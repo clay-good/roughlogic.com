@@ -2165,9 +2165,9 @@ export const finalGradeNeededExample = { inputs: { current_pct: 88, final_weight
 
 function renderFinalGradeNeeded(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Standard weighted-average arithmetic (the common syllabus weighted-category convention); the instructor's gradebook governs. Pure public algebra.";
-  const current = makeNumber("Current grade (%)", "fgn-cur", { step: "any", value: "88" }); current.input.value = "88";
-  const fw = makeNumber("Final exam weight (%)", "fgn-fw", { step: "any", min: "0", max: "100", value: "25" }); fw.input.value = "25";
-  const target = makeNumber("Target grade (%)", "fgn-target", { step: "any", value: "90" }); target.input.value = "90";
+  const current = makeNumber("Current grade (%)", "fgn-cur", { step: "any" });
+  const fw = makeNumber("Final exam weight (%)", "fgn-fw", { step: "any", min: "0", max: "100" });
+  const target = makeNumber("Target grade (%)", "fgn-target", { step: "any" });
   for (const f of [current, fw, target]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { current.input.value = "88"; fw.input.value = "25"; target.input.value = "90"; update(); });
   const oNeeded = makeOutputLine(outputRegion, "Needed final score", "fgn-out-needed");
@@ -2272,12 +2272,12 @@ export const twoSampleTTestExample = { inputs: { mean1: 82, sd1: 6, n1: 25, mean
 
 function renderTwoSampleTTest(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per OpenIntro Statistics Chapter 7 (inference for numerical data, Welch's t) and the Welch-Satterthwaite df, by name; the t-CDF reuses the bundled special-function helper. Free at openintro.org.";
-  const m1 = makeNumber("Group 1 mean", "tt-m1", { step: "any", value: "82" }); m1.input.value = "82";
-  const s1 = makeNumber("Group 1 SD", "tt-s1", { step: "any", min: "0", value: "6" }); s1.input.value = "6";
-  const n1 = makeNumber("Group 1 n", "tt-n1", { step: "1", min: "2", value: "25" }); n1.input.value = "25";
-  const m2 = makeNumber("Group 2 mean", "tt-m2", { step: "any", value: "78" }); m2.input.value = "78";
-  const s2 = makeNumber("Group 2 SD", "tt-s2", { step: "any", min: "0", value: "7" }); s2.input.value = "7";
-  const n2 = makeNumber("Group 2 n", "tt-n2", { step: "1", min: "2", value: "22" }); n2.input.value = "22";
+  const m1 = makeNumber("Group 1 mean", "tt-m1", { step: "any" });
+  const s1 = makeNumber("Group 1 SD", "tt-s1", { step: "any", min: "0" });
+  const n1 = makeNumber("Group 1 n", "tt-n1", { step: "1", min: "2" });
+  const m2 = makeNumber("Group 2 mean", "tt-m2", { step: "any" });
+  const s2 = makeNumber("Group 2 SD", "tt-s2", { step: "any", min: "0" });
+  const n2 = makeNumber("Group 2 n", "tt-n2", { step: "1", min: "2" });
   const tail = makeSelect("Tail", "tt-tail", [{ value: "two", label: "Two-sided", selected: true }, { value: "one", label: "One-sided" }]);
   for (const f of [m1, s1, n1, m2, s2, n2, tail]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { m1.input.value = "82"; s1.input.value = "6"; n1.input.value = "25"; m2.input.value = "78"; s2.input.value = "7"; n2.input.value = "22"; tail.select.value = "two"; update(); });
@@ -2325,9 +2325,9 @@ export const pairedTTestExample = { inputs: { mean_diff: 2.5, sd_diff: 3.0, n_pa
 
 function renderPairedTTest(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per OpenIntro Statistics Chapter 7 (inference for paired data) - the paired t-test is a one-sample t on the differences, t = d_bar/(s_d/sqrt(n)) on n-1 df, by name; the t-CDF reuses the bundled special-function helper. Free at openintro.org.";
-  const md = makeNumber("Mean of the differences d_bar", "ptt-md", { step: "any", value: "2.5" }); md.input.value = "2.5";
-  const sd = makeNumber("SD of the differences s_d", "ptt-sd", { step: "any", min: "0", value: "3" }); sd.input.value = "3";
-  const n = makeNumber("Number of pairs n", "ptt-n", { step: "1", min: "2", value: "20" }); n.input.value = "20";
+  const md = makeNumber("Mean of the differences d_bar", "ptt-md", { step: "any" });
+  const sd = makeNumber("SD of the differences s_d", "ptt-sd", { step: "any", min: "0" });
+  const n = makeNumber("Number of pairs n", "ptt-n", { step: "1", min: "2" });
   const tail = makeSelect("Tail", "ptt-tail", [{ value: "two", label: "Two-sided", selected: true }, { value: "one", label: "One-sided" }]);
   for (const f of [md, sd, n, tail]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { md.input.value = "2.5"; sd.input.value = "3"; n.input.value = "20"; tail.select.value = "two"; update(); });
@@ -2376,10 +2376,10 @@ export const oneSampleTTestExample = { inputs: { sample_mean: 16.1, sample_sd: 0
 
 function renderOneSampleTTest(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per OpenIntro Statistics Chapter 7 (inference for a single mean) - the one-sample t-test, t = (x_bar - mu0)/(s/sqrt(n)) on n-1 df, by name; the t-CDF reuses the bundled special-function helper. Free at openintro.org.";
-  const xb = makeNumber("Sample mean x_bar", "ostt-xb", { step: "any", value: "16.1" }); xb.input.value = "16.1";
-  const sd = makeNumber("Sample SD s", "ostt-sd", { step: "any", min: "0", value: "0.3" }); sd.input.value = "0.3";
-  const n = makeNumber("Sample size n", "ostt-n", { step: "1", min: "2", value: "25" }); n.input.value = "25";
-  const mu0 = makeNumber("Hypothesized / target mean mu0", "ostt-mu", { step: "any", value: "16.0" }); mu0.input.value = "16.0";
+  const xb = makeNumber("Sample mean x_bar", "ostt-xb", { step: "any" });
+  const sd = makeNumber("Sample SD s", "ostt-sd", { step: "any", min: "0" });
+  const n = makeNumber("Sample size n", "ostt-n", { step: "1", min: "2" });
+  const mu0 = makeNumber("Hypothesized / target mean mu0", "ostt-mu", { step: "any" });
   const tail = makeSelect("Tail", "ostt-tail", [{ value: "two", label: "Two-sided", selected: true }, { value: "one", label: "One-sided" }]);
   for (const f of [xb, sd, n, mu0, tail]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { xb.input.value = "16.1"; sd.input.value = "0.3"; n.input.value = "25"; mu0.input.value = "16.0"; tail.select.value = "two"; update(); });
@@ -2646,10 +2646,10 @@ export function computeTwoProportionZTest({ x1 = 0, n1 = 0, x2 = 0, n2 = 0, tail
 export const twoProportionZTestExample = { inputs: { x1: 45, n1: 100, x2: 30, n2: 100, tail: "two", alpha: 0.05 } };
 function renderTwoProportionZTest(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: pooled two-proportion z-test per OpenIntro Statistics Chapter 6 (inference for two proportions), by name: p_pool = (x1+x2)/(n1+n2), z = (p1-p2)/sqrt(p_pool(1-p_pool)(1/n1+1/n2)); p from the standard-normal CDF; the difference CI uses the unpooled SE. Verified against statsmodels proportions_ztest. Free at openintro.org.";
-  const x1 = makeNumber("Group 1 successes x1", "tp-x1", { step: "1", min: "0", value: "45" }); x1.input.value = "45";
-  const n1 = makeNumber("Group 1 total n1", "tp-n1", { step: "1", min: "1", value: "100" }); n1.input.value = "100";
-  const x2 = makeNumber("Group 2 successes x2", "tp-x2", { step: "1", min: "0", value: "30" }); x2.input.value = "30";
-  const n2 = makeNumber("Group 2 total n2", "tp-n2", { step: "1", min: "1", value: "100" }); n2.input.value = "100";
+  const x1 = makeNumber("Group 1 successes x1", "tp-x1", { step: "1", min: "0" });
+  const n1 = makeNumber("Group 1 total n1", "tp-n1", { step: "1", min: "1" });
+  const x2 = makeNumber("Group 2 successes x2", "tp-x2", { step: "1", min: "0" });
+  const n2 = makeNumber("Group 2 total n2", "tp-n2", { step: "1", min: "1" });
   const tail = makeSelect("Tail", "tp-tail", [{ value: "two", label: "Two-sided", selected: true }, { value: "one", label: "One-sided" }]);
   for (const f of [x1, n1, x2, n2, tail]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { x1.input.value = "45"; n1.input.value = "100"; x2.input.value = "30"; n2.input.value = "100"; tail.select.value = "two"; update(); });

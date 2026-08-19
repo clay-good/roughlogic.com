@@ -914,14 +914,10 @@ export function computeRockConstructionEntrance({ length_ft = 50, width_ft = 14,
 
 function _v830renderRockConstructionEntrance(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: pad take-off identity by name. volume (cy) = length x width x depth/12 / 27; tons = length x width x depth/12 x placed unit weight / 2000. The general permit / AHJ sets the pad dimensions.";
-  const l = makeNumber("Entrance length (ft)", "rce-l", { step: "any", min: "0", value: "50" });
-  l.input.value = "50";
-  const w = makeNumber("Entrance width (ft)", "rce-w", { step: "any", min: "0", value: "14" });
-  w.input.value = "14";
-  const d = makeNumber("Stone depth (in)", "rce-d", { step: "any", min: "0", value: "6" });
-  d.input.value = "6";
-  const uw = makeNumber("Placed stone unit weight (pcf)", "rce-uw", { step: "any", min: "0", value: "100" });
-  uw.input.value = "100";
+  const l = makeNumber("Entrance length (ft)", "rce-l", { step: "any", min: "0" });
+  const w = makeNumber("Entrance width (ft)", "rce-w", { step: "any", min: "0" });
+  const d = makeNumber("Stone depth (in)", "rce-d", { step: "any", min: "0" });
+  const uw = makeNumber("Placed stone unit weight (pcf)", "rce-uw", { step: "any", min: "0" });
   for (const f of [l, w, d, uw]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { l.input.value = "50"; w.input.value = "14"; d.input.value = "6"; uw.input.value = "100"; update(); });
   const oTons = makeOutputLine(outputRegion, "Stone to order", "rce-out-tons");
@@ -972,16 +968,11 @@ export function computePipeFlotation({ pipe_od_in = 48, pipe_weight_plf = 200, b
 
 function _v831renderPipeFlotation(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Archimedes flotation identity by name. uplift (lb/ft) = water unit weight x pi/4 x OD^2; FS = resisting weight / uplift. Submerged backfill counts only its buoyant weight; the design engineer governs.";
-  const od = makeNumber("Pipe outside diameter (in)", "pf-od", { step: "any", min: "0", value: "48" });
-  od.input.value = "48";
-  const pw = makeNumber("Empty pipe weight (lb/ft)", "pf-pw", { step: "any", min: "0", value: "200" });
-  pw.input.value = "200";
-  const bw = makeNumber("Resisting backfill weight (lb/ft)", "pf-bw", { step: "any", min: "0", value: "900" });
-  bw.input.value = "900";
-  const tf = makeNumber("Target factor of safety", "pf-tf", { step: "any", min: "0", value: "1.5" });
-  tf.input.value = "1.5";
-  const uw = makeNumber("Water unit weight (pcf)", "pf-uw", { step: "any", min: "0", value: "62.4" });
-  uw.input.value = "62.4";
+  const od = makeNumber("Pipe outside diameter (in)", "pf-od", { step: "any", min: "0" });
+  const pw = makeNumber("Empty pipe weight (lb/ft)", "pf-pw", { step: "any", min: "0" });
+  const bw = makeNumber("Resisting backfill weight (lb/ft)", "pf-bw", { step: "any", min: "0" });
+  const tf = makeNumber("Target factor of safety", "pf-tf", { step: "any", min: "0" });
+  const uw = makeNumber("Water unit weight (pcf)", "pf-uw", { step: "any", min: "0" });
   for (const f of [od, pw, bw, tf, uw]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { od.input.value = "48"; pw.input.value = "200"; bw.input.value = "900"; tf.input.value = "1.5"; uw.input.value = "62.4"; update(); });
   const oFs = makeOutputLine(outputRegion, "Factor of safety", "pf-out-fs");
@@ -1030,14 +1021,10 @@ export function computeRestrainedPipeLength({ pipe_od_in = 12, pressure_psi = 15
 
 function _v832renderRestrainedPipeLength(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: thrust / restrained-length identity by name. thrust (lb) = 2 x pressure x area x sin(bend/2); length each side (ft) = thrust / unit resistance. The unit resistance comes from the restraint manufacturer's tables (EBAA / AWWA M41).";
-  const od = makeNumber("Pipe outside diameter (in)", "rpl-od", { step: "any", min: "0", value: "12" });
-  od.input.value = "12";
-  const p = makeNumber("Design (test) pressure (psi)", "rpl-p", { step: "any", min: "0", value: "150" });
-  p.input.value = "150";
-  const ba = makeNumber("Horizontal bend angle (deg)", "rpl-ba", { step: "any", min: "0", value: "90" });
-  ba.input.value = "90";
-  const ur = makeNumber("Soil resistance per foot (lb/ft)", "rpl-ur", { step: "any", min: "0", value: "600" });
-  ur.input.value = "600";
+  const od = makeNumber("Pipe outside diameter (in)", "rpl-od", { step: "any", min: "0" });
+  const p = makeNumber("Design (test) pressure (psi)", "rpl-p", { step: "any", min: "0" });
+  const ba = makeNumber("Horizontal bend angle (deg)", "rpl-ba", { step: "any", min: "0" });
+  const ur = makeNumber("Soil resistance per foot (lb/ft)", "rpl-ur", { step: "any", min: "0" });
   for (const f of [od, p, ba, ur]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { od.input.value = "12"; p.input.value = "150"; ba.input.value = "90"; ur.input.value = "600"; update(); });
   const oLen = makeOutputLine(outputRegion, "Restrained length each side", "rpl-out-len");
@@ -1083,18 +1070,12 @@ export function computeHddPullback({ eff_weight_plf = 5, length_ft = 800, fricti
 
 function _v833renderHddPullback(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: simplified pullback identity by name (ASTM F1962 basis). pullback (lb) = friction x effective weight x length x bend factor + fluid drag. A first-order estimate; the drilling contractor and rig thrust govern.";
-  const ew = makeNumber("Effective pipe weight in fluid (lb/ft)", "hdd-ew", { step: "any", min: "0", value: "5" });
-  ew.input.value = "5";
-  const ln = makeNumber("Bore / pull length (ft)", "hdd-ln", { step: "any", min: "0", value: "800" });
-  ln.input.value = "800";
-  const fc = makeNumber("Friction coefficient", "hdd-fc", { step: "any", min: "0", value: "0.3" });
-  fc.input.value = "0.3";
-  const bf = makeNumber("Pull-path bend factor", "hdd-bf", { step: "any", min: "0", value: "1.5" });
-  bf.input.value = "1.5";
-  const fd = makeNumber("Hydrokinetic drag allowance (lb)", "hdd-fd", { step: "any", min: "0", value: "0" });
-  fd.input.value = "0";
-  const sp = makeNumber("Pipe safe pull strength (lb, 0 = skip)", "hdd-sp", { step: "any", min: "0", value: "20000" });
-  sp.input.value = "20000";
+  const ew = makeNumber("Effective pipe weight in fluid (lb/ft)", "hdd-ew", { step: "any", min: "0" });
+  const ln = makeNumber("Bore / pull length (ft)", "hdd-ln", { step: "any", min: "0" });
+  const fc = makeNumber("Friction coefficient", "hdd-fc", { step: "any", min: "0" });
+  const bf = makeNumber("Pull-path bend factor", "hdd-bf", { step: "any", min: "0" });
+  const fd = makeNumber("Hydrokinetic drag allowance (lb)", "hdd-fd", { step: "any", min: "0" });
+  const sp = makeNumber("Pipe safe pull strength (lb, 0 = skip)", "hdd-sp", { step: "any", min: "0" });
   for (const f of [ew, ln, fc, bf, fd, sp]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ew.input.value = "5"; ln.input.value = "800"; fc.input.value = "0.3"; bf.input.value = "1.5"; fd.input.value = "0"; sp.input.value = "20000"; update(); });
   const oPull = makeOutputLine(outputRegion, "Estimated pullback force", "hdd-out-pull");
@@ -1146,16 +1127,11 @@ export function computeDustControlWater({ length_ft = 2000, width_ft = 20, rate_
 
 function _v836renderDustControlWater(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: watering identity by name. gallons per application = area (sy) x rate (gal/sy); area = length x width / 9; trips = ceil(gallons / truck capacity). The rate and frequency come from the site's fugitive-dust plan and AHJ air permit.";
-  const l = makeNumber("Watered length (ft)", "dcw-l", { step: "any", min: "0", value: "2000" });
-  l.input.value = "2000";
-  const w = makeNumber("Watered width (ft)", "dcw-w", { step: "any", min: "0", value: "20" });
-  w.input.value = "20";
-  const rt = makeNumber("Application rate (gal/sy)", "dcw-rt", { step: "any", min: "0", value: "0.5" });
-  rt.input.value = "0.5";
-  const tc = makeNumber("Water truck capacity (gal)", "dcw-tc", { step: "any", min: "0", value: "4000" });
-  tc.input.value = "4000";
-  const ap = makeNumber("Passes per day (count)", "dcw-ap", { step: "any", min: "0", value: "6" });
-  ap.input.value = "6";
+  const l = makeNumber("Watered length (ft)", "dcw-l", { step: "any", min: "0" });
+  const w = makeNumber("Watered width (ft)", "dcw-w", { step: "any", min: "0" });
+  const rt = makeNumber("Application rate (gal/sy)", "dcw-rt", { step: "any", min: "0" });
+  const tc = makeNumber("Water truck capacity (gal)", "dcw-tc", { step: "any", min: "0" });
+  const ap = makeNumber("Passes per day (count)", "dcw-ap", { step: "any", min: "0" });
   for (const f of [l, w, rt, tc, ap]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { l.input.value = "2000"; w.input.value = "20"; rt.input.value = "0.5"; tc.input.value = "4000"; ap.input.value = "6"; update(); });
   const oApp = makeOutputLine(outputRegion, "Gallons per application", "dcw-out-app");
@@ -1199,12 +1175,9 @@ export function computeHaulRoadResistance({ gvw_lb = 150000, grade_pct = 5, roll
 
 function _v844renderHaulRoadResistance(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: resistance identity by name. total resistance (%) = grade + rolling resistance; required rimpull = total resistance x GVW; 20 lb/ton per 1%. The manufacturer's rimpull-speed curve gives the available rimpull in gear.";
-  const g = makeNumber("Gross vehicle weight, loaded (lb)", "hrr-g", { step: "any", min: "0", value: "150000" });
-  g.input.value = "150000";
-  const gr = makeNumber("Road grade (%, negative downhill)", "hrr-gr", { step: "any", value: "5" });
-  gr.input.value = "5";
-  const rr = makeNumber("Rolling resistance (%)", "hrr-rr", { step: "any", value: "4" });
-  rr.input.value = "4";
+  const g = makeNumber("Gross vehicle weight, loaded (lb)", "hrr-g", { step: "any", min: "0" });
+  const gr = makeNumber("Road grade (%, negative downhill)", "hrr-gr", { step: "any" });
+  const rr = makeNumber("Rolling resistance (%)", "hrr-rr", { step: "any" });
   for (const f of [g, gr, rr]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { g.input.value = "150000"; gr.input.value = "5"; rr.input.value = "4"; update(); });
   const oRimpull = makeOutputLine(outputRegion, "Required rimpull", "hrr-out-rimpull");
@@ -1252,14 +1225,10 @@ export function computeDumpTruckLoads({ total_lcy = 625, box_vol_cy = 12, weight
 
 function _v845renderDumpTruckLoads(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: governing-payload identity by name. weight-limited volume = weight limit / density; payload = min(weight-limited, box); loads = ceil(total / payload). The box capacity comes from the truck; the legal payload comes from the axle and GVW limits.";
-  const t = makeNumber("Total loose volume to haul (cy)", "dtl-t", { step: "any", min: "0", value: "625" });
-  t.input.value = "625";
-  const b = makeNumber("Heaped box capacity (cy)", "dtl-b", { step: "any", min: "0", value: "12" });
-  b.input.value = "12";
-  const wl = makeNumber("Legal payload weight limit (lb)", "dtl-wl", { step: "any", min: "0", value: "40000" });
-  wl.input.value = "40000";
-  const d = makeNumber("Loose material density (lb/cy)", "dtl-d", { step: "any", min: "0", value: "2800" });
-  d.input.value = "2800";
+  const t = makeNumber("Total loose volume to haul (cy)", "dtl-t", { step: "any", min: "0" });
+  const b = makeNumber("Heaped box capacity (cy)", "dtl-b", { step: "any", min: "0" });
+  const wl = makeNumber("Legal payload weight limit (lb)", "dtl-wl", { step: "any", min: "0" });
+  const d = makeNumber("Loose material density (lb/cy)", "dtl-d", { step: "any", min: "0" });
   for (const f of [t, b, wl, d]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { t.input.value = "625"; b.input.value = "12"; wl.input.value = "40000"; d.input.value = "2800"; update(); });
   const oLoads = makeOutputLine(outputRegion, "Truck loads", "dtl-out-loads");
@@ -1306,16 +1275,11 @@ export function computeUnitCostEarthwork({ equipment_rate_per_hr = 150, operator
 
 function _v846renderUnitCostEarthwork(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: unit-cost identity by name. unit cost ($/cy) = (equipment + operator + support hourly rates) / production per hour. The equipment rate is the ownership-plus-operating rate; the production comes from the production tiles.";
-  const eq = makeNumber("Equipment ownership + operating rate ($/hr)", "uce-eq", { step: "any", min: "0", value: "150" });
-  eq.input.value = "150";
-  const op = makeNumber("Operator wage + burden ($/hr)", "uce-op", { step: "any", min: "0", value: "65" });
-  op.input.value = "65";
-  const su = makeNumber("Support equipment / labor ($/hr)", "uce-su", { step: "any", min: "0", value: "0" });
-  su.input.value = "0";
-  const pr = makeNumber("Production rate (cy/hr)", "uce-pr", { step: "any", min: "0", value: "656" });
-  pr.input.value = "656";
-  const tc = makeNumber("Total quantity (cy, 0 = skip)", "uce-tc", { step: "any", min: "0", value: "0" });
-  tc.input.value = "0";
+  const eq = makeNumber("Equipment ownership + operating rate ($/hr)", "uce-eq", { step: "any", min: "0" });
+  const op = makeNumber("Operator wage + burden ($/hr)", "uce-op", { step: "any", min: "0" });
+  const su = makeNumber("Support equipment / labor ($/hr)", "uce-su", { step: "any", min: "0" });
+  const pr = makeNumber("Production rate (cy/hr)", "uce-pr", { step: "any", min: "0" });
+  const tc = makeNumber("Total quantity (cy, 0 = skip)", "uce-tc", { step: "any", min: "0" });
   for (const f of [eq, op, su, pr, tc]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { eq.input.value = "150"; op.input.value = "65"; su.input.value = "0"; pr.input.value = "656"; tc.input.value = "0"; update(); });
   const oUnit = makeOutputLine(outputRegion, "Unit cost", "uce-out-unit");
@@ -1359,14 +1323,10 @@ export function computeSoilStabilizationQuantity({ application_pct = 6, soil_den
 
 function _v847renderSoilStabilizationQuantity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: stabilizer-quantity identity by name. spread (lb/sy) = percent/100 x density x depth/12 x 9; tons = spread x area / 2000. The application percent is by dry soil weight from the geotech's mix design.";
-  const ap = makeNumber("Stabilizer content by dry soil weight (%)", "ssq-ap", { step: "any", min: "0", value: "6" });
-  ap.input.value = "6";
-  const d = makeNumber("Soil dry density (pcf)", "ssq-d", { step: "any", min: "0", value: "110" });
-  d.input.value = "110";
-  const dp = makeNumber("Treatment depth (in)", "ssq-dp", { step: "any", min: "0", value: "8" });
-  dp.input.value = "8";
-  const a = makeNumber("Treated area (sy)", "ssq-a", { step: "any", min: "0", value: "10000" });
-  a.input.value = "10000";
+  const ap = makeNumber("Stabilizer content by dry soil weight (%)", "ssq-ap", { step: "any", min: "0" });
+  const d = makeNumber("Soil dry density (pcf)", "ssq-d", { step: "any", min: "0" });
+  const dp = makeNumber("Treatment depth (in)", "ssq-dp", { step: "any", min: "0" });
+  const a = makeNumber("Treated area (sy)", "ssq-a", { step: "any", min: "0" });
   for (const f of [ap, d, dp, a]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ap.input.value = "6"; d.input.value = "110"; dp.input.value = "8"; a.input.value = "10000"; update(); });
   const oTons = makeOutputLine(outputRegion, "Stabilizer to order", "ssq-out-tons");
@@ -1415,20 +1375,13 @@ export function computeFlexiblePipeDeflection({ cover_ft = 12, soil_density_pcf 
 
 function _v848renderFlexiblePipeDeflection(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Modified Iowa (Spangler) deflection identity by name. deflection % = DL x K x Wc / (0.149 x PS + 0.061 x E') x 100, where Wc = cover x density / 144. E' (soil support) is the field-controllable variable; the pipe manufacturer and engineer govern the limit.";
-  const c = makeNumber("Soil cover over the pipe (ft)", "fpd-c", { step: "any", min: "0", value: "12" });
-  c.input.value = "12";
-  const d = makeNumber("Backfill density (pcf)", "fpd-d", { step: "any", min: "0", value: "120" });
-  d.input.value = "120";
-  const dl = makeNumber("Deflection lag factor DL", "fpd-dl", { step: "any", min: "0", value: "1.5" });
-  dl.input.value = "1.5";
-  const k = makeNumber("Bedding constant K", "fpd-k", { step: "any", min: "0", value: "0.1" });
-  k.input.value = "0.1";
-  const ps = makeNumber("Pipe stiffness PS (psi)", "fpd-ps", { step: "any", min: "0", value: "46" });
-  ps.input.value = "46";
-  const em = makeNumber("Modulus of soil reaction E' (psi)", "fpd-em", { step: "any", min: "0", value: "1000" });
-  em.input.value = "1000";
-  const al = makeNumber("Allowable deflection (%)", "fpd-al", { step: "any", min: "0", value: "5" });
-  al.input.value = "5";
+  const c = makeNumber("Soil cover over the pipe (ft)", "fpd-c", { step: "any", min: "0" });
+  const d = makeNumber("Backfill density (pcf)", "fpd-d", { step: "any", min: "0" });
+  const dl = makeNumber("Deflection lag factor DL", "fpd-dl", { step: "any", min: "0" });
+  const k = makeNumber("Bedding constant K", "fpd-k", { step: "any", min: "0" });
+  const ps = makeNumber("Pipe stiffness PS (psi)", "fpd-ps", { step: "any", min: "0" });
+  const em = makeNumber("Modulus of soil reaction E' (psi)", "fpd-em", { step: "any", min: "0" });
+  const al = makeNumber("Allowable deflection (%)", "fpd-al", { step: "any", min: "0" });
   for (const f of [c, d, dl, k, ps, em, al]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { c.input.value = "12"; d.input.value = "120"; dl.input.value = "1.5"; k.input.value = "0.1"; ps.input.value = "46"; em.input.value = "1000"; al.input.value = "5"; update(); });
   const oDefl = makeOutputLine(outputRegion, "Predicted deflection", "fpd-out-defl");
@@ -1839,14 +1792,14 @@ function _v1260renderSoilPermeability(inputRegion, outputRegion, citationEl) {
     { value: "constant-head", label: "Constant head (ASTM D2434, coarse soils)", selected: true },
     { value: "falling-head", label: "Falling head (ASTM D5084, fine soils)" },
   ]);
-  const l = makeNumber("Sample length L (cm)", "sp-l", { step: "any", min: "0", value: "12" }); l.input.value = "12";
-  const a = makeNumber("Sample area A (cm2)", "sp-a", { step: "any", min: "0", value: "78.5" }); a.input.value = "78.5";
-  const t = makeNumber("Elapsed time t (s)", "sp-t", { step: "any", min: "0", value: "60" }); t.input.value = "60";
-  const q = makeNumber("[Constant head] Volume collected Q (cm3)", "sp-q", { step: "any", min: "0", value: "250" }); q.input.value = "250";
-  const h = makeNumber("[Constant head] Constant head h (cm)", "sp-h", { step: "any", min: "0", value: "30" }); h.input.value = "30";
-  const ap = makeNumber("[Falling head] Standpipe area a (cm2)", "sp-ap", { step: "any", min: "0", value: "1.0" }); ap.input.value = "1.0";
-  const h1 = makeNumber("[Falling head] Head start h1 (cm)", "sp-h1", { step: "any", min: "0", value: "100" }); h1.input.value = "100";
-  const h2 = makeNumber("[Falling head] Head end h2 (cm)", "sp-h2", { step: "any", min: "0", value: "90" }); h2.input.value = "90";
+  const l = makeNumber("Sample length L (cm)", "sp-l", { step: "any", min: "0" });
+  const a = makeNumber("Sample area A (cm2)", "sp-a", { step: "any", min: "0" });
+  const t = makeNumber("Elapsed time t (s)", "sp-t", { step: "any", min: "0" });
+  const q = makeNumber("[Constant head] Volume collected Q (cm3)", "sp-q", { step: "any", min: "0" });
+  const h = makeNumber("[Constant head] Constant head h (cm)", "sp-h", { step: "any", min: "0" });
+  const ap = makeNumber("[Falling head] Standpipe area a (cm2)", "sp-ap", { step: "any", min: "0" });
+  const h1 = makeNumber("[Falling head] Head start h1 (cm)", "sp-h1", { step: "any", min: "0" });
+  const h2 = makeNumber("[Falling head] Head end h2 (cm)", "sp-h2", { step: "any", min: "0" });
   for (const f of [method, l, a, t, q, h, ap, h1, h2]) inputRegion.appendChild(f.wrap);
   const oK = makeOutputLine(outputRegion, "Hydraulic conductivity k", "sp-out-k");
   const oKf = makeOutputLine(outputRegion, "k (ft/day)", "sp-out-kf");

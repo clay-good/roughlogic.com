@@ -97,10 +97,8 @@ export function computeMotorPoleIdentification({ rated_rpm = 0, line_freq_hz = 6
 export const motorPoleIdentificationExample = { inputs: { rated_rpm: 1750, line_freq_hz: 60 } };
 function renderMotorPoleIdentification(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: first-principles AC-machine relation Ns = 120 x f / P inverted to identify the poles - pole-pairs = round(60 x f / rpm), poles = 2 x pole-pairs, then Ns = 120 x f / poles and slip = (Ns - rpm)/Ns. The motor nameplate and the manufacturer govern the rated full-load speed.";
-  const rpm = makeNumber("Nameplate full-load speed (rpm)", "mpi-rpm", { step: "any", min: "0", value: "1750" });
-  rpm.input.value = "1750";
-  const freq = makeNumber("Line frequency (Hz)", "mpi-freq", { step: "any", min: "0", value: "60" });
-  freq.input.value = "60";
+  const rpm = makeNumber("Nameplate full-load speed (rpm)", "mpi-rpm", { step: "any", min: "0" });
+  const freq = makeNumber("Line frequency (Hz)", "mpi-freq", { step: "any", min: "0" });
   for (const f of [rpm, freq]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { rpm.input.value = "1750"; freq.input.value = "60"; update(); });
   const oPoles = makeOutputLine(outputRegion, "Poles / synchronous speed", "mpi-out-poles");
@@ -389,9 +387,9 @@ export function computeMotorLockedRotorKva({ horsepower = 0, code_letter = "G", 
 export const motorLockedRotorKvaExample = { inputs: { horsepower: 25, code_letter: "G", voltage_v: 460, phase: 3 } };
 function renderMotorLockedRotorKva(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 2023 Table 430.7(B) locked-rotor indicating code letters: the letter gives the locked-rotor kVA/hp band (upper end used here); locked_rotor_kva = hp x kVA/hp; LRA = kVA x 1000 / (sqrt(3) x V) three-phase. The code letter is not the design letter. A design aid; the nameplate and measured inrush govern.";
-  const hp = makeNumber("Motor horsepower (hp)", "mlr-hp", { step: "any", min: "0" }); hp.input.value = "25";
+  const hp = makeNumber("Motor horsepower (hp)", "mlr-hp", { step: "any", min: "0" });
   const code = makeSelect("Code letter (NEC 430.7(B))", "mlr-code", Object.keys(_NEC_430_7B_KVA_PER_HP).map((k) => ({ value: k, label: k + " (" + _NEC_430_7B_KVA_PER_HP[k] + " kVA/hp)", selected: k === "G" })));
-  const v = makeNumber("Voltage (V)", "mlr-v", { step: "any", min: "0" }); v.input.value = "460";
+  const v = makeNumber("Voltage (V)", "mlr-v", { step: "any", min: "0" });
   const ph = makeSelect("Phase", "mlr-ph", [
     { value: "3", label: "Three-phase", selected: true },
     { value: "1", label: "Single-phase" },
@@ -438,9 +436,9 @@ export function computeMotorMaxHpForStartingCurrent({ max_starting_current_a = 0
 export const motorMaxHpForStartingCurrentExample = { inputs: { max_starting_current_a: 300, code_letter: "G", voltage_v: 460, phase: 3 } };
 function _v722renderMotorMaxHpForStartingCurrent(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 2023 Table 430.7(B) locked-rotor code letters solved for the horsepower: max hp = starting-current budget / (kVA/hp x 1000 / (sqrt(3) x V)) three-phase. The code letter is the starting-kVA letter, not the design letter. A design aid; the nameplate and measured inrush govern.";
-  const lra = makeNumber("Max starting current budget (A)", "mmh-lra", { step: "any", min: "0" }); lra.input.value = "300";
+  const lra = makeNumber("Max starting current budget (A)", "mmh-lra", { step: "any", min: "0" });
   const code = makeSelect("Code letter (NEC 430.7(B))", "mmh-code", Object.keys(_NEC_430_7B_KVA_PER_HP).map((k) => ({ value: k, label: k + " (" + _NEC_430_7B_KVA_PER_HP[k] + " kVA/hp)", selected: k === "G" })));
-  const v = makeNumber("Voltage (V)", "mmh-v", { step: "any", min: "0" }); v.input.value = "460";
+  const v = makeNumber("Voltage (V)", "mmh-v", { step: "any", min: "0" });
   const ph = makeSelect("Phase", "mmh-ph", [
     { value: "3", label: "Three-phase", selected: true },
     { value: "1", label: "Single-phase" },
@@ -485,9 +483,9 @@ export function computeMotorFaultContribution({ motor_fla_a = 0, x_subtransient_
 export const motorFaultContributionExample = { inputs: { motor_fla_a: 500, x_subtransient_pu: 0.167, utility_fault_a: 22000 } };
 function renderMotorFaultContribution(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: first-cycle motor short-circuit contribution (IEEE C37.13 / IEEE 141): contribution = summed motor FLA / subtransient reactance (~4-6x FLA), total = utility fault + contribution. A first-cycle effect for the momentary and interrupting duty; grouped small motors often lumped at 4x FLA per IEEE C37.13. A design aid; a full short-circuit study governs.";
-  const fla = makeNumber("Summed motor full-load current (A)", "mfc-fla", { step: "any", min: "0" }); fla.input.value = "500";
-  const xd = makeNumber("Subtransient reactance (per unit, 0.167 = 16.7%)", "mfc-xd", { step: "any", min: "0", max: "1" }); xd.input.value = "0.167";
-  const util = makeNumber("Utility / transformer fault current (A)", "mfc-util", { step: "any", min: "0" }); util.input.value = "22000";
+  const fla = makeNumber("Summed motor full-load current (A)", "mfc-fla", { step: "any", min: "0" });
+  const xd = makeNumber("Subtransient reactance (per unit, 0.167 = 16.7%)", "mfc-xd", { step: "any", min: "0", max: "1" });
+  const util = makeNumber("Utility / transformer fault current (A)", "mfc-util", { step: "any", min: "0" });
   for (const f of [fla, xd, util]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { fla.input.value = "500"; xd.input.value = "0.167"; util.input.value = "22000"; update(); });
   const oC = makeOutputLine(outputRegion, "Motor contribution (first cycle)", "mfc-out-c");
@@ -542,14 +540,14 @@ export function computeReducedVoltageStarter({ across_line_lra_a = 0, across_lin
 export const reducedVoltageStarterExample = { inputs: { across_line_lra_a: 600, across_line_lrt_pct: 100, starter_type: "autotransformer", tap_fraction: 0.65 } };
 function renderReducedVoltageStarter(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: reduced-voltage-starter current and torque (NEMA ICS 2; torque ~ voltage^2): autotransformer motor = tap x LRA, line = tap^2 x LRA, torque = tap^2 x LRT; wye-delta = 0.333x on current and torque; solid-state/reactor = tap x LRA on both with tap^2 x LRT. An autotransformer's line current is the tap squared. A design aid; the motor speed-torque curve and the load govern.";
-  const lra = makeNumber("Across-the-line LRA (A)", "rvs-lra", { step: "any", min: "0" }); lra.input.value = "600";
-  const lrt = makeNumber("Across-the-line torque basis (%)", "rvs-lrt", { step: "any", min: "0" }); lrt.input.value = "100";
+  const lra = makeNumber("Across-the-line LRA (A)", "rvs-lra", { step: "any", min: "0" });
+  const lrt = makeNumber("Across-the-line torque basis (%)", "rvs-lrt", { step: "any", min: "0" });
   const type = makeSelect("Starter type", "rvs-type", [
     { value: "autotransformer", label: "Autotransformer (line = tap²)", selected: true },
     { value: "wye-delta", label: "Wye-delta (fixed 1/3)" },
     { value: "solid-state", label: "Solid-state / reactor (line = tap)" },
   ]);
-  const tap = makeNumber("Tap / voltage fraction (e.g. 0.65)", "rvs-tap", { step: "any", min: "0", max: "1" }); tap.input.value = "0.65";
+  const tap = makeNumber("Tap / voltage fraction (e.g. 0.65)", "rvs-tap", { step: "any", min: "0", max: "1" });
   for (const f of [lra, lrt, type, tap]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { lra.input.value = "600"; lrt.input.value = "100"; type.select.value = "autotransformer"; tap.input.value = "0.65"; update(); });
   const oM = makeOutputLine(outputRegion, "Motor current", "rvs-out-m");
@@ -600,10 +598,10 @@ export const vfdReflectedWaveExample = { inputs: { rise_time_us: 0.1, velocity_p
 
 function renderVfdReflectedWave(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: VFD reflected-wave cable-length limit (NEMA MG-1 Part 31; transmission-line reflection): cable_velocity = 0.01 x velocity_pct x 984; L_crit = rise_time x cable_velocity / 2; V_bus = sqrt(2) x V_LL; V_peak = 2 V_bus past L_crit; limits 3.1 x V_LL (inverter-duty) and ~1000 V (general-purpose). The limit is the drive rise time, not the horsepower. The fix is a dV/dt filter or an inverter-duty motor. The drive and motor data govern.";
-  const rt = makeNumber("Drive rise time (us)", "rw-rt", { step: "any", min: "0", value: "0.1" }); rt.input.value = "0.1";
-  const vp = makeNumber("Cable velocity (% of light)", "rw-vp", { step: "any", min: "0", value: "50" }); vp.input.value = "50";
-  const Vll = makeNumber("System voltage V_LL (V)", "rw-v", { step: "any", min: "0", value: "480" }); Vll.input.value = "480";
-  const run = makeNumber("Cable run length (ft)", "rw-run", { step: "any", min: "0", value: "100" }); run.input.value = "100";
+  const rt = makeNumber("Drive rise time (us)", "rw-rt", { step: "any", min: "0" });
+  const vp = makeNumber("Cable velocity (% of light)", "rw-vp", { step: "any", min: "0" });
+  const Vll = makeNumber("System voltage V_LL (V)", "rw-v", { step: "any", min: "0" });
+  const run = makeNumber("Cable run length (ft)", "rw-run", { step: "any", min: "0" });
   for (const f of [rt, vp, Vll, run]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { rt.input.value = "0.1"; vp.input.value = "50"; Vll.input.value = "480"; run.input.value = "100"; update(); });
   const oL = makeOutputLine(outputRegion, "Critical length", "rw-out-l");
@@ -648,12 +646,9 @@ export const rotaryPhaseConverterExample = { inputs: { largest_motor_hp: 10, tot
 
 function _v925renderRotaryPhaseConverter(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: rotary phase converter idler sizing by name. idler HP = max(start factor x largest motor HP, total running HP); ~2x start factor for normal loads, 3x for high-inertia. The converter manufacturer's data and the motor locked-rotor current govern.";
-  const lg = makeNumber("Largest single motor (HP)", "rpc-lg", { step: "any", min: "0", value: "10" });
-  lg.input.value = "10";
-  const tot = makeNumber("Total HP running at once", "rpc-tot", { step: "any", min: "0", value: "15" });
-  tot.input.value = "15";
-  const sf = makeNumber("Start factor (2 normal, 3 high-inertia)", "rpc-sf", { step: "any", min: "1", value: "2" });
-  sf.input.value = "2";
+  const lg = makeNumber("Largest single motor (HP)", "rpc-lg", { step: "any", min: "0" });
+  const tot = makeNumber("Total HP running at once", "rpc-tot", { step: "any", min: "0" });
+  const sf = makeNumber("Start factor (2 normal, 3 high-inertia)", "rpc-sf", { step: "any", min: "1" });
   for (const f of [lg, tot, sf]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { lg.input.value = "10"; tot.input.value = "15"; sf.input.value = "2"; update(); });
   const oIdler = makeOutputLine(outputRegion, "Minimum idler size", "rpc-out-i");
@@ -691,12 +686,9 @@ export const motorAccelerationTimeExample = { inputs: { inertia_lbft2: 100, spee
 
 function _v944renderMotorAccelerationTime(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: motor across-the-line acceleration time by name. t = WK^2 x dN / (308 x T_net), the rotational F = m x a, with WK^2 the reflected inertia (lb-ft^2), dN the speed change (rpm), and T_net the average net accelerating torque (lb-ft). The motor's speed-torque and thermal-limit curves and the reflected load inertia govern.";
-  const wk = makeNumber("Total inertia WK² (lb-ft²)", "mat-wk", { step: "any", min: "0", value: "100" });
-  wk.input.value = "100";
-  const dn = makeNumber("Speed change (rpm)", "mat-dn", { step: "any", min: "0", value: "1750" });
-  dn.input.value = "1750";
-  const tq = makeNumber("Avg net accelerating torque (lb-ft)", "mat-tq", { step: "any", min: "0", value: "50" });
-  tq.input.value = "50";
+  const wk = makeNumber("Total inertia WK² (lb-ft²)", "mat-wk", { step: "any", min: "0" });
+  const dn = makeNumber("Speed change (rpm)", "mat-dn", { step: "any", min: "0" });
+  const tq = makeNumber("Avg net accelerating torque (lb-ft)", "mat-tq", { step: "any", min: "0" });
   for (const f of [wk, dn, tq]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { wk.input.value = "100"; dn.input.value = "1750"; tq.input.value = "50"; update(); });
   const oTime = makeOutputLine(outputRegion, "Acceleration time", "mat-out-t");
@@ -739,16 +731,11 @@ export const motorRmsHpExample = { inputs: { hp_run: 20, run_time_s: 10, hp_idle
 
 function _v945renderMotorRmsHp(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: motor RMS horsepower for a duty-cycle load (NEMA MG-1 duty-cycle / RMS-horsepower sizing method), by name. HP_rms = sqrt( (HP_run^2 x t_run + HP_idle^2 x t_idle) / (t_run + t_idle / K) ); the idle time is divided by the cooling factor K (~3 stopped, ~2 unloaded). Sizes the thermal duty only -- check the peak against breakdown torque separately. The motor's thermal-damage curve, service factor, and the manufacturer's duty rating govern.";
-  const hr = makeNumber("Working (run) load (HP)", "mrh-hr", { step: "any", min: "0", value: "20" });
-  hr.input.value = "20";
-  const tr = makeNumber("Run time (s)", "mrh-tr", { step: "any", min: "0", value: "10" });
-  tr.input.value = "10";
-  const hi = makeNumber("Idle / light load (HP)", "mrh-hi", { step: "any", min: "0", value: "0" });
-  hi.input.value = "0";
-  const ti = makeNumber("Idle / rest time (s)", "mrh-ti", { step: "any", min: "0", value: "20" });
-  ti.input.value = "20";
-  const cf = makeNumber("Idle cooling factor (3 stopped, 2 unloaded)", "mrh-cf", { step: "any", min: "1", value: "3" });
-  cf.input.value = "3";
+  const hr = makeNumber("Working (run) load (HP)", "mrh-hr", { step: "any", min: "0" });
+  const tr = makeNumber("Run time (s)", "mrh-tr", { step: "any", min: "0" });
+  const hi = makeNumber("Idle / light load (HP)", "mrh-hi", { step: "any", min: "0" });
+  const ti = makeNumber("Idle / rest time (s)", "mrh-ti", { step: "any", min: "0" });
+  const cf = makeNumber("Idle cooling factor (3 stopped, 2 unloaded)", "mrh-cf", { step: "any", min: "1" });
   for (const f of [hr, tr, hi, ti, cf]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { hr.input.value = "20"; tr.input.value = "10"; hi.input.value = "0"; ti.input.value = "20"; cf.input.value = "3"; update(); });
   const oRms = makeOutputLine(outputRegion, "RMS horsepower", "mrh-out-r");

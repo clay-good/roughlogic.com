@@ -375,8 +375,7 @@ export const conduitOffsetExample = { inputs: { offset_in: 6, angle_deg: 30 } };
 
 function renderConduitOffset(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Conduit offset bending is first-principles trigonometry taught in the electrical apprenticeship; mark spacing and multipliers follow Ugly's Electrical References and NECA conduit-bending guidance by name. Bender deduct and shoe figures are tool-specific - confirm against your bender. See the cable-bend-radius tile for minimum conductor bend radius. The AHJ governs.";
-  const offset = makeNumber("Offset depth (in)", "co-offset", { step: "any", min: "0", value: "6" });
-  offset.input.value = "6";
+  const offset = makeNumber("Offset depth (in)", "co-offset", { step: "any", min: "0" });
   const angle = makeSelect("Bend angle", "co-angle", [
     { value: "10", label: "10 deg" },
     { value: "22.5", label: "22.5 deg" },
@@ -1293,9 +1292,9 @@ export function computeWeldDepositComposition({ dilution_pct = 0, base_pct = 0, 
 export const weldDepositCompositionExample = { inputs: { dilution_pct: 30, base_pct: 0, filler_pct: 23 } };
 function renderWeldDepositComposition(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: diluted weld-deposit composition, the standard welding-metallurgy mixing rule (by name): deposit% = D x base% + (1 - D) x filler%, with D the dilution fraction from the weld-dilution tile. One element, one pass, well-mixed pool; microstructure and ferrite come from a Schaeffler/WRC diagram, not this. The WPS, the filler certs, and the base-metal MTR govern.";
-  const dil = makeNumber("Dilution D (%, from the weld-dilution tile)", "wdc-dil", { step: "any", min: "0", max: "100" }); dil.input.value = "30";
-  const base = makeNumber("Element content in base metal (%)", "wdc-base", { step: "any", min: "0", max: "100" }); base.input.value = "0";
-  const filler = makeNumber("Element content in filler (%)", "wdc-filler", { step: "any", min: "0", max: "100" }); filler.input.value = "23";
+  const dil = makeNumber("Dilution D (%, from the weld-dilution tile)", "wdc-dil", { step: "any", min: "0", max: "100" });
+  const base = makeNumber("Element content in base metal (%)", "wdc-base", { step: "any", min: "0", max: "100" });
+  const filler = makeNumber("Element content in filler (%)", "wdc-filler", { step: "any", min: "0", max: "100" });
   for (const f of [dil, base, filler]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { dil.input.value = "30"; base.input.value = "0"; filler.input.value = "23"; update(); });
   const oDep = makeOutputLine(outputRegion, "Deposit content (as-welded)", "wdc-out-dep");
@@ -1435,9 +1434,9 @@ export function computeCoilLength({ outside_diameter_in = 0, inside_diameter_in 
 export const coilLengthExample = { inputs: { outside_diameter_in: 48, inside_diameter_in: 16, material_thickness_in: 0.024 } };
 function _v802renderCoilLength(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Coil / roll stock length from the annulus identity L = pi (OD^2 - ID^2) / (4 t), for coil outside diameter OD, core diameter ID, and material thickness t (same units). First-principles. A layout aid; measure or weigh to confirm before a critical cut.";
-  const od = makeNumber("Coil outside diameter OD (in)", "coil-od", { step: "any", min: "0" }); od.input.value = "48";
-  const id = makeNumber("Core / mandrel diameter ID (in)", "coil-id", { step: "any", min: "0" }); id.input.value = "16";
-  const t = makeNumber("Material thickness t (in)", "coil-t", { step: "any", min: "0" }); t.input.value = "0.024";
+  const od = makeNumber("Coil outside diameter OD (in)", "coil-od", { step: "any", min: "0" });
+  const id = makeNumber("Core / mandrel diameter ID (in)", "coil-id", { step: "any", min: "0" });
+  const t = makeNumber("Material thickness t (in)", "coil-t", { step: "any", min: "0" });
   for (const f of [od, id, t]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { od.input.value = "48"; id.input.value = "16"; t.input.value = "0.024"; update(); });
   const oFt = makeOutputLine(outputRegion, "Coil length", "coil-out-ft");
@@ -1486,14 +1485,10 @@ export const barstockCutlistExample = { inputs: { stock_length_in: 240, piece_le
 
 function _v909renderBarstockCutlist(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: cut-list yield identity by name. pieces per stick = floor( (stock + kerf) / (piece + kerf) ); drop = stock - [pieces x piece + (pieces - 1) x kerf]; sticks = ceil(pieces needed / pieces per stick). N pieces take N-1 internal saw cuts.";
-  const sl = makeNumber("Stock length (in)", "bcl-sl", { step: "any", min: "0", value: "240" });
-  sl.input.value = "240";
-  const pl = makeNumber("Cut piece length (in)", "bcl-pl", { step: "any", min: "0", value: "14.5" });
-  pl.input.value = "14.5";
-  const kf = makeNumber("Saw kerf (in)", "bcl-kf", { step: "any", min: "0", value: "0.125" });
-  kf.input.value = "0.125";
-  const pn = makeNumber("Pieces needed", "bcl-pn", { step: "1", min: "0", value: "100" });
-  pn.input.value = "100";
+  const sl = makeNumber("Stock length (in)", "bcl-sl", { step: "any", min: "0" });
+  const pl = makeNumber("Cut piece length (in)", "bcl-pl", { step: "any", min: "0" });
+  const kf = makeNumber("Saw kerf (in)", "bcl-kf", { step: "any", min: "0" });
+  const pn = makeNumber("Pieces needed", "bcl-pn", { step: "1", min: "0" });
   for (const f of [sl, pl, kf, pn]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { sl.input.value = "240"; pl.input.value = "14.5"; kf.input.value = "0.125"; pn.input.value = "100"; update(); });
   const oPer = makeOutputLine(outputRegion, "Pieces per stick", "bcl-out-per");
@@ -1546,15 +1541,13 @@ export const vesselHeadVolumeExample = { inputs: { inside_diameter_in: 48, head_
 
 function _v912renderVesselHeadVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: dished-head volume geometry by name. 2:1 semi-elliptical head = pi D^3/24; hemispherical = pi D^3/12; ASME flanged-and-dished (torispherical) ~ 0.0847 D^3 (standard crown/knuckle, approximate); straight flange = pi/4 D^2 x length. US gallons = in^3 / 231.";
-  const dia = makeNumber("Inside diameter (in)", "vhv-dia", { step: "any", min: "0", value: "48" });
-  dia.input.value = "48";
+  const dia = makeNumber("Inside diameter (in)", "vhv-dia", { step: "any", min: "0" });
   const ht = makeSelect("Head type", "vhv-ht", [
     { value: "elliptical", label: "2:1 semi-elliptical", selected: true },
     { value: "fd", label: "ASME flanged & dished (approx)" },
     { value: "hemispherical", label: "Hemispherical" },
   ]);
-  const sf = makeNumber("Straight flange (in)", "vhv-sf", { step: "any", min: "0", value: "0" });
-  sf.input.value = "0";
+  const sf = makeNumber("Straight flange (in)", "vhv-sf", { step: "any", min: "0" });
   for (const f of [dia, ht, sf]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { dia.input.value = "48"; ht.select.value = "elliptical"; sf.input.value = "0"; update(); });
   const oHead = makeOutputLine(outputRegion, "One head volume", "vhv-out-head");
@@ -1605,14 +1598,10 @@ export const bendSpringbackExample = { inputs: { tool_radius_in: 1.0, thickness_
 
 function _v962renderBendSpringback(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: sheet-metal bend springback (Machinery's Handbook), by name. Ks = Ri/Rf = 4 x^3 - 3 x + 1, x = Ri x yield / (E x thickness); released radius Rf = Ri/Ks (larger than the tool radius). E ~ 29-30e6 psi steel, ~10e6 aluminum. Air-bend basis; coining nearly eliminates springback. The material cert, tooling method, and a test bend govern the overbend.";
-  const rr = makeNumber("Tool (inside) bend radius (in)", "bsb-rr", { step: "any", min: "0", value: "1.0" });
-  rr.input.value = "1.0";
-  const tt = makeNumber("Material thickness (in)", "bsb-tt", { step: "any", min: "0", value: "0.1" });
-  tt.input.value = "0.1";
-  const yy = makeNumber("Yield strength (psi)", "bsb-yy", { step: "any", min: "0", value: "50000" });
-  yy.input.value = "50000";
-  const ee = makeNumber("Elastic modulus (psi, ~29e6 steel)", "bsb-ee", { step: "any", min: "0", value: "29000000" });
-  ee.input.value = "29000000";
+  const rr = makeNumber("Tool (inside) bend radius (in)", "bsb-rr", { step: "any", min: "0" });
+  const tt = makeNumber("Material thickness (in)", "bsb-tt", { step: "any", min: "0" });
+  const yy = makeNumber("Yield strength (psi)", "bsb-yy", { step: "any", min: "0" });
+  const ee = makeNumber("Elastic modulus (psi, ~29e6 steel)", "bsb-ee", { step: "any", min: "0" });
   for (const f of [rr, tt, yy, ee]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { rr.input.value = "1.0"; tt.input.value = "0.1"; yy.input.value = "50000"; ee.input.value = "29000000"; update(); });
   const oK = makeOutputLine(outputRegion, "Springback factor Ks", "bsb-out-k");
@@ -1720,9 +1709,9 @@ function _v1127renderBarNesting(inputRegion, outputRegion, citationEl) {
   const list = makeTextarea("Cut list, one line per size as length,quantity", "bn-list", { rows: "5" });
   list.input.value = barNestingExample.inputs.cut_list;
   inputRegion.appendChild(list.wrap);
-  const stock = makeNumber("Stock length (in)", "bn-stock", { step: "any", min: "0" }); stock.input.value = "240";
-  const kerf = makeNumber("Saw kerf (in)", "bn-kerf", { step: "any", min: "0" }); kerf.input.value = "0.125";
-  const trim = makeNumber("End trim per stick (in)", "bn-trim", { step: "any", min: "0" }); trim.input.value = "1";
+  const stock = makeNumber("Stock length (in)", "bn-stock", { step: "any", min: "0" });
+  const kerf = makeNumber("Saw kerf (in)", "bn-kerf", { step: "any", min: "0" });
+  const trim = makeNumber("End trim per stick (in)", "bn-trim", { step: "any", min: "0" });
   for (const f of [stock, kerf, trim]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { list.input.value = barNestingExample.inputs.cut_list; stock.input.value = "240"; kerf.input.value = "0.125"; trim.input.value = "1"; update(); });
   const oSticks = makeOutputLine(outputRegion, "Sticks required", "bn-out-sticks");
@@ -1784,7 +1773,7 @@ export function computeSheetMetalGauge({ gauge = 0, material = "steel" } = {}) {
 export const sheetMetalGaugeExample = { inputs: { gauge: 16, material: "steel" } };
 function _renderSheetMetalGauge(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: sheet-metal gauge to decimal thickness - standard (uncoated) steel by the Manufacturers' Standard Gage (MSG, U.S. Act of Congress March 3, 1893; thickness = weight/41.82); galvanized (GSG) = MSG plus the zinc coating; aluminum/brass/copper by the Brown & Sharpe geometric formula t = 0.005 x 92^((36 - n)/39) in (the same relation the awg-wire-geometry tile uses), by name; public-domain. Stainless is commonly MSG but some mills differ. A reference; the material spec and a caliper govern the delivered sheet.";
-  const g = makeNumber("Gauge number", "smg-g", { step: "1", value: "16" }); g.input.value = "16";
+  const g = makeNumber("Gauge number", "smg-g", { step: "1" });
   const mat = makeSelect("Material", "smg-mat", [
     { value: "steel", label: "Standard steel (MSG)", selected: true },
     { value: "galvanized", label: "Galvanized steel (GSG)" },

@@ -1156,7 +1156,7 @@ export const searchProbabilityExample = { inputs: { pod_list: [30, 40, 50], poa_
 function renderSearchProbability(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Standard SAR search theory (Koopman detection theory) as used in the U.S. National SAR Supplement and NASAR / FEMA search-planning doctrine, by name; POD/POA/POS definitions are public. Method cited, not reproduced. POS is always <= POA.";
   const pods = makeText("Per-pass POD values (%, comma-separated, up to 5)", "sp-pods", { value: "30, 40, 50" }); pods.input.value = "30, 40, 50";
-  const poa = makeNumber("POA (area contains subject, %)", "sp-poa", { step: "any", min: "0", max: "100", value: "60" }); poa.input.value = "60";
+  const poa = makeNumber("POA (area contains subject, %)", "sp-poa", { step: "any", min: "0", max: "100" });
   for (const f of [pods, poa]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { pods.input.value = "30, 40, 50"; poa.input.value = "60"; update(); });
   const oCum = makeOutputLine(outputRegion, "Cumulative POD", "sp-out-cum");

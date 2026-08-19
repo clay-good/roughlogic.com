@@ -1102,9 +1102,9 @@ function renderMileageRollup(inputRegion, outputRegion, citationEl) {
 function renderHomeOffice(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per IRS Publication 587 (Business Use of Your Home) and Form 8829. Simplified method: $5/ft^2 up to 300 ft^2 ($1,500 cap, Rev. Proc. 2013-13). Actual method: (office ft^2 / home ft^2) x total home expenses. The tile reports the higher of the two. Free at irs.gov.";
   inputRegion.appendChild(makeNotice(TAX_LAW_NOTICE));
-  const office = makeNumber("Home-office area (ft²)", "ho-office", { step: "any", min: "0", value: "200" });
-  const home = makeNumber("Total home area (ft²)", "ho-home", { step: "any", min: "0", value: "2000" });
-  const expenses = makeNumber("Total home expenses ($/yr)", "ho-exp", { step: "any", min: "0", value: "24000" });
+  const office = makeNumber("Home-office area (ft²)", "ho-office", { step: "any", min: "0" });
+  const home = makeNumber("Total home area (ft²)", "ho-home", { step: "any", min: "0" });
+  const expenses = makeNumber("Total home expenses ($/yr)", "ho-exp", { step: "any", min: "0" });
   for (const f of [office, home, expenses]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
     office.input.value = "200"; home.input.value = "2000"; expenses.input.value = "24000"; update();
@@ -1195,11 +1195,11 @@ export const decliningBalanceDepreciationExample = { inputs: { cost: 50000, salv
 
 function renderDecliningBalanceDepreciation(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: GAAP book depreciation - ASC 360 (Property, Plant, and Equipment), by name; distinct from the macrs-depreciation tile (IRS Pub 946 tax method). Accounting information, not advice; a CPA and current GAAP govern. Salvage is NOT subtracted before applying the DB rate.";
-  const cost = makeNumber("Cost ($)", "dbd-cost", { step: "any", min: "0", value: "50000" }); cost.input.value = "50000";
-  const salvage = makeNumber("Salvage ($)", "dbd-salv", { step: "any", min: "0", value: "5000" }); salvage.input.value = "5000";
-  const life = makeNumber("Useful life (yr)", "dbd-life", { step: "1", min: "1", value: "5" }); life.input.value = "5";
+  const cost = makeNumber("Cost ($)", "dbd-cost", { step: "any", min: "0" });
+  const salvage = makeNumber("Salvage ($)", "dbd-salv", { step: "any", min: "0" });
+  const life = makeNumber("Useful life (yr)", "dbd-life", { step: "1", min: "1" });
   const factor = makeSelect("DB factor", "dbd-fac", [{ value: "2", label: "200% (double-declining)", selected: true }, { value: "1.5", label: "150%" }]);
-  const year = makeNumber("Year of interest", "dbd-year", { step: "1", min: "1", value: "1" }); year.input.value = "1";
+  const year = makeNumber("Year of interest", "dbd-year", { step: "1", min: "1" });
   const sw = makeCheckbox("Switch to straight-line when advantageous", "dbd-sw", true);
   for (const f of [cost, salvage, life, factor, year, sw]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cost.input.value = "50000"; salvage.input.value = "5000"; life.input.value = "5"; factor.select.value = "2"; year.input.value = "1"; sw.input.checked = true; update(); });
@@ -1255,10 +1255,10 @@ export const sumOfYearsDigitsDepreciationExample = { inputs: { cost: 50000, salv
 
 function renderSumOfYearsDigitsDepreciation(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: GAAP book depreciation - ASC 360 (Property, Plant, and Equipment), by name; sum-of-the-years'-digits accelerated method. Distinct from the macrs-depreciation tile (IRS Pub 946 tax method). Accounting information, not advice; a CPA and current GAAP govern.";
-  const cost = makeNumber("Cost ($)", "syd-cost", { step: "any", min: "0", value: "50000" }); cost.input.value = "50000";
-  const salvage = makeNumber("Salvage ($)", "syd-salv", { step: "any", min: "0", value: "5000" }); salvage.input.value = "5000";
-  const life = makeNumber("Useful life (yr)", "syd-life", { step: "1", min: "1", value: "5" }); life.input.value = "5";
-  const year = makeNumber("Year of interest", "syd-year", { step: "1", min: "1", value: "1" }); year.input.value = "1";
+  const cost = makeNumber("Cost ($)", "syd-cost", { step: "any", min: "0" });
+  const salvage = makeNumber("Salvage ($)", "syd-salv", { step: "any", min: "0" });
+  const life = makeNumber("Useful life (yr)", "syd-life", { step: "1", min: "1" });
+  const year = makeNumber("Year of interest", "syd-year", { step: "1", min: "1" });
   for (const f of [cost, salvage, life, year]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cost.input.value = "50000"; salvage.input.value = "5000"; life.input.value = "5"; year.input.value = "1"; update(); });
   const oDep = makeOutputLine(outputRegion, "Year depreciation", "syd-out-dep");
@@ -1313,9 +1313,9 @@ export const futureValueOfAnnuityExample = { inputs: { payment: 500, rate_pct: 0
 
 function renderFutureValueOfAnnuity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: time-value-of-money annuity identities - ordinary annuity FV = PMT [((1+i)^n - 1)/i], PV = PMT [(1-(1+i)^-n)/i], annuity-due x (1+i); i the periodic rate, n the number of payments (standard finance, public-domain; TILA/Reg Z compounding). The rate must be per period, not per year. Accounting information, not advice; the account terms and a CPA govern.";
-  const pmt = makeNumber("Payment per period ($)", "fva-pmt", { step: "any", min: "0", value: "500" }); pmt.input.value = "500";
-  const rate = makeNumber("Interest rate PER PERIOD (%)", "fva-rate", { step: "any", min: "0", value: "0.5" }); rate.input.value = "0.5";
-  const periods = makeNumber("Number of periods", "fva-n", { step: "1", min: "1", value: "120" }); periods.input.value = "120";
+  const pmt = makeNumber("Payment per period ($)", "fva-pmt", { step: "any", min: "0" });
+  const rate = makeNumber("Interest rate PER PERIOD (%)", "fva-rate", { step: "any", min: "0" });
+  const periods = makeNumber("Number of periods", "fva-n", { step: "1", min: "1" });
   const timing = makeSelect("Payment timing", "fva-timing", [{ value: "ordinary", label: "Ordinary (end of period)", selected: true }, { value: "due", label: "Annuity-due (start of period)" }]);
   for (const f of [pmt, rate, periods, timing]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { pmt.input.value = "500"; rate.input.value = "0.5"; periods.input.value = "120"; timing.select.value = "ordinary"; update(); });
@@ -1363,7 +1363,7 @@ export const effectiveAnnualRateExample = { inputs: { apr_pct: 12, compounding: 
 
 function renderEffectiveAnnualRate(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: effective annual rate / APY = (1 + APR/m)^m - 1 (or e^APR - 1 continuous), the compounding identity behind the TILA/Reg Z (12 CFR 1030) APY disclosure. Inverse nominal APR = m[(1+EAR)^(1/m) - 1]. Accounting information, not advice; the account disclosure and a CPA govern.";
-  const apr = makeNumber("Nominal APR (%)", "ear-apr", { step: "any", min: "0", value: "12" }); apr.input.value = "12";
+  const apr = makeNumber("Nominal APR (%)", "ear-apr", { step: "any", min: "0" });
   const comp = makeSelect("Compounding", "ear-comp", [
     { value: "annual", label: "Annually" }, { value: "semiannual", label: "Semiannually" },
     { value: "quarterly", label: "Quarterly" }, { value: "monthly", label: "Monthly", selected: true },
@@ -1480,11 +1480,11 @@ export const employerPayrollTaxExample = { inputs: { wages: 200000, ss_base: 168
 
 function renderEmployerPayrollTax(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: FICA - 26 USC 3101/3111 and IRS Pub 15 (Circular E), rates 6.2% SS / 1.45% Medicare; FUTA - 26 USC 3301-3306, $7,000 wage base, 6.0% gross / 0.6% net with the state credit, IRS Form 940 - all by name. The SS wage base is indexed annually and user-supplied. Tax information, not advice. Free at irs.gov/forms-pubs and uscode.house.gov.";
-  const wages = makeNumber("Gross annual wages ($)", "ept-wages", { step: "any", min: "0", value: "200000" }); wages.input.value = "200000";
-  const ssBase = makeNumber("Social Security wage base ($, current year)", "ept-ssbase", { step: "any", min: "0", value: "168600" }); ssBase.input.value = "168600";
-  const futaRate = makeNumber("FUTA effective rate (%)", "ept-futa", { step: "any", min: "0", value: "0.6" }); futaRate.input.value = "0.6";
-  const sutaRate = makeNumber("State SUTA rate (%, optional)", "ept-suta", { step: "any", min: "0", value: "2.7" }); sutaRate.input.value = "2.7";
-  const sutaBase = makeNumber("SUTA wage base ($, optional)", "ept-sutabase", { step: "any", min: "0", value: "7000" }); sutaBase.input.value = "7000";
+  const wages = makeNumber("Gross annual wages ($)", "ept-wages", { step: "any", min: "0" });
+  const ssBase = makeNumber("Social Security wage base ($, current year)", "ept-ssbase", { step: "any", min: "0" });
+  const futaRate = makeNumber("FUTA effective rate (%)", "ept-futa", { step: "any", min: "0" });
+  const sutaRate = makeNumber("State SUTA rate (%, optional)", "ept-suta", { step: "any", min: "0" });
+  const sutaBase = makeNumber("SUTA wage base ($, optional)", "ept-sutabase", { step: "any", min: "0" });
   for (const f of [wages, ssBase, futaRate, sutaRate, sutaBase]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { wages.input.value = "200000"; ssBase.input.value = "168600"; futaRate.input.value = "0.6"; sutaRate.input.value = "2.7"; sutaBase.input.value = "7000"; update(); });
   const oTotal = makeOutputLine(outputRegion, "Total employer payroll tax", "ept-out-total");
@@ -1576,15 +1576,15 @@ export function computeEquipmentHourlyRate({ purchase = 0, salvage = 0, life_hr 
 export const equipmentHourlyRateExample = { inputs: { purchase: 50000, salvage: 10000, life_hr: 5000, annual_hr: 1000, iit_pct: 8, fuel_gph: 2, fuel_price: 4, maint_hr: 4, wear_hr: 1 } };
 function renderEquipmentHourlyRate(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: equipment owning + operating hourly rate (CAT / AED cost-recovery method): owning = (purchase - salvage)/life + IIT% x avg value / annual hours; operating = fuel + maintenance + wear per hour. The owner's actual costs, financing, and utilization govern.";
-  const pur = makeNumber("Purchase price ($)", "ehr-pur", { step: "any", min: "0" }); pur.input.value = "50000";
-  const sal = makeNumber("Salvage value ($)", "ehr-sal", { step: "any", min: "0" }); sal.input.value = "10000";
-  const life = makeNumber("Useful life (hours)", "ehr-life", { step: "any", min: "0" }); life.input.value = "5000";
-  const ann = makeNumber("Hours operated per year", "ehr-ann", { step: "any", min: "0" }); ann.input.value = "1000";
-  const iit = makeNumber("Interest+insurance+tax (%/yr of avg value)", "ehr-iit", { step: "any", min: "0" }); iit.input.value = "8";
-  const fg = makeNumber("Fuel burn (gal/hr)", "ehr-fg", { step: "any", min: "0" }); fg.input.value = "2";
-  const fp = makeNumber("Fuel price ($/gal)", "ehr-fp", { step: "any", min: "0" }); fp.input.value = "4";
-  const mh = makeNumber("Maintenance ($/hr)", "ehr-mh", { step: "any", min: "0" }); mh.input.value = "4";
-  const wh = makeNumber("Tires/wear ($/hr)", "ehr-wh", { step: "any", min: "0" }); wh.input.value = "1";
+  const pur = makeNumber("Purchase price ($)", "ehr-pur", { step: "any", min: "0" });
+  const sal = makeNumber("Salvage value ($)", "ehr-sal", { step: "any", min: "0" });
+  const life = makeNumber("Useful life (hours)", "ehr-life", { step: "any", min: "0" });
+  const ann = makeNumber("Hours operated per year", "ehr-ann", { step: "any", min: "0" });
+  const iit = makeNumber("Interest+insurance+tax (%/yr of avg value)", "ehr-iit", { step: "any", min: "0" });
+  const fg = makeNumber("Fuel burn (gal/hr)", "ehr-fg", { step: "any", min: "0" });
+  const fp = makeNumber("Fuel price ($/gal)", "ehr-fp", { step: "any", min: "0" });
+  const mh = makeNumber("Maintenance ($/hr)", "ehr-mh", { step: "any", min: "0" });
+  const wh = makeNumber("Tires/wear ($/hr)", "ehr-wh", { step: "any", min: "0" });
   for (const f of [pur, sal, life, ann, iit, fg, fp, mh, wh]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { pur.input.value = "50000"; sal.input.value = "10000"; life.input.value = "5000"; ann.input.value = "1000"; iit.input.value = "8"; fg.input.value = "2"; fp.input.value = "4"; mh.input.value = "4"; wh.input.value = "1"; update(); });
   const oOwn = makeOutputLine(outputRegion, "Owning cost", "ehr-out-own");
@@ -1692,10 +1692,10 @@ export function computeWipPercentComplete({ contract_usd = 0, cost_to_date_usd =
 export const wipPercentCompleteExample = { inputs: { contract_usd: 500000, cost_to_date_usd: 300000, est_total_cost_usd: 400000, billed_to_date_usd: 350000 } };
 function renderWipPercentComplete(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Cost-to-cost percent-of-completion revenue recognition (construction accounting, ASC 606 / AICPA construction guide): percent complete = cost to date / estimated total cost, earned revenue = percent complete x contract, over/under billing = earned revenue - billed. A management aid; the CPA-prepared WIP schedule governs.";
-  const contract = makeNumber("Contract value (USD)", "wip-c", { step: "any", min: "0" }); contract.input.value = "500000";
-  const cost = makeNumber("Cost to date (USD)", "wip-cost", { step: "any", min: "0" }); cost.input.value = "300000";
-  const est = makeNumber("Estimated total cost (USD)", "wip-est", { step: "any", min: "0" }); est.input.value = "400000";
-  const billed = makeNumber("Billed to date (USD)", "wip-b", { step: "any", min: "0" }); billed.input.value = "350000";
+  const contract = makeNumber("Contract value (USD)", "wip-c", { step: "any", min: "0" });
+  const cost = makeNumber("Cost to date (USD)", "wip-cost", { step: "any", min: "0" });
+  const est = makeNumber("Estimated total cost (USD)", "wip-est", { step: "any", min: "0" });
+  const billed = makeNumber("Billed to date (USD)", "wip-b", { step: "any", min: "0" });
   for (const f of [contract, cost, est, billed]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { contract.input.value = "500000"; cost.input.value = "300000"; est.input.value = "400000"; billed.input.value = "350000"; update(); });
   const oPct = makeOutputLine(outputRegion, "Percent complete", "wip-out-pct");
@@ -1737,10 +1737,10 @@ export function computeChangeOrderMarkup({ direct_cost_usd = 0, overhead_pct = 1
 export const changeOrderMarkupExample = { inputs: { direct_cost_usd: 10000, overhead_pct: 10, profit_pct: 10, current_contract_usd: 500000 } };
 function renderChangeOrderMarkup(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Change-order pricing with overhead and profit (construction estimating practice / AIA G701): price = direct cost x (1 + overhead%) x (1 + profit%), the standard compounded markup (the additive direct x (1 + OH% + profit%) is slightly less). The contract's general conditions set the allowed markup and method. A pricing aid; the contract terms and owner approval govern.";
-  const direct = makeNumber("Added direct cost (USD)", "com-d", { step: "any", min: "0" }); direct.input.value = "10000";
-  const oh = makeNumber("Overhead markup (%)", "com-oh", { step: "any", min: "0" }); oh.input.value = "10";
-  const profit = makeNumber("Profit markup (%)", "com-p", { step: "any", min: "0" }); profit.input.value = "10";
-  const current = makeNumber("Current contract total (USD, optional)", "com-c", { step: "any", min: "0" }); current.input.value = "500000";
+  const direct = makeNumber("Added direct cost (USD)", "com-d", { step: "any", min: "0" });
+  const oh = makeNumber("Overhead markup (%)", "com-oh", { step: "any", min: "0" });
+  const profit = makeNumber("Profit markup (%)", "com-p", { step: "any", min: "0" });
+  const current = makeNumber("Current contract total (USD, optional)", "com-c", { step: "any", min: "0" });
   for (const f of [direct, oh, profit, current]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { direct.input.value = "10000"; oh.input.value = "10"; profit.input.value = "10"; current.input.value = "500000"; update(); });
   const oPrice = makeOutputLine(outputRegion, "Change-order price", "com-out-price");
@@ -1779,9 +1779,9 @@ export function computeRetainageTracker({ work_this_period_usd = 0, retainage_pc
 export const retainageTrackerExample = { inputs: { work_this_period_usd: 100000, retainage_pct: 10, prior_retained_usd: 40000 } };
 function renderRetainageTracker(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Retainage on a progress payment (AIA G702 Application and Certificate for Payment / G703 Continuation Sheet): retention this period = work completed x retainage rate, net payment = work - retention, cumulative retention = prior + this period. A billing aid; the contract terms and the owner's certified payment govern.";
-  const work = makeNumber("Work this period (USD)", "ret-w", { step: "any", min: "0" }); work.input.value = "100000";
-  const rate = makeNumber("Retainage rate (%)", "ret-r", { step: "any", min: "0", max: "100" }); rate.input.value = "10";
-  const prior = makeNumber("Prior retained (USD)", "ret-p", { step: "any", min: "0" }); prior.input.value = "40000";
+  const work = makeNumber("Work this period (USD)", "ret-w", { step: "any", min: "0" });
+  const rate = makeNumber("Retainage rate (%)", "ret-r", { step: "any", min: "0", max: "100" });
+  const prior = makeNumber("Prior retained (USD)", "ret-p", { step: "any", min: "0" });
   for (const f of [work, rate, prior]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { work.input.value = "100000"; rate.input.value = "10"; prior.input.value = "40000"; update(); });
   const oRet = makeOutputLine(outputRegion, "Retention this draw", "ret-out-ret");
@@ -1824,10 +1824,10 @@ export function computeSuretyBondPremium({ contract_usd = 0, rate1_per_k = 25, r
 export const suretyBondPremiumExample = { inputs: { contract_usd: 500000, rate1_per_k: 25, rate2_per_k: 15, rate3_per_k: 10 } };
 function renderSuretyBondPremium(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Surety bond premium (tiered rate, surety-industry practice): charged per $1,000 of contract in bands (e.g. $25/$15/$10 per thousand on the first $100k / next $400k / above $500k). The effective rate falls as the contract grows. A budgeting aid; the surety's rate schedule and underwriting govern.";
-  const c = makeNumber("Contract value to bond ($)", "sbp-c", { step: "any", min: "0" }); c.input.value = "500000";
-  const r1 = makeNumber("Rate on first $100k ($/thousand)", "sbp-r1", { step: "any", min: "0" }); r1.input.value = "25";
-  const r2 = makeNumber("Rate on next $400k ($/thousand)", "sbp-r2", { step: "any", min: "0" }); r2.input.value = "15";
-  const r3 = makeNumber("Rate above $500k ($/thousand)", "sbp-r3", { step: "any", min: "0" }); r3.input.value = "10";
+  const c = makeNumber("Contract value to bond ($)", "sbp-c", { step: "any", min: "0" });
+  const r1 = makeNumber("Rate on first $100k ($/thousand)", "sbp-r1", { step: "any", min: "0" });
+  const r2 = makeNumber("Rate on next $400k ($/thousand)", "sbp-r2", { step: "any", min: "0" });
+  const r3 = makeNumber("Rate above $500k ($/thousand)", "sbp-r3", { step: "any", min: "0" });
   for (const f of [c, r1, r2, r3]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { c.input.value = "500000"; r1.input.value = "25"; r2.input.value = "15"; r3.input.value = "10"; update(); });
   const oP = makeOutputLine(outputRegion, "Bond premium", "sbp-out-p");
@@ -1866,9 +1866,9 @@ export function computeWorkersCompEmrPremium({ payroll_usd = 0, class_rate = 0, 
 export const workersCompEmrPremiumExample = { inputs: { payroll_usd: 500000, class_rate: 8.00, emr: 0.85 } };
 function renderWorkersCompEmrPremium(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Workers-comp premium and experience mod (NCCI / state rating-bureau practice): manual premium = payroll/100 x class rate, actual premium = manual x EMR (an EMR below 1.0 is a credit, above 1.0 a debit). A budgeting aid; the rating bureau's EMR and the insurer's rates govern.";
-  const p = makeNumber("Annual payroll for the class ($)", "wce-p", { step: "any", min: "0" }); p.input.value = "500000";
-  const rate = makeNumber("Manual class rate ($/$100 payroll)", "wce-r", { step: "any", min: "0" }); rate.input.value = "8.00";
-  const emr = makeNumber("Experience mod (EMR)", "wce-e", { step: "any", min: "0" }); emr.input.value = "0.85";
+  const p = makeNumber("Annual payroll for the class ($)", "wce-p", { step: "any", min: "0" });
+  const rate = makeNumber("Manual class rate ($/$100 payroll)", "wce-r", { step: "any", min: "0" });
+  const emr = makeNumber("Experience mod (EMR)", "wce-e", { step: "any", min: "0" });
   for (const f of [p, rate, emr]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { p.input.value = "500000"; rate.input.value = "8.00"; emr.input.value = "0.85"; update(); });
   const oM = makeOutputLine(outputRegion, "Manual / modified premium", "wce-out-m");
@@ -1907,9 +1907,9 @@ export function computePrevailingWageFringe({ base_wage_hr = 0, fringe_hr = 0, p
 export const prevailingWageFringeExample = { inputs: { base_wage_hr: 35, fringe_hr: 15, payroll_tax: 7.65 } };
 function renderPrevailingWageFringe(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Prevailing-wage fringe (Davis-Bacon / state determination): package = base wage + fringe; paying the fringe as cash makes it taxable wages, funding it through a bona-fide plan does not, saving fringe x the wage-based burden per hour. A budgeting aid; the wage determination and the plan's bona-fide status govern.";
-  const base = makeNumber("Base hourly wage ($/hr)", "pwf-b", { step: "any", min: "0" }); base.input.value = "35";
-  const fringe = makeNumber("Fringe rate from the determination ($/hr)", "pwf-f", { step: "any", min: "0" }); fringe.input.value = "15";
-  const tax = makeNumber("Wage-based burden (payroll tax + comp, %)", "pwf-t", { step: "any", min: "0" }); tax.input.value = "7.65";
+  const base = makeNumber("Base hourly wage ($/hr)", "pwf-b", { step: "any", min: "0" });
+  const fringe = makeNumber("Fringe rate from the determination ($/hr)", "pwf-f", { step: "any", min: "0" });
+  const tax = makeNumber("Wage-based burden (payroll tax + comp, %)", "pwf-t", { step: "any", min: "0" });
   for (const f of [base, fringe, tax]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { base.input.value = "35"; fringe.input.value = "15"; tax.input.value = "7.65"; update(); });
   const oP = makeOutputLine(outputRegion, "Required package", "pwf-out-p");
@@ -1952,9 +1952,9 @@ export function computeEoqOrderQuantity({ annual_demand = 0, order_cost = 0, hol
 export const eoqOrderQuantityExample = { inputs: { annual_demand: 12000, order_cost: 50, holding_cost: 3 } };
 function renderEoqOrderQuantity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: economic order quantity (Wilson EOQ inventory model): EOQ = sqrt(2 D S / H); orders/yr = D / EOQ; cycle = 365 / orders; total annual cost = sqrt(2 D S H). Minimizes ordering plus holding cost; the total-cost curve is flat near the minimum, so rounding to a case quantity barely hurts. No quantity discounts assumed. A planning aid; the demand and supplier terms govern.";
-  const d = makeNumber("Annual demand (units/yr)", "eoq-d", { step: "any", min: "0" }); d.input.value = "12000";
-  const s = makeNumber("Fixed cost per order ($)", "eoq-s", { step: "any", min: "0" }); s.input.value = "50";
-  const h = makeNumber("Annual holding cost per unit ($/unit/yr)", "eoq-h", { step: "any", min: "0" }); h.input.value = "3";
+  const d = makeNumber("Annual demand (units/yr)", "eoq-d", { step: "any", min: "0" });
+  const s = makeNumber("Fixed cost per order ($)", "eoq-s", { step: "any", min: "0" });
+  const h = makeNumber("Annual holding cost per unit ($/unit/yr)", "eoq-h", { step: "any", min: "0" });
   for (const f of [d, s, h]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { d.input.value = "12000"; s.input.value = "50"; h.input.value = "3"; update(); });
   const oEoq = makeOutputLine(outputRegion, "Economic order quantity", "eoq-out-eoq");
@@ -2010,10 +2010,10 @@ export function computeReorderPoint({ avg_daily_demand = 0, lead_time_days = 0, 
 export const reorderPointExample = { inputs: { avg_daily_demand: 100, lead_time_days: 7, demand_sd: 20, service_level_pct: 95 } };
 function renderReorderPoint(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: reorder point and safety stock (service-level inventory control): z = inverse_normal(service_level/100); safety_stock = z x demand_sd x sqrt(lead_time); reorder_point = avg_daily_demand x lead_time + safety_stock. Safety stock scales with sqrt(lead time) and the z-score, so the last few points of service cost a disproportionate buffer. A planning aid; the demand pattern and supplier reliability govern.";
-  const dd = makeNumber("Average daily demand (units/day)", "rop-dd", { step: "any", min: "0" }); dd.input.value = "100";
-  const lt = makeNumber("Supplier lead time (days)", "rop-lt", { step: "any", min: "0" }); lt.input.value = "7";
-  const sd = makeNumber("Daily demand std deviation (units/day)", "rop-sd", { step: "any", min: "0" }); sd.input.value = "20";
-  const sl = makeNumber("Target service level (%)", "rop-sl", { step: "any", min: "0", max: "100" }); sl.input.value = "95";
+  const dd = makeNumber("Average daily demand (units/day)", "rop-dd", { step: "any", min: "0" });
+  const lt = makeNumber("Supplier lead time (days)", "rop-lt", { step: "any", min: "0" });
+  const sd = makeNumber("Daily demand std deviation (units/day)", "rop-sd", { step: "any", min: "0" });
+  const sl = makeNumber("Target service level (%)", "rop-sl", { step: "any", min: "0", max: "100" });
   for (const f of [dd, lt, sd, sl]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { dd.input.value = "100"; lt.input.value = "7"; sd.input.value = "20"; sl.input.value = "95"; update(); });
   const oSafety = makeOutputLine(outputRegion, "Safety stock", "rop-out-safety");
@@ -2057,11 +2057,11 @@ export function computeUnitsOfProductionDepr({ cost_basis = 0, salvage_value = 0
 export const unitsOfProductionDeprExample = { inputs: { cost_basis: 50000, salvage_value: 5000, total_units: 100000, period_units: 8000, accumulated_units: 8000 } };
 function renderUnitsOfProductionDepr(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: units-of-production (activity) depreciation (GAAP; IRS Pub 946 activity method): rate = (cost - salvage) / total_units; period_depreciation = rate x period_units; book_value = max(cost - rate x accumulated_units, salvage). Depreciation tracks usage, so an idle asset takes zero; book value is floored at salvage. A GAAP/book method, not tax MACRS. A bookkeeping aid; the accounting policy and tax rules govern.";
-  const cost = makeNumber("Cost basis ($)", "upd-cost", { step: "any", min: "0" }); cost.input.value = "50000";
-  const salvage = makeNumber("Salvage value ($)", "upd-salvage", { step: "any", min: "0" }); salvage.input.value = "5000";
-  const total = makeNumber("Total estimated lifetime units (hrs/mi/pcs)", "upd-total", { step: "any", min: "0" }); total.input.value = "100000";
-  const period = makeNumber("Units used this period", "upd-period", { step: "any", min: "0" }); period.input.value = "8000";
-  const accum = makeNumber("Units used to date (incl. this period)", "upd-accum", { step: "any", min: "0" }); accum.input.value = "8000";
+  const cost = makeNumber("Cost basis ($)", "upd-cost", { step: "any", min: "0" });
+  const salvage = makeNumber("Salvage value ($)", "upd-salvage", { step: "any", min: "0" });
+  const total = makeNumber("Total estimated lifetime units (hrs/mi/pcs)", "upd-total", { step: "any", min: "0" });
+  const period = makeNumber("Units used this period", "upd-period", { step: "any", min: "0" });
+  const accum = makeNumber("Units used to date (incl. this period)", "upd-accum", { step: "any", min: "0" });
   for (const f of [cost, salvage, total, period, accum]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cost.input.value = "50000"; salvage.input.value = "5000"; total.input.value = "100000"; period.input.value = "8000"; accum.input.value = "8000"; update(); });
   const oRate = makeOutputLine(outputRegion, "Depreciation rate per unit", "upd-out-rate");

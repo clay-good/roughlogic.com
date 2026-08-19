@@ -1738,10 +1738,8 @@ export const elevationPressureLossExample = { inputs: { mode: "floors", value: 9
 function renderElevationPressureLoss(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Hydrostatic head 0.434 psi/ft (public). Fire-ground '5 psi per floor' standpipe approximation per IFSTA Pumping Apparatus Driver/Operator and the NFPA 14 design basis, by name. Feeds the pump discharge pressure tiles; distinct from pdp / standpipe-pdp which bundle friction and nozzle pressure.";
   const mode = makeSelect("Input mode", "epl-mode", [{ value: "floors", label: "Number of floors", selected: true }, { value: "feet", label: "Elevation change (ft)" }]);
-  const val = makeNumber("Floors or feet", "epl-val", { step: "any", min: "0", value: "9" });
-  val.input.value = "9";
-  const fh = makeNumber("Floor height (ft)", "epl-fh", { step: "any", min: "0", value: "10" });
-  fh.input.value = "10";
+  const val = makeNumber("Floors or feet", "epl-val", { step: "any", min: "0" });
+  const fh = makeNumber("Floor height (ft)", "epl-fh", { step: "any", min: "0" });
   const dir = makeSelect("Direction", "epl-dir", [{ value: "up", label: "Up (loss)", selected: true }, { value: "down", label: "Down (gain)" }]);
   for (const f of [mode, val, fh, dir]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { mode.select.value = "floors"; val.input.value = "9"; fh.input.value = "10"; dir.select.value = "up"; update(); });
@@ -1832,9 +1830,8 @@ export const smoothBoreFlowExample = { inputs: { bore_in: 1.125, nozzle_pressure
 
 function renderSmoothBoreFlow(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: IFSTA Pumping Apparatus Driver/Operator Handbook (by name, not reproduced) - smooth-bore discharge gpm = 29.7 x d^2 x sqrt(NP) and nozzle reaction 1.57 x d^2 x NP. Standard nozzle pressure 50 psi handline / 80 psi master (editable). Incident command and the pump operator govern.";
-  const bore = makeNumber("Tip / bore diameter (in)", "sbf-bore", { step: "any", min: "0", value: "1.125" });
-  const np = makeNumber("Nozzle pressure (psi)", "sbf-np", { step: "any", min: "0", value: "50" });
-  bore.input.value = "1.125"; np.input.value = "50";
+  const bore = makeNumber("Tip / bore diameter (in)", "sbf-bore", { step: "any", min: "0" });
+  const np = makeNumber("Nozzle pressure (psi)", "sbf-np", { step: "any", min: "0" });
   for (const f of [bore, np]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { bore.input.value = "1.125"; np.input.value = "50"; update(); });
   const oG = makeOutputLine(outputRegion, "Flow", "sbf-out-g");
@@ -1874,9 +1871,8 @@ export const smoothBoreDiameterForFlowExample = { inputs: { target_gpm: 250, noz
 
 function renderSmoothBoreDiameterForFlow(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: IFSTA Pumping Apparatus Driver/Operator Handbook (by name, not reproduced) - smooth-bore discharge gpm = 29.7 x d^2 x sqrt(NP) solved for the diameter: d = sqrt( gpm / (29.7 x sqrt(NP)) ); reaction 1.57 x d^2 x NP. Standard nozzle pressure 50 psi handline / 80 psi master (editable). Incident command and the pump operator govern.";
-  const gpm = makeNumber("Target flow (gpm)", "sbd-gpm", { step: "any", min: "0", value: "250" });
-  const np = makeNumber("Nozzle pressure (psi)", "sbd-np", { step: "any", min: "0", value: "50" });
-  gpm.input.value = "250"; np.input.value = "50";
+  const gpm = makeNumber("Target flow (gpm)", "sbd-gpm", { step: "any", min: "0" });
+  const np = makeNumber("Nozzle pressure (psi)", "sbd-np", { step: "any", min: "0" });
   for (const f of [gpm, np]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { gpm.input.value = "250"; np.input.value = "50"; update(); });
   const oB = makeOutputLine(outputRegion, "Required tip / bore diameter", "sbd-out-b");
@@ -1917,9 +1913,9 @@ export function computeHydrantAvailableFlow({ static_psi = 0, residual_psi = 0, 
 export const hydrantAvailableFlowExample = { inputs: { static_psi: 70, residual_psi: 50, qf_gpm: 1000 } };
 function renderHydrantAvailableFlow(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NFPA 291 (Fire Flow Testing and Marking of Hydrants) -- rated flow at 20 psi QR = QF x (hr/hf)^0.54 with hf = static - residual and hr = static - 20, and the AA/A/B/C color classes (>= 1500 / 1000 / 500 / < 500 gpm). A field estimate at one location and time; the water authority's flow data govern.";
-  const s = makeNumber("Static pressure (psi)", "haf-s", { step: "any", min: "0" }); s.input.value = "70";
-  const res = makeNumber("Residual pressure while flowing (psi)", "haf-r", { step: "any", min: "0" }); res.input.value = "50";
-  const qf = makeNumber("Test flow QF (gpm)", "haf-q", { step: "any", min: "0" }); qf.input.value = "1000";
+  const s = makeNumber("Static pressure (psi)", "haf-s", { step: "any", min: "0" });
+  const res = makeNumber("Residual pressure while flowing (psi)", "haf-r", { step: "any", min: "0" });
+  const qf = makeNumber("Test flow QF (gpm)", "haf-q", { step: "any", min: "0" });
   for (const f of [s, res, qf]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { s.input.value = "70"; res.input.value = "50"; qf.input.value = "1000"; update(); });
   const oQ = makeOutputLine(outputRegion, "Rated flow at 20 psi", "haf-out-q");
@@ -1963,11 +1959,11 @@ export function computeNfaFiregroundFlow({ length_ft = 0, width_ft = 0, percent_
 export const nfaFiregroundFlowExample = { inputs: { length_ft: 40, width_ft: 60, percent_involved: 50, floors_involved: 1, exposures: 2 } };
 function renderNfaFiregroundFlow(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A size-up aid, not a water-supply design; incident command governs. Citation: National Fire Academy fireground fire-flow quick-calc (NFA; IFSTA), by name. base = (L x W / 3) x (percent/100) x floors; exposures add 0.25 x base each; total = base + exposures. Validated only for interior/offensive attack up to ~50% involvement and ~1,000 gpm - beyond that use the ISO / required-fire-flow method.";
-  const L = makeNumber("Building length (ft)", "nfa-l", { step: "any", min: "0", value: "40" }); L.input.value = "40";
-  const W = makeNumber("Building width (ft)", "nfa-w", { step: "any", min: "0", value: "60" }); W.input.value = "60";
-  const pct = makeNumber("Percent involved (%)", "nfa-pct", { step: "any", min: "0", max: "100", value: "50" }); pct.input.value = "50";
-  const floors = makeNumber("Involved floors", "nfa-floors", { step: "1", min: "1", value: "1" }); floors.input.value = "1";
-  const exp = makeNumber("Exposures to protect", "nfa-exp", { step: "1", min: "0", value: "2" }); exp.input.value = "2";
+  const L = makeNumber("Building length (ft)", "nfa-l", { step: "any", min: "0" });
+  const W = makeNumber("Building width (ft)", "nfa-w", { step: "any", min: "0" });
+  const pct = makeNumber("Percent involved (%)", "nfa-pct", { step: "any", min: "0", max: "100" });
+  const floors = makeNumber("Involved floors", "nfa-floors", { step: "1", min: "1" });
+  const exp = makeNumber("Exposures to protect", "nfa-exp", { step: "1", min: "0" });
   for (const f of [L, W, pct, floors, exp]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { L.input.value = "40"; W.input.value = "60"; pct.input.value = "50"; floors.input.value = "1"; exp.input.value = "2"; update(); });
   const oBase = makeOutputLine(outputRegion, "Base fire flow", "nfa-out-base");
@@ -2009,9 +2005,9 @@ export function computeIowaRateOfFlow({ length_ft = 0, width_ft = 0, height_ft =
 export const iowaRateOfFlowExample = { inputs: { length_ft: 20, width_ft: 30, height_ft: 10 } };
 function renderIowaRateOfFlow(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A fire-behavior teaching and size-up aid, not a water-supply design; incident command governs. Citation: Iowa rate-of-flow formula (Royer-Nelson / Iowa State fire behavior), by name. volume_ft3 = length x width x height; total_gal = volume_ft3 / 200 (one gallon controls ~200 ft^3 of compartment); rate_gpm = volume_ft3 / 100 (that water applied in the 30-second knockdown burst). This is a confined-compartment interior burst for a single open area, not the sustained flow the NFA and ISO methods size.";
-  const L = makeNumber("Compartment length (ft)", "iowa-l", { step: "any", min: "0", value: "20" }); L.input.value = "20";
-  const W = makeNumber("Compartment width (ft)", "iowa-w", { step: "any", min: "0", value: "30" }); W.input.value = "30";
-  const H = makeNumber("Compartment height / ceiling (ft)", "iowa-h", { step: "any", min: "0", value: "10" }); H.input.value = "10";
+  const L = makeNumber("Compartment length (ft)", "iowa-l", { step: "any", min: "0" });
+  const W = makeNumber("Compartment width (ft)", "iowa-w", { step: "any", min: "0" });
+  const H = makeNumber("Compartment height / ceiling (ft)", "iowa-h", { step: "any", min: "0" });
   for (const f of [L, W, H]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { L.input.value = "20"; W.input.value = "30"; H.input.value = "10"; update(); });
   const oVol = makeOutputLine(outputRegion, "Compartment volume", "iowa-out-vol");
@@ -2057,11 +2053,11 @@ export function computeRelayPumpDistance({ target_flow_gpm = 0, hose_coefficient
 export const relayPumpDistanceExample = { inputs: { target_flow_gpm: 800, hose_coefficient: 0.08, max_discharge_psi: 200, intake_residual_psi: 20, elevation_ft: 10 } };
 function renderRelayPumpDistance(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A planning aid, not incident command; the SOP and the pump's real capability govern. Citation: IFSTA Pumping Apparatus Driver/Operator relay pumping maximum distance, by name. budget = max_discharge - intake_residual - 0.434 x elevation; FL_per_100 = C x (Q/100)^2; max_distance = budget / FL_per_100 x 100. The next pumper needs a 20 psi intake residual or it cavitates, so the usable pressure is the max discharge minus 20 minus the lift; distance falls with the square of flow.";
-  const Q = makeNumber("Relay flow (gpm)", "relay-q", { step: "any", min: "0", value: "800" }); Q.input.value = "800";
-  const C = makeNumber("Hose coefficient C (5 in LDH ~ 0.08)", "relay-c", { step: "any", min: "0", value: "0.08" }); C.input.value = "0.08";
-  const maxD = makeNumber("Pump max discharge (psi)", "relay-maxd", { step: "any", min: "0", value: "200" }); maxD.input.value = "200";
-  const intake = makeNumber("Intake residual to hold (psi)", "relay-intake", { step: "any", min: "0", value: "20" }); intake.input.value = "20";
-  const elev = makeNumber("Elevation gain (ft, negative = downhill)", "relay-elev", { step: "any", value: "10" }); elev.input.value = "10";
+  const Q = makeNumber("Relay flow (gpm)", "relay-q", { step: "any", min: "0" });
+  const C = makeNumber("Hose coefficient C (5 in LDH ~ 0.08)", "relay-c", { step: "any", min: "0" });
+  const maxD = makeNumber("Pump max discharge (psi)", "relay-maxd", { step: "any", min: "0" });
+  const intake = makeNumber("Intake residual to hold (psi)", "relay-intake", { step: "any", min: "0" });
+  const elev = makeNumber("Elevation gain (ft, negative = downhill)", "relay-elev", { step: "any" });
   for (const f of [Q, C, maxD, intake, elev]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { Q.input.value = "800"; C.input.value = "0.08"; maxD.input.value = "200"; intake.input.value = "20"; elev.input.value = "10"; update(); });
   const oBudget = makeOutputLine(outputRegion, "Pressure budget", "relay-out-budget");
@@ -2102,9 +2098,9 @@ export function computeDraftLiftMax({ site_elevation_ft = 0, pump_factor = 0.667
 export const draftLiftMaxExample = { inputs: { site_elevation_ft: 3000, pump_factor: 0.667, suction_losses_ft: 0 } };
 function renderDraftLiftMax(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A planning aid, not incident command. Citation: IFSTA / NWCG firefighter math altitude-corrected drafting maximum lift, by name. theoretical = 33.9 - elevation / 1000; attainable = factor x theoretical - suction losses (factor about 2/3). 1 in Hg of vacuum is about 1.13 ft of lift. A real pump cannot pull a perfect vacuum, so about two-thirds of theoretical (about 22.5 ft at sea level) is the ceiling, and every 1,000 ft of altitude shaves another foot; lift is set by atmosphere pushing water up the suction, not the pump.";
-  const elev = makeNumber("Site elevation (ft above sea level)", "draft-elev", { step: "any", min: "0", value: "3000" }); elev.input.value = "3000";
-  const factor = makeNumber("Pump condition factor (0-1, default 0.667)", "draft-factor", { step: "any", min: "0", max: "1", value: "0.667" }); factor.input.value = "0.667";
-  const loss = makeNumber("Strainer / suction losses (ft, 0 if unknown)", "draft-loss", { step: "any", min: "0", value: "0" }); loss.input.value = "0";
+  const elev = makeNumber("Site elevation (ft above sea level)", "draft-elev", { step: "any", min: "0" });
+  const factor = makeNumber("Pump condition factor (0-1, default 0.667)", "draft-factor", { step: "any", min: "0", max: "1" });
+  const loss = makeNumber("Strainer / suction losses (ft, 0 if unknown)", "draft-loss", { step: "any", min: "0" });
   for (const f of [elev, factor, loss]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { elev.input.value = "3000"; factor.input.value = "0.667"; loss.input.value = "0"; update(); });
   const oTheo = makeOutputLine(outputRegion, "Theoretical lift", "draft-out-theo");
@@ -2148,9 +2144,9 @@ export function computeVacuumLiftReading({ vacuum_inhg = 0, site_elevation_ft = 
 export const vacuumLiftReadingExample = { inputs: { vacuum_inhg: 10, site_elevation_ft: 0, pump_factor: 0.667 } };
 function renderVacuumLiftReading(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A readout aid, not incident command; the pump operator and incident command govern. Citation: IFSTA / NWCG fire-pump drafting practice vacuum-to-lift conversion, by name. suction_head_ft = vacuum_inhg x 1.13; theoretical_ceiling = 33.9 - elevation/1000; attainable_ceiling = factor x theoretical (factor about 2/3); margin = attainable - suction_head. At steady flow the compound gauge reads the lift plus the suction-hose friction, so the readout is total suction head; a reading approaching the ceiling means the pump is about to lose prime and cavitate.";
-  const vac = makeNumber("Compound (vacuum) gauge reading (in Hg)", "vlr-vac", { step: "any", min: "0", value: "10" }); vac.input.value = "10";
-  const elev = makeNumber("Draft-site elevation (ft above sea level)", "vlr-elev", { step: "any", min: "0", value: "0" }); elev.input.value = "0";
-  const factor = makeNumber("Pump condition factor (0-1, default 0.667)", "vlr-factor", { step: "any", min: "0", max: "1", value: "0.667" }); factor.input.value = "0.667";
+  const vac = makeNumber("Compound (vacuum) gauge reading (in Hg)", "vlr-vac", { step: "any", min: "0" });
+  const elev = makeNumber("Draft-site elevation (ft above sea level)", "vlr-elev", { step: "any", min: "0" });
+  const factor = makeNumber("Pump condition factor (0-1, default 0.667)", "vlr-factor", { step: "any", min: "0", max: "1" });
   for (const f of [vac, elev, factor]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { vac.input.value = "10"; elev.input.value = "0"; factor.input.value = "0.667"; update(); });
   const oHead = makeOutputLine(outputRegion, "Total suction head", "vlr-out-head");
@@ -2193,10 +2189,10 @@ export function computeTankerShuttleFlow({ nominal_tank_gal = 0, usable_fraction
 export const tankerShuttleFlowExample = { inputs: { nominal_tank_gal: 3000, usable_fraction: 0.9, tanker_count: 3, cycle_time_min: 12 } };
 function renderTankerShuttleFlow(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A planning aid, not incident command; the fill-site pump capacity and the operation govern. Citation: ISO PPC hauled-water credit / NFPA 1142 water shuttle, by name. usable = nominal x fraction; shuttle_flow = usable x tankers / cycle (cycle = fill + dump + 2 x travel). ISO credits only about 90% of nominal tank volume, and the fleet flow is capped by the slowest link - usually the fill or dump site, not the tank size.";
-  const nom = makeNumber("Nominal tank volume (gal)", "shuttle-nom", { step: "any", min: "0", value: "3000" }); nom.input.value = "3000";
-  const frac = makeNumber("Usable fraction (ISO ~0.90)", "shuttle-frac", { step: "any", min: "0", max: "1", value: "0.9" }); frac.input.value = "0.9";
-  const count = makeNumber("Number of tankers", "shuttle-count", { step: "1", min: "0", value: "3" }); count.input.value = "3";
-  const cycle = makeNumber("Cycle time (min: fill + dump + round-trip)", "shuttle-cycle", { step: "any", min: "0", value: "12" }); cycle.input.value = "12";
+  const nom = makeNumber("Nominal tank volume (gal)", "shuttle-nom", { step: "any", min: "0" });
+  const frac = makeNumber("Usable fraction (ISO ~0.90)", "shuttle-frac", { step: "any", min: "0", max: "1" });
+  const count = makeNumber("Number of tankers", "shuttle-count", { step: "1", min: "0" });
+  const cycle = makeNumber("Cycle time (min: fill + dump + round-trip)", "shuttle-cycle", { step: "any", min: "0" });
   for (const f of [nom, frac, count, cycle]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { nom.input.value = "3000"; frac.input.value = "0.9"; count.input.value = "3"; cycle.input.value = "12"; update(); });
   const oUse = makeOutputLine(outputRegion, "Usable volume per tanker", "shuttle-out-use");
@@ -2242,11 +2238,11 @@ export function computeTankerShuttleCycle({ tank_gal = 0, fill_gpm = 0, dump_gpm
 export const tankerShuttleCycleExample = { inputs: { tank_gal: 3000, fill_gpm: 1000, dump_gpm: 1000, distance_mi: 2, speed_mph: 35 } };
 function renderTankerShuttleCycle(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A planning aid, not incident command; the fill-site capacity and the operation govern. Citation: IFSTA / NFPA 1142 rural water-supply shuttle cycle time, by name. fill_min = tank_gal / fill_gpm; dump_min = tank_gal / dump_gpm; travel_min = 2 x distance_mi / speed_mph x 60 (round trip); cycle_min = fill + dump + travel; single_tanker_gpm = tank_gal / cycle_min. The travel is the round trip; the tank load is the usable water moved (ISO ~90% of nominal); fill and dump are the site-limited rates. Feed the cycle to tanker-shuttle-flow for the fleet flow.";
-  const tank = makeNumber("Usable water per trip (gal)", "tsc-tank", { step: "any", min: "0", value: "3000" }); tank.input.value = "3000";
-  const fill = makeNumber("Fill-site rate (gpm)", "tsc-fill", { step: "any", min: "0", value: "1000" }); fill.input.value = "1000";
-  const dump = makeNumber("Dump / unload rate (gpm)", "tsc-dump", { step: "any", min: "0", value: "1000" }); dump.input.value = "1000";
-  const dist = makeNumber("One-way haul distance (mi)", "tsc-dist", { step: "any", min: "0", value: "2" }); dist.input.value = "2";
-  const speed = makeNumber("Average road speed (mph)", "tsc-speed", { step: "any", min: "0", value: "35" }); speed.input.value = "35";
+  const tank = makeNumber("Usable water per trip (gal)", "tsc-tank", { step: "any", min: "0" });
+  const fill = makeNumber("Fill-site rate (gpm)", "tsc-fill", { step: "any", min: "0" });
+  const dump = makeNumber("Dump / unload rate (gpm)", "tsc-dump", { step: "any", min: "0" });
+  const dist = makeNumber("One-way haul distance (mi)", "tsc-dist", { step: "any", min: "0" });
+  const speed = makeNumber("Average road speed (mph)", "tsc-speed", { step: "any", min: "0" });
   for (const f of [tank, fill, dump, dist, speed]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { tank.input.value = "3000"; fill.input.value = "1000"; dump.input.value = "1000"; dist.input.value = "2"; speed.input.value = "35"; update(); });
   const oBreak = makeOutputLine(outputRegion, "Fill / dump / travel", "tsc-out-break");
@@ -2297,11 +2293,11 @@ export function computeTankerFleetSize({ tank_gal = 0, fill_gpm = 0, dump_gpm = 
 export const tankerFleetSizeExample = { inputs: { tank_gal: 3000, fill_gpm: 1000, dump_gpm: 1000, distance_mi: 2, speed_mph: 35 } };
 function renderTankerFleetSize(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A planning aid, not incident command; the fill-site capacity and the operation govern. Citation: IFSTA / NFPA 1142 rural water-supply fill-site-limited fleet size, by name. bottleneck_min = max(tank/fill_gpm, tank/dump_gpm); fleet_for_max = ceil(cycle_min / bottleneck_min); site_limited_flow_gpm = tank / bottleneck_min. The bottleneck is the slower fixed site; the flow caps at the tank load over that service time no matter the fleet, so tankers beyond the solved fleet just queue. The tank load is the usable water moved (ISO ~90% of nominal).";
-  const tank = makeNumber("Usable water per trip (gal)", "tfs-tank", { step: "any", min: "0", value: "3000" }); tank.input.value = "3000";
-  const fill = makeNumber("Fill-site rate (gpm)", "tfs-fill", { step: "any", min: "0", value: "1000" }); fill.input.value = "1000";
-  const dump = makeNumber("Dump / unload rate (gpm)", "tfs-dump", { step: "any", min: "0", value: "1000" }); dump.input.value = "1000";
-  const dist = makeNumber("One-way haul distance (mi)", "tfs-dist", { step: "any", min: "0", value: "2" }); dist.input.value = "2";
-  const speed = makeNumber("Average road speed (mph)", "tfs-speed", { step: "any", min: "0", value: "35" }); speed.input.value = "35";
+  const tank = makeNumber("Usable water per trip (gal)", "tfs-tank", { step: "any", min: "0" });
+  const fill = makeNumber("Fill-site rate (gpm)", "tfs-fill", { step: "any", min: "0" });
+  const dump = makeNumber("Dump / unload rate (gpm)", "tfs-dump", { step: "any", min: "0" });
+  const dist = makeNumber("One-way haul distance (mi)", "tfs-dist", { step: "any", min: "0" });
+  const speed = makeNumber("Average road speed (mph)", "tfs-speed", { step: "any", min: "0" });
   for (const f of [tank, fill, dump, dist, speed]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { tank.input.value = "3000"; fill.input.value = "1000"; dump.input.value = "1000"; dist.input.value = "2"; speed.input.value = "35"; update(); });
   const oFleet = makeOutputLine(outputRegion, "Fleet to reach the ceiling", "tfs-out-fleet");
@@ -2348,11 +2344,11 @@ export function computeFoamEductorLimit({ inlet_pressure_psi = 0, eductor_flow_g
 export const foamEductorLimitExample = { inputs: { inlet_pressure_psi: 200, eductor_flow_gpm: 95, hose_coefficient: 15.5, nozzle_pressure_psi: 100, elevation_ft: 30 } };
 function renderFoamEductorLimit(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A planning aid, not incident command; the eductor manufacturer data governs. Citation: IFSTA / eductor manufacturer data (TFT/Elkhart) in-line foam eductor back-pressure limit, by name. max_back_pressure = 0.65 x inlet; FL_per_100 = C x (Q/100)^2; max_length = (max_back_pressure - nozzle - 0.434 x elevation) / FL_per_100 x 100. If the back-pressure exceeds about 65% of inlet the eductor stops drawing foam concentrate entirely (not less, none) while water keeps flowing; the eductor's rated flow must equal the nozzle's flow.";
-  const inlet = makeNumber("Eductor inlet pressure (psi, ~200)", "fe-inlet", { step: "any", min: "0", value: "200" }); inlet.input.value = "200";
-  const Q = makeNumber("Rated eductor flow (gpm, = nozzle flow)", "fe-q", { step: "any", min: "0", value: "95" }); Q.input.value = "95";
-  const C = makeNumber("Downstream hose coefficient C (1.75 in ~ 15.5)", "fe-c", { step: "any", min: "0", value: "15.5" }); C.input.value = "15.5";
-  const nozzle = makeNumber("Nozzle operating pressure (psi)", "fe-nozzle", { step: "any", min: "0", value: "100" }); nozzle.input.value = "100";
-  const elev = makeNumber("Elevation to nozzle (ft, negative = downhill)", "fe-elev", { step: "any", value: "30" }); elev.input.value = "30";
+  const inlet = makeNumber("Eductor inlet pressure (psi, ~200)", "fe-inlet", { step: "any", min: "0" });
+  const Q = makeNumber("Rated eductor flow (gpm, = nozzle flow)", "fe-q", { step: "any", min: "0" });
+  const C = makeNumber("Downstream hose coefficient C (1.75 in ~ 15.5)", "fe-c", { step: "any", min: "0" });
+  const nozzle = makeNumber("Nozzle operating pressure (psi)", "fe-nozzle", { step: "any", min: "0" });
+  const elev = makeNumber("Elevation to nozzle (ft, negative = downhill)", "fe-elev", { step: "any" });
   for (const f of [inlet, Q, C, nozzle, elev]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { inlet.input.value = "200"; Q.input.value = "95"; C.input.value = "15.5"; nozzle.input.value = "100"; elev.input.value = "30"; update(); });
   const oBP = makeOutputLine(outputRegion, "Maximum allowable back-pressure", "fe-out-bp");
@@ -2427,14 +2423,14 @@ export const extinguisherCoverageExample = { inputs: { floor_area_sf: 40000, haz
 
 function _v1143renderExtinguisherCoverage(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NFPA 10 - a maximum travel distance to a Class A extinguisher of 75 ft at all hazard levels, a maximum travel distance of 30 ft for Class K, a Class B travel distance of 30 or 50 ft depending on the extinguisher's B rating and the hazard level (entered, not assumed), and the 6.1.3.3 ceiling of 11,250 sq ft of coverage per extinguisher. The square-grid relation area = 2 x travel^2 is geometry, not a code value, and it reproduces the 11,250 exactly at 75 ft. Travel distance is measured along the PATH OF TRAVEL, not in a straight line, so the grid figure is an open-floor best case. The extinguisher RATING is a separate determination from NFPA 10's maximum-area-per-unit-of-A table by hazard classification, which is not reproduced here. Class D travel distances are not shipped. Also not checked: mounting height, signage, obstruction, inspection intervals, or whether extinguishers are required at all. A planning aid, not a fire-protection design; NFPA 10 as adopted and the AHJ govern.";
-  const a = makeNumber("Floor area (sq ft)", "exc-a", { step: "any", min: "0" }); a.input.value = "40000";
+  const a = makeNumber("Floor area (sq ft)", "exc-a", { step: "any", min: "0" });
   const hc = makeSelect("Hazard class", "exc-hc", [
     { value: "A", label: "Class A - ordinary combustibles (75 ft)", selected: true },
     { value: "B", label: "Class B - flammable liquids (enter 30 or 50 ft)" },
     { value: "K", label: "Class K - cooking media (30 ft)" },
   ]);
-  const td = makeNumber("Travel distance for Class B (ft)", "exc-td", { step: "any", min: "0" }); td.input.value = "0";
-  const cp = makeNumber("Area cap per extinguisher (sq ft; NFPA 11,250)", "exc-cp", { step: "any", min: "0" }); cp.input.value = "11250";
+  const td = makeNumber("Travel distance for Class B (ft)", "exc-td", { step: "any", min: "0" });
+  const cp = makeNumber("Area cap per extinguisher (sq ft; NFPA 11,250)", "exc-cp", { step: "any", min: "0" });
   inputRegion.appendChild(a.wrap); inputRegion.appendChild(hc.wrap); inputRegion.appendChild(td.wrap); inputRegion.appendChild(cp.wrap);
   attachExampleButton(inputRegion, () => { a.input.value = "40000"; hc.select.value = "A"; td.input.value = "0"; cp.input.value = "11250"; update(); });
   const oN = makeOutputLine(outputRegion, "Extinguishers required", "exc-out-n");

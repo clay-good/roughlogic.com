@@ -3721,10 +3721,8 @@ export const ujointOperatingAngleExample = { inputs: { input_angle_deg: 10, outp
 
 function _v959renderUjointOperatingAngle(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Cardan (Hooke) U-joint kinematics and the two-joint cancellation rule, by name. A single joint at angle b swings the output speed between cos(b) and 1/cos(b) of input (peak-to-peak = 1/cos(b) - cos(b)) twice per rev; a two-joint shaft cancels it only when both working angles are equal and the yokes are phased. Keep angles small; the manufacturer's rpm-vs-angle chart and the service manual govern.";
-  const ia = makeNumber("Input (first) U-joint angle (deg)", "uja-ia", { step: "any", min: "0", value: "10" });
-  ia.input.value = "10";
-  const oa = makeNumber("Output (second) U-joint angle (deg)", "uja-oa", { step: "any", min: "0", value: "10" });
-  oa.input.value = "10";
+  const ia = makeNumber("Input (first) U-joint angle (deg)", "uja-ia", { step: "any", min: "0" });
+  const oa = makeNumber("Output (second) U-joint angle (deg)", "uja-oa", { step: "any", min: "0" });
   for (const f of [ia, oa]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ia.input.value = "10"; oa.input.value = "10"; update(); });
   const oV = makeOutputLine(outputRegion, "Cancellation verdict", "uja-out-v");

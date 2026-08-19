@@ -151,8 +151,8 @@ export const drillPointAngleFromLengthExample = { inputs: { diameter_in: 0.5, po
 
 function renderDrillPointAngleFromLength(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Included point angle = 2 x atan( (diameter / 2) / point length ) - first-principles drill-point geometry (the standard 118-degree / 135-degree drill-point relation as in Machinery's Handbook, by name) solved for the angle. Geometry only; web thinning, drift, and the actual grind govern the drilled hole.";
-  const dia = makeNumber("Drill diameter (in)", "dpa-dia", { step: "any", min: "0", value: "0.5" }); dia.input.value = "0.5";
-  const plen = makeNumber("Point length / tip allowance (in)", "dpa-plen", { step: "any", min: "0", value: "0.15" }); plen.input.value = "0.15";
+  const dia = makeNumber("Drill diameter (in)", "dpa-dia", { step: "any", min: "0" });
+  const plen = makeNumber("Point length / tip allowance (in)", "dpa-plen", { step: "any", min: "0" });
   for (const f of [dia, plen]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { dia.input.value = "0.5"; plen.input.value = "0.15"; update(); });
   const oAngle = makeOutputLine(outputRegion, "Included point angle", "dpa-out-angle");
@@ -193,8 +193,8 @@ export const cuttingDiameterForRpmExample = { inputs: { surface_speed_sfm: 100, 
 
 function renderCuttingDiameterForRpm(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Machining spindle speed RPM = 12 x SFM / (pi x diameter) - first-principles cutting geometry (the speeds-and-feeds method as in Machinery's Handbook, Industrial Press, by name) - solved for the diameter: diameter = 12 x SFM / (pi x RPM). The recommended surface speed (SFM) comes from the tool / material chart (user-supplied); the machine, fixturing, and rigidity govern the safe spindle speed.";
-  const sfm = makeNumber("Surface speed (SFM)", "cdr-sfm", { step: "any", min: "0", value: "100" }); sfm.input.value = "100";
-  const rpm = makeNumber("Spindle RPM (e.g. machine maximum)", "cdr-rpm", { step: "any", min: "0", value: "1000" }); rpm.input.value = "1000";
+  const sfm = makeNumber("Surface speed (SFM)", "cdr-sfm", { step: "any", min: "0" });
+  const rpm = makeNumber("Spindle RPM (e.g. machine maximum)", "cdr-rpm", { step: "any", min: "0" });
   for (const f of [sfm, rpm]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { sfm.input.value = "100"; rpm.input.value = "1000"; update(); });
   const oDia = makeOutputLine(outputRegion, "Diameter at that RPM", "cdr-out-dia");
@@ -338,12 +338,9 @@ export function computeSpindleMaxMrr({ available_motor_hp = 0, unit_power_hp = 1
 export const spindleMaxMrrExample = { inputs: { available_motor_hp: 5, unit_power_hp: 1.0, efficiency_pct: 80 } };
 function renderSpindleMaxMrr(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: first-principles specific-cutting-energy relation solved for the removal rate, max MRR = motor hp x efficiency / unit power, with Machinery's Handbook unit-power values (tabular reference), by name. The power (stall) limit only; depth/feed, tool strength, and rigidity are separate limits. The tool and machine govern the real cut.";
-  const motor = makeNumber("Available motor horsepower (hp)", "smm-motor", { step: "any", min: "0", value: "5" });
-  motor.input.value = "5";
-  const unitPower = makeNumber("Unit power (hp per in3/min)", "smm-up", { step: "any", min: "0", value: "1.0" });
-  unitPower.input.value = "1.0";
-  const eff = makeNumber("Spindle drive efficiency (%)", "smm-eff", { step: "any", min: "0", value: "80" });
-  eff.input.value = "80";
+  const motor = makeNumber("Available motor horsepower (hp)", "smm-motor", { step: "any", min: "0" });
+  const unitPower = makeNumber("Unit power (hp per in3/min)", "smm-up", { step: "any", min: "0" });
+  const eff = makeNumber("Spindle drive efficiency (%)", "smm-eff", { step: "any", min: "0" });
   for (const f of [motor, unitPower, eff]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { motor.input.value = "5"; unitPower.input.value = "1.0"; eff.input.value = "80"; update(); });
   const oMrr = makeOutputLine(outputRegion, "Max material removal rate", "smm-out-mrr");
@@ -580,9 +577,9 @@ export function computeSpurGearGeometry({ diametral_pitch = 0, teeth = 0, mating
 export const spurGearGeometryExample = { inputs: { diametral_pitch: 10, teeth: 40, mating_teeth: 20 } };
 function renderSpurGearGeometry(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Spur gear tooth proportions (diametral-pitch system, 20-degree full-depth involute; AGMA / Machinery's Handbook): pitch dia = N/Pd, OD = (N+2)/Pd, addendum = 1/Pd, dedendum = 1.25/Pd, whole depth = 2.25/Pd, root = (N-2.5)/Pd, center distance = (N1+N2)/(2 Pd). A shop aid; the gear drawing and AGMA standard govern.";
-  const pd = makeNumber("Diametral pitch Pd (teeth/in)", "sgg-pd", { step: "any", min: "0" }); pd.input.value = "10";
-  const n = makeNumber("Number of teeth N", "sgg-n", { step: "any", min: "0" }); n.input.value = "40";
-  const nm = makeNumber("Mating gear teeth (optional)", "sgg-nm", { step: "any", min: "0" }); nm.input.value = "20";
+  const pd = makeNumber("Diametral pitch Pd (teeth/in)", "sgg-pd", { step: "any", min: "0" });
+  const n = makeNumber("Number of teeth N", "sgg-n", { step: "any", min: "0" });
+  const nm = makeNumber("Mating gear teeth (optional)", "sgg-nm", { step: "any", min: "0" });
   for (const f of [pd, n, nm]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { pd.input.value = "10"; n.input.value = "40"; nm.input.value = "20"; update(); });
   const oPd = makeOutputLine(outputRegion, "Pitch / outside diameter", "sgg-out-pd");
@@ -636,10 +633,10 @@ export function computeWormGearGeometry({ axial_pitch_in = 0, worm_starts = 0, w
 export const wormGearGeometryExample = { inputs: { axial_pitch_in: 0.5, worm_starts: 1, worm_pitch_dia_in: 2, wheel_teeth: 40 } };
 function renderWormGearGeometry(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: worm and worm-wheel geometry (Machinery's Handbook, first-principles): lead = axial pitch x starts, lead angle = atan(lead/(pi x worm pitch dia)), ratio = wheel teeth / starts, wheel pitch dia = N x axial pitch / pi, center distance = (d_worm + d_wheel)/2; a lead angle below ~5 degrees tends to self-lock. A shop aid; the gear drawing and the AGMA / Machinery's Handbook data govern.";
-  const px = makeNumber("Worm axial pitch (in)", "wgg-px", { step: "any", min: "0" }); px.input.value = "0.5";
-  const nw = makeNumber("Worm starts (threads, 1-4)", "wgg-nw", { step: "any", min: "0" }); nw.input.value = "1";
-  const dw = makeNumber("Worm pitch diameter (in)", "wgg-dw", { step: "any", min: "0" }); dw.input.value = "2";
-  const ng = makeNumber("Worm-wheel teeth N", "wgg-ng", { step: "any", min: "0" }); ng.input.value = "40";
+  const px = makeNumber("Worm axial pitch (in)", "wgg-px", { step: "any", min: "0" });
+  const nw = makeNumber("Worm starts (threads, 1-4)", "wgg-nw", { step: "any", min: "0" });
+  const dw = makeNumber("Worm pitch diameter (in)", "wgg-dw", { step: "any", min: "0" });
+  const ng = makeNumber("Worm-wheel teeth N", "wgg-ng", { step: "any", min: "0" });
   for (const f of [px, nw, dw, ng]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { px.input.value = "0.5"; nw.input.value = "1"; dw.input.value = "2"; ng.input.value = "40"; update(); });
   const oLead = makeOutputLine(outputRegion, "Lead / lead angle", "wgg-out-lead");
@@ -683,8 +680,8 @@ export function computeGearIdentification({ teeth = 0, outside_dia_in = 0 } = {}
 export const gearIdentificationExample = { inputs: { teeth: 40, outside_dia_in: 4.2 } };
 function renderGearIdentification(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Spur gear identification (diametral-pitch system, 20-degree full-depth involute; AGMA / Machinery's Handbook), the inverse of OD = (N+2)/Pd: Pd = (N+2)/OD, pitch dia = N/Pd, module = 25.4/Pd, snapped to the nearest standard Pd. A shop aid; confirm against the gear drawing or a gear gauge.";
-  const n = makeNumber("Number of teeth N (counted)", "gid-n", { step: "any", min: "0" }); n.input.value = "40";
-  const od = makeNumber("Measured outside diameter (in)", "gid-od", { step: "any", min: "0" }); od.input.value = "4.2";
+  const n = makeNumber("Number of teeth N (counted)", "gid-n", { step: "any", min: "0" });
+  const od = makeNumber("Measured outside diameter (in)", "gid-od", { step: "any", min: "0" });
   for (const f of [n, od]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { n.input.value = "40"; od.input.value = "4.2"; update(); });
   const oPd = makeOutputLine(outputRegion, "Diametral pitch Pd", "gid-out-pd");
@@ -727,10 +724,8 @@ export const gearChordalThicknessExample = { inputs: { diametral_pitch: 10, teet
 
 function renderGearChordalThickness(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: gear-tooth caliper chordal dimensions for a 20-degree full-depth involute spur gear - chordal tooth thickness tc = (N/Pd) sin(90/N deg), chordal addendum ac = 1/Pd + (N/(2Pd))(1 - cos(90/N deg)), the standard Machinery's Handbook / AGMA gear-tooth-caliper method. Standard tooth, no profile shift or backlash allowance. A shop inspection aid; the gear drawing and AGMA govern.";
-  const pd = makeNumber("Diametral pitch Pd (teeth/in)", "gct-pd", { step: "any", min: "0", value: "10" });
-  pd.input.value = "10";
-  const n = makeNumber("Number of teeth N", "gct-n", { step: "1", min: "3", value: "40" });
-  n.input.value = "40";
+  const pd = makeNumber("Diametral pitch Pd (teeth/in)", "gct-pd", { step: "any", min: "0" });
+  const n = makeNumber("Number of teeth N", "gct-n", { step: "1", min: "3" });
   for (const f of [pd, n]) inputRegion.appendChild(f.wrap);
   const oTc = makeOutputLine(outputRegion, "Chordal tooth thickness (caliper reading)", "gct-out-tc");
   const oAc = makeOutputLine(outputRegion, "Chordal addendum (caliper tongue depth)", "gct-out-ac");
@@ -773,9 +768,9 @@ export function computeBearingL10Life({ dynamic_rating_lbf = 0, equivalent_load_
 export const bearingL10LifeExample = { inputs: { dynamic_rating_lbf: 5000, equivalent_load_lbf: 1000, speed_rpm: 1750, bearing_type: "ball" } };
 function renderBearingL10Life(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ISO 281 / ABMA 9 & 11 basic rating life: L10 = (C/P)^p x 10^6 rev, L10h = L10 / (60 x rpm), p = 3 ball / 10/3 roller. Life scales as the cube (ball) of the load ratio. Basic L10 assumes clean, well-lubricated operation; L10 is the life at which 10% have failed, not the average. A planning estimate; the mounting, lubrication, and application govern.";
-  const c = makeNumber("Basic dynamic load rating C (lbf)", "bl10-c", { step: "any", min: "0" }); c.input.value = "5000";
-  const p = makeNumber("Equivalent dynamic load P (lbf)", "bl10-p", { step: "any", min: "0" }); p.input.value = "1000";
-  const rpm = makeNumber("Operating speed (rpm)", "bl10-rpm", { step: "any", min: "0" }); rpm.input.value = "1750";
+  const c = makeNumber("Basic dynamic load rating C (lbf)", "bl10-c", { step: "any", min: "0" });
+  const p = makeNumber("Equivalent dynamic load P (lbf)", "bl10-p", { step: "any", min: "0" });
+  const rpm = makeNumber("Operating speed (rpm)", "bl10-rpm", { step: "any", min: "0" });
   const type = makeSelect("Bearing type", "bl10-type", [
     { value: "ball", label: "Ball (p = 3)", selected: true },
     { value: "roller", label: "Roller (p = 10/3)" },
@@ -823,9 +818,9 @@ export function computeBearingMaxLoad({ dynamic_rating_lbf = 0, target_life_hr =
 export const bearingMaxLoadExample = { inputs: { dynamic_rating_lbf: 5000, target_life_hr: 1190, speed_rpm: 1750, bearing_type: "ball" } };
 function renderBearingMaxLoad(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ISO 281 / ABMA 9 & 11 basic rating life solved for the load: P_max = C x (10^6 / L10_rev)^(1/p) with L10_rev = target_hr x 60 x rpm, p = 3 ball / 10/3 roller. Life scales as the cube (ball) of the load ratio. Basic L10 assumes clean, well-lubricated operation; L10 is the life at which 10% have failed, not the average. A planning estimate; the mounting, lubrication, and application govern.";
-  const c = makeNumber("Basic dynamic load rating C (lbf)", "bml-c", { step: "any", min: "0" }); c.input.value = "5000";
-  const hr = makeNumber("Target rating life L10h (hr)", "bml-hr", { step: "any", min: "0" }); hr.input.value = "1190";
-  const rpm = makeNumber("Operating speed (rpm)", "bml-rpm", { step: "any", min: "0" }); rpm.input.value = "1750";
+  const c = makeNumber("Basic dynamic load rating C (lbf)", "bml-c", { step: "any", min: "0" });
+  const hr = makeNumber("Target rating life L10h (hr)", "bml-hr", { step: "any", min: "0" });
+  const rpm = makeNumber("Operating speed (rpm)", "bml-rpm", { step: "any", min: "0" });
   const type = makeSelect("Bearing type", "bml-type", [
     { value: "ball", label: "Ball (p = 3)", selected: true },
     { value: "roller", label: "Roller (p = 10/3)" },
@@ -897,9 +892,9 @@ export function computeBearingEquivalentLoad({ radial_load_lbf = 0, thrust_load_
 export const bearingEquivalentLoadExample = { inputs: { radial_load_lbf: 1000, thrust_load_lbf: 500, static_rating_lbf: 5000 } };
 function renderBearingEquivalentLoad(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ISO 281 dynamic equivalent load P = X Fr + Y Fa for a single-row deep-groove ball bearing, with the e-ratio and thrust factor Y interpolated from the standard ISO 281 / SKF table on Fa/C0 (X = 0.56 above e; X = 1, Y = 0 at or below e). Feed P into bearing-l10-life. A planning estimate; ISO 281 and the bearing maker's catalogue govern.";
-  const fr = makeNumber("Radial load Fr (lbf)", "beq-fr", { step: "any", min: "0" }); fr.input.value = "1000";
-  const fa = makeNumber("Thrust (axial) load Fa (lbf)", "beq-fa", { step: "any", min: "0" }); fa.input.value = "500";
-  const c0 = makeNumber("Basic static load rating C0 (lbf)", "beq-c0", { step: "any", min: "0" }); c0.input.value = "5000";
+  const fr = makeNumber("Radial load Fr (lbf)", "beq-fr", { step: "any", min: "0" });
+  const fa = makeNumber("Thrust (axial) load Fa (lbf)", "beq-fa", { step: "any", min: "0" });
+  const c0 = makeNumber("Basic static load rating C0 (lbf)", "beq-c0", { step: "any", min: "0" });
   for (const f of [fr, fa, c0]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { fr.input.value = "1000"; fa.input.value = "500"; c0.input.value = "5000"; update(); });
   const oP = makeOutputLine(outputRegion, "Equivalent dynamic load P", "beq-out-p");
@@ -964,11 +959,11 @@ export function computeFatigueSafetyFactor({ alternating_stress_psi = 0, mean_st
 export const fatigueSafetyFactorExample = { inputs: { alternating_stress_psi: 25000, mean_stress_psi: 30000, endurance_limit_psi: 40000, ultimate_strength_psi: 100000, yield_strength_psi: 80000, criterion: "goodman" } };
 function renderFatigueSafetyFactor(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: fluctuating-stress fatigue criteria (Shigley, Mechanical Engineering Design; Juvinall): modified Goodman 1/n = sa/Se + sm/Sut, Soderberg 1/n = sa/Se + sm/Sy, Gerber n sa/Se + (n sm/Sut)^2 = 1, with the Langer first-cycle-yield line ny = Sy/(sa + sm). Se is the corrected endurance limit (an input). Infinite-life, uniaxial; the engineer of record governs.";
-  const sa = makeNumber("Alternating stress sigma_a (psi)", "fat-sa", { step: "any", min: "0" }); sa.input.value = "25000";
-  const sm = makeNumber("Mean stress sigma_m (psi)", "fat-sm", { step: "any", min: "0" }); sm.input.value = "30000";
-  const se = makeNumber("Corrected endurance limit Se (psi)", "fat-se", { step: "any", min: "0" }); se.input.value = "40000";
-  const sut = makeNumber("Ultimate strength Sut (psi)", "fat-sut", { step: "any", min: "0" }); sut.input.value = "100000";
-  const sy = makeNumber("Yield strength Sy (psi)", "fat-sy", { step: "any", min: "0" }); sy.input.value = "80000";
+  const sa = makeNumber("Alternating stress sigma_a (psi)", "fat-sa", { step: "any", min: "0" });
+  const sm = makeNumber("Mean stress sigma_m (psi)", "fat-sm", { step: "any", min: "0" });
+  const se = makeNumber("Corrected endurance limit Se (psi)", "fat-se", { step: "any", min: "0" });
+  const sut = makeNumber("Ultimate strength Sut (psi)", "fat-sut", { step: "any", min: "0" });
+  const sy = makeNumber("Yield strength Sy (psi)", "fat-sy", { step: "any", min: "0" });
   const crit = makeSelect("Criterion", "fat-crit", [
     { value: "goodman", label: "Modified Goodman (standard)", selected: true },
     { value: "soderberg", label: "Soderberg (conservative)" },
@@ -1041,9 +1036,9 @@ export function computeEnduranceLimitMarin({ ultimate_strength_psi = 0, surface_
 export const enduranceLimitMarinExample = { inputs: { ultimate_strength_psi: 105000, surface_finish: "machined", diameter_in: 1, load_type: "bending", reliability_pct: "99", temperature_factor_kd: 1 } };
 function renderEnduranceLimitMarin(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: corrected endurance limit Se = ka kb kc kd ke Se' with the Shigley Marin factors (Mechanical Engineering Design, Ch. 6): Se' = 0.5 Sut (steel, Sut <= 200 ksi); ka = a Sut_ksi^b by surface finish; kb the size factor; kc the load factor (1/0.85/0.59); kd temperature; ke reliability. Steel; feed Se into fatigue-safety-factor. A design aid; Shigley and the engineer of record govern.";
-  const sut = makeNumber("Ultimate strength Sut (psi)", "elm-sut", { step: "any", min: "0" }); sut.input.value = "105000";
+  const sut = makeNumber("Ultimate strength Sut (psi)", "elm-sut", { step: "any", min: "0" });
   const surf = makeSelect("Surface finish", "elm-surf", Object.keys(MARIN_SURFACE).map((k) => ({ value: k, label: MARIN_SURFACE[k].label, selected: k === "machined" })));
-  const d = makeNumber("Diameter d (in)", "elm-d", { step: "any", min: "0" }); d.input.value = "1";
+  const d = makeNumber("Diameter d (in)", "elm-d", { step: "any", min: "0" });
   const load = makeSelect("Load type", "elm-load", [
     { value: "bending", label: "Rotating bending (kc = 1)", selected: true },
     { value: "axial", label: "Axial (kc = 0.85, kb = 1)" },
@@ -1056,7 +1051,7 @@ function renderEnduranceLimitMarin(inputRegion, outputRegion, citationEl) {
     { value: "99", label: "99% (ke = 0.814)", selected: true },
     { value: "99.9", label: "99.9% (ke = 0.753)" },
   ]);
-  const kd = makeNumber("Temperature factor kd", "elm-kd", { step: "any", min: "0" }); kd.input.value = "1";
+  const kd = makeNumber("Temperature factor kd", "elm-kd", { step: "any", min: "0" });
   for (const f of [sut, surf, d, load, rel, kd]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { sut.input.value = "105000"; surf.select.value = "machined"; d.input.value = "1"; load.select.value = "bending"; rel.select.value = "99"; kd.input.value = "1"; update(); });
   const oSe = makeOutputLine(outputRegion, "Corrected endurance limit Se", "elm-out-se");
@@ -1120,12 +1115,12 @@ export function computePowerScrewTorque({ axial_load_lbf = 0, mean_diameter_in =
 export const powerScrewTorqueExample = { inputs: { axial_load_lbf: 1000, mean_diameter_in: 1.0, lead_in: 0.2, thread_friction: 0.15, collar_friction: 0.15, collar_diameter_in: 1.5, thread_form: "acme" } };
 function renderPowerScrewTorque(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: power-screw raising/lowering torque (Shigley, Mechanical Engineering Design, Ch. 8): T_raise = (F dm/2)(l + pi mu dm sec_a)/(pi dm - mu l sec_a) + F muc dc/2, T_lower with (pi mu dm sec_a - l)/(pi dm + mu l sec_a), sec_a = 1/cos of the thread half-angle (square 0, Acme 14.5, Unified 30 deg). Efficiency = F l/(2 pi T_raise); self-locking if pi mu dm sec_a > l. A design aid; Shigley and the maker govern.";
-  const F = makeNumber("Axial load F (lbf)", "pst-f", { step: "any", min: "0" }); F.input.value = "1000";
-  const dm = makeNumber("Mean thread diameter dm (in)", "pst-dm", { step: "any", min: "0" }); dm.input.value = "1.0";
-  const l = makeNumber("Lead l = pitch x starts (in)", "pst-l", { step: "any", min: "0" }); l.input.value = "0.2";
-  const mu = makeNumber("Thread friction coefficient", "pst-mu", { step: "any", min: "0" }); mu.input.value = "0.15";
-  const muc = makeNumber("Collar friction coefficient", "pst-muc", { step: "any", min: "0" }); muc.input.value = "0.15";
-  const dc = makeNumber("Collar mean diameter dc (in, 0 = thrust bearing)", "pst-dc", { step: "any", min: "0" }); dc.input.value = "1.5";
+  const F = makeNumber("Axial load F (lbf)", "pst-f", { step: "any", min: "0" });
+  const dm = makeNumber("Mean thread diameter dm (in)", "pst-dm", { step: "any", min: "0" });
+  const l = makeNumber("Lead l = pitch x starts (in)", "pst-l", { step: "any", min: "0" });
+  const mu = makeNumber("Thread friction coefficient", "pst-mu", { step: "any", min: "0" });
+  const muc = makeNumber("Collar friction coefficient", "pst-muc", { step: "any", min: "0" });
+  const dc = makeNumber("Collar mean diameter dc (in, 0 = thrust bearing)", "pst-dc", { step: "any", min: "0" });
   const form = makeSelect("Thread form", "pst-form", [
     { value: "square", label: "Square (half-angle 0)" },
     { value: "acme", label: "Acme (half-angle 14.5 deg)", selected: true },
@@ -1185,11 +1180,11 @@ export function computeDiskClutchTorque({ clamp_force_lbf = 0, friction_coeffici
 export const diskClutchTorqueExample = { inputs: { clamp_force_lbf: 1000, friction_coefficient: 0.3, outer_radius_in: 3, inner_radius_in: 2, friction_surfaces: 1 } };
 function renderDiskClutchTorque(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: disk-clutch friction torque (Shigley, Mechanical Engineering Design, Ch. 16): uniform wear T = F mu N (ro + ri)/2 (p max at the inner radius, the design value), uniform pressure T = (2/3) F mu N (ro^3 - ri^3)/(ro^2 - ri^2), and max contact pressure p_max = F/(2 pi ri (ro - ri)). N is the number of friction interfaces. A design aid; Shigley and the facing maker govern.";
-  const F = makeNumber("Axial clamp force F (lbf)", "dct-f", { step: "any", min: "0" }); F.input.value = "1000";
-  const mu = makeNumber("Friction coefficient", "dct-mu", { step: "any", min: "0" }); mu.input.value = "0.3";
-  const ro = makeNumber("Outer friction radius ro (in)", "dct-ro", { step: "any", min: "0" }); ro.input.value = "3";
-  const ri = makeNumber("Inner friction radius ri (in)", "dct-ri", { step: "any", min: "0" }); ri.input.value = "2";
-  const N = makeNumber("Friction surfaces N (single plate = 2)", "dct-n", { step: "1", min: "1" }); N.input.value = "1";
+  const F = makeNumber("Axial clamp force F (lbf)", "dct-f", { step: "any", min: "0" });
+  const mu = makeNumber("Friction coefficient", "dct-mu", { step: "any", min: "0" });
+  const ro = makeNumber("Outer friction radius ro (in)", "dct-ro", { step: "any", min: "0" });
+  const ri = makeNumber("Inner friction radius ri (in)", "dct-ri", { step: "any", min: "0" });
+  const N = makeNumber("Friction surfaces N (single plate = 2)", "dct-n", { step: "1", min: "1" });
   for (const f of [F, mu, ro, ri, N]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { F.input.value = "1000"; mu.input.value = "0.3"; ro.input.value = "3"; ri.input.value = "2"; N.input.value = "1"; update(); });
   const oW = makeOutputLine(outputRegion, "Torque (uniform wear, design)", "dct-out-w");
@@ -1258,11 +1253,11 @@ export function computeEulerJohnsonColumn({ modulus_psi = 30000000, yield_streng
 export const eulerJohnsonColumnExample = { inputs: { modulus_psi: 30000000, yield_strength_psi: 40000, moment_of_inertia_in4: 0.05, area_in2: 1.0, length_in: 20, end_condition: "pinned-pinned" } };
 function renderEulerJohnsonColumn(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Euler-Johnson column buckling (Shigley, Mechanical Engineering Design, Ch. 4): SR = K L/sqrt(I/A), transition SR_D = pi sqrt(2 E/Sy); Euler Pcr = pi^2 E I/(K L)^2 for SR >= SR_D, J.B. Johnson Pcr = A[Sy - (Sy SR/(2 pi))^2/E] below it. K by end condition. Concentric load; apply a safety factor. A design aid; Shigley and the engineer of record govern.";
-  const E = makeNumber("Modulus E (psi)", "ejc-e", { step: "any", min: "0" }); E.input.value = "30000000";
-  const Sy = makeNumber("Yield strength Sy (psi)", "ejc-sy", { step: "any", min: "0" }); Sy.input.value = "40000";
-  const I = makeNumber("Moment of inertia I (in⁴)", "ejc-i", { step: "any", min: "0" }); I.input.value = "0.05";
-  const A = makeNumber("Cross-section area A (in²)", "ejc-a", { step: "any", min: "0" }); A.input.value = "1.0";
-  const L = makeNumber("Unbraced length L (in)", "ejc-l", { step: "any", min: "0" }); L.input.value = "20";
+  const E = makeNumber("Modulus E (psi)", "ejc-e", { step: "any", min: "0" });
+  const Sy = makeNumber("Yield strength Sy (psi)", "ejc-sy", { step: "any", min: "0" });
+  const I = makeNumber("Moment of inertia I (in⁴)", "ejc-i", { step: "any", min: "0" });
+  const A = makeNumber("Cross-section area A (in²)", "ejc-a", { step: "any", min: "0" });
+  const L = makeNumber("Unbraced length L (in)", "ejc-l", { step: "any", min: "0" });
   const end = makeSelect("End condition", "ejc-end", Object.keys(COLUMN_END_K).map((k) => ({ value: k, label: COLUMN_END_K[k].label, selected: k === "pinned-pinned" })));
   for (const f of [E, Sy, I, A, L, end]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { E.input.value = "30000000"; Sy.input.value = "40000"; I.input.value = "0.05"; A.input.value = "1.0"; L.input.value = "20"; end.select.value = "pinned-pinned"; update(); });
@@ -1315,9 +1310,9 @@ export function computeThickWallCylinderStress({ pressure_psi = 0, inner_radius_
 export const thickWallCylinderStressExample = { inputs: { pressure_psi: 3000, inner_radius_in: 2, wall_thickness_in: 0.5 } };
 function renderThickWallCylinderStress(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Lame thick-wall cylinder stress for internal pressure (Shigley, Mechanical Engineering Design; Roark's Formulas for Stress and Strain): sigma_hoop(bore) = P(ro^2+ri^2)/(ro^2-ri^2), sigma_hoop(outer) = 2P ri^2/(ro^2-ri^2), sigma_radial(bore) = -P, sigma_long(closed) = P ri^2/(ro^2-ri^2). The thin-wall P D/(2t) is shown for comparison. A design aid; the engineer of record governs.";
-  const P = makeNumber("Internal pressure P (psi)", "twc-p", { step: "any", min: "0" }); P.input.value = "3000";
-  const ri = makeNumber("Inner radius ri (in)", "twc-ri", { step: "any", min: "0" }); ri.input.value = "2";
-  const t = makeNumber("Wall thickness t (in)", "twc-t", { step: "any", min: "0" }); t.input.value = "0.5";
+  const P = makeNumber("Internal pressure P (psi)", "twc-p", { step: "any", min: "0" });
+  const ri = makeNumber("Inner radius ri (in)", "twc-ri", { step: "any", min: "0" });
+  const t = makeNumber("Wall thickness t (in)", "twc-t", { step: "any", min: "0" });
   for (const f of [P, ri, t]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { P.input.value = "3000"; ri.input.value = "2"; t.input.value = "0.5"; update(); });
   const oH = makeOutputLine(outputRegion, "Hoop stress (bore / outer)", "twc-out-h");
@@ -1367,10 +1362,10 @@ export function computeRackAndPinion({ pinion_teeth = 0, diametral_pitch_1_in = 
 export const rackAndPinionExample = { inputs: { pinion_teeth: 20, diametral_pitch_1_in: 10, pinion_torque_in_lb: 100, pinion_rpm: 500 } };
 function renderRackAndPinion(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: rack-and-pinion kinematics and force (Machinery's Handbook): pitch diameter PD = N/Pd, travel per revolution = pi PD, travel per tooth = pi/Pd, linear speed = pi PD x rpm, rack force F = 2 T/PD. Ideal kinematics and static force; tooth stress, backlash, and inertia are separate. A design aid; the drive maker governs.";
-  const N = makeNumber("Pinion teeth N", "rap-n", { step: "1", min: "0" }); N.input.value = "20";
-  const Pd = makeNumber("Diametral pitch Pd (teeth per in)", "rap-pd", { step: "any", min: "0" }); Pd.input.value = "10";
-  const T = makeNumber("Pinion torque T (in-lbf)", "rap-t", { step: "any", min: "0" }); T.input.value = "100";
-  const rpm = makeNumber("Pinion speed (rpm)", "rap-rpm", { step: "any", min: "0" }); rpm.input.value = "500";
+  const N = makeNumber("Pinion teeth N", "rap-n", { step: "1", min: "0" });
+  const Pd = makeNumber("Diametral pitch Pd (teeth per in)", "rap-pd", { step: "any", min: "0" });
+  const T = makeNumber("Pinion torque T (in-lbf)", "rap-t", { step: "any", min: "0" });
+  const rpm = makeNumber("Pinion speed (rpm)", "rap-rpm", { step: "any", min: "0" });
   for (const f of [N, Pd, T, rpm]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { N.input.value = "20"; Pd.input.value = "10"; T.input.value = "100"; rpm.input.value = "500"; update(); });
   const oPD = makeOutputLine(outputRegion, "Pinion pitch diameter", "rap-out-pd");
@@ -1422,10 +1417,10 @@ export function computePlainBearingPressurePv({ radial_load_lbf = 0, journal_dia
 export const plainBearingPressurePvExample = { inputs: { radial_load_lbf: 800, journal_diameter_in: 1.0, bearing_length_in: 1.5, speed_rpm: 300 } };
 function renderPlainBearingPressurePv(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: plain-bearing projected pressure P = W/(L D), surface velocity V = pi D N/12 ft/min, and the PV factor P*V vs the material limit (~50,000 psi-ft/min oil-impregnated bronze) (Machinery's Handbook). Sizing basis for a sleeve/journal bearing or bronze bushing; the bushing maker's rated PV governs.";
-  const W = makeNumber("Radial load W (lbf)", "pbp-w", { step: "any", min: "0" }); W.input.value = "800";
-  const D = makeNumber("Journal diameter D (in)", "pbp-d", { step: "any", min: "0" }); D.input.value = "1.0";
-  const L = makeNumber("Bearing length L (in)", "pbp-l", { step: "any", min: "0" }); L.input.value = "1.5";
-  const N = makeNumber("Shaft speed (rpm)", "pbp-n", { step: "any", min: "0" }); N.input.value = "300";
+  const W = makeNumber("Radial load W (lbf)", "pbp-w", { step: "any", min: "0" });
+  const D = makeNumber("Journal diameter D (in)", "pbp-d", { step: "any", min: "0" });
+  const L = makeNumber("Bearing length L (in)", "pbp-l", { step: "any", min: "0" });
+  const N = makeNumber("Shaft speed (rpm)", "pbp-n", { step: "any", min: "0" });
   for (const f of [W, D, L, N]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { W.input.value = "800"; D.input.value = "1.0"; L.input.value = "1.5"; N.input.value = "300"; update(); });
   const oP = makeOutputLine(outputRegion, "Projected pressure P", "pbp-out-p");
@@ -1473,10 +1468,10 @@ export function computeFlangeCouplingTorque({ bolt_count = 0, bolt_diameter_in =
 export const flangeCouplingTorqueExample = { inputs: { bolt_count: 6, bolt_diameter_in: 0.5, allowable_shear_psi: 10000, bolt_circle_diameter_in: 5 } };
 function renderFlangeCouplingTorque(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: rigid flange coupling torque capacity, bolts in single shear at the bolt-circle radius: T = n (pi/4 d^2 tau) (BCD/2) (Machinery's Handbook; Shigley, Mechanical Engineering Design). Fitted bolts carry torque in shear; also check flange bearing, key, and hub. A design aid; the coupling maker governs.";
-  const n = makeNumber("Number of bolts n", "fct-n", { step: "1", min: "0" }); n.input.value = "6";
-  const d = makeNumber("Bolt diameter d (in)", "fct-d", { step: "any", min: "0" }); d.input.value = "0.5";
-  const tau = makeNumber("Allowable bolt shear stress (psi)", "fct-tau", { step: "any", min: "0" }); tau.input.value = "10000";
-  const bcd = makeNumber("Bolt-circle diameter BCD (in)", "fct-bcd", { step: "any", min: "0" }); bcd.input.value = "5";
+  const n = makeNumber("Number of bolts n", "fct-n", { step: "1", min: "0" });
+  const d = makeNumber("Bolt diameter d (in)", "fct-d", { step: "any", min: "0" });
+  const tau = makeNumber("Allowable bolt shear stress (psi)", "fct-tau", { step: "any", min: "0" });
+  const bcd = makeNumber("Bolt-circle diameter BCD (in)", "fct-bcd", { step: "any", min: "0" });
   for (const f of [n, d, tau, bcd]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { n.input.value = "6"; d.input.value = "0.5"; tau.input.value = "10000"; bcd.input.value = "5"; update(); });
   const oT = makeOutputLine(outputRegion, "Torque capacity", "fct-out-t");
@@ -1518,7 +1513,7 @@ export function computeCountersinkDepth({ countersink_dia_in = 0, included_angle
 export const countersinkDepthExample = { inputs: { countersink_dia_in: 0.5, included_angle_deg: 82, pilot_hole_dia_in: 0.25 } };
 function renderCountersinkDepth(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: countersink diameter-to-depth (Machinery's Handbook countersinking): Z = (D_cs - d_hole) / (2 tan(angle/2)); full-cone travel = D_cs / (2 tan(angle/2)). 82 deg inch flat-head and 90 deg metric heads are not interchangeable. A setup aid; the tool geometry and the fastener callout govern.";
-  const d = makeNumber("Finished countersink diameter D_cs (in)", "csd-d", { step: "any", min: "0" }); d.input.value = "0.5";
+  const d = makeNumber("Finished countersink diameter D_cs (in)", "csd-d", { step: "any", min: "0" });
   const ang = makeSelect("Included angle (deg)", "csd-ang", [
     { value: "82", label: "82 (inch flat-head)", selected: true },
     { value: "90", label: "90 (metric flat-head)" },
@@ -1526,7 +1521,7 @@ function renderCountersinkDepth(inputRegion, outputRegion, citationEl) {
     { value: "120", label: "120" },
     { value: "60", label: "60 (lathe center)" },
   ]);
-  const hole = makeNumber("Pilot / through-hole diameter (in)", "csd-hole", { step: "any", min: "0" }); hole.input.value = "0.25";
+  const hole = makeNumber("Pilot / through-hole diameter (in)", "csd-hole", { step: "any", min: "0" });
   for (const f of [d, ang, hole]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { d.input.value = "0.5"; ang.select.value = "82"; hole.input.value = "0.25"; update(); });
   const oZ = makeOutputLine(outputRegion, "Plunge depth below surface", "csd-out-z");
@@ -1572,7 +1567,7 @@ export function computeCountersinkDiameterFromDepth({ plunge_depth_in = 0, inclu
 export const countersinkDiameterFromDepthExample = { inputs: { plunge_depth_in: 0.1438, included_angle_deg: 82, pilot_hole_dia_in: 0.25 } };
 function renderCountersinkDiameterFromDepth(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: countersink depth-to-diameter (Machinery's Handbook countersinking) solved for the diameter: D_cs = 2 Z tan(angle/2) + d_hole. 82 deg inch flat-head and 90 deg metric heads are not interchangeable. A setup aid; the tool geometry and the fastener callout govern.";
-  const z = makeNumber("Plunge depth below surface Z (in)", "cdd-z", { step: "any", min: "0" }); z.input.value = "0.1438";
+  const z = makeNumber("Plunge depth below surface Z (in)", "cdd-z", { step: "any", min: "0" });
   const ang = makeSelect("Included angle (deg)", "cdd-ang", [
     { value: "82", label: "82 (inch flat-head)", selected: true },
     { value: "90", label: "90 (metric flat-head)" },
@@ -1580,7 +1575,7 @@ function renderCountersinkDiameterFromDepth(inputRegion, outputRegion, citationE
     { value: "120", label: "120" },
     { value: "60", label: "60 (lathe center)" },
   ]);
-  const hole = makeNumber("Pilot / through-hole diameter (in)", "cdd-hole", { step: "any", min: "0" }); hole.input.value = "0.25";
+  const hole = makeNumber("Pilot / through-hole diameter (in)", "cdd-hole", { step: "any", min: "0" });
   for (const f of [z, ang, hole]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { z.input.value = "0.1438"; ang.select.value = "82"; hole.input.value = "0.25"; update(); });
   const oD = makeOutputLine(outputRegion, "Finished countersink diameter D_cs", "cdd-out-d");
@@ -1644,9 +1639,9 @@ export function computeKeyseatKeySize({ shaft_diameter_in = 0, torque_in_lb = 0,
 export const keyseatKeySizeExample = { inputs: { shaft_diameter_in: 1.0, torque_in_lb: 1000, key_length_in: 1.5 } };
 function renderKeyseatKeySize(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ANSI B17.1 Keys and Keyseats (Machinery's Handbook): the standard key width from the shaft-diameter band; shaft keyseat depth = key height / 2; key shear = 2T/(D W L), bearing = 4T/(D H L). The key width is band-based, not D/4; a key longer than the hub adds no capacity. A design aid; the material allowables and fit class govern.";
-  const d = makeNumber("Shaft diameter D (in)", "kks-d", { step: "any", min: "0" }); d.input.value = "1.0";
-  const t = makeNumber("Transmitted torque (in-lb, 0 = geometry only)", "kks-t", { step: "any", min: "0" }); t.input.value = "1000";
-  const len = makeNumber("Key / hub engagement length L (in, 0 = geometry only)", "kks-l", { step: "any", min: "0" }); len.input.value = "1.5";
+  const d = makeNumber("Shaft diameter D (in)", "kks-d", { step: "any", min: "0" });
+  const t = makeNumber("Transmitted torque (in-lb, 0 = geometry only)", "kks-t", { step: "any", min: "0" });
+  const len = makeNumber("Key / hub engagement length L (in, 0 = geometry only)", "kks-l", { step: "any", min: "0" });
   for (const f of [d, t, len]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { d.input.value = "1.0"; t.input.value = "1000"; len.input.value = "1.5"; update(); });
   const oW = makeOutputLine(outputRegion, "Standard key (W x H)", "kks-out-w");
@@ -1693,10 +1688,8 @@ export const knurlBlankDiameterExample = { inputs: { target_diameter_in: 0.75, k
 
 function _v910renderKnurlBlankDiameter(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: knurl tracking rule by name. A circular-pitch (TPI) knurl tracks cleanly when the blank circumference is a whole number of teeth: teeth = round(pi x D x TPI); blank diameter = teeth / (pi x TPI).";
-  const td = makeNumber("Target diameter (in)", "kbd-td", { step: "any", min: "0", value: "0.75" });
-  td.input.value = "0.75";
-  const tp = makeNumber("Knurl pitch (TPI)", "kbd-tp", { step: "any", min: "0", value: "21" });
-  tp.input.value = "21";
+  const td = makeNumber("Target diameter (in)", "kbd-td", { step: "any", min: "0" });
+  const tp = makeNumber("Knurl pitch (TPI)", "kbd-tp", { step: "any", min: "0" });
   for (const f of [td, tp]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { td.input.value = "0.75"; tp.input.value = "21"; update(); });
   const oTeeth = makeOutputLine(outputRegion, "Teeth around blank", "kbd-out-teeth");
@@ -1742,12 +1735,9 @@ export const grindingWheelRpmExample = { inputs: { wheel_diameter_in: 7, rated_m
 
 function _v911renderGrindingWheelRpm(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: surface speed identity by name. SFPM = pi x wheel diameter (in) x RPM / 12; max RPM = rated SFPM x 12 / (pi x diameter). Per ANSI B7.1; the wheel blotter rating and the machine nameplate govern -- never exceed the wheel's rated speed.";
-  const wd = makeNumber("Wheel diameter (in)", "gwr-wd", { step: "any", min: "0", value: "7" });
-  wd.input.value = "7";
-  const rs = makeNumber("Wheel rated max speed (SFPM)", "gwr-rs", { step: "any", min: "0", value: "6500" });
-  rs.input.value = "6500";
-  const gr = makeNumber("Grinder speed (RPM)", "gwr-gr", { step: "any", min: "0", value: "3450" });
-  gr.input.value = "3450";
+  const wd = makeNumber("Wheel diameter (in)", "gwr-wd", { step: "any", min: "0" });
+  const rs = makeNumber("Wheel rated max speed (SFPM)", "gwr-rs", { step: "any", min: "0" });
+  const gr = makeNumber("Grinder speed (RPM)", "gwr-gr", { step: "any", min: "0" });
   for (const f of [wd, rs, gr]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { wd.input.value = "7"; rs.input.value = "6500"; gr.input.value = "3450"; update(); });
   const oVerdict = makeOutputLine(outputRegion, "Verdict", "gwr-out-v");
@@ -1793,10 +1783,8 @@ export const reamingDrillAllowanceExample = { inputs: { reamer_diameter_in: 0.5,
 
 function _v917renderReamingDrillAllowance(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: machine-reaming stock allowance by name. drill = reamer diameter - allowance; Machinery's Handbook diameter-band allowances (~0.010 under 1/4, 0.015 to 1/2, 0.020 to 1, 0.025 to 1-1/2, 0.030 to 2 in). The reamer maker's guidance and the material govern.";
-  const rd = makeNumber("Finished reamer diameter (in)", "rda-rd", { step: "any", min: "0", value: "0.5" });
-  rd.input.value = "0.5";
-  const ov = makeNumber("Allowance override (in, 0 = auto band)", "rda-ov", { step: "any", min: "0", value: "0" });
-  ov.input.value = "0";
+  const rd = makeNumber("Finished reamer diameter (in)", "rda-rd", { step: "any", min: "0" });
+  const ov = makeNumber("Allowance override (in, 0 = auto band)", "rda-ov", { step: "any", min: "0" });
   for (const f of [rd, ov]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { rd.input.value = "0.5"; ov.input.value = "0"; update(); });
   const oDrill = makeOutputLine(outputRegion, "Prebore drill diameter", "rda-out-d");
@@ -1836,14 +1824,10 @@ export const taylorToolLifeExample = { inputs: { taylor_c: 300, taylor_n: 0.2, c
 
 function _v952renderTaylorToolLife(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Taylor tool-life equation V x T^n = C (F.W. Taylor), by name. Tool life T = (C/V)^(1/n); speed for a target life V = C / T^n. C = cutting speed (sfm) for 1-minute life, n = tool-material exponent (~0.1-0.15 HSS, 0.2-0.4 carbide). Base form (no feed/depth term); the insert maker's data and the tool/work/coolant combination govern.";
-  const cc = makeNumber("Taylor C (sfm at 1-min life)", "ttl-cc", { step: "any", min: "0", value: "300" });
-  cc.input.value = "300";
-  const nn = makeNumber("Taylor exponent n (~0.125 HSS, ~0.25 carbide)", "ttl-nn", { step: "any", min: "0", value: "0.2" });
-  nn.input.value = "0.2";
-  const vv = makeNumber("Cutting speed (sfm)", "ttl-vv", { step: "any", min: "0", value: "200" });
-  vv.input.value = "200";
-  const tl = makeNumber("Target tool life (min)", "ttl-tl", { step: "any", min: "0", value: "15" });
-  tl.input.value = "15";
+  const cc = makeNumber("Taylor C (sfm at 1-min life)", "ttl-cc", { step: "any", min: "0" });
+  const nn = makeNumber("Taylor exponent n (~0.125 HSS, ~0.25 carbide)", "ttl-nn", { step: "any", min: "0" });
+  const vv = makeNumber("Cutting speed (sfm)", "ttl-vv", { step: "any", min: "0" });
+  const tl = makeNumber("Target tool life (min)", "ttl-tl", { step: "any", min: "0" });
   for (const f of [cc, nn, vv, tl]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cc.input.value = "300"; nn.input.value = "0.2"; vv.input.value = "200"; tl.input.value = "15"; update(); });
   const oLife = makeOutputLine(outputRegion, "Tool life at this speed", "ttl-out-l");
@@ -1883,8 +1867,7 @@ export const threadSingleDepthExample = { inputs: { tpi: 13 } };
 
 function _v1006renderThreadSingleDepth(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: single-point thread cutting depth (60-degree UN external), by name. pitch = 1/TPI; external thread height = 0.6134 x pitch; compound infeed at 29.5 deg = depth / cos(29.5). Feed over several passes and verify with a gauge or the three-wire method. The thread standard, the tool geometry, and a thread gauge govern the finished part.";
-  const tp = makeNumber("Threads per inch (TPI)", "tsd-tp", { step: "any", min: "0", value: "13" });
-  tp.input.value = "13";
+  const tp = makeNumber("Threads per inch (TPI)", "tsd-tp", { step: "any", min: "0" });
   inputRegion.appendChild(tp.wrap);
   attachExampleButton(inputRegion, () => { tp.input.value = "13"; update(); });
   const oD = makeOutputLine(outputRegion, "Radial (single) depth", "tsd-out-d");
@@ -1926,8 +1909,8 @@ export function computeAcmeThreadDepth({ major_dia_in = 0, tpi = 0 } = {}) {
 export const acmeThreadDepthExample = { inputs: { major_dia_in: 1.0, tpi: 5 } };
 function renderAcmeThreadDepth(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: general-purpose Acme (29-degree) thread dimensions (Machinery's Handbook / ASME B1.5): pitch = 1/TPI, external thread depth = P/2 + 0.010 in, pitch dia = D - P/2, external minor = D - P - 0.020, crest flat = 0.3707 P. Cut with a 29-degree tool and verify over wires. General-purpose class; Stub Acme and centralizing classes differ; ASME B1.5 and a thread gauge govern.";
-  const D = makeNumber("Major (nominal) diameter (in)", "acme-d", { step: "any", min: "0", value: "1" }); D.input.value = "1";
-  const tp = makeNumber("Threads per inch (TPI)", "acme-tpi", { step: "any", min: "0", value: "5" }); tp.input.value = "5";
+  const D = makeNumber("Major (nominal) diameter (in)", "acme-d", { step: "any", min: "0" });
+  const tp = makeNumber("Threads per inch (TPI)", "acme-tpi", { step: "any", min: "0" });
   for (const f of [D, tp]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { D.input.value = "1"; tp.input.value = "5"; update(); });
   const oDepth = makeOutputLine(outputRegion, "Thread depth / pitch", "acme-out-depth");
@@ -1973,8 +1956,8 @@ export function computeStubAcmeThreadDepth({ major_dia_in = 0, tpi = 0 } = {}) {
 export const stubAcmeThreadDepthExample = { inputs: { major_dia_in: 1.0, tpi: 5 } };
 function renderStubAcmeThreadDepth(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Stub Acme (29-degree) thread dimensions (Machinery's Handbook / ASME B1.8): pitch = 1/TPI, basic thread depth = 0.3 P, pitch dia = D - 0.3 P, external minor = D - 0.6 P, crest flat = P/2 - 0.3P tan(14.5 deg) = 0.4224 P. The shallower companion to general-purpose Acme (P/2 depth). Cut with a 29-degree tool and verify over wires. ASME B1.8 and a thread gauge govern.";
-  const D = makeNumber("Major (nominal) diameter (in)", "stacme-d", { step: "any", min: "0", value: "1" }); D.input.value = "1";
-  const tp = makeNumber("Threads per inch (TPI)", "stacme-tpi", { step: "any", min: "0", value: "5" }); tp.input.value = "5";
+  const D = makeNumber("Major (nominal) diameter (in)", "stacme-d", { step: "any", min: "0" });
+  const tp = makeNumber("Threads per inch (TPI)", "stacme-tpi", { step: "any", min: "0" });
   for (const f of [D, tp]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { D.input.value = "1"; tp.input.value = "5"; update(); });
   const oDepth = makeOutputLine(outputRegion, "Thread depth / pitch", "stacme-out-depth");
@@ -2128,11 +2111,11 @@ export const ballnoseFeedCuspExample = { inputs: { r_in: 0.25, stepover_in: 0.03
 
 function _v1128renderBallnoseFeedCusp(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: the ballnose cusp geometry h = R - sqrt(R^2 - (w/2)^2) applied twice - once with w = the stepover, giving the cusp across the passes (delegated to the landed ballnose-scallop-height tile so the two cannot disagree), and once with w = the feed per tooth, giving the cusp along the feed direction that the stepover tile names as separate. Near the bottom both reduce to w^2/(8R), so each scales with the square of its spacing. The finish is the LARGER of the two cusps; the two are balanced when the feed per tooth equals the stepover. Theoretical geometric cusps on a flat surface cut at the tool tip: a sloped surface changes the effective stepover and cutting radius, and tool deflection, runout, and servo behavior at direction changes add to the real finish. Neither converts to Ra, which is an averaged roughness rather than peak-to-valley geometry. A shop aid; the tool, the deflection, and the surface slope govern.";
-  const r = makeNumber("Ballnose radius R (in = cutter dia / 2)", "bfc-r", { step: "any", min: "0" }); r.input.value = "0.25";
-  const s = makeNumber("Stepover (in)", "bfc-s", { step: "any", min: "0" }); s.input.value = "0.030";
-  const fz = makeNumber("Feed per tooth (in)", "bfc-fz", { step: "any", min: "0" }); fz.input.value = "0.006";
-  const n = makeNumber("Spindle speed (rpm; 0 to skip the feedrate)", "bfc-n", { step: "any", min: "0" }); n.input.value = "8000";
-  const z = makeNumber("Flutes", "bfc-z", { step: "1", min: "1" }); z.input.value = "2";
+  const r = makeNumber("Ballnose radius R (in = cutter dia / 2)", "bfc-r", { step: "any", min: "0" });
+  const s = makeNumber("Stepover (in)", "bfc-s", { step: "any", min: "0" });
+  const fz = makeNumber("Feed per tooth (in)", "bfc-fz", { step: "any", min: "0" });
+  const n = makeNumber("Spindle speed (rpm; 0 to skip the feedrate)", "bfc-n", { step: "any", min: "0" });
+  const z = makeNumber("Flutes", "bfc-z", { step: "1", min: "1" });
   for (const f of [r, s, fz, n, z]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { r.input.value = "0.25"; s.input.value = "0.030"; fz.input.value = "0.006"; n.input.value = "8000"; z.input.value = "2"; update(); });
   const oAcross = makeOutputLine(outputRegion, "Cusp across the passes (stepover)", "bfc-out-across");

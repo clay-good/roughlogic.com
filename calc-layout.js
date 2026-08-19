@@ -144,9 +144,9 @@ export function computeTriangleSas({ side_a = 0, side_b = 0, included_angle_deg 
 export const triangleSasExample = { inputs: { side_a: 10, side_b: 8, included_angle_deg: 60 } };
 function renderTriangleSas(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: law of cosines c = sqrt(a^2 + b^2 - 2ab cos C) with the SAS area (1/2) ab sin C (standard trigonometry); C = 90 collapses to the Pythagorean theorem. A layout aid; verify critical dimensions on the work.";
-  const a = makeNumber("Side a", "tsas-a", { step: "any", min: "0" }); a.input.value = "10";
-  const b = makeNumber("Side b", "tsas-b", { step: "any", min: "0" }); b.input.value = "8";
-  const C = makeNumber("Included angle C (deg)", "tsas-c", { step: "any", min: "0" }); C.input.value = "60";
+  const a = makeNumber("Side a", "tsas-a", { step: "any", min: "0" });
+  const b = makeNumber("Side b", "tsas-b", { step: "any", min: "0" });
+  const C = makeNumber("Included angle C (deg)", "tsas-c", { step: "any", min: "0" });
   for (const f of [a, b, C]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { a.input.value = "10"; b.input.value = "8"; C.input.value = "60"; update(); });
   const oC = makeOutputLine(outputRegion, "Third side c", "tsas-out-c");
@@ -195,9 +195,9 @@ export function computeTriangleSss({ side_a = 0, side_b = 0, side_c = 0 } = {}) 
 export const triangleSssExample = { inputs: { side_a: 10, side_b: 8, side_c: 9.165 } };
 function renderTriangleSss(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: law of cosines solved for the angles, A = acos((b^2 + c^2 - a^2)/(2bc)), with Heron's area sqrt(s(s-a)(s-b)(s-c)) (standard trigonometry). A right angle opposite the longest side is a square corner (3-4-5). A layout aid; verify critical dimensions on the work.";
-  const a = makeNumber("Side a", "tsss-a", { step: "any", min: "0" }); a.input.value = "10";
-  const b = makeNumber("Side b", "tsss-b", { step: "any", min: "0" }); b.input.value = "8";
-  const c = makeNumber("Side c", "tsss-c", { step: "any", min: "0" }); c.input.value = "9.165";
+  const a = makeNumber("Side a", "tsss-a", { step: "any", min: "0" });
+  const b = makeNumber("Side b", "tsss-b", { step: "any", min: "0" });
+  const c = makeNumber("Side c", "tsss-c", { step: "any", min: "0" });
   for (const f of [a, b, c]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { a.input.value = "10"; b.input.value = "8"; c.input.value = "9.165"; update(); });
   const oA = makeOutputLine(outputRegion, "Angles (A / B / C)", "tsss-out-a");
@@ -243,9 +243,9 @@ export function computeTriangleAsa({ angle_a_deg = 0, angle_b_deg = 0, included_
 export const triangleAsaExample = { inputs: { angle_a_deg: 70.89, angle_b_deg: 49.11, included_side_c: 9.165 } };
 function renderTriangleAsa(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: law of sines a = c sin A/sin C with C = 180 - A - B (standard trigonometry) - the ASA triangulation solve from a baseline and two angles. A layout aid; verify critical dimensions on the work.";
-  const A = makeNumber("Angle A (deg)", "tasa-a", { step: "any", min: "0" }); A.input.value = "70.89";
-  const B = makeNumber("Angle B (deg)", "tasa-b", { step: "any", min: "0" }); B.input.value = "49.11";
-  const c = makeNumber("Included side (baseline) c", "tasa-c", { step: "any", min: "0" }); c.input.value = "9.165";
+  const A = makeNumber("Angle A (deg)", "tasa-a", { step: "any", min: "0" });
+  const B = makeNumber("Angle B (deg)", "tasa-b", { step: "any", min: "0" });
+  const c = makeNumber("Included side (baseline) c", "tasa-c", { step: "any", min: "0" });
   for (const f of [A, B, c]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { A.input.value = "70.89"; B.input.value = "49.11"; c.input.value = "9.165"; update(); });
   const oC = makeOutputLine(outputRegion, "Third angle C", "tasa-out-c");
@@ -296,11 +296,11 @@ export const boltCircleExample = { inputs: { bolt_circle_dia_in: 8, num_holes: 6
 
 function _v32renderBoltCircle(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Bolt-circle (circle-of-holes) layout - hole i sits at angle start + i x 360/N on a radius dia/2, so x = cx + R cos, y = cy + R sin; adjacent center-to-center chord = 2 R sin(180/N) - first-principles trigonometry (the circle-of-holes geometry as in Machinery's Handbook, by name). Confirm the pattern, datum, and tolerance against the drawing before drilling.";
-  const dia = makeNumber("Bolt circle diameter (in)", "bc-dia", { step: "any", min: "0", value: "8" }); dia.input.value = "8";
-  const n = makeNumber("Number of holes", "bc-n", { step: "1", min: "1", value: "6" }); n.input.value = "6";
-  const start = makeNumber("Start angle (deg, optional)", "bc-start", { step: "any", value: "0" }); start.input.value = "0";
-  const cx = makeNumber("Center X (in, optional)", "bc-cx", { step: "any", value: "0" }); cx.input.value = "0";
-  const cy = makeNumber("Center Y (in, optional)", "bc-cy", { step: "any", value: "0" }); cy.input.value = "0";
+  const dia = makeNumber("Bolt circle diameter (in)", "bc-dia", { step: "any", min: "0" });
+  const n = makeNumber("Number of holes", "bc-n", { step: "1", min: "1" });
+  const start = makeNumber("Start angle (deg, optional)", "bc-start", { step: "any" });
+  const cx = makeNumber("Center X (in, optional)", "bc-cx", { step: "any" });
+  const cy = makeNumber("Center Y (in, optional)", "bc-cy", { step: "any" });
   for (const f of [dia, n, start, cx, cy]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { dia.input.value = "8"; n.input.value = "6"; start.input.value = "0"; cx.input.value = "0"; cy.input.value = "0"; update(); });
   const oSpacing = makeOutputLine(outputRegion, "Spacing / chord", "bc-out-spacing");
@@ -357,7 +357,7 @@ export const decimalToFractionExample = { inputs: { value_in: 2.375, denominator
 
 function _v33renderDecimalToFraction(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Decimal-to-fraction tape-measure math - round the decimal to the nearest 1/N tick, reduce the fraction to lowest terms (GCD), and break it into feet-inches; the error is the rounded value minus the exact decimal - first-principles arithmetic, public domain. Binary (power-of-two) denominators are the tape-measure / machinist-scale standard.";
-  const value = makeNumber("Decimal value (in)", "d2f-val", { step: "any", value: "2.375" }); value.input.value = "2.375";
+  const value = makeNumber("Decimal value (in)", "d2f-val", { step: "any" });
   const den = makeSelect("Round to", "d2f-den", [
     { value: "2", label: "1/2 in" }, { value: "4", label: "1/4 in" }, { value: "8", label: "1/8 in" },
     { value: "16", label: "1/16 in", selected: true }, { value: "32", label: "1/32 in" }, { value: "64", label: "1/64 in" },
@@ -754,13 +754,13 @@ export const polygonMiterExample = { inputs: { sides: 6, size_mode: "side", size
 
 function _v55renderPolygonMiter(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Regular-polygon frame geometry - each joint is mitered at 180/N degrees off square, the interior angle is (N-2) x 180/N, and the side relates to the across-flats width by s = flats x tan(180/N) and the across-corners diameter by s = corners x sin(180/N) - first-principles trigonometry, public domain. Reproduces the known miters (square 45, hexagon 30, octagon 22.5). Cut a scrap test joint and allow for blade kerf.";
-  const n = makeNumber("Number of sides (N)", "pm-n", { step: "1", min: "3", value: "6" }); n.input.value = "6";
+  const n = makeNumber("Number of sides (N)", "pm-n", { step: "1", min: "3" });
   const mode = makeSelect("Size given as", "pm-mode", [
     { value: "side", label: "Side length (each piece)" },
     { value: "flats", label: "Across flats (face-to-face width)" },
     { value: "corners", label: "Across corners (point-to-point)" },
   ]);
-  const size = makeNumber("Size (in)", "pm-size", { step: "any", min: "0", value: "12" }); size.input.value = "12";
+  const size = makeNumber("Size (in)", "pm-size", { step: "any", min: "0" });
   for (const f of [n, mode, size]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { n.input.value = "6"; mode.select.value = "side"; size.input.value = "12"; update(); });
   const oMiter = makeOutputLine(outputRegion, "Miter / interior angle", "pm-out-miter");

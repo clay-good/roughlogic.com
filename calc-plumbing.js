@@ -871,8 +871,7 @@ export function renderRecircPumpHead(inputRegion, outputRegion, citationEl) {
 export function renderTrapArm(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Standard trap-arm length table (public plumbing engineering practice). The trap weir must not drain through the vent; total fall limited to one pipe diameter.";
   const dia = makeSelect("Pipe diameter (in)", "ta-d", Object.keys(TRAP_ARM_MAX_FT).map((s) => ({ value: s, label: s + "\""})));
-  const slope = makeNumber("Slope (in/ft)", "ta-s", { step: "any", min: "0", value: "0.25" });
-  slope.input.value = "0.25";
+  const slope = makeNumber("Slope (in/ft)", "ta-s", { step: "any", min: "0" });
   for (const f of [dia, slope]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { dia.select.value = "2"; slope.input.value = "0.25"; update(); });
   const oM = makeOutputLine(outputRegion, "Maximum length", "ta-out-m");
@@ -2403,12 +2402,12 @@ export const whExpansionTankExample = {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v16p_renderWhExpansionTank(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: expansion factor = (rho_cold - rho_hot) / rho_hot from public steam-table densities; V_expansion = heater volume x factor; V_tank = V_expansion / acceptance factor. Per the ASPE Plumbing Engineering Design Handbook (2nd ed.) Ch. 6 and ASME B40.1. Pre-charge equals incoming pressure. AHJ governs. Free at aspe.org.";
-  const vol = makeNumber("Water heater capacity (gal)", "xt-vol", { step: "any", min: "0", value: "40" });
-  const pin = makeNumber("Incoming pressure (psi)", "xt-pin", { step: "any", min: "0", value: "60" });
-  const prel = makeNumber("Relief setting (psi)", "xt-prel", { step: "any", min: "0", value: "150" });
-  const tin = makeNumber("Incoming water temp (°F)", "xt-tin", { step: "any", value: "50" });
-  const tset = makeNumber("Set-point temp (°F)", "xt-tset", { step: "any", value: "120" });
-  const af = makeNumber("Acceptance factor (manufacturer)", "xt-af", { step: "any", min: "0", max: "1", value: "0.46" });
+  const vol = makeNumber("Water heater capacity (gal)", "xt-vol", { step: "any", min: "0" });
+  const pin = makeNumber("Incoming pressure (psi)", "xt-pin", { step: "any", min: "0" });
+  const prel = makeNumber("Relief setting (psi)", "xt-prel", { step: "any", min: "0" });
+  const tin = makeNumber("Incoming water temp (°F)", "xt-tin", { step: "any" });
+  const tset = makeNumber("Set-point temp (°F)", "xt-tset", { step: "any" });
+  const af = makeNumber("Acceptance factor (manufacturer)", "xt-af", { step: "any", min: "0", max: "1" });
   for (const f of [vol, pin, prel, tin, tset, af]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
     vol.input.value = "40"; pin.input.value = "60"; prel.input.value = "150";
@@ -2688,7 +2687,7 @@ export const trapPrimerExample = {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v16p_renderTrapPrimer(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: primers = ceil(floor drains / drains-per-distribution-unit); annual water = drains x (oz per cycle / 128) x cycles per year. Per IPC 2021 §1002.4 (trap seals) with manufacturer flow rates from published cut sheets (Precision Plumbing Products / Sioux Chief / Mifab). AHJ governs. Free at codes.iccsafe.org.";
-  const drains = makeNumber("Floor-drain count", "tp-drains", { step: "1", min: "0", value: "6" });
+  const drains = makeNumber("Floor-drain count", "tp-drains", { step: "1", min: "0" });
   const zone = makeSelect("Building zone", "tp-zone", [
     { value: "occupied", label: "Occupied space", selected: true },
     { value: "mech_room", label: "Mechanical room" },
@@ -2700,8 +2699,8 @@ function _v16p_renderTrapPrimer(inputRegion, outputRegion, citationEl) {
     { value: "pump_discharge", label: "Pump-discharge (up to 4 drains)" },
     { value: "manual", label: "Manual (1 drain)" },
   ]);
-  const vol = makeNumber("Delivery per cycle (fl oz)", "tp-vol", { step: "any", min: "0", value: "8" });
-  const cyc = makeNumber("Prime cycles per day", "tp-cyc", { step: "any", min: "0", value: "1" });
+  const vol = makeNumber("Delivery per cycle (fl oz)", "tp-vol", { step: "any", min: "0" });
+  const cyc = makeNumber("Prime cycles per day", "tp-cyc", { step: "any", min: "0" });
   for (const f of [drains, zone, method, vol, cyc]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
     drains.input.value = "6"; zone.select.value = "occupied"; method.select.value = "electronic";
@@ -2827,7 +2826,7 @@ export const backflowSizingExample = {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v16p_renderBackflowSizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: high (health) hazard requires a reduced-pressure principle (RP) assembly per IPC 312 / the cross-connection control program; downstream pressure = upstream - assembly head loss. Head loss interpolated from the bundled Watts technical-bulletin curves (representative; the assembly cut sheet and the USC FCCCHR approved-assembly list govern). Annual test required per EPA 40 CFR 141.85 / AWWA M14. AHJ governs. Free at codes.iccsafe.org and awwa.org for M14 TOC.";
-  const flow = makeNumber("Service flow demand (GPM)", "bs-flow", { step: "any", min: "0", value: "100" });
+  const flow = makeNumber("Service flow demand (GPM)", "bs-flow", { step: "any", min: "0" });
   const hazard = makeSelect("Hazard category (IPC 312)", "bs-haz", [
     { value: "high", label: "High / health hazard", selected: true },
     { value: "low", label: "Low / non-health hazard" },
@@ -2844,8 +2843,8 @@ function _v16p_renderBackflowSizing(inputRegion, outputRegion, citationEl) {
     { value: "1.5", label: "1-1/2 in" },
     { value: "2", label: "2 in" },
   ]);
-  const up = makeNumber("Upstream supply pressure (psi)", "bs-up", { step: "any", min: "0", value: "70" });
-  const minRes = makeNumber("Minimum residual required (psi)", "bs-res", { step: "any", min: "0", value: "20" });
+  const up = makeNumber("Upstream supply pressure (psi)", "bs-up", { step: "any", min: "0" });
+  const minRes = makeNumber("Minimum residual required (psi)", "bs-res", { step: "any", min: "0" });
   for (const f of [flow, hazard, assembly, size, up, minRes]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
     flow.input.value = "100"; hazard.select.value = "high"; assembly.select.value = "DC";
@@ -3042,12 +3041,9 @@ export const thermalExpansionVolumeExample = { inputs: { volume_gal: 50, cold_f:
 
 function renderThermalExpansionVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Water density vs. temperature, NIST / standard steam tables (public domain). dV = V*(rho_cold/rho_hot - 1), interpolated within 32-212 F. Distinct from the expansion-tank sizing tiles - this outputs the raw expansion volume only. Free at nist.gov.";
-  const vol = makeNumber("System water volume (gal)", "tev-v", { step: "any", min: "0", value: "50" });
-  vol.input.value = "50";
-  const cold = makeNumber("Cold inlet temperature (°F)", "tev-c", { step: "any", value: "50" });
-  cold.input.value = "50";
-  const hot = makeNumber("Set hot temperature (°F)", "tev-h", { step: "any", value: "140" });
-  hot.input.value = "140";
+  const vol = makeNumber("System water volume (gal)", "tev-v", { step: "any", min: "0" });
+  const cold = makeNumber("Cold inlet temperature (°F)", "tev-c", { step: "any" });
+  const hot = makeNumber("Set hot temperature (°F)", "tev-h", { step: "any" });
   const sys = makeSelect("System type", "tev-sys", [{ value: "closed", label: "Closed (needs expansion control)", selected: true }, { value: "open", label: "Open" }]);
   for (const f of [vol, cold, hot, sys]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { vol.input.value = "50"; cold.input.value = "50"; hot.input.value = "140"; sys.select.value = "closed"; update(); });
@@ -3103,18 +3099,12 @@ export const ventSizingStackExample = { inputs: { vent_dia_in: 2, connected_dfu:
 
 function renderVentSizingStack(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per the adopted plumbing code's vent sizing and length provisions (IPC Chapter 9 / UPC Chapter 9, by name). Table values user-supplied; the AHJ-adopted edition governs. Developed length excludes fitting equivalents; wet-vent configurations out of scope. Code library free read-only at codes.iccsafe.org.";
-  const d = makeNumber("Vent nominal diameter (in)", "vss-d", { step: "any", min: "0", value: "2" });
-  d.input.value = "2";
-  const dfu = makeNumber("Connected drainage fixture units (DFU)", "vss-dfu", { step: "any", min: "0", value: "18" });
-  dfu.input.value = "18";
-  const len = makeNumber("Developed vent length (ft)", "vss-len", { step: "any", min: "0", value: "90" });
-  len.input.value = "90";
-  const tdfu = makeNumber("Table-permitted DFU for this diameter", "vss-tdfu", { step: "any", min: "0", value: "24" });
-  tdfu.input.value = "24";
-  const tmax = makeNumber("Table-permitted max length (ft)", "vss-tmax", { step: "any", min: "0", value: "120" });
-  tmax.input.value = "120";
-  const drain = makeNumber("Served drain diameter (in, optional)", "vss-drain", { step: "any", min: "0", value: "3" });
-  drain.input.value = "3";
+  const d = makeNumber("Vent nominal diameter (in)", "vss-d", { step: "any", min: "0" });
+  const dfu = makeNumber("Connected drainage fixture units (DFU)", "vss-dfu", { step: "any", min: "0" });
+  const len = makeNumber("Developed vent length (ft)", "vss-len", { step: "any", min: "0" });
+  const tdfu = makeNumber("Table-permitted DFU for this diameter", "vss-tdfu", { step: "any", min: "0" });
+  const tmax = makeNumber("Table-permitted max length (ft)", "vss-tmax", { step: "any", min: "0" });
+  const drain = makeNumber("Served drain diameter (in, optional)", "vss-drain", { step: "any", min: "0" });
   for (const f of [d, dfu, len, tdfu, tmax, drain]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { d.input.value = "2"; dfu.input.value = "18"; len.input.value = "90"; tdfu.input.value = "24"; tmax.input.value = "120"; drain.input.value = "3"; update(); });
   const oVerdict = makeOutputLine(outputRegion, "Verdict", "vss-out-v");
@@ -3603,13 +3593,12 @@ export const waterHeaterStorageSizingExample = { inputs: { tank_gal: 50, input_b
 
 function renderWaterHeaterStorageSizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: first-principles recovery Q = 8.33 x gph x delta-T with the DOE/AHRI first-hour-rating definition (usable storage plus one hour of recovery), by name, not reproduced. The 8.33 lb/gal water constant and the default 0.70 usable-storage fraction are editable. The manufacturer's rated FHR on the EnergyGuide label and the AHJ govern.";
-  const tank = makeNumber("Tank capacity (gal)", "whss-tank", { step: "any", min: "0", value: "50" });
-  const input = makeNumber("Input rate (BTU/hr)", "whss-in", { step: "any", min: "0", value: "40000" });
-  const eff = makeNumber("Recovery efficiency (%)", "whss-eff", { step: "any", min: "0", value: "80" });
-  const rise = makeNumber("Temperature rise (°F)", "whss-rise", { step: "any", min: "0", value: "90" });
-  const usable = makeNumber("Usable-storage fraction", "whss-usable", { step: "any", min: "0", value: "0.70" });
-  const peak = makeNumber("Peak-hour demand (gal)", "whss-peak", { step: "any", min: "0", value: "80" });
-  tank.input.value = "50"; input.input.value = "40000"; eff.input.value = "80"; rise.input.value = "90"; usable.input.value = "0.70"; peak.input.value = "80";
+  const tank = makeNumber("Tank capacity (gal)", "whss-tank", { step: "any", min: "0" });
+  const input = makeNumber("Input rate (BTU/hr)", "whss-in", { step: "any", min: "0" });
+  const eff = makeNumber("Recovery efficiency (%)", "whss-eff", { step: "any", min: "0" });
+  const rise = makeNumber("Temperature rise (°F)", "whss-rise", { step: "any", min: "0" });
+  const usable = makeNumber("Usable-storage fraction", "whss-usable", { step: "any", min: "0" });
+  const peak = makeNumber("Peak-hour demand (gal)", "whss-peak", { step: "any", min: "0" });
   for (const f of [tank, input, eff, rise, usable, peak]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
     tank.input.value = "50"; input.input.value = "40000"; eff.input.value = "80"; rise.input.value = "90"; usable.input.value = "0.70"; peak.input.value = "80"; update();
@@ -4137,8 +4126,8 @@ export function computeVelocityHead({ V_fps = 0, gamma = 62.4, rho = 1.94 } = {}
 export const velocityHeadExample = { inputs: { V_fps: 10, gamma: 62.4, rho: 1.94 } };
 function _v371renderVelocityHead(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: velocity head h_v = V^2/(2g) (g = 32.2 ft/s^2) and dynamic pressure q = 1/2 rho V^2, first-principles fluid mechanics. Both scale with V^2. The code velocity limits (~5-8 ft/s water) and the engineer of record govern.";
-  const V = makeNumber("Flow velocity (ft/s)", "vh-v", { step: "any", min: "0" }); V.input.value = "10";
-  const rho = makeNumber("Fluid density (slug/ft³, 1.94 water)", "vh-rho", { step: "any", min: "0" }); rho.input.value = "1.94";
+  const V = makeNumber("Flow velocity (ft/s)", "vh-v", { step: "any", min: "0" });
+  const rho = makeNumber("Fluid density (slug/ft³, 1.94 water)", "vh-rho", { step: "any", min: "0" });
   for (const f of [V, rho]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { V.input.value = "10"; rho.input.value = "1.94"; update(); });
   const oHv = makeOutputLine(outputRegion, "Velocity head", "vh-out-hv");
@@ -4174,9 +4163,9 @@ export function computeFlowContinuity({ V1_fps = 0, D1_in = 0, D2_in = 0 } = {})
 export const flowContinuityExample = { inputs: { V1_fps: 6, D1_in: 4, D2_in: 2 } };
 function _v372renderFlowContinuity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: continuity V2 = V1 (D1/D2)^2 from Q = A V constant for an incompressible fluid, first-principles. Reducing the pipe accelerates the flow; expanding it slows it. The code velocity limits and the engineer of record govern.";
-  const V1 = makeNumber("Upstream velocity (ft/s)", "fc-v1", { step: "any", min: "0" }); V1.input.value = "6";
-  const D1 = makeNumber("Upstream diameter (in)", "fc-d1", { step: "any", min: "0" }); D1.input.value = "4";
-  const D2 = makeNumber("Downstream diameter (in)", "fc-d2", { step: "any", min: "0" }); D2.input.value = "2";
+  const V1 = makeNumber("Upstream velocity (ft/s)", "fc-v1", { step: "any", min: "0" });
+  const D1 = makeNumber("Upstream diameter (in)", "fc-d1", { step: "any", min: "0" });
+  const D2 = makeNumber("Downstream diameter (in)", "fc-d2", { step: "any", min: "0" });
   for (const f of [V1, D1, D2]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { V1.input.value = "6"; D1.input.value = "4"; D2.input.value = "2"; update(); });
   const oV2 = makeOutputLine(outputRegion, "Downstream velocity", "fc-out-v2");
@@ -4212,10 +4201,10 @@ export function computeBernoulliHead({ P_psi = 0, V_fps = 0, z_ft = 0, gamma = 6
 export const bernoulliHeadExample = { inputs: { P_psi: 30, V_fps: 6, z_ft: 10, gamma: 62.4 } };
 function _v373renderBernoulliHead(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Bernoulli total head H = P/gamma + V^2/(2g) + z (feet of fluid), first-principles energy equation; conserved along a streamline with no loss (H1 = H2 + h_loss). The engineer of record governs the system analysis.";
-  const P = makeNumber("Gauge pressure (psi)", "bh-p", { step: "any" }); P.input.value = "30";
-  const V = makeNumber("Velocity (ft/s)", "bh-v", { step: "any", min: "0" }); V.input.value = "6";
-  const z = makeNumber("Elevation (ft)", "bh-z", { step: "any" }); z.input.value = "10";
-  const g = makeNumber("Fluid specific weight (lb/ft³, 62.4 water)", "bh-g", { step: "any", min: "0" }); g.input.value = "62.4";
+  const P = makeNumber("Gauge pressure (psi)", "bh-p", { step: "any" });
+  const V = makeNumber("Velocity (ft/s)", "bh-v", { step: "any", min: "0" });
+  const z = makeNumber("Elevation (ft)", "bh-z", { step: "any" });
+  const g = makeNumber("Fluid specific weight (lb/ft³, 62.4 water)", "bh-g", { step: "any", min: "0" });
   for (const f of [P, V, z, g]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { P.input.value = "30"; V.input.value = "6"; z.input.value = "10"; g.input.value = "62.4"; update(); });
   const oComp = makeOutputLine(outputRegion, "Pressure / velocity / elevation head", "bh-out-comp");
@@ -4256,10 +4245,10 @@ export function computeThrustBlockSizing({ pressure_psi = 0, od_in = 0, bend_deg
 export const thrustBlockSizingExample = { inputs: { pressure_psi: 100, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000 } };
 function _v388renderThrustBlockSizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: AWWA M41 (Ductile-Iron Pipe and Fittings) thrust-block method -- resultant thrust at a bend T = 2 P A sin(theta/2), bearing area Ab = T / (allowable soil bearing). Use the test/surge pressure and a geotechnical soil-bearing value. Sizes the bearing face only; the engineer of record governs the block design.";
-  const P = makeNumber("Internal pressure (psi, test/surge)", "tbs-p", { step: "any", min: "0" }); P.input.value = "100";
-  const od = makeNumber("Pipe outside diameter (in)", "tbs-od", { step: "any", min: "0" }); od.input.value = "8.625";
-  const bend = makeNumber("Bend angle (deg)", "tbs-b", { step: "any", min: "0" }); bend.input.value = "90";
-  const soil = makeNumber("Allowable soil bearing (psf)", "tbs-s", { step: "any", min: "0" }); soil.input.value = "2000";
+  const P = makeNumber("Internal pressure (psi, test/surge)", "tbs-p", { step: "any", min: "0" });
+  const od = makeNumber("Pipe outside diameter (in)", "tbs-od", { step: "any", min: "0" });
+  const bend = makeNumber("Bend angle (deg)", "tbs-b", { step: "any", min: "0" });
+  const soil = makeNumber("Allowable soil bearing (psf)", "tbs-s", { step: "any", min: "0" });
   for (const f of [P, od, bend, soil]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { P.input.value = "100"; od.input.value = "8.625"; bend.input.value = "90"; soil.input.value = "2000"; update(); });
   const oT = makeOutputLine(outputRegion, "Resultant thrust", "tbs-out-t");
@@ -4303,10 +4292,10 @@ export function computeThrustBlockMaxPressure({ bearing_area_ft2 = 0, od_in = 0,
 export const thrustBlockMaxPressureExample = { inputs: { bearing_area_ft2: 4.13, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000 } };
 function _v745renderThrustBlockMaxPressure(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: AWWA M41 (Ductile-Iron Pipe and Fittings) thrust-block method -- T = 2 P A sin(theta/2), Ab = T / soil, solved for the pressure: P = Ab x soil / (2 A sin(theta/2)). Compare against the test/surge pressure and a geotechnical soil-bearing value. Checks the bearing face only; the engineer of record governs the block design.";
-  const Ab = makeNumber("Bearing-face area (ft²)", "tbm-a", { step: "any", min: "0" }); Ab.input.value = "4.13";
-  const od = makeNumber("Pipe outside diameter (in)", "tbm-od", { step: "any", min: "0" }); od.input.value = "8.625";
-  const bend = makeNumber("Bend angle (deg)", "tbm-b", { step: "any", min: "0" }); bend.input.value = "90";
-  const soil = makeNumber("Allowable soil bearing (psf)", "tbm-s", { step: "any", min: "0" }); soil.input.value = "2000";
+  const Ab = makeNumber("Bearing-face area (ft²)", "tbm-a", { step: "any", min: "0" });
+  const od = makeNumber("Pipe outside diameter (in)", "tbm-od", { step: "any", min: "0" });
+  const bend = makeNumber("Bend angle (deg)", "tbm-b", { step: "any", min: "0" });
+  const soil = makeNumber("Allowable soil bearing (psf)", "tbm-s", { step: "any", min: "0" });
   for (const f of [Ab, od, bend, soil]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { Ab.input.value = "4.13"; od.input.value = "8.625"; bend.input.value = "90"; soil.input.value = "2000"; update(); });
   const oP = makeOutputLine(outputRegion, "Max test / surge pressure", "tbm-out-p");
@@ -4350,11 +4339,11 @@ export function computeStormwaterDetentionVolume({ runoff_c = 0, intensity_in_hr
 export const stormwaterDetentionVolumeExample = { inputs: { runoff_c: 0.85, intensity_in_hr: 3, area_ac: 2, q_allow_cfs: 1.0, duration_min: 30 } };
 function _v428renderStormwaterDetentionVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Modified Rational detention volume: peak inflow Q_in = C i A (Rational method), storage = (Q_in - Q_allow) x duration x 60. The critical duration is found by searching the IDF curve for the largest volume. A design aid; the routing, the outlet, and the local drainage ordinance govern.";
-  const c = makeNumber("Developed runoff coefficient C", "sdv-c", { step: "any", min: "0" }); c.input.value = "0.85";
-  const i = makeNumber("Design rainfall intensity (in/hr)", "sdv-i", { step: "any", min: "0" }); i.input.value = "3";
-  const area = makeNumber("Drainage area (acres)", "sdv-a", { step: "any", min: "0" }); area.input.value = "2";
-  const qa = makeNumber("Allowable release (cfs)", "sdv-qa", { step: "any", min: "0" }); qa.input.value = "1.0";
-  const dur = makeNumber("Storm duration (min)", "sdv-d", { step: "any", min: "0" }); dur.input.value = "30";
+  const c = makeNumber("Developed runoff coefficient C", "sdv-c", { step: "any", min: "0" });
+  const i = makeNumber("Design rainfall intensity (in/hr)", "sdv-i", { step: "any", min: "0" });
+  const area = makeNumber("Drainage area (acres)", "sdv-a", { step: "any", min: "0" });
+  const qa = makeNumber("Allowable release (cfs)", "sdv-qa", { step: "any", min: "0" });
+  const dur = makeNumber("Storm duration (min)", "sdv-d", { step: "any", min: "0" });
   for (const f of [c, i, area, qa, dur]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { c.input.value = "0.85"; i.input.value = "3"; area.input.value = "2"; qa.input.value = "1.0"; dur.input.value = "30"; update(); });
   const oQ = makeOutputLine(outputRegion, "Peak inflow", "sdv-out-q");
@@ -4388,8 +4377,8 @@ export function computeHydronicFillPressure({ height_ft = 0, margin_psi = 4 } = 
 export const hydronicFillPressureExample = { inputs: { height_ft: 30, margin_psi: 4 } };
 function _v452renderHydronicFillPressure(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Hydronic fill pressure by static height: fill = height / 2.31 + margin (2.31 ft of water = 1 psi), a common margin ~4 psi to keep the top of the loop above atmospheric. The expansion-tank pre-charge matches the fill; the relief valve sits well above. A design aid; the manufacturer's instructions govern.";
-  const h = makeNumber("Height fill-to-highest-point (ft)", "hfp-h", { step: "any", min: "0" }); h.input.value = "30";
-  const m = makeNumber("Top-of-system margin (psi, default 4)", "hfp-m", { step: "any", min: "0" }); m.input.value = "4";
+  const h = makeNumber("Height fill-to-highest-point (ft)", "hfp-h", { step: "any", min: "0" });
+  const m = makeNumber("Top-of-system margin (psi, default 4)", "hfp-m", { step: "any", min: "0" });
   for (const f of [h, m]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { h.input.value = "30"; m.input.value = "4"; update(); });
   const oFill = makeOutputLine(outputRegion, "Cold-fill pressure", "hfp-out-fill");
@@ -4545,16 +4534,16 @@ export const fixtureClearanceCheckExample = { inputs: { center_to_left_in: 15, c
 
 function _v1132renderFixtureClearanceCheck(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: IPC 405.3.1 - a water closet, urinal, lavatory, or bidet not set closer than 15 in from its center to any side wall, partition, vanity, or other obstruction; adjacent fixtures not closer than 30 in center to center where no partition separates them; not less than 21 in of clearance in front to any wall, fixture, or door; and water-closet compartments not less than 30 in wide by 60 in deep for floor-mounted closets. The derived minimum wall-to-wall width for a row of n fixtures is 2 x 15 + (n - 1) x 30. All minimums are editable inputs because state and local amendments exist. These are the PLUMBING minimums, not an accessible layout: ANSI A117.1 and the ADA Standards require substantially more, including a different centerline range, a defined clear floor space, and grab-bar blocking. A screen, not a code-official determination; the adopted code and the AHJ govern.";
-  const l = makeNumber("Centerline to the left obstruction (in)", "fcc-l", { step: "any", min: "0" }); l.input.value = "15";
-  const r = makeNumber("Centerline to the right obstruction (in)", "fcc-r", { step: "any", min: "0" }); r.input.value = "18";
-  const f = makeNumber("Clearance in front (in)", "fcc-f", { step: "any", min: "0" }); f.input.value = "24";
-  const a = makeNumber("Adjacent fixture center to center (in; 0 = none)", "fcc-a", { step: "any", min: "0" }); a.input.value = "30";
-  const n = makeNumber("Fixtures in the row", "fcc-n", { step: "1", min: "1" }); n.input.value = "2";
-  const cw = makeNumber("Compartment width (in; 0 = not a compartment)", "fcc-cw", { step: "any", min: "0" }); cw.input.value = "0";
-  const cd = makeNumber("Compartment depth (in)", "fcc-cd", { step: "any", min: "0" }); cd.input.value = "0";
-  const ms = makeNumber("Minimum side clearance (in; IPC 15)", "fcc-ms", { step: "any", min: "0" }); ms.input.value = "15";
-  const mc = makeNumber("Minimum center to center (in; IPC 30)", "fcc-mc", { step: "any", min: "0" }); mc.input.value = "30";
-  const mf = makeNumber("Minimum front clearance (in; IPC 21)", "fcc-mf", { step: "any", min: "0" }); mf.input.value = "21";
+  const l = makeNumber("Centerline to the left obstruction (in)", "fcc-l", { step: "any", min: "0" });
+  const r = makeNumber("Centerline to the right obstruction (in)", "fcc-r", { step: "any", min: "0" });
+  const f = makeNumber("Clearance in front (in)", "fcc-f", { step: "any", min: "0" });
+  const a = makeNumber("Adjacent fixture center to center (in; 0 = none)", "fcc-a", { step: "any", min: "0" });
+  const n = makeNumber("Fixtures in the row", "fcc-n", { step: "1", min: "1" });
+  const cw = makeNumber("Compartment width (in; 0 = not a compartment)", "fcc-cw", { step: "any", min: "0" });
+  const cd = makeNumber("Compartment depth (in)", "fcc-cd", { step: "any", min: "0" });
+  const ms = makeNumber("Minimum side clearance (in; IPC 15)", "fcc-ms", { step: "any", min: "0" });
+  const mc = makeNumber("Minimum center to center (in; IPC 30)", "fcc-mc", { step: "any", min: "0" });
+  const mf = makeNumber("Minimum front clearance (in; IPC 21)", "fcc-mf", { step: "any", min: "0" });
   for (const x of [l, r, f, a, n, cw, cd, ms, mc, mf]) inputRegion.appendChild(x.wrap);
   attachExampleButton(inputRegion, () => { l.input.value = "15"; r.input.value = "18"; f.input.value = "24"; a.input.value = "30"; n.input.value = "2"; cw.input.value = "0"; cd.input.value = "0"; ms.input.value = "15"; mc.input.value = "30"; mf.input.value = "21"; update(); });
   const oV = makeOutputLine(outputRegion, "Verdict", "fcc-out-v");
@@ -4635,12 +4624,12 @@ export const showerCompartmentCheckExample = { inputs: { width_in: 28, depth_in:
 
 function _v1134renderShowerCompartmentCheck(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: IPC 417.4 - shower compartments not less than 900 sq in in interior cross-sectional area and not less than 30 in in least dimension, measured from the finished interior dimension at a height equal to the top of the threshold and at a point tangent to its centerline, exclusive of fixture valves, showerheads, soap dishes, and safety grab bars or rails, and continued to a height not less than 70 in above the shower drain outlet; with the exception permitting a least dimension of not less than 25 in where the compartment has not less than 1,300 sq in of cross-sectional area. Both conditions of a path must be met - area alone never settles it. Rectangular compartments only; a neo-angle or irregular stall needs the disc drawn on the plan. The door and its swing, the receptor and drain, waterproofing, the 70 in height, and accessible (ANSI A117.1 / ADA) stalls are not checked. All thresholds are editable inputs because local amendments exist. A screen, not a code-official determination; the adopted code and the AHJ govern.";
-  const w = makeNumber("Finished interior width (in)", "scc-w", { step: "any", min: "0" }); w.input.value = "28";
-  const d = makeNumber("Finished interior depth (in)", "scc-d", { step: "any", min: "0" }); d.input.value = "36";
-  const a0 = makeNumber("Base minimum area (sq in; IPC 900)", "scc-a0", { step: "any", min: "0" }); a0.input.value = "900";
-  const d0 = makeNumber("Base minimum least dimension (in; IPC 30)", "scc-d0", { step: "any", min: "0" }); d0.input.value = "30";
-  const a1 = makeNumber("Exception minimum area (sq in; IPC 1300)", "scc-a1", { step: "any", min: "0" }); a1.input.value = "1300";
-  const d1 = makeNumber("Exception minimum least dimension (in; IPC 25)", "scc-d1", { step: "any", min: "0" }); d1.input.value = "25";
+  const w = makeNumber("Finished interior width (in)", "scc-w", { step: "any", min: "0" });
+  const d = makeNumber("Finished interior depth (in)", "scc-d", { step: "any", min: "0" });
+  const a0 = makeNumber("Base minimum area (sq in; IPC 900)", "scc-a0", { step: "any", min: "0" });
+  const d0 = makeNumber("Base minimum least dimension (in; IPC 30)", "scc-d0", { step: "any", min: "0" });
+  const a1 = makeNumber("Exception minimum area (sq in; IPC 1300)", "scc-a1", { step: "any", min: "0" });
+  const d1 = makeNumber("Exception minimum least dimension (in; IPC 25)", "scc-d1", { step: "any", min: "0" });
   for (const x of [w, d, a0, d0, a1, d1]) inputRegion.appendChild(x.wrap);
   attachExampleButton(inputRegion, () => { w.input.value = "28"; d.input.value = "36"; a0.input.value = "900"; d0.input.value = "30"; a1.input.value = "1300"; d1.input.value = "25"; update(); });
   const oV = makeOutputLine(outputRegion, "Verdict", "scc-out-v");
@@ -4737,14 +4726,14 @@ export const ventTerminalCheckExample = { inputs: { height_above_roof_in: 6, sno
 
 function _v1135renderVentTerminalCheck(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: IPC 903.1 - open vent pipes extending through a roof terminated not less than 6 in above the roof or 6 in above the anticipated snow accumulation, whichever is greater, except not less than 7 ft where the roof is used for any purpose other than weather protection. IPC 903.1.1 - where the 97.5-percent value for outdoor design temperature is 0 degF or less, vent extensions through a roof or wall not less than 3 in in diameter, with any increase in the size of the vent made not less than 1 ft inside the thermal envelope of the building. IPC 903.2 - an open vent terminal not located directly beneath any door, openable window, or other air intake of the building or of an adjacent building, and not within 10 ft horizontally of such an opening unless it is 3 ft above it. Anticipated snow accumulation and the design temperature are local figures. Not checked: the vent SIZE from drainage fixture units and developed length, whether a vent is required, the branch below, flashing, wall terminations, or fuel-gas venting. A screen, not a code-official determination; the adopted code and the AHJ govern.";
-  const h = makeNumber("Height above the roof (in)", "vtc-h", { step: "any", min: "0" }); h.input.value = "6";
-  const sn = makeNumber("Anticipated snow accumulation (in)", "vtc-sn", { step: "any", min: "0" }); sn.input.value = "18";
+  const h = makeNumber("Height above the roof (in)", "vtc-h", { step: "any", min: "0" });
+  const sn = makeNumber("Anticipated snow accumulation (in)", "vtc-sn", { step: "any", min: "0" });
   const ru = makeSelect("Roof used for anything but weather protection?", "vtc-ru", [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes - 7 ft applies" }]);
-  const dt = makeNumber("97.5% outdoor design temperature (°F)", "vtc-dt", { step: "any" }); dt.input.value = "-10";
-  const di = makeNumber("Vent diameter through the roof (in)", "vtc-di", { step: "any", min: "0" }); di.input.value = "2";
-  const ic = makeNumber("Size increase made this far inside the thermal envelope (in; 0 = none)", "vtc-ic", { step: "any", min: "0" }); ic.input.value = "6";
-  const hz = makeNumber("Horizontal distance to the nearest door, openable window, or intake (ft)", "vtc-hz", { step: "any", min: "0" }); hz.input.value = "4";
-  const ab = makeNumber("Height above that opening (ft)", "vtc-ab", { step: "any", min: "0" }); ab.input.value = "1";
+  const dt = makeNumber("97.5% outdoor design temperature (°F)", "vtc-dt", { step: "any" });
+  const di = makeNumber("Vent diameter through the roof (in)", "vtc-di", { step: "any", min: "0" });
+  const ic = makeNumber("Size increase made this far inside the thermal envelope (in; 0 = none)", "vtc-ic", { step: "any", min: "0" });
+  const hz = makeNumber("Horizontal distance to the nearest door, openable window, or intake (ft)", "vtc-hz", { step: "any", min: "0" });
+  const ab = makeNumber("Height above that opening (ft)", "vtc-ab", { step: "any", min: "0" });
   inputRegion.appendChild(h.wrap); inputRegion.appendChild(sn.wrap); inputRegion.appendChild(ru.wrap);
   for (const x of [dt, di, ic, hz, ab]) inputRegion.appendChild(x.wrap);
   attachExampleButton(inputRegion, () => { h.input.value = "6"; sn.input.value = "18"; ru.select.value = "no"; dt.input.value = "-10"; di.input.value = "2"; ic.input.value = "6"; hz.input.value = "4"; ab.input.value = "1"; update(); });
@@ -4820,13 +4809,13 @@ export const aavInstallCheckExample = { inputs: { height_above_drain_in: 4, heig
 
 function _v1136renderAavInstallCheck(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: IPC 918 - individual and branch-type air admittance valves located not less than 4 in above the horizontal branch drain or fixture drain being vented (918.4); installed not less than 6 in above insulation materials (918.6); located in a ventilated space and remaining accessible; and, the requirement that governs everything else, at least one vent pipe extending to the OUTDOORS even where air admittance valves are used (918.7), because a valve admits air to relieve negative pressure and provides no relief of positive pressure. Valve capacity is rated in drainage fixture units per its ASSE 1051 or 1050 listing and is not interchangeable between individual, branch, and stack types. Not checked: whether AAVs are permitted at all by the adopted code and the AHJ, the developed length and sizing of the vent, the relief vent required where a horizontal branch is more than four branch intervals from the top of the stack, plenum restrictions, or the fixture arrangement below. A screen, not a code-official determination; the adopted code, the valve's listing, and the AHJ govern.";
-  const hd = makeNumber("Height above the branch or fixture drain (in)", "aav-hd", { step: "any", min: "0" }); hd.input.value = "4";
-  const hi = makeNumber("Height above insulation (in; 0 = no insulation below)", "aav-hi", { step: "any", min: "0" }); hi.input.value = "6";
+  const hd = makeNumber("Height above the branch or fixture drain (in)", "aav-hd", { step: "any", min: "0" });
+  const hi = makeNumber("Height above insulation (in; 0 = no insulation below)", "aav-hi", { step: "any", min: "0" });
   const ov = makeSelect("At least one vent extends to the outdoors?", "aav-ov", [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }]);
   const vs = makeSelect("Valve is in a ventilated space?", "aav-vs", [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }]);
   const ac = makeSelect("Valve remains accessible?", "aav-ac", [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }]);
-  const df = makeNumber("Drainage fixture units served", "aav-df", { step: "any", min: "0" }); df.input.value = "6";
-  const vr = makeNumber("Valve DFU rating (from its listing)", "aav-vr", { step: "any", min: "0" }); vr.input.value = "20";
+  const df = makeNumber("Drainage fixture units served", "aav-df", { step: "any", min: "0" });
+  const vr = makeNumber("Valve DFU rating (from its listing)", "aav-vr", { step: "any", min: "0" });
   inputRegion.appendChild(hd.wrap); inputRegion.appendChild(hi.wrap);
   inputRegion.appendChild(ov.wrap); inputRegion.appendChild(vs.wrap); inputRegion.appendChild(ac.wrap);
   inputRegion.appendChild(df.wrap); inputRegion.appendChild(vr.wrap);
@@ -4911,15 +4900,15 @@ export const grabBarLayoutExample = { inputs: { bar_height_in: 34, side_bar_leng
 
 function _v1137renderGrabBarLayout(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: 2010 ADA Standards for Accessible Design - 609.4, grab bars installed in a horizontal position 33 in minimum and 36 in maximum above the finish floor measured to the top of the gripping surface; 604.5.1, a side-wall grab bar 42 in minimum long located 12 in maximum from the rear wall, and a rear-wall grab bar 36 in minimum long extending at least 12 in from the water closet centerline toward the side wall and at least 24 in toward the open side; 609.8, grab bars and their mounting sustaining 250 lbf. Prying moment and fastener force are statics from the standoff and flange geometry, not code values. Standard water-closet configuration only: ambulatory stalls, bathtubs, and roll-in and transfer showers have their own layouts under 604.8, 607, and 608. Clear floor space, the 16-18 in centerline, seat height, gripping diameter, and the 1-1/2 in clearance behind the bar are not checked. The 2010 ADA Standards and ANSI A117.1 differ in places; a screen, not a certification of accessibility - the adopted standard and the AHJ govern.";
-  const h = makeNumber("Bar height to the top of the gripping surface (in)", "gbl-h", { step: "any", min: "0" }); h.input.value = "34";
-  const sl = makeNumber("Side-wall bar length (in)", "gbl-sl", { step: "any", min: "0" }); sl.input.value = "42";
-  const sf = makeNumber("Side bar distance from the rear wall (in)", "gbl-sf", { step: "any", min: "0" }); sf.input.value = "12";
-  const rl = makeNumber("Rear-wall bar length (in)", "gbl-rl", { step: "any", min: "0" }); rl.input.value = "36";
-  const rs = makeNumber("Rear bar reach toward the side wall (in)", "gbl-rs", { step: "any", min: "0" }); rs.input.value = "12";
-  const ro = makeNumber("Rear bar reach toward the open side (in)", "gbl-ro", { step: "any", min: "0" }); ro.input.value = "24";
-  const ld = makeNumber("Design load (lbf; ADA 250)", "gbl-ld", { step: "any", min: "0" }); ld.input.value = "250";
-  const so = makeNumber("Standoff from the wall to the bar centerline (in)", "gbl-so", { step: "any", min: "0" }); so.input.value = "1.5";
-  const fs = makeNumber("Flange fastener spacing (in; 0 to skip)", "gbl-fs", { step: "any", min: "0" }); fs.input.value = "3";
+  const h = makeNumber("Bar height to the top of the gripping surface (in)", "gbl-h", { step: "any", min: "0" });
+  const sl = makeNumber("Side-wall bar length (in)", "gbl-sl", { step: "any", min: "0" });
+  const sf = makeNumber("Side bar distance from the rear wall (in)", "gbl-sf", { step: "any", min: "0" });
+  const rl = makeNumber("Rear-wall bar length (in)", "gbl-rl", { step: "any", min: "0" });
+  const rs = makeNumber("Rear bar reach toward the side wall (in)", "gbl-rs", { step: "any", min: "0" });
+  const ro = makeNumber("Rear bar reach toward the open side (in)", "gbl-ro", { step: "any", min: "0" });
+  const ld = makeNumber("Design load (lbf; ADA 250)", "gbl-ld", { step: "any", min: "0" });
+  const so = makeNumber("Standoff from the wall to the bar centerline (in)", "gbl-so", { step: "any", min: "0" });
+  const fs = makeNumber("Flange fastener spacing (in; 0 to skip)", "gbl-fs", { step: "any", min: "0" });
   for (const x of [h, sl, sf, rl, rs, ro, ld, so, fs]) inputRegion.appendChild(x.wrap);
   attachExampleButton(inputRegion, () => { h.input.value = "34"; sl.input.value = "42"; sf.input.value = "12"; rl.input.value = "36"; rs.input.value = "12"; ro.input.value = "24"; ld.input.value = "250"; so.input.value = "1.5"; fs.input.value = "3"; update(); });
   const oV = makeOutputLine(outputRegion, "Layout verdict", "gbl-out-v");
@@ -5006,14 +4995,14 @@ export const cleanoutLayoutExample = { inputs: { horizontal_run_ft: 240, max_spa
 
 function _v1140renderCleanoutLayout(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: IPC 708 - horizontal drains provided with cleanouts located not more than 100 ft apart; a cleanout where a horizontal drainage pipe, building drain, or building sewer has a change of horizontal direction greater than 45 degrees, with the allowance that where more than one such change occurs within 40 ft of developed length the cleanout at the first change serves all of them; a cleanout at the base of each waste or soil stack; a clear space of not less than 18 in at the opening of cleanouts 6 in and smaller; and, where a cleanout is in a crawl space, an unobstructed pathway height of not less than 24 in. Larger cleanouts carry their own clearance requirement, not checked here. Also not checked: cleanout size relative to the pipe, fittings or fixtures serving as cleanouts, the building drain and sewer junction, manholes, cleanout orientation, concealed piping and access covers, or material and threads. A screen; the adopted code and the AHJ govern.";
-  const L = makeNumber("Horizontal drain run (ft)", "clo-l", { step: "any", min: "0" }); L.input.value = "240";
-  const sp = makeNumber("Maximum cleanout spacing (ft; IPC 100)", "clo-sp", { step: "any", min: "0" }); sp.input.value = "100";
-  const dc = makeNumber("Changes of horizontal direction over 45 degrees", "clo-dc", { step: "1", min: "0" }); dc.input.value = "9";
-  const gp = makeNumber("Of those, how many are grouped away (0 = let the 40 ft cap decide)", "clo-gp", { step: "1", min: "0" }); gp.input.value = "0";
-  const st = makeNumber("Waste or soil stacks", "clo-st", { step: "1", min: "0" }); st.input.value = "2";
-  const ps = makeNumber("Cleanout / pipe size (in)", "clo-ps", { step: "any", min: "0" }); ps.input.value = "4";
-  const cs = makeNumber("Clear space at the opening (in)", "clo-cs", { step: "any", min: "0" }); cs.input.value = "18";
-  const ch = makeNumber("Crawl-space pathway height (in; 0 = not in a crawl space)", "clo-ch", { step: "any", min: "0" }); ch.input.value = "30";
+  const L = makeNumber("Horizontal drain run (ft)", "clo-l", { step: "any", min: "0" });
+  const sp = makeNumber("Maximum cleanout spacing (ft; IPC 100)", "clo-sp", { step: "any", min: "0" });
+  const dc = makeNumber("Changes of horizontal direction over 45 degrees", "clo-dc", { step: "1", min: "0" });
+  const gp = makeNumber("Of those, how many are grouped away (0 = let the 40 ft cap decide)", "clo-gp", { step: "1", min: "0" });
+  const st = makeNumber("Waste or soil stacks", "clo-st", { step: "1", min: "0" });
+  const ps = makeNumber("Cleanout / pipe size (in)", "clo-ps", { step: "any", min: "0" });
+  const cs = makeNumber("Clear space at the opening (in)", "clo-cs", { step: "any", min: "0" });
+  const ch = makeNumber("Crawl-space pathway height (in; 0 = not in a crawl space)", "clo-ch", { step: "any", min: "0" });
   for (const x of [L, sp, dc, gp, st, ps, cs, ch]) inputRegion.appendChild(x.wrap);
   attachExampleButton(inputRegion, () => { L.input.value = "240"; sp.input.value = "100"; dc.input.value = "9"; gp.input.value = "0"; st.input.value = "2"; ps.input.value = "4"; cs.input.value = "18"; ch.input.value = "30"; update(); });
   const oT = makeOutputLine(outputRegion, "Total cleanouts", "clo-out-t");
@@ -5093,9 +5082,9 @@ export const waterServicePressureCheckExample = { inputs: { static_pressure_psi:
 
 function _v1146renderWaterServicePressureCheck(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: IPC 604.8 - static water pressure not greater than 80 psi, with an approved pressure-reducing valve conforming to ASSE 1003 or CSA B356 installed on the domestic water branch main or riser at the connection to the water service pipe where the main pressure exceeds it. IPC 607.3 - where a storage water heater is supplied with cold water that passes through a check valve, pressure-reducing valve, or backflow preventer, a thermal expansion control device connected to the cold water supply downstream of all such devices, and expansion tanks sized per the manufacturer so that system pressure does not exceed what 604.8 requires. Not checked: expansion tank size or precharge, per-fixture flow pressure and flow rate, pipe sizing and the friction, elevation, and meter losses between static and flowing pressure, seasonal pressure variation, PRV maintenance and failure modes, or the water heater's T and P relief and discharge piping. A screen; the adopted code, the device listings, and the AHJ govern.";
-  const sp = makeNumber("Static water pressure at the service (psi)", "wsp-sp", { step: "any", min: "0" }); sp.input.value = "95";
-  const ps = makeNumber("PRV setpoint if one is fitted (psi; 0 = none)", "wsp-ps", { step: "any", min: "0" }); ps.input.value = "60";
-  const mf = makeNumber("Minimum pressure the fixtures need (psi)", "wsp-mf", { step: "any", min: "0" }); mf.input.value = "20";
+  const sp = makeNumber("Static water pressure at the service (psi)", "wsp-sp", { step: "any", min: "0" });
+  const ps = makeNumber("PRV setpoint if one is fitted (psi; 0 = none)", "wsp-ps", { step: "any", min: "0" });
+  const mf = makeNumber("Minimum pressure the fixtures need (psi)", "wsp-mf", { step: "any", min: "0" });
   const cb = makeSelect("Check valve or backflow preventer on the service?", "wsp-cb", [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }]);
   const wh = makeSelect("Storage water heater?", "wsp-wh", [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }]);
   const ec = makeSelect("Thermal expansion control installed?", "wsp-ec", [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }]);
@@ -5200,16 +5189,16 @@ export const accessibleToiletCompartmentExample = { inputs: { compartment_count:
 
 function _v1160renderAccessibleToiletCompartment(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: 2010 ADA Standards for Accessible Design, 213.3.1 and 604.8. Section 213.3.1: where toilet compartments are provided, at least one shall comply with 604.8.1, and in addition at least one shall comply with 604.8.2 where six or more toilet compartments are provided or where the combination of urinals and water closets totals six or more fixtures. Section 604.8.1.1: wheelchair accessible compartments shall be 60 in wide minimum measured perpendicular to the side wall, and 56 in deep minimum for wall hung water closets and 59 in deep minimum for floor mounted water closets measured perpendicular to the rear wall. Section 604.8.2.1: ambulatory accessible compartments shall have a depth of 60 in minimum and a width of 35 in minimum and 37 in maximum. A US federal standard in the public domain. Not checked: door swing and the requirement that the door not swing into the minimum required area, toe clearance under the partitions and its exception at greater depths, grab bars, water closet centerline, clear floor and turning space in the room, lavatories and dispensers, the accessible route, children's-use dimensions, or the additional requirements of ANSI A117.1 and state and local accessibility law. A compartment sizing screen, not a restroom design; the 2010 ADA Standards and the AHJ govern.";
-  const nStall = makeNumber("Toilet compartments in the room", "atc-n", { step: "1", min: "1" }); nStall.input.value = "4";
-  const nWc = makeNumber("Water closets in the room", "atc-wc", { step: "1", min: "1" }); nWc.input.value = "4";
-  const nUr = makeNumber("Urinals in the room", "atc-ur", { step: "1", min: "0" }); nUr.input.value = "3";
+  const nStall = makeNumber("Toilet compartments in the room", "atc-n", { step: "1", min: "1" });
+  const nWc = makeNumber("Water closets in the room", "atc-wc", { step: "1", min: "1" });
+  const nUr = makeNumber("Urinals in the room", "atc-ur", { step: "1", min: "0" });
   const mount = makeSelect("Water closet mounting", "atc-mount", [{ value: "wall-hung", label: "Wall hung (56 in deep min)" }, { value: "floor-mounted", label: "Floor mounted (59 in deep min)" }]);
   mount.select.value = "floor-mounted";
-  const wW = makeNumber("Wheelchair compartment width (in)", "atc-ww", { step: "any", min: "0" }); wW.input.value = "60";
-  const wD = makeNumber("Wheelchair compartment depth (in)", "atc-wd", { step: "any", min: "0" }); wD.input.value = "56";
+  const wW = makeNumber("Wheelchair compartment width (in)", "atc-ww", { step: "any", min: "0" });
+  const wD = makeNumber("Wheelchair compartment depth (in)", "atc-wd", { step: "any", min: "0" });
   const ambP = makeSelect("Ambulatory compartment provided?", "atc-ap", [{ value: "no", label: "No" }, { value: "yes", label: "Yes" }]);
-  const aW = makeNumber("Ambulatory compartment width (in)", "atc-aw", { step: "any", min: "0" }); aW.input.value = "0";
-  const aD = makeNumber("Ambulatory compartment depth (in)", "atc-ad", { step: "any", min: "0" }); aD.input.value = "0";
+  const aW = makeNumber("Ambulatory compartment width (in)", "atc-aw", { step: "any", min: "0" });
+  const aD = makeNumber("Ambulatory compartment depth (in)", "atc-ad", { step: "any", min: "0" });
   for (const x of [nStall, nWc, nUr, mount, wW, wD, ambP, aW, aD]) inputRegion.appendChild(x.wrap);
   attachExampleButton(inputRegion, () => { nStall.input.value = "4"; nWc.input.value = "4"; nUr.input.value = "3"; mount.select.value = "floor-mounted"; wW.input.value = "60"; wD.input.value = "56"; ambP.select.value = "no"; aW.input.value = "0"; aD.input.value = "0"; update(); });
   const oV = makeOutputLine(outputRegion, "Verdict", "atc-out-v");

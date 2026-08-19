@@ -65,16 +65,11 @@ export const solderJointQuantityExample = { inputs: { joints: 200, wire_in_per_j
 
 function _v856renderSolderJointQuantity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: solder-weight identity by name. weight per inch = pi/4 x diameter^2 x density; solder = joints x wire per joint x weight per inch. The wire per joint is a field rule (~the pipe diameter in inches of 1/8 in wire); lead-free solder is ~0.30 lb/in^3.";
-  const j = makeNumber("Joints to sweat", "sjq-j", { step: "any", min: "0", value: "200" });
-  j.input.value = "200";
-  const wj = makeNumber("Solder wire per joint (in)", "sjq-wj", { step: "any", min: "0", value: "0.75" });
-  wj.input.value = "0.75";
-  const wd = makeNumber("Solder wire diameter (in)", "sjq-wd", { step: "any", min: "0", value: "0.125" });
-  wd.input.value = "0.125";
-  const dn = makeNumber("Solder density (lb/in³)", "sjq-dn", { step: "any", min: "0", value: "0.30" });
-  dn.input.value = "0.30";
-  const sp = makeNumber("Spool weight (lb)", "sjq-sp", { step: "any", min: "0", value: "1" });
-  sp.input.value = "1";
+  const j = makeNumber("Joints to sweat", "sjq-j", { step: "any", min: "0" });
+  const wj = makeNumber("Solder wire per joint (in)", "sjq-wj", { step: "any", min: "0" });
+  const wd = makeNumber("Solder wire diameter (in)", "sjq-wd", { step: "any", min: "0" });
+  const dn = makeNumber("Solder density (lb/in³)", "sjq-dn", { step: "any", min: "0" });
+  const sp = makeNumber("Spool weight (lb)", "sjq-sp", { step: "any", min: "0" });
   for (const f of [j, wj, wd, dn, sp]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { j.input.value = "200"; wj.input.value = "0.75"; wd.input.value = "0.125"; dn.input.value = "0.30"; sp.input.value = "1"; update(); });
   const oSolder = makeOutputLine(outputRegion, "Solder to order", "sjq-out-solder");
@@ -119,18 +114,12 @@ export const pipeInsulationTakeoffExample = { inputs: { pipe_ft: 250, waste_pct:
 
 function _v857renderPipeInsulationTakeoff(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: insulation-takeoff identity by name. cut = pipe x (1 + waste) + fittings x allowance; sections = ceil(cut / section length); jacket = pi x insulation OD x cut. The jacket area uses the insulation OD, not the pipe.";
-  const p = makeNumber("Pipe run length (ft)", "pit-p", { step: "any", min: "0", value: "250" });
-  p.input.value = "250";
-  const w = makeNumber("Waste allowance (percent)", "pit-w", { step: "any", min: "0", value: "5" });
-  w.input.value = "5";
-  const nf = makeNumber("Ells / tees / valves (count)", "pit-nf", { step: "any", min: "0", value: "12" });
-  nf.input.value = "12";
-  const fa = makeNumber("Insulation allowance per fitting (ft)", "pit-fa", { step: "any", min: "0", value: "1" });
-  fa.input.value = "1";
-  const sl = makeNumber("Insulation section length (ft)", "pit-sl", { step: "any", min: "0", value: "3" });
-  sl.input.value = "3";
-  const od = makeNumber("Insulation outside diameter (in)", "pit-od", { step: "any", min: "0", value: "4.5" });
-  od.input.value = "4.5";
+  const p = makeNumber("Pipe run length (ft)", "pit-p", { step: "any", min: "0" });
+  const w = makeNumber("Waste allowance (percent)", "pit-w", { step: "any", min: "0" });
+  const nf = makeNumber("Ells / tees / valves (count)", "pit-nf", { step: "any", min: "0" });
+  const fa = makeNumber("Insulation allowance per fitting (ft)", "pit-fa", { step: "any", min: "0" });
+  const sl = makeNumber("Insulation section length (ft)", "pit-sl", { step: "any", min: "0" });
+  const od = makeNumber("Insulation outside diameter (in)", "pit-od", { step: "any", min: "0" });
   for (const f of [p, w, nf, fa, sl, od]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { p.input.value = "250"; w.input.value = "5"; nf.input.value = "12"; fa.input.value = "1"; sl.input.value = "3"; od.input.value = "4.5"; update(); });
   const oSections = makeOutputLine(outputRegion, "Insulation sections", "pit-out-sections");
@@ -178,20 +167,13 @@ export const heatTraceSizingExample = { inputs: { pipe_ft: 150, allowance_pct: 1
 
 function _v858renderHeatTraceSizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: heat-trace identity by name. cable = pipe x (1 + allowance) + valves x allowance; watts = rated W/ft x cable; amps = watts / voltage. Continuous load must stay under 80% of the breaker. The manufacturer's tables and max circuit length govern.";
-  const p = makeNumber("Pipe run length (ft)", "hts-p", { step: "any", min: "0", value: "150" });
-  p.input.value = "150";
-  const al = makeNumber("Support / spiral allowance (percent)", "hts-al", { step: "any", min: "0", value: "10" });
-  al.input.value = "10";
-  const nv = makeNumber("Valves and flanges (count)", "hts-nv", { step: "any", min: "0", value: "1" });
-  nv.input.value = "1";
-  const va = makeNumber("Cable allowance per valve (ft)", "hts-va", { step: "any", min: "0", value: "3" });
-  va.input.value = "3";
-  const wf = makeNumber("Cable rated wattage (W/ft)", "hts-wf", { step: "any", min: "0", value: "5" });
-  wf.input.value = "5";
-  const v = makeNumber("Supply voltage (V)", "hts-v", { step: "any", min: "0", value: "120" });
-  v.input.value = "120";
-  const br = makeNumber("Circuit breaker rating (A)", "hts-br", { step: "any", min: "0", value: "20" });
-  br.input.value = "20";
+  const p = makeNumber("Pipe run length (ft)", "hts-p", { step: "any", min: "0" });
+  const al = makeNumber("Support / spiral allowance (percent)", "hts-al", { step: "any", min: "0" });
+  const nv = makeNumber("Valves and flanges (count)", "hts-nv", { step: "any", min: "0" });
+  const va = makeNumber("Cable allowance per valve (ft)", "hts-va", { step: "any", min: "0" });
+  const wf = makeNumber("Cable rated wattage (W/ft)", "hts-wf", { step: "any", min: "0" });
+  const v = makeNumber("Supply voltage (V)", "hts-v", { step: "any", min: "0" });
+  const br = makeNumber("Circuit breaker rating (A)", "hts-br", { step: "any", min: "0" });
   for (const f of [p, al, nv, va, wf, v, br]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { p.input.value = "150"; al.input.value = "10"; nv.input.value = "1"; va.input.value = "3"; wf.input.value = "5"; v.input.value = "120"; br.input.value = "20"; update(); });
   const oCable = makeOutputLine(outputRegion, "Heat-trace cable", "hts-out-cable");
@@ -235,14 +217,10 @@ export const pipePurgeVolumeExample = { inputs: { pipe_id_in: 2.067, length_ft: 
 
 function _v894renderPipePurgeVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: purge identity by name. pipe volume = pi/4 x ID^2 x length; purge volume = pipe volume x air changes; time = purge volume / flow. A nitrogen purge while brazing keeps scale and oxidation out of the line.";
-  const id = makeNumber("Pipe inside diameter (in)", "ppv-id", { step: "any", min: "0", value: "2.067" });
-  id.input.value = "2.067";
-  const ln = makeNumber("Run length (ft)", "ppv-ln", { step: "any", min: "0", value: "100" });
-  ln.input.value = "100";
-  const ac = makeNumber("Volume changes to sweep", "ppv-ac", { step: "any", min: "0", value: "5" });
-  ac.input.value = "5";
-  const fl = makeNumber("Purge gas flow (scfh)", "ppv-fl", { step: "any", min: "0", value: "60" });
-  fl.input.value = "60";
+  const id = makeNumber("Pipe inside diameter (in)", "ppv-id", { step: "any", min: "0" });
+  const ln = makeNumber("Run length (ft)", "ppv-ln", { step: "any", min: "0" });
+  const ac = makeNumber("Volume changes to sweep", "ppv-ac", { step: "any", min: "0" });
+  const fl = makeNumber("Purge gas flow (scfh)", "ppv-fl", { step: "any", min: "0" });
   for (const f of [id, ln, ac, fl]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { id.input.value = "2.067"; ln.input.value = "100"; ac.input.value = "5"; fl.input.value = "60"; update(); });
   const oPipe = makeOutputLine(outputRegion, "Pipe volume", "ppv-out-pipe");
@@ -289,16 +267,11 @@ export const hydronicSystemVolumeExample = { inputs: { pipe_length_ft: 500, gal_
 
 function _v903renderHydronicSystemVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: volume identity by name. system = pipe length x gallons per foot + terminals + boiler; glycol = system x fraction; water = system - glycol. The gallons per foot comes from the pipe size (3/4 in ~0.023 gal/ft).";
-  const pl = makeNumber("Total pipe length (ft)", "hsv-pl", { step: "any", min: "0", value: "500" });
-  pl.input.value = "500";
-  const gf = makeNumber("Gallons per foot (gal/ft)", "hsv-gf", { step: "any", min: "0", value: "0.023" });
-  gf.input.value = "0.023";
-  const tg = makeNumber("Terminal / emitter volume (gal)", "hsv-tg", { step: "any", min: "0", value: "8" });
-  tg.input.value = "8";
-  const bg = makeNumber("Boiler + buffer tank volume (gal)", "hsv-bg", { step: "any", min: "0", value: "5" });
-  bg.input.value = "5";
-  const gc = makeNumber("Glycol fraction (0-1)", "hsv-gc", { step: "any", min: "0", value: "0.30" });
-  gc.input.value = "0.30";
+  const pl = makeNumber("Total pipe length (ft)", "hsv-pl", { step: "any", min: "0" });
+  const gf = makeNumber("Gallons per foot (gal/ft)", "hsv-gf", { step: "any", min: "0" });
+  const tg = makeNumber("Terminal / emitter volume (gal)", "hsv-tg", { step: "any", min: "0" });
+  const bg = makeNumber("Boiler + buffer tank volume (gal)", "hsv-bg", { step: "any", min: "0" });
+  const gc = makeNumber("Glycol fraction (0-1)", "hsv-gc", { step: "any", min: "0" });
   for (const f of [pl, gf, tg, bg, gc]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { pl.input.value = "500"; gf.input.value = "0.023"; tg.input.value = "8"; bg.input.value = "5"; gc.input.value = "0.30"; update(); });
   const oSystem = makeOutputLine(outputRegion, "System volume", "hsv-out-system");
@@ -348,14 +321,10 @@ export const pexHomerunTakeoffExample = { inputs: { fixtures: 8, hot_fixtures: 6
 
 function _v906renderPexHomerunTakeoff(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: takeoff identity by name. cold ports = fixtures; hot ports = hot fixtures; tubing = (cold + hot) x average run x (1 + waste). Home-run plumbing runs one line per fixture from a central manifold.";
-  const fx = makeNumber("Total fixtures", "phr-fx", { step: "1", min: "0", value: "8" });
-  fx.input.value = "8";
-  const hf = makeNumber("Fixtures needing hot", "phr-hf", { step: "1", min: "0", value: "6" });
-  hf.input.value = "6";
-  const ar = makeNumber("Average home-run length (ft)", "phr-ar", { step: "any", min: "0", value: "35" });
-  ar.input.value = "35";
-  const ws = makeNumber("Waste allowance (%)", "phr-ws", { step: "any", min: "0", value: "10" });
-  ws.input.value = "10";
+  const fx = makeNumber("Total fixtures", "phr-fx", { step: "1", min: "0" });
+  const hf = makeNumber("Fixtures needing hot", "phr-hf", { step: "1", min: "0" });
+  const ar = makeNumber("Average home-run length (ft)", "phr-ar", { step: "any", min: "0" });
+  const ws = makeNumber("Waste allowance (%)", "phr-ws", { step: "any", min: "0" });
   for (const f of [fx, hf, ar, ws]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { fx.input.value = "8"; hf.input.value = "6"; ar.input.value = "35"; ws.input.value = "10"; update(); });
   const oPorts = makeOutputLine(outputRegion, "Manifold ports", "phr-out-ports");
@@ -403,18 +372,12 @@ export const solarThermalCollectorExample = { inputs: { optical_efficiency: 0.70
 
 function _v987renderSolarThermalCollector(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: solar thermal flat-plate collector output (ASHRAE 93 / Hottel-Whillier-Bliss efficiency line), by name. eta = optical efficiency - loss coeff x (inlet - ambient)/irradiance; useful heat = irradiance x eta x area. The SRCC-rated intercept and slope, the incidence angle, flow rate, and glazing govern.";
-  const oe = makeNumber("Optical efficiency (y-intercept, ~0.70)", "stc-oe", { step: "any", min: "0", max: "1", value: "0.70" });
-  oe.input.value = "0.70";
-  const lc = makeNumber("Loss coefficient (Btu/hr-ft²-F, slope)", "stc-lc", { step: "any", min: "0", value: "0.85" });
-  lc.input.value = "0.85";
-  const it = makeNumber("Fluid inlet temp (°F)", "stc-it", { step: "any", value: "120" });
-  it.input.value = "120";
-  const at = makeNumber("Ambient air temp (°F)", "stc-at", { step: "any", value: "70" });
-  at.input.value = "70";
-  const ir = makeNumber("Solar irradiance (Btu/hr-ft²)", "stc-ir", { step: "any", min: "0", value: "300" });
-  ir.input.value = "300";
-  const ar = makeNumber("Collector area (sq ft)", "stc-ar", { step: "any", min: "0", value: "40" });
-  ar.input.value = "40";
+  const oe = makeNumber("Optical efficiency (y-intercept, ~0.70)", "stc-oe", { step: "any", min: "0", max: "1" });
+  const lc = makeNumber("Loss coefficient (Btu/hr-ft²-F, slope)", "stc-lc", { step: "any", min: "0" });
+  const it = makeNumber("Fluid inlet temp (°F)", "stc-it", { step: "any" });
+  const at = makeNumber("Ambient air temp (°F)", "stc-at", { step: "any" });
+  const ir = makeNumber("Solar irradiance (Btu/hr-ft²)", "stc-ir", { step: "any", min: "0" });
+  const ar = makeNumber("Collector area (sq ft)", "stc-ar", { step: "any", min: "0" });
   for (const f of [oe, lc, it, at, ir, ar]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { oe.input.value = "0.70"; lc.input.value = "0.85"; it.input.value = "120"; at.input.value = "70"; ir.input.value = "300"; ar.input.value = "40"; update(); });
   const oE = makeOutputLine(outputRegion, "Collector efficiency", "stc-out-e");

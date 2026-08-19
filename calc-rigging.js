@@ -978,12 +978,11 @@ export const multiLegSlingExample = { inputs: { total_load_lb: 8000, num_legs: 4
 
 function renderMultiLegSling(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ASME B30.9 (slings) and standard rigging statics by name. Conservative tension = (load / 2 legs for >=3-leg rigid loads) / sin(angle from horizontal); the equal-share value is reference-only. The qualified rigger and the sling tag govern.";
-  const load = makeNumber("Total load (lb)", "mls-load", { step: "any", min: "0", value: "8000" });
+  const load = makeNumber("Total load (lb)", "mls-load", { step: "any", min: "0" });
   const legs = makeSelect("Number of sling legs", "mls-legs", [
     { value: "2", label: "2 legs" }, { value: "3", label: "3 legs" }, { value: "4", label: "4 legs" },
   ]);
-  const angle = makeNumber("Leg angle from horizontal (deg)", "mls-angle", { step: "any", min: "0", value: "60" });
-  load.input.value = "8000"; angle.input.value = "60";
+  const angle = makeNumber("Leg angle from horizontal (deg)", "mls-angle", { step: "any", min: "0" });
   for (const f of [load, legs, angle]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { load.input.value = "8000"; legs.select.value = "4"; angle.input.value = "60"; update(); });
   const oT = makeOutputLine(outputRegion, "Tension per leg (conservative)", "mls-out-t");
@@ -1020,10 +1019,9 @@ export const wireRopeStrengthExample = { inputs: { diameter_in: 0.5, constructio
 
 function renderWireRopeStrength(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Wire Rope Users Manual rule-of-thumb by name. MBS = factor x d^2 (factor ~46 tons/in^2 for IPS 6x19, editable); WLL = MBS / design factor (5:1 typical). ESTIMATE - the manufacturer's certified rating governs; never use unmarked rope.";
-  const dia = makeNumber("Rope nominal diameter (in)", "wrs-dia", { step: "any", min: "0", value: "0.5" });
-  const cf = makeNumber("Construction factor (tons/in²)", "wrs-cf", { step: "any", min: "0", value: "46" });
-  const df = makeNumber("Design factor (safety factor)", "wrs-df", { step: "any", min: "0", value: "5" });
-  dia.input.value = "0.5"; cf.input.value = "46"; df.input.value = "5";
+  const dia = makeNumber("Rope nominal diameter (in)", "wrs-dia", { step: "any", min: "0" });
+  const cf = makeNumber("Construction factor (tons/in²)", "wrs-cf", { step: "any", min: "0" });
+  const df = makeNumber("Design factor (safety factor)", "wrs-df", { step: "any", min: "0" });
   for (const f of [dia, cf, df]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { dia.input.value = "0.5"; cf.input.value = "46"; df.input.value = "5"; update(); });
   const oM = makeOutputLine(outputRegion, "Estimated breaking strength", "wrs-out-m");
@@ -1066,10 +1064,9 @@ export function computeWireRopeDiameterForWll({ wll_required_tons = 0, construct
 export const wireRopeDiameterForWllExample = { inputs: { wll_required_tons: 5, construction_factor: 46, design_factor: 5 } };
 function renderWireRopeDiameterForWll(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Wire Rope Users Manual rule-of-thumb solved for the diameter: d = sqrt(WLL x design factor / construction factor), from MBS = factor x d^2 (factor ~46 tons/in^2 for IPS 6x19, editable) and WLL = MBS / design factor (5:1 typical). ESTIMATE - the manufacturer's certified rating governs; never use unmarked rope.";
-  const wll = makeNumber("Required working load limit (tons)", "wrd-wll", { step: "any", min: "0", value: "5" });
-  const cf = makeNumber("Construction factor (tons/in²)", "wrd-cf", { step: "any", min: "0", value: "46" });
-  const df = makeNumber("Design factor (safety factor)", "wrd-df", { step: "any", min: "0", value: "5" });
-  wll.input.value = "5"; cf.input.value = "46"; df.input.value = "5";
+  const wll = makeNumber("Required working load limit (tons)", "wrd-wll", { step: "any", min: "0" });
+  const cf = makeNumber("Construction factor (tons/in²)", "wrd-cf", { step: "any", min: "0" });
+  const df = makeNumber("Design factor (safety factor)", "wrd-df", { step: "any", min: "0" });
   for (const f of [wll, cf, df]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { wll.input.value = "5"; cf.input.value = "46"; df.input.value = "5"; update(); });
   const oD = makeOutputLine(outputRegion, "Exact diameter required", "wrd-out-d");
@@ -1116,12 +1113,11 @@ export function computeWireRopeStretch({ load_lb = 0, length_ft = 0, rope_diamet
 export const wireRopeStretchExample = { inputs: { load_lb: 10000, length_ft: 100, rope_diameter_in: 0.5, effective_modulus_psi: 12000000, metallic_area_factor: 0.40 } };
 function renderWireRopeStretch(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: wire-rope elastic elongation dL = P L / (A_m E_r) with the metallic area A_m = F d^2 (fill factor F ~ 0.40 for 6x19/6x37 IWRC) and the effective rope modulus E_r ~ 12e6 psi for a seated rope (Wire Rope Users Manual). Elastic stretch only; the initial constructional (seating) stretch (~0.5-0.75%) is separate. A rigging estimate; the rope maker governs.";
-  const P = makeNumber("Line load (lb)", "wrs-p", { step: "any", min: "0", value: "10000" });
-  const L = makeNumber("Rope length under load (ft)", "wrs-l", { step: "any", min: "0", value: "100" });
-  const d = makeNumber("Rope diameter (in)", "wrs-d", { step: "any", min: "0", value: "0.5" });
-  const E = makeNumber("Effective rope modulus (psi)", "wrs-e", { step: "any", min: "0", value: "12000000" });
-  const F = makeNumber("Metallic-area factor (fill factor)", "wrs-f", { step: "any", min: "0", value: "0.40" });
-  P.input.value = "10000"; L.input.value = "100"; d.input.value = "0.5"; E.input.value = "12000000"; F.input.value = "0.40";
+  const P = makeNumber("Line load (lb)", "wrs-p", { step: "any", min: "0" });
+  const L = makeNumber("Rope length under load (ft)", "wrs-l", { step: "any", min: "0" });
+  const d = makeNumber("Rope diameter (in)", "wrs-d", { step: "any", min: "0" });
+  const E = makeNumber("Effective rope modulus (psi)", "wrs-e", { step: "any", min: "0" });
+  const F = makeNumber("Metallic-area factor (fill factor)", "wrs-f", { step: "any", min: "0" });
   for (const f of [P, L, d, E, F]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { P.input.value = "10000"; L.input.value = "100"; d.input.value = "0.5"; E.input.value = "12000000"; F.input.value = "0.40"; update(); });
   const oS = makeOutputLine(outputRegion, "Elastic stretch", "wrs-out-s");
@@ -1614,8 +1610,7 @@ export const wireRopeClipsExample = { inputs: { rope_diameter_in: 0.75 } };
 
 function _v938renderWireRopeClips(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: wire-rope clip count and spacing by name (OSHA 29 CFR 1926.251 Table H-2 / H-20). clips by rope diameter (1/2->3, 3/4->4, 1->5, ...); spacing = 6 x diameter. U-bolt on the dead end ('never saddle a dead horse'); torque per the maker. The manufacturer and OSHA govern the termination.";
-  const dia = makeNumber("Wire rope diameter (in)", "wrc-dia", { step: "any", min: "0", value: "0.75" });
-  dia.input.value = "0.75";
+  const dia = makeNumber("Wire rope diameter (in)", "wrc-dia", { step: "any", min: "0" });
   inputRegion.appendChild(dia.wrap);
   attachExampleButton(inputRegion, () => { dia.input.value = "0.75"; update(); });
   const oClips = makeOutputLine(outputRegion, "Minimum clips", "wrc-out-clips");
@@ -1665,16 +1660,11 @@ export const craneLoadRadiusBoomExample = { inputs: { boom_length_ft: 30, boom_a
 
 function _v953renderCraneLoadRadiusBoom(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: crane load radius and boom-tip height from boom geometry, by name. radius = boom-foot offset + boom length x cos(angle); tip height = boom-foot height + boom length x sin(angle); angle for a target radius = acos((target - offset)/length). Boom geometry only (no deflection/stretch/out-of-level, which increase the real radius). The load chart, load-moment indicator, and qualified operator govern.";
-  const bl = makeNumber("Boom length (ft)", "clr-bl", { step: "any", min: "0", value: "30" });
-  bl.input.value = "30";
-  const ba = makeNumber("Boom angle from horizontal (deg)", "clr-ba", { step: "any", min: "0", value: "60" });
-  ba.input.value = "60";
-  const bo = makeNumber("Boom-foot offset from center pin (ft)", "clr-bo", { step: "any", min: "0", value: "4" });
-  bo.input.value = "4";
-  const bh = makeNumber("Boom-foot height (ft)", "clr-bh", { step: "any", min: "0", value: "6" });
-  bh.input.value = "6";
-  const tr = makeNumber("Target load radius (ft)", "clr-tr", { step: "any", min: "0", value: "25" });
-  tr.input.value = "25";
+  const bl = makeNumber("Boom length (ft)", "clr-bl", { step: "any", min: "0" });
+  const ba = makeNumber("Boom angle from horizontal (deg)", "clr-ba", { step: "any", min: "0" });
+  const bo = makeNumber("Boom-foot offset from center pin (ft)", "clr-bo", { step: "any", min: "0" });
+  const bh = makeNumber("Boom-foot height (ft)", "clr-bh", { step: "any", min: "0" });
+  const tr = makeNumber("Target load radius (ft)", "clr-tr", { step: "any", min: "0" });
   for (const f of [bl, ba, bo, bh, tr]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { bl.input.value = "30"; ba.input.value = "60"; bo.input.value = "4"; bh.input.value = "6"; tr.input.value = "25"; update(); });
   const oR = makeOutputLine(outputRegion, "Load radius", "clr-out-r");
@@ -1721,12 +1711,9 @@ export const reevingPartsOfLineExample = { inputs: { load_lb: 20000, parts_of_li
 
 function _v991renderReevingPartsOfLine(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: block-and-tackle reeving line pull, by name. pull = load x (1 - k) / (1 - k^N); reeving efficiency = load / (N x pull); k per-sheave ~0.98 roller / 0.96 plain. Steady hauling pull on the lead line only (not the inertia to start the load). The block/rope ratings, the sheave friction, and a qualified rigger and lift plan govern.";
-  const ld = makeNumber("Load (lb)", "rpl-ld", { step: "any", min: "0", value: "20000" });
-  ld.input.value = "20000";
-  const np = makeNumber("Parts of line", "rpl-np", { step: "1", min: "1", value: "4" });
-  np.input.value = "4";
-  const ke = makeNumber("Per-sheave efficiency (0.98 roller, 0.96 plain)", "rpl-ke", { step: "any", min: "0", max: "1", value: "0.98" });
-  ke.input.value = "0.98";
+  const ld = makeNumber("Load (lb)", "rpl-ld", { step: "any", min: "0" });
+  const np = makeNumber("Parts of line", "rpl-np", { step: "1", min: "1" });
+  const ke = makeNumber("Per-sheave efficiency (0.98 roller, 0.96 plain)", "rpl-ke", { step: "any", min: "0", max: "1" });
   for (const f of [ld, np, ke]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ld.input.value = "20000"; np.input.value = "4"; ke.input.value = "0.98"; update(); });
   const oP = makeOutputLine(outputRegion, "Hauling-line pull", "rpl-out-p");
@@ -1771,12 +1758,9 @@ export const guyWireTensionExample = { inputs: { horizontal_load_lb: 500, attach
 
 function _v996renderGuyWireTension(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: guy-wire / down-guy tension and mast download, by name. theta = atan(height/lead); guy tension = H / cos(theta); mast download (and anchor uplift) = H x tan(theta). Single-guy statics only (real rigs balance multiple guys, mast wind/weight, pretension). The pole class, anchor capacity, guy grade, and the engineer / NESC / RUS govern.";
-  const hl = makeNumber("Horizontal load at top (lb)", "gwt-hl", { step: "any", min: "0", value: "500" });
-  hl.input.value = "500";
-  const ah = makeNumber("Guy attachment height (ft)", "gwt-ah", { step: "any", min: "0", value: "20" });
-  ah.input.value = "20";
-  const al = makeNumber("Anchor lead distance (ft)", "gwt-al", { step: "any", min: "0", value: "20" });
-  al.input.value = "20";
+  const hl = makeNumber("Horizontal load at top (lb)", "gwt-hl", { step: "any", min: "0" });
+  const ah = makeNumber("Guy attachment height (ft)", "gwt-ah", { step: "any", min: "0" });
+  const al = makeNumber("Anchor lead distance (ft)", "gwt-al", { step: "any", min: "0" });
   for (const f of [hl, ah, al]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { hl.input.value = "500"; ah.input.value = "20"; al.input.value = "20"; update(); });
   const oT = makeOutputLine(outputRegion, "Guy tension", "gwt-out-t");

@@ -912,15 +912,15 @@ export const irrigationRequirementExample = {
 function renderIrrigationRequirement(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per FAO Irrigation and Drainage Paper 56 (Crop Evapotranspiration, Allen et al. 1998) and the USDA NRCS Irrigation Guide. ET_crop = Kc x ET0 x days; gross = max(0, ET_crop - rainfall) / efficiency; acre-ft = gross_in x acres / 12. Kc values from FAO 56 Table 12. Reference ET0 from your local CIMIS / Mesonet / NOAA station. Free at fao.org.";
   const crop = makeSelect("Crop", "ir-crop", Object.keys(FAO56_CROP_KC).map((k) => ({ value: k, label: k.charAt(0).toUpperCase() + k.slice(1) + " (Kc " + FAO56_CROP_KC[k] + ")", selected: k === "corn" })));
-  const et0 = makeNumber("Reference ET0 (in/day)", "ir-et0", { step: "any", min: "0", value: "0.25" });
-  const days = makeNumber("Period length (days)", "ir-days", { step: "any", min: "0", value: "30" });
-  const area = makeNumber("Field area (acres)", "ir-area", { step: "any", min: "0", value: "80" });
+  const et0 = makeNumber("Reference ET0 (in/day)", "ir-et0", { step: "any", min: "0" });
+  const days = makeNumber("Period length (days)", "ir-days", { step: "any", min: "0" });
+  const area = makeNumber("Field area (acres)", "ir-area", { step: "any", min: "0" });
   const eff = makeSelect("Irrigation method (efficiency)", "ir-eff", [
     { value: "90", label: "Drip (90%)", selected: true },
     { value: "75", label: "Sprinkler (75%)" },
     { value: "50", label: "Flood (50%)" },
   ]);
-  const rain = makeNumber("Effective rainfall over the period (in)", "ir-rain", { step: "any", min: "0", value: "1.0" });
+  const rain = makeNumber("Effective rainfall over the period (in)", "ir-rain", { step: "any", min: "0" });
   for (const f of [crop, et0, days, area, eff, rain]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
     crop.select.value = "corn"; et0.input.value = "0.25"; days.input.value = "30";
@@ -1022,16 +1022,16 @@ export const stockingRateExample = {
 
 function renderStockingRate(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per USDA NRCS National Range and Pasture Handbook Ch. 6 (stocking rate). available forage = production x area x utilization; AUMs = available / 780 lb (26 lb dry matter/day x 30 days per animal unit). Drought and climate adjustments are essential. Free at nrcs.usda.gov for the handbook.";
-  const area = makeNumber("Pasture area (acres)", "sr-area", { step: "any", min: "0", value: "160" });
-  const forage = makeNumber("Forage production (lb/acre)", "sr-forage", { step: "any", min: "0", value: "1500" });
-  const util = makeNumber("Utilization (%)", "sr-util", { step: "any", min: "0", max: "100", value: "40" });
+  const area = makeNumber("Pasture area (acres)", "sr-area", { step: "any", min: "0" });
+  const forage = makeNumber("Forage production (lb/acre)", "sr-forage", { step: "any", min: "0" });
+  const util = makeNumber("Utilization (%)", "sr-util", { step: "any", min: "0", max: "100" });
   const cls = makeSelect("Animal class", "sr-cls", [
     { value: "cow_calf", label: "Cow-calf pair (1.0 AU)", selected: true },
     { value: "yearling", label: "Yearling (0.7 AU)" },
     { value: "sheep", label: "Sheep (0.2 AU)" },
     { value: "horse", label: "Horse (1.25 AU)" },
   ]);
-  const herd = makeNumber("Herd size (optional)", "sr-herd", { step: "1", min: "0", value: "30" });
+  const herd = makeNumber("Herd size (optional)", "sr-herd", { step: "1", min: "0" });
   for (const f of [area, forage, util, cls, herd]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
     area.input.value = "160"; forage.input.value = "1500"; util.input.value = "40";
@@ -1156,11 +1156,10 @@ export const grainBinHeightForCapacityExample = { inputs: { target_bushels: 1287
 
 function renderGrainBinHeightForCapacity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: bin geometry solved for the wall height: eave = (target_ft3/packing - roof_cone_ft3) / floor_area, from bushels = (area x eave + cone) x packing x 0.8036 (1 bushel = 1.2445 ft^3). A geometric fill volume; the bin manufacturer's rated capacity and the structure govern.";
-  const bu = makeNumber("Target capacity (bushels)", "gbh-bu", { step: "any", min: "0", value: "12875" });
-  const d = makeNumber("Bin diameter (ft)", "gbh-d", { step: "any", min: "0", value: "30" });
-  const peak = makeNumber("Roof/peak cone height (ft, 0 = flat)", "gbh-peak", { step: "any", min: "0", value: "8" });
-  const pack = makeNumber("Packing factor", "gbh-pack", { step: "any", min: "0", value: "1.0" });
-  bu.input.value = "12875"; d.input.value = "30"; peak.input.value = "8"; pack.input.value = "1.0";
+  const bu = makeNumber("Target capacity (bushels)", "gbh-bu", { step: "any", min: "0" });
+  const d = makeNumber("Bin diameter (ft)", "gbh-d", { step: "any", min: "0" });
+  const peak = makeNumber("Roof/peak cone height (ft, 0 = flat)", "gbh-peak", { step: "any", min: "0" });
+  const pack = makeNumber("Packing factor", "gbh-pack", { step: "any", min: "0" });
   for (const f of [bu, d, peak, pack]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { bu.input.value = "12875"; d.input.value = "30"; peak.input.value = "8"; pack.input.value = "1.0"; update(); });
   const oEave = makeOutputLine(outputRegion, "Required eave (wall) height", "gbh-out-eave");
@@ -1176,9 +1175,9 @@ function renderGrainBinHeightForCapacity(inputRegion, outputRegion, citationEl) 
 
 function renderGrainBin(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Bin geometry first-principles (cylinder + cone); bushels = ft^3 x 0.8036 (1 bushel = 1.2445 ft^3); test weights per USDA FGIS (Federal Grain Inspection Service) standards. Free at ams.usda.gov/services/grain-inspection.";
-  const d = makeNumber("Bin diameter (ft)", "gb-d", { step: "any", min: "0", value: "30" });
-  const eave = makeNumber("Eave (wall) height (ft)", "gb-eave", { step: "any", min: "0", value: "20" });
-  const peak = makeNumber("Peak cone height (ft; 0 for flat)", "gb-peak", { step: "any", min: "0", value: "8" });
+  const d = makeNumber("Bin diameter (ft)", "gb-d", { step: "any", min: "0" });
+  const eave = makeNumber("Eave (wall) height (ft)", "gb-eave", { step: "any", min: "0" });
+  const peak = makeNumber("Peak cone height (ft; 0 for flat)", "gb-peak", { step: "any", min: "0" });
   const grain = makeSelect("Grain", "gb-grain", [
     { value: "corn", label: "Corn (56 lb/bu)", selected: true },
     { value: "wheat", label: "Wheat (60 lb/bu)" },
@@ -1249,16 +1248,11 @@ export const bunkerSiloCapacityExample = { inputs: { bottom_width_ft: 30, top_wi
 
 function renderBunkerSiloCapacity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: horizontal (bunker/trench) silo capacity - trapezoidal cross-section (bottom + top)/2 x average depth, times length, times as-fed density, over 2000 lb/ton. Per NRCS / MWPS forage storage sizing, by name. As-fed silage density is user-entered (corn silage ~40-50 lb/ft^3, varies with dry matter and packing). Use the settled depth; a core sample or weigh-back governs the real inventory.";
-  const b = makeNumber("Bottom width (ft)", "bsc-b", { step: "any", min: "0", value: "30" });
-  b.input.value = "30";
-  const t = makeNumber("Top width (ft; = bottom for vertical walls)", "bsc-t", { step: "any", min: "0", value: "30" });
-  t.input.value = "30";
-  const h = makeNumber("Average settled depth (ft)", "bsc-h", { step: "any", min: "0", value: "8" });
-  h.input.value = "8";
-  const L = makeNumber("Length (ft)", "bsc-l", { step: "any", min: "0", value: "100" });
-  L.input.value = "100";
-  const rho = makeNumber("As-fed density (lb/ft³)", "bsc-rho", { step: "any", min: "0", value: "44" });
-  rho.input.value = "44";
+  const b = makeNumber("Bottom width (ft)", "bsc-b", { step: "any", min: "0" });
+  const t = makeNumber("Top width (ft; = bottom for vertical walls)", "bsc-t", { step: "any", min: "0" });
+  const h = makeNumber("Average settled depth (ft)", "bsc-h", { step: "any", min: "0" });
+  const L = makeNumber("Length (ft)", "bsc-l", { step: "any", min: "0" });
+  const rho = makeNumber("As-fed density (lb/ft³)", "bsc-rho", { step: "any", min: "0" });
   for (const f of [b, t, h, L, rho]) inputRegion.appendChild(f.wrap);
   const oT = makeOutputLine(outputRegion, "Forage capacity", "bsc-out-tons");
   const oV = makeOutputLine(outputRegion, "Volume", "bsc-out-vol");
@@ -1301,14 +1295,10 @@ export const feedConversionRatioExample = { inputs: { initial_weight_lb: 650, fi
 
 function renderFeedConversionRatio(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: livestock production metrics - average daily gain ADG = (final - initial weight)/days, and feed conversion ratio FCR = total feed / total gain (lb feed per lb gain). Standard USDA / land-grant extension animal-science definitions, by name. Enter feed on the as-fed basis (standard); a lower FCR is more efficient. A benchmarking aid; the ration and environment govern.";
-  const w0 = makeNumber("Initial weight (lb)", "fcr-w0", { step: "any", min: "0", value: "650" });
-  w0.input.value = "650";
-  const w1 = makeNumber("Final weight (lb)", "fcr-w1", { step: "any", min: "0", value: "1250" });
-  w1.input.value = "1250";
-  const days = makeNumber("Days on feed", "fcr-days", { step: "any", min: "0", value: "200" });
-  days.input.value = "200";
-  const feed = makeNumber("Total feed fed, as-fed (lb)", "fcr-feed", { step: "any", min: "0", value: "3900" });
-  feed.input.value = "3900";
+  const w0 = makeNumber("Initial weight (lb)", "fcr-w0", { step: "any", min: "0" });
+  const w1 = makeNumber("Final weight (lb)", "fcr-w1", { step: "any", min: "0" });
+  const days = makeNumber("Days on feed", "fcr-days", { step: "any", min: "0" });
+  const feed = makeNumber("Total feed fed, as-fed (lb)", "fcr-feed", { step: "any", min: "0" });
   for (const f of [w0, w1, days, feed]) inputRegion.appendChild(f.wrap);
   const oADG = makeOutputLine(outputRegion, "Average daily gain", "fcr-out-adg");
   const oFCR = makeOutputLine(outputRegion, "Feed conversion ratio", "fcr-out-fcr");
@@ -1469,10 +1459,10 @@ export const npkBlendExample = {
 function renderNpkBlend(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per USDA NRCS Agronomy Technical Note ranges and the state Cooperative Extension Service published recommendations (state-keyed). Recommendation = max(0, crop demand - soil-test credit); the blend is solved from three straights (potash 0-0-60 for K, DAP 18-46-0 for P, urea 46-0-0 for the N balance). Your certified soil-test lab report and state Extension recommendation govern. Free at nrcs.usda.gov.";
   const crop = makeSelect("Crop", "npk-crop", Object.keys(CROP_NUTRIENT_DEMAND).map((k) => ({ value: k, label: cap(k) + " (" + CROP_NUTRIENT_DEMAND[k].n + "-" + CROP_NUTRIENT_DEMAND[k].p + "-" + CROP_NUTRIENT_DEMAND[k].k + ")", selected: k === "corn" })));
-  const soilN = makeNumber("Soil-test N credit (lb/acre)", "npk-sn", { step: "any", min: "0", value: "20" });
-  const soilP = makeNumber("Soil-test P2O5 credit (lb/acre)", "npk-sp", { step: "any", min: "0", value: "10" });
-  const soilK = makeNumber("Soil-test K2O credit (lb/acre)", "npk-sk", { step: "any", min: "0", value: "15" });
-  const area = makeNumber("Field area (acres)", "npk-area", { step: "any", min: "0", value: "80" });
+  const soilN = makeNumber("Soil-test N credit (lb/acre)", "npk-sn", { step: "any", min: "0" });
+  const soilP = makeNumber("Soil-test P2O5 credit (lb/acre)", "npk-sp", { step: "any", min: "0" });
+  const soilK = makeNumber("Soil-test K2O credit (lb/acre)", "npk-sk", { step: "any", min: "0" });
+  const area = makeNumber("Field area (acres)", "npk-area", { step: "any", min: "0" });
   for (const f of [crop, soilN, soilP, soilK, area]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
     crop.select.value = "corn"; soilN.input.value = "20"; soilP.input.value = "10";
@@ -1596,9 +1586,9 @@ export const tankMixExample = {
 
 function renderTankMix(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: The EPA pesticide label is the law (FIFRA); follow its rate, carrier volume, REI, and PPE. Tank-mix math first-principles: acres/tank = tank gal / GPA; product/tank = acres/tank x rate. NRCS Agronomy Technical Note 5 for spray calibration. The separate nozzle-output (GPA) calibration is the Chemical Application Rate (GPA) tile. Free at epa.gov/pesticide-labels.";
-  const tank = makeNumber("Tank capacity (gal)", "tm-tank", { step: "any", min: "0", value: "300" });
-  const gpa = makeNumber("Spray volume (GPA)", "tm-gpa", { step: "any", min: "0", value: "15" });
-  const rate = makeNumber("Product rate per acre", "tm-rate", { step: "any", min: "0", value: "1.5" });
+  const tank = makeNumber("Tank capacity (gal)", "tm-tank", { step: "any", min: "0" });
+  const gpa = makeNumber("Spray volume (GPA)", "tm-gpa", { step: "any", min: "0" });
+  const rate = makeNumber("Product rate per acre", "tm-rate", { step: "any", min: "0" });
   const unit = makeSelect("Product unit", "tm-unit", [
     { value: "fl_oz", label: "fluid ounces (liquid)" },
     { value: "pt", label: "pints (liquid)", selected: true },
@@ -1607,7 +1597,7 @@ function renderTankMix(inputRegion, outputRegion, citationEl) {
     { value: "oz", label: "ounces (dry)" },
     { value: "lb", label: "pounds (dry)" },
   ]);
-  const area = makeNumber("Field area (acres; optional)", "tm-area", { step: "any", min: "0", value: "80" });
+  const area = makeNumber("Field area (acres; optional)", "tm-area", { step: "any", min: "0" });
   for (const f of [tank, gpa, rate, unit, area]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
     tank.input.value = "300"; gpa.input.value = "15"; rate.input.value = "1.5";
@@ -1799,8 +1789,8 @@ function renderGrowingDegreeDays(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per the USDA / NWS growing-degree-day method and McMaster & Wilhelm (1997), 'Growing degree-days: one equation, two interpretations,' Agric. & Forest Meteorology 87, by name. Corn 50/86 F base/cutoff is the land-grant extension convention. Free at university extension sites.";
   const data = makeText("Daily Tmax/Tmin pairs (e.g. 92/64, 90/62)", "gdd-data", { value: "92/64" });
   data.input.value = "92/64";
-  const base = makeNumber("Base temperature (°F)", "gdd-base", { step: "any", value: "50" }); base.input.value = "50";
-  const cutoff = makeNumber("Upper cutoff (F, 0 = none)", "gdd-cut", { step: "any", min: "0", value: "86" }); cutoff.input.value = "86";
+  const base = makeNumber("Base temperature (°F)", "gdd-base", { step: "any" });
+  const cutoff = makeNumber("Upper cutoff (F, 0 = none)", "gdd-cut", { step: "any", min: "0" });
   const method = makeSelect("Method", "gdd-method", [{ value: "standard", label: "Standard" }, { value: "modified", label: "Modified (cap/floor)", selected: true }]);
   for (const f of [data, base, cutoff, method]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { data.input.value = "92/64"; base.input.value = "50"; cutoff.input.value = "86"; method.select.value = "modified"; update(); });
@@ -1969,8 +1959,8 @@ export const twoStrokeMixExample = { inputs: { ratio: 50, fuel_amount: 1, fuel_u
 
 function renderTwoStrokeMix(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Two-stroke fuel/oil mix - oil volume = fuel volume / ratio (gas:oil by volume); 1 US gallon = 128 fl oz, 1 fl oz = 29.5735 mL - first-principles volume arithmetic, public. Use the oil grade and ratio the equipment maker specifies; the equipment manual governs.";
-  const ratio = makeNumber("Mix ratio (X in X:1)", "tsm-ratio", { step: "any", min: "0", value: "50" }); ratio.input.value = "50";
-  const amt = makeNumber("Fuel amount", "tsm-amt", { step: "any", min: "0", value: "1" }); amt.input.value = "1";
+  const ratio = makeNumber("Mix ratio (X in X:1)", "tsm-ratio", { step: "any", min: "0" });
+  const amt = makeNumber("Fuel amount", "tsm-amt", { step: "any", min: "0" });
   const unit = makeSelect("Fuel unit", "tsm-unit", [
     { value: "gallon", label: "US gallons", selected: true }, { value: "liter", label: "liters" },
   ]);
@@ -2025,12 +2015,12 @@ export function computeTwoStrokeMixRatioCheck({ fuel_amount = 0, fuel_unit = "ga
 export const twoStrokeMixRatioCheckExample = { inputs: { fuel_amount: 1, fuel_unit: "gallon", oil_amount: 2.56, target_ratio: 50 } };
 function renderTwoStrokeMixRatioCheck(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Two-stroke mix ratio check - ratio = fuel volume / oil volume (gas:oil by volume); 1 US gallon = 128 fl oz - first-principles volume arithmetic, the inverse of the two-stroke mix tile, public. Use the oil grade and ratio the equipment maker specifies; the equipment manual governs.";
-  const fuel = makeNumber("Fuel amount", "tsmc-fuel", { step: "any", min: "0", value: "1" }); fuel.input.value = "1";
+  const fuel = makeNumber("Fuel amount", "tsmc-fuel", { step: "any", min: "0" });
   const unit = makeSelect("Fuel unit", "tsmc-unit", [
     { value: "gallon", label: "US gallons", selected: true }, { value: "liter", label: "liters" },
   ]);
-  const oil = makeNumber("Oil added (fl oz for gallons, mL for liters)", "tsmc-oil", { step: "any", min: "0", value: "2.56" }); oil.input.value = "2.56";
-  const tr = makeNumber("Target ratio (X in X:1)", "tsmc-tr", { step: "any", min: "0", value: "50" }); tr.input.value = "50";
+  const oil = makeNumber("Oil added (fl oz for gallons, mL for liters)", "tsmc-oil", { step: "any", min: "0" });
+  const tr = makeNumber("Target ratio (X in X:1)", "tsmc-tr", { step: "any", min: "0" });
   for (const f of [fuel, unit, oil, tr]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { fuel.input.value = "1"; unit.select.value = "gallon"; oil.input.value = "2.56"; tr.input.value = "50"; update(); });
   const oRatio = makeOutputLine(outputRegion, "Achieved ratio", "tsmc-out-ratio");
@@ -2257,11 +2247,10 @@ export const hayDryMatterExample = { inputs: { bale_weight_lb: 1200, moisture_pc
 
 function renderHayDryMatter(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: first-principles dry-matter balance with USDA NRCS / land-grant extension safe-storage guidance (by name). Dry matter = weight x (1 - moisture); weight at target = dry matter / (1 - target). Safe ceiling ~18% large / 20% small (editable). The producer and extension govern.";
-  const wt = makeNumber("Bale weight, as-baled (lb)", "hdm-wt", { step: "any", min: "0", value: "1200" });
-  const moist = makeNumber("Measured moisture (%)", "hdm-m", { step: "any", min: "0", value: "22" });
-  const tgt = makeNumber("Target moisture (%)", "hdm-t", { step: "any", min: "0", value: "15" });
-  const safe = makeNumber("Safe-storage ceiling (%)", "hdm-s", { step: "any", min: "0", value: "18" });
-  wt.input.value = "1200"; moist.input.value = "22"; tgt.input.value = "15"; safe.input.value = "18";
+  const wt = makeNumber("Bale weight, as-baled (lb)", "hdm-wt", { step: "any", min: "0" });
+  const moist = makeNumber("Measured moisture (%)", "hdm-m", { step: "any", min: "0" });
+  const tgt = makeNumber("Target moisture (%)", "hdm-t", { step: "any", min: "0" });
+  const safe = makeNumber("Safe-storage ceiling (%)", "hdm-s", { step: "any", min: "0" });
   for (const f of [wt, moist, tgt, safe]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { wt.input.value = "1200"; moist.input.value = "22"; tgt.input.value = "15"; safe.input.value = "18"; update(); });
   const oDm = makeOutputLine(outputRegion, "Dry matter", "hdm-out-dm");
@@ -2532,16 +2521,11 @@ export const grainShrinkMoistureExample = { inputs: { W_lb: 10000, M_wet_pct: 20
 
 function renderGrainShrinkMoisture(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Grain drying shrink per the standard moisture-shrink relation used by USDA and land-grant extension: dry weight = wet weight x (100 - wet moisture)/(100 - market moisture), then a handling/invisible shrink deduction; net bushels = net weight / market test weight (56 lb corn, 60 wheat/soybeans). The buyer's contract, moisture discount schedule, and settlement scale govern.";
-  const W = makeNumber("Gross wet weight (lb)", "gsm-w", { step: "any", min: "0", value: "10000" });
-  W.input.value = "10000";
-  const Mw = makeNumber("Wet moisture (%)", "gsm-mw", { step: "any", min: "0", max: "100", value: "20" });
-  Mw.input.value = "20";
-  const Md = makeNumber("Market moisture (%)", "gsm-md", { step: "any", min: "0", max: "100", value: "15" });
-  Md.input.value = "15";
-  const h = makeNumber("Handling shrink (%)", "gsm-h", { step: "any", min: "0", value: "0.5" });
-  h.input.value = "0.5";
-  const tw = makeNumber("Test weight (lb/bu; 56 corn, 60 wheat/soy)", "gsm-tw", { step: "any", min: "0", value: "56" });
-  tw.input.value = "56";
+  const W = makeNumber("Gross wet weight (lb)", "gsm-w", { step: "any", min: "0" });
+  const Mw = makeNumber("Wet moisture (%)", "gsm-mw", { step: "any", min: "0", max: "100" });
+  const Md = makeNumber("Market moisture (%)", "gsm-md", { step: "any", min: "0", max: "100" });
+  const h = makeNumber("Handling shrink (%)", "gsm-h", { step: "any", min: "0" });
+  const tw = makeNumber("Test weight (lb/bu; 56 corn, 60 wheat/soy)", "gsm-tw", { step: "any", min: "0" });
   for (const f of [W, Mw, Md, h, tw]) inputRegion.appendChild(f.wrap);
   const oNet = makeOutputLine(outputRegion, "Net market weight", "gsm-out-net");
   const oBu = makeOutputLine(outputRegion, "Net market bushels", "gsm-out-bu");
@@ -2585,14 +2569,10 @@ export const livestockDryMatterIntakeExample = { inputs: { BW_lb: 1200, intake: 
 
 function renderLivestockDryMatterIntake(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Dry-matter intake per NRC Nutrient Requirements of Beef Cattle / Dairy Cattle: DMI = body weight x intake (% of BW on a dry-matter basis); as-fed = DMI / feed dry-matter fraction. Feed dry matter runs about 88% for dry hay and 30-40% for corn silage. A ration balancer and a nutritionist govern the actual diet.";
-  const BW = makeNumber("Body weight (lb)", "ldm-bw", { step: "any", min: "0", value: "1200" });
-  BW.input.value = "1200";
-  const intake = makeNumber("Dry-matter intake (% of body weight)", "ldm-in", { step: "any", min: "0", value: "2.5" });
-  intake.input.value = "2.5";
-  const dm = makeNumber("Feed dry matter (%; 88 hay, 35 silage)", "ldm-dm", { step: "any", min: "0", max: "100", value: "88" });
-  dm.input.value = "88";
-  const head = makeNumber("Number of animals", "ldm-head", { step: "1", min: "0", value: "1" });
-  head.input.value = "1";
+  const BW = makeNumber("Body weight (lb)", "ldm-bw", { step: "any", min: "0" });
+  const intake = makeNumber("Dry-matter intake (% of body weight)", "ldm-in", { step: "any", min: "0" });
+  const dm = makeNumber("Feed dry matter (%; 88 hay, 35 silage)", "ldm-dm", { step: "any", min: "0", max: "100" });
+  const head = makeNumber("Number of animals", "ldm-head", { step: "1", min: "0" });
   for (const f of [BW, intake, dm, head]) inputRegion.appendChild(f.wrap);
   const oDMI = makeOutputLine(outputRegion, "Dry-matter intake", "ldm-out-dmi");
   const oAF = makeOutputLine(outputRegion, "As-fed intake", "ldm-out-af");
@@ -2633,16 +2613,13 @@ export const manureApplicationRateExample = { inputs: { crop_need: 150, total_nu
 
 function renderManureApplicationRate(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Nutrient-based manure rate per USDA NRCS Code 590 (Nutrient Management) and land-grant manure-management guidance: available nutrient per unit = total nutrient x first-year availability; application rate = crop requirement / available per unit. Solid manure is ton/acre, liquid is 1,000 gal/acre. The rate is set by the most limiting of N or P2O5 under the farm's nutrient-management plan; a manure test and the plan govern.";
-  const need = makeNumber("Crop nutrient need (lb/acre, N or P2O5)", "mar-need", { step: "any", min: "0", value: "150" });
-  need.input.value = "150";
+  const need = makeNumber("Crop nutrient need (lb/acre, N or P2O5)", "mar-need", { step: "any", min: "0" });
   const form = makeSelect("Manure form", "mar-form", [
     { value: "solid", label: "Solid (lb/ton -> ton/acre)", selected: true },
     { value: "liquid", label: "Liquid (lb/1,000 gal -> 1,000 gal/acre)" },
   ]);
-  const total = makeNumber("Total nutrient (lb/ton or lb/1,000 gal)", "mar-total", { step: "any", min: "0", value: "10" });
-  total.input.value = "10";
-  const avail = makeNumber("First-year availability (%)", "mar-avail", { step: "any", min: "0", max: "100", value: "50" });
-  avail.input.value = "50";
+  const total = makeNumber("Total nutrient (lb/ton or lb/1,000 gal)", "mar-total", { step: "any", min: "0" });
+  const avail = makeNumber("First-year availability (%)", "mar-avail", { step: "any", min: "0", max: "100" });
   for (const f of [need, form, total, avail]) inputRegion.appendChild(f.wrap);
   const oAvail = makeOutputLine(outputRegion, "Available nutrient per unit", "mar-out-avail");
   const oRate = makeOutputLine(outputRegion, "Application rate", "mar-out-rate");
@@ -2692,12 +2669,12 @@ export function computeMulchTopsoilVolume({ area_ft2 = 0, depth_in = 0, bulk_den
 export const mulchTopsoilVolumeExample = { inputs: { area_ft2: 1000, depth_in: 3, bulk_density: 1.1, bag_ft3: 2, load_yd3: 10, waste_pct: 0 } };
 function renderMulchTopsoilVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Bulk landscape material take-off (first-principles volume): cubic yards = area x depth / 324 (depth in inches), bags = ceil(yd^3 x 27 / bag size), tons = yd^3 x bulk density, truckloads = ceil(yd^3 / load). Bulk densities: mulch ~0.5, topsoil ~1.1, gravel ~1.4 ton/yd^3. A quantity aid; the supplier's bag/load size and product density govern.";
-  const area = makeNumber("Area (ft²)", "mtv-area", { step: "any", min: "0", value: "1000" });
-  const depth = makeNumber("Depth (in)", "mtv-depth", { step: "any", min: "0", value: "3" });
-  const dens = makeNumber("Bulk density (ton/yd³: mulch 0.5, topsoil 1.1, gravel 1.4)", "mtv-dens", { step: "any", min: "0", value: "1.1" });
-  const bag = makeNumber("Bag size (ft³, default 2)", "mtv-bag", { step: "any", min: "0", value: "2" });
-  const load = makeNumber("Truck load (yd³, default 10)", "mtv-load", { step: "any", min: "0", value: "10" });
-  const waste = makeNumber("Waste/compaction allowance (%)", "mtv-waste", { step: "any", min: "0", value: "0" });
+  const area = makeNumber("Area (ft²)", "mtv-area", { step: "any", min: "0" });
+  const depth = makeNumber("Depth (in)", "mtv-depth", { step: "any", min: "0" });
+  const dens = makeNumber("Bulk density (ton/yd³: mulch 0.5, topsoil 1.1, gravel 1.4)", "mtv-dens", { step: "any", min: "0" });
+  const bag = makeNumber("Bag size (ft³, default 2)", "mtv-bag", { step: "any", min: "0" });
+  const load = makeNumber("Truck load (yd³, default 10)", "mtv-load", { step: "any", min: "0" });
+  const waste = makeNumber("Waste/compaction allowance (%)", "mtv-waste", { step: "any", min: "0" });
   for (const f of [area, depth, dens, bag, load, waste]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { area.input.value = "1000"; depth.input.value = "3"; dens.input.value = "1.1"; bag.input.value = "2"; load.input.value = "10"; waste.input.value = "0"; update(); });
   const oYd = makeOutputLine(outputRegion, "Volume", "mtv-out-yd");
@@ -2741,12 +2718,12 @@ export function computeGrainDryingEnergy({ bushels = 0, lb_per_bushel = 56, mi_p
 export const grainDryingEnergyExample = { inputs: { bushels: 1000, lb_per_bushel: 56, mi_percent: 20, mf_percent: 15, btu_per_lb: 1500, price_per_gal: 0 } };
 function renderGrainDryingEnergy(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Grain drying energy (first-principles shrink + heat balance): water removed = weight x (Mi - Mf)/(100 - Mf), energy = water x ~1500 Btu/lb (dryer efficiency included), propane = energy / 91,500 Btu/gal. A planning aid; the dryer efficiency, fuel heat content, and market discount schedule govern.";
-  const bu = makeNumber("Quantity (bushels)", "gde-bu", { step: "any", min: "0", value: "1000" });
-  const lbbu = makeNumber("Test weight (lb/bu: corn 56, wheat/soy 60)", "gde-lb", { step: "any", min: "0", value: "56" });
-  const mi = makeNumber("Initial moisture (%)", "gde-mi", { step: "any", min: "0", value: "20" });
-  const mf = makeNumber("Final moisture (%)", "gde-mf", { step: "any", min: "0", value: "15" });
-  const btu = makeNumber("Drying energy (Btu/lb water, default 1500)", "gde-btu", { step: "any", min: "0", value: "1500" });
-  const price = makeNumber("Propane price ($/gal, optional)", "gde-price", { step: "any", min: "0", value: "" });
+  const bu = makeNumber("Quantity (bushels)", "gde-bu", { step: "any", min: "0" });
+  const lbbu = makeNumber("Test weight (lb/bu: corn 56, wheat/soy 60)", "gde-lb", { step: "any", min: "0" });
+  const mi = makeNumber("Initial moisture (%)", "gde-mi", { step: "any", min: "0" });
+  const mf = makeNumber("Final moisture (%)", "gde-mf", { step: "any", min: "0" });
+  const btu = makeNumber("Drying energy (Btu/lb water, default 1500)", "gde-btu", { step: "any", min: "0" });
+  const price = makeNumber("Propane price ($/gal, optional)", "gde-price", { step: "any", min: "0" });
   for (const f of [bu, lbbu, mi, mf, btu, price]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { bu.input.value = "1000"; lbbu.input.value = "56"; mi.input.value = "20"; mf.input.value = "15"; btu.input.value = "1500"; price.input.value = ""; update(); });
   const oWater = makeOutputLine(outputRegion, "Water removed", "gde-out-water");
@@ -2790,11 +2767,11 @@ export function computeManureNutrientApplication({ crop_n_need_lb_acre = 0, tota
 export const manureNutrientApplicationExample = { inputs: { crop_n_need_lb_acre: 150, total_n_lb_ton: 10, availability_pct: 50, p2o5_lb_ton: 5, k2o_lb_ton: 8 } };
 function renderManureNutrientApplication(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: N-based manure application rate (USDA NRCS Code 590 Nutrient Management): available N per ton = total N x first-year availability, rate = crop N need / available N per ton, with the P2O5 and K2O delivered at that rate reported so phosphorus over-application is visible. A planning aid; a manure test, the soil test, and the nutrient-management plan govern.";
-  const need = makeNumber("Crop N need (lb/acre)", "mna-need", { step: "any", min: "0", value: "150" });
-  const totalN = makeNumber("Manure total N (lb/ton)", "mna-tn", { step: "any", min: "0", value: "10" });
-  const avail = makeNumber("First-year N availability (%)", "mna-av", { step: "any", min: "0", max: "100", value: "50" });
-  const p2o5 = makeNumber("Manure P2O5 (lb/ton, optional)", "mna-p", { step: "any", min: "0", value: "5" });
-  const k2o = makeNumber("Manure K2O (lb/ton, optional)", "mna-k", { step: "any", min: "0", value: "8" });
+  const need = makeNumber("Crop N need (lb/acre)", "mna-need", { step: "any", min: "0" });
+  const totalN = makeNumber("Manure total N (lb/ton)", "mna-tn", { step: "any", min: "0" });
+  const avail = makeNumber("First-year N availability (%)", "mna-av", { step: "any", min: "0", max: "100" });
+  const p2o5 = makeNumber("Manure P2O5 (lb/ton, optional)", "mna-p", { step: "any", min: "0" });
+  const k2o = makeNumber("Manure K2O (lb/ton, optional)", "mna-k", { step: "any", min: "0" });
   for (const f of [need, totalN, avail, p2o5, k2o]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { need.input.value = "150"; totalN.input.value = "10"; avail.input.value = "50"; p2o5.input.value = "5"; k2o.input.value = "8"; update(); });
   const oRate = makeOutputLine(outputRegion, "Application rate (N-based)", "mna-out-rate");
@@ -2837,10 +2814,10 @@ export const centerPivotRuntimeExample = { inputs: { system_flow_gpm: 800, area_
 
 function _v568renderCenterPivotRuntime(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: center-pivot application depth and runtime (USDA-NRCS center-pivot design; university extension), by name. hours = area x depth x 452.6 / flow; gross_gpm_per_acre = flow / area; net_depth = depth x efficiency / 100. The depth is set by the outer-tower speed; the outer spans cover more area, so the instantaneous application rate under an outer span can run off even when the daily depth is right. The pivot design and soil intake govern.";
-  const flow = makeNumber("System flow Q (gpm)", "cpr-flow", { step: "any", min: "0", value: "800" }); flow.input.value = "800";
-  const area = makeNumber("Irrigated area (acres)", "cpr-area", { step: "any", min: "0", value: "125" }); area.input.value = "125";
-  const depth = makeNumber("Gross target depth (in)", "cpr-depth", { step: "any", min: "0", value: "1.0" }); depth.input.value = "1.0";
-  const eff = makeNumber("Application efficiency (%)", "cpr-eff", { step: "any", min: "0", max: "100", value: "85" }); eff.input.value = "85";
+  const flow = makeNumber("System flow Q (gpm)", "cpr-flow", { step: "any", min: "0" });
+  const area = makeNumber("Irrigated area (acres)", "cpr-area", { step: "any", min: "0" });
+  const depth = makeNumber("Gross target depth (in)", "cpr-depth", { step: "any", min: "0" });
+  const eff = makeNumber("Application efficiency (%)", "cpr-eff", { step: "any", min: "0", max: "100" });
   for (const f of [flow, area, depth, eff]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { flow.input.value = "800"; area.input.value = "125"; depth.input.value = "1.0"; eff.input.value = "85"; update(); });
   const oHours = makeOutputLine(outputRegion, "Runtime per pass", "cpr-out-hours");
@@ -2888,11 +2865,11 @@ export function computePivotApplicationRate({ pass_depth_in = 0, pivot_length_ft
 export const pivotApplicationRateExample = { inputs: { pass_depth_in: 1.0, pivot_length_ft: 1320, revolution_hr: 24, wetted_band_ft: 100, soil_intake_in_hr: 0.5 } };
 function _v602renderPivotApplicationRate(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: center-pivot outer-span application rate (USDA-NRCS center-pivot design; university extension), by name. speed = 2 x pi x pivot_length / (revolution_hr x 60); wetting = wetted_band / speed; app_rate = pass_depth x 2 x pi x pivot_length / (revolution_hr x wetted_band). This is the average rate over the wetted band at the outer span (the true peak runs about 6% higher); the outer end governs because it moves fastest. Runoff is avoided only by the short wetting time and surface storage, so a slope or a tight soil runs off when the rate exceeds the intake.";
-  const D = makeNumber("Gross pass depth (in)", "par-d", { step: "any", min: "0", value: "1.0" }); D.input.value = "1.0";
-  const L = makeNumber("Pivot length to outer tower (ft)", "par-l", { step: "any", min: "0", value: "1320" }); L.input.value = "1320";
-  const T = makeNumber("Revolution time (hr)", "par-t", { step: "any", min: "0", value: "24" }); T.input.value = "24";
-  const W = makeNumber("Wetted band at outer span (ft)", "par-w", { step: "any", min: "0", value: "100" }); W.input.value = "100";
-  const intake = makeNumber("Soil intake rate (in/hr: sand ~1.0, loam ~0.5, clay ~0.15)", "par-i", { step: "any", min: "0", value: "0.5" }); intake.input.value = "0.5";
+  const D = makeNumber("Gross pass depth (in)", "par-d", { step: "any", min: "0" });
+  const L = makeNumber("Pivot length to outer tower (ft)", "par-l", { step: "any", min: "0" });
+  const T = makeNumber("Revolution time (hr)", "par-t", { step: "any", min: "0" });
+  const W = makeNumber("Wetted band at outer span (ft)", "par-w", { step: "any", min: "0" });
+  const intake = makeNumber("Soil intake rate (in/hr: sand ~1.0, loam ~0.5, clay ~0.15)", "par-i", { step: "any", min: "0" });
   for (const f of [D, L, T, W, intake]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { D.input.value = "1.0"; L.input.value = "1320"; T.input.value = "24"; W.input.value = "100"; intake.input.value = "0.5"; update(); });
   const oRate = makeOutputLine(outputRegion, "Outer-span application rate", "par-out-rate");
@@ -2936,10 +2913,10 @@ export function computePivotTimerDepth({ system_flow_gpm = 0, area_acres = 0, re
 export const pivotTimerDepthExample = { inputs: { system_flow_gpm: 800, area_acres: 125, revolution_100_hr: 20, timer_pct: 50 } };
 function _v604renderPivotTimerDepth(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: center-pivot percent-timer to depth (USDA-NRCS center-pivot design; university extension), by name. revolution = revolution_100_hr x 100 / timer_pct; depth = system_flow x revolution / (452.6 x area); pass_days = revolution / 24. The timer sets the outer-tower speed, so the depth is inversely proportional to the setting - halving the timer doubles the depth. The full-speed revolution time is the machine's rated maximum-speed pass.";
-  const Q = makeNumber("System flow Q (gpm)", "ptd-q", { step: "any", min: "0", value: "800" }); Q.input.value = "800";
-  const A = makeNumber("Irrigated area (acres)", "ptd-a", { step: "any", min: "0", value: "125" }); A.input.value = "125";
-  const T100 = makeNumber("Revolution time at 100% timer (hr)", "ptd-t", { step: "any", min: "0", value: "20" }); T100.input.value = "20";
-  const timer = makeNumber("End-tower timer setting (%)", "ptd-p", { step: "any", min: "0", max: "100", value: "50" }); timer.input.value = "50";
+  const Q = makeNumber("System flow Q (gpm)", "ptd-q", { step: "any", min: "0" });
+  const A = makeNumber("Irrigated area (acres)", "ptd-a", { step: "any", min: "0" });
+  const T100 = makeNumber("Revolution time at 100% timer (hr)", "ptd-t", { step: "any", min: "0" });
+  const timer = makeNumber("End-tower timer setting (%)", "ptd-p", { step: "any", min: "0", max: "100" });
   for (const f of [Q, A, T100, timer]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { Q.input.value = "800"; A.input.value = "125"; T100.input.value = "20"; timer.input.value = "50"; update(); });
   const oRev = makeOutputLine(outputRegion, "Revolution time", "ptd-out-rev");
@@ -2980,8 +2957,8 @@ export const grainAerationAirflowExample = { inputs: { bin_capacity_bu: 20000, a
 
 function _v569renderGrainAerationAirflow(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: stored-grain aeration fan airflow (MWPS / university extension; Shedd airflow-resistance curves), by name. required_cfm = rate_cfm_per_bu x bushels; cooling_hours = 15 / rate (per cooling front). Bands: aeration cooling 0.1-0.25 cfm/bu, natural-air drying 0.5-1.0 cfm/bu. Static pressure rises steeply with depth and fan power grows ~fourfold when the rate or depth doubles - read the fan curve at the actual static pressure. The fan selection and grain condition govern.";
-  const bu = makeNumber("Stored grain (bushels)", "gaa-bu", { step: "any", min: "0", value: "20000" }); bu.input.value = "20000";
-  const rate = makeNumber("Target airflow (cfm/bu, 0.1-0.25 cool, 0.5-1.0 dry)", "gaa-rate", { step: "any", min: "0", value: "0.15" }); rate.input.value = "0.15";
+  const bu = makeNumber("Stored grain (bushels)", "gaa-bu", { step: "any", min: "0" });
+  const rate = makeNumber("Target airflow (cfm/bu, 0.1-0.25 cool, 0.5-1.0 dry)", "gaa-rate", { step: "any", min: "0" });
   for (const f of [bu, rate]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { bu.input.value = "20000"; rate.input.value = "0.15"; update(); });
   const oCfm = makeOutputLine(outputRegion, "Required fan airflow", "gaa-out-cfm");
@@ -3032,14 +3009,14 @@ export function computeManureStorageVolume({ daily_manure_ft3 = 0, wastewater_ft
 export const manureStorageVolumeExample = { inputs: { daily_manure_ft3: 150, wastewater_ft3: 0, bedding_ft3: 20, storage_days: 120, surface_area_ft2: 8000, net_precip_in: 6, storm_in: 4, freeboard_in: 12 } };
 function _v582renderManureStorageVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A planning aid, not the engineer of record; NRCS 313 and the engineer/planner govern. Citation: NRCS Conservation Practice Standard 313 / ASABE D384 manure production, by name. manure = (daily + wastewater + bedding) x storage_days; precip_storm = area x (net_precip + storm) / 12; freeboard = area x freeboard_in / 12; total = the sum. An uncovered facility must bank the net precipitation and the 25-year, 24-hour storm over the storage period; minimum storage is 120 days; freeboard is 6 in (vertical wall) or 12 in (other).";
-  const manure = makeNumber("Daily manure (ft3/day = head x rate)", "msv-manure", { step: "any", min: "0", value: "150" }); manure.input.value = "150";
-  const ww = makeNumber("Added wastewater (ft3/day, 0 if none)", "msv-ww", { step: "any", min: "0", value: "0" }); ww.input.value = "0";
-  const bed = makeNumber("Added bedding (ft3/day, 0 if none)", "msv-bed", { step: "any", min: "0", value: "20" }); bed.input.value = "20";
-  const days = makeNumber("Storage period (days, >= 120)", "msv-days", { step: "any", min: "0", value: "120" }); days.input.value = "120";
-  const area = makeNumber("Surface area (ft2, 0 if roofed)", "msv-area", { step: "any", min: "0", value: "8000" }); area.input.value = "8000";
-  const precip = makeNumber("Net precipitation over period (in)", "msv-precip", { step: "any", min: "0", value: "6" }); precip.input.value = "6";
-  const storm = makeNumber("25-yr 24-hr storm depth (in)", "msv-storm", { step: "any", min: "0", value: "4" }); storm.input.value = "4";
-  const fb = makeNumber("Freeboard (in: 6 vertical wall / 12 other)", "msv-fb", { step: "any", min: "0", value: "12" }); fb.input.value = "12";
+  const manure = makeNumber("Daily manure (ft3/day = head x rate)", "msv-manure", { step: "any", min: "0" });
+  const ww = makeNumber("Added wastewater (ft3/day, 0 if none)", "msv-ww", { step: "any", min: "0" });
+  const bed = makeNumber("Added bedding (ft3/day, 0 if none)", "msv-bed", { step: "any", min: "0" });
+  const days = makeNumber("Storage period (days, >= 120)", "msv-days", { step: "any", min: "0" });
+  const area = makeNumber("Surface area (ft2, 0 if roofed)", "msv-area", { step: "any", min: "0" });
+  const precip = makeNumber("Net precipitation over period (in)", "msv-precip", { step: "any", min: "0" });
+  const storm = makeNumber("25-yr 24-hr storm depth (in)", "msv-storm", { step: "any", min: "0" });
+  const fb = makeNumber("Freeboard (in: 6 vertical wall / 12 other)", "msv-fb", { step: "any", min: "0" });
   for (const f of [manure, ww, bed, days, area, precip, storm, fb]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { manure.input.value = "150"; ww.input.value = "0"; bed.input.value = "20"; days.input.value = "120"; area.input.value = "8000"; precip.input.value = "6"; storm.input.value = "4"; fb.input.value = "12"; update(); });
   const oManure = makeOutputLine(outputRegion, "Manure + wastewater + bedding volume", "msv-out-manure");
@@ -3095,14 +3072,14 @@ export function computeManureCoverSavings({ daily_manure_ft3 = 0, wastewater_ft3
 export const manureCoverSavingsExample = { inputs: { daily_manure_ft3: 150, wastewater_ft3: 0, bedding_ft3: 20, storage_days: 120, surface_area_ft2: 8000, net_precip_in: 6, storm_in: 4, freeboard_in: 12 } };
 function _v606renderManureCoverSavings(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: manure storage covered-vs-open comparison (USDA-NRCS Conservation Practice 313 waste storage facility), by name. open = (manure + wastewater + bedding) x days + area x (net_precip + storm)/12 + area x freeboard/12; roof_saving = area x (net_precip + storm)/12; covered = open - roof_saving. The roof saving is the net precipitation and the 25-year, 24-hour storm the open facility must otherwise bank on its own surface; the freeboard is held the same in both cases. The saving is clean rainwater the operation also avoids hauling.";
-  const manure = makeNumber("Daily manure (ft3/day)", "mcs-manure", { step: "any", min: "0", value: "150" }); manure.input.value = "150";
-  const ww = makeNumber("Added wastewater (ft3/day)", "mcs-ww", { step: "any", min: "0", value: "0" }); ww.input.value = "0";
-  const bed = makeNumber("Added bedding (ft3/day)", "mcs-bed", { step: "any", min: "0", value: "20" }); bed.input.value = "20";
-  const days = makeNumber("Storage period (days)", "mcs-days", { step: "any", min: "0", value: "120" }); days.input.value = "120";
-  const area = makeNumber("Surface / roof area (ft2)", "mcs-area", { step: "any", min: "0", value: "8000" }); area.input.value = "8000";
-  const precip = makeNumber("Net precipitation over the period (in)", "mcs-precip", { step: "any", min: "0", value: "6" }); precip.input.value = "6";
-  const storm = makeNumber("25-yr 24-hr storm depth (in)", "mcs-storm", { step: "any", min: "0", value: "4" }); storm.input.value = "4";
-  const fb = makeNumber("Freeboard (in: 6 vertical wall, 12 other)", "mcs-fb", { step: "any", min: "0", value: "12" }); fb.input.value = "12";
+  const manure = makeNumber("Daily manure (ft3/day)", "mcs-manure", { step: "any", min: "0" });
+  const ww = makeNumber("Added wastewater (ft3/day)", "mcs-ww", { step: "any", min: "0" });
+  const bed = makeNumber("Added bedding (ft3/day)", "mcs-bed", { step: "any", min: "0" });
+  const days = makeNumber("Storage period (days)", "mcs-days", { step: "any", min: "0" });
+  const area = makeNumber("Surface / roof area (ft2)", "mcs-area", { step: "any", min: "0" });
+  const precip = makeNumber("Net precipitation over the period (in)", "mcs-precip", { step: "any", min: "0" });
+  const storm = makeNumber("25-yr 24-hr storm depth (in)", "mcs-storm", { step: "any", min: "0" });
+  const fb = makeNumber("Freeboard (in: 6 vertical wall, 12 other)", "mcs-fb", { step: "any", min: "0" });
   for (const f of [manure, ww, bed, days, area, precip, storm, fb]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { manure.input.value = "150"; ww.input.value = "0"; bed.input.value = "20"; days.input.value = "120"; area.input.value = "8000"; precip.input.value = "6"; storm.input.value = "4"; fb.input.value = "12"; update(); });
   const oOpen = makeOutputLine(outputRegion, "Open facility volume", "mcs-out-open");
@@ -3144,12 +3121,9 @@ export const tractorBallastExample = { inputs: { power_hp: 180, weight_to_power_
 
 function _v914renderTractorBallast(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: tractor ballasting rule by name. target weight = weight-to-power ratio x power (hp); ballast change = target - current. ASABE / operator's-manual guidance (~120-145 lb/hp for field draft, ~90-110 for transport; target 8-15% wheel slip). The operator's manual and implement govern.";
-  const hp = makeNumber("Engine or PTO power (hp)", "tbal-hp", { step: "any", min: "0", value: "180" });
-  hp.input.value = "180";
-  const rt = makeNumber("Weight-to-power ratio (lb/hp)", "tbal-rt", { step: "any", min: "0", value: "125" });
-  rt.input.value = "125";
-  const cw = makeNumber("Current tractor weight (lb)", "tbal-cw", { step: "any", min: "0", value: "18000" });
-  cw.input.value = "18000";
+  const hp = makeNumber("Engine or PTO power (hp)", "tbal-hp", { step: "any", min: "0" });
+  const rt = makeNumber("Weight-to-power ratio (lb/hp)", "tbal-rt", { step: "any", min: "0" });
+  const cw = makeNumber("Current tractor weight (lb)", "tbal-cw", { step: "any", min: "0" });
   for (const f of [hp, rt, cw]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { hp.input.value = "180"; rt.input.value = "125"; cw.input.value = "18000"; update(); });
   const oTarget = makeOutputLine(outputRegion, "Target total weight", "tbal-out-t");
@@ -3190,10 +3164,8 @@ export const anhydrousAmmoniaRateExample = { inputs: { n_target_lb_per_ac: 180, 
 
 function _v940renderAnhydrousAmmoniaRate(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: anhydrous ammonia rate by name. product = target N / 0.82 (82-0-0 grade); gal/acre = lb/acre / 5.15 (liquid density); acres/tank = tank gal / (gal/acre). Anhydrous is hazardous and pressurized -- calibrate the applicator; the label and co-op govern.";
-  const nt = makeNumber("Target nitrogen (lb N/acre)", "anh-nt", { step: "any", min: "0", value: "180" });
-  nt.input.value = "180";
-  const tk = makeNumber("Nurse tank size (gal, 0 to skip)", "anh-tk", { step: "any", min: "0", value: "1000" });
-  tk.input.value = "1000";
+  const nt = makeNumber("Target nitrogen (lb N/acre)", "anh-nt", { step: "any", min: "0" });
+  const tk = makeNumber("Nurse tank size (gal, 0 to skip)", "anh-tk", { step: "any", min: "0" });
   for (const f of [nt, tk]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { nt.input.value = "180"; tk.input.value = "1000"; update(); });
   const oRate = makeOutputLine(outputRegion, "Anhydrous rate", "anh-out-rate");
@@ -3236,16 +3208,11 @@ export const madIrrigationTriggerExample = { inputs: { field_capacity: 0.30, wil
 
 function _v964renderMadIrrigationTrigger(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: available-water / management-allowed-depletion irrigation scheduling (FAO-56 / NRCS Irrigation Guide), by name. TAW = (field capacity - wilting point) x root depth; RAW = MAD x TAW; interval = RAW / ETc. MAD ~0.5 (0.3-0.6 by crop). The field-measured soil moisture, the actual root depth and ETc, and the agronomist govern.";
-  const fc = makeNumber("Field capacity (in/in, e.g. 0.30)", "mad-fc", { step: "any", min: "0", value: "0.30" });
-  fc.input.value = "0.30";
-  const wp = makeNumber("Wilting point (in/in, e.g. 0.12)", "mad-wp", { step: "any", min: "0", value: "0.12" });
-  wp.input.value = "0.12";
-  const rd = makeNumber("Root depth (in)", "mad-rd", { step: "any", min: "0", value: "24" });
-  rd.input.value = "24";
-  const md = makeNumber("MAD fraction (0-1, ~0.5)", "mad-md", { step: "any", min: "0", value: "0.5" });
-  md.input.value = "0.5";
-  const et = makeNumber("Crop use ETc (in/day)", "mad-et", { step: "any", min: "0", value: "0.25" });
-  et.input.value = "0.25";
+  const fc = makeNumber("Field capacity (in/in, e.g. 0.30)", "mad-fc", { step: "any", min: "0" });
+  const wp = makeNumber("Wilting point (in/in, e.g. 0.12)", "mad-wp", { step: "any", min: "0" });
+  const rd = makeNumber("Root depth (in)", "mad-rd", { step: "any", min: "0" });
+  const md = makeNumber("MAD fraction (0-1, ~0.5)", "mad-md", { step: "any", min: "0" });
+  const et = makeNumber("Crop use ETc (in/day)", "mad-et", { step: "any", min: "0" });
   for (const f of [fc, wp, rd, md, et]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { fc.input.value = "0.30"; wp.input.value = "0.12"; rd.input.value = "24"; md.input.value = "0.5"; et.input.value = "0.25"; update(); });
   const oT = makeOutputLine(outputRegion, "Total available water (TAW)", "mad-out-t");
@@ -3290,12 +3257,9 @@ export const fertigationInjectionRateExample = { inputs: { product_rate_gal_per_
 
 function _v974renderFertigationInjectionRate(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: fertigation / chemigation injection rate, by name. total product = rate (gal/acre) x acres; injection rate = total / set hours. Start after the system is pressurized, flush at the end; an EPA-required anti-siphon/check-valve/interlock package must protect the water source (chemigation rules). The product label (FIFRA), the state chemigation rules, and a drawdown calibration govern.";
-  const pr = makeNumber("Product rate (gal/acre)", "fir-pr", { step: "any", min: "0", value: "5" });
-  pr.input.value = "5";
-  const ac = makeNumber("Area (acres)", "fir-ac", { step: "any", min: "0", value: "40" });
-  ac.input.value = "40";
-  const st = makeNumber("Irrigation set time (hours)", "fir-st", { step: "any", min: "0", value: "6" });
-  st.input.value = "6";
+  const pr = makeNumber("Product rate (gal/acre)", "fir-pr", { step: "any", min: "0" });
+  const ac = makeNumber("Area (acres)", "fir-ac", { step: "any", min: "0" });
+  const st = makeNumber("Irrigation set time (hours)", "fir-st", { step: "any", min: "0" });
   for (const f of [pr, ac, st]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { pr.input.value = "5"; ac.input.value = "40"; st.input.value = "6"; update(); });
   const oT = makeOutputLine(outputRegion, "Total product", "fir-out-t");

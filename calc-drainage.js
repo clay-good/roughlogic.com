@@ -228,8 +228,8 @@ export function computeOverflowScupperSizing({ length_in = 0, head_in = 0 } = {}
 export const overflowScupperSizingExample = { inputs: { length_in: 6, head_in: 3.5 } };
 function renderOverflowScupperSizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Overflow scupper as a rectangular weir Q = 3.33 L H^1.5 (cfs, feet), contracted 3.33 (L - 0.2 H) H^1.5 (IPC 1108 secondary drainage / FM Global). Head at the blocked-primary condition. A design aid; the plumbing code and roof-loading check govern.";
-  const len = makeNumber("Scupper opening width (in)", "oss-len", { step: "any", min: "0" }); len.input.value = "6";
-  const head = makeNumber("Head above scupper invert (in)", "oss-head", { step: "any", min: "0" }); head.input.value = "3.5";
+  const len = makeNumber("Scupper opening width (in)", "oss-len", { step: "any", min: "0" });
+  const head = makeNumber("Head above scupper invert (in)", "oss-head", { step: "any", min: "0" });
   for (const f of [len, head]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { len.input.value = "6"; head.input.value = "3.5"; update(); });
   const oQ = makeOutputLine(outputRegion, "Capacity (suppressed)", "oss-out-q");
@@ -272,8 +272,8 @@ export function computeScupperWidthForFlow({ required_gpm = 0, head_in = 0 } = {
 export const scupperWidthForFlowExample = { inputs: { required_gpm: 118, head_in: 3.5 } };
 function renderScupperWidthForFlow(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Overflow scupper as a rectangular weir Q = 3.33 L H^1.5 (cfs, feet) solved for the width: L = Q / (3.33 H^1.5) suppressed, L = Q / (3.33 H^1.5) + 0.2 H contracted (IPC 1108 secondary drainage / FM Global). Head at the blocked-primary condition. A design aid; the plumbing code and roof-loading check govern.";
-  const gpm = makeNumber("Required overflow flow (gpm)", "swf-gpm", { step: "any", min: "0" }); gpm.input.value = "118";
-  const head = makeNumber("Head above scupper invert (in)", "swf-head", { step: "any", min: "0" }); head.input.value = "3.5";
+  const gpm = makeNumber("Required overflow flow (gpm)", "swf-gpm", { step: "any", min: "0" });
+  const head = makeNumber("Head above scupper invert (in)", "swf-head", { step: "any", min: "0" });
   for (const f of [gpm, head]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { gpm.input.value = "118"; head.input.value = "3.5"; update(); });
   const oS = makeOutputLine(outputRegion, "Width (suppressed / full wall)", "swf-out-s");
@@ -307,8 +307,8 @@ export function computeSewageForceMainVelocity({ gpm = 0, id_in = 0 } = {}) {
 export const sewageForceMainVelocityExample = { inputs: { gpm: 50, id_in: 2 } };
 function renderSewageForceMainVelocity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Sewage force-main velocity V = 0.4085 Q / d^2 (ft/s, gpm, in), with the ~2 ft/s minimum scour velocity to keep solids suspended (Ten States Standards). A design aid; the state design criteria and the pump curve govern.";
-  const q = makeNumber("Pump flow (gpm)", "sfm-q", { step: "any", min: "0" }); q.input.value = "50";
-  const id = makeNumber("Force-main inside diameter (in)", "sfm-id", { step: "any", min: "0" }); id.input.value = "2";
+  const q = makeNumber("Pump flow (gpm)", "sfm-q", { step: "any", min: "0" });
+  const id = makeNumber("Force-main inside diameter (in)", "sfm-id", { step: "any", min: "0" });
   for (const f of [q, id]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { q.input.value = "50"; id.input.value = "2"; update(); });
   const oV = makeOutputLine(outputRegion, "Velocity", "sfm-out-v");
@@ -351,14 +351,10 @@ export const drywellInfiltrationExample = { inputs: { runoff_volume_ft3: 200, vo
 
 function _v976renderDrywellInfiltration(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: dry well / infiltration trench (soakaway) sizing, by name. excavation = runoff / void ratio; footprint = excavation / depth; draindown ~ 12 x depth x void / infiltration rate. Void from the aggregate (~0.35 open stone), infiltration from a field perc test (not a default), runoff from the design storm. An overflow path is required; the perc test, the stormwater code, and the AHJ / geotech govern.";
-  const rv = makeNumber("Runoff (storage) volume (ft³)", "dwi-rv", { step: "any", min: "0", value: "200" });
-  rv.input.value = "200";
-  const vr = makeNumber("Aggregate void ratio (~0.35)", "dwi-vr", { step: "any", min: "0", value: "0.35" });
-  vr.input.value = "0.35";
-  const td = makeNumber("Trench/pit depth (ft)", "dwi-td", { step: "any", min: "0", value: "4" });
-  td.input.value = "4";
-  const ir = makeNumber("Soil infiltration rate (in/hr, perc test)", "dwi-ir", { step: "any", min: "0", value: "0.5" });
-  ir.input.value = "0.5";
+  const rv = makeNumber("Runoff (storage) volume (ft³)", "dwi-rv", { step: "any", min: "0" });
+  const vr = makeNumber("Aggregate void ratio (~0.35)", "dwi-vr", { step: "any", min: "0" });
+  const td = makeNumber("Trench/pit depth (ft)", "dwi-td", { step: "any", min: "0" });
+  const ir = makeNumber("Soil infiltration rate (in/hr, perc test)", "dwi-ir", { step: "any", min: "0" });
   for (const f of [rv, vr, td, ir]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { rv.input.value = "200"; vr.input.value = "0.35"; td.input.value = "4"; ir.input.value = "0.5"; update(); });
   const oE = makeOutputLine(outputRegion, "Excavation volume", "dwi-out-e");

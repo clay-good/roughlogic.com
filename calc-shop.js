@@ -407,9 +407,9 @@ function renderDovetailOverPins(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: dovetail measurement over two rods - offset k = D(1 + cot(alpha/2)); male over-rods = flat + k, female over-rods = flat - k, alpha the included angle (commonly 60 deg). First-principles trigonometry as in Machinery's Handbook (Industrial Press), 'Checking a Dovetail Slide', by name; public domain. Use a rod that contacts the flank below the corner; the print tolerance and a verified gauge govern.";
   const type = makeSelect("Dovetail type", "dvt-type", [{ value: "male", label: "Male (external)" }, { value: "female", label: "Female (internal)" }]);
   const known = makeSelect("Known dimension", "dvt-known", [{ value: "flat", label: "Flat width -> find over-rods" }, { value: "over_pins", label: "Measured over-rods -> find flat" }]);
-  const dim = makeNumber("Known dimension (in)", "dvt-dim", { step: "any", min: "0", value: "2.0" }); dim.input.value = "2.0";
-  const pin = makeNumber("Rod / pin diameter (in)", "dvt-pin", { step: "any", min: "0", value: "0.5" }); pin.input.value = "0.5";
-  const ang = makeNumber("Included dovetail angle (deg, commonly 60)", "dvt-ang", { step: "any", min: "0", value: "60" }); ang.input.value = "60";
+  const dim = makeNumber("Known dimension (in)", "dvt-dim", { step: "any", min: "0" });
+  const pin = makeNumber("Rod / pin diameter (in)", "dvt-pin", { step: "any", min: "0" });
+  const ang = makeNumber("Included dovetail angle (deg, commonly 60)", "dvt-ang", { step: "any", min: "0" });
   for (const f of [type, known, dim, pin, ang]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { type.select.value = "male"; known.select.value = "flat"; dim.input.value = "2.0"; pin.input.value = "0.5"; ang.input.value = "60"; update(); });
   const oResult = makeOutputLine(outputRegion, "Over-rods / flat", "dvt-out-res");
@@ -1170,8 +1170,8 @@ export const compoundMiterExample = { inputs: { spring_angle_deg: 38, corner_ang
 
 function _renderCompoundMiter(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Compound-miter geometry for crown molding cut flat on the saw - miter (table) = atan(tan(corner/2) x sin(spring)) and bevel (blade tilt) = asin(cos(spring) x cos(corner/2)) - first-principles trigonometry, public domain. Reproduces the standard published compound-miter chart (38 deg spring / 90 deg corner = 31.62 miter / 33.86 bevel; 45 / 90 = 35.26 / 30.00). Cut a scrap test corner first.";
-  const spring = makeNumber("Spring angle (deg, 38 or 45)", "cm-spring", { step: "any", min: "0", value: "38" }); spring.input.value = "38";
-  const corner = makeNumber("Wall corner angle (deg, 90 square)", "cm-corner", { step: "any", min: "0", value: "90" }); corner.input.value = "90";
+  const spring = makeNumber("Spring angle (deg, 38 or 45)", "cm-spring", { step: "any", min: "0" });
+  const corner = makeNumber("Wall corner angle (deg, 90 square)", "cm-corner", { step: "any", min: "0" });
   for (const f of [spring, corner]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { spring.input.value = "38"; corner.input.value = "90"; update(); });
   const oMiter = makeOutputLine(outputRegion, "Miter angle (saw table)", "cm-out-miter");
@@ -1215,7 +1215,7 @@ export function computeToleranceStackRss({ nominal_gap_in = 0, tolerances = "" }
 export const toleranceStackRssExample = { inputs: { nominal_gap_in: 0.020, tolerances: "0.005, 0.005, 0.005" } };
 function _v399renderToleranceStackRss(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Tolerance stack-up (mechanical design / GD&T practice): worst-case tolerance = sum of the half-widths, RSS (statistical) tolerance = sqrt(sum of squares). RSS assumes centered, independent, normally distributed dimensions. A design aid; the drawing tolerances and the assembly's criticality govern.";
-  const gap = makeNumber("Nominal (mean) gap (in)", "tsr-gap", { step: "any" }); gap.input.value = "0.020";
+  const gap = makeNumber("Nominal (mean) gap (in)", "tsr-gap", { step: "any" });
   const tols = makeTextarea("Tolerance half-widths (in, comma or space separated)", "tsr-tols", { rows: "3" });
   tols.input.value = "0.005, 0.005, 0.005";
   for (const f of [gap, tols]) inputRegion.appendChild(f.wrap);
@@ -1251,8 +1251,8 @@ export function computeConeFlatPattern({ base_radius_in = 0, height_in = 0 } = {
 export const coneFlatPatternExample = { inputs: { base_radius_in: 6, height_in: 8 } };
 function _v400renderConeFlatPattern(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Radial-line cone development (sheet-metal layout): slant height L = sqrt(r^2 + h^2), flat-pattern sector radius = L, sweep angle = 360 x r / L. Add seam/lap and bend allowance. A layout aid; verify against a test piece.";
-  const r = makeNumber("Base radius (in)", "cfp-r", { step: "any", min: "0" }); r.input.value = "6";
-  const h = makeNumber("Vertical height (in)", "cfp-h", { step: "any", min: "0" }); h.input.value = "8";
+  const r = makeNumber("Base radius (in)", "cfp-r", { step: "any", min: "0" });
+  const h = makeNumber("Vertical height (in)", "cfp-h", { step: "any", min: "0" });
   for (const f of [r, h]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { r.input.value = "6"; h.input.value = "8"; update(); });
   const oL = makeOutputLine(outputRegion, "Slant height / pattern radius", "cfp-out-l");
@@ -1297,9 +1297,9 @@ export function computeFrustumVolume({ large_diameter_ft = 0, small_diameter_ft 
 export const frustumVolumeExample = { inputs: { large_diameter_ft: 6, small_diameter_ft: 2, height_ft: 4 } };
 function _v1312renderFrustumVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: conical frustum volume V = (pi h/12)(D^2 + D d + d^2) with slant height sqrt(h^2 + (R-r)^2) and lateral surface pi(R+r)L (standard solid geometry; Machinery's Handbook). d = 0 gives a full cone. A takeoff aid; verify against the drawing.";
-  const D = makeNumber("Large diameter D (ft)", "frv-d", { step: "any", min: "0" }); D.input.value = "6";
-  const d = makeNumber("Small diameter d (ft, 0 = full cone)", "frv-sd", { step: "any", min: "0" }); d.input.value = "2";
-  const h = makeNumber("Height h (ft)", "frv-h", { step: "any", min: "0" }); h.input.value = "4";
+  const D = makeNumber("Large diameter D (ft)", "frv-d", { step: "any", min: "0" });
+  const d = makeNumber("Small diameter d (ft, 0 = full cone)", "frv-sd", { step: "any", min: "0" });
+  const h = makeNumber("Height h (ft)", "frv-h", { step: "any", min: "0" });
   for (const f of [D, d, h]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { D.input.value = "6"; d.input.value = "2"; h.input.value = "4"; update(); });
   const oV = makeOutputLine(outputRegion, "Volume", "frv-out-v");
@@ -1343,8 +1343,8 @@ export function computeRegularPolygon({ num_sides = 0, side_length = 0 } = {}) {
 export const regularPolygonExample = { inputs: { num_sides: 6, side_length: 2 } };
 function _v1313renderRegularPolygon(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: regular-polygon geometry (standard plane geometry; Machinery's Handbook): apothem s/(2 tan(pi/n)), circumradius s/(2 sin(pi/n)), area n s^2/(4 tan(pi/n)), interior angle (n-2)180/n; across-flats = 2 apothem, across-corners = 2 circumradius. A shop and layout aid; verify critical dimensions on the work.";
-  const n = makeNumber("Number of sides n", "rpg-n", { step: "1", min: "3" }); n.input.value = "6";
-  const s = makeNumber("Side length s", "rpg-s", { step: "any", min: "0" }); s.input.value = "2";
+  const n = makeNumber("Number of sides n", "rpg-n", { step: "1", min: "3" });
+  const s = makeNumber("Side length s", "rpg-s", { step: "any", min: "0" });
   for (const f of [n, s]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { n.input.value = "6"; s.input.value = "2"; update(); });
   const oA = makeOutputLine(outputRegion, "Across flats / corners", "rpg-out-a");
@@ -1387,8 +1387,8 @@ export function computeEllipseAreaPerimeter({ major_axis = 0, minor_axis = 0 } =
 export const ellipseAreaPerimeterExample = { inputs: { major_axis: 10, minor_axis: 6 } };
 function _v1314renderEllipseAreaPerimeter(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ellipse area pi a b (exact) and Ramanujan's perimeter approximation pi[3(a+b) - sqrt((3a+b)(a+3b))] (standard geometry; Ramanujan 1914), a=major/2, b=minor/2. Equal axes give a circle. A shop and layout aid; verify critical dimensions on the work.";
-  const M = makeNumber("Major axis (long width)", "elp-m", { step: "any", min: "0" }); M.input.value = "10";
-  const m = makeNumber("Minor axis (short width)", "elp-n", { step: "any", min: "0" }); m.input.value = "6";
+  const M = makeNumber("Major axis (long width)", "elp-m", { step: "any", min: "0" });
+  const m = makeNumber("Minor axis (short width)", "elp-n", { step: "any", min: "0" });
   for (const f of [M, m]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { M.input.value = "10"; m.input.value = "6"; update(); });
   const oA = makeOutputLine(outputRegion, "Area", "elp-out-a");
@@ -1433,8 +1433,8 @@ export function computeSphericalCapVolume({ sphere_diameter_ft = 0, fill_depth_f
 export const sphericalCapVolumeExample = { inputs: { sphere_diameter_ft: 10, fill_depth_ft: 3 } };
 function _v1315renderSphericalCapVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: spherical cap volume V = (pi h^2/3)(3R - h) with the full sphere (4/3) pi R^3 (standard solid geometry; Machinery's Handbook). h = R is a hemisphere. A takeoff / dipstick aid; verify against the tank chart or drawing.";
-  const D = makeNumber("Sphere diameter D (ft)", "scv-d", { step: "any", min: "0" }); D.input.value = "10";
-  const h = makeNumber("Fill depth / cap height h (ft)", "scv-h", { step: "any", min: "0" }); h.input.value = "3";
+  const D = makeNumber("Sphere diameter D (ft)", "scv-d", { step: "any", min: "0" });
+  const h = makeNumber("Fill depth / cap height h (ft)", "scv-h", { step: "any", min: "0" });
   for (const f of [D, h]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { D.input.value = "10"; h.input.value = "3"; update(); });
   const oV = makeOutputLine(outputRegion, "Cap / fill volume", "scv-out-v");
@@ -1473,8 +1473,8 @@ export function computeParabolicSegment({ base_span = 0, rise_height = 0 } = {})
 export const parabolicSegmentExample = { inputs: { base_span: 20, rise_height: 5 } };
 function _v1316renderParabolicSegment(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: parabolic segment area (2/3) b h (Archimedes) and exact arc length (1/2)sqrt(b^2+16h^2) + (b^2/(8h)) ln((4h+sqrt(b^2+16h^2))/b) (standard geometry; Machinery's Handbook). A shop and layout aid; verify critical dimensions on the work.";
-  const b = makeNumber("Base / span b", "pbs-b", { step: "any", min: "0" }); b.input.value = "20";
-  const h = makeNumber("Rise / height h (at midspan)", "pbs-h", { step: "any", min: "0" }); h.input.value = "5";
+  const b = makeNumber("Base / span b", "pbs-b", { step: "any", min: "0" });
+  const h = makeNumber("Rise / height h (at midspan)", "pbs-h", { step: "any", min: "0" });
   for (const f of [b, h]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { b.input.value = "20"; h.input.value = "5"; update(); });
   const oA = makeOutputLine(outputRegion, "Segment area", "pbs-out-a");
@@ -1523,11 +1523,11 @@ export function computePyramidFrustumVolume({ bottom_length_ft = 0, bottom_width
 export const pyramidFrustumVolumeExample = { inputs: { bottom_length_ft: 6, bottom_width_ft: 6, top_length_ft: 2, top_width_ft: 2, height_ft: 4 } };
 function _v1317renderPyramidFrustumVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: truncated-pyramid (rectangular frustum) volume V = (h/3)(A1 + A2 + sqrt(A1 A2)) - the prismatoid formula (standard solid geometry; Machinery's Handbook). Top 0x0 gives a full pyramid. A takeoff aid; verify against the drawing.";
-  const Lb = makeNumber("Bottom length (ft)", "pfv-lb", { step: "any", min: "0" }); Lb.input.value = "6";
-  const Wb = makeNumber("Bottom width (ft)", "pfv-wb", { step: "any", min: "0" }); Wb.input.value = "6";
-  const Lt = makeNumber("Top length (ft)", "pfv-lt", { step: "any", min: "0" }); Lt.input.value = "2";
-  const Wt = makeNumber("Top width (ft)", "pfv-wt", { step: "any", min: "0" }); Wt.input.value = "2";
-  const h = makeNumber("Height (ft)", "pfv-h", { step: "any", min: "0" }); h.input.value = "4";
+  const Lb = makeNumber("Bottom length (ft)", "pfv-lb", { step: "any", min: "0" });
+  const Wb = makeNumber("Bottom width (ft)", "pfv-wb", { step: "any", min: "0" });
+  const Lt = makeNumber("Top length (ft)", "pfv-lt", { step: "any", min: "0" });
+  const Wt = makeNumber("Top width (ft)", "pfv-wt", { step: "any", min: "0" });
+  const h = makeNumber("Height (ft)", "pfv-h", { step: "any", min: "0" });
   for (const f of [Lb, Wb, Lt, Wt, h]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { Lb.input.value = "6"; Wb.input.value = "6"; Lt.input.value = "2"; Wt.input.value = "2"; h.input.value = "4"; update(); });
   const oV = makeOutputLine(outputRegion, "Volume", "pfv-out-v");
@@ -1569,8 +1569,8 @@ export function computeTorusVolume({ center_diameter_in = 0, tube_diameter_in = 
 export const torusVolumeExample = { inputs: { center_diameter_in: 12, tube_diameter_in: 2 } };
 function _v1318renderTorusVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: torus volume V = 2 pi^2 R r^2 and surface area 4 pi^2 R r (Pappus's theorem; standard solid geometry; Machinery's Handbook), R = Dc/2 (ring centerline radius), r = dt/2 (tube radius). A takeoff aid; verify against the drawing.";
-  const Dc = makeNumber("Ring centerline diameter Dc (in)", "trv-dc", { step: "any", min: "0" }); Dc.input.value = "12";
-  const dt = makeNumber("Tube diameter dt (in)", "trv-dt", { step: "any", min: "0" }); dt.input.value = "2";
+  const Dc = makeNumber("Ring centerline diameter Dc (in)", "trv-dc", { step: "any", min: "0" });
+  const dt = makeNumber("Tube diameter dt (in)", "trv-dt", { step: "any", min: "0" });
   for (const f of [Dc, dt]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { Dc.input.value = "12"; dt.input.value = "2"; update(); });
   const oV = makeOutputLine(outputRegion, "Volume", "trv-out-v");
@@ -1612,9 +1612,9 @@ export function computeEllipsoidVolume({ length_ft = 0, width_ft = 0, height_ft 
 export const ellipsoidVolumeExample = { inputs: { length_ft: 10, width_ft: 6, height_ft: 4 } };
 function _v1319renderEllipsoidVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ellipsoid volume V = (4/3) pi a b c = pi L W H/6 (standard solid geometry; Machinery's Handbook), a,b,c the semi-axes. Equal axes give a sphere; half is a dished head/dome. A takeoff aid; verify against the drawing.";
-  const L = makeNumber("Length L (ft)", "elv-l", { step: "any", min: "0" }); L.input.value = "10";
-  const W = makeNumber("Width W (ft)", "elv-w", { step: "any", min: "0" }); W.input.value = "6";
-  const H = makeNumber("Height H (ft)", "elv-h", { step: "any", min: "0" }); H.input.value = "4";
+  const L = makeNumber("Length L (ft)", "elv-l", { step: "any", min: "0" });
+  const W = makeNumber("Width W (ft)", "elv-w", { step: "any", min: "0" });
+  const H = makeNumber("Height H (ft)", "elv-h", { step: "any", min: "0" });
   for (const f of [L, W, H]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { L.input.value = "10"; W.input.value = "6"; H.input.value = "4"; update(); });
   const oV = makeOutputLine(outputRegion, "Ellipsoid volume", "elv-out-v");
@@ -1655,8 +1655,8 @@ export function computeAnnulusArea({ outer_diameter = 0, inner_diameter = 0 } = 
 export const annulusAreaExample = { inputs: { outer_diameter: 6.625, inner_diameter: 6.065 } };
 function _v1320renderAnnulusArea(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: annulus (ring) area (pi/4)(D^2 - d^2) = pi(R^2 - r^2) (standard plane geometry; Machinery's Handbook). The ring is the metal in a tube wall, a washer, or a flange face; d = 0 gives a full circle. A shop and layout aid; verify critical dimensions on the work.";
-  const D = makeNumber("Outer diameter D", "ana-d", { step: "any", min: "0" }); D.input.value = "6.625";
-  const d = makeNumber("Inner (bore) diameter d", "ana-id", { step: "any", min: "0" }); d.input.value = "6.065";
+  const D = makeNumber("Outer diameter D", "ana-d", { step: "any", min: "0" });
+  const d = makeNumber("Inner (bore) diameter d", "ana-id", { step: "any", min: "0" });
   for (const f of [D, d]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { D.input.value = "6.625"; d.input.value = "6.065"; update(); });
   const oR = makeOutputLine(outputRegion, "Ring (annulus) area", "ana-out-r");
@@ -1698,8 +1698,8 @@ export function computeCircularSector({ radius = 0, angle_deg = 0 } = {}) {
 export const circularSectorExample = { inputs: { radius: 5, angle_deg: 60 } };
 function _v1321renderCircularSector(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: circular sector area (1/2) r^2 theta = (angle/360) pi r^2 and arc length r theta, chord 2 r sin(theta/2) (standard plane geometry; Machinery's Handbook). The segment is a separate tile. A shop and layout aid; verify critical dimensions on the work.";
-  const r = makeNumber("Radius r", "csec-r", { step: "any", min: "0" }); r.input.value = "5";
-  const a = makeNumber("Central angle (deg)", "csec-a", { step: "any", min: "0" }); a.input.value = "60";
+  const r = makeNumber("Radius r", "csec-r", { step: "any", min: "0" });
+  const a = makeNumber("Central angle (deg)", "csec-a", { step: "any", min: "0" });
   for (const f of [r, a]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { r.input.value = "5"; a.input.value = "60"; update(); });
   const oA = makeOutputLine(outputRegion, "Sector area", "csec-out-a");
@@ -1768,9 +1768,9 @@ function _v1322renderTankVolumeDishedHeads(inputRegion, outputRegion, citationEl
     { value: "elliptical", label: "2:1 semi-elliptical (ASME dished)" },
     { value: "hemispherical", label: "Hemispherical" },
   ]);
-  const D = makeNumber("Tank diameter D (ft)", "tvdh-d", { step: "any", min: "0" }); D.input.value = "8";
-  const L = makeNumber("Straight-shell length L, seam to seam (ft)", "tvdh-l", { step: "any", min: "0" }); L.input.value = "20";
-  const h = makeNumber("Liquid depth (dipstick, ft)", "tvdh-h", { step: "any", min: "0" }); h.input.value = "4";
+  const D = makeNumber("Tank diameter D (ft)", "tvdh-d", { step: "any", min: "0" });
+  const L = makeNumber("Straight-shell length L, seam to seam (ft)", "tvdh-l", { step: "any", min: "0" });
+  const h = makeNumber("Liquid depth (dipstick, ft)", "tvdh-h", { step: "any", min: "0" });
   for (const f of [head, D, L, h]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { head.select.value = "elliptical"; D.input.value = "8"; L.input.value = "20"; h.input.value = "4"; update(); });
   const oV = makeOutputLine(outputRegion, "Liquid volume", "tvdh-out-v");
@@ -1817,9 +1817,9 @@ export function computeSphericalZoneVolume({ base_radius_1_ft = 0, base_radius_2
 export const sphericalZoneVolumeExample = { inputs: { base_radius_1_ft: 4, base_radius_2_ft: 3, zone_height_ft: 2 } };
 function _v1323renderSphericalZoneVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: spherical zone (segment of two bases) volume V = (pi h/6)(3 r1^2 + 3 r2^2 + h^2) by the prismatoid rule (standard solid geometry; Machinery's Handbook), r1/r2 the face radii and h the height between the planes; needs no sphere radius. One base zero gives the spherical cap. A takeoff aid; verify against the tank chart or drawing.";
-  const r1 = makeNumber("Lower base radius r1 (ft)", "spz-r1", { step: "any", min: "0" }); r1.input.value = "4";
-  const r2 = makeNumber("Upper base radius r2 (ft)", "spz-r2", { step: "any", min: "0" }); r2.input.value = "3";
-  const h = makeNumber("Zone height h, between the planes (ft)", "spz-h", { step: "any", min: "0" }); h.input.value = "2";
+  const r1 = makeNumber("Lower base radius r1 (ft)", "spz-r1", { step: "any", min: "0" });
+  const r2 = makeNumber("Upper base radius r2 (ft)", "spz-r2", { step: "any", min: "0" });
+  const h = makeNumber("Zone height h, between the planes (ft)", "spz-h", { step: "any", min: "0" });
   for (const f of [r1, r2, h]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { r1.input.value = "4"; r2.input.value = "3"; h.input.value = "2"; update(); });
   const oV = makeOutputLine(outputRegion, "Zone volume", "spz-out-v");
@@ -1878,10 +1878,10 @@ export function computeOvalTankVolume({ width_in = 0, height_in = 0, length_in =
 export const ovalTankVolumeExample = { inputs: { width_in: 27, height_in: 44, length_in: 60, depth_in: 22 } };
 function _v1324renderOvalTankVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: horizontal oval (obround / stadium) tank partial volume - cross-section a rectangle capped by two semicircles (r = W/2, straight run s = H - W); the wetted area is a circular segment through the bottom end, then the half-round plus a rectangle, then the full area minus the empty top segment, times the length. First-principles plane/solid geometry (the circular-segment relation as in Machinery's Handbook), by name; public domain. A close estimate with flat ends; the tank's own chart governs.";
-  const W = makeNumber("Width across the flats W (in)", "ovt-w", { step: "any", min: "0" }); W.input.value = "27";
-  const H = makeNumber("Height, rounded top to bottom H (in)", "ovt-h", { step: "any", min: "0" }); H.input.value = "44";
-  const L = makeNumber("Tank length L (in)", "ovt-l", { step: "any", min: "0" }); L.input.value = "60";
-  const d = makeNumber("Liquid depth (dipstick, in)", "ovt-d", { step: "any", min: "0" }); d.input.value = "22";
+  const W = makeNumber("Width across the flats W (in)", "ovt-w", { step: "any", min: "0" });
+  const H = makeNumber("Height, rounded top to bottom H (in)", "ovt-h", { step: "any", min: "0" });
+  const L = makeNumber("Tank length L (in)", "ovt-l", { step: "any", min: "0" });
+  const d = makeNumber("Liquid depth (dipstick, in)", "ovt-d", { step: "any", min: "0" });
   for (const f of [W, H, L, d]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { W.input.value = "27"; H.input.value = "44"; L.input.value = "60"; d.input.value = "22"; update(); });
   const oV = makeOutputLine(outputRegion, "Liquid volume", "ovt-out-v");
@@ -1944,10 +1944,10 @@ export function computeConeBottomTankVolume({ diameter_ft = 0, cone_height_ft = 
 export const coneBottomTankVolumeExample = { inputs: { diameter_ft: 6, cone_height_ft: 3, cylinder_height_ft: 8, depth_ft: 6 } };
 function _v1325renderConeBottomTankVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: cone-bottom vertical tank partial volume - a cone from the apex, V = (pi R^2/(3 Hc^2)) h^3 up to the cone height, then the full cone (1/3) pi R^2 Hc plus a straight cylinder pi R^2 (h - Hc). First-principles solid geometry (cone + cylinder; Machinery's Handbook), by name; public domain. A dipstick / takeoff aid; the tank's own chart governs.";
-  const D = makeNumber("Tank diameter D (ft)", "cbt-d", { step: "any", min: "0" }); D.input.value = "6";
-  const Hc = makeNumber("Cone (bottom) height (ft)", "cbt-hc", { step: "any", min: "0" }); Hc.input.value = "3";
-  const Hcyl = makeNumber("Cylinder (straight side) height (ft)", "cbt-hy", { step: "any", min: "0" }); Hcyl.input.value = "8";
-  const d = makeNumber("Liquid depth from the apex (ft)", "cbt-dep", { step: "any", min: "0" }); d.input.value = "6";
+  const D = makeNumber("Tank diameter D (ft)", "cbt-d", { step: "any", min: "0" });
+  const Hc = makeNumber("Cone (bottom) height (ft)", "cbt-hc", { step: "any", min: "0" });
+  const Hcyl = makeNumber("Cylinder (straight side) height (ft)", "cbt-hy", { step: "any", min: "0" });
+  const d = makeNumber("Liquid depth from the apex (ft)", "cbt-dep", { step: "any", min: "0" });
   for (const f of [D, Hc, Hcyl, d]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { D.input.value = "6"; Hc.input.value = "3"; Hcyl.input.value = "8"; d.input.value = "6"; update(); });
   const oV = makeOutputLine(outputRegion, "Liquid volume", "cbt-out-v");
@@ -2010,10 +2010,10 @@ export function computeTaperedTankVolume({ bottom_diameter_ft = 0, top_diameter_
 export const taperedTankVolumeExample = { inputs: { bottom_diameter_ft: 4, top_diameter_ft: 10, height_ft: 12, depth_ft: 6 } };
 function _v1326renderTaperedTankVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: tapered (frustum) tank partial volume - the liquid up to depth h is a frustum, V = (pi h/3)(R1^2 + R1 r(h) + r(h)^2) with r(h) = R1 + (R2 - R1) h/H. First-principles solid geometry (frustum of a cone; Machinery's Handbook), by name; public domain. A dipstick / takeoff aid; the tank's own chart governs.";
-  const D1 = makeNumber("Bottom diameter (ft)", "ttk-d1", { step: "any", min: "0" }); D1.input.value = "4";
-  const D2 = makeNumber("Top diameter (ft)", "ttk-d2", { step: "any", min: "0" }); D2.input.value = "10";
-  const H = makeNumber("Tank height (ft)", "ttk-h", { step: "any", min: "0" }); H.input.value = "12";
-  const d = makeNumber("Liquid depth from the bottom (ft)", "ttk-dep", { step: "any", min: "0" }); d.input.value = "6";
+  const D1 = makeNumber("Bottom diameter (ft)", "ttk-d1", { step: "any", min: "0" });
+  const D2 = makeNumber("Top diameter (ft)", "ttk-d2", { step: "any", min: "0" });
+  const H = makeNumber("Tank height (ft)", "ttk-h", { step: "any", min: "0" });
+  const d = makeNumber("Liquid depth from the bottom (ft)", "ttk-dep", { step: "any", min: "0" });
   for (const f of [D1, D2, H, d]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { D1.input.value = "4"; D2.input.value = "10"; H.input.value = "12"; d.input.value = "6"; update(); });
   const oV = makeOutputLine(outputRegion, "Liquid volume", "ttk-out-v");
@@ -2064,9 +2064,9 @@ export function computeParaboloidVolume({ base_diameter_ft = 0, height_ft = 0, f
 export const paraboloidVolumeExample = { inputs: { base_diameter_ft: 4, height_ft: 3, fill_depth_ft: 1.5 } };
 function _v1329renderParaboloidVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: paraboloid of revolution volume V = (1/2) pi R^2 H (half the enclosing cylinder) and the apex-up partial fill V(y) = pi R^2 y^2/(2H) with r(y) = R sqrt(y/H). First-principles solid geometry (Pappus / integration; Machinery's Handbook), by name; public domain. A shop and takeoff aid; verify critical dimensions on the work.";
-  const D = makeNumber("Base (rim) diameter (ft)", "pbv-d", { step: "any", min: "0" }); D.input.value = "4";
-  const H = makeNumber("Height, rim to apex (ft)", "pbv-h", { step: "any", min: "0" }); H.input.value = "3";
-  const y = makeNumber("Fill depth from the apex (ft, optional)", "pbv-y", { step: "any", min: "0" }); y.input.value = "1.5";
+  const D = makeNumber("Base (rim) diameter (ft)", "pbv-d", { step: "any", min: "0" });
+  const H = makeNumber("Height, rim to apex (ft)", "pbv-h", { step: "any", min: "0" });
+  const y = makeNumber("Fill depth from the apex (ft, optional)", "pbv-y", { step: "any", min: "0" });
   for (const f of [D, H, y]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { D.input.value = "4"; H.input.value = "3"; y.input.value = "1.5"; update(); });
   const oV = makeOutputLine(outputRegion, "Full volume", "pbv-out-v");
@@ -2113,8 +2113,8 @@ export function computeCylindricalWedgeVolume({ base_diameter_ft = 0, height_ft 
 export const cylindricalWedgeVolumeExample = { inputs: { base_diameter_ft: 4, height_ft: 3 } };
 function _v1330renderCylindricalWedgeVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: cylindrical wedge (ungula) volume V = (2/3) R^2 H = D^2 H/6 for a cylinder cut by a plane through a base diameter (base a semicircle, rise H at the far side). First-principles solid geometry (integration of the sloping top over the semicircle; Machinery's Handbook), by name; public domain. A shop and takeoff aid; verify critical dimensions on the work.";
-  const D = makeNumber("Base (cylinder) diameter (ft)", "cwv-d", { step: "any", min: "0" }); D.input.value = "4";
-  const H = makeNumber("Wedge height at the far side (ft)", "cwv-h", { step: "any", min: "0" }); H.input.value = "3";
+  const D = makeNumber("Base (cylinder) diameter (ft)", "cwv-d", { step: "any", min: "0" });
+  const H = makeNumber("Wedge height at the far side (ft)", "cwv-h", { step: "any", min: "0" });
   for (const f of [D, H]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { D.input.value = "4"; H.input.value = "3"; update(); });
   const oV = makeOutputLine(outputRegion, "Wedge volume", "cwv-out-v");
@@ -2161,9 +2161,9 @@ export function computeBarrelVolume({ bung_diameter_in = 0, head_diameter_in = 0
 export const barrelVolumeExample = { inputs: { bung_diameter_in: 27, head_diameter_in: 24, length_in: 36 } };
 function _v1331renderBarrelVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: barrel / cask volume - parabolic staves V = (pi L/15)(2D^2 + Dd + 3/4 d^2) and circular-arc staves (Kepler) V = (pi L/12)(2D^2 + d^2), from the bung (middle) diameter D, head (end) diameter d, and length L. Standard solid geometry (Machinery's Handbook; Kepler's barrel rule), by name; public domain. A takeoff aid; a strapping chart or water fill governs custody.";
-  const D = makeNumber("Bung (middle) diameter (in)", "brl-d", { step: "any", min: "0" }); D.input.value = "27";
-  const d = makeNumber("Head (end) diameter (in)", "brl-hd", { step: "any", min: "0" }); d.input.value = "24";
-  const L = makeNumber("Length (in)", "brl-l", { step: "any", min: "0" }); L.input.value = "36";
+  const D = makeNumber("Bung (middle) diameter (in)", "brl-d", { step: "any", min: "0" });
+  const d = makeNumber("Head (end) diameter (in)", "brl-hd", { step: "any", min: "0" });
+  const L = makeNumber("Length (in)", "brl-l", { step: "any", min: "0" });
   for (const f of [D, d, L]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { D.input.value = "27"; d.input.value = "24"; L.input.value = "36"; update(); });
   const oV = makeOutputLine(outputRegion, "Volume (parabolic staves, exact)", "brl-out-v");
@@ -2208,12 +2208,12 @@ export function computePressFitPressure({ shaft_dia_in = 0, interference_in = 0,
 export const pressFitPressureExample = { inputs: { shaft_dia_in: 2, interference_in: 0.002, hub_od_in: 4, modulus_psi: 30e6, friction_coeff: 0.12, engagement_in: 3 } };
 function _v511renderPressFitPressure(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Lame interference-fit relations (Machinery's Handbook 'Forces and Fits'; Lame thick-cylinder equations, same-material solid shaft): p = (E x interference / D) x (Do^2 - D^2)/(2 Do^2); holding force = p x pi x D x length x friction; hub bore stress = p x (Do^2 + D^2)/(Do^2 - D^2). A design aid; the materials, surface finish, and assembly method govern.";
-  const d = makeNumber("Interface diameter D (in)", "pfp-d", { step: "any", min: "0" }); d.input.value = "2";
-  const i = makeNumber("Diametral interference (in)", "pfp-i", { step: "any", min: "0" }); i.input.value = "0.002";
-  const dout = makeNumber("Hub outer diameter Do (in)", "pfp-do", { step: "any", min: "0" }); dout.input.value = "4";
-  const e = makeNumber("Elastic modulus E (psi, steel ~30e6)", "pfp-e", { step: "any", min: "0" }); e.input.value = "30000000";
-  const mu = makeNumber("Friction coefficient (~0.12 dry steel)", "pfp-mu", { step: "any", min: "0" }); mu.input.value = "0.12";
-  const len = makeNumber("Engagement length L (in)", "pfp-l", { step: "any", min: "0" }); len.input.value = "3";
+  const d = makeNumber("Interface diameter D (in)", "pfp-d", { step: "any", min: "0" });
+  const i = makeNumber("Diametral interference (in)", "pfp-i", { step: "any", min: "0" });
+  const dout = makeNumber("Hub outer diameter Do (in)", "pfp-do", { step: "any", min: "0" });
+  const e = makeNumber("Elastic modulus E (psi, steel ~30e6)", "pfp-e", { step: "any", min: "0" });
+  const mu = makeNumber("Friction coefficient (~0.12 dry steel)", "pfp-mu", { step: "any", min: "0" });
+  const len = makeNumber("Engagement length L (in)", "pfp-l", { step: "any", min: "0" });
   for (const f of [d, i, dout, e, mu, len]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { d.input.value = "2"; i.input.value = "0.002"; dout.input.value = "4"; e.input.value = "30000000"; mu.input.value = "0.12"; len.input.value = "3"; update(); });
   const oP = makeOutputLine(outputRegion, "Contact pressure", "pfp-out-p");
@@ -2268,13 +2268,13 @@ export function computePressFitInterferenceForForce({ target_holding_lb = 0, sha
 export const pressFitInterferenceForForceExample = { inputs: { target_holding_lb: 25447, shaft_dia_in: 2, hub_od_in: 4, modulus_psi: 30e6, friction_coeff: 0.12, engagement_in: 3, hub_yield_psi: 0 } };
 function _v728renderPressFitInterferenceForForce(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Lame interference-fit relations (Machinery's Handbook 'Forces and Fits'; Lame thick-cylinder equations, same-material solid shaft) solved for the interference: i = holding x 2 Do^2 / (E x (Do^2 - D^2) x pi x L x mu); contact pressure and hub bore stress reported at that interference. A design aid; the materials, surface finish, and assembly method govern.";
-  const hold = makeNumber("Target holding force (lb)", "pfi-h", { step: "any", min: "0" }); hold.input.value = "25447";
-  const d = makeNumber("Interface diameter D (in)", "pfi-d", { step: "any", min: "0" }); d.input.value = "2";
-  const dout = makeNumber("Hub outer diameter Do (in)", "pfi-do", { step: "any", min: "0" }); dout.input.value = "4";
-  const e = makeNumber("Elastic modulus E (psi, steel ~30e6)", "pfi-e", { step: "any", min: "0" }); e.input.value = "30000000";
-  const mu = makeNumber("Friction coefficient (~0.12 dry steel)", "pfi-mu", { step: "any", min: "0" }); mu.input.value = "0.12";
-  const len = makeNumber("Engagement length L (in)", "pfi-l", { step: "any", min: "0" }); len.input.value = "3";
-  const yld = makeNumber("Hub yield strength (psi, optional flag)", "pfi-y", { step: "any", min: "0" }); yld.input.value = "";
+  const hold = makeNumber("Target holding force (lb)", "pfi-h", { step: "any", min: "0" });
+  const d = makeNumber("Interface diameter D (in)", "pfi-d", { step: "any", min: "0" });
+  const dout = makeNumber("Hub outer diameter Do (in)", "pfi-do", { step: "any", min: "0" });
+  const e = makeNumber("Elastic modulus E (psi, steel ~30e6)", "pfi-e", { step: "any", min: "0" });
+  const mu = makeNumber("Friction coefficient (~0.12 dry steel)", "pfi-mu", { step: "any", min: "0" });
+  const len = makeNumber("Engagement length L (in)", "pfi-l", { step: "any", min: "0" });
+  const yld = makeNumber("Hub yield strength (psi, optional flag)", "pfi-y", { step: "any", min: "0" });
   for (const f of [hold, d, dout, e, mu, len, yld]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { hold.input.value = "25447"; d.input.value = "2"; dout.input.value = "4"; e.input.value = "30000000"; mu.input.value = "0.12"; len.input.value = "3"; yld.input.value = ""; update(); });
   const oI = makeOutputLine(outputRegion, "Required interference", "pfi-out-i");
@@ -2321,10 +2321,10 @@ export function computeRollerChainLength({ small_teeth_n1 = 0, large_teeth_n2 = 
 export const rollerChainLengthExample = { inputs: { small_teeth_n1: 17, large_teeth_n2: 51, center_distance_in: 30, pitch_in: 0.5 } };
 function _v512renderRollerChainLength(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ANSI B29.1 roller-chain length: L = 2(C/p) + (N1+N2)/2 + ((N2-N1)/(2 pi))^2/(C/p) pitches, rounded UP to an even count (an odd count needs a weaker offset link), then the center distance recomputed C = (p/4)[A + sqrt(A^2 - 8((N2-N1)/(2 pi))^2)]. A design aid; the sprocket selection and take-up govern.";
-  const n1 = makeNumber("Small sprocket teeth N1", "rcl-n1", { step: "1", min: "1" }); n1.input.value = "17";
-  const n2 = makeNumber("Large sprocket teeth N2", "rcl-n2", { step: "1", min: "1" }); n2.input.value = "51";
-  const c = makeNumber("Nominal center distance C (in)", "rcl-c", { step: "any", min: "0" }); c.input.value = "30";
-  const p = makeNumber("Chain pitch p (in, #40 = 0.5)", "rcl-p", { step: "any", min: "0" }); p.input.value = "0.5";
+  const n1 = makeNumber("Small sprocket teeth N1", "rcl-n1", { step: "1", min: "1" });
+  const n2 = makeNumber("Large sprocket teeth N2", "rcl-n2", { step: "1", min: "1" });
+  const c = makeNumber("Nominal center distance C (in)", "rcl-c", { step: "any", min: "0" });
+  const p = makeNumber("Chain pitch p (in, #40 = 0.5)", "rcl-p", { step: "any", min: "0" });
   for (const f of [n1, n2, c, p]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { n1.input.value = "17"; n2.input.value = "51"; c.input.value = "30"; p.input.value = "0.5"; update(); });
   const oL = makeOutputLine(outputRegion, "Exact chain length", "rcl-out-l");
@@ -2363,8 +2363,8 @@ export function computeSprocketPitchDiameter({ chain_pitch_in = 0, tooth_count_n
 export const sprocketPitchDiameterExample = { inputs: { chain_pitch_in: 0.5, tooth_count_n: 17 } };
 function _v801renderSprocketPitchDiameter(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ANSI B29.1 sprocket pitch diameter PD = p / sin(180 deg / N) and maximum outside diameter OD = p (0.6 + cot(180 deg / N)), for chain pitch p and tooth count N. A design aid; the manufacturer's tooth form and hub govern.";
-  const p = makeNumber("Chain pitch p (in, #40 = 0.5)", "spd-p", { step: "any", min: "0" }); p.input.value = "0.5";
-  const n = makeNumber("Sprocket teeth N", "spd-n", { step: "1", min: "3" }); n.input.value = "17";
+  const p = makeNumber("Chain pitch p (in, #40 = 0.5)", "spd-p", { step: "any", min: "0" });
+  const n = makeNumber("Sprocket teeth N", "spd-n", { step: "1", min: "3" });
   for (const f of [p, n]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { p.input.value = "0.5"; n.input.value = "17"; update(); });
   const oPd = makeOutputLine(outputRegion, "Pitch diameter", "spd-out-pd");
@@ -2445,11 +2445,11 @@ export const cylinderStorageSeparationExample = { inputs: { separation_ft: 8, ba
 
 function _v1155renderCylinderStorageSeparation(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: OSHA 29 CFR 1926.350, a US federal regulation in the public domain. 'Oxygen cylinders in storage shall be separated from fuel-gas cylinders or combustible materials (especially oil or grease), a minimum distance of 20 feet (6.1 m) or by a noncombustible barrier at least 5 feet (1.5 m) high having a fire-resistance rating of at least one-half hour.' 'Compressed gas cylinders shall be secured in an upright position at all times except, if necessary, for short periods of time while cylinders are actually being hoisted or carried.' 'Valve protection caps shall be in place and secured.' Not checked: cylinders in use rather than in storage; acetylene-specific storage and the waiting period after a cylinder has been on its side; regulator, hose, and torch condition; flashback arrestors; prohibited hoisting methods; transport in enclosed vehicles; indoor storage quantity limits; or NFPA 55 and state rules, which are often stricter. A screen, not a gas-storage plan; 1926.350, the gas supplier, and the AHJ govern.";
-  const sp = makeNumber("Distance between oxygen and fuel gas or combustibles (ft)", "css-sp", { step: "any", min: "0" }); sp.input.value = "8";
+  const sp = makeNumber("Distance between oxygen and fuel gas or combustibles (ft)", "css-sp", { step: "any", min: "0" });
   const bp = makeSelect("Barrier between them?", "css-bp", [{ value: "no", label: "No" }, { value: "yes", label: "Yes", selected: true }]);
-  const bh = makeNumber("Barrier height (ft)", "css-bh", { step: "any", min: "0" }); bh.input.value = "4";
+  const bh = makeNumber("Barrier height (ft)", "css-bh", { step: "any", min: "0" });
   const bn = makeSelect("Barrier is noncombustible?", "css-bn", [{ value: "no", label: "No" }, { value: "yes", label: "Yes", selected: true }]);
-  const br = makeNumber("Barrier fire-resistance rating (hours)", "css-br", { step: "any", min: "0" }); br.input.value = "1";
+  const br = makeNumber("Barrier fire-resistance rating (hours)", "css-br", { step: "any", min: "0" });
   const up = makeSelect("Cylinders secured upright?", "css-up", [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }]);
   const vc = makeSelect("Valve protection caps in place and secured?", "css-vc", [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }]);
   inputRegion.appendChild(sp.wrap); inputRegion.appendChild(bp.wrap); inputRegion.appendChild(bh.wrap);

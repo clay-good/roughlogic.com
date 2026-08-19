@@ -656,12 +656,9 @@ export const evaporativeCoolerEffectivenessExample = { inputs: { dry_bulb_F: 95,
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function renderEvaporativeCoolerEffectiveness(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: direct-evaporative (swamp) cooler leaving dry-bulb T_out = T_db - saturation_effectiveness x (T_db - T_wb), the standard ASHRAE Fundamentals saturation-effectiveness relation. Pad effectiveness ~0.80-0.90 for rigid media, less for aspen; the leaving air rides the constant-wet-bulb line so its RH is high. Direct single-stage only. A shop estimate; the equipment data govern.";
-  const db = makeNumber("Entering dry-bulb (°F)", "ece-db", { step: "any", value: "95" });
-  db.input.value = "95";
-  const wb = makeNumber("Entering wet-bulb (°F)", "ece-wb", { step: "any", value: "65" });
-  wb.input.value = "65";
-  const eff = makeNumber("Pad saturation effectiveness (0-1)", "ece-eff", { step: "any", min: "0", max: "1", value: "0.85" });
-  eff.input.value = "0.85";
+  const db = makeNumber("Entering dry-bulb (°F)", "ece-db", { step: "any" });
+  const wb = makeNumber("Entering wet-bulb (°F)", "ece-wb", { step: "any" });
+  const eff = makeNumber("Pad saturation effectiveness (0-1)", "ece-eff", { step: "any", min: "0", max: "1" });
   for (const f of [db, wb, eff]) inputRegion.appendChild(f.wrap);
   const oT = makeOutputLine(outputRegion, "Leaving dry-bulb", "ece-out-t");
   const oD = makeOutputLine(outputRegion, "Temperature drop", "ece-out-d");
@@ -707,9 +704,9 @@ export function computeIndirectEvaporativeCooling({ dry_bulb_F, secondary_wet_bu
 export const indirectEvaporativeCoolingExample = { inputs: { dry_bulb_F: 95, secondary_wet_bulb_F: 65, effectiveness: 0.65 } };
 function renderIndirectEvaporativeCooling(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: indirect-evaporative cooler leaving dry-bulb T_out = T_ent - indirect_effectiveness x (T_ent - T_wb,secondary), the ASHRAE Handbook (HVAC Systems & Equipment, Ch. 41) sensible-effectiveness relation. The product air is cooled sensibly (no added moisture) toward the secondary stream's wet-bulb; indirect effectiveness ~0.5-0.75. A shop estimate; the equipment data govern.";
-  const db = makeNumber("Entering product dry-bulb (°F)", "iec-db", { step: "any", value: "95" }); db.input.value = "95";
-  const wb = makeNumber("Secondary-stream wet-bulb (°F)", "iec-wb", { step: "any", value: "65" }); wb.input.value = "65";
-  const eff = makeNumber("Indirect effectiveness (0-1, ~0.5-0.75)", "iec-eff", { step: "any", min: "0", max: "1", value: "0.65" }); eff.input.value = "0.65";
+  const db = makeNumber("Entering product dry-bulb (°F)", "iec-db", { step: "any" });
+  const wb = makeNumber("Secondary-stream wet-bulb (°F)", "iec-wb", { step: "any" });
+  const eff = makeNumber("Indirect effectiveness (0-1, ~0.5-0.75)", "iec-eff", { step: "any", min: "0", max: "1" });
   for (const f of [db, wb, eff]) inputRegion.appendChild(f.wrap);
   const oT = makeOutputLine(outputRegion, "Leaving dry-bulb (dry, no moisture added)", "iec-out-t");
   const oD = makeOutputLine(outputRegion, "Temperature drop", "iec-out-d");
@@ -2713,12 +2710,9 @@ export const economizerSavingsHoursExample = { inputs: { cfm: 4000, delta_t_f: 2
 
 function renderEconomizerSavingsHours(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ASHRAE sensible-heat relation Q = 1.08 * CFM * dT (public); air-side economizer changeover per ASHRAE Standard 90.1, by name. Estimate; design conditions govern. The 1.08 factor is sea-level standard air. ASHRAE 90.1 free read-only at ashrae.org.";
-  const cfm = makeNumber("Supply airflow (CFM)", "esh-cfm", { step: "any", min: "0", value: "4000" });
-  cfm.input.value = "4000";
-  const dt = makeNumber("Mix-to-supply delta-T (°F)", "esh-dt", { step: "any", value: "20" });
-  dt.input.value = "20";
-  const hrs = makeNumber("Economizer-eligible hours", "esh-hrs", { step: "any", min: "0", max: "8760", value: "1500" });
-  hrs.input.value = "1500";
+  const cfm = makeNumber("Supply airflow (CFM)", "esh-cfm", { step: "any", min: "0" });
+  const dt = makeNumber("Mix-to-supply delta-T (°F)", "esh-dt", { step: "any" });
+  const hrs = makeNumber("Economizer-eligible hours", "esh-hrs", { step: "any", min: "0", max: "8760" });
   for (const f of [cfm, dt, hrs]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cfm.input.value = "4000"; dt.input.value = "20"; hrs.input.value = "1500"; update(); });
   const oQ = makeOutputLine(outputRegion, "Sensible free-cooling capacity", "esh-out-q");
@@ -2768,18 +2762,12 @@ export const pipeHeatLossRadialExample = { inputs: { od_in: 2, thickness_in: 1, 
 
 function renderPipeHeatLossRadial(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Fourier conduction through a cylindrical shell (public heat-transfer formula); insulation k-values per ASHRAE Fundamentals / ASTM C335, by name (user-supplied). Distinct from the flat-wall insulation tiles - this is the radial log-mean form. k is at the mean insulation temperature.";
-  const od = makeNumber("Pipe outer diameter (in)", "phlr-od", { step: "any", min: "0", value: "2" });
-  od.input.value = "2";
-  const th = makeNumber("Insulation thickness (in)", "phlr-th", { step: "any", min: "0", value: "1" });
-  th.input.value = "1";
-  const k = makeNumber("Insulation k-value (BTU-in/hr-ft2-F)", "phlr-k", { step: "any", min: "0", value: "0.25" });
-  k.input.value = "0.25";
-  const hot = makeNumber("Fluid / surface temperature (°F)", "phlr-hot", { step: "any", value: "200" });
-  hot.input.value = "200";
-  const amb = makeNumber("Ambient temperature (°F)", "phlr-amb", { step: "any", value: "70" });
-  amb.input.value = "70";
-  const len = makeNumber("Pipe length (ft)", "phlr-len", { step: "any", min: "0", value: "1" });
-  len.input.value = "1";
+  const od = makeNumber("Pipe outer diameter (in)", "phlr-od", { step: "any", min: "0" });
+  const th = makeNumber("Insulation thickness (in)", "phlr-th", { step: "any", min: "0" });
+  const k = makeNumber("Insulation k-value (BTU-in/hr-ft2-F)", "phlr-k", { step: "any", min: "0" });
+  const hot = makeNumber("Fluid / surface temperature (°F)", "phlr-hot", { step: "any" });
+  const amb = makeNumber("Ambient temperature (°F)", "phlr-amb", { step: "any" });
+  const len = makeNumber("Pipe length (ft)", "phlr-len", { step: "any", min: "0" });
   for (const f of [od, th, k, hot, amb, len]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { od.input.value = "2"; th.input.value = "1"; k.input.value = "0.25"; hot.input.value = "200"; amb.input.value = "70"; len.input.value = "1"; update(); });
   const oPF = makeOutputLine(outputRegion, "Heat loss per linear foot", "phlr-out-pf");
@@ -2827,11 +2815,11 @@ export function computeInsulationThicknessForHeatLoss({ od_in = 0, k_value = 0, 
 export const insulationThicknessForHeatLossExample = { inputs: { od_in: 2, k_value: 0.25, hot_f: 200, amb_f: 70, target_q_per_ft_btuh: 40 } };
 function renderInsulationThicknessForHeatLoss(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Fourier conduction through a cylindrical shell (public heat-transfer formula) solved for the thickness: thickness = (od/2) x (exp(2*pi*(k/12)*(hot - amb)/q) - 1); insulation k-values per ASHRAE Fundamentals / ASTM C335, by name (user-supplied). Targets a heat-loss budget, not a surface temperature. k is at the mean insulation temperature; conduction only (ignores the outer air film, so conservative).";
-  const od = makeNumber("Pipe outer diameter (in)", "itl-od", { step: "any", min: "0", value: "2" }); od.input.value = "2";
-  const k = makeNumber("Insulation k (BTU-in/hr-ft2-F)", "itl-k", { step: "any", min: "0", value: "0.25" }); k.input.value = "0.25";
-  const hot = makeNumber("Hot surface temp (°F)", "itl-hot", { step: "any", value: "200" }); hot.input.value = "200";
-  const amb = makeNumber("Ambient temp (°F)", "itl-amb", { step: "any", value: "70" }); amb.input.value = "70";
-  const q = makeNumber("Target heat loss (BTU/hr per ft)", "itl-q", { step: "any", min: "0", value: "40" }); q.input.value = "40";
+  const od = makeNumber("Pipe outer diameter (in)", "itl-od", { step: "any", min: "0" });
+  const k = makeNumber("Insulation k (BTU-in/hr-ft2-F)", "itl-k", { step: "any", min: "0" });
+  const hot = makeNumber("Hot surface temp (°F)", "itl-hot", { step: "any" });
+  const amb = makeNumber("Ambient temp (°F)", "itl-amb", { step: "any" });
+  const q = makeNumber("Target heat loss (BTU/hr per ft)", "itl-q", { step: "any", min: "0" });
   for (const f of [od, k, hot, amb, q]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { od.input.value = "2"; k.input.value = "0.25"; hot.input.value = "200"; amb.input.value = "70"; q.input.value = "40"; update(); });
   const oTh = makeOutputLine(outputRegion, "Required insulation thickness", "itl-out-th");
@@ -2879,14 +2867,10 @@ export const fanMotorBhpExample = { inputs: { cfm: 4000, tsp_inwc: 2.0, eta_fan:
 
 function renderFanMotorBhp(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: AMCA / ASHRAE fan-power relation BHP = (CFM * SP) / (6356 * eta) (public); standard motor HP sizes per NEMA MG 1, by name. Estimate; fan curve and motor data govern. TSP must be total (external + internal). Free principles in published HVAC texts.";
-  const cfm = makeNumber("Airflow (CFM)", "fmb-cfm", { step: "any", min: "0", value: "4000" });
-  cfm.input.value = "4000";
-  const tsp = makeNumber("Total static pressure (in. w.c.)", "fmb-tsp", { step: "any", min: "0", value: "2.0" });
-  tsp.input.value = "2.0";
-  const ef = makeNumber("Fan total efficiency (0-1)", "fmb-ef", { step: "any", min: "0", max: "1", value: "0.65" });
-  ef.input.value = "0.65";
-  const ed = makeNumber("Drive/belt efficiency (0-1)", "fmb-ed", { step: "any", min: "0", max: "1", value: "1" });
-  ed.input.value = "1";
+  const cfm = makeNumber("Airflow (CFM)", "fmb-cfm", { step: "any", min: "0" });
+  const tsp = makeNumber("Total static pressure (in. w.c.)", "fmb-tsp", { step: "any", min: "0" });
+  const ef = makeNumber("Fan total efficiency (0-1)", "fmb-ef", { step: "any", min: "0", max: "1" });
+  const ed = makeNumber("Drive/belt efficiency (0-1)", "fmb-ed", { step: "any", min: "0", max: "1" });
   for (const f of [cfm, tsp, ef, ed]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cfm.input.value = "4000"; tsp.input.value = "2.0"; ef.input.value = "0.65"; ed.input.value = "1"; update(); });
   const oA = makeOutputLine(outputRegion, "Air horsepower", "fmb-out-a");
@@ -2931,11 +2915,11 @@ export const fanMotorMaxAirflowExample = { inputs: { power_hp: 1.936, power_basi
 
 function renderFanMotorMaxAirflow(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: AMCA / ASHRAE fan-power relation solved for airflow: CFM_max = 6356 x BHP x fan efficiency / TSP, from BHP = (CFM x SP) / (6356 x eta) (public). A motor (nameplate) HP converts to brake HP with the drive efficiency. Estimate; the fan curve and motor data govern. TSP must be total (external + internal).";
-  const power = makeNumber("Motor / brake power (hp)", "fma-p", { step: "any", min: "0", value: "1.936" }); power.input.value = "1.936";
+  const power = makeNumber("Motor / brake power (hp)", "fma-p", { step: "any", min: "0" });
   const basis = makeSelect("Power basis", "fma-basis", [{ value: "motor", label: "Motor (nameplate) HP", selected: true }, { value: "brake", label: "Brake HP" }]);
-  const tsp = makeNumber("Total static pressure (in. w.c.)", "fma-tsp", { step: "any", min: "0", value: "2.0" }); tsp.input.value = "2.0";
-  const ef = makeNumber("Fan total efficiency (0-1)", "fma-ef", { step: "any", min: "0", max: "1", value: "0.65" }); ef.input.value = "0.65";
-  const ed = makeNumber("Drive/belt efficiency (0-1)", "fma-ed", { step: "any", min: "0", max: "1", value: "1" }); ed.input.value = "1";
+  const tsp = makeNumber("Total static pressure (in. w.c.)", "fma-tsp", { step: "any", min: "0" });
+  const ef = makeNumber("Fan total efficiency (0-1)", "fma-ef", { step: "any", min: "0", max: "1" });
+  const ed = makeNumber("Drive/belt efficiency (0-1)", "fma-ed", { step: "any", min: "0", max: "1" });
   for (const f of [power, basis, tsp, ef, ed]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { power.input.value = "1.936"; basis.select.value = "brake"; tsp.input.value = "2.0"; ef.input.value = "0.65"; ed.input.value = "1"; update(); });
   const oCfm = makeOutputLine(outputRegion, "Max airflow", "fma-out-cfm");
@@ -3791,8 +3775,8 @@ function _v329renderBuildingUa(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: whole-building heat-loss coefficient UA = sum(A/R) + 1.08 x CFM, the infiltration conductance from 1.08 = 60 x 0.075 x 0.24, and the design load Q = UA x dT, ASHRAE Fundamentals / RESNET basis, by name. Sensible only; enter the natural infiltration cfm. An energy-audit aid, not a stamped Manual J.";
   const asm = makeTextarea("Assemblies, one per line as area_ft2,R-value", "bua-asm", { rows: "4" });
   asm.input.value = "1200,17\n1500,38\n200,3\n1500,19";
-  const cfm = makeNumber("Natural infiltration (cfm)", "bua-cfm", { step: "any", min: "0" }); cfm.input.value = "50";
-  const dt = makeNumber("Design temperature difference (F, optional)", "bua-dt", { step: "any", min: "0" }); dt.input.value = "70";
+  const cfm = makeNumber("Natural infiltration (cfm)", "bua-cfm", { step: "any", min: "0" });
+  const dt = makeNumber("Design temperature difference (F, optional)", "bua-dt", { step: "any", min: "0" });
   for (const f of [asm, cfm, dt]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { asm.input.value = "1200,17\n1500,38\n200,3\n1500,19"; cfm.input.value = "50"; dt.input.value = "70"; update(); });
   const oCond = makeOutputLine(outputRegion, "Conduction + infiltration conductance", "bua-out-cond");
@@ -4081,8 +4065,8 @@ function _renderAdpiSelection(inputRegion, outputRegion, citationEl) {
   ]);
   load.select.value = "40";
   inputRegion.appendChild(type.wrap); inputRegion.appendChild(load.wrap);
-  const thr = makeNumber("Catalog isothermal throw T (ft)", "adpi-throw", { step: "any", min: "0" }); thr.input.value = "8";
-  const clen = makeNumber("Characteristic length L (ft)", "adpi-l", { step: "any", min: "0" }); clen.input.value = "10";
+  const thr = makeNumber("Catalog isothermal throw T (ft)", "adpi-throw", { step: "any", min: "0" });
+  const clen = makeNumber("Characteristic length L (ft)", "adpi-l", { step: "any", min: "0" });
   for (const f of [thr, clen]) inputRegion.appendChild(f.wrap);
   const oRatio = makeOutputLine(outputRegion, "T/L ratio", "adpi-out-ratio");
   const oOpt = makeOutputLine(outputRegion, "Optimum T/L (max ADPI)", "adpi-out-opt");
@@ -4138,8 +4122,8 @@ export const vibrationIsolationExample = { inputs: { equipment_rpm: 900, static_
 
 function _renderVibrationIsolation(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ASHRAE Handbook -- Fundamentals, Sound and Vibration (single-DOF isolator). Natural frequency fn = 3.13/sqrt(static deflection in inches) Hz; disturbing frequency = rpm/60; transmissibility T = 1/|(f/fn)^2 - 1|; isolation efficiency = (1 - T). Isolation needs a frequency ratio over sqrt(2) = 1.414, else the mount amplifies (resonance at 1). Undamped idealization; the rated isolator deflection under load governs. A design aid, not a stamped vibration-isolation design.";
-  const rpm = makeNumber("Equipment running speed (rpm)", "vib-rpm", { step: "any", min: "0" }); rpm.input.value = "900";
-  const defl = makeNumber("Isolator static deflection under load (in)", "vib-defl", { step: "any", min: "0" }); defl.input.value = "1";
+  const rpm = makeNumber("Equipment running speed (rpm)", "vib-rpm", { step: "any", min: "0" });
+  const defl = makeNumber("Isolator static deflection under load (in)", "vib-defl", { step: "any", min: "0" });
   for (const f of [rpm, defl]) inputRegion.appendChild(f.wrap);
   const oFn = makeOutputLine(outputRegion, "System natural frequency", "vib-out-fn");
   const oFd = makeOutputLine(outputRegion, "Disturbing frequency", "vib-out-fd");
@@ -4541,9 +4525,9 @@ function _v442renderRadiantFloorOutput(inputRegion, outputRegion, citationEl) {
     { value: "q_to_surface", label: "Surface temperature for a target output" },
   ]);
   inputRegion.appendChild(mode.wrap);
-  const surf = makeNumber("Floor mean surface temperature (°F)", "rfo-surf", { step: "any" }); surf.input.value = "85";
-  const room = makeNumber("Room air temperature (°F)", "rfo-room", { step: "any" }); room.input.value = "70";
-  const qt = makeNumber("Target output (Btu/hr-ft²)", "rfo-qt", { step: "any", min: "0" }); qt.input.value = "30";
+  const surf = makeNumber("Floor mean surface temperature (°F)", "rfo-surf", { step: "any" });
+  const room = makeNumber("Room air temperature (°F)", "rfo-room", { step: "any" });
+  const qt = makeNumber("Target output (Btu/hr-ft²)", "rfo-qt", { step: "any", min: "0" });
   for (const f of [surf, room, qt]) inputRegion.appendChild(f.wrap);
   const oQ = makeOutputLine(outputRegion, "Heat output", "rfo-out-q");
   const oS = makeOutputLine(outputRegion, "Mean surface temperature", "rfo-out-s");
@@ -4644,10 +4628,10 @@ function _v443renderEconomizerEnthalpyChangeover(inputRegion, outputRegion, cita
     { value: "fixed_drybulb", label: "Fixed dry-bulb setpoint" },
   ]);
   inputRegion.appendChild(mode.wrap);
-  const hoa = makeNumber("Outdoor-air enthalpy (Btu/lb)", "eco-hoa", { step: "any" }); hoa.input.value = "24";
-  const hra = makeNumber("Return-air enthalpy (Btu/lb)", "eco-hra", { step: "any" }); hra.input.value = "28";
-  const toa = makeNumber("Outdoor dry-bulb (°F)", "eco-toa", { step: "any" }); toa.input.value = "70";
-  const sp = makeNumber("Fixed high-limit setpoint (°F)", "eco-sp", { step: "any" }); sp.input.value = "65";
+  const hoa = makeNumber("Outdoor-air enthalpy (Btu/lb)", "eco-hoa", { step: "any" });
+  const hra = makeNumber("Return-air enthalpy (Btu/lb)", "eco-hra", { step: "any" });
+  const toa = makeNumber("Outdoor dry-bulb (°F)", "eco-toa", { step: "any" });
+  const sp = makeNumber("Fixed high-limit setpoint (°F)", "eco-sp", { step: "any" });
   for (const f of [hoa, hra, toa, sp]) inputRegion.appendChild(f.wrap);
   const oE = makeOutputLine(outputRegion, "Economizer", "eco-out-e");
   const oM = makeOutputLine(outputRegion, "Margin to changeover", "eco-out-m");

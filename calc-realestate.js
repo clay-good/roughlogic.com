@@ -2411,10 +2411,10 @@ export const pmiCancellationDateExample = { inputs: { value: 250000, loan: 25000
 
 function renderPmiCancellationDate(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per the Homeowners Protection Act of 1998 (12 USC 4901-4910) - automatic termination at 78% and borrower-requested cancellation at 80% of original value, with the amortization-midpoint requirement, by name; applies to borrower-paid PMI on conventional loans, not FHA MIP. CFPB consumer guidance free at consumerfinance.gov; uscode.house.gov for the statute. Estimate; the servicer governs.";
-  const value = makeNumber("Original property value ($)", "pmi-value", { step: "any", min: "0", value: "250000" }); value.input.value = "250000";
-  const loan = makeNumber("Original loan amount ($)", "pmi-loan", { step: "any", min: "0", value: "250000" }); loan.input.value = "250000";
-  const rate = makeNumber("Interest rate (% APR)", "pmi-rate", { step: "any", min: "0", value: "6.5" }); rate.input.value = "6.5";
-  const term = makeNumber("Term (months)", "pmi-term", { step: "1", min: "1", value: "360" }); term.input.value = "360";
+  const value = makeNumber("Original property value ($)", "pmi-value", { step: "any", min: "0" });
+  const loan = makeNumber("Original loan amount ($)", "pmi-loan", { step: "any", min: "0" });
+  const rate = makeNumber("Interest rate (% APR)", "pmi-rate", { step: "any", min: "0" });
+  const term = makeNumber("Term (months)", "pmi-term", { step: "1", min: "1" });
   for (const f of [value, loan, rate, term]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { value.input.value = "250000"; loan.input.value = "250000"; rate.input.value = "6.5"; term.input.value = "360"; update(); });
   const o80 = makeOutputLine(outputRegion, "80% LTV (request cancellation)", "pmi-out-80");
@@ -2673,14 +2673,14 @@ export function computeFixFlipProfit({ arv_usd = 0, purchase_usd = 0, rehab_usd 
 export const fixFlipProfitExample = { inputs: { arv_usd: 300000, purchase_usd: 180000, rehab_usd: 40000, holding_usd: 8000, financing_usd: 12000, selling_pct: 6, cash_invested_usd: 114000, hold_months: 6 } };
 function renderFixFlipProfit(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Fix-and-flip profit and return (real-estate investing practice): all-in = purchase + rehab + holding + financing + selling (selling = ARV x selling%), profit = ARV - all-in, margin = profit/ARV, cash ROI = profit/cash, annualized = ROI x 12/months. The ARV must come from real comparable sales and the rehab from a real scope. A screening aid; the actual deal governs.";
-  const arv = makeNumber("After-repair value ARV ($)", "ffp-arv", { step: "any", min: "0" }); arv.input.value = "300000";
-  const buy = makeNumber("Purchase price ($)", "ffp-buy", { step: "any", min: "0" }); buy.input.value = "180000";
-  const rehab = makeNumber("Rehab budget ($)", "ffp-rehab", { step: "any", min: "0" }); rehab.input.value = "40000";
-  const hold = makeNumber("Holding costs ($)", "ffp-hold", { step: "any", min: "0" }); hold.input.value = "8000";
-  const fin = makeNumber("Financing (points + interest, $)", "ffp-fin", { step: "any", min: "0" }); fin.input.value = "12000";
-  const sell = makeNumber("Selling cost (% of ARV)", "ffp-sell", { step: "any", min: "0" }); sell.input.value = "6";
-  const cash = makeNumber("Cash invested ($)", "ffp-cash", { step: "any", min: "0" }); cash.input.value = "114000";
-  const months = makeNumber("Hold period (months)", "ffp-mo", { step: "any", min: "0" }); months.input.value = "6";
+  const arv = makeNumber("After-repair value ARV ($)", "ffp-arv", { step: "any", min: "0" });
+  const buy = makeNumber("Purchase price ($)", "ffp-buy", { step: "any", min: "0" });
+  const rehab = makeNumber("Rehab budget ($)", "ffp-rehab", { step: "any", min: "0" });
+  const hold = makeNumber("Holding costs ($)", "ffp-hold", { step: "any", min: "0" });
+  const fin = makeNumber("Financing (points + interest, $)", "ffp-fin", { step: "any", min: "0" });
+  const sell = makeNumber("Selling cost (% of ARV)", "ffp-sell", { step: "any", min: "0" });
+  const cash = makeNumber("Cash invested ($)", "ffp-cash", { step: "any", min: "0" });
+  const months = makeNumber("Hold period (months)", "ffp-mo", { step: "any", min: "0" });
   for (const f of [arv, buy, rehab, hold, fin, sell, cash, months]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { arv.input.value = "300000"; buy.input.value = "180000"; rehab.input.value = "40000"; hold.input.value = "8000"; fin.input.value = "12000"; sell.input.value = "6"; cash.input.value = "114000"; months.input.value = "6"; update(); });
   const oProfit = makeOutputLine(outputRegion, "Net profit (margin)", "ffp-out-profit");
@@ -2725,11 +2725,11 @@ export function computeBrrrrRefi({ arv_usd = 0, total_invested_usd = 0, refi_ltv
 export const brrrrRefiExample = { inputs: { arv_usd: 200000, total_invested_usd: 140000, refi_ltv_pct: 75, existing_payoff_usd: 0, annual_cash_flow_usd: 0 } };
 function renderBrrrrRefi(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: BRRRR cash-out refinance (real-estate investing practice): new loan = ARV x refi LTV, cash returned = new loan - existing payoff, capital left = total invested - cash returned, post-refi cash-on-cash = annual cash flow / capital left (infinite when all capital is recovered). The appraised ARV and the lender's LTV/seasoning rules govern. A screening aid; the actual refinance terms govern.";
-  const arv = makeNumber("Appraised ARV ($)", "brr-arv", { step: "any", min: "0" }); arv.input.value = "200000";
-  const inv = makeNumber("Total invested ($)", "brr-inv", { step: "any", min: "0" }); inv.input.value = "140000";
-  const ltv = makeNumber("Refi LTV (%)", "brr-ltv", { step: "any", min: "0", max: "100" }); ltv.input.value = "75";
-  const payoff = makeNumber("Existing loan payoff ($, optional)", "brr-pay", { step: "any", min: "0" }); payoff.input.value = "0";
-  const cf = makeNumber("Annual cash flow after new payment ($, optional)", "brr-cf", { step: "any" }); cf.input.value = "0";
+  const arv = makeNumber("Appraised ARV ($)", "brr-arv", { step: "any", min: "0" });
+  const inv = makeNumber("Total invested ($)", "brr-inv", { step: "any", min: "0" });
+  const ltv = makeNumber("Refi LTV (%)", "brr-ltv", { step: "any", min: "0", max: "100" });
+  const payoff = makeNumber("Existing loan payoff ($, optional)", "brr-pay", { step: "any", min: "0" });
+  const cf = makeNumber("Annual cash flow after new payment ($, optional)", "brr-cf", { step: "any" });
   for (const f of [arv, inv, ltv, payoff, cf]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { arv.input.value = "200000"; inv.input.value = "140000"; ltv.input.value = "75"; payoff.input.value = "0"; cf.input.value = "0"; update(); });
   const oLoan = makeOutputLine(outputRegion, "New loan / cash returned", "brr-out-loan");
@@ -2768,11 +2768,11 @@ export function computeRentalTotalReturn({ cash_invested_usd = 0, annual_cash_fl
 export const rentalTotalReturnExample = { inputs: { cash_invested_usd: 50000, annual_cash_flow_usd: 3000, principal_paydown_usd: 2500, appreciation_usd: 7500, tax_savings_usd: 1500 } };
 function renderRentalTotalReturn(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Rental total return (real-estate investing practice): total = cash flow + principal paydown + appreciation + depreciation tax savings, each as a percent of cash invested. Cash-on-cash alone ignores equity buildup and the tax shield, understating the return. Appreciation is a projection. A screening aid; the actual results govern.";
-  const cash = makeNumber("Cash invested ($)", "rtr-cash", { step: "any", min: "0" }); cash.input.value = "50000";
-  const cf = makeNumber("Annual cash flow ($)", "rtr-cf", { step: "any" }); cf.input.value = "3000";
-  const pay = makeNumber("First-year principal paydown ($)", "rtr-pay", { step: "any", min: "0" }); pay.input.value = "2500";
-  const appr = makeNumber("First-year appreciation ($)", "rtr-appr", { step: "any" }); appr.input.value = "7500";
-  const tax = makeNumber("Depreciation tax savings ($)", "rtr-tax", { step: "any" }); tax.input.value = "1500";
+  const cash = makeNumber("Cash invested ($)", "rtr-cash", { step: "any", min: "0" });
+  const cf = makeNumber("Annual cash flow ($)", "rtr-cf", { step: "any" });
+  const pay = makeNumber("First-year principal paydown ($)", "rtr-pay", { step: "any", min: "0" });
+  const appr = makeNumber("First-year appreciation ($)", "rtr-appr", { step: "any" });
+  const tax = makeNumber("Depreciation tax savings ($)", "rtr-tax", { step: "any" });
   for (const f of [cash, cf, pay, appr, tax]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cash.input.value = "50000"; cf.input.value = "3000"; pay.input.value = "2500"; appr.input.value = "7500"; tax.input.value = "1500"; update(); });
   const oTotal = makeOutputLine(outputRegion, "Total first-year return", "rtr-out-total");
@@ -2815,10 +2815,10 @@ export function computeNetEffectiveRent({ face_rent = 0, term_periods = 0, free_
 export const netEffectiveRentExample = { inputs: { face_rent: 40, term_periods: 120, free_periods: 10, one_time_credit: 0 } };
 function renderNetEffectiveRent(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: net effective rent (straight-line concession spread; Appraisal Institute income approach / commercial-lease concession practice): paid = face x (term - free); NER = (paid - one-time credit) / term; discount = (1 - NER/face) x 100. A straight-line average, not a present-value effective rent. A comparison aid; the executed lease governs.";
-  const face = makeNumber("Face (base) rent ($/period, e.g. $/SF/yr)", "ner-face", { step: "any", min: "0" }); face.input.value = "40";
-  const term = makeNumber("Lease term (periods)", "ner-term", { step: "any", min: "0" }); term.input.value = "120";
-  const free = makeNumber("Free-rent periods", "ner-free", { step: "any", min: "0" }); free.input.value = "10";
-  const credit = makeNumber("One-time TI / concession credit ($, 0 = none)", "ner-credit", { step: "any", min: "0" }); credit.input.value = "0";
+  const face = makeNumber("Face (base) rent ($/period, e.g. $/SF/yr)", "ner-face", { step: "any", min: "0" });
+  const term = makeNumber("Lease term (periods)", "ner-term", { step: "any", min: "0" });
+  const free = makeNumber("Free-rent periods", "ner-free", { step: "any", min: "0" });
+  const credit = makeNumber("One-time TI / concession credit ($, 0 = none)", "ner-credit", { step: "any", min: "0" });
   for (const f of [face, term, free, credit]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { face.input.value = "40"; term.input.value = "120"; free.input.value = "10"; credit.input.value = "0"; update(); });
   const oNer = makeOutputLine(outputRegion, "Net effective rent", "ner-out-ner");
@@ -2862,10 +2862,10 @@ export function computeRequiredFaceRent({ target_ner = 0, term_periods = 0, free
 export const requiredFaceRentExample = { inputs: { target_ner: 30, term_periods: 120, free_periods: 20, one_time_credit: 0 } };
 function renderRequiredFaceRent(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: required face rent (inverse of the straight-line net-effective-rent spread; Appraisal Institute income approach / commercial-lease concession practice): face = (target_NER x term + one-time credit) / (term - free); discount = (1 - NER/face) x 100. A straight-line average, not a present-value effective rent. A pricing aid; the executed lease governs.";
-  const ner = makeNumber("Target net effective rent ($/period, e.g. $/SF/yr)", "rfr-ner", { step: "any", min: "0" }); ner.input.value = "30";
-  const term = makeNumber("Lease term (periods)", "rfr-term", { step: "any", min: "0" }); term.input.value = "120";
-  const free = makeNumber("Free-rent periods", "rfr-free", { step: "any", min: "0" }); free.input.value = "20";
-  const credit = makeNumber("One-time TI / concession credit ($, 0 = none)", "rfr-credit", { step: "any", min: "0" }); credit.input.value = "0";
+  const ner = makeNumber("Target net effective rent ($/period, e.g. $/SF/yr)", "rfr-ner", { step: "any", min: "0" });
+  const term = makeNumber("Lease term (periods)", "rfr-term", { step: "any", min: "0" });
+  const free = makeNumber("Free-rent periods", "rfr-free", { step: "any", min: "0" });
+  const credit = makeNumber("One-time TI / concession credit ($, 0 = none)", "rfr-credit", { step: "any", min: "0" });
   for (const f of [ner, term, free, credit]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ner.input.value = "30"; term.input.value = "120"; free.input.value = "20"; credit.input.value = "0"; update(); });
   const oFace = makeOutputLine(outputRegion, "Required face rent", "rfr-out-face");
@@ -2908,9 +2908,9 @@ export function computeCommercialLoadFactor({ usable_sf = 0, common_area_factor 
 export const commercialLoadFactorExample = { inputs: { usable_sf: 10000, common_area_factor: 0.15, base_rent: 30 } };
 function renderCommercialLoadFactor(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: BOMA rentable/usable load factor (ANSI/BOMA Z65.1 Office Standard): rentable = usable x (1 + common_area_factor); load_factor = rentable / usable; annual_rent = base_rent x rentable; cost_per_usable = base_rent x load_factor. Rent is per rentable SF, which includes common areas the tenant cannot occupy. A cost-comparison aid; the measured BOMA areas and the lease govern.";
-  const usable = makeNumber("Usable (occupiable) area (SF)", "clf-usable", { step: "any", min: "0" }); usable.input.value = "10000";
-  const caf = makeNumber("Common-area (add-on) factor (decimal, 0.15 = 15%)", "clf-caf", { step: "any", min: "0" }); caf.input.value = "0.15";
-  const rent = makeNumber("Quoted base rent ($/rentable SF/yr)", "clf-rent", { step: "any", min: "0" }); rent.input.value = "30";
+  const usable = makeNumber("Usable (occupiable) area (SF)", "clf-usable", { step: "any", min: "0" });
+  const caf = makeNumber("Common-area (add-on) factor (decimal, 0.15 = 15%)", "clf-caf", { step: "any", min: "0" });
+  const rent = makeNumber("Quoted base rent ($/rentable SF/yr)", "clf-rent", { step: "any", min: "0" });
   for (const f of [usable, caf, rent]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { usable.input.value = "10000"; caf.input.value = "0.15"; rent.input.value = "30"; update(); });
   const oRent = makeOutputLine(outputRegion, "Rentable area (load factor)", "clf-out-rent");
@@ -2954,10 +2954,10 @@ export function computeBlendedMortgageRate({ balance_1 = 0, rate_1 = 0, balance_
 export const blendedMortgageRateExample = { inputs: { balance_1: 300000, rate_1: 4, balance_2: 100000, rate_2: 8 } };
 function renderBlendedMortgageRate(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: blended mortgage rate (weighted-average cost of debt): blended = (bal1 x rate1 + bal2 x rate2) / (bal1 + bal2); monthly interest = (bal1 x rate1 + bal2 x rate2) / 1200. A balance-weighted snapshot that ignores differing terms and amortization; a variable second drifts. A comparison aid; the loan documents govern.";
-  const b1 = makeNumber("First loan balance ($)", "bmr-b1", { step: "any", min: "0" }); b1.input.value = "300000";
-  const r1 = makeNumber("First loan rate (%)", "bmr-r1", { step: "any", min: "0" }); r1.input.value = "4";
-  const b2 = makeNumber("Second loan balance ($, HELOC / seller 2nd)", "bmr-b2", { step: "any", min: "0" }); b2.input.value = "100000";
-  const r2 = makeNumber("Second loan rate (%)", "bmr-r2", { step: "any", min: "0" }); r2.input.value = "8";
+  const b1 = makeNumber("First loan balance ($)", "bmr-b1", { step: "any", min: "0" });
+  const r1 = makeNumber("First loan rate (%)", "bmr-r1", { step: "any", min: "0" });
+  const b2 = makeNumber("Second loan balance ($, HELOC / seller 2nd)", "bmr-b2", { step: "any", min: "0" });
+  const r2 = makeNumber("Second loan rate (%)", "bmr-r2", { step: "any", min: "0" });
   for (const f of [b1, r1, b2, r2]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { b1.input.value = "300000"; r1.input.value = "4"; b2.input.value = "100000"; r2.input.value = "8"; update(); });
   const oBlend = makeOutputLine(outputRegion, "Blended rate", "bmr-out-blend");
@@ -3001,9 +3001,9 @@ export function computeFloorAreaRatio({ building_floor_area_sf = 0, lot_area_sf 
 export const floorAreaRatioExample = { inputs: { building_floor_area_sf: 30000, lot_area_sf: 20000, far_limit: 2.0 } };
 function renderFloorAreaRatio(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: floor area ratio (municipal zoning intensity measure): FAR = gross building floor area / lot area; max buildable floor area = FAR_limit x lot area; remaining = max buildable - existing. What counts as floor area (parking, basements, mechanical) varies by municipality; enter the gross figure the local code defines. A screening aid; the zoning ordinance and planning authority govern.";
-  const bldg = makeNumber("Building gross floor area (SF)", "far-bldg", { step: "any", min: "0" }); bldg.input.value = "30000";
-  const lot = makeNumber("Lot area (SF)", "far-lot", { step: "any", min: "0" }); lot.input.value = "20000";
-  const limit = makeNumber("Zoning FAR limit (0 = skip the cap check)", "far-limit", { step: "any", min: "0" }); limit.input.value = "2.0";
+  const bldg = makeNumber("Building gross floor area (SF)", "far-bldg", { step: "any", min: "0" });
+  const lot = makeNumber("Lot area (SF)", "far-lot", { step: "any", min: "0" });
+  const limit = makeNumber("Zoning FAR limit (0 = skip the cap check)", "far-limit", { step: "any", min: "0" });
   for (const f of [bldg, lot, limit]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { bldg.input.value = "30000"; lot.input.value = "20000"; limit.input.value = "2.0"; update(); });
   const oFar = makeOutputLine(outputRegion, "Floor area ratio (FAR)", "far-out-far");

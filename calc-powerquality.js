@@ -207,18 +207,13 @@ export const motorVdStartingExample = { inputs: { source_voltage_V: 480, length_
 
 function renderMotorVdStarting(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Ohm's-law voltage-drop method (first principles); motor locked-rotor current per NEC Article 430 code-letter tables (user-supplied, or 6x FLA estimate); contactor pickup/dropout commonly ~85% nominal per NEMA ICS 2, by name. The AHJ governs. Distinct from the steady-state voltage-drop tile. Free read-only at nfpa.org/freeaccess.";
-  const v = makeNumber("Source voltage (V)", "mvds-v", { step: "any", min: "0", value: "480" });
-  v.input.value = "480";
+  const v = makeNumber("Source voltage (V)", "mvds-v", { step: "any", min: "0" });
   const phase = makeSelect("Phase", "mvds-phase", [{ value: "three", label: "3-phase", selected: true }, { value: "single", label: "1-phase" }]);
-  const len = makeNumber("One-way conductor length (ft)", "mvds-len", { step: "any", min: "0", value: "250" });
-  len.input.value = "250";
-  const cm = makeNumber("Conductor circular mils (cmils)", "mvds-cm", { step: "any", min: "0", value: "250000" });
-  cm.input.value = "250000";
-  const lrc = makeNumber("Locked-rotor current (A)", "mvds-lrc", { step: "any", min: "0", value: "180" });
-  lrc.input.value = "180";
+  const len = makeNumber("One-way conductor length (ft)", "mvds-len", { step: "any", min: "0" });
+  const cm = makeNumber("Conductor circular mils (cmils)", "mvds-cm", { step: "any", min: "0" });
+  const lrc = makeNumber("Locked-rotor current (A)", "mvds-lrc", { step: "any", min: "0" });
   const k = makeSelect("Conductor material (K)", "mvds-k", [{ value: "12.9", label: "Copper (K=12.9)", selected: true }, { value: "21.2", label: "Aluminum (K=21.2)" }]);
-  const limit = makeNumber("Dip limit (%)", "mvds-lim", { step: "any", min: "0", value: "15" });
-  limit.input.value = "15";
+  const limit = makeNumber("Dip limit (%)", "mvds-lim", { step: "any", min: "0" });
   for (const f of [v, phase, len, cm, lrc, k, limit]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
     v.input.value = "480"; phase.select.value = "three"; len.input.value = "250";
@@ -290,12 +285,9 @@ export const motorUnbalanceDerateExample = { inputs: { v_ab: 460, v_bc: 455, v_c
 
 function _v172renderMotorUnbalanceDerate(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEMA MG-1 motor derating for voltage unbalance, by name - unbalance = max deviation from the average voltage divided by the average; the derate factor is read off the MG-1 curve (1% -> ~0.98, 5% -> ~0.75). Above 5% the motor should not be operated. The manufacturer and MG-1 govern.";
-  const ab = makeNumber("Line voltage A-B (V)", "mu-ab", { step: "any", min: "0", value: "460" });
-  ab.input.value = "460";
-  const bc = makeNumber("Line voltage B-C (V)", "mu-bc", { step: "any", min: "0", value: "455" });
-  bc.input.value = "455";
-  const ca = makeNumber("Line voltage C-A (V)", "mu-ca", { step: "any", min: "0", value: "450" });
-  ca.input.value = "450";
+  const ab = makeNumber("Line voltage A-B (V)", "mu-ab", { step: "any", min: "0" });
+  const bc = makeNumber("Line voltage B-C (V)", "mu-bc", { step: "any", min: "0" });
+  const ca = makeNumber("Line voltage C-A (V)", "mu-ca", { step: "any", min: "0" });
   for (const f of [ab, bc, ca]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ab.input.value = "460"; bc.input.value = "455"; ca.input.value = "450"; update(); });
 
@@ -406,12 +398,9 @@ export const motorCapacitorMaxExample = { inputs: { v_ll: 480, i_noload_a: 8, sa
 
 function _v184renderMotorCapacitorMax(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEMA MG-1 / IEEE 18 - a motor-terminal capacitor must stay below the magnetizing (no-load) kVAR = sqrt(3) x V x I_no-load / 1000, with a safety margin (default 0.90), to avoid self-excitation overvoltage. The manufacturer's max-kVAR table governs.";
-  const v = makeNumber("Motor line-to-line voltage (V)", "mcm-v", { step: "any", min: "0", value: "480" });
-  v.input.value = "480";
-  const i = makeNumber("No-load (magnetizing) current (A)", "mcm-i", { step: "any", min: "0", value: "8" });
-  i.input.value = "8";
-  const sf = makeNumber("Safety factor (default 0.90)", "mcm-sf", { step: "any", min: "0", value: "0.90" });
-  sf.input.value = "0.90";
+  const v = makeNumber("Motor line-to-line voltage (V)", "mcm-v", { step: "any", min: "0" });
+  const i = makeNumber("No-load (magnetizing) current (A)", "mcm-i", { step: "any", min: "0" });
+  const sf = makeNumber("Safety factor (default 0.90)", "mcm-sf", { step: "any", min: "0" });
   for (const f of [v, i, sf]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { v.input.value = "480"; i.input.value = "8"; sf.input.value = "0.90"; update(); });
 
@@ -453,8 +442,8 @@ export function computeHarmonicResonance({ short_circuit_mva = 0, cap_bank_mvar 
 export const harmonicResonanceExample = { inputs: { short_circuit_mva: 200, cap_bank_mvar: 1.2 } };
 function _v523renderHarmonicResonance(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: parallel-resonance order of a PF capacitor bank (IEEE 519 / IEEE 1531 harmonic filter and resonance guidance): h_resonant = sqrt(MVA_sc / MVAR_cap); flagged when within 0.5 of the 5th/7th/11th/13th. A bigger bank lowers the order toward the strong low harmonics. A screening aid; a harmonic study governs.";
-  const sc = makeNumber("Short-circuit power at the bus (MVA)", "hr-sc", { step: "any", min: "0" }); sc.input.value = "200";
-  const cap = makeNumber("Power-factor capacitor bank (MVAR)", "hr-cap", { step: "any", min: "0" }); cap.input.value = "1.2";
+  const sc = makeNumber("Short-circuit power at the bus (MVA)", "hr-sc", { step: "any", min: "0" });
+  const cap = makeNumber("Power-factor capacitor bank (MVAR)", "hr-cap", { step: "any", min: "0" });
   for (const f of [sc, cap]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { sc.input.value = "200"; cap.input.value = "1.2"; update(); });
   const oH = makeOutputLine(outputRegion, "Resonant order", "hr-out-h");
@@ -493,8 +482,8 @@ export function computeCapacitorBankForResonanceOrder({ short_circuit_mva = 0, t
 export const capacitorBankForResonanceOrderExample = { inputs: { short_circuit_mva: 200, target_resonant_order: 4.7 } };
 function _v717renderCapacitorBankForResonanceOrder(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: parallel-resonance order of a PF capacitor bank (IEEE 519 / IEEE 1531) solved for the bank: MVAR_cap = MVA_sc / h_target^2, the largest bank that keeps the resonant order at or above the target (a bigger bank lowers the order toward the low harmonics). A screening aid; a harmonic study governs.";
-  const sc = makeNumber("Short-circuit power at the bus (MVA)", "cbr-sc", { step: "any", min: "0" }); sc.input.value = "200";
-  const h = makeNumber("Target min resonant order (e.g. 4.7 to stay below the 5th)", "cbr-h", { step: "any", min: "0" }); h.input.value = "4.7";
+  const sc = makeNumber("Short-circuit power at the bus (MVA)", "cbr-sc", { step: "any", min: "0" });
+  const h = makeNumber("Target min resonant order (e.g. 4.7 to stay below the 5th)", "cbr-h", { step: "any", min: "0" });
   for (const f of [sc, h]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { sc.input.value = "200"; h.input.value = "4.7"; update(); });
   const oM = makeOutputLine(outputRegion, "Max capacitor bank", "cbr-out-m");
@@ -532,9 +521,9 @@ export function computeTddIeee519({ isc_a = 0, il_a = 0, measured_tdd_pct = 0 } 
 export const tddIeee519Example = { inputs: { isc_a: 10000, il_a: 400, measured_tdd_pct: 6 } };
 function _v524renderTddIeee519(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: IEEE 519-2022 Table 1 current-distortion limits (TDD at the PCC): ratio = Isc/IL; limit = 5% (ratio < 20) / 8% (20-50) / 12% (50-100) / 15% (100-1000) / 20% (> 1000); pass if measured TDD <= limit. The limit is on total demand distortion, not THD, and loosens with a stiffer supply. A screening aid; the utility agreement and a measurement study govern.";
-  const isc = makeNumber("Short-circuit current at the PCC (A)", "tdd-isc", { step: "any", min: "0" }); isc.input.value = "10000";
-  const il = makeNumber("Maximum demand load current (A)", "tdd-il", { step: "any", min: "0" }); il.input.value = "400";
-  const tdd = makeNumber("Measured TDD (%)", "tdd-tdd", { step: "any", min: "0" }); tdd.input.value = "6";
+  const isc = makeNumber("Short-circuit current at the PCC (A)", "tdd-isc", { step: "any", min: "0" });
+  const il = makeNumber("Maximum demand load current (A)", "tdd-il", { step: "any", min: "0" });
+  const tdd = makeNumber("Measured TDD (%)", "tdd-tdd", { step: "any", min: "0" });
   for (const f of [isc, il, tdd]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { isc.input.value = "10000"; il.input.value = "400"; tdd.input.value = "6"; update(); });
   const oRatio = makeOutputLine(outputRegion, "Short-circuit ratio Isc/IL", "tdd-out-ratio");
@@ -592,14 +581,10 @@ export const rlcReactanceResonanceExample = { inputs: { frequency_hz: 60, resist
 
 function _v955renderRlcReactanceResonance(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: series R-L-C reactance / impedance / resonance relations, by name. XL = 2 pi f L; XC = 1/(2 pi f C); Z = sqrt(R^2 + (XL - XC)^2); PF = R/Z; resonant f0 = 1/(2 pi sqrt(L C)). Single-frequency lumped-element steady state; a harmonic/transient study governs a power-system resonance.";
-  const fr = makeNumber("Frequency (Hz)", "rlc-fr", { step: "any", min: "0", value: "60" });
-  fr.input.value = "60";
-  const rr = makeNumber("Resistance R (ohms)", "rlc-rr", { step: "any", min: "0", value: "10" });
-  rr.input.value = "10";
-  const ll = makeNumber("Inductance L (H)", "rlc-ll", { step: "any", min: "0", value: "0.05" });
-  ll.input.value = "0.05";
-  const cc = makeNumber("Capacitance C (uF)", "rlc-cc", { step: "any", min: "0", value: "50" });
-  cc.input.value = "50";
+  const fr = makeNumber("Frequency (Hz)", "rlc-fr", { step: "any", min: "0" });
+  const rr = makeNumber("Resistance R (ohms)", "rlc-rr", { step: "any", min: "0" });
+  const ll = makeNumber("Inductance L (H)", "rlc-ll", { step: "any", min: "0" });
+  const cc = makeNumber("Capacitance C (uF)", "rlc-cc", { step: "any", min: "0" });
   for (const f of [fr, rr, ll, cc]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { fr.input.value = "60"; rr.input.value = "10"; ll.input.value = "0.05"; cc.input.value = "50"; update(); });
   const oX = makeOutputLine(outputRegion, "XL / XC", "rlc-out-x");

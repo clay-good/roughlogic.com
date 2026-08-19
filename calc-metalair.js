@@ -210,8 +210,7 @@ function _renderDuctStaticTotal(inputRegion, outputRegion, citationEl) {
   const DEFAULT = "filter,0.10\nsupply registers,0.03\nreturn grille,0.03\nwet coil,0.30\nsupply duct,0.10\nreturn duct,0.08";
   const list = makeTextarea("Components: label,drop(in. w.c.) per line", "ds-list", { rows: "6" });
   list.input.value = DEFAULT;
-  const rated = makeNumber("Blower rated ESP (in. w.c.)", "ds-rated", { step: "any", min: "0", value: "0.50" });
-  rated.input.value = "0.50";
+  const rated = makeNumber("Blower rated ESP (in. w.c.)", "ds-rated", { step: "any", min: "0" });
   inputRegion.appendChild(list.wrap);
   inputRegion.appendChild(rated.wrap);
   attachExampleButton(inputRegion, () => { list.input.value = DEFAULT; rated.input.value = "0.50"; update(); });
@@ -314,12 +313,9 @@ export const ductTransitionLengthExample = { inputs: { large_dim_in: 20, small_d
 
 function _renderDuctTransitionLength(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: duct transition length by name. concentric length = ((large - small)/2) / tan(slope); eccentric length = (large - small) / tan(slope). SMACNA keeps the slope near 15 degrees per side (~4:1) to limit turbulence; the SMACNA standards and the pressure loss govern.";
-  const lg = makeNumber("Large end dimension (in)", "dtl-lg", { step: "any", min: "0", value: "20" });
-  lg.input.value = "20";
-  const sm = makeNumber("Small end dimension (in)", "dtl-sm", { step: "any", min: "0", value: "12" });
-  sm.input.value = "12";
-  const sl = makeNumber("Transition slope (deg per side)", "dtl-sl", { step: "any", min: "0", value: "15" });
-  sl.input.value = "15";
+  const lg = makeNumber("Large end dimension (in)", "dtl-lg", { step: "any", min: "0" });
+  const sm = makeNumber("Small end dimension (in)", "dtl-sm", { step: "any", min: "0" });
+  const sl = makeNumber("Transition slope (deg per side)", "dtl-sl", { step: "any", min: "0" });
   for (const f of [lg, sm, sl]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { lg.input.value = "20"; sm.input.value = "12"; sl.input.value = "15"; update(); });
   const oConc = makeOutputLine(outputRegion, "Concentric length", "dtl-out-c");
@@ -364,12 +360,9 @@ export const ductStaticRegainExample = { inputs: { upstream_velocity_fpm: 2000, 
 
 function _v960renderDuctStaticRegain(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: duct static-regain method, by name (SMACNA / ASHRAE Fundamentals). VP = (V/4005)^2 in w.c. (standard air); static regain = R x (VP_upstream - VP_downstream), recovery factor R ~ 0.75 (0.5-0.9). The 4005 constant assumes standard air (altitude/temperature shift it); the fitting quality sets R, and SMACNA/ASHRAE and the engineer govern.";
-  const uv = makeNumber("Upstream velocity (fpm)", "dsr-uv", { step: "any", min: "0", value: "2000" });
-  uv.input.value = "2000";
-  const dv = makeNumber("Downstream velocity (fpm)", "dsr-dv", { step: "any", min: "0", value: "1500" });
-  dv.input.value = "1500";
-  const rf = makeNumber("Recovery factor (0-1, ~0.75)", "dsr-rf", { step: "any", min: "0", value: "0.75" });
-  rf.input.value = "0.75";
+  const uv = makeNumber("Upstream velocity (fpm)", "dsr-uv", { step: "any", min: "0" });
+  const dv = makeNumber("Downstream velocity (fpm)", "dsr-dv", { step: "any", min: "0" });
+  const rf = makeNumber("Recovery factor (0-1, ~0.75)", "dsr-rf", { step: "any", min: "0" });
   for (const f of [uv, dv, rf]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { uv.input.value = "2000"; dv.input.value = "1500"; rf.input.value = "0.75"; update(); });
   const oR = makeOutputLine(outputRegion, "Static regain", "dsr-out-r");

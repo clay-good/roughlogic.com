@@ -128,11 +128,11 @@ export function computeWirelessFspl({ distance_km = 0, frequency_mhz = 0, tx_pow
 export const wirelessFsplExample = { inputs: { distance_km: 1, frequency_mhz: 2400, tx_power_dbm: 20, tx_gain_dbi: 12, rx_gain_dbi: 12 } };
 function _renderWirelessFspl(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: free-space path loss FSPL(dB) = 32.44 + 20 log10(d_km) + 20 log10(f_MHz) and received power Pr = Pt + Gt + Gr - FSPL, from the Friis transmission equation / ITU-R P.525 (free); the 32.44 constant is for km and MHz. Ideal free space only - cable/connector loss, rain and atmospheric attenuation, obstruction/Fresnel diffraction, and multipath are separate; a real link carries a fade margin over this. The path survey and radio spec govern.";
-  const d = makeNumber("Link distance (km)", "fspl-d", { step: "any", min: "0", value: "1" }); d.input.value = "1";
-  const f = makeNumber("Frequency (MHz)", "fspl-f", { step: "any", min: "0", value: "2400" }); f.input.value = "2400";
-  const pt = makeNumber("Transmit power (dBm)", "fspl-pt", { step: "any", value: "20" }); pt.input.value = "20";
-  const gt = makeNumber("Transmit antenna gain (dBi)", "fspl-gt", { step: "any", value: "12" }); gt.input.value = "12";
-  const gr = makeNumber("Receive antenna gain (dBi)", "fspl-gr", { step: "any", value: "12" }); gr.input.value = "12";
+  const d = makeNumber("Link distance (km)", "fspl-d", { step: "any", min: "0" });
+  const f = makeNumber("Frequency (MHz)", "fspl-f", { step: "any", min: "0" });
+  const pt = makeNumber("Transmit power (dBm)", "fspl-pt", { step: "any" });
+  const gt = makeNumber("Transmit antenna gain (dBi)", "fspl-gt", { step: "any" });
+  const gr = makeNumber("Receive antenna gain (dBi)", "fspl-gr", { step: "any" });
   for (const fld of [d, f, pt, gt, gr]) inputRegion.appendChild(fld.wrap);
   attachExampleButton(inputRegion, () => { d.input.value = "1"; f.input.value = "2400"; pt.input.value = "20"; gt.input.value = "12"; gr.input.value = "12"; update(); });
   const oFspl = makeOutputLine(outputRegion, "Free-space path loss", "fspl-out-l");
@@ -179,10 +179,10 @@ export function computeFresnelZoneClearance({ frequency_ghz = 0, d1_km = 0, d2_k
 export const fresnelZoneClearanceExample = { inputs: { frequency_ghz: 2.4, d1_km: 2.5, d2_km: 2.5, zone_number: 1 } };
 function _renderFresnelZoneClearance(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Fresnel zone radius r_n = 17.32 sqrt(n d1 d2 / (f_GHz D)) (d1, d2, D in km; 17.32 = sqrt(300) from r_n = sqrt(n lambda d1 d2 / D)) and the 60%-of-first-zone line-of-sight clearance rule, per ITU-R P.526 / first-principles diffraction. Earth curvature and antenna height are added to the clearance budget separately. A planning geometry; the path survey governs.";
-  const f = makeNumber("Frequency (GHz)", "frz-f", { step: "any", min: "0", value: "2.4" }); f.input.value = "2.4";
-  const d1 = makeNumber("Distance end 1 to obstruction (km)", "frz-d1", { step: "any", min: "0", value: "2.5" }); d1.input.value = "2.5";
-  const d2 = makeNumber("Distance end 2 to obstruction (km)", "frz-d2", { step: "any", min: "0", value: "2.5" }); d2.input.value = "2.5";
-  const n = makeNumber("Zone number (1 = first)", "frz-n", { step: "1", min: "1", value: "1" }); n.input.value = "1";
+  const f = makeNumber("Frequency (GHz)", "frz-f", { step: "any", min: "0" });
+  const d1 = makeNumber("Distance end 1 to obstruction (km)", "frz-d1", { step: "any", min: "0" });
+  const d2 = makeNumber("Distance end 2 to obstruction (km)", "frz-d2", { step: "any", min: "0" });
+  const n = makeNumber("Zone number (1 = first)", "frz-n", { step: "1", min: "1" });
   for (const fld of [f, d1, d2, n]) inputRegion.appendChild(fld.wrap);
   attachExampleButton(inputRegion, () => { f.input.value = "2.4"; d1.input.value = "2.5"; d2.input.value = "2.5"; n.input.value = "1"; update(); });
   const oR = makeOutputLine(outputRegion, "Fresnel zone radius", "frz-out-r");
@@ -229,14 +229,14 @@ export function computeWirelessLinkBudget({ tx_power_dbm = 20, tx_gain_dbi = 0, 
 export const wirelessLinkBudgetExample = { inputs: { tx_power_dbm: 20, tx_gain_dbi: 12, tx_cable_loss_db: 1, distance_km: 1, frequency_mhz: 2400, rx_gain_dbi: 12, rx_cable_loss_db: 1, rx_sensitivity_dbm: -80 } };
 function _renderWirelessLinkBudget(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: wireless link budget - EIRP = Pt + Gt - Lcable(tx); Prx = EIRP - FSPL + Gr - Lcable(rx); fade margin = Prx - Rx sensitivity; FSPL = 32.44 + 20 log10(d_km) + 20 log10(f_MHz) (Friis / ITU-R P.525). Aim for >= 10 dB fade margin (20+ for carrier-class). Free space only - rain/atmospheric attenuation, obstruction/Fresnel diffraction, and interference are separate. The path survey and a commissioning test govern.";
-  const pt = makeNumber("Transmit power (dBm)", "wlb-pt", { step: "any", value: "20" }); pt.input.value = "20";
-  const gt = makeNumber("Transmit antenna gain (dBi)", "wlb-gt", { step: "any", value: "12" }); gt.input.value = "12";
-  const ltx = makeNumber("Transmit cable/connector loss (dB)", "wlb-ltx", { step: "any", min: "0", value: "1" }); ltx.input.value = "1";
-  const d = makeNumber("Link distance (km)", "wlb-d", { step: "any", min: "0", value: "1" }); d.input.value = "1";
-  const f = makeNumber("Frequency (MHz)", "wlb-f", { step: "any", min: "0", value: "2400" }); f.input.value = "2400";
-  const gr = makeNumber("Receive antenna gain (dBi)", "wlb-gr", { step: "any", value: "12" }); gr.input.value = "12";
-  const lrx = makeNumber("Receive cable/connector loss (dB)", "wlb-lrx", { step: "any", min: "0", value: "1" }); lrx.input.value = "1";
-  const sens = makeNumber("Receiver sensitivity (dBm)", "wlb-sens", { step: "any", value: "-80" }); sens.input.value = "-80";
+  const pt = makeNumber("Transmit power (dBm)", "wlb-pt", { step: "any" });
+  const gt = makeNumber("Transmit antenna gain (dBi)", "wlb-gt", { step: "any" });
+  const ltx = makeNumber("Transmit cable/connector loss (dB)", "wlb-ltx", { step: "any", min: "0" });
+  const d = makeNumber("Link distance (km)", "wlb-d", { step: "any", min: "0" });
+  const f = makeNumber("Frequency (MHz)", "wlb-f", { step: "any", min: "0" });
+  const gr = makeNumber("Receive antenna gain (dBi)", "wlb-gr", { step: "any" });
+  const lrx = makeNumber("Receive cable/connector loss (dB)", "wlb-lrx", { step: "any", min: "0" });
+  const sens = makeNumber("Receiver sensitivity (dBm)", "wlb-sens", { step: "any" });
   for (const fld of [pt, gt, ltx, d, f, gr, lrx, sens]) inputRegion.appendChild(fld.wrap);
   attachExampleButton(inputRegion, () => { pt.input.value = "20"; gt.input.value = "12"; ltx.input.value = "1"; d.input.value = "1"; f.input.value = "2400"; gr.input.value = "12"; lrx.input.value = "1"; sens.input.value = "-80"; update(); });
   const oEirp = makeOutputLine(outputRegion, "EIRP / path loss", "wlb-out-eirp");
@@ -774,10 +774,10 @@ export function computeCameraLensFov({ sensor_width_mm = 0, focal_length_mm = 0,
 export const cameraLensFovExample = { inputs: { sensor_width_mm: 5.37, focal_length_mm: 4, distance_ft: 30, h_pixels: 1920 } };
 function _renderCameraLensFov(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Camera FOV and pixel density (IEC 62676-4 DORI): FOV = 2 atan(sensor/(2 focal)); scene = distance x sensor/focal; ppf = pixels/scene. DORI bands Detect 8 / Observe 19 / Recognize 38 / Identify 76 ppf. A design aid; verify against the lens chart and a live view.";
-  const sw = makeNumber("Sensor width (mm, e.g. 1/2.7in = 5.37)", "clf-sw", { step: "any", min: "0" }); sw.input.value = "5.37";
-  const fl = makeNumber("Focal length (mm)", "clf-fl", { step: "any", min: "0" }); fl.input.value = "4";
-  const di = makeNumber("Target distance (ft)", "clf-di", { step: "any", min: "0" }); di.input.value = "30";
-  const px = makeNumber("Horizontal resolution (pixels)", "clf-px", { step: "1", min: "0" }); px.input.value = "1920";
+  const sw = makeNumber("Sensor width (mm, e.g. 1/2.7in = 5.37)", "clf-sw", { step: "any", min: "0" });
+  const fl = makeNumber("Focal length (mm)", "clf-fl", { step: "any", min: "0" });
+  const di = makeNumber("Target distance (ft)", "clf-di", { step: "any", min: "0" });
+  const px = makeNumber("Horizontal resolution (pixels)", "clf-px", { step: "1", min: "0" });
   for (const f of [sw, fl, di, px]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { sw.input.value = "5.37"; fl.input.value = "4"; di.input.value = "30"; px.input.value = "1920"; update(); });
   const oFov = makeOutputLine(outputRegion, "Horizontal FOV / scene width", "clf-out-fov");
@@ -822,10 +822,10 @@ export function computeCameraMaxDistanceForPpf({ sensor_width_mm = 0, focal_leng
 export const cameraMaxDistanceForPpfExample = { inputs: { sensor_width_mm: 5.37, focal_length_mm: 4, h_pixels: 1920, target_ppf: 76 } };
 function _renderCameraMaxDistanceForPpf(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Camera pixel density (IEC 62676-4 DORI): ppf = px x focal / (distance x sensor), solved for the distance: distance_max = px x focal / (target ppf x sensor). DORI bands Detect 8 / Observe 19 / Recognize 38 / Identify 76 ppf. A design aid; verify against the lens chart and a live view.";
-  const sw = makeNumber("Sensor width (mm, e.g. 1/2.7in = 5.37)", "cmd-sw", { step: "any", min: "0" }); sw.input.value = "5.37";
-  const fl = makeNumber("Focal length (mm)", "cmd-fl", { step: "any", min: "0" }); fl.input.value = "4";
-  const px = makeNumber("Horizontal resolution (pixels)", "cmd-px", { step: "1", min: "0" }); px.input.value = "1920";
-  const tp = makeNumber("Target pixel density (ppf, 76 = Identify)", "cmd-tp", { step: "any", min: "0" }); tp.input.value = "76";
+  const sw = makeNumber("Sensor width (mm, e.g. 1/2.7in = 5.37)", "cmd-sw", { step: "any", min: "0" });
+  const fl = makeNumber("Focal length (mm)", "cmd-fl", { step: "any", min: "0" });
+  const px = makeNumber("Horizontal resolution (pixels)", "cmd-px", { step: "1", min: "0" });
+  const tp = makeNumber("Target pixel density (ppf, 76 = Identify)", "cmd-tp", { step: "any", min: "0" });
   for (const f of [sw, fl, px, tp]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { sw.input.value = "5.37"; fl.input.value = "4"; px.input.value = "1920"; tp.input.value = "76"; update(); });
   const oDist = makeOutputLine(outputRegion, "Max distance for that density", "cmd-out-dist");
@@ -866,10 +866,10 @@ export function computeCeilingSpeakerCoverage({ ceiling_ft = 0, ear_ft = 0, cove
 export const ceilingSpeakerCoverageExample = { inputs: { ceiling_ft: 10, ear_ft: 4, coverage_deg: 90, room_area_ft2: 1200, layout: "edge_to_edge" } };
 function _renderCeilingSpeakerCoverage(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Ceiling speaker coverage: diameter = 2 x (ceiling - ear) x tan(angle/2); spacing = diameter (edge-to-edge) or 0.7 x diameter (minimum overlap, -6 dB); count = ceil(area / spacing^2). A layout aid; verify with the speaker's coverage angle at the design frequency and the target SPL.";
-  const ch = makeNumber("Ceiling height (ft)", "csc-ch", { step: "any", min: "0" }); ch.input.value = "10";
-  const ea = makeNumber("Listener ear height (ft, seated ~4)", "csc-ea", { step: "any", min: "0" }); ea.input.value = "4";
-  const co = makeNumber("Speaker coverage angle (deg, ~90)", "csc-co", { step: "any", min: "0" }); co.input.value = "90";
-  const ar = makeNumber("Room area (ft²)", "csc-ar", { step: "any", min: "0" }); ar.input.value = "1200";
+  const ch = makeNumber("Ceiling height (ft)", "csc-ch", { step: "any", min: "0" });
+  const ea = makeNumber("Listener ear height (ft, seated ~4)", "csc-ea", { step: "any", min: "0" });
+  const co = makeNumber("Speaker coverage angle (deg, ~90)", "csc-co", { step: "any", min: "0" });
+  const ar = makeNumber("Room area (ft²)", "csc-ar", { step: "any", min: "0" });
   const ly = makeSelect("Layout", "csc-ly", [
     { value: "edge_to_edge", label: "Edge-to-edge (minimum count)", selected: true }, { value: "minimum_overlap", label: "Minimum overlap (even coverage)" },
   ]);
@@ -916,9 +916,9 @@ export function computeCeilingSpeakerCoverageAngle({ ceiling_ft = 0, ear_ft = 0,
 export const ceilingSpeakerCoverageAngleExample = { inputs: { ceiling_ft: 10, ear_ft: 4, target_diameter_ft: 8 } };
 function _renderCeilingSpeakerCoverageAngle(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Ceiling speaker coverage: diameter = 2 x (ceiling - ear) x tan(angle/2), solved for the angle: coverage angle = 2 x atan( diameter / (2 x (ceiling - ear)) ). A layout aid; verify with the speaker's coverage angle at the design frequency and the target SPL.";
-  const ch = makeNumber("Ceiling height (ft)", "csa-ch", { step: "any", min: "0" }); ch.input.value = "10";
-  const ea = makeNumber("Listener ear height (ft, seated ~4)", "csa-ea", { step: "any", min: "0" }); ea.input.value = "4";
-  const dia = makeNumber("Target coverage diameter / spacing (ft)", "csa-dia", { step: "any", min: "0" }); dia.input.value = "8";
+  const ch = makeNumber("Ceiling height (ft)", "csa-ch", { step: "any", min: "0" });
+  const ea = makeNumber("Listener ear height (ft, seated ~4)", "csa-ea", { step: "any", min: "0" });
+  const dia = makeNumber("Target coverage diameter / spacing (ft)", "csa-dia", { step: "any", min: "0" });
   for (const f of [ch, ea, dia]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ch.input.value = "10"; ea.input.value = "4"; dia.input.value = "8"; update(); });
   const oAngle = makeOutputLine(outputRegion, "Required coverage angle", "csa-out-angle");
@@ -956,10 +956,10 @@ export function computeStructuredCablingChannel({ permanent_link_m = 0, cords_m 
 export const structuredCablingChannelExample = { inputs: { permanent_link_m: 85, cords_m: 8, temp_c: 20, derate_per_c: 0.004 } };
 function _renderStructuredCablingChannel(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Structured cabling channel (TIA-568): 100 m total = 90 m permanent link + up to 10 m cords; above 20 deg C the max permanent link de-rates ~0.4%/deg C (UTP). Passes if the link is within its de-rated max and the channel is within 100 m. A design aid; the cable's published de-rating and the adopted TIA-568 edition govern.";
-  const pl = makeNumber("Permanent-link length (m)", "scc-pl", { step: "any", min: "0" }); pl.input.value = "85";
-  const cd = makeNumber("Total patch + equipment cords (m)", "scc-cd", { step: "any", min: "0" }); cd.input.value = "8";
-  const tc = makeNumber("Installed cable temperature (°C)", "scc-tc", { step: "any" }); tc.input.value = "20";
-  const dr = makeNumber("De-rate per °C above 20 (0.004 UTP)", "scc-dr", { step: "any", min: "0" }); dr.input.value = "0.004";
+  const pl = makeNumber("Permanent-link length (m)", "scc-pl", { step: "any", min: "0" });
+  const cd = makeNumber("Total patch + equipment cords (m)", "scc-cd", { step: "any", min: "0" });
+  const tc = makeNumber("Installed cable temperature (°C)", "scc-tc", { step: "any" });
+  const dr = makeNumber("De-rate per °C above 20 (0.004 UTP)", "scc-dr", { step: "any", min: "0" });
   for (const f of [pl, cd, tc, dr]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { pl.input.value = "85"; cd.input.value = "8"; tc.input.value = "20"; dr.input.value = "0.004"; update(); });
   const oPl = makeOutputLine(outputRegion, "Permanent link vs de-rated max", "scc-out-pl");
@@ -998,14 +998,10 @@ export const lvCablePullFootageExample = { inputs: { drops: 48, avg_run_ft: 120,
 
 function _v855renderLvCablePullFootage(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: footage takeoff identity by name. total = drops x (average run + slack); boxes = ceil(total / box length). The slack covers service loops and rack dressing; each run is length-limited by structured-cabling-channel.";
-  const d = makeNumber("Number of cable drops", "lvf-d", { step: "any", min: "0", value: "48" });
-  d.input.value = "48";
-  const ar = makeNumber("Average run length (ft)", "lvf-ar", { step: "any", min: "0", value: "120" });
-  ar.input.value = "120";
-  const sl = makeNumber("Service-loop / dressing slack per drop (ft)", "lvf-sl", { step: "any", min: "0", value: "15" });
-  sl.input.value = "15";
-  const bx = makeNumber("Cable box / spool length (ft)", "lvf-bx", { step: "any", min: "0", value: "1000" });
-  bx.input.value = "1000";
+  const d = makeNumber("Number of cable drops", "lvf-d", { step: "any", min: "0" });
+  const ar = makeNumber("Average run length (ft)", "lvf-ar", { step: "any", min: "0" });
+  const sl = makeNumber("Service-loop / dressing slack per drop (ft)", "lvf-sl", { step: "any", min: "0" });
+  const bx = makeNumber("Cable box / spool length (ft)", "lvf-bx", { step: "any", min: "0" });
   for (const f of [d, ar, sl, bx]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { d.input.value = "48"; ar.input.value = "120"; sl.input.value = "15"; bx.input.value = "1000"; update(); });
   const oTotal = makeOutputLine(outputRegion, "Total cable footage", "lvf-out-total");
@@ -1048,16 +1044,11 @@ export const cableSupportJhookExample = { inputs: { run_ft: 400, spacing_ft: 4, 
 
 function _v890renderCableSupportJhook(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: support identity by name. hooks = ceil(run / spacing); load per hook = cables x weight per foot x spacing. TIA-569 non-continuous support runs about 4 to 5 ft on center.";
-  const rn = makeNumber("Pathway length (ft)", "jhk-rn", { step: "any", min: "0", value: "400" });
-  rn.input.value = "400";
-  const sp = makeNumber("Hook spacing (ft)", "jhk-sp", { step: "any", min: "0", value: "4" });
-  sp.input.value = "4";
-  const nc = makeNumber("Cables in the bundle", "jhk-nc", { step: "any", min: "0", value: "50" });
-  nc.input.value = "50";
-  const cw = makeNumber("Weight per cable (lb/ft)", "jhk-cw", { step: "any", min: "0", value: "0.035" });
-  cw.input.value = "0.035";
-  const hw = makeNumber("Hook safe working load (lb, 0 = skip)", "jhk-hw", { step: "any", min: "0", value: "0" });
-  hw.input.value = "0";
+  const rn = makeNumber("Pathway length (ft)", "jhk-rn", { step: "any", min: "0" });
+  const sp = makeNumber("Hook spacing (ft)", "jhk-sp", { step: "any", min: "0" });
+  const nc = makeNumber("Cables in the bundle", "jhk-nc", { step: "any", min: "0" });
+  const cw = makeNumber("Weight per cable (lb/ft)", "jhk-cw", { step: "any", min: "0" });
+  const hw = makeNumber("Hook safe working load (lb, 0 = skip)", "jhk-hw", { step: "any", min: "0" });
   for (const f of [rn, sp, nc, cw, hw]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { rn.input.value = "400"; sp.input.value = "4"; nc.input.value = "50"; cw.input.value = "0.035"; hw.input.value = "0"; update(); });
   const oHooks = makeOutputLine(outputRegion, "J-hooks / bridle rings", "jhk-out-hooks");
@@ -1104,18 +1095,12 @@ export const accessControlPowerSupplyExample = { inputs: { lock_count: 4, lock_c
 
 function _v929renderAccessControlPowerSupply(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: access-control power / standby-battery sizing by name (NFPA 72 / UL 294). total load = locks x hold + readers + REX + controller; supply >= 1.25 x load; battery Ah = load x standby hours x 1.25 (aging). Fail-safe maglocks draw continuously; the listed panel, the AHJ, and the door hardware govern.";
-  const lc = makeNumber("Maglock count", "acp-lc", { step: "1", min: "0", value: "4" });
-  lc.input.value = "4";
-  const li = makeNumber("Per-lock hold current (A)", "acp-li", { step: "any", min: "0", value: "0.5" });
-  li.input.value = "0.5";
-  const rc = makeNumber("Reader count", "acp-rc", { step: "1", min: "0", value: "2" });
-  rc.input.value = "2";
-  const ri = makeNumber("Per-reader current (A)", "acp-ri", { step: "any", min: "0", value: "0.15" });
-  ri.input.value = "0.15";
-  const ol = makeNumber("Other load: REX + controller (A)", "acp-ol", { step: "any", min: "0", value: "0.225" });
-  ol.input.value = "0.225";
-  const sh = makeNumber("Standby time (hr)", "acp-sh", { step: "any", min: "0", value: "4" });
-  sh.input.value = "4";
+  const lc = makeNumber("Maglock count", "acp-lc", { step: "1", min: "0" });
+  const li = makeNumber("Per-lock hold current (A)", "acp-li", { step: "any", min: "0" });
+  const rc = makeNumber("Reader count", "acp-rc", { step: "1", min: "0" });
+  const ri = makeNumber("Per-reader current (A)", "acp-ri", { step: "any", min: "0" });
+  const ol = makeNumber("Other load: REX + controller (A)", "acp-ol", { step: "any", min: "0" });
+  const sh = makeNumber("Standby time (hr)", "acp-sh", { step: "any", min: "0" });
   for (const f of [lc, li, rc, ri, ol, sh]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { lc.input.value = "4"; li.input.value = "0.5"; rc.input.value = "2"; ri.input.value = "0.15"; ol.input.value = "0.225"; sh.input.value = "4"; update(); });
   const oLoad = makeOutputLine(outputRegion, "Total load", "acp-out-load");
@@ -1168,16 +1153,11 @@ export const fireAlarmNacVoltageDropExample = { inputs: { nominal_voltage_v: 24,
 
 function _v937renderFireAlarmNacVoltageDrop(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: fire-alarm NAC end-of-line voltage drop by name (NFPA 72). CUSTV = 0.85 x nominal; loop R = 2 x length x (ohm/1000 ft)/1000 (Class B out-and-back, NEC Ch 9 Table 8); V_EOL = CUSTV - I x loop R, must be >= the device's listed minimum. The panel voltage, appliance draws, and the wire table govern.";
-  const nv = makeNumber("Panel nominal voltage (V)", "nac-nv", { step: "any", min: "0", value: "24" });
-  nv.input.value = "24";
-  const ic = makeNumber("Total appliance current at EOL (A)", "nac-ic", { step: "any", min: "0", value: "0.8" });
-  ic.input.value = "0.8";
-  const rl = makeNumber("Run length (ft, one way)", "nac-rl", { step: "any", min: "0", value: "250" });
-  rl.input.value = "250";
-  const rr = makeNumber("Conductor resistance (ohm/1000 ft)", "nac-rr", { step: "any", min: "0", value: "2.525" });
-  rr.input.value = "2.525";
-  const dm = makeNumber("Device minimum voltage (V)", "nac-dm", { step: "any", min: "0", value: "16" });
-  dm.input.value = "16";
+  const nv = makeNumber("Panel nominal voltage (V)", "nac-nv", { step: "any", min: "0" });
+  const ic = makeNumber("Total appliance current at EOL (A)", "nac-ic", { step: "any", min: "0" });
+  const rl = makeNumber("Run length (ft, one way)", "nac-rl", { step: "any", min: "0" });
+  const rr = makeNumber("Conductor resistance (ohm/1000 ft)", "nac-rr", { step: "any", min: "0" });
+  const dm = makeNumber("Device minimum voltage (V)", "nac-dm", { step: "any", min: "0" });
   for (const f of [nv, ic, rl, rr, dm]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { nv.input.value = "24"; ic.input.value = "0.8"; rl.input.value = "250"; rr.input.value = "2.525"; dm.input.value = "16"; update(); });
   const oV = makeOutputLine(outputRegion, "Verdict", "nac-out-v");
@@ -1228,12 +1208,9 @@ export const loopSignalScalingExample = { inputs: { signal_ma: 12, range_low: 0,
 
 function _v946renderLoopSignalScaling(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: 4-20 mA current-loop (live-zero) signal scaling, by name; ANSI/ISA-50.00.01 analog signal ranges and NAMUR NE43 fault levels. percent = (mA - 4)/16 x 100; value = range_low + percent/100 x (range_high - range_low). Linear scaling only (a DP-flow transmitter is square-root); the transmitter's range and calibration govern.";
-  const ma = makeNumber("Loop signal (mA)", "lss-ma", { step: "any", value: "12" });
-  ma.input.value = "12";
-  const lo = makeNumber("Range low (value at 4 mA)", "lss-lo", { step: "any", value: "0" });
-  lo.input.value = "0";
-  const hi = makeNumber("Range high (value at 20 mA)", "lss-hi", { step: "any", value: "100" });
-  hi.input.value = "100";
+  const ma = makeNumber("Loop signal (mA)", "lss-ma", { step: "any" });
+  const lo = makeNumber("Range low (value at 4 mA)", "lss-lo", { step: "any" });
+  const hi = makeNumber("Range high (value at 20 mA)", "lss-hi", { step: "any" });
   for (const f of [ma, lo, hi]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ma.input.value = "12"; lo.input.value = "0"; hi.input.value = "100"; update(); });
   const oVal = makeOutputLine(outputRegion, "Engineering value", "lss-out-v");
@@ -1291,10 +1268,10 @@ export function computeDpFlowSignalScaling({ signal_ma = 12, flow_low = 0, flow_
 export const dpFlowSignalScalingExample = { inputs: { signal_ma: 12, flow_low: 0, flow_high: 500, low_flow_cutoff_pct: 0 } };
 function renderDpFlowSignalScaling(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: differential-pressure flow transmitter square-root extraction on a 4-20 mA loop, by name (ISA / instrumentation practice; NAMUR NE43 fault levels). flow% = sqrt((mA - 4)/16), value = flow_low + flow% x (flow_high - flow_low); a low-flow cutoff zeroes the noisy square root near 4 mA. Loop linearization only (the flow element's Cd is in the transmitter calibration). The transmitter range and calibration govern.";
-  const ma = makeNumber("Loop signal (mA)", "dfs-ma", { step: "any", value: "12" }); ma.input.value = "12";
-  const lo = makeNumber("Flow at 4 mA (usually 0)", "dfs-lo", { step: "any", value: "0" }); lo.input.value = "0";
-  const hi = makeNumber("Flow at 20 mA (full scale)", "dfs-hi", { step: "any", value: "500" }); hi.input.value = "500";
-  const cut = makeNumber("Low-flow cutoff (% of flow, e.g. 5)", "dfs-cut", { step: "any", min: "0", max: "100", value: "0" }); cut.input.value = "0";
+  const ma = makeNumber("Loop signal (mA)", "dfs-ma", { step: "any" });
+  const lo = makeNumber("Flow at 4 mA (usually 0)", "dfs-lo", { step: "any" });
+  const hi = makeNumber("Flow at 20 mA (full scale)", "dfs-hi", { step: "any" });
+  const cut = makeNumber("Low-flow cutoff (% of flow, e.g. 5)", "dfs-cut", { step: "any", min: "0", max: "100" });
   for (const f of [ma, lo, hi, cut]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ma.input.value = "12"; lo.input.value = "0"; hi.input.value = "500"; cut.input.value = "0"; update(); });
   const oVal = makeOutputLine(outputRegion, "Flow value", "dfs-out-v");
@@ -1344,10 +1321,8 @@ export const rtdResistanceToTempExample = { inputs: { resistance_ohms: 119.397, 
 
 function _v947renderRtdResistanceToTemp(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: IEC 60751 platinum RTD (Callendar-Van Dusen) resistance-temperature relation, by name; standard coefficients A = 3.9083e-3, B = -5.775e-7 per C. R = R0(1 + A T + B T^2), solved for T (exact T >= 0 C; below 0 C drops the C-term, a close approximation). Assumes a lead-compensated (3/4-wire) reading; the sensor calibration and class govern.";
-  const rm = makeNumber("Measured resistance (ohms)", "rtd-rm", { step: "any", min: "0", value: "119.397" });
-  rm.input.value = "119.397";
-  const r0 = makeNumber("R0 at 0 C (100 = Pt100, 1000 = Pt1000)", "rtd-r0", { step: "any", min: "0", value: "100" });
-  r0.input.value = "100";
+  const rm = makeNumber("Measured resistance (ohms)", "rtd-rm", { step: "any", min: "0" });
+  const r0 = makeNumber("R0 at 0 C (100 = Pt100, 1000 = Pt1000)", "rtd-r0", { step: "any", min: "0" });
   for (const f of [rm, r0]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { rm.input.value = "119.397"; r0.input.value = "100"; update(); });
   const oC = makeOutputLine(outputRegion, "Temperature (°C)", "rtd-out-c");
@@ -1385,10 +1360,8 @@ export const pulseFlowmeterRateExample = { inputs: { frequency_hz: 100, k_factor
 
 function _v948renderPulseFlowmeterRate(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: pulse-output flowmeter (turbine/paddlewheel/PD) K-factor scaling, by name. rate = frequency_Hz x 60 / K-factor (pulses per gallon); totalized volume = pulse count / K-factor. The K-factor is stamped on the meter or its calibration certificate; it drifts with viscosity and at low flow. The calibration cert, linear range, and fluid govern.";
-  const fr = makeNumber("Output frequency (Hz = pulses/sec)", "pfm-fr", { step: "any", min: "0", value: "100" });
-  fr.input.value = "100";
-  const kf = makeNumber("K-factor (pulses per gallon)", "pfm-kf", { step: "any", min: "0", value: "200" });
-  kf.input.value = "200";
+  const fr = makeNumber("Output frequency (Hz = pulses/sec)", "pfm-fr", { step: "any", min: "0" });
+  const kf = makeNumber("K-factor (pulses per gallon)", "pfm-kf", { step: "any", min: "0" });
   for (const f of [fr, kf]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { fr.input.value = "100"; kf.input.value = "200"; update(); });
   const oGpm = makeOutputLine(outputRegion, "Flow rate", "pfm-out-gpm");
@@ -1438,14 +1411,10 @@ export const loopVoltageBudgetExample = { inputs: { supply_v: 24, transmitter_mi
 
 function _v949renderLoopVoltageBudget(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: loop-powered (2-wire) 4-20 mA transmitter voltage budget, by name. Max total loop resistance = (supply - transmitter minimum) / 0.020 A; voltage at the transmitter = supply - 0.020 x (load + wire + barrier resistance), which must exceed the transmitter's compliance (lift-off) voltage at the 20 mA worst case. The transmitter datasheet's compliance voltage and the barrier burden govern.";
-  const sv = makeNumber("Loop supply (Vdc)", "lvb-sv", { step: "any", min: "0", value: "24" });
-  sv.input.value = "24";
-  const tv = makeNumber("Transmitter minimum voltage (V)", "lvb-tv", { step: "any", min: "0", value: "10.5" });
-  tv.input.value = "10.5";
-  const lr = makeNumber("Load / sense resistor (ohms)", "lvb-lr", { step: "any", min: "0", value: "250" });
-  lr.input.value = "250";
-  const wr = makeNumber("Wire + barrier resistance (ohms)", "lvb-wr", { step: "any", min: "0", value: "50" });
-  wr.input.value = "50";
+  const sv = makeNumber("Loop supply (Vdc)", "lvb-sv", { step: "any", min: "0" });
+  const tv = makeNumber("Transmitter minimum voltage (V)", "lvb-tv", { step: "any", min: "0" });
+  const lr = makeNumber("Load / sense resistor (ohms)", "lvb-lr", { step: "any", min: "0" });
+  const wr = makeNumber("Wire + barrier resistance (ohms)", "lvb-wr", { step: "any", min: "0" });
   for (const f of [sv, tv, lr, wr]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { sv.input.value = "24"; tv.input.value = "10.5"; lr.input.value = "250"; wr.input.value = "50"; update(); });
   const oV = makeOutputLine(outputRegion, "Verdict", "lvb-out-v");
@@ -1492,14 +1461,10 @@ export const thermistorBetaTempExample = { inputs: { resistance_ohms: 20000, r0_
 
 function _v950renderThermistorBetaTemp(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NTC thermistor beta (B-parameter) equation, by name. 1/T = 1/T0 + (1/B) ln(R/R0), temperatures in kelvin; R0 and B (e.g. 10 kohm at 25 C, B ~ 3950 K) come from the sensor datasheet. A two-point fit (accurate ~+/-0.2-1 C near T0); a wider span uses Steinhart-Hart. Distinct from a positive-coefficient platinum RTD. The datasheet R-T curve and tolerance govern.";
-  const rm = makeNumber("Measured resistance (ohms)", "th-rm", { step: "any", min: "0", value: "20000" });
-  rm.input.value = "20000";
-  const r0 = makeNumber("R0 at reference temp (ohms, e.g. 10000)", "th-r0", { step: "any", min: "0", value: "10000" });
-  r0.input.value = "10000";
-  const bk = makeNumber("Beta B (K, e.g. 3950)", "th-bk", { step: "any", min: "0", value: "3950" });
-  bk.input.value = "3950";
-  const rt = makeNumber("Reference temp T0 in C (usually 25)", "th-rt", { step: "any", value: "25" });
-  rt.input.value = "25";
+  const rm = makeNumber("Measured resistance (ohms)", "th-rm", { step: "any", min: "0" });
+  const r0 = makeNumber("R0 at reference temp (ohms, e.g. 10000)", "th-r0", { step: "any", min: "0" });
+  const bk = makeNumber("Beta B (K, e.g. 3950)", "th-bk", { step: "any", min: "0" });
+  const rt = makeNumber("Reference temp T0 in C (usually 25)", "th-rt", { step: "any" });
   for (const f of [rm, r0, bk, rt]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { rm.input.value = "20000"; r0.input.value = "10000"; bk.input.value = "3950"; rt.input.value = "25"; update(); });
   const oC = makeOutputLine(outputRegion, "Temperature (°C)", "th-out-c");
@@ -1545,10 +1510,10 @@ export function computeThermistorSteinhartHart({ resistance_ohms = 10000, coeff_
 export const thermistorSteinhartHartExample = { inputs: { resistance_ohms: 10000, coeff_a: 0.001125308852122, coeff_b: 0.000234711863267, coeff_c: 0.000000085663516 } };
 function renderThermistorSteinhartHart(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NTC thermistor 3-constant Steinhart-Hart equation, by name: 1/T = A + B ln(R) + C (ln R)^3, T in kelvin; A, B, C from the datasheet or a 3-point calibration. The accurate form the beta (B-parameter) equation approximates (~+/-0.01-0.02 C over a wide span). Distinct from a positive-coefficient platinum RTD. The datasheet R-T curve, tolerance, and self-heating govern.";
-  const rm = makeNumber("Measured resistance (ohms)", "sh-rm", { step: "any", min: "0", value: "10000" }); rm.input.value = "10000";
-  const a = makeNumber("Coefficient A", "sh-a", { step: "any", value: "0.001125308852122" }); a.input.value = "0.001125308852122";
-  const b = makeNumber("Coefficient B", "sh-b", { step: "any", value: "0.000234711863267" }); b.input.value = "0.000234711863267";
-  const c = makeNumber("Coefficient C", "sh-c", { step: "any", value: "0.000000085663516" }); c.input.value = "0.000000085663516";
+  const rm = makeNumber("Measured resistance (ohms)", "sh-rm", { step: "any", min: "0" });
+  const a = makeNumber("Coefficient A", "sh-a", { step: "any" });
+  const b = makeNumber("Coefficient B", "sh-b", { step: "any" });
+  const c = makeNumber("Coefficient C", "sh-c", { step: "any" });
   for (const f of [rm, a, b, c]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { rm.input.value = "10000"; a.input.value = "0.001125308852122"; b.input.value = "0.000234711863267"; c.input.value = "0.000000085663516"; update(); });
   const oC = makeOutputLine(outputRegion, "Temperature (°C)", "sh-out-c");
@@ -1596,12 +1561,9 @@ export const dpLevelHydrostaticExample = { inputs: { measured_pressure_psi: 4.33
 
 function _v958renderDpLevelHydrostatic(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: hydrostatic DP level transmitter (head to level), by name. P = 0.433 x SG x H (psi), so level H = P / (0.433 x SG); 0.433 psi/ft is water at ~60 F. Full-span (URV) = 0.433 x SG x max level. Assumes an open (vented) tank, tap at zero level, no elevation/suppression; a wet leg or elevated tap needs zero suppression/elevation set at calibration. The transmitter range and calibration govern.";
-  const pp = makeNumber("Measured pressure (psi)", "dpl-pp", { step: "any", min: "0", value: "4.33" });
-  pp.input.value = "4.33";
-  const sg = makeNumber("Fluid specific gravity", "dpl-sg", { step: "any", min: "0", value: "1.0" });
-  sg.input.value = "1.0";
-  const ml = makeNumber("Full-span (max) level (ft)", "dpl-ml", { step: "any", min: "0", value: "20" });
-  ml.input.value = "20";
+  const pp = makeNumber("Measured pressure (psi)", "dpl-pp", { step: "any", min: "0" });
+  const sg = makeNumber("Fluid specific gravity", "dpl-sg", { step: "any", min: "0" });
+  const ml = makeNumber("Full-span (max) level (ft)", "dpl-ml", { step: "any", min: "0" });
   for (const f of [pp, sg, ml]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { pp.input.value = "4.33"; sg.input.value = "1.0"; ml.input.value = "20"; update(); });
   const oL = makeOutputLine(outputRegion, "Level", "dpl-out-l");
@@ -1653,10 +1615,8 @@ export const pidTuningZieglerNicholsExample = { inputs: { ultimate_gain_ku: 4, u
 
 function _v961renderPidTuningZieglerNichols(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Ziegler-Nichols closed-loop (ultimate-sensitivity) PID tuning, by name. PID: Kp = 0.6 Ku, Ti = 0.5 Tu, Td = 0.125 Tu; PI: Kp = 0.45 Ku, Ti = Tu/1.2; P: Kp = 0.5 Ku. Ku/Tu are the gain and period at the stability limit. Aggressive (quarter-amplitude decay); a starting point, not a final tune. The process, the controller algorithm form, and the technician govern.";
-  const ku = makeNumber("Ultimate gain Ku (gain at steady oscillation)", "pid-ku", { step: "any", min: "0", value: "4" });
-  ku.input.value = "4";
-  const tu = makeNumber("Ultimate period Tu (s, oscillation period)", "pid-tu", { step: "any", min: "0", value: "2" });
-  tu.input.value = "2";
+  const ku = makeNumber("Ultimate gain Ku (gain at steady oscillation)", "pid-ku", { step: "any", min: "0" });
+  const tu = makeNumber("Ultimate period Tu (s, oscillation period)", "pid-tu", { step: "any", min: "0" });
   for (const f of [ku, tu]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ku.input.value = "4"; tu.input.value = "2"; update(); });
   const oPid = makeOutputLine(outputRegion, "PID: Kp / Ti / Td", "pid-out-pid");

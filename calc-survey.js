@@ -177,8 +177,8 @@ function renderTraverseClosure(inputRegion, outputRegion, citationEl) {
   const DEFAULT = "0,100\n90,200\n180,100\n270,200";
   const courses = makeTextarea("Courses, one per line as azimuth_deg,distance (>= 2)", "tc-courses", { rows: "4" });
   courses.input.value = DEFAULT;
-  const n0 = makeNumber("Start N", "tc-n0", { step: "any", value: "0" }); n0.input.value = "0";
-  const e0 = makeNumber("Start E", "tc-e0", { step: "any", value: "0" }); e0.input.value = "0";
+  const n0 = makeNumber("Start N", "tc-n0", { step: "any" });
+  const e0 = makeNumber("Start E", "tc-e0", { step: "any" });
   for (const f of [courses, n0, e0]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { courses.input.value = DEFAULT; n0.input.value = "0"; e0.input.value = "0"; update(); });
   const oClosure = makeOutputLine(outputRegion, "Closure", "tc-out-closure");
@@ -244,10 +244,10 @@ export const differentialLevelingExample = { inputs: { bm_elev: 100.00, bs: [4.3
 
 function renderDifferentialLeveling(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: height-of-instrument differential leveling HI = elev + BS, elev = HI - FS, elevation change sum(BS) - sum(FS), and the loop misclosure, per the standard surveying references (Ghilani/Wolf), by name. Arithmetic reduction only; the project control and specs govern.";
-  const bm = makeNumber("Benchmark elevation (ft)", "dl-bm", { step: "any" }); bm.input.value = "100.00";
+  const bm = makeNumber("Benchmark elevation (ft)", "dl-bm", { step: "any" });
   const bs = makeTextarea("Backsights, one per line (ft)", "dl-bs", { rows: "3" }); bs.input.value = "4.32\n5.60";
   const fs = makeTextarea("Foresights, one per line (ft)", "dl-fs", { rows: "3" }); fs.input.value = "2.15\n3.40";
-  const kc = makeNumber("Known closing elevation (ft, optional)", "dl-kc", { step: "any" }); kc.input.value = "104.40";
+  const kc = makeNumber("Known closing elevation (ft, optional)", "dl-kc", { step: "any" });
   for (const f of [bm, bs, fs, kc]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { bm.input.value = "100.00"; bs.input.value = "4.32\n5.60"; fs.input.value = "2.15\n3.40"; kc.input.value = "104.40"; update(); });
   const oFinal = makeOutputLine(outputRegion, "Final elevation", "dl-out-final");
@@ -302,7 +302,7 @@ function renderLevelLoopAdjustment(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: compass-rule (distance-weighted) level-loop adjustment, correction = -misclosure x cumulative-distance / total-distance, per the standard surveying references (Ghilani/Wolf), by name. The vertical analog of the horizontal compass rule; the project control and specs govern.";
   const elevs = makeTextarea("Computed elevations, one per line (ft; last = closing point)", "lla-elevs", { rows: "3" }); elevs.input.value = "105.20\n108.60\n100.05";
   const dists = makeTextarea("Leg distance to each point, one per line (ft)", "lla-dists", { rows: "3" }); dists.input.value = "500\n800\n700";
-  const kc = makeNumber("Known closing elevation (ft)", "lla-kc", { step: "any" }); kc.input.value = "100.00";
+  const kc = makeNumber("Known closing elevation (ft)", "lla-kc", { step: "any" });
   for (const f of [elevs, dists, kc]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { elevs.input.value = "105.20\n108.60\n100.05"; dists.input.value = "500\n800\n700"; kc.input.value = "100.00"; update(); });
   const oMis = makeOutputLine(outputRegion, "Misclosure", "lla-out-mis");
@@ -610,8 +610,7 @@ export const levelingCurvatureRefractionExample = { inputs: { sight_distance_ft:
 
 function renderLevelingCurvatureRefraction(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: combined earth curvature-and-refraction correction h_cr = 0.0206 K^2 ft, K the sight distance in thousands of feet (curvature 0.0239 K^2 minus refraction 0.0033 K^2); equivalently 0.574 M^2 with M in miles. Standard leveling reduction per Ghilani, Elementary Surveying, by name. Assumes a refraction coefficient k ~ 0.14. A computational aid; the project procedure governs.";
-  const d = makeNumber("Sight distance (ft)", "lcr-d", { step: "any", min: "0", value: "2000" });
-  d.input.value = "2000";
+  const d = makeNumber("Sight distance (ft)", "lcr-d", { step: "any", min: "0" });
   inputRegion.appendChild(d.wrap);
   const oC = makeOutputLine(outputRegion, "Combined correction (subtract from far rod)", "lcr-out-c");
   const oCurv = makeOutputLine(outputRegion, "Curvature component", "lcr-out-curv");
@@ -655,12 +654,9 @@ export const gridToGroundExample = { inputs: { grid_distance_ft: 10000, grid_sca
 
 function renderGridToGround(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: state-plane grid-to-ground reduction - elevation factor EF = R/(R+h), R = 20,906,000 ft (NGS mean earth radius), combined factor CF = grid-scale-factor x EF, ground = grid / CF. Standard NGS/NOAA State Plane Coordinate System practice, by name. The grid scale factor is a projection value near 1.0; h is the ELLIPSOID height (orthometric H + geoid N). A computational aid; the published control governs.";
-  const grid = makeNumber("Grid (map) distance (ft)", "g2g-d", { step: "any", min: "0", value: "10000" });
-  grid.input.value = "10000";
-  const gsf = makeNumber("Grid scale factor (near 1.0)", "g2g-gsf", { step: "any", min: "0", value: "0.9999" });
-  gsf.input.value = "0.9999";
-  const h = makeNumber("Ellipsoid height h = H + N (ft)", "g2g-h", { step: "any", value: "5280" });
-  h.input.value = "5280";
+  const grid = makeNumber("Grid (map) distance (ft)", "g2g-d", { step: "any", min: "0" });
+  const gsf = makeNumber("Grid scale factor (near 1.0)", "g2g-gsf", { step: "any", min: "0" });
+  const h = makeNumber("Ellipsoid height h = H + N (ft)", "g2g-h", { step: "any" });
   for (const f of [grid, gsf, h]) inputRegion.appendChild(f.wrap);
   const oG = makeOutputLine(outputRegion, "Ground distance", "g2g-out-ground");
   const oCF = makeOutputLine(outputRegion, "Combined factor", "g2g-out-cf");
@@ -704,14 +700,10 @@ export const cogoInverseLocateExample = { inputs: { start_n: 5000, start_e: 5000
 
 function renderCogoInverseLocate(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: coordinate geometry inverse - distance = sqrt(dN^2 + dE^2), azimuth = atan2(dE, dN) clockwise from north, dN = N2-N1, dE = E2-E1. First-principles latitude/departure per the standard route-surveying references (Ghilani & Wolf; FM 5-233), by name. The exact inverse of cogo-forward-point. Plane geometry - no curvature or grid scale factor; the project control and datum govern.";
-  const n1 = makeNumber("Start northing N1 (ft)", "cil-n1", { step: "any", value: "5000" });
-  n1.input.value = "5000";
-  const e1 = makeNumber("Start easting E1 (ft)", "cil-e1", { step: "any", value: "5000" });
-  e1.input.value = "5000";
-  const n2 = makeNumber("End northing N2 (ft)", "cil-n2", { step: "any", value: "5141.42" });
-  n2.input.value = "5141.42";
-  const e2 = makeNumber("End easting E2 (ft)", "cil-e2", { step: "any", value: "5141.42" });
-  e2.input.value = "5141.42";
+  const n1 = makeNumber("Start northing N1 (ft)", "cil-n1", { step: "any" });
+  const e1 = makeNumber("Start easting E1 (ft)", "cil-e1", { step: "any" });
+  const n2 = makeNumber("End northing N2 (ft)", "cil-n2", { step: "any" });
+  const e2 = makeNumber("End easting E2 (ft)", "cil-e2", { step: "any" });
   for (const f of [n1, e1, n2, e2]) inputRegion.appendChild(f.wrap);
   const oD = makeOutputLine(outputRegion, "Distance", "cil-out-d");
   const oA = makeOutputLine(outputRegion, "Azimuth (clockwise from north)", "cil-out-a");
@@ -804,11 +796,11 @@ export const tapingNormalTensionExample = { inputs: { span_ft: 100, tape_weight_
 
 function renderTapingNormalTension(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: normal tension, the pull at which the tension and sag corrections to a suspended steel tape cancel. Derived, not tabulated: setting (P - P0) L / (A E) = w^2 L^3 / (24 P^2) and substituting the span weight W = w L eliminates the length and leaves P^2 (P - P0) = A E W^2 / 24, whose square root is the textbook implicit form P = 0.204 W sqrt(A E) / sqrt(P - P0) (0.204 = 1/sqrt(24)). Solved here by bisection on the cubic. The component corrections match the taping-corrections tile exactly. Steel modulus 29,000,000 psi by default; tape area and weight per foot come from the tape's specification. Does not address temperature or standardization error, and normal tension may exceed a practical or rated pull. A field aid; the tape calibration and the survey's procedure govern.";
-  const l = makeNumber("Unsupported span L (ft)", "tnt-l", { step: "any", min: "0" }); l.input.value = "100";
-  const w = makeNumber("Tape weight per foot (lb/ft)", "tnt-w", { step: "any", min: "0" }); w.input.value = "0.02";
-  const a = makeNumber("Tape cross-section A (in²)", "tnt-a", { step: "any", min: "0" }); a.input.value = "0.006";
-  const p0 = makeNumber("Standardization pull P0 (lb)", "tnt-p0", { step: "any", min: "0" }); p0.input.value = "10";
-  const pa = makeNumber("Pull you actually used (lb, optional)", "tnt-pa", { step: "any", min: "0" }); pa.input.value = "20";
+  const l = makeNumber("Unsupported span L (ft)", "tnt-l", { step: "any", min: "0" });
+  const w = makeNumber("Tape weight per foot (lb/ft)", "tnt-w", { step: "any", min: "0" });
+  const a = makeNumber("Tape cross-section A (in²)", "tnt-a", { step: "any", min: "0" });
+  const p0 = makeNumber("Standardization pull P0 (lb)", "tnt-p0", { step: "any", min: "0" });
+  const pa = makeNumber("Pull you actually used (lb, optional)", "tnt-pa", { step: "any", min: "0" });
   for (const f of [l, w, a, p0, pa]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { l.input.value = "100"; w.input.value = "0.02"; a.input.value = "0.006"; p0.input.value = "10"; pa.input.value = "20"; update(); });
   const oNt = makeOutputLine(outputRegion, "Normal tension", "tnt-out-nt");

@@ -605,10 +605,8 @@ function renderSccrCombination(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: UL 508A Supplement SB industrial-control-panel SCCR (weakest-link method); NEC 409.110 / 110.10. The panel SCCR = min(component SCCRs, feeder OCPD interrupting rating), and it must meet or exceed the available fault current. One low-rated component caps the whole panel; a current-limiting fuse ahead of a weak component can raise the combination through its let-through. UL 508A and the AHJ govern.";
   const comps = makeTextarea("Component SCCRs (kA, comma or space separated)", "sccr-comps", { rows: "2" });
   comps.input.value = "65, 5, 5, 10";
-  const feeder = makeNumber("Feeder OCPD interrupting rating (kA, 0 to omit)", "sccr-feeder", { step: "any", min: "0", value: "0" });
-  feeder.input.value = "0";
-  const fault = makeNumber("Available fault current (kA)", "sccr-fault", { step: "any", min: "0", value: "22" });
-  fault.input.value = "22";
+  const feeder = makeNumber("Feeder OCPD interrupting rating (kA, 0 to omit)", "sccr-feeder", { step: "any", min: "0" });
+  const fault = makeNumber("Available fault current (kA)", "sccr-fault", { step: "any", min: "0" });
   for (const f of [comps, feeder, fault]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { comps.input.value = "65, 5, 5, 10"; feeder.input.value = "0"; fault.input.value = "22"; update(); });
   const oSccr = makeOutputLine(outputRegion, "Panel SCCR (weakest link)", "sccr-out-sccr");

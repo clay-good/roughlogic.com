@@ -1053,8 +1053,7 @@ export function computeWindSpeedFromVelocityPressure({ velocity_pressure_psf = 0
 export const windSpeedFromVelocityPressureExample = { inputs: { velocity_pressure_psf: 25 } };
 function renderWindSpeedFromVelocityPressure(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ASCE 7 velocity pressure q = 0.00256 V^2 (V mph, q psf) solved for the wind speed, V = sqrt(q / 0.00256). Enter the bare velocity pressure, not a Cp-loaded design surface pressure. A design aid; ASCE 7 and the engineer of record govern.";
-  const q = makeNumber("Velocity pressure q (psf)", "wsv-q", { step: "any", min: "0", value: "25" });
-  q.input.value = "25";
+  const q = makeNumber("Velocity pressure q (psf)", "wsv-q", { step: "any", min: "0" });
   inputRegion.appendChild(q.wrap);
   attachExampleButton(inputRegion, () => { q.input.value = "25"; update(); });
   const oV = makeOutputLine(outputRegion, "Equivalent basic wind speed", "wsv-out-v");
@@ -3653,18 +3652,12 @@ export const columnBucklingWoodExample = { inputs: { b_in: 3.5, d_in: 3.5, le_in
 
 function renderColumnBucklingWood(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per the NDS column-stability provisions (the Cp / Euler buckling basis), by name; reference design values user-supplied. Solid rectangular sawn lumber, c = 0.8. The IBC-adopted NDS edition governs. AWC publishes the NDS free read-only at awc.org.";
-  const b = makeNumber("Column width b (in)", "cbw-b", { step: "any", min: "0", value: "3.5" });
-  b.input.value = "3.5";
-  const d = makeNumber("Column depth d (in)", "cbw-d", { step: "any", min: "0", value: "3.5" });
-  d.input.value = "3.5";
-  const le = makeNumber("Unbraced length lu (in) - Ke is applied below", "cbw-le", { step: "any", min: "0", value: "96" });
-  le.input.value = "96";
-  const fc = makeNumber("Fc* (psi)", "cbw-fc", { step: "any", min: "0", value: "1150" });
-  fc.input.value = "1150";
-  const emin = makeNumber("Emin (psi)", "cbw-emin", { step: "any", min: "0", value: "580000" });
-  emin.input.value = "580000";
-  const ke = makeNumber("Effective-length factor Ke", "cbw-ke", { step: "any", min: "0", value: "1" });
-  ke.input.value = "1";
+  const b = makeNumber("Column width b (in)", "cbw-b", { step: "any", min: "0" });
+  const d = makeNumber("Column depth d (in)", "cbw-d", { step: "any", min: "0" });
+  const le = makeNumber("Unbraced length lu (in) - Ke is applied below", "cbw-le", { step: "any", min: "0" });
+  const fc = makeNumber("Fc* (psi)", "cbw-fc", { step: "any", min: "0" });
+  const emin = makeNumber("Emin (psi)", "cbw-emin", { step: "any", min: "0" });
+  const ke = makeNumber("Effective-length factor Ke", "cbw-ke", { step: "any", min: "0" });
   for (const f of [b, d, le, fc, emin, ke]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { b.input.value = "3.5"; d.input.value = "3.5"; le.input.value = "96"; fc.input.value = "1150"; emin.input.value = "580000"; ke.input.value = "1"; update(); });
   const oSlen = makeOutputLine(outputRegion, "Slenderness le/d", "cbw-out-slen");
@@ -4021,10 +4014,8 @@ function renderLayoutSquaring(inputRegion, outputRegion, citationEl) {
     { value: "find-diagonal", label: "Find diagonal" }, { value: "check-square", label: "Check square" },
   ]);
   inputRegion.appendChild(mode.wrap);
-  const a = makeNumber("Side a", "lsq-a", { step: "any", min: "0", value: "3" });
-  a.input.value = "3";
-  const b = makeNumber("Side b", "lsq-b", { step: "any", min: "0", value: "4" });
-  b.input.value = "4";
+  const a = makeNumber("Side a", "lsq-a", { step: "any", min: "0" });
+  const b = makeNumber("Side b", "lsq-b", { step: "any", min: "0" });
   const diagHost = document.createElement("div");
   for (const f of [a, b]) inputRegion.appendChild(f.wrap);
   inputRegion.appendChild(diagHost);

@@ -2108,22 +2108,14 @@ export const pumpTdhExample = {
 function renderPumpTdh(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: TDH = static head + suction friction + discharge friction + fittings friction. Friction is Hazen-Williams (Crane Technical Paper No. 410). Enter the pipe internal diameter, C factor (150 PVC, 130 new steel, 100 old steel), and fittings equivalent length from TP-410. The manufacturer pump curve governs the operating point. Free at flowoffluids.com for Crane TP-410 excerpts.";
 
-  const flow = makeNumber("Flow rate (GPM)", "tdh-q", { step: "any", min: "0", value: "100" });
-  flow.input.value = "100";
-  const dia = makeNumber("Pipe internal diameter (in)", "tdh-d", { step: "any", min: "0", value: "4.026" });
-  dia.input.value = "4.026";
-  const cfac = makeNumber("Hazen-Williams C (150 PVC / 130 steel)", "tdh-c", { step: "any", min: "0", value: "150" });
-  cfac.input.value = "150";
-  const lift = makeNumber("Static suction lift (ft; negative if flooded)", "tdh-lift", { step: "any", value: "10" });
-  lift.input.value = "10";
-  const disch = makeNumber("Static discharge head (ft)", "tdh-disch", { step: "any", min: "0", value: "50" });
-  disch.input.value = "50";
-  const sLen = makeNumber("Suction pipe length (ft)", "tdh-slen", { step: "any", min: "0", value: "20" });
-  sLen.input.value = "20";
-  const dLen = makeNumber("Discharge pipe length (ft)", "tdh-dlen", { step: "any", min: "0", value: "200" });
-  dLen.input.value = "200";
-  const fLen = makeNumber("Fittings equivalent length (ft)", "tdh-flen", { step: "any", min: "0", value: "30" });
-  fLen.input.value = "30";
+  const flow = makeNumber("Flow rate (GPM)", "tdh-q", { step: "any", min: "0" });
+  const dia = makeNumber("Pipe internal diameter (in)", "tdh-d", { step: "any", min: "0" });
+  const cfac = makeNumber("Hazen-Williams C (150 PVC / 130 steel)", "tdh-c", { step: "any", min: "0" });
+  const lift = makeNumber("Static suction lift (ft; negative if flooded)", "tdh-lift", { step: "any" });
+  const disch = makeNumber("Static discharge head (ft)", "tdh-disch", { step: "any", min: "0" });
+  const sLen = makeNumber("Suction pipe length (ft)", "tdh-slen", { step: "any", min: "0" });
+  const dLen = makeNumber("Discharge pipe length (ft)", "tdh-dlen", { step: "any", min: "0" });
+  const fLen = makeNumber("Fittings equivalent length (ft)", "tdh-flen", { step: "any", min: "0" });
   for (const f of [flow, dia, cfac, lift, disch, sLen, dLen, fLen]) inputRegion.appendChild(f.wrap);
 
   attachExampleButton(inputRegion, () => {
@@ -2239,20 +2231,15 @@ export const hydraulicCylinderExample = {
 function renderHydraulicCylinder(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: First-principles fluid power per NFPA T2.13.7 cylinder definitions: F = P * A, with A the full bore on extension and the bore-minus-rod annulus on retraction; v = (GPM * 231) / (60 * A). AHJ and machine design govern. Free at nfpa.com for the NFPA fluid-power table of contents.";
 
-  const bore = makeNumber("Bore diameter (in)", "hc-bore", { step: "any", min: "0", value: "4" });
-  bore.input.value = "4";
-  const rod = makeNumber("Rod diameter (in)", "hc-rod", { step: "any", min: "0", value: "2" });
-  rod.input.value = "2";
-  const pres = makeNumber("System pressure (psi)", "hc-p", { step: "any", min: "0", value: "2000" });
-  pres.input.value = "2000";
-  const flow = makeNumber("Pump flow (GPM; 0 to skip speed)", "hc-q", { step: "any", min: "0", value: "10" });
-  flow.input.value = "10";
+  const bore = makeNumber("Bore diameter (in)", "hc-bore", { step: "any", min: "0" });
+  const rod = makeNumber("Rod diameter (in)", "hc-rod", { step: "any", min: "0" });
+  const pres = makeNumber("System pressure (psi)", "hc-p", { step: "any", min: "0" });
+  const flow = makeNumber("Pump flow (GPM; 0 to skip speed)", "hc-q", { step: "any", min: "0" });
   const dir = makeSelect("Direction", "hc-dir", [
     { value: "extend", label: "Extend (full bore)", selected: true },
     { value: "retract", label: "Retract (annulus)" },
   ]);
-  const stroke = makeNumber("Stroke length (in; 0 to skip)", "hc-stroke", { step: "any", min: "0", value: "12" });
-  stroke.input.value = "12";
+  const stroke = makeNumber("Stroke length (in; 0 to skip)", "hc-stroke", { step: "any", min: "0" });
   for (const f of [bore, rod, pres, flow, dir, stroke]) inputRegion.appendChild(f.wrap);
 
   attachExampleButton(inputRegion, () => {
@@ -2380,22 +2367,16 @@ export const vbeltDriveExample = {
 function renderVbeltDrive(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ratio = driver_rpm / driven_rpm = D_driven / D_driver; belt length L = 2C + (pi/2)(D1+D2) + (D2-D1)^2/(4C) per ANSI/RMA IP-20 / IP-22. HP-per-belt is a coarse planning default by cross-section; the manufacturer's speed-specific power table (Gates Industrial Drive Design Manual) and service-factor table govern the final selection. Free at gates.com/literature.";
 
-  const rIn = makeNumber("Driver RPM", "vb-rin", { step: "any", min: "0", value: "1750" });
-  rIn.input.value = "1750";
-  const rOut = makeNumber("Driven RPM", "vb-rout", { step: "any", min: "0", value: "875" });
-  rOut.input.value = "875";
-  const hp = makeNumber("Driver shaft power (HP)", "vb-hp", { step: "any", min: "0", value: "10" });
-  hp.input.value = "10";
-  const d1 = makeNumber("Driver pitch diameter (in)", "vb-d1", { step: "any", min: "0", value: "4" });
-  d1.input.value = "4";
-  const C = makeNumber("Center distance (in)", "vb-c", { step: "any", min: "0", value: "20" });
-  C.input.value = "20";
+  const rIn = makeNumber("Driver RPM", "vb-rin", { step: "any", min: "0" });
+  const rOut = makeNumber("Driven RPM", "vb-rout", { step: "any", min: "0" });
+  const hp = makeNumber("Driver shaft power (HP)", "vb-hp", { step: "any", min: "0" });
+  const d1 = makeNumber("Driver pitch diameter (in)", "vb-d1", { step: "any", min: "0" });
+  const C = makeNumber("Center distance (in)", "vb-c", { step: "any", min: "0" });
   const sect = makeSelect("Belt cross-section", "vb-sect", [
     { value: "A", label: "A" }, { value: "B", label: "B", selected: true }, { value: "C", label: "C" },
     { value: "D", label: "D" }, { value: "3V", label: "3V" }, { value: "5V", label: "5V" }, { value: "8V", label: "8V" },
   ]);
-  const sf = makeNumber("Service factor (1.0-1.8)", "vb-sf", { step: "any", min: "0", value: "1.2" });
-  sf.input.value = "1.2";
+  const sf = makeNumber("Service factor (1.0-1.8)", "vb-sf", { step: "any", min: "0" });
   for (const f of [rIn, rOut, hp, d1, C, sect, sf]) inputRegion.appendChild(f.wrap);
 
   attachExampleButton(inputRegion, () => {
@@ -2486,9 +2467,9 @@ export function computeBeltCenterDistance({ large_pitch_diameter_in = 0, small_p
 export const beltCenterDistanceExample = { inputs: { large_pitch_diameter_in: 10, small_pitch_diameter_in: 4, belt_pitch_length_in: 62.44 } };
 function renderBeltCenterDistance(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: center distance for a standard belt - the inverse of L = 2C + (pi/2)(D+d) + (D-d)^2/(4C) (ANSI/RMA IP-20 / IP-22), C = [A + sqrt(A^2 - 2(D-d)^2)]/4 with A = L - (pi/2)(D+d); wrap on the small sheave = 180 - 2 asin((D-d)/2C). Standard drive geometry (Gates Industrial Drive Design Manual, free at gates.com/literature). A design aid; the manufacturer's tables govern.";
-  const D = makeNumber("Large sheave pitch diameter (in)", "bcd-d", { step: "any", min: "0" }); D.input.value = "10";
-  const d = makeNumber("Small sheave pitch diameter (in)", "bcd-sd", { step: "any", min: "0" }); d.input.value = "4";
-  const L = makeNumber("Belt pitch length (in, standard)", "bcd-l", { step: "any", min: "0" }); L.input.value = "62.44";
+  const D = makeNumber("Large sheave pitch diameter (in)", "bcd-d", { step: "any", min: "0" });
+  const d = makeNumber("Small sheave pitch diameter (in)", "bcd-sd", { step: "any", min: "0" });
+  const L = makeNumber("Belt pitch length (in, standard)", "bcd-l", { step: "any", min: "0" });
   for (const f of [D, d, L]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { D.input.value = "10"; d.input.value = "4"; L.input.value = "62.44"; update(); });
   const oC = makeOutputLine(outputRegion, "Center distance (in)", "bcd-out-c");
@@ -2535,10 +2516,10 @@ export const beltHpTransmittedExample = { inputs: { tight_side_tension_lb: 250, 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function renderBeltHpTransmitted(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: belt power P = (T1 - T2) V / 33000 hp with belt speed V = pi D N / 12 ft/min; only the effective tension Te = T1 - T2 does work. First-principles as in Machinery's Handbook / Gates Industrial Drive Design Manual, by name. A design aid; the belt/sheave ratings and wrap angle govern.";
-  const t1 = makeNumber("Tight-side tension T1 (lb)", "bht-t1", { step: "any", min: "0" }); t1.input.value = "250";
-  const t2 = makeNumber("Slack-side tension T2 (lb)", "bht-t2", { step: "any", min: "0" }); t2.input.value = "100";
-  const d = makeNumber("Sheave pitch diameter D (in)", "bht-d", { step: "any", min: "0" }); d.input.value = "6";
-  const n = makeNumber("Sheave speed N (rpm)", "bht-n", { step: "any", min: "0" }); n.input.value = "1750";
+  const t1 = makeNumber("Tight-side tension T1 (lb)", "bht-t1", { step: "any", min: "0" });
+  const t2 = makeNumber("Slack-side tension T2 (lb)", "bht-t2", { step: "any", min: "0" });
+  const d = makeNumber("Sheave pitch diameter D (in)", "bht-d", { step: "any", min: "0" });
+  const n = makeNumber("Sheave speed N (rpm)", "bht-n", { step: "any", min: "0" });
   for (const f of [t1, t2, d, n]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { t1.input.value = "250"; t2.input.value = "100"; d.input.value = "6"; n.input.value = "1750"; update(); });
   const oP = makeOutputLine(outputRegion, "Power transmitted", "bht-out-p");
@@ -2951,8 +2932,8 @@ export function computeBoltProofLoad({ nominal_diameter_in = 0, threads_per_inch
 export const boltProofLoadExample = { inputs: { nominal_diameter_in: 0.5, threads_per_inch: 13, grade: "5" } };
 function renderBoltProofLoad(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: SAE J429 inch-series bolt strength (ASME B1.1 tensile stress area): At = 0.7854 x (D - 0.9743/n)^2; proof / yield / tensile load = At x the grade strength (Grade 2: 55/57/74 ksi; Grade 5 / A325: 85/92/120; Grade 8 / A490: 120/130/150); recommended clamp = 75% of proof. The grade is read from the head markings. A design aid; the joint design and torque method govern.";
-  const d = makeNumber("Nominal (major) diameter D (in)", "bpl-d", { step: "any", min: "0" }); d.input.value = "0.5";
-  const n = makeNumber("Threads per inch (TPI)", "bpl-n", { step: "any", min: "0" }); n.input.value = "13";
+  const d = makeNumber("Nominal (major) diameter D (in)", "bpl-d", { step: "any", min: "0" });
+  const n = makeNumber("Threads per inch (TPI)", "bpl-n", { step: "any", min: "0" });
   const grade = makeSelect("SAE grade", "bpl-grade", [
     { value: "2", label: "Grade 2 (55 ksi proof)" },
     { value: "5", label: "Grade 5 / A325 (85 ksi proof)", selected: true },

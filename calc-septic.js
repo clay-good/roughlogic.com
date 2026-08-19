@@ -503,16 +503,11 @@ export const leachFieldAggregateExample = { inputs: { num_trenches: 3, trench_le
 
 function renderLeachFieldAggregate(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: drainrock identity by name. stone = trenches x length x width x depth / 27; tons = stone x drainrock unit weight (~1.4 ton/cy). The trench dimensions come from the AHJ-approved septic design; the required length is septic-drainfield.";
-  const nt = makeNumber("Number of trenches", "lfa-nt", { step: "1", min: "0", value: "3" });
-  nt.input.value = "3";
-  const tl = makeNumber("Trench length (ft)", "lfa-tl", { step: "any", min: "0", value: "60" });
-  tl.input.value = "60";
-  const tw = makeNumber("Trench width (in)", "lfa-tw", { step: "any", min: "0", value: "24" });
-  tw.input.value = "24";
-  const sd = makeNumber("Stone depth (in)", "lfa-sd", { step: "any", min: "0", value: "12" });
-  sd.input.value = "12";
-  const ws = makeNumber("Waste allowance (%)", "lfa-ws", { step: "any", min: "0", value: "10" });
-  ws.input.value = "10";
+  const nt = makeNumber("Number of trenches", "lfa-nt", { step: "1", min: "0" });
+  const tl = makeNumber("Trench length (ft)", "lfa-tl", { step: "any", min: "0" });
+  const tw = makeNumber("Trench width (in)", "lfa-tw", { step: "any", min: "0" });
+  const sd = makeNumber("Stone depth (in)", "lfa-sd", { step: "any", min: "0" });
+  const ws = makeNumber("Waste allowance (%)", "lfa-ws", { step: "any", min: "0" });
   for (const f of [nt, tl, tw, sd, ws]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { nt.input.value = "3"; tl.input.value = "60"; tw.input.value = "24"; sd.input.value = "12"; ws.input.value = "10"; update(); });
   const oCy = makeOutputLine(outputRegion, "Drainrock volume", "lfa-out-cy");

@@ -1044,11 +1044,11 @@ export function computeTruckSweptPathWidth({ turn_radius_ft = 0, wheelbase1_ft =
 export const truckSweptPathWidthExample = { inputs: { turn_radius_ft: 50, wheelbase1_ft: 20, wheelbase2_ft: 40, vehicle_width_ft: 8.5, front_swingout_ft: 0 } };
 function renderTruckSweptPathWidth(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: AASHTO Green Book swept-path width SPW = vehicle width + off-tracking (+ front swing-out), with OT = R - sqrt(R^2 - sum(L_i^2)) the low-speed off-tracking (R the turn radius, L_i each unit's wheelbase in quadrature). The roadway width a turning truck covers; high-speed off-tracking is separate. The design vehicle and the agency govern.";
-  const R = makeNumber("Turn radius R (ft)", "tsp-r", { step: "any", min: "0", value: "50" }); R.input.value = "50";
-  const l1 = makeNumber("Tractor / unit wheelbase (ft)", "tsp-l1", { step: "any", min: "0", value: "20" }); l1.input.value = "20";
-  const l2 = makeNumber("Trailer kingpin-to-axle (ft; 0 if single unit)", "tsp-l2", { step: "any", min: "0", value: "40" }); l2.input.value = "40";
-  const w = makeNumber("Vehicle width (ft; ~8.5 legal max)", "tsp-w", { step: "any", min: "0", value: "8.5" }); w.input.value = "8.5";
-  const fs = makeNumber("Front swing-out (ft; 0, or from the turning template)", "tsp-fs", { step: "any", min: "0", value: "0" }); fs.input.value = "0";
+  const R = makeNumber("Turn radius R (ft)", "tsp-r", { step: "any", min: "0" });
+  const l1 = makeNumber("Tractor / unit wheelbase (ft)", "tsp-l1", { step: "any", min: "0" });
+  const l2 = makeNumber("Trailer kingpin-to-axle (ft; 0 if single unit)", "tsp-l2", { step: "any", min: "0" });
+  const w = makeNumber("Vehicle width (ft; ~8.5 legal max)", "tsp-w", { step: "any", min: "0" });
+  const fs = makeNumber("Front swing-out (ft; 0, or from the turning template)", "tsp-fs", { step: "any", min: "0" });
   for (const f of [R, l1, l2, w, fs]) inputRegion.appendChild(f.wrap);
   const oSPW = makeOutputLine(outputRegion, "Swept-path width", "tsp-out-spw");
   const oOT = makeOutputLine(outputRegion, "Off-tracking (rear inside front)", "tsp-out-ot");
@@ -1208,12 +1208,12 @@ export const costPerMileExample = { inputs: { fixed_monthly: 6000, miles_month: 
 
 function renderCostPerMile(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Cost-per-mile bucket methodology per ATRI (American Transportation Research Institute), 'An Analysis of the Operational Costs of Trucking', by name; arithmetic is public and all figures are user-supplied. Deadhead miles should be in the mileage base. Report free at truckingresearch.org.";
-  const fixed = makeNumber("Fixed monthly costs ($)", "cpm-fixed", { step: "any", min: "0", value: "6000" }); fixed.input.value = "6000";
-  const miles = makeNumber("Miles per month", "cpm-miles", { step: "any", min: "0", value: "10000" }); miles.input.value = "10000";
-  const price = makeNumber("Fuel price ($/gal)", "cpm-price", { step: "any", min: "0", value: "4.0" }); price.input.value = "4.0";
-  const mpg = makeNumber("Fuel economy (mpg)", "cpm-mpg", { step: "any", min: "0", value: "6.5" }); mpg.input.value = "6.5";
-  const maint = makeNumber("Maintenance ($/mi)", "cpm-maint", { step: "any", min: "0", value: "0.18" }); maint.input.value = "0.18";
-  const driver = makeNumber("Driver pay ($/mi)", "cpm-driver", { step: "any", min: "0", value: "0.65" }); driver.input.value = "0.65";
+  const fixed = makeNumber("Fixed monthly costs ($)", "cpm-fixed", { step: "any", min: "0" });
+  const miles = makeNumber("Miles per month", "cpm-miles", { step: "any", min: "0" });
+  const price = makeNumber("Fuel price ($/gal)", "cpm-price", { step: "any", min: "0" });
+  const mpg = makeNumber("Fuel economy (mpg)", "cpm-mpg", { step: "any", min: "0" });
+  const maint = makeNumber("Maintenance ($/mi)", "cpm-maint", { step: "any", min: "0" });
+  const driver = makeNumber("Driver pay ($/mi)", "cpm-driver", { step: "any", min: "0" });
   for (const f of [fixed, miles, price, mpg, maint, driver]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { fixed.input.value = "6000"; miles.input.value = "10000"; price.input.value = "4.0"; mpg.input.value = "6.5"; maint.input.value = "0.18"; driver.input.value = "0.65"; update(); });
   const oTotal = makeOutputLine(outputRegion, "Total cost per mile", "cpm-out-total");
@@ -1329,11 +1329,11 @@ export const axleLoadDistributionExample = { inputs: { drive_lb: 35200, trailer_
 
 function renderAxleLoadDistribution(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per the federal axle/gross weight limits - 23 CFR 658.17 (12,000 lb steer, 34,000 lb tandem, 80,000 lb gross) and the federal Bridge Formula, by name; lever-arm statics is public. Cross-references the bridge-formula tile. FMCSA enforces. Free at ecfr.gov.";
-  const drive = makeNumber("Drive-tandem weight (lb)", "ald-drive", { step: "any", min: "0", value: "35200" }); drive.input.value = "35200";
-  const trailer = makeNumber("Trailer-tandem weight (lb)", "ald-trailer", { step: "any", min: "0", value: "32000" }); trailer.input.value = "32000";
-  const L = makeNumber("Kingpin-to-tandem distance (in)", "ald-l", { step: "any", min: "0", value: "400" }); L.input.value = "400";
-  const spacing = makeNumber("Hole spacing (in)", "ald-sp", { step: "any", min: "0", value: "6" }); spacing.input.value = "6";
-  const cap = makeNumber("Legal tandem cap (lb)", "ald-cap", { step: "any", min: "0", value: "34000" }); cap.input.value = "34000";
+  const drive = makeNumber("Drive-tandem weight (lb)", "ald-drive", { step: "any", min: "0" });
+  const trailer = makeNumber("Trailer-tandem weight (lb)", "ald-trailer", { step: "any", min: "0" });
+  const L = makeNumber("Kingpin-to-tandem distance (in)", "ald-l", { step: "any", min: "0" });
+  const spacing = makeNumber("Hole spacing (in)", "ald-sp", { step: "any", min: "0" });
+  const cap = makeNumber("Legal tandem cap (lb)", "ald-cap", { step: "any", min: "0" });
   for (const f of [drive, trailer, L, spacing, cap]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { drive.input.value = "35200"; trailer.input.value = "32000"; L.input.value = "400"; spacing.input.value = "6"; cap.input.value = "34000"; update(); });
   const oShift = makeOutputLine(outputRegion, "Weight shift per hole", "ald-out-shift");

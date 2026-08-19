@@ -338,12 +338,12 @@ export const langelierIndexExample = { inputs: { ph: 7.5, temp: 25, temp_unit: "
 
 function renderLangelierIndex(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Langelier (1936) saturation index as standardized in Standard Methods for the Examination of Water and Wastewater (APHA/AWWA/WEF) and AWWA practice, by name; method cited, not reproduced. The user supplies measured water-quality values. LSI predicts tendency, not rate.";
-  const ph = makeNumber("pH", "lsi-ph", { step: "any", min: "0", value: "7.5" }); ph.input.value = "7.5";
-  const temp = makeNumber("Water temperature", "lsi-temp", { step: "any", value: "77" }); temp.input.value = "77";
+  const ph = makeNumber("pH", "lsi-ph", { step: "any", min: "0" });
+  const temp = makeNumber("Water temperature", "lsi-temp", { step: "any" });
   const unit = makeSelect("Temp unit", "lsi-unit", [{ value: "F", label: "Fahrenheit", selected: true }, { value: "C", label: "Celsius" }]);
-  const ca = makeNumber("Calcium hardness (mg/L CaCO3)", "lsi-ca", { step: "any", min: "0", value: "200" }); ca.input.value = "200";
-  const alk = makeNumber("Total alkalinity (mg/L CaCO3)", "lsi-alk", { step: "any", min: "0", value: "150" }); alk.input.value = "150";
-  const tds = makeNumber("TDS (mg/L)", "lsi-tds", { step: "any", min: "0", value: "320" }); tds.input.value = "320";
+  const ca = makeNumber("Calcium hardness (mg/L CaCO3)", "lsi-ca", { step: "any", min: "0" });
+  const alk = makeNumber("Total alkalinity (mg/L CaCO3)", "lsi-alk", { step: "any", min: "0" });
+  const tds = makeNumber("TDS (mg/L)", "lsi-tds", { step: "any", min: "0" });
   for (const f of [ph, temp, unit, ca, alk, tds]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ph.input.value = "7.5"; temp.input.value = "77"; unit.select.value = "F"; ca.input.value = "200"; alk.input.value = "150"; tds.input.value = "320"; update(); });
   const oLSI = makeOutputLine(outputRegion, "LSI", "lsi-out-lsi");
@@ -395,11 +395,11 @@ export const chemicalFeedPumpExample = { inputs: { flow_mgd: 0.5, dose_mgl: 8, s
 
 function renderChemicalFeedPump(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Pounds-formula basis (lb/day = MGD x mg/L x 8.34), standard AWWA / EPA water-operator practice, by name. Distinct from the coagulant-dose and pounds-formula tiles - this solves for the physical pump setting (% / GPD / mL per min). The operator of record and primacy agency govern.";
-  const flow = makeNumber("Plant flow (MGD)", "cfp-flow", { step: "any", min: "0", value: "0.5" }); flow.input.value = "0.5";
-  const dose = makeNumber("Target dose (mg/L)", "cfp-dose", { step: "any", min: "0", value: "8" }); dose.input.value = "8";
-  const strength = makeNumber("Solution strength (% active)", "cfp-str", { step: "any", min: "0", max: "100", value: "12.5" }); strength.input.value = "12.5";
-  const sg = makeNumber("Solution specific gravity", "cfp-sg", { step: "any", min: "0", value: "1.16" }); sg.input.value = "1.16";
-  const pump = makeNumber("Pump max output (GPD)", "cfp-pump", { step: "any", min: "0", value: "50" }); pump.input.value = "50";
+  const flow = makeNumber("Plant flow (MGD)", "cfp-flow", { step: "any", min: "0" });
+  const dose = makeNumber("Target dose (mg/L)", "cfp-dose", { step: "any", min: "0" });
+  const strength = makeNumber("Solution strength (% active)", "cfp-str", { step: "any", min: "0", max: "100" });
+  const sg = makeNumber("Solution specific gravity", "cfp-sg", { step: "any", min: "0" });
+  const pump = makeNumber("Pump max output (GPD)", "cfp-pump", { step: "any", min: "0" });
   for (const f of [flow, dose, strength, sg, pump]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { flow.input.value = "0.5"; dose.input.value = "8"; strength.input.value = "12.5"; sg.input.value = "1.16"; pump.input.value = "50"; update(); });
   const oFeed = makeOutputLine(outputRegion, "Solution feed", "cfp-out-feed");
@@ -859,10 +859,10 @@ export function computeClarifierSurfaceLoading({ flow_mgd = 0, surface_ft2 = 0, 
 export const clarifierSurfaceLoadingExample = { inputs: { flow_mgd: 1.0, surface_ft2: 1256.6, weir_len_ft: 125.7, mlss_mgl: 2500 } };
 function renderClarifierSurfaceLoading(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Clarifier hydraulic and solids loading (Ten States Standards / Metcalf & Eddy, Wastewater Engineering): surface overflow rate = flow/area (gpd/ft^2), weir overflow rate = flow/weir length (gpd/ft), solids loading = flow x MLSS x 8.34 / area (lb/ft^2/day). The state design criteria govern the limits. An operations aid; the operator of record and the primacy agency govern compliance.";
-  const flow = makeNumber("Flow (MGD)", "csl-flow", { step: "any", min: "0" }); flow.input.value = "1.0";
-  const area = makeNumber("Surface area (ft²)", "csl-area", { step: "any", min: "0" }); area.input.value = "1256.6";
-  const weir = makeNumber("Total weir length (ft)", "csl-weir", { step: "any", min: "0" }); weir.input.value = "125.7";
-  const mlss = makeNumber("MLSS (mg/L, secondary only)", "csl-mlss", { step: "any", min: "0" }); mlss.input.value = "2500";
+  const flow = makeNumber("Flow (MGD)", "csl-flow", { step: "any", min: "0" });
+  const area = makeNumber("Surface area (ft²)", "csl-area", { step: "any", min: "0" });
+  const weir = makeNumber("Total weir length (ft)", "csl-weir", { step: "any", min: "0" });
+  const mlss = makeNumber("MLSS (mg/L, secondary only)", "csl-mlss", { step: "any", min: "0" });
   for (const f of [flow, area, weir, mlss]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { flow.input.value = "1.0"; area.input.value = "1256.6"; weir.input.value = "125.7"; mlss.input.value = "2500"; update(); });
   const oSor = makeOutputLine(outputRegion, "Surface overflow rate", "csl-out-sor");
@@ -902,8 +902,8 @@ export function computeClarifierAreaForLoading({ flow_mgd = 0, target_sor_gpd_ft
 export const clarifierAreaForLoadingExample = { inputs: { flow_mgd: 1.0, target_sor_gpd_ft2: 800 } };
 function renderClarifierAreaForLoading(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Clarifier hydraulic loading (Ten States Standards / Metcalf & Eddy, Wastewater Engineering): surface overflow rate = flow/area, solved for the area: area = flow x 1e6 / SOR; equivalent circular diameter = sqrt(4 x area / pi). The state design criteria govern the limits. An operations aid; the operator of record and the primacy agency govern compliance.";
-  const flow = makeNumber("Design flow (MGD)", "cal-flow", { step: "any", min: "0" }); flow.input.value = "1.0";
-  const sor = makeNumber("Target surface overflow rate (gpd/ft², ~700-1000)", "cal-sor", { step: "any", min: "0" }); sor.input.value = "800";
+  const flow = makeNumber("Design flow (MGD)", "cal-flow", { step: "any", min: "0" });
+  const sor = makeNumber("Target surface overflow rate (gpd/ft², ~700-1000)", "cal-sor", { step: "any", min: "0" });
   for (const f of [flow, sor]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { flow.input.value = "1.0"; sor.input.value = "800"; update(); });
   const oArea = makeOutputLine(outputRegion, "Required surface area", "cal-out-area");
@@ -942,9 +942,9 @@ export function computeBodTssLoadingRemoval({ flow_mgd = 0, influent_mgl = 0, ef
 export const bodTssLoadingRemovalExample = { inputs: { flow_mgd: 1.0, influent_mgl: 200, effluent_mgl: 20 } };
 function renderBodTssLoadingRemoval(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: BOD/TSS mass loading and removal (the pounds formula, Metcalf & Eddy / operator practice): load (lb/day) = MGD x mg/L x 8.34, removal% = (influent - effluent) / influent x 100. An operations aid; the operator of record and the primacy agency govern compliance.";
-  const flow = makeNumber("Plant flow (MGD)", "btl-flow", { step: "any", min: "0" }); flow.input.value = "1.0";
-  const inf = makeNumber("Influent BOD or TSS (mg/L)", "btl-inf", { step: "any", min: "0" }); inf.input.value = "200";
-  const eff = makeNumber("Effluent BOD or TSS (mg/L)", "btl-eff", { step: "any", min: "0" }); eff.input.value = "20";
+  const flow = makeNumber("Plant flow (MGD)", "btl-flow", { step: "any", min: "0" });
+  const inf = makeNumber("Influent BOD or TSS (mg/L)", "btl-inf", { step: "any", min: "0" });
+  const eff = makeNumber("Effluent BOD or TSS (mg/L)", "btl-eff", { step: "any", min: "0" });
   for (const f of [flow, inf, eff]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { flow.input.value = "1.0"; inf.input.value = "200"; eff.input.value = "20"; update(); });
   const oInf = makeOutputLine(outputRegion, "Influent / effluent load", "btl-out-inf");
@@ -979,8 +979,8 @@ export function computeTdsFromConductivity({ conductivity_us_cm = 0, k_factor = 
 export const tdsFromConductivityExample = { inputs: { conductivity_us_cm: 1000, k_factor: 0.65 } };
 function renderTdsFromConductivity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: TDS from conductivity (Standard Methods 2510 / operator practice): TDS (mg/L) = k x EC (uS/cm at 25 C), k commonly 0.55-0.75 by ion makeup. An estimate, not a gravimetric TDS; calibrate k against a lab result. An operations aid; the operator of record and the primacy agency govern compliance.";
-  const ec = makeNumber("Conductivity (uS/cm at 25 C)", "tfc-ec", { step: "any", min: "0" }); ec.input.value = "1000";
-  const k = makeNumber("TDS/EC factor (0.4-0.9, default 0.65)", "tfc-k", { step: "any", min: "0" }); k.input.value = "0.65";
+  const ec = makeNumber("Conductivity (uS/cm at 25 C)", "tfc-ec", { step: "any", min: "0" });
+  const k = makeNumber("TDS/EC factor (0.4-0.9, default 0.65)", "tfc-k", { step: "any", min: "0" });
   for (const f of [ec, k]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ec.input.value = "1000"; k.input.value = "0.65"; update(); });
   const oTds = makeOutputLine(outputRegion, "Total dissolved solids", "tfc-out-tds");
@@ -1014,8 +1014,8 @@ export function computeConductivityFromTds({ tds_mgl = 0, k_factor = 0.65 } = {}
 export const conductivityFromTdsExample = { inputs: { tds_mgl: 650, k_factor: 0.65 } };
 function renderConductivityFromTds(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: conductivity from TDS (Standard Methods 2510 / operator practice), the inverse of the TDS estimate: EC (uS/cm at 25 C) = TDS (mg/L) / k, k commonly 0.55-0.75 by ion makeup. An estimate, not a measurement; calibrate k against a lab result. An operations aid; the operator of record and the primacy agency govern compliance.";
-  const tds = makeNumber("Total dissolved solids (mg/L)", "cft-tds", { step: "any", min: "0" }); tds.input.value = "650";
-  const k = makeNumber("TDS/EC factor (0.4-0.9, default 0.65)", "cft-k", { step: "any", min: "0" }); k.input.value = "0.65";
+  const tds = makeNumber("Total dissolved solids (mg/L)", "cft-tds", { step: "any", min: "0" });
+  const k = makeNumber("TDS/EC factor (0.4-0.9, default 0.65)", "cft-k", { step: "any", min: "0" });
   for (const f of [tds, k]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { tds.input.value = "650"; k.input.value = "0.65"; update(); });
   const oEc = makeOutputLine(outputRegion, "Electrical conductivity", "cft-out-ec");
@@ -1327,11 +1327,11 @@ export function computeFlocculatorPaddlePower({ paddle_radius_ft = 0, wheel_rpm 
 export const flocculatorPaddlePowerExample = { inputs: { paddle_radius_ft: 6, wheel_rpm: 3, paddle_area_ft2: 40, drag_coeff: 1.8, slip_factor: 0.25 } };
 function renderFlocculatorPaddlePower(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Camp paddle flocculator power (water-treatment design practice), by name. v_tip = 2 x pi x radius x rpm / 60; v_rel = v_tip x (1 - k); P = 0.5 x Cd x 1.937 x area x v_rel^3 (ft-lb/s, x 1.35582 for W, / 550 for hp). The power goes as the cube of the relative velocity; the water slips (rotates with the paddles) so v_rel is only (1 - k) of the tip speed - ignoring the slip roughly doubles the power. Cd (about 1.8, 1.0 to 1.8 reported) and k (about 0.25, 0.25 to 0.40 reported) are user inputs because references disagree. This power feeds flocculation-g-value.";
-  const r = makeNumber("Paddle radius to blade centroid (ft)", "fpp-r", { step: "any", min: "0", value: "6" }); r.input.value = "6";
-  const n = makeNumber("Wheel speed (rpm)", "fpp-n", { step: "any", min: "0", value: "3" }); n.input.value = "3";
-  const a = makeNumber("Total paddle-blade area (ft²)", "fpp-a", { step: "any", min: "0", value: "40" }); a.input.value = "40";
-  const cd = makeNumber("Drag coefficient Cd (about 1.8)", "fpp-cd", { step: "any", min: "0", value: "1.8" }); cd.input.value = "1.8";
-  const k = makeNumber("Slip factor k (about 0.25)", "fpp-k", { step: "any", min: "0", max: "1", value: "0.25" }); k.input.value = "0.25";
+  const r = makeNumber("Paddle radius to blade centroid (ft)", "fpp-r", { step: "any", min: "0" });
+  const n = makeNumber("Wheel speed (rpm)", "fpp-n", { step: "any", min: "0" });
+  const a = makeNumber("Total paddle-blade area (ft²)", "fpp-a", { step: "any", min: "0" });
+  const cd = makeNumber("Drag coefficient Cd (about 1.8)", "fpp-cd", { step: "any", min: "0" });
+  const k = makeNumber("Slip factor k (about 0.25)", "fpp-k", { step: "any", min: "0", max: "1" });
   for (const f of [r, n, a, cd, k]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { r.input.value = "6"; n.input.value = "3"; a.input.value = "40"; cd.input.value = "1.8"; k.input.value = "0.25"; update(); });
   const oPower = makeOutputLine(outputRegion, "Power into the basin", "fpp-out-power");
@@ -1374,12 +1374,12 @@ export function computeChlorineCylinderWithdrawal({ feed_rate_lb_day = 0, contai
 export const chlorineCylinderWithdrawalExample = { inputs: { feed_rate_lb_day: 100, container_type: "cylinder", room_temp_f: 70 } };
 function renderChlorineCylinderWithdrawal(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: gas chlorine container withdrawal rate (The Chlorine Institute; state operator training), by name. Per-container ceiling ~40 lb/day (150-lb cylinder) or ~400 lb/day (1-ton) at ~70 F, derated in a colder room; containers = ceil(feed / per-container). The withdrawal rate is a temperature-dependent latent-heat ceiling - pulling too fast frosts the container. Exceeding it forces a manifold or evaporator. The Chlorine Institute guidance and the manufacturer chart govern.";
-  const feed = makeNumber("Required chlorine feed (lb/day)", "ccw-feed", { step: "any", min: "0", value: "100" }); feed.input.value = "100";
+  const feed = makeNumber("Required chlorine feed (lb/day)", "ccw-feed", { step: "any", min: "0" });
   const type = makeSelect("Container type", "ccw-type", [
     { value: "cylinder", label: "150-lb cylinder (~40 lb/day)", selected: true },
     { value: "ton", label: "1-ton container (~400 lb/day)" },
   ]);
-  const temp = makeNumber("Chlorine room temperature (°F)", "ccw-temp", { step: "any", value: "70" }); temp.input.value = "70";
+  const temp = makeNumber("Chlorine room temperature (°F)", "ccw-temp", { step: "any" });
   for (const f of [feed, type, temp]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { feed.input.value = "100"; type.select.value = "cylinder"; temp.input.value = "70"; update(); });
   const oPer = makeOutputLine(outputRegion, "Per-container ceiling", "ccw-out-per");
@@ -1426,18 +1426,12 @@ export const poolTileCopingPerimeterExample = { inputs: { length_ft: 32, width_f
 
 function _v898renderPoolTileCopingPerimeter(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: perimeter-takeoff identity by name. perimeter = 2 x (length + width); tiles = ceil(perimeter / tile length x courses x (1 + waste)); coping = ceil(perimeter / coping length x (1 + waste)).";
-  const ln = makeNumber("Pool length (ft)", "ptc-ln", { step: "any", min: "0", value: "32" });
-  ln.input.value = "32";
-  const wd = makeNumber("Pool width (ft)", "ptc-wd", { step: "any", min: "0", value: "16" });
-  wd.input.value = "16";
-  const tl = makeNumber("Waterline tile length (in)", "ptc-tl", { step: "any", min: "0", value: "6" });
-  tl.input.value = "6";
-  const cs = makeNumber("Waterline tile courses", "ptc-cs", { step: "any", min: "0", value: "1" });
-  cs.input.value = "1";
-  const cl = makeNumber("Coping unit length (in)", "ptc-cl", { step: "any", min: "0", value: "12" });
-  cl.input.value = "12";
-  const ws = makeNumber("Waste allowance (%)", "ptc-ws", { step: "any", min: "0", value: "10" });
-  ws.input.value = "10";
+  const ln = makeNumber("Pool length (ft)", "ptc-ln", { step: "any", min: "0" });
+  const wd = makeNumber("Pool width (ft)", "ptc-wd", { step: "any", min: "0" });
+  const tl = makeNumber("Waterline tile length (in)", "ptc-tl", { step: "any", min: "0" });
+  const cs = makeNumber("Waterline tile courses", "ptc-cs", { step: "any", min: "0" });
+  const cl = makeNumber("Coping unit length (in)", "ptc-cl", { step: "any", min: "0" });
+  const ws = makeNumber("Waste allowance (%)", "ptc-ws", { step: "any", min: "0" });
   for (const f of [ln, wd, tl, cs, cl, ws]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ln.input.value = "32"; wd.input.value = "16"; tl.input.value = "6"; cs.input.value = "1"; cl.input.value = "12"; ws.input.value = "10"; update(); });
   const oPerim = makeOutputLine(outputRegion, "Pool perimeter", "ptc-out-perim");
@@ -1484,18 +1478,12 @@ export const poolInteriorFinishVolumeExample = { inputs: { length_ft: 30, width_
 
 function _v899renderPoolInteriorFinishVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: interior-finish identity by name. interior = length x width + 2 x (length + width) x average depth; gunite = interior x shell / 27 x (1 + waste); plaster = interior x plaster / 27.";
-  const ln = makeNumber("Pool length (ft)", "pif-ln", { step: "any", min: "0", value: "30" });
-  ln.input.value = "30";
-  const wd = makeNumber("Pool width (ft)", "pif-wd", { step: "any", min: "0", value: "15" });
-  wd.input.value = "15";
-  const dp = makeNumber("Average depth (ft)", "pif-dp", { step: "any", min: "0", value: "5.5" });
-  dp.input.value = "5.5";
-  const sh = makeNumber("Gunite shell thickness (in)", "pif-sh", { step: "any", min: "0", value: "8" });
-  sh.input.value = "8";
-  const pl = makeNumber("Plaster thickness (in)", "pif-pl", { step: "any", min: "0", value: "0.375" });
-  pl.input.value = "0.375";
-  const ws = makeNumber("Gunite waste allowance (%)", "pif-ws", { step: "any", min: "0", value: "15" });
-  ws.input.value = "15";
+  const ln = makeNumber("Pool length (ft)", "pif-ln", { step: "any", min: "0" });
+  const wd = makeNumber("Pool width (ft)", "pif-wd", { step: "any", min: "0" });
+  const dp = makeNumber("Average depth (ft)", "pif-dp", { step: "any", min: "0" });
+  const sh = makeNumber("Gunite shell thickness (in)", "pif-sh", { step: "any", min: "0" });
+  const pl = makeNumber("Plaster thickness (in)", "pif-pl", { step: "any", min: "0" });
+  const ws = makeNumber("Gunite waste allowance (%)", "pif-ws", { step: "any", min: "0" });
   for (const f of [ln, wd, dp, sh, pl, ws]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ln.input.value = "30"; wd.input.value = "15"; dp.input.value = "5.5"; sh.input.value = "8"; pl.input.value = "0.375"; ws.input.value = "15"; update(); });
   const oArea = makeOutputLine(outputRegion, "Interior surface area", "pif-out-area");
@@ -1547,14 +1535,10 @@ export const oilWaterSeparatorSizingExample = { inputs: { flow_gpm: 50, oil_sg: 
 
 function _v943renderOilWaterSeparatorSizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: gravity oil/water separator surface area by name (API 421). rise velocity Vt = g(rho_w - rho_o)d^2/(18 mu) (Stokes); horizontal area = 1.2 x Q / Vt. A screen; API 421, the manufacturer, and the engineer / AHJ govern the separator and discharge.";
-  const q = makeNumber("Design flow (gpm)", "ows-q", { step: "any", min: "0", value: "50" });
-  q.input.value = "50";
-  const sg = makeNumber("Oil specific gravity", "ows-sg", { step: "any", min: "0", value: "0.85" });
-  sg.input.value = "0.85";
-  const dm = makeNumber("Design droplet (micron)", "ows-dm", { step: "any", min: "0", value: "150" });
-  dm.input.value = "150";
-  const mu = makeNumber("Water viscosity (cP)", "ows-mu", { step: "any", min: "0", value: "1.1" });
-  mu.input.value = "1.1";
+  const q = makeNumber("Design flow (gpm)", "ows-q", { step: "any", min: "0" });
+  const sg = makeNumber("Oil specific gravity", "ows-sg", { step: "any", min: "0" });
+  const dm = makeNumber("Design droplet (micron)", "ows-dm", { step: "any", min: "0" });
+  const mu = makeNumber("Water viscosity (cP)", "ows-mu", { step: "any", min: "0" });
   for (const f of [q, sg, dm, mu]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { q.input.value = "50"; sg.input.value = "0.85"; dm.input.value = "150"; mu.input.value = "1.1"; update(); });
   const oVt = makeOutputLine(outputRegion, "Droplet rise velocity", "ows-out-vt");
@@ -1612,12 +1596,9 @@ export const particleSettlingVelocityExample = { inputs: { particle_diameter_mm:
 
 function _v1271renderParticleSettlingVelocity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: discrete-particle settling velocity by Stokes' law, Vs = g(rho_p - rho_w)d^2/(18 mu) (first-principles; Davis & Cornwell). Water density and viscosity from temperature; valid only for particle Reynolds number below about 1 (the tile flags the transition/Newton regime). A discrete (Type I) settling screen; the engineer governs the basin.";
-  const d = makeNumber("Particle diameter (mm)", "psv-d", { step: "any", min: "0", value: "0.05" });
-  d.input.value = "0.05";
-  const sg = makeNumber("Particle specific gravity", "psv-sg", { step: "any", min: "0", value: "2.65" });
-  sg.input.value = "2.65";
-  const tf = makeNumber("Water temperature (°F)", "psv-tf", { step: "any", value: "68" });
-  tf.input.value = "68";
+  const d = makeNumber("Particle diameter (mm)", "psv-d", { step: "any", min: "0" });
+  const sg = makeNumber("Particle specific gravity", "psv-sg", { step: "any", min: "0" });
+  const tf = makeNumber("Water temperature (°F)", "psv-tf", { step: "any" });
   for (const f of [d, sg, tf]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { d.input.value = "0.05"; sg.input.value = "2.65"; tf.input.value = "68"; update(); });
   const oVs = makeOutputLine(outputRegion, "Settling velocity", "psv-out-vs");
@@ -1712,8 +1693,8 @@ export function computeDesignFlowPeaking({ population = 0, per_capita_gpcd = 100
 export const designFlowPeakingExample = { inputs: { population: 50000, per_capita_gpcd: 100 } };
 function renderDesignFlowPeaking(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: sanitary design flow from population (Metcalf & Eddy, Wastewater Engineering / Ten States Standards): average daily flow = population x per-capita flow (gpcd); Harmon peaking factor PF = 1 + 14/(4 + sqrt(P)) and Gifft minimum ratio 0.2 x P^(1/6), P the population in thousands. Domestic sanitary flow only; infiltration/inflow and industrial load are added separately. The Harmon factor is drawn for populations of about 1,000 to 1,000,000. A design aid; Ten States Standards and the state design criteria and the engineer of record govern.";
-  const pop = makeNumber("Population (persons)", "dfp-pop", { step: "any", min: "0" }); pop.input.value = "50000";
-  const gpcd = makeNumber("Per-capita flow (gpcd, ~60-100 domestic)", "dfp-gpcd", { step: "any", min: "0" }); gpcd.input.value = "100";
+  const pop = makeNumber("Population (persons)", "dfp-pop", { step: "any", min: "0" });
+  const gpcd = makeNumber("Per-capita flow (gpcd, ~60-100 domestic)", "dfp-gpcd", { step: "any", min: "0" });
   for (const f of [pop, gpcd]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { pop.input.value = "50000"; gpcd.input.value = "100"; update(); });
   const oAvg = makeOutputLine(outputRegion, "Average daily flow (feed flow_mgd)", "dfp-out-avg");

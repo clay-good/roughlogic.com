@@ -335,9 +335,9 @@ export const basalAreaPrismExample = { inputs: { baf: 10, in_tree_count: 8, dbh_
 
 function _v563renderBasalAreaPrism(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: prism (variable-radius / angle-gauge) point sampling, per USDA Forest Service mensuration and Bitterlich variable-radius plots, by name. basal_area_per_acre = BAF x in-tree count; per-tree basal area = 0.005454 x DBH^2; trees per acre = BAF / per-tree BA. The prism counts by angular size, not distance; the basal area per acre is independent of plot radius. A field estimate; a qualified cruise and the forester govern.";
-  const baf = makeNumber("Basal-area factor (BAF, ft²/ac)", "bap-baf", { step: "any", min: "0", value: "10" }); baf.input.value = "10";
-  const count = makeNumber("Trees counted 'in'", "bap-count", { step: "1", min: "0", value: "8" }); count.input.value = "8";
-  const dbh = makeNumber("Tree DBH (in, for the expansion)", "bap-dbh", { step: "any", min: "0", value: "14" }); dbh.input.value = "14";
+  const baf = makeNumber("Basal-area factor (BAF, ft²/ac)", "bap-baf", { step: "any", min: "0" });
+  const count = makeNumber("Trees counted 'in'", "bap-count", { step: "1", min: "0" });
+  const dbh = makeNumber("Tree DBH (in, for the expansion)", "bap-dbh", { step: "any", min: "0" });
   for (const f of [baf, count, dbh]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { baf.input.value = "10"; count.input.value = "8"; dbh.input.value = "14"; update(); });
   const oBa = makeOutputLine(outputRegion, "Basal area per acre", "bap-out-ba");
@@ -387,9 +387,9 @@ export const reinekeSdiExample = { inputs: { trees_per_acre: 300, qmd_in: 10, sd
 
 function _v564renderReinekeSdi(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Reineke Stand Density Index (Reineke 1933; USDA FS RMRS), by name. SDI = TPA x (QMD/10)^1.605; percent of max = SDI / SDI_max x 100. SDI uses the quadratic mean diameter (the diameter of the tree of average basal area), not the arithmetic mean; the 1.605 exponent is the empirical self-thinning slope; the maximum SDI is species-specific. A management aid; a qualified silvicultural prescription governs.";
-  const tpa = makeNumber("Trees per acre (live stems)", "sdi-tpa", { step: "any", min: "0", value: "300" }); tpa.input.value = "300";
-  const qmd = makeNumber("Quadratic mean diameter (in)", "sdi-qmd", { step: "any", min: "0", value: "10" }); qmd.input.value = "10";
-  const smax = makeNumber("Species maximum SDI (0 to skip)", "sdi-max", { step: "any", min: "0", value: "400" }); smax.input.value = "400";
+  const tpa = makeNumber("Trees per acre (live stems)", "sdi-tpa", { step: "any", min: "0" });
+  const qmd = makeNumber("Quadratic mean diameter (in)", "sdi-qmd", { step: "any", min: "0" });
+  const smax = makeNumber("Species maximum SDI (0 to skip)", "sdi-max", { step: "any", min: "0" });
   for (const f of [tpa, qmd, smax]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { tpa.input.value = "300"; qmd.input.value = "10"; smax.input.value = "400"; update(); });
   const oSdi = makeOutputLine(outputRegion, "Stand Density Index", "sdi-out-sdi");
@@ -527,8 +527,8 @@ export const trunkDecayStrengthExample = { inputs: { diameter_in: 24, shell_thic
 
 function _v565renderTrunkDecayStrength(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: hollow-trunk strength-loss screen (Wagener 1963; Smiley & Fraedrich 1992; Mattheck & Breloer t/R; ISA TRAQ), by name. hollow_d = D - 2t; loss% = (hollow_d^3 / D^3) x 100; t/R = t / (D/2), with the Mattheck concern trigger at t/R < 0.30. Strength loss goes as the cube of the hollow ratio (small until the hollow is large); an open cavity is far weaker. A screen, not a load rating; a qualified arborist and a TRAQ assessment govern.";
-  const D = makeNumber("Trunk diameter outside bark (in)", "tds-d", { step: "any", min: "0", value: "24" }); D.input.value = "24";
-  const t = makeNumber("Sound-wood shell thickness (in, radial)", "tds-t", { step: "any", min: "0", value: "4" }); t.input.value = "4";
+  const D = makeNumber("Trunk diameter outside bark (in)", "tds-d", { step: "any", min: "0" });
+  const t = makeNumber("Sound-wood shell thickness (in, radial)", "tds-t", { step: "any", min: "0" });
   for (const f of [D, t]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { D.input.value = "24"; t.input.value = "4"; update(); });
   const oLoss = makeOutputLine(outputRegion, "Strength loss (section modulus)", "tds-out-loss");
@@ -577,8 +577,8 @@ export const trunkMinShellThicknessExample = { inputs: { diameter_in: 24, allow_
 
 function _v730renderTrunkMinShellThickness(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: hollow-trunk strength-loss screen (Wagener 1963; Smiley & Fraedrich 1992; Mattheck & Breloer t/R; ISA TRAQ), by name, solved for the shell: t = (D/2) x (1 - (loss/100)^(1/3)), the inverse of loss% = ((D - 2t)/D)^3 x 100, with the Mattheck concern trigger at t/R < 0.30. Strength loss goes as the cube of the hollow ratio; an open cavity is far weaker. A screen, not a load rating; a qualified arborist and a TRAQ assessment govern.";
-  const D = makeNumber("Trunk diameter outside bark (in)", "tms-d", { step: "any", min: "0", value: "24" }); D.input.value = "24";
-  const loss = makeNumber("Allowable strength loss (%)", "tms-loss", { step: "any", min: "0", value: "29.6" }); loss.input.value = "29.6";
+  const D = makeNumber("Trunk diameter outside bark (in)", "tms-d", { step: "any", min: "0" });
+  const loss = makeNumber("Allowable strength loss (%)", "tms-loss", { step: "any", min: "0" });
   for (const f of [D, loss]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { D.input.value = "24"; loss.input.value = "29.6"; update(); });
   const oShell = makeOutputLine(outputRegion, "Minimum sound-shell thickness", "tms-out-shell");
@@ -623,9 +623,9 @@ export function computeTreeOpenCavity({ diameter_in = 0, shell_thick_in = 0, ope
 export const treeOpenCavityExample = { inputs: { diameter_in: 24, shell_thick_in: 3, opening_width_in: 8 } };
 function _v607renderTreeOpenCavity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Smiley & Fraedrich (1992) open-cavity strength-loss formula, by name. hollow_d = diameter - 2 x shell_thick; R = min(1, opening_width / (pi x diameter)); closed_loss = (hollow_d^3 / diameter^3) x 100 (Wagener closed hollow); open_loss = (hollow_d^3 + R x (diameter^3 - hollow_d^3)) / diameter^3 x 100. An open face makes the ring a broken tube, far weaker than a closed hollow; the formula collapses to Wagener at R = 0. The ISA 33% guide is a concern trigger, not a failure prediction.";
-  const D = makeNumber("Trunk diameter (in, inside bark)", "toc-d", { step: "any", min: "0", value: "24" }); D.input.value = "24";
-  const t = makeNumber("Sound-shell (wall) thickness (in)", "toc-t", { step: "any", min: "0", value: "3" }); t.input.value = "3";
-  const opening = makeNumber("Open cavity face width (in, 0 = closed hollow)", "toc-o", { step: "any", min: "0", value: "8" }); opening.input.value = "8";
+  const D = makeNumber("Trunk diameter (in, inside bark)", "toc-d", { step: "any", min: "0" });
+  const t = makeNumber("Sound-shell (wall) thickness (in)", "toc-t", { step: "any", min: "0" });
+  const opening = makeNumber("Open cavity face width (in, 0 = closed hollow)", "toc-o", { step: "any", min: "0" });
   for (const f of [D, t, opening]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { D.input.value = "24"; t.input.value = "3"; opening.input.value = "8"; update(); });
   const oOpen = makeOutputLine(outputRegion, "Open-cavity strength loss", "toc-out-open");
@@ -665,7 +665,7 @@ export const treeProtectionZoneExample = { inputs: { dbh_in: 20, radius_factor: 
 
 function _v566renderTreeProtectionZone(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: tree protection zone / critical root zone (ANSI A300 Part 5; ISA critical root zone), by name. radius = radius_factor x DBH; area = pi x radius^2. Factors: 1.0 ft per in of DBH (standard), 1.5 ft per in (conservative / mature). The zone is set by the trunk, not the canopy dripline; protection is cumulative (fence plus no grade change, compaction, or trenching). A qualified arborist and the local ordinance govern.";
-  const dbh = makeNumber("DBH (in)", "tpz-dbh", { step: "any", min: "0", value: "20" }); dbh.input.value = "20";
+  const dbh = makeNumber("DBH (in)", "tpz-dbh", { step: "any", min: "0" });
   const factor = makeSelect("Radius factor", "tpz-factor", [
     { value: "1.0", label: "1.0 ft/in (standard)", selected: true },
     { value: "1.5", label: "1.5 ft/in (conservative / mature)" },
@@ -719,12 +719,12 @@ export function computeTreeCrzEncroachment({ dbh_in = 0, radius_factor = 1.0, li
 export const treeCrzEncroachmentExample = { inputs: { dbh_in: 20, radius_factor: 1.0, limit_distance_ft: 5, species_tolerance: "intermediate" } };
 function _v608renderTreeCrzEncroachment(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: critical root zone encroachment (ANSI A300 Part 5 tree protection; arboriculture practice), by name. radius = radius_factor x DBH; the construction limit line at distance d cuts a segment R^2 x acos(d/R) - d x sqrt(R^2 - d^2); encroach = segment / (pi x R^2) x 100. Species thresholds (Matheny & Clark tolerance): tolerant ~40%, intermediate ~30%, sensitive ~20%. The encroachment is for a single straight limit line; a real footprint may cut more than one side and the impacts are cumulative. The CRZ is set by the trunk, not the canopy.";
-  const dbh = makeNumber("DBH (in)", "tce-dbh", { step: "any", min: "0", value: "20" }); dbh.input.value = "20";
+  const dbh = makeNumber("DBH (in)", "tce-dbh", { step: "any", min: "0" });
   const factor = makeSelect("Radius factor", "tce-factor", [
     { value: "1.0", label: "1.0 ft/in (standard)", selected: true },
     { value: "1.5", label: "1.5 ft/in (conservative / mature)" },
   ]);
-  const dist = makeNumber("Construction limit-line distance from trunk (ft)", "tce-dist", { step: "any", min: "0", value: "5" }); dist.input.value = "5";
+  const dist = makeNumber("Construction limit-line distance from trunk (ft)", "tce-dist", { step: "any", min: "0" });
   const species = makeSelect("Species tolerance", "tce-species", [
     { value: "tolerant", label: "Tolerant (~40%)" },
     { value: "intermediate", label: "Intermediate (~30%)", selected: true },
@@ -776,8 +776,8 @@ export const crownPruningDoseExample = { inputs: { live_foliage: 100, removed_fo
 
 function _v567renderCrownPruningDose(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ANSI A300 Part 1 live-crown removal limit (ISA Best Management Practices), by name. removal_pct = removed / live x 100, compared to the class cap: mature <= 25% in a single season, young ~15%, over-mature ~10%, stressed 0%. The 25% is the mature maximum, not a target; lion's-tailing violates A300 even under the percent cap. A planning aid; a qualified arborist governs.";
-  const live = makeNumber("Live crown / foliage before pruning (ft² or %)", "cpd-live", { step: "any", min: "0", value: "100" }); live.input.value = "100";
-  const removed = makeNumber("Foliage proposed for removal (same units)", "cpd-removed", { step: "any", min: "0", value: "15" }); removed.input.value = "15";
+  const live = makeNumber("Live crown / foliage before pruning (ft² or %)", "cpd-live", { step: "any", min: "0" });
+  const removed = makeNumber("Foliage proposed for removal (same units)", "cpd-removed", { step: "any", min: "0" });
   const cls = makeSelect("Maturity class", "cpd-cls", [
     { value: "young", label: "Young (~15% cap)" },
     { value: "mature", label: "Mature (25% cap)", selected: true },
@@ -826,12 +826,9 @@ export const treeHeightClinometerExample = { inputs: { horizontal_distance_ft: 1
 
 function renderTreeHeightClinometer(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: clinometer / percent-slope tree height H = D x (top% - base%)/100, both readings signed (+ above eye level, - below), standard USDA Forest Service mensuration / hypsometry, by name. Percent = 100 x tan(angle) for a degree-scale instrument. Assumes the top is above the base and D is the true horizontal distance. A field estimate; lean and a hidden top add error.";
-  const d = makeNumber("Horizontal distance to trunk (ft)", "thc-d", { step: "any", min: "0", value: "100" });
-  d.input.value = "100";
-  const top = makeNumber("Top reading (% slope, + above eye)", "thc-top", { step: "any", value: "58" });
-  top.input.value = "58";
-  const base = makeNumber("Base reading (% slope, - below eye)", "thc-base", { step: "any", value: "-4" });
-  base.input.value = "-4";
+  const d = makeNumber("Horizontal distance to trunk (ft)", "thc-d", { step: "any", min: "0" });
+  const top = makeNumber("Top reading (% slope, + above eye)", "thc-top", { step: "any" });
+  const base = makeNumber("Base reading (% slope, - below eye)", "thc-base", { step: "any" });
   for (const f of [d, top, base]) inputRegion.appendChild(f.wrap);
   const oH = makeOutputLine(outputRegion, "Tree height", "thc-out-h");
   const oA = makeOutputLine(outputRegion, "Height above eye level", "thc-out-a");
@@ -872,12 +869,9 @@ export const firewoodCordExample = { inputs: { length_ft: 8, height_ft: 4, depth
 
 function renderFirewoodCord(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: a full (standard) cord = 128 stacked cubic feet (a 4 x 4 x 8 ft rick); cords = length x height x depth / 128. Per NIST Handbook 130, Uniform Regulation for the Method of Sale of Commodities - firewood is sold by the cord, not 'face cord' or 'rick'. Stacked volume includes air gaps. A measurement aid; the state weights-and-measures office governs.";
-  const l = makeNumber("Stack length (ft)", "fwc-l", { step: "any", min: "0", value: "8" });
-  l.input.value = "8";
-  const h = makeNumber("Stack height (ft)", "fwc-h", { step: "any", min: "0", value: "4" });
-  h.input.value = "4";
-  const d = makeNumber("Stack depth / log length (ft)", "fwc-d", { step: "any", min: "0", value: "4" });
-  d.input.value = "4";
+  const l = makeNumber("Stack length (ft)", "fwc-l", { step: "any", min: "0" });
+  const h = makeNumber("Stack height (ft)", "fwc-h", { step: "any", min: "0" });
+  const d = makeNumber("Stack depth / log length (ft)", "fwc-d", { step: "any", min: "0" });
   for (const f of [l, h, d]) inputRegion.appendChild(f.wrap);
   const oC = makeOutputLine(outputRegion, "Cords (full cord = 128 ft³)", "fwc-out-c");
   const oV = makeOutputLine(outputRegion, "Stacked volume", "fwc-out-v");

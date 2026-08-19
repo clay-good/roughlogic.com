@@ -179,9 +179,9 @@ export function computeSpiralCurve({ radius_ft = 0, spiral_length_ft = 0, delta_
 export const spiralCurveExample = { inputs: { radius_ft: 1000, spiral_length_ft: 250, delta_deg: 20 } };
 function renderSpiralCurve(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: spiral (transition/clothoid) curve geometry per AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) and Ghilani & Wolf, Elementary Surveying: theta_s = Ls/(2R), throw p = Ls^2/(24R), k = Ls/2 - Ls^3/(240 R^2), Ts = (R+p) tan(delta/2) + k, Es = (R+p)/cos(delta/2) - R, SC deflection = theta_s/3. Symmetric spirals, series approximation. The design of record and engineer of record govern.";
-  const rad = makeNumber("Radius R at the SC (ft)", "sc-r", { step: "any", min: "0", value: "1000" }); rad.input.value = "1000";
-  const ls = makeNumber("Spiral length Ls (ft)", "sc-ls", { step: "any", min: "0", value: "250" }); ls.input.value = "250";
-  const delta = makeNumber("Total deflection angle delta (deg)", "sc-delta", { step: "any", min: "0", value: "20" }); delta.input.value = "20";
+  const rad = makeNumber("Radius R at the SC (ft)", "sc-r", { step: "any", min: "0" });
+  const ls = makeNumber("Spiral length Ls (ft)", "sc-ls", { step: "any", min: "0" });
+  const delta = makeNumber("Total deflection angle delta (deg)", "sc-delta", { step: "any", min: "0" });
   for (const f of [rad, ls, delta]) inputRegion.appendChild(f.wrap);
   const oTheta = makeOutputLine(outputRegion, "Spiral angle theta_s / SC deflection", "sc-out-theta");
   const oPK = makeOutputLine(outputRegion, "Throw p / k", "sc-out-pk");
@@ -245,10 +245,10 @@ export function computeCompoundCurve({ r1_ft = 0, r2_ft = 0, delta1_deg = 0, del
 export const compoundCurveExample = { inputs: { r1_ft: 500, r2_ft: 800, delta1_deg: 30, delta2_deg: 25 } };
 function renderCompoundCurve(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: compound circular curve geometry per AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) and Ghilani & Wolf, Elementary Surveying: each arc T = R tan(delta/2), L = R delta_rad; back tangent t1 = T1 + (T1+T2) sin(delta2)/sin(delta), forward tangent t2 = T2 + (T1+T2) sin(delta1)/sin(delta), delta = delta1 + delta2 (law of sines on the vertex triangle). Same-direction arcs; the engineer of record governs.";
-  const r1 = makeNumber("First radius R1 (ft)", "cc-r1", { step: "any", min: "0", value: "500" }); r1.input.value = "500";
-  const d1 = makeNumber("First central angle delta1 (deg)", "cc-d1", { step: "any", min: "0", value: "30" }); d1.input.value = "30";
-  const r2 = makeNumber("Second radius R2 (ft)", "cc-r2", { step: "any", min: "0", value: "800" }); r2.input.value = "800";
-  const d2 = makeNumber("Second central angle delta2 (deg)", "cc-d2", { step: "any", min: "0", value: "25" }); d2.input.value = "25";
+  const r1 = makeNumber("First radius R1 (ft)", "cc-r1", { step: "any", min: "0" });
+  const d1 = makeNumber("First central angle delta1 (deg)", "cc-d1", { step: "any", min: "0" });
+  const r2 = makeNumber("Second radius R2 (ft)", "cc-r2", { step: "any", min: "0" });
+  const d2 = makeNumber("Second central angle delta2 (deg)", "cc-d2", { step: "any", min: "0" });
   for (const f of [r1, d1, r2, d2]) inputRegion.appendChild(f.wrap);
   const oT = makeOutputLine(outputRegion, "Arc semi-tangents T1 / T2", "cc-out-t");
   const oPI = makeOutputLine(outputRegion, "Back / forward tangent (PI to PC / PT)", "cc-out-pi");
@@ -309,9 +309,9 @@ export function computeReverseCurve({ r1_ft = 0, r2_ft = 0, offset_ft = 0 } = {}
 export const reverseCurveExample = { inputs: { r1_ft: 500, r2_ft: 500, offset_ft: 60 } };
 function renderReverseCurve(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: reverse-curve geometry between parallel tangents per Ghilani & Wolf, Elementary Surveying, and AASHTO A Policy on Geometric Design of Highways and Streets: equal central angle I = arccos(1 - p/(R1+R2)); each arc T = R tan(I/2), L = R I_rad; tangent-point distance (R1+R2) sin I. Opposite-curvature arcs; insert a tangent/spiral at the PRC for superelevation runout. The engineer of record governs.";
-  const r1 = makeNumber("First radius R1 (ft)", "rc-r1", { step: "any", min: "0", value: "500" }); r1.input.value = "500";
-  const r2 = makeNumber("Second radius R2 (ft)", "rc-r2", { step: "any", min: "0", value: "500" }); r2.input.value = "500";
-  const p = makeNumber("Offset between parallel tangents p (ft)", "rc-p", { step: "any", min: "0", value: "60" }); p.input.value = "60";
+  const r1 = makeNumber("First radius R1 (ft)", "rc-r1", { step: "any", min: "0" });
+  const r2 = makeNumber("Second radius R2 (ft)", "rc-r2", { step: "any", min: "0" });
+  const p = makeNumber("Offset between parallel tangents p (ft)", "rc-p", { step: "any", min: "0" });
   for (const f of [r1, r2, p]) inputRegion.appendChild(f.wrap);
   const oI = makeOutputLine(outputRegion, "Central angle I (each arc)", "rc-out-i");
   const oT = makeOutputLine(outputRegion, "Arc semi-tangents T1 / T2", "rc-out-t");
@@ -729,9 +729,9 @@ export const superelevationSafeCurveSpeedExample = { inputs: { R_ft: 1500, e: 0.
 
 function renderSuperelevationSafeCurveSpeed(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: AASHTO point-mass curve model e + f = V^2/(15 R) (A Policy on Geometric Design of Highways and Streets, the Green Book) solved for the speed: V = sqrt( 15 R (e + f) ) mph. The side-friction factor f is from the AASHTO design-speed table and decreases with speed. A design aid, not a substitute for a licensed civil engineer's geometric design.";
-  const R = makeNumber("Curve radius R (ft)", "ses-r", { step: "any", min: "0", value: "1500" }); R.input.value = "1500";
-  const e = makeNumber("Superelevation e (e.g. 0.08)", "ses-e", { step: "any", value: "0.08" }); e.input.value = "0.08";
-  const f = makeNumber("Side-friction factor f", "ses-f", { step: "any", min: "0", value: "0.12" }); f.input.value = "0.12";
+  const R = makeNumber("Curve radius R (ft)", "ses-r", { step: "any", min: "0" });
+  const e = makeNumber("Superelevation e (e.g. 0.08)", "ses-e", { step: "any" });
+  const f = makeNumber("Side-friction factor f", "ses-f", { step: "any", min: "0" });
   for (const fld of [R, e, f]) inputRegion.appendChild(fld.wrap);
   attachExampleButton(inputRegion, () => { R.input.value = "1500"; e.input.value = "0.08"; f.input.value = "0.12"; update(); });
   const oV = makeOutputLine(outputRegion, "Maximum safe speed", "ses-out-v");
@@ -769,12 +769,9 @@ export const verticalCurveSightDistanceExample = { inputs: { A_pct: 5, S_ft: 570
 
 function renderVerticalCurveSightDistance(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: AASHTO crest vertical-curve minimums per A Policy on Geometric Design of Highways and Streets (the Green Book): L = A S^2 / C for S <= L and L = 2 S - C/A for S > L, with C = 2158 (SSD crest; a 3.5 ft eye and 2.0 ft object height) or 2800 (passing); K = L/A. This is the crest SSD control -- sag curves use headlight/comfort/drainage criteria. A design aid, not a substitute for a licensed civil engineer's design.";
-  const A = makeNumber("Algebraic grade difference A (%, |g2-g1|)", "vcs-a", { step: "any", min: "0", value: "5" });
-  A.input.value = "5";
-  const S = makeNumber("Stopping sight distance S (ft)", "vcs-s", { step: "any", min: "0", value: "570" });
-  S.input.value = "570";
-  const C = makeNumber("Sight constant C (2158 SSD, 2800 passing)", "vcs-c", { step: "any", min: "0", value: "2158" });
-  C.input.value = "2158";
+  const A = makeNumber("Algebraic grade difference A (%, |g2-g1|)", "vcs-a", { step: "any", min: "0" });
+  const S = makeNumber("Stopping sight distance S (ft)", "vcs-s", { step: "any", min: "0" });
+  const C = makeNumber("Sight constant C (2158 SSD, 2800 passing)", "vcs-c", { step: "any", min: "0" });
   for (const fld of [A, S, C]) inputRegion.appendChild(fld.wrap);
   const oL = makeOutputLine(outputRegion, "Minimum curve length L", "vcs-out-l");
   const oK = makeOutputLine(outputRegion, "Rate of vertical curvature K", "vcs-out-k");
@@ -812,10 +809,8 @@ export const sagVerticalCurveExample = { inputs: { A_pct: 4, S_ft: 400 } };
 
 function renderSagVerticalCurve(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: AASHTO sag vertical-curve minimums per A Policy on Geometric Design of Highways and Streets (the Green Book), headlight sight-distance criterion: L = A S^2 / (400 + 3.5 S) for S <= L and L = 2 S - (400 + 3.5 S)/A for S > L, where 400 and 3.5 embed the 2.0 ft headlight height and 1-degree beam divergence; K = L/A. This is the headlight-SSD control (the governing sag stopping criterion); the comfort criterion L = A V^2/46.5 and drainage K <= 167 are separate checks. A design aid, not a substitute for a licensed civil engineer's design.";
-  const A = makeNumber("Algebraic grade difference A (%, |g2-g1|)", "svc-a", { step: "any", min: "0", value: "4" });
-  A.input.value = "4";
-  const S = makeNumber("Stopping sight distance S (ft)", "svc-s", { step: "any", min: "0", value: "400" });
-  S.input.value = "400";
+  const A = makeNumber("Algebraic grade difference A (%, |g2-g1|)", "svc-a", { step: "any", min: "0" });
+  const S = makeNumber("Stopping sight distance S (ft)", "svc-s", { step: "any", min: "0" });
   for (const fld of [A, S]) inputRegion.appendChild(fld.wrap);
   const oL = makeOutputLine(outputRegion, "Minimum sag curve length L", "svc-out-l");
   const oK = makeOutputLine(outputRegion, "Rate of vertical curvature K", "svc-out-k");
@@ -857,10 +852,8 @@ export const sagVerticalCurveComfortExample = { inputs: { A_pct: 4, V_mph: 60 } 
 
 function renderSagVerticalCurveComfort(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: AASHTO comfort and drainage sag vertical-curve controls per A Policy on Geometric Design of Highways and Streets (the Green Book): the comfort criterion L = A V^2 / 46.5 (A in %, V in mph, L in ft) limits the vertical acceleration to about 1 ft/s^2, giving K = L/A = V^2/46.5; the drainage maximum K <= 167 (a 0.30% minimum grade within 50 ft of the low point) caps the length at 167 A on curbed sections. These bracket the acceptable length; headlight stopping sight distance is the separate governing control (the sag-vertical-curve tile). A design aid, not a substitute for a licensed civil engineer's design.";
-  const A = makeNumber("Algebraic grade difference A (%, |g2-g1|)", "svcc-a", { step: "any", min: "0", value: "4" });
-  A.input.value = "4";
-  const V = makeNumber("Design speed V (mph)", "svcc-v", { step: "any", min: "0", value: "60" });
-  V.input.value = "60";
+  const A = makeNumber("Algebraic grade difference A (%, |g2-g1|)", "svcc-a", { step: "any", min: "0" });
+  const V = makeNumber("Design speed V (mph)", "svcc-v", { step: "any", min: "0" });
   for (const fld of [A, V]) inputRegion.appendChild(fld.wrap);
   const oL = makeOutputLine(outputRegion, "Comfort minimum length L", "svcc-out-l");
   const oK = makeOutputLine(outputRegion, "Rate of vertical curvature K", "svcc-out-k");

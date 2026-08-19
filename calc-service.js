@@ -389,12 +389,9 @@ export const rangeDemand22055Example = { inputs: { num_ranges: 1, nameplate_kw: 
 
 function _v167renderRangeDemand(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 2023 Table 220.55 Column C and its Notes (household electric ranges, wall ovens, counter cooktops). One 12 kW range demands 8 kW, not 12; a range over 12 kW gets a 5%-per-kW Column C increase (Note 1). The AHJ-adopted edition governs. Free at nfpa.org/freeaccess.";
-  const n = makeNumber("Number of ranges (equal rating)", "rd-n", { step: "1", min: "1", value: "1" });
-  n.input.value = "1";
-  const kw = makeNumber("Each range nameplate (kW)", "rd-kw", { step: "any", min: "0", value: "12" });
-  kw.input.value = "12";
-  const v = makeNumber("Service voltage (V)", "rd-v", { step: "any", min: "0", value: "240" });
-  v.input.value = "240";
+  const n = makeNumber("Number of ranges (equal rating)", "rd-n", { step: "1", min: "1" });
+  const kw = makeNumber("Each range nameplate (kW)", "rd-kw", { step: "any", min: "0" });
+  const v = makeNumber("Service voltage (V)", "rd-v", { step: "any", min: "0" });
   for (const f of [n, kw, v]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { n.input.value = "1"; kw.input.value = "12"; v.input.value = "240"; update(); });
 
@@ -451,12 +448,9 @@ export const dryerDemand22054Example = { inputs: { num_dryers: 4, nameplate_w: 4
 
 function _v168renderDryerDemand(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 2023 220.54 and Table 220.54 (household electric clothes dryers). Each dryer counts at the larger of 5,000 W or nameplate; the Table 220.54 demand factor applies once there are five or more. The AHJ-adopted edition governs. Free at nfpa.org/freeaccess.";
-  const n = makeNumber("Number of dryers", "dd-n", { step: "1", min: "1", value: "4" });
-  n.input.value = "4";
-  const w = makeNumber("Each dryer nameplate (W)", "dd-w", { step: "any", min: "0", value: "4500" });
-  w.input.value = "4500";
-  const v = makeNumber("Service voltage (V)", "dd-v", { step: "any", min: "0", value: "240" });
-  v.input.value = "240";
+  const n = makeNumber("Number of dryers", "dd-n", { step: "1", min: "1" });
+  const w = makeNumber("Each dryer nameplate (W)", "dd-w", { step: "any", min: "0" });
+  const v = makeNumber("Service voltage (V)", "dd-v", { step: "any", min: "0" });
   for (const f of [n, w, v]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { n.input.value = "4"; w.input.value = "4500"; v.input.value = "240"; update(); });
 
@@ -507,8 +501,7 @@ export const neutralDemand22061Example = { inputs: { max_unbalanced_a: 250, nonl
 
 function _v169renderNeutralDemand(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 2023 220.61 (feeder and service neutral load). The neutral carries the maximum unbalanced load; 220.61(B) permits 70% on the portion over 200 A, and 220.61(C) prohibits any reduction for nonlinear-load portions. The AHJ governs. Free at nfpa.org/freeaccess.";
-  const load = makeNumber("Maximum unbalanced load (A)", "nd-load", { step: "any", min: "0", value: "250" });
-  load.input.value = "250";
+  const load = makeNumber("Maximum unbalanced load (A)", "nd-load", { step: "any", min: "0" });
   const excl = makeSelect("Load type", "nd-excl", [
     { value: "0", label: "Ordinary (70% on the part over 200 A)" },
     { value: "1", label: "Nonlinear (220.61(C) - no reduction)" },
@@ -568,14 +561,10 @@ export const commercialLightingLoadExample = { inputs: { floor_area_ft2: 5000, u
 
 function _v180renderCommercialLightingLoad(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 2023 Table 220.12 (general-lighting unit load), 220.14(I) (180 VA per receptacle strap), and 220.44 (receptacle demand factor over 10 kVA). The 125% continuous factor is applied at the OCPD; the energy code may set the lighting load. The AHJ governs. Free at nfpa.org/freeaccess.";
-  const area = makeNumber("Gross floor area (ft²)", "cll-area", { step: "any", min: "0", value: "5000" });
-  area.input.value = "5000";
-  const unit = makeNumber("Unit load (VA/ft², Table 220.12)", "cll-unit", { step: "any", min: "0", value: "3" });
-  unit.input.value = "3";
-  const count = makeNumber("General-use receptacle straps", "cll-count", { step: "1", min: "0", value: "60" });
-  count.input.value = "60";
-  const volt = makeNumber("Supply voltage (V)", "cll-v", { step: "any", min: "0", value: "208" });
-  volt.input.value = "208";
+  const area = makeNumber("Gross floor area (ft²)", "cll-area", { step: "any", min: "0" });
+  const unit = makeNumber("Unit load (VA/ft², Table 220.12)", "cll-unit", { step: "any", min: "0" });
+  const count = makeNumber("General-use receptacle straps", "cll-count", { step: "1", min: "0" });
+  const volt = makeNumber("Supply voltage (V)", "cll-v", { step: "any", min: "0" });
   for (const f of [area, unit, count, volt]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { area.input.value = "5000"; unit.input.value = "3"; count.input.value = "60"; volt.input.value = "208"; update(); });
 
@@ -630,10 +619,8 @@ export const noncoincidentLoadExample = { inputs: { load_a_va: 9000, load_b_va: 
 
 function _v181renderNoncoincidentLoad(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 2023 220.60 (noncoincident loads) - where two loads are unlikely to be in use at the same time, the larger is counted and the smaller omitted; the exception adds both where they operate simultaneously. The AHJ judges noncoincidence. Free at nfpa.org/freeaccess.";
-  const a = makeNumber("Load A - e.g. electric heat (VA)", "ncl-a", { step: "any", min: "0", value: "9000" });
-  a.input.value = "9000";
-  const b = makeNumber("Load B - e.g. air-conditioning (VA)", "ncl-b", { step: "any", min: "0", value: "6000" });
-  b.input.value = "6000";
+  const a = makeNumber("Load A - e.g. electric heat (VA)", "ncl-a", { step: "any", min: "0" });
+  const b = makeNumber("Load B - e.g. air-conditioning (VA)", "ncl-b", { step: "any", min: "0" });
   const both = makeSelect("Can both run at the same time?", "ncl-both", [
     { value: "0", label: "No - noncoincident (count the larger)" },
     { value: "1", label: "Yes - simultaneous (add both, exception)" },
@@ -688,22 +675,14 @@ export function computeVfdEnergySavings({ full_load_kw = 0, frac_a = 1.0, hours_
 }
 function renderVfdEnergySavings(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: centrifugal affinity cube law P/P_full = (Q/Q_full)^3 and the US DOE motor/pump-system energy method (by name). The cube law holds on a friction-dominated system; the baseline is full-speed operation for the same hours. A screening estimate, not a metered M&V.";
-  const kw = makeNumber("Full-load motor input power (kW)", "vfd-kw", { step: "any", min: "0", value: "20" });
-  kw.input.value = "20";
-  const fa = makeNumber("Bin A flow fraction (0-1)", "vfd-fa", { step: "any", min: "0", value: "1" });
-  fa.input.value = "1";
-  const ha = makeNumber("Bin A hours/yr", "vfd-ha", { step: "any", min: "0", value: "2000" });
-  ha.input.value = "2000";
-  const fb = makeNumber("Bin B flow fraction (0-1)", "vfd-fb", { step: "any", min: "0", value: "0.8" });
-  fb.input.value = "0.8";
-  const hb = makeNumber("Bin B hours/yr", "vfd-hb", { step: "any", min: "0", value: "3000" });
-  hb.input.value = "3000";
-  const fc = makeNumber("Bin C flow fraction (0-1)", "vfd-fc", { step: "any", min: "0", value: "0.6" });
-  fc.input.value = "0.6";
-  const hc = makeNumber("Bin C hours/yr", "vfd-hc", { step: "any", min: "0", value: "2000" });
-  hc.input.value = "2000";
-  const rate = makeNumber("Energy rate ($/kWh)", "vfd-rate", { step: "any", min: "0", value: "0.12" });
-  rate.input.value = "0.12";
+  const kw = makeNumber("Full-load motor input power (kW)", "vfd-kw", { step: "any", min: "0" });
+  const fa = makeNumber("Bin A flow fraction (0-1)", "vfd-fa", { step: "any", min: "0" });
+  const ha = makeNumber("Bin A hours/yr", "vfd-ha", { step: "any", min: "0" });
+  const fb = makeNumber("Bin B flow fraction (0-1)", "vfd-fb", { step: "any", min: "0" });
+  const hb = makeNumber("Bin B hours/yr", "vfd-hb", { step: "any", min: "0" });
+  const fc = makeNumber("Bin C flow fraction (0-1)", "vfd-fc", { step: "any", min: "0" });
+  const hc = makeNumber("Bin C hours/yr", "vfd-hc", { step: "any", min: "0" });
+  const rate = makeNumber("Energy rate ($/kWh)", "vfd-rate", { step: "any", min: "0" });
   for (const f of [kw, fa, ha, fb, hb, fc, hc, rate]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { kw.input.value = "20"; fa.input.value = "1"; ha.input.value = "2000"; fb.input.value = "0.8"; hb.input.value = "3000"; fc.input.value = "0.6"; hc.input.value = "2000"; rate.input.value = "0.12"; update(); });
   const oFull = makeOutputLine(outputRegion, "Full-speed energy", "vfd-out-full");
@@ -750,20 +729,13 @@ export function computeLightingRetrofitSavings({ fixtures = 0, watts_existing = 
 }
 function renderLightingRetrofitSavings(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: energy-and-demand lighting-savings method kWh_saved = fixtures x (W_old - W_new)/1000 x hours, demand savings at $/kW-month x 12, simple payback = cost / annual savings (by name). Burn hours are the actual operating hours; demand savings apply only to the peak-coincident reduction. A simple payback, not a life-cycle analysis.";
-  const fixtures = makeNumber("Fixtures retrofitted", "lrs-fix", { step: "any", min: "0", value: "100" });
-  fixtures.input.value = "100";
-  const we = makeNumber("Existing watts/fixture", "lrs-we", { step: "any", min: "0", value: "128" });
-  we.input.value = "128";
-  const wn = makeNumber("New watts/fixture", "lrs-wn", { step: "any", min: "0", value: "44" });
-  wn.input.value = "44";
-  const hours = makeNumber("Annual operating hours", "lrs-hours", { step: "any", min: "0", value: "4000" });
-  hours.input.value = "4000";
-  const rate = makeNumber("Energy rate ($/kWh)", "lrs-rate", { step: "any", min: "0", value: "0.12" });
-  rate.input.value = "0.12";
-  const demand = makeNumber("Demand charge ($/kW-month, optional)", "lrs-demand", { step: "any", min: "0", value: "12" });
-  demand.input.value = "12";
-  const cost = makeNumber("Installed cost ($, optional)", "lrs-cost", { step: "any", min: "0", value: "8000" });
-  cost.input.value = "8000";
+  const fixtures = makeNumber("Fixtures retrofitted", "lrs-fix", { step: "any", min: "0" });
+  const we = makeNumber("Existing watts/fixture", "lrs-we", { step: "any", min: "0" });
+  const wn = makeNumber("New watts/fixture", "lrs-wn", { step: "any", min: "0" });
+  const hours = makeNumber("Annual operating hours", "lrs-hours", { step: "any", min: "0" });
+  const rate = makeNumber("Energy rate ($/kWh)", "lrs-rate", { step: "any", min: "0" });
+  const demand = makeNumber("Demand charge ($/kW-month, optional)", "lrs-demand", { step: "any", min: "0" });
+  const cost = makeNumber("Installed cost ($, optional)", "lrs-cost", { step: "any", min: "0" });
   for (const f of [fixtures, we, wn, hours, rate, demand, cost]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { fixtures.input.value = "100"; we.input.value = "128"; wn.input.value = "44"; hours.input.value = "4000"; rate.input.value = "0.12"; demand.input.value = "12"; cost.input.value = "8000"; update(); });
   const oKw = makeOutputLine(outputRegion, "Connected load saved", "lrs-out-kw");
@@ -814,16 +786,11 @@ export function computePowerFactorBillingSavings({ real_power_kw = 0, pf_existin
 }
 function renderPowerFactorBillingSavings(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: power-triangle demand-billing method kVA = kW / pf, kVAR = kW x (tan(acos pf_old) - tan(acos pf_new)), demand savings = kVA reduction x $/kVA-month x 12 (by name). Enter the effective $/kVA-month for the tariff. Diminishing returns above ~0.9; a billing estimate, not a rate-tariff analysis.";
-  const kw = makeNumber("Billed real power (kW)", "pfb-kw", { step: "any", min: "0", value: "400" });
-  kw.input.value = "400";
-  const pfe = makeNumber("Existing power factor (0-1)", "pfb-pfe", { step: "any", min: "0", value: "0.78" });
-  pfe.input.value = "0.78";
-  const pft = makeNumber("Target power factor (0-1)", "pfb-pft", { step: "any", min: "0", value: "0.95" });
-  pft.input.value = "0.95";
-  const demand = makeNumber("Demand charge ($/kVA-month)", "pfb-demand", { step: "any", min: "0", value: "8" });
-  demand.input.value = "8";
-  const cost = makeNumber("Capacitor-bank cost ($, optional)", "pfb-cost", { step: "any", min: "0", value: "5685" });
-  cost.input.value = "5685";
+  const kw = makeNumber("Billed real power (kW)", "pfb-kw", { step: "any", min: "0" });
+  const pfe = makeNumber("Existing power factor (0-1)", "pfb-pfe", { step: "any", min: "0" });
+  const pft = makeNumber("Target power factor (0-1)", "pfb-pft", { step: "any", min: "0" });
+  const demand = makeNumber("Demand charge ($/kVA-month)", "pfb-demand", { step: "any", min: "0" });
+  const cost = makeNumber("Capacitor-bank cost ($, optional)", "pfb-cost", { step: "any", min: "0" });
   for (const f of [kw, pfe, pft, demand, cost]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { kw.input.value = "400"; pfe.input.value = "0.78"; pft.input.value = "0.95"; demand.input.value = "8"; cost.input.value = "5685"; update(); });
   const oBefore = makeOutputLine(outputRegion, "Apparent power before", "pfb-out-before");
@@ -936,12 +903,9 @@ export const insulationResistancePiExample = { inputs: { ir_30s_mohm: 800, ir_1m
 
 function _v957renderInsulationResistancePi(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: insulation-resistance polarization index (PI) and dielectric absorption ratio (DAR), by name (IEEE 43). DAR = IR(60s)/IR(30s); PI = IR(10min)/IR(1min). PI < 1 dangerous, 1-2 questionable, 2-4 good, > 4 excellent; DAR < 1.25 marginal, 1.4+ good. Temperature-correct to a common base; on very-high-IR epoxy windings PI loses meaning. The baseline trend and OEM criteria govern.";
-  const t30 = makeNumber("IR at 30 seconds (Mohm)", "irp-30", { step: "any", min: "0", value: "800" });
-  t30.input.value = "800";
-  const t60 = makeNumber("IR at 1 minute / 60 s (Mohm)", "irp-60", { step: "any", min: "0", value: "1040" });
-  t60.input.value = "1040";
-  const t600 = makeNumber("IR at 10 minutes (Mohm)", "irp-600", { step: "any", min: "0", value: "4160" });
-  t600.input.value = "4160";
+  const t30 = makeNumber("IR at 30 seconds (Mohm)", "irp-30", { step: "any", min: "0" });
+  const t60 = makeNumber("IR at 1 minute / 60 s (Mohm)", "irp-60", { step: "any", min: "0" });
+  const t600 = makeNumber("IR at 10 minutes (Mohm)", "irp-600", { step: "any", min: "0" });
   for (const f of [t30, t60, t600]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { t30.input.value = "800"; t60.input.value = "1040"; t600.input.value = "4160"; update(); });
   const oPi = makeOutputLine(outputRegion, "Polarization index (PI)", "irp-out-pi");

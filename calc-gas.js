@@ -282,14 +282,10 @@ export const gasPipePressureDropExample = { inputs: { flow_cfh: 1000, id_in: 1.0
 
 function renderGasPipePressureDrop(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per the published Spitzglass low-pressure gas-flow equation (public engineering formula). The longhand alternative to the NFPA 54 / IFGC capacity tables that the gas-pipe-sizing tile uses; NFPA 54 governs the installation. Inside diameter must be the actual bore. Free read-only at nfpa.org/freeaccess and codes.iccsafe.org.";
-  const q = makeNumber("Gas flow (CFH)", "gpd-q", { step: "any", min: "0", value: "1000" });
-  q.input.value = "1000";
-  const d = makeNumber("Pipe inside diameter (in, actual bore)", "gpd-d", { step: "any", min: "0", value: "1.049" });
-  d.input.value = "1.049";
-  const len = makeNumber("Pipe length (ft)", "gpd-len", { step: "any", min: "0", value: "100" });
-  len.input.value = "100";
-  const sg = makeNumber("Gas specific gravity", "gpd-sg", { step: "any", min: "0", value: "0.6" });
-  sg.input.value = "0.6";
+  const q = makeNumber("Gas flow (CFH)", "gpd-q", { step: "any", min: "0" });
+  const d = makeNumber("Pipe inside diameter (in, actual bore)", "gpd-d", { step: "any", min: "0" });
+  const len = makeNumber("Pipe length (ft)", "gpd-len", { step: "any", min: "0" });
+  const sg = makeNumber("Gas specific gravity", "gpd-sg", { step: "any", min: "0" });
   for (const f of [q, d, len, sg]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { q.input.value = "1000"; d.input.value = "1.049"; len.input.value = "100"; sg.input.value = "0.6"; update(); });
   const oDrop = makeOutputLine(outputRegion, "Pressure drop", "gpd-out-drop");
@@ -341,14 +337,10 @@ export const gasPipeMaxFlowExample = { inputs: { drop_inwc: 0.5, id_in: 1.049, l
 
 function renderGasPipeMaxFlow(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per the published Spitzglass low-pressure gas-flow equation (public engineering formula), solved for the flow - the capacity a bore carries within an allowable drop, the inverse of the gas-pipe pressure-drop tile and a longhand alternative to the NFPA 54 / IFGC capacity tables; NFPA 54 governs the installation. Inside diameter must be the actual bore. Free read-only at nfpa.org/freeaccess and codes.iccsafe.org.";
-  const dh = makeNumber("Allowable pressure drop (in w.c.)", "gmf-dh", { step: "any", min: "0", value: "0.5" });
-  dh.input.value = "0.5";
-  const d = makeNumber("Pipe inside diameter (in, actual bore)", "gmf-d", { step: "any", min: "0", value: "1.049" });
-  d.input.value = "1.049";
-  const len = makeNumber("Pipe length (ft)", "gmf-len", { step: "any", min: "0", value: "100" });
-  len.input.value = "100";
-  const sg = makeNumber("Gas specific gravity", "gmf-sg", { step: "any", min: "0", value: "0.6" });
-  sg.input.value = "0.6";
+  const dh = makeNumber("Allowable pressure drop (in w.c.)", "gmf-dh", { step: "any", min: "0" });
+  const d = makeNumber("Pipe inside diameter (in, actual bore)", "gmf-d", { step: "any", min: "0" });
+  const len = makeNumber("Pipe length (ft)", "gmf-len", { step: "any", min: "0" });
+  const sg = makeNumber("Gas specific gravity", "gmf-sg", { step: "any", min: "0" });
   for (const f of [dh, d, len, sg]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { dh.input.value = "0.5"; d.input.value = "1.049"; len.input.value = "100"; sg.input.value = "0.6"; update(); });
   const oFlow = makeOutputLine(outputRegion, "Max flow", "gmf-out-flow");
@@ -578,10 +570,8 @@ export const wobbeIndexExample = { inputs: { hhv_btu_ft3: 1000, specific_gravity
 
 function _v977renderWobbeIndex(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Wobbe index of a fuel gas (AGA / ISO 13686 interchangeability), by name. WI = HHV / sqrt(specific gravity). Two gases of equal Wobbe deliver the same heat input through the same orifice at the same pressure. NG ~1,291, propane ~2,040. Captures orifice/heat-input, not flame speed; the supplier's analysis, the appliance listing, and the conversion kit govern.";
-  const hv = makeNumber("Higher heating value (BTU/ft³)", "wob-hv", { step: "any", min: "0", value: "1000" });
-  hv.input.value = "1000";
-  const sg = makeNumber("Specific gravity (vs air)", "wob-sg", { step: "any", min: "0", value: "0.60" });
-  sg.input.value = "0.60";
+  const hv = makeNumber("Higher heating value (BTU/ft³)", "wob-hv", { step: "any", min: "0" });
+  const sg = makeNumber("Specific gravity (vs air)", "wob-sg", { step: "any", min: "0" });
   for (const f of [hv, sg]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { hv.input.value = "1000"; sg.input.value = "0.60"; update(); });
   const oW = makeOutputLine(outputRegion, "Wobbe index", "wob-out-w");
@@ -665,11 +655,11 @@ function _v1145renderGasApplianceConnection(inputRegion, outputRegion, citationE
     { value: "decorative-vented", label: "Decorative appliance in a vented fireplace" }, { value: "gas-fireplace", label: "Gas fireplace" }, { value: "outdoor-grill", label: "Outdoor grill" }, { value: "other", label: "Other" },
   ]);
   const sr = makeSelect("Shutoff in the same room?", "gac-sr", [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }]);
-  const sd = makeNumber("Shutoff distance to the appliance (ft)", "gac-sd", { step: "any", min: "0" }); sd.input.value = "4";
+  const sd = makeNumber("Shutoff distance to the appliance (ft)", "gac-sd", { step: "any", min: "0" });
   const su = makeSelect("Shutoff upstream of the connector?", "gac-su", [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }]);
   const tp = makeSelect("Sediment trap installed?", "gac-tp", [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }]);
   const ti = makeSelect("Trap built into the appliance?", "gac-ti", [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }]);
-  const cl = makeNumber("Connector overall length (ft; 0 = hard piped)", "gac-cl", { step: "any", min: "0" }); cl.input.value = "4";
+  const cl = makeNumber("Connector overall length (ft; 0 = hard piped)", "gac-cl", { step: "any", min: "0" });
   inputRegion.appendChild(ap.wrap); inputRegion.appendChild(sr.wrap); inputRegion.appendChild(sd.wrap);
   inputRegion.appendChild(su.wrap); inputRegion.appendChild(tp.wrap); inputRegion.appendChild(ti.wrap); inputRegion.appendChild(cl.wrap);
   attachExampleButton(inputRegion, () => { ap.select.value = "furnace"; sr.select.value = "yes"; sd.input.value = "4"; su.select.value = "yes"; tp.select.value = "no"; ti.select.value = "no"; cl.input.value = "4"; update(); });

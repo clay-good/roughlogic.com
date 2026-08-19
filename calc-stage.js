@@ -755,12 +755,12 @@ export const powerDistroExample = { inputs: { watts: 12000, voltage_v: 208, phas
 
 function renderPowerDistro(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: First-principles AC power (P = V*I*PF; 3-phase adds sqrt(3)). The NEC continuous-load 80% rule and temporary-power Articles 520/525, by name; a qualified electrician and the AHJ govern temporary power. Distinct from neutral-imbalance. Free read-only at nfpa.org/freeaccess.";
-  const w = makeNumber("Total connected load (W)", "pd-w", { step: "any", min: "0", value: "12000" }); w.input.value = "12000";
-  const v = makeNumber("Service voltage (V, line-line for 3-phase)", "pd-v", { step: "any", min: "0", value: "208" }); v.input.value = "208";
+  const w = makeNumber("Total connected load (W)", "pd-w", { step: "any", min: "0" });
+  const v = makeNumber("Service voltage (V, line-line for 3-phase)", "pd-v", { step: "any", min: "0" });
   const phase = makeSelect("Phase", "pd-phase", [{ value: "three", label: "3-phase", selected: true }, { value: "single", label: "1-phase" }]);
-  const rating = makeNumber("Service rating (A per leg)", "pd-rating", { step: "any", min: "0", value: "60" }); rating.input.value = "60";
-  const pf = makeNumber("Power factor", "pd-pf", { step: "any", min: "0", max: "1", value: "1" }); pf.input.value = "1";
-  const der = makeNumber("Continuous-derate target", "pd-der", { step: "any", min: "0", max: "1", value: "0.8" }); der.input.value = "0.8";
+  const rating = makeNumber("Service rating (A per leg)", "pd-rating", { step: "any", min: "0" });
+  const pf = makeNumber("Power factor", "pd-pf", { step: "any", min: "0", max: "1" });
+  const der = makeNumber("Continuous-derate target", "pd-der", { step: "any", min: "0", max: "1" });
   for (const f of [w, v, phase, rating, pf, der]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { w.input.value = "12000"; v.input.value = "208"; phase.select.value = "three"; rating.input.value = "60"; pf.input.value = "1"; der.input.value = "0.8"; update(); });
   const oAmps = makeOutputLine(outputRegion, "Current per leg", "pd-out-amps");
@@ -905,18 +905,18 @@ function renderDecibelConverter(inputRegion, outputRegion, citationEl) {
     { value: "reference-level", label: "Reference level (back-solve linear)" },
     { value: "combine", label: "Combine incoherent sources" },
   ]);
-  const p1 = makeNumber("Reference power p1 (W)", "dbc-p1", { step: "any", min: "0", value: "1" }); p1.input.value = "1";
-  const p2 = makeNumber("Power p2 (W)", "dbc-p2", { step: "any", min: "0", value: "2" }); p2.input.value = "2";
-  const v1 = makeNumber("Reference voltage/pressure v1", "dbc-v1", { step: "any", min: "0", value: "1" }); v1.input.value = "1";
-  const v2 = makeNumber("Voltage/pressure v2", "dbc-v2", { step: "any", min: "0", value: "2" }); v2.input.value = "2";
-  const level = makeNumber("Level (dB)", "dbc-level", { step: "any", value: "4" }); level.input.value = "4";
+  const p1 = makeNumber("Reference power p1 (W)", "dbc-p1", { step: "any", min: "0" });
+  const p2 = makeNumber("Power p2 (W)", "dbc-p2", { step: "any", min: "0" });
+  const v1 = makeNumber("Reference voltage/pressure v1", "dbc-v1", { step: "any", min: "0" });
+  const v2 = makeNumber("Voltage/pressure v2", "dbc-v2", { step: "any", min: "0" });
+  const level = makeNumber("Level (dB)", "dbc-level", { step: "any" });
   const ref = makeSelect("Reference type", "dbc-ref", [
     { value: "dBu", label: "dBu (0.775 V)", selected: true },
     { value: "dBV", label: "dBV (1 V)" },
     { value: "dBSPL", label: "dBSPL (20 uPa)" },
   ]);
   const list = makeNumber("Source levels (dB, comma-separated)", "dbc-list", { type: "text" });
-  list.input.type = "text"; list.input.value = "90, 90";
+  list.input.type = "text";
   for (const f of [mode, p1, p2, v1, v2, level, ref, list]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
     mode.select.value = "power-ratio"; p1.input.value = "1"; p2.input.value = "2"; v1.input.value = "1"; v2.input.value = "2";
@@ -1773,18 +1773,12 @@ export const acousticGainPagNagExample = { inputs: { ds_ft: 2, d0_ft: 30, d1_ft:
 
 function _v1003renderAcousticGainPagNag(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: potential / needed acoustic gain (PAG/NAG feedback stability; Davis & Patronis, Sound System Engineering; Yamaha Sound Reinforcement Handbook), by name. PAG = 20log(D1) + 20log(D0) - 20log(Ds) - 20log(D2) - 10log(NOM) - 6; NAG = 20log(D0/EAD); stable when PAG >= NAG. The room acoustics, mic/speaker directivity, and system tuning govern actual stability.";
-  const ds = makeNumber("Ds: talker to mic (ft)", "agp-ds", { step: "any", min: "0", value: "2" });
-  ds.input.value = "2";
-  const d0 = makeNumber("D0: talker to farthest listener (ft)", "agp-d0", { step: "any", min: "0", value: "30" });
-  d0.input.value = "30";
-  const d1 = makeNumber("D1: speaker to farthest listener (ft)", "agp-d1", { step: "any", min: "0", value: "8" });
-  d1.input.value = "8";
-  const d2 = makeNumber("D2: speaker to mic (ft)", "agp-d2", { step: "any", min: "0", value: "12" });
-  d2.input.value = "12";
-  const nm = makeNumber("Number of open mics (NOM)", "agp-nm", { step: "1", min: "1", value: "1" });
-  nm.input.value = "1";
-  const ea = makeNumber("EAD: equivalent acoustic distance (ft)", "agp-ea", { step: "any", min: "0", value: "6" });
-  ea.input.value = "6";
+  const ds = makeNumber("Ds: talker to mic (ft)", "agp-ds", { step: "any", min: "0" });
+  const d0 = makeNumber("D0: talker to farthest listener (ft)", "agp-d0", { step: "any", min: "0" });
+  const d1 = makeNumber("D1: speaker to farthest listener (ft)", "agp-d1", { step: "any", min: "0" });
+  const d2 = makeNumber("D2: speaker to mic (ft)", "agp-d2", { step: "any", min: "0" });
+  const nm = makeNumber("Number of open mics (NOM)", "agp-nm", { step: "1", min: "1" });
+  const ea = makeNumber("EAD: equivalent acoustic distance (ft)", "agp-ea", { step: "any", min: "0" });
   for (const f of [ds, d0, d1, d2, nm, ea]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ds.input.value = "2"; d0.input.value = "30"; d1.input.value = "8"; d2.input.value = "12"; nm.input.value = "1"; ea.input.value = "6"; update(); });
   const oP = makeOutputLine(outputRegion, "PAG / NAG", "agp-out-p");

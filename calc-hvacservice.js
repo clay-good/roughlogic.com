@@ -746,9 +746,9 @@ export function computeExcessAirO2({ measured_o2_pct = 0, measured_co2_pct = 0, 
 export const excessAirO2Example = { inputs: { measured_o2_pct: 4, measured_co2_pct: 0, co2max_pct: 11.7 } };
 function _v583renderExcessAirO2(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A tuning aid, not a certified combustion test; the analyzer, the appliance, and the manufacturer instructions govern. Citation: ASME PTC 4.1 / combustion analysis practice excess air from flue-gas oxygen, by name. EA = O2 / (20.9 - O2) x 100, or from carbon dioxide EA = (CO2max / CO2 - 1) x 100 (CO2max ~ 11.7% natural gas, 13.7% propane, 15.3% #2 oil). The oxygen form assumes complete combustion, so measurable CO understates the excess air; a gas appliance targets about 3 to 4% oxygen (15 to 25% excess air).";
-  const o2 = makeNumber("Flue-gas O2 (%, dry air-free)", "eao-o2", { step: "any", min: "0", max: "20.9", value: "4" }); o2.input.value = "4";
-  const co2 = makeNumber("Flue-gas CO2 (%, 0 to use the O2 form)", "eao-co2", { step: "any", min: "0", value: "0" }); co2.input.value = "0";
-  const co2max = makeNumber("Fuel CO2max (%: 11.7 gas / 13.7 propane / 15.3 oil)", "eao-co2max", { step: "any", min: "0", value: "11.7" }); co2max.input.value = "11.7";
+  const o2 = makeNumber("Flue-gas O2 (%, dry air-free)", "eao-o2", { step: "any", min: "0", max: "20.9" });
+  const co2 = makeNumber("Flue-gas CO2 (%, 0 to use the O2 form)", "eao-co2", { step: "any", min: "0" });
+  const co2max = makeNumber("Fuel CO2max (%: 11.7 gas / 13.7 propane / 15.3 oil)", "eao-co2max", { step: "any", min: "0" });
   for (const f of [o2, co2, co2max]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { o2.input.value = "4"; co2.input.value = "0"; co2max.input.value = "11.7"; update(); });
   const oEA = makeOutputLine(outputRegion, "Excess air", "eao-out-ea");
@@ -787,8 +787,8 @@ export function computeCoAirFree({ measured_co_ppm = 0, measured_o2_pct = 0 } = 
 export const coAirFreeExample = { inputs: { measured_co_ppm: 60, measured_o2_pct: 8 } };
 function _v584renderCoAirFree(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A safety-screening aid, not a certified combustion test; the analyzer and the manufacturer instructions govern. Citation: ANSI Z21 400 ppm air-free limit / BPI field practice air-free CO correction, by name. CO_air_free = CO_measured x 20.9 / (20.9 - measured_O2). As-measured CO is diluted by excess and dilution air and reads deceptively low; sample in the flue before the draft hood or dilution air. Limits: 400 ppm air-free (ANSI), under 100 ppm field target.";
-  const co = makeNumber("Measured CO (ppm)", "caf-co", { step: "any", min: "0", value: "60" }); co.input.value = "60";
-  const o2 = makeNumber("Flue-gas O2 at the same point (%)", "caf-o2", { step: "any", min: "0", max: "20.9", value: "8" }); o2.input.value = "8";
+  const co = makeNumber("Measured CO (ppm)", "caf-co", { step: "any", min: "0" });
+  const o2 = makeNumber("Flue-gas O2 at the same point (%)", "caf-o2", { step: "any", min: "0", max: "20.9" });
   for (const f of [co, o2]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { co.input.value = "60"; o2.input.value = "8"; update(); });
   const oCO = makeOutputLine(outputRegion, "Air-free CO", "caf-out-co");
@@ -827,8 +827,8 @@ export function computeDraftHoodDilution({ appliance_o2_pct = 0, diluted_o2_pct 
 export const draftHoodDilutionExample = { inputs: { appliance_o2_pct: 5, diluted_o2_pct: 12 } };
 function _v622renderDraftHoodDilution(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A diagnostic aid, not a certified combustion test; the analyzer and the manufacturer instructions govern. Citation: combustion-analysis practice, ambient-oxygen (20.9%) dilution mass balance, by name. dilution_ratio = (20.9 - O2_appliance) / (20.9 - O2_diluted); dilution_air_fraction = (O2_diluted - O2_appliance) / (20.9 - O2_appliance). The appliance O2 is sampled at the flue outlet before the draft hood, the diluted O2 in the vent connector after it. A CO reading in the diluted stream understates the real flue value by this ratio - sample the air-free CO before the draft hood.";
-  const oa = makeNumber("Appliance O2, before the draft hood (%)", "dhd-oa", { step: "any", min: "0", max: "20.9", value: "5" }); oa.input.value = "5";
-  const od = makeNumber("Diluted O2, after the draft hood (%)", "dhd-od", { step: "any", min: "0", max: "20.9", value: "12" }); od.input.value = "12";
+  const oa = makeNumber("Appliance O2, before the draft hood (%)", "dhd-oa", { step: "any", min: "0", max: "20.9" });
+  const od = makeNumber("Diluted O2, after the draft hood (%)", "dhd-od", { step: "any", min: "0", max: "20.9" });
   for (const f of [oa, od]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { oa.input.value = "5"; od.input.value = "12"; update(); });
   const oR = makeOutputLine(outputRegion, "Dilution ratio", "dhd-out-r");
@@ -873,11 +873,11 @@ export function computeChimneyDraft({ stack_height_ft = 0, ambient_temp_f = 0, m
 export const chimneyDraftExample = { inputs: { stack_height_ft: 30, ambient_temp_f: 60, mean_flue_temp_f: 400, baro_psia: 14.7, net_factor: 0.6 } };
 function _v585renderChimneyDraft(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A design aid, not a venting sign-off; the venting standard (NFPA 211) and the appliance instructions govern. Citation: ASHRAE Handbook HVAC Systems (chimney/vent) / NFPA 211 theoretical chimney draft, by name. D_t = 0.52 x B x H x (1/T_o - 1/T_m) with temperatures in Rankine and D_t in inches of water column; D_net = factor x D_t (factor 0.5 to 0.8). The barometric pressure must be altitude-corrected (thinner air at elevation cuts the draft), and T_m is the mean flue temperature, not the outlet.";
-  const H = makeNumber("Stack height (ft)", "chd-h", { step: "any", min: "0", value: "30" }); H.input.value = "30";
-  const to = makeNumber("Ambient temperature (°F)", "chd-to", { step: "any", value: "60" }); to.input.value = "60";
-  const tm = makeNumber("Mean flue-gas temperature (°F)", "chd-tm", { step: "any", value: "400" }); tm.input.value = "400";
-  const B = makeNumber("Barometric pressure (psia, altitude-corrected)", "chd-b", { step: "any", min: "0", value: "14.7" }); B.input.value = "14.7";
-  const factor = makeNumber("Net-available factor (0.5-0.8)", "chd-f", { step: "any", min: "0", value: "0.6" }); factor.input.value = "0.6";
+  const H = makeNumber("Stack height (ft)", "chd-h", { step: "any", min: "0" });
+  const to = makeNumber("Ambient temperature (°F)", "chd-to", { step: "any" });
+  const tm = makeNumber("Mean flue-gas temperature (°F)", "chd-tm", { step: "any" });
+  const B = makeNumber("Barometric pressure (psia, altitude-corrected)", "chd-b", { step: "any", min: "0" });
+  const factor = makeNumber("Net-available factor (0.5-0.8)", "chd-f", { step: "any", min: "0" });
   for (const f of [H, to, tm, B, factor]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { H.input.value = "30"; to.input.value = "60"; tm.input.value = "400"; B.input.value = "14.7"; factor.input.value = "0.6"; update(); });
   const oDt = makeOutputLine(outputRegion, "Theoretical draft", "chd-out-dt");
@@ -924,11 +924,11 @@ export function computeChimneyHeightForDraft({ target_draft_net_inwc = 0, ambien
 export const chimneyHeightForDraftExample = { inputs: { target_draft_net_inwc: 0.1046, ambient_temp_f: 60, mean_flue_temp_f: 400, baro_psia: 14.7, net_factor: 0.6 } };
 function renderChimneyHeightForDraft(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A design aid, not a venting sign-off; the venting standard (NFPA 211) and the appliance instructions govern. Citation: ASHRAE Handbook HVAC Systems (chimney/vent) / NFPA 211 theoretical chimney draft solved for the height: H = D_net_target / (net_factor x 0.52 x B x (1/T_o - 1/T_m)), temperatures in Rankine, D in inches of water column. Enter the NET draft the appliance needs (net_factor 0.5 to 0.8 accounts for flow and fitting losses). The barometric pressure must be altitude-corrected (thinner air at elevation cuts the draft), and T_m is the mean flue temperature, not the outlet.";
-  const dt = makeNumber("Target net draft (in wc)", "chhd-dt", { step: "any", min: "0", value: "0.1046" }); dt.input.value = "0.1046";
-  const to = makeNumber("Ambient temperature (°F)", "chhd-to", { step: "any", value: "60" }); to.input.value = "60";
-  const tm = makeNumber("Mean flue-gas temperature (°F)", "chhd-tm", { step: "any", value: "400" }); tm.input.value = "400";
-  const B = makeNumber("Barometric pressure (psia, altitude-corrected)", "chhd-b", { step: "any", min: "0", value: "14.7" }); B.input.value = "14.7";
-  const factor = makeNumber("Net-available factor (0.5-0.8)", "chhd-f", { step: "any", min: "0", value: "0.6" }); factor.input.value = "0.6";
+  const dt = makeNumber("Target net draft (in wc)", "chhd-dt", { step: "any", min: "0" });
+  const to = makeNumber("Ambient temperature (°F)", "chhd-to", { step: "any" });
+  const tm = makeNumber("Mean flue-gas temperature (°F)", "chhd-tm", { step: "any" });
+  const B = makeNumber("Barometric pressure (psia, altitude-corrected)", "chhd-b", { step: "any", min: "0" });
+  const factor = makeNumber("Net-available factor (0.5-0.8)", "chhd-f", { step: "any", min: "0" });
   for (const f of [dt, to, tm, B, factor]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { dt.input.value = "0.1046"; to.input.value = "60"; tm.input.value = "400"; B.input.value = "14.7"; factor.input.value = "0.6"; update(); });
   const oH = makeOutputLine(outputRegion, "Required stack height", "chhd-out-h");
@@ -980,9 +980,9 @@ function _v594renderFlueGasCombustionEff(inputRegion, outputRegion, citationEl) 
     { value: "propane", label: "Propane (LPG)" },
     { value: "oil2", label: "#2 fuel oil" },
   ]);
-  const o2 = makeNumber("Flue-gas O2 (%, dry, undiluted)", "fgce-o2", { step: "any", min: "0", max: "20.9", value: "5" }); o2.input.value = "5";
-  const ts = makeNumber("Stack temperature (°F)", "fgce-ts", { step: "any", value: "400" }); ts.input.value = "400";
-  const ta = makeNumber("Combustion-air temperature (°F)", "fgce-ta", { step: "any", value: "70" }); ta.input.value = "70";
+  const o2 = makeNumber("Flue-gas O2 (%, dry, undiluted)", "fgce-o2", { step: "any", min: "0", max: "20.9" });
+  const ts = makeNumber("Stack temperature (°F)", "fgce-ts", { step: "any" });
+  const ta = makeNumber("Combustion-air temperature (°F)", "fgce-ta", { step: "any" });
   inputRegion.appendChild(fuel.wrap);
   for (const f of [o2, ts, ta]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { fuel.select.value = "natural_gas"; o2.input.value = "5"; ts.input.value = "400"; ta.input.value = "70"; update(); });
@@ -1033,7 +1033,7 @@ function _v609renderCombustionLambda(inputRegion, outputRegion, citationEl) {
     { value: "propane", label: "Propane (AFR 15.5)" },
     { value: "oil2", label: "#2 fuel oil (AFR 14.5)" },
   ]);
-  const o2 = makeNumber("Flue-gas O2 (%, dry, air-free)", "clam-o2", { step: "any", min: "0", max: "20.9", value: "3" }); o2.input.value = "3";
+  const o2 = makeNumber("Flue-gas O2 (%, dry, air-free)", "clam-o2", { step: "any", min: "0", max: "20.9" });
   inputRegion.appendChild(fuel.wrap);
   inputRegion.appendChild(o2.wrap);
   attachExampleButton(inputRegion, () => { fuel.select.value = "natural_gas"; o2.input.value = "3"; update(); });

@@ -810,9 +810,9 @@ function renderVanDerWaals(inputRegion, outputRegion, citationEl) {
     { value: "ammonia", label: "Ammonia" },
     { value: "water-vapor", label: "Water vapor" },
   ]);
-  const n = makeNumber("Moles (mol)", "vdw-n", { step: "any", min: "0", value: "1" }); n.input.value = "1";
-  const v = makeNumber("Volume (L)", "vdw-v", { step: "any", min: "0", value: "1" }); v.input.value = "1";
-  const t = makeNumber("Temperature (°C)", "vdw-t", { step: "any", value: "0" }); t.input.value = "0";
+  const n = makeNumber("Moles (mol)", "vdw-n", { step: "any", min: "0" });
+  const v = makeNumber("Volume (L)", "vdw-v", { step: "any", min: "0" });
+  const t = makeNumber("Temperature (°C)", "vdw-t", { step: "any" });
   for (const f of [gas, n, v, t]) inputRegion.appendChild(f.wrap);
   const oReal = makeOutputLine(outputRegion, "Real pressure (van der Waals)", "vdw-out-real");
   const oIdeal = makeOutputLine(outputRegion, "Ideal pressure (PV=nRT)", "vdw-out-ideal");
@@ -835,10 +835,10 @@ function renderVanDerWaals(inputRegion, outputRegion, citationEl) {
 function renderArrheniusEquation(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Arrhenius equation k = A exp(-Ea/RT), two-point form Ea = R ln(k2/k1)/(1/T1 - 1/T2), R = 8.314 J/(mol*K), temperatures in kelvin (Arrhenius, 1889). Q10 = (k2/k1)^(10/dT). Assumes a single mechanism over the interval. First principles.";
   inputRegion.appendChild(makeNotice(LAB_NOTICE));
-  const k1 = makeNumber("Rate constant k1", "arr-k1", { step: "any", min: "0", value: "1" }); k1.input.value = "1";
-  const t1 = makeNumber("Temperature 1 (°C)", "arr-t1", { step: "any", value: "25" }); t1.input.value = "25";
-  const k2 = makeNumber("Rate constant k2", "arr-k2", { step: "any", min: "0", value: "2" }); k2.input.value = "2";
-  const t2 = makeNumber("Temperature 2 (°C)", "arr-t2", { step: "any", value: "35" }); t2.input.value = "35";
+  const k1 = makeNumber("Rate constant k1", "arr-k1", { step: "any", min: "0" });
+  const t1 = makeNumber("Temperature 1 (°C)", "arr-t1", { step: "any" });
+  const k2 = makeNumber("Rate constant k2", "arr-k2", { step: "any", min: "0" });
+  const t2 = makeNumber("Temperature 2 (°C)", "arr-t2", { step: "any" });
   for (const f of [k1, t1, k2, t2]) inputRegion.appendChild(f.wrap);
   const oEa = makeOutputLine(outputRegion, "Activation energy Ea", "arr-out-ea");
   const oA = makeOutputLine(outputRegion, "Pre-exponential A / Q10", "arr-out-a");
@@ -858,10 +858,10 @@ function renderArrheniusEquation(inputRegion, outputRegion, citationEl) {
 function renderClausiusClapeyron(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Clausius-Clapeyron equation ln(P2/P1) = -(dHvap/R)(1/T2 - 1/T1), so dHvap = R ln(P2/P1)/(1/T1 - 1/T2), R = 8.314 J/(mol*K), temperatures in kelvin. Only the pressure ratio enters, so any consistent unit works. Assumes constant dHvap and an ideal vapor. First principles.";
   inputRegion.appendChild(makeNotice(LAB_NOTICE));
-  const p1 = makeNumber("Vapor pressure P1 (any unit)", "cc-p1", { step: "any", min: "0", value: "760" }); p1.input.value = "760";
-  const t1 = makeNumber("Temperature 1 (°C)", "cc-t1", { step: "any", value: "100" }); t1.input.value = "100";
-  const p2 = makeNumber("Vapor pressure P2 (same unit as P1)", "cc-p2", { step: "any", min: "0", value: "525.9" }); p2.input.value = "525.9";
-  const t2 = makeNumber("Temperature 2 (°C)", "cc-t2", { step: "any", value: "90" }); t2.input.value = "90";
+  const p1 = makeNumber("Vapor pressure P1 (any unit)", "cc-p1", { step: "any", min: "0" });
+  const t1 = makeNumber("Temperature 1 (°C)", "cc-t1", { step: "any" });
+  const p2 = makeNumber("Vapor pressure P2 (same unit as P1)", "cc-p2", { step: "any", min: "0" });
+  const t2 = makeNumber("Temperature 2 (°C)", "cc-t2", { step: "any" });
   for (const f of [p1, t1, p2, t2]) inputRegion.appendChild(f.wrap);
   const oH = makeOutputLine(outputRegion, "Enthalpy of vaporization dHvap", "cc-out-h");
   const oS = makeOutputLine(outputRegion, "ln(P) vs 1/T slope", "cc-out-s");
@@ -881,9 +881,9 @@ function renderClausiusClapeyron(inputRegion, outputRegion, citationEl) {
 function renderOsmolarity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: osmolarity Osm = i x C (i the van't Hoff dissociation number: 1 glucose/urea, 2 NaCl/KCl, 3 CaCl2/MgCl2) and osmotic pressure Pi = Osm R T, R = 0.08206 L*atm/(mol*K), T in kelvin (van't Hoff's law; standard physical chemistry). Ideal dilute-solution form; report per liter of solution. First principles.";
   inputRegion.appendChild(makeNotice(LAB_NOTICE));
-  const c = makeNumber("Molar concentration C (mol/L)", "osm-c", { step: "any", min: "0", value: "0.154" }); c.input.value = "0.154";
-  const i = makeNumber("van't Hoff factor i (1 glucose, 2 NaCl, 3 CaCl2)", "osm-i", { step: "any", min: "0", value: "2" }); i.input.value = "2";
-  const t = makeNumber("Temperature (°C)", "osm-t", { step: "any", value: "37" }); t.input.value = "37";
+  const c = makeNumber("Molar concentration C (mol/L)", "osm-c", { step: "any", min: "0" });
+  const i = makeNumber("van't Hoff factor i (1 glucose, 2 NaCl, 3 CaCl2)", "osm-i", { step: "any", min: "0" });
+  const t = makeNumber("Temperature (°C)", "osm-t", { step: "any" });
   for (const f of [c, i, t]) inputRegion.appendChild(f.wrap);
   const oOsm = makeOutputLine(outputRegion, "Osmolarity", "osm-out-osm");
   const oPi = makeOutputLine(outputRegion, "Osmotic pressure", "osm-out-pi");
@@ -903,10 +903,10 @@ function renderOsmolarity(inputRegion, outputRegion, citationEl) {
 function renderNernstEquation(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Nernst equation E = E0 - (RT/nF) ln Q, R = 8.314 J/(mol*K), F = 96485 C/mol; at 25 C the slope is 0.05916/n V per decade of Q (Nernst; standard electrochemistry). Uses activities approximated by concentrations; excludes junction potential and overpotential. First principles.";
   inputRegion.appendChild(makeNotice(LAB_NOTICE));
-  const e0 = makeNumber("Standard potential E0 (V)", "ns-e0", { step: "any", value: "1.10" }); e0.input.value = "1.10";
-  const n = makeNumber("Electrons transferred n", "ns-n", { step: "any", min: "0", value: "2" }); n.input.value = "2";
-  const q = makeNumber("Reaction quotient Q", "ns-q", { step: "any", min: "0", value: "0.01" }); q.input.value = "0.01";
-  const t = makeNumber("Temperature (°C)", "ns-t", { step: "any", value: "25" }); t.input.value = "25";
+  const e0 = makeNumber("Standard potential E0 (V)", "ns-e0", { step: "any" });
+  const n = makeNumber("Electrons transferred n", "ns-n", { step: "any", min: "0" });
+  const q = makeNumber("Reaction quotient Q", "ns-q", { step: "any", min: "0" });
+  const t = makeNumber("Temperature (°C)", "ns-t", { step: "any" });
   for (const f of [e0, n, q, t]) inputRegion.appendChild(f.wrap);
   const oE = makeOutputLine(outputRegion, "Cell / electrode potential E", "ns-out-e");
   const oS = makeOutputLine(outputRegion, "Nernst slope (per decade of Q)", "ns-out-s");
@@ -1124,12 +1124,9 @@ export const od600CellCountExample = { inputs: { od600: 0.5, factor_cells_per_od
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderOd600CellCount(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Standard microbiology spectrophotometry; cells/mL = OD600 x factor x dilution. The OD-to-cells factor is strain- and instrument-specific and user-supplied (no universal constant). Linear range typically OD < ~0.8. Lab SOP governs.";
-  const od = makeNumber("OD600 reading", "odc-od", { step: "any", min: "0", value: "0.5" });
-  od.input.value = "0.5";
-  const factor = makeNumber("Conversion factor (cells/mL per OD)", "odc-factor", { step: "any", min: "0", value: "800000000" });
-  factor.input.value = "800000000";
-  const dil = makeNumber("Dilution factor", "odc-dil", { step: "any", min: "0", value: "1" });
-  dil.input.value = "1";
+  const od = makeNumber("OD600 reading", "odc-od", { step: "any", min: "0" });
+  const factor = makeNumber("Conversion factor (cells/mL per OD)", "odc-factor", { step: "any", min: "0" });
+  const dil = makeNumber("Dilution factor", "odc-dil", { step: "any", min: "0" });
   for (const f of [od, factor, dil]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { od.input.value = "0.5"; factor.input.value = "800000000"; dil.input.value = "1"; update(); });
   const oCells = makeOutputLine(outputRegion, "Cell density", "odc-out");
@@ -1308,9 +1305,9 @@ export const cfuPlateCountExample = { inputs: { colonies: 150, dilution_factor: 
 
 function renderCfuPlateCount(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per the FDA Bacteriological Analytical Manual (BAM) Chapter 3 (Aerobic Plate Count) and APHA Standard Methods, by name; both public/free. Countable range 25-250 (FDA BAM) or 30-300 (APHA). Free at fda.gov/food/science-research-food/laboratory-methods-food.";
-  const col = makeNumber("Colonies counted", "cfu-col", { step: "any", min: "0", value: "150" }); col.input.value = "150";
-  const df = makeNumber("Dilution factor (e.g. 1e-5 or 100000)", "cfu-df", { step: "any", min: "0", value: "0.00001" }); df.input.value = "0.00001";
-  const vol = makeNumber("Volume plated (mL)", "cfu-vol", { step: "any", min: "0", value: "0.1" }); vol.input.value = "0.1";
+  const col = makeNumber("Colonies counted", "cfu-col", { step: "any", min: "0" });
+  const df = makeNumber("Dilution factor (e.g. 1e-5 or 100000)", "cfu-df", { step: "any", min: "0" });
+  const vol = makeNumber("Volume plated (mL)", "cfu-vol", { step: "any", min: "0" });
   for (const f of [col, df, vol]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { col.input.value = "150"; df.input.value = "0.00001"; vol.input.value = "0.1"; update(); });
   const oCfu = makeOutputLine(outputRegion, "CFU/mL", "cfu-out-cfu");
@@ -1360,11 +1357,11 @@ export const molarityFromStockExample = { inputs: { purity_pct: 37, density_g_ml
 
 function renderMolarityFromStock(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Standard reagent preparation - stock molarity from assay and density, stock_M = 10 x purity_pct x density / MW; volume_to_draw = target_M x final_volume / stock_M. A concentrated liquid reagent is labeled by weight percent and density, not molarity, so both must be combined with the molecular weight (ignoring either is a 20-40% error). Always add concentrated acid to water, never the reverse. The reagent lot certificate of analysis and lab safety procedures govern.";
-  const purity = makeNumber("Assay / purity (% w/w)", "mfs-purity", { step: "any", min: "0", value: "37" }); purity.input.value = "37";
-  const density = makeNumber("Density (g/mL)", "mfs-density", { step: "any", min: "0", value: "1.19" }); density.input.value = "1.19";
-  const mw = makeNumber("Molecular weight (g/mol)", "mfs-mw", { step: "any", min: "0", value: "36.46" }); mw.input.value = "36.46";
-  const target = makeNumber("Target molarity (mol/L, optional)", "mfs-target", { step: "any", min: "0", value: "1" }); target.input.value = "1";
-  const finalVol = makeNumber("Final volume to prepare (mL, optional)", "mfs-vol", { step: "any", min: "0", value: "1000" }); finalVol.input.value = "1000";
+  const purity = makeNumber("Assay / purity (% w/w)", "mfs-purity", { step: "any", min: "0" });
+  const density = makeNumber("Density (g/mL)", "mfs-density", { step: "any", min: "0" });
+  const mw = makeNumber("Molecular weight (g/mol)", "mfs-mw", { step: "any", min: "0" });
+  const target = makeNumber("Target molarity (mol/L, optional)", "mfs-target", { step: "any", min: "0" });
+  const finalVol = makeNumber("Final volume to prepare (mL, optional)", "mfs-vol", { step: "any", min: "0" });
   for (const f of [purity, density, mw, target, finalVol]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { purity.input.value = "37"; density.input.value = "1.19"; mw.input.value = "36.46"; target.input.value = "1"; finalVol.input.value = "1000"; update(); });
   const oStock = makeOutputLine(outputRegion, "Stock molarity", "mfs-out-stock");
@@ -1415,15 +1412,15 @@ export const nucleicAcidA260Example = { inputs: { a260: 0.6, na_type: "dsDNA", d
 
 function renderNucleicAcidA260(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Standard spectrophotometric nucleic-acid quantitation (Beer-Lambert at 260 nm); concentration = A260 x factor x dilution, factor 50 (dsDNA) / 33 (ssDNA, oligo) / 40 (RNA) ug/mL per A260; purity = A260 / A280. The factor is an empirical mass coefficient, not molar, and differs by strandedness. A 260/280 below ~1.8 (DNA) or ~2.0 (RNA) flags protein/phenol carryover. Assumes a clean 1 cm path and a blanked instrument. The sample and instrument govern.";
-  const a260 = makeNumber("A260 (absorbance at 260 nm)", "na260-a260", { step: "any", min: "0", value: "0.6" }); a260.input.value = "0.6";
+  const a260 = makeNumber("A260 (absorbance at 260 nm)", "na260-a260", { step: "any", min: "0" });
   const type = makeSelect("Nucleic-acid type", "na260-type", [
     { value: "dsDNA", label: "Double-stranded DNA (factor 50)" },
     { value: "ssDNA", label: "Single-stranded DNA (factor 33)" },
     { value: "oligo", label: "Oligo (factor 33)" },
     { value: "RNA", label: "RNA (factor 40)" },
   ]);
-  const dil = makeNumber("Dilution factor", "na260-dil", { step: "any", min: "0", value: "50" }); dil.input.value = "50";
-  const a280 = makeNumber("A280 (optional, for 260/280 purity)", "na260-a280", { step: "any", min: "0", value: "0.324" }); a280.input.value = "0.324";
+  const dil = makeNumber("Dilution factor", "na260-dil", { step: "any", min: "0" });
+  const a280 = makeNumber("A280 (optional, for 260/280 purity)", "na260-a280", { step: "any", min: "0" });
   for (const f of [a260, type, dil, a280]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { a260.input.value = "0.6"; type.select.value = "dsDNA"; dil.input.value = "50"; a280.input.value = "0.324"; update(); });
   const oConc = makeOutputLine(outputRegion, "Concentration", "na260-out-conc");
@@ -1469,10 +1466,10 @@ export const ligationMolarRatioExample = { inputs: { vector_ng: 50, vector_lengt
 
 function renderLigationMolarRatio(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Standard molecular cloning - ligation insert:vector molar-ratio setup; insert_ng = ratio x (insert_length / vector_length) x vector_ng; vector_pmol = vector_ng / (vector_length x 650) x 1e3; insert_pmol = ratio x vector_pmol. The ratio is molar, not mass; 650 g/mol per bp is the dsDNA average (ssDNA and RNA differ); 3:1 is a starting point optimized empirically. The enzyme protocol and fragment ends govern.";
-  const vng = makeNumber("Vector mass (ng)", "lmr-vng", { step: "any", min: "0", value: "50" }); vng.input.value = "50";
-  const vlen = makeNumber("Vector length (bp)", "lmr-vlen", { step: "any", min: "0", value: "5000" }); vlen.input.value = "5000";
-  const ilen = makeNumber("Insert length (bp)", "lmr-ilen", { step: "any", min: "0", value: "1000" }); ilen.input.value = "1000";
-  const ratio = makeNumber("Insert:vector molar ratio", "lmr-ratio", { step: "any", min: "0", value: "3" }); ratio.input.value = "3";
+  const vng = makeNumber("Vector mass (ng)", "lmr-vng", { step: "any", min: "0" });
+  const vlen = makeNumber("Vector length (bp)", "lmr-vlen", { step: "any", min: "0" });
+  const ilen = makeNumber("Insert length (bp)", "lmr-ilen", { step: "any", min: "0" });
+  const ratio = makeNumber("Insert:vector molar ratio", "lmr-ratio", { step: "any", min: "0" });
   for (const f of [vng, vlen, ilen, ratio]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { vng.input.value = "50"; vlen.input.value = "5000"; ilen.input.value = "1000"; ratio.input.value = "3"; update(); });
   const oInsert = makeOutputLine(outputRegion, "Insert mass to add", "lmr-out-insert");
@@ -1517,9 +1514,9 @@ export const doublingTimeExample = { inputs: { initial_count: 1e5, final_count: 
 
 function renderDoublingTime(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Standard exponential-growth / population-doubling kinetics; Td = elapsed x ln(2) / ln(N / N0); mu = ln(N / N0) / elapsed; doublings = log2(N / N0). Doubling time is constant only during log (exponential) phase; a measurement spanning lag or stationary phase is meaningless. If N is an optical density, the ratio assumes OD stays proportional to cell count (fails at high density). The culture, medium, and conditions govern.";
-  const n0 = makeNumber("Initial count or OD (N0)", "dt-n0", { step: "any", min: "0", value: "100000" }); n0.input.value = "100000";
-  const n = makeNumber("Final count or OD (N)", "dt-n", { step: "any", min: "0", value: "800000" }); n.input.value = "800000";
-  const t = makeNumber("Elapsed time (h)", "dt-t", { step: "any", min: "0", value: "24" }); t.input.value = "24";
+  const n0 = makeNumber("Initial count or OD (N0)", "dt-n0", { step: "any", min: "0" });
+  const n = makeNumber("Final count or OD (N)", "dt-n", { step: "any", min: "0" });
+  const t = makeNumber("Elapsed time (h)", "dt-t", { step: "any", min: "0" });
   for (const f of [n0, n, t]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { n0.input.value = "100000"; n.input.value = "800000"; t.input.value = "24"; update(); });
   const oTd = makeOutputLine(outputRegion, "Doubling time", "dt-out-td");
@@ -1561,9 +1558,9 @@ export function computeGrowthProjectedCount({ initial_count = 0, doubling_time =
 export const growthProjectedCountExample = { inputs: { initial_count: 1e5, doubling_time: 8, elapsed_time: 24 } };
 function renderGrowthProjectedCount(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Standard exponential-growth kinetics, Td = t x ln(2) / ln(N/N0) solved for N: N = N0 x 2^(t / Td); doublings = t / Td; fold = 2^(t / Td). Holds only in log (exponential) phase; a projection past stationary phase over-predicts. If N is an optical density, the ratio assumes OD stays proportional to cell count. The culture, medium, and conditions govern.";
-  const n0 = makeNumber("Initial count or OD (N0)", "gpc-n0", { step: "any", min: "0", value: "100000" }); n0.input.value = "100000";
-  const td = makeNumber("Doubling time (h)", "gpc-td", { step: "any", min: "0", value: "8" }); td.input.value = "8";
-  const t = makeNumber("Elapsed time (h)", "gpc-t", { step: "any", min: "0", value: "24" }); t.input.value = "24";
+  const n0 = makeNumber("Initial count or OD (N0)", "gpc-n0", { step: "any", min: "0" });
+  const td = makeNumber("Doubling time (h)", "gpc-td", { step: "any", min: "0" });
+  const t = makeNumber("Elapsed time (h)", "gpc-t", { step: "any", min: "0" });
   for (const f of [n0, td, t]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { n0.input.value = "100000"; td.input.value = "8"; t.input.value = "24"; update(); });
   const oN = makeOutputLine(outputRegion, "Projected count or OD", "gpc-out-n");
@@ -1605,9 +1602,9 @@ export const michaelisMentenExample = { inputs: { vmax: 100, km: 25, substrate: 
 
 function renderMichaelisMenten(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Standard enzyme kinetics - the Michaelis-Menten equation; v = Vmax x [S] / (Km + [S]); percent_vmax = v / Vmax x 100. At [S] = Km the velocity is exactly half of Vmax. Km is the substrate concentration at half of Vmax (an affinity proxy, a low Km means high affinity, not a rate). The hyperbola approaches but never reaches Vmax. Assumes steady state with substrate far in excess of enzyme. The assay conditions govern.";
-  const vmax = makeNumber("Vmax (maximum velocity)", "mm-vmax", { step: "any", min: "0", value: "100" }); vmax.input.value = "100";
-  const km = makeNumber("Km (substrate at half Vmax)", "mm-km", { step: "any", min: "0", value: "25" }); km.input.value = "25";
-  const sub = makeNumber("Substrate concentration [S]", "mm-sub", { step: "any", min: "0", value: "25" }); sub.input.value = "25";
+  const vmax = makeNumber("Vmax (maximum velocity)", "mm-vmax", { step: "any", min: "0" });
+  const km = makeNumber("Km (substrate at half Vmax)", "mm-km", { step: "any", min: "0" });
+  const sub = makeNumber("Substrate concentration [S]", "mm-sub", { step: "any", min: "0" });
   for (const f of [vmax, km, sub]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { vmax.input.value = "100"; km.input.value = "25"; sub.input.value = "25"; update(); });
   const oV = makeOutputLine(outputRegion, "Velocity", "mm-out-v");
@@ -1644,8 +1641,8 @@ export function computeSubstrateForVelocity({ km = 0, target_percent = 0 } = {})
 export const substrateForVelocityExample = { inputs: { km: 25, target_percent: 90 } };
 function renderSubstrateForVelocity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: the Michaelis-Menten equation inverted - [S] = Km x f/(1 - f) for a target fraction f = v/Vmax. At [S] = Km the velocity is half of Vmax; 90% needs 9 x Km, 99% needs 99 x Km. Steady state, substrate in excess of enzyme; the assay conditions govern.";
-  const km = makeNumber("Km (substrate at half Vmax)", "sfv-km", { step: "any", min: "0", value: "25" }); km.input.value = "25";
-  const pct = makeNumber("Target velocity (% of Vmax)", "sfv-pct", { step: "any", min: "0", value: "90" }); pct.input.value = "90";
+  const km = makeNumber("Km (substrate at half Vmax)", "sfv-km", { step: "any", min: "0" });
+  const pct = makeNumber("Target velocity (% of Vmax)", "sfv-pct", { step: "any", min: "0" });
   for (const f of [km, pct]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { km.input.value = "25"; pct.input.value = "90"; update(); });
   const oS = makeOutputLine(outputRegion, "Required substrate [S]", "sfv-out-s");

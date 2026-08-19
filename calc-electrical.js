@@ -3204,18 +3204,12 @@ export function renderVoltageDropReactance(inputRegion, outputRegion, citationEl
     { value: "three", label: "Three-phase", selected: true },
     { value: "single", label: "Single-phase" },
   ]);
-  const volts = makeNumber("System voltage (V, line-to-line)", "vdr-v", { step: "any", min: "0", value: "480" });
-  volts.input.value = "480";
-  const cur = makeNumber("Load current (A)", "vdr-i", { step: "any", min: "0", value: "100" });
-  cur.input.value = "100";
-  const len = makeNumber("One-way length (ft)", "vdr-l", { step: "any", min: "0", value: "200" });
-  len.input.value = "200";
-  const r = makeNumber("R per 1000 ft (ohm; Table 9)", "vdr-r", { step: "any", min: "0", value: "0.13" });
-  r.input.value = "0.13";
-  const x = makeNumber("X per 1000 ft (ohm; Table 9)", "vdr-x", { step: "any", min: "0", value: "0.044" });
-  x.input.value = "0.044";
-  const pf = makeNumber("Power factor (0.5-1.0)", "vdr-pf", { step: "any", min: "0", max: "1", value: "0.85" });
-  pf.input.value = "0.85";
+  const volts = makeNumber("System voltage (V, line-to-line)", "vdr-v", { step: "any", min: "0" });
+  const cur = makeNumber("Load current (A)", "vdr-i", { step: "any", min: "0" });
+  const len = makeNumber("One-way length (ft)", "vdr-l", { step: "any", min: "0" });
+  const r = makeNumber("R per 1000 ft (ohm; Table 9)", "vdr-r", { step: "any", min: "0" });
+  const x = makeNumber("X per 1000 ft (ohm; Table 9)", "vdr-x", { step: "any", min: "0" });
+  const pf = makeNumber("Power factor (0.5-1.0)", "vdr-pf", { step: "any", min: "0", max: "1" });
   for (const f of [phase, volts, cur, len, r, x, pf]) inputRegion.appendChild(f.wrap);
 
   attachExampleButton(inputRegion, () => {
@@ -3533,17 +3527,14 @@ export const ambientAmpacityAdjustExample = {
 export function renderAmbientAmpacityAdjust(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per NEC 2023 310.15(B)(1) (ambient-temperature correction, 30 C table basis) and 310.15(C)(1) (more than three current-carrying conductors). Enter the base ampacity from your NEC 310.16 column; the correction factors are bundled de-facto reference. AHJ governs. Free at nfpa.org/freeaccess for the NEC table of contents.";
 
-  const base = makeNumber("Base ampacity (A; from NEC 310.16)", "aa-base", { step: "any", min: "0", value: "75" });
-  base.input.value = "75";
+  const base = makeNumber("Base ampacity (A; from NEC 310.16)", "aa-base", { step: "any", min: "0" });
   const col = makeSelect("Termination / insulation column", "aa-col", [
     { value: "60", label: "60 C" },
     { value: "75", label: "75 C", selected: true },
     { value: "90", label: "90 C" },
   ]);
-  const amb = makeNumber("Ambient temperature (°C)", "aa-amb", { step: "any", value: "50" });
-  amb.input.value = "50";
-  const count = makeNumber("Current-carrying conductors", "aa-n", { step: "1", min: "1", value: "12" });
-  count.input.value = "12";
+  const amb = makeNumber("Ambient temperature (°C)", "aa-amb", { step: "any" });
+  const count = makeNumber("Current-carrying conductors", "aa-n", { step: "1", min: "1" });
   for (const f of [base, col, amb, count]) inputRegion.appendChild(f.wrap);
 
   attachExampleButton(inputRegion, () => {
@@ -3705,26 +3696,16 @@ export const serviceLoadOptionalExample = {
 export function renderServiceLoadOptional(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per NEC 2023 220.82 (optional dwelling load calculation): general load demand = first 10 kVA at 100% + remainder at 40%; 220.82(C) adds the larger of heating vs cooling at 100%. Compared against the standard 220.42 method; size to the larger. AHJ governs the adopted edition. Free at nfpa.org/freeaccess for the NEC table of contents.";
 
-  const area = makeNumber("Dwelling area (ft²)", "slo-area", { step: "any", min: "0", value: "2400" });
-  area.input.value = "2400";
-  const sa = makeNumber("Small-appliance circuits", "slo-sa", { step: "1", min: "0", value: "2" });
-  sa.input.value = "2";
-  const laundry = makeNumber("Laundry circuits", "slo-laundry", { step: "1", min: "0", value: "1" });
-  laundry.input.value = "1";
-  const fixed = makeNumber("Fixed appliances (kW total)", "slo-fixed", { step: "any", min: "0", value: "3" });
-  fixed.input.value = "3";
-  const range = makeNumber("Range / cooktop (kW)", "slo-range", { step: "any", min: "0", value: "12" });
-  range.input.value = "12";
-  const dryer = makeNumber("Dryer (kW)", "slo-dryer", { step: "any", min: "0", value: "5.5" });
-  dryer.input.value = "5.5";
-  const wh = makeNumber("Water heater (kW)", "slo-wh", { step: "any", min: "0", value: "4.5" });
-  wh.input.value = "4.5";
-  const heat = makeNumber("Heating (kW)", "slo-heat", { step: "any", min: "0", value: "9" });
-  heat.input.value = "9";
-  const cool = makeNumber("Cooling (kW)", "slo-cool", { step: "any", min: "0", value: "5" });
-  cool.input.value = "5";
-  const ev = makeNumber("EV charger (A; 0 if none)", "slo-ev", { step: "any", min: "0", value: "0" });
-  ev.input.value = "0";
+  const area = makeNumber("Dwelling area (ft²)", "slo-area", { step: "any", min: "0" });
+  const sa = makeNumber("Small-appliance circuits", "slo-sa", { step: "1", min: "0" });
+  const laundry = makeNumber("Laundry circuits", "slo-laundry", { step: "1", min: "0" });
+  const fixed = makeNumber("Fixed appliances (kW total)", "slo-fixed", { step: "any", min: "0" });
+  const range = makeNumber("Range / cooktop (kW)", "slo-range", { step: "any", min: "0" });
+  const dryer = makeNumber("Dryer (kW)", "slo-dryer", { step: "any", min: "0" });
+  const wh = makeNumber("Water heater (kW)", "slo-wh", { step: "any", min: "0" });
+  const heat = makeNumber("Heating (kW)", "slo-heat", { step: "any", min: "0" });
+  const cool = makeNumber("Cooling (kW)", "slo-cool", { step: "any", min: "0" });
+  const ev = makeNumber("EV charger (A; 0 if none)", "slo-ev", { step: "any", min: "0" });
   const volts = makeSelect("Service voltage", "slo-v", [
     { value: "240", label: "240 V (single-phase dwelling)", selected: true },
     { value: "208", label: "208 V" },
@@ -4629,8 +4610,7 @@ function _v176renderWorkingSpace11026(inputRegion, outputRegion, citationEl) {
     { value: "2", label: "Condition 2 - grounded surface opposite" },
     { value: "3", label: "Condition 3 - live parts both sides" },
   ]);
-  const w = makeNumber("Equipment width (in)", "ws-w", { step: "any", min: "0", value: "24" });
-  w.input.value = "24";
+  const w = makeNumber("Equipment width (in)", "ws-w", { step: "any", min: "0" });
   for (const f of [band, cond, w]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { band.select.value = "151-600 V"; cond.select.value = "2"; w.input.value = "24"; update(); });
 
@@ -4715,8 +4695,7 @@ export const motorBranchProtectionExample = { inputs: { flc_a: 28, device_type: 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v179renderMotorBranchProtection(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 2023 430.52 and Table 430.52 (branch-circuit short-circuit and ground-fault protection) with 430.110 (disconnect ampere rating). Sized on the table FLC (430.6(A)); overload is separate (430.32). The AHJ governs. Free at nfpa.org/freeaccess.";
-  const flc = makeNumber("Motor full-load current FLC (A, from Table 430.247-250)", "mbp-flc", { step: "any", min: "0", value: "28" });
-  flc.input.value = "28";
+  const flc = makeNumber("Motor full-load current FLC (A, from Table 430.247-250)", "mbp-flc", { step: "any", min: "0" });
   const dev = makeSelect("Protective device type", "mbp-dev", [
     { value: "inverse-time breaker", label: "Inverse-time breaker (250%)" },
     { value: "dual-element/time-delay fuse", label: "Dual-element / time-delay fuse (175%)" },
@@ -4892,9 +4871,9 @@ export function computeConduitJamRatio({ conduit_id_in = 0, conductor_od_in = 0,
 export const conduitJamRatioExample = { inputs: { conduit_id_in: 2.067, conductor_od_in: 0.65, n_conductors: 3 } };
 function _v374renderConduitJamRatio(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: conduit jam ratio = conduit ID / conductor OD; jamming risk for exactly three same-size conductors when the ratio is ~2.8-3.2, a widely-referenced NEC Chapter 9 pulling guideline (Table 4 conduit ID, Table 5 conductor OD). A caution, not a code limit; the NEC and the AHJ govern.";
-  const id = makeNumber("Conduit inside diameter (in, NEC Ch.9 Table 4)", "cjr-id", { step: "any", min: "0" }); id.input.value = "2.067";
-  const od = makeNumber("Conductor outside diameter (in, Table 5)", "cjr-od", { step: "any", min: "0" }); od.input.value = "0.65";
-  const n = makeNumber("Number of conductors", "cjr-n", { step: "1", min: "1" }); n.input.value = "3";
+  const id = makeNumber("Conduit inside diameter (in, NEC Ch.9 Table 4)", "cjr-id", { step: "any", min: "0" });
+  const od = makeNumber("Conductor outside diameter (in, Table 5)", "cjr-od", { step: "any", min: "0" });
+  const n = makeNumber("Number of conductors", "cjr-n", { step: "1", min: "1" });
   for (const f of [id, od, n]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { id.input.value = "2.067"; od.input.value = "0.65"; n.input.value = "3"; update(); });
   const oRatio = makeOutputLine(outputRegion, "Jam ratio (ID / OD)", "cjr-out-ratio");
@@ -4942,12 +4921,12 @@ export function computeMotorEfficiencyUpgradeSavings({ hp = 0, load = 0, eff_sta
 export const motorEfficiencyUpgradeSavingsExample = { inputs: { hp: 50, load: 0.75, eff_standard: 0.90, eff_premium: 0.945, hours: 4000, rate_kwh: 0.12 } };
 function _v471renderMotorEfficiencyUpgradeSavings(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Premium-motor upgrade saving (first-principles): input kW = HP x 0.746 x load / efficiency; annual saving = (kW at old eff - kW at new eff) x run hours x rate. The saving scales with load, hours, and rate. Energy charge only; the utility tariff and rebates change the payback. A screening estimate, not a metered M&V.";
-  const hp = makeNumber("Motor horsepower", "meu-hp", { step: "any", min: "0" }); hp.input.value = "50";
-  const ld = makeNumber("Load fraction (0-1)", "meu-ld", { step: "any", min: "0", max: "1" }); ld.input.value = "0.75";
-  const es = makeNumber("Existing motor efficiency (0-1)", "meu-es", { step: "any", min: "0", max: "1" }); es.input.value = "0.90";
-  const ep = makeNumber("Premium motor efficiency (0-1)", "meu-ep", { step: "any", min: "0", max: "1" }); ep.input.value = "0.945";
-  const hr = makeNumber("Annual run hours", "meu-hr", { step: "any", min: "0" }); hr.input.value = "4000";
-  const rate = makeNumber("Electricity rate ($/kWh)", "meu-rate", { step: "any", min: "0" }); rate.input.value = "0.12";
+  const hp = makeNumber("Motor horsepower", "meu-hp", { step: "any", min: "0" });
+  const ld = makeNumber("Load fraction (0-1)", "meu-ld", { step: "any", min: "0", max: "1" });
+  const es = makeNumber("Existing motor efficiency (0-1)", "meu-es", { step: "any", min: "0", max: "1" });
+  const ep = makeNumber("Premium motor efficiency (0-1)", "meu-ep", { step: "any", min: "0", max: "1" });
+  const hr = makeNumber("Annual run hours", "meu-hr", { step: "any", min: "0" });
+  const rate = makeNumber("Electricity rate ($/kWh)", "meu-rate", { step: "any", min: "0" });
   for (const f of [hp, ld, es, ep, hr, rate]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { hp.input.value = "50"; ld.input.value = "0.75"; es.input.value = "0.90"; ep.input.value = "0.945"; hr.input.value = "4000"; rate.input.value = "0.12"; update(); });
   const oKw = makeOutputLine(outputRegion, "Input kW standard / premium", "meu-out-kw");
@@ -4991,11 +4970,11 @@ export function computeTransformerLoadingEfficiency({ kva_rating = 0, noload_w =
 export const transformerLoadingEfficiencyExample = { inputs: { kva_rating: 75, noload_w: 200, loadloss_w: 1200, load: 0.75, pf: 1.0 } };
 function _v472renderTransformerLoadingEfficiency(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Transformer loading efficiency (first-principles): output = kVA x load x PF; loss = (no-load + load^2 x full-load loss); efficiency = output / (output + loss); peak efficiency at load = sqrt(no-load / full-load loss). A design/screening aid; the manufacturer's test report governs.";
-  const kva = makeNumber("Transformer rating (kVA)", "tle-kva", { step: "any", min: "0" }); kva.input.value = "75";
-  const nl = makeNumber("No-load (core) loss (W)", "tle-nl", { step: "any", min: "0" }); nl.input.value = "200";
-  const ll = makeNumber("Full-load (copper) loss (W)", "tle-ll", { step: "any", min: "0" }); ll.input.value = "1200";
-  const ld = makeNumber("Load fraction (0-1)", "tle-ld", { step: "any", min: "0", max: "1" }); ld.input.value = "0.75";
-  const pf = makeNumber("Power factor (0-1)", "tle-pf", { step: "any", min: "0", max: "1" }); pf.input.value = "1.0";
+  const kva = makeNumber("Transformer rating (kVA)", "tle-kva", { step: "any", min: "0" });
+  const nl = makeNumber("No-load (core) loss (W)", "tle-nl", { step: "any", min: "0" });
+  const ll = makeNumber("Full-load (copper) loss (W)", "tle-ll", { step: "any", min: "0" });
+  const ld = makeNumber("Load fraction (0-1)", "tle-ld", { step: "any", min: "0", max: "1" });
+  const pf = makeNumber("Power factor (0-1)", "tle-pf", { step: "any", min: "0", max: "1" });
   for (const f of [kva, nl, ll, ld, pf]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { kva.input.value = "75"; nl.input.value = "200"; ll.input.value = "1200"; ld.input.value = "0.75"; pf.input.value = "1.0"; update(); });
   const oEff = makeOutputLine(outputRegion, "Efficiency", "tle-out-eff");
@@ -5044,12 +5023,12 @@ export function computeEconomicConductorSizing({ current_a = 0, r_small_ohm = 0,
 export const economicConductorSizingExample = { inputs: { current_a: 100, r_small_ohm: 0.20, r_big_ohm: 0.125, hours: 4000, rate_kwh: 0.12, upsize_cost: 800 } };
 function _v473renderEconomicConductorSizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Economic conductor sizing (first-principles I^2R): three-phase loss = 3 x I^2 x R; annual saving = (loss small - loss big) x hours x rate; payback = upsize cost / saving. Pays only on heavily loaded, long-hour feeders. A screening estimate; installed cost and the code minimum still govern.";
-  const I = makeNumber("Per-phase load current (A)", "ecs-i", { step: "any", min: "0" }); I.input.value = "100";
-  const rs = makeNumber("Smaller conductor resistance (ohm, run)", "ecs-rs", { step: "any", min: "0" }); rs.input.value = "0.20";
-  const rb = makeNumber("Larger conductor resistance (ohm, run)", "ecs-rb", { step: "any", min: "0" }); rb.input.value = "0.125";
-  const hr = makeNumber("Annual run hours", "ecs-hr", { step: "any", min: "0" }); hr.input.value = "4000";
-  const rate = makeNumber("Electricity rate ($/kWh)", "ecs-rate", { step: "any", min: "0" }); rate.input.value = "0.12";
-  const cost = makeNumber("Added upsize cost ($)", "ecs-cost", { step: "any", min: "0" }); cost.input.value = "800";
+  const I = makeNumber("Per-phase load current (A)", "ecs-i", { step: "any", min: "0" });
+  const rs = makeNumber("Smaller conductor resistance (ohm, run)", "ecs-rs", { step: "any", min: "0" });
+  const rb = makeNumber("Larger conductor resistance (ohm, run)", "ecs-rb", { step: "any", min: "0" });
+  const hr = makeNumber("Annual run hours", "ecs-hr", { step: "any", min: "0" });
+  const rate = makeNumber("Electricity rate ($/kWh)", "ecs-rate", { step: "any", min: "0" });
+  const cost = makeNumber("Added upsize cost ($)", "ecs-cost", { step: "any", min: "0" });
   for (const f of [I, rs, rb, hr, rate, cost]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { I.input.value = "100"; rs.input.value = "0.20"; rb.input.value = "0.125"; hr.input.value = "4000"; rate.input.value = "0.12"; cost.input.value = "800"; update(); });
   const oLoss = makeOutputLine(outputRegion, "Loss small / big", "ecs-out-loss");
@@ -5099,10 +5078,10 @@ export function computeGeneratorFuelRuntime({ tank_capacity_gal = 0, consumption
 export const generatorFuelRuntimeExample = { inputs: { tank_capacity_gal: 100, consumption_gph: 3.0, usable_pct: 90, target_runtime_hr: 72 } };
 function _v487renderGeneratorFuelRuntime(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: generator fuel runtime (first-principles): runtime = usable fuel / consumption; usable = tank x usable%. For a target duration, fuel = consumption x hours and the tank = fuel / usable%. Enter consumption from the genset data plate. A planning aid; the published fuel curve and the AHJ's fuel-storage rules govern.";
-  const tank = makeNumber("Fuel tank capacity (gal)", "gfr-tank", { step: "any", min: "0" }); tank.input.value = "100";
-  const gph = makeNumber("Fuel consumption at load (gph)", "gfr-gph", { step: "any", min: "0" }); gph.input.value = "3.0";
-  const usable = makeNumber("Usable tank fraction (%)", "gfr-usable", { step: "any", min: "0", max: "100" }); usable.input.value = "90";
-  const target = makeNumber("Target backup duration (hr, 0 to skip)", "gfr-target", { step: "any", min: "0" }); target.input.value = "72";
+  const tank = makeNumber("Fuel tank capacity (gal)", "gfr-tank", { step: "any", min: "0" });
+  const gph = makeNumber("Fuel consumption at load (gph)", "gfr-gph", { step: "any", min: "0" });
+  const usable = makeNumber("Usable tank fraction (%)", "gfr-usable", { step: "any", min: "0", max: "100" });
+  const target = makeNumber("Target backup duration (hr, 0 to skip)", "gfr-target", { step: "any", min: "0" });
   for (const f of [tank, gph, usable, target]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { tank.input.value = "100"; gph.input.value = "3.0"; usable.input.value = "90"; target.input.value = "72"; update(); });
   const oRun = makeOutputLine(outputRegion, "Runtime on a full tank", "gfr-out-run");
@@ -5148,14 +5127,14 @@ export function computeTransformerVoltageRegulation({ percent_r = 0, percent_x =
 export const transformerVoltageRegulationExample = { inputs: { percent_r: 1.2, percent_x: 5.0, power_factor: 0.85, leading: false, load_fraction: 1.0 } };
 function _v494renderTransformerVoltageRegulation(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Transformer voltage-regulation approximation (from %R, %X, and load power factor): VR% = load x (%R cos + %X sin) + load^2 x (%X cos - %R sin)^2 / 200, sin negative for a leading power factor. An IEEE C57 test-report quantity; %Z alone does not give it because it depends on the %R / %X split and the power factor. Terminal regulation, not the feeder drop. A design aid; the utility's voltage study governs.";
-  const pr = makeNumber("Transformer %R (from test report)", "tvr-r", { step: "any", min: "0" }); pr.input.value = "1.2";
-  const px = makeNumber("Transformer %X (from test report)", "tvr-x", { step: "any", min: "0" }); px.input.value = "5.0";
-  const pf = makeNumber("Load power factor (0-1)", "tvr-pf", { step: "any", min: "0", max: "1" }); pf.input.value = "0.85";
+  const pr = makeNumber("Transformer %R (from test report)", "tvr-r", { step: "any", min: "0" });
+  const px = makeNumber("Transformer %X (from test report)", "tvr-x", { step: "any", min: "0" });
+  const pf = makeNumber("Load power factor (0-1)", "tvr-pf", { step: "any", min: "0", max: "1" });
   const lead = makeSelect("Power-factor type", "tvr-lead", [
     { value: "lagging", label: "Lagging (motors) - voltage sags", selected: true },
     { value: "leading", label: "Leading (over-corrected / exporting) - voltage rises" },
   ]);
-  const ld = makeNumber("Per-unit loading (1.0 = full load)", "tvr-ld", { step: "any", min: "0" }); ld.input.value = "1.0";
+  const ld = makeNumber("Per-unit loading (1.0 = full load)", "tvr-ld", { step: "any", min: "0" });
   for (const f of [pr, px, pf]) inputRegion.appendChild(f.wrap);
   inputRegion.appendChild(lead.wrap);
   inputRegion.appendChild(ld.wrap);
@@ -5205,11 +5184,11 @@ export function computeCapacitorDischargeTime({ capacitance_uf = 0, initial_volt
 export const capacitorDischargeTimeExample = { inputs: { capacitance_uf: 100, initial_voltage: 600, safe_voltage: 50, time_limit_s: 0, resistor_ohm: 0 } };
 function _v495renderCapacitorDischargeTime(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 2023 460.6 discharge of stored energy: residual voltage to 50 V within 1 minute at or below 600 V (5 minutes above 600 V). V(t) = V0 e^(-t/RC); t = R C ln(V0/V_safe); R_max = t_limit / (C ln(V0/V_safe)); continuous burn = V0^2/R. The discharge means must be permanently or automatically connected. A design aid; the equipment listing and the AHJ govern.";
-  const cap = makeNumber("Total capacitance (uF)", "cdt-cap", { step: "any", min: "0" }); cap.input.value = "100";
-  const v0 = makeNumber("Initial voltage at disconnect (V)", "cdt-v0", { step: "any", min: "0" }); v0.input.value = "600";
-  const vs = makeNumber("Safe voltage target (V, 460.6 = 50)", "cdt-vs", { step: "any", min: "0" }); vs.input.value = "50";
-  const tl = makeNumber("Code time limit (s, 0 = auto 60/300)", "cdt-tl", { step: "any", min: "0" }); tl.input.value = "0";
-  const r = makeNumber("Bleed resistor (ohm, 0 = solve for largest)", "cdt-r", { step: "any", min: "0" }); r.input.value = "0";
+  const cap = makeNumber("Total capacitance (uF)", "cdt-cap", { step: "any", min: "0" });
+  const v0 = makeNumber("Initial voltage at disconnect (V)", "cdt-v0", { step: "any", min: "0" });
+  const vs = makeNumber("Safe voltage target (V, 460.6 = 50)", "cdt-vs", { step: "any", min: "0" });
+  const tl = makeNumber("Code time limit (s, 0 = auto 60/300)", "cdt-tl", { step: "any", min: "0" });
+  const r = makeNumber("Bleed resistor (ohm, 0 = solve for largest)", "cdt-r", { step: "any", min: "0" });
   for (const f of [cap, v0, vs, tl, r]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cap.input.value = "100"; v0.input.value = "600"; vs.input.value = "50"; tl.input.value = "0"; r.input.value = "0"; update(); });
   const oR = makeOutputLine(outputRegion, "Resistor (max compliant or chosen)", "cdt-out-r");
@@ -5253,8 +5232,8 @@ export function computeAsymmetricalFaultXr({ isym_ka = 0, x_over_r = 0 } = {}) {
 export const asymmetricalFaultXrExample = { inputs: { isym_ka: 20, x_over_r: 15 } };
 function _v496renderAsymmetricalFaultXr(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: First-cycle fault asymmetry from X/R (IEEE C37 / NEMA AB-4 model): I_peak = sqrt(2) x I_sym x (1 + e^(-pi/(X/R))); asymmetrical RMS multiplier MF = sqrt(1 + 2 e^(-2 pi/(X/R))); I_asym = I_sym x MF. The asymmetrical first-cycle current, not the symmetrical RMS, is what a peak-withstand and bus bracing rating must survive. A design aid; the interrupting-duty rating and coordination study govern.";
-  const isym = makeNumber("Symmetrical RMS fault current (kA)", "afx-isym", { step: "any", min: "0" }); isym.input.value = "20";
-  const xr = makeNumber("Circuit X/R ratio", "afx-xr", { step: "any", min: "0" }); xr.input.value = "15";
+  const isym = makeNumber("Symmetrical RMS fault current (kA)", "afx-isym", { step: "any", min: "0" });
+  const xr = makeNumber("Circuit X/R ratio", "afx-xr", { step: "any", min: "0" });
   for (const f of [isym, xr]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { isym.input.value = "20"; xr.input.value = "15"; update(); });
   const oPeak = makeOutputLine(outputRegion, "First peak current", "afx-out-peak");
@@ -5293,9 +5272,9 @@ export function computeBatteryHydrogenVent({ cell_count = 0, charge_current_a = 
 export const batteryHydrogenVentExample = { inputs: { cell_count: 24, charge_current_a: 20, room_volume_ft3: 800 } };
 function _v518renderBatteryHydrogenVent(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: IEEE 1635 / IEEE-ASHRAE Guide 21 battery-room hydrogen ventilation (NFPA 855 4% LEL): Q = 0.054 x I x N cfm (N = individual 2 V CELLS, not jars), ACH = Q x 60 / room volume; holds the average hydrogen below 1% (75% margin under the 4% LEL). A design aid; the applicable code and room design govern.";
-  const n = makeNumber("Cell count (individual 2 V cells, NOT jars)", "bhv-n", { step: "1", min: "1" }); n.input.value = "24";
-  const i = makeNumber("Maximum charge current (A)", "bhv-i", { step: "any", min: "0" }); i.input.value = "20";
-  const vol = makeNumber("Room volume (ft³)", "bhv-v", { step: "any", min: "0" }); vol.input.value = "800";
+  const n = makeNumber("Cell count (individual 2 V cells, NOT jars)", "bhv-n", { step: "1", min: "1" });
+  const i = makeNumber("Maximum charge current (A)", "bhv-i", { step: "any", min: "0" });
+  const vol = makeNumber("Room volume (ft³)", "bhv-v", { step: "any", min: "0" });
   for (const f of [n, i, vol]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { n.input.value = "24"; i.input.value = "20"; vol.input.value = "800"; update(); });
   const oQ = makeOutputLine(outputRegion, "Required exhaust airflow", "bhv-out-q");
@@ -5332,8 +5311,8 @@ export const batteryVentMaxCurrentExample = { inputs: { available_cfm: 100, cell
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function renderBatteryVentMaxCurrent(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: IEEE 1635 / IEEE-ASHRAE Guide 21 battery-room hydrogen ventilation (NFPA 855 4% LEL), solved for the current: I_max = Q / (0.054 x N), N = individual 2 V CELLS (not jars). Holds the average hydrogen below 1% (75% margin under the 4% LEL). A design aid; the applicable code and room design govern.";
-  const q = makeNumber("Available exhaust airflow (cfm)", "bvmc-q", { step: "any", min: "0" }); q.input.value = "100";
-  const n = makeNumber("Cell count (individual 2 V cells, NOT jars)", "bvmc-n", { step: "1", min: "1" }); n.input.value = "24";
+  const q = makeNumber("Available exhaust airflow (cfm)", "bvmc-q", { step: "any", min: "0" });
+  const n = makeNumber("Cell count (individual 2 V cells, NOT jars)", "bvmc-n", { step: "1", min: "1" });
   for (const f of [q, n]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { q.input.value = "100"; n.input.value = "24"; update(); });
   const oI = makeOutputLine(outputRegion, "Max charge current", "bvmc-out-i");
@@ -5374,14 +5353,14 @@ export function computeTransformerInrushPoint({ kva = 0, primary_voltage_v = 0, 
 export const transformerInrushPointExample = { inputs: { kva: 75, primary_voltage_v: 480, phase: 3, inrush_multiple: 12, duration_s: 0.1 } };
 function _v520renderTransformerInrushPoint(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: transformer energization-inrush coordination (IEEE C57.109; NEC 450.3 context): FLA = kVA x 1000 / (sqrt(3) x V) three-phase; inrush point = multiple x FLA at the stated duration (~12x at 0.1 s, up to 25x at 0.01 s). The primary device curve must sit right of the inrush point and left of the damage curve. A design aid; the manufacturer's inrush data and a coordination study govern.";
-  const kva = makeNumber("Transformer rating (kVA)", "tip-kva", { step: "any", min: "0" }); kva.input.value = "75";
-  const v = makeNumber("Primary line voltage (V)", "tip-v", { step: "any", min: "0" }); v.input.value = "480";
+  const kva = makeNumber("Transformer rating (kVA)", "tip-kva", { step: "any", min: "0" });
+  const v = makeNumber("Primary line voltage (V)", "tip-v", { step: "any", min: "0" });
   const ph = makeSelect("Phase", "tip-ph", [
     { value: "3", label: "Three-phase", selected: true },
     { value: "1", label: "Single-phase" },
   ]);
-  const mult = makeNumber("Inrush multiple (x FLA)", "tip-mult", { step: "any", min: "0" }); mult.input.value = "12";
-  const dur = makeNumber("Duration (s)", "tip-dur", { step: "any", min: "0" }); dur.input.value = "0.1";
+  const mult = makeNumber("Inrush multiple (x FLA)", "tip-mult", { step: "any", min: "0" });
+  const dur = makeNumber("Duration (s)", "tip-dur", { step: "any", min: "0" });
   for (const f of [kva, v, ph, mult, dur]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { kva.input.value = "75"; v.input.value = "480"; ph.select.value = "3"; mult.input.value = "12"; dur.input.value = "0.1"; update(); });
   const oFla = makeOutputLine(outputRegion, "Full-load current (FLA)", "tip-out-fla");
@@ -5440,9 +5419,9 @@ export const terminationTempAmpacityExample = { inputs: { amp_90c: 260, amp_75c:
 
 function _v562renderTerminationTempAmpacity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 2023 110.14(C) temperature limitations with Table 310.16: the usable ampacity is capped at the lowest-rated termination (60 C at or below 100 A unless listed 75 C, else 75 C; 75 C above 100 A), and the 90 C column is used ONLY for the ambient/fill derating math (derated 90 C = amp_90c x derate), not the final termination current; governing = min(termination column, derated 90 C). The NEC and the equipment listing govern.";
-  const a90 = makeNumber("90 C ampacity (Table 310.16)", "tta-90", { step: "any", min: "0" }); a90.input.value = "260";
-  const a75 = makeNumber("75 C ampacity", "tta-75", { step: "any", min: "0" }); a75.input.value = "230";
-  const a60 = makeNumber("60 C ampacity", "tta-60", { step: "any", min: "0" }); a60.input.value = "195";
+  const a90 = makeNumber("90 C ampacity (Table 310.16)", "tta-90", { step: "any", min: "0" });
+  const a75 = makeNumber("75 C ampacity", "tta-75", { step: "any", min: "0" });
+  const a60 = makeNumber("60 C ampacity", "tta-60", { step: "any", min: "0" });
   const tr = makeSelect("Lowest termination rating", "tta-tr", [
     { value: "75", label: "75 C", selected: true },
     { value: "60", label: "60 C" },
@@ -5451,7 +5430,7 @@ function _v562renderTerminationTempAmpacity(inputRegion, outputRegion, citationE
     { value: "yes", label: "Yes (75 C column)", selected: true },
     { value: "no", label: "No (<= 100 A)" },
   ]);
-  const d = makeNumber("Combined ambient/fill derate (1.0 = none)", "tta-d", { step: "any", min: "0", max: "1" }); d.input.value = "0.8";
+  const d = makeNumber("Combined ambient/fill derate (1.0 = none)", "tta-d", { step: "any", min: "0", max: "1" });
   for (const f of [a90, a75, a60, tr, over, d]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { a90.input.value = "260"; a75.input.value = "230"; a60.input.value = "195"; tr.select.value = "75"; over.select.value = "yes"; d.input.value = "0.8"; update(); });
   const oTerm = makeOutputLine(outputRegion, "Termination-column ampacity", "tta-out-term");
@@ -5537,10 +5516,10 @@ export function computeTransformerTurnsRatio({ primary_voltage_v = 0, secondary_
 export const transformerTurnsRatioExample = { inputs: { primary_voltage_v: 480, secondary_voltage_v: 120, secondary_current_a: 50, load_impedance_ohm: 8 } };
 function _v806renderTransformerTurnsRatio(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ideal transformer identities a = Np/Ns = Vp/Vs = Is/Ip, impedance ratio Zp/Zs = a^2, by name; the lossless nameplate ratio (winding resistance and leakage reactance are the separate voltage-regulation tile). A design aid; the nameplate governs.";
-  const vp = makeNumber("Primary voltage Vp (V)", "ttr-vp", { step: "any", min: "0" }); vp.input.value = "480";
-  const vs = makeNumber("Secondary voltage Vs (V)", "ttr-vs", { step: "any", min: "0" }); vs.input.value = "120";
-  const is = makeNumber("Secondary current Is (A, optional)", "ttr-is", { step: "any", min: "0" }); is.input.value = "50";
-  const zs = makeNumber("Secondary / load impedance (ohm, optional)", "ttr-zs", { step: "any", min: "0" }); zs.input.value = "8";
+  const vp = makeNumber("Primary voltage Vp (V)", "ttr-vp", { step: "any", min: "0" });
+  const vs = makeNumber("Secondary voltage Vs (V)", "ttr-vs", { step: "any", min: "0" });
+  const is = makeNumber("Secondary current Is (A, optional)", "ttr-is", { step: "any", min: "0" });
+  const zs = makeNumber("Secondary / load impedance (ohm, optional)", "ttr-zs", { step: "any", min: "0" });
   for (const f of [vp, vs, is, zs]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { vp.input.value = "480"; vs.input.value = "120"; is.input.value = "50"; zs.input.value = "8"; update(); });
   const oA = makeOutputLine(outputRegion, "Turns ratio", "ttr-out-a");
@@ -5580,16 +5559,11 @@ export const cableReelCapacityExample = { inputs: { flange_dia_in: 30, drum_dia_
 
 function _v849renderCableReelCapacity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: reel-capacity identity by name. length (ft) = fill x pi x (flange^2 - drum^2) x traverse / (48 x cable_OD^2), lengths in inches. The fill factor (~0.85-0.9) accounts for imperfect winding.";
-  const fl = makeNumber("Reel flange diameter (in)", "crc-fl", { step: "any", min: "0", value: "30" });
-  fl.input.value = "30";
-  const dr = makeNumber("Drum / hub diameter (in)", "crc-dr", { step: "any", min: "0", value: "12" });
-  dr.input.value = "12";
-  const tw = makeNumber("Inside width between flanges (in)", "crc-tw", { step: "any", min: "0", value: "18" });
-  tw.input.value = "18";
-  const od = makeNumber("Cable outside diameter (in)", "crc-od", { step: "any", min: "0", value: "1" });
-  od.input.value = "1";
-  const ff = makeNumber("Winding fill factor", "crc-ff", { step: "any", min: "0", value: "0.9" });
-  ff.input.value = "0.9";
+  const fl = makeNumber("Reel flange diameter (in)", "crc-fl", { step: "any", min: "0" });
+  const dr = makeNumber("Drum / hub diameter (in)", "crc-dr", { step: "any", min: "0" });
+  const tw = makeNumber("Inside width between flanges (in)", "crc-tw", { step: "any", min: "0" });
+  const od = makeNumber("Cable outside diameter (in)", "crc-od", { step: "any", min: "0" });
+  const ff = makeNumber("Winding fill factor", "crc-ff", { step: "any", min: "0" });
   for (const f of [fl, dr, tw, od, ff]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { fl.input.value = "30"; dr.input.value = "12"; tw.input.value = "18"; od.input.value = "1"; ff.input.value = "0.9"; update(); });
   const oLen = makeOutputLine(outputRegion, "Cable that fits on the reel", "crc-out-len");
@@ -5626,14 +5600,10 @@ export const wirePullingLubricantExample = { inputs: { length_ft: 400, conduit_i
 
 function _v852renderWirePullingLubricant(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: film-coating estimate by name. gallons = K x length x conduit ID^2 x bend factor. K is a film-coating rule from the lubricant manufacturer (~0.0015 for the common Polywater rule); more bends and fill raise the bend factor.";
-  const l = makeNumber("Conduit run length (ft)", "wpl-l", { step: "any", min: "0", value: "400" });
-  l.input.value = "400";
-  const id = makeNumber("Conduit inside diameter (in)", "wpl-id", { step: "any", min: "0", value: "3" });
-  id.input.value = "3";
-  const k = makeNumber("Film-coating K factor", "wpl-k", { step: "any", min: "0", value: "0.0015" });
-  k.input.value = "0.0015";
-  const bf = makeNumber("Bend / fill multiplier", "wpl-bf", { step: "any", min: "0", value: "1.0" });
-  bf.input.value = "1.0";
+  const l = makeNumber("Conduit run length (ft)", "wpl-l", { step: "any", min: "0" });
+  const id = makeNumber("Conduit inside diameter (in)", "wpl-id", { step: "any", min: "0" });
+  const k = makeNumber("Film-coating K factor", "wpl-k", { step: "any", min: "0" });
+  const bf = makeNumber("Bend / fill multiplier", "wpl-bf", { step: "any", min: "0" });
   for (const f of [l, id, k, bf]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { l.input.value = "400"; id.input.value = "3"; k.input.value = "0.0015"; bf.input.value = "1.0"; update(); });
   const oGal = makeOutputLine(outputRegion, "Lubricant to bring", "wpl-out-gal");
@@ -5672,16 +5642,11 @@ export const branchCircuitWireFootageExample = { inputs: { circuits: 20, avg_hom
 
 function _v854renderBranchCircuitWireFootage(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: footage takeoff identity by name. total = circuits x (home run + makeup) x conductors; rolls = ceil(total / roll length). Each conductor is counted in conduit; set conductors to 1 for cable (NM / romex). Wire is bought per color.";
-  const c = makeNumber("Number of branch circuits", "bcw-c", { step: "any", min: "0", value: "20" });
-  c.input.value = "20";
-  const hr = makeNumber("Average home-run length (ft)", "bcw-hr", { step: "any", min: "0", value: "45" });
-  hr.input.value = "45";
-  const mu = makeNumber("Box makeup / slack per circuit (ft)", "bcw-mu", { step: "any", min: "0", value: "15" });
-  mu.input.value = "15";
-  const cp = makeNumber("Conductors per circuit (1 for cable)", "bcw-cp", { step: "any", min: "0", value: "3" });
-  cp.input.value = "3";
-  const rf = makeNumber("Roll / spool length (ft)", "bcw-rf", { step: "any", min: "0", value: "1000" });
-  rf.input.value = "1000";
+  const c = makeNumber("Number of branch circuits", "bcw-c", { step: "any", min: "0" });
+  const hr = makeNumber("Average home-run length (ft)", "bcw-hr", { step: "any", min: "0" });
+  const mu = makeNumber("Box makeup / slack per circuit (ft)", "bcw-mu", { step: "any", min: "0" });
+  const cp = makeNumber("Conductors per circuit (1 for cable)", "bcw-cp", { step: "any", min: "0" });
+  const rf = makeNumber("Roll / spool length (ft)", "bcw-rf", { step: "any", min: "0" });
   for (const f of [c, hr, mu, cp, rf]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { c.input.value = "20"; hr.input.value = "45"; mu.input.value = "15"; cp.input.value = "3"; rf.input.value = "1000"; update(); });
   const oTotal = makeOutputLine(outputRegion, "Total conductor footage", "bcw-out-total");
@@ -5723,10 +5688,8 @@ export const microinverterBranchCountExample = { inputs: { branch_ocpd_a: 20, un
 
 function _v924renderMicroinverterBranchCount(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: max microinverters per AC branch by name (NEC 705.60 / 690.8(B) / 240.4). N = floor(branch OCPD x 0.80 / unit max continuous AC current) -- the combined continuous output cannot exceed 80% of the branch OCPD. The datasheet and the adopted NEC edition govern.";
-  const oc = makeNumber("Branch OCPD (A)", "mbc-oc", { step: "any", min: "0", value: "20" });
-  oc.input.value = "20";
-  const iu = makeNumber("Microinverter max AC current (A)", "mbc-iu", { step: "any", min: "0", value: "1.21" });
-  iu.input.value = "1.21";
+  const oc = makeNumber("Branch OCPD (A)", "mbc-oc", { step: "any", min: "0" });
+  const iu = makeNumber("Microinverter max AC current (A)", "mbc-iu", { step: "any", min: "0" });
   for (const f of [oc, iu]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { oc.input.value = "20"; iu.input.value = "1.21"; update(); });
   const oN = makeOutputLine(outputRegion, "Max microinverters per branch", "mbc-out-n");
@@ -5772,10 +5735,8 @@ export const welderArcCircuitConductorExample = { inputs: { primary_current_a: 4
 
 function _v932renderWelderArcCircuitConductor(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: arc-welder branch-circuit conductor and OCPD by name (NEC 630.11 / 630.12) for a TRANSFORMER or DC-RECTIFIER welder. I_eff = I_primary x sqrt(duty), the transformer/rectifier column of Table 630.11(A); a MOTOR-GENERATOR welder uses a different, higher column not modeled here. Conductor ampacity >= I_eff; OCPD <= 200% of the rated primary. The welder nameplate and the adopted NEC edition govern.";
-  const ip = makeNumber("Nameplate primary current (A)", "wac-ip", { step: "any", min: "0", value: "40" });
-  ip.input.value = "40";
-  const dc = makeNumber("Duty cycle (%)", "wac-dc", { step: "any", min: "0", value: "50" });
-  dc.input.value = "50";
+  const ip = makeNumber("Nameplate primary current (A)", "wac-ip", { step: "any", min: "0" });
+  const dc = makeNumber("Duty cycle (%)", "wac-dc", { step: "any", min: "0" });
   for (const f of [ip, dc]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ip.input.value = "40"; dc.input.value = "50"; update(); });
   const oEff = makeOutputLine(outputRegion, "Effective current (size conductor to)", "wac-out-eff");
@@ -5817,10 +5778,8 @@ export const welderResistanceCircuitConductorExample = { inputs: { primary_curre
 
 function _v933renderWelderResistanceCircuitConductor(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: resistance-welder branch-circuit conductor and OCPD by name (NEC 630.31 / 630.32). conductor = primary x sqrt(duty) (630.31(A)(2)); OCPD <= 300% of the rated primary (630.32(A)). The welder nameplate and the adopted NEC edition govern.";
-  const ip = makeNumber("Nameplate primary current (A)", "wrc-ip", { step: "any", min: "0", value: "100" });
-  ip.input.value = "100";
-  const dc = makeNumber("Duty cycle (%)", "wrc-dc", { step: "any", min: "0", value: "50" });
-  dc.input.value = "50";
+  const ip = makeNumber("Nameplate primary current (A)", "wrc-ip", { step: "any", min: "0" });
+  const dc = makeNumber("Duty cycle (%)", "wrc-dc", { step: "any", min: "0" });
   for (const f of [ip, dc]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ip.input.value = "100"; dc.input.value = "50"; update(); });
   const oCond = makeOutputLine(outputRegion, "Conductor current (size to)", "wrc-out-cond");
@@ -5863,12 +5822,9 @@ export const batteryInverterDcConductorExample = { inputs: { inverter_power_w: 4
 
 function _v941renderBatteryInverterDcConductor(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: battery-to-inverter DC conductor and OCPD by name (NEC 690.8(B) / 706 / 240.4). I_dc = P_ac / (V_dc x efficiency); conductor ampacity and OCPD at 125% of I_dc, OCPD to the next standard size (240.6). Use a listed DC-rated (Class T) fuse; the datasheets and NEC govern.";
-  const pw = makeNumber("Inverter continuous power (W)", "bid-pw", { step: "any", min: "0", value: "4000" });
-  pw.input.value = "4000";
-  const bv = makeNumber("Battery bank voltage (V)", "bid-bv", { step: "any", min: "0", value: "48" });
-  bv.input.value = "48";
-  const ef = makeNumber("Inverter efficiency (%)", "bid-ef", { step: "any", min: "0", value: "90" });
-  ef.input.value = "90";
+  const pw = makeNumber("Inverter continuous power (W)", "bid-pw", { step: "any", min: "0" });
+  const bv = makeNumber("Battery bank voltage (V)", "bid-bv", { step: "any", min: "0" });
+  const ef = makeNumber("Inverter efficiency (%)", "bid-ef", { step: "any", min: "0" });
   for (const f of [pw, bv, ef]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { pw.input.value = "4000"; bv.input.value = "48"; ef.input.value = "90"; update(); });
   const oI = makeOutputLine(outputRegion, "DC input current", "bid-out-i");
@@ -5915,12 +5871,9 @@ export const pvAcOutputCircuitExample = { inputs: { ac_power_w: 9600, ac_voltage
 
 function _v942renderPvAcOutputCircuit(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: inverter AC output-circuit conductor and OCPD by name (NEC 690.8(B) / 705.60 / 240.4). I_cont = P / (V x [1 or sqrt(3)]); conductor and OCPD at 125% of I_cont, OCPD to the next standard size (240.6). Check the 705.12 busbar limit separately; the datasheet and NEC govern.";
-  const pw = makeNumber("Inverter AC power (W)", "pao-pw", { step: "any", min: "0", value: "9600" });
-  pw.input.value = "9600";
-  const vv = makeNumber("AC voltage (V, line-to-line)", "pao-vv", { step: "any", min: "0", value: "240" });
-  vv.input.value = "240";
-  const ph = makeNumber("Phases (1 or 3)", "pao-ph", { step: "1", min: "1", value: "1" });
-  ph.input.value = "1";
+  const pw = makeNumber("Inverter AC power (W)", "pao-pw", { step: "any", min: "0" });
+  const vv = makeNumber("AC voltage (V, line-to-line)", "pao-vv", { step: "any", min: "0" });
+  const ph = makeNumber("Phases (1 or 3)", "pao-ph", { step: "1", min: "1" });
   for (const f of [pw, vv, ph]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { pw.input.value = "9600"; vv.input.value = "240"; ph.input.value = "1"; update(); });
   const oI = makeOutputLine(outputRegion, "Continuous output current", "pao-out-i");
@@ -5962,10 +5915,8 @@ export const soilResistivityWennerExample = { inputs: { probe_spacing_ft: 10, me
 
 function _v951renderSoilResistivityWenner(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Wenner 4-pin (four-electrode, equal-spacing) soil resistivity test, by name (IEEE 81 / ASTM G57). rho = 2 x pi x a x R with a the equal probe spacing (converted to meters) and R the earth-tester reading; result in ohm-m and ohm-cm. Assumes electrode depth small vs spacing. Resistivity varies with moisture/temperature/season; the IEEE 81 method and the engineer govern.";
-  const sp = makeNumber("Probe spacing a (ft)", "srw-sp", { step: "any", min: "0", value: "10" });
-  sp.input.value = "10";
-  const rr = makeNumber("Earth-tester reading R (ohms)", "srw-rr", { step: "any", min: "0", value: "5" });
-  rr.input.value = "5";
+  const sp = makeNumber("Probe spacing a (ft)", "srw-sp", { step: "any", min: "0" });
+  const rr = makeNumber("Earth-tester reading R (ohms)", "srw-rr", { step: "any", min: "0" });
   for (const f of [sp, rr]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { sp.input.value = "10"; rr.input.value = "5"; update(); });
   const oM = makeOutputLine(outputRegion, "Soil resistivity", "srw-out-m");
@@ -6008,18 +5959,12 @@ export const maxCircuitLengthForVdExample = { inputs: { source_voltage_v: 120, t
 
 function _v981renderMaxCircuitLengthForVd(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: maximum one-way circuit length for a voltage-drop target, by name. L = VD_target x cmil / (factor x K x I); factor = 2 single-phase / sqrt(3) three-phase; K = 12.9 Cu / 21.2 Al ohm-cmil/ft; VD_target = target% x source V. DC-resistance drop only (reactance adds on larger conductors); the 3%/5% figures are NEC recommendations. The conductor must still pass the 310.16 ampacity check; the AHJ governs.";
-  const sv = makeNumber("Source voltage (V)", "mcl-sv", { step: "any", min: "0", value: "120" });
-  sv.input.value = "120";
-  const tp = makeNumber("Target voltage drop (%)", "mcl-tp", { step: "any", min: "0", value: "3" });
-  tp.input.value = "3";
-  const cu = makeNumber("Load current (A)", "mcl-cu", { step: "any", min: "0", value: "20" });
-  cu.input.value = "20";
-  const cm = makeNumber("Conductor size (circular mils)", "mcl-cm", { step: "any", min: "0", value: "6530" });
-  cm.input.value = "6530";
-  const kk = makeNumber("K (12.9 Cu, 21.2 Al)", "mcl-kk", { step: "any", min: "0", value: "12.9" });
-  kk.input.value = "12.9";
-  const ph = makeNumber("Phases (1 or 3)", "mcl-ph", { step: "1", min: "1", value: "1" });
-  ph.input.value = "1";
+  const sv = makeNumber("Source voltage (V)", "mcl-sv", { step: "any", min: "0" });
+  const tp = makeNumber("Target voltage drop (%)", "mcl-tp", { step: "any", min: "0" });
+  const cu = makeNumber("Load current (A)", "mcl-cu", { step: "any", min: "0" });
+  const cm = makeNumber("Conductor size (circular mils)", "mcl-cm", { step: "any", min: "0" });
+  const kk = makeNumber("K (12.9 Cu, 21.2 Al)", "mcl-kk", { step: "any", min: "0" });
+  const ph = makeNumber("Phases (1 or 3)", "mcl-ph", { step: "1", min: "1" });
   for (const f of [sv, tp, cu, cm, kk, ph]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { sv.input.value = "120"; tp.input.value = "3"; cu.input.value = "20"; cm.input.value = "6530"; kk.input.value = "12.9"; ph.input.value = "1"; update(); });
   const oV = makeOutputLine(outputRegion, "Allowable drop", "mcl-out-v");
@@ -6068,10 +6013,8 @@ export const openDeltaTransformerExample = { inputs: { transformer_kva_each: 25,
 
 function _v985renderOpenDeltaTransformer(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: open-delta (V-V) transformer bank capacity, by name. available 3-phase kVA = sqrt(3) x one unit; each unit carries load / sqrt(3); bank utilization capped at 86.6% of the two installed, and 57.7% of the closed-delta three-unit bank. The nameplate kVA and impedance, the load balance and power factor, and the utility govern.";
-  const ke = makeNumber("Transformer rating, each (kVA)", "odt-ke", { step: "any", min: "0", value: "25" });
-  ke.input.value = "25";
-  const rl = makeNumber("Required three-phase load (kVA)", "odt-rl", { step: "any", min: "0", value: "40" });
-  rl.input.value = "40";
+  const ke = makeNumber("Transformer rating, each (kVA)", "odt-ke", { step: "any", min: "0" });
+  const rl = makeNumber("Required three-phase load (kVA)", "odt-rl", { step: "any", min: "0" });
   for (const f of [ke, rl]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ke.input.value = "25"; rl.input.value = "40"; update(); });
   const oA = makeOutputLine(outputRegion, "Bank capacity (3-phase)", "odt-out-a");
@@ -6124,12 +6067,9 @@ export const conduitNipple60FillExample = { inputs: { conduit_area_sqin: 0.864, 
 
 function _v989renderConduitNipple60Fill(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: conduit nipple 60% fill, NEC Chapter 9 Note 4, by name. A nipple <= 24 in between enclosures may fill to 60% (vs 40%/31%/53% normal). fill% = count x conductor area / conduit total area (Table 4 conduit area, Table 5 conductor area). Note 4 also exempts nipples from the 310.15(C)(1) ampacity adjustment. The exact table areas and the AHJ govern.";
-  const ca = makeNumber("Conduit total area (sq in, Table 4)", "cn6-ca", { step: "any", min: "0", value: "0.864" });
-  ca.input.value = "0.864";
-  const wa = makeNumber("Each conductor area (sq in, Table 5)", "cn6-wa", { step: "any", min: "0", value: "0.0211" });
-  wa.input.value = "0.0211";
-  const nc = makeNumber("Conductor count", "cn6-nc", { step: "1", min: "1", value: "20" });
-  nc.input.value = "20";
+  const ca = makeNumber("Conduit total area (sq in, Table 4)", "cn6-ca", { step: "any", min: "0" });
+  const wa = makeNumber("Each conductor area (sq in, Table 5)", "cn6-wa", { step: "any", min: "0" });
+  const nc = makeNumber("Conductor count", "cn6-nc", { step: "1", min: "1" });
   for (const f of [ca, wa, nc]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ca.input.value = "0.864"; wa.input.value = "0.0211"; nc.input.value = "20"; update(); });
   const oF = makeOutputLine(outputRegion, "Fill", "cn6-out-f");

@@ -971,9 +971,9 @@ export const poolTurnoverExample = {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v16w_renderPoolTurnover(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: required flow = pool volume / (turnover hours x 60); chlorine product = volume x ppm x 8.34 / 1,000,000 / available-chlorine fraction. Per the NSPF Certified Pool Operator Handbook (2022) and ANSI/APSP/ICC 11. NSPF governs operator certification; AHJ governs adopted code. Free at phta.org for the APSP-11 TOC.";
-  const vol = makeNumber("Pool volume (gal)", "pt-vol", { step: "any", min: "0", value: "20000" });
-  const hr = makeNumber("Turnover target (hr)", "pt-hr", { step: "any", min: "0", value: "6" });
-  const ppm = makeNumber("Free-chlorine target (ppm)", "pt-ppm", { step: "any", min: "0", value: "2" });
+  const vol = makeNumber("Pool volume (gal)", "pt-vol", { step: "any", min: "0" });
+  const hr = makeNumber("Turnover target (hr)", "pt-hr", { step: "any", min: "0" });
+  const ppm = makeNumber("Free-chlorine target (ppm)", "pt-ppm", { step: "any", min: "0" });
   const type = makeSelect("Chlorine product", "pt-type", [
     { value: "cal_hypo", label: "Cal-hypo (65%)", selected: true },
     { value: "trichlor", label: "Trichlor (90%)" },
@@ -1121,9 +1121,8 @@ export const wellMaxYieldExample = { inputs: { specific_capacity_gpm_ft: 1.0, al
 
 function _renderWellMaxYield(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: sustainable well yield from specific capacity: max_yield = specific_capacity x allowable_drawdown (GPM). Specific capacity (GPM per ft) from a step-drawdown test or the well-drawdown tile; the allowable drawdown is static level to a safe level above the pump intake. Per AWWA A100 and USGS well-testing methods; a constant-rate test governs. Free at awwa.org / pubs.usgs.gov.";
-  const sc = makeNumber("Specific capacity (GPM per ft of drawdown)", "wmy-sc", { step: "any", min: "0", value: "1.0" });
-  const s = makeNumber("Allowable drawdown (ft, static to safe level)", "wmy-s", { step: "any", min: "0", value: "30" });
-  sc.input.value = "1.0"; s.input.value = "30";
+  const sc = makeNumber("Specific capacity (GPM per ft of drawdown)", "wmy-sc", { step: "any", min: "0" });
+  const s = makeNumber("Allowable drawdown (ft, static to safe level)", "wmy-s", { step: "any", min: "0" });
   for (const f of [sc, s]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { sc.input.value = "1.0"; s.input.value = "30"; update(); });
   const oY = makeOutputLine(outputRegion, "Max sustainable yield", "wmy-out-y");
@@ -1194,10 +1193,10 @@ export const coolingWaterMakeupExample = {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v16w_renderCoolingWaterMakeup(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: evaporation = recirculation x delta-T / 1000; blowdown = evaporation / (COC - 1); drift = recirculation x drift fraction; makeup = evaporation + blowdown + drift. Per the Cooling Technology Institute (CTI) publications and ASHRAE Systems and Equipment 2020 Ch. 40 (cooling towers). Free at cti.org and ashrae.org for the TOCs.";
-  const recirc = makeNumber("Recirculation flow (GPM)", "cm-recirc", { step: "any", min: "0", value: "1000" });
-  const dT = makeNumber("Cooling range delta-T (°F)", "cm-dt", { step: "any", min: "0", value: "10" });
-  const coc = makeNumber("Cycles of concentration", "cm-coc", { step: "any", min: "0", value: "4" });
-  const drift = makeNumber("Drift fraction (e.g. 0.002)", "cm-drift", { step: "any", min: "0", value: "0.002" });
+  const recirc = makeNumber("Recirculation flow (GPM)", "cm-recirc", { step: "any", min: "0" });
+  const dT = makeNumber("Cooling range delta-T (°F)", "cm-dt", { step: "any", min: "0" });
+  const coc = makeNumber("Cycles of concentration", "cm-coc", { step: "any", min: "0" });
+  const drift = makeNumber("Drift fraction (e.g. 0.002)", "cm-drift", { step: "any", min: "0" });
   for (const f of [recirc, dT, coc, drift]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
     recirc.input.value = "1000"; dT.input.value = "10"; coc.input.value = "4"; drift.input.value = "0.002"; update();
@@ -1350,9 +1349,9 @@ export const chlorineDecayConstantExample = {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v16w_renderChlorineDecayConstant(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: first-order decay C(t) = C0 x exp(-k x t) solved for the rate constant, k = ln(C0 / C) / t, from an initial and a measured residual over an elapsed time (a distribution bottle test); half-life = ln(2) / k. Per EPA 815-R-02-020 (Effects of Water Age on Distribution System Water Quality) and AWWA M14. Free at epa.gov and awwa.org.";
-  const c0 = makeNumber("Initial free chlorine (mg/L)", "cdc-c0", { step: "any", min: "0", value: "2.0" });
-  const c = makeNumber("Measured residual after time (mg/L)", "cdc-c", { step: "any", min: "0", value: "0.7358" });
-  const t = makeNumber("Elapsed time (hr)", "cdc-t", { step: "any", min: "0", value: "10" });
+  const c0 = makeNumber("Initial free chlorine (mg/L)", "cdc-c0", { step: "any", min: "0" });
+  const c = makeNumber("Measured residual after time (mg/L)", "cdc-c", { step: "any", min: "0" });
+  const t = makeNumber("Elapsed time (hr)", "cdc-t", { step: "any", min: "0" });
   for (const f of [c0, c, t]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
     c0.input.value = "2.0"; c.input.value = "0.7358"; t.input.value = "10"; update();
@@ -1807,12 +1806,9 @@ export const roRecoveryConcentrationExample = { inputs: { feed_gpm: 10, permeate
 
 function _v926renderRoRecoveryConcentration(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: RO mass balance by name (AMTA / AWWA membrane practice). recovery = permeate/feed; concentrate flow = feed - permeate; concentration factor CF = 1/(1-recovery); concentrate TDS ~ CF x feed TDS at high rejection. The membrane maker's projection and the state primacy agency govern.";
-  const fd = makeNumber("Feed flow (gpm)", "ror-fd", { step: "any", min: "0", value: "10" });
-  fd.input.value = "10";
-  const pm = makeNumber("Permeate flow (gpm)", "ror-pm", { step: "any", min: "0", value: "7.5" });
-  pm.input.value = "7.5";
-  const td = makeNumber("Feed TDS (mg/L)", "ror-td", { step: "any", min: "0", value: "500" });
-  td.input.value = "500";
+  const fd = makeNumber("Feed flow (gpm)", "ror-fd", { step: "any", min: "0" });
+  const pm = makeNumber("Permeate flow (gpm)", "ror-pm", { step: "any", min: "0" });
+  const td = makeNumber("Feed TDS (mg/L)", "ror-td", { step: "any", min: "0" });
   for (const f of [fd, pm, td]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { fd.input.value = "10"; pm.input.value = "7.5"; td.input.value = "500"; update(); });
   const oR = makeOutputLine(outputRegion, "Recovery", "ror-out-r");
@@ -1856,16 +1852,11 @@ export const ironManganeseChlorineDoseExample = { inputs: { fe_mgl: 3.0, mn_mgl:
 
 function _v927renderIronManganeseChlorineDose(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: iron/manganese chlorine-oxidation stoichiometry by name (AWWA / Ten States). 0.62 mg Cl2 per mg Fe, 1.30 mg Cl2 per mg Mn, plus other demand and the target residual; lb/day = dose x flow(MGD) x 8.34. Jar tests, pH, and the state primacy agency govern.";
-  const fe = makeNumber("Iron Fe (mg/L)", "imc-fe", { step: "any", min: "0", value: "3.0" });
-  fe.input.value = "3.0";
-  const mn = makeNumber("Manganese Mn (mg/L)", "imc-mn", { step: "any", min: "0", value: "0.5" });
-  mn.input.value = "0.5";
-  const dm = makeNumber("Other chlorine demand (mg/L)", "imc-dm", { step: "any", min: "0", value: "0.5" });
-  dm.input.value = "0.5";
-  const rs = makeNumber("Target free residual (mg/L)", "imc-rs", { step: "any", min: "0", value: "0.3" });
-  rs.input.value = "0.3";
-  const fl = makeNumber("Flow (MGD)", "imc-fl", { step: "any", min: "0", value: "0.05" });
-  fl.input.value = "0.05";
+  const fe = makeNumber("Iron Fe (mg/L)", "imc-fe", { step: "any", min: "0" });
+  const mn = makeNumber("Manganese Mn (mg/L)", "imc-mn", { step: "any", min: "0" });
+  const dm = makeNumber("Other chlorine demand (mg/L)", "imc-dm", { step: "any", min: "0" });
+  const rs = makeNumber("Target free residual (mg/L)", "imc-rs", { step: "any", min: "0" });
+  const fl = makeNumber("Flow (MGD)", "imc-fl", { step: "any", min: "0" });
   for (const f of [fe, mn, dm, rs, fl]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { fe.input.value = "3.0"; mn.input.value = "0.5"; dm.input.value = "0.5"; rs.input.value = "0.3"; fl.input.value = "0.05"; update(); });
   const oDose = makeOutputLine(outputRegion, "Chlorine dose", "imc-out-d");
@@ -1905,12 +1896,9 @@ export const cisternStorageDaysExample = { inputs: { usable_storage_gal: 2500, d
 
 function _v935renderCisternStorageDays(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: storage-reserve mass balance by name. reserve days = usable storage / daily demand; required volume = daily demand x target days. Use usable storage and a peak (not average) demand; local rainfall or source yield and the AHJ govern.";
-  const st = makeNumber("Usable storage (gal)", "csd-st", { step: "any", min: "0", value: "2500" });
-  st.input.value = "2500";
-  const dd = makeNumber("Daily demand (gpd)", "csd-dd", { step: "any", min: "0", value: "150" });
-  dd.input.value = "150";
-  const td = makeNumber("Target reserve (days, for required volume)", "csd-td", { step: "any", min: "0", value: "30" });
-  td.input.value = "30";
+  const st = makeNumber("Usable storage (gal)", "csd-st", { step: "any", min: "0" });
+  const dd = makeNumber("Daily demand (gpd)", "csd-dd", { step: "any", min: "0" });
+  const td = makeNumber("Target reserve (days, for required volume)", "csd-td", { step: "any", min: "0" });
   for (const f of [st, dd, td]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { st.input.value = "2500"; dd.input.value = "150"; td.input.value = "30"; update(); });
   const oDays = makeOutputLine(outputRegion, "Reserve on this tank", "csd-out-days");
@@ -1951,14 +1939,10 @@ export const dechlorinationDoseExample = { inputs: { chlorine_residual_mg_l: 2, 
 
 function _v971renderDechlorinationDose(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: dechlorination chemical dose (stoichiometry + the pounds formula), by name. reagent dose (mg/L) = ratio x chlorine residual; feed (lb/day) = dose x flow (MGD) x 8.34 / (purity/100). Ratio (mg reagent / mg Cl2): SO2 ~0.9-1.0, metabisulfite 1.34, bisulfite 1.46, sulfite 1.77, thiosulfate ~0.56. The discharge permit, the reagent assay, and the state primacy agency govern.";
-  const cr = makeNumber("Chlorine residual to remove (mg/L)", "dcl-cr", { step: "any", min: "0", value: "2" });
-  cr.input.value = "2";
-  const fl = makeNumber("Flow (MGD)", "dcl-fl", { step: "any", min: "0", value: "5" });
-  fl.input.value = "5";
-  const sr = makeNumber("Stoich ratio (mg reagent / mg Cl2)", "dcl-sr", { step: "any", min: "0", value: "1.46" });
-  sr.input.value = "1.46";
-  const pu = makeNumber("Reagent purity (percent)", "dcl-pu", { step: "any", min: "0", value: "100" });
-  pu.input.value = "100";
+  const cr = makeNumber("Chlorine residual to remove (mg/L)", "dcl-cr", { step: "any", min: "0" });
+  const fl = makeNumber("Flow (MGD)", "dcl-fl", { step: "any", min: "0" });
+  const sr = makeNumber("Stoich ratio (mg reagent / mg Cl2)", "dcl-sr", { step: "any", min: "0" });
+  const pu = makeNumber("Reagent purity (percent)", "dcl-pu", { step: "any", min: "0" });
   for (const f of [cr, fl, sr, pu]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cr.input.value = "2"; fl.input.value = "5"; sr.input.value = "1.46"; pu.input.value = "100"; update(); });
   const oD = makeOutputLine(outputRegion, "Reagent dose", "dcl-out-d");
@@ -2004,16 +1988,11 @@ export const floatMethodFlowExample = { inputs: { float_distance_ft: 20, travel_
 
 function _v973renderFloatMethodFlow(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: float (velocity-area) open-channel flow method, by name. Q = C x surface velocity x cross-sectional area; surface velocity = distance / time, area = width x mean depth. C ~0.85 converts surface to mean velocity (0.8 rough to ~0.9 smooth). A rough field estimate; a permit-compliance flow needs a calibrated meter, and the metering standard governs.";
-  const fd = makeNumber("Float travel distance (ft)", "fmf-fd", { step: "any", min: "0", value: "20" });
-  fd.input.value = "20";
-  const tt = makeNumber("Travel time (s)", "fmf-tt", { step: "any", min: "0", value: "10" });
-  tt.input.value = "10";
-  const cw = makeNumber("Channel width (ft)", "fmf-cw", { step: "any", min: "0", value: "4" });
-  cw.input.value = "4";
-  const md = makeNumber("Mean depth (ft)", "fmf-md", { step: "any", min: "0", value: "1.5" });
-  md.input.value = "1.5";
-  const fc = makeNumber("Float coefficient (0-1, ~0.85)", "fmf-fc", { step: "any", min: "0", value: "0.85" });
-  fc.input.value = "0.85";
+  const fd = makeNumber("Float travel distance (ft)", "fmf-fd", { step: "any", min: "0" });
+  const tt = makeNumber("Travel time (s)", "fmf-tt", { step: "any", min: "0" });
+  const cw = makeNumber("Channel width (ft)", "fmf-cw", { step: "any", min: "0" });
+  const md = makeNumber("Mean depth (ft)", "fmf-md", { step: "any", min: "0" });
+  const fc = makeNumber("Float coefficient (0-1, ~0.85)", "fmf-fc", { step: "any", min: "0" });
   for (const f of [fd, tt, cw, md, fc]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { fd.input.value = "20"; tt.input.value = "10"; cw.input.value = "4"; md.input.value = "1.5"; fc.input.value = "0.85"; update(); });
   const oV = makeOutputLine(outputRegion, "Surface velocity", "fmf-out-v");
@@ -2059,16 +2038,11 @@ export const fluorideFeedDoseExample = { inputs: { target_dose_mg_l: 0.7, raw_fl
 
 function _v984renderFluorideFeedDose(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: fluoride feed dose (available-fluoride-ion pounds formula), by name. feed lb/day = (target - raw) x flow MGD x 8.34 / (AFI x purity). AFI: fluorosilicic acid 0.792, sodium fluoride 0.452, sodium fluorosilicate 0.607. US PHS target 0.7 mg/L. The daily lab checks, the SDWA maximum, the product assay, and the state fluoridation program govern.";
-  const td = makeNumber("Target fluoride (mg/L)", "flf-td", { step: "any", min: "0", value: "0.7" });
-  td.input.value = "0.7";
-  const rf = makeNumber("Raw background fluoride (mg/L)", "flf-rf", { step: "any", min: "0", value: "0.1" });
-  rf.input.value = "0.1";
-  const fl = makeNumber("Flow (MGD)", "flf-fl", { step: "any", min: "0", value: "2" });
-  fl.input.value = "2";
-  const af = makeNumber("Available fluoride ion (0-1): FSA 0.792, NaF 0.452, Na2SiF6 0.607", "flf-af", { step: "any", min: "0", max: "1", value: "0.792" });
-  af.input.value = "0.792";
-  const pu = makeNumber("Purity / solution strength (0-1)", "flf-pu", { step: "any", min: "0", max: "1", value: "0.25" });
-  pu.input.value = "0.25";
+  const td = makeNumber("Target fluoride (mg/L)", "flf-td", { step: "any", min: "0" });
+  const rf = makeNumber("Raw background fluoride (mg/L)", "flf-rf", { step: "any", min: "0" });
+  const fl = makeNumber("Flow (MGD)", "flf-fl", { step: "any", min: "0" });
+  const af = makeNumber("Available fluoride ion (0-1): FSA 0.792, NaF 0.452, Na2SiF6 0.607", "flf-af", { step: "any", min: "0", max: "1" });
+  const pu = makeNumber("Purity / solution strength (0-1)", "flf-pu", { step: "any", min: "0", max: "1" });
   for (const f of [td, rf, fl, af, pu]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { td.input.value = "0.7"; rf.input.value = "0.1"; fl.input.value = "2"; af.input.value = "0.792"; pu.input.value = "0.25"; update(); });
   const oF = makeOutputLine(outputRegion, "Chemical feed", "flf-out-f");
@@ -2122,16 +2096,11 @@ export const twoSourceBlendExample = { inputs: { flow1_gpm: 500, conc1: 4, flow2
 
 function _v992renderTwoSourceBlend(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: flow-weighted two-source water blend, by name. blended = (Q1 C1 + Q2 C2)/(Q1 + Q2); low-source fraction for a target = (Chigh - target)/(Chigh - Clow). A blending mass balance; the source concentrations vary, the SDWA MCL applies, and the state primacy agency and the operator's monitoring govern compliance.";
-  const f1 = makeNumber("Source 1 flow (gpm)", "tsb-f1", { step: "any", min: "0", value: "500" });
-  f1.input.value = "500";
-  const c1 = makeNumber("Source 1 concentration (mg/L)", "tsb-c1", { step: "any", min: "0", value: "4" });
-  c1.input.value = "4";
-  const f2 = makeNumber("Source 2 flow (gpm)", "tsb-f2", { step: "any", min: "0", value: "300" });
-  f2.input.value = "300";
-  const c2 = makeNumber("Source 2 concentration (mg/L)", "tsb-c2", { step: "any", min: "0", value: "12" });
-  c2.input.value = "12";
-  const tc = makeNumber("Target concentration (mg/L)", "tsb-tc", { step: "any", min: "0", value: "8" });
-  tc.input.value = "8";
+  const f1 = makeNumber("Source 1 flow (gpm)", "tsb-f1", { step: "any", min: "0" });
+  const c1 = makeNumber("Source 1 concentration (mg/L)", "tsb-c1", { step: "any", min: "0" });
+  const f2 = makeNumber("Source 2 flow (gpm)", "tsb-f2", { step: "any", min: "0" });
+  const c2 = makeNumber("Source 2 concentration (mg/L)", "tsb-c2", { step: "any", min: "0" });
+  const tc = makeNumber("Target concentration (mg/L)", "tsb-tc", { step: "any", min: "0" });
   for (const f of [f1, c1, f2, c2, tc]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { f1.input.value = "500"; c1.input.value = "4"; f2.input.value = "300"; c2.input.value = "12"; tc.input.value = "8"; update(); });
   const oB = makeOutputLine(outputRegion, "Blended concentration", "tsb-out-b");

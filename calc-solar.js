@@ -293,14 +293,10 @@ export function renderPvInterconnectionBusbar(inputRegion, outputRegion, citatio
     { value: "load_side_other", label: "Load-side, other position / line-tap (100% rule)" },
     { value: "supply_side_tap", label: "Supply-side tap (NEC 705.11; not a busbar rule)" },
   ]);
-  const main = makeNumber("Main breaker rating (A)", "bb-main", { step: "any", min: "0", value: "200" });
-  main.input.value = "200";
-  const busbar = makeNumber("Panel busbar rating (A)", "bb-busbar", { step: "any", min: "0", value: "200" });
-  busbar.input.value = "200";
-  const pvE = makeNumber("Existing PV breaker (A; 0 if none)", "bb-pve", { step: "any", min: "0", value: "0" });
-  pvE.input.value = "0";
-  const pvP = makeNumber("Proposed PV breaker (A)", "bb-pvp", { step: "any", min: "0", value: "40" });
-  pvP.input.value = "40";
+  const main = makeNumber("Main breaker rating (A)", "bb-main", { step: "any", min: "0" });
+  const busbar = makeNumber("Panel busbar rating (A)", "bb-busbar", { step: "any", min: "0" });
+  const pvE = makeNumber("Existing PV breaker (A; 0 if none)", "bb-pve", { step: "any", min: "0" });
+  const pvP = makeNumber("Proposed PV breaker (A)", "bb-pvp", { step: "any", min: "0" });
   for (const f of [method, main, busbar, pvE, pvP]) inputRegion.appendChild(f.wrap);
 
   attachExampleButton(inputRegion, () => {
@@ -409,21 +405,16 @@ export const offGridBatteryExample = {
 export function renderOffGridBattery(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per IEEE 1013 (Sizing Lead-Acid Batteries for Stand-Alone PV Systems) and IEEE 1561 (PV / Hybrid Power Systems). Flooded lead-acid uses ~50% usable depth-of-discharge; lithium-iron-phosphate (LFP) uses ~80%. The manufacturer datasheet governs the chemistry-specific derate. Free at standards.ieee.org for IEEE 1013 bibliographic data.";
 
-  const daily = makeNumber("Daily load (Wh/day)", "ob-daily", { step: "any", min: "0", value: "2400" });
-  daily.input.value = "2400";
-  const days = makeNumber("Days of autonomy", "ob-days", { step: "any", min: "0", value: "3" });
-  days.input.value = "3";
-  const dod = makeNumber("Depth-of-discharge limit (0-1; 0.5 lead-acid / 0.8 LFP)", "ob-dod", { step: "any", min: "0", value: "0.5" });
-  dod.input.value = "0.5";
+  const daily = makeNumber("Daily load (Wh/day)", "ob-daily", { step: "any", min: "0" });
+  const days = makeNumber("Days of autonomy", "ob-days", { step: "any", min: "0" });
+  const dod = makeNumber("Depth-of-discharge limit (0-1; 0.5 lead-acid / 0.8 LFP)", "ob-dod", { step: "any", min: "0" });
   const volts = makeSelect("System DC voltage", "ob-v", [
     { value: "12", label: "12 V", selected: true },
     { value: "24", label: "24 V" },
     { value: "48", label: "48 V" },
   ]);
-  const eta = makeNumber("Round-trip efficiency (0-1; 0.85 lead-acid / 0.95 LFP)", "ob-eta", { step: "any", min: "0", value: "0.85" });
-  eta.input.value = "0.85";
-  const derate = makeNumber("Temperature derate (0-1; 1.0 if none)", "ob-derate", { step: "any", min: "0", value: "1" });
-  derate.input.value = "1";
+  const eta = makeNumber("Round-trip efficiency (0-1; 0.85 lead-acid / 0.95 LFP)", "ob-eta", { step: "any", min: "0" });
+  const derate = makeNumber("Temperature derate (0-1; 1.0 if none)", "ob-derate", { step: "any", min: "0" });
   for (const f of [daily, days, dod, volts, eta, derate]) inputRegion.appendChild(f.wrap);
 
   attachExampleButton(inputRegion, () => {
@@ -540,14 +531,10 @@ export const evChargerLoadExample = {
 export function renderEvChargerLoad(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per NEC 2023 Article 625 (EV charging). 625.41/625.42 classify the EVSE as a continuous load (circuit and breaker at 125% of nameplate); 625.42(A) covers energy-management sizing. Panel load per NEC 220.83/220.87. Conductor is a first-principles estimate (copper, 75 C, 30 C ambient); verify against NEC 310.16. AHJ governs. Free at nfpa.org/freeaccess for the NEC table of contents.";
 
-  const ch = makeNumber("Charger nameplate (A)", "ev-ch", { step: "any", min: "0", value: "48" });
-  ch.input.value = "48";
-  const main = makeNumber("Panel main breaker (A)", "ev-main", { step: "any", min: "0", value: "200" });
-  main.input.value = "200";
-  const existing = makeNumber("Existing service load (A)", "ev-exist", { step: "any", min: "0", value: "130" });
-  existing.input.value = "130";
-  const busbar = makeNumber("Panel busbar rating (A; 0 if unknown)", "ev-busbar", { step: "any", min: "0", value: "200" });
-  busbar.input.value = "200";
+  const ch = makeNumber("Charger nameplate (A)", "ev-ch", { step: "any", min: "0" });
+  const main = makeNumber("Panel main breaker (A)", "ev-main", { step: "any", min: "0" });
+  const existing = makeNumber("Existing service load (A)", "ev-exist", { step: "any", min: "0" });
+  const busbar = makeNumber("Panel busbar rating (A; 0 if unknown)", "ev-busbar", { step: "any", min: "0" });
   const managed = makeCheckbox("Load-managed (NEC 625.42(A) EMS)", "ev-managed");
   for (const f of [ch, main, existing, busbar, managed]) inputRegion.appendChild(f.wrap);
 
@@ -625,11 +612,9 @@ export const pvCircuitAmpacityExample = { inputs: { module_isc_a: 10, parallel_s
 
 function renderPvCircuitAmpacity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 2023 690.8(A)(1) (max current = Isc x strings x 125%) and 690.8(B)(1) (min ampacity = max current x 125%; the factors stack to 156% of Isc). Also size for 690.8(B)(2) after conditions of use and take the greater. The engineer governs. Free at nfpa.org/freeaccess.";
-  const isc = makeNumber("Module Isc per source circuit (A)", "pca-isc", { step: "any", min: "0", value: "10" });
-  isc.input.value = "10";
-  const strings = makeNumber("Parallel source circuits (strings)", "pca-strings", { step: "1", min: "1", value: "2" });
-  strings.input.value = "2";
-  const ocpd = makeNumber("Series fuse / OCPD rating to check (A, optional)", "pca-ocpd", { step: "any", min: "0", value: "0" });
+  const isc = makeNumber("Module Isc per source circuit (A)", "pca-isc", { step: "any", min: "0" });
+  const strings = makeNumber("Parallel source circuits (strings)", "pca-strings", { step: "1", min: "1" });
+  const ocpd = makeNumber("Series fuse / OCPD rating to check (A, optional)", "pca-ocpd", { step: "any", min: "0" });
   for (const f of [isc, strings, ocpd]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { isc.input.value = "10"; strings.input.value = "2"; ocpd.input.value = "0"; update(); });
 
@@ -670,12 +655,9 @@ export function computePvEnergyYield({ dc_kw = 0, psh = 5.0, perf_ratio = 0.77 }
 }
 function renderPvEnergyYield(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NREL PVWatts energy model E = Pdc x PSH x 365 x PR, with specific yield = E / Pdc and capacity factor = E / (Pdc x 8760) (by name). The peak-sun-hours is the plane-of-array daily irradiation from NREL NSRDB / PVWatts for the site, tilt, and azimuth; the performance ratio (default 0.77, the PVWatts all-loss default) is the single biggest lever. A pre-design estimate, not a bankable production model.";
-  const dc = makeNumber("Array DC nameplate (kW)", "pey-dc", { step: "any", min: "0", value: "8" });
-  dc.input.value = "8";
-  const psh = makeNumber("Peak-sun-hours (kWh/m2/day)", "pey-psh", { step: "any", min: "0", value: "5" });
-  psh.input.value = "5";
-  const pr = makeNumber("Performance ratio (0-1)", "pey-pr", { step: "any", min: "0", value: "0.77" });
-  pr.input.value = "0.77";
+  const dc = makeNumber("Array DC nameplate (kW)", "pey-dc", { step: "any", min: "0" });
+  const psh = makeNumber("Peak-sun-hours (kWh/m2/day)", "pey-psh", { step: "any", min: "0" });
+  const pr = makeNumber("Performance ratio (0-1)", "pey-pr", { step: "any", min: "0" });
   for (const f of [dc, psh, pr]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { dc.input.value = "8"; psh.input.value = "5"; pr.input.value = "0.77"; update(); });
   const oAnnual = makeOutputLine(outputRegion, "Annual energy", "pey-out-annual");
@@ -713,12 +695,9 @@ export function computePvArraySizing({ target_annual_kwh = 0, psh = 5.0, perf_ra
 }
 function renderPvArraySizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NREL PVWatts energy model E = Pdc x PSH x 365 x PR solved for the array size, Pdc = E_target / (PSH x 365 x PR) (by name). The peak-sun-hours is the plane-of-array daily irradiation from NREL NSRDB / PVWatts for the site, tilt, and azimuth; the performance ratio (default 0.77, the PVWatts all-loss default) is the single biggest lever. A pre-design estimate, not a bankable production model.";
-  const kwh = makeNumber("Target annual energy (kWh/yr)", "pas-kwh", { step: "any", min: "0", value: "12000" });
-  kwh.input.value = "12000";
-  const psh = makeNumber("Peak-sun-hours (kWh/m2/day)", "pas-psh", { step: "any", min: "0", value: "5" });
-  psh.input.value = "5";
-  const pr = makeNumber("Performance ratio (0-1)", "pas-pr", { step: "any", min: "0", value: "0.77" });
-  pr.input.value = "0.77";
+  const kwh = makeNumber("Target annual energy (kWh/yr)", "pas-kwh", { step: "any", min: "0" });
+  const psh = makeNumber("Peak-sun-hours (kWh/m2/day)", "pas-psh", { step: "any", min: "0" });
+  const pr = makeNumber("Performance ratio (0-1)", "pas-pr", { step: "any", min: "0" });
   for (const f of [kwh, psh, pr]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { kwh.input.value = "12000"; psh.input.value = "5"; pr.input.value = "0.77"; update(); });
   const oDc = makeOutputLine(outputRegion, "Required DC array size", "pas-out-dc");
@@ -758,12 +737,9 @@ export function computePvRowSpacing({ module_length_ft = 0, tilt_deg = 0, profil
 }
 function renderPvRowSpacing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NREL / Sandia PV array row-spacing geometry pitch = L x cos(tilt) + L x sin(tilt) / tan(profile angle), GCR = L / pitch (by name). The minimum profile angle is the winter-design sun elevation (from latitude or solar-times). Assumes due-south rows and a level field. A layout geometry, not an annual shading-loss model.";
-  const len = makeNumber("Module slope length (ft)", "prs-len", { step: "any", min: "0", value: "6.5" });
-  len.input.value = "6.5";
-  const tilt = makeNumber("Array tilt (degrees)", "prs-tilt", { step: "any", min: "0", value: "30" });
-  tilt.input.value = "30";
-  const prof = makeNumber("Min solar profile angle (degrees)", "prs-prof", { step: "any", min: "0", value: "22" });
-  prof.input.value = "22";
+  const len = makeNumber("Module slope length (ft)", "prs-len", { step: "any", min: "0" });
+  const tilt = makeNumber("Array tilt (degrees)", "prs-tilt", { step: "any", min: "0" });
+  const prof = makeNumber("Min solar profile angle (degrees)", "prs-prof", { step: "any", min: "0" });
   for (const f of [len, tilt, prof]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { len.input.value = "6.5"; tilt.input.value = "30"; prof.input.value = "22"; update(); });
   const oPitch = makeOutputLine(outputRegion, "Row pitch (front to front)", "prs-out-pitch");
@@ -812,12 +788,9 @@ export function computePvRowShadeAngle({ module_length_ft = 0, tilt_deg = 0, row
 }
 function renderPvRowShadeAngle(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NREL / Sandia PV row-spacing geometry solved for the profile angle: prof = atan(L sin(tilt) / (pitch - L cos(tilt))) (by name). With the pitch fixed by the roof, this is the lowest sun elevation the layout stays shade-free to; compare it to the winter-design sun elevation. Assumes due-south rows and a level field.";
-  const len = makeNumber("Module slope length (ft)", "prsa-len", { step: "any", min: "0", value: "6.5" });
-  len.input.value = "6.5";
-  const tilt = makeNumber("Array tilt (degrees)", "prsa-tilt", { step: "any", min: "0", value: "30" });
-  tilt.input.value = "30";
-  const pitch = makeNumber("Available row pitch (ft)", "prsa-pitch", { step: "any", min: "0", value: "12" });
-  pitch.input.value = "12";
+  const len = makeNumber("Module slope length (ft)", "prsa-len", { step: "any", min: "0" });
+  const tilt = makeNumber("Array tilt (degrees)", "prsa-tilt", { step: "any", min: "0" });
+  const pitch = makeNumber("Available row pitch (ft)", "prsa-pitch", { step: "any", min: "0" });
   for (const f of [len, tilt, pitch]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { len.input.value = "6.5"; tilt.input.value = "30"; pitch.input.value = "12"; update(); });
   const oProf = makeOutputLine(outputRegion, "Shade-free down to (profile angle)", "prsa-out-prof");
@@ -858,12 +831,9 @@ export function computePvInverterRatio({ dc_kw = 0, ac_kw = 0, inv_eff = 0.96 } 
 }
 function renderPvInverterRatio(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: inverter loading ratio ILR = Pdc / Pac and NREL inverter-sizing guidance; clipping begins where the array DC output exceeds Pac / inverter efficiency (by name). The cost-optimal 1.1-1.3 band shifts with irradiance, equipment price, and energy value; an accurate annual clipping loss needs an 8760-hour simulation. A sizing sanity check, not a clipping-loss model.";
-  const dc = makeNumber("Array DC nameplate (kW)", "pir-dc", { step: "any", min: "0", value: "8" });
-  dc.input.value = "8";
-  const ac = makeNumber("Inverter AC rating (kW)", "pir-ac", { step: "any", min: "0", value: "6.6" });
-  ac.input.value = "6.6";
-  const eff = makeNumber("Inverter peak efficiency (0-1)", "pir-eff", { step: "any", min: "0", value: "0.96" });
-  eff.input.value = "0.96";
+  const dc = makeNumber("Array DC nameplate (kW)", "pir-dc", { step: "any", min: "0" });
+  const ac = makeNumber("Inverter AC rating (kW)", "pir-ac", { step: "any", min: "0" });
+  const eff = makeNumber("Inverter peak efficiency (0-1)", "pir-eff", { step: "any", min: "0" });
   for (const f of [dc, ac, eff]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { dc.input.value = "8"; ac.input.value = "6.6"; eff.input.value = "0.96"; update(); });
   const oIlr = makeOutputLine(outputRegion, "Loading ratio (DC:AC)", "pir-out-ilr");
@@ -905,18 +875,12 @@ export function computeBatteryTouArbitrage({ nameplate_kwh = 0, dod = 0.90, rte 
 }
 function renderBatteryTouArbitrage(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: energy-arbitrage value daily = usable x peak - (usable / RTE) x offpeak, break-even when peak > offpeak / RTE, and the NREL battery round-trip / degradation framing (by name). RTE is AC-to-AC; DoD is the warranty-usable fraction. A gross spread-value aid, not a financed payback.";
-  const kwh = makeNumber("Battery nameplate (kWh)", "bta-kwh", { step: "any", min: "0", value: "13.5" });
-  kwh.input.value = "13.5";
-  const dod = makeNumber("Depth of discharge (0-1)", "bta-dod", { step: "any", min: "0", value: "0.9" });
-  dod.input.value = "0.9";
-  const rte = makeNumber("Round-trip efficiency (0-1)", "bta-rte", { step: "any", min: "0", value: "0.9" });
-  rte.input.value = "0.9";
-  const peak = makeNumber("On-peak price ($/kWh)", "bta-peak", { step: "any", min: "0", value: "0.45" });
-  peak.input.value = "0.45";
-  const off = makeNumber("Off-peak price ($/kWh)", "bta-off", { step: "any", min: "0", value: "0.15" });
-  off.input.value = "0.15";
-  const cyc = makeNumber("Cycles per year", "bta-cyc", { step: "any", min: "0", value: "365" });
-  cyc.input.value = "365";
+  const kwh = makeNumber("Battery nameplate (kWh)", "bta-kwh", { step: "any", min: "0" });
+  const dod = makeNumber("Depth of discharge (0-1)", "bta-dod", { step: "any", min: "0" });
+  const rte = makeNumber("Round-trip efficiency (0-1)", "bta-rte", { step: "any", min: "0" });
+  const peak = makeNumber("On-peak price ($/kWh)", "bta-peak", { step: "any", min: "0" });
+  const off = makeNumber("Off-peak price ($/kWh)", "bta-off", { step: "any", min: "0" });
+  const cyc = makeNumber("Cycles per year", "bta-cyc", { step: "any", min: "0" });
   for (const f of [kwh, dod, rte, peak, off, cyc]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { kwh.input.value = "13.5"; dod.input.value = "0.9"; rte.input.value = "0.9"; peak.input.value = "0.45"; off.input.value = "0.15"; cyc.input.value = "365"; update(); });
   const oUsable = makeOutputLine(outputRegion, "Usable energy per cycle", "bta-out-usable");
@@ -958,16 +922,11 @@ export function computeBatteryPeakShaving({ nameplate_kwh = 0, dod = 0.90, event
 }
 function renderBatteryPeakShaving(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: demand-charge peak-shaving method sustainable shave = usable / duration, actual = min(target, sustainable), savings = actual x $/kW-month x 12 (by name). The shave is energy-limited when the peak outlasts the usable energy. A demand-savings estimate, not a metered bill.";
-  const kwh = makeNumber("Battery nameplate (kWh)", "bps-kwh", { step: "any", min: "0", value: "100" });
-  kwh.input.value = "100";
-  const dod = makeNumber("Depth of discharge (0-1)", "bps-dod", { step: "any", min: "0", value: "0.9" });
-  dod.input.value = "0.9";
-  const dur = makeNumber("Peak-event duration (h)", "bps-dur", { step: "any", min: "0", value: "3" });
-  dur.input.value = "3";
-  const tgt = makeNumber("Target demand reduction (kW)", "bps-tgt", { step: "any", min: "0", value: "40" });
-  tgt.input.value = "40";
-  const demand = makeNumber("Demand charge ($/kW-month)", "bps-demand", { step: "any", min: "0", value: "18" });
-  demand.input.value = "18";
+  const kwh = makeNumber("Battery nameplate (kWh)", "bps-kwh", { step: "any", min: "0" });
+  const dod = makeNumber("Depth of discharge (0-1)", "bps-dod", { step: "any", min: "0" });
+  const dur = makeNumber("Peak-event duration (h)", "bps-dur", { step: "any", min: "0" });
+  const tgt = makeNumber("Target demand reduction (kW)", "bps-tgt", { step: "any", min: "0" });
+  const demand = makeNumber("Demand charge ($/kW-month)", "bps-demand", { step: "any", min: "0" });
   for (const f of [kwh, dod, dur, tgt, demand]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { kwh.input.value = "100"; dod.input.value = "0.9"; dur.input.value = "3"; tgt.input.value = "40"; demand.input.value = "18"; update(); });
   const oUsable = makeOutputLine(outputRegion, "Usable energy", "bps-out-usable");
@@ -1008,14 +967,10 @@ export function computeBatteryCRate({ nameplate_kwh = 0, c_rate = 0.5, dod = 0.9
 }
 function renderBatteryCRate(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: battery C-rate definition power = nameplate x C, discharge time = 1 / C, deliverable = min(C-rate power, inverter rating) (by name). Continuous, not surge; usable uses DoD. A nameplate power check, not a cell-level thermal model.";
-  const kwh = makeNumber("Battery nameplate (kWh)", "bcr-kwh", { step: "any", min: "0", value: "40" });
-  kwh.input.value = "40";
-  const c = makeNumber("Continuous C-rate (0.5 = 0.5C)", "bcr-c", { step: "any", min: "0", value: "0.5" });
-  c.input.value = "0.5";
-  const dod = makeNumber("Depth of discharge (0-1)", "bcr-dod", { step: "any", min: "0", value: "0.9" });
-  dod.input.value = "0.9";
-  const inv = makeNumber("Inverter rating (kW, 0 = no limit)", "bcr-inv", { step: "any", min: "0", value: "15" });
-  inv.input.value = "15";
+  const kwh = makeNumber("Battery nameplate (kWh)", "bcr-kwh", { step: "any", min: "0" });
+  const c = makeNumber("Continuous C-rate (0.5 = 0.5C)", "bcr-c", { step: "any", min: "0" });
+  const dod = makeNumber("Depth of discharge (0-1)", "bcr-dod", { step: "any", min: "0" });
+  const inv = makeNumber("Inverter rating (kW, 0 = no limit)", "bcr-inv", { step: "any", min: "0" });
   for (const f of [kwh, c, dod, inv]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { kwh.input.value = "40"; c.input.value = "0.5"; dod.input.value = "0.9"; inv.input.value = "15"; update(); });
   const oCPower = makeOutputLine(outputRegion, "C-rate power (cells)", "bcr-out-cpower");
@@ -1066,12 +1021,12 @@ export function computeEvChargeTime({ battery_capacity_kwh = 0, start_soc_pct = 
 }
 function renderEvChargeTime(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: AC Level 2 charge time (SAE J1772 onboard-charger limit): energy = capacity x (target - start); charge power = min(EVSE, onboard charger); time = energy / (power x efficiency). AC is capped by the onboard charger; DC fast charging tapers and is not this model. A planning estimate; the vehicle's charging curve governs.";
-  const cap = makeNumber("Battery capacity (kWh)", "ect-cap", { step: "any", min: "0", value: "75" }); cap.input.value = "75";
-  const start = makeNumber("Start state of charge (%)", "ect-start", { step: "any", min: "0", max: "100", value: "20" }); start.input.value = "20";
-  const target = makeNumber("Target state of charge (%)", "ect-target", { step: "any", min: "0", max: "100", value: "80" }); target.input.value = "80";
-  const evse = makeNumber("EVSE output power (kW)", "ect-evse", { step: "any", min: "0", value: "11.5" }); evse.input.value = "11.5";
-  const onboard = makeNumber("Vehicle onboard charger (kW, 0 = DC fast)", "ect-onboard", { step: "any", min: "0", value: "7.7" }); onboard.input.value = "7.7";
-  const eff = makeNumber("Charging efficiency (%)", "ect-eff", { step: "any", min: "0", max: "100", value: "88" }); eff.input.value = "88";
+  const cap = makeNumber("Battery capacity (kWh)", "ect-cap", { step: "any", min: "0" });
+  const start = makeNumber("Start state of charge (%)", "ect-start", { step: "any", min: "0", max: "100" });
+  const target = makeNumber("Target state of charge (%)", "ect-target", { step: "any", min: "0", max: "100" });
+  const evse = makeNumber("EVSE output power (kW)", "ect-evse", { step: "any", min: "0" });
+  const onboard = makeNumber("Vehicle onboard charger (kW, 0 = DC fast)", "ect-onboard", { step: "any", min: "0" });
+  const eff = makeNumber("Charging efficiency (%)", "ect-eff", { step: "any", min: "0", max: "100" });
   for (const f of [cap, start, target, evse, onboard, eff]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cap.input.value = "75"; start.input.value = "20"; target.input.value = "80"; evse.input.value = "11.5"; onboard.input.value = "7.7"; eff.input.value = "88"; update(); });
   const oEnergy = makeOutputLine(outputRegion, "Energy needed", "ect-out-energy");
@@ -1141,11 +1096,11 @@ export function computePvCellTemperaturePower({ T_amb_C = 0, G_wm2 = 0, NOCT_C =
 export const pvCellTemperaturePowerExample = { inputs: { T_amb_C: 30, G_wm2: 800, NOCT_C: 45, P_stc_W: 400, gamma: -0.35 } };
 function renderPvCellTemperaturePower(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: PV NOCT cell-temperature model T_cell = T_amb + (NOCT - 20) x G/800 and the datasheet power temperature coefficient (about -0.35%/C for crystalline silicon), by name. Temperature derate only (no soiling/wiring/inverter/shading). A design aid; the module datasheet governs.";
-  const Ta = makeNumber("Ambient temperature (°C)", "pctp-ta", { step: "any", value: "30" }); Ta.input.value = "30";
-  const G = makeNumber("Plane-of-array irradiance (W/m²)", "pctp-g", { step: "any", min: "0", value: "800" }); G.input.value = "800";
-  const noct = makeNumber("NOCT (C, datasheet, default 45)", "pctp-noct", { step: "any", min: "0", value: "45" }); noct.input.value = "45";
-  const Pstc = makeNumber("Module STC power (W)", "pctp-p", { step: "any", min: "0", value: "400" }); Pstc.input.value = "400";
-  const g = makeNumber("Power temp coefficient (%/C, e.g. -0.35)", "pctp-gamma", { step: "any", value: "-0.35" }); g.input.value = "-0.35";
+  const Ta = makeNumber("Ambient temperature (°C)", "pctp-ta", { step: "any" });
+  const G = makeNumber("Plane-of-array irradiance (W/m²)", "pctp-g", { step: "any", min: "0" });
+  const noct = makeNumber("NOCT (C, datasheet, default 45)", "pctp-noct", { step: "any", min: "0" });
+  const Pstc = makeNumber("Module STC power (W)", "pctp-p", { step: "any", min: "0" });
+  const g = makeNumber("Power temp coefficient (%/C, e.g. -0.35)", "pctp-gamma", { step: "any" });
   for (const f of [Ta, G, noct, Pstc, g]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { Ta.input.value = "30"; G.input.value = "800"; noct.input.value = "45"; Pstc.input.value = "400"; g.input.value = "-0.35"; update(); });
   const oTc = makeOutputLine(outputRegion, "Cell temperature", "pctp-out-tc");
@@ -1193,11 +1148,11 @@ export function computePvMaxAmbientForPower({ target_power_W = 0, P_stc_W = 0, G
 export const pvMaxAmbientForPowerExample = { inputs: { target_power_W: 358, P_stc_W: 400, G_wm2: 800, NOCT_C: 45, gamma: -0.35 } };
 function renderPvMaxAmbientForPower(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: PV NOCT cell-temperature model and the datasheet power temperature coefficient (about -0.35%/C for crystalline silicon), by name, solved for the ambient: T_cell = 25 + (P/P_stc - 1) x 100/gamma, T_amb = T_cell - (NOCT - 20) x G/800. Temperature derate only (no soiling/wiring/inverter/shading). A design aid; the module datasheet governs.";
-  const Ptgt = makeNumber("Target power (W)", "pma-pt", { step: "any", min: "0", value: "358" }); Ptgt.input.value = "358";
-  const Pstc = makeNumber("Module STC power (W)", "pma-p", { step: "any", min: "0", value: "400" }); Pstc.input.value = "400";
-  const G = makeNumber("Plane-of-array irradiance (W/m²)", "pma-g", { step: "any", min: "0", value: "800" }); G.input.value = "800";
-  const noct = makeNumber("NOCT (C, datasheet, default 45)", "pma-noct", { step: "any", min: "0", value: "45" }); noct.input.value = "45";
-  const g = makeNumber("Power temp coefficient (%/C, e.g. -0.35)", "pma-gamma", { step: "any", value: "-0.35" }); g.input.value = "-0.35";
+  const Ptgt = makeNumber("Target power (W)", "pma-pt", { step: "any", min: "0" });
+  const Pstc = makeNumber("Module STC power (W)", "pma-p", { step: "any", min: "0" });
+  const G = makeNumber("Plane-of-array irradiance (W/m²)", "pma-g", { step: "any", min: "0" });
+  const noct = makeNumber("NOCT (C, datasheet, default 45)", "pma-noct", { step: "any", min: "0" });
+  const g = makeNumber("Power temp coefficient (%/C, e.g. -0.35)", "pma-gamma", { step: "any" });
   for (const f of [Ptgt, Pstc, G, noct, g]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { Ptgt.input.value = "358"; Pstc.input.value = "400"; G.input.value = "800"; noct.input.value = "45"; g.input.value = "-0.35"; update(); });
   const oTa = makeOutputLine(outputRegion, "Max ambient temperature", "pma-out-ta");
@@ -1302,9 +1257,9 @@ export function computePvStringFusing({ Isc_A = 0, max_fuse_A = 0, n_strings = 1
 export const pvStringFusingExample = { inputs: { Isc_A: 10, max_fuse_A: 20, n_strings: 4 } };
 function renderPvStringFusing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 690.9(B) PV source-circuit overcurrent: OCPD >= 1.56 x Isc (1.25 x 1.25), rounded up to a 240.6(A) standard rating, checked against the module label maximum series fuse; fuses required with 3+ paralleled source circuits (690.9(A)), by name. A design aid; the NEC and the AHJ govern.";
-  const isc = makeNumber("Module Isc (A)", "psf-isc", { step: "any", min: "0", value: "10" }); isc.input.value = "10";
-  const maxf = makeNumber("Module max series fuse (A, from label)", "psf-max", { step: "any", min: "0", value: "20" }); maxf.input.value = "20";
-  const n = makeNumber("Paralleled source circuits", "psf-n", { step: "1", min: "1", value: "4" }); n.input.value = "4";
+  const isc = makeNumber("Module Isc (A)", "psf-isc", { step: "any", min: "0" });
+  const maxf = makeNumber("Module max series fuse (A, from label)", "psf-max", { step: "any", min: "0" });
+  const n = makeNumber("Paralleled source circuits", "psf-n", { step: "1", min: "1" });
   for (const f of [isc, maxf, n]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { isc.input.value = "10"; maxf.input.value = "20"; n.input.value = "4"; update(); });
   const oReq = makeOutputLine(outputRegion, "Minimum OCPD (1.56 x Isc)", "psf-out-req");
@@ -1353,12 +1308,12 @@ export function computeEvChargeCost({ battery_capacity_kwh = 0, start_soc_pct = 
 }
 function renderEvChargeCost(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: EV charge-cost-at-the-meter model. energy to battery = capacity x (target - start); grid energy = energy / efficiency (the meter draws more than the pack stores, because AC Level 2 loses about 10-15% to the onboard rectifier and thermal load); cost = grid energy x rate; cost per stored kWh = rate / efficiency. Ignores tiered, time-of-use, and demand pricing. A planning estimate; the local tariff governs.";
-  const cap = makeNumber("Battery capacity (kWh)", "ecc-cap", { step: "any", min: "0", value: "75" }); cap.input.value = "75";
-  const start = makeNumber("Start state of charge (%)", "ecc-start", { step: "any", min: "0", max: "100", value: "20" }); start.input.value = "20";
-  const target = makeNumber("Target state of charge (%)", "ecc-target", { step: "any", min: "0", max: "100", value: "80" }); target.input.value = "80";
-  const rate = makeNumber("Electricity rate ($/kWh)", "ecc-rate", { step: "any", min: "0", value: "0.15" }); rate.input.value = "0.15";
-  const eff = makeNumber("Charging efficiency (%)", "ecc-eff", { step: "any", min: "0", max: "100", value: "88" }); eff.input.value = "88";
-  const mpk = makeNumber("Vehicle efficiency (mi/kWh, 0 = skip)", "ecc-mpk", { step: "any", min: "0", value: "3.5" }); mpk.input.value = "3.5";
+  const cap = makeNumber("Battery capacity (kWh)", "ecc-cap", { step: "any", min: "0" });
+  const start = makeNumber("Start state of charge (%)", "ecc-start", { step: "any", min: "0", max: "100" });
+  const target = makeNumber("Target state of charge (%)", "ecc-target", { step: "any", min: "0", max: "100" });
+  const rate = makeNumber("Electricity rate ($/kWh)", "ecc-rate", { step: "any", min: "0" });
+  const eff = makeNumber("Charging efficiency (%)", "ecc-eff", { step: "any", min: "0", max: "100" });
+  const mpk = makeNumber("Vehicle efficiency (mi/kWh, 0 = skip)", "ecc-mpk", { step: "any", min: "0" });
   for (const f of [cap, start, target, rate, eff, mpk]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cap.input.value = "75"; start.input.value = "20"; target.input.value = "80"; rate.input.value = "0.15"; eff.input.value = "88"; mpk.input.value = "3.5"; update(); });
   const oEnergy = makeOutputLine(outputRegion, "Energy to battery", "ecc-out-energy");
@@ -1415,11 +1370,11 @@ export function computeEvDcfcTime({ usable_capacity_kwh = 0, start_soc_pct = 0, 
 }
 function renderEvDcfcTime(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: DC fast-charge CC-CV taper model. cc_power = min(charger, vehicle acceptance); three constant-power bands (0-80% at full power, 80-90% at ~50%, 90-100% at ~25%); per-band time = energy / (cc_power x band_fraction). DC fast charging holds constant power only to ~80% and then tapers to protect the cells, so the naive energy / rated-power estimate under-predicts a to-full session. A planning estimate; the vehicle's charging curve governs.";
-  const cap = makeNumber("Usable capacity (kWh)", "edt-cap", { step: "any", min: "0", value: "60" }); cap.input.value = "60";
-  const start = makeNumber("Start state of charge (%)", "edt-start", { step: "any", min: "0", max: "100", value: "10" }); start.input.value = "10";
-  const target = makeNumber("Target state of charge (%)", "edt-target", { step: "any", min: "0", max: "100", value: "100" }); target.input.value = "100";
-  const charger = makeNumber("Charger rated power (kW)", "edt-charger", { step: "any", min: "0", value: "150" }); charger.input.value = "150";
-  const accept = makeNumber("Vehicle peak DC acceptance (kW)", "edt-accept", { step: "any", min: "0", value: "100" }); accept.input.value = "100";
+  const cap = makeNumber("Usable capacity (kWh)", "edt-cap", { step: "any", min: "0" });
+  const start = makeNumber("Start state of charge (%)", "edt-start", { step: "any", min: "0", max: "100" });
+  const target = makeNumber("Target state of charge (%)", "edt-target", { step: "any", min: "0", max: "100" });
+  const charger = makeNumber("Charger rated power (kW)", "edt-charger", { step: "any", min: "0" });
+  const accept = makeNumber("Vehicle peak DC acceptance (kW)", "edt-accept", { step: "any", min: "0" });
   for (const f of [cap, start, target, charger, accept]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cap.input.value = "60"; start.input.value = "10"; target.input.value = "100"; charger.input.value = "150"; accept.input.value = "100"; update(); });
   const oPower = makeOutputLine(outputRegion, "Constant-current power", "edt-out-power");
@@ -1474,8 +1429,8 @@ export const solarEgc69045Example = { inputs: { ocpd_rating_a: 20, pv_isc_a: 0, 
 
 function renderSolarEgc69045(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 2023 690.45 equipment grounding conductors for PV systems with Table 250.122: the EGC is sized from the governing overcurrent rating (or, where there is no OCPD, from the PV short-circuit current), never smaller than 14 AWG, and 690.45 waives the 250.122(B) proportional upsize so enlarging the circuit conductors for voltage drop does not enlarge the EGC. The NEC and the AHJ govern.";
-  const ocpd = makeNumber("OCPD rating (A, 0 = no OCPD)", "segc-ocpd", { step: "1", min: "0", value: "20" }); ocpd.input.value = "20";
-  const isc = makeNumber("PV short-circuit current (A, used if no OCPD)", "segc-isc", { step: "any", min: "0", value: "0" }); isc.input.value = "0";
+  const ocpd = makeNumber("OCPD rating (A, 0 = no OCPD)", "segc-ocpd", { step: "1", min: "0" });
+  const isc = makeNumber("PV short-circuit current (A, used if no OCPD)", "segc-isc", { step: "any", min: "0" });
   const vd = makeSelect("Conductors upsized for voltage drop?", "segc-vd", [{ value: "no", label: "No" }, { value: "yes", label: "Yes" }]);
   for (const f of [ocpd, isc, vd]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ocpd.input.value = "20"; isc.input.value = "0"; vd.select.value = "no"; update(); });
@@ -1515,8 +1470,8 @@ export function computeShadowLength({ object_height_ft = 0, sun_altitude_deg = 0
 export const shadowLengthExample = { inputs: { object_height_ft: 10, sun_altitude_deg: 30 } };
 function renderShadowLength(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: sun shadow-length geometry (first-principles trigonometry): shadow = object height / tan(sun altitude); shadow-to-height ratio = cot(altitude). At 45 degrees the shadow equals the height; a low sun throws a long shadow. Use the winter-design sun elevation for the worst-case shade. Level ground and a vertical object assumed; the sun path and terrain govern.";
-  const h = makeNumber("Object height (ft)", "shad-h", { step: "any", min: "0" }); h.input.value = "10";
-  const a = makeNumber("Sun altitude above horizon (deg)", "shad-a", { step: "any", min: "0", max: "90" }); a.input.value = "30";
+  const h = makeNumber("Object height (ft)", "shad-h", { step: "any", min: "0" });
+  const a = makeNumber("Sun altitude above horizon (deg)", "shad-a", { step: "any", min: "0", max: "90" });
   for (const f of [h, a]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { h.input.value = "10"; a.input.value = "30"; update(); });
   const oL = makeOutputLine(outputRegion, "Shadow length", "shad-out-l");
@@ -1566,9 +1521,9 @@ export function computeSolarAltitude({ latitude_deg = 0, day_of_year = 355, hour
 export const solarAltitudeExample = { inputs: { latitude_deg: 40, day_of_year: 355, hours_from_solar_noon: 0 } };
 function renderSolarAltitude(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: solar altitude angle (NOAA/ASHRAE solar geometry): sin(altitude) = sin(lat) sin(dec) + cos(lat) cos(dec) cos(H), with the declination from Cooper's equation dec = 23.45 sin(360 (284 + n)/365) and the hour angle H = 15 (hours from solar noon); at solar noon altitude = 90 - |lat - dec|. True solar time and a flat horizon assumed; refraction and the equation of time are separate. A site-planning geometry; the actual sun path governs.";
-  const lat = makeNumber("Latitude (deg, + north)", "salt-lat", { step: "any" }); lat.input.value = "40";
-  const doy = makeNumber("Day of year (1-365; 355 = winter solstice)", "salt-doy", { step: "1", min: "1", max: "366" }); doy.input.value = "355";
-  const hrs = makeNumber("Hours from solar noon (- morning, + afternoon)", "salt-hrs", { step: "any", min: "-12", max: "12" }); hrs.input.value = "0";
+  const lat = makeNumber("Latitude (deg, + north)", "salt-lat", { step: "any" });
+  const doy = makeNumber("Day of year (1-365; 355 = winter solstice)", "salt-doy", { step: "1", min: "1", max: "366" });
+  const hrs = makeNumber("Hours from solar noon (- morning, + afternoon)", "salt-hrs", { step: "any", min: "-12", max: "12" });
   for (const f of [lat, doy, hrs]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { lat.input.value = "40"; doy.input.value = "355"; hrs.input.value = "0"; update(); });
   const oAlt = makeOutputLine(outputRegion, "Solar altitude (elevation)", "salt-out-alt");
@@ -1622,9 +1577,9 @@ export function computeSolarAzimuth({ latitude_deg = 0, day_of_year = 172, hours
 export const solarAzimuthExample = { inputs: { latitude_deg: 40, day_of_year: 172, hours_from_solar_noon: -3 } };
 function renderSolarAzimuth(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: solar azimuth (compass bearing, clockwise from true north): from-south azimuth gamma = atan2(cos(dec) sin(H), cos(H) cos(dec) sin(lat) - sin(dec) cos(lat)), compass = 180 + gamma; declination from Cooper's equation dec = 23.45 sin(360 (284 + n)/365), hour angle H = 15 (hours from solar noon) (NOAA / Duffie & Beckman solar geometry). At solar noon the northern-hemisphere sun bears due south (180 deg). True solar time and a flat horizon assumed; the equation of time and refraction are separate. The actual sun path governs.";
-  const lat = makeNumber("Latitude (deg, + north)", "sazi-lat", { step: "any" }); lat.input.value = "40";
-  const doy = makeNumber("Day of year (1-365; 172 = summer solstice)", "sazi-doy", { step: "1", min: "1", max: "366" }); doy.input.value = "172";
-  const hrs = makeNumber("Hours from solar noon (- morning, + afternoon)", "sazi-hrs", { step: "any", min: "-12", max: "12" }); hrs.input.value = "-3";
+  const lat = makeNumber("Latitude (deg, + north)", "sazi-lat", { step: "any" });
+  const doy = makeNumber("Day of year (1-365; 172 = summer solstice)", "sazi-doy", { step: "1", min: "1", max: "366" });
+  const hrs = makeNumber("Hours from solar noon (- morning, + afternoon)", "sazi-hrs", { step: "any", min: "-12", max: "12" });
   for (const f of [lat, doy, hrs]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { lat.input.value = "40"; doy.input.value = "172"; hrs.input.value = "-3"; update(); });
   const oAzi = makeOutputLine(outputRegion, "Solar azimuth (compass bearing)", "sazi-out-azi");
@@ -1672,18 +1627,12 @@ export const pvRailClampTakeoffExample = { inputs: { rows: 2, modules_per_row: 1
 
 function _v896renderPvRailClampTakeoff(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: racking-takeoff identity by name. run = modules x (width + gap); rail = rows x rails x run; mid clamps = rails x rows x (modules - 1); end clamps = 2 x rails x rows; splices = (ceil(run / stock) - 1) x rails x rows.";
-  const rw = makeNumber("Module rows", "prc-rw", { step: "any", min: "0", value: "2" });
-  rw.input.value = "2";
-  const mp = makeNumber("Modules per row", "prc-mp", { step: "any", min: "0", value: "12" });
-  mp.input.value = "12";
-  const mw = makeNumber("Module width along the rail (ft)", "prc-mw", { step: "any", min: "0", value: "3.42" });
-  mw.input.value = "3.42";
-  const gp = makeNumber("Module-to-module gap (ft)", "prc-gp", { step: "any", min: "0", value: "0" });
-  gp.input.value = "0";
-  const rp = makeNumber("Rails per row", "prc-rp", { step: "any", min: "0", value: "2" });
-  rp.input.value = "2";
-  const rs = makeNumber("Rail stock length (ft)", "prc-rs", { step: "any", min: "0", value: "14" });
-  rs.input.value = "14";
+  const rw = makeNumber("Module rows", "prc-rw", { step: "any", min: "0" });
+  const mp = makeNumber("Modules per row", "prc-mp", { step: "any", min: "0" });
+  const mw = makeNumber("Module width along the rail (ft)", "prc-mw", { step: "any", min: "0" });
+  const gp = makeNumber("Module-to-module gap (ft)", "prc-gp", { step: "any", min: "0" });
+  const rp = makeNumber("Rails per row", "prc-rp", { step: "any", min: "0" });
+  const rs = makeNumber("Rail stock length (ft)", "prc-rs", { step: "any", min: "0" });
   for (const f of [rw, mp, mw, gp, rp, rs]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { rw.input.value = "2"; mp.input.value = "12"; mw.input.value = "3.42"; gp.input.value = "0"; rp.input.value = "2"; rs.input.value = "14"; update(); });
   const oRail = makeOutputLine(outputRegion, "Rail footage", "prc-out-rail");
@@ -1732,18 +1681,12 @@ export const pvBallastWeightExample = { inputs: { modules: 30, module_wt_lb: 50,
 
 function _v897renderPvBallastWeight(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: load-screen identity by name. total = modules x (module weight + ballast) + racking; added pressure = total / array area. A dead-load screen, not a design; the PE-stamped ballast plan and the engineer govern.";
-  const mo = makeNumber("Module count", "pbw-mo", { step: "any", min: "0", value: "30" });
-  mo.input.value = "30";
-  const mw = makeNumber("Module weight (lb)", "pbw-mw", { step: "any", min: "0", value: "50" });
-  mw.input.value = "50";
-  const bl = makeNumber("Ballast per module (lb)", "pbw-bl", { step: "any", min: "0", value: "40" });
-  bl.input.value = "40";
-  const rk = makeNumber("Total racking weight (lb)", "pbw-rk", { step: "any", min: "0", value: "150" });
-  rk.input.value = "150";
-  const ar = makeNumber("Array footprint area (ft²)", "pbw-ar", { step: "any", min: "0", value: "630" });
-  ar.input.value = "630";
-  const al = makeNumber("Allowable added pressure (psf)", "pbw-al", { step: "any", min: "0", value: "5" });
-  al.input.value = "5";
+  const mo = makeNumber("Module count", "pbw-mo", { step: "any", min: "0" });
+  const mw = makeNumber("Module weight (lb)", "pbw-mw", { step: "any", min: "0" });
+  const bl = makeNumber("Ballast per module (lb)", "pbw-bl", { step: "any", min: "0" });
+  const rk = makeNumber("Total racking weight (lb)", "pbw-rk", { step: "any", min: "0" });
+  const ar = makeNumber("Array footprint area (ft²)", "pbw-ar", { step: "any", min: "0" });
+  const al = makeNumber("Allowable added pressure (psf)", "pbw-al", { step: "any", min: "0" });
   for (const f of [mo, mw, bl, rk, ar, al]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { mo.input.value = "30"; mw.input.value = "50"; bl.input.value = "40"; rk.input.value = "150"; ar.input.value = "630"; al.input.value = "5"; update(); });
   const oTotal = makeOutputLine(outputRegion, "Total added weight", "pbw-out-total");
@@ -1788,12 +1731,9 @@ export const dcShuntSizingExample = { inputs: { rated_current_a: 100, rated_mill
 
 function _v963renderDcShuntSizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: DC current-shunt sizing (Ohm's law), by name. R = rated_mV/1000 / rated_A; current = rated_A x (measured_mV / rated_mV); dissipation at rating = rated_A x rated_mV/1000. Derate to ~2/3 for continuous use; sense at the potential terminals. The shunt accuracy class and the meter range/calibration govern.";
-  const ir = makeNumber("Rated current (A)", "shu-ir", { step: "any", min: "0", value: "100" });
-  ir.input.value = "100";
-  const mr = makeNumber("Rated output (mV at rated current)", "shu-mr", { step: "any", min: "0", value: "50" });
-  mr.input.value = "50";
-  const mm = makeNumber("Measured output (mV)", "shu-mm", { step: "any", min: "0", value: "25" });
-  mm.input.value = "25";
+  const ir = makeNumber("Rated current (A)", "shu-ir", { step: "any", min: "0" });
+  const mr = makeNumber("Rated output (mV at rated current)", "shu-mr", { step: "any", min: "0" });
+  const mm = makeNumber("Measured output (mV)", "shu-mm", { step: "any", min: "0" });
   for (const f of [ir, mr, mm]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ir.input.value = "100"; mr.input.value = "50"; mm.input.value = "25"; update(); });
   const oR = makeOutputLine(outputRegion, "Shunt resistance", "shu-out-r");
@@ -1836,14 +1776,10 @@ export const evRangePerHourExample = { inputs: { evse_power_kw: 7.7, charge_effi
 
 function _v968renderEvRangePerHour(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: EV range added per hour of AC charging, by name. range/hr = EVSE power (kW) x charge efficiency x vehicle efficiency (mi/kWh); hours = target range / range per hr. Steady AC Level 2; the vehicle's onboard-charger limit caps the AC rate (see ev-charge-time), DC fast charging tapers, and the actual efficiency governs.";
-  const pw = makeNumber("EVSE power (kW, e.g. 7.7)", "evr-pw", { step: "any", min: "0", value: "7.7" });
-  pw.input.value = "7.7";
-  const ef = makeNumber("Charge efficiency (0-1, ~0.88)", "evr-ef", { step: "any", min: "0", value: "0.88" });
-  ef.input.value = "0.88";
-  const ve = makeNumber("Vehicle efficiency (mi/kWh)", "evr-ve", { step: "any", min: "0", value: "3.5" });
-  ve.input.value = "3.5";
-  const tr = makeNumber("Target range to add (mi)", "evr-tr", { step: "any", min: "0", value: "100" });
-  tr.input.value = "100";
+  const pw = makeNumber("EVSE power (kW, e.g. 7.7)", "evr-pw", { step: "any", min: "0" });
+  const ef = makeNumber("Charge efficiency (0-1, ~0.88)", "evr-ef", { step: "any", min: "0" });
+  const ve = makeNumber("Vehicle efficiency (mi/kWh)", "evr-ve", { step: "any", min: "0" });
+  const tr = makeNumber("Target range to add (mi)", "evr-tr", { step: "any", min: "0" });
   for (const f of [pw, ef, ve, tr]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { pw.input.value = "7.7"; ef.input.value = "0.88"; ve.input.value = "3.5"; tr.input.value = "100"; update(); });
   const oR = makeOutputLine(outputRegion, "Range added", "evr-out-r");
@@ -1891,16 +1827,11 @@ export const batterySeriesParallelExample = { inputs: { target_bus_v: 48, module
 
 function _v972renderBatterySeriesParallel(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: battery bank series/parallel configuration, by name. series = round(target bus V / module V); bus = series x module V; total Ah = parallel x module Ah; usable kWh = series x parallel x V x Ah x DoD / 1000. LFP ~12.8 V/80% DoD, flooded lead-acid ~12.0 V/50%. The battery/BMS series-parallel limits, the inverter voltage window, and NEC 706 govern.";
-  const tv = makeNumber("Target bus voltage (V)", "bsp-tv", { step: "any", min: "0", value: "48" });
-  tv.input.value = "48";
-  const mv = makeNumber("Module nominal voltage (V)", "bsp-mv", { step: "any", min: "0", value: "12.8" });
-  mv.input.value = "12.8";
-  const ma = makeNumber("Module capacity (Ah)", "bsp-ma", { step: "any", min: "0", value: "100" });
-  ma.input.value = "100";
-  const ps = makeNumber("Parallel strings", "bsp-ps", { step: "1", min: "1", value: "2" });
-  ps.input.value = "2";
-  const dd = makeNumber("Depth of discharge (0-1)", "bsp-dd", { step: "any", min: "0", value: "0.8" });
-  dd.input.value = "0.8";
+  const tv = makeNumber("Target bus voltage (V)", "bsp-tv", { step: "any", min: "0" });
+  const mv = makeNumber("Module nominal voltage (V)", "bsp-mv", { step: "any", min: "0" });
+  const ma = makeNumber("Module capacity (Ah)", "bsp-ma", { step: "any", min: "0" });
+  const ps = makeNumber("Parallel strings", "bsp-ps", { step: "1", min: "1" });
+  const dd = makeNumber("Depth of discharge (0-1)", "bsp-dd", { step: "any", min: "0" });
   for (const f of [tv, mv, ma, ps, dd]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { tv.input.value = "48"; mv.input.value = "12.8"; ma.input.value = "100"; ps.input.value = "2"; dd.input.value = "0.8"; update(); });
   const oC = makeOutputLine(outputRegion, "Configuration", "bsp-out-c");
@@ -1945,14 +1876,10 @@ export const bifacialPvGainExample = { inputs: { front_poa_wm2: 1000, rear_poa_w
 
 function _v983renderBifacialPvGain(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: bifacial PV rear-side gain, by name. gain = bifaciality x (rear irradiance / front irradiance); effective power = front x (1 + gain). Bifaciality (phi) ~0.65-0.90 from the datasheet; rear irradiance climbs with ground albedo, mounting height, and row spacing. The datasheet bifaciality, the site albedo, and a bifacial ray-trace govern the real yield.";
-  const fp = makeNumber("Front plane-of-array irradiance (W/m²)", "bpg-fp", { step: "any", min: "0", value: "1000" });
-  fp.input.value = "1000";
-  const rp = makeNumber("Rear plane-of-array irradiance (W/m²)", "bpg-rp", { step: "any", min: "0", value: "150" });
-  rp.input.value = "150";
-  const bf = makeNumber("Bifaciality coefficient (0-1, from datasheet)", "bpg-bf", { step: "any", min: "0", max: "1", value: "0.75" });
-  bf.input.value = "0.75";
-  const pw = makeNumber("Front-side nameplate power (W)", "bpg-pw", { step: "any", min: "0", value: "400" });
-  pw.input.value = "400";
+  const fp = makeNumber("Front plane-of-array irradiance (W/m²)", "bpg-fp", { step: "any", min: "0" });
+  const rp = makeNumber("Rear plane-of-array irradiance (W/m²)", "bpg-rp", { step: "any", min: "0" });
+  const bf = makeNumber("Bifaciality coefficient (0-1, from datasheet)", "bpg-bf", { step: "any", min: "0", max: "1" });
+  const pw = makeNumber("Front-side nameplate power (W)", "bpg-pw", { step: "any", min: "0" });
   for (const f of [fp, rp, bf, pw]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { fp.input.value = "1000"; rp.input.value = "150"; bf.input.value = "0.75"; pw.input.value = "400"; update(); });
   const oG = makeOutputLine(outputRegion, "Bifacial gain", "bpg-out-g");

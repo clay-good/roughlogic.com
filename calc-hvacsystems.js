@@ -293,12 +293,12 @@ function _v16h_renderHxLmtdNtu(inputRegion, outputRegion, citationEl) {
     { value: "counterflow", label: "Counter-flow", selected: true },
     { value: "parallel", label: "Parallel-flow" },
   ]);
-  const thi = makeNumber("Hot inlet (°F)", "hx-thi", { step: "any", value: "200" });
-  const tho = makeNumber("Hot outlet (°F)", "hx-tho", { step: "any", value: "100" });
-  const tci = makeNumber("Cold inlet (°F)", "hx-tci", { step: "any", value: "60" });
-  const tco = makeNumber("Cold outlet (°F)", "hx-tco", { step: "any", value: "140" });
-  const hg = makeNumber("Hot flow (GPM)", "hx-hg", { step: "any", min: "0", value: "50" });
-  const cg = makeNumber("Cold flow (GPM)", "hx-cg", { step: "any", min: "0", value: "62.5" });
+  const thi = makeNumber("Hot inlet (°F)", "hx-thi", { step: "any" });
+  const tho = makeNumber("Hot outlet (°F)", "hx-tho", { step: "any" });
+  const tci = makeNumber("Cold inlet (°F)", "hx-tci", { step: "any" });
+  const tco = makeNumber("Cold outlet (°F)", "hx-tco", { step: "any" });
+  const hg = makeNumber("Hot flow (GPM)", "hx-hg", { step: "any", min: "0" });
+  const cg = makeNumber("Cold flow (GPM)", "hx-cg", { step: "any", min: "0" });
   const hf = makeSelect("Hot fluid", "hx-hf", _v16h_HX_FLUIDS.map((o) => ({ ...o })));
   const cf = makeSelect("Cold fluid", "hx-cf", _v16h_HX_FLUIDS.map((o) => ({ ...o })));
   for (const f of [config, thi, tho, tci, tco, hg, cg, hf, cf]) inputRegion.appendChild(f.wrap);
@@ -806,11 +806,11 @@ export const humidifierCapacityExample = {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v16h_renderHumidifierCapacity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: addition (lb/hr) = 60 x CFM x rho x (W_target - W_entering), with W from dry-bulb and RH at the altitude-corrected pressure; latent load = addition x 1061 BTU/lb. Per ASHRAE Fundamentals 2021 Ch. 1 (psychrometrics). AHJ and the manufacturer's published humidifier capacity govern actual delivery. Free at ashrae.org for the TOC.";
-  const cfm = makeNumber("Supply airflow (CFM)", "hc10-cfm", { step: "any", min: "0", value: "1000" });
-  const db = makeNumber("Supply dry-bulb (°F)", "hc10-db", { step: "any", value: "70" });
-  const rin = makeNumber("Entering RH (%)", "hc10-rin", { step: "any", min: "0", max: "100", value: "20" });
-  const rtg = makeNumber("Target RH (%)", "hc10-rtg", { step: "any", min: "0", max: "100", value: "40" });
-  const alt = makeNumber("Altitude (ft)", "hc10-alt", { step: "any", value: "0" });
+  const cfm = makeNumber("Supply airflow (CFM)", "hc10-cfm", { step: "any", min: "0" });
+  const db = makeNumber("Supply dry-bulb (°F)", "hc10-db", { step: "any" });
+  const rin = makeNumber("Entering RH (%)", "hc10-rin", { step: "any", min: "0", max: "100" });
+  const rtg = makeNumber("Target RH (%)", "hc10-rtg", { step: "any", min: "0", max: "100" });
+  const alt = makeNumber("Altitude (ft)", "hc10-alt", { step: "any" });
   for (const f of [cfm, db, rin, rtg, alt]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
     cfm.input.value = "1000"; db.input.value = "70"; rin.input.value = "20"; rtg.input.value = "40"; alt.input.value = "0"; update();
@@ -1015,11 +1015,11 @@ export function computeWindowSolarHeatGain({ area_ft2 = 0, shgc = 0, psf = 0, u_
 }
 function _v16h_renderWindowSolarHeatGain(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ASHRAE / ACCA Manual J fenestration cooling load Q_solar = A x SHGC x PSF and Q_cond = A x U x CLTD (by name). The peak solar factor is from the ASHRAE/ACCA table for the orientation and latitude; SHGC and U come from the NFRC label; interior shades reduce the solar term by a separate shade factor. One cooling-load component, not a Manual J.";
-  const area = makeNumber("Glazing area (ft²)", "wsh-area", { step: "any", min: "0", value: "40" });
-  const shgc = makeNumber("SHGC (NFRC label, 0-1)", "wsh-shgc", { step: "any", min: "0", value: "0.30" });
-  const psf = makeNumber("Peak solar factor (Btu/h/ft²)", "wsh-psf", { step: "any", min: "0", value: "200" });
-  const u = makeNumber("U-factor (Btu/h/ft²/F)", "wsh-u", { step: "any", min: "0", value: "0.30" });
-  const cltd = makeNumber("Glass CLTD (°F)", "wsh-cltd", { step: "any", value: "14" });
+  const area = makeNumber("Glazing area (ft²)", "wsh-area", { step: "any", min: "0" });
+  const shgc = makeNumber("SHGC (NFRC label, 0-1)", "wsh-shgc", { step: "any", min: "0" });
+  const psf = makeNumber("Peak solar factor (Btu/h/ft²)", "wsh-psf", { step: "any", min: "0" });
+  const u = makeNumber("U-factor (Btu/h/ft²/F)", "wsh-u", { step: "any", min: "0" });
+  const cltd = makeNumber("Glass CLTD (°F)", "wsh-cltd", { step: "any" });
   for (const f of [area, shgc, psf, u, cltd]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { area.input.value = "40"; shgc.input.value = "0.30"; psf.input.value = "200"; u.input.value = "0.30"; cltd.input.value = "14"; update(); });
   const oSolar = makeOutputLine(outputRegion, "Solar gain", "wsh-out-solar");
@@ -1137,12 +1137,12 @@ export function computeInternalHeatGains({ occupants = 0, sens_per_person = 245,
 }
 function _v16h_renderInternalHeatGains(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ASHRAE / ACCA Manual J internal-gain method (by name): occupant sensible and latent from the activity table, lighting and equipment at 3.412 Btu/h per watt, scaled by the use factor. Recessed lighting on a return plenum delivers part of its heat to the plenum. One cooling-load component, not a Manual J.";
-  const occ = makeNumber("Occupants", "ihg-occ", { step: "any", min: "0", value: "6" });
-  const sens = makeNumber("Sensible per person (Btu/h)", "ihg-sens", { step: "any", min: "0", value: "245" });
-  const lat = makeNumber("Latent per person (Btu/h)", "ihg-lat", { step: "any", min: "0", value: "200" });
-  const light = makeNumber("Lighting power (W)", "ihg-light", { step: "any", min: "0", value: "800" });
-  const equip = makeNumber("Equipment power (W)", "ihg-equip", { step: "any", min: "0", value: "1200" });
-  const use = makeNumber("Use factor (0-1)", "ihg-use", { step: "any", min: "0", value: "1.0" });
+  const occ = makeNumber("Occupants", "ihg-occ", { step: "any", min: "0" });
+  const sens = makeNumber("Sensible per person (Btu/h)", "ihg-sens", { step: "any", min: "0" });
+  const lat = makeNumber("Latent per person (Btu/h)", "ihg-lat", { step: "any", min: "0" });
+  const light = makeNumber("Lighting power (W)", "ihg-light", { step: "any", min: "0" });
+  const equip = makeNumber("Equipment power (W)", "ihg-equip", { step: "any", min: "0" });
+  const use = makeNumber("Use factor (0-1)", "ihg-use", { step: "any", min: "0" });
   for (const f of [occ, sens, lat, light, equip, use]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { occ.input.value = "6"; sens.input.value = "245"; lat.input.value = "200"; light.input.value = "800"; equip.input.value = "1200"; use.input.value = "1.0"; update(); });
   const oSensible = makeOutputLine(outputRegion, "Sensible load", "ihg-out-sensible");
@@ -1178,9 +1178,9 @@ export function computeEnvelopeConductionLoad({ area_ft2 = 0, u_factor = 0, cltd
 }
 function _v16h_renderEnvelopeConductionLoad(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ASHRAE / ACCA Manual J opaque-envelope cooling load Q = U x A x CLTD, the CLTD being the sol-air cooling-load temperature difference (by name). The sol-air CLTD comes from the ASHRAE/ACCA table for the surface type, color, orientation, and design day; the U-factor is the whole-assembly value. One cooling-load component, not a Manual J.";
-  const area = makeNumber("Opaque surface area (ft²)", "ecl-area", { step: "any", min: "0", value: "1000" });
-  const u = makeNumber("Assembly U-factor (Btu/h/ft²/F)", "ecl-u", { step: "any", min: "0", value: "0.05" });
-  const cltd = makeNumber("Sol-air CLTD (°F)", "ecl-cltd", { step: "any", value: "70" });
+  const area = makeNumber("Opaque surface area (ft²)", "ecl-area", { step: "any", min: "0" });
+  const u = makeNumber("Assembly U-factor (Btu/h/ft²/F)", "ecl-u", { step: "any", min: "0" });
+  const cltd = makeNumber("Sol-air CLTD (°F)", "ecl-cltd", { step: "any" });
   for (const f of [area, u, cltd]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { area.input.value = "1000"; u.input.value = "0.05"; cltd.input.value = "70"; update(); });
   const oCond = makeOutputLine(outputRegion, "Conduction cooling load", "ecl-out-cond");
@@ -1217,10 +1217,10 @@ export function computeCoilFaceVelocity({ cfm = 0, face_width_in = 0, face_heigh
 }
 function _v409renderCoilFaceVelocity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Cooling-coil face velocity = CFM / coil face area, with the ~500 fpm moisture-carryover limit for a wet coil (ASHRAE / coil-selection practice). Above the threshold a wet coil blows condensate past the drain pan. A selection aid; the coil manufacturer's rated face velocity governs.";
-  const cfm = makeNumber("Airflow (cfm)", "cfv-cfm", { step: "any", min: "0", value: "2000" });
-  const w = makeNumber("Coil face width (in)", "cfv-w", { step: "any", min: "0", value: "24" });
-  const h = makeNumber("Coil face height (in)", "cfv-h", { step: "any", min: "0", value: "18" });
-  const thr = makeNumber("Carryover threshold (fpm, default 500)", "cfv-thr", { step: "any", min: "0", value: "500" });
+  const cfm = makeNumber("Airflow (cfm)", "cfv-cfm", { step: "any", min: "0" });
+  const w = makeNumber("Coil face width (in)", "cfv-w", { step: "any", min: "0" });
+  const h = makeNumber("Coil face height (in)", "cfv-h", { step: "any", min: "0" });
+  const thr = makeNumber("Carryover threshold (fpm, default 500)", "cfv-thr", { step: "any", min: "0" });
   for (const f of [cfm, w, h, thr]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cfm.input.value = "2000"; w.input.value = "24"; h.input.value = "18"; thr.input.value = "500"; update(); });
   const oV = makeOutputLine(outputRegion, "Face velocity", "cfv-out-v");
@@ -1258,8 +1258,8 @@ export function computeCoilFaceArea({ cfm = 0, target_fpm = 500 } = {}) {
 export const coilFaceAreaExample = { inputs: { cfm: 2000, target_fpm: 500 } };
 function _v701renderCoilFaceArea(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Required coil face area = CFM / target face velocity (the inverse of face velocity = CFM / area), sized to the ~500 fpm wet-coil moisture-carryover limit (ASHRAE / coil-selection practice). A selection aid; the coil manufacturer's rated face velocity governs.";
-  const cfm = makeNumber("Airflow (cfm)", "cfa-cfm", { step: "any", min: "0", value: "2000" });
-  const v = makeNumber("Target face velocity (fpm, default 500)", "cfa-v", { step: "any", min: "0", value: "500" });
+  const cfm = makeNumber("Airflow (cfm)", "cfa-cfm", { step: "any", min: "0" });
+  const v = makeNumber("Target face velocity (fpm, default 500)", "cfa-v", { step: "any", min: "0" });
   for (const f of [cfm, v]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cfm.input.value = "2000"; v.input.value = "500"; update(); });
   const oA = makeOutputLine(outputRegion, "Required face area", "cfa-out-a");
@@ -1298,10 +1298,10 @@ export function computeVavBoxAirflow({ zone_sensible_btuh = 0, supply_dt_f = 0, 
 }
 function _v410renderVavBoxAirflow(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: VAV box airflow limits: maximum = zone sensible / (1.08 x supply deltaT), minimum = max(ASHRAE 62.1 ventilation minimum, turndown x maximum). The 1.08 is the sensible-heat constant for standard air. A design aid; the box manufacturer's range and the ventilation calculation govern.";
-  const load = makeNumber("Zone sensible load (Btu/hr)", "vav-load", { step: "any", min: "0", value: "12000" });
-  const dt = makeNumber("Supply-to-room deltaT (°F)", "vav-dt", { step: "any", min: "0", value: "20" });
-  const vent = makeNumber("Ventilation minimum (cfm, ASHRAE 62.1)", "vav-vent", { step: "any", min: "0", value: "100" });
-  const td = makeNumber("Turndown fraction (default 0.30)", "vav-td", { step: "any", min: "0", max: "1", value: "0.30" });
+  const load = makeNumber("Zone sensible load (Btu/hr)", "vav-load", { step: "any", min: "0" });
+  const dt = makeNumber("Supply-to-room deltaT (°F)", "vav-dt", { step: "any", min: "0" });
+  const vent = makeNumber("Ventilation minimum (cfm, ASHRAE 62.1)", "vav-vent", { step: "any", min: "0" });
+  const td = makeNumber("Turndown fraction (default 0.30)", "vav-td", { step: "any", min: "0", max: "1" });
   for (const f of [load, dt, vent, td]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { load.input.value = "12000"; dt.input.value = "20"; vent.input.value = "100"; td.input.value = "0.30"; update(); });
   const oMax = makeOutputLine(outputRegion, "Maximum airflow", "vav-out-max");
@@ -1341,10 +1341,10 @@ export function computeHydronicBufferTank({ min_on_time_min = 0, source_min_btu 
 export const hydronicBufferTankExample = { inputs: { min_on_time_min: 10, source_min_btu: 60000, zone_min_load_btu: 0, delta_t_f: 20 } };
 function _v587renderHydronicBufferTank(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A sizing aid, not the manufacturer's data; the equipment minimum-cycle data and the manufacturer govern. Citation: ASHRAE / Idronics (Caleffi) anti-short-cycle buffer-tank practice, by name. V = on_time x (source_min - zone_load) / (500 x delta_T). The worst case is at about zero load, when the full minimum output has nowhere to go but the tank; sizing at the design load undersizes it badly. The 500 factor is for water (adjust for glycol); existing distribution-piping water may already supply part of the volume.";
-  const t = makeNumber("Minimum on-time (min)", "hbt-t", { step: "any", min: "0", value: "10" }); t.input.value = "10";
-  const qMin = makeNumber("Source minimum output (Btu/hr)", "hbt-qmin", { step: "any", min: "0", value: "60000" }); qMin.input.value = "60000";
-  const qLoad = makeNumber("Minimum simultaneous zone load (Btu/hr, 0 = worst case)", "hbt-qload", { step: "any", min: "0", value: "0" }); qLoad.input.value = "0";
-  const dt = makeNumber("Allowable temperature swing (°F)", "hbt-dt", { step: "any", min: "0", value: "20" }); dt.input.value = "20";
+  const t = makeNumber("Minimum on-time (min)", "hbt-t", { step: "any", min: "0" });
+  const qMin = makeNumber("Source minimum output (Btu/hr)", "hbt-qmin", { step: "any", min: "0" });
+  const qLoad = makeNumber("Minimum simultaneous zone load (Btu/hr, 0 = worst case)", "hbt-qload", { step: "any", min: "0" });
+  const dt = makeNumber("Allowable temperature swing (°F)", "hbt-dt", { step: "any", min: "0" });
   for (const f of [t, qMin, qLoad, dt]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { t.input.value = "10"; qMin.input.value = "60000"; qLoad.input.value = "0"; dt.input.value = "20"; update(); });
   const oV = makeOutputLine(outputRegion, "Required buffer volume", "hbt-out-v");
@@ -1389,12 +1389,12 @@ export function computeBufferTankLoopCredit({ min_on_time_min = 0, source_min_bt
 export const bufferTankLoopCreditExample = { inputs: { min_on_time_min: 10, source_min_btu: 60000, zone_min_load_btu: 0, delta_t_f: 20, pipe_id_in: 1.5, loop_length_ft: 200 } };
 function _v623renderBufferTankLoopCredit(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A sizing aid, not the manufacturer's data; the equipment minimum-cycle data and the manufacturer govern. Citation: ASHRAE / Idronics (Caleffi) anti-short-cycle buffer-tank practice, by name. V_gross = on_time x (source_min - zone_load) / (500 x delta_T); loop_gal = 0.0408 x d^2 x L; V_net = max(0, V_gross - loop_gal). The loop credit is valid only for water fully coupled to the buffer (a common primary loop); the 500 factor is for water (adjust for glycol); existing distribution-piping water may cover part or all of the requirement.";
-  const t = makeNumber("Minimum on-time (min)", "btlc-t", { step: "any", min: "0", value: "10" }); t.input.value = "10";
-  const qMin = makeNumber("Source minimum output (Btu/hr)", "btlc-qmin", { step: "any", min: "0", value: "60000" }); qMin.input.value = "60000";
-  const qLoad = makeNumber("Minimum simultaneous zone load (Btu/hr, 0 = worst case)", "btlc-qload", { step: "any", min: "0", value: "0" }); qLoad.input.value = "0";
-  const dt = makeNumber("Allowable temperature swing (°F)", "btlc-dt", { step: "any", min: "0", value: "20" }); dt.input.value = "20";
-  const d = makeNumber("Loop internal diameter (in)", "btlc-d", { step: "any", min: "0", value: "1.5" }); d.input.value = "1.5";
-  const L = makeNumber("Loop developed length (ft)", "btlc-l", { step: "any", min: "0", value: "200" }); L.input.value = "200";
+  const t = makeNumber("Minimum on-time (min)", "btlc-t", { step: "any", min: "0" });
+  const qMin = makeNumber("Source minimum output (Btu/hr)", "btlc-qmin", { step: "any", min: "0" });
+  const qLoad = makeNumber("Minimum simultaneous zone load (Btu/hr, 0 = worst case)", "btlc-qload", { step: "any", min: "0" });
+  const dt = makeNumber("Allowable temperature swing (°F)", "btlc-dt", { step: "any", min: "0" });
+  const d = makeNumber("Loop internal diameter (in)", "btlc-d", { step: "any", min: "0" });
+  const L = makeNumber("Loop developed length (ft)", "btlc-l", { step: "any", min: "0" });
   for (const f of [t, qMin, qLoad, dt, d, L]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { t.input.value = "10"; qMin.input.value = "60000"; qLoad.input.value = "0"; dt.input.value = "20"; d.input.value = "1.5"; L.input.value = "200"; update(); });
   const oGross = makeOutputLine(outputRegion, "Gross buffer required", "btlc-out-gross");
@@ -1439,16 +1439,11 @@ export const outdoorResetRatioExample = { inputs: { supply_design_f: 180, supply
 
 function _v915renderOutdoorResetRatio(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: outdoor reset curve by name. reset ratio = (design supply - min supply) / (no-heat OA - design OA); supply target = min supply + ratio x (no-heat OA - current OA), clamped to the min/design supply. The control manual and the building heat loss govern.";
-  const sd = makeNumber("Design supply temp (F, at design OA)", "orr-sd", { step: "any", value: "180" });
-  sd.input.value = "180";
-  const sm = makeNumber("Minimum supply temp (F, at no-heat OA)", "orr-sm", { step: "any", value: "80" });
-  sm.input.value = "80";
-  const od = makeNumber("Design outdoor temp (°F)", "orr-od", { step: "any", value: "0" });
-  od.input.value = "0";
-  const on = makeNumber("No-heat outdoor temp (°F)", "orr-on", { step: "any", value: "65" });
-  on.input.value = "65";
-  const oc = makeNumber("Current outdoor temp (°F)", "orr-oc", { step: "any", value: "30" });
-  oc.input.value = "30";
+  const sd = makeNumber("Design supply temp (F, at design OA)", "orr-sd", { step: "any" });
+  const sm = makeNumber("Minimum supply temp (F, at no-heat OA)", "orr-sm", { step: "any" });
+  const od = makeNumber("Design outdoor temp (°F)", "orr-od", { step: "any" });
+  const on = makeNumber("No-heat outdoor temp (°F)", "orr-on", { step: "any" });
+  const oc = makeNumber("Current outdoor temp (°F)", "orr-oc", { step: "any" });
   for (const f of [sd, sm, od, on, oc]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { sd.input.value = "180"; sm.input.value = "80"; od.input.value = "0"; on.input.value = "65"; oc.input.value = "30"; update(); });
   const oRatio = makeOutputLine(outputRegion, "Reset ratio", "orr-out-r");
@@ -1491,14 +1486,10 @@ export const hydronicInjectionMixingExample = { inputs: { secondary_gpm: 10, sec
 
 function _v956renderHydronicInjectionMixing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: hydronic injection-mixing loop flow (primary/secondary energy balance), by name. injection gpm = secondary gpm x (secondary supply - secondary return) / (primary supply - secondary return). Sizes the injection flow; a variable-speed injection pump or modulating valve, boiler protection, and the heat loss govern the design.";
-  const sg = makeNumber("Secondary loop flow (gpm)", "him-sg", { step: "any", min: "0", value: "10" });
-  sg.input.value = "10";
-  const ss = makeNumber("Secondary supply temp (°F)", "him-ss", { step: "any", value: "110" });
-  ss.input.value = "110";
-  const sr = makeNumber("Secondary return temp (°F)", "him-sr", { step: "any", value: "90" });
-  sr.input.value = "90";
-  const ps = makeNumber("Primary supply temp (°F)", "him-ps", { step: "any", value: "180" });
-  ps.input.value = "180";
+  const sg = makeNumber("Secondary loop flow (gpm)", "him-sg", { step: "any", min: "0" });
+  const ss = makeNumber("Secondary supply temp (°F)", "him-ss", { step: "any" });
+  const sr = makeNumber("Secondary return temp (°F)", "him-sr", { step: "any" });
+  const ps = makeNumber("Primary supply temp (°F)", "him-ps", { step: "any" });
   for (const f of [sg, ss, sr, ps]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { sg.input.value = "10"; ss.input.value = "110"; sr.input.value = "90"; ps.input.value = "180"; update(); });
   const oI = makeOutputLine(outputRegion, "Injection flow", "him-out-i");
@@ -1537,10 +1528,8 @@ export const valveAuthorityExample = { inputs: { valve_pressure_drop_psi: 5, con
 
 function _v980renderValveAuthority(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: control valve authority (beta), by name. authority = valve open pressure drop / total drop across the variable branch (valve + coil/variable piping). Target beta >= 0.5 for a near-linear installed characteristic; below 0.25 is poor (resize the valve smaller). Separate from Cv flow sizing (valve-flow-coefficient). The design pressures, valve trim, and engineer/balancer govern.";
-  const vd = makeNumber("Valve pressure drop, fully open (psi)", "va-vd", { step: "any", min: "0", value: "5" });
-  vd.input.value = "5";
-  const cd = makeNumber("Coil + variable piping drop (psi)", "va-cd", { step: "any", min: "0", value: "3" });
-  cd.input.value = "3";
+  const vd = makeNumber("Valve pressure drop, fully open (psi)", "va-vd", { step: "any", min: "0" });
+  const cd = makeNumber("Coil + variable piping drop (psi)", "va-cd", { step: "any", min: "0" });
   for (const f of [vd, cd]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { vd.input.value = "5"; cd.input.value = "3"; update(); });
   const oA = makeOutputLine(outputRegion, "Valve authority (beta)", "va-out-a");

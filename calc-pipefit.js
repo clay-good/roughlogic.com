@@ -994,10 +994,10 @@ export function computeSteamPrvNapier({ orifice_area_in2 = 0, upstream_p_psia = 
 export const steamPrvNapierExample = { inputs: { orifice_area_in2: 0.5, upstream_p_psia: 100, downstream_p_psia: 30, discharge_coeff: 0.9 } };
 function _renderSteamPrvNapier(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A sizing aid, not a relief-valve certification; ASME/API and the valve manufacturer govern. Citation: Napier's formula / ASME/API 520 / Grashof steam orifice / PRV capacity, by name. Choked when P2 < 0.58 x P1; capacity W = 51.43 x Cd x A x P1 (saturated, choked). When choked the capacity depends only on the upstream pressure. Napier is for saturated steam (superheat needs a Ksh factor); a liquid Cv (square-root in pressure drop) is wrong for choked steam, which is linear in P1. Apply the discharge coefficient (~0.6 sharp orifice, ~1 nozzle).";
-  const A = makeNumber("Orifice / seat area (in²)", "spn-a", { step: "any", min: "0", value: "0.5" }); A.input.value = "0.5";
-  const P1 = makeNumber("Upstream absolute pressure (psia)", "spn-p1", { step: "any", min: "0", value: "100" }); P1.input.value = "100";
-  const P2 = makeNumber("Downstream absolute pressure (psia)", "spn-p2", { step: "any", min: "0", value: "30" }); P2.input.value = "30";
-  const Cd = makeNumber("Discharge coefficient Cd (~0.6 orifice, ~1 nozzle)", "spn-cd", { step: "any", min: "0", max: "1", value: "0.9" }); Cd.input.value = "0.9";
+  const A = makeNumber("Orifice / seat area (in²)", "spn-a", { step: "any", min: "0" });
+  const P1 = makeNumber("Upstream absolute pressure (psia)", "spn-p1", { step: "any", min: "0" });
+  const P2 = makeNumber("Downstream absolute pressure (psia)", "spn-p2", { step: "any", min: "0" });
+  const Cd = makeNumber("Discharge coefficient Cd (~0.6 orifice, ~1 nozzle)", "spn-cd", { step: "any", min: "0", max: "1" });
   for (const f of [A, P1, P2, Cd]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { A.input.value = "0.5"; P1.input.value = "100"; P2.input.value = "30"; Cd.input.value = "0.9"; update(); });
   const oChoke = makeOutputLine(outputRegion, "Flow regime", "spn-out-choke");
@@ -1039,9 +1039,9 @@ export function computeSteamPrvAreaForCapacity({ required_capacity_lb_hr = 0, up
 export const steamPrvAreaForCapacityExample = { inputs: { required_capacity_lb_hr: 5000, upstream_p_psia: 100, discharge_coeff: 0.9 } };
 function _renderSteamPrvAreaForCapacity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A sizing aid, not a relief-valve certification; ASME/API and the valve manufacturer govern. Citation: Napier's formula / ASME/API 520 choked steam capacity W = 51.43 x Cd x A x P1 solved for the area: A = W / (51.43 x Cd x P1). Assumes choked flow (P2 < 0.58 x P1); round up to a standard API 526 orifice letter. Saturated steam (superheat needs Ksh); apply the discharge coefficient (~0.6 orifice, ~1 nozzle).";
-  const W = makeNumber("Required relief capacity (lb/hr)", "spa-w", { step: "any", min: "0", value: "5000" }); W.input.value = "5000";
-  const P1 = makeNumber("Upstream absolute pressure (psia)", "spa-p1", { step: "any", min: "0", value: "100" }); P1.input.value = "100";
-  const Cd = makeNumber("Discharge coefficient Cd (~0.6 orifice, ~1 nozzle)", "spa-cd", { step: "any", min: "0", max: "1", value: "0.9" }); Cd.input.value = "0.9";
+  const W = makeNumber("Required relief capacity (lb/hr)", "spa-w", { step: "any", min: "0" });
+  const P1 = makeNumber("Upstream absolute pressure (psia)", "spa-p1", { step: "any", min: "0" });
+  const Cd = makeNumber("Discharge coefficient Cd (~0.6 orifice, ~1 nozzle)", "spa-cd", { step: "any", min: "0", max: "1" });
   for (const f of [W, P1, Cd]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { W.input.value = "5000"; P1.input.value = "100"; Cd.input.value = "0.9"; update(); });
   const oA = makeOutputLine(outputRegion, "Required orifice / seat area", "spa-out-a");
@@ -1084,12 +1084,9 @@ export const steamBoilerBlowdownExample = { inputs: { steam_rate_lb_hr: 10000, f
 
 function _v954renderSteamBoilerBlowdown(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: steam boiler surface blowdown by TDS mass balance (cycles of concentration), by name. CoC = boiler-water TDS limit / feedwater TDS; blowdown rate = steam rate x FW_TDS / (BW_limit - FW_TDS); blowdown % of feedwater = 1/CoC. Steam assumed TDS-free. The ASME / manufacturer TDS limits and the water-treatment program and a licensed operator govern.";
-  const sr = makeNumber("Steam rate (lb/hr)", "sbb-sr", { step: "any", min: "0", value: "10000" });
-  sr.input.value = "10000";
-  const fw = makeNumber("Feedwater TDS (ppm)", "sbb-fw", { step: "any", min: "0", value: "100" });
-  fw.input.value = "100";
-  const bw = makeNumber("Max boiler-water TDS (ppm)", "sbb-bw", { step: "any", min: "0", value: "3500" });
-  bw.input.value = "3500";
+  const sr = makeNumber("Steam rate (lb/hr)", "sbb-sr", { step: "any", min: "0" });
+  const fw = makeNumber("Feedwater TDS (ppm)", "sbb-fw", { step: "any", min: "0" });
+  const bw = makeNumber("Max boiler-water TDS (ppm)", "sbb-bw", { step: "any", min: "0" });
   for (const f of [sr, fw, bw]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { sr.input.value = "10000"; fw.input.value = "100"; bw.input.value = "3500"; update(); });
   const oC = makeOutputLine(outputRegion, "Cycles of concentration", "sbb-out-c");
@@ -1131,12 +1128,9 @@ export const radiatorEdrOutputExample = { inputs: { edr_sqft: 320, system_k: 240
 
 function _v990renderRadiatorEdrOutput(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: radiator EDR to heat output, Hydronics Institute / I=B=R basis, by name. Q = EDR x k; k = 240 BTU/hr per sq ft (steam, 215 F / 70 F room), 150 (hot water, 170 F avg). Gross boiler = net x (1 + pickup); I=B=R pickup ~0.33 steam, ~0.15 hot water; select by NET rating. The radiator EDR, the real piping/pickup, and the boiler's I=B=R rating govern.";
-  const ed = makeNumber("Connected EDR (sq ft)", "red-ed", { step: "any", min: "0", value: "320" });
-  ed.input.value = "320";
-  const sk = makeNumber("EDR constant (240 steam, 150 hot water)", "red-sk", { step: "any", min: "0", value: "240" });
-  sk.input.value = "240";
-  const pf = makeNumber("Boiler pickup factor (0.33 steam, 0.15 HW)", "red-pf", { step: "any", min: "0", value: "0.33" });
-  pf.input.value = "0.33";
+  const ed = makeNumber("Connected EDR (sq ft)", "red-ed", { step: "any", min: "0" });
+  const sk = makeNumber("EDR constant (240 steam, 150 hot water)", "red-sk", { step: "any", min: "0" });
+  const pf = makeNumber("Boiler pickup factor (0.33 steam, 0.15 HW)", "red-pf", { step: "any", min: "0" });
   for (const f of [ed, sk, pf]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ed.input.value = "320"; sk.input.value = "240"; pf.input.value = "0.33"; update(); });
   const oH = makeOutputLine(outputRegion, "Radiator heat output", "red-out-h");
