@@ -277,9 +277,40 @@ test("outputLabels reads a declarative renderer's formatter, not its display id"
   assert.equal(st.bags, "Plaster bags");
 });
 
+// The formatter names a line's answers; a key it only TESTS picks the wording.
+test("outputLabels skips a key the output line only tests", async () => {
+  const { outputLabels } = await import("../../mcp/catalog.mjs");
+  // `(r.heating ? "heating: " : "") + fmt(r.q_btuh, 0) + " Btu/hr"` -- the flag
+  // in front chooses a word, so the caption belongs to the number behind it.
+  const cc = await outputLabels("cooling-coil-total-load");
+  assert.equal(cc.q_btuh, "Total coil load");
+  assert.equal(cc.heating, undefined, "a flag that only picks wording is not an answer");
+  // `(r.clamped ? " (clamped to 0)" : "")` trails rather than leads; same rule.
+  const hp = await outputLabels("heat-pump-cold-capacity");
+  assert.equal(hp.cap_design, "Delivered capacity at design");
+  assert.equal(hp.aux_kw, "Auxiliary heat needed");
+});
+
+// "Verdict" is the name of a conclusion. Over the one key a line reports, that
+// is exactly right; over a number carried along inside a sentence, it names
+// something the reader cannot see.
+test("outputLabels keeps a conclusion caption only where the line has one subject", async () => {
+  const { outputLabels } = await import("../../mcp/catalog.mjs");
+  // `(r) => r.all_pass ? "PASS" : "FAIL"` -- the verdict IS the answer.
+  const gh = await outputLabels("guard-handrail-check");
+  assert.equal(gh.all_pass, "Verdict");
+  // `"FAILS: " + [... "area by " + fmt(r.area_deficit_sqin, 0) ...]` -- the
+  // caption is for the sentence, not for the shortfall inside it.
+  const ew = await outputLabels("egress-window-check");
+  assert.equal(ew.area_deficit_sqin, undefined, "a verdict caption does not name a number it mentions");
+  const ff = await outputLabels("fireplace-flue-area");
+  assert.equal(ff.surplus_sqin, undefined);
+  assert.equal(ff.required_area_sqin, "Required net flue area", "the quantity lines still name their key");
+});
+
 // A ratchet, not a target: the share of worked-example answer rows that print
 // a name instead of a bare API key. Reading the formatters took it from 1,942
-// to 2,870 of 4,844 rows. It may only go up.
+// to 2,989 of 4,844 rows. It may only go up.
 test("worked-example answer rows are named, not keyed", async () => {
   const { outputLabels } = await import("../../mcp/catalog.mjs");
   const { readFile } = await import("node:fs/promises");
@@ -293,5 +324,5 @@ test("worked-example answer rows are named, not keyed", async () => {
     const labels = await outputLabels(row.tile_id);
     for (const k of Object.keys(row.outputs || {})) { total += 1; if (labels[k]) named += 1; }
   }
-  assert.ok(named >= 2870, `named answer rows fell to ${named} of ${total}; the floor is 2,870`);
+  assert.ok(named >= 2989, `named answer rows fell to ${named} of ${total}; the floor is 2,989`);
 });

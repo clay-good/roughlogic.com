@@ -433,29 +433,50 @@ export async function inputLabels(id) {
 
 // Which compute result key a schema output descriptor actually captions.
 //
-// A declarative renderer's `outputs[].key` is the id of a DISPLAY LINE ("v",
-// "h"), not a result key, so taking it at face value names almost nothing --
-// and occasionally names the wrong thing. The honest source is the line's own
-// formatter, `value: (r) => fmt(r.tank_volume_gal, 0) + " gal"`, which says in
-// its body exactly which result the caption sits above.
+// A declarative renderer describes each output line by its DISPLAY id ("v",
+// "cf"), not by a result key, so taking that id at face value names almost
+// nothing -- and once named the wrong number. The honest source is the line's
+// own formatter, `value: (r) => fmt(r.tank_volume_gal, 0) + " gal"`, which says
+// which result the caption sits above.
 //
-// Two shapes are trusted, and only those two:
-//   - the line shows ONE result, so the caption can only belong to it;
-//   - the line shows several ("12 x 8 = 96 panels") but the author's own
-//     display id repeats the leading key, which is them naming it.
-// A multi-value line with an unconfirmed id is captioned for the whole line
-// rather than any one number ("Panel grid" is not the name of `panels_l`), so
-// it names nothing. Schemas written by hand carry no formatter; there the key
-// IS the result key, and it is used as-is.
-function schemaOutputKey(o) {
+// A key the formatter only TESTS -- `r.heating ? "heating: " : ""` -- picks the
+// wording rather than reporting a number, so it is not one of the line's
+// answers. Dropping those is what lets "Total coil load" reach `q_btuh` instead
+// of stopping at the `heating` flag in front of it.
+const COND_REF = /(!\s*)?\br\.([A-Za-z_$][\w$]*)\s*(\?|===|!==|==|!=|>=|<=|>|<|&&|\|\|)?/g;
+
+// A caption that is a bare judgment ("Verdict", "Check") or a question is the
+// name of a conclusion. Where the line reports one thing that IS the
+// conclusion, that is exactly right -- "Verdict PASS". Where the line states
+// the conclusion in words and carries a number along inside the sentence
+// ("FAILS: area by 3 sq in"), the caption belongs to the sentence, and putting
+// it over the 3 names something the reader cannot see.
+const NOT_A_QUANTITY = new Set(["verdict", "status", "check", "result", "count", "note"]);
+
+function schemaOutputKey(o, label) {
   if (typeof o.format !== "function") return o.key || null;
-  const refs = [...new Set([...o.format.toString().matchAll(/\br\.([A-Za-z_$][\w$]*)/g)].map((m) => m[1]))]
+  const src = o.format.toString();
+  const all = [], shown = [];
+  for (const m of src.matchAll(COND_REF)) {
+    const [, negated, key, operator] = m;
     // `r.error` / `r.message` is the failure branch borrowing a line whose
     // caption belongs to the value it shows when things go right.
-    .filter((k) => k !== "error" && k !== "message");
-  if (refs.length === 0) return null;
-  if (refs.length > 1 && o.key !== refs[0]) return null;
-  return refs[0];
+    if (key === "error" || key === "message") continue;
+    if (!all.includes(key)) all.push(key);
+    if (negated || operator) continue;
+    if (!shown.includes(key)) shown.push(key);
+  }
+  // A conclusion-caption is only trustworthy when the line has one subject.
+  if (all.length > 1 && (label.endsWith("?") || NOT_A_QUANTITY.has(label.toLowerCase()))) return null;
+  // One number, one caption. A line that reports a single key as words
+  // (`r.pass ? "PASS" : "FAIL"`) tests it and shows nothing else, so that key
+  // is still what the caption is about.
+  if (shown.length === 1) return shown[0];
+  if (shown.length === 0) return all.length === 1 ? all[0] : null;
+  // Several answers on one line ("12 x 8 = 96 panels"): the caption belongs to
+  // the whole line unless the author's own display id repeats the value it
+  // leads with, which is them naming it.
+  return o.key === shown[0] ? shown[0] : null;
 }
 
 // The answer-side counterpart of inputLabels: the caption the calculator prints
@@ -474,9 +495,9 @@ export async function outputLabels(id) {
       const claimed = new Map();
       for (const o of schema.outputs) {
         if (!o || typeof o.label !== "string" || !o.label.trim()) continue;
-        const key = schemaOutputKey(o);
-        if (!key) continue;
         const label = o.label.trim();
+        const key = schemaOutputKey(o, label);
+        if (!key) continue;
         // Two lines writing the same result disagree about what it is called;
         // the bare key says less than a coin flip between them.
         if (claimed.has(key)) { if (claimed.get(key) !== label) claimed.set(key, null); continue; }
