@@ -460,7 +460,7 @@ function shellHeader(depth) {
     '  <div class="header-inner">',
     `    <a class="brand" href="${prefix}" aria-label="Rough Logic home">`,
     '      <span class="wordmark">roughlogic</span>',
-    '      <span class="tagline">tools for the trade.</span>',
+    '      <span class="tagline">tools for the trades</span>',
     '    </a>',
     '  </div>',
     '</header>',
