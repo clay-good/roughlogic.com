@@ -600,9 +600,16 @@ function tileShell(tool, tools, groupNames, relatedMap, examples, labels, outLab
   // The field names `run_calculator` accepts and the result keys it returns,
   // for the rows that now print a plain-language name instead. One line, inside
   // the collapsed proof.
+  // Every field name the example exercises, on one quiet line inside the
+  // collapsed proof. This used to list only the CAPTIONED keys, on the theory
+  // that an uncaptioned row already printed its own key. It no longer does --
+  // an uncaptioned row prints the key read back as English -- so listing only
+  // the captioned ones would drop `tank_volume_gal` off the page entirely and
+  // leave an agent nothing to call the tile with.
   const namedKeys = example
-    ? [...Object.keys(example.inputs || {}).filter((k) => labels && labels[k]),
-       ...Object.keys(example.outputs || {}).filter((k) => outLabels && outLabels[k])]
+    ? [...Object.keys(example.inputs || {}), ...Object.keys(example.outputs || {})]
+        .filter((k, i, all) => all.indexOf(k) === i)
+        .filter((k) => exampleValue((example.inputs || {})[k] ?? (example.outputs || {})[k]) !== "")
     : [];
   const outputRows = example ? exampleRows(example.outputs, outLabels) : "";
   const assumptionRows = (citation && Array.isArray(citation.assumptions) ? citation.assumptions : [])
