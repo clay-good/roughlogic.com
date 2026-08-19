@@ -15,11 +15,13 @@ import { test, expect } from "@playwright/test";
 const CASES = [
   {
     name: "voltage-drop",
+    title: "Voltage Drop",
     query: "voltage drop 120v 150 ft 20 amps",
     filled: { "vd-src": "120", "vd-len": "150", "vd-cur": "20" },
   },
   {
     name: "fire-friction",
+    title: "Fire Hose Friction Loss",
     query: "friction loss 200 ft of hose at 150 gpm",
     filled: { "ff-l": "200", "ff-q": "150" },
   },
@@ -69,9 +71,13 @@ for (const c of CASES) {
     const input = page.locator("#search-input");
     await input.click();
     await input.fill(c.query);
-    // Let the lazy tools/aliases/slots/discovery loads land and the
-    // dropdown render before Enter picks the top match.
-    await expect(page.locator("#search-results .search-result").first()).toBeVisible();
+    // Enter picks whatever is ranked first AT THAT MOMENT, and the ranking
+    // keeps moving while the lazy alias / slot / discovery shards land -- so
+    // waiting for merely "a row is visible" raced, and under full-suite load
+    // this query landed on max-circuit-length-for-vd instead of voltage-drop.
+    // Wait for the row that should win to actually be the first one.
+    await expect(page.locator("#search-results .search-result").first().locator(".sr-name"))
+      .toHaveText(c.title);
     await input.press("Enter");
     await expect(page).toHaveURL(new RegExp("#" + c.name + "\\?v=1&"));
     for (const [id, value] of Object.entries(c.filled)) {
