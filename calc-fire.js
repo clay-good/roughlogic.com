@@ -1432,20 +1432,16 @@ function _v15f_renderStandpipePDP(inputRegion, outputRegion, citationEl) {
     { value: "II", label: "Class II (1.5 in)" },
     { value: "III", label: "Class III (both)" },
   ]);
-  const elev = _v15f_makeNumber("Highest outlet above pumper (ft)", "spp-elev", { step: "any", value: "110" });
-  elev.input.value = "110";
+  const elev = _v15f_makeNumber("Highest outlet above pumper (ft)", "spp-elev", { step: "any"});
   const np = _v15f_makeNumber("Required nozzle pressure (psi)", "spp-np", { step: "any", min: "0", value: "100" });
   np.input.value = "100";
-  const gpm = _v15f_makeNumber("Design flow (GPM)", "spp-gpm", { step: "any", min: "0", value: "250" });
-  gpm.input.value = "250";
+  const gpm = _v15f_makeNumber("Design flow (GPM)", "spp-gpm", { step: "any", min: "0"});
   const appl = _v15f_makeNumber("Appliance loss (psi)", "spp-appl", { step: "any", min: "0", value: "25" });
   appl.input.value = "25";
-  const slen = _v15f_makeNumber("Supply hose length (ft)", "spp-slen", { step: "any", min: "0", value: "200" });
-  slen.input.value = "200";
+  const slen = _v15f_makeNumber("Supply hose length (ft)", "spp-slen", { step: "any", min: "0"});
   const sdia = _v15f_makeSelect("Supply hose diameter", "spp-sdia", Object.keys(HOSE_FRICTION_COEFFICIENTS).map((k) => ({ value: k, label: k.replace("_in", " in") })));
   sdia.select.value = "3_in";
-  const bh = _v15f_makeNumber("Building height (ft)", "spp-bh", { step: "any", min: "0", value: "120" });
-  bh.input.value = "120";
+  const bh = _v15f_makeNumber("Building height (ft)", "spp-bh", { step: "any", min: "0"});
   for (const f of [cls, elev, np, gpm, appl, slen, sdia, bh]) inputRegion.appendChild(f.wrap);
   _v15f_attachEx(inputRegion, () => {
     cls.select.value = "I"; elev.input.value = "110"; np.input.value = "100"; gpm.input.value = "250"; appl.input.value = "25"; slen.input.value = "200"; sdia.select.value = "3_in"; bh.input.value = "120"; update();
@@ -1546,20 +1542,14 @@ export const smokeEjectorExample = {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v15f_renderSmokeEjector(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: Departmental SOPs and incident command govern all ventilation operations. Citation: per NFPA 1500 §8.5 and the IFSTA Essentials of Fire Fighting ventilation chapter. CFM = volume * ACH / 60; fans = ceil(CFM / per-fan rating). Free at usfa.fema.gov.";
-  const L = _v15f_makeNumber("Room length (ft)", "se-l", { step: "any", min: "0", value: "30" });
-  L.input.value = "30";
-  const W = _v15f_makeNumber("Room width (ft)", "se-w", { step: "any", min: "0", value: "40" });
-  W.input.value = "40";
-  const H = _v15f_makeNumber("Ceiling height (ft)", "se-h", { step: "any", min: "0", value: "10" });
-  H.input.value = "10";
+  const L = _v15f_makeNumber("Room length (ft)", "se-l", { step: "any", min: "0"});
+  const W = _v15f_makeNumber("Room width (ft)", "se-w", { step: "any", min: "0"});
+  const H = _v15f_makeNumber("Ceiling height (ft)", "se-h", { step: "any", min: "0"});
   const ach = _v15f_makeNumber("Target air changes per hour", "se-ach", { step: "any", min: "0", value: "5" });
   ach.input.value = "5";
-  const fan = _v15f_makeNumber("Ejector fan CFM rating", "se-fan", { step: "any", min: "0", value: "4000" });
-  fan.input.value = "4000";
-  const ex = _v15f_makeNumber("Exhaust opening (ft^2)", "se-ex", { step: "any", min: "0", value: "12" });
-  ex.input.value = "12";
-  const en = _v15f_makeNumber("Entry opening (ft^2)", "se-en", { step: "any", min: "0", value: "10" });
-  en.input.value = "10";
+  const fan = _v15f_makeNumber("Ejector fan CFM rating", "se-fan", { step: "any", min: "0"});
+  const ex = _v15f_makeNumber("Exhaust opening (ft^2)", "se-ex", { step: "any", min: "0"});
+  const en = _v15f_makeNumber("Entry opening (ft^2)", "se-en", { step: "any", min: "0"});
   for (const f of [L, W, H, ach, fan, ex, en]) inputRegion.appendChild(f.wrap);
   _v15f_attachEx(inputRegion, () => {
     L.input.value = "30"; W.input.value = "40"; H.input.value = "10"; ach.input.value = "5"; fan.input.value = "4000"; ex.input.value = "12"; en.input.value = "10"; update();

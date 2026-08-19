@@ -6155,12 +6155,9 @@ function _v1109renderMwbcVoltageDrop(inputRegion, outputRegion, citationEl) {
     { value: "copper", label: "Copper" }, { value: "aluminum", label: "Aluminum" },
   ]);
   mt.select.value = "copper";
-  const ln = makeNumber("One-way circuit length (ft)", "mwbc-len", { step: "any", min: "0", value: "100" });
-  ln.input.value = "100";
-  const la = makeNumber("Leg A load (A)", "mwbc-la", { step: "any", min: "0", value: "16" });
-  la.input.value = "16";
-  const lb = makeNumber("Leg B load (A)", "mwbc-lb", { step: "any", min: "0", value: "4" });
-  lb.input.value = "4";
+  const ln = makeNumber("One-way circuit length (ft)", "mwbc-len", { step: "any", min: "0"});
+  const la = makeNumber("Leg A load (A)", "mwbc-la", { step: "any", min: "0"});
+  const lb = makeNumber("Leg B load (A)", "mwbc-lb", { step: "any", min: "0"});
   const sv = makeNumber("Source volts, line to neutral", "mwbc-sv", { step: "any", min: "0", value: "120" });
   sv.input.value = "120";
   const tc = makeNumber("Conductor temperature (°C)", "mwbc-tc", { step: "any", value: "75" });
@@ -6225,8 +6222,7 @@ export const egcParallelRacewaysExample = { inputs: { ocpd_A: 400, raceway_count
 
 function _v1111renderEgcParallelRaceways(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 250.122(F), equipment grounding conductors for conductors in parallel, by section number. Where circuit conductors are paralleled in separate raceways, a full-size EGC sized from Table 250.122 to the rating of the circuit's overcurrent device is required in EACH raceway - the EGC is not divided among the parallel sets. The table lookup is delegated to this catalog's existing egc-sizing model rather than duplicated. EDITION NOTE: this is the 2023-and-earlier rule; the 2026 NEC revises 250.122(F) so the EGC in each raceway need not exceed the largest ungrounded conductor in that raceway. 250.122(B) proportional upsizing and the 250.122(A) never-larger-than-the-circuit-conductors limit still apply. The NEC as adopted and the AHJ govern.";
-  const oc = makeNumber("Overcurrent device rating (A)", "egcp-oc", { step: "any", min: "0", value: "400" });
-  oc.input.value = "400";
+  const oc = makeNumber("Overcurrent device rating (A)", "egcp-oc", { step: "any", min: "0"});
   const rc = makeNumber("Number of parallel raceways", "egcp-rc", { step: "1", min: "2", value: "2" });
   rc.input.value = "2";
   const mt = makeSelect("Conductor material", "egcp-mt", [

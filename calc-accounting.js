@@ -1627,12 +1627,12 @@ export function computeOverheadRecoveryRate({ annual_overhead = 0, basis = "per-
 export const overheadRecoveryRateExample = { inputs: { annual_overhead: 200000, basis: "per-hour", billable_hours: 8000, annual_direct: 500000, job_direct: 10000 } };
 function renderOverheadRecoveryRate(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: overhead recovery = annual overhead / billable hours ($/hr) or / annual direct cost (% markup), standard contractor cost-recovery. Every billed hour or direct dollar carries its share. The contractor's books and billable volume govern.";
-  const oh = makeNumber("Annual overhead ($)", "orr-oh", { step: "any", min: "0" }); oh.input.value = "200000";
+  const oh = makeNumber("Annual overhead ($)", "orr-oh", { step: "any", min: "0" });
   const basis = makeSelect("Recovery basis", "orr-basis", [
     { value: "per-hour", label: "Per billable hour ($/hr)" },
     { value: "markup", label: "Markup on direct cost (%)" },
   ]);
-  const bh = makeNumber("Annual billable hours", "orr-bh", { step: "any", min: "0" }); bh.input.value = "8000";
+  const bh = makeNumber("Annual billable hours", "orr-bh", { step: "any", min: "0" });
   const ad = makeNumber("Annual direct cost ($)", "orr-ad", { step: "any", min: "0" }); ad.input.value = "500000";
   const jd = makeNumber("Job direct cost ($, optional)", "orr-jd", { step: "any", min: "0" });
   inputRegion.appendChild(oh.wrap); inputRegion.appendChild(basis.wrap);

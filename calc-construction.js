@@ -3199,10 +3199,8 @@ export const headerSizingExample = {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v15c_renderHeaderSizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per IRC 2021 §R602.7 (headers). Member sized from first-principles simple-span mechanics (M = wL^2/8; sigma = M/S; delta = 5wL^4/384EI) with AWC NDS-2018 reference design values bundled per the lumber-spans tile. Jack studs from the end reaction over the NDS F_c-perp bearing. Allowable spans verified against IRC Table R602.7(1) by physics; the AHJ governs the adopted code. Free at codes.iccsafe.org and awc.org.";
-  const span = _v15c_makeNumber("Header clear span (ft)", "hdr-span", { step: "any", min: "0", value: "6" });
-  span.input.value = "6";
-  const trib = _v15c_makeNumber("Tributary width (ft; half the building width)", "hdr-trib", { step: "any", min: "0", value: "14" });
-  trib.input.value = "14";
+  const span = _v15c_makeNumber("Header clear span (ft)", "hdr-span", { step: "any", min: "0"});
+  const trib = _v15c_makeNumber("Tributary width (ft; half the building width)", "hdr-trib", { step: "any", min: "0"});
   const floors = _v15c_makeSelect("Floors supported above", "hdr-floors", [
     { value: "0", label: "Roof / ceiling only" },
     { value: "1", label: "Roof + 1 floor" },
@@ -3398,12 +3396,9 @@ export const deckBeamPostExample = {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v15c_renderDeckBeamPost(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per IRC 2021 §R507 (decks). Beam and post sized from first-principles mechanics (M = wL^2/8; L/360 deflection; NDS column C_P stability factor) with AWC NDS-2018 reference values bundled. Footing from the soil-bearing tile (IRC Table R401.4.1). Ledger fastener spacing per the public IRC Table R507.9.1.3(1). AHJ governs. Free at codes.iccsafe.org and awc.org.";
-  const joist = _v15c_makeNumber("Joist span / deck depth (ft)", "dk-joist", { step: "any", min: "0", value: "12" });
-  joist.input.value = "12";
-  const beamSpan = _v15c_makeNumber("Beam span / post spacing (ft)", "dk-beam", { step: "any", min: "0", value: "8" });
-  beamSpan.input.value = "8";
-  const postH = _v15c_makeNumber("Post height (ft)", "dk-posth", { step: "any", min: "0", value: "8" });
-  postH.input.value = "8";
+  const joist = _v15c_makeNumber("Joist span / deck depth (ft)", "dk-joist", { step: "any", min: "0"});
+  const beamSpan = _v15c_makeNumber("Beam span / post spacing (ft)", "dk-beam", { step: "any", min: "0"});
+  const postH = _v15c_makeNumber("Post height (ft)", "dk-posth", { step: "any", min: "0"});
   const live = _v15c_makeNumber("Live load (psf)", "dk-live", { step: "any", min: "0", value: "40" });
   live.input.value = "40";
   const dead = _v15c_makeNumber("Dead load (psf)", "dk-dead", { step: "any", min: "0", value: "10" });
@@ -3587,10 +3582,8 @@ export const pointLoadBearingExample = { inputs: { load_lb: 4000, width_in: 3.0,
 
 function renderPointLoadBearing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per the National Design Specification (NDS) for Wood Construction - compression perpendicular to grain and the bearing-area factor Cb, by name; Fc-perp values user-supplied by species/grade. The IBC-adopted NDS edition governs. AWC publishes the NDS free read-only at awc.org.";
-  const p = makeNumber("Reaction load (lb)", "plb-p", { step: "any", min: "0", value: "4000" });
-  p.input.value = "4000";
-  const w = makeNumber("Member bearing width (in)", "plb-w", { step: "any", min: "0", value: "3.0" });
-  w.input.value = "3.0";
+  const p = makeNumber("Reaction load (lb)", "plb-p", { step: "any", min: "0"});
+  const w = makeNumber("Member bearing width (in)", "plb-w", { step: "any", min: "0"});
   const fc = makeNumber("Allowable Fc-perp (psi)", "plb-fc", { step: "any", min: "0", value: "625" });
   fc.input.value = "625";
   const cb = makeNumber("Bearing-area factor Cb", "plb-cb", { step: "any", min: "0", value: "1" });
@@ -6068,9 +6061,9 @@ const _renderConcreteMaturity = _simpleRenderer({
   fields: [
     { key: "concrete_temp_f", label: "Average concrete temperature (°F)", kind: "number", attrs: { step: "any" } },
     { key: "hours", label: "Elapsed curing time (hours)", kind: "number", attrs: { step: "any" } },
-    { key: "datum_f", label: "Datum temperature T0 (°F)", kind: "number", default: 32, attrs: { step: "any" } },
+    { key: "datum_f", label: "Datum temperature T0 (°F)", kind: "number", attrs: { step: "any" } },
     { key: "q_kelvin", label: "Arrhenius constant Q (K)", kind: "number" },
-    { key: "ref_temp_f", label: "Reference temperature Tr (°F)", kind: "number", default: 68, attrs: { step: "any" } },
+    { key: "ref_temp_f", label: "Reference temperature Tr (°F)", kind: "number", attrs: { step: "any" } },
     { key: "target_ttf_c", label: "Target TTF (°C-hr, 0 = none)", kind: "number" },
   ],
   outputs: [

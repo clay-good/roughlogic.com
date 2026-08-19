@@ -191,7 +191,7 @@ ELECDESIGN_RENDERERS["point-illuminance"] = _simpleRenderer({
   fields: [
     { key: "intensity_cd", label: "Luminous intensity toward point (candela)", kind: "number" },
     { key: "mount_height_ft", label: "Mounting height above work plane (ft)", kind: "number" },
-    { key: "angle_deg", label: "Angle from straight-down / nadir (deg)", kind: "number", attrs: { step: "any", min: "0", max: "89.9" }, default: 0 },
+    { key: "angle_deg", label: "Angle from straight-down / nadir (deg)", kind: "number", attrs: { step: "any", min: "0", max: "89.9" } },
   ],
   outputs: [
     { key: "e", id: "pi-out-e", label: "Horizontal illuminance", value: (r) => fmt(r.e_fc, 2) + " fc (" + fmt(r.e_lux, 1) + " lux)" },
@@ -231,7 +231,7 @@ ELECDESIGN_RENDERERS["luminaire-height-for-illuminance"] = _simpleRenderer({
   fields: [
     { key: "intensity_cd", label: "Luminous intensity toward point (candela)", kind: "number" },
     { key: "target_fc", label: "Target horizontal illuminance (fc)", kind: "number" },
-    { key: "angle_deg", label: "Angle from straight-down / nadir (deg)", kind: "number", attrs: { step: "any", min: "0", max: "89.9" }, default: 0 },
+    { key: "angle_deg", label: "Angle from straight-down / nadir (deg)", kind: "number", attrs: { step: "any", min: "0", max: "89.9" } },
   ],
   outputs: [
     { key: "h", id: "lhi-out-h", label: "Mounting height above work plane", value: (r) => fmt(r.mount_height_ft, 2) + " ft" },
@@ -270,7 +270,7 @@ ELECDESIGN_RENDERERS["point-method-required-candela"] = _simpleRenderer({
     { key: "target_illuminance", label: "Target illuminance at the point", kind: "number" },
     { key: "illuminance_unit", label: "Unit", kind: "select", options: [{ value: "fc", label: "Footcandles (fc)" }, { value: "lux", label: "Lux" }] },
     { key: "mount_height_ft", label: "Mounting height above work plane (ft)", kind: "number" },
-    { key: "angle_deg", label: "Angle from straight-down / nadir (deg)", kind: "number", attrs: { step: "any", min: "0", max: "89.9" }, default: 0 },
+    { key: "angle_deg", label: "Angle from straight-down / nadir (deg)", kind: "number", attrs: { step: "any", min: "0", max: "89.9" } },
   ],
   outputs: [
     { key: "i", id: "pmrc-out-i", label: "Required intensity toward point", value: (r) => fmt(r.required_cd, 0) + " cd" },

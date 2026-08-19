@@ -3426,15 +3426,15 @@ AGRICULTURE_RENDERERS["reference-et0"] = _r({
   citation: "Citation: Hargreaves reference ET (Hargreaves & Samani 1985) as presented in FAO Irrigation & Drainage Paper 56 (Allen et al. 1998), by name: ET0 = 0.0023 (Tmean + 17.8) sqrt(Tmax - Tmin) Ra; extraterrestrial radiation Ra from the FAO-56 Annex 2 astronomical equations by latitude and day of year. Free at fao.org. A local station ET0 and the full Penman-Monteith method govern when full climate data exist.",
   example: referenceEt0Example.inputs,
   fields: [
-    { key: "latitude_deg", label: "Latitude (deg, + north / - south)", kind: "number", default: 45, attrs: { step: "any" } },
+    { key: "latitude_deg", label: "Latitude (deg, + north / - south)", kind: "number", attrs: { step: "any" } },
     { key: "month", label: "Month", kind: "select", default: "jul", options: [
       { value: "jan", label: "January" }, { value: "feb", label: "February" }, { value: "mar", label: "March" },
       { value: "apr", label: "April" }, { value: "may", label: "May" }, { value: "jun", label: "June" },
       { value: "jul", label: "July" }, { value: "aug", label: "August" }, { value: "sep", label: "September" },
       { value: "oct", label: "October" }, { value: "nov", label: "November" }, { value: "dec", label: "December" },
     ] },
-    { key: "tmax_f", label: "Daily high Tmax (°F)", kind: "number", default: 86, attrs: { step: "any" } },
-    { key: "tmin_f", label: "Daily low Tmin (°F)", kind: "number", default: 59, attrs: { step: "any" } },
+    { key: "tmax_f", label: "Daily high Tmax (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "tmin_f", label: "Daily low Tmin (°F)", kind: "number", attrs: { step: "any" } },
   ],
   outputs: [
     { key: "e", id: "et0-out-e", label: "Reference ET0", value: (r) => fmt(r.et0_in_day, 3) + " in/day (" + fmt(r.et0_mm_day, 2) + " mm/day)" },

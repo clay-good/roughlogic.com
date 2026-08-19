@@ -1389,8 +1389,8 @@ const renderMassLawTL = _r({
   citation: "Citation: field-incidence limp-mass law TL = 20 log10(m f) - 47 dB (normal incidence - 42), m the surface mass in kg/m^2 and f in Hz; +6 dB per doubling of mass or frequency (first-principles panel acoustics, Bies & Hansen / FHWA highway-noise guidance). Surface mass entered in lb/ft^2, converted at 1 lb/ft^2 = 4.88243 kg/m^2. Idealized mass law only -- excludes the coincidence dip, stiffness region, and flanking, and is not the ASTM E413 STC rating; the acoustician governs.",
   example: massLawTLExample.inputs,
   fields: [
-    { key: "surface_mass_psf", label: "Surface mass (lb/ft²; 1/2in gypsum ~2.0)", kind: "number", attrs: { step: "any", min: "0" }, default: 2.0 },
-    { key: "frequency_hz", label: "Frequency (Hz)", kind: "number", attrs: { step: "any", min: "0" }, default: 500 },
+    { key: "surface_mass_psf", label: "Surface mass (lb/ft²; 1/2in gypsum ~2.0)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "frequency_hz", label: "Frequency (Hz)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "incidence", label: "Incidence", kind: "select", options: [{ value: "field", label: "Field / random (-47)" }, { value: "normal", label: "Normal (-42)" }] },
   ],
   outputs: [
@@ -1428,7 +1428,7 @@ const renderSpeedOfSoundAir = _r({
   citation: "Citation: speed of sound in dry air c = 331.3 sqrt(1 + T_C/273.15) m/s, from c = sqrt(gamma R T / M) (kinetic theory; NIST), converted to ft/s (x 3.28084); propagation delay = 1000/c ms per foot. 1,126 ft/s at 68 F, the ~1,130 ft/s rule of thumb. Dry air; humidity is a small second-order correction. A first-principles aid; the system tuning governs.",
   example: speedOfSoundAirExample.inputs,
   fields: [
-    { key: "temperature_f", label: "Air temperature (°F)", kind: "number", attrs: { step: "any" }, default: 68 },
+    { key: "temperature_f", label: "Air temperature (°F)", kind: "number", attrs: { step: "any" } },
   ],
   outputs: [
     { key: "ft", id: "sos-out-ft", label: "Speed of sound", value: (r) => fmt(r.speed_ftps, 1) + " ft/s (" + fmt(r.speed_mps, 1) + " m/s)" },
@@ -1466,7 +1466,7 @@ const renderRoomAbsorptionTarget = _r({
     { key: "volume_ft3", label: "Room volume (ft³)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "target_rt60_s", label: "Target RT60 (s)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "existing_sabins", label: "Existing absorption (sabins, 0 = none)", kind: "number", default: 0, attrs: { step: "any", min: "0" } },
-    { key: "sabine_coeff", label: "Sabine coefficient (default 0.049)", kind: "number", default: 0.049, attrs: { step: "any", min: "0" } },
+    { key: "sabine_coeff", label: "Sabine coefficient (default 0.049)", kind: "number", attrs: { step: "any", min: "0" } },
   ],
   outputs: [
     { key: "req", id: "rat-out-req", label: "Total absorption required", value: (r) => fmt(r.required_sabins, 0) + " sabins" },

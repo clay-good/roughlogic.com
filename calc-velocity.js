@@ -99,12 +99,9 @@ export const refrigerantVelocityExample = { inputs: { mass_flow_lb_hr: 600, line
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderRefrigerantVelocity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per the ASHRAE Refrigeration Handbook line-sizing and oil-return guidance, by name. Refrigerant specific volume at the line condition is user-supplied. Estimate; manufacturer line-sizing tables govern.";
-  const mf = _v23h_makeNumber("Mass flow (lb/hr)", "rv-mf", { step: "any", min: "0", value: "600" });
-  mf.input.value = "600";
-  const id = _v23h_makeNumber("Line inside diameter (in)", "rv-id", { step: "any", min: "0", value: "0.75" });
-  id.input.value = "0.75";
-  const sv = _v23h_makeNumber("Specific volume (ft^3/lb)", "rv-sv", { step: "any", min: "0", value: "0.5" });
-  sv.input.value = "0.5";
+  const mf = _v23h_makeNumber("Mass flow (lb/hr)", "rv-mf", { step: "any", min: "0"});
+  const id = _v23h_makeNumber("Line inside diameter (in)", "rv-id", { step: "any", min: "0"});
+  const sv = _v23h_makeNumber("Specific volume (ft^3/lb)", "rv-sv", { step: "any", min: "0"});
   const orient = _v23h_makeSelect("Orientation", "rv-or", [
     { value: "horizontal", label: "Horizontal", selected: true },
     { value: "riser", label: "Suction riser (higher minimum)" },
@@ -149,10 +146,8 @@ export const refrigerantLineSizeExample = { inputs: { mass_flow_lb_hr: 600, spec
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderRefrigerantLineSize(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per the ASHRAE Refrigeration Handbook line-sizing and oil-return guidance, by name (the velocity relation solved for the line ID). Refrigerant specific volume at the line condition is user-supplied. Estimate; manufacturer line-sizing tables govern.";
-  const mf = _v23h_makeNumber("Mass flow (lb/hr)", "rls-mf", { step: "any", min: "0", value: "600" });
-  mf.input.value = "600";
-  const sv = _v23h_makeNumber("Specific volume (ft^3/lb)", "rls-sv", { step: "any", min: "0", value: "0.5" });
-  sv.input.value = "0.5";
+  const mf = _v23h_makeNumber("Mass flow (lb/hr)", "rls-mf", { step: "any", min: "0"});
+  const sv = _v23h_makeNumber("Specific volume (ft^3/lb)", "rls-sv", { step: "any", min: "0"});
   const orient = _v23h_makeSelect("Oil-return minimum", "rls-or", [
     { value: "1500", label: "Suction riser (~1500 fpm)", selected: true },
     { value: "700", label: "Horizontal (~700 fpm)" },

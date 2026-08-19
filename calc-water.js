@@ -1276,9 +1276,9 @@ export const chlorineDecayExample = {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v16w_renderChlorineDecay(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: first-order decay C(t) = C0 x exp(-k x t); time to target = ln(C0 / target) / k; booster distance = velocity x time-to-target (when a distribution velocity is entered). Per EPA 815-R-02-020 (Effects of Water Age on Distribution System Water Quality) and AWWA M14. EPA 40 CFR 141.74 governs the residual at the extremity. Free at epa.gov and awwa.org.";
-  const c0 = makeNumber("Initial free chlorine (mg/L)", "cd-c0", { step: "any", min: "0", value: "2.0" });
+  const c0 = makeNumber("Initial free chlorine (mg/L)", "cd-c0", { step: "any", min: "0"});
   const k = makeNumber("Decay-rate constant k (1/hr)", "cd-k", { step: "any", min: "0", value: "0.1" });
-  const t = makeNumber("Elapsed time (hr)", "cd-t", { step: "any", min: "0", value: "10" });
+  const t = makeNumber("Elapsed time (hr)", "cd-t", { step: "any", min: "0"});
   const target = makeNumber("Target residual (mg/L)", "cd-target", { step: "any", min: "0", value: "0.2" });
   const vel = makeNumber("Distribution velocity (ft/s, optional)", "cd-vel", { step: "any", min: "0" });
   for (const f of [c0, k, t, target, vel]) inputRegion.appendChild(f.wrap);

@@ -762,7 +762,7 @@ STEEL_RENDERERS["steel-bolt-slip-critical"] = _simpleRenderer({
   fields: [
     { key: "mu", label: "Slip coefficient mu (0.30 A / 0.50 B)", kind: "number" },
     { key: "tb_kip", label: "Minimum pretension Tb (kip, Table J3.1)", kind: "number" },
-    { key: "ns", label: "Slip planes ns (1 single, 2 double)", kind: "number", attrs: { step: "1", min: "1" }, default: 1 },
+    { key: "ns", label: "Slip planes ns (1 single, 2 double)", kind: "number", attrs: { step: "1", min: "1" } },
     { key: "n", label: "Number of bolts", kind: "number", attrs: { step: "1", min: "1" }, default: 1 },
     { key: "hf", label: "Filler factor hf", kind: "number" },
     { key: "du", label: "Du multiplier", kind: "number" },
@@ -1628,7 +1628,7 @@ STEEL_RENDERERS["slip-critical-with-tension"] = _simpleRenderer({
     { key: "tb_kip", label: "Minimum pretension Tb (kip, Table J3.1)", kind: "number" },
     { key: "applied_tension_kip", label: "Applied tension on the connection Tu (kip)", kind: "number" },
     { key: "n", label: "Number of bolts", kind: "number", attrs: { step: "1", min: "1" }, default: 1 },
-    { key: "ns", label: "Slip planes ns (1 single, 2 double)", kind: "number", attrs: { step: "1", min: "1" }, default: 1 },
+    { key: "ns", label: "Slip planes ns (1 single, 2 double)", kind: "number", attrs: { step: "1", min: "1" } },
     { key: "hf", label: "Filler factor hf", kind: "number" },
     { key: "du", label: "Du multiplier", kind: "number" },
   ],

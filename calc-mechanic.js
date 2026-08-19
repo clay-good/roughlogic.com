@@ -2092,10 +2092,10 @@ export const gearMphRpmExample = { inputs: { solve_for: "mph", rpm: 2500, trans_
 function renderGearMphRpm(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Classical drivetrain kinematics; SAE J267 metric tire-size convention for decoding a tire code to diameter, by name. Pure geometry, public. Geometric (no-slip) speed - ignores tire and torque-converter slip. Consistent with the tire-gearing decoder.";
   const solve = makeSelect("Solve for", "gmr-solve", [{ value: "mph", label: "MPH", selected: true }, { value: "rpm", label: "RPM" }]);
-  const rpm = makeNumber("Engine RPM", "gmr-rpm", { step: "any", min: "0", value: "2500" }); rpm.input.value = "2500";
+  const rpm = makeNumber("Engine RPM", "gmr-rpm", { step: "any", min: "0"});
   const trans = makeNumber("Transmission gear ratio", "gmr-trans", { step: "any", min: "0", value: "1" }); trans.input.value = "1";
-  const axle = makeNumber("Axle ratio", "gmr-axle", { step: "any", min: "0", value: "3.55" }); axle.input.value = "3.55";
-  const dia = makeNumber("Tire diameter (in)", "gmr-dia", { step: "any", min: "0", value: "28.5" }); dia.input.value = "28.5";
+  const axle = makeNumber("Axle ratio", "gmr-axle", { step: "any", min: "0"});
+  const dia = makeNumber("Tire diameter (in)", "gmr-dia", { step: "any", min: "0"});
   const mph = makeNumber("MPH (for RPM solve)", "gmr-mph", { step: "any", min: "0" });
   for (const f of [solve, rpm, trans, axle, dia, mph]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { solve.select.value = "mph"; rpm.input.value = "2500"; trans.input.value = "1"; axle.input.value = "3.55"; dia.input.value = "28.5"; mph.input.value = ""; update(); });
@@ -2230,7 +2230,7 @@ MECHANIC_RENDERERS["injector-max-hp"] = _simpleRenderer({
   fields: [
     { key: "inj_flow", label: "Injector static flow", kind: "number" },
     { key: "flow_unit", label: "Flow unit", kind: "select", options: [{ value: "lbh", label: "lb/h" }, { value: "ccmin", label: "cc/min" }], default: "lbh" },
-    { key: "n_cyl", label: "Number of injectors", kind: "number", default: 8, attrs: { step: "1", min: "1" } },
+    { key: "n_cyl", label: "Number of injectors", kind: "number", attrs: { step: "1", min: "1" } },
     { key: "duty", label: "Maximum duty cycle (0-1)", kind: "number" },
     { key: "bsfc", label: "BSFC (lb/hp-h; 0.50 NA, 0.55-0.65 boost)", kind: "number" },
   ],

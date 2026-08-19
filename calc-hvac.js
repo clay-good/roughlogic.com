@@ -4585,9 +4585,9 @@ HVAC_RENDERERS["snowmelt-load"] = _rEnv({
     { key: "t_air_f", label: "Design air temperature (°F)", kind: "number", attrs: { step: "any" } },
     { key: "wind_mph", label: "Design wind speed (mph)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "rh_pct", label: "Relative humidity (%)", kind: "number", attrs: { step: "any", min: "0" } },
-    { key: "ar", label: "Snow-free area ratio A_r (0 / 0.5 / 1)", kind: "number", default: 0.5, attrs: { step: "any", min: "0" } },
+    { key: "ar", label: "Snow-free area ratio A_r (0 / 0.5 / 1)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "area_ft2", label: "Heated slab area (ft²)", kind: "number", attrs: { step: "any", min: "0" } },
-    { key: "back_loss_pct", label: "Back + edge losses (%)", kind: "number", default: 20, attrs: { step: "any", min: "0" } },
+    { key: "back_loss_pct", label: "Back + edge losses (%)", kind: "number", attrs: { step: "any", min: "0" } },
   ],
   outputs: [
     { key: "qo", id: "sml-out-qo", label: "Design surface flux q_o", value: (r) => fmt(r.q_o, 1) + " Btu/hr-ft^2" },
