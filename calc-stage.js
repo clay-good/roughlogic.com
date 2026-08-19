@@ -508,7 +508,7 @@ const renderSPL = _r({
   fields: [
     { key: "L1_dB", label: "SPL at reference (dB)", kind: "number" },
     // v593: labeled ft; the compute uses only the d2/d1 ratio, so no conversion.
-    { key: "d1", label: "Reference distance (ft)", kind: "number", default: 1 },
+    { key: "d1", label: "Reference distance (ft)", kind: "number" },
     { key: "d2", label: "Target distance (ft)", kind: "number" },
     { key: "mode", label: "Mode", kind: "select", options: Object.keys(SPL_MODES).map((k) => ({ value: k, label: SPL_MODES[k].label })) },
     { key: "n_sources", label: "Identical sources", kind: "number", default: 1 },
@@ -529,7 +529,7 @@ const renderRiggingCheck = _r({
     { key: "configuration", label: "Configuration", kind: "select", options: [{ value: "vertical", label: "Vertical" }, { value: "basket", label: "Basket" }, { value: "bridle", label: "Bridle" }, { value: "choker", label: "Choker" }] },
     { key: "load_lb", label: "Load (lb)", kind: "number" },
     { key: "included_angle_deg", label: "Included angle (deg)", kind: "number" },
-    { key: "n_legs", label: "Legs", kind: "number", default: 2 },
+    { key: "n_legs", label: "Legs", kind: "number" },
   ],
   outputs: [
     { key: "h", id: "rg-out-h", label: "Hardware",          value: (r) => r.hardware_label },
@@ -1147,7 +1147,7 @@ const renderLedVideoWall = _r({
     { key: "rows", label: "Cabinets tall", kind: "number" },
     { key: "cab_weight_lb", label: "Weight per cabinet (lb, optional)", kind: "number" },
     { key: "cab_max_watts", label: "Peak watts per cabinet (optional)", kind: "number" },
-    { key: "avg_power_factor", label: "Average-power factor (0-1)", kind: "number", default: 0.35 },
+    { key: "avg_power_factor", label: "Average-power factor (0-1)", kind: "number" },
   ],
   outputs: [
     { key: "res", id: "lvw-out-res", label: "Resolution", value: (r) => r.total_w_px + " x " + r.total_h_px + " px (" + fmt(r.total_pixels, 0) + " px)" },
@@ -1184,8 +1184,8 @@ const renderProjectorBrightness = _r({
   fields: [
     { key: "screen_w_ft", label: "Screen width (ft)", kind: "number" },
     { key: "screen_h_ft", label: "Screen height (ft)", kind: "number" },
-    { key: "screen_gain", label: "Screen gain", kind: "number", default: 1.0 },
-    { key: "target_foot_lamberts", label: "Target foot-lamberts", kind: "number", default: 16 },
+    { key: "screen_gain", label: "Screen gain", kind: "number" },
+    { key: "target_foot_lamberts", label: "Target foot-lamberts", kind: "number" },
     { key: "throw_ratio", label: "Throw ratio (optional)", kind: "number" },
   ],
   outputs: [
@@ -1230,10 +1230,10 @@ const renderProjectorMaxScreenSize = _r({
   example: projectorMaxScreenSizeExample.inputs,
   fields: [
     { key: "available_lumens", label: "Projector brightness (ANSI lumens)", kind: "number" },
-    { key: "screen_gain", label: "Screen gain", kind: "number", default: 1.0 },
-    { key: "target_foot_lamberts", label: "Target foot-lamberts (16 dark, 30-50 lit)", kind: "number", default: 16 },
-    { key: "aspect_w", label: "Aspect ratio width (e.g. 16)", kind: "number", default: 16 },
-    { key: "aspect_h", label: "Aspect ratio height (e.g. 9)", kind: "number", default: 9 },
+    { key: "screen_gain", label: "Screen gain", kind: "number" },
+    { key: "target_foot_lamberts", label: "Target foot-lamberts (16 dark, 30-50 lit)", kind: "number" },
+    { key: "aspect_w", label: "Aspect ratio width (e.g. 16)", kind: "number" },
+    { key: "aspect_h", label: "Aspect ratio height (e.g. 9)", kind: "number" },
   ],
   outputs: [
     { key: "d", id: "pms-out-d", label: "Max screen diagonal", value: (r) => fmt(r.max_diagonal_ft, 1) + " ft (" + fmt(r.max_diagonal_ft * 12, 0) + " in)" },
@@ -1560,8 +1560,8 @@ const renderLedTapeRun = _r({
     { key: "run_length_ft", label: "Run length (ft)", kind: "number" },
     { key: "supply_voltage_v", label: "Supply voltage (V, 12 / 24)", kind: "number" },
     { key: "resistance_per_ft", label: "Round-trip resistance (ohm/ft)", kind: "number" },
-    { key: "headroom_pct", label: "PSU headroom (%)", kind: "number", default: 20 },
-    { key: "drop_tolerance_pct", label: "Acceptable end drop (%)", kind: "number", default: 10 },
+    { key: "headroom_pct", label: "PSU headroom (%)", kind: "number" },
+    { key: "drop_tolerance_pct", label: "Acceptable end drop (%)", kind: "number" },
   ],
   outputs: [
     { key: "l", id: "ltr-out-l", label: "Total load / PSU size", value: (r) => fmt(r.load_w, 1) + " W (PSU >= " + fmt(r.psu_w, 0) + " W)" },
@@ -1603,7 +1603,7 @@ const renderLedTapeMaxRun = _r({
     { key: "power_per_ft_w", label: "Strip power (W/ft)", kind: "number" },
     { key: "supply_voltage_v", label: "Supply voltage (V, 12 / 24)", kind: "number" },
     { key: "resistance_per_ft", label: "Round-trip resistance (ohm/ft)", kind: "number" },
-    { key: "drop_tolerance_pct", label: "Acceptable end drop (%)", kind: "number", default: 10 },
+    { key: "drop_tolerance_pct", label: "Acceptable end drop (%)", kind: "number" },
   ],
   outputs: [
     { key: "r", id: "ltmr-out-r", label: "Max single end-fed run", value: (r) => fmt(r.max_run_ft, 1) + " ft" },
@@ -1642,10 +1642,10 @@ const renderSPLDistanceForLevel = _r({
   example: splDistanceForLevelExample.inputs,
   fields: [
     { key: "L1_dB", label: "SPL at reference (dB)", kind: "number" },
-    { key: "d1", label: "Reference distance (ft)", kind: "number", default: 1 },
+    { key: "d1", label: "Reference distance (ft)", kind: "number" },
     { key: "target_L2_dB", label: "Target SPL (dB)", kind: "number" },
     { key: "mode", label: "Mode", kind: "select", options: Object.keys(SPL_MODES).map((k) => ({ value: k, label: SPL_MODES[k].label })) },
-    { key: "n_sources", label: "Identical sources", kind: "number", default: 1 },
+    { key: "n_sources", label: "Identical sources", kind: "number" },
   ],
   outputs: [
     { key: "d", id: "sdfl-out-d", label: "Distance for the target level", value: (r) => fmt(r.d2, 1) + " ft" },

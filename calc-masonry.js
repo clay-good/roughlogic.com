@@ -121,11 +121,11 @@ MASONRY_RENDERERS["cmu-wall-flexure"] = _simpleRenderer({
   citation: "Citation: TMS 402-16 (Building Code Requirements for Masonry Structures, ACI 530 / ASCE 5) allowable-stress-design cracked transformed-section flexure: n = Es/Em with Es = 29,000,000 psi and Em = 900 f'm for concrete masonry, rho = As/(b d), k = sqrt(2 rho n + (rho n)^2) - rho n, j = 1 - k/3, the steel-governed allowable moment Ms = As Fs j d and the masonry-governed Mm = 0.5 Fb k j b d^2, with Fs = 32,000 psi for Grade 60 reinforcement and Fb = 0.45 f'm, as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C (Allowable Stress Design of Concrete Masonry). Returns the allowable service-level bending moment of a singly reinforced, fully grouted section by the working-stress method: the section is assumed cracked, the reinforcement developed and in tension, the axial compression negligible (near-pure flexure), and one steel layer at the reported depth. The axial term and the one-third stress increase are not applied, and this is not the strength-design (LRFD) moment. Take f'm, the bar size, and the spacing from the structural drawings. A design aid, not a substitute for the engineer of record's stamped design.",
   example: cmuWallFlexureExample.inputs,
   fields: [
-    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number", default: 2000 },
+    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
     { key: "as_in2", label: "Steel area As over the strip (in²)", kind: "number" },
     { key: "d_in", label: "Effective depth d (in)", kind: "number" },
-    { key: "b_in", label: "Strip width b (in)", kind: "number", default: 12 },
-    { key: "fs_psi", label: "Allowable steel stress Fs (psi)", kind: "number", default: 32000 },
+    { key: "b_in", label: "Strip width b (in)", kind: "number" },
+    { key: "fs_psi", label: "Allowable steel stress Fs (psi)", kind: "number" },
   ],
   outputs: [
     { key: "nk", id: "cwf-out-nk", label: "n / k / j", value: (r) => fmt(r.n_ratio, 2) + " / " + fmt(r.k, 3) + " / " + fmt(r.j, 3) },
@@ -168,14 +168,14 @@ MASONRY_RENDERERS["cmu-shear-wall"] = _simpleRenderer({
   citation: "Citation: TMS 402-16 (ACI 530 / ASCE 5) allowable-stress in-plane shear: Fvm = 0.5 x ((4.0 - 1.75 x M/(V dv)) x sqrt(f'm)) + 0.25 x (P/An) with the shear-span ratio taken positive and not greater than 1.0 inside the masonry term, Fvs = 0.5 x (Av Fs dv) / (An s), the combined Fv = Fvm + Fvs, and the maximum-Fv cap of 3 sqrt(f'm) at M/(V dv) <= 0.25 grading linearly to 2 sqrt(f'm) at M/(V dv) >= 1.0, as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C. Returns the allowable service-level in-plane shear of a reinforced, fully grouted masonry shear wall. P is the sustained gravity compression (a larger P raises the masonry term, so use the load combination that actually acts with the shear); M/(V dv) is the shear-span ratio the designer supplies from the wall's height and length; the special-reinforced detailing and minimum-reinforcement rules of TMS 402 are the engineer's to satisfy separately. A design aid, not a substitute for the engineer of record's stamped lateral design.",
   example: cmuShearWallExample.inputs,
   fields: [
-    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number", default: 1500 },
+    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
     { key: "b_in", label: "Net wall thickness (in)", kind: "number" },
     { key: "dv_in", label: "Shear depth dv, wall length (in)", kind: "number" },
     { key: "p_lb", label: "Sustained axial load P (lb)", kind: "number", default: 0 },
-    { key: "mvd", label: "Shear-span ratio M/(V dv)", kind: "number", default: 0.5 },
+    { key: "mvd", label: "Shear-span ratio M/(V dv)", kind: "number" },
     { key: "av_in2", label: "Horizontal bar area Av (in², 0 = none)", kind: "number", default: 0 },
-    { key: "s_in", label: "Horizontal bar spacing s (in)", kind: "number", default: 48 },
-    { key: "fs_psi", label: "Allowable steel stress Fs (psi)", kind: "number", default: 32000 },
+    { key: "s_in", label: "Horizontal bar spacing s (in)", kind: "number" },
+    { key: "fs_psi", label: "Allowable steel stress Fs (psi)", kind: "number" },
   ],
   outputs: [
     { key: "fm", id: "csw-out-fm", label: "Masonry term Fvm", value: (r) => fmt(r.fvm, 1) + " psi" },
@@ -211,12 +211,12 @@ MASONRY_RENDERERS["cmu-wall-axial"] = _simpleRenderer({
   citation: "Citation: TMS 402-16 (ACI 530 / ASCE 5) allowable-stress axial compression for reinforced masonry: Pa = (0.25 f'm An + 0.65 Ast Fs) x (1 - (h/(140 r))^2) for a slenderness ratio h/r <= 99, and Pa = (0.25 f'm An + 0.65 Ast Fs) x (70 r / h)^2 for h/r > 99 (the two branches meet at h/r = 99), with Fs the allowable compressive stress in the reinforcement, as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C. Returns the allowable service-level concentric axial compression of a reinforced, fully grouted masonry wall or column. The 0.65 Ast Fs reinforcement term applies where the vertical bars are laterally tied per the code's column provisions -- for an untied wall the conservative practice is to drop that term (enter Ast = 0) and take only 0.25 f'm An x R. Pure axial only: the moment interaction is separate (combine with the CMU wall flexure tile through the unity check). The radius of gyration r and effective height h come from the section and the wall's actual bracing. A design aid, not a substitute for the engineer of record's stamped design.",
   example: cmuWallAxialExample.inputs,
   fields: [
-    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number", default: 2000 },
+    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
     { key: "an_in2", label: "Net area An (in²)", kind: "number" },
     { key: "ast_in2", label: "Vertical steel Ast, tied (in², 0 = untied)", kind: "number", default: 0 },
     { key: "h_in", label: "Effective height h (in)", kind: "number" },
     { key: "r_in", label: "Radius of gyration r (in)", kind: "number" },
-    { key: "fs_psi", label: "Allowable steel stress Fs (psi)", kind: "number", default: 32000 },
+    { key: "fs_psi", label: "Allowable steel stress Fs (psi)", kind: "number" },
   ],
   outputs: [
     { key: "hr", id: "cwa-out-hr", label: "Slenderness h/r", value: (r) => fmt(r.hr, 1) + (r.slender ? " (slender branch, h/r > 99)" : " (short/intermediate branch)") },
@@ -262,7 +262,7 @@ MASONRY_RENDERERS["masonry-wall-weight"] = _simpleRenderer({
   fields: [
     { key: "hollow_psf", label: "Hollow wall weight (psf, NCMA)", kind: "number" },
     { key: "grout_adder", label: "Full-grout weight adder (psf, NCMA)", kind: "number" },
-    { key: "cell_spacing", label: "Grouted-cell spacing at full grout (in; 8 CMU)", kind: "number", default: 8 },
+    { key: "cell_spacing", label: "Grouted-cell spacing at full grout (in; 8 CMU)", kind: "number" },
     { key: "grout_spacing", label: "Grout/rebar spacing (in; 0 = ungrouted)", kind: "number", default: 0 },
     { key: "height_ft", label: "Wall height (ft, for line load)", kind: "number" },
     { key: "area_ft2", label: "Wall area (ft², optional, for total)", kind: "number" },
@@ -305,9 +305,9 @@ MASONRY_RENDERERS["brick-veneer-anchor-spacing"] = _simpleRenderer({
   example: brickVeneerAnchorSpacingExample.inputs,
   fields: [
     { key: "area_ft2", label: "Veneer wall area (ft²)", kind: "number" },
-    { key: "area_per", label: "Max area per anchor (ft²; 2.67, 2.0 high-demand)", kind: "number", default: 2.67 },
-    { key: "max_horiz_in", label: "Max horizontal spacing (in)", kind: "number", default: 32 },
-    { key: "max_vert_in", label: "Max vertical spacing (in)", kind: "number", default: 24 },
+    { key: "area_per", label: "Max area per anchor (ft²; 2.67, 2.0 high-demand)", kind: "number" },
+    { key: "max_horiz_in", label: "Max horizontal spacing (in)", kind: "number" },
+    { key: "max_vert_in", label: "Max vertical spacing (in)", kind: "number" },
   ],
   outputs: [
     { key: "a", id: "bva-out-a", label: "Anchors required", value: (r) => String(r.anchors) },
@@ -381,10 +381,10 @@ MASONRY_RENDERERS["masonry-anchor-bolt"] = _simpleRenderer({
   citation: "Citation: TMS 402 ASD headed anchor bolt tension: allowable = lesser of masonry breakout Bab = 1.25 x Apt x sqrt(f'm) (Apt = pi x lbe^2, the projected cone) and steel Bas = 0.6 x Ab x fy. Edge distance reduces Apt; shear is a separate check. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: masonryAnchorBoltExample.inputs,
   fields: [
-    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number", default: 1500 },
-    { key: "lbe_in", label: "Effective embedment lbe (in)", kind: "number", default: 4 },
-    { key: "ab_in2", label: "Bolt tensile area Ab (in², 3/4in = 0.442)", kind: "number", default: 0.442 },
-    { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number", default: 36000 },
+    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
+    { key: "lbe_in", label: "Effective embedment lbe (in)", kind: "number" },
+    { key: "ab_in2", label: "Bolt tensile area Ab (in², 3/4in = 0.442)", kind: "number" },
+    { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number" },
   ],
   outputs: [
     { key: "ba", id: "mab-out-ba", label: "Allowable tension Ba", value: (r) => fmt(r.ba_lb, 0) + " lb (" + (r.masonry_governs ? "masonry breakout governs" : "steel governs") + ")" },
@@ -426,10 +426,10 @@ MASONRY_RENDERERS["masonry-anchor-embedment"] = _simpleRenderer({
   citation: "Citation: TMS 402 ASD headed anchor bolt tension solved for the embedment: lbe = sqrt(T / (1.25 pi sqrt(f'm))) from the masonry breakout branch Bab = 1.25 x Apt x sqrt(f'm) (Apt = pi lbe^2). The steel branch Bas = 0.6 Ab fy is a separate ceiling. Edge distance reduces Apt; shear is a separate check. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: masonryAnchorEmbedmentExample.inputs,
   fields: [
-    { key: "required_tension_lb", label: "Required tension T (lb)", kind: "number", default: 5000 },
-    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number", default: 1500 },
-    { key: "ab_in2", label: "Bolt tensile area Ab (in², 3/4in = 0.442)", kind: "number", default: 0.442 },
-    { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number", default: 36000 },
+    { key: "required_tension_lb", label: "Required tension T (lb)", kind: "number" },
+    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
+    { key: "ab_in2", label: "Bolt tensile area Ab (in², 3/4in = 0.442)", kind: "number" },
+    { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number" },
   ],
   outputs: [
     { key: "lbe", id: "mae-out-lbe", label: "Required embedment lbe", value: (r) => fmt(r.lbe_in, 2) + " in" },
@@ -483,11 +483,11 @@ MASONRY_RENDERERS["masonry-anchor-shear"] = _simpleRenderer({
   citation: "Citation: TMS 402-16 ASD headed anchor bolt shear (Section 8.1.5.2): allowable = least of masonry breakout Bvb = 1.25 x Apv x sqrt(f'm) (Apv = pi lbe^2 / 2, lbe = edge distance), masonry crushing Bvc = 350 x (f'm Ab)^(1/4), anchor pryout Bvpry = 2.0 x Bab (Bab = 1.25 x pi lb^2 x sqrt(f'm)), and bolt steel Bvs = 0.36 x Ab x fy. Crushing coefficient verified vs NCMA TEK 12-03A. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: masonryAnchorShearExample.inputs,
   fields: [
-    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number", default: 1500 },
-    { key: "lb_in", label: "Effective embedment lb (in)", kind: "number", default: 5 },
-    { key: "lbe_in", label: "Edge distance lbe (in)", kind: "number", default: 4 },
-    { key: "ab_in2", label: "Bolt tensile area Ab (in², 3/4in = 0.442)", kind: "number", default: 0.442 },
-    { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number", default: 36000 },
+    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
+    { key: "lb_in", label: "Effective embedment lb (in)", kind: "number" },
+    { key: "lbe_in", label: "Edge distance lbe (in)", kind: "number" },
+    { key: "ab_in2", label: "Bolt tensile area Ab (in², 3/4in = 0.442)", kind: "number" },
+    { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number" },
   ],
   outputs: [
     { key: "bv", id: "mas-out-bv", label: "Allowable shear Bv", value: (r) => fmt(r.bv_lb, 0) + " lb (" + r.governing_mode + " governs)" },
@@ -562,7 +562,7 @@ MASONRY_RENDERERS["masonry-prism-fm"] = _simpleRenderer({
   example: masonryPrismFmExample.inputs,
   fields: [
     { key: "unit_type", label: "Unit type", kind: "select", default: "concrete", options: [{ value: "concrete", label: "Concrete (CMU)" }, { value: "clay", label: "Clay (not yet supported)" }] },
-    { key: "unit_strength_psi", label: "Net-area unit strength (psi)", kind: "number", default: 2000 },
+    { key: "unit_strength_psi", label: "Net-area unit strength (psi)", kind: "number" },
     { key: "mortar_type", label: "Mortar type", kind: "select", default: "ms", options: [{ value: "ms", label: "Type M or S" }, { value: "n", label: "Type N" }] },
   ],
   outputs: [
@@ -596,9 +596,9 @@ MASONRY_RENDERERS["brick-veneer-weep-count"] = _simpleRenderer({
   citation: "Citation: brick veneer weep spacing by name (IRC R703.8.6 / TMS 402). weeps per line = ceil(wall length in / max spacing) + 1; weeps <= 33 in o.c., >= 3/16 in dia, directly above each through-wall flashing line. The AHJ-adopted code and the wall detail govern.",
   example: brickVeneerWeepCountExample.inputs,
   fields: [
-    { key: "wall_length_ft", label: "Wall / flashing length (ft)", kind: "number", default: 30 },
-    { key: "max_spacing_in", label: "Max weep spacing (in, code cap 33)", kind: "number", default: 33 },
-    { key: "flashing_lines", label: "Flashing lines (base + lintels)", kind: "number", default: 1 },
+    { key: "wall_length_ft", label: "Wall / flashing length (ft)", kind: "number" },
+    { key: "max_spacing_in", label: "Max weep spacing (in, code cap 33)", kind: "number" },
+    { key: "flashing_lines", label: "Flashing lines (base + lintels)", kind: "number" },
   ],
   outputs: [
     { key: "wpl", id: "bvw-out-wpl", label: "Weeps per flashing line", value: (r) => fmt(r.weeps_per_line, 0) },
@@ -633,10 +633,10 @@ MASONRY_RENDERERS["masonry-joint-reinforcement"] = _simpleRenderer({
   citation: "Citation: masonry joint-reinforcement takeoff by name. reinforced courses = ceil(height in / vertical spacing); pieces per course = ceil(length / piece length); total = courses x pieces. IRC R606.12.2 / TMS 402 cap the vertical spacing at 16 in; wire laps >= 6 in. The structural spec and the adopted code govern.",
   example: masonryJointReinforcementExample.inputs,
   fields: [
-    { key: "wall_length_ft", label: "Wall length (ft)", kind: "number", default: 40 },
-    { key: "wall_height_ft", label: "Wall height (ft)", kind: "number", default: 12 },
-    { key: "vertical_spacing_in", label: "Vertical spacing (in, code cap 16)", kind: "number", default: 16 },
-    { key: "piece_length_ft", label: "Wire piece length (ft)", kind: "number", default: 10 },
+    { key: "wall_length_ft", label: "Wall length (ft)", kind: "number" },
+    { key: "wall_height_ft", label: "Wall height (ft)", kind: "number" },
+    { key: "vertical_spacing_in", label: "Vertical spacing (in, code cap 16)", kind: "number" },
+    { key: "piece_length_ft", label: "Wire piece length (ft)", kind: "number" },
   ],
   outputs: [
     { key: "c", id: "mjr-out-c", label: "Reinforced courses", value: (r) => fmt(r.reinforced_courses, 0) },
@@ -695,10 +695,10 @@ MASONRY_RENDERERS["masonry-lintel-bearing"] = _simpleRenderer({
   example: masonryLintelBearingExample.inputs,
   fields: [
     { key: "clear_span_ft", label: "Clear span of opening (ft)", kind: "number" },
-    { key: "lintel_depth_in", label: "Lintel depth (in)", kind: "number", default: 8 },
-    { key: "support_center_ft", label: "Distance between support centers (ft, 0 = use span + depth)", kind: "number", default: 0 },
+    { key: "lintel_depth_in", label: "Lintel depth (in)", kind: "number" },
+    { key: "support_center_ft", label: "Distance between support centers (ft, 0 = use span + depth)", kind: "number" },
     { key: "udl_plf", label: "Uniform load on lintel (lb/ft)", kind: "number" },
-    { key: "bearing_width_in", label: "Bearing width (in, wall thickness at the end)", kind: "number", default: 7.625 },
+    { key: "bearing_width_in", label: "Bearing width (in, wall thickness at the end)", kind: "number" },
     { key: "allowable_bearing_psi", label: "Allowable bearing stress (psi, from your code edition)", kind: "number" },
   ],
   outputs: [
@@ -776,13 +776,13 @@ MASONRY_RENDERERS["fireplace-flue-area"] = _simpleRenderer({
   citation: "Citation: IRC R1003.15.1 (Option 1) and the identical IBC 2113.16.1 - round chimney flues need a net cross-sectional area of at least 1/12 of the fireplace opening, square flues at least 1/10, rectangular flues with an aspect ratio under 2:1 at least 1/10, and rectangular flues 2:1 or greater at least 1/8. All are conditioned on a chimney at least 15 ft high measured from the firebox floor to the top of the chimney flue; below that height the code's Option 2 figure (R1003.15.2) governs and is not reproduced here. Clay flue liner net areas come from the code's liner tables, which are also not reproduced - enter the liner's ACTUAL inside dimensions. Flue AREA only; this is not a draft, throat, smoke-chamber, or termination check. A screen; the adopted code and the AHJ govern.",
   example: fireplaceFlueAreaExample.inputs,
   fields: [
-    { key: "opening_width_in", label: "Fireplace opening width (in)", kind: "number", default: 36 },
-    { key: "opening_height_in", label: "Fireplace opening height (in)", kind: "number", default: 29 },
+    { key: "opening_width_in", label: "Fireplace opening width (in)", kind: "number" },
+    { key: "opening_height_in", label: "Fireplace opening height (in)", kind: "number" },
     { key: "flue_shape", label: "Flue shape", kind: "select", options: [{ value: "rectangular", label: "Square or rectangular liner", selected: true }, { value: "round", label: "Round liner or pipe" }] },
-    { key: "flue_inside_a_in", label: "Liner INSIDE dimension A (in)", kind: "number", default: 11.5 },
-    { key: "flue_inside_b_in", label: "Liner INSIDE dimension B (in)", kind: "number", default: 11.5 },
-    { key: "flue_inside_dia_in", label: "Round liner INSIDE diameter (in)", kind: "number", default: 0 },
-    { key: "chimney_height_ft", label: "Chimney height, firebox floor to flue top (ft)", kind: "number", default: 20 },
+    { key: "flue_inside_a_in", label: "Liner INSIDE dimension A (in)", kind: "number" },
+    { key: "flue_inside_b_in", label: "Liner INSIDE dimension B (in)", kind: "number" },
+    { key: "flue_inside_dia_in", label: "Round liner INSIDE diameter (in)", kind: "number" },
+    { key: "chimney_height_ft", label: "Chimney height, firebox floor to flue top (ft)", kind: "number" },
   ],
   outputs: [
     { key: "o", id: "ffa-out-o", label: "Fireplace opening area", value: (r) => fmt(r.opening_area_sqin, 0) + " sq in" },
@@ -855,9 +855,9 @@ MASONRY_RENDERERS["masonry-limited-access-zone"] = _simpleRenderer({
   citation: "Citation: OSHA 29 CFR 1926.706, Subpart Q - Concrete and Masonry Construction. A US federal regulation in the public domain. A limited access zone shall be established prior to the start of construction of the wall; it shall be equal to the height of the wall to be constructed plus four feet and shall run the entire length of the wall; it shall be established on the side of the wall which will be unscaffolded; it shall be restricted to entry by employees actively engaged in constructing the wall and no other employees shall be permitted to enter the zone; and it shall remain in place until the wall is adequately supported to prevent overturning and collapse, unless the height of the wall is over eight feet, in which case it shall remain until the bracing requirement is met. Masonry walls over eight feet in height shall be adequately braced to prevent overturning and to prevent collapse unless the wall is adequately supported so that it will not overturn or collapse, and the bracing shall remain in place until permanent supporting elements of the structure are in place. Not checked: the design of the bracing or of any alternative support, wind during construction, impalement protection, scaffold design on the working side, mortar and grout strength gain, or whether an engineer's involvement is required. A screen, not a bracing design; Subpart Q and the engineer of record govern.",
   example: masonryLimitedAccessZoneExample.inputs,
   fields: [
-    { key: "wall_height_ft", label: "Height of the wall TO BE CONSTRUCTED (ft)", kind: "number", default: 12 },
-    { key: "wall_length_ft", label: "Wall length (ft)", kind: "number", default: 60 },
-    { key: "zone_width_provided_ft", label: "Zone width provided (ft)", kind: "number", default: 8 },
+    { key: "wall_height_ft", label: "Height of the wall TO BE CONSTRUCTED (ft)", kind: "number" },
+    { key: "wall_length_ft", label: "Wall length (ft)", kind: "number" },
+    { key: "zone_width_provided_ft", label: "Zone width provided (ft)", kind: "number" },
     { key: "zone_runs_full_length", label: "Zone runs the entire length of the wall?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
     { key: "zone_on_unscaffolded_side", label: "Zone on the unscaffolded side?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
     { key: "established_before_start", label: "Established before the wall started?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },

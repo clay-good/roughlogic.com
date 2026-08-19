@@ -1248,7 +1248,7 @@ const renderDryingChamberCO2 = _v23SimpleRenderer({
   fields: [
     { key: "containment_volume_ft3", label: "Containment volume (ft³)", kind: "number" },
     { key: "co2_generation_cfm", label: "CO2 generation (cfm of CO2)", kind: "number" },
-    { key: "target_indoor_ppm", label: "Target indoor CO2 (ppm)", kind: "number", default: 1000 },
+    { key: "target_indoor_ppm", label: "Target indoor CO2 (ppm)", kind: "number" },
     { key: "outdoor_ppm", label: "Outdoor CO2 (ppm)", kind: "number", default: 420 },
   ],
   outputs: [

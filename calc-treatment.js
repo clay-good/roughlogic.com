@@ -663,10 +663,10 @@ TREATMENT_RENDERERS["pool-heater-btu"] = _rPool({
   citation: "Citation: pool heat-up energy Btu = gallons x 8.34 x temperature rise; time = energy / (output x efficiency). Gas ~80%; enter a heat pump's COP-equivalent Btu/h. Ignores cover/evaporation/standby losses. A sizing estimate; the equipment ratings govern.",
   example: poolHeaterBtuExample.inputs,
   fields: [
-    { key: "gallons", label: "Pool volume (gallons)", default: 20000 },
-    { key: "dT_F", label: "Temperature rise (°F)", default: 10 },
-    { key: "output", label: "Heater output (Btu/h)", default: 400000 },
-    { key: "eff", label: "Efficiency (0.80 gas; COP-equiv HP)", default: 0.80 },
+    { key: "gallons", label: "Pool volume (gallons)" },
+    { key: "dT_F", label: "Temperature rise (°F)" },
+    { key: "output", label: "Heater output (Btu/h)" },
+    { key: "eff", label: "Efficiency (0.80 gas; COP-equiv HP)" },
   ],
   outputs: [
     { key: "q", id: "phb-out-q", label: "Heat-up energy", value: (r) => fmt(r.Q_btu, 0) + " Btu" },
@@ -701,10 +701,10 @@ TREATMENT_RENDERERS["pool-heater-size"] = _rPool({
   citation: "Citation: pool heater sizing solved for output: output = (gallons x 8.34 x rise) / (target_hours x efficiency), from time = energy / (output x efficiency). Gas ~80%; enter a heat pump's COP-equivalent Btu/h. Ignores cover/evaporation/standby losses. A sizing estimate; the equipment ratings govern.",
   example: poolHeaterSizeExample.inputs,
   fields: [
-    { key: "gallons", label: "Pool volume (gallons)", default: 20000 },
-    { key: "dT_F", label: "Temperature rise (°F)", default: 10 },
+    { key: "gallons", label: "Pool volume (gallons)" },
+    { key: "dT_F", label: "Temperature rise (°F)" },
     { key: "target_hours", label: "Target heat-up time (h)", default: 5.2 },
-    { key: "eff", label: "Efficiency (0.80 gas; COP-equiv HP)", default: 0.80 },
+    { key: "eff", label: "Efficiency (0.80 gas; COP-equiv HP)" },
   ],
   outputs: [
     { key: "o", id: "phs-out-o", label: "Required heater output", value: (r) => fmt(r.required_output_btu, 0) + " Btu/h" },
@@ -820,11 +820,11 @@ TREATMENT_RENDERERS["breakpoint-chlorination"] = _rPool({
   citation: "Citation: breakpoint chlorination: combined chlorine = total - free, breakpoint dose = ratio x combined (commonly ~10:1). Shock past breakpoint (a partial dose worsens chloramines). Optional volume/product convert ppm to weight. A pool-care aid; the label and testing govern.",
   example: breakpointChlorinationExample.inputs,
   fields: [
-    { key: "total_ppm", label: "Total chlorine (ppm)", default: 1.5 },
-    { key: "free_ppm", label: "Free chlorine (ppm)", default: 1.0 },
-    { key: "ratio", label: "Breakpoint ratio (default 10)", default: 10 },
-    { key: "gallons", label: "Pool volume (gallons, optional)", default: 15000 },
-    { key: "avail", label: "Product available chlorine (%, optional)", default: 65 },
+    { key: "total_ppm", label: "Total chlorine (ppm)" },
+    { key: "free_ppm", label: "Free chlorine (ppm)" },
+    { key: "ratio", label: "Breakpoint ratio (default 10)" },
+    { key: "gallons", label: "Pool volume (gallons, optional)" },
+    { key: "avail", label: "Product available chlorine (%, optional)" },
   ],
   outputs: [
     { key: "c", id: "bpc-out-c", label: "Combined chlorine (chloramines)", value: (r) => fmt(r.combined_ppm, 2) + " ppm" },
@@ -1142,8 +1142,8 @@ const renderDigesterGasProduction = _rPool({
   fields: [
     { key: "vs_fed_lb_day", label: "Volatile solids fed (lb/day)", kind: "number" },
     { key: "vs_reduction_pct", label: "VS reduction (%, typical 50-60)", kind: "number" },
-    { key: "gas_yield_ft3_lb", label: "Gas yield (ft³ per lb VS destroyed)", kind: "number", default: 15 },
-    { key: "methane_pct", label: "Methane fraction of gas (%)", kind: "number", default: 65 },
+    { key: "gas_yield_ft3_lb", label: "Gas yield (ft³ per lb VS destroyed)", kind: "number" },
+    { key: "methane_pct", label: "Methane fraction of gas (%)", kind: "number" },
   ],
   outputs: [
     { key: "vsd", id: "dgp-out-vsd", label: "VS destroyed", value: (r) => fmt(r.vs_destroyed_lb_day, 0) + " lb/day" },
@@ -1645,9 +1645,9 @@ TREATMENT_RENDERERS["pool-calcium-hardness-dose"] = _rPool({
   citation: "Citation: pool calcium hardness increase with calcium chloride, by name. lb = ppm x gallons x 8.34e-6 x (110.98/100.09) / (purity/100), the CaCO3-equivalent converted to calcium chloride by molecular weight and product purity. ~1.2 lb of 77% flake per 10,000 gal per 10 ppm. Add to water (heat!), pump running, retest; the test kit and the product label govern.",
   example: poolCalciumHardnessDoseExample.inputs,
   fields: [
-    { key: "gallons", label: "Pool volume (gal)", default: 20000 },
-    { key: "ppm_increase", label: "Calcium hardness increase (ppm)", default: 20 },
-    { key: "product_purity_pct", label: "Calcium chloride content (percent: ~77 flake, ~94 anhydrous)", default: 77 },
+    { key: "gallons", label: "Pool volume (gal)" },
+    { key: "ppm_increase", label: "Calcium hardness increase (ppm)" },
+    { key: "product_purity_pct", label: "Calcium chloride content (percent: ~77 flake, ~94 anhydrous)" },
   ],
   outputs: [
     { key: "lb", label: "Calcium chloride", value: (r) => fmt(r.calcium_chloride_lb, 2) + " lb" },

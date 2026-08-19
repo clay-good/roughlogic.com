@@ -2273,7 +2273,7 @@ const renderDepreciationRecapture = _v23SimpleRenderer({
     { key: "total_gain", label: "Total gain on sale ($)", kind: "number" },
     { key: "ordinary_rate_pct", label: "Ordinary income rate (%)", kind: "number" },
     { key: "straight_line_depreciation", label: "Straight-line depreciation ($, §1250)", kind: "number" },
-    { key: "max_1250_rate_pct", label: "§1250 max rate (%)", kind: "number", default: 25 },
+    { key: "max_1250_rate_pct", label: "§1250 max rate (%)", kind: "number" },
   ],
   outputs: [
     { key: "rec", id: "dr-out-rec", label: "Recaptured amount", value: (r) => "$" + fmt(r.recaptured, 0) + " at " + fmt(r.rate_applied_pct, 0) + "%" },

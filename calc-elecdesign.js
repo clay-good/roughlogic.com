@@ -109,7 +109,7 @@ ELECDESIGN_RENDERERS["pull-box-sizing"] = _simpleRenderer({
       { value: "angle", label: "Angle / U pull (6x + others)" },
     ] },
     { key: "largest_raceway_in", label: "Largest raceway (trade size, in)", kind: "number" },
-    { key: "other_raceways_in", label: "Other raceways in row (sum, in)", kind: "number", default: 0 },
+    { key: "other_raceways_in", label: "Other raceways in row (sum, in)", kind: "number" },
   ],
   outputs: [
     { key: "g", id: "pbs-out-g", label: "Minimum box dimension", value: (r) => fmt(r.governing, 1) + " in (" + (r.pull_type === "angle" ? "angle/U" : "straight") + " pull)" },
@@ -148,8 +148,8 @@ ELECDESIGN_RENDERERS["lumen-method"] = _simpleRenderer({
     { key: "target_fc", label: "Target maintained (footcandles)", kind: "number" },
     { key: "area_sqft", label: "Room area (sq ft)", kind: "number" },
     { key: "lumens_per_lum", label: "Lumens per luminaire", kind: "number" },
-    { key: "cu", label: "Coefficient of utilization (CU)", kind: "number", default: 0.7 },
-    { key: "llf", label: "Light-loss factor (LLF)", kind: "number", default: 0.8 },
+    { key: "cu", label: "Coefficient of utilization (CU)", kind: "number" },
+    { key: "llf", label: "Light-loss factor (LLF)", kind: "number" },
   ],
   outputs: [
     { key: "c", id: "lm-out-c", label: "Luminaires (rounded up)", value: (r) => String(r.count) },
@@ -445,8 +445,8 @@ ELECDESIGN_RENDERERS["neutral-grounding-resistor"] = _simpleRenderer({
   citation: "Citation: neutral grounding resistor sizing (IEEE 142 grounding practice): V_LN = V_LL / sqrt(3); R = V_LN / I_ground; P = I_ground^2 x R = V_LN x I_ground. The resistor sees line-to-neutral, not line-to-line. HRG limits to a few amps (continuous rating); LRG to 100-400 A (short-time rating). A design aid; IEEE 142 and the protection scheme govern.",
   example: neutralGroundingResistorExample.inputs,
   fields: [
-    { key: "system_voltage_ll_v", label: "System line-to-line voltage (V)", kind: "number", default: 480 },
-    { key: "target_fault_a", label: "Target ground-fault current (A)", kind: "number", default: 5 },
+    { key: "system_voltage_ll_v", label: "System line-to-line voltage (V)", kind: "number" },
+    { key: "target_fault_a", label: "Target ground-fault current (A)", kind: "number" },
     { key: "duty", label: "Grounding duty", kind: "select", default: "hrg", options: [
       { value: "hrg", label: "High-resistance (HRG) - continuous rating" },
       { value: "lrg", label: "Low-resistance (LRG) - short-time rating" },
@@ -684,9 +684,9 @@ ELECDESIGN_RENDERERS["room-cavity-ratio"] = _simpleRenderer({
   citation: "Citation: room cavity ratio, IES zonal-cavity method, by name. RCR = 5 x cavity height x (L + W) / (L x W); cavity height = luminaire plane to the WORK plane (not floor to ceiling). The RCR (with the surface reflectances) reads the CU off the fixture's photometric report, which feeds the lumen method. The IES photometric file and the actual reflectances govern the CU.",
   example: roomCavityRatioExample.inputs,
   fields: [
-    { key: "room_length_ft", label: "Room length (ft)", kind: "number", default: 40 },
-    { key: "room_width_ft", label: "Room width (ft)", kind: "number", default: 30 },
-    { key: "cavity_height_ft", label: "Cavity height: luminaire to work plane (ft)", kind: "number", default: 8 },
+    { key: "room_length_ft", label: "Room length (ft)", kind: "number" },
+    { key: "room_width_ft", label: "Room width (ft)", kind: "number" },
+    { key: "cavity_height_ft", label: "Cavity height: luminaire to work plane (ft)", kind: "number" },
   ],
   outputs: [
     { key: "r", id: "rcr-out-r", label: "Room cavity ratio (RCR)", value: (r) => fmt(r.room_cavity_ratio, 2) },
@@ -722,9 +722,9 @@ ELECDESIGN_RENDERERS["luminaire-spacing-mh-ratio"] = _simpleRenderer({
   citation: "Citation: luminaire spacing criterion (SC), historically the spacing-to-mounting-height ratio (S/MH), IES, by name. Max center-to-center spacing = SMH x mounting height above the WORK plane. The fixture's photometric distribution, the room reflectances, and the target uniformity govern the final layout.",
   example: luminaireSpacingMhExample.inputs,
   fields: [
-    { key: "smh_ratio", label: "Spacing-to-mounting-height ratio (from the photometric report)", kind: "number", default: 1.3 },
-    { key: "mounting_height_ft", label: "Mounting height above the work plane (ft)", kind: "number", default: 8 },
-    { key: "actual_spacing_ft", label: "Proposed center-to-center spacing (ft)", kind: "number", default: 9 },
+    { key: "smh_ratio", label: "Spacing-to-mounting-height ratio (from the photometric report)", kind: "number" },
+    { key: "mounting_height_ft", label: "Mounting height above the work plane (ft)", kind: "number" },
+    { key: "actual_spacing_ft", label: "Proposed center-to-center spacing (ft)", kind: "number" },
   ],
   outputs: [
     { key: "s", id: "smh-out-s", label: "Max spacing (ft)", value: (r) => fmt(r.max_spacing_ft, 2) },

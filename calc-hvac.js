@@ -3182,11 +3182,11 @@ HVAC_RENDERERS["assembly-r-value"] = _rEnv({
   example: assemblyRValueExample.inputs,
   fields: [
     { key: "cavity_r", label: "Cavity insulation R", kind: "number" },
-    { key: "continuous_r", label: "Continuous insulation R", kind: "number", default: 0 },
+    { key: "continuous_r", label: "Continuous insulation R", kind: "number" },
     { key: "stud_depth_in", label: "Stud depth (in)", kind: "number" },
-    { key: "framing_factor", label: "Framing factor (0-1)", kind: "number", default: 0.25 },
-    { key: "air_films_r", label: "Air films R", kind: "number", default: 0.85 },
-    { key: "finish_layers_r", label: "Finish layers R", kind: "number", default: 1.05 },
+    { key: "framing_factor", label: "Framing factor (0-1)", kind: "number" },
+    { key: "air_films_r", label: "Air films R", kind: "number" },
+    { key: "finish_layers_r", label: "Finish layers R", kind: "number" },
   ],
   outputs: [
     { key: "f", id: "arv-out-f", label: "Framing path R", value: (r) => fmt(r.r_framing_path, 2) },
@@ -3219,7 +3219,7 @@ HVAC_RENDERERS["blown-insulation-coverage"] = _rEnv({
   fields: [
     { key: "area_sqft", label: "Attic area (sq ft)", kind: "number" },
     { key: "bags_per_1000", label: "Bags per 1,000 sq ft", kind: "number" },
-    { key: "r_per_inch", label: "R per inch", kind: "number", default: 3.5 },
+    { key: "r_per_inch", label: "R per inch", kind: "number" },
     { key: "target_r", label: "Target R-value", kind: "number" },
   ],
   outputs: [
@@ -3269,7 +3269,7 @@ HVAC_RENDERERS["heat-pump-seasonal-energy"] = _rEnv({
     { key: "seasonal_load_mmbtu", label: "Seasonal heating load (MMBtu)", kind: "number" },
     { key: "hspf", label: "Heat-pump HSPF", kind: "number" },
     { key: "rate_kwh", label: "Electric rate ($/kWh)", kind: "number" },
-    { key: "afue", label: "Furnace AFUE (0-1)", kind: "number", default: 0.95 },
+    { key: "afue", label: "Furnace AFUE (0-1)", kind: "number" },
     { key: "rate_therm", label: "Gas rate ($/therm, 0 = skip gas)", kind: "number" },
   ],
   outputs: [
@@ -3307,7 +3307,7 @@ HVAC_RENDERERS["dual-fuel-balance-point"] = _rEnv({
   fields: [
     { key: "rate_kwh", label: "Electric rate ($/kWh)", kind: "number" },
     { key: "rate_therm", label: "Gas rate ($/therm)", kind: "number" },
-    { key: "afue", label: "Furnace AFUE (0-1)", kind: "number", default: 0.95 },
+    { key: "afue", label: "Furnace AFUE (0-1)", kind: "number" },
     { key: "cop_now", label: "Heat-pump COP at current temp", kind: "number" },
   ],
   outputs: [
@@ -3393,8 +3393,8 @@ HVAC_RENDERERS["air-leak-cost"] = _rEnv({
     { key: "compressor_cfm", label: "Compressor delivered capacity (cfm)", kind: "number" },
     { key: "load_min", label: "Loaded time over test cycles (min)", kind: "number" },
     { key: "unload_min", label: "Unloaded time over test cycles (min)", kind: "number" },
-    { key: "specific_power", label: "Specific power (kW/100cfm)", kind: "number", default: 22 },
-    { key: "run_hours", label: "Run hours/yr (energized)", kind: "number", default: 8760 },
+    { key: "specific_power", label: "Specific power (kW/100cfm)", kind: "number" },
+    { key: "run_hours", label: "Run hours/yr (energized)", kind: "number" },
     { key: "rate_kwh", label: "Energy rate ($/kWh)", kind: "number" },
   ],
   outputs: [
@@ -3432,10 +3432,10 @@ HVAC_RENDERERS["compressed-air-power"] = _rEnv({
   example: compressedAirPowerExample.inputs,
   fields: [
     { key: "free_air_cfm", label: "Free-air flow at intake (cfm)", kind: "number" },
-    { key: "inlet_psia", label: "Inlet pressure (psia)", kind: "number", default: 14.7 },
+    { key: "inlet_psia", label: "Inlet pressure (psia)", kind: "number" },
     { key: "discharge_psig", label: "Discharge pressure (psig)", kind: "number" },
-    { key: "overall_eff", label: "Overall wire-to-air efficiency (0-1)", kind: "number", default: 0.75 },
-    { key: "run_hours", label: "Run hours/yr", kind: "number", default: 4000 },
+    { key: "overall_eff", label: "Overall wire-to-air efficiency (0-1)", kind: "number" },
+    { key: "run_hours", label: "Run hours/yr", kind: "number" },
     { key: "rate_kwh", label: "Energy rate ($/kWh)", kind: "number" },
   ],
   outputs: [
@@ -3476,9 +3476,9 @@ HVAC_RENDERERS["air-pressure-setpoint-savings"] = _rEnv({
   fields: [
     { key: "current_psig", label: "Current discharge setpoint (psig)", kind: "number" },
     { key: "reduced_psig", label: "Proposed lower setpoint (psig)", kind: "number" },
-    { key: "inlet_psia", label: "Inlet pressure (psia)", kind: "number", default: 14.7 },
+    { key: "inlet_psia", label: "Inlet pressure (psia)", kind: "number" },
     { key: "input_kw", label: "Current compressor input (kW)", kind: "number" },
-    { key: "run_hours", label: "Run hours/yr", kind: "number", default: 6000 },
+    { key: "run_hours", label: "Run hours/yr", kind: "number" },
     { key: "rate_kwh", label: "Energy rate ($/kWh)", kind: "number" },
   ],
   outputs: [
@@ -3525,8 +3525,8 @@ HVAC_RENDERERS["erv-sensible-recovery"] = _rEnv({
   fields: [
     { key: "cfm", label: "Balanced ventilation airflow (cfm)", kind: "number" },
     { key: "t_oa_F", label: "Outdoor air temperature (°F)", kind: "number" },
-    { key: "t_ra_F", label: "Return/exhaust air temperature (°F)", kind: "number", default: 70 },
-    { key: "eps_s", label: "Rated sensible effectiveness (0-1)", kind: "number", default: 0.75 },
+    { key: "t_ra_F", label: "Return/exhaust air temperature (°F)", kind: "number" },
+    { key: "eps_s", label: "Rated sensible effectiveness (0-1)", kind: "number" },
   ],
   outputs: [
     { key: "dt", id: "esr-out-dt", label: "Available temperature difference", value: (r) => fmt(r.dT_F, 1) + " F" },
@@ -3562,8 +3562,8 @@ HVAC_RENDERERS["mua-tempering-load"] = _rEnv({
   fields: [
     { key: "cfm", label: "Makeup airflow (cfm, = exhaust)", kind: "number" },
     { key: "t_oa_F", label: "Outdoor air temperature (°F)", kind: "number" },
-    { key: "t_target_F", label: "Target supply temperature (°F)", kind: "number", default: 65 },
-    { key: "eta", label: "Heater thermal efficiency (0-1)", kind: "number", default: 0.80 },
+    { key: "t_target_F", label: "Target supply temperature (°F)", kind: "number" },
+    { key: "eta", label: "Heater thermal efficiency (0-1)", kind: "number" },
     { key: "w_oa_gr", label: "Outdoor humidity ratio (gr/lb, optional)", kind: "number" },
     { key: "w_target_gr", label: "Target humidity ratio (gr/lb, optional)", kind: "number" },
   ],
@@ -3602,8 +3602,8 @@ HVAC_RENDERERS["dcv-co2-ventilation"] = _rEnv({
   fields: [
     { key: "n", label: "Occupancy (people)", kind: "number" },
     { key: "co2_set_ppm", label: "Indoor CO2 setpoint (ppm)", kind: "number" },
-    { key: "co2_oa_ppm", label: "Outdoor CO2 (ppm)", kind: "number", default: 400 },
-    { key: "gen_cfm", label: "CO2 generation per person (cfm)", kind: "number", default: 0.0106 },
+    { key: "co2_oa_ppm", label: "Outdoor CO2 (ppm)", kind: "number" },
+    { key: "gen_cfm", label: "CO2 generation per person (cfm)", kind: "number" },
   ],
   outputs: [
     { key: "qp", id: "dcv-out-qp", label: "Outdoor airflow per person", value: (r) => fmt(r.Q_person_cfm, 1) + " cfm/person" },
@@ -3673,7 +3673,7 @@ HVAC_RENDERERS["hydronic-gpm-deltat"] = _rEnv({
     { key: "load", label: "Load (Btu/h, or tons if unit set to 1)", kind: "number" },
     { key: "unit_tons", label: "Load unit (0 = Btu/h, 1 = tons)", kind: "number", default: 0 },
     { key: "dt_f", label: "Design delta-T (degF)", kind: "number" },
-    { key: "factor", label: "Fluid factor (500 water, ~485 30% PG)", kind: "number", default: 500 },
+    { key: "factor", label: "Fluid factor (500 water, ~485 30% PG)", kind: "number" },
   ],
   outputs: [
     { key: "q", id: "hgd-out-q", label: "Load", value: (r) => fmt(r.q_btuh, 0) + " Btu/h" },
@@ -3886,9 +3886,9 @@ HVAC_RENDERERS["wall-condensation-gradient"] = _rEnv({
   fields: [
     { key: "r_inside", label: "R-value warm side to the plane", kind: "number" },
     { key: "r_outside", label: "R-value beyond the plane", kind: "number" },
-    { key: "t_in_f", label: "Indoor air temperature (°F)", kind: "number", default: 70 },
+    { key: "t_in_f", label: "Indoor air temperature (°F)", kind: "number" },
     { key: "t_out_f", label: "Outdoor air temperature (°F)", kind: "number" },
-    { key: "rh_in_pct", label: "Indoor relative humidity (%)", kind: "number", default: 40 },
+    { key: "rh_in_pct", label: "Indoor relative humidity (%)", kind: "number" },
   ],
   outputs: [
     { key: "tp", id: "wcg-out-tp", label: "Condensation-plane temperature", value: (r) => fmt(r.t_plane_f, 1) + " F" },
@@ -4207,7 +4207,7 @@ HVAC_RENDERERS["air-density-correction"] = _rEnv({
   example: airDensityCorrectionExample.inputs,
   fields: [
     { key: "elev_ft", label: "Site elevation (ft)", kind: "number" },
-    { key: "T_F", label: "Air temperature (°F)", kind: "number", default: 70 },
+    { key: "T_F", label: "Air temperature (°F)", kind: "number" },
     { key: "acfm", label: "Actual airflow ACFM (cfm, optional)", kind: "number" },
     { key: "rated_sp", label: "Sea-level rated fan static (in-wc, optional)", kind: "number" },
   ],
@@ -4244,8 +4244,8 @@ HVAC_RENDERERS["moist-air-enthalpy"] = _rEnv({
   citation: "Citation: Moist-air enthalpy (ASHRAE Handbook - Fundamentals): h = 0.240 t + W (1061 + 0.444 t) Btu per lb dry air, with t the dry-bulb (F) and W the humidity ratio (lb water / lb dry air). 0.240 = dry-air specific heat, 1061 = latent heat at the 0 F datum, 0.444 = water-vapor specific heat. Total heat content of one air state; pair with outdoor-air-mix or a psychrometric chart for W. Sea-level coefficients; a design aid, not a substitute for a measured chart state or equipment ratings.",
   example: moistAirEnthalpyExample.inputs,
   fields: [
-    { key: "t_db_f", label: "Dry-bulb temperature (°F)", kind: "number", default: 80 },
-    { key: "w_lb_lb", label: "Humidity ratio W (lb water / lb dry air)", kind: "number", default: 0.0112 },
+    { key: "t_db_f", label: "Dry-bulb temperature (°F)", kind: "number" },
+    { key: "w_lb_lb", label: "Humidity ratio W (lb water / lb dry air)", kind: "number" },
   ],
   outputs: [
     { key: "h", id: "mae-out-h", label: "Enthalpy h", value: (r) => fmt(r.h, 2) + " Btu/lb dry air" },
@@ -4275,8 +4275,8 @@ HVAC_RENDERERS["drybulb-from-enthalpy"] = _rEnv({
   citation: "Citation: Moist-air enthalpy (ASHRAE Handbook - Fundamentals) solved for the dry-bulb: t = (h - 1061 W) / (0.240 + 0.444 W) deg F, the inverse of h = 0.240 t + W (1061 + 0.444 t). 0.240 = dry-air specific heat, 1061 = latent heat at the 0 F datum, 0.444 = water-vapor specific heat. The humidity ratio comes from the chart or RH. Sea-level coefficients; a design aid, not a substitute for a measured chart state or equipment ratings.",
   example: drybulbFromEnthalpyExample.inputs,
   fields: [
-    { key: "enthalpy_btu", label: "Enthalpy h (Btu/lb dry air)", kind: "number", default: 31.48 },
-    { key: "w_lb_lb", label: "Humidity ratio W (lb water / lb dry air)", kind: "number", default: 0.0112 },
+    { key: "enthalpy_btu", label: "Enthalpy h (Btu/lb dry air)", kind: "number" },
+    { key: "w_lb_lb", label: "Humidity ratio W (lb water / lb dry air)", kind: "number" },
   ],
   outputs: [
     { key: "t", id: "dbe-out-t", label: "Dry-bulb temperature", value: (r) => fmt(r.t_db_f, 1) + " F" },
@@ -4305,9 +4305,9 @@ HVAC_RENDERERS["cooling-coil-total-load"] = _rEnv({
   citation: "Citation: Cooling-coil total load (ASHRAE Handbook - Fundamentals): Q = 4.5 x CFM x (h_ent - h_lvg) Btu/hr, with 4.5 = 60 x 0.075 (standard air) and enthalpies from moist-air-enthalpy; tons = Q / 12000. Captures the full sensible-plus-latent heat the coil removes, unlike the dry-bulb 1.08 x CFM x deltaT. A leaving enthalpy above entering gives a negative Q (heating). A design aid; equipment ratings govern.",
   example: coolingCoilTotalLoadExample.inputs,
   fields: [
-    { key: "cfm", label: "Airflow across the coil (cfm)", kind: "number", default: 2000 },
-    { key: "h_ent_btu", label: "Entering-air enthalpy (Btu/lb)", kind: "number", default: 31.48 },
-    { key: "h_lvg_btu", label: "Leaving-air enthalpy (Btu/lb)", kind: "number", default: 22.97 },
+    { key: "cfm", label: "Airflow across the coil (cfm)", kind: "number" },
+    { key: "h_ent_btu", label: "Entering-air enthalpy (Btu/lb)", kind: "number" },
+    { key: "h_lvg_btu", label: "Leaving-air enthalpy (Btu/lb)", kind: "number" },
   ],
   outputs: [
     { key: "q", id: "cctl-out-q", label: "Total coil load", value: (r) => (r.heating ? "heating: " : "") + fmt(r.q_btuh, 0) + " Btu/hr" },
@@ -4337,9 +4337,9 @@ HVAC_RENDERERS["coil-bypass-factor"] = _rEnv({
   citation: "Citation: Coil bypass / contact factor (ASHRAE Handbook - Fundamentals): BF = (t_lvg - t_adp) / (t_ent - t_adp), CF = 1 - BF, with the apparatus dew point (ADP) the effective coil-surface temperature. BF is the fraction of air bypassing the coil unconditioned; a lower BF dehumidifies better. Leaving air lies between the ADP and the entering temperature. A design aid; the coil rating governs.",
   example: coilBypassFactorExample.inputs,
   fields: [
-    { key: "t_ent_f", label: "Entering-air dry-bulb (°F)", kind: "number", default: 80 },
-    { key: "t_lvg_f", label: "Leaving-air dry-bulb (°F)", kind: "number", default: 55 },
-    { key: "t_adp_f", label: "Apparatus dew point ADP (°F)", kind: "number", default: 50 },
+    { key: "t_ent_f", label: "Entering-air dry-bulb (°F)", kind: "number" },
+    { key: "t_lvg_f", label: "Leaving-air dry-bulb (°F)", kind: "number" },
+    { key: "t_adp_f", label: "Apparatus dew point ADP (°F)", kind: "number" },
   ],
   outputs: [
     { key: "bf", id: "cbf-out-bf", label: "Bypass factor BF", value: (r) => fmt(r.bf, 3) },
@@ -4371,11 +4371,11 @@ HVAC_RENDERERS["fan-affinity-laws"] = _rEnv({
   citation: "Citation: Fan affinity laws (AMCA / ASHRAE Handbook - Fundamentals) for a fixed fan at a changed speed: Q2 = Q1 (N2/N1), SP2 = SP1 (N2/N1)^2, BHP2 = BHP1 (N2/N1)^3. The cube-law power relation is the basis of VFD energy savings. Valid for the same fan on the same system curve; it does not capture motor/drive efficiency changes or a shifted system curve. A field aid; the fan curve and equipment ratings govern.",
   example: fanAffinityLawsExample.inputs,
   fields: [
-    { key: "q1_cfm", label: "Baseline airflow Q1 (cfm)", kind: "number", default: 10000 },
-    { key: "sp1_inwg", label: "Baseline static pressure SP1 (in wg)", kind: "number", default: 1.0 },
-    { key: "bhp1_hp", label: "Baseline brake horsepower BHP1 (hp)", kind: "number", default: 5.0 },
-    { key: "n1", label: "Baseline speed N1 (rpm)", kind: "number", default: 900 },
-    { key: "n2", label: "New speed N2 (rpm)", kind: "number", default: 1200 },
+    { key: "q1_cfm", label: "Baseline airflow Q1 (cfm)", kind: "number" },
+    { key: "sp1_inwg", label: "Baseline static pressure SP1 (in wg)", kind: "number" },
+    { key: "bhp1_hp", label: "Baseline brake horsepower BHP1 (hp)", kind: "number" },
+    { key: "n1", label: "Baseline speed N1 (rpm)", kind: "number" },
+    { key: "n2", label: "New speed N2 (rpm)", kind: "number" },
   ],
   outputs: [
     { key: "r", id: "fal-out-r", label: "Speed ratio r = N2/N1", value: (r) => fmt(r.r, 4) },
@@ -4410,8 +4410,8 @@ HVAC_RENDERERS["colebrook-friction-factor"] = _rEnv({
   citation: "Citation: Darcy friction factor -- laminar f = 64/Re, and the Swamee-Jain (1976) explicit approximation to the Colebrook-White equation f = 0.25 / [log10(eps/D / 3.7 + 5.74 / Re^0.9)]^2 for turbulent flow (within ~1% of the Colebrook/Moody value over 5000 < Re < 1e8, eps/D <= 0.05). The 2300-4000 transition is indeterminate. Feeds the Darcy-Weisbach head loss h = f (L/D) V^2/(2g). A design aid; the system analysis governs.",
   example: colebrookFrictionFactorExample.inputs,
   fields: [
-    { key: "reynolds", label: "Reynolds number Re", kind: "number", default: 100000 },
-    { key: "rel_roughness", label: "Relative roughness eps/D", kind: "number", default: 0.0003 },
+    { key: "reynolds", label: "Reynolds number Re", kind: "number" },
+    { key: "rel_roughness", label: "Relative roughness eps/D", kind: "number" },
   ],
   outputs: [
     { key: "f", id: "cff-out-f", label: "Darcy friction factor f", value: (r) => fmt(r.f, 4) },
@@ -4445,9 +4445,9 @@ HVAC_RENDERERS["manual-d-friction-rate"] = _rEnv({
   citation: "Citation: ACCA Manual D friction rate: available static pressure ASP = blower rated ESP - total component drops, design friction rate FR = ASP x 100 / total effective length (in wg per 100 ft). The TEL includes the fitting equivalent lengths, not just the physical run. A design aid; the full Manual D layout governs.",
   example: manualDFrictionRateExample.inputs,
   fields: [
-    { key: "blower_esp_inwg", label: "Blower rated ESP at design CFM (in wg)", kind: "number", default: 0.60 },
-    { key: "component_drop_inwg", label: "Total component drops (in wg)", kind: "number", default: 0.42 },
-    { key: "tel_ft", label: "Total effective length (ft)", kind: "number", default: 180 },
+    { key: "blower_esp_inwg", label: "Blower rated ESP at design CFM (in wg)", kind: "number" },
+    { key: "component_drop_inwg", label: "Total component drops (in wg)", kind: "number" },
+    { key: "tel_ft", label: "Total effective length (ft)", kind: "number" },
   ],
   outputs: [
     { key: "asp", id: "mdf-out-asp", label: "Available static pressure", value: (r) => fmt(r.asp_inwg, 2) + " in wg" },
@@ -4481,10 +4481,10 @@ HVAC_RENDERERS["erv-total-enthalpy-recovery"] = _rEnv({
   citation: "Citation: ERV total (enthalpy) recovery (ASHRAE Handbook - Fundamentals / AHRI 1060): Q = 4.5 x CFM x effectiveness x (h_outdoor - h_return) Btu/hr, supply enthalpy = h_outdoor - effectiveness x (h_outdoor - h_return). Positive Q is a summer cooling recovery, negative a winter heating recovery. A design aid; the ERV's rated effectiveness governs.",
   example: ervTotalEnthalpyRecoveryExample.inputs,
   fields: [
-    { key: "cfm", label: "Ventilation airflow through the ERV (cfm)", kind: "number", default: 1000 },
-    { key: "effectiveness", label: "Enthalpy (total-energy) effectiveness (0-1)", kind: "number", default: 0.75 },
-    { key: "h_outdoor", label: "Outdoor-air enthalpy (Btu/lb)", kind: "number", default: 38 },
-    { key: "h_return", label: "Return/exhaust-air enthalpy (Btu/lb)", kind: "number", default: 28 },
+    { key: "cfm", label: "Ventilation airflow through the ERV (cfm)", kind: "number" },
+    { key: "effectiveness", label: "Enthalpy (total-energy) effectiveness (0-1)", kind: "number" },
+    { key: "h_outdoor", label: "Outdoor-air enthalpy (Btu/lb)", kind: "number" },
+    { key: "h_return", label: "Return/exhaust-air enthalpy (Btu/lb)", kind: "number" },
   ],
   outputs: [
     { key: "q", id: "erv-out-q", label: "Total energy recovered", value: (r) => (r.cooling ? "" : "heating: ") + fmt(Math.abs(r.q_total_btuh), 0) + " Btu/hr" + (r.cooling ? " (cooling recovery)" : "") },

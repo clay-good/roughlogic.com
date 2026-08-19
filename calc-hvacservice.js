@@ -108,9 +108,9 @@ HVACSERVICE_RENDERERS["condensate-drain"] = _simpleRenderer({
   example: condensateDrainExample.inputs,
   fields: [
     { key: "tons", label: "Cooling capacity (tons)", kind: "number" },
-    { key: "pints_per_ton_hr", label: "Condensate rate (pints/ton-hr)", kind: "number", default: 3 },
+    { key: "pints_per_ton_hr", label: "Condensate rate (pints/ton-hr)", kind: "number" },
     { key: "run_ft", label: "Horizontal run (ft)", kind: "number", default: 0 },
-    { key: "slope_in_per_ft", label: "Slope (in/ft)", kind: "number", default: 0.125 },
+    { key: "slope_in_per_ft", label: "Slope (in/ft)", kind: "number" },
   ],
   outputs: [
     { key: "p", id: "cd-out-p", label: "Condensate rate", value: (r) => fmt(r.rate_pints_hr, 1) + " pints/hr" },
@@ -150,7 +150,7 @@ HVACSERVICE_RENDERERS["recovery-cylinder"] = _simpleRenderer({
     { key: "water_capacity_lb", label: "Cylinder water capacity WC (lb)", kind: "number" },
     { key: "refrig_density_lb_gal", label: "Refrigerant liquid density (lb/gal)", kind: "number" },
     { key: "current_net_lb", label: "Refrigerant already in (net lb)", kind: "number", default: 0 },
-    { key: "fill_fraction", label: "Max fill fraction", kind: "number", default: 0.8 },
+    { key: "fill_fraction", label: "Max fill fraction", kind: "number" },
   ],
   outputs: [
     { key: "m", id: "rc-out-m", label: "Max net at fill limit", value: (r) => fmt(r.max_net_lb, 1) + " lb" },
@@ -202,7 +202,7 @@ HVACSERVICE_RENDERERS["hvac-equipment-circuit"] = _simpleRenderer({
   fields: [
     { key: "compressor_rla_A", label: "Compressor RLA (A)", kind: "number" },
     { key: "fan_fla_A", label: "Condenser-fan FLA (A)", kind: "number", default: 0 },
-    { key: "other_load_A", label: "Other loads (A)", kind: "number", default: 0 },
+    { key: "other_load_A", label: "Other loads (A)", kind: "number" },
     { key: "installed_breaker_A", label: "Installed breaker (A, optional)", kind: "number", default: 0 },
   ],
   outputs: [
@@ -403,7 +403,7 @@ HVACSERVICE_RENDERERS["gas-meter-clock"] = _simpleRenderer({
   fields: [
     { key: "sec_per_rev", label: "Seconds per revolution", kind: "number" },
     { key: "dial_size_cf", label: "Test-dial size (cf/rev)", kind: "number" },
-    { key: "heating_value_btu_cf", label: "Heating value (BTU/cf)", kind: "number", default: 1030 },
+    { key: "heating_value_btu_cf", label: "Heating value (BTU/cf)", kind: "number" },
     { key: "nameplate_input_btuh", label: "Nameplate input (BTU/hr, optional)", kind: "number", default: 0 },
   ],
   outputs: [
@@ -438,9 +438,9 @@ HVACSERVICE_RENDERERS["gas-meter-clock-target"] = _simpleRenderer({
   citation: "Citation: first-principles meter-clocking arithmetic solved for the on-rate time - seconds-per-rev = 3600 x dial size x heating value / target firing rate (public), the inverse of the meter-clock tile. The default 1030 BTU/cf natural-gas (about 2500 for LP) heating value is editable; the gas utility's actual heating value and the equipment rating plate govern.",
   example: gasMeterClockTargetExample.inputs,
   fields: [
-    { key: "target_input_btuh", label: "Target / nameplate firing rate (BTU/hr)", kind: "number", default: 100000 },
-    { key: "dial_size_cf", label: "Test-dial size (cf/rev)", kind: "number", default: 1 },
-    { key: "heating_value_btu_cf", label: "Heating value (BTU/cf)", kind: "number", default: 1030 },
+    { key: "target_input_btuh", label: "Target / nameplate firing rate (BTU/hr)", kind: "number" },
+    { key: "dial_size_cf", label: "Test-dial size (cf/rev)", kind: "number" },
+    { key: "heating_value_btu_cf", label: "Heating value (BTU/cf)", kind: "number" },
   ],
   outputs: [
     { key: "s", id: "gmct-out-s", label: "On-rate seconds per revolution", value: (r) => fmt(r.sec_per_rev, 1) + " s" },
@@ -484,9 +484,9 @@ HVACSERVICE_RENDERERS["furnace-temp-rise"] = _simpleRenderer({
     { key: "return_air_F", label: "Return-air temp (°F)", kind: "number" },
     { key: "supply_air_F", label: "Supply-air temp (°F)", kind: "number" },
     { key: "input_btuh", label: "Furnace input (BTU/hr)", kind: "number" },
-    { key: "efficiency_pct", label: "Efficiency (%)", kind: "number", default: 80 },
-    { key: "rise_min_F", label: "Plate min rise (°F)", kind: "number", default: 40 },
-    { key: "rise_max_F", label: "Plate max rise (°F)", kind: "number", default: 70 },
+    { key: "efficiency_pct", label: "Efficiency (%)", kind: "number" },
+    { key: "rise_min_F", label: "Plate min rise (°F)", kind: "number" },
+    { key: "rise_max_F", label: "Plate max rise (°F)", kind: "number" },
   ],
   outputs: [
     { key: "d", id: "ftr-out-d", label: "Temperature rise", value: (r) => fmt(r.delta_T_F, 1) + " F" },
@@ -527,11 +527,11 @@ HVACSERVICE_RENDERERS["furnace-airflow-to-rise"] = _simpleRenderer({
   example: furnaceAirflowToRiseExample.inputs,
   fields: [
     { key: "input_btuh", label: "Furnace input (BTU/hr)", kind: "number" },
-    { key: "efficiency_pct", label: "Efficiency (%)", kind: "number", default: 80 },
+    { key: "efficiency_pct", label: "Efficiency (%)", kind: "number" },
     { key: "cfm", label: "Blower airflow (CFM)", kind: "number" },
-    { key: "return_air_F", label: "Return-air temp (°F)", kind: "number", default: 70 },
-    { key: "rise_min_F", label: "Plate min rise (°F)", kind: "number", default: 40 },
-    { key: "rise_max_F", label: "Plate max rise (°F)", kind: "number", default: 70 },
+    { key: "return_air_F", label: "Return-air temp (°F)", kind: "number" },
+    { key: "rise_min_F", label: "Plate min rise (°F)", kind: "number" },
+    { key: "rise_max_F", label: "Plate max rise (°F)", kind: "number" },
   ],
   outputs: [
     { key: "d", id: "far-out-d", label: "Predicted temperature rise", value: (r) => fmt(r.delta_T_F, 1) + " F" },
@@ -571,8 +571,8 @@ HVACSERVICE_RENDERERS["blower-door-ach50"] = _simpleRenderer({
   fields: [
     { key: "cfm50", label: "Blower-door reading CFM50 (cfm)", kind: "number" },
     { key: "volume_ft3", label: "Conditioned volume (ft³)", kind: "number" },
-    { key: "n_factor", label: "LBL N-factor (ACH50 -> natural)", kind: "number", default: 17 },
-    { key: "target_ach50", label: "Target ACH50 (IECC limit)", kind: "number", default: 3 },
+    { key: "n_factor", label: "LBL N-factor (ACH50 -> natural)", kind: "number" },
+    { key: "target_ach50", label: "Target ACH50 (IECC limit)", kind: "number" },
   ],
   outputs: [
     { key: "a", id: "bda-out-a", label: "ACH50", value: (r) => fmt(r.ach50, 2) + " ACH50" },
@@ -609,7 +609,7 @@ HVACSERVICE_RENDERERS["ashrae-622-ventilation"] = _simpleRenderer({
   fields: [
     { key: "floor_area_ft2", label: "Conditioned floor area (ft²)", kind: "number" },
     { key: "bedrooms", label: "Bedrooms (Nbr)", kind: "number" },
-    { key: "infil_credit_cfm", label: "Infiltration credit Qinf (cfm)", kind: "number", default: 0 },
+    { key: "infil_credit_cfm", label: "Infiltration credit Qinf (cfm)", kind: "number" },
   ],
   outputs: [
     { key: "t", id: "a62-out-t", label: "Total required Qtot", value: (r) => fmt(r.q_tot, 1) + " cfm" },
@@ -642,7 +642,7 @@ HVACSERVICE_RENDERERS["infiltration-load"] = _simpleRenderer({
   fields: [
     { key: "cfm", label: "Infiltration airflow (cfm)", kind: "number" },
     { key: "delta_t_f", label: "Design indoor-outdoor delta-T (°F)", kind: "number" },
-    { key: "delta_gr", label: "Humidity-ratio diff (grains/lb)", kind: "number", default: 0 },
+    { key: "delta_gr", label: "Humidity-ratio diff (grains/lb)", kind: "number" },
   ],
   outputs: [
     { key: "s", id: "ifl-out-s", label: "Sensible load", value: (r) => fmt(r.q_sensible, 0) + " Btu/h" },
@@ -674,9 +674,9 @@ HVACSERVICE_RENDERERS["outside-air-percent-temps"] = _simpleRenderer({
   citation: "Citation: The mixed-air temperature balance %OA = 100 (T_ra - T_ma) / (T_ra - T_oa) (ASHRAE / AABC-NEBB field practice), the standard field check of the outside-air damper fraction against the design minimum. Needs well-mixed, shielded dry-bulb readings; a small return-to-outdoor spread (under ~10 F) makes it sensitive to sensor error. A field aid, not a substitute for a direct airflow measurement.",
   example: outsideAirPercentTempsExample.inputs,
   fields: [
-    { key: "t_ra_f", label: "Return-air temperature T_ra (°F)", kind: "number", default: 75 },
-    { key: "t_ma_f", label: "Mixed-air temperature T_ma (°F)", kind: "number", default: 68 },
-    { key: "t_oa_f", label: "Outdoor-air temperature T_oa (°F)", kind: "number", default: 40 },
+    { key: "t_ra_f", label: "Return-air temperature T_ra (°F)", kind: "number" },
+    { key: "t_ma_f", label: "Mixed-air temperature T_ma (°F)", kind: "number" },
+    { key: "t_oa_f", label: "Outdoor-air temperature T_oa (°F)", kind: "number" },
   ],
   outputs: [
     { key: "pct", id: "oapt-out-pct", label: "Outside-air fraction", value: (r) => fmt(r.pct_oa, 1) + "% OA" },
@@ -708,9 +708,9 @@ HVACSERVICE_RENDERERS["duct-leakage-cfm25"] = _simpleRenderer({
   citation: "Citation: Residential duct leakage (IECC R403.3.5): normalized = leakage CFM25 / conditioned floor area x 100, compared to the code limit (4 CFM25 per 100 ft^2 total / post-construction, 3 for a rough-in without the air handler). A field aid; the adopted energy code, the required test type, and the rater govern.",
   example: ductLeakageCfm25Example.inputs,
   fields: [
-    { key: "leakage_cfm25", label: "Measured total leakage at 25 Pa (CFM25)", kind: "number", default: 80 },
-    { key: "cfa_ft2", label: "Conditioned floor area (ft²)", kind: "number", default: 2000 },
-    { key: "limit", label: "Limit (CFM25 per 100 ft², default 4)", kind: "number", default: 4 },
+    { key: "leakage_cfm25", label: "Measured total leakage at 25 Pa (CFM25)", kind: "number" },
+    { key: "cfa_ft2", label: "Conditioned floor area (ft²)", kind: "number" },
+    { key: "limit", label: "Limit (CFM25 per 100 ft², default 4)", kind: "number" },
   ],
   outputs: [
     { key: "norm", id: "dlc-out-norm", label: "Normalized leakage", value: (r) => fmt(r.normalized, 2) + " CFM25 / 100 ft^2" },
@@ -1079,9 +1079,9 @@ HVACSERVICE_RENDERERS["oil-burner-firing-rate"] = _simpleRenderer({
   citation: "Citation: oil burner nozzle firing rate (GPH), by name. input = output / (steady-state efficiency); GPH = input / heating value. No. 2 fuel oil ~138,500 BTU/gal (editable). Nozzles come in fixed GPH steps; actual flow shifts with pump pressure (rated at 100 psi, flow ~ sqrt of pressure ratio). The rating plate, nozzle chart, pump pressure, and a combustion analysis govern.",
   example: oilBurnerFiringRateExample.inputs,
   fields: [
-    { key: "output_btu_hr", label: "Design heat output (BTU/hr)", kind: "number", default: 88000 },
-    { key: "steady_state_efficiency_pct", label: "Steady-state efficiency (%)", kind: "number", default: 85 },
-    { key: "heating_value_btu_gal", label: "Oil heating value (BTU/gal, #2 ~138,500)", kind: "number", default: 138500 },
+    { key: "output_btu_hr", label: "Design heat output (BTU/hr)", kind: "number" },
+    { key: "steady_state_efficiency_pct", label: "Steady-state efficiency (%)", kind: "number" },
+    { key: "heating_value_btu_gal", label: "Oil heating value (BTU/gal, #2 ~138,500)", kind: "number" },
   ],
   outputs: [
     { key: "i", id: "obf-out-i", label: "Fuel input", value: (r) => fmt(r.input_btu_hr, 0) + " BTU/hr" },
@@ -1116,7 +1116,7 @@ HVACSERVICE_RENDERERS["flue-gas-dew-point"] = _simpleRenderer({
   citation: "Citation: natural-gas flue-gas water dew point, by name. Methane stoichiometry (CH4 -> 2 H2O; wet moles 1 + 9.52*lambda) gives the water fraction; its partial pressure into the Antoine saturation relation (water, NIST) gives the dew point (~134 F at 15% excess air). Non-condensing appliances must keep flue gas above it or the vent corrodes. The appliance listing, the vent-sizing tables (NFPA 54), and the AHJ govern.",
   example: flueGasDewPointExample.inputs,
   fields: [
-    { key: "excess_air_pct", label: "Excess air (%)", kind: "number", default: 15 },
+    { key: "excess_air_pct", label: "Excess air (%)", kind: "number" },
   ],
   outputs: [
     { key: "w", id: "fgd-out-w", label: "Flue-gas water vapor", value: (r) => fmt(r.water_vapor_pct, 1) + " %" },
@@ -1151,9 +1151,9 @@ HVACSERVICE_RENDERERS["condensing-flue-condensate"] = _simpleRenderer({
   citation: "Citation: condensing appliance flue condensate rate, by name. Natural gas makes ~9.4 lb water per therm; condensate = (input/100,000) x water/therm x condensing fraction / 8.34 lb/gal. ~0.96 gph per 100,000 BTU/hr at an 0.85 fraction. The condensate is mildly acidic (pH ~3-5) -- codes may require a neutralizer. The rated condensate output, the plumbing code (drain/trap/neutralizer), and the manufacturer govern.",
   example: condensingFlueCondensateExample.inputs,
   fields: [
-    { key: "input_btu_hr", label: "Fuel input (BTU/hr)", kind: "number", default: 100000 },
-    { key: "water_lb_per_therm", label: "Water produced per therm (lb, ~9.4 nat gas)", kind: "number", default: 9.4 },
-    { key: "condensing_fraction", label: "Condensing fraction (0-1, ~0.85)", kind: "number", default: 0.85 },
+    { key: "input_btu_hr", label: "Fuel input (BTU/hr)", kind: "number" },
+    { key: "water_lb_per_therm", label: "Water produced per therm (lb, ~9.4 nat gas)", kind: "number" },
+    { key: "condensing_fraction", label: "Condensing fraction (0-1, ~0.85)", kind: "number" },
   ],
   outputs: [
     { key: "w", id: "cfc-out-w", label: "Water produced", value: (r) => fmt(r.water_produced_lb_hr, 1) + " lb/hr" },
@@ -1200,7 +1200,7 @@ HVACSERVICE_RENDERERS["condensate-trap-depth"] = _simpleRenderer({
   fields: [
     { key: "configuration", label: "Unit configuration", kind: "select", options: [{ value: "draw-through", label: "Draw-through (negative at pan)", selected: true }, { value: "blow-through", label: "Blow-through (positive at pan)" }] },
     { key: "static_pressure_in_wc", label: "Max static pressure, worst case (in w.c.)", kind: "number" },
-    { key: "pipe_diameter_in", label: "Drain pipe diameter (in)", kind: "number", default: 1.0 },
+    { key: "pipe_diameter_in", label: "Drain pipe diameter (in)", kind: "number" },
     { key: "insulation_in", label: "Insulation thickness (in)", kind: "number", default: 0 },
   ],
   outputs: [
@@ -1282,11 +1282,11 @@ HVACSERVICE_RENDERERS["condensate-overflow-pan"] = _simpleRenderer({
   example: condensateOverflowPanExample.inputs,
   fields: [
     { key: "method", label: "Method (M1411.3.1)", kind: "select", options: [{ value: "pan-with-drain", label: "Auxiliary pan with a separate drain", selected: true }, { value: "overflow-line", label: "Separate overflow line off the equipment pan" }, { value: "pan-with-device", label: "Auxiliary pan, no drain, with a shutoff device" }, { value: "device-only", label: "Water-level detection device only" }] },
-    { key: "unit_width_in", label: "Unit or coil width (in)", kind: "number", default: 21 },
-    { key: "unit_length_in", label: "Unit or coil length (in)", kind: "number", default: 45 },
-    { key: "pan_width_in", label: "Pan width (in)", kind: "number", default: 24 },
-    { key: "pan_length_in", label: "Pan length (in)", kind: "number", default: 48 },
-    { key: "pan_depth_in", label: "Pan depth (in)", kind: "number", default: 1.5 },
+    { key: "unit_width_in", label: "Unit or coil width (in)", kind: "number" },
+    { key: "unit_length_in", label: "Unit or coil length (in)", kind: "number" },
+    { key: "pan_width_in", label: "Pan width (in)", kind: "number" },
+    { key: "pan_length_in", label: "Pan length (in)", kind: "number" },
+    { key: "pan_depth_in", label: "Pan depth (in)", kind: "number" },
   ],
   outputs: [
     { key: "m", id: "cop-out-m", label: "Method", value: (r) => r.needs_pan ? "uses an auxiliary pan" : "no auxiliary pan - dimensions not checked" },

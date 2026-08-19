@@ -151,10 +151,10 @@ FIRESPRINKLER_RENDERERS["sprinkler-system-demand"] = _simpleRenderer({
   citation: "Citation: NFPA 13 (Standard for the Installation of Sprinkler Systems), 2022: sprinkler demand = density x design area, total demand = sprinkler demand + inside/outside hose-stream allowance, stored volume = total demand x duration. Hazard-class defaults are editable: Light 0.10 gpm/ft^2 over 1,500 ft^2 with 100 gpm hose for 30 min; Ordinary Group 1 0.15 / 1,500 / 250 / 60-90; Ordinary Group 2 0.20 / 1,500 / 250 / 60-90. This is the area/density (pipe-schedule-style) screening demand -- a full hydraulic calculation to the most-remote area including friction and elevation yields the governing demand and is a separate analysis. The density / area / duration come from the applicable NFPA 13 density-area curve for the actual commodity and storage arrangement; storage and special occupancies (ESFR, high-piled, in-rack) use their own criteria. A design aid, not a stamped hydraulic submittal -- a qualified fire-protection engineer and the AHJ govern.",
   example: sprinklerSystemDemandExample.inputs,
   fields: [
-    { key: "density", label: "Design density (gpm/ft²)", kind: "number", default: 0.20 },
-    { key: "design_area", label: "Hydraulic design area (ft²)", kind: "number", default: 1500 },
-    { key: "hose_gpm", label: "Hose-stream allowance (gpm)", kind: "number", default: 250 },
-    { key: "duration_min", label: "Required supply duration (min)", kind: "number", default: 90 },
+    { key: "density", label: "Design density (gpm/ft²)", kind: "number" },
+    { key: "design_area", label: "Hydraulic design area (ft²)", kind: "number" },
+    { key: "hose_gpm", label: "Hose-stream allowance (gpm)", kind: "number" },
+    { key: "duration_min", label: "Required supply duration (min)", kind: "number" },
   ],
   outputs: [
     { key: "sg", id: "ssd-out-sg", label: "Sprinkler demand", value: (r) => fmt(r.sprinkler_gpm, 0) + " gpm" },
@@ -191,9 +191,9 @@ FIRESPRINKLER_RENDERERS["sprinkler-protection-area-for-supply"] = _simpleRendere
   citation: "Citation: NFPA 13 (2022) area/density demand solved for the area: sprinkler flow = supply - hose allowance, max design area = sprinkler flow / density. The area/density (pipe-schedule-style) screen; a full hydraulic calculation to the most-remote area at the supply's flowing pressure governs and is separate. A design aid; a fire-protection engineer and the AHJ govern.",
   example: sprinklerProtectionAreaForSupplyExample.inputs,
   fields: [
-    { key: "available_supply_gpm", label: "Available water supply (gpm)", kind: "number", default: 550 },
-    { key: "density", label: "Design density (gpm/ft²)", kind: "number", default: 0.20 },
-    { key: "hose_gpm", label: "Hose-stream allowance (gpm)", kind: "number", default: 250 },
+    { key: "available_supply_gpm", label: "Available water supply (gpm)", kind: "number" },
+    { key: "density", label: "Design density (gpm/ft²)", kind: "number" },
+    { key: "hose_gpm", label: "Hose-stream allowance (gpm)", kind: "number" },
   ],
   outputs: [
     { key: "area", id: "spa-out-area", label: "Max hydraulic design area", value: (r) => fmt(r.max_design_area_ft2, 0) + " ft^2" },
@@ -231,8 +231,8 @@ FIRESPRINKLER_RENDERERS["sprinkler-head-layout"] = _simpleRenderer({
   fields: [
     { key: "room_length", label: "Room length (ft)", kind: "number" },
     { key: "room_width", label: "Room width (ft)", kind: "number" },
-    { key: "area_per_head", label: "Max protection area per head (ft²)", kind: "number", default: 130 },
-    { key: "max_spacing", label: "Max spacing between heads (ft)", kind: "number", default: 15 },
+    { key: "area_per_head", label: "Max protection area per head (ft²)", kind: "number" },
+    { key: "max_spacing", label: "Max spacing between heads (ft)", kind: "number" },
   ],
   outputs: [
     { key: "sp", id: "shl-out-sp", label: "Governing spacing", value: (r) => fmt(r.spacing, 2) + " ft" },
@@ -270,13 +270,13 @@ FIRESPRINKLER_RENDERERS["sprinkler-pressure-demand"] = _simpleRenderer({
   citation: "Citation: NFPA 13 (Standard for the Installation of Sprinkler Systems), 2022 hydraulic method: the pressure demand at the base of the riser is the start pressure at the hydraulically most remote sprinkler P1 = (Q_head / K)^2 (the K-factor discharge relation Q = K sqrt(P)), plus the Hazen-Williams friction loss p = 4.52 Q^1.85 / (C^1.85 d^4.87) psi per foot carried over the governing run's equivalent length, plus the elevation head 0.433 psi per foot to lift the water to the head. The Hazen-Williams C defaults are the NFPA 13 pipe-type values (120 black/galvanized steel, 150 copper or listed CPVC, 100 old unlined cast iron), the equivalent length is the actual pipe plus the fitting/valve equivalents from the NFPA 13 fitting table, and the 7 psi minimum operating pressure at the end sprinkler is the standard-spray floor (flagged, not enforced). This assembles one representative flowing path; a full stamped design balances every node, branch, and grid loop in the remote area. A design aid, not a stamped hydraulic submittal - a qualified fire-protection engineer and the AHJ govern.",
   example: sprinklerPressureDemandExample.inputs,
   fields: [
-    { key: "q_head_gpm", label: "Flow at most remote head (gpm)", kind: "number", default: 26 },
-    { key: "k_factor", label: "Sprinkler K-factor (gpm/psi^0.5)", kind: "number", default: 5.6 },
-    { key: "q_total_gpm", label: "Total flow through governing run (gpm)", kind: "number", default: 260 },
-    { key: "pipe_id_in", label: "Pipe internal diameter (in)", kind: "number", default: 3.068 },
-    { key: "c_factor", label: "Hazen-Williams C (120 steel / 150 CPVC / 100 old CI)", kind: "number", default: 120 },
-    { key: "equiv_length_ft", label: "Equivalent length: pipe + fittings (ft)", kind: "number", default: 150 },
-    { key: "elevation_ft", label: "Elevation of remote head above base of riser (ft)", kind: "number", default: 15 },
+    { key: "q_head_gpm", label: "Flow at most remote head (gpm)", kind: "number" },
+    { key: "k_factor", label: "Sprinkler K-factor (gpm/psi^0.5)", kind: "number" },
+    { key: "q_total_gpm", label: "Total flow through governing run (gpm)", kind: "number" },
+    { key: "pipe_id_in", label: "Pipe internal diameter (in)", kind: "number" },
+    { key: "c_factor", label: "Hazen-Williams C (120 steel / 150 CPVC / 100 old CI)", kind: "number" },
+    { key: "equiv_length_ft", label: "Equivalent length: pipe + fittings (ft)", kind: "number" },
+    { key: "elevation_ft", label: "Elevation of remote head above base of riser (ft)", kind: "number" },
   ],
   outputs: [
     { key: "sp", id: "spd-out-sp", label: "Start pressure at remote head", value: (r) => fmt(r.start_pressure_psi, 1) + " psi" + (r.below_min ? " (below 7 psi minimum)" : "") },
@@ -314,9 +314,9 @@ FIRESPRINKLER_RENDERERS["smoke-detector-spacing-count"] = _simpleRenderer({
   citation: "Citation: NFPA 72 spot-detector grid by name. rows = ceil(length / spacing); columns = ceil(width / spacing); detectors = rows x columns; wall maximum = spacing / 2. The 0.7-times-spacing rule confirms every point is covered.",
   example: smokeDetectorSpacingCountExample.inputs,
   fields: [
-    { key: "room_length_ft", label: "Room length (ft)", kind: "number", default: 60 },
-    { key: "room_width_ft", label: "Room width (ft)", kind: "number", default: 40 },
-    { key: "listed_spacing_ft", label: "Device listed spacing (ft)", kind: "number", default: 30 },
+    { key: "room_length_ft", label: "Room length (ft)", kind: "number" },
+    { key: "room_width_ft", label: "Room width (ft)", kind: "number" },
+    { key: "listed_spacing_ft", label: "Device listed spacing (ft)", kind: "number" },
   ],
   outputs: [
     { key: "d", id: "sds-out-d", label: "Detectors", value: (r) => fmt(r.detectors, 0) + " detectors (" + fmt(r.rows, 0) + " x " + fmt(r.cols, 0) + " grid)" },
@@ -351,9 +351,9 @@ FIRESPRINKLER_RENDERERS["drypipe-air-compressor"] = _simpleRenderer({
   citation: "Citation: dry-pipe air compressor free-air CFM by name (NFPA 13 restore-time rule). free air = (system gal / 7.48) x (normal psig / 14.7) / restore minutes; restore within 30 min (60 for some systems). A listed air-maintenance device is required; the compressor rating at pressure and the AHJ govern.",
   example: drypipeAirCompressorExample.inputs,
   fields: [
-    { key: "dry_volume_gal", label: "Dry system volume (gal, from pipe schedule)", kind: "number", default: 400 },
-    { key: "normal_pressure_psig", label: "Normal air pressure (psig)", kind: "number", default: 40 },
-    { key: "restore_minutes", label: "Restore time (min, NFPA 13 <= 30)", kind: "number", default: 30 },
+    { key: "dry_volume_gal", label: "Dry system volume (gal, from pipe schedule)", kind: "number" },
+    { key: "normal_pressure_psig", label: "Normal air pressure (psig)", kind: "number" },
+    { key: "restore_minutes", label: "Restore time (min, NFPA 13 <= 30)", kind: "number" },
   ],
   outputs: [
     { key: "v", id: "dac-out-v", label: "System volume", value: (r) => fmt(r.system_ft3, 1) + " ft3" },
@@ -392,9 +392,9 @@ FIRESPRINKLER_RENDERERS["jockey-pump-sizing"] = _simpleRenderer({
   citation: "Citation: jockey (pressure-maintenance) pump sizing by name (NFPA 20). jockey flow ~1% of the fire pump (>= 1 gpm); jockey stop = churn + min static; jockey start = stop - 10; fire-pump start = jockey start - 5 (staggered). A settings guide; NFPA 20 and the AHJ govern.",
   example: jockeyPumpSizingExample.inputs,
   fields: [
-    { key: "fire_pump_gpm", label: "Fire pump rated flow (gpm)", kind: "number", default: 750 },
-    { key: "churn_psi", label: "Fire pump churn / shutoff pressure (psi)", kind: "number", default: 120 },
-    { key: "min_static_psi", label: "Minimum static supply pressure (psi)", kind: "number", default: 50 },
+    { key: "fire_pump_gpm", label: "Fire pump rated flow (gpm)", kind: "number" },
+    { key: "churn_psi", label: "Fire pump churn / shutoff pressure (psi)", kind: "number" },
+    { key: "min_static_psi", label: "Minimum static supply pressure (psi)", kind: "number" },
   ],
   outputs: [
     { key: "q", id: "jps-out-q", label: "Jockey pump flow", value: (r) => fmt(r.jockey_gpm, 1) + " gpm" },

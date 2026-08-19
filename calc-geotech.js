@@ -123,13 +123,13 @@ GEOTECH_RENDERERS["soil-bearing-capacity"] = _simpleRenderer({
   citation: "Citation: the general bearing-capacity equation qu = c Nc sc + q Nq sq + 0.5 gamma B Ngamma sgamma with the Vesic (1973) factors Nq = e^(pi tan phi) x tan^2(45 + phi/2), Nc = (Nq - 1) x cot phi (5.14 at phi = 0), Ngamma = 2 x (Nq + 1) x tan phi, and the De Beer / Vesic shape factors, as compiled in Das, Principles of Foundation Engineering, and FHWA-NHI-16-009 (GEC 6, Shallow Foundations). Returns the gross ultimate and allowable pressure for general-shear failure of a level, concentrically loaded footing with level ground and the water table at or below one footing width beneath the base -- the net-bearing, groundwater, load-inclination, eccentricity, local/punching-shear, and settlement corrections are not applied, and settlement (not strength) usually governs a footing on sand. Take c, phi, and gamma from the geotechnical report for the actual site. A design aid, not a substitute for a geotechnical engineer's report -- the geotechnical engineer of record's stamped recommendation governs.",
   example: soilBearingCapacityExample.inputs,
   fields: [
-    { key: "c", label: "Soil cohesion c (psf, 0 for clean sand)", kind: "number", default: 0 },
+    { key: "c", label: "Soil cohesion c (psf, 0 for clean sand)", kind: "number" },
     { key: "phi", label: "Friction angle phi (deg, 0 for undrained clay)", kind: "number" },
-    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number", default: 120 },
+    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number" },
     { key: "b_ft", label: "Footing width B (ft)", kind: "number" },
     { key: "df_ft", label: "Embedment depth Df (ft)", kind: "number", default: 0 },
     { key: "shape", label: "Footing shape", kind: "select", options: [{ value: "strip", label: "Strip (continuous)" }, { value: "square", label: "Square" }, { value: "circular", label: "Circular" }], default: "strip" },
-    { key: "fs", label: "Factor of safety", kind: "number", default: 3 },
+    { key: "fs", label: "Factor of safety", kind: "number" },
   ],
   outputs: [
     { key: "nf", id: "sbc-out-nf", label: "Bearing factors Nc / Nq / Ngamma", value: (r) => fmt(r.nc, 2) + " / " + fmt(r.nq, 2) + " / " + fmt(r.ngamma, 2) },
@@ -168,9 +168,9 @@ GEOTECH_RENDERERS["lateral-earth-pressure"] = _simpleRenderer({
   example: lateralEarthPressureExample.inputs,
   fields: [
     { key: "phi", label: "Friction angle phi (deg)", kind: "number" },
-    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number", default: 120 },
+    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number" },
     { key: "h_ft", label: "Retained height H (ft)", kind: "number" },
-    { key: "q", label: "Uniform surcharge q (psf)", kind: "number", default: 0 },
+    { key: "q", label: "Uniform surcharge q (psf)", kind: "number" },
   ],
   outputs: [
     { key: "k", id: "lep-out-k", label: "Coefficients Ka / Kp", value: (r) => fmt(r.ka, 3) + " / " + fmt(r.kp, 2) },
@@ -208,9 +208,9 @@ GEOTECH_RENDERERS["at-rest-earth-pressure"] = _simpleRenderer({
   example: atRestEarthPressureExample.inputs,
   fields: [
     { key: "phi", label: "Friction angle phi (deg)", kind: "number" },
-    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number", default: 120 },
+    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number" },
     { key: "h_ft", label: "Retained height H (ft)", kind: "number" },
-    { key: "q", label: "Uniform surcharge q (psf)", kind: "number", default: 0 },
+    { key: "q", label: "Uniform surcharge q (psf)", kind: "number" },
   ],
   outputs: [
     { key: "k0", id: "arep-out-k0", label: "At-rest coefficient K0", value: (r) => fmt(r.k0, 3) },
@@ -249,9 +249,9 @@ GEOTECH_RENDERERS["submerged-earth-pressure"] = _simpleRenderer({
   example: submergedEarthPressureExample.inputs,
   fields: [
     { key: "phi", label: "Friction angle phi (deg)", kind: "number" },
-    { key: "gamma_sat", label: "Saturated unit weight (pcf)", kind: "number", default: 125 },
+    { key: "gamma_sat", label: "Saturated unit weight (pcf)", kind: "number" },
     { key: "h_ft", label: "Submerged retained height H (ft)", kind: "number" },
-    { key: "q", label: "Uniform surcharge q (psf)", kind: "number", default: 0 },
+    { key: "q", label: "Uniform surcharge q (psf)", kind: "number" },
   ],
   outputs: [
     { key: "k", id: "sep-out-k", label: "Ka / buoyant unit weight", value: (r) => fmt(r.ka, 3) + " / " + fmt(r.gamma_buoy, 1) + " pcf" },
@@ -294,7 +294,7 @@ GEOTECH_RENDERERS["sloped-backfill-earth-pressure"] = _simpleRenderer({
   fields: [
     { key: "phi", label: "Friction angle phi (deg)", kind: "number" },
     { key: "beta", label: "Backfill slope beta (deg, above horizontal)", kind: "number", default: 0 },
-    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number", default: 120 },
+    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number" },
     { key: "h_ft", label: "Retained height H (ft)", kind: "number" },
   ],
   outputs: [
@@ -337,9 +337,9 @@ GEOTECH_RENDERERS["coulomb-earth-pressure"] = _simpleRenderer({
   fields: [
     { key: "phi", label: "Soil friction angle phi (deg)", kind: "number" },
     { key: "delta", label: "Wall friction delta (deg, ~2/3 phi, 0 smooth)", kind: "number", default: 0 },
-    { key: "theta", label: "Wall batter theta (deg from vertical, 0 vertical)", kind: "number", default: 0 },
-    { key: "alpha", label: "Backfill slope alpha (deg, 0 level)", kind: "number", default: 0 },
-    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number", default: 120 },
+    { key: "theta", label: "Wall batter theta (deg from vertical, 0 vertical)", kind: "number" },
+    { key: "alpha", label: "Backfill slope alpha (deg, 0 level)", kind: "number" },
+    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number" },
     { key: "h_ft", label: "Retained height H (ft)", kind: "number" },
   ],
   outputs: [
@@ -403,11 +403,11 @@ GEOTECH_RENDERERS["retaining-wall-stability"] = _simpleRenderer({
     { key: "t_base", label: "Base slab thickness (ft)", kind: "number" },
     { key: "t_stem", label: "Stem thickness (ft)", kind: "number" },
     { key: "toe_ft", label: "Toe length (ft)", kind: "number" },
-    { key: "gamma_s", label: "Soil unit weight (pcf)", kind: "number", default: 110 },
-    { key: "gamma_c", label: "Concrete unit weight (pcf)", kind: "number", default: 150 },
+    { key: "gamma_s", label: "Soil unit weight (pcf)", kind: "number" },
+    { key: "gamma_c", label: "Concrete unit weight (pcf)", kind: "number" },
     { key: "phi", label: "Backfill friction angle phi (deg)", kind: "number" },
-    { key: "mu", label: "Base friction coefficient mu", kind: "number", default: 0.5 },
-    { key: "q", label: "Backfill surcharge q (psf)", kind: "number", default: 0 },
+    { key: "mu", label: "Base friction coefficient mu", kind: "number" },
+    { key: "q", label: "Backfill surcharge q (psf)", kind: "number" },
   ],
   outputs: [
     { key: "sv", id: "rws-out-sv", label: "Vertical resultant / resisting moment", value: (r) => fmt(r.sum_v, 0) + " lb/ft, Mr " + fmt(r.mr, 0) + " ft-lb/ft" },
@@ -451,8 +451,8 @@ GEOTECH_RENDERERS["soil-settlement-elastic"] = _simpleRenderer({
     { key: "q_ksf", label: "Net contact pressure q (ksf)", kind: "number" },
     { key: "b_ft", label: "Footing width B (ft)", kind: "number" },
     { key: "es_ksf", label: "Soil elastic modulus Es (ksf)", kind: "number" },
-    { key: "nu", label: "Poisson's ratio nu (0.3 sand)", kind: "number", default: 0.3 },
-    { key: "is_f", label: "Influence factor Is (0.82 rigid square)", kind: "number", default: 0.82 },
+    { key: "nu", label: "Poisson's ratio nu (0.3 sand)", kind: "number" },
+    { key: "is_f", label: "Influence factor Is (0.82 rigid square)", kind: "number" },
   ],
   outputs: [
     { key: "se", id: "sse-out-se", label: "Elastic settlement Se", value: (r) => fmt(r.se_in, 2) + " in (" + fmt(r.se_ft, 4) + " ft)" },
@@ -493,11 +493,11 @@ GEOTECH_RENDERERS["elastic-settlement-allowable-pressure"] = _simpleRenderer({
   citation: "Citation: theory-of-elasticity immediate settlement Se = q B (1 - nu^2) Is / Es solved for the pressure, q = Se Es / (B (1 - nu^2) Is), with the shape/rigidity influence factor Is (Bowles), by name. A settlement (serviceability) limit, not the bearing-capacity strength check. A design aid, not a substitute for the geotechnical engineer's report.",
   example: elasticSettlementAllowablePressureExample.inputs,
   fields: [
-    { key: "settlement_limit_in", label: "Settlement limit Se (in)", kind: "number", default: 1 },
+    { key: "settlement_limit_in", label: "Settlement limit Se (in)", kind: "number" },
     { key: "b_ft", label: "Footing width B (ft)", kind: "number" },
     { key: "es_ksf", label: "Soil elastic modulus Es (ksf)", kind: "number" },
-    { key: "nu", label: "Poisson's ratio nu (0.3 sand)", kind: "number", default: 0.3 },
-    { key: "is_f", label: "Influence factor Is (0.82 rigid square)", kind: "number", default: 0.82 },
+    { key: "nu", label: "Poisson's ratio nu (0.3 sand)", kind: "number" },
+    { key: "is_f", label: "Influence factor Is (0.82 rigid square)", kind: "number" },
   ],
   outputs: [
     { key: "q", id: "esap-out-q", label: "Allowable pressure (settlement limit)", value: (r) => fmt(r.allowable_pressure_ksf, 2) + " ksf (" + fmt(r.allowable_pressure_psf, 0) + " psf)" },
@@ -535,8 +535,8 @@ GEOTECH_RENDERERS["pile-axial-capacity"] = _simpleRenderer({
     { key: "d_ft", label: "Pile diameter D (ft)", kind: "number" },
     { key: "l_ft", label: "Embedded length L (ft)", kind: "number" },
     { key: "cu_ksf", label: "Undrained shear strength cu (ksf)", kind: "number" },
-    { key: "alpha", label: "Adhesion factor alpha (~0.55 medium stiff)", kind: "number", default: 0.55 },
-    { key: "fs", label: "Factor of safety FS", kind: "number", default: 3 },
+    { key: "alpha", label: "Adhesion factor alpha (~0.55 medium stiff)", kind: "number" },
+    { key: "fs", label: "Factor of safety FS", kind: "number" },
   ],
   outputs: [
     { key: "qs", id: "pac-out-qs", label: "Skin friction Qs", value: (r) => fmt(r.qs_kip, 1) + " kip (" + fmt(r.skin_frac * 100, 0) + "% of capacity)" },
@@ -582,11 +582,11 @@ GEOTECH_RENDERERS["pile-length-for-capacity"] = _simpleRenderer({
   citation: "Citation: alpha (total-stress) pile capacity Qult = alpha cu (pi D L) + 9 cu (pi D^2/4) solved for the embedment L = (Qall FS - Qp) / (alpha cu pi D), with the adhesion factor and Nc = 9 per the FHWA / Das foundation references, by name. Single pile, uniform clay. A design aid; the geotechnical engineer and a load test govern.",
   example: pileLengthForCapacityExample.inputs,
   fields: [
-    { key: "qall_target_kip", label: "Target allowable capacity Qall (kip)", kind: "number", default: 50 },
+    { key: "qall_target_kip", label: "Target allowable capacity Qall (kip)", kind: "number" },
     { key: "d_ft", label: "Pile diameter D (ft)", kind: "number" },
     { key: "cu_ksf", label: "Undrained shear strength cu (ksf)", kind: "number" },
-    { key: "alpha", label: "Adhesion factor alpha (~0.55 medium stiff)", kind: "number", default: 0.55 },
-    { key: "fs", label: "Factor of safety FS", kind: "number", default: 3 },
+    { key: "alpha", label: "Adhesion factor alpha (~0.55 medium stiff)", kind: "number" },
+    { key: "fs", label: "Factor of safety FS", kind: "number" },
   ],
   outputs: [
     { key: "l", id: "plc-out-l", label: "Required embedded length L", value: (r) => fmt(r.l_ft, 1) + " ft" },
@@ -627,7 +627,7 @@ GEOTECH_RENDERERS["slope-stability-infinite"] = _simpleRenderer({
     { key: "beta_deg", label: "Slope angle beta (deg)", kind: "number" },
     { key: "phi_deg", label: "Effective friction angle phi' (deg)", kind: "number" },
     { key: "c_psf", label: "Effective cohesion c' (psf, 0 cohesionless)", kind: "number", default: 0 },
-    { key: "gamma_pcf", label: "Soil unit weight (pcf)", kind: "number", default: 120 },
+    { key: "gamma_pcf", label: "Soil unit weight (pcf)", kind: "number" },
     { key: "h_ft", label: "Depth to failure plane H (ft)", kind: "number" },
   ],
   outputs: [
@@ -670,8 +670,8 @@ GEOTECH_RENDERERS["slope-stability-seepage"] = _simpleRenderer({
   fields: [
     { key: "beta_deg", label: "Slope angle beta (deg)", kind: "number" },
     { key: "phi_deg", label: "Effective friction angle phi' (deg)", kind: "number" },
-    { key: "c_psf", label: "Effective cohesion c' (psf, 0 cohesionless)", kind: "number", default: 0 },
-    { key: "gamma_sat", label: "Saturated unit weight (pcf)", kind: "number", default: 125 },
+    { key: "c_psf", label: "Effective cohesion c' (psf, 0 cohesionless)", kind: "number" },
+    { key: "gamma_sat", label: "Saturated unit weight (pcf)", kind: "number" },
     { key: "h_ft", label: "Depth to failure plane H (ft)", kind: "number" },
   ],
   outputs: [
@@ -965,9 +965,9 @@ GEOTECH_RENDERERS["consolidation-time-rate"] = _simpleRenderer({
   citation: "Citation: Terzaghi 1-D consolidation time factor: Tv = (pi/4)(U/100)^2 for U <= 60%, else 1.781 - 0.933 log10(100 - U); time t = Tv Hdr^2 / cv, with Hdr the longest drainage path (full layer for single, half for double drainage). A design aid; the engineer of record and the site cv govern.",
   example: consolidationTimeRateExample.inputs,
   fields: [
-    { key: "u_percent", label: "Target degree of consolidation U (%)", kind: "number", default: 90 },
-    { key: "cv_ft2_day", label: "Coefficient of consolidation cv (ft²/day)", kind: "number", default: 0.1 },
-    { key: "hdr_ft", label: "Drainage path Hdr (ft)", kind: "number", default: 10 },
+    { key: "u_percent", label: "Target degree of consolidation U (%)", kind: "number" },
+    { key: "cv_ft2_day", label: "Coefficient of consolidation cv (ft²/day)", kind: "number" },
+    { key: "hdr_ft", label: "Drainage path Hdr (ft)", kind: "number" },
   ],
   outputs: [
     { key: "tv", id: "ctr-out-tv", label: "Time factor Tv", value: (r) => fmt(r.tv, 3) },
@@ -1001,9 +1001,9 @@ GEOTECH_RENDERERS["consolidation-degree"] = _simpleRenderer({
   citation: "Citation: Terzaghi 1-D consolidation degree from elapsed time - Tv = cv t / Hdr^2, then U = 100 sqrt(4 Tv / pi) for Tv <= 0.283 (U <= 60%), else U = 100 - 10^((1.781 - Tv)/0.933); the inverse of the consolidation-time tile. Hdr is the longest drainage path (full layer for single, half for double drainage). A design aid; the engineer of record and the site cv govern.",
   example: consolidationDegreeExample.inputs,
   fields: [
-    { key: "cv_ft2_day", label: "Coefficient of consolidation cv (ft²/day)", kind: "number", default: 0.1 },
-    { key: "hdr_ft", label: "Drainage path Hdr (ft)", kind: "number", default: 10 },
-    { key: "t_days", label: "Elapsed time (days)", kind: "number", default: 848 },
+    { key: "cv_ft2_day", label: "Coefficient of consolidation cv (ft²/day)", kind: "number" },
+    { key: "hdr_ft", label: "Drainage path Hdr (ft)", kind: "number" },
+    { key: "t_days", label: "Elapsed time (days)", kind: "number" },
   ],
   outputs: [
     { key: "tv", id: "ccd-out-tv", label: "Time factor Tv", value: (r) => fmt(r.tv, 3) },
@@ -1055,8 +1055,8 @@ GEOTECH_RENDERERS["coefficient-of-consolidation"] = _simpleRenderer({
       { value: "casagrande", label: "Casagrande log-time (t50, T50 = 0.197)" },
       { value: "taylor", label: "Taylor sqrt-time (t90, T90 = 0.848)" },
     ] },
-    { key: "t_fit_min", label: "Fitting time t50 or t90 (min)", kind: "number", default: 5 },
-    { key: "specimen_height_in", label: "Specimen height (in)", kind: "number", default: 1.0 },
+    { key: "t_fit_min", label: "Fitting time t50 or t90 (min)", kind: "number" },
+    { key: "specimen_height_in", label: "Specimen height (in)", kind: "number" },
     { key: "drainage", label: "Specimen drainage", kind: "select", default: "double", options: [
       { value: "double", label: "Two-way (Hdr = H/2)" },
       { value: "single", label: "One-way (Hdr = H)" },
@@ -1093,9 +1093,9 @@ GEOTECH_RENDERERS["spt-bearing-capacity"] = _simpleRenderer({
   citation: "Citation: Meyerhof SPT allowable bearing on sand for 1 in settlement: qa = N60/4 ksf for B <= 4 ft, else (N60/6)((B+1)/B)^2, times Kd = min(1 + 0.33 D/B, 1.33). A settlement-controlled allowable (no added factor of safety); N60 must be energy-corrected. A design aid; the engineer of record and the geotechnical report govern.",
   example: sptBearingCapacityExample.inputs,
   fields: [
-    { key: "n60", label: "SPT N60 (energy-corrected)", kind: "number", default: 20 },
-    { key: "b_ft", label: "Footing width B (ft)", kind: "number", default: 6 },
-    { key: "d_ft", label: "Embedment depth D (ft)", kind: "number", default: 2 },
+    { key: "n60", label: "SPT N60 (energy-corrected)", kind: "number" },
+    { key: "b_ft", label: "Footing width B (ft)", kind: "number" },
+    { key: "d_ft", label: "Embedment depth D (ft)", kind: "number" },
   ],
   outputs: [
     { key: "qab", id: "spt-out-qab", label: "Base allowable (before depth factor)", value: (r) => fmt(r.qa_base_ksf, 2) + " ksf (" + (r.small_footing ? "B <= 4 branch" : "wide-footing branch") + ")" },
@@ -1134,9 +1134,9 @@ GEOTECH_RENDERERS["spt-required-n60"] = _simpleRenderer({
   citation: "Citation: Meyerhof SPT allowable bearing on sand solved for the blow count, N60 = qa_target / qa(N60=1), with qa = N60/4 ksf (B <= 4 ft) or (N60/6)((B+1)/B)^2 times Kd = min(1 + 0.33 D/B, 1.33), by name. A settlement-controlled (serviceability) check; N60 must be energy-corrected. A design aid; the engineer of record and the geotechnical report govern.",
   example: sptRequiredN60Example.inputs,
   fields: [
-    { key: "qa_target_ksf", label: "Target allowable bearing qa (ksf)", kind: "number", default: 5 },
-    { key: "b_ft", label: "Footing width B (ft)", kind: "number", default: 6 },
-    { key: "d_ft", label: "Embedment depth D (ft)", kind: "number", default: 2 },
+    { key: "qa_target_ksf", label: "Target allowable bearing qa (ksf)", kind: "number" },
+    { key: "b_ft", label: "Footing width B (ft)", kind: "number" },
+    { key: "d_ft", label: "Embedment depth D (ft)", kind: "number" },
   ],
   outputs: [
     { key: "n60", id: "srn-out-n60", label: "Required N60 (round up for design)", value: (r) => fmt(r.n60, 1) + " (design " + r.n60_design + ")" },
@@ -1177,11 +1177,11 @@ GEOTECH_RENDERERS["soil-vertical-effective-stress"] = _simpleRenderer({
   citation: "Citation: Terzaghi's effective-stress principle sigma' = sigma - u with a hydrostatic pore pressure u = gamma_w x (depth below the water table), gamma_w = 62.4 pcf, and the total vertical stress accumulated from the moist unit weight above the table and the saturated unit weight below it, plus any surface surcharge -- as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.01, by name. Equivalent to stacking the buoyant unit weight (gamma_sat - gamma_w) below the table. Hydrostatic conditions, level ground, uniform layers, no capillary rise. A design aid, not a substitute for the geotechnical engineer of record's report.",
   example: soilVerticalEffectiveStressExample.inputs,
   fields: [
-    { key: "gamma_moist_pcf", label: "Moist unit weight above water table (pcf)", kind: "number", default: 120 },
-    { key: "gamma_sat_pcf", label: "Saturated unit weight below water table (pcf)", kind: "number", default: 125 },
+    { key: "gamma_moist_pcf", label: "Moist unit weight above water table (pcf)", kind: "number" },
+    { key: "gamma_sat_pcf", label: "Saturated unit weight below water table (pcf)", kind: "number" },
     { key: "depth_ft", label: "Depth of interest (ft)", kind: "number" },
     { key: "water_table_depth_ft", label: "Depth to water table (ft, >= depth = dry)", kind: "number" },
-    { key: "surcharge_psf", label: "Surface surcharge (psf, 0 = none)", kind: "number", default: 0 },
+    { key: "surcharge_psf", label: "Surface surcharge (psf, 0 = none)", kind: "number" },
   ],
   outputs: [
     { key: "sv", id: "svs-out-sv", label: "Total vertical stress sigma_v", value: (r) => fmt(r.total_stress_psf, 0) + " psf" },
@@ -1223,12 +1223,12 @@ GEOTECH_RENDERERS["liquefaction-screening"] = _simpleRenderer({
   citation: "Citation: Seed-Idriss simplified liquefaction triggering: rd = 1 - 0.00233172 z (z in ft, <= 30.02 ft) else 1.174 - 0.00813816 z (the published per-meter constants 0.00765 and 0.0267 and the 9.15 m breakpoint restated per foot via 0.3048), CSR = 0.65 amax (sigma_v/sigma'_v) rd, FS = (CRR/CSR) MSF, liquefiable if FS < 1. A screening tool for level ground; the geotechnical engineer of record and a site-specific analysis govern.",
   example: liquefactionScreeningExample.inputs,
   fields: [
-    { key: "amax_g", label: "Peak ground acceleration (g)", kind: "number", default: 0.30 },
-    { key: "sigma_v_psf", label: "Total vertical stress (psf)", kind: "number", default: 2000 },
-    { key: "sigma_vp_psf", label: "Effective vertical stress (psf)", kind: "number", default: 1200 },
-    { key: "depth_ft", label: "Depth (ft)", kind: "number", default: 16.4042 },
-    { key: "crr", label: "Cyclic resistance ratio CRR", kind: "number", default: 0.20 },
-    { key: "msf", label: "Magnitude scaling factor (Mw 7.5 = 1.0)", kind: "number", default: 1.0 },
+    { key: "amax_g", label: "Peak ground acceleration (g)", kind: "number" },
+    { key: "sigma_v_psf", label: "Total vertical stress (psf)", kind: "number" },
+    { key: "sigma_vp_psf", label: "Effective vertical stress (psf)", kind: "number" },
+    { key: "depth_ft", label: "Depth (ft)", kind: "number" },
+    { key: "crr", label: "Cyclic resistance ratio CRR", kind: "number" },
+    { key: "msf", label: "Magnitude scaling factor (Mw 7.5 = 1.0)", kind: "number" },
   ],
   outputs: [
     { key: "csr", id: "liq-out-csr", label: "Cyclic stress ratio CSR", value: (r) => fmt(r.csr, 3) + " (rd " + fmt(r.rd, 3) + ")" },
@@ -1375,7 +1375,7 @@ GEOTECH_RENDERERS["slope-failure-depth-for-fs"] = _simpleRenderer({
     { key: "beta_deg", label: "Slope angle beta (deg)", kind: "number" },
     { key: "phi_deg", label: "Effective friction angle phi' (deg)", kind: "number" },
     { key: "c_psf", label: "Effective cohesion c' (psf, must be > 0)", kind: "number" },
-    { key: "gamma_pcf", label: "Soil unit weight (pcf)", kind: "number", default: 120 },
+    { key: "gamma_pcf", label: "Soil unit weight (pcf)", kind: "number" },
     { key: "target_fs", label: "Target factor of safety (e.g. 1.5)", kind: "number" },
   ],
   outputs: [
@@ -1414,11 +1414,11 @@ GEOTECH_RENDERERS["frost-depth-berggren"] = _simpleRenderer({
   citation: "Citation: Stefan / modified-Berggren frost penetration (US Army Corps / FHWA), by name. Stefan X = sqrt(48 kf FI / L); L = 144 x dry density x water content/100 (latent heat of fusion); modified Berggren X_MB = lambda x X_Stefan, lambda ~0.6-0.9 from the Berggren nomograph. Computes the physics, not the code frost line -- the locally adopted frost depth (IRC Table R301.2 / amendment), the geotech report, and the AHJ govern the footing depth.",
   example: frostDepthBerggrenExample.inputs,
   fields: [
-    { key: "freezing_index_f_days", label: "Air-freezing index (F-days)", kind: "number", default: 2000 },
-    { key: "frozen_conductivity_btu", label: "Frozen conductivity kf (BTU/hr-ft-F)", kind: "number", default: 1.0 },
-    { key: "dry_density_pcf", label: "Dry density (pcf)", kind: "number", default: 100 },
-    { key: "water_content_pct", label: "Water content (percent)", kind: "number", default: 15 },
-    { key: "berggren_lambda", label: "Berggren lambda (0-1, ~0.8)", kind: "number", default: 0.8 },
+    { key: "freezing_index_f_days", label: "Air-freezing index (F-days)", kind: "number" },
+    { key: "frozen_conductivity_btu", label: "Frozen conductivity kf (BTU/hr-ft-F)", kind: "number" },
+    { key: "dry_density_pcf", label: "Dry density (pcf)", kind: "number" },
+    { key: "water_content_pct", label: "Water content (percent)", kind: "number" },
+    { key: "berggren_lambda", label: "Berggren lambda (0-1, ~0.8)", kind: "number" },
   ],
   outputs: [
     { key: "l", id: "frb-out-l", label: "Volumetric latent heat", value: (r) => fmt(r.volumetric_latent_heat_btu_ft3, 0) + " BTU/ft^3" },
@@ -1484,12 +1484,12 @@ GEOTECH_RENDERERS["seismic-earth-pressure"] = _simpleRenderer({
   fields: [
     { key: "phi", label: "Soil friction angle phi (deg)", kind: "number" },
     { key: "delta", label: "Wall friction delta (deg, ~2/3 phi, 0 smooth)", kind: "number", default: 0 },
-    { key: "theta", label: "Wall batter theta (deg from vertical, 0 vertical)", kind: "number", default: 0 },
-    { key: "alpha", label: "Backfill slope alpha (deg, 0 level)", kind: "number", default: 0 },
-    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number", default: 120 },
+    { key: "theta", label: "Wall batter theta (deg from vertical, 0 vertical)", kind: "number" },
+    { key: "alpha", label: "Backfill slope alpha (deg, 0 level)", kind: "number" },
+    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number" },
     { key: "h_ft", label: "Retained height H (ft)", kind: "number" },
     { key: "kh", label: "Horizontal seismic coefficient kh", kind: "number", default: 0 },
-    { key: "kv", label: "Vertical seismic coefficient kv (+ up)", kind: "number", default: 0 },
+    { key: "kv", label: "Vertical seismic coefficient kv (+ up)", kind: "number" },
   ],
   outputs: [
     { key: "k", id: "sep-out-k", label: "Kae (seismic) / Ka (static Coulomb)", value: (r) => fmt(r.kae, 3) + " / " + fmt(r.ka_static, 3) },
@@ -1564,7 +1564,7 @@ GEOTECH_RENDERERS["cohesive-earth-pressure"] = _simpleRenderer({
     { key: "c_psf", label: "Cohesion c (psf)", kind: "number" },
     { key: "gamma", label: "Soil unit weight (pcf)", kind: "number", default: 120 },
     { key: "h_ft", label: "Retained height H (ft)", kind: "number" },
-    { key: "q", label: "Uniform surcharge q (psf)", kind: "number", default: 0 },
+    { key: "q", label: "Uniform surcharge q (psf)", kind: "number" },
   ],
   outputs: [
     { key: "k", id: "cohep-out-k", label: "Coefficients Ka / Kp", value: (r) => fmt(r.ka, 3) + " / " + fmt(r.kp, 2) },
@@ -1633,7 +1633,7 @@ GEOTECH_RENDERERS["pole-embedment-depth"] = _simpleRenderer({
     { key: "lateral_force_lb", label: "Applied lateral force P (lb)", kind: "number" },
     { key: "force_height_ft", label: "Height of force above grade h (ft)", kind: "number" },
     { key: "post_width_ft", label: "Post/footing width b (ft; round dia or square diagonal)", kind: "number" },
-    { key: "lateral_bearing_psf_per_ft", label: "Lateral bearing (psf per ft depth, local code)", kind: "number", default: 150 },
+    { key: "lateral_bearing_psf_per_ft", label: "Lateral bearing (psf per ft depth, local code)", kind: "number" },
     { key: "constraint", label: "Restraint at grade", kind: "select", options: [{ value: "nonconstrained", label: "Nonconstrained (soil only)", selected: true }, { value: "constrained", label: "Constrained (rigid slab/pavement at grade)" }] },
     { key: "isolated", label: "Isolated pole (1/2-in movement OK, 2x bearing)", kind: "select", options: [{ value: "yes", label: "Yes (flagpole/sign/fence, 1806.3.4)", selected: true }, { value: "no", label: "No (movement-sensitive)" }] },
   ],

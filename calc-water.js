@@ -346,7 +346,7 @@ const renderFilterLoading = _r({
   fields: [
     { key: "filter_area_ft2",       label: "Filter area (ft²)", kind: "number" },
     { key: "flow_gpm",              label: "Flow (GPM)", kind: "number" },
-    { key: "backwash_rate_gpm_ft2", label: "Backwash rate (gpm/ft²)", kind: "number", default: 15 },
+    { key: "backwash_rate_gpm_ft2", label: "Backwash rate (gpm/ft²)", kind: "number" },
   ],
   outputs: [
     { key: "l", id: "fl-out-l", label: "Loading rate", value: (r) => fmt(r.loading_gpm_per_ft2, 2) + " gpm/ft^2" },
@@ -362,7 +362,7 @@ const renderFilterAreaForLoading = _r({
   fields: [
     { key: "flow_gpm",               label: "Design flow (GPM)", kind: "number" },
     { key: "target_loading_gpm_ft2", label: "Target loading rate (gpm/ft²)", kind: "number" },
-    { key: "backwash_rate_gpm_ft2",  label: "Backwash rate (gpm/ft²)", kind: "number", default: 15 },
+    { key: "backwash_rate_gpm_ft2",  label: "Backwash rate (gpm/ft²)", kind: "number" },
   ],
   outputs: [
     { key: "a", id: "fal-out-a", label: "Required filter area", value: (r) => fmt(r.required_area_ft2, 1) + " ft^2" },
@@ -451,8 +451,8 @@ const renderPumpEff = _r({
     { key: "flow_gpm",   label: "Flow (GPM)", kind: "number" },
     { key: "tdh_ft",     label: "Total dynamic head (ft)", kind: "number" },
     { key: "motor_kW",   label: "Motor input (kW)", kind: "number" },
-    { key: "motor_eff",  label: "Motor efficiency (0-1)", kind: "number", default: 0.92 },
-    { key: "drive_eff",  label: "Drive efficiency (0-1)", kind: "number", default: 1.0 },
+    { key: "motor_eff",  label: "Motor efficiency (0-1)", kind: "number" },
+    { key: "drive_eff",  label: "Drive efficiency (0-1)", kind: "number" },
   ],
   outputs: [
     { key: "w", id: "pe-out-w", label: "Water HP",         value: (r) => fmt(r.whp, 2) + " hp" },
@@ -1490,9 +1490,9 @@ const renderChlorineDemand = _v23SimpleRenderer({
   citation: "Citation: Standard Methods 4500-Cl / AWWA M14 (by name, not reproduced). Demand = applied - residual; dose for a target = demand + target. A high demand suggests ammonia / organics - check breakpoint. The state primacy agency sets the compliance residual and method.",
   example: chlorineDemandExample.inputs,
   fields: [
-    { key: "applied_mg_l", label: "Applied chlorine (mg/L)", kind: "number", default: 3.0 },
-    { key: "measured_residual_mg_l", label: "Measured residual (mg/L)", kind: "number", default: 0.8 },
-    { key: "target_residual_mg_l", label: "Target residual (mg/L)", kind: "number", default: 1.0 },
+    { key: "applied_mg_l", label: "Applied chlorine (mg/L)", kind: "number" },
+    { key: "measured_residual_mg_l", label: "Measured residual (mg/L)", kind: "number" },
+    { key: "target_residual_mg_l", label: "Target residual (mg/L)", kind: "number" },
   ],
   outputs: [
     { key: "d", id: "cld-out-d", label: "Chlorine demand", value: (r) => fmt(r.demand_mg_l, 2) + " mg/L" + (r.high_demand ? " (high - check ammonia / breakpoint)" : "") },
@@ -1523,9 +1523,9 @@ const renderUvDose = _v23SimpleRenderer({
   citation: "Citation: USEPA UV Disinfection Guidance Manual (by name, not reproduced). Dose = intensity x time (mW.s/cm^2 = mJ/cm^2); common validated target 40 mJ/cm^2 (editable). The validated reactor dose and the state primacy agency govern.",
   example: uvDoseExample.inputs,
   fields: [
-    { key: "intensity_mw_cm2", label: "UV intensity (mW/cm²)", kind: "number", default: 10 },
-    { key: "exposure_time_s", label: "Exposure time (s)", kind: "number", default: 5 },
-    { key: "target_dose_mj_cm2", label: "Target dose (mJ/cm²)", kind: "number", default: 40 },
+    { key: "intensity_mw_cm2", label: "UV intensity (mW/cm²)", kind: "number" },
+    { key: "exposure_time_s", label: "Exposure time (s)", kind: "number" },
+    { key: "target_dose_mj_cm2", label: "Target dose (mJ/cm²)", kind: "number" },
   ],
   outputs: [
     { key: "d", id: "uvd-out-d", label: "Delivered dose", value: (r) => fmt(r.dose_mj_cm2, 1) + " mJ/cm^2" },
@@ -1558,9 +1558,9 @@ const renderUvRequiredExposure = _v23SimpleRenderer({
   citation: "Citation: USEPA UV Disinfection Guidance Manual (by name, not reproduced). Dose = intensity x time (mW.s/cm^2 = mJ/cm^2) solved for the missing operand: required time = dose / intensity, or required intensity = dose / time; common validated target 40 mJ/cm^2 (editable). The validated reactor dose and the state primacy agency govern.",
   example: uvRequiredExposureExample.inputs,
   fields: [
-    { key: "target_dose_mj_cm2", label: "Target dose (mJ/cm²)", kind: "number", default: 40 },
-    { key: "intensity_mw_cm2", label: "UV intensity (mW/cm², 0 = solve for it)", kind: "number", default: 10 },
-    { key: "exposure_time_s", label: "Exposure time (s, 0 = solve for it)", kind: "number", default: 0 },
+    { key: "target_dose_mj_cm2", label: "Target dose (mJ/cm²)", kind: "number" },
+    { key: "intensity_mw_cm2", label: "UV intensity (mW/cm², 0 = solve for it)", kind: "number" },
+    { key: "exposure_time_s", label: "Exposure time (s, 0 = solve for it)", kind: "number" },
   ],
   outputs: [
     { key: "t", id: "uvr-out-t", label: "Required exposure time", value: (r) => r.required_time_s == null ? "(time was given)" : fmt(r.required_time_s, 2) + " s" },
@@ -1766,9 +1766,9 @@ const renderAerationOxygenDemand = _v23SimpleRenderer({
   example: aerationOxygenDemandExample.inputs,
   fields: [
     { key: "bod_removed_lb_day", label: "BOD removed (lb/day)", kind: "number" },
-    { key: "oxygen_factor", label: "Oxygen factor (lb O2 / lb BOD, 0.9-1.5)", kind: "number", default: 1.1 },
+    { key: "oxygen_factor", label: "Oxygen factor (lb O2 / lb BOD, 0.9-1.5)", kind: "number" },
     { key: "nh3_nitrified_lb_day", label: "Ammonia-N nitrified (lb/day, 0 to skip)", kind: "number", default: 0 },
-    { key: "sote_pct", label: "SOTE (%, ~10-35 diffused)", kind: "number", default: 20 },
+    { key: "sote_pct", label: "SOTE (%, ~10-35 diffused)", kind: "number" },
   ],
   outputs: [
     { key: "o", id: "aod-out-o", label: "Oxygen demand (carbon + nitrogen)", value: (r) => fmt(r.o2_demand_lb_day, 0) + " lb/day (" + fmt(r.o2_carbon_lb_day, 0) + " carbon + " + fmt(r.o2_nitro_lb_day, 0) + " nitrification)" },

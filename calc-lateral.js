@@ -192,7 +192,7 @@ LATERAL_RENDERERS["shearwall-deflection"] = _simpleRenderer({
     { key: "v_plf", label: "Unit shear v (plf, service/ASD)", kind: "number" },
     { key: "h_ft", label: "Wall height h (ft)", kind: "number" },
     { key: "b_ft", label: "Wall length b (ft)", kind: "number" },
-    { key: "e_psi", label: "End-post modulus E (psi)", kind: "number", default: 1600000 },
+    { key: "e_psi", label: "End-post modulus E (psi)", kind: "number" },
     { key: "a_in2", label: "End-post area A (in²)", kind: "number" },
     { key: "ga_kin", label: "Apparent shear stiffness Ga (kips/in)", kind: "number" },
     { key: "da_in", label: "Anchorage elongation da (in)", kind: "number", default: 0 },
@@ -233,7 +233,7 @@ LATERAL_RENDERERS["diaphragm-collector-force"] = _simpleRenderer({
   fields: [
     { key: "unit_shear_plf", label: "Diaphragm unit shear v (plf)", kind: "number" },
     { key: "collector_len_ft", label: "Collector length to wall Lc (ft)", kind: "number" },
-    { key: "omega0", label: "Overstrength factor Omega0 (1.0 to skip)", kind: "number", default: 2.5 },
+    { key: "omega0", label: "Overstrength factor Omega0 (1.0 to skip)", kind: "number" },
   ],
   outputs: [
     { key: "f", id: "dcf-out-f", label: "Collector force (strength level)", value: (r) => fmt(r.collector_force_lb, 0) + " lb axial" },

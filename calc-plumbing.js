@@ -2946,7 +2946,7 @@ const renderTrapSealLoss = _v23SimpleRenderer({
   fields: [
     { key: "developed_distance_ft", label: "Developed trap-to-vent distance (ft)", kind: "number" },
     { key: "table_max_ft", label: "Permitted maximum (ft, from adopted table)", kind: "number" },
-    { key: "trap_seal_in", label: "Trap-seal depth (in)", kind: "number", default: 2 },
+    { key: "trap_seal_in", label: "Trap-seal depth (in)", kind: "number" },
   ],
   outputs: [
     { key: "pass", id: "tsl-out-pass", label: "Within limit", value: (r) => r.within_limit ? "PASS - within permitted distance" : "FAIL - trap arm exceeds the table maximum" },

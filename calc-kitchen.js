@@ -343,7 +343,7 @@ const renderCoolingCurve = _r({
   example: coolingCurveExample.inputs,
   fields: [
     { key: "start_F",      label: "Starting temp (F; confirms food is hot; cooling time shown is the FDA 135-to-70-to-41 window, not measured from this temp)", kind: "number", default: 165 },
-    { key: "ambient_F",    label: "Ambient temp (°F)", kind: "number", default: 70 },
+    { key: "ambient_F",    label: "Ambient temp (°F)", kind: "number" },
     { key: "container",    label: "Container", kind: "select", options: Object.keys(COOLING_BASE_MIN).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
     { key: "product_type", label: "Product type", kind: "select", options: [{ value: "thin_liquid", label: "Thin liquid" }, { value: "thick_liquid", label: "Thick liquid" }, { value: "dense_solid", label: "Dense solid" }] },
   ],
@@ -1163,11 +1163,11 @@ KITCHEN_RENDERERS["dough-water-temperature"] = _r({
   citation: "Citation: desired dough temperature (DDT) mixing-water calculation (Hamelman / Bread Bakers Guild), by name. water = DDT x N - (sum of the other factors + friction); N = 3 (flour, room, friction) or 4 (adds a preferment). Friction factor ~0-5 F hand, ~24-30 F spiral mixer, measured per mixer. If below freezing, add weighed ice. The measured friction factor and the finished-dough reading govern.",
   example: doughWaterTemperatureExample.inputs,
   fields: [
-    { key: "desired_dough_temp_f", label: "Desired dough temp DDT (°F)", kind: "number", default: 75 },
-    { key: "flour_temp_f", label: "Flour temp (°F)", kind: "number", default: 68 },
-    { key: "room_temp_f", label: "Room temp (°F)", kind: "number", default: 72 },
-    { key: "friction_factor_f", label: "Friction factor (F, ~24-30 spiral, 0-5 hand)", kind: "number", default: 24 },
-    { key: "preferment_temp_f", label: "Preferment temp (F, 0 if none)", kind: "number", default: 0 },
+    { key: "desired_dough_temp_f", label: "Desired dough temp DDT (°F)", kind: "number" },
+    { key: "flour_temp_f", label: "Flour temp (°F)", kind: "number" },
+    { key: "room_temp_f", label: "Room temp (°F)", kind: "number" },
+    { key: "friction_factor_f", label: "Friction factor (F, ~24-30 spiral, 0-5 hand)", kind: "number" },
+    { key: "preferment_temp_f", label: "Preferment temp (F, 0 if none)", kind: "number" },
   ],
   outputs: [
     { key: "w", id: "dwt-out-w", label: "Mixing water temperature", value: (r) => fmt(r.water_temp_f, 0) + " F (" + r.factor_count + "-factor)" },
@@ -1200,9 +1200,9 @@ KITCHEN_RENDERERS["as-purchased-quantity"] = _r({
   citation: "Citation: as-purchased quantity from edible-portion needed (standard culinary math; CIA The Professional Chef, On Cooking), by name. AP = EP needed / yield (always divide, so the buy exceeds what you serve); AP units = AP / unit weight. The purchasing inverse of the yield-ep tile. The actual yield varies with grade, season, and trimming, so a yield test on the real product governs.",
   example: asPurchasedQuantityExample.inputs,
   fields: [
-    { key: "ep_quantity_needed", label: "Edible-portion quantity needed (lb or each)", kind: "number", default: 20 },
-    { key: "yield_pct", label: "Yield (%)", kind: "number", default: 75 },
-    { key: "unit_weight", label: "Weight per purchase unit (0 to skip)", kind: "number", default: 0 },
+    { key: "ep_quantity_needed", label: "Edible-portion quantity needed (lb or each)", kind: "number" },
+    { key: "yield_pct", label: "Yield (%)", kind: "number" },
+    { key: "unit_weight", label: "Weight per purchase unit (0 to skip)", kind: "number" },
   ],
   outputs: [
     { key: "q", id: "apq-out-q", label: "As-purchased quantity", value: (r) => fmt(r.ap_quantity, 2) },
@@ -1236,8 +1236,8 @@ KITCHEN_RENDERERS["abv-from-gravity"] = _r({
   citation: "Citation: alcohol by volume from gravity (standard homebrew/brewing formula; Papazian, The Complete Joy of Homebrewing), by name. ABV% = (OG - FG) x 131.25; apparent attenuation = (OG - FG)/(OG - 1). The 131.25 factor is an approximation (drifts high on strong brews). A temperature-corrected hydrometer/refractometer and, for a sold product, the TTB/lab method govern the label.",
   example: abvFromGravityExample.inputs,
   fields: [
-    { key: "original_gravity", label: "Original gravity (OG)", kind: "number", default: 1.055 },
-    { key: "final_gravity", label: "Final gravity (FG)", kind: "number", default: 1.012 },
+    { key: "original_gravity", label: "Original gravity (OG)", kind: "number" },
+    { key: "final_gravity", label: "Final gravity (FG)", kind: "number" },
   ],
   outputs: [
     { key: "a", id: "abv-out-a", label: "Alcohol by volume", value: (r) => fmt(r.abv_pct, 2) + " % ABV" },

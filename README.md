@@ -18,16 +18,16 @@
 2. Type your numbers. The answer updates as you type. There is no submit button.
 3. Tap **Copy** to take a value with you.
 
-Every field shows an example value as its placeholder, so you can see the expected unit and magnitude before you type over it.
+A calculator opens empty. Every number box is captioned with the value the page's worked example uses (`e.g. 150`), so you can see the expected unit and magnitude before you type your own over it.
 
-**Every calculator's page is the same four things**, in this order:
+**Every calculator's page is the same short thing**, in this order. Nothing below the example is open until you ask for it:
 
 | | |
 |---|---|
 | **Title + one line** | what it does |
 | **Run the calculator** | opens it with the example already loaded |
 | **Example** | the exact inputs and the exact answer |
-| **Two collapsed blocks** | the formula, source, and assumptions; and the scope and limits |
+| **Collapsed detail** | *Show the formula, source, and assumptions* on every page, and *More about this calculator* where there is more to say |
 
 Here is that Example block, from [Voltage Drop](https://roughlogic.com/tools/voltage-drop/):
 

@@ -401,8 +401,8 @@ const renderBridgeFormulaMinSpacing = _simpleRenderer({
   citation: "Citation: Federal Bridge Formula B (23 CFR 658.17) solved for the minimum axle spread - L = ((W/500) - 12 N - 36)(N-1)/N from W = 500 (L N/(N-1) + 12 N + 36), by name. The 20,000 lb single / 34,000 lb tandem / 80,000 lb interstate caps apply independently; the enforcing state DOT and the permit govern.",
   example: bridgeFormulaMinSpacingExample.inputs,
   fields: [
-    { key: "target_weight_lb", label: "Target group weight (lb)", kind: "number", default: 80000 },
-    { key: "num_axles", label: "Number of axles in the group", kind: "number", default: 5 },
+    { key: "target_weight_lb", label: "Target group weight (lb)", kind: "number" },
+    { key: "num_axles", label: "Number of axles in the group", kind: "number" },
   ],
   outputs: [
     { key: "l", id: "bfms-out-l", label: "Minimum outer-to-outer spread", value: (r) => r.fits_at_zero ? "0 ft (the axles already satisfy the formula bunched together)" : fmt(r.min_spacing_ft, 1) + " ft" },
@@ -599,9 +599,9 @@ const renderPalletLoadout = _simpleRenderer({
     { key: "case_height_in",   label: "Case height (in)",  kind: "number" },
     { key: "case_weight_lb",   label: "Case weight (lb)",  kind: "number" },
     { key: "cases_per_pallet", label: "Cases per pallet",  kind: "number", default: 36 },
-    { key: "pallet_length_in", label: "Pallet length (in)",kind: "number", default: 48 },
-    { key: "pallet_width_in",  label: "Pallet width (in)", kind: "number", default: 40 },
-    { key: "pallet_height_in", label: "Pallet height (in)",kind: "number", default: 48 },
+    { key: "pallet_length_in", label: "Pallet length (in)",kind: "number" },
+    { key: "pallet_width_in",  label: "Pallet width (in)", kind: "number" },
+    { key: "pallet_height_in", label: "Pallet height (in)",kind: "number" },
     { key: "trailer", label: "Trailer", kind: "select", options: Object.keys(TRAILER_DIMENSIONS_IN).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
     { key: "pinwheel", label: "Pinwheel allowed", kind: "checkbox" },
   ],
@@ -1524,10 +1524,10 @@ const renderGcwrCheck = _simpleRenderer({
   citation: "Citation: 49 CFR 393.75 (tires) / 658.17 (80,000 lb federal gross) and the manufacturer's GCWR rating plate (by section, not reproduced). The binding limit is the smaller of the GCWR and the federal cap. A permit or the AHJ governs an over-limit move. Free at ecfr.gov.",
   example: gcwrCheckExample.inputs,
   fields: [
-    { key: "gcwr_lb", label: "Rated GCWR (lb)", kind: "number", default: 80000 },
-    { key: "tractor_weight_lb", label: "Power-unit weight, loaded (lb)", kind: "number", default: 18000 },
-    { key: "trailer_weight_lb", label: "Trailer weight, loaded (lb)", kind: "number", default: 60000 },
-    { key: "federal_max_lb", label: "Federal gross cap (lb)", kind: "number", default: 80000 },
+    { key: "gcwr_lb", label: "Rated GCWR (lb)", kind: "number" },
+    { key: "tractor_weight_lb", label: "Power-unit weight, loaded (lb)", kind: "number" },
+    { key: "trailer_weight_lb", label: "Trailer weight, loaded (lb)", kind: "number" },
+    { key: "federal_max_lb", label: "Federal gross cap (lb)", kind: "number" },
   ],
   outputs: [
     { key: "c", id: "gcwr-out-c", label: "Combined weight", value: (r) => fmt(r.combined_lb, 0) + " lb" },
@@ -1563,9 +1563,9 @@ const renderTireLoadCheck = _simpleRenderer({
   citation: "Citation: 49 CFR 393.75 (tire load) and the DOT sidewall max-load marking (by section, not reproduced). Capacity = tires x marked max load per tire; use the single vs dual rating to match the position. The marking and the AHJ govern. Free at ecfr.gov.",
   example: tireLoadCheckExample.inputs,
   fields: [
-    { key: "axle_weight_lb", label: "Axle scale weight (lb)", kind: "number", default: 12000 },
+    { key: "axle_weight_lb", label: "Axle scale weight (lb)", kind: "number" },
     { key: "tires_on_axle", label: "Tires on axle (2 single / 4 dual)", kind: "select", options: [{ value: "2", label: "2 (single)" }, { value: "4", label: "4 (dual)" }] },
-    { key: "tire_max_load_lb", label: "Marked max load per tire (lb)", kind: "number", default: 6175 },
+    { key: "tire_max_load_lb", label: "Marked max load per tire (lb)", kind: "number" },
   ],
   outputs: [
     { key: "cap", id: "tlc-out-cap", label: "Axle tire capacity", value: (r) => fmt(r.axle_capacity_lb, 0) + " lb" },
@@ -1602,9 +1602,9 @@ const renderDetentionDemurrageBilling = _simpleRenderer({
   citation: "Citation: Detention/demurrage billing (carrier tariff / rate-confirmation practice): chargeable hours = max(0, actual - free), charge = hours x detention rate, opportunity cost = hours x on-road revenue per hour. A billing aid; the carrier's tariff and the signed rate confirmation govern the actual charge.",
   example: detentionDemurrageBillingExample.inputs,
   fields: [
-    { key: "free_hours", label: "Free time (hr)", kind: "number", default: 2 },
-    { key: "actual_hours", label: "Actual time at facility (hr)", kind: "number", default: 5 },
-    { key: "rate_usd_hr", label: "Detention rate ($/hr)", kind: "number", default: 50 },
+    { key: "free_hours", label: "Free time (hr)", kind: "number" },
+    { key: "actual_hours", label: "Actual time at facility (hr)", kind: "number" },
+    { key: "rate_usd_hr", label: "Detention rate ($/hr)", kind: "number" },
     { key: "truck_rev_usd_hr", label: "Truck revenue on road ($/hr, optional)", kind: "number", default: 0 },
   ],
   outputs: [
@@ -1643,10 +1643,10 @@ const renderDriverPayCpmVsPercentage = _simpleRenderer({
   citation: "Citation: Driver pay comparison (carrier settlement practice): CPM pay = rate x miles, percentage pay = percent x linehaul, break-even load rate = CPM / (percent decimal) per mile. Above break-even the percentage pays more; below it, cents-per-mile does. A comparison aid; the pay plan and accessorials govern.",
   example: driverPayCpmVsPercentageExample.inputs,
   fields: [
-    { key: "cpm_usd", label: "Cents-per-mile rate ($/mi)", kind: "number", default: 0.60 },
-    { key: "pct", label: "Percentage-of-linehaul rate (%)", kind: "number", default: 25 },
-    { key: "miles", label: "Loaded miles", kind: "number", default: 1000 },
-    { key: "linehaul_usd", label: "Load linehaul revenue ($)", kind: "number", default: 2500 },
+    { key: "cpm_usd", label: "Cents-per-mile rate ($/mi)", kind: "number" },
+    { key: "pct", label: "Percentage-of-linehaul rate (%)", kind: "number" },
+    { key: "miles", label: "Loaded miles", kind: "number" },
+    { key: "linehaul_usd", label: "Load linehaul revenue ($)", kind: "number" },
   ],
   outputs: [
     { key: "cpm", id: "dpc-out-cpm", label: "Cents-per-mile pay", value: (r) => "$" + fmt(r.cpm_pay_usd, 2) },
@@ -1683,10 +1683,10 @@ const renderInvoiceFactoringCost = _simpleRenderer({
   citation: "Citation: Invoice factoring cost (freight-factoring practice): advance = invoice x advance%, fee = invoice x fee%, reserve = invoice - advance - fee, effective APR = (fee%/advance%) x (365/days) x 100. A cost aid; the factoring agreement (recourse, minimums, reserve release) governs.",
   example: invoiceFactoringCostExample.inputs,
   fields: [
-    { key: "invoice_usd", label: "Invoice amount ($)", kind: "number", default: 2000 },
-    { key: "advance_pct", label: "Advance rate (%)", kind: "number", default: 90 },
-    { key: "fee_pct", label: "Factoring fee (%)", kind: "number", default: 3 },
-    { key: "days_to_pay", label: "Days until customer pays", kind: "number", default: 30 },
+    { key: "invoice_usd", label: "Invoice amount ($)", kind: "number" },
+    { key: "advance_pct", label: "Advance rate (%)", kind: "number" },
+    { key: "fee_pct", label: "Factoring fee (%)", kind: "number" },
+    { key: "days_to_pay", label: "Days until customer pays", kind: "number" },
   ],
   outputs: [
     { key: "adv", id: "ifc-out-adv", label: "Advance now / fee", value: (r) => "$" + fmt(r.advance_usd, 2) + " advanced, $" + fmt(r.fee_usd, 2) + " fee" },
@@ -1733,13 +1733,13 @@ const renderTrailerTongueWeight = _simpleRenderer({
   citation: "Citation: standard towing tongue-weight guidance (NHTSA / SAE J2807 and the hitch/vehicle manufacturer ratings): tongue% = tongue / gross x 100, target 10-15% conventional and 15-25% gooseneck/fifth wheel. Too little causes sway; too much overloads the hitch and unloads the steer axle. A setup screen; the manufacturer ratings and a scale govern.",
   example: trailerTongueWeightExample.inputs,
   fields: [
-    { key: "trailer_gross_weight_lb", label: "Trailer gross weight, loaded (lb)", kind: "number", default: 7000 },
-    { key: "tongue_weight_lb", label: "Measured tongue (coupler) weight (lb)", kind: "number", default: 700 },
+    { key: "trailer_gross_weight_lb", label: "Trailer gross weight, loaded (lb)", kind: "number" },
+    { key: "tongue_weight_lb", label: "Measured tongue (coupler) weight (lb)", kind: "number" },
     { key: "hitch_type", label: "Hitch type", kind: "select", options: [
       { value: "conventional", label: "Conventional / bumper-pull (10-15%)" },
       { value: "gooseneck", label: "Gooseneck / fifth wheel (15-25%)" },
     ], default: "conventional" },
-    { key: "hitch_rating_lb", label: "Hitch tongue-weight rating (lb, 0 to skip)", kind: "number", default: 0 },
+    { key: "hitch_rating_lb", label: "Hitch tongue-weight rating (lb, 0 to skip)", kind: "number" },
   ],
   outputs: [
     { key: "p", id: "ttw-out-p", label: "Tongue weight", value: (r) => fmt(r.tongue_pct, 1) + "%" },
@@ -1785,11 +1785,11 @@ TRUCKING_RENDERERS["def-consumption"] = _simpleRenderer({
   citation: "Citation: DEF consumption and range model (SCR aftertreatment; ISO 22241 DEF spec): def_used = diesel x dose/100; diesel per DEF tank = def_tank / (dose/100); range = diesel_per_def x mpg. DEF runs at about 2 to 3% of diesel, so a DEF tank spans several fuel fills; running it empty forces an ECU derate to ~5 mph. DEF freezes at ~12 F. A planning estimate; the OEM and DEF quality govern.",
   example: defConsumptionExample.inputs,
   fields: [
-    { key: "diesel_gal", label: "Diesel consumed (gal, 0 = derive from miles/mpg)", kind: "number", default: 200 },
-    { key: "trip_miles", label: "Trip distance (mi, used if diesel is 0)", kind: "number", default: 0 },
-    { key: "mpg", label: "Fuel economy (mpg, for range)", kind: "number", default: 6.5 },
-    { key: "dose_pct", label: "DEF dose (% of diesel, ~2-3)", kind: "number", default: 2.5 },
-    { key: "def_tank_gal", label: "DEF tank size (gal)", kind: "number", default: 13 },
+    { key: "diesel_gal", label: "Diesel consumed (gal, 0 = derive from miles/mpg)", kind: "number" },
+    { key: "trip_miles", label: "Trip distance (mi, used if diesel is 0)", kind: "number" },
+    { key: "mpg", label: "Fuel economy (mpg, for range)", kind: "number" },
+    { key: "dose_pct", label: "DEF dose (% of diesel, ~2-3)", kind: "number" },
+    { key: "def_tank_gal", label: "DEF tank size (gal)", kind: "number" },
   ],
   outputs: [
     { key: "du", id: "def-out-du", label: "DEF used this leg", value: (r) => fmt(r.def_used_gal, 1) + " gal (from " + fmt(r.diesel_gal_used, 0) + " gal diesel)" },
@@ -1824,9 +1824,9 @@ TRUCKING_RENDERERS["static-rollover-threshold"] = _simpleRenderer({
   citation: "Citation: static stability factor by name. SRT = (track width / 2) / CG height (the lateral g that lifts the inside wheels); steady-curve rollover speed = sqrt(SRT x g x R), g = 32.174 ft/s^2. A static screen; suspension roll, tire slip, and load shift lower the real threshold. The loaded CG and the truck govern.",
   example: staticRolloverThresholdExample.inputs,
   fields: [
-    { key: "track_width_in", label: "Track width (in, wheel centerline to centerline)", kind: "number", default: 72 },
-    { key: "cg_height_in", label: "Loaded CG height (in above ground)", kind: "number", default: 80 },
-    { key: "curve_radius_ft", label: "Curve radius (ft, 0 = skip rollover speed)", kind: "number", default: 200 },
+    { key: "track_width_in", label: "Track width (in, wheel centerline to centerline)", kind: "number" },
+    { key: "cg_height_in", label: "Loaded CG height (in above ground)", kind: "number" },
+    { key: "curve_radius_ft", label: "Curve radius (ft, 0 = skip rollover speed)", kind: "number" },
   ],
   outputs: [
     { key: "srt", id: "srt-out-g", label: "Static rollover threshold", value: (r) => fmt(r.srt_g, 2) + " g" },
@@ -1870,10 +1870,10 @@ TRUCKING_RENDERERS["truck-startability"] = _simpleRenderer({
   citation: "Citation: traction-limited startable grade (first-principles statics; SAE J2188 defines gradeability): max grade (%) = 100 (mu (W_drive/W_gross) - f), where mu is the tire-road friction (~0.6 dry, 0.3 wet, 0.15 ice) and f the rolling-resistance coefficient (~0.012 on pavement); available tractive effort = mu x W_drive. Small-angle field form; a STARTING (traction) limit, not a sustained-climb (power) limit. Wheel slip and weight transfer shift the real number. The driver, the surface, and the truck govern.",
   example: truckStartabilityExample.inputs,
   fields: [
-    { key: "gross_weight_lb", label: "Gross combination weight (lb)", kind: "number", default: 80000 },
-    { key: "drive_axle_weight_lb", label: "Weight on drive axles (lb)", kind: "number", default: 34000 },
-    { key: "friction_coeff", label: "Tire-road friction (0.6 dry, 0.3 wet, 0.15 ice)", kind: "number", default: 0.6 },
-    { key: "rolling_resistance_coeff", label: "Rolling resistance coefficient (~0.012 pavement)", kind: "number", default: 0.012 },
+    { key: "gross_weight_lb", label: "Gross combination weight (lb)", kind: "number" },
+    { key: "drive_axle_weight_lb", label: "Weight on drive axles (lb)", kind: "number" },
+    { key: "friction_coeff", label: "Tire-road friction (0.6 dry, 0.3 wet, 0.15 ice)", kind: "number" },
+    { key: "rolling_resistance_coeff", label: "Rolling resistance coefficient (~0.012 pavement)", kind: "number" },
   ],
   outputs: [
     { key: "grade", id: "tsg-out-grade", label: "Max startable grade", value: (r) => fmt(r.max_grade_pct, 1) + "%" + (r.max_grade_pct <= 0 ? " (cannot start on any upgrade)" : "") },
@@ -1915,7 +1915,7 @@ TRUCKING_RENDERERS["hydroplaning-speed"] = _simpleRenderer({
   citation: "Citation: dynamic hydroplaning speed per NASA TN D-2056 (Horne & Dreher) and FAA AC 91-6A, by name: spin-down Vp = 9 sqrt(P) knots (10.35 sqrt(P) mph), spin-up onset 7.7 sqrt(P) knots, P = tire inflation pressure (psi). Assumes standing water ~0.1 in and smooth/worn tread. Public domain. Road conditions and the driver govern.",
   example: hydroplaningSpeedExample.inputs,
   fields: [
-    { key: "tire_pressure_psi", label: "Tire inflation pressure (psi)", kind: "number", default: 100 },
+    { key: "tire_pressure_psi", label: "Tire inflation pressure (psi)", kind: "number" },
   ],
   outputs: [
     { key: "s", id: "hyd-out-s", label: "Hydroplaning speed (spin-down)", value: (r) => fmt(r.hydroplaning_speed_mph, 0) + " mph (" + fmt(r.hydroplaning_speed_knots, 0) + " kn)" },

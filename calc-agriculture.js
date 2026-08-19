@@ -375,7 +375,7 @@ const renderTimberCruise = _r({
   example: timberCruiseExample.inputs,
   fields: [
     { key: "small_end_dib_in", label: "Small-end DIB (in)", kind: "number" },
-    { key: "log_length_ft", label: "Log length (ft)", kind: "number", default: 16 },
+    { key: "log_length_ft", label: "Log length (ft)", kind: "number" },
     { key: "rule", label: "Rule", kind: "select", options: [{ value: "doyle", label: "Doyle" }, { value: "scribner", label: "Scribner" }, { value: "international", label: "International 1/4" }] },
     { key: "price_per_bf", label: "Price ($/bf, optional)", kind: "number", attrs: { step: "any", min: "0" } },
   ],
@@ -395,7 +395,7 @@ const renderSeedRate = _r({
     { key: "in_row_spacing_in", label: "In-row spacing (in, optional)", kind: "number" },
     { key: "target_pop_per_acre", label: "Target population / acre", kind: "number" },
     { key: "seeds_per_lb", label: "Seeds per lb", kind: "number" },
-    { key: "germination_pct", label: "Germination %", kind: "number", default: 95 },
+    { key: "germination_pct", label: "Germination %", kind: "number" },
     { key: "seed_price_per_lb", label: "Seed price ($/lb, optional)", kind: "number" },
   ],
   outputs: [
@@ -480,7 +480,7 @@ const renderBulkDensity = _r({
   fields: [
     { key: "dry_mass_g", label: "Dry core mass (g)", kind: "number" },
     { key: "core_volume_cc", label: "Core volume (cc)", kind: "number" },
-    { key: "particle_density_pcc", label: "Particle density (g/cc)", kind: "number", default: 2.65 },
+    { key: "particle_density_pcc", label: "Particle density (g/cc)", kind: "number" },
     { key: "texture", label: "Texture", kind: "select", options: Object.keys(COMPACTION_THRESHOLDS_PCC).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
   ],
   outputs: [
@@ -497,7 +497,7 @@ const renderCropYield = _r({
   fields: [
     { key: "crop", label: "Crop", kind: "select", options: Object.keys(STD_MOISTURE_PCT).map((k) => ({ value: k, label: k })) },
     { key: "rows_per_pass", label: "Rows per pass", kind: "number", default: 6 },
-    { key: "row_spacing_in", label: "Row spacing (in)", kind: "number", default: 30 },
+    { key: "row_spacing_in", label: "Row spacing (in)", kind: "number" },
     { key: "measured_length_ft", label: "Measured length (ft)", kind: "number" },
     { key: "weight_in_strip_lb", label: "Weight in strip (lb)", kind: "number" },
     { key: "current_moisture_pct", label: "Current moisture %", kind: "number" },
@@ -2476,9 +2476,9 @@ const renderSodTakeoff = _v23SimpleRenderer({
   example: sodTakeoffExample.inputs,
   fields: [
     { key: "lawn_ft2", label: "Lawn area to sod (ft²)", kind: "number" },
-    { key: "waste_pct", label: "Cut / edge waste (%)", kind: "number", default: 5 },
-    { key: "slab_ft2", label: "Slab coverage (ft²)", kind: "number", default: 10 },
-    { key: "pallet_ft2", label: "Pallet coverage (ft²)", kind: "number", default: 450 },
+    { key: "waste_pct", label: "Cut / edge waste (%)", kind: "number" },
+    { key: "slab_ft2", label: "Slab coverage (ft²)", kind: "number" },
+    { key: "pallet_ft2", label: "Pallet coverage (ft²)", kind: "number" },
   ],
   outputs: [
     { key: "o", id: "sod-out-o", label: "Order area", value: (r) => fmt(r.order_ft2, 0) + " ft^2 (" + fmt(r.order_syd, 1) + " syd)" },
@@ -3298,8 +3298,8 @@ AGRICULTURE_RENDERERS["cattle-heart-girth-weight"] = _r({
   citation: "Citation: cattle live weight from heart girth (Schaeffer's formula), by name. weight (lb) = heart girth^2 x body length / 300, both in inches; girth behind the front legs, length shoulder-point to pin bone. Calibrated for mature beef cattle; off for young/dairy/pregnant animals. A certified scale governs a sale weight.",
   example: cattleHeartGirthWeightExample.inputs,
   fields: [
-    { key: "heart_girth_in", label: "Heart girth (in, behind front legs)", kind: "number", default: 70 },
-    { key: "body_length_in", label: "Body length (in, shoulder to pin bone)", kind: "number", default: 55 },
+    { key: "heart_girth_in", label: "Heart girth (in, behind front legs)", kind: "number" },
+    { key: "body_length_in", label: "Body length (in, shoulder to pin bone)", kind: "number" },
   ],
   outputs: [
     { key: "w", id: "chg-out-w", label: "Estimated live weight", value: (r) => fmt(r.live_weight_lb, 0) + " lb" },
@@ -3333,10 +3333,10 @@ AGRICULTURE_RENDERERS["corn-yield-estimate"] = _r({
   citation: "Citation: pre-harvest corn yield, yield component (ear-count) method (Purdue / Iowa State Extension), by name. bu/ac = ears (per 1/1000 acre) x (rows around x kernels per row) / factor; factor = thousands of kernels per bushel (~90, 75-80 big kernels, 95-100 small). Count ears in 17.5 ft of 30-in row. A pre-harvest estimate; the harvested, moisture-corrected yield governs.",
   example: cornYieldEstimateExample.inputs,
   fields: [
-    { key: "ears_per_thousandth_acre", label: "Ears in 1/1000 acre (17.5 ft of 30-in row)", kind: "number", default: 32 },
-    { key: "kernel_rows_around", label: "Kernel rows around the ear", kind: "number", default: 16 },
-    { key: "kernels_per_row", label: "Kernels per row", kind: "number", default: 35 },
-    { key: "kernel_factor", label: "Kernel factor (1000s kernels/bu, ~90)", kind: "number", default: 90 },
+    { key: "ears_per_thousandth_acre", label: "Ears in 1/1000 acre (17.5 ft of 30-in row)", kind: "number" },
+    { key: "kernel_rows_around", label: "Kernel rows around the ear", kind: "number" },
+    { key: "kernels_per_row", label: "Kernels per row", kind: "number" },
+    { key: "kernel_factor", label: "Kernel factor (1000s kernels/bu, ~90)", kind: "number" },
   ],
   outputs: [
     { key: "k", id: "cye-out-k", label: "Kernels per ear", value: (r) => fmt(r.kernels_per_ear, 0) },
@@ -3371,9 +3371,9 @@ AGRICULTURE_RENDERERS["dressing-percentage"] = _r({
   citation: "Citation: carcass dressing percentage and freezer yield, by name. dressing % = hot carcass weight / live weight x 100; boneless take-home = carcass x cutting yield. Typical dressing: beef 60-64%, pork 72-75%, lamb ~50%; beef cutting yield ~65-70% of the carcass. The processor's certified scale and the cut sheet govern the actual freezer yield.",
   example: dressingPercentageExample.inputs,
   fields: [
-    { key: "live_weight_lb", label: "Live weight (lb)", kind: "number", default: 1200 },
-    { key: "hot_carcass_weight_lb", label: "Hot carcass weight (lb)", kind: "number", default: 744 },
-    { key: "cutting_yield_pct", label: "Cutting yield (% of carcass, boneless)", kind: "number", default: 67 },
+    { key: "live_weight_lb", label: "Live weight (lb)", kind: "number" },
+    { key: "hot_carcass_weight_lb", label: "Hot carcass weight (lb)", kind: "number" },
+    { key: "cutting_yield_pct", label: "Cutting yield (% of carcass, boneless)", kind: "number" },
   ],
   outputs: [
     { key: "d", id: "drp-out-d", label: "Dressing percentage", value: (r) => fmt(r.dressing_pct, 1) + " %" },
