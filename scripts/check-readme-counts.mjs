@@ -34,7 +34,12 @@ async function liveCounts() {
   const modules = files.filter((f) => /^calc-.*\.js$/.test(f)).length;
   // sitemap = one URL per tile + one per active group + home.
   const sitemap = tiles + groups + 1;
-  return { tiles, groups, modules, sitemap };
+  // The README tells a reader how many gates stand between a change and a
+  // landing. That is the `npm run lint` chain itself, so read it rather than
+  // trusting a number someone typed once.
+  const pkg = JSON.parse(await readFile(resolve(ROOT, "package.json"), "utf8"));
+  const gates = String(pkg.scripts.lint || "").split("&&").filter((c) => c.trim()).length;
+  return { tiles, groups, modules, sitemap, gates };
 }
 
 // For a label-anchored pattern, collect every number that precedes/follows
@@ -111,6 +116,11 @@ async function main() {
   checked += checkPattern(readme, /(\d+) group modules/g, live.modules, "calc-* module count", errors);
   checked += checkPattern(readme, /(\d+) per-group calculator modules/g, live.modules, "calc-* module count", errors);
 
+  // Gate count: the trust section's headline number and the develop-section
+  // comment. A reader is being told how much has to pass; say the real number.
+  checked += checkPattern(readme, /runs (\d+) static gates/g, live.gates, "lint gate count", errors);
+  checked += checkPattern(readme, /static-gate chain \((\d+) checks\)/g, live.gates, "lint gate count", errors);
+
   // Sitemap URL count: the build diagram node and the prose "carries N URLs".
   checked += checkPattern(readme, /sitemap\.xml\\n(\d+) URLs/g, live.sitemap, "sitemap URL count", errors);
   checked += checkPattern(readme, /carries (\d+) URLs/g, live.sitemap, "sitemap URL count", errors);
@@ -123,7 +133,7 @@ async function main() {
   }
   console.log(
     "check-readme-counts OK: " + checked + " label-anchored catalog counts in README match live values " +
-    "(" + live.tiles + " tiles, " + live.modules + " modules, " + live.sitemap + " sitemap URLs).",
+    "(" + live.tiles + " tiles, " + live.modules + " modules, " + live.sitemap + " sitemap URLs, " + live.gates + " lint gates).",
   );
 }
 

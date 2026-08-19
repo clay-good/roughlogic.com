@@ -2,7 +2,7 @@
 
 **Field math for the trades. Free, fast, no ads, no accounts, works offline.**
 
-[roughlogic.com](https://roughlogic.com) is 1709 small, single-purpose calculators for electricians, plumbers, HVAC techs, carpenters, restoration techs, firefighters, surveyors, and dozens of other trades. Everything runs in your browser. Every answer comes from a published formula and cites its source.
+[roughlogic.com](https://roughlogic.com) is 1,709 small, single-purpose calculators for electricians, plumbers, HVAC techs, carpenters, restoration techs, firefighters, surveyors, and dozens of other trades. Everything runs in your browser. Every answer comes from a published formula and cites its source.
 
 <p align="center">
   <img src="docs/img/home-mobile.png" width="240" alt="roughlogic home view on a phone: a headline, a one-paragraph description, a single search bar, and a browse-by-trade index">
@@ -33,14 +33,14 @@ Here is that Example block, from [Voltage Drop](https://roughlogic.com/tools/vol
 
 | You enter | | You get | |
 |---|---|---|---|
-| Phase | single | `drop_V` | 7.45 |
-| Material | copper | `percent` | 3.1 |
+| Phase | single | Voltage drop | 7.45 |
+| Material | copper | Percent drop | 3.1 |
 | AWG | 10 | | |
-| Length one-way (ft) `length_ft` | 150 | | |
+| Length one-way (ft) | 150 | | |
 | Current (A) | 20 | | |
 | Source voltage (V) | 240 | | |
 
-Grounded in `Vd = 2 · K · I · L / CM`, NEC Ch. 9 conductor properties. Inputs are named the way the calculator names them, with the machine field name alongside when it differs; that name is what an AI agent passes.
+Grounded in `Vd = 2 · K · I · L / CM`, NEC Ch. 9 conductor properties. Everything is named the way the calculator names it. The machine field names an AI agent passes (`length_ft`, `drop_V`) are listed inside the collapsed formula block, so the page stays readable and the contract stays published.
 
 Your inputs live in the URL, so a calculator is bookmarkable and shareable with its numbers preloaded. After the first load it works with no signal. No account, no email, no tracking, ever.
 
@@ -71,7 +71,7 @@ One calculator is one formula on one screen. (In the source and the gate names b
 
 ## Why you can trust the answers
 
-The hard part of a calculator catalog is not the arithmetic. It is proving, at scale, that every tile stays correct as the catalog grows. That is a build problem here: `npm run lint` runs more than 30 static gates before a change can land.
+The hard part of a calculator catalog is not the arithmetic. It is proving, at scale, that every tile stays correct as the catalog grows. That is a build problem here: `npm run lint` runs 41 static gates before a change can land.
 
 | Gate | What it guarantees |
 |---|---|
@@ -103,7 +103,7 @@ The home payload gzips to well under the 100 KB budget. Opening a calculator dyn
 npm install        # dev tooling only; the site itself has zero runtime deps
 npm run dev        # serve the SPA locally
 npm run build      # emit dist/ (SPA + static shells + sitemap)
-npm run lint       # the full static-gate chain (30+ checks)
+npm run lint       # the full static-gate chain (41 checks)
 npm test           # unit tests (node --test)
 npm run test:e2e   # Playwright integration suite (needs a browser)
 ```
