@@ -26,9 +26,18 @@ const MIN_LEAD = 40;
 // Floor for the bracket-cut last resort (see wordCut).
 const BRACKET_MIN = 24;
 
+// A sentence can also end in front of a lower-case symbol, because the next
+// sentence is a formula and its subject is a variable name: "...the azimuth of
+// the line between them. distance = sqrt(dN^2 + dE^2)". Upper-casing is the
+// only signal the base rule has, so without this the plain-English opening
+// gets welded to the equation and the lead the reader sees is half algebra.
+// Narrow on purpose: the token must be an identifier followed by "=", or a
+// named function call, so "3 in. of head" and "e.g. the" still stay put.
+const FORMULA_OPENER = /^(?:%?[A-Za-z][A-Za-z0-9_,]*(?:\([^)]*\))?\s*=\s|(?:sqrt|sin|cos|tan|ln|log|exp|atan2)\s*\()/;
+
 export function firstSentence(desc) {
   const s = String(desc).trim();
-  const re = /\.\s+(?=[A-Z0-9])/g;
+  const re = /\.\s+(?=[A-Za-z0-9%])/g;
   let m;
   while ((m = re.exec(s))) {
     const end = m.index + 1;
@@ -36,6 +45,8 @@ export function firstSentence(desc) {
     const before = s.slice(0, m.index);
     const word = (before.match(/([A-Za-z.]+)$/) || ["", ""])[1].toLowerCase();
     if (ABBREV.has(word)) continue;
+    const after = s.slice(m.index + m[0].length);
+    if (!/^[A-Z0-9]/.test(after) && !FORMULA_OPENER.test(after)) continue;
     return s.slice(0, end);
   }
   return s;

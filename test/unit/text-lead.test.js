@@ -187,3 +187,41 @@ test("no description body calls a calculator a tile or a sibling", () => {
     .map((t) => t.id);
   assert.deepEqual(offenders, []);
 });
+
+// A description whose next sentence is a formula puts its subject on the left
+// of an equals sign, in lower case, so the uppercase rule alone welds the two
+// together and the reader's one line opens with algebra.
+test("firstSentence ends in front of a sentence that opens on a formula", () => {
+  assert.equal(
+    firstSentence("The sun's elevation angle above the horizon. sin(altitude) = sin(lat) sin(dec)."),
+    "The sun's elevation angle above the horizon.",
+  );
+  assert.equal(
+    firstSentence("How much outside air a unit is really pulling. %OA = 100 (T_ra - T_ma) / (T_ra - T_oa)."),
+    "How much outside air a unit is really pulling.",
+  );
+  // Still not a split: a unit abbreviation followed by ordinary prose.
+  assert.equal(
+    firstSentence("Head loss across a valve of at least 3 in. of head is what governs here."),
+    "Head loss across a valve of at least 3 in. of head is what governs here.",
+  );
+});
+
+// The one line under the title is the whole page for a reader who is deciding
+// whether this is the right calculator. An equation cannot answer that: "ACH =
+// CFM x 60 / volume" names no room, no problem, and no unit the reader is
+// holding. The formula is never lost -- it is one tap away in the collapsed
+// block, which prints it, its source, and its assumptions. So a lead may name
+// a quantity in words ("Debt yield = NOI / loan") but may not open on a bare
+// symbol: an acronym, a subscripted variable, or anything with a digit in it.
+test("no public lead opens on a bare symbolic variable", () => {
+  const opener = /^([A-Za-z%][A-Za-z0-9_,%'.]*)(\s*\([^)]*\))?\s*[=~]\s/;
+  const symbolic = (tok) =>
+    /[0-9_,%']/.test(tok) || tok.length < 4 || tok === tok.toUpperCase();
+  const offenders = [];
+  for (const t of TOOLS) {
+    const m = leadSentence(t.desc).match(opener);
+    if (m && symbolic(m[1])) offenders.push(`${t.id} -> ${m[1]}`);
+  }
+  assert.deepEqual(offenders, []);
+});
