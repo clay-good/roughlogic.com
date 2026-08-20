@@ -234,9 +234,9 @@ test("firstSentence ends in front of a sentence that opens on a formula", () => 
 // a quantity in words ("Debt yield = NOI / loan") but may not open on a bare
 // symbol: an acronym, a subscripted variable, or anything with a digit in it.
 test("no public lead opens on a bare symbolic variable", () => {
-  const opener = /^([A-Za-z%][A-Za-z0-9_,%'.]*)(\s*\([^)]*\))?\s*[=~]\s/;
+  const opener = /^([A-Za-z%][A-Za-z0-9_,%'./-]*)(\s*\([^)]*\))?\s*[=~]\s/;
   const symbolic = (tok) =>
-    /[0-9_,%']/.test(tok) || tok.length < 4 || tok === tok.toUpperCase();
+    /[0-9_,%'/]/.test(tok) || tok.length < 4 || tok === tok.toUpperCase();
   const offenders = [];
   for (const t of TOOLS) {
     const m = leadSentence(t.desc).match(opener);

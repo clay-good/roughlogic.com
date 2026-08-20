@@ -33,7 +33,7 @@ const BRACKET_MIN = 24;
 // gets welded to the equation and the lead the reader sees is half algebra.
 // Narrow on purpose: the token must be an identifier followed by "=", or a
 // named function call, so "3 in. of head" and "e.g. the" still stay put.
-const FORMULA_OPENER = /^(?:%?[A-Za-z][A-Za-z0-9_,]*(?:\([^)]*\))?\s*=\s|(?:sqrt|sin|cos|tan|ln|log|exp|atan2)\s*\()/;
+const FORMULA_OPENER = /^(?:%?[A-Za-z][A-Za-z0-9_,\/]*(?:\([^)]*\))?\s*=\s|(?:sqrt|sin|cos|tan|ln|log|exp|atan2)\s*\()/;
 
 export function firstSentence(desc) {
   const s = String(desc).trim();

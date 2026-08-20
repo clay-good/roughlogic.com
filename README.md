@@ -18,7 +18,7 @@
 2. Type your numbers. The answer updates as you type. There is no submit button.
 3. Tap **Copy** to take a value with you.
 
-A calculator opens empty. Every number box is captioned with the value the page's worked example uses (`e.g. 150`), so you can see the expected unit and magnitude before you type your own over it.
+A calculator opens empty, and each box is captioned with the value the page's worked example uses (`e.g. 150`), so you can see the expected unit and magnitude before typing your own over it. A box whose value is a trade convention rather than a job number (30 °C ambient, a 0.61 orifice coefficient) opens holding that convention instead.
 
 **Every calculator's page is the same short thing**, in this order. Nothing below the example is open until you ask for it:
 
