@@ -691,6 +691,14 @@ function tileShell(tool, tools, groupNames, relatedMap, examples, labels, outLab
   return [head, styles, jsonld, '</head>', body].join("\n");
 }
 
+// A group label mid-sentence ("... calculators for HVAC.") is lower-cased so it
+// reads as prose, but a blanket toLowerCase turns HVAC into "hvac", SAR into
+// "sar", and K-12 into "k-12". Only a capital followed by lower-case letters
+// is an ordinary word; a bare capital or a run of them is a name, and stays one.
+export function sentenceCase(label) {
+  return label.replace(/[A-Z][a-z]+/g, (w) => w.toLowerCase());
+}
+
 function groupShell(group, tools, groupNames) {
   const groupLabel = groupNames[group] || group;
   const groupSlug = GROUP_SLUG[group] || group.toLowerCase();
@@ -732,7 +740,7 @@ function groupShell(group, tools, groupNames) {
     '    </ol>',
     '  </nav>',
     `  <h1 class="shell-h1">${escapeHtml(groupLabel)}</h1>`,
-    `  <p class="shell-lead">${escapeHtml(tilesInGroup.length)} calculators for ${escapeHtml(groupLabel.toLowerCase())}. Every one runs in your browser. Free, no account.</p>`,
+    `  <p class="shell-lead">${escapeHtml(tilesInGroup.length)} ${tilesInGroup.length === 1 ? "calculator" : "calculators"} for ${escapeHtml(sentenceCase(groupLabel))}. Every one runs in your browser. Free, no account.</p>`,
     `  <p class="shell-run"><a class="shell-run-link" href="../../#group=${escapeHtml(group)}">Open the live group view</a></p>`,
     '  <section class="shell-section" aria-label="Tools in this group">',
     '    <h2>Tools in this group</h2>',
