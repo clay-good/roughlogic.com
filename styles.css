@@ -119,6 +119,12 @@ a:focus, button:focus, select:focus, input:focus, textarea:focus,
 
 button {
   font-family: inherit;
+  /* And the size. The UA default button face is 13.3 px, so any button that
+     does not set its own -- the "Add row" / "Remove" controls the multi-row
+     calculators build, the proof block's copy-with-sources button -- rendered
+     below the 1rem reading floor. Inheriting the family but not the size left
+     a control smaller than every word around it. */
+  font-size: 1rem;
 }
 
 main {
@@ -811,10 +817,15 @@ input[aria-invalid="true"] {
   border-color: var(--border-light);
 }
 
-/* Per-output Copy and Copy-all. Min 48 px touch target per spec.md
-   section 11.6 / spec-v2.md section 1. */
+/* Per-output Copy, Copy-all, and the proof block's copy-with-sources button.
+   Min 48 px touch target per spec.md section 11.6 / spec-v2.md section 1.
+   .view-copy-reference used to carry only a margin and a min-height, so it
+   fell back to the browser's default button face at 13.3 px -- below the
+   1rem reading floor, on every tile, and visually unrelated to the two
+   buttons beside it. */
 .copy-btn,
-.copy-all-btn {
+.copy-all-btn,
+.view-copy-reference {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -832,7 +843,8 @@ input[aria-invalid="true"] {
 }
 
 .copy-btn:hover,
-.copy-all-btn:hover {
+.copy-all-btn:hover,
+.view-copy-reference:hover {
   color: var(--bg-primary);
   background: var(--fg);
   border-color: var(--fg);
@@ -1214,7 +1226,7 @@ input[aria-invalid="true"] {
    ============================================================ */
 @media print {
   .site-header, .primary-nav, .skip-link,
-  .copy-btn, .copy-all-btn,
+  .copy-btn, .copy-all-btn, .view-copy-reference,
   .integrity-banner,
   .back-link, .site-footer .footer-badges {
     display: none !important;

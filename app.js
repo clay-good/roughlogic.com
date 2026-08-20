@@ -1519,6 +1519,18 @@ function ensureTools() {
 const EMPTY_IDS = [];
 
 const FIRE_GROUND_TRADE = "fire";
+// Trades a tile carries when it is for everybody, not for a fireground. The
+// notice says who is in charge of the answer, so "incident command governs the
+// fireground" on a sales-tax or unit-conversion tile names the wrong authority
+// -- and those tiles reached it only because `fire` is one of the six trades
+// they list to mean "every trade". A tile tagged for electrical AND plumbing
+// AND HVAC is a general-purpose tool; the AHJ default is the honest notice.
+const GENERAL_PURPOSE_TRADES = ["electrical", "plumbing", "hvac"];
+function isFireGroundTile(tool) {
+  if (tool.group === "F") return true;
+  if (!tool.trades.includes(FIRE_GROUND_TRADE)) return false;
+  return !GENERAL_PURPOSE_TRADES.every((t) => tool.trades.includes(t));
+}
 
 // Inline notices. One short line each: who governs the real decision.
 // The static shells already carry this as a quiet footer line
@@ -1741,7 +1753,7 @@ function renderToolView(id, params) {
   else if (tool.group === "T") notice.textContent = NOTICE_LAB;
   else if (tool.group === "X") notice.textContent = NOTICE_REAL_ESTATE;
   else if (tool.group === "Y") notice.textContent = NOTICE_EDUCATION;
-  else if (tool.trades.includes(FIRE_GROUND_TRADE)) notice.textContent = NOTICE_FIRE;
+  else if (isFireGroundTile(tool)) notice.textContent = NOTICE_FIRE;
   else notice.textContent = NOTICE_DEFAULT;
   // Appended below the answer, not above the fields. It is standing boilerplate
   // -- what governs, not what to do -- and it reads the same on every tile.
