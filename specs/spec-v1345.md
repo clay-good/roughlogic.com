@@ -1,6 +1,6 @@
 # spec-v1345.md — The catalog gets a page
 
-> Status: **PLANNED.** Part of [scope-one-box](scope-one-box.md). Depends on [v1346](spec-v1346.md).
+> Status: **SHIPPED (2026-08-20).** Part of [scope-one-box](scope-one-box.md). Depends on [v1346](spec-v1346.md).
 > New build step, one new page, one footer badge. **Pure addition: nothing is removed, no URL
 > changes, no existing page is edited except to gain the badge.** Catalog stays **1,709**.
 
@@ -53,8 +53,30 @@ Every number goes up or stays flat. There is no subtraction anywhere in this spe
 - `index.html` — the same badge in the home footer.
 - `styles.css` — `.tools-index`, `.ti-*`, `.all-tools-badge`. Existing tokens only.
 
+## What shipped differently
+
+- **Built inside `scripts/build-shells.mjs`, not as a separate `build-tools-index.mjs`.** That
+  module already owns `shellHead`, `shellHeader`, `shellFooter`, `escapeHtml`, `GROUP_SLUG`,
+  `jsonLdBlock`, and the sitemap writer. A second HTML-emitting script would have duplicated the
+  header and footer, which is exactly the drift this spec's own gotcha warns about.
+- **`<body class="shell-page">` is load-bearing and was missed on the first cut.** 40 rules in
+  `styles.css` are scoped to that class, including the container width and the CTA treatment.
+  Without it the page rendered as unstyled prose that *looked close enough to pass a screenshot*
+  — the h1 was large, the lists were lists — while the "Ask for it instead" CTA was plain grey
+  text instead of the blue button. Browser-verified, not eyeballed: the computed style said
+  `padding: 0px, background: rgba(0,0,0,0)`.
+- **`check-shells` did not glob the new page.** It walks `dist/tools/<id>/index.html`, so
+  `dist/tools/index.html` sat directly in that folder and matched nothing. It is now linted
+  explicitly under the **group** cap (45 KB gzip against a 68 KB ceiling) — at 1,709 links it is
+  legitimately the largest page on the site, and it was briefly the only shipped shell no gate
+  watched.
+- **`check-readme-counts` computes the sitemap total from a formula**, `tiles + groups + 1`, not
+  from the file. Adding a URL meant editing the formula to `+ 2` as well as the README, or the
+  gate would have kept asserting a number the sitemap no longer had.
+
 ## Gotchas
 
+- **`<body class="shell-page">` or 40 rules silently do not apply.** See above.
 - **Do not make `<body>` a flex container** to pin the footer. sophiewell's v757 did, and a flex
   item cannot shrink below its content: 20 tiles with wide reference tables stopped being able to
   scroll those tables inside their own box and pushed the document to 385px inside a 320px

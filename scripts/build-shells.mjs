@@ -618,10 +618,18 @@ function shellHeader(depth) {
   ].join("\n");
 }
 
-function shellFooter() {
+function shellFooter(depth = 2) {
+  const prefix = "../".repeat(depth);
   return [
     '<footer class="site-footer" role="contentinfo">',
     '  <div class="footer-badges">',
+    // spec-v1345: the escape hatch for the reader who cannot name what they
+    // need. One click away on every page, never on the path of the reader who
+    // types. It is also the internal-linking hub these 1,709 pre-rendered
+    // pages never had -- /tools/ was a 404 until this spec.
+    `    <a class="footer-badge" href="${prefix}tools/" aria-label="Browse all calculators">`,
+    '      <span>All calculators</span>',
+    '    </a>',
     '    <a class="footer-badge" href="https://claygood.com" rel="noopener">',
     '      <span>Made with </span>',
     '      <span class="footer-badge-heart" aria-hidden="true">&#9829;</span>',
@@ -830,6 +838,127 @@ function groupShell(group, tools, groupNames) {
   return [head, styles, jsonld, '</head>', body].join("\n");
 }
 
+// spec-v1345: the catalog page at /tools/.
+//
+// The home page takes a question and does not offer a menu, which is right for
+// the reader who knows what they need. It is not right for the one who does
+// not: search only works if you can name the thing. And a catalog of 1,709
+// with no way to see the catalog reads as a site hiding its inventory.
+//
+// It is also the internal-linking hub this site never had. /tools/<id>/ has
+// existed only in the sitemap and in whatever "Related tools" picked, and
+// /tools/ itself was a 404 sitting directly above 1,709 pre-rendered pages.
+//
+// Grouped by the catalog's own 21 trade groups rather than A-Z, because a flat
+// list of 1,709 names is not browsable -- the groups let a reader find the
+// neighbourhood before the name. It also mirrors what already ranks:
+// /groups/construction/ is the top organic landing page, so category-first is
+// the shape this audience already uses.
+//
+// EACH GROUP HEADING LINKS ITS HUB as a real crawlable URL. The hubs
+// cross-link each other only by SPA hash (`../../#group=E`), which is a
+// fragment and not a URL, so this page is the first thing on the site to pass
+// real link equity between them.
+//
+// Every count is computed from the live TOOLS array, so nothing here can drift
+// the way a hand-typed count does and no check-readme-counts surface is needed.
+function toolsIndexShell(tools, groupNames) {
+  const canonical = SITE_URL + "/tools/";
+  const byGroup = new Map();
+  for (const t of tools) {
+    if (!byGroup.has(t.group)) byGroup.set(t.group, []);
+    byGroup.get(t.group).push(t);
+  }
+  // Sorted by group letter, which is the order the site already presents its
+  // trades in. A group present in TOOLS but missing from GROUP_NAMES still
+  // renders, under "Group <letter>", so a new trade appears on this page
+  // rather than vanishing from it.
+  const order = [...byGroup.keys()].sort();
+
+  const labelFor = (g) => groupNames[g] || ("Group " + g);
+
+  const jump = order.map((g) => {
+    const slug = GROUP_SLUG[g] || g.toLowerCase();
+    return `      <li><a href="#g-${escapeHtml(slug)}">${escapeHtml(labelFor(g))}</a></li>`;
+  }).join("\n");
+
+  const sections = order.map((g) => {
+    const slug = GROUP_SLUG[g] || g.toLowerCase();
+    const rows = byGroup.get(g).slice().sort((a, b) => a.name.localeCompare(b.name));
+    return [
+      `  <section class="ti-group" aria-labelledby="g-${escapeHtml(slug)}">`,
+      `    <h2 id="g-${escapeHtml(slug)}">`,
+      `      <a class="ti-hub" href="../groups/${escapeHtml(slug)}/">${escapeHtml(labelFor(g))}</a>`,
+      `      <span class="ti-count">${rows.length}</span>`,
+      '    </h2>',
+      '    <ul class="ti-list">',
+      rows.map((t) => `      <li><a href="${escapeHtml(t.id)}/">${escapeHtml(t.name)}</a></li>`).join("\n"),
+      '    </ul>',
+      '  </section>',
+    ].join("\n");
+  }).join("\n");
+
+  const title = "All " + tools.length + " Calculators - Rough Logic";
+  const description =
+    "Every one of the " + tools.length + " free trade calculators on Rough Logic, grouped by trade. " +
+    "Runs in your browser. No signup, no ads, no tracking, no AI.";
+
+  const jsonld = jsonLdBlock([
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: title,
+      description,
+      url: canonical,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL + "/" },
+        { "@type": "ListItem", position: 2, name: "All calculators", item: canonical },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      numberOfItems: order.length,
+      itemListElement: order.map((g, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: labelFor(g),
+        url: SITE_URL + "/groups/" + (GROUP_SLUG[g] || g.toLowerCase()) + "/",
+      })),
+    },
+  ]);
+
+  const head = shellHead({ title, description, canonical, ogType: "website" });
+  const styles = shellStylesAndIcons(1);
+  const body = [
+    // `shell-page` is load-bearing: 40 rules in styles.css are scoped to it,
+    // including the container width and the CTA treatment. Without it this
+    // page renders as unstyled prose that merely looks close.
+    '<body class="shell-page">',
+    shellHeader(1),
+    '<main class="shell-main tools-index">',
+    `  <h1 class="shell-h1">All ${tools.length} calculators</h1>`,
+    '  <p class="shell-lede">Every calculator on Rough Logic, grouped by trade. If you already know what you need, asking is faster.</p>',
+    '  <p class="ti-cta"><a class="shell-run-link" href="../">Ask for it instead</a></p>',
+    '  <nav class="ti-jump" aria-label="Jump to a trade">',
+    '    <ul>',
+    jump,
+    '    </ul>',
+    '  </nav>',
+    sections,
+    '</main>',
+    shellFooter(1),
+    '</body>',
+    '</html>',
+    '',
+  ].join("\n");
+  return [head, styles, jsonld, '</head>', body].join("\n");
+}
+
 function buildSitemap(tools, groups, builtIso) {
   const lastmod = builtIso.slice(0, 10);
   const lines = ['<?xml version="1.0" encoding="UTF-8"?>'];
@@ -851,6 +980,13 @@ function buildSitemap(tools, groups, builtIso) {
     lines.push('    <priority>0.8</priority>');
     lines.push('  </url>');
   }
+  // spec-v1345: the catalog hub.
+  lines.push('  <url>');
+  lines.push(`    <loc>${SITE_URL}/tools/</loc>`);
+  lines.push(`    <lastmod>${lastmod}</lastmod>`);
+  lines.push('    <changefreq>weekly</changefreq>');
+  lines.push('    <priority>0.9</priority>');
+  lines.push('  </url>');
   // Tiles.
   for (const t of tools) {
     lines.push('  <url>');
@@ -920,6 +1056,11 @@ async function main() {
     groupCount += 1;
   }
 
+  // spec-v1345: the catalog hub at /tools/index.html.
+  const toolsIndexOut = resolve(DIST, "tools", "index.html");
+  await mkdir(dirname(toolsIndexOut), { recursive: true });
+  await writeFile(toolsIndexOut, toolsIndexShell(tools, groupNames), "utf8");
+
   // Regenerate sitemap.xml at dist/ root from the live TOOLS + groups.
   const stampPath = resolve(DIST, "build-info.json");
   let builtIso = new Date().toISOString();
@@ -937,8 +1078,8 @@ async function main() {
 
   console.log(
     "build-shells: " + shellCount + " tile shells, " +
-    groupCount + " group shells, sitemap with " +
-    (1 + groups.length + tools.length) + " URLs."
+    groupCount + " group shells, 1 catalog hub, sitemap with " +
+    (2 + groups.length + tools.length) + " URLs."
   );
 }
 

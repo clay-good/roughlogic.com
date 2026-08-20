@@ -316,6 +316,17 @@ async function main() {
     await lintShell(p, "tile", errors);
   }
 
+  // spec-v1345: the catalog hub at dist/tools/index.html. Linted under the
+  // GROUP cap, not the tile cap -- it is a listing page like a group hub, not
+  // a tile shell, and at 1,709 links it is legitimately the largest page on
+  // the site. Without this it is the only shipped shell no gate watches.
+  const toolsIndex = resolve(DIST, "tools", "index.html");
+  if (existsSync(toolsIndex)) {
+    await lintShell(toolsIndex, "group", errors);
+  } else {
+    errors.push("tools/index.html: missing catalog hub (spec-v1345).");
+  }
+
   // Walk dist/groups/* shells.
   const groupsDir = resolve(DIST, "groups");
   if (existsSync(groupsDir)) {
@@ -340,7 +351,7 @@ async function main() {
   const tileCount = tools.length;
   const groupCount = existsSync(groupsDir) ? (await readdir(groupsDir)).length : 0;
   console.log(
-    "check-shells OK: " + tileCount + " tile shells + " + groupCount + " group shells; " +
+    "check-shells OK: " + tileCount + " tile shells + " + groupCount + " group shells + 1 catalog hub; " +
     "all titles <= " + TITLE_CAP + " chars, descriptions <= " + DESCRIPTION_CAP + " chars, " +
     "JSON-LD valid against allowlist, gzip under " + TILE_GZIP_CAP + " / " + GROUP_GZIP_CAP + " B caps."
   );

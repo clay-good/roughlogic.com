@@ -32,8 +32,9 @@ async function liveCounts() {
   const groups = new Set([...toolsData.matchAll(/group: "([A-Z])"/g)].map((m) => m[1])).size;
   const files = await readdir(ROOT);
   const modules = files.filter((f) => /^calc-.*\.js$/.test(f)).length;
-  // sitemap = one URL per tile + one per active group + home.
-  const sitemap = tiles + groups + 1;
+  // sitemap = one URL per tile + one per active group + home + the
+  // spec-v1345 catalog hub at /tools/.
+  const sitemap = tiles + groups + 2;
   // The README tells a reader how many gates stand between a change and a
   // landing. That is the `npm run lint` chain itself, so read it rather than
   // trusting a number someone typed once.

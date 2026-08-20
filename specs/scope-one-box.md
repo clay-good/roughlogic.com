@@ -4,7 +4,7 @@
 > Adapts the shipped sophiewell.com program (`spec-v751`–`v758`) to this catalog and this
 > catalog's traffic. No tile is added, removed, or renumbered. The catalog stays **1,709**.
 >
-> **v1339 shipped** (`0338fead`). The rest are specified below.
+> **v1339, v1346, and v1345 shipped.** The rest are specified below.
 
 ## The product in one line
 
@@ -34,7 +34,7 @@ aesthetic grounds, and three measured facts set hard limits on what these specs 
 |---|---|
 | **All 1,709 tile shells link their own group hub.** `/groups/construction/` is linked by its 466 tiles. | The hubs are not fragile. The home page's 21 links are a small share of their inbound links. |
 | **The hubs cross-link by SPA hash** — `../../#group=E`, not `/groups/electrical/`. A fragment is not a crawlable URL. | Hub-to-hub link equity does **not** flow today. Removing the home nav would leave each hub reachable only from its own tiles and the sitemap. |
-| **`/tools/` is a 404**, sitting above 1,709 pre-rendered tile pages. | There is a free, zero-risk addition available before any subtraction is contemplated. |
+| ~~**`/tools/` is a 404**~~ — **fixed by [v1345](spec-v1345.md)**: it now lists all 1,709 by trade, links all 21 hubs as real URLs, and is reachable from every page's footer. | The free, zero-risk addition is banked. Subtraction ([v1347](spec-v1347.md)) now has something to wait on. |
 
 **So the nav change is split in two, and the risky half is gated on evidence.** v1345 adds
 `/tools/` and the footer badge — pure addition, nothing removed, no URL changed. v1337 simplifies
@@ -80,7 +80,7 @@ lands before any pixel moves; the additive nav work lands before any link is rem
 | [v1341](spec-v1341.md) | Enter routes to the answer, with provenance on every filled field | v1340 | behaviour |
 | [v1342](spec-v1342.md) | Ask for the first missing value, in words | v1341 | behaviour |
 | [v1343](spec-v1343.md) | Two or three plain choices when the query is ambiguous | v1341 | behaviour |
-| [v1345](spec-v1345.md) | `/tools/` — every calculator by category — and the footer badge | v1346 | **none: pure addition** |
+| ~~[v1345](spec-v1345.md)~~ | ~~`/tools/` — every calculator by category — and the footer badge~~ **SHIPPED** | v1346 | none |
 | [v1337](spec-v1337.md) | The home page becomes one box. **All 21 trade links kept.** | v1345 | low |
 | [v1338](spec-v1338.md) | Answer first, inputs second | — | low |
 | [v1344](spec-v1344.md) | An MCP `answer_query` that reads the same registry | v1340 | none |
