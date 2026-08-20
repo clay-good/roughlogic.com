@@ -334,20 +334,21 @@ test("worked-example answer rows are named, not keyed", async () => {
 test("outputUnits reads as a unit, never as part of the number", async () => {
   const { BESPOKE_OUTPUT_UNITS } = await import("../fixtures/bespoke-output-units.js");
   const ids = Object.keys(BESPOKE_OUTPUT_UNITS);
-  assert.ok(ids.length >= 657, `unit maps fell to ${ids.length} tiles; the floor is 657`);
+  assert.ok(ids.length >= 658, `unit maps fell to ${ids.length} tiles; the floor is 658`);
   for (const id of ids) {
     for (const [key, u] of Object.entries(BESPOKE_OUTPUT_UNITS[id])) {
       const where = `${id}.${key}`;
       assert.equal(typeof u.prefix, "string", where);
       assert.equal(typeof u.suffix, "string", where);
       assert.ok(u.prefix !== "" || u.suffix !== "", `${where} records no unit at all`);
-      assert.ok((u.prefix + u.suffix).length <= 16, `${where} is a sentence, not a unit`);
+      assert.ok(u.suffix.length <= 16 && (u.prefix + u.suffix).length <= 24, `${where} is a sentence, not a unit`);
       // A digit against the number reads as part of it ("1200 3-phase").
       assert.ok(!/^\s*[\d.]/.test(u.suffix), `${where} starts with a digit`);
+      if ("digits" in u) assert.ok(Number.isInteger(u.digits) && u.digits >= 0 && u.digits <= 10, `${where} decimals ${u.digits}`);
     }
   }
   const { outputUnits } = await import("../../mcp/catalog.mjs");
-  assert.deepEqual(outputUnits("abrasive-blast").cfm, { prefix: "", suffix: " cfm" });
+  assert.deepEqual(outputUnits("abrasive-blast").cfm, { prefix: "", suffix: " cfm", digits: 0 });
   assert.deepEqual(outputUnits("no-such-tile"), {});
 });
 

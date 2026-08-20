@@ -211,13 +211,24 @@ function parseOutputUnit(expr, key) {
   let prefix = "", suffix = "";
   for (let i = 0; i < at; i++) { const v = lit(parts[i]); if (v === null) return null; prefix += v; }
   for (let i = at + 1; i < parts.length; i++) { const v = lit(parts[i]); if (v === null) return null; suffix += v; }
+  // A long prefix is a sentence leading into the number ("Maximum allowable
+  // pressure " + p + " psi"). The page already has its own caption for that,
+  // but the unit trailing the number is still the unit -- so drop the prefix
+  // and keep the suffix. Where there is no suffix the prefix is all the row
+  // would say ("Class " + n), so it stays.
+  if (suffix !== "" && (prefix.trim().length > 2 || /[A-Za-z]{3}/.test(prefix))) prefix = "";
   if (prefix === "" && suffix === "") return null;
   // A unit is short. Anything longer is a sentence about the answer, which the
   // page already has room for in the collapsed proof.
-  if ((prefix + suffix).length > 16) return null;
+  if (suffix.length > 16 || (prefix + suffix).length > 24) return null;
   // A digit next to the number reads as part of it ("1200 3-phase").
   if (/^\s*[\d.]/.test(suffix)) return null;
-  return { prefix, suffix };
+  // How many decimals the calculator itself shows. A page that prints
+  // `1.52625` where the tool prints `1.5` is quoting a precision the tool
+  // never claims.
+  const d = parts[at].match(/\bfmt\(\s*r\.[A-Za-z_$][\w$]*\s*,\s*(\d+)\s*\)\s*$/);
+  const digits = d ? Number(d[1]) : null;
+  return digits === null ? { prefix, suffix } : { prefix, suffix, digits };
 }
 
 // Walk the same `NAME.textContent = ...` assignments parseOutputLabels reads,

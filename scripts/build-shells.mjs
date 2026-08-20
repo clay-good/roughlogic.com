@@ -316,6 +316,17 @@ function withoutRepeat(suffix, label) {
   return re.test(hay) ? "" : suffix;
 }
 
+// A fixture holds a full-precision number; the calculator rounds it before
+// showing it. `Simple payback 1.52625` where the tool says `1.5` quotes a
+// precision the tool never claimed. Only ever rounds DOWN to the tool's
+// decimals -- padding a clean 5 out to 5.0000 would read worse, not better.
+function atToolPrecision(raw, val, digits) {
+  if (typeof digits !== "number" || !Number.isFinite(raw) || Math.abs(raw) >= 1e15) return val;
+  const shownDecimals = (String(raw).split(".")[1] || "").length;
+  if (shownDecimals <= digits) return val;
+  return raw.toFixed(digits);
+}
+
 function exampleRows(obj, labels, displays, units) {
   return Object.entries(obj || {})
     .map(([k, v]) => {
@@ -331,7 +342,7 @@ function exampleRows(obj, labels, displays, units) {
       // prints); a hand-written renderer's extracted unit second.
       const unit = units && units[k];
       const shown = (displays && displayFor(displays[k], val, raw, caption))
-        || (unit && typeof raw === "number" ? unit.prefix + val + withoutRepeat(unit.suffix, caption) : null)
+        || (unit && typeof raw === "number" ? unit.prefix + atToolPrecision(raw, val, unit.digits) + withoutRepeat(unit.suffix, caption) : null)
         || val;
       // A named row prints the name and the number, nothing else. The raw field
       // name is the API's, not the reader's: it used to trail 5,396 of the
