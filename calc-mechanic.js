@@ -209,7 +209,7 @@ export function computeDriveshaftCritical({ od_in = 0, wall_in = 0, length_in = 
   return { critical_rpm: N_crit_rpm, recommended_max_rpm: safe_rpm };
 }
 
-export const driveshaftExample = { inputs: { od_in: 3.5, wall_in: 0.083, length_in: 50, material: "steel" } };
+export const driveshaftExample = { inputs: { od_in: 3.5, wall_in: 0.083, length_in: 48, material: "steel" } };
 
 // dims: in { target_rpm: T^-1, od_in: L, wall_in: L, material: dimensionless } out: { max_length_in: L, critical_rpm: T^-1 }
 export function computeDriveshaftMaxLength({ target_rpm = 0, od_in = 0, wall_in = 0, material = "steel" } = {}) {

@@ -934,7 +934,7 @@ export function renderTanklessGPM(inputRegion, outputRegion, citationEl) {
   const out = makeNumber("Target outlet (°F)", "tl-o", { step: "any", min: "0", value: "110" });
   out.input.value = "110";
   for (const f of [solve, kbtu, tgpm, zone, ovr, out]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { solve.select.value = "kbtu"; kbtu.input.value = ""; tgpm.input.value = "5"; zone.select.value = "5A_Chicago_IL"; ovr.input.value = "40"; out.input.value = "110"; update(); });
+  attachExampleButton(inputRegion, () => { solve.select.value = "gpm"; kbtu.input.value = "199"; tgpm.input.value = ""; zone.select.value = "5A_Chicago_IL"; ovr.input.value = ""; out.input.value = "110"; update(); });
   const oG = makeOutputLine(outputRegion, "Solved", "tl-out-g");
   const oI = makeOutputLine(outputRegion, "Inlet temperature", "tl-out-i");
   const oD = makeOutputLine(outputRegion, "delta T", "tl-out-d");

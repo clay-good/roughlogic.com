@@ -736,7 +736,7 @@ export function renderStandpipeFriction(inputRegion, outputRegion, citationEl) {
   L.input.value = "100";
   const dia = makeSelect("Outlet hose diameter", "sp-d", Object.keys(HOSE_FRICTION_COEFFICIENTS).map((k) => ({ value: k, label: k.replace("_in", " in") })));
   for (const f of [h, n, q, L, dia]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { h.input.value = "100"; n.input.value = "2"; q.input.value = "250"; L.input.value = "100"; dia.select.value = "2.5_in"; update(); });
+  attachExampleButton(inputRegion, () => { h.input.value = "200"; n.input.value = "1"; q.input.value = "250"; L.input.value = "100"; dia.select.value = "2.5_in"; update(); });
   const oE = makeOutputLine(outputRegion, "Elevation pressure", "sp-out-e");
   const oF = makeOutputLine(outputRegion, "Friction (all outlets)", "sp-out-f");
   const oT = makeOutputLine(outputRegion, "Total", "sp-out-t");
@@ -766,7 +766,7 @@ export function renderLadderPipeReach(inputRegion, outputRegion, citationEl) {
   const t = makeSelect("Nozzle type", "lp-t", Object.keys(MASTER_STREAM_TYPES).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
   const p = makeNumber("Nozzle pressure (psi)", "lp-p", { step: "any", min: "0" });
   for (const f of [a, L, t, p]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { a.input.value = "70"; L.input.value = "100"; t.select.value = "smooth_bore_2"; p.input.value = "80"; update(); });
+  attachExampleButton(inputRegion, () => { a.input.value = "70"; L.input.value = "100"; t.select.value = "smooth_bore_1_75"; p.input.value = "80"; update(); });
   const oH = makeOutputLine(outputRegion, "Horizontal ladder reach", "lp-out-h");
   const oV = makeOutputLine(outputRegion, "Vertical ladder reach", "lp-out-v");
   const oS = makeOutputLine(outputRegion, "Stream reach", "lp-out-s");

@@ -459,7 +459,7 @@ export function computeReeferBurn({ unit = "thermo_king_continuous", tank_gal = 
   };
 }
 
-export const reeferBurnExample = { inputs: { unit: "thermo_king_continuous", tank_gal: 50, haul_hr: 24, ambient_band: "moderate" } };
+export const reeferBurnExample = { inputs: { unit: "thermo_king_continuous", tank_gal: 50, haul_hr: 24, ambient_band: "moderate", haul_miles: 1200, average_mph: 55 } };
 
 // --- Utility 194: Incoterms 2020 Decoder ---
 

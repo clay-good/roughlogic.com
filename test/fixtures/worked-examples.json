@@ -11576,8 +11576,8 @@
    "tile_id": "truss-capacity",
    "source_publisher": "Tomcat 16 in box truss published technical data sheet (typical)",
    "source_title": "Truss UDL screening: published udl_max_lb_per_ft * span; pass if total imposed (udl + equivalent point) <= published",
-   "source_edition_or_year": "Tomcat 16 in box truss bulletin (150 plf nominal, 15,000 lb safety-factor envelope)",
-   "source_section_or_page": "16 in box / 40 ft span / 200 + 400 + 200 lb point loads -> 150 plf / 6000 lb total uniform capacity / pass",
+   "source_edition_or_year": "Tomcat 16 in box truss bulletin (150 plf nominal)",
+   "source_section_or_page": "16 in box / 40 ft span / 200 + 400 + 200 lb point loads -> 150 plf / 6000 lb total uniform capacity / 800 lb of point load / 3.75 safety factor / pass",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -11586,15 +11586,15 @@
     "point_loads": [
      {
       "position_ft": 10,
-      "load_lb": 200
+      "weight_lb": 200
      },
      {
       "position_ft": 20,
-      "load_lb": 400
+      "weight_lb": 400
      },
      {
       "position_ft": 30,
-      "load_lb": 200
+      "weight_lb": 200
      }
     ]
    },
@@ -11611,8 +11611,14 @@
       "abs": 0.01
      }
     },
+    "total_point_load_lb": {
+     "value": 800,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
     "safety_factor": {
-     "value": 15000,
+     "value": 3.75,
      "tolerance": {
       "abs": 0
      }
@@ -12954,43 +12960,60 @@
    "source_publisher": "49 CFR 395 (FMCSA hours of service for property carriers)",
    "source_title": "14-hr on-duty / 11-hr drive / 70-hr week budget tracker per profile",
    "source_edition_or_year": "49 CFR 395 property_70_8 profile (14 hr on-duty, 11 hr drive, 70 hr/8 day rolling)",
-   "source_section_or_page": "property_70_8 / no events yet / 35 hr weekly used -> 11 hr drive remaining, 14 hr on-duty remaining, 35 hr weekly remaining, no break needed yet",
+   "source_section_or_page": "property_70_8 / 0.5 hr on-duty + 5 hr drive + 0.5 hr off-duty + 4 hr drive / 30 hr weekly used -> 9 hr driven, 2 hr drive remaining (395.3(a)(3) 11-hr limit), 4.5 hr on-duty remaining (395.3(a)(2) 14-hr window), 30.5 hr weekly remaining, 30-min break satisfied by the 0.5 hr off-duty",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-08-20",
    "inputs": {
     "profile": "property_70_8",
-    "events": [],
-    "weekly_on_duty_used_hr": 35
+    "events": [
+     {
+      "kind": "on_duty",
+      "hours": 0.5
+     },
+     {
+      "kind": "drive",
+      "hours": 5
+     },
+     {
+      "kind": "off_duty",
+      "hours": 0.5
+     },
+     {
+      "kind": "drive",
+      "hours": 4
+     }
+    ],
+    "weekly_on_duty_used_hr": 30
    },
    "outputs": {
     "drive_remaining": {
-     "value": 11,
+     "value": 2,
      "tolerance": {
       "abs": 0.01
      }
     },
     "on_duty_remaining": {
-     "value": 14,
+     "value": 4.5,
      "tolerance": {
       "abs": 0.01
      }
     },
     "weekly_remaining": {
-     "value": 35,
+     "value": 30.5,
      "tolerance": {
       "abs": 0.01
      }
     },
     "drive_used": {
-     "value": 0,
+     "value": 9,
      "tolerance": {
-      "abs": 0
+      "abs": 0.01
      }
     },
     "on_duty_used": {
-     "value": 0,
+     "value": 9.5,
      "tolerance": {
-      "abs": 0
+      "abs": 0.01
      }
     },
     "needs_break": {

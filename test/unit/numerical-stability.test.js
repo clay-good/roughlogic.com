@@ -1261,14 +1261,14 @@ test("computeSeedRate: bit-stable seeds_per_acre + lbs_per_acre + cost_per_acre 
   assert.equal(bits(r.cost_per_acre), "4059435e50d79437", `cost_per_acre=${r.cost_per_acre}`);
 });
 
-test("computeTrussCapacity: bit-stable equivalent_udl + total_point_load + safety_factor at the spec example (16in box, 30 ft, 2x250 lb)", () => {
-  // Group N. Equivalent UDL converts two 250 lb point loads on a 30 ft
-  // span into a per-foot equivalent (1000/30 = 33.33...). Pins the
-  // point-load summation and the UDL conversion identity.
+test("computeTrussCapacity: bit-stable equivalent_udl + total_point_load + safety_factor at the spec example (16in box, 40 ft, 200+400+200 lb)", () => {
+  // Group N. Equivalent UDL converts 800 lb of point load on a 40 ft span
+  // into a per-foot equivalent (2*800/40 = 40). Pins the point-load
+  // summation and the UDL conversion identity.
   const r = computeTrussCapacity(trussExample.inputs);
-  assert.equal(bits(r.equivalent_udl_lb_per_ft), "4040aaaaaaaaaaab", `equivalent_udl=${r.equivalent_udl_lb_per_ft}`);
-  assert.equal(bits(r.total_point_load_lb), "407f400000000000", `total_point_load=${r.total_point_load_lb}`);
-  assert.equal(bits(r.safety_factor), "401ccccccccccccc", `safety_factor=${r.safety_factor}`);
+  assert.equal(bits(r.equivalent_udl_lb_per_ft), "4044000000000000", `equivalent_udl=${r.equivalent_udl_lb_per_ft}`);
+  assert.equal(bits(r.total_point_load_lb), "4089000000000000", `total_point_load=${r.total_point_load_lb}`);
+  assert.equal(bits(r.safety_factor), "400e000000000000", `safety_factor=${r.safety_factor}`);
 });
 
 test("computePanConversion: bit-stable total_qt + capacity_qt + servings_per_pan at the spec example (120 servings, 6 oz, full 4 in pan)", () => {

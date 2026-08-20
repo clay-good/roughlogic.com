@@ -2460,7 +2460,7 @@ export function computeCraneLiftCheck({
 }
 
 export const craneLiftCheckExample = {
-  inputs: { load_lb: 8000, rigging_lb: 200, block_lb: 250, jib_deduct_lb: 0, sling_legs: 2, sling_angle_deg: 60, chart_capacity_lb: 12000 },
+  inputs: { load_lb: 8000, rigging_lb: 200, block_lb: 0, jib_deduct_lb: 0, sling_legs: 2, sling_angle_deg: 60, chart_capacity_lb: 12000 },
 };
 
 // --- v7 renderers (all use _simple* helpers) ---

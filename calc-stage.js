@@ -125,7 +125,7 @@ export function computeTrussCapacity({ truss_model = "16in_box", span_ft = 0, po
 }
 
 export const trussExample = {
-  inputs: { truss_model: "16in_box", span_ft: 30, point_loads: [{ weight_lb: 250, position_ft: 10 }, { weight_lb: 250, position_ft: 20 }] },
+  inputs: { truss_model: "16in_box", span_ft: 40, point_loads: [{ weight_lb: 200, position_ft: 10 }, { weight_lb: 400, position_ft: 20 }, { weight_lb: 200, position_ft: 30 }] },
 };
 
 // --- 217: Audio Speaker Time Alignment ---
