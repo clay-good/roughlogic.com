@@ -597,6 +597,7 @@ function renderSalesTaxNexus(inputRegion, outputRegion, citationEl) {
     }
   }
   sel.select.addEventListener("input", refresh);
+  attachExampleButton(inputRegion, () => { sel.select.value = salesTaxNexusExample.inputs.state; refresh(); });
   refresh();
 }
 

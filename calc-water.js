@@ -265,7 +265,7 @@ export function computeSRTandFM({
   return { mlss_lb, mlvss_lb, srt_days, srt_note, fm_ratio, cas_flag };
 }
 
-export const srtFMExample = { inputs: { aeration_volume_gal: 1500000, mlss_mg_l: 2500, mlvss_mg_l: 1900, was_flow_mgd: 0.05, was_tss_mg_l: 7500, bod_load_lb_day: 6000, effluent_tss_mg_l: 12, effluent_flow_mgd: 5.0 } };
+export const srtFMExample = { inputs: { aeration_volume_gal: 1000000, mlss_mg_l: 2500, mlvss_mg_l: 2000, was_flow_mgd: 0.05, was_tss_mg_l: 8000, bod_load_lb_day: 5000, effluent_tss_mg_l: 10, effluent_flow_mgd: 0.95 } };
 
 // --- Renderers ---
 
@@ -849,7 +849,7 @@ function renderDisinfectionCT(inputRegion, outputRegion, citationEl) {
   for (const f of [c, t10, t, p, lt]) inputRegion.appendChild(f.wrap);
 
   attachExampleButton(inputRegion, () => {
-    c.input.value = "0.4"; t10.input.value = "300"; t.input.value = "5"; p.input.value = "7.0"; lt.select.value = "3"; update();
+    c.input.value = "1"; t10.input.value = "150"; t.input.value = "5"; p.input.value = "7.0"; lt.select.value = "3"; update();
   });
 
   const oA = makeOutputLine(outputRegion, "CT achieved (mg-min/L)", "ct-out-a");

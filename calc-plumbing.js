@@ -396,9 +396,15 @@ export function renderPipeSizing(inputRegion, outputRegion, citationEl) {
     wrap.appendChild(lab); wrap.appendChild(inp); inputRegion.appendChild(wrap);
     rows.push({ key: f, input: inp });
   }
+  const slope = makeSelect("Drain slope", "ps-slope", [
+    { value: "0.25", label: "1/4 in per ft", selected: true },
+    { value: "0.5", label: "1/2 in per ft" },
+  ]);
+  inputRegion.appendChild(slope.wrap);
   attachExampleButton(inputRegion, () => {
     const ex = { lavatory: 2, water_closet_flush_tank: 2, shower: 1, kitchen_sink: 1 };
     for (const r of rows) r.input.value = ex[r.key] || "";
+    slope.select.value = "0.25";
     update();
   });
   const oWSFU = makeOutputLine(outputRegion, "Total WSFU", "ps-out-wsfu");
@@ -408,7 +414,7 @@ export function renderPipeSizing(inputRegion, outputRegion, citationEl) {
   const oDr = makeOutputLine(outputRegion, "Recommended drainage size", "ps-out-dr");
   const update = debounce(() => {
     const fx = rows.map((r) => ({ fixture: r.key, count: Number(r.input.value) || 0 })).filter((f) => f.count > 0);
-    const r = computePipeSizing({ fixtures: fx });
+    const r = computePipeSizing({ fixtures: fx, slope_in_per_ft: Number(slope.select.value) });
     if (r.error) { oWSFU.textContent = r.error; return; }
     oWSFU.textContent = fmt(r.total_wsfu, 1);
     oGPM.textContent = fmt(r.estimated_demand_gpm, 1) + " gpm";
@@ -417,6 +423,7 @@ export function renderPipeSizing(inputRegion, outputRegion, citationEl) {
     oDr.textContent = r.recommended_drainage_size + "\"";
   }, DEBOUNCE_MS);
   for (const r of rows) r.input.addEventListener("input", update);
+  slope.select.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }

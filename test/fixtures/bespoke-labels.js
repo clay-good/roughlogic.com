@@ -627,6 +627,7 @@ export const BESPOKE_LABELS = {
   "pipe-partial-flow-depth": {"d_in":"Pipe diameter (in)","slope":"Pipe slope S (ft/ft)","flow_gpm":"Flow Q (gpm)","material":"Pipe material"},
   "pipe-pressure-rating": {"od_in":"Outside diameter (in)","wall_in":"Nominal wall (in)","allow_stress":"Allowable stress S at temperature (psi)","joint_factor":"Joint factor E (seamless = 1.0)","y_coeff":"y-coefficient (ferritic <= 900F = 0.4)","mill_tol_frac":"Mill under-tolerance fraction","allowance_in":"Corrosion + threading allowance A (in)","design_p":"Design pressure (psi, required-wall mode)","mode":"Mode"},
   "pipe-purge-volume": {"pipe_id_in":"Pipe inside diameter (in)","length_ft":"Run length (ft)","air_changes":"Volume changes to sweep","flow_scfh":"Purge gas flow (scfh)"},
+  "pipe-sizing": {"slope_in_per_ft":"Drain slope"},
   "pipe-spacing-rack": {"pipe_od_in":"Pipe outside diameter (in)","insulation_thickness_in":"Insulation thickness (in)","clearance_in":"Clearance gap (in)","pipe_count":"Number of pipes","rack_width_in":"Rack / strut width (in, optional)"},
   "pipe-support-spacing": {"material":"Pipe material","pipe_size":"Nominal pipe size (in)","run_length":"Horizontal run to support (ft)","orientation":"Orientation"},
   "pipe-template-wrap": {"outside_diameter_in":"Pipe outside diameter (in)","cut_angle_deg":"Cut angle from square (deg)","stations":"Stations around circumference"},

@@ -2235,7 +2235,7 @@ export function computeStairStringerV7({
 }
 
 export const stairStringerExampleV7 = {
-  inputs: { total_rise_in: 109, target_rise_in: 7.0, target_tread_in: 11.0, nosing_in: 1, stringer_thickness_in: 11.25, code_max_rise_in: 7.75, code_min_tread_in: 10 },
+  inputs: { total_rise_in: 108, target_rise_in: 6.75, target_tread_in: 11.0, nosing_in: 1, stringer_thickness_in: 11.25, code_max_rise_in: 7.75, code_min_tread_in: 10 },
 };
 
 // --- 247: Hip, Valley, and Jack Rafter Schedule ---

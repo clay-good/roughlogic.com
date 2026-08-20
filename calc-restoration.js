@@ -455,7 +455,7 @@ export function renderPPE(inputRegion, outputRegion, citationEl) {
     { value: "1", label: "Category 1" }, { value: "2", label: "Category 2", selected: true }, { value: "3", label: "Category 3" },
   ]);
   inputRegion.appendChild(c.wrap);
-  attachExampleButton(inputRegion, () => { c.select.value = "3"; update(); });
+  attachExampleButton(inputRegion, () => { c.select.value = "1"; update(); });
   const oP = makeOutputLine(outputRegion, "Recommended PPE", "ppe-out-p");
   const oN = makeOutputLine(outputRegion, "Notes", "ppe-out-n");
   const update = debounce(() => {

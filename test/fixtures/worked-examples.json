@@ -97,20 +97,33 @@
   {
    "tile_id": "concrete",
    "source_publisher": "Project (first-principles)",
-   "source_title": "Concrete volume identity (footing variant): L * W * thickness / 27",
+   "source_title": "Concrete slab volume = L * W * thickness / 27 with waste factor",
    "source_edition_or_year": "n/a",
-   "source_section_or_page": "Volume identity; 20x10 footing 4 in deep",
+   "source_section_or_page": "Volume identity; 10% waste typical",
    "verified_by": "rl",
    "verified_on": "2026-05-10",
    "inputs": {
-    "shape": "footing",
-    "length_ft": 20,
+    "shape": "slab",
+    "length_ft": 10,
     "width_ft": 10,
-    "thickness_in": 4
+    "thickness_in": 4,
+    "waste_factor": 0.1
    },
    "outputs": {
+    "cubic_feet": {
+     "value": 33.333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
     "cubic_yards": {
-     "value": 2.469,
+     "value": 1.235,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cubic_yards_with_waste": {
+     "value": 1.358,
      "tolerance": {
       "pct": 0.5
      }
@@ -1168,33 +1181,20 @@
   {
    "tile_id": "concrete",
    "source_publisher": "Project (first-principles)",
-   "source_title": "Concrete slab volume = L * W * thickness / 27 with waste factor",
+   "source_title": "Concrete volume identity (footing variant): L * W * thickness / 27",
    "source_edition_or_year": "n/a",
-   "source_section_or_page": "Volume identity; 10% waste typical",
+   "source_section_or_page": "Volume identity; 20x10 footing 4 in deep",
    "verified_by": "rl",
    "verified_on": "2026-05-10",
    "inputs": {
-    "shape": "slab",
-    "length_ft": 10,
+    "shape": "footing",
+    "length_ft": 20,
     "width_ft": 10,
-    "thickness_in": 4,
-    "waste_factor": 0.1
+    "thickness_in": 4
    },
    "outputs": {
-    "cubic_feet": {
-     "value": 33.333,
-     "tolerance": {
-      "pct": 0.5
-     }
-    },
     "cubic_yards": {
-     "value": 1.235,
-     "tolerance": {
-      "pct": 0.5
-     }
-    },
-    "cubic_yards_with_waste": {
-     "value": 1.358,
+     "value": 2.469,
      "tolerance": {
       "pct": 0.5
      }
@@ -13279,7 +13279,7 @@
     "was_tss_mg_l": 8000,
     "effluent_tss_mg_l": 10,
     "effluent_flow_mgd": 0.95,
-    "bod_load_lb_day": 1500
+    "bod_load_lb_day": 5000
    },
    "outputs": {
     "mlss_lb": {

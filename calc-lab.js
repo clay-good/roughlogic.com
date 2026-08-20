@@ -961,7 +961,7 @@ function renderResuspend(inputRegion, outputRegion, citationEl) {
     out.textContent = fmt(r.volume, 6) + " L (" + fmt(r.volume * 1000, 3) + " mL)";
   }, DEBOUNCE_MS);
   for (const f of [m, t]) f.input.addEventListener("input", update);
-  attachExampleButton(inputRegion, () => { m.input.value = 0.001; t.input.value = 1.0; update(); });
+  attachExampleButton(inputRegion, () => { m.input.value = 0.05; t.input.value = 10; update(); });
 }
 
 function renderPcrMix(inputRegion, outputRegion, citationEl) {

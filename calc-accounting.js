@@ -347,7 +347,7 @@ export function computePayrollWithholding({
   };
 }
 
-export const payrollExample = { inputs: { gross_per_period: 2500, pay_frequency: "biweekly", filing_status: "single", tax_year: 2025 } };
+export const payrollExample = { inputs: { gross_per_period: 1500, pay_frequency: "biweekly", filing_status: "single", tax_year: 2025 } };
 
 // --- 240: Loan Amortization Schedule ---
 //
@@ -872,7 +872,7 @@ function renderPayroll(inputRegion, outputRegion, citationEl) {
   }, DEBOUNCE_MS);
   for (const el of [gross.input, freq.select, fs.select, ytdSs.input]) el.addEventListener("input", update);
   attachExampleButton(inputRegion, () => {
-    gross.input.value = 2500; freq.select.value = "biweekly"; ytdSs.input.value = 0; update();
+    gross.input.value = 1500; freq.select.value = "biweekly"; ytdSs.input.value = 0; update();
   });
 }
 

@@ -175,7 +175,7 @@ export function computeBackcountryNeeds({ body_weight_lb = 0, ambient_band = "mo
   return { water_per_day_l: water_per_day, kcal_per_day, trip_water_l: trip_water, trip_kcal };
 }
 
-export const backcountryExample = { inputs: { body_weight_lb: 175, ambient_band: "hot", exertion: "hard", trip_days: 3, group_size: 4 } };
+export const backcountryExample = { inputs: { body_weight_lb: 170, ambient_band: "moderate", exertion: "moderate", trip_days: 3, group_size: 1 } };
 
 // --- 231: UTM and Lat-Long Conversion (WGS84) ---
 //

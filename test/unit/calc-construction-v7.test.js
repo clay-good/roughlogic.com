@@ -33,7 +33,8 @@ test("246 109 in / 7 in target → 16 risers, exact rise 6.8125", () => {
 
 test("246 stringer hypotenuse = sqrt(rise² + run²)", () => {
   const r = computeStairStringer(stairStringerExampleV7.inputs);
-  const expected = Math.sqrt(109 * 109 + r.total_run_in * r.total_run_in);
+  const rise = stairStringerExampleV7.inputs.total_rise_in;
+  const expected = Math.sqrt(rise * rise + r.total_run_in * r.total_run_in);
   assert.ok(close(r.stringer_length_in, expected, 0.001));
 });
 
@@ -61,7 +62,7 @@ test("246 errors on zero / negative inputs", () => {
 
 test("246 angle_deg matches atan2(rise, run)", () => {
   const r = computeStairStringer(stairStringerExampleV7.inputs);
-  const expected = Math.atan2(109, r.total_run_in) * 180 / Math.PI;
+  const expected = Math.atan2(stairStringerExampleV7.inputs.total_rise_in, r.total_run_in) * 180 / Math.PI;
   assert.ok(close(r.angle_deg, expected, 0.001));
 });
 
