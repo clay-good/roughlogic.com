@@ -1,6 +1,6 @@
 # spec-v1338.md — Answer first, inputs second
 
-> Status: **PLANNED.** Part of [scope-one-box](scope-one-box.md).
+> Status: **SHIPPED (2026-08-20).** Part of [scope-one-box](scope-one-box.md).
 > Presentation only. No compute changes, no number changes. Catalog stays **1,709**.
 
 ## Why
@@ -38,6 +38,55 @@ The order settles at **title → answer → inputs → detail → notice → pro
   above the question asking for the value it needed.
 - **The proof stays where it is.** It is already a collapsed `details.proof` below the answer
   (`5e8f2e57`). This spec does not touch it.
+
+## What shipped differently
+
+- **Appended in the new order, not hoisted afterwards.** The plan was to move `.output-region`
+  after the renderer ran. It does not have to be moved at all: `renderToolView` creates both
+  regions itself, so appending the output first costs nothing and sidesteps the entire hazard —
+  `.output-region` is `aria-live`, and relocating a **populated** live region re-announces its
+  contents. At creation time it is empty, so there is nothing to re-announce and no timing to get
+  wrong. The `setTimeout(…, 0)` re-assert dance sophiewell had to measure its way into is not
+  needed here.
+- **`:empty` was not enough, and the gap was visible on the first tile opened.** Most renderers
+  build their output ROWS at mount and leave the value spans blank, so the region has children from
+  the first paint. `ohms-law` opened as **`V: Copy  I: Copy  R: Copy  P: Copy`** — four labels and
+  four buttons with nothing to copy. Below the inputs that was merely untidy; hoisted above them it
+  became the first thing on the page, and it would have shipped as a visible regression on the
+  majority of the catalog. `syncAnswerVisibility()` toggles `.output-blank` by reading the
+  `.out-value` / `<dd>` cells, on mount and after each debounced recompute. **A region whose shape
+  it cannot read is left visible** — hiding something we do not understand is worse than showing it.
+- **The ask card moved with the answer.** [v1342](spec-v1342.md) inserted it before the input
+  region; it now goes before the **output** region, or a tile that reads a blank required field as
+  zero renders a confident `0.0` directly above the question asking for the value it needed.
+
+## The regression this shipped and then caught
+
+Hiding the answer until there is one is not one rule, it is two — and the first cut only had one.
+The full-catalog sweep failed on **six tests**, all from the same mistake:
+
+| Failed | Because |
+|---|---|
+| `Copy-all button is visible on a calculator with labelled outputs` | Copy-all lives **inside** `.output-region`. |
+| `no horizontal scroll at 320px` on `#loan-amortization`, `#macrs-depreciation` | The schedule `<table>` lives inside it too, so `waitForSelector` never saw it. |
+| three `v5-csv-export` cases | The CSV export button, likewise. |
+
+The cause: **for some tiles the answer IS a table**, and their summary `.out-value` spans stay
+empty while the table carries everything. Reading only the value spans therefore hid a fully
+populated region, and took three working controls down with it.
+
+Two fixes, both now pinned by tests:
+
+- **Rich output counts as an answer.** A region containing a `table`, list, `canvas`, `svg`, or
+  `img` is never hidden.
+- **Watch the output, not the input events.** *"Test with example"* fills fields through the
+  renderer's own update path without necessarily dispatching an `input` event the region would
+  hear, so an input listener left a populated answer hidden. A `MutationObserver` on the output
+  region sees the answer change however it was produced.
+
+**The lesson is about the sweep, not the code.** All three surfaces are things a reader uses and
+no unit test covers, and every one of them was invisible to a spot-check on a tile I happened to
+open. The catalog-wide e2e run is what made a plausible one-line CSS idea survivable.
 
 ## Gotchas
 

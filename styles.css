@@ -1890,3 +1890,15 @@ textarea.is-autofilled {
 
 .ask-go:hover,
 .ask-go:focus-visible { filter: brightness(1.1); }
+
+/* spec-v1338: the answer is the first thing in the tool body, so an
+   uncomputed tile must not open on an empty box. Every tile opens
+   blank since the example defaults were removed, which makes this
+   the common case rather than an edge one.
+
+   Two rules, because there are two shapes of empty: a region with no
+   children at all, and -- far more common -- one whose renderer built
+   its rows at mount and left every value blank. Only JavaScript can
+   tell the second apart, so app.js toggles .output-blank. */
+.output-region:empty,
+.output-region.output-blank { display: none; }

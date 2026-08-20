@@ -1801,6 +1801,37 @@ function applyQueryPrefill(region, id, params) {
   }).catch(() => { /* prefill is an enhancement; the form is always there */ });
 }
 
+// spec-v1338: hide the answer card until the tile actually has an answer.
+//
+// `:empty` in CSS is not enough. Most renderers build their output ROWS at
+// mount and leave the value spans blank, so the region has children from the
+// first paint -- ohms-law opens as "V: Copy  I: Copy  R: Copy  P: Copy". Below
+// the inputs that was merely untidy; hoisted above them it is the first thing
+// on the page. Since every tile now opens blank, this is the common case, not
+// an edge one.
+//
+// A region whose structure this cannot read (no .out-value spans, no <dd>) is
+// left visible. Hiding something we do not understand is worse than showing it.
+function syncAnswerVisibility(outputRegion) {
+  if (!outputRegion) return;
+  // Rich output -- a schedule table, a list, a chart -- IS the answer for
+  // tiles like loan-amortization and macrs-depreciation, and their summary
+  // spans can stay empty while the table carries everything. Reading only the
+  // value spans hid a fully populated region, which took the schedule table,
+  // the CSV export button and Copy-all down with it.
+  if (outputRegion.querySelector("table, ul, ol, canvas, svg, img")) {
+    outputRegion.classList.remove("output-blank");
+    return;
+  }
+  const cells = outputRegion.querySelectorAll(".out-value, dd");
+  if (!cells.length) return;
+  let hasValue = false;
+  for (const cell of cells) {
+    if (String(cell.textContent || "").trim() !== "") { hasValue = true; break; }
+  }
+  outputRegion.classList.toggle("output-blank", !hasValue);
+}
+
 // spec-v1342: ask for the first value the tile cannot answer without.
 //
 // A query that carries three of four values lands on a form with one empty box
@@ -1916,7 +1947,11 @@ function askCard(region, rows, resolved, filledIds) {
   target.addEventListener("change", dismiss, { once: true });
 
   card.appendChild(form);
-  view.insertBefore(card, region);
+  // Above the ANSWER, not merely above the inputs: when the card is up there
+  // is no answer yet, and a tile that reads a blank required field as zero
+  // would otherwise render a confident "0.0" directly above the question
+  // asking for the value it needed.
+  view.insertBefore(card, view.querySelector(".output-region") || region);
   // Focus is NOT moved here. renderToolView already focuses the h1 for screen
   // reader users and a second focus call in the same microtask races it; the
   // card is the first thing in the body, so Tab reaches it anyway.
@@ -2030,13 +2065,29 @@ function renderToolView(id, params) {
   const inputRegion = document.createElement("section");
   inputRegion.className = "input-region";
   inputRegion.setAttribute("aria-label", "Inputs");
-  view.appendChild(inputRegion);
 
   const outputRegion = document.createElement("section");
   outputRegion.className = "output-region";
   outputRegion.setAttribute("aria-live", "polite");
   outputRegion.setAttribute("aria-label", "Output");
+
+  // spec-v1338: the answer goes ABOVE the inputs.
+  //
+  // The order the reader needs is the reverse of the order the page is built
+  // in. The number is what they came for; the inputs are what let them check
+  // it in one glance, and that glance is the whole reason a card beats a chat
+  // bubble. On a 16-field tile the answer used to be off the bottom of the
+  // screen, and after spec-v1341 a reader arriving with their own values
+  // already filled in landed on a form whose answer they had to scroll for.
+  //
+  // Appended in this order rather than moved afterwards, deliberately.
+  // `.output-region` is aria-live, and relocating a POPULATED live region
+  // re-announces its contents; at creation time it is empty, so there is
+  // nothing to re-announce and no timing to get wrong. The `:empty` rule in
+  // styles.css keeps it invisible until the tile actually has something to
+  // say -- which, since every tile now opens blank, is the common case.
   view.appendChild(outputRegion);
+  view.appendChild(inputRegion);
 
   // Everything after the opening sentence: scope, caveats, what the calculator
   // does not cover. Real reference content, so it stays on the page -- but the
@@ -2128,6 +2179,20 @@ function renderToolView(id, params) {
       // once, and cleared whether or not it was used, so the next navigation
       // starts clean.
       applyQueryPrefill(inputRegion, id, params || {});
+      // spec-v1338: the answer sits above the inputs now, so it must not show
+      // a column of empty labels before anything is typed. Renderers compute
+      // on a debounce, so re-check after their timer rather than inline.
+      syncAnswerVisibility(outputRegion);
+      // Watch the OUTPUT, not the input events. "Test with example" fills the
+      // fields through the renderer's own update path without necessarily
+      // dispatching an input event the region would hear, so listening on the
+      // inputs left a populated answer hidden -- which is how this hid the
+      // loan-amortization schedule, its CSV export button, and Copy-all.
+      // A MutationObserver sees the answer change however it was produced.
+      try {
+        const watcher = new MutationObserver(() => syncAnswerVisibility(outputRegion));
+        watcher.observe(outputRegion, { childList: true, subtree: true, characterData: true });
+      } catch { /* visibility is cosmetic; never block the calculator for it */ }
       if (params && params.example === "1") {
         const exBtn = inputRegion.querySelector("button");
         if (exBtn && /example/i.test(exBtn.textContent || "")) exBtn.click();

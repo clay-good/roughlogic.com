@@ -232,3 +232,41 @@ test("spec-v1342 ask card: no card when nothing was extracted", async ({ page })
   await expect(page.locator("#area_ft2")).toBeVisible();
   await expect(page.locator(".ask-card")).toHaveCount(0);
 });
+
+// spec-v1338: the answer comes first.
+
+test("spec-v1338: the answer region precedes the inputs in the DOM", async ({ page }) => {
+  await page.goto("/#ohms-law");
+  await page.waitForSelector(".input-region input");
+  const answerFirst = await page.evaluate(() => {
+    const out = document.querySelector(".output-region");
+    const inp = document.querySelector(".input-region");
+    return Boolean(out.compareDocumentPosition(inp) & Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+  expect(answerFirst).toBe(true);
+});
+
+test("spec-v1338: an untouched tile shows no empty answer box", async ({ page }) => {
+  // Most renderers build their answer ROWS at mount and leave the values
+  // blank, so ohms-law used to open as "V: Copy  I: Copy  R: Copy  P: Copy".
+  // Below the inputs that was untidy; above them it is the first thing seen.
+  await page.goto("/#ohms-law");
+  await page.waitForSelector(".input-region input");
+  await expect(page.locator(".output-region")).toBeHidden();
+
+  await page.locator("#ol-v").fill("120");
+  await page.locator("#ol-i").fill("10");
+  await expect(page.locator(".output-region")).toBeVisible();
+  await expect(page.locator(".output-region")).toContainText("12.000");
+});
+
+test("spec-v1338: a table-only answer is never hidden", async ({ page }) => {
+  // loan-amortization's summary spans can stay empty while its schedule table
+  // carries the whole answer. Reading only the value spans hid a fully
+  // populated region -- and took the CSV export button and Copy-all with it.
+  await page.goto("/#loan-amortization");
+  await page.waitForSelector(".input-region button");
+  await page.locator(".input-region button").first().click();
+  await expect(page.locator(".output-region table").first()).toBeVisible();
+  await expect(page.locator(".copy-all-btn")).toBeVisible();
+});
