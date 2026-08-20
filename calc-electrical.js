@@ -3339,12 +3339,10 @@ export const powerTriangleExample = {
 export function renderPowerTriangle(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: First-principles AC power triangle: kVA^2 = kW^2 + kVAR^2; PF = kW / kVA; theta = arccos(PF). IEEE 1459 defines apparent, real, and reactive power; this tile handles the sinusoidal case. Free at standards.ieee.org for the IEEE 1459 abstract.";
 
-  const kw = makeNumber("Real power (kW; blank if unknown)", "pt-kw", { step: "any", min: "0", value: "100" });
-  kw.input.value = "100";
+  const kw = makeNumber("Real power (kW; blank if unknown)", "pt-kw", { step: "any", min: "0" });
   const kva = makeNumber("Apparent power (kVA; blank if unknown)", "pt-kva", { step: "any", min: "0" });
   const kvar = makeNumber("Reactive power (kVAR; blank if unknown)", "pt-kvar", { step: "any", min: "0" });
-  const pf = makeNumber("Power factor (0-1; blank if unknown)", "pt-pf", { step: "any", min: "0", max: "1", value: "0.8" });
-  pf.input.value = "0.8";
+  const pf = makeNumber("Power factor (0-1; blank if unknown)", "pt-pf", { step: "any", min: "0", max: "1" });
   const ang = makeNumber("Phase angle (deg; blank if unknown)", "pt-ang", { step: "any", min: "0", max: "90" });
   const sign = makeSelect("Reactive sign", "pt-sign", [
     { value: "lagging", label: "Lagging (inductive)", selected: true },
@@ -3806,8 +3804,7 @@ export function renderLuxFootcandle(inputRegion, outputRegion, citationEl) {
     { value: "convert", label: "Convert lux <-> footcandle", selected: true },
     { value: "room", label: "Room average (lumen method)" },
   ]);
-  const fc = makeNumber("Footcandles (convert mode)", "lxfc-fc", { step: "any", min: "0", value: "100" });
-  fc.input.value = "100";
+  const fc = makeNumber("Footcandles (convert mode)", "lxfc-fc", { step: "any", min: "0" });
   const lx = makeNumber("Lux (convert mode)", "lxfc-lux", { step: "any", min: "0" });
   const lumens = makeNumber("Total luminaire lumens (room mode)", "lxfc-lm", { step: "any", min: "0" });
   const area = makeNumber("Room area (ft², room mode)", "lxfc-area", { step: "any", min: "0" });

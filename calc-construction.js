@@ -3707,10 +3707,8 @@ export const beamReactionsExample = { inputs: { span_ft: 16, w_plf: 200, point_l
 
 function renderBeamReactions(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Statics / AISC Steel Construction Manual simple-beam diagram formulas (public; also in the AWC/NDS and any statics text). Simple-span pinned-roller only. Distinct from the beam-loading and joist-deflection tiles - this outputs reactions and moment for post/footing sizing, not stress or deflection.";
-  const span = makeNumber("Span L (ft)", "br-l", { step: "any", min: "0", value: "16" });
-  span.input.value = "16";
-  const w = makeNumber("Uniform load w (plf)", "br-w", { step: "any", min: "0", value: "200" });
-  w.input.value = "200";
+  const span = makeNumber("Span L (ft)", "br-l", { step: "any", min: "0" });
+  const w = makeNumber("Uniform load w (plf)", "br-w", { step: "any", min: "0" });
   const p = makeNumber("Point load P (lb, optional)", "br-p", { step: "any", min: "0" });
   const a = makeNumber("Point-load distance a from left (ft)", "br-a", { step: "any", min: "0" });
   for (const f of [span, w, p, a]) inputRegion.appendChild(f.wrap);
@@ -3774,12 +3772,9 @@ function renderWeldHeatInput(inputRegion, outputRegion, citationEl) {
     { value: "SMAW", label: "SMAW" }, { value: "GMAW", label: "GMAW" },
     { value: "FCAW", label: "FCAW" }, { value: "GTAW", label: "GTAW" }, { value: "SAW", label: "SAW" },
   ]);
-  const volt = makeNumber("Voltage (V)", "whi-v", { step: "any", min: "0", value: "25" });
-  volt.input.value = "25";
-  const cur = makeNumber("Current (A)", "whi-i", { step: "any", min: "0", value: "200" });
-  cur.input.value = "200";
-  const ts = makeNumber("Travel speed (in/min)", "whi-ts", { step: "any", min: "0", value: "8" });
-  ts.input.value = "8";
+  const volt = makeNumber("Voltage (V)", "whi-v", { step: "any", min: "0" });
+  const cur = makeNumber("Current (A)", "whi-i", { step: "any", min: "0" });
+  const ts = makeNumber("Travel speed (in/min)", "whi-ts", { step: "any", min: "0" });
   const eff = makeNumber("Arc efficiency (0-1)", "whi-eta", { step: "any", min: "0", max: "1", value: "0.8" });
   eff.input.value = "0.8";
   const wmin = makeNumber("WPS min (kJ/in, optional)", "whi-min", { step: "any", min: "0" });
@@ -3895,8 +3890,7 @@ function renderMetalWeight(inputRegion, outputRegion, citationEl) {
   inputRegion.appendChild(shape.wrap);
   const dimsHost = document.createElement("div");
   inputRegion.appendChild(dimsHost);
-  const len = makeNumber("Length (in)", "mw-len", { step: "any", min: "0", value: "120" });
-  len.input.value = "120";
+  const len = makeNumber("Length (in)", "mw-len", { step: "any", min: "0" });
   const qty = makeNumber("Quantity", "mw-qty", { step: "1", min: "1", value: "1" });
   qty.input.value = "1";
   const alloy = makeSelect("Alloy", "mw-alloy", [

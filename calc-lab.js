@@ -771,10 +771,10 @@ function renderIdealGasLaw(inputRegion, outputRegion, citationEl) {
     { value: "volume", label: "Volume V (L)", selected: true },
     { value: "temperature", label: "Temperature T (°C)" },
   ]);
-  const p = makeNumber("Pressure (atm)", "igl-p", { step: "any", min: "0", value: "1" }); p.input.value = "1";
+  const p = makeNumber("Pressure (atm)", "igl-p", { step: "any", min: "0" });
   const v = makeNumber("Volume (L)", "igl-v", { step: "any", min: "0" });
-  const n = makeNumber("Moles (mol)", "igl-n", { step: "any", min: "0", value: "1" }); n.input.value = "1";
-  const t = makeNumber("Temperature (°C)", "igl-t", { step: "any", value: "25" }); t.input.value = "25";
+  const n = makeNumber("Moles (mol)", "igl-n", { step: "any", min: "0" });
+  const t = makeNumber("Temperature (°C)", "igl-t", { step: "any" });
   for (const f of [solve, p, v, n, t]) inputRegion.appendChild(f.wrap);
   const oRes = makeOutputLine(outputRegion, "Result", "igl-out-res");
   const oMv = makeOutputLine(outputRegion, "Molar volume", "igl-out-mv");
@@ -1257,7 +1257,7 @@ export const primerTmExample = { inputs: { sequence: "GCGGATCCATG", method: "aut
 
 function renderPrimerTm(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per Wallace R.B. et al., Nucleic Acids Research 6 (1979), for the short-oligo rule and Marmur & Doty, J Mol Biol 5 (1962) / standard molecular-biology references for the GC% formula, by name. Complements the pcr-master-mix tile. Nearest-neighbor (SantaLucia) thermodynamics is the modern gold standard. Free abstracts at pubmed.ncbi.nlm.nih.gov.";
-  const seq = makeText("Primer sequence (5' -> 3')", "ptm-seq", { value: "GCGGATCCATG" }); seq.input.value = "GCGGATCCATG";
+  const seq = makeText("Primer sequence (5' -> 3')", "ptm-seq", {});
   const method = makeSelect("Method", "ptm-method", [
     { value: "auto", label: "Auto (Wallace <=14 nt, else GC%)", selected: true },
     { value: "wallace", label: "Wallace 2(A+T)+4(G+C)" },

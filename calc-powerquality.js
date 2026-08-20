@@ -78,10 +78,8 @@ function renderParallelConductorDerate(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per NEC (NFPA 70) - paralleled conductors (Article 310, parallel-conductor provisions, 1/0 AWG and larger) and the more-than-three current-carrying-conductor adjustment factor (310.15(C)(1)). All parallel sets must be identical length, material, and termination. Conductor ampacities user-supplied from the adopted NEC ampacity table; the AHJ-adopted edition governs. Free read-only at nfpa.org/freeaccess.";
   const sizes = ["1/0", "2/0", "3/0", "4/0", "250", "300", "350", "400", "500", "600", "750"];
   const size = makeSelect("Conductor size (AWG / kcmil, 1/0+)", "pcd-size", sizes.map((s, i) => ({ value: s, label: s, selected: i === 2 })));
-  const isingle = makeNumber("Single-conductor ampacity (A)", "pcd-is", { step: "any", min: "0", value: "200" });
-  isingle.input.value = "200";
-  const nsets = makeNumber("Number of parallel sets", "pcd-n", { step: "1", min: "1", value: "3" });
-  nsets.input.value = "3";
+  const isingle = makeNumber("Single-conductor ampacity (A)", "pcd-is", { step: "any", min: "0" });
+  const nsets = makeNumber("Number of parallel sets", "pcd-n", { step: "1", min: "1" });
   const ccc = makeNumber("Total current-carrying conductors in raceway (>3 for derate)", "pcd-ccc", { step: "1", min: "0" });
   const amb = makeNumber("Ambient-correction factor (0-1)", "pcd-amb", { step: "any", min: "0", max: "1", value: "1" });
   amb.input.value = "1";
@@ -146,12 +144,9 @@ export const neutralCurrent3phExample = { inputs: { ia_A: 100, ib_A: 80, ic_A: 6
 
 function renderNeutralCurrent3ph(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Phasor sum of three 120-degree-displaced currents (first principles). Neutral-as-current-carrying-conductor and harmonic guidance per NEC Article 310 and IEEE Std 519, by name; the AHJ-adopted edition governs. Result is RMS magnitude, not direction. Free read-only at nfpa.org/freeaccess.";
-  const ia = makeNumber("Phase A current (A)", "nc-ia", { step: "any", min: "0", value: "100" });
-  ia.input.value = "100";
-  const ib = makeNumber("Phase B current (A)", "nc-ib", { step: "any", min: "0", value: "80" });
-  ib.input.value = "80";
-  const ic = makeNumber("Phase C current (A)", "nc-ic", { step: "any", min: "0", value: "60" });
-  ic.input.value = "60";
+  const ia = makeNumber("Phase A current (A)", "nc-ia", { step: "any", min: "0" });
+  const ib = makeNumber("Phase B current (A)", "nc-ib", { step: "any", min: "0" });
+  const ic = makeNumber("Phase C current (A)", "nc-ic", { step: "any", min: "0" });
   const trip = makeNumber("Per-phase triplen (3rd-harmonic) content (%, optional)", "nc-trip", { step: "any", min: "0", max: "100" });
   for (const f of [ia, ib, ic, trip]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ia.input.value = "100"; ib.input.value = "80"; ic.input.value = "60"; trip.input.value = ""; update(); });

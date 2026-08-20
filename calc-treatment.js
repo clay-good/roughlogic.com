@@ -61,7 +61,7 @@ function renderWeirFlow(inputRegion, outputRegion, citationEl) {
     { value: "rect_contracted", label: "Rectangular (contracted)" },
     { value: "rect_suppressed", label: "Rectangular (suppressed)" },
   ]);
-  const H = makeNumber("Head over crest H (ft)", "wf-h", { step: "any", min: "0", value: "0.5" }); H.input.value = "0.5";
+  const H = makeNumber("Head over crest H (ft)", "wf-h", { step: "any", min: "0" });
   const L = makeNumber("Crest length L (ft, rectangular)", "wf-l", { step: "any", min: "0" });
   const coeff = makeNumber("Weir coefficient (0 = default)", "wf-c", { step: "any", min: "0" });
   for (const f of [type, H, L, coeff]) inputRegion.appendChild(f.wrap);
@@ -107,8 +107,8 @@ export function computeCipollettiWeir({ crest_length_ft = 0, head_ft = 0, coeff 
 export const cipollettiWeirExample = { inputs: { crest_length_ft: 3, head_ft: 0.5, coeff: 0 } };
 function renderCipollettiWeir(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Cipolletti (trapezoidal, 1H:4V) sharp-crested weir free-flow discharge Q = 3.367 x L x H^(3/2) (cfs, ft), per the USBR Water Measurement Manual (public domain) / King's Handbook of Hydraulics; the 4:1 side slopes compensate end-contraction so the full crest length is used. Requires a ventilated, free-flow, sharp-crested weir; the head is measured about 4H upstream. Free at usbr.gov/tsc/techreferences/mands/wmm.";
-  const L = makeNumber("Crest length L (ft)", "cip-l", { step: "any", min: "0", value: "3" }); L.input.value = "3";
-  const H = makeNumber("Head over crest H (ft)", "cip-h", { step: "any", min: "0", value: "0.5" }); H.input.value = "0.5";
+  const L = makeNumber("Crest length L (ft)", "cip-l", { step: "any", min: "0" });
+  const H = makeNumber("Head over crest H (ft)", "cip-h", { step: "any", min: "0" });
   const coeff = makeNumber("Weir coefficient (0 = default 3.367)", "cip-c", { step: "any", min: "0" });
   for (const f of [L, H, coeff]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { L.input.value = "3"; H.input.value = "0.5"; coeff.input.value = ""; update(); });
@@ -158,9 +158,9 @@ export function computeSluiceGateFlow({ gate_opening_ft = 0, gate_width_ft = 0, 
 export const sluiceGateFlowExample = { inputs: { gate_opening_ft: 1, gate_width_ft: 5, upstream_depth_ft: 6, contraction_coeff: 0 } };
 function renderSluiceGateFlow(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: free-flow sluice (underflow) gate discharge Q = Cd b a sqrt(2 g y1), with Cd = Cc / sqrt(1 + Cc a / y1) and the contraction coefficient Cc ~ 0.61 for a sharp-edged vertical gate (first-principles open-channel hydraulics, Henderson Open Channel Flow / USBR Water Measurement Manual). g = 32.2 ft/s^2; a = gate opening, b = width, y1 = upstream depth above the floor. Free-flow only: the tailwater must not drown the contracted jet. Free at usbr.gov/tsc/techreferences/mands/wmm.";
-  const a = makeNumber("Gate opening a (ft)", "slg-a", { step: "any", min: "0", value: "1" }); a.input.value = "1";
-  const b = makeNumber("Gate width b (ft)", "slg-b", { step: "any", min: "0", value: "5" }); b.input.value = "5";
-  const y1 = makeNumber("Upstream depth y1, above floor (ft)", "slg-y1", { step: "any", min: "0", value: "6" }); y1.input.value = "6";
+  const a = makeNumber("Gate opening a (ft)", "slg-a", { step: "any", min: "0" });
+  const b = makeNumber("Gate width b (ft)", "slg-b", { step: "any", min: "0" });
+  const y1 = makeNumber("Upstream depth y1, above floor (ft)", "slg-y1", { step: "any", min: "0" });
   const cc = makeNumber("Contraction coeff Cc (0 = default 0.61)", "slg-cc", { step: "any", min: "0", max: "1" });
   for (const f of [a, b, y1, cc]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { a.input.value = "1"; b.input.value = "5"; y1.input.value = "6"; cc.input.value = ""; update(); });
@@ -211,8 +211,8 @@ export function computeBroadCrestedWeir({ crest_length_ft = 0, head_ft = 0, disc
 export const broadCrestedWeirExample = { inputs: { crest_length_ft: 10, head_ft: 1, discharge_coeff: 0 } };
 function renderBroadCrestedWeir(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: broad-crested (critical-flow) weir free-flow discharge Q = Cd (2/3)^1.5 sqrt(g) L H^1.5, theoretical coefficient (2/3)^1.5 sqrt(g) = 3.089 (ft units, below the 3.33 sharp-crested Francis value), Cd ~ 0.85-0.95, per first-principles critical-flow hydraulics and the USBR Water Measurement Manual (public domain). Free-flow (modular) only; the approach-velocity head is neglected. Free at usbr.gov/tsc/techreferences/mands/wmm.";
-  const L = makeNumber("Crest length L, across channel (ft)", "bcw-l", { step: "any", min: "0", value: "10" }); L.input.value = "10";
-  const H = makeNumber("Head over crest H (ft)", "bcw-h", { step: "any", min: "0", value: "1" }); H.input.value = "1";
+  const L = makeNumber("Crest length L, across channel (ft)", "bcw-l", { step: "any", min: "0" });
+  const H = makeNumber("Head over crest H (ft)", "bcw-h", { step: "any", min: "0" });
   const coeff = makeNumber("Discharge coeff Cd (0 = default 0.90)", "bcw-c", { step: "any", min: "0", max: "1" });
   for (const f of [L, H, coeff]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { L.input.value = "10"; H.input.value = "1"; coeff.input.value = ""; update(); });
@@ -278,7 +278,7 @@ function renderWeirHeadFromFlow(inputRegion, outputRegion, citationEl) {
     { value: "rect_contracted", label: "Rectangular (contracted)" },
     { value: "rect_suppressed", label: "Rectangular (suppressed)" },
   ]);
-  const Q = makeNumber("Target flow Q (cfs)", "whf-q", { step: "any", min: "0", value: "0.446" }); Q.input.value = "0.446";
+  const Q = makeNumber("Target flow Q (cfs)", "whf-q", { step: "any", min: "0" });
   const L = makeNumber("Crest length L (ft, rectangular)", "whf-l", { step: "any", min: "0" });
   const coeff = makeNumber("Weir coefficient (0 = default)", "whf-c", { step: "any", min: "0" });
   for (const f of [type, Q, L, coeff]) inputRegion.appendChild(f.wrap);
@@ -609,8 +609,8 @@ export function computePoolChlorineDose({ ppm = 0, gallons = 0, product = "cal-h
 export const poolChlorineDoseExample = { inputs: { ppm: 2, gallons: 15000, product: "cal-hypo-65", avail: 0 } };
 function renderPoolChlorineDose(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: free-chlorine dose = ppm x (gallons/1,000,000) x 8.34 lb, divided by the product available-chlorine fraction; liquid ~10 lb/gal. Product strengths: liquid 12.5%, cal-hypo 65%, dichlor 56%, trichlor 90%. Dose to a target and retest; the product label governs.";
-  const ppm = makeNumber("Target free-chlorine rise (ppm)", "pcd-ppm", { step: "any", min: "0" }); ppm.input.value = "2";
-  const gal = makeNumber("Pool volume (gallons)", "pcd-gal", { step: "any", min: "0" }); gal.input.value = "15000";
+  const ppm = makeNumber("Target free-chlorine rise (ppm)", "pcd-ppm", { step: "any", min: "0" });
+  const gal = makeNumber("Pool volume (gallons)", "pcd-gal", { step: "any", min: "0" });
   const prod = makeSelect("Product", "pcd-prod", [
     { value: "cal-hypo-65", label: "Cal-hypo 65% (granular)" },
     { value: "liquid-12.5", label: "Liquid chlorine 12.5%" },

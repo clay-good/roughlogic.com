@@ -1203,8 +1203,8 @@ export const asmeShellThicknessExample = { inputs: { design_pressure_psi: 150, i
 
 function _v1113renderAsmeShellThickness(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ASME BPVC Section VIII Division 1, UG-27 shell thickness under internal pressure, by section number. Cylindrical shell, circumferential stress on the longitudinal joint: t = P R / (S E - 0.6 P). Spherical shell: t = P R / (2 S E - 0.2 P). R is the INSIDE radius in the corroded condition, S the allowable stress at the design temperature, and E the joint efficiency; the corrosion allowance is added after the strength calculation. Validity: thickness not more than half the inside radius, and for the cylinder pressure not more than 0.385 S E - beyond either, the thick-wall rules of Appendix 1 govern. Both formulas and both limits were confirmed against two independent published sources. The longitudinal-stress case on the circumferential joint is a separate, rarely governing equation and is deliberately not included. No allowable-stress or joint-efficiency table is reproduced - both are entered. ASME BPVC Section VIII and the vessel engineer govern.";
-  const p = makeNumber("Design pressure (psig)", "ast-p", { step: "any", min: "0", value: "150" }); p.input.value = "150";
-  const r = makeNumber("Inside radius, corroded (in)", "ast-r", { step: "any", min: "0", value: "24" }); r.input.value = "24";
+  const p = makeNumber("Design pressure (psig)", "ast-p", { step: "any", min: "0" });
+  const r = makeNumber("Inside radius, corroded (in)", "ast-r", { step: "any", min: "0" });
   const s = makeNumber("Allowable stress at design temp (psi)", "ast-s", { step: "any", min: "0", value: "17500" }); s.input.value = "17500";
   const e = makeNumber("Joint efficiency E (1.00 full RT, 0.85 spot, 0.70 none)", "ast-e", { step: "any", min: "0", max: "1", value: "0.85" }); e.input.value = "0.85";
   const c = makeNumber("Corrosion allowance (in)", "ast-c", { step: "any", min: "0", value: "0.0625" }); c.input.value = "0.0625";
@@ -1287,8 +1287,8 @@ export const asmeHeadThicknessExample = { inputs: { design_pressure_psi: 150, in
 
 function _renderAsmeHeadThickness(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ASME BPVC Section VIII Division 1, UG-32 formed-head thickness under internal pressure, by section number. 2:1 ellipsoidal (UG-32(d)): t = P D / (2 S E - 0.2 P). Hemispherical (UG-32(f)): t = P R / (2 S E - 0.2 P), R = D/2. Standard flanged-and-dished torispherical (UG-32(e), crown radius L = D, 6% knuckle): t = 0.885 P L / (S E - 0.1 P). D is the INSIDE diameter in the corroded condition, S the allowable stress at the design temperature, E the joint efficiency; the corrosion allowance is added after. All three forms and the 0.885 coefficient were confirmed against two independent sources (CASTI Guidebook Eq 8.1 and worked Example 8.1; ASME UG-32). Non-2:1 ellipsoidal (K factor) and non-standard torispherical (M factor) are outside this tile. No allowable-stress or joint-efficiency table is reproduced. ASME BPVC Section VIII and the vessel engineer govern.";
-  const p = makeNumber("Design pressure (psig)", "aht-p", { step: "any", min: "0", value: "150" }); p.input.value = "150";
-  const d = makeNumber("Inside diameter, corroded (in)", "aht-d", { step: "any", min: "0", value: "48" }); d.input.value = "48";
+  const p = makeNumber("Design pressure (psig)", "aht-p", { step: "any", min: "0" });
+  const d = makeNumber("Inside diameter, corroded (in)", "aht-d", { step: "any", min: "0" });
   const s = makeNumber("Allowable stress at design temp (psi)", "aht-s", { step: "any", min: "0", value: "17500" }); s.input.value = "17500";
   const e = makeNumber("Joint efficiency E (1.00 full RT, 0.85 spot, 0.70 none)", "aht-e", { step: "any", min: "0", max: "1", value: "0.85" }); e.input.value = "0.85";
   const c = makeNumber("Corrosion allowance (in)", "aht-c", { step: "any", min: "0", value: "0.0625" }); c.input.value = "0.0625";

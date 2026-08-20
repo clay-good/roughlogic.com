@@ -49,8 +49,7 @@ export function renderDuctVelocityPressure(inputRegion, outputRegion, citationEl
     { value: "velocity", label: "Velocity from VP", selected: true },
     { value: "vp", label: "VP from velocity" },
   ]);
-  const vp = _v23h_makeNumber("Velocity pressure (in. w.c.)", "dvp-vp", { step: "any", min: "0", value: "0.25" });
-  vp.input.value = "0.25";
+  const vp = _v23h_makeNumber("Velocity pressure (in. w.c.)", "dvp-vp", { step: "any", min: "0" });
   const vel = _v23h_makeNumber("Air velocity (fpm)", "dvp-vel", { step: "any", min: "0" });
   for (const f of [mode, vp, vel]) inputRegion.appendChild(f.wrap);
   _v23h_attachEx(inputRegion, () => { mode.select.value = "velocity"; vp.input.value = "0.25"; vel.input.value = ""; update(); });
@@ -189,11 +188,8 @@ export const pitotTraverseCfmExample = { inputs: { vp_avg_inwc: 0.15, w_in: 24, 
 export function renderPitotTraverseCfm(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Pitot-tube traverse airflow (ASHRAE Fundamentals / AABC-NEBB field practice): velocity V = 4005 x sqrt(VP) for standard air (0.075 lb/ft^3, sea level) from a single traverse-average velocity pressure, then CFM = V x duct area. This takes one pre-averaged VP; the more exact method converts each point's VP to a velocity and averages the velocities (the pitot-traverse-average tile), which reads slightly lower because the square root is concave. Apply a density correction at altitude or high temperature. A field measurement, not a substitute for a calibrated flow station.";
   const vp = _v23h_makeNumber("Average velocity pressure (in. w.c.)", "ptc-vp", { step: "any", min: "0" });
-  vp.input.value = "0.15";
   const w = _v23h_makeNumber("Duct width (in)", "ptc-w", { step: "any", min: "0" });
-  w.input.value = "24";
   const h = _v23h_makeNumber("Duct height (in)", "ptc-h", { step: "any", min: "0" });
-  h.input.value = "12";
   for (const f of [vp, w, h]) inputRegion.appendChild(f.wrap);
   _v23h_attachEx(inputRegion, () => { vp.input.value = "0.15"; w.input.value = "24"; h.input.value = "12"; update(); });
   const oVel = _v23h_makeOut(outputRegion, "Traverse velocity", "ptc-out-v");
@@ -248,10 +244,8 @@ export function renderPitotTraverseAverage(inputRegion, outputRegion, citationEl
   citationEl.textContent = "Citation: Pitot-tube traverse airflow averaged the correct way (ASHRAE Fundamentals / AABC / NEBB field practice, by name): convert each equal-area point's velocity pressure to a velocity V = 4005 x sqrt(VP) for standard air (0.075 lb/ft^3, sea level), average the velocities, then CFM = average velocity x duct area. Averaging the velocity pressures first reads high because the square root is concave. Apply a density correction at altitude or high temperature. A field measurement, not a substitute for a calibrated flow station.";
   const reads = _v23h_makeTextarea("Velocity pressure at each traverse point (in. w.c.), one per line", "pta-reads", { rows: "5" });
   reads.input.value = "0.09\n0.16\n0.25\n0.16";
-  const w = _v23h_makeNumber("Duct width (in)", "pta-w", { step: "any", min: "0", value: "24" });
-  w.input.value = "24";
-  const h = _v23h_makeNumber("Duct height (in)", "pta-h", { step: "any", min: "0", value: "12" });
-  h.input.value = "12";
+  const w = _v23h_makeNumber("Duct width (in)", "pta-w", { step: "any", min: "0" });
+  const h = _v23h_makeNumber("Duct height (in)", "pta-h", { step: "any", min: "0" });
   for (const f of [reads, w, h]) inputRegion.appendChild(f.wrap);
   _v23h_attachEx(inputRegion, () => { reads.input.value = "0.09\n0.16\n0.25\n0.16"; w.input.value = "24"; h.input.value = "12"; update(); });
   const oV = _v23h_makeOut(outputRegion, "Average velocity (velocity-averaged)", "pta-out-v");
@@ -318,9 +312,9 @@ export const dpFlowMeterExample = { inputs: { pipe_id_in: 4, bore_in: 2, dp_psi:
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderDpFlowMeter(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: differential-pressure flow meter (orifice / venturi / nozzle), Bernoulli primary-element equation Q = Cd A2 sqrt(2 dP / (rho (1 - beta^4))), beta = d/D, by name (ISO 5167 defines the precise Cd; the equation is public physics). Cd ~ 0.61 orifice, 0.98 venturi, 0.97 nozzle. Incompressible liquid only (a gas needs an expansion factor Y). The calibrated meter governs.";
-  const D = _v23h_makeNumber("Pipe inside diameter (in)", "dpf-D", { step: "any", min: "0" }); D.input.value = "4";
-  const d = _v23h_makeNumber("Bore / throat diameter (in)", "dpf-d", { step: "any", min: "0" }); d.input.value = "2";
-  const dp = _v23h_makeNumber("Differential pressure (psi)", "dpf-dp", { step: "any", min: "0" }); dp.input.value = "1";
+  const D = _v23h_makeNumber("Pipe inside diameter (in)", "dpf-D", { step: "any", min: "0" });
+  const d = _v23h_makeNumber("Bore / throat diameter (in)", "dpf-d", { step: "any", min: "0" });
+  const dp = _v23h_makeNumber("Differential pressure (psi)", "dpf-dp", { step: "any", min: "0" });
   const cd = _v23h_makeNumber("Discharge coefficient Cd (orifice 0.61, venturi 0.98)", "dpf-cd", { step: "any", min: "0" }); cd.input.value = "0.61";
   const rho = _v23h_makeNumber("Fluid density (lb/ft3, water 62.4)", "dpf-rho", { step: "any", min: "0" }); rho.input.value = "62.4";
   for (const f of [D, d, dp, cd, rho]) inputRegion.appendChild(f.wrap);
@@ -392,11 +386,11 @@ export const gasDpFlowMeterExample = { inputs: { pipe_id_in: 4, bore_in: 2, p1_p
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderGasDpFlowMeter(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: gas (compressible) differential-pressure flow meter (orifice), ISO 5167-2 expansibility factor eps = 1 - (0.351 + 0.256 beta^4 + 0.93 beta^8)(1 - (p2/p1)^(1/kappa)) and qm = (Cd/sqrt(1-beta^4)) eps A sqrt(2 gc dP rho1), by name; rho1 from the ideal-gas law. Enter upstream ABSOLUTE pressure (psia). Valid for p2/p1 >= 0.75; the calibrated meter governs.";
-  const D = _v23h_makeNumber("Pipe inside diameter (in)", "gdpf-D", { step: "any", min: "0" }); D.input.value = "4";
-  const d = _v23h_makeNumber("Bore / throat diameter (in)", "gdpf-d", { step: "any", min: "0" }); d.input.value = "2";
-  const p1 = _v23h_makeNumber("Upstream static pressure (psia, absolute = psig + 14.7)", "gdpf-p1", { step: "any", min: "0" }); p1.input.value = "100";
-  const dp = _v23h_makeNumber("Differential pressure (psi; 1 psi = 27.68 in w.c.)", "gdpf-dp", { step: "any", min: "0" }); dp.input.value = "1";
-  const tF = _v23h_makeNumber("Upstream temperature (F)", "gdpf-t", { step: "any" }); tF.input.value = "60";
+  const D = _v23h_makeNumber("Pipe inside diameter (in)", "gdpf-D", { step: "any", min: "0" });
+  const d = _v23h_makeNumber("Bore / throat diameter (in)", "gdpf-d", { step: "any", min: "0" });
+  const p1 = _v23h_makeNumber("Upstream static pressure (psia, absolute = psig + 14.7)", "gdpf-p1", { step: "any", min: "0" });
+  const dp = _v23h_makeNumber("Differential pressure (psi; 1 psi = 27.68 in w.c.)", "gdpf-dp", { step: "any", min: "0" });
+  const tF = _v23h_makeNumber("Upstream temperature (F)", "gdpf-t", { step: "any" });
   const sg = _v23h_makeNumber("Gas specific gravity (air 1.0, nat gas ~0.6)", "gdpf-sg", { step: "any", min: "0" }); sg.input.value = "1.0";
   const kap = _v23h_makeNumber("Isentropic exponent kappa (air 1.4, nat gas 1.3)", "gdpf-k", { step: "any", min: "0" }); kap.input.value = "1.4";
   const cd = _v23h_makeNumber("Discharge coefficient Cd (orifice 0.61)", "gdpf-cd", { step: "any", min: "0" }); cd.input.value = "0.61";
@@ -456,9 +450,9 @@ export const orificePressureLossExample = { inputs: { pipe_id_in: 4, bore_in: 2,
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderOrificePressureLoss(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ISO 5167-1/2 permanent pressure loss for a square-edge orifice, dW/dP = (sqrt(1 - beta^4 (1 - Cd^2)) - Cd beta^2) / (sqrt(1 - beta^4 (1 - Cd^2)) + Cd beta^2), beta = d/D, by name. Orifice plates only (a venturi recovers most of the dP -- a separate calculation). 1 psi = 27.68 in w.c. The manufacturer's or ISO 5167 loss data governs.";
-  const D = _v23h_makeNumber("Pipe inside diameter (in)", "opl-D", { step: "any", min: "0" }); D.input.value = "4";
-  const d = _v23h_makeNumber("Bore / orifice diameter (in)", "opl-d", { step: "any", min: "0" }); d.input.value = "2";
-  const dp = _v23h_makeNumber("Differential pressure across taps (psi)", "opl-dp", { step: "any", min: "0" }); dp.input.value = "1";
+  const D = _v23h_makeNumber("Pipe inside diameter (in)", "opl-D", { step: "any", min: "0" });
+  const d = _v23h_makeNumber("Bore / orifice diameter (in)", "opl-d", { step: "any", min: "0" });
+  const dp = _v23h_makeNumber("Differential pressure across taps (psi)", "opl-dp", { step: "any", min: "0" });
   const cd = _v23h_makeNumber("Orifice discharge coefficient Cd (~0.61)", "opl-cd", { step: "any", min: "0" }); cd.input.value = "0.61";
   for (const f of [D, d, dp, cd]) inputRegion.appendChild(f.wrap);
   const oL = _v23h_makeOut(outputRegion, "Permanent pressure loss", "opl-out-l");

@@ -239,6 +239,27 @@ function primeExamplePlaceholders(host, fillFn, seeded) {
       touched.push(el);
     }
   }
+  // Some tiles rebuild their own fields inside the filler: the shape select on
+  // an area tile, the fixture list on a DFU tile, the per-bend rows on a
+  // conduit tile all tear down and re-create the boxes below them. Those boxes
+  // are not in the snapshot above -- they did not exist when it was taken -- so
+  // the restore never reaches them and the example's numbers stay on screen,
+  // looking like a job somebody else typed in, with no placeholder and no
+  // answer. Anything the fill created is example output by definition: read it
+  // into the placeholder and hand back an empty box.
+  // Not when the fill was asked for: the ?example=1 link and a deep link both
+  // mean "show me this filled in", and blanking the boxes there would leave an
+  // answer standing over empty fields.
+  const seen = new Set(before.map((snap) => snap.el));
+  if (!seeded) {
+    for (const el of host.querySelectorAll("input, select, textarea")) {
+      if (seen.has(el)) continue;
+      if (isTextish(el) && el.value && !el.getAttribute("placeholder")) {
+        el.setAttribute("placeholder", "e.g. " + el.value);
+        el.value = "";
+      }
+    }
+  }
   // Re-fire the events the tile listens on so any mode-driven field
   // visibility and the output region return to their pre-fill state. These do
   // not bubble: the tile's own per-field listeners see them, but the delegated

@@ -146,9 +146,9 @@ export const chillerTonsExample = {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v16h_renderChillerTons(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Q (BTU/hr) = GPM x factor x delta-T; tons = Q / 12000. The water factor 500 = 60 min/hr x 8.33 lb/gal x 1 BTU/lb-F (first-principles fluid energy balance). Glycol factors per ASHRAE Fundamentals 2021 Ch. 31 (secondary coolants). Free at ashrae.org for the TOC.";
-  const gpm = makeNumber("Chilled-water flow (GPM)", "ct3-gpm", { step: "any", min: "0", value: "240" });
-  const ewt = makeNumber("Entering water temp (°F)", "ct3-ewt", { step: "any", value: "54" });
-  const lwt = makeNumber("Leaving water temp (°F)", "ct3-lwt", { step: "any", value: "44" });
+  const gpm = makeNumber("Chilled-water flow (GPM)", "ct3-gpm", { step: "any", min: "0" });
+  const ewt = makeNumber("Entering water temp (°F)", "ct3-ewt", { step: "any" });
+  const lwt = makeNumber("Leaving water temp (°F)", "ct3-lwt", { step: "any" });
   const fluid = makeSelect("Fluid", "ct3-fluid", [
     { value: "water", label: "Water (500)", selected: true },
     { value: "glycol_30", label: "30% propylene glycol" },
@@ -408,8 +408,8 @@ export const airChangesPerHourExample = {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v16h_renderAirChangesPerHour(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ACH = supply CFM x 60 / room volume (ft^3). Net delivered ACH uses the smaller of supply and return; their difference is the pressurization airflow. Target bands per ASHRAE 62.1-2022 (ventilation) and ASHRAE 170-2021 (healthcare). AHJ and the governing standard's full procedure govern. Free at ashrae.org for the TOCs.";
-  const vol = makeNumber("Room volume (ft³)", "ach-vol", { step: "any", min: "0", value: "10000" });
-  const supply = makeNumber("Supply CFM", "ach-supply", { step: "any", min: "0", value: "1000" });
+  const vol = makeNumber("Room volume (ft³)", "ach-vol", { step: "any", min: "0" });
+  const supply = makeNumber("Supply CFM", "ach-supply", { step: "any", min: "0" });
   const ret = makeNumber("Return CFM (blank = supply)", "ach-return", { step: "any", min: "0" });
   const occ = makeSelect("Occupancy (comparison band)", "ach-occ", [
     { value: "residential", label: "Residential (0.35-1)" },
@@ -695,7 +695,7 @@ function _v16h_renderCompressorShortCycle(inputRegion, outputRegion, citationEl)
     { value: "two_stage", label: "Two-stage" },
     { value: "inverter", label: "VRF / inverter" },
   ]);
-  const lf = makeNumber("Load fraction (% of design)", "cc8-lf", { step: "any", min: "0", max: "100", value: "50" });
+  const lf = makeNumber("Load fraction (% of design)", "cc8-lf", { step: "any", min: "0", max: "100" });
   const obs = makeNumber("Observed cycles/hr (optional)", "cc8-obs", { step: "any", min: "0" });
   for (const f of [sys, lf, obs]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
@@ -952,8 +952,8 @@ function _v16h_renderFilterPressureDrop(inputRegion, outputRegion, citationEl) {
     { value: "merv16", label: "MERV 16" },
     { value: "hepa", label: "HEPA" },
   ]);
-  const area = makeNumber("Face area (ft²)", "fp7-area", { step: "any", min: "0", value: "4" });
-  const vel = makeNumber("Face velocity (fpm)", "fp7-vel", { step: "any", min: "0", value: "300" });
+  const area = makeNumber("Face area (ft²)", "fp7-area", { step: "any", min: "0" });
+  const vel = makeNumber("Face velocity (fpm)", "fp7-vel", { step: "any", min: "0" });
   const cleanO = makeNumber("Clean drop override (in WC, optional)", "fp7-clean", { step: "any", min: "0" });
   const finalO = makeNumber("Change-out drop override (in WC, optional)", "fp7-final", { step: "any", min: "0" });
   const eff = makeNumber("Fan total efficiency (0-1)", "fp7-eff", { step: "any", min: "0", max: "1", value: "0.6" });

@@ -420,7 +420,7 @@ function _v37renderSineBar(inputRegion, outputRegion, citationEl) {
     { value: "stack", label: "Gauge-block stack for a target angle" },
   ]);
   const len = makeNumber("Sine bar length (in: roll-center distance)", "sb-len", { step: "any", min: "0", value: "5" }); len.input.value = "5";
-  const stack = makeNumber("Gauge-block stack height (in)", "sb-stack", { step: "any", min: "0", value: "2.5" }); stack.input.value = "2.5";
+  const stack = makeNumber("Gauge-block stack height (in)", "sb-stack", { step: "any", min: "0" });
   const angle = makeNumber("Target angle (deg)", "sb-angle", { step: "any", min: "0" });
   for (const f of [mode, len, stack, angle]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { mode.select.value = "angle"; len.input.value = "5"; stack.input.value = "2.5"; angle.input.value = ""; update(); });
@@ -488,7 +488,7 @@ function _v38renderThreadPitch(inputRegion, outputRegion, citationEl) {
     { value: "inch", label: "Inch (UN/UNC/UNF: enter TPI)" },
     { value: "metric", label: "Metric (ISO: enter pitch in mm)" },
   ]);
-  const tpi = makeNumber("Threads per inch (TPI)", "tp-tpi", { step: "any", min: "0", value: "20" }); tpi.input.value = "20";
+  const tpi = makeNumber("Threads per inch (TPI)", "tp-tpi", { step: "any", min: "0" });
   const pmm = makeNumber("Metric pitch (mm)", "tp-pmm", { step: "any", min: "0" });
   const starts = makeNumber("Number of starts", "tp-starts", { step: "1", min: "1", value: "1" }); starts.input.value = "1";
   for (const f of [std, tpi, pmm, starts]) inputRegion.appendChild(f.wrap);
@@ -842,8 +842,8 @@ export const equalSpacingExample = { inputs: { run_in: 60, item_width_in: 1.5, m
 
 function _v57renderEqualSpacing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Equal-spacing layout - N items of width w in a run R have N+1 equal gaps of (R - N x w)/(N+1) and a center-to-center pitch of gap + w; in max-gap mode the smallest N whose gap stays at or below the limit is ceil((R - gmax)/(w + gmax)) - first-principles arithmetic, public domain. The gap limit (for example the IRC R312.1.3 4-inch-sphere guard rule) is user-supplied; the adopted code governs.";
-  const run = makeNumber("Total run (in)", "es-run", { step: "any", min: "0", value: "60" }); run.input.value = "60";
-  const w = makeNumber("Item width (in, 0 for marks)", "es-w", { step: "any", min: "0", value: "1.5" }); w.input.value = "1.5";
+  const run = makeNumber("Total run (in)", "es-run", { step: "any", min: "0" });
+  const w = makeNumber("Item width (in, 0 for marks)", "es-w", { step: "any", min: "0" });
   const mode = makeSelect("Solve for", "es-mode", [
     { value: "max-gap", label: "Count from a maximum gap" },
     { value: "count", label: "Gap from a desired count" },

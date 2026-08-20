@@ -1861,8 +1861,8 @@ function _v1157renderCranePowerLineClearance(inputRegion, outputRegion, citation
     { value: "deenergized", label: "Deenergized and visibly grounded" },
   ]);
   const kv = makeNumber("Line voltage (kV; 0 = not determined)", "cpc-kv", { step: "any", min: "0" }); kv.input.value = "0";
-  const ac = makeNumber("Actual clearance held (ft)", "cpc-ac", { step: "any", min: "0" }); ac.input.value = "12";
-  const bl = makeNumber("Boom length (ft; 0 to skip)", "cpc-bl", { step: "any", min: "0" }); bl.input.value = "80";
+  const ac = makeNumber("Actual clearance held (ft)", "cpc-ac", { step: "any", min: "0" });
+  const bl = makeNumber("Boom length (ft; 0 to skip)", "cpc-bl", { step: "any", min: "0" });
   inputRegion.appendChild(op.wrap); inputRegion.appendChild(kv.wrap); inputRegion.appendChild(ac.wrap); inputRegion.appendChild(bl.wrap);
   attachExampleButton(inputRegion, () => { op.select.value = "table-a"; kv.input.value = "12"; ac.input.value = "12"; bl.input.value = "80"; update(); });
   const oR = makeOutputLine(outputRegion, "Required clearance", "cpc-out-r");

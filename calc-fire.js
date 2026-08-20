@@ -1626,8 +1626,7 @@ export function renderFireStreamReaction(inputRegion, outputRegion, citationEl) 
     { value: "smooth", label: "Smooth bore (bore + NP)", selected: true },
     { value: "fog", label: "Fog (flow + NP)" },
   ]);
-  const bore = _v23f_makeNumber("Bore diameter (in)", "fsr-bore", { step: "any", min: "0", value: "1.0" });
-  bore.input.value = "1.0";
+  const bore = _v23f_makeNumber("Bore diameter (in)", "fsr-bore", { step: "any", min: "0" });
   const flow = _v23f_makeNumber("Flow (gpm, fog)", "fsr-flow", { step: "any", min: "0" });
   const np = _v23f_makeNumber("Nozzle pressure (psi)", "fsr-np", { step: "any", min: "0", value: "50" });
   np.input.value = "50";
@@ -1680,8 +1679,7 @@ export function renderSprinklerKFactor(inputRegion, outputRegion, citationEl) {
   ]);
   const k = _v23f_makeNumber("K-factor (nameplate)", "skf-k", { step: "any", min: "0", value: "5.6" });
   k.input.value = "5.6";
-  const p = _v23f_makeNumber("Pressure (psi)", "skf-p", { step: "any", min: "0", value: "7" });
-  p.input.value = "7";
+  const p = _v23f_makeNumber("Pressure (psi)", "skf-p", { step: "any", min: "0" });
   const q = _v23f_makeNumber("Flow (gpm)", "skf-q", { step: "any", min: "0" });
   for (const f of [mode, k, p, q]) inputRegion.appendChild(f.wrap);
   _v23f_attachEx(inputRegion, () => { mode.select.value = "flow"; k.input.value = "5.6"; p.input.value = "7"; q.input.value = ""; update(); });
@@ -1775,10 +1773,8 @@ export const waterSupplyDurationExample = { inputs: { volume_gal: 3000, flow_gpm
 
 function renderWaterSupplyDuration(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Volume/flow continuity (first principles). Required-duration context per NFPA 1142 (rural/suburban water supply), by name. Distinct from nfpa-1142-water-supply (which sizes required supply from the structure) and scba-cylinder-time (air, not water). NFPA 1142 free read-only at nfpa.org/freeaccess.";
-  const vol = makeNumber("Available water volume (gal)", "wsd-v", { step: "any", min: "0", value: "3000" });
-  vol.input.value = "3000";
-  const flow = makeNumber("Required / selected flow (GPM)", "wsd-q", { step: "any", min: "0", value: "250" });
-  flow.input.value = "250";
+  const vol = makeNumber("Available water volume (gal)", "wsd-v", { step: "any", min: "0" });
+  const flow = makeNumber("Required / selected flow (GPM)", "wsd-q", { step: "any", min: "0" });
   const re = makeNumber("Continuous resupply rate (GPM, optional)", "wsd-r", { step: "any", min: "0" });
   for (const f of [vol, flow, re]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { vol.input.value = "3000"; flow.input.value = "250"; re.input.value = ""; update(); });

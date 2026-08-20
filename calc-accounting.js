@@ -1424,9 +1424,9 @@ export const markupVsMarginExample = { inputs: { cost: 60, price: 0, markup_pct:
 
 function renderMarkupVsMargin(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Standard managerial-accounting pricing identity (cost-volume-profit), universal public formula; AICPA / introductory managerial-accounting texts, by name. Markup and margin diverge sharply (50% markup = 33.3% margin).";
-  const cost = makeNumber("Cost ($)", "mvm-cost", { step: "any", min: "0", value: "60" }); cost.input.value = "60";
+  const cost = makeNumber("Cost ($)", "mvm-cost", { step: "any", min: "0" });
   const price = makeNumber("Selling price ($)", "mvm-price", { step: "any", min: "0" });
-  const markup = makeNumber("Markup %", "mvm-markup", { step: "any", value: "50" }); markup.input.value = "50";
+  const markup = makeNumber("Markup %", "mvm-markup", { step: "any" });
   const margin = makeNumber("Gross margin %", "mvm-margin", { step: "any" });
   const units = makeNumber("Unit count (optional)", "mvm-units", { step: "any", min: "0" });
   for (const f of [cost, price, markup, margin, units]) inputRegion.appendChild(f.wrap);

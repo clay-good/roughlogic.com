@@ -823,10 +823,10 @@ function renderSpeakerImpedance(inputRegion, outputRegion, citationEl) {
     { value: "series-parallel", label: "Series-parallel" },
   ]);
   const z = makeNumber("Per-driver nominal impedance (Ohm)", "si-z", { step: "any", min: "0", value: "8" }); z.input.value = "8";
-  const count = makeNumber("Driver count (series or parallel)", "si-count", { step: "1", min: "1", value: "4" }); count.input.value = "4";
-  const spb = makeNumber("Drivers per series branch (series-parallel)", "si-spb", { step: "1", min: "1", value: "2" }); spb.input.value = "2";
-  const branches = makeNumber("Parallel branches (series-parallel)", "si-branches", { step: "1", min: "1", value: "2" }); branches.input.value = "2";
-  const ampMin = makeNumber("Amplifier minimum rated load (Ohm; optional)", "si-ampmin", { step: "any", min: "0", value: "2" }); ampMin.input.value = "2";
+  const count = makeNumber("Driver count (series or parallel)", "si-count", { step: "1", min: "1" });
+  const spb = makeNumber("Drivers per series branch (series-parallel)", "si-spb", { step: "1", min: "1" });
+  const branches = makeNumber("Parallel branches (series-parallel)", "si-branches", { step: "1", min: "1" });
+  const ampMin = makeNumber("Amplifier minimum rated load (Ohm; optional)", "si-ampmin", { step: "any", min: "0" });
   const power = makeNumber("Total amplifier power for split (W; optional)", "si-power", { step: "any", min: "0" });
   for (const f of [topo, z, count, spb, branches, ampMin, power]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
@@ -975,11 +975,11 @@ export const ampPowerSplExample = { inputs: { sensitivity_db: 90, power_w: 100, 
 
 function renderAmpPowerSpl(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: First-principles loudspeaker SPL from the 1 W / 1 m sensitivity reference, the 10log power term, and the inverse-square distance term (public; ANSI S1.1 decibel basis). Free-field estimate, room gain and power compression and excursion limits not modeled, the manufacturer max-SPL spec governs.";
-  const sens = makeNumber("Speaker sensitivity (dB @ 1 W / 1 m)", "aps-sens", { step: "any", value: "90" }); sens.input.value = "90";
-  const power = makeNumber("Amplifier power per channel (W)", "aps-power", { step: "any", min: "0", value: "100" }); power.input.value = "100";
+  const sens = makeNumber("Speaker sensitivity (dB @ 1 W / 1 m)", "aps-sens", { step: "any" });
+  const power = makeNumber("Amplifier power per channel (W)", "aps-power", { step: "any", min: "0" });
   // v593: US-facing ft field, converted at this boundary into the metric-native
   // compute (3.28 ft ~ 1 m); the dB @ 1 W / 1 m sensitivity reference stays.
-  const dist = makeNumber("Listening distance (ft)", "aps-dist", { step: "any", min: "0", value: "3.28" }); dist.input.value = "3.28";
+  const dist = makeNumber("Listening distance (ft)", "aps-dist", { step: "any", min: "0" });
   const crest = makeNumber("Crest factor / headroom (dB; optional)", "aps-crest", { step: "any", value: "12" }); crest.input.value = "12";
   const target = makeNumber("Target SPL for inverse power (dB; optional)", "aps-target", { step: "any" });
   const maxSpl = makeNumber("Rated max SPL (dB; optional)", "aps-max", { step: "any", min: "0" });

@@ -992,10 +992,8 @@ export const truckOffTrackingExample = { inputs: { turn_radius_ft: 50, wheelbase
 
 function renderTruckOffTracking(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: AASHTO Green Book low-speed off-tracking OT = R - sqrt(R^2 - sum(L_i^2)), R the turn radius and L_i each unit's wheelbase (tractor wheelbase + trailer kingpin-to-axle for a combination), summed in quadrature. Steady-state low-speed value; high-speed off-tracking and swept-path width are separate. The design vehicle and the agency govern.";
-  const R = makeNumber("Turn radius R (ft)", "tot-r", { step: "any", min: "0", value: "50" });
-  R.input.value = "50";
-  const l1 = makeNumber("Tractor / unit wheelbase (ft)", "tot-l1", { step: "any", min: "0", value: "20" });
-  l1.input.value = "20";
+  const R = makeNumber("Turn radius R (ft)", "tot-r", { step: "any", min: "0" });
+  const l1 = makeNumber("Tractor / unit wheelbase (ft)", "tot-l1", { step: "any", min: "0" });
   const l2 = makeNumber("Trailer kingpin-to-axle (ft; 0 if single unit)", "tot-l2", { step: "any", min: "0" });
   for (const f of [R, l1, l2]) inputRegion.appendChild(f.wrap);
   const oOT = makeOutputLine(outputRegion, "Off-tracking (rear inside front)", "tot-out-ot");
@@ -1260,9 +1258,9 @@ export const deadheadPercentExample = { inputs: { loaded_mi: 800, deadhead_mi: 1
 
 function renderDeadheadPercent(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Freight-economics arithmetic; FMCSA/DOT terminology ('deadhead' = unladen movement), by name. Public definitions, no proprietary table. Rate per total mile is the effective loaded rate after absorbing empty miles.";
-  const loaded = makeNumber("Loaded miles", "dh-loaded", { step: "any", min: "0", value: "800" }); loaded.input.value = "800";
-  const dead = makeNumber("Deadhead miles", "dh-dead", { step: "any", min: "0", value: "120" }); dead.input.value = "120";
-  const rev = makeNumber("Linehaul revenue ($)", "dh-rev", { step: "any", min: "0", value: "1840" }); rev.input.value = "1840";
+  const loaded = makeNumber("Loaded miles", "dh-loaded", { step: "any", min: "0" });
+  const dead = makeNumber("Deadhead miles", "dh-dead", { step: "any", min: "0" });
+  const rev = makeNumber("Linehaul revenue ($)", "dh-rev", { step: "any", min: "0" });
   const sur = makeNumber("Fuel surcharge ($, optional)", "dh-sur", { step: "any", min: "0" });
   for (const f of [loaded, dead, rev, sur]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { loaded.input.value = "800"; dead.input.value = "120"; rev.input.value = "1840"; sur.input.value = ""; update(); });

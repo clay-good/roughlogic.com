@@ -671,20 +671,20 @@ export const tr55TimeOfConcentrationExample = { inputs: { sheet_n: 0.24, sheet_l
 function renderTr55TimeOfConcentration(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NRCS TR-55 (Urban Hydrology for Small Watersheds, 1986) Chapter 3 velocity method: sheet-flow Tt = 0.007 (n L)^0.8 / (P2^0.5 s^0.4), shallow-concentrated V = 16.1345 sqrt(s) (unpaved) / 20.3282 sqrt(s) (paved), channel V = (1.49/n) R^(2/3) sqrt(s), Tt = L/(3600 V); Tc = sum. A public USDA/NRCS document. Sheet flow capped at 100 ft. The overland roughness and the 2-year 24-hour rainfall are user-supplied. A design aid; the local drainage manual and the engineer of record govern.";
   const mk = (label, id, val) => { const f = makeNumber(label, id, { step: "any", min: "0" }); if (val !== undefined) f.input.value = String(val); return f; };
-  const sN = mk("Sheet: Manning n (overland)", "tr-sn", 0.24);
-  const sL = mk("Sheet: length (ft, <= 100)", "tr-sl", 100);
-  const p2 = mk("Sheet: 2-yr 24-hr rainfall P2 (in)", "tr-p2", 3.6);
-  const sS = mk("Sheet: slope (ft/ft)", "tr-ss", 0.01);
+  const sN = mk("Sheet: Manning n (overland)", "tr-sn");
+  const sL = mk("Sheet: length (ft, <= 100)", "tr-sl");
+  const p2 = mk("Sheet: 2-yr 24-hr rainfall P2 (in)", "tr-p2");
+  const sS = mk("Sheet: slope (ft/ft)", "tr-ss");
   const shSurf = makeSelect("Shallow concentrated: surface", "tr-shsurf", [
     { value: "unpaved", label: "Unpaved (V = 16.13 sqrt s)", selected: true },
     { value: "paved", label: "Paved (V = 20.33 sqrt s)" },
   ]);
-  const shL = mk("Shallow: length (ft, 0 to skip)", "tr-shl", 1400);
-  const shS = mk("Shallow: slope (ft/ft)", "tr-shs", 0.01);
-  const cN = mk("Channel: Manning n", "tr-cn", 0.05);
-  const cR = mk("Channel: hydraulic radius R (ft)", "tr-cr", 0.75);
-  const cL = mk("Channel: length (ft, 0 to skip)", "tr-cl", 3000);
-  const cS = mk("Channel: slope (ft/ft)", "tr-cs", 0.005);
+  const shL = mk("Shallow: length (ft, 0 to skip)", "tr-shl");
+  const shS = mk("Shallow: slope (ft/ft)", "tr-shs");
+  const cN = mk("Channel: Manning n", "tr-cn");
+  const cR = mk("Channel: hydraulic radius R (ft)", "tr-cr");
+  const cL = mk("Channel: length (ft, 0 to skip)", "tr-cl");
+  const cS = mk("Channel: slope (ft/ft)", "tr-cs");
   for (const f of [sN, sL, p2, sS]) inputRegion.appendChild(f.wrap);
   inputRegion.appendChild(shSurf.wrap);
   for (const f of [shL, shS, cN, cR, cL, cS]) inputRegion.appendChild(f.wrap);
@@ -751,9 +751,9 @@ export function computeCurveNumberRunoff({ rainfall_in = 0, curve_number = 0, ar
 export const curveNumberRunoffExample = { inputs: { rainfall_in: 5, curve_number: 80, area_acres: 10 } };
 function renderCurveNumberRunoff(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NRCS Curve Number runoff method (TR-55 Urban Hydrology for Small Watersheds, Chapter 2): S = 1000/CN - 10, Ia = 0.2 S, Q = (P - Ia)^2 / (P - Ia + S) for P > Ia (runoff depth, in). A public USDA/NRCS document. The curve number (from land cover and hydrologic soil group, TR-55 Table 2-2) and the rainfall depth are user-supplied; Ia = 0.2 S is the standard assumption. A design aid; the local drainage manual and the engineer of record govern.";
-  const p = makeNumber("Storm rainfall depth P (in)", "cnr-p", { step: "any", min: "0", value: "5" }); p.input.value = "5";
-  const cn = makeNumber("Curve number CN (30 to 98)", "cnr-cn", { step: "any", min: "0", max: "100", value: "80" }); cn.input.value = "80";
-  const ac = makeNumber("Drainage area (acres, optional)", "cnr-ac", { step: "any", min: "0", value: "10" }); ac.input.value = "10";
+  const p = makeNumber("Storm rainfall depth P (in)", "cnr-p", { step: "any", min: "0" });
+  const cn = makeNumber("Curve number CN (30 to 98)", "cnr-cn", { step: "any", min: "0", max: "100" });
+  const ac = makeNumber("Drainage area (acres, optional)", "cnr-ac", { step: "any", min: "0" });
   for (const f of [p, cn, ac]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { p.input.value = "5"; cn.input.value = "80"; ac.input.value = "10"; update(); });
   const oQ = makeOutputLine(outputRegion, "Runoff depth Q", "cnr-out-q");
@@ -852,10 +852,10 @@ export function computeTr55GraphicalPeakDischarge({ tc_hr = 0, curve_number = 0,
 export const tr55GraphicalPeakDischargeExample = { inputs: { tc_hr: 1.53, curve_number: 75, rainfall_in: 6.0, area_mi2: 0.39, rainfall_type: "II", pond_pct: 0 } };
 function renderTr55GraphicalPeakDischarge(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NRCS TR-55 Graphical Peak Discharge method (Urban Hydrology for Small Watersheds, Chapter 4 with Appendix F Table F-1 and Table 4-2): qp = qu Am Q Fp, with the unit peak discharge log10(qu) = C0 + C1 log10(Tc) + C2 (log10 Tc)^2 by rainfall type and Ia/P. A public USDA/NRCS document; Tc from Chapter 3, Q from the curve number (Chapter 2), Fp from Table 4-2. Valid for Tc 0.1 to 10 hr, Ia/P 0.1 to 0.5, and CN above 40. A design aid; the local drainage manual and the engineer of record govern.";
-  const tc = makeNumber("Time of concentration Tc (hr, 0.1 to 10)", "tpd-tc", { step: "any", min: "0", value: "1.53" }); tc.input.value = "1.53";
-  const cn = makeNumber("Curve number CN (above 40)", "tpd-cn", { step: "any", min: "0", max: "100", value: "75" }); cn.input.value = "75";
-  const p = makeNumber("Design rainfall P, 24-hr (in)", "tpd-p", { step: "any", min: "0", value: "6" }); p.input.value = "6";
-  const area = makeNumber("Drainage area (mi²)", "tpd-area", { step: "any", min: "0", value: "0.39" }); area.input.value = "0.39";
+  const tc = makeNumber("Time of concentration Tc (hr, 0.1 to 10)", "tpd-tc", { step: "any", min: "0" });
+  const cn = makeNumber("Curve number CN (above 40)", "tpd-cn", { step: "any", min: "0", max: "100" });
+  const p = makeNumber("Design rainfall P, 24-hr (in)", "tpd-p", { step: "any", min: "0" });
+  const area = makeNumber("Drainage area (mi²)", "tpd-area", { step: "any", min: "0" });
   const type = makeSelect("Rainfall distribution", "tpd-type", [
     { value: "I", label: "Type I" }, { value: "IA", label: "Type IA" }, { value: "II", label: "Type II", selected: true }, { value: "III", label: "Type III" },
   ]);
@@ -921,10 +921,10 @@ export function computeTr55DetentionStorage({ qi_cfs = 0, qo_cfs = 0, runoff_in 
 export const tr55DetentionStorageExample = { inputs: { qi_cfs: 360, qo_cfs: 180, runoff_in: 3.4, area_mi2: 0.117, rainfall_type: "II" } };
 function renderTr55DetentionStorage(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NRCS TR-55 Detention Storage sizing (Urban Hydrology for Small Watersheds, Chapter 6 with figure 6-1 and Appendix F Table F-2): Vs/Vr = C0 + C1 r + C2 r^2 + C3 r^3 with r = qo/qi, Vr = 53.33 Q Am (acre-ft), Vs = (Vs/Vr) Vr. A public USDA/NRCS document. An approximate preliminary single-stage size; the final basin comes from a stage-storage routing. The local drainage manual and the engineer of record govern.";
-  const qi = makeNumber("Peak inflow qi (cfs)", "tds-qi", { step: "any", min: "0", value: "360" }); qi.input.value = "360";
-  const qo = makeNumber("Allowable peak outflow qo (cfs)", "tds-qo", { step: "any", min: "0", value: "180" }); qo.input.value = "180";
-  const q = makeNumber("Runoff depth Q (in)", "tds-q", { step: "any", min: "0", value: "3.4" }); q.input.value = "3.4";
-  const area = makeNumber("Drainage area (mi²)", "tds-area", { step: "any", min: "0", value: "0.117" }); area.input.value = "0.117";
+  const qi = makeNumber("Peak inflow qi (cfs)", "tds-qi", { step: "any", min: "0" });
+  const qo = makeNumber("Allowable peak outflow qo (cfs)", "tds-qo", { step: "any", min: "0" });
+  const q = makeNumber("Runoff depth Q (in)", "tds-q", { step: "any", min: "0" });
+  const area = makeNumber("Drainage area (mi²)", "tds-area", { step: "any", min: "0" });
   const type = makeSelect("Rainfall distribution", "tds-type", [
     { value: "I", label: "Type I" }, { value: "IA", label: "Type IA" }, { value: "II", label: "Type II", selected: true }, { value: "III", label: "Type III" },
   ]);
@@ -982,8 +982,8 @@ export function computeCompositeCurveNumber({ pervious_cn = 0, impervious_pct = 
 export const compositeCurveNumberExample = { inputs: { pervious_cn: 74, impervious_pct: 25, connection: "unconnected", unconnected_ratio: 0.5 } };
 function renderCompositeCurveNumber(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NRCS TR-55 composite curve number for impervious area (Urban Hydrology for Small Watersheds, Chapter 2, figures 2-3 and 2-4): connected CNc = CNp + (Pimp/100)(98 - CNp); unconnected (total impervious under 30%) CNc = CNp + (Pimp/100)(98 - CNp)(1 - 0.5 R). A public USDA/NRCS document; the pervious CN (from land cover and hydrologic soil group, Table 2-2) is user-supplied. A design aid; the local drainage manual and the engineer of record govern.";
-  const cnp = makeNumber("Pervious curve number CNp", "ccn-cnp", { step: "any", min: "0", max: "100", value: "74" }); cnp.input.value = "74";
-  const pimp = makeNumber("Impervious area (% of the area)", "ccn-pimp", { step: "any", min: "0", max: "100", value: "25" }); pimp.input.value = "25";
+  const cnp = makeNumber("Pervious curve number CNp", "ccn-cnp", { step: "any", min: "0", max: "100" });
+  const pimp = makeNumber("Impervious area (% of the area)", "ccn-pimp", { step: "any", min: "0", max: "100" });
   const conn = makeSelect("Impervious connection", "ccn-conn", [
     { value: "connected", label: "Directly connected" }, { value: "unconnected", label: "Unconnected (drains over pervious)", selected: true },
   ]);

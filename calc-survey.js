@@ -560,10 +560,8 @@ function renderEdmSlopeReduction(inputRegion, outputRegion, citationEl) {
     { value: "vertical", label: "Vertical angle (from horizontal, 0 = level)" },
   ]);
   inputRegion.appendChild(mode.wrap);
-  const s = makeNumber("Slope distance S (ft)", "edm-s", { step: "any", min: "0", value: "250" });
-  s.input.value = "250";
-  const ang = makeNumber("Angle (deg)", "edm-a", { step: "any", value: "86" });
-  ang.input.value = "86";
+  const s = makeNumber("Slope distance S (ft)", "edm-s", { step: "any", min: "0" });
+  const ang = makeNumber("Angle (deg)", "edm-a", { step: "any" });
   const hi = makeNumber("Instrument height HI (ft, optional)", "edm-hi", { step: "any" });
   const hr = makeNumber("Reflector/rod height HR (ft, optional)", "edm-hr", { step: "any" });
   for (const f of [s, ang, hi, hr]) inputRegion.appendChild(f.wrap);
@@ -887,16 +885,14 @@ function renderAzimuthBearing(inputRegion, outputRegion, citationEl) {
     { value: "bearing_to_azimuth", label: "Quadrant bearing -> azimuth" },
   ]);
   inputRegion.appendChild(mode.wrap);
-  const az = makeNumber("Azimuth (deg, 0 to 360, clockwise from north)", "azb-az", { step: "any", min: "0", max: "360", value: "138.5" });
-  az.input.value = "138.5";
+  const az = makeNumber("Azimuth (deg, 0 to 360, clockwise from north)", "azb-az", { step: "any", min: "0", max: "360" });
   const quad = makeSelect("Bearing quadrant", "azb-quad", [
     { value: "NE", label: "NE (N _ E)" },
     { value: "SE", label: "SE (S _ E)" },
     { value: "SW", label: "SW (S _ W)" },
     { value: "NW", label: "NW (N _ W)" },
   ]);
-  const ang = makeNumber("Bearing angle (deg, 0 to 90)", "azb-ang", { step: "any", min: "0", max: "90", value: "41.5" });
-  ang.input.value = "41.5";
+  const ang = makeNumber("Bearing angle (deg, 0 to 90)", "azb-ang", { step: "any", min: "0", max: "90" });
   for (const f of [az, quad, ang]) inputRegion.appendChild(f.wrap);
   const oAz = makeOutputLine(outputRegion, "Azimuth", "azb-out-az");
   const oBearing = makeOutputLine(outputRegion, "Quadrant bearing", "azb-out-bearing");

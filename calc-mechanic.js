@@ -1988,8 +1988,8 @@ export const hpFromTorqueExample = { inputs: { solve_for: "hp", torque_lbft: 400
 function renderHpFromTorque(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Classical definition of mechanical power (Watt's 33,000 ft-lb/min); SAE J1349 engine-power rating, by name. The constant 5252 is a pure derivation, fully public. Torque and HP are equal at 5252 RPM by definition.";
   const solve = makeSelect("Solve for", "hpt-solve", [{ value: "hp", label: "Horsepower", selected: true }, { value: "torque", label: "Torque" }, { value: "rpm", label: "RPM" }]);
-  const t = makeNumber("Torque (lb-ft)", "hpt-t", { step: "any", min: "0", value: "400" }); t.input.value = "400";
-  const n = makeNumber("RPM", "hpt-n", { step: "any", min: "0", value: "5000" }); n.input.value = "5000";
+  const t = makeNumber("Torque (lb-ft)", "hpt-t", { step: "any", min: "0" });
+  const n = makeNumber("RPM", "hpt-n", { step: "any", min: "0" });
   const hp = makeNumber("Horsepower", "hpt-hp", { step: "any", min: "0" });
   for (const f of [solve, t, n, hp]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { solve.select.value = "hp"; t.input.value = "400"; n.input.value = "5000"; hp.input.value = ""; update(); });
@@ -2035,8 +2035,8 @@ export const volumetricEfficiencyExample = { inputs: { displacement_ci: 350, rpm
 
 function renderVolumetricEfficiency(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Classical four-stroke airflow derivation; SAE engine-test conventions, by name. The 3456/1728 constants are pure unit derivations, public (in every engine-builder reference). VE above 100% is legitimate for forced induction.";
-  const disp = makeNumber("Displacement (ci)", "ve-disp", { step: "any", min: "0", value: "350" }); disp.input.value = "350";
-  const rpm = makeNumber("RPM", "ve-rpm", { step: "any", min: "0", value: "5500" }); rpm.input.value = "5500";
+  const disp = makeNumber("Displacement (ci)", "ve-disp", { step: "any", min: "0" });
+  const rpm = makeNumber("RPM", "ve-rpm", { step: "any", min: "0" });
   const cycle = makeSelect("Cycle", "ve-cycle", [{ value: "four", label: "4-stroke", selected: true }, { value: "two", label: "2-stroke" }]);
   const actual = makeNumber("Measured CFM (optional, to compute VE)", "ve-actual", { step: "any", min: "0" });
   const vep = makeNumber("Target VE % (optional, to compute CFM)", "ve-vep", { step: "any", min: "0" });

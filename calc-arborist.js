@@ -928,11 +928,11 @@ export const treeAppraisalCtlaExample = { inputs: { dbh_in: 24, unit_cost_per_sq
 
 function renderTreeAppraisalCtla(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: the CTLA (Council of Tree and Landscape Appraisers) trunk formula method, by name: appraised value = unit tree cost x trunk cross-sectional area x species rating x condition rating x location rating. Trunk area is measured at 4.5 ft above grade for trunks over 12 in diameter, and at 1 ft above grade at or below 12 in. The unit cost and all three ratings are regional values from a plant appraisal committee guide and are entered here - no table is shipped, because a national default would be wrong everywhere. Single-stem trunks; multi-stem trees use a different area rule, and cost-of-cure or income approaches may fit better for very large or historic specimens. An estimating aid, not an appraisal - a defensible appraisal is a qualified appraiser's report.";
-  const d = makeNumber("Trunk diameter (in)", "tac-d", { step: "any", min: "0", value: "24" }); d.input.value = "24";
-  const u = makeNumber("Unit tree cost ($ per sq in of trunk)", "tac-u", { step: "any", min: "0", value: "60" }); u.input.value = "60";
-  const s = makeNumber("Species rating (%)", "tac-s", { step: "any", min: "0", max: "100", value: "80" }); s.input.value = "80";
-  const c = makeNumber("Condition rating (%)", "tac-c", { step: "any", min: "0", max: "100", value: "70" }); c.input.value = "70";
-  const l = makeNumber("Location rating (%)", "tac-l", { step: "any", min: "0", max: "100", value: "75" }); l.input.value = "75";
+  const d = makeNumber("Trunk diameter (in)", "tac-d", { step: "any", min: "0" });
+  const u = makeNumber("Unit tree cost ($ per sq in of trunk)", "tac-u", { step: "any", min: "0" });
+  const s = makeNumber("Species rating (%)", "tac-s", { step: "any", min: "0", max: "100" });
+  const c = makeNumber("Condition rating (%)", "tac-c", { step: "any", min: "0", max: "100" });
+  const l = makeNumber("Location rating (%)", "tac-l", { step: "any", min: "0", max: "100" });
   for (const f of [d, u, s, c, l]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { d.input.value = "24"; u.input.value = "60"; s.input.value = "80"; c.input.value = "70"; l.input.value = "75"; update(); });
   const oA = makeOutputLine(outputRegion, "Trunk area / measure at", "tac-out-a");

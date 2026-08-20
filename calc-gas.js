@@ -451,8 +451,7 @@ export const gasFuelConversionExample = { inputs: { appliance_input_btuh: 100000
 
 function renderGasFuelConversion(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: first-principles orifice flow Q ~ A x sqrt(P / SG) holding appliance input, with cfh = input / heating value (public). The default NG/LP heating values (1030/2500 BTU/cf), specific gravities (0.60/1.52), and manifold pressures (3.5/11.0 in. w.c.) are editable. Field orifice drilling is generally prohibited - use a listed conversion kit; the manufacturer and AHJ govern.";
-  const inp = makeNumber("Appliance input (BTU/hr)", "gfc-in", { step: "any", min: "0", value: "100000" });
-  inp.input.value = "100000";
+  const inp = makeNumber("Appliance input (BTU/hr)", "gfc-in", { step: "any", min: "0" });
   const fromFuel = makeSelect("From fuel", "gfc-from", [
     { value: "natural_gas", label: "Natural gas" }, { value: "propane", label: "Propane" },
   ]);

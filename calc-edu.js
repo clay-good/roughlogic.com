@@ -2112,8 +2112,7 @@ export function renderCurveGradeScaler(inputRegion, outputRegion, citationEl) {
     { value: "sqrt", label: "Square-root (10 x sqrt(raw))" },
     { value: "linear", label: "Linear rescale to target mean" },
   ]);
-  const raw = makeNumber("Raw score (0-100)", "cgs-raw", { step: "any", min: "0", max: "100", value: "49" });
-  raw.input.value = "49";
+  const raw = makeNumber("Raw score (0-100)", "cgs-raw", { step: "any", min: "0", max: "100" });
   const param = makeNumber("Points to add (flat) or target mean (linear)", "cgs-param", { step: "any" });
   const mean = makeNumber("Class mean (linear only)", "cgs-mean", { step: "any", min: "0", max: "100" });
   for (const f of [method, raw, param, mean]) inputRegion.appendChild(f.wrap);
@@ -2222,7 +2221,7 @@ export const categoryWeightedGradeExample = { inputs: { categories: [{ earned: 9
 
 function renderCategoryWeightedGrade(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Pure weighted-mean arithmetic; standard US letter bands (A >= 90, B >= 80, C >= 70, D >= 60). The instructor's gradebook governs; bands vary by school.";
-  const data = makeText("Categories (pct/weight, e.g. 92/20, 85/30, 78/50)", "cwg-data", { value: "92/20, 85/30, 78/50" }); data.input.value = "92/20, 85/30, 78/50";
+  const data = makeText("Categories (pct/weight, e.g. 92/20, 85/30, 78/50)", "cwg-data", {});
   inputRegion.appendChild(data.wrap);
   attachExampleButton(inputRegion, () => { data.input.value = "92/20, 85/30, 78/50"; update(); });
   const oOverall = makeOutputLine(outputRegion, "Overall grade", "cwg-out-overall");

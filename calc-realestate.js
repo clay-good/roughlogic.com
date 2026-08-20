@@ -2351,8 +2351,8 @@ export const grossRentMultiplierExample = { inputs: { price: 300000, gross_rent:
 
 function renderGrossRentMultiplier(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Standard income-approach screening metric (gross rent / gross income multiplier) per the Appraisal Institute's The Appraisal of Real Estate income approach, by name; USPAP governs the appraiser's value opinion. Distinct from cap-rate-dscr, which uses NOI, not gross rent. Screening only.";
-  const price = makeNumber("Purchase price / value ($)", "grm-price", { step: "any", min: "0", value: "300000" }); price.input.value = "300000";
-  const rent = makeNumber("Gross rental income ($)", "grm-rent", { step: "any", min: "0", value: "36000" }); rent.input.value = "36000";
+  const price = makeNumber("Purchase price / value ($)", "grm-price", { step: "any", min: "0" });
+  const rent = makeNumber("Gross rental income ($)", "grm-rent", { step: "any", min: "0" });
   const basis = makeSelect("Rent basis", "grm-basis", [{ value: "annual", label: "Annual", selected: true }, { value: "monthly", label: "Monthly" }]);
   const mgrm = makeNumber("Market/comparable GRM (optional)", "grm-mgrm", { step: "any", min: "0" });
   for (const f of [price, rent, basis, mgrm]) inputRegion.appendChild(f.wrap);
@@ -2469,8 +2469,8 @@ export const sellerNetSheetExample = { inputs: { price: 400000, payoff: 250000, 
 
 function renderSellerNetSheet(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per the TILA-RESPA Integrated Disclosure / Closing Disclosure (12 CFR 1026.38) and RESPA (12 CFR 1024), by name; the transfer-tax rate is state/local and user-supplied. Distinct from the buyer-side closing-costs tile. Estimate; the settlement statement and closing agent govern. Free at consumerfinance.gov and ecfr.gov.";
-  const price = makeNumber("Sale price ($)", "sns-price", { step: "any", min: "0", value: "400000" }); price.input.value = "400000";
-  const payoff = makeNumber("Mortgage payoff ($)", "sns-payoff", { step: "any", min: "0", value: "250000" }); payoff.input.value = "250000";
+  const price = makeNumber("Sale price ($)", "sns-price", { step: "any", min: "0" });
+  const payoff = makeNumber("Mortgage payoff ($)", "sns-payoff", { step: "any", min: "0" });
   const comm = makeNumber("Commission (%)", "sns-comm", { step: "any", min: "0", value: "5.5" }); comm.input.value = "5.5";
   const tt = makeNumber("Transfer/excise tax (%)", "sns-tt", { step: "any", min: "0", value: "0.5" }); tt.input.value = "0.5";
   const fees = makeNumber("Title/escrow/attorney fees ($)", "sns-fees", { step: "any", min: "0", value: "2500" }); fees.input.value = "2500";

@@ -99,13 +99,10 @@ function renderHorizontalCurve(inputRegion, outputRegion, citationEl) {
     { value: "radius", label: "By radius (ft)" }, { value: "degree", label: "By degree of curve" },
   ]);
   inputRegion.appendChild(mode.wrap);
-  const rad = makeNumber("Radius R (ft)", "hc-r", { step: "any", min: "0", value: "1000" });
-  rad.input.value = "1000";
+  const rad = makeNumber("Radius R (ft)", "hc-r", { step: "any", min: "0" });
   const deg = makeNumber("Degree of curve D", "hc-d", { step: "any", min: "0" });
-  const delta = makeNumber("Deflection angle delta (deg)", "hc-delta", { step: "any", min: "0", value: "30" });
-  delta.input.value = "30";
-  const pi = makeNumber("PI station (ft, optional)", "hc-pi", { step: "any", value: "5000" });
-  pi.input.value = "5000";
+  const delta = makeNumber("Deflection angle delta (deg)", "hc-delta", { step: "any", min: "0" });
+  const pi = makeNumber("PI station (ft, optional)", "hc-pi", { step: "any" });
   for (const f of [rad, deg, delta, pi]) inputRegion.appendChild(f.wrap);
   const oT = makeOutputLine(outputRegion, "Tangent T", "hc-out-t");
   const oL = makeOutputLine(outputRegion, "Curve length L", "hc-out-l");
@@ -373,11 +370,9 @@ function renderCurveDeflectionStakeout(inputRegion, outputRegion, citationEl) {
     { value: "radius", label: "By radius (ft)" }, { value: "degree", label: "By degree of curve" },
   ]);
   inputRegion.appendChild(mode.wrap);
-  const rad = makeNumber("Radius R (ft)", "cds-r", { step: "any", min: "0", value: "500" });
-  rad.input.value = "500";
+  const rad = makeNumber("Radius R (ft)", "cds-r", { step: "any", min: "0" });
   const deg = makeNumber("Degree of curve D", "cds-d", { step: "any", min: "0" });
-  const arc = makeNumber("Arc length from PC (ft)", "cds-l", { step: "any", min: "0", value: "100" });
-  arc.input.value = "100";
+  const arc = makeNumber("Arc length from PC (ft)", "cds-l", { step: "any", min: "0" });
   for (const f of [rad, deg, arc]) inputRegion.appendChild(f.wrap);
   const oDef = makeOutputLine(outputRegion, "Deflection angle from PC", "cds-out-def");
   const oChord = makeOutputLine(outputRegion, "Sub-chord from PC", "cds-out-chord");
@@ -611,10 +606,8 @@ export const slopeStakeCutFillExample = { inputs: { existing_elev_ft: 104.5, des
 
 function renderSlopeStakeCutFill(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Slope-stake cut/fill and catch-point geometry per FM 5-233 Construction Surveying and FHWA construction-survey guidance, planar approximation. The grading plan and surveyor of record govern.";
-  const existing = makeNumber("Existing ground elevation (ft)", "ssc-ex", { step: "any", value: "104.5" });
-  existing.input.value = "104.5";
-  const design = makeNumber("Design (finished grade) elevation (ft)", "ssc-de", { step: "any", value: "100" });
-  design.input.value = "100";
+  const existing = makeNumber("Existing ground elevation (ft)", "ssc-ex", { step: "any" });
+  const design = makeNumber("Design (finished grade) elevation (ft)", "ssc-de", { step: "any" });
   const slope = makeNumber("Slope ratio H (H:V, e.g. 2 for 2:1)", "ssc-sr", { step: "any", min: "0", value: "2" });
   slope.input.value = "2";
   const offset = makeNumber("Offset to hinge from CL (ft, optional)", "ssc-off", { step: "any" });
@@ -670,10 +663,8 @@ function renderSuperelevation(inputRegion, outputRegion, citationEl) {
     { value: "rmin", label: "Minimum radius R_min (from max bank)" },
   ]);
   inputRegion.appendChild(mode.wrap);
-  const V = makeNumber("Design speed V (mph)", "se-v", { step: "any", min: "0", value: "60" });
-  V.input.value = "60";
-  const R = makeNumber("Curve radius R (ft)", "se-r", { step: "any", min: "0", value: "1500" });
-  R.input.value = "1500";
+  const V = makeNumber("Design speed V (mph)", "se-v", { step: "any", min: "0" });
+  const R = makeNumber("Curve radius R (ft)", "se-r", { step: "any", min: "0" });
   const em = makeNumber("Max superelevation e_max (e.g. 0.08)", "se-emax", { step: "any", min: "0" });
   const f = makeNumber("Side-friction factor f", "se-f", { step: "any", min: "0", value: "0.12" });
   f.input.value = "0.12";
@@ -904,10 +895,8 @@ function renderHorizontalSightlineOffset(inputRegion, outputRegion, citationEl) 
     { value: "maxS", label: "Max sight distance S (from cleared offset)" },
   ]);
   inputRegion.appendChild(mode.wrap);
-  const R = makeNumber("Curve radius R to inside-lane CL (ft)", "hso-r", { step: "any", min: "0", value: "1000" });
-  R.input.value = "1000";
-  const S = makeNumber("Sight distance S (ft)", "hso-s", { step: "any", min: "0", value: "570" });
-  S.input.value = "570";
+  const R = makeNumber("Curve radius R to inside-lane CL (ft)", "hso-r", { step: "any", min: "0" });
+  const S = makeNumber("Sight distance S (ft)", "hso-s", { step: "any", min: "0" });
   const M = makeNumber("Cleared offset M (ft)", "hso-m", { step: "any", min: "0" });
   for (const fld of [R, S, M]) inputRegion.appendChild(fld.wrap);
   const oOut = makeOutputLine(outputRegion, "Result", "hso-out");

@@ -1348,8 +1348,7 @@ export const evaporationLoadExample = { inputs: { area_ft2: 800, water_class: 3,
 
 function renderEvaporationLoad(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per the IICRC S500 water-class framework and evaporation-load drying principle, by name (not reproduced); per-class load factors are editable field defaults the user tunes to the standard and the job. Class 4 (bound water) is non-linear in area. IICRC S500 governs.";
-  const area = makeNumber("Affected floor area (ft2)", "el-area", { step: "any", min: "0", value: "800" });
-  area.input.value = "800";
+  const area = makeNumber("Affected floor area (ft2)", "el-area", { step: "any", min: "0" });
   const cls = makeSelect("Water class", "el-cls", [1, 2, 3, 4].map((c) => ({ value: String(c), label: "Class " + c, selected: c === 3 })));
   const lf = makeNumber("Load factor (gal/ft2, blank = class default)", "el-lf", { step: "any", min: "0" });
   const frac = makeNumber("First-24-hour fraction (0-1)", "el-frac", { step: "any", min: "0", max: "1", value: "0.4" });
@@ -2753,9 +2752,9 @@ export function computeSurfaceCondensationRisk({ air_temp_f = 0, air_rh_pct = 0,
 
 function renderSurfaceCondensationRisk(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Magnus dew-point relation and the keep-surfaces-above-dew-point rule (ANSI/IICRC S500), by name. The Magnus form is an approximation and the IR-read surface temperature GOVERNS; psychrometric is the chamber reference. A screen.";
-  const at = makeNumber("Chamber air temp (°F)", "scr-at", { step: "any", value: "80" });
-  const rh = makeNumber("Chamber relative humidity (%)", "scr-rh", { step: "any", min: "0", max: "100", value: "50" });
-  const st = makeNumber("Coldest surface temp (°F, IR read)", "scr-st", { step: "any", value: "50" });
+  const at = makeNumber("Chamber air temp (°F)", "scr-at", { step: "any" });
+  const rh = makeNumber("Chamber relative humidity (%)", "scr-rh", { step: "any", min: "0", max: "100" });
+  const st = makeNumber("Coldest surface temp (°F, IR read)", "scr-st", { step: "any" });
   for (const f of [at, rh, st]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { at.input.value = "80"; rh.input.value = "50"; st.input.value = "50"; update(); });
   const oDew = makeOutputLine(outputRegion, "Dew point", "scr-out-dew");
@@ -2798,8 +2797,8 @@ export function computeSporeIoRatio({ indoor_spores_m3 = 0, outdoor_spores_m3 = 
 
 function renderSporeIoRatio(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Indoor/outdoor spore ratio and the marker-genera principle (ANSI/IICRC S520), by name. An independent environmental professional interprets clearance; a ratio at or under 1 alone does not clear a project. A screen, not a certificate.";
-  const ind = makeNumber("Indoor spore concentration (spores/m³)", "sio-ind", { step: "any", min: "0", value: "800" });
-  const out = makeNumber("Outdoor control (spores/m³)", "sio-out", { step: "any", min: "0", value: "1500" });
+  const ind = makeNumber("Indoor spore concentration (spores/m³)", "sio-ind", { step: "any", min: "0" });
+  const out = makeNumber("Outdoor control (spores/m³)", "sio-out", { step: "any", min: "0" });
   const mark = makeCheckbox("Water-damage marker (Stachybotrys / Chaetomium) elevated indoors", "sio-mark", false);
   for (const f of [ind, out]) inputRegion.appendChild(f.wrap);
   inputRegion.appendChild(mark.wrap);
@@ -2845,7 +2844,7 @@ export function computeHardwoodFloorDryingMat({ floor_area_ft2 = 0, mat_coverage
 
 function renderHardwoodFloorDryingMat(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Hardwood floor drying-mat system sizing (ANSI/IICRC S500 Class 4 specialty drying), by name. The mat-system manufacturer's coverage and unit ratings GOVERN; subfloor construction and finish affect feasibility. A sizing screen.";
-  const area = makeNumber("Wet hardwood floor area (ft²)", "hfm-area", { step: "any", min: "0", value: "120" });
+  const area = makeNumber("Wet hardwood floor area (ft²)", "hfm-area", { step: "any", min: "0" });
   const cov = makeNumber("Coverage per mat (ft²)", "hfm-cov", { step: "any", min: "0", value: "6" });
   const per = makeNumber("Mats per suction unit", "hfm-per", { step: "any", min: "0", value: "16" });
   for (const f of [area, cov, per]) inputRegion.appendChild(f.wrap);
@@ -2891,7 +2890,7 @@ export function computeMoldCleaningLabor({ affected_sf = 0, production_sf_per_hr
 
 function renderMoldCleaningLabor(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Source-removal multi-pass cleaning labor method (ANSI/IICRC S520), by name. The Condition, substrate, and access GOVERN the production rate; non-cleanable porous materials are removed, not cleaned. A labor screen.";
-  const area = makeNumber("Cleanable affected surface (ft²)", "mcl-area", { step: "any", min: "0", value: "500" });
+  const area = makeNumber("Cleanable affected surface (ft²)", "mcl-area", { step: "any", min: "0" });
   const prod = makeNumber("Production rate (ft²/hr per pass)", "mcl-prod", { step: "any", min: "0", value: "100" });
   const pass = makeNumber("Cleaning passes (vac / wipe / vac)", "mcl-pass", { step: "any", min: "1", value: "2" });
   const crew = makeNumber("Crew size", "mcl-crew", { step: "any", min: "0", value: "2" });

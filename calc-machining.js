@@ -2020,10 +2020,10 @@ export const gearUndercutBacklashExample = { inputs: { pressure_angle_deg: 20, t
 function renderGearUndercutBacklash(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: involute gear geometry. The undercut limit is Nmin = 2k / sin^2(pressure angle), where k is the addendum coefficient (1.0 full depth, 0.8 stub) - it reproduces the standard published minimums of 32 teeth at 14.5 degrees, 18 at 20 degrees, and 12 at 25 degrees. Backlash from opening the center distance is B = 2 x (center-distance change) x tan(pressure angle), because the flanks separate along the line of action. Standard proportions with no profile shift assumed; profile shift (long-addendum pinion) is the usual fix for an undercut pinion and changes both results. A shop aid; the gear drawing and the AGMA standard govern.";
   const pa = makeNumber("Pressure angle (deg)", "gub-pa", { step: "any", min: "0" }); pa.input.value = "20";
-  const n = makeNumber("Number of teeth N", "gub-n", { step: "1", min: "1" }); n.input.value = "14";
+  const n = makeNumber("Number of teeth N", "gub-n", { step: "1", min: "1" });
   const k = makeNumber("Addendum coefficient (1.0 full, 0.8 stub)", "gub-k", { step: "any", min: "0" }); k.input.value = "1.0";
-  const dc = makeNumber("Center-distance increase (in, 0 = skip)", "gub-dc", { step: "any", min: "0" }); dc.input.value = "0.010";
-  const pd = makeNumber("Diametral pitch (teeth/in, 0 = skip)", "gub-pd", { step: "any", min: "0" }); pd.input.value = "10";
+  const dc = makeNumber("Center-distance increase (in, 0 = skip)", "gub-dc", { step: "any", min: "0" });
+  const pd = makeNumber("Diametral pitch (teeth/in, 0 = skip)", "gub-pd", { step: "any", min: "0" });
   for (const f of [pa, n, k, dc, pd]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { pa.input.value = "20"; n.input.value = "14"; k.input.value = "1.0"; dc.input.value = "0.010"; pd.input.value = "10"; update(); });
   const oM = makeOutputLine(outputRegion, "Undercut minimum", "gub-out-m");

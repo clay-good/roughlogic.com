@@ -296,11 +296,11 @@ export const flangeBoltTorqueExample = { inputs: { bolt_diameter_in: 0.75, threa
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v26renderFlangeBoltTorque(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Bolt-preload torque by the short-form T = K*D*F and the cross/star tightening sequence, per ASME PCC-1 Guidelines for Pressure Boundary Bolted Flange Joint Assembly and the ASME B16.5 flange classes, by name; the nut factor K, gasket seating stress, and target preload are joint- and lubricant-specific and user-supplied. A computational aid - the assembly procedure, gasket manufacturer, and the engineer of record govern the installed torque.";
-  const d = makeNumber("Bolt nominal diameter (in)", "fbt-d", { step: "any", min: "0", value: "0.75" });
+  const d = makeNumber("Bolt nominal diameter (in)", "fbt-d", { step: "any", min: "0" });
   const series = makeSelect("Thread series", "fbt-series", [
     { value: "UNC", label: "UNC (coarse)", selected: true }, { value: "8UN", label: "8UN (large flange)" },
   ]);
-  const count = makeNumber("Bolt count", "fbt-count", { step: "1", min: "2", value: "8" });
+  const count = makeNumber("Bolt count", "fbt-count", { step: "1", min: "2" });
   const at = makeNumber("Tensile area (in², optional override)", "fbt-at", { step: "any", min: "0" });
   const pct = makeNumber("Target preload (% of yield)", "fbt-pct", { step: "any", min: "0", value: "50" });
   const yld = makeNumber("Bolt yield (ksi, B7 = 105)", "fbt-yld", { step: "any", min: "0", value: "105" });
@@ -451,8 +451,7 @@ function renderConduitSaddle(inputRegion, outputRegion, citationEl) {
     { value: "three-point", label: "Three-point", selected: true },
     { value: "four-point", label: "Four-point" },
   ]);
-  const depth = makeNumber("Obstruction depth (in)", "cs-depth", { step: "any", min: "0", value: "3" });
-  depth.input.value = "3";
+  const depth = makeNumber("Obstruction depth (in)", "cs-depth", { step: "any", min: "0" });
   const preset = makeSelect("Bend preset (center/outer)", "cs-preset", [
     { value: "45/22.5", label: "45/22.5 deg", selected: true },
     { value: "60/30", label: "60/30 deg" },
@@ -538,8 +537,7 @@ function renderConduit90Stub(inputRegion, outputRegion, citationEl) {
     { value: "back-to-back", label: "Back-to-back" },
     { value: "segment-90", label: "Segmented 90" },
   ]);
-  const height = makeNumber("Stub height (in)", "c90-height", { step: "any", min: "0", value: "8" });
-  height.input.value = "8";
+  const height = makeNumber("Stub height (in)", "c90-height", { step: "any", min: "0" });
   const deduct = makeSelect("Bender deduct/take-up", "c90-deduct", [
     { value: "5", label: "EMT 1/2 in (deduct 5)" },
     { value: "6", label: "EMT 3/4 in (deduct 6)", selected: true },

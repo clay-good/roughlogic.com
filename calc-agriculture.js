@@ -1843,9 +1843,9 @@ export const pearsonSquareRationExample = { inputs: { feed_a_pct: 9, feed_b_pct:
 
 function renderPearsonSquareRation(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Pearson square method - standard land-grant animal-science ration formulation (USDA / university extension; Ensminger 'Feeds & Nutrition'), by name. The square is public arithmetic. Single nutrient only. Free at university extension sites.";
-  const a = makeNumber("Feed A nutrient %", "psr-a", { step: "any", value: "9" }); a.input.value = "9";
-  const b = makeNumber("Feed B nutrient %", "psr-b", { step: "any", value: "44" }); b.input.value = "44";
-  const target = makeNumber("Target %", "psr-t", { step: "any", value: "16" }); target.input.value = "16";
+  const a = makeNumber("Feed A nutrient %", "psr-a", { step: "any" });
+  const b = makeNumber("Feed B nutrient %", "psr-b", { step: "any" });
+  const target = makeNumber("Target %", "psr-t", { step: "any" });
   const batch = makeNumber("Total batch (lb, optional)", "psr-batch", { step: "any", min: "0" });
   for (const f of [a, b, target, batch]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { a.input.value = "9"; b.input.value = "44"; target.input.value = "16"; batch.input.value = ""; update(); });
@@ -1902,8 +1902,8 @@ export const livestockWaterRequirementExample = { inputs: { method: "table", hea
 function renderLivestockWaterRequirement(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per NRC Nutrient Requirements of Beef Cattle / Dairy Cattle water-intake guidance and the USDA NRCS National Range and Pasture Handbook water section, by name; per-class gallon breakpoints user-supplied (table values, not reproduced). Distinct from thi-livestock. Free NRCS guidance at nrcs.usda.gov.";
   const method = makeSelect("Method", "lwr-method", [{ value: "table", label: "Temperature table (interpolate)", selected: true }, { value: "intake", label: "Intake ratio (water per DMI)" }]);
-  const head = makeNumber("Head count", "lwr-head", { step: "1", min: "1", value: "50" }); head.input.value = "50";
-  const temp = makeNumber("Air temperature (°F)", "lwr-temp", { step: "any", value: "80" }); temp.input.value = "80";
+  const head = makeNumber("Head count", "lwr-head", { step: "1", min: "1" });
+  const temp = makeNumber("Air temperature (°F)", "lwr-temp", { step: "any" });
   const tl = makeNumber("Low breakpoint temp (°F)", "lwr-tl", { step: "any", value: "40" }); tl.input.value = "40";
   const gl = makeNumber("Gallons/head at low temp", "lwr-gl", { step: "any", min: "0", value: "8" }); gl.input.value = "8";
   const th = makeNumber("High breakpoint temp (°F)", "lwr-th", { step: "any", value: "90" }); th.input.value = "90";
