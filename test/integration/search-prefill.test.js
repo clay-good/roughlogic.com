@@ -151,3 +151,84 @@ test("spec-v1341 provenance: a shared link never claims its recipient typed it",
   await expect(page.locator("#vd-len")).toHaveValue("150");
   await expect(page.locator(".field-provenance")).toHaveCount(0);
 });
+
+// spec-v1342: the ask card.
+//
+// A query carrying most of what a tile needs lands with one box empty and no
+// sign which one. The card asks for it in words, names its unit, and shows a
+// receipt of what is already in so the work does not look lost.
+
+const ASK_QUERY = "asphalt tonnage 2400 sq ft 3 in deep 12 ft wide";
+
+test("spec-v1342 ask card: asks for the missing value, naming its unit", async ({ page }) => {
+  await page.goto("/");
+  const input = page.locator("#search-input");
+  await input.click();
+  await input.fill(ASK_QUERY);
+  await expect(page.locator("#search-results .search-result").first().locator(".sr-name"))
+    .toHaveText("Asphalt Tonnage");
+  await input.press("Enter");
+
+  const card = page.locator(".ask-card");
+  await expect(card).toBeVisible();
+  // The unit matters: "What is the mix density?" is unanswerable beside a box
+  // measured in pcf.
+  await expect(card.locator(".ask-q")).toHaveText("What is the mix density in pcf?");
+  await expect(card.locator(".ask-receipt")).toContainText("paved area 2400");
+
+  // A tile that reads a blank required field as zero renders a confident
+  // answer that looks exactly like a real one. It stays hidden while asking.
+  await expect(page.locator(".output-region")).toBeHidden();
+
+  // The question is a real <label for>, not an aria-label: check-field-accessors
+  // and the a11y sweep both hold dynamically created inputs to one.
+  const askId = await card.locator("input").getAttribute("id");
+  await expect(page.locator(`label[for="${askId}"]`)).toHaveCount(1);
+});
+
+test("spec-v1342 ask card: answering it computes and dismisses", async ({ page }) => {
+  await page.goto("/");
+  const input = page.locator("#search-input");
+  await input.click();
+  await input.fill(ASK_QUERY);
+  await expect(page.locator("#search-results .search-result").first().locator(".sr-name"))
+    .toHaveText("Asphalt Tonnage");
+  await input.press("Enter");
+
+  const card = page.locator(".ask-card");
+  await expect(card).toBeVisible();
+  await card.locator("input").fill("145");
+  await card.locator(".ask-go").click();
+
+  await expect(card).toHaveCount(0);
+  await expect(page.locator("#density_pcf")).toHaveValue("145");
+  const answer = page.locator(".output-region");
+  await expect(answer).toBeVisible();
+  await expect(answer).toContainText("43.5");
+  expect(await answer.textContent()).not.toMatch(/NaN|Infinity|undefined/);
+});
+
+test("spec-v1342 ask card: it is a shortcut, never a gate", async ({ page }) => {
+  // Filling the real field below dismisses it just as well. The whole tile
+  // stays interactive underneath the card the entire time.
+  await page.goto("/");
+  const input = page.locator("#search-input");
+  await input.click();
+  await input.fill(ASK_QUERY);
+  await expect(page.locator("#search-results .search-result").first().locator(".sr-name"))
+    .toHaveText("Asphalt Tonnage");
+  await input.press("Enter");
+  await expect(page.locator(".ask-card")).toBeVisible();
+
+  await page.locator("#density_pcf").fill("150");
+  await expect(page.locator(".ask-card")).toHaveCount(0);
+  await expect(page.locator(".output-region")).toBeVisible();
+});
+
+test("spec-v1342 ask card: no card when nothing was extracted", async ({ page }) => {
+  // The reader typed a tool name, not a sentence. The tile's own form is the
+  // right answer and a question would be noise.
+  await page.goto("/#asphalt-tonnage");
+  await expect(page.locator("#area_ft2")).toBeVisible();
+  await expect(page.locator(".ask-card")).toHaveCount(0);
+});

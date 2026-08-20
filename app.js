@@ -1797,7 +1797,134 @@ function applyQueryPrefill(region, id, params) {
     // words too, so they are captioned alongside.
     for (const key of Object.keys(params)) if (key !== "v") marked.add(key);
     markProvenance(region, marked);
+    askCard(region, rows, resolved, marked);
   }).catch(() => { /* prefill is an enhancement; the form is always there */ });
+}
+
+// spec-v1342: ask for the first value the tile cannot answer without.
+//
+// A query that carries three of four values lands on a form with one empty box
+// and no sign which one is holding everything up. One question, in words, at
+// the top of the page, is the difference between an assistant and a form.
+//
+// It renders only when the reader's own words filled something AND a required
+// field is still empty. If nothing was filled they typed a tool name, not a
+// sentence, and the tile's own form is the right answer.
+//
+// The question text comes from the RENDERED <label>, never from the registry:
+// registry labels are written for machines, and rendering one at a person has
+// misfired before. Where no label is found, no card. Fail quiet.
+function askCard(region, rows, resolved, filledIds) {
+  if (!region || !filledIds || !filledIds.size) return;
+  const view = region.parentElement;
+  if (!view) return;
+  clearAskCard(view);
+
+  const isEmpty = (el) => {
+    if (!el) return false;
+    if (el.type === "checkbox") return false;         // a box says its own state
+    return String(el.value || "").trim() === "";
+  };
+
+  // Declaration order, so the reader is asked in the order the tile reads.
+  let target = null, targetRow = null;
+  for (const row of rows) {
+    if (!row.r) continue;
+    const el = resolved.get(row.d);
+    if (el && isEmpty(el)) { target = el; targetRow = row; break; }
+  }
+  if (!target || !targetRow) return;
+  // A select or checkbox has no sensible one-line stand-in; the field itself is
+  // the better control. Number and text only.
+  if (target.tagName === "SELECT" || target.type === "checkbox") return;
+
+  const label = view.querySelector('label[for="' + (window.CSS && CSS.escape ? CSS.escape(target.id) : target.id) + '"]');
+  const labelText = label ? String(label.textContent || "").trim() : "";
+  if (!labelText) return;
+
+  // Ask in the unit the field is CURRENTLY showing. "What is the length?" is
+  // unanswerable beside a box measured in inches when the reader means feet.
+  const unitMatch = labelText.match(/\(([^()]*)\)\s*$/);
+  const name = labelText.replace(/\s*\([^()]*\)\s*$/, "").trim().toLowerCase();
+  const unit = unitMatch ? unitMatch[1].split(/[,;]/)[0].trim() : "";
+
+  const card = document.createElement("section");
+  card.className = "ask-card";
+  // NOT a live region, and not inside one: this is a question, not a result.
+  card.setAttribute("aria-label", "One more value needed");
+
+  const q = document.createElement("p");
+  q.className = "ask-q";
+  q.textContent = unit ? `What is the ${name} in ${unit}?` : `What is the ${name}?`;
+  card.appendChild(q);
+
+  // The receipt, so the work does not look lost.
+  const have = [];
+  for (const row of rows) {
+    const el = resolved.get(row.d);
+    if (!el || !filledIds.has(el.id) || el === target) continue;
+    const shown = el.tagName === "SELECT" && el.selectedOptions && el.selectedOptions[0]
+      ? el.selectedOptions[0].textContent.trim()
+      : String(el.value || "").trim();
+    if (shown) have.push(String(row.l).toLowerCase() + " " + shown);
+  }
+  if (have.length) {
+    const receipt = document.createElement("p");
+    receipt.className = "ask-receipt";
+    // Commas and spaces, never slash-joined: this is the likeliest place on
+    // the page to produce a long unbreakable token at 320px.
+    receipt.textContent = "Everything else is in: " + have.join(", ") + ".";
+    card.appendChild(receipt);
+  }
+
+  const form = document.createElement("form");
+  form.className = "ask-form";
+  const inputId = "ask-" + target.id;
+  // A real <label for>, not an aria-label: scripts/check-field-accessors and
+  // the a11y sweep hold every dynamically created input to one, and the
+  // visible text and the accessible name become a single string that cannot
+  // drift apart.
+  const inputLabel = document.createElement("label");
+  inputLabel.className = "visually-hidden";
+  inputLabel.setAttribute("for", inputId);
+  inputLabel.textContent = q.textContent;
+  const field = document.createElement("input");
+  field.id = inputId;
+  field.className = "ask-input input";
+  field.type = "number";
+  field.step = "any";
+  field.inputMode = "decimal";
+  const go = document.createElement("button");
+  go.type = "submit";
+  go.className = "ask-go";
+  go.textContent = "Use it";
+  form.append(inputLabel, field, go);
+
+  const dismiss = () => clearAskCard(view);
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const value = String(field.value || "").trim();
+    if (!value) return;
+    target.value = value;
+    // The renderers are split on which event they listen to.
+    target.dispatchEvent(new Event("input", { bubbles: true }));
+    target.dispatchEvent(new Event("change", { bubbles: true }));
+    dismiss();
+  });
+  // A shortcut, never a gate: filling the real field below dismisses it too.
+  target.addEventListener("input", dismiss, { once: true });
+  target.addEventListener("change", dismiss, { once: true });
+
+  card.appendChild(form);
+  view.insertBefore(card, region);
+  // Focus is NOT moved here. renderToolView already focuses the h1 for screen
+  // reader users and a second focus call in the same microtask races it; the
+  // card is the first thing in the body, so Tab reaches it anyway.
+}
+
+function clearAskCard(view) {
+  if (!view) return;
+  for (const el of view.querySelectorAll(".ask-card")) el.remove();
 }
 
 // spec-v1341: mark the inputs a typed question filled.

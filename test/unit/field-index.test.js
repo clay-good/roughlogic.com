@@ -161,3 +161,73 @@ test("the manifest lists every shard and records a hash for each", async () => {
   assert.match(manifest.asOf, /^\d{4}-\d{2}-\d{2}$/);
   assert.ok(manifest.edition && manifest.edition.length > 0);
 });
+
+// --- spec-v1342: derived requiredness ---------------------------------------
+//
+// The registry carries no `required` flag and the obvious proxy -- a field with
+// no default -- is a guess: plenty of fields default to 0 precisely because 0
+// means absent. It is derived instead, by blanking one field at a time and
+// re-running the tile's own worked example. These pin the three rules that
+// derivation had to learn, each of which was wrong in a different direction on
+// the way here.
+
+test("requiredness simulates an EMPTY BOX, not an omitted key", async () => {
+  // asphalt-tonnage's compute has a JS default for density, so omitting the
+  // key answered fine and the field looked optional -- while the real page,
+  // which sends Number("") || 0, showed "Density must be positive."
+  const { TOOLS } = await import("../../tools-data.js");
+  const rows = await rowsFor("asphalt-tonnage", TOOLS);
+  const required = rows.filter((r) => r.r).map((r) => r.d);
+  assert.ok(required.includes("density_pcf"), "mix density is required");
+  assert.ok(required.includes("area_ft2"));
+  assert.ok(required.includes("depth_in"));
+});
+
+test("a field the example declares ABSENT is never required", async () => {
+  // ohms-law's example passes `R: null` and `P: null` -- that is how it says
+  // "solve for these". Marking them required would have the ask card demand
+  // the very number the reader came for.
+  const { TOOLS } = await import("../../tools-data.js");
+  const rows = await rowsFor("ohms-law", TOOLS);
+  const required = rows.filter((r) => r.r).map((r) => r.d).sort();
+  assert.deepEqual(required, ["I", "V"]);
+});
+
+test("a value that collapses an answer to zero is required", async () => {
+  // voltage-drop with no length answers a confident "0 V drop, 0%", which
+  // looks exactly like an answer. `phase` is genuinely optional -- it defaults
+  // to single and the tile still answers.
+  const { TOOLS } = await import("../../tools-data.js");
+  const rows = await rowsFor("voltage-drop", TOOLS);
+  const required = rows.filter((r) => r.r).map((r) => r.d);
+  assert.ok(required.includes("length_ft"), "length is required");
+  assert.ok(required.includes("current_A"), "current is required");
+  assert.ok(!required.includes("phase"), "phase defaults and must not be asked for");
+});
+
+test("requiredness is a subset of the indexed fields, never invented", async () => {
+  const dir = resolve(ROOT, "data", "fields");
+  let required = 0, total = 0;
+  for (const file of await readdir(dir)) {
+    if (file === "manifest.json") continue;
+    const shard = JSON.parse(await readFile(resolve(dir, file), "utf8"));
+    for (const rows of Object.values(shard.tiles)) {
+      for (const r of rows) {
+        total++;
+        if (r.r === undefined) continue;
+        assert.equal(r.r, 1, "the required flag is 1 or absent, never 0 or a string");
+        required++;
+      }
+    }
+  }
+  assert.ok(required > 0 && required < total, `required ${required} of ${total}`);
+});
+
+async function rowsFor(id, TOOLS) {
+  const tool = TOOLS.find((t) => t.id === id);
+  assert.ok(tool, `${id} is in the catalog`);
+  const bucket = bucketFor(tool.group, id);
+  const shard = JSON.parse(await readFile(resolve(ROOT, "data", "fields", bucket + ".json"), "utf8"));
+  assert.ok(shard.tiles[id], `${id} is indexed`);
+  return shard.tiles[id];
+}

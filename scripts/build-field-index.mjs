@@ -27,6 +27,8 @@
 //   k  the kind: number | select | checkbox | text
 //   u  the canonical unit the label declares, omitted when it declares none
 //   o  the allowed values, select fields only
+//   r  1 when the tile cannot answer without this field (spec-v1342), derived
+//      by blanking it and re-running the tile's own worked example
 //
 // A field with no label is omitted entirely. Those come from the 379 tiles
 // that degrade to compute-parameter introspection, where the extractor would
@@ -56,12 +58,83 @@ const SHARD_GZIP_CAP = 24 * 1024;
 // next day. Bump it deliberately when the descriptor shape changes.
 const EDITION_DATE = "2026-08-20";
 
-const { describe } = await import(resolve(ROOT, "mcp", "catalog.mjs"));
+const { describe, run } = await import(resolve(ROOT, "mcp", "catalog.mjs"));
 const { TOOLS } = await import(resolve(ROOT, "tools-data.js"));
 const { unitFromLabel, labelLead } = await import(resolve(ROOT, "field-units.js"));
 const { bucketFor } = await import(resolve(ROOT, "field-bucket.js"));
 
 const KINDS = new Set(["number", "select", "checkbox", "text", "textarea"]);
+
+// spec-v1342: which fields the tile CANNOT answer without.
+//
+// The renderers carry no `required` flag, and the obvious proxy -- a field
+// with no `default` -- is a guess dressed as data: plenty of fields default to
+// 0 precisely because 0 means absent ("Height above insulation (in; 0 = no
+// insulation below)"). So it is derived by experiment instead. Every one of
+// the 1,709 tiles has a publisher-verified worked example, so: run the tile on
+// its own example, then blank one field at a time and run it again.
+//
+// The test is "can it still ANSWER", not "did the answer change". On ohms-law
+// every input changes the answer, because the tile solves for whichever one
+// you leave out -- and an ask card that demands the resistance when the reader
+// came for the resistance is worse than no card at all.
+function cannotAnswer(base, trimmed) {
+  if (!trimmed || typeof trimmed !== "object") return true;
+  if (trimmed.error) return true;
+  if (!base || typeof base !== "object") return false;
+  for (const [k, v] of Object.entries(base)) {
+    if (typeof v !== "number" || !Number.isFinite(v)) continue;
+    const t = trimmed[k];
+    // The tile stopped producing this number at all.
+    if (t === undefined || t === null) return true;
+    if (typeof t === "number" && !Number.isFinite(t)) return true;
+    // A number the tile HAD, collapsed to zero. Finite, and worthless:
+    // voltage-drop with no length answers a confident "0 V drop, 0%", which
+    // looks exactly like an answer. That is precisely what the ask card is
+    // for, so it counts as not being able to answer. Checked per-output
+    // rather than across all of them, because a tile that echoes an input
+    // back ("voltage at load") keeps one number non-zero no matter what.
+    if (v !== 0 && typeof t === "number" && t === 0) return true;
+  }
+  return false;
+}
+
+async function requiredKeys(id, rows) {
+  const out = new Set();
+  let example = null;
+  try {
+    const described = await describe({ id });
+    example = described.example && described.example.inputs;
+  } catch { return out; }
+  if (!example || typeof example !== "object") return out;
+  let base;
+  try { base = await run({ id, inputs: { ...example } }); } catch { return out; }
+  for (const row of rows) {
+    if (!(row.d in example)) continue;
+    // An example that passes `R: null` is DECLARING the field absent -- that is
+    // how ohms-law says "solve for R". Blanking what was never supplied
+    // measures nothing.
+    const given = example[row.d];
+    if (given === null || given === undefined || given === "") continue;
+    // Simulate what the BROWSER sends for an empty box, not what `run()` does
+    // for an omitted key. The declarative renderer passes
+    // `Number(input.value) || 0`, so an empty numeric field arrives as 0 --
+    // it never reaches the compute's own default parameter. Deleting the key
+    // instead let asphalt-tonnage fall back to its 145 pcf default and look
+    // optional, while the real page showed "Density must be positive."
+    const trimmed = { ...example };
+    if (row.k === "number" || row.k === undefined) trimmed[row.d] = 0;
+    else if (row.k === "text" || row.k === "textarea") trimmed[row.d] = "";
+    else delete trimmed[row.d];
+    try {
+      const result = await run({ id, inputs: trimmed });
+      if (cannotAnswer(base.result, result.result)) out.add(row.d);
+    } catch {
+      out.add(row.d);
+    }
+  }
+  return out;
+}
 
 function rowFor(field) {
   if (!field || typeof field.key !== "string" || !field.key) return null;
@@ -108,6 +181,10 @@ for (const tool of TOOLS) {
     }
     keys.add(r.d);
   }
+  // spec-v1342: mark the fields the tile cannot answer without.
+  const required = await requiredKeys(tool.id, rows);
+  for (const r of rows) if (required.has(r.d)) r.r = 1;
+
   const g = bucketFor(tool.group, tool.id);
   if (!shards.has(g)) shards.set(g, {});
   shards.get(g)[tool.id] = rows;

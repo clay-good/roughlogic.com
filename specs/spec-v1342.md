@@ -1,6 +1,6 @@
 # spec-v1342.md — Ask for the missing value, in words
 
-> Status: **PLANNED.** Part of [scope-one-box](scope-one-box.md).
+> Status: **SHIPPED (2026-08-20).** Part of [scope-one-box](scope-one-box.md).
 > Depends on [v1340](spec-v1340.md), [v1341](spec-v1341.md). Adds one field to the v1339 index.
 > Catalog stays **1,709**.
 
@@ -58,6 +58,34 @@ the question from the **rendered `<label for>` text in the tile body** — the s
 already reading beside that input. `queryFill` returns field keys and those keys are DOM ids, so
 `document.querySelector('label[for="<key>"]')` is a direct lookup. **Where no label is found,
 render no card.** Fail quiet.
+
+## The derivation took three attempts, and each wrong turn is worth keeping
+
+The rule is "blank a field, re-run the tile's own worked example, see if it can still answer."
+Getting from that sentence to something correct meant being wrong three times, in three different
+directions.
+
+| Attempt | What it marked | Why it was wrong |
+|---|---|---|
+| "the answer CHANGED" | 2,979 fields | On `ohms-law` every input changes the answer, because the tile solves for whichever one you leave out. The card would have asked for the resistance when the reader came for the resistance. |
+| "the tile can no longer answer", by **deleting the key** | 2,216 | `run()` falls back to the compute's own JS default, so `asphalt-tonnage` quietly used its 145 pcf default and density looked optional — while the real page showed *"Density must be positive."* **The browser sends `Number("") \|\| 0` for an empty box; it never reaches that default.** |
+| "…by **zeroing** the field" | 3,405 | Faithful to the browser, but `voltage-drop` with no length answers a confident **0 V drop, 0%** — finite, and exactly the confident-wrong-number the card exists for. |
+| **shipped:** zeroing, **plus any output that collapses to zero** | **3,846 (71.7%)** | Checked per-output rather than across all of them, because a tile that echoes an input back ("voltage at load") keeps one number non-zero no matter what. |
+
+One more rule fell out of it: **a field the example declares absent is never required.** `ohms-law`
+passes `R: null` and `P: null` — that is how it says *solve for these* — and blanking what was
+never supplied measures nothing.
+
+The result reads correctly on every tile checked by hand:
+
+| | |
+|---|---|
+| `ohms-law` | `V`, `I` — the two you must give, not the two you came for |
+| `voltage-drop` | the five real inputs; **not** `phase`, which defaults to single |
+| `asphalt-tonnage` | area, depth, density; **not** paving width, which only affects a secondary line |
+
+The whole pass costs **0.6 s** across 1,331 tiles, so it lives in `build-field-index.mjs` with
+`--check` catching drift, alongside the rest of the index's cost.
 
 ## Gotchas
 

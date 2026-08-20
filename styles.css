@@ -1829,3 +1829,64 @@ select.is-autofilled,
 textarea.is-autofilled {
   border-color: var(--accent);
 }
+
+/* ============================================================
+   spec-v1342: the ask card.
+
+   A question, not a result -- so it is deliberately NOT inside
+   the aria-live output region, and it hides the answer while it
+   is open. A tile whose compute reads a blank required field as
+   zero renders a confident "0.0 V" that looks exactly like an
+   answer sitting above the question asking for the value it
+   needed.
+   ============================================================ */
+.ask-card {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--bg-secondary);
+}
+
+.ask-card ~ .output-region { display: none; }
+
+.ask-q {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.ask-receipt {
+  margin: var(--space-2) 0 0;
+  font-size: 0.9375rem;
+  color: var(--fg-dim);
+  overflow-wrap: anywhere;
+}
+
+.ask-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.ask-input {
+  flex: 1 1 8rem;
+  min-width: 0;
+  min-height: var(--touch-min);
+}
+
+.ask-go {
+  min-height: var(--touch-min);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ask-go:hover,
+.ask-go:focus-visible { filter: brightness(1.1); }

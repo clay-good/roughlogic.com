@@ -4,7 +4,7 @@
 > Adapts the shipped sophiewell.com program (`spec-v751`–`v758`) to this catalog and this
 > catalog's traffic. No tile is added, removed, or renumbered. The catalog stays **1,709**.
 >
-> **v1339, v1340, v1341, v1345, and v1346 shipped.** The rest are specified below.
+> **v1339, v1340, v1341, v1342, v1345, and v1346 shipped.** The rest are specified below.
 
 ## The product in one line
 
@@ -78,7 +78,7 @@ lands before any pixel moves; the additive nav work lands before any link is rem
 | [v1346](spec-v1346.md) | Gate both doors: every tile searchable **and** MCP-runnable | — | none |
 | ~~[v1340](spec-v1340.md)~~ | ~~`query-fill.js` — query + tile → filled, missing, unmatched~~ **SHIPPED** | v1339 | none |
 | ~~[v1341](spec-v1341.md)~~ | ~~Enter routes to the answer, with provenance on every filled field~~ **SHIPPED** | v1340 | behaviour |
-| [v1342](spec-v1342.md) | Ask for the first missing value, in words | v1341 | behaviour |
+| ~~[v1342](spec-v1342.md)~~ | ~~Ask for the first missing value, in words~~ **SHIPPED** | v1341 | behaviour |
 | [v1343](spec-v1343.md) | Two or three plain choices when the query is ambiguous | v1341 | behaviour |
 | ~~[v1345](spec-v1345.md)~~ | ~~`/tools/` — every calculator by category — and the footer badge~~ **SHIPPED** | v1346 | none |
 | [v1337](spec-v1337.md) | The home page becomes one box. **All 21 trade links kept.** | v1345 | low |
@@ -120,8 +120,10 @@ Every spec in this program is held to all four. [v1346](spec-v1346.md) and the e
 default and resolves 63.3% of fields. **A bare `(C)` is never Celsius** — in this catalog it is as
 often Hazen-Williams or Manning's coefficient.
 
-**2. There is no `required` flag.** v1342 derives it honestly, by blanking one field at a time and
-seeing whether the compute still answers — not by guessing from a missing `default`.
+**2. There is no `required` flag.** ~~v1342 derives it~~ **Solved in [v1342](spec-v1342.md)**:
+3,846 of 5,367 fields (71.7%), derived by zeroing one field at a time and re-running the tile's own
+worked example. Zeroing, not deleting — the browser sends `Number("") || 0` for an empty box and
+never reaches the compute's own default.
 
 **3. 378 tiles have names but no labels.** They degrade to compute-parameter introspection, so the
 extractor sees `area_ft2` and no human text. They get the same treatment sophiewell gave its
