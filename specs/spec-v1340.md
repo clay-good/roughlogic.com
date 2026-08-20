@@ -7,7 +7,7 @@
 ## Why
 
 `data/search/slots.json` turns typed quantities into a prefilled tile and covers **49 tiles**.
-[v1339](spec-v1339.md) put the descriptors for **1,330** tiles in the browser's reach. This spec
+[v1339](spec-v1339.md) put the descriptors for **1,331** tiles in the browser's reach. This spec
 is the code that spends them.
 
 It is the substrate for v1341–v1344 and it ships **invisible**: nothing on screen changes, the
@@ -80,7 +80,7 @@ found was smaller than reaching into the existing parsers.
 ## Not in scope
 
 - **`slots.json`'s 49 templates stay and keep winning where they fire.** They carry hand-verified
-  unit spellings the generic path cannot claim. `queryFill` is the fallback for the other 1,281
+  unit spellings the generic path cannot claim. `queryFill` is the fallback for the other 1,282
   indexed tiles and never overrides a template hit. Folding them together is a later question,
   worth asking only once the generic path has proven equal on all 49.
 - Requiredness. `missing` here means "unfilled", not "required" — there is no `required` flag in

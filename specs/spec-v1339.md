@@ -17,7 +17,7 @@ never getting done — so `voltage drop 120v 150 ft` lands prefilled and
 The metadata to do this generically looks like it lives in 57 `calc-*.js` modules. It does not.
 It already exists in machine-readable form: the declarative renderers carry `render.schema.inputs`,
 and `test/fixtures/bespoke-schemas.js` carries the statically-extracted equivalent for the
-hand-written ones. Between them that is **7,322 field descriptors across 1,330 tiles** — the key,
+hand-written ones. Between them that is **7,323 field descriptors across 1,331 tiles** — the key,
 the human label, the kind, and the allowed values of every input the catalog renders. Nothing in
 the browser reads a byte of it.
 
@@ -38,7 +38,7 @@ browser knows a tile's group from `TOOLS` before it wants that tile's fields, so
 filename with no manifest fetch, and the service worker pre-caches by the same pattern.
 
 ```
-21 shards · 1,330 tiles · 5,366 fields · 93.2 KB gzip total · largest 16.5 KB
+21 shards · 1,331 tiles · 5,367 fields · 93.2 KB gzip total · largest 16.5 KB
 ```
 
 ## The unit lives in the label, and the label is only sometimes a unit
@@ -57,7 +57,7 @@ So `unitFromLabel` is deliberately narrow and refuses by default: take the trail
 only if it closes the label, keep the first comma- or semicolon-delimited segment, and accept it
 **only** if that segment is a known unit. `ft, optional` → `ft`. `1.0 NW, 0.75 LW` → nothing.
 
-**3,397 of 5,366 fields (63.3%) resolve a unit.** The rest carry none, which is the correct
+**3,398 of 5,367 fields (63.3%) resolve a unit.** The rest carry none, which is the correct
 answer, not a gap: a field with no declared unit simply cannot be matched by unit agreement.
 
 ### The trap that would have shipped a wrong number
@@ -83,7 +83,7 @@ and looks like the feature simply not working. One module, one rule, no way to d
 
 ## What is deliberately not in the index
 
-- **Fields with no label — 1,956 of them, and 379 tiles entirely.** Those tiles degrade to
+- **Fields with no label — 1,955 of them, and 378 tiles entirely.** Those tiles degrade to
   compute-parameter introspection, where the descriptor is `area_ft2` and no human text. Matching
   a query against a machine key is guessing. They are omitted, and they keep working exactly as
   they do today.
@@ -115,6 +115,10 @@ and looks like the feature simply not working. One module, one rule, no way to d
   fresh deploy once 404'd `v5-platform.js`. They ship now rather than in v1340 so the precache
   list does not churn twice; `check-dist` still reports the same 3 pre-existing orphan warnings.
 - Do not add a `data/fields/` entry to `expected-hashes.json`. These regenerate.
+- **The index tracks the catalog, and the catalog moves.** Rebasing onto a `main` that had
+  landed `c3745a40` (nine tools the input-side parity lens could not see) gave `pipe-sizing` a
+  schema and the index grew by a field — `--check` caught it, which is the gate working as
+  intended. Regenerate after any rebase; never hand-edit a shard to make the gate quiet.
 
 ## Proof
 

@@ -53,7 +53,7 @@ server. Measured across the whole catalog:
 | Tiles reachable in the search dropdown by their own name | **1,709 / 1,709** (1,704 rank first) |
 | Tiles runnable through the MCP server | **1,709 / 1,709** |
 | Tiles with a publisher-verified worked example | **1,709 / 1,709** |
-| Tiles whose inputs the field index describes (v1339) | 1,330 |
+| Tiles whose inputs the field index describes (v1339) | 1,331 |
 
 Both doors are at 100% **today, by luck rather than by construction** — no gate asserts either
 one. A renamed export, a tile added without a `COMPUTE_MAP` row, or a name that collides its way
@@ -108,7 +108,7 @@ Every spec in this program is held to all four. [v1346](spec-v1346.md) and the e
 
 | | |
 |---|---|
-| **The field registry** | 1,330 tiles carry `render.schema` or a `BESPOKE_SCHEMAS` entry. `key` **is** the DOM id, so a filled field and a hash param are the same string. |
+| **The field registry** | 1,331 tiles carry `render.schema` or a `BESPOKE_SCHEMAS` entry. `key` **is** the DOM id, so a filled field and a hash param are the same string. |
 | **A quantity parser** | `search-discovery.extractQuantities()` already pulls `{value, unit}` out of a typed query. |
 | **A shared ranker** | `rankTools()` is used by the browser *and* the MCP server, so recall cannot drift between them. |
 | **Deep links that work** | `applyHashState` already dispatches **both** `input` and `change` — the pre-existing bug sophiewell's v754 had to fix does not exist here. |
@@ -123,7 +123,7 @@ often Hazen-Williams or Manning's coefficient.
 **2. There is no `required` flag.** v1342 derives it honestly, by blanking one field at a time and
 seeing whether the compute still answers — not by guessing from a missing `default`.
 
-**3. 379 tiles have names but no labels.** They degrade to compute-parameter introspection, so the
+**3. 378 tiles have names but no labels.** They degrade to compute-parameter introspection, so the
 extractor sees `area_ft2` and no human text. They get the same treatment sophiewell gave its
 unlabelled cases: **no card rather than a bad one.** They keep working exactly as today, and
 v1346 keeps them reachable and runnable.

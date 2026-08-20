@@ -55,7 +55,7 @@ same flag. Otherwise this feature will be silently dead and every test will pass
 
 - The `Needs …` line is generated from field labels. Same restraint as [v1342](spec-v1342.md):
   short, human, two or three input names then stop — and **no card rather than a bad one**. A tile
-  outside the 1,330 indexed has no `Needs` line; render the option without it, not with a blank one.
+  outside the 1,331 indexed has no `Needs` line; render the option without it, not with a blank one.
 - Options are `button`s, not links, and route through the **same** code path as the listbox so
   focus handling, hash building, and provenance stay in one place.
 - Each option is a 44px touch target (`--touch-min` is 48px here) and three stacked cards must

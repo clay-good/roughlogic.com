@@ -11,7 +11,7 @@ pick a tile, describe to learn its input keys, run to compute, re-typing values 
 itself.
 
 If a large share of the ~20k/mo really is agent traffic, that is the single highest-leverage
-change in this program. The website goes from 49 tiles of extraction to 1,330 in
+change in this program. The website goes from 49 tiles of extraction to 1,331 in
 [v1340](spec-v1340.md); agents should not be left on the old path.
 
 And it is nearly free here: `mcp/catalog.mjs` already imports the renderers directly, so the same

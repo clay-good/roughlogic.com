@@ -11,7 +11,7 @@ asked a question and got a filing cabinet.
 Enter already routes to the top match, and `prefillHash()` already carries typed quantities into
 the hash — for the **49 tiles** in `slots.json`. For the other 1,660 the tile opens empty and the
 values the reader just typed are thrown away. [v1340](spec-v1340.md) makes those values usable for
-1,330 tiles. This spec spends them.
+1,331 tiles. This spec spends them.
 
 ## What it does
 

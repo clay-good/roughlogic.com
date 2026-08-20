@@ -30,7 +30,7 @@ field, run the tile's own compute, and compare.
 | a different finite answer | **required** — it is load-bearing |
 | an identical answer | optional |
 
-That is a build step over ~5,300 fields, it is mechanical, and it is checkable. It writes `r: 1`
+That is a build step over ~5,367 fields, it is mechanical, and it is checkable. It writes `r: 1`
 onto the v1339 rows and the shards regenerate with it. **A field the extractor cannot see is never
 marked required** — the 1,956 unlabelled fields stay out of the index, so the card can never ask
 for something it cannot name.
