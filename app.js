@@ -1569,6 +1569,21 @@ const state = {
   route: { view: "home", id: null, params: {} },
 };
 
+// spec-v1341: which fields the reader's own words filled, for the one
+// navigation that is about to happen.
+//
+// This is deliberately NOT read off the hash. A deep link someone was sent and
+// a query someone just typed produce an identical hash, so reading provenance
+// from the URL would make a shared link claim its recipient typed it. It lives
+// in memory, is consumed by the very next renderToolView, and is cleared
+// there whether it was used or not.
+let pendingProvenance = null;
+
+// The words the reader typed, for the one navigation that is about to happen.
+let pendingQuery = null;
+
+const PROVENANCE_TEXT = "from your question";
+
 // Boot.
 document.addEventListener("DOMContentLoaded", boot);
 
@@ -1699,6 +1714,126 @@ function navigateTo(hash) {
 }
 
 // --- Tool view shell ---
+
+// spec-v1341: resolve the field index's rows to this tile's actual inputs.
+//
+// The index is keyed by the RENDERER's field key, and that is not reliably the
+// DOM id. Hand-written renderers name their inputs for the page (`vd-src`,
+// `vd-len`) while their schema is keyed by the compute's parameters
+// (`source_voltage_V`, `length_ft`), and the declarative factory uses
+// `f.id || f.key`, so a tile that declares an explicit id diverges too.
+// Assuming the two are the same -- which spec-v1339 originally recorded as
+// fact -- puts values into the wrong boxes or into no box at all.
+//
+// So nothing is assumed: each row is resolved against the LIVE DOM, first by
+// id, then by the rendered <label> text, which the index already carries and
+// which is the string a human reads beside that input. A row that resolves to
+// neither is skipped. Silence is the correct failure here.
+function resolveFields(region, rows) {
+  const out = new Map();
+  if (!region || !Array.isArray(rows)) return out;
+  const byLabel = new Map();
+  for (const label of region.querySelectorAll("label[for]")) {
+    const key = String(label.textContent || "")
+      .replace(/\s*\([^()]*\)\s*$/, "").trim().toLowerCase();
+    if (key && !byLabel.has(key)) byLabel.set(key, label.getAttribute("for"));
+  }
+  const taken = new Set();
+  for (const row of rows) {
+    let el = null;
+    try { el = region.querySelector("#" + CSS.escape(row.d)); } catch { el = null; }
+    if (!el) {
+      const domId = byLabel.get(String(row.l || "").trim().toLowerCase());
+      if (domId && !taken.has(domId)) {
+        try { el = region.querySelector("#" + CSS.escape(domId)); } catch { el = null; }
+      }
+    }
+    if (!el || taken.has(el.id)) continue;
+    taken.add(el.id);
+    out.set(row.d, el);
+  }
+  return out;
+}
+
+// spec-v1341: fill this tile's inputs from the words the reader typed.
+//
+// Runs after the renderer has mounted and after applyHashState, so it can see
+// the real inputs and can avoid touching anything the hash already set -- a
+// deep link's values are the reader's, not ours to revise. Whatever it writes,
+// the existing wireHashState picks up from the DOM and encodes into the URL,
+// so a prefilled answer is still a shareable link without this path having to
+// build one.
+//
+// It runs even when a slots.json template already fired, because a template
+// covers only the fields someone hand-listed: on `voltage-drop` the template
+// set source/length/current and left the AWG select on its first option, so a
+// reader who typed "12 awg" got an answer computed at 18 AWG with no sign
+// anything had been ignored.
+function applyQueryPrefill(region, id, params) {
+  const pending = pendingQuery;
+  pendingQuery = null;
+  if (!pending || pending.id !== id || !region) return;
+  const tool = TOOLS.find((t) => t.id === id);
+  if (!tool) return;
+  import("./query-fill.js").then(async (mod) => {
+    const rows = await mod.loadFields(id, tool.group);
+    if (!rows || !region.isConnected) return;
+    const { filled } = mod.queryFill(pending.text, rows);
+    const resolved = resolveFields(region, rows);
+    const marked = new Set();
+    for (const [key, value] of Object.entries(filled)) {
+      const el = resolved.get(key);
+      if (!el || !el.id) continue;
+      if (Object.prototype.hasOwnProperty.call(params, el.id)) continue;  // the hash owns it
+      if (el.type === "checkbox") el.checked = value === "1" || value === "true";
+      else el.value = String(value);
+      // Renderers are split on which event they listen to; dispatch both,
+      // exactly as applyHashState does.
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+      el.dispatchEvent(new Event("change", { bubbles: true }));
+      marked.add(el.id);
+    }
+    // Fields the hash filled from the same typed question are the reader's
+    // words too, so they are captioned alongside.
+    for (const key of Object.keys(params)) if (key !== "v") marked.add(key);
+    markProvenance(region, marked);
+  }).catch(() => { /* prefill is an enhancement; the form is always there */ });
+}
+
+// spec-v1341: mark the inputs a typed question filled.
+//
+// This is the verification affordance -- the whole reason a card beats a chat
+// bubble. A tradesperson who sees `120 V - 150 ft - 12 AWG - 20 A` captioned
+// under the answer catches a mis-parse in about a second; without the caption
+// a prefilled field is indistinguishable from one they typed themselves.
+//
+// The caption is a <span>, not a <p class="muted">: collapseLongNotes folds
+// direct p.muted children of the tool body and would otherwise swallow these.
+// It also stays OUT of the output region, which is aria-live -- a caption
+// announced as part of the answer on every keystroke is noise.
+function markProvenance(region, keys) {
+  if (!region || !keys || !keys.size) return;
+  for (const key of keys) {
+    let el;
+    try { el = region.querySelector("#" + CSS.escape(key)); } catch { el = null; }
+    if (!el) continue;
+    const field = el.closest(".field") || el.parentElement;
+    if (!field || field.querySelector(".field-provenance")) continue;
+    el.classList.add("is-autofilled");
+    const note = document.createElement("span");
+    note.className = "field-provenance";
+    note.textContent = PROVENANCE_TEXT;
+    field.appendChild(note);
+    // The first edit makes it the reader's value, not ours. `once` so the
+    // listener cannot pile up across re-renders of the same field.
+    const clear = () => {
+      el.classList.remove("is-autofilled");
+      if (note.parentElement) note.remove();
+    };
+    el.addEventListener("input", clear, { once: true });
+    el.addEventListener("change", clear, { once: true });
+  }
+}
 
 function renderToolView(id, params) {
   const tool = TOOLS.find((t) => t.id === id);
@@ -1862,6 +1997,10 @@ function renderToolView(id, params) {
       renderer(inputRegion, outputRegion, citation, params || {});
       libs.applyHashState(inputRegion, params || {});
       libs.wireHashState(inputRegion, id);
+      // spec-v1341: caption the fields the reader's own words filled. Consumed
+      // once, and cleared whether or not it was used, so the next navigation
+      // starts clean.
+      applyQueryPrefill(inputRegion, id, params || {});
       if (params && params.example === "1") {
         const exBtn = inputRegion.querySelector("button");
         if (exBtn && /example/i.test(exBtn.textContent || "")) exBtn.click();
@@ -1999,6 +2138,7 @@ function bindSearch() {
     return tool.id + "?v=1&" + new URLSearchParams(params).toString();
   }
 
+
   // spec-v592 live answer preview. The map is a lazy shard; the compute
   // is the same lazily-imported module export the tile itself calls. Any
   // failure renders nothing: the preview only ever adds to a result row.
@@ -2116,6 +2256,11 @@ function bindSearch() {
     setExpanded(false);
     setActive(-1);
     input.blur();
+    // spec-v1341: the generic fill runs AFTER the tile renders, against the
+    // live DOM -- see applyQueryPrefill. The hand-written slot template still
+    // builds the hash where it fires, because it carries unit spellings
+    // verified against the tile's own renderer.
+    pendingQuery = typed ? { id: tool.id, group: tool.group, text: typed } : null;
     navigateTo(prefillHash(tool, typed));
   }
 

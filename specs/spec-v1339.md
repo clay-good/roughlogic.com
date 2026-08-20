@@ -27,7 +27,7 @@ the browser reads a byte of it.
 
 | | |
 |---|---|
-| `d` | the field key — which in this catalog is **also the DOM input id**, so a filled field and a hash-state param are the same string |
+| `d` | the field key. **NOTE: this is _not_ reliably the DOM input id** — the original version of this spec said it was, and [v1341](spec-v1341.md) found otherwise on the first tile it opened. Hand-written renderers name their inputs for the page (`vd-src`) while their extracted schema is keyed by the compute's parameters (`source_voltage_V`), and the declarative factory builds ids as `f.id \|\| f.key`. Resolve a row to an element against the live DOM — by id, then by the rendered `<label>` text `l` carries — never by assuming. |
 | `l` | the label lead: the human text with its trailing unit stripped |
 | `k` | `number` / `select` / `checkbox` / `text` |
 | `u` | the canonical unit the label declares, **omitted when it declares none** |
@@ -83,6 +83,12 @@ and looks like the feature simply not working. One module, one rule, no way to d
 
 ## What is deliberately not in the index
 
+- **A guarantee this spec should not have made.** The row-shape note above originally claimed the
+  field key is also the DOM id, on the strength of it being true for the declarative factory's
+  default path. It is false for every hand-written renderer in the catalog. It cost nothing here —
+  this spec only writes JSON — but v1341 was designed on top of it and would have shipped a hash
+  full of parameters matching no input. **Verify a claim like that against a rendered page before
+  writing it down as fact.**
 - **Fields with no label — 1,955 of them, and 378 tiles entirely.** Those tiles degrade to
   compute-parameter introspection, where the descriptor is `area_ft2` and no human text. Matching
   a query against a machine key is guessing. They are omitted, and they keep working exactly as

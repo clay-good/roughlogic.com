@@ -305,6 +305,16 @@ export function queryFill(query, rows) {
     // field.
     for (const row of rows) {
       if (row.k === "select" || row.k === "checkbox") {
+        // A select only competes for a number it could actually HOLD. On
+        // `lv-dc-drop` the System-voltage select offers 12/24/48 and the query
+        // says 12, so it is a genuine rival for that fragment and the nearby
+        // "Device min voltage" field must not take it unopposed. On
+        // `drainage-invert` the Slope-units select offers in_per_ft/percent
+        // and the query says 2, which it can never hold -- treating it as a
+        // rival there burned the fragment and cost 237 fills catalog-wide for
+        // no safety gain.
+        if (!Array.isArray(row.o)) continue;
+        if (!row.o.some((o) => String(o) === String(qty.value))) continue;
         const terms = termsByRow.get(row.d);
         for (const t of terms) {
           const at = window.lastIndexOf(t);
@@ -333,6 +343,15 @@ export function queryFill(query, rows) {
     }
   });
 
+  // A fragment that named TWO fields is ambiguous, and it stays ambiguous.
+  // Burning it here is the point: without this, "slope 2 in per ft" -- where
+  // "slope" names both the Slope field and its Slope-units select -- falls
+  // through Phase A's veto into Phase B, which matches the bare `in` against
+  // the tile's Pipe OD field and writes a 2 into it. A weaker rule must never
+  // get to re-home a fragment a stronger rule already refused.
+  const burned = new Set();
+  for (const [qi, hits] of rowsFor) if (hits.length > 1) burned.add(qi);
+
   // Resolve only the unambiguous pairs: one field wanted by one fragment, and
   // that fragment wanting only that field. Everything else is dropped.
   for (const [qi, hits] of rowsFor) {
@@ -352,7 +371,7 @@ export function queryFill(query, rows) {
   // field when EXACTLY ONE unfilled field can accept its unit. A unitless
   // number never reaches here -- it would match everything.
   quantities.forEach((qty, qi) => {
-    if (claimed.has(qi)) return;
+    if (claimed.has(qi) || burned.has(qi)) return;
     const qtyUnit = canonicalUnit(rawUnitOf(qty, text));
     if (!qtyUnit) return;
     const compatible = numberRows.filter(
@@ -403,6 +422,26 @@ export function queryFill(query, rows) {
     // One token claimed by two fields fills neither.
     if ((optionClaims.get(choice.toLowerCase()) || []).length !== 1) continue;
     filled[key] = choice;
+  }
+
+  // --- The unit-select veto ------------------------------------------------
+  // 22 tiles put the unit in a SELECT beside the number rather than in the
+  // number's label -- drainage-invert's "Slope" with a `slope_units` of
+  // in_per_ft|percent, refrigerant-charging's "Suction pressure" with
+  // psig|psia. Those number fields correctly declare no unit of their own, so
+  // nothing above can check one.
+  //
+  // That makes an unfilled unit select dangerous: "slope 2 in per ft" fills
+  // slope=2 by name while the select sits on whatever it defaults to, and if
+  // that default is `percent` the tile computes a slope forty times too steep
+  // with no sign anything is wrong. So when a unit select is left unfilled,
+  // every UNITLESS number this query filled is dropped. Fields that carry
+  // their own unit are unaffected -- they were checked on the way in.
+  const unitSelects = selectRows.filter((r) => /\bunits?\b/i.test(r.d) || /\bunits?\b/i.test(r.l));
+  if (unitSelects.some((r) => !(r.d in filled))) {
+    for (const r of numberRows) {
+      if (!rowUnit(r) && r.d in filled) delete filled[r.d];
+    }
   }
 
   // --- The ambiguous pair veto --------------------------------------------

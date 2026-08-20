@@ -1804,3 +1804,28 @@ input[aria-invalid="true"] {
 @media (max-width: 600px) {
   .ti-list { columns: 1; }
 }
+
+/* ============================================================
+   spec-v1341: provenance on a field the reader's question filled.
+
+   The caption is the verification affordance -- it is what lets
+   someone catch a mis-parse at a glance -- so it is styled to be
+   read, not to be decorative. Kept at the meta floor (0.9375rem)
+   rather than shrunk, and the string stays short so a 16-field
+   tile does not overflow at 320px.
+   ============================================================ */
+.field-provenance {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: 0.9375rem;
+  color: var(--fg-dim);
+  overflow-wrap: anywhere;
+}
+
+.input.is-autofilled,
+.select.is-autofilled,
+input.is-autofilled,
+select.is-autofilled,
+textarea.is-autofilled {
+  border-color: var(--accent);
+}

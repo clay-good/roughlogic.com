@@ -4,7 +4,7 @@
 > Adapts the shipped sophiewell.com program (`spec-v751`–`v758`) to this catalog and this
 > catalog's traffic. No tile is added, removed, or renumbered. The catalog stays **1,709**.
 >
-> **v1339, v1340, v1345, and v1346 shipped.** The rest are specified below.
+> **v1339, v1340, v1341, v1345, and v1346 shipped.** The rest are specified below.
 
 ## The product in one line
 
@@ -77,7 +77,7 @@ lands before any pixel moves; the additive nav work lands before any link is rem
 | ~~v1339~~ | ~~The field index: `data/fields/*.json` from the renderers' own schemas~~ **SHIPPED** | — | none |
 | [v1346](spec-v1346.md) | Gate both doors: every tile searchable **and** MCP-runnable | — | none |
 | ~~[v1340](spec-v1340.md)~~ | ~~`query-fill.js` — query + tile → filled, missing, unmatched~~ **SHIPPED** | v1339 | none |
-| [v1341](spec-v1341.md) | Enter routes to the answer, with provenance on every filled field | v1340 | behaviour |
+| ~~[v1341](spec-v1341.md)~~ | ~~Enter routes to the answer, with provenance on every filled field~~ **SHIPPED** | v1340 | behaviour |
 | [v1342](spec-v1342.md) | Ask for the first missing value, in words | v1341 | behaviour |
 | [v1343](spec-v1343.md) | Two or three plain choices when the query is ambiguous | v1341 | behaviour |
 | ~~[v1345](spec-v1345.md)~~ | ~~`/tools/` — every calculator by category — and the footer badge~~ **SHIPPED** | v1346 | none |
@@ -108,7 +108,7 @@ Every spec in this program is held to all four. [v1346](spec-v1346.md) and the e
 
 | | |
 |---|---|
-| **The field registry** | 1,331 tiles carry `render.schema` or a `BESPOKE_SCHEMAS` entry. `key` **is** the DOM id, so a filled field and a hash param are the same string. |
+| **The field registry** | 1,331 tiles carry `render.schema` or a `BESPOKE_SCHEMAS` entry. (`key` is **not** reliably the DOM id — see [v1341](spec-v1341.md); resolve against the live DOM by id, then by rendered label.) |
 | **A quantity parser** | `search-discovery.extractQuantities()` already pulls `{value, unit}` out of a typed query. |
 | **A shared ranker** | `rankTools()` is used by the browser *and* the MCP server, so recall cannot drift between them. |
 | **Deep links that work** | `applyHashState` already dispatches **both** `input` and `change` — the pre-existing bug sophiewell's v754 had to fix does not exist here. |
