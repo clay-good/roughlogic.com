@@ -1,8 +1,10 @@
 # scope-one-box.md — One box in, an instrument out
 
-> Status: **PLANNED (2026-08-20).** Nine specs, `spec-v1337` through `spec-v1345`.
-> Ports the shipped sophiewell.com program (`spec-v751`–`spec-v758`) onto this catalog.
-> No tile is added, removed, or renumbered. The catalog stays **1,709** throughout.
+> Status: **IN PROGRESS.** Eleven specs, `spec-v1337` through `spec-v1347`.
+> Adapts the shipped sophiewell.com program (`spec-v751`–`v758`) to this catalog and this
+> catalog's traffic. No tile is added, removed, or renumbered. The catalog stays **1,709**.
+>
+> **v1339 shipped** (`0338fead`). The rest are specified below.
 
 ## The product in one line
 
@@ -15,118 +17,130 @@ The output is a number that goes on a panel schedule, not prose. Three reasons t
 
 | | |
 |---|---|
-| **Verification** | `2.9 V drop` in a chat bubble has to be trusted. `120 V · 150 ft · 12 AWG · 20 A` sitting under the 2.9 catches a mis-parse in a second. That glance is the whole safety story. |
+| **Verification** | `2.9 V drop` in a chat bubble has to be trusted. `120 V · 150 ft · 12 AWG · 20 A` sitting under the 2.9 catches a mis-parse in a second. |
 | **Posture** | A chat box invites "is this to code?". A box that returns an instrument never makes that offer. The site stays a math aid, which is what every NOTICE on it already says. |
-| **Scrollback** | On a truck at 6am the current number should fill the screen, not sit under three previous jobs'. `search → find → use → leave` is still right. |
+| **Scrollback** | On a truck at 6am the current number should fill the screen, not sit under three previous jobs'. |
 
-What we want *from* chat needs no model: type how you talk, see what the machine understood, and be
-asked for what is missing instead of handed a blank form. All three are deterministic table lookup.
-**No model runs, local or remote.** That keeps the home page's "no AI, no tracking" claim true.
+**No model runs, local or remote.** Every step is regex and table lookup. That is what keeps the
+home page's "no signup, no tracking, no AI" claim literally true.
+
+## The traffic constrains the design
+
+~20k/mo at the DNS layer, 120 Google clicks in the last 28 days, and the top organic landing page
+is **`/groups/construction/`**. That is not a site whose navigation should be rearranged on
+aesthetic grounds, and three measured facts set hard limits on what these specs may do:
+
+| Measured | Consequence |
+|---|---|
+| **All 1,709 tile shells link their own group hub.** `/groups/construction/` is linked by its 466 tiles. | The hubs are not fragile. The home page's 21 links are a small share of their inbound links. |
+| **The hubs cross-link by SPA hash** — `../../#group=E`, not `/groups/electrical/`. A fragment is not a crawlable URL. | Hub-to-hub link equity does **not** flow today. Removing the home nav would leave each hub reachable only from its own tiles and the sitemap. |
+| **`/tools/` is a 404**, sitting above 1,709 pre-rendered tile pages. | There is a free, zero-risk addition available before any subtraction is contemplated. |
+
+**So the nav change is split in two, and the risky half is gated on evidence.** v1345 adds
+`/tools/` and the footer badge — pure addition, nothing removed, no URL changed. v1337 simplifies
+the home page while **keeping all 21 links**, demoted to a compact strip below the box. Only
+v1347 removes them, and only after Search Console confirms `/tools/` is indexed and hub
+impressions are flat. That ordering means the site is never carrying two link-graph changes at
+once, and the one with any risk is trivially revertible.
+
+## Both doors are already open. Nothing gates them shut.
+
+The ask was that every calculator be reachable from the website's search **and** the local MCP
+server. Measured across the whole catalog:
+
+| | |
+|---|---|
+| Tiles reachable in the search dropdown by their own name | **1,709 / 1,709** (1,704 rank first) |
+| Tiles runnable through the MCP server | **1,709 / 1,709** |
+| Tiles with a publisher-verified worked example | **1,709 / 1,709** |
+| Tiles whose inputs the field index describes (v1339) | 1,330 |
+
+Both doors are at 100% **today, by luck rather than by construction** — no gate asserts either
+one. A renamed export, a tile added without a `COMPUTE_MAP` row, or a name that collides its way
+out of the top twelve would all pass CI silently. [v1346](spec-v1346.md) pins both properties, and
+it lands **early**, because it is the safety net the rest of this program is built over.
 
 ## This is not a re-theme
 
-The two sites already share a palette, a spacing scale, and a header/footer shape. The token
-*names* differ (`--fg` here, `--text-primary` there) and the accent differs on purpose —
-roughlogic's brand blue `#5aa9ff`, not sophiewell's clinical teal. **Nothing in the palette
-changes.** What is being adopted is the *product* pattern and the components it needs: the one-box
-home, the answer-first tile, and four new cards. Every new rule uses tokens that already exist.
+The two sites already share a palette, a spacing scale, and a header/footer shape. Only the token
+*names* differ, and the accent differs on purpose — roughlogic's brand blue `#5aa9ff`, not
+sophiewell's clinical teal. **Nothing in the palette changes.** What is adopted is the product
+pattern and the components it needs. Every new rule uses tokens that already exist.
 
-## What we already have that sophiewell had to build
+## The eleven specs
 
-| | |
-|---|---|
-| **The field registry** | 1,330 of 1,709 tiles carry a `render.schema` or a `BESPOKE_SCHEMAS` entry: `key`, `label`, `kind`, `options`, `default`, `attrs`. 7,322 field descriptors. `key` **is** the DOM id, so a filled field and a hash param are the same thing — sophiewell needed a `dom`/`arg` split, we do not. |
-| **A quantity parser** | `search-discovery.extractQuantities()` already pulls `{value, unit}` pairs out of a typed query, glued or spaced, fractions included. |
-| **A ranker** | `rankTools()` already scores the catalog and is shared with the MCP server, so browser and agent recall cannot drift. |
-| **Deep-link plumbing** | `buildHash`/`applyHashState` are live and versioned, and already dispatch **both** `input` and `change` — the pre-existing bug spec-v754 had to fix does not exist here. |
-| **Browsable hubs** | 21 prerendered `/groups/<slug>/` pages, in the sitemap, and linked from **every one of the 1,709 tile shells**. Half of spec-v757 is already solved; the other half — a hub for `/tools/` itself — is not, and is [v1345](spec-v1345.md). |
-| **Empty-on-open tiles** | Since `2ef4ac05` no tile opens pre-filled, and examples are click-to-fill. spec-v754's worst bug — the worked example silently topping up a partly answered question and changing the answer — **cannot happen here.** |
+Build order is **substrate first, addition before subtraction**. The invisible, CI-verifiable work
+lands before any pixel moves; the additive nav work lands before any link is removed.
 
-## What is actually missing
-
-| | |
-|---|---|
-| **Prefill reaches 49 tiles, not 1,709** | `data/search/slots.json` is hand-maintained: one row per tile, hand-picked unit tokens per param. 49 of 1,709. Which tile a typed query prefills is luck. |
-| **Enter lands on a picklist** | Typing a sentence returns twelve tool names. The reader asked a question and got a filing cabinet. |
-| **The answer is below the inputs** | `renderToolView` builds title → lead → **inputs** → **answer**. On a 16-field tile the number is off-screen. |
-| **Nothing asks for a missing value** | Three of four values typed gets you a form with one empty box and no sign which one. |
-| **Nothing carries provenance** | A prefilled field looks identical to one the reader typed. |
-
-## Two decisions, made
-
-- **The trade nav moves into an `All calculators` footer badge, beside Clay Good and GitHub.**
-  The first cut of this doc proposed demoting the nav below the fold, on the assumption that the
-  home page's 21 links were load-bearing for the hubs. **They are not**, and the numbers say so:
-
-  | | |
-  |---|---|
-  | Tile shells that already link their group hub | **1,709 of 1,709** |
-  | Home-page links to the same 21 hubs | 21 |
-  | `/tools/` — the parent of all 1,709 pre-rendered tile pages | **currently a 404** |
-
-  Each hub already carries roughly 81 inbound internal links from its own tiles. The home page's
-  21 are a rounding error on top of that, so removing them costs the hubs approximately nothing —
-  and routing the badge through a real `/tools/` index *gains* every hub a link from a page that
-  all 1,709 shells point at. The crawl graph comes out strictly ahead, not merely intact.
-
-  **The condition that makes it true:** the badge must point at a pre-rendered `/tools/` page, not
-  a JavaScript affordance. That page is [spec-v1345](spec-v1345.md), and it lands **before**
-  v1337 removes anything. It also becomes the no-JS path off the home document, and it is a better
-  one than the nav it replaces — it reaches all 1,709 tiles, where the nav reached 21 hubs.
-
-- **The accent stays roughlogic blue.** New components use the existing `--accent` /
-  `--accent-strong`, which already clear WCAG AA in both themes. No new palette tokens.
-
-## The nine specs
-
-Build order is **substrate first**: v1339 and v1340 are invisible and CI-verifiable, so the
-extraction is live and proven before any pixel moves. That sequencing is the one thing sophiewell
-called out as having earned its keep.
-
-| Spec | What it does | Depends on | Visible |
+| Spec | What it does | Depends on | Risk |
 |---|---|---|---|
-| v1339 | The field index: `data/fields/<group>.json` from the renderer schemas | — | no |
-| v1340 | `query-fill.js` — query + tile → filled, missing, unmatched | v1339 | no |
-| v1341 | Enter routes to the answer, with provenance on every filled field | v1340 | behaviour |
-| v1342 | Ask for the first missing value, in words | v1341 | yes |
-| v1343 | Two or three plain choices when the query is ambiguous | v1341 | yes |
-| v1345 | The catalog gets a page: `/tools/`, and the footer badge that reaches it | — | yes |
-| v1337 | The home page becomes one box; the trade nav moves to the badge | v1345 | yes |
-| v1338 | Answer first, inputs second | — | yes |
-| v1344 | An MCP `answer_query` that reads the same registry | v1340 | no |
+| ~~v1339~~ | ~~The field index: `data/fields/*.json` from the renderers' own schemas~~ **SHIPPED** | — | none |
+| [v1346](spec-v1346.md) | Gate both doors: every tile searchable **and** MCP-runnable | — | none |
+| [v1340](spec-v1340.md) | `query-fill.js` — query + tile → filled, missing, unmatched | v1339 | none |
+| [v1341](spec-v1341.md) | Enter routes to the answer, with provenance on every filled field | v1340 | behaviour |
+| [v1342](spec-v1342.md) | Ask for the first missing value, in words | v1341 | behaviour |
+| [v1343](spec-v1343.md) | Two or three plain choices when the query is ambiguous | v1341 | behaviour |
+| [v1345](spec-v1345.md) | `/tools/` — every calculator by category — and the footer badge | v1346 | **none: pure addition** |
+| [v1337](spec-v1337.md) | The home page becomes one box. **All 21 trade links kept.** | v1345 | low |
+| [v1338](spec-v1338.md) | Answer first, inputs second | — | low |
+| [v1344](spec-v1344.md) | An MCP `answer_query` that reads the same registry | v1340 | none |
+| [v1347](spec-v1347.md) | Retire the home trade strip — **gated on Search Console evidence** | v1337 | the only real one |
+
+## The four SEO invariants, enforced not promised
+
+Every spec in this program is held to all four. [v1346](spec-v1346.md) and the existing
+`check-dist` / `check-shells` / `build-sitemap` gates do the enforcing.
+
+1. **No URL changes and no redirects.** `/`, `/tools/<id>/`, `/groups/<slug>/` all stay exactly
+   where they are. This program adds `/tools/` and nothing else.
+2. **No group-hub shell is edited.** Titles, meta descriptions, canonicals, JSON-LD, and the
+   466-tile listings on `/groups/construction/` are untouched by all eleven specs.
+3. **The home page keeps its count surfaces.** `check-readme-counts` requires **exactly two**
+   `"<N> free calculators for"` strings in `index.html` — the JSON-LD description and the hero
+   lede. The rewritten intro keeps the count rather than retiring the surface, which is both
+   shorter copy *and* one less way for the site to drift. (sophiewell retired its equivalent
+   surface; we do not need to.)
+4. **Every hub stays reachable without JavaScript.** Today that is the home nav. After v1345 it is
+   the footer badge → `/tools/`, a pre-rendered page — and that path reaches all 1,709 tiles,
+   where the nav reached 21 hubs.
+
+## What we already had that sophiewell had to build
+
+| | |
+|---|---|
+| **The field registry** | 1,330 tiles carry `render.schema` or a `BESPOKE_SCHEMAS` entry. `key` **is** the DOM id, so a filled field and a hash param are the same string. |
+| **A quantity parser** | `search-discovery.extractQuantities()` already pulls `{value, unit}` out of a typed query. |
+| **A shared ranker** | `rankTools()` is used by the browser *and* the MCP server, so recall cannot drift between them. |
+| **Deep links that work** | `applyHashState` already dispatches **both** `input` and `change` — the pre-existing bug sophiewell's v754 had to fix does not exist here. |
+| **Empty-on-open tiles** | Since `2ef4ac05` no tile opens pre-filled. sophiewell's worst bug — the worked example silently topping up a partly answered question and changing the answer — **cannot happen here.** |
 
 ## The three problems this port has that sophiewell did not
 
-**1. Units live in the label, not in a field.** sophiewell's descriptors carry `unit: "kg"`.
-Ours carry `label: "Length one-way (ft)"` — 4,357 of 7,322 fields end in a parenthesized unit.
-The trailing-paren convention is already a governed contract (`docs/unit-notation-in-labels.md`,
-`check-us-defaults`), so it is parseable, but the parser is ours to write and it must be tested
-against the **actual distinct trailing tokens in the catalog**, not an idealized list. `(ft²)`,
-`(in⁴)`, `(°F)`, and `(C)` — which is *not* always Celsius — are all live.
+**1. Units live in the label, not in a field.** Solved in v1339: `unitFromLabel` refuses by
+default and resolves 63.3% of fields. **A bare `(C)` is never Celsius** — in this catalog it is as
+often Hazen-Williams or Manning's coefficient.
 
-**2. There is no `required` flag.** sophiewell's registry says which inputs a tile cannot answer
-without; ours does not. v1342's ask card needs one. The proposed rule: a field is required when
-its `attrs` carry no usable `default` and the compute returns non-finite without it — derived at
-build time by running each tile's compute with that one field blanked, which is cheap and honest,
-rather than hand-annotating 7,322 fields.
+**2. There is no `required` flag.** v1342 derives it honestly, by blanking one field at a time and
+seeing whether the compute still answers — not by guessing from a missing `default`.
 
-**3. 379 tiles have names but no labels.** They degrade to compute-param introspection, so the
-extractor sees `area_ft2` and no human text. Those tiles get the same treatment sophiewell gave
-its unlabelled cases: **no card rather than a bad one.** They keep working exactly as today.
+**3. 379 tiles have names but no labels.** They degrade to compute-parameter introspection, so the
+extractor sees `area_ft2` and no human text. They get the same treatment sophiewell gave its
+unlabelled cases: **no card rather than a bad one.** They keep working exactly as today, and
+v1346 keeps them reachable and runnable.
 
 ## What this program is not
 
-- **Not an LLM.** No model, no inference cost, no server, no path by which a wrong number gets
-  invented. Every step is regex and table lookup.
+- **Not an LLM.** No model, no server, no path by which a wrong number gets invented.
 - **Not query telemetry.** The home page says no tracking and that stays true. Failed queries are
-  diagnosed by running the extractor over a checked-in corpus (`test/fixtures/queries.txt`), never
-  by recording what anyone typed.
+  diagnosed against a checked-in corpus (`test/fixtures/queries.txt`), never by recording what
+  anyone typed. Given that a large share of the 20k/mo appears to be agents, this matters more
+  here than it did on sophiewell: agent traffic is exactly the kind that makes query logging look
+  cheap and useful.
 - **Not a catalog change.** 1,709 before, 1,709 after. No compute is touched.
-- **Not a palette change.** See *This is not a re-theme*.
+- **Not a palette change.**
 
-## The safety rule that governs all nine
+## The safety rule that governs all eleven
 
 **A wrong prefill is worse than no prefill.** One field with two readings fills neither. One
-fragment claimed by two fields fills neither. A number whose unit does not match the field's unit
-is refused, not converted by guess. Across sophiewell's 4,953-field measurement the extractor was
-either right or blank on every one but two, and that is the bar.
+fragment claimed by two fields fills neither. A number whose unit does not match the field's is
+refused, not converted by guess.

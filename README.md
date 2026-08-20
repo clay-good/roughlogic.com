@@ -71,7 +71,7 @@ One calculator is one formula on one screen. (In the source and the gate names b
 
 ## Why you can trust the answers
 
-The hard part of a calculator catalog is not the arithmetic. It is proving, at scale, that every tile stays correct as the catalog grows. That is a build problem here: `npm run lint` runs 42 static gates before a change can land.
+The hard part of a calculator catalog is not the arithmetic. It is proving, at scale, that every tile stays correct as the catalog grows. That is a build problem here: `npm run lint` runs 43 static gates before a change can land.
 
 | Gate | What it guarantees |
 |---|---|
@@ -103,7 +103,7 @@ The home payload gzips to well under the 100 KB budget. Opening a calculator dyn
 npm install        # dev tooling only; the site itself has zero runtime deps
 npm run dev        # serve the SPA locally
 npm run build      # emit dist/ (SPA + static shells + sitemap)
-npm run lint       # the full static-gate chain (42 checks)
+npm run lint       # the full static-gate chain (43 checks)
 npm test           # unit tests (node --test)
 npm run test:e2e   # Playwright integration suite (needs a browser)
 ```
