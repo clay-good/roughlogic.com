@@ -265,12 +265,74 @@ export function humanizeKey(key) {
 // because it is the field-name contract the MCP `run_calculator` tool takes and
 // the two surfaces must stay visibly identical. `labels` is empty for a tile
 // whose renderer carries no schema; those rows fall back to the key alone.
-function exampleRows(obj, labels) {
+// The answer a reader sees in the calculator, when the renderer's own
+// formatter agrees with the number this page is pinned to. `1200` on its own
+// does not say watts; `1200.00 W` does, and it is the exact string the tool
+// prints. Guarded three ways: the display must carry the pinned number (the
+// worked-example gate already proves the compute matches it), must be short
+// enough to stay one row on a phone, and must not be the renderer's own
+// "nothing to show" placeholder.
+const NO_ANSWER = new Set(["-", "--", "\u2014", "n/a", "na", "none", ""]);
+function displayFor(display, val, raw, label) {
+  if (typeof display !== "string") return null;
+  const d = display.trim();
+  if (d.length === 0 || d.length > 44) return null;
+  if (NO_ANSWER.has(d.toLowerCase())) return null;
+  if (typeof raw === "number") {
+    const m = d.match(/-?[\d,]*\.?\d+/);
+    if (!m) {
+      // A pass/fail line reports its number as a word. "PASS" beats "1"; any
+      // other wordless display is not this answer.
+      return (raw === 0 || raw === 1) && /^[A-Za-z][A-Za-z ]{0,14}$/.test(d) ? d : null;
+    }
+    const n = Number(m[0].replace(/,/g, ""));
+    if (!Number.isFinite(n)) return null;
+    const ok = raw === 0 ? Math.abs(n) < 1e-9 : Math.abs(n - raw) <= Math.abs(raw) * 0.01;
+    if (!ok) return null;
+    // Same stutter guard as the extracted units: "Incident energy (cal/cm^2)"
+    // has said the unit once already.
+    if (m.index === 0) {
+      const tail = d.slice(m[0].length);
+      if (tail && !withoutRepeat(tail, label)) return m[0];
+    }
+    return d;
+  }
+  if (typeof raw === "string" && raw.trim() !== "") {
+    return d.toLowerCase().includes(raw.trim().toLowerCase()) ? d : null;
+  }
+  return null;
+}
+
+// "Arc-flash boundary (in)" has already said inches; repeating it after the
+// number reads like a stutter. Drop a suffix the caption already carries.
+function withoutRepeat(suffix, label) {
+  if (!suffix || !label) return suffix;
+  // "cal/cm²" and "cal/cm^2" are the same unit spelled two ways.
+  const flat = (x) => String(x).replace(/\u00b2/g, "^2").replace(/\u00b3/g, "^3").toLowerCase();
+  const token = flat(suffix.trim().replace(/^[^A-Za-z0-9\u00b2\u00b3]+|[^A-Za-z0-9^/%\u00b2\u00b3-]+$/g, ""));
+  if (!token) return suffix;
+  const hay = flat(label);
+  const re = new RegExp("(^|[^a-z0-9])" + token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "([^a-z0-9]|$)");
+  return re.test(hay) ? "" : suffix;
+}
+
+function exampleRows(obj, labels, displays, units) {
   return Object.entries(obj || {})
     .map(([k, v]) => {
       const val = exampleValue(v);
       if (val === "") return "";
+      const raw = (v && typeof v === "object" && !Array.isArray(v) && "value" in v) ? v.value : v;
       const label = labels && labels[k];
+      // An uncaptioned row still prints a caption -- the key read back as
+      // English -- so the stutter guard has to see the same words the reader
+      // will ("Total loss db" already says decibels).
+      const caption = label || humanizeKey(k) || "";
+      // The formatter's own string first (it is exactly what the calculator
+      // prints); a hand-written renderer's extracted unit second.
+      const unit = units && units[k];
+      const shown = (displays && displayFor(displays[k], val, raw, caption))
+        || (unit && typeof raw === "number" ? unit.prefix + val + withoutRepeat(unit.suffix, caption) : null)
+        || val;
       // A named row prints the name and the number, nothing else. The raw field
       // name is the API's, not the reader's: it used to trail 5,396 of the
       // 6,791 example rows in the catalog, wrapping a two-token row onto three
@@ -282,10 +344,10 @@ function exampleRows(obj, labels) {
         // the reader parse snake_case. The key is still published verbatim on
         // the "Field names used by the API" line inside the collapsed proof.
         const readable = humanizeKey(k);
-        if (readable) return `      <li><span>${escapeHtml(readable)}</span> <b>${escapeHtml(val)}</b></li>`;
-        return `      <li><code>${escapeHtml(k)}</code> <b>${escapeHtml(val)}</b></li>`;
+        if (readable) return `      <li><span>${escapeHtml(readable)}</span> <b>${escapeHtml(shown)}</b></li>`;
+        return `      <li><code>${escapeHtml(k)}</code> <b>${escapeHtml(shown)}</b></li>`;
       }
-      return `      <li><span>${escapeHtml(label)}</span> <b>${escapeHtml(val)}</b></li>`;
+      return `      <li><span>${escapeHtml(label)}</span> <b>${escapeHtml(shown)}</b></li>`;
     })
     .filter(Boolean)
     .join("\n");
@@ -563,7 +625,7 @@ function shellFooter() {
   ].join("\n");
 }
 
-function tileShell(tool, tools, groupNames, relatedMap, examples, labels, outLabels) {
+function tileShell(tool, tools, groupNames, relatedMap, examples, labels, outLabels, outDisplays, outUnits) {
   const professionNoun = PROFESSION_NOUN[tool.trades[0]] || "Trades";
   const groupLabel = groupNames[tool.group] || tool.group;
   const groupSlug = GROUP_SLUG[tool.group] || tool.group.toLowerCase();
@@ -611,7 +673,7 @@ function tileShell(tool, tools, groupNames, relatedMap, examples, labels, outLab
         .filter((k, i, all) => all.indexOf(k) === i)
         .filter((k) => exampleValue((example.inputs || {})[k] ?? (example.outputs || {})[k]) !== "")
     : [];
-  const outputRows = example ? exampleRows(example.outputs, outLabels) : "";
+  const outputRows = example ? exampleRows(example.outputs, outLabels, outDisplays, outUnits) : "";
   const assumptionRows = (citation && Array.isArray(citation.assumptions) ? citation.assumptions : [])
     .map((a) => `      <li><span>${escapeHtml(a.name)}</span> <b>${escapeHtml(a.value)}</b><small>${escapeHtml(a.source)}</small></li>`)
     .join("\n");
@@ -817,14 +879,19 @@ async function main() {
   // The field labels the browser prints above each input, resolved through the
   // same MCP catalog layer the agent surface reads, so the label on a shell and
   // the label in the calculator can never drift. ~140 ms for the whole catalog.
-  const { inputLabels, outputLabels } = await import(resolve(ROOT, "mcp/catalog.mjs"));
+  const { inputLabels, outputLabels, outputDisplays, outputUnits } = await import(resolve(ROOT, "mcp/catalog.mjs"));
 
   let shellCount = 0;
   // Per-tile shells.
   for (const tool of tools) {
     const labels = await inputLabels(tool.id);
     const outLabels = await outputLabels(tool.id);
-    const html = tileShell(tool, tools, groupNames, relatedMap, examples, labels, outLabels);
+    // The exact answer strings the calculator prints for this page's example,
+    // so "You get" carries the unit instead of a bare number.
+    const ex = examples.get(tool.id);
+    const outDisplays = ex ? await outputDisplays(tool.id, ex.inputs) : {};
+    const outUnits = outputUnits(tool.id);
+    const html = tileShell(tool, tools, groupNames, relatedMap, examples, labels, outLabels, outDisplays, outUnits);
     const out = resolve(DIST, "tools", tool.id, "index.html");
     await mkdir(dirname(out), { recursive: true });
     await writeFile(out, html, "utf8");

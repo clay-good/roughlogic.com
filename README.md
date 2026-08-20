@@ -33,8 +33,8 @@ Here is that Example block, from [Voltage Drop](https://roughlogic.com/tools/vol
 
 | You enter | | You get | |
 |---|---|---|---|
-| Phase | single | Voltage drop | 7.45 |
-| Material | copper | Percent drop | 3.1 |
+| Phase | single | Voltage drop | 7.45 V |
+| Material | copper | Percent drop | 3.11 % |
 | AWG | 10 | | |
 | Length one-way (ft) | 150 | | |
 | Current (A) | 20 | | |

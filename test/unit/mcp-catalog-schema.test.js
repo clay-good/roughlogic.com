@@ -326,3 +326,61 @@ test("worked-example answer rows are named, not keyed", async () => {
   }
   assert.ok(named >= 2989, `named answer rows fell to ${named} of ${total}; the floor is 2,989`);
 });
+
+// A bare `1200` does not say watts. `outputUnits` carries the text a
+// hand-written renderer concatenates onto its answer, so the tile page can
+// print the number the way the calculator prints it. Display-only: it never
+// reaches a compute call, so the rule is only that it reads as a unit.
+test("outputUnits reads as a unit, never as part of the number", async () => {
+  const { BESPOKE_OUTPUT_UNITS } = await import("../fixtures/bespoke-output-units.js");
+  const ids = Object.keys(BESPOKE_OUTPUT_UNITS);
+  assert.ok(ids.length >= 657, `unit maps fell to ${ids.length} tiles; the floor is 657`);
+  for (const id of ids) {
+    for (const [key, u] of Object.entries(BESPOKE_OUTPUT_UNITS[id])) {
+      const where = `${id}.${key}`;
+      assert.equal(typeof u.prefix, "string", where);
+      assert.equal(typeof u.suffix, "string", where);
+      assert.ok(u.prefix !== "" || u.suffix !== "", `${where} records no unit at all`);
+      assert.ok((u.prefix + u.suffix).length <= 16, `${where} is a sentence, not a unit`);
+      // A digit against the number reads as part of it ("1200 3-phase").
+      assert.ok(!/^\s*[\d.]/.test(u.suffix), `${where} starts with a digit`);
+    }
+  }
+  const { outputUnits } = await import("../../mcp/catalog.mjs");
+  assert.deepEqual(outputUnits("abrasive-blast").cfm, { prefix: "", suffix: " cfm" });
+  assert.deepEqual(outputUnits("no-such-tile"), {});
+});
+
+// The answer string the calculator itself prints, for the renderers that carry
+// a format closure. Same rule as the caption pass: only a line that resolves
+// to one result key is reported, so a display is never shown against a number
+// it is not about.
+test("outputDisplays returns the string the calculator prints", async () => {
+  const { outputDisplays } = await import("../../mcp/catalog.mjs");
+  const ohm = await outputDisplays("ohms-law", { V: 120, I: 10, R: null, P: null });
+  assert.equal(ohm.R, "12.00 ohm");
+  assert.equal(ohm.P, "1200.00 W");
+  // A bespoke renderer has no format closure and reports nothing rather than
+  // guessing.
+  assert.deepEqual(await outputDisplays("abrasive-blast", {}), {});
+  assert.deepEqual(await outputDisplays("no-such-tile", {}), {});
+});
+
+// A ratchet, not a target: the share of worked-example answer rows that print
+// with the unit the calculator shows. It may only go up.
+test("worked-example answer rows carry their unit", async () => {
+  const { outputDisplays, outputUnits } = await import("../../mcp/catalog.mjs");
+  const { readFile } = await import("node:fs/promises");
+  const raw = JSON.parse(await readFile(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8"));
+  const rows = Array.isArray(raw) ? raw : (raw.examples || raw.rows || []);
+  const seen = new Set();
+  let total = 0, united = 0;
+  for (const row of rows) {
+    if (!row || !row.tile_id || seen.has(row.tile_id)) continue;
+    seen.add(row.tile_id);
+    const units = outputUnits(row.tile_id);
+    const displays = await outputDisplays(row.tile_id, row.inputs || {});
+    for (const k of Object.keys(row.outputs || {})) { total += 1; if (units[k] || displays[k]) united += 1; }
+  }
+  assert.ok(united >= 2195, `answer rows with a unit fell to ${united} of ${total}; the floor is 2,195`);
+});

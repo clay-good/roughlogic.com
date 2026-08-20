@@ -24,6 +24,8 @@ try { ({ RELATED } = await import("../scripts/related-tiles.mjs")); } catch { RE
 // (hand-written) renderers that carry no in-source render.schema. Read as a
 // fallback; schemaIfConsistent still degrades any entry whose keys diverge.
 let BESPOKE_SCHEMAS = {};
+let BESPOKE_OUTPUT_UNITS = {};
+try { ({ BESPOKE_OUTPUT_UNITS } = await import("../test/fixtures/bespoke-output-units.js")); } catch { BESPOKE_OUTPUT_UNITS = {}; }
 try { ({ BESPOKE_SCHEMAS } = await import("../test/fixtures/bespoke-schemas.js")); } catch { BESPOKE_SCHEMAS = {}; }
 // Display-only field labels for renderers that earn no schema. Read by
 // inputLabels() alone -- never by describe(), which must keep advertising only
@@ -511,6 +513,45 @@ export async function outputLabels(id) {
       }
     }
   } catch { /* keep whatever the extracted captions gave us */ }
+  return out;
+}
+
+// The answer STRING the calculator prints for each result key -- the number
+// with the unit and any wording attached to it ("24.4 A", "$1,200/yr", "PASS").
+// `outputLabels` names an answer; this says what the answer reads like once the
+// renderer has formatted it. Only lines the schema resolves to exactly one
+// result key are reported, so a display can never be attributed to a number it
+// is not about. Bespoke (hand-written) renderers have no format closure and
+// return nothing here; their answers stay bare.
+// The text a hand-written renderer wraps around an answer -- `{ prefix, suffix }`
+// per result key, statically extracted from the renderer's own display
+// expression. `outputDisplays` covers the renderers that carry a format
+// closure; this covers the rest, for a caller that has the number already.
+export function outputUnits(id) {
+  return BESPOKE_OUTPUT_UNITS[id] || {};
+}
+
+export async function outputDisplays(id, inputs) {
+  const { COMPUTE_MAP, RENDERER_MAP, modCache } = await load();
+  const reg = COMPUTE_MAP[id];
+  if (!reg) return {};
+  const out = {};
+  try {
+    const fn = await importCompute(reg, modCache);
+    const schema = schemaIfConsistent(await readSchema(id, RENDERER_MAP, modCache), fn);
+    if (!schema || !Array.isArray(schema.outputs)) return out;
+    const result = fn({ ...(inputs || {}) });
+    if (!result || result.error) return out;
+    for (const o of schema.outputs) {
+      if (!o || typeof o.format !== "function") continue;
+      const label = typeof o.label === "string" ? o.label.trim() : "";
+      const key = schemaOutputKey(o, label);
+      if (!key || key in out) continue;
+      let display = null;
+      try { const s = o.format(result); if (typeof s === "string" || typeof s === "number") display = String(s); } catch { display = null; }
+      if (display) out[key] = display;
+    }
+  } catch { /* a tile whose renderer will not import keeps its bare answers */ }
   return out;
 }
 
