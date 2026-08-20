@@ -542,6 +542,15 @@ The principle from spec.md section 5 governs every entry: the data is either pub
 - Shard layout: `{ version: 1, tiles: { <tile-id>: { module, fn, args, defaults, headline } } }` -- `args` maps DOM input ids to compute argument names; `headline` lists `{ key, label, unit, decimals }` output lines.
 - Privacy: No runtime fetch beyond the same lazy load as the aliases shard. The preview calls the same exported compute functions the tile calls, offline.
 
+### data/fields/*.json (spec-v1339 field index)
+
+- Source: Generated runtime shards projecting each tile's own input descriptors -- the `render.schema.inputs` the declarative renderers carry, and the statically-extracted `BESPOKE_SCHEMAS` for the hand-written ones -- into a form the browser can read. Derived data with no independent content: the renderers stay authoritative and these shards regenerate from them by `scripts/build-field-index.mjs`.
+- License: MIT-licensed creative work, identical to the renderers it is projected from. Not derived from any external standard or commercial taxonomy.
+- Cadence: Regenerated whenever a tile's inputs change; `node scripts/build-field-index.mjs --check` fails CI on any drift, and the build fails outright if a shard passes 24 KB gzip.
+- Shard layout: `{ version: 1, bucket, tiles: { <tile-id>: [{ d, l, k, u, o }] } }` -- `d` is the field key, which in this catalog is also the DOM input id; `l` is the label with its trailing unit stripped; `k` is the kind; `u` is the canonical unit the label declares, omitted when it declares none; `o` lists a select's allowed values. A field with no human label is omitted rather than indexed under its machine key.
+- Sharding: One shard per tile group, matching the `aliases-<letter>.json` convention, so the browser derives the filename from the group it already knows and never fetches a manifest to find one. Group E is split in two (`e-1`, `e-2`) because a single shard gzips to 31.7 KB; the split rule lives in `field-bucket.js` and is imported by both the writer and the reader so they cannot disagree.
+- Privacy: Lazy fetch on first use, cached per session, never at first paint. Nothing about a query is recorded or transmitted; the extraction is regex and table lookup running locally.
+
 ### data/cross/glossary.json (v5, utility 271)
 
 - Source: Original plain-English definitions written by the project author. MIT licensed.

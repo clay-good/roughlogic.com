@@ -29,6 +29,12 @@ const FILES = [
   "clipboard.js",
   "ui-fields.js",
   "ui-validity.js",
+  // spec-v1339: the field index's shared vocabulary. field-bucket.js exists
+  // so the build step that WRITES data/fields/*.json and the browser code
+  // that READS them derive the same filename from one rule; shipping it is
+  // what makes that guarantee real rather than a comment.
+  "field-units.js",
+  "field-bucket.js",
   "integrity.js",
   "calc-electrical.js",
   "calc-motor.js",
