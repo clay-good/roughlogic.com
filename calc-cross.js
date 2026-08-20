@@ -453,7 +453,7 @@ export function renderTimeAndMaterials(inputRegion, outputRegion, citationEl) {
   const pr = makeNumber("Profit (percent)", "tm-pr", { step: "any", min: "0", value: "0" });
   pr.input.value = "0";
   for (const f of [h, r, m, o, pr]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { h.input.value = "8"; r.input.value = "95"; m.input.value = "250"; o.input.value = "15"; pr.input.value = "10"; update(); });
+  attachExampleButton(inputRegion, () => { h.input.value = "20"; r.input.value = "50"; m.input.value = "500"; o.input.value = "10"; pr.input.value = "15"; update(); });
   const oL = makeOutputLine(outputRegion, "Labor", "tm-out-l");
   const oM = makeOutputLine(outputRegion, "Material", "tm-out-m");
   const oOv = makeOutputLine(outputRegion, "Overhead", "tm-out-o");

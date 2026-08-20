@@ -345,7 +345,7 @@ export function renderDehumidifier(inputRegion, outputRegion, citationEl) {
     { value: "1", label: "Class 1" }, { value: "2", label: "Class 2", selected: true }, { value: "3", label: "Class 3" }, { value: "4", label: "Class 4" },
   ]);
   for (const f of [v, c]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { v.input.value = "5000"; c.select.value = "2"; update(); });
+  attachExampleButton(inputRegion, () => { v.input.value = "6000"; c.select.value = "2"; update(); });
   const oA = makeOutputLine(outputRegion, "AHAM pints/day", "dh-out-a");
   const oF = makeOutputLine(outputRegion, "Field pints/day", "dh-out-f");
   // v8 §C.6: operational guidance ("one large LGR or two mid-range for redundancy") row.
@@ -437,7 +437,7 @@ export function renderMold(inputRegion, outputRegion, citationEl) {
   const T = makeNumber("Temperature (°F)", "mr-t", { step: "any" });
   const h = makeNumber("Hours of elevated humidity", "mr-h", { step: "any", min: "0" });
   for (const f of [rh, T, h]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { rh.input.value = "75"; T.input.value = "75"; h.input.value = "48"; update(); });
+  attachExampleButton(inputRegion, () => { rh.input.value = "80"; T.input.value = "75"; h.input.value = "60"; update(); });
   const oR = makeOutputLine(outputRegion, "Risk", "mr-out");
   const update = debounce(() => {
     const r = computeMoldRisk({ rh_percent: Number(rh.input.value) || 0, temperature_F: Number(T.input.value) || 0, hours_elevated: Number(h.input.value) || 0 });

@@ -427,7 +427,7 @@ export function renderMasterStream(inputRegion, outputRegion, citationEl) {
   const t = makeSelect("Nozzle type", "ms-t", Object.keys(MASTER_STREAM_TYPES).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
   const p = makeNumber("Nozzle pressure (psi)", "ms-p", { step: "any", min: "0" });
   for (const f of [t, p]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { t.select.value = "smooth_bore_2"; p.input.value = "80"; update(); });
+  attachExampleButton(inputRegion, () => { t.select.value = "smooth_bore_1_75"; p.input.value = "80"; update(); });
   const oR = makeOutputLine(outputRegion, "Typical reach", "ms-out");
   const oNR = makeOutputLine(outputRegion, "Nozzle reaction (smooth bore)", "ms-out-nr");
   const update = debounce(() => {
@@ -677,7 +677,7 @@ export function renderReverseLayFriction(inputRegion, outputRegion, citationEl) 
   const np = makeNumber("Number of pumps", "rl-n", { step: "1", min: "1", value: "1" });
   np.input.value = "1";
   for (const f of [dia, gpm, len, np]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { dia.select.value = "5_in"; gpm.input.value = "1000"; len.input.value = "1000"; np.input.value = "2"; update(); });
+  attachExampleButton(inputRegion, () => { dia.select.value = "2.5_in"; gpm.input.value = "250"; len.input.value = "600"; np.input.value = "2"; update(); });
   const oS = makeOutputLine(outputRegion, "Single-pump friction", "rl-out-s");
   const oP = makeOutputLine(outputRegion, "Per-pump friction (parallel)", "rl-out-p");
   const oN = makeOutputLine(outputRegion, "Pump count", "rl-out-n");

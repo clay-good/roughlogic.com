@@ -742,7 +742,7 @@ function renderMolecularWeight(inputRegion, outputRegion, citationEl) {
     breakOut.textContent = r.breakdown.map((b) => b.symbol + " x " + b.count + " (" + b.atomic_weight + ")").join("; ");
   }, DEBOUNCE_MS);
   f.input.addEventListener("input", update);
-  attachExampleButton(inputRegion, () => { f.input.value = "(NH4)2SO4"; update(); });
+  attachExampleButton(inputRegion, () => { f.input.value = "NaCl"; update(); });
 }
 
 function renderMassMoles(inputRegion, outputRegion, citationEl) {
@@ -1077,7 +1077,7 @@ function renderHemocytometer(inputRegion, outputRegion, citationEl) {
     via.textContent = r.viability_pct == null ? "-" : fmt(r.viability_pct, 1) + "%";
   }, DEBOUNCE_MS);
   for (const f of [cnt, sq, df, dead]) f.input.addEventListener("input", update);
-  attachExampleButton(inputRegion, () => { cnt.input.value = 200; sq.input.value = 4; df.input.value = 2; dead.input.value = 10; update(); });
+  attachExampleButton(inputRegion, () => { cnt.input.value = 240; sq.input.value = 4; df.input.value = 2; dead.input.value = 12; update(); });
 }
 
 export const LAB_RENDERERS = {

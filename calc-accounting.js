@@ -978,7 +978,7 @@ function renderSalesTaxCompound(inputRegion, outputRegion, citationEl) {
   }, DEBOUNCE_MS);
   for (const f of [pre, post, r1, r2]) f.input.addEventListener("input", update);
   attachExampleButton(inputRegion, () => {
-    pre.input.value = 100; post.input.value = ""; r1.input.value = 6; r2.input.value = 1.5; update();
+    pre.input.value = 1000; post.input.value = ""; r1.input.value = 6.25; r2.input.value = 1.5; update();
   });
 }
 
