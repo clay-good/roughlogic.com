@@ -181,8 +181,45 @@ function leadCut(desc) {
   return { sentence, lead: sentence.slice(0, at).replace(/[,;:\s-]+$/, "") + ".", at };
 }
 
+// A lead that has already said what the calculator gives you, in words, and
+// then appends the equation ("The rise (sagitta) of an arc from a known radius
+// and chord, rise = R - sqrt(R^2 - (chord/2)^2)") carries the formula twice
+// over: the collapsed block below prints it with its source, and Details
+// prints the sentence whole. On the one line the page is built around, the
+// algebra is the half a reader cannot act on. So when the words come first and
+// the equation trails them after a real seam, the lead stops at that seam and
+// Details picks up from the equation.
+const EQUATION = /[A-Za-z0-9_)\]]\s*(?:=|~)\s*[A-Za-z0-9(\u221a.-]/;
+const TAIL_SEAM = /(?:, | -- | - |: |; )/g;
+
+// The seam a trailing formula hangs off, or -1.
+function formulaTailAt(lead) {
+  const eq = lead.search(EQUATION);
+  if (eq < 0) return -1;
+  TAIL_SEAM.lastIndex = 0;
+  let at = -1;
+  let m;
+  while ((m = TAIL_SEAM.exec(lead)) && m.index < eq) {
+    if (m.index >= MIN_LEAD && balanced(lead.slice(0, m.index))) at = m.index;
+  }
+  if (at < 0) return -1;
+  // The words in front have to stand on their own, and carry no equation of
+  // their own -- otherwise this would cut a lead that was always algebra
+  // ("Q = C i A peak runoff, in cfs and gpm") down to more algebra.
+  if (EQUATION.test(lead.slice(0, at))) return -1;
+  // And the seam has to introduce the formula, not continue a list. "across
+  // HP, torque, and RPM via HP = Torque x RPM / 5252" puts its last seam in
+  // the middle of the list, and cutting there drops RPM from a lead that names
+  // the other two. A tail opening on a coordinator is the sentence still
+  // talking, so leave that lead whole rather than truncate the list.
+  if (/^(?:and|or|plus|then|but|as well as)\b/i.test(lead.slice(at).replace(/^[,;:\s-]+/, ""))) return -1;
+  return at;
+}
+
 export function leadSentence(desc) {
-  return leadCut(desc).lead;
+  const { lead } = leadCut(desc);
+  const at = formulaTailAt(lead);
+  return at < 0 ? lead : trimDangling(lead.slice(0, at)) + ".";
 }
 
 // Upper-case the opening letter so the block reads as prose -- unless it opens
@@ -207,8 +244,16 @@ function openAsSentence(t) {
 // repeats rather than ship a Details block that opens mid-thought.
 export function restOfDescription(desc) {
   const s = String(desc).trim();
-  const { sentence, at } = leadCut(s);
+  const { sentence, lead, at } = leadCut(s);
   const tail = s.slice(sentence.length).trim();
+  // When the formula trim fired, Details opens on the equation the lead
+  // dropped -- a complete statement on its own, and the one thing the reader
+  // opened the disclosure for.
+  const cut = formulaTailAt(lead);
+  if (cut >= 0) {
+    const rest = (s.slice(cut).replace(/^[,;:\s-]+/, "") + "").trim();
+    if (rest) return rest;
+  }
   if (at < 0) return tail;
   if (s.slice(at, at + 2) !== ": ") return s;
   const rest = (sentence.slice(at + 2).trim() + (tail ? " " + tail : "")).trim();

@@ -173,6 +173,25 @@ test("no description points a reader at a raw slug", () => {
   assert.deepEqual(offenders, []);
 });
 
+// The two scans above only look at ids with 2+ hyphens, on the reasoning that
+// a one-hyphen id is usually trade vocabulary as well ("three-phase",
+// "expansion-tank", "combustion-air") and reads fine in prose. That holds --
+// except when half the id is an acronym. "The QMD reineke-sdi requires",
+// "Defers head to pump-tdh", "The efficiency seer-eer never reads" and six
+// more shipped on public pages, each one a machine name a reader cannot say
+// out loud. Name the calculator in words instead.
+test("no description prints a one-hyphen slug that is half acronym", () => {
+  const ACRONYM = /^(?:sas|sss|asa|ssa|sdi|tdh|spl|edr|npk|eer|seer|tpa|qmd|cop|dfu|adpi|rt60|nff|pdp|svi|ct|ua|io)$/;
+  const slugs = new Set(TOOLS.map((t) => t.id).filter((id) => id.split("-").some((p) => ACRONYM.test(p))));
+  const offenders = [];
+  for (const t of TOOLS) {
+    for (const m of t.desc.matchAll(/\b([a-z][a-z0-9]*(?:-[a-z0-9]+)+)\b/g)) {
+      if (slugs.has(m[1]) && m[1] !== t.id) offenders.push(t.id + " -> " + m[1]);
+    }
+  }
+  assert.deepEqual(offenders, []);
+});
+
 test("no description body calls a calculator a tile or a sibling", () => {
   const jargon = /\b(tile|tiles|sibling|siblings|never covered|the catalog)\b/i;
   // Ceramic tile is the actual subject in these; ADPI's "catalog throw" is the
@@ -224,4 +243,32 @@ test("no public lead opens on a bare symbolic variable", () => {
     if (m && symbolic(m[1])) offenders.push(`${t.id} -> ${m[1]}`);
   }
   assert.deepEqual(offenders, []);
+});
+
+// The one line is the summary; the equation belongs under the disclosure that
+// prints it with its source. A lead that says both is spending half its width
+// on the half a reader cannot act on.
+test("a lead that names the thing in words drops the equation trailing it", () => {
+  assert.equal(
+    leadSentence("The rise of an arc from a known radius and chord, rise = R - sqrt(R^2 - (chord/2)^2). More."),
+    "The rise of an arc from a known radius and chord.",
+  );
+  // Details picks up exactly where the lead stopped, so the equation is one
+  // tap away rather than gone from the page.
+  assert.match(
+    restOfDescription("The rise of an arc from a known radius and chord, rise = R - sqrt(R^2 - (chord/2)^2). More."),
+    /^rise = R - sqrt/,
+  );
+  // A lead that was always algebra is left alone: cutting it yields more
+  // algebra, not fewer symbols.
+  assert.equal(
+    leadSentence("Q = C i A peak runoff in cfs and gpm, with bundled C values for the site."),
+    "Q = C i A peak runoff in cfs and gpm, with bundled C values for the site.",
+  );
+  // A seam mid-list is not a formula seam: cutting there would drop RPM from
+  // a lead that just named the other two.
+  assert.equal(
+    leadSentence("Horsepower, kilowatts, and a selector across HP, torque, and RPM via HP = Torque * RPM / 5252."),
+    "Horsepower, kilowatts, and a selector across HP, torque, and RPM via HP = Torque * RPM / 5252.",
+  );
 });
