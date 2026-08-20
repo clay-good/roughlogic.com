@@ -4,7 +4,7 @@
 > Adapts the shipped sophiewell.com program (`spec-v751`–`v758`) to this catalog and this
 > catalog's traffic. No tile is added, removed, or renumbered. The catalog stays **1,709**.
 >
-> **v1339, v1346, and v1345 shipped.** The rest are specified below.
+> **v1339, v1340, v1345, and v1346 shipped.** The rest are specified below.
 
 ## The product in one line
 
@@ -76,7 +76,7 @@ lands before any pixel moves; the additive nav work lands before any link is rem
 |---|---|---|---|
 | ~~v1339~~ | ~~The field index: `data/fields/*.json` from the renderers' own schemas~~ **SHIPPED** | — | none |
 | [v1346](spec-v1346.md) | Gate both doors: every tile searchable **and** MCP-runnable | — | none |
-| [v1340](spec-v1340.md) | `query-fill.js` — query + tile → filled, missing, unmatched | v1339 | none |
+| ~~[v1340](spec-v1340.md)~~ | ~~`query-fill.js` — query + tile → filled, missing, unmatched~~ **SHIPPED** | v1339 | none |
 | [v1341](spec-v1341.md) | Enter routes to the answer, with provenance on every filled field | v1340 | behaviour |
 | [v1342](spec-v1342.md) | Ask for the first missing value, in words | v1341 | behaviour |
 | [v1343](spec-v1343.md) | Two or three plain choices when the query is ambiguous | v1341 | behaviour |

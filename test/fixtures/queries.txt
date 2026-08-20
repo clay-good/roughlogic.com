@@ -1,0 +1,35 @@
+# spec-v1340 query corpus.
+#
+# Checked-in phrasings, one per line, with the tile they target and the fields
+# each should produce. THIS FILE REPLACES QUERY TELEMETRY. The home page says
+# no tracking and that stays true, so when extraction misses, the way to
+# diagnose it is to add the phrasing here and run the extractor over it -- never
+# by recording what anyone typed. With a large share of this site's traffic
+# apparently being agents, logging queries would look especially cheap and
+# useful, which is exactly why the decision is written down once, here.
+#
+# Format:  <tile-id> | <query> | <key>=<value>[,<key>=<value>...]
+# An expectation of `-` means the query must fill NOTHING for that tile. Those
+# lines are the safety cases and they matter more than the recall ones.
+
+# --- full natural sentences, the case this whole program exists for ---------
+voltage-drop | voltage drop 120v 150 ft 12 awg copper 20a single phase | source_voltage_V=120,length_ft=150,current_A=20,awg=12,material=copper,phase=single
+voltage-drop | voltage drop on a 240 volt circuit, 200 feet, aluminum, 30 amps | source_voltage_V=240,length_ft=200,current_A=30,material=aluminum
+ohms-law | ohms law 120 volts 10 amps | V=120,I=10
+asphalt-tonnage | asphalt 2400 sq ft 3 in deep 12 ft wide | area_ft2=2400,depth_in=3,paving_width_ft=12
+
+# --- unit conversion into the field's own unit ------------------------------
+# The field is in feet; the reader said inches. Convert, do not refuse.
+asphalt-tonnage | asphalt paving width 144 in | paving_width_ft=12
+
+# --- the safety cases -------------------------------------------------------
+# Two same-unit fields and no names to tell them apart: fill NEITHER.
+ohms-law | 120 v 10 v | -
+# A unit from another family never crosses over.
+asphalt-tonnage | compacted depth 3 gpm | -
+
+# --- carpenter spellings ----------------------------------------------------
+asphalt-tonnage | asphalt paving width 12 ft compacted depth 3 in | paving_width_ft=12,depth_in=3
+ohms-law | resistance 12 ohms and 120 volts | R=12,V=120
+# A select option named verbatim must survive the rewrites that would shred it.
+voltage-drop | voltage drop three phase 480v 300 ft aluminum 50a | phase=three,source_voltage_V=480,length_ft=300,material=aluminum,current_A=50

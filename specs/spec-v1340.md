@@ -1,6 +1,6 @@
 # spec-v1340.md — query-fill: one extractor for the whole catalog
 
-> Status: **PLANNED.** Part of [scope-one-box](scope-one-box.md). Depends on [v1339](spec-v1339.md).
+> Status: **SHIPPED (2026-08-20).** Part of [scope-one-box](scope-one-box.md). Depends on [v1339](spec-v1339.md).
 > New browser module + a checked-in query corpus. No tile added, no compute changed, nothing
 > visible. Catalog stays **1,709**.
 
@@ -59,6 +59,57 @@ misread pitch is a wrong rafter length.
 glued units and fractions, and it is shared with the MCP server. **Reuse it; do not write a second
 number parser.** The normalizations run *before* it, as a query rewrite, exactly as sophiewell
 found was smaller than reaching into the existing parsers.
+
+## Measured
+
+Every indexed tile's own worked example, re-phrased as a query and fed back through the
+extractor. The phrasing strips digits out of the label first, because a reader says *"design
+rainfall 4 in/hr"*, never *"design rainfall, 100-yr / 1-hr 4 in/hr"* -- leaving them in measures
+the extractor against a query built to trap it.
+
+| | |
+|---|---|
+| Tiles measured | 1,330 |
+| Every value recovered | 598 (45.0%) |
+| Some recovered | 638 (48.0%) |
+| None recovered | 94 (7.1%) |
+| **Fields recovered** | **3,163 / 5,069 (62.4%)** |
+| **Tiles with a WRONG value** | **0 (0.00%)** |
+
+The last row is the only one that matters, and it is zero across 5,069 fields. sophiewell's
+equivalent measurement had two. Recovery is lower than its 90.1%, and that is expected: 36.7% of
+this catalog's indexed fields declare no unit at all, so they can only be reached by name.
+
+**The 4-character term floor was verified, not assumed.** Lowering it to 3 to pick up trade words
+like `run` and `gap` made recovery *worse* -- 61.6% -- because the extra short terms create more
+ambiguity and the veto fires more often. The floor stays at 4.
+
+## Four bugs the measurement caught
+
+The first pass reported 12 tiles with a wrong value. Ten were artifacts of the synthetic query;
+the other two were real, and so were two more found on the way.
+
+| | |
+|---|---|
+| **A conversion silently truncated the reader's precision** | `toFixed(6)` turned `0.015452412` into `0.015452` on `boring-bar-max-overhang`. A same-unit value now returns the reader's own string untouched, and a real conversion keeps 12 significant digits. |
+| **A select's name bled into a number field** | `lv-dc-drop` has a `System voltage` select beside a `Device min voltage` field. Selects were excluded from the name contest, which left the number field as the sole match for the word "voltage" and it took the 12. Selects now compete for a name even though they are filled separately -- a fragment two fields can claim fills neither, and a select is a field. |
+| **A rewrite shredded a value the tile names verbatim** | `lumber-spans` has a `nominal_size` select whose options are literally `2x4`, `2x6`, `2x10`. The nominal-lumber rewrite turned `2x10` into `nominal width 2 in nominal depth 10 in`, and the injected `2` filled the tile's tributary-width field. `rewriteQuery` now takes a protect set of the tile's own option values: **a tile that names a value verbatim always outranks a rewrite of it.** |
+| **A dropped unit letter put 100 into a °F field** | `ambient 100 c` -- `extractQuantities` only reads single-letter units when glued, so the ` c` vanished and the bare 100 filled a field measured in °F. Temperature is now rewritten explicitly, and a **bare** `c`/`f` only counts inside a temperature context, so Hazen-Williams `c 130` is still left alone. |
+
+## What shipped differently
+
+- **`extractQuantities` gained an opt-in `withIndex`.** Name-then-value needs positions, and the
+  returned shape is asserted by `deepEqual` in `test/unit/search-discovery.test.js` and relied on
+  by `mapSlots`. An optional second argument adds `index`/`end` without touching the existing
+  contract -- one parser, no breakage.
+- **An exact unit match breaks a same-family tie.** `3 in` on a tile holding a depth in inches and
+  a width in feet is not genuinely ambiguous: the reader wrote inches. Same-family fields only
+  compete when nothing matches the unit exactly, and then one must still win alone.
+- **An unreadable unit now blocks a unit-bearing field.** If the reader attached a unit we cannot
+  parse, refusing is right -- we do not know whether it agrees. A short list of prose words
+  (`long`, `wide`, `of`, `at`) is exempt, since `40 ft long` must still work.
+- **A short label is kept whole.** The 4-character floor erased `AWG` and `Rise` entirely, leaving
+  those fields unfillable by name.
 
 ## Gotchas
 

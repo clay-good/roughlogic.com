@@ -477,7 +477,15 @@ export function rankTools(tokens, tools, aliases, opts) {
 // number-ish token ("62.2", "6-3-2" never yield partial quantities).
 const QUANTITY_RE = /(\d+\s*\/\s*\d+|\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)/g;
 
-export function extractQuantities(query) {
+// spec-v1340: `opts.withIndex` adds `index` (offset of the number in the
+// lowercased query) and `end` (offset just past the number and its unit) to
+// each row. Opt-in, because the returned object shape is asserted by
+// deepEqual in test/unit/search-discovery.test.js and by mapSlots' callers.
+// query-fill.js needs the positions to tell `length 40 width 20` from
+// `40 length 20 width`; adding a second number parser to get them would be
+// the thing this argument exists to avoid.
+export function extractQuantities(query, opts) {
+  const withIndex = Boolean(opts && opts.withIndex);
   if (typeof query !== "string" || !query) return [];
   const q = query.toLowerCase();
   const out = [];
@@ -508,7 +516,12 @@ export function extractQuantities(query) {
     const spaced = rest.match(/^ ([a-z][a-z/]{1,7})(?![a-z0-9])/);
     if (glued) unit = glued[1];
     else if (spaced) unit = spaced[1];
-    out.push({ value, unit });
+    if (withIndex) {
+      const consumed = glued ? glued[1].length : spaced ? spaced[0].length : 0;
+      out.push({ value, unit, index: m.index, end: afterIdx + consumed });
+    } else {
+      out.push({ value, unit });
+    }
   }
   return out;
 }

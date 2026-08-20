@@ -294,6 +294,7 @@ const CAPS = {
   // chi2Cdf / betainc / tcdf); built module ~7.0 KB gzipped, cap carries
   // the documented ~20% headroom.
   "pure-math.js": 8500,
+  "query-fill.js": 9500, // spec-v1340 query-fill 2026-08-20 (default 6144 -> 9500): the natural-language extractor is ONE cohesive algorithm -- the trade rewrites, the unit-family tables, the negation window, and the two matching phases only make sense together -- so the gate's preferred remedy of splitting per-tile does not apply; a split would put the veto rules in a different file from the matching they veto. Sits at 8,195 B gz; raised with modest headroom for the spec-v1342/v1343 follow-ons. Lazy-loaded on first search interaction, absent from the home-view payload (58.8% of budget, unchanged by this module).
 
   // Reference / citation modules. citations.js is the structured §3
   // reference block that every per-tile source-stamp resolves against;

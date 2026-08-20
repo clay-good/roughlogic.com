@@ -35,6 +35,7 @@ const FILES = [
   // what makes that guarantee real rather than a comment.
   "field-units.js",
   "field-bucket.js",
+  "query-fill.js",
   "integrity.js",
   "calc-electrical.js",
   "calc-motor.js",
