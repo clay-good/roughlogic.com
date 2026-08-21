@@ -1,6 +1,6 @@
 # spec-v1337.md — The home page becomes one box
 
-> Status: **PLANNED.** Part of [scope-one-box](scope-one-box.md). Depends on [v1345](spec-v1345.md).
+> Status: **SHIPPED (2026-08-20).** Part of [scope-one-box](scope-one-box.md). Depends on [v1345](spec-v1345.md).
 > Presentation only. No tile added, no number changed, **no link removed.** Catalog stays **1,709**.
 
 ## Why
@@ -63,6 +63,24 @@ gate watches is exactly how a README once reached 1145 against a catalog of 1564
   existing `render()`. **No new routing logic.**
 - `styles.css` — `.hero-examples`, `.hero-chip`; `.home-trades*` restyled quieter. Existing
   tokens only; the chips use `--accent`.
+
+## What shipped differently
+
+- **The placeholder goal was already half-built, by `spec-v592`.** That spec rotates a
+  natural-language question through the box, one per day of the month, deterministically and with
+  no timer. The static placeholder in `index.html` is only the pre-JS fallback. So this spec did
+  not replace the rotation; it **fixed what was in it**. Half the entries carried no numbers
+  (*"how many squares on a roof"*, *"how much can the crane pick after deductions"*), and since
+  [v1341](spec-v1341.md) the box does something with numbers — it fills the calculator in. A
+  placeholder without values now teaches half the feature. The two that had nothing to give were
+  replaced, not padded.
+- **The chip-closes-its-own-listbox bug is real and was hit exactly as predicted.** The document
+  click handler treats anything outside the input and the list as an outside click. `.hero-chip`
+  is now exempt.
+- **The lede keeps its count**, so `check-readme-counts` keeps both of its `index.html` surfaces.
+  sophiewell retired the equivalent surface; there was no reason to follow it there, and four
+  words is a cheap price for a drift check that has already caught a stale README once.
+- **`&mdash;` is banned** by `check-ngrams`. The lede is punctuated with a comma.
 
 ## Gotchas
 

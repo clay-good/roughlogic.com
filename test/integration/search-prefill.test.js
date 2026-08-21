@@ -270,3 +270,54 @@ test("spec-v1338: a table-only answer is never hidden", async ({ page }) => {
   await expect(page.locator(".output-region table").first()).toBeVisible();
   await expect(page.locator(".copy-all-btn")).toBeVisible();
 });
+
+// spec-v1337: the home page is one box.
+
+test("spec-v1337 home: one box, four chips, and all 21 trade links kept", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("h1.home-h1")).toHaveText("Field math, answered.");
+  // The count stays in the lede: check-readme-counts holds it, and a visible
+  // count no gate watches is how a README once drifted to 1145 of 1564.
+  await expect(page.locator("p.home-lede")).toContainText("1,709 free calculators");
+  await expect(page.locator(".hero-chip")).toHaveCount(4);
+
+  // spec-v1347 removes these later, on evidence. Until then every one stays:
+  // /groups/construction/ is the top organic landing page.
+  await expect(page.locator(".home-trades-list a")).toHaveCount(21);
+});
+
+test("spec-v1337 chips: a chip fills the box and leaves the results open", async ({ page }) => {
+  // The document click handler that closes the listbox treated a chip as a
+  // click OUTSIDE the search UI, so a chip filled the box and instantly closed
+  // the results it had just opened.
+  await page.goto("/");
+  const chip = page.locator(".hero-chip").first();
+  const query = await chip.getAttribute("data-q");
+  await chip.click();
+  await expect(page.locator("#search-input")).toHaveValue(query);
+  await expect(page.locator("#search-results")).toBeVisible();
+  await expect(page.locator(".search-result").first()).toBeVisible();
+});
+
+test("spec-v1337 chips: every chip routes to a real tile with values", async ({ page }) => {
+  // A chip that teaches a query the site cannot answer is worse than no chip.
+  const count = await (async () => { await page.goto("/"); return page.locator(".hero-chip").count(); })();
+  for (let i = 0; i < count; i++) {
+    await page.goto("/");
+    await page.locator(".hero-chip").nth(i).click();
+    await expect(page.locator(".search-result").first()).toBeVisible();
+    await page.locator("#search-input").press("Enter");
+    await expect(page).toHaveURL(/#[a-z0-9-]+\?v=1&/);
+    await expect(page.locator(".field-provenance").first()).toBeVisible();
+  }
+});
+
+test("spec-v1337 chips: 48px touch targets", async ({ page }) => {
+  await page.goto("/");
+  const chips = page.locator(".hero-chip");
+  const n = await chips.count();
+  for (let i = 0; i < n; i++) {
+    const box = await chips.nth(i).boundingBox();
+    expect(box.height).toBeGreaterThanOrEqual(44);
+  }
+});

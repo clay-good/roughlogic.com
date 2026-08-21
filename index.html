@@ -71,11 +71,15 @@
 <main id="main" tabindex="-1">
 
   <section id="tools" class="home" aria-labelledby="intro-heading">
-    <h1 id="intro-heading" class="home-h1">Trade calculators for the field</h1>
+    <h1 id="intro-heading" class="home-h1">Field math, answered.</h1>
+    <!-- spec-v1337: one sentence, and it KEEPS THE COUNT. check-readme-counts
+         requires exactly two "<N> free calculators for" strings in this file
+         (this one and the JSON-LD description above), and a visible count that
+         no gate watches is exactly how a README once reached 1145 against a
+         catalog of 1564. Four words is a cheap price for a drift check. -->
     <p class="home-lede">
-      1,709 free calculators for the trades. Each one runs in your
-      browser and shows the formula it used. No signup, no ads,
-      no tracking, no AI.
+      1,709 free calculators for the trades. Type the job the way you'd
+      say it, and you get the number, the inputs, and the source.
     </p>
 
     <!-- One search bar. Type free text to filter, or focus it to browse the
@@ -93,10 +97,25 @@
         inputmode="search"
         autocomplete="off"
         spellcheck="false"
-        placeholder="ohms law, duct sizing, refrigerant P-T..."
+        placeholder="voltage drop 120v 150 ft 12awg 20a"
         class="search-input"
       >
       <ul id="search-results" class="search-results" role="listbox" aria-label="Tools" hidden></ul>
+    </div>
+
+    <!-- spec-v1337: the examples ARE the instructions; there is no other
+         instruction text. Buttons, not links: clicking one fills the box and
+         runs the same code path as typing, so what a reader sees demonstrated
+         is exactly what their own typing will do. Every one of these routes to
+         a real tile today -- a chip that teaches a query the site cannot
+         answer is worse than no chip. Commas and spaces, never slash-joined:
+         a token over 30 characters fails the 320px sweep. -->
+    <div class="hero-examples">
+      <span class="hero-examples-label">Try:</span>
+      <button type="button" class="hero-chip" data-q="voltage drop 120v 150 ft 12 awg copper 20a single phase">voltage drop 120v 150 ft 12awg 20a</button>
+      <button type="button" class="hero-chip" data-q="asphalt tonnage 2400 sq ft 3 in deep 12 ft wide">asphalt 2400 sq ft, 3 in deep</button>
+      <button type="button" class="hero-chip" data-q="ohms law 120 volts 10 amps">ohms law 120 v, 10 a</button>
+      <button type="button" class="hero-chip" data-q="friction loss 200 ft of hose at 150 gpm">friction loss 200 ft, 150 gpm</button>
     </div>
 
     <noscript>
@@ -106,9 +125,18 @@
     <!-- Static, crawlable index of the 21 trade groups. Each link points at
          the prerendered group hub shell (/groups/<slug>/) so a crawler that
          reads the home document finds real navigable content and internal
-         links instead of only the hero copy. Present for JS and no-JS alike. -->
-    <nav class="home-trades" aria-label="Browse calculators by trade">
-      <h2 class="home-trades-h2">Browse calculators by trade</h2>
+         links instead of only the hero copy. Present for JS and no-JS alike.
+
+         spec-v1337 DEMOTES this, and deliberately does not delete it. Every
+         one of the 21 links stays. /groups/construction/ is this site's top
+         organic landing page and the honest position is that we do not yet
+         know how much of that depends on being linked from here, so the
+         one-box design is bought at zero link-graph cost and spec-v1347
+         removes the strip later, on Search Console evidence, as a one-line
+         revert. `.is-quiet` is colour and weight only -- never smaller type,
+         which would break the gated readable-type floor. -->
+    <nav class="home-trades is-quiet" aria-label="Browse calculators by trade">
+      <h2 class="home-trades-h2">Or browse by trade</h2>
       <ul class="home-trades-list">
         <li><a href="groups/electrical/">Electrical</a></li>
         <li><a href="groups/plumbing/">Plumbing and Gas</a></li>

@@ -1902,3 +1902,67 @@ textarea.is-autofilled {
    tell the second apart, so app.js toggles .output-blank. */
 .output-region:empty,
 .output-region.output-blank { display: none; }
+
+/* ============================================================
+   spec-v1337: the example chips under the search box.
+
+   These are the only instructions on the page, so they are
+   styled to be read and tapped, not decorated. Each is a full
+   48px touch target and the labels avoid slash-joined tokens so
+   the 320px sweep stays green.
+   ============================================================ */
+.hero-examples {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+/* 1rem, not 0.9375rem: the readable-type floor is gated and it counts this
+   as reading text, not metadata. Quiet is the colour's job here. */
+.hero-examples-label {
+  color: var(--fg-dim);
+  font-size: 1rem;
+}
+
+.hero-chip {
+  min-height: var(--touch-min);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--bg-secondary);
+  color: var(--fg-muted);
+  font: inherit;
+  /* A chip is a CONTROL, so the gated floor is a full 1rem -- 0.9375rem is
+     the allowance for metadata, and check-readable-type says so by name. */
+  font-size: 1rem;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.hero-chip:hover,
+.hero-chip:focus-visible {
+  border-color: var(--accent);
+  color: var(--fg);
+}
+
+/* The trade strip is kept but demoted (spec-v1337). Colour and weight
+   only -- the readable-type floor is gated, so this must never shrink
+   the text. spec-v1347 removes it once Search Console says it is safe. */
+.home-trades.is-quiet {
+  margin-top: var(--space-7);
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-4);
+}
+
+.home-trades.is-quiet .home-trades-h2 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--fg-dim);
+}
+
+.home-trades.is-quiet .home-trades-list a { color: var(--fg-muted); }
+
+.home-trades.is-quiet .home-trades-list a:hover,
+.home-trades.is-quiet .home-trades-list a:focus-visible { color: var(--accent); }

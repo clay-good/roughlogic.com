@@ -2456,6 +2456,18 @@ function bindSearch() {
     navigateTo(prefillHash(tool, typed));
   }
 
+  // spec-v1337: the example chips. Each sets the box and runs the SAME code
+  // path as typing -- no new routing logic -- so what a reader sees
+  // demonstrated is exactly what their own typing does.
+  for (const chip of document.querySelectorAll(".hero-chip")) {
+    chip.addEventListener("click", () => {
+      const q = chip.getAttribute("data-q") || chip.textContent.trim();
+      input.value = q;
+      input.focus();
+      loadAndRender();
+    });
+  }
+
   function render(query) {
     clearChildren(list);
     matches = searchTools(query);
@@ -2540,14 +2552,19 @@ function bindSearch() {
   // (deterministic, no timers, nothing for prefers-reduced-motion to
   // object to). The shipped index.html placeholder is the static
   // fallback; the .hero-label accessible name is unchanged.
+  // spec-v1337: every rotation now carries NUMBERS. Since spec-v1341 the box
+  // does something with them -- it fills the calculator in -- so a placeholder
+  // without values ("how many squares on a roof", "how much can the crane pick
+  // after deductions") teaches half the feature. The two that had no numbers
+  // to give were replaced rather than padded.
   const QUESTION_PLACEHOLDERS = [
     "how many yards of concrete for a 10x12 slab",
     "what size wire for 50 amps at 120 ft",
     "voltage drop 120v 150 ft 20 amps",
-    "how many squares on a roof",
+    "asphalt tonnage 2400 sq ft 3 in deep",
     "what gauge wire for a 30 amp breaker",
     "cfm for a 12 inch round duct",
-    "how much can the crane pick after deductions",
+    "ohms law 120 volts 10 amps",
     "friction loss 200 ft of hose at 150 gpm",
   ];
   input.placeholder = QUESTION_PLACEHOLDERS[(new Date().getDate() - 1) % QUESTION_PLACEHOLDERS.length];
@@ -2585,6 +2602,10 @@ function bindSearch() {
   // Close the dropdown when a click lands outside the search.
   document.addEventListener("click", (e) => {
     if (e.target === input || list.contains(e.target)) return;
+    // spec-v1337: a chip is part of the search UI, not a click outside it.
+    // Without this the chip fills the box and instantly closes the results it
+    // has just opened -- the exact bug sophiewell's v751 hit.
+    if (e.target.closest && e.target.closest(".hero-chip")) return;
     setExpanded(false);
     setActive(-1);
   });
