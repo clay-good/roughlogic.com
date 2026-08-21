@@ -7,7 +7,7 @@
 <p align="center">
   <img src="docs/img/home-mobile.png" width="240" alt="roughlogic home view on a phone: a headline, one line of description, a single search box, and four tappable example questions">
   &nbsp;
-  <img src="docs/img/calculator-mobile.png" width="240" alt="The Ohm's Law calculator on a phone in the light theme, with labeled numeric inputs and live computed outputs, each with a Copy button">
+  <img src="docs/img/calculator-mobile.png" width="240" alt="The Ohm's Law calculator on a phone in the light theme: the answer at the top with a Copy button on each value, the labeled inputs that produced it below, and a collapsed Show the formula, sources, and assumptions at the bottom">
   &nbsp;
   <img src="docs/img/calculator-dark.png" width="240" alt="The same Ohm's Law calculator in the dark theme">
 </p>
