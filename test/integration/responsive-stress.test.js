@@ -233,3 +233,39 @@ test("every live tile view: no page-level horizontal scroll at 320 px", async ({
     `live tile views scrolling horizontally at 320 px:\n${offenders.join("\n")}`,
   ).toEqual([]);
 });
+
+// The rotating example in the home search box is the only instruction on the
+// page, and an input clips its placeholder rather than wrapping it: six of the
+// eight originals overflowed at 375 px and all eight at 320 px, so a phone
+// reader's first impression was a sentence chopped mid-word ("what gauge wire
+// for a 30 ar"). The pool is written to fit, which is a fact about rendered
+// pixels and cannot be checked by counting characters -- so it is checked here,
+// in a browser, at the narrowest viewport the site supports. The long
+// conversational examples live in the chips below the box, which wrap.
+test("every rotating placeholder fits the home search box at 320 px", async ({ page }) => {
+  const src = readFileSync(join(__dirname, "..", "..", "app.js"), "utf8");
+  const block = src.match(/const QUESTION_PLACEHOLDERS = \[([\s\S]*?)\];/);
+  expect(block, "QUESTION_PLACEHOLDERS not found in app.js").toBeTruthy();
+  const pool = [...block[1].matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+  expect(pool.length).toBeGreaterThan(0);
+
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.goto("/index.html");
+  const input = page.locator("#search-input");
+  await expect(input).toBeVisible();
+
+  const clipped = [];
+  for (const text of pool) {
+    const m = await input.evaluate((el, t) => {
+      const cs = getComputedStyle(el);
+      const c = document.createElement("canvas").getContext("2d");
+      c.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      return {
+        width: c.measureText(t).width,
+        room: el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight),
+      };
+    }, text);
+    if (m.width > m.room) clipped.push(`"${text}" is ${Math.round(m.width)} px in a ${Math.round(m.room)} px box`);
+  }
+  expect(clipped, `placeholders clipped at 320 px:\n${clipped.join("\n")}`).toEqual([]);
+});
