@@ -1197,9 +1197,8 @@ input[aria-invalid="true"] {
   .home { padding: var(--space-6) var(--space-3) var(--space-5); }
   .view-region { padding: var(--space-4) var(--space-3); }
   .view-title { font-size: 1.7rem; }
-  /* The hero box keeps its 1.25rem type on a phone -- the type floor is not
-     negotiable -- and buys the room back from its own side padding, so a
-     one-line example question fits at 320 px instead of clipping. */
+  /* The hero box buys room back from its own side padding so a one-line
+     example question fits instead of clipping. */
   .hero-search .search-input { padding: 18px 16px; }
   .site-footer { margin: var(--space-5) auto var(--space-4); }
   /* v12 Phase F.1: the reference block uses
@@ -1810,6 +1809,21 @@ input[aria-invalid="true"] {
 .ti-list a:focus-visible {
   color: var(--accent);
   text-decoration: underline;
+}
+
+/* The narrowest phones. The example question in the hero box is the only
+   instruction on the home page and an input CLIPS a placeholder rather than
+   wrapping it, so at 320 px the box needs every pixel: slightly tighter
+   padding, and 1.125rem type instead of 1.25rem. Still comfortably above the
+   1rem reading floor, and it is the difference between an example that reads
+   and one chopped mid-word on a device whose fallback font is wider than the
+   one the pool was measured against (CI's Linux WebKit is ~15% wider than
+   macOS system-ui). The gate in responsive-stress.test.js measures this. */
+@media (max-width: 360px) {
+  .hero-search .search-input {
+    font-size: 1.125rem;
+    padding: 16px 13px;
+  }
 }
 
 @media (max-width: 600px) {

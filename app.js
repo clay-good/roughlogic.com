@@ -2392,9 +2392,12 @@ function bindSearch() {
   // box carry the long, conversational forms -- they wrap -- and the
   // placeholder carries a short one that fits on one line.
   //
-  // Each entry is verified four ways: it fits (<= 197 px against the box's
-  // ~222 px of inner width at 320 px), the ranker puts the intended calculator
-  // first, query-fill recovers real values from it, and what the tile then
+  // Each entry is verified four ways: it fits the box at 320 px on both
+  // Chromium and WebKit (a gate measures it -- the widest entry is 181 px in
+  // a 228 px box, and the margin is not slack: CI's Linux fallback font runs
+  // ~15% wider than macOS system-ui and clipped three of these before the box
+  // was given the room), the ranker puts the intended calculator first,
+  // query-fill recovers real values from it, and what the tile then
   // shows is either an answer or a question -- never a number resting on a
   // dropdown the question never spoke to. That last one ruled out two
   // otherwise-good examples: `hose 150 gpm 200 ft` answers 108 psi off
