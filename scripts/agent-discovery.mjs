@@ -4,10 +4,10 @@
 // and a unit test can assert their contents against the live catalog. No hosted
 // endpoint — these only describe the local stdio server; they do not run it.
 
-// The four tools the MCP server exposes (mcp/server.mjs). Kept here so the
+// The five tools the MCP server exposes (mcp/server.mjs). Kept here so the
 // discovery files and the server share one list; the golden surface manifest
 // (test/fixtures/mcp-surface.json) pins the server side.
-export const MCP_TOOLS = ["search_calculators", "describe_calculator", "run_calculator", "run_calculators"];
+export const MCP_TOOLS = ["search_calculators", "describe_calculator", "run_calculator", "answer_query", "run_calculators"];
 export const MCP_RESOURCES = ["roughlogic://catalog", "roughlogic://trade/{trade}", "roughlogic://calculator/{id}"];
 export const MCP_PROMPTS = ["find-calculator", "run-with-inputs", "size-and-check"];
 const INSTALL = "claude mcp add roughlogic -- node /absolute/path/to/roughlogic.com/mcp/server.mjs";

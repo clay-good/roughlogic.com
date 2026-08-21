@@ -53,7 +53,7 @@ test("tools/list declares an object outputSchema for every tool", async () => {
     { jsonrpc: "2.0", id: 2, method: "tools/list" },
   ]);
   const tools = replies.get(2).result.tools;
-  assert.equal(tools.length, 4);
+  assert.equal(tools.length, 5);
   for (const t of tools) {
     assert.equal(t.outputSchema && t.outputSchema.type, "object", `${t.name} declares an object outputSchema`);
   }

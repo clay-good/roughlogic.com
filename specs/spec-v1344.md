@@ -1,6 +1,6 @@
 # spec-v1344.md — answer_query reads the same registry
 
-> Status: **PLANNED.** Part of [scope-one-box](scope-one-box.md). Depends on [v1340](spec-v1340.md).
+> Status: **SHIPPED (2026-08-20).** Part of [scope-one-box](scope-one-box.md). Depends on [v1340](spec-v1340.md).
 > MCP only. No tile added, no compute changed, nothing visible. Catalog stays **1,709**.
 
 ## Why
@@ -43,6 +43,49 @@ the query contains a **distinctive** word from its name — four characters or m
 connective vocabulary a trade catalog shares everywhere. Build that noise list from the actual
 catalog, not from intuition; in this catalog it will include at least `calculator`, `sizing`,
 `load`, `size`, `flow`, `drop`, `rate`, `factor`, `index`, `chart`, `table`, `length`, `weight`.
+
+## Measured
+
+Every indexed tile's own worked example, re-phrased as a question and asked through
+`answer_query`:
+
+| | |
+|---|---|
+| Tiles asked | 1,330 |
+| **Answered in ONE call** | **468 (35.2%)** |
+| `MISSING_INPUTS`, naming what it recovered and what it needs | 641 (48.2%) |
+| `NO_VALUES` / `NO_MATCH` | 221 |
+
+**Read the second row as a success, not a shortfall.** It is still one round trip, and it comes
+back with the recovered inputs and the missing ones named by their human labels — where the old
+path needed `search` + `describe` + `run` and re-typing. The one-call rate is well under
+sophiewell's 75.7% for a deliberate reason: [v1342](spec-v1342.md)'s requiredness derivation is
+strict here (71.7% of fields), so a tile with one unrecovered required value reports it instead of
+computing around it.
+
+**15 of the 468 answered on a different tile than the one whose example generated the question**
+(3.2%). These are near-siblings — the synthetic query names a tile and the ranker prefers a
+close relative that also answers it. It is the same ambiguity [v1343](spec-v1343.md) handles in
+the browser. It is **not silent**: every response carries `id` and `name`, so the caller is always
+told exactly which calculator ran. That is the mitigation, and it is why this ships rather than
+waiting.
+
+## What shipped differently
+
+- **It reads `data/fields/*.json`, the browser's own shards, rather than re-projecting
+  `describe()`.** The plan said the server needs no data file because it holds the registry in
+  memory. True, but the shards also carry v1342's `r` (required) flags, which a fresh projection
+  would not — and reading them is what guarantees an agent and a person cannot disagree about what
+  a tile needs. A missing shard still degrades to a `describe()` projection, minus requiredness.
+- **Values are coerced at the boundary, and unfilled numerics are passed as explicit `null`.**
+  Two bugs, one after the other. `queryFill` returns strings because it also feeds the DOM and the
+  URL hash, and `ohms-law` counts how many of V/I/R/P it was handed with `Number.isFinite` — so a
+  question that plainly supplied two values came back **"Provide any two of V, I, R, P."** Then,
+  with numbers, it still derived nothing: the compute tests `out.V === null`, so an *undefined*
+  key derives nothing at all. Both are how the browser already behaves (`Number(input.value)`, and
+  every worked example in the repo spelling absence as `R: null`); this is the same convention
+  applied at the same boundary. Selects and checkboxes are omitted rather than nulled, so their
+  own defaults apply and `validateSelects` is never handed a null to reject.
 
 ## Gotchas
 

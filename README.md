@@ -46,7 +46,7 @@ Your inputs live in the URL, so a calculator is bookmarkable and shareable with 
 
 ## Use it from an AI agent
 
-The whole catalog is available to AI agents (Claude Code, Claude Desktop, Cursor) through a local, zero-dependency [MCP](https://modelcontextprotocol.io) server that runs on your machine over stdio. No hosting, no network. Four tools (`search_calculators`, `describe_calculator`, `run_calculator`, `run_calculators`) read straight from this repo, so the agent surface can never drift from the site. See [mcp/README.md](mcp/README.md).
+The whole catalog is available to AI agents (Claude Code, Claude Desktop, Cursor) through a local, zero-dependency [MCP](https://modelcontextprotocol.io) server that runs on your machine over stdio. No hosting, no network. Five tools (`search_calculators`, `describe_calculator`, `run_calculator`, `answer_query`, `run_calculators`) read straight from this repo, so the agent surface can never drift from the site. See [mcp/README.md](mcp/README.md).
 
 ## What's in the catalog
 

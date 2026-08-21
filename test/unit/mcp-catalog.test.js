@@ -1,0 +1,79 @@
+// spec-v1344: the MCP catalog layer's answer_query.
+//
+// The website went from 49 prefilled tiles to 1,331 with the field index;
+// agents were still on the old three-round-trip path. These pin the one-call
+// behaviour and, more importantly, the refusals.
+
+import { test } from "node:test";
+import assert from "node:assert/strict";
+// --- spec-v1344: answer_query ------------------------------------------------
+//
+// One call instead of three. The property that matters is the same one that
+// governs the browser path: it must not answer wrongly, and it must not point
+// confidently at a calculator nobody asked about.
+
+test("spec-v1344: a full question is answered in one call, marked via registry", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  const out = await answerQuery({ query: "voltage drop 120v 150 ft 12 awg copper 20a single phase" });
+  assert.equal(out.status, "OK");
+  assert.equal(out.id, "voltage-drop");
+  assert.equal(out.via, "registry");
+  // The same number the website computes for the same sentence.
+  assert.ok(Math.abs(out.result.drop_V - 11.853) < 0.01, `drop_V ${out.result.drop_V}`);
+  assert.equal(out.inputs.awg, "12");
+});
+
+test("spec-v1344: values are coerced the way the browser coerces them", async () => {
+  // queryFill returns strings because it also feeds the DOM and the URL hash.
+  // ohms-law counts how many of V/I/R/P it was handed and a stringified "120"
+  // failed that check, so a question that plainly supplied two values came
+  // back "Provide any two of V, I, R, P."
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  const out = await answerQuery({ query: "ohms law 120 volts 10 amps" });
+  assert.equal(out.status, "OK");
+  assert.ok(!out.result.error, `unexpected error: ${out.result.error}`);
+  // And it DERIVES the rest: an unfilled numeric field is passed as an
+  // explicit null, which is how this catalog spells "absent".
+  assert.ok(Math.abs(out.result.R - 12) < 1e-9, `R ${out.result.R}`);
+  assert.ok(Math.abs(out.result.P - 1200) < 1e-9, `P ${out.result.P}`);
+});
+
+test("spec-v1344: a partial question returns what it worked out, not a refusal", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  const out = await answerQuery({ query: "asphalt tonnage 2400 sq ft 3 in deep 12 ft wide" });
+  assert.equal(out.status, "MISSING_INPUTS");
+  assert.equal(out.id, "asphalt-tonnage");
+  // What it recovered, so the caller does not re-type it...
+  assert.equal(out.inputs.area_ft2, "2400");
+  assert.equal(out.inputs.depth_in, "3");
+  // ...and what it still needs, by human label.
+  assert.ok(out.missing.some((m) => m.key === "density_pcf"), JSON.stringify(out.missing));
+});
+
+test("spec-v1344: naming a calculator without values is NO_VALUES, not a guess", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  const out = await answerQuery({ query: "voltage drop" });
+  assert.equal(out.status, "NO_VALUES");
+  assert.equal(out.id, "voltage-drop");
+});
+
+test("spec-v1344: nonsense is NO_MATCH, never a confident pointer", async () => {
+  // The ranker returns its best guess however weak. A tile is only named when
+  // the query yielded values for it or contains a DISTINCTIVE word from its
+  // name -- four characters or more, and not the connective vocabulary half
+  // the catalog shares.
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  for (const q of ["what is the meaning of life", "hello there", "asdfghjkl"]) {
+    const out = await answerQuery({ query: q });
+    assert.equal(out.status, "NO_MATCH", `${q} -> ${out.status} ${out.id || ""}`);
+    assert.equal(out.id, undefined, `${q} named ${out.id}`);
+  }
+});
+
+test("spec-v1344: the same question twice gives the same answer", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  const q = "voltage drop 240v 200 ft 10 awg aluminum 30a";
+  const a = await answerQuery({ query: q });
+  const b = await answerQuery({ query: q });
+  assert.deepEqual(a.result, b.result);
+});

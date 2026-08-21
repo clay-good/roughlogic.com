@@ -590,6 +590,148 @@ export async function run({ id, inputs } = {}) {
   return out;
 }
 
+// spec-v1344: answer a plain-language question in ONE call.
+//
+// An agent that already knows the values -- because the user's question
+// contained them -- still needed three round trips: search to pick a tile,
+// describe to learn its input keys, run to compute, re-typing values it had
+// written out itself. If a large share of this site's traffic is agents, that
+// is the highest-leverage thing in the whole one-box program.
+//
+// The field descriptors come from data/fields/<bucket>.json -- the SAME shards
+// the browser reads, including the spec-v1342 `r` (required) flags. Reading
+// them rather than re-projecting describe()'s output means an agent and a
+// person cannot disagree about what a tile needs. A missing shard degrades to
+// a projection of describe(), minus requiredness.
+async function fieldRowsFor(id, group) {
+  const { bucketFor } = await import(new URL("../field-bucket.js", import.meta.url).href);
+  try {
+    const url = new URL(`../data/fields/${bucketFor(group, id)}.json`, import.meta.url);
+    const shard = JSON.parse(await readFile(url, "utf8"));
+    if (shard && shard.tiles && shard.tiles[id]) return shard.tiles[id];
+  } catch { /* fall through to the projection below */ }
+  try {
+    const described = await describe({ id });
+    const { unitFromLabel, labelLead } = await import(new URL("../field-units.js", import.meta.url).href);
+    return (described.inputs || [])
+      .filter((f) => f && f.key && typeof f.label === "string" && f.label.trim())
+      .map((f) => {
+        const row = { d: f.key, l: labelLead(f.label) };
+        if (f.kind) row.k = f.kind;
+        const unit = unitFromLabel(f.label);
+        if (unit) row.u = unit;
+        if (f.kind === "select" && Array.isArray(f.options)) {
+          row.o = f.options.map((o) => (o && typeof o === "object" ? o.value : o)).filter((v) => v != null).map(String);
+        }
+        return row;
+      });
+  } catch { return []; }
+}
+
+// The connective vocabulary a trade catalog shares everywhere. A match on one
+// of these is not evidence that THIS tile is the one the caller meant.
+const TILE_NAME_NOISE = new Set([
+  "calculator", "calculators", "sizing", "size", "load", "loads", "flow",
+  "drop", "rate", "factor", "index", "chart", "table", "length", "weight",
+  "total", "check", "tool", "from", "with", "and", "for", "the", "per",
+]);
+
+// The ranker returns its best guess however weak, so a tile is only NAMED when
+// something corroborates it: either the query yielded values for it, or the
+// query contains a distinctive word from its name. Without this, "what is the
+// meaning of life" comes back as a confident pointer at a calculator the
+// caller never asked about.
+function queryNamesTile(query, name) {
+  const q = String(query || "").toLowerCase();
+  for (const word of String(name || "").toLowerCase().split(/[^a-z0-9]+/)) {
+    if (word.length < 4 || TILE_NAME_NOISE.has(word)) continue;
+    if (q.includes(word)) return true;
+  }
+  return false;
+}
+
+// queryFill returns strings, because it also feeds the DOM and the URL hash.
+// The computes want numbers: ohms-law counts how many of V/I/R/P it was given
+// and a stringified "120" failed its check, so a query that plainly supplied
+// two values came back "Provide any two of V, I, R, P." The browser never
+// meets this because it reads fields through Number(input.value); this is the
+// same coercion, applied at the same boundary.
+//
+// Selects are left alone: their values ARE strings, and validateSelects
+// already normalizes a number-shaped option back to the string the compute
+// expects.
+function coerceForCompute(filled, rows) {
+  const out = {};
+  for (const row of rows) {
+    const has = Object.prototype.hasOwnProperty.call(filled, row.d);
+    if (!has) {
+      // An unfilled NUMERIC field is passed as an explicit null, which is how
+      // this catalog spells "absent" -- ohms-law derives the values it was not
+      // given by testing `out.V === null`, so an undefined key derives
+      // nothing and the tile answers with only what it was handed. Every
+      // worked example in the repo uses the same convention (`R: null`).
+      // Selects and checkboxes are OMITTED instead, so their own defaults
+      // apply and validateSelects is never handed a null to reject.
+      if (row.k === "select" || row.k === "checkbox") continue;
+      out[row.d] = null;
+      continue;
+    }
+    const value = filled[row.d];
+    if (row.k === "select" || row.k === "text" || row.k === "textarea") { out[row.d] = value; continue; }
+    if (row.k === "checkbox") { out[row.d] = value === "1" || value === "true"; continue; }
+    const n = Number(value);
+    out[row.d] = Number.isFinite(n) ? n : value;
+  }
+  return out;
+}
+
+export async function answerQuery({ query } = {}) {
+  const q = String(query || "").trim();
+  if (!q) return { status: "NO_MATCH", query: q, message: "Pass a plain-language question." };
+
+  const { byId } = await load();
+  const ranked = await search({ query: q, limit: 3 });
+  const top = ranked && ranked.results && ranked.results[0];
+  if (!top) return { status: "NO_MATCH", query: q, message: "No calculator matched." };
+
+  const tool = byId.get(top.id);
+  const rows = await fieldRowsFor(top.id, tool ? tool.group : "");
+  const { queryFill } = await import(new URL("../query-fill.js", import.meta.url).href);
+  const { filled } = rows.length ? queryFill(q, rows) : { filled: {} };
+  const recovered = Object.keys(filled);
+
+  // Corroboration, in either form.
+  if (!recovered.length && !queryNamesTile(q, top.name)) {
+    return { status: "NO_MATCH", query: q, message: "No calculator matched." };
+  }
+  if (!recovered.length) {
+    return {
+      status: "NO_VALUES", query: q, id: top.id, name: top.name,
+      message: `"${top.name}" looks like the calculator, but the question carried no values to compute with. Call describe_calculator for its inputs.`,
+    };
+  }
+
+  // Name what it still needs, in one round trip instead of three.
+  const missingRequired = rows.filter((r) => r.r && !(r.d in filled)).map((r) => ({ key: r.d, label: r.l, unit: r.u || null }));
+  if (missingRequired.length) {
+    return {
+      status: "MISSING_INPUTS", query: q, id: top.id, name: top.name,
+      inputs: filled, missing: missingRequired,
+      message: `"${top.name}" needs ${missingRequired.map((m) => m.label).join(", ")}.`,
+    };
+  }
+
+  try {
+    const out = await run({ id: top.id, inputs: coerceForCompute(filled, rows) });
+    return { ...out, status: "OK", query: q, name: top.name, via: "registry" };
+  } catch (e) {
+    return {
+      status: "MISSING_INPUTS", query: q, id: top.id, name: top.name, inputs: filled,
+      missing: [], message: e && e.message ? e.message : "The calculator could not run on those values.",
+    };
+  }
+}
+
 // spec-v1187: bounded batch evaluation. The real agent tasks are plural — sweep
 // a voltage drop across wire gauges, compare two layouts, re-run at three
 // occupancy counts — each of which is a separate round-trip today. One call

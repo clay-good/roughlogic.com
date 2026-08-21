@@ -18,6 +18,7 @@ would overwhelm a client's tool list):
 | `search_calculators` | Find calculators by keyword and/or trade. Call with no arguments for a trade overview with counts. |
 | `describe_calculator` | Input fields with labels, select options, units, and min/max; the outputs; a publisher-verified worked example; the cited source; and any limitation banner. |
 | `run_calculator` | Evaluate a calculator with your own inputs. Returns the raw result plus rendered outputs (units + display strings), range warnings, and the limitation banner. With no inputs, the worked example is run. |
+| `answer_query` | **Answer a plain-language question in one call.** Picks the calculator, extracts the values out of the question, and computes: `voltage drop 120v 150 ft 12 awg copper 20a` returns 11.85 V without a `describe` round trip. Returns `MISSING_INPUTS` naming what it still needs rather than a bare refusal, `NO_VALUES` when the question named a calculator but carried no numbers, and `NO_MATCH` otherwise. Reads the same `data/fields/` descriptors the website reads, so an agent and a person cannot disagree about what a tile needs. |
 | `run_calculators` | Evaluate up to 50 `{ id, inputs }` calls in one request — for sweeps and comparisons. A bad item returns `{ id, error }` without failing the batch. |
 
 Typical flow: `search_calculators({query:"voltage drop", trade:"electrical"})`
@@ -72,7 +73,7 @@ claude mcp add roughlogic -- node /absolute/path/to/roughlogic.com/mcp/server.mj
 }
 ```
 
-Restart the client; the four tools appear under the `roughlogic` server.
+Restart the client; the five tools appear under the `roughlogic` server.
 
 ## Sharing it
 

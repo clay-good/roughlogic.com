@@ -19,6 +19,7 @@ import { readFileSync } from "node:fs";
 import {
   search, describe, run, runMany,
   listResources, listResourceTemplates, readResource,
+  answerQuery,
 } from "./catalog.mjs";
 
 // Report the site's version: the server exposes the site's catalog verbatim,
@@ -120,6 +121,35 @@ const TOOLS = [
     },
   },
   {
+    name: "answer_query",
+    annotations: { title: "Answer a question", readOnlyHint: true, idempotentHint: true, destructiveHint: false, openWorldHint: false },
+    description:
+      "Answer a plain-language question in ONE call: picks the calculator, extracts the values out of the question, and computes. Use this when the question already contains its numbers ('voltage drop 120v 150 ft 12 awg 20a') instead of chaining search_calculators + describe_calculator + run_calculator. Returns status OK with the computed outputs, MISSING_INPUTS naming what it still needs, NO_VALUES when the question named a calculator but carried no numbers, or NO_MATCH.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: { type: "string", description: "The question in plain language, with its values, e.g. 'voltage drop 120v 150 ft 12 awg copper 20a'." },
+      },
+      required: ["query"],
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        status: { type: "string", description: "OK | MISSING_INPUTS | NO_VALUES | NO_MATCH" },
+        query: { type: "string" },
+        id: { type: "string" },
+        name: { type: "string" },
+        via: { type: "string", description: "'registry' when the field index answered." },
+        inputs: { type: "object", description: "The values recovered from the question." },
+        missing: { type: "array", items: { type: "object", properties: { key: { type: "string" }, label: { type: "string" }, unit: { type: ["string", "null"] } } } },
+        result: { type: "object" },
+        outputs: { type: "array", items: { type: "object" } },
+        message: { type: "string" },
+      },
+      required: ["status"],
+    },
+  },
+  {
     name: "run_calculators",
     annotations: { title: "Run calculators (batch)", readOnlyHint: true, idempotentHint: true, destructiveHint: false, openWorldHint: false },
     description:
@@ -199,6 +229,7 @@ async function dispatchTool(name, args) {
     case "describe_calculator": return describe(args || {});
     case "run_calculator": return run(args || {});
     case "run_calculators": return runMany(args || {});
+    case "answer_query": return answerQuery(args || {});
     default: throw new Error(`unknown tool: ${name}`);
   }
 }

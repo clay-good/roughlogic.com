@@ -4,7 +4,7 @@
 > Adapts the shipped sophiewell.com program (`spec-v751`–`v758`) to this catalog and this
 > catalog's traffic. No tile is added, removed, or renumbered. The catalog stays **1,709**.
 >
-> **v1337, v1338, v1339, v1340, v1341, v1342, v1345, and v1346 shipped.** Only v1343 and v1344
+> **v1337, v1338, v1339, v1340, v1341, v1342, v1344, v1345, and v1346 shipped.** Only v1343 and v1344
 > remain; v1347 is deliberately blocked on Search Console evidence.
 
 ## The product in one line
@@ -84,7 +84,7 @@ lands before any pixel moves; the additive nav work lands before any link is rem
 | ~~[v1345](spec-v1345.md)~~ | ~~`/tools/` — every calculator by category — and the footer badge~~ **SHIPPED** | v1346 | none |
 | ~~[v1337](spec-v1337.md)~~ | ~~The home page becomes one box. **All 21 trade links kept.**~~ **SHIPPED** | v1345 | low |
 | ~~[v1338](spec-v1338.md)~~ | ~~Answer first, inputs second~~ **SHIPPED** | — | low |
-| [v1344](spec-v1344.md) | An MCP `answer_query` that reads the same registry | v1340 | none |
+| ~~[v1344](spec-v1344.md)~~ | ~~An MCP `answer_query` that reads the same registry~~ **SHIPPED** | v1340 | none |
 | [v1347](spec-v1347.md) | Retire the home trade strip — **gated on Search Console evidence** | v1337 | the only real one |
 
 ## The four SEO invariants, enforced not promised
