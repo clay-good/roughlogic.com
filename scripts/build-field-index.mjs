@@ -259,10 +259,21 @@ const manifestText = JSON.stringify({
   hashes: Object.fromEntries(written.map((w) => [`${w.g}.json`, "pending"])),
 }, null, 2) + "\n";
 
+// Deterministic view of the manifest for the --check comparison: every field
+// except the per-shard gzip_size_bytes, which varies a few bytes across zlib
+// builds (macOS vs CI Linux) and is informational only. The shard list, names,
+// order, and hash keys ARE deterministic. Same treatment as the alias shards.
+function manifestShape(m) {
+  return JSON.stringify({
+    ...m,
+    shards: (m.shards || []).map((s) => ({ file: s.file, name: s.name })),
+  });
+}
+
 if (CHECK) {
   let existing = null;
-  try { existing = await readFile(manifestPath, "utf8"); } catch { existing = null; }
-  if (existing !== manifestText) {
+  try { existing = JSON.parse(await readFile(manifestPath, "utf8")); } catch { existing = null; }
+  if (!existing || manifestShape(existing) !== manifestShape(JSON.parse(manifestText))) {
     console.error("build-field-index FAIL: data/fields/manifest.json is stale. Run: node scripts/build-field-index.mjs");
     drift++;
   }
