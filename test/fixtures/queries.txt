@@ -33,3 +33,14 @@ asphalt-tonnage | asphalt paving width 12 ft compacted depth 3 in | paving_width
 ohms-law | resistance 12 ohms and 120 volts | R=12,V=120
 # A select option named verbatim must survive the rewrites that would shred it.
 voltage-drop | voltage drop three phase 480v 300 ft aluminum 50a | phase=three,source_voltage_V=480,length_ft=300,material=aluminum,current_A=50
+
+# --- a size the dropdown holds (spec-v1340 Phase B0) ------------------------
+# The size is a SELECT, so nothing above Phase B0 would take it, and the only
+# field on the tile that accepts a length is Length (ft): the 4 in used to be
+# converted into it as a 0.33 ft pipe, which also left the reader's real 50 ft
+# with nowhere to go. The dimensioned number fills the dropdown; the foot value
+# still fills the field measured in feet.
+pipe-volume | pipe volume 4 in 50 ft | nominal_size=4,length_ft=50
+pipe-volume | pipe volume 2 in 100 ft | nominal_size=2,length_ft=100
+# No unit on the number, no fill: a bare 4 is not evidence of a 4" pipe.
+pipe-volume | pipe volume 4 100 ft | length_ft=100

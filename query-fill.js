@@ -366,6 +366,50 @@ export function queryFill(query, rows) {
     claimed.add(qi);
   }
 
+  // --- Phase B0: a size a dropdown holds -----------------------------------
+  // A select whose options are all numbers is a list of VALUES -- pipe-volume's
+  // nominal size ("1", "2", "4"), lumber spans' span table, a gauge list. Phase
+  // C will not touch those without the field's own name beside the number,
+  // which is right for a bare "40", and wrong for the way people actually
+  // write: "pipe volume 4 in 50 ft" left the size sitting on its first option
+  // and the tile answered 2.24 gal for a 1" pipe -- an answer to a question
+  // nobody asked, with nothing on screen saying the 4 had been dropped.
+  //
+  // So a number that CARRIES A UNIT may fill one, under the same one-and-only
+  // rule the rest of this file uses: the quantity is still unclaimed, exactly
+  // one option equals it, and exactly one such select on the tile can take it.
+  // A bare number never qualifies -- the unit is the corroboration.
+  //
+  // It runs BEFORE the unit-agreement fallback, and only for a quantity no
+  // number field claims EXACTLY. That ordering is the whole point: on
+  // `pipe-volume` the only field that accepts a length is Length (ft), so the
+  // fallback read "4 in" as a pipe 0.33 ft long, wrote 4 inches into it, and
+  // then had nothing left to put the reader's real 50 ft into. A field
+  // measured in the unit the reader wrote still wins -- "50 ft" into Length
+  // (ft) -- so this only takes the leftovers a same-family guess would have
+  // mangled.
+  const numericSelects = selectRows.filter(
+    (r) => !(r.d in filled) && r.o.length > 1 && r.o.every((o) => /^[\d.]+$/.test(String(o).trim())),
+  );
+  if (numericSelects.length) {
+    quantities.forEach((qty, qi) => {
+      if (claimed.has(qi) || burned.has(qi)) return;
+      const qtyUnit = canonicalUnit(rawUnitOf(qty, text));
+      if (!qtyUnit) return;                                // a bare number is not evidence
+      // A number field measured in exactly this unit is the better home.
+      if (numberRows.some((r) => !(r.d in filled) && rowUnit(r) === qtyUnit)) return;
+      const takers = [];
+      for (const row of numericSelects) {
+        if (row.d in filled) continue;
+        const opts = row.o.filter((o) => Number(o) === Number(qty.value));
+        if (opts.length === 1) takers.push({ row, opt: String(opts[0]) });
+      }
+      if (takers.length !== 1) return;
+      filled[takers[0].row.d] = takers[0].opt;
+      claimed.add(qi);
+    });
+  }
+
   // --- Phase B: unit agreement --------------------------------------------
   // For what is left, fall back to spec-v591's proven rule: a quantity fills a
   // field when EXACTLY ONE unfilled field can accept its unit. A unitless

@@ -244,6 +244,13 @@ main {
 
 .search-input::placeholder { color: var(--fg-dim); }
 
+/* An example question that does not fit the box is worth more ending in an
+   ellipsis than chopped mid-word: a clipped "what gauge wire for a 30 ar"
+   reads as a broken page rather than as an example. The pool in app.js is
+   sized to fit at 320 px; this is the net under it for a font wider than the
+   one it was measured against. */
+.search-input { text-overflow: ellipsis; }
+
 .search-input:focus {
   border-color: var(--fg);
   background: var(--bg-secondary);
@@ -1190,6 +1197,10 @@ input[aria-invalid="true"] {
   .home { padding: var(--space-6) var(--space-3) var(--space-5); }
   .view-region { padding: var(--space-4) var(--space-3); }
   .view-title { font-size: 1.7rem; }
+  /* The hero box keeps its 1.25rem type on a phone -- the type floor is not
+     negotiable -- and buys the room back from its own side padding, so a
+     one-line example question fits at 320 px instead of clipping. */
+  .hero-search .search-input { padding: 18px 16px; }
   .site-footer { margin: var(--space-5) auto var(--space-4); }
   /* v12 Phase F.1: the reference block uses
      grid-template-columns: max-content 1fr on dt+dd. At a 375 px

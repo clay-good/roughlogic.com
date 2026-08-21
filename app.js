@@ -2381,20 +2381,34 @@ function bindSearch() {
   // (deterministic, no timers, nothing for prefers-reduced-motion to
   // object to). The shipped index.html placeholder is the static
   // fallback; the .hero-label accessible name is unchanged.
-  // spec-v1337: every rotation now carries NUMBERS. Since spec-v1341 the box
-  // does something with them -- it fills the calculator in -- so a placeholder
-  // without values ("how many squares on a roof", "how much can the crane pick
-  // after deductions") teaches half the feature. The two that had no numbers
-  // to give were replaced rather than padded.
+  // spec-v1337: every rotation carries NUMBERS. Since spec-v1341 the box does
+  // something with them -- it fills the calculator in -- so a placeholder
+  // without values teaches half the feature.
+  //
+  // Every entry must also FIT THE BOX AT 320 px, which the longer questions
+  // did not: six of the previous eight clipped at 375 px and all eight clipped
+  // at 320 px, so the first thing a phone reader saw was a sentence chopped
+  // mid-word ("what gauge wire for a 30 ar"). The four example chips below the
+  // box carry the long, conversational forms -- they wrap -- and the
+  // placeholder carries a short one that fits on one line.
+  //
+  // Each entry is verified four ways: it fits (<= 197 px against the box's
+  // ~222 px of inner width at 320 px), the ranker puts the intended calculator
+  // first, query-fill recovers real values from it, and what the tile then
+  // shows is either an answer or a question -- never a number resting on a
+  // dropdown the question never spoke to. That last one ruled out two
+  // otherwise-good examples: `hose 150 gpm 200 ft` answers 108 psi off
+  // whichever hose diameter sits first in the list, and a voltage drop with no
+  // gauge in it answers off 18 AWG. Both now name the size. Two of the eight
+  // entries this replaces recovered no values at all and one matched no
+  // calculator.
   const QUESTION_PLACEHOLDERS = [
-    "how many yards of concrete for a 10x12 slab",
-    "what size wire for 50 amps at 120 ft",
-    "voltage drop 120v 150 ft 20 amps",
-    "asphalt tonnage 2400 sq ft 3 in deep",
-    "what gauge wire for a 30 amp breaker",
-    "cfm for a 12 inch round duct",
-    "ohms law 120 volts 10 amps",
-    "friction loss 200 ft of hose at 150 gpm",
+    "ohms law 120v 10a",              // answers outright: 12 ohms, 1200 W
+    "volt drop 12awg 150ft",          // fills 3, then asks for the current
+    "asphalt 2400 sq ft 3 in",        // fills 2, then asks for the mix density
+    "wire 50a 120 ft copper",         // two calculators fit: it offers both
+    "friction loss 150 gpm",          // fills 1, then asks for pipe and method
+    "pipe volume 1 in 100 ft",        // answers outright: 4.49 gal
   ];
   input.placeholder = QUESTION_PLACEHOLDERS[(new Date().getDate() - 1) % QUESTION_PLACEHOLDERS.length];
 

@@ -342,3 +342,24 @@ test("end-to-end: real shards resolve representative queries", async () => {
   const r3 = resolveQuery("manual j", aliases, ids);
   assert.ok(r3 && r3.match === "manual-j-cooling");
 });
+
+// A moment and a torque are written as two units with a hyphen between them.
+// The unit match used to stop at the hyphen, so "5422 kip-ft" came back as
+// 5422 kip -- a moment read as a force -- and "300 ft-lb" came back as 300
+// FEET, which is how a torque ends up filling a length field.
+test("extractQuantities keeps compound moment and torque units whole", () => {
+  assert.deepEqual(extractQuantities("overturning 5422 kip-ft, dead load 900 kip"), [
+    { value: "5422", unit: "kip-ft" },
+    { value: "900", unit: "kip" },
+  ]);
+  assert.deepEqual(extractQuantities("torque 300 ft-lb"), [{ value: "300", unit: "ft-lb" }]);
+  assert.deepEqual(extractQuantities("12 in-lb"), [{ value: "12", unit: "in-lb" }]);
+});
+
+// An allowlist, not a rule about hyphens: an ordinary hyphenated phrase after
+// a unit still reads as that unit, and a hyphenated word that is no unit at
+// all still reads as no unit.
+test("extractQuantities leaves ordinary hyphenated phrases alone", () => {
+  assert.deepEqual(extractQuantities("150 ft-long run"), [{ value: "150", unit: "ft" }]);
+  assert.deepEqual(extractQuantities("3-ply wall"), [{ value: "3", unit: null }]);
+});

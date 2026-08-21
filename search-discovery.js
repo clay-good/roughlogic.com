@@ -475,6 +475,15 @@ export function rankTools(tokens, tools, aliases, opts) {
 // Number grammar: a simple fraction ("3/4"), a thousands-comma group
 // ("1,200"), or a plain decimal. The match must not sit inside a longer
 // number-ish token ("62.2", "6-3-2" never yield partial quantities).
+// The two-token units a moment or a torque is written in. Everything else
+// keeps the single-token reading, so this cannot change how an ordinary
+// hyphenated phrase parses.
+const COMPOUND_UNITS = new Set([
+  "lb-ft", "ft-lb", "lb-in", "in-lb",
+  "kip-ft", "ft-kip", "kip-in", "in-kip",
+  "n-m", "kn-m",
+]);
+
 const QUANTITY_RE = /(\d+\s*\/\s*\d+|\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)/g;
 
 // spec-v1340: `opts.withIndex` adds `index` (offset of the number in the
@@ -516,8 +525,22 @@ export function extractQuantities(query, opts) {
     const spaced = rest.match(/^ ([a-z][a-z/]{1,7})(?![a-z0-9])/);
     if (glued) unit = glued[1];
     else if (spaced) unit = spaced[1];
+    // A moment or a torque is written as two units with a hyphen between
+    // them, and the match above stops at the hyphen: "5422 kip-ft" came back
+    // as 5422 KIP, a moment read as a force, and "300 ft-lb" came back as 300
+    // FEET. Both then fill the one field on the tile that accepts that unit,
+    // which is how a torque ends up in a length box. Only these compounds are
+    // rejoined -- an allowlist, not a rule about hyphens, so "150 ft-long run"
+    // still reads as 150 ft.
+    let tail = null;
+    if (unit) {
+      const consumedSoFar = glued ? glued[1].length : spaced[0].length;
+      tail = q.slice(afterIdx + consumedSoFar).match(/^-([a-z]{1,3})(?![a-z0-9])/);
+      if (tail && COMPOUND_UNITS.has(unit + "-" + tail[1])) unit = unit + "-" + tail[1];
+      else tail = null;
+    }
     if (withIndex) {
-      const consumed = glued ? glued[1].length : spaced ? spaced[0].length : 0;
+      const consumed = (glued ? glued[1].length : spaced ? spaced[0].length : 0) + (tail ? tail[0].length : 0);
       out.push({ value, unit, index: m.index, end: afterIdx + consumed });
     } else {
       out.push({ value, unit });

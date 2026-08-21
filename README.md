@@ -5,7 +5,7 @@
 [roughlogic.com](https://roughlogic.com) is 1,709 small, single-purpose calculators for electricians, plumbers, HVAC techs, carpenters, restoration techs, firefighters, surveyors, and dozens of other trades. Everything runs in your browser. Every answer comes from a published formula and cites its source.
 
 <p align="center">
-  <img src="docs/img/home-mobile.png" width="240" alt="roughlogic home view on a phone: a headline, a one-paragraph description, a single search bar, and a browse-by-trade index">
+  <img src="docs/img/home-mobile.png" width="240" alt="roughlogic home view on a phone: a headline, one line of description, a single search box, and four tappable example questions">
   &nbsp;
   <img src="docs/img/calculator-mobile.png" width="240" alt="The Ohm's Law calculator on a phone in the light theme, with labeled numeric inputs and live computed outputs, each with a Copy button">
   &nbsp;
@@ -14,9 +14,9 @@
 
 ## Use it
 
-1. Search for what you need, or browse by trade.
-2. Type your numbers. The answer updates as you type. There is no submit button.
-3. Tap **Copy** to take a value with you.
+1. Type the job the way you'd say it, numbers and all: `voltage drop 120v 150 ft 12 awg 20a`. Search by name or browse by trade if you'd rather.
+2. The calculator opens with your numbers already in it, each box captioned with the words they came from. If one value is missing, the page asks for it in words.
+3. The answer sits at the top of the page, above the inputs that produced it, and updates as you type. There is no submit button. Tap **Copy** to take a value with you.
 
 A calculator opens empty, and each box is captioned with the value the page's worked example uses (`e.g. 150`), so you can see the expected unit and magnitude before typing your own over it. A box whose value is a trade convention rather than a job number (30 °C ambient, a 0.61 orifice coefficient) opens holding that convention instead.
 
