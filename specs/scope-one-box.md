@@ -80,7 +80,7 @@ lands before any pixel moves; the additive nav work lands before any link is rem
 | ~~[v1340](spec-v1340.md)~~ | ~~`query-fill.js` — query + tile → filled, missing, unmatched~~ **SHIPPED** | v1339 | none |
 | ~~[v1341](spec-v1341.md)~~ | ~~Enter routes to the answer, with provenance on every filled field~~ **SHIPPED** | v1340 | behaviour |
 | ~~[v1342](spec-v1342.md)~~ | ~~Ask for the first missing value, in words~~ **SHIPPED** | v1341 | behaviour |
-| [v1343](spec-v1343.md) | Two or three plain choices when the query is ambiguous | v1341 | behaviour |
+| ~~[v1343](spec-v1343.md)~~ | ~~Two or three plain choices when the query is ambiguous~~ **SHIPPED** | v1341 | behaviour |
 | ~~[v1345](spec-v1345.md)~~ | ~~`/tools/` — every calculator by category — and the footer badge~~ **SHIPPED** | v1346 | none |
 | ~~[v1337](spec-v1337.md)~~ | ~~The home page becomes one box. **All 21 trade links kept.**~~ **SHIPPED** | v1345 | low |
 | ~~[v1338](spec-v1338.md)~~ | ~~Answer first, inputs second~~ **SHIPPED** | — | low |

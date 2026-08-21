@@ -1715,92 +1715,6 @@ function navigateTo(hash) {
 
 // --- Tool view shell ---
 
-// spec-v1341: resolve the field index's rows to this tile's actual inputs.
-//
-// The index is keyed by the RENDERER's field key, and that is not reliably the
-// DOM id. Hand-written renderers name their inputs for the page (`vd-src`,
-// `vd-len`) while their schema is keyed by the compute's parameters
-// (`source_voltage_V`, `length_ft`), and the declarative factory uses
-// `f.id || f.key`, so a tile that declares an explicit id diverges too.
-// Assuming the two are the same -- which spec-v1339 originally recorded as
-// fact -- puts values into the wrong boxes or into no box at all.
-//
-// So nothing is assumed: each row is resolved against the LIVE DOM, first by
-// id, then by the rendered <label> text, which the index already carries and
-// which is the string a human reads beside that input. A row that resolves to
-// neither is skipped. Silence is the correct failure here.
-function resolveFields(region, rows) {
-  const out = new Map();
-  if (!region || !Array.isArray(rows)) return out;
-  const byLabel = new Map();
-  for (const label of region.querySelectorAll("label[for]")) {
-    const key = String(label.textContent || "")
-      .replace(/\s*\([^()]*\)\s*$/, "").trim().toLowerCase();
-    if (key && !byLabel.has(key)) byLabel.set(key, label.getAttribute("for"));
-  }
-  const taken = new Set();
-  for (const row of rows) {
-    let el = null;
-    try { el = region.querySelector("#" + CSS.escape(row.d)); } catch { el = null; }
-    if (!el) {
-      const domId = byLabel.get(String(row.l || "").trim().toLowerCase());
-      if (domId && !taken.has(domId)) {
-        try { el = region.querySelector("#" + CSS.escape(domId)); } catch { el = null; }
-      }
-    }
-    if (!el || taken.has(el.id)) continue;
-    taken.add(el.id);
-    out.set(row.d, el);
-  }
-  return out;
-}
-
-// spec-v1341: fill this tile's inputs from the words the reader typed.
-//
-// Runs after the renderer has mounted and after applyHashState, so it can see
-// the real inputs and can avoid touching anything the hash already set -- a
-// deep link's values are the reader's, not ours to revise. Whatever it writes,
-// the existing wireHashState picks up from the DOM and encodes into the URL,
-// so a prefilled answer is still a shareable link without this path having to
-// build one.
-//
-// It runs even when a slots.json template already fired, because a template
-// covers only the fields someone hand-listed: on `voltage-drop` the template
-// set source/length/current and left the AWG select on its first option, so a
-// reader who typed "12 awg" got an answer computed at 18 AWG with no sign
-// anything had been ignored.
-function applyQueryPrefill(region, id, params) {
-  const pending = pendingQuery;
-  pendingQuery = null;
-  if (!pending || pending.id !== id || !region) return;
-  const tool = TOOLS.find((t) => t.id === id);
-  if (!tool) return;
-  import("./query-fill.js").then(async (mod) => {
-    const rows = await mod.loadFields(id, tool.group);
-    if (!rows || !region.isConnected) return;
-    const { filled } = mod.queryFill(pending.text, rows);
-    const resolved = resolveFields(region, rows);
-    const marked = new Set();
-    for (const [key, value] of Object.entries(filled)) {
-      const el = resolved.get(key);
-      if (!el || !el.id) continue;
-      if (Object.prototype.hasOwnProperty.call(params, el.id)) continue;  // the hash owns it
-      if (el.type === "checkbox") el.checked = value === "1" || value === "true";
-      else el.value = String(value);
-      // Renderers are split on which event they listen to; dispatch both,
-      // exactly as applyHashState does.
-      el.dispatchEvent(new Event("input", { bubbles: true }));
-      el.dispatchEvent(new Event("change", { bubbles: true }));
-      marked.add(el.id);
-    }
-    // Fields the hash filled from the same typed question are the reader's
-    // words too, so they are captioned alongside.
-    for (const key of Object.keys(params)) if (key !== "v") marked.add(key);
-    markProvenance(region, marked);
-    askCard(region, rows, resolved, marked);
-  }).catch(() => { /* prefill is an enhancement; the form is always there */ });
-}
-
 // spec-v1338: hide the answer card until the tile actually has an answer.
 //
 // `:empty` in CSS is not enough. Most renderers build their output ROWS at
@@ -1832,169 +1746,20 @@ function syncAnswerVisibility(outputRegion) {
   outputRegion.classList.toggle("output-blank", !hasValue);
 }
 
-// spec-v1342: ask for the first value the tile cannot answer without.
-//
-// A query that carries three of four values lands on a form with one empty box
-// and no sign which one is holding everything up. One question, in words, at
-// the top of the page, is the difference between an assistant and a form.
-//
-// It renders only when the reader's own words filled something AND a required
-// field is still empty. If nothing was filled they typed a tool name, not a
-// sentence, and the tile's own form is the right answer.
-//
-// The question text comes from the RENDERED <label>, never from the registry:
-// registry labels are written for machines, and rendering one at a person has
-// misfired before. Where no label is found, no card. Fail quiet.
-function askCard(region, rows, resolved, filledIds) {
-  if (!region || !filledIds || !filledIds.size) return;
-  const view = region.parentElement;
-  if (!view) return;
-  clearAskCard(view);
-
-  const isEmpty = (el) => {
-    if (!el) return false;
-    if (el.type === "checkbox") return false;         // a box says its own state
-    return String(el.value || "").trim() === "";
-  };
-
-  // Declaration order, so the reader is asked in the order the tile reads.
-  let target = null, targetRow = null;
-  for (const row of rows) {
-    if (!row.r) continue;
-    const el = resolved.get(row.d);
-    if (el && isEmpty(el)) { target = el; targetRow = row; break; }
-  }
-  if (!target || !targetRow) return;
-  // A select or checkbox has no sensible one-line stand-in; the field itself is
-  // the better control. Number and text only.
-  if (target.tagName === "SELECT" || target.type === "checkbox") return;
-
-  const label = view.querySelector('label[for="' + (window.CSS && CSS.escape ? CSS.escape(target.id) : target.id) + '"]');
-  const labelText = label ? String(label.textContent || "").trim() : "";
-  if (!labelText) return;
-
-  // Ask in the unit the field is CURRENTLY showing. "What is the length?" is
-  // unanswerable beside a box measured in inches when the reader means feet.
-  const unitMatch = labelText.match(/\(([^()]*)\)\s*$/);
-  const name = labelText.replace(/\s*\([^()]*\)\s*$/, "").trim().toLowerCase();
-  const unit = unitMatch ? unitMatch[1].split(/[,;]/)[0].trim() : "";
-
-  const card = document.createElement("section");
-  card.className = "ask-card";
-  // NOT a live region, and not inside one: this is a question, not a result.
-  card.setAttribute("aria-label", "One more value needed");
-
-  const q = document.createElement("p");
-  q.className = "ask-q";
-  q.textContent = unit ? `What is the ${name} in ${unit}?` : `What is the ${name}?`;
-  card.appendChild(q);
-
-  // The receipt, so the work does not look lost.
-  const have = [];
-  for (const row of rows) {
-    const el = resolved.get(row.d);
-    if (!el || !filledIds.has(el.id) || el === target) continue;
-    const shown = el.tagName === "SELECT" && el.selectedOptions && el.selectedOptions[0]
-      ? el.selectedOptions[0].textContent.trim()
-      : String(el.value || "").trim();
-    if (shown) have.push(String(row.l).toLowerCase() + " " + shown);
-  }
-  if (have.length) {
-    const receipt = document.createElement("p");
-    receipt.className = "ask-receipt";
-    // Commas and spaces, never slash-joined: this is the likeliest place on
-    // the page to produce a long unbreakable token at 320px.
-    receipt.textContent = "Everything else is in: " + have.join(", ") + ".";
-    card.appendChild(receipt);
-  }
-
-  const form = document.createElement("form");
-  form.className = "ask-form";
-  const inputId = "ask-" + target.id;
-  // A real <label for>, not an aria-label: scripts/check-field-accessors and
-  // the a11y sweep hold every dynamically created input to one, and the
-  // visible text and the accessible name become a single string that cannot
-  // drift apart.
-  const inputLabel = document.createElement("label");
-  inputLabel.className = "visually-hidden";
-  inputLabel.setAttribute("for", inputId);
-  inputLabel.textContent = q.textContent;
-  const field = document.createElement("input");
-  field.id = inputId;
-  field.className = "ask-input input";
-  field.type = "number";
-  field.step = "any";
-  field.inputMode = "decimal";
-  const go = document.createElement("button");
-  go.type = "submit";
-  go.className = "ask-go";
-  go.textContent = "Use it";
-  form.append(inputLabel, field, go);
-
-  const dismiss = () => clearAskCard(view);
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const value = String(field.value || "").trim();
-    if (!value) return;
-    target.value = value;
-    // The renderers are split on which event they listen to.
-    target.dispatchEvent(new Event("input", { bubbles: true }));
-    target.dispatchEvent(new Event("change", { bubbles: true }));
-    dismiss();
-  });
-  // A shortcut, never a gate: filling the real field below dismisses it too.
-  target.addEventListener("input", dismiss, { once: true });
-  target.addEventListener("change", dismiss, { once: true });
-
-  card.appendChild(form);
-  // Above the ANSWER, not merely above the inputs: when the card is up there
-  // is no answer yet, and a tile that reads a blank required field as zero
-  // would otherwise render a confident "0.0" directly above the question
-  // asking for the value it needed.
-  view.insertBefore(card, view.querySelector(".output-region") || region);
-  // Focus is NOT moved here. renderToolView already focuses the h1 for screen
-  // reader users and a second focus call in the same microtask races it; the
-  // card is the first thing in the body, so Tab reaches it anyway.
-}
-
-function clearAskCard(view) {
-  if (!view) return;
-  for (const el of view.querySelectorAll(".ask-card")) el.remove();
-}
-
-// spec-v1341: mark the inputs a typed question filled.
-//
-// This is the verification affordance -- the whole reason a card beats a chat
-// bubble. A tradesperson who sees `120 V - 150 ft - 12 AWG - 20 A` captioned
-// under the answer catches a mis-parse in about a second; without the caption
-// a prefilled field is indistinguishable from one they typed themselves.
-//
-// The caption is a <span>, not a <p class="muted">: collapseLongNotes folds
-// direct p.muted children of the tool body and would otherwise swallow these.
-// It also stays OUT of the output region, which is aria-live -- a caption
-// announced as part of the answer on every keystroke is noise.
-function markProvenance(region, keys) {
-  if (!region || !keys || !keys.size) return;
-  for (const key of keys) {
-    let el;
-    try { el = region.querySelector("#" + CSS.escape(key)); } catch { el = null; }
-    if (!el) continue;
-    const field = el.closest(".field") || el.parentElement;
-    if (!field || field.querySelector(".field-provenance")) continue;
-    el.classList.add("is-autofilled");
-    const note = document.createElement("span");
-    note.className = "field-provenance";
-    note.textContent = PROVENANCE_TEXT;
-    field.appendChild(note);
-    // The first edit makes it the reader's value, not ours. `once` so the
-    // listener cannot pile up across re-renders of the same field.
-    const clear = () => {
-      el.classList.remove("is-autofilled");
-      if (note.parentElement) note.remove();
-    };
-    el.addEventListener("input", clear, { once: true });
-    el.addEventListener("change", clear, { once: true });
-  }
+// spec-v1341/v1342: the tile-side prefill, provenance captions and ask card
+// live in tile-prefill.js, lazily imported. None of it is reachable from the
+// home view, and app.js is loaded there against a hard 49 KB JS sub-budget
+// (spec-v10 section H.2), so code that only runs on a tile does not belong in
+// the file the home page pays for.
+function applyQueryPrefill(region, id, params) {
+  const pending = pendingQuery;
+  pendingQuery = null;
+  if (!pending || pending.id !== id || !region) return;
+  const tool = TOOLS.find((t) => t.id === id);
+  if (!tool) return;
+  import("./tile-prefill.js").then((mod) => mod.applyQueryPrefill({
+    region, tool, params: params || {}, query: pending.text, provenanceText: PROVENANCE_TEXT,
+  })).catch(() => { /* prefill is an enhancement; the form is always there */ });
 }
 
 function renderToolView(id, params) {
@@ -2247,6 +2012,13 @@ function bindSearch() {
   }
   let matches = [];
   let activeIndex = -1;
+  // spec-v1343: did the READER choose this row, or did the list merely
+  // highlight the first one for them? render() calls setActive(0), so
+  // activeIndex is 0 the moment anything is typed and every Enter looks like a
+  // deliberate pick. Without this flag the ambiguity check below never runs and
+  // the whole feature ships silently dead -- which is exactly what happened on
+  // sophiewell before its own v756 was debugged.
+  let userPicked = false;
 
   // Alias terms map a free-text phrase to a tile id; loaded lazily.
   // Row shape matches the shard ({ term, target }) so the rows feed
@@ -2456,6 +2228,62 @@ function bindSearch() {
     navigateTo(prefillHash(tool, typed));
   }
 
+  // spec-v1343: is the ranker's top pick actually a pick?
+  //
+  // Measured over 36 realistic probes, 17 come back with the runner-up scoring
+  // at least 95% of the leader -- "pressure drop", "heat loss", "payment",
+  // "grounding". Those are not variants of one calculator; they answer
+  // different questions. A query carrying VALUES almost always separates
+  // cleanly, so this fires on the vague ones and stays out of the way of the
+  // specific ones, which is the right split.
+  //
+  // Runs on Enter only. A second ranking pass per keystroke would be wasted
+  // work for a decision only Enter makes.
+  const AMBIGUITY_RATIO = 0.95;
+  function ambiguousMatches() {
+    if (!lastRanked || !Array.isArray(lastRanked.rows) || lastRanked.rows.length < 2) return null;
+    const rows = lastRanked.rows;
+    const leader = rows[0].score;
+    if (!leader) return null;
+    // A curated alias is a deliberate routing decision, not a coincidence of
+    // token scores. If one fired, respect it.
+    const typed = (input.value || "").trim().toLowerCase();
+    if (aliasRows.some((a) => a.term === typed)) return null;
+    // A slots.json template fired means the query was specific enough to
+    // prefill; that is not ambiguity either.
+    if (slotsByTile && slotsByTile.has(rows[0].tool.id) && discovery
+        && discovery.mapSlots(discovery.extractQuantities(input.value), slotsByTile.get(rows[0].tool.id))) return null;
+    const close = rows.filter((r) => r.score / leader >= AMBIGUITY_RATIO);
+    if (close.length < 2) return null;
+    // Two where the top pair separates from the rest; three at the outside.
+    return close.slice(0, 3).map((r) => r.tool);
+  }
+
+  function clearPickCard() {
+    for (const el of document.querySelectorAll(".pick-card")) el.remove();
+  }
+
+  // The card itself is a lazy import: the home view carries a hard 49 KB JS
+  // sub-budget and this only matters once someone has searched.
+  function renderPickCard(tools, typed) {
+    setExpanded(false);
+    import("./pick-card.js").then((mod) => {
+      mod.renderPickCard({
+        tools,
+        host: document.getElementById("tools"),
+        lead: leadSentence,
+        onPick: (tool) => { input.value = typed; pick(tool); },
+      });
+    }).catch(() => {
+      // The card is an enhancement. Fall back to routing at the top match,
+      // which is what happened before this spec existed.
+      if (tools[0]) pick(tools[0]);
+    });
+  }
+
+  // A new search replaces any open question.
+  input.addEventListener("input", clearPickCard);
+
   // spec-v1337: the example chips. Each sets the box and runs the SAME code
   // path as typing -- no new routing logic -- so what a reader sees
   // demonstrated is exactly what their own typing does.
@@ -2529,13 +2357,14 @@ function bindSearch() {
       item.appendChild(group);
       // mousedown so the route fires before the input-blur close handler.
       item.addEventListener("mousedown", (e) => { e.preventDefault(); pick(tool); });
-      item.addEventListener("mouseenter", () => setActive(i));
+      item.addEventListener("mouseenter", () => { userPicked = true; setActive(i); });
       list.appendChild(item);
       // spec-v592: computed answer preview on the top-ranked row when the
       // typed numbers map onto the tile's slots.
       if (i === 0 && lastRanked) schedulePreview(tool, query, item);
     });
     setExpanded(true);
+    userPicked = false;
     setActive(0);
   }
 
@@ -2572,13 +2401,22 @@ function bindSearch() {
   input.addEventListener("keydown", (e) => {
     if (e.key === "ArrowDown") {
       if (!matches.length) return;
+      userPicked = true;
       setActive((activeIndex + 1) % matches.length);
       e.preventDefault();
     } else if (e.key === "ArrowUp") {
       if (!matches.length) return;
+      userPicked = true;
       setActive((activeIndex - 1 + matches.length) % matches.length);
       e.preventDefault();
     } else if (e.key === "Enter") {
+      if (userPicked && activeIndex >= 0 && matches[activeIndex]) { e.preventDefault(); pick(matches[activeIndex]); return; }
+      // spec-v1343: the reader did not choose a row -- they just pressed
+      // Enter. If the ranker cannot separate its top two, say so instead of
+      // guessing: "pressure drop" is compressed-air and filter, "heat loss" is
+      // duct and pipe, and picking wrong on a job is not a small error.
+      const ambiguous = ambiguousMatches();
+      if (ambiguous) { e.preventDefault(); renderPickCard(ambiguous, input.value); return; }
       if (activeIndex >= 0 && matches[activeIndex]) { e.preventDefault(); pick(matches[activeIndex]); return; }
       if (matches[0]) { e.preventDefault(); pick(matches[0]); return; }
       // No rendered matches: fall back to an exact tool-name match (once

@@ -1,6 +1,6 @@
 # spec-v1343.md — Two plain choices when the query is ambiguous
 
-> Status: **PLANNED.** Part of [scope-one-box](scope-one-box.md). Depends on [v1341](spec-v1341.md).
+> Status: **SHIPPED (2026-08-20).** Part of [scope-one-box](scope-one-box.md). Depends on [v1341](spec-v1341.md).
 > Catalog stays **1,709**.
 
 ## Why
@@ -50,6 +50,45 @@ highlighted the first one for them*.
 `bindSearch()` here has the same `setActive` / `activeIndex` / `pick()` structure. **Read what
 `render()` does to `activeIndex` before writing the Enter branch**, and if it pre-selects, add the
 same flag. Otherwise this feature will be silently dead and every test will pass.
+
+## The bug the spec predicted was there
+
+`render()` calls `setActive(0)`, so `activeIndex` is `0` the instant anything is typed and the
+Enter branch at `app.js` took it as a deliberate pick every time. **The ambiguity check would
+never have run and every test would still have passed** — the feature would have shipped silently
+dead, exactly as it first did on sophiewell. A `userPicked` flag now separates *the reader chose
+this row* (arrow keys, hover) from *the list highlighted the first one for them*, and there is an
+e2e case asserting that arrowing to a row still routes.
+
+## Measured: the gate fires where it should, and stays out of the way where it shouldn't
+
+Over 36 realistic probes, **17 come back with the runner-up scoring at least 95% of the leader**:
+
+| Query | The two it cannot separate |
+|---|---|
+| `pressure drop` | compressed-air, filter |
+| `heat loss` | duct heat gain, pipe heat loss |
+| `payment` | loan payment, PITI |
+| `grounding` | grounding electrode, grounding electrode conductor |
+| `anchor` | anchor embedment, anchor rode scope |
+
+And the split falls in the right place on its own: **a query carrying values almost always
+separates cleanly**, so `voltage drop 120v 150 ft 12 awg copper 20a` routes straight through with
+its six fields filled, while a bare `pressure drop` asks. Nothing had to be tuned for that; it
+falls out of the ranker scoring a specific query higher.
+
+## What shipped differently
+
+- **The card is a lazily-imported module (`pick-card.js`), not code in `app.js`.** Adding it inline
+  pushed the home view's **JS sub-budget** past its 49 KB ceiling (`spec-v10 §H.2`) — 51,059 B
+  against 50,176 B. That budget is not negotiable and raising it would be the wrong trade for a
+  card that only matters after someone has searched.
+- **The tile-side prefill moved out too, into `tile-prefill.js`.** Even after extracting the card
+  the budget was still 441 B over, and the honest fix was the same one: `resolveFields`,
+  `markProvenance` and `askCard` from v1341/v1342 are unreachable from the home view, so they do
+  not belong in the file the home page pays for. `app.js` is now at **94.1%** of the JS
+  sub-budget, with headroom. `syncAnswerVisibility` stayed behind on purpose — it runs on every
+  tile, prefilled or not.
 
 ## Gotchas
 

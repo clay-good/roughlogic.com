@@ -321,3 +321,72 @@ test("spec-v1337 chips: 48px touch targets", async ({ page }) => {
     expect(box.height).toBeGreaterThanOrEqual(44);
   }
 });
+
+// spec-v1343: two or three plain choices when the query is ambiguous.
+
+test("spec-v1343: a vague query asks instead of guessing", async ({ page }) => {
+  // "pressure drop" is compressed-air AND filter AND flash-steam. They are not
+  // variants of one calculator; they answer different questions.
+  await page.goto("/");
+  const input = page.locator("#search-input");
+  await input.click();
+  await input.fill("pressure drop");
+  await expect(page.locator(".search-result").first()).toBeVisible();
+  await input.press("Enter");
+
+  const card = page.locator(".pick-card");
+  await expect(card).toBeVisible();
+  const picks = card.locator(".pick");
+  expect(await picks.count()).toBeGreaterThanOrEqual(2);
+  expect(await picks.count()).toBeLessThanOrEqual(3);
+  // Named by the question each answers, not by a group label.
+  await expect(picks.first().locator(".pick-name")).not.toBeEmpty();
+  await expect(picks.first().locator(".pick-desc")).not.toBeEmpty();
+
+  // NOTHING routes until the reader chooses.
+  expect(page.url()).not.toMatch(/#\w/);
+});
+
+test("spec-v1343: choosing an option routes to that calculator", async ({ page }) => {
+  await page.goto("/");
+  const input = page.locator("#search-input");
+  await input.click();
+  await input.fill("pressure drop");
+  await expect(page.locator(".search-result").first()).toBeVisible();
+  await input.press("Enter");
+  await expect(page.locator(".pick-card")).toBeVisible();
+
+  await page.locator(".pick").first().click();
+  await expect(page).toHaveURL(/#[a-z0-9-]+/);
+  await expect(page.locator(".pick-card")).toHaveCount(0);
+  await expect(page.locator(".input-region")).toBeVisible();
+});
+
+test("spec-v1343: a specific query routes straight through, no card", async ({ page }) => {
+  // The gate must not fire on a query that carries its own values -- that is
+  // the whole point of the split.
+  await page.goto("/");
+  const input = page.locator("#search-input");
+  await input.click();
+  await input.fill("voltage drop 120v 150 ft 12 awg copper 20a single phase");
+  await expect(page.locator("#search-results .search-result").first().locator(".sr-name"))
+    .toHaveText("Voltage Drop");
+  await input.press("Enter");
+  await expect(page).toHaveURL(/#voltage-drop\?v=1&/);
+  await expect(page.locator(".pick-card")).toHaveCount(0);
+});
+
+test("spec-v1343: arrowing to a row is a deliberate pick and routes", async ({ page }) => {
+  // render() calls setActive(0), so activeIndex is 0 the moment anything is
+  // typed. Without the userPicked flag every Enter looks deliberate and the
+  // ambiguity check never runs -- the feature would ship silently dead.
+  await page.goto("/");
+  const input = page.locator("#search-input");
+  await input.click();
+  await input.fill("pressure drop");
+  await expect(page.locator(".search-result").first()).toBeVisible();
+  await input.press("ArrowDown");
+  await input.press("Enter");
+  await expect(page).toHaveURL(/#[a-z0-9-]+/);
+  await expect(page.locator(".pick-card")).toHaveCount(0);
+});

@@ -1966,3 +1966,64 @@ textarea.is-autofilled {
 
 .home-trades.is-quiet .home-trades-list a:hover,
 .home-trades.is-quiet .home-trades-list a:focus-visible { color: var(--accent); }
+
+/* ============================================================
+   spec-v1343: the disambiguation card.
+
+   The one state in this program where a page appears before an
+   answer does, and that is the point: ambiguity is the one case
+   where guessing costs more than asking.
+   ============================================================ */
+.pick-card {
+  margin: var(--space-4) auto 0;
+  max-width: 640px;
+  text-align: left;
+}
+
+.pick-q {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.pick-sub {
+  margin: var(--space-1) 0 var(--space-3);
+  color: var(--fg-dim);
+}
+
+.picks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pick {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-height: var(--touch-min);
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-secondary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pick:hover,
+.pick:focus-visible { border-color: var(--accent); }
+
+.pick-name {
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.pick-desc {
+  color: var(--fg-muted);
+  overflow-wrap: anywhere;
+}
+
+.pick-needs {
+  color: var(--fg-dim);
+  overflow-wrap: anywhere;
+}

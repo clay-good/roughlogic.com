@@ -36,6 +36,8 @@ const FILES = [
   "field-units.js",
   "field-bucket.js",
   "query-fill.js",
+  "pick-card.js",
+  "tile-prefill.js",
   "integrity.js",
   "calc-electrical.js",
   "calc-motor.js",
