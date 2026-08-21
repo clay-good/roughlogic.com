@@ -50,6 +50,8 @@
 //     A quantity maps only when exactly one yet-unfilled slot accepts its
 //     unit token; any ambiguity drops that quantity.
 
+import { canonicalUnit } from "./field-units.js";
+
 export function resolveQuery(query, aliases, toolIds) {
   if (typeof query !== "string") return null;
   const q = query.trim().toLowerCase();
@@ -287,6 +289,10 @@ function corpusFor(tool, aliases, aliasEntry) {
       // Signal-bearing name parts for the covered-name bonus: split
       // compounds, drop question-frame words ("with", "for", "a").
       nameParts: tokenize(tool.name, false).filter((t) => !STOPWORDS.has(t)),
+      // The whole name as a normalized phrase, for the containment bonus
+      // below: the same tokenizing the query goes through, so "Manual J
+      // Cooling Load (Simplified)" and a reader's typing meet in one form.
+      namePhrase: tokenize(tool.name, true).join(" "),
     };
     _corpusCache.set(tool, c);
   }
@@ -405,8 +411,40 @@ export function rankTools(tokens, tools, aliases, opts) {
       }
     }
     if (corpus.nameLower.startsWith(joined)) score += 2;
+    // The mirror of the line above, and the one that was missing: the QUERY
+    // contains this calculator's whole name. "asphalt tonnage 5000 ft2 3 in
+    // 145 pcf" named Asphalt Tonnage outright and still came second to
+    // Pavement Milling Production, which matched more of the leftover words --
+    // and on the agent door, where nobody sees a dropdown, second place is
+    // simply the wrong answer.
+    //
+    // It cannot be a score bonus, because coverage sorts ahead of score: a
+    // sibling matching one more stray word wins however large the bonus. So
+    // it is its own sort key, ahead of coverage.
+    //
+    // The name must OPEN the query, not merely appear in it, and that is the
+    // difference between a reader naming a calculator and a reader using its
+    // words: "asphalt tonnage 5000 ft2 3 in 145 pcf" is someone asking for
+    // Asphalt Tonnage and then giving it numbers, while "max circuit length
+    // for voltage drop" contains Voltage Drop in full and is not asking for
+    // it -- promoting on containment alone took that query off Max Circuit
+    // Length, which is the tile it had always correctly returned. A one-word
+    // name cannot earn it either: "slope" opening a sentence is not a reader
+    // asking for Slope.
+    // And what follows the name has to be NUMBERS, not more words. "friction
+    // loss 200 ft of hose at 150 gpm" opens with the Friction Loss tile's whole
+    // name and is asking for the fire-hose one: the word "hose" is the reader
+    // narrowing, and coverage is exactly the machinery that reads it. So the
+    // promotion applies only when the reader named a calculator and then gave
+    // it values -- every leftover word a quantity, a unit, or a connective.
+    const namesInFull =
+      corpus.namePhrase.includes(" ") &&
+      (joined + " ").startsWith(corpus.namePhrase + " ") &&
+      tokens
+        .slice(corpus.namePhrase.split(" ").length)
+        .every((t, i) => soft[i + corpus.namePhrase.split(" ").length] || STOPWORDS.has(t) || canonicalUnit(t) !== null);
     if (verbatimTarget === tool.id) score += 4;
-    scored.push({ tool, corpus, weights, score, coverage, viaTypo: false });
+    scored.push({ tool, corpus, weights, score, coverage, viaTypo: false, namesInFull });
   }
 
   // Pass 2: bounded typo fallback, only for query tokens of length >= 3
@@ -450,10 +488,12 @@ export function rankTools(tokens, tools, aliases, opts) {
   }
 
   const out = scored.filter((r) => r.coverage > 0);
-  // Full-coverage candidates first, then best token coverage; ties break
-  // by score desc, then name: a total, deterministic order.
+  // A calculator the query NAMED IN FULL first; then full-coverage
+  // candidates, then best token coverage; ties break by score desc, then
+  // name: a total, deterministic order.
   out.sort(
     (a, b) =>
+      (b.namesInFull ? 1 : 0) - (a.namesInFull ? 1 : 0) ||
       b.coverage - a.coverage ||
       b.score - a.score ||
       String(a.tool.name).localeCompare(String(b.tool.name)),

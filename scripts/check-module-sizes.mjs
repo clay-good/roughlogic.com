@@ -294,7 +294,7 @@ const CAPS = {
   // chi2Cdf / betainc / tcdf); built module ~7.0 KB gzipped, cap carries
   // the documented ~20% headroom.
   "pure-math.js": 8500,
-  "query-fill.js": 9500, // spec-v1340 query-fill 2026-08-20 (default 6144 -> 9500): the natural-language extractor is ONE cohesive algorithm -- the trade rewrites, the unit-family tables, the negation window, and the two matching phases only make sense together -- so the gate's preferred remedy of splitting per-tile does not apply; a split would put the veto rules in a different file from the matching they veto. Sits at 8,195 B gz; raised with modest headroom for the spec-v1342/v1343 follow-ons. Lazy-loaded on first search interaction, absent from the home-view payload (58.8% of budget, unchanged by this module).
+  "query-fill.js": 10500, // spec-v1340 query-fill 2026-08-20 (default 6144 -> 9500; -> 10500 on 2026-08-21 for Phase B0, the rule that lets a dimensioned number fill an all-numeric dropdown -- same cohesive algorithm, and the ordering argument for why it runs where it does is the part worth keeping): the natural-language extractor is ONE cohesive algorithm -- the trade rewrites, the unit-family tables, the negation window, and the two matching phases only make sense together -- so the gate's preferred remedy of splitting per-tile does not apply; a split would put the veto rules in a different file from the matching they veto. Sits at 8,195 B gz; raised with modest headroom for the spec-v1342/v1343 follow-ons. Lazy-loaded on first search interaction, absent from the home-view payload (58.8% of budget, unchanged by this module).
 
   // Reference / citation modules. citations.js is the structured §3
   // reference block that every per-tile source-stamp resolves against;
@@ -336,7 +336,11 @@ const CAPS = {
   // estimate left under 2% headroom). Re-bumped 7000 -> 8500 B later on
   // 2026-07-10 for the spec-v591 quantity slot parser
   // (extractQuantities / mapSlots, 7053 B as landed + ~20% headroom).
-  "search-discovery.js": 8500,
+  // 8500 -> 10000 on 2026-08-21: the compound moment/torque unit allowlist
+  // ("300 ft-lb" was reading as 300 FEET) and the full-name-opens-the-query
+  // sort key. Both are single rules inside the one ranking pass; splitting
+  // the ranker would put a sort key in a different file from the sort.
+  "search-discovery.js": 10000,
   // v10 Phase B.2 per-tile meta-object registry. Grows incrementally
   // toward full TOOLS coverage; cap raised in lockstep. Bumped from
   // 7000 -> 9000 B on 2026-05-18 (spec-v13 Phase E seed of 55

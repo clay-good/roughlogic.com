@@ -363,3 +363,35 @@ test("extractQuantities leaves ordinary hyphenated phrases alone", () => {
   assert.deepEqual(extractQuantities("150 ft-long run"), [{ value: "150", unit: "ft" }]);
   assert.deepEqual(extractQuantities("3-ply wall"), [{ value: "3", unit: null }]);
 });
+
+// A query that OPENS with a calculator's whole name is asking for that
+// calculator and then handing it numbers. Coverage sorts ahead of score, so a
+// sibling matching one more of the leftover words used to win: "asphalt
+// tonnage 5000 ft2 3 in 145 pcf" returned Pavement Milling Production, and on
+// the agent door -- where nobody sees a dropdown -- second place is the wrong
+// answer.
+test("a query that opens with a tile's full name returns that tile first", async () => {
+  const { TOOLS, aliases } = await loadCatalog();
+  const rank = (q) => rankTools(normalizeQuery(q).tokens, TOOLS, aliases, { limit: 3 }).map((r) => r.tool.id);
+  assert.equal(rank("asphalt tonnage 5000 ft2 3 in 145 pcf")[0], "asphalt-tonnage");
+  assert.equal(rank("voltage imbalance 480 v 475 v 470 v")[0], "voltage-imbalance");
+});
+
+// The name must OPEN the query, not merely appear in it. "max circuit length
+// for voltage drop" contains Voltage Drop in full and is not asking for it.
+test("a full name inside a longer question does not take the top spot", async () => {
+  const { TOOLS, aliases } = await loadCatalog();
+  const rank = (q) => rankTools(normalizeQuery(q).tokens, TOOLS, aliases, { limit: 3 }).map((r) => r.tool.id);
+  assert.equal(rank("max circuit length for voltage drop")[0], "max-circuit-length-for-vd");
+});
+
+// ...and what follows the name has to be numbers. "friction loss 200 ft of
+// hose at 150 gpm" opens with the Friction Loss tile's whole name and is
+// asking for the fire-hose one: "hose" is the reader narrowing, and coverage
+// is the machinery that reads it.
+test("a qualifying word after the name still lets coverage decide", async () => {
+  const { TOOLS, aliases } = await loadCatalog();
+  const rank = (q) => rankTools(normalizeQuery(q).tokens, TOOLS, aliases, { limit: 3 }).map((r) => r.tool.id);
+  assert.equal(rank("friction loss 200 ft of hose at 150 gpm")[0], "fire-friction");
+  assert.equal(rank("friction loss 150 gpm 100 ft")[0], "friction-loss");
+});
