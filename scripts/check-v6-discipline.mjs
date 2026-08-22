@@ -21,7 +21,9 @@
 //    structured citation entries one trade group at a time, and
 //    failing here would block all PRs that have not yet completed
 //    their group's audit. The summary nonetheless tells the maintainer
-//    where the audit work is concentrated.
+//    where the audit work is concentrated; --verbose adds the per-module
+//    counts, which are otherwise 49 WARN lines on every lint run and drown
+//    the warnings a maintainer must actually act on.
 //
 // No network. No mutation. Pure read-and-report.
 
@@ -96,18 +98,31 @@ async function checkFreeAccessDocCoverage() {
 
 async function reportInlineCitationStrings() {
   // Scan calc-*.js for "per <Capitalized>..." patterns. Advisory only.
+  //
+  // The per-file rows are behind --verbose. They used to print unconditionally:
+  // 49 WARN lines on every `npm run lint`, out of 50 warnings and 280 lines of
+  // output in total. That is a standing backlog nobody actions on a given run,
+  // and it buried the warnings that ARE actionable -- a data shard past its
+  // refresh cadence emits exactly one WARN line, visually identical to these.
+  // The summary below keeps the number and the pointer, so nothing is lost
+  // from the default run.
   const entries = (await readdir(ROOT)).filter((n) => /^calc-.*\.js$/.test(n));
+  const verbose = process.argv.includes("--verbose");
   let total = 0;
+  let files = 0;
   for (const f of entries) {
     const text = await readFile(resolve(ROOT, f), "utf8");
     const matches = text.match(/"[^"]*\bper [A-Z][^"]*"/g) || [];
     if (matches.length > 0) {
       total += matches.length;
-      warnings.push("v6 citation-string lint (advisory): " + f + " contains " + matches.length + " inline 'per <Source>' citation strings. The v6 audit moves these into citations.js so an audit edits one place.");
+      files += 1;
+      if (verbose) {
+        warnings.push("v6 citation-string lint (advisory): " + f + " contains " + matches.length + " inline 'per <Source>' citation strings. The v6 audit moves these into citations.js so an audit edits one place.");
+      }
     }
   }
   if (total > 0) {
-    warnings.push("v6 citation-string lint summary: " + total + " inline reference strings across calc-*.js. Track per-group audit progress in docs/v6-audit.md.");
+    warnings.push("v6 citation-string lint summary (advisory): " + total + " inline reference strings across " + files + " calc-*.js modules. Track per-group audit progress in docs/v6-audit.md; re-run with --verbose for the per-module counts.");
   }
 }
 

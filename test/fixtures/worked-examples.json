@@ -68060,9 +68060,9 @@
      }
     },
     "burden_pct": {
-     "value": 31.2,
+     "value": 31.15,
      "tolerance": {
-      "pct": 2
+      "pct": 0.5
      }
     }
    }
