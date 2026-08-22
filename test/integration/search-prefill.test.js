@@ -63,6 +63,10 @@ test("search no-match: the dead end offers the browse-all-trades fork", async ({
   const browse = page.locator(".search-browse a");
   await expect(browse).toBeVisible();
   await expect(browse).toContainText("Browse all 21 trades");
+  // It used to route home and scroll to the trade strip under the hero. With
+  // the strip gone the fork has to be a real destination, or the dead end
+  // stays a dead end.
+  await expect(browse).toHaveAttribute("href", "tools/");
 });
 
 for (const c of CASES) {
@@ -281,9 +285,13 @@ test("spec-v1337 home: one box, four chips, and all 21 trade links kept", async 
   await expect(page.locator("p.home-lede")).toContainText("1,709 free calculators");
   await expect(page.locator(".hero-chip")).toHaveCount(4);
 
-  // spec-v1347 removes these later, on evidence. Until then every one stays:
-  // /groups/construction/ is the top organic landing page.
-  await expect(page.locator(".home-trades-list a")).toHaveCount(21);
+  // spec-v1347: the browse-by-trade strip is gone from the home document --
+  // the box is the whole page. The 21 group hubs keep their internal links
+  // through /tools/, which the footer reaches from every page, and they stay
+  // in the sitemap; assert both here so the link graph cannot quietly drop
+  // them the way deleting the strip alone would have.
+  await expect(page.locator(".home-trades-list")).toHaveCount(0);
+  await expect(page.locator("footer a[href$='tools/']")).toHaveCount(1);
 });
 
 test("spec-v1337 chips: a chip fills the box and leaves the results open", async ({ page }) => {

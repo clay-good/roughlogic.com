@@ -337,53 +337,6 @@ main {
   box-shadow: 0 0 0 4px rgba(90, 169, 255, 0.18);
 }
 
-/* Static "browse by trade" index under the hero. Links to the 24
-   prerendered group hubs: a crawlable content + internal-link surface
-   on the home document, kept visually quiet so the search bar stays
-   the primary entry point. */
-.home-trades {
-  width: 100%;
-  max-width: 720px;
-  margin: var(--space-6) auto 0;
-  text-align: center;
-}
-
-.home-trades-h2 {
-  margin: 0 0 var(--space-3);
-  font-size: 0.9375rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--fg-dim);
-}
-
-.home-trades-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-2);
-}
-
-.home-trades-list a {
-  display: inline-block;
-  padding: 8px 14px;
-  font-size: 1rem;
-  color: var(--fg-muted);
-  text-decoration: none;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-}
-
-.home-trades-list a:hover,
-.home-trades-list a:focus-visible {
-  color: var(--fg);
-  border-color: var(--accent);
-}
-
 .search-results {
   position: absolute;
   top: calc(100% + 8px);
@@ -1975,26 +1928,6 @@ textarea.is-autofilled {
   border-color: var(--accent);
   color: var(--fg);
 }
-
-/* The trade strip is kept but demoted (spec-v1337). Colour and weight
-   only -- the readable-type floor is gated, so this must never shrink
-   the text. spec-v1347 removes it once Search Console says it is safe. */
-.home-trades.is-quiet {
-  margin-top: var(--space-7);
-  border-top: 1px solid var(--border);
-  padding-top: var(--space-4);
-}
-
-.home-trades.is-quiet .home-trades-h2 {
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--fg-dim);
-}
-
-.home-trades.is-quiet .home-trades-list a { color: var(--fg-muted); }
-
-.home-trades.is-quiet .home-trades-list a:hover,
-.home-trades.is-quiet .home-trades-list a:focus-visible { color: var(--accent); }
 
 /* ============================================================
    spec-v1343: the disambiguation card.

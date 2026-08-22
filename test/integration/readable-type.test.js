@@ -23,7 +23,6 @@ const META_FLOOR_PX = 15;         // 0.9375rem: footer, source stamps, section e
 // below it. Add to this list only with a reason, never to silence a finding.
 const META = new Set([
   "p.data-source-stamp",          // "Source: NOAA ..., version ..., fetched ..."
-  "h2.home-trades-h2",            // uppercase eyebrow over the browse-by-trade index
 ]);
 
 const rows = JSON.parse(readFileSync(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8")).rows;

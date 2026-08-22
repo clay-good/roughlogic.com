@@ -2305,23 +2305,17 @@ function bindSearch() {
       empty.setAttribute("role", "presentation");
       empty.textContent = "No match yet. Try a trade, a unit, or a tool name (e.g. \"voltage drop\", \"duct\", \"mileage\").";
       list.appendChild(empty);
-      // spec-v592 no-match fallback: a dead end becomes a fork in the
-      // road -- route home to the browse-by-trade index.
+      // spec-v592 no-match fallback: a dead end becomes a fork in the road.
+      // It used to route home and scroll to the browse-by-trade strip under
+      // the hero; that strip is gone, so the fork is now the catalog page the
+      // footer points at -- a real navigation, not a scroll, and the same
+      // destination from every page on the site.
       const browse = document.createElement("li");
       browse.className = "search-empty search-browse";
       browse.setAttribute("role", "presentation");
       const link = document.createElement("a");
-      link.href = "#home";
+      link.href = "tools/";
       link.textContent = "Browse all " + GROUPS.length + " trades";
-      link.addEventListener("mousedown", (e) => {
-        e.preventDefault();
-        input.value = "";
-        setExpanded(false);
-        input.blur();
-        navigateTo("home");
-        const nav = document.querySelector(".home-trades");
-        if (nav) nav.scrollIntoView({ block: "start" });
-      });
       browse.appendChild(link);
       list.appendChild(browse);
       setExpanded(true);

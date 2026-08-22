@@ -24,6 +24,16 @@ path-based URL:
 
 - `/tools/<id>/index.html` -- one per tile.
 - `/groups/<slug>/index.html` -- one per active group.
+- `/tools/index.html` -- the catalog hub, every tile listed under its group.
+
+**Where the group hubs get their internal links.** The home document used to
+carry a browse-by-trade strip linking all 21 hubs directly; spec-v1347 removed
+it so the home page is the search box and nothing else. The hubs are now one
+hop further out: every page on the site (home, tile shells, group shells)
+footers to `/tools/`, and `/tools/` links all 21. All 21 also stay in
+`sitemap.xml`. `/groups/construction/` is the top organic landing page, so if
+its impressions move in Search Console, this is the change to look at first --
+the strip is a one-block revert to `index.html`.
 
 Shells are generated at build time by
 [../scripts/build-shells.mjs](../scripts/build-shells.mjs) from the
