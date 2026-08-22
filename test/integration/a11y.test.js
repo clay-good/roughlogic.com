@@ -265,12 +265,23 @@ test("every tile's inputs have an accessible name and numeric keypad hint", asyn
       const fields = document.querySelectorAll(
         "#view-region input[type=number], #view-region input[type=text]",
       );
+      // Two inputs that share an id both satisfy a document-wide
+      // `label[for=...]` lookup, because querySelector returns the FIRST
+      // match -- which is how tire-gearing shipped two text fields both
+      // carrying the literal id "undefined": the second one's label pointed
+      // at the first one's box. `el.labels` is the DOM's own association, so
+      // it cannot be fooled that way. Duplicate ids are checked below.
+      const seenIds = new Map();
       for (const el of fields) {
         const r = el.getBoundingClientRect();
         if (r.width === 0 && r.height === 0) continue; // hidden / inactive mode
+        if (el.id) {
+          if (seenIds.has(el.id)) out.push(`${tid}: two inputs share id "${el.id}" ("${seenIds.get(el.id)}" and "${el.placeholder}") -- one of them owns the label`);
+          else seenIds.set(el.id, el.placeholder || el.name || "");
+        }
         const named =
           el.getAttribute("aria-label") ||
-          (el.id && document.querySelector(`label[for="${CSS.escape(el.id)}"]`)) ||
+          (el.labels && el.labels.length > 0) ||
           el.closest("label");
         if (!named) out.push(`${tid}: input has no accessible name (placeholder="${el.placeholder}")`);
         if (el.type === "number" && !el.getAttribute("inputmode")) {

@@ -396,8 +396,15 @@ function _r(spec) {
       if (f.kind === "select") field = makeSelect(f.label, f.id || f.key, f.options);
       else if (f.kind === "text") {
         const wrap = document.createElement("div"); wrap.className = "field";
-        const lab = document.createElement("label"); lab.htmlFor = f.id; lab.textContent = f.label;
-        const input = document.createElement("input"); input.type = "text"; input.id = f.id; input.autocomplete = "off";
+        // `f.id || f.key`, the same fallback every other branch uses. Reading
+        // `f.id` alone gave every text field on a tile the literal id
+        // "undefined", so two of them collided and the second field's
+        // <label for> resolved to the FIRST input: clicking "New tire size"
+        // focused "Original tire size", and a screen reader announced the
+        // wrong one.
+        const fid = f.id || f.key;
+        const lab = document.createElement("label"); lab.htmlFor = fid; lab.textContent = f.label;
+        const input = document.createElement("input"); input.type = "text"; input.id = fid; input.autocomplete = "off";
         wrap.appendChild(lab); wrap.appendChild(input);
         field = { wrap, input };
       }

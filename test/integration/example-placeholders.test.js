@@ -34,7 +34,7 @@ const REFERENCE_TILES = new Set([
   "irs-form-index", "knot-reference", "lab-safety-quickread", "loto-steps",
   "magnetic-declination", "mold-conditions", "osha-recordkeeping", "osha-top10",
   "sales-tax-nexus", "smoke-reading", "storm-shelter", "thermal-delta-t",
-  "tool-maintenance", "triage-quickread", "water-classes", "historical-pricing",
+  "tool-maintenance", "triage-quickread", "water-classes",
 ]);
 
 test("every calculator offers its worked example, and answers nothing until asked", async ({ page }) => {

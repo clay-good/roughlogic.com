@@ -11,7 +11,7 @@
 // Strict no-alerts, no-subscriptions. Source and series ID are stamped on
 // every datapoint via the bundled shard.
 
-import { DEBOUNCE_MS, debounce, makeSelect, makeNumber, fmt } from "./ui-fields.js";
+import { DEBOUNCE_MS, debounce, makeSelect, makeNumber, fmt, attachExampleButton } from "./ui-fields.js";
 
 // Catalog of bundled commodity series. The `file` is the same-origin shard
 // under data/historical/commodities/. Each entry repeats the federal series
@@ -228,6 +228,15 @@ function renderHistoricalPricing(inputRegion, outputRegion, citationEl) {
 
   sel.select.addEventListener("input", update);
   lookback.input.addEventListener("input", update);
+  // The tile opens on "Pick a commodity", which tells the reader what to do
+  // but not what an answer looks like. Every other calculator offers its
+  // worked example in one tap; this one is a picker, so the example is which
+  // commodity to pick -- copper over 12 months, the same case the page prints.
+  attachExampleButton(inputRegion, () => {
+    sel.select.value = "copper";
+    lookback.input.value = "12";
+    update();
+  });
 }
 
 export const HISTORICAL_RENDERERS = {
