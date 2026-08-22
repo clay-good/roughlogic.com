@@ -231,3 +231,27 @@ test("rewriteQuery refuses to fold an inches part of 12 or more", () => {
   assert.equal(rewriteQuery("8 ft 6 in"), "8.5 ft");
   assert.equal(rewriteQuery("8 ft 11 in"), "8.916666666666666 ft");
 });
+
+// The words a reader types to FIND a calculator are not the names of its
+// fields. "joist hanger 20 ft 16 in" filled only the spacing, because Phase A
+// burns a quantity whose preceding window names two fields and "joist" is a
+// term of both "Joist-run width" and "Ends per joist" -- so the tool name
+// vetoed the number. That is the phrasing this site teaches, and passing the
+// tile's name in is what lets the fill ignore it.
+test("a tile's own name does not veto the value beside it", async () => {
+  const all = {};
+  const dir = resolve(ROOT, "data", "fields");
+  for (const n of await readdir(dir)) {
+    if (n === "manifest.json") continue;
+    Object.assign(all, JSON.parse(await readFile(resolve(dir, n), "utf8")).tiles);
+  }
+  const rows = all["joist-hanger-count"];
+  assert.ok(rows, "joist-hanger-count should be indexed");
+  const named = queryFill("joist hanger 20 ft 16 in", rows, { name: "Joist Hanger and Connector-Nail Count" }).filled;
+  assert.equal(named.run_width_ft, "20");
+  assert.equal(named.spacing_in, "16");
+  // Values alone were never the problem, and still are not.
+  const bare = queryFill("20 ft 16 in", rows).filled;
+  assert.equal(bare.run_width_ft, "20");
+  assert.equal(bare.spacing_in, "16");
+});

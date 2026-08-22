@@ -272,7 +272,7 @@ function valueFor(qty, row, text) {
   return String(Number(converted.toPrecision(12)));
 }
 
-export function queryFill(query, rows) {
+export function queryFill(query, rows, opts) {
   const empty = { filled: {}, missing: [], unmatched: [] };
   if (!Array.isArray(rows) || !rows.length) return empty;
 
@@ -298,6 +298,18 @@ export function queryFill(query, rows) {
   if (!text) return { filled: {}, missing: rows.map((r) => r.d), unmatched: [] };
   const termsByRow = new Map(rows.map((r) => [r.d, labelTerms(r.l)]));
 
+  // Words from the tile's OWN NAME are not field names, and reading them as
+  // field names loses the reader's first value: "joist hanger 20 ft 16 in"
+  // filled only the spacing, while the bare "20 ft 16 in" filled both. Phase A
+  // burns a quantity whose preceding window names two fields, and "joist" is a
+  // term of both "Joist-run width" and "Ends per joist" -- so the tool name the
+  // reader typed to FIND the calculator vetoed the number they typed to use it.
+  // That is the phrasing this site teaches, so the name is dropped from the
+  // window before it can name anything.
+  const nameWords = new Set(
+    opts && typeof opts.name === "string" ? labelTerms(opts.name) : [],
+  );
+
   const quantities = extractQuantities(text, { withIndex: true });
   const filled = {};
   const claimed = new Set();       // quantity indexes already spent
@@ -315,6 +327,7 @@ export function queryFill(query, rows) {
     const window = text.slice(prevEnd, qty.index);
     prevEnd = qty.end;
     const wanted = windowTerms(window);
+    for (const w of nameWords) wanted.delete(w);
     if (!wanted.size) return;
     const hits = [];
     // Selects compete here even though only number rows get filled in this

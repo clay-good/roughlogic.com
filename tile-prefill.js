@@ -55,7 +55,9 @@ export function applyQueryPrefill({ region, tool, params, query, provenanceText 
   import("./query-fill.js").then(async (mod) => {
     const rows = await mod.loadFields(tool.id, tool.group);
     if (!rows || !region.isConnected) return;
-    const { filled } = mod.queryFill(query, rows);
+    // The tile's own name goes in so the words the reader typed to FIND this
+    // calculator are not mistaken for the names of its fields.
+    const { filled } = mod.queryFill(query, rows, { name: tool.name });
     const resolved = resolveFields(region, rows);
     const marked = new Set();
     for (const [key, value] of Object.entries(filled)) {

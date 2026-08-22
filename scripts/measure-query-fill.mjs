@@ -33,6 +33,10 @@ const SHOW_MISSES = process.argv.includes("--misses");
 // is how a person in a hurry types, and it is the only phrasing that can show
 // a value landing in the wrong field for want of a name to hold it.
 const TERSE = process.argv.includes("--terse");
+// The phrasing the site teaches and the ranker rewards: the calculator's name,
+// then the values. It is the only mode that exercises the rule keeping a tile's
+// own name from being read as a field name.
+const NAMED = process.argv.includes("--named");
 
 const { queryFill } = await import(resolve(ROOT, "query-fill.js"));
 const { describe } = await import(resolve(ROOT, "mcp", "catalog.mjs"));
@@ -84,10 +88,11 @@ let fields = 0, recovered = 0, wrong = 0;
 const wrongRows = [], missRows = [];
 
 for (const [id, rows] of rowsByTile) {
-  let example;
+  let example, name = id;
   try {
     const d = await describe({ id });
     example = d.example && d.example.inputs;
+    if (d.name) name = d.name;
   } catch { continue; }
   if (!example || typeof example !== "object") continue;
 
@@ -98,7 +103,8 @@ for (const [id, rows] of rowsByTile) {
   if (!want.length) continue;
 
   tiles++;
-  const filled = (queryFill(phrase(rows, example), rows) || {}).filled || {};
+  const q = NAMED ? `${name} ${phrase(rows, example)}` : phrase(rows, example);
+  const filled = (queryFill(q, rows, NAMED ? { name } : undefined) || {}).filled || {};
   let hit = 0, bad = 0;
   for (const row of want) {
     fields++;
@@ -120,7 +126,7 @@ if (SHOW_WRONG) for (const r of wrongRows) console.log("WRONG  " + r);
 if (SHOW_MISSES) for (const r of missRows.slice(0, 200)) console.log("miss   " + r);
 
 console.log(
-  `measure-query-fill${TERSE ? " (terse: values only, no field names)" : ""}: ${tiles} tiles measured -- ` +
+  `measure-query-fill${TERSE ? " (terse: values only, no field names)" : ""}${NAMED ? " (named: the tile name, then the values)" : ""}: ${tiles} tiles measured -- ` +
   `every value recovered ${all} (${pct(all, tiles)}), some ${some} (${pct(some, tiles)}), none ${none} (${pct(none, tiles)}).`,
 );
 console.log(

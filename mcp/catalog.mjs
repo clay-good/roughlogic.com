@@ -697,7 +697,9 @@ export async function answerQuery({ query } = {}) {
   const tool = byId.get(top.id);
   const rows = await fieldRowsFor(top.id, tool ? tool.group : "");
   const { queryFill } = await import(new URL("../query-fill.js", import.meta.url).href);
-  const { filled } = rows.length ? queryFill(q, rows) : { filled: {} };
+  // The tile's own name goes in so the words the agent used to NAME the
+  // calculator are not mistaken for the names of its fields.
+  const { filled } = rows.length ? queryFill(q, rows, { name: top.name }) : { filled: {} };
   const recovered = Object.keys(filled);
 
   // Corroboration, in either form.
