@@ -44,3 +44,13 @@ pipe-volume | pipe volume 4 in 50 ft | nominal_size=4,length_ft=50
 pipe-volume | pipe volume 2 in 100 ft | nominal_size=2,length_ft=100
 # No unit on the number, no fill: a bare 4 is not evidence of a 4" pipe.
 pipe-volume | pipe volume 4 100 ft | length_ft=100
+
+# --- "20 ft 18 in" is two fields, not one measurement --------------------
+# The spelled feet-and-inches fold turned a run and a spacing into a single
+# 17.33 ft run, throwing the spacing away. Eighteen inches is not the inches
+# part of anything, and on a tile measuring one field in feet and another in
+# inches a question carrying both is answering both.
+joist-hanger-count | 20 ft 16 in | run_width_ft=20,spacing_in=16
+srw-geogrid-spacing | 8 ft 9 in | wall_height_ft=8
+# A tile with nowhere to put inches still reads it the carpenter's way.
+voltage-drop | voltage drop length one-way 8 ft 6 in | length_ft=8.5

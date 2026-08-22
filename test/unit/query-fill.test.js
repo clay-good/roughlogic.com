@@ -221,3 +221,13 @@ test("every phrasing in test/fixtures/queries.txt extracts as recorded", async (
   }
   assert.ok(checked >= 8, `expected the corpus to carry real phrasings, got ${checked}`);
 });
+
+// Eighteen inches is not the inches part of a feet-and-inches measurement, so
+// "16 ft 16 in" is a run and a spacing, not one length. The tick form is
+// unambiguous by construction and keeps folding whatever the number.
+test("rewriteQuery refuses to fold an inches part of 12 or more", () => {
+  assert.equal(rewriteQuery("16 ft 16 in"), "16 ft 16 in");
+  assert.equal(rewriteQuery("20 ft 18 in"), "20 ft 18 in");
+  assert.equal(rewriteQuery("8 ft 6 in"), "8.5 ft");
+  assert.equal(rewriteQuery("8 ft 11 in"), "8.916666666666666 ft");
+});

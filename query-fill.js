@@ -47,8 +47,15 @@ const REWRITES = [
   // all three are how a carpenter writes it on a stud.
   [/(\d+)\s*'\s*(\d+[\s-]+\d+\s*\/\s*\d+|\d+\s*\/\s*\d+|\d+)\s*"?/g,
     (m, ft, inch) => `${Number(ft) + frac(inch) / 12} ft`],
+  // ...but ONLY when the inches part could really be one: the inches in a
+  // feet-and-inches measurement are always under 12. Spelled out, this pattern
+  // also matches a question naming two DIFFERENT fields -- "joist hanger 16 ft
+  // 16 in oc" is a 16 ft run at 16 in on-centre, and merging it produced a
+  // 17.33 ft run and threw the spacing away. Sixteen inches is not the inches
+  // part of anything. The tick form (8'6") is left alone: a tick pair is one
+  // measurement by construction, however it is written.
   [/(\d+)\s*(?:ft|foot|feet)\s+(\d+[\s-]+\d+\s*\/\s*\d+|\d+\s*\/\s*\d+|\d+)\s*(?:in|inch|inches)\b/g,
-    (m, ft, inch) => `${Number(ft) + frac(inch) / 12} ft`],
+    (m, ft, inch) => (frac(inch) < 12 ? `${Number(ft) + frac(inch) / 12} ft` : m), "spelled-feet-inches"],
   // Mixed number with a fraction: 3-1/2" or 3 1/2 in.
   [/(\d+)[\s-](\d+)\s*\/\s*(\d+)\s*("|in\b|inch(?:es)?\b)/g,
     (m, whole, n, d) => `${Number(whole) + Number(n) / Number(d)} in`],
@@ -112,10 +119,12 @@ const TEMP_CONTEXT = /\b(temp|temperature|ambient|outdoor|indoor|db|wb|dry\s*bul
 // "nominal width 2 in nominal depth 10 in". The injected 2 then filled the
 // tile's tributary-width field, which is a wrong number reaching a real form.
 // A tile that names a value verbatim always outranks a rewrite of it.
-export function rewriteQuery(query, protect) {
+export function rewriteQuery(query, protect, skip) {
   let q = String(query || "").toLowerCase();
   const guard = protect instanceof Set ? protect : null;
-  for (const [re, fn] of REWRITES) {
+  const skipped = skip instanceof Set ? skip : null;
+  for (const [re, fn, name] of REWRITES) {
+    if (name && skipped && skipped.has(name)) continue;
     q = q.replace(re, (...args) => {
       const whole = String(args[0]).toLowerCase().replace(/\s+/g, "");
       if (guard && guard.has(whole)) return args[0];
@@ -274,7 +283,18 @@ export function queryFill(query, rows) {
   const protect = new Set();
   for (const r of selectRows) for (const o of r.o) protect.add(String(o).toLowerCase().replace(/\s+/g, ""));
 
-  const text = rewriteQuery(query, protect);
+  // "20 ft 18 in" is never one measurement, and the rule above already refuses
+  // it. "40 ft 6 in" genuinely might be -- 40'6" is how a carpenter writes it.
+  // What settles it is the TILE: when it measures one field in feet and
+  // another in inches, a question carrying both is far more likely answering
+  // both than writing one of them the long way, and merging destroys a value
+  // outright rather than merely mis-homing it. The unambiguous tick form
+  // (40'6") is untouched and still means one measurement.
+  const skip = new Set();
+  if (numberRows.some((r) => rowUnit(r) === "ft") && numberRows.some((r) => rowUnit(r) === "in")) {
+    skip.add("spelled-feet-inches");
+  }
+  const text = rewriteQuery(query, protect, skip);
   if (!text) return { filled: {}, missing: rows.map((r) => r.d), unmatched: [] };
   const termsByRow = new Map(rows.map((r) => [r.d, labelTerms(r.l)]));
 

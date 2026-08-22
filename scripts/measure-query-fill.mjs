@@ -18,6 +18,7 @@
 //   node scripts/measure-query-fill.mjs            summary
 //   node scripts/measure-query-fill.mjs --wrong    every wrong value, named
 //   node scripts/measure-query-fill.mjs --misses   fields no phrasing recovers
+//   node scripts/measure-query-fill.mjs --terse     values only, no field names
 
 import { readFile, readdir } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
