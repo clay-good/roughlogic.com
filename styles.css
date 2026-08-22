@@ -1742,7 +1742,11 @@ input[aria-invalid="true"] {
   background: var(--bg-secondary);
   color: var(--fg-muted);
   text-decoration: none;
-  font-size: 0.9375rem;
+  /* 1rem, not the 0.9375rem meta size: on /tools/ these 21 chips are not
+     chrome around the content, they ARE how a reader gets to their trade.
+     Reading text and controls sit at the 1rem floor; only genuinely
+     secondary text (the breadcrumb trail, timestamps) goes below it. */
+  font-size: 1rem;
 }
 
 .ti-jump a:hover,

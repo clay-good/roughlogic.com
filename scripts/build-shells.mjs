@@ -130,7 +130,87 @@ async function loadWorkedExamples() {
   for (const row of rows) {
     if (row && row.tile_id && !byTile.has(row.tile_id)) byTile.set(row.tile_id, row);
   }
+  await addComputedExamples(byTile);
   return byTile;
+}
+
+// One tile's registry row is a WIRING STUB by design, and the page paid for it.
+//
+// `magnetic-declination` computes from the World Magnetic Model, which means
+// reading a 12-degree coefficient table -- asynchronous, and the worked-example
+// runner is synchronous, so its fixture declares the model id rather than a
+// declination. That is the right call for the runner (numerical correctness is
+// proven separately against all 100 NCEI WMM2025 test vectors). It is the wrong
+// outcome for the page: with no inputs in the fixture, the one calculator whose
+// answer a reader most needs to see demonstrated printed no example at all, and
+// its call-to-action read "Open the reference" as though it had nothing to
+// compute.
+//
+// So the page's example is computed HERE, at build time, from the same bundled
+// coefficients the browser reads, using the tile's own published example
+// inputs. Nothing is hard-coded: when the model is refreshed, this example
+// refreshes with it. If anything fails, the page falls back to what it does
+// today rather than printing a number nobody checked.
+async function addComputedExamples(byTile) {
+  try {
+    const { computeWMM, magneticDeclinationExample } = await import(new URL("../calc-field.js", import.meta.url).href);
+    const coefficients = JSON.parse(await readFile(resolve(ROOT, "data/field/wmm/coefficients.json"), "utf8"));
+    const inputs = magneticDeclinationExample.inputs;
+    const year = Number(String(inputs.date_iso).slice(0, 4));
+    const r = computeWMM({
+      lat_deg: inputs.lat_deg, lon_deg: inputs.lon_deg, alt_km: inputs.alt_km || 0,
+      decimal_year: year, coefficients,
+    });
+    if (!r || r.error || !Number.isFinite(r.D)) return;
+    const round = (n, d) => Number(n.toFixed(d));
+    byTile.set("magnetic-declination", {
+      tile_id: "magnetic-declination",
+      inputs: {
+        lat_deg: inputs.lat_deg, lon_deg: inputs.lon_deg,
+        alt_km: inputs.alt_km || 0, date: inputs.date_iso,
+      },
+      outputs: {
+        declination_deg: { value: round(r.D, 2) },
+        inclination_deg: { value: round(r.I, 2) },
+        total_intensity_nT: { value: Math.round(r.F) },
+        annual_change_deg_yr: { value: round(r.dD, 3) },
+      },
+    });
+  } catch { /* the page keeps the behaviour it has today */ }
+
+  // The general case of the same problem: a fixture that names inputs but
+  // records no outputs, because the answer is a TABLE and the registry's
+  // schema holds only numbers and strings. `lexile-band` told a reader to
+  // enter grade 5 and then stopped, when the compute had the answer in hand
+  // -- the band for the grade they entered. Where the compute returns a
+  // flat, printable value beside the table, the page prints it.
+  for (const [id, row] of byTile) {
+    if (!row.inputs || !Object.keys(row.inputs).length) continue;
+    if (row.outputs && Object.keys(row.outputs).length) continue;
+    try {
+      const { run } = await import(new URL("../mcp/catalog.mjs", import.meta.url).href);
+      const out = await run({ id, inputs: { ...row.inputs } });
+      const result = out && out.result;
+      if (!result || typeof result !== "object") continue;
+      const printable = {};
+      for (const [k, v] of Object.entries(result)) {
+        if (typeof v === "number" ? Number.isFinite(v) : typeof v === "string") printable[k] = { value: v };
+        else if (v && typeof v === "object" && !Array.isArray(v)) {
+          // One level in: `selected: { grade, typical, stretch }` is the row
+          // the reader asked for, and it is the answer.
+          for (const [k2, v2] of Object.entries(v)) {
+            if (typeof v2 !== "string" && !(typeof v2 === "number" && Number.isFinite(v2))) continue;
+            // Echoing an input back is not an answer: the grade the reader
+            // just entered does not need a row of its own under "You get".
+            if (Object.values(row.inputs).some((iv) => String(iv) === String(v2))) continue;
+            printable[`${k}_${k2}`] = { value: v2 };
+          }
+        }
+        if (Object.keys(printable).length >= 6) break;
+      }
+      if (Object.keys(printable).length) byTile.set(id, { ...row, outputs: printable });
+    } catch { /* leave the page as it is */ }
+  }
 }
 
 // Render a fixture value as the literal a reader would type. Outputs are
@@ -204,9 +284,9 @@ const KEY_UNITS = new Map(Object.entries({
   fpm: "fpm", fps: "fps", mph: "mph", rpm: "RPM", kt: "kt", sabins: "sabins",
   kipft: "kip-ft", ftlb: "ft-lb", inlb: "in-lb", ftkip: "ft-kip", sy: "SY", therms: "therms", acres: "acres",
 }));
-const KEY_UNITS_CASED = new Map(Object.entries({ A: "A", V: "V", F: "\u00b0F", C: "\u00b0C", W: "W" }));
+const KEY_UNITS_CASED = new Map(Object.entries({ A: "A", V: "V", F: "\u00b0F", C: "\u00b0C", W: "W", nT: "nT" }));
 // A denominator ("lb_hr" = lb/hr) is only ever the LAST token of a key.
-const KEY_PER_UNITS = new Map(Object.entries({ min: "min", day: "day", s: "s", hr: "hr", sf: "ft\u00b2" }));
+const KEY_PER_UNITS = new Map(Object.entries({ min: "min", day: "day", s: "s", hr: "hr", sf: "ft\u00b2", yr: "yr" }));
 const KEY_ACRONYMS = new Set(["awg", "nec", "ada", "ocpd", "fla", "mca", "mocp", "rh", "cg", "tds", "bod", "tss",
   "srt", "hrt", "vslr", "sor", "wor", "apf", "uv", "led", "hvac", "pdp", "gpp", "wsfu", "dfu", "ach", "shr",
   "eer", "cop", "stc", "emt", "pvc", "rmc", "imc", "cmu", "srw", "spt", "cbr", "usc", "aashto", "asd", "lrfd",
