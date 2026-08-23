@@ -1,9 +1,9 @@
 {
   "name": "legal",
-  "version": "2026-08-10",
-  "fetched": "2026-08-10",
-  "edition": "Post-Wayfair sales-tax-nexus thresholds from each state's department of revenue. Verified 2026-08-10.",
-  "asOf": "2026-08-10",
+  "version": "2026-08-23",
+  "fetched": "2026-08-23",
+  "edition": "Post-Wayfair sales-tax-nexus thresholds from each state's department of revenue. Verified 2026-08-23.",
+  "asOf": "2026-08-23",
   "refresh_cadence": "quarterly",
   "shards": [
     {
@@ -13,6 +13,6 @@
     }
   ],
   "hashes": {
-    "sales-tax-nexus.json": "a6239e551d7d818c8a603d65d8eaeafda5effd2e7cd74057e1f51ba1e08c48ab"
+    "sales-tax-nexus.json": "69255ed21a02a1fc178dc473a589c3d60bd5ef0d791662135e2535b0e6764c2b"
   }
 }
