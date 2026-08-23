@@ -1,9 +1,9 @@
 {
   "name": "electrical",
-  "version": "2026-08-03",
-  "fetched": "2026-08-03",
-  "edition": "NEC 2023 (NFPA 70); IEEE 802.3bt-2018 PoE; ANSI/IEEE C57 (transformer step series); NEMA MG-1 (motor code letters); Eaton/Bussmann SPD (point-to-point C-values); manufacturer cable specs as of 2026-08-03.",
-  "asOf": "2026-08-03",
+  "version": "2026-08-10",
+  "fetched": "2026-08-10",
+  "edition": "NEC 2023 (NFPA 70); IEEE 802.3bt-2018 PoE; ANSI/IEEE C57 (transformer step series); NEMA MG-1 (motor code letters); Eaton/Bussmann SPD (point-to-point C-values); manufacturer cable specs as of 2026-08-10.",
+  "asOf": "2026-08-10",
   "refresh_cadence": "annual",
   "shards": [
     {
