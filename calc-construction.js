@@ -2258,6 +2258,8 @@ export function computeHipValleyRafter({
   // A non-positive jack spacing would make `n * dx_oc_ft < run_ft` loop
   // forever and exhaust memory (v18 C-6/D-6).
   if (!(dx_oc_ft > 0)) return { error: "Jack spacing must be positive." };
+  const jack_count = Math.max(0, Math.ceil(run_ft / dx_oc_ft) - 1);
+  if (jack_count > 10000) return { error: "Jack schedule exceeds the 10,000-row safety limit." };
   const jacks = [];
   let n = 1;
   while (n * dx_oc_ft < run_ft) {

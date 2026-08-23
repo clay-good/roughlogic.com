@@ -16,6 +16,29 @@
 
 export const HASH_SCHEMA_VERSION = 1;
 const HASH_VERSION_KEY = "v";
+const PRIVATE_INPUT_TYPES = new Set(["password", "email", "tel", "file"]);
+const PRIVATE_AUTOCOMPLETE_TOKENS = new Set([
+  "name", "honorific-prefix", "given-name", "additional-name", "family-name",
+  "honorific-suffix", "nickname", "username", "new-password", "current-password",
+  "one-time-code", "organization-title", "organization", "street-address",
+  "address-line1", "address-line2", "address-line3", "address-level1",
+  "address-level2", "address-level3", "address-level4", "country", "country-name",
+  "postal-code", "cc-name", "cc-given-name", "cc-additional-name", "cc-family-name",
+  "cc-number", "cc-exp", "cc-exp-month", "cc-exp-year", "cc-csc", "cc-type",
+  "transaction-currency", "transaction-amount", "language", "bday", "bday-day",
+  "bday-month", "bday-year", "sex", "url", "photo", "tel", "tel-country-code",
+  "tel-national", "tel-area-code", "tel-local", "tel-local-prefix", "tel-local-suffix",
+  "tel-extension", "email", "impp",
+]);
+
+export function isPrivateControl(el) {
+  if (!el) return false;
+  if (el.dataset && el.dataset.reportSensitive === "true") return true;
+  if (PRIVATE_INPUT_TYPES.has(String(el.type || "").toLowerCase())) return true;
+  const tokens = String(el.getAttribute && el.getAttribute("autocomplete") || "")
+    .toLowerCase().trim().split(/\s+/).filter(Boolean);
+  return tokens.some((token) => PRIVATE_AUTOCOMPLETE_TOKENS.has(token));
+}
 
 export function applyHashState(region, params) {
   if (!region || !params) return;
@@ -24,7 +47,7 @@ export function applyHashState(region, params) {
     if (k === HASH_VERSION_KEY) continue;
     let el;
     try { el = region.querySelector("#" + CSS.escape(k)); } catch { el = null; }
-    if (!el) continue;
+    if (!el || isPrivateControl(el)) continue;
     if (el.type === "checkbox") {
       el.checked = (v === "1" || v === "true");
     } else {
@@ -65,7 +88,7 @@ export function wireHashState(region, toolId, opts = {}) {
 function collectParams(region, ignore) {
   const params = {};
   for (const el of region.querySelectorAll("input, select, textarea")) {
-    if (!el.id || ignore.has(el.id)) continue;
+    if (!el.id || ignore.has(el.id) || isPrivateControl(el)) continue;
     // Reserved: an element with id="v" would collide with the schema-version
     // key written by wireHashState. Reject up front; tile authors should
     // pick another id.

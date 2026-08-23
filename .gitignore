@@ -145,13 +145,10 @@ test/integration/playwright-report/
 # --------------------
 # Environment & Secrets
 # --------------------
-.env
-.env.local
-.env.*.local
-.dev.vars
-.env.production
-.env.development
-.env.test
+.env*
+.dev.vars*
+!.env.example
+!.dev.vars.example
 *.pem
 *.key
 *.crt

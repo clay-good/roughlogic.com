@@ -191,14 +191,12 @@ self.addEventListener("install", (event) => {
     // always version-consistent (a fresh index.html never pairs with a stale
     // app.js, which would silently break the home search/picker).
     const reload = (url) => new Request(url, { cache: "reload" });
-    // Tolerate missing optional assets so installation does not fail in dev.
-    await Promise.all(
-      SHELL_ASSETS.map((url) => shell.add(reload(url)).catch(() => undefined))
-    );
+    // Fail the install if any required asset is unavailable. The current
+    // worker remains active, and this partial cache can never reach activate
+    // or delete the known-good offline snapshot.
+    await Promise.all(SHELL_ASSETS.map((url) => shell.add(reload(url))));
     const data = await caches.open(DATA_CACHE);
-    await Promise.all(
-      DATA_MANIFESTS.map((url) => data.add(reload(url)).catch(() => undefined))
-    );
+    await Promise.all(DATA_MANIFESTS.map((url) => data.add(reload(url))));
     await self.skipWaiting();
   })());
 });

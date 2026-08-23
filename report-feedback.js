@@ -3,6 +3,7 @@
 // not pay for reporting or contact Turnstile.
 
 import { collectOutputs } from "./clipboard.js";
+import { isPrivateControl } from "./hash-state.js";
 
 const CONFIG_URL = "/api/reports/config";
 const REPORT_URL = "/api/reports";
@@ -10,9 +11,8 @@ const TURNSTILE_URL = "https://challenges.cloudflare.com/turnstile/v0/api.js?ren
 const NOTE_LIMIT = 160;
 const OUTPUT_TEXT_LIMIT = 12000;
 const MAX_FIELDS = 100;
-const SENSITIVE_INPUT_TYPES = new Set(["password", "email", "tel", "file"]);
-const SENSITIVE_AUTOCOMPLETE = /(?:^|\s)(?:name|email|tel|street-address|postal-code|cc-[^\s]+|current-password|new-password|one-time-code)(?:\s|$)/i;
 let turnstilePromise = null;
+let reportDialogOpen = false;
 
 function bounded(value, max) {
   return String(value == null ? "" : value).trim().slice(0, max);
@@ -44,8 +44,7 @@ export function collectReportInputs(inputRegion) {
   for (const el of inputRegion.querySelectorAll("input, select, textarea")) {
     if (out.length >= MAX_FIELDS) break;
     if (el.disabled || ["button", "submit", "reset", "hidden"].includes(el.type)) continue;
-    if (SENSITIVE_INPUT_TYPES.has(el.type)
-      || SENSITIVE_AUTOCOMPLETE.test(el.getAttribute("autocomplete") || "")) continue;
+    if (isPrivateControl(el)) continue;
     out.push({ label: labelFor(inputRegion, el), value: controlValue(el) });
   }
   return out;
@@ -69,14 +68,44 @@ export function collectReportOutputs(outputRegion) {
   return { values, ...outputText(outputRegion) };
 }
 
+function containsPrivateControl(inputRegion) {
+  return Boolean(inputRegion && [...inputRegion.querySelectorAll("input, select, textarea")]
+    .some((el) => isPrivateControl(el)));
+}
+
+export function sanitizedReportUrl(inputRegion, source = window.location.href) {
+  const url = new URL(source);
+  url.search = "";
+  const rawHash = url.hash.replace(/^#/, "");
+  const split = rawHash.indexOf("?");
+  if (split === -1) return url.href;
+  const toolId = rawHash.slice(0, split);
+  const current = new URLSearchParams(rawHash.slice(split + 1));
+  const allowed = new Set(["v"]);
+  if (inputRegion) {
+    for (const el of inputRegion.querySelectorAll("input, select, textarea")) {
+      if (el.id && !isPrivateControl(el)) allowed.add(el.id);
+    }
+  }
+  for (const key of [...current.keys()]) {
+    if (!allowed.has(key)) current.delete(key);
+  }
+  const query = current.toString();
+  url.hash = "#" + toolId + (query ? "?" + query : "");
+  return url.href;
+}
+
 export function buildReportPayload({ tool, inputRegion, outputRegion, note, token }) {
+  const privateContext = containsPrivateControl(inputRegion);
   return {
     calculator_id: tool.id,
     calculator_name: tool.name,
-    page_url: window.location.href,
+    page_url: sanitizedReportUrl(inputRegion),
     note: bounded(note, NOTE_LIMIT),
     inputs: collectReportInputs(inputRegion),
-    outputs: collectReportOutputs(outputRegion),
+    outputs: privateContext
+      ? { values: [], text: "[Output omitted because this calculator contains a private field.]", truncated: false }
+      : collectReportOutputs(outputRegion),
     turnstile_token: token,
   };
 }
@@ -124,7 +153,9 @@ function makeButton(label, className) {
 }
 
 export async function openReportDialog({ tool, inputRegion, outputRegion, trigger, host }) {
-  if (!tool || !trigger || trigger.dataset.reportSent === "true") return;
+  if (!tool || !trigger || trigger.dataset.reportSent === "true" || reportDialogOpen) return;
+  reportDialogOpen = true;
+  trigger.disabled = true;
 
   const dialog = document.createElement("dialog");
   dialog.className = "report-dialog";
@@ -198,6 +229,8 @@ export async function openReportDialog({ tool, inputRegion, outputRegion, trigge
     }
     if (dialog.open) dialog.close();
     dialog.remove();
+    reportDialogOpen = false;
+    trigger.disabled = trigger.dataset.reportSent === "true";
     if (trigger.isConnected) trigger.focus();
   };
   cancel.addEventListener("click", close);

@@ -16,6 +16,9 @@ phase docs ([edition-rollover.md](edition-rollover.md),
 - [ ] Tile has all three mandatory doors: website rendering, local MCP
   description/execution, and the shared **Report a problem** control inherited
   through `renderToolView` (never fork or bypass the shared report path).
+- [ ] Any identity, contact, address, credential, payment, or private/free-prose
+  control sets `data-report-sensitive="true"`; verify its value appears nowhere
+  in the URL or complete report payload.
 - [ ] Tile renders without console warnings or errors.
 - [ ] Tile id is added to the `TOOLS` array in [../tools-data.js](../tools-data.js)
   (the catalog registry; lazy-loaded out of `app.js` per spec-v10 §H.2).

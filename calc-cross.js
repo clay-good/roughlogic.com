@@ -517,6 +517,7 @@ export function renderTipOut(inputRegion, outputRegion, citationEl) {
   function addRow(name = "", hours = "") {
     const row = document.createElement("div"); row.className = "field";
     const n = makeText("Name", "to-n-" + rows.length); n.input.value = name;
+    n.input.dataset.reportSensitive = "true";
     const h = makeNumber("Hours", "to-h-" + rows.length, { step: "any", min: "0" }); h.input.value = hours;
     const rm = document.createElement("button"); rm.type = "button"; rm.textContent = "Remove";
     rm.style.marginLeft = "8px";

@@ -8,9 +8,12 @@ Production keeps the existing `roughlogic-com` Pages project for static files.
 The separate `roughlogic-reports` Worker is bound only to
 `roughlogic.com/api/reports*`, so normal calculator and asset requests never
 invoke it. Public `workers.dev` and version-preview URLs are explicitly disabled
-so they cannot bypass the zone WAF. `wrangler pages deploy dist --project-name
-roughlogic-com --branch main` publishes the static build; `wrangler deploy`
+so they cannot bypass the zone WAF. `npx --no-install wrangler pages deploy
+dist --project-name roughlogic-com --branch main` publishes the static build;
+`npx --no-install wrangler deploy`
 publishes the API Worker and fails if either required secret is absent.
+Run `npm ci` first so every privileged Wrangler command uses the exact version
+and integrity hashes committed in `package-lock.json`.
 
 ## Launch checklist
 
@@ -22,7 +25,7 @@ fails closed and leaves all calculators operational.
 From the repository root:
 
 ```sh
-npx wrangler d1 create roughlogic-reports
+npx --no-install wrangler d1 create roughlogic-reports
 ```
 
 Add the UUID returned by Cloudflare to `wrangler.jsonc`:
@@ -44,7 +47,7 @@ missing binding as unavailable.
 Apply the checked-in schema:
 
 ```sh
-npx wrangler d1 migrations apply roughlogic-reports --remote
+npx --no-install wrangler d1 migrations apply roughlogic-reports --remote
 ```
 
 ### 2. Create Turnstile
@@ -68,8 +71,8 @@ The sitekey is public by design and is safe in this MIT-licensed repository.
 Never put either secret below in Git:
 
 ```sh
-npx wrangler secret put TURNSTILE_SECRET_KEY
-npx wrangler secret put REPORT_HASH_SECRET
+npx --no-install wrangler secret put TURNSTILE_SECRET_KEY
+npx --no-install wrangler secret put REPORT_HASH_SECRET
 ```
 
 Paste the Turnstile secret into the first prompt. Paste a cryptographically
@@ -97,14 +100,19 @@ Worker invocation path. This rule rejects floods before they invoke the Worker. 
 daily HMAC gate, the 200/day global accepted-report ceiling, D1's free limits,
 and the Workers Free request limit remain independent backstops.
 
+The Worker also caps successfully verified attempts at 10/reporter/day and
+400/day globally. This is separate from the 5 unique accepted
+reports/reporter/day and 200 accepted reports/day: duplicates consume the
+attempt allowance and cannot create unlimited Siteverify/write batches.
+
 ### 4. Deploy and prove the path
 
 Build once, deploy the API Worker, and then deploy the same build to Pages:
 
 ```sh
 npm run build
-wrangler deploy
-wrangler pages deploy dist --project-name roughlogic-com --branch main
+npx --no-install wrangler deploy
+npx --no-install wrangler pages deploy dist --project-name roughlogic-com --branch main
 ```
 
 Then verify:
@@ -125,7 +133,7 @@ Then verify:
 List open reports, oldest first and grouped naturally by calculator:
 
 ```sh
-npx wrangler d1 execute roughlogic-reports --remote --command "SELECT id, created_at, calculator_id, note, page_url, inputs_json, outputs_json, output_text, output_truncated FROM calculator_reports WHERE status = 'open' ORDER BY calculator_id, created_at;"
+npx --no-install wrangler d1 execute roughlogic-reports --remote --command "SELECT id, created_at, calculator_id, note, page_url, inputs_json, outputs_json, output_text, output_truncated FROM calculator_reports WHERE status = 'open' ORDER BY calculator_id, created_at;"
 ```
 
 For each report:
@@ -151,14 +159,13 @@ the calculator's stated scope, and put that reason in `resolution_note`.
 Apply a resolution through Wrangler:
 
 ```sh
-npx wrangler d1 execute roughlogic-reports --remote --command "UPDATE calculator_reports SET status = 'resolved', resolved_at = datetime('now'), resolution_note = 'Fixed in spec-vNNNN.' WHERE id = '<REPORT ID>';"
+npx --no-install wrangler d1 execute roughlogic-reports --remote --command "UPDATE calculator_reports SET status = 'resolved', resolved_at = datetime('now'), resolution_note = 'Fixed in spec-vNNNN.' WHERE id = '<REPORT ID>';"
 ```
 
-Remove expired rate counters after review:
-
-```sh
-npx wrangler d1 execute roughlogic-reports --remote --command "DELETE FROM report_limits WHERE bucket < date('now', '-14 days');"
-```
+Retention is automatic. The Worker runs cleanup daily at 08:17 UTC and before
+verified writes: all reports expire after 30 days and both accepted/attempt
+counter buckets expire after 14 days. Do not use D1 as a permanent archive;
+put durable fix rationale in the public spec, tests, and changelog.
 
 ## Triage targets
 
@@ -173,12 +180,20 @@ unit errors, and multiple independent reports against the same calculator.
 - Turnstile is loaded only after the report dialog opens.
 - No more than 200 reports can be accepted in a UTC day without a reviewed code
   change, even if environment configuration asks for more.
-- Accepted traffic writes at most one report row and two counter rows per report.
-- Duplicate and over-quota submissions add zero rows.
+- No more than 400 verified attempts globally or 10 per daily HMAC reporter are
+  processed before the Worker returns the generic quota response early.
+- Accepted traffic writes at most one report row plus bounded accepted/attempt
+  counters; cleanup and all writes stay in one D1 batch.
+- Duplicate verified submissions consume attempt allowance but add no report row.
 - Raw IP addresses, user agents, identity, email, and Turnstile tokens are not
   stored.
 - The client skips password, contact, payment, identity, one-time-code, and
   file inputs even if a future calculator accidentally renders one.
+- Query strings and unknown/private hash keys are removed from the stored URL;
+  if any private control exists, the rendered output snapshot is omitted so a
+  derived result cannot repeat or transform identity data.
+- Persisted Worker invocation logs are disabled; aggregate metrics remain available.
+- Every report is automatically deleted after 30 days.
 - Report text is limited to 160 characters; request and stored value sizes are
   independently bounded.
 - Chunked bodies are canceled at 24 KB, encoded bodies are rejected, and stored

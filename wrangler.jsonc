@@ -9,7 +9,7 @@
     "required": ["TURNSTILE_SECRET_KEY", "REPORT_HASH_SECRET"]
   },
   "observability": {
-    "enabled": true
+    "enabled": false
   },
   "routes": [
     {
@@ -17,6 +17,9 @@
       "zone_name": "roughlogic.com"
     }
   ],
+  "triggers": {
+    "crons": ["17 8 * * *"]
+  },
   "vars": {
     "TURNSTILE_SITE_KEY": "0x4AAAAAAEZVderfD5yAGmMV",
     "REPORT_ALLOWED_ORIGINS": "https://roughlogic.com",

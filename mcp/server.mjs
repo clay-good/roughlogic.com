@@ -15,6 +15,7 @@
 // stderr is for logs only. No network, no install — `node mcp/server.mjs`.
 
 import { readFileSync } from "node:fs";
+import { once } from "node:events";
 import {
   search, describe, run, runMany,
   listResources, listResourceTemplates, readResource,
@@ -31,6 +32,7 @@ const SERVER_INFO = { name: "roughlogic", version: SITE_VERSION };
 const DEFAULT_PROTOCOL = "2024-11-05";
 const MAX_RPC_MESSAGE_BYTES = 256 * 1024;
 const MAX_RPC_BATCH_SIZE = 50;
+const MAX_PENDING_RPC = 100;
 
 const TOOLS = [
   {
@@ -237,16 +239,18 @@ async function dispatchTool(name, args) {
 
 // --- JSON-RPC plumbing ---------------------------------------------------
 
-function send(msg) {
-  process.stdout.write(JSON.stringify(msg) + "\n");
+async function send(msg) {
+  if (!process.stdout.write(JSON.stringify(msg) + "\n")) {
+    await once(process.stdout, "drain");
+  }
 }
 
-function reply(id, result) {
-  send({ jsonrpc: "2.0", id, result });
+async function reply(id, result) {
+  await send({ jsonrpc: "2.0", id, result });
 }
 
-function replyError(id, code, message) {
-  send({ jsonrpc: "2.0", id, error: { code, message } });
+async function replyError(id, code, message) {
+  await send({ jsonrpc: "2.0", id, error: { code, message } });
 }
 
 async function handle(msg) {
@@ -258,48 +262,48 @@ async function handle(msg) {
       case "initialize": {
         const requested = params && params.protocolVersion;
         const protocolVersion = typeof requested === "string" ? requested : DEFAULT_PROTOCOL;
-        reply(id, { protocolVersion, capabilities: { tools: {}, resources: {}, prompts: {} }, serverInfo: SERVER_INFO });
+        await reply(id, { protocolVersion, capabilities: { tools: {}, resources: {}, prompts: {} }, serverInfo: SERVER_INFO });
         return;
       }
       case "notifications/initialized":
       case "initialized":
         return; // notification — no response
       case "ping":
-        reply(id, {});
+        await reply(id, {});
         return;
       case "tools/list":
-        reply(id, { tools: TOOLS });
+        await reply(id, { tools: TOOLS });
         return;
       case "resources/list":
-        reply(id, await listResources());
+        await reply(id, await listResources());
         return;
       case "resources/templates/list":
-        reply(id, listResourceTemplates());
+        await reply(id, listResourceTemplates());
         return;
       case "resources/read": {
         const uri = params && params.uri;
-        reply(id, await readResource(uri));
+        await reply(id, await readResource(uri));
         return;
       }
       case "prompts/list":
-        reply(id, { prompts: PROMPTS.map(({ name, description, arguments: a }) => ({ name, description, arguments: a })) });
+        await reply(id, { prompts: PROMPTS.map(({ name, description, arguments: a }) => ({ name, description, arguments: a })) });
         return;
       case "prompts/get":
-        reply(id, getPrompt(params && params.name, params && params.arguments));
+        await reply(id, getPrompt(params && params.name, params && params.arguments));
         return;
       case "tools/call": {
         const toolName = params && params.name;
         const data = await dispatchTool(toolName, params && params.arguments);
         // spec-v1192: return the typed object in the structured channel and keep
         // the JSON text as a fallback for clients that predate structured output.
-        reply(id, {
+        await reply(id, {
           content: [{ type: "text", text: JSON.stringify(data, null, 2) }],
           structuredContent: data,
         });
         return;
       }
       default:
-        if (!isNotification) replyError(id, -32601, `method not found: ${method}`);
+        if (!isNotification) await replyError(id, -32601, `method not found: ${method}`);
         return;
     }
   } catch (err) {
@@ -310,9 +314,9 @@ async function handle(msg) {
     }
     // For a failed tools/call, prefer a tool-level error so the model sees it.
     if (method === "tools/call") {
-      reply(id, { content: [{ type: "text", text: `Error: ${message}` }], isError: true });
+      await reply(id, { content: [{ type: "text", text: `Error: ${message}` }], isError: true });
     } else {
-      replyError(id, -32603, message);
+      await replyError(id, -32603, message);
     }
   }
 }
@@ -336,11 +340,30 @@ function acceptRpcLine(line) {
       return;
     }
     for (const item of msg) {
-      if (item && typeof item === "object" && !Array.isArray(item)) handle(item);
+      if (item && typeof item === "object" && !Array.isArray(item)) enqueueRpc(item);
     }
   } else if (msg && typeof msg === "object") {
-    handle(msg);
+    enqueueRpc(msg);
   }
+}
+
+let rpcTail = Promise.resolve();
+let pendingRpc = 0;
+let overloadLogged = false;
+function enqueueRpc(msg) {
+  if (pendingRpc >= MAX_PENDING_RPC) {
+    if (!overloadLogged) process.stderr.write(`[roughlogic-mcp] dropping requests while queue is full\n`);
+    overloadLogged = true;
+    return;
+  }
+  pendingRpc += 1;
+  rpcTail = rpcTail
+    .then(() => handle(msg))
+    .catch((error) => process.stderr.write(`[roughlogic-mcp] request error: ${error && error.message ? error.message : "unknown"}\n`))
+    .finally(() => {
+      pendingRpc -= 1;
+      if (pendingRpc < MAX_PENDING_RPC) overloadLogged = false;
+    });
 }
 
 // Do not let readline or JSON.parse buffer an unbounded line from a buggy or

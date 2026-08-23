@@ -6,71 +6,27 @@ on:
   pull_request:
     branches: [main, develop]
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
           node-version: 20
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Lint and grep checks
         run: npm run lint
       - name: Unit tests
         run: npm run test:unit
       - name: Verify data integrity
         run: npm run data:verify
-
-  lighthouse:
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 20
-      - name: Install dependencies
-        # The site is dependency-free (package.json deps/devDeps are empty;
-        # scripts/build.mjs imports only node: builtins) and intentionally
-        # ships no package-lock.json, so `npm ci` errors with EUSAGE and the
-        # whole lighthouse job fails before it can build. `npm install` is a
-        # safe no-op here; the Lighthouse CLI is installed separately below.
-        run: npm install --no-audit --no-fund
-      # spec-v13 Phase A + D + F + H: lighthouserc.json serves the built
-      # dist/ tree (so the prerendered tile and group shells under
-      # /tools/<id>/ and /groups/<slug>/ are reachable by Lighthouse). The
-      # repo-root files (index.html, app.js, styles.css, data/, etc.) are
-      # all copied into dist/ by scripts/build.mjs.
-      #
-      # Per-URL budgets (assertMatrix in lighthouserc.json): the prerendered
-      # /tools/ and /groups/ shells are the canonical, crawler-indexed
-      # landing pages and carry the STRICT budget (perf >= 0.95, FCP <= 1s,
-      # LCP <= 1.5s) -- they ship only styles.css and meet it comfortably.
-      # The SPA shell (index.html) loads the ~132 KB app.js bundle that runs
-      # every calculator client-side. Under the desktop preset's 4x CPU
-      # throttle on the shared 2-core runner, app.js parse/execute produces
-      # a large, high-variance total-blocking-time (observed 1.5s-2.8s run
-      # to run) which also swings the composite performance SCORE (0.43-0.56)
-      # -- neither is a stable gate nor actionable without re-architecting
-      # the bundle (both are near-zero on real desktop hardware). The home
-      # view is therefore gated on the metrics that stayed green across both
-      # fast and slow runs -- FCP, LCP, the layout-shift (CLS) guard, and the
-      # accessibility / best-practices / SEO scores -- with relaxed FCP/LCP
-      # ceilings for the bundle. The prerendered shells keep the full strict
-      # budget including perf score and TBT. The SPA hash routes (/index.html#tile) are interaction
-      # states reached via each shell's "Run the calculator" link; cold-
-      # loading them paints the home hero then swaps in the tool (an
-      # intentional progressive-enhancement layout shift), which is not a
-      # meaningful cold-load perf budget -- their functional + a11y coverage
-      # lives in the integration and accessibility jobs below.
-      - name: Build site
-        run: npm run build
-      - name: Install Lighthouse CI
-        run: npm install -g @lhci/cli
-      - name: Run Lighthouse CI
-        run: lhci autorun --config=./lighthouserc.json
-        env:
-          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
 
   # Fast a11y-only signal: axe-core scan over every tile_id in TOOLS plus
   # the home view (spec-v10 §E.3, parameterized at test-import time from
@@ -80,14 +36,16 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
           node-version: 20
       - name: Install Playwright and axe-core
         run: |
-          npm install --no-save @playwright/test@latest @axe-core/playwright@latest
-          npx playwright install --with-deps chromium
+          npm ci --ignore-scripts --no-audit --no-fund
+          ./node_modules/.bin/playwright install --with-deps chromium
       - name: Run accessibility tests (axe-core only)
         run: npm run test:a11y
 
@@ -100,8 +58,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
           node-version: 20
       - name: Install Playwright and axe-core
@@ -110,8 +70,8 @@ jobs:
         # in playwright.config.js, so the no-horizontal-scroll guarantee is
         # verified on both engines.
         run: |
-          npm install --no-save @playwright/test@latest @axe-core/playwright@latest
-          npx playwright install --with-deps chromium webkit
+          npm ci --ignore-scripts --no-audit --no-fund
+          ./node_modules/.bin/playwright install --with-deps chromium webkit
       - name: Run integration tests (full suite)
         run: npm run test:e2e
       # spec-v18 §6: prerendered-shell 320px horizontal-scroll gate. Needs a

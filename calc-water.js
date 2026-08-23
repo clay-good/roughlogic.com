@@ -186,7 +186,9 @@ export function computeDilution({ c1 = 0, v1 = 0, c2 = 0, v2 = 0, mode = "single
   }
   if (mode === "serial") {
     if (!(c1 > 0)) return { error: "Stock concentration must be positive." };
-    if (!(steps >= 1)) return { error: "Need at least one step." };
+    if (!Number.isInteger(steps) || steps < 1 || steps > 1000) {
+      return { error: "Serial steps must be a whole number from 1 to 1,000." };
+    }
     if (!(dilution_factor > 1)) return { error: "Dilution factor must be > 1." };
     const series = [];
     let c = c1;
@@ -413,7 +415,7 @@ function renderDilution(inputRegion, outputRegion, citationEl) {
   const c2 = makeNumber("Final C2", "dl-c2", { step: "any", min: "0" });
   const v2 = makeNumber("Final V2", "dl-v2", { step: "any", min: "0" });
   const mode = makeSelect("Mode", "dl-mode", [{ value: "single", label: "Single (solve missing)" }, { value: "serial", label: "Serial" }]);
-  const steps = makeNumber("Serial steps", "dl-steps", { step: "1", min: "1" });
+  const steps = makeNumber("Serial steps", "dl-steps", { step: "1", min: "1", max: "1000" });
   const df = makeNumber("Dilution factor (>1)", "dl-df", { step: "any", min: "1.001" });
   for (const f of [c1, v1, c2, v2, mode, steps, df]) inputRegion.appendChild(f.wrap);
   const oC1 = makeOutputLine(outputRegion, "C1", "dl-out-c1");

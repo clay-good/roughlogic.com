@@ -18,11 +18,12 @@ function requireMatch(text, pattern, message) {
   if (!pattern.test(text)) errors.push(message);
 }
 
-const [app, client, worker, migration, wrangler, build, sw, agents, checklist, quickstart] = await Promise.all([
+const [app, client, worker, migration, hardeningMigration, wrangler, build, sw, agents, checklist, quickstart] = await Promise.all([
   read("app.js"),
   read("report-feedback.js"),
   read("report-worker.mjs"),
   read("migrations/0001_calculator_reports.sql"),
+  read("migrations/0002_report_attempts.sql"),
   read("wrangler.jsonc"),
   read("scripts/build.mjs"),
   read("sw.js"),
@@ -43,8 +44,10 @@ requireMatch(client, /maxlength|MAX_NOTE_LENGTH|NOTE_LIMIT/,
   "report client no longer carries a bounded note contract");
 requireMatch(client, /calculator_id[\s\S]*page_url[\s\S]*inputs[\s\S]*outputs[\s\S]*turnstile_token/,
   "report client payload lost required reproduction context");
-requireMatch(client, /SENSITIVE_INPUT_TYPES[\s\S]*SENSITIVE_AUTOCOMPLETE/,
-  "report client must skip password, contact, payment, and identity fields");
+requireMatch(client, /isPrivateControl[\s\S]*sanitizedReportUrl/,
+  "report client must share centralized private-field detection and sanitize stored URLs");
+requireMatch(client, /Output omitted because this calculator contains a private field/,
+  "report client must omit derived outputs when a calculator contains a private field");
 
 requireMatch(worker, /import \{ TOOLS \} from "\.\/tools-data\.js"/,
   "report Worker must validate calculator IDs against the live catalog");
@@ -64,8 +67,12 @@ requireMatch(worker, /dailyReporterHmac[\s\S]*name: "HMAC"/,
   "report Worker must hash daily rate-limit identity with HMAC");
 requireMatch(worker, /dailyReporterHmac\(day, remoteIp, env\.REPORT_HASH_SECRET\)/,
   "report Worker must key its daily HMAC with REPORT_HASH_SECRET");
-requireMatch(worker, /await db\.batch\(\[insert, incrementGlobal, incrementReporter\]\)/,
-  "report insert and both counters must remain one D1 batch");
+requireMatch(worker, /attemptLimitReached[\s\S]*DAILY_ATTEMPT_LIMIT[\s\S]*REPORTER_ATTEMPT_LIMIT/,
+  "report Worker must reserve a separate bounded verified-attempt budget");
+requireMatch(worker, /REPORT_RETENTION_DAYS\s*=\s*30[\s\S]*cleanupReports/,
+  "report Worker must automatically purge reports after 30 days");
+requireMatch(worker, /await db\.batch\(\[[\s\S]*incrementGlobalAttempt[\s\S]*insert[\s\S]*incrementReporter[\s\S]*\]\)/,
+  "retention, attempt reservations, report insert, and accepted counters must remain one D1 batch");
 
 requireMatch(migration, /CREATE TABLE calculator_reports/,
   "D1 migration is missing calculator_reports");
@@ -75,6 +82,10 @@ requireMatch(migration, /CREATE TABLE report_limits/,
   "D1 migration is missing bounded rate counters");
 requireMatch(migration, /status IN \('open', 'resolved', 'wont_fix'\)/,
   "D1 migration is missing the maintainer review lifecycle");
+requireMatch(hardeningMigration, /CREATE TABLE report_attempt_limits/,
+  "D1 hardening migration is missing verified-attempt counters");
+requireMatch(hardeningMigration, /calculator_reports_created_at/,
+  "D1 hardening migration is missing the retention index");
 
 requireMatch(wrangler, /"main"\s*:\s*"report-worker\.mjs"/,
   "wrangler must use the report Worker entry");
@@ -86,6 +97,10 @@ requireMatch(wrangler, /"secrets"[\s\S]*"required"[\s\S]*"TURNSTILE_SECRET_KEY"[
   "wrangler must fail deployment when either required protection secret is missing");
 requireMatch(wrangler, /"pattern"\s*:\s*"roughlogic\.com\/api\/reports\*"/,
   "wrangler must expose only the report API route on the production zone");
+requireMatch(wrangler, /"observability"\s*:\s*\{\s*"enabled"\s*:\s*false/,
+  "report Worker must not persist invocation logs containing request metadata");
+requireMatch(wrangler, /"crons"\s*:\s*\["17 8 \* \* \*"\]/,
+  "wrangler must schedule daily retention cleanup");
 if (/"assets"\s*:|"ASSETS"/.test(wrangler)) {
   errors.push("report Worker must not bind or serve the Pages static asset tree");
 }

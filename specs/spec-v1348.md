@@ -47,6 +47,7 @@ still expose a crash, unit error, implausible result, or stale citation.
 - Cloudflare D1 storage, migration, duplicate suppression, per-reporter limits, and a hard
   accepted-report ceiling.
 - A private maintainer workflow through authenticated Cloudflare D1 access.
+- Automatic bounded retention, added by the security follow-up in spec-v1349.
 - CI and contributor-documentation standards that make the feedback path mandatory for
   every new calculator, alongside website and MCP wiring.
 
@@ -55,7 +56,6 @@ still expose a crash, unit error, implausible result, or stale citation.
 - Email notifications, user accounts, public issue lists, attachments, screenshots,
   threaded replies, or collecting a reporter email address.
 - A public or separately authenticated admin application.
-- Automatic deletion or modification of calculator reports.
 - Sending reports while offline. Offline calculation continues unchanged.
 
 ## 4. User experience
@@ -237,9 +237,9 @@ Not stored:
 - unique `dedupe_key`;
 - `status` (`open`, `resolved`, or `wont_fix`), `resolved_at`, `resolution_note`.
 
-`report_limits` stores only `bucket`, `scope`, `subject`, and `count`. A weekly cleanup may remove
-counter buckets older than 14 days; report records are retained until the maintainer deliberately
-deletes them.
+`report_limits` stores only `bucket`, `scope`, `subject`, and `count`. Spec-v1349
+adds separate verified-attempt counters and a daily cleanup: counters expire
+after 14 days and every report expires after 30 days.
 
 ## 8. Maintainer workflow
 

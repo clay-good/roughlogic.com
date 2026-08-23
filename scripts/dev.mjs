@@ -5,12 +5,12 @@
 // file applies. Default port 8080.
 
 import { createServer } from "node:http";
-import { stat, readFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
-import { resolve, extname } from "node:path";
+import { lstat, readFile, realpath } from "node:fs/promises";
+import { resolve, extname, relative, isAbsolute } from "node:path";
 
-const ROOT = resolve(new URL(".", import.meta.url).pathname, "..");
+const ROOT = resolve(new URL(".", import.meta.url).pathname, "..", "dist");
 const PORT = Number(process.env.PORT) || 8080;
+const HOST = "127.0.0.1";
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -45,21 +45,35 @@ const SECURITY_HEADERS = {
 
 createServer(async (req, res) => {
   try {
+    const host = String(req.headers.host || "").toLowerCase();
+    if (host !== `localhost:${PORT}` && host !== `${HOST}:${PORT}`) {
+      res.writeHead(421); res.end("Misdirected request"); return;
+    }
+    if (req.method !== "GET" && req.method !== "HEAD") {
+      res.writeHead(405, { Allow: "GET, HEAD" }); res.end(); return;
+    }
     const url = new URL(req.url || "/", "http://localhost");
     let p = decodeURIComponent(url.pathname);
     if (p === "/" || p === "") p = "/index.html";
     const file = resolve(ROOT, "." + p);
-    if (!file.startsWith(ROOT)) { res.writeHead(403); res.end(); return; }
-    if (!existsSync(file)) { res.writeHead(404); res.end("Not found"); return; }
-    const st = await stat(file);
-    if (st.isDirectory()) { res.writeHead(403); res.end(); return; }
+    const rel = relative(ROOT, file);
+    if (!rel || rel.startsWith("..") || isAbsolute(rel)) { res.writeHead(403); res.end(); return; }
+    let st;
+    try { st = await lstat(file); } catch (error) {
+      if (error && error.code === "ENOENT") { res.writeHead(404); res.end("Not found"); return; }
+      throw error;
+    }
+    if (!st.isFile() || st.isSymbolicLink()) { res.writeHead(403); res.end(); return; }
+    const canonical = await realpath(file);
+    const canonicalRel = relative(ROOT, canonical);
+    if (canonicalRel.startsWith("..") || isAbsolute(canonicalRel)) { res.writeHead(403); res.end(); return; }
     const data = await readFile(file);
     const headers = { ...SECURITY_HEADERS, "Content-Type": MIME[extname(file)] || "application/octet-stream", "Content-Length": data.byteLength };
     res.writeHead(200, headers);
-    res.end(data);
+    res.end(req.method === "HEAD" ? undefined : data);
   } catch (e) {
     res.writeHead(500); res.end("Server error");
   }
-}).listen(PORT, () => {
+}).listen(PORT, HOST, () => {
   console.log("dev: http://localhost:" + PORT + "/");
 });

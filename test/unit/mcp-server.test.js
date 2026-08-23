@@ -6,6 +6,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { readFile } from "node:fs/promises";
 
 const SERVER = fileURLToPath(new URL("../../mcp/server.mjs", import.meta.url));
 
@@ -145,4 +146,23 @@ test("oversized or malformed local RPC input is dropped and the server recovers"
   });
   assert.deepEqual(reply.found.result, {});
   assert.match(reply.stderr, /dropping oversized message/);
+});
+
+test("MCP rejects enormous finite calculator workloads without allocating their output", async () => {
+  const replies = await rpc([{
+    jsonrpc: "2.0", id: 44, method: "tools/call",
+    params: { name: "run_calculator", arguments: {
+      id: "lab-dilution", inputs: { c1: 1000, mode: "serial", steps: 1e9, dilution_factor: 10 },
+    } },
+  }]);
+  const result = replies.get(44).result.structuredContent;
+  assert.match(JSON.stringify(result), /1,000|whole number|error/i);
+});
+
+test("MCP serializes a bounded request queue and honors stdout backpressure", async () => {
+  const source = await readFile(SERVER, "utf8");
+  assert.match(source, /MAX_PENDING_RPC\s*=\s*100/);
+  assert.match(source, /rpcTail\s*=\s*rpcTail/);
+  assert.match(source, /once\(process\.stdout, "drain"\)/);
+  assert.doesNotMatch(source, /\bhandle\(item\);/);
 });

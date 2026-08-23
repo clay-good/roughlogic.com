@@ -27,12 +27,15 @@ No bundler, no transpiler, no minifier. The shipped files are the source.
 
 ## Local development
 
-`npm run dev` starts a Node-only static server on http://localhost:8080 with the same Content-Security-Policy and same-origin headers as production. No external server software is required for development.
+`npm run dev` first builds `dist/`, then serves only that public tree on
+`http://localhost:8080`. It binds to loopback, validates the Host header, and
+refuses symlinks; repository metadata and local environment files are never in
+its document root.
 
 ## Cloudflare configuration checklist
 
 - HTTPS enforced (default on Pages).
-- HSTS preloaded via the `Strict-Transport-Security: max-age=31536000; includeSubDomains; preload` line in `_headers`. Submit https://roughlogic.com to https://hstspreload.org once production traffic is verified.
+- HSTS is preload-ready via `Strict-Transport-Security: max-age=31536000; includeSubDomains; preload`; the directive does not itself mean browsers have accepted the domain into their preload list. Submit only as a deliberate, long-lived commitment.
 - `_headers` carries: CSP, X-Content-Type-Options nosniff, X-Frame-Options DENY, Referrer-Policy no-referrer, COOP/COEP/CORP same-origin, and Permissions-Policy disabling camera/microphone/geolocation/payment/USB/accelerometer/gyroscope/magnetometer.
 - Custom domain `roughlogic.com` mapped to the Pages production environment.
 - Preview deployments map to `*.pages.dev`.

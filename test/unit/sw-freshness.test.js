@@ -37,6 +37,15 @@ test("install handler calls skipWaiting so the new SW takes over on next visit",
   assert.match(t, /self\.skipWaiting\(\)/);
 });
 
+test("install is atomic: required cache failures are not swallowed", async () => {
+  const t = await readSw();
+  assert.match(t, /Promise\.all\(SHELL_ASSETS\.map/);
+  assert.match(t, /Promise\.all\(DATA_MANIFESTS\.map/);
+  assert.doesNotMatch(t, /\.catch\(\(\)\s*=>\s*undefined\)/);
+  assert.ok(t.indexOf("Promise.all(SHELL_ASSETS") < t.indexOf("self.skipWaiting()"));
+  assert.ok(t.indexOf("Promise.all(DATA_MANIFESTS") < t.indexOf("self.skipWaiting()"));
+});
+
 test("activate handler claims clients and deletes prior caches", async () => {
   const t = await readSw();
   assert.match(t, /self\.clients\.claim\(\)/);

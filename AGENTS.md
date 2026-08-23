@@ -59,6 +59,9 @@ description/execution, and the shared **Report a problem** path. New tiles inher
 reporting through `renderToolView`; never bypass, hide, fork, or replace that
 shared control. `scripts/check-feedback-loop.mjs` enforces the repository-level
 mount, API, D1 migration, and documentation standard.
+Any identity, contact, address, credential, payment, or other private/free-prose
+control must set `data-report-sensitive="true"`. Private controls must never be
+serialized into URL state, report inputs, or derived output snapshots.
 
 ## The rules that bind an agent here
 

@@ -180,7 +180,7 @@ outcome. The audit trail is append-only and public.
 
 | Command | What it does |
 | ------- | ------------ |
-| `npm run dev` | Local dev server (no build step). |
+| `npm run dev` | Builds `dist/`, then serves only that public tree on loopback. |
 | `npm run build` | Produces `dist/` for deployment. |
 | `npm test` | Full unit-test suite under Node's test runner. |
 | `npm run test:unit` | Same as `npm test`. |
@@ -221,7 +221,9 @@ For every minor or patch release:
 
 ## Hard rules (do not break)
 
-- 100% client-side. No server, no account, no telemetry, no AI.
+- Calculator execution is 100% client-side with no account, analytics, or AI.
+  The sole hosted write path is the isolated, user-initiated report Worker;
+  persisted invocation logs are disabled and D1 records expire after 30 days.
 - No localStorage / sessionStorage / cookies / IndexedDB beyond
   `rl-theme`. URL hash is the only state mechanism. (The
   `rl-bigbuttons` key was retired in spec-v11.)

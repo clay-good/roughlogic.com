@@ -306,7 +306,9 @@ export function computeSolarTimes({ lat_deg = 0, lon_deg = 0, date_iso = "", tz_
   if (!(lon_deg >= -180 && lon_deg <= 180)) return { error: "Longitude out of range." };
   // A non-finite tz offset makes the 1440-minute wrap loop in fmtTime spin
   // forever (v18 C-6/D-6).
-  if (!Number.isFinite(tz_offset_hours)) return { error: "Time-zone offset must be finite." };
+  if (!Number.isFinite(tz_offset_hours) || Math.abs(tz_offset_hours) > 24) {
+    return { error: "Time-zone offset must be between -24 and 24 hours." };
+  }
   const d = new Date(date_iso || new Date().toISOString().slice(0, 10) + "T12:00:00Z");
   if (Number.isNaN(d.getTime())) return { error: "Invalid date." };
   const gamma = fractionalYear(d);
@@ -340,9 +342,7 @@ export function computeSolarTimes({ lat_deg = 0, lon_deg = 0, date_iso = "", tz_
   }
   function fmtTime(utcMinutes) {
     if (utcMinutes === null) return null;
-    let local = utcMinutes + tz_offset_hours * 60;
-    while (local < 0) local += 1440;
-    while (local >= 1440) local -= 1440;
+    const local = ((utcMinutes + tz_offset_hours * 60) % 1440 + 1440) % 1440;
     const h = Math.floor(local / 60);
     const m = Math.floor(local - h * 60);
     return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");

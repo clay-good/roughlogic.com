@@ -5,7 +5,7 @@
 // robots.txt, sitemap.xml, data/, LICENSE) into ./dist.
 // No bundler. No transpiler. No minifier. The shipped files are the source.
 
-import { readdir, mkdir, copyFile, stat, readFile, writeFile, rm } from "node:fs/promises";
+import { readdir, mkdir, copyFile, lstat, readFile, writeFile, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { resolve, dirname, relative } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -139,9 +139,11 @@ async function copyDir(src, dst) {
     if (name.startsWith(".")) continue;
     const s = resolve(src, name);
     const d = resolve(dst, name);
-    const st = await stat(s);
+    const st = await lstat(s);
+    if (st.isSymbolicLink()) throw new Error("build: refusing symbolic link in public source: " + relative(ROOT, s));
     if (st.isDirectory()) await copyDir(s, d);
-    else await copyFile(s, d);
+    else if (st.isFile()) await copyFile(s, d);
+    else throw new Error("build: refusing special file in public source: " + relative(ROOT, s));
   }
 }
 
@@ -163,7 +165,8 @@ async function checkRuntimeFilesEnumerated() {
   for (const name of await readdir(ROOT)) {
     if (skip.has(name) || name.startsWith(".")) continue;
     if (!name.endsWith(".js")) continue;
-    const st = await stat(resolve(ROOT, name));
+    const st = await lstat(resolve(ROOT, name));
+    if (st.isSymbolicLink()) throw new Error("build: refusing symbolic link at repository root: " + name);
     if (!st.isFile()) continue;
     if (!filesSet.has(name)) missing.push(name);
   }
@@ -203,6 +206,8 @@ async function main() {
       console.error("missing required file: " + f);
       process.exit(1);
     }
+    const st = await lstat(s);
+    if (!st.isFile() || st.isSymbolicLink()) throw new Error("build: required public source must be a regular file: " + f);
     const d = resolve(DIST, f);
     await mkdir(dirname(d), { recursive: true });
     await copyFile(s, d);
@@ -211,6 +216,8 @@ async function main() {
   for (const f of OPTIONAL) {
     const s = resolve(ROOT, f);
     if (!existsSync(s)) continue;
+    const st = await lstat(s);
+    if (!st.isFile() || st.isSymbolicLink()) throw new Error("build: optional public source must be a regular file: " + f);
     await copyFile(s, resolve(DIST, f));
   }
 
@@ -259,7 +266,8 @@ async function main() {
   async function walk(dir) {
     for (const name of await readdir(dir)) {
       const p = resolve(dir, name);
-      const st = await stat(p);
+      const st = await lstat(p);
+      if (st.isSymbolicLink()) throw new Error("build: symbolic link reached dist: " + relative(DIST, p));
       if (st.isDirectory()) await walk(p);
       else { total += st.size; count += 1; }
     }

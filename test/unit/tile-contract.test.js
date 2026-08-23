@@ -23,6 +23,7 @@ import { computeAmortization, computeMacrs } from "../../calc-accounting.js";
 import { computeSerialDilution } from "../../calc-lab.js";
 import { computeHipValleyRafter } from "../../calc-construction.js";
 import { computeSolarTimes } from "../../calc-field.js";
+import { computeDilution as computeWaterDilution } from "../../calc-water.js";
 
 test("tile contract: no Tier-1 (crasher) violations over the registered fixtures", async () => {
   const rows = await loadFixtures();
@@ -68,14 +69,21 @@ test("serial-dilution: number_of_steps = Infinity errors instead of OOM", () => 
   assert.ok(!ok.error && ok.tubes.length === 5);
 });
 
+test("lab-dilution: huge finite serial schedules are rejected", () => {
+  const r = computeWaterDilution({ c1: 1000, mode: "serial", steps: 1e9, dilution_factor: 10 });
+  assert.ok(r.error, "expected a bounded error for an enormous finite step count");
+});
+
 test("hip-valley-rafter: run_ft = Infinity and non-positive spacing error instead of OOM", () => {
   assert.ok(computeHipValleyRafter({ run_ft: Infinity, pitch: 6 }).error, "expected an error for non-finite run");
   assert.ok(computeHipValleyRafter({ run_ft: 14, pitch: 6, jack_oc_in: -1 }).error, "expected an error for non-positive jack spacing");
+  assert.ok(computeHipValleyRafter({ run_ft: 1000000, pitch: 6, jack_oc_in: 0.01 }).error, "expected an error for an enormous jack schedule");
   assert.ok(!computeHipValleyRafter({ run_ft: 14, pitch: 6, jack_oc_in: 16 }).error);
 });
 
 test("solar-times: tz_offset_hours = Infinity errors instead of looping forever", () => {
   const r = computeSolarTimes({ lat_deg: 39.7392, lon_deg: -104.9903, date_iso: "2026-06-21", tz_offset_hours: Infinity });
   assert.ok(r.error, "expected an error for non-finite tz offset");
+  assert.ok(computeSolarTimes({ lat_deg: 39.7392, lon_deg: -104.9903, date_iso: "2026-06-21", tz_offset_hours: 1e15 }).error);
   assert.ok(!computeSolarTimes({ lat_deg: 39.7392, lon_deg: -104.9903, date_iso: "2026-06-21", tz_offset_hours: -6 }).error);
 });

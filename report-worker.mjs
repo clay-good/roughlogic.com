@@ -9,6 +9,10 @@ export const MAX_BODY_BYTES = 24 * 1024;
 export const MAX_NOTE_LENGTH = 160;
 export const DAILY_LIMIT_CEILING = 200;
 export const REPORTER_LIMIT_CEILING = 5;
+export const DAILY_ATTEMPT_LIMIT = 400;
+export const REPORTER_ATTEMPT_LIMIT = 10;
+export const REPORT_RETENTION_DAYS = 30;
+export const COUNTER_RETENTION_DAYS = 14;
 const MAX_URL_LENGTH = 8192;
 const MAX_FIELDS = 100;
 const MAX_LABEL_LENGTH = 120;
@@ -17,7 +21,7 @@ const MAX_OUTPUT_TEXT_LENGTH = 12000;
 const TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 const TURNSTILE_ACTION = "calculator-report";
 const TOOL_BY_ID = new Map(TOOLS.map((tool) => [tool.id, tool]));
-const UNSAFE_STORED_TEXT = /[\u0000-\u0008\u000B-\u001F\u007F-\u009F\u202A-\u202E\u2066-\u2069]/u;
+const UNSAFE_STORED_TEXT = /[\u0000-\u0008\u000B-\u001F\u007F-\u009F\u061C\u200E\u200F\u202A-\u202E\u2066-\u2069]/u;
 
 const JSON_HEADERS = {
   "Content-Type": "application/json; charset=utf-8",
@@ -75,7 +79,7 @@ function validRows(rows) {
 
 function urlIdentifiesCalculator(url, calculatorId) {
   const hashId = url.hash.replace(/^#/, "").split("?")[0];
-  if (hashId === calculatorId) return true;
+  if ((url.pathname === "/" || url.pathname === "/index.html") && hashId === calculatorId) return true;
   return url.pathname === "/tools/" + calculatorId + "/";
 }
 
@@ -95,7 +99,7 @@ export function validateReportPayload(payload, origins = ["https://roughlogic.co
   }
   let pageUrl;
   try { pageUrl = new URL(payload.page_url); } catch { return { ok: false, status: 400 }; }
-  if (pageUrl.username || pageUrl.password
+  if (pageUrl.username || pageUrl.password || pageUrl.search
     || !origins.includes(pageUrl.origin)
     || !urlIdentifiesCalculator(pageUrl, payload.calculator_id)) {
     return { ok: false, status: 403 };
@@ -207,6 +211,36 @@ async function dailyReporterHmac(day, remoteIp, secret) {
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
+function cutoffIso(now, days) {
+  return new Date(now.getTime() - days * 86400000).toISOString();
+}
+
+export async function cleanupReports(db, now = new Date()) {
+  const deleteReports = db.prepare(
+    "DELETE FROM calculator_reports WHERE created_at < ?",
+  ).bind(cutoffIso(now, REPORT_RETENTION_DAYS));
+  const counterCutoff = cutoffIso(now, COUNTER_RETENTION_DAYS).slice(0, 10);
+  const deleteAcceptedCounters = db.prepare(
+    "DELETE FROM report_limits WHERE bucket < ?",
+  ).bind(counterCutoff);
+  const deleteAttemptCounters = db.prepare(
+    "DELETE FROM report_attempt_limits WHERE bucket < ?",
+  ).bind(counterCutoff);
+  await db.batch([deleteReports, deleteAcceptedCounters, deleteAttemptCounters]);
+}
+
+async function attemptLimitReached(db, day, reporter) {
+  const row = await db.prepare(`
+    SELECT
+      COALESCE((SELECT count FROM report_attempt_limits
+        WHERE bucket = ? AND scope = 'global' AND subject = 'all'), 0) AS global_count,
+      COALESCE((SELECT count FROM report_attempt_limits
+        WHERE bucket = ? AND scope = 'reporter' AND subject = ?), 0) AS reporter_count
+  `).bind(day, day, reporter).first();
+  return Number(row && row.global_count) >= DAILY_ATTEMPT_LIMIT
+    || Number(row && row.reporter_count) >= REPORTER_ATTEMPT_LIMIT;
+}
+
 function configuredLimit(value, fallback, ceiling) {
   const parsed = Number(value);
   if (!Number.isInteger(parsed) || parsed < 1) return fallback;
@@ -217,12 +251,10 @@ function storagePayload(value) {
   return JSON.stringify(value);
 }
 
-async function storeReport(db, report, env, remoteIp) {
-  const now = new Date();
+export async function storeReport(db, report, env, reporter, now = new Date()) {
   const createdAt = now.toISOString();
   const day = createdAt.slice(0, 10);
   const reportId = crypto.randomUUID();
-  const reporter = await dailyReporterHmac(day, remoteIp, env.REPORT_HASH_SECRET);
   const dailyLimit = configuredLimit(env.REPORT_DAILY_LIMIT, DAILY_LIMIT_CEILING, DAILY_LIMIT_CEILING);
   const reporterLimit = configuredLimit(env.REPORT_REPORTER_DAILY_LIMIT, REPORTER_LIMIT_CEILING, REPORTER_LIMIT_CEILING);
   const dedupeSource = storagePayload({
@@ -233,6 +265,27 @@ async function storeReport(db, report, env, remoteIp) {
     outputs: report.outputs,
   });
   const dedupeKey = day + ":" + await sha256(dedupeSource);
+
+  const deleteReports = db.prepare(
+    "DELETE FROM calculator_reports WHERE created_at < ?",
+  ).bind(cutoffIso(now, REPORT_RETENTION_DAYS));
+  const counterCutoff = cutoffIso(now, COUNTER_RETENTION_DAYS).slice(0, 10);
+  const deleteAcceptedCounters = db.prepare(
+    "DELETE FROM report_limits WHERE bucket < ?",
+  ).bind(counterCutoff);
+  const deleteAttemptCounters = db.prepare(
+    "DELETE FROM report_attempt_limits WHERE bucket < ?",
+  ).bind(counterCutoff);
+  const incrementGlobalAttempt = db.prepare(`
+    INSERT INTO report_attempt_limits (bucket, scope, subject, count)
+    VALUES (?, 'global', 'all', 1)
+    ON CONFLICT (bucket, scope, subject) DO UPDATE SET count = count + 1
+  `).bind(day);
+  const incrementReporterAttempt = db.prepare(`
+    INSERT INTO report_attempt_limits (bucket, scope, subject, count)
+    VALUES (?, 'reporter', ?, 1)
+    ON CONFLICT (bucket, scope, subject) DO UPDATE SET count = count + 1
+  `).bind(day, reporter);
 
   const insert = db.prepare(`
     INSERT OR IGNORE INTO calculator_reports (
@@ -248,11 +301,20 @@ async function storeReport(db, report, env, remoteIp) {
       SELECT count FROM report_limits
       WHERE bucket = ? AND scope = 'reporter' AND subject = ?
     ), 0) < ?
+    AND COALESCE((
+      SELECT count FROM report_attempt_limits
+      WHERE bucket = ? AND scope = 'global' AND subject = 'all'
+    ), 0) <= ?
+    AND COALESCE((
+      SELECT count FROM report_attempt_limits
+      WHERE bucket = ? AND scope = 'reporter' AND subject = ?
+    ), 0) <= ?
   `).bind(
     reportId, createdAt, report.calculatorId, report.calculatorName, report.pageUrl,
     report.note || null, storagePayload(report.inputs), storagePayload(report.outputs.values),
     report.outputs.text, report.outputs.truncated ? 1 : 0, dedupeKey,
     day, dailyLimit, day, reporter, reporterLimit,
+    day, DAILY_ATTEMPT_LIMIT, day, reporter, REPORTER_ATTEMPT_LIMIT,
   );
 
   const incrementGlobal = db.prepare(`
@@ -271,7 +333,11 @@ async function storeReport(db, report, env, remoteIp) {
 
   // D1 batch statements execute sequentially as one transaction. The counters
   // move only if this batch inserted its unique report row.
-  await db.batch([insert, incrementGlobal, incrementReporter]);
+  await db.batch([
+    deleteReports, deleteAcceptedCounters, deleteAttemptCounters,
+    incrementGlobalAttempt, incrementReporterAttempt,
+    insert, incrementGlobal, incrementReporter,
+  ]);
 }
 
 function reportingConfigured(env) {
@@ -309,6 +375,18 @@ async function handleReport(request, env) {
   const validated = validateReportPayload(parsed.value, origins);
   if (!validated.ok) return json(validated.status, { ok: false });
 
+  const now = new Date();
+  const day = now.toISOString().slice(0, 10);
+  let reporter;
+  try {
+    reporter = await dailyReporterHmac(day, remoteIp, env.REPORT_HASH_SECRET);
+    if (await attemptLimitReached(env.REPORTS_DB, day, reporter)) {
+      return json(202, { ok: true });
+    }
+  } catch {
+    return json(503, { ok: false });
+  }
+
   const verificationId = crypto.randomUUID();
   const verified = await verifyTurnstile({
     token: validated.value.turnstileToken,
@@ -320,7 +398,7 @@ async function handleReport(request, env) {
   if (!verified) return json(400, { ok: false });
 
   try {
-    await storeReport(env.REPORTS_DB, validated.value, env, remoteIp);
+    await storeReport(env.REPORTS_DB, validated.value, env, reporter, now);
   } catch {
     return json(503, { ok: false });
   }
@@ -340,5 +418,8 @@ export async function handleRequest(request, env) {
 export default {
   fetch(request, env) {
     return handleRequest(request, env);
+  },
+  scheduled(_event, env, ctx) {
+    ctx.waitUntil(cleanupReports(env.REPORTS_DB));
   },
 };

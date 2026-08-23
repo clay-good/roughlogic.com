@@ -15,6 +15,9 @@ The report Worker is API-only and least-privileged: its sole public route is
 `roughlogic.com/api/reports*`; `workers.dev` and version preview URLs are
 disabled; it has only D1, four bounded public variables, and two encrypted
 required secrets. It cannot read or serve the Pages asset tree.
+Persisted invocation logs are disabled. Verified attempts and accepted reports
+have separate daily ceilings, private controls are removed from the URL and
+payload, and a daily cron deletes every report after 30 days.
 
 ## Runtime overview
 
@@ -24,7 +27,9 @@ Selecting a tile loads only the data shards relevant to that utility. No data is
 
 Most computation runs in the main thread. The simplified Manual J cooling and heating load estimators (utilities 21 and 22) and the duct sizing calculator (utility 23) run inside a Web Worker so the UI remains responsive on multi-zone inputs.
 
-The service worker caches the application shell on first load. Data shards are cached on first access. Cache version is keyed to the build hash.
+The service worker atomically caches the required application shell and data
+manifests. A failed required fetch leaves the prior worker and known-good cache
+active. Cache version is keyed to the build hash.
 
 ## ASCII architecture diagram
 
