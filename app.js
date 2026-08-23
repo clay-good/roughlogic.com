@@ -1836,6 +1836,28 @@ function renderToolView(id, params) {
   outputRegion.setAttribute("aria-live", "polite");
   outputRegion.setAttribute("aria-label", "Output");
 
+  // spec-v1348: one shared report control covers the whole catalog and every
+  // future tile that enters through renderToolView. The reporting client and
+  // Turnstile are loaded only after an intentional click, so normal calculator
+  // use stays local, offline-capable, and free of reporting network work.
+  const report = document.createElement("button");
+  report.type = "button";
+  report.className = "report-trigger";
+  report.textContent = "Report a problem";
+  report.addEventListener("click", () => {
+    report.disabled = true;
+    import("./report-feedback.js").then((mod) => {
+      if (!report.isConnected) return;
+      report.disabled = false;
+      return mod.openReportDialog({ tool, inputRegion, outputRegion, trigger: report, host: view });
+    }).catch(() => {
+      if (!report.isConnected) return;
+      report.disabled = false;
+      report.textContent = "Reporting unavailable";
+    });
+  });
+  headerRow.appendChild(report);
+
   // spec-v1338: the answer goes ABOVE the inputs.
   //
   // The order the reader needs is the reverse of the order the page is built

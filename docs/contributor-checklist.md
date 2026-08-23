@@ -13,6 +13,9 @@ phase docs ([edition-rollover.md](edition-rollover.md),
 
 ## New tile
 
+- [ ] Tile has all three mandatory doors: website rendering, local MCP
+  description/execution, and the shared **Report a problem** control inherited
+  through `renderToolView` (never fork or bypass the shared report path).
 - [ ] Tile renders without console warnings or errors.
 - [ ] Tile id is added to the `TOOLS` array in [../tools-data.js](../tools-data.js)
   (the catalog registry; lazy-loaded out of `app.js` per spec-v10 §H.2).
@@ -167,8 +170,9 @@ phase docs ([edition-rollover.md](edition-rollover.md),
 - [ ] `npm run lint` clean.
 - [ ] `npm test` passing (full unit suite).
 - [ ] `npm run build` clean (dist/ produced).
-- [ ] No new third-party runtime dependency. No new outbound
-  network call. No new storage key beyond `rl-theme`.
+- [ ] No new third-party runtime dependency or outbound network call beyond the
+  reviewed, lazy Turnstile/reporting exception in spec-v1348. No new storage key
+  beyond `rl-theme`, and no new remote write path without its own approved spec.
 - [ ] No emoji, no em-dash, no decorative icon in shipped
   strings.
 - [ ] CHANGELOG updated if the change is user-visible.

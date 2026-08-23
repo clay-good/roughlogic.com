@@ -13,9 +13,9 @@
 //      un-themed paint, easy to miss -- and the edge _headers CSP is not
 //      exercised by the local Playwright suite at all (those headers only
 //      apply at the Cloudflare edge), so a drift there ships silently.
-//   2. Posture weakening: someone relaxes script-src to allow a CDN, or
-//      connect-src to allow an external API, quietly breaking the
-//      no-external-network guarantee.
+//   2. Posture weakening: someone relaxes script-src for anything beyond the
+//      one reviewed Turnstile origin, or connect-src for an external API,
+//      quietly expanding the reporting exception into general network access.
 //
 // This gate recomputes the boot-script hash and asserts BOTH CSPs carry
 // it, and that the security-critical directives stay locked to 'self'
@@ -31,6 +31,7 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const TURNSTILE_ORIGIN = "https://challenges.cloudflare.com";
 
 // Pull the `content="..."` of the <meta http-equiv="Content-Security-Policy">.
 // The content is double-quoted and the CSP itself uses single quotes
@@ -75,6 +76,10 @@ function isExternalOrigin(tok) {
   return true; // anything else (a host, http(s):, *, a wildcard domain) is external
 }
 
+function isAllowedReportingOrigin(dir, tok) {
+  return tok === TURNSTILE_ORIGIN && (dir === "script-src" || dir === "frame-src");
+}
+
 async function main() {
   const errors = [];
   const html = await readFile(resolve(ROOT, "index.html"), "utf8");
@@ -109,11 +114,17 @@ async function main() {
       if (!scriptSrc.includes(expected)) {
         errors.push(`${label}: script-src does not carry the current boot-script hash ${expected}. Recompute it (sha256 of the inline <script>) and update BOTH index.html and _headers.`);
       }
-      // 2b. script-src must be exactly 'self' + the hash -- no host, no 'unsafe-inline'/'unsafe-eval'.
+      // 2b. script-src is self + the hash + the exact Turnstile host. The
+      // report client loads it only after an intentional click.
       for (const tok of scriptSrc) {
-        if (tok === "'self'" || /^'sha256-/.test(tok)) continue;
-        errors.push(`${label}: script-src carries a disallowed token '${tok}' (only 'self' and the boot-script sha256 are allowed).`);
+        if (tok === "'self'" || tok === TURNSTILE_ORIGIN || /^'sha256-/.test(tok)) continue;
+        errors.push(`${label}: script-src carries a disallowed token '${tok}' (only 'self', Turnstile, and the boot-script sha256 are allowed).`);
       }
+    }
+
+    const frameSrc = dirs["frame-src"] || [];
+    if (JSON.stringify(frameSrc) !== JSON.stringify([TURNSTILE_ORIGIN])) {
+      errors.push(`${label}: frame-src must be exactly ${TURNSTILE_ORIGIN} for the report dialog (got ${JSON.stringify(frameSrc)}).`);
     }
 
     // 3. The locked-down directives behind "0 trackers / works offline".
@@ -133,7 +144,7 @@ async function main() {
     // 4. No external origin in ANY directive (only keywords / data: / hashes).
     for (const [dir, toks] of Object.entries(dirs)) {
       for (const tok of toks) {
-        if (isExternalOrigin(tok)) {
+        if (isExternalOrigin(tok) && !isAllowedReportingOrigin(dir, tok)) {
           errors.push(`${label}: ${dir} references an external origin '${tok}' -- the CSP must stay self-only (no CDN, font host, analytics, or API).`);
         }
       }
@@ -147,7 +158,7 @@ async function main() {
   }
   console.log(
     "check-csp OK: boot-script sha256 " + expected + " matches script-src in index.html <meta>, _headers, and scripts/dev.mjs; " +
-    "default-src / connect-src / object-src locked to self/none; no external origin in any directive.",
+    "default-src / connect-src / object-src locked to self/none; only the reviewed Turnstile script/frame origin is external.",
   );
 }
 

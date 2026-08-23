@@ -14,7 +14,6 @@
 // Transport is MCP stdio: newline-delimited JSON-RPC 2.0 on stdin/stdout.
 // stderr is for logs only. No network, no install — `node mcp/server.mjs`.
 
-import { createInterface } from "node:readline";
 import { readFileSync } from "node:fs";
 import {
   search, describe, run, runMany,
@@ -30,6 +29,8 @@ const SITE_VERSION = JSON.parse(
 const SERVER_INFO = { name: "roughlogic", version: SITE_VERSION };
 // Echo the client's protocol version when sane; otherwise this baseline.
 const DEFAULT_PROTOCOL = "2024-11-05";
+const MAX_RPC_MESSAGE_BYTES = 256 * 1024;
+const MAX_RPC_BATCH_SIZE = 50;
 
 const TOOLS = [
   {
@@ -316,9 +317,8 @@ async function handle(msg) {
   }
 }
 
-const rl = createInterface({ input: process.stdin });
-rl.on("line", (line) => {
-  const trimmed = line.trim();
+function acceptRpcLine(line) {
+  const trimmed = line.toString("utf8").trim();
   if (!trimmed) return;
   let msg;
   try {
@@ -327,9 +327,48 @@ rl.on("line", (line) => {
     process.stderr.write(`[roughlogic-mcp] dropping non-JSON line\n`);
     return;
   }
-  // Tolerate JSON-RPC batches (arrays) as well as single messages.
-  if (Array.isArray(msg)) msg.forEach((m) => handle(m));
-  else handle(msg);
+  // Tolerate bounded JSON-RPC batches as well as single messages. Invalid
+  // scalar/null messages never reach handle(), where object destructuring
+  // would otherwise turn malformed local input into an unhandled rejection.
+  if (Array.isArray(msg)) {
+    if (msg.length === 0 || msg.length > MAX_RPC_BATCH_SIZE) {
+      process.stderr.write(`[roughlogic-mcp] dropping invalid batch\n`);
+      return;
+    }
+    for (const item of msg) {
+      if (item && typeof item === "object" && !Array.isArray(item)) handle(item);
+    }
+  } else if (msg && typeof msg === "object") {
+    handle(msg);
+  }
+}
+
+// Do not let readline or JSON.parse buffer an unbounded line from a buggy or
+// hostile local MCP client. Once a message crosses the ceiling, discard bytes
+// through its newline and resume cleanly with the next message.
+let rpcBuffer = Buffer.alloc(0);
+let droppingOversized = false;
+process.stdin.on("data", (chunk) => {
+  let start = 0;
+  while (start < chunk.length) {
+    const newline = chunk.indexOf(0x0A, start);
+    const end = newline === -1 ? chunk.length : newline;
+    const part = chunk.subarray(start, end);
+    if (!droppingOversized) {
+      if (rpcBuffer.length + part.length > MAX_RPC_MESSAGE_BYTES) {
+        rpcBuffer = Buffer.alloc(0);
+        droppingOversized = true;
+        process.stderr.write(`[roughlogic-mcp] dropping oversized message\n`);
+      } else if (part.length) {
+        rpcBuffer = Buffer.concat([rpcBuffer, part]);
+      }
+    }
+    if (newline === -1) break;
+    if (!droppingOversized) acceptRpcLine(rpcBuffer);
+    rpcBuffer = Buffer.alloc(0);
+    droppingOversized = false;
+    start = newline + 1;
+  }
 });
 
 process.stderr.write(`[roughlogic-mcp] ready on stdio\n`);

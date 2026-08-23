@@ -38,6 +38,7 @@ const FILES = [
   "query-fill.js",
   "pick-card.js",
   "tile-prefill.js",
+  "report-feedback.js",
   "integrity.js",
   "calc-electrical.js",
   "calc-motor.js",

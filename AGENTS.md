@@ -8,8 +8,9 @@ Guidance for AI agents working in or with this repository. (Humans: see
 **roughlogic.com** is a static, offline-first site of **1,709 calculators** for the
 trades (electrical, plumbing, HVAC, construction, restoration, and more) across
 **57 calc modules**, plus a local, zero-cost **MCP server** that exposes every one
-of them to an AI agent. US standards only. No AI at runtime. No hosted service —
-the site serves static files and the MCP server runs on your machine over stdio.
+of them to an AI agent. US standards only. No AI at runtime. Calculator execution
+is local; the only hosted write path is the bounded, user-initiated D1 feedback
+endpoint, and the MCP server runs on your machine over stdio.
 
 ## Use the calculators as an agent (the fast path)
 
@@ -42,6 +43,8 @@ server also serves MCP resources (`roughlogic://catalog`, `roughlogic://trade/{t
 | Tile id → renderer (for field schemas) | `test/fixtures/renderer-map.js` (generated from `app.js`) |
 | Publisher-verified worked examples | `test/fixtures/worked-examples.json` |
 | MCP server + catalog layer | `mcp/server.mjs`, `mcp/catalog.mjs` |
+| Shared calculator report UI | `report-feedback.js` |
+| Defensive report Worker + D1 | `report-worker.mjs`, `migrations/` |
 
 ## How to add or change a calculator
 
@@ -51,10 +54,18 @@ new tile touches several registries (`tools-data.js`, the compute module, the
 fixture) and must pass the CI gates (`npm run lint`, `npm test`, `npm run build`).
 Run them locally before pushing. Match the surrounding module's style.
 
+Every calculator has three mandatory doors: website rendering, local MCP
+description/execution, and the shared **Report a problem** path. New tiles inherit
+reporting through `renderToolView`; never bypass, hide, fork, or replace that
+shared control. `scripts/check-feedback-loop.mjs` enforces the repository-level
+mount, API, D1 migration, and documentation standard.
+
 ## The rules that bind an agent here
 
 - **US standards only.** No metric-defaulted inputs.
 - **Never reproduce copyrighted tables.** Cite the source and locator; take table values as inputs.
 - **Verify every formula against a primary source** — not against a sibling tile.
-- **No hosting.** The MCP server stays local stdio; the site serves only static files.
+- **No hosted calculator or AI runtime.** The MCP server stays local stdio; only
+  the spec-v1348 feedback endpoint may write remotely, and it must remain bounded,
+  Turnstile-protected, data-minimized, and fail-closed.
 - **Work in a git worktree**, not directly on `main`.

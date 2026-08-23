@@ -1,6 +1,20 @@
 # Architecture
 
-roughlogic.com is a single-page static web application. There is no server, no account, no analytics, no telemetry, and no runtime dependency. Everything ships as same-origin static assets.
+roughlogic.com is a single-page, offline-first static web application. Calculator
+execution has no account, analytics, or telemetry and ships as same-origin static
+assets. The sole hosted write path is a user-initiated calculator report endpoint:
+a selectively routed Cloudflare Worker validates Turnstile and stores a bounded,
+data-minimized reproduction record in D1.
+
+Ordinary asset and calculator traffic never invokes that Worker code. Turnstile is
+lazy-loaded only when the user opens **Report a problem**. See
+[calculator-reports.md](calculator-reports.md) and
+[spec-v1348](../specs/spec-v1348.md).
+
+The report Worker is API-only and least-privileged: its sole public route is
+`roughlogic.com/api/reports*`; `workers.dev` and version preview URLs are
+disabled; it has only D1, four bounded public variables, and two encrypted
+required secrets. It cannot read or serve the Pages asset tree.
 
 ## Runtime overview
 

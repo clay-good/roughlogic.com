@@ -42,6 +42,9 @@ Tests live in `test/unit/` and `test/integration/`.
      (`check-related-tiles`).
    - 3-5 search aliases in [../data/search/aliases.json](../data/search/aliases.json)
      (`check-discoverability`; terms must be unique catalog-wide).
+   - Confirm the tile enters through the shared `renderToolView` path, which is
+     its mandatory third door after the website and local MCP surfaces and adds
+     **Report a problem** without per-tile code (`check-feedback-loop`).
 4. Add tests + fixtures:
    - At least one worked-example fixture row in
      [../test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json)
@@ -89,6 +92,16 @@ Tests live in `test/unit/` and `test/integration/`.
     mobile-responsive sweep at 320 / 375 / 414 / 760 px per
     [mobile-responsive.md](mobile-responsive.md) is required for
     every new tile.
+
+### "I want to review calculator problem reports"
+
+Use [calculator-reports.md](calculator-reports.md). Quick version:
+
+1. Query open rows from `roughlogic-reports` through authenticated Wrangler.
+2. Reproduce from the saved URL, inputs, and output.
+3. Verify against the primary source and fix through the normal spec-first path.
+4. Mark the row `resolved` or `wont_fix` with a short audit note.
+5. Remove rate-counter buckets older than 14 days.
 
 ### "I want to roll a code edition"
 

@@ -430,6 +430,124 @@ main {
   margin-bottom: var(--space-4);
 }
 
+.report-trigger {
+  margin-left: auto;
+  min-height: var(--touch-min);
+  padding: 0 14px;
+  background: transparent;
+  color: var(--fg-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.report-trigger:hover,
+.report-trigger:focus-visible {
+  color: var(--fg);
+  border-color: var(--border-light);
+  background: var(--bg-tertiary);
+}
+
+.report-trigger:disabled {
+  opacity: 0.65;
+}
+
+.report-dialog {
+  width: min(520px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  padding: var(--space-5);
+  color: var(--fg);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.45);
+}
+
+.report-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.report-dialog h2 {
+  margin: 0 0 var(--space-2);
+  font-size: 1.6rem;
+}
+
+.report-context,
+.report-privacy,
+.report-status {
+  margin: 0 0 var(--space-3);
+  line-height: 1.5;
+  color: var(--fg-muted);
+}
+
+.report-privacy {
+  font-size: 0.9375rem;
+}
+
+.report-dialog label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-weight: 600;
+}
+
+.report-dialog textarea {
+  display: block;
+  width: 100%;
+  min-height: 96px;
+  resize: vertical;
+  padding: 12px;
+  color: var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  font: inherit;
+  line-height: 1.4;
+}
+
+.report-count {
+  margin: var(--space-1) 0 var(--space-3);
+  color: var(--fg-dim);
+  font-size: 0.9375rem;
+  text-align: right;
+}
+
+.report-turnstile {
+  min-height: 65px;
+  margin-bottom: var(--space-3);
+}
+
+.report-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.report-actions button {
+  min-height: var(--touch-min);
+  padding: 0 16px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.report-cancel {
+  color: var(--fg-muted);
+  background: transparent;
+}
+
+.report-submit {
+  color: var(--bg);
+  background: var(--fg);
+}
+
+.report-submit:disabled {
+  opacity: 0.5;
+}
+
 .back-link {
   display: inline-flex;
   align-items: center;
@@ -1150,6 +1268,7 @@ input[aria-invalid="true"] {
   .home { padding: var(--space-6) var(--space-3) var(--space-5); }
   .view-region { padding: var(--space-4) var(--space-3); }
   .view-title { font-size: 1.7rem; }
+  .report-dialog { padding: var(--space-4); }
   /* The hero box buys room back from its own side padding so a one-line
      example question fits instead of clipping. */
   .hero-search .search-input { padding: 18px 16px; }

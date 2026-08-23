@@ -42,7 +42,7 @@ Here is that Example block, from [Voltage Drop](https://roughlogic.com/tools/vol
 
 Grounded in `Vd = 2 · K · I · L / CM`, NEC Ch. 9 conductor properties. Everything is named the way the calculator names it. The machine field names an AI agent passes (`length_ft`, `drop_V`) are listed inside the collapsed formula block, so the page stays readable and the contract stays published.
 
-Your inputs live in the URL, so a calculator is bookmarkable and shareable with its numbers preloaded. After the first load it works with no signal. No account, no email, no tracking, ever.
+Your inputs live in the URL, so a calculator is bookmarkable and shareable with its numbers preloaded. After the first load it works with no signal. No account, no email, and no tracking. A user-initiated problem report is the one explicit exception to local-only data: it sends the displayed URL, inputs, results, and an optional 160-character note to a bounded Cloudflare D1 queue.
 
 ## Use it from an AI agent
 
@@ -71,7 +71,7 @@ One calculator is one formula on one screen. (In the source and the gate names b
 
 ## Why you can trust the answers
 
-The hard part of a calculator catalog is not the arithmetic. It is proving, at scale, that every tile stays correct as the catalog grows. That is a build problem here: `npm run lint` runs 43 static gates before a change can land.
+The hard part of a calculator catalog is not the arithmetic. It is proving, at scale, that every tile stays correct as the catalog grows. That is a build problem here: `npm run lint` runs 44 static gates before a change can land.
 
 | Gate | What it guarantees |
 |---|---|
@@ -84,12 +84,13 @@ The hard part of a calculator catalog is not the arithmetic. It is proving, at s
 | `check-dead-inputs` | no rendered field is silently ignored by the compute function |
 | `check-tile-contract` | every tile is registered, crash-free, and matches its declared I/O shape |
 | `check-shell-mobile` | zero horizontal scroll on every page at 320 px and 200% text zoom |
+| `check-feedback-loop` | every current and future calculator retains the shared defensive D1 reporting path |
 
 CI adds four parallel jobs per push: lint + unit tests + data-integrity verification, Lighthouse (median of 3), axe-core accessibility at 320 px, and the full Playwright suite on Chromium and WebKit. At runtime, `integrity.js` re-verifies the SHA-256 of every data manifest against `data/integrity.json`; the read-only posture means the worst case is a visible warning, never silent corruption.
 
 ## How it's built
 
-A 100% client-side static site. No server, no database, no accounts, no analytics, no runtime third-party dependency.
+Calculator execution is a client-side, offline-first static site with no accounts or analytics. One isolated Cloudflare Worker accepts user-initiated problem reports into D1; Turnstile loads only after the report dialog opens, and static requests remain asset-first.
 
 The browser loads `index.html` + `styles.css` + `app.js` (router, search, theme, URL-hash state), which dynamic-imports one of 57 per-group calculator modules (`calc-*.js`) on first open, which reads the sharded JSON in `data/`. A service worker (`sw.js`) caches the shell and data shards keyed to the build hash, so the site works offline after the first load.
 
@@ -103,7 +104,7 @@ The home payload gzips to well under the 100 KB budget. Opening a calculator dyn
 npm install        # dev tooling only; the site itself has zero runtime deps
 npm run dev        # serve the SPA locally
 npm run build      # emit dist/ (SPA + static shells + sitemap)
-npm run lint       # the full static-gate chain (43 checks)
+npm run lint       # the full static-gate chain (44 checks)
 npm test           # unit tests (node --test)
 npm run test:e2e   # Playwright integration suite (needs a browser)
 ```

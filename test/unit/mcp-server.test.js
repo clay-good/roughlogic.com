@@ -120,3 +120,29 @@ test("tools/call returns structuredContent plus a matching text fallback", async
   assert.equal(res.content[0].type, "text");
   assert.equal(res.content[0].text, JSON.stringify(res.structuredContent, null, 2));
 });
+
+test("oversized or malformed local RPC input is dropped and the server recovers", async () => {
+  const reply = await new Promise((resolve, reject) => {
+    const child = spawn("node", [SERVER], { stdio: ["pipe", "pipe", "pipe"] });
+    let stdout = "";
+    let stderr = "";
+    const timer = setTimeout(() => { child.kill(); reject(new Error("timeout")); }, 30000);
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk;
+      const lines = stdout.split("\n").filter(Boolean);
+      const found = lines.map((line) => JSON.parse(line)).find((msg) => msg.id === 99);
+      if (found) {
+        clearTimeout(timer);
+        child.kill();
+        resolve({ found, stderr });
+      }
+    });
+    child.stderr.on("data", (chunk) => { stderr += chunk; });
+    child.on("error", reject);
+    child.stdin.write("x".repeat(256 * 1024 + 1) + "\n");
+    child.stdin.write("null\n");
+    child.stdin.write(JSON.stringify({ jsonrpc: "2.0", id: 99, method: "ping" }) + "\n");
+  });
+  assert.deepEqual(reply.found.result, {});
+  assert.match(reply.stderr, /dropping oversized message/);
+});

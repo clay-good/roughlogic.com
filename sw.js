@@ -34,6 +34,7 @@ const SHELL_ASSETS = [
   "./query-fill.js",
   "./pick-card.js",
   "./tile-prefill.js",
+  "./report-feedback.js",
   "./ui-validity.js",
   "./integrity.js",
   "./calc-electrical.js",
@@ -219,8 +220,14 @@ self.addEventListener("fetch", (event) => {
   if (req.method !== "GET") return;
 
   const url = new URL(req.url);
-  // Same origin only; the CSP forbids cross-origin connections at runtime.
+  // The service worker owns only this origin. Turnstile's reviewed external
+  // script/frame exception never enters this fetch handler.
   if (url.origin !== self.location.origin) return;
+
+  // Reporting configuration is a live kill-switch surface. Never cache API
+  // responses in the versioned offline shell or an old public sitekey could
+  // make a disabled report path look available until the next site build.
+  if (url.pathname.startsWith("/api/")) return;
 
   if (url.pathname.includes("/data/")) {
     event.respondWith(cacheFirst(DATA_CACHE, req));

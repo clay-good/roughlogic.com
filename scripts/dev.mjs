@@ -35,7 +35,7 @@ const SECURITY_HEADERS = {
   // than production: the two CSPs combine and `script-src 'self'` blocks the
   // boot script, flashing un-themed paint locally. check-csp.mjs gates this
   // line against the recomputed hash so it cannot drift from _headers again.
-  "Content-Security-Policy": "default-src 'self'; script-src 'self' 'sha256-0qFLOnMo4ZqgtC+YMO+1763cr/ZxTi2v7KEhzLIIz4I='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; form-action 'self'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'; worker-src 'self'",
+  "Content-Security-Policy": "default-src 'self'; script-src 'self' https://challenges.cloudflare.com 'sha256-0qFLOnMo4ZqgtC+YMO+1763cr/ZxTi2v7KEhzLIIz4I='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-src https://challenges.cloudflare.com; form-action 'self'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'; worker-src 'self'",
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "DENY",
   "Referrer-Policy": "no-referrer",
