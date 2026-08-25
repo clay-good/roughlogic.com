@@ -20,6 +20,15 @@ import { getLimitationCopy } from "../limitation-banner.js";
 // tiles". Build-time data; a missing/unreadable module degrades to no related.
 let RELATED = {};
 try { ({ RELATED } = await import("../scripts/related-tiles.mjs")); } catch { RELATED = {}; }
+// Hand-authored captions for the worked-example rows the extractor cannot name
+// (a line that shows three numbers under one caption, a compute-side key the
+// renderer never prints alone). Display-only, and the FLOOR: an extracted label
+// or a renderer schema overrides them. See scripts/curated-labels.mjs.
+let CURATED_INPUT_LABELS = {};
+let CURATED_OUTPUT_LABELS = {};
+try {
+  ({ CURATED_INPUT_LABELS, CURATED_OUTPUT_LABELS } = await import("../scripts/curated-labels.mjs"));
+} catch { CURATED_INPUT_LABELS = {}; CURATED_OUTPUT_LABELS = {}; }
 // spec-v1184 coverage growth: statically-extracted field schemas for bespoke
 // (hand-written) renderers that carry no in-source render.schema. Read as a
 // fallback; schemaIfConsistent still degrades any entry whose keys diverge.
@@ -420,7 +429,7 @@ export async function inputLabels(id) {
   // The statically-extracted labels are the floor; a consistent renderer schema
   // overrides them, since it is the renderer's own descriptor rather than a
   // parse of it.
-  const out = { ...(BESPOKE_LABELS[id] || {}) };
+  const out = { ...(CURATED_INPUT_LABELS[id] || {}), ...(BESPOKE_LABELS[id] || {}) };
   try {
     const fn = await importCompute(reg, modCache);
     const schema = schemaIfConsistent(await readSchema(id, RENDERER_MAP, modCache), fn);
@@ -489,7 +498,7 @@ export async function outputLabels(id) {
   const { COMPUTE_MAP, RENDERER_MAP, modCache } = await load();
   const reg = COMPUTE_MAP[id];
   if (!reg) return {};
-  const out = { ...(BESPOKE_OUTPUT_LABELS[id] || {}) };
+  const out = { ...(CURATED_OUTPUT_LABELS[id] || {}), ...(BESPOKE_OUTPUT_LABELS[id] || {}) };
   try {
     const fn = await importCompute(reg, modCache);
     const schema = schemaIfConsistent(await readSchema(id, RENDERER_MAP, modCache), fn);
