@@ -18,7 +18,7 @@
 2. The calculator opens with your numbers already in it, each box captioned with the words they came from. If one value is missing, the page asks for it in words.
 3. The answer sits at the top of the page, above the inputs that produced it, and updates as you type. There is no submit button. Tap **Copy** to take a value with you.
 
-A calculator opens empty, and each box is captioned with the value the page's worked example uses (`e.g. 150`), so you can see the expected unit and magnitude before typing your own over it. A box whose value is a trade convention rather than a job number (30 °C ambient, a 0.61 orifice coefficient) opens holding that convention instead.
+Open a calculator directly, without a question to fill it, and it starts empty -- each box captioned with the value the page's worked example uses (`e.g. 150`), so you can see the expected unit and magnitude before typing your own over it. A box whose value is a trade convention rather than a job number (30 °C ambient, a 0.61 orifice coefficient) opens holding that convention instead.
 
 **Every calculator's page is the same short thing**, in this order. Nothing below the example is open until you ask for it:
 
@@ -40,7 +40,7 @@ Here is that Example block, from [Voltage Drop](https://roughlogic.com/tools/vol
 | Current (A) | 20 | | |
 | Source voltage (V) | 240 | | |
 
-Grounded in `Vd = 2 · K · I · L / CM`, NEC Ch. 9 conductor properties. Everything is named the way the calculator names it. The machine field names an AI agent passes (`length_ft`, `drop_V`) are listed inside the collapsed formula block, so the page stays readable and the contract stays published.
+Grounded in `VD = 2 · I · R · L`, with R from NEC Ch. 9 Table 8 -- the same line the page prints under *Show the formula, source, and assumptions*. Everything is named the way the calculator names it. The machine field names an AI agent passes (`length_ft`, `drop_V`) are listed inside the collapsed formula block, so the page stays readable and the contract stays published.
 
 Your inputs live in the URL, so a calculator is bookmarkable and shareable with its numbers preloaded. After the first load it works with no signal. No account, no email, and no tracking. A user-initiated problem report is the one explicit exception to local-only data: it sends the displayed URL, inputs, results, and an optional 160-character note to a bounded Cloudflare D1 queue.
 

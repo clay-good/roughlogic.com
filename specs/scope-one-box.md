@@ -4,8 +4,8 @@
 > Adapts the shipped sophiewell.com program (`spec-v751`–`v758`) to this catalog and this
 > catalog's traffic. No tile is added, removed, or renumbered. The catalog stays **1,709**.
 >
-> **v1337, v1338, v1339, v1340, v1341, v1342, v1344, v1345, and v1346 shipped.** Only v1343 and v1344
-> remain; v1347 is deliberately blocked on Search Console evidence.
+> **Ten of eleven shipped:** v1337, v1338, v1339, v1340, v1341, v1342, v1343, v1344, v1345, v1346.
+> Only v1347 remains, and it is deliberately blocked on Search Console evidence.
 
 ## The product in one line
 
@@ -76,7 +76,7 @@ lands before any pixel moves; the additive nav work lands before any link is rem
 | Spec | What it does | Depends on | Risk |
 |---|---|---|---|
 | ~~v1339~~ | ~~The field index: `data/fields/*.json` from the renderers' own schemas~~ **SHIPPED** | — | none |
-| [v1346](spec-v1346.md) | Gate both doors: every tile searchable **and** MCP-runnable | — | none |
+| ~~[v1346](spec-v1346.md)~~ | ~~Gate both doors: every tile searchable **and** MCP-runnable~~ **SHIPPED** | — | none |
 | ~~[v1340](spec-v1340.md)~~ | ~~`query-fill.js` — query + tile → filled, missing, unmatched~~ **SHIPPED** | v1339 | none |
 | ~~[v1341](spec-v1341.md)~~ | ~~Enter routes to the answer, with provenance on every filled field~~ **SHIPPED** | v1340 | behaviour |
 | ~~[v1342](spec-v1342.md)~~ | ~~Ask for the first missing value, in words~~ **SHIPPED** | v1341 | behaviour |
