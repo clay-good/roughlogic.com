@@ -104,6 +104,7 @@ const FILES = [
   // imported by the three v5 calc modules above.
   "v5-platform.js",
   "citations.js",
+  "constant-notes.js",
   // v8 Phase D shared helpers
   "cost-output.js",
   "context-band.js",

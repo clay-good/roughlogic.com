@@ -1762,6 +1762,45 @@ function applyQueryPrefill(region, id, params) {
   })).catch(() => { /* prefill is an enhancement; the form is always there */ });
 }
 
+// A "Note" that reads the same for every set of inputs is not part of the
+// answer -- it is reference prose that happens to come back alongside it.
+// Left in the answer region it renders as a second disclosure, a median 565
+// characters of explanation wedged between the number the reader came for and
+// the one block that holds the formula and the sources. On 976 tiles.
+//
+// So move it into that block, right under the scope prose, and leave the
+// answer region holding only the answer. The renderer keeps its reference to
+// the span and keeps writing to it; only the span's place on the page changes.
+//
+// `run_calculator` still returns the note untouched. An agent reading a result
+// has no disclosure to open, and the note is the only prose it gets.
+//
+// scripts/extract-constant-notes.mjs measures which tiles these are by running
+// each compute twice on different inputs; the list is lazy-loaded, so a tile
+// with no note row never pays for it.
+function relocateConstantNote(id, outputRegion, proof, citation) {
+  const row = outputRegion.querySelector("details.note-row");
+  if (!row) return;
+  // Never empty the answer region. A handful of tiles answer ONLY in prose,
+  // and for those the note IS the result -- moving it would leave the reader
+  // looking at a blank card and would trip the "example paints something"
+  // gate. Those keep their note where it is.
+  if (!outputRegion.querySelector(".out-value:not(.note-value)")) return;
+  import("./constant-notes.js").then((mod) => {
+    if (!mod.CONSTANT_NOTE_TILES.has(id) || !row.isConnected) return;
+    const value = row.querySelector(".note-value");
+    if (!value) return;
+    const para = document.createElement("p");
+    para.className = "view-detail view-detail-note";
+    // Move the live element, do not copy its text: the renderer holds this
+    // node and writes the note into it on every recompute.
+    para.appendChild(value);
+    row.remove();
+    // Under the scope prose, above the formula -- prose first, then receipts.
+    proof.insertBefore(para, citation);
+  }).catch(() => { /* placement is cosmetic; never break a calculator for it */ });
+}
+
 function renderToolView(id, params) {
   const tool = TOOLS.find((t) => t.id === id);
   const view = document.getElementById("view-region");
@@ -1956,6 +1995,7 @@ function renderToolView(id, params) {
     // hash so the user can reload or paste the URL into a new tab.
     try {
       renderer(inputRegion, outputRegion, citation, params || {});
+      relocateConstantNote(id, outputRegion, proof, citation);
       libs.applyHashState(inputRegion, params || {});
       libs.wireHashState(inputRegion, id);
       // spec-v1341: caption the fields the reader's own words filled. Consumed

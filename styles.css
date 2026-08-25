@@ -971,7 +971,12 @@ input[aria-invalid="true"] {
 
 .note-row > summary:hover { color: var(--fg); }
 
-.note-row .note-value {
+/* The note prose itself. It is reading text, not a result, so it overrides
+   .out-value's monospace answer styling -- in the answer region for the tiles
+   whose note actually tracks their answer, and inside the collapsed Details
+   block for the 976 whose note never changes (app.js relocateConstantNote). */
+.note-row .note-value,
+.view-detail-note .note-value {
   display: block;
   font-family: inherit;
   font-size: 1rem;
@@ -979,6 +984,12 @@ input[aria-invalid="true"] {
   line-height: 1.6;
   color: var(--fg-muted);
   padding-bottom: var(--space-2);
+}
+
+/* Relocated note prose reads as one more paragraph of the scope prose it now
+   sits under, so it takes .view-detail's spacing and adds nothing of its own. */
+.view-detail-note {
+  margin: 0 0 var(--space-3);
 }
 
 .proof {

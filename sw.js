@@ -96,6 +96,7 @@ const SHELL_ASSETS = [
   "./calc-rigging.js",
   "./v5-platform.js",
   "./citations.js",
+  "./constant-notes.js",
   "./cost-output.js",
   "./context-band.js",
   "./standard-sizes.js",
