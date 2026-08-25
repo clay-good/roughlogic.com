@@ -79,6 +79,7 @@ The hard part of a calculator catalog is not the arithmetic. It is proving, at s
 | `check-cross-validation` | independent tiles computing the same quantity agree numerically |
 | `check-bounds` | a fuzzer sweeps each tile's input domain; no NaN/∞, monotonicity where required |
 | `check-worked-examples` | each tile's example reproduces a publisher-verified reference number |
+| `check-example-parity` | the example a page prints is the example its calculator opens |
 | `check-citation-coverage` | every tile names a real, dated source, freshness-tracked |
 | `check-derivation-coverage` | every formula has a written derivation |
 | `check-dead-inputs` | no rendered field is silently ignored by the compute function |
