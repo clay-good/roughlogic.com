@@ -218,7 +218,7 @@ async function addComputedExamples(byTile) {
 // structured (an array of course loads, a nested object) is emitted as
 // compact JSON, which is exactly what the MCP callers pass -- unless that
 // JSON is too long to read, in which case it degrades to its shape.
-function exampleValue(v) {
+export function exampleValue(v) {
   const raw = (v && typeof v === "object" && !Array.isArray(v) && "value" in v) ? v.value : v;
   if (raw === null || raw === undefined) return "";
   if (typeof raw === "object") return structuredValue(raw);
@@ -233,15 +233,54 @@ function exampleValue(v) {
 // which is what a reader needs from it anyway.
 const STRUCTURED_CAP = 120;
 function structuredValue(raw) {
+  // A list of rows is a TABLE the reader fills in through labelled fields --
+  // air-receiver asks for "Tool 1 CFM" and "Tool 1 duty cycle (0 to 1)", not
+  // for JSON. Printing the literal `[{"cfm":4,"duty_cycle":0.5},...]` on the
+  // page gave them something they cannot read and would never paste, on 38
+  // rows across 45 pages. Read it back as prose in the same words the fields
+  // use, and it says the same thing in less room.
+  const prose = rowsAsProse(raw);
+  if (prose && prose.length <= STRUCTURED_CAP) return prose;
   const json = JSON.stringify(raw, (k, x) => (typeof x === "number" ? readableNumber(x) : x));
   if (json.length <= STRUCTURED_CAP) return json;
   if (Array.isArray(raw)) {
-    const first = JSON.stringify(raw[0], (k, x) => (typeof x === "number" ? readableNumber(x) : x));
+    // Too long either way: keep the first row, in prose when it reads, and
+    // say how many more there are.
+    const firstProse = rowsAsProse([raw[0]]);
+    const first = firstProse && firstProse.length <= STRUCTURED_CAP
+      ? firstProse
+      : JSON.stringify(raw[0], (k, x) => (typeof x === "number" ? readableNumber(x) : x));
     const rest = raw.length - 1;
     const head = first && first.length <= STRUCTURED_CAP ? first : shapeOf(raw[0]);
-    return rest > 0 ? `[${head}, and ${rest} more]` : `[${head}]`;
+    return rest > 0 ? `${head}, and ${rest} more` : `${head}`;
   }
   return shapeOf(raw);
+}
+
+// "cfm 4, duty cycle 0.5; cfm 3, duty cycle 0.4" for an array of flat rows,
+// or null when the value is not that shape (a nested row, an array of bare
+// values, an object) and JSON still says it best. Field names go through
+// humanizeKey, the same reader the uncaptioned example rows use, so a key it
+// cannot improve on stays the key rather than becoming a worse guess.
+function rowsAsProse(raw) {
+  if (!Array.isArray(raw) || raw.length === 0) return null;
+  const out = [];
+  for (const row of raw) {
+    if (!row || typeof row !== "object" || Array.isArray(row)) return null;
+    const entries = Object.entries(row);
+    if (entries.length === 0) return null;
+    const parts = [];
+    for (const [k, v] of entries) {
+      if (v !== null && typeof v === "object") return null;
+      const label = humanizeKey(k);
+      // humanizeKey capitalises for use as a caption; mid-sentence it is
+      // lower-case, except where the word is an acronym it deliberately cased.
+      const name = label ? (/^[A-Z][a-z]/.test(label) ? label.charAt(0).toLowerCase() + label.slice(1) : label) : k;
+      parts.push(`${name} ${exampleValue(v)}`.trim());
+    }
+    out.push(parts.join(", "));
+  }
+  return out.join("; ");
 }
 
 // A value-free rendering of an object: the field names, no quotes, so it
