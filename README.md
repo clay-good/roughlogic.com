@@ -7,7 +7,7 @@
 <p align="center">
   <img src="docs/img/home-mobile.png" width="240" alt="roughlogic home view on a phone: a headline, one line of description, a single search box, and four tappable example questions">
   &nbsp;
-  <img src="docs/img/calculator-mobile.png" width="240" alt="The Ohm's Law calculator on a phone in the light theme: the answer at the top with a Copy button on each value, the labeled inputs that produced it below, and a collapsed Show the formula, sources, and assumptions at the bottom">
+  <img src="docs/img/calculator-mobile.png" width="240" alt="The Ohm's Law calculator on a phone in the light theme: the answer at the top with a Copy button on each value, the labeled inputs that produced it below, and a collapsed Details, formula, and sources at the bottom">
   &nbsp;
   <img src="docs/img/calculator-dark.png" width="240" alt="The same Ohm's Law calculator in the dark theme">
 </p>
@@ -27,7 +27,7 @@ Open a calculator directly, without a question to fill it, and it starts empty -
 | **Title + one line** | what it does |
 | **Run the calculator** | opens it with the example already loaded |
 | **Example** | the exact inputs and the exact answer |
-| **Collapsed detail** | *Show the formula, source, and assumptions* on every page, and *More about this calculator* where there is more to say |
+| **Collapsed detail** | One *Details, formula, and sources* drop-down at the bottom of every page -- scope, formula, sources, and assumptions, all in the one place |
 
 Here is that Example block, from [Voltage Drop](https://roughlogic.com/tools/voltage-drop/):
 
@@ -40,7 +40,7 @@ Here is that Example block, from [Voltage Drop](https://roughlogic.com/tools/vol
 | Current (A) | 20 | | |
 | Source voltage (V) | 240 | | |
 
-Grounded in `VD = 2 · I · R · L`, with R from NEC Ch. 9 Table 8 -- the same line the page prints under *Show the formula, source, and assumptions*. Everything is named the way the calculator names it. The machine field names an AI agent passes (`length_ft`, `drop_V`) are listed inside the collapsed formula block, so the page stays readable and the contract stays published.
+Grounded in `VD = 2 · I · R · L`, with R from NEC Ch. 9 Table 8 -- the same line the page prints under *Details, formula, and sources*. Everything is named the way the calculator names it. The machine field names an AI agent passes (`length_ft`, `drop_V`) are listed inside the collapsed formula block, so the page stays readable and the contract stays published.
 
 Your inputs live in the URL, so a calculator is bookmarkable and shareable with its numbers preloaded. After the first load it works with no signal. No account, no email, and no tracking. A user-initiated problem report is the one explicit exception to local-only data: it sends the displayed URL, inputs, results, and an optional 160-character note to a bounded Cloudflare D1 queue.
 

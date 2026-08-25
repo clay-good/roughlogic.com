@@ -812,23 +812,21 @@ function tileShell(tool, tools, groupNames, relatedMap, examples, labels, outLab
       outputRows ? '    </ul>' : '',
       '  </section>',
     ].filter(Boolean).join("\n") : '',
-    // Scope, limits, and what the calculator does not cover. Real reference
-    // content, but the reader has already had the one-line summary and a
-    // worked example by this point, so it collapses like the proof does and
-    // the visible page stays title, one line, Run, example.
-    detail ? [
-      '  <details class="shell-detail-block" aria-label="Details">',
-      '    <summary>More about this calculator</summary>',
-      `    <p class="shell-detail">${escapeHtml(detail)}</p>`,
-      '  </details>',
-    ].join("\n") : '',
-    citation ? [
-      '  <details class="shell-proof" aria-label="Formula and source">',
-      '    <summary>Show the formula, source, and assumptions</summary>',
-      `    <p class="shell-formula">${escapeHtml(citation.formula)}</p>`,
-      `    <p class="shell-source">${escapeHtml(citation.edition)}</p>`,
-      citation.freeAccess ? `    <p class="shell-source">${escapeHtml(citation.freeAccess)}</p>` : '',
-      citation.governance ? `    <p class="shell-source">${escapeHtml(citation.governance)}</p>` : '',
+    // ONE disclosure holds everything the reader may want after the answer:
+    // the scope prose, the formula, the source lines, the API field names, and
+    // the assumptions. It used to be two adjacent <details> -- "More about
+    // this calculator" and the proof -- which put the same reference material
+    // behind two clicks in two places on 1,430 of 1,709 pages, and made the
+    // reader guess which one held the sentence they wanted. One block, one
+    // click, one place. The visible page stays title, one line, Run, example.
+    (detail || citation) ? [
+      '  <details class="shell-proof" aria-label="Details, formula, and sources">',
+      '    <summary>Details, formula, and sources</summary>',
+      detail ? `    <p class="shell-detail">${escapeHtml(detail)}</p>` : '',
+      citation ? `    <p class="shell-formula">${escapeHtml(citation.formula)}</p>` : '',
+      citation ? `    <p class="shell-source">${escapeHtml(citation.edition)}</p>` : '',
+      citation && citation.freeAccess ? `    <p class="shell-source">${escapeHtml(citation.freeAccess)}</p>` : '',
+      citation && citation.governance ? `    <p class="shell-source">${escapeHtml(citation.governance)}</p>` : '',
       namedKeys.length ? `    <p class="shell-source">Field names used by the API: ${namedKeys.map((k) => `<code>${escapeHtml(k)}</code>`).join(", ")}</p>` : '',
       assumptionRows ? '    <ul class="shell-io shell-assume">' : '',
       assumptionRows,

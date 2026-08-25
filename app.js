@@ -1876,34 +1876,30 @@ function renderToolView(id, params) {
   view.appendChild(outputRegion);
   view.appendChild(inputRegion);
 
-  // Everything after the opening sentence: scope, caveats, what the calculator
-  // does not cover. Real reference content, so it stays on the page -- but the
-  // reader has already had the one-line summary and the answer by now, so it
-  // collapses like the proof block below it and the visible page stays title,
-  // inputs, answer. Same treatment, same order, as the static shell.
-  const detailText = restOfDescription(tool.desc);
-  if (detailText) {
-    const detail = document.createElement("details");
-    detail.className = "proof view-detail-block";
-    const detailSummary = document.createElement("summary");
-    detailSummary.textContent = "More about this calculator";
-    const detailBody = document.createElement("p");
-    detailBody.className = "view-detail";
-    detailBody.textContent = detailText;
-    detail.appendChild(detailSummary);
-    detail.appendChild(detailBody);
-    view.appendChild(detail);
-  }
   view.appendChild(notice);
 
-  // One collapsed block holds the whole proof: the inline citation, the
-  // structured reference rows, and the data-source stamp. Closed by default
-  // so the page reads as question -> answer; one click shows the receipts.
+  // ONE collapsed block holds everything behind the answer: the scope prose
+  // (everything after the tile's opening sentence -- caveats, limits, what the
+  // calculator does not cover), the inline citation, the structured reference
+  // rows, and the data-source stamp. Closed by default so the page reads as
+  // question -> answer; one click shows the receipts.
+  //
+  // This used to be TWO adjacent disclosures -- "More about this calculator"
+  // and the proof -- so the same reference material sat behind two clicks in
+  // two places and the reader had to guess which one held their sentence.
+  // Same treatment, same order, as the static shell.
   const proof = document.createElement("details");
   proof.className = "proof";
   const proofSummary = document.createElement("summary");
-  proofSummary.textContent = "Show the formula, sources, and assumptions";
+  proofSummary.textContent = "Details, formula, and sources";
   proof.appendChild(proofSummary);
+  const detailText = restOfDescription(tool.desc);
+  if (detailText) {
+    const detailBody = document.createElement("p");
+    detailBody.className = "view-detail";
+    detailBody.textContent = detailText;
+    proof.appendChild(detailBody);
+  }
   proof.appendChild(citation);
 
   const sources = document.createElement("section");

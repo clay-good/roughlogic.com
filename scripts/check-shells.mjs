@@ -276,12 +276,20 @@ async function lintShell(path, kind, errors) {
   // crawlers (and offline readers) get the reference content, not just the tile
   // name. It rides in a collapsed <details> so the page still reads as
   // title -> example -> answer, with the receipts one click away.
+  //
+  // ONE disclosure per page, holding all of it: scope prose, formula, sources,
+  // assumptions. A second <details> would put the same reference material
+  // behind two clicks in two places, so the count is pinned at exactly one.
   if (kind === "tile") {
-    if (!/aria-label="Formula and source"/.test(html)) {
-      errors.push(where + ": missing the 'Formula and source' section (spec-v45 prerendered citation).");
+    if (!/aria-label="Details, formula, and sources"/.test(html)) {
+      errors.push(where + ": missing the 'Details, formula, and sources' section (spec-v45 prerendered citation).");
     }
     if (!/class="shell-formula"/.test(html) || !/class="shell-source"/.test(html)) {
-      errors.push(where + ": 'Formula and source' section is missing the formula or source line.");
+      errors.push(where + ": 'Details, formula, and sources' section is missing the formula or source line.");
+    }
+    const disclosures = (html.match(/<details/g) || []).length;
+    if (disclosures !== 1) {
+      errors.push(where + ": " + disclosures + " <details> blocks; a tile shell gets exactly one.");
     }
   }
 

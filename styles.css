@@ -1328,20 +1328,18 @@ input[aria-invalid="true"] {
   /* A printed page has no disclosure to click, so the proof must print in
      full. app.js also sets `open` on beforeprint; this covers browsers that
      print without firing the event. */
-  .proof, .shell-proof, .shell-detail-block {
+  .proof, .shell-proof {
     background: white !important;
     color: black !important;
     border-color: #999 !important;
   }
   .proof::details-content,
-  .shell-proof::details-content,
-  .shell-detail-block::details-content {
+  .shell-proof::details-content {
     content-visibility: visible;
     block-size: auto;
   }
   .proof > summary,
-  .shell-proof > summary,
-  .shell-detail-block > summary {
+  .shell-proof > summary {
     list-style: none;
   }
 }
@@ -1748,23 +1746,9 @@ input[aria-invalid="true"] {
   margin-bottom: var(--space-3);
 }
 
-/* The Details prose, collapsed. Same disclosure shape as .shell-proof so the
-   two blocks below the example read as a pair. Still zero-JS. */
-.shell-page .shell-detail-block {
-  margin: var(--space-4) 0;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0 var(--space-3);
-}
-.shell-page .shell-detail-block > summary {
-  cursor: pointer;
-  padding: var(--space-3) 0;
-  font-size: 1.0625rem;
-  font-weight: 600;
-  display: list-item;
-  list-style-position: inside;
-}
-.shell-page .shell-detail-block .shell-detail {
+/* The scope prose now opens the single .shell-proof disclosure, ahead of the
+   formula. It needs the same gap the reference rows get. */
+.shell-page .shell-proof .shell-detail {
   margin-bottom: var(--space-3);
 }
 
