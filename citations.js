@@ -1898,7 +1898,7 @@ export const CITATIONS = {
     ],
   },
   "phase-balance": {
-    formula: "Per-phase totals; imbalance % over average; greedy heaviest-to-lightest swap suggestion to minimize neutral current.",
+    formula: "Per-phase totals, then imbalance % = (max - min) / average x 100. The swap suggestion is a greedy pass that moves the smallest fitting circuit from the heaviest phase to the lightest.",
     edition: "Engineering practice; NEC Article 220 by name.",
     freeAccess: NEC_FREE,
     governance: GOVERNANCE.electrical,
@@ -4447,14 +4447,15 @@ export const CITATIONS = {
     ],
   },
   "duct-sizing": {
-    formula: "Equal-friction or static-regain method per ACCA Manual D 3rd ed. and ASHRAE Fundamentals duct chapter. Friction rate 0.08–0.10 in WC per 100 ft typical for residential systems.",
-    edition: "ACCA Manual D, 3rd edition by name. ASHRAE Handbook (Fundamentals) by name.",
+    formula: "Equal-friction sizing. Solves Darcy-Weisbach with the Colebrook-White friction factor for the round diameter whose loss equals the target friction rate, then converts to a rectangle by the Huebscher equivalent-diameter relation D_e = 1.30 (a b)^0.625 / (a + b)^0.25. Friction rate 0.08–0.10 in WC per 100 ft typical for residential systems. Static regain is NOT computed.",
+    edition: "ASHRAE Handbook (Fundamentals), duct design chapter, by name (Darcy-Weisbach / Colebrook-White and the Huebscher relation). ACCA Manual D, 3rd edition by name for the residential friction-rate practice.",
     freeAccess: "ACCA / ASHRAE Handbook licensed; principles free in published engineering texts.",
     governance: GOVERNANCE.mechanical,
     editionNote: "Editions available: ACCA Manual D 3rd ed. is the current published edition. The simplified estimator on this tile does not replace Manual D for layouts.",
     assumptions: [
       { name: "Default friction rate", value: "0.08 in WC per 100 ft unless user supplies", source: "ACCA Manual D 3rd ed. typical" },
       { name: "Duct surface roughness", value: "data/hvac/duct-friction.json by material", source: "public engineering reference" },
+      { name: "Method not covered", value: "static regain; the tile sizes to a constant friction rate only", source: "ASHRAE Fundamentals duct design chapter" },
     ],
   },
   "static-pressure-hvac": {
@@ -4597,7 +4598,7 @@ export const CITATIONS = {
     ],
   },
   "wet-bulb-psychrometer": {
-    formula: "Sling psychrometer dry-bulb / wet-bulb pair → relative humidity, dew point, and grains per pound via August-Roche-Magnus saturation-vapor-pressure approximation.",
+    formula: "Sling psychrometer dry-bulb / wet-bulb pair → relative humidity, dew point, and grains per pound. Vapor pressure from the psychrometer relation e = e_s(Tw) - A x P x (Td - Tw) with A ≈ 0.000662 1/°C at sea level; saturation vapor pressure e_s by the August-Roche-Magnus approximation.",
     edition: "August-Roche-Magnus formulation by name; ASHRAE Fundamentals psychrometric chart by name.",
     freeAccess: "Psychrometric formulas free in published engineering texts.",
     governance: GOVERNANCE.mechanical,
@@ -5009,7 +5010,7 @@ export const CITATIONS = {
     ],
   },
   "anchor-embedment": {
-    formula: "Required tensile breakout depth from ACI 318 §17 anchor-design provisions; minimum embedment ratios per anchor type (cast-in / post-installed mechanical / adhesive).",
+    formula: "Bond-strength embedment ld = T / (0.7 x sqrt(f'c) x pi x d), with the cracked-concrete case taken as ld / 0.7 and the ACI 318 §17 critical edge distance flagged at 1.5 x hef. A screen, not the §17 concrete-breakout (Ncb) calculation.",
     edition: "ACI 318-19 §17 (Anchoring to Concrete). " + IBC_2021 + " §1908 references ACI 318.",
     freeAccess: "ACI 318 licensed; principles free in published structural texts.",
     governance: GOVERNANCE.structural,
@@ -6374,7 +6375,7 @@ export const CITATIONS = {
     ],
   },
   "geometry": {
-    formula: "Circle / ellipse (Ramanujan perimeter) / hexagon / sphere area, perimeter, volume formulas. Classical geometry.",
+    formula: "Classical plane and solid geometry: circle, ellipse, hexagon, sphere area / perimeter / volume. Ellipse perimeter by Ramanujan's approximation P = pi (a + b) (1 + 3h / (10 + sqrt(4 - 3h))) with h = ((a - b)/(a + b))^2.",
     edition: "Classical geometry; physical fact.",
     freeAccess: "Free in geometry texts.",
     governance: GOVERNANCE.general,
