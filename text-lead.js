@@ -233,15 +233,26 @@ function openAsSentence(t) {
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
 
+// A remainder that opens on a coordinator is the sentence still talking
+// ("plus per-set load adequacy", "and those are not independent numbers").
+// Cutting there ships a Details block that starts mid-thought, so those keep
+// the whole sentence instead.
+const COORDINATOR = /^(?:and|or|plus|then|but|nor|yet|so|as well as)\b/i;
+
 // The prose that belongs below the answer.
 //
 // When the lead is the whole opening sentence, that is everything after it.
-// When the lead is a clause-cut summary, what follows depends on the seam. A
-// COLON splits a sentence into a summary and a self-contained explanation, so
-// Details starts after the colon and the page states its opening line once.
-// Every other seam leaves a fragment behind ("plus per-set load adequacy",
-// "-- and those are not independent numbers"), so there the whole sentence
-// repeats rather than ship a Details block that opens mid-thought.
+// When the lead is a clause-cut summary, Details picks up from the seam the
+// lead stopped at, so the page states its opening line ONCE. It used to repeat
+// the whole sentence at every seam except a colon, on the reasoning that the
+// remainder would read as a fragment -- but that put the lead verbatim at the
+// top of 472 tile pages and again as the first words inside the disclosure a
+// few lines below it, which is the more visible fault of the two. The
+// remainders read as noun phrases, which is what the leads are too ("Sizing
+// and reading a DC current-measuring shunt." -> "The precision low-value
+// resistor a DC panel meter, battery monitor, or PV/DC combiner uses to
+// measure current."). Only a remainder that genuinely opens mid-thought still
+// gets the repeat.
 export function restOfDescription(desc) {
   const s = String(desc).trim();
   const { sentence, lead, at } = leadCut(s);
@@ -255,7 +266,20 @@ export function restOfDescription(desc) {
     if (rest) return rest;
   }
   if (at < 0) return tail;
-  if (s.slice(at, at + 2) !== ": ") return s;
-  const rest = (sentence.slice(at + 2).trim() + (tail ? " " + tail : "")).trim();
-  return rest ? openAsSentence(rest) : s;
+  // The lead ran past the cap with no seam to cut at, so it was truncated
+  // mid-word with an ellipsis. The reader has half a sentence; Details owes
+  // them the whole one.
+  if (lead.endsWith("...")) return s;
+  const clauseSeam = /^(?:: | -- |; )/.test(s.slice(at, at + 4));
+  const rest = sentence.slice(at).replace(/^[,;:\s-]+/, "").trim();
+  if (!rest || COORDINATOR.test(rest)) return s;
+  // A CLAUSE seam (": ", " -- ", "; ") ends a thought, so whatever follows it
+  // stands on its own. A bare COMMA may still be inside a list, where cutting
+  // strands the rest of it ("Rafter span, and pitch.", "in-range / low / high
+  // flags."). Those stranded items are short; the comma remainders worth
+  // keeping are appositive clauses several times their length ("the field
+  // measurement behind every ground-grid and driven-rod design: rho = ..."),
+  // so length is what separates them.
+  if (!clauseSeam && rest.length < 30) return s;
+  return openAsSentence((rest + (tail ? " " + tail : "")).trim());
 }
