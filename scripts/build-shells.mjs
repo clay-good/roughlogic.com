@@ -850,12 +850,20 @@ function tileShell(tool, tools, groupNames, relatedMap, examples, labels, outLab
   return [head, styles, jsonld, '</head>', body].join("\n");
 }
 
-// A group label mid-sentence ("... calculators for HVAC.") is lower-cased so it
-// reads as prose, but a blanket toLowerCase turns HVAC into "hvac", SAR into
-// "sar", and K-12 into "k-12". Only a capital followed by lower-case letters
-// is an ordinary word; a bare capital or a run of them is a name, and stays one.
-export function sentenceCase(label) {
-  return label.replace(/[A-Z][a-z]+/g, (w) => w.toLowerCase());
+// The one line under a group hub's <h1>.
+//
+// It used to name the group again -- "Electrical" as the heading, then "206
+// calculators for electrical" directly beneath it -- which said the same word
+// twice and read badly for every label that is not an adjective ("135
+// calculators for mechanic - auto, marine, aviation"). The heading, the title,
+// the breadcrumb and the meta description all still carry the name, so the
+// lead just counts what is on the page.
+//
+// Both clauses have to agree with the count: the one-tile group read "1
+// calculator ... Every one runs in your browser."
+export function groupLead(count) {
+  const what = count === 1 ? "calculator. It runs" : "calculators. Every one runs";
+  return `${count} ${what} in your browser. Free, no account.`;
 }
 
 function groupShell(group, tools, groupNames) {
@@ -899,7 +907,7 @@ function groupShell(group, tools, groupNames) {
     '    </ol>',
     '  </nav>',
     `  <h1 class="shell-h1">${escapeHtml(groupLabel)}</h1>`,
-    `  <p class="shell-lead">${escapeHtml(tilesInGroup.length)} ${tilesInGroup.length === 1 ? "calculator" : "calculators"} for ${escapeHtml(sentenceCase(groupLabel))}. Every one runs in your browser. Free, no account.</p>`,
+    `  <p class="shell-lead">${escapeHtml(groupLead(tilesInGroup.length))}</p>`,
     `  <p class="shell-run"><a class="shell-run-link" href="../../#group=${escapeHtml(group)}">Open the live group view</a></p>`,
     '  <section class="shell-section" aria-label="Tools in this group">',
     '    <h2>Tools in this group</h2>',
