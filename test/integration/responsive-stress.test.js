@@ -157,8 +157,18 @@ test.describe("landscape + tablet widths, no horizontal scroll", () => {
 // and exhausted all three attempts. Pin an explicit timeout with headroom for
 // further growth instead; per-engine workers run chromium + webkit-responsive
 // in parallel, so this does not serialize the rest of the suite.
+//
+// The 300 s that replaced `test.slow()` stopped being headroom. At 1,709 tiles
+// this sweep measures 4.6 min on chromium and 4.7 min on WebKit (CI run
+// 32885661033) -- 92% of the cap -- and on 2026-08-25 the WebKit pass blew all
+// three attempts on a run whose re-run then passed all three jobs green. A
+// whole-catalog sweep that is a coin flip reports content failures it did not
+// find, which is worse than no gate: the fix that gets tried next is a content
+// fix for a phantom overflow. 600 s restores the ~2x margin the number was
+// picked with. A timeout is not the budget -- it is the line past which the
+// run is certainly wedged -- so raising it costs a passing run nothing.
 test("every live tile view: no page-level horizontal scroll at 320 px", async ({ page }) => {
-  test.setTimeout(300_000);
+  test.setTimeout(600_000);
   await page.setViewportSize({ width: 320, height: 720 });
   await gotoOk(page, "/index.html");
   const offenders = [];
