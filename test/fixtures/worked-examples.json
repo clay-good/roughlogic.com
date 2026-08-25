@@ -9085,30 +9085,30 @@
    "source_publisher": "Project (first-principles) over Haas precedence-effect threshold",
    "source_title": "Speed of sound c = 331.3 + 0.606 * T_C m/s; delay_ms = (d_delay - d_main) * 304.8 / c - haas_offset_ms",
    "source_edition_or_year": "n/a; ISO/AES standard speed-of-sound formula; Haas window 5-30 ms",
-   "source_section_or_page": "Main 30 ft / delay 90 ft / 20 C / 15 ms Haas offset -> c = 343.42 m/s, delta = -53.25 ms, recommended -38.25 ms",
+   "source_section_or_page": "Main 80 ft, delay 30 ft, 50 ft difference at 22 C (344.632 m/s = 1130.7 ft/s) = 44.22 ms; + 15 ms Haas offset = 59.22 ms",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-08-25",
    "inputs": {
-    "d_main_ft": 30,
-    "d_delay_ft": 90,
-    "ambient_C": 20,
+    "d_main_ft": 80,
+    "d_delay_ft": 30,
+    "ambient_C": 22,
     "haas_offset_ms": 15
    },
    "outputs": {
     "c_m_s": {
-     "value": 343.42,
+     "value": 344.632,
      "tolerance": {
       "abs": 0.01
      }
     },
     "ms_difference": {
-     "value": -53.25,
+     "value": 44.2210822,
      "tolerance": {
       "abs": 0.05
      }
     },
     "recommended_delay_ms": {
-     "value": -38.25,
+     "value": 59.2210822,
      "tolerance": {
       "abs": 0.05
      }
@@ -11677,23 +11677,38 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Recipe scaling factor: factor = target_yield / original_yield; row.quantity *= factor",
    "source_edition_or_year": "n/a; standard culinary recipe-scaling identity",
-   "source_section_or_page": "Original yield 8 -> target 12 -> factor 1.5; 500 g flour scales to 750 g (per-row quantity asserted via the rows array)",
+   "source_section_or_page": "Original yield 12 -> target 30 -> factor 2.5; 2 cup flour scales to 5 cup (per-row quantity asserted via the rows array)",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-08-25",
    "inputs": {
     "rows": [
      {
-      "name": "flour",
-      "quantity": 500,
-      "unit": "g"
+      "ingredient": "flour_ap",
+      "quantity": 2,
+      "unit": "cup"
+     },
+     {
+      "ingredient": "sugar_granulated",
+      "quantity": 1,
+      "unit": "cup"
+     },
+     {
+      "ingredient": "egg_whole",
+      "quantity": 2,
+      "unit": "egg"
+     },
+     {
+      "ingredient": "butter",
+      "quantity": 0.5,
+      "unit": "cup"
      }
     ],
-    "original_yield": 8,
-    "target_yield": 12
+    "original_yield": 12,
+    "target_yield": 30
    },
    "outputs": {
     "factor": {
-     "value": 1.5,
+     "value": 2.5,
      "tolerance": {
       "abs": 0.001
      }
@@ -11887,40 +11902,44 @@
    "source_publisher": "Compressed Air & Gas Institute (CAGI) sizing practice",
    "source_title": "Receiver sizing: V = (t * deficit_scfm * P_atm) / (P_high - P_low) when demand exceeds pump",
    "source_edition_or_year": "CAGI standard receiver-sizing identity (P_atm 14.7 psi)",
-   "source_section_or_page": "Two tools (5 cfm @ 0.4 + 3 cfm @ 0.5) / 8 scfm pump / 175-90 psig / 1 min -> 3.5 demand, 0 deficit, 2 concurrent (pump alone sustains both)",
+   "source_section_or_page": "Three tools (4 cfm @ 0.5 + 3 cfm @ 0.4 + 8 cfm @ 0.3) = 5.6 scfm demand against a 5 scfm pump -> 0.6 scfm deficit; V = 1 min x 0.6 x 14.7 / (175 - 125) = 0.1764 ft3 (1.32 gal)",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-08-25",
    "inputs": {
     "tools": [
      {
-      "cfm": 5,
-      "duty_cycle": 0.4
+      "cfm": 4,
+      "duty_cycle": 0.5
      },
      {
       "cfm": 3,
-      "duty_cycle": 0.5
+      "duty_cycle": 0.4
+     },
+     {
+      "cfm": 8,
+      "duty_cycle": 0.3
      }
     ],
-    "pump_scfm": 8,
+    "pump_scfm": 5,
     "p_high_psi": 175,
-    "p_low_psi": 90,
+    "p_low_psi": 125,
     "drawdown_minutes": 1
    },
    "outputs": {
     "demand_scfm": {
-     "value": 3.5,
+     "value": 5.6,
      "tolerance": {
       "abs": 0.01
      }
     },
     "deficit_scfm": {
-     "value": -4.5,
+     "value": 0.6,
      "tolerance": {
       "abs": 0.01
      }
     },
     "receiver_ft3": {
-     "value": 0,
+     "value": 0.1764,
      "tolerance": {
       "abs": 0.001
      }
@@ -12274,37 +12293,51 @@
    "source_publisher": "ASHRAE Fundamentals Darcy-Weisbach + ACCA Manual D fitting tables",
    "source_title": "Round-duct friction: f * (L/D) * 0.5 * rho * v^2 (galv smooth typical roughness)",
    "source_edition_or_year": "ASHRAE Fundamentals duct-friction chapter (galv smooth roughness 0.0005 ft)",
-   "source_section_or_page": "10 in round / 400 cfm / 30 ft / no fittings -> 733.39 fpm / Re 62876 / friction 0.086 in WC / 100 ft / 0.0257 in WC straight loss",
+   "source_section_or_page": "1200 cfm in 12 in round galvanised duct, 60 ft, with 4 smooth-radius 90 elbows + 1 filter + 2 diffusers: 1527.9 fpm, 0.2665 in wc per 100 ft straight, plus fitting losses",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-08-25",
    "inputs": {
     "shape": "round",
-    "D_in": 10,
-    "cfm": 400,
-    "length_ft": 30,
-    "fittings": []
+    "D_in": 12,
+    "material": "galv_smooth",
+    "cfm": 1200,
+    "length_ft": 60,
+    "fittings": [
+     {
+      "kind": "elbow_90_smooth_radius",
+      "count": 4
+     },
+     {
+      "kind": "filter_typical",
+      "count": 1
+     },
+     {
+      "kind": "diffuser_typical",
+      "count": 2
+     }
+    ]
    },
    "outputs": {
     "velocity_fpm": {
-     "value": 733.39,
+     "value": 1527.887454,
      "tolerance": {
       "abs": 0.5
      }
     },
     "friction_loss_per_100ft_in_wc": {
-     "value": 0.0856,
+     "value": 0.2665033146,
      "tolerance": {
       "abs": 0.005
      }
     },
     "straight_loss_in_wc": {
-     "value": 0.0257,
+     "value": 0.1599019888,
      "tolerance": {
       "abs": 0.005
      }
     },
     "hydraulic_diameter_in": {
-     "value": 10,
+     "value": 12,
      "tolerance": {
       "abs": 0.01
      }
@@ -13324,20 +13357,34 @@
    "source_publisher": "USITT DMX512-A / project bundled DMX universe planner",
    "source_title": "Per-fixture address range; conflict detection per universe; 512 channel cap",
    "source_edition_or_year": "USITT DMX512-A 1996 (revised 2008)",
-   "source_section_or_page": "12 PARs @ 8 ch starting at 1 + 4 movers @ 24 ch starting at 97 -> max universe 1, no conflicts, 6.25% utilization, no split recommended",
+   "source_section_or_page": "Four-fixture patch in universe 1 (front wash 1-12, rear wash 13-24, movers 50-65, haze 200-203): no channel conflicts, max universe 1, 8.59% utilisation, no split recommended",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-08-25",
    "inputs": {
     "fixtures": [
      {
-      "name": "PAR",
+      "name": "front wash",
       "start": 1,
-      "channels": 8
+      "channels": 12,
+      "universe": 1
      },
      {
-      "name": "mover",
-      "start": 97,
-      "channels": 24
+      "name": "rear wash",
+      "start": 13,
+      "channels": 12,
+      "universe": 1
+     },
+     {
+      "name": "movers",
+      "start": 50,
+      "channels": 16,
+      "universe": 1
+     },
+     {
+      "name": "haze",
+      "start": 200,
+      "channels": 4,
+      "universe": 1
      }
     ]
    },
@@ -23585,9 +23632,9 @@
    "source_publisher": "FM 5-233 Construction Surveying (by name)",
    "source_title": "Latitude/departure misclosure and relative precision",
    "source_edition_or_year": "FM 5-233 (public-domain US Government work)",
-   "source_section_or_page": "courses (0 deg, 100 ft), (90 deg, 100 ft) -> sumLat 100, sumDep 100, misclosure 141.42 ft",
+   "source_section_or_page": "Closed four-course square (100 N, 200 E, 100 S, 200 W): perimeter 600 ft, misclosure 0, perfect closure",
    "verified_by": "rl",
-   "verified_on": "2026-06-09",
+   "verified_on": "2026-08-25",
    "inputs": {
     "courses": [
      {
@@ -23596,25 +23643,35 @@
      },
      {
       "azimuth_deg": 90,
+      "distance": 200
+     },
+     {
+      "azimuth_deg": 180,
       "distance": 100
+     },
+     {
+      "azimuth_deg": 270,
+      "distance": 200
      }
-    ]
+    ],
+    "n0": 0,
+    "e0": 0
    },
    "outputs": {
     "sum_lat": {
-     "value": 100,
+     "value": 0,
      "tolerance": {
       "abs": 0.001
      }
     },
     "sum_dep": {
-     "value": 100,
+     "value": 0,
      "tolerance": {
       "abs": 0.001
      }
     },
     "linear_misclosure": {
-     "value": 141.4214,
+     "value": 0,
      "tolerance": {
       "abs": 0.001
      }
@@ -23626,15 +23683,15 @@
    "source_publisher": "Naismith's rule (W. W. Naismith, 1892)",
    "source_title": "time = distance / pace + 1 hr per 600 m ascent",
    "source_edition_or_year": "first-principles + canonical ascent rate",
-   "source_section_or_page": "10 km, 600 m ascent, 5 km/h -> 2 hr flat + 1 hr ascent = 3 hr",
+   "source_section_or_page": "6 mi at 3 mph = 2.00 hr flat; 2000 ft (609.6 m) of ascent at 1 hr per 600 m = 1.016 hr; total 3.016 hr",
    "verified_by": "rl",
-   "verified_on": "2026-06-12",
+   "verified_on": "2026-08-25",
    "inputs": {
-    "distance": 10,
-    "distance_unit": "km",
-    "ascent": 600,
-    "ascent_unit": "m",
-    "speed": 5,
+    "distance": 6,
+    "distance_unit": "mi",
+    "ascent": 2000,
+    "ascent_unit": "ft",
+    "speed": 3,
     "factor": 1
    },
    "outputs": {
@@ -23645,13 +23702,13 @@
      }
     },
     "ascent_hours": {
-     "value": 1,
+     "value": 1.016,
      "tolerance": {
       "abs": 0.0001
      }
     },
     "total_hours": {
-     "value": 3,
+     "value": 3.016,
      "tolerance": {
       "abs": 0.0001
      }
