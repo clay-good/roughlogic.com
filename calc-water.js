@@ -832,9 +832,16 @@ export function computeDisinfectionCT({
 
 export const disinfectionCTExample = {
   // 3-log Giardia at 5 C / pH 7.0: CT_required = 139 mg-min/L (SWTR Table A-1).
-  // Operator achieves C=1.0 mg/L * t10=150 min = 150 mg-min/L >= 139 -> passes
+  // Operator achieves C=0.4 mg/L * t10=375 min = 150 mg-min/L >= 139 -> passes
   // 3-log Giardia (log_inactivation = 150/139 * 3 = 3.24).
-  inputs: { chlorine_mg_l: 1.0, t10_minutes: 150, temperature_C: 5, pH: 7.0 },
+  //
+  // The residual is 0.4 and not 1.0 on purpose. This tile bundles the <= 0.4
+  // mg/L column of Table A-1, and required CT RISES with residual, so reading
+  // that column at 1.0 mg/L understates the requirement -- the tile says so in
+  // a warning, and the page's headline example must not be the case that trips
+  // it. 0.4 x 375 is the same 150 mg-min/L against the same verified 139,
+  // inside the band the bundled table actually covers.
+  inputs: { chlorine_mg_l: 0.4, t10_minutes: 375, temperature_C: 5, pH: 7.0 },
 };
 
 function renderDisinfectionCT(inputRegion, outputRegion, citationEl) {
@@ -851,7 +858,7 @@ function renderDisinfectionCT(inputRegion, outputRegion, citationEl) {
   for (const f of [c, t10, t, p, lt]) inputRegion.appendChild(f.wrap);
 
   attachExampleButton(inputRegion, () => {
-    c.input.value = "1"; t10.input.value = "150"; t.input.value = "5"; p.input.value = "7.0"; lt.select.value = "3"; update();
+    c.input.value = "0.4"; t10.input.value = "375"; t.input.value = "5"; p.input.value = "7.0"; lt.select.value = "3"; update();
   });
 
   const oA = makeOutputLine(outputRegion, "CT achieved (mg-min/L)", "ct-out-a");

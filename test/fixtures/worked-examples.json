@@ -3760,12 +3760,12 @@
    "source_publisher": "USEPA",
    "source_title": "Surface Water Treatment Rule free-chlorine 3-log Giardia inactivation at 5 C / pH 7.0",
    "source_edition_or_year": "EPA 815-R-99-014 (1999)",
-   "source_section_or_page": "Table A-1 (<=0.4 mg/L band): CT_required = 139 mg-min/L at 5 C, pH 7.0; C=1.0 mg/L x t10=150 min = 150 >= 139 -> passes 3-log Giardia",
+   "source_section_or_page": "Table A-1 (<=0.4 mg/L band): CT_required = 139 mg-min/L at 5 C, pH 7.0; C=0.4 mg/L x t10=375 min = 150 >= 139 -> passes 3-log Giardia",
    "verified_by": "rl",
    "verified_on": "2026-07-17",
    "inputs": {
-    "chlorine_mg_l": 1.0,
-    "t10_minutes": 150,
+    "chlorine_mg_l": 0.4,
+    "t10_minutes": 375,
     "temperature_C": 5,
     "pH": 7
    },
