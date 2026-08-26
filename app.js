@@ -1955,6 +1955,23 @@ function renderToolView(id, params) {
   import("./citations.js").then((cit) => {
     const block = cit.renderCitationBlock(sources, id);
     if (block) {
+      // The structured block states the formula, the edition, the free-access
+      // pointer and what governs, in six labelled rows. The renderer's own
+      // one-line `Citation: ...` says the same thing again, a few lines above
+      // it, inside the same disclosure -- so voltage-drop printed its formula
+      // twice, once as "V_drop = 2*K*I*D / cmils" and once as "VD = 2 * I * R
+      // * L", and a reader had to work out that those are one equation.
+      //
+      // The comment below has always described the inline line as the
+      // fallback for "tiles not yet audited"; showing BOTH was the gap
+      // between that intent and the code. The static shell has never printed
+      // it -- check-shells has passed for 1,709 pages without it -- so this
+      // makes the live view agree with the page it mirrors.
+      //
+      // Hidden rather than removed: every renderer is handed this element and
+      // writes into it, and `hidden` takes it out of the a11y tree and the
+      // printed page while keeping that contract intact.
+      citation.hidden = true;
       const copyBtn = document.createElement("button");
       copyBtn.type = "button";
       copyBtn.className = "view-copy-reference";
