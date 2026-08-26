@@ -1343,6 +1343,13 @@ export const RENDERER_MAP = {
   "knurl-blank-diameter": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "grinding-wheel-rpm": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "reaming-drill-allowance": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
+  // spec-v1402..v1412: the 2026-08-26 trade-expansion machining and fabrication band.
+  "drill-feed-thrust": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
+  "band-saw-blade-pitch": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
+  "tube-bend-wall-thinning": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
+  "counterbore-depth": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
+  "weld-cooling-rate-t85": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
+  "interpass-temperature-control": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
   "taylor-tool-life": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "spindle-power-torque": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },

@@ -496,6 +496,13 @@ const _TILES = [
   ["countersink-diameter-from-depth", "K"],
   // spec-v513 shaft key and keyseat size (ANSI B17.1)
   ["keyseat-key-size", "K"], ["knurl-blank-diameter", "K"], ["grinding-wheel-rpm", "K"], ["reaming-drill-allowance", "K"], ["taylor-tool-life", "K"],
+  // spec-v1402..v1412: the 2026-08-26 trade-expansion machining and fabrication band.
+  ["drill-feed-thrust", "K"],
+  ["band-saw-blade-pitch", "K"],
+  ["tube-bend-wall-thinning", "E"],
+  ["counterbore-depth", "K"],
+  ["weld-cooling-rate-t85", "E"],
+  ["interpass-temperature-control", "E"],
 
   // v43 cross-trade tank gauging (calc-cross.js)
   ["tank-volume", "G"], ["linear-interpolation", "G"], ["radiant-heat-exchange", "G"],

@@ -874,6 +874,10 @@ const TOOL_MODULES = (() => {
     "coil-length",
     // spec-v909 bar / tube stock cut list yield (group E)
     "barstock-cutlist", "bar-nesting", "sheet-metal-gauge",
+    // spec-v1402..v1412: the 2026-08-26 trade-expansion machining and fabrication band.
+    "tube-bend-wall-thinning",
+    "weld-cooling-rate-t85",
+    "interpass-temperature-control",
     // spec-v912 dished tank / vessel head volume (group E)
     "vessel-head-volume",
   ]);
@@ -1030,6 +1034,10 @@ const TOOL_MODULES = (() => {
     "grinding-wheel-rpm",
     // spec-v917 reaming prebore (drill) allowance
     "reaming-drill-allowance",
+    // spec-v1402..v1412: the 2026-08-26 trade-expansion machining and fabrication band.
+    "drill-feed-thrust",
+    "band-saw-blade-pitch",
+    "counterbore-depth",
     "taylor-tool-life",
     // v100 cutting-fluid concentration
     "cutting-fluid-concentration",

@@ -107,6 +107,13 @@ export const COMPUTE_MAP = {
   "knurl-blank-diameter": { module: "../../calc-machining.js", fn: "computeKnurlBlankDiameter" },
   "grinding-wheel-rpm": { module: "../../calc-machining.js", fn: "computeGrindingWheelRpm" },
   "reaming-drill-allowance": { module: "../../calc-machining.js", fn: "computeReamingDrillAllowance" },
+  // spec-v1402..v1412: the 2026-08-26 trade-expansion machining and fabrication band.
+  "drill-feed-thrust": { module: "../../calc-machining.js", fn: "computeDrillFeedThrust" },
+  "band-saw-blade-pitch": { module: "../../calc-machining.js", fn: "computeBandSawBladePitch" },
+  "tube-bend-wall-thinning": { module: "../../calc-fab.js", fn: "computeTubeBendWallThinning" },
+  "counterbore-depth": { module: "../../calc-machining.js", fn: "computeCounterboreDepth" },
+  "weld-cooling-rate-t85": { module: "../../calc-fab.js", fn: "computeWeldCoolingRateT85" },
+  "interpass-temperature-control": { module: "../../calc-fab.js", fn: "computeInterpassTemperatureControl" },
   "taylor-tool-life": { module: "../../calc-machining.js", fn: "computeTaylorToolLife" },
   "cutting-diameter-for-rpm": { module: "../../calc-machining.js", fn: "computeCuttingDiameterForRpm" },
   "drill-point-depth": { module: "../../calc-machining.js", fn: "computeDrillPointDepth" },

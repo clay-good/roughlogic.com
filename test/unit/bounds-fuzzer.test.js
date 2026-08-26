@@ -40215,3 +40215,194 @@ test("bounds: spec-v1401 computeLitterCarryTeam pins the staffing and the pace s
   assert.ok("error" in _v1401({ ...base, support_personnel: -1 }));
   assert.ok("error" in _v1401({ ...base, pace_mph: Infinity }));
 });
+
+// ===========================================================================
+// spec-v1402..v1412: the 2026-08-26 trade-expansion machining and
+// fabrication band (v1402-v1405, v1410, v1412).
+// ===========================================================================
+
+import { computeDrillFeedThrust as _v1402 } from "../../calc-machining.js";
+test("bounds: spec-v1402 computeDrillFeedThrust pins the torque that goes as D squared", () => {
+  // 0.500 in at 80 SFM and 0.006 IPR: 611 rpm, 3.67 IPM, 0.72 cipm, 0.72/0.90 hp, 74 in-lb.
+  const base = { diameter_in: 0.500, sfm: 80, feed_ipr: 0.006, unit_power: 1.0, spindle_efficiency: 0.80 };
+  const r = _v1402(base);
+  assert.ok(Math.abs(r.rpm - 611.2) < 1e-1);
+  assert.ok(Math.abs(r.feed_ipm - 3.667) < 1e-3);
+  assert.ok(Math.abs(r.removal_rate_cipm - 0.720) < 1e-3);
+  assert.ok(Math.abs(r.power_at_cut_hp - 0.720) < 1e-3);
+  assert.ok(Math.abs(r.motor_power_hp - 0.900) < 1e-3);
+  assert.ok(Math.abs(r.torque_in_lb - 74.25) < 1e-2);
+  // At constant SFM and IPR, doubling the diameter QUADRUPLES the torque -- the whole point.
+  const big = _v1402({ ...base, diameter_in: 1.000 });
+  assert.ok(Math.abs(big.torque_in_lb / r.torque_in_lb - 4) < 1e-9);
+  // ...halves the RPM and doubles the removal rate.
+  assert.ok(Math.abs(big.rpm - r.rpm / 2) < 1e-9);
+  assert.ok(Math.abs(big.removal_rate_cipm - 2 * r.removal_rate_cipm) < 1e-9);
+  // Motor power is the cut power divided by efficiency, never less than it.
+  assert.ok(r.motor_power_hp > r.power_at_cut_hp);
+  assert.ok(Math.abs(_v1402({ ...base, spindle_efficiency: 1 }).motor_power_hp - r.power_at_cut_hp) < 1e-9);
+  assert.ok("error" in _v1402({ ...base, diameter_in: 0 }));
+  assert.ok("error" in _v1402({ ...base, sfm: 0 }));
+  assert.ok("error" in _v1402({ ...base, feed_ipr: 0 }));
+  assert.ok("error" in _v1402({ ...base, unit_power: 0 }));
+  assert.ok("error" in _v1402({ ...base, spindle_efficiency: 1.5 }));
+  assert.ok("error" in _v1402({ ...base, sfm: Infinity }));
+});
+
+import { computeBandSawBladePitch as _v1403 } from "../../calc-machining.js";
+test("bounds: spec-v1403 computeBandSawBladePitch pins the three-to-24 band and the thin-wall wall", () => {
+  // A 2.0 in section wants 1.5 to 12 TPI; 250 SFM on 12 in wheels is 79.6 rpm.
+  const base = { thickness_in_cut_in: 2.0, blade_speed_sfm: 250, wheel_diameter_in: 12, cut_area_sqin: 3.1416, feed_sqin_per_min: 5 };
+  const r = _v1403(base);
+  assert.ok(Math.abs(r.min_tpi - 1.5) < 1e-9);
+  assert.ok(Math.abs(r.max_tpi - 12) < 1e-9);
+  assert.ok(Math.abs(r.wheel_rpm - 79.577) < 1e-3);
+  assert.ok(Math.abs(r.cut_time_min - 0.6283) < 1e-4);
+  assert.ok(Math.abs(r.cut_time_sec - 37.70) < 1e-2);
+  assert.ok(r.practical.startsWith("a blade between"));
+  // The band is always exactly a factor of eight wide -- 24/3.
+  assert.ok(Math.abs(r.max_tpi / r.min_tpi - 8) < 1e-12);
+  // Thin wall: the rule demands a finer pitch than any stocked blade.
+  const thinWall = _v1403({ ...base, thickness_in_cut_in: 0.120 });
+  assert.ok(Math.abs(thinWall.min_tpi - 25) < 1e-9);
+  assert.ok(Math.abs(thinWall.max_tpi - 200) < 1e-9);
+  assert.ok(thinWall.practical.startsWith("NO stocked blade"));
+  // Exactly at 24 TPI minimum (0.125 in) a blade still exists.
+  assert.ok(_v1403({ ...base, thickness_in_cut_in: 0.125 }).practical.startsWith("a blade between"));
+  // Wheel RPM is inverse in wheel diameter at a fixed blade speed.
+  const bigWheel = _v1403({ ...base, wheel_diameter_in: 24 });
+  assert.ok(Math.abs(bigWheel.wheel_rpm - r.wheel_rpm / 2) < 1e-9);
+  assert.ok("error" in _v1403({ ...base, thickness_in_cut_in: 0 }));
+  assert.ok("error" in _v1403({ ...base, blade_speed_sfm: 0 }));
+  assert.ok("error" in _v1403({ ...base, wheel_diameter_in: 0 }));
+  assert.ok("error" in _v1403({ ...base, cut_area_sqin: 0 }));
+  assert.ok("error" in _v1403({ ...base, feed_sqin_per_min: 0 }));
+  assert.ok("error" in _v1403({ ...base, thickness_in_cut_in: Infinity }));
+});
+
+import { computeTubeBendWallThinning as _v1404 } from "../../calc-fab.js";
+test("bounds: spec-v1404 computeTubeBendWallThinning pins thinning as a ratio-only function", () => {
+  // 2.0 OD, 0.120 wall, 3.0 CLR: 1.5D, D/t 16.7, wall 0.090, 25% thinner, 4.71 in arc.
+  const base = { od_in: 2.0, wall_in: 0.120, clr_in: 3.0, bend_angle_deg: 90 };
+  const r = _v1404(base);
+  assert.ok(Math.abs(r.bend_ratio - 1.5) < 1e-9);
+  assert.ok(Math.abs(r.d_over_t - 16.667) < 1e-3);
+  assert.ok(Math.abs(r.wall_after_in - 0.090) < 1e-9);
+  assert.ok(Math.abs(r.thinning_pct - 25) < 1e-9);
+  assert.ok(Math.abs(r.arc_length_in - 4.712) < 1e-3);
+  // Opening to 3D nearly halves the thinning, for a bend twice the size.
+  const open = _v1404({ ...base, clr_in: 6.0 });
+  assert.ok(Math.abs(open.wall_after_in - 0.10286) < 1e-5);
+  assert.ok(Math.abs(open.thinning_pct - 14.286) < 1e-3);
+  // Thinning depends ONLY on the radius ratio: not on the wall, not on the angle.
+  const thinner = _v1404({ ...base, wall_in: 0.065 });
+  assert.ok(Math.abs(thinner.thinning_pct - r.thinning_pct) < 1e-12);
+  const shallow = _v1404({ ...base, bend_angle_deg: 30 });
+  assert.ok(Math.abs(shallow.thinning_pct - r.thinning_pct) < 1e-12);
+  // The arc IS proportional to the angle.
+  assert.ok(Math.abs(shallow.arc_length_in - r.arc_length_in / 3) < 1e-9);
+  // A tight bend on a thin shell calls for a mandrel.
+  assert.ok(r.mandrel_advisory.startsWith("TIGHT and thin"));
+  assert.ok(_v1404({ ...base, clr_in: 8.0 }).mandrel_advisory.startsWith("inside the range"));
+  assert.ok("error" in _v1404({ ...base, od_in: 0 }));
+  assert.ok("error" in _v1404({ ...base, wall_in: 0 }));
+  assert.ok("error" in _v1404({ ...base, wall_in: 1.5 }));
+  assert.ok("error" in _v1404({ ...base, clr_in: 0.5 }));
+  assert.ok("error" in _v1404({ ...base, bend_angle_deg: 0 }));
+  assert.ok("error" in _v1404({ ...base, od_in: Infinity }));
+});
+
+import { computeCounterboreDepth as _v1405 } from "../../calc-machining.js";
+test("bounds: spec-v1405 computeCounterboreDepth pins the engagement the bore eats", () => {
+  // 0.500 head + 0.015 = 0.515 bore; 0.750 - 0.515 = 0.235 left against 0.500 required.
+  const base = { screw_diameter_in: 0.500, head_height_in: 0.500, below_flush_in: 0.015, plate_thickness_in: 0.750, engagement_multiplier: 1.0, tapped_part: true };
+  const r = _v1405(base);
+  assert.ok(Math.abs(r.counterbore_depth_in - 0.515) < 1e-9);
+  assert.ok(Math.abs(r.remaining_thickness_in - 0.235) < 1e-9);
+  assert.ok(Math.abs(r.required_engagement_in - 0.500) < 1e-9);
+  assert.ok(Math.abs(r.shortfall_in - 0.265) < 1e-9);
+  assert.strictEqual(r.passes, false);
+  // The reported minimum thickness is exactly the one that just passes.
+  assert.ok(Math.abs(r.minimum_thickness_in - 1.015) < 1e-9);
+  const atMinimum = _v1405({ ...base, plate_thickness_in: r.minimum_thickness_in });
+  assert.strictEqual(atMinimum.passes, true);
+  assert.ok(Math.abs(atMinimum.shortfall_in) < 1e-12);
+  // A CLEARANCE plate has no conflict at all -- the bore does not eat engagement.
+  const clearance = _v1405({ ...base, tapped_part: false });
+  assert.strictEqual(clearance.passes, true);
+  assert.ok(Math.abs(clearance.available_engagement_in - base.plate_thickness_in) < 1e-9);
+  // Aluminum wants twice the engagement of steel.
+  const aluminum = _v1405({ ...base, engagement_multiplier: 2.0 });
+  assert.ok(Math.abs(aluminum.required_engagement_in - 2 * r.required_engagement_in) < 1e-9);
+  // A bore deeper than the plate breaks through.
+  assert.ok("error" in _v1405({ ...base, plate_thickness_in: 0.400 }));
+  assert.ok("error" in _v1405({ ...base, screw_diameter_in: 0 }));
+  assert.ok("error" in _v1405({ ...base, head_height_in: 0 }));
+  assert.ok("error" in _v1405({ ...base, below_flush_in: -1 }));
+  assert.ok("error" in _v1405({ ...base, engagement_multiplier: 0 }));
+  assert.ok("error" in _v1405({ ...base, plate_thickness_in: Infinity }));
+});
+
+import { computeWeldCoolingRateT85 as _v1410 } from "../../calc-fab.js";
+test("bounds: spec-v1410 computeWeldCoolingRateT85 pins both regimes and the transition", () => {
+  // Q = 1.0 kJ/mm, no preheat: 3D is 5.29 s, 2D at 10 mm is 11.36 s, transition 14.66 mm.
+  const base = { heat_input_kj_mm: 1.0, preheat_c: 20, thickness_mm: 10, f2: 1.0, f3: 1.0 };
+  const r = _v1410(base);
+  assert.ok(Math.abs(r.t85_3d_s - 5.2885) < 1e-3);
+  assert.ok(Math.abs(r.t85_2d_s - 11.3636) < 1e-3);
+  assert.ok(Math.abs(r.transition_mm - 14.659) < 1e-3);
+  assert.ok(Math.abs(r.governing_s - r.t85_2d_s) < 1e-12);
+  assert.strictEqual(r.two_dimensional, true);
+  // Thick plate: 2D falls to 2.84 s, the plate is above the transition, and 3D governs.
+  const thick = _v1410({ ...base, thickness_mm: 20 });
+  assert.ok(Math.abs(thick.t85_2d_s - 2.8409) < 1e-3);
+  assert.ok(Math.abs(thick.governing_s - thick.t85_3d_s) < 1e-12);
+  assert.strictEqual(thick.two_dimensional, false);
+  // The 3D value does NOT depend on thickness; the 2D value goes as 1/d^2.
+  assert.ok(Math.abs(thick.t85_3d_s - r.t85_3d_s) < 1e-12);
+  assert.ok(Math.abs(thick.t85_2d_s - r.t85_2d_s / 4) < 1e-9);
+  // AT the transition thickness the two expressions agree, which is what defines it.
+  const atTransition = _v1410({ ...base, thickness_mm: r.transition_mm });
+  assert.ok(Math.abs(atTransition.t85_2d_s - atTransition.t85_3d_s) < 1e-9);
+  // Preheat slows the cool: 20 C to 150 C takes the 3D figure from 5.29 to 7.85 s.
+  const preheated = _v1410({ ...base, preheat_c: 150, thickness_mm: 30 });
+  assert.ok(Math.abs(preheated.t85_3d_s - 7.846) < 1e-3);
+  assert.ok(preheated.t85_3d_s > r.t85_3d_s);
+  assert.ok("error" in _v1410({ ...base, heat_input_kj_mm: 0 }));
+  assert.ok("error" in _v1410({ ...base, thickness_mm: 0 }));
+  assert.ok("error" in _v1410({ ...base, f2: 0 }));
+  assert.ok("error" in _v1410({ ...base, preheat_c: 500 }));
+  assert.ok("error" in _v1410({ ...base, heat_input_kj_mm: Infinity }));
+});
+
+import { computeInterpassTemperatureControl as _v1412 } from "../../calc-fab.js";
+test("bounds: spec-v1412 computeInterpassTemperatureControl pins the window and both waits", () => {
+  // tau 12 min, ambient 70: 300 F gives 6.85 min of idle; 500 F down to 200 F is 14.36 min.
+  const base = { tau_min: 12, ambient_f: 70, preheat_min_f: 200, interpass_max_f: 500, current_temp_f: 300, restart_temp_f: 200, elapsed_min: 10 };
+  const r = _v1412(base);
+  assert.ok(Math.abs(r.idle_allowance_min - 6.8465) < 1e-3);
+  assert.ok(Math.abs(r.required_wait_min - 14.355) < 1e-3);
+  assert.ok(Math.abs(r.temp_at_elapsed_f - 169.96) < 1e-2);
+  assert.strictEqual(r.inside_window, true);
+  // The projection agrees with the idle allowance: at that elapsed time the joint is AT preheat.
+  const atIdle = _v1412({ ...base, elapsed_min: r.idle_allowance_min });
+  assert.ok(Math.abs(atIdle.temp_at_elapsed_f - base.preheat_min_f) < 1e-9);
+  // Below preheat and above the interpass maximum are both flagged, in opposite directions.
+  const cold = _v1412({ ...base, current_temp_f: 150 });
+  assert.strictEqual(cold.inside_window, false);
+  assert.ok(cold.status.startsWith("BELOW"));
+  assert.ok(Math.abs(cold.idle_allowance_min) < 1e-12);
+  const hot = _v1412({ ...base, current_temp_f: 600 });
+  assert.strictEqual(hot.inside_window, false);
+  assert.ok(hot.status.startsWith("ABOVE"));
+  // A joint with twice the time constant holds heat twice as long.
+  const heavy = _v1412({ ...base, tau_min: 24 });
+  assert.ok(Math.abs(heavy.idle_allowance_min - 2 * r.idle_allowance_min) < 1e-9);
+  assert.ok("error" in _v1412({ ...base, tau_min: 0 }));
+  assert.ok("error" in _v1412({ ...base, preheat_min_f: 70 }));
+  assert.ok("error" in _v1412({ ...base, interpass_max_f: 150 }));
+  assert.ok("error" in _v1412({ ...base, current_temp_f: 60 }));
+  assert.ok("error" in _v1412({ ...base, restart_temp_f: 50 }));
+  assert.ok("error" in _v1412({ ...base, elapsed_min: -1 }));
+  assert.ok("error" in _v1412({ ...base, tau_min: Infinity }));
+});

@@ -1439,6 +1439,18 @@
     {"term":"hp needed for a boat speed","target":"crouch-hp-for-speed","kind":"question"},
     {"term":"power for a target boat mph","target":"crouch-hp-for-speed","kind":"question"},
     {"term":"engine power for a planing speed","target":"crouch-hp-for-speed","kind":"question"},
-    {"term":"repower hp for more speed","target":"crouch-hp-for-speed","kind":"question"}
+    {"term":"repower hp for more speed","target":"crouch-hp-for-speed","kind":"question"},
+    {"term":"drill speed and feed","target":"drill-feed-thrust","kind":"industry"},
+    {"term":"drilling torque","target":"drill-feed-thrust","kind":"industry"},
+    {"term":"drill horsepower","target":"drill-feed-thrust","kind":"industry"},
+    {"term":"what rpm for a drill","target":"drill-feed-thrust","kind":"question"},
+    {"term":"band saw pitch","target":"band-saw-blade-pitch","kind":"industry"},
+    {"term":"blade tpi selection","target":"band-saw-blade-pitch","kind":"industry"},
+    {"term":"teeth in the cut","target":"band-saw-blade-pitch","kind":"industry"},
+    {"term":"what tpi for this material","target":"band-saw-blade-pitch","kind":"question"},
+    {"term":"counterbore depth","target":"counterbore-depth","kind":"industry"},
+    {"term":"thread engagement remaining","target":"counterbore-depth","kind":"industry"},
+    {"term":"socket head counterbore","target":"counterbore-depth","kind":"industry"},
+    {"term":"how deep to counterbore","target":"counterbore-depth","kind":"question"}
   ]
 }

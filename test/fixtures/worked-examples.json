@@ -91497,6 +91497,278 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "drill-feed-thrust",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "0.500 in HSS drill in mild steel at 80 SFM, 0.006 IPR, unit power 1.0, 80% spindle",
+   "source_edition_or_year": "shop speeds and feeds",
+   "source_section_or_page": "RPM = 3.82 SFM / D; torque = 63,025 hp / RPM",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "diameter_in": 0.5,
+    "sfm": 80,
+    "feed_ipr": 0.006,
+    "unit_power": 1,
+    "spindle_efficiency": 0.8
+   },
+   "outputs": {
+    "rpm": {
+     "value": 611.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "feed_ipm": {
+     "value": 3.6672,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "removal_rate_cipm": {
+     "value": 0.720053,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "power_at_cut_hp": {
+     "value": 0.720053,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "motor_power_hp": {
+     "value": 0.900066,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "torque_in_lb": {
+     "value": 74.2496,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "band-saw-blade-pitch",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "2.0 in solid round, 250 SFM on 12 in wheels, 5 sq in per minute",
+   "source_edition_or_year": "blade pitch rule",
+   "source_section_or_page": "three to twenty-four teeth in the cut",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "thickness_in_cut_in": 2,
+    "blade_speed_sfm": 250,
+    "wheel_diameter_in": 12,
+    "cut_area_sqin": 3.1416,
+    "feed_sqin_per_min": 5
+   },
+   "outputs": {
+    "min_tpi": {
+     "value": 1.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_tpi": {
+     "value": 12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wheel_rpm": {
+     "value": 79.5775,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cut_time_min": {
+     "value": 0.62832,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tube-bend-wall-thinning",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "2.0 in OD, 0.120 in wall, 90 degrees on a 3.0 in centerline radius",
+   "source_edition_or_year": "bending geometry",
+   "source_section_or_page": "wall x CLR / (CLR + OD/2)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "od_in": 2,
+    "wall_in": 0.12,
+    "clr_in": 3,
+    "bend_angle_deg": 90
+   },
+   "outputs": {
+    "bend_ratio": {
+     "value": 1.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "d_over_t": {
+     "value": 16.6667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wall_after_in": {
+     "value": 0.09,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "thinning_pct": {
+     "value": 25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "arc_length_in": {
+     "value": 4.71239,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "counterbore-depth",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "1/2-13 SHCS, 0.500 in head, 0.015 below flush, 0.750 in steel plate",
+   "source_edition_or_year": "machine design",
+   "source_section_or_page": "one diameter of engagement into steel",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "screw_diameter_in": 0.5,
+    "head_height_in": 0.5,
+    "below_flush_in": 0.015,
+    "plate_thickness_in": 0.75,
+    "engagement_multiplier": 1,
+    "tapped_part": "yes"
+   },
+   "outputs": {
+    "counterbore_depth_in": {
+     "value": 0.515,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "remaining_thickness_in": {
+     "value": 0.235,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_engagement_in": {
+     "value": 0.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "shortfall_in": {
+     "value": 0.265,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "minimum_thickness_in": {
+     "value": 1.015,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "weld-cooling-rate-t85",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Q = 1.0 kJ/mm, no preheat (20 C), 10 mm plate, shape factors 1.0",
+   "source_edition_or_year": "EN 1011-2 formulation",
+   "source_section_or_page": "2D and 3D heat flow, and the transition",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "heat_input_kj_mm": 1,
+    "preheat_c": 20,
+    "thickness_mm": 10,
+    "f2": 1,
+    "f3": 1
+   },
+   "outputs": {
+    "t85_3d_s": {
+     "value": 5.28846,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "t85_2d_s": {
+     "value": 11.3636,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "transition_mm": {
+     "value": 14.6586,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "governing_s": {
+     "value": 11.3636,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "interpass-temperature-control",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "tau 12 min, ambient 70 F, preheat 200 F, interpass max 500 F, joint at 300 F",
+   "source_edition_or_year": "Newtonian cooling",
+   "source_section_or_page": "tau x ln((T1 - ambient)/(T2 - ambient))",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "tau_min": 12,
+    "ambient_f": 70,
+    "preheat_min_f": 200,
+    "interpass_max_f": 500,
+    "current_temp_f": 300,
+    "restart_temp_f": 200,
+    "elapsed_min": 10
+   },
+   "outputs": {
+    "idle_allowance_min": {
+     "value": 6.84654,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_wait_min": {
+     "value": 14.355,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "temp_at_elapsed_f": {
+     "value": 169.958,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

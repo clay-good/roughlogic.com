@@ -1791,3 +1791,238 @@ function _renderSheetMetalGauge(inputRegion, outputRegion, citationEl) {
   mat.select.addEventListener("change", update);
 }
 FAB_RENDERERS["sheet-metal-gauge"] = _renderSheetMetalGauge;
+
+// ===========================================================================
+// spec-v1404, v1410, v1412: the fabrication and welding third of the
+// 2026-08-26 trade-expansion Group E band. See specs/scope-trade-expansion.md.
+// (Drilling, band sawing, and counterboring live in calc-machining.js.)
+// ===========================================================================
+
+// Compact renderer factory, copied from the sibling calc-firesprinkler.js
+// factory (number and select inputs; same schema shape). Non-exported, so it
+// adds no v14 derivation-corpus row.
+function _simpleRenderer(spec) {
+  const _rlRender = function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      let field;
+      if (f.kind === "select") field = makeSelect(f.label, f.id || f.key, f.options);
+      else field = makeNumber(f.label, f.id || f.key, f.attrs || { step: "any", min: "0" });
+      fields[f.key] = field;
+      if (f.default !== undefined) {
+        if (f.kind === "select") field.select.value = f.default;
+        else field.input.value = String(f.default);
+      }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key];
+        else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) {
+        if (f.kind === "select") params[f.key] = fields[f.key].select.value;
+        else params[f.key] = Number(fields[f.key].input.value) || 0;
+      }
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) {
+      const el = f.kind === "select" ? fields[f.key].select : fields[f.key].input;
+      el.addEventListener(f.kind === "select" ? "change" : "input", update);
+    }
+  };
+
+  _rlRender.schema = {
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
+    citation: spec.citation ?? null,
+    scope: spec.scope ?? null,
+  };
+  return _rlRender;
+}
+
+// ===================== spec-v1404: tube bend wall thinning =====================
+// dims: in { args: dimensionless } out: { bend_ratio: dimensionless, d_over_t: dimensionless, wall_after_in: L, thinning_pct: dimensionless, arc_length_in: L }
+export function computeTubeBendWallThinning({ od_in = 0, wall_in = 0, clr_in = 0, bend_angle_deg = 90 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(od_in > 0)) return { error: "Tube outside diameter must be positive." };
+  if (!(wall_in > 0)) return { error: "Wall thickness must be positive." };
+  if (!(wall_in < od_in / 2)) return { error: "Wall thickness must be less than the tube radius." };
+  if (!(clr_in > od_in / 2)) return { error: "Centerline bend radius must exceed the tube radius, or the bend closes on itself." };
+  if (!(bend_angle_deg > 0 && bend_angle_deg <= 360)) return { error: "Bend angle must be above 0 and at most 360 degrees." };
+  // Thinning depends ONLY on the ratio of bend radius to tube radius -- not on the material
+  // and not on the bend angle.
+  const bend_ratio = clr_in / od_in;
+  const d_over_t = od_in / wall_in;
+  const wall_after_in = wall_in * clr_in / (clr_in + od_in / 2);
+  const thinning_pct = (1 - clr_in / (clr_in + od_in / 2)) * 100;
+  const arc_length_in = clr_in * bend_angle_deg * Math.PI / 180;
+  const mandrel_advisory = bend_ratio < 2 && d_over_t > 15
+    ? "TIGHT and thin: below about 2D on a high D/t tube a mandrel and a wiper die are needed to keep the tube from collapsing or wrinkling on the inside"
+    : bend_ratio < 2
+      ? "tight bend: below about 2D, a mandrel is usually required"
+      : d_over_t > 30
+        ? "thin shell: a D/t above about 30 buckles rather than bends, and wants a mandrel even on an open radius"
+        : "inside the range that bends without a mandrel on most tooling";
+  if (![bend_ratio, d_over_t, wall_after_in, thinning_pct, arc_length_in].every(Number.isFinite)) return { error: "Tube-bending math is not a finite value." };
+  return {
+    bend_ratio,
+    d_over_t,
+    wall_after_in,
+    thinning_pct,
+    arc_length_in,
+    mandrel_advisory,
+    note: "How much a tube's outside wall thins in a bend, and the two ratios that decide whether the bend is makeable. Bending stretches the outside of a bend and compresses the inside. Taking the neutral axis at the centerline, the outer fiber is stretched in proportion to how far it sits outside that centerline and the wall thins by the same proportion -- so the thinning depends ONLY on the ratio of the bend radius to the tube radius, not on the material and not on the bend angle. Two ratios do the work. R/D is how tight the bend is: at 3D the thinning is modest, at 1.5D it is severe, and below about 2D on thin wall a mandrel and a wiper die are needed to keep the tube from collapsing or wrinkling on the inside. D/t is how thin the tube is relative to its diameter, and a high D/t tube is a thin shell that buckles rather than bends. Together they are the two axes of every tube-bending capability chart. A 2.0 in OD tube with a 0.120 in wall bent 90 degrees on a 3.0 in centerline radius is a 1.5D bend at D/t 16.7, and the wall goes to 0.090 in -- a quarter of it gone -- over a 4.71 in arc. Open the bend to 6.0 in and the same tube thins only to 0.1029 in, 14.3%, for a bend that takes twice the space, which is the trade on every job and why 3D is the default when the package allows it. The consequence downstream is pressure rating: a pressure calculation done on the nominal wall is wrong for a bent tube, because the thinned outer wall is the governing section. A geometric estimate; the bender's own capability chart, a measured first article, and the applicable piping code govern.",
+  };
+}
+
+export const tubeBendWallThinningExample = { inputs: { od_in: 2.0, wall_in: 0.120, clr_in: 3.0, bend_angle_deg: 90 } };
+
+FAB_RENDERERS["tube-bend-wall-thinning"] = _simpleRenderer({
+  citation: "Citation: tube bend wall thinning from the neutral-axis-at-centerline geometry -- wall after = wall x CLR / (CLR + OD/2), so the thinning depends only on the radius ratio -- by name; public bending geometry, and the R/D and D/t ratios are the two axes of every bender's published capability chart, cited not reproduced. The bender's capability chart, a measured first article, and the applicable piping code govern.",
+  example: tubeBendWallThinningExample.inputs,
+  fields: [
+    { key: "od_in", label: "Tube outside diameter (in)", kind: "number" },
+    { key: "wall_in", label: "Wall thickness (in)", kind: "number" },
+    { key: "clr_in", label: "Centerline bend radius (in)", kind: "number" },
+    { key: "bend_angle_deg", label: "Bend angle (deg)", kind: "number" },
+  ],
+  outputs: [
+    { key: "r", id: "tbwt-out-r", label: "Bend ratio", value: (r) => fmt(r.bend_ratio, 2) + "D" },
+    { key: "t", id: "tbwt-out-t", label: "D/t ratio", value: (r) => fmt(r.d_over_t, 1) },
+    { key: "w", id: "tbwt-out-w", label: "Wall at the outside of the bend", value: (r) => fmt(r.wall_after_in, 4) + " in (" + fmt(r.thinning_pct, 1) + " % thinner)" },
+    { key: "a", id: "tbwt-out-a", label: "Arc length of the bend", value: (r) => fmt(r.arc_length_in, 2) + " in" },
+    { key: "m", id: "tbwt-out-m", label: "Mandrel advisory", value: (r) => r.mandrel_advisory },
+    { key: "n", id: "tbwt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTubeBendWallThinning,
+});
+
+// ===================== spec-v1410: weld cooling time t8/5 =====================
+// dims: in { args: dimensionless } out: { t85_3d_s: T, t85_2d_s: T, transition_mm: L, governing_s: T }
+export function computeWeldCoolingRateT85({ heat_input_kj_mm = 0, preheat_c = 20, thickness_mm = 0, f2 = 1.0, f3 = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(heat_input_kj_mm > 0)) return { error: "Heat input must be positive." };
+  if (!(thickness_mm > 0)) return { error: "Plate thickness must be positive." };
+  if (!(f2 > 0 && f3 > 0)) return { error: "Joint shape factors must be positive." };
+  if (!(preheat_c < 500)) return { error: "Preheat must be below 500 C, the bottom of the 800-500 C window this measures." };
+  // In a THICK plate heat escapes in three dimensions and thickness stops mattering; in a
+  // THIN plate flow is two-dimensional, cooling is SLOWER, and it goes as 1/d^2.
+  const a3 = 1 / (500 - preheat_c) - 1 / (800 - preheat_c);
+  const a2 = 1 / (500 - preheat_c) ** 2 - 1 / (800 - preheat_c) ** 2;
+  const t85_3d_s = (6700 - 5 * preheat_c) * heat_input_kj_mm * a3 * f3;
+  const t85_2d_s = (4300 - 4.3 * preheat_c) * 1e5 * heat_input_kj_mm ** 2 / thickness_mm ** 2 * a2 * f2;
+  // The two expressions cross at the transition thickness; each governs on its own side,
+  // which is equivalently to say the LARGER of the two is the real one.
+  const transition_mm = Math.sqrt((4300 - 4.3 * preheat_c) * 1e5 * heat_input_kj_mm ** 2 * a2 * f2 / ((6700 - 5 * preheat_c) * heat_input_kj_mm * a3 * f3));
+  const two_dimensional = thickness_mm < transition_mm;
+  const governing_s = Math.max(t85_2d_s, t85_3d_s);
+  const regime = two_dimensional
+    ? "two-dimensional (the plate is THIN for this heat input, below the transition, and cools more slowly than the thick-plate figure)"
+    : "three-dimensional (the plate is THICK for this heat input, above the transition, and the thickness no longer matters)";
+  if (![t85_3d_s, t85_2d_s, transition_mm, governing_s].every(Number.isFinite)) return { error: "Cooling-time math is not a finite value." };
+  return {
+    t85_3d_s,
+    t85_2d_s,
+    transition_mm,
+    governing_s,
+    two_dimensional,
+    regime,
+    note: "The cooling time through the 800 to 500 degree Celsius window, which is where austenite transforms and where a weld's final microstructure -- its hardness, its toughness, and its susceptibility to hydrogen cracking -- is decided. Cool too fast and the result is untempered martensite; cool too slowly and grain growth costs toughness. Every lever a welding procedure pulls -- heat input, preheat, interpass temperature -- is pulled to land this number in the right window. The two regimes are the part that is easy to get wrong. In a thick plate the heat escapes into three dimensions and the thickness stops mattering, so the cooling time is independent of it. In a thin plate the heat has nowhere to go through the thickness, the flow is two-dimensional, cooling is SLOWER, and it depends on one over the thickness squared, which is sharp. The two expressions cross at a transition thickness and each governs on its own side, which is the same as saying the larger of the two is the real one. At 1.0 kJ/mm with no preheat the thick-plate figure is 5.29 s, and a 10 mm plate is below the 14.7 mm transition so two-dimensional flow governs at 11.4 s -- more than twice as long. A 20 mm plate is above the transition and the 3D figure of 5.29 s governs instead. Getting the regime backward on that example is a factor of two in either direction. Preheat is the other lever: raising it from 20 to 150 C takes the thick-plate time from 5.29 to 7.85 s, a 48% slower cool from preheat alone, which is exactly what preheat is for. An engineering estimate; the welding procedure specification, the carbon-equivalent screen, and a qualified welding engineer govern.",
+  };
+}
+
+export const weldCoolingRateT85Example = { inputs: { heat_input_kj_mm: 1.0, preheat_c: 20, thickness_mm: 10, f2: 1.0, f3: 1.0 } };
+
+FAB_RENDERERS["weld-cooling-rate-t85"] = _simpleRenderer({
+  citation: "Citation: the t8/5 weld cooling-time model in its two- and three-dimensional heat-flow forms, with the transition thickness where they cross, by name -- the formulation published in EN 1011-2 and the standard welding-metallurgy references, cited and not reproduced. Heat input in kJ/mm, temperatures in degrees Celsius and thickness in millimetres, which is the notation this model is universally written in. The welding procedure specification, the carbon-equivalent screen, and a qualified welding engineer govern.",
+  example: weldCoolingRateT85Example.inputs,
+  fields: [
+    { key: "heat_input_kj_mm", label: "Heat input Q (kJ/mm, after process efficiency)", kind: "number" },
+    { key: "preheat_c", label: "Preheat / interpass temperature (deg C)", kind: "number", attrs: { step: "any" } },
+    { key: "thickness_mm", label: "Plate thickness (mm, the t8/5 model is metric)", kind: "number" },
+    { key: "f2", label: "Two-dimensional joint shape factor F2", kind: "number" },
+    { key: "f3", label: "Three-dimensional joint shape factor F3", kind: "number" },
+  ],
+  outputs: [
+    { key: "g", id: "wt85-out-g", label: "Governing cooling time", value: (r) => fmt(r.governing_s, 2) + " s" },
+    { key: "r", id: "wt85-out-r", label: "Regime", value: (r) => r.regime },
+    { key: "d", id: "wt85-out-d", label: "Three-dimensional value", value: (r) => fmt(r.t85_3d_s, 2) + " s" },
+    { key: "w", id: "wt85-out-w", label: "Two-dimensional value", value: (r) => fmt(r.t85_2d_s, 2) + " s" },
+    { key: "t", id: "wt85-out-t", label: "Transition thickness", value: (r) => fmt(r.transition_mm, 2) + " mm" },
+    { key: "n", id: "wt85-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWeldCoolingRateT85,
+});
+
+// ===================== spec-v1412: interpass temperature window =====================
+// dims: in { args: dimensionless } out: { idle_allowance_min: T, required_wait_min: T, temp_at_elapsed_f: T }
+export function computeInterpassTemperatureControl({ tau_min = 0, ambient_f = 70, preheat_min_f = 0, interpass_max_f = 0, current_temp_f = 0, restart_temp_f = 0, elapsed_min = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(tau_min > 0)) return { error: "Joint time constant must be positive." };
+  if (!Number.isFinite(ambient_f)) return { error: "Ambient temperature must be a finite number." };
+  if (!(preheat_min_f > ambient_f)) return { error: "The preheat minimum must be above ambient, or the joint never falls below it." };
+  if (!(interpass_max_f > preheat_min_f)) return { error: "The interpass maximum must be above the preheat minimum -- they are the two ends of one window." };
+  if (!(current_temp_f > ambient_f)) return { error: "The current joint temperature must be above ambient." };
+  if (!(restart_temp_f > ambient_f)) return { error: "The restart temperature must be above ambient." };
+  if (!(elapsed_min >= 0)) return { error: "Elapsed time cannot be negative." };
+  // Newtonian cooling toward ambient. tau is a property of THIS joint -- its mass, its
+  // section, its exposure -- and it has to be measured, not assumed.
+  const idle_allowance_min = current_temp_f > preheat_min_f
+    ? tau_min * Math.log((current_temp_f - ambient_f) / (preheat_min_f - ambient_f))
+    : 0;
+  const required_wait_min = interpass_max_f > restart_temp_f
+    ? tau_min * Math.log((interpass_max_f - ambient_f) / (restart_temp_f - ambient_f))
+    : 0;
+  const temp_at_elapsed_f = ambient_f + (current_temp_f - ambient_f) * Math.exp(-elapsed_min / tau_min);
+  const inside_window = current_temp_f >= preheat_min_f && current_temp_f <= interpass_max_f;
+  const status = inside_window
+    ? "inside the window: welding may proceed, with " + fmt(idle_allowance_min, 1) + " min of idle before the joint drops below preheat and has to be reheated"
+    : current_temp_f < preheat_min_f
+      ? "BELOW the preheat minimum: reheat before welding, or the procedure is violated and hydrogen cracking risk rises"
+      : "ABOVE the interpass maximum: wait before the next pass, or the cooling time stretches and grain growth costs toughness";
+  if (![idle_allowance_min, required_wait_min, temp_at_elapsed_f].every(Number.isFinite)) return { error: "Interpass-temperature math is not a finite value." };
+  return {
+    idle_allowance_min,
+    required_wait_min,
+    temp_at_elapsed_f,
+    inside_window,
+    status,
+    note: "How long a welder can stop before a joint needs reheating, and how long to wait after a pass that ran hot. Preheat and interpass are a window rather than two separate rules, and the welder lives inside it: below the preheat minimum, hydrogen cracking risk rises and the procedure is violated, and above the interpass maximum the cooling time stretches, grain growth costs toughness, and the procedure is violated in the other direction. Both limits come from the welding procedure specification. The two outputs answer the two questions that actually arise on a heavy weldment. The idle allowance is how long a welder can stop -- for a fit-up, for a grind, for a break -- before the joint drops below preheat, and it is usually shorter than people expect. The required wait is the other case: a pass ran hot, the joint is at or over the interpass maximum, and welding cannot resume until it comes down. A joint with a measured time constant of 12 min in a 70 F shop, on a procedure calling for 200 F preheat and a 500 F interpass maximum, gives about 6.9 min of idle after a pass that ended at 300 F, and about 14.4 min of waiting after a pass that ended at 500 F. Seven minutes is shorter than a lot of fit-up interruptions, which is why heavy weldments get blankets and why a torch stays lit next to the work; and fourteen minutes of standing still, on a joint with twenty passes, is nearly five hours of lost production if it happens every time. The time constant is a property of the specific joint -- its mass, its section, its exposure -- and it must be measured rather than assumed: timing one cooling interval with a contact pyrometer gives it, and the whole schedule follows. A scheduling aid; the welding procedure specification and a measured joint temperature govern.",
+  };
+}
+
+export const interpassTemperatureControlExample = { inputs: { tau_min: 12, ambient_f: 70, preheat_min_f: 200, interpass_max_f: 500, current_temp_f: 300, restart_temp_f: 200, elapsed_min: 10 } };
+
+FAB_RENDERERS["interpass-temperature-control"] = _simpleRenderer({
+  citation: "Citation: Newtonian cooling of a weld joint toward ambient, T(t) = ambient + (start - ambient) exp(-t/tau), applied to the preheat-minimum and interpass-maximum window the welding procedure specification sets, by name. The time constant is a property of the specific joint and is MEASURED, not bundled. The WPS and a measured joint temperature govern.",
+  example: interpassTemperatureControlExample.inputs,
+  fields: [
+    { key: "tau_min", label: "Measured joint time constant tau (min)", kind: "number" },
+    { key: "ambient_f", label: "Ambient temperature (F)", kind: "number", attrs: { step: "any" } },
+    { key: "preheat_min_f", label: "Preheat minimum from the WPS (F)", kind: "number" },
+    { key: "interpass_max_f", label: "Interpass maximum from the WPS (F)", kind: "number" },
+    { key: "current_temp_f", label: "Current or post-pass joint temperature (F)", kind: "number" },
+    { key: "restart_temp_f", label: "Target restart temperature (F)", kind: "number" },
+    { key: "elapsed_min", label: "Elapsed time to project (min, 0 to skip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "s", id: "iptc-out-s", label: "Current status", value: (r) => r.status },
+    { key: "i", id: "iptc-out-i", label: "Idle allowance before reheat", value: (r) => fmt(r.idle_allowance_min, 1) + " min" },
+    { key: "w", id: "iptc-out-w", label: "Wait after an over-temperature pass", value: (r) => fmt(r.required_wait_min, 1) + " min" },
+    { key: "t", id: "iptc-out-t", label: "Temperature at the elapsed time", value: (r) => fmt(r.temp_at_elapsed_f, 1) + " F" },
+    { key: "n", id: "iptc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeInterpassTemperatureControl,
+});

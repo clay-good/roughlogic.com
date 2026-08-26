@@ -104497,6 +104497,126 @@
    "term": "person hours for a carry out",
    "target": "litter-carry-team",
    "kind": "industry"
+  },
+  {
+   "term": "drill speed and feed",
+   "target": "drill-feed-thrust",
+   "kind": "industry"
+  },
+  {
+   "term": "drilling torque",
+   "target": "drill-feed-thrust",
+   "kind": "industry"
+  },
+  {
+   "term": "drill horsepower",
+   "target": "drill-feed-thrust",
+   "kind": "industry"
+  },
+  {
+   "term": "what rpm for a drill",
+   "target": "drill-feed-thrust",
+   "kind": "question"
+  },
+  {
+   "term": "band saw pitch",
+   "target": "band-saw-blade-pitch",
+   "kind": "industry"
+  },
+  {
+   "term": "blade tpi selection",
+   "target": "band-saw-blade-pitch",
+   "kind": "industry"
+  },
+  {
+   "term": "teeth in the cut",
+   "target": "band-saw-blade-pitch",
+   "kind": "industry"
+  },
+  {
+   "term": "what tpi for this material",
+   "target": "band-saw-blade-pitch",
+   "kind": "question"
+  },
+  {
+   "term": "tube bend thinning",
+   "target": "tube-bend-wall-thinning",
+   "kind": "industry"
+  },
+  {
+   "term": "wall thinning in a bend",
+   "target": "tube-bend-wall-thinning",
+   "kind": "industry"
+  },
+  {
+   "term": "bend ratio 3d",
+   "target": "tube-bend-wall-thinning",
+   "kind": "industry"
+  },
+  {
+   "term": "how much wall is lost in a bend",
+   "target": "tube-bend-wall-thinning",
+   "kind": "question"
+  },
+  {
+   "term": "counterbore depth",
+   "target": "counterbore-depth",
+   "kind": "industry"
+  },
+  {
+   "term": "thread engagement remaining",
+   "target": "counterbore-depth",
+   "kind": "industry"
+  },
+  {
+   "term": "socket head counterbore",
+   "target": "counterbore-depth",
+   "kind": "industry"
+  },
+  {
+   "term": "how deep to counterbore",
+   "target": "counterbore-depth",
+   "kind": "question"
+  },
+  {
+   "term": "weld cooling time",
+   "target": "weld-cooling-rate-t85",
+   "kind": "industry"
+  },
+  {
+   "term": "t8/5",
+   "target": "weld-cooling-rate-t85",
+   "kind": "industry"
+  },
+  {
+   "term": "cooling rate weld",
+   "target": "weld-cooling-rate-t85",
+   "kind": "industry"
+  },
+  {
+   "term": "thickness transition welding",
+   "target": "weld-cooling-rate-t85",
+   "kind": "industry"
+  },
+  {
+   "term": "interpass temperature window",
+   "target": "interpass-temperature-control",
+   "kind": "industry"
+  },
+  {
+   "term": "how long before reheat",
+   "target": "interpass-temperature-control",
+   "kind": "question"
+  },
+  {
+   "term": "preheat window welding",
+   "target": "interpass-temperature-control",
+   "kind": "industry"
+  },
+  {
+   "term": "time between weld passes",
+   "target": "interpass-temperature-control",
+   "kind": "industry"
   }
  ]
 }

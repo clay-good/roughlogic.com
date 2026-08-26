@@ -178,6 +178,13 @@ const RELATED = {
   "knurl-blank-diameter": ["cutting-speed-rpm", "tap-drill-size", "decimal-to-fraction"],
   "grinding-wheel-rpm": ["cutting-speed-rpm", "gear-mph-rpm", "hp-from-torque"],
   "reaming-drill-allowance": ["tap-drill-size", "drill-point-depth", "cutting-speed-rpm"],
+  // spec-v1402..v1412: the 2026-08-26 trade-expansion machining and fabrication band.
+  "drill-feed-thrust": ["cutting-speed-rpm","tap-drill-size","drill-point-depth"],
+  "band-saw-blade-pitch": ["machining-time","barstock-cutlist","cutting-speed-rpm"],
+  "tube-bend-wall-thinning": ["bend-allowance","multi-bend-flat-pattern","press-brake-tonnage"],
+  "counterbore-depth": ["tap-drill-size","reaming-drill-allowance","bolt-torque"],
+  "weld-cooling-rate-t85": ["weld-preheat-fuel","weld-passes-arc-time","interpass-temperature-control"],
+  "interpass-temperature-control": ["weld-cooling-rate-t85","weld-preheat-fuel","weld-passes-arc-time"],
   "taylor-tool-life": ["cutting-speed-rpm", "cutting-diameter-for-rpm", "tap-drill-size"],
   "cutting-diameter-for-rpm": ["cutting-speed-rpm", "drill-point-depth", "drill-point-angle-from-length"],
   "drill-point-depth": ["cutting-speed-rpm", "bolt-circle", "decimal-to-fraction"],

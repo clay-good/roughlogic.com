@@ -2141,6 +2141,7 @@ cross-check.
 | calc-fab.js | `computeConduitOffset` | `{ offset_in = 0, angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeConduitSaddle` | `{ mode = "three-point", depth_in = 0, preset = "45/22.5", width_in = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeFlangeBoltTorque` | `{ bolt_diameter_in = 0, thread_series = "UNC", bolt_count = 8, tensile_area_i...` | _ | _ | _ |
+| calc-fab.js | `computeInterpassTemperatureControl` | `{ tau_min = 0, ambient_f = 70, preheat_min_f = 0, interpass_max_f = 0, curren...` | _ | _ | _ |
 | calc-fab.js | `computeMinBendRadius` | `{ thickness_in = 0, elongation_pct = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeOxyfuelCuttingGas` | `{ oxygen_cfh, fuel_cfh, cut_length_in, cut_speed_ipm, oxygen_cyl_ft3 = 244, f...` | _ | _ | _ |
 | calc-fab.js | `computePipeFittingTakeout` | `{ reference = "center-to-center", dimension_in = 0, takeout_a_in = 0, takeout...` | _ | _ | _ |
@@ -2149,7 +2150,9 @@ cross-check.
 | calc-fab.js | `computeSheetMetalGauge` | `{ gauge = 0, material = "steel" } = {}` | _ | _ | _ |
 | calc-fab.js | `computeShieldingGasRuntime` | `{ flow_cfh, arc_on_min, cylinder_ft3, gas_cost = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeShrinkFit` | `{ nominal_dia_in = 0, interference_in = 0, clearance_in = 0, alpha_per_f = 0....` | _ | _ | _ |
+| calc-fab.js | `computeTubeBendWallThinning` | `{ od_in = 0, wall_in = 0, clr_in = 0, bend_angle_deg = 90 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeVesselHeadVolume` | `{ inside_diameter_in = 48, head_type = "elliptical", straight_flange_in = 0 }...` | _ | _ | _ |
+| calc-fab.js | `computeWeldCoolingRateT85` | `{ heat_input_kj_mm = 0, preheat_c = 20, thickness_mm = 0, f2 = 1.0, f3 = 1.0 ...` | _ | _ | _ |
 | calc-fab.js | `computeWeldCostPerFoot` | `{ deposit_lb_per_ft, deposition_eff_pct = 95, filler_cost_per_lb = 0, deposit...` | _ | _ | _ |
 | calc-fab.js | `computeWeldDepositComposition` | `{ dilution_pct = 0, base_pct = 0, filler_pct = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeWeldDilution` | `{ A_base = 0, A_filler = 0 } = {}` | _ | _ | _ |
@@ -2584,17 +2587,20 @@ cross-check.
 | calc-machining.js | `computeAcmeThreadDepth` | `{ major_dia_in = 0, tpi = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeBallnoseFeedCusp` | `{ r_in = 0.25, stepover_in = 0.03, feed_per_tooth_in = 0.004, rpm = 0, flutes...` | _ | _ | _ |
 | calc-machining.js | `computeBallnoseScallopHeight` | `{ r_in = 0, mode = "scallop-from-stepover", s_in = 0, h_in = 0 } = {}` | _ | _ | _ |
+| calc-machining.js | `computeBandSawBladePitch` | `{ thickness_in_cut_in = 0, blade_speed_sfm = 0, wheel_diameter_in = 0, cut_ar...` | _ | _ | _ |
 | calc-machining.js | `computeBearingEquivalentLoad` | `{ radial_load_lbf = 0, thrust_load_lbf = 0, static_rating_lbf = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeBearingL10Life` | `{ dynamic_rating_lbf = 0, equivalent_load_lbf = 0, speed_rpm = 0, bearing_typ...` | _ | _ | _ |
 | calc-machining.js | `computeBearingMaxLoad` | `{ dynamic_rating_lbf = 0, target_life_hr = 0, speed_rpm = 0, bearing_type = "...` | _ | _ | _ |
 | calc-machining.js | `computeBoringBarDeflection` | `{ d_in = 0, l_in = 0, f_lb = 0, e_psi = 30e6 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeBoringBarMaxOverhang` | `{ d_in = 0, f_lb = 0, allowable_deflection_in = 0, e_psi = 30e6 } = {}` | _ | _ | _ |
+| calc-machining.js | `computeCounterboreDepth` | `{ screw_diameter_in = 0, head_height_in = 0, below_flush_in = 0.015, plate_th...` | _ | _ | _ |
 | calc-machining.js | `computeCountersinkDepth` | `{ countersink_dia_in = 0, included_angle_deg = 82, pilot_hole_dia_in = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeCountersinkDiameterFromDepth` | `{ plunge_depth_in = 0, included_angle_deg = 82, pilot_hole_dia_in = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeCuttingDiameterForRpm` | `{ surface_speed_sfm = 0, target_rpm = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeCuttingFluidConcentration` | `{ brix_reading = 0, refractometer_factor = 0, sump_volume_gal = 0, target_pct...` | _ | _ | _ |
 | calc-machining.js | `computeCuttingSpeed` | `{ surface_speed_sfm = 0, diameter_in = 0, num_flutes = 0, chip_load_in = 0 } ...` | _ | _ | _ |
 | calc-machining.js | `computeDiskClutchTorque` | `{ clamp_force_lbf = 0, friction_coefficient = 0.3, outer_radius_in = 0, inner...` | _ | _ | _ |
+| calc-machining.js | `computeDrillFeedThrust` | `{ diameter_in = 0, sfm = 0, feed_ipr = 0, unit_power = 1.0, spindle_efficienc...` | _ | _ | _ |
 | calc-machining.js | `computeDrillPointAngleFromLength` | `{ diameter_in = 0, point_length_in = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeDrillPointDepth` | `{ diameter_in = 0, point_angle_deg = 118, full_depth_in = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeEnduranceLimitMarin` | `{ ultimate_strength_psi = 0, surface_finish = "machined", diameter_in = 1, lo...` | _ | _ | _ |
@@ -3425,7 +3431,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2011.
+Row count: 2017.
 
 <!-- END function-corpus-v14 -->
 
@@ -4065,7 +4071,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (466 tiles)
+### Group E Construction (469 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4262,6 +4268,7 @@ per spec-v14 §13.1 second paragraph.
 | `ice-barrier-coverage` | Eave Ice-Barrier Membrane Courses and Rolls | IRC R905.1.2 eave ice-barrier extent ...; spec-v215 section 2.1 pinned example (typical 4/12, 12 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `insulation-batt-coverage` | Insulation Batt Coverage and Count | manufacturer label; spec-v439 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `intermittent-fillet-weld` | Intermittent Fillet Weld Schedule (AISC J2 / AWS) | AISC 360 J2.2b / AWS D1.1; spec-v453 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `interpass-temperature-control` | Interpass Temperature Window and Time Between Passes | Project (first-principles); tau x ln((T1 - ambient)/(T2 - ambient)) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `joist-cantilever-check` | Joist / Deck Cantilever Ratio Check (IRC R507.6) | joist cantilever ratio (IRC R507.6); max = 10/4 = 2.5; overhang 3 > 2.5 -> EXCEEDS (margin -0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `joist-deflection` | Joist Mid-Span Deflection | Project (first-principles); 50 plf / 12 ft span / E 1.6e6 psi / I 47.6 in^4 (typical ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `joist-hanger-count` | Joist Hanger and Connector-Nail Count | Joist-hanger count identity (first-pr...; joists = ceil(16*12/16)+1 = 13; hangers = 13*2 = 26; nail... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -4490,6 +4497,7 @@ per spec-v14 §13.1 second paragraph.
 | `tile-count` | Tile Count and Grout Volume | Project (first-principles); 100 ft^2 with 12x12 tiles, default 1/8 in grout, 10% wast... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `traffic-taper-length` | Work-Zone Merging Taper Length and Device Count (MUTCD) | MUTCD merging-taper identity (public-...; S >= 45: L = 12*55 = 660 ft; devices = ceil(660/40)+1 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `trim-linear-footage` | Trim Linear Footage and Miters | finish-carpentry practice; spec-v440 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `tube-bend-wall-thinning` | Tube Bend Wall Thinning and Bend Ratio | Project (first-principles); wall x CLR / (CLR + OD/2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `turning-clear-floor-space` | Turning Space and Clear Floor Space (2010 ADA Standards 304, 305) | US Department of Justice / US Access ...; 305.3 gives 30 in by 48 in and 305.5 requires it 'positio... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `unit-cost-earthwork` | Earthwork Production Unit Cost | Production unit-cost identity (first-...; hourly = 150+65 = 215; unit cost = 215/656 = $0.328/cy | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `valley-flashing-takeoff` | Valley Flashing Takeoff (Metal, Pieces, Ice Barrier) | framing-square 17-inch rule; 6:12 gives sqrt(36+288)/12 = sqrt(324)/12 = 18/12 = exact... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4502,6 +4510,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-cement-ratio` | Water-Cementitious Ratio and Exposure Cap (ACI 318) | ACI 318 Table 19.3.2.1; ACI 211.1 (wa...; 282 lb water / (470 cement + 94 fly ash = 564) = 0.50, ex... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-closet-location` | Water Closet Location and Seat Height (2010 ADA Standards 604) | US Department of Justice / US Access ...; 604.2: 'The centerline of the water closet shall be 16 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-for-compaction` | Water to Reach Optimum Moisture for Compaction | Gravimetric water-content identity (f...; dry weight = 100*27*105 = 283,500 lb; water = 0.05*283,50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `weld-cooling-rate-t85` | Weld Cooling Time and the Thickness Transition | Project (first-principles); 2D and 3D heat flow, and the transition | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `weld-cost-per-foot` | All-In Welding Cost per Foot | AWS welding cost and consumable refer...; 0.10 lb/ft, 95% eff, $2.50/lb, 8 lb/hr, 30% factor, $65/h... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `weld-deposit-composition` | Diluted Weld Deposit Composition | welding metallurgy / AWS (dilution mi...; deposit% = D x base% + (1 - D) x filler% = 0.30 x 0 + 0.7... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `weld-dilution` | Weld Dilution Ratio | welding metallurgy / AWS; spec-v356 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4761,7 +4770,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (135 tiles)
+### Group K Mechanic (138 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4774,6 +4783,7 @@ per spec-v14 §13.1 second paragraph.
 | `ballnose-feed-cusp` | Ballnose Feed-Direction Cusp and the Governing Finish | ballnose cusp geometry (CAM / mold ma...; R = 0.25 in. Across the passes at a 0.030 in stepover: h ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ballnose-scallop-height` | Ballnose Milling Scallop Height from Stepover | Ballnose scallop geometry; spec-v319 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `band-brake-torque` | Band Brake / Capstan Torque | Project (first-principles); T1 = T2 e^(mu theta) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `band-saw-blade-pitch` | Band Saw Blade Pitch, Speed, and Cut Time | Project (first-principles); three to twenty-four teeth in the cut | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bearing-equivalent-load` | Rolling-Bearing Dynamic Equivalent Load P (ISO 281) | Project (first-principles); P = X Fr + Y Fa | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bearing-l10-life` | Rolling-Bearing L10 Rating Life (ISO 281) | ISO 281 basic rating life; spec-v504 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bearing-max-load` | Max Bearing Load for a Target L10 Life | ISO 281 basic rating life (inverse); spec-v672 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4787,6 +4797,7 @@ per spec-v14 §13.1 second paragraph.
 | `chamber-cc-for-cr` | Chamber Volume for a Target Compression Ratio | SAE engine-geometry identities (inverse); 4.0 x 3.48 in cylinder, 10.73:1 target, 4.1 gasket bore /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `climb-gradient-roc` | Climb Gradient to Rate of Climb | FAA TERPS / AIM (departure climb grad...; 300 ft/nm gradient at 120 kt -> 300 x 120 / 60 = 600 ft/m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cooling-system-flow` | Cooling-System Coolant Flow for a Heat Load | heat-transfer first principles; spec-v398 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `counterbore-depth` | Counterbore Depth and Thread Engagement Left | Project (first-principles); one diameter of engagement into steel | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `countersink-depth` | Countersink Diameter and Cutting Depth | Machinery's Handbook countersinking; spec-v509 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `countersink-diameter-from-depth` | Countersink Diameter from a Plunge Depth | Machinery's Handbook countersinking (...; spec-v733 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `crosswind-component` | Crosswind and Headwind Component | runway wind-component resolution (FAA...; spec-v501 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4800,6 +4811,7 @@ per spec-v14 §13.1 second paragraph.
 | `displacement-cr` | Engine Displacement and Compression Ratio | Project (first-principles) over stand...; 4.0 bore / 3.48 stroke / 8 cyl / 64 cc chamber / 4.1 gask... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dividing-head` | Dividing-Head Simple Indexing | First-principles indexing arithmetic ...; N 9 on a 40:1 head -> 4 turns + 4/9; on a 54-hole circle ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dovetail-over-pins` | Dovetail Slide Measurement Over Rods | Machinery's Handbook (Checking a Dove...; k = 0.500 x (1 + cot(30 deg)) = 0.500 x (1 + 1.73205) = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `drill-feed-thrust` | Drill Speed, Feed, Power, and Torque | Project (first-principles); RPM = 3.82 SFM / D; torque = 63,025 hp / RPM | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `drill-point-angle-from-length` | Drill Point Angle from Tip Length | First-principles drill-point geometry...; 0.5-in drill, 0.15-in tip -> 118.1-deg point (59.0-deg lip) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `drill-point-depth` | Drill Point Depth | First-principles drill-point geometry...; 0.5-in drill, 118-deg point, 1.0-in full depth -> 0.1502-... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `driveshaft-crit` | Driveshaft Critical Speed | Project (first-principles) over Spice...; 3.5 in OD / 0.083 in wall / 48 in long / steel -> 9823 rp... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5358,6 +5370,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1760. Fixture-covered or reference-cadence: 1760 / 1760.
+Tile count: 1766. Fixture-covered or reference-cadence: 1766 / 1766.
 
 <!-- END tile-index-v14 -->

@@ -5602,6 +5602,18 @@
     {"term":"f m from unit strength method","target":"masonry-prism-fm","kind":"question"},
     {"term":"net area masonry strength","target":"masonry-prism-fm","kind":"question"},
     {"term":"tms 602 fm table","target":"masonry-prism-fm","kind":"question"},
-    {"term":"masonry prism strength","target":"masonry-prism-fm","kind":"question"}
+    {"term":"masonry prism strength","target":"masonry-prism-fm","kind":"question"},
+    {"term":"tube bend thinning","target":"tube-bend-wall-thinning","kind":"industry"},
+    {"term":"wall thinning in a bend","target":"tube-bend-wall-thinning","kind":"industry"},
+    {"term":"bend ratio 3d","target":"tube-bend-wall-thinning","kind":"industry"},
+    {"term":"how much wall is lost in a bend","target":"tube-bend-wall-thinning","kind":"question"},
+    {"term":"weld cooling time","target":"weld-cooling-rate-t85","kind":"industry"},
+    {"term":"t8/5","target":"weld-cooling-rate-t85","kind":"industry"},
+    {"term":"cooling rate weld","target":"weld-cooling-rate-t85","kind":"industry"},
+    {"term":"thickness transition welding","target":"weld-cooling-rate-t85","kind":"industry"},
+    {"term":"interpass temperature window","target":"interpass-temperature-control","kind":"industry"},
+    {"term":"how long before reheat","target":"interpass-temperature-control","kind":"question"},
+    {"term":"preheat window welding","target":"interpass-temperature-control","kind":"industry"},
+    {"term":"time between weld passes","target":"interpass-temperature-control","kind":"industry"}
   ]
 }

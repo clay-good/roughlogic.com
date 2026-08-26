@@ -2137,3 +2137,233 @@ function _v1128renderBallnoseFeedCusp(inputRegion, outputRegion, citationEl) {
   for (const f of [r, s, fz, n, z]) f.input.addEventListener("input", update);
 }
 MACHINING_RENDERERS["ballnose-feed-cusp"] = _v1128renderBallnoseFeedCusp;
+
+// ===========================================================================
+// spec-v1402, v1403, v1405: the machining third of the 2026-08-26
+// trade-expansion Group E band. See specs/scope-trade-expansion.md.
+// (Tube bending and the two welding tiles live in calc-fab.js.)
+// ===========================================================================
+
+// Compact renderer factory, copied from the sibling calc-firesprinkler.js
+// factory (number and select inputs; same schema shape). Non-exported, so it
+// adds no v14 derivation-corpus row.
+function _simpleRenderer(spec) {
+  const _rlRender = function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      let field;
+      if (f.kind === "select") field = makeSelect(f.label, f.id || f.key, f.options);
+      else field = makeNumber(f.label, f.id || f.key, f.attrs || { step: "any", min: "0" });
+      fields[f.key] = field;
+      if (f.default !== undefined) {
+        if (f.kind === "select") field.select.value = f.default;
+        else field.input.value = String(f.default);
+      }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key];
+        else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) {
+        if (f.kind === "select") params[f.key] = fields[f.key].select.value;
+        else params[f.key] = Number(fields[f.key].input.value) || 0;
+      }
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) {
+      const el = f.kind === "select" ? fields[f.key].select : fields[f.key].input;
+      el.addEventListener(f.kind === "select" ? "change" : "input", update);
+    }
+  };
+
+  _rlRender.schema = {
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
+    citation: spec.citation ?? null,
+    scope: spec.scope ?? null,
+  };
+  return _rlRender;
+}
+
+// ===================== spec-v1402: drill speed, feed, power, and torque =====================
+// dims: in { args: dimensionless } out: { rpm: T^-1, feed_ipm: L T^-1, removal_rate_cipm: L^3 T^-1, torque_in_lb: M L^2 T^-2 }
+export function computeDrillFeedThrust({ diameter_in = 0, sfm = 0, feed_ipr = 0, unit_power = 1.0, spindle_efficiency = 0.8 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(diameter_in > 0)) return { error: "Drill diameter must be positive." };
+  if (!(sfm > 0)) return { error: "Surface speed must be positive." };
+  if (!(feed_ipr > 0)) return { error: "Feed per revolution must be positive." };
+  if (!(unit_power > 0)) return { error: "Unit power must be positive." };
+  if (!(spindle_efficiency > 0 && spindle_efficiency <= 1)) return { error: "Spindle efficiency must be between 0 and 1." };
+  // A drill cuts the ENTIRE circle, so it removes far more per minute than an end mill of
+  // the same diameter -- and its torque rises with the SQUARE of diameter at constant SFM.
+  const rpm = 3.82 * sfm / diameter_in;
+  const feed_ipm = feed_ipr * rpm;
+  const removal_rate_cipm = Math.PI * (diameter_in / 2) ** 2 * feed_ipm;
+  const power_at_cut_hp = removal_rate_cipm * unit_power;
+  const motor_power_hp = power_at_cut_hp / spindle_efficiency;
+  const torque_in_lb = 63025 * power_at_cut_hp / rpm;
+  if (![rpm, feed_ipm, removal_rate_cipm, power_at_cut_hp, motor_power_hp, torque_in_lb].every(Number.isFinite)) return { error: "Drilling math is not a finite value." };
+  return {
+    rpm,
+    feed_ipm,
+    removal_rate_cipm,
+    power_at_cut_hp,
+    motor_power_hp,
+    torque_in_lb,
+    note: "Spindle speed, feed rate, power, and torque for a drilling operation. Drilling is fed in inches per REVOLUTION rather than per tooth, because a drill's two lips both cut on the same revolution and the feed per revolution is what sets the chip thickness on each -- which is the difference between this and a milling speeds-and-feeds calculation. The removal rate is the full hole cross-section times the feed rate, since a drill cuts the entire circle, and that is why a drill of a given diameter removes far more material per minute than an end mill of the same diameter. The torque line is the one that matters on a hand-fed machine or a mag drill. Power is modest and torque is not: a half-inch drill in mild steel at 80 surface feet per minute and 0.006 in per revolution turns 611 rpm, feeds 3.67 in/min, removes 0.72 cubic inches a minute, takes 0.72 hp at the cut and 0.90 at the motor, and produces 74 in-lb of spindle torque. Torque rises with the SQUARE of diameter at constant surface speed and feed per revolution, so a one-inch drill at the same settings takes four times the torque -- which is why a drill press that handles a half-inch bit throws the work out of the vise with a one-inch one, and why the workholding rather than the motor is usually the real limit. A shop estimate; the tool manufacturer's published speeds and feeds, the machine's rating, and the workholding govern.",
+  };
+}
+
+export const drillFeedThrustExample = { inputs: { diameter_in: 0.500, sfm: 80, feed_ipr: 0.006, unit_power: 1.0, spindle_efficiency: 0.80 } };
+
+MACHINING_RENDERERS["drill-feed-thrust"] = _simpleRenderer({
+  citation: "Citation: drilling speed and feed from the standard shop relations -- RPM = 3.82 SFM / D, feed rate = IPR x RPM, removal rate = the full hole area x feed rate -- with power from the material's unit power and torque = 63,025 x hp / RPM, by name (Machinery's Handbook method). Feed is per REVOLUTION, not per tooth. The tool manufacturer's published speeds and feeds, the machine's rating, and the workholding govern.",
+  example: drillFeedThrustExample.inputs,
+  fields: [
+    { key: "diameter_in", label: "Drill diameter (in)", kind: "number" },
+    { key: "sfm", label: "Surface speed (SFM)", kind: "number" },
+    { key: "feed_ipr", label: "Feed per revolution (in)", kind: "number" },
+    { key: "unit_power", label: "Unit power for the material (hp per cubic in/min)", kind: "number" },
+    { key: "spindle_efficiency", label: "Spindle efficiency (0-1)", kind: "number" },
+  ],
+  outputs: [
+    { key: "r", id: "drft-out-r", label: "Spindle speed", value: (r) => fmt(r.rpm, 0) + " rpm" },
+    { key: "f", id: "drft-out-f", label: "Feed rate", value: (r) => fmt(r.feed_ipm, 3) + " in/min" },
+    { key: "m", id: "drft-out-m", label: "Material removal rate", value: (r) => fmt(r.removal_rate_cipm, 3) + " cubic in/min" },
+    { key: "p", id: "drft-out-p", label: "Power", value: (r) => fmt(r.power_at_cut_hp, 2) + " hp at the cut, " + fmt(r.motor_power_hp, 2) + " hp at the motor" },
+    { key: "t", id: "drft-out-t", label: "Spindle torque", value: (r) => fmt(r.torque_in_lb, 1) + " in-lb" },
+    { key: "n", id: "drft-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDrillFeedThrust,
+});
+
+// ===================== spec-v1403: band saw blade pitch, speed, and cut time =====================
+// dims: in { args: dimensionless } out: { min_tpi: dimensionless, max_tpi: dimensionless, wheel_rpm: T^-1, cut_time_min: T }
+export function computeBandSawBladePitch({ thickness_in_cut_in = 0, blade_speed_sfm = 0, wheel_diameter_in = 0, cut_area_sqin = 0, feed_sqin_per_min = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(thickness_in_cut_in > 0)) return { error: "Section thickness in the cut must be positive." };
+  if (!(blade_speed_sfm > 0)) return { error: "Blade speed must be positive." };
+  if (!(wheel_diameter_in > 0)) return { error: "Wheel diameter must be positive." };
+  if (!(cut_area_sqin > 0)) return { error: "Cut cross-sectional area must be positive." };
+  if (!(feed_sqin_per_min > 0)) return { error: "Feed rate must be positive." };
+  // Between THREE and TWENTY-FOUR teeth must be in the cut. Fewer and a tooth straddles the
+  // work and strips; more and the chips pack with no gullet space and the teeth rub.
+  const min_tpi = 3 / thickness_in_cut_in;
+  const max_tpi = 24 / thickness_in_cut_in;
+  const wheel_rpm = blade_speed_sfm * 12 / (Math.PI * wheel_diameter_in);
+  const cut_time_min = cut_area_sqin / feed_sqin_per_min;
+  const cut_time_sec = cut_time_min * 60;
+  // The finest common bimetal pitch is an 18/24 variable, so a minimum requirement past
+  // 24 TPI cannot be met by any blade a shop actually stocks.
+  const practical = min_tpi <= 24
+    ? "a blade between " + fmt(min_tpi, 1) + " and " + fmt(Math.min(max_tpi, 24), 1) + " TPI satisfies the rule; a variable pitch spanning that band is the usual choice"
+    : "NO stocked blade satisfies the three-teeth rule on a section this thin -- the minimum of " + fmt(min_tpi, 0) + " TPI is finer than the 18/24 variable that is the finest common pitch, so the work has to be bundled or nested, or cut with a fine pitch at reduced feed as an accepted compromise";
+  if (![min_tpi, max_tpi, wheel_rpm, cut_time_min].every(Number.isFinite)) return { error: "Band-saw math is not a finite value." };
+  return {
+    min_tpi,
+    max_tpi,
+    wheel_rpm,
+    cut_time_min,
+    cut_time_sec,
+    practical,
+    note: "The blade pitch a band saw cut needs, the wheel speed that gives the blade speed, and how long the cut takes. The whole pitch rule is that between three and twenty-four teeth must be engaged in the cut at any moment. Fewer than three and a tooth can straddle the work, catch a corner, and strip, which is how a blade dies on thin-wall tube in a single stroke. More than twenty-four and there is no gullet space for the chip, so the chips pack, the teeth rub instead of cutting, and the work hardens ahead of the blade, which is how a blade dies on stainless. Because the tooth count depends on the THICKNESS IN THE CUT rather than on the part's overall size, the answer changes continuously through a cut on a round bar or a tube -- which is exactly why variable-pitch blades exist and why they are the default for mixed work. A 2.0 in solid round wants between 1.5 and 12 TPI, so a 4/6 variable sits comfortably inside the band, and at 250 surface feet per minute on 12 in wheels the wheels turn 79.6 rpm and a 3.14 sq in cut at 5 sq in per minute takes 38 seconds. Now cut 2.0 in square tube with a 0.120 in wall: the thickness in the cut is the wall, so the band becomes 25 to 200 TPI and there is no such blade. That is the real lesson -- thin wall cannot satisfy the minimum-three-teeth rule with any practical pitch on its own, which is why thin tube gets bundled, nested, or cut fine and slow as a compromise. A selection aid; the blade manufacturer's pitch chart and the machine's own feed capability govern.",
+  };
+}
+
+export const bandSawBladePitchExample = { inputs: { thickness_in_cut_in: 2.0, blade_speed_sfm: 250, wheel_diameter_in: 12, cut_area_sqin: 3.1416, feed_sqin_per_min: 5 } };
+
+MACHINING_RENDERERS["band-saw-blade-pitch"] = _simpleRenderer({
+  citation: "Citation: the three-to-twenty-four-teeth-in-the-cut band saw pitch rule, by name -- standard sawing practice published in every blade manufacturer's selection chart, cited not reproduced. Wheel RPM = blade SFM x 12 / (pi x wheel diameter); cut time = cut area / feed in square inches per minute. The blade manufacturer's pitch chart and the machine's feed capability govern.",
+  example: bandSawBladePitchExample.inputs,
+  fields: [
+    { key: "thickness_in_cut_in", label: "Section thickness in the cut (in, the wall on a tube)", kind: "number" },
+    { key: "blade_speed_sfm", label: "Blade speed for the material (SFM)", kind: "number" },
+    { key: "wheel_diameter_in", label: "Wheel diameter (in)", kind: "number" },
+    { key: "cut_area_sqin", label: "Cut cross-sectional area (sq in)", kind: "number" },
+    { key: "feed_sqin_per_min", label: "Achievable feed (sq in per min)", kind: "number" },
+  ],
+  outputs: [
+    { key: "t", id: "bsbp-out-t", label: "Pitch band", value: (r) => fmt(r.min_tpi, 1) + " to " + fmt(r.max_tpi, 1) + " TPI" },
+    { key: "p", id: "bsbp-out-p", label: "Against practical blades", value: (r) => r.practical },
+    { key: "w", id: "bsbp-out-w", label: "Wheel speed", value: (r) => fmt(r.wheel_rpm, 1) + " rpm" },
+    { key: "c", id: "bsbp-out-c", label: "Cut time", value: (r) => fmt(r.cut_time_min, 2) + " min (" + fmt(r.cut_time_sec, 0) + " s)" },
+    { key: "n", id: "bsbp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeBandSawBladePitch,
+});
+
+// ===================== spec-v1405: counterbore depth and remaining material =====================
+// dims: in { args: dimensionless } out: { counterbore_depth_in: L, remaining_thickness_in: L, required_engagement_in: L, shortfall_in: L }
+export function computeCounterboreDepth({ screw_diameter_in = 0, head_height_in = 0, below_flush_in = 0.015, plate_thickness_in = 0, engagement_multiplier = 1.0, tapped_part = "yes" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Accepts the renderer's "yes"/"no" and a programmatic caller's boolean alike.
+  const in_tapped_part = tapped_part !== "no" && tapped_part !== false;
+  if (!(screw_diameter_in > 0)) return { error: "Screw nominal diameter must be positive." };
+  if (!(head_height_in > 0)) return { error: "Head height must be positive." };
+  if (!(below_flush_in >= 0)) return { error: "Clearance below flush cannot be negative." };
+  if (!(plate_thickness_in > 0)) return { error: "Plate thickness must be positive." };
+  if (!(engagement_multiplier > 0)) return { error: "Engagement multiplier must be positive." };
+  // Every thousandth of counterbore comes out of the material below -- and when the bore is
+  // in the TAPPED part it comes straight out of the thread engagement.
+  const counterbore_depth_in = head_height_in + below_flush_in;
+  const remaining_thickness_in = plate_thickness_in - counterbore_depth_in;
+  if (!(remaining_thickness_in > 0)) {
+    return { error: "The counterbore is deeper than the plate: the bore would break through." };
+  }
+  const required_engagement_in = engagement_multiplier * screw_diameter_in;
+  const available_engagement_in = in_tapped_part ? remaining_thickness_in : plate_thickness_in;
+  const shortfall_in = Math.max(0, required_engagement_in - available_engagement_in);
+  const passes = available_engagement_in >= required_engagement_in;
+  const minimum_thickness_in = in_tapped_part ? counterbore_depth_in + required_engagement_in : required_engagement_in;
+  const verdict = passes
+    ? "PASSES with " + fmt(available_engagement_in - required_engagement_in, 3) + " in of engagement to spare"
+    : "FAILS by " + fmt(shortfall_in, 3) + " in: the joint will strip its threads before the bolt yields. Take the tapped part to at least " + fmt(minimum_thickness_in, 3) + " in, or move the counterbore into a separate clearance plate so the tapped part keeps its full thickness";
+  if (![counterbore_depth_in, remaining_thickness_in, required_engagement_in, shortfall_in].every(Number.isFinite)) return { error: "Counterbore math is not a finite value." };
+  return {
+    counterbore_depth_in,
+    remaining_thickness_in,
+    required_engagement_in,
+    available_engagement_in,
+    shortfall_in,
+    passes,
+    minimum_thickness_in,
+    verdict,
+    note: "How deep a counterbore goes, and what it leaves behind for the threads. The bore itself is arithmetic: the head has to end up flush or a chosen amount below flush, so the counterbore goes as deep as the head is tall plus that clearance, and fifteen thousandths below flush is a common choice -- enough that the head is definitively under the surface, little enough that a driver still reaches it. The second half is where a design gets caught. Every thousandth of counterbore is a thousandth taken out of the material below, and when the counterbore is in the TAPPED part rather than in a clearance plate it comes straight out of the thread engagement. Steel wants about one diameter of engagement, cast iron about one and a half, and aluminum two or more, and a counterbore that leaves less than that has quietly turned a strong joint into one that strips its threads before the bolt yields. A half-inch socket head cap screw with a 0.500 in tall head, counterbored 0.015 in below flush in a 0.750 in steel plate, uses 0.515 in of the plate and leaves 0.235 in against a 0.500 in requirement -- three quarters of an inch of plate looked like plenty and the bore ate two thirds of it. The fixes are a thicker tapped part, or moving the counterbore into a separate clearance plate, which is what a properly detailed joint does. A design check; the fastener standard's head dimensions, the material's own thread strength, and the engineer of record govern.",
+  };
+}
+
+export const counterboreDepthExample = { inputs: { screw_diameter_in: 0.500, head_height_in: 0.500, below_flush_in: 0.015, plate_thickness_in: 0.750, engagement_multiplier: 1.0, tapped_part: "yes" } };
+
+MACHINING_RENDERERS["counterbore-depth"] = _simpleRenderer({
+  citation: "Citation: counterbore depth from head height plus the clearance below flush, checked against the thread engagement the material needs (about 1.0 diameter into steel, 1.5 into cast iron, 2.0 or more into aluminum), by name -- standard machine-design practice; the multiplier is entered rather than bundled. The fastener standard's head dimensions and the engineer of record govern.",
+  example: counterboreDepthExample.inputs,
+  fields: [
+    { key: "screw_diameter_in", label: "Screw nominal diameter (in)", kind: "number" },
+    { key: "head_height_in", label: "Head height (in)", kind: "number" },
+    { key: "below_flush_in", label: "Clearance below flush (in)", kind: "number" },
+    { key: "plate_thickness_in", label: "Plate thickness (in)", kind: "number" },
+    { key: "engagement_multiplier", label: "Engagement multiplier (1.0 steel, 1.5 cast iron, 2.0 aluminum)", kind: "number" },
+    { key: "tapped_part", label: "The counterbore is in the tapped part", kind: "select", options: [{ value: "yes", label: "Yes -- the bore eats the thread engagement" }, { value: "no", label: "No -- it is a separate clearance plate" }] },
+  ],
+  outputs: [
+    { key: "d", id: "cbdp-out-d", label: "Counterbore depth", value: (r) => fmt(r.counterbore_depth_in, 3) + " in" },
+    { key: "r", id: "cbdp-out-r", label: "Remaining thickness below the bore", value: (r) => fmt(r.remaining_thickness_in, 3) + " in" },
+    { key: "e", id: "cbdp-out-e", label: "Thread engagement", value: (r) => fmt(r.available_engagement_in, 3) + " in available against " + fmt(r.required_engagement_in, 3) + " in required" },
+    { key: "v", id: "cbdp-out-v", label: "Against the engagement requirement", value: (r) => r.verdict },
+    { key: "n", id: "cbdp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCounterboreDepth,
+});

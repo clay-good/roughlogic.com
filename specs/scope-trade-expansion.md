@@ -151,4 +151,5 @@ renames an id, or moves a tile between groups.
 | Trucking and logistics (Group J) | v1377-v1385 | **landed 2026-08-26**, 9 tiles; catalog 1,736 -> 1,745 |
 | Fire-ground and fire protection (Group F) | v1386-v1393 | **landed 2026-08-26**, 8 tiles; catalog 1,745 -> 1,753 |
 | Field, survey, and SAR (Group P) | v1394-v1401 | **landed 2026-08-26**, 7 tiles (v1399 cut, see below); catalog 1,753 -> 1,760 |
-| Every other band | v1402-v1449 | not yet built |
+| Machining, fabrication, welding | v1402-v1405, v1410, v1412 | **landed 2026-08-26**, 6 tiles; catalog 1,760 -> 1,766 |
+| Every other band | v1406-v1409, v1411, v1413-v1449 | not yet built |
