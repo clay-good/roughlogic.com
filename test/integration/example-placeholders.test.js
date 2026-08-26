@@ -37,6 +37,25 @@ const REFERENCE_TILES = new Set([
   "tool-maintenance", "triage-quickread", "water-classes",
 ]);
 
+// KNOWN BLIND SPOT, measured 2026-08-26. This sweep reads each view 25 ms
+// after opening it, which is right for the button and the field values but
+// cannot see an answer that arrives LATE. A worker-backed tile
+// (manual-j-cooling posts to manual-j-worker.js) answers about 2 SECONDS
+// after open in a real browser -- and at 1,700 tiles a 2 s settle per view
+// would take an hour, so the sweep cannot simply wait.
+//
+// Worse, the behaviour does not reproduce here at all: under Playwright the
+// same tile shows NO answer even at 4 s, with no console error and no failed
+// request, while a real browser shows it on 8 opens out of 8. Three attempts
+// to make this gate catch it -- stability polling, never-settle-on-empty, and
+// a targeted 2.6 s pass over the async tiles derived from source -- all
+// passed against a build with the bug deliberately restored.
+//
+// So: a green run here does NOT prove an async tile opens blank. That class
+// was caught by hand (open the tile 8x in a browser, read `.output-region`)
+// and is guarded at the source instead, by the reader-driven stop condition
+// in primeExamplePlaceholders. If you change that guard, verify it the same
+// way; this test will not tell you.
 test("every calculator offers its worked example, and answers nothing until asked", async ({ page }) => {
   // A 1,709-view hash sweep, not a 3x nudge on the default budget.
   test.setTimeout(300_000);
