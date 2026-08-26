@@ -26,7 +26,7 @@
 import { readFile, readdir, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { gzipSync } from "node:zlib";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -408,4 +408,12 @@ async function main() {
   );
 }
 
-await main();
+// Run the sweep only when this file IS the command, not when a test imports
+// `answerRows` / `soleNumber` from it. `await main()` at module scope used to
+// fire on import, and main() exits 1 when dist/ is missing -- which is the
+// normal state in CI's `test` job, since that job runs the unit tests BEFORE
+// the build. The gate passed locally (a dist/ was lying around) and failed on
+// the runner.
+if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
+  await main();
+}
