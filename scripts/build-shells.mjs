@@ -322,6 +322,28 @@ const KEY_UNITS = new Map(Object.entries({
   ft2: "ft\u00b2", ft3: "ft\u00b3", sqin: "sq in", sqft: "ft\u00b2", in2: "in\u00b2", in3: "in\u00b3", in4: "in\u2074",
   fpm: "fpm", fps: "fps", mph: "mph", rpm: "RPM", kt: "kt", sabins: "sabins",
   kipft: "kip-ft", ftlb: "ft-lb", inlb: "in-lb", ftkip: "ft-kip", sy: "SY", therms: "therms", acres: "acres",
+  // Unambiguous multi-letter units the table was missing, so their keys read
+  // back with the unit glued on as a lowercase word and the answer beside it
+  // looking unitless: "Pag db = 14", "Resistance ohm = 241458", "Run time sec
+  // = 300". `ohms` was already here; the singular was not.
+  //
+  // Deliberately NOT added: the single letters a / f / v / w / m / l. The
+  // catalog uses CASE to disambiguate those (`_A` is amps, `_F` is degrees,
+  // both in KEY_UNITS_CASED), and the lower-case tails are not units often
+  // enough to matter -- checked, not assumed: `cramers_v` is Cramer's V, an
+  // effect size, not volts, and `aspect_w` is a WIDTH, not watts. One bad
+  // label is worse than a plain one. Also not `min` -- it means "minimum" far
+  // more often than "minutes" (`conductor_min_A`) -- nor `acre`, which reads
+  // correctly already in `seeds_per_acre`.
+  //
+  // And emphatically NOT `db`. It is decibels in the acoustics and RF tiles,
+  // but DRY-BULB in the HVAC ones (`leaving_db_F`, `return_db_F`) and BEAM
+  // DEPTH in the structural ones (`beam_depth_db_in`). Mapping it turned
+  // "Leaving db (°F)" into "Leaving (dB/°F)" and a beam depth into decibels
+  // per inch. Same shape as the `(C)`-is-not-always-Celsius trap: a token
+  // that is a unit in one trade and a word in another needs a per-tile
+  // caption, not a catalog-wide rule.
+  ohm: "ohm", lbf: "lbf", psia: "psia", kvar: "kVAR", lux: "lux", sec: "sec", oz: "oz", lf: "LF",
 }));
 const KEY_UNITS_CASED = new Map(Object.entries({ A: "A", V: "V", F: "\u00b0F", C: "\u00b0C", W: "W", nT: "nT" }));
 // A denominator ("lb_hr" = lb/hr) is only ever the LAST token of a key.
@@ -364,6 +386,14 @@ export function humanizeKey(key) {
   // in_lb / ft_lb is a torque, not a quotient.
   if (unit === "in/lb") unit = "in-lb";
   if (unit === "ft/lb") unit = "ft-lb";
+  // Same for pound-FORCE: `raise_torque_in_lbf` is inch-pounds of torque, not
+  // inches per pound-force, and the slash inverts the meaning.
+  if (unit === "in/lbf") unit = "in-lbf";
+  if (unit === "ft/lbf") unit = "ft-lbf";
+  // And resistivity is a PRODUCT: soil resistivity is ohm-cm (ohm-metres in
+  // SI), never ohms per centimetre.
+  if (unit === "ohm/cm") unit = "ohm-cm";
+  if (unit === "ohm/m") unit = "ohm-m";
   const words = parts.map((p, i) => {
     const l = p.toLowerCase();
     if (KEY_ACRONYMS.has(l)) return l.toUpperCase();

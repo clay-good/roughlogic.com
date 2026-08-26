@@ -47,3 +47,31 @@ test("trade acronyms stay uppercase", () => {
   assert.equal(humanizeKey("primary_ocpd_max_A"), "Primary OCPD max (A)");
   assert.equal(humanizeKey("required_ach"), "Required ACH");
 });
+
+// Units added 2026-08-25, and the three traps they surfaced.
+test("unambiguous multi-letter units read back as units", () => {
+  assert.equal(humanizeKey("resistance_ohm"), "Resistance (ohm)");
+  assert.equal(humanizeKey("run_time_sec"), "Run time (sec)");
+  assert.equal(humanizeKey("discharge_psia"), "Discharge (psia)");
+  assert.equal(humanizeKey("magnetizing_kvar"), "Magnetizing (kVAR)");
+  assert.equal(humanizeKey("illuminance_lux"), "Illuminance (lux)");
+  assert.equal(humanizeKey("total_oz"), "Total (oz)");
+  assert.equal(humanizeKey("baseboard_lf"), "Baseboard (LF)");
+});
+
+test("a compound unit that is a PRODUCT never renders as a quotient", () => {
+  // in-lbf is inch-pounds of torque; in/lbf inverts it. Same for resistivity,
+  // which is ohm-cm, never ohms per centimetre.
+  assert.equal(humanizeKey("raise_torque_in_lbf"), "Raise torque (in-lbf)");
+  assert.equal(humanizeKey("soil_resistivity_ohm_cm"), "Soil resistivity (ohm-cm)");
+  // A genuine rate keeps its slash.
+  assert.equal(humanizeKey("sweat_rate_oz_hr"), "Sweat rate (oz/hr)");
+});
+
+test("`db` is never treated as a unit: it is dry-bulb and beam depth too", () => {
+  // Decibels in the acoustics tiles, DRY-BULB in the HVAC ones, BEAM DEPTH in
+  // the structural ones. Mapping it made "Leaving db (°F)" into
+  // "Leaving (dB/°F)" and a beam depth into decibels per inch.
+  assert.equal(humanizeKey("leaving_db_F"), "Leaving db (°F)");
+  assert.equal(humanizeKey("beam_depth_db_in"), "Beam depth db (in)");
+});
