@@ -291,6 +291,27 @@ async function lintShell(path, kind, errors) {
     if (disclosures !== 1) {
       errors.push(where + ": " + disclosures + " <details> blocks; a tile shell gets exactly one.");
     }
+
+    // A worked example whose every numeric answer is zero teaches nothing.
+    // air-receiver -- a receiver SIZING tile -- printed "Receiver: 0 ft3";
+    // traverse-closure printed 0.000 ft misclosure, which suppressed the 1:N
+    // relative precision entirely; neutral-imbalance printed 0.0% imbalance
+    // from a balanced load. Each was a correct result and a useless example.
+    //
+    // Only rows that parse as a number ON THEIR OWN count, so a reference
+    // tile answering "AUGGCCUAA", "Level III", "high_cost" or a "2-4" range
+    // is not mistaken for a zero. A tile with no numeric answer at all is not
+    // judged here.
+    const answers = answerRows(html);
+    const nums = answers.map((a) => soleNumber(a.value)).filter((n) => n !== null);
+    if (nums.length && nums.every((n) => n === 0)) {
+      errors.push(where + ": every numeric answer in the worked example is zero (" +
+        answers.map((a) => a.label + " = " + a.value).join("; ") +
+        "). Show a case that exercises the tile.");
+    }
+    for (const a of answers) {
+      if (!String(a.value).trim()) errors.push(where + ": worked-example answer '" + a.label + "' is blank.");
+    }
   }
 
   // Gzip size budget.
@@ -299,6 +320,28 @@ async function lintShell(path, kind, errors) {
   if (gz > cap) {
     errors.push(where + ": shell gzipped size " + gz + " B exceeds " + cap + " B cap (" + kind + ").");
   }
+}
+
+// The "You get" rows of a tile shell, as { label, value }.
+export function answerRows(html) {
+  const block = html.match(/<p class="shell-io-label">You get<\/p>\s*<ul class="shell-io">([\s\S]*?)<\/ul>/);
+  if (!block) return [];
+  return [...block[1].matchAll(/<li><span>([^<]*)<\/span> <b>([^<]*)<\/b>/g)]
+    .map((m) => ({ label: m[1], value: m[2] }));
+}
+
+// The number a printed answer IS, or null when it is not simply a number.
+// "0.1" and "25.98 A" are numbers; "AUGGCCUAA", "Level III", "high_cost" and
+// the range "2-4" are not, and must never be read as a zero.
+export function soleNumber(value) {
+  const t = String(value).trim();
+  if (!/\d/.test(t)) return null;
+  const m = t.match(/^[-+]?\d[\d,]*\.?\d*(?:[eE][-+]?\d+)?/);
+  if (!m) return null;
+  const rest = t.slice(m[0].length).trim();
+  if (rest && /^[-+]?\d/.test(rest)) return null;
+  const n = Number(m[0].replace(/,/g, ""));
+  return Number.isFinite(n) ? n : null;
 }
 
 async function main() {
