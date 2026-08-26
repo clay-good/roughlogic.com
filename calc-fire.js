@@ -2437,3 +2437,276 @@ function _v1143renderExtinguisherCoverage(inputRegion, outputRegion, citationEl)
   hc.select.addEventListener("change", update);
 }
 FIRE_RENDERERS["extinguisher-coverage"] = _v1143renderExtinguisherCoverage;
+
+// ===========================================================================
+// spec-v1388, v1389, v1391, v1392: the fire-ground half of the 2026-08-26
+// trade-expansion Group F band. See specs/scope-trade-expansion.md.
+// (The fire-protection half -- stairwell pressurization, tank sizing,
+// sprinkler obstruction, hydrant spacing -- lives in calc-firesprinkler.js.)
+// ===========================================================================
+
+// Compact renderer factory, copied verbatim from the sibling calc-firesprinkler.js
+// factory (same helper set, same schema shape). Non-exported, so it adds no v14
+// derivation-corpus row.
+function _simpleRenderer(spec) {
+  const _rlRender = function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      let field;
+      if (f.kind === "select") field = makeSelect(f.label, f.id || f.key, f.options);
+      else field = makeNumber(f.label, f.id || f.key, f.attrs || { step: "any", min: "0" });
+      fields[f.key] = field;
+      if (f.default !== undefined) {
+        if (f.kind === "select") field.select.value = f.default;
+        else field.input.value = String(f.default);
+      }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key];
+        else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) {
+        if (f.kind === "select") params[f.key] = fields[f.key].select.value;
+        else params[f.key] = Number(fields[f.key].input.value) || 0;
+      }
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) {
+      const el = f.kind === "select" ? fields[f.key].select : fields[f.key].input;
+      el.addEventListener(f.kind === "select" ? "change" : "input", update);
+    }
+  };
+
+  _rlRender.schema = {
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
+    citation: spec.citation ?? null,
+    scope: spec.scope ?? null,
+  };
+  return _rlRender;
+}
+
+// ===================== spec-v1388: PPV fan sizing and clearing time =====================
+// dims: in { args: dimensionless } out: { effective_cfm: L^3 T^-1, air_change_min: T, clearing_min: T, required_cfm: L^3 T^-1 }
+export function computePpvFanSizing({ volume_cf = 0, fan_cfm = 0, entrainment_efficiency = 0.6, remaining_fraction = 0.10, target_time_min = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(volume_cf > 0)) return { error: "Structure volume must be positive." };
+  if (!(fan_cfm > 0)) return { error: "Fan rated flow must be positive." };
+  if (!(entrainment_efficiency > 0 && entrainment_efficiency <= 1)) return { error: "Entrainment efficiency must be between 0 and 1." };
+  if (!(remaining_fraction > 0 && remaining_fraction < 1)) return { error: "Target remaining fraction must be above 0 and below 1." };
+  if (!(target_time_min >= 0)) return { error: "Target clearing time cannot be negative." };
+  // Clearing is DILUTION, not displacement: entering air mixes with what is there, so the
+  // contaminant falls exponentially and each air change removes about 63% of what remains.
+  const effective_cfm = fan_cfm * entrainment_efficiency;
+  const air_change_min = volume_cf / effective_cfm;
+  const air_changes_needed = Math.log(1 / remaining_fraction);
+  const clearing_min = air_change_min * air_changes_needed;
+  const required_cfm = target_time_min > 0 ? volume_cf * air_changes_needed / (entrainment_efficiency * target_time_min) : null;
+  if (![effective_cfm, air_change_min, air_changes_needed, clearing_min].every(Number.isFinite)) return { error: "PPV clearing math is not a finite value." };
+  if (required_cfm !== null && !Number.isFinite(required_cfm)) return { error: "PPV clearing math is not a finite value." };
+  return {
+    effective_cfm,
+    air_change_min,
+    air_changes_needed,
+    clearing_min,
+    required_cfm,
+    note: "How long positive-pressure ventilation takes to clear a structure, and what fan rating a target time would need. A PPV fan's rated flow is measured in free air at the fan face, and what reaches the structure is less: the cone has to seal the doorway, some air spills, and the exhaust opening has to be sized to let the air out. An entrainment efficiency somewhere around 50% to 70% is the working assumption, and the effective flow is what the arithmetic should use. The clearing time is a dilution problem rather than a displacement one. Air entering a room mixes with what is already there instead of pushing it out as a plug, so the contaminant falls exponentially and each air change removes about 63% of what remains: getting to 90% clear takes 2.3 air changes and 99% takes 4.6. That is why a crew that gives the fan one air change and goes in finds the building still charged. An 18,000 cubic ft single story with a 12,000 cfm fan at 60% entrainment moves 7,200 effective cfm, so one air change is 2.5 minutes and clearing to 10% of the starting concentration takes 5.8 -- and getting from there to 99% clear costs another 5.8, as long again as the whole clear took to that point. Halve the exhaust opening so the effective flow drops to 3,600 cfm and the same fan takes 11.5 minutes: the opening, not the fan horsepower, doubled the time. A planning estimate; the incident commander, the department's own SOPs, and a gas meter reading govern when a structure is clear.",
+  };
+}
+
+export const ppvFanSizingExample = { inputs: { volume_cf: 18000, fan_cfm: 12000, entrainment_efficiency: 0.60, remaining_fraction: 0.10, target_time_min: 4 } };
+
+FIRE_RENDERERS["ppv-fan-sizing"] = _simpleRenderer({
+  citation: "Citation: positive-pressure ventilation clearing time as a well-mixed dilution problem -- the contaminant falls exponentially, so clearing to a remaining fraction f takes ln(1/f) air changes -- with the fan's rated free-air flow reduced by an entrainment efficiency, by name. Public physics; the entrainment efficiency and the target are entered. The incident commander, department SOPs, and a gas meter reading govern when a structure is clear.",
+  example: ppvFanSizingExample.inputs,
+  fields: [
+    { key: "volume_cf", label: "Structure volume (cubic ft)", kind: "number" },
+    { key: "fan_cfm", label: "Fan rated flow (cfm, free air)", kind: "number" },
+    { key: "entrainment_efficiency", label: "Entrainment efficiency (0-1)", kind: "number" },
+    { key: "remaining_fraction", label: "Target remaining fraction (0.10 = 90% clear)", kind: "number" },
+    { key: "target_time_min", label: "Target clearing time (min, 0 to skip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "e", id: "ppvf-out-e", label: "Effective flow into the structure", value: (r) => fmt(r.effective_cfm, 0) + " cfm" },
+    { key: "a", id: "ppvf-out-a", label: "One air change", value: (r) => fmt(r.air_change_min, 2) + " min" },
+    { key: "c", id: "ppvf-out-c", label: "Clearing time to the target", value: (r) => fmt(r.clearing_min, 2) + " min (" + fmt(r.air_changes_needed, 2) + " air changes)" },
+    { key: "r", id: "ppvf-out-r", label: "Fan rating a target time would need", value: (r) => r.required_cfm === null ? "-" : fmt(r.required_cfm, 0) + " cfm rated" },
+    { key: "n", id: "ppvf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePpvFanSizing,
+});
+
+// ===================== spec-v1389: hose lay section count, reach, and charged weight =====================
+// dims: in { args: dimensionless } out: { lay_length_ft: L, sections: dimensionless, actual_reach_ft: L, charged_weight_lb: M }
+export function computeHoseLaySectionCount({ map_distance_ft = 0, slack_fraction = 0.20, section_length_ft = 50, hose_id_in = 0, dry_weight_per_section_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(map_distance_ft > 0)) return { error: "Map distance must be positive." };
+  if (!(slack_fraction >= 0)) return { error: "Slack allowance cannot be negative." };
+  if (!(section_length_ft > 0)) return { error: "Section length must be positive." };
+  if (!(hose_id_in > 0)) return { error: "Hose inside diameter must be positive." };
+  if (!(dry_weight_per_section_lb >= 0)) return { error: "Dry weight per section cannot be negative." };
+  // A hose lay never runs the straight-line distance. Undercounting by one section at the
+  // end of a long lay is a break in the line at the worst possible moment.
+  const lay_length_ft = map_distance_ft * (1 + slack_fraction);
+  const sections = Math.ceil(lay_length_ft / section_length_ft);
+  const sections_by_map = Math.ceil(map_distance_ft / section_length_ft);
+  const actual_reach_ft = sections * section_length_ft;
+  const gal_per_ft = Math.PI * (hose_id_in / 2) ** 2 * 12 / 231;
+  const gallons = gal_per_ft * actual_reach_ft;
+  const water_per_section_lb = gal_per_ft * section_length_ft * 8.34;
+  const charged_weight_lb = sections * (dry_weight_per_section_lb + water_per_section_lb);
+  if (![lay_length_ft, sections, actual_reach_ft, gal_per_ft, gallons, charged_weight_lb].every(Number.isFinite)) return { error: "Hose-lay math is not a finite value." };
+  return {
+    lay_length_ft,
+    sections,
+    sections_by_map,
+    actual_reach_ft,
+    gal_per_ft,
+    gallons,
+    water_per_section_lb,
+    charged_weight_lb,
+    note: "How many sections a hose lay takes, how far it actually reaches, and what it weighs charged. The section count is a ceiling function on a padded distance and both halves matter. A lay never runs the straight-line distance: it goes around the building, up the stairs, and over the fence, and a 20% slack allowance is a conservative planning figure that a bad approach will exceed. Undercounting by one section at the end of a long lay is a break in the line at the worst possible moment, which is the whole reason a lay is counted before it is pulled rather than after. A 600 ft approach at 20% slack is 720 ft of hose, which is 15 fifty-foot sections where the map alone would have said 12 -- three sections of difference. The weight line is the one crews feel. Water is 8.34 lb per gallon and a 2.5 in line holds 0.255 gal per foot, so a 50 ft section carries about 106 lb of water on top of the hose itself, and a fifteen-section lay is over a ton of charged line on the ground: perfectly manageable while it is moving on flat ground, and immovable the moment it has to be advanced up a stairwell. That is the number behind every rule about advancing dry and charging at the door. A planning estimate; the actual approach, the department's SOPs, and the officer on the line govern.",
+  };
+}
+
+export const hoseLaySectionCountExample = { inputs: { map_distance_ft: 600, slack_fraction: 0.20, section_length_ft: 50, hose_id_in: 2.5, dry_weight_per_section_lb: 30 } };
+
+FIRE_RENDERERS["hose-lay-section-count"] = _simpleRenderer({
+  citation: "Citation: hose lay section count as a ceiling function on the map distance padded by a slack allowance, with the charged weight from the hose's internal volume (pi (d/2)^2 x 12 / 231 gal per ft) at 8.34 lb per gallon, by name. Public geometry. The actual approach, department SOPs, and the officer on the line govern.",
+  example: hoseLaySectionCountExample.inputs,
+  fields: [
+    { key: "map_distance_ft", label: "Map distance to the objective (ft)", kind: "number" },
+    { key: "slack_fraction", label: "Slack allowance (0.20 = 20%)", kind: "number" },
+    { key: "section_length_ft", label: "Section length (ft)", kind: "number" },
+    { key: "hose_id_in", label: "Hose inside diameter (in)", kind: "number" },
+    { key: "dry_weight_per_section_lb", label: "Dry weight per section (lb)", kind: "number" },
+  ],
+  outputs: [
+    { key: "l", id: "hlsc-out-l", label: "Padded lay length", value: (r) => fmt(r.lay_length_ft, 0) + " ft" },
+    { key: "s", id: "hlsc-out-s", label: "Sections required", value: (r) => String(r.sections) + " (the map distance alone would say " + String(r.sections_by_map) + ")" },
+    { key: "r", id: "hlsc-out-r", label: "Actual reach", value: (r) => fmt(r.actual_reach_ft, 0) + " ft" },
+    { key: "g", id: "hlsc-out-g", label: "Water in the charged lay", value: (r) => fmt(r.gallons, 1) + " gal (" + fmt(r.gal_per_ft, 3) + " gal per ft)" },
+    { key: "w", id: "hlsc-out-w", label: "Total charged weight", value: (r) => fmt(r.charged_weight_lb, 0) + " lb" },
+    { key: "n", id: "hlsc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHoseLaySectionCount,
+});
+
+// ===================== spec-v1391: fire department connection supply check =====================
+// dims: in { args: dimensionless } out: { flow_per_line_gpm: L^3 T^-1, friction_loss_psi: M L^-1 T^-2, engine_pressure_psi: M L^-1 T^-2 }
+export function computeFdcSupplyCheck({ fdc_pressure_psi = 0, total_flow_gpm = 0, lines = 2, line_length_ft = 0, friction_coefficient = 0.677, elevation_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(fdc_pressure_psi > 0)) return { error: "Pressure required at the connection must be positive." };
+  if (!(total_flow_gpm > 0)) return { error: "Total flow must be positive." };
+  if (!(lines >= 1)) return { error: "Supply-line count must be at least 1." };
+  if (!(line_length_ft > 0)) return { error: "Line length must be positive." };
+  if (!(friction_coefficient > 0)) return { error: "Friction coefficient must be positive." };
+  if (!Number.isFinite(elevation_ft)) return { error: "Elevation must be a finite number." };
+  // Friction loss goes as the SQUARE of flow, so two lines at half the flow each lose a
+  // QUARTER of what one line would. Supplying with one line when two are available is the
+  // most common way a pump operator ends up short.
+  const flow_per_line_gpm = total_flow_gpm / lines;
+  const hundreds = line_length_ft / 100;
+  const friction_loss_psi = friction_coefficient * (flow_per_line_gpm / 100) ** 2 * hundreds;
+  const elevation_psi = 0.434 * elevation_ft;
+  const engine_pressure_psi = fdc_pressure_psi + friction_loss_psi + elevation_psi;
+  const single_line_friction_psi = friction_coefficient * (total_flow_gpm / 100) ** 2 * hundreds;
+  const single_line_engine_psi = fdc_pressure_psi + single_line_friction_psi + elevation_psi;
+  const single_line_cost_psi = single_line_engine_psi - engine_pressure_psi;
+  if (![flow_per_line_gpm, friction_loss_psi, elevation_psi, engine_pressure_psi, single_line_engine_psi].every(Number.isFinite)) return { error: "FDC supply math is not a finite value." };
+  return {
+    flow_per_line_gpm,
+    friction_loss_psi,
+    elevation_psi,
+    engine_pressure_psi,
+    single_line_friction_psi,
+    single_line_engine_psi,
+    single_line_cost_psi,
+    note: "The discharge pressure an engine has to make to supply a fire department connection. The placard on the connection states the pressure the SYSTEM needs there, and the pump operator has to add everything between the pump panel and that connection: the friction loss in the supply lines and the elevation change at 0.434 psi per foot. On a short lay both are small; on a long lay to a rear-yard connection at high flow they are not, and the difference shows up as a standpipe outlet that does not make its rated pressure four floors up. The flow split across lines is where the arithmetic bites, because friction loss goes as the SQUARE of flow: two lines each carrying half the total lose a QUARTER of what one line carrying all of it would. Supplying a connection with one line when two are available is the single most common way a pump operator ends up short. A system needing 100 psi at the connection at 500 gpm through two 200 ft lines of 3 in hose loses 8.5 psi and the engine makes 108.5; put the same 500 gpm through one line and the loss quadruples to 33.9 psi and the engine has to make 133.9 -- twenty-five psi of pump capacity spent on a decision made in twenty seconds at the hydrant. A pump-panel estimate; the department's own friction-loss coefficients, the system placard, and the pump operator govern.",
+  };
+}
+
+export const fdcSupplyCheckExample = { inputs: { fdc_pressure_psi: 100, total_flow_gpm: 500, lines: 2, line_length_ft: 200, friction_coefficient: 0.677, elevation_ft: 0 } };
+
+FIRE_RENDERERS["fdc-supply-check"] = _simpleRenderer({
+  citation: "Citation: fire department connection supply pressure from the standard fireground friction-loss form FL = C (Q/100)^2 (L/100) with the department's own coefficient for the hose in use, plus 0.434 psi per foot of elevation, by name. The pressure required at the connection is the system placard's. The department's coefficients, the placard, and the pump operator govern.",
+  example: fdcSupplyCheckExample.inputs,
+  fields: [
+    { key: "fdc_pressure_psi", label: "Pressure required at the connection (psi)", kind: "number" },
+    { key: "total_flow_gpm", label: "Total flow (gpm)", kind: "number" },
+    { key: "lines", label: "Supply lines", kind: "number" },
+    { key: "line_length_ft", label: "Line length (ft)", kind: "number" },
+    { key: "friction_coefficient", label: "Friction coefficient C for the hose in use", kind: "number" },
+    { key: "elevation_ft", label: "Connection above the pump (ft, negative if below)", kind: "number", attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "q", id: "fdcs-out-q", label: "Flow per line", value: (r) => fmt(r.flow_per_line_gpm, 0) + " gpm" },
+    { key: "f", id: "fdcs-out-f", label: "Friction loss per line", value: (r) => fmt(r.friction_loss_psi, 1) + " psi" },
+    { key: "e", id: "fdcs-out-e", label: "Elevation", value: (r) => fmt(r.elevation_psi, 1) + " psi" },
+    { key: "p", id: "fdcs-out-p", label: "Required engine discharge pressure", value: (r) => fmt(r.engine_pressure_psi, 1) + " psi" },
+    { key: "s", id: "fdcs-out-s", label: "Same flow through one line", value: (r) => fmt(r.single_line_engine_psi, 1) + " psi, which costs " + fmt(r.single_line_cost_psi, 1) + " psi more" },
+    { key: "n", id: "fdcs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFdcSupplyCheck,
+});
+
+// ===================== spec-v1392: radiant exposure separation distance =====================
+// dims: in { args: dimensionless } out: { radiated_power_kw: dimensionless, separation_m: L, separation_ft: L, flux_at_distance: dimensionless }
+export function computeRadiantExposureSeparation({ heat_release_kw = 0, radiative_fraction = 0.3, target_flux_kwm2 = 12.6, evaluate_distance_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(heat_release_kw > 0)) return { error: "Fire heat release rate must be positive." };
+  if (!(radiative_fraction > 0 && radiative_fraction <= 1)) return { error: "Radiative fraction must be between 0 and 1." };
+  if (!(target_flux_kwm2 > 0)) return { error: "Target radiant flux must be positive." };
+  if (!(evaluate_distance_ft >= 0)) return { error: "Evaluation distance cannot be negative." };
+  // Point source: the power spreads over a sphere, so flux falls with the SQUARE of
+  // distance and separation is a WEAK lever against fire size.
+  const radiated_power_kw = radiative_fraction * heat_release_kw;
+  const separation_m = Math.sqrt(radiated_power_kw / (4 * Math.PI * target_flux_kwm2));
+  const separation_ft = separation_m * 3.28084;
+  // The model is naturally metric (kW/m2 is the trade's own flux unit), so the
+  // reader's distance in feet is converted before it enters the inverse square.
+  const evaluate_distance_m = evaluate_distance_ft / 3.28084;
+  const flux_at_distance = evaluate_distance_ft > 0 ? radiated_power_kw / (4 * Math.PI * evaluate_distance_m ** 2) : null;
+  if (![radiated_power_kw, separation_m, separation_ft].every(Number.isFinite)) return { error: "Radiant-exposure math is not a finite value." };
+  if (flux_at_distance !== null && !Number.isFinite(flux_at_distance)) return { error: "Radiant-exposure math is not a finite value." };
+  return {
+    radiated_power_kw,
+    separation_m,
+    separation_ft,
+    flux_at_distance,
+    note: "How far away an exposure has to be to stay under a chosen radiant heat flux. A fire radiates a fraction of its heat release rate outward in all directions -- roughly 0.2 to 0.4 for most fuels, with 0.3 a common working value -- and treated as a point source that power spreads over the surface of a sphere, so the flux falls with the SQUARE of distance and doubling the separation quarters the exposure. The target flux is the decision, and it moves the answer a long way: widely used thresholds put piloted ignition of wood near 12.6 kW/m2, spontaneous ignition much higher, the pain threshold for bare skin around 2.5 kW/m2, and a commonly cited limit for a firefighter in full protective clothing operating for a sustained period well below the ignition figure. Protecting a wood wall is a different problem from protecting a person, so the threshold is an input rather than a constant. A 5 MW fire -- roughly a fully involved passenger vehicle -- at a radiative fraction of 0.3 radiates 1,500 kW and reaches the piloted-ignition threshold at 3.08 m, about 10 ft. Scale the fire tenfold to 50 MW and the separation goes only to 9.73 m, about 32 ft: a tenfold fire produced a threefold distance, because of the square root. Separation is a weak lever against fire size, which is why exposure protection is done with water and with construction rather than with distance alone. A screening estimate; a fire protection engineer, the applicable exposure-protection standard, and the incident commander govern.",
+  };
+}
+
+export const radiantExposureSeparationExample = { inputs: { heat_release_kw: 5000, radiative_fraction: 0.3, target_flux_kwm2: 12.6, evaluate_distance_ft: 20 } };
+
+FIRE_RENDERERS["radiant-exposure-separation"] = _simpleRenderer({
+  citation: "Citation: point-source radiation model -- radiated power = radiative fraction x heat release rate, flux = power / (4 pi r^2), with a distance entered in feet converted to metres before the inverse square -- by name; public physics, standard in the fire-protection engineering literature (SFPE Handbook). The radiative fraction and the target flux threshold are entered, not bundled. A screening estimate; a fire protection engineer, the applicable exposure-protection standard, and the incident commander govern.",
+  example: radiantExposureSeparationExample.inputs,
+  fields: [
+    { key: "heat_release_kw", label: "Fire heat release rate (kW)", kind: "number" },
+    { key: "radiative_fraction", label: "Radiative fraction (0-1)", kind: "number" },
+    { key: "target_flux_kwm2", label: "Target radiant flux (kW/m2)", kind: "number" },
+    { key: "evaluate_distance_ft", label: "Distance to evaluate the flux at (ft, 0 to skip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "p", id: "rdex-out-p", label: "Radiated power", value: (r) => fmt(r.radiated_power_kw, 0) + " kW" },
+    { key: "s", id: "rdex-out-s", label: "Separation for the target flux", value: (r) => fmt(r.separation_m, 2) + " m (" + fmt(r.separation_ft, 1) + " ft)" },
+    { key: "f", id: "rdex-out-f", label: "Flux at the stated distance", value: (r) => r.flux_at_distance === null ? "-" : fmt(r.flux_at_distance, 2) + " kW/m2" },
+    { key: "n", id: "rdex-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRadiantExposureSeparation,
+});

@@ -2213,11 +2213,13 @@ cross-check.
 | calc-fire.js | `computeDraftLiftMax` | `{ site_elevation_ft = 0, pump_factor = 0.667, suction_losses_ft = 0 } = {}` | _ | _ | _ |
 | calc-fire.js | `computeElevationPressureLoss` | `{ mode = "floors", value = 0, floor_height_ft = 10, direction = "up" } = {}` | _ | _ | _ |
 | calc-fire.js | `computeExtinguisherCoverage` | `{ floor_area_sf = 0, hazard_class = "A", travel_distance_ft = 0, area_cap_sf ...` | _ | _ | _ |
+| calc-fire.js | `computeFdcSupplyCheck` | `{ fdc_pressure_psi = 0, total_flow_gpm = 0, lines = 2, line_length_ft = 0, fr...` | _ | _ | _ |
 | calc-fire.js | `computeFireFriction` | `{ hose_diameter, gpm, length_ft }` | _ | _ | _ |
 | calc-fire.js | `computeFireStreamReaction` | `{ nozzle_type = "smooth", bore_in = 0, flow_gpm = 0, nozzle_pressure_psi = 0 ...` | _ | _ | _ |
 | calc-fire.js | `computeFoam` | `{ fire_area_ft2, application_rate_gpm_per_ft2 = 0.10, foam_percentage = 3, du...` | _ | _ | _ |
 | calc-fire.js | `computeFoamEductorLimit` | `{ inlet_pressure_psi = 0, eductor_flow_gpm = 0, hose_coefficient = 0, nozzle_...` | _ | _ | _ |
 | calc-fire.js | `computeFoamMaxCoverageArea` | `{ available_concentrate_gal = 0, application_rate_gpm_per_ft2 = 0.10, foam_pe...` | _ | _ | _ |
+| calc-fire.js | `computeHoseLaySectionCount` | `{ map_distance_ft = 0, slack_fraction = 0.20, section_length_ft = 50, hose_id...` | _ | _ | _ |
 | calc-fire.js | `computeHydrantAvailableFlow` | `{ static_psi = 0, residual_psi = 0, qf_gpm = 0 } = {}` | _ | _ | _ |
 | calc-fire.js | `computeHydrantFlow` | `{ pitot_psi, outlet_diameter_in, c = 0.9 }` | _ | _ | _ |
 | calc-fire.js | `computeIowaRateOfFlow` | `{ length_ft = 0, width_ft = 0, height_ft = 0 } = {}` | _ | _ | _ |
@@ -2227,6 +2229,8 @@ cross-check.
 | calc-fire.js | `computeNFPA1142WaterSupply` | `{ volume_ft3 = 0, occupancy_class = 7, construction_class = "V", exposure_wit...` | _ | _ | _ |
 | calc-fire.js | `computeNfaFiregroundFlow` | `{ length_ft = 0, width_ft = 0, percent_involved = 0, floors_involved = 1, exp...` | _ | _ | _ |
 | calc-fire.js | `computePDP` | `{ nozzle_pressure_psi, friction_loss_psi, elevation_ft = 0, appliance_loss_ps...` | _ | _ | _ |
+| calc-fire.js | `computePpvFanSizing` | `{ volume_cf = 0, fan_cfm = 0, entrainment_efficiency = 0.6, remaining_fractio...` | _ | _ | _ |
+| calc-fire.js | `computeRadiantExposureSeparation` | `{ heat_release_kw = 0, radiative_fraction = 0.3, target_flux_kwm2 = 12.6, eva...` | _ | _ | _ |
 | calc-fire.js | `computeRelayPumpDistance` | `{ target_flow_gpm = 0, hose_coefficient = 0, max_discharge_psi = 0, intake_re...` | _ | _ | _ |
 | calc-fire.js | `computeRequiredFireFlow` | `{ structure_area_ft2, construction_class = "ordinary", occupancy_factor = 1.0...` | _ | _ | _ |
 | calc-fire.js | `computeReverseLayFriction` | `{ hose_diameter, gpm, length_ft, n_pumps = 1 }` | _ | _ | _ |
@@ -2262,12 +2266,16 @@ cross-check.
 | calc-fire.js | `renderStandpipeFriction` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-firesprinkler.js | `computeDrypipeAirCompressor` | `{ dry_volume_gal = 400, normal_pressure_psig = 40, restore_minutes = 30 } = {}` | _ | _ | _ |
 | calc-firesprinkler.js | `computeFirePumpCurve` | `{ rated_gpm = 0, rated_psi = 0, churn_psi = 0, overload_psi = 0 } = {}` | _ | _ | _ |
+| calc-firesprinkler.js | `computeFireTankSizing` | `{ sprinkler_demand_gpm = 0, hose_allowance_gpm = 0, duration_min = 60, unusab...` | _ | _ | _ |
+| calc-firesprinkler.js | `computeHydrantSpacingCount` | `{ required_flow_gpm = 0, credited_flow_per_hydrant_gpm = 0, frontage_ft = 0, ...` | _ | _ | _ |
 | calc-firesprinkler.js | `computeJockeyPumpSizing` | `{ fire_pump_gpm = 750, churn_psi = 120, min_static_psi = 50 } = {}` | _ | _ | _ |
 | calc-firesprinkler.js | `computeSmokeDetectorSpacingCount` | `{ room_length_ft = 60, room_width_ft = 40, listed_spacing_ft = 30 } = {}` | _ | _ | _ |
 | calc-firesprinkler.js | `computeSprinklerHeadLayout` | `{ room_length = 0, room_width = 0, area_per_head = 130, max_spacing = 15 } = {}` | _ | _ | _ |
+| calc-firesprinkler.js | `computeSprinklerObstruction` | `{ obstruction_width_in = 0, horizontal_separation_in = 0, obstruction_depth_i...` | _ | _ | _ |
 | calc-firesprinkler.js | `computeSprinklerPressureDemand` | `{ q_head_gpm = 0, k_factor = 5.6, q_total_gpm = 0, pipe_id_in = 0, c_factor =...` | _ | _ | _ |
 | calc-firesprinkler.js | `computeSprinklerProtectionAreaForSupply` | `{ available_supply_gpm = 0, density = 0.20, hose_gpm = 250 } = {}` | _ | _ | _ |
 | calc-firesprinkler.js | `computeSprinklerSystemDemand` | `{ density = 0.20, design_area = 1500, hose_gpm = 250, duration_min = 90 } = {}` | _ | _ | _ |
+| calc-firesprinkler.js | `computeStairwellPressurization` | `{ leakage_area_sqft = 0, pressure_inwg = 0.15, door_width_ft = 3, door_height...` | _ | _ | _ |
 | calc-gas.js | `computeGasAltitudeDerate` | `{ nameplate_input_btuh = 0, elevation_ft = 0, derate_pct_per_1000 = 4, thresh...` | _ | _ | _ |
 | calc-gas.js | `computeGasApplianceConnection` | `{ appliance = "furnace", shutoff_same_room = "yes", shutoff_distance_ft = 0, ...` | _ | _ | _ |
 | calc-gas.js | `computeGasFuelConversion` | `{ appliance_input_btuh = 0, hv_from = 1030, hv_to = 2500, sg_from = 0.60, sg_...` | _ | _ | _ |
@@ -3410,7 +3418,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1996.
+Row count: 2004.
 
 <!-- END function-corpus-v14 -->
 
@@ -4521,7 +4529,7 @@ per spec-v14 §13.1 second paragraph.
 | `wood-screw-withdrawal` | Wood Screw Withdrawal Design Value (NDS 12.2.2) | NDS 2018 12.2.2; spec-v334 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-tension-member` | Wood Tension Member Parallel to Grain (NDS 3.8) | NDS 2018 3.8.1; spec-v291 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group F Fire-ground (50 tiles)
+### Group F Fire-ground (58 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4535,14 +4543,18 @@ per spec-v14 §13.1 second paragraph.
 | `extinguisher-coverage` | Portable Fire Extinguisher Coverage (NFPA 10) | National Fire Protection Association; Class A travel distance is 75 ft at all hazard levels and... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fall-arrest-anchorage` | Fall Arrest Anchorage and System Force Check (OSHA 1926.502(d)) | Occupational Safety and Health Admini...; 'Anchorages... capable of supporting at least 5,000 pound... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fall-arrest-clearance` | Required Fall-Arrest Clearance (ANSI Z359) | ANSI Z359.1 / OSHA 1926 Subpart M; free fall 6 + deceleration 3.5 + worker 5 + margin 3 = 17... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `fdc-supply-check` | Fire Department Connection Supply Pressure | Project (first-principles); FL = C (Q/100)^2 (L/100) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fire-friction` | Fire Hose Friction Loss | National Fire Academy; FL = C * Q^2 * L; 2.5 in C = 2; FL = 2 * (2.5)^2 * 2 = 25... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fire-pump-curve` | Fire Pump Rated / Churn / Overload Curve Check (NFPA 20) | NFPA 20 (Standard for the Installatio...; spec-v248 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `fire-stream-reaction` | Nozzle / Fire-Stream Reaction Force | IFSTA Pumping Apparatus Driver/Operat...; 1.0 in smooth bore @ 50 psi -> NR = 1.57 * 1 * 50 = 78.5 lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `fire-tank-sizing` | Fire-Protection Water Tank Sizing | NFPA; net usable capacity; hose allowance at the connection | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `foam` | Foam Concentrate | NFPA; 1500 ft^2 fire / 0.10 gpm/ft^2 application / 3% concentra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `foam-eductor-limit` | Foam Eductor Back-Pressure / Hose-Lay Limit | IFSTA / eductor manufacturer data (TF...; 200 psi inlet, 95 gpm eductor, C 15.5, 100 psi nozzle, 30... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `foam-max-coverage-area` | Max Fire Area from Available Foam Concentrate | NFPA; 100 gal concentrate, 0.10 gpm/ft^2, 3%, 15 min -> 2,222 ft^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `hose-lay-section-count` | Hose Lay Section Count, Reach, and Charged Weight | Project (first-principles); pi (d/2)^2 x 12 / 231 gal per ft at 8.34 lb/gal | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hydrant-available-flow` | Hydrant Rated Flow at 20 psi (NFPA 291) | NFPA 291; spec-v389 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydrant-flow` | Hydrant Flow | NFPA; Q = 29.83 * c * d^2 * sqrt(P) = 29.83 * 0.9 * 6.25 * sqrt... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `hydrant-spacing-count` | Hydrant Count and Spacing for a Required Fire Flow | ICC; Appendix C hydrant spacing | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `iowa-rate-of-flow` | Iowa Rate-of-Flow (Volume Method) | Iowa rate-of-flow formula (Royer-Nels...; 20 x 30 x 10 ft room = 6,000 ft3 -> 30 gal to control, 60... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `iso-nff` | ISO Needed Fire Flow | ISO Public Protection Classification ...; 5000 ft^2 / 2 stories / Class 2 / occupancy 1.0 / 50 ft e... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `jockey-pump-sizing` | Jockey (Pressure-Maintenance) Pump Sizing (NFPA 20) | jockey pump sizing (NFPA 20); jockey = max(0.01*750, 1) = 7.5; stop = 120+50 = 170; sta... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4551,6 +4563,8 @@ per spec-v14 §13.1 second paragraph.
 | `nfa-fireground-flow` | National Fire Academy Quick Fire-Flow | National Fire Academy / IFSTA; 40 x 60 ft, 50% involved, 1 floor, 2 exposures -> base 40... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `nfpa-1142-water-supply` | NFPA 1142 Rural Water Supply | NFPA; §5 WS = (V * CCN) / OHC = 30000 * 1.5 / 7 = 6,429 gal | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pdp` | Pump Discharge Pressure | NFPA; PDP = NP + FL + elev_psi + appliance = 100 + 25 + 0.5*20 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `ppv-fan-sizing` | PPV Fan Sizing and Clearing Time | Project (first-principles); ln(1/f) air changes | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `radiant-exposure-separation` | Radiant Exposure Separation Distance | Project (first-principles); flux = power / (4 pi r^2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `relay-pump-distance` | Relay Pumping Max Distance | IFSTA Pumping Apparatus Driver/Operator; 800 gpm, C 0.08, 200 psi pump, 20 psi intake, 10 ft uphil... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `required-fire-flow` | Required Fire Flow | ISO / NFPA 1142 area-based simplified...; 5000 ft^2 / ordinary / occupancy 1.0 / exposure 1.0 / com... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `reverse-lay-friction` | Reverse-Lay Friction Loss | IFSTA Pumping Apparatus / NFPA 1962 h...; 2.5 in / 250 gpm / 600 ft / 2 pumps -> 75 psi single-pump... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4565,9 +4579,11 @@ per spec-v14 §13.1 second paragraph.
 | `sprinkler-density` | Sprinkler GPM Density | NFPA; Ordinary Hazard Group 2 minimum density 0.20 gpm/ft^2; 15... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sprinkler-head-layout` | Sprinkler Head Count and Spacing (NFPA 13) | NFPA 13 (Standard for the Installatio...; spec-v250 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sprinkler-k-factor` | Sprinkler K-Factor Solver | NFPA 13 (sprinkler discharge relation); K 5.6 @ 7 psi -> Q = 5.6 * sqrt(7) = 14.816 gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `sprinkler-obstruction` | Sprinkler Obstruction Clearance (Three Times Rule) | NFPA; three times the width, capped at 24 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sprinkler-pressure-demand` | Sprinkler Pressure Demand at the Base of Riser (NFPA 13) | NFPA 13 (Standard for the Installatio...; spec-v479 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sprinkler-protection-area-for-supply` | Max Sprinkler Design Area for a Water Supply (NFPA 13) | NFPA 13 (Standard for the Installatio...; 550 gpm supply, 250 gpm hose, 0.20 gpm/ft^2 -> 1,500 ft^2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sprinkler-system-demand` | Sprinkler System Demand and Water Supply (NFPA 13) | NFPA 13 (Standard for the Installatio...; spec-v249 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `stairwell-pressurization` | Stairwell Pressurization Airflow and Door Force | Project (first-principles); Q = 2610 A sqrt(dP); 30 lbf cap | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `standpipe-friction` | Standpipe Friction Loss | NFPA 14 (2024) standpipe hydraulics; 200 ft riser / 1 outlet @ 250 gpm / 100 ft 2.5 in outlet ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `standpipe-pdp` | Standpipe Pump Discharge Pressure (NFPA 14) | NFPA 14 / National Fire Academy; PDP = 100 + 8.46 supply FL + 25 appliance + 47.74 elevati... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tanker-fleet-size` | Tanker Shuttle Fill-Site-Limited Fleet Size | IFSTA / NFPA 1142 rural water-supply ...; 3,000 gal, 1,000 gpm fill and dump, 2 mi at 35 mph -> 12.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5328,6 +5344,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1745. Fixture-covered or reference-cadence: 1745 / 1745.
+Tile count: 1753. Fixture-covered or reference-cadence: 1753 / 1753.
 
 <!-- END tile-index-v14 -->

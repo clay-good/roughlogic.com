@@ -104197,6 +104197,166 @@
    "term": "how much dunnage under a machine",
    "target": "deck-point-load-dunnage",
    "kind": "question"
+  },
+  {
+   "term": "stairwell pressurization",
+   "target": "stairwell-pressurization",
+   "kind": "industry"
+  },
+  {
+   "term": "smoke control airflow",
+   "target": "stairwell-pressurization",
+   "kind": "industry"
+  },
+  {
+   "term": "door opening force pressure",
+   "target": "stairwell-pressurization",
+   "kind": "industry"
+  },
+  {
+   "term": "stair pressurization fan",
+   "target": "stairwell-pressurization",
+   "kind": "industry"
+  },
+  {
+   "term": "fire water tank sizing",
+   "target": "fire-tank-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "nfpa 22 tank",
+   "target": "fire-tank-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "sprinkler storage tank",
+   "target": "fire-tank-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "how big a fire tank",
+   "target": "fire-tank-sizing",
+   "kind": "question"
+  },
+  {
+   "term": "ppv fan sizing",
+   "target": "ppv-fan-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "positive pressure ventilation time",
+   "target": "ppv-fan-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "how long to clear a structure",
+   "target": "ppv-fan-sizing",
+   "kind": "question"
+  },
+  {
+   "term": "air changes to clear smoke",
+   "target": "ppv-fan-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "hose lay sections",
+   "target": "hose-lay-section-count",
+   "kind": "industry"
+  },
+  {
+   "term": "how many lengths of hose",
+   "target": "hose-lay-section-count",
+   "kind": "question"
+  },
+  {
+   "term": "charged hose weight",
+   "target": "hose-lay-section-count",
+   "kind": "industry"
+  },
+  {
+   "term": "hose lay reach",
+   "target": "hose-lay-section-count",
+   "kind": "industry"
+  },
+  {
+   "term": "sprinkler obstruction",
+   "target": "sprinkler-obstruction",
+   "kind": "industry"
+  },
+  {
+   "term": "three times rule sprinkler",
+   "target": "sprinkler-obstruction",
+   "kind": "industry"
+  },
+  {
+   "term": "duct under a sprinkler",
+   "target": "sprinkler-obstruction",
+   "kind": "industry"
+  },
+  {
+   "term": "sprinkler clearance from obstruction",
+   "target": "sprinkler-obstruction",
+   "kind": "industry"
+  },
+  {
+   "term": "fdc supply pressure",
+   "target": "fdc-supply-check",
+   "kind": "industry"
+  },
+  {
+   "term": "fire department connection pressure",
+   "target": "fdc-supply-check",
+   "kind": "industry"
+  },
+  {
+   "term": "supplying an fdc",
+   "target": "fdc-supply-check",
+   "kind": "industry"
+  },
+  {
+   "term": "engine pressure for fdc",
+   "target": "fdc-supply-check",
+   "kind": "industry"
+  },
+  {
+   "term": "radiant exposure separation",
+   "target": "radiant-exposure-separation",
+   "kind": "industry"
+  },
+  {
+   "term": "exposure protection distance",
+   "target": "radiant-exposure-separation",
+   "kind": "industry"
+  },
+  {
+   "term": "radiant heat flux distance",
+   "target": "radiant-exposure-separation",
+   "kind": "industry"
+  },
+  {
+   "term": "how far from a fire is safe",
+   "target": "radiant-exposure-separation",
+   "kind": "question"
+  },
+  {
+   "term": "hydrant spacing",
+   "target": "hydrant-spacing-count",
+   "kind": "industry"
+  },
+  {
+   "term": "how many hydrants",
+   "target": "hydrant-spacing-count",
+   "kind": "question"
+  },
+  {
+   "term": "hydrant count for fire flow",
+   "target": "hydrant-spacing-count",
+   "kind": "industry"
+  },
+  {
+   "term": "maximum distance to a hydrant",
+   "target": "hydrant-spacing-count",
+   "kind": "industry"
   }
  ]
 }

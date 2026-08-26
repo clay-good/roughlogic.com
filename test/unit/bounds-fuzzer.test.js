@@ -39742,3 +39742,251 @@ test("bounds: spec-v1385 computeDeckPointLoadDunnage pins the linear conversion"
   assert.ok("error" in _v1385({ ...base, deck_rating_plf: 0 }));
   assert.ok("error" in _v1385({ ...base, load_lb: Infinity }));
 });
+
+// ===========================================================================
+// spec-v1386..v1393: the 2026-08-26 trade-expansion Group F band.
+// ===========================================================================
+
+import { computeStairwellPressurization as _v1386 } from "../../calc-firesprinkler.js";
+test("bounds: spec-v1386 computeStairwellPressurization pins the square root and the door", () => {
+  // 2.5 sq ft at 0.15 in. w.g.: 2,527 cfm and 18.9 lbf with a 10 lbf closer.
+  const base = { leakage_area_sqft: 2.5, pressure_inwg: 0.15, door_width_ft: 3, door_height_ft: 7, knob_setback_in: 3, closer_force_lbf: 10, force_limit_lbf: 30 };
+  const r = _v1386(base);
+  assert.ok(Math.abs(r.airflow_cfm - 2527.1) < 1e-1);
+  assert.ok(Math.abs(r.door_force_lbf - 18.93) < 1e-2);
+  assert.ok(Math.abs(r.margin_lbf - 11.07) < 1e-2);
+  assert.ok(r.verdict.startsWith("PASSES"));
+  // Flow goes as the SQUARE ROOT: 0.60 in. w.g. is four times 0.15 and exactly twice the fan.
+  const four = _v1386({ ...base, pressure_inwg: 0.60 });
+  assert.ok(Math.abs(four.airflow_cfm - 2 * r.airflow_cfm) < 1e-6);
+  // Door force is LINEAR in pressure, which is why the door caps the design and the fan does not.
+  assert.ok(Math.abs(four.pressure_force_lbf - 4 * r.pressure_force_lbf) < 1e-6);
+  // Pushing to 0.25 grows the fan 29% and the door force to 24.9 lbf.
+  const higher = _v1386({ ...base, pressure_inwg: 0.25 });
+  assert.ok(Math.abs(higher.airflow_cfm - 3262.5) < 1e-1);
+  assert.ok(Math.abs(higher.door_force_lbf - 24.89) < 1e-2);
+  // A heavier closer at the same pressure takes the door to the limit.
+  const heavyCloser = _v1386({ ...base, pressure_inwg: 0.25, closer_force_lbf: 15 });
+  assert.ok(heavyCloser.door_force_lbf > 29 && heavyCloser.door_force_lbf <= 30);
+  // The reported maximum pressure is exactly the one that lands on the force limit.
+  const atMax = _v1386({ ...base, pressure_inwg: r.max_pressure_inwg });
+  assert.ok(Math.abs(atMax.door_force_lbf - base.force_limit_lbf) < 1e-9);
+  assert.ok("error" in _v1386({ ...base, leakage_area_sqft: 0 }));
+  assert.ok("error" in _v1386({ ...base, pressure_inwg: 0 }));
+  assert.ok("error" in _v1386({ ...base, door_width_ft: 0 }));
+  assert.ok("error" in _v1386({ ...base, knob_setback_in: 40 }));
+  assert.ok("error" in _v1386({ ...base, closer_force_lbf: 35 }));
+  assert.ok("error" in _v1386({ ...base, pressure_inwg: Infinity }));
+});
+
+import { computeFireTankSizing as _v1387 } from "../../calc-firesprinkler.js";
+test("bounds: spec-v1387 computeFireTankSizing pins the hose allowance and the net/gross split", () => {
+  // 750 + 250 = 1,000 gpm x 60 min = 60,000 gal net, 65,217 gross at 8% unusable, 18.1 hr refill.
+  const base = { sprinkler_demand_gpm: 750, hose_allowance_gpm: 250, duration_min: 60, unusable_fraction: 0.08, refill_gpm: 60 };
+  const r = _v1387(base);
+  assert.ok(Math.abs(r.total_demand_gpm - 1000) < 1e-9);
+  assert.ok(Math.abs(r.net_volume_gal - 60000) < 1e-9);
+  assert.ok(Math.abs(r.gross_volume_gal - 65217.4) < 1e-1);
+  assert.ok(Math.abs(r.refill_hours - 18.12) < 1e-2);
+  // The hose allowance is a quarter of the tank; without it a 50,000 gal tank looks adequate.
+  assert.ok(Math.abs(r.hose_share_pct - 25) < 1e-9);
+  assert.ok(Math.abs(r.volume_without_hose_gal - 45000) < 1e-9);
+  const noHose = _v1387({ ...base, hose_allowance_gpm: 0 });
+  assert.ok(Math.abs(noHose.net_volume_gal - 45000) < 1e-9);
+  assert.ok(Math.abs(noHose.hose_share_pct) < 1e-12);
+  // Gross always exceeds net, and equals it only when nothing is unusable.
+  assert.ok(r.gross_volume_gal > r.net_volume_gal);
+  const allUsable = _v1387({ ...base, unusable_fraction: 0 });
+  assert.ok(Math.abs(allUsable.gross_volume_gal - allUsable.net_volume_gal) < 1e-9);
+  assert.ok("error" in _v1387({ ...base, sprinkler_demand_gpm: 0 }));
+  assert.ok("error" in _v1387({ ...base, hose_allowance_gpm: -1 }));
+  assert.ok("error" in _v1387({ ...base, duration_min: 0 }));
+  assert.ok("error" in _v1387({ ...base, unusable_fraction: 1 }));
+  assert.ok("error" in _v1387({ ...base, refill_gpm: 0 }));
+  assert.ok("error" in _v1387({ ...base, duration_min: Infinity }));
+});
+
+import { computePpvFanSizing as _v1388 } from "../../calc-fire.js";
+test("bounds: spec-v1388 computePpvFanSizing pins dilution, not displacement", () => {
+  // 18,000 cf, 12,000 cfm at 60%: 7,200 effective, 2.5 min per air change, 5.76 min to 90% clear.
+  const base = { volume_cf: 18000, fan_cfm: 12000, entrainment_efficiency: 0.60, remaining_fraction: 0.10, target_time_min: 4 };
+  const r = _v1388(base);
+  assert.ok(Math.abs(r.effective_cfm - 7200) < 1e-9);
+  assert.ok(Math.abs(r.air_change_min - 2.5) < 1e-9);
+  assert.ok(Math.abs(r.air_changes_needed - 2.3026) < 1e-3);
+  assert.ok(Math.abs(r.clearing_min - 5.7565) < 1e-3);
+  // 90% clear takes 2.3 air changes and 99% takes 4.6 -- the second half costs as much again.
+  const ninetyNine = _v1388({ ...base, remaining_fraction: 0.01 });
+  assert.ok(Math.abs(ninetyNine.clearing_min - 2 * r.clearing_min) < 1e-9);
+  // One air change removes about 63%, not 90%.
+  const oneChange = _v1388({ ...base, remaining_fraction: 1 / Math.E });
+  assert.ok(Math.abs(oneChange.air_changes_needed - 1) < 1e-12);
+  assert.ok(Math.abs(oneChange.clearing_min - r.air_change_min) < 1e-9);
+  // Halving the effective flow doubles the time with the SAME fan: the opening governs.
+  const halfOpening = _v1388({ ...base, entrainment_efficiency: 0.30 });
+  assert.ok(Math.abs(halfOpening.clearing_min - 2 * r.clearing_min) < 1e-9);
+  // The reported required rating is the one that hits the target time exactly.
+  const atRequired = _v1388({ ...base, fan_cfm: r.required_cfm });
+  assert.ok(Math.abs(atRequired.clearing_min - base.target_time_min) < 1e-9);
+  assert.strictEqual(_v1388({ ...base, target_time_min: 0 }).required_cfm, null);
+  assert.ok("error" in _v1388({ ...base, volume_cf: 0 }));
+  assert.ok("error" in _v1388({ ...base, fan_cfm: 0 }));
+  assert.ok("error" in _v1388({ ...base, entrainment_efficiency: 1.5 }));
+  assert.ok("error" in _v1388({ ...base, remaining_fraction: 1 }));
+  assert.ok("error" in _v1388({ ...base, volume_cf: Infinity }));
+});
+
+import { computeHoseLaySectionCount as _v1389 } from "../../calc-fire.js";
+test("bounds: spec-v1389 computeHoseLaySectionCount pins the slack, the count, and the weight", () => {
+  // 600 ft at 20% slack is 720 ft: 15 sections where the map alone would say 12.
+  const base = { map_distance_ft: 600, slack_fraction: 0.20, section_length_ft: 50, hose_id_in: 2.5, dry_weight_per_section_lb: 30 };
+  const r = _v1389(base);
+  assert.ok(Math.abs(r.lay_length_ft - 720) < 1e-9);
+  assert.strictEqual(r.sections, 15);
+  assert.strictEqual(r.sections_by_map, 12);
+  assert.ok(Math.abs(r.actual_reach_ft - 750) < 1e-9);
+  assert.ok(Math.abs(r.gal_per_ft - 0.2550) < 1e-4);
+  assert.ok(Math.abs(r.water_per_section_lb - 106.33) < 1e-2);
+  assert.ok(Math.abs(r.charged_weight_lb - 2045) < 1);
+  // Volume goes as the SQUARE of diameter: 1.75 in holds about half what 2.5 in does.
+  const smaller = _v1389({ ...base, hose_id_in: 1.75 });
+  assert.ok(Math.abs(smaller.gal_per_ft / r.gal_per_ft - (1.75 / 2.5) ** 2) < 1e-12);
+  // No slack at all falls back to the map count.
+  const noSlack = _v1389({ ...base, slack_fraction: 0 });
+  assert.strictEqual(noSlack.sections, r.sections_by_map);
+  // The reach is always at least the padded lay length, never short of it.
+  assert.ok(r.actual_reach_ft >= r.lay_length_ft);
+  assert.ok("error" in _v1389({ ...base, map_distance_ft: 0 }));
+  assert.ok("error" in _v1389({ ...base, slack_fraction: -0.1 }));
+  assert.ok("error" in _v1389({ ...base, section_length_ft: 0 }));
+  assert.ok("error" in _v1389({ ...base, hose_id_in: 0 }));
+  assert.ok("error" in _v1389({ ...base, map_distance_ft: Infinity }));
+});
+
+import { computeSprinklerObstruction as _v1390 } from "../../calc-firesprinkler.js";
+test("bounds: spec-v1390 computeSprinklerObstruction pins the three-times rule and its cap", () => {
+  // A 12 in duct needs min(36, 24) = 24 in, and 24 in of separation meets it exactly.
+  const base = { obstruction_width_in: 12, horizontal_separation_in: 24, obstruction_depth_in: 8 };
+  const r = _v1390(base);
+  assert.ok(Math.abs(r.required_separation_in - 24) < 1e-9);
+  assert.ok(Math.abs(r.three_times_in - 36) < 1e-9);
+  assert.strictEqual(r.capped, true);
+  assert.ok(Math.abs(r.deficiency_in) < 1e-12);
+  assert.strictEqual(r.passes, true);
+  // Below 8 in of width the three-times rule governs and is under the cap.
+  const narrow = _v1390({ ...base, obstruction_width_in: 6 });
+  assert.ok(Math.abs(narrow.required_separation_in - 18) < 1e-9);
+  assert.strictEqual(narrow.capped, false);
+  // At exactly 8 in the two are equal and the cap has not yet bitten.
+  const atCap = _v1390({ ...base, obstruction_width_in: 8 });
+  assert.ok(Math.abs(atCap.required_separation_in - 24) < 1e-9);
+  assert.strictEqual(atCap.capped, false);
+  // A WIDER duct does not demand more separation, which is the whole point of the cap.
+  const wider = _v1390({ ...base, obstruction_width_in: 18 });
+  assert.ok(Math.abs(wider.required_separation_in - r.required_separation_in) < 1e-9);
+  assert.strictEqual(wider.passes, true);
+  // Move the head closer and it is deficient, with the sprinkler-below remedy named.
+  const close = _v1390({ ...base, horizontal_separation_in: 18 });
+  assert.strictEqual(close.passes, false);
+  assert.ok(Math.abs(close.deficiency_in - 6) < 1e-9);
+  assert.ok(close.remedy.includes("sprinkler below"));
+  assert.ok("error" in _v1390({ ...base, obstruction_width_in: 0 }));
+  assert.ok("error" in _v1390({ ...base, horizontal_separation_in: -1 }));
+  assert.ok("error" in _v1390({ ...base, obstruction_width_in: Infinity }));
+});
+
+import { computeFdcSupplyCheck as _v1391 } from "../../calc-fire.js";
+test("bounds: spec-v1391 computeFdcSupplyCheck pins the square-of-flow split", () => {
+  // 500 gpm through two 200 ft 3 in lines: 8.46 psi loss, 108.5 psi engine pressure.
+  const base = { fdc_pressure_psi: 100, total_flow_gpm: 500, lines: 2, line_length_ft: 200, friction_coefficient: 0.677, elevation_ft: 0 };
+  const r = _v1391(base);
+  assert.ok(Math.abs(r.flow_per_line_gpm - 250) < 1e-9);
+  assert.ok(Math.abs(r.friction_loss_psi - 8.4625) < 1e-4);
+  assert.ok(Math.abs(r.engine_pressure_psi - 108.4625) < 1e-4);
+  // One line quadruples the loss, because friction goes as the SQUARE of flow.
+  assert.ok(Math.abs(r.single_line_friction_psi - 4 * r.friction_loss_psi) < 1e-9);
+  assert.ok(Math.abs(r.single_line_engine_psi - 133.85) < 1e-2);
+  assert.ok(Math.abs(r.single_line_cost_psi - 25.39) < 1e-2);
+  // A one-line supply IS the single-line case, so the comparison collapses to zero cost.
+  const oneLine = _v1391({ ...base, lines: 1 });
+  assert.ok(Math.abs(oneLine.friction_loss_psi - r.single_line_friction_psi) < 1e-9);
+  assert.ok(Math.abs(oneLine.single_line_cost_psi) < 1e-12);
+  // Elevation is 0.434 psi per foot, and a connection below the pump gives pressure back.
+  const upFour = _v1391({ ...base, elevation_ft: 40 });
+  assert.ok(Math.abs(upFour.elevation_psi - 17.36) < 1e-2);
+  const below = _v1391({ ...base, elevation_ft: -10 });
+  assert.ok(below.engine_pressure_psi < r.engine_pressure_psi);
+  assert.ok("error" in _v1391({ ...base, fdc_pressure_psi: 0 }));
+  assert.ok("error" in _v1391({ ...base, total_flow_gpm: 0 }));
+  assert.ok("error" in _v1391({ ...base, lines: 0 }));
+  assert.ok("error" in _v1391({ ...base, line_length_ft: 0 }));
+  assert.ok("error" in _v1391({ ...base, friction_coefficient: 0 }));
+  assert.ok("error" in _v1391({ ...base, elevation_ft: Infinity }));
+});
+
+import { computeRadiantExposureSeparation as _v1392 } from "../../calc-fire.js";
+test("bounds: spec-v1392 computeRadiantExposureSeparation pins the weak-lever square root", () => {
+  // 5 MW at 0.3 radiates 1,500 kW and reaches 12.6 kW/m2 at 3.08 m = 10.1 ft.
+  const base = { heat_release_kw: 5000, radiative_fraction: 0.3, target_flux_kwm2: 12.6, evaluate_distance_ft: 20 };
+  const r = _v1392(base);
+  assert.ok(Math.abs(r.radiated_power_kw - 1500) < 1e-9);
+  assert.ok(Math.abs(r.separation_m - 3.078) < 1e-3);
+  assert.ok(Math.abs(r.separation_ft - 10.10) < 1e-2);
+  // A tenfold fire gives only a threefold distance: separation is a weak lever.
+  const tenfold = _v1392({ ...base, heat_release_kw: 50000 });
+  assert.ok(Math.abs(tenfold.separation_m - 9.733) < 1e-3);
+  assert.ok(Math.abs(tenfold.separation_m / r.separation_m - Math.sqrt(10)) < 1e-9);
+  // The flux AT the separation distance is exactly the target: the two are inverses,
+  // and the ft input round-trips through the metric model.
+  const atSeparation = _v1392({ ...base, evaluate_distance_ft: r.separation_ft });
+  assert.ok(Math.abs(atSeparation.flux_at_distance - base.target_flux_kwm2) < 1e-9);
+  // Doubling the distance quarters the flux.
+  const near = _v1392({ ...base, evaluate_distance_ft: 20 });
+  const far = _v1392({ ...base, evaluate_distance_ft: 40 });
+  assert.ok(Math.abs(far.flux_at_distance - near.flux_at_distance / 4) < 1e-9);
+  // A skin-pain threshold is a much longer distance than a wood-ignition one.
+  const skin = _v1392({ ...base, target_flux_kwm2: 2.5 });
+  assert.ok(skin.separation_m > r.separation_m);
+  assert.strictEqual(_v1392({ ...base, evaluate_distance_ft: 0 }).flux_at_distance, null);
+  assert.ok("error" in _v1392({ ...base, heat_release_kw: 0 }));
+  assert.ok("error" in _v1392({ ...base, radiative_fraction: 1.5 }));
+  assert.ok("error" in _v1392({ ...base, target_flux_kwm2: 0 }));
+  assert.ok("error" in _v1392({ ...base, heat_release_kw: Infinity }));
+});
+
+import { computeHydrantSpacingCount as _v1393 } from "../../calc-firesprinkler.js";
+test("bounds: spec-v1393 computeHydrantSpacingCount pins both rules and the geometry", () => {
+  // 3,000 gpm at 1,000 each is 3 by flow; 1,200 ft at 400 ft spacing is 4 by frontage.
+  const base = { required_flow_gpm: 3000, credited_flow_per_hydrant_gpm: 1000, frontage_ft: 1200, average_spacing_ft: 400, max_distance_ft: 225 };
+  const r = _v1393(base);
+  assert.strictEqual(r.hydrants_by_flow, 3);
+  assert.strictEqual(r.hydrants_by_frontage, 4);
+  assert.strictEqual(r.governing_count, 4);
+  assert.ok(Math.abs(r.actual_spacing_ft - 400) < 1e-9);
+  assert.ok(Math.abs(r.worst_distance_ft - 200) < 1e-9);
+  assert.strictEqual(r.passes, true);
+  // A site can have all the water it needs and still be short a hydrant on geometry.
+  assert.ok(r.governing.includes("spacing"));
+  // A weaker main raises the flow count until the two tie with no margin on either.
+  const weakMain = _v1393({ ...base, credited_flow_per_hydrant_gpm: 750 });
+  assert.strictEqual(weakMain.hydrants_by_flow, 4);
+  assert.ok(weakMain.governing.startsWith("neither"));
+  // A very strong main leaves the spacing rule governing on its own.
+  const strongMain = _v1393({ ...base, credited_flow_per_hydrant_gpm: 3000 });
+  assert.strictEqual(strongMain.hydrants_by_flow, 1);
+  assert.strictEqual(strongMain.governing_count, 4);
+  // A high flow demand can make the flow rule govern instead.
+  const bigFlow = _v1393({ ...base, required_flow_gpm: 8000 });
+  assert.strictEqual(bigFlow.hydrants_by_flow, 8);
+  assert.ok(bigFlow.governing.includes("flow"));
+  // A tighter distance limit fails on the same layout.
+  const tight = _v1393({ ...base, max_distance_ft: 150 });
+  assert.strictEqual(tight.passes, false);
+  assert.ok(tight.verdict.startsWith("FAILS"));
+  assert.ok("error" in _v1393({ ...base, required_flow_gpm: 0 }));
+  assert.ok("error" in _v1393({ ...base, credited_flow_per_hydrant_gpm: 0 }));
+  assert.ok("error" in _v1393({ ...base, frontage_ft: 0 }));
+  assert.ok("error" in _v1393({ ...base, average_spacing_ft: 0 }));
+  assert.ok("error" in _v1393({ ...base, max_distance_ft: 0 }));
+  assert.ok("error" in _v1393({ ...base, frontage_ft: Infinity }));
+});

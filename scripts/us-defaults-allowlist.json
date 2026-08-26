@@ -349,6 +349,12 @@
       "match": "diameter (mm",
       "family": "entertainment lighting gobos",
       "justification": "Gobo and gate sizes are specified in millimeters everywhere in the US entertainment-lighting trade: an M-size gobo is 66 mm outside diameter with a 48 mm image, and every US manufacturer's catalog and every fixture's spec sheet prints those figures in mm. A US lighting technician reads this number in mm off the gobo holder itself."
+    },
+    {
+      "module": "*",
+      "match": "kW/m2",
+      "family": "fire-protection engineering",
+      "justification": "Radiant heat flux is expressed in kW/m2 everywhere in US fire-protection engineering: the SFPE Handbook, NFPA standards, and every published ignition and tenability threshold state it that way, and a US fire protection engineer reads the number in that unit off their own reference."
     }
   ]
 }

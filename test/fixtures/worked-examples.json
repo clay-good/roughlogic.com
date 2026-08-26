@@ -90854,6 +90854,330 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "stairwell-pressurization",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "2.5 sq ft leakage at 0.15 in. w.g., 3 x 7 door, 3 in knob setback, 10 lbf closer",
+   "source_edition_or_year": "orifice flow + door moment",
+   "source_section_or_page": "Q = 2610 A sqrt(dP); 30 lbf cap",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "leakage_area_sqft": 2.5,
+    "pressure_inwg": 0.15,
+    "door_width_ft": 3,
+    "door_height_ft": 7,
+    "knob_setback_in": 3,
+    "closer_force_lbf": 10,
+    "force_limit_lbf": 30
+   },
+   "outputs": {
+    "airflow_cfm": {
+     "value": 2527.12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "door_force_lbf": {
+     "value": 18.9345,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_pressure_inwg": {
+     "value": 0.335775,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fire-tank-sizing",
+   "source_publisher": "NFPA",
+   "source_title": "750 gpm sprinkler demand + 250 gpm hose, 60 min, 8% unusable, 60 gpm refill",
+   "source_edition_or_year": "NFPA 22 / NFPA 13",
+   "source_section_or_page": "net usable capacity; hose allowance at the connection",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "sprinkler_demand_gpm": 750,
+    "hose_allowance_gpm": 250,
+    "duration_min": 60,
+    "unusable_fraction": 0.08,
+    "refill_gpm": 60
+   },
+   "outputs": {
+    "total_demand_gpm": {
+     "value": 1000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "net_volume_gal": {
+     "value": 60000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gross_volume_gal": {
+     "value": 65217.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "refill_hours": {
+     "value": 18.1159,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ppv-fan-sizing",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "18,000 cubic ft, 12,000 cfm fan at 60% entrainment, to 10% remaining, 4 min target",
+   "source_edition_or_year": "well-mixed dilution",
+   "source_section_or_page": "ln(1/f) air changes",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "volume_cf": 18000,
+    "fan_cfm": 12000,
+    "entrainment_efficiency": 0.6,
+    "remaining_fraction": 0.1,
+    "target_time_min": 4
+   },
+   "outputs": {
+    "effective_cfm": {
+     "value": 7200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "air_change_min": {
+     "value": 2.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "clearing_min": {
+     "value": 5.75646,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_cfm": {
+     "value": 17269.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hose-lay-section-count",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "600 ft approach at 20% slack, 50 ft sections of 2.5 in hose, 30 lb dry",
+   "source_edition_or_year": "hose volume",
+   "source_section_or_page": "pi (d/2)^2 x 12 / 231 gal per ft at 8.34 lb/gal",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "map_distance_ft": 600,
+    "slack_fraction": 0.2,
+    "section_length_ft": 50,
+    "hose_id_in": 2.5,
+    "dry_weight_per_section_lb": 30
+   },
+   "outputs": {
+    "lay_length_ft": {
+     "value": 720,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sections": {
+     "value": 15,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "actual_reach_ft": {
+     "value": 750,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "charged_weight_lb": {
+     "value": 2045.02,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sprinkler-obstruction",
+   "source_publisher": "NFPA",
+   "source_title": "12 in wide duct with the nearest sprinkler 24 in away",
+   "source_edition_or_year": "NFPA 13",
+   "source_section_or_page": "three times the width, capped at 24 in",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "obstruction_width_in": 12,
+    "horizontal_separation_in": 24,
+    "obstruction_depth_in": 8
+   },
+   "outputs": {
+    "required_separation_in": {
+     "value": 24,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "three_times_in": {
+     "value": 36,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "deficiency_in": {
+     "value": 0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fdc-supply-check",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "100 psi at the connection, 500 gpm through two 200 ft lines of 3 in hose, C = 0.677",
+   "source_edition_or_year": "fireground hydraulics",
+   "source_section_or_page": "FL = C (Q/100)^2 (L/100)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "fdc_pressure_psi": 100,
+    "total_flow_gpm": 500,
+    "lines": 2,
+    "line_length_ft": 200,
+    "friction_coefficient": 0.677,
+    "elevation_ft": 0
+   },
+   "outputs": {
+    "flow_per_line_gpm": {
+     "value": 250,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "friction_loss_psi": {
+     "value": 8.4625,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "engine_pressure_psi": {
+     "value": 108.463,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "single_line_engine_psi": {
+     "value": 133.85,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "radiant-exposure-separation",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "5 MW fire at a 0.3 radiative fraction against 12.6 kW/m2, flux read at 5 m",
+   "source_edition_or_year": "point-source radiation",
+   "source_section_or_page": "flux = power / (4 pi r^2)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "heat_release_kw": 5000,
+    "radiative_fraction": 0.3,
+    "target_flux_kwm2": 12.6,
+    "evaluate_distance_ft": 20
+   },
+   "outputs": {
+    "radiated_power_kw": {
+     "value": 1500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "separation_m": {
+     "value": 3.07791,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "separation_ft": {
+     "value": 10.0981,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "flux_at_distance": {
+     "value": 3.21212,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydrant-spacing-count",
+   "source_publisher": "ICC",
+   "source_title": "3,000 gpm required, 1,000 gpm per hydrant, 1,200 ft frontage, 400 ft spacing, 225 ft limit",
+   "source_edition_or_year": "International Fire Code",
+   "source_section_or_page": "Appendix C hydrant spacing",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "required_flow_gpm": 3000,
+    "credited_flow_per_hydrant_gpm": 1000,
+    "frontage_ft": 1200,
+    "average_spacing_ft": 400,
+    "max_distance_ft": 225
+   },
+   "outputs": {
+    "hydrants_by_flow": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hydrants_by_frontage": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "actual_spacing_ft": {
+     "value": 400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "worst_distance_ft": {
+     "value": 200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

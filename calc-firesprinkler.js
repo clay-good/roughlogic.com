@@ -403,3 +403,239 @@ FIRESPRINKLER_RENDERERS["jockey-pump-sizing"] = _simpleRenderer({
   ],
   compute: computeJockeyPumpSizing,
 });
+
+// ===========================================================================
+// spec-v1386, v1387, v1390, v1393: the fire-protection half of the 2026-08-26
+// trade-expansion Group F band. See specs/scope-trade-expansion.md.
+// (The fire-ground half -- PPV, hose lay, FDC supply, radiant exposure --
+// lives in calc-fire.js.)
+// ===========================================================================
+
+// ===================== spec-v1386: stairwell pressurization =====================
+// dims: in { args: dimensionless } out: { airflow_cfm: L^3 T^-1, door_force_lbf: M L T^-2, max_pressure_inwg: M L^-1 T^-2 }
+export function computeStairwellPressurization({ leakage_area_sqft = 0, pressure_inwg = 0.15, door_width_ft = 3, door_height_ft = 7, knob_setback_in = 3, closer_force_lbf = 10, force_limit_lbf = 30 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(leakage_area_sqft > 0)) return { error: "Total effective leakage area must be positive." };
+  if (!(pressure_inwg > 0)) return { error: "Design pressure difference must be positive." };
+  if (!(door_width_ft > 0 && door_height_ft > 0)) return { error: "Door width and height must be positive." };
+  if (!(knob_setback_in > 0)) return { error: "Knob setback must be positive." };
+  if (!(knob_setback_in / 12 < door_width_ft)) return { error: "Knob setback must be less than the door width." };
+  if (!(closer_force_lbf >= 0)) return { error: "Door closer force cannot be negative." };
+  if (!(force_limit_lbf > closer_force_lbf)) return { error: "The opening-force limit must exceed the closer force alone." };
+  // Orifice flow: note the SQUARE ROOT -- doubling the design pressure multiplies the fan
+  // by 1.41, not by 2. The door, not the fan, is what caps the design pressure.
+  const airflow_cfm = 2610 * leakage_area_sqft * Math.sqrt(pressure_inwg);
+  const door_area_sqft = door_width_ft * door_height_ft;
+  const setback_ft = knob_setback_in / 12;
+  const lever = 2 * (door_width_ft - setback_ft);
+  const pressure_force_lbf = 5.2 * door_width_ft * door_area_sqft * pressure_inwg / lever;
+  const door_force_lbf = closer_force_lbf + pressure_force_lbf;
+  const margin_lbf = force_limit_lbf - door_force_lbf;
+  const max_pressure_inwg = (force_limit_lbf - closer_force_lbf) * lever / (5.2 * door_width_ft * door_area_sqft);
+  const verdict = door_force_lbf <= force_limit_lbf
+    ? "PASSES the opening-force limit with " + fmt(margin_lbf, 1) + " lbf of margin"
+    : "FAILS the opening-force limit by " + fmt(-margin_lbf, 1) + " lbf -- a person cannot reliably open this door";
+  if (![airflow_cfm, door_force_lbf, margin_lbf, max_pressure_inwg].every(Number.isFinite)) return { error: "Stairwell-pressurization math is not a finite value." };
+  return {
+    airflow_cfm,
+    door_force_lbf,
+    pressure_force_lbf,
+    margin_lbf,
+    max_pressure_inwg,
+    verdict,
+    note: "The air a pressurized stairwell takes and the force it puts on the door, which are the two halves of the same design and pull against each other. A pressurized stairwell holds a positive pressure difference against the floors so smoke cannot enter, and the air it takes is an orifice problem: every gap in the enclosure -- door undercuts and edge gaps, construction leakage, penetrations -- passes flow proportional to the SQUARE ROOT of the pressure difference, with 2610 the flow coefficient in customary units. That square root matters, because doubling the design pressure does not double the fan, it multiplies it by 1.41. The second equation is the constraint that actually decides the design. Pressure across a closed door acts on the whole leaf, and the moment it produces has to be overcome at the knob, which is a short lever arm from the hinges. The code caps total opening force at 30 lbf and the door closer alone already eats 10 to 15 of it, so on a 3 by 7 door there is only so much pressure left, and the usable window between holding smoke back and letting a person out is narrow -- typically 0.10 to 0.25 in. w.g. A stairwell with 2.5 sq ft of leakage at 0.15 in. w.g. takes 2,527 cfm and opens at 18.9 lbf with a 10 lbf closer; push it to 0.25 for more smoke margin and the fan grows only 29% while the door force reaches 24.9 lbf, and with a 15 lbf closer it would be at the limit. The door, not the fan, caps the design pressure. A screen, never a stamp: the smoke-control design, its commissioning test, and a qualified engineer govern.",
+  };
+}
+
+export const stairwellPressurizationExample = { inputs: { leakage_area_sqft: 2.5, pressure_inwg: 0.15, door_width_ft: 3, door_height_ft: 7, knob_setback_in: 3, closer_force_lbf: 10, force_limit_lbf: 30 } };
+
+FIRESPRINKLER_RENDERERS["stairwell-pressurization"] = _simpleRenderer({
+  citation: "Citation: stairwell pressurization airflow from the orifice relation Q = 2610 x A x sqrt(dP) in customary units (cfm, sq ft, in. w.g.), and door opening force from the pressure moment about the hinges at the knob's lever arm, by name. The 30 lbf total opening-force cap is the International Building Code / NFPA 92 limit, cited by name and not reproduced. A screen, never a stamp; the smoke-control design, its commissioning test, and a qualified engineer govern.",
+  example: stairwellPressurizationExample.inputs,
+  fields: [
+    { key: "leakage_area_sqft", label: "Total effective leakage area (sq ft)", kind: "number" },
+    { key: "pressure_inwg", label: "Design pressure difference (in. w.g.)", kind: "number" },
+    { key: "door_width_ft", label: "Door width (ft)", kind: "number" },
+    { key: "door_height_ft", label: "Door height (ft)", kind: "number" },
+    { key: "knob_setback_in", label: "Knob setback from the latch edge (in)", kind: "number" },
+    { key: "closer_force_lbf", label: "Door closer force (lbf)", kind: "number" },
+    { key: "force_limit_lbf", label: "Opening-force limit (lbf)", kind: "number" },
+  ],
+  outputs: [
+    { key: "q", id: "stpr-out-q", label: "Required pressurization airflow", value: (r) => fmt(r.airflow_cfm, 0) + " cfm" },
+    { key: "f", id: "stpr-out-f", label: "Door opening force", value: (r) => fmt(r.door_force_lbf, 1) + " lbf (" + fmt(r.pressure_force_lbf, 1) + " lbf of it from the pressure)" },
+    { key: "v", id: "stpr-out-v", label: "Against the opening-force limit", value: (r) => r.verdict },
+    { key: "p", id: "stpr-out-p", label: "Maximum pressure this door tolerates", value: (r) => fmt(r.max_pressure_inwg, 3) + " in. w.g." },
+    { key: "n", id: "stpr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeStairwellPressurization,
+});
+
+// ===================== spec-v1387: fire-protection water tank sizing =====================
+// dims: in { args: dimensionless } out: { total_demand_gpm: L^3 T^-1, net_volume_gal: L^3, gross_volume_gal: L^3, refill_hours: T }
+export function computeFireTankSizing({ sprinkler_demand_gpm = 0, hose_allowance_gpm = 0, duration_min = 60, unusable_fraction = 0.08, refill_gpm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(sprinkler_demand_gpm > 0)) return { error: "Sprinkler system demand must be positive." };
+  if (!(hose_allowance_gpm >= 0)) return { error: "Hose stream allowance cannot be negative." };
+  if (!(duration_min > 0)) return { error: "Required duration must be positive." };
+  if (!(unusable_fraction >= 0 && unusable_fraction < 1)) return { error: "Unusable fraction must be at least 0 and below 1." };
+  if (!(refill_gpm > 0)) return { error: "Refill rate must be positive." };
+  // The tank has to hold the sprinkler demand AND the hose allowance, and the code counts
+  // NET USABLE capacity: water below the outlet does not count.
+  const total_demand_gpm = sprinkler_demand_gpm + hose_allowance_gpm;
+  const net_volume_gal = total_demand_gpm * duration_min;
+  const gross_volume_gal = net_volume_gal / (1 - unusable_fraction);
+  const refill_hours = gross_volume_gal / refill_gpm / 60;
+  const volume_without_hose_gal = sprinkler_demand_gpm * duration_min;
+  const hose_share_pct = net_volume_gal > 0 ? (net_volume_gal - volume_without_hose_gal) / net_volume_gal * 100 : 0;
+  if (![total_demand_gpm, net_volume_gal, gross_volume_gal, refill_hours, hose_share_pct].every(Number.isFinite)) return { error: "Tank-sizing math is not a finite value." };
+  return {
+    total_demand_gpm,
+    net_volume_gal,
+    gross_volume_gal,
+    refill_hours,
+    volume_without_hose_gal,
+    hose_share_pct,
+    note: "The stored water a fire-protection tank has to hold, and how long it takes to put back. The tank has to carry the sprinkler demand AND the hose stream allowance for the full required duration. The hose allowance is added to the sprinkler demand at the point of connection, and it is frequently left out of a tank calculation because it does not appear in the hydraulic calculation of the sprinkler system itself -- on a light-hazard system it can be a quarter of the total, and leaving it out undersizes the tank by that much. The gross-versus-net distinction is the second thing that gets missed: the requirement is on NET USABLE capacity, so water below the outlet, the vortex-plate allowance, and any dead volume at the bottom do not count toward it, and a tank ordered at the net figure is short by whatever that fraction is. The refill line is the operational answer, because after a fire the tank has to be restored within a maximum time, so a tank fed by a small well can be the right volume and still be unacceptable. An ordinary-hazard system demanding 750 gpm at the riser with a 250 gpm hose allowance over 60 minutes needs 60,000 gal net, which at 8% unusable is 65,217 gal gross -- a 70,000 gal tank -- and refills at 60 gpm in 18.1 hours. Without the hose allowance the net would have been 45,000 gal and a 50,000 gal tank would have looked adequate. A sizing screen, never a stamp; NFPA 22 and NFPA 13 in full, the stamped hydraulic calculation, and the AHJ govern.",
+  };
+}
+
+export const fireTankSizingExample = { inputs: { sprinkler_demand_gpm: 750, hose_allowance_gpm: 250, duration_min: 60, unusable_fraction: 0.08, refill_gpm: 60 } };
+
+FIRESPRINKLER_RENDERERS["fire-tank-sizing"] = _simpleRenderer({
+  citation: "Citation: fire-protection water tank sizing per NFPA 22 (net usable capacity, and a maximum restoration time after use) with the hose stream allowance added to the sprinkler demand at the point of connection per NFPA 13, both cited by name and not reproduced. A sizing screen, never a stamp; the stamped hydraulic calculation and the AHJ govern.",
+  example: fireTankSizingExample.inputs,
+  fields: [
+    { key: "sprinkler_demand_gpm", label: "Sprinkler demand at the point of connection (gpm)", kind: "number" },
+    { key: "hose_allowance_gpm", label: "Hose stream allowance (gpm)", kind: "number" },
+    { key: "duration_min", label: "Required duration (min)", kind: "number" },
+    { key: "unusable_fraction", label: "Unusable fraction of tank volume (0-1)", kind: "number" },
+    { key: "refill_gpm", label: "Refill rate (gpm)", kind: "number" },
+  ],
+  outputs: [
+    { key: "d", id: "ftnk-out-d", label: "Total demand", value: (r) => fmt(r.total_demand_gpm, 0) + " gpm" },
+    { key: "n", id: "ftnk-out-n", label: "Net required volume", value: (r) => fmt(r.net_volume_gal, 0) + " gal (the hose allowance is " + fmt(r.hose_share_pct, 0) + "% of it)" },
+    { key: "g", id: "ftnk-out-g", label: "Gross tank volume", value: (r) => fmt(r.gross_volume_gal, 0) + " gal" },
+    { key: "r", id: "ftnk-out-r", label: "Refill time", value: (r) => fmt(r.refill_hours, 1) + " hr" },
+    { key: "z", id: "ftnk-out-z", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFireTankSizing,
+});
+
+// ===================== spec-v1390: sprinkler obstruction clearance =====================
+// dims: in { args: dimensionless } out: { required_separation_in: L, deficiency_in: L }
+export function computeSprinklerObstruction({ obstruction_width_in = 0, horizontal_separation_in = 0, obstruction_depth_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(obstruction_width_in > 0)) return { error: "Obstruction width must be positive." };
+  if (!(horizontal_separation_in >= 0)) return { error: "Horizontal separation cannot be negative." };
+  if (!(obstruction_depth_in >= 0)) return { error: "Obstruction depth below the deflector cannot be negative." };
+  // Three times the width, CAPPED at 24 in: past two feet of width the rule stops
+  // growing and a different provision takes over.
+  const three_times_in = 3 * obstruction_width_in;
+  const required_separation_in = Math.min(three_times_in, 24);
+  const capped = three_times_in > 24;
+  const deficiency_in = Math.max(0, required_separation_in - horizontal_separation_in);
+  const passes = horizontal_separation_in >= required_separation_in;
+  // The second remedy is a vertical one: dropping the deflector to the obstruction's
+  // bottom takes the obstruction out of the pattern instead of moving the head sideways.
+  const deflector_rise_in = obstruction_depth_in;
+  const remedy = passes
+    ? (deficiency_in === 0 && horizontal_separation_in === required_separation_in
+      ? "meets the requirement exactly, with nothing to spare"
+      : "clears the requirement by " + fmt(horizontal_separation_in - required_separation_in, 1) + " in")
+    : "deficient by " + fmt(deficiency_in, 1) + " in: move the sprinkler at least that far horizontally, drop the deflector the "
+      + fmt(deflector_rise_in, 1) + " in to sit at or below the obstruction's bottom, or add a sprinkler below the obstruction -- which is a design and hydraulic change, not a field adjustment";
+  if (![required_separation_in, deficiency_in].every(Number.isFinite)) return { error: "Obstruction-clearance math is not a finite value." };
+  return {
+    required_separation_in,
+    three_times_in,
+    capped,
+    deficiency_in,
+    passes,
+    deflector_rise_in,
+    remedy,
+    note: "Whether a sprinkler sits far enough from an obstruction, by the three-times rule. A standard spray sprinkler throws its water outward and downward from the deflector, and anything hanging in that pattern casts a dry shadow behind it. The general rule for an obstruction against a wall or in the pattern is to keep the sprinkler horizontally away by at least three times the obstruction's width, capped at 24 inches -- past two feet of width the three-times rule stops growing and a different provision takes over, which is counterintuitive and is precisely why the cap exists. The rule is a screen with three outcomes and reporting all three is the point: either the sprinkler is far enough away, or it can be moved, or the deflector drops to sit at or below the obstruction's bottom so the obstruction is no longer in the pattern, or -- when none of those is possible, which is the common case with a wide duct or a continuous obstruction -- the answer is a sprinkler underneath, which is a design change and a hydraulic change rather than a field adjustment. A 12 in wide duct with the nearest sprinkler 24 in away needs min(36, 24) = 24 in and meets it exactly with nothing to spare; widen the duct to 18 in and the requirement stays at 24 in because of the cap, so the same sprinkler still passes; narrow the separation to 18 in and the head is deficient by 6 in and either moves or gains a sprinkler below it. Finding that out at rough-in is a great deal cheaper than finding it out at inspection. A screen, never a stamp; NFPA 13's obstruction provisions in full, the sprinkler manufacturer's listing, and the AHJ govern.",
+  };
+}
+
+export const sprinklerObstructionExample = { inputs: { obstruction_width_in: 12, horizontal_separation_in: 24, obstruction_depth_in: 8 } };
+
+FIRESPRINKLER_RENDERERS["sprinkler-obstruction"] = _simpleRenderer({
+  citation: "Citation: NFPA 13's three-times rule for an obstruction in a standard spray sprinkler's pattern -- horizontal separation of at least three times the obstruction width, capped at 24 in -- cited by name and not reproduced, with the listed remedies (move the sprinkler, drop the deflector to at or below the obstruction's bottom, or add a sprinkler below). A screen, never a stamp; NFPA 13 in full, the sprinkler's listing, and the AHJ govern.",
+  example: sprinklerObstructionExample.inputs,
+  fields: [
+    { key: "obstruction_width_in", label: "Obstruction width (in)", kind: "number" },
+    { key: "horizontal_separation_in", label: "Sprinkler to near edge, horizontally (in)", kind: "number" },
+    { key: "obstruction_depth_in", label: "Obstruction depth below the deflector (in)", kind: "number" },
+  ],
+  outputs: [
+    { key: "r", id: "sprob-out-r", label: "Required separation", value: (r) => fmt(r.required_separation_in, 1) + " in" + (r.capped ? " (three times the width would be " + fmt(r.three_times_in, 1) + " in, capped at 24)" : "") },
+    { key: "d", id: "sprob-out-d", label: "Deficiency", value: (r) => (r.deficiency_in > 0 ? fmt(r.deficiency_in, 1) + " in short" : "none") },
+    { key: "e", id: "sprob-out-e", label: "Deflector drop that clears the obstruction instead", value: (r) => fmt(r.deflector_rise_in, 1) + " in, to sit at or below the obstruction's bottom" },
+    { key: "v", id: "sprob-out-v", label: "Against the rule", value: (r) => (r.passes ? "PASSES: " : "FAILS: ") + r.remedy },
+    { key: "n", id: "sprob-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSprinklerObstruction,
+});
+
+// ===================== spec-v1393: hydrant count and spacing =====================
+// dims: in { args: dimensionless } out: { hydrants_by_flow: dimensionless, hydrants_by_frontage: dimensionless, actual_spacing_ft: L, max_distance_ft: L }
+export function computeHydrantSpacingCount({ required_flow_gpm = 0, credited_flow_per_hydrant_gpm = 0, frontage_ft = 0, average_spacing_ft = 0, max_distance_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(required_flow_gpm > 0)) return { error: "Required fire flow must be positive." };
+  if (!(credited_flow_per_hydrant_gpm > 0)) return { error: "Credited flow per hydrant must be positive." };
+  if (!(frontage_ft > 0)) return { error: "Frontage length must be positive." };
+  if (!(average_spacing_ft > 0)) return { error: "Average spacing requirement must be positive." };
+  if (!(max_distance_ft > 0)) return { error: "Maximum distance to a hydrant must be positive." };
+  // Two INDEPENDENT requirements: a site can have all the water it needs and still be
+  // short a hydrant on geometry.
+  const hydrants_by_flow = Math.ceil(required_flow_gpm / credited_flow_per_hydrant_gpm);
+  const hydrants_by_frontage = Math.ceil(frontage_ft / average_spacing_ft) + 1;
+  const governing_count = Math.max(hydrants_by_flow, hydrants_by_frontage);
+  const actual_spacing_ft = governing_count > 1 ? frontage_ft / (governing_count - 1) : frontage_ft;
+  const worst_distance_ft = actual_spacing_ft / 2;
+  const passes = worst_distance_ft <= max_distance_ft;
+  const governing = hydrants_by_frontage > hydrants_by_flow
+    ? "the spacing rule (geometry)"
+    : hydrants_by_flow > hydrants_by_frontage
+      ? "the flow rule (water)"
+      : "neither: both rules ask for the same count, with no margin on either";
+  const verdict = passes
+    ? "PASSES: no point on the frontage sits more than " + fmt(worst_distance_ft, 0) + " ft from a hydrant, inside the " + fmt(max_distance_ft, 0) + " ft limit"
+    : "FAILS the maximum-distance limit by " + fmt(worst_distance_ft - max_distance_ft, 0) + " ft -- add a hydrant";
+  if (![hydrants_by_flow, hydrants_by_frontage, actual_spacing_ft, worst_distance_ft].every(Number.isFinite)) return { error: "Hydrant-spacing math is not a finite value." };
+  return {
+    hydrants_by_flow,
+    hydrants_by_frontage,
+    governing_count,
+    actual_spacing_ft,
+    worst_distance_ft,
+    passes,
+    governing,
+    verdict,
+    note: "How many hydrants a site needs, from two independent requirements that both have to be satisfied. The FLOW requirement is that enough hydrants be reachable to deliver the required fire flow at once, at whatever each hydrant can actually be credited for -- which is set by the main rather than by the hydrant, and is the number a flow test produces. The SPACING requirement is geometric: no point along the frontage may sit farther than a specified distance from a hydrant, which caps how far apart they can be regardless of how much water each one makes. The code assigns both the average spacing and the maximum distance as a function of the required fire flow, in a table; those values are entered here rather than reproduced, and the geometry is the part a fire marshal actually checks against the site plan. A site requiring 3,000 gpm with hydrants credited at 1,000 gpm each needs 3 by flow, but 1,200 ft of frontage at a 400 ft average spacing needs ceil(1200/400) + 1 = 4, so the spacing rule governs -- a site can have all the water it needs and still be short a hydrant. Four hydrants across 1,200 ft sit 400 ft apart, which puts the worst point 200 ft from a hydrant, inside a 225 ft limit. Credit each hydrant at only 750 gpm, as a weaker main would, and the flow requirement rises to 4 as well, so the two tie with no margin on either -- the case where a fifth hydrant or a looped main is the real answer. A screen; the International Fire Code appendix tables, the flow test, and the fire marshal govern.",
+  };
+}
+
+export const hydrantSpacingCountExample = { inputs: { required_flow_gpm: 3000, credited_flow_per_hydrant_gpm: 1000, frontage_ft: 1200, average_spacing_ft: 400, max_distance_ft: 225 } };
+
+FIRESPRINKLER_RENDERERS["hydrant-spacing-count"] = _simpleRenderer({
+  citation: "Citation: hydrant count from the two independent requirements -- enough hydrants to deliver the required fire flow at the credited flow per hydrant, and an average spacing with a maximum distance from any point on the frontage. The International Fire Code appendix assigns both spacing values as a function of required fire flow in a table; those values are entered rather than reproduced, and the section is cited by name. The flow test and the fire marshal govern.",
+  example: hydrantSpacingCountExample.inputs,
+  fields: [
+    { key: "required_flow_gpm", label: "Required fire flow (gpm)", kind: "number" },
+    { key: "credited_flow_per_hydrant_gpm", label: "Credited flow per hydrant (gpm)", kind: "number" },
+    { key: "frontage_ft", label: "Frontage or road length served (ft)", kind: "number" },
+    { key: "average_spacing_ft", label: "Required average spacing (ft)", kind: "number" },
+    { key: "max_distance_ft", label: "Maximum distance from any point to a hydrant (ft)", kind: "number" },
+  ],
+  outputs: [
+    { key: "f", id: "hysp-out-f", label: "Hydrants by the flow rule", value: (r) => String(r.hydrants_by_flow) },
+    { key: "s", id: "hysp-out-s", label: "Hydrants by the spacing rule", value: (r) => String(r.hydrants_by_frontage) },
+    { key: "c", id: "hysp-out-c", label: "Governing count", value: (r) => String(r.governing_count) + " hydrants -- " + r.governing + " governs" },
+    { key: "a", id: "hysp-out-a", label: "Resulting spacing", value: (r) => fmt(r.actual_spacing_ft, 0) + " ft apart, worst point " + fmt(r.worst_distance_ft, 0) + " ft from a hydrant" },
+    { key: "v", id: "hysp-out-v", label: "Against the distance limit", value: (r) => r.verdict },
+    { key: "n", id: "hysp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHydrantSpacingCount,
+});

@@ -746,6 +746,11 @@ const TOOL_MODULES = (() => {
   ]);
   declare("./calc-fire.js", "FIRE_RENDERERS", [
     "fire-friction", "pdp", "hydrant-flow", "required-fire-flow",
+    // spec-v1386..v1393: the 2026-08-26 trade-expansion Group F band.
+    "ppv-fan-sizing",
+    "hose-lay-section-count",
+    "fdc-supply-check",
+    "radiant-exposure-separation",
     "master-stream", "aerial-ladder", "foam", "foam-max-coverage-area", "smoke-reading",
     // v2
     "reverse-lay-friction", "sprinkler-density", "standpipe-friction",
@@ -802,6 +807,11 @@ const TOOL_MODULES = (() => {
   declare("./calc-firesprinkler.js", "FIRESPRINKLER_RENDERERS", [
     "fire-pump-curve", "sprinkler-system-demand", "sprinkler-protection-area-for-supply", "sprinkler-head-layout", "smoke-detector-spacing-count", "drypipe-air-compressor", "jockey-pump-sizing",
     "sprinkler-pressure-demand",
+    // spec-v1386..v1393: the 2026-08-26 trade-expansion Group F band.
+    "stairwell-pressurization",
+    "fire-tank-sizing",
+    "sprinkler-obstruction",
+    "hydrant-spacing-count",
   ]);
   declare("./calc-references.js", "REFERENCE_RENDERERS", [
     "color-codes", "knot-reference", "inspection-checklist",

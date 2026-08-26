@@ -784,6 +784,15 @@ const _TILES = [
   // spec-v248..v250 fire-sprinkler system-design trio (calc-firesprinkler.js)
   ["fire-pump-curve", "F"], ["sprinkler-system-demand", "F"], ["sprinkler-protection-area-for-supply", "F"], ["sprinkler-head-layout", "F"], ["smoke-detector-spacing-count", "F"], ["drypipe-air-compressor", "F"], ["jockey-pump-sizing", "F"],
   ["sprinkler-pressure-demand", "F"],
+  // spec-v1386..v1393: the 2026-08-26 trade-expansion Group F band.
+  ["stairwell-pressurization", "F"],
+  ["fire-tank-sizing", "F"],
+  ["ppv-fan-sizing", "F"],
+  ["hose-lay-section-count", "F"],
+  ["sprinkler-obstruction", "F"],
+  ["fdc-supply-check", "F"],
+  ["radiant-exposure-separation", "F"],
+  ["hydrant-spacing-count", "F"],
   // spec-v115 trucking weight compliance (Group J)
   ["gcwr-check", "J"],
   ["tire-load-check", "J"],
