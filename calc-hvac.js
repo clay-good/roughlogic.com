@@ -3460,8 +3460,13 @@ export function computeAirPressureSetpointSavings({ current_psig = 0, reduced_ps
   const exp = (_K_AIR - 1) / _K_AIR;
   const work_current = ((current_psig + 14.7) / inlet_psia) ** exp - 1;
   const work_reduced = ((reduced_psig + 14.7) / inlet_psia) ** exp - 1;
-  const pct_saved = 1 - work_reduced / work_current;
-  const kw_saved = input_kw * pct_saved;
+  // The saved FRACTION drives the kW; the tile reports a PERCENT, because
+  // the key says pct and 268 of the catalog's 278 percent outputs are on a
+  // 0-100 scale. Returning 0.0707 under `pct_saved` made the static page
+  // print "Percent energy saved 0.0707297" -- read as 0.07%, not 7.07%.
+  const saved_fraction = 1 - work_reduced / work_current;
+  const pct_saved = saved_fraction * 100;
+  const kw_saved = input_kw * saved_fraction;
   const annual_kwh = kw_saved * run_hours;
   const annual_savings = annual_kwh * rate_kwh;
   return {
@@ -3482,7 +3487,7 @@ HVAC_RENDERERS["air-pressure-setpoint-savings"] = _rEnv({
     { key: "rate_kwh", label: "Energy rate ($/kWh)", kind: "number" },
   ],
   outputs: [
-    { key: "pct", id: "apss-out-pct", label: "Percent energy saved", value: (r) => fmt(r.pct_saved * 100, 2) + "%" },
+    { key: "pct", id: "apss-out-pct", label: "Percent energy saved", value: (r) => fmt(r.pct_saved, 2) + "%" },
     { key: "kw", id: "apss-out-kw", label: "Power saved", value: (r) => fmt(r.kw_saved, 2) + " kW" },
     { key: "kwh", id: "apss-out-kwh", label: "Annual energy saved", value: (r) => fmt(r.annual_kwh, 0) + " kWh/yr" },
     { key: "save", id: "apss-out-save", label: "Annual savings", value: (r) => "$" + fmt(r.annual_savings, 0) + "/yr" },

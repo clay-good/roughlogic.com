@@ -1679,9 +1679,13 @@ export function computeWipPercentComplete({ contract_usd = 0, cost_to_date_usd =
   if (!(est > 0)) return { error: "Estimated total cost must be positive (USD)." };
   if (cost < 0 || billed < 0) return { error: "Cost and billed amounts must be non-negative (USD)." };
   const raw_pct = cost / est;
-  const pct_complete = Math.min(raw_pct, 1.0);
+  // Reported as a PERCENT (the key and the tile name both say so); the
+  // fraction stays local because earned revenue multiplies by it. The page
+  // used to print "Percent complete 0.75" for a job 75% done.
+  const complete_fraction = Math.min(raw_pct, 1.0);
+  const pct_complete = complete_fraction * 100;
   const overrun = raw_pct > 1.0;
-  const earned_revenue = pct_complete * contract;
+  const earned_revenue = complete_fraction * contract;
   const over_under = earned_revenue - billed;
   return {
     pct_complete, earned_revenue, over_under, overrun,
@@ -1705,7 +1709,7 @@ function renderWipPercentComplete(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeWipPercentComplete({ contract_usd: Number(contract.input.value) || 0, cost_to_date_usd: Number(cost.input.value) || 0, est_total_cost_usd: Number(est.input.value) || 0, billed_to_date_usd: Number(billed.input.value) || 0 });
     if (r.error) { oPct.textContent = r.error; oEarn.textContent = "-"; oOU.textContent = "-"; oNote.textContent = ""; return; }
-    oPct.textContent = fmt(r.pct_complete * 100, 1) + "%" + (r.overrun ? " (cost past estimate -- overrun)" : "");
+    oPct.textContent = fmt(r.pct_complete, 1) + "%" + (r.overrun ? " (cost past estimate -- overrun)" : "");
     oEarn.textContent = "$" + fmt(r.earned_revenue, 0);
     oOU.textContent = (r.underbilled ? "+$" + fmt(r.over_under, 0) + " underbilled (asset)" : "-$" + fmt(Math.abs(r.over_under), 0) + " overbilled (liability)");
     oNote.textContent = r.note;

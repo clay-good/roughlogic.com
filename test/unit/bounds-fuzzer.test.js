@@ -15693,13 +15693,13 @@ test("bounds: spec-v240 computeCompressedAirPower pins the 100-psig case, the 12
 
 test("bounds: spec-v241 computeAirPressureSetpointSavings pins the 15-psi drop, the 5-psi trim, and error seams", () => {
   const r = _v241({ current_psig: 120, reduced_psig: 105, inlet_psia: 14.7, input_kw: 50, run_hours: 6000, rate_kwh: 0.10 });
-  assert.ok(Math.abs(r.pct_saved - 0.07072966232122269) < 1e-9);
+  assert.ok(Math.abs(r.pct_saved - 7.072966232122269) < 1e-9); // a PERCENT, not a fraction
   assert.ok(Math.abs(r.kw_saved - 3.5364831160611345) < 1e-6);
   assert.ok(Math.abs(r.annual_kwh - 21218.898696366807) < 1e-3);
   assert.ok(Math.abs(r.annual_savings - 2121.889869636681) < 1e-4);
   // A modest 5 psi trim.
   const r2 = _v241({ current_psig: 120, reduced_psig: 115, inlet_psia: 14.7, input_kw: 50, run_hours: 6000, rate_kwh: 0.10 });
-  assert.ok(Math.abs(r2.pct_saved - 0.022921509860722944) < 1e-9);
+  assert.ok(Math.abs(r2.pct_saved - 2.2921509860722944) < 1e-9);
   assert.ok(Math.abs(r2.annual_savings - 687.6452958216884) < 1e-4);
   // Error seams.
   assert.ok("error" in _v241({ current_psig: 120, reduced_psig: 105, inlet_psia: 0, input_kw: 50, rate_kwh: 0.10 }));
@@ -21347,7 +21347,7 @@ import { computeWipPercentComplete as _v390, computeChangeOrderMarkup as _v391, 
 
 test("bounds: spec-v390 computeWipPercentComplete pins percent complete, over/under, the overrun cap, and error seams", () => {
   const r = _v390({ contract_usd: 500000, cost_to_date_usd: 300000, est_total_cost_usd: 400000, billed_to_date_usd: 350000 });
-  assert.ok(Math.abs(r.pct_complete - 0.75) < 1e-12);
+  assert.ok(Math.abs(r.pct_complete - 75) < 1e-12); // a PERCENT, not a fraction
   assert.ok(Math.abs(r.earned_revenue - 375000) < 1e-9);
   assert.ok(Math.abs(r.over_under - 25000) < 1e-9 && r.underbilled === true);
   // Front-loaded billing flips it to overbilled.
@@ -21355,7 +21355,7 @@ test("bounds: spec-v390 computeWipPercentComplete pins percent complete, over/un
   assert.ok(Math.abs(over.over_under + 25000) < 1e-9 && over.underbilled === false);
   // Cost past the estimate caps percent complete at 100% and flags overrun.
   const orun = _v390({ contract_usd: 500000, cost_to_date_usd: 450000, est_total_cost_usd: 400000, billed_to_date_usd: 350000 });
-  assert.ok(orun.pct_complete === 1.0 && orun.overrun === true);
+  assert.ok(orun.pct_complete === 100 && orun.overrun === true); // clamped at 100%
   // Error seams.
   assert.ok("error" in _v390({ contract_usd: 0, cost_to_date_usd: 300000, est_total_cost_usd: 400000 }));
   assert.ok("error" in _v390({ contract_usd: 500000, cost_to_date_usd: 300000, est_total_cost_usd: 0 }));
@@ -22276,7 +22276,7 @@ test("bounds: spec-v403 computeBrrrrRefi pins the loan, capital recovery, CoC, a
 test("bounds: spec-v404 computeRentalTotalReturn pins the four-component sum and error seams", () => {
   const r = _v404({ cash_invested_usd: 50000, annual_cash_flow_usd: 3000, principal_paydown_usd: 2500, appreciation_usd: 7500, tax_savings_usd: 1500 });
   assert.ok(Math.abs(r.total_usd - 14500) < 1e-6);
-  assert.ok(Math.abs(r.total_pct - 0.29) < 1e-9);
+  assert.ok(Math.abs(r.total_pct - 29) < 1e-9); // a PERCENT, not a fraction
   assert.ok(Math.abs(r.cf_pct - 0.06) < 1e-9 && Math.abs(r.appr_pct - 0.15) < 1e-9);
   // Zeroing appreciation still leaves the paydown + tax shield.
   const flat = _v404({ cash_invested_usd: 50000, annual_cash_flow_usd: 3000, principal_paydown_usd: 2500, appreciation_usd: 0, tax_savings_usd: 1500 });

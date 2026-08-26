@@ -2760,7 +2760,9 @@ export function computeRentalTotalReturn({ cash_invested_usd = 0, annual_cash_fl
   if (!(cash > 0)) return { error: "Cash invested must be positive (USD)." };
   const total_usd = cf + paydown + appr + tax;
   return {
-    total_usd, total_pct: total_usd / cash,
+    // A PERCENT, not a fraction -- the key says pct. Was 0.29 for a 29%
+    // return, which an agent reading the result would report as 0.29%.
+    total_usd, total_pct: (total_usd / cash) * 100,
     cf_pct: cf / cash, paydown_pct: paydown / cash, appr_pct: appr / cash, tax_pct: tax / cash,
     note: "Rental total return, all four components as a percent of cash invested: cash flow (the money in hand), principal paydown (the tenant retiring your loan), appreciation (the value gain), and the depreciation tax shield. The cash-on-cash number alone (cash flow / cash) understates the real return, often by half or more, because it ignores equity buildup and the tax benefit. Appreciation is a projection, not a guarantee; the other three are realized. A screening aid; the actual results govern.",
   };
@@ -2782,7 +2784,7 @@ function renderRentalTotalReturn(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeRentalTotalReturn({ cash_invested_usd: readNum(cash.input), annual_cash_flow_usd: readNum(cf.input), principal_paydown_usd: readNum(pay.input), appreciation_usd: readNum(appr.input), tax_savings_usd: readNum(tax.input) });
     if (r.error) { oTotal.textContent = r.error; oBreak.textContent = "-"; oNote.textContent = ""; return; }
-    oTotal.textContent = "$" + fmt(r.total_usd, 0) + " (" + fmt(r.total_pct * 100, 1) + "% of cash)";
+    oTotal.textContent = "$" + fmt(r.total_usd, 0) + " (" + fmt(r.total_pct, 1) + "% of cash)";
     oBreak.textContent = "cash " + fmt(r.cf_pct * 100, 1) + "% + paydown " + fmt(r.paydown_pct * 100, 1) + "% + appreciation " + fmt(r.appr_pct * 100, 1) + "% + tax " + fmt(r.tax_pct * 100, 1) + "%";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
