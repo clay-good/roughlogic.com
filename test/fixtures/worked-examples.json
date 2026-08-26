@@ -1986,6 +1986,35 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Three-phase neutral current via the |I_a + a^2 I_b + a I_c| identity",
    "source_edition_or_year": "n/a",
+   "source_section_or_page": "Unbalanced 100 / 85 / 70 A: I_N = sqrt(100^2+85^2+70^2 - 100x85 - 85x70 - 100x70) = sqrt(675) = 25.98 A; imbalance = (100-70)/85 = 35.3%",
+   "verified_by": "rl",
+   "verified_on": "2026-08-25",
+   "inputs": {
+    "I_A": 100,
+    "I_B": 85,
+    "I_C": 70,
+    "harmonic_loads": false
+   },
+   "outputs": {
+    "neutral_A": {
+     "value": 25.98076211,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "imbalance_percent": {
+     "value": 35.29411765,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "neutral-imbalance",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Three-phase neutral current via the |I_a + a^2 I_b + a I_c| identity",
+   "source_edition_or_year": "n/a",
    "source_section_or_page": "Standard symmetric-components root for balanced magnitudes (no harmonics)",
    "verified_by": "rl",
    "verified_on": "2026-05-10",
@@ -23623,6 +23652,63 @@
      "value": 400,
      "tolerance": {
       "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "traverse-closure",
+   "source_publisher": "FM 5-233 Construction Surveying (by name)",
+   "source_title": "Latitude/departure misclosure and relative precision",
+   "source_edition_or_year": "FM 5-233 (public-domain US Government work)",
+   "source_section_or_page": "Closed four-course traverse (200 N, 300 E, 200 S, 299.9 W): 0.100 ft linear misclosure over a 999.9 ft perimeter = 1:9999 relative precision",
+   "verified_by": "rl",
+   "verified_on": "2026-08-25",
+   "inputs": {
+    "courses": [
+     {
+      "azimuth_deg": 0,
+      "distance": 200
+     },
+     {
+      "azimuth_deg": 90,
+      "distance": 300
+     },
+     {
+      "azimuth_deg": 180,
+      "distance": 200
+     },
+     {
+      "azimuth_deg": 270,
+      "distance": 299.9
+     }
+    ],
+    "n0": 0,
+    "e0": 0
+   },
+   "outputs": {
+    "sum_dep": {
+     "value": 0.1,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "linear_misclosure": {
+     "value": 0.1,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "perimeter_ft": {
+     "value": 999.9,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "relative_precision_denominator": {
+     "value": 9999,
+     "tolerance": {
+      "abs": 1
      }
     }
    }

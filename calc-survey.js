@@ -170,11 +170,15 @@ export function computeTraverseClosure({ courses, n0 = 0, e0 = 0 } = {}) {
     adjusted,
   };
 }
-export const traverseClosureExample = { inputs: { courses: [{ azimuth_deg: 0, distance: 100 }, { azimuth_deg: 90, distance: 200 }, { azimuth_deg: 180, distance: 100 }, { azimuth_deg: 270, distance: 200 }], n0: 0, e0: 0 } };
+// A traverse that closes PERFECTLY reports 0.000 ft misclosure and no
+// relative precision at all -- the 1:N figure is the whole reason a surveyor
+// runs the check, and a square makes it null. This one closes to 0.100 ft
+// over a 999.9 ft perimeter: 1:9999, a real answer to read.
+export const traverseClosureExample = { inputs: { courses: [{ azimuth_deg: 0, distance: 200 }, { azimuth_deg: 90, distance: 300 }, { azimuth_deg: 180, distance: 200 }, { azimuth_deg: 270, distance: 299.9 }], n0: 0, e0: 0 } };
 
 function renderTraverseClosure(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Latitude/departure traverse and compass-rule (Bowditch) adjustment per FM 5-233 Construction Surveying (public-domain US Government work) and standard surveying references. The recorded plat and surveyor of record govern; this is a field estimate.";
-  const DEFAULT = "0,100\n90,200\n180,100\n270,200";
+  const DEFAULT = "0,200\n90,300\n180,200\n270,299.9";
   const courses = makeTextarea("Courses, one per line as azimuth_deg,distance (>= 2)", "tc-courses", { rows: "4" });
   courses.input.value = DEFAULT;
   const n0 = makeNumber("Start N", "tc-n0", { step: "any" });

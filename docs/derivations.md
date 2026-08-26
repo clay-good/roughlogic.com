@@ -4996,7 +4996,7 @@ per spec-v14 §13.1 second paragraph.
 | `led-video-wall` | LED Video Wall Build | LED panel maker's spec sheet (native ...; spec-v92 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lighting-beam` | Stage Lighting Beam and Throw | first-principles theatrical photometr...; 20 deg beam, 30 ft throw, 100000 cd -> 10.58 ft pool, 111... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lighting-throw-for-pool` | Throw Distance for a Target Beam Pool | first-principles theatrical photometr...; 10.58 ft pool from a 20 deg beam -> 30 ft throw (round-tr... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `neutral-imbalance` | Three-Phase Neutral Imbalance and Distro | Project (first-principles); Standard symmetric-components root for balanced magnitude... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `neutral-imbalance` | Three-Phase Neutral Imbalance and Distro | Project (first-principles); Unbalanced 100 / 85 / 70 A: I_N = sqrt(100^2+85^2+70^2 - ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `partition-mass-law-tl` | Partition Mass-Law Transmission Loss | Mass law (Bies & Hansen / FHWA highwa...; m = 2.0 x 4.88243 = 9.765 kg/m^2; TL = 20 log10(9.765 x 5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `power-distro` | Power Distro Per-Leg Loading | First-principles AC power + NEC 80% c...; 12,000 W on 120/208 3-phase, 60 A/leg -> 33.3 A/leg, pass | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `projector-brightness` | Projector Brightness and Throw | Standard AV screen-luminance identity...; spec-v92 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5067,7 +5067,7 @@ per spec-v14 §13.1 second paragraph.
 | `sweep-width-correction` | Sweep Width Correction (Weather, Speed, Fatigue) | IAMSAR Manual Vol. II / US National S...; 120 ft raw width, weather 0.5, speed 1.0, fatigue 0.9 -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `taping-corrections` | Steel Tape Distance Corrections (Temperature, Slope, Tension, Sag) | Steel-tape corrections (Ghilani/Wolf); spec-v313 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `taping-normal-tension` | Normal Tension for a Suspended Steel Tape | standard surveying references (Ghilan...; A 100 ft span of tape at 0.02 lb/ft weighs W = 2 lb; A E ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `traverse-closure` | Traverse Closure and Adjustment | FM 5-233 Construction Surveying (by n...; Closed four-course square (100 N, 200 E, 100 S, 200 W): p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `traverse-closure` | Traverse Closure and Adjustment | FM 5-233 Construction Surveying (by n...; Closed four-course traverse (200 N, 300 E, 200 S, 299.9 W... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `utm-conversion` | UTM and Lat-Lon Conversion | USGS / NGA WGS84 UTM forward (project...; lat 40 N / lon 105 W (central meridian of zone 13) -> zon... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group Q Historical (1 tile)

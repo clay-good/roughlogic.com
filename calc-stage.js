@@ -239,7 +239,12 @@ export function computeNeutralImbalance({ I_A = 0, I_B = 0, I_C = 0, harmonic_lo
   return { neutral_A: I_N, imbalance_percent, harmonic_warning };
 }
 
-export const neutralImbalanceExample = { inputs: { I_A: 100, I_B: 100, I_C: 100, harmonic_loads: false } };
+// A BALANCED 100/100/100 A load answers 0.00 A neutral and 0.0% imbalance --
+// a correct result, and a useless worked example for a tile about imbalance.
+// 100/85/70 A gives 25.98 A on the neutral and 35.3% imbalance. The balanced
+// case is kept as the second worked-example row, where it still asserts that
+// the symmetric-components root collapses to zero.
+export const neutralImbalanceExample = { inputs: { I_A: 100, I_B: 85, I_C: 70, harmonic_loads: false } };
 
 // --- 220: SPL and Inverse Square Law ---
 
