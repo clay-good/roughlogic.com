@@ -130,6 +130,16 @@ const _TILES = [
   ["cost-per-mile", "J"],
   ["deadhead-percent", "J"],
   ["axle-load-distribution", "J"], ["static-rollover-threshold", "J"], ["truck-startability", "J"], ["hydroplaning-speed", "J"],
+  // spec-v1377..v1385: the 2026-08-26 trade-expansion Group J band.
+  ["tiedown-count", "J"],
+  ["kingpin-to-axle", "J"],
+  ["safe-descent-speed", "J"],
+  ["air-brake-pushrod-stroke", "J"],
+  ["oversize-permit-screen", "J"],
+  ["hazmat-placard-threshold", "J"],
+  ["idle-fuel-cost", "J"],
+  ["flatbed-tarp-size", "J"],
+  ["deck-point-load-dunnage", "J"],
   ["detention-demurrage-billing", "J"], ["driver-pay-cpm-vs-percentage", "J"], ["invoice-factoring-cost", "J"],
   // spec-v486 trailer tongue weight and sway check (Group J)
   ["trailer-tongue-weight", "J"],

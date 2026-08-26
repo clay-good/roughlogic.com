@@ -3283,6 +3283,7 @@ cross-check.
 | calc-treatment.js | `computeVaAlkalinityRatio` | `{ volatile_acids_mgl = 0, alkalinity_mgl = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeWeirFlow` | `{ weir_type = "vnotch90", head_ft = 0, crest_length_ft = 0, coeff = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeWeirHeadFromFlow` | `{ weir_type = "vnotch90", target_flow_cfs = 0, crest_length_ft = 0, coeff = 0...` | _ | _ | _ |
+| calc-trucking.js | `computeAirBrakePushrodStroke` | `{ readjustment_limit_in = 2.0, measured_stroke_in = 0, defective_brakes = 0, ...` | _ | _ | _ |
 | calc-trucking.js | `computeAxleLoadDistribution` | `{ drive_lb = 0, trailer_lb = 0, kingpin_to_tandem_in = 0, hole_spacing_in = 6...` | _ | _ | _ |
 | calc-trucking.js | `computeBridgeFormula` | `{ axle_weights_lb = [], axle_spacings_ft = [] }` | _ | _ | _ |
 | calc-trucking.js | `computeBridgeFormulaMinSpacing` | `{ target_weight_lb = 0, num_axles = 0 } = {}` | _ | _ | _ |
@@ -3290,24 +3291,32 @@ cross-check.
 | calc-trucking.js | `computeCostPerMile` | `{ fixed_monthly = 0, miles_month = 0, fuel_price = 0, mpg = 0, maint_cpm = 0,...` | _ | _ | _ |
 | calc-trucking.js | `computeDIM` | `{ length_in = 0, width_in = 0, height_in = 0, actual_weight_lb = 0, carrier =...` | _ | _ | _ |
 | calc-trucking.js | `computeDeadheadPercent` | `{ loaded_mi = 0, deadhead_mi = 0, revenue = 0, surcharge = 0 } = {}` | _ | _ | _ |
+| calc-trucking.js | `computeDeckPointLoadDunnage` | `{ load_lb = 0, feet_count = 4, foot_area_sqin = 0, dunnage_bearing_ft = 0, de...` | _ | _ | _ |
 | calc-trucking.js | `computeDefConsumption` | `{ diesel_gal = 0, trip_miles = 0, mpg = 0, dose_pct = 2.5, def_tank_gal = 0 }...` | _ | _ | _ |
 | calc-trucking.js | `computeDetentionDemurrageBilling` | `{ free_hours = 0, actual_hours = 0, rate_usd_hr = 0, truck_rev_usd_hr = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeDriverPayCpmVsPercentage` | `{ cpm_usd = 0, pct = 0, miles = 0, linehaul_usd = 0 } = {}` | _ | _ | _ |
+| calc-trucking.js | `computeFlatbedTarpSize` | `{ load_length_ft = 0, load_width_ft = 0, load_height_ft = 0, tarp_length_ft =...` | _ | _ | _ |
 | calc-trucking.js | `computeFreightDensity` | `{ length_in = 0, width_in = 0, height_in = 0, weight_lb = 0 }` | _ | _ | _ |
 | calc-trucking.js | `computeFuelSurcharge` | `{ current_fuel_price = 0, base_fuel_price = 0, mpg_peg = 0, loaded_miles = 0 ...` | _ | _ | _ |
 | calc-trucking.js | `computeFuelTaxIFTA` | `{ miles = 0, fleet_mpg = 0, tax_rate_per_gal = 0, gallons_purchased = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeGcwrCheck` | `{ gcwr_lb = 0, tractor_weight_lb = 0, trailer_weight_lb = 0, federal_max_lb =...` | _ | _ | _ |
 | calc-trucking.js | `computeHOS` | `{ profile = "property_70_8", events = [], weekly_on_duty_used_hr = 0, current...` | _ | _ | _ |
+| calc-trucking.js | `computeHazmatPlacardThreshold` | `{ materials = [], table1_present = false } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeHydroplaningSpeed` | `{ tire_pressure_psi = 0 } = {}` | _ | _ | _ |
+| calc-trucking.js | `computeIdleFuelCost` | `{ idle_hours_per_day = 0, operating_days = 0, idle_gph = 0.8, fuel_price = 0,...` | _ | _ | _ |
 | calc-trucking.js | `computeIncoterm` | `{ term = "FOB" }` | _ | _ | _ |
 | calc-trucking.js | `computeInvoiceFactoringCost` | `{ invoice_usd = 0, advance_pct = 90, fee_pct = 3, days_to_pay = 30 } = {}` | _ | _ | _ |
+| calc-trucking.js | `computeKingpinToAxle` | `{ kpra_ft = 0, state_limit_ft = 40, hole_spacing_in = 6 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeLoadProfitability` | `{ linehaul_revenue = 0, loaded_miles = 0, deadhead_miles = 0, fuel_price = 0,...` | _ | _ | _ |
 | calc-trucking.js | `computeMaintenanceReserve` | `{ tire_set_cost = 0, tire_life_mi = 0, pm_cost = 0, pm_interval_mi = 0, major...` | _ | _ | _ |
+| calc-trucking.js | `computeOversizePermitScreen` | `{ width_ft = 0, height_ft = 0, length_ft = 0, weight_lb = 0, width_limit_ft =...` | _ | _ | _ |
 | calc-trucking.js | `computePalletLoadout` | `{ case_length_in = 0, case_width_in = 0, case_height_in = 0, case_weight_lb =...` | _ | _ | _ |
 | calc-trucking.js | `computeReeferBurn` | `{ unit = "thermo_king_continuous", tank_gal = 50, haul_hr = 24, ambient_band ...` | _ | _ | _ |
+| calc-trucking.js | `computeSafeDescentSpeed` | `{ gcw_lb = 0, grade_pct = 0, descent_speed_mph = 0, engine_brake_hp = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeSsdDesignSpeed` | `{ sight_distance_ft = 0, reaction_time_s = 2.5, friction = 0.35, grade = 0.0 ...` | _ | _ | _ |
 | calc-trucking.js | `computeStaticRolloverThreshold` | `{ track_width_in = 72, cg_height_in = 80, curve_radius_ft = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeStoppingSightDistance` | `{ speed_mph = 0, reaction_time_s = 2.5, friction = 0.35, grade = 0.0, } = {}` | _ | _ | _ |
+| calc-trucking.js | `computeTiedownCount` | `{ length_ft = 0, weight_lb = 0, tiedowns = 0, wll_per_tiedown_lb = 0, secured...` | _ | _ | _ |
 | calc-trucking.js | `computeTireLoadCheck` | `{ axle_weight_lb = 0, tires_on_axle = 2, tire_max_load_lb = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeTrailerTongueWeight` | `{ trailer_gross_weight_lb = 0, tongue_weight_lb = 0, hitch_type = "convention...` | _ | _ | _ |
 | calc-trucking.js | `computeTruckOffTracking` | `{ turn_radius_ft = 0, wheelbase1_ft = 0, wheelbase2_ft = 0 } = {}` | _ | _ | _ |
@@ -3401,7 +3410,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1987.
+Row count: 1996.
 
 <!-- END function-corpus-v14 -->
 
@@ -4685,35 +4694,44 @@ per spec-v14 §13.1 second paragraph.
 | `tool-maintenance` | Tool Maintenance Intervals | Project bundled tool maintenance sche...; Reference compute returns the per-attribute table; runner... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 | `triage-quickread` | Field First Aid Triage Quick-Read | START / SALT triage protocols (projec...; Returns 4 categories + notice + citation; tested on the n... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 
-### Group J Trucking (30 tiles)
+### Group J Trucking (39 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
+| `air-brake-pushrod-stroke` | Air Brake Pushrod Stroke and Out-of-Service Screen | CVSA; 20% of brakes defective | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `axle-load-distribution` | Axle-Load Tandem Slide | 23 CFR 658.17 federal weight limits +...; drive 35,200 (1200 over), trailer 32,000, L 400 in, 6-in ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bridge-formula` | Federal Bridge Formula and Axle Weights | FHWA; 23 CFR 658.17 Table B | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bridge-formula-min-spacing` | Bridge Formula Minimum Axle Spread | FHWA (Federal Bridge Formula B, solve...; spec-v656 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cargo-securement-wll` | Cargo Securement Working-Load-Limit Check | FMCSA 49 CFR 393.100-393.136; 8000 lb, 4 tiedowns x 1500 lb -> 6000 lb aggregate >= 400... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cost-per-mile` | Operating Cost Per Mile | ATRI cost-per-mile bucket methodology; $6000/10,000 mi, $4.00/gal at 6.5 mpg, $0.18 maint, $0.65... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `deadhead-percent` | Deadhead Percentage and Effective Rate | Freight-economics arithmetic + FMCSA ...; 800 loaded / 120 deadhead / $1840 -> 13.04% deadhead, $2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `deck-point-load-dunnage` | Trailer Deck Point Load and Dunnage Spread | Project (first-principles); load / bearing length along the trailer | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `def-consumption` | Diesel Exhaust Fluid (DEF) Consumption and Range | DEF consumption and range model (SCR ...; spec-v508 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `detention-demurrage-billing` | Detention Billing and Opportunity Cost | carrier tariff practice; spec-v423 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dim-weight` | Dimensional Weight (DIM) | UPS / FedEx (carrier-published); UPS Service Guide divisor; FedEx Ground / Express also 13... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `driver-pay-cpm-vs-percentage` | Driver Pay: Cents-per-Mile vs Percentage | carrier settlement practice; spec-v424 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `flatbed-tarp-size` | Flatbed Tarp Coverage, Count, and Weight | Project (first-principles); width = W + 2H + 2 tuck; shingled overlap | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `freight-density` | Freight Density and NMFC Class | NMFTA; NMFTA NMFC density-class bracket (cited by name) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fuel-surcharge` | Fuel Surcharge per Mile | Standard pegged fuel-surcharge identi...; spec-v91 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fuel-tax-ifta` | IFTA Per-Jurisdiction Fuel Tax | IFTA Articles of Agreement; 1200 mi / 6 MPG = 200 gal; (200-150) x $0.30 = $15 net due | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gcwr-check` | Gross Combination Weight Check | 23 CFR 658.17 / 49 CFR 393.75 + GCWR ...; spec-v115 section 2.1 pinned example (18k + 60k = 78k, +2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `hazmat-placard-threshold` | HazMat Placarding Threshold Screen | PHMSA; 1,001 lb Table 2 aggregate | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hos-math` | Hours of Service Math | 49 CFR 395 (FMCSA hours of service fo...; property_70_8 / 0.5 hr on-duty + 5 hr drive + 0.5 hr off-... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hydroplaning-speed` | Dynamic Hydroplaning Speed | NASA TN D-2056 (Horne & Dreher) / FAA...; 9 x sqrt(100) = 90 kn x 1.1507794 = 103.57 mph; spin-up 7... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `idle-fuel-cost` | Idle Fuel Burn, Cost, and Engine-Hour Equivalent | Project (first-principles); hours x rate x price | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `incoterm-decoder` | Incoterms 2020 Decoder | ICC Incoterms 2020 (cited by name only); FOB -> name 'Free On Board' / freight 'buyer' / export 's... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `invoice-factoring-cost` | Invoice Factoring Cost and Effective APR | freight-factoring practice; spec-v425 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `kingpin-to-axle` | Kingpin-to-Rear-Axle Compliance and Tandem Slide | Project (first-principles); kingpin to rear-axle center | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `load-profitability` | Per-Load Net Profit | First-principles owner-operator load ...; spec-v91 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `maintenance-reserve` | Maintenance Reserve per Mile | First-principles owner-operator reser...; spec-v91 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `oversize-permit-screen` | Oversize and Overweight Permit Threshold Screen | Project (first-principles); excess on each of four dimensions | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pallet-loadout` | Pallet Cube and Trailer Loadout | GMA pallet (48 x 40 in) + 53 ft dry-v...; 12 x 10 x 8 in case @ 25 lb / 48 cases per pallet -> 26 p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `reefer-burn` | Reefer Fuel Burn and Run Time | Thermo King published technical bulle...; Continuous SB / 50 gal tank / 24 hr / moderate / 1200 mi ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `safe-descent-speed` | Safe Downgrade Descent Speed and Brake Load | Project (first-principles); P = W x v x grade / 550 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ssd-design-speed` | Max Design Speed from Sight Distance | AASHTO (inverse); 490.225 ft sight distance, dry level (f 0.35, t 2.5 s) ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `static-rollover-threshold` | Static Rollover Threshold | static stability factor (NHTSA); srt = (72/2)/80 = 0.45; speed = sqrt(0.45*32.174*200)*0.6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stopping-sight-distance` | Stopping Sight Distance (AASHTO) | AASHTO; d_pr = 1.47*v*t_pr; d_br = v^2 / (30*(f+g)) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `tiedown-count` | Minimum Tiedown Count and Aggregate WLL | FMCSA; 393.110 count rule and 393.106 aggregate WLL | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tire-load-check` | Tire Load-Rating Check (per Axle) | 49 CFR 393.75 + DOT sidewall marking; spec-v115 section 2.2 pinned example (capacity 12,350, ut... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-off-tracking` | Low-Speed Off-Tracking (Swept Path) | AASHTO Green Book (low-speed off-trac...; OT = 50 - sqrt(2500 - 400) = 50 - 45.826 = 4.174 ft; effe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5310,6 +5328,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1736. Fixture-covered or reference-cadence: 1736 / 1736.
+Tile count: 1745. Fixture-covered or reference-cadence: 1745 / 1745.
 
 <!-- END tile-index-v14 -->

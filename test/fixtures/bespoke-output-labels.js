@@ -385,6 +385,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "haul-road-resistance": {"required_rimpull_lb":"Required rimpull","total_resistance_pct":"Total resistance"},
   "haversine": {"miles":"Distance (miles)","kilometers":"Distance (km)","initial_bearing_deg":"Initial bearing"},
   "hay-dry-matter": {"dry_matter_lb":"Dry matter","weight_at_target_lb":"Weight at target moisture","flag":"Storage flag","note":"Note"},
+  "hazmat-placard-threshold": {"table2_aggregate_lb":"Table 2 aggregate gross weight","threshold_met":"Against the 1,001 lb threshold","class_count":"Table 2 classes aboard","verdict":"Placarding determination","note":"Note"},
   "hdd-pullback": {"pullback_lb":"Estimated pullback force","utilization":"Utilization vs safe pull"},
   "heat-trace-sizing": {"cable_ft":"Heat-trace cable","amps":"Circuit load"},
   "hemocytometer": {"cells_per_mL":"Cells per mL","viability_pct":"Viability"},

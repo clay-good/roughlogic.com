@@ -39459,3 +39459,286 @@ test("bounds: spec-v1376 computeOutdoorStageWind pins the square law and the bal
   assert.ok("error" in _v1376({ ...base, safety_factor: 0.5 }));
   assert.ok("error" in _v1376({ ...base, wind_speed_mph: Infinity }));
 });
+
+// ===========================================================================
+// spec-v1377..v1385: the 2026-08-26 trade-expansion Group J band.
+// ===========================================================================
+
+import { computeTiedownCount as _v1377 } from "../../calc-trucking.js";
+test("bounds: spec-v1377 computeTiedownCount pins both rules and which one governs", () => {
+  // 24 ft, 12,000 lb: 2 + ceil(14/10) = 4 by count; 6,000 lb aggregate WLL; 4 x 5,400 = 21,600.
+  const base = { length_ft: 24, weight_lb: 12000, tiedowns: 4, wll_per_tiedown_lb: 5400, secured_both_ends: true };
+  const r = _v1377(base);
+  assert.strictEqual(r.min_tiedowns, 4);
+  assert.ok(Math.abs(r.required_wll_lb - 6000) < 1e-9);
+  assert.ok(Math.abs(r.provided_wll_lb - 21600) < 1e-9);
+  assert.ok(r.governing.includes("count"));
+  assert.ok(r.verdict.startsWith("PASSES"));
+  // Every one of the four count-rule branches.
+  assert.strictEqual(_v1377({ ...base, length_ft: 4, weight_lb: 900 }).min_tiedowns, 1);
+  assert.strictEqual(_v1377({ ...base, length_ft: 4, weight_lb: 1200 }).min_tiedowns, 2);
+  assert.strictEqual(_v1377({ ...base, length_ft: 9, weight_lb: 100 }).min_tiedowns, 2);
+  assert.strictEqual(_v1377({ ...base, length_ft: 10 }).min_tiedowns, 2);
+  assert.strictEqual(_v1377({ ...base, length_ft: 10.5 }).min_tiedowns, 3);
+  assert.strictEqual(_v1377({ ...base, length_ft: 30 }).min_tiedowns, 4);
+  assert.strictEqual(_v1377({ ...base, length_ft: 31 }).min_tiedowns, 5);
+  // Which rule governs is a property of the CARGO and the hardware, not of the plan:
+  // the 24 ft beam needs 4 by count and only 2 chains of this rating by weight.
+  assert.strictEqual(r.tiedowns_by_wll, 2);
+  // Short and heavy flips it: a 4 ft, 14,000 lb block is trivial on count and needs
+  // three 3,000 lb chains on weight, so the chain rating decides.
+  const block = _v1377({ length_ft: 4, weight_lb: 14000, tiedowns: 3, wll_per_tiedown_lb: 3000, secured_both_ends: true });
+  assert.strictEqual(block.min_tiedowns, 2);
+  assert.ok(Math.abs(block.required_wll_lb - 7000) < 1e-9);
+  assert.strictEqual(block.tiedowns_by_wll, 3);
+  assert.ok(block.governing.includes("working load limit"));
+  // With big enough chains the same block is governed by neither rule in particular.
+  const bigChains = _v1377({ length_ft: 4, weight_lb: 14000, tiedowns: 2, wll_per_tiedown_lb: 5400, secured_both_ends: true });
+  assert.strictEqual(bigChains.tiedowns_by_wll, 2);
+  assert.ok(bigChains.governing.startsWith("neither"));
+  // Anchored at one end only, a tiedown counts half its working load limit.
+  const oneEnd = _v1377({ ...base, secured_both_ends: false });
+  assert.ok(Math.abs(oneEnd.provided_wll_lb - r.provided_wll_lb / 2) < 1e-9);
+  // Three chains passes the WLL rule and fails the count rule.
+  const three = _v1377({ ...base, tiedowns: 3 });
+  assert.ok(three.verdict.startsWith("FAILS the count rule"));
+  assert.ok("error" in _v1377({ ...base, length_ft: 0 }));
+  assert.ok("error" in _v1377({ ...base, weight_lb: 0 }));
+  assert.ok("error" in _v1377({ ...base, tiedowns: 0 }));
+  assert.ok("error" in _v1377({ ...base, wll_per_tiedown_lb: 0 }));
+  assert.ok("error" in _v1377({ ...base, weight_lb: Infinity }));
+});
+
+import { computeKingpinToAxle as _v1378 } from "../../calc-trucking.js";
+test("bounds: spec-v1378 computeKingpinToAxle pins the slide in whole holes", () => {
+  // 42 ft against 40 ft is 24 in over: ceil(24/6) = 4 holes forward, landing at 40.0 ft.
+  const base = { kpra_ft: 42, state_limit_ft: 40, hole_spacing_in: 6 };
+  const r = _v1378(base);
+  assert.ok(Math.abs(r.excess_ft - 2.0) < 1e-9);
+  assert.strictEqual(r.holes_needed, 4);
+  assert.ok(Math.abs(r.resulting_kpra_ft - 40.0) < 1e-9);
+  assert.ok(Math.abs(r.slide_in - 24) < 1e-9);
+  // Holes are whole: a partial hole always rounds up, so the result lands under the limit.
+  const partial = _v1378({ ...base, kpra_ft: 41.1 });
+  assert.strictEqual(partial.holes_needed, 3);
+  assert.ok(partial.resulting_kpra_ft < base.state_limit_ft);
+  // Already compliant needs no slide at all, and never a negative one.
+  const legal = _v1378({ ...base, kpra_ft: 38 });
+  assert.strictEqual(legal.holes_needed, 0);
+  assert.ok(Math.abs(legal.resulting_kpra_ft - 38) < 1e-9);
+  assert.ok(legal.verdict.startsWith("COMPLIANT"));
+  // A 41 ft state limit is a different answer for the same trailer.
+  assert.strictEqual(_v1378({ ...base, state_limit_ft: 41 }).holes_needed, 2);
+  assert.ok("error" in _v1378({ ...base, kpra_ft: 0 }));
+  assert.ok("error" in _v1378({ ...base, state_limit_ft: 0 }));
+  assert.ok("error" in _v1378({ ...base, hole_spacing_in: 0 }));
+  assert.ok("error" in _v1378({ ...base, kpra_ft: Infinity }));
+});
+
+import { computeSafeDescentSpeed as _v1379 } from "../../calc-trucking.js";
+test("bounds: spec-v1379 computeSafeDescentSpeed pins the balance speed and the shortfall", () => {
+  // 80,000 lb on 6%: 320 hp at 25 mph, balance at 31.25 mph, 576 hp at 45 mph.
+  const base = { gcw_lb: 80000, grade_pct: 6, descent_speed_mph: 45, engine_brake_hp: 400 };
+  const r = _v1379(base);
+  assert.ok(Math.abs(r.descent_power_hp - 576) < 1e-6);
+  assert.ok(Math.abs(r.balance_speed_mph - 31.25) < 1e-6);
+  assert.ok(Math.abs(r.service_brake_hp - 176) < 1e-6);
+  assert.ok(r.verdict.startsWith("NOT engine-brake controlled"));
+  const slow = _v1379({ ...base, descent_speed_mph: 25 });
+  assert.ok(Math.abs(slow.descent_power_hp - 320) < 1e-6);
+  assert.ok(Math.abs(slow.reserve_hp - 80) < 1e-6);
+  assert.ok(Math.abs(slow.service_brake_hp) < 1e-12);
+  assert.ok(slow.verdict.startsWith("engine-brake controlled"));
+  // AT the balance speed the demand exactly equals the retarder rating.
+  const atBalance = _v1379({ ...base, descent_speed_mph: r.balance_speed_mph });
+  assert.ok(Math.abs(atBalance.descent_power_hp - base.engine_brake_hp) < 1e-6);
+  // The balance speed falls inversely with weight: a permit load balances much slower.
+  const heavy = _v1379({ ...base, gcw_lb: 105000 });
+  assert.ok(Math.abs(heavy.balance_speed_mph - 23.81) < 1e-2);
+  assert.ok(Math.abs(heavy.balance_speed_mph - r.balance_speed_mph * 80000 / 105000) < 1e-9);
+  assert.ok("error" in _v1379({ ...base, gcw_lb: 0 }));
+  assert.ok("error" in _v1379({ ...base, grade_pct: 0 }));
+  assert.ok("error" in _v1379({ ...base, descent_speed_mph: 0 }));
+  assert.ok("error" in _v1379({ ...base, engine_brake_hp: 0 }));
+  assert.ok("error" in _v1379({ ...base, gcw_lb: Infinity }));
+});
+
+import { computeAirBrakePushrodStroke as _v1380 } from "../../calc-trucking.js";
+test("bounds: spec-v1380 computeAirBrakePushrodStroke pins the at-the-limit rule and 20%", () => {
+  // 3 of 10 defective is 30%, at or past the 20% threshold: out of service.
+  const base = { readjustment_limit_in: 2.0, measured_stroke_in: 1.75, defective_brakes: 3, total_brakes: 10 };
+  const r = _v1380(base);
+  assert.ok(Math.abs(r.margin_in - 0.25) < 1e-9);
+  assert.strictEqual(r.this_brake_defective, false);
+  assert.ok(Math.abs(r.defective_fraction_pct - 30) < 1e-9);
+  assert.strictEqual(r.out_of_service, true);
+  // AT the limit counts as defective, not only over it.
+  assert.strictEqual(_v1380({ ...base, measured_stroke_in: 2.0 }).this_brake_defective, true);
+  assert.strictEqual(_v1380({ ...base, measured_stroke_in: 1.999 }).this_brake_defective, false);
+  // Exactly 20% is out of service: 2 of 10.
+  const two = _v1380({ ...base, defective_brakes: 2 });
+  assert.ok(Math.abs(two.defective_fraction_pct - 20) < 1e-9);
+  assert.strictEqual(two.out_of_service, true);
+  // One defective is legal to operate, and it is one brake from being parked.
+  const one = _v1380({ ...base, defective_brakes: 1 });
+  assert.strictEqual(one.out_of_service, false);
+  assert.strictEqual(one.brakes_to_oos, 1);
+  // A long-stroke chamber has a different limit for the same measurement.
+  assert.strictEqual(_v1380({ ...base, readjustment_limit_in: 2.5, measured_stroke_in: 2.25 }).this_brake_defective, false);
+  assert.ok("error" in _v1380({ ...base, readjustment_limit_in: 0 }));
+  assert.ok("error" in _v1380({ ...base, measured_stroke_in: -1 }));
+  assert.ok("error" in _v1380({ ...base, total_brakes: 0 }));
+  assert.ok("error" in _v1380({ ...base, defective_brakes: 11 }));
+  assert.ok("error" in _v1380({ ...base, measured_stroke_in: Infinity }));
+});
+
+import { computeOversizePermitScreen as _v1381 } from "../../calc-trucking.js";
+test("bounds: spec-v1381 computeOversizePermitScreen pins the excess on each dimension", () => {
+  // 12 ft wide, 14.5 ft high, 75 ft long, 90,000 lb against 8.5 / 14.0 / 75 / 80,000.
+  const base = { width_ft: 12.0, height_ft: 14.5, length_ft: 75, weight_lb: 90000, width_limit_ft: 8.5, height_limit_ft: 14.0, length_limit_ft: 75, weight_limit_lb: 80000 };
+  const r = _v1381(base);
+  assert.ok(Math.abs(r.width_excess_ft - 3.5) < 1e-9);
+  assert.ok(Math.abs(r.height_excess_ft - 0.5) < 1e-9);
+  assert.ok(Math.abs(r.length_excess_ft) < 1e-9);
+  assert.ok(Math.abs(r.weight_excess_lb - 10000) < 1e-9);
+  // Exactly at the limit is NOT over: three of four, not four.
+  assert.strictEqual(r.over_count, 3);
+  assert.strictEqual(r.permit_required, true);
+  assert.ok(r.verdict.includes("width, height, weight"));
+  // A legal load on all four indicates no permit.
+  const legal = _v1381({ ...base, width_ft: 8.5, height_ft: 13.5, weight_lb: 79000 });
+  assert.strictEqual(legal.over_count, 0);
+  assert.strictEqual(legal.permit_required, false);
+  // A route with a taller limit takes the height question off the table.
+  const tallRoute = _v1381({ ...base, height_limit_ft: 14.5 });
+  assert.strictEqual(tallRoute.over_count, 2);
+  assert.ok("error" in _v1381({ ...base, width_ft: 0 }));
+  assert.ok("error" in _v1381({ ...base, weight_lb: 0 }));
+  assert.ok("error" in _v1381({ ...base, height_limit_ft: 0 }));
+  assert.ok("error" in _v1381({ ...base, width_ft: Infinity }));
+});
+
+import { computeHazmatPlacardThreshold as _v1382 } from "../../calc-trucking.js";
+test("bounds: spec-v1382 computeHazmatPlacardThreshold pins the 1,001 lb aggregate", () => {
+  // 400 + 700 = 1,100 lb aggregate, at or above 1,001: placard required.
+  const materials = [
+    { name: "flammable liquid, drum", hazard_class: "3", gross_lb: 400, table1: false },
+    { name: "flammable liquid, tote", hazard_class: "3", gross_lb: 700, table1: false },
+  ];
+  const r = _v1382({ materials, table1_present: false });
+  assert.ok(Math.abs(r.table2_aggregate_lb - 1100) < 1e-9);
+  assert.strictEqual(r.threshold_met, true);
+  assert.strictEqual(r.placard_required, true);
+  // 950 lb is under the threshold -- a PLACARDING exemption only.
+  const under = _v1382({ materials: [materials[0], { ...materials[1], gross_lb: 550 }], table1_present: false });
+  assert.ok(Math.abs(under.table2_aggregate_lb - 950) < 1e-9);
+  assert.strictEqual(under.threshold_met, false);
+  assert.ok(under.verdict.includes("PLACARDING exemption"));
+  // Exactly 1,001 lb meets the threshold; 1,000 does not.
+  assert.strictEqual(_v1382({ materials: [{ hazard_class: "3", gross_lb: 1001 }], table1_present: false }).threshold_met, true);
+  assert.strictEqual(_v1382({ materials: [{ hazard_class: "3", gross_lb: 1000 }], table1_present: false }).threshold_met, false);
+  // The aggregate runs across ALL Table 2 classes, not per class.
+  const mixed = _v1382({ materials: [{ hazard_class: "3", gross_lb: 600 }, { hazard_class: "8", gross_lb: 500 }], table1_present: false });
+  assert.ok(Math.abs(mixed.table2_aggregate_lb - 1100) < 1e-9);
+  assert.strictEqual(mixed.class_count, 2);
+  assert.strictEqual(mixed.threshold_met, true);
+  // A Table 1 material placards at ANY quantity, and never counts toward the aggregate.
+  const t1 = _v1382({ materials: [{ hazard_class: "1.1", gross_lb: 5, table1: true }], table1_present: false });
+  assert.strictEqual(t1.placard_required, true);
+  assert.strictEqual(t1.threshold_met, false);
+  assert.ok(Math.abs(t1.table2_aggregate_lb) < 1e-12);
+  assert.ok("error" in _v1382({ materials: [], table1_present: false }));
+  assert.ok("error" in _v1382({ materials: [{ hazard_class: "3", gross_lb: -1 }], table1_present: false }));
+  assert.ok("error" in _v1382({ materials: [{ hazard_class: "3", gross_lb: 0 }], table1_present: false }));
+});
+
+import { computeIdleFuelCost as _v1383 } from "../../calc-trucking.js";
+test("bounds: spec-v1383 computeIdleFuelCost pins the fuel, the fleet, and the wear equivalent", () => {
+  // 6 x 250 = 1,500 hr; x 0.8 = 1,200 gal; x $4.10 = $4,920; x 20 = $98,400; x 7 = 10,500 mi.
+  const base = { idle_hours_per_day: 6, operating_days: 250, idle_gph: 0.8, fuel_price: 4.10, trucks: 20, miles_per_engine_hour: 7, fleet_annual_miles: 2200000 };
+  const r = _v1383(base);
+  assert.ok(Math.abs(r.annual_idle_hours - 1500) < 1e-9);
+  assert.ok(Math.abs(r.annual_gallons - 1200) < 1e-9);
+  assert.ok(Math.abs(r.annual_cost - 4920) < 1e-6);
+  assert.ok(Math.abs(r.fleet_cost - 98400) < 1e-6);
+  assert.ok(Math.abs(r.equivalent_miles - 10500) < 1e-9);
+  assert.ok(Math.abs(r.cost_per_mile_cents - 4.4727) < 1e-3);
+  // The per-mile figure is the same whether it is taken per truck or across the fleet.
+  const perTruck = _v1383({ ...base, trucks: 1, fleet_annual_miles: 110000 });
+  assert.ok(Math.abs(perTruck.cost_per_mile_cents - r.cost_per_mile_cents) < 1e-9);
+  // Without a mileage figure the per-mile output is null, not zero.
+  assert.strictEqual(_v1383({ ...base, fleet_annual_miles: 0 }).cost_per_mile_cents, null);
+  // Halving the idle hours halves every downstream figure.
+  const half = _v1383({ ...base, idle_hours_per_day: 3 });
+  assert.ok(Math.abs(half.fleet_cost - r.fleet_cost / 2) < 1e-6);
+  assert.ok(Math.abs(half.equivalent_miles - r.equivalent_miles / 2) < 1e-9);
+  assert.ok("error" in _v1383({ ...base, idle_hours_per_day: 0 }));
+  assert.ok("error" in _v1383({ ...base, operating_days: 0 }));
+  assert.ok("error" in _v1383({ ...base, idle_gph: 0 }));
+  assert.ok("error" in _v1383({ ...base, fuel_price: 0 }));
+  assert.ok("error" in _v1383({ ...base, trucks: 0 }));
+  assert.ok("error" in _v1383({ ...base, miles_per_engine_hour: -1 }));
+  assert.ok("error" in _v1383({ ...base, fuel_price: Infinity }));
+});
+
+import { computeFlatbedTarpSize as _v1384 } from "../../calc-trucking.js";
+test("bounds: spec-v1384 computeFlatbedTarpSize pins the both-sides width and the shingling", () => {
+  // 8 + 2(6) + 2(1) = 22 ft wide; ceil((40-4)/(20-4)) = 3 tarps covering 52 ft at 195 lb.
+  const base = { load_length_ft: 40, load_width_ft: 8, load_height_ft: 6, tarp_length_ft: 20, tarp_width_ft: 27, overlap_ft: 4, tuck_ft: 1, tarp_weight_lb: 65 };
+  const r = _v1384(base);
+  assert.ok(Math.abs(r.width_needed_ft - 22) < 1e-9);
+  assert.strictEqual(r.width_ok, true);
+  assert.ok(Math.abs(r.width_spare_ft - 5) < 1e-9);
+  assert.strictEqual(r.tarps_needed, 3);
+  assert.ok(Math.abs(r.covered_length_ft - 52) < 1e-9);
+  assert.strictEqual(r.length_ok, true);
+  assert.ok(Math.abs(r.total_weight_lb - 195) < 1e-9);
+  // Height counts TWICE, because the tarp comes down both sides.
+  const taller = _v1384({ ...base, load_height_ft: 7 });
+  assert.ok(Math.abs(taller.width_needed_ft - r.width_needed_ft - 2) < 1e-9);
+  // Three feet taller and the steel tarp no longer reaches.
+  const tooTall = _v1384({ ...base, load_height_ft: 9 });
+  assert.strictEqual(tooTall.width_ok, false);
+  assert.ok(tooTall.verdict.includes("too narrow"));
+  // Every overlap costs its length from the run: 3 x 20 is 60 ft of tarp, 52 ft of coverage.
+  assert.ok(Math.abs(r.tarps_needed * base.tarp_length_ft - r.covered_length_ft - (r.tarps_needed - 1) * base.overlap_ft) < 1e-9);
+  // With no overlap the shingling loss disappears.
+  const noLap = _v1384({ ...base, overlap_ft: 0 });
+  assert.strictEqual(noLap.tarps_needed, 2);
+  assert.ok(Math.abs(noLap.covered_length_ft - 40) < 1e-9);
+  assert.ok("error" in _v1384({ ...base, load_length_ft: 0 }));
+  assert.ok("error" in _v1384({ ...base, load_width_ft: 0 }));
+  assert.ok("error" in _v1384({ ...base, tarp_length_ft: 0 }));
+  assert.ok("error" in _v1384({ ...base, overlap_ft: 20 }));
+  assert.ok("error" in _v1384({ ...base, tuck_ft: -1 }));
+  assert.ok("error" in _v1384({ ...base, load_height_ft: Infinity }));
+});
+
+import { computeDeckPointLoadDunnage as _v1385 } from "../../calc-trucking.js";
+test("bounds: spec-v1385 computeDeckPointLoadDunnage pins the linear conversion", () => {
+  // 12,000 lb on two 8 ft timbers is 1,500 plf, 125% of a 1,200 plf deck; 10 ft is exact.
+  const base = { load_lb: 12000, feet_count: 4, foot_area_sqin: 36, dunnage_bearing_ft: 8, deck_rating_plf: 1200 };
+  const r = _v1385(base);
+  assert.ok(Math.abs(r.total_bearing_sqft - 1.0) < 1e-9);
+  assert.ok(Math.abs(r.bearing_pressure_psf - 12000) < 1e-9);
+  assert.ok(Math.abs(r.linear_load_plf - 1500) < 1e-9);
+  assert.ok(Math.abs(r.utilization_pct - 125) < 1e-9);
+  assert.ok(Math.abs(r.required_length_ft - 10.0) < 1e-9);
+  assert.ok(Math.abs(r.shortfall_ft - 2.0) < 1e-9);
+  assert.ok(r.verdict.startsWith("OVER"));
+  // At exactly the required length the utilization is 100% and the shortfall is gone.
+  const exact = _v1385({ ...base, dunnage_bearing_ft: 10 });
+  assert.ok(Math.abs(exact.utilization_pct - 100) < 1e-9);
+  assert.ok(Math.abs(exact.shortfall_ft) < 1e-12);
+  // Twelve feet gives real margin.
+  const roomy = _v1385({ ...base, dunnage_bearing_ft: 12 });
+  assert.ok(Math.abs(roomy.utilization_pct - 83.33) < 1e-2);
+  assert.ok(roomy.verdict.includes("real margin"));
+  // Without a foot area the bare-pressure output is null, not zero.
+  assert.strictEqual(_v1385({ ...base, foot_area_sqin: 0 }).bearing_pressure_psf, null);
+  assert.ok("error" in _v1385({ ...base, load_lb: 0 }));
+  assert.ok("error" in _v1385({ ...base, feet_count: 0 }));
+  assert.ok("error" in _v1385({ ...base, dunnage_bearing_ft: 0 }));
+  assert.ok("error" in _v1385({ ...base, deck_rating_plf: 0 }));
+  assert.ok("error" in _v1385({ ...base, load_lb: Infinity }));
+});

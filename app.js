@@ -938,6 +938,16 @@ const TOOL_MODULES = (() => {
     "def-consumption",
     // spec-v913 static rollover threshold
     "static-rollover-threshold", "truck-startability", "hydroplaning-speed",
+    // spec-v1377..v1385: the 2026-08-26 trade-expansion Group J band.
+    "tiedown-count",
+    "kingpin-to-axle",
+    "safe-descent-speed",
+    "air-brake-pushrod-stroke",
+    "oversize-permit-screen",
+    "hazmat-placard-threshold",
+    "idle-fuel-cost",
+    "flatbed-tarp-size",
+    "deck-point-load-dunnage",
   ]);
   // v4 Group K: Mechanic - Auto, Marine, Aviation.
   declare("./calc-mechanic.js", "MECHANIC_RENDERERS", [

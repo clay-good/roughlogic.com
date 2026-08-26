@@ -250,6 +250,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "harmonic-resonance": {"h_resonant":{"prefix":"","suffix":"th order","digits":2}},
   "haul-cycle-production": {"production_lcy_hr":{"prefix":"","suffix":" lcy/hr","digits":1},"trucks_to_match":{"prefix":"","suffix":" trucks"},"fleet_production_lcy_hr":{"prefix":"","suffix":" lcy/hr","digits":0}},
   "hay-dry-matter": {"dry_matter_lb":{"prefix":"","suffix":" lb","digits":0},"weight_at_target_lb":{"prefix":"","suffix":" lb","digits":0}},
+  "hazmat-placard-threshold": {"table2_aggregate_lb":{"prefix":"","suffix":" lb","digits":0}},
   "hdd-pullback": {"pullback_lb":{"prefix":"","suffix":" lb","digits":0}},
   "henderson-hasselbalch": {"moles_base":{"prefix":"","suffix":" mol","digits":6},"moles_acid":{"prefix":"","suffix":" mol","digits":6}},
   "hepa-filter-life": {"days":{"prefix":"","suffix":" days","digits":1},"grams_per_day":{"prefix":"","suffix":" g/day","digits":1}},

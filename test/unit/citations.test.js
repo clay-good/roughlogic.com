@@ -328,7 +328,8 @@ test("Group J audit coverage: every trucking tile id has a CITATIONS entry", asy
   const re = /\{ id: "([a-z0-9-]+)"/g;
   let m;
   while ((m = re.exec(groupJBlock)) !== null) ids.push(m[1]);
-  assert.ok(ids.length === 22, "expected 22 Group J tile ids, got " + ids.length);
+  // 22 original + the 9 of the spec-v1377..v1385 trade-expansion band.
+  assert.ok(ids.length === 31, "expected 31 Group J tile ids, got " + ids.length);
   for (const id of ids) {
     assert.ok(CITATIONS[id], "Group J tile '" + id + "' missing CITATIONS entry");
   }

@@ -90492,6 +90492,368 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "tiedown-count",
+   "source_publisher": "FMCSA",
+   "source_title": "24 ft, 12,000 lb steel beam on four tiedowns at 5,400 lb WLL each, secured both ends",
+   "source_edition_or_year": "49 CFR 393",
+   "source_section_or_page": "393.110 count rule and 393.106 aggregate WLL",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "length_ft": 24,
+    "weight_lb": 12000,
+    "tiedowns": 4,
+    "wll_per_tiedown_lb": 5400,
+    "secured_both_ends": true
+   },
+   "outputs": {
+    "min_tiedowns": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_wll_lb": {
+     "value": 6000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "provided_wll_lb": {
+     "value": 21600,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "kingpin-to-axle",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "42 ft measured against a 40 ft limit on 6 in hole spacing",
+   "source_edition_or_year": "state KPRA limit",
+   "source_section_or_page": "kingpin to rear-axle center",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "kpra_ft": 42,
+    "state_limit_ft": 40,
+    "hole_spacing_in": 6
+   },
+   "outputs": {
+    "excess_ft": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "holes_needed": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "resulting_kpra_ft": {
+     "value": 40,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "slide_in": {
+     "value": 24,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "safe-descent-speed",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "80,000 lb on a 6% grade at 45 mph with a 400 hp engine brake",
+   "source_edition_or_year": "gravitational work rate",
+   "source_section_or_page": "P = W x v x grade / 550",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "gcw_lb": 80000,
+    "grade_pct": 6,
+    "descent_speed_mph": 45,
+    "engine_brake_hp": 400
+   },
+   "outputs": {
+    "descent_power_hp": {
+     "value": 576,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "balance_speed_mph": {
+     "value": 31.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "service_brake_hp": {
+     "value": 176,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "air-brake-pushrod-stroke",
+   "source_publisher": "CVSA",
+   "source_title": "1.75 in stroke against a 2.0 in limit; 3 of 10 brakes defective",
+   "source_edition_or_year": "out-of-service criteria",
+   "source_section_or_page": "20% of brakes defective",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "readjustment_limit_in": 2,
+    "measured_stroke_in": 1.75,
+    "defective_brakes": 3,
+    "total_brakes": 10
+   },
+   "outputs": {
+    "margin_in": {
+     "value": 0.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "defective_fraction_pct": {
+     "value": 30,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "oversize-permit-screen",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "12 ft x 14 ft 6 in x 75 ft, 90,000 lb against an 8.5 / 14.0 / 75 / 80,000 route",
+   "source_edition_or_year": "route thresholds",
+   "source_section_or_page": "excess on each of four dimensions",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "width_ft": 12,
+    "height_ft": 14.5,
+    "length_ft": 75,
+    "weight_lb": 90000,
+    "width_limit_ft": 8.5,
+    "height_limit_ft": 14,
+    "length_limit_ft": 75,
+    "weight_limit_lb": 80000
+   },
+   "outputs": {
+    "width_excess_ft": {
+     "value": 3.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "height_excess_ft": {
+     "value": 0.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "weight_excess_lb": {
+     "value": 10000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hazmat-placard-threshold",
+   "source_publisher": "PHMSA",
+   "source_title": "400 lb and 700 lb gross of Class 3, nothing from Table 1",
+   "source_edition_or_year": "49 CFR 172.504",
+   "source_section_or_page": "1,001 lb Table 2 aggregate",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "materials": [
+     {
+      "name": "flammable liquid, drum",
+      "hazard_class": "3",
+      "gross_lb": 400,
+      "table1": false
+     },
+     {
+      "name": "flammable liquid, tote",
+      "hazard_class": "3",
+      "gross_lb": 700,
+      "table1": false
+     }
+    ],
+    "table1_present": false
+   },
+   "outputs": {
+    "table2_aggregate_lb": {
+     "value": 1100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_lb": {
+     "value": -99,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "idle-fuel-cost",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "6 hr/day, 250 days, 0.8 gal/hr, $4.10 diesel, 20 trucks, 2.2M fleet miles",
+   "source_edition_or_year": "idle fuel balance",
+   "source_section_or_page": "hours x rate x price",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "idle_hours_per_day": 6,
+    "operating_days": 250,
+    "idle_gph": 0.8,
+    "fuel_price": 4.1,
+    "trucks": 20,
+    "miles_per_engine_hour": 7,
+    "fleet_annual_miles": 2200000
+   },
+   "outputs": {
+    "annual_idle_hours": {
+     "value": 1500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annual_gallons": {
+     "value": 1200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annual_cost": {
+     "value": 4920,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fleet_cost": {
+     "value": 98400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "equivalent_miles": {
+     "value": 10500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cost_per_mile_cents": {
+     "value": 4.47273,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flatbed-tarp-size",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "40 ft load, 8 ft wide, 6 ft high, 20 x 27 ft tarps with a 4 ft lap and 1 ft tuck",
+   "source_edition_or_year": "wrap geometry",
+   "source_section_or_page": "width = W + 2H + 2 tuck; shingled overlap",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "load_length_ft": 40,
+    "load_width_ft": 8,
+    "load_height_ft": 6,
+    "tarp_length_ft": 20,
+    "tarp_width_ft": 27,
+    "overlap_ft": 4,
+    "tuck_ft": 1,
+    "tarp_weight_lb": 65
+   },
+   "outputs": {
+    "width_needed_ft": {
+     "value": 22,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tarps_needed": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "covered_length_ft": {
+     "value": 52,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_weight_lb": {
+     "value": 195,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "deck-point-load-dunnage",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "12,000 lb machine on four 36 sq in feet, two 8 ft timbers, deck rated 1,200 plf",
+   "source_edition_or_year": "linear deck rating",
+   "source_section_or_page": "load / bearing length along the trailer",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "load_lb": 12000,
+    "feet_count": 4,
+    "foot_area_sqin": 36,
+    "dunnage_bearing_ft": 8,
+    "deck_rating_plf": 1200
+   },
+   "outputs": {
+    "bearing_pressure_psf": {
+     "value": 12000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "linear_load_plf": {
+     "value": 1500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "utilization_pct": {
+     "value": 125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_length_ft": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

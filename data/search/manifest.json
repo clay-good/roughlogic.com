@@ -9,7 +9,7 @@
     {
       "file": "aliases.json",
       "name": "Search aliases master (authoring source; runtime loads the per-group aliases-<letter>.json shards)",
-      "gzip_size_bytes": 298765
+      "gzip_size_bytes": 299262
     },
     {
       "file": "aliases-a.json",
@@ -54,7 +54,7 @@
     {
       "file": "aliases-j.json",
       "name": "Search aliases, group J runtime shard (generated from aliases.json)",
-      "gzip_size_bytes": 5805
+      "gzip_size_bytes": 6266
     },
     {
       "file": "aliases-k.json",

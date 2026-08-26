@@ -5,11 +5,11 @@
 // the number first and keeps its explanation in the single place it belongs.
 // The compute still returns the note; only where it is PRINTED changes.
 //
-// 998 of 1736 tiles, one bit each in TOOLS order (see the
+// 1007 of 1745 tiles, one bit each in TOOLS order (see the
 // generator for why this is a bitmap and not a list of ids).
 import { TOOLS } from "./tools-data.js";
 
-const BITS = "BACE3wAAAEIAAGoIQPj8B0ACARIA0Ho8v/4APYCBACBQYYM4kA4AAPCxAAAAAsAAAIJ/k8QF+AB/nwPA97w/+P8BOMADAD7/hR/oHwIAOPsBAPA/3P+C4f/H7+8/zuO/+T/mjn+n+//f/f+fl/1/////+v////7/7/u//////+f/3/yH///3/+vBM5nvPobffAMAwH/8f9o5/v///+3/93/4O7593fc/P/j9///2/9+n67/N918BgB8PALj8EAa7CBB/smac/OT8/+/B/v+hAML8/X/lefynng==";
+const BITS = "BACE3wAAAEIAAGoIQPj8B0ACARIA0Ho8v/4APYCBACBQYYM4kA4AAPCxAAAAAsAAAIL//yaJC/AB/j4HgO95f/D/A3CABwB8/gs/0D8EAHD2AwDgf7j/BcP/j9/ff5zHf/N/zB3/Tvf/v/v/Py/7//7///X////9/9/3f//////P/7/5D///7//Xg2cy330Mv/kGAID/+P+0c/z////b/+//8Hd8+7rvf37w+///7f+/T9d/m++/AgA/HgBw+SEMdhEg/mTNOPnJ+f/fg/3/QwGE+fv/yvP4Tz0B";
 
 const bytes = Uint8Array.from(atob(BITS), (c) => c.charCodeAt(0));
 export const CONSTANT_NOTE_TILES = new Set(
