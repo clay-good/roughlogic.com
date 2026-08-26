@@ -179,8 +179,10 @@ export function computeMasterStreamReach({ nozzle_type, nozzle_pressure_psi }) {
 }
 
 export const masterStreamExample = {
-  inputs: { nozzle_type: "smooth_bore_2", nozzle_pressure_psi: 80 },
-  expected: { typical_reach_ft: 100 },
+  // The publisher-verified case the tile page prints (IFSTA): a 1-3/4 in
+  // smooth bore at 80 psi reaches 90 ft.
+  inputs: { nozzle_type: "smooth_bore_1_75", nozzle_pressure_psi: 80 },
+  expected: { typical_reach_ft: 90 },
 };
 
 // --- Utility 56: Aerial Ladder Reach ---

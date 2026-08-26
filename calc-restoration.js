@@ -131,7 +131,9 @@ export function computeDehumidifierSize({ room_cubic_feet, water_class = "2", ex
 }
 
 export const dehumidifierExample = {
-  inputs: { room_cubic_feet: 5000, water_class: "2" },
+  // The publisher-verified case the tile page prints (AHAM DH-1 / IICRC S500):
+  // 6000 ft^3 Class 2 -> 240 pints/day AHAM, 372 field-corrected.
+  inputs: { room_cubic_feet: 6000, water_class: "2" },
   expectedRange: { aham_pints_per_day: { min: 150, max: 250 } },
 };
 
@@ -253,7 +255,9 @@ export function computeMoldRisk({ rh_percent, temperature_F, hours_elevated }) {
 }
 
 export const moldExample = {
-  inputs: { rh_percent: 75, temperature_F: 75, hours_elevated: 48 },
+  // The publisher-verified case the tile page prints (EPA / IICRC S520-2024):
+  // 80% RH for 60 elevated hours -> high risk.
+  inputs: { rh_percent: 80, temperature_F: 75, hours_elevated: 60 },
   expected: { risk: "high" },
 };
 

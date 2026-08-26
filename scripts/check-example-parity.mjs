@@ -43,6 +43,11 @@ for (const r of rows) if (!fixture.has(r.tile_id)) fixture.set(r.tile_id, r);
 // would bury the real defects -- a tile that prints 600 and loads 800. 0.1% is
 // tighter than any rounding in the catalog and still catches every real
 // divergence; the closest genuine one (0.015452 vs 0.015) is 3% out.
+// "abv-from-gravity" -> "abvFromGravity".
+function camelCase(id) {
+  return String(id).split("-").map((p, i) => (i === 0 ? p : p.charAt(0).toUpperCase() + p.slice(1))).join("");
+}
+
 const DISPLAY_TOLERANCE = 0.001;
 const close = (a, b) => Math.abs(a - b) <= Math.max(Math.abs(b) * DISPLAY_TOLERANCE, 1e-12);
 
@@ -82,7 +87,18 @@ for (const [id, reg] of Object.entries(COMPUTE_MAP)) {
   // an acronym breaks: computeDIM -> `dIMExample`, but the module writes
   // `dimExample`. Fall back to a case-insensitive match on the same name rather
   // than leaving 33 tiles uncompared over their spelling.
-  const ex = mod[name] || mod[Object.keys(mod).find((k) => k.toLowerCase() === name.toLowerCase())];
+  // A second convention exists: 16 tiles name the export after the TILE
+  // ("abv-from-gravity" -> `abvFromGravityExample`) rather than after the
+  // compute stem, because the two do not always match. Both are deterministic
+  // -- neither guesses at an export -- so try the tile id before giving up.
+  // A tile the gate cannot resolve is a tile whose printed example is
+  // UNVERIFIED against the one it opens, which is exactly where the seven
+  // divergences fixed in 8803966f were living.
+  const byTile = camelCase(id) + "Example";
+  const ex = mod[name]
+    || mod[Object.keys(mod).find((k) => k.toLowerCase() === name.toLowerCase())]
+    || mod[byTile]
+    || mod[Object.keys(mod).find((k) => k.toLowerCase() === byTile.toLowerCase())];
   if (!ex || !ex.inputs) { unresolved++; continue; }
   compared++;
   const diffs = [];
