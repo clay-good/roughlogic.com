@@ -1,6 +1,6 @@
 {
  "_comment": "v10 Phase C.1 worked-example registry (spec-v10 \u00a75.1). One or more rows per tile recording a worked example from a primary public source: tile id, source citation, inputs, expected outputs with tolerance. The unit-test runner (when wired in Phase C migration) reads the registry and asserts each tile's output matches within tolerance. This file is the migration target for the existing per-test fixture obligation; tiles are added incrementally.",
- "_updated": "2026-06-18",
+ "_updated": "2026-08-26",
  "_schema": "Each row: { tile_id, source_publisher, source_title, source_edition_or_year, source_section_or_page, verified_by, verified_on (ISO date), inputs (object), outputs (object: { name: { value, tolerance: { abs?, pct? } } }) }. Tolerance defaults per spec-v10 \u00a75.3: code-table 1 percent or 1 unit-of-least-precision; first-principles 0.5 percent; standard-rounded sizes exact match.",
  "_coverage_target": "Spec-v10 \u00a75.2 declares this file the migration target. Every tile must eventually have at least one row. Current coverage is a starter set; new tiles ship a row with their PR per the contributor checklist. The check-worked-examples.mjs linter reports coverage but does not (yet) fail CI on missing rows. Fail-on-missing is enabled when coverage exceeds 80 percent.",
  "rows": [
@@ -89301,6 +89301,627 @@
     },
     "height_ft": {
      "value": 22.61,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ice-machine-sizing",
+   "source_publisher": "AHRI",
+   "source_title": "300 covers x 1.5 lb/cover, derate 0.80, utilization 0.90, peak 0.40",
+   "source_edition_or_year": "Standard 810 rating point",
+   "source_section_or_page": "70 F air / 50 F water",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "covers_per_day": 300,
+    "lb_per_cover": 1.5,
+    "derate_factor": 0.8,
+    "utilization": 0.9,
+    "peak_fraction": 0.4
+   },
+   "outputs": {
+    "daily_demand_lb": {
+     "value": 450,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_nameplate_lb": {
+     "value": 625,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bin_capacity_lb": {
+     "value": 180,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "warewasher-hot-water",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "1.16 gpm rinse, 140 F supply, 180 F rinse, 40 racks/hr x 1.2 gal, 80% booster",
+   "source_edition_or_year": "sensible heat",
+   "source_section_or_page": "500.4 BTU/hr per gpm-degree F",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "rinse_gpm": 1.16,
+    "supply_temp_f": 140,
+    "rinse_temp_f": 180,
+    "racks_per_hour": 40,
+    "gal_per_rack": 1.2,
+    "booster_efficiency": 0.8
+   },
+   "outputs": {
+    "delta_t_f": {
+     "value": 40,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "booster_btuh": {
+     "value": 23218.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "booster_kw": {
+     "value": 6.80497,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gas_input_btuh": {
+     "value": 29023.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hourly_hot_water_gal": {
+     "value": 48,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "freezing-time-plank",
+   "source_publisher": "ASHRAE",
+   "source_title": "3 in beef slab, 65 lb/ft3, Lf 106, 28 F freezing point, -10 F blast, h 3.0, k 0.9",
+   "source_edition_or_year": "Handbook Refrigeration",
+   "source_section_or_page": "Plank's equation, slab constants 1/2 and 1/8",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "a_ft": 0.25,
+    "shape": "slab",
+    "density_pcf": 65,
+    "latent_heat_btu_lb": 106,
+    "freezing_point_f": 28,
+    "medium_temp_f": -10,
+    "h_coeff": 3,
+    "k_frozen": 0.9
+   },
+   "outputs": {
+    "freezing_time_hr": {
+     "value": 9.12875,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "surface_term": {
+     "value": 0.0416667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "internal_term": {
+     "value": 0.00868056,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thaw-time",
+   "source_publisher": "ASHRAE",
+   "source_title": "12 lb turkey as a 0.7 ft sphere, 64 lb/ft3, Lf 106, 28 F thaw point, 38 F cooler, h 2.0, k 0.28",
+   "source_edition_or_year": "Handbook Refrigeration",
+   "source_section_or_page": "Plank's equation reversed, sphere constants 1/6 and 1/24",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "a_ft": 0.7,
+    "shape": "sphere",
+    "density_pcf": 64,
+    "latent_heat_btu_lb": 106,
+    "thaw_point_f": 28,
+    "cooler_temp_f": 38,
+    "h_coeff": 2,
+    "k_unfrozen": 0.28
+   },
+   "outputs": {
+    "thaw_time_hr": {
+     "value": 89.04,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "thaw_time_days": {
+     "value": 3.71,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "surface_term": {
+     "value": 0.0583333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "internal_term": {
+     "value": 0.0729167,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fryer-oil-turnover",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "50 lb vat, 120 lb/day at 12% pickup, 360 days, $1.10/lb",
+   "source_edition_or_year": "oil-absorption balance",
+   "source_section_or_page": "turnover = vat capacity / daily loss",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "vat_capacity_lb": 50,
+    "daily_product_lb": 120,
+    "absorption_fraction": 0.12,
+    "operating_days": 360,
+    "oil_price_per_lb": 1.1
+   },
+   "outputs": {
+    "daily_oil_loss_lb": {
+     "value": 14.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "turnover_days": {
+     "value": 3.47222,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annual_oil_lb": {
+     "value": 5184,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annual_cost": {
+     "value": 5702.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "keg-yield",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "$150 half barrel, 16 oz pours, 15% loss, $7 menu price",
+   "source_edition_or_year": "US keg volumes",
+   "source_section_or_page": "half barrel 15.5 gal x 128 fl oz/gal",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "keg_size": "half_barrel",
+    "custom_gallons": 0,
+    "serving_oz": 16,
+    "loss_fraction": 0.15,
+    "keg_cost": 150,
+    "menu_price": 7
+   },
+   "outputs": {
+    "gross_oz": {
+     "value": 1984,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "net_oz": {
+     "value": 1686.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "servings": {
+     "value": 105.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cost_per_serving": {
+     "value": 1.42315,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pour_cost_pct": {
+     "value": 20.3307,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "beverage-co2-duration",
+   "source_publisher": "Brewers Association",
+   "source_title": "20 lb cylinder, 1.2 lb CO2/keg direct-draw, 2 kegs/day, 20% reserve",
+   "source_edition_or_year": "Draught Beer Quality Manual",
+   "source_section_or_page": "per-keg CO2 consumption",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "cylinder_lb": 20,
+    "lb_co2_per_keg": 1.2,
+    "kegs_per_day": 2,
+    "reserve_fraction": 0.2
+   },
+   "outputs": {
+    "kegs_per_cylinder": {
+     "value": 16.6667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "days_of_supply": {
+     "value": 8.33333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "changeout_kegs": {
+     "value": 13.3333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "changeout_days": {
+     "value": 6.66667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dough-ball-scaling",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "12 in round pan at a 0.10 thickness factor, scaled from a 20.11 oz ball on a 16 in pan",
+   "source_edition_or_year": "thickness-factor scaling",
+   "source_section_or_page": "area = pi (d/2)^2",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "pan_shape": "round",
+    "diameter_in": 12,
+    "length_in": 0,
+    "width_in": 0,
+    "thickness_factor": 0.1,
+    "reference_weight_oz": 20.11,
+    "reference_diameter_in": 16
+   },
+   "outputs": {
+    "pan_area_sqin": {
+     "value": 113.097,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "dough_weight_oz": {
+     "value": 11.3097,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "scaled_weight_oz": {
+     "value": 11.3119,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fermentation-time-q10",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "2.0 hr bulk at 78 F, dough at 68 F, Q10 = 2.0",
+   "source_edition_or_year": "Q10 rule",
+   "source_section_or_page": "t = t_ref x Q10^(delta C / 10)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "reference_time_hr": 2,
+    "reference_temp_f": 78,
+    "actual_temp_f": 68,
+    "q10": 2
+   },
+   "outputs": {
+    "predicted_time_hr": {
+     "value": 2.93947,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ratio": {
+     "value": 1.46973,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "delta_f": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "delta_c": {
+     "value": 5.55556,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "covers-per-labor-hour",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "420 covers, 96 labor hours, $12,600 net sales, $1,680 labor",
+   "source_edition_or_year": "labor productivity",
+   "source_section_or_page": "CPLH / SPLH",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "covers": 420,
+    "labor_hours": 96,
+    "net_sales": 12600,
+    "labor_cost": 1680
+   },
+   "outputs": {
+    "cplh": {
+     "value": 4.375,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "splh": {
+     "value": 131.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "labor_cost_pct": {
+     "value": 13.3333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "average_check": {
+     "value": 30,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "labor_per_cover": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "par-level-order",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "24 lb/day, 2-day lead, 3-day cycle, 25% safety, 40 lb on hand, 10 lb cases",
+   "source_edition_or_year": "inventory par",
+   "source_section_or_page": "par = usage x (lead + cycle) x (1 + safety)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "daily_usage": 24,
+    "lead_time_days": 2,
+    "order_cycle_days": 3,
+    "safety_factor": 0.25,
+    "on_hand": 40,
+    "on_order": 0,
+    "units_per_case": 10
+   },
+   "outputs": {
+    "coverage_days": {
+     "value": 5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "par_level": {
+     "value": 150,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "order_needed": {
+     "value": 110,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cases": {
+     "value": 11,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tphc-window",
+   "source_publisher": "FDA",
+   "source_title": "potato salad marked at 10:30 am, 41 F into a 75 F room, tau 4.0 hr, 6-hour option",
+   "source_edition_or_year": "Food Code",
+   "source_section_or_page": "3-501.19",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "mark_time": "10:30",
+    "window_option": "cold_6",
+    "start_temp_f": 41,
+    "ambient_f": 75,
+    "tau_hr": 4
+   },
+   "outputs": {
+    "window_hr": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "projected_temp_f": {
+     "value": 67.4136,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "time_to_70_hr": {
+     "value": 7.66769,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steam-kettle-heatup",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "40 gal kettle, 60 F to 200 F, 100,000 BTU/hr, 85% jacket, steam at 15 psig",
+   "source_edition_or_year": "sensible heat + steam latent heat",
+   "source_section_or_page": "945.6 BTU/lb at 15 psig",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "gallons": 40,
+    "specific_gravity": 1,
+    "specific_heat": 1,
+    "start_temp_f": 60,
+    "final_temp_f": 200,
+    "rated_input_btuh": 100000,
+    "jacket_efficiency": 0.85,
+    "latent_heat_btu_lb": 945.6
+   },
+   "outputs": {
+    "mass_lb": {
+     "value": 333.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heat_btu": {
+     "value": 46704,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heatup_min": {
+     "value": 32.9675,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "steam_per_batch_lb": {
+     "value": 49.3909,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "steam_rate_lb_hr": {
+     "value": 89.89,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hot-holding-energy",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "3 x 1.5 kW steam tables, 2 x 0.5 kW lamps, 1 x 2.0 kW cabinet, diversity 0.65, 208 V three-phase",
+   "source_edition_or_year": "diversified demand",
+   "source_section_or_page": "3,412 BTU/hr per kW",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "equipment": [
+     {
+      "name": "steam table",
+      "kw": 1.5,
+      "qty": 3
+     },
+     {
+      "name": "heat lamp",
+      "kw": 0.5,
+      "qty": 2
+     },
+     {
+      "name": "holding cabinet",
+      "kw": 2,
+      "qty": 1
+     }
+    ],
+    "diversity_factor": 0.65,
+    "voltage": 208,
+    "phase": "three"
+   },
+   "outputs": {
+    "connected_kw": {
+     "value": 7.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "demand_kw": {
+     "value": 4.875,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "demand_amps": {
+     "value": 13.5316,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sensible_btuh": {
+     "value": 16633.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tons": {
+     "value": 1.38613,
      "tolerance": {
       "pct": 0.5
      }

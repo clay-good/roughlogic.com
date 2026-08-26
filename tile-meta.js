@@ -313,6 +313,21 @@ const _TILES = [
 
   ["recipe-scale", "O"], ["yield-ep", "O"], ["as-purchased-quantity", "O"], ["cooling-curve", "O"],
   ["plate-cost", "O"], ["pan-conversion", "O"], ["sous-vide-pasteurization", "O"],
+  // spec-v1350..v1363: the 2026-08-26 trade-expansion Group O band.
+  ["ice-machine-sizing", "O"],
+  ["warewasher-hot-water", "O"],
+  ["freezing-time-plank", "O"],
+  ["thaw-time", "O"],
+  ["fryer-oil-turnover", "O"],
+  ["keg-yield", "O"],
+  ["beverage-co2-duration", "O"],
+  ["dough-ball-scaling", "O"],
+  ["fermentation-time-q10", "O"],
+  ["covers-per-labor-hour", "O"],
+  ["par-level-order", "O"],
+  ["tphc-window", "O"],
+  ["steam-kettle-heatup", "O"],
+  ["hot-holding-energy", "O"],
 
   ["pacing-distance", "P"], ["bearing-conversion", "P"], ["slope-avalanche", "P"],
   ["backcountry-needs", "P"], ["utm-conversion", "P"], ["solar-times", "P"],

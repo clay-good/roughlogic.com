@@ -1169,6 +1169,21 @@ const TOOL_MODULES = (() => {
   // v4 Group O: Kitchen and Food Service.
   declare("./calc-kitchen.js", "KITCHEN_RENDERERS", [
     "recipe-scale", "yield-ep", "as-purchased-quantity", "cooling-curve",
+    // spec-v1350..v1363: the 2026-08-26 trade-expansion Group O band.
+    "ice-machine-sizing",
+    "warewasher-hot-water",
+    "freezing-time-plank",
+    "thaw-time",
+    "fryer-oil-turnover",
+    "keg-yield",
+    "beverage-co2-duration",
+    "dough-ball-scaling",
+    "fermentation-time-q10",
+    "covers-per-labor-hour",
+    "par-level-order",
+    "tphc-window",
+    "steam-kettle-heatup",
+    "hot-holding-energy",
     "plate-cost", "pan-conversion",
     // v9
     "sous-vide-pasteurization",

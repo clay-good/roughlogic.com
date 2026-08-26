@@ -129,3 +129,10 @@ written, so the fixture that lands with the tile has a verified target.
 The bands are independent and can land in any order. Within a band, specs are ordered so that a
 tile never depends on one specified later. Nothing in this program changes an existing tile,
 renames an id, or moves a tile between groups.
+
+### Landed so far
+
+| Band | Specs | Status |
+| --- | --- | --- |
+| Kitchen and food service (Group O) | v1350-v1363 | **landed 2026-08-26**, 14 tiles; catalog 1,709 -> 1,723 |
+| Every other band | v1364-v1449 | not yet built |

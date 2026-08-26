@@ -437,6 +437,7 @@ export const BESPOKE_LABELS = {
   "horizontal-curve": {"mode":"Definition mode","radius_ft":"Radius R (ft)","degree_of_curve":"Degree of curve D","delta_deg":"Deflection angle delta (deg)","pi_station_ft":"PI station (ft, optional)"},
   "horizontal-sightline-offset": {"mode":"Solve for","R_ft":"Curve radius R to inside-lane CL (ft)","S_ft":"Sight distance S (ft)","M_ft":"Cleared offset M (ft)"},
   "hos-math": {"profile":"Profile","weekly_on_duty_used_hr":"Weekly on-duty already used (hr)"},
+  "hot-holding-energy": {"diversity_factor":"Diversity factor (0-1)","voltage":"Service voltage (V)","phase":"Phase"},
   "hp-from-torque": {"solve_for":"Solve for","torque_lbft":"Torque (lb-ft)","rpm":"RPM","hp":"Horsepower"},
   "humidifier-capacity": {"cfm":"Supply airflow (CFM)","supply_db_F":"Supply dry-bulb (°F)","entering_rh_pct":"Entering RH (%)","target_rh_pct":"Target RH (%)","altitude_ft":"Altitude (ft)"},
   "hx-lmtd-ntu": {"config":"Flow configuration","th_in_F":"Hot inlet (°F)","th_out_F":"Hot outlet (°F)","tc_in_F":"Cold inlet (°F)","tc_out_F":"Cold outlet (°F)","hot_gpm":"Hot flow (GPM)","cold_gpm":"Cold flow (GPM)","hot_fluid":"Hot fluid","cold_fluid":"Cold fluid"},

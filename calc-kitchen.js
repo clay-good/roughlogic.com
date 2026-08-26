@@ -3,7 +3,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
-  makeOutputLine, attachExampleButton, fmt, makeRowField,
+  makeOutputLine, attachExampleButton, fmt, makeRowField, makeText,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
@@ -225,6 +225,7 @@ function _r(spec) {
     for (const f of spec.fields) {
       let field;
       if (f.kind === "select") field = makeSelect(f.label, f.id || f.key, f.options);
+      else if (f.kind === "text") field = makeText(f.label, f.id || f.key, f.attrs || {});
       else field = makeNumber(f.label, f.id || f.key, f.attrs || { step: "any" });
       fields[f.key] = field;
       if (f.default !== undefined) {
@@ -247,6 +248,7 @@ function _r(spec) {
       const params = {};
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
+        else if (f.kind === "text") params[f.key] = fields[f.key].input.value;
         else params[f.key] = Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
@@ -1246,3 +1248,836 @@ KITCHEN_RENDERERS["abv-from-gravity"] = _r({
   ],
   compute: computeAbvFromGravity,
 });
+
+// ===========================================================================
+// spec-v1350..v1363: the 2026-08-26 trade-expansion Group O band.
+// See specs/scope-trade-expansion.md. Fourteen tiles, no new dependency.
+// ===========================================================================
+
+// ===================== spec-v1350: ice machine capacity and bin sizing =====================
+// dims: in { args: dimensionless } out: { daily_demand_lb: M, required_nameplate_lb: M, bin_capacity_lb: M }
+export function computeIceMachineSizing({ covers_per_day = 0, lb_per_cover = 0, derate_factor = 0.8, utilization = 0.9, peak_fraction = 0.4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(covers_per_day > 0)) return { error: "Covers per day must be positive." };
+  if (!(lb_per_cover > 0)) return { error: "Pounds of ice per cover must be positive." };
+  if (!(derate_factor > 0 && derate_factor <= 1)) return { error: "Derate factor must be between 0 and 1." };
+  if (!(utilization > 0 && utilization <= 1)) return { error: "Utilization must be between 0 and 1." };
+  if (!(peak_fraction > 0 && peak_fraction <= 1)) return { error: "Peak-period fraction must be between 0 and 1." };
+  // Machine is sized for the DAY, bin for the PEAK BLOCK; the two are different numbers.
+  const daily_demand_lb = covers_per_day * lb_per_cover;
+  const required_nameplate_lb = daily_demand_lb / (derate_factor * utilization);
+  const bin_capacity_lb = daily_demand_lb * peak_fraction;
+  if (![daily_demand_lb, required_nameplate_lb, bin_capacity_lb].every(Number.isFinite)) return { error: "Ice-machine sizing math is not a finite value." };
+  return {
+    daily_demand_lb,
+    required_nameplate_lb,
+    bin_capacity_lb,
+    note: "Ice machine nameplate production and bin capacity from the covers a kitchen serves, the two sizing questions a food-service package gets wrong most often. Daily demand is covers times pounds of ice per cover, a planning benchmark near 1.5 lb for a full-service restaurant and well above that for a bar-heavy concept. Machines are cataloged at the AHRI 810 rating point, 70 F ambient air with 50 F inlet water, and a real kitchen delivers neither: at 90 F air and 70 F water the same machine makes roughly a fifth less ice, so the nameplate must be bought oversized. Utilization is the second derate, because a machine run at 100% duty has no recovery margin, and the practice is to size near 90%. Nameplate = daily demand / (derate x utilization). A 300-cover restaurant at 1.5 lb per cover needs 450 lb/day, and at a 0.80 derate and 0.90 utilization the nameplate is 450 / 0.72 = 625 lb/day, so a 500 lb/day machine is undersized by a fifth. The bin is a separate question: it is sized for the peak block, the fraction of the day's ice that must be sitting in the bin when the rush starts, because production during the rush is slower than draw, so 40% of 450 lb is a 180 lb bin. A planning estimate; the manufacturer's published capacity table at the installed air and water temperature governs the selection.",
+  };
+}
+
+export const iceMachineSizingExample = { inputs: { covers_per_day: 300, lb_per_cover: 1.5, derate_factor: 0.80, utilization: 0.90, peak_fraction: 0.40 } };
+
+KITCHEN_RENDERERS["ice-machine-sizing"] = _r({
+  citation: "Citation: ice machine capacity and bin sizing against the AHRI Standard 810 rating point (70 F air / 50 F water), by name, with the standard installed-condition derate and utilization practice. Daily demand = covers x lb per cover; nameplate = demand / (derate x utilization); bin = demand x peak fraction. A planning screen; the manufacturer's published capacity at the installed air and water temperature governs the selection.",
+  example: iceMachineSizingExample.inputs,
+  fields: [
+    { key: "covers_per_day", label: "Covers per day", kind: "number" },
+    { key: "lb_per_cover", label: "Ice per cover (lb)", kind: "number" },
+    { key: "derate_factor", label: "Installed-condition derate (0-1)", kind: "number" },
+    { key: "utilization", label: "Target utilization (0-1)", kind: "number" },
+    { key: "peak_fraction", label: "Peak-period fraction of daily demand (0-1)", kind: "number" },
+  ],
+  outputs: [
+    { key: "d", id: "icems-out-d", label: "Daily ice demand", value: (r) => fmt(r.daily_demand_lb, 1) + " lb/day" },
+    { key: "m", id: "icems-out-m", label: "Required nameplate at 70/50", value: (r) => fmt(r.required_nameplate_lb, 1) + " lb/day" },
+    { key: "b", id: "icems-out-b", label: "Required bin capacity", value: (r) => fmt(r.bin_capacity_lb, 1) + " lb" },
+    { key: "n", id: "icems-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeIceMachineSizing,
+});
+
+// ===================== spec-v1351: warewasher hot-water demand and booster sizing =====================
+// dims: in { args: dimensionless } out: { delta_t_f: T, booster_btuh: dimensionless, booster_kw: dimensionless, gas_input_btuh: dimensionless, hourly_hot_water_gal: L^3 }
+export function computeWarewasherHotWater({ rinse_gpm = 0, supply_temp_f = 140, rinse_temp_f = 180, racks_per_hour = 0, gal_per_rack = 0, booster_efficiency = 0.8 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(rinse_gpm > 0)) return { error: "Final-rinse flow must be positive." };
+  if (!(rinse_temp_f > supply_temp_f)) return { error: "Final-rinse temperature must exceed the supply temperature." };
+  if (!(racks_per_hour > 0)) return { error: "Racks per hour must be positive." };
+  if (!(gal_per_rack > 0)) return { error: "Gallons per rack must be positive." };
+  if (!(booster_efficiency > 0 && booster_efficiency <= 1)) return { error: "Booster thermal efficiency must be between 0 and 1." };
+  // 500.4 = 8.34 lb/gal x 60 min/hr: one gpm raised one degree F is 500.4 BTU/hr.
+  const delta_t_f = rinse_temp_f - supply_temp_f;
+  const booster_btuh = rinse_gpm * delta_t_f * 500.4;
+  const booster_kw = booster_btuh / 3412;
+  const gas_input_btuh = booster_btuh / booster_efficiency;
+  const hourly_hot_water_gal = racks_per_hour * gal_per_rack;
+  if (![delta_t_f, booster_btuh, booster_kw, gas_input_btuh, hourly_hot_water_gal].every(Number.isFinite)) return { error: "Warewasher hot-water math is not a finite value." };
+  return {
+    delta_t_f,
+    booster_btuh,
+    booster_kw,
+    gas_input_btuh,
+    hourly_hot_water_gal,
+    note: "Booster heater load and building hot-water demand for a high-temperature dish machine, the two numbers that decide whether a rack comes out sanitized. A high-temp machine sanitizes with a 180 F final rinse and the building rarely delivers more than 140 F, so a booster makes up the last 40 degrees, and it must make them up at the rinse flow rate rather than averaged over the hour. The constant 500.4 is 8.34 lb/gal x 60 min/hr, so one gallon per minute raised one degree F is 500.4 BTU/hr, and the booster load is rinse gpm x rise x 500.4. A door-type machine with a 1.16 gpm rinse from 140 F to 180 F needs 1.16 x 40 x 500.4 = 23,219 BTU/hr, which is 6.8 kW, so a 9 kW electric booster covers it and a 7 kW does not once connection losses are counted; on a gas booster at 80% thermal efficiency the input is 23,219 / 0.80 = 29,024 BTU/hr. The second output sizes the building water heater instead of the booster: racks per hour times gallons per rack is the total volume the machine pulls off the 140 F system, 40 x 1.2 = 48 gal/hr here, and a machine can be perfectly boosted and still run cold because the building heater cannot keep up with that volume. A sizing screen; the machine's data plate, the local plumbing code, and the health authority's sanitizing-temperature rule govern.",
+  };
+}
+
+export const warewasherHotWaterExample = { inputs: { rinse_gpm: 1.16, supply_temp_f: 140, rinse_temp_f: 180, racks_per_hour: 40, gal_per_rack: 1.2, booster_efficiency: 0.80 } };
+
+KITCHEN_RENDERERS["warewasher-hot-water"] = _r({
+  citation: "Citation: warewasher booster-heater load from the sensible-heat relation with the 500.4 BTU/hr per gpm-degree F constant (8.34 lb/gal x 60 min/hr), and hourly hot-water demand from racks per hour x gallons per rack, by name. The 180 F final-rinse temperature is the NSF/ANSI 3 and FDA Food Code high-temperature sanitizing condition, cited not mirrored. The machine data plate and the local health authority govern.",
+  example: warewasherHotWaterExample.inputs,
+  fields: [
+    { key: "rinse_gpm", label: "Final-rinse flow (gpm)", kind: "number" },
+    { key: "supply_temp_f", label: "Supply water temperature (F)", kind: "number" },
+    { key: "rinse_temp_f", label: "Final-rinse temperature (F)", kind: "number" },
+    { key: "racks_per_hour", label: "Racks per hour", kind: "number" },
+    { key: "gal_per_rack", label: "Gallons per rack", kind: "number" },
+    { key: "booster_efficiency", label: "Booster thermal efficiency (0-1)", kind: "number" },
+  ],
+  outputs: [
+    { key: "t", id: "wwhw-out-t", label: "Temperature rise", value: (r) => fmt(r.delta_t_f, 1) + " F" },
+    { key: "b", id: "wwhw-out-b", label: "Booster load", value: (r) => fmt(r.booster_btuh, 0) + " BTU/hr (" + fmt(r.booster_kw, 2) + " kW)" },
+    { key: "g", id: "wwhw-out-g", label: "Gas input at stated efficiency", value: (r) => fmt(r.gas_input_btuh, 0) + " BTU/hr" },
+    { key: "w", id: "wwhw-out-w", label: "Hourly hot-water demand", value: (r) => fmt(r.hourly_hot_water_gal, 1) + " gal/hr" },
+    { key: "n", id: "wwhw-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWarewasherHotWater,
+});
+
+// ===================== spec-v1352: freezing time by Plank's equation =====================
+// Plank shape constants: slab P=1/2 R=1/8; cylinder P=1/4 R=1/16; sphere P=1/6 R=1/24.
+export const PLANK_SHAPE_CONSTANTS = {
+  slab:     { P: 1 / 2, R: 1 / 8,  label: "Slab (thickness a)" },
+  cylinder: { P: 1 / 4, R: 1 / 16, label: "Cylinder (diameter a)" },
+  sphere:   { P: 1 / 6, R: 1 / 24, label: "Sphere (diameter a)" },
+};
+
+// dims: in { args: dimensionless } out: { freezing_time_hr: T, surface_term: dimensionless, internal_term: dimensionless, driving_term: dimensionless }
+export function computeFreezingTimePlank({ a_ft = 0, shape = "slab", density_pcf = 0, latent_heat_btu_lb = 0, freezing_point_f = 28, medium_temp_f = -10, h_coeff = 0, k_frozen = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const s = PLANK_SHAPE_CONSTANTS[shape];
+  if (!s) return { error: "Shape must be slab, cylinder, or sphere." };
+  if (!(a_ft > 0)) return { error: "Characteristic dimension must be positive." };
+  if (!(density_pcf > 0)) return { error: "Density must be positive." };
+  if (!(latent_heat_btu_lb > 0)) return { error: "Latent heat must be positive." };
+  if (!(h_coeff > 0)) return { error: "Surface heat-transfer coefficient must be positive." };
+  if (!(k_frozen > 0)) return { error: "Frozen thermal conductivity must be positive." };
+  if (!(freezing_point_f > medium_temp_f)) return { error: "The freezing medium must be colder than the product's freezing point." };
+  // t = (rho Lf / (Tf - Ta)) x (P a / h + R a^2 / k). The internal term goes as a^2.
+  const driving_term = density_pcf * latent_heat_btu_lb / (freezing_point_f - medium_temp_f);
+  const surface_term = s.P * a_ft / h_coeff;
+  const internal_term = s.R * a_ft * a_ft / k_frozen;
+  const freezing_time_hr = driving_term * (surface_term + internal_term);
+  const controlling = surface_term >= internal_term ? "surface (airflow-limited)" : "internal (thickness-limited)";
+  if (![driving_term, surface_term, internal_term, freezing_time_hr].every(Number.isFinite)) return { error: "Plank freezing-time math is not a finite value." };
+  return {
+    freezing_time_hr,
+    surface_term,
+    internal_term,
+    driving_term,
+    controlling,
+    note: "Freezing time for a product in a blast or still freezer by Plank's equation, the classic refrigeration estimate that splits the answer into the two resistances that actually control it. The surface term P a / h is how hard it is to get heat off the product, which is airflow; the internal term R a^2 / k is how hard it is to get heat out of the middle, which is thickness, and it enters SQUARED. Halving the thickness cuts the internal term by four, while doubling the air velocity only helps the surface term. The shape constants are P = 1/2 and R = 1/8 for a slab, 1/4 and 1/16 for a cylinder, 1/6 and 1/24 for a sphere. Latent heat is the product's water, not pure water's 143.4 BTU/lb, so a 74% moisture beef slab carries about 106 BTU/lb, and the freezing point sits a few degrees below 32 F because of dissolved solids. A 3 in (0.25 ft) beef slab at 65 lb/ft3, freezing point 28 F, blast freezer at -10 F, h = 3.0 and frozen k = 0.9 gives a driving term of 6890 / 38 = 181.3, a surface term of 0.0417 and an internal term of 0.0087, so the time is about 9.1 hr and the product is airflow-limited. Double the slab to 6 in and the time more than doubles, because the internal term grew fourfold while the surface term only doubled. An engineering estimate; Plank neglects sensible heat above and below the freezing point and assumes a single freezing temperature, so it runs optimistic, and a measured product-temperature log governs a food-safety decision.",
+  };
+}
+
+export const freezingTimePlankExample = { inputs: { a_ft: 0.25, shape: "slab", density_pcf: 65, latent_heat_btu_lb: 106, freezing_point_f: 28, medium_temp_f: -10, h_coeff: 3.0, k_frozen: 0.9 } };
+
+KITCHEN_RENDERERS["freezing-time-plank"] = _r({
+  citation: "Citation: Plank's equation for freezing time, t = (rho Lf / (Tf - Ta)) x (P a / h + R a^2 / k), by name, with the standard shape constants (slab 1/2, 1/8; cylinder 1/4, 1/16; sphere 1/6, 1/24) as published in ASHRAE Handbook Refrigeration, chapter on food freezing times, cited not mirrored. Plank neglects sensible heat above and below the freezing point, so it runs optimistic; a measured product-temperature log governs a food-safety decision.",
+  example: freezingTimePlankExample.inputs,
+  fields: [
+    { key: "a_ft", label: "Characteristic dimension a (ft)", kind: "number" },
+    { key: "shape", label: "Shape", kind: "select", options: Object.keys(PLANK_SHAPE_CONSTANTS).map((k) => ({ value: k, label: PLANK_SHAPE_CONSTANTS[k].label })) },
+    { key: "density_pcf", label: "Product density (lb/ft3)", kind: "number" },
+    { key: "latent_heat_btu_lb", label: "Latent heat of the product (BTU/lb)", kind: "number" },
+    { key: "freezing_point_f", label: "Initial freezing point (F)", kind: "number" },
+    { key: "medium_temp_f", label: "Freezing-medium temperature (F)", kind: "number" },
+    { key: "h_coeff", label: "Surface coefficient h (BTU/hr-ft2-F)", kind: "number" },
+    { key: "k_frozen", label: "Frozen conductivity k (BTU/hr-ft-F)", kind: "number" },
+  ],
+  outputs: [
+    { key: "t", id: "ftpl-out-t", label: "Freezing time", value: (r) => fmt(r.freezing_time_hr, 2) + " hr" },
+    { key: "s", id: "ftpl-out-s", label: "Surface resistance term", value: (r) => fmt(r.surface_term, 5) + " hr-F-ft3/BTU" },
+    { key: "i", id: "ftpl-out-i", label: "Internal resistance term", value: (r) => fmt(r.internal_term, 5) + " hr-F-ft3/BTU" },
+    { key: "c", id: "ftpl-out-c", label: "Controlling resistance", value: (r) => r.controlling },
+    { key: "n", id: "ftpl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFreezingTimePlank,
+});
+
+// ===================== spec-v1353: refrigerated thawing time =====================
+// dims: in { args: dimensionless } out: { thaw_time_hr: T, thaw_time_days: T, surface_term: dimensionless, internal_term: dimensionless }
+export function computeThawTime({ a_ft = 0, shape = "sphere", density_pcf = 0, latent_heat_btu_lb = 0, thaw_point_f = 28, cooler_temp_f = 38, h_coeff = 0, k_unfrozen = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const s = PLANK_SHAPE_CONSTANTS[shape];
+  if (!s) return { error: "Shape must be slab, cylinder, or sphere." };
+  if (!(a_ft > 0)) return { error: "Characteristic dimension must be positive." };
+  if (!(density_pcf > 0)) return { error: "Density must be positive." };
+  if (!(latent_heat_btu_lb > 0)) return { error: "Latent heat must be positive." };
+  if (!(h_coeff > 0)) return { error: "Surface heat-transfer coefficient must be positive." };
+  if (!(k_unfrozen > 0)) return { error: "Unfrozen thermal conductivity must be positive." };
+  if (!(cooler_temp_f > thaw_point_f)) return { error: "The cooler must be warmer than the product's thaw point." };
+  // Plank run the other way: the driving difference is the cooler ABOVE the thaw point,
+  // and conduction is through the THAWED outer layer, whose k is about a third of frozen.
+  const driving_term = density_pcf * latent_heat_btu_lb / (cooler_temp_f - thaw_point_f);
+  const surface_term = s.P * a_ft / h_coeff;
+  const internal_term = s.R * a_ft * a_ft / k_unfrozen;
+  const thaw_time_hr = driving_term * (surface_term + internal_term);
+  const thaw_time_days = thaw_time_hr / 24;
+  const controlling = internal_term >= surface_term ? "internal (thickness-limited)" : "surface (airflow-limited)";
+  if (![driving_term, surface_term, internal_term, thaw_time_hr, thaw_time_days].every(Number.isFinite)) return { error: "Thawing-time math is not a finite value." };
+  return {
+    thaw_time_hr,
+    thaw_time_days,
+    surface_term,
+    internal_term,
+    driving_term,
+    controlling,
+    food_code_methods: "FDA Food Code section 3-501.13 permits four thawing methods: under refrigeration at 41 F or below; submerged under running water at 70 F or below with the product reaching 41 F or below within four hours; in a microwave immediately followed by cooking; or as part of the cooking process. Countertop thawing is not one of them.",
+    note: "Refrigerated thawing time by Plank's equation run in reverse, the number kitchens underestimate more than any other. Thawing carries the same latent heat and the same two resistances as freezing, but two things change and both push the same direction: the driving temperature difference is now the cooler ABOVE the thaw point instead of the freezer below it, and conduction happens through the THAWED outer layer, whose conductivity is roughly a third of frozen product's. A 38 F cooler gives a driving difference near 10 F where a -10 F freezer gave 38 F, so thawing takes several times longer than freezing did. A 12 lb turkey treated as a 0.7 ft sphere at 64 lb/ft3 and 106 BTU/lb, thaw point 28 F, walk-in at 38 F, h = 2.0 and unfrozen k = 0.28 gives a driving term of 6784 / 10 = 678.4, a surface term of 0.0583 and an internal term of 0.0729, so about 89 hr, which is 3.7 days. That brackets the USDA rule of thumb of roughly 24 hours per 4 to 5 pounds a little long, which is the safe direction. Note that the internal term now EXCEEDS the surface term, the reverse of the frozen slab: in thawing, thickness usually controls and blowing more air at a frozen turkey does very little. An engineering estimate; the FDA Food Code's permitted methods and a measured product temperature govern.",
+  };
+}
+
+export const thawTimeExample = { inputs: { a_ft: 0.7, shape: "sphere", density_pcf: 64, latent_heat_btu_lb: 106, thaw_point_f: 28, cooler_temp_f: 38, h_coeff: 2.0, k_unfrozen: 0.28 } };
+
+KITCHEN_RENDERERS["thaw-time"] = _r({
+  citation: "Citation: Plank's equation applied to thawing, t = (rho Lf / (Ta - Tf)) x (P a / h + R a^2 / k_unfrozen), by name, with the ASHRAE Handbook Refrigeration shape constants, cited not mirrored. Reported against the four thawing methods permitted by FDA Food Code section 3-501.13, cited by section and not reproduced. A conduction estimate; the Food Code method and a measured product temperature govern.",
+  example: thawTimeExample.inputs,
+  fields: [
+    { key: "a_ft", label: "Characteristic dimension a (ft)", kind: "number" },
+    { key: "shape", label: "Shape", kind: "select", options: Object.keys(PLANK_SHAPE_CONSTANTS).map((k) => ({ value: k, label: PLANK_SHAPE_CONSTANTS[k].label })) },
+    { key: "density_pcf", label: "Product density (lb/ft3)", kind: "number" },
+    { key: "latent_heat_btu_lb", label: "Latent heat of the product (BTU/lb)", kind: "number" },
+    { key: "thaw_point_f", label: "Thaw point (F)", kind: "number" },
+    { key: "cooler_temp_f", label: "Cooler air temperature (F)", kind: "number" },
+    { key: "h_coeff", label: "Surface coefficient h (BTU/hr-ft2-F)", kind: "number" },
+    { key: "k_unfrozen", label: "Unfrozen conductivity k (BTU/hr-ft-F)", kind: "number" },
+  ],
+  outputs: [
+    { key: "t", id: "thwt-out-t", label: "Thawing time", value: (r) => fmt(r.thaw_time_hr, 1) + " hr (" + fmt(r.thaw_time_days, 2) + " days)" },
+    { key: "s", id: "thwt-out-s", label: "Surface resistance term", value: (r) => fmt(r.surface_term, 5) + " hr-F-ft3/BTU" },
+    { key: "i", id: "thwt-out-i", label: "Internal resistance term", value: (r) => fmt(r.internal_term, 5) + " hr-F-ft3/BTU" },
+    { key: "c", id: "thwt-out-c", label: "Controlling resistance", value: (r) => r.controlling },
+    { key: "m", id: "thwt-out-m", label: "Permitted methods", value: (r) => r.food_code_methods },
+    { key: "n", id: "thwt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeThawTime,
+});
+
+// ===================== spec-v1354: fryer oil turnover, life, and annual cost =====================
+// dims: in { args: dimensionless } out: { daily_oil_loss_lb: M, turnover_days: T, annual_oil_lb: M, annual_cost: dimensionless }
+export function computeFryerOilTurnover({ vat_capacity_lb = 0, daily_product_lb = 0, absorption_fraction = 0.12, operating_days = 360, oil_price_per_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(vat_capacity_lb > 0)) return { error: "Vat oil capacity must be positive." };
+  if (!(daily_product_lb > 0)) return { error: "Daily product weight must be positive." };
+  if (!(absorption_fraction > 0 && absorption_fraction <= 1)) return { error: "Oil absorption fraction must be between 0 and 1." };
+  if (!(operating_days > 0)) return { error: "Operating days per year must be positive." };
+  if (!(oil_price_per_lb >= 0)) return { error: "Oil price cannot be negative." };
+  // Turnover runs OPPOSITE to intuition: a busy fryer holds better oil than a slow one.
+  const daily_oil_loss_lb = daily_product_lb * absorption_fraction;
+  const turnover_days = vat_capacity_lb / daily_oil_loss_lb;
+  const annual_oil_lb = daily_oil_loss_lb * operating_days;
+  const annual_cost = annual_oil_lb * oil_price_per_lb;
+  const vat_charges_per_year = annual_oil_lb / vat_capacity_lb;
+  if (![daily_oil_loss_lb, turnover_days, annual_oil_lb, annual_cost, vat_charges_per_year].every(Number.isFinite)) return { error: "Fryer oil-turnover math is not a finite value." };
+  return {
+    daily_oil_loss_lb,
+    turnover_days,
+    annual_oil_lb,
+    annual_cost,
+    vat_charges_per_year,
+    note: "Fryer oil turnover rate, annual consumption, and annual cost, the numbers that decide whether a filter machine pays for itself. Fried product carries oil out of the vat, roughly 8% of its weight for a naked product and 10% to 15% for a breaded or battered one, and that loss is replaced with fresh oil. The turnover rate is how many days it takes for the replacement to equal the vat's whole charge, and it is the single best predictor of oil life. It runs opposite to intuition: a busy fryer with a three-day turnover holds better oil than a slow one with a fifteen-day turnover, because the busy fryer constantly dilutes its own degradation products with fresh oil, while a slow fryer degrades on the clock whether or not anything is cooked in it. A 50 lb vat frying 120 lb/day of breaded product at 12% pickup loses 14.4 lb/day, turns over in 50 / 14.4 = 3.5 days, and consumes 14.4 x 360 = 5184 lb/yr, which at $1.10/lb is $5702 a year, a hundred vat charges. The same vat frying 30 lb/day turns over in 13.9 days, and that oil will be dark and smoking long before it has been replaced once. A cost and practice estimate; the polar-materials reading or the operator's discard test governs when oil is actually spent.",
+  };
+}
+
+export const fryerOilTurnoverExample = { inputs: { vat_capacity_lb: 50, daily_product_lb: 120, absorption_fraction: 0.12, operating_days: 360, oil_price_per_lb: 1.10 } };
+
+KITCHEN_RENDERERS["fryer-oil-turnover"] = _r({
+  citation: "Citation: fryer oil turnover from the oil-absorption balance (public food-service and frying-oil management practice; the turnover-rate predictor of oil life is standard in the frying literature), by name. Daily loss = product weight x absorption; turnover = vat capacity / daily loss. A polar-materials reading or the operator's discard test governs when oil is spent.",
+  example: fryerOilTurnoverExample.inputs,
+  fields: [
+    { key: "vat_capacity_lb", label: "Vat oil capacity (lb)", kind: "number" },
+    { key: "daily_product_lb", label: "Product fried per day (lb)", kind: "number" },
+    { key: "absorption_fraction", label: "Oil absorption fraction (0-1)", kind: "number" },
+    { key: "operating_days", label: "Operating days per year", kind: "number" },
+    { key: "oil_price_per_lb", label: "Oil price ($/lb)", kind: "number" },
+  ],
+  outputs: [
+    { key: "d", id: "fryot-out-d", label: "Daily oil loss", value: (r) => fmt(r.daily_oil_loss_lb, 2) + " lb/day" },
+    { key: "t", id: "fryot-out-t", label: "Turnover", value: (r) => fmt(r.turnover_days, 1) + " days" },
+    { key: "a", id: "fryot-out-a", label: "Annual oil consumption", value: (r) => fmt(r.annual_oil_lb, 0) + " lb/yr (" + fmt(r.vat_charges_per_year, 1) + " vat charges)" },
+    { key: "c", id: "fryot-out-c", label: "Annual oil cost", value: (r) => "$" + fmt(r.annual_cost, 2) },
+    { key: "n", id: "fryot-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFryerOilTurnover,
+});
+
+// ===================== spec-v1355: keg yield, pours, and cost per ounce =====================
+export const KEG_SIZES_GAL = {
+  half_barrel:    { gal: 15.5,  label: "Half barrel (15.5 gal)" },
+  quarter_barrel: { gal: 7.75,  label: "Quarter barrel (7.75 gal)" },
+  sixth_barrel:   { gal: 5.16,  label: "Sixth barrel (5.16 gal)" },
+  full_barrel:    { gal: 31.0,  label: "Full barrel (31 gal)" },
+  custom:         { gal: 0,     label: "Custom (enter gallons)" },
+};
+
+// dims: in { args: dimensionless } out: { gross_oz: L^3, net_oz: L^3, servings: dimensionless, cost_per_serving: dimensionless, pour_cost_pct: dimensionless }
+export function computeKegYield({ keg_size = "half_barrel", custom_gallons = 0, serving_oz = 16, loss_fraction = 0.15, keg_cost = 0, menu_price = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const preset = KEG_SIZES_GAL[keg_size];
+  if (!preset) return { error: "Keg size must be a listed barrel size or custom." };
+  const gallons = keg_size === "custom" ? custom_gallons : preset.gal;
+  if (!(gallons > 0)) return { error: "Keg volume must be positive (enter gallons for a custom size)." };
+  if (!(serving_oz > 0)) return { error: "Serving size must be positive." };
+  if (!(loss_fraction >= 0 && loss_fraction < 1)) return { error: "Loss fraction must be at least 0 and below 1." };
+  if (!(keg_cost > 0)) return { error: "Keg cost must be positive." };
+  if (!(menu_price > 0)) return { error: "Menu price per serving must be positive." };
+  // The NET number, not the gross one, is what pour cost has to be computed against.
+  const gross_oz = gallons * 128;
+  const net_oz = gross_oz * (1 - loss_fraction);
+  const servings = net_oz / serving_oz;
+  const cost_per_serving = keg_cost / servings;
+  const pour_cost_pct = cost_per_serving / menu_price * 100;
+  const revenue_per_keg = servings * menu_price;
+  if (![gross_oz, net_oz, servings, cost_per_serving, pour_cost_pct, revenue_per_keg].every(Number.isFinite)) return { error: "Keg-yield math is not a finite value." };
+  return {
+    gross_oz,
+    net_oz,
+    servings,
+    cost_per_serving,
+    pour_cost_pct,
+    revenue_per_keg,
+    gallons,
+    note: "Servings, cost per pour, and pour cost from a keg, computed against the NET yield rather than the number on paper. A half barrel is 15.5 gallons, which is 15.5 x 128 = 1984 fluid ounces, which on paper is 124 sixteen-ounce pints, and nobody gets 124. Foam at the tap, the first pull of a new keg, line cleaning, the heel left in the keg, and the head on every glass take 10% to 20% off the top, and a poorly balanced draft system takes more. Pricing off the gross number is the mistake this calculation exists to prevent. A $150 half barrel poured as 16 oz pints at a 15% loss nets 1984 x 0.85 = 1686 oz, which is 105.4 pints, so the cost is 150 / 105.4 = $1.42 a pint and the pour cost against a $7 menu price is 20.3%. Now tighten the system: cutting the loss from 15% to 8% yields 114.1 pints, drops the cost to $1.31, and moves the pour cost to 18.8%, which is about $11 of margin per keg from balancing the draft lines rather than raising the price. Balancing the draft lines is where that work happens, and pour cost prices a drink once the cost per ounce is known; this calculation produces that cost per ounce. An operating estimate; the bar's own measured yield over several kegs governs.",
+  };
+}
+
+export const kegYieldExample = { inputs: { keg_size: "half_barrel", custom_gallons: 0, serving_oz: 16, loss_fraction: 0.15, keg_cost: 150, menu_price: 7 } };
+
+KITCHEN_RENDERERS["keg-yield"] = _r({
+  citation: "Citation: keg yield and pour cost from published US keg volumes (half barrel 15.5 gal, quarter 7.75 gal, sixth 5.16 gal, full barrel 31 gal) and the standard 128 fl oz per gallon, by name, with a draft-system loss fraction from public bar-operations practice. Net ounces = gallons x 128 x (1 - loss); pour cost = cost per serving / menu price. The bar's own measured yield over several kegs governs.",
+  example: kegYieldExample.inputs,
+  fields: [
+    { key: "keg_size", label: "Keg size", kind: "select", options: Object.keys(KEG_SIZES_GAL).map((k) => ({ value: k, label: KEG_SIZES_GAL[k].label })) },
+    { key: "custom_gallons", label: "Custom keg volume (gal, 0 to use the preset)", kind: "number" },
+    { key: "serving_oz", label: "Serving size (oz)", kind: "number" },
+    { key: "loss_fraction", label: "Loss fraction (0-1)", kind: "number" },
+    { key: "keg_cost", label: "Keg cost ($)", kind: "number" },
+    { key: "menu_price", label: "Menu price per serving ($)", kind: "number" },
+  ],
+  outputs: [
+    { key: "g", id: "kegy-out-g", label: "Gross volume", value: (r) => fmt(r.gross_oz, 0) + " oz (" + fmt(r.gallons, 2) + " gal)" },
+    { key: "e", id: "kegy-out-e", label: "Net volume after loss", value: (r) => fmt(r.net_oz, 0) + " oz" },
+    { key: "s", id: "kegy-out-s", label: "Servings per keg", value: (r) => fmt(r.servings, 1) },
+    { key: "c", id: "kegy-out-c", label: "Cost per serving", value: (r) => "$" + fmt(r.cost_per_serving, 2) },
+    { key: "p", id: "kegy-out-p", label: "Pour cost", value: (r) => fmt(r.pour_cost_pct, 1) + " % (revenue $" + fmt(r.revenue_per_keg, 2) + " per keg)" },
+    { key: "n", id: "kegy-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeKegYield,
+});
+
+// ===================== spec-v1356: beverage CO2 cylinder duration =====================
+// dims: in { args: dimensionless } out: { kegs_per_cylinder: dimensionless, days_of_supply: T, changeout_kegs: dimensionless, changeout_days: T }
+export function computeBeverageCo2Duration({ cylinder_lb = 0, lb_co2_per_keg = 1.2, kegs_per_day = 0, reserve_fraction = 0.2 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(cylinder_lb > 0)) return { error: "Cylinder weight must be positive." };
+  if (!(lb_co2_per_keg > 0)) return { error: "Pounds of CO2 per keg must be positive." };
+  if (!(kegs_per_day > 0)) return { error: "Kegs dispensed per day must be positive." };
+  if (!(reserve_fraction >= 0 && reserve_fraction < 1)) return { error: "Reserve fraction must be at least 0 and below 1." };
+  // Consumption scales with VOLUME dispensed, not with the number of taps.
+  const kegs_per_cylinder = cylinder_lb / lb_co2_per_keg;
+  const days_of_supply = kegs_per_cylinder / kegs_per_day;
+  const changeout_kegs = kegs_per_cylinder * (1 - reserve_fraction);
+  const changeout_days = changeout_kegs / kegs_per_day;
+  if (![kegs_per_cylinder, days_of_supply, changeout_kegs, changeout_days].every(Number.isFinite)) return { error: "CO2 duration math is not a finite value." };
+  return {
+    kegs_per_cylinder,
+    days_of_supply,
+    changeout_kegs,
+    changeout_days,
+    note: "How long a beverage CO2 cylinder lasts and when to swap it, from the gas a draft system actually consumes. CO2 leaves the cylinder two ways: it pushes beer out of the keg, and it stays dissolved in the beer that leaves. Both scale with volume dispensed, which is why a two-tap bar and a twelve-tap bar pouring the same number of kegs a year use the same gas. Direct-draw systems at 12 to 14 psi run near one pound of CO2 per half barrel; a long-draw system pushing 30 to 40 psi through a glycol trunk uses considerably more, and blended gas changes the arithmetic again. A 20 lb cylinder on a direct-draw system at 1.2 lb per keg carries 20 / 1.2 = 16.7 kegs, and a bar pouring 2 kegs a day gets 8.3 days out of it. The practical output is the change-out point, because a cylinder run to empty goes flat mid-pour and the regulator loses pressure without warning, so a 20% reserve puts the swap at 13.3 kegs, about 6.7 days. That makes a single 20 lb cylinder a weekly item and the bar needs a second one on the wall, not a phone call. Push the same bar to a long-draw system at 1.5 lb per keg and the cylinder drops to 13.3 kegs: the system design, not the volume, moved the delivery schedule. An operating estimate; a cylinder scale and the gas supplier's measured consumption govern.",
+  };
+}
+
+export const beverageCo2DurationExample = { inputs: { cylinder_lb: 20, lb_co2_per_keg: 1.2, kegs_per_day: 2, reserve_fraction: 0.20 } };
+
+KITCHEN_RENDERERS["beverage-co2-duration"] = _r({
+  citation: "Citation: beverage CO2 cylinder duration from the per-keg gas consumption of a draft system (public draft-beer engineering practice; the Brewers Association Draught Beer Quality Manual is the standard reference), by name. Kegs per cylinder = cylinder weight / lb CO2 per keg; change-out = kegs per cylinder x (1 - reserve). A cylinder scale and the gas supplier's measured consumption govern.",
+  example: beverageCo2DurationExample.inputs,
+  fields: [
+    { key: "cylinder_lb", label: "Cylinder weight (lb of CO2)", kind: "number" },
+    { key: "lb_co2_per_keg", label: "CO2 per keg (lb)", kind: "number" },
+    { key: "kegs_per_day", label: "Kegs dispensed per day", kind: "number" },
+    { key: "reserve_fraction", label: "Reserve fraction (0-1)", kind: "number" },
+  ],
+  outputs: [
+    { key: "k", id: "bco2-out-k", label: "Kegs per cylinder", value: (r) => fmt(r.kegs_per_cylinder, 1) },
+    { key: "d", id: "bco2-out-d", label: "Days of supply", value: (r) => fmt(r.days_of_supply, 1) + " days" },
+    { key: "c", id: "bco2-out-c", label: "Change out at", value: (r) => fmt(r.changeout_kegs, 1) + " kegs (" + fmt(r.changeout_days, 1) + " days)" },
+    { key: "n", id: "bco2-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeBeverageCo2Duration,
+});
+
+// ===================== spec-v1357: dough ball weight from thickness factor =====================
+// dims: in { args: dimensionless } out: { pan_area_sqin: L^2, dough_weight_oz: M, scaled_weight_oz: M }
+export function computeDoughBallScaling({ pan_shape = "round", diameter_in = 0, length_in = 0, width_in = 0, thickness_factor = 0.1, reference_weight_oz = 0, reference_diameter_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (pan_shape !== "round" && pan_shape !== "rectangular") return { error: "Pan shape must be round or rectangular." };
+  if (!(thickness_factor > 0)) return { error: "Thickness factor must be positive." };
+  let pan_area_sqin;
+  if (pan_shape === "round") {
+    if (!(diameter_in > 0)) return { error: "Pan diameter must be positive." };
+    pan_area_sqin = Math.PI * (diameter_in / 2) ** 2;
+  } else {
+    if (!(length_in > 0 && width_in > 0)) return { error: "Pan length and width must be positive." };
+    pan_area_sqin = length_in * width_in;
+  }
+  if (!(reference_weight_oz >= 0 && reference_diameter_in >= 0)) return { error: "Reference weight and diameter cannot be negative." };
+  // Area goes as the SQUARE of the diameter, so scaling a dough ball by diameter runs thin.
+  const dough_weight_oz = thickness_factor * pan_area_sqin;
+  let scaled_weight_oz = null;
+  let reference_area_sqin = null;
+  if (reference_weight_oz > 0 && reference_diameter_in > 0) {
+    reference_area_sqin = Math.PI * (reference_diameter_in / 2) ** 2;
+    scaled_weight_oz = reference_weight_oz * (pan_area_sqin / reference_area_sqin);
+  }
+  if (![pan_area_sqin, dough_weight_oz].every(Number.isFinite)) return { error: "Dough-ball scaling math is not a finite value." };
+  if (scaled_weight_oz !== null && !Number.isFinite(scaled_weight_oz)) return { error: "Dough-ball scaling math is not a finite value." };
+  return {
+    pan_area_sqin,
+    dough_weight_oz,
+    scaled_weight_oz,
+    reference_area_sqin,
+    note: "Dough ball weight for any pan size from a thickness factor, the constant that makes a pizza program repeatable. The thickness factor is dough ounces per square inch of pan, and once a shop knows its crust is right at a factor of 0.10, every pan in the house is one multiplication away: thin crust runs roughly 0.075 to 0.090, a standard hand-tossed 0.095 to 0.11, and a thick or pan style 0.12 and up. The reason to compute rather than eyeball is that area goes as the SQUARE of the diameter. A 16 in pizza is not a third bigger than a 12 in, it is 78% bigger, and a dough ball scaled by diameter comes out visibly thin. At a factor of 0.10 a 16 in pan has an area of pi x 8 x 8 = 201.1 sq in and takes a 20.1 oz ball, a 14 in takes 15.4 oz, a 12 in takes 11.3 oz, and an 18 in takes 25.4 oz. Scaling by diameter instead would have put the 12 in ball at 20.1 x 12 / 16 = 15.1 oz, a third heavy. Given a known-good reference ball and its pan diameter, the second output does the area-ratio conversion directly, so one measured ball produces the whole ladder. A scaling relation, not a recipe; hydration, flour, and the shop's own bake test govern whether the factor is right to begin with.",
+  };
+}
+
+export const doughBallScalingExample = { inputs: { pan_shape: "round", diameter_in: 12, length_in: 0, width_in: 0, thickness_factor: 0.10, reference_weight_oz: 20.11, reference_diameter_in: 16 } };
+
+KITCHEN_RENDERERS["dough-ball-scaling"] = _r({
+  citation: "Citation: dough ball weight from the thickness factor (dough ounces per square inch of pan), standard pizza-industry scaling practice as taught by the American Institute of Baking and the pizza trade press, by name. Round area = pi (d/2)^2, rectangular = L x W; weight = thickness factor x area; scaled weight = reference weight x area ratio. The shop's own bake test governs the factor.",
+  example: doughBallScalingExample.inputs,
+  fields: [
+    { key: "pan_shape", label: "Pan shape", kind: "select", options: [{ value: "round", label: "Round" }, { value: "rectangular", label: "Rectangular" }] },
+    { key: "diameter_in", label: "Round pan diameter (in)", kind: "number" },
+    { key: "length_in", label: "Rectangular pan length (in)", kind: "number" },
+    { key: "width_in", label: "Rectangular pan width (in)", kind: "number" },
+    { key: "thickness_factor", label: "Thickness factor (oz per sq in)", kind: "number" },
+    { key: "reference_weight_oz", label: "Known-good dough ball weight (oz, 0 to skip)", kind: "number" },
+    { key: "reference_diameter_in", label: "Diameter of that known-good pan (in, 0 to skip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "a", id: "dbsc-out-a", label: "Pan area", value: (r) => fmt(r.pan_area_sqin, 1) + " sq in" },
+    { key: "w", id: "dbsc-out-w", label: "Dough ball weight", value: (r) => fmt(r.dough_weight_oz, 2) + " oz" },
+    { key: "s", id: "dbsc-out-s", label: "Weight scaled from the reference ball", value: (r) => r.scaled_weight_oz === null ? "-" : fmt(r.scaled_weight_oz, 2) + " oz" },
+    { key: "n", id: "dbsc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDoughBallScaling,
+});
+
+// ===================== spec-v1358: fermentation and proof time vs temperature (Q10) =====================
+// dims: in { args: dimensionless } out: { predicted_time_hr: T, predicted_time_min: T, ratio: dimensionless, delta_f: T, delta_c: T }
+export function computeFermentationTimeQ10({ reference_time_hr = 0, reference_temp_f = 78, actual_temp_f = 78, q10 = 2.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(reference_time_hr > 0)) return { error: "Reference proof or bulk time must be positive." };
+  if (!(q10 > 1)) return { error: "Q10 must be greater than 1." };
+  if (!Number.isFinite(reference_temp_f) || !Number.isFinite(actual_temp_f)) return { error: "Temperatures must be finite numbers." };
+  // 10 C is 18 F, so a 10 F miss on dough temperature is worth roughly 45% on the clock.
+  const delta_f = reference_temp_f - actual_temp_f;
+  const delta_c = delta_f * 5 / 9;
+  const ratio = Math.pow(q10, delta_c / 10);
+  const predicted_time_hr = reference_time_hr * ratio;
+  const predicted_time_min = predicted_time_hr * 60;
+  const direction = delta_f > 0 ? "colder than reference, so slower" : delta_f < 0 ? "warmer than reference, so faster" : "at the reference temperature";
+  if (![delta_f, delta_c, ratio, predicted_time_hr, predicted_time_min].every(Number.isFinite)) return { error: "Q10 fermentation math is not a finite value." };
+  return {
+    predicted_time_hr,
+    predicted_time_min,
+    ratio,
+    delta_f,
+    delta_c,
+    direction,
+    note: "Bulk fermentation or proof time at today's dough temperature, scaled from the shop's own reference time by the Q10 rule. Q10 is the factor by which a biological rate changes for a 10 degree C change in temperature, and for baker's yeast in the range a bakery actually works in it is close to 2: warm the dough 10 C and it ferments twice as fast, cool it 10 C and it takes twice as long. Ten degrees C is 18 degrees F, which is why a 10 degree F miss on dough temperature is worth roughly 45% on the clock, large enough to blow a production schedule and small enough that it gets ignored. The relation is t = t_reference x Q10 ^ (delta C / 10), where delta C is the shortfall below the reference temperature. A bulk ferment that takes 2.0 hr at 78 F, on a morning when the dough comes off the mixer at 68 F, is 10 F or 5.56 C colder, so the ratio is 2 ^ 0.556 = 1.47 and the ferment runs 2.94 hr, nearly an hour late on a two-hour bulk. Run it the other way and at 88 F the same dough finishes in 1.36 hr, so a schedule built on 2 hours over-proofs it. Between 68 F and 88 F, an ordinary summer-versus-winter swing in an un-air-conditioned bakery, the same dough takes anywhere from 82 to 176 minutes. A scheduling estimate; the dough itself, judged by volume and the poke test, governs when it is ready.",
+  };
+}
+
+export const fermentationTimeQ10Example = { inputs: { reference_time_hr: 2.0, reference_temp_f: 78, actual_temp_f: 68, q10: 2.0 } };
+
+KITCHEN_RENDERERS["fermentation-time-q10"] = _r({
+  citation: "Citation: the Q10 temperature-coefficient rule applied to yeast fermentation, t = t_reference x Q10 ^ (delta C / 10), by name; Q10 near 2.0 for baker's yeast is the value published in the standard baking-science references (Calvel, The Taste of Bread; AIB technical bulletins), cited not mirrored. The dough itself, judged by volume and the poke test, governs when it is ready.",
+  example: fermentationTimeQ10Example.inputs,
+  fields: [
+    { key: "reference_time_hr", label: "Reference proof or bulk time (hr)", kind: "number" },
+    { key: "reference_temp_f", label: "Reference dough temperature (F)", kind: "number" },
+    { key: "actual_temp_f", label: "Actual dough temperature (F)", kind: "number" },
+    { key: "q10", label: "Q10", kind: "number" },
+  ],
+  outputs: [
+    { key: "t", id: "ferq-out-t", label: "Predicted time", value: (r) => fmt(r.predicted_time_hr, 2) + " hr (" + fmt(r.predicted_time_min, 0) + " min)" },
+    { key: "r", id: "ferq-out-r", label: "Ratio to the reference time", value: (r) => fmt(r.ratio, 3) + " x" },
+    { key: "d", id: "ferq-out-d", label: "Temperature difference", value: (r) => fmt(r.delta_f, 1) + " F (" + fmt(r.delta_c, 2) + " C) " + r.direction },
+    { key: "n", id: "ferq-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFermentationTimeQ10,
+});
+
+// ===================== spec-v1359: covers and sales per labor hour =====================
+// dims: in { args: dimensionless } out: { cplh: dimensionless, splh: dimensionless, labor_cost_pct: dimensionless, average_check: dimensionless, labor_per_cover: dimensionless }
+export function computeCoversPerLaborHour({ covers = 0, labor_hours = 0, net_sales = 0, labor_cost = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(covers > 0)) return { error: "Covers served must be positive." };
+  if (!(labor_hours > 0)) return { error: "Labor hours must be positive." };
+  if (!(net_sales > 0)) return { error: "Net sales must be positive." };
+  if (!(labor_cost >= 0)) return { error: "Labor cost cannot be negative." };
+  // CPLH is menu-price-independent: it measures throughput, which labor % cannot.
+  const cplh = covers / labor_hours;
+  const splh = net_sales / labor_hours;
+  const labor_cost_pct = labor_cost / net_sales * 100;
+  const average_check = net_sales / covers;
+  const labor_per_cover = labor_cost / covers;
+  if (![cplh, splh, labor_cost_pct, average_check, labor_per_cover].every(Number.isFinite)) return { error: "Labor-productivity math is not a finite value." };
+  return {
+    cplh,
+    splh,
+    labor_cost_pct,
+    average_check,
+    labor_per_cover,
+    note: "Covers per labor hour, sales per labor hour, labor cost percentage, average check, and labor dollars per cover, the five readings that together say whether a shift was staffed right. Labor cost percentage alone cannot answer that, because it moves whenever the menu price moves: raise prices and the percentage falls without a single scheduling change. Covers per labor hour is menu-price-independent, so it measures throughput; sales per labor hour sits in between and is the one that scales across concepts, since a fine-dining room at 2 covers per labor hour on a $90 check can be more productive per hour worked than a diner at 8 covers on a $14 check. A dinner period with 420 covers, 96 labor hours across front and back of house, $12,600 in net sales and $1,680 in labor runs 420 / 96 = 4.38 covers per labor hour, $131.25 in sales per labor hour, a labor cost of 1680 / 12600 = 13.3%, a $30.00 average check, and $4.00 of labor per cover. That 13.3% is strong, and reporting all five together shows what carried it: each labor hour turned 4.4 covers on a $30 check. Cut eight hours from the schedule and covers per labor hour goes to 4.77 and labor to 12.2% -- if the covers still get served, which is the judgment no calculation makes. A management reading; the schedule, the service standard, and the guests waiting at the door govern.",
+  };
+}
+
+export const coversPerLaborHourExample = { inputs: { covers: 420, labor_hours: 96, net_sales: 12600, labor_cost: 1680 } };
+
+KITCHEN_RENDERERS["covers-per-labor-hour"] = _r({
+  citation: "Citation: covers per labor hour and sales per labor hour, the standard restaurant labor-productivity readings (National Restaurant Association operations reporting; standard food-service management texts), by name. CPLH = covers / labor hours; SPLH = net sales / labor hours; labor cost % = labor cost / net sales. A management reading, not a staffing decision.",
+  example: coversPerLaborHourExample.inputs,
+  fields: [
+    { key: "covers", label: "Covers served", kind: "number" },
+    { key: "labor_hours", label: "Labor hours worked", kind: "number" },
+    { key: "net_sales", label: "Net sales ($)", kind: "number" },
+    { key: "labor_cost", label: "Labor cost ($)", kind: "number" },
+  ],
+  outputs: [
+    { key: "c", id: "cplh-out-c", label: "Covers per labor hour", value: (r) => fmt(r.cplh, 2) },
+    { key: "s", id: "cplh-out-s", label: "Sales per labor hour", value: (r) => "$" + fmt(r.splh, 2) },
+    { key: "l", id: "cplh-out-l", label: "Labor cost", value: (r) => fmt(r.labor_cost_pct, 1) + " % of net sales" },
+    { key: "a", id: "cplh-out-a", label: "Average check", value: (r) => "$" + fmt(r.average_check, 2) },
+    { key: "p", id: "cplh-out-p", label: "Labor per cover", value: (r) => "$" + fmt(r.labor_per_cover, 2) },
+    { key: "n", id: "cplh-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCoversPerLaborHour,
+});
+
+// ===================== spec-v1360: par level and order quantity =====================
+// dims: in { args: dimensionless } out: { coverage_days: T, par_level: dimensionless, order_needed: dimensionless, cases: dimensionless, overshoot: dimensionless }
+export function computeParLevelOrder({ daily_usage = 0, lead_time_days = 0, order_cycle_days = 0, safety_factor = 0.25, on_hand = 0, on_order = 0, units_per_case = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(daily_usage > 0)) return { error: "Average daily usage must be positive." };
+  if (!(lead_time_days >= 0)) return { error: "Lead time cannot be negative." };
+  if (!(order_cycle_days > 0)) return { error: "Order cycle must be positive." };
+  if (!(safety_factor >= 0)) return { error: "Safety factor cannot be negative." };
+  if (!(on_hand >= 0 && on_order >= 0)) return { error: "On-hand and on-order quantities cannot be negative." };
+  if (!(units_per_case > 0)) return { error: "Units per case must be positive." };
+  // A par covers TWO intervals: the lead time until this order lands, plus the full
+  // cycle until the following one does. Sizing to lead time alone is how a walk-in runs dry.
+  const coverage_days = lead_time_days + order_cycle_days;
+  const par_level = daily_usage * coverage_days * (1 + safety_factor);
+  const order_needed = Math.max(0, par_level - on_hand - on_order);
+  const cases = Math.ceil(order_needed / units_per_case);
+  const ordered_quantity = cases * units_per_case;
+  const overshoot = ordered_quantity - order_needed;
+  if (![coverage_days, par_level, order_needed, cases, ordered_quantity, overshoot].every(Number.isFinite)) return { error: "Par-level math is not a finite value." };
+  return {
+    coverage_days,
+    par_level,
+    order_needed,
+    cases,
+    ordered_quantity,
+    overshoot,
+    note: "Par level and the order that brings inventory back up to it, in whole cases. A par is not a minimum and it is not an average: it is the quantity that has to be on the shelf the moment an order is placed so the kitchen does not run out before the NEXT delivery lands. That is two intervals, not one -- the lead time until this order arrives plus the full cycle until the following order arrives -- and sizing a par to lead time alone is the most common way a walk-in runs dry on a Saturday. Par = daily usage x (lead time + order cycle) x (1 + safety factor), and the order is that par less what is on hand and already on order. The last step is what separates this from a spreadsheet: food arrives in cases, so the order is always rounded up, and both the raw shortfall and the whole cases are reported along with the overshoot that the rounding puts in the walk-in as excess. A protein used at 24 lb/day with a 2-day lead time, ordered every 3 days at a 25% safety factor, with 40 lb on hand and nothing on order, covers 5 days, pars at 24 x 5 x 1.25 = 150 lb, needs 110 lb, and orders 11 ten-pound cases with no overshoot. Drop the safety factor to zero and the par falls to 120 lb and the order to 8 cases, which is 30 lb less inventory and a stockout on any day usage runs a quarter above average. A purchasing estimate; the actual usage history and the vendor's delivery reliability govern.",
+  };
+}
+
+export const parLevelOrderExample = { inputs: { daily_usage: 24, lead_time_days: 2, order_cycle_days: 3, safety_factor: 0.25, on_hand: 40, on_order: 0, units_per_case: 10 } };
+
+KITCHEN_RENDERERS["par-level-order"] = _r({
+  citation: "Citation: par level from usage over the coverage window (lead time plus order cycle) with a safety factor, the standard food-service inventory practice taught in the purchasing texts (CIA Purchasing; ServSafe management), by name. Par = daily usage x coverage days x (1 + safety); order = par - on hand - on order, rounded up to whole cases. Actual usage history and vendor reliability govern.",
+  example: parLevelOrderExample.inputs,
+  fields: [
+    { key: "daily_usage", label: "Average daily usage (counting unit)", kind: "number" },
+    { key: "lead_time_days", label: "Lead time (days)", kind: "number" },
+    { key: "order_cycle_days", label: "Order cycle (days)", kind: "number" },
+    { key: "safety_factor", label: "Safety factor (0.25 = 25%)", kind: "number" },
+    { key: "on_hand", label: "Quantity on hand", kind: "number" },
+    { key: "on_order", label: "Quantity already on order", kind: "number" },
+    { key: "units_per_case", label: "Units per case", kind: "number" },
+  ],
+  outputs: [
+    { key: "c", id: "parl-out-c", label: "Coverage window", value: (r) => fmt(r.coverage_days, 1) + " days" },
+    { key: "p", id: "parl-out-p", label: "Par level", value: (r) => fmt(r.par_level, 1) + " units" },
+    { key: "o", id: "parl-out-o", label: "Order needed", value: (r) => fmt(r.order_needed, 1) + " units" },
+    { key: "s", id: "parl-out-s", label: "Cases to order", value: (r) => String(r.cases) + " cases (" + fmt(r.ordered_quantity, 1) + " units)" },
+    { key: "v", id: "parl-out-v", label: "Overshoot above par", value: (r) => fmt(r.overshoot, 1) + " units" },
+    { key: "n", id: "parl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeParLevelOrder,
+});
+
+// ===================== spec-v1361: time as a public health control window =====================
+export const TPHC_WINDOWS = {
+  cold_4: { hours: 4, label: "Cold food, 4-hour option (no temperature condition)" },
+  cold_6: { hours: 6, label: "Cold food, 6-hour option (must stay at or below 70 F)" },
+  hot_4:  { hours: 4, label: "Hot food, 4-hour option (starts at 135 F or above)" },
+};
+
+// Parse "HH:MM" (24-hour) or "H:MM am/pm" into minutes past midnight. Returns null on a
+// string the reader has not finished typing, so the tile reports a parse error rather
+// than a wrong discard time.
+function _parseClock(s) {
+  const t = String(s || "").trim().toLowerCase();
+  const m = t.match(/^(\d{1,2}):(\d{2})\s*(am|pm)?$/);
+  if (!m) return null;
+  let h = Number(m[1]);
+  const min = Number(m[2]);
+  if (min > 59) return null;
+  if (m[3]) {
+    if (h < 1 || h > 12) return null;
+    if (m[3] === "pm" && h !== 12) h += 12;
+    if (m[3] === "am" && h === 12) h = 0;
+  } else if (h > 23) return null;
+  return h * 60 + min;
+}
+
+function _formatClock(minutes) {
+  const wrapped = ((minutes % 1440) + 1440) % 1440;
+  const h24 = Math.floor(wrapped / 60);
+  const min = Math.round(wrapped % 60);
+  const ampm = h24 < 12 ? "am" : "pm";
+  const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+  return h12 + ":" + String(min).padStart(2, "0") + " " + ampm + (minutes >= 1440 ? " (next day)" : "");
+}
+
+// dims: in { args: dimensionless } out: { window_hr: T, projected_temp_f: T, time_to_70_hr: T }
+export function computeTphcWindow({ mark_time = "10:30", window_option = "cold_6", start_temp_f = 41, ambient_f = 75, tau_hr = 4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const w = TPHC_WINDOWS[window_option];
+  if (!w) return { error: "Window option must be the cold 4-hour, cold 6-hour, or hot 4-hour choice." };
+  const marked = _parseClock(mark_time);
+  if (marked === null) return { error: "Mark time must be a clock time such as 10:30 or 10:30 am." };
+  if (!(tau_hr > 0)) return { error: "Product time constant must be positive." };
+  if (!Number.isFinite(start_temp_f) || !Number.isFinite(ambient_f)) return { error: "Temperatures must be finite numbers." };
+  if (window_option === "hot_4" && start_temp_f < 135) return { error: "The hot-food option starts at 135 F or above." };
+  if (window_option !== "hot_4" && start_temp_f > 41) return { error: "The cold-food options start at 41 F or below." };
+  // Newtonian approach to room temperature: T(t) = Ta - (Ta - T0) exp(-t/tau).
+  const window_hr = w.hours;
+  const discard_minutes = marked + window_hr * 60;
+  const projected_temp_f = ambient_f - (ambient_f - start_temp_f) * Math.exp(-window_hr / tau_hr);
+  let time_to_70_hr = null;
+  if (ambient_f > 70 && start_temp_f < 70) {
+    time_to_70_hr = -tau_hr * Math.log((ambient_f - 70) / (ambient_f - start_temp_f));
+  }
+  const six_hour_supportable = window_option !== "cold_6"
+    ? "not applicable to this option"
+    : (time_to_70_hr === null || time_to_70_hr > window_hr)
+      ? "supportable: the product is projected to stay at or below 70 F through the window, subject to the measurement the Food Code still requires"
+      : "not supportable: the product is projected to cross 70 F before the window ends, so only the 4-hour option is available";
+  if (!Number.isFinite(projected_temp_f)) return { error: "Time-as-a-public-health-control math is not a finite value." };
+  if (time_to_70_hr !== null && !Number.isFinite(time_to_70_hr)) return { error: "Time-as-a-public-health-control math is not a finite value." };
+  return {
+    window_hr,
+    discard_time: _formatClock(discard_minutes),
+    projected_temp_f,
+    time_to_70_hr,
+    six_hour_supportable,
+    note: "The discard time and the temperature projection behind a Time as a Public Health Control window. The FDA Food Code lets a kitchen hold time/temperature control for safety food with no temperature control if it works to a clock instead of a thermometer: cold food starting at 41 F or below may be held up to four hours and then discarded with no temperature condition, or up to six hours but only if the food never exceeds 70 F during the window, which must be verified by measurement; hot food starting at 135 F or above gets four hours. In every case the food is marked with its start time and discarded at the end, and it may not be returned to refrigeration. The part a wall clock cannot answer is whether a pan will cross 70 F inside six hours, and that depends on the room and on the product's time constant tau, roughly how quickly that pan of that product responds. Warming follows a first-order approach, T(t) = ambient - (ambient - start) x exp(-t / tau). Potato salad marked out of the walk-in at 41 F into a 75 F dining room with tau = 4.0 hr sits at 67.4 F after six hours and does not reach 70 F until 7.7 hr, so the six-hour option is supportable. Move the same pan to a 90 F kitchen line and it crosses 70 F at 3.6 hr, so only the four-hour option is available. This is a projection from the marked time, not a countdown against the wall clock. A projection; the Food Code, the local health authority, and an actual measured product temperature govern.",
+  };
+}
+
+export const tphcWindowExample = { inputs: { mark_time: "10:30", window_option: "cold_6", start_temp_f: 41, ambient_f: 75, tau_hr: 4.0 } };
+
+KITCHEN_RENDERERS["tphc-window"] = _r({
+  citation: "Citation: Time as a Public Health Control, FDA Food Code section 3-501.19 (4-hour and 6-hour options, the 70 F ceiling on the 6-hour option, and the mark-and-discard requirement), cited by section and not reproduced, with the first-order Newtonian warming projection T(t) = ambient - (ambient - start) exp(-t/tau). A projection, never a determination; the local health authority and a measured product temperature govern.",
+  example: tphcWindowExample.inputs,
+  fields: [
+    { key: "mark_time", label: "Mark time (clock time, e.g. 10:30 am)", kind: "text" },
+    { key: "window_option", label: "Window option", kind: "select", options: Object.keys(TPHC_WINDOWS).map((k) => ({ value: k, label: TPHC_WINDOWS[k].label })) },
+    { key: "start_temp_f", label: "Starting product temperature (F)", kind: "number" },
+    { key: "ambient_f", label: "Ambient temperature (F)", kind: "number" },
+    { key: "tau_hr", label: "Product time constant tau (hr)", kind: "number" },
+  ],
+  outputs: [
+    { key: "d", id: "tphc-out-d", label: "Discard time", value: (r) => r.discard_time + " (" + fmt(r.window_hr, 0) + " hr window)" },
+    { key: "t", id: "tphc-out-t", label: "Projected temperature at the end of the window", value: (r) => fmt(r.projected_temp_f, 1) + " F" },
+    { key: "s", id: "tphc-out-s", label: "Projected time to reach 70 F", value: (r) => r.time_to_70_hr === null ? "never reaches 70 F at this ambient" : fmt(r.time_to_70_hr, 2) + " hr" },
+    { key: "v", id: "tphc-out-v", label: "Six-hour option", value: (r) => r.six_hour_supportable },
+    { key: "n", id: "tphc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTphcWindow,
+});
+
+// ===================== spec-v1362: steam kettle heat-up time and steam demand =====================
+// dims: in { args: dimensionless } out: { mass_lb: M, heat_btu: dimensionless, heatup_min: T, steam_per_batch_lb: M, steam_rate_lb_hr: M T^-1 }
+export function computeSteamKettleHeatup({ gallons = 0, specific_gravity = 1.0, specific_heat = 1.0, start_temp_f = 60, final_temp_f = 200, rated_input_btuh = 0, jacket_efficiency = 0.85, latent_heat_btu_lb = 945.6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(gallons > 0)) return { error: "Kettle working volume must be positive." };
+  if (!(specific_gravity > 0)) return { error: "Specific gravity must be positive." };
+  if (!(specific_heat > 0)) return { error: "Specific heat must be positive." };
+  if (!(final_temp_f > start_temp_f)) return { error: "The final temperature must exceed the starting temperature." };
+  if (!(rated_input_btuh > 0)) return { error: "Rated heat input must be positive." };
+  if (!(jacket_efficiency > 0 && jacket_efficiency <= 1)) return { error: "Jacket efficiency must be between 0 and 1." };
+  if (!(latent_heat_btu_lb > 0)) return { error: "Latent heat of steam must be positive." };
+  // Kettles are sized on batch volume and boilers on PEAK steam rate, and the peak is the come-up.
+  const mass_lb = gallons * 8.34 * specific_gravity;
+  const heat_btu = mass_lb * specific_heat * (final_temp_f - start_temp_f);
+  const useful_input_btuh = rated_input_btuh * jacket_efficiency;
+  const heatup_hr = heat_btu / useful_input_btuh;
+  const heatup_min = heatup_hr * 60;
+  const steam_per_batch_lb = heat_btu / latent_heat_btu_lb;
+  const steam_rate_lb_hr = steam_per_batch_lb / heatup_hr;
+  const boiler_hp = steam_rate_lb_hr / 34.5;
+  if (![mass_lb, heat_btu, heatup_hr, heatup_min, steam_per_batch_lb, steam_rate_lb_hr, boiler_hp].every(Number.isFinite)) return { error: "Steam-kettle math is not a finite value." };
+  return {
+    mass_lb,
+    heat_btu,
+    heatup_hr,
+    heatup_min,
+    steam_per_batch_lb,
+    steam_rate_lb_hr,
+    boiler_hp,
+    note: "Heat-up time for a steam-jacketed kettle and the steam rate the boiler has to deliver while it comes up. The first half is the ordinary sensible-heat relation: mass is gallons x 8.34 x specific gravity, the heat required is mass x specific heat x temperature rise, and the time is that heat divided by the rated input times the jacket efficiency. What makes it worth computing is the second reading. Dividing the same heat by the latent heat of the steam gives pounds of steam per batch, and dividing that by the heat-up time gives the pounds per hour the boiler must supply DURING the come-up. Kettles are sized on batch volume and boilers on peak steam rate, and the peak is the come-up, not the simmer, so a kitchen with four kettles that all start at 6 am has a boiler problem that never appears on the equipment schedule. At 15 psig the latent heat of saturated steam is about 945.6 BTU/lb; higher pressure carries slightly less latent heat per pound but a larger temperature difference across the jacket, so it heats faster. A 40 gal kettle of water-like stock from 60 F to 200 F rated at 100,000 BTU/hr with an 85% jacket holds 333.6 lb, needs 46,704 BTU, comes up in 0.55 hr or 33 minutes, and draws 49.4 lb of steam per batch, which is about 90 lb/hr or roughly 3 boiler horsepower. Four of them starting together want about 10 boiler horsepower for half an hour; stagger the starts and the peak halves. A sizing estimate; the kettle's rated input and the boiler manufacturer's data govern.",
+  };
+}
+
+export const steamKettleHeatupExample = { inputs: { gallons: 40, specific_gravity: 1.0, specific_heat: 1.0, start_temp_f: 60, final_temp_f: 200, rated_input_btuh: 100000, jacket_efficiency: 0.85, latent_heat_btu_lb: 945.6 } };
+
+KITCHEN_RENDERERS["steam-kettle-heatup"] = _r({
+  citation: "Citation: steam-jacketed kettle heat-up from the sensible-heat relation Q = m c dT with 8.34 lb per gallon of water, and steam demand from Q divided by the latent heat of saturated steam at the operating pressure (about 945.6 BTU/lb at 15 psig per the ASME steam tables), cited by name and not reproduced. Boiler horsepower at 34.5 lb/hr of steam. The kettle's rated input and the boiler manufacturer's data govern.",
+  example: steamKettleHeatupExample.inputs,
+  fields: [
+    { key: "gallons", label: "Kettle working volume (gal)", kind: "number" },
+    { key: "specific_gravity", label: "Product specific gravity", kind: "number" },
+    { key: "specific_heat", label: "Product specific heat (BTU/lb-F)", kind: "number" },
+    { key: "start_temp_f", label: "Starting temperature (F)", kind: "number" },
+    { key: "final_temp_f", label: "Final temperature (F)", kind: "number" },
+    { key: "rated_input_btuh", label: "Rated heat input (BTU/hr)", kind: "number" },
+    { key: "jacket_efficiency", label: "Jacket efficiency (0-1)", kind: "number" },
+    { key: "latent_heat_btu_lb", label: "Latent heat of steam (BTU/lb)", kind: "number" },
+  ],
+  outputs: [
+    { key: "m", id: "stkh-out-m", label: "Batch mass", value: (r) => fmt(r.mass_lb, 1) + " lb" },
+    { key: "q", id: "stkh-out-q", label: "Heat required", value: (r) => fmt(r.heat_btu, 0) + " BTU" },
+    { key: "t", id: "stkh-out-t", label: "Heat-up time", value: (r) => fmt(r.heatup_min, 1) + " min (" + fmt(r.heatup_hr, 2) + " hr)" },
+    { key: "s", id: "stkh-out-s", label: "Steam per batch", value: (r) => fmt(r.steam_per_batch_lb, 1) + " lb" },
+    { key: "r", id: "stkh-out-r", label: "Peak steam rate during come-up", value: (r) => fmt(r.steam_rate_lb_hr, 1) + " lb/hr (" + fmt(r.boiler_hp, 2) + " boiler hp)" },
+    { key: "n", id: "stkh-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSteamKettleHeatup,
+});
+
+// ===================== spec-v1363: hot-holding connected load, demand, and kitchen heat gain =====================
+// dims: in { args: dimensionless } out: { connected_kw: dimensionless, demand_kw: dimensionless, demand_amps: I, sensible_btuh: dimensionless, tons: dimensionless }
+export function computeHotHoldingEnergy({ equipment = [], diversity_factor = 0.65, voltage = 208, phase = "three" } = {}) {
+  if (!Array.isArray(equipment) || equipment.length === 0) return { error: "List at least one piece of hot-holding equipment." };
+  if (!(Number(diversity_factor) > 0 && Number(diversity_factor) <= 1)) return { error: "Diversity factor must be between 0 and 1." };
+  if (!(Number(voltage) > 0)) return { error: "Service voltage must be positive." };
+  if (phase !== "single" && phase !== "three") return { error: "Phase must be single or three." };
+  let connected_kw = 0;
+  for (const e of equipment) {
+    const kw = Number(e.kw) || 0;
+    const qty = Number(e.qty) || 0;
+    if (kw < 0 || qty < 0) return { error: "Equipment kW and quantity cannot be negative." };
+    connected_kw += kw * qty;
+  }
+  if (!(connected_kw > 0)) return { error: "Total connected load must be positive." };
+  // Every watt a holding cabinet draws comes back out as sensible heat: 3412 BTU/hr per kW.
+  const demand_kw = connected_kw * Number(diversity_factor);
+  const denominator = phase === "three" ? Number(voltage) * Math.sqrt(3) : Number(voltage);
+  const demand_amps = demand_kw * 1000 / denominator;
+  const sensible_btuh = demand_kw * 3412;
+  const tons = sensible_btuh / 12000;
+  if (![connected_kw, demand_kw, demand_amps, sensible_btuh, tons].every(Number.isFinite)) return { error: "Hot-holding load math is not a finite value." };
+  return {
+    connected_kw,
+    demand_kw,
+    demand_amps,
+    sensible_btuh,
+    tons,
+    note: "Connected load, diversified demand, feeder amps, and kitchen heat gain from a line of hot-holding equipment, printed from one input list. Steam tables, holding cabinets, heat lamps, and soup wells are thermostatically cycling resistance heat. Connected load is the sum of the nameplates and is the wrong number to size anything by, because the units are never all in their on-cycle at the same moment; diversified demand, typically 0.6 to 0.75 for a mixed holding line, is what the feeder actually sees. The same demand number then does double duty, and that is the whole point: every watt a holding cabinet draws comes back out as sensible heat into the kitchen, so demand kilowatts convert directly to cooling load at 3412 BTU/hr per kilowatt with no efficiency to discount. Kitchens are routinely designed with the electrical load counted and the same load forgotten on the cooling side. Three 1.5 kW steam tables, two 0.5 kW heat lamps, and one 2.0 kW holding cabinet total 7.5 kW connected; at a 0.65 diversity that is 4.875 kW of demand, which on a 208 V three-phase service is 13.5 A and 16,634 BTU/hr, or 1.39 tons. Thirteen and a half amps is a modest feeder; nearly a ton and a half of cooling from six pieces nobody thinks of as heat sources is not, and that is before the fryers, the range, and the dish machine. Note that the exhaust hood captures only the fraction that rises into it, and the holding cabinet's share stays in the room. A load estimate; NEC Article 220 kitchen-equipment demand factors and the equipment nameplates govern the feeder, and the mechanical engineer's load calculation governs the cooling.",
+  };
+}
+
+export const hotHoldingEnergyExample = {
+  inputs: {
+    equipment: [
+      { name: "steam table", kw: 1.5, qty: 3 },
+      { name: "heat lamp", kw: 0.5, qty: 2 },
+      { name: "holding cabinet", kw: 2.0, qty: 1 },
+    ],
+    diversity_factor: 0.65,
+    voltage: 208,
+    phase: "three",
+  },
+};
+
+function renderHotHoldingEnergy(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: hot-holding connected load, diversified demand, and kitchen sensible heat gain. Demand = connected kW x diversity factor; amps = kW x 1000 / (V x sqrt(3)) three-phase or / V single-phase; heat gain = demand kW x 3412 BTU/hr per kW, the exact electrical-to-thermal conversion. NEC Article 220 kitchen-equipment demand factors and the equipment nameplates govern the feeder; the mechanical engineer's load calculation governs the cooling.";
+  attachExampleButton(inputRegion, () => fillExample(hotHoldingEnergyExample.inputs));
+  const list = document.createElement("div"); inputRegion.appendChild(list);
+  const rows = [];
+  for (let i = 0; i < 6; i++) {
+    const wrap = document.createElement("div"); wrap.className = "field";
+    const tag = "Equipment " + (i + 1) + " ";
+    const nF = makeRowField(tag + "name", "hhe-i" + i + "-n", { type: "text", inputmode: "text" });
+    const kF = makeRowField(tag + "unit load (kW)", "hhe-i" + i + "-kw", { step: "any", min: "0" });
+    const qF = makeRowField(tag + "quantity", "hhe-i" + i + "-q", { step: "any", min: "0" });
+    for (const f of [nF, kF, qF]) wrap.appendChild(f.wrap);
+    list.appendChild(wrap);
+    [nF.input, kF.input, qF.input].forEach((el) => el.addEventListener("input", update));
+    rows.push({ n: nF.input, kw: kF.input, q: qF.input });
+  }
+  const dv = makeNumber("Diversity factor (0-1)", "hhe-dv", { step: "any", min: "0", max: "1" });
+  const vt = makeNumber("Service voltage (V)", "hhe-vt", { step: "any", min: "1" });
+  dv.input.value = "0.65";
+  vt.input.value = "208";
+  const ph = makeSelect("Phase", "hhe-ph", [{ value: "three", label: "Three-phase" }, { value: "single", label: "Single-phase" }]);
+  for (const f of [dv, vt, ph]) inputRegion.appendChild(f.wrap);
+  for (const el of [dv.input, vt.input, ph.select]) el.addEventListener("input", update);
+  const oC = makeOutputLine(outputRegion, "Connected load", "hhe-out-c");
+  const oD = makeOutputLine(outputRegion, "Diversified demand", "hhe-out-d");
+  const oA = makeOutputLine(outputRegion, "Demand amps", "hhe-out-a");
+  const oH = makeOutputLine(outputRegion, "Sensible heat gain", "hhe-out-h");
+  const oN = makeOutputLine(outputRegion, "Note", "hhe-out-n");
+  function fillExample(v) {
+    for (let i = 0; i < rows.length; i++) {
+      const e = v.equipment[i];
+      if (e) { rows[i].n.value = e.name; rows[i].kw.value = e.kw; rows[i].q.value = e.qty; }
+    }
+    dv.input.value = v.diversity_factor;
+    vt.input.value = v.voltage;
+    ph.select.value = v.phase;
+    update();
+  }
+  function update() {
+    const equipment = rows
+      .map((r) => ({ name: r.n.value, kw: Number(r.kw.value) || 0, qty: Number(r.q.value) || 0 }))
+      .filter((e) => e.kw > 0 && e.qty > 0);
+    const outs = [oC, oD, oA, oH, oN];
+    if (equipment.length === 0) { for (const o of outs) o.textContent = "-"; return; }
+    const r = computeHotHoldingEnergy({
+      equipment,
+      diversity_factor: Number(dv.input.value) || 0,
+      voltage: Number(vt.input.value) || 0,
+      phase: ph.select.value,
+    });
+    if (r.error) { oC.textContent = r.error; for (const o of [oD, oA, oH, oN]) o.textContent = "-"; return; }
+    oC.textContent = fmt(r.connected_kw, 3) + " kW";
+    oD.textContent = fmt(r.demand_kw, 3) + " kW";
+    oA.textContent = fmt(r.demand_amps, 1) + " A";
+    oH.textContent = fmt(r.sensible_btuh, 0) + " BTU/hr (" + fmt(r.tons, 2) + " tons)";
+    oN.textContent = r.note;
+  }
+}
+KITCHEN_RENDERERS["hot-holding-energy"] = renderHotHoldingEnergy;

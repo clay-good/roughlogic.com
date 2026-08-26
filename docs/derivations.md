@@ -2463,21 +2463,35 @@ cross-check.
 | calc-kitchen.js | `computeAbvFromGravity` | `{ original_gravity = 1.055, final_gravity = 1.012 } = {}` | _ | _ | _ |
 | calc-kitchen.js | `computeAsPurchasedQuantity` | `{ ep_quantity_needed = 20, yield_pct = 75, unit_weight = 0 } = {}` | _ | _ | _ |
 | calc-kitchen.js | `computeBakersPercentage` | `{ flour_g = 0, hydration_pct = 0, salt_pct = 0, yeast_pct = 0, other_pct = 0,...` | _ | _ | _ |
+| calc-kitchen.js | `computeBeverageCo2Duration` | `{ cylinder_lb = 0, lb_co2_per_keg = 1.2, kegs_per_day = 0, reserve_fraction =...` | _ | _ | _ |
 | calc-kitchen.js | `computeBrineCure` | `{ mode = "brine", water_g = 0, salt_g = 0, meat_g = 0, cure_g = 0, target_pct...` | _ | _ | _ |
 | calc-kitchen.js | `computeCoolingCurve` | `{ start_F = 135, ambient_F = 70, container = "full_pan_4in", product_type = "...` | _ | _ | _ |
+| calc-kitchen.js | `computeCoversPerLaborHour` | `{ covers = 0, labor_hours = 0, net_sales = 0, labor_cost = 0 } = {}` | _ | _ | _ |
+| calc-kitchen.js | `computeDoughBallScaling` | `{ pan_shape = "round", diameter_in = 0, length_in = 0, width_in = 0, thicknes...` | _ | _ | _ |
 | calc-kitchen.js | `computeDoughWaterTemperature` | `{ desired_dough_temp_f = 75, flour_temp_f = 68, room_temp_f = 72, friction_fa...` | _ | _ | _ |
 | calc-kitchen.js | `computeDraftBeerLineBalance` | `{ applied_pressure_psi = 0, rise_ft = 0, tubing_type = "vinyl_316" } = {}` | _ | _ | _ |
 | calc-kitchen.js | `computeDrinkAbvDilution` | `{ total_volume_oz = 0, weighted_abv_pct = 0, method = "stirred", dilution_pct...` | _ | _ | _ |
+| calc-kitchen.js | `computeFermentationTimeQ10` | `{ reference_time_hr = 0, reference_temp_f = 78, actual_temp_f = 78, q10 = 2.0...` | _ | _ | _ |
 | calc-kitchen.js | `computeFoodCostPercentage` | `{ beginning_inventory = 0, purchases = 0, ending_inventory = 0, food_sales = ...` | _ | _ | _ |
+| calc-kitchen.js | `computeFreezingTimePlank` | `{ a_ft = 0, shape = "slab", density_pcf = 0, latent_heat_btu_lb = 0, freezing...` | _ | _ | _ |
+| calc-kitchen.js | `computeFryerOilTurnover` | `{ vat_capacity_lb = 0, daily_product_lb = 0, absorption_fraction = 0.12, oper...` | _ | _ | _ |
+| calc-kitchen.js | `computeHotHoldingEnergy` | `{ equipment = [], diversity_factor = 0.65, voltage = 208, phase = "three" } = {}` | _ | _ | _ |
+| calc-kitchen.js | `computeIceMachineSizing` | `{ covers_per_day = 0, lb_per_cover = 0, derate_factor = 0.8, utilization = 0....` | _ | _ | _ |
+| calc-kitchen.js | `computeKegYield` | `{ keg_size = "half_barrel", custom_gallons = 0, serving_oz = 16, loss_fractio...` | _ | _ | _ |
 | calc-kitchen.js | `computeKitchenSanitizerPpm` | `{ sanitizer_type = "chlorine", active_pct = 0, target_ppm = 0, batch_gallons ...` | _ | _ | _ |
 | calc-kitchen.js | `computeMenuEngineering` | `{ units_sold = 0, menu_price = 0, food_cost = 0, total_units = 0, item_count ...` | _ | _ | _ |
 | calc-kitchen.js | `computeOverrunPercent` | `{ mix_weight_lb = 0, finished_weight_lb = 0 } = {}` | _ | _ | _ |
 | calc-kitchen.js | `computePanConversion` | `{ target_qt = 0, target_servings = 0, portion_oz = 0, pan_size = "full", pan_...` | _ | _ | _ |
+| calc-kitchen.js | `computeParLevelOrder` | `{ daily_usage = 0, lead_time_days = 0, order_cycle_days = 0, safety_factor = ...` | _ | _ | _ |
 | calc-kitchen.js | `computePlateCost` | `{ ingredients = [], target_food_cost_pct = 30 }` | _ | _ | _ |
 | calc-kitchen.js | `computePourCost` | `{ bottle_cost = 0, bottle_size_ml = 0, pour_size_oz = 0, target_pour_cost_pct...` | _ | _ | _ |
 | calc-kitchen.js | `computePrimeCost` | `{ food_cost = 0, beverage_cost = 0, labor_cost = 0, total_sales = 0 } = {}` | _ | _ | _ |
 | calc-kitchen.js | `computeRecipeScale` | `{ rows = [], original_yield = 0, target_yield = 0 }` | _ | _ | _ |
 | calc-kitchen.js | `computeSousVidePasteurization` | `{ category = "beef", thickness_in = 0, bath_temperature_F = 0, initial_temper...` | _ | _ | _ |
+| calc-kitchen.js | `computeSteamKettleHeatup` | `{ gallons = 0, specific_gravity = 1.0, specific_heat = 1.0, start_temp_f = 60...` | _ | _ | _ |
+| calc-kitchen.js | `computeThawTime` | `{ a_ft = 0, shape = "sphere", density_pcf = 0, latent_heat_btu_lb = 0, thaw_p...` | _ | _ | _ |
+| calc-kitchen.js | `computeTphcWindow` | `{ mark_time = "10:30", window_option = "cold_6", start_temp_f = 41, ambient_f...` | _ | _ | _ |
+| calc-kitchen.js | `computeWarewasherHotWater` | `{ rinse_gpm = 0, supply_temp_f = 140, rinse_temp_f = 180, racks_per_hour = 0,...` | _ | _ | _ |
 | calc-kitchen.js | `computeYieldEP` | `{ ap_weight = 0, trim_weight = 0, cooking_loss_pct = 0, ap_cost_per_lb = 0 }` | _ | _ | _ |
 | calc-lab.js | `computeArrheniusEquation` | `{ k1 = 0, temp1_c = 0, k2 = 0, temp2_c = 0 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeBeerLambert` | `{ absorbance = 0, path_length_cm = 1, epsilon = 0 }` | _ | _ | _ |
@@ -3374,7 +3388,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1960.
+Row count: 1974.
 
 <!-- END function-corpus-v14 -->
 
@@ -5013,28 +5027,42 @@ per spec-v14 §13.1 second paragraph.
 | `truss-capacity` | Truss Point Load and Span Capacity | Tomcat 16 in box truss published tech...; 16 in box / 40 ft span / 200 + 400 + 200 lb point loads -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `winch-fleet-angle` | Winch Drum Fleet Angle | Winch drum fleet angle (Wire Rope Use...; 6 in offset over a 240 in lead -> atan(0.025) = 1.43 deg,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group O Kitchen (19 tiles)
+### Group O Kitchen (33 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `abv-from-gravity` | Alcohol by Volume from Gravity | Alcohol by volume from gravity (stand...; ABV = (1.055 - 1.012) x 131.25 = 0.043 x 131.25 = 5.64%; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `as-purchased-quantity` | As-Purchased Quantity from Edible Portion | As-purchased quantity from edible por...; AP = EP / yield = 20 / 0.75 = 26.67 lb (always divide; th... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bakers-percentage` | Baker's Percentage | Baker's percentage (baker's math); flour 1000 g, 65% hydration, 2% salt, 1% yeast, 4 pieces ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `beverage-co2-duration` | Beverage CO2 Cylinder Duration | Brewers Association; per-keg CO2 consumption | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `brine-cure` | Brine / Cure Concentration | Mass-fraction chemistry + USDA FSIS 9...; equilibrium: meat 1000 g, salt 25 g, cure 2.5 g -> 2.5% s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cooling-curve` | Food Safety Cooling Curve | FDA Food Code 2022 (project bundled t...; Full 4 in pan / thick liquid / start 135 F / ambient 70 F... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `covers-per-labor-hour` | Covers and Sales per Labor Hour | Project (first-principles); CPLH / SPLH | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `dough-ball-scaling` | Dough Ball Weight from Thickness Factor | Project (first-principles); area = pi (d/2)^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dough-water-temperature` | Desired Dough Temperature (Mixing Water) | Desired dough temperature (DDT) mixin...; water = 75 x 3 - (68 + 72 + 24) = 225 - 164 = 61 F | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `draft-beer-line-balance` | Draft Beer Line Balancing | Draft-beer line balancing (Brewers As...; 12 psi, 4 ft rise, 3/16 in vinyl (3.0 psi/ft) -> (12 - 2 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `drink-abv-dilution` | Cocktail ABV with Dilution | Cocktail dilution model (Dave Arnold,...; Stirred Martini 3 oz at 32.67% ABV, 25% melt -> 26.1% ABV... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `fermentation-time-q10` | Fermentation and Proof Time vs Temperature | Project (first-principles); t = t_ref x Q10^(delta C / 10) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `food-cost-percentage` | Period Food-Cost Percentage | Standard restaurant-accounting identi...; spec-v90 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `freezing-time-plank` | Freezing Time by Plank's Equation | ASHRAE; Plank's equation, slab constants 1/2 and 1/8 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `fryer-oil-turnover` | Fryer Oil Turnover, Life, and Annual Cost | Project (first-principles); turnover = vat capacity / daily loss | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `hot-holding-energy` | Hot-Holding Load, Demand, and Kitchen Heat Gain | Project (first-principles); 3,412 BTU/hr per kW | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `ice-machine-sizing` | Ice Machine Capacity and Bin Sizing | AHRI; 70 F air / 50 F water | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `keg-yield` | Keg Yield, Pours, and Cost per Ounce | Project (first-principles); half barrel 15.5 gal x 128 fl oz/gal | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `kitchen-sanitizer-ppm` | 3-Compartment Sink Sanitizer Dilution | FDA Food Code Sec. 4-501.114 sanitizi...; Bleach 5.25% active, 100 ppm, 3-gal compartment -> 0.24 o... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `menu-engineering` | Menu Engineering Matrix | Kasavana & Smith menu-engineering model; 200 of 1000 units, 10-item menu, price $12, food cost $4,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `overrun-percent` | Ice Cream Overrun | Goff & Hartel, Ice Cream, 7th ed.; FD...; Mix 9.0 lb/gal frozen to 4.5 lb/gal -> 100% overrun, 50% ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pan-conversion` | Steam Table and Pan Conversion | ServSafe / hotel-pan capacity tables ...; 120 servings * 6 oz / full pan @ 4 in -> 22.5 qt total / ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `par-level-order` | Par Level and Order Quantity | Project (first-principles); par = usage x (lead + cycle) x (1 + safety) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `plate-cost` | Plate Cost and Menu Pricing | NRA / CIA menu-engineering practice; ribeye 0.5 lb @ $16/lb + potato 0.4 lb @ $1.20/lb + veg 0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pour-cost` | Beverage Pour Cost and Drink Price | First-principles bar cost control; US...; spec-v90 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `prime-cost` | Restaurant Prime Cost | Standard restaurant P&L prime-cost de...; spec-v90 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `recipe-scale` | Recipe Scaling | Project (first-principles); Original yield 12 -> target 30 -> factor 2.5; 2 cup flour... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sous-vide-pasteurization` | Sous-Vide Pasteurization Time | FDA / Baldwin; Heisler-slab approximation Fo ~ 0.4; Annex 6 hold at 140 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `steam-kettle-heatup` | Steam Kettle Heat-Up Time and Steam Demand | Project (first-principles); 945.6 BTU/lb at 15 psig | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `thaw-time` | Refrigerated Thawing Time | ASHRAE; Plank's equation reversed, sphere constants 1/6 and 1/24 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `tphc-window` | Time as a Public Health Control Window | FDA; 3-501.19 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `warewasher-hot-water` | Warewasher Hot-Water Demand and Booster Sizing | Project (first-principles); 500.4 BTU/hr per gpm-degree F | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `yield-ep` | Yield Percentage and Edible Portion | Project (first-principles) over Culin...; 10 lb AP / 1.5 lb trim / 15% cooking loss / $8/lb -> 72.2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group P Field (28 tiles)
@@ -5256,6 +5284,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1709. Fixture-covered or reference-cadence: 1709 / 1709.
+Tile count: 1723. Fixture-covered or reference-cadence: 1723 / 1723.
 
 <!-- END tile-index-v14 -->

@@ -396,6 +396,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "horizontal-curve": {"tangent_ft":"Tangent T","curve_length_ft":"Curve length L","degree_of_curve":"Degree of curve"},
   "horizontal-sightline-offset": {"mode":"Result"},
   "hos-math": {"on_duty_remaining":"On-duty remaining (14 hr window)","weekly_remaining":"Weekly remaining","needs_break":"30-min break","next_drive_start_iso":"Next legal drive start (if current time supplied)"},
+  "hot-holding-energy": {"connected_kw":"Connected load","demand_kw":"Diversified demand","demand_amps":"Demand amps","sensible_btuh":"Sensible heat gain","note":"Note"},
   "hp-from-torque": {"torque_lbft":"Result","kw":"Kilowatts","note":"Note"},
   "hud-fmr": {"fmr_0br":"0BR (efficiency)","fmr_1br":"1BR","fmr_2br":"2BR","fmr_3br":"3BR","fmr_4br":"4BR"},
   "humidifier-capacity": {"addition_lb_hr":"Moisture addition","gpd":"Daily water","latent_btu_hr":"Latent load added","warnings":"Notes"},

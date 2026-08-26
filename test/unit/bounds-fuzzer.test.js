@@ -38773,3 +38773,341 @@ test("bounds: spec-v1328 computeFlatTopStockpileVolume pins the frustum volume, 
   assert.ok("error" in _v1328({ base_diameter_ft: 80, top_diameter_ft: 20, repose_angle_deg: 37, density_pcf: 0 }));
   assert.ok("error" in _v1328({ base_diameter_ft: Infinity, top_diameter_ft: 20, repose_angle_deg: 37, density_pcf: 100 }));
 });
+
+// ===========================================================================
+// spec-v1350..v1363: the 2026-08-26 trade-expansion Group O band.
+// ===========================================================================
+
+import { computeIceMachineSizing as _v1350 } from "../../calc-kitchen.js";
+test("bounds: spec-v1350 computeIceMachineSizing pins demand, nameplate, and bin", () => {
+  // 300 covers x 1.5 lb = 450 lb/day; 450 / (0.80 x 0.90) = 625; bin 450 x 0.40 = 180.
+  const r = _v1350({ covers_per_day: 300, lb_per_cover: 1.5, derate_factor: 0.80, utilization: 0.90, peak_fraction: 0.40 });
+  assert.ok(Math.abs(r.daily_demand_lb - 450) < 1e-9);
+  assert.ok(Math.abs(r.required_nameplate_lb - 625) < 1e-9);
+  assert.ok(Math.abs(r.bin_capacity_lb - 180) < 1e-9);
+  // At the rating point itself the nameplate falls to demand / utilization.
+  const rated = _v1350({ covers_per_day: 300, lb_per_cover: 1.5, derate_factor: 1.0, utilization: 0.90, peak_fraction: 0.40 });
+  assert.ok(Math.abs(rated.required_nameplate_lb - 500) < 1e-9);
+  assert.ok("error" in _v1350({ covers_per_day: 0, lb_per_cover: 1.5, derate_factor: 0.8, utilization: 0.9, peak_fraction: 0.4 }));
+  assert.ok("error" in _v1350({ covers_per_day: 300, lb_per_cover: 0, derate_factor: 0.8, utilization: 0.9, peak_fraction: 0.4 }));
+  assert.ok("error" in _v1350({ covers_per_day: 300, lb_per_cover: 1.5, derate_factor: 1.5, utilization: 0.9, peak_fraction: 0.4 }));
+  assert.ok("error" in _v1350({ covers_per_day: 300, lb_per_cover: 1.5, derate_factor: 0.8, utilization: 0, peak_fraction: 0.4 }));
+  assert.ok("error" in _v1350({ covers_per_day: 300, lb_per_cover: 1.5, derate_factor: 0.8, utilization: 0.9, peak_fraction: 1.5 }));
+  assert.ok("error" in _v1350({ covers_per_day: Infinity, lb_per_cover: 1.5, derate_factor: 0.8, utilization: 0.9, peak_fraction: 0.4 }));
+});
+
+import { computeWarewasherHotWater as _v1351 } from "../../calc-kitchen.js";
+test("bounds: spec-v1351 computeWarewasherHotWater pins the booster load and the building demand", () => {
+  // 1.16 gpm x 40 F x 500.4 = 23,218.6 BTU/hr = 6.80 kW; / 0.80 = 29,023 BTU/hr; 40 x 1.2 = 48 gal/hr.
+  const r = _v1351({ rinse_gpm: 1.16, supply_temp_f: 140, rinse_temp_f: 180, racks_per_hour: 40, gal_per_rack: 1.2, booster_efficiency: 0.80 });
+  assert.ok(Math.abs(r.delta_t_f - 40) < 1e-9);
+  assert.ok(Math.abs(r.booster_btuh - 23218.56) < 1e-6);
+  assert.ok(Math.abs(r.booster_kw - 6.8049) < 1e-3);
+  assert.ok(Math.abs(r.gas_input_btuh - 29023.2) < 1e-6);
+  assert.ok(Math.abs(r.hourly_hot_water_gal - 48) < 1e-9);
+  // A colder building supply is a bigger booster: 120 F supply raises the rise to 60 F.
+  const cold = _v1351({ rinse_gpm: 1.16, supply_temp_f: 120, rinse_temp_f: 180, racks_per_hour: 40, gal_per_rack: 1.2, booster_efficiency: 0.80 });
+  assert.ok(Math.abs(cold.booster_btuh - 34827.84) < 1e-6);
+  assert.ok("error" in _v1351({ rinse_gpm: 0, supply_temp_f: 140, rinse_temp_f: 180, racks_per_hour: 40, gal_per_rack: 1.2, booster_efficiency: 0.8 }));
+  assert.ok("error" in _v1351({ rinse_gpm: 1.16, supply_temp_f: 180, rinse_temp_f: 180, racks_per_hour: 40, gal_per_rack: 1.2, booster_efficiency: 0.8 }));
+  assert.ok("error" in _v1351({ rinse_gpm: 1.16, supply_temp_f: 140, rinse_temp_f: 180, racks_per_hour: 0, gal_per_rack: 1.2, booster_efficiency: 0.8 }));
+  assert.ok("error" in _v1351({ rinse_gpm: 1.16, supply_temp_f: 140, rinse_temp_f: 180, racks_per_hour: 40, gal_per_rack: 0, booster_efficiency: 0.8 }));
+  assert.ok("error" in _v1351({ rinse_gpm: 1.16, supply_temp_f: 140, rinse_temp_f: 180, racks_per_hour: 40, gal_per_rack: 1.2, booster_efficiency: 1.5 }));
+  assert.ok("error" in _v1351({ rinse_gpm: Infinity, supply_temp_f: 140, rinse_temp_f: 180, racks_per_hour: 40, gal_per_rack: 1.2, booster_efficiency: 0.8 }));
+});
+
+import { computeFreezingTimePlank as _v1352 } from "../../calc-kitchen.js";
+test("bounds: spec-v1352 computeFreezingTimePlank pins the two resistance terms and the a^2 law", () => {
+  // 3 in beef slab: 65 x 106 / 38 = 181.3; 0.5 x 0.25 / 3 = 0.04167; 0.125 x 0.0625 / 0.9 = 0.00868; t = 9.13 hr.
+  const base = { a_ft: 0.25, shape: "slab", density_pcf: 65, latent_heat_btu_lb: 106, freezing_point_f: 28, medium_temp_f: -10, h_coeff: 3.0, k_frozen: 0.9 };
+  const r = _v1352(base);
+  assert.ok(Math.abs(r.driving_term - 181.3158) < 1e-3);
+  assert.ok(Math.abs(r.surface_term - 0.0416667) < 1e-6);
+  assert.ok(Math.abs(r.internal_term - 0.00868056) < 1e-7);
+  assert.ok(Math.abs(r.freezing_time_hr - 9.1287) < 1e-3);
+  assert.strictEqual(r.controlling, "surface (airflow-limited)");
+  // The internal term goes as a^2: doubling the slab quadruples it and doubles the surface term.
+  const thick = _v1352({ ...base, a_ft: 0.5 });
+  assert.ok(Math.abs(thick.internal_term - 4 * r.internal_term) < 1e-9);
+  assert.ok(Math.abs(thick.surface_term - 2 * r.surface_term) < 1e-9);
+  assert.ok(thick.freezing_time_hr > 2 * r.freezing_time_hr);
+  assert.ok("error" in _v1352({ ...base, shape: "cube" }));
+  assert.ok("error" in _v1352({ ...base, a_ft: 0 }));
+  assert.ok("error" in _v1352({ ...base, density_pcf: 0 }));
+  assert.ok("error" in _v1352({ ...base, latent_heat_btu_lb: 0 }));
+  assert.ok("error" in _v1352({ ...base, h_coeff: 0 }));
+  assert.ok("error" in _v1352({ ...base, k_frozen: 0 }));
+  assert.ok("error" in _v1352({ ...base, medium_temp_f: 30 }));
+  assert.ok("error" in _v1352({ ...base, a_ft: Infinity }));
+});
+
+import { computeThawTime as _v1353 } from "../../calc-kitchen.js";
+test("bounds: spec-v1353 computeThawTime pins the reversed driving term and the thickness-limited verdict", () => {
+  // 12 lb turkey as a 0.7 ft sphere: 64 x 106 / 10 = 678.4; 0.05833 + 0.07292; t = 89.0 hr = 3.7 days.
+  const base = { a_ft: 0.7, shape: "sphere", density_pcf: 64, latent_heat_btu_lb: 106, thaw_point_f: 28, cooler_temp_f: 38, h_coeff: 2.0, k_unfrozen: 0.28 };
+  const r = _v1353(base);
+  assert.ok(Math.abs(r.driving_term - 678.4) < 1e-6);
+  assert.ok(Math.abs(r.surface_term - 0.0583333) < 1e-6);
+  assert.ok(Math.abs(r.internal_term - 0.0729167) < 1e-6);
+  assert.ok(Math.abs(r.thaw_time_hr - 89.04) < 1e-2);
+  assert.ok(Math.abs(r.thaw_time_days - 3.71) < 1e-2);
+  // In thawing the internal term exceeds the surface term: thickness controls.
+  assert.ok(r.internal_term > r.surface_term);
+  assert.strictEqual(r.controlling, "internal (thickness-limited)");
+  // A warmer cooler thaws faster, in inverse proportion to the driving difference.
+  const warm = _v1353({ ...base, cooler_temp_f: 48 });
+  assert.ok(Math.abs(warm.thaw_time_hr - r.thaw_time_hr / 2) < 1e-6);
+  assert.ok("error" in _v1353({ ...base, shape: "cube" }));
+  assert.ok("error" in _v1353({ ...base, a_ft: 0 }));
+  assert.ok("error" in _v1353({ ...base, density_pcf: 0 }));
+  assert.ok("error" in _v1353({ ...base, latent_heat_btu_lb: 0 }));
+  assert.ok("error" in _v1353({ ...base, h_coeff: 0 }));
+  assert.ok("error" in _v1353({ ...base, k_unfrozen: 0 }));
+  assert.ok("error" in _v1353({ ...base, cooler_temp_f: 20 }));
+  assert.ok("error" in _v1353({ ...base, a_ft: Infinity }));
+});
+
+import { computeFryerOilTurnover as _v1354 } from "../../calc-kitchen.js";
+test("bounds: spec-v1354 computeFryerOilTurnover pins turnover and the annual cost", () => {
+  // 120 lb/day x 12% = 14.4 lb/day; 50 / 14.4 = 3.47 days; 14.4 x 360 = 5,184 lb; x 1.10 = $5,702.40.
+  const r = _v1354({ vat_capacity_lb: 50, daily_product_lb: 120, absorption_fraction: 0.12, operating_days: 360, oil_price_per_lb: 1.10 });
+  assert.ok(Math.abs(r.daily_oil_loss_lb - 14.4) < 1e-9);
+  assert.ok(Math.abs(r.turnover_days - 3.4722) < 1e-3);
+  assert.ok(Math.abs(r.annual_oil_lb - 5184) < 1e-9);
+  assert.ok(Math.abs(r.annual_cost - 5702.4) < 1e-6);
+  // A slow station turns over far more slowly on the same vat.
+  const slow = _v1354({ vat_capacity_lb: 50, daily_product_lb: 30, absorption_fraction: 0.12, operating_days: 360, oil_price_per_lb: 1.10 });
+  assert.ok(Math.abs(slow.turnover_days - 13.889) < 1e-2);
+  assert.ok(slow.turnover_days > 4 * r.turnover_days - 1e-6);
+  assert.ok("error" in _v1354({ vat_capacity_lb: 0, daily_product_lb: 120, absorption_fraction: 0.12, operating_days: 360, oil_price_per_lb: 1.1 }));
+  assert.ok("error" in _v1354({ vat_capacity_lb: 50, daily_product_lb: 0, absorption_fraction: 0.12, operating_days: 360, oil_price_per_lb: 1.1 }));
+  assert.ok("error" in _v1354({ vat_capacity_lb: 50, daily_product_lb: 120, absorption_fraction: 1.5, operating_days: 360, oil_price_per_lb: 1.1 }));
+  assert.ok("error" in _v1354({ vat_capacity_lb: 50, daily_product_lb: 120, absorption_fraction: 0.12, operating_days: 0, oil_price_per_lb: 1.1 }));
+  assert.ok("error" in _v1354({ vat_capacity_lb: 50, daily_product_lb: 120, absorption_fraction: 0.12, operating_days: 360, oil_price_per_lb: -1 }));
+  assert.ok("error" in _v1354({ vat_capacity_lb: Infinity, daily_product_lb: 120, absorption_fraction: 0.12, operating_days: 360, oil_price_per_lb: 1.1 }));
+});
+
+import { computeKegYield as _v1355 } from "../../calc-kitchen.js";
+test("bounds: spec-v1355 computeKegYield pins the net yield and the pour cost", () => {
+  // 15.5 x 128 = 1,984 oz; x 0.85 = 1,686.4; / 16 = 105.4 pints; 150 / 105.4 = $1.42; 20.3%.
+  const base = { keg_size: "half_barrel", custom_gallons: 0, serving_oz: 16, loss_fraction: 0.15, keg_cost: 150, menu_price: 7 };
+  const r = _v1355(base);
+  assert.ok(Math.abs(r.gross_oz - 1984) < 1e-9);
+  assert.ok(Math.abs(r.net_oz - 1686.4) < 1e-9);
+  assert.ok(Math.abs(r.servings - 105.4) < 1e-9);
+  assert.ok(Math.abs(r.cost_per_serving - 1.4231) < 1e-3);
+  assert.ok(Math.abs(r.pour_cost_pct - 20.33) < 1e-2);
+  // Tightening the draft system to an 8% loss adds servings and drops the pour cost.
+  const tight = _v1355({ ...base, loss_fraction: 0.08 });
+  assert.ok(Math.abs(tight.servings - 114.08) < 1e-2);
+  assert.ok(tight.pour_cost_pct < r.pour_cost_pct);
+  // A custom size uses the entered gallons; a zero-gallon custom is an error.
+  const custom = _v1355({ ...base, keg_size: "custom", custom_gallons: 5 });
+  assert.ok(Math.abs(custom.gross_oz - 640) < 1e-9);
+  assert.ok("error" in _v1355({ ...base, keg_size: "custom", custom_gallons: 0 }));
+  assert.ok("error" in _v1355({ ...base, keg_size: "pony" }));
+  assert.ok("error" in _v1355({ ...base, serving_oz: 0 }));
+  assert.ok("error" in _v1355({ ...base, loss_fraction: 1 }));
+  assert.ok("error" in _v1355({ ...base, keg_cost: 0 }));
+  assert.ok("error" in _v1355({ ...base, menu_price: 0 }));
+  assert.ok("error" in _v1355({ ...base, keg_cost: Infinity }));
+});
+
+import { computeBeverageCo2Duration as _v1356 } from "../../calc-kitchen.js";
+test("bounds: spec-v1356 computeBeverageCo2Duration pins the change-out point", () => {
+  // 20 / 1.2 = 16.67 kegs; / 2 = 8.33 days; x 0.80 = 13.33 kegs = 6.67 days.
+  const base = { cylinder_lb: 20, lb_co2_per_keg: 1.2, kegs_per_day: 2, reserve_fraction: 0.20 };
+  const r = _v1356(base);
+  assert.ok(Math.abs(r.kegs_per_cylinder - 16.6667) < 1e-3);
+  assert.ok(Math.abs(r.days_of_supply - 8.3333) < 1e-3);
+  assert.ok(Math.abs(r.changeout_kegs - 13.3333) < 1e-3);
+  assert.ok(Math.abs(r.changeout_days - 6.6667) < 1e-3);
+  // A long-draw system at 1.5 lb per keg empties the same cylinder sooner.
+  const longDraw = _v1356({ ...base, lb_co2_per_keg: 1.5 });
+  assert.ok(Math.abs(longDraw.kegs_per_cylinder - 13.3333) < 1e-3);
+  assert.ok(longDraw.days_of_supply < r.days_of_supply);
+  assert.ok("error" in _v1356({ ...base, cylinder_lb: 0 }));
+  assert.ok("error" in _v1356({ ...base, lb_co2_per_keg: 0 }));
+  assert.ok("error" in _v1356({ ...base, kegs_per_day: 0 }));
+  assert.ok("error" in _v1356({ ...base, reserve_fraction: 1 }));
+  assert.ok("error" in _v1356({ ...base, cylinder_lb: Infinity }));
+});
+
+import { computeDoughBallScaling as _v1357 } from "../../calc-kitchen.js";
+test("bounds: spec-v1357 computeDoughBallScaling pins area, weight, and the area-ratio scale", () => {
+  // 12 in round at a 0.10 factor: pi x 36 = 113.1 sq in -> 11.31 oz; scaled from a 20.11 oz 16 in ball agrees.
+  const base = { pan_shape: "round", diameter_in: 12, length_in: 0, width_in: 0, thickness_factor: 0.10, reference_weight_oz: 20.11, reference_diameter_in: 16 };
+  const r = _v1357(base);
+  assert.ok(Math.abs(r.pan_area_sqin - 113.0973) < 1e-3);
+  assert.ok(Math.abs(r.dough_weight_oz - 11.3097) < 1e-3);
+  assert.ok(Math.abs(r.scaled_weight_oz - 11.312) < 1e-2);
+  // A 16 in pan is 78% larger than a 12 in one, not a third larger.
+  const sixteen = _v1357({ ...base, diameter_in: 16 });
+  assert.ok(Math.abs(sixteen.pan_area_sqin / r.pan_area_sqin - 16 / 9) < 1e-9);
+  // Without a reference ball the scaled output is null, not zero.
+  const noRef = _v1357({ ...base, reference_weight_oz: 0, reference_diameter_in: 0 });
+  assert.strictEqual(noRef.scaled_weight_oz, null);
+  // A rectangular pan uses length x width.
+  const rect = _v1357({ ...base, pan_shape: "rectangular", diameter_in: 0, length_in: 18, width_in: 13 });
+  assert.ok(Math.abs(rect.pan_area_sqin - 234) < 1e-9);
+  assert.ok("error" in _v1357({ ...base, pan_shape: "oval" }));
+  assert.ok("error" in _v1357({ ...base, diameter_in: 0 }));
+  assert.ok("error" in _v1357({ ...base, thickness_factor: 0 }));
+  assert.ok("error" in _v1357({ ...base, pan_shape: "rectangular", diameter_in: 0, length_in: 18, width_in: 0 }));
+  assert.ok("error" in _v1357({ ...base, diameter_in: Infinity }));
+});
+
+import { computeFermentationTimeQ10 as _v1358 } from "../../calc-kitchen.js";
+test("bounds: spec-v1358 computeFermentationTimeQ10 pins the Q10 ratio in both directions", () => {
+  // 10 F colder = 5.56 C: 2^0.5556 = 1.470, so a 2.0 hr bulk runs 2.94 hr.
+  const base = { reference_time_hr: 2.0, reference_temp_f: 78, actual_temp_f: 68, q10: 2.0 };
+  const r = _v1358(base);
+  assert.ok(Math.abs(r.delta_f - 10) < 1e-9);
+  assert.ok(Math.abs(r.delta_c - 5.5556) < 1e-3);
+  assert.ok(Math.abs(r.ratio - 1.4697) < 1e-3);
+  assert.ok(Math.abs(r.predicted_time_hr - 2.9395) < 1e-3);
+  // Warmer runs faster, and a full 10 C (18 F) swing is exactly the Q10 factor.
+  const warm = _v1358({ ...base, actual_temp_f: 88 });
+  assert.ok(Math.abs(warm.predicted_time_hr - 1.3608) < 1e-3);
+  const tenC = _v1358({ ...base, actual_temp_f: 78 - 18 });
+  assert.ok(Math.abs(tenC.ratio - 2) < 1e-9);
+  // At the reference temperature the time is unchanged.
+  const same = _v1358({ ...base, actual_temp_f: 78 });
+  assert.ok(Math.abs(same.predicted_time_hr - 2.0) < 1e-12);
+  assert.ok("error" in _v1358({ ...base, reference_time_hr: 0 }));
+  assert.ok("error" in _v1358({ ...base, q10: 1 }));
+  assert.ok("error" in _v1358({ ...base, actual_temp_f: Infinity }));
+});
+
+import { computeCoversPerLaborHour as _v1359 } from "../../calc-kitchen.js";
+test("bounds: spec-v1359 computeCoversPerLaborHour pins all five readings", () => {
+  // 420 covers / 96 hr = 4.375; 12,600 / 96 = 131.25; 1,680 / 12,600 = 13.33%; check $30.00; $4.00 per cover.
+  const base = { covers: 420, labor_hours: 96, net_sales: 12600, labor_cost: 1680 };
+  const r = _v1359(base);
+  assert.ok(Math.abs(r.cplh - 4.375) < 1e-9);
+  assert.ok(Math.abs(r.splh - 131.25) < 1e-9);
+  assert.ok(Math.abs(r.labor_cost_pct - 13.3333) < 1e-3);
+  assert.ok(Math.abs(r.average_check - 30) < 1e-9);
+  assert.ok(Math.abs(r.labor_per_cover - 4) < 1e-9);
+  // CPLH is menu-price independent: doubling the check leaves it alone but halves labor %.
+  const priced = _v1359({ ...base, net_sales: 25200 });
+  assert.ok(Math.abs(priced.cplh - r.cplh) < 1e-12);
+  assert.ok(Math.abs(priced.labor_cost_pct - r.labor_cost_pct / 2) < 1e-9);
+  assert.ok("error" in _v1359({ ...base, covers: 0 }));
+  assert.ok("error" in _v1359({ ...base, labor_hours: 0 }));
+  assert.ok("error" in _v1359({ ...base, net_sales: 0 }));
+  assert.ok("error" in _v1359({ ...base, labor_cost: -1 }));
+  assert.ok("error" in _v1359({ ...base, covers: Infinity }));
+});
+
+import { computeParLevelOrder as _v1360 } from "../../calc-kitchen.js";
+test("bounds: spec-v1360 computeParLevelOrder pins the two-interval par and the case rounding", () => {
+  // 2 + 3 = 5 days; 24 x 5 x 1.25 = 150 lb; 150 - 40 = 110; 11 ten-pound cases, no overshoot.
+  const base = { daily_usage: 24, lead_time_days: 2, order_cycle_days: 3, safety_factor: 0.25, on_hand: 40, on_order: 0, units_per_case: 10 };
+  const r = _v1360(base);
+  assert.ok(Math.abs(r.coverage_days - 5) < 1e-9);
+  assert.ok(Math.abs(r.par_level - 150) < 1e-9);
+  assert.ok(Math.abs(r.order_needed - 110) < 1e-9);
+  assert.strictEqual(r.cases, 11);
+  assert.ok(Math.abs(r.overshoot - 0) < 1e-9);
+  // Dropping the safety factor shortens the par and the order.
+  const bare = _v1360({ ...base, safety_factor: 0 });
+  assert.ok(Math.abs(bare.par_level - 120) < 1e-9);
+  assert.strictEqual(bare.cases, 8);
+  // A partial case rounds up and the overshoot is reported.
+  const partial = _v1360({ ...base, units_per_case: 25 });
+  assert.strictEqual(partial.cases, 5);
+  assert.ok(Math.abs(partial.overshoot - 15) < 1e-9);
+  // Enough on hand and on order means nothing to buy, never a negative order.
+  const stocked = _v1360({ ...base, on_hand: 200 });
+  assert.ok(Math.abs(stocked.order_needed - 0) < 1e-9 && stocked.cases === 0);
+  assert.ok("error" in _v1360({ ...base, daily_usage: 0 }));
+  assert.ok("error" in _v1360({ ...base, lead_time_days: -1 }));
+  assert.ok("error" in _v1360({ ...base, order_cycle_days: 0 }));
+  assert.ok("error" in _v1360({ ...base, safety_factor: -0.1 }));
+  assert.ok("error" in _v1360({ ...base, units_per_case: 0 }));
+  assert.ok("error" in _v1360({ ...base, on_hand: Infinity }));
+});
+
+import { computeTphcWindow as _v1361 } from "../../calc-kitchen.js";
+test("bounds: spec-v1361 computeTphcWindow pins the discard clock and the 70 F crossing", () => {
+  // 41 F into a 75 F room, tau 4 hr: T(6) = 75 - 34 e^-1.5 = 67.4 F; 70 F at 7.67 hr; 10:30 + 6:00 = 4:30 pm.
+  const base = { mark_time: "10:30", window_option: "cold_6", start_temp_f: 41, ambient_f: 75, tau_hr: 4.0 };
+  const r = _v1361(base);
+  assert.strictEqual(r.window_hr, 6);
+  assert.strictEqual(r.discard_time, "4:30 pm");
+  assert.ok(Math.abs(r.projected_temp_f - 67.41) < 1e-2);
+  assert.ok(Math.abs(r.time_to_70_hr - 7.6677) < 1e-3);
+  assert.ok(r.six_hour_supportable.startsWith("supportable"));
+  // A 90 F line inverts the verdict: it crosses 70 F at 3.58 hr, inside the window.
+  const hotLine = _v1361({ ...base, ambient_f: 90 });
+  assert.ok(Math.abs(hotLine.time_to_70_hr - 3.58) < 1e-2);
+  assert.ok(hotLine.six_hour_supportable.startsWith("not supportable"));
+  // A 12-hour clock with a meridiem parses the same as 24-hour, and the window can wrap past midnight.
+  assert.strictEqual(_v1361({ ...base, mark_time: "10:30 am" }).discard_time, "4:30 pm");
+  assert.ok(_v1361({ ...base, mark_time: "22:00" }).discard_time.includes("next day"));
+  // A room at or below 70 F never crosses it.
+  assert.strictEqual(_v1361({ ...base, ambient_f: 68 }).time_to_70_hr, null);
+  assert.ok("error" in _v1361({ ...base, mark_time: "half past ten" }));
+  assert.ok("error" in _v1361({ ...base, mark_time: "10:75" }));
+  assert.ok("error" in _v1361({ ...base, window_option: "cold_8" }));
+  assert.ok("error" in _v1361({ ...base, tau_hr: 0 }));
+  assert.ok("error" in _v1361({ ...base, start_temp_f: 50 }));
+  assert.ok("error" in _v1361({ ...base, window_option: "hot_4", start_temp_f: 100 }));
+  assert.ok("error" in _v1361({ ...base, ambient_f: Infinity }));
+});
+
+import { computeSteamKettleHeatup as _v1362 } from "../../calc-kitchen.js";
+test("bounds: spec-v1362 computeSteamKettleHeatup pins the batch duty and the come-up steam rate", () => {
+  // 40 gal x 8.34 = 333.6 lb; x 140 F = 46,704 BTU; / 85,000 = 0.55 hr = 33 min; 49.4 lb steam; 89.9 lb/hr.
+  const base = { gallons: 40, specific_gravity: 1.0, specific_heat: 1.0, start_temp_f: 60, final_temp_f: 200, rated_input_btuh: 100000, jacket_efficiency: 0.85, latent_heat_btu_lb: 945.6 };
+  const r = _v1362(base);
+  assert.ok(Math.abs(r.mass_lb - 333.6) < 1e-9);
+  assert.ok(Math.abs(r.heat_btu - 46704) < 1e-6);
+  assert.ok(Math.abs(r.heatup_min - 32.97) < 1e-2);
+  assert.ok(Math.abs(r.steam_per_batch_lb - 49.39) < 1e-2);
+  assert.ok(Math.abs(r.steam_rate_lb_hr - 89.89) < 1e-2);
+  assert.ok(Math.abs(r.boiler_hp - 2.606) < 1e-2);
+  // The come-up steam rate is a property of the burner, not the batch: doubling the volume
+  // doubles both the steam and the time, leaving the peak rate unchanged.
+  const big = _v1362({ ...base, gallons: 80 });
+  assert.ok(Math.abs(big.steam_rate_lb_hr - r.steam_rate_lb_hr) < 1e-9);
+  assert.ok(Math.abs(big.heatup_min - 2 * r.heatup_min) < 1e-9);
+  assert.ok("error" in _v1362({ ...base, gallons: 0 }));
+  assert.ok("error" in _v1362({ ...base, specific_gravity: 0 }));
+  assert.ok("error" in _v1362({ ...base, specific_heat: 0 }));
+  assert.ok("error" in _v1362({ ...base, final_temp_f: 60 }));
+  assert.ok("error" in _v1362({ ...base, rated_input_btuh: 0 }));
+  assert.ok("error" in _v1362({ ...base, jacket_efficiency: 1.5 }));
+  assert.ok("error" in _v1362({ ...base, latent_heat_btu_lb: 0 }));
+  assert.ok("error" in _v1362({ ...base, gallons: Infinity }));
+});
+
+import { computeHotHoldingEnergy as _v1363 } from "../../calc-kitchen.js";
+test("bounds: spec-v1363 computeHotHoldingEnergy pins demand, amps, and the heat gain", () => {
+  // 3(1.5) + 2(0.5) + 2.0 = 7.5 kW; x 0.65 = 4.875 kW; / (208 x 1.732) = 13.5 A; x 3412 = 16,634 BTU/hr.
+  const equipment = [
+    { name: "steam table", kw: 1.5, qty: 3 },
+    { name: "heat lamp", kw: 0.5, qty: 2 },
+    { name: "holding cabinet", kw: 2.0, qty: 1 },
+  ];
+  const base = { equipment, diversity_factor: 0.65, voltage: 208, phase: "three" };
+  const r = _v1363(base);
+  assert.ok(Math.abs(r.connected_kw - 7.5) < 1e-9);
+  assert.ok(Math.abs(r.demand_kw - 4.875) < 1e-9);
+  assert.ok(Math.abs(r.demand_amps - 13.53) < 1e-2);
+  assert.ok(Math.abs(r.sensible_btuh - 16633.5) < 1e-6);
+  assert.ok(Math.abs(r.tons - 1.386) < 1e-3);
+  // Single-phase drops the sqrt(3) and raises the current by that factor.
+  const single = _v1363({ ...base, phase: "single" });
+  assert.ok(Math.abs(single.demand_amps - r.demand_amps * Math.sqrt(3)) < 1e-9);
+  // A stringified nameplate from a programmatic caller still adds rather than concatenates.
+  const strung = _v1363({ ...base, equipment: [{ name: "steam table", kw: "1.5", qty: "3" }] });
+  assert.ok(Math.abs(strung.connected_kw - 4.5) < 1e-9);
+  assert.ok("error" in _v1363({ ...base, equipment: [] }));
+  assert.ok("error" in _v1363({ ...base, equipment: [{ name: "x", kw: 0, qty: 0 }] }));
+  assert.ok("error" in _v1363({ ...base, equipment: [{ name: "x", kw: -1, qty: 1 }] }));
+  assert.ok("error" in _v1363({ ...base, diversity_factor: 1.5 }));
+  assert.ok("error" in _v1363({ ...base, voltage: 0 }));
+  assert.ok("error" in _v1363({ ...base, phase: "two" }));
+});

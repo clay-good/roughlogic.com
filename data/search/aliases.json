@@ -1,6 +1,6 @@
 {
- "_comment": "v10 Phase D.1 search aliases (spec-v10 \u00a76.1). One row per alias mapping a free-text term to a tile id. AUTHORING MASTER ONLY since the spec-v590 split remediation (2026-07-17): the runtime never fetches this file. scripts/build-alias-shards.mjs derives the per-group runtime shards data/search/aliases-<letter>.json from it (lazy parallel fetch on first search interaction via bindSearch / ensureAliases in app.js; --check in npm run lint gates drift), so edit THIS file and rerun the script. On exact-term match the user is routed to the target tile via the same path as a tool-name suggestion. Industry vocabulary, misspellings, abbreviations, question phrasings (spec-v590), and adjacent-question redirects only. The resolveQuery / matchAliasPrefix helpers in search-discovery.js are the canonical pure-functional resolvers (exercised by test/unit/search-discovery.test.js).",
- "_updated": "2026-07-17",
+ "_comment": "v10 Phase D.1 search aliases (spec-v10 §6.1). One row per alias mapping a free-text term to a tile id. AUTHORING MASTER ONLY since the spec-v590 split remediation (2026-07-17): the runtime never fetches this file. scripts/build-alias-shards.mjs derives the per-group runtime shards data/search/aliases-<letter>.json from it (lazy parallel fetch on first search interaction via bindSearch / ensureAliases in app.js; --check in npm run lint gates drift), so edit THIS file and rerun the script. On exact-term match the user is routed to the target tile via the same path as a tool-name suggestion. Industry vocabulary, misspellings, abbreviations, question phrasings (spec-v590), and adjacent-question redirects only. The resolveQuery / matchAliasPrefix helpers in search-discovery.js are the canonical pure-functional resolvers (exercised by test/unit/search-discovery.test.js).",
+ "_updated": "2026-08-26",
  "_schema": "Each alias row: { term: string, target: tile-id, kind: 'industry' | 'redirect' | 'adjacent' }. Multiple aliases may map to the same target.",
  "aliases": [
   {
@@ -103467,6 +103467,296 @@
    "term": "masonry prism strength",
    "target": "masonry-prism-fm",
    "kind": "question"
+  },
+  {
+   "term": "ice machine sizing",
+   "target": "ice-machine-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "ice machine capacity",
+   "target": "ice-machine-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "ice bin sizing",
+   "target": "ice-machine-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "pounds of ice per cover",
+   "target": "ice-machine-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "how big an ice machine do i need",
+   "target": "ice-machine-sizing",
+   "kind": "question"
+  },
+  {
+   "term": "booster heater sizing",
+   "target": "warewasher-hot-water",
+   "kind": "industry"
+  },
+  {
+   "term": "dish machine booster",
+   "target": "warewasher-hot-water",
+   "kind": "industry"
+  },
+  {
+   "term": "warewasher hot water demand",
+   "target": "warewasher-hot-water",
+   "kind": "industry"
+  },
+  {
+   "term": "180 degree final rinse",
+   "target": "warewasher-hot-water",
+   "kind": "industry"
+  },
+  {
+   "term": "how big a booster heater for a dish machine",
+   "target": "warewasher-hot-water",
+   "kind": "question"
+  },
+  {
+   "term": "plank equation freezing time",
+   "target": "freezing-time-plank",
+   "kind": "industry"
+  },
+  {
+   "term": "blast freezer time",
+   "target": "freezing-time-plank",
+   "kind": "industry"
+  },
+  {
+   "term": "product freezing time",
+   "target": "freezing-time-plank",
+   "kind": "industry"
+  },
+  {
+   "term": "how long to freeze a product",
+   "target": "freezing-time-plank",
+   "kind": "question"
+  },
+  {
+   "term": "thawing time",
+   "target": "thaw-time",
+   "kind": "industry"
+  },
+  {
+   "term": "refrigerated thawing",
+   "target": "thaw-time",
+   "kind": "industry"
+  },
+  {
+   "term": "how long to thaw a turkey",
+   "target": "thaw-time",
+   "kind": "question"
+  },
+  {
+   "term": "walk in thaw time",
+   "target": "thaw-time",
+   "kind": "industry"
+  },
+  {
+   "term": "fryer oil turnover",
+   "target": "fryer-oil-turnover",
+   "kind": "industry"
+  },
+  {
+   "term": "fryer oil life",
+   "target": "fryer-oil-turnover",
+   "kind": "industry"
+  },
+  {
+   "term": "frying oil cost per year",
+   "target": "fryer-oil-turnover",
+   "kind": "industry"
+  },
+  {
+   "term": "how often does fryer oil turn over",
+   "target": "fryer-oil-turnover",
+   "kind": "question"
+  },
+  {
+   "term": "keg yield",
+   "target": "keg-yield",
+   "kind": "industry"
+  },
+  {
+   "term": "pints per keg",
+   "target": "keg-yield",
+   "kind": "industry"
+  },
+  {
+   "term": "beer cost per ounce",
+   "target": "keg-yield",
+   "kind": "industry"
+  },
+  {
+   "term": "how many pints in a half barrel",
+   "target": "keg-yield",
+   "kind": "question"
+  },
+  {
+   "term": "co2 cylinder duration",
+   "target": "beverage-co2-duration",
+   "kind": "industry"
+  },
+  {
+   "term": "beer gas consumption",
+   "target": "beverage-co2-duration",
+   "kind": "industry"
+  },
+  {
+   "term": "how long does a co2 tank last",
+   "target": "beverage-co2-duration",
+   "kind": "question"
+  },
+  {
+   "term": "kegs per co2 cylinder",
+   "target": "beverage-co2-duration",
+   "kind": "industry"
+  },
+  {
+   "term": "dough ball weight",
+   "target": "dough-ball-scaling",
+   "kind": "industry"
+  },
+  {
+   "term": "pizza thickness factor",
+   "target": "dough-ball-scaling",
+   "kind": "industry"
+  },
+  {
+   "term": "dough ball scaling",
+   "target": "dough-ball-scaling",
+   "kind": "industry"
+  },
+  {
+   "term": "how much dough for a 16 inch pizza",
+   "target": "dough-ball-scaling",
+   "kind": "question"
+  },
+  {
+   "term": "proof time temperature",
+   "target": "fermentation-time-q10",
+   "kind": "industry"
+  },
+  {
+   "term": "q10 fermentation",
+   "target": "fermentation-time-q10",
+   "kind": "industry"
+  },
+  {
+   "term": "bulk ferment time",
+   "target": "fermentation-time-q10",
+   "kind": "industry"
+  },
+  {
+   "term": "how much longer does cold dough take to proof",
+   "target": "fermentation-time-q10",
+   "kind": "question"
+  },
+  {
+   "term": "covers per labor hour",
+   "target": "covers-per-labor-hour",
+   "kind": "industry"
+  },
+  {
+   "term": "sales per labor hour",
+   "target": "covers-per-labor-hour",
+   "kind": "industry"
+  },
+  {
+   "term": "restaurant labor productivity",
+   "target": "covers-per-labor-hour",
+   "kind": "industry"
+  },
+  {
+   "term": "cplh splh",
+   "target": "covers-per-labor-hour",
+   "kind": "industry"
+  },
+  {
+   "term": "par level",
+   "target": "par-level-order",
+   "kind": "industry"
+  },
+  {
+   "term": "kitchen order quantity",
+   "target": "par-level-order",
+   "kind": "industry"
+  },
+  {
+   "term": "kitchen inventory par",
+   "target": "par-level-order",
+   "kind": "industry"
+  },
+  {
+   "term": "how much should i order",
+   "target": "par-level-order",
+   "kind": "question"
+  },
+  {
+   "term": "time as a public health control",
+   "target": "tphc-window",
+   "kind": "industry"
+  },
+  {
+   "term": "tphc",
+   "target": "tphc-window",
+   "kind": "industry"
+  },
+  {
+   "term": "four hour rule food",
+   "target": "tphc-window",
+   "kind": "industry"
+  },
+  {
+   "term": "six hour rule food holding",
+   "target": "tphc-window",
+   "kind": "industry"
+  },
+  {
+   "term": "steam kettle heat up time",
+   "target": "steam-kettle-heatup",
+   "kind": "industry"
+  },
+  {
+   "term": "kettle steam demand",
+   "target": "steam-kettle-heatup",
+   "kind": "industry"
+  },
+  {
+   "term": "boiler steam rate kitchen",
+   "target": "steam-kettle-heatup",
+   "kind": "industry"
+  },
+  {
+   "term": "how long to heat a steam kettle",
+   "target": "steam-kettle-heatup",
+   "kind": "question"
+  },
+  {
+   "term": "hot holding load",
+   "target": "hot-holding-energy",
+   "kind": "industry"
+  },
+  {
+   "term": "steam table electrical load",
+   "target": "hot-holding-energy",
+   "kind": "industry"
+  },
+  {
+   "term": "kitchen heat gain equipment",
+   "target": "hot-holding-energy",
+   "kind": "industry"
+  },
+  {
+   "term": "holding cabinet cooling load",
+   "target": "hot-holding-energy",
+   "kind": "industry"
   }
  ]
 }

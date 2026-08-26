@@ -256,6 +256,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "hood-exhaust": {"Q_exhaust_cfm":{"prefix":"","suffix":" cfm","digits":0},"cfm_per_ft":{"prefix":"","suffix":" cfm/ft","digits":0},"makeup_cfm":{"prefix":"","suffix":" cfm","digits":0},"duct_area_in2":{"prefix":"","suffix":" in^2","digits":1}},
   "horizontal-curve": {"curve_length_ft":{"prefix":"","suffix":" ft","digits":2},"degree_of_curve":{"prefix":"","suffix":" deg","digits":4}},
   "hos-math": {"on_duty_remaining":{"prefix":"","suffix":" hr","digits":2},"weekly_remaining":{"prefix":"","suffix":" hr","digits":2}},
+  "hot-holding-energy": {"connected_kw":{"prefix":"","suffix":" kW","digits":3},"demand_kw":{"prefix":"","suffix":" kW","digits":3},"demand_amps":{"prefix":"","suffix":" A","digits":1}},
   "hud-fmr": {"fmr_0br":{"prefix":"$","suffix":""},"fmr_1br":{"prefix":"$","suffix":""},"fmr_2br":{"prefix":"$","suffix":""},"fmr_3br":{"prefix":"$","suffix":""},"fmr_4br":{"prefix":"$","suffix":""}},
   "humidifier-capacity": {"gpd":{"prefix":"","suffix":" gal/day","digits":1},"latent_btu_hr":{"prefix":"","suffix":" BTU/hr","digits":0}},
   "hx-lmtd-ntu": {"lmtd_F":{"prefix":"","suffix":" F","digits":2}},
