@@ -1150,6 +1150,20 @@ const TOOL_MODULES = (() => {
   declare("./calc-stage.js", "STAGE_RENDERERS", [
     "truss-capacity", "time-alignment", "dmx-planner",
     "neutral-imbalance", "spl-distance", "spl-distance-for-level", "acoustic-gain-pag-nag", "rigging-check",
+    // spec-v1364..v1376: the 2026-08-26 trade-expansion Group N band.
+    "line-array-splay",
+    "delay-tower-alignment",
+    "cardioid-sub-array",
+    "driver-spacing-lobing",
+    "wireless-intermod",
+    "rf-antenna-cable-loss",
+    "chain-hoist-lift-time",
+    "gobo-image-size",
+    "mired-gel-shift",
+    "haze-machine-sizing",
+    "stage-deck-live-load",
+    "video-wall-data-rate",
+    "outdoor-stage-wind",
     // v9
     "spl-atmospheric",
   

@@ -309,6 +309,20 @@ const _TILES = [
 
   ["truss-capacity", "N"], ["time-alignment", "N"], ["dmx-planner", "N"],
   ["neutral-imbalance", "N"], ["spl-distance", "N"], ["acoustic-gain-pag-nag", "N"], ["spl-distance-for-level", "N"], ["rigging-check", "N"],
+  // spec-v1364..v1376: the 2026-08-26 trade-expansion Group N band.
+  ["line-array-splay", "N"],
+  ["delay-tower-alignment", "N"],
+  ["cardioid-sub-array", "N"],
+  ["driver-spacing-lobing", "N"],
+  ["wireless-intermod", "N"],
+  ["rf-antenna-cable-loss", "N"],
+  ["chain-hoist-lift-time", "N"],
+  ["gobo-image-size", "N"],
+  ["mired-gel-shift", "N"],
+  ["haze-machine-sizing", "N"],
+  ["stage-deck-live-load", "N"],
+  ["video-wall-data-rate", "N"],
+  ["outdoor-stage-wind", "N"],
   ["spl-atmospheric", "N"],
 
   ["recipe-scale", "O"], ["yield-ep", "O"], ["as-purchased-quantity", "O"], ["cooling-curve", "O"],

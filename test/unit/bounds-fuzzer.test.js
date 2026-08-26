@@ -39111,3 +39111,351 @@ test("bounds: spec-v1363 computeHotHoldingEnergy pins demand, amps, and the heat
   assert.ok("error" in _v1363({ ...base, voltage: 0 }));
   assert.ok("error" in _v1363({ ...base, phase: "two" }));
 });
+
+// ===========================================================================
+// spec-v1364..v1376: the 2026-08-26 trade-expansion Group N band.
+// ===========================================================================
+
+import { computeLineArraySplay as _v1364 } from "../../calc-stage.js";
+test("bounds: spec-v1364 computeLineArraySplay pins the coverage angle, the splay, and the taper", () => {
+  // 26 ft trim over 4 ft ears, 25 ft to 150 ft: 41.35 - 8.34 = 33.0 deg, 2.75 per box, 15.6 dB.
+  const base = { trim_height_ft: 26, ear_height_ft: 4, near_throw_ft: 25, far_throw_ft: 150, cabinets: 12 };
+  const r = _v1364(base);
+  assert.ok(Math.abs(r.angle_near_deg - 41.348) < 1e-2);
+  assert.ok(Math.abs(r.angle_far_deg - 8.344) < 1e-2);
+  assert.ok(Math.abs(r.coverage_deg - 33.004) < 1e-2);
+  assert.ok(Math.abs(r.avg_splay_deg - 2.750) < 1e-3);
+  assert.ok(Math.abs(r.level_taper_db - 15.563) < 1e-2);
+  // The taper depends only on the throw RATIO, not on the trim.
+  const higher = _v1364({ ...base, trim_height_ft: 40 });
+  assert.ok(Math.abs(higher.level_taper_db - r.level_taper_db) < 1e-12);
+  // Twice the cabinets is half the average splay across the same angle.
+  const dense = _v1364({ ...base, cabinets: 24 });
+  assert.ok(Math.abs(dense.avg_splay_deg - r.avg_splay_deg / 2) < 1e-12);
+  assert.ok("error" in _v1364({ ...base, trim_height_ft: 0 }));
+  assert.ok("error" in _v1364({ ...base, ear_height_ft: 30 }));
+  assert.ok("error" in _v1364({ ...base, near_throw_ft: 0 }));
+  assert.ok("error" in _v1364({ ...base, far_throw_ft: 20 }));
+  assert.ok("error" in _v1364({ ...base, cabinets: 0 }));
+  assert.ok("error" in _v1364({ ...base, trim_height_ft: Infinity }));
+});
+
+import { computeDelayTowerAlignment as _v1365 } from "../../calc-stage.js";
+test("bounds: spec-v1365 computeDelayTowerAlignment pins the delay and the temperature drift", () => {
+  // 180 ft at 70 F: 160.0 ms geometric, 175.0 ms set. At 90 F, c = 1146.0 and geometric = 157.1.
+  const base = { distance_ft: 180, temp_f: 70, haas_offset_ms: 15, compare_temp_f: 90 };
+  const r = _v1365(base);
+  assert.ok(Math.abs(r.speed_ft_s - 1125) < 1e-9);
+  assert.ok(Math.abs(r.geometric_ms - 160.0) < 1e-9);
+  assert.ok(Math.abs(r.set_delay_ms - 175.0) < 1e-9);
+  assert.ok(Math.abs(r.compare_speed_ft_s - 1146.04) < 1e-2);
+  assert.ok(Math.abs(r.compare_geometric_ms - 157.06) < 1e-2);
+  assert.ok(Math.abs(r.drift_ms + 2.94) < 1e-2);
+  // The drift scales with distance: the same 20 F swing on a 400 ft throw is 6.5 ms.
+  const far = _v1365({ ...base, distance_ft: 400 });
+  assert.ok(Math.abs(far.drift_ms + 6.53) < 1e-2);
+  assert.ok(Math.abs(far.drift_ms - r.drift_ms * 400 / 180) < 1e-9);
+  assert.ok("error" in _v1365({ ...base, distance_ft: 0 }));
+  assert.ok("error" in _v1365({ ...base, temp_f: -500 }));
+  assert.ok("error" in _v1365({ ...base, compare_temp_f: -500 }));
+  assert.ok("error" in _v1365({ ...base, haas_offset_ms: -1 }));
+  assert.ok("error" in _v1365({ ...base, distance_ft: Infinity }));
+});
+
+import { computeCardioidSubArray as _v1366 } from "../../calc-stage.js";
+test("bounds: spec-v1366 computeCardioidSubArray pins the quarter-wave relation", () => {
+  // 3.0 ft centers at 70 F: 2.667 ms per element, deepest rejection at 93.75 Hz, 12.0 ft wavelength.
+  const base = { spacing_ft: 3.0, elements: 4, temp_f: 70, target_freq_hz: 60 };
+  const r = _v1366(base);
+  assert.ok(Math.abs(r.delay_per_element_ms - 2.6667) < 1e-3);
+  assert.ok(Math.abs(r.optimum_freq_hz - 93.75) < 1e-9);
+  assert.ok(Math.abs(r.wavelength_ft - 12.0) < 1e-9);
+  // The spacing IS one quarter of the wavelength at the optimum -- the whole design.
+  assert.ok(Math.abs(r.wavelength_ft / 4 - base.spacing_ft) < 1e-9);
+  assert.ok(Math.abs(r.total_delay_ms - 8.0) < 1e-3);
+  assert.ok(Math.abs(r.array_depth_ft - 9.0) < 1e-9);
+  // Tuning an octave lower doubles the spacing, and the stage depth with it.
+  assert.ok(Math.abs(r.spacing_for_target_ft - 4.6875) < 1e-4);
+  const octave = _v1366({ ...base, target_freq_hz: 46.875 });
+  assert.ok(Math.abs(octave.spacing_for_target_ft - 6.0) < 1e-9);
+  // Without a target the spacing output is null, not zero.
+  assert.strictEqual(_v1366({ ...base, target_freq_hz: 0 }).spacing_for_target_ft, null);
+  assert.ok("error" in _v1366({ ...base, spacing_ft: 0 }));
+  assert.ok("error" in _v1366({ ...base, elements: 1 }));
+  assert.ok("error" in _v1366({ ...base, temp_f: -500 }));
+  assert.ok("error" in _v1366({ ...base, target_freq_hz: -1 }));
+  assert.ok("error" in _v1366({ ...base, spacing_ft: Infinity }));
+});
+
+import { computeDriverSpacingLobing as _v1367 } from "../../calc-stage.js";
+test("bounds: spec-v1367 computeDriverSpacingLobing pins the ceiling and the null angle", () => {
+  // 18 in centers at 70 F: ceiling 375 Hz. At 500 Hz the ratio is 0.75 -> null at 48.6 deg.
+  const base = { spacing_ft: 1.5, test_freq_hz: 500, temp_f: 70 };
+  const r = _v1367(base);
+  assert.ok(Math.abs(r.crossover_ceiling_hz - 375) < 1e-9);
+  assert.ok(Math.abs(r.null_angle_deg - 48.59) < 1e-2);
+  assert.ok(Math.abs(r.wavelength_ft - 2.25) < 1e-9);
+  assert.ok(Math.abs(r.max_spacing_ft - 1.125) < 1e-9);
+  // At 250 Hz the ratio exceeds 1 and no null exists anywhere.
+  const low = _v1367({ ...base, test_freq_hz: 250 });
+  assert.strictEqual(low.null_angle_deg, null);
+  assert.ok(low.verdict.startsWith("clean"));
+  // Exactly at the ceiling the null sits at 90 degrees -- the worst-case path difference.
+  const atCeiling = _v1367({ ...base, test_freq_hz: 375 });
+  assert.ok(Math.abs(atCeiling.null_angle_deg - 90) < 1e-9);
+  assert.ok("error" in _v1367({ ...base, spacing_ft: 0 }));
+  assert.ok("error" in _v1367({ ...base, test_freq_hz: 0 }));
+  assert.ok("error" in _v1367({ ...base, temp_f: -500 }));
+  assert.ok("error" in _v1367({ ...base, spacing_ft: Infinity }));
+});
+
+import { computeWirelessIntermod as _v1368 } from "../../calc-stage.js";
+test("bounds: spec-v1368 computeWirelessIntermod pins the third- and fifth-order products", () => {
+  // 542.000 and 545.000: third order 539.000 / 548.000, fifth order 536.000 / 551.000.
+  const base = { f1_mhz: 542.0, f2_mhz: 545.0, test_freq_mhz: 539.0 };
+  const r = _v1368(base);
+  assert.ok(Math.abs(r.spacing_mhz - 3.0) < 1e-9);
+  assert.ok(Math.abs(r.third_low_mhz - 539.0) < 1e-9);
+  assert.ok(Math.abs(r.third_high_mhz - 548.0) < 1e-9);
+  assert.ok(Math.abs(r.fifth_low_mhz - 536.0) < 1e-9);
+  assert.ok(Math.abs(r.fifth_high_mhz - 551.0) < 1e-9);
+  // The evenly spaced third channel sits exactly ON a third-order product.
+  assert.ok(Math.abs(r.test_margin_mhz) < 1e-9);
+  // Nudging it off the even step clears every product by at least a megahertz.
+  const moved = _v1368({ ...base, test_freq_mhz: 540.1 });
+  assert.ok(moved.test_margin_mhz > 1.0);
+  // The products do not depend on which carrier is entered first.
+  const swapped = _v1368({ f1_mhz: 545.0, f2_mhz: 542.0, test_freq_mhz: 0 });
+  assert.ok(Math.abs(swapped.third_low_mhz - r.third_low_mhz) < 1e-9);
+  assert.strictEqual(swapped.test_margin_mhz, null);
+  assert.ok("error" in _v1368({ ...base, f1_mhz: 0 }));
+  assert.ok("error" in _v1368({ ...base, f2_mhz: 542.0 }));
+  assert.ok("error" in _v1368({ ...base, test_freq_mhz: -1 }));
+  assert.ok("error" in _v1368({ ...base, f1_mhz: Infinity }));
+});
+
+import { computeRfAntennaCableLoss as _v1369 } from "../../calc-stage.js";
+test("bounds: spec-v1369 computeRfAntennaCableLoss pins the budget and the unity window", () => {
+  // 150 ft at 8.8 dB/100 ft = 13.2 dB; a 12 dB amplifier lands at -1.2 dB, inside unity.
+  const base = { length_ft: 150, loss_per_100ft_db: 8.8, connectors: 0, loss_per_connector_db: 0.25, splitter_loss_db: 0, amplifier_gain_db: 12 };
+  const r = _v1369(base);
+  assert.ok(Math.abs(r.cable_loss_db - 13.2) < 1e-9);
+  assert.ok(Math.abs(r.total_loss_db - 13.2) < 1e-9);
+  assert.ok(Math.abs(r.net_gain_db + 1.2) < 1e-9);
+  assert.ok(r.verdict.startsWith("at unity"));
+  // Low-loss coax on the same run needs no amplifier at all.
+  const lowLoss = _v1369({ ...base, loss_per_100ft_db: 3.9, amplifier_gain_db: 0 });
+  assert.ok(Math.abs(lowLoss.cable_loss_db - 5.85) < 1e-9);
+  // Too much gain is its own fault, and it reads as a weak signal.
+  const hot = _v1369({ ...base, amplifier_gain_db: 25 });
+  assert.ok(hot.verdict.startsWith("OVER"));
+  // Connectors and splitters add to the loss side.
+  const loaded = _v1369({ ...base, connectors: 4, splitter_loss_db: 3.5 });
+  assert.ok(Math.abs(loaded.total_loss_db - (13.2 + 1.0 + 3.5)) < 1e-9);
+  assert.ok("error" in _v1369({ ...base, length_ft: 0 }));
+  assert.ok("error" in _v1369({ ...base, loss_per_100ft_db: 0 }));
+  assert.ok("error" in _v1369({ ...base, connectors: -1 }));
+  assert.ok("error" in _v1369({ ...base, splitter_loss_db: -1 }));
+  assert.ok("error" in _v1369({ ...base, amplifier_gain_db: -1 }));
+  assert.ok("error" in _v1369({ ...base, length_ft: Infinity }));
+});
+
+import { computeChainHoistLiftTime as _v1370 } from "../../calc-stage.js";
+test("bounds: spec-v1370 computeChainHoistLiftTime pins the lift time and the duty ceiling", () => {
+  // 60 ft at 16 ft/min = 3.75 min; 2,000 x 16 / 33,000 = 0.97 hp; 40% of 10 min = 4.0 min; 1.07 lifts.
+  const base = { lift_height_ft: 60, hoist_speed_fpm: 16, load_lb: 2000, duty_cycle: 0.40, rating_period_min: 10, hoists: 8 };
+  const r = _v1370(base);
+  assert.ok(Math.abs(r.lift_time_min - 3.75) < 1e-9);
+  assert.ok(Math.abs(r.hoisting_hp - 0.9697) < 1e-4);
+  assert.ok(Math.abs(r.set_hp - 7.7576) < 1e-4);
+  assert.ok(Math.abs(r.allowed_on_time_min - 4.0) < 1e-9);
+  assert.ok(Math.abs(r.lifts_per_period - 1.0667) < 1e-3);
+  assert.ok(r.verdict.startsWith("one lift per period"));
+  // A high-speed hoist halves the time and doubles the power draw.
+  const fast = _v1370({ ...base, hoist_speed_fpm: 32 });
+  assert.ok(Math.abs(fast.lift_time_min - r.lift_time_min / 2) < 1e-9);
+  assert.ok(Math.abs(fast.hoisting_hp - r.hoisting_hp * 2) < 1e-9);
+  assert.ok(fast.verdict.startsWith("room to spare"));
+  // A long trim can exceed the allowed on-time in a single press.
+  const longTrim = _v1370({ ...base, lift_height_ft: 100 });
+  assert.ok(longTrim.lifts_per_period < 1);
+  assert.ok(longTrim.verdict.startsWith("over the rating"));
+  assert.ok("error" in _v1370({ ...base, lift_height_ft: 0 }));
+  assert.ok("error" in _v1370({ ...base, hoist_speed_fpm: 0 }));
+  assert.ok("error" in _v1370({ ...base, load_lb: 0 }));
+  assert.ok("error" in _v1370({ ...base, duty_cycle: 1.5 }));
+  assert.ok("error" in _v1370({ ...base, rating_period_min: 0 }));
+  assert.ok("error" in _v1370({ ...base, hoists: 0 }));
+  assert.ok("error" in _v1370({ ...base, load_lb: Infinity }));
+});
+
+import { computeGoboImageSize as _v1371 } from "../../calc-stage.js";
+test("bounds: spec-v1371 computeGoboImageSize pins the image, the keystone, and the falloff", () => {
+  // 36 deg at 30 ft = 19.5 ft; 45 deg off perpendicular stretches to 27.6 ft at 0.71 illuminance.
+  const base = { throw_ft: 30, field_angle_deg: 36, incidence_deg: 45, gobo_image_mm: 0, gate_diameter_mm: 0 };
+  const r = _v1371(base);
+  assert.ok(Math.abs(r.image_diameter_ft - 19.495) < 1e-3);
+  assert.ok(Math.abs(r.keystone_stretch - 1.41421) < 1e-5);
+  assert.ok(Math.abs(r.stretched_axis_ft - 27.570) < 1e-3);
+  assert.ok(Math.abs(r.relative_illuminance - 0.70711) < 1e-5);
+  assert.ok(Math.abs(r.stops_down - 0.5) < 1e-9);
+  // 60 degrees doubles the long axis exactly, because 1/cos(60) = 2.
+  const sixty = _v1371({ ...base, incidence_deg: 60 });
+  assert.ok(Math.abs(sixty.keystone_stretch - 2) < 1e-9);
+  // Straight on there is no stretch and no falloff.
+  const straight = _v1371({ ...base, incidence_deg: 0 });
+  assert.ok(Math.abs(straight.keystone_stretch - 1) < 1e-12);
+  assert.ok(Math.abs(straight.relative_illuminance - 1) < 1e-12);
+  // A gobo that fills only part of the gate scales the projection by that fraction.
+  const partial = _v1371({ ...base, gobo_image_mm: 26, gate_diameter_mm: 52 });
+  assert.ok(Math.abs(partial.framed_diameter_ft - r.image_diameter_ft / 2) < 1e-9);
+  assert.strictEqual(r.framed_diameter_ft, null);
+  assert.ok("error" in _v1371({ ...base, throw_ft: 0 }));
+  assert.ok("error" in _v1371({ ...base, field_angle_deg: 0 }));
+  assert.ok("error" in _v1371({ ...base, incidence_deg: 90 }));
+  assert.ok("error" in _v1371({ ...base, gobo_image_mm: 60, gate_diameter_mm: 52 }));
+  assert.ok("error" in _v1371({ ...base, throw_ft: Infinity }));
+});
+
+import { computeMiredGelShift as _v1372 } from "../../calc-stage.js";
+test("bounds: spec-v1372 computeMiredGelShift pins the shift and the same-sheet-different-result fact", () => {
+  // 3,200 K is 312.5 mireds, 5,600 K is 178.6: a -133.9 shift, and a full CTB at -131 is within 3.
+  const base = { source_k: 3200, target_k: 5600, applied_shift: 0 };
+  const r = _v1372(base);
+  assert.ok(Math.abs(r.source_mired - 312.5) < 1e-9);
+  assert.ok(Math.abs(r.target_mired - 178.571) < 1e-3);
+  assert.ok(Math.abs(r.shift_needed + 133.929) < 1e-3);
+  assert.strictEqual(r.nearest_name, "Full CTB");
+  assert.ok(Math.abs(r.nearest_error) < 3);
+  // Reversed, the shift is the same size and the opposite sign -- one full CTO.
+  const reversed = _v1372({ source_k: 5600, target_k: 3200, applied_shift: 0 });
+  assert.ok(Math.abs(reversed.shift_needed - -r.shift_needed) < 1e-9);
+  assert.strictEqual(reversed.nearest_name, "Full CTO");
+  // The same sheet lands somewhere different depending on where it starts, which is the
+  // whole reason mireds exist: +131 from 5,600 K reaches 3,230 K, from 6,500 K only 3,510 K.
+  const fromDaylight = _v1372({ source_k: 5600, target_k: 3200, applied_shift: 131 });
+  const fromCooler = _v1372({ source_k: 6500, target_k: 3200, applied_shift: 131 });
+  assert.ok(Math.abs(fromDaylight.resulting_k - 3230) < 5);
+  assert.ok(Math.abs(fromCooler.resulting_k - 3510) < 5);
+  assert.ok(fromCooler.resulting_k > fromDaylight.resulting_k);
+  assert.ok("error" in _v1372({ ...base, source_k: 0 }));
+  assert.ok("error" in _v1372({ ...base, target_k: 0 }));
+  // A blue shift larger than the source's own mired value would pass infinite kelvin.
+  assert.ok("error" in _v1372({ source_k: 6500, target_k: 3200, applied_shift: -400 }));
+  assert.ok("error" in _v1372({ ...base, source_k: Infinity }));
+});
+
+import { computeHazeMachineSizing as _v1373 } from "../../calc-stage.js";
+test("bounds: spec-v1373 computeHazeMachineSizing pins the volume-times-ACH scaling", () => {
+  // 200,000 cf at 4 ACH: 13,333 cfm, 4x the reference machine, 15 min to 63% and 35 to 90%.
+  const base = { volume_cf: 200000, ach: 4, ref_volume_cf: 100000, ref_ach: 2, ref_output: 1 };
+  const r = _v1373(base);
+  assert.ok(Math.abs(r.ventilation_cfm - 13333.33) < 1e-2);
+  assert.ok(Math.abs(r.scaling_factor - 4.0) < 1e-9);
+  assert.ok(Math.abs(r.required_output - 4.0) < 1e-9);
+  assert.ok(Math.abs(r.time_constant_hr - 0.25) < 1e-9);
+  assert.ok(Math.abs(r.time_to_90_hr - 0.5756) < 1e-4);
+  // Output scales on the PRODUCT: halving the ACH halves the fluid and doubles the fill time.
+  const quiet = _v1373({ ...base, ach: 2 });
+  assert.ok(Math.abs(quiet.required_output - r.required_output / 2) < 1e-9);
+  assert.ok(Math.abs(quiet.time_constant_hr - r.time_constant_hr * 2) < 1e-9);
+  // Doubling the room alone also doubles the requirement, and does NOT change the fill time.
+  const bigger = _v1373({ ...base, volume_cf: 400000 });
+  assert.ok(Math.abs(bigger.required_output - r.required_output * 2) < 1e-9);
+  assert.ok(Math.abs(bigger.time_constant_hr - r.time_constant_hr) < 1e-12);
+  assert.ok("error" in _v1373({ ...base, volume_cf: 0 }));
+  assert.ok("error" in _v1373({ ...base, ach: 0 }));
+  assert.ok("error" in _v1373({ ...base, ref_volume_cf: 0 }));
+  assert.ok("error" in _v1373({ ...base, ref_ach: 0 }));
+  assert.ok("error" in _v1373({ ...base, ref_output: 0 }));
+  assert.ok("error" in _v1373({ ...base, volume_cf: Infinity }));
+});
+
+import { computeStageDeckLiveLoad as _v1374 } from "../../calc-stage.js";
+test("bounds: spec-v1374 computeStageDeckLiveLoad pins the per-leg load and the point-load check", () => {
+  // 4 x 8 at 125 psf = 4,000 lb + 60 lb deck = 1,015 lb per leg: 101.5% of a 1,000 lb rating.
+  const base = { length_ft: 4, width_ft: 8, legs: 4, design_psf: 125, deck_dead_lb: 60, leg_rating_lb: 1000, point_load_lb: 900, bearing_sqin: 4, deck_point_rating_lb: 1000 };
+  const r = _v1374(base);
+  assert.ok(Math.abs(r.deck_area_sqft - 32) < 1e-9);
+  assert.ok(Math.abs(r.live_load_lb - 4000) < 1e-9);
+  assert.ok(Math.abs(r.total_load_lb - 4060) < 1e-9);
+  assert.ok(Math.abs(r.load_per_leg_lb - 1015) < 1e-9);
+  assert.ok(Math.abs(r.leg_utilization_pct - 101.5) < 1e-9);
+  assert.ok(r.leg_verdict.startsWith("OVER"));
+  assert.ok(Math.abs(r.bearing_psi - 225) < 1e-9);
+  assert.ok(Math.abs(r.point_utilization_pct - 90) < 1e-9);
+  // The same deck on a 2,500 lb leg has real margin: which product was rented decides it.
+  const stronger = _v1374({ ...base, leg_rating_lb: 2500 });
+  assert.ok(Math.abs(stronger.leg_utilization_pct - 40.6) < 1e-1);
+  assert.ok(stronger.leg_verdict.startsWith("OK"));
+  // A fifth leg brings the original inside its rating.
+  const fifthLeg = _v1374({ ...base, legs: 5 });
+  assert.ok(fifthLeg.leg_utilization_pct < 100);
+  // With no concentrated load the point outputs are null, not zero.
+  const uniformOnly = _v1374({ ...base, point_load_lb: 0, bearing_sqin: 0, deck_point_rating_lb: 0 });
+  assert.strictEqual(uniformOnly.point_utilization_pct, null);
+  assert.strictEqual(uniformOnly.bearing_psi, null);
+  assert.ok("error" in _v1374({ ...base, length_ft: 0 }));
+  assert.ok("error" in _v1374({ ...base, legs: 0 }));
+  assert.ok("error" in _v1374({ ...base, design_psf: 0 }));
+  assert.ok("error" in _v1374({ ...base, leg_rating_lb: 0 }));
+  assert.ok("error" in _v1374({ ...base, deck_dead_lb: -1 }));
+  assert.ok("error" in _v1374({ ...base, point_load_lb: -1 }));
+  assert.ok("error" in _v1374({ ...base, length_ft: Infinity }));
+});
+
+import { computeVideoWallDataRate as _v1375 } from "../../calc-stage.js";
+test("bounds: spec-v1375 computeVideoWallDataRate pins the rate and the port count", () => {
+  // 3,840 x 2,160 = 8,294,400 px; x 24 x 60 / 1e9 = 11.94 Gbps; 13 ports of 650,000.
+  const base = { width_px: 3840, height_px: 2160, bit_depth: 8, refresh_hz: 60, pixels_per_port: 650000 };
+  const r = _v1375(base);
+  assert.ok(Math.abs(r.total_pixels - 8294400) < 1e-9);
+  assert.ok(Math.abs(r.data_rate_gbps - 11.944) < 1e-3);
+  assert.strictEqual(r.ports_needed, 13);
+  assert.ok(Math.abs(r.spare_pixels - 155600) < 1e-9);
+  assert.ok(Math.abs(r.last_port_used - 494400) < 1e-9);
+  // 10-bit crosses what a single-link source format will pass.
+  const tenBit = _v1375({ ...base, bit_depth: 10 });
+  assert.ok(Math.abs(tenBit.data_rate_gbps - 14.930) < 1e-3);
+  assert.strictEqual(tenBit.ports_needed, 13); // ports count PIXELS, not bits
+  // A wall that divides evenly leaves no spare on the last port.
+  const even = _v1375({ ...base, width_px: 1300, height_px: 1000 });
+  assert.strictEqual(even.ports_needed, 2);
+  assert.ok(Math.abs(even.spare_pixels - 0) < 1e-9);
+  assert.ok("error" in _v1375({ ...base, width_px: 0 }));
+  assert.ok("error" in _v1375({ ...base, height_px: 0 }));
+  assert.ok("error" in _v1375({ ...base, bit_depth: 0 }));
+  assert.ok("error" in _v1375({ ...base, refresh_hz: 0 }));
+  assert.ok("error" in _v1375({ ...base, pixels_per_port: 0 }));
+  assert.ok("error" in _v1375({ ...base, width_px: Infinity }));
+});
+
+import { computeOutdoorStageWind as _v1376 } from "../../calc-stage.js";
+test("bounds: spec-v1376 computeOutdoorStageWind pins the square law and the ballast", () => {
+  // 40 mph: q = 4.096 psf, F = 852 lb on 160 sq ft, M = 10,224 ft-lb, ballast 3,834 lb.
+  const base = { banner_height_ft: 8, banner_width_ft: 20, centroid_height_ft: 12, wind_speed_mph: 40, drag_coefficient: 1.3, base_width_ft: 8, safety_factor: 1.5, available_ballast_lb: 2000 };
+  const r = _v1376(base);
+  assert.ok(Math.abs(r.velocity_pressure_psf - 4.096) < 1e-9);
+  assert.ok(Math.abs(r.wind_force_lb - 851.968) < 1e-6);
+  assert.ok(Math.abs(r.overturning_moment_ftlb - 10223.616) < 1e-4);
+  assert.ok(Math.abs(r.required_ballast_lb - 3833.856) < 1e-4);
+  // The square law both ways: 30 mph needs 2,157 lb, 55 mph needs 7,248 lb.
+  const calm = _v1376({ ...base, wind_speed_mph: 30 });
+  const gale = _v1376({ ...base, wind_speed_mph: 55 });
+  assert.ok(Math.abs(calm.required_ballast_lb - 2156.6) < 1);
+  assert.ok(Math.abs(gale.required_ballast_lb - 7248.4) < 1);
+  assert.ok(Math.abs(gale.required_ballast_lb / r.required_ballast_lb - (55 / 40) ** 2) < 1e-9);
+  // The capacity speed inverts the requirement: feeding back the required ballast
+  // returns the design wind speed exactly.
+  const exact = _v1376({ ...base, available_ballast_lb: r.required_ballast_lb });
+  assert.ok(Math.abs(exact.capacity_speed_mph - 40) < 1e-9);
+  assert.strictEqual(_v1376({ ...base, available_ballast_lb: 0 }).capacity_speed_mph, null);
+  assert.ok("error" in _v1376({ ...base, banner_height_ft: 0 }));
+  assert.ok("error" in _v1376({ ...base, banner_width_ft: 0 }));
+  assert.ok("error" in _v1376({ ...base, centroid_height_ft: 0 }));
+  assert.ok("error" in _v1376({ ...base, wind_speed_mph: 0 }));
+  assert.ok("error" in _v1376({ ...base, drag_coefficient: 0 }));
+  assert.ok("error" in _v1376({ ...base, base_width_ft: 0 }));
+  assert.ok("error" in _v1376({ ...base, safety_factor: 0.5 }));
+  assert.ok("error" in _v1376({ ...base, wind_speed_mph: Infinity }));
+});

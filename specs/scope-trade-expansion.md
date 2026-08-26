@@ -135,4 +135,5 @@ renames an id, or moves a tile between groups.
 | Band | Specs | Status |
 | --- | --- | --- |
 | Kitchen and food service (Group O) | v1350-v1363 | **landed 2026-08-26**, 14 tiles; catalog 1,709 -> 1,723 |
-| Every other band | v1364-v1449 | not yet built |
+| Stage and live production (Group N) | v1364-v1376 | **landed 2026-08-26**, 13 tiles; catalog 1,723 -> 1,736 |
+| Every other band | v1377-v1449 | not yet built |

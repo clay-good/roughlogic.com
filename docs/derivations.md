@@ -3166,20 +3166,30 @@ cross-check.
 | calc-stage.js | `_v9_atmosphericAbsorption` | `{ f_Hz, T_K, h_r, p_a_kPa }` | _ | _ | _ |
 | calc-stage.js | `computeAcousticGainPagNag` | `{ ds_ft = 2, d0_ft = 30, d1_ft = 8, d2_ft = 12, open_mics = 1, ead_ft = 6 } = {}` | _ | _ | _ |
 | calc-stage.js | `computeAmpPowerSpl` | `{ sensitivity_db, power_w, distance_m, crest_db, target_spl_db, max_spl_db }` | _ | _ | _ |
+| calc-stage.js | `computeCardioidSubArray` | `{ spacing_ft = 0, elements = 4, temp_f = 70, target_freq_hz = 0 } = {}` | _ | _ | _ |
+| calc-stage.js | `computeChainHoistLiftTime` | `{ lift_height_ft = 0, hoist_speed_fpm = 16, load_lb = 0, duty_cycle = 0.4, ra...` | _ | _ | _ |
 | calc-stage.js | `computeCounterweightArborLoad` | `{ batten_weight_lb = 0, attached_load_lb = 0, purchase_type = "single", brick...` | _ | _ | _ |
 | calc-stage.js | `computeDMX` | `{ fixtures = [] }` | _ | _ | _ |
 | calc-stage.js | `computeDecibelConverter` | `{ mode, p1, p2, v1, v2, level_db, ref_type, levels }` | _ | _ | _ |
+| calc-stage.js | `computeDelayTowerAlignment` | `{ distance_ft = 0, temp_f = 70, haas_offset_ms = 15, compare_temp_f = 90 } = {}` | _ | _ | _ |
+| calc-stage.js | `computeDriverSpacingLobing` | `{ spacing_ft = 0, test_freq_hz = 0, temp_f = 70 } = {}` | _ | _ | _ |
 | calc-stage.js | `computeEyringReverberation` | `{ volume_ft3 = 0, surface_area_ft2 = 0, avg_absorption = 0, sabine_coeff = 0....` | _ | _ | _ |
+| calc-stage.js | `computeGoboImageSize` | `{ throw_ft = 0, field_angle_deg = 0, incidence_deg = 0, gobo_image_mm = 0, ga...` | _ | _ | _ |
+| calc-stage.js | `computeHazeMachineSizing` | `{ volume_cf = 0, ach = 0, ref_volume_cf = 100000, ref_ach = 2, ref_output = 1...` | _ | _ | _ |
 | calc-stage.js | `computeLedTapeMaxRun` | `{ power_per_ft_w = 0, supply_voltage_v = 0, resistance_per_ft = 0, drop_toler...` | _ | _ | _ |
 | calc-stage.js | `computeLedTapeRun` | `{ power_per_ft_w = 0, run_length_ft = 0, supply_voltage_v = 0, resistance_per...` | _ | _ | _ |
 | calc-stage.js | `computeLedVideoWall` | `{ cab_w_px = 0, cab_h_px = 0, pixel_pitch_mm = 0, cols = 0, rows = 0, cab_wei...` | _ | _ | _ |
 | calc-stage.js | `computeLightingBeam` | `{ beam_angle_deg = 0, throw_distance = 0, distance_unit = "ft", source = "can...` | _ | _ | _ |
 | calc-stage.js | `computeLightingThrowForPool` | `{ target_pool_diameter = 0, beam_angle_deg = 0, distance_unit = "ft" } = {}` | _ | _ | _ |
+| calc-stage.js | `computeLineArraySplay` | `{ trim_height_ft = 0, ear_height_ft = 4, near_throw_ft = 0, far_throw_ft = 0,...` | _ | _ | _ |
 | calc-stage.js | `computeMassLawTL` | `{ surface_mass_psf = 0, frequency_hz = 0, incidence = "field" } = {}` | _ | _ | _ |
+| calc-stage.js | `computeMiredGelShift` | `{ source_k = 3200, target_k = 5600, applied_shift = 0 } = {}` | _ | _ | _ |
 | calc-stage.js | `computeNeutralImbalance` | `{ I_A = 0, I_B = 0, I_C = 0, harmonic_loads = false }` | _ | _ | _ |
+| calc-stage.js | `computeOutdoorStageWind` | `{ banner_height_ft = 0, banner_width_ft = 0, centroid_height_ft = 0, wind_spe...` | _ | _ | _ |
 | calc-stage.js | `computePowerDistro` | `{ watts = 0, voltage_v = 208, phase = "three", rating_a = 0, pf = 1, derate =...` | _ | _ | _ |
 | calc-stage.js | `computeProjectorBrightness` | `{ screen_w_ft = 0, screen_h_ft = 0, screen_gain = 1.0, target_foot_lamberts =...` | _ | _ | _ |
 | calc-stage.js | `computeProjectorMaxScreenSize` | `{ available_lumens = 0, screen_gain = 1.0, target_foot_lamberts = 16, aspect_...` | _ | _ | _ |
+| calc-stage.js | `computeRfAntennaCableLoss` | `{ length_ft = 0, loss_per_100ft_db = 0, connectors = 0, loss_per_connector_db...` | _ | _ | _ |
 | calc-stage.js | `computeRiggingCheck` | `{ hardware = "sling_5_8_steel", configuration = "vertical", load_lb = 0, incl...` | _ | _ | _ |
 | calc-stage.js | `computeRoomAbsorptionTarget` | `{ volume_ft3 = 0, target_rt60_s = 0, existing_sabins = 0, sabine_coeff = 0.04...` | _ | _ | _ |
 | calc-stage.js | `computeRoomAcoustics` | `{ volume_ft3 = 0, total_sabins = 0, length_ft = 0, width_ft = 0, height_ft = ...` | _ | _ | _ |
@@ -3188,9 +3198,12 @@ cross-check.
 | calc-stage.js | `computeSPLDistanceForLevel` | `{ L1_dB = 0, d1 = 1, target_L2_dB = 0, mode = "free_field", n_sources = 1 } = {}` | _ | _ | _ |
 | calc-stage.js | `computeSpeakerImpedance` | `{ topology, z_ohm, count, series_per_branch, branches, amp_min_ohm, power_w }` | _ | _ | _ |
 | calc-stage.js | `computeSpeedOfSoundAir` | `{ temperature_f = 68 } = {}` | _ | _ | _ |
+| calc-stage.js | `computeStageDeckLiveLoad` | `{ length_ft = 0, width_ft = 0, legs = 4, design_psf = 125, deck_dead_lb = 0, ...` | _ | _ | _ |
 | calc-stage.js | `computeTimeAlignment` | `{ d_main_ft = 0, d_delay_ft = 0, ambient_C = 20, haas_offset_ms = 15 }` | _ | _ | _ |
 | calc-stage.js | `computeTrussCapacity` | `{ truss_model = "16in_box", span_ft = 0, point_loads = [] }` | _ | _ | _ |
+| calc-stage.js | `computeVideoWallDataRate` | `{ width_px = 0, height_px = 0, bit_depth = 8, refresh_hz = 60, pixels_per_por...` | _ | _ | _ |
 | calc-stage.js | `computeWinchFleetAngle` | `{ lateral_offset = 0, lead_distance = 0 } = {}` | _ | _ | _ |
+| calc-stage.js | `computeWirelessIntermod` | `{ f1_mhz = 0, f2_mhz = 0, test_freq_mhz = 0 } = {}` | _ | _ | _ |
 | calc-steel.js | `computeBoltGroupEccentric` | `{ load_kip = 0, ecc_in = 0, ncols = 2, nrows = 3, gage_in = 3, pitch_in = 3 }...` | _ | _ | _ |
 | calc-steel.js | `computeBoltShearBearing` | `{ d_in = 0.75, ab_in2 = 0.4418, fnv_ksi = 54, nplanes = 1, t_in = 0.5, fu_ksi...` | _ | _ | _ |
 | calc-steel.js | `computeColumnBasePlate` | `{ pu_kip = 0, fc_ksi = 4, fy_ksi = 36, d_in = 0, bf_in = 0, b_in = 0, n_in = ...` | _ | _ | _ |
@@ -3388,7 +3401,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1974.
+Row count: 1987.
 
 <!-- END function-corpus-v14 -->
 
@@ -4995,26 +5008,36 @@ per spec-v14 §13.1 second paragraph.
 | `well-drawdown` | Well Drawdown and Specific Capacity | AWWA / USGS; drawdown = 80 - 50 = 30 ft; specific capacity = 30/30 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `well-max-yield` | Well Sustainable Yield from Specific Capacity | AWWA / USGS (inverse); 1.0 GPM/ft, 30 ft allowable drawdown -> 30 GPM (round-tri... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group N Stage (27 tiles)
+### Group N Stage (40 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `acoustic-gain-pag-nag` | Potential / Needed Acoustic Gain (Feedback Stability) | Potential / needed acoustic gain (PAG...; PAG = 20log8 + 20log30 - 20log2 - 20log12 - 10log1 - 6 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `amp-power-spl` | Amplifier Power to SPL | first-principles loudspeaker SPL (ANS...; 90 dB sensitivity, 100 W, 1 m -> 110 dB | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `cardioid-sub-array` | End-Fire and Cardioid Subwoofer Spacing | Project (first-principles); c / (4 x spacing) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `chain-hoist-lift-time` | Chain Hoist Lift Time, Power, and Duty Cycle | Project (first-principles); hp = load x speed / 33,000 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `counterweight-arbor-load` | Counterweight Fly System Balance | Theatrical counterweight rigging (sin...; 100 lb batten + 400 lb load, single, 30 lb bricks, 200 lb... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `decibel-converter` | Decibel Converter | ANSI S1.1 (by name); P2/P1 = 2 -> 3.0103 dB | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `delay-tower-alignment` | Delay Loudspeaker Time and Haas Offset | Project (first-principles); 1125 ft/s at 70 F, scaled as sqrt(absolute temperature) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dmx-planner` | DMX-512 Address and Universe Planner | USITT DMX512-A / project bundled DMX ...; Four-fixture patch in universe 1 (front wash 1-12, rear w... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `driver-spacing-lobing` | Driver Spacing, Lobing, and Crossover Ceiling | Project (first-principles); ceiling = c / (2 x spacing) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `eyring-reverberation` | Eyring Reverberation Time (RT60, High Absorption) | C.F. Eyring reverberation equation (J...; A = 1300 x 0.30 = 390 sabins; Eyring = 0.049 x 5000 / (-1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `gobo-image-size` | Gobo Projected Image Size and Keystone | Project (first-principles); 2 x throw x tan(field/2), 1/cos keystone | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `haze-machine-sizing` | Haze and Fog Machine Output for a Venue | Project (first-principles); output scales on volume x ACH | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `led-tape-max-run` | LED Tape Max Run Before the Far End Dims | Constant-voltage LED strip voltage dr...; 4.4 W/ft, 12 V, 0.05 ohm/ft, 10% -> 11.44 ft max end-fed run | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `led-tape-run` | LED Tape PSU and Voltage-Drop Run | Constant-voltage LED strip loading an...; 4.4 W/ft, 16 ft, 12 V, 0.05 ohm/ft -> 70.4 W load, 88 W P... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `led-video-wall` | LED Video Wall Build | LED panel maker's spec sheet (native ...; spec-v92 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lighting-beam` | Stage Lighting Beam and Throw | first-principles theatrical photometr...; 20 deg beam, 30 ft throw, 100000 cd -> 10.58 ft pool, 111... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lighting-throw-for-pool` | Throw Distance for a Target Beam Pool | first-principles theatrical photometr...; 10.58 ft pool from a 20 deg beam -> 30 ft throw (round-tr... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `line-array-splay` | Line Array Vertical Coverage and Splay | Project (first-principles); atan(dh/near) - atan(dh/far) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `mired-gel-shift` | Color-Temperature Correction in Mireds | Project (first-principles); mired = 1,000,000 / kelvin | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `neutral-imbalance` | Three-Phase Neutral Imbalance and Distro | Project (first-principles); Unbalanced 100 / 85 / 70 A: I_N = sqrt(100^2+85^2+70^2 - ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `outdoor-stage-wind` | Outdoor Stage and Banner Wind Load | ESTA; q = 0.00256 V^2, moment balance about the downwind edge | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `partition-mass-law-tl` | Partition Mass-Law Transmission Loss | Mass law (Bies & Hansen / FHWA highwa...; m = 2.0 x 4.88243 = 9.765 kg/m^2; TL = 20 log10(9.765 x 5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `power-distro` | Power Distro Per-Leg Loading | First-principles AC power + NEC 80% c...; 12,000 W on 120/208 3-phase, 60 A/leg -> 33.3 A/leg, pass | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `projector-brightness` | Projector Brightness and Throw | Standard AV screen-luminance identity...; spec-v92 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `projector-max-screen-size` | Max Screen Size for a Projector | Standard AV screen-luminance identity...; spec-v727 section 2 pinned example: 5,000 lm, gain 1.0, 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `rf-antenna-cable-loss` | RF Antenna Cable Loss and Amplifier Budget | Project (first-principles); loss = length/100 x loss per 100 ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rigging-check` | Rigging Capacity Quick Check | OSHA 1926.251 + ASME B30.9 sling capa...; 5/8 in steel / vertical / 1500 lb / 2 legs -> WLL 6700 / ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `room-absorption-target` | Absorption Needed for a Target RT60 | W.C. Sabine reverberation equation (p...; spec-v664 section 2 pinned example: 5,000 ft^3 targeting ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `room-acoustics` | Room Acoustics: RT60 and Axial Modes | W.C. Sabine reverberation equation (p...; spec-v120 section 2 pinned example: 5,000 ft^3 / 500 sabi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5023,9 +5046,12 @@ per spec-v14 §13.1 second paragraph.
 | `spl-atmospheric` | SPL with Atmospheric Absorption (ANSI S1.26) | ANSI; Inverse-square 20*log10(30) = 29.54 dB; absorption at 1 k... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spl-distance` | SPL and Inverse Square Law | Project (first-principles); Free-field SPL attenuation; 110 dB at 1 m -> ~80.5 dB at ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spl-distance-for-level` | Distance for a Target SPL | Project (inverse-square law, inverse); 110 dB at 1 ft free-field falls to 84 dB at about 20 ft (... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `stage-deck-live-load` | Stage Deck and Platform Live-Load Check | ICC; Table 1607.1 stage live load | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `time-alignment` | Audio Speaker Time Alignment | Project (first-principles) over Haas ...; Main 80 ft, delay 30 ft, 50 ft difference at 22 C (344.63... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `truss-capacity` | Truss Point Load and Span Capacity | Tomcat 16 in box truss published tech...; 16 in box / 40 ft span / 200 + 400 + 200 lb point loads -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `video-wall-data-rate` | LED Wall Data Rate and Processor Ports | Project (first-principles); pixels x bits x 3 x refresh | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `winch-fleet-angle` | Winch Drum Fleet Angle | Winch drum fleet angle (Wire Rope Use...; 6 in offset over a 240 in lead -> atan(0.025) = 1.43 deg,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `wireless-intermod` | Two-Transmitter Intermodulation Screen | Project (first-principles); 2f1-f2, 2f2-f1, 3f1-2f2, 3f2-2f1 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group O Kitchen (33 tiles)
 
@@ -5284,6 +5310,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1723. Fixture-covered or reference-cadence: 1723 / 1723.
+Tile count: 1736. Fixture-covered or reference-cadence: 1736 / 1736.
 
 <!-- END tile-index-v14 -->

@@ -103757,6 +103757,266 @@
    "term": "holding cabinet cooling load",
    "target": "hot-holding-energy",
    "kind": "industry"
+  },
+  {
+   "term": "line array splay",
+   "target": "line-array-splay",
+   "kind": "industry"
+  },
+  {
+   "term": "array vertical coverage",
+   "target": "line-array-splay",
+   "kind": "industry"
+  },
+  {
+   "term": "line array trim angle",
+   "target": "line-array-splay",
+   "kind": "industry"
+  },
+  {
+   "term": "how much splay per box",
+   "target": "line-array-splay",
+   "kind": "question"
+  },
+  {
+   "term": "delay tower alignment",
+   "target": "delay-tower-alignment",
+   "kind": "industry"
+  },
+  {
+   "term": "delay speaker time",
+   "target": "delay-tower-alignment",
+   "kind": "industry"
+  },
+  {
+   "term": "haas offset",
+   "target": "delay-tower-alignment",
+   "kind": "industry"
+  },
+  {
+   "term": "how many ms to delay a speaker",
+   "target": "delay-tower-alignment",
+   "kind": "question"
+  },
+  {
+   "term": "end fire subwoofer array",
+   "target": "cardioid-sub-array",
+   "kind": "industry"
+  },
+  {
+   "term": "cardioid sub array",
+   "target": "cardioid-sub-array",
+   "kind": "industry"
+  },
+  {
+   "term": "sub array delay",
+   "target": "cardioid-sub-array",
+   "kind": "industry"
+  },
+  {
+   "term": "subwoofer rear rejection",
+   "target": "cardioid-sub-array",
+   "kind": "industry"
+  },
+  {
+   "term": "driver spacing lobing",
+   "target": "driver-spacing-lobing",
+   "kind": "industry"
+  },
+  {
+   "term": "crossover ceiling frequency",
+   "target": "driver-spacing-lobing",
+   "kind": "industry"
+  },
+  {
+   "term": "speaker comb filtering spacing",
+   "target": "driver-spacing-lobing",
+   "kind": "industry"
+  },
+  {
+   "term": "how far apart can two subs be",
+   "target": "driver-spacing-lobing",
+   "kind": "question"
+  },
+  {
+   "term": "intermodulation frequencies",
+   "target": "wireless-intermod",
+   "kind": "industry"
+  },
+  {
+   "term": "wireless mic intermod",
+   "target": "wireless-intermod",
+   "kind": "industry"
+  },
+  {
+   "term": "third order products",
+   "target": "wireless-intermod",
+   "kind": "industry"
+  },
+  {
+   "term": "why is one wireless channel dropping",
+   "target": "wireless-intermod",
+   "kind": "question"
+  },
+  {
+   "term": "antenna cable loss",
+   "target": "rf-antenna-cable-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "coax loss budget",
+   "target": "rf-antenna-cable-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "rf amplifier gain unity",
+   "target": "rf-antenna-cable-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "how long can an antenna run be",
+   "target": "rf-antenna-cable-loss",
+   "kind": "question"
+  },
+  {
+   "term": "chain hoist lift time",
+   "target": "chain-hoist-lift-time",
+   "kind": "industry"
+  },
+  {
+   "term": "hoist duty cycle",
+   "target": "chain-hoist-lift-time",
+   "kind": "industry"
+  },
+  {
+   "term": "motor lift time trim",
+   "target": "chain-hoist-lift-time",
+   "kind": "industry"
+  },
+  {
+   "term": "how long to fly a truss",
+   "target": "chain-hoist-lift-time",
+   "kind": "question"
+  },
+  {
+   "term": "gobo image size",
+   "target": "gobo-image-size",
+   "kind": "industry"
+  },
+  {
+   "term": "projected image keystone",
+   "target": "gobo-image-size",
+   "kind": "industry"
+  },
+  {
+   "term": "gobo projection size",
+   "target": "gobo-image-size",
+   "kind": "industry"
+  },
+  {
+   "term": "how big will a gobo project",
+   "target": "gobo-image-size",
+   "kind": "question"
+  },
+  {
+   "term": "mired shift",
+   "target": "mired-gel-shift",
+   "kind": "industry"
+  },
+  {
+   "term": "color temperature gel",
+   "target": "mired-gel-shift",
+   "kind": "industry"
+  },
+  {
+   "term": "ctb cto correction",
+   "target": "mired-gel-shift",
+   "kind": "industry"
+  },
+  {
+   "term": "what gel gets me to daylight",
+   "target": "mired-gel-shift",
+   "kind": "question"
+  },
+  {
+   "term": "haze machine sizing",
+   "target": "haze-machine-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "hazer output venue",
+   "target": "haze-machine-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "fog machine coverage",
+   "target": "haze-machine-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "how long does haze take to fill a room",
+   "target": "haze-machine-sizing",
+   "kind": "question"
+  },
+  {
+   "term": "stage deck load",
+   "target": "stage-deck-live-load",
+   "kind": "industry"
+  },
+  {
+   "term": "platform live load",
+   "target": "stage-deck-live-load",
+   "kind": "industry"
+  },
+  {
+   "term": "staging leg rating",
+   "target": "stage-deck-live-load",
+   "kind": "industry"
+  },
+  {
+   "term": "how much weight can a stage deck hold",
+   "target": "stage-deck-live-load",
+   "kind": "question"
+  },
+  {
+   "term": "led wall data rate",
+   "target": "video-wall-data-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "video wall processor ports",
+   "target": "video-wall-data-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "sending card pixel count",
+   "target": "video-wall-data-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "how many ports for an led wall",
+   "target": "video-wall-data-rate",
+   "kind": "question"
+  },
+  {
+   "term": "outdoor stage wind load",
+   "target": "outdoor-stage-wind",
+   "kind": "industry"
+  },
+  {
+   "term": "banner ballast",
+   "target": "outdoor-stage-wind",
+   "kind": "industry"
+  },
+  {
+   "term": "scrim wind force",
+   "target": "outdoor-stage-wind",
+   "kind": "industry"
+  },
+  {
+   "term": "how much ballast for a banner",
+   "target": "outdoor-stage-wind",
+   "kind": "question"
   }
  ]
 }

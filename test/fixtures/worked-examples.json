@@ -89927,6 +89927,571 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "line-array-splay",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "26 ft trim over 4 ft ears, 25 ft to 150 ft, twelve cabinets",
+   "source_edition_or_year": "trim geometry",
+   "source_section_or_page": "atan(dh/near) - atan(dh/far)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "trim_height_ft": 26,
+    "ear_height_ft": 4,
+    "near_throw_ft": 25,
+    "far_throw_ft": 150,
+    "cabinets": 12
+   },
+   "outputs": {
+    "angle_near_deg": {
+     "value": 41.3478,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "angle_far_deg": {
+     "value": 8.34389,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "coverage_deg": {
+     "value": 33.0039,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "avg_splay_deg": {
+     "value": 2.75032,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "level_taper_db": {
+     "value": 15.563,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "delay-tower-alignment",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "180 ft to the tower, 70 F, 15 ms Haas offset, compared at 90 F",
+   "source_edition_or_year": "propagation delay",
+   "source_section_or_page": "1125 ft/s at 70 F, scaled as sqrt(absolute temperature)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "distance_ft": 180,
+    "temp_f": 70,
+    "haas_offset_ms": 15,
+    "compare_temp_f": 90
+   },
+   "outputs": {
+    "speed_ft_s": {
+     "value": 1125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "geometric_ms": {
+     "value": 160,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "set_delay_ms": {
+     "value": 175,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "compare_geometric_ms": {
+     "value": 157.062,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cardioid-sub-array",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "four elements on 3.0 ft centers at 70 F, retuned to 60 Hz",
+   "source_edition_or_year": "quarter-wave spacing",
+   "source_section_or_page": "c / (4 x spacing)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "spacing_ft": 3,
+    "elements": 4,
+    "temp_f": 70,
+    "target_freq_hz": 60
+   },
+   "outputs": {
+    "delay_per_element_ms": {
+     "value": 2.66667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "optimum_freq_hz": {
+     "value": 93.75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wavelength_ft": {
+     "value": 12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "spacing_for_target_ft": {
+     "value": 4.6875,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "driver-spacing-lobing",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "two 15 in woofers on 18 in centers at 70 F, tested at 500 Hz",
+   "source_edition_or_year": "two-source interference",
+   "source_section_or_page": "ceiling = c / (2 x spacing)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "spacing_ft": 1.5,
+    "test_freq_hz": 500,
+    "temp_f": 70
+   },
+   "outputs": {
+    "crossover_ceiling_hz": {
+     "value": 375,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wavelength_ft": {
+     "value": 2.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "null_angle_deg": {
+     "value": 48.5904,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_spacing_ft": {
+     "value": 1.125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wireless-intermod",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "542.000 and 545.000 MHz, third channel tested at 539.000 MHz",
+   "source_edition_or_year": "two-tone intermodulation",
+   "source_section_or_page": "2f1-f2, 2f2-f1, 3f1-2f2, 3f2-2f1",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "f1_mhz": 542,
+    "f2_mhz": 545,
+    "test_freq_mhz": 539
+   },
+   "outputs": {
+    "spacing_mhz": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "third_low_mhz": {
+     "value": 539,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "third_high_mhz": {
+     "value": 548,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fifth_low_mhz": {
+     "value": 536,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fifth_high_mhz": {
+     "value": 551,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rf-antenna-cable-loss",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "150 ft of RG-8X-class coax at 600 MHz (8.8 dB/100 ft) with a 12 dB inline amplifier",
+   "source_edition_or_year": "feedline budget",
+   "source_section_or_page": "loss = length/100 x loss per 100 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "length_ft": 150,
+    "loss_per_100ft_db": 8.8,
+    "connectors": 0,
+    "loss_per_connector_db": 0.25,
+    "splitter_loss_db": 0,
+    "amplifier_gain_db": 12
+   },
+   "outputs": {
+    "cable_loss_db": {
+     "value": 13.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_loss_db": {
+     "value": 13.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "net_gain_db": {
+     "value": -1.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "chain-hoist-lift-time",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "one-ton hoist at 16 ft/min, 2,000 lb up a 60 ft trim, 40% duty over 10 min",
+   "source_edition_or_year": "intermittent duty",
+   "source_section_or_page": "hp = load x speed / 33,000",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "lift_height_ft": 60,
+    "hoist_speed_fpm": 16,
+    "load_lb": 2000,
+    "duty_cycle": 0.4,
+    "rating_period_min": 10,
+    "hoists": 8
+   },
+   "outputs": {
+    "lift_time_min": {
+     "value": 3.75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hoisting_hp": {
+     "value": 0.969697,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "allowed_on_time_min": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lifts_per_period": {
+     "value": 1.06667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gobo-image-size",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "36-degree ellipsoidal at a 30 ft throw, 45 degrees off perpendicular",
+   "source_edition_or_year": "projection geometry",
+   "source_section_or_page": "2 x throw x tan(field/2), 1/cos keystone",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "throw_ft": 30,
+    "field_angle_deg": 36,
+    "incidence_deg": 45,
+    "gobo_image_mm": 0,
+    "gate_diameter_mm": 0
+   },
+   "outputs": {
+    "image_diameter_ft": {
+     "value": 19.4952,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "keystone_stretch": {
+     "value": 1.41421,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "stretched_axis_ft": {
+     "value": 27.5704,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "relative_illuminance": {
+     "value": 0.707107,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mired-gel-shift",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "3,200 K tungsten matched to 5,600 K daylight, nearest sheet applied",
+   "source_edition_or_year": "reciprocal color temperature",
+   "source_section_or_page": "mired = 1,000,000 / kelvin",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "source_k": 3200,
+    "target_k": 5600,
+    "applied_shift": 0
+   },
+   "outputs": {
+    "source_mired": {
+     "value": 312.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "target_mired": {
+     "value": 178.571,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "shift_needed": {
+     "value": -133.929,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "resulting_k": {
+     "value": 5509.64,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "haze-machine-sizing",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "200,000 cubic ft at 4 ACH, scaled from 100,000 cubic ft at 2 ACH on one quart per hour",
+   "source_edition_or_year": "steady-state mass balance",
+   "source_section_or_page": "output scales on volume x ACH",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "volume_cf": 200000,
+    "ach": 4,
+    "ref_volume_cf": 100000,
+    "ref_ach": 2,
+    "ref_output": 1
+   },
+   "outputs": {
+    "ventilation_cfm": {
+     "value": 13333.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "scaling_factor": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_output": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "time_constant_hr": {
+     "value": 0.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "time_to_90_hr": {
+     "value": 0.575646,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "stage-deck-live-load",
+   "source_publisher": "ICC",
+   "source_title": "4 x 8 ft deck at 125 psf, 60 lb dead, four legs rated 1,000 lb",
+   "source_edition_or_year": "International Building Code",
+   "source_section_or_page": "Table 1607.1 stage live load",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "length_ft": 4,
+    "width_ft": 8,
+    "legs": 4,
+    "design_psf": 125,
+    "deck_dead_lb": 60,
+    "leg_rating_lb": 1000,
+    "point_load_lb": 900,
+    "bearing_sqin": 4,
+    "deck_point_rating_lb": 1000
+   },
+   "outputs": {
+    "deck_area_sqft": {
+     "value": 32,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "live_load_lb": {
+     "value": 4000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_load_lb": {
+     "value": 4060,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "load_per_leg_lb": {
+     "value": 1015,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "leg_utilization_pct": {
+     "value": 101.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "video-wall-data-rate",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "3,840 x 2,160 at 8-bit and 60 Hz on 650,000-pixel ports",
+   "source_edition_or_year": "uncompressed video rate",
+   "source_section_or_page": "pixels x bits x 3 x refresh",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "width_px": 3840,
+    "height_px": 2160,
+    "bit_depth": 8,
+    "refresh_hz": 60,
+    "pixels_per_port": 650000
+   },
+   "outputs": {
+    "total_pixels": {
+     "value": 8294400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "data_rate_gbps": {
+     "value": 11.9439,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ports_needed": {
+     "value": 13,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "spare_pixels": {
+     "value": 155600,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "outdoor-stage-wind",
+   "source_publisher": "ESTA",
+   "source_title": "20 x 8 ft banner, centroid 12 ft up, 40 mph, Cd 1.3, 8 ft base, safety factor 1.5",
+   "source_edition_or_year": "ANSI E1.21",
+   "source_section_or_page": "q = 0.00256 V^2, moment balance about the downwind edge",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "banner_height_ft": 8,
+    "banner_width_ft": 20,
+    "centroid_height_ft": 12,
+    "wind_speed_mph": 40,
+    "drag_coefficient": 1.3,
+    "base_width_ft": 8,
+    "safety_factor": 1.5,
+    "available_ballast_lb": 2000
+   },
+   "outputs": {
+    "velocity_pressure_psf": {
+     "value": 4.096,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wind_force_lb": {
+     "value": 851.968,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "overturning_moment_ftlb": {
+     "value": 10223.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_ballast_lb": {
+     "value": 3833.86,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

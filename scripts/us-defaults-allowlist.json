@@ -343,6 +343,12 @@
       "match": "Marked temperature rise",
       "family": "electrical / motors",
       "justification": "The motor nameplate itself marks temperature rise in °C, and NEC 430.32(A)(1) states its 40 °C threshold in °C. The tradesperson reads this number off the nameplate in this unit."
+    },
+    {
+      "module": "calc-stage.js",
+      "match": "diameter (mm",
+      "family": "entertainment lighting gobos",
+      "justification": "Gobo and gate sizes are specified in millimeters everywhere in the US entertainment-lighting trade: an M-size gobo is 66 mm outside diameter with a 48 mm image, and every US manufacturer's catalog and every fixture's spec sheet prints those figures in mm. A US lighting technician reads this number in mm off the gobo holder itself."
     }
   ]
 }
