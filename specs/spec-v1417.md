@@ -1,74 +1,70 @@
-# roughlogic.com Specification v1417 -- Compressor Volumetric Efficiency and Capacity Derate (calc-hvacservice.js, Group C, HVAC and refrigeration service, 1 New Tile)
+# roughlogic.com Specification v1417 -- Refrigerant Annual Leak Rate and the EPA Repair Threshold (calc-refrigerant.js, Group C, HVAC and refrigeration service, 1 New Tile)
 
 > **Status: PROPOSED (2026-08-26). Single-tile spec.** Part of [scope-trade-expansion](scope-trade-expansion.md).
-> In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-hvacservice.js`**
+> In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-refrigerant.js`**
 > (Group C, HVAC and refrigeration service), no new module or dependency. Inherits spec.md through spec-v1349.md.
 >
-> **The gap.** The catalog computes compression ratio and theoretical displacement but stops before the consequence: as the compression ratio rises, volumetric efficiency falls, and the compressor pumps less refrigerant from the same displacement. That is why a dirty condenser costs capacity, why low-ambient operation helps, and why a freezer machine is so much larger than a cooler machine for the same box load.
+> **The gap.** The catalog has eight refrigerant tiles and none of them touches the number that carries a legal consequence: the annualized leak rate. Whether a system must be repaired within 30 days turns on pounds added over twelve months divided by full charge, compared against a threshold that differs by appliance type, and nothing in the catalog computes it.
 
 Repository: github.com/clay-good/roughlogic.com -- US standards only.
 
 ## 1. Inheritance and conventions
 
 The v14 dimensional lint, bounds-fuzzer, worked-example registry, and reviewer-signoff apply. The v18/v21
-contract: a non-positive compression ratio, displacement, or polytropic exponent, a clearance fraction outside 0-1, or a computed volumetric efficiency at or below zero, returns `{ error }`; no numeric field is ever `Infinity`. Citation discipline (v19/v22): the reciprocating-compressor volumetric efficiency relation with clearance re-expansion, eta_v = 1 - C (r^(1/n) - 1), by name, `GOVERNANCE.general`.
+contract: a non-positive full charge or reporting period, a negative quantity added, or a threshold outside 0-100 percent returns `{ error }`; no numeric field is ever `Infinity`. Citation discipline (v19/v22): the EPA Section 608 refrigerant management leak-rate calculation and the appliance-type leak-rate thresholds at 40 CFR Part 82 Subpart F, cited by section and linked, by name, `GOVERNANCE.general`.
 
 ## 2. The tile
 
-### 2.1 `compressor-capacity-derate` -- Compressor Volumetric Efficiency and Capacity Derate
+### 2.1 `refrigerant-leak-rate` -- Refrigerant Annual Leak Rate and the EPA Repair Threshold
 
 ```
-compression ratio r = absolute discharge pressure / absolute suction pressure
-volumetric eff      = 1 - C x (r^(1/n) - 1)
-actual induced vol  = displacement x volumetric efficiency
-capacity ratio      = eta_v at condition B / eta_v at condition A
+annualized leak rate = pounds added in the period / full charge x (12 / months in period) x 100
+allowed before trigger = threshold percent x full charge
+pounds over            = pounds added - allowed
 ```
 
-At the end of a compression stroke, the gas trapped in the clearance volume is at discharge pressure. On the way
-back down it re-expands, and the piston has already travelled part of its stroke before suction pressure is
-reached and the suction valve can open. The higher the compression ratio, the longer that re-expansion takes and
-the less of the stroke is left to draw in fresh vapor. `C` is the clearance fraction, typically 3% to 5% for a
-reciprocating machine, and `n` the polytropic exponent, near 1.15 for common refrigerants.
+The rule is simple arithmetic with real teeth. For an appliance containing 50 pounds or more of refrigerant, the
+owner or operator tracks refrigerant added, annualizes it against the **full charge** -- the amount the system is
+designed to hold, not what happens to be in it -- and compares the result against the threshold for that appliance
+type. The thresholds under 40 CFR Part 82 Subpart F differ by category, with commercial refrigeration and
+industrial process refrigeration at higher percentages than comfort cooling and other appliances.
 
-The practical reading is that compression ratio, not discharge pressure, is what costs capacity -- and it is a
-ratio, so a small rise in suction pressure helps far more than an equal fall in head pressure. That is the whole
-argument for keeping evaporators clean and suction lines properly sized, and it is why a machine that is fine in
-a cooler is badly undersized when the same box is converted to a freezer.
+Two details cause most of the errors. **Full charge** must be established and documented, and a system whose full
+charge has never been recorded cannot compute a compliant leak rate at all. And the calculation **annualizes**:
+adding refrigerant twice in three months is a much higher annual rate than the same pounds spread over a year, and
+the shorter the window the more it magnifies.
 
-**Inputs:** suction and discharge pressures (absolute, or gauge with the local barometric), clearance fraction,
-polytropic exponent, compressor displacement (CFM), and a second operating condition to compare against.
+Exceeding the threshold starts a clock -- leak repairs within a set number of days, verification tests,
+and, if the leak cannot be repaired, a retrofit or retirement plan. The tile computes the number that starts it.
 
-**Outputs:** compression ratio, volumetric efficiency, actual induced volume, and the capacity ratio between two
-operating conditions.
+**Inputs:** full charge (lb), pounds of refrigerant added, length of the period in months, appliance type and its
+threshold percentage.
+
+**Outputs:** annualized leak rate, the threshold that applies, pounds that could have been added before
+triggering, pounds over, and whether the threshold is exceeded.
 
 ## 3. Worked example
 
-A machine with 4% clearance and `n = 1.15`, compared at two conditions:
+A 200 lb system with 34 lb added over the past twelve months:
 
 ```
-r = 5  (say 40 psia suction, 200 psia discharge):
-    eta_v = 1 - 0.04 x (5^0.870 - 1)  = 1 - 0.04 x 3.054 = 0.878
-
-r = 10 (20 psia suction, same 200 psia discharge):
-    eta_v = 1 - 0.04 x (10^0.870 - 1) = 1 - 0.04 x 6.405 = 0.744
-
-capacity ratio = 0.744 / 0.878 = 0.847
+leak rate = 34 / 200 x (12/12) x 100 = 17.0%
+against a 10% threshold: EXCEEDED by 7 percentage points; 20 lb was the allowance, 14 lb over
+against a 20% threshold: not exceeded; 40 lb was the allowance
 ```
 
-Halving the suction pressure costs 15% of the *pumping* efficiency alone -- and that is before the much larger
-effect of the lower-density vapor at the lower suction pressure, which is what really collapses mass flow. The two
-together are why the same compressor that makes 5 tons at a 40 F evaporator makes well under 2 at a -20 F one.
-
-Read it the other way for a service call: a system whose suction pressure has dropped because of a restricted
-metering device or a starved evaporator is losing capacity by this curve, and raising head pressure to compensate
-makes it strictly worse.
+The same 34 pounds is a violation on one appliance type and unremarkable on another, which is why identifying the
+appliance category correctly is the first step and not a formality. Now shorten the window: if those 34 pounds
+went in over **six** months, the annualized rate is 34%, and the system is over even the higher threshold. Nothing
+about the leak changed -- only the period it is measured against.
 
 ## 4. Scope and non-goals
 
-The classical reciprocating clearance model. It describes the volumetric efficiency of the *pump* only, and does
-not include the refrigerant's density change with suction pressure, the superheat at the compressor inlet, valve
-and port pressure losses, motor and mechanical efficiency, or heat picked up from the cylinder walls -- all of
-which matter and several of which are larger than the clearance effect at extreme ratios. It does not apply to
-scroll, screw, or rotary compressors, which have fixed volume ratios and entirely different part-load and
-off-design behavior. Clearance fraction and polytropic exponent are estimates unless taken from the manufacturer.
-The compressor manufacturer's published capacity tables govern; they already contain all of this.
+**A compliance arithmetic aid, not a compliance determination.** Appliance categories, threshold percentages,
+repair deadlines, verification-test requirements, and the recordkeeping and reporting obligations are set in
+regulation and have been revised more than once; take them from the current 40 CFR Part 82 Subpart F text and
+from EPA guidance, not from memory or from this tile. The tile does not determine an appliance's category or its
+full charge, does not address the chronically-leaking-appliance reporting provisions, the retrofit-or-retire plan
+requirements, or state and local rules that are stricter than the federal ones -- California's refrigerant
+management program in particular. Anyone servicing these systems must hold EPA Section 608 certification. The
+EPA, the state air authority, and the owner's compliance program govern.

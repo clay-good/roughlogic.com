@@ -1,73 +1,74 @@
-# roughlogic.com Specification v1406 -- Press-Fit Interference, Pressure, and Assembly Force (calc-machining.js, Group E, machining and fabrication, 1 New Tile)
+# roughlogic.com Specification v1406 -- Permissible Residual Unbalance and Balance Grade (ISO 1940) (calc-shop.js, Group G, shop and industrial, 1 New Tile)
 
 > **Status: PROPOSED (2026-08-26). Single-tile spec.** Part of [scope-trade-expansion](scope-trade-expansion.md).
-> In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-machining.js`**
-> (Group E, machining and fabrication), no new module or dependency. Inherits spec.md through spec-v1349.md.
+> In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-shop.js`**
+> (Group G, shop and industrial), no new module or dependency. Inherits spec.md through spec-v1349.md.
 >
-> **The gap.** The catalog has thermal expansion and bolt preload but nothing for the interference fit, which is how a gear goes on a shaft, a bearing race goes in a housing, and a bushing goes in a bore. The chain from a few thousandths of interference to a contact pressure, to a holding torque, to the press force required is pure Lame theory and none of it is in the catalog.
+> **The gap.** The catalog has vibration isolation and floor vibration but nothing that says how well a rotating part has to be balanced. ISO 1940 answers it with one relation -- balance grade divided by angular velocity -- and the consequence is counterintuitive: the faster the rotor, the tighter the tolerance, so a part perfectly acceptable at 1,800 rpm is out of specification at 3,600.
 
 Repository: github.com/clay-good/roughlogic.com -- US standards only.
 
 ## 1. Inheritance and conventions
 
 The v14 dimensional lint, bounds-fuzzer, worked-example registry, and reviewer-signoff apply. The v18/v21
-contract: a non-positive shaft diameter, hub outside diameter, interference, elastic modulus, or engagement length, a hub outside diameter at or below the shaft diameter, or a friction coefficient at or below zero, returns `{ error }`; no numeric field is ever `Infinity`. Citation discipline (v19/v22): the Lame thick-wall interference-fit pressure relation for a solid shaft in a hub of the same material, and the friction-limited holding torque and assembly force that follow, by name, `GOVERNANCE.general`.
+contract: a non-positive balance grade, rotor speed, rotor mass, or correction radius, or a plane count other than 1 or 2 returns `{ error }`; no numeric field is ever `Infinity`. Citation discipline (v19/v22): the ISO 1940-1 balance quality grade definition (grade G equals permissible eccentricity times angular velocity, in mm/s), cited by number and linked, by name, `GOVERNANCE.general`.
 
 ## 2. The tile
 
-### 2.1 `press-fit-interference` -- Press-Fit Interference, Pressure, and Assembly Force
+### 2.1 `rotor-balance-grade` -- Permissible Residual Unbalance and Balance Grade (ISO 1940)
 
 ```
-contact pressure p = (delta / d) x (E / 2) x (D^2 - d^2) / D^2
-                     for a solid shaft in a hub of the same material,
-                     delta = diametral interference, d = shaft dia, D = hub OD
-axial press force  = mu x pi x d x L x p
-holding torque     = axial force x d / 2
-shrink temperature = delta / (alpha x d) + assembly clearance allowance
+omega        = 2 pi x rpm / 60                       rad/s
+e_permissible = G x 1000 / omega                     g-mm per kg of rotor
+U_permissible = e_permissible x rotor mass in kg     g-mm total
+per plane     = U_permissible / number of planes
+correction mass = per-plane U / correction radius in mm     grams
 ```
 
-Interference generates pressure because the hub has to stretch and the shaft has to compress until they agree on a
-common diameter. How much pressure depends on how stiff the hub is, which is the `(D^2 - d^2)/D^2` term: a thin
-hub gives way easily and generates little pressure no matter how much interference is pressed into it, while a
-massive hub approaches the solid-shaft limit. This is why a thin-walled bushing needs proportionally more
-interference than a thick one.
+A balance grade `G` is defined as the permissible eccentricity multiplied by the angular velocity, expressed in
+millimetres per second -- so G6.3 means "the center of mass may sit off the axis by however much gives 6.3 mm/s of
+rim velocity at operating speed." The grades are a published ladder: G6.3 for general machinery, pumps, and fans;
+G2.5 for machine tool drives, turbines, and better electric motors; G1 and G0.4 for grinding spindles and
+precision equipment.
 
-Once the pressure is known, everything else is friction. The axial force to press it together is the pressure
-acting over the contact area times the coefficient of friction, and the torque the joint will transmit before it
-slips is that same friction force acting at the shaft radius. Both scale linearly with engagement length, which is
-usually the cheapest design variable available.
+The important consequence is in the division. Permissible eccentricity is inversely proportional to speed, so
+**doubling the rotor speed halves the allowable unbalance**. A fan balanced to G6.3 at 1,800 rpm and then run at
+3,600 rpm is not at G6.3 any more; it is at G12.6, one full grade coarser, and it will vibrate accordingly. That
+is why rebalancing is required after a speed change and why a two-speed machine is balanced to its high speed.
 
-**Inputs:** shaft diameter, hub outside diameter, diametral interference, elastic modulus, engagement length,
-friction coefficient, and the coefficient of thermal expansion for the shrink-fit temperature.
+The last two lines translate the tolerance into something a balancing machine operator can act on: how many grams
+at what radius, split between the correction planes.
 
-**Outputs:** contact pressure, hoop stress at the hub bore, axial assembly force, holding torque capacity, and
-the temperature difference a shrink or freeze fit would need.
+**Inputs:** balance grade G, operating speed (rpm), rotor mass (kg), number of correction planes, correction
+radius (mm).
+
+**Outputs:** angular velocity, permissible eccentricity, permissible residual unbalance in total and per plane,
+and the equivalent correction mass at the stated radius.
 
 ## 3. Worked example
 
-A 2.000 in shaft in a 4.000 in outside diameter steel hub, 0.002 in diametral interference, 2.000 in engagement,
-`E = 30,000,000 psi`, `mu = 0.12`:
+A 50 kg rotor at 3,600 rpm to grade G6.3, corrected in two planes at a 150 mm radius:
 
 ```
-p            = (0.002/2.000) x 15,000,000 x (16 - 4)/16 = 0.001 x 15,000,000 x 0.75 = 11,250 psi
-axial force  = 0.12 x pi x 2.000 x 2.000 x 11,250       = 16,965 lb
-holding torque = 16,965 x 1.000                          = 16,965 in-lb = 1,414 ft-lb
+omega          = 2 pi x 3,600 / 60      = 377.0 rad/s
+e_permissible  = 6.3 x 1000 / 377.0     = 16.71 g-mm/kg
+U_permissible  = 16.71 x 50             = 836 g-mm
+per plane      = 418 g-mm
+correction mass= 418 / 150              = 2.79 g per plane
 ```
 
-Two thousandths of interference is worth over eight tons of press force and fourteen hundred foot-pounds of
-torque -- which is why press fits work and why they are unforgiving. Halve the hub wall by dropping the outside
-diameter to 3.000 in and the stiffness term falls from 0.75 to 0.556, so the pressure drops to 8,333 psi and the
-capacity falls by a quarter with no change in the interference at all. And the tolerance sensitivity is brutal:
-at 0.003 in interference instead of 0.002 the pressure is 16,875 psi and the press force is over twelve tons.
-Interference fits are specified to tenths for a reason.
+Under three grams at six inches of radius -- which is about the mass of a small washer, and it gives a sense of
+how little material puts a rotor out of tolerance. Now run the same rotor at 1,800 rpm: the permissible unbalance
+doubles to 1,671 g-mm, 5.57 g per plane. Same rotor, same grade, twice the tolerance, purely because it turns half
+as fast.
 
 ## 4. Scope and non-goals
 
-A solid shaft in a hub of the same material, elastic behavior only, uniform pressure over the contact length.
-Different materials require the full two-material Lame form, which this simplification does not use. It does not
-check the hub for yielding -- the hoop stress at the bore is roughly twice the contact pressure for a thick hub
-and much higher for a thin one, and a hub can be stressed past yield by an interference that looks modest. It
-ignores surface finish, which flattens on assembly and reduces effective interference by a real amount, stress
-concentration at the hub ends, centrifugal loosening at speed, and the differential thermal growth that can
-release the joint in service. Friction coefficients for pressed joints vary by a factor of two. The designer and
-the assembly's own test govern.
+Rigid-rotor balancing under ISO 1940-1. A **flexible** rotor -- one operating above its first bending critical
+speed -- cannot be balanced this way at all, because its shape changes with speed; that is ISO 11342 and it is a
+different discipline. Balance grade selection comes from the ISO tables for the machine type and is a design
+decision, not a calculation. The tile does not address single-plane versus two-plane criteria (a narrow disc may
+need only one plane, a long rotor needs two and sometimes more), the distribution of tolerance between planes for
+an asymmetric rotor, bearing and support dynamics, resonance, or the fact that a well-balanced rotor in a
+resonant structure still vibrates. Measured vibration, not computed unbalance, is the acceptance criterion.
+ISO 1940 and 10816, the equipment manufacturer, and the balancing technician govern.

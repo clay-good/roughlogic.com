@@ -1,72 +1,72 @@
-# roughlogic.com Specification v1404 -- Reaming Stock Allowance, Speed, and Feed (calc-machining.js, Group E, machining and fabrication, 1 New Tile)
+# roughlogic.com Specification v1404 -- Tube Bend Wall Thinning, Bend Ratio, and Arc Length (calc-fab.js, Group E, welding and fabrication, 1 New Tile)
 
 > **Status: PROPOSED (2026-08-26). Single-tile spec.** Part of [scope-trade-expansion](scope-trade-expansion.md).
-> In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-machining.js`**
-> (Group E, machining and fabrication), no new module or dependency. Inherits spec.md through spec-v1349.md.
+> In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-fab.js`**
+> (Group E, welding and fabrication), no new module or dependency. Inherits spec.md through spec-v1349.md.
 >
-> **The gap.** A reamer follows the hole it is given, and how much stock it is given decides whether the hole comes out to size. Too little and the reamer burnishes instead of cutting; too much and it chatters and cuts oversize. The allowance rule, and the fact that reaming runs at roughly two-thirds the drilling speed and two to three times the drilling feed, is not anywhere in the catalog.
+> **The gap.** The catalog has minimum plate bend radius and cable bend radius but nothing for bending tube or pipe, where the governing failure is wall thinning on the outside of the bend. Thinning is a simple geometric consequence of the centerline radius and the tube diameter, and it is what decides whether a bend needs a mandrel and whether the bent tube still meets its pressure rating.
 
 Repository: github.com/clay-good/roughlogic.com -- US standards only.
 
 ## 1. Inheritance and conventions
 
 The v14 dimensional lint, bounds-fuzzer, worked-example registry, and reviewer-signoff apply. The v18/v21
-contract: a non-positive reamer diameter, surface speed, or feed multiplier, or a stock allowance at or below zero, returns `{ error }`; no numeric field is ever `Infinity`. Citation discipline (v19/v22): the reaming stock-allowance practice by hole size and the reaming speed and feed convention relative to drilling (Machinery's Handbook), by name, `GOVERNANCE.general`.
+contract: a non-positive tube diameter, wall thickness, centerline radius, or bend angle, or a centerline radius at or below half the tube diameter returns `{ error }`; no numeric field is ever `Infinity`. Citation discipline (v19/v22): the neutral-axis wall-thinning relation for tube bending and the bend-ratio (R/D) and D/t conventions that govern mandrel selection, by name, `GOVERNANCE.general`.
 
 ## 2. The tile
 
-### 2.1 `reaming-allowance` -- Reaming Stock Allowance, Speed, and Feed
+### 2.1 `tube-bend-wall-thinning` -- Tube Bend Wall Thinning, Bend Ratio, and Arc Length
 
 ```
-stock allowance  = about 1/64 in on diameter up to 1/2 in
-                   about 1/32 in on diameter from 1/2 to 1 in
-                   about 1/16 in above 1 in
-drill size       = reamer diameter - stock allowance
-reaming SFM      = about 2/3 of the drilling surface speed
-RPM              = 3.82 x SFM / diameter
-reaming feed     = 2 to 3 times the drilling feed per revolution
-feed rate        = feed per revolution x RPM
+bend ratio  = centerline radius / outside diameter        "R/D", quoted as 1.5D, 2D, 3D
+D/t ratio   = outside diameter / wall thickness
+outside wall after bending = original wall x CLR / (CLR + OD/2)
+thinning percent           = 1 - CLR / (CLR + OD/2)
+arc length  = CLR x bend angle in radians
 ```
 
-A reamer is a sizing tool, not a hole-making tool, and it needs a specific amount of material to cut. Below the
-allowance it rides on the hole wall and burnishes -- the hole comes out undersize, the reamer glazes, and the
-finish is worse rather than better. Above it the reamer's margins cannot guide it, it chatters, and it cuts a
-lobed, oversize hole.
+Bending a tube stretches the outside of the bend and compresses the inside. Taking the neutral axis at the
+centerline, the outer fiber is stretched in proportion to how far it sits outside that centerline, and the wall
+thins by the same proportion -- so thinning depends only on the ratio of the bend radius to the tube radius, not
+on the material and not on the bend angle.
 
-The speed and feed convention runs opposite to intuition: slower than drilling and *faster* in feed. Slow, because
-surface speed is what generates the heat that expands the reamer and enlarges the hole. Fast in feed, because the
-reamer needs a real chip on each flute for the same reason a milling cutter does -- a starved reamer rubs.
-Roughly two-thirds the speed and two to three times the feed is the working rule.
+Two ratios do the work. **R/D** is how tight the bend is: at 3D the thinning is modest, at 1.5D it is severe, and
+below about 2D on thin wall a mandrel and a wiper die are needed to keep the tube from collapsing or wrinkling on
+the inside. **D/t** is how thin the tube is relative to its diameter: a high D/t tube is a thin shell and it
+buckles rather than bends. Together they are the two axes of every tube-bending capability chart.
 
-**Inputs:** finished hole (reamer) diameter, base drilling surface speed for the material, base drilling feed per
-revolution, and the speed and feed multipliers.
+The consequence that matters downstream is pressure rating. A pressure calculation done on the nominal wall is
+wrong for a bent tube -- the thinned outer wall is the governing section, and on a tight bend it can be a quarter
+thinner than what was purchased.
 
-**Outputs:** recommended stock allowance, drill size to leave it, reaming surface speed and RPM, feed per
-revolution, and feed rate in inches per minute.
+**Inputs:** tube outside diameter, wall thickness, centerline bend radius (or the bend ratio), bend angle.
+
+**Outputs:** bend ratio, D/t ratio, wall thickness at the outside of the bend, thinning percentage, arc length of
+the bend, and a mandrel advisory.
 
 ## 3. Worked example
 
-A 0.500 in reamed hole in mild steel, where the drilling baseline is 80 SFM and 0.006 IPR:
+A 2.0 in OD tube with a 0.120 in wall, bent 90 degrees on a 3.0 in centerline radius:
 
 ```
-allowance   = 0.016 in on diameter    -> drill 0.484 in (a 31/64 drill is 0.4844, right on it)
-reaming SFM = 80 x 2/3                = 53 SFM
-RPM         = 3.82 x 53 / 0.500       = 405 RPM
-feed        = 0.006 x 3               = 0.018 IPR
-feed rate   = 0.018 x 405             = 7.29 IPM
+bend ratio = 3.0 / 2.0                  = 1.5D  (tight)
+D/t        = 2.0 / 0.120                = 16.7
+wall after = 0.120 x 3.0 / (3.0 + 1.0)  = 0.090 in
+thinning   = 25%
+arc length = 3.0 x (pi/2)               = 4.71 in
 ```
 
-Note that the reamer runs at a third of the drill's RPM and twice its feed rate in inches per minute -- 405 RPM
-against 611, but 7.3 IPM against 3.7. That combination is what produces a chip instead of a rub. Leave only
-0.005 in of stock instead of 0.016 and the reamer will burnish; leave 0.031 in and it will chatter and cut a
-hole that gauges oversize and out of round.
+A quarter of the wall gone. Open the bend to a 6.0 in radius (3D) and the same tube thins only to 0.1029 in, 14.3%
+-- nearly half the thinning, for a bend that takes twice the space. That is the trade on every tube-bending job,
+and it is why 3D is the default when the package allows it and 1.5D is a decision, not a habit.
 
 ## 4. Scope and non-goals
 
-Machine reaming of a drilled hole in general-purpose material. Hand reaming, chucking reamers, adjustable
-reamers, and carbide and coated reamers all carry their own allowances and speeds, and high-performance reamers
-are frequently run far faster than this convention allows. The tile does not select a reamer, address hole
-alignment (a reamer follows the drilled hole and will not correct a crooked one -- boring will), coolant, or the
-straightness and finish requirements that may call for a different process entirely. Reamed hole tolerance
-depends on setup rigidity and spindle runout more than on any of these numbers. Machinery's Handbook, the tool
-manufacturer, and the machinist govern.
+A geometric first approximation. Real thinning depends on the bending method (rotary draw, compression, roll,
+press), on whether a mandrel and wiper are used, on the material's strain behavior, and on the die and pressure-die
+setup, and measured thinning on a well-supported rotary-draw bend is usually less than this neutral-axis
+prediction while a poorly supported one can be worse. The tile does not predict ovality or wrinkling, which
+frequently govern before thinning does, does not select mandrel type or ball count, does not compute springback,
+and does not evaluate the bent section against a pressure or structural code -- ASME B31 piping codes have their
+own bending and thinning requirements and minimum wall provisions. The bender manufacturer, the applicable piping
+code, and a test bend govern.

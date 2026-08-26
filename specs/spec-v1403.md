@@ -1,69 +1,69 @@
-# roughlogic.com Specification v1403 -- Chip Load, Feed Rate, and Radial Chip Thinning (calc-machining.js, Group E, machining and fabrication, 1 New Tile)
+# roughlogic.com Specification v1403 -- Band Saw Blade Pitch, Speed, and Cut Time (calc-machining.js, Group E, machining and fabrication, 1 New Tile)
 
 > **Status: PROPOSED (2026-08-26). Single-tile spec.** Part of [scope-trade-expansion](scope-trade-expansion.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-machining.js`**
 > (Group E, machining and fabrication), no new module or dependency. Inherits spec.md through spec-v1349.md.
 >
-> **The gap.** The catalog computes cutting speed and material removal rate but not the number a machinist actually programs: inches per minute, from chip load, flute count, and RPM. And it stops short of the correction that matters most on modern toolpaths -- radial chip thinning, which makes a light radial cut require a *higher* programmed feed than the chip load implies, not a lower one.
+> **The gap.** The catalog computes grinding wheel speed, cutting speed for milling and turning, and radial chip thinning, but the saw -- the first machine most parts touch -- has no tile. Blade pitch is chosen by a tooth-count rule that depends on the section being cut, and getting it wrong strips teeth on thin wall or work-hardens on thick.
 
 Repository: github.com/clay-good/roughlogic.com -- US standards only.
 
 ## 1. Inheritance and conventions
 
 The v14 dimensional lint, bounds-fuzzer, worked-example registry, and reviewer-signoff apply. The v18/v21
-contract: a non-positive cutter diameter, flute count, chip load, or surface speed, or a radial engagement at or above the cutter diameter, returns `{ error }`; no numeric field is ever `Infinity`. Citation discipline (v19/v22): the feed relation IPM = RPM x flutes x chip load and the radial chip-thinning factor D / (2 sqrt(D ae - ae^2)), by name, `GOVERNANCE.general`.
+contract: a non-positive section thickness, blade speed, wheel diameter, or cut area, or a feed rate at or below zero returns `{ error }`; no numeric field is ever `Infinity`. Citation discipline (v19/v22): the 3-to-24 teeth-in-the-cut rule for band sawing and the surface-speed relation for the blade, by name, `GOVERNANCE.general`.
 
 ## 2. The tile
 
-### 2.1 `chip-load-feed-rate` -- Chip Load, Feed Rate, and Radial Chip Thinning
+### 2.1 `band-saw-blade-pitch` -- Band Saw Blade Pitch, Speed, and Cut Time
 
 ```
-RPM              = 3.82 x SFM / diameter
-programmed IPM   = RPM x flutes x chip load
-chip thinning    = D / (2 sqrt(D x ae - ae^2))     for radial engagement ae < D/2
-adjusted IPM     = programmed IPM x chip thinning
+minimum TPI   = 3 / section thickness in the cut
+maximum TPI   = 24 / section thickness in the cut
+wheel RPM     = blade speed (SFM) x 12 / (pi x wheel diameter)
+cut area      = the cross-section the blade passes through
+cut time      = cut area / feed rate (sq in per minute)
 ```
 
-The first two lines are the ordinary feed calculation and every machinist knows them. The third is the one that
-separates a conservative program from a good one.
+The whole rule is that between **three and twenty-four teeth** must be engaged in the cut at any moment. Fewer
+than three and a tooth can straddle the work, catch a corner, and strip -- which is how a blade dies on thin-wall
+tube in one stroke. More than twenty-four and there is no gullet space for the chip, so the chips pack, the teeth
+rub instead of cutting, and the work hardens ahead of the blade -- which is how a blade dies on stainless.
 
-When a cutter engages less than half its diameter radially, the chip it produces is thinner than the programmed
-feed per tooth, because the tooth enters and exits the material over a short arc and never reaches full chip
-thickness. Running the nominal chip load in that condition means the actual chip is too thin -- the tool rubs
-instead of cutting, heat goes into the edge instead of into the chip, and the tool wears out faster than it would
-at a heavier feed. The fix is counterintuitive: *increase* the programmed feed by the chip-thinning factor to
-restore the real chip thickness. This is the whole basis of high-efficiency and trochoidal milling, where a 10%
-radial engagement runs at very high feed rates.
+Because the tooth count depends on the *thickness in the cut* and not on the part's overall size, the answer
+changes through the cut on a round bar or a tube, which is exactly why variable-pitch blades exist and why they
+are the default for mixed work. The tile reports the acceptable band so a single blade can be checked against a
+range of sections rather than one.
 
-**Inputs:** cutter diameter (in), number of flutes, chip load per tooth (in), surface speed (SFM), radial
-engagement (in).
+**Inputs:** section thickness in the cut (or the tube wall and diameter), blade speed for the material (SFM),
+wheel diameter, cut cross-sectional area, achievable feed rate in square inches per minute.
 
-**Outputs:** RPM, programmed feed rate before correction, chip-thinning factor, corrected feed rate, and the
-actual chip thickness at the nominal feed.
+**Outputs:** minimum and maximum TPI, the recommended pitch band, wheel RPM at the chosen blade speed, cut area,
+and cut time.
 
 ## 3. Worked example
 
-A 0.500 in four-flute carbide end mill at 400 SFM, 0.003 in chip load, taking a 0.050 in radial cut (10% of
-diameter):
+A 2.0 in solid mild steel round, blade at 250 SFM on 12 in wheels, cutting at 5 sq in per minute:
 
 ```
-RPM             = 3.82 x 400 / 0.500          = 3,056 RPM
-programmed IPM  = 3,056 x 4 x 0.003           = 36.7 IPM
-chip thinning   = 0.500 / (2 sqrt(0.5 x 0.05 - 0.05^2)) = 0.5 / 0.30 = 1.667
-adjusted IPM    = 36.7 x 1.667                = 61.1 IPM
+minimum TPI = 3 / 2.0            = 1.5
+maximum TPI = 24 / 2.0           = 12
+              -> a 4/6 variable pitch sits comfortably inside the band
+wheel RPM   = 250 x 12 / (pi x 12) = 79.6 rpm
+cut area    = pi x 1.0^2           = 3.14 sq in
+cut time    = 3.14 / 5             = 0.63 min = 38 seconds
 ```
 
-Sixty-one inches a minute instead of thirty-seven -- a two-thirds increase in feed, at the same spindle speed and
-the same real chip thickness, simply by acknowledging what the geometry is doing. Run it at 36.7 IPM and the
-actual chip is 0.0018 in, thin enough on many materials to rub and work-harden. Note that the correction only
-applies below half-diameter engagement; at `ae = D/2` the factor is exactly 1.0 and above it there is no thinning
-at all.
+Now cut 2.0 in square tube with a 0.120 in wall instead. The thickness in the cut on the walls is 0.120 in, so the
+band becomes 25 to 200 TPI -- and there is no such blade. That is the real lesson: thin wall cannot satisfy the
+minimum-three-teeth rule with any practical pitch on its own, which is why thin tube is bundled, nested, or cut
+with a fine 14/18 blade at reduced feed and accepted as a compromise.
 
 ## 4. Scope and non-goals
 
-Radial chip thinning only. Axial chip thinning applies separately to ballnose and high-feed cutters and is a
-different correction that this tile does not perform. The corrected feed must still be checked against spindle
-power, machine feed-rate limits, tool deflection, and fixture rigidity -- chip thinning permits a higher feed, it
-does not guarantee the machine can deliver it, and on a light machine deflection will govern first. Chip load
-values come from the tool manufacturer for the specific material and must be adjusted for depth of cut and tool
-stickout. The tool manufacturer's data and the machinist govern.
+Pitch selection and cycle time. Blade speed and achievable feed rate are material and machine figures from the
+blade manufacturer's chart -- feed rate in particular depends on machine rigidity, blade tension, coolant, and
+blade condition, and it is the least predictable input here. The tile does not select blade width (which is set by
+the smallest radius to be cut and by the machine's wheel diameter), tooth form, set, or backing material, does not
+address break-in, blade tension, or guide adjustment, and does not compute blade life. It assumes a straight cut
+through a uniform section. The saw and blade manufacturers govern.

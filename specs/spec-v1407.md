@@ -1,69 +1,67 @@
-# roughlogic.com Specification v1407 -- Press Brake Bending Tonnage, Die Opening, and Flange Limits (calc-machining.js, Group E, machining and fabrication, 1 New Tile)
+# roughlogic.com Specification v1407 -- Bearing Regrease Quantity and Relubrication Interval (calc-shop.js, Group G, shop and industrial, 1 New Tile)
 
 > **Status: PROPOSED (2026-08-26). Single-tile spec.** Part of [scope-trade-expansion](scope-trade-expansion.md).
-> In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-machining.js`**
-> (Group E, machining and fabrication), no new module or dependency. Inherits spec.md through spec-v1349.md.
+> In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-shop.js`**
+> (Group G, shop and industrial), no new module or dependency. Inherits spec.md through spec-v1349.md.
 >
-> **The gap.** The catalog computes bend allowance and multi-bend flat patterns, but not whether the brake can make the bend. Tonnage, the die opening that sets it, the minimum flange the die opening permits, and the inside radius the die produces are one linked set of numbers, and getting the first one wrong bends the machine instead of the part.
+> **The gap.** The catalog computes bearing life, dynamic equivalent load, and sleeve-bearing PV, but nothing about the thing that actually kills most bearings, which is lubrication -- too little, too much, or too late. The quantity is a simple function of bearing size and the interval is a published relation in speed and bore, and neither is in the catalog.
 
 Repository: github.com/clay-good/roughlogic.com -- US standards only.
 
 ## 1. Inheritance and conventions
 
 The v14 dimensional lint, bounds-fuzzer, worked-example registry, and reviewer-signoff apply. The v18/v21
-contract: a non-positive thickness, die opening, bend length, or material factor, or a die opening below the material thickness, returns `{ error }`; no numeric field is ever `Infinity`. Citation discipline (v19/v22): the air-bending tonnage relation P = 575 t^2 / V for mild steel with a material factor, and the die-opening rules of thumb for minimum flange and natural inside radius, by name, `GOVERNANCE.general`.
+contract: a non-positive outside diameter, width, bore, or speed, or a computed interval at or below zero returns `{ error }`; no numeric field is ever `Infinity`. Citation discipline (v19/v22): the grease-quantity relation G = 0.005 x D x B (grams, millimetres) and the standard relubrication-interval relation for grease-lubricated rolling bearings, by name, `GOVERNANCE.general`.
 
 ## 2. The tile
 
-### 2.1 `press-brake-tonnage` -- Press Brake Bending Tonnage, Die Opening, and Flange Limits
+### 2.1 `bearing-regrease` -- Bearing Regrease Quantity and Relubrication Interval
 
 ```
-tons per foot   = 575 x t^2 / V x material factor      (t and V in inches)
-total tonnage   = tons per foot x bend length in feet
-die opening     = commonly 8 x t for mild steel up to about 1/4 in
-minimum flange  = about 0.75 x V
-inside radius   = about 0.156 x V   (air bending, mild steel)
+grease quantity (g) = 0.005 x outside diameter (mm) x width (mm)
+interval (hours)    = K x [ 14,000,000 / (rpm x sqrt(bore in mm)) - 4 x bore in mm ]
+                      K adjusts for bearing type, load, temperature, and orientation
 ```
 
-Air bending tonnage rises with the *square* of thickness and falls inversely with the die opening. Both halves
-matter. Doubling material thickness quadruples the tonnage; opening the die halves it. That trade -- more tonnage
-in a narrow die, less in a wide one -- is the central decision at the brake, and it is not free, because the die
-opening also sets the inside radius and the smallest flange the part can have.
+Two numbers and both are commonly wrong in the field. **Quantity** is proportional to the bearing's outside
+diameter times its width -- essentially to the free volume inside it -- and it comes out much smaller than people
+expect. Over-greasing is not conservative: excess grease is churned by the rolling elements, it heats, and it
+either bleeds out or cooks into a varnish that starves the bearing. A great many "lubrication failures" are
+over-lubrication.
 
-The minimum flange is the constraint that surprises people. A flange shorter than roughly three quarters of the
-die opening will not sit on both die shoulders, so it will not bend -- it slips into the vee and the part is
-scrap. On thick material in a wide die that minimum can be well over an inch, and a design with a half-inch
-flange in quarter-inch plate is simply not air-bendable in the ordinary way.
+**Interval** falls with speed and with bore. The relation gives the interval for a horizontal, moderately loaded
+bearing at normal temperature, and the correction factor `K` cuts it hard from there: roughly halve it for every
+15 degrees Celsius above about 70 C, halve it again for a vertical shaft, and cut it substantially for heavy load,
+contamination, or vibration. Two identical bearings in different service can have intervals a factor of ten apart.
 
-**Inputs:** material thickness, die opening (or the multiplier to derive it), bend length, material factor
-relative to mild steel, and the target inside radius.
+**Inputs:** bearing outside diameter, width, and bore (mm), operating speed, bearing type, and the correction
+factors for temperature, orientation, load, and environment.
 
-**Outputs:** tons per foot, total tonnage, die opening, minimum flange, natural inside radius, and the ratio of
-the achieved radius to the material thickness.
+**Outputs:** grease quantity in grams, base relubrication interval, corrected interval, and the interval expressed
+in operating days at a stated duty.
 
 ## 3. Worked example
 
-A 4 ft bend in 0.250 in mild steel in an 8t (2.000 in) die:
+A 6310 deep-groove ball bearing -- 110 mm outside diameter, 27 mm wide, 50 mm bore -- at 1,800 rpm, horizontal,
+normal temperature and load:
 
 ```
-tons per foot  = 575 x 0.250^2 / 2.000  = 17.97 tons/ft
-total tonnage  = 17.97 x 4              = 71.9 tons
-minimum flange = 0.75 x 2.000           = 1.50 in
-inside radius  = 0.156 x 2.000          = 0.312 in   (1.25 x material thickness)
+quantity = 0.005 x 110 x 27                              = 14.9 g
+interval = 14,000,000 / (1,800 x sqrt(50)) - 4 x 50
+         = 1,100 - 200                                   = 900 hours
 ```
 
-Seventy-two tons for a four-foot bend in quarter-inch plate, which most shop brakes will do. Now try to hold a
-tighter radius by moving to a 1.000 in die: the tonnage doubles to 35.9 tons per foot and 144 tons total -- past
-many brakes -- while the inside radius comes in to 0.156 in and the minimum flange drops to 0.75 in. And in the
-other direction, stainless at a material factor near 1.5 takes 108 tons in the original die, half again as much,
-for exactly the same geometry.
+Fifteen grams every nine hundred hours -- about five weeks of continuous running, or a quarter of a year on a
+single shift. Now put the same bearing on a vertical shaft in a hot room: halving for the orientation and halving
+again for temperature takes it to about 225 hours, monthly on a single shift, and a lubrication schedule built on
+the base number would be four times too slow.
 
 ## 4. Scope and non-goals
 
-Air bending, the common case. Bottoming and coining take several times the tonnage -- coining can take five to
-ten times -- and are not covered by this relation. The 575 coefficient is the customary-unit constant for mild
-steel of about 60,000 psi tensile; the material factor scales it, and it should come from the material's actual
-tensile strength rather than a remembered figure. Springback is not modeled and is real, particularly on
-high-strength material. The tile does not check the brake's tonnage-per-inch limit at the ram, which can be
-exceeded by a short heavy bend even when the total tonnage is fine, and does not address tooling capacity, part
-handling, or bend sequence. The press brake manufacturer's tonnage chart and the tooling supplier govern.
+Grease-lubricated rolling bearings in ordinary service. The interval relation is an industry approximation for a
+standard bearing type on a horizontal shaft at moderate load and temperature; the correction factors are judgment
+calls and the bearing manufacturer's own relubrication chart or software should be used where it exists. The tile
+does not select a grease -- base oil viscosity, thickener type, and compatibility with what is already in the
+bearing all matter, and **mixing incompatible greases can destroy a bearing faster than not greasing it at all**.
+It does not address oil lubrication, sealed-for-life bearings (which must not be regreased), grease relief and
+purge arrangements, or automatic lubricators. The bearing manufacturer governs.

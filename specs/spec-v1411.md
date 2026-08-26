@@ -1,70 +1,76 @@
-# roughlogic.com Specification v1411 -- Weld Metal Volume and Filler Metal Purchased per Joint (calc-fab.js, Group E, welding and fabrication, 1 New Tile)
+# roughlogic.com Specification v1411 -- Curtain Wall Mullion Deflection Limit and Required Stiffness (calc-construction.js, Group E, specialty trades, 1 New Tile)
 
 > **Status: PROPOSED (2026-08-26). Single-tile spec.** Part of [scope-trade-expansion](scope-trade-expansion.md).
-> In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-fab.js`**
-> (Group E, welding and fabrication), no new module or dependency. Inherits spec.md through spec-v1349.md.
+> In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-construction.js`**
+> (Group E, specialty trades), no new module or dependency. Inherits spec.md through spec-v1349.md.
 >
-> **The gap.** The catalog converts wire feed speed into a deposition rate -- how fast metal goes down -- but never answers the estimator's question, which is how many pounds a joint takes. That is a geometry problem (the weld's cross-section times its length) followed by a yield problem (deposition efficiency), and neither step is in the catalog.
+> **The gap.** Curtain wall and storefront are absent from the catalog. The number that governs a mullion is not strength -- aluminum mullions almost never fail in bending -- it is deflection, because the glass and the sealant cannot follow the frame. The required moment of inertia falls straight out of the span, the tributary width, and the deflection limit.
 
 Repository: github.com/clay-good/roughlogic.com -- US standards only.
 
 ## 1. Inheritance and conventions
 
 The v14 dimensional lint, bounds-fuzzer, worked-example registry, and reviewer-signoff apply. The v18/v21
-contract: a non-positive leg size, groove dimension, or weld length, or a deposition efficiency or deposition rate at or below zero, returns `{ error }`; no numeric field is ever `Infinity`. Citation discipline (v19/v22): the weld cross-sectional area relations for fillet and groove welds with a reinforcement allowance, the density of steel at 0.284 lb per cubic inch, and the published deposition efficiency by process, by name, `GOVERNANCE.general`.
+contract: a non-positive span, tributary width, design pressure, or elastic modulus, or a deflection-limit divisor at or below zero returns `{ error }`; no numeric field is ever `Infinity`. Citation discipline (v19/v22): the AAMA deflection limits for framing members supporting glass (L/175 for spans to 13 ft 6 in, L/240 plus 1/4 in beyond) and the simple-span uniform-load deflection relation, by name, `GOVERNANCE.general`.
 
 ## 2. The tile
 
-### 2.1 `filler-metal-consumption` -- Weld Metal Volume and Filler Metal Purchased per Joint
+### 2.1 `curtain-wall-mullion-deflection` -- Curtain Wall Mullion Deflection Limit and Required Stiffness
 
 ```
-fillet area      = leg^2 / 2 x (1 + reinforcement allowance)
-groove area      = from the groove geometry (root opening, included angle, thickness) plus reinforcement
-weld volume      = area x weld length
-deposited weight = volume x 0.284 lb per cubic inch
-purchased weight = deposited weight / deposition efficiency
-arc hours        = deposited weight / deposition rate
+line load w      = design wind pressure x tributary width
+deflection limit = span / 175                    for spans up to 13 ft 6 in
+                 = span / 240 + 0.25 in          for longer spans
+required I       = 5 w L^4 / (384 E x deflection limit)      simple span, uniform load
+bending moment   = w L^2 / 8
 ```
 
-Two steps, and estimators routinely conflate them. **Deposited** weight is what ends up in the joint, and it is
-pure geometry. **Purchased** weight is what you buy, and it is larger by the deposition efficiency -- roughly 95%
-for solid wire under gas, 85% for flux-cored, and as low as 60% for stick electrodes once the stub loss is
-counted. Ordering by deposited weight is how a job runs out of wire.
+A mullion is a simple beam spanning floor to floor, loaded by the wind pressure on the glass either side of it --
+so the line load is the pressure times the tributary width, half a bay each way. Aluminum's elastic modulus is
+about 10 million psi, a third of steel's, which is why aluminum framing is deflection-governed almost without
+exception: it has plenty of strength and not much stiffness.
 
-The leg-squared term is what makes fillet sizing consequential. A 5/16 fillet has 56% more weld metal than a 1/4
-fillet, and a 3/8 has 125% more -- for a joint whose strength requirement may have been satisfied at 1/4. Oversized
-fillets are the most common and most expensive habit in a fab shop, and this tile prices the habit in pounds and
-in arc hours.
+The deflection limit is not comfort. Glass is rigid and its sealant joints have limited movement capacity, so a
+frame that deflects too far either breaks the glass or opens the seal and leaks. AAMA sets L/175 for framing
+supporting glass on ordinary spans, and switches to L/240 plus a quarter inch on long ones -- because on a very
+long span a pure ratio would allow a deflection larger than any sealant can accommodate.
 
-**Inputs:** weld type and geometry (fillet leg size, or groove dimensions), weld length, reinforcement allowance,
-deposition efficiency for the process, deposition rate (lb/hr), and filler price per pound.
+Note how hard span drives it. Deflection goes as `L^4` while the allowance goes as `L`, so required stiffness
+scales as `L^3`: a mullion spanning 13 ft rather than 10 ft needs `(13/10)^3 = 2.2` times the moment of inertia,
+and more still past 13 ft 6 in where the limit tightens to L/240 plus a quarter inch. Floor-to-floor height is the
+single most consequential input in a curtain wall's framing cost.
 
-**Outputs:** weld cross-sectional area, weld metal volume, deposited weight, purchased weight, arc hours, and
-filler cost per joint.
+**Inputs:** mullion span, tributary width, design wind pressure, elastic modulus, deflection-limit rule.
+
+**Outputs:** line load, allowable deflection, required moment of inertia, bending moment, and the required section
+modulus at a stated allowable stress.
 
 ## 3. Worked example
 
-A 5/16 in fillet, 100 ft long, 10% reinforcement, flux-cored at 85% deposition efficiency and 8 lb/hr:
+A 10 ft (120 in) mullion span at 5 ft tributary width, 30 psf design wind, aluminum at E = 10,000,000 psi:
 
 ```
-area       = 0.3125^2 / 2 x 1.10   = 0.0537 sq in
-volume     = 0.0537 x 1,200 in     = 64.5 cubic in
-deposited  = 64.5 x 0.284          = 18.3 lb
-purchased  = 18.3 / 0.85           = 21.5 lb
-arc hours  = 18.3 / 8              = 2.29 hr
+line load   = 30 x 5              = 150 lb/ft = 12.5 lb/in
+limit       = 120 / 175           = 0.686 in
+required I  = 5 x 12.5 x 120^4 / (384 x 10e6 x 0.686) = 4.92 in^4
+moment      = 12.5 x 120^2 / 8    = 22,500 in-lb
 ```
 
-Now check the oversizing cost. If the drawing called for a 1/4 in fillet and the welder laid 5/16, the deposited
-weight should have been 11.7 lb and the arc time 1.46 hr -- so the extra sixteenth of an inch cost 6.6 lb of wire
-and 50 minutes of arc time on a single hundred-foot weld. Across a shop, that difference is a line on the profit
-and loss statement.
+Just under five cubic inches to the fourth of moment of inertia, from a wind pressure most people would call
+modest. Push the span to 13 ft (156 in) at the same pressure and tributary width and the required I goes to
+10.8 in^4 -- more than double, for a 30% longer span. That is the cube law, and it is why curtain wall sections
+get visibly deeper as floor heights rise.
 
 ## 4. Scope and non-goals
 
-Geometry and yield, not procedure. It does not size the weld -- required fillet size and groove detail come from
-the design and from the applicable code (AWS D1.1 for structural steel), and undersizing a weld to save wire is a
-structural failure, not a saving. Deposition efficiencies and rates are process and operator figures; published
-values are typical and a shop should measure its own. The tile does not include tack welds, root passes run at a
-different size, repairs and rework, or the arc-on fraction that converts arc hours into shift hours (the shielding
-gas tile carries that). It assumes carbon steel density. The welding procedure specification, the applicable AWS
-code, and the welding engineer govern.
+**A screening calculation, not a curtain wall design.** It treats one mullion as a simply supported beam under a
+uniform load and ignores continuity, the anchor conditions, the differential movement between floors that the
+anchors must accommodate, and the torsion a pressure-plate system puts into an unsymmetric section. Aluminum
+sections are thin-walled and often need to be checked for local buckling and for torsional behavior, neither of
+which a moment of inertia captures. The required-moment-of-inertia arithmetic itself is the ordinary simple-span
+relation the catalog's `steel-inertia-for-deflection` tile carries; what this tile adds is the AAMA two-part
+deflection limit and the tributary-width conversion that a framing member supporting glass is judged by. It does
+not compute design wind pressure, which is an ASCE 7 component-and-cladding calculation, does not check strength, thermal movement, water management, condensation,
+or the anchor and embed design, and does not address the testing (AAMA 501 and the ASTM E283/E331/E330 series)
+that qualifies a real system. Curtain wall is engineered, tested, and stamped. AAMA, the system manufacturer, the
+structural engineer, and the AHJ govern.

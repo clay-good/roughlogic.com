@@ -1,68 +1,76 @@
-# roughlogic.com Specification v1409 -- Shielding Gas Flow, Consumption, and Cylinder Duration (calc-fab.js, Group E, welding and fabrication, 1 New Tile)
+# roughlogic.com Specification v1409 -- Hydraulic Reservoir Size and Cooler Heat Rejection (calc-shop.js, Group G, shop and industrial, 1 New Tile)
 
 > **Status: PROPOSED (2026-08-26). Single-tile spec.** Part of [scope-trade-expansion](scope-trade-expansion.md).
-> In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-fab.js`**
-> (Group E, welding and fabrication), no new module or dependency. Inherits spec.md through spec-v1349.md.
+> In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-shop.js`**
+> (Group G, shop and industrial), no new module or dependency. Inherits spec.md through spec-v1349.md.
 >
-> **The gap.** The catalog computes oxy-fuel cutting gas consumption and welder duty cycle but never the shielding gas a wire process actually burns, which is the consumable a shop reorders most often and budgets for least well. The chain from flow rate through arc-on time to cylinder duration is three multiplications and it is not in the catalog.
+> **The gap.** The catalog computes hydraulic pump flow, drive horsepower, cylinder force, line velocity, and accumulator volume -- the whole circuit except the two things that keep it from cooking itself. Reservoir size and cooler capacity both come from the same number, the power the system turns into heat, and neither is in the catalog.
 
 Repository: github.com/clay-good/roughlogic.com -- US standards only.
 
 ## 1. Inheritance and conventions
 
 The v14 dimensional lint, bounds-fuzzer, worked-example registry, and reviewer-signoff apply. The v18/v21
-contract: a non-positive flow rate, shift length, or cylinder volume, or a duty fraction or waste fraction outside 0-1, returns `{ error }`; no numeric field is ever `Infinity`. Citation discipline (v19/v22): the shielding-gas consumption relation (flow rate times arc-on time) and the standard high-pressure cylinder volumes, by name, `GOVERNANCE.general`.
+contract: a non-positive flow, pressure, or efficiency, an efficiency or heat fraction outside 0-1, or a reservoir multiplier at or below zero returns `{ error }`; no numeric field is ever `Infinity`. Citation discipline (v19/v22): the reservoir sizing convention (a multiple of pump flow per minute) and the heat-rejection relation from system inefficiency at 2,545 BTU/hr per horsepower, by name, `GOVERNANCE.general`.
 
 ## 2. The tile
 
-### 2.1 `shielding-gas-consumption` -- Shielding Gas Flow, Consumption, and Cylinder Duration
+### 2.1 `hydraulic-reservoir-cooler` -- Hydraulic Reservoir Size and Cooler Heat Rejection
 
 ```
-arc-on hours    = shift hours x arc-on (duty) fraction
-gas consumed    = flow rate (cfh) x arc-on hours
-with waste      = gas consumed x (1 + waste fraction)
-cylinder life   = cylinder volume / gas consumed per shift
-cost per arc hr = cylinder cost / cylinder volume x flow rate
+hydraulic hp    = gpm x psi / 1,714
+input hp        = hydraulic hp / pump efficiency
+heat generated  = input hp x heat fraction
+heat (BTU/hr)   = heat hp x 2,545
+reservoir       = pump flow x reservoir multiplier      (3x gpm industrial, 1 to 2x mobile)
+cooler duty     = heat generated - reservoir dissipation
 ```
 
-Shielding gas is billed by the cylinder and consumed by the hour, and the bridge between them is *arc-on* time,
-not shift time. A welder who is 60% arc-on across an eight-hour shift is running gas for less than five hours, and
-a shop that estimates on shift hours will over-order by two thirds.
+Everything a hydraulic system does that is not useful work becomes heat in the oil: pressure drop across valves
+and lines, relief-valve flow, pump and motor inefficiency. A quarter of input power is a common figure for a
+system with ordinary metering losses, and on a system that spends much of its cycle over relief it is far more.
 
-The waste fraction is not a rounding allowance. Pre-flow and post-flow, purging a long gun line at every start,
-and the surge that occurs when the trigger is pulled against a regulator set on a cold cylinder all consume gas
-that never shields anything, and on short-arc work with many starts it can be a fifth of the total. Turning the
-flow up to fix porosity makes it worse and usually makes the porosity worse too, by pulling air into a turbulent
-gas stream.
+The reservoir does three jobs -- de-aerate, settle contamination, and shed heat -- and the classic industrial rule
+of three times the pump's per-minute flow is really a *dwell time* rule: it gives the oil about three minutes in
+the tank to release entrained air before it goes around again. Mobile equipment cannot carry that much oil and
+runs one to two times instead, which is exactly why mobile systems need coolers and industrial power units often
+do not.
 
-**Inputs:** flow rate (cfh), shift hours, arc-on fraction, waste fraction, cylinder volume (cf), cylinder cost,
-number of welders.
+The last line is the design decision. Whatever heat the reservoir cannot shed at the acceptable oil temperature,
+a cooler must -- and if neither does it, the oil temperature climbs until the viscosity falls far enough that
+leakage losses balance the input, which is a stable and destructive equilibrium.
 
-**Outputs:** arc-on hours, gas consumed per shift with and without waste, shifts per cylinder, cost per arc hour,
-and cost per shift for the shop.
+**Inputs:** pump flow (gpm), system pressure (psi), pump and drive efficiency, heat fraction, reservoir
+multiplier, reservoir dissipation at the design oil temperature.
+
+**Outputs:** hydraulic and input horsepower, heat generated in hp and BTU/hr, reservoir volume, and the required
+cooler duty.
 
 ## 3. Worked example
 
-One welder at 35 cfh, 60% arc-on over an 8 hour shift, 15% waste, on a 251 cf cylinder:
+A 20 gpm pump at 2,000 psi, 85% pump efficiency, 25% of input turning to heat, industrial 3x reservoir, tank
+shedding 4,000 BTU/hr at the design temperature:
 
 ```
-arc-on hours  = 8 x 0.60      = 4.8 hr
-gas consumed  = 35 x 4.8      = 168 cf
-with waste    = 168 x 1.15    = 193 cf
-cylinder life = 251 / 193     = 1.30 shifts
+hydraulic hp = 20 x 2,000 / 1,714  = 23.3 hp
+input hp     = 23.3 / 0.85         = 27.5 hp
+heat         = 27.5 x 0.25         = 6.9 hp = 17,469 BTU/hr
+reservoir    = 20 x 3              = 60 gal
+cooler duty  = 17,469 - 4,000      = 13,469 BTU/hr
 ```
 
-A cylinder and a third per welder per shift -- so a five-welder shop is changing more than six cylinders a day
-and needs the delivery schedule to match. Now drop the flow from 35 cfh to 25, which is adequate for most indoor
-short-arc work: consumption falls to 138 cf and the cylinder lasts 1.82 shifts, a 29% reduction in gas cost from
-turning a knob. The flow rate is the single largest lever, and it is almost always set too high.
+Thirteen and a half thousand BTU per hour into a cooler -- a real heat exchanger and a real fan, not an
+afterthought. And note what the heat fraction does: a system designed so that only 15% of input becomes heat needs
+`27.5 x 0.15 x 2,545 = 10,482` BTU/hr of rejection and a cooler barely half the size. Circuit design, not cooler
+selection, is where hydraulic heat is actually controlled.
 
 ## 4. Scope and non-goals
 
-Consumption arithmetic. It does not recommend a flow rate, which depends on the process, the nozzle size, the
-gas mixture, the joint configuration, and above all on drafts -- outdoor or fan-exposed work needs more gas or a
-different process entirely, and no flow rate saves a gas-shielded weld in real wind. Cylinder volumes vary by
-supplier and by gas; nominal sizes are not standardized across the industry. The tile does not address gas
-mixture selection, regulator and flowmeter calibration (a flowmeter reading is only correct for the gas it was
-calibrated on), cylinder handling and storage, or the confined-space asphyxiation hazard that shielding gas
-presents. The gas supplier and the welding procedure govern.
+Steady-state heat balance at one operating point. Real duty cycles are not steady -- a machine that runs over
+relief for part of its cycle and unloaded for the rest needs a weighted average, and sizing on the worst instant
+buys a cooler that is never needed. The heat fraction is an estimate and should be replaced by a measured oil
+temperature rise where one exists. Reservoir dissipation depends on surface area, air movement, and the
+temperature difference to ambient, and a tank in a hot enclosed space sheds almost nothing. The tile does not size
+the cooler itself, select between air and water cooling, address filtration, reservoir baffling and
+suction/return separation, suction-line NPSH, or the fluid's viscosity limits at startup temperature. The
+component manufacturers and the fluid supplier govern.

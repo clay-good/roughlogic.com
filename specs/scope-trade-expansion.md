@@ -46,10 +46,34 @@ keyseat size, weld heat input, line-set charge adder, dryer exhaust developed le
 leakage CFM25, step-and-touch voltage, conductor thermal withstand, motor starting voltage dip,
 cable tray fill, abrasive blast consumption, and engine displacement.
 
+That first screen was keyword-based and it was not good enough. A second pass -- token-overlap
+scoring of every proposed tile's id and name against every one of the 1,708 catalog rows, then
+reading the description of each close match -- found **nine duplicates the keyword sweep had
+missed**. A keyword probe does not match across hyphenation ("arc flash" against "Arc-Flash"), and
+reading only the top two hits of a long list hides the third. All nine were cut:
+
+| Cut | Already in the catalog as |
+| --- | --- |
+| chip load and feed rate | `radial-chip-thinning` |
+| reaming stock allowance | `reaming-drill-allowance` |
+| press-fit interference | `press-fit-pressure` |
+| press brake tonnage | `press-brake-tonnage` (the same id) |
+| shielding gas consumption | `shielding-gas-runtime` |
+| filler metal per joint | `weld-metal-volume` |
+| compressor capacity derate | `compressor-volumetric-efficiency` |
+| arc-flash incident energy | `arc-flash-screen` |
+| freestanding sign wind | `wind-solid-sign` |
+
+Their spec numbers were reused for nine verified-new tiles: band saw blade pitch, tube bend wall
+thinning, ISO 1940 balance grade, bearing regrease interval, hydraulic reservoir and cooler duty,
+curtain wall mullion deflection, refrigerant leak rate against the EPA threshold, IEEE 80 ground
+grid conductor sizing, and attached canopy uplift.
+
 Adjacent math is **not** a duplicate. A tile is a duplicate only when it answers the same field
-question. That is why press-fit interference earns a spec even though the catalog has shrink-fit
-adjacent math, and why filler-metal weight per joint earns one even though deposition rate exists:
-one answers "how fast does the wire melt," the other "how many pounds do I buy for this joint."
+question. That is why the ground-grid conductor tile earns a spec alongside three existing IEEE 80
+tiles, and why the curtain wall mullion tile earns one even though the catalog carries a general
+required-moment-of-inertia tile: one is an engineer sizing a beam, the other is a glazier against an
+AAMA limit. Where two tiles sit close, the new spec names the existing one and says what it adds.
 
 ## 3. What is in scope, and the lines that hold
 
@@ -75,13 +99,19 @@ The v106 boundary is unchanged and every tile in this program sits inside it:
 | v1377-v1385 | Trucking and logistics | J | `calc-trucking.js` |
 | v1386-v1393 | Fire-ground and fire protection | F | `calc-fire.js`, `calc-firesprinkler.js` |
 | v1394-v1401 | Field, survey, and SAR | P | `calc-field.js`, `calc-survey.js` |
-| v1402-v1408 | Machining and fabrication | E / K | `calc-machining.js`, `calc-fab.js` |
-| v1409-v1412 | Welding | E | `calc-fab.js` |
+| v1402-v1405 | Machining and fabrication | E | `calc-machining.js`, `calc-fab.js` |
+| v1406-v1409 | Rotating equipment and hydraulics | G | `calc-shop.js` |
+| v1410, v1412 | Welding | E | `calc-fab.js` |
+| v1411 | Curtain wall | E | `calc-construction.js` |
 | v1413-v1419 | HVAC and refrigeration service | C | `calc-refrigerant.js`, `calc-hvacservice.js` |
-| v1420-v1424 | Electrical power system | A | `calc-elecdesign.js`, `calc-powerquality.js` |
-| v1425-v1434 | Specialty trades | E / G | `calc-construction.js`, `calc-cross.js` |
-| v1435-v1444 | Industrial and finishing | G | `calc-shop.js`, `calc-cross.js` |
-| v1445-v1449 | Restoration and finish trades | D / E | `calc-restoration.js`, `calc-finish.js` |
+| v1420-v1424 | Electrical power system | A | `calc-elecdesign.js` |
+| v1425-v1434 | Specialty trades | E / G / K | `calc-construction.js`, `calc-shop.js`, `calc-mechanic.js` |
+| v1435-v1444 | Industrial and finishing | G | `calc-shop.js` |
+| v1445-v1446 | Restoration | D | `calc-restoration.js` |
+| v1447-v1449 | Finish trades | E | `calc-finish.js` |
+
+The bands drifted from their original plan when the second duplicate audit forced nine
+replacements; this table is the actual assignment, not the intended one.
 
 ## 5. Conventions every tile in the program inherits
 
