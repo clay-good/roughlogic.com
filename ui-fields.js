@@ -280,7 +280,37 @@ function primeExamplePlaceholders(host, fillFn, seeded) {
   if (!seeded && out && typeof MutationObserver === "function") {
     const obs = new MutationObserver(() => restoreOutputs(untouched));
     obs.observe(out, { childList: true, subtree: true, characterData: true });
-    setTimeout(() => { restoreOutputs(untouched); obs.disconnect(); }, DEBOUNCE_MS * 4);
+    // Stop watching when the READER acts, not when a timer expires.
+    //
+    // This used to disconnect after DEBOUNCE_MS * 4 -- 200 ms -- which is
+    // ample for a debounced synchronous compute and far too short for a
+    // WORKER. manual-j-cooling posts to manual-j-worker.js, so its answer
+    // landed after the observer had gone and stood there: the tile opened
+    // showing "Total cooling load: 460 BTU/hr" computed from the
+    // trade-convention design temps alone, before the reader had entered a
+    // single area. Deterministic, 8 opens out of 8. The catalog-wide gate
+    // that asserts a tile "answers nothing until asked" reads the region on
+    // its own schedule, so it caught this only intermittently.
+    //
+    // Waiting for a real input event is both correct and safe: `untouched()`
+    // already stops the restore the moment a field differs from what priming
+    // put back, so a longer watch can never overwrite the reader's own answer.
+    let timer = 0;
+    const stop = () => {
+      restoreOutputs(untouched);
+      obs.disconnect();
+      host.removeEventListener("input", stop, true);
+      host.removeEventListener("change", stop, true);
+      clearTimeout(timer);
+    };
+    // Capture phase: the tile's restore events do not bubble, and neither do
+    // some renderers' own. Capture sees them either way. These listeners are
+    // attached AFTER the restore above has already fired its events, so the
+    // guard never trips on its own writes.
+    host.addEventListener("input", stop, true);
+    host.addEventListener("change", stop, true);
+    // A backstop so the observer cannot outlive a view the reader abandoned.
+    timer = setTimeout(stop, 8000);
   }
 }
 
