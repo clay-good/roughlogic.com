@@ -2171,9 +2171,13 @@ cross-check.
 | calc-feeder.js | `computeTransformerConductorProtection` | `{ kva = 0, primary_v = 0, secondary_v = 0, phase = 3, secondary_protection = ...` | _ | _ | _ |
 | calc-field.js | `computeBackcountryNeeds` | `{ body_weight_lb = 0, ambient_band = "moderate", exertion = "moderate", trip_...` | _ | _ | _ |
 | calc-field.js | `computeBearingConversion` | `{ declination_deg = 0, bearing_deg = 0, direction = "magnetic_to_true" }` | _ | _ | _ |
+| calc-field.js | `computeContourSlope` | `{ contour_interval_ft = 0, intervals_crossed = 0, map_distance_in = 0, repres...` | _ | _ | _ |
+| calc-field.js | `computeHelicopterLzSizing` | `{ rotor_diameter_ft = 0, size_factor = 2, measured_clear_ft = 0, ground_slope...` | _ | _ | _ |
 | calc-field.js | `computeHikingTime` | `{ distance = 0, distance_unit = "km", ascent = 0, ascent_unit = "m", speed = ...` | _ | _ | _ |
 | calc-field.js | `computeLightningCountdown` | `{ flash_to_bang_s = 0 } = {}` | _ | _ | _ |
+| calc-field.js | `computeLitterCarryTeam` | `{ distance_mi = 0, pace_mph = 1.0, carriers_per_litter = 6, duty_fraction = 0...` | _ | _ | _ |
 | calc-field.js | `computeMagneticDeclination` | `` | _ | _ | _ |
+| calc-field.js | `computeMapScaleConversion` | `{ representative_fraction = 24000, map_distance_in = 0, map_area_sqin = 0 } = {}` | _ | _ | _ |
 | calc-field.js | `computePacing` | `{ calibration_distance_ft = 0, calibration_paces = 0, current_paces = 0, terr...` | _ | _ | _ |
 | calc-field.js | `computeSearchProbability` | `{ pod_list = [], poa_pct = 100 } = {}` | _ | _ | _ |
 | calc-field.js | `computeSlopeAvalanche` | `{ rise_ft = 0, run_ft = 0, measured_angle_deg = 0 }` | _ | _ | _ |
@@ -3251,12 +3255,15 @@ cross-check.
 | calc-survey.js | `computeDifferentialLeveling` | `{ bm_elev = 0, bs, fs, known_close = null } = {}` | _ | _ | _ |
 | calc-survey.js | `computeDistanceDistanceIntersect` | `{ n0_ft = 0, e0_ft = 0, dist0_ft = 0, n1_ft = 0, e1_ft = 0, dist1_ft = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeEdmSlopeReduction` | `{ angle_mode, slope_distance_ft = 0, angle_deg = 0, hi_ft = 0, hr_ft = 0 } = {}` | _ | _ | _ |
+| calc-survey.js | `computeGradeRodCutFill` | `{ benchmark_elev_ft = 0, backsight_ft = 0, design_elev_ft = 0, ground_rod_ft ...` | _ | _ | _ |
 | calc-survey.js | `computeGridToGround` | `{ grid_distance_ft = 0, grid_scale_factor = 1, ellipsoid_height_ft = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeLevelLoopAdjustment` | `{ elevs, dists, known_close = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeLevelingCurvatureRefraction` | `{ sight_distance_ft = 0 } = {}` | _ | _ | _ |
+| calc-survey.js | `computeSlopeStaking` | `{ half_width_ft = 0, depth_ft = 0, side_slope_ratio = 2, ground_cross_slope =...` | _ | _ | _ |
 | calc-survey.js | `computeStadiaDistance` | `{ s_ft = 0, theta_deg = 0, k_f = 100, hi_ft = 0, rod_ft = 0, sta_elev = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeTapingCorrections` | `{ l_ft = 0, t_f = 68, t0_f = 68, h_ft = 0, p_lb = 0, p0_lb = 0, a_in2 = 0, w_...` | _ | _ | _ |
 | calc-survey.js | `computeTapingNormalTension` | `{ span_ft = 100, tape_weight_plf = 0.02, tape_area_in2 = 0.006, standard_pull...` | _ | _ | _ |
+| calc-survey.js | `computeThreePointResection` | `{ ax = 0, ay = 0, azimuth_to_a_deg = 0, bx = 0, by = 0, azimuth_to_b_deg = 0,...` | _ | _ | _ |
 | calc-survey.js | `computeTraverseClosure` | `{ courses, n0 = 0, e0 = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeBodTssLoadingRemoval` | `{ flow_mgd = 0, influent_mgl = 0, effluent_mgl = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeBreakpointChlorination` | `{ total_ppm = 0, free_ppm = 0, ratio = 10, gallons = 0, avail = 0 } = {}` | _ | _ | _ |
@@ -3418,7 +3425,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2004.
+Row count: 2011.
 
 <!-- END function-corpus-v14 -->
 
@@ -5125,7 +5132,7 @@ per spec-v14 §13.1 second paragraph.
 | `warewasher-hot-water` | Warewasher Hot-Water Demand and Booster Sizing | Project (first-principles); 500.4 BTU/hr per gpm-degree F | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `yield-ep` | Yield Percentage and Edible Portion | Project (first-principles) over Culin...; 10 lb AP / 1.5 lb trim / 15% cooking loss / $8/lb -> 72.2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group P Field (28 tiles)
+### Group P Field (35 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5135,26 +5142,33 @@ per spec-v14 §13.1 second paragraph.
 | `bearing-conversion` | Magnetic Declination and Bearing Conversion | Project (first-principles); true = magnetic + east declination = 280 + 12 = 292 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cogo-forward-point` | COGO Forward Locate (Bearing and Distance) | Coordinate geometry (Ghilani & Wolf; ...; dN = 200 cos45 = 141.421; dE = 200 sin45 = 141.421; N2 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cogo-inverse-locate` | COGO Inverse (Two Points to Bearing and Distance) | Coordinate geometry (Ghilani & Wolf; ...; dN = 141.42, dE = 141.42; distance = sqrt(141.42^2 x 2) =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `contour-slope` | Slope and Grade from Contour Lines | Project (first-principles); rise over scaled run | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `differential-leveling` | Differential Leveling (HI Method) and Loop Misclosure | Height-of-instrument leveling (Ghilan...; spec-v311 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `distance-distance-intersection` | Distance-Distance (Swing-Tie) Intersection | Euclidean geometry / trilateration (G...; d = 100 ft; a = (70.711^2 - 70.711^2 + 100^2)/(2*100) = 5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `edm-slope-reduction` | Total-Station Slope-to-Horizontal Reduction | Ghilani, Elementary Surveying (plane-...; H = 250 sin86 = 249.391 ft; V = 250 cos86 = 17.439 ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `grade-rod-cut-fill` | Grade Rod, Cut, and Fill from One Setup | Project (first-principles); grade rod = HI - design elevation | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `grid-to-ground` | State-Plane Grid-to-Ground Distance | NGS State Plane Coordinate System; EF = 20906000/20911280 = 0.9997475; CF = 0.9999 x 0.99974... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `helicopter-lz-sizing` | Helicopter Landing Zone Size, Slope, and Approach | Project (first-principles); size, slope, and approach | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hiking-time` | Hiking Time (Naismith's Rule) | Naismith's rule (W. W. Naismith, 1892); 6 mi at 3 mph = 2.00 hr flat; 2000 ft (609.6 m) of ascent... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `level-loop-adjustment` | Level-Loop Misclosure Distribution (Compass Rule) | Compass-rule level-loop adjustment (G...; spec-v631 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `leveling-curvature-refraction` | Leveling Curvature-and-Refraction Correction | Ghilani, Elementary Surveying (leveli...; K = 2.0; h_cr = 0.0206 x 4 = 0.0824 ft (curvature 0.0956 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lightning-countdown` | Lightning 30-30 Rule Countdown | NOAA / NWS; Public NWS lightning-safety guideline | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `litter-carry-team` | Litter Carry Team Size, Rotation, and Effort | Project (first-principles); teams = ceil(1 / duty fraction) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `magnetic-declination` | Magnetic Declination (WMM2025) | NOAA NCEI; Bundled at data/field/wmm/coefficients.json (verbatim fro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `map-scale-conversion` | Map Scale: Distance, Area, and Representative Fraction | Project (first-principles); RF / 12, squared for area | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pacing-distance` | Pacing and Distance | Project (first-principles); 100 ft over 38 paces / 120 current paces / flat -> pace 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `search-probability` | Search Probability of Detection | SAR search theory (Koopman) / Nationa...; POD 30/40/50%, POA 60% -> cum POD 79%, POS 47.4% | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `search-track-spacing` | Search Track Spacing and Coverage | NSARC / USCG search theory (exponenti...; 100 m sweep width, 50 m spacing -> coverage 2.0, POD 86% | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `searcher-hours` | Search Effort in Searcher-Hours | NSARC / USCG search-planning practice; 160 acres at 40 ft spacing -> 33 mi of track line; at 1.5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `slope-avalanche` | Slope Angle and Avalanche Risk Window | American Avalanche Association / NWS ...; Measured 32 deg -> 62.49% slope, in_avalanche_window true... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `slope-staking` | Slope Stake Catch Point on a Cross Slope | Project (first-principles); d = half-width + H s / (1 - s g) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `solar-times` | Sunrise, Sunset, and Civil Twilight | NOAA Solar Position Algorithm (SPA, p...; 40 N / -105 W / 2026-06-21 (summer solstice) / -6 UTC -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `stadia-distance` | Stadia Tacheometry (Distance and Elevation) | Stadia tacheometry (K = 100); spec-v312 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sweat-rate-hydration` | Sweat Rate and Fluid Replacement | ACSM / NATA fluid-replacement (weigh-...; 180 lb pre, 177 lb post, 20 oz drunk, 2 hr -> 68 oz sweat... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sweep-width-correction` | Sweep Width Correction (Weather, Speed, Fatigue) | IAMSAR Manual Vol. II / US National S...; 120 ft raw width, weather 0.5, speed 1.0, fatigue 0.9 -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `taping-corrections` | Steel Tape Distance Corrections (Temperature, Slope, Tension, Sag) | Steel-tape corrections (Ghilani/Wolf); spec-v313 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `taping-normal-tension` | Normal Tension for a Suspended Steel Tape | standard surveying references (Ghilan...; A 100 ft span of tape at 0.02 lb/ft weighs W = 2 lb; A E ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `three-point-resection` | Two-Bearing Resection | Project (first-principles); back-azimuth intersection | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `traverse-closure` | Traverse Closure and Adjustment | FM 5-233 Construction Surveying (by n...; Closed four-course traverse (200 N, 300 E, 200 S, 299.9 W... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `utm-conversion` | UTM and Lat-Lon Conversion | USGS / NGA WGS84 UTM forward (project...; lat 40 N / lon 105 W (central meridian of zone 13) -> zon... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
@@ -5344,6 +5358,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1753. Fixture-covered or reference-cadence: 1753 / 1753.
+Tile count: 1760. Fixture-covered or reference-cadence: 1760 / 1760.
 
 <!-- END tile-index-v14 -->

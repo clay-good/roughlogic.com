@@ -1256,3 +1256,232 @@ function renderHikingTime(inputRegion, outputRegion, citationEl) {
   for (const f of [dunit.select, aunit.select]) f.addEventListener("change", update);
 }
 FIELD_RENDERERS["hiking-time"] = renderHikingTime;
+
+// ===========================================================================
+// spec-v1397, v1398, v1400, v1401: the field half of the 2026-08-26
+// trade-expansion Group P band. See specs/scope-trade-expansion.md.
+// (The surveying half -- resection, slope staking, grade rod -- lives in
+// calc-survey.js. spec-v1399 was cut as a duplicate of the existing
+// haversine tile, which already reports great-circle distance and bearing.)
+// ===========================================================================
+
+// ===================== spec-v1397: map scale distance and area =====================
+// dims: in { args: dimensionless } out: { ft_per_inch: L, ground_distance_ft: L, ground_area_acres: L^2, acres_per_sq_inch: L^2 }
+export function computeMapScaleConversion({ representative_fraction = 24000, map_distance_in = 0, map_area_sqin = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(representative_fraction > 0)) return { error: "Representative fraction must be positive (24000 for a 1:24,000 map)." };
+  if (!(map_distance_in >= 0)) return { error: "Measured map distance cannot be negative." };
+  if (!(map_area_sqin >= 0)) return { error: "Measured map area cannot be negative." };
+  if (!(map_distance_in > 0 || map_area_sqin > 0)) return { error: "Enter a measured distance, a measured area, or both." };
+  // Scale enters AREA as its SQUARE: a map at four times the denominator covers
+  // sixteen times the ground per square inch, not four.
+  const ft_per_inch = representative_fraction / 12;
+  const ground_distance_ft = map_distance_in * ft_per_inch;
+  const ground_distance_mi = ground_distance_ft / 5280;
+  const sqft_per_sq_inch = ft_per_inch * ft_per_inch;
+  const acres_per_sq_inch = sqft_per_sq_inch / 43560;
+  const ground_area_sqft = map_area_sqin * sqft_per_sq_inch;
+  const ground_area_acres = map_area_sqin * acres_per_sq_inch;
+  if (![ft_per_inch, ground_distance_ft, ground_distance_mi, acres_per_sq_inch, ground_area_acres].every(Number.isFinite)) return { error: "Map-scale math is not a finite value." };
+  return {
+    ft_per_inch,
+    ground_distance_ft,
+    ground_distance_mi,
+    acres_per_sq_inch,
+    ground_area_sqft,
+    ground_area_acres,
+    note: "Ground distance and ground area from something measured off a map at a stated scale. A representative fraction of 1:24,000 means one unit on the map is 24,000 of the same units on the ground, and because the fraction is unitless the conversion to feet per inch is just a division by twelve -- which is why the standard 7.5-minute quadrangle gives 2,000 ft per inch, and where the old rule about an inch being roughly a third of a mile comes from. Area is where it goes wrong. Scale enters area SQUARED, so a map at twice the scale denominator does not cover twice the ground per square inch, it covers four times. On a 1:24,000 quadrangle one square inch is 91.83 acres; on a 1:100,000 sheet the same square inch is 1,594 acres, seventeen times more, for a scale that is only about four times smaller. Anyone estimating a burn area, a search segment, or a parcel off a map without squaring the scale will be off by a large multiple, and the error is always in the direction of underestimating the bigger sheet. Measuring 3.5 in along a route on a quadrangle is 7,000 ft or 1.33 mi, and a 2.4 sq in polygon planimetered off the same sheet is 220 acres -- but 3,826 acres off the 1:100,000 sheet, from the same pencil marks. A measurement aid; the map's own scale bar, its datum, and a GIS measurement govern anything that matters.",
+  };
+}
+
+export const mapScaleConversionExample = { inputs: { representative_fraction: 24000, map_distance_in: 3.5, map_area_sqin: 2.4 } };
+
+FIELD_RENDERERS["map-scale-conversion"] = _r({
+  citation: "Citation: representative fraction to ground units -- ft per map inch = RF / 12, with area scaling as the SQUARE of that -- by name; public map arithmetic. The 1:24,000 USGS 7.5-minute quadrangle at 2,000 ft per inch is named as the familiar case, not reproduced from any table. The map's own scale bar, its datum, and a GIS measurement govern anything that matters.",
+  example: mapScaleConversionExample.inputs,
+  fields: [
+    { key: "representative_fraction", label: "Representative fraction denominator (24000 for 1:24,000)", kind: "number" },
+    { key: "map_distance_in", label: "Measured map distance (in, 0 to skip)", kind: "number" },
+    { key: "map_area_sqin", label: "Measured map area (sq in, 0 to skip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "s", id: "mpsc-out-s", label: "Ground feet per map inch", value: (r) => fmt(r.ft_per_inch, 1) + " ft" },
+    { key: "d", id: "mpsc-out-d", label: "Ground distance", value: (r) => fmt(r.ground_distance_ft, 1) + " ft (" + fmt(r.ground_distance_mi, 3) + " mi)" },
+    { key: "a", id: "mpsc-out-a", label: "Ground area", value: (r) => fmt(r.ground_area_acres, 2) + " acres (" + fmt(r.ground_area_sqft, 0) + " sq ft)" },
+    { key: "p", id: "mpsc-out-p", label: "Acres per square inch at this scale", value: (r) => fmt(r.acres_per_sq_inch, 2) + " acres" },
+    { key: "n", id: "mpsc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMapScaleConversion,
+});
+
+// ===================== spec-v1398: slope and grade from contour lines =====================
+// dims: in { args: dimensionless } out: { rise_ft: L, run_ft: L, grade_pct: dimensionless, slope_angle_deg: dimensionless, slope_distance_ft: L }
+export function computeContourSlope({ contour_interval_ft = 0, intervals_crossed = 0, map_distance_in = 0, representative_fraction = 24000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(contour_interval_ft > 0)) return { error: "Contour interval must be positive." };
+  if (!(intervals_crossed > 0)) return { error: "Number of intervals crossed must be positive." };
+  if (!(map_distance_in > 0)) return { error: "Measured map distance must be positive." };
+  if (!(representative_fraction > 0)) return { error: "Representative fraction must be positive." };
+  // Four readings because four trades ask for the same slope four different ways.
+  const rise_ft = contour_interval_ft * intervals_crossed;
+  const run_ft = map_distance_in * representative_fraction / 12;
+  const grade_pct = rise_ft / run_ft * 100;
+  const slope_angle_deg = Math.atan(rise_ft / run_ft) * 180 / Math.PI;
+  const slope_ratio = run_ft / rise_ft;
+  const slope_distance_ft = Math.hypot(run_ft, rise_ft);
+  const slope_distance_excess_pct = (slope_distance_ft / run_ft - 1) * 100;
+  if (![rise_ft, run_ft, grade_pct, slope_angle_deg, slope_ratio, slope_distance_ft].every(Number.isFinite)) return { error: "Contour-slope math is not a finite value." };
+  return {
+    rise_ft,
+    run_ft,
+    grade_pct,
+    slope_angle_deg,
+    slope_ratio,
+    slope_distance_ft,
+    slope_distance_excess_pct,
+    note: "The slope of a route read straight off a contour map, reported four ways. Count the contour lines the route crosses and multiply by the interval for the rise; scale the measured map distance for the run; everything else is one arctangent. Four different trades ask for the answer in four different units -- a grading contractor wants percent, a hiker or an avalanche forecaster wants degrees, an earthwork crew wants the ratio, and anyone estimating time or rope wants the true slope distance rather than the map distance -- so all four are printed together. The relationship between percent and degrees is worth having in front of you because the two scales diverge sharply: 100% grade is 45 degrees, not 90, and the 30 degrees that matters most to an avalanche forecaster is a 58% grade. Reading one scale as if it were the other is a genuine safety error in steep terrain. Five 40 ft intervals over a map distance that scales to 1,300 ft is a 200 ft rise, a 15.4% grade, 8.75 degrees, 6.5 to 1, and a slope distance of 1,315 ft. Note how little the slope distance exceeds the map distance -- fifteen feet out of thirteen hundred, about 1% -- and that stays true up to surprisingly steep ground, since even a 30% grade is only 4.4% longer than the map. It is elevation gain, not path length, that makes steep ground slow. A map reading; the ground itself, the map's own contour accuracy, and the party's judgment govern.",
+  };
+}
+
+export const contourSlopeExample = { inputs: { contour_interval_ft: 40, intervals_crossed: 5, map_distance_in: 0.65, representative_fraction: 24000 } };
+
+FIELD_RENDERERS["contour-slope"] = _r({
+  citation: "Citation: slope from contour count and map scale -- rise = interval x intervals crossed, run = map inches x RF / 12 -- reported as percent, degrees, ratio, and true slope distance, by name; public map arithmetic and trigonometry. The ground itself, the map's contour accuracy, and the party's judgment govern.",
+  example: contourSlopeExample.inputs,
+  fields: [
+    { key: "contour_interval_ft", label: "Contour interval (ft)", kind: "number" },
+    { key: "intervals_crossed", label: "Intervals crossed", kind: "number" },
+    { key: "map_distance_in", label: "Measured map distance (in)", kind: "number" },
+    { key: "representative_fraction", label: "Representative fraction denominator", kind: "number" },
+  ],
+  outputs: [
+    { key: "r", id: "cnsl-out-r", label: "Rise and run", value: (r) => fmt(r.rise_ft, 1) + " ft over " + fmt(r.run_ft, 1) + " ft" },
+    { key: "g", id: "cnsl-out-g", label: "Grade", value: (r) => fmt(r.grade_pct, 2) + " %" },
+    { key: "a", id: "cnsl-out-a", label: "Slope angle", value: (r) => fmt(r.slope_angle_deg, 2) + " deg" },
+    { key: "t", id: "cnsl-out-t", label: "Slope ratio", value: (r) => fmt(r.slope_ratio, 2) + " : 1" },
+    { key: "d", id: "cnsl-out-d", label: "True slope distance", value: (r) => fmt(r.slope_distance_ft, 1) + " ft, " + fmt(r.slope_distance_excess_pct, 2) + " % longer than the map distance" },
+    { key: "n", id: "cnsl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeContourSlope,
+});
+
+// ===================== spec-v1400: helicopter landing zone sizing =====================
+// dims: in { args: dimensionless } out: { required_side_ft: L, slope_limit_pct: dimensionless, approach_length_ft: L, total_clear_ft: L }
+export function computeHelicopterLzSizing({ rotor_diameter_ft = 0, size_factor = 2, measured_clear_ft = 0, ground_slope_deg = 0, slope_limit_deg = 8, obstacle_height_ft = 0, approach_ratio = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(rotor_diameter_ft > 0)) return { error: "Rotor diameter must be positive." };
+  if (!(size_factor > 0)) return { error: "Size factor must be positive." };
+  if (!(measured_clear_ft > 0)) return { error: "Measured clear area must be positive." };
+  if (!(ground_slope_deg >= 0)) return { error: "Ground slope cannot be negative." };
+  if (!(slope_limit_deg > 0 && slope_limit_deg < 90)) return { error: "Aircraft slope limit must be above 0 and below 90 degrees." };
+  if (!(obstacle_height_ft >= 0)) return { error: "Obstacle height cannot be negative." };
+  if (!(approach_ratio > 0)) return { error: "Approach ratio must be positive." };
+  // Three checks, and a clearing has to pass ALL of them. The approach one is the check a
+  // ground team miscalculates: a tree line does not cost its own height, it costs the ratio.
+  const required_side_ft = size_factor * rotor_diameter_ft;
+  const area_ok = measured_clear_ft >= required_side_ft;
+  const slope_limit_pct = Math.tan(slope_limit_deg * Math.PI / 180) * 100;
+  const ground_slope_pct = Math.tan(ground_slope_deg * Math.PI / 180) * 100;
+  const slope_ok = ground_slope_deg <= slope_limit_deg;
+  const approach_length_ft = obstacle_height_ft * approach_ratio;
+  const total_clear_ft = required_side_ft + 2 * approach_length_ft;
+  const failures = [];
+  if (!area_ok) failures.push("area (" + fmt(required_side_ft - measured_clear_ft, 0) + " ft short of the required " + fmt(required_side_ft, 0) + " ft side)");
+  if (!slope_ok) failures.push("slope (" + fmt(ground_slope_deg, 1) + " deg against a " + fmt(slope_limit_deg, 1) + " deg limit)");
+  const verdict = failures.length === 0
+    ? "PASSES on area and slope; it still needs " + fmt(approach_length_ft, 0) + " ft of unobstructed approach beyond the tallest obstacle, and a second obstacle inside that distance fails the site from the air"
+    : "FAILS on " + failures.join(" and ");
+  if (![required_side_ft, slope_limit_pct, approach_length_ft, total_clear_ft].every(Number.isFinite)) return { error: "Landing-zone math is not a finite value." };
+  return {
+    required_side_ft,
+    area_ok,
+    slope_limit_pct,
+    ground_slope_pct,
+    slope_ok,
+    approach_length_ft,
+    total_clear_ft,
+    verdict,
+    note: "Whether a clearing will take a helicopter, from the three checks it has to pass together. The size check is a clear square keyed to rotor diameter -- roughly twice the rotor for a routine daytime landing, and larger at night, in dust or snow, or with a sling load. The slope check is the aircraft's own published limit, usually somewhere under ten degrees and often less across the roll axis than the pitch axis, and it is what disqualifies most hillside clearings. The approach check is the one a ground team miscalculates. The aircraft does not want to descend vertically into a hole; it wants a shallow approach and departure into the wind, commonly ten to one or shallower, and that path has to clear every obstacle. A 40 ft tree line on the approach end does not cost forty feet of clearing, it costs four hundred feet of clear approach beyond it, and doubling the tree height doubles that requirement -- the approach is linear in obstacle height and unforgiving. That is why a clearing that measures fine on the ground is refused from the air: a 50 ft rotor aircraft needs a 100 ft square and can accept six degrees of slope against an eight degree limit, and still fails if a second tree line stands 300 ft out. A screening aid, never a clearance: the aircrew, the aircraft's published limits, and the pilot in command decide whether a site is usable.",
+  };
+}
+
+export const helicopterLzSizingExample = { inputs: { rotor_diameter_ft: 50, size_factor: 2, measured_clear_ft: 120, ground_slope_deg: 6, slope_limit_deg: 8, obstacle_height_ft: 40, approach_ratio: 10 } };
+
+FIELD_RENDERERS["helicopter-lz-sizing"] = _r({
+  citation: "Citation: helicopter landing zone screening on three checks -- a clear square keyed to rotor diameter, the aircraft's published slope limit, and an approach path at the stated ratio clearing the tallest obstacle -- by name; the size factor, slope limit, and approach ratio are entered rather than bundled because they belong to the aircraft and the conditions. A screening aid, never a clearance: the aircrew and the pilot in command decide.",
+  example: helicopterLzSizingExample.inputs,
+  fields: [
+    { key: "rotor_diameter_ft", label: "Rotor diameter (ft)", kind: "number" },
+    { key: "size_factor", label: "Size factor (2 for routine daytime)", kind: "number" },
+    { key: "measured_clear_ft", label: "Measured clear area, side (ft)", kind: "number" },
+    { key: "ground_slope_deg", label: "Ground slope (deg)", kind: "number" },
+    { key: "slope_limit_deg", label: "Aircraft slope limit (deg)", kind: "number" },
+    { key: "obstacle_height_ft", label: "Tallest obstacle on the approach (ft)", kind: "number" },
+    { key: "approach_ratio", label: "Approach ratio (10 for 10:1)", kind: "number" },
+  ],
+  outputs: [
+    { key: "a", id: "hlz-out-a", label: "Required clear area", value: (r) => fmt(r.required_side_ft, 0) + " x " + fmt(r.required_side_ft, 0) + " ft -- " + (r.area_ok ? "measured area clears it" : "measured area is short") },
+    { key: "s", id: "hlz-out-s", label: "Slope limit", value: (r) => fmt(r.slope_limit_pct, 1) + " % grade, and the ground reads " + fmt(r.ground_slope_pct, 1) + " % -- " + (r.slope_ok ? "inside the limit" : "OVER the limit") },
+    { key: "p", id: "hlz-out-p", label: "Approach required beyond the obstacle", value: (r) => fmt(r.approach_length_ft, 0) + " ft" },
+    { key: "t", id: "hlz-out-t", label: "Total clear distance end to end", value: (r) => fmt(r.total_clear_ft, 0) + " ft" },
+    { key: "v", id: "hlz-out-v", label: "Screening result", value: (r) => r.verdict },
+    { key: "n", id: "hlz-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHelicopterLzSizing,
+});
+
+// ===================== spec-v1401: litter carry team size and rotation =====================
+// dims: in { args: dimensionless } out: { carry_time_hr: T, teams_needed: dimensionless, total_personnel: dimensionless, person_hours: T }
+export function computeLitterCarryTeam({ distance_mi = 0, pace_mph = 1.0, carriers_per_litter = 6, duty_fraction = 0.5, rotation_interval_min = 10, support_personnel = 2 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(distance_mi > 0)) return { error: "Carry distance must be positive." };
+  if (!(pace_mph > 0)) return { error: "Sustained pace must be positive." };
+  if (!(carriers_per_litter >= 1)) return { error: "Carriers per litter must be at least 1." };
+  if (!(duty_fraction > 0 && duty_fraction <= 1)) return { error: "Duty fraction per team must be above 0 and at most 1." };
+  if (!(rotation_interval_min > 0)) return { error: "Rotation interval must be positive." };
+  if (!(support_personnel >= 0)) return { error: "Support personnel cannot be negative." };
+  // The pace is a SUSTAINED pace that already assumes rotation, so the staffing has to
+  // provide it. It is by far the most sensitive input and the one guessed optimistically.
+  const carry_time_hr = distance_mi / pace_mph;
+  const carry_time_min = carry_time_hr * 60;
+  const teams_needed = Math.ceil(1 / duty_fraction);
+  const carriers_needed = carriers_per_litter * teams_needed;
+  const total_personnel = carriers_needed + support_personnel;
+  const person_hours = total_personnel * carry_time_hr;
+  const rotations = carry_time_min / rotation_interval_min;
+  if (![carry_time_hr, teams_needed, carriers_needed, total_personnel, person_hours, rotations].every(Number.isFinite)) return { error: "Litter-carry math is not a finite value." };
+  return {
+    carry_time_hr,
+    carry_time_min,
+    teams_needed,
+    carriers_needed,
+    total_personnel,
+    person_hours,
+    rotations,
+    note: "What a litter carry-out actually costs in people and hours. A litter takes six carriers on anything but easy ground, and six carriers cannot carry for an hour. The pace used in planning -- often under one mile per hour on moderate terrain, and far less on steep or brushy ground -- is a SUSTAINED pace that already assumes rotation, so the staffing has to provide the rotation that pace assumes. Two teams alternating gives each team a fifty percent duty fraction, which is roughly what a long carry-out requires, and a very steep or very long carry may take three. The person-hour total is the output that drives the radio call. A carry that sounds like an hour and a half back to the trailhead is, once the arithmetic is done, twenty or more person-hours -- most of a mutual-aid team -- and knowing that at the start rather than at the halfway point is the difference between a controlled extraction and a stalled one. A 1.5 mile carry at a sustained 1.0 mph with six carriers per litter, two teams alternating and rotating every ten minutes, plus a medical attendant and a navigator, is ninety minutes, fourteen people, twenty-one person-hours, and nine rotations. Steepen the ground so the sustained pace falls to half a mile an hour and the time doubles, the person-hours double, and a third team is probably needed. The pace is by far the most sensitive number here and it is the one that gets guessed optimistically. A planning aid; the incident commander, the team's own condition, and the terrain govern.",
+  };
+}
+
+export const litterCarryTeamExample = { inputs: { distance_mi: 1.5, pace_mph: 1.0, carriers_per_litter: 6, duty_fraction: 0.5, rotation_interval_min: 10, support_personnel: 2 } };
+
+FIELD_RENDERERS["litter-carry-team"] = _r({
+  citation: "Citation: litter carry staffing from a sustained pace that already assumes rotation, with the team count as the reciprocal of the duty fraction, by name; standard search-and-rescue planning practice. The pace, duty fraction, and rotation interval are entered rather than bundled. A planning aid; the incident commander, the team's condition, and the terrain govern.",
+  example: litterCarryTeamExample.inputs,
+  fields: [
+    { key: "distance_mi", label: "Carry distance (mi)", kind: "number" },
+    { key: "pace_mph", label: "Sustained pace (mph)", kind: "number" },
+    { key: "carriers_per_litter", label: "Carriers per litter", kind: "number" },
+    { key: "duty_fraction", label: "Duty fraction per team (0.5 = half the time carrying)", kind: "number" },
+    { key: "rotation_interval_min", label: "Rotation interval (min)", kind: "number" },
+    { key: "support_personnel", label: "Attendants and support personnel", kind: "number" },
+  ],
+  outputs: [
+    { key: "t", id: "ltcy-out-t", label: "Carry time", value: (r) => fmt(r.carry_time_hr, 2) + " hr (" + fmt(r.carry_time_min, 0) + " min)" },
+    { key: "m", id: "ltcy-out-m", label: "Teams in rotation", value: (r) => String(r.teams_needed) + " teams, " + String(r.carriers_needed) + " carriers" },
+    { key: "p", id: "ltcy-out-p", label: "Total personnel", value: (r) => String(r.total_personnel) + " people" },
+    { key: "h", id: "ltcy-out-h", label: "Person-hours", value: (r) => fmt(r.person_hours, 1) },
+    { key: "r", id: "ltcy-out-r", label: "Rotations during the carry", value: (r) => fmt(r.rotations, 1) },
+    { key: "n", id: "ltcy-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeLitterCarryTeam,
+});

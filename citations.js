@@ -8633,6 +8633,91 @@ export const CITATIONS = {
       { name: "Fit walker, good ground", value: "the default pace assumes a fit walker on good ground with a light load; scale with the factor otherwise", source: "Naismith's rule" },
     ],
   },
+  // spec-v1394..v1401: the 2026-08-26 trade-expansion Group P band.
+  "three-point-resection": {
+    formula: "back azimuth = observed azimuth + declination + 180 (mod 360); solve (Ax + t sin backA, Ay + t cos backA) = (Bx + s sin backB, By + s cos backB); positional error scales as 1 / sin(intersection angle).",
+    edition: "Two-bearing resection by back-azimuth intersection, by name -- public plane surveying and land-navigation practice. The strength of fix is reported as the intersection angle, whose sine divides the positional error; under about 30 degrees a third known point is required. A field method; the survey of record and a checked closure govern.",
+    freeAccess: "The intersection is plane trigonometry on the user's own observed bearings and published control coordinates.",
+    governance: GOVERNANCE.general,
+    editionNote: "Standing at an unknown point, a bearing shot to a known feature is, reversed, a line from that feature through you. Two such back azimuths give two lines, and where they cross is your position. The method is identical with a compass on a quadrangle and with a total station on control monuments, and the only care it needs beyond the arithmetic is the declination correction when the bearings are magnetic rather than grid. The strength-of-fix output is what keeps the method honest. When the two lines cross near square the fix is sharp, and when they cross at a shallow angle a small bearing error slides the intersection a long way along the lines, because the positional error scales as one over the sine of the intersection angle. Below about thirty degrees of intersection the fix should not be trusted, and the answer is a third known point, whose three back-lines will not meet at a single point but will form a small triangle -- the cocked hat -- whose size is the honest statement of how good the fix is. Two features lying nearly in the same direction from the occupied point are the worst case, and the same one-degree uncertainty that was worth a few feet at a square crossing becomes worth many times that.",
+    assumptions: [
+      { name: "Back azimuth", value: "the observed azimuth plus 180 degrees, after the declination correction; it is a line FROM the known point THROUGH the occupied one", source: "plane surveying practice" },
+      { name: "Strength of fix", value: "positional error scales as 1 / sin(intersection angle); below about 30 degrees, use a third point", source: "land-navigation practice" },
+      { name: "Cocked hat", value: "three back-lines form a small triangle rather than meeting at a point; its size states the fix quality", source: "land-navigation practice" },
+    ],
+  },
+  "slope-staking": {
+    formula: "d = half_width_ft + depth_ft x side_slope_ratio / (1 - side_slope_ratio x g), where g is the ground cross slope taken positive when it works against the section; vertical at the catch = depth_ft + g x (d - half_width_ft).",
+    edition: "Slope-stake catch point with the ground cross-slope correction, by name -- standard construction-surveying practice. The level-ground form is the zero-cross-slope case and is reported alongside for comparison. The grading plan, the surveyor of record, and the existing-ground breaks between shots govern.",
+    freeAccess: "The correction is plane geometry on the section's own dimensions; nothing is reproduced from any standard.",
+    governance: GOVERNANCE.general,
+    editionNote: "The design slope leaves the hinge point at the shoulder and runs out at its ratio until it daylights on the existing ground. If the ground were level the catch would sit at the half-width plus the depth times the ratio, and the correction would not be needed -- but the ground is never level. A cross slope that rises away from centerline pushes the catch point farther out on a cut, because the ground is climbing toward the slope while the slope is climbing toward the ground and the two take longer to meet. The denominator carries the whole correction, and it also carries the warning. As the side-slope ratio times the cross slope approaches one -- a ground cross slope as steep as the design side slope -- the denominator goes to zero and the slope never catches at all. That is a real condition on side-hill work rather than a mathematical curiosity, and the answer is a retaining structure or a change to the section, not a longer tape. The difference from the level-ground answer grows quickly with cross slope, which is why staking a side-hill section from the flat-ground number puts the stake short by feet rather than inches.",
+    assumptions: [
+      { name: "Cross-slope correction", value: "the (1 - s g) denominator; the level-ground answer is the g = 0 case", source: "construction surveying practice" },
+      { name: "Never daylights", value: "when s x g reaches 1 the slope runs parallel to the ground; the section needs a retaining structure or a slope change", source: "construction surveying practice" },
+      { name: "Planar ground", value: "one constant cross slope between the hinge and the catch; existing-ground breaks between shots change the true catch", source: "construction surveying practice" },
+    ],
+  },
+  "grade-rod-cut-fill": {
+    formula: "hi_ft = benchmark_elev_ft + backsight_ft; grade_rod_ft = hi_ft - design_elev_ft; ground_elevation_ft = hi_ft - ground_rod_ft; cut_fill_ft = grade_rod_ft - ground_rod_ft, positive being cut.",
+    edition: "The grade-rod method of differential leveling, by name; standard construction-surveying practice. A smaller rod reading means higher ground and therefore a cut. The grading plan, the benchmark of record, and a checked level circuit govern.",
+    freeAccess: "Four subtractions on the crew's own benchmark, rod readings, and design elevation.",
+    governance: GOVERNANCE.general,
+    editionNote: "Set the instrument, shoot the benchmark, and the height of instrument is fixed for the whole setup. From then on a single number carries the entire design: the grade rod is the height of instrument less the design elevation, which is the rod reading that would be observed if the rod were standing on finished grade. Every subsequent shot is compared against that one number and the difference is the cut or fill, with no elevation arithmetic at all -- which is the whole reason the method exists, because it turns a per-shot calculation into a per-shot subtraction. The sign is where crews go wrong and it is worth stating plainly. A rod reading smaller than the grade rod means the rod is standing higher than design, because the rod reads downward from a fixed instrument: smaller reading, higher ground, cut. It reads backward the first hundred times and it is worth checking the first few shots independently against the ground elevation, which the same height of instrument also gives. When the design grade sits at or above the instrument no rod reading can reach it, and the setup has to move.",
+    assumptions: [
+      { name: "One setup", value: "the height of instrument and therefore the grade rod are fixed until the instrument moves", source: "differential leveling practice" },
+      { name: "Sign", value: "a SMALLER rod reading than the grade rod means higher ground and a cut", source: "differential leveling practice" },
+      { name: "Reachable design", value: "if the design elevation is at or above the instrument, no rod reading reaches it and the setup must move", source: "differential leveling practice" },
+    ],
+  },
+  "map-scale-conversion": {
+    formula: "ft_per_inch = representative_fraction / 12; ground_distance_ft = map_distance_in x ft_per_inch; acres_per_sq_inch = ft_per_inch^2 / 43,560; ground_area_acres = map_area_sqin x acres_per_sq_inch.",
+    edition: "Representative fraction to ground units, with area scaling as the SQUARE of the linear scale, by name; public map arithmetic. The 1:24,000 USGS 7.5-minute quadrangle at 2,000 ft per inch is named as the familiar case, not reproduced from any table. The map's own scale bar, its datum, and a GIS measurement govern anything that matters.",
+    freeAccess: "Multiplication and division on the map's stated scale and the user's own measurements.",
+    governance: GOVERNANCE.general,
+    editionNote: "A representative fraction of one to twenty-four thousand means one unit on the map is twenty-four thousand of the same units on the ground, and because the fraction is unitless the conversion to feet per inch is a division by twelve. That is where the familiar two thousand feet to the inch on a standard quadrangle comes from, and with it the old rule about an inch being roughly a third of a mile. Area is where map arithmetic goes wrong, because scale enters area squared. A map at twice the scale denominator does not cover twice the ground per square inch, it covers four times, so a square inch on a small-scale sheet is worth many times what it is worth on a quadrangle -- a factor of seventeen between the two most common US sheet scales, for a linear scale only about four times smaller. Anyone estimating a burn area, a search segment, or a parcel off a map without squaring the scale will be off by a large multiple, and the error always runs toward underestimating the smaller-scale sheet. The acres-per-square-inch output exists so that the squaring is done once, visibly, rather than assumed.",
+    assumptions: [
+      { name: "Unitless fraction", value: "RF / 12 gives ground feet per map inch directly", source: "public map arithmetic" },
+      { name: "Area is squared", value: "ground per square inch goes as the SQUARE of the linear scale; 43,560 sq ft per acre", source: "public map arithmetic" },
+      { name: "Paper and datum", value: "the map's own scale bar governs; paper distortion and the sheet's datum are not modeled", source: "cartographic practice" },
+    ],
+  },
+  "contour-slope": {
+    formula: "rise_ft = contour_interval_ft x intervals_crossed; run_ft = map_distance_in x representative_fraction / 12; grade_pct = rise/run x 100; slope_angle_deg = atan(rise/run); slope_ratio = run/rise; slope_distance_ft = sqrt(run^2 + rise^2).",
+    edition: "Slope from contour count and map scale, reported as percent, degrees, ratio, and true slope distance, by name; public map arithmetic and trigonometry. The ground itself, the map's contour accuracy, and the party's judgment govern.",
+    freeAccess: "Counting contours and scaling a distance are public map arithmetic; the arctangent is trigonometry.",
+    governance: GOVERNANCE.general,
+    editionNote: "Count the contour lines a route crosses and multiply by the interval for the rise, scale the measured map distance for the run, and everything else is one arctangent. The answer is printed four ways because four trades ask for it four different ways: a grading contractor wants percent, a hiker or an avalanche forecaster wants degrees, an earthwork crew wants the ratio, and anyone estimating time or rope wants the true slope distance rather than the map distance. The relationship between percent and degrees is worth having in front of you because the two scales diverge sharply and neither is a shorthand for the other: a hundred percent grade is forty-five degrees, not ninety, and the thirty degrees that matters most in avalanche terrain is a fifty-eight percent grade. Reading one scale as if it were the other is a genuine safety error in steep country. The slope-distance output carries its own lesson: it exceeds the map distance by only about one percent on moderate ground and by only a few percent even on steep ground, which is why it is elevation gain rather than path length that makes steep ground slow -- exactly the premise the classic hiking-time rules are built on.",
+    assumptions: [
+      { name: "Rise from contours", value: "interval times the number of intervals crossed; the map's contour accuracy governs", source: "public map arithmetic" },
+      { name: "Percent is not degrees", value: "100% grade is 45 degrees; 30 degrees is a 58% grade", source: "trigonometry" },
+      { name: "Path length is not the cost", value: "slope distance exceeds map distance by only a few percent even on steep ground", source: "trigonometry" },
+    ],
+  },
+  "helicopter-lz-sizing": {
+    formula: "required_side_ft = size_factor x rotor_diameter_ft; slope_limit_pct = tan(slope_limit_deg) x 100; approach_length_ft = obstacle_height_ft x approach_ratio; total_clear_ft = required_side_ft + 2 x approach_length_ft.",
+    edition: "Helicopter landing zone screening on three checks -- a clear square keyed to rotor diameter, the aircraft's published slope limit, and an approach path at the stated ratio clearing the tallest obstacle -- by name; the size factor, slope limit, and approach ratio are entered rather than bundled because they belong to the aircraft and the conditions. A screening aid, never a clearance: the aircrew and the pilot in command decide.",
+    freeAccess: "The three checks are geometry on values the crew measures and the aircrew publishes; no aircraft's limits are reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Three checks, and a clearing has to pass all of them. The size check is a clear square keyed to rotor diameter, roughly twice the rotor for a routine daytime landing and larger at night, in dust or snow, or with a sling load, which is why the factor is entered rather than fixed. The slope check is the aircraft's own published limit, usually somewhere under ten degrees and often tighter across the roll axis than the pitch axis, and it is what disqualifies most hillside clearings. The approach check is the one a ground team miscalculates, and it is the reason a clearing that measures fine on the ground gets refused from the air. The aircraft does not want to descend vertically into a hole; it wants a shallow approach and departure into the wind, commonly ten to one or shallower, and that path has to clear every obstacle along it. A tree line on the approach end does not cost its own height in clearing, it costs that height times the approach ratio in clear distance beyond it, and doubling the obstacle height doubles the requirement. A second obstacle inside that distance fails the site even when area and slope both pass.",
+    assumptions: [
+      { name: "Size factor", value: "about 2x rotor diameter for routine daytime; larger at night, in dust or snow, or with a sling load", source: "helicopter LZ practice" },
+      { name: "Slope limit", value: "the aircraft's published figure, often tighter across roll than pitch", source: "aircraft flight manual" },
+      { name: "Approach", value: "linear in obstacle height at the approach ratio; a 10:1 path over a 40 ft obstacle needs 400 ft beyond it", source: "helicopter LZ practice" },
+    ],
+  },
+  "litter-carry-team": {
+    formula: "carry_time_hr = distance_mi / pace_mph; teams_needed = ceil(1 / duty_fraction); carriers_needed = carriers_per_litter x teams_needed; total_personnel = carriers_needed + support_personnel; person_hours = total_personnel x carry_time_hr; rotations = carry_time_min / rotation_interval_min.",
+    edition: "Litter carry staffing from a sustained pace that already assumes rotation, with the team count as the reciprocal of the duty fraction, by name; standard search-and-rescue planning practice. The pace, duty fraction, and rotation interval are entered rather than bundled. A planning aid; the incident commander, the team's condition, and the terrain govern.",
+    freeAccess: "Division and multiplication on the team's own distance, pace, and staffing assumptions.",
+    governance: GOVERNANCE.general,
+    editionNote: "A litter takes six carriers on anything but easy ground, and six carriers cannot carry for an hour. The pace used in planning -- often under a mile per hour on moderate terrain and far less on steep or brushy ground -- is a sustained pace that already assumes rotation, so the staffing has to provide the rotation that the pace assumes. Two teams alternating give each team a fifty percent duty fraction, which is roughly what a long carry-out requires, and a very steep or very long carry may take three teams rather than two. The person-hour total is the output that drives the radio call. A carry that sounds like an hour and a half back to the trailhead becomes, once the arithmetic is done, twenty or more person-hours, which is most of a mutual-aid team, and knowing that at the start rather than at the halfway point is the difference between a controlled extraction and a stalled one. The pace is by far the most sensitive input: halving it doubles the time and the person-hours together and usually adds a team, and it is the number that gets guessed optimistically.",
+    assumptions: [
+      { name: "Sustained pace", value: "already assumes rotation; often under 1 mph on moderate ground and far less on steep or brushy terrain", source: "SAR planning practice" },
+      { name: "Duty fraction", value: "teams = ceil(1 / duty fraction); two alternating teams give each 50%", source: "SAR planning practice" },
+      { name: "Most sensitive input", value: "halving the pace doubles both time and person-hours and usually adds a team", source: "SAR planning practice" },
+    ],
+  },
 
   // ---- spec-v26 electrician / plumber / pipefitter (Groups A, B, G) ----
   "motor-feeder-multiple": {

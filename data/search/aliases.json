@@ -104357,6 +104357,146 @@
    "term": "maximum distance to a hydrant",
    "target": "hydrant-spacing-count",
    "kind": "industry"
+  },
+  {
+   "term": "resection",
+   "target": "three-point-resection",
+   "kind": "industry"
+  },
+  {
+   "term": "two bearing resection",
+   "target": "three-point-resection",
+   "kind": "industry"
+  },
+  {
+   "term": "where am i from two bearings",
+   "target": "three-point-resection",
+   "kind": "question"
+  },
+  {
+   "term": "cocked hat fix",
+   "target": "three-point-resection",
+   "kind": "industry"
+  },
+  {
+   "term": "slope staking",
+   "target": "slope-staking",
+   "kind": "industry"
+  },
+  {
+   "term": "catch point cross slope",
+   "target": "slope-staking",
+   "kind": "industry"
+  },
+  {
+   "term": "slope stake side hill",
+   "target": "slope-staking",
+   "kind": "industry"
+  },
+  {
+   "term": "where does the slope daylight",
+   "target": "slope-staking",
+   "kind": "question"
+  },
+  {
+   "term": "grade rod",
+   "target": "grade-rod-cut-fill",
+   "kind": "industry"
+  },
+  {
+   "term": "cut and fill from a rod reading",
+   "target": "grade-rod-cut-fill",
+   "kind": "industry"
+  },
+  {
+   "term": "grade rod from height of instrument",
+   "target": "grade-rod-cut-fill",
+   "kind": "industry"
+  },
+  {
+   "term": "how much to cut at this shot",
+   "target": "grade-rod-cut-fill",
+   "kind": "question"
+  },
+  {
+   "term": "map scale",
+   "target": "map-scale-conversion",
+   "kind": "industry"
+  },
+  {
+   "term": "representative fraction",
+   "target": "map-scale-conversion",
+   "kind": "industry"
+  },
+  {
+   "term": "acres per square inch",
+   "target": "map-scale-conversion",
+   "kind": "industry"
+  },
+  {
+   "term": "feet per inch on a map",
+   "target": "map-scale-conversion",
+   "kind": "industry"
+  },
+  {
+   "term": "slope from contours",
+   "target": "contour-slope",
+   "kind": "industry"
+  },
+  {
+   "term": "grade from a map",
+   "target": "contour-slope",
+   "kind": "industry"
+  },
+  {
+   "term": "contour interval slope",
+   "target": "contour-slope",
+   "kind": "industry"
+  },
+  {
+   "term": "how steep is this route",
+   "target": "contour-slope",
+   "kind": "question"
+  },
+  {
+   "term": "helicopter landing zone",
+   "target": "helicopter-lz-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "lz size",
+   "target": "helicopter-lz-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "helispot approach",
+   "target": "helicopter-lz-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "how big does an lz need to be",
+   "target": "helicopter-lz-sizing",
+   "kind": "question"
+  },
+  {
+   "term": "litter carry",
+   "target": "litter-carry-team",
+   "kind": "industry"
+  },
+  {
+   "term": "carry out staffing",
+   "target": "litter-carry-team",
+   "kind": "industry"
+  },
+  {
+   "term": "how many people to carry a litter",
+   "target": "litter-carry-team",
+   "kind": "question"
+  },
+  {
+   "term": "person hours for a carry out",
+   "target": "litter-carry-team",
+   "kind": "industry"
   }
  ]
 }

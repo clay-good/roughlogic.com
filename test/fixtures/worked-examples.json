@@ -91178,6 +91178,325 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "three-point-resection",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "known points (1000, 5000) and (3000, 5400), azimuths 315 and 45 degrees",
+   "source_edition_or_year": "plane surveying",
+   "source_section_or_page": "back-azimuth intersection",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "ax": 1000,
+    "ay": 5000,
+    "azimuth_to_a_deg": 315,
+    "bx": 3000,
+    "by": 5400,
+    "azimuth_to_b_deg": 45,
+    "declination_deg": 0
+   },
+   "outputs": {
+    "east": {
+     "value": 1800,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "north": {
+     "value": 4200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "distance_a_ft": {
+     "value": 1131.37,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "distance_b_ft": {
+     "value": 1697.06,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "intersection_angle_deg": {
+     "value": 90,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "slope-staking",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "12 ft half-width, 6 ft cut, 2:1 side slopes, ground rising 10% away from centerline",
+   "source_edition_or_year": "construction surveying",
+   "source_section_or_page": "d = half-width + H s / (1 - s g)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "half_width_ft": 12,
+    "depth_ft": 6,
+    "side_slope_ratio": 2,
+    "ground_cross_slope": 0.1,
+    "section": "cut"
+   },
+   "outputs": {
+    "catch_distance_ft": {
+     "value": 27,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "run_ft": {
+     "value": 15,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vertical_at_catch_ft": {
+     "value": 7.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "flat_ground_distance_ft": {
+     "value": 24,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "grade-rod-cut-fill",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "benchmark 100.00, backsight 5.20, design 98.50, ground rod 4.90",
+   "source_edition_or_year": "differential leveling",
+   "source_section_or_page": "grade rod = HI - design elevation",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "benchmark_elev_ft": 100,
+    "backsight_ft": 5.2,
+    "design_elev_ft": 98.5,
+    "ground_rod_ft": 4.9
+   },
+   "outputs": {
+    "hi_ft": {
+     "value": 105.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "grade_rod_ft": {
+     "value": 6.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ground_elevation_ft": {
+     "value": 100.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cut_fill_ft": {
+     "value": 1.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "map-scale-conversion",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "1:24,000 quadrangle, 3.5 in measured and a 2.4 sq in polygon",
+   "source_edition_or_year": "map arithmetic",
+   "source_section_or_page": "RF / 12, squared for area",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "representative_fraction": 24000,
+    "map_distance_in": 3.5,
+    "map_area_sqin": 2.4
+   },
+   "outputs": {
+    "ft_per_inch": {
+     "value": 2000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ground_distance_ft": {
+     "value": 7000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "acres_per_sq_inch": {
+     "value": 91.8274,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ground_area_acres": {
+     "value": 220.386,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "contour-slope",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "five 40 ft intervals over 0.65 in on a 1:24,000 quadrangle",
+   "source_edition_or_year": "map arithmetic",
+   "source_section_or_page": "rise over scaled run",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "contour_interval_ft": 40,
+    "intervals_crossed": 5,
+    "map_distance_in": 0.65,
+    "representative_fraction": 24000
+   },
+   "outputs": {
+    "rise_ft": {
+     "value": 200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "run_ft": {
+     "value": 1300,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "grade_pct": {
+     "value": 15.3846,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "slope_angle_deg": {
+     "value": 8.74616,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "slope_distance_ft": {
+     "value": 1315.29,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "helicopter-lz-sizing",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "50 ft rotor at 2x, 120 ft clearing, 6 deg ground against an 8 deg limit, 40 ft trees at 10:1",
+   "source_edition_or_year": "LZ screening",
+   "source_section_or_page": "size, slope, and approach",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "rotor_diameter_ft": 50,
+    "size_factor": 2,
+    "measured_clear_ft": 120,
+    "ground_slope_deg": 6,
+    "slope_limit_deg": 8,
+    "obstacle_height_ft": 40,
+    "approach_ratio": 10
+   },
+   "outputs": {
+    "required_side_ft": {
+     "value": 100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "slope_limit_pct": {
+     "value": 14.0541,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "approach_length_ft": {
+     "value": 400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_clear_ft": {
+     "value": 900,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "litter-carry-team",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "1.5 mi at 1.0 mph, six carriers, two teams, 10 min rotations, two support",
+   "source_edition_or_year": "SAR planning",
+   "source_section_or_page": "teams = ceil(1 / duty fraction)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "distance_mi": 1.5,
+    "pace_mph": 1,
+    "carriers_per_litter": 6,
+    "duty_fraction": 0.5,
+    "rotation_interval_min": 10,
+    "support_personnel": 2
+   },
+   "outputs": {
+    "carry_time_hr": {
+     "value": 1.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "teams_needed": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "carriers_needed": {
+     "value": 12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_personnel": {
+     "value": 14,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "person_hours": {
+     "value": 21,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rotations": {
+     "value": 9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

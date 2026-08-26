@@ -365,6 +365,14 @@ const _TILES = [
   ["rolling-offset", "G"],
   ["speaker-impedance", "N"], ["decibel-converter", "N"], ["amp-power-spl", "N"], ["lighting-beam", "N"], ["lighting-throw-for-pool", "N"],
   ["area-by-coordinates", "P"], ["traverse-closure", "P"], ["hiking-time", "P"],
+  // spec-v1394..v1401: the 2026-08-26 trade-expansion Group P band.
+  ["three-point-resection", "P"],
+  ["slope-staking", "P"],
+  ["grade-rod-cut-fill", "P"],
+  ["map-scale-conversion", "P"],
+  ["contour-slope", "P"],
+  ["helicopter-lz-sizing", "P"],
+  ["litter-carry-team", "P"],
 
   ["historical-pricing", "Q"],
 

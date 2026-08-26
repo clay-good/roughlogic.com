@@ -1247,6 +1247,11 @@ const TOOL_MODULES = (() => {
     "search-probability",
     // v52
     "hiking-time",
+    // spec-v1394..v1401: the 2026-08-26 trade-expansion Group P band.
+    "map-scale-conversion",
+    "contour-slope",
+    "helicopter-lz-sizing",
+    "litter-carry-team",
   ]);
   // spec-v71 cap-relief split: the two v25 surveying coordinate/traverse
   // tiles moved out of calc-field.js (it sat at 96.8% of its size cap) into
@@ -1255,6 +1260,10 @@ const TOOL_MODULES = (() => {
   // output changed.
   declare("./calc-survey.js", "SURVEY_RENDERERS", [
     "area-by-coordinates", "traverse-closure",
+    // spec-v1394..v1401: the 2026-08-26 trade-expansion Group P band.
+    "three-point-resection",
+    "slope-staking",
+    "grade-rod-cut-fill",
     // spec-v311..v313 field-surveying depth batch
     "differential-leveling", "level-loop-adjustment", "stadia-distance", "taping-corrections", "taping-normal-tension", "azimuth-bearing-conversion",
     "cogo-forward-point", "distance-distance-intersection", "edm-slope-reduction", "leveling-curvature-refraction", "grid-to-ground", "cogo-inverse-locate",

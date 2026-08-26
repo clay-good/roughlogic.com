@@ -39990,3 +39990,228 @@ test("bounds: spec-v1393 computeHydrantSpacingCount pins both rules and the geom
   assert.ok("error" in _v1393({ ...base, max_distance_ft: 0 }));
   assert.ok("error" in _v1393({ ...base, frontage_ft: Infinity }));
 });
+
+// ===========================================================================
+// spec-v1394..v1401: the 2026-08-26 trade-expansion Group P band.
+// (spec-v1399 was cut as a duplicate of the existing haversine tile.)
+// ===========================================================================
+
+import { computeThreePointResection as _v1394 } from "../../calc-survey.js";
+test("bounds: spec-v1394 computeThreePointResection pins the intersection and the strength", () => {
+  // Azimuths 315 and 45 to (1000,5000) and (3000,5400) cross square at (1800, 4200).
+  const base = { ax: 1000, ay: 5000, azimuth_to_a_deg: 315, bx: 3000, by: 5400, azimuth_to_b_deg: 45, declination_deg: 0 };
+  const r = _v1394(base);
+  assert.ok(Math.abs(r.east - 1800) < 1e-6);
+  assert.ok(Math.abs(r.north - 4200) < 1e-6);
+  assert.ok(Math.abs(r.distance_a_ft - 1131.371) < 1e-3);
+  assert.ok(Math.abs(r.distance_b_ft - 1697.056) < 1e-3);
+  assert.ok(Math.abs(r.back_azimuth_a_deg - 135) < 1e-9);
+  assert.ok(Math.abs(r.back_azimuth_b_deg - 225) < 1e-9);
+  assert.ok(Math.abs(r.intersection_angle_deg - 90) < 1e-9);
+  assert.ok(Math.abs(r.error_multiplier - 1) < 1e-12);
+  assert.ok(r.strength.startsWith("strong"));
+  // The fix reproduces itself from B as well as from A -- an independent check.
+  assert.ok(Math.abs(Math.hypot(r.east - base.bx, r.north - base.by) - r.distance_b_ft) < 1e-9);
+  // A shallow crossing multiplies the positional error by 1/sin and is flagged weak.
+  const shallow = _v1394({ ...base, azimuth_to_b_deg: 335 });
+  assert.ok(shallow.intersection_angle_deg < 30);
+  assert.ok(Math.abs(shallow.error_multiplier - 1 / Math.sin(shallow.intersection_angle_deg * Math.PI / 180)) < 1e-9);
+  assert.ok(shallow.strength.startsWith("WEAK"));
+  // A declination correction rotates both back azimuths and moves the fix.
+  const declined = _v1394({ ...base, declination_deg: 10 });
+  assert.ok(Math.abs(declined.back_azimuth_a_deg - 145) < 1e-9);
+  assert.ok(Math.abs(declined.east - r.east) > 1);
+  // Parallel back azimuths never cross.
+  assert.ok("error" in _v1394({ ...base, azimuth_to_b_deg: 315 }));
+  assert.ok("error" in _v1394({ ...base, bx: 1000, by: 5000 }));
+  assert.ok("error" in _v1394({ ...base, ax: Infinity }));
+});
+
+import { computeSlopeStaking as _v1395 } from "../../calc-survey.js";
+test("bounds: spec-v1395 computeSlopeStaking pins the cross-slope correction and its limit", () => {
+  // 12 ft half-width, 6 ft cut, 2:1, 10% cross slope: 27.0 ft out, 7.5 ft down.
+  const base = { half_width_ft: 12, depth_ft: 6, side_slope_ratio: 2, ground_cross_slope: 0.10, section: "cut" };
+  const r = _v1395(base);
+  assert.ok(Math.abs(r.catch_distance_ft - 27.0) < 1e-9);
+  assert.ok(Math.abs(r.run_ft - 15.0) < 1e-9);
+  assert.ok(Math.abs(r.vertical_at_catch_ft - 7.5) < 1e-9);
+  assert.ok(Math.abs(r.flat_ground_distance_ft - 24.0) < 1e-9);
+  assert.ok(Math.abs(r.difference_ft - 3.0) < 1e-9);
+  // The catch really is on the design slope: run / vertical is the side-slope ratio.
+  assert.ok(Math.abs(r.run_ft / r.vertical_at_catch_ft - base.side_slope_ratio) < 1e-9);
+  // Level ground collapses to the flat-ground form exactly.
+  const level = _v1395({ ...base, ground_cross_slope: 0 });
+  assert.ok(Math.abs(level.catch_distance_ft - level.flat_ground_distance_ft) < 1e-12);
+  // The error grows fast: 20% cross slope catches at 32.0 ft, eight feet past level.
+  const steeper = _v1395({ ...base, ground_cross_slope: 0.20 });
+  assert.ok(Math.abs(steeper.catch_distance_ft - 32.0) < 1e-9);
+  // At a cross slope equal to 1/ratio the slope runs parallel and never daylights.
+  assert.ok(Math.abs(r.limiting_cross_slope - 0.5) < 1e-12);
+  assert.ok("error" in _v1395({ ...base, ground_cross_slope: 0.50 }));
+  assert.ok("error" in _v1395({ ...base, ground_cross_slope: 0.60 }));
+  // On a FILL the sign flips: the same rising cross slope pulls the catch IN.
+  const fill = _v1395({ ...base, section: "fill" });
+  assert.ok(fill.catch_distance_ft < fill.flat_ground_distance_ft);
+  assert.ok("error" in _v1395({ ...base, section: "bench" }));
+  assert.ok("error" in _v1395({ ...base, half_width_ft: 0 }));
+  assert.ok("error" in _v1395({ ...base, depth_ft: 0 }));
+  assert.ok("error" in _v1395({ ...base, side_slope_ratio: 0 }));
+  assert.ok("error" in _v1395({ ...base, depth_ft: Infinity }));
+});
+
+import { computeGradeRodCutFill as _v1396 } from "../../calc-survey.js";
+test("bounds: spec-v1396 computeGradeRodCutFill pins the grade rod and the backward sign", () => {
+  // BM 100.00 + BS 5.20 = HI 105.20; grade rod 6.70; a 4.90 shot is a 1.80 ft cut.
+  const base = { benchmark_elev_ft: 100.00, backsight_ft: 5.20, design_elev_ft: 98.50, ground_rod_ft: 4.90 };
+  const r = _v1396(base);
+  assert.ok(Math.abs(r.hi_ft - 105.20) < 1e-9);
+  assert.ok(Math.abs(r.grade_rod_ft - 6.70) < 1e-9);
+  assert.ok(Math.abs(r.ground_elevation_ft - 100.30) < 1e-9);
+  assert.ok(Math.abs(r.cut_fill_ft - 1.80) < 1e-9);
+  assert.strictEqual(r.label, "CUT 1.80 ft");
+  // The independent check: ground elevation less design equals the cut.
+  assert.ok(Math.abs((r.ground_elevation_ft - base.design_elev_ft) - r.cut_fill_ft) < 1e-9);
+  // A LARGER rod reading is LOWER ground and therefore a fill -- the backward sign.
+  const low = _v1396({ ...base, ground_rod_ft: 7.55 });
+  assert.ok(Math.abs(low.cut_fill_ft + 0.85) < 1e-9);
+  assert.strictEqual(low.label, "FILL 0.85 ft");
+  assert.ok(low.ground_elevation_ft < base.design_elev_ft);
+  // Reading exactly the grade rod is on grade.
+  const onGrade = _v1396({ ...base, ground_rod_ft: r.grade_rod_ft });
+  assert.strictEqual(onGrade.label, "ON GRADE");
+  assert.ok(Math.abs(onGrade.ground_elevation_ft - base.design_elev_ft) < 1e-9);
+  // A design grade at or above the instrument cannot be reached by any rod reading.
+  assert.ok("error" in _v1396({ ...base, design_elev_ft: 105.20 }));
+  assert.ok("error" in _v1396({ ...base, design_elev_ft: 110 }));
+  assert.ok("error" in _v1396({ ...base, backsight_ft: 0 }));
+  assert.ok("error" in _v1396({ ...base, ground_rod_ft: 0 }));
+  assert.ok("error" in _v1396({ ...base, benchmark_elev_ft: Infinity }));
+});
+
+import { computeMapScaleConversion as _v1397 } from "../../calc-field.js";
+test("bounds: spec-v1397 computeMapScaleConversion pins that area is SQUARED", () => {
+  // 1:24,000 is 2,000 ft per inch and 91.83 acres per square inch.
+  const base = { representative_fraction: 24000, map_distance_in: 3.5, map_area_sqin: 2.4 };
+  const r = _v1397(base);
+  assert.ok(Math.abs(r.ft_per_inch - 2000) < 1e-9);
+  assert.ok(Math.abs(r.ground_distance_ft - 7000) < 1e-9);
+  assert.ok(Math.abs(r.ground_distance_mi - 1.3258) < 1e-4);
+  assert.ok(Math.abs(r.acres_per_sq_inch - 91.827) < 1e-3);
+  assert.ok(Math.abs(r.ground_area_acres - 220.386) < 1e-3);
+  // Scale enters area SQUARED: 1:100,000 is 4.167x the linear scale and 17.36x the area.
+  const small = _v1397({ ...base, representative_fraction: 100000 });
+  assert.ok(Math.abs(small.acres_per_sq_inch - 1594.2) < 1e-1);
+  assert.ok(Math.abs(small.ft_per_inch / r.ft_per_inch - 100000 / 24000) < 1e-9);
+  assert.ok(Math.abs(small.acres_per_sq_inch / r.acres_per_sq_inch - (100000 / 24000) ** 2) < 1e-9);
+  // Distance is LINEAR in the scale, which is the whole contrast.
+  assert.ok(Math.abs(small.ground_distance_ft / r.ground_distance_ft - 100000 / 24000) < 1e-9);
+  // Either measurement alone is enough; neither is not.
+  assert.ok(Math.abs(_v1397({ ...base, map_area_sqin: 0 }).ground_area_acres) < 1e-12);
+  assert.ok(Math.abs(_v1397({ ...base, map_distance_in: 0 }).ground_distance_ft) < 1e-12);
+  assert.ok("error" in _v1397({ ...base, map_distance_in: 0, map_area_sqin: 0 }));
+  assert.ok("error" in _v1397({ ...base, representative_fraction: 0 }));
+  assert.ok("error" in _v1397({ ...base, map_area_sqin: -1 }));
+  assert.ok("error" in _v1397({ ...base, representative_fraction: Infinity }));
+});
+
+import { computeContourSlope as _v1398 } from "../../calc-field.js";
+test("bounds: spec-v1398 computeContourSlope pins percent, degrees, ratio, and slope distance", () => {
+  // Five 40 ft intervals over 0.65 in on a 1:24,000 quad: 200 ft over 1,300 ft.
+  const base = { contour_interval_ft: 40, intervals_crossed: 5, map_distance_in: 0.65, representative_fraction: 24000 };
+  const r = _v1398(base);
+  assert.ok(Math.abs(r.rise_ft - 200) < 1e-9);
+  assert.ok(Math.abs(r.run_ft - 1300) < 1e-9);
+  assert.ok(Math.abs(r.grade_pct - 15.3846) < 1e-3);
+  assert.ok(Math.abs(r.slope_angle_deg - 8.7462) < 1e-3);
+  assert.ok(Math.abs(r.slope_ratio - 6.5) < 1e-9);
+  assert.ok(Math.abs(r.slope_distance_ft - 1315.29) < 1e-2);
+  assert.ok(Math.abs(r.slope_distance_excess_pct - 1.18) < 1e-2);
+  // 100% grade is 45 degrees, not 90 -- the fact the tile exists to keep straight.
+  const oneToOne = _v1398({ ...base, map_distance_in: 200 / 2000 });
+  assert.ok(Math.abs(oneToOne.grade_pct - 100) < 1e-9);
+  assert.ok(Math.abs(oneToOne.slope_angle_deg - 45) < 1e-9);
+  assert.ok(Math.abs(oneToOne.slope_ratio - 1) < 1e-9);
+  // 30 degrees, the avalanche figure, is a 58% grade.
+  const thirty = _v1398({ ...base, map_distance_in: 200 / Math.tan(30 * Math.PI / 180) / 2000 });
+  assert.ok(Math.abs(thirty.slope_angle_deg - 30) < 1e-6);
+  assert.ok(Math.abs(thirty.grade_pct - 57.735) < 1e-2);
+  // Even a 30% grade is only 4.4% longer than the map distance.
+  const thirtyPct = _v1398({ ...base, map_distance_in: 200 / 0.30 / 2000 });
+  assert.ok(Math.abs(thirtyPct.grade_pct - 30) < 1e-9);
+  assert.ok(Math.abs(thirtyPct.slope_distance_excess_pct - 4.40) < 1e-2);
+  assert.ok("error" in _v1398({ ...base, contour_interval_ft: 0 }));
+  assert.ok("error" in _v1398({ ...base, intervals_crossed: 0 }));
+  assert.ok("error" in _v1398({ ...base, map_distance_in: 0 }));
+  assert.ok("error" in _v1398({ ...base, representative_fraction: 0 }));
+  assert.ok("error" in _v1398({ ...base, intervals_crossed: Infinity }));
+});
+
+import { computeHelicopterLzSizing as _v1400 } from "../../calc-field.js";
+test("bounds: spec-v1400 computeHelicopterLzSizing pins all three checks", () => {
+  // 50 ft rotor at 2x needs a 100 ft square; 8 deg is 14.05%; 40 ft trees at 10:1 need 400 ft.
+  const base = { rotor_diameter_ft: 50, size_factor: 2, measured_clear_ft: 120, ground_slope_deg: 6, slope_limit_deg: 8, obstacle_height_ft: 40, approach_ratio: 10 };
+  const r = _v1400(base);
+  assert.ok(Math.abs(r.required_side_ft - 100) < 1e-9);
+  assert.strictEqual(r.area_ok, true);
+  assert.ok(Math.abs(r.slope_limit_pct - 14.054) < 1e-3);
+  assert.strictEqual(r.slope_ok, true);
+  assert.ok(Math.abs(r.approach_length_ft - 400) < 1e-9);
+  assert.ok(Math.abs(r.total_clear_ft - 900) < 1e-9);
+  assert.ok(r.verdict.startsWith("PASSES"));
+  // The approach is LINEAR in obstacle height and unforgiving.
+  const taller = _v1400({ ...base, obstacle_height_ft: 80 });
+  assert.ok(Math.abs(taller.approach_length_ft - 2 * r.approach_length_ft) < 1e-9);
+  // A clearing that measures fine can still fail on area alone.
+  const tight = _v1400({ ...base, measured_clear_ft: 90 });
+  assert.strictEqual(tight.area_ok, false);
+  assert.ok(tight.verdict.includes("area"));
+  // And on slope alone.
+  const steep = _v1400({ ...base, ground_slope_deg: 10 });
+  assert.strictEqual(steep.slope_ok, false);
+  assert.ok(steep.verdict.includes("slope"));
+  // Exactly at the slope limit passes.
+  assert.strictEqual(_v1400({ ...base, ground_slope_deg: 8 }).slope_ok, true);
+  // Night or a sling load takes the same rotor to a larger square.
+  const night = _v1400({ ...base, size_factor: 3 });
+  assert.ok(Math.abs(night.required_side_ft - 150) < 1e-9);
+  assert.strictEqual(night.area_ok, false);
+  assert.ok("error" in _v1400({ ...base, rotor_diameter_ft: 0 }));
+  assert.ok("error" in _v1400({ ...base, size_factor: 0 }));
+  assert.ok("error" in _v1400({ ...base, measured_clear_ft: 0 }));
+  assert.ok("error" in _v1400({ ...base, slope_limit_deg: 90 }));
+  assert.ok("error" in _v1400({ ...base, approach_ratio: 0 }));
+  assert.ok("error" in _v1400({ ...base, obstacle_height_ft: Infinity }));
+});
+
+import { computeLitterCarryTeam as _v1401 } from "../../calc-field.js";
+test("bounds: spec-v1401 computeLitterCarryTeam pins the staffing and the pace sensitivity", () => {
+  // 1.5 mi at 1.0 mph, six carriers, two teams, 10 min rotations, two support.
+  const base = { distance_mi: 1.5, pace_mph: 1.0, carriers_per_litter: 6, duty_fraction: 0.5, rotation_interval_min: 10, support_personnel: 2 };
+  const r = _v1401(base);
+  assert.ok(Math.abs(r.carry_time_hr - 1.5) < 1e-9);
+  assert.ok(Math.abs(r.carry_time_min - 90) < 1e-9);
+  assert.strictEqual(r.teams_needed, 2);
+  assert.strictEqual(r.carriers_needed, 12);
+  assert.strictEqual(r.total_personnel, 14);
+  assert.ok(Math.abs(r.person_hours - 21) < 1e-9);
+  assert.ok(Math.abs(r.rotations - 9) < 1e-9);
+  // The pace is the most sensitive input: halving it doubles time AND person-hours.
+  const slow = _v1401({ ...base, pace_mph: 0.5 });
+  assert.ok(Math.abs(slow.carry_time_hr - 2 * r.carry_time_hr) < 1e-9);
+  assert.ok(Math.abs(slow.person_hours - 2 * r.person_hours) < 1e-9);
+  // A third of the time carrying means three teams, not two.
+  const third = _v1401({ ...base, duty_fraction: 1 / 3 });
+  assert.strictEqual(third.teams_needed, 3);
+  assert.strictEqual(third.carriers_needed, 18);
+  // A duty fraction of 1 is a single team carrying without relief.
+  const noRelief = _v1401({ ...base, duty_fraction: 1 });
+  assert.strictEqual(noRelief.teams_needed, 1);
+  assert.strictEqual(noRelief.carriers_needed, 6);
+  assert.ok("error" in _v1401({ ...base, distance_mi: 0 }));
+  assert.ok("error" in _v1401({ ...base, pace_mph: 0 }));
+  assert.ok("error" in _v1401({ ...base, carriers_per_litter: 0 }));
+  assert.ok("error" in _v1401({ ...base, duty_fraction: 1.5 }));
+  assert.ok("error" in _v1401({ ...base, rotation_interval_min: 0 }));
+  assert.ok("error" in _v1401({ ...base, support_personnel: -1 }));
+  assert.ok("error" in _v1401({ ...base, pace_mph: Infinity }));
+});

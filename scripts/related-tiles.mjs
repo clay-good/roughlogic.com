@@ -541,6 +541,14 @@ const RELATED = {
   // slope-avalanche handle the field-safety reference.
   "pacing-distance": ["utm-conversion", "haversine", "bearing-conversion"],
   "hiking-time": ["pacing-distance", "backcountry-needs", "slope-avalanche"],
+  // spec-v1394..v1401: the 2026-08-26 trade-expansion Group P band.
+  "three-point-resection": ["cogo-forward-point","cogo-inverse-locate","azimuth-bearing-conversion"],
+  "slope-staking": ["slope-stake-cut-fill","grade-rod-cut-fill","differential-leveling"],
+  "grade-rod-cut-fill": ["differential-leveling","level-loop-adjustment","slope-staking"],
+  "map-scale-conversion": ["contour-slope","pacing-distance","utm-conversion"],
+  "contour-slope": ["map-scale-conversion","hiking-time","slope-avalanche"],
+  "helicopter-lz-sizing": ["backcountry-needs","searcher-hours","litter-carry-team"],
+  "litter-carry-team": ["searcher-hours","search-probability","helicopter-lz-sizing"],
   "utm-conversion": ["pacing-distance", "haversine", "bearing-conversion"],
   "bearing-conversion": ["magnetic-declination", "pacing-distance", "utm-conversion"],
   "magnetic-declination": ["bearing-conversion", "solar-times"],

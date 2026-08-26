@@ -916,3 +916,238 @@ function renderAzimuthBearing(inputRegion, outputRegion, citationEl) {
   update();
 }
 SURVEY_RENDERERS["azimuth-bearing-conversion"] = renderAzimuthBearing;
+
+// ===========================================================================
+// spec-v1394, v1395, v1396: the surveying half of the 2026-08-26
+// trade-expansion Group P band. See specs/scope-trade-expansion.md.
+// (The field half -- map scale, contour slope, helicopter LZ, litter carry --
+// lives in calc-field.js.)
+// ===========================================================================
+
+// Compact renderer factory, copied from the sibling calc-firesprinkler.js
+// factory (number and select inputs; same schema shape). Non-exported, so it
+// adds no v14 derivation-corpus row.
+function _simpleRenderer(spec) {
+  const _rlRender = function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      let field;
+      if (f.kind === "select") field = makeSelect(f.label, f.id || f.key, f.options);
+      else field = makeNumber(f.label, f.id || f.key, f.attrs || { step: "any" });
+      fields[f.key] = field;
+      if (f.default !== undefined) {
+        if (f.kind === "select") field.select.value = f.default;
+        else field.input.value = String(f.default);
+      }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key];
+        else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) {
+        if (f.kind === "select") params[f.key] = fields[f.key].select.value;
+        else params[f.key] = Number(fields[f.key].input.value) || 0;
+      }
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) {
+      const el = f.kind === "select" ? fields[f.key].select : fields[f.key].input;
+      el.addEventListener(f.kind === "select" ? "change" : "input", update);
+    }
+  };
+
+  _rlRender.schema = {
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
+    citation: spec.citation ?? null,
+    scope: spec.scope ?? null,
+  };
+  return _rlRender;
+}
+
+// ===================== spec-v1394: two-bearing resection =====================
+// dims: in { args: dimensionless } out: { east: L, north: L, distance_a_ft: L, distance_b_ft: L, intersection_angle_deg: dimensionless }
+export function computeThreePointResection({ ax = 0, ay = 0, azimuth_to_a_deg = 0, bx = 0, by = 0, azimuth_to_b_deg = 0, declination_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!Number.isFinite(ax) || !Number.isFinite(ay) || !Number.isFinite(bx) || !Number.isFinite(by)) return { error: "Known-point coordinates must be finite numbers." };
+  if (ax === bx && ay === by) return { error: "The two known points must be different." };
+  const rad = Math.PI / 180;
+  // A bearing to a known feature, reversed, is a line FROM that feature THROUGH you.
+  const backA = (azimuth_to_a_deg + declination_deg + 180) % 360;
+  const backB = (azimuth_to_b_deg + declination_deg + 180) % 360;
+  let intersection_angle_deg = Math.abs(backA - backB) % 360;
+  if (intersection_angle_deg > 180) intersection_angle_deg = 360 - intersection_angle_deg;
+  if (intersection_angle_deg > 90) intersection_angle_deg = 180 - intersection_angle_deg;
+  if (intersection_angle_deg < 1e-9) return { error: "The two back-azimuths are parallel: the lines never cross, so there is no fix." };
+  // Solve (Ax + t sinA, Ay + t cosA) = (Bx + s sinB, By + s cosB) for t.
+  const sa = Math.sin(backA * rad), ca = Math.cos(backA * rad);
+  const sb = Math.sin(backB * rad), cb = Math.cos(backB * rad);
+  const det = sa * cb - ca * sb;
+  if (Math.abs(det) < 1e-12) return { error: "The two back-azimuths are parallel: the lines never cross, so there is no fix." };
+  const t = ((bx - ax) * cb - (by - ay) * sb) / det;
+  const east = ax + t * sa;
+  const north = ay + t * ca;
+  const distance_a_ft = Math.hypot(east - ax, north - ay);
+  const distance_b_ft = Math.hypot(east - bx, north - by);
+  // Positional error scales as one over the sine of the intersection angle.
+  const error_multiplier = 1 / Math.sin(intersection_angle_deg * rad);
+  const strength = intersection_angle_deg >= 60
+    ? "strong: the lines cross near square, so a bearing error moves the fix about as little as it can"
+    : intersection_angle_deg >= 30
+      ? "usable: a bearing error moves the fix " + fmt(error_multiplier, 1) + " times as far as it would at a square crossing"
+      : "WEAK: under about 30 degrees of intersection a small bearing error slides the fix a long way along the lines -- shoot a third known point";
+  if (![east, north, distance_a_ft, distance_b_ft, error_multiplier].every(Number.isFinite)) return { error: "Resection math is not a finite value." };
+  return {
+    east,
+    north,
+    distance_a_ft,
+    distance_b_ft,
+    back_azimuth_a_deg: backA,
+    back_azimuth_b_deg: backB,
+    intersection_angle_deg,
+    error_multiplier,
+    strength,
+    note: "Where you are standing, from bearings shot to two known points. Shoot a bearing to a known feature and reverse it: that back azimuth is a line FROM the known feature THROUGH you. Do it to a second known feature and you have two lines, and where they cross is your position. The method works identically with a compass on a quadrangle and with a total station on control monuments, and the only care it needs is the declination correction when the bearings are magnetic. The strength-of-fix output is what keeps it honest. When the two lines cross near square the fix is sharp; when they cross at a shallow angle a small bearing error slides the intersection a long way along the lines, because the positional error scales as one over the sine of the intersection angle. Under about thirty degrees the fix should not be trusted, and the answer is a third known point -- whose three back-lines will not meet at a point but will form a small triangle, the cocked hat, whose size is the honest statement of how good the fix is. From known points at (1000, 5000) and (3000, 5400), azimuths of 315 and 45 degrees give back azimuths of 135 and 225, which cross square at (1800, 4200). Move so both features lie nearly in the same direction and the same one-degree uncertainty is worth three or four times as much ground. A field method; the survey of record and a checked closure govern anything that matters.",
+  };
+}
+
+export const threePointResectionExample = { inputs: { ax: 1000, ay: 5000, azimuth_to_a_deg: 315, bx: 3000, by: 5400, azimuth_to_b_deg: 45, declination_deg: 0 } };
+
+SURVEY_RENDERERS["three-point-resection"] = _simpleRenderer({
+  citation: "Citation: two-bearing resection by back-azimuth intersection, by name -- public plane surveying and land-navigation practice. The strength of fix is reported as the intersection angle, whose sine divides the positional error; under about 30 degrees a third known point is required. A field method; the survey of record and a checked closure govern.",
+  example: threePointResectionExample.inputs,
+  fields: [
+    { key: "ax", label: "Known point A easting", kind: "number" },
+    { key: "ay", label: "Known point A northing", kind: "number" },
+    { key: "azimuth_to_a_deg", label: "Observed azimuth to A (deg)", kind: "number" },
+    { key: "bx", label: "Known point B easting", kind: "number" },
+    { key: "by", label: "Known point B northing", kind: "number" },
+    { key: "azimuth_to_b_deg", label: "Observed azimuth to B (deg)", kind: "number" },
+    { key: "declination_deg", label: "Declination correction (deg, 0 if grid bearings)", kind: "number" },
+  ],
+  outputs: [
+    { key: "p", id: "tpre-out-p", label: "Occupied point", value: (r) => fmt(r.east, 2) + " E, " + fmt(r.north, 2) + " N" },
+    { key: "d", id: "tpre-out-d", label: "Distance to the known points", value: (r) => fmt(r.distance_a_ft, 1) + " to A, " + fmt(r.distance_b_ft, 1) + " to B" },
+    { key: "b", id: "tpre-out-b", label: "Back azimuths used", value: (r) => fmt(r.back_azimuth_a_deg, 2) + " deg from A, " + fmt(r.back_azimuth_b_deg, 2) + " deg from B" },
+    { key: "a", id: "tpre-out-a", label: "Intersection angle", value: (r) => fmt(r.intersection_angle_deg, 2) + " deg" },
+    { key: "s", id: "tpre-out-s", label: "Strength of fix", value: (r) => r.strength },
+    { key: "n", id: "tpre-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeThreePointResection,
+});
+
+// ===================== spec-v1395: slope stake catch point on a cross slope =====================
+// dims: in { args: dimensionless } out: { catch_distance_ft: L, vertical_at_catch_ft: L, flat_ground_distance_ft: L }
+export function computeSlopeStaking({ half_width_ft = 0, depth_ft = 0, side_slope_ratio = 2, ground_cross_slope = 0, section = "cut" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (section !== "cut" && section !== "fill") return { error: "Section must be cut or fill." };
+  if (!(half_width_ft > 0)) return { error: "Half-width must be positive." };
+  if (!(depth_ft > 0)) return { error: "Cut or fill depth at the hinge must be positive." };
+  if (!(side_slope_ratio > 0)) return { error: "Side-slope ratio must be positive." };
+  if (!Number.isFinite(ground_cross_slope)) return { error: "Ground cross slope must be a finite number." };
+  // On a CUT the ground rising away from centerline pushes the catch farther out; on a
+  // FILL it is the ground falling away that does. The sign convention flips with the section.
+  const g = section === "cut" ? ground_cross_slope : -ground_cross_slope;
+  const denominator = 1 - side_slope_ratio * g;
+  if (!(denominator > 0)) {
+    return { error: "The ground cross slope is as steep as the design side slope, so the slope never daylights -- the section needs a retaining structure or a slope change, not a longer tape." };
+  }
+  const run_ft = depth_ft * side_slope_ratio / denominator;
+  const catch_distance_ft = half_width_ft + run_ft;
+  const vertical_at_catch_ft = depth_ft + g * run_ft;
+  const flat_ground_distance_ft = half_width_ft + depth_ft * side_slope_ratio;
+  const difference_ft = catch_distance_ft - flat_ground_distance_ft;
+  const limiting_cross_slope = 1 / side_slope_ratio;
+  if (![run_ft, catch_distance_ft, vertical_at_catch_ft, flat_ground_distance_ft].every(Number.isFinite)) return { error: "Slope-staking math is not a finite value." };
+  return {
+    catch_distance_ft,
+    run_ft,
+    vertical_at_catch_ft,
+    flat_ground_distance_ft,
+    difference_ft,
+    limiting_cross_slope,
+    note: "Where a design side slope actually meets the ground, once the ground's own cross slope is accounted for. The design slope leaves the hinge point at the shoulder and runs out at its ratio until it daylights. If the ground were level the catch would sit at the half-width plus the depth times the ratio, and no correction would be needed -- but the ground is never level, and a cross slope that rises away from centerline pushes the catch point FARTHER out on a cut, because the ground is climbing toward the slope while the slope is climbing toward the ground and they take longer to meet. The denominator carries the whole correction and it also carries the warning: as the ratio times the cross slope approaches one -- a ground cross slope as steep as the design side slope -- the denominator goes to zero and the slope never catches at all. That is a real condition on side-hill work and the answer is a retaining structure or a slope change, not a longer tape. A 24 ft roadway in a 6 ft cut at 2:1 with the ground rising 10% away from centerline catches at 27.0 ft out and 7.5 ft down, three feet past the 24.0 ft the level-ground form would give; at 20% cross slope it is 32.0 ft, eight feet past. At 50% the 2:1 slope runs parallel to the ground and never daylights. A field calculation; the grading plan, the surveyor of record, and the existing-ground breaks between shots govern.",
+  };
+}
+
+export const slopeStakingExample = { inputs: { half_width_ft: 12, depth_ft: 6, side_slope_ratio: 2, ground_cross_slope: 0.10, section: "cut" } };
+
+SURVEY_RENDERERS["slope-staking"] = _simpleRenderer({
+  citation: "Citation: slope-stake catch point with the ground cross-slope correction, d = half-width + H s / (1 - s g), by name -- standard construction-surveying practice. The level-ground form is the g = 0 case and is reported alongside for comparison. The grading plan, the surveyor of record, and the existing-ground breaks between shots govern.",
+  example: slopeStakingExample.inputs,
+  fields: [
+    { key: "half_width_ft", label: "Roadway or pad half-width (ft)", kind: "number" },
+    { key: "depth_ft", label: "Cut or fill depth at the hinge (ft)", kind: "number" },
+    { key: "side_slope_ratio", label: "Side-slope ratio (run per unit rise, so 2 for 2:1)", kind: "number" },
+    { key: "ground_cross_slope", label: "Ground cross slope (0.10 = 10% rising away)", kind: "number", attrs: { step: "any" } },
+    { key: "section", label: "Section", kind: "select", options: [{ value: "cut", label: "Cut" }, { value: "fill", label: "Fill" }] },
+  ],
+  outputs: [
+    { key: "d", id: "slst-out-d", label: "Catch point from centerline", value: (r) => fmt(r.catch_distance_ft, 2) + " ft (" + fmt(r.run_ft, 2) + " ft beyond the hinge)" },
+    { key: "v", id: "slst-out-v", label: "Vertical from the hinge to the catch", value: (r) => fmt(r.vertical_at_catch_ft, 2) + " ft" },
+    { key: "f", id: "slst-out-f", label: "Level-ground answer for comparison", value: (r) => fmt(r.flat_ground_distance_ft, 2) + " ft, which is " + fmt(Math.abs(r.difference_ft), 2) + " ft " + (r.difference_ft >= 0 ? "short" : "long") },
+    { key: "l", id: "slst-out-l", label: "Cross slope at which this slope never daylights", value: (r) => fmt(r.limiting_cross_slope * 100, 1) + " %" },
+    { key: "n", id: "slst-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSlopeStaking,
+});
+
+// ===================== spec-v1396: grade rod, cut, and fill =====================
+// dims: in { args: dimensionless } out: { hi_ft: L, grade_rod_ft: L, ground_elevation_ft: L, cut_fill_ft: L }
+export function computeGradeRodCutFill({ benchmark_elev_ft = 0, backsight_ft = 0, design_elev_ft = 0, ground_rod_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!Number.isFinite(benchmark_elev_ft) || !Number.isFinite(design_elev_ft)) return { error: "Benchmark and design elevations must be finite numbers." };
+  if (!(backsight_ft > 0)) return { error: "Backsight rod reading must be positive." };
+  if (!(ground_rod_ft > 0)) return { error: "Ground rod reading must be positive." };
+  // One number carries the whole design for the setup: the grade rod is the reading that
+  // WOULD be observed if the rod stood on finished grade.
+  const hi_ft = benchmark_elev_ft + backsight_ft;
+  const grade_rod_ft = hi_ft - design_elev_ft;
+  if (!(grade_rod_ft > 0)) return { error: "The design grade sits at or above the instrument, so no rod reading can reach it -- move the instrument up or reset on a higher benchmark." };
+  const ground_elevation_ft = hi_ft - ground_rod_ft;
+  const cut_fill_ft = grade_rod_ft - ground_rod_ft;
+  const label = cut_fill_ft > 0 ? "CUT " + fmt(cut_fill_ft, 2) + " ft" : cut_fill_ft < 0 ? "FILL " + fmt(-cut_fill_ft, 2) + " ft" : "ON GRADE";
+  if (![hi_ft, grade_rod_ft, ground_elevation_ft, cut_fill_ft].every(Number.isFinite)) return { error: "Grade-rod math is not a finite value." };
+  return {
+    hi_ft,
+    grade_rod_ft,
+    ground_elevation_ft,
+    cut_fill_ft,
+    label,
+    note: "The cut or fill at a shot, from one grade rod that carries the whole design for the instrument setup. Set the instrument, shoot the benchmark, and the height of instrument is fixed: it is the benchmark elevation plus the backsight. From then on a single number does all the work -- the grade rod is the height of instrument less the design elevation, which is the rod reading that WOULD be observed if the rod were standing on finished grade. Every subsequent shot is compared against it and the difference is the cut or fill, with no elevation arithmetic at all. The sign is where crews go wrong and it is worth stating plainly: a rod reading SMALLER than the grade rod means the rod is standing HIGHER than design, because the rod reads downward from a fixed instrument. Smaller reading, higher ground, cut. It reads backward the first hundred times. A benchmark at 100.00 with a 5.20 backsight fixes the height of instrument at 105.20, and a design grade of 98.50 makes the grade rod 6.70; a ground shot reading 4.90 is therefore a cut of 1.80 ft, which checks independently because the ground sits at 100.30 against a design of 98.50. A shot reading 7.55 on the same setup is a fill of 0.85 ft. One grade rod, every shot on the setup, until the instrument moves. A field calculation; the grading plan, the benchmark of record, and a checked level circuit govern.",
+  };
+}
+
+export const gradeRodCutFillExample = { inputs: { benchmark_elev_ft: 100.00, backsight_ft: 5.20, design_elev_ft: 98.50, ground_rod_ft: 4.90 } };
+
+SURVEY_RENDERERS["grade-rod-cut-fill"] = _simpleRenderer({
+  citation: "Citation: the grade-rod method of differential leveling -- height of instrument = benchmark + backsight, grade rod = HI - design elevation, cut or fill = grade rod - ground rod -- by name; standard construction-surveying practice. A smaller rod reading means higher ground and a cut. The grading plan, the benchmark of record, and a checked level circuit govern.",
+  example: gradeRodCutFillExample.inputs,
+  fields: [
+    { key: "benchmark_elev_ft", label: "Benchmark elevation (ft)", kind: "number" },
+    { key: "backsight_ft", label: "Backsight rod reading (ft)", kind: "number" },
+    { key: "design_elev_ft", label: "Design (finished grade) elevation (ft)", kind: "number" },
+    { key: "ground_rod_ft", label: "Ground rod reading at the shot (ft)", kind: "number" },
+  ],
+  outputs: [
+    { key: "h", id: "grcf-out-h", label: "Height of instrument", value: (r) => fmt(r.hi_ft, 2) + " ft" },
+    { key: "g", id: "grcf-out-g", label: "Grade rod for this setup", value: (r) => fmt(r.grade_rod_ft, 2) + " ft" },
+    { key: "e", id: "grcf-out-e", label: "Ground elevation at the shot", value: (r) => fmt(r.ground_elevation_ft, 2) + " ft" },
+    { key: "c", id: "grcf-out-c", label: "Cut or fill", value: (r) => r.label },
+    { key: "n", id: "grcf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGradeRodCutFill,
+});

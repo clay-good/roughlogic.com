@@ -64,6 +64,18 @@ reading only the top two hits of a long list hides the third. All nine were cut:
 | arc-flash incident energy | `arc-flash-screen` |
 | freestanding sign wind | `wind-solid-sign` |
 
+A **tenth** duplicate surfaced while the Group P band was being built, and it shows the limit of the
+token-overlap screen itself. spec-v1399 (great-circle distance and initial bearing) is answered by the
+existing `haversine` tile, whose description reads "Great-circle distance and initial bearing between two
+coordinates" and whose compute returns miles, kilometers, and the initial bearing from the same haversine
+form. **"great-circle-distance" and "haversine" share no tokens**, so no amount of token-overlap scoring
+would have caught it -- the screen compares names, and these two names describe the same thing without a
+word in common. The lesson for the remaining bands is that a name-similarity screen has to be paired with a
+FORMULA-level check: search the catalog for the method, not only for the name. spec-v1399 was cut, and the
+part of it that is genuinely new -- the FINAL bearing and its divergence from the initial one -- is recorded
+as a follow-up against the existing tile rather than shipped as a second tile answering the same question.
+
+
 Their spec numbers were reused for nine verified-new tiles: band saw blade pitch, tube bend wall
 thinning, ISO 1940 balance grade, bearing regrease interval, hydraulic reservoir and cooler duty,
 curtain wall mullion deflection, refrigerant leak rate against the EPA threshold, IEEE 80 ground
@@ -138,4 +150,5 @@ renames an id, or moves a tile between groups.
 | Stage and live production (Group N) | v1364-v1376 | **landed 2026-08-26**, 13 tiles; catalog 1,723 -> 1,736 |
 | Trucking and logistics (Group J) | v1377-v1385 | **landed 2026-08-26**, 9 tiles; catalog 1,736 -> 1,745 |
 | Fire-ground and fire protection (Group F) | v1386-v1393 | **landed 2026-08-26**, 8 tiles; catalog 1,745 -> 1,753 |
-| Every other band | v1394-v1449 | not yet built |
+| Field, survey, and SAR (Group P) | v1394-v1401 | **landed 2026-08-26**, 7 tiles (v1399 cut, see below); catalog 1,753 -> 1,760 |
+| Every other band | v1402-v1449 | not yet built |
