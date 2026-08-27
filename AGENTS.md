@@ -40,7 +40,7 @@ server also serves MCP resources (`roughlogic://catalog`, `roughlogic://trade/{t
 | Compute functions **and** renderers | `calc-*.js` (one module per trade group) |
 | Tile registry (id → name, group, trades) | `tools-data.js` |
 | Tile id → compute function | `test/fixtures/compute-map.js` |
-| Tile id → renderer (for field schemas) | `test/fixtures/renderer-map.js` (generated from `app.js`) |
+| Tile id → renderer (for field schemas) | `test/fixtures/renderer-map.js` (generated from `tool-modules.js`) |
 | Publisher-verified worked examples | `test/fixtures/worked-examples.json` |
 | MCP server + catalog layer | `mcp/server.mjs`, `mcp/catalog.mjs` |
 | Shared calculator report UI | `report-feedback.js` |
@@ -50,7 +50,7 @@ server also serves MCP resources (`roughlogic://catalog`, `roughlogic://trade/{t
 
 Work is **spec-first**: write a numbered `specs/spec-vNNNN.md`, then implement. A
 new tile touches several registries (`tools-data.js`, the compute module, the
-`declare(...)` table in `app.js`, `compute-map.js`, a `worked-examples.json`
+`declare(...)` table in `tool-modules.js`, `compute-map.js`, a `worked-examples.json`
 fixture) and must pass the CI gates (`npm run lint`, `npm test`, `npm run build`).
 Run them locally before pushing. Match the surrounding module's style.
 

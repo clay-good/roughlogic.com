@@ -125,8 +125,16 @@ repo-root `calc-*.js` set, each with a documented gzip cap in
 
 Each calc-*.js module is dynamic-imported on first tool open, the same
 pattern as v1. The home-view payload (index.html + styles.css + app.js +
-integrity.js + theme.js + routing.js) gzips to ~55 KB at v12, well under
-the 100 KB budget in spec.md section 11.1.
+integrity.js + theme.js + routing.js) gzips to **45,008 B** as of
+2026-08-27, well under the 100 KB budget in spec.md section 11.1.
+
+Two registries that once lived inside `app.js` are dynamic-imported and
+are therefore outside that payload: the `TOOLS` catalog registry in
+`tools-data.js`, loaded on the first search keystroke or tile route, and
+the `TOOL_MODULES` tile-id to renderer table in `tool-modules.js`, loaded
+on the first tile open by `loadRenderer()`. Both grow by one entry per
+tile, so keeping them out of the home view is what stops first paint from
+getting slower every time the catalog grows.
 
 ## v2 hash format
 

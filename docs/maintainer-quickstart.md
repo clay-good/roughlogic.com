@@ -34,8 +34,11 @@ Tests live in `test/unit/` and `test/integration/`.
      lazy-loaded out of `app.js` per spec-v17 §H.2 -- NOT in app.js).
    - `[id, group]` row in `_TILES` in [../tile-meta.js](../tile-meta.js).
    - the tile id in the matching `declare("./calc-<group>.js",
-     "<NAME>_RENDERERS", [...])` list in [../app.js](../app.js) (the
-     `check-wiring` lint fails if a `TOOLS` id has no declared renderer).
+     "<NAME>_RENDERERS", [...])` list in
+     [../tool-modules.js](../tool-modules.js) (the tile-id to renderer
+     registry, lazy-loaded out of `app.js` per spec-v10 §§H.1/H.2 -- NOT
+     in app.js; the `check-wiring` lint fails if a `TOOLS` id has no
+     declared renderer).
    - `{ module, fn }` entry in
      [../test/fixtures/compute-map.js](../test/fixtures/compute-map.js).
    - a 3-6 id entry in [../scripts/related-tiles.mjs](../scripts/related-tiles.mjs)
@@ -131,7 +134,8 @@ The 90-day deprecation per spec.md §10:
    on YYYY-MM-DD."
 3. Wait 90 days.
 4. Remove the tile from the `TOOLS` array in [../tools-data.js](../tools-data.js)
-   and from the `declare(...)` renderer list in [../app.js](../app.js).
+   and from the `declare(...)` renderer list in
+   [../tool-modules.js](../tool-modules.js).
 5. Add a URL-hash redirect in [../routing.js](../routing.js) so
    stale bookmarks land on the closest replacement (or home, with
    a banner).

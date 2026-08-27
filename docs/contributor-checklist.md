@@ -25,7 +25,9 @@ phase docs ([edition-rollover.md](edition-rollover.md),
 - [ ] Tile renderer is wired into the per-group `<NAME>_RENDERERS`
   dispatch table in `calc-<group>.js`, and the tile id is added to
   the matching `declare("./calc-<group>.js", "<NAME>_RENDERERS",
-  [...])` list in [../app.js](../app.js) (the `check-wiring` lint
+  [...])` list in [../tool-modules.js](../tool-modules.js) (the
+  tile-id to renderer registry, lazy-loaded out of `app.js` per
+  spec-v10 §§H.1/H.2) (the `check-wiring` lint
   fails if a `TOOLS` id has no declared renderer).
 - [ ] A `// dims:` dimensional-analysis annotation sits immediately
   above the exported compute function (the Phase C lint requires one
