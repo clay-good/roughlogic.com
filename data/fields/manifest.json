@@ -24,7 +24,7 @@
     {
       "file": "d.json",
       "name": "Field descriptors, d runtime shard (generated)",
-      "gzip_size_bytes": 2622
+      "gzip_size_bytes": 2897
     },
     {
       "file": "e-1.json",
@@ -34,7 +34,7 @@
     {
       "file": "e-2.json",
       "name": "Field descriptors, e-2 runtime shard (generated)",
-      "gzip_size_bytes": 17600
+      "gzip_size_bytes": 17820
     },
     {
       "file": "f.json",

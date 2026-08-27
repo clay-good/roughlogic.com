@@ -2221,8 +2221,10 @@ cross-check.
 | calc-finish.js | `computeRetainingWallBlock` | `{ wall_length_ft = 0, exposed_height_ft = 0, block_length_in = 18, block_heig...` | _ | _ | _ |
 | calc-finish.js | `computeRoughOpeningSize` | `{ opening_type = "window", unit_width_in = 0, unit_height_in = 0, width_adder...` | _ | _ | _ |
 | calc-finish.js | `computeSoffitRidgeVentCount` | `{ attic_area_sf = 1500, vent_ratio = 300, soffit_vent_nfa_in2 = 26, ridge_nfa...` | _ | _ | _ |
+| calc-finish.js | `computeSprayTipSelection` | `{ tip_number = 0, pressure_psi = 0, wet_film_mils = 0, ref_orifice_in = 0.015...` | _ | _ | _ |
 | calc-finish.js | `computeSrwGeogridSpacing` | `{ wall_height_ft = 0, block_depth_in = 12, block_height_in = 8, base_course_b...` | _ | _ | _ |
 | calc-finish.js | `computeStepFlashingCount` | `{ wall_run_ft = 20, shingle_exposure_in = 5, waste_pct = 5 } = {}` | _ | _ | _ |
+| calc-finish.js | `computeTextureMaterialTakeoff` | `{ gross_area_sqft = 0, openings_sqft = 0, coverage_per_bag_sqft = 0, waste_pc...` | _ | _ | _ |
 | calc-finish.js | `computeThinsetCoverage` | `{ area_sqft = 0, trowel = "quarter_three_eighths", coverage_per_bag = 0, bag_...` | _ | _ | _ |
 | calc-finish.js | `computeValleyFlashingTakeoff` | `{ valley_run_ft = 0, valley_count = 1, pitch_rise_per_12 = 6, metal_width_in ...` | _ | _ | _ |
 | calc-fire.js | `computeAerialLadderReach` | `{ angle_deg, extension_ft }` | _ | _ | _ |
@@ -3040,6 +3042,7 @@ cross-check.
 | calc-restoration.js | `computeOzoneShockTreatment` | `{ structure_volume_ft3 = 0, rated_volume_per_unit = 2000, treatment_time_hr =...` | _ | _ | _ |
 | calc-restoration.js | `computePPE` | `{ category }` | _ | _ | _ |
 | calc-restoration.js | `computePsychrometric` | `{ temperature_F, RH_percent, atmospheric_pressure_hPa = 1013.25 }` | _ | _ | _ |
+| calc-restoration.js | `computeSewageLossDisposal` | `{ soft_area_sqft = 0, soft_thickness_in = 0, board_area_sqft = 0, board_thick...` | _ | _ | _ |
 | calc-restoration.js | `computeSmokeResidueMethod` | `{ residue_type = "dry" } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeSootCleaningTakeoff` | `{ affected_sf = 0, sponge_coverage_sf = 100, production_sf_per_hr = 150, seal...` | _ | _ | _ |
 | calc-restoration.js | `computeSporeIoRatio` | `{ indoor_spores_m3 = 0, outdoor_spores_m3 = 0, indoor_marker = 0 } = {}` | _ | _ | _ |
@@ -3048,6 +3051,7 @@ cross-check.
 | calc-restoration.js | `computeThermalDeltaTReference` | `` | _ | _ | _ |
 | calc-restoration.js | `computeThermalFogDeodorization` | `{ structure_volume_ft3 = 0, dose_oz_per_1000ft3 = 5, treatments = 1 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeWaterClassScreen` | `{ floor_wet_fraction = 0, wall_wet_fraction = 0, wick_height_ft = 0, low_evap...` | _ | _ | _ |
+| calc-restoration.js | `computeWaterExtractionRate` | `{ area_sqft = 0, standing_depth_in = 0, absorption_gal_per_sqft = 0, extracti...` | _ | _ | _ |
 | calc-restoration.js | `computeWaterReference` | `` | _ | _ | _ |
 | calc-restoration.js | `computeWoodEmc` | `{ temperature_F = 0, rh_pct = 0 } = {}` | _ | _ | _ |
 | calc-restoration.js | `renderAirMovers` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -3465,7 +3469,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2051.
+Row count: 2055.
 
 <!-- END function-corpus-v14 -->
 
@@ -4059,7 +4063,7 @@ per spec-v14 §13.1 second paragraph.
 | `window-overhang-shade` | Window Overhang Shading (Profile Angle and Shade Line) | ASHRAE Handbook-Fundamentals (Fenestr...; spec-v1012 section 2.1 pinned example; tan(profile) = tan... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `window-solar-heat-gain` | Window Solar Heat Gain and Conduction Cooling Load | ASHRAE / ACCA Manual J fenestration; spec-v227 section 2.1 pinned example (west window) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group D Restoration (51 tiles)
+### Group D Restoration (53 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4105,6 +4109,7 @@ per spec-v14 §13.1 second paragraph.
 | `ozone-shock-treatment` | Ozone Deodorization Sizing, Time, and Lockout | ANSI/IICRC S700 deodorization; 8000 ft^3 at 2000 ft^3/unit -> 4 generators, lockout requ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ppe` | PPE Selection | OSHA / IICRC S500 PPE category schedule; Category 1 -> nitrile gloves, safety glasses, work clothi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `psychrometric` | Psychrometric Calculator | ASHRAE Handbook (Fundamentals); 75 F @ 50% RH -> dew point ~55.1 F, ~64.5 GPP (grains per... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `sewage-loss-disposal` | Category 3 Loss Disposal Volume, Containers, and Routing | Project (first-principles); loose = in place x bulking factor | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `smoke-residue-method` | Smoke Residue Type and Cleaning Method Screen | ANSI/IICRC S700 residue-method mapping; dry residue -> dry-sponge then dry/wet cleaning | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `soot-cleaning-takeoff` | Dry-Sponge Soot Cleaning Takeoff and Seal Coat | ANSI/IICRC S700 fire and smoke restor...; 1200 ft^2 at 100 ft^2/sponge, 150 ft^2/hr, seal -> 12, 8.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spore-io-ratio` | Indoor/Outdoor Spore Ratio Clearance Screen | ANSI/IICRC S520 (indoor/outdoor clear...; 800 vs 1,500 spores/m^3, no marker -> 0.53 ratio, support... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4113,9 +4118,10 @@ per spec-v14 §13.1 second paragraph.
 | `thermal-delta-t` | Thermal Imager Delta-T Reference | IICRC S500 + ASHRAE-bundled thermal-d...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thermal-fog-deodorization` | Thermal/ULV Fog Deodorizer Dosage | ANSI/IICRC S700 deodorization; 8000 ft^3 at 5 oz/1000 ft^3, 1 pass -> 40 oz, 0.31 gal | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (477 tiles)
+### Group E Construction (479 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4496,6 +4502,7 @@ per spec-v14 §13.1 second paragraph.
 | `spiral-curve` | Spiral (Transition) Curve Layout | AASHTO Green Book / Ghilani & Wolf, E...; theta_s = 250/2000 = 0.125 rad = 7.162 deg; p = 250^2/240... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spoil-setback` | Trench Spoil Pile Setback and Surcharge | OSHA 29 CFR 1926.651(j) / Subpart P; 10 ft trench, 4 ft pile at 34 deg, 2 ft minimum -> 5.93 f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spray-foam-board-feet` | Spray Foam Board-Feet and Set Count | Spray-foam board-feet identity (first...; board-feet = 2000*3 = 6,000; sets = ceil(6000*1.10/4800) = 2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `spray-tip-selection` | Airless Spray Tip Size, Fan Width, Output, and Coverage Rate | Project (first-principles); flow scales as orifice squared; 1,604.17 sq ft per gal at... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spt-bearing-capacity` | SPT Allowable Bearing on Sand (Meyerhof) | Meyerhof / Das; spec-v415 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spt-required-n60` | Required SPT N60 for a Target Bearing (Meyerhof) | Meyerhof / Das; 5 ksf target, B 6 ft, D 2 ft -> N60 ~19.86 (design 20) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `square-footage` | Square Footage | Project (first-principles); 10 ft x 12 ft rectangle -> 120 ft^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4542,6 +4549,7 @@ per spec-v14 §13.1 second paragraph.
 | `tactile-sign-mounting` | Tactile Sign Mounting Height and Location (2010 ADA Standards 703.4) | US Department of Justice / US Access ...; 703.4.1: tactile characters shall be located '48 inches m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tapered-roof-insulation` | Tapered Roof Insulation Average Thickness and Quantity | Tapered-insulation identity (first-pr...; avg = 0.5 + 0.25*40/2 = 5.5 in; board-feet = 2000*5.5 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `temporary-stairway-check` | Temporary Stairway Check (OSHA 1926.1052) | Occupational Safety and Health Admini...; 'Stairways having four or more risers or rising more than... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `texture-material-takeoff` | Wall and Ceiling Texture Material Takeoff | Project (first-principles); bags = ceil(net x (1 + waste) / coverage) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thermal-stress-max-deltat` | Max Temperature Change for a Stress Limit | mechanics of materials (inverse); spec-v674 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `thermal-stress-restrained` | Restrained Thermal Stress and Force | mechanics of materials; spec-v360 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `thinset-coverage` | Thin-Set Mortar Coverage | Manufacturer thin-set coverage charts...; spec-v95 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5438,6 +5446,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1800. Fixture-covered or reference-cadence: 1800 / 1800.
+Tile count: 1804. Fixture-covered or reference-cadence: 1804 / 1804.
 
 <!-- END tile-index-v14 -->

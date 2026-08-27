@@ -663,6 +663,11 @@ const _TILES = [
   ["heat-treat-soak-time", "G"],
   ["quench-severity", "G"],
   ["belt-conveyor-tension-power", "G"],
+  // spec-v1445..v1449: the 2026-08-26 trade-expansion restoration and finish band (v1449 cut).
+  ["water-extraction-rate", "D"],
+  ["sewage-loss-disposal", "D"],
+  ["spray-tip-selection", "E"],
+  ["texture-material-takeoff", "E"],
   ["dust-collection-duct", "G"],
   ["carburetor-altitude-jetting", "K"],
   ["step-touch-voltage", "A"],

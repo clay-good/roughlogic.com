@@ -93514,6 +93514,240 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "water-extraction-rate",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "800 sq ft under 1 in of water over carpet and pad at 0.15 gal/sq ft, 5 gpm wand, 100 gal tank",
+   "source_edition_or_year": "ANSI/IICRC S500 practice",
+   "source_section_or_page": "standing + absorbed; wand time = total / gpm",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "area_sqft": 800,
+    "standing_depth_in": 1,
+    "absorption_gal_per_sqft": 0.15,
+    "extraction_rate_gpm": 5,
+    "waste_tank_gal": 100,
+    "dehu_gal_per_day": 15
+   },
+   "outputs": {
+    "standing_gal": {
+     "value": 498.701,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "absorbed_gal": {
+     "value": 120,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_gal": {
+     "value": 618.701,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wand_time_min": {
+     "value": 123.74,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wand_time_hr": {
+     "value": 2.06234,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tank_dumps": {
+     "value": 7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "water_weight_lb": {
+     "value": 5163.31,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "dehu_days": {
+     "value": 41.2468,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sewage-loss-disposal",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "500 sq ft carpet and pad plus 120 sq ft of 1/2 in board, bulked 3x, 620 gal extracted",
+   "source_edition_or_year": "ANSI/IICRC S500 practice",
+   "source_section_or_page": "loose = in place x bulking factor",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "soft_area_sqft": 500,
+    "soft_thickness_in": 0.5,
+    "board_area_sqft": 120,
+    "board_thickness_in": 0.5,
+    "bulking_factor": 3,
+    "bag_capacity_gal": 33,
+    "container_cy": 10,
+    "extracted_gal": 620
+   },
+   "outputs": {
+    "in_place_cf": {
+     "value": 25.8333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "loose_cf": {
+     "value": 77.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bag_cf": {
+     "value": 4.41146,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bag_count": {
+     "value": 18,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "container_cf": {
+     "value": 270,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "container_utilization_pct": {
+     "value": 28.7037,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "liquid_weight_lb": {
+     "value": 5174.15,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spray-tip-selection",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "517 tip at 2,000 psi laying 6 wet mils, calibrated to a .015 tip at 0.31 gpm",
+   "source_edition_or_year": "airless spray practice",
+   "source_section_or_page": "flow scales as orifice squared; 1,604.17 sq ft per gal at 1 mil",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "tip_number": 517,
+    "pressure_psi": 2000,
+    "wet_film_mils": 6,
+    "ref_orifice_in": 0.015,
+    "ref_flow_gpm": 0.31,
+    "ref_pressure_psi": 2000
+   },
+   "outputs": {
+    "fan_width_in": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "orifice_in": {
+     "value": 0.017,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "flow_gpm": {
+     "value": 0.398178,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "coverage_rate_sqft_min": {
+     "value": 106.457,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "travel_speed_fpm": {
+     "value": 127.749,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "texture-material-takeoff",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "2,400 sq ft ceiling, knockdown at 225 sq ft per 40 lb bag, 10% waste, 1.4 gal per bag",
+   "source_edition_or_year": "drywall finishing practice",
+   "source_section_or_page": "bags = ceil(net x (1 + waste) / coverage)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "gross_area_sqft": 2400,
+    "openings_sqft": 0,
+    "coverage_per_bag_sqft": 225,
+    "waste_pct": 10,
+    "bag_weight_lb": 40,
+    "water_gal_per_bag": 1.4
+   },
+   "outputs": {
+    "net_area_sqft": {
+     "value": 2400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "order_area_sqft": {
+     "value": 2640,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bags_before_waste": {
+     "value": 10.6667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bags_required": {
+     "value": 12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "dry_weight_lb": {
+     "value": 480,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "mix_water_gal": {
+     "value": 16.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

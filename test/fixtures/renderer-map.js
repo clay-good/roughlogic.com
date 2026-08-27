@@ -803,6 +803,11 @@ export const RENDERER_MAP = {
   "heat-treat-soak-time": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "quench-severity": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "belt-conveyor-tension-power": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
+  // spec-v1445..v1449: the 2026-08-26 trade-expansion restoration and finish band (v1449 cut).
+  "water-extraction-rate": { module: "../../calc-restoration.js", exportName: "RESTORATION_RENDERERS" },
+  "sewage-loss-disposal": { module: "../../calc-restoration.js", exportName: "RESTORATION_RENDERERS" },
+  "spray-tip-selection": { module: "../../calc-finish.js", exportName: "FINISH_RENDERERS" },
+  "texture-material-takeoff": { module: "../../calc-finish.js", exportName: "FINISH_RENDERERS" },
   "step-touch-voltage": { module: "../../calc-elecdesign.js", exportName: "ELECDESIGN_RENDERERS" },
   "ground-potential-rise": { module: "../../calc-elecdesign.js", exportName: "ELECDESIGN_RENDERERS" },
   "max-grid-resistance-for-touch": { module: "../../calc-elecdesign.js", exportName: "ELECDESIGN_RENDERERS" },

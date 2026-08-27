@@ -93,6 +93,14 @@ differed. A name screen would never have seen it -- one is named for a stairwell
 door and a person. The follow-up recorded against the existing tile is a set of search aliases, so that a
 reader looking for door opening force reaches it.
 
+The **fourteenth and last** cut closed the program. spec-v1449 (floating floor row layout and balanced rip) is
+already computed by `flooring-takeoff`, whose description names "the last-row balance that tells you whether to rip
+the first course" and whose compute carries the identical `(remainder + plank width) / 2` rip on the same
+"narrower than a third of a plank" trigger, along with boxes at a pattern-driven waste allowance. Its note even
+names the 1/4 to 3/8 in expansion gap. The one genuinely new element -- subtracting the expansion gap from the
+usable width *before* the row division -- is a refinement to that calculation rather than a second calculation, and
+is recorded as a follow-up against it, with search aliases routing the layout question there.
+
 
 Their spec numbers were reused for nine verified-new tiles: band saw blade pitch, tube bend wall
 thinning, ISO 1940 balance grade, bearing regrease interval, hydraulic reservoir and cooler duty,
@@ -188,4 +196,7 @@ renames an id, or moves a tile between groups.
 | Electrical power system (Group A) | v1420-v1424 | **landed 2026-08-26**, 3 tiles (v1423 and v1424 cut, see below); catalog 1,778 -> 1,781 |
 | Specialty trades (Groups E, G, K) | v1425-v1434 | **landed 2026-08-27**, 9 tiles (v1427 cut, see below); catalog 1,781 -> 1,790 |
 | Industrial and finishing (Group G) | v1435-v1444 | **landed 2026-08-27**, 10 tiles, none cut; catalog 1,790 -> 1,800 |
-| Every other band | v1445-v1449 | not yet built |
+| Restoration and finish trades (Groups D, E) | v1445-v1449 | **landed 2026-08-27**, 4 tiles (v1449 cut, see below); catalog 1,800 -> 1,804 |
+
+**The program is complete.** All 100 specs are handled: **86 tiles landed** and **14 cut as duplicates**, taking the
+catalog from 1,709 to 1,804.

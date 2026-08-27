@@ -320,6 +320,11 @@ const RELATED = {
   "heat-treat-soak-time": ["quench-severity","carbon-equivalent","interpass-temperature-control"],
   "quench-severity": ["heat-treat-soak-time","carbon-equivalent","weld-cooling-rate-t85"],
   "belt-conveyor-tension-power": ["screw-conveyor","bucket-elevator-capacity","motor-shaft-torque"],
+  // spec-v1445..v1448: the 2026-08-26 trade-expansion restoration and finish band.
+  "water-extraction-rate": ["standing-water","dehumidifier","sewage-loss-disposal"],
+  "sewage-loss-disposal": ["flood-cut-takeoff","dumpster-count","water-extraction-rate"],
+  "spray-tip-selection": ["paint-coverage","texture-material-takeoff","powder-coating-coverage"],
+  "texture-material-takeoff": ["drywall","spray-tip-selection","paint-coverage"],
   "step-touch-voltage": ["grounding-electrode", "neutral-grounding-resistor", "grounding-electrode-conductor"],
   "ground-potential-rise": ["step-touch-voltage", "neutral-grounding-resistor", "grounding-electrode"],
   "rolling-sphere-protection": ["grounding-electrode", "step-touch-voltage", "ground-potential-rise"],

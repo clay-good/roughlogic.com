@@ -1149,3 +1149,124 @@ FINISH_RENDERERS["crawl-space-ventilation"] = _simpleRenderer({
   ],
   compute: computeCrawlSpaceVentilation,
 });
+
+// ===========================================================================
+// spec-v1447, v1448: the finish-trades band of the 2026-08-26 trade
+// expansion. See specs/scope-trade-expansion.md.
+//
+// spec-v1449 (floating floor row layout) was CUT as a duplicate: the
+// flooring takeoff above already computes boxes at a pattern-driven waste
+// allowance AND the last-row balance, with the identical
+// (remainder + plank width) / 2 rip and the same "narrower than a third of a
+// plank" trigger. Folding the expansion gap into the usable width before the
+// row division is a refinement to that calculation, not a second one.
+// ===========================================================================
+
+// ===================== spec-v1447: airless spray tip selection =====================
+// dims: in { args: dimensionless } out: { flow_gpm: L^3 T^-1, coverage_rate_sqft_min: L^2 T^-1, travel_speed_fpm: L T^-1 }
+export function computeSprayTipSelection({ tip_number = 0, pressure_psi = 0, wet_film_mils = 0, ref_orifice_in = 0.015, ref_flow_gpm = 0.31, ref_pressure_psi = 2000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(tip_number >= 100 && tip_number <= 999)) return { error: "Tip number must be a three-digit airless tip designation (100 to 999)." };
+  if (!Number.isInteger(tip_number)) return { error: "Tip number must be a whole three-digit designation." };
+  const orifice_thou = tip_number % 100;
+  if (!(orifice_thou > 0)) return { error: "The last two digits of the tip number are the orifice in thousandths and must be non-zero." };
+  if (!(pressure_psi > 0)) return { error: "Spray pressure must be positive." };
+  if (!(wet_film_mils > 0)) return { error: "Wet film thickness must be positive." };
+  if (!(ref_orifice_in > 0)) return { error: "The calibration tip's orifice must be positive." };
+  if (!(ref_flow_gpm > 0)) return { error: "The calibration tip's flow must be positive." };
+  if (!(ref_pressure_psi > 0)) return { error: "The calibration pressure must be positive." };
+  // The tip number is two facts in three digits: fan width is the first digit
+  // doubled (at 12 in from the surface), orifice is the last two in thousandths.
+  const fan_width_in = Math.floor(tip_number / 100) * 2;
+  const orifice_in = orifice_thou / 1000;
+  // Flow goes as the SQUARE of the orifice and only the square root of pressure.
+  const flow_gpm = ref_flow_gpm * (orifice_in / ref_orifice_in) ** 2 * Math.sqrt(pressure_psi / ref_pressure_psi);
+  // One gallon at one mil covers 231 cubic in / 0.001 in / 144 = 1604.17 sq ft.
+  const coverage_rate_sqft_min = flow_gpm * 1604.1667 / wet_film_mils;
+  const fan_width_ft = fan_width_in / 12;
+  const travel_speed_fpm = coverage_rate_sqft_min / fan_width_ft;
+  if (![fan_width_in, orifice_in, flow_gpm, coverage_rate_sqft_min, travel_speed_fpm].every(Number.isFinite)) return { error: "Spray-tip math is not a finite value." };
+  return {
+    fan_width_in, fan_width_ft, orifice_in, flow_gpm, coverage_rate_sqft_min, travel_speed_fpm,
+    gallons_per_hour: flow_gpm * 60,
+    too_fast: travel_speed_fpm > 180,
+    verdict: travel_speed_fpm > 180
+      ? "faster than most people can move a gun smoothly -- this tip wants a heavier film or a wider fan, and forcing it produces runs"
+      : travel_speed_fpm < 40
+        ? "slow enough that the tip is oversized for the film build, and the gun will load the surface"
+        : "a brisk but entirely normal gun speed",
+    note: "What an airless tip number actually means and what it commits the sprayer to. The number is two facts in three digits and both matter. FAN WIDTH is the first digit doubled, measured at 12 inches from the surface, and it should be matched to the work: a wide fan on a narrow surface wastes most of the material and a narrow fan on a wall is slow. ORIFICE is the last two digits in thousandths, and it sets flow, which goes as the SQUARE of the orifice -- a .021 tip passes nearly twice what a .015 does at the same pressure. Orifice also has to be matched to the coating's viscosity, which is why a lacquer tip will not spray block filler. Pressure is the weaker lever because it enters as a square root, so raising it does far less to flow than changing the tip does, and it is the wrong knob to reach for. The output that turns all this into a decision is travel speed. A 517 tip at 2,000 psi laying 6 wet mils flows about 0.40 gpm, which covers 106 square feet a minute -- that is why airless exists -- and demands a gun speed of 128 feet a minute, about a foot and a half a second, which is brisk but entirely normal. Now try to build the same 6 mils with a .021 tip: flow goes to 0.61 gpm, coverage to 162 square feet a minute, and the required travel speed to 195 feet a minute, which is faster than most people can move a gun smoothly. That tip wants a heavier film or a wider fan, and forcing it produces runs. Flow and geometry only, from a calibration against a tip of known output. Real flow depends on the coating's viscosity and temperature, on pump condition and tip wear -- a worn tip passes more material through a wider, softer fan, which is how a job quietly starts running heavy -- and on the specific pump's performance at pressure. Transfer efficiency is not modeled and it is not high: overspray, bounce-back, and the light edges of the fan pattern all mean the material leaving the tip exceeds the material on the wall, and the fifty percent overlap the trade uses is what evens the pattern out. The coating manufacturer's recommended tip range and wet film thickness, the sprayer manufacturer's data, and the safety requirements for high-pressure airless equipment -- which injects fluid through skin -- govern.",
+  };
+}
+
+export const sprayTipSelectionExample = { inputs: { tip_number: 517, pressure_psi: 2000, wet_film_mils: 6, ref_orifice_in: 0.015, ref_flow_gpm: 0.31, ref_pressure_psi: 2000 } };
+
+FINISH_RENDERERS["spray-tip-selection"] = _simpleRenderer({
+  citation: "Citation: the airless tip-number convention -- fan width at 12 in is the first digit doubled, orifice is the last two digits in thousandths -- by name; flow scaled from a calibration tip as the square of the orifice ratio times the square root of the pressure ratio, and coverage from the exact 1,604.17 sq ft per gallon at one mil (231 cubic in / 0.001 in / 144). Flow and geometry only: viscosity, temperature, pump condition, tip wear, and transfer efficiency are not modeled. The coating manufacturer's recommended tip range, the sprayer manufacturer's data, and airless injection-injury safety requirements govern.",
+  example: sprayTipSelectionExample.inputs,
+  fields: [
+    { key: "tip_number", label: "Tip number (three digits, e.g. 517)", kind: "number", attrs: { step: "1", min: "100" } },
+    { key: "pressure_psi", label: "Spray pressure (psi)", kind: "number" },
+    { key: "wet_film_mils", label: "Target wet film thickness (mils)", kind: "number" },
+    { key: "ref_orifice_in", label: "Calibration tip orifice (in)", kind: "number" },
+    { key: "ref_flow_gpm", label: "Calibration tip flow (gpm)", kind: "number" },
+    { key: "ref_pressure_psi", label: "Calibration pressure (psi)", kind: "number" },
+  ],
+  outputs: [
+    { key: "t", id: "sts-out-t", label: "What the tip number says", value: (r) => fmt(r.fan_width_in, 0) + " in fan at 12 in, " + fmt(r.orifice_in, 3) + " in orifice" },
+    { key: "f", id: "sts-out-f", label: "Flow", value: (r) => fmt(r.flow_gpm, 3) + " gpm (" + fmt(r.gallons_per_hour, 1) + " gal/hr)" },
+    { key: "c", id: "sts-out-c", label: "Coverage rate", value: (r) => fmt(r.coverage_rate_sqft_min, 0) + " sq ft per minute at " + fmt(r.fan_width_in, 0) + " in" },
+    { key: "s", id: "sts-out-s", label: "Required gun speed", value: (r) => fmt(r.travel_speed_fpm, 0) + " ft per minute -- " + r.verdict },
+    { key: "n", id: "sts-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSprayTipSelection,
+});
+
+// ===================== spec-v1448: wall and ceiling texture takeoff =====================
+// dims: in { args: dimensionless } out: { net_area_sqft: L^2, dry_weight_lb: M, mix_water_gal: L^3 }
+export function computeTextureMaterialTakeoff({ gross_area_sqft = 0, openings_sqft = 0, coverage_per_bag_sqft = 0, waste_pct = 10, bag_weight_lb = 40, water_gal_per_bag = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(gross_area_sqft > 0)) return { error: "Gross area must be positive." };
+  if (!(openings_sqft >= 0)) return { error: "Opening area cannot be negative." };
+  if (!(openings_sqft < gross_area_sqft)) return { error: "Openings must be less than the gross area." };
+  if (!(coverage_per_bag_sqft > 0)) return { error: "Coverage per bag must be positive." };
+  if (!(waste_pct >= 0)) return { error: "Waste factor cannot be negative." };
+  if (!(bag_weight_lb > 0)) return { error: "Bag weight must be positive." };
+  if (!(water_gal_per_bag >= 0)) return { error: "Mix water cannot be negative." };
+  const net_area_sqft = gross_area_sqft - openings_sqft;
+  const order_area_sqft = net_area_sqft * (1 + waste_pct / 100);
+  const bags_before_waste = net_area_sqft / coverage_per_bag_sqft;
+  const bags_required = Math.ceil(order_area_sqft / coverage_per_bag_sqft);
+  const dry_weight_lb = bags_required * bag_weight_lb;
+  const mix_water_gal = bags_required * water_gal_per_bag;
+  if (![net_area_sqft, order_area_sqft, bags_before_waste, dry_weight_lb, mix_water_gal].every(Number.isFinite)) return { error: "Texture takeoff math is not a finite value." };
+  return {
+    net_area_sqft, order_area_sqft, bags_before_waste, bags_required,
+    dry_weight_lb, mix_water_gal,
+    actual_coverage_sqft: bags_required * coverage_per_bag_sqft,
+    note: "The material for the last coat ordered on a drywall job and the one most often short. Texture coverage is not one number, and treating it as one is the whole reason this calculation exists. A light orange peel spreads thin and covers a great deal per bag; a heavy knockdown or a splatter-and-trowel covers a fraction of that; a popcorn ceiling texture is different again because it goes on thick and dry. Between the lightest and heaviest common textures the coverage ratio is three to one or more, which on a house-sized job is the difference between eight bags and twenty-five. A 2,400 sq ft ceiling at a knockdown covering 225 sq ft per 40 lb bag takes 12 bags with 10 percent waste; change nothing but the texture and a heavy splatter at 120 sq ft per bag takes 22 while a light orange peel at 350 takes 8. That is the range a single remembered figure is trying to cover, and it is why the coverage rate has to come from the product bag rather than from memory. Water matters for a reason beyond ordering: mix ratio controls consistency, consistency controls the texture pattern, and a bag mixed wetter than the last one produces a visibly different wall, so the water is reported alongside the bags to be measured rather than eyeballed. Quantity only. Coverage per bag is a manufacturer figure that assumes a specific spray pattern, nozzle, and pressure, and the same bag over a heavier hand covers substantially less -- the operator is a bigger variable than the product. This does not select a texture, match an existing one (which is a sample-board exercise and often the hardest part of a repair), address primer and sealer requirements before or after texture, cover the knockdown timing window that decides whether the pattern flattens correctly, or take off the equipment, masking, and protection the job needs. Ceiling textures applied before the late 1970s may contain asbestos and are a regulated material that must be tested before disturbance -- that is a survey and abatement question, not a takeoff one. The product's own coverage data, the finish specification, and applicable asbestos regulations govern.",
+  };
+}
+
+export const textureMaterialTakeoffExample = { inputs: { gross_area_sqft: 2400, openings_sqft: 0, coverage_per_bag_sqft: 225, waste_pct: 10, bag_weight_lb: 40, water_gal_per_bag: 1.4 } };
+
+FINISH_RENDERERS["texture-material-takeoff"] = _simpleRenderer({
+  citation: "Citation: net area less openings, bags = ceil(net area x (1 + waste) / coverage per bag), with the coverage rate, bag weight, and mix water taken from the product's own data rather than assumed -- coverage varies three to one across common texture types. Quantity only: it selects no texture, matches no existing pattern, and addresses no primer, timing, or masking. Ceiling textures applied before the late 1970s may contain asbestos and are a regulated material requiring testing before disturbance. The product's coverage data, the finish specification, and applicable asbestos regulations govern.",
+  example: textureMaterialTakeoffExample.inputs,
+  fields: [
+    { key: "gross_area_sqft", label: "Gross area to texture (sq ft)", kind: "number" },
+    { key: "openings_sqft", label: "Openings to deduct (sq ft)", kind: "number" },
+    { key: "coverage_per_bag_sqft", label: "Coverage per bag, from the product (sq ft)", kind: "number" },
+    { key: "waste_pct", label: "Waste factor (%)", kind: "number" },
+    { key: "bag_weight_lb", label: "Bag weight (lb)", kind: "number" },
+    { key: "water_gal_per_bag", label: "Mix water per bag (gal)", kind: "number" },
+  ],
+  outputs: [
+    { key: "a", id: "tmt-out-a", label: "Net area to cover", value: (r) => fmt(r.net_area_sqft, 0) + " sq ft, ordered as " + fmt(r.order_area_sqft, 0) + " sq ft with waste" },
+    { key: "b", id: "tmt-out-b", label: "Bags required", value: (r) => fmt(r.bags_required, 0) + " bags (" + fmt(r.bags_before_waste, 1) + " before waste), covering " + fmt(r.actual_coverage_sqft, 0) + " sq ft" },
+    { key: "w", id: "tmt-out-w", label: "Dry weight to deliver", value: (r) => fmt(r.dry_weight_lb, 0) + " lb" },
+    { key: "m", id: "tmt-out-m", label: "Mix water", value: (r) => fmt(r.mix_water_gal, 1) + " gal -- measure it, because consistency controls the pattern" },
+    { key: "n", id: "tmt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTextureMaterialTakeoff,
+});

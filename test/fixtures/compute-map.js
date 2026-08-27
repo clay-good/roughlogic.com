@@ -1343,6 +1343,11 @@ export const COMPUTE_MAP = {
   "heat-treat-soak-time": { module: "../../calc-shop.js", fn: "computeHeatTreatSoakTime" },
   "quench-severity": { module: "../../calc-shop.js", fn: "computeQuenchSeverity" },
   "belt-conveyor-tension-power": { module: "../../calc-shop.js", fn: "computeBeltConveyorTensionPower" },
+  // spec-v1445..v1449: the 2026-08-26 trade-expansion restoration and finish band (v1449 cut).
+  "water-extraction-rate": { module: "../../calc-restoration.js", fn: "computeWaterExtractionRate" },
+  "sewage-loss-disposal": { module: "../../calc-restoration.js", fn: "computeSewageLossDisposal" },
+  "spray-tip-selection": { module: "../../calc-finish.js", fn: "computeSprayTipSelection" },
+  "texture-material-takeoff": { module: "../../calc-finish.js", fn: "computeTextureMaterialTakeoff" },
   "step-touch-voltage": { module: "../../calc-elecdesign.js", fn: "computeStepTouchVoltage" },
   "ground-potential-rise": { module: "../../calc-elecdesign.js", fn: "computeGroundPotentialRise" },
   "max-grid-resistance-for-touch": { module: "../../calc-elecdesign.js", fn: "computeMaxGridResistanceForTouch" },

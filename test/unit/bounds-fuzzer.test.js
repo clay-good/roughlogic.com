@@ -41630,3 +41630,158 @@ test("bounds: spec-v1444 computeBeltConveyorTensionPower pins which term dominat
   assert.ok("error" in _v1444({ ...base, drive_efficiency: 1.5 }));
   assert.ok("error" in _v1444({ ...base, friction_factor: Infinity }));
 });
+
+// ===========================================================================
+// spec-v1445..v1449: the 2026-08-26 trade-expansion restoration and finish
+// band. (spec-v1449, floating floor row layout, was cut as a duplicate: the
+// existing resilient/LVP flooring takeoff already computes boxes at a
+// pattern-driven waste allowance AND the identical balanced last-row rip,
+// (remainder + plank width) / 2 on the same one-third-of-a-plank trigger.)
+// ===========================================================================
+
+import { computeWaterExtractionRate as _v1445 } from "../../calc-restoration.js";
+test("bounds: spec-v1445 computeWaterExtractionRate pins extraction against evaporation", () => {
+  const base = { area_sqft: 800, standing_depth_in: 1, absorption_gal_per_sqft: 0.15, extraction_rate_gpm: 5, waste_tank_gal: 100, dehu_gal_per_day: 15 };
+  const r = _v1445(base);
+  assert.ok(Math.abs(r.standing_gal - 498.7) < 0.1);
+  assert.ok(Math.abs(r.absorbed_gal - 120) < 1e-9);
+  assert.ok(Math.abs(r.total_gal - 618.7) < 0.1);
+  assert.ok(Math.abs(r.wand_time_min - 123.7) < 0.1);
+  assert.ok(Math.abs(r.wand_time_hr - 2.06) < 1e-2);
+  assert.strictEqual(r.tank_dumps, 7); // 6.19 tanks is seven trips
+  assert.ok(Math.abs(r.water_weight_lb - 5163) < 1);
+  assert.ok(Math.abs(r.dehu_days - 41.2) < 0.1);
+  // The whole argument for extraction: the wand is three orders of magnitude
+  // faster than the dehumidifiers at the same water.
+  assert.ok(r.speed_ratio > 400);
+  // Either source alone is a valid loss; neither alone is an error.
+  assert.ok(!("error" in _v1445({ ...base, standing_depth_in: 0 })));
+  assert.ok(!("error" in _v1445({ ...base, absorption_gal_per_sqft: 0 })));
+  assert.ok(Math.abs(_v1445({ ...base, standing_depth_in: 0 }).total_gal - 120) < 1e-9);
+  // Dumps round UP -- a partly full tank is still a trip.
+  assert.strictEqual(_v1445({ ...base, waste_tank_gal: 619 }).tank_dumps, 1);
+  assert.strictEqual(_v1445({ ...base, waste_tank_gal: 618 }).tank_dumps, 2);
+  // Volume is exactly linear in area, and time exactly inverse in the rate.
+  assert.ok(Math.abs(_v1445({ ...base, area_sqft: 1600 }).total_gal - 2 * r.total_gal) < 1e-6);
+  assert.ok(Math.abs(_v1445({ ...base, extraction_rate_gpm: 10 }).wand_time_min - r.wand_time_min / 2) < 1e-9);
+  assert.ok("error" in _v1445({ ...base, area_sqft: 0 }));
+  assert.ok("error" in _v1445({ ...base, standing_depth_in: 0, absorption_gal_per_sqft: 0 }));
+  assert.ok("error" in _v1445({ ...base, standing_depth_in: -1 }));
+  assert.ok("error" in _v1445({ ...base, extraction_rate_gpm: 0 }));
+  assert.ok("error" in _v1445({ ...base, waste_tank_gal: 0 }));
+  assert.ok("error" in _v1445({ ...base, dehu_gal_per_day: 0 }));
+  assert.ok("error" in _v1445({ ...base, area_sqft: Infinity }));
+});
+
+import { computeSewageLossDisposal as _v1446 } from "../../calc-restoration.js";
+test("bounds: spec-v1446 computeSewageLossDisposal pins bulking and the liquid split", () => {
+  const base = { soft_area_sqft: 500, soft_thickness_in: 0.5, board_area_sqft: 120, board_thickness_in: 0.5, bulking_factor: 3, bag_capacity_gal: 33, container_cy: 10, extracted_gal: 620 };
+  const r = _v1446(base);
+  assert.ok(Math.abs(r.in_place_cf - 25.833) < 1e-3);
+  assert.ok(Math.abs(r.loose_cf - 77.5) < 1e-6);
+  assert.ok(Math.abs(r.bag_cf - 4.411) < 1e-3);
+  assert.strictEqual(r.bag_count, 18);
+  assert.ok(Math.abs(r.container_cf - 270) < 1e-9);
+  assert.ok(Math.abs(r.container_utilization_pct - 28.7) < 0.1);
+  assert.strictEqual(r.oversized, true); // the box ordered by habit is mostly empty
+  assert.ok(Math.abs(r.liquid_weight_lb - 5174) < 1);
+  // BULKING is the whole point: at a factor of 1 the takeoff would call for a
+  // third of the containers, which is the error the tile exists to prevent.
+  const unbulked = _v1446({ ...base, bulking_factor: 1 });
+  assert.ok(Math.abs(unbulked.loose_cf - r.in_place_cf) < 1e-9);
+  assert.strictEqual(unbulked.bag_count, 6);
+  assert.ok(Math.abs(r.loose_cf / unbulked.loose_cf - 3) < 1e-9);
+  // The liquid never enters the solid volume -- it routes separately.
+  const noLiquid = _v1446({ ...base, extracted_gal: 0 });
+  assert.ok(Math.abs(noLiquid.loose_cf - r.loose_cf) < 1e-12);
+  assert.strictEqual(noLiquid.bag_count, r.bag_count);
+  assert.strictEqual(noLiquid.liquid_weight_lb, 0);
+  // Either material alone is a valid takeoff.
+  assert.ok(!("error" in _v1446({ ...base, board_area_sqft: 0, board_thickness_in: 0 })));
+  assert.ok(!("error" in _v1446({ ...base, soft_area_sqft: 0, soft_thickness_in: 0 })));
+  // A bigger box is the same debris, just less used.
+  const big = _v1446({ ...base, container_cy: 30 });
+  assert.ok(Math.abs(big.container_utilization_pct - r.container_utilization_pct / 3) < 1e-9);
+  assert.ok("error" in _v1446({ ...base, soft_area_sqft: 0, board_area_sqft: 0 }));
+  assert.ok("error" in _v1446({ ...base, soft_thickness_in: 0 })); // area without thickness
+  assert.ok("error" in _v1446({ ...base, bulking_factor: 0.5 }));
+  assert.ok("error" in _v1446({ ...base, bag_capacity_gal: 0 }));
+  assert.ok("error" in _v1446({ ...base, container_cy: 0 }));
+  assert.ok("error" in _v1446({ ...base, extracted_gal: -1 }));
+  assert.ok("error" in _v1446({ ...base, soft_area_sqft: Infinity }));
+});
+
+import { computeSprayTipSelection as _v1447 } from "../../calc-finish.js";
+test("bounds: spec-v1447 computeSprayTipSelection pins the tip number and the gun speed", () => {
+  const base = { tip_number: 517, pressure_psi: 2000, wet_film_mils: 6, ref_orifice_in: 0.015, ref_flow_gpm: 0.31, ref_pressure_psi: 2000 };
+  const r = _v1447(base);
+  // The tip number is two facts in three digits.
+  assert.ok(Math.abs(r.fan_width_in - 10) < 1e-12);
+  assert.ok(Math.abs(r.orifice_in - 0.017) < 1e-12);
+  assert.ok(Math.abs(r.flow_gpm - 0.398) < 1e-3);
+  assert.ok(Math.abs(r.coverage_rate_sqft_min - 106.5) < 0.1);
+  assert.ok(Math.abs(r.travel_speed_fpm - 127.7) < 0.1);
+  assert.strictEqual(r.too_fast, false);
+  // Two sizes up in orifice demands a gun speed most people cannot deliver.
+  const big = _v1447({ ...base, tip_number: 521 });
+  assert.ok(Math.abs(big.flow_gpm - 0.608) < 1e-3);
+  assert.ok(Math.abs(big.coverage_rate_sqft_min - 162.4) < 0.1);
+  assert.ok(Math.abs(big.travel_speed_fpm - 194.9) < 0.1);
+  assert.strictEqual(big.too_fast, true);
+  // Flow goes as the SQUARE of the orifice: .021 against .015 is exactly 1.96x.
+  assert.ok(Math.abs(big.flow_gpm / _v1447({ ...base, tip_number: 515 }).flow_gpm - (21 / 15) ** 2) < 1e-9);
+  // Pressure is the WEAK lever: a square root, so +25% pressure is +12% flow.
+  const pushed = _v1447({ ...base, pressure_psi: 2500 });
+  assert.ok(Math.abs(pushed.flow_gpm / r.flow_gpm - Math.sqrt(2500 / 2000)) < 1e-9);
+  assert.ok(pushed.flow_gpm / r.flow_gpm < 1.13);
+  // The first digit is the fan and it changes the speed without changing flow.
+  const wide = _v1447({ ...base, tip_number: 717 });
+  assert.ok(Math.abs(wide.fan_width_in - 14) < 1e-12);
+  assert.ok(Math.abs(wide.flow_gpm - r.flow_gpm) < 1e-12);
+  assert.ok(wide.travel_speed_fpm < r.travel_speed_fpm);
+  // A heavier film build slows the gun in exact proportion.
+  assert.ok(Math.abs(_v1447({ ...base, wet_film_mils: 12 }).travel_speed_fpm - r.travel_speed_fpm / 2) < 1e-9);
+  assert.ok("error" in _v1447({ ...base, tip_number: 99 }));
+  assert.ok("error" in _v1447({ ...base, tip_number: 1021 }));
+  assert.ok("error" in _v1447({ ...base, tip_number: 517.5 }));
+  assert.ok("error" in _v1447({ ...base, tip_number: 500 })); // zero orifice digits
+  assert.ok("error" in _v1447({ ...base, pressure_psi: 0 }));
+  assert.ok("error" in _v1447({ ...base, wet_film_mils: 0 }));
+  assert.ok("error" in _v1447({ ...base, ref_flow_gpm: 0 }));
+  assert.ok("error" in _v1447({ ...base, pressure_psi: Infinity }));
+});
+
+import { computeTextureMaterialTakeoff as _v1448 } from "../../calc-finish.js";
+test("bounds: spec-v1448 computeTextureMaterialTakeoff pins the three-to-one coverage range", () => {
+  const base = { gross_area_sqft: 2400, openings_sqft: 0, coverage_per_bag_sqft: 225, waste_pct: 10, bag_weight_lb: 40, water_gal_per_bag: 1.4 };
+  const r = _v1448(base);
+  assert.ok(Math.abs(r.net_area_sqft - 2400) < 1e-12);
+  assert.ok(Math.abs(r.order_area_sqft - 2640) < 1e-9);
+  assert.ok(Math.abs(r.bags_before_waste - 10.667) < 1e-3);
+  assert.strictEqual(r.bags_required, 12);
+  assert.ok(Math.abs(r.dry_weight_lb - 480) < 1e-9);
+  assert.ok(Math.abs(r.mix_water_gal - 16.8) < 1e-6);
+  // The whole reason the tile exists: the same ceiling, three textures, and a
+  // three-to-one spread that a remembered number cannot cover.
+  assert.strictEqual(_v1448({ ...base, coverage_per_bag_sqft: 120 }).bags_required, 22);
+  assert.strictEqual(_v1448({ ...base, coverage_per_bag_sqft: 350 }).bags_required, 8);
+  // Openings come off the gross area before anything else.
+  const withDoors = _v1448({ ...base, openings_sqft: 400 });
+  assert.ok(Math.abs(withDoors.net_area_sqft - 2000) < 1e-12);
+  assert.strictEqual(withDoors.bags_required, 10);
+  // Bags round UP, and the rounded count is what drives weight and water.
+  assert.ok(r.actual_coverage_sqft >= r.order_area_sqft);
+  assert.ok(Math.abs(r.dry_weight_lb - r.bags_required * base.bag_weight_lb) < 1e-9);
+  assert.ok(Math.abs(r.mix_water_gal - r.bags_required * base.water_gal_per_bag) < 1e-9);
+  // Zero waste is a legitimate takeoff and is strictly fewer bags here.
+  const noWaste = _v1448({ ...base, waste_pct: 0 });
+  assert.strictEqual(noWaste.bags_required, 11);
+  assert.ok(noWaste.bags_required < r.bags_required);
+  assert.ok("error" in _v1448({ ...base, gross_area_sqft: 0 }));
+  assert.ok("error" in _v1448({ ...base, openings_sqft: 2400 })); // openings >= gross
+  assert.ok("error" in _v1448({ ...base, openings_sqft: -1 }));
+  assert.ok("error" in _v1448({ ...base, coverage_per_bag_sqft: 0 }));
+  assert.ok("error" in _v1448({ ...base, waste_pct: -1 }));
+  assert.ok("error" in _v1448({ ...base, bag_weight_lb: 0 }));
+  assert.ok("error" in _v1448({ ...base, gross_area_sqft: Infinity }));
+});

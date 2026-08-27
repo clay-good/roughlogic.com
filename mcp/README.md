@@ -1,7 +1,7 @@
 # roughlogic MCP server
 
 A local, zero-dependency [Model Context Protocol](https://modelcontextprotocol.io)
-server that exposes the roughlogic catalog of **1,800 trades calculators**
+server that exposes the roughlogic catalog of **1,804 trades calculators**
 (electrical, plumbing, HVAC, construction, restoration, and more) to any MCP
 client — Claude Code, Claude Desktop, Cursor, and the like.
 

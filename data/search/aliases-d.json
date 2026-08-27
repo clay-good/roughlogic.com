@@ -719,6 +719,13 @@
     {"term":"remediation cleaning hours by substrate","target":"mold-cleaning-labor","kind":"question"},
     {"term":"calendar time to clean mold surfaces","target":"mold-cleaning-labor","kind":"question"},
     {"term":"production rate mold surface cleaning","target":"mold-cleaning-labor","kind":"question"},
-    {"term":"labor cost driver mold remediation","target":"mold-cleaning-labor","kind":"question"}
+    {"term":"labor cost driver mold remediation","target":"mold-cleaning-labor","kind":"question"},
+    {"term":"water extraction gallons","target":"water-extraction-rate","kind":"industry"},
+    {"term":"wand extraction time","target":"water-extraction-rate","kind":"industry"},
+    {"term":"waste tank dumps","target":"water-extraction-rate","kind":"industry"},
+    {"term":"how long to extract this loss","target":"water-extraction-rate","kind":"question"},
+    {"term":"category 3 disposal","target":"sewage-loss-disposal","kind":"industry"},
+    {"term":"sewage loss debris","target":"sewage-loss-disposal","kind":"industry"},
+    {"term":"contaminated debris bags","target":"sewage-loss-disposal","kind":"industry"}
   ]
 }

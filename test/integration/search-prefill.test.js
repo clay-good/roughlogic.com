@@ -282,7 +282,7 @@ test("spec-v1337 home: one box, four chips, and all 21 trade links kept", async 
   await expect(page.locator("h1.home-h1")).toHaveText("Field math, answered.");
   // The count stays in the lede: check-readme-counts holds it, and a visible
   // count no gate watches is how a README once drifted to 1145 of 1564.
-  await expect(page.locator("p.home-lede")).toContainText("1,800 free calculators");
+  await expect(page.locator("p.home-lede")).toContainText("1,804 free calculators");
   await expect(page.locator(".hero-chip")).toHaveCount(4);
 
   // spec-v1347: the browse-by-trade strip is gone from the home document --

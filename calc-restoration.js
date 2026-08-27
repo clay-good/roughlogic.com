@@ -2912,3 +2912,174 @@ function renderMoldCleaningLabor(inputRegion, outputRegion, citationEl) {
   update();
 }
 RESTORATION_RENDERERS["mold-cleaning-labor"] = renderMoldCleaningLabor;
+
+
+// ===========================================================================
+// spec-v1445, v1446: the restoration band of the 2026-08-26 trade expansion.
+// See specs/scope-trade-expansion.md.
+//
+// This module had no declarative renderer factory of its own; the one below is
+// copied verbatim from calc-finish.js, which imports the same ui-fields
+// helpers under the same bare names. The schema-coverage gates read it.
+// ===========================================================================
+
+function _simpleRenderer(spec) {
+  const _rlRender = function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      let field;
+      if (f.kind === "select") field = makeSelect(f.label, f.id || f.key, f.options);
+      else field = makeNumber(f.label, f.id || f.key, f.attrs || { step: "any", min: "0" });
+      fields[f.key] = field;
+      if (f.default !== undefined) {
+        if (f.kind === "select") field.select.value = f.default;
+        else field.input.value = String(f.default);
+      }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key];
+        else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) {
+        if (f.kind === "select") params[f.key] = fields[f.key].select.value;
+        else params[f.key] = Number(fields[f.key].input.value) || 0;
+      }
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) {
+      const el = f.kind === "select" ? fields[f.key].select : fields[f.key].input;
+      el.addEventListener(f.kind === "select" ? "change" : "input", update);
+    }
+  };
+
+  _rlRender.schema = {
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
+    citation: spec.citation ?? null,
+    scope: spec.scope ?? null,
+  };
+  return _rlRender;
+}
+
+// ===================== spec-v1445: water extraction volume and time =====================
+// dims: in { args: dimensionless } out: { total_gal: L^3, wand_time_min: T, water_weight_lb: M L T^-2 }
+export function computeWaterExtractionRate({ area_sqft = 0, standing_depth_in = 0, absorption_gal_per_sqft = 0, extraction_rate_gpm = 0, waste_tank_gal = 0, dehu_gal_per_day = 15 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(area_sqft > 0)) return { error: "Affected area must be positive." };
+  if (!(standing_depth_in >= 0)) return { error: "Standing water depth cannot be negative." };
+  if (!(absorption_gal_per_sqft >= 0)) return { error: "Absorption rate cannot be negative." };
+  if (!(standing_depth_in > 0 || absorption_gal_per_sqft > 0)) return { error: "Enter standing depth, absorbed water, or both." };
+  if (!(extraction_rate_gpm > 0)) return { error: "Effective extraction rate must be positive." };
+  if (!(waste_tank_gal > 0)) return { error: "Waste tank capacity must be positive." };
+  if (!(dehu_gal_per_day > 0)) return { error: "Dehumidifier removal rate must be positive." };
+  const standing_gal = area_sqft * (standing_depth_in / 12) * 7.48052;
+  const absorbed_gal = area_sqft * absorption_gal_per_sqft;
+  const total_gal = standing_gal + absorbed_gal;
+  const wand_time_min = total_gal / extraction_rate_gpm;
+  const tank_dumps = Math.ceil(total_gal / waste_tank_gal);
+  const water_weight_lb = total_gal * 8.3454;
+  // The comparison that justifies every extra pass: a gallon extracted is a
+  // gallon the dehumidifiers never have to evaporate.
+  const dehu_days = total_gal / dehu_gal_per_day;
+  if (![standing_gal, absorbed_gal, total_gal, wand_time_min, water_weight_lb, dehu_days].every(Number.isFinite)) return { error: "Extraction math is not a finite value." };
+  return {
+    standing_gal, absorbed_gal, total_gal, wand_time_min,
+    wand_time_hr: wand_time_min / 60, tank_dumps, water_weight_lb, dehu_days,
+    speed_ratio: dehu_days * 24 * 60 / wand_time_min,
+    note: "The three numbers that plan day one of a water loss, and the first rule of the trade stated as arithmetic: every gallon extracted is a gallon the dehumidifiers never have to evaporate. Extraction is not a preliminary step, it is the step. Two sources of water behave differently. STANDING water is a straight volume calculation and it comes up fast. ABSORBED water is held in the carpet, the pad, and the substrate, it comes up slowly, and it is what decides whether a second and third pass is worth making -- which it almost always is, because the marginal gallon from a slow pass is still hundreds of times cheaper than evaporating it. Eight hundred square feet under an inch of water, over carpet and pad holding 0.15 gallons per square foot, is 499 gallons standing plus 120 absorbed. At an effective 5 gpm through the wand that is a little over two hours of wand time and seven trips to the drain with a 100 gallon waste tank. Then the comparison that justifies all of it: 619 gallons is about 5,160 pounds of water, and a large LGR dehumidifier pulling a real-world 15 gallons a day would take 41 days to remove it. The wand did it in an afternoon, and everything the drying equipment does afterward is the small remainder. The volume half of this is the standing-water calculation extended -- what it adds is the absorbed fraction, the wand time, and the dump count. Volume, time, and logistics. The effective extraction rate is not the pump's rated flow: it depends on the wand, the operator, the substrate, and how much of each pass is spent moving rather than pulling, and it falls sharply as the material dries out, which is exactly why later passes take longer for less water. Absorption rates vary widely by assembly and by how long the water sat, and a saturated pad, a cushion-back carpet, and a wood subfloor all behave differently. This does not classify the water, set the drying goal, size the dehumidification or air movement, address antimicrobial application, or decide what is salvageable -- and on a Category 2 or 3 loss the extracted water is contaminated and its disposal is regulated. ANSI/IICRC S500, the local sewer authority, and the restorer's own moisture readings govern.",
+  };
+}
+
+export const waterExtractionRateExample = { inputs: { area_sqft: 800, standing_depth_in: 1, absorption_gal_per_sqft: 0.15, extraction_rate_gpm: 5, waste_tank_gal: 100, dehu_gal_per_day: 15 } };
+
+RESTORATION_RENDERERS["water-extraction-rate"] = _simpleRenderer({
+  citation: "Citation: standing volume from area and depth at 7.48052 gallons per cubic foot, absorbed water from an assembly absorption rate in gallons per square foot, and water weight at 8.3454 lb per gallon, by name; the extraction-versus-evaporation comparison uses the dehumidifier's real-world daily removal, which is entered rather than assumed. Volume, time, and logistics only -- no water classification, drying goal, equipment sizing, or salvageability determination. ANSI/IICRC S500, the local sewer authority, and the restorer's own moisture readings govern.",
+  example: waterExtractionRateExample.inputs,
+  fields: [
+    { key: "area_sqft", label: "Affected area (sq ft)", kind: "number" },
+    { key: "standing_depth_in", label: "Standing water depth (in)", kind: "number" },
+    { key: "absorption_gal_per_sqft", label: "Absorbed water (gal per sq ft of assembly)", kind: "number" },
+    { key: "extraction_rate_gpm", label: "Effective extraction rate (gpm at the wand)", kind: "number" },
+    { key: "waste_tank_gal", label: "Waste tank capacity (gal)", kind: "number" },
+    { key: "dehu_gal_per_day", label: "Dehumidifier removal, real-world (gal per day)", kind: "number" },
+  ],
+  outputs: [
+    { key: "v", id: "wer-out-v", label: "Water to extract", value: (r) => fmt(r.total_gal, 0) + " gal = " + fmt(r.standing_gal, 0) + " standing + " + fmt(r.absorbed_gal, 0) + " absorbed (" + fmt(r.water_weight_lb, 0) + " lb)" },
+    { key: "t", id: "wer-out-t", label: "Wand time", value: (r) => fmt(r.wand_time_min, 0) + " min = " + fmt(r.wand_time_hr, 1) + " hr at the rate entered" },
+    { key: "d", id: "wer-out-d", label: "Waste tank dumps", value: (r) => fmt(r.tank_dumps, 0) + " trips to the drain" },
+    { key: "c", id: "wer-out-c", label: "If the dehumidifiers had to do it", value: (r) => fmt(r.dehu_days, 0) + " days of dehumidification -- extraction is about " + fmt(r.speed_ratio, 0) + " times faster" },
+    { key: "n", id: "wer-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWaterExtractionRate,
+});
+
+// ===================== spec-v1446: Category 3 disposal volume and routing =====================
+// dims: in { args: dimensionless } out: { in_place_cf: L^3, loose_cf: L^3, bag_count: dimensionless }
+export function computeSewageLossDisposal({ soft_area_sqft = 0, soft_thickness_in = 0, board_area_sqft = 0, board_thickness_in = 0, bulking_factor = 3, bag_capacity_gal = 33, container_cy = 10, extracted_gal = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(soft_area_sqft >= 0 && board_area_sqft >= 0)) return { error: "Removed areas cannot be negative." };
+  if (!(soft_area_sqft > 0 || board_area_sqft > 0)) return { error: "Enter at least one material removed." };
+  if (!(soft_thickness_in >= 0 && board_thickness_in >= 0)) return { error: "Material thicknesses cannot be negative." };
+  if (soft_area_sqft > 0 && !(soft_thickness_in > 0)) return { error: "Carpet and pad thickness must be positive." };
+  if (board_area_sqft > 0 && !(board_thickness_in > 0)) return { error: "Board thickness must be positive." };
+  if (!(bulking_factor >= 1)) return { error: "Bulking factor cannot be below 1.0." };
+  if (!(bag_capacity_gal > 0)) return { error: "Bag capacity must be positive." };
+  if (!(container_cy > 0)) return { error: "Container size must be positive." };
+  if (!(extracted_gal >= 0)) return { error: "Extracted liquid cannot be negative." };
+  const soft_cf = soft_area_sqft * (soft_thickness_in / 12);
+  const board_cf = board_area_sqft * (board_thickness_in / 12);
+  const in_place_cf = soft_cf + board_cf;
+  // Debris does not stay the size it was on the wall: carpet and pad in
+  // particular bulk enormously once cut out and rolled.
+  const loose_cf = in_place_cf * bulking_factor;
+  const bag_cf = bag_capacity_gal / 7.48052;
+  const bag_count = Math.ceil(loose_cf / bag_cf);
+  const container_cf = container_cy * 27;
+  const container_utilization_pct = loose_cf / container_cf * 100;
+  const liquid_weight_lb = extracted_gal * 8.3454;
+  if (![in_place_cf, loose_cf, bag_cf, container_cf, container_utilization_pct].every(Number.isFinite)) return { error: "Disposal math is not a finite value." };
+  return {
+    soft_cf, board_cf, in_place_cf, loose_cf, bag_cf, bag_count,
+    container_cf, container_utilization_pct, liquid_weight_lb,
+    oversized: container_utilization_pct < 50,
+    note: "The waste stream a Category 3 loss produces, sized on the volume it actually occupies and split the way it actually leaves the building. Demolition debris does not stay the size it was on the wall. Carpet and pad in particular bulk enormously once they are cut out and rolled -- a factor of two to three is ordinary -- so a takeoff done on in-place thickness underestimates the container by that factor, which is why both numbers are printed and the container is sized on the loose one. The routing split is the part specific to Category 3, and it is the reason the liquid is reported separately rather than folded in. SOLIDS are bagged, sealed, and removed through the containment. LIQUIDS are the extracted water, they are the bigger number by weight on most losses, and they do not go in the box at all -- they are routed to sanitary sewer where the authority permits it, which is a question to ask before the truck leaves rather than after. A sewage loss with 500 sq ft of carpet and pad and 120 sq ft of half-inch board from a flood cut is about 26 cubic ft in place and 78 loose at a factor of three, which is 18 contractor bags and a 10 yard box that is under a third full. That last finding is the useful one, because the box was going to be ordered by habit. Volume, containers, and routing only. It does not weigh the debris, and weight rather than volume governs a haul on dense material -- the roll-off haul-count calculation handles that side and takes a debris volume as its input. Bulking factors are observational and vary with the material, how it is cut, and how it is rolled or folded. Whether Category 3 solids are ordinary construction debris or a regulated waste stream is a LOCAL determination that differs by jurisdiction and is worth a phone call, and sanitary discharge of extracted water requires the sewer authority's approval. This does not address containment construction, negative pressure, PPE, worker decontamination, or the antimicrobial and cleaning steps that precede removal. ANSI/IICRC S500, the local solid waste and sewer authorities, and OSHA govern.",
+  };
+}
+
+export const sewageLossDisposalExample = { inputs: { soft_area_sqft: 500, soft_thickness_in: 0.5, board_area_sqft: 120, board_thickness_in: 0.5, bulking_factor: 3, bag_capacity_gal: 33, container_cy: 10, extracted_gal: 620 } };
+
+RESTORATION_RENDERERS["sewage-loss-disposal"] = _simpleRenderer({
+  citation: "Citation: in-place debris volume from area times thickness, a bulking factor applied to get the loose volume the container actually sees, bag count at 7.48052 gallons per cubic foot, and a container at 27 cubic ft per cubic yard, by name. The liquid fraction is reported separately because it routes separately. Whether Category 3 solids are ordinary construction debris or a regulated waste stream is a LOCAL determination, and sanitary discharge of extracted water requires the sewer authority's approval. ANSI/IICRC S500, the local solid waste and sewer authorities, and OSHA govern.",
+  example: sewageLossDisposalExample.inputs,
+  fields: [
+    { key: "soft_area_sqft", label: "Carpet and pad removed (sq ft)", kind: "number" },
+    { key: "soft_thickness_in", label: "Carpet and pad thickness (in)", kind: "number" },
+    { key: "board_area_sqft", label: "Drywall or board removed (sq ft)", kind: "number" },
+    { key: "board_thickness_in", label: "Board thickness (in)", kind: "number" },
+    { key: "bulking_factor", label: "Bulking factor once cut and rolled", kind: "number" },
+    { key: "bag_capacity_gal", label: "Disposal bag capacity (gal)", kind: "number" },
+    { key: "container_cy", label: "Roll-off container size (cubic yards)", kind: "number" },
+    { key: "extracted_gal", label: "Extracted liquid (gal)", kind: "number" },
+  ],
+  outputs: [
+    { key: "v", id: "sld-out-v", label: "Debris volume", value: (r) => fmt(r.in_place_cf, 1) + " cubic ft in place, " + fmt(r.loose_cf, 1) + " cubic ft loose" },
+    { key: "b", id: "sld-out-b", label: "Bags", value: (r) => fmt(r.bag_count, 0) + " bags at " + fmt(r.bag_cf, 2) + " cubic ft each" },
+    { key: "c", id: "sld-out-c", label: "Container", value: (r) => fmt(r.container_cf, 0) + " cubic ft of box, " + fmt(r.container_utilization_pct, 0) + "% used" + (r.oversized ? " -- the box is oversized for this debris" : "") },
+    { key: "l", id: "sld-out-l", label: "Liquid, routed separately", value: (r) => fmt(r.liquid_weight_lb, 0) + " lb of extracted water, which does not go in the box" },
+    { key: "n", id: "sld-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSewageLossDisposal,
+});

@@ -407,6 +407,9 @@ const TOOL_MODULES = (() => {
     "duct-velocity-pressure", "refrigerant-velocity", "refrigerant-line-size", "pitot-traverse-cfm", "pitot-traverse-average", "dp-flow-meter", "gas-dp-flow-meter", "orifice-pressure-loss",
   ]);
   declare("./calc-restoration.js", "RESTORATION_RENDERERS", [
+    // trade expansion v1445-v1448
+    "water-extraction-rate",
+    "sewage-loss-disposal",
     "psychrometric", "drying-goal", "dehumidifier", "air-movers",
     "water-classes", "drying-times", "mold", "ppe",
     // v58
@@ -575,6 +578,9 @@ const TOOL_MODULES = (() => {
   // in the spec-v94 module note); relieves the calc-construction.js cap watch.
   // All tiles keep group "E" (module independent of group letter).
   declare("./calc-finish.js", "FINISH_RENDERERS", [
+    // trade expansion v1445-v1448
+    "spray-tip-selection",
+    "texture-material-takeoff",
     // v95 interior finish
     "thinset-coverage", "flooring-takeoff",
     // v97 hardscape

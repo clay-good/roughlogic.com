@@ -5639,6 +5639,17 @@
     {"term":"low e argon u factor","target":"igu-u-factor","kind":"industry"},
     {"term":"why are my windows sweating","target":"igu-u-factor","kind":"question"},
     {"term":"escalator capacity per hour","target":"escalator-capacity","kind":"industry"},
-    {"term":"escalator loading factor","target":"escalator-capacity","kind":"industry"}
+    {"term":"escalator loading factor","target":"escalator-capacity","kind":"industry"},
+    {"term":"airless spray tip","target":"spray-tip-selection","kind":"industry"},
+    {"term":"spray tip number meaning","target":"spray-tip-selection","kind":"industry"},
+    {"term":"what does a 517 tip mean","target":"spray-tip-selection","kind":"question"},
+    {"term":"gun travel speed spray","target":"spray-tip-selection","kind":"industry"},
+    {"term":"texture bags needed","target":"texture-material-takeoff","kind":"industry"},
+    {"term":"knockdown texture coverage","target":"texture-material-takeoff","kind":"industry"},
+    {"term":"orange peel material takeoff","target":"texture-material-takeoff","kind":"industry"},
+    {"term":"floating floor last row","target":"flooring-takeoff","kind":"industry"},
+    {"term":"laminate row layout","target":"flooring-takeoff","kind":"industry"},
+    {"term":"balanced rip first row","target":"flooring-takeoff","kind":"industry"},
+    {"term":"will my last row be a sliver","target":"flooring-takeoff","kind":"question"}
   ]
 }
