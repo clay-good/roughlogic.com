@@ -2835,3 +2835,550 @@ SHOP_RENDERERS["dust-collection-duct"] = _simpleRenderer({
   ],
   compute: computeDustCollectionDuct,
 });
+
+
+// ===========================================================================
+// spec-v1435 .. v1444: the industrial and finishing band of the 2026-08-26
+// trade expansion. See specs/scope-trade-expansion.md. Ten tiles, Group G.
+// ===========================================================================
+
+// ===================== spec-v1435: pneumatic cylinder air consumption =====================
+// dims: in { args: dimensionless } out: { volume_per_cycle_ft3: L^3, scfm_total: L^3 T^-1, compressor_hp: M L^2 T^-3 }
+export function computePneumaticCylinderScfm({ bore_in = 0, rod_in = 0, stroke_in = 0, cycles_per_min = 0, pressure_psig = 0, cylinders = 1, cfm_per_hp = 4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(bore_in > 0)) return { error: "Bore diameter must be positive." };
+  if (!(rod_in >= 0)) return { error: "Rod diameter cannot be negative." };
+  if (!(rod_in < bore_in)) return { error: "Rod diameter must be less than the bore." };
+  if (!(stroke_in > 0)) return { error: "Stroke must be positive." };
+  if (!(cycles_per_min > 0)) return { error: "Cycles per minute must be positive." };
+  if (!(pressure_psig > 0)) return { error: "Operating gauge pressure must be positive." };
+  if (!(cylinders >= 1)) return { error: "There must be at least one cylinder." };
+  if (!(cfm_per_hp > 0)) return { error: "Compressor specific output must be positive." };
+  const bore_area = Math.PI * bore_in * bore_in / 4;
+  const rod_area = Math.PI * rod_in * rod_in / 4;
+  const extend_in3 = bore_area * stroke_in;
+  // The rod occupies part of the bore on the way back, so retract is smaller.
+  const retract_in3 = (bore_area - rod_area) * stroke_in;
+  const per_cycle_in3 = extend_in3 + retract_in3;
+  const volume_per_cycle_ft3 = per_cycle_in3 / 1728;
+  // Compressed air is billed in STANDARD cubic feet -- free air -- and the
+  // cylinder is filled with compressed air. That ratio is the whole story.
+  const compression_ratio = (pressure_psig + 14.7) / 14.7;
+  const scfm_per_cylinder = volume_per_cycle_ft3 * cycles_per_min * compression_ratio;
+  const scfm_total = scfm_per_cylinder * cylinders;
+  const compressor_hp = scfm_total / cfm_per_hp;
+  if (![volume_per_cycle_ft3, compression_ratio, scfm_per_cylinder, scfm_total, compressor_hp].every(Number.isFinite)) return { error: "Pneumatic consumption math is not a finite value." };
+  return {
+    extend_in3, retract_in3, per_cycle_in3, volume_per_cycle_ft3,
+    compression_ratio, scfm_per_cylinder, scfm_total, compressor_hp,
+    note: "What a pneumatic cylinder actually costs to run, which is not its swept volume. Compressed air is billed in STANDARD cubic feet -- free air at atmospheric pressure -- and a cylinder is filled with COMPRESSED air, so every cubic foot of cylinder volume at 90 psig took just over seven cubic feet of free air to fill, and every cycle throws all of it away through the exhaust port. That factor of seven is the whole reason pneumatics are expensive to run and the reason a shop's compressor is always smaller than its air demand. The rod side matters and is easy to skip: on the retract stroke the rod occupies part of the bore, so the retract volume is smaller than the extend volume, and on a large-rod cylinder that difference is substantial -- counting both strokes at full bore over-estimates, counting only the extend stroke under-estimates by nearly half. A 2.5 in bore with a 1 in rod on a 12 in stroke cycling 20 times a minute at 90 psig moves 108 cubic inches per cycle and consumes 8.9 SCFM, roughly two horsepower of compressor running continuously for one small actuator; ten of them is a 20 hp compressor doing nothing but cycling cylinders. The pressure lever is real and underused: dropping the supply from 90 psig to 70 psig cuts the compression ratio from 7.12 to 5.76 and the consumption by 19%, which is free money if the application still makes its force at the lower pressure. Demand only. This does not size a compressor, a receiver, or the distribution piping, and it takes no account of the leakage that in most shops exceeds the productive demand, of valve and fitting losses, of the air a cylinder's cushions and pilot lines consume, or of the dryer and filtration load the flow implies. Duty cycle is assumed steady at the entered rate. The compressor manufacturer's rating at the actual discharge pressure, and an air audit of the real system, govern.",
+  };
+}
+
+export const pneumaticCylinderScfmExample = { inputs: { bore_in: 2.5, rod_in: 1, stroke_in: 12, cycles_per_min: 20, pressure_psig: 90, cylinders: 1, cfm_per_hp: 4 } };
+
+SHOP_RENDERERS["pneumatic-cylinder-scfm"] = _simpleRenderer({
+  citation: "Citation: cylinder swept volume from bore, rod, and stroke, and the compression ratio (gauge pressure + 14.7) / 14.7 that converts compressed volume to FREE air, by name; SCFM = volume per cycle x cycles per minute x compression ratio. The 4 CFM per horsepower figure is the conventional shop rule for a reciprocating compressor and is entered rather than assumed. Demand only -- no compressor, receiver, piping, or leakage. The compressor manufacturer's rating at the actual discharge pressure governs.",
+  example: pneumaticCylinderScfmExample.inputs,
+  fields: [
+    { key: "bore_in", label: "Bore diameter (in)", kind: "number" },
+    { key: "rod_in", label: "Rod diameter (in)", kind: "number" },
+    { key: "stroke_in", label: "Stroke (in)", kind: "number" },
+    { key: "cycles_per_min", label: "Cycles per minute", kind: "number" },
+    { key: "pressure_psig", label: "Operating pressure (psig)", kind: "number" },
+    { key: "cylinders", label: "Number of cylinders", kind: "number" },
+    { key: "cfm_per_hp", label: "Compressor output (CFM per hp)", kind: "number" },
+  ],
+  outputs: [
+    { key: "v", id: "pcs-out-v", label: "Volume per cycle", value: (r) => fmt(r.per_cycle_in3, 2) + " cubic in (" + fmt(r.extend_in3, 2) + " extend + " + fmt(r.retract_in3, 2) + " retract) = " + fmt(r.volume_per_cycle_ft3, 4) + " cubic ft" },
+    { key: "c", id: "pcs-out-c", label: "Compression ratio", value: (r) => fmt(r.compression_ratio, 2) + " cubic ft of free air per cubic ft of cylinder" },
+    { key: "s", id: "pcs-out-s", label: "Air consumption", value: (r) => fmt(r.scfm_per_cylinder, 2) + " SCFM per cylinder, " + fmt(r.scfm_total, 2) + " SCFM total" },
+    { key: "h", id: "pcs-out-h", label: "Compressor implied", value: (r) => fmt(r.compressor_hp, 2) + " hp running continuously" },
+    { key: "n", id: "pcs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePneumaticCylinderScfm,
+});
+
+// ===================== spec-v1436: bucket elevator capacity and power =====================
+// dims: in { args: dimensionless } out: { capacity_ft3_hr: L^3 T^-1, lifting_hp: M L^2 T^-3, motor_hp: M L^2 T^-3 }
+export function computeBucketElevatorCapacity({ bucket_volume_ft3 = 0, spacing_in = 0, speed_fpm = 0, fill_factor = 0.75, bulk_density_pcf = 0, lift_ft = 0, drive_efficiency = 0.75, friction_allowance = 1.2 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(bucket_volume_ft3 > 0)) return { error: "Bucket volume must be positive." };
+  if (!(spacing_in > 0)) return { error: "Bucket spacing must be positive." };
+  if (!(speed_fpm > 0)) return { error: "Belt or chain speed must be positive." };
+  if (!(fill_factor > 0 && fill_factor <= 1)) return { error: "Fill factor must be between 0 and 1." };
+  if (!(bulk_density_pcf > 0)) return { error: "Material bulk density must be positive." };
+  if (!(lift_ft > 0)) return { error: "Lift height must be positive." };
+  if (!(drive_efficiency > 0 && drive_efficiency <= 1)) return { error: "Drive efficiency must be between 0 and 1." };
+  if (!(friction_allowance >= 1)) return { error: "Scoop and friction allowance cannot be below 1.0." };
+  const buckets_per_ft = 12 / spacing_in;
+  const capacity_ft3_hr = bucket_volume_ft3 * buckets_per_ft * speed_fpm * 60 * fill_factor;
+  const mass_lb_hr = capacity_ft3_hr * bulk_density_pcf;
+  const tons_per_hr = mass_lb_hr / 2000;
+  const bushels_per_hr = capacity_ft3_hr / 1.2445; // 1 bushel = 1.2445 cubic ft
+  // Power is dominated by LIFT -- the opposite of a horizontal conveyor.
+  const lifting_hp = (mass_lb_hr / 60) * lift_ft / 33000;
+  const motor_hp = lifting_hp / drive_efficiency * friction_allowance;
+  if (![buckets_per_ft, capacity_ft3_hr, mass_lb_hr, lifting_hp, motor_hp].every(Number.isFinite)) return { error: "Bucket-elevator math is not a finite value." };
+  return {
+    buckets_per_ft, capacity_ft3_hr, mass_lb_hr, tons_per_hr, bushels_per_hr,
+    lifting_hp, motor_hp, lift_share_pct: lifting_hp / motor_hp * 100,
+    note: "What a bucket elevator moves and what it takes to drive it, and the fill factor is where the honesty lives. A bucket elevator does not fill its buckets: at the boot the buckets scoop or are fed, and how much they pick up depends on the material's flowability, the boot design, and the speed. Seventy-five percent is a working figure for free-flowing grain and considerably less for a sluggish material, and rating an elevator at 100% fill is how a system bought for 20 tons an hour delivers 15. The fill factor's leverage is worth seeing directly: the same machine at 60% fill rather than 75% delivers 16.2 tons per hour instead of 20.3, and no amount of extra motor recovers it -- the fix is at the boot, not at the drive. Power is dominated by LIFT, which is the opposite of a horizontal conveyor. Friction, scoop resistance, and drive losses are the smaller corrections, so elevator power scales almost linearly with height and with tonnage and is quite insensitive to everything else. Buckets of 0.05 cubic ft on 8 in centers at 250 fpm and 75% fill move 844 cubic ft an hour, which is 20.3 tons of 48 lb grain, and lifting it 60 ft takes 1.23 horsepower before losses and about 2 hp at the motor. Two horsepower to lift twenty tons an hour sixty feet is why bucket elevators are the cheapest vertical conveying there is. Capacity and power only. This does not select buckets, belt, or chain, does not size the head and boot pulleys or the shaft and bearings, does not check belt tension or the take-up, and does not address the discharge -- centrifugal, continuous, or positive -- which sets the speed a given bucket can actually run at. Legs handling grain and other combustible dusts are governed by NFPA 61 and NFPA 68 for explosion venting, and none of that is addressed here. The elevator manufacturer, the material's own test data, and NFPA govern.",
+  };
+}
+
+export const bucketElevatorCapacityExample = { inputs: { bucket_volume_ft3: 0.05, spacing_in: 8, speed_fpm: 250, fill_factor: 0.75, bulk_density_pcf: 48, lift_ft: 60, drive_efficiency: 0.75, friction_allowance: 1.2 } };
+
+SHOP_RENDERERS["bucket-elevator-capacity"] = _simpleRenderer({
+  citation: "Citation: bucket elevator volumetric capacity = bucket volume x buckets per foot x speed x 60 x fill factor, mass rate from the material's bulk density, and lifting horsepower = mass rate per minute x lift / 33,000, by name; the fill factor and the scoop-and-friction allowance are entered rather than assumed, and 1.2445 cubic ft per bushel is the US bushel. Capacity and power only -- no bucket, belt, chain, pulley, or shaft selection, and NO position on combustible grain dust, which NFPA 61 and NFPA 68 govern. The elevator manufacturer and the material's own test data govern.",
+  example: bucketElevatorCapacityExample.inputs,
+  fields: [
+    { key: "bucket_volume_ft3", label: "Bucket volume (cubic ft)", kind: "number" },
+    { key: "spacing_in", label: "Bucket spacing (in)", kind: "number" },
+    { key: "speed_fpm", label: "Belt or chain speed (fpm)", kind: "number" },
+    { key: "fill_factor", label: "Fill factor (0 to 1)", kind: "number" },
+    { key: "bulk_density_pcf", label: "Material bulk density (lb/cubic ft)", kind: "number" },
+    { key: "lift_ft", label: "Lift height (ft)", kind: "number" },
+    { key: "drive_efficiency", label: "Drive efficiency (0 to 1)", kind: "number" },
+    { key: "friction_allowance", label: "Scoop and friction allowance (1.2 = +20%)", kind: "number" },
+  ],
+  outputs: [
+    { key: "c", id: "bec-out-c", label: "Capacity", value: (r) => fmt(r.capacity_ft3_hr, 0) + " cubic ft/hr at " + fmt(r.buckets_per_ft, 2) + " buckets per foot" },
+    { key: "m", id: "bec-out-m", label: "Mass rate", value: (r) => fmt(r.mass_lb_hr, 0) + " lb/hr = " + fmt(r.tons_per_hr, 2) + " tons/hr = " + fmt(r.bushels_per_hr, 0) + " bu/hr" },
+    { key: "l", id: "bec-out-l", label: "Lifting power", value: (r) => fmt(r.lifting_hp, 2) + " hp, which is " + fmt(r.lift_share_pct, 0) + "% of the motor -- lift dominates" },
+    { key: "h", id: "bec-out-h", label: "Motor power", value: (r) => fmt(r.motor_hp, 2) + " hp after drive losses and the scoop allowance" },
+    { key: "n", id: "bec-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeBucketElevatorCapacity,
+});
+
+// ===================== spec-v1437: cyclone separator cut size and pressure drop =====================
+// dims: in { args: dimensionless } out: { d50_ft: L, d50_micron: L, pressure_drop_psf: M L^-1 T^-2 }
+export function computeCycloneSeparatorSizing({ inlet_width_ft = 0, inlet_velocity_fps = 0, turns = 5, gas_viscosity_lb_ft_s = 1.24e-5, gas_density_pcf = 0.075, particle_density_pcf = 0, k_velocity_heads = 8, airflow_cfm = 0, second_velocity_fps = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(inlet_width_ft > 0)) return { error: "Inlet width must be positive." };
+  if (!(inlet_velocity_fps > 0)) return { error: "Inlet velocity must be positive." };
+  if (!(turns > 0)) return { error: "Effective number of turns must be positive." };
+  if (!(gas_viscosity_lb_ft_s > 0)) return { error: "Gas viscosity must be positive." };
+  if (!(gas_density_pcf > 0)) return { error: "Gas density must be positive." };
+  if (!(particle_density_pcf > gas_density_pcf)) return { error: "Particle density must exceed the gas density." };
+  if (!(k_velocity_heads > 0)) return { error: "The pressure-drop coefficient must be positive." };
+  if (!(airflow_cfm > 0)) return { error: "Airflow must be positive." };
+  if (!(second_velocity_fps > 0)) return { error: "The comparison velocity must be positive." };
+  const GC = 32.174;
+  // Lapple cut size: the diameter caught with 50% efficiency. Everything in the
+  // numerator hurts, everything in the denominator helps.
+  const cut = (v) => Math.sqrt(9 * gas_viscosity_lb_ft_s * inlet_width_ft / (2 * Math.PI * turns * v * (particle_density_pcf - gas_density_pcf)));
+  const drop = (v) => k_velocity_heads * gas_density_pcf * v * v / (2 * GC);
+  const d50_ft = cut(inlet_velocity_fps);
+  const d50_micron = d50_ft * 304800;
+  const pressure_drop_psf = drop(inlet_velocity_fps);
+  const pressure_drop_inwg = pressure_drop_psf / 5.202;
+  const fan_hp = pressure_drop_psf * airflow_cfm / 33000;
+  const alt_d50_micron = cut(second_velocity_fps) * 304800;
+  const alt_drop_inwg = drop(second_velocity_fps) / 5.202;
+  if (![d50_ft, d50_micron, pressure_drop_psf, pressure_drop_inwg, fan_hp, alt_d50_micron].every(Number.isFinite)) return { error: "Cyclone math is not a finite value." };
+  return {
+    d50_ft, d50_micron, pressure_drop_psf, pressure_drop_inwg, fan_hp,
+    alt_d50_micron, alt_drop_inwg,
+    cut_gain_pct: (1 - alt_d50_micron / d50_micron) * 100,
+    drop_rise_pct: (alt_drop_inwg / pressure_drop_inwg - 1) * 100,
+    note: "What a cyclone will and will not catch, and what catching it costs. The Lapple cut size d50 is the particle diameter the cyclone captures with 50% efficiency; larger particles are caught more efficiently, smaller ones less, and the efficiency curve is smooth -- a cyclone does not have a sharp cutoff and never will. Every term in the numerator hurts and every term in the denominator helps, and reading them tells you how cyclones are designed. A NARROWER inlet improves the cut because particles have less distance to migrate to the wall; HIGHER velocity improves it, and so do MORE turns, which is why cyclones are tall and slender rather than squat; denser particles are easier. And that is the whole trade, because everything that improves the cut also raises the pressure drop, which goes as velocity SQUARED. A standard-proportion cyclone with a 0.25 ft inlet, 5 turns, and 50 ft/s on 90 lb/cubic ft wood dust cuts at 4.28 microns and costs 4.48 in w.g. Push the velocity to 70 ft/s chasing a finer cut and the cut size improves only to 3.62 microns, a 15% gain, while the pressure drop nearly doubles to 8.78 in w.g. That asymmetry is why cyclones are almost always followed by a filter rather than pushed harder: the last few microns cost more in fan power than a baghouse does. Cut size and pressure drop only. This is the classical Lapple relation with an assumed effective number of turns, and real collection efficiency depends on the full cyclone geometry, the inlet loading, particle shape and agglomeration, re-entrainment from the wall and the dust hopper, and the vortex finder -- none of which is a formula. It does not size the cyclone body, the hopper, or the airlock, and it takes NO position on combustible dust hazard management, which NFPA 652, NFPA 664 for wood, and NFPA 68 and 69 govern. Manufacturer test data and NFPA govern.",
+  };
+}
+
+export const cycloneSeparatorSizingExample = { inputs: { inlet_width_ft: 0.25, inlet_velocity_fps: 50, turns: 5, gas_viscosity_lb_ft_s: 1.24e-5, gas_density_pcf: 0.075, particle_density_pcf: 90, k_velocity_heads: 8, airflow_cfm: 1200, second_velocity_fps: 70 } };
+
+SHOP_RENDERERS["cyclone-separator-sizing"] = _simpleRenderer({
+  citation: "Citation: the classical Lapple cut-size relation d50 = sqrt(9 mu W / (2 pi N V (rho_p - rho_g))), by name, and cyclone pressure drop counted in inlet velocity heads, dP = K rho_g V^2 / (2 gc), with K commonly 8. Cut size and pressure drop only -- collection efficiency also depends on full geometry, inlet loading, particle shape, re-entrainment, and the vortex finder. NO position on combustible dust hazard management, which NFPA 652, 664, 68, and 69 govern. Manufacturer test data and NFPA govern.",
+  example: cycloneSeparatorSizingExample.inputs,
+  fields: [
+    { key: "inlet_width_ft", label: "Inlet width (ft)", kind: "number" },
+    { key: "inlet_velocity_fps", label: "Inlet velocity (ft/s)", kind: "number" },
+    { key: "turns", label: "Effective number of turns", kind: "number" },
+    { key: "gas_viscosity_lb_ft_s", label: "Gas viscosity (lb/ft-s)", kind: "number" },
+    { key: "gas_density_pcf", label: "Gas density (lb/cubic ft)", kind: "number" },
+    { key: "particle_density_pcf", label: "Particle density (lb/cubic ft)", kind: "number" },
+    { key: "k_velocity_heads", label: "Pressure-drop coefficient K (velocity heads)", kind: "number" },
+    { key: "airflow_cfm", label: "Airflow (CFM)", kind: "number" },
+    { key: "second_velocity_fps", label: "Comparison inlet velocity (ft/s)", kind: "number" },
+  ],
+  outputs: [
+    { key: "d", id: "css-out-d", label: "Cut size d50", value: (r) => fmt(r.d50_micron, 2) + " microns (" + fmt(r.d50_ft, 7) + " ft) at 50% capture" },
+    { key: "p", id: "css-out-p", label: "Pressure drop", value: (r) => fmt(r.pressure_drop_inwg, 2) + " in w.g. (" + fmt(r.pressure_drop_psf, 1) + " psf), " + fmt(r.fan_hp, 2) + " fan hp at this airflow" },
+    { key: "t", id: "css-out-t", label: "The trade at the comparison velocity", value: (r) => fmt(r.alt_d50_micron, 2) + " microns for " + fmt(r.alt_drop_inwg, 2) + " in w.g. -- " + fmt(r.cut_gain_pct, 0) + "% finer cut costs " + fmt(r.drop_rise_pct, 0) + "% more pressure" },
+    { key: "n", id: "css-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCycloneSeparatorSizing,
+});
+
+// ===================== spec-v1438: gas spring force and mounting geometry =====================
+// dims: in { args: dimensionless } out: { lid_moment_in_lb: M L^2 T^-2, force_per_strut_lb: M L T^-2 }
+export function computeGasStrutForce({ lid_weight_lb = 0, cg_distance_in = 0, opening_angle_deg = 0, moment_arm_in = 0, struts = 2, second_angle_deg = 0, second_moment_arm_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(lid_weight_lb > 0)) return { error: "Lid weight must be positive." };
+  if (!(cg_distance_in > 0)) return { error: "Hinge-to-center-of-gravity distance must be positive." };
+  if (!(opening_angle_deg >= 0 && opening_angle_deg < 90)) return { error: "Opening angle must be at least 0 and below 90 degrees." };
+  if (!(moment_arm_in > 0)) return { error: "Strut moment arm must be positive." };
+  if (!(struts >= 1)) return { error: "There must be at least one strut." };
+  if (!(second_angle_deg >= 0 && second_angle_deg < 90)) return { error: "The comparison angle must be at least 0 and below 90 degrees." };
+  if (!(second_moment_arm_in > 0)) return { error: "The comparison moment arm must be positive." };
+  // Everything is a moment about the hinge. The lid's horizontal reach shortens
+  // toward zero as it opens; the strut's arm typically grows and then shrinks.
+  const horizontal_cg_in = cg_distance_in * Math.cos(opening_angle_deg * Math.PI / 180);
+  const lid_moment_in_lb = lid_weight_lb * horizontal_cg_in;
+  const force_per_strut_lb = lid_moment_in_lb / (struts * moment_arm_in);
+  const total_force_lb = force_per_strut_lb * struts;
+  const second_horizontal_in = cg_distance_in * Math.cos(second_angle_deg * Math.PI / 180);
+  const second_moment_in_lb = lid_weight_lb * second_horizontal_in;
+  const second_force_per_strut_lb = second_moment_in_lb / (struts * second_moment_arm_in);
+  if (![lid_moment_in_lb, force_per_strut_lb, total_force_lb, second_force_per_strut_lb].every(Number.isFinite)) return { error: "Gas-strut math is not a finite value." };
+  return {
+    horizontal_cg_in, lid_moment_in_lb, force_per_strut_lb, total_force_lb,
+    second_horizontal_in, second_moment_in_lb, second_force_per_strut_lb,
+    rises_through_swing: second_force_per_strut_lb > force_per_strut_lb,
+    note: "The force rating a gas strut needs, from the moment balance nobody writes down. Everything is a moment about the hinge: the lid's weight acts at its center of gravity, which for a uniform panel is halfway along it, and the strut pushes along its own line at whatever perpendicular distance the mounting points give it. That perpendicular distance is the MOMENT ARM, and it is almost always much shorter than the lid's, which is why struts are rated in the tens or hundreds of pounds for lids that weigh far less. The moment arm is also the design variable and the cheapest one to change. A 40 lb hatch with its center of gravity 18 in from the hinge makes a 720 in-lb moment, and two struts on a 4 in arm each need 90 lb. Move the body-side mount out to a 6 in arm and the requirement falls to 60 lb each -- a third less force for a change in one mounting hole location. Move it in to 2.5 in and each strut needs 144 lb, and the hatch becomes genuinely hard to pull closed against them. Two struts halve the requirement, which is why almost everything uses a pair. The catch a first-time designer meets is that both moments change through the swing and they do not change at the same rate. The lid's moment FALLS as it opens, because the horizontal distance to the center of gravity shortens toward zero at vertical; the strut's arm typically grows and then shrinks. A strut sized only at the closed position may hold the lid there and then fling it open, or hold it open and refuse to close, which is why the required force is worth checking at more than one position. Static moment balance at the positions entered. It does not model the gas spring's own force curve, which rises as the rod compresses and falls with cold weather -- a strut is noticeably weaker on a winter morning -- and it does not account for damping, the end-of-stroke behavior, the strut's free length and stroke against the geometry it has to fit, friction at the ball ends, or the fatigue life of the mounting brackets and the panel they bolt to. The strut manufacturer's force curve, stroke, and mounting recommendations govern.",
+  };
+}
+
+export const gasStrutForceExample = { inputs: { lid_weight_lb: 40, cg_distance_in: 18, opening_angle_deg: 0, moment_arm_in: 4, struts: 2, second_angle_deg: 45, second_moment_arm_in: 5 } };
+
+SHOP_RENDERERS["gas-strut-force"] = _simpleRenderer({
+  citation: "Citation: static moment balance about the hinge -- lid moment = weight x horizontal distance to the center of gravity, strut moment = force x perpendicular moment arm, so required force per strut = lid moment / (struts x arm) -- by name. Checked at the positions entered; it does not model the gas spring's own force curve, its rise as the rod compresses, or its loss of force in cold weather. The strut manufacturer's force curve, stroke, and mounting recommendations govern.",
+  example: gasStrutForceExample.inputs,
+  fields: [
+    { key: "lid_weight_lb", label: "Lid or hatch weight (lb)", kind: "number" },
+    { key: "cg_distance_in", label: "Hinge to center of gravity, along the lid (in)", kind: "number" },
+    { key: "opening_angle_deg", label: "Opening angle being checked (deg, 0 = closed)", kind: "number" },
+    { key: "moment_arm_in", label: "Strut perpendicular moment arm at that angle (in)", kind: "number" },
+    { key: "struts", label: "Number of struts", kind: "number" },
+    { key: "second_angle_deg", label: "Comparison opening angle (deg)", kind: "number" },
+    { key: "second_moment_arm_in", label: "Strut moment arm at the comparison angle (in)", kind: "number" },
+  ],
+  outputs: [
+    { key: "m", id: "gsf-out-m", label: "Lid moment about the hinge", value: (r) => fmt(r.lid_moment_in_lb, 0) + " in-lb (" + fmt(r.horizontal_cg_in, 2) + " in of horizontal reach)" },
+    { key: "f", id: "gsf-out-f", label: "Required force", value: (r) => fmt(r.force_per_strut_lb, 1) + " lb per strut, " + fmt(r.total_force_lb, 1) + " lb total" },
+    { key: "s", id: "gsf-out-s", label: "At the comparison angle", value: (r) => fmt(r.second_force_per_strut_lb, 1) + " lb per strut -- the requirement " + (r.rises_through_swing ? "RISES through the swing, so a strut sized closed may not hold it open" : "falls through the swing, so a strut sized closed can fling it open") },
+    { key: "n", id: "gsf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGasStrutForce,
+});
+
+// ===================== spec-v1439: spray booth airflow and makeup air load =====================
+// dims: in { args: dimensionless } out: { exhaust_cfm: L^3 T^-1, heating_btu_hr: M L^2 T^-3, gas_input_btu_hr: M L^2 T^-3 }
+export function computeSprayBoothAirflow({ opening_width_ft = 0, opening_height_ft = 0, face_velocity_fpm = 100, indoor_temp_f = 70, outdoor_temp_f = 0, burner_efficiency = 0.8, hours_per_year = 0, price_per_therm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(opening_width_ft > 0 && opening_height_ft > 0)) return { error: "Booth opening width and height must be positive." };
+  if (!(face_velocity_fpm > 0)) return { error: "Design face velocity must be positive." };
+  if (!(indoor_temp_f > outdoor_temp_f)) return { error: "Indoor target must be above the outdoor design temperature." };
+  if (!(burner_efficiency > 0 && burner_efficiency <= 1)) return { error: "Burner efficiency must be between 0 and 1." };
+  if (!(hours_per_year >= 0)) return { error: "Hours of operation cannot be negative." };
+  if (!(price_per_therm >= 0)) return { error: "Fuel price cannot be negative." };
+  const opening_sqft = opening_width_ft * opening_height_ft;
+  // Face velocity is a life-safety requirement, not a design choice, and the
+  // airflow follows from the opening whether the booth is spraying or not.
+  const exhaust_cfm = opening_sqft * face_velocity_fpm;
+  const delta_t = indoor_temp_f - outdoor_temp_f;
+  const heating_btu_hr = 1.08 * exhaust_cfm * delta_t;
+  const gas_input_btu_hr = heating_btu_hr / burner_efficiency;
+  const therms_per_hour = gas_input_btu_hr / 100000;
+  const cost_per_hour = therms_per_hour * price_per_therm;
+  const annual_cost = cost_per_hour * hours_per_year;
+  if (![exhaust_cfm, heating_btu_hr, gas_input_btu_hr, cost_per_hour].every(Number.isFinite)) return { error: "Spray-booth math is not a finite value." };
+  return {
+    opening_sqft, exhaust_cfm, makeup_cfm: exhaust_cfm, delta_t,
+    heating_btu_hr, heating_mbh: heating_btu_hr / 1000, gas_input_btu_hr,
+    therms_per_hour, cost_per_hour, annual_cost,
+    note: "The airflow a spray booth takes and what it costs to replace it. Booth ventilation is not sized for comfort or even for the paint -- it is sized to keep the vapor concentration far below the lower flammable limit and to keep overspray moving away from the operator. NFPA 33 and OSHA 1910.107 set that as a FACE VELOCITY across the booth opening, commonly 100 fpm for an open-face booth, and the airflow follows from the opening area whether the booth is spraying or not. That air leaves the building and it has to be replaced, and replacing it in January is the expensive part. The sensible load is 1.08 x cfm x delta-T, and at booth airflows the delta-T does not have to be large before the number is enormous: a 14 by 9 ft opening at 100 fpm is 12,600 cfm, and tempering it from 20 F to 70 F is 680,400 BTU/hr -- more than most residential furnaces put out in a day, running whenever the booth runs, and at $1.20 a therm and 80% burner efficiency about $10 an hour in gas alone. That is why booth discipline, spraying in batches and not leaving the fan running, is worth real money. Note what the face velocity does and does not allow: nothing about it is negotiable downward, because it is a life-safety requirement, but a smaller opening is a smaller airflow, and a 10 ft wide booth at the same 100 fpm needs 9,000 cfm and costs 29% less to temper. Airflow and the sensible makeup-air load only. It does not size the fan, the ductwork, or the makeup air unit, does not compute the negative pressure the booth must hold relative to the shop, and does not address filter selection, filter loading and its effect on airflow, the interlocks between the spray equipment and the fan, the electrical classification of the booth and the area around it, or the exhaust stack height and discharge location. Air-solvent concentration, recirculation, and heat recovery are all separate questions with their own code limits. NFPA 33, OSHA 1910.107, the adopted mechanical code, the equipment manufacturer, and the AHJ govern.",
+  };
+}
+
+export const sprayBoothAirflowExample = { inputs: { opening_width_ft: 14, opening_height_ft: 9, face_velocity_fpm: 100, indoor_temp_f: 70, outdoor_temp_f: 20, burner_efficiency: 0.8, hours_per_year: 1000, price_per_therm: 1.2 } };
+
+SHOP_RENDERERS["spray-booth-airflow"] = _simpleRenderer({
+  citation: "Citation: spray booth exhaust airflow from the design FACE VELOCITY across the booth opening, the requirement NFPA 33 and OSHA 1910.107 set (commonly 100 fpm open-face), cited by name and not reproduced; makeup-air sensible load from the standard-air relation 1.08 x cfm x delta-T. Airflow and the sensible load only -- it sizes no fan, duct, or makeup air unit and addresses no filter, interlock, electrical classification, or stack requirement. NFPA 33, OSHA 1910.107, the adopted mechanical code, and the AHJ govern.",
+  example: sprayBoothAirflowExample.inputs,
+  fields: [
+    { key: "opening_width_ft", label: "Booth opening width (ft)", kind: "number" },
+    { key: "opening_height_ft", label: "Booth opening height (ft)", kind: "number" },
+    { key: "face_velocity_fpm", label: "Design face velocity (fpm)", kind: "number" },
+    { key: "indoor_temp_f", label: "Indoor target temperature (F)", kind: "number" },
+    { key: "outdoor_temp_f", label: "Outdoor design temperature (F)", kind: "number", attrs: { step: "any" } },
+    { key: "burner_efficiency", label: "Makeup air unit efficiency (0 to 1)", kind: "number" },
+    { key: "hours_per_year", label: "Booth hours per year", kind: "number" },
+    { key: "price_per_therm", label: "Gas price ($/therm)", kind: "number" },
+  ],
+  outputs: [
+    { key: "a", id: "sba-out-a", label: "Exhaust and makeup airflow", value: (r) => fmt(r.exhaust_cfm, 0) + " cfm across " + fmt(r.opening_sqft, 0) + " sq ft of opening" },
+    { key: "l", id: "sba-out-l", label: "Makeup air heating load", value: (r) => fmt(r.heating_btu_hr, 0) + " BTU/hr (" + fmt(r.heating_mbh, 0) + " MBH) over a " + fmt(r.delta_t, 0) + " F rise" },
+    { key: "g", id: "sba-out-g", label: "Gas input required", value: (r) => fmt(r.gas_input_btu_hr, 0) + " BTU/hr = " + fmt(r.therms_per_hour, 2) + " therms per hour" },
+    { key: "c", id: "sba-out-c", label: "Operating cost", value: (r) => "$" + fmt(r.cost_per_hour, 2) + " per hour, $" + fmt(r.annual_cost, 0) + " over the hours entered" },
+    { key: "n", id: "sba-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSprayBoothAirflow,
+});
+
+// ===================== spec-v1440: powder coating coverage and reclaim =====================
+// dims: in { args: dimensionless } out: { theoretical_coverage_sqft_lb: L^2 M^-1, powder_required_lb: M }
+export function computePowderCoatingCoverage({ specific_gravity = 0, film_thickness_mils = 0, part_area_sqft = 0, transfer_efficiency = 0.6, reclaim_efficiency = 0, price_per_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(specific_gravity > 0)) return { error: "Powder specific gravity must be positive." };
+  if (!(film_thickness_mils > 0)) return { error: "Film thickness must be positive." };
+  if (!(part_area_sqft > 0)) return { error: "Part surface area must be positive." };
+  if (!(transfer_efficiency > 0 && transfer_efficiency <= 1)) return { error: "Transfer efficiency must be between 0 and 1." };
+  if (!(reclaim_efficiency >= 0 && reclaim_efficiency <= 1)) return { error: "Reclaim efficiency must be between 0 and 1." };
+  if (!(price_per_lb >= 0)) return { error: "Powder price cannot be negative." };
+  // 192.7 is the standard powder-coating constant: sq ft per lb at 1 mil and SG 1.0.
+  const theoretical_coverage_sqft_lb = 192.7 / (specific_gravity * film_thickness_mils);
+  const waste_coverage = theoretical_coverage_sqft_lb * transfer_efficiency;
+  const waste_powder_lb = part_area_sqft / waste_coverage;
+  // Reclaim recovers the overspray, so the utilisation is the first pass plus
+  // the recovered share of what missed.
+  const utilization = transfer_efficiency + (1 - transfer_efficiency) * reclaim_efficiency;
+  const reclaim_coverage = theoretical_coverage_sqft_lb * utilization;
+  const reclaim_powder_lb = part_area_sqft / reclaim_coverage;
+  const saving_pct = (1 - reclaim_powder_lb / waste_powder_lb) * 100;
+  const waste_cost = waste_powder_lb * price_per_lb;
+  const reclaim_cost = reclaim_powder_lb * price_per_lb;
+  if (![theoretical_coverage_sqft_lb, waste_coverage, waste_powder_lb, utilization, reclaim_powder_lb].every(Number.isFinite)) return { error: "Powder coating math is not a finite value." };
+  return {
+    theoretical_coverage_sqft_lb, waste_coverage, waste_powder_lb,
+    utilization, reclaim_coverage, reclaim_powder_lb, saving_pct,
+    waste_cost, reclaim_cost, cost_saving: waste_cost - reclaim_cost,
+    note: "How much powder a job takes, and the two factors that move the answer by a factor of two. Theoretical coverage is fixed by physics -- specific gravity and film thickness -- and no shop achieves it, because what leaves the gun is not all what lands on the part. TRANSFER EFFICIENCY is the first-pass share, typically 60% or so on manual equipment, and what misses becomes overspray. RECLAIM is the second factor and it is the one that decides the booth: a reclaim booth recovers the overspray and returns it to the hopper, so the utilisation is the first pass plus the recovered share of what missed, which pushes a 60% transfer efficiency to 98%. A powder of specific gravity 1.5 at 2.0 mils covers 64.2 sq ft per pound theoretically. Sprayed to waste at 60% transfer that is 38.5 sq ft per pound and a 500 sq ft job takes 13.0 lb; with 95% reclaim the effective coverage rises to 62.9 and the same job takes 7.9 lb. Thirteen pounds against eight is a 39% cut in material on one job, and at four to eight dollars a pound across a production year that difference is the reclaim booth's payback. Then check the thickness discipline, because it outweighs the transfer efficiency: running the same job at 3.0 mils instead of 2.0 pushes the no-reclaim requirement from 13.0 lb to 19.5 lb. Material only. Part surface area is the input this is most sensitive to and it is genuinely hard to estimate on a complex part, where the Faraday cage effect in inside corners and recesses both lowers transfer efficiency and leaves those areas thin. It does not address cure schedule, film build uniformity, pretreatment, color change losses in a reclaim system -- which are substantial and are why some shops spray to waste deliberately -- powder shelf life, or the contamination that ends a reclaim batch. The powder manufacturer's technical data sheet, the coating specification's film thickness range, and the booth manufacturer govern.",
+  };
+}
+
+export const powderCoatingCoverageExample = { inputs: { specific_gravity: 1.5, film_thickness_mils: 2, part_area_sqft: 500, transfer_efficiency: 0.6, reclaim_efficiency: 0.95, price_per_lb: 6 } };
+
+SHOP_RENDERERS["powder-coating-coverage"] = _simpleRenderer({
+  citation: "Citation: theoretical powder coverage = 192.7 / (specific gravity x film thickness in mils), the standard powder-coating constant (sq ft per lb at 1 mil and SG 1.0), by name; effective coverage from transfer efficiency, and reclaim utilisation = transfer + (1 - transfer) x reclaim efficiency. Material only -- no cure schedule, film uniformity, pretreatment, Faraday-cage effect, or reclaim color-change loss. The powder manufacturer's technical data sheet and the coating specification govern.",
+  example: powderCoatingCoverageExample.inputs,
+  fields: [
+    { key: "specific_gravity", label: "Powder specific gravity", kind: "number" },
+    { key: "film_thickness_mils", label: "Target film thickness (mils)", kind: "number" },
+    { key: "part_area_sqft", label: "Part surface area (sq ft)", kind: "number" },
+    { key: "transfer_efficiency", label: "Transfer efficiency (0 to 1)", kind: "number" },
+    { key: "reclaim_efficiency", label: "Reclaim efficiency (0 to 1, 0 = spray to waste)", kind: "number" },
+    { key: "price_per_lb", label: "Powder price ($/lb)", kind: "number" },
+  ],
+  outputs: [
+    { key: "t", id: "pcc-out-t", label: "Theoretical coverage", value: (r) => fmt(r.theoretical_coverage_sqft_lb, 1) + " sq ft per lb at this SG and film build" },
+    { key: "w", id: "pcc-out-w", label: "Sprayed to waste", value: (r) => fmt(r.waste_coverage, 1) + " sq ft/lb effective, " + fmt(r.waste_powder_lb, 1) + " lb for the job ($" + fmt(r.waste_cost, 0) + ")" },
+    { key: "r", id: "pcc-out-r", label: "With reclaim", value: (r) => fmt(r.utilization * 100, 0) + "% utilisation, " + fmt(r.reclaim_coverage, 1) + " sq ft/lb, " + fmt(r.reclaim_powder_lb, 1) + " lb ($" + fmt(r.reclaim_cost, 0) + ")" },
+    { key: "s", id: "pcc-out-s", label: "What reclaim buys", value: (r) => fmt(r.saving_pct, 0) + "% less powder, $" + fmt(r.cost_saving, 0) + " on this job" },
+    { key: "n", id: "pcc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePowderCoatingCoverage,
+});
+
+// ===================== spec-v1441: plating tank current and time (Faraday) =====================
+// dims: in { args: dimensionless } out: { total_current_a: I, plating_time_s: T, thickness_rate_in_hr: L T^-1 }
+export function computePlatingTankCurrent({ current_density_asf = 0, part_area_sqft = 0, atomic_weight = 0, valence = 0, metal_density_gcc = 0, current_efficiency = 0.95, target_thickness_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(current_density_asf > 0)) return { error: "Current density must be positive." };
+  if (!(part_area_sqft > 0)) return { error: "Part surface area must be positive." };
+  if (!(atomic_weight > 0)) return { error: "Atomic weight must be positive." };
+  if (!(valence > 0)) return { error: "Valence must be positive." };
+  if (!(metal_density_gcc > 0)) return { error: "Metal density must be positive." };
+  if (!(current_efficiency > 0 && current_efficiency <= 1)) return { error: "Current efficiency must be between 0 and 1." };
+  if (!(target_thickness_in > 0)) return { error: "Target thickness must be positive." };
+  const FARADAY = 96485; // C/mol
+  const total_current_a = current_density_asf * part_area_sqft;
+  // Faraday's law: mass is EXACTLY proportional to charge passed. What the bath
+  // chemistry changes is the current efficiency, not the constant.
+  const mass_rate_g_s = total_current_a * atomic_weight / (valence * FARADAY) * current_efficiency;
+  const volume_rate_cm3_s = mass_rate_g_s / metal_density_gcc;
+  const area_cm2 = part_area_sqft * 929.0304;
+  const thickness_rate_cm_s = volume_rate_cm3_s / area_cm2;
+  const target_cm = target_thickness_in * 2.54;
+  const plating_time_s = target_cm / thickness_rate_cm_s;
+  const plating_time_min = plating_time_s / 60;
+  const thickness_rate_in_hr = thickness_rate_cm_s / 2.54 * 3600;
+  const deposit_mass_g = mass_rate_g_s * plating_time_s;
+  if (![total_current_a, mass_rate_g_s, thickness_rate_cm_s, plating_time_s, thickness_rate_in_hr].every(Number.isFinite)) return { error: "Plating math is not a finite value." };
+  return {
+    total_current_a, mass_rate_g_s, volume_rate_cm3_s, area_cm2,
+    thickness_rate_cm_s, thickness_rate_in_hr, plating_time_s, plating_time_min, deposit_mass_g,
+    note: "Plating and anodizing are the one shop process governed by an exact physical law, and this is that law. Faraday's law of electrolysis says the mass deposited is exactly proportional to the charge passed, with the constant of proportionality being the metal's equivalent weight over the Faraday constant. Nothing about the bath chemistry, the additives, or the operator changes that -- what they change is CURRENT EFFICIENCY, the fraction of the current that deposits metal rather than evolving hydrogen. Nickel baths run near 95%; decorative chromium baths run in the teens, which is why chrome plating is so slow and so power-hungry, and running the same geometry in a 15% bath drops the deposition rate by more than six times before any other difference is counted. The useful reading is that CURRENT DENSITY, not total current, sets the rate: a part twice as large needs twice the current to plate in the same time, and a rectifier that cannot deliver it simply plates slower -- doubling the rack area without doubling the rectifier halves the current density and doubles the time. Current density also has upper and lower limits set by the bath, too low and coverage is poor, too high and the deposit burns, so the practical rate is bounded by chemistry rather than by the power supply. Nickel at 40 A per sq ft over 20 sq ft of part at 95% efficiency draws 800 A and lays a mil down in about 30 minutes, which matches shop experience closely, because Faraday's law is not an approximation. The sacrificial-anode life calculation here runs the same law in the other direction, on metal being consumed rather than deposited. AVERAGE thickness only, which is the number Faraday's law gives and not the number an inspector measures. Real deposits are not uniform: current concentrates at edges and points and starves in recesses, so a rack that averages a mil may be well over on a corner and well under in a bore, and throwing power, anode placement, robbers, and shields are the whole craft of fixing that. It does not address bath composition, temperature, agitation, filtration, pretreatment and cleaning -- which decide adhesion -- hydrogen embrittlement and the bake that relieves it, rectifier ripple, or waste treatment. Plating baths are hazardous chemistry with serious ventilation, PPE, and disposal requirements. The bath supplier's data, the plating specification, and the applicable environmental and safety regulations govern.",
+  };
+}
+
+export const platingTankCurrentExample = { inputs: { current_density_asf: 40, part_area_sqft: 20, atomic_weight: 58.69, valence: 2, metal_density_gcc: 8.9, current_efficiency: 0.95, target_thickness_in: 0.001 } };
+
+SHOP_RENDERERS["plating-tank-current"] = _simpleRenderer({
+  citation: "Citation: Faraday's law of electrolysis, mass rate = current x atomic weight / (valence x 96,485 C/mol) x current efficiency, by name, with the deposit thickness rate following from the metal's density and the part's surface area. AVERAGE thickness only -- real deposits concentrate at edges and starve in recesses, which throwing power, anode placement, robbers, and shields address. The bath supplier's data, the plating specification, and the applicable environmental and safety regulations govern.",
+  example: platingTankCurrentExample.inputs,
+  fields: [
+    { key: "current_density_asf", label: "Current density (A per sq ft)", kind: "number" },
+    { key: "part_area_sqft", label: "Part surface area (sq ft)", kind: "number" },
+    { key: "atomic_weight", label: "Metal atomic weight (g/mol)", kind: "number" },
+    { key: "valence", label: "Valence (electrons per ion)", kind: "number" },
+    { key: "metal_density_gcc", label: "Metal density (g/cm3)", kind: "number" },
+    { key: "current_efficiency", label: "Cathode current efficiency (0 to 1)", kind: "number" },
+    { key: "target_thickness_in", label: "Target thickness (in)", kind: "number" },
+  ],
+  outputs: [
+    { key: "i", id: "ptc-out-i", label: "Total current", value: (r) => fmt(r.total_current_a, 0) + " A into " + fmt(r.area_cm2, 0) + " cm2 of part" },
+    { key: "m", id: "ptc-out-m", label: "Deposition rate", value: (r) => fmt(r.mass_rate_g_s, 4) + " g/s = " + fmt(r.thickness_rate_in_hr * 1000, 3) + " mils per hour" },
+    { key: "t", id: "ptc-out-t", label: "Time to the target thickness", value: (r) => fmt(r.plating_time_s, 0) + " s = " + fmt(r.plating_time_min, 1) + " minutes" },
+    { key: "d", id: "ptc-out-d", label: "Metal deposited", value: (r) => fmt(r.deposit_mass_g, 1) + " g over the run (average thickness -- edges run heavy, recesses thin)" },
+    { key: "n", id: "ptc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePlatingTankCurrent,
+});
+
+// ===================== spec-v1442: heat-treat soak time and furnace load =====================
+// dims: in { args: dimensionless } out: { total_at_temp_hr: T, charge_heat_btu: M L^2 T^-2, furnace_input_btu_hr: M L^2 T^-3 }
+export function computeHeatTreatSoakTime({ charge_weight_lb = 0, section_thickness_in = 0, soak_temp_f = 0, start_temp_f = 70, through_heat_rate_hr_per_in = 1, soak_rate_hr_per_in = 1, specific_heat = 0.12, furnace_efficiency = 0.6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(charge_weight_lb > 0)) return { error: "Charge weight must be positive." };
+  if (!(section_thickness_in > 0)) return { error: "Maximum section thickness must be positive." };
+  if (!(soak_temp_f > start_temp_f)) return { error: "Soak temperature must be above the starting temperature." };
+  if (!(through_heat_rate_hr_per_in > 0)) return { error: "Through-heat rate must be positive." };
+  if (!(soak_rate_hr_per_in > 0)) return { error: "Soak rate must be positive." };
+  if (!(specific_heat > 0)) return { error: "Specific heat must be positive." };
+  if (!(furnace_efficiency > 0 && furnace_efficiency <= 1)) return { error: "Furnace efficiency must be between 0 and 1." };
+  // Soak is governed by SECTION THICKNESS, not by weight.
+  const through_heat_hr = through_heat_rate_hr_per_in * section_thickness_in;
+  const soak_hr = soak_rate_hr_per_in * section_thickness_in;
+  const total_at_temp_hr = through_heat_hr + soak_hr;
+  const delta_t = soak_temp_f - start_temp_f;
+  const charge_heat_btu = charge_weight_lb * specific_heat * delta_t;
+  const furnace_input_btu_hr = charge_heat_btu / (through_heat_hr * furnace_efficiency);
+  const furnace_input_kw = furnace_input_btu_hr / 3412.14;
+  if (![through_heat_hr, soak_hr, total_at_temp_hr, charge_heat_btu, furnace_input_btu_hr].every(Number.isFinite)) return { error: "Heat-treat math is not a finite value." };
+  return {
+    through_heat_hr, soak_hr, total_at_temp_hr, delta_t,
+    charge_heat_btu, furnace_input_btu_hr, furnace_input_kw,
+    note: "The two numbers a shop needs before loading a furnace: how long the charge has to sit at temperature, and how much energy it takes to get there. Soak time is governed by SECTION THICKNESS, not by weight. A hundred pounds of half-inch bar and a hundred pounds of two-inch bar are entirely different soaks, because what has to happen is that the CENTER of the thickest section reaches temperature and then stays there long enough for the transformation to complete. The common rule -- roughly an hour per inch of section at temperature, after the part is through-heated -- is a convention with a lot of process-specific variation behind it, and it is separate from the time it takes to get the part hot in the first place, which is why both terms are printed. The thickness leverage is the whole lesson: a 4 in section doubles both the through-heat and the soak, for a charge that may weigh exactly the same. In heat treating, geometry beats weight every time. The energy side sizes the furnace, and the surprise is usually how much of the furnace's input never reaches the work: wall losses, opening losses, atmosphere, and fixturing all consume a large share, and 50% to 70% overall efficiency is common on a batch furnace. A 500 lb charge of alloy steel taken to 1,550 F from room temperature absorbs 88,800 BTU, and delivering it during a two-hour ramp at 60% efficiency needs about 74,000 BTU/hr, or 21.7 kW -- which is the number that says whether the shop's furnace and its circuit can run this charge on schedule. Time and energy only, and the soak rule is a convention rather than a metallurgical prediction. THIS DOES NOT SPECIFY A HEAT TREATMENT. The austenitizing temperature, the soak time, the quench medium, the temper, and the resulting properties come from the steel's own specification and the applicable process standard (AMS 2759, ASTM A991, or the customer's own), and they depend on the alloy, the prior condition, the required hardness and toughness, and the section size. It does not address atmosphere and decarburization, fixturing and distortion, ramp rates and thermal shock on thick or complex sections, pyrometry and thermocouple placement, or the survey and calibration requirements a certified shop works under. The steel's specification, the process standard, and the metallurgist govern.",
+  };
+}
+
+export const heatTreatSoakTimeExample = { inputs: { charge_weight_lb: 500, section_thickness_in: 2, soak_temp_f: 1550, start_temp_f: 70, through_heat_rate_hr_per_in: 1, soak_rate_hr_per_in: 1, specific_heat: 0.12, furnace_efficiency: 0.6 } };
+
+SHOP_RENDERERS["heat-treat-soak-time"] = _simpleRenderer({
+  citation: "Citation: the section-thickness soak convention used in heat-treating practice -- through-heat and soak each proportional to the maximum section thickness, commonly about one hour per inch at temperature -- by name, and charge heat from the sensible-heat relation weight x specific heat x temperature rise, divided by the furnace's overall efficiency for the input. Time and energy only. THIS SPECIFIES NO HEAT TREATMENT: temperature, soak, quench, temper, and properties come from the steel's specification and the applicable process standard. The metallurgist governs.",
+  example: heatTreatSoakTimeExample.inputs,
+  fields: [
+    { key: "charge_weight_lb", label: "Charge weight (lb)", kind: "number" },
+    { key: "section_thickness_in", label: "Maximum section thickness (in)", kind: "number" },
+    { key: "soak_temp_f", label: "Soak temperature (F)", kind: "number" },
+    { key: "start_temp_f", label: "Starting temperature (F)", kind: "number", attrs: { step: "any" } },
+    { key: "through_heat_rate_hr_per_in", label: "Through-heat rate (hr per in)", kind: "number" },
+    { key: "soak_rate_hr_per_in", label: "Soak rate (hr per in)", kind: "number" },
+    { key: "specific_heat", label: "Specific heat (BTU/lb-F)", kind: "number" },
+    { key: "furnace_efficiency", label: "Furnace overall efficiency (0 to 1)", kind: "number" },
+  ],
+  outputs: [
+    { key: "t", id: "htst-out-t", label: "Time at temperature", value: (r) => fmt(r.total_at_temp_hr, 2) + " hr = " + fmt(r.through_heat_hr, 2) + " through-heat + " + fmt(r.soak_hr, 2) + " soak" },
+    { key: "q", id: "htst-out-q", label: "Charge heat", value: (r) => fmt(r.charge_heat_btu, 0) + " BTU over a " + fmt(r.delta_t, 0) + " F rise" },
+    { key: "i", id: "htst-out-i", label: "Furnace input during the ramp", value: (r) => fmt(r.furnace_input_btu_hr, 0) + " BTU/hr = " + fmt(r.furnace_input_kw, 1) + " kW delivered" },
+    { key: "n", id: "htst-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHeatTreatSoakTime,
+});
+
+// ===================== spec-v1443: quench severity and the Biot screen =====================
+// dims: in { args: dimensionless } out: { biot: dimensionless, second_biot: dimensionless }
+export function computeQuenchSeverity({ grossmann_h = 0, section_diameter_in = 0, second_grossmann_h = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(grossmann_h > 0)) return { error: "Grossmann H-value must be positive." };
+  if (!(section_diameter_in > 0)) return { error: "Section diameter must be positive." };
+  if (!(second_grossmann_h > 0)) return { error: "The comparison H-value must be positive." };
+  const radius_in = section_diameter_in / 2;
+  // Bi = h r / k = 2 H r. Below 0.5 the SURFACE is the bottleneck; above 2 the
+  // section is, and a more severe quench buys almost nothing at the center.
+  const regime = (bi) => bi < 0.5 ? "surface-limited -- quenchant and agitation dominate" : bi > 2 ? "conduction-limited -- the section governs and agitation buys little" : "transitional -- agitation helps, but less than the H ratio suggests";
+  const biot = 2 * grossmann_h * radius_in;
+  const second_biot = 2 * second_grossmann_h * radius_in;
+  const h_ratio = second_grossmann_h / grossmann_h;
+  const worth_it = biot < 0.5 && second_biot < 0.5;
+  if (![radius_in, biot, second_biot, h_ratio].every(Number.isFinite)) return { error: "Quench-severity math is not a finite value." };
+  return {
+    radius_in, biot, second_biot, h_ratio,
+    regime: regime(biot), second_regime: regime(second_biot), worth_it,
+    verdict: worth_it
+      ? "Both conditions are surface-limited, so stepping up to H = " + fmt(second_grossmann_h, 2) + " raises the cooling rate by roughly the H ratio of " + fmt(h_ratio, 2) + "x"
+      : biot > 2
+        ? "Already conduction-limited at H = " + fmt(grossmann_h, 2) + ": a more severe quench changes the surface and does essentially nothing at the core, while adding distortion and cracking risk"
+        : "Partly conduction-limited: the step up buys real but sub-proportional improvement at the core",
+    note: "Whether agitating the quench is worth doing, which depends entirely on which regime the part is in. Everyone reaches for more agitation when a quench comes out soft, and on a thick section it does almost nothing -- because the heat is not surface-limited, it is conduction-limited. Grossmann's H-value is the standard ranking of quench severity, and the usual table runs from still oil near 0.25, through agitated oil near 0.4, still water near 1.0, agitated water near 1.5, up to agitated brine above 2.0. What that table does not say is when moving up it helps. The Biot number answers that. It is the ratio of the internal conduction resistance to the surface transfer resistance. When it is SMALL the surface is the bottleneck -- heat cannot get OFF the part fast enough, and anything that improves the surface condition, a more severe quenchant, more agitation, better fixturing so the vapor blanket breaks, directly improves the cooling rate. When it is LARGE the surface is already removing heat faster than the interior can supply it, the center cools at a rate set by the steel's own conductivity, and a more severe quench changes the surface and does essentially nothing at the core while adding distortion and cracking risk. On a 1 in bar, still oil gives a Biot of 0.25 and agitated oil 0.40 -- both surface-limited, so the move from still to agitated raises the cooling rate by roughly the H ratio of 1.6 times, and the quenchant is the whole story. On a 6 in bar, still water gives 6.0 and agitated brine 12.0 -- both conduction-limited, so doubling the severity barely moves the center cooling rate and mostly doubles the gradient. Those two sentences are the reason large sections are made from deep-hardening alloys and small ones are not. A REGIME SCREEN, not a hardness prediction. It says whether agitation is worth doing; it does not say what hardness results, which needs the steel's hardenability (its Jominy curve or its ideal diameter), its chemistry, the prior microstructure, and a CCT diagram. Grossmann H-values are themselves approximate rankings from a bar-quench correlation, not physical properties, and real quenching passes through vapor-blanket, boiling, and convection stages with wildly different heat-transfer coefficients rather than the single value the number implies. It does not address distortion, quench cracking, residual stress, part orientation and racking, quenchant temperature and contamination, or the temper that must follow. The steel's specification, its hardenability data, and the metallurgist govern.",
+  };
+}
+
+export const quenchSeverityExample = { inputs: { grossmann_h: 0.25, section_diameter_in: 1, second_grossmann_h: 0.4 } };
+
+SHOP_RENDERERS["quench-severity"] = _simpleRenderer({
+  citation: "Citation: Grossmann's quench severity H-value as the standard ranking (still oil about 0.25, agitated oil about 0.4, still water about 1.0, agitated water about 1.5, agitated brine above 2.0), cited by name and entered rather than looked up, with the Biot number Bi = h r / k = 2 H r and the conventional surface-limited (Bi below 0.5) and conduction-limited (Bi above 2) regimes. A REGIME SCREEN, not a hardness prediction: hardness needs the steel's hardenability, chemistry, and a CCT diagram. The metallurgist governs.",
+  example: quenchSeverityExample.inputs,
+  fields: [
+    { key: "grossmann_h", label: "Grossmann H-value of the quench", kind: "number" },
+    { key: "section_diameter_in", label: "Section diameter (in)", kind: "number" },
+    { key: "second_grossmann_h", label: "H-value of the quench being considered", kind: "number" },
+  ],
+  outputs: [
+    { key: "b", id: "qs-out-b", label: "Biot number as quenched", value: (r) => fmt(r.biot, 2) + " at a " + fmt(r.radius_in, 2) + " in radius -- " + r.regime },
+    { key: "s", id: "qs-out-s", label: "Biot number at the stronger quench", value: (r) => fmt(r.second_biot, 2) + " -- " + r.second_regime },
+    { key: "v", id: "qs-out-v", label: "Is stepping up worth it", value: (r) => r.verdict },
+    { key: "n", id: "qs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeQuenchSeverity,
+});
+
+// ===================== spec-v1444: belt conveyor tension and drive power =====================
+// dims: in { args: dimensionless } out: { effective_tension_lb: M L T^-2, belt_hp: M L^2 T^-3, motor_hp: M L^2 T^-3 }
+export function computeBeltConveyorTensionPower({ tons_per_hour = 0, belt_speed_fpm = 0, length_ft = 0, lift_ft = 0, belt_weight_plf = 0, idler_weight_plf = 0, friction_factor = 0.022, drive_efficiency = 0.85 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(tons_per_hour > 0)) return { error: "Capacity in tons per hour must be positive." };
+  if (!(belt_speed_fpm > 0)) return { error: "Belt speed must be positive." };
+  if (!(length_ft > 0)) return { error: "Conveyor length must be positive." };
+  if (!(lift_ft >= 0)) return { error: "Lift cannot be negative." };
+  if (!(belt_weight_plf > 0)) return { error: "Belt weight per foot must be positive." };
+  if (!(idler_weight_plf >= 0)) return { error: "Idler rotating weight per foot cannot be negative." };
+  if (!(friction_factor > 0)) return { error: "Friction factor must be positive." };
+  if (!(drive_efficiency > 0 && drive_efficiency <= 1)) return { error: "Drive efficiency must be between 0 and 1." };
+  const material_load_plf = tons_per_hour * 2000 / (belt_speed_fpm * 60);
+  // The belt counts TWICE -- carrying side and return side.
+  const friction_term_lb = friction_factor * length_ft * (2 * belt_weight_plf + material_load_plf + idler_weight_plf);
+  const lift_term_lb = lift_ft * material_load_plf;
+  const effective_tension_lb = friction_term_lb + lift_term_lb;
+  const belt_hp = effective_tension_lb * belt_speed_fpm / 33000;
+  const motor_hp = belt_hp / drive_efficiency;
+  const lift_share_pct = effective_tension_lb > 0 ? lift_term_lb / effective_tension_lb * 100 : 0;
+  if (![material_load_plf, friction_term_lb, lift_term_lb, effective_tension_lb, belt_hp, motor_hp].every(Number.isFinite)) return { error: "Belt-conveyor math is not a finite value." };
+  return {
+    material_load_plf, friction_term_lb, lift_term_lb, effective_tension_lb,
+    belt_hp, motor_hp, lift_share_pct,
+    dominant: lift_term_lb > friction_term_lb ? "lift" : "friction",
+    lever: lift_term_lb > friction_term_lb
+      ? "the profile, not the maintenance -- perfect idlers would save a fraction of a horsepower and no amount of maintenance touches the rise"
+      : "idler condition, alignment, and belt tension, because friction is nearly everything on this run",
+    note: "What a belt conveyor's drive has to deliver, split into the two physically different things it is made of. EFFECTIVE TENSION is the force the drive pulley must produce. The FRICTION term is everything that resists motion along the run -- the belt itself counted on BOTH the carrying and the return sides, the material, and the rotating mass of the idlers -- multiplied by a friction factor around 0.022 for a well-maintained conveyor and by the length. The LIFT term is the potential energy being added, and it is the material weight per foot times the rise. Nothing else. Which term dominates decides what to fix, and that is the whole point of printing them separately. A 100 ft conveyor lifting 20 ft with 200 tons an hour at 300 fpm carries 22.2 lb of material per foot, and its lift term of 444 lb is five times its friction term of 88 lb: perfect idlers would save under a horsepower and cutting the rise in half would save two and a half, so if the motor is marginal the answer is the profile, not the maintenance. Reverse the geometry to 500 ft of flat run at the same tonnage and the friction term becomes 442 lb with no lift term at all, and now idler condition and alignment are the entire conversation. On a long flat conveyor friction is nearly everything; on a short steep one lift is nearly everything and the only ways down are less material or less rise. Effective tension and drive power only, on the simplified CEMA form. It does not compute the tension distribution around the loop, the slack-side tension needed to prevent drive-pulley slip or to keep the belt from sagging between idlers, or the take-up travel that maintains it, and it does not size the belt itself -- carcass rating, ply, cover, or splice. Acceleration, braking, and the runaway condition on a declining conveyor are separate and important problems, as is the belt tension the starting method produces. Skirtboard, plow, and tripper losses, material acceleration at the loading point, and the effect of temperature and belt condition on the friction factor are all outside it. CEMA's Belt Conveyors for Bulk Materials, the belt and idler manufacturers, and the engineer of record govern.",
+  };
+}
+
+export const beltConveyorTensionPowerExample = { inputs: { tons_per_hour: 200, belt_speed_fpm: 300, length_ft: 100, lift_ft: 20, belt_weight_plf: 5, idler_weight_plf: 8, friction_factor: 0.022, drive_efficiency: 0.85 } };
+
+SHOP_RENDERERS["belt-conveyor-tension-power"] = _simpleRenderer({
+  citation: "Citation: the simplified CEMA effective-tension form -- Te = f x L x (2 Wb + Wm + Wrot) + H x Wm, with the belt counted on both the carrying and return sides -- and belt horsepower = Te x speed / 33,000, by name; the friction factor (about 0.022 for a well-maintained conveyor) and the idler rotating weight are entered rather than tabulated. Effective tension and drive power only -- no tension distribution, slack-side tension, take-up, belt carcass selection, or acceleration and braking. CEMA's Belt Conveyors for Bulk Materials, the belt and idler manufacturers, and the engineer of record govern.",
+  example: beltConveyorTensionPowerExample.inputs,
+  fields: [
+    { key: "tons_per_hour", label: "Capacity (tons per hour)", kind: "number" },
+    { key: "belt_speed_fpm", label: "Belt speed (fpm)", kind: "number" },
+    { key: "length_ft", label: "Conveyor length (ft)", kind: "number" },
+    { key: "lift_ft", label: "Lift (ft)", kind: "number" },
+    { key: "belt_weight_plf", label: "Belt weight (lb per ft)", kind: "number" },
+    { key: "idler_weight_plf", label: "Idler rotating weight (lb per ft)", kind: "number" },
+    { key: "friction_factor", label: "Friction factor", kind: "number" },
+    { key: "drive_efficiency", label: "Drive efficiency (0 to 1)", kind: "number" },
+  ],
+  outputs: [
+    { key: "w", id: "bctp-out-w", label: "Material load on the belt", value: (r) => fmt(r.material_load_plf, 1) + " lb per ft of belt" },
+    { key: "t", id: "bctp-out-t", label: "Effective tension", value: (r) => fmt(r.effective_tension_lb, 1) + " lb = " + fmt(r.friction_term_lb, 1) + " friction + " + fmt(r.lift_term_lb, 1) + " lift" },
+    { key: "d", id: "bctp-out-d", label: "Which term dominates", value: (r) => "the " + r.dominant + " term at " + fmt(r.lift_share_pct, 0) + "% lift -- the lever is " + r.lever },
+    { key: "p", id: "bctp-out-p", label: "Power", value: (r) => fmt(r.belt_hp, 2) + " belt hp, " + fmt(r.motor_hp, 2) + " hp at the motor" },
+    { key: "n", id: "bctp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeBeltConveyorTensionPower,
+});

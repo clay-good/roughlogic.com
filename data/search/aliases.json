@@ -105072,6 +105072,166 @@
    "term": "why is this door so hard to open",
    "target": "stairwell-pressurization",
    "kind": "question"
+  },
+  {
+   "term": "air cylinder air consumption",
+   "target": "pneumatic-cylinder-scfm",
+   "kind": "industry"
+  },
+  {
+   "term": "cylinder scfm",
+   "target": "pneumatic-cylinder-scfm",
+   "kind": "industry"
+  },
+  {
+   "term": "compressed air demand cylinder",
+   "target": "pneumatic-cylinder-scfm",
+   "kind": "industry"
+  },
+  {
+   "term": "how much air does this cylinder use",
+   "target": "pneumatic-cylinder-scfm",
+   "kind": "question"
+  },
+  {
+   "term": "bucket elevator capacity",
+   "target": "bucket-elevator-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "grain leg tons per hour",
+   "target": "bucket-elevator-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "elevator bucket fill factor",
+   "target": "bucket-elevator-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "cyclone cut size",
+   "target": "cyclone-separator-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "lapple cyclone",
+   "target": "cyclone-separator-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "cyclone pressure drop",
+   "target": "cyclone-separator-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "what will my cyclone catch",
+   "target": "cyclone-separator-sizing",
+   "kind": "question"
+  },
+  {
+   "term": "gas strut force",
+   "target": "gas-strut-force",
+   "kind": "industry"
+  },
+  {
+   "term": "gas spring sizing",
+   "target": "gas-strut-force",
+   "kind": "industry"
+  },
+  {
+   "term": "what size gas strut for this lid",
+   "target": "gas-strut-force",
+   "kind": "question"
+  },
+  {
+   "term": "spray booth cfm",
+   "target": "spray-booth-airflow",
+   "kind": "industry"
+  },
+  {
+   "term": "paint booth face velocity",
+   "target": "spray-booth-airflow",
+   "kind": "industry"
+  },
+  {
+   "term": "booth makeup air heating",
+   "target": "spray-booth-airflow",
+   "kind": "industry"
+  },
+  {
+   "term": "powder coating coverage",
+   "target": "powder-coating-coverage",
+   "kind": "industry"
+  },
+  {
+   "term": "powder transfer efficiency",
+   "target": "powder-coating-coverage",
+   "kind": "industry"
+  },
+  {
+   "term": "powder reclaim savings",
+   "target": "powder-coating-coverage",
+   "kind": "industry"
+  },
+  {
+   "term": "plating time thickness",
+   "target": "plating-tank-current",
+   "kind": "industry"
+  },
+  {
+   "term": "faraday plating rate",
+   "target": "plating-tank-current",
+   "kind": "industry"
+  },
+  {
+   "term": "anodizing tank current",
+   "target": "plating-tank-current",
+   "kind": "industry"
+  },
+  {
+   "term": "heat treat soak time",
+   "target": "heat-treat-soak-time",
+   "kind": "industry"
+  },
+  {
+   "term": "hour per inch soak",
+   "target": "heat-treat-soak-time",
+   "kind": "industry"
+  },
+  {
+   "term": "furnace charge heat",
+   "target": "heat-treat-soak-time",
+   "kind": "industry"
+  },
+  {
+   "term": "grossmann quench severity",
+   "target": "quench-severity",
+   "kind": "industry"
+  },
+  {
+   "term": "biot number quench",
+   "target": "quench-severity",
+   "kind": "industry"
+  },
+  {
+   "term": "will agitating the quench help",
+   "target": "quench-severity",
+   "kind": "question"
+  },
+  {
+   "term": "belt conveyor horsepower",
+   "target": "belt-conveyor-tension-power",
+   "kind": "industry"
+  },
+  {
+   "term": "conveyor effective tension",
+   "target": "belt-conveyor-tension-power",
+   "kind": "industry"
+  },
+  {
+   "term": "cema belt tension",
+   "target": "belt-conveyor-tension-power",
+   "kind": "industry"
   }
  ]
 }

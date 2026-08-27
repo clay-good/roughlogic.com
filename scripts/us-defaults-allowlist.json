@@ -415,6 +415,18 @@
       "match": "Insulation damage temperature (deg C)",
       "family": "ICEA conductor short-circuit limits",
       "justification": "The ICEA P-32-382 conductor short-circuit temperature limits, and the insulation damage temperatures they are compared against, are published in degrees Celsius -- the same basis the catalog's existing conductor short-circuit withstand tile is allowlisted on. A US electrical engineer reads the 75 C and 250 C limits in Celsius off the standard itself."
+    },
+    {
+      "module": "calc-shop.js",
+      "match": "Metal atomic weight (g/mol)",
+      "family": "Faraday's law of electrolysis",
+      "justification": "Atomic weight has no customary-unit form at all -- it is grams per mole by definition, and it is the value a plater reads straight off the periodic table or the bath supplier's data sheet to enter Faraday's law. Converting it would produce a number that appears in no reference a US plating shop owns."
+    },
+    {
+      "module": "calc-shop.js",
+      "match": "Metal density (g/cm3)",
+      "family": "Faraday's law of electrolysis",
+      "justification": "Plating and metallurgical references list metal density in g/cm3 universally, including the ones on a US plating shop's shelf, and it pairs directly with the g/s mass rate Faraday's law produces. A US plater reads 8.9 for nickel off that table; lb/cubic ft would have to be converted back before it could be used."
     }
   ]
 }

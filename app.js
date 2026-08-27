@@ -934,6 +934,17 @@ const TOOL_MODULES = (() => {
   declare("./calc-shop.js", "SHOP_RENDERERS", [
     // trade expansion v1432
     "dust-collection-duct",
+    // trade expansion v1435-v1444
+    "pneumatic-cylinder-scfm",
+    "bucket-elevator-capacity",
+    "cyclone-separator-sizing",
+    "gas-strut-force",
+    "spray-booth-airflow",
+    "powder-coating-coverage",
+    "plating-tank-current",
+    "heat-treat-soak-time",
+    "quench-severity",
+    "belt-conveyor-tension-power",
     // Group K (machinist)
     "machining-time", "material-removal-rate", "turning-surface-finish", "feed-for-surface-finish",
     "taper-calc", "taper-diameter", "dovetail-over-pins", "tailstock-setover", "dividing-head",

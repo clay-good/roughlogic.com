@@ -41280,3 +41280,353 @@ test("bounds: spec-v1433 computeCarburetorAltitudeJetting pins the fourth-root d
   assert.ok("error" in _v1433({ ...base, jet_diameter_in: -1 }));
   assert.ok("error" in _v1433({ ...base, actual_pressure_inhg: Infinity }));
 });
+
+// ===========================================================================
+// spec-v1435..v1444: the 2026-08-26 trade-expansion industrial and finishing
+// band. Ten tiles, all in calc-shop.js, all Group G.
+// ===========================================================================
+
+import { computePneumaticCylinderScfm as _v1435 } from "../../calc-shop.js";
+test("bounds: spec-v1435 computePneumaticCylinderScfm pins the compression ratio and the rod side", () => {
+  const base = { bore_in: 2.5, rod_in: 1, stroke_in: 12, cycles_per_min: 20, pressure_psig: 90, cylinders: 1, cfm_per_hp: 4 };
+  const r = _v1435(base);
+  assert.ok(Math.abs(r.extend_in3 - 58.905) < 1e-3);
+  assert.ok(Math.abs(r.retract_in3 - 49.480) < 1e-3);
+  assert.ok(Math.abs(r.per_cycle_in3 - 108.385) < 1e-3);
+  assert.ok(Math.abs(r.volume_per_cycle_ft3 - 0.062723) < 1e-6);
+  assert.ok(Math.abs(r.compression_ratio - 7.1224) < 1e-4);
+  assert.ok(Math.abs(r.scfm_total - 8.935) < 1e-3);
+  assert.ok(Math.abs(r.compressor_hp - 2.234) < 1e-3);
+  // The rod side is genuinely smaller, and a no-rod cylinder is the upper bound.
+  assert.ok(r.retract_in3 < r.extend_in3);
+  const noRod = _v1435({ ...base, rod_in: 0 });
+  assert.ok(Math.abs(noRod.retract_in3 - noRod.extend_in3) < 1e-9);
+  assert.ok(noRod.scfm_total > r.scfm_total);
+  // Counting only the extend stroke under-estimates by nearly half.
+  assert.ok(r.per_cycle_in3 / r.extend_in3 > 1.8);
+  // Consumption follows the COMPRESSION RATIO, not the gauge pressure: dropping
+  // 90 -> 70 psig is a 22% pressure cut and a 19% air cut.
+  const lower = _v1435({ ...base, pressure_psig: 70 });
+  assert.ok(Math.abs(lower.compression_ratio - 5.7619) < 1e-4);
+  assert.ok(Math.abs(lower.scfm_total - 7.228) < 1e-3);
+  assert.ok(Math.abs((1 - lower.scfm_total / r.scfm_total) * 100 - 19.1) < 0.2);
+  // Cylinders and cycle rate are both exactly linear.
+  assert.ok(Math.abs(_v1435({ ...base, cylinders: 10 }).scfm_total - 10 * r.scfm_total) < 1e-9);
+  assert.ok(Math.abs(_v1435({ ...base, cycles_per_min: 40 }).scfm_total - 2 * r.scfm_total) < 1e-9);
+  assert.ok("error" in _v1435({ ...base, bore_in: 0 }));
+  assert.ok("error" in _v1435({ ...base, rod_in: 2.5 })); // rod cannot equal the bore
+  assert.ok("error" in _v1435({ ...base, rod_in: -1 }));
+  assert.ok("error" in _v1435({ ...base, stroke_in: 0 }));
+  assert.ok("error" in _v1435({ ...base, pressure_psig: 0 }));
+  assert.ok("error" in _v1435({ ...base, cylinders: 0 }));
+  assert.ok("error" in _v1435({ ...base, bore_in: Infinity }));
+});
+
+import { computeBucketElevatorCapacity as _v1436 } from "../../calc-shop.js";
+test("bounds: spec-v1436 computeBucketElevatorCapacity pins the fill factor's leverage", () => {
+  const base = { bucket_volume_ft3: 0.05, spacing_in: 8, speed_fpm: 250, fill_factor: 0.75, bulk_density_pcf: 48, lift_ft: 60, drive_efficiency: 0.75, friction_allowance: 1.2 };
+  const r = _v1436(base);
+  assert.ok(Math.abs(r.buckets_per_ft - 1.5) < 1e-12);
+  assert.ok(Math.abs(r.capacity_ft3_hr - 843.75) < 1e-6);
+  assert.ok(Math.abs(r.mass_lb_hr - 40500) < 1e-6);
+  assert.ok(Math.abs(r.tons_per_hr - 20.25) < 1e-9);
+  assert.ok(Math.abs(r.bushels_per_hr - 678) < 1);
+  assert.ok(Math.abs(r.lifting_hp - 1.2273) < 1e-4);
+  assert.ok(Math.abs(r.motor_hp - 1.9636) < 1e-4);
+  // Fill factor runs straight into capacity: 60% instead of 75% is 16.2 tph.
+  const lean = _v1436({ ...base, fill_factor: 0.6 });
+  assert.ok(Math.abs(lean.tons_per_hr - 16.2) < 1e-9);
+  assert.ok(Math.abs(lean.tons_per_hr / r.tons_per_hr - 0.8) < 1e-9);
+  // And no amount of extra motor recovers it -- the motor FALLS with the fill.
+  assert.ok(lean.motor_hp < r.motor_hp);
+  // Lift dominates: the lifting term is most of the motor even after losses.
+  assert.ok(r.lift_share_pct > 60);
+  assert.ok(Math.abs(_v1436({ ...base, lift_ft: 120 }).lifting_hp - 2 * r.lifting_hp) < 1e-9);
+  // Tighter bucket spacing is more buckets per foot and proportionally more.
+  const tight = _v1436({ ...base, spacing_in: 4 });
+  assert.ok(Math.abs(tight.capacity_ft3_hr - 2 * r.capacity_ft3_hr) < 1e-6);
+  assert.ok("error" in _v1436({ ...base, bucket_volume_ft3: 0 }));
+  assert.ok("error" in _v1436({ ...base, spacing_in: 0 }));
+  assert.ok("error" in _v1436({ ...base, fill_factor: 0 }));
+  assert.ok("error" in _v1436({ ...base, fill_factor: 1.5 }));
+  assert.ok("error" in _v1436({ ...base, drive_efficiency: 1.2 }));
+  assert.ok("error" in _v1436({ ...base, friction_allowance: 0.8 }));
+  assert.ok("error" in _v1436({ ...base, lift_ft: Infinity }));
+});
+
+import { computeCycloneSeparatorSizing as _v1437 } from "../../calc-shop.js";
+test("bounds: spec-v1437 computeCycloneSeparatorSizing pins the cut-versus-pressure asymmetry", () => {
+  const base = { inlet_width_ft: 0.25, inlet_velocity_fps: 50, turns: 5, gas_viscosity_lb_ft_s: 1.24e-5, gas_density_pcf: 0.075, particle_density_pcf: 90, k_velocity_heads: 8, airflow_cfm: 1200, second_velocity_fps: 70 };
+  const r = _v1437(base);
+  assert.ok(Math.abs(r.d50_micron - 4.284) < 1e-3);
+  assert.ok(Math.abs(r.pressure_drop_psf - 23.31) < 1e-2);
+  assert.ok(Math.abs(r.pressure_drop_inwg - 4.481) < 1e-3);
+  assert.ok(Math.abs(r.alt_d50_micron - 3.620) < 1e-3);
+  assert.ok(Math.abs(r.alt_drop_inwg - 8.783) < 1e-3);
+  // THE trade: a 15% finer cut costs 96% more pressure. Velocity enters the cut
+  // as an inverse square root and the pressure drop as a square.
+  assert.ok(Math.abs(r.cut_gain_pct - 15.5) < 0.3);
+  assert.ok(r.drop_rise_pct > 90);
+  assert.ok(Math.abs(r.alt_d50_micron / r.d50_micron - Math.sqrt(50 / 70)) < 1e-9);
+  assert.ok(Math.abs(r.alt_drop_inwg / r.pressure_drop_inwg - (70 / 50) ** 2) < 1e-9);
+  // A NARROWER inlet improves the cut and costs nothing in pressure drop, which
+  // is the one lever that is not a trade.
+  const narrow = _v1437({ ...base, inlet_width_ft: 0.125 });
+  assert.ok(narrow.d50_micron < r.d50_micron);
+  assert.ok(Math.abs(narrow.pressure_drop_psf - r.pressure_drop_psf) < 1e-12);
+  assert.ok(Math.abs(narrow.d50_micron / r.d50_micron - Math.SQRT1_2) < 1e-9);
+  // More turns improve it too, which is why cyclones are tall and slender.
+  assert.ok(_v1437({ ...base, turns: 10 }).d50_micron < r.d50_micron);
+  // Denser particles are easier.
+  assert.ok(_v1437({ ...base, particle_density_pcf: 180 }).d50_micron < r.d50_micron);
+  assert.ok("error" in _v1437({ ...base, inlet_width_ft: 0 }));
+  assert.ok("error" in _v1437({ ...base, inlet_velocity_fps: 0 }));
+  assert.ok("error" in _v1437({ ...base, turns: 0 }));
+  assert.ok("error" in _v1437({ ...base, particle_density_pcf: 0.05 })); // below the gas
+  assert.ok("error" in _v1437({ ...base, airflow_cfm: 0 }));
+  assert.ok("error" in _v1437({ ...base, gas_viscosity_lb_ft_s: Infinity }));
+});
+
+import { computeGasStrutForce as _v1438 } from "../../calc-shop.js";
+test("bounds: spec-v1438 computeGasStrutForce pins the moment arm as the design variable", () => {
+  const base = { lid_weight_lb: 40, cg_distance_in: 18, opening_angle_deg: 0, moment_arm_in: 4, struts: 2, second_angle_deg: 45, second_moment_arm_in: 5 };
+  const r = _v1438(base);
+  assert.ok(Math.abs(r.horizontal_cg_in - 18) < 1e-12);
+  assert.ok(Math.abs(r.lid_moment_in_lb - 720) < 1e-9);
+  assert.ok(Math.abs(r.force_per_strut_lb - 90) < 1e-9);
+  assert.ok(Math.abs(r.total_force_lb - 180) < 1e-9);
+  // The arm is the cheap lever: 4 -> 6 in drops each strut a third, 4 -> 2.5 in
+  // raises it to 144 lb and the hatch becomes hard to pull closed.
+  assert.ok(Math.abs(_v1438({ ...base, moment_arm_in: 6 }).force_per_strut_lb - 60) < 1e-9);
+  assert.ok(Math.abs(_v1438({ ...base, moment_arm_in: 2.5 }).force_per_strut_lb - 144) < 1e-9);
+  // Two struts halve the requirement and never change the lid moment.
+  const one = _v1438({ ...base, struts: 1 });
+  assert.ok(Math.abs(one.force_per_strut_lb - 2 * r.force_per_strut_lb) < 1e-9);
+  assert.ok(Math.abs(one.lid_moment_in_lb - r.lid_moment_in_lb) < 1e-12);
+  assert.ok(Math.abs(one.total_force_lb - r.total_force_lb) < 1e-9);
+  // The lid's moment FALLS as it opens: the horizontal reach goes as cos.
+  const open60 = _v1438({ ...base, opening_angle_deg: 60 });
+  assert.ok(Math.abs(open60.horizontal_cg_in - 9) < 1e-9);
+  assert.ok(Math.abs(open60.lid_moment_in_lb - 360) < 1e-9);
+  assert.ok(open60.lid_moment_in_lb < r.lid_moment_in_lb);
+  // With the same arm at both positions the requirement always falls through the
+  // swing; here the second arm is longer, so it falls further.
+  assert.ok(r.second_force_per_strut_lb < r.force_per_strut_lb);
+  assert.strictEqual(r.rises_through_swing, false);
+  assert.ok("error" in _v1438({ ...base, lid_weight_lb: 0 }));
+  assert.ok("error" in _v1438({ ...base, cg_distance_in: 0 }));
+  assert.ok("error" in _v1438({ ...base, moment_arm_in: 0 }));
+  assert.ok("error" in _v1438({ ...base, struts: 0 }));
+  assert.ok("error" in _v1438({ ...base, opening_angle_deg: 90 }));
+  assert.ok("error" in _v1438({ ...base, opening_angle_deg: -5 }));
+  assert.ok("error" in _v1438({ ...base, lid_weight_lb: Infinity }));
+});
+
+import { computeSprayBoothAirflow as _v1439 } from "../../calc-shop.js";
+test("bounds: spec-v1439 computeSprayBoothAirflow pins the makeup-air load", () => {
+  const base = { opening_width_ft: 14, opening_height_ft: 9, face_velocity_fpm: 100, indoor_temp_f: 70, outdoor_temp_f: 20, burner_efficiency: 0.8, hours_per_year: 1000, price_per_therm: 1.2 };
+  const r = _v1439(base);
+  assert.ok(Math.abs(r.opening_sqft - 126) < 1e-12);
+  assert.ok(Math.abs(r.exhaust_cfm - 12600) < 1e-9);
+  assert.ok(Math.abs(r.makeup_cfm - r.exhaust_cfm) < 1e-12);
+  assert.ok(Math.abs(r.heating_btu_hr - 680400) < 1e-6);
+  assert.ok(Math.abs(r.heating_mbh - 680.4) < 1e-6);
+  assert.ok(Math.abs(r.gas_input_btu_hr - 850500) < 1e-6);
+  assert.ok(Math.abs(r.cost_per_hour - 10.206) < 1e-3);
+  assert.ok(Math.abs(r.annual_cost - 10206) < 1e-2);
+  // The face velocity is not negotiable downward, but the OPENING is: a 10 ft
+  // booth at the same 100 fpm is 9,000 cfm and 29% less to temper.
+  const smaller = _v1439({ ...base, opening_width_ft: 10 });
+  assert.ok(Math.abs(smaller.exhaust_cfm - 9000) < 1e-9);
+  assert.ok(Math.abs((1 - smaller.heating_btu_hr / r.heating_btu_hr) * 100 - 28.6) < 0.1);
+  // Load is exactly linear in both airflow and delta-T.
+  assert.ok(Math.abs(_v1439({ ...base, outdoor_temp_f: -30 }).heating_btu_hr - 2 * r.heating_btu_hr) < 1e-6);
+  assert.ok(Math.abs(_v1439({ ...base, face_velocity_fpm: 200 }).heating_btu_hr - 2 * r.heating_btu_hr) < 1e-6);
+  // A worse burner needs more gas for the same delivered load.
+  assert.ok(_v1439({ ...base, burner_efficiency: 0.6 }).gas_input_btu_hr > r.gas_input_btu_hr);
+  // Zero hours and zero price are legitimate: the airflow answer still stands.
+  assert.strictEqual(_v1439({ ...base, hours_per_year: 0 }).annual_cost, 0);
+  assert.ok("error" in _v1439({ ...base, opening_width_ft: 0 }));
+  assert.ok("error" in _v1439({ ...base, face_velocity_fpm: 0 }));
+  assert.ok("error" in _v1439({ ...base, outdoor_temp_f: 70 })); // no rise
+  assert.ok("error" in _v1439({ ...base, burner_efficiency: 0 }));
+  assert.ok("error" in _v1439({ ...base, hours_per_year: -1 }));
+  assert.ok("error" in _v1439({ ...base, opening_height_ft: Infinity }));
+});
+
+import { computePowderCoatingCoverage as _v1440 } from "../../calc-shop.js";
+test("bounds: spec-v1440 computePowderCoatingCoverage pins reclaim against film build", () => {
+  const base = { specific_gravity: 1.5, film_thickness_mils: 2, part_area_sqft: 500, transfer_efficiency: 0.6, reclaim_efficiency: 0.95, price_per_lb: 6 };
+  const r = _v1440(base);
+  assert.ok(Math.abs(r.theoretical_coverage_sqft_lb - 64.23) < 1e-2);
+  assert.ok(Math.abs(r.waste_coverage - 38.54) < 1e-2);
+  assert.ok(Math.abs(r.waste_powder_lb - 12.97) < 1e-2);
+  assert.ok(Math.abs(r.utilization - 0.98) < 1e-9);
+  assert.ok(Math.abs(r.reclaim_coverage - 62.95) < 1e-2);
+  assert.ok(Math.abs(r.reclaim_powder_lb - 7.94) < 1e-2);
+  assert.ok(Math.abs(r.saving_pct - 38.8) < 0.1);
+  // Spray to waste is the reclaim_efficiency = 0 case and must agree exactly.
+  const toWaste = _v1440({ ...base, reclaim_efficiency: 0 });
+  assert.ok(Math.abs(toWaste.utilization - base.transfer_efficiency) < 1e-12);
+  assert.ok(Math.abs(toWaste.reclaim_powder_lb - toWaste.waste_powder_lb) < 1e-9);
+  assert.ok(Math.abs(toWaste.saving_pct) < 1e-9);
+  // Film build outweighs transfer efficiency: 2.0 -> 3.0 mils raises the
+  // no-reclaim requirement 50%, more than reclaim ever saves.
+  const thick = _v1440({ ...base, film_thickness_mils: 3 });
+  assert.ok(Math.abs(thick.waste_powder_lb - 19.46) < 1e-2);
+  assert.ok(Math.abs(thick.waste_powder_lb / r.waste_powder_lb - 1.5) < 1e-9);
+  assert.ok((thick.waste_powder_lb - r.waste_powder_lb) > (r.waste_powder_lb - r.reclaim_powder_lb));
+  // Coverage is inverse in BOTH specific gravity and thickness.
+  assert.ok(Math.abs(_v1440({ ...base, specific_gravity: 3 }).theoretical_coverage_sqft_lb - r.theoretical_coverage_sqft_lb / 2) < 1e-9);
+  // Perfect reclaim reaches full utilisation regardless of transfer efficiency.
+  assert.ok(Math.abs(_v1440({ ...base, reclaim_efficiency: 1 }).utilization - 1) < 1e-12);
+  assert.ok("error" in _v1440({ ...base, specific_gravity: 0 }));
+  assert.ok("error" in _v1440({ ...base, film_thickness_mils: 0 }));
+  assert.ok("error" in _v1440({ ...base, part_area_sqft: 0 }));
+  assert.ok("error" in _v1440({ ...base, transfer_efficiency: 0 }));
+  assert.ok("error" in _v1440({ ...base, transfer_efficiency: 1.2 }));
+  assert.ok("error" in _v1440({ ...base, reclaim_efficiency: 1.2 }));
+  assert.ok("error" in _v1440({ ...base, price_per_lb: Infinity }));
+});
+
+import { computePlatingTankCurrent as _v1441 } from "../../calc-shop.js";
+test("bounds: spec-v1441 computePlatingTankCurrent pins Faraday's law and current density", () => {
+  const base = { current_density_asf: 40, part_area_sqft: 20, atomic_weight: 58.69, valence: 2, metal_density_gcc: 8.9, current_efficiency: 0.95, target_thickness_in: 0.001 };
+  const r = _v1441(base);
+  assert.ok(Math.abs(r.total_current_a - 800) < 1e-9);
+  assert.ok(Math.abs(r.mass_rate_g_s - 0.23115) < 1e-5);
+  assert.ok(Math.abs(r.volume_rate_cm3_s - 0.025972) < 1e-6);
+  assert.ok(Math.abs(r.area_cm2 - 18580.6) < 0.1);
+  assert.ok(Math.abs(r.plating_time_s - 1817) < 1);
+  assert.ok(Math.abs(r.plating_time_min - 30.29) < 1e-2);
+  // CURRENT DENSITY sets the rate, not total current: doubling the rack area at
+  // the same density plates in the SAME time and doubles the current.
+  const bigRack = _v1441({ ...base, part_area_sqft: 40 });
+  assert.ok(Math.abs(bigRack.plating_time_s - r.plating_time_s) < 1e-6);
+  assert.ok(Math.abs(bigRack.total_current_a - 2 * r.total_current_a) < 1e-9);
+  // Doubling the rack WITHOUT more rectifier halves the density and doubles time.
+  const starved = _v1441({ ...base, part_area_sqft: 40, current_density_asf: 20 });
+  assert.ok(Math.abs(starved.plating_time_s - 2 * r.plating_time_s) < 1e-6);
+  // Efficiency is exactly proportional: a 15% chrome bath is 6.3x slower.
+  const chrome = _v1441({ ...base, current_efficiency: 0.15 });
+  assert.ok(Math.abs(chrome.plating_time_s / r.plating_time_s - 0.95 / 0.15) < 1e-6);
+  assert.ok(chrome.plating_time_s / r.plating_time_s > 6);
+  // Thickness is exactly linear in time -- Faraday's law is not an approximation.
+  assert.ok(Math.abs(_v1441({ ...base, target_thickness_in: 0.002 }).plating_time_s - 2 * r.plating_time_s) < 1e-6);
+  assert.ok("error" in _v1441({ ...base, current_density_asf: 0 }));
+  assert.ok("error" in _v1441({ ...base, part_area_sqft: 0 }));
+  assert.ok("error" in _v1441({ ...base, valence: 0 }));
+  assert.ok("error" in _v1441({ ...base, metal_density_gcc: 0 }));
+  assert.ok("error" in _v1441({ ...base, current_efficiency: 0 }));
+  assert.ok("error" in _v1441({ ...base, current_efficiency: 1.5 }));
+  assert.ok("error" in _v1441({ ...base, target_thickness_in: Infinity }));
+});
+
+import { computeHeatTreatSoakTime as _v1442 } from "../../calc-shop.js";
+test("bounds: spec-v1442 computeHeatTreatSoakTime pins geometry beating weight", () => {
+  const base = { charge_weight_lb: 500, section_thickness_in: 2, soak_temp_f: 1550, start_temp_f: 70, through_heat_rate_hr_per_in: 1, soak_rate_hr_per_in: 1, specific_heat: 0.12, furnace_efficiency: 0.6 };
+  const r = _v1442(base);
+  assert.ok(Math.abs(r.through_heat_hr - 2) < 1e-12);
+  assert.ok(Math.abs(r.soak_hr - 2) < 1e-12);
+  assert.ok(Math.abs(r.total_at_temp_hr - 4) < 1e-12);
+  assert.ok(Math.abs(r.charge_heat_btu - 88800) < 1e-6);
+  assert.ok(Math.abs(r.furnace_input_btu_hr - 74000) < 1e-6);
+  assert.ok(Math.abs(r.furnace_input_kw - 21.69) < 1e-2);
+  // GEOMETRY BEATS WEIGHT. Doubling the section doubles both time terms and
+  // leaves the charge heat untouched; doubling the WEIGHT does the opposite.
+  const thick = _v1442({ ...base, section_thickness_in: 4 });
+  assert.ok(Math.abs(thick.total_at_temp_hr - 8) < 1e-12);
+  assert.ok(Math.abs(thick.charge_heat_btu - r.charge_heat_btu) < 1e-9);
+  const heavy = _v1442({ ...base, charge_weight_lb: 1000 });
+  assert.ok(Math.abs(heavy.total_at_temp_hr - r.total_at_temp_hr) < 1e-12);
+  assert.ok(Math.abs(heavy.charge_heat_btu - 2 * r.charge_heat_btu) < 1e-6);
+  // A thicker section spreads the same heat over a longer ramp, so the required
+  // INPUT RATE falls even though the total time doubles.
+  assert.ok(thick.furnace_input_btu_hr < r.furnace_input_btu_hr);
+  assert.ok(Math.abs(thick.furnace_input_btu_hr - r.furnace_input_btu_hr / 2) < 1e-6);
+  // A worse furnace needs proportionally more input for the same charge.
+  assert.ok(Math.abs(_v1442({ ...base, furnace_efficiency: 0.3 }).furnace_input_btu_hr - 2 * r.furnace_input_btu_hr) < 1e-6);
+  assert.ok("error" in _v1442({ ...base, charge_weight_lb: 0 }));
+  assert.ok("error" in _v1442({ ...base, section_thickness_in: 0 }));
+  assert.ok("error" in _v1442({ ...base, soak_temp_f: 70 }));
+  assert.ok("error" in _v1442({ ...base, specific_heat: 0 }));
+  assert.ok("error" in _v1442({ ...base, furnace_efficiency: 1.5 }));
+  assert.ok("error" in _v1442({ ...base, section_thickness_in: Infinity }));
+});
+
+import { computeQuenchSeverity as _v1443 } from "../../calc-shop.js";
+test("bounds: spec-v1443 computeQuenchSeverity pins both regimes", () => {
+  // 1 in bar: still oil against agitated oil, both surface-limited.
+  const thin = _v1443({ grossmann_h: 0.25, section_diameter_in: 1, second_grossmann_h: 0.4 });
+  assert.ok(Math.abs(thin.radius_in - 0.5) < 1e-12);
+  assert.ok(Math.abs(thin.biot - 0.25) < 1e-12);
+  assert.ok(Math.abs(thin.second_biot - 0.4) < 1e-12);
+  assert.ok(Math.abs(thin.h_ratio - 1.6) < 1e-12);
+  assert.strictEqual(thin.worth_it, true);
+  assert.ok(thin.regime.startsWith("surface-limited"));
+  assert.ok(thin.second_regime.startsWith("surface-limited"));
+  assert.ok(thin.verdict.includes("1.60"));
+  // 6 in bar: still water against agitated brine, both conduction-limited, and
+  // doubling the severity buys essentially nothing at the core.
+  const thick = _v1443({ grossmann_h: 1, section_diameter_in: 6, second_grossmann_h: 2 });
+  assert.ok(Math.abs(thick.biot - 6) < 1e-12);
+  assert.ok(Math.abs(thick.second_biot - 12) < 1e-12);
+  assert.strictEqual(thick.worth_it, false);
+  assert.ok(thick.regime.startsWith("conduction-limited"));
+  assert.ok(thick.verdict.includes("essentially nothing at the core"));
+  // Biot is exactly linear in BOTH the severity and the radius, which is why the
+  // same quenchant lands in opposite regimes on the two bars.
+  assert.ok(Math.abs(_v1443({ grossmann_h: 0.5, section_diameter_in: 1, second_grossmann_h: 1 }).biot - 2 * thin.biot) < 1e-12);
+  assert.ok(Math.abs(_v1443({ grossmann_h: 0.25, section_diameter_in: 2, second_grossmann_h: 0.4 }).biot - 2 * thin.biot) < 1e-12);
+  // The transitional band between 0.5 and 2 is reported as its own regime.
+  const mid = _v1443({ grossmann_h: 0.5, section_diameter_in: 1, second_grossmann_h: 1.5 });
+  assert.ok(Math.abs(mid.biot - 0.5) < 1e-12);
+  assert.ok(mid.regime.startsWith("transitional"));
+  assert.strictEqual(mid.worth_it, false);
+  assert.ok("error" in _v1443({ grossmann_h: 0, section_diameter_in: 1, second_grossmann_h: 0.4 }));
+  assert.ok("error" in _v1443({ grossmann_h: 0.25, section_diameter_in: 0, second_grossmann_h: 0.4 }));
+  assert.ok("error" in _v1443({ grossmann_h: 0.25, section_diameter_in: 1, second_grossmann_h: 0 }));
+  assert.ok("error" in _v1443({ grossmann_h: Infinity, section_diameter_in: 1, second_grossmann_h: 0.4 }));
+});
+
+import { computeBeltConveyorTensionPower as _v1444 } from "../../calc-shop.js";
+test("bounds: spec-v1444 computeBeltConveyorTensionPower pins which term dominates", () => {
+  const base = { tons_per_hour: 200, belt_speed_fpm: 300, length_ft: 100, lift_ft: 20, belt_weight_plf: 5, idler_weight_plf: 8, friction_factor: 0.022, drive_efficiency: 0.85 };
+  const r = _v1444(base);
+  assert.ok(Math.abs(r.material_load_plf - 22.222) < 1e-3);
+  assert.ok(Math.abs(r.friction_term_lb - 88.49) < 1e-2);
+  assert.ok(Math.abs(r.lift_term_lb - 444.44) < 1e-2);
+  assert.ok(Math.abs(r.effective_tension_lb - 532.93) < 1e-2);
+  assert.ok(Math.abs(r.belt_hp - 4.845) < 1e-3);
+  assert.ok(Math.abs(r.motor_hp - 5.700) < 1e-3);
+  // Short and steep: lift is five times friction, so the profile is the lever.
+  assert.strictEqual(r.dominant, "lift");
+  assert.ok(r.lift_term_lb / r.friction_term_lb > 5);
+  assert.ok(r.lever.includes("profile"));
+  // Long and flat at the same tonnage: friction becomes everything.
+  const flat = _v1444({ ...base, length_ft: 500, lift_ft: 0 });
+  assert.ok(Math.abs(flat.friction_term_lb - 442.44) < 1e-2);
+  assert.ok(Math.abs(flat.lift_term_lb) < 1e-12);
+  assert.strictEqual(flat.dominant, "friction");
+  assert.ok(flat.lever.includes("idler"));
+  // The belt is counted on BOTH sides: halving the belt weight removes 2 x Wb.
+  const lightBelt = _v1444({ ...base, belt_weight_plf: 2.5 });
+  assert.ok(Math.abs(r.friction_term_lb - lightBelt.friction_term_lb - 0.022 * 100 * 5) < 1e-9);
+  // Lift is exactly linear in rise; friction is exactly linear in length.
+  assert.ok(Math.abs(_v1444({ ...base, lift_ft: 40 }).lift_term_lb - 2 * r.lift_term_lb) < 1e-9);
+  assert.ok(Math.abs(_v1444({ ...base, length_ft: 200 }).friction_term_lb - 2 * r.friction_term_lb) < 1e-9);
+  // A faster belt carries LESS material per foot at the same tonnage, so the lift
+  // term falls -- the one place speed helps rather than costs.
+  const fast = _v1444({ ...base, belt_speed_fpm: 600 });
+  assert.ok(Math.abs(fast.material_load_plf - r.material_load_plf / 2) < 1e-9);
+  assert.ok(fast.lift_term_lb < r.lift_term_lb);
+  // A flat conveyor is allowed: zero lift is a valid input, not an error.
+  assert.ok(!("error" in _v1444({ ...base, lift_ft: 0 })));
+  assert.ok("error" in _v1444({ ...base, tons_per_hour: 0 }));
+  assert.ok("error" in _v1444({ ...base, belt_speed_fpm: 0 }));
+  assert.ok("error" in _v1444({ ...base, length_ft: 0 }));
+  assert.ok("error" in _v1444({ ...base, lift_ft: -5 }));
+  assert.ok("error" in _v1444({ ...base, belt_weight_plf: 0 }));
+  assert.ok("error" in _v1444({ ...base, drive_efficiency: 1.5 }));
+  assert.ok("error" in _v1444({ ...base, friction_factor: Infinity }));
+});

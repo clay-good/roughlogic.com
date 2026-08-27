@@ -3122,11 +3122,14 @@ cross-check.
 | calc-shop.js | `computeAnnulusArea` | `{ outer_diameter = 0, inner_diameter = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeBarrelVolume` | `{ bung_diameter_in = 0, head_diameter_in = 0, length_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeBearingRegrease` | `{ od_mm = 0, width_mm = 0, bore_mm = 0, rpm = 0, correction_factor = 1.0, dut...` | _ | _ | _ |
+| calc-shop.js | `computeBeltConveyorTensionPower` | `{ tons_per_hour = 0, belt_speed_fpm = 0, length_ft = 0, lift_ft = 0, belt_wei...` | _ | _ | _ |
+| calc-shop.js | `computeBucketElevatorCapacity` | `{ bucket_volume_ft3 = 0, spacing_in = 0, speed_fpm = 0, fill_factor = 0.75, b...` | _ | _ | _ |
 | calc-shop.js | `computeCarbonEquivalent` | `{ c = 0, mn = 0, cr = 0, mo = 0, v = 0, ni = 0, cu = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeCircularSector` | `{ radius = 0, angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeCompoundMiter` | `{ spring_angle_deg = 38, corner_angle_deg = 90 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeConeBottomTankVolume` | `{ diameter_ft = 0, cone_height_ft = 0, cylinder_height_ft = 0, depth_ft = 0 }...` | _ | _ | _ |
 | calc-shop.js | `computeConeFlatPattern` | `{ base_radius_in = 0, height_in = 0 } = {}` | _ | _ | _ |
+| calc-shop.js | `computeCycloneSeparatorSizing` | `{ inlet_width_ft = 0, inlet_velocity_fps = 0, turns = 5, gas_viscosity_lb_ft_...` | _ | _ | _ |
 | calc-shop.js | `computeCylinderStorageSeparation` | `{ separation_ft = 0, barrier_present = "no", barrier_height_ft = 0, barrier_n...` | _ | _ | _ |
 | calc-shop.js | `computeCylindricalWedgeVolume` | `{ base_diameter_ft = 0, height_ft = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeDividingHead` | `{ divisions = 0, worm_ratio = 40, circles = "" } = {}` | _ | _ | _ |
@@ -3136,6 +3139,8 @@ cross-check.
 | calc-shop.js | `computeEllipsoidVolume` | `{ length_ft = 0, width_ft = 0, height_ft = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeFeedForSurfaceFinish` | `{ target_finish_uin = 0, finish_basis = "ra", nose_radius_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeFrustumVolume` | `{ large_diameter_ft = 0, small_diameter_ft = 0, height_ft = 0 } = {}` | _ | _ | _ |
+| calc-shop.js | `computeGasStrutForce` | `{ lid_weight_lb = 0, cg_distance_in = 0, opening_angle_deg = 0, moment_arm_in...` | _ | _ | _ |
+| calc-shop.js | `computeHeatTreatSoakTime` | `{ charge_weight_lb = 0, section_thickness_in = 0, soak_temp_f = 0, start_temp...` | _ | _ | _ |
 | calc-shop.js | `computeHydraulicReservoirCooler` | `{ pump_gpm = 0, pressure_psi = 0, pump_efficiency = 0.85, heat_fraction = 0.2...` | _ | _ | _ |
 | calc-shop.js | `computeMachiningTime` | `{ feed_mode = "rpm-ipr", cut_length_in = 0, rpm = 0, feed_ipr_in = 0, feed_ip...` | _ | _ | _ |
 | calc-shop.js | `computeMaterialRemovalRate` | `{ mode = "milling", woc_in = 0, doc_in = 0, feed_ipm_in = 0, sfm = 0, feed_ip...` | _ | _ | _ |
@@ -3143,6 +3148,9 @@ cross-check.
 | calc-shop.js | `computeParabolicSegment` | `{ base_span = 0, rise_height = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeParaboloidVolume` | `{ base_diameter_ft = 0, height_ft = 0, fill_depth_ft = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computePlasmaCutSpeed` | `{ cut_length_in = 0, cut_speed_ipm = 0, pierces_per_part = 0, set_cost = 0, r...` | _ | _ | _ |
+| calc-shop.js | `computePlatingTankCurrent` | `{ current_density_asf = 0, part_area_sqft = 0, atomic_weight = 0, valence = 0...` | _ | _ | _ |
+| calc-shop.js | `computePneumaticCylinderScfm` | `{ bore_in = 0, rod_in = 0, stroke_in = 0, cycles_per_min = 0, pressure_psig =...` | _ | _ | _ |
+| calc-shop.js | `computePowderCoatingCoverage` | `{ specific_gravity = 0, film_thickness_mils = 0, part_area_sqft = 0, transfer...` | _ | _ | _ |
 | calc-shop.js | `computePressBrakeMaxThickness` | `{ available_tonnage_tons = 0, die_opening_in = 0, bend_length_ft = 0, uts_ksi...` | _ | _ | _ |
 | calc-shop.js | `computePressBrakeTonnage` | `{ thickness_in = 0, bend_length_ft = 0, die_opening_in = 0, uts_ksi = 60 } = {}` | _ | _ | _ |
 | calc-shop.js | `computePressFitInterferenceForForce` | `{ target_holding_lb = 0, shaft_dia_in = 0, hub_od_in = 0, modulus_psi = 30e6,...` | _ | _ | _ |
@@ -3150,12 +3158,14 @@ cross-check.
 | calc-shop.js | `computePunchCapacity` | `{ capacity_tons = 0, shear_strength_psi = 0, solve_for = "thickness", diamete...` | _ | _ | _ |
 | calc-shop.js | `computePunchForce` | `{ shape = "round", diameter_in = 0, side_a_in = 0, side_b_in = 0, perimeter_i...` | _ | _ | _ |
 | calc-shop.js | `computePyramidFrustumVolume` | `{ bottom_length_ft = 0, bottom_width_ft = 0, top_length_ft = 0, top_width_ft ...` | _ | _ | _ |
+| calc-shop.js | `computeQuenchSeverity` | `{ grossmann_h = 0, section_diameter_in = 0, second_grossmann_h = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeRegularPolygon` | `{ num_sides = 0, side_length = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeRolledBlank` | `{ reference = "od", diameter_in = 0, thickness_in = 0, k_factor = 0.5 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeRollerChainLength` | `{ small_teeth_n1 = 0, large_teeth_n2 = 0, center_distance_in = 0, pitch_in = ...` | _ | _ | _ |
 | calc-shop.js | `computeRotorBalanceGrade` | `{ balance_grade = 6.3, rpm = 0, rotor_mass_kg = 0, planes = 2, correction_rad...` | _ | _ | _ |
 | calc-shop.js | `computeSphericalCapVolume` | `{ sphere_diameter_ft = 0, fill_depth_ft = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeSphericalZoneVolume` | `{ base_radius_1_ft = 0, base_radius_2_ft = 0, zone_height_ft = 0 } = {}` | _ | _ | _ |
+| calc-shop.js | `computeSprayBoothAirflow` | `{ opening_width_ft = 0, opening_height_ft = 0, face_velocity_fpm = 100, indoo...` | _ | _ | _ |
 | calc-shop.js | `computeSprocketPitchDiameter` | `{ chain_pitch_in = 0, tooth_count_n = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeTailstockSetover` | `{ overall_length_in = 0, large_dia_in = 0, small_dia_in = 0, taper_length_in ...` | _ | _ | _ |
 | calc-shop.js | `computeTankVolumeDishedHeads` | `{ diameter_ft = 0, shell_length_ft = 0, fill_depth_ft = 0, head_type = "ellip...` | _ | _ | _ |
@@ -3455,7 +3465,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2041.
+Row count: 2051.
 
 <!-- END function-corpus-v14 -->
 
@@ -4650,7 +4660,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (98 tiles)
+### Group G Cross-trade (108 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4658,9 +4668,11 @@ per spec-v14 §13.1 second paragraph.
 | `barrel-volume` | Barrel / Cask Volume (Bulged Sides) | Project (first-principles); V=(pi L/15)(2D^2+Dd+3/4 d^2); matches numeric integral | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bearing-regrease` | Bearing Regrease Quantity and Interval | Project (first-principles); 0.005 OD x width; 14e6 / (rpm sqrt(bore)) - 4 bore | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `belt-center-distance` | Belt Drive Center Distance (for a Standard Belt) | Project (first-principles); C=[A+sqrt(A^2-2(D-d)^2)]/4; cross-checks vbelt-drive forward | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `belt-conveyor-tension-power` | Belt Conveyor Effective Tension and Drive Power | CEMA; Te = f L (2 Wb + Wm + Wrot) + H Wm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `belt-hp-transmitted` | Belt Power from Tension and Speed | belt-drive power relation (Machinery'...; spec-v807 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bolt-circle` | Bolt Circle Layout | First-principles circle-of-holes trig...; 8-in bolt circle, 6 holes, start 0 deg -> R 4, spacing 60... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bolt-proof-load` | Bolt Proof, Yield, and Tensile Load (SAE J429) | SAE J429 (ASME B1.1 tensile stress area); spec-v503 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `bucket-elevator-capacity` | Bucket Elevator Capacity, Speed, and Power | Project (first-principles); capacity = bucket volume x buckets/ft x speed x 60 x fill | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `center-of-gravity-2point` | Center of Gravity from Two Scales | ASME B30.9 / ITI rigging references (...; readings 3000 and 1000 lb over 10 ft -> 4000 lb total, CG... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `circle-from-3-points` | Circle Through Three Points | First-principles coordinate geometry ...; (0,0),(4,0),(0,3) -> center (2, 1.5), radius 2.5 (right-t... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `circular-arc` | Circular Arc Layout | First-principles circle geometry (sag...; chord 24 in, rise 4 in -> radius 20 in, central angle 73.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4669,6 +4681,7 @@ per spec-v14 §13.1 second paragraph.
 | `circular-segment-area` | Circular Segment Area (from Chord and Rise) | First-principles circle geometry (Mac...; R = (144 + 16)/8 = 20; theta = 2 acos(16/20) = 1.28700 ra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cone-bottom-tank-volume` | Cone-Bottom Tank Volume from Dipstick | Project (first-principles); cone (h^3) + cylinder | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cone-flat-pattern` | Cone Flat-Pattern Development (Radial Line) | sheet-metal radial-line layout; spec-v400 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `cyclone-separator-sizing` | Cyclone Separator Cut Size and Pressure Drop | Project (first-principles); d50 = sqrt(9 mu W / (2 pi N V (rho_p - rho_g))) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cylindrical-wedge-volume` | Cylindrical Wedge (Ungula) Volume | Project (first-principles); V=(2/3)R^2 H=D^2 H/6=8 ft^3; no pi | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `decimal-to-fraction` | Decimal to Fraction | First-principles tape-measure arithmetic; 2.375 in to nearest 1/16 -> 2-3/8 in (whole 2, 3/8), error 0 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dilution` | Dilution / Mixing Ratio | Project (first-principles); C1*V1 = C2*V2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4680,11 +4693,13 @@ per spec-v14 §13.1 second paragraph.
 | `fall-protection-clearance` | Fall Protection Clearance | 29 CFR 1926.502 (fall-protection syst...; 6 ft shock-absorbing lanyard / 5 ft worker height / 1 ft ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `flange-bolt-torque` | Flange Bolt-Up Torque | ASME PCC-1 / B16.5 (by name); 3/4 in B7 bolt (A_t 0.334 in^2) at 50% of 105 ksi yield, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `frustum-volume` | Frustum (Truncated Cone) Volume and Surface | Project (first-principles); V=(pi h/12)(D^2+Dd+d^2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `gas-strut-force` | Gas Spring Force and Mounting Geometry | Project (first-principles); force per strut = lid moment / (struts x moment arm) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gear-cascade` | Gear Ratio and RPM Cascade | First-principles / AGMA; overall = product of stage ratios; RPM_out = RPM_in/overa... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `geometry` | Geometry Pack | Project (first-principles); r=10 ft / sector 90 deg -> circumference 62.832 / area 31... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `haversine` | GPS Distance (Haversine) | Project (first-principles); Haversine identity over Earth radius 3958.8 mi | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hearing-protector-nrr` | Hearing Protector Attenuation (OSHA 1910.95 App. B) | Occupational Safety and Health Admini...; NIOSH derates the labelled NRR by protector type: 'all ot... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `heat-stress` | Heat Stress (WBGT and Heat Index) | NWS; NWS Technical Attachment SR 90-23 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `heat-treat-soak-time` | Heat-Treat Soak Time and Furnace Load | Project (first-principles); soak by section thickness; charge heat = w x c x dT | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hydraulic-cylinder` | Hydraulic Cylinder Force and Speed | NFPA (fluid power); F = P*A; v = GPM*231/(60*A); A_extend = pi*(bore/2)^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hydraulic-reservoir-cooler` | Hydraulic Reservoir Size and Cooler Heat Rejection | Project (first-principles); gpm x psi / 1,714; 2,545 BTU/hr per hp | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ladder-angle` | Ladder Placement Angle | OSHA; OSHA 1926.1053(b)(5) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4706,8 +4721,11 @@ per spec-v14 §13.1 second paragraph.
 | `pipe-spacing-rack` | Insulated Pipe Rack Spacing | ASTM C585 + first-principles geometry...; 2.375 in OD + 1 in insulation -> 4.375 in insulated OD; +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-template-wrap` | Pipe Wraparound Template Ordinates | NCCER Pipefitting / standard layout r...; 45 deg cut on 6.625 in OD, 8 stations -> max ordinate 6.6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `plasma-cut-speed` | Plasma Cut Time, Consumable Life, and Cost per Part | Project (first-principles); the smaller of the two limits governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `plating-tank-current` | Electroplating and Anodizing Tank Current and Time | Project (first-principles); mass rate = I x AW / (n x 96,485) x efficiency | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pneumatic-cylinder-scfm` | Pneumatic Cylinder Air Consumption (SCFM) | Project (first-principles); SCFM = volume per cycle x cycles x compression ratio | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `polygon-miter` | Regular Polygon Miter and Layout | First-principles regular-polygon geom...; regular hexagon, side 12 in -> 30 deg miter, 120 deg inte... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `portable-ladder-setup` | Portable Ladder Setup Geometry (OSHA 1926.1053) | Occupational Safety and Health Admini...; 'When portable ladders are used for access to an upper la... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `powder-coating-coverage` | Powder Coating Coverage, Transfer Efficiency, and Reclaim | Project (first-principles); coverage = 192.7 / (SG x mils) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `press-fit-interference-for-force` | Interference for a Target Press-Fit Holding Force | Lame interference-fit model (Machiner...; spec-v728 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `press-fit-pressure` | Interference Press-Fit Pressure and Holding Force (Lame) | Lame interference-fit model (Machiner...; spec-v511 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pulley-ma-gen` | Pulley System Mechanical Advantage | Project (first-principles); Triple block (block_3, 3 pulleys), efficiency 0.95 -> the... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4715,6 +4733,7 @@ per spec-v14 §13.1 second paragraph.
 | `punch-capacity` | Punch Capacity: Max Hole or Thickness | First-principles shear (inverse); 9.8175 ton press, 0.5 in hole, 50,000 psi shear -> 0.25 i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `punch-force` | Punch / Shear Force | First-principles shear + Machinery's ...; round 0.5 in hole, T 0.25 in, tau 50,000 psi -> 19,634.95... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pyramid-frustum-volume` | Truncated Pyramid (Rectangular Frustum) Volume | Project (first-principles); V=(h/3)(A1+A2+sqrt(A1 A2)) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `quench-severity` | Quench Severity, Biot Number, and the Agitation Screen | Project (first-principles); Bi = 2 H r | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `radiant-heat-exchange` | Radiant Heat Exchange (Stefan-Boltzmann) | Stefan-Boltzmann law (SI cross-checked); Ts = 659.67 R, Tsurr = 529.67 R; q = 0.9 x 1 x 0.1714e-8 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rainwater-catchment-area` | Catchment Area for a Target Harvest | ARCSA / NOAA (inverse); 11,593 gal target, 30 in, 0.62 efficiency -> about 1,000 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rainwater-yield` | Rainwater Harvesting Yield | Project (first-principles); Standard 0.6233 gal-per-in-per-ft^2 conversion factor | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4730,6 +4749,7 @@ per spec-v14 §13.1 second paragraph.
 | `slope-from-level` | Slope from Digital Level | Project (first-principles); Trig conversion arctan / tan | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spherical-cap-volume` | Spherical Cap / Dome / Partial-Fill Volume | Project (first-principles); V=(pi h^2/3)(3R-h) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spherical-zone-volume` | Spherical Zone (Segment of Two Bases) Volume | Project (first-principles); prismatoid rule V=(pi h/6)(3r1^2+3r2^2+h^2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `spray-booth-airflow` | Spray Booth Airflow and Makeup Air Load | NFPA; exhaust = opening x face velocity; load = 1.08 x cfm x dT | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `swing-fall-geometry` | Swing Fall Geometry (Pendulum Drop and Arc) | pendulum geometry; asin(10/20) = exactly 30 deg; drop 20 - sqrt(400-100) = 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tank-volume` | Tank Volume (Dipstick) | First-principles circular-segment geo...; 24 in dia x 48 in horizontal, depth 12 in (half) -> 47.00... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tank-volume-dished-heads` | Horizontal Tank Volume with Dished Heads (Dipstick) | Project (first-principles); shell segment + head cap (b/R = 1/2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5418,6 +5438,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1790. Fixture-covered or reference-cadence: 1790 / 1790.
+Tile count: 1800. Fixture-covered or reference-cadence: 1800 / 1800.
 
 <!-- END tile-index-v14 -->

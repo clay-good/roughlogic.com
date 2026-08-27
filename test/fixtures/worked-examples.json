@@ -92959,6 +92959,561 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "pneumatic-cylinder-scfm",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "2.5 in bore, 1.0 in rod, 12 in stroke at 20 cycles/min and 90 psig",
+   "source_edition_or_year": "compressed air practice",
+   "source_section_or_page": "SCFM = volume per cycle x cycles x compression ratio",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "bore_in": 2.5,
+    "rod_in": 1,
+    "stroke_in": 12,
+    "cycles_per_min": 20,
+    "pressure_psig": 90,
+    "cylinders": 1,
+    "cfm_per_hp": 4
+   },
+   "outputs": {
+    "extend_in3": {
+     "value": 58.9049,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "retract_in3": {
+     "value": 49.4801,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "per_cycle_in3": {
+     "value": 108.385,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "volume_per_cycle_ft3": {
+     "value": 0.0627228,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "compression_ratio": {
+     "value": 7.12245,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "scfm_total": {
+     "value": 8.93479,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "compressor_hp": {
+     "value": 2.2337,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bucket-elevator-capacity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "0.05 cubic ft buckets on 8 in centers, 250 fpm, 75% fill, 48 lb/cubic ft grain up 60 ft",
+   "source_edition_or_year": "bucket elevator practice",
+   "source_section_or_page": "capacity = bucket volume x buckets/ft x speed x 60 x fill",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "bucket_volume_ft3": 0.05,
+    "spacing_in": 8,
+    "speed_fpm": 250,
+    "fill_factor": 0.75,
+    "bulk_density_pcf": 48,
+    "lift_ft": 60,
+    "drive_efficiency": 0.75,
+    "friction_allowance": 1.2
+   },
+   "outputs": {
+    "buckets_per_ft": {
+     "value": 1.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "capacity_ft3_hr": {
+     "value": 843.75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "mass_lb_hr": {
+     "value": 40500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tons_per_hr": {
+     "value": 20.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bushels_per_hr": {
+     "value": 677.983,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lifting_hp": {
+     "value": 1.22727,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "motor_hp": {
+     "value": 1.96364,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cyclone-separator-sizing",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "0.25 ft inlet, 5 turns, 50 ft/s on 90 lb/cubic ft wood dust in air",
+   "source_edition_or_year": "Lapple cyclone theory",
+   "source_section_or_page": "d50 = sqrt(9 mu W / (2 pi N V (rho_p - rho_g)))",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "inlet_width_ft": 0.25,
+    "inlet_velocity_fps": 50,
+    "turns": 5,
+    "gas_viscosity_lb_ft_s": 0.0000124,
+    "gas_density_pcf": 0.075,
+    "particle_density_pcf": 90,
+    "k_velocity_heads": 8,
+    "airflow_cfm": 1200,
+    "second_velocity_fps": 70
+   },
+   "outputs": {
+    "d50_micron": {
+     "value": 4.28368,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pressure_drop_psf": {
+     "value": 23.3107,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pressure_drop_inwg": {
+     "value": 4.48111,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_d50_micron": {
+     "value": 3.62037,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_drop_inwg": {
+     "value": 8.78298,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fan_hp": {
+     "value": 0.847664,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gas-strut-force",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "40 lb hatch, center of gravity 18 in from the hinge, two struts on a 4 in arm",
+   "source_edition_or_year": "statics",
+   "source_section_or_page": "force per strut = lid moment / (struts x moment arm)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "lid_weight_lb": 40,
+    "cg_distance_in": 18,
+    "opening_angle_deg": 0,
+    "moment_arm_in": 4,
+    "struts": 2,
+    "second_angle_deg": 45,
+    "second_moment_arm_in": 5
+   },
+   "outputs": {
+    "horizontal_cg_in": {
+     "value": 18,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lid_moment_in_lb": {
+     "value": 720,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "force_per_strut_lb": {
+     "value": 90,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_force_lb": {
+     "value": 180,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "second_force_per_strut_lb": {
+     "value": 50.9117,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spray-booth-airflow",
+   "source_publisher": "NFPA",
+   "source_title": "Open-face booth 14 ft by 9 ft at 100 fpm, makeup air from 20 F to 70 F",
+   "source_edition_or_year": "NFPA 33 / OSHA 1910.107 face velocity",
+   "source_section_or_page": "exhaust = opening x face velocity; load = 1.08 x cfm x dT",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "opening_width_ft": 14,
+    "opening_height_ft": 9,
+    "face_velocity_fpm": 100,
+    "indoor_temp_f": 70,
+    "outdoor_temp_f": 20,
+    "burner_efficiency": 0.8,
+    "hours_per_year": 1000,
+    "price_per_therm": 1.2
+   },
+   "outputs": {
+    "opening_sqft": {
+     "value": 126,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "exhaust_cfm": {
+     "value": 12600,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heating_btu_hr": {
+     "value": 680400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gas_input_btu_hr": {
+     "value": 850500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "therms_per_hour": {
+     "value": 8.505,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cost_per_hour": {
+     "value": 10.206,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "powder-coating-coverage",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "SG 1.5 powder at 2.0 mils over 500 sq ft, 60% transfer, 95% reclaim",
+   "source_edition_or_year": "powder coating practice",
+   "source_section_or_page": "coverage = 192.7 / (SG x mils)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "specific_gravity": 1.5,
+    "film_thickness_mils": 2,
+    "part_area_sqft": 500,
+    "transfer_efficiency": 0.6,
+    "reclaim_efficiency": 0.95,
+    "price_per_lb": 6
+   },
+   "outputs": {
+    "theoretical_coverage_sqft_lb": {
+     "value": 64.2333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "waste_coverage": {
+     "value": 38.54,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "waste_powder_lb": {
+     "value": 12.9735,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "utilization": {
+     "value": 0.98,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "reclaim_coverage": {
+     "value": 62.9487,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "reclaim_powder_lb": {
+     "value": 7.94298,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "plating-tank-current",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Nickel at 40 A/sq ft over 20 sq ft, 95% efficiency, 1 mil target",
+   "source_edition_or_year": "Faraday's law of electrolysis",
+   "source_section_or_page": "mass rate = I x AW / (n x 96,485) x efficiency",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "current_density_asf": 40,
+    "part_area_sqft": 20,
+    "atomic_weight": 58.69,
+    "valence": 2,
+    "metal_density_gcc": 8.9,
+    "current_efficiency": 0.95,
+    "target_thickness_in": 0.001
+   },
+   "outputs": {
+    "total_current_a": {
+     "value": 800,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "mass_rate_g_s": {
+     "value": 0.231147,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "volume_rate_cm3_s": {
+     "value": 0.0259716,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "area_cm2": {
+     "value": 18580.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "plating_time_s": {
+     "value": 1817.17,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "plating_time_min": {
+     "value": 30.2862,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "heat-treat-soak-time",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "500 lb charge, 2.0 in maximum section, 1,550 F from 70 F, 60% furnace efficiency",
+   "source_edition_or_year": "heat treating practice",
+   "source_section_or_page": "soak by section thickness; charge heat = w x c x dT",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "charge_weight_lb": 500,
+    "section_thickness_in": 2,
+    "soak_temp_f": 1550,
+    "start_temp_f": 70,
+    "through_heat_rate_hr_per_in": 1,
+    "soak_rate_hr_per_in": 1,
+    "specific_heat": 0.12,
+    "furnace_efficiency": 0.6
+   },
+   "outputs": {
+    "through_heat_hr": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "soak_hr": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_at_temp_hr": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "charge_heat_btu": {
+     "value": 88800,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "furnace_input_btu_hr": {
+     "value": 74000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "furnace_input_kw": {
+     "value": 21.6873,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "quench-severity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "1 in bar in still oil (H 0.25) against agitated oil (H 0.40)",
+   "source_edition_or_year": "Grossmann quench severity",
+   "source_section_or_page": "Bi = 2 H r",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "grossmann_h": 0.25,
+    "section_diameter_in": 1,
+    "second_grossmann_h": 0.4
+   },
+   "outputs": {
+    "radius_in": {
+     "value": 0.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "biot": {
+     "value": 0.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "second_biot": {
+     "value": 0.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "h_ratio": {
+     "value": 1.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "belt-conveyor-tension-power",
+   "source_publisher": "CEMA",
+   "source_title": "100 ft conveyor lifting 20 ft, 200 tph at 300 fpm, f = 0.022",
+   "source_edition_or_year": "CEMA Belt Conveyors for Bulk Materials",
+   "source_section_or_page": "Te = f L (2 Wb + Wm + Wrot) + H Wm",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "tons_per_hour": 200,
+    "belt_speed_fpm": 300,
+    "length_ft": 100,
+    "lift_ft": 20,
+    "belt_weight_plf": 5,
+    "idler_weight_plf": 8,
+    "friction_factor": 0.022,
+    "drive_efficiency": 0.85
+   },
+   "outputs": {
+    "material_load_plf": {
+     "value": 22.2222,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "friction_term_lb": {
+     "value": 88.4889,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lift_term_lb": {
+     "value": 444.444,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "effective_tension_lb": {
+     "value": 532.933,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "belt_hp": {
+     "value": 4.84485,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "motor_hp": {
+     "value": 5.69982,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

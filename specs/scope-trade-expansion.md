@@ -187,4 +187,5 @@ renames an id, or moves a tile between groups.
 | HVAC and refrigeration service (Group C) | v1413-v1419 | **landed 2026-08-26**, 7 tiles; catalog 1,771 -> 1,778 |
 | Electrical power system (Group A) | v1420-v1424 | **landed 2026-08-26**, 3 tiles (v1423 and v1424 cut, see below); catalog 1,778 -> 1,781 |
 | Specialty trades (Groups E, G, K) | v1425-v1434 | **landed 2026-08-27**, 9 tiles (v1427 cut, see below); catalog 1,781 -> 1,790 |
-| Every other band | v1435-v1449 | not yet built |
+| Industrial and finishing (Group G) | v1435-v1444 | **landed 2026-08-27**, 10 tiles, none cut; catalog 1,790 -> 1,800 |
+| Every other band | v1445-v1449 | not yet built |
