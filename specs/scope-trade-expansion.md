@@ -75,6 +75,15 @@ FORMULA-level check: search the catalog for the method, not only for the name. s
 part of it that is genuinely new -- the FINAL bearing and its divergence from the initial one -- is recorded
 as a follow-up against the existing tile rather than shipped as a second tile answering the same question.
 
+The formula-level screen that lesson called for then caught **two more** in the electrical band, bringing
+the total cut to **twelve**. spec-v1423 (infinite-bus transformer secondary fault) is already computed by
+`short-circuit-pp`, whose Bussmann point-to-point method opens with exactly `kVA x 1000 / (V x 1.732 x
+%Z/100)` and returns it as `I_sca_secondary`; the motor contribution it would have added is
+`motor-fault-contribution`. spec-v1424 (nonlinear neutral) is `neutral-current-3ph`, which already returns
+`3 x per-phase triplen` and sets the neutral-as-CCC flag, with the fourth-conductor derate in
+`ambient-ampacity-adjust`. Neither would have been caught by comparing names. **Every remaining band gets
+the formula screen before any code is written.**
+
 
 Their spec numbers were reused for nine verified-new tiles: band saw blade pitch, tube bend wall
 thinning, ISO 1940 balance grade, bearing regrease interval, hydraulic reservoir and cooler duty,
@@ -154,4 +163,5 @@ renames an id, or moves a tile between groups.
 | Machining, fabrication, welding | v1402-v1405, v1410, v1412 | **landed 2026-08-26**, 6 tiles; catalog 1,760 -> 1,766 |
 | Rotating equipment, hydraulics, curtain wall | v1406-v1409, v1411 | **landed 2026-08-26**, 5 tiles; catalog 1,766 -> 1,771 |
 | HVAC and refrigeration service (Group C) | v1413-v1419 | **landed 2026-08-26**, 7 tiles; catalog 1,771 -> 1,778 |
-| Every other band | v1420-v1449 | not yet built |
+| Electrical power system (Group A) | v1420-v1424 | **landed 2026-08-26**, 3 tiles (v1423 and v1424 cut, see below); catalog 1,778 -> 1,781 |
+| Every other band | v1425-v1449 | not yet built |

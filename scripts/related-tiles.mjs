@@ -295,6 +295,10 @@ const RELATED = {
   "tdd-ieee-519": ["transformer-k-factor", "harmonic-resonance", "voltage-imbalance"],
   "rlc-reactance-resonance": ["harmonic-resonance", "pf-correction", "voltage-drop-reactance"],
   "neutral-grounding-resistor": ["grounding-electrode", "egc-sizing", "grounding-electrode-conductor"],
+  // spec-v1420..v1422: the 2026-08-26 trade-expansion electrical band.
+  "grounding-grid-conductor": ["conductor-short-circuit-withstand","ground-potential-rise","step-touch-voltage"],
+  "selective-coordination-screen": ["transformer-inrush-point","short-circuit-pp","fuse-let-through"],
+  "fuse-let-through": ["conductor-short-circuit-withstand","short-circuit-pp","selective-coordination-screen"],
   "step-touch-voltage": ["grounding-electrode", "neutral-grounding-resistor", "grounding-electrode-conductor"],
   "ground-potential-rise": ["step-touch-voltage", "neutral-grounding-resistor", "grounding-electrode"],
   "rolling-sphere-protection": ["grounding-electrode", "step-touch-voltage", "ground-potential-rise"],

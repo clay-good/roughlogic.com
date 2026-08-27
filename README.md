@@ -2,7 +2,7 @@
 
 **Field math for the trades. Free, fast, no ads, no accounts, works offline.**
 
-[roughlogic.com](https://roughlogic.com) is 1,778 small, single-purpose calculators for electricians, plumbers, HVAC techs, carpenters, restoration techs, firefighters, surveyors, and dozens of other trades. Everything runs in your browser. Every answer comes from a published formula and cites its source.
+[roughlogic.com](https://roughlogic.com) is 1,781 small, single-purpose calculators for electricians, plumbers, HVAC techs, carpenters, restoration techs, firefighters, surveyors, and dozens of other trades. Everything runs in your browser. Every answer comes from a published formula and cites its source.
 
 <p align="center">
   <img src="docs/img/home-mobile.png" width="240" alt="roughlogic home view on a phone: a headline, one line of description, a single search box, and four tappable example questions">
@@ -95,7 +95,7 @@ Calculator execution is a client-side, offline-first static site with no account
 
 The browser loads `index.html` + `styles.css` + `app.js` (router, search, theme, URL-hash state), which dynamic-imports one of 57 per-group calculator modules (`calc-*.js`) on first open, which reads the sharded JSON in `data/`. A service worker (`sw.js`) caches the shell and data shards keyed to the build hash, so the site works offline after the first load.
 
-At build time only (never in production), `build-data.mjs` refreshes the integrity-hashed data shards from NIST, NOAA, NCEI WMM, FHFA, HUD, and published bulletins, and `build-shells.mjs` emits one zero-JS crawlable static shell per tile (1778) and per group, plus a sitemap that carries 1801 URLs.
+At build time only (never in production), `build-data.mjs` refreshes the integrity-hashed data shards from NIST, NOAA, NCEI WMM, FHFA, HUD, and published bulletins, and `build-shells.mjs` emits one zero-JS crawlable static shell per tile (1781) and per group, plus a sitemap that carries 1804 URLs.
 
 The home payload gzips to well under the 100 KB budget. Opening a calculator dynamic-imports only that trade's module and only the data shards it needs. See [docs/architecture.md](docs/architecture.md) and [docs/seo.md](docs/seo.md).
 

@@ -49,12 +49,23 @@ const BUDGET_BYTES = 100 * 1024;
 // TOOLS-extraction into its own lazy-loaded shard remains the preferred
 // long-term remediation; the cap bumps are the documented interim
 // accommodation while the v15 / v16 tile groups are still landing.
-// Sub-budgets sum to 94 KB; the gap to the overall 100 KB cap is
+//
+// Re-bumped 49 -> 52 KB on 2026-08-26: the spec-v1350..v1449 trade
+// expansion added 72 tiles across nine bands, and each one costs app.js
+// a tile-id string in a declare() list plus a TOOLS row. That took the
+// home-view JS from ~48.4 KB gzipped to 50.1 KB -- 99.8% of the old
+// 49 KB cap, which would have gone red on the very next tile anyone
+// added. THE TOOLS-EXTRACTION REMEDIATION IS NOW GENUINELY DUE: app.js
+// gzipped is within a few KB of the whole home-view budget's JS share,
+// and the remaining ~28 specs of that expansion will push it further.
+// The cap bump buys room for those; it is not a substitute for the
+// lazy-loaded TOOLS shard spec-v10 SS H.1 / H.2 calls for.
+// Sub-budgets sum to 97 KB; the gap to the overall 100 KB cap is
 // intentional slack.
 const SUB_BUDGETS = {
   html: 20 * 1024,
   css: 25 * 1024,
-  js: 49 * 1024,
+  js: 52 * 1024,
 };
 
 let total = 0;

@@ -40808,3 +40808,124 @@ test("bounds: spec-v1419 computeHeadPressureControl pins the minimum head and th
   assert.ok("error" in _v1419({ ...base, liquid_density_pcf: 0 }));
   assert.ok("error" in _v1419({ ...base, valve_dp_psi: Infinity }));
 });
+
+// ===========================================================================
+// spec-v1420..v1422: the 2026-08-26 trade-expansion electrical band.
+// (spec-v1423 and spec-v1424 were cut as duplicates of the existing
+// point-to-point short-circuit and three-phase neutral tiles.)
+// ===========================================================================
+
+import { computeGroundingGridConductor as _v1420 } from "../../calc-elecdesign.js";
+test("bounds: spec-v1420 computeGroundingGridConductor pins the sqrt-time, linear-current relation", () => {
+  // 12 kA for 0.5 s on brazed copper (Kf 7.00): 59.4 kcmil.
+  const base = { fault_current_ka: 12, clearing_time_s: 0.5, material: "copper_brazed", installed_kcmil: 211.6 };
+  const r = _v1420(base);
+  assert.ok(Math.abs(r.area_kcmil - 59.40) < 1e-2);
+  assert.ok(Math.abs(r.area_cmil - 59397) < 1);
+  assert.ok(Math.abs(r.kf - 7.00) < 1e-12);
+  assert.strictEqual(r.adequate, true);
+  // Quartering the clearing time HALVES the conductor -- protection speed buys copper.
+  const fast = _v1420({ ...base, clearing_time_s: 0.125 });
+  assert.ok(Math.abs(fast.area_kcmil - r.area_kcmil / 2) < 1e-9);
+  // Halving it is a 29% reduction, which is the square root at work.
+  const quicker = _v1420({ ...base, clearing_time_s: 0.25 });
+  assert.ok(Math.abs(quicker.area_kcmil - 42.0) < 1e-1);
+  assert.ok(Math.abs(quicker.area_kcmil / r.area_kcmil - Math.SQRT1_2) < 1e-9);
+  // Current is LINEAR: twice the fault is twice the conductor.
+  const bigFault = _v1420({ ...base, fault_current_ka: 24 });
+  assert.ok(Math.abs(bigFault.area_kcmil - 2 * r.area_kcmil) < 1e-9);
+  // Steel needs more than twice the area of brazed copper for the same duty.
+  const steel = _v1420({ ...base, material: "steel" });
+  assert.ok(Math.abs(steel.area_kcmil - 134.9) < 1e-1);
+  assert.ok(steel.area_kcmil > 2 * r.area_kcmil);
+  // A bolted joint holds a lower temperature and therefore needs more conductor.
+  assert.ok(_v1420({ ...base, material: "copper_bolted" }).area_kcmil > r.area_kcmil);
+  // An undersized installed conductor is called out; with none entered the flag is null.
+  assert.strictEqual(_v1420({ ...base, installed_kcmil: 33.6 }).adequate, false);
+  assert.strictEqual(_v1420({ ...base, installed_kcmil: 0 }).adequate, null);
+  assert.ok("error" in _v1420({ ...base, material: "aluminum" }));
+  assert.ok("error" in _v1420({ ...base, fault_current_ka: 0 }));
+  assert.ok("error" in _v1420({ ...base, clearing_time_s: 0 }));
+  assert.ok("error" in _v1420({ ...base, installed_kcmil: -1 }));
+  assert.ok("error" in _v1420({ ...base, fault_current_ka: Infinity }));
+});
+
+import { computeSelectiveCoordinationScreen as _v1421 } from "../../calc-elecdesign.js";
+test("bounds: spec-v1421 computeSelectiveCoordinationScreen pins both device behaviours", () => {
+  // Breakers: 400 A at 10x is a 4,000 A pickup, and 12,000 A available defeats it.
+  const base = { device_type: "breaker", upstream_rating_a: 400, downstream_rating_a: 100, published_ratio: 2, instantaneous_multiplier: 10, available_fault_a: 12000 };
+  const r = _v1421(base);
+  assert.ok(Math.abs(r.ratio - 4) < 1e-12);
+  assert.ok(Math.abs(r.pickup_a - 4000) < 1e-9);
+  assert.ok(Math.abs(r.coordinated_to_a - 4000) < 1e-9);
+  assert.strictEqual(r.coordinated, false);
+  assert.ok(r.verdict.startsWith("NOT selectively coordinated"));
+  // The RATIO is irrelevant for breakers above the pickup: widen it and nothing changes.
+  const wider = _v1421({ ...base, downstream_rating_a: 20 });
+  assert.ok(Math.abs(wider.ratio - 20) < 1e-12);
+  assert.strictEqual(wider.coordinated, false);
+  assert.ok(Math.abs(wider.pickup_a - r.pickup_a) < 1e-9);
+  // Below the pickup the same pair IS coordinated.
+  const lowFault = _v1421({ ...base, available_fault_a: 3000 });
+  assert.strictEqual(lowFault.coordinated, true);
+  // Exactly at the pickup still coordinates.
+  assert.strictEqual(_v1421({ ...base, available_fault_a: 4000 }).coordinated, true);
+  // Fuses at or above the published ratio coordinate to the interrupting rating,
+  // at the SAME 12,000 A that defeated the breakers. Same ratings, opposite answers.
+  const fuse = _v1421({ ...base, device_type: "fuse" });
+  assert.strictEqual(fuse.coordinated, true);
+  assert.strictEqual(fuse.pickup_a, null);
+  assert.strictEqual(fuse.coordinated_to_a, Infinity);
+  assert.ok(fuse.verdict.startsWith("COORDINATED"));
+  // A fuse pair below the family ratio is not coordinated at any current.
+  const tight = _v1421({ ...base, device_type: "fuse", downstream_rating_a: 250 });
+  assert.strictEqual(tight.coordinated, false);
+  assert.strictEqual(tight.coordinated_to_a, 0);
+  assert.ok("error" in _v1421({ ...base, device_type: "relay" }));
+  assert.ok("error" in _v1421({ ...base, upstream_rating_a: 0 }));
+  assert.ok("error" in _v1421({ ...base, downstream_rating_a: 500 }));
+  assert.ok("error" in _v1421({ ...base, available_fault_a: 0 }));
+  assert.ok("error" in _v1421({ ...base, instantaneous_multiplier: 0 }));
+  assert.ok("error" in _v1421({ ...base, device_type: "fuse", published_ratio: 0 }));
+  assert.ok("error" in _v1421({ ...base, upstream_rating_a: Infinity }));
+});
+
+import { computeFuseLetThrough as _v1422 } from "../../calc-elecdesign.js";
+test("bounds: spec-v1422 computeFuseLetThrough pins the withstand and the series-rating rule", () => {
+  // 4 AWG copper, 75 C to 250 C over a half cycle: 5,473 A, 299,502 A2s, 12x margin.
+  const base = { conductor_cmil: 41740, initial_temp_c: 75, damage_temp_c: 250, duration_s: 0.01, let_through_i2t: 25000, let_through_peak_a: 12000, equipment_peak_withstand_a: 25000 };
+  const r = _v1422(base);
+  assert.ok(Math.abs(r.withstand_a - 5473) < 1);
+  assert.ok(Math.abs(r.withstand_i2t - 299502) < 5);
+  assert.ok(Math.abs(r.margin - 12.0) < 1e-1);
+  assert.strictEqual(r.thermal_ok, true);
+  assert.strictEqual(r.peak_ok, true);
+  // The withstand I2t is independent of the duration BASIS: it is a property of the
+  // conductor and its temperature limits, which is why I2t is the right currency.
+  const longer = _v1422({ ...base, duration_s: 0.04 });
+  assert.ok(Math.abs(longer.withstand_i2t - r.withstand_i2t) < 1e-6);
+  assert.ok(Math.abs(longer.withstand_a - r.withstand_a / 2) < 1);
+  // Withstand I2t goes as the SQUARE of area: twice the conductor is four times the energy.
+  const bigger = _v1422({ ...base, conductor_cmil: 83480 });
+  assert.ok(Math.abs(bigger.withstand_i2t / r.withstand_i2t - 4) < 1e-9);
+  // An unrestricted fault is what current limitation prevents: 25 kA for a half cycle is
+  // 6,250,000 A2s, more than twenty times this conductor's withstand.
+  assert.ok(25000 ** 2 * 0.01 / r.withstand_i2t > 20);
+  // A device that lets through more than the conductor can take fails the thermal check.
+  const unprotected = _v1422({ ...base, let_through_i2t: 500000 });
+  assert.strictEqual(unprotected.thermal_ok, false);
+  assert.ok(unprotected.margin < 1);
+  // Peak stress is a separate check and can fail on its own.
+  const violent = _v1422({ ...base, let_through_peak_a: 40000 });
+  assert.strictEqual(violent.peak_ok, false);
+  assert.ok(violent.peak_verdict.includes("EXCEEDS"));
+  assert.strictEqual(_v1422({ ...base, let_through_peak_a: 0 }).peak_ok, null);
+  // The series-rating rule is stated on every result, protected or not.
+  assert.ok(r.series_rating_rule.includes("SERIES RATING"));
+  assert.ok(unprotected.series_rating_rule.includes("cannot be calculated"));
+  assert.ok("error" in _v1422({ ...base, conductor_cmil: 0 }));
+  assert.ok("error" in _v1422({ ...base, damage_temp_c: 50 }));
+  assert.ok("error" in _v1422({ ...base, duration_s: 0 }));
+  assert.ok("error" in _v1422({ ...base, let_through_i2t: 0 }));
+  assert.ok("error" in _v1422({ ...base, conductor_cmil: Infinity }));
+});

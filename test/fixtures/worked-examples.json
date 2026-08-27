@@ -92293,6 +92293,116 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "grounding-grid-conductor",
+   "source_publisher": "IEEE",
+   "source_title": "12 kA for 0.5 s on soft-drawn copper with brazed joints",
+   "source_edition_or_year": "IEEE Std 80",
+   "source_section_or_page": "A = I x Kf x sqrt(tc)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "fault_current_ka": 12,
+    "clearing_time_s": 0.5,
+    "material": "copper_brazed",
+    "installed_kcmil": 211.6
+   },
+   "outputs": {
+    "area_kcmil": {
+     "value": 59.397,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "area_cmil": {
+     "value": 59397,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "kf": {
+     "value": 7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "selective-coordination-screen",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "400 A upstream breaker at 10x instantaneous against a 100 A downstream, 12,000 A available",
+   "source_edition_or_year": "coordination practice",
+   "source_section_or_page": "breakers coordinate only to the instantaneous pickup",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "device_type": "breaker",
+    "upstream_rating_a": 400,
+    "downstream_rating_a": 100,
+    "published_ratio": 2,
+    "instantaneous_multiplier": 10,
+    "available_fault_a": 12000
+   },
+   "outputs": {
+    "ratio": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pickup_a": {
+     "value": 4000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "coordinated_to_a": {
+     "value": 4000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fuse-let-through",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "4 AWG copper (41,740 cmil), 75 C to 250 C over 0.01 s, against 25,000 A2s of let-through",
+   "source_edition_or_year": "ICEA / Onderdonk",
+   "source_section_or_page": "0.0297 x cmil x sqrt(log10((T2+234)/(T1+234))/t)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "conductor_cmil": 41740,
+    "initial_temp_c": 75,
+    "damage_temp_c": 250,
+    "duration_s": 0.01,
+    "let_through_i2t": 25000,
+    "let_through_peak_a": 12000,
+    "equipment_peak_withstand_a": 25000
+   },
+   "outputs": {
+    "withstand_a": {
+     "value": 5472.68,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "withstand_i2t": {
+     "value": 299502,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin": {
+     "value": 11.9801,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

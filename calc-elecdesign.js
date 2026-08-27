@@ -733,3 +733,201 @@ ELECDESIGN_RENDERERS["luminaire-spacing-mh-ratio"] = _simpleRenderer({
   ],
   compute: computeLuminaireSpacingMh,
 });
+
+// ===========================================================================
+// spec-v1420, v1421, v1422: the electrical power-system band of the
+// 2026-08-26 trade expansion. See specs/scope-trade-expansion.md.
+//
+// spec-v1423 (infinite-bus transformer secondary fault) and spec-v1424
+// (nonlinear neutral current) were CUT as duplicates -- the catalog's
+// point-to-point short-circuit tile already returns the infinite-bus
+// secondary fault current, and its three-phase neutral tile already returns
+// the triplen neutral current and the neutral-as-CCC determination.
+// ===========================================================================
+
+// ===================== spec-v1420: ground grid conductor sizing (IEEE 80) =====================
+// IEEE 80 Kf constants: the temperature limit is set by the JOINT, not the conductor,
+// which is why the same copper gets a different constant depending on how it is joined.
+export const IEEE80_KF = {
+  copper_brazed: { kf: 7.00, label: "Soft-drawn copper, brazed or exothermic joints" },
+  copper_hard_brazed: { kf: 7.06, label: "Hard-drawn copper, brazed joints" },
+  copper_bolted: { kf: 11.5, label: "Copper, bolted or pressure connections" },
+  copper_clad_steel: { kf: 14.6, label: "Copper-clad steel" },
+  steel: { kf: 15.9, label: "Steel" },
+};
+
+// dims: in { args: dimensionless } out: { area_kcmil: L^2, area_cmil: L^2 }
+export function computeGroundingGridConductor({ fault_current_ka = 0, clearing_time_s = 0, material = "copper_brazed", installed_kcmil = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const m = IEEE80_KF[material];
+  if (!m) return { error: "Material and joint type must be one of the listed IEEE 80 combinations." };
+  if (!(fault_current_ka > 0)) return { error: "Symmetrical fault current must be positive (kA)." };
+  if (!(clearing_time_s > 0)) return { error: "Fault duration must be positive (s)." };
+  if (!(installed_kcmil >= 0)) return { error: "Installed conductor size cannot be negative." };
+  // Scales with the SQUARE ROOT of time and LINEARLY with current: faster protection is a
+  // real substitute for copper, and high available fault current costs conductor everywhere.
+  const area_kcmil = fault_current_ka * m.kf * Math.sqrt(clearing_time_s);
+  const area_cmil = area_kcmil * 1000;
+  const adequate = installed_kcmil > 0 ? installed_kcmil >= area_kcmil : null;
+  const verdict = installed_kcmil === 0
+    ? "no installed size entered"
+    : adequate
+      ? "the installed " + fmt(installed_kcmil, 1) + " kcmil clears the thermal minimum with " + fmt(installed_kcmil - area_kcmil, 1) + " kcmil to spare"
+      : "the installed " + fmt(installed_kcmil, 1) + " kcmil is " + fmt(area_kcmil - installed_kcmil, 1) + " kcmil SHORT of the thermal minimum";
+  if (![area_kcmil, area_cmil].every(Number.isFinite)) return { error: "Grid-conductor math is not a finite value." };
+  return {
+    area_kcmil,
+    area_cmil,
+    kf: m.kf,
+    adequate,
+    verdict,
+    note: "The smallest grounding-grid conductor that survives a fault long enough for protection to clear it, by the IEEE 80 sizing relation. The conductor has to carry the fault without reaching a temperature that damages it or, worse, its joints -- and the constant encodes the material's thermal capacity and its temperature limit, where the limit is set by the JOINT rather than by the conductor. A bolted or pressure connection has to be held far below the conductor's fusing point while an exothermic or brazed connection can go much higher, which is why the same copper gets a different constant depending on how it is joined. Two properties of the relation matter in practice. It scales with the SQUARE ROOT of time, so a fault that clears in a quarter of the time needs only half the conductor, which makes protection speed a real substitute for copper. And it scales LINEARLY with current, so a system with high available fault current needs proportionally more conductor everywhere in the grid. A conductor carrying 12 kA for 0.5 s needs 59.4 kcmil of brazed copper or 135.3 kcmil of steel -- copper needs less than half the area for the same duty, which is most of the reason grids are copper. But the thermal number is a FLOOR and not a specification: a buried grid conductor is handled, tamped over, and expected to last forty years in soil, so 4/0 copper is the common practical minimum regardless of what the thermal calculation allows. This is the bare-grid counterpart to the insulated-conductor thermal withstand calculation, which works from the ICEA adiabatic relation and an insulation temperature limit instead. A screen, never a stamp; IEEE 80 in full, the soil and corrosion conditions, and the engineer of record govern.",
+  };
+}
+
+export const groundingGridConductorExample = { inputs: { fault_current_ka: 12, clearing_time_s: 0.5, material: "copper_brazed", installed_kcmil: 211.6 } };
+
+ELECDESIGN_RENDERERS["grounding-grid-conductor"] = _simpleRenderer({
+  citation: "Citation: IEEE Std 80 ground-grid conductor sizing, A in kcmil = I in kA x Kf x sqrt(tc), cited by name and not reproduced; the Kf constants for copper, copper-clad steel, and steel encode the material's thermal capacity and the temperature limit its JOINT type allows. The thermal answer is a floor -- mechanical and corrosion requirements usually set a larger practical minimum. A screen, never a stamp; IEEE 80 in full and the engineer of record govern.",
+  example: groundingGridConductorExample.inputs,
+  fields: [
+    { key: "fault_current_ka", label: "Symmetrical fault current through the conductor (kA)", kind: "number" },
+    { key: "clearing_time_s", label: "Fault duration (s)", kind: "number" },
+    { key: "material", label: "Material and joint type", kind: "select", options: Object.keys(IEEE80_KF).map((k) => ({ value: k, label: IEEE80_KF[k].label })) },
+    { key: "installed_kcmil", label: "Installed conductor size (kcmil, 0 to skip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "a", id: "ggc-out-a", label: "Thermal minimum area", value: (r) => fmt(r.area_kcmil, 1) + " kcmil (" + fmt(r.area_cmil, 0) + " circular mils)" },
+    { key: "k", id: "ggc-out-k", label: "Kf for this material and joint", value: (r) => fmt(r.kf, 2) },
+    { key: "v", id: "ggc-out-v", label: "Against the installed conductor", value: (r) => r.verdict },
+    { key: "n", id: "ggc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGroundingGridConductor,
+});
+
+// ===================== spec-v1421: overcurrent selective coordination screen =====================
+// dims: in { args: dimensionless } out: { ratio: dimensionless, pickup_a: I, coordinated_to_a: I }
+export function computeSelectiveCoordinationScreen({ device_type = "fuse", upstream_rating_a = 0, downstream_rating_a = 0, published_ratio = 2, instantaneous_multiplier = 10, available_fault_a = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (device_type !== "fuse" && device_type !== "breaker") return { error: "Device type must be fuse or breaker." };
+  if (!(upstream_rating_a > 0)) return { error: "Upstream device rating must be positive." };
+  if (!(downstream_rating_a > 0)) return { error: "Downstream device rating must be positive." };
+  if (!(upstream_rating_a >= downstream_rating_a)) return { error: "The upstream device should not be smaller than the downstream one." };
+  if (!(available_fault_a > 0)) return { error: "Available fault current at the downstream device must be positive." };
+  const ratio = upstream_rating_a / downstream_rating_a;
+  if (device_type === "fuse") {
+    if (!(published_ratio > 0)) return { error: "The published fuse ratio for the family must be positive." };
+    // Within a family, meeting the PUBLISHED ratio coordinates all the way to the
+    // interrupting rating -- the ratio table is the whole answer.
+    const coordinated = ratio >= published_ratio;
+    return {
+      ratio,
+      published_ratio,
+      pickup_a: null,
+      coordinated_to_a: coordinated ? Infinity : 0,
+      coordinated,
+      verdict: coordinated
+        ? "COORDINATED: " + fmt(ratio, 2) + ":1 meets the family's published " + fmt(published_ratio, 2) + ":1, so selectivity holds at any fault current up to the interrupting rating"
+        : "NOT coordinated: " + fmt(ratio, 2) + ":1 is below the family's published " + fmt(published_ratio, 2) + ":1 -- the upstream fuse may open before the downstream one clears",
+      note: "Whether two overcurrent devices in series will let the downstream one clear a fault alone, screened the way each device type actually behaves. Fuses coordinate on a RATIO, and the ratio is a published test result for a specific fuse family rather than a general rule. Within a family, an upstream fuse at or above the published ratio will not open before a downstream one clears, at any fault current up to the interrupting rating -- which is why fuses coordinate all the way down and why the ratio table is the whole answer. Circuit breakers fail differently and that is the part worth understanding. A thermal-magnetic breaker's instantaneous element trips essentially without delay, so once the fault current exceeds the upstream breaker's instantaneous pickup, BOTH devices open and selectivity is lost no matter how far apart the ratings are: a 400 A upstream against a 100 A downstream looks like a comfortable four-to-one and coordinates not at all above the pickup. Coordination therefore holds only up to that pickup current, and whether that is acceptable depends entirely on the available fault current at the downstream device. The breaker case has three fixes and they are all real work: raise the instantaneous setting if the breaker allows it and the downstream equipment survives the longer clearing time, move to a breaker with a short-time delay and no instantaneous -- which raises incident energy, so the arc-flash and coordination requirements genuinely conflict -- or use fuses. A screen, never a study: the manufacturer's published ratio tables and time-current curves, a full coordination study, and the engineer of record govern.",
+    };
+  }
+  if (!(instantaneous_multiplier > 0)) return { error: "The instantaneous pickup multiplier must be positive." };
+  // Above the upstream instantaneous pickup BOTH devices open, no matter the ratio.
+  const pickup_a = upstream_rating_a * instantaneous_multiplier;
+  const coordinated = available_fault_a <= pickup_a;
+  if (![ratio, pickup_a].every(Number.isFinite)) return { error: "Coordination-screen math is not a finite value." };
+  return {
+    ratio,
+    published_ratio: null,
+    pickup_a,
+    coordinated_to_a: pickup_a,
+    coordinated,
+    verdict: coordinated
+      ? "COORDINATED up to " + fmt(pickup_a, 0) + " A of instantaneous pickup, and the " + fmt(available_fault_a, 0) + " A available sits below it"
+      : "NOT selectively coordinated: coordination holds only to the " + fmt(pickup_a, 0) + " A instantaneous pickup and " + fmt(available_fault_a, 0) + " A is available, so both devices open. The ratio of " + fmt(ratio, 2) + ":1 is irrelevant above the pickup",
+    note: "Whether two overcurrent devices in series will let the downstream one clear a fault alone, screened the way each device type actually behaves. Fuses coordinate on a RATIO, and the ratio is a published test result for a specific fuse family rather than a general rule. Within a family, an upstream fuse at or above the published ratio will not open before a downstream one clears, at any fault current up to the interrupting rating -- which is why fuses coordinate all the way down and why the ratio table is the whole answer. Circuit breakers fail differently and that is the part worth understanding. A thermal-magnetic breaker's instantaneous element trips essentially without delay, so once the fault current exceeds the upstream breaker's instantaneous pickup, BOTH devices open and selectivity is lost no matter how far apart the ratings are: a 400 A upstream against a 100 A downstream looks like a comfortable four-to-one and coordinates not at all above the pickup. Coordination therefore holds only up to that pickup current, and whether that is acceptable depends entirely on the available fault current at the downstream device. The breaker case has three fixes and they are all real work: raise the instantaneous setting if the breaker allows it and the downstream equipment survives the longer clearing time, move to a breaker with a short-time delay and no instantaneous -- which raises incident energy, so the arc-flash and coordination requirements genuinely conflict -- or use fuses. A screen, never a study: the manufacturer's published ratio tables and time-current curves, a full coordination study, and the engineer of record govern.",
+  };
+}
+
+export const selectiveCoordinationScreenExample = { inputs: { device_type: "breaker", upstream_rating_a: 400, downstream_rating_a: 100, published_ratio: 2, instantaneous_multiplier: 10, available_fault_a: 12000 } };
+
+ELECDESIGN_RENDERERS["selective-coordination-screen"] = _simpleRenderer({
+  citation: "Citation: selective coordination screened by device type -- fuses against the manufacturer's published minimum ratio for the family (commonly 2:1), which holds to the interrupting rating, and breakers only up to the upstream instantaneous pickup, above which both devices open. Cited by name; the ratio and the instantaneous setting are the manufacturer's published values and are entered rather than bundled. A screen, never a study: the published time-current curves, a full coordination study, and the engineer of record govern.",
+  example: selectiveCoordinationScreenExample.inputs,
+  fields: [
+    { key: "device_type", label: "Device type", kind: "select", options: [{ value: "fuse", label: "Fuses (ratio method)" }, { value: "breaker", label: "Circuit breakers (instantaneous pickup)" }] },
+    { key: "upstream_rating_a", label: "Upstream device rating (A)", kind: "number" },
+    { key: "downstream_rating_a", label: "Downstream device rating (A)", kind: "number" },
+    { key: "published_ratio", label: "Published fuse ratio for the family (fuses only)", kind: "number" },
+    { key: "instantaneous_multiplier", label: "Upstream instantaneous pickup, x rating (breakers only)", kind: "number" },
+    { key: "available_fault_a", label: "Available fault current at the downstream device (A)", kind: "number" },
+  ],
+  outputs: [
+    { key: "r", id: "selc-out-r", label: "Rating ratio", value: (r) => fmt(r.ratio, 2) + " : 1" },
+    { key: "p", id: "selc-out-p", label: "Instantaneous pickup", value: (r) => r.pickup_a === null ? "not applicable to fuses" : fmt(r.pickup_a, 0) + " A" },
+    { key: "c", id: "selc-out-c", label: "Coordination holds to", value: (r) => (r.coordinated_to_a === Infinity ? "the interrupting rating" : r.coordinated_to_a === 0 ? "no fault current -- the ratio is not met" : fmt(r.coordinated_to_a, 0) + " A") },
+    { key: "v", id: "selc-out-v", label: "Against the available fault current", value: (r) => r.verdict },
+    { key: "n", id: "selc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSelectiveCoordinationScreen,
+});
+
+// ===================== spec-v1422: current-limiting let-through and downstream withstand =====================
+// dims: in { args: dimensionless } out: { withstand_a: I, withstand_i2t: dimensionless, margin: dimensionless }
+export function computeFuseLetThrough({ conductor_cmil = 0, initial_temp_c = 75, damage_temp_c = 250, duration_s = 0.01, let_through_i2t = 0, let_through_peak_a = 0, equipment_peak_withstand_a = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(conductor_cmil > 0)) return { error: "Conductor area must be positive (circular mils)." };
+  if (!(damage_temp_c > initial_temp_c)) return { error: "The insulation damage temperature must exceed the initial temperature." };
+  if (!(duration_s > 0)) return { error: "Fault duration must be positive." };
+  if (!(let_through_i2t > 0)) return { error: "Device let-through I-squared-t must be positive (read it off the manufacturer's curve)." };
+  if (!(let_through_peak_a >= 0)) return { error: "Device peak let-through cannot be negative." };
+  if (!(equipment_peak_withstand_a >= 0)) return { error: "Equipment peak withstand cannot be negative." };
+  // The copper ICEA/Onderdonk constants: 0.0297 and 234.
+  const withstand_a = 0.0297 * conductor_cmil * Math.sqrt(Math.log10((damage_temp_c + 234) / (initial_temp_c + 234)) / duration_s);
+  const withstand_i2t = withstand_a * withstand_a * duration_s;
+  const margin = withstand_i2t / let_through_i2t;
+  const thermal_ok = margin >= 1;
+  const peak_ok = (let_through_peak_a > 0 && equipment_peak_withstand_a > 0) ? let_through_peak_a <= equipment_peak_withstand_a : null;
+  const peak_verdict = peak_ok === null
+    ? "no peak comparison entered"
+    : peak_ok
+      ? "the device's " + fmt(let_through_peak_a, 0) + " A peak let-through is inside the equipment's " + fmt(equipment_peak_withstand_a, 0) + " A peak withstand"
+      : "the device's " + fmt(let_through_peak_a, 0) + " A peak let-through EXCEEDS the equipment's " + fmt(equipment_peak_withstand_a, 0) + " A peak withstand -- this is the magnetic force that bends busbars and rips apart terminations";
+  if (![withstand_a, withstand_i2t, margin].every(Number.isFinite)) return { error: "Let-through math is not a finite value." };
+  return {
+    withstand_a,
+    withstand_i2t,
+    margin,
+    thermal_ok,
+    peak_ok,
+    peak_verdict,
+    series_rating_rule: "A let-through curve does NOT permit a downstream device to be applied above its own interrupting rating. That is a SERIES RATING, and a series rating exists only as a tested combination published by the manufacturer and marked on the equipment: it cannot be calculated, it cannot be inferred from a let-through curve, and the code requires the specific combination be listed.",
+    note: "Whether a current-limiting device's let-through protects the conductor and equipment behind it. A current-limiting fuse or breaker opens inside the first quarter cycle, before the fault current reaches its prospective peak, and what it lets through is characterized two ways on the manufacturer's curve: PEAK let-through current, which drives the magnetic forces that bend busbars and rip apart terminations, and let-through I-squared-t, which drives the heating that damages insulation. Downstream conductors and equipment have to survive both, so both are compared. The margin is usually enormous, and that is the point -- a current-limiting device converts an unprotectable conductor into a protected one, and the arithmetic shows by how much. A 4 AWG copper conductor at 41,740 circular mils, 75 C initial and a 250 C insulation damage limit, withstands 5,474 A for a half cycle, which is about 299,600 A2s against a device letting through 25,000 -- a margin of twelve to one. The same conductor facing an unrestricted 25 kA fault for that same half cycle would see 6,250,000 A2s, twenty-one times its withstand, and the insulation would be destroyed whether or not the breaker eventually opened. What a let-through curve does NOT do is let a downstream device be applied above its own interrupting rating. That is a series rating, it exists only as a tested combination published by the manufacturer and marked on the equipment, and it cannot be calculated or inferred from a curve. This is the device-curve counterpart to the conductor short-circuit withstand calculation, which works from the raw available fault current instead. A screen; the manufacturer's published let-through curves, the equipment's marked ratings, and the engineer of record govern.",
+  };
+}
+
+export const fuseLetThroughExample = { inputs: { conductor_cmil: 41740, initial_temp_c: 75, damage_temp_c: 250, duration_s: 0.01, let_through_i2t: 25000, let_through_peak_a: 12000, equipment_peak_withstand_a: 25000 } };
+
+ELECDESIGN_RENDERERS["fuse-let-through"] = _simpleRenderer({
+  citation: "Citation: conductor thermal withstand by the public-domain ICEA / Onderdonk adiabatic relation (copper constants 0.0297 and 234), compared against the current-limiting device's published let-through I-squared-t and peak current, by name. The let-through values are read off the manufacturer's curve and entered. A series rating is a TESTED, listed, marked combination per NEC 240.86 and cannot be calculated from a let-through curve. The manufacturer's curves, the equipment's marked ratings, and the engineer of record govern.",
+  example: fuseLetThroughExample.inputs,
+  fields: [
+    { key: "conductor_cmil", label: "Conductor area (circular mils)", kind: "number" },
+    { key: "initial_temp_c", label: "Initial conductor temperature (deg C)", kind: "number" },
+    { key: "damage_temp_c", label: "Insulation damage temperature (deg C)", kind: "number" },
+    { key: "duration_s", label: "Fault duration basis (s)", kind: "number" },
+    { key: "let_through_i2t", label: "Device let-through I-squared-t (A2s, from the curve)", kind: "number" },
+    { key: "let_through_peak_a", label: "Device peak let-through current (A, 0 to skip)", kind: "number" },
+    { key: "equipment_peak_withstand_a", label: "Equipment peak withstand (A, 0 to skip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "w", id: "flt-out-w", label: "Conductor withstand current", value: (r) => fmt(r.withstand_a, 0) + " A for that duration" },
+    { key: "i", id: "flt-out-i", label: "Conductor withstand I-squared-t", value: (r) => fmt(r.withstand_i2t, 0) + " A2s" },
+    { key: "m", id: "flt-out-m", label: "Thermal margin over the let-through", value: (r) => fmt(r.margin, 1) + " x -- " + (r.thermal_ok ? "the conductor is protected" : "the conductor is NOT protected") },
+    { key: "p", id: "flt-out-p", label: "Peak stress", value: (r) => r.peak_verdict },
+    { key: "s", id: "flt-out-s", label: "Series rating", value: (r) => r.series_rating_rule },
+    { key: "n", id: "flt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFuseLetThrough,
+});

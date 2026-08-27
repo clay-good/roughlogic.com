@@ -778,6 +778,10 @@ export const RENDERER_MAP = {
   "lighting-uniformity-ratio": { module: "../../calc-elecdesign.js", exportName: "ELECDESIGN_RENDERERS" },
   "egress-lighting-check": { module: "../../calc-elecdesign.js", exportName: "ELECDESIGN_RENDERERS" },
   "neutral-grounding-resistor": { module: "../../calc-elecdesign.js", exportName: "ELECDESIGN_RENDERERS" },
+  // spec-v1420..v1422: the 2026-08-26 trade-expansion electrical band.
+  "grounding-grid-conductor": { module: "../../calc-elecdesign.js", exportName: "ELECDESIGN_RENDERERS" },
+  "selective-coordination-screen": { module: "../../calc-elecdesign.js", exportName: "ELECDESIGN_RENDERERS" },
+  "fuse-let-through": { module: "../../calc-elecdesign.js", exportName: "ELECDESIGN_RENDERERS" },
   "step-touch-voltage": { module: "../../calc-elecdesign.js", exportName: "ELECDESIGN_RENDERERS" },
   "ground-potential-rise": { module: "../../calc-elecdesign.js", exportName: "ELECDESIGN_RENDERERS" },
   "max-grid-resistance-for-touch": { module: "../../calc-elecdesign.js", exportName: "ELECDESIGN_RENDERERS" },

@@ -2015,7 +2015,9 @@ cross-check.
 | calc-edu.js | `renderStatistics` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `roundToSigFigs` | `value, n` | _ | _ | _ |
 | calc-elecdesign.js | `computeEgressLightingCheck` | `{ avg_fc = 0, min_fc = 0, max_fc = 0, mode = "normal" } = {}` | _ | _ | _ |
+| calc-elecdesign.js | `computeFuseLetThrough` | `{ conductor_cmil = 0, initial_temp_c = 75, damage_temp_c = 250, duration_s = ...` | _ | _ | _ |
 | calc-elecdesign.js | `computeGroundPotentialRise` | `{ grid_current_a = 0, grid_resistance_ohm = 0, tolerable_touch_v = 0 } = {}` | _ | _ | _ |
+| calc-elecdesign.js | `computeGroundingGridConductor` | `{ fault_current_ka = 0, clearing_time_s = 0, material = "copper_brazed", inst...` | _ | _ | _ |
 | calc-elecdesign.js | `computeLightingLightLossFactor` | `{ LLD = 0, LDD = 0, BF = 0, LBO = 0, RSDD = 0, other = 0, initial_lm = 0 } = {}` | _ | _ | _ |
 | calc-elecdesign.js | `computeLightingUniformityRatio` | `{ readings = [], target_avgmin = 0, target_maxmin = 0 } = {}` | _ | _ | _ |
 | calc-elecdesign.js | `computeLumenMethod` | `{ target_fc = 0, area_sqft = 0, lumens_per_lum = 0, cu = 0.7, llf = 0.8 } = {}` | _ | _ | _ |
@@ -2029,6 +2031,7 @@ cross-check.
 | calc-elecdesign.js | `computeRollingSphereProtection` | `{ mast_height_ft = 0, sphere_radius_ft = 150 } = {}` | _ | _ | _ |
 | calc-elecdesign.js | `computeRoomCavityRatio` | `{ room_length_ft = 40, room_width_ft = 30, cavity_height_ft = 8 } = {}` | _ | _ | _ |
 | calc-elecdesign.js | `computeSccrCombination` | `{ component_sccrs_ka = [], feeder_ir_ka = 0, available_fault_ka = 0 } = {}` | _ | _ | _ |
+| calc-elecdesign.js | `computeSelectiveCoordinationScreen` | `{ device_type = "fuse", upstream_rating_a = 0, downstream_rating_a = 0, publi...` | _ | _ | _ |
 | calc-elecdesign.js | `computeStepTouchVoltage` | `{ clearing_time_s = 0, surface_resistivity = 0, native_resistivity = 0, layer...` | _ | _ | _ |
 | calc-electrical.js | `computeAmbientAmpacityAdjust` | `{ base_ampacity_a = 0, temp_column = 75, ambient_c = 30, conductor_count = 3,...` | _ | _ | _ |
 | calc-electrical.js | `computeArcFlashScreen` | `{ voltage_V = 0, bolted_fault_A = 0, clearing_time_s = 0, working_distance_in...` | _ | _ | _ |
@@ -3443,7 +3446,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2029.
+Row count: 2032.
 
 <!-- END function-corpus-v14 -->
 
@@ -3511,7 +3514,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (206 tiles)
+### Group A Electrical (209 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3584,6 +3587,7 @@ per spec-v14 §13.1 second paragraph.
 | `fiber-max-length` | Fiber Max Length for a Loss Budget | TIA-568 / IEEE 802.3 (by name), inverse; 2.6 dB budget, OM4 3.0 dB/km, 2 connectors @ 0.75 dB -> 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fire-alarm-nac-voltage-drop` | Fire-Alarm NAC Circuit Voltage Drop (End-of-Line) | fire-alarm NAC voltage drop (NFPA 72); CUSTV = 0.85*24 = 20.4; loop R = 2*250*(2.525/1000) = 1.2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fresnel-zone-clearance` | Fresnel Zone Radius and 60% Clearance | ITU-R P.526 / first-principles Fresne...; d1 = d2 = 2.5 km, D = 5 km; r1 = 17.32 sqrt(2.5 x 2.5 / (... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `fuse-let-through` | Current-Limiting Let-Through and Downstream Withstand | Project (first-principles); 0.0297 x cmil x sqrt(log10((T2+234)/(T1+234))/t) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `generator-conductor-445` | Generator Output Conductor at 115% (NEC 445.13) | NEC 2023 445.13(A); spec-v493 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `generator-fuel-runtime` | Generator Fuel Runtime and Backup Duration | generator fuel runtime (first-princip...; spec-v487 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `generator-motor-starting` | Generator Sizing for Motor Starting | NEC 430.110 + manufacturer locked-rot...; 25 hp Code G + 10 hp Code F + 5 hp Code B motors, 15 kW n... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3592,6 +3596,7 @@ per spec-v14 §13.1 second paragraph.
 | `ground-potential-rise` | Ground Potential Rise Screen (IEEE 80) | IEEE Std 80 (ground potential rise); 200-A grid current, 0.5-ohm grid, 200-V tolerable touch -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `grounding-electrode` | Grounding Electrode Resistance (Dwight / IEEE 142) | IEEE / Dwight; R = (rho / (2*pi*L)) * (ln(8L/d) - 1) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `grounding-electrode-conductor` | Grounding Electrode Conductor Sizing | NFPA; spec-v109 section 2.1 pinned example (250 kcmil Cu servic... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `grounding-grid-conductor` | Ground Grid Conductor Sizing for Fault Current | IEEE; A = I x Kf x sqrt(tc) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `harmonic-resonance` | Harmonic Parallel-Resonance Order | parallel-resonance order of a PF capa...; spec-v523 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `insulation-resistance-pi` | Insulation Resistance PI / DAR (Megger Test) | Insulation resistance PI / DAR (IEEE ...; DAR = 1040/800 = 1.30; PI = 4160/1040 = 4.0 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lighting-density` | Lighting Power Density | ASHRAE / IECC; 1000 ft^2 office @ 1.0 W/ft^2 -> 1000 W target lighting load | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3678,6 +3683,7 @@ per spec-v14 §13.1 second paragraph.
 | `rotary-phase-converter-sizing` | Rotary Phase Converter Idler Sizing | rotary phase converter idler sizing (...; start = 2*10 = 20; idler = max(20, 15) = 20 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rtd-resistance-to-temp` | RTD (Pt100 / Pt1000) Resistance to Temperature | IEC 60751 platinum RTD (Callendar-Van...; T = (-A + sqrt(A^2 - 4B(1 - 119.397/100)))/(2B), A=3.9083... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sccr-combination` | Industrial Control Panel SCCR (UL 508A) | UL 508A Supplement SB / NEC 409.110; 65/5/5/10 kA components, 22 kA fault -> panel SCCR 5 kA (... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `selective-coordination-screen` | Overcurrent Selective Coordination Screen | Project (first-principles); breakers coordinate only to the instantaneous pickup | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `service-conductor-sizing` | Dwelling Service/Feeder Conductor at 83% (NEC 310.12) | NEC 2023 310.12 / Table 310.16 (75 degC); spec-v279 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `service-load` | Service Load Calculation (Residential) | NFPA; 2000 ft^2 dwelling with 2 small-appliance + 1 laundry + 6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `service-load-optional` | Service Load Calculation (NEC 220.82 Optional Method) | NFPA; general demand = 10kVA + 40%*(general-10kVA); + larger HV... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5394,6 +5400,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1778. Fixture-covered or reference-cadence: 1778 / 1778.
+Tile count: 1781. Fixture-covered or reference-cadence: 1781 / 1781.
 
 <!-- END tile-index-v14 -->

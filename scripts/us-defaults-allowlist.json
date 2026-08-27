@@ -403,6 +403,18 @@
       "match": "Bearing bore (mm)",
       "family": "metric bearing designations",
       "justification": "Rolling-element bearings are metric worldwide including in the US: a 6310 IS 50 x 110 x 27 mm, and the bore, outside diameter, and width are the designation itself and are stamped on the bearing. A US millwright reads these numbers in millimetres off the part in their hand."
+    },
+    {
+      "module": "calc-elecdesign.js",
+      "match": "Initial conductor temperature (deg C)",
+      "family": "ICEA conductor short-circuit limits",
+      "justification": "The ICEA P-32-382 conductor short-circuit temperature limits, and the insulation damage temperatures they are compared against, are published in degrees Celsius -- the same basis the catalog's existing conductor short-circuit withstand tile is allowlisted on. A US electrical engineer reads the 75 C and 250 C limits in Celsius off the standard itself."
+    },
+    {
+      "module": "calc-elecdesign.js",
+      "match": "Insulation damage temperature (deg C)",
+      "family": "ICEA conductor short-circuit limits",
+      "justification": "The ICEA P-32-382 conductor short-circuit temperature limits, and the insulation damage temperatures they are compared against, are published in degrees Celsius -- the same basis the catalog's existing conductor short-circuit withstand tile is allowlisted on. A US electrical engineer reads the 75 C and 250 C limits in Celsius off the standard itself."
     }
   ]
 }

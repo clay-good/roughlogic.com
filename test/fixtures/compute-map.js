@@ -1318,6 +1318,10 @@ export const COMPUTE_MAP = {
   "tdd-ieee-519": { module: "../../calc-powerquality.js", fn: "computeTddIeee519" },
   "rlc-reactance-resonance": { module: "../../calc-powerquality.js", fn: "computeRlcReactanceResonance" },
   "neutral-grounding-resistor": { module: "../../calc-elecdesign.js", fn: "computeNeutralGroundingResistor" },
+  // spec-v1420..v1422: the 2026-08-26 trade-expansion electrical band.
+  "grounding-grid-conductor": { module: "../../calc-elecdesign.js", fn: "computeGroundingGridConductor" },
+  "selective-coordination-screen": { module: "../../calc-elecdesign.js", fn: "computeSelectiveCoordinationScreen" },
+  "fuse-let-through": { module: "../../calc-elecdesign.js", fn: "computeFuseLetThrough" },
   "step-touch-voltage": { module: "../../calc-elecdesign.js", fn: "computeStepTouchVoltage" },
   "ground-potential-rise": { module: "../../calc-elecdesign.js", fn: "computeGroundPotentialRise" },
   "max-grid-resistance-for-touch": { module: "../../calc-elecdesign.js", fn: "computeMaxGridResistanceForTouch" },

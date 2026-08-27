@@ -357,7 +357,7 @@ const TOOL_MODULES = (() => {
   // module, the v42/v70..v88 precedent); ids, citations, examples, dimensional
   // annotations, and behavior unchanged.
   declare("./calc-refrigerant.js", "REFRIGERANT_RENDERERS", [
-    // spec-v1413..v1419: the 2026-08-26 trade-expansion Group C band.
+    // trade expansion v1413-v1419
     "txv-capacity-check",
     "defrost-cycle-sizing",
     "refrigerant-leak-rate",
@@ -551,7 +551,7 @@ const TOOL_MODULES = (() => {
     "water-closet-location",
     "lavatory-tub-clearance",
     "ramp-detail-check",
-    // spec-v1411: the 2026-08-26 trade-expansion curtain wall tile.
+    // trade expansion v1411
     "curtain-wall-mullion-deflection",
     // spec-v332..v334 wood-fastener withdrawal batch.
     "wood-nail-withdrawal", "wood-lag-withdrawal", "wood-screw-withdrawal",
@@ -579,6 +579,10 @@ const TOOL_MODULES = (() => {
   // spec-v101 new electrician design/layout bench; relieves the standing
   // calc-electrical.js cap watch. Both tiles keep group "A".
   declare("./calc-elecdesign.js", "ELECDESIGN_RENDERERS", [
+    // trade expansion v1420-v1422
+    "grounding-grid-conductor",
+    "selective-coordination-screen",
+    "fuse-let-through",
     "pull-box-sizing", "lumen-method",
     "room-cavity-ratio",
     "luminaire-spacing-mh-ratio",
@@ -597,7 +601,7 @@ const TOOL_MODULES = (() => {
   // calc-hvac.js cap watch. Both tiles keep group "C".
   declare("./calc-hvacservice.js", "HVACSERVICE_RENDERERS", [
     "condensate-drain", "condensate-overflow-pan", "condensate-trap-depth", "recovery-cylinder",
-    // spec-v1413..v1419: the 2026-08-26 trade-expansion Group C band.
+    // trade expansion v1413-v1419
     "damper-authority",
     "chilled-water-delta-t", "outside-air-percent-temps",
     // spec-v104 electrical-side field-service diagnostics (same module).
@@ -757,7 +761,7 @@ const TOOL_MODULES = (() => {
   ]);
   declare("./calc-fire.js", "FIRE_RENDERERS", [
     "fire-friction", "pdp", "hydrant-flow", "required-fire-flow",
-    // spec-v1386..v1393: the 2026-08-26 trade-expansion Group F band.
+    // trade expansion v1386-v1393
     "ppv-fan-sizing",
     "hose-lay-section-count",
     "fdc-supply-check",
@@ -818,7 +822,7 @@ const TOOL_MODULES = (() => {
   declare("./calc-firesprinkler.js", "FIRESPRINKLER_RENDERERS", [
     "fire-pump-curve", "sprinkler-system-demand", "sprinkler-protection-area-for-supply", "sprinkler-head-layout", "smoke-detector-spacing-count", "drypipe-air-compressor", "jockey-pump-sizing",
     "sprinkler-pressure-demand",
-    // spec-v1386..v1393: the 2026-08-26 trade-expansion Group F band.
+    // trade expansion v1386-v1393
     "stairwell-pressurization",
     "fire-tank-sizing",
     "sprinkler-obstruction",
@@ -885,7 +889,7 @@ const TOOL_MODULES = (() => {
     "coil-length",
     // spec-v909 bar / tube stock cut list yield (group E)
     "barstock-cutlist", "bar-nesting", "sheet-metal-gauge",
-    // spec-v1402..v1412: the 2026-08-26 trade-expansion machining and fabrication band.
+    // trade expansion v1402-v1412
     "tube-bend-wall-thinning",
     "weld-cooling-rate-t85",
     "interpass-temperature-control",
@@ -933,7 +937,7 @@ const TOOL_MODULES = (() => {
     "compound-miter",
     // spec-v399..v400 fabrication shop-math
     "tolerance-stack-rss", "cone-flat-pattern", "frustum-volume", "regular-polygon", "ellipse-area-perimeter", "spherical-cap-volume", "parabolic-segment", "pyramid-frustum-volume", "torus-volume", "ellipsoid-volume", "annulus-area", "circular-sector", "paraboloid-volume", "cylindrical-wedge-volume", "barrel-volume", "tank-volume-dished-heads", "spherical-zone-volume", "oval-tank-volume", "cone-bottom-tank-volume", "tapered-tank-volume",
-    // spec-v1406..v1409: the 2026-08-26 trade-expansion rotating-equipment and hydraulics band.
+    // trade expansion v1406-v1409
     "rotor-balance-grade",
     "bearing-regrease",
     "plasma-cut-speed",
@@ -968,7 +972,7 @@ const TOOL_MODULES = (() => {
     "def-consumption",
     // spec-v913 static rollover threshold
     "static-rollover-threshold", "truck-startability", "hydroplaning-speed",
-    // spec-v1377..v1385: the 2026-08-26 trade-expansion Group J band.
+    // trade expansion v1377-v1385
     "tiedown-count",
     "kingpin-to-axle",
     "safe-descent-speed",
@@ -1050,7 +1054,7 @@ const TOOL_MODULES = (() => {
     "grinding-wheel-rpm",
     // spec-v917 reaming prebore (drill) allowance
     "reaming-drill-allowance",
-    // spec-v1402..v1412: the 2026-08-26 trade-expansion machining and fabrication band.
+    // trade expansion v1402-v1412
     "drill-feed-thrust",
     "band-saw-blade-pitch",
     "counterbore-depth",
@@ -1194,7 +1198,7 @@ const TOOL_MODULES = (() => {
   declare("./calc-stage.js", "STAGE_RENDERERS", [
     "truss-capacity", "time-alignment", "dmx-planner",
     "neutral-imbalance", "spl-distance", "spl-distance-for-level", "acoustic-gain-pag-nag", "rigging-check",
-    // spec-v1364..v1376: the 2026-08-26 trade-expansion Group N band.
+    // trade expansion v1364-v1376
     "line-array-splay",
     "delay-tower-alignment",
     "cardioid-sub-array",
@@ -1227,7 +1231,7 @@ const TOOL_MODULES = (() => {
   // v4 Group O: Kitchen and Food Service.
   declare("./calc-kitchen.js", "KITCHEN_RENDERERS", [
     "recipe-scale", "yield-ep", "as-purchased-quantity", "cooling-curve",
-    // spec-v1350..v1363: the 2026-08-26 trade-expansion Group O band.
+    // trade expansion v1350-v1363
     "ice-machine-sizing",
     "warewasher-hot-water",
     "freezing-time-plank",
@@ -1271,7 +1275,7 @@ const TOOL_MODULES = (() => {
     "search-probability",
     // v52
     "hiking-time",
-    // spec-v1394..v1401: the 2026-08-26 trade-expansion Group P band.
+    // trade expansion v1394-v1401
     "map-scale-conversion",
     "contour-slope",
     "helicopter-lz-sizing",
@@ -1284,7 +1288,7 @@ const TOOL_MODULES = (() => {
   // output changed.
   declare("./calc-survey.js", "SURVEY_RENDERERS", [
     "area-by-coordinates", "traverse-closure",
-    // spec-v1394..v1401: the 2026-08-26 trade-expansion Group P band.
+    // trade expansion v1394-v1401
     "three-point-resection",
     "slope-staking",
     "grade-rod-cut-fill",

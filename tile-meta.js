@@ -640,6 +640,10 @@ const _TILES = [
   ["tdd-ieee-519", "A"], ["rlc-reactance-resonance", "A"],
   // spec-v525 neutral grounding resistor sizing (IEEE 142)
   ["neutral-grounding-resistor", "A"],
+  // spec-v1420..v1422: the 2026-08-26 trade-expansion electrical band.
+  ["grounding-grid-conductor", "A"],
+  ["selective-coordination-screen", "A"],
+  ["fuse-let-through", "A"],
   ["step-touch-voltage", "A"],
   ["ground-potential-rise", "A"], ["max-grid-resistance-for-touch", "A"],
   ["sccr-combination", "A"],
