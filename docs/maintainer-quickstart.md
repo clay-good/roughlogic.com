@@ -43,6 +43,11 @@ Tests live in `test/unit/` and `test/integration/`.
      [../test/fixtures/compute-map.js](../test/fixtures/compute-map.js).
    - a 3-6 id entry in [../scripts/related-tiles.mjs](../scripts/related-tiles.mjs)
      (`check-related-tiles`).
+   - the tile id in
+     [../test/fixtures/renderer-schema-coverage.json](../test/fixtures/renderer-schema-coverage.json)
+     if the renderer exposes a field schema -- declarative
+     `_simpleRenderer` tiles DO, bespoke hand-written renderers do not
+     (`check-renderer-schema` ratchets this list and fails on a regression).
    - 3-5 search aliases in [../data/search/aliases.json](../data/search/aliases.json)
      (`check-discoverability`; terms must be unique catalog-wide).
    - Confirm the tile enters through the shared `renderToolView` path, which is
@@ -66,16 +71,41 @@ Tests live in `test/unit/` and `test/integration/`.
    and the inline entry (formula / edition / freeAccess / governance)
    in [../citations.js](../citations.js); both agree
    (`check-citation-coverage`).
-6. Regenerate the v14 corpus + tile-index (`node scripts/build-corpus.mjs`
-   and `node scripts/build-tile-index.mjs`; the `--check` forms run in
-   `npm run lint`). Update the affected `data/<folder>/manifest.json`
-   (`edition`, `asOf`) and run `npm run data:refresh` only if the tile
-   uses a bundled dataset.
+6. Regenerate the derived artifacts, **in this order** -- several read
+   each other's output, and `extract-citations` reads a file the build
+   emits, so running it early leaves `renderer-citations.js` stale and
+   the count oscillates:
+
+   ```
+   node scripts/build-corpus.mjs
+   node scripts/build-tile-index.mjs
+   node scripts/build-field-index.mjs
+   node scripts/build-alias-shards.mjs
+   node scripts/extract-constant-notes.mjs
+   node scripts/extract-bespoke-schemas.mjs --write
+   node scripts/build-renderer-map.mjs
+   npm run build
+   node scripts/extract-citations.mjs --write   # LAST, after the build
+   ```
+
+   The `--check` forms of these run in `npm run lint`. Update the
+   affected `data/<folder>/manifest.json` (`edition`, `asOf`) and run
+   `npm run data:refresh` only if the tile uses a bundled dataset.
 7. Run the full gate: `npm run audit` (six stages: lint -> test ->
    build -> check:dist -> check:shells -> data:verify, per spec-v12
-   §G.3 + spec-v13 Phase G). Update the README catalog counts (the
-   `check-readme-counts` gate verifies the tile/module/group/sitemap
-   totals, including the Mermaid-diagram nodes).
+   §G.3 + spec-v13 Phase G). Update the catalog counts in **all four**
+   files the `check-readme-counts` gate reads -- [../README.md](../README.md),
+   [../index.html](../index.html) (both the JSON-LD description and the
+   home lede), [../AGENTS.md](../AGENTS.md), and
+   [../mcp/README.md](../mcp/README.md) -- covering the tile, module,
+   group, and sitemap totals including the Mermaid-diagram nodes.
+
+   **Then update the count that no lint gate watches:**
+   [../test/integration/search-prefill.test.js](../test/integration/search-prefill.test.js)
+   asserts the home lede's tile count as a literal string. `npm run lint`
+   stays green when it is stale and the failure surfaces ~15 minutes into
+   `npm run test:e2e`, so change it in the same pass as index.html rather
+   than discovering it later.
 8. Add a CHANGELOG stanza under "Unreleased" naming the tile, the
    group, the citation, and the worked example.
 9. Per-module gzipped-size check: enforced by
