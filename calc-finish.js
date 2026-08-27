@@ -134,7 +134,7 @@ FINISH_RENDERERS["thinset-coverage"] = _simpleRenderer({
 
 const _FLOORING_WASTE = { straight: 10, diagonal: 15, herringbone: 17 }; // percent by install pattern
 // dims: in { room_length_ft: L, room_width_ft: L, box_coverage_sqft: L^2, pattern: dimensionless, waste_pct: dimensionless, plank_width_in: L } out: { order_area: L^2, boxes: dimensionless, full_rows: dimensionless, remainder: L }
-export function computeFlooringTakeoff({ room_length_ft = 0, room_width_ft = 0, box_coverage_sqft = 20, pattern = "straight", waste_pct = 0, plank_width_in = 0 } = {}) {
+export function computeFlooringTakeoff({ room_length_ft = 0, room_width_ft = 0, box_coverage_sqft = 20, pattern = "straight", waste_pct = 0, plank_width_in = 0, expansion_gap_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (waste_pct < 0) return { error: "Waste must be non-negative." };
   if (!(room_length_ft > 0) || !(room_width_ft > 0)) return { error: "Room dimensions must be positive." };
@@ -144,22 +144,29 @@ export function computeFlooringTakeoff({ room_length_ft = 0, room_width_ft = 0, 
   if (!(waste > 0)) return { error: "Choose an install pattern or enter a waste percent." };
   const order_area = field_area * (1 + waste / 100);
   const boxes = Math.ceil(order_area / box_coverage_sqft);
-  let full_rows = null, remainder = null, rip_needed = null, start_width = null;
+  if (expansion_gap_in < 0) return { error: "Expansion gap cannot be negative." };
+  let full_rows = null, remainder = null, rip_needed = null, start_width = null, usable_width_in = null;
   if (plank_width_in > 0) {
-    const width_in = room_width_ft * 12;
-    full_rows = Math.floor(width_in / plank_width_in);
-    remainder = width_in - full_rows * plank_width_in;
+    // spec-v1449 follow-up: a floating floor is not fastened down and needs a
+    // perimeter expansion gap on BOTH walls, so the width the rows actually
+    // divide into is the room less two gaps. Dividing the raw room width can
+    // land the last row a gap-and-a-half wider than it will really be, which
+    // is exactly the sliver this check exists to catch.
+    usable_width_in = room_width_ft * 12 - 2 * expansion_gap_in;
+    if (!(usable_width_in > 0)) return { error: "The expansion gaps leave no room across the floor." };
+    full_rows = Math.floor(usable_width_in / plank_width_in);
+    remainder = usable_width_in - full_rows * plank_width_in;
     rip_needed = remainder > 0 && remainder < plank_width_in / 3;
     start_width = rip_needed ? (remainder + plank_width_in) / 2 : plank_width_in;
   }
   return {
-    field_area, waste, order_area, boxes, full_rows, remainder, rip_needed, start_width,
-    note: "Order the field area plus a waste allowance set by the pattern - about 10% straight, 15% on a 45-degree diagonal, 17% for herringbone, because every angled plank gets a miter cut and the drop-offs do not reuse. Add a few points more for many doorways and obstacles. Floating floors need a 1/4 to 3/8 in expansion gap at the perimeter. If the last row would come out narrower than about a third of a plank, rip the first row so the room starts and ends on matching widths.",
+    field_area, waste, order_area, boxes, full_rows, remainder, rip_needed, start_width, usable_width_in,
+    note: "Order the field area plus a waste allowance set by the pattern - about 10% straight, 15% on a 45-degree diagonal, 17% for herringbone, because every angled plank gets a miter cut and the drop-offs do not reuse. Add a few points more for many doorways and obstacles. Floating floors need a 1/4 to 3/8 in expansion gap at the perimeter, and because that gap comes off BOTH walls the rows divide into the room width less two of them -- entering it is what makes the last-row answer the real one. If the last row would come out narrower than about a third of a plank, rip the first row so the room starts and ends on matching widths.",
   };
 }
 export const flooringTakeoffExample = { inputs: { room_length_ft: 15, room_width_ft: 12, box_coverage_sqft: 20, pattern: "straight", waste_pct: 0, plank_width_in: 7.5 } };
 FINISH_RENDERERS["flooring-takeoff"] = _simpleRenderer({
-  citation: "Citation: Published flooring waste rules of thumb (10% straight / 15% diagonal / 17% herringbone) and the standard last-row balancing rule (rip the first row when the last would be under a third of a plank).",
+  citation: "Citation: Published flooring waste rules of thumb (10% straight / 15% diagonal / 17% herringbone) and the standard last-row balancing rule (rip the first row when the last would be under a third of a plank). On a floating floor the rows divide into the room width less the perimeter expansion gap at each wall, so that gap is entered rather than ignored.",
   example: flooringTakeoffExample.inputs,
   fields: [
     { key: "room_length_ft", label: "Room length (ft)", kind: "number" },
@@ -172,12 +179,13 @@ FINISH_RENDERERS["flooring-takeoff"] = _simpleRenderer({
     ] },
     { key: "waste_pct", label: "Waste override (%, optional)", kind: "number" },
     { key: "plank_width_in", label: "Plank width (in, optional)", kind: "number" },
+    { key: "expansion_gap_in", label: "Expansion gap at each wall (in, floating floors)", kind: "number" },
   ],
   outputs: [
     { key: "f", id: "flt-out-f", label: "Field area", value: (r) => fmt(r.field_area, 0) + " sq ft" },
     { key: "o", id: "flt-out-o", label: "Order area", value: (r) => fmt(r.order_area, 0) + " sq ft (" + fmt(r.waste, 0) + "% waste)" },
     { key: "b", id: "flt-out-b", label: "Boxes", value: (r) => String(r.boxes) },
-    { key: "r", id: "flt-out-r", label: "Last row", value: (r) => r.full_rows === null ? "-" : r.full_rows + " full rows, " + fmt(r.remainder, 2) + " in left" + (r.rip_needed ? " - rip first row to " + fmt(r.start_width, 2) + " in" : " (no rip needed)") },
+    { key: "r", id: "flt-out-r", label: "Last row", value: (r) => r.full_rows === null ? "-" : r.full_rows + " full rows across " + fmt(r.usable_width_in, 2) + " in of usable width, " + fmt(r.remainder, 2) + " in left" + (r.rip_needed ? " - rip the FIRST and last row to " + fmt(r.start_width, 2) + " in so both edges match" : " (no rip needed)") },
     { key: "n", id: "flt-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeFlooringTakeoff,

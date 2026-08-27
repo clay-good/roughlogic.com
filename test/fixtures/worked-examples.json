@@ -93748,6 +93748,90 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "haversine",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "New York to Los Angeles: the course turns 27.8 degrees between departure and arrival",
+   "source_edition_or_year": "great-circle navigation",
+   "source_section_or_page": "final bearing = reverse leg's initial bearing + 180",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "lat1": 40.7128,
+    "lon1": -74.006,
+    "lat2": 34.0522,
+    "lon2": -118.2437
+   },
+   "outputs": {
+    "initial_bearing_deg": {
+     "value": 273.6871,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "final_bearing_deg": {
+     "value": 245.9188,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bearing_drift_deg": {
+     "value": -27.7683,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flooring-takeoff",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "12 ft room in 7.5 in plank with a 1/4 in expansion gap at each wall",
+   "source_edition_or_year": "floating floor layout practice",
+   "source_section_or_page": "usable width = room width - 2 x gap",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "room_length_ft": 15,
+    "room_width_ft": 12,
+    "box_coverage_sqft": 20,
+    "pattern": "straight",
+    "plank_width_in": 7.5,
+    "expansion_gap_in": 0.25
+   },
+   "outputs": {
+    "usable_width_in": {
+     "value": 143.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "full_rows": {
+     "value": 19,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "remainder": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "start_width": {
+     "value": 4.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "boxes": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

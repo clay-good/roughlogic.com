@@ -41785,3 +41785,87 @@ test("bounds: spec-v1448 computeTextureMaterialTakeoff pins the three-to-one cov
   assert.ok("error" in _v1448({ ...base, bag_weight_lb: 0 }));
   assert.ok("error" in _v1448({ ...base, gross_area_sqft: Infinity }));
 });
+
+// ===========================================================================
+// spec-v1399 and spec-v1449 follow-ups. Both specs were CUT as duplicates of
+// existing tiles; each was recorded with the genuinely new part to be added
+// to the tile that already answered the question. These are those additions.
+// ===========================================================================
+
+import { computeHaversineDistance as _hav } from "../../calc-cross.js";
+test("follow-up spec-v1399: haversine reports the FINAL bearing and its drift", () => {
+  // New York to Los Angeles: leaves on 273.7, arrives on 245.9.
+  const r = _hav({ lat1: 40.7128, lon1: -74.0060, lat2: 34.0522, lon2: -118.2437 });
+  assert.ok(Math.abs(r.miles - 2445.6) < 0.5);
+  assert.ok(Math.abs(r.initial_bearing_deg - 273.69) < 0.02);
+  assert.ok(Math.abs(r.final_bearing_deg - 245.92) < 0.02);
+  assert.ok(Math.abs(r.bearing_drift_deg - -27.77) < 0.02);
+  // The drift is the signed shortest difference between the two bearings.
+  const wrapped = ((r.final_bearing_deg - r.initial_bearing_deg + 180) % 360 + 360) % 360 - 180;
+  assert.ok(Math.abs(r.bearing_drift_deg - wrapped) < 1e-9);
+  assert.ok(Math.abs(r.bearing_drift_deg) <= 180);
+  // A MERIDIAN is itself a great circle, so a due-north leg never turns.
+  const meridian = _hav({ lat1: 10, lon1: 5, lat2: 50, lon2: 5 });
+  assert.ok(Math.abs(meridian.initial_bearing_deg) < 1e-9);
+  assert.ok(Math.abs(meridian.final_bearing_deg) < 1e-9);
+  assert.ok(Math.abs(meridian.bearing_drift_deg) < 1e-9);
+  // A short leg barely turns -- which is why nobody notices on a job site.
+  const short = _hav({ lat1: 40.0, lon1: -74.0, lat2: 40.1, lon2: -74.1 });
+  assert.ok(Math.abs(short.bearing_drift_deg) < 0.1);
+  // A high-latitude east-west leg turns enormously: this is the safety point.
+  const polar = _hav({ lat1: 60, lon1: -140, lat2: 60, lon2: 140 });
+  assert.ok(Math.abs(polar.bearing_drift_deg) > 70);
+  assert.ok(Math.abs(polar.initial_bearing_deg - 306.01) < 0.05);
+  assert.ok(Math.abs(polar.final_bearing_deg - 233.99) < 0.05);
+  // Reversing the leg mirrors the two bearings: the final bearing of A->B is
+  // the reciprocal of the initial bearing of B->A.
+  const back = _hav({ lat1: 34.0522, lon1: -118.2437, lat2: 40.7128, lon2: -74.0060 });
+  const reciprocal = (back.initial_bearing_deg + 180) % 360;
+  assert.ok(Math.abs(reciprocal - r.final_bearing_deg) < 1e-9);
+  assert.ok(Math.abs(back.miles - r.miles) < 1e-9);
+  // Both bearings stay in [0, 360).
+  for (const b of [r.initial_bearing_deg, r.final_bearing_deg, polar.final_bearing_deg, back.final_bearing_deg]) {
+    assert.ok(b >= 0 && b < 360);
+  }
+});
+
+import { computeFlooringTakeoff as _flr } from "../../calc-finish.js";
+test("follow-up spec-v1449: the expansion gap comes off the width before the rows divide", () => {
+  const base = { room_length_ft: 15, room_width_ft: 12, box_coverage_sqft: 20, pattern: "straight", waste_pct: 0, plank_width_in: 7.5 };
+  // Backward compatible: with no gap entered the old answer is unchanged.
+  const noGap = _flr(base);
+  assert.ok(Math.abs(noGap.usable_width_in - 144) < 1e-9);
+  assert.strictEqual(noGap.full_rows, 19);
+  assert.ok(Math.abs(noGap.remainder - 1.5) < 1e-9);
+  assert.strictEqual(noGap.rip_needed, true);
+  assert.ok(Math.abs(noGap.start_width - 4.5) < 1e-9);
+  // A quarter-inch gap at EACH wall takes an inch and a half off the leftover,
+  // which is the number spec-v1449 was built around.
+  const gap = _flr({ ...base, expansion_gap_in: 0.25 });
+  assert.ok(Math.abs(gap.usable_width_in - 143.5) < 1e-9);
+  assert.strictEqual(gap.full_rows, 19);
+  assert.ok(Math.abs(gap.remainder - 1.0) < 1e-9);
+  assert.strictEqual(gap.rip_needed, true);
+  assert.ok(Math.abs(gap.start_width - 4.25) < 1e-9);
+  // The gap is a LAYOUT input, not a quantity one: boxes are untouched.
+  assert.strictEqual(gap.boxes, noGap.boxes);
+  assert.ok(Math.abs(gap.order_area - noGap.order_area) < 1e-12);
+  // Two gaps, not one -- doubling the gap takes twice as much off.
+  const wide = _flr({ ...base, expansion_gap_in: 0.5 });
+  assert.ok(Math.abs(noGap.usable_width_in - wide.usable_width_in - 1.0) < 1e-9);
+  // The balanced rip always averages the sliver with a full plank, so both
+  // ripped rows land between the sliver and a full plank.
+  for (const r of [noGap, gap, wide]) {
+    if (!r.rip_needed) continue;
+    assert.ok(r.start_width > r.remainder && r.start_width < base.plank_width_in);
+    assert.ok(Math.abs(r.start_width - (r.remainder + base.plank_width_in) / 2) < 1e-12);
+  }
+  // A gap big enough to swallow the room is an error, not a negative width.
+  assert.ok("error" in _flr({ ...base, expansion_gap_in: 100 }));
+  assert.ok("error" in _flr({ ...base, expansion_gap_in: -1 }));
+  // Without a plank width there is no layout to compute and no gap error.
+  const noPlank = _flr({ ...base, plank_width_in: 0, expansion_gap_in: 0.25 });
+  assert.strictEqual(noPlank.full_rows, null);
+  assert.strictEqual(noPlank.usable_width_in, null);
+  assert.ok(noPlank.boxes > 0);
+});

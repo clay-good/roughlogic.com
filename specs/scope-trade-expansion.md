@@ -101,6 +101,16 @@ names the 1/4 to 3/8 in expansion gap. The one genuinely new element -- subtract
 usable width *before* the row division -- is a refinement to that calculation rather than a second calculation, and
 is recorded as a follow-up against it, with search aliases routing the layout question there.
 
+### Both recorded follow-ups are now done (2026-08-27)
+
+The two cuts that carried a genuinely new element have had it added to the calculator that already
+answered the question. `haversine` now returns the **final bearing** and its drift from the initial one --
+the safety point spec-v1399 was built around, since a great-circle course turns continuously and the
+initial bearing is a departure heading rather than a course to steer. `flooring-takeoff` now subtracts the
+perimeter **expansion gap at both walls** before dividing the width into rows, which is what spec-v1449
+added over the existing balanced-rip calculation. Neither is a new tile, and both are covered by pinned
+fixtures and bounds rows.
+
 
 Their spec numbers were reused for nine verified-new tiles: band saw blade pitch, tube bend wall
 thinning, ISO 1940 balance grade, bearing regrease interval, hydraulic reservoir and cooler duty,

@@ -6565,7 +6565,7 @@ export const CITATIONS = {
     assumptions: [],
   },
   "haversine": {
-    formula: "Great-circle distance via the haversine formula a = sin²(Δφ/2) + cos(φ1) × cos(φ2) × sin²(Δλ/2); d = 2 × R × atan2(sqrt(a), sqrt(1−a)). R = 6371 km mean earth radius.",
+    formula: "Great-circle distance via the haversine formula a = sin²(Δφ/2) + cos(φ1) × cos(φ2) × sin²(Δλ/2); d = 2 × R × atan2(sqrt(a), sqrt(1−a)). R = 6371 km mean earth radius. Initial bearing from atan2(sin(Δλ) cos(φ2), cos(φ1) sin(φ2) − sin(φ1) cos(φ2) cos(Δλ)); FINAL bearing is the reverse leg's initial bearing turned 180 degrees, and the drift between them is reported as a signed shortest-angle difference.",
     edition: "Classical spherical trigonometry; WGS84 mean radius.",
     freeAccess: "Haversine / great-circle derivations are free in navigation texts and at nist.gov and university OCW.",
     governance: GOVERNANCE.general,
@@ -13967,7 +13967,7 @@ export const CITATIONS = {
     ],
   },
   "flooring-takeoff": {
-    formula: "Boxes = ceil(area x (1 + pattern waste) / box coverage); last row from full_rows = floor(width / plank), rip if the remainder is under a third of a plank.",
+    formula: "Boxes = ceil(area x (1 + pattern waste) / box coverage); usable width = room width - 2 x perimeter expansion gap; last row from full_rows = floor(usable width / plank), rip the first and last row to (remainder + plank) / 2 if the remainder is under a third of a plank.",
     edition: "Published flooring waste rules of thumb and the standard last-row balancing rule.",
     freeAccess: "First-principles; flooring-maker layout guides free at maker pages.",
     governance: GOVERNANCE.general,

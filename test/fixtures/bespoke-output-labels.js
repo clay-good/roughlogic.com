@@ -383,7 +383,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "harmonic-resonance": {"h_resonant":"Resonant order","near_harmonic":"Near a common harmonic?","note":"Note"},
   "haul-cycle-production": {"cycle_min":"Cycle time","production_lcy_hr":"Production per truck","trucks_to_match":"Trucks to match the loader","fleet_production_lcy_hr":"Matched fleet production"},
   "haul-road-resistance": {"required_rimpull_lb":"Required rimpull","total_resistance_pct":"Total resistance"},
-  "haversine": {"miles":"Distance (miles)","kilometers":"Distance (km)","initial_bearing_deg":"Initial bearing"},
+  "haversine": {"miles":"Distance (miles)","kilometers":"Distance (km)","initial_bearing_deg":"Initial bearing","final_bearing_deg":"Final bearing (course on arrival)"},
   "hay-dry-matter": {"dry_matter_lb":"Dry matter","weight_at_target_lb":"Weight at target moisture","flag":"Storage flag","note":"Note"},
   "hazmat-placard-threshold": {"table2_aggregate_lb":"Table 2 aggregate gross weight","threshold_met":"Against the 1,001 lb threshold","class_count":"Table 2 classes aboard","verdict":"Placarding determination","note":"Note"},
   "hdd-pullback": {"pullback_lb":"Estimated pullback force","utilization":"Utilization vs safe pull"},

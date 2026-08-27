@@ -850,10 +850,25 @@ export function computeHaversineDistance({ lat1, lon1, lat2, lon2 }) {
   const x = Math.cos(phi1) * Math.sin(phi2) - Math.sin(phi1) * Math.cos(phi2) * Math.cos(dlam);
   let bearing = Math.atan2(y, x) * 180 / Math.PI;
   if (bearing < 0) bearing += 360;
+  // spec-v1399 follow-up: the FINAL bearing, which is the one a great-circle
+  // course actually arrives on. It is the reverse leg's initial bearing turned
+  // around, and on a long leg it differs from the initial bearing by a lot --
+  // a navigator who steers the initial bearing the whole way does not arrive.
+  // That divergence is the whole safety point and it is why a great-circle
+  // course is flown as a series of rhumb-line legs re-cut along the way.
+  const ry = Math.sin(-dlam) * Math.cos(phi1);
+  const rx = Math.cos(phi2) * Math.sin(phi1) - Math.sin(phi2) * Math.cos(phi1) * Math.cos(-dlam);
+  let reverse = Math.atan2(ry, rx) * 180 / Math.PI;
+  const final_bearing_deg = ((reverse + 180) % 360 + 360) % 360;
+  // Signed shortest angular difference, so it reads as "turn this much".
+  let drift = final_bearing_deg - bearing;
+  drift = ((drift + 180) % 360 + 360) % 360 - 180;
   return {
     miles: EARTH_RADIUS_MI * c,
     kilometers: EARTH_RADIUS_KM * c,
     initial_bearing_deg: bearing,
+    final_bearing_deg,
+    bearing_drift_deg: drift,
   };
 }
 
@@ -1090,7 +1105,7 @@ export function renderSlopeFromLevel(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderHaversineDistance(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Haversine formula. Earth radius 3958.8 mi / 6371.0088 km. Initial bearing from atan2.";
+  citationEl.textContent = "Citation: Haversine formula. Earth radius 3958.8 mi / 6371.0088 km. Initial bearing from atan2; final bearing is the reverse leg's initial bearing turned 180 degrees. A great-circle course changes heading continuously, so the initial bearing is a departure heading and not a course to steer the whole way.";
   const a1 = makeNumber("Lat 1", "ha-a1", { step: "any" });
   const o1 = makeNumber("Lon 1", "ha-o1", { step: "any" });
   const a2 = makeNumber("Lat 2", "ha-a2", { step: "any" });
@@ -1100,6 +1115,7 @@ export function renderHaversineDistance(inputRegion, outputRegion, citationEl) {
   const oM = makeOutputLine(outputRegion, "Distance (miles)", "ha-out-m");
   const oK = makeOutputLine(outputRegion, "Distance (km)", "ha-out-k");
   const oB = makeOutputLine(outputRegion, "Initial bearing", "ha-out-b");
+  const oF = makeOutputLine(outputRegion, "Final bearing (course on arrival)", "ha-out-f");
   const update = debounce(() => {
     const r = computeHaversineDistance({
       lat1: Number(a1.input.value) || 0, lon1: Number(o1.input.value) || 0,
@@ -1108,6 +1124,7 @@ export function renderHaversineDistance(inputRegion, outputRegion, citationEl) {
     oM.textContent = fmt(r.miles, 2);
     oK.textContent = fmt(r.kilometers, 2);
     oB.textContent = fmt(r.initial_bearing_deg, 2);
+    oF.textContent = fmt(r.final_bearing_deg, 2) + " (" + (r.bearing_drift_deg >= 0 ? "+" : "") + fmt(r.bearing_drift_deg, 2) + " from the initial bearing)";
   }, DEBOUNCE_MS);
   for (const el of [a1.input, o1.input, a2.input, o2.input]) el.addEventListener("input", update);
 }
