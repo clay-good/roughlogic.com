@@ -357,6 +357,12 @@ const TOOL_MODULES = (() => {
   // module, the v42/v70..v88 precedent); ids, citations, examples, dimensional
   // annotations, and behavior unchanged.
   declare("./calc-refrigerant.js", "REFRIGERANT_RENDERERS", [
+    // spec-v1413..v1419: the 2026-08-26 trade-expansion Group C band.
+    "txv-capacity-check",
+    "defrost-cycle-sizing",
+    "refrigerant-leak-rate",
+    "refrigerant-recovery-time",
+    "head-pressure-control",
     // v2
     "refrigerant-pt", "superheat-subcool", "compare-refrigerants", "refrigerant-charge", "refrigerant-lineset-charge-adjust",
     // v7
@@ -590,7 +596,10 @@ const TOOL_MODULES = (() => {
   // spec-v102 new HVAC field-service bench; relieves the standing
   // calc-hvac.js cap watch. Both tiles keep group "C".
   declare("./calc-hvacservice.js", "HVACSERVICE_RENDERERS", [
-    "condensate-drain", "condensate-overflow-pan", "condensate-trap-depth", "recovery-cylinder", "outside-air-percent-temps",
+    "condensate-drain", "condensate-overflow-pan", "condensate-trap-depth", "recovery-cylinder",
+    // spec-v1413..v1419: the 2026-08-26 trade-expansion Group C band.
+    "damper-authority",
+    "chilled-water-delta-t", "outside-air-percent-temps",
     // spec-v104 electrical-side field-service diagnostics (same module).
     "hvac-equipment-circuit", "run-capacitor-microfarad",
     // spec-v105 evacuation/leak-check field diagnostics (same module).

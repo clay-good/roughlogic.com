@@ -40578,3 +40578,233 @@ test("bounds: spec-v1411 computeCurtainWallMullionDeflection pins the cube law a
   assert.ok("error" in _v1411({ ...base, allowable_stress_psi: -1 }));
   assert.ok("error" in _v1411({ ...base, span_in: Infinity }));
 });
+
+// ===========================================================================
+// spec-v1413..v1419: the 2026-08-26 trade-expansion Group C band.
+// ===========================================================================
+
+import { computeTxvCapacityCheck as _v1413 } from "../../calc-refrigerant.js";
+test("bounds: spec-v1413 computeTxvCapacityCheck pins the square-root correction", () => {
+  // 3 tons rated 100 psi / 100 F, installed at 120 psi with 90 F liquid: 3.52 tons, 117%.
+  const base = { nominal_tons: 3.0, rated_dp_psi: 100, actual_dp_psi: 120, liquid_temp_factor: 1.07, evaporator_load_tons: 3.0 };
+  const r = _v1413(base);
+  assert.ok(Math.abs(r.pressure_factor - 1.0954) < 1e-4);
+  assert.ok(Math.abs(r.installed_capacity_tons - 3.516) < 1e-3);
+  assert.ok(Math.abs(r.sizing_ratio_pct - 117.2) < 1e-1);
+  assert.ok(r.verdict.startsWith("inside"));
+  // At the rating point the factor is exactly 1 and only the liquid factor applies.
+  const atRating = _v1413({ ...base, actual_dp_psi: 100 });
+  assert.ok(Math.abs(atRating.pressure_factor - 1) < 1e-12);
+  assert.ok(Math.abs(atRating.installed_capacity_tons - base.nominal_tons * base.liquid_temp_factor) < 1e-12);
+  // Low ambient collapses the drop: sqrt(0.5) = 0.707, and the valve starves at 76%.
+  const lowAmbient = _v1413({ ...base, actual_dp_psi: 50 });
+  assert.ok(Math.abs(lowAmbient.pressure_factor - Math.SQRT1_2) < 1e-9);
+  assert.ok(Math.abs(lowAmbient.sizing_ratio_pct - 75.7) < 1e-1);
+  assert.ok(lowAmbient.verdict.startsWith("UNDERSIZED"));
+  // FOUR times the drop is exactly TWICE the capacity -- the square root, both ways.
+  const quadruple = _v1413({ ...base, actual_dp_psi: 400 });
+  assert.ok(Math.abs(quadruple.installed_capacity_tons - 2 * atRating.installed_capacity_tons) < 1e-9);
+  assert.ok(quadruple.verdict.startsWith("OVERSIZED"));
+  assert.ok("error" in _v1413({ ...base, nominal_tons: 0 }));
+  assert.ok("error" in _v1413({ ...base, rated_dp_psi: 0 }));
+  assert.ok("error" in _v1413({ ...base, actual_dp_psi: 0 }));
+  assert.ok("error" in _v1413({ ...base, liquid_temp_factor: 0 }));
+  assert.ok("error" in _v1413({ ...base, evaporator_load_tons: 0 }));
+  assert.ok("error" in _v1413({ ...base, actual_dp_psi: Infinity }));
+});
+
+import { computeDefrostCycleSizing as _v1414 } from "../../calc-refrigerant.js";
+test("bounds: spec-v1414 computeDefrostCycleSizing pins the three terms and the frost sensitivity", () => {
+  // -10 F coil, 20 lb frost, 60 lb coil warmed 60 F, 3 kW at 80%: 4,575 BTU, 26.8 min.
+  const base = { frost_lb: 20, coil_temp_f: -10, coil_mass_lb: 60, coil_specific_heat: 0.10, coil_temp_rise_f: 60, heater_btuh: 10236, defrost_efficiency: 0.80 };
+  const r = _v1414(base);
+  assert.ok(Math.abs(r.sensible_btu - 420) < 1e-9);
+  assert.ok(Math.abs(r.latent_btu - 2880) < 1e-9);
+  assert.ok(Math.abs(r.coil_warmup_btu - 360) < 1e-9);
+  assert.ok(Math.abs(r.total_btu - 4575) < 1e-6);
+  assert.ok(Math.abs(r.defrost_min - 26.82) < 1e-2);
+  // Latent dominates: nearly four fifths of the useful heat is melting, not warming.
+  assert.ok(r.latent_btu > r.sensible_btu + r.coil_warmup_btu);
+  assert.ok(Math.abs(r.latent_share_pct - 78.7) < 1e-1);
+  // A fixed termination time is right for exactly ONE frost load.
+  const light = _v1414({ ...base, frost_lb: 10 });
+  const heavy = _v1414({ ...base, frost_lb: 40 });
+  assert.ok(Math.abs(light.defrost_min - 14.7) < 1e-1);
+  assert.ok(Math.abs(heavy.defrost_min - 51.0) < 1e-1);
+  // Perfect efficiency puts no extra heat in the box beyond the coil warm-up.
+  const ideal = _v1414({ ...base, defrost_efficiency: 1 });
+  assert.ok(Math.abs(ideal.box_gain_btu - ideal.coil_warmup_btu) < 1e-9);
+  assert.ok(ideal.total_btu < r.total_btu);
+  // A coil already at freezing has no ice to warm, only to melt.
+  const atFreezing = _v1414({ ...base, coil_temp_f: 31.9 });
+  assert.ok(atFreezing.sensible_btu < 1.1);
+  assert.ok("error" in _v1414({ ...base, frost_lb: 0 }));
+  assert.ok("error" in _v1414({ ...base, coil_temp_f: 40 }));
+  assert.ok("error" in _v1414({ ...base, coil_specific_heat: 0 }));
+  assert.ok("error" in _v1414({ ...base, heater_btuh: 0 }));
+  assert.ok("error" in _v1414({ ...base, defrost_efficiency: 1.5 }));
+  assert.ok("error" in _v1414({ ...base, frost_lb: Infinity }));
+});
+
+import { computeDamperAuthority as _v1415 } from "../../calc-hvacservice.js";
+test("bounds: spec-v1415 computeDamperAuthority pins authority and square-root leakage", () => {
+  // 0.15 of 0.60 is 0.25 authority; 4 x 4 = 16 cfm at 1 in, 11.3 at half an inch.
+  const base = { damper_dp_inwg: 0.15, branch_dp_inwg: 0.60, face_area_sqft: 4, leakage_class_cfm_sqft: 4, closed_dp_inwg: 0.5, design_cfm: 2000 };
+  const r = _v1415(base);
+  assert.ok(Math.abs(r.authority - 0.25) < 1e-12);
+  assert.strictEqual(r.in_band, false);
+  assert.ok(r.verdict.includes("BELOW"));
+  assert.ok(Math.abs(r.leakage_1in_cfm - 16) < 1e-9);
+  assert.ok(Math.abs(r.leakage_actual_cfm - 11.314) < 1e-3);
+  assert.ok(Math.abs(r.leakage_pct - 0.566) < 1e-3);
+  // Leakage scales as the SQUARE ROOT: four times the pressure is twice the leakage.
+  const quad = _v1415({ ...base, closed_dp_inwg: 2.0 });
+  assert.ok(Math.abs(quad.leakage_actual_cfm - 2 * r.leakage_actual_cfm) < 1e-9);
+  // At exactly 1 in w.g. the two leakage figures agree, which is what the class means.
+  const atOne = _v1415({ ...base, closed_dp_inwg: 1.0 });
+  assert.ok(Math.abs(atOne.leakage_actual_cfm - atOne.leakage_1in_cfm) < 1e-12);
+  // The reported drop for the target band lands inside it.
+  const fixed = _v1415({ ...base, damper_dp_inwg: r.dp_for_target });
+  assert.strictEqual(fixed.in_band, true);
+  assert.ok(Math.abs(fixed.authority - 0.4) < 1e-9);
+  // Too much authority is its own fault: fan energy spent on control it does not need.
+  const stiff = _v1415({ ...base, damper_dp_inwg: 0.45 });
+  assert.ok(stiff.verdict.includes("ABOVE"));
+  assert.ok("error" in _v1415({ ...base, damper_dp_inwg: 0 }));
+  assert.ok("error" in _v1415({ ...base, damper_dp_inwg: 0.9 }));
+  assert.ok("error" in _v1415({ ...base, face_area_sqft: 0 }));
+  assert.ok("error" in _v1415({ ...base, closed_dp_inwg: 0 }));
+  assert.ok("error" in _v1415({ ...base, design_cfm: 0 }));
+  assert.ok("error" in _v1415({ ...base, branch_dp_inwg: Infinity }));
+});
+
+import { computeChilledWaterDeltaT as _v1416 } from "../../calc-hvacservice.js";
+test("bounds: spec-v1416 computeChilledWaterDeltaT pins the cube-law pump penalty", () => {
+  // 240 tons at 600 gpm against a 12 F design: 9.6 F actual, 480 design flow, 1.95x power.
+  const base = { load_btuh: 2880000, actual_gpm: 600, design_delta_t_f: 12 };
+  const r = _v1416(base);
+  assert.ok(Math.abs(r.actual_delta_t_f - 9.6) < 1e-9);
+  assert.ok(Math.abs(r.design_flow_gpm - 480) < 1e-9);
+  assert.ok(Math.abs(r.excess_flow_gpm - 120) < 1e-9);
+  assert.ok(Math.abs(r.excess_pct - 25) < 1e-9);
+  assert.ok(Math.abs(r.pump_penalty - 1.9531) < 1e-4);
+  assert.ok(Math.abs(r.tons - 240) < 1e-9);
+  assert.ok(r.verdict.startsWith("LOW delta-T"));
+  // The penalty is exactly the cube of the flow ratio.
+  assert.ok(Math.abs(r.pump_penalty - (base.actual_gpm / r.design_flow_gpm) ** 3) < 1e-12);
+  // At design flow the delta-T IS the design delta-T and the penalty is exactly 1.
+  const atDesign = _v1416({ ...base, actual_gpm: 480 });
+  assert.ok(Math.abs(atDesign.actual_delta_t_f - base.design_delta_t_f) < 1e-9);
+  assert.ok(Math.abs(atDesign.pump_penalty - 1) < 1e-12);
+  assert.ok(Math.abs(atDesign.excess_flow_gpm) < 1e-12);
+  // Below design flow the delta-T runs HIGH, which is the other side of the reading.
+  const tight = _v1416({ ...base, actual_gpm: 400 });
+  assert.ok(tight.actual_delta_t_f > base.design_delta_t_f);
+  assert.ok(tight.pump_penalty < 1);
+  assert.ok(tight.verdict.includes("ABOVE the design delta-T"));
+  // Load and flow scale together with no change to delta-T.
+  const doubled = _v1416({ load_btuh: 5760000, actual_gpm: 1200, design_delta_t_f: 12 });
+  assert.ok(Math.abs(doubled.actual_delta_t_f - r.actual_delta_t_f) < 1e-9);
+  assert.ok("error" in _v1416({ ...base, load_btuh: 0 }));
+  assert.ok("error" in _v1416({ ...base, actual_gpm: 0 }));
+  assert.ok("error" in _v1416({ ...base, design_delta_t_f: 0 }));
+  assert.ok("error" in _v1416({ ...base, actual_gpm: Infinity }));
+});
+
+import { computeRefrigerantLeakRate as _v1417 } from "../../calc-refrigerant.js";
+test("bounds: spec-v1417 computeRefrigerantLeakRate pins the annualization", () => {
+  // 34 lb into a 200 lb charge over twelve months is 17.0%, 14 lb over a 10% allowance.
+  const base = { full_charge_lb: 200, pounds_added_lb: 34, period_months: 12, threshold_pct: 10 };
+  const r = _v1417(base);
+  assert.ok(Math.abs(r.leak_rate_pct - 17.0) < 1e-9);
+  assert.ok(Math.abs(r.allowed_lb - 20) < 1e-9);
+  assert.ok(Math.abs(r.pounds_over_lb - 14) < 1e-9);
+  assert.strictEqual(r.exceeded, true);
+  // The SAME pounds is unremarkable against a higher threshold -- the category matters.
+  const higher = _v1417({ ...base, threshold_pct: 20 });
+  assert.strictEqual(higher.exceeded, false);
+  assert.ok(Math.abs(higher.allowed_lb - 40) < 1e-9);
+  // Halving the window DOUBLES the annualized rate, with nothing about the leak changed.
+  const sixMonths = _v1417({ ...base, period_months: 6, threshold_pct: 20 });
+  assert.ok(Math.abs(sixMonths.leak_rate_pct - 34.0) < 1e-9);
+  assert.strictEqual(sixMonths.exceeded, true);
+  // The allowance scales with the window too, so the pounds-over reading stays consistent.
+  assert.ok(Math.abs(sixMonths.allowed_lb - 20) < 1e-9);
+  // Exactly at the threshold is not exceeded.
+  const exact = _v1417({ ...base, pounds_added_lb: 20 });
+  assert.ok(Math.abs(exact.leak_rate_pct - 10) < 1e-9);
+  assert.strictEqual(exact.exceeded, false);
+  // Adding nothing is a zero rate, not an error.
+  assert.ok(Math.abs(_v1417({ ...base, pounds_added_lb: 0 }).leak_rate_pct) < 1e-12);
+  assert.ok("error" in _v1417({ ...base, full_charge_lb: 0 }));
+  assert.ok("error" in _v1417({ ...base, pounds_added_lb: -1 }));
+  assert.ok("error" in _v1417({ ...base, period_months: 0 }));
+  assert.ok("error" in _v1417({ ...base, period_months: 18 }));
+  assert.ok("error" in _v1417({ ...base, threshold_pct: 0 }));
+  assert.ok("error" in _v1417({ ...base, full_charge_lb: Infinity }));
+});
+
+import { computeRefrigerantRecoveryTime as _v1418 } from "../../calc-refrigerant.js";
+test("bounds: spec-v1418 computeRefrigerantRecoveryTime pins the phase split and the speed-up", () => {
+  // 45 lb, 30 as liquid at 8 lb/min and 15 as vapor at 3: 8.75 min against 15 all-vapor.
+  const base = { total_charge_lb: 45, liquid_charge_lb: 30, liquid_rate_lb_min: 8, vapor_rate_lb_min: 3, evacuation_min: 10, cylinder_net_lb: 40.4 };
+  const r = _v1418(base);
+  assert.ok(Math.abs(r.liquid_min - 3.75) < 1e-9);
+  assert.ok(Math.abs(r.vapor_min - 5.0) < 1e-9);
+  assert.ok(Math.abs(r.recovery_min - 8.75) < 1e-9);
+  assert.ok(Math.abs(r.total_min - 18.75) < 1e-9);
+  assert.ok(Math.abs(r.all_vapor_min - 15.0) < 1e-9);
+  assert.ok(Math.abs(r.speedup_factor - 1.714) < 1e-3);
+  assert.strictEqual(r.cylinders, 2);
+  // The gap WIDENS with charge size: a 200 lb charge is a 2.1x speed-up, 35 min saved.
+  const big = _v1418({ ...base, total_charge_lb: 200, liquid_charge_lb: 170, evacuation_min: 0 });
+  assert.ok(Math.abs(big.recovery_min - 31.25) < 1e-9);
+  assert.ok(Math.abs(big.all_vapor_min - 66.667) < 1e-3);
+  assert.ok(Math.abs(big.speedup_factor - 2.133) < 1e-3);
+  assert.ok(Math.abs(big.minutes_saved - 35.42) < 1e-2);
+  assert.ok(big.speedup_factor > r.speedup_factor);
+  // Recovering nothing as liquid IS the all-vapor case: no speed-up at all.
+  const allVapor = _v1418({ ...base, liquid_charge_lb: 0 });
+  assert.ok(Math.abs(allVapor.recovery_min - allVapor.all_vapor_min) < 1e-9);
+  assert.ok(Math.abs(allVapor.speedup_factor - 1) < 1e-12);
+  assert.ok(Math.abs(allVapor.liquid_min) < 1e-12);
+  // Without a cylinder capacity the container output is null, not zero.
+  assert.strictEqual(_v1418({ ...base, cylinder_net_lb: 0 }).cylinders, null);
+  assert.ok("error" in _v1418({ ...base, total_charge_lb: 0 }));
+  assert.ok("error" in _v1418({ ...base, liquid_charge_lb: 60 }));
+  assert.ok("error" in _v1418({ ...base, liquid_rate_lb_min: 0 }));
+  assert.ok("error" in _v1418({ ...base, vapor_rate_lb_min: 0 }));
+  assert.ok("error" in _v1418({ ...base, evacuation_min: -1 }));
+  assert.ok("error" in _v1418({ ...base, total_charge_lb: Infinity }));
+});
+
+import { computeHeadPressureControl as _v1419 } from "../../calc-refrigerant.js";
+test("bounds: spec-v1419 computeHeadPressureControl pins the minimum head and the winter charge", () => {
+  // 20 + 100 + 15 = 135 psig; 0.35 cu ft x 0.80 x 70 pcf = 19.6 lb of flooding charge.
+  const base = { refrigerant: "R_410A", evaporator_psig: 20, valve_dp_psi: 100, line_losses_psi: 15, condenser_volume_cf: 0.35, flooded_fraction: 0.80, liquid_density_pcf: 70, receiver_capacity_lb: 25, summer_charge_lb: 40 };
+  const r = _v1419(base);
+  assert.ok(Math.abs(r.min_head_psig - 135) < 1e-9);
+  assert.ok(Math.abs(r.flooding_charge_lb - 19.6) < 1e-9);
+  assert.ok(Math.abs(r.winter_charge_lb - 59.6) < 1e-9);
+  assert.strictEqual(r.receiver_ok, true);
+  // The saturated condensing temperature comes off the module's own P-T table.
+  assert.ok(r.min_condensing_f !== null && r.min_condensing_f > 0 && r.min_condensing_f < 100);
+  // The minimum head is a straight sum: every term moves it one for one.
+  const colder = _v1419({ ...base, evaporator_psig: 10 });
+  assert.ok(Math.abs(colder.min_head_psig - (r.min_head_psig - 10)) < 1e-9);
+  const looser = _v1419({ ...base, line_losses_psi: 30 });
+  assert.ok(Math.abs(looser.min_head_psig - (r.min_head_psig + 15)) < 1e-9);
+  // A receiver too small to hold the flooding charge is called out.
+  const small = _v1419({ ...base, receiver_capacity_lb: 15 });
+  assert.strictEqual(small.receiver_ok, false);
+  assert.ok(small.receiver_verdict.includes("SHORT"));
+  // Full flooding is the whole condenser volume of liquid.
+  const full = _v1419({ ...base, flooded_fraction: 1.0 });
+  assert.ok(Math.abs(full.flooding_charge_lb - base.condenser_volume_cf * base.liquid_density_pcf) < 1e-9);
+  assert.ok("error" in _v1419({ ...base, evaporator_psig: -1 }));
+  assert.ok("error" in _v1419({ ...base, valve_dp_psi: 0 }));
+  assert.ok("error" in _v1419({ ...base, condenser_volume_cf: 0 }));
+  assert.ok("error" in _v1419({ ...base, flooded_fraction: 1.5 }));
+  assert.ok("error" in _v1419({ ...base, liquid_density_pcf: 0 }));
+  assert.ok("error" in _v1419({ ...base, valve_dp_psi: Infinity }));
+});

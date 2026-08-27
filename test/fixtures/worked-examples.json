@@ -91994,6 +91994,305 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "txv-capacity-check",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "3-ton TXV rated 100 psi / 100 F liquid, installed at 120 psi with 90 F liquid, 3-ton coil",
+   "source_edition_or_year": "orifice capacity correction",
+   "source_section_or_page": "sqrt(actual dP / rated dP)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "nominal_tons": 3,
+    "rated_dp_psi": 100,
+    "actual_dp_psi": 120,
+    "liquid_temp_factor": 1.07,
+    "evaporator_load_tons": 3
+   },
+   "outputs": {
+    "pressure_factor": {
+     "value": 1.09545,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "installed_capacity_tons": {
+     "value": 3.51638,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sizing_ratio_pct": {
+     "value": 117.213,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "defrost-cycle-sizing",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "freezer coil at -10 F, 20 lb frost, 60 lb coil warmed 60 F, 3 kW heater at 80%",
+   "source_edition_or_year": "defrost heat balance",
+   "source_section_or_page": "144 BTU/lb latent, 0.5 BTU/lb-F sensible",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "frost_lb": 20,
+    "coil_temp_f": -10,
+    "coil_mass_lb": 60,
+    "coil_specific_heat": 0.1,
+    "coil_temp_rise_f": 60,
+    "heater_btuh": 10236,
+    "defrost_efficiency": 0.8
+   },
+   "outputs": {
+    "sensible_btu": {
+     "value": 420,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "latent_btu": {
+     "value": 2880,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "coil_warmup_btu": {
+     "value": 360,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_btu": {
+     "value": 4575,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "defrost_min": {
+     "value": 26.8171,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "damper-authority",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "0.15 in w.g. damper in a 0.60 in w.g. branch, 4 sq ft, 4 cfm/sq ft class, closed against 0.5 in w.g.",
+   "source_edition_or_year": "damper authority",
+   "source_section_or_page": "damper dP / branch dP; leakage as sqrt(dP)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "damper_dp_inwg": 0.15,
+    "branch_dp_inwg": 0.6,
+    "face_area_sqft": 4,
+    "leakage_class_cfm_sqft": 4,
+    "closed_dp_inwg": 0.5,
+    "design_cfm": 2000
+   },
+   "outputs": {
+    "authority": {
+     "value": 0.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "leakage_1in_cfm": {
+     "value": 16,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "leakage_actual_cfm": {
+     "value": 11.3137,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "leakage_pct": {
+     "value": 0.565685,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "chilled-water-delta-t",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "240 tons at a measured 600 gpm against a 12 degree design delta-T",
+   "source_edition_or_year": "hydronic sensible relation",
+   "source_section_or_page": "Q = 500 x gpm x delta-T; cube law on flow",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "load_btuh": 2880000,
+    "actual_gpm": 600,
+    "design_delta_t_f": 12
+   },
+   "outputs": {
+    "actual_delta_t_f": {
+     "value": 9.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "design_flow_gpm": {
+     "value": 480,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "excess_flow_gpm": {
+     "value": 120,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pump_penalty": {
+     "value": 1.95313,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "refrigerant-leak-rate",
+   "source_publisher": "EPA",
+   "source_title": "200 lb full charge with 34 lb added over twelve months, 10% threshold",
+   "source_edition_or_year": "40 CFR Part 82 Subpart F",
+   "source_section_or_page": "annualized leak rate",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "full_charge_lb": 200,
+    "pounds_added_lb": 34,
+    "period_months": 12,
+    "threshold_pct": 10
+   },
+   "outputs": {
+    "leak_rate_pct": {
+     "value": 17,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "allowed_lb": {
+     "value": 20,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pounds_over_lb": {
+     "value": 14,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "refrigerant-recovery-time",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "45 lb charge, 30 lb liquid at 8 lb/min and 15 lb vapor at 3 lb/min",
+   "source_edition_or_year": "recovery machine rates",
+   "source_section_or_page": "charge divided by phase rate",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "total_charge_lb": 45,
+    "liquid_charge_lb": 30,
+    "liquid_rate_lb_min": 8,
+    "vapor_rate_lb_min": 3,
+    "evacuation_min": 10,
+    "cylinder_net_lb": 40.4
+   },
+   "outputs": {
+    "liquid_min": {
+     "value": 3.75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vapor_min": {
+     "value": 5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "recovery_min": {
+     "value": 8.75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "all_vapor_min": {
+     "value": 15,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "speedup_factor": {
+     "value": 1.71429,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "head-pressure-control",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "20 psig evaporator, 100 psi valve drop, 15 psi line losses; 0.35 cu ft condenser 80% flooded at 70 pcf",
+   "source_edition_or_year": "low-ambient control",
+   "source_section_or_page": "minimum head built from the bottom",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "refrigerant": "R_410A",
+    "evaporator_psig": 20,
+    "valve_dp_psi": 100,
+    "line_losses_psi": 15,
+    "condenser_volume_cf": 0.35,
+    "flooded_fraction": 0.8,
+    "liquid_density_pcf": 70,
+    "receiver_capacity_lb": 25,
+    "summer_charge_lb": 40
+   },
+   "outputs": {
+    "min_head_psig": {
+     "value": 135,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "min_condensing_f": {
+     "value": 46.88,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "flooding_charge_lb": {
+     "value": 19.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "winter_charge_lb": {
+     "value": 59.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

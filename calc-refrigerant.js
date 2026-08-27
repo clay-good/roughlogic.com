@@ -1138,3 +1138,348 @@ function _v978renderCompressorVolumetricEfficiency(inputRegion, outputRegion, ci
   for (const f of [cl, sp, dp, nn]) f.input.addEventListener("input", update);
 }
 REFRIGERANT_RENDERERS["compressor-volumetric-efficiency"] = _v978renderCompressorVolumetricEfficiency;
+
+// ===========================================================================
+// spec-v1413, v1414, v1417, v1418, v1419: the refrigeration-service half of
+// the 2026-08-26 trade-expansion Group C band. See scope-trade-expansion.md.
+// (The two air- and water-side control tiles live in calc-hvacservice.js.)
+// ===========================================================================
+
+// Compact renderer factory, copied from the sibling calc-hvacservice.js
+// factory (number and select inputs; same schema shape). Non-exported, so it
+// adds no v14 derivation-corpus row.
+function _simpleRenderer(spec) {
+  const _rlRender = function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      let field;
+      if (f.kind === "select") field = makeSelect(f.label, f.id || f.key, f.options);
+      else field = makeNumber(f.label, f.id || f.key, f.attrs || { step: "any", min: "0" });
+      fields[f.key] = field;
+      if (f.default !== undefined) {
+        if (f.kind === "select") field.select.value = f.default;
+        else field.input.value = String(f.default);
+      }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key];
+        else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) {
+        if (f.kind === "select") params[f.key] = fields[f.key].select.value;
+        else params[f.key] = Number(fields[f.key].input.value) || 0;
+      }
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) {
+      const el = f.kind === "select" ? fields[f.key].select : fields[f.key].input;
+      el.addEventListener(f.kind === "select" ? "change" : "input", update);
+    }
+  };
+
+  _rlRender.schema = {
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
+    citation: spec.citation ?? null,
+    scope: spec.scope ?? null,
+  };
+  return _rlRender;
+}
+
+// ===================== spec-v1413: TXV capacity correction and sizing =====================
+// dims: in { args: dimensionless } out: { pressure_factor: dimensionless, installed_capacity_tons: dimensionless, sizing_ratio_pct: dimensionless }
+export function computeTxvCapacityCheck({ nominal_tons = 0, rated_dp_psi = 100, actual_dp_psi = 0, liquid_temp_factor = 1.0, evaporator_load_tons = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(nominal_tons > 0)) return { error: "Nominal valve tonnage must be positive." };
+  if (!(rated_dp_psi > 0)) return { error: "Rated pressure drop must be positive." };
+  if (!(actual_dp_psi > 0)) return { error: "Actual pressure drop across the valve must be positive." };
+  if (!(liquid_temp_factor > 0)) return { error: "Liquid-temperature correction factor must be positive." };
+  if (!(evaporator_load_tons > 0)) return { error: "Evaporator design load must be positive." };
+  // A TXV is an ORIFICE: flow follows the square root of the NET pressure difference across
+  // it -- condensing less evaporating less distributor and line losses, not head pressure.
+  const pressure_factor = Math.sqrt(actual_dp_psi / rated_dp_psi);
+  const installed_capacity_tons = nominal_tons * liquid_temp_factor * pressure_factor;
+  const sizing_ratio_pct = installed_capacity_tons / evaporator_load_tons * 100;
+  const verdict = sizing_ratio_pct < 100
+    ? "UNDERSIZED at " + fmt(sizing_ratio_pct, 0) + "% of load: the valve starves the coil at design conditions -- high superheat, lost capacity, and a compressor that never satisfies"
+    : sizing_ratio_pct <= 130
+      ? "inside the 100-130% window"
+      : "OVERSIZED at " + fmt(sizing_ratio_pct, 0) + "% of load: the valve hunts -- it overfeeds, floods back, closes, starves, and cycles, and the symptom looks like a bad bulb rather than a sizing error";
+  if (![pressure_factor, installed_capacity_tons, sizing_ratio_pct].every(Number.isFinite)) return { error: "TXV capacity math is not a finite value." };
+  return {
+    pressure_factor,
+    installed_capacity_tons,
+    sizing_ratio_pct,
+    verdict,
+    note: "What a thermostatic expansion valve actually delivers where it is installed, against the load it has to feed. A TXV is an orifice, so its flow follows the square root of the pressure difference across it -- and that is the NET difference, condensing pressure less evaporating pressure less the distributor and line losses, not the system's head pressure. A valve rated at 100 psi of drop passes about 10% more at 120 psi and 30% less at 50 psi. The liquid-temperature factor is the second correction and it runs the other way from intuition: colder, more subcooled liquid entering the valve carries more refrigerating effect per pound, so the valve delivers MORE tons for the same mass flow, gaining capacity below its rating temperature and losing it above. The sizing window is what the corrections are for. A valve under 100% of load starves the coil at design conditions, with high superheat, lost capacity, and a compressor that never satisfies. A valve much over 130% hunts: it overfeeds, floods back, closes, starves, and cycles, and the symptom looks like a bad bulb rather than a sizing error. A 3-ton valve rated at 100 psi and 100 F liquid, installed at 120 psi of drop with 90 F liquid, delivers 3.52 tons and sits at 117% of a 3-ton coil -- comfortable. Put the same valve on a low-ambient day when the drop collapses to 50 psi and it delivers 2.27 tons, 76% of load, and starves the coil. That is precisely why head-pressure control exists on systems that run in winter, and it is a valve problem before it is a compressor problem. A selection check; the valve manufacturer's published capacity tables at the actual conditions govern.",
+  };
+}
+
+export const txvCapacityCheckExample = { inputs: { nominal_tons: 3.0, rated_dp_psi: 100, actual_dp_psi: 120, liquid_temp_factor: 1.07, evaporator_load_tons: 3.0 } };
+
+REFRIGERANT_RENDERERS["txv-capacity-check"] = _simpleRenderer({
+  citation: "Citation: thermostatic expansion valve capacity correction from the orifice relation -- capacity scales as the square root of the NET pressure drop across the valve -- with the manufacturer's liquid-temperature correction factor applied, by name. The 100-130% of load sizing window is standard refrigeration-service practice. The valve manufacturer's published capacity tables at the actual conditions govern.",
+  example: txvCapacityCheckExample.inputs,
+  fields: [
+    { key: "nominal_tons", label: "Nominal valve capacity (tons)", kind: "number" },
+    { key: "rated_dp_psi", label: "Rated pressure drop (psi)", kind: "number" },
+    { key: "actual_dp_psi", label: "Actual net pressure drop across the valve (psi)", kind: "number" },
+    { key: "liquid_temp_factor", label: "Liquid-temperature correction factor", kind: "number" },
+    { key: "evaporator_load_tons", label: "Evaporator design load (tons)", kind: "number" },
+  ],
+  outputs: [
+    { key: "f", id: "txvc-out-f", label: "Pressure-drop factor", value: (r) => fmt(r.pressure_factor, 3) },
+    { key: "c", id: "txvc-out-c", label: "Installed capacity", value: (r) => fmt(r.installed_capacity_tons, 2) + " tons" },
+    { key: "s", id: "txvc-out-s", label: "Sizing ratio", value: (r) => fmt(r.sizing_ratio_pct, 1) + " % of load" },
+    { key: "v", id: "txvc-out-v", label: "Against the window", value: (r) => r.verdict },
+    { key: "n", id: "txvc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTxvCapacityCheck,
+});
+
+// ===================== spec-v1414: evaporator defrost heat and cycle time =====================
+// dims: in { args: dimensionless } out: { sensible_btu: dimensionless, latent_btu: dimensionless, total_btu: dimensionless, defrost_min: T }
+export function computeDefrostCycleSizing({ frost_lb = 0, coil_temp_f = -10, coil_mass_lb = 0, coil_specific_heat = 0.10, coil_temp_rise_f = 0, heater_btuh = 0, defrost_efficiency = 0.8 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(frost_lb > 0)) return { error: "Frost mass per cycle must be positive." };
+  if (!(coil_temp_f < 32)) return { error: "The coil must start below 32 F, or there is no frost to melt." };
+  if (!(coil_mass_lb >= 0)) return { error: "Coil mass cannot be negative." };
+  if (!(coil_specific_heat > 0)) return { error: "Coil specific heat must be positive." };
+  if (!(coil_temp_rise_f >= 0)) return { error: "Coil temperature rise cannot be negative." };
+  if (!(heater_btuh > 0)) return { error: "Defrost heater rating must be positive." };
+  if (!(defrost_efficiency > 0 && defrost_efficiency <= 1)) return { error: "Defrost efficiency must be between 0 and 1." };
+  // Three terms and they are NOT the same size: latent dominates at 144 BTU/lb, and the
+  // coil warm-up term is the one that gets forgotten.
+  const sensible_btu = frost_lb * 0.5 * (32 - coil_temp_f);
+  const latent_btu = frost_lb * 144;
+  const coil_warmup_btu = coil_mass_lb * coil_specific_heat * coil_temp_rise_f;
+  const useful_btu = sensible_btu + latent_btu + coil_warmup_btu;
+  const total_btu = useful_btu / defrost_efficiency;
+  const defrost_hr = total_btu / heater_btuh;
+  const defrost_min = defrost_hr * 60;
+  // Everything that is not melting frost is heat going into the box.
+  const box_gain_btu = total_btu - useful_btu + coil_warmup_btu;
+  const latent_share_pct = latent_btu / useful_btu * 100;
+  if (![sensible_btu, latent_btu, coil_warmup_btu, total_btu, defrost_min].every(Number.isFinite)) return { error: "Defrost math is not a finite value." };
+  return {
+    sensible_btu,
+    latent_btu,
+    coil_warmup_btu,
+    total_btu,
+    defrost_hr,
+    defrost_min,
+    box_gain_btu,
+    latent_share_pct,
+    note: "How much heat a defrost takes and how long it runs, from the three terms that make it up. They are not the same size: melting the ice costs 144 BTU per pound against about 21 to warm that same ice from a freezer coil's temperature up to 32 F, so the latent term dominates -- but the coil warm-up term is the one that gets forgotten, and on a large coil with heavy fin stock it is real. Defrost efficiency captures everything that is NOT melting frost: heat going into the box instead of the coil, into the drain pan, and out through the insulation, and on electric defrost it is commonly only 60% to 80%. The last relation closes the loop, because frost accumulates at the coil's moisture removal rate, which is set by the box's latent load -- door openings, product respiration, infiltration. That determines how much frost is on the coil when defrost initiates, which determines how long defrost takes, so a box with heavy traffic needs more defrosts and each one is longer, and every minute of defrost is a minute of heat going into a freezer. A freezer coil at -10 F with 20 lb of frost, 60 lb of coil warmed 60 F, a 3 kW heater and 80% efficiency needs 4,575 BTU and runs 26.8 minutes, which lines up with the 20 to 30 minute terminations most controllers are set to. But halve the frost by fixing a door gasket and it falls to 14.7 minutes; double it and it climbs to 51.0. A fixed termination time is right for exactly one frost load, which is the argument for demand defrost. A sizing estimate; the manufacturer's defrost data and a measured coil temperature at termination govern.",
+  };
+}
+
+export const defrostCycleSizingExample = { inputs: { frost_lb: 20, coil_temp_f: -10, coil_mass_lb: 60, coil_specific_heat: 0.10, coil_temp_rise_f: 60, heater_btuh: 10236, defrost_efficiency: 0.80 } };
+
+REFRIGERANT_RENDERERS["defrost-cycle-sizing"] = _simpleRenderer({
+  citation: "Citation: defrost heat from the sensible, latent, and coil warm-up terms -- 144 BTU/lb to melt ice, about 0.5 BTU/lb-F to warm it to 32 F -- divided by the defrost efficiency, by name; public thermodynamics with the efficiency entered rather than bundled. The equipment manufacturer's defrost data and a measured coil temperature at termination govern.",
+  example: defrostCycleSizingExample.inputs,
+  fields: [
+    { key: "frost_lb", label: "Frost mass per cycle (lb)", kind: "number" },
+    { key: "coil_temp_f", label: "Coil temperature at defrost start (F)", kind: "number", attrs: { step: "any" } },
+    { key: "coil_mass_lb", label: "Coil mass (lb)", kind: "number" },
+    { key: "coil_specific_heat", label: "Coil specific heat (BTU/lb-F)", kind: "number" },
+    { key: "coil_temp_rise_f", label: "Coil temperature rise during defrost (F)", kind: "number" },
+    { key: "heater_btuh", label: "Defrost heater rating (BTU/hr)", kind: "number" },
+    { key: "defrost_efficiency", label: "Defrost efficiency (0.6-0.8 electric)", kind: "number" },
+  ],
+  outputs: [
+    { key: "s", id: "dfrc-out-s", label: "Sensible heat to bring the ice to 32 F", value: (r) => fmt(r.sensible_btu, 0) + " BTU" },
+    { key: "l", id: "dfrc-out-l", label: "Latent heat to melt it", value: (r) => fmt(r.latent_btu, 0) + " BTU (" + fmt(r.latent_share_pct, 0) + "% of the useful heat)" },
+    { key: "c", id: "dfrc-out-c", label: "Coil warm-up", value: (r) => fmt(r.coil_warmup_btu, 0) + " BTU" },
+    { key: "t", id: "dfrc-out-t", label: "Total defrost heat", value: (r) => fmt(r.total_btu, 0) + " BTU" },
+    { key: "d", id: "dfrc-out-d", label: "Defrost time", value: (r) => fmt(r.defrost_min, 1) + " min" },
+    { key: "b", id: "dfrc-out-b", label: "Heat left in the box", value: (r) => fmt(r.box_gain_btu, 0) + " BTU per defrost" },
+    { key: "n", id: "dfrc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDefrostCycleSizing,
+});
+
+// ===================== spec-v1417: refrigerant leak rate and the repair threshold =====================
+// dims: in { args: dimensionless } out: { leak_rate_pct: dimensionless, allowed_lb: M, pounds_over_lb: M }
+export function computeRefrigerantLeakRate({ full_charge_lb = 0, pounds_added_lb = 0, period_months = 12, threshold_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(full_charge_lb > 0)) return { error: "Full charge must be positive -- a system whose full charge has never been recorded cannot compute a compliant leak rate at all." };
+  if (!(pounds_added_lb >= 0)) return { error: "Pounds added cannot be negative." };
+  if (!(period_months > 0 && period_months <= 12)) return { error: "The period must be above 0 and at most 12 months." };
+  if (!(threshold_pct > 0 && threshold_pct <= 100)) return { error: "The threshold percentage must be above 0 and at most 100." };
+  // The calculation ANNUALIZES: the same pounds over a shorter window is a higher rate.
+  const leak_rate_pct = pounds_added_lb / full_charge_lb * (12 / period_months) * 100;
+  const allowed_lb = threshold_pct / 100 * full_charge_lb * (period_months / 12);
+  const pounds_over_lb = pounds_added_lb - allowed_lb;
+  const exceeded = leak_rate_pct > threshold_pct;
+  const verdict = exceeded
+    ? "EXCEEDED: " + fmt(leak_rate_pct, 1) + "% against a " + fmt(threshold_pct, 1) + "% threshold, " + fmt(pounds_over_lb, 1) + " lb over the allowance -- this starts the repair clock, the verification tests, and, if the leak cannot be repaired, a retrofit or retirement plan"
+    : "not exceeded: " + fmt(leak_rate_pct, 1) + "% against a " + fmt(threshold_pct, 1) + "% threshold, with " + fmt(-pounds_over_lb, 1) + " lb of allowance left in this period";
+  if (![leak_rate_pct, allowed_lb, pounds_over_lb].every(Number.isFinite)) return { error: "Leak-rate math is not a finite value." };
+  return {
+    leak_rate_pct,
+    allowed_lb,
+    pounds_over_lb,
+    exceeded,
+    verdict,
+    note: "The annualized refrigerant leak rate that decides whether a repair clock has started. The rule is simple arithmetic with real teeth: for an appliance containing 50 pounds or more of refrigerant, the owner or operator tracks refrigerant added, annualizes it against the FULL CHARGE -- the amount the system is designed to hold, not what happens to be in it -- and compares the result against the threshold for that appliance type, which differs by category, with commercial and industrial process refrigeration at higher percentages than comfort cooling. Two details cause most of the errors. Full charge must be established and documented, and a system whose full charge has never been recorded cannot compute a compliant leak rate at all. And the calculation ANNUALIZES, so adding refrigerant twice in three months is a much higher annual rate than the same pounds spread over a year, and the shorter the window the more it magnifies. A 200 lb system with 34 lb added over twelve months is at 17.0%: over a 10% threshold by 14 lb, and comfortably under a 20% one. The same 34 pounds is a violation on one appliance type and unremarkable on another, which is why identifying the category correctly is the first step and not a formality -- and if those 34 pounds went in over six months instead, the annualized rate is 34% and the system is over even the higher threshold, with nothing about the leak having changed. Exceeding the threshold starts a clock: repairs within a set number of days, verification tests, and a retrofit or retirement plan if the leak cannot be repaired. A compliance screen; 40 CFR Part 82 Subpart F in full, the appliance's own category and threshold, and the service records govern.",
+  };
+}
+
+export const refrigerantLeakRateExample = { inputs: { full_charge_lb: 200, pounds_added_lb: 34, period_months: 12, threshold_pct: 10 } };
+
+REFRIGERANT_RENDERERS["refrigerant-leak-rate"] = _simpleRenderer({
+  citation: "Citation: the annualized leak-rate calculation of 40 CFR Part 82 Subpart F -- pounds added divided by the FULL CHARGE, annualized over the period, against the threshold for the appliance type -- cited by part and not reproduced. The thresholds differ by appliance category and are entered rather than bundled. 40 CFR Part 82 in full, the appliance's category, and the service records govern.",
+  example: refrigerantLeakRateExample.inputs,
+  fields: [
+    { key: "full_charge_lb", label: "Full charge (lb, as designed and documented)", kind: "number" },
+    { key: "pounds_added_lb", label: "Refrigerant added in the period (lb)", kind: "number" },
+    { key: "period_months", label: "Length of the period (months)", kind: "number" },
+    { key: "threshold_pct", label: "Threshold for this appliance type (%)", kind: "number" },
+  ],
+  outputs: [
+    { key: "r", id: "rflk-out-r", label: "Annualized leak rate", value: (r) => fmt(r.leak_rate_pct, 1) + " %" },
+    { key: "a", id: "rflk-out-a", label: "Allowance in this period", value: (r) => fmt(r.allowed_lb, 1) + " lb" },
+    { key: "o", id: "rflk-out-o", label: "Against the allowance", value: (r) => (r.pounds_over_lb > 0 ? fmt(r.pounds_over_lb, 1) + " lb over" : fmt(-r.pounds_over_lb, 1) + " lb remaining") },
+    { key: "v", id: "rflk-out-v", label: "Threshold determination", value: (r) => r.verdict },
+    { key: "n", id: "rflk-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRefrigerantLeakRate,
+});
+
+// ===================== spec-v1418: refrigerant recovery time and phase split =====================
+// dims: in { args: dimensionless } out: { liquid_min: T, vapor_min: T, total_min: T, speedup_factor: dimensionless }
+export function computeRefrigerantRecoveryTime({ total_charge_lb = 0, liquid_charge_lb = 0, liquid_rate_lb_min = 0, vapor_rate_lb_min = 0, evacuation_min = 0, cylinder_net_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(total_charge_lb > 0)) return { error: "Total charge must be positive." };
+  if (!(liquid_charge_lb >= 0)) return { error: "Liquid charge cannot be negative." };
+  if (!(liquid_charge_lb <= total_charge_lb)) return { error: "The liquid portion cannot exceed the total charge." };
+  if (liquid_charge_lb > 0 && !(liquid_rate_lb_min > 0)) return { error: "Liquid recovery rate must be positive when a liquid portion is recovered." };
+  if (!(vapor_rate_lb_min > 0)) return { error: "Vapor recovery rate must be positive." };
+  if (!(evacuation_min >= 0)) return { error: "Evacuation time cannot be negative." };
+  if (!(cylinder_net_lb >= 0)) return { error: "Cylinder net capacity cannot be negative." };
+  // Recovery time is dominated by the VAPOR phase, and by a large margin.
+  const vapor_charge_lb = total_charge_lb - liquid_charge_lb;
+  const liquid_min = liquid_charge_lb > 0 ? liquid_charge_lb / liquid_rate_lb_min : 0;
+  const vapor_min = vapor_charge_lb / vapor_rate_lb_min;
+  const recovery_min = liquid_min + vapor_min;
+  const total_min = recovery_min + evacuation_min;
+  const all_vapor_min = total_charge_lb / vapor_rate_lb_min;
+  const speedup_factor = all_vapor_min / recovery_min;
+  const minutes_saved = all_vapor_min - recovery_min;
+  const cylinders = cylinder_net_lb > 0 ? Math.ceil(total_charge_lb / cylinder_net_lb) : null;
+  if (![vapor_charge_lb, liquid_min, vapor_min, recovery_min, total_min, all_vapor_min, speedup_factor].every(Number.isFinite)) return { error: "Recovery-time math is not a finite value." };
+  return {
+    liquid_min,
+    vapor_min,
+    recovery_min,
+    total_min,
+    all_vapor_min,
+    speedup_factor,
+    minutes_saved,
+    cylinders,
+    note: "How long a recovery takes, and what recovering liquid first is worth. Recovery time is dominated by the vapor phase and by a large margin: a machine moving liquid in push-pull handles pounds per minute, while the same machine pulling the last vapor out to the required vacuum moves a fraction of that and slows further as pressure falls. Recovering liquid first, wherever the system and the machine allow it, is the difference between a ten-minute job and an hour-long one. The speed-up factor is the output that changes behavior, because setting up for push-pull or liquid recovery costs a few minutes of hose work and the calculation puts a number on how many minutes it buys -- which is what makes the argument on a hot roof at four in the afternoon. On a small charge the setup costs more than it saves; on a large one it saves the afternoon. A 45 lb charge taken 30 lb as liquid at 8 lb/min and 15 lb as vapor at 3 lb/min recovers in 8.75 min against 15.0 all-vapor, a 1.7 times speed-up, and the gap widens with charge size because the liquid fraction grows while the vapor tail stays roughly fixed: a 200 lb charge taken 170 as liquid is 31.3 min against 66.7, saving thirty-five minutes. The evacuation term is the tail and it is the part that cannot be rushed -- the rate falls as pressure falls, and stopping short is both a regulatory violation and a system left with refrigerant in it. A planning estimate; the recovery machine's rated performance, the required evacuation level, and EPA Section 608 requirements govern.",
+  };
+}
+
+export const refrigerantRecoveryTimeExample = { inputs: { total_charge_lb: 45, liquid_charge_lb: 30, liquid_rate_lb_min: 8, vapor_rate_lb_min: 3, evacuation_min: 10, cylinder_net_lb: 40.4 } };
+
+REFRIGERANT_RENDERERS["refrigerant-recovery-time"] = _simpleRenderer({
+  citation: "Citation: recovery time split by phase -- liquid at the machine's liquid or push-pull rate, vapor at its much lower vapor rate, plus evacuation to the required level -- by name, with the all-vapor case reported for comparison. Rates are the recovery machine's published figures, entered rather than bundled. The machine's rated performance, the required evacuation level, and EPA Section 608 requirements govern.",
+  example: refrigerantRecoveryTimeExample.inputs,
+  fields: [
+    { key: "total_charge_lb", label: "Total charge (lb)", kind: "number" },
+    { key: "liquid_charge_lb", label: "Portion recovered as liquid (lb)", kind: "number" },
+    { key: "liquid_rate_lb_min", label: "Liquid recovery rate (lb/min)", kind: "number" },
+    { key: "vapor_rate_lb_min", label: "Vapor recovery rate (lb/min)", kind: "number" },
+    { key: "evacuation_min", label: "Evacuation to the required vacuum (min)", kind: "number" },
+    { key: "cylinder_net_lb", label: "Cylinder net capacity (lb, 0 to skip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "l", id: "rfrt-out-l", label: "Liquid phase", value: (r) => fmt(r.liquid_min, 2) + " min" },
+    { key: "v", id: "rfrt-out-v", label: "Vapor phase", value: (r) => fmt(r.vapor_min, 2) + " min" },
+    { key: "t", id: "rfrt-out-t", label: "Total with evacuation", value: (r) => fmt(r.total_min, 2) + " min (" + fmt(r.recovery_min, 2) + " min of recovery)" },
+    { key: "a", id: "rfrt-out-a", label: "All-vapor comparison", value: (r) => fmt(r.all_vapor_min, 2) + " min" },
+    { key: "s", id: "rfrt-out-s", label: "Speed-up from recovering liquid first", value: (r) => fmt(r.speedup_factor, 2) + " x, saving " + fmt(r.minutes_saved, 1) + " min" },
+    { key: "c", id: "rfrt-out-c", label: "Cylinders the charge fills", value: (r) => r.cylinders === null ? "-" : String(r.cylinders) + " cylinder(s)" },
+    { key: "n", id: "rfrt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRefrigerantRecoveryTime,
+});
+
+// ===================== spec-v1419: low-ambient head pressure control =====================
+// dims: in { args: dimensionless } out: { min_head_psig: M L^-1 T^-2, flooding_charge_lb: M, winter_charge_lb: M }
+export function computeHeadPressureControl({ refrigerant = "R_410A", evaporator_psig = 0, valve_dp_psi = 0, line_losses_psi = 0, condenser_volume_cf = 0, flooded_fraction = 0.8, liquid_density_pcf = 70, receiver_capacity_lb = 0, summer_charge_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(evaporator_psig >= 0)) return { error: "Evaporator pressure cannot be negative." };
+  if (!(valve_dp_psi > 0)) return { error: "The expansion valve's required pressure drop must be positive." };
+  if (!(line_losses_psi >= 0)) return { error: "Distributor and line losses cannot be negative." };
+  if (!(condenser_volume_cf > 0)) return { error: "Condenser internal volume must be positive." };
+  if (!(flooded_fraction > 0 && flooded_fraction <= 1)) return { error: "Flooded fraction must be above 0 and at most 1." };
+  if (!(liquid_density_pcf > 0)) return { error: "Liquid density must be positive." };
+  if (!(receiver_capacity_lb >= 0)) return { error: "Receiver working capacity cannot be negative." };
+  if (!(summer_charge_lb >= 0)) return { error: "Summer charge cannot be negative." };
+  // The valve does not care about head pressure as such -- it cares about the pressure
+  // DIFFERENCE across itself, so the minimum head is built up from the bottom.
+  const min_head_psig = evaporator_psig + valve_dp_psi + line_losses_psi;
+  const min_condensing_f = _interpRefSatT(refrigerant, min_head_psig + 14.7);
+  const flooding_charge_lb = condenser_volume_cf * flooded_fraction * liquid_density_pcf;
+  const winter_charge_lb = summer_charge_lb + flooding_charge_lb;
+  const receiver_ok = receiver_capacity_lb >= flooding_charge_lb;
+  const receiver_verdict = receiver_capacity_lb === 0
+    ? "no receiver capacity entered"
+    : receiver_ok
+      ? "the receiver holds the flooding charge in summer with " + fmt(receiver_capacity_lb - flooding_charge_lb, 1) + " lb to spare"
+      : "the receiver is " + fmt(flooding_charge_lb - receiver_capacity_lb, 1) + " lb SHORT of holding the flooding charge in summer -- the system will either flood the compressor in summer or starve in winter, depending on where the charge was set";
+  if (![min_head_psig, flooding_charge_lb, winter_charge_lb].every(Number.isFinite)) return { error: "Head-pressure-control math is not a finite value." };
+  return {
+    min_head_psig,
+    min_condensing_f,
+    flooding_charge_lb,
+    winter_charge_lb,
+    receiver_ok,
+    receiver_verdict,
+    note: "The lowest head pressure a system can be allowed to run at in cold weather, and the extra refrigerant that holding it takes. The expansion valve does not care about head pressure as such -- it cares about the pressure DIFFERENCE across itself, because that is what drives flow through the orifice. As ambient falls, condensing pressure falls with it, the difference across the valve shrinks, and at some point the valve can no longer feed the coil. The minimum head pressure is therefore built up from the bottom: whatever the evaporator is at, plus the drop the valve needs at full load, plus everything lost in the distributor and the liquid line. Fan cycling is the cheap fix and it is coarse, because head pressure swings between fan stages and on a multi-fan condenser in a cold, windy location it may not hold at all. Flooding the condenser is the fix that works: a head-pressure-control valve backs liquid up into the condenser, reducing its effective surface until it can only reject heat at an acceptable pressure. That backed-up liquid is real refrigerant and it has to be in the system, which means a receiver sized to hold it in summer and a winter charge substantially above the summer one. A system at 20 psig evaporator with a valve needing 100 psi and 15 psi of line losses must hold 135 psig, and a 0.35 cubic ft condenser flooded 80% at 70 lb per cubic foot backs up 19.6 lb -- which in summer, when the condenser drains, all has to live in the receiver. Systems converted to flooded-condenser control without adding charge starve in exactly the weather they were supposed to fix. A design screen; the equipment manufacturer's data, the control valve's setting, and a qualified refrigeration engineer govern.",
+  };
+}
+
+export const headPressureControlExample = { inputs: { refrigerant: "R_410A", evaporator_psig: 20, valve_dp_psi: 100, line_losses_psi: 15, condenser_volume_cf: 0.35, flooded_fraction: 0.80, liquid_density_pcf: 70, receiver_capacity_lb: 25, summer_charge_lb: 40 } };
+
+REFRIGERANT_RENDERERS["head-pressure-control"] = _simpleRenderer({
+  citation: "Citation: minimum head pressure built up from the evaporator pressure plus the expansion valve's required pressure drop plus distributor and liquid-line losses, by name, with the flooding charge from the condenser's internal volume at the design flooded fraction. The saturated condensing temperature is read from the same bundled P-T tables this module already carries for its P-T tile. The equipment manufacturer's data, the control valve's setting, and a qualified refrigeration engineer govern.",
+  example: headPressureControlExample.inputs,
+  fields: [
+    { key: "refrigerant", label: "Refrigerant", kind: "select", options: Object.keys(REFRIGERANT_PT_TABLES_v7).map((k) => ({ value: k, label: k.replace(/_/g, "-") })) },
+    { key: "evaporator_psig", label: "Evaporator saturation pressure (psig)", kind: "number" },
+    { key: "valve_dp_psi", label: "Expansion valve required drop (psi)", kind: "number" },
+    { key: "line_losses_psi", label: "Distributor and liquid-line losses (psi)", kind: "number" },
+    { key: "condenser_volume_cf", label: "Condenser internal volume (cubic ft)", kind: "number" },
+    { key: "flooded_fraction", label: "Flooded fraction at design low ambient (0-1)", kind: "number" },
+    { key: "liquid_density_pcf", label: "Liquid refrigerant density (lb/cubic ft)", kind: "number" },
+    { key: "receiver_capacity_lb", label: "Receiver working capacity (lb, 0 to skip)", kind: "number" },
+    { key: "summer_charge_lb", label: "Summer charge (lb)", kind: "number" },
+  ],
+  outputs: [
+    { key: "p", id: "hpc-out-p", label: "Minimum head pressure", value: (r) => fmt(r.min_head_psig, 1) + " psig" },
+    { key: "t", id: "hpc-out-t", label: "Minimum saturated condensing temperature", value: (r) => r.min_condensing_f === null ? "-" : fmt(r.min_condensing_f, 1) + " F" },
+    { key: "f", id: "hpc-out-f", label: "Flooding charge", value: (r) => fmt(r.flooding_charge_lb, 1) + " lb" },
+    { key: "w", id: "hpc-out-w", label: "Total winter charge", value: (r) => fmt(r.winter_charge_lb, 1) + " lb" },
+    { key: "r", id: "hpc-out-r", label: "Receiver check", value: (r) => r.receiver_verdict },
+    { key: "n", id: "hpc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHeadPressureControl,
+});

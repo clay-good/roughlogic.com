@@ -153,4 +153,5 @@ renames an id, or moves a tile between groups.
 | Field, survey, and SAR (Group P) | v1394-v1401 | **landed 2026-08-26**, 7 tiles (v1399 cut, see below); catalog 1,753 -> 1,760 |
 | Machining, fabrication, welding | v1402-v1405, v1410, v1412 | **landed 2026-08-26**, 6 tiles; catalog 1,760 -> 1,766 |
 | Rotating equipment, hydraulics, curtain wall | v1406-v1409, v1411 | **landed 2026-08-26**, 5 tiles; catalog 1,766 -> 1,771 |
-| Every other band | v1413-v1449 | not yet built |
+| HVAC and refrigeration service (Group C) | v1413-v1419 | **landed 2026-08-26**, 7 tiles; catalog 1,771 -> 1,778 |
+| Every other band | v1420-v1449 | not yet built |

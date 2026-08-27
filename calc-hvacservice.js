@@ -1297,3 +1297,126 @@ HVACSERVICE_RENDERERS["condensate-overflow-pan"] = _simpleRenderer({
   ],
   compute: computeCondensateOverflowPan,
 });
+
+
+// ===========================================================================
+// spec-v1415, v1416: the air- and water-side control half of the 2026-08-26
+// trade-expansion Group C band. See specs/scope-trade-expansion.md.
+// (The five refrigeration-service tiles live in calc-refrigerant.js.)
+// ===========================================================================
+
+// ===================== spec-v1415: control damper authority and leakage =====================
+// dims: in { args: dimensionless } out: { authority: dimensionless, leakage_1in_cfm: L^3 T^-1, leakage_actual_cfm: L^3 T^-1, leakage_pct: dimensionless }
+export function computeDamperAuthority({ damper_dp_inwg = 0, branch_dp_inwg = 0, face_area_sqft = 0, leakage_class_cfm_sqft = 0, closed_dp_inwg = 0, design_cfm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(damper_dp_inwg > 0)) return { error: "Damper pressure drop wide open must be positive." };
+  if (!(branch_dp_inwg > 0)) return { error: "Total branch pressure drop must be positive." };
+  if (!(damper_dp_inwg <= branch_dp_inwg)) return { error: "The damper's own drop cannot exceed the branch total it is part of." };
+  if (!(face_area_sqft > 0)) return { error: "Damper face area must be positive." };
+  if (!(leakage_class_cfm_sqft >= 0)) return { error: "Leakage class rate cannot be negative." };
+  if (!(closed_dp_inwg > 0)) return { error: "Pressure across the closed damper must be positive." };
+  if (!(design_cfm > 0)) return { error: "Design airflow must be positive." };
+  // Authority is the fraction of the branch's resistance that belongs to the damper. Low
+  // authority makes the installed characteristic effectively on/off, and no amount of
+  // controller tuning fixes it, because the problem is hydraulic.
+  const authority = damper_dp_inwg / branch_dp_inwg;
+  const in_band = authority >= 0.3 && authority <= 0.5;
+  // Leakage scales as the square root of pressure, like any other orifice.
+  const leakage_1in_cfm = leakage_class_cfm_sqft * face_area_sqft;
+  const leakage_actual_cfm = leakage_1in_cfm * Math.sqrt(closed_dp_inwg / 1.0);
+  const leakage_pct = leakage_actual_cfm / design_cfm * 100;
+  const dp_for_target = 0.4 * branch_dp_inwg;
+  const verdict = in_band
+    ? "authority " + fmt(authority, 2) + " is inside the 0.3 to 0.5 target band"
+    : authority < 0.3
+      ? "authority " + fmt(authority, 2) + " is BELOW the 0.3 target: closing the damper barely changes the branch total until it is nearly shut, and then the flow falls off a cliff. Raise the damper's own resistance -- a smaller damper, or opposed blades instead of parallel -- toward about " + fmt(dp_for_target, 2) + " in w.g., which is usually the answer, because a damper sized to the duct is oversized for control"
+      : "authority " + fmt(authority, 2) + " is ABOVE the 0.5 band: the damper is carrying most of the branch resistance, which costs fan energy for control it does not need";
+  if (![authority, leakage_1in_cfm, leakage_actual_cfm, leakage_pct].every(Number.isFinite)) return { error: "Damper-authority math is not a finite value." };
+  return {
+    authority,
+    in_band,
+    leakage_1in_cfm,
+    leakage_actual_cfm,
+    leakage_pct,
+    dp_for_target,
+    verdict,
+    note: "Whether a control damper has enough authority to modulate, and how much a closed one leaks. Authority is the fraction of the branch's resistance that belongs to the damper itself. When it is high, closing the damper changes the branch's total resistance a lot, so flow tracks position and control is smooth; when it is low -- a small damper drop in a branch full of coil, filter, and duct resistance -- closing the damper barely changes the total until it is nearly shut, and then the flow falls off a cliff. The installed characteristic becomes effectively on/off, and no amount of controller tuning fixes it, because the problem is hydraulic and not a control-loop setting. A band of 0.3 to 0.5 is the usual target. The leakage half matters for a different reason entirely: a closed damper that leaks is a closed damper that does not close. On an outside-air damper in a cold climate that is a freeze-stat trip and a burst coil; on a smoke damper it is a life-safety failure; on a VAV box minimum it is a comfort complaint and an energy penalty that runs all year. Leakage is classified as cubic feet per minute per square foot at 1 in w.g., and it scales as the square root of pressure like any other orifice. A damper with 0.15 in w.g. of drop in a 0.60 in w.g. branch has an authority of 0.25 -- poor control -- while leaking only 11.3 cfm of 2,000 at half an inch, which is excellent. Fixing the authority means raising the damper's own resistance or reducing the rest of the branch, and the first is almost always the answer because a damper sized to the duct is usually oversized for control. This is the air-side companion to the hydronic control valve authority question. A design screen; the damper manufacturer's published leakage class and pressure-drop data, and AMCA's classifications in full, govern.",
+  };
+}
+
+export const damperAuthorityExample = { inputs: { damper_dp_inwg: 0.15, branch_dp_inwg: 0.60, face_area_sqft: 4, leakage_class_cfm_sqft: 4, closed_dp_inwg: 0.5, design_cfm: 2000 } };
+
+HVACSERVICE_RENDERERS["damper-authority"] = _simpleRenderer({
+  citation: "Citation: control damper authority as the damper's wide-open pressure drop over the total variable-branch drop, with a 0.3 to 0.5 target band, and AMCA-classified leakage in cfm per square foot at 1 in w.g. scaled as the square root of the actual pressure, by name. The leakage class rate is entered rather than bundled. The damper manufacturer's published leakage class and pressure-drop data, and AMCA's classifications in full, govern.",
+  example: damperAuthorityExample.inputs,
+  fields: [
+    { key: "damper_dp_inwg", label: "Damper pressure drop wide open (in w.g.)", kind: "number" },
+    { key: "branch_dp_inwg", label: "Total branch pressure drop (in w.g.)", kind: "number" },
+    { key: "face_area_sqft", label: "Damper face area (sq ft)", kind: "number" },
+    { key: "leakage_class_cfm_sqft", label: "Leakage class rate (cfm per sq ft at 1 in w.g.)", kind: "number" },
+    { key: "closed_dp_inwg", label: "Pressure across the closed damper (in w.g.)", kind: "number" },
+    { key: "design_cfm", label: "Design airflow (cfm)", kind: "number" },
+  ],
+  outputs: [
+    { key: "a", id: "dmpa-out-a", label: "Authority", value: (r) => fmt(r.authority, 3) },
+    { key: "v", id: "dmpa-out-v", label: "Against the target band", value: (r) => r.verdict },
+    { key: "l", id: "dmpa-out-l", label: "Leakage at 1 in w.g.", value: (r) => fmt(r.leakage_1in_cfm, 1) + " cfm" },
+    { key: "c", id: "dmpa-out-c", label: "Leakage at the actual pressure", value: (r) => fmt(r.leakage_actual_cfm, 1) + " cfm (" + fmt(r.leakage_pct, 2) + " % of design)" },
+    { key: "n", id: "dmpa-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDamperAuthority,
+});
+
+// ===================== spec-v1416: chilled-water low delta-T screen =====================
+// dims: in { args: dimensionless } out: { actual_delta_t_f: T, design_flow_gpm: L^3 T^-1, excess_flow_gpm: L^3 T^-1, pump_penalty: dimensionless }
+export function computeChilledWaterDeltaT({ load_btuh = 0, actual_gpm = 0, design_delta_t_f = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(load_btuh > 0)) return { error: "Measured load must be positive." };
+  if (!(actual_gpm > 0)) return { error: "Measured flow must be positive." };
+  if (!(design_delta_t_f > 0)) return { error: "Design delta-T must be positive." };
+  // 500 is 8.34 lb/gal x 60 min/hr x water's specific heat of 1.0. Pump power follows the
+  // CUBE of flow, so the penalty line is usually the largest number in the conversation.
+  const actual_delta_t_f = load_btuh / (500 * actual_gpm);
+  const design_flow_gpm = load_btuh / (500 * design_delta_t_f);
+  const excess_flow_gpm = actual_gpm - design_flow_gpm;
+  const excess_pct = excess_flow_gpm / design_flow_gpm * 100;
+  const pump_penalty = (actual_gpm / design_flow_gpm) ** 3;
+  const tons = load_btuh / 12000;
+  const verdict = excess_flow_gpm > 0
+    ? "LOW delta-T: the plant is moving " + fmt(excess_flow_gpm, 0) + " gpm more than the load needs, " + fmt(excess_pct, 0) + "% over, and the pumps are drawing " + fmt(pump_penalty, 2) + " times design power to do it"
+    : excess_flow_gpm < 0
+      ? "running ABOVE the design delta-T on " + fmt(-excess_flow_gpm, 0) + " gpm less than design flow"
+      : "at the design delta-T exactly";
+  if (![actual_delta_t_f, design_flow_gpm, excess_flow_gpm, pump_penalty, tons].every(Number.isFinite)) return { error: "Chilled-water delta-T math is not a finite value." };
+  return {
+    actual_delta_t_f,
+    design_flow_gpm,
+    excess_flow_gpm,
+    excess_pct,
+    pump_penalty,
+    tons,
+    verdict,
+    note: "Whether a chilled-water plant is achieving its design delta-T, and what the excess flow is costing in pumping power. Five hundred is 8.34 lb per gallon times 60 minutes per hour times water's specific heat of one, so a circuit's delta-T is fixed once the load and the flow are known -- a plant designed for a 12 degree delta-T and running 9 is moving a third more water than it needs to, and the water is doing the same job either way. The consequences compound. Pump power follows the CUBE of flow, so 25% excess flow is nearly double the pumping energy, and that line is usually the largest number in the whole conversation. Beyond the pumping cost, a low delta-T means the chillers see a warmer return than they were selected for, so the plant has to run more machines at part load to serve the same tons and each one runs less efficiently: a plant with a chronic low delta-T is short of capacity long before it is short of chillers. A 240 ton plant at a measured 600 gpm against a 12 degree design is running 9.6 degrees, 120 gpm over the 480 it needs, with the pumps drawing 1.95 times design power -- roughly 20 hp of continuous waste on a 40 hp pump, spent to move water that is not picking up heat. The causes are all downstream: three-way valves left in place, coil control valves that never fully close, coils fouled or selected for a low delta-T, and a bypass that was supposed to be temporary. This does not find them, but it quantifies why finding them is worth doing. A diagnostic screen; the plant's own instrumentation, a calibrated flow measurement, and the chiller selection govern.",
+  };
+}
+
+export const chilledWaterDeltaTExample = { inputs: { load_btuh: 2880000, actual_gpm: 600, design_delta_t_f: 12 } };
+
+HVACSERVICE_RENDERERS["chilled-water-delta-t"] = _simpleRenderer({
+  citation: "Citation: the chilled-water sensible relation Q = 500 x gpm x delta-T (500 being 8.34 lb/gal x 60 min/hr x water's specific heat), with the pump-affinity cube law applied to the excess flow, by name. Public hydronics. The plant's own instrumentation, a calibrated flow measurement, and the chiller selection govern.",
+  example: chilledWaterDeltaTExample.inputs,
+  fields: [
+    { key: "load_btuh", label: "Measured load (BTU/hr)", kind: "number" },
+    { key: "actual_gpm", label: "Measured flow (gpm)", kind: "number" },
+    { key: "design_delta_t_f", label: "Design delta-T (F)", kind: "number" },
+  ],
+  outputs: [
+    { key: "d", id: "cwdt-out-d", label: "Actual delta-T", value: (r) => fmt(r.actual_delta_t_f, 2) + " F on " + fmt(r.tons, 0) + " tons" },
+    { key: "f", id: "cwdt-out-f", label: "Flow the load needs at design delta-T", value: (r) => fmt(r.design_flow_gpm, 0) + " gpm" },
+    { key: "e", id: "cwdt-out-e", label: "Excess flow", value: (r) => fmt(r.excess_flow_gpm, 0) + " gpm (" + fmt(r.excess_pct, 1) + " %)" },
+    { key: "p", id: "cwdt-out-p", label: "Pump power against design", value: (r) => fmt(r.pump_penalty, 2) + " x" },
+    { key: "v", id: "cwdt-out-v", label: "Reading", value: (r) => r.verdict },
+    { key: "n", id: "cwdt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeChilledWaterDeltaT,
+});
