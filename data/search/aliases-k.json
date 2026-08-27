@@ -1451,6 +1451,9 @@
     {"term":"counterbore depth","target":"counterbore-depth","kind":"industry"},
     {"term":"thread engagement remaining","target":"counterbore-depth","kind":"industry"},
     {"term":"socket head counterbore","target":"counterbore-depth","kind":"industry"},
-    {"term":"how deep to counterbore","target":"counterbore-depth","kind":"question"}
+    {"term":"how deep to counterbore","target":"counterbore-depth","kind":"question"},
+    {"term":"carburetor jetting altitude","target":"carburetor-altitude-jetting","kind":"industry"},
+    {"term":"main jet altitude correction","target":"carburetor-altitude-jetting","kind":"industry"},
+    {"term":"what jet do i need at elevation","target":"carburetor-altitude-jetting","kind":"question"}
   ]
 }

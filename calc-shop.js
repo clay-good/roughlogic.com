@@ -2757,3 +2757,81 @@ SHOP_RENDERERS["hydraulic-reservoir-cooler"] = _simpleRenderer({
   ],
   compute: computeHydraulicReservoirCooler,
 });
+
+
+// ===========================================================================
+// spec-v1432: the dust-collection tile of the specialty-trades band of the
+// 2026-08-26 trade expansion. See specs/scope-trade-expansion.md.
+// ===========================================================================
+
+// ===================== spec-v1432: dust collection duct velocity =====================
+// Standard spiral / snap-lock round duct sizes, in inches. The rule is to pick
+// the LARGEST standard size that still holds the minimum conveying velocity,
+// which means rounding DOWN from the required diameter, not up.
+export const DUST_DUCT_SIZES_IN = [3, 4, 5, 6, 7, 8, 10, 12, 14, 16];
+
+const _dustPick = (required_in) => {
+  let pick = DUST_DUCT_SIZES_IN[0];
+  for (const s of DUST_DUCT_SIZES_IN) if (s <= required_in) pick = s;
+  return pick;
+};
+const _dustArea = (dia_in) => Math.PI * (dia_in / 12) * (dia_in / 12) / 4;
+
+// dims: in { args: dimensionless } out: { branch_area_sqft: L^2, branch_diameter_in: L, branch_velocity_actual_fpm: L T^-1 }
+export function computeDustCollectionDuct({ cfm_per_machine = 0, branch_velocity_fpm = 4000, main_velocity_fpm = 3500, machines = 1, simultaneous = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(cfm_per_machine > 0)) return { error: "Airflow per machine must be positive." };
+  if (!(branch_velocity_fpm > 0)) return { error: "Minimum branch conveying velocity must be positive." };
+  if (!(main_velocity_fpm > 0)) return { error: "Minimum main conveying velocity must be positive." };
+  if (!(machines >= 1)) return { error: "There must be at least one machine." };
+  if (!(simultaneous >= 1)) return { error: "At least one gate must be open at once." };
+  if (!(simultaneous <= machines)) return { error: "More gates cannot be open than there are machines." };
+  const branch_area_sqft = cfm_per_machine / branch_velocity_fpm;
+  const branch_diameter_in = Math.sqrt(4 * branch_area_sqft / Math.PI) * 12;
+  const branch_size_in = _dustPick(branch_diameter_in);
+  const branch_velocity_actual_fpm = cfm_per_machine / _dustArea(branch_size_in);
+  const main_cfm = simultaneous * cfm_per_machine;
+  const main_area_sqft = main_cfm / main_velocity_fpm;
+  const main_diameter_in = Math.sqrt(4 * main_area_sqft / Math.PI) * 12;
+  const main_size_in = _dustPick(main_diameter_in);
+  const main_velocity_actual_fpm = main_cfm / _dustArea(main_size_in);
+  // The instinct to round UP is exactly wrong here: the next size up settles out.
+  const branch_up_in = DUST_DUCT_SIZES_IN.find((s) => s > branch_size_in) ?? branch_size_in;
+  const branch_up_velocity_fpm = cfm_per_machine / _dustArea(branch_up_in);
+  const all_open_cfm = machines * cfm_per_machine;
+  const branch_ok = branch_velocity_actual_fpm >= branch_velocity_fpm;
+  const main_ok = main_velocity_actual_fpm >= main_velocity_fpm;
+  if (![branch_area_sqft, branch_diameter_in, branch_velocity_actual_fpm, main_diameter_in, main_velocity_actual_fpm].every(Number.isFinite)) return { error: "Dust-collection duct math is not a finite value." };
+  return {
+    branch_area_sqft, branch_diameter_in, branch_size_in, branch_velocity_actual_fpm,
+    main_cfm, main_area_sqft, main_diameter_in, main_size_in, main_velocity_actual_fpm,
+    branch_up_in, branch_up_velocity_fpm, all_open_cfm, branch_ok, main_ok,
+    verdict: branch_ok && main_ok
+      ? "both runs hold their minimum conveying velocity"
+      : (branch_ok ? "" : "the branch is BELOW its minimum conveying velocity") + (branch_ok || main_ok ? "" : " and ") + (main_ok ? "" : "the main is BELOW its minimum conveying velocity") + " -- it will fill with chips",
+    note: "Dust collection duct is sized backward from every other duct system in a building, and this is the calculation that gets it right. Everywhere else, duct is sized for pressure loss and bigger is better. Here the requirement is VELOCITY and bigger is worse: below roughly 3,500 fpm, wood dust and chips settle out of the airstream and accumulate until the duct plugs, and the plug is both a production stoppage and, in the wrong dust, an ignition and explosion concern. So the rule is to choose the SMALLEST standard duct that still carries the required flow, and to check the resulting velocity rather than assume it. A machine needing 400 CFM at a 4,000 fpm minimum wants 4.28 in of duct, which means 4 in pipe running at 4,584 fpm -- correct. Round UP to 5 in instead and the same 400 CFM runs at only 2,934 fpm, well below the conveying minimum, and that branch will fill with chips. Rounding up feels safe and is exactly the wrong instinct. The main is the second half and the simultaneous-use assumption is the single most consequential input in the whole design. Sizing the main for every machine running at once is how a home shop ends up with an 8 in trunk it cannot pull air through; sizing it for the number of gates actually open, often one and sometimes two, gives a smaller main, a higher velocity, and a collector that works. Two gates at 400 CFM is 800 CFM, 6.06 in required, 6 in pipe at 4,074 fpm -- still conveying, where an 8 in main at the same flow would run at 2,292 fpm and become a settling chamber. VELOCITY AND GEOMETRY ONLY. This does not compute system pressure loss, which is what actually determines whether the collector can move the design airflow through the run, and a system that is velocity-correct but static-pressure-starved delivers neither. It does not size the collector or its filtration and does not address blast gates, flexible hose (which costs several times the loss of smooth pipe), or fitting losses; required airflow per machine is a manufacturer and hood-design figure, not a computation. IT TAKES NO POSITION ON COMBUSTIBLE DUST HAZARD MANAGEMENT, which is a serious matter governed by NFPA 652, NFPA 664 for wood, and NFPA 68 and 69 for explosion protection, covering grounding and bonding, duct construction, collector location, and explosion venting. NFPA, OSHA, and the collector manufacturer govern.",
+  };
+}
+
+export const dustCollectionDuctExample = { inputs: { cfm_per_machine: 400, branch_velocity_fpm: 4000, main_velocity_fpm: 4000, machines: 3, simultaneous: 2 } };
+
+SHOP_RENDERERS["dust-collection-duct"] = _simpleRenderer({
+  citation: "Citation: the minimum conveying-velocity practice for wood and metal dust -- roughly 3,500 to 4,500 fpm in branches, with mains at the low end of that range -- and the simultaneous-use convention for sizing the main, by name. Duct size from the continuity relation, area = airflow / velocity, rounded DOWN to a standard size so the velocity stays above the minimum. Velocity and geometry only: no system pressure loss, no collector sizing, and no position on combustible dust hazard management, which NFPA 652, 664, 68, and 69, OSHA, and the collector manufacturer govern.",
+  example: dustCollectionDuctExample.inputs,
+  fields: [
+    { key: "cfm_per_machine", label: "Required airflow per machine (CFM)", kind: "number" },
+    { key: "branch_velocity_fpm", label: "Minimum branch conveying velocity (fpm)", kind: "number" },
+    { key: "main_velocity_fpm", label: "Minimum main conveying velocity (fpm)", kind: "number" },
+    { key: "machines", label: "Machines on the system", kind: "number" },
+    { key: "simultaneous", label: "Gates expected open at once", kind: "number" },
+  ],
+  outputs: [
+    { key: "b", id: "dcd-out-b", label: "Branch", value: (r) => fmt(r.branch_diameter_in, 2) + " in required -- use " + fmt(r.branch_size_in, 0) + " in at " + fmt(r.branch_velocity_actual_fpm, 0) + " fpm" },
+    { key: "r", id: "dcd-out-r", label: "Why not the next size up", value: (r) => fmt(r.branch_up_in, 0) + " in would run at only " + fmt(r.branch_up_velocity_fpm, 0) + " fpm and settle out" },
+    { key: "m", id: "dcd-out-m", label: "Main", value: (r) => fmt(r.main_cfm, 0) + " CFM, " + fmt(r.main_diameter_in, 2) + " in required -- use " + fmt(r.main_size_in, 0) + " in at " + fmt(r.main_velocity_actual_fpm, 0) + " fpm" },
+    { key: "a", id: "dcd-out-a", label: "If every gate were open", value: (r) => fmt(r.all_open_cfm, 0) + " CFM, which is the assumption that oversizes a main" },
+    { key: "v", id: "dcd-out-v", label: "Against the conveying minimum", value: (r) => r.verdict },
+    { key: "n", id: "dcd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDustCollectionDuct,
+});

@@ -40929,3 +40929,354 @@ test("bounds: spec-v1422 computeFuseLetThrough pins the withstand and the series
   assert.ok("error" in _v1422({ ...base, let_through_i2t: 0 }));
   assert.ok("error" in _v1422({ ...base, conductor_cmil: Infinity }));
 });
+
+// ===========================================================================
+// spec-v1425..v1434: the 2026-08-26 trade-expansion specialty-trades band.
+// (spec-v1427, door opening force against the ADA 5 lbf limit, was cut as a
+// duplicate: the existing stairwell-pressurization solver already returns the
+// knob pressure force from the same 5.2 x W x A x dP / (2 x (W - d)) relation,
+// the total with the closer, the margin to a user-entered limit, and the
+// maximum pressure the door tolerates at that closer setting.)
+// ===========================================================================
+
+import { computeElevatorHandlingCapacity as _v1425 } from "../../calc-construction.js";
+test("bounds: spec-v1425 computeElevatorHandlingCapacity pins RTT and shows stopping dominating", () => {
+  const base = { rise_ft: 120, car_speed_fpm: 350, passengers_per_trip: 12, probable_stops: 7, stop_time_s: 10, transfer_time_s: 1.2, cars: 3, population: 500, target_interval_s: 30 };
+  const r = _v1425(base);
+  assert.ok(Math.abs(r.travel_s - 41.14) < 1e-2);
+  assert.ok(Math.abs(r.stopping_s - 80) < 1e-9);
+  assert.ok(Math.abs(r.transfer_s - 28.8) < 1e-9);
+  assert.ok(Math.abs(r.rtt_s - 149.94) < 1e-2);
+  assert.ok(Math.abs(r.interval_s - 49.98) < 1e-2);
+  assert.ok(Math.abs(r.hc_total - 72.03) < 1e-2);
+  assert.ok(Math.abs(r.hc_percent - 14.41) < 1e-2);
+  assert.strictEqual(r.cars_for_target, 5);
+  // The STOPPING term is the largest, which is the whole point of the tile.
+  assert.strictEqual(r.dominant, "stopping");
+  assert.ok(r.stopping_s > r.travel_s && r.stopping_s > r.transfer_s);
+  // Doubling the rated speed halves ONLY the travel term -- 20.6 s off a 150 s
+  // round trip, which is why a faster car buys so little.
+  const fast = _v1425({ ...base, car_speed_fpm: 700 });
+  assert.ok(Math.abs(fast.travel_s - r.travel_s / 2) < 1e-9);
+  assert.ok(Math.abs((r.rtt_s - fast.rtt_s) - 20.57) < 1e-2);
+  assert.ok(fast.interval_s > 40); // still failing
+  // Halving the probable stops does far more than doubling the speed did.
+  const zoned = _v1425({ ...base, probable_stops: 3 });
+  assert.ok(r.rtt_s - zoned.rtt_s > 1.9 * (r.rtt_s - fast.rtt_s));
+  // Interval scales exactly inversely with the car count; capacity linearly.
+  const six = _v1425({ ...base, cars: 6 });
+  assert.ok(Math.abs(six.interval_s - r.interval_s / 2) < 1e-9);
+  assert.ok(Math.abs(six.hc_total - 2 * r.hc_total) < 1e-9);
+  assert.ok("error" in _v1425({ ...base, rise_ft: 0 }));
+  assert.ok("error" in _v1425({ ...base, car_speed_fpm: 0 }));
+  assert.ok("error" in _v1425({ ...base, cars: 0 }));
+  assert.ok("error" in _v1425({ ...base, population: 0 }));
+  assert.ok("error" in _v1425({ ...base, stop_time_s: Infinity }));
+});
+
+import { computeGlassThicknessWind as _v1426 } from "../../calc-construction.js";
+test("bounds: spec-v1426 computeGlassThicknessWind pins load, deflection, and the type factor", () => {
+  const base = { width_ft: 5, height_ft: 8, design_pressure_psf: 30, glass_type: "annealed", deflection_divisor: 175, thickness_in: 0.25, lites: 1, spacer_allowance_psf: 0.33 };
+  const r = _v1426(base);
+  assert.ok(Math.abs(r.area_sqft - 40) < 1e-9);
+  assert.ok(Math.abs(r.total_load_lb - 1200) < 1e-9);
+  assert.ok(Math.abs(r.aspect_ratio - 1.6) < 1e-12);
+  assert.ok(Math.abs(r.allowable_deflection_in - 0.34286) < 1e-4);
+  assert.ok(Math.abs(r.lite_weight_lb - 131) < 1e-9);
+  // A single lite carries no spacer allowance; an insulating unit of two does.
+  assert.ok(Math.abs(r.assembly_weight_lb - 131) < 1e-9);
+  const igu = _v1426({ ...base, lites: 2 });
+  assert.ok(Math.abs(igu.assembly_weight_lb - 275.2) < 1e-6);
+  assert.strictEqual(igu.two_person, true);
+  // The deflection limit is taken on the SHORT span, so swapping width and
+  // height changes nothing.
+  const swapped = _v1426({ ...base, width_ft: 8, height_ft: 5 });
+  assert.ok(Math.abs(swapped.allowable_deflection_in - r.allowable_deflection_in) < 1e-12);
+  assert.ok(Math.abs(swapped.aspect_ratio - r.aspect_ratio) < 1e-12);
+  // The type factor divides the pressure the chart is entered with: annealed 30,
+  // heat-strengthened 15, tempered 7.5.
+  assert.ok(Math.abs(r.equivalent_annealed_psf - 30) < 1e-9);
+  assert.ok(Math.abs(_v1426({ ...base, glass_type: "heat_strengthened" }).equivalent_annealed_psf - 15) < 1e-9);
+  assert.ok(Math.abs(_v1426({ ...base, glass_type: "tempered" }).equivalent_annealed_psf - 7.5) < 1e-9);
+  // Type does NOT change the weight -- tempering does not make glass lighter.
+  assert.ok(Math.abs(_v1426({ ...base, glass_type: "tempered" }).lite_weight_lb - r.lite_weight_lb) < 1e-12);
+  assert.ok("error" in _v1426({ ...base, glass_type: "laminated" }));
+  assert.ok("error" in _v1426({ ...base, width_ft: 0 }));
+  assert.ok("error" in _v1426({ ...base, design_pressure_psf: 0 }));
+  assert.ok("error" in _v1426({ ...base, deflection_divisor: 0 }));
+  assert.ok("error" in _v1426({ ...base, thickness_in: 0 }));
+  assert.ok("error" in _v1426({ ...base, lites: 0 }));
+  assert.ok("error" in _v1426({ ...base, spacer_allowance_psf: -1 }));
+  assert.ok("error" in _v1426({ ...base, width_ft: Infinity }));
+});
+
+import { computeAwningCanopyLoad as _v1428 } from "../../calc-construction.js";
+test("bounds: spec-v1428 computeAwningCanopyLoad pins uplift governing over snow", () => {
+  const base = { projection_ft: 12, width_ft: 20, wind_speed_mph: 115, kz: 0.98, kzt: 1, kd: 0.85, cn_uplift: 1.2, cn_downward: 0.7, ground_snow_psf: 30, ce: 1, ct: 1, is: 1, dead_load_psf: 3.33 };
+  const r = _v1428(base);
+  assert.ok(Math.abs(r.area_sqft - 240) < 1e-9);
+  assert.ok(Math.abs(r.q_psf - 28.20) < 1e-2);
+  assert.ok(Math.abs(r.uplift_psf - 33.84) < 1e-2);
+  assert.ok(Math.abs(r.uplift_force_lb - 8122) < 1);
+  assert.ok(Math.abs(r.snow_pf_psf - 21) < 1e-9);
+  assert.ok(Math.abs(r.snow_force_lb - 5040) < 1e-9);
+  // Uplift governs, and the canopy's own dead weight offsets only a tenth of it.
+  assert.strictEqual(r.uplift_governs, true);
+  assert.ok(Math.abs(r.dead_offset_pct - 9.84) < 1e-2);
+  assert.ok(Math.abs(r.net_uplift_lb - (r.uplift_force_lb - 799.2)) < 1e-6);
+  // Velocity pressure is QUADRATIC in wind speed: 1.2x the speed is 1.44x the load.
+  const windier = _v1428({ ...base, wind_speed_mph: 138 });
+  assert.ok(Math.abs(windier.q_psf / r.q_psf - 1.44) < 1e-9);
+  // Snow is linear in pg, and at 60 psf ground snow gravity finally beats uplift.
+  const snowy = _v1428({ ...base, ground_snow_psf: 60 });
+  assert.ok(Math.abs(snowy.snow_force_lb - 2 * r.snow_force_lb) < 1e-9);
+  assert.strictEqual(snowy.uplift_governs, false);
+  // Ce, Ct, and Is multiply the snow case and leave the wind case untouched.
+  const sheltered = _v1428({ ...base, ce: 0.9 });
+  assert.ok(Math.abs(sheltered.snow_pf_psf - 0.9 * r.snow_pf_psf) < 1e-9);
+  assert.ok(Math.abs(sheltered.q_psf - r.q_psf) < 1e-12);
+  assert.ok("error" in _v1428({ ...base, projection_ft: 0 }));
+  assert.ok("error" in _v1428({ ...base, wind_speed_mph: 0 }));
+  assert.ok("error" in _v1428({ ...base, cn_uplift: 0 }));
+  assert.ok("error" in _v1428({ ...base, ce: 0 }));
+  assert.ok("error" in _v1428({ ...base, ground_snow_psf: -1 }));
+  assert.ok("error" in _v1428({ ...base, dead_load_psf: -1 }));
+  assert.ok("error" in _v1428({ ...base, kz: Infinity }));
+});
+
+import { computeGarageDoorTorsionSpring as _v1429 } from "../../calc-construction.js";
+test("bounds: spec-v1429 computeGarageDoorTorsionSpring pins weight and height pulling opposite ways", () => {
+  const base = { door_weight_lb: 150, door_height_in: 84, drum_radius_in: 2, springs: 2 };
+  const r = _v1429(base);
+  assert.ok(Math.abs(r.required_torque_inlb - 300) < 1e-9);
+  assert.ok(Math.abs(r.travel_per_turn_in - 12.566) < 1e-3);
+  assert.ok(Math.abs(r.turns - 6.685) < 1e-3);
+  assert.ok(Math.abs(r.required_ippt - 44.88) < 1e-2);
+  assert.ok(Math.abs(r.ippt_per_spring - 22.44) < 1e-2);
+  // Heavier door, same height: the rate rises in proportion to the weight.
+  const heavy = _v1429({ ...base, door_weight_lb: 190 });
+  assert.ok(Math.abs(heavy.turns - r.turns) < 1e-12);
+  assert.ok(Math.abs(heavy.required_torque_inlb - 380) < 1e-9);
+  assert.ok(Math.abs(heavy.required_ippt / r.required_ippt - 190 / 150) < 1e-9);
+  assert.ok(Math.abs(heavy.required_ippt - 56.85) < 1e-2);
+  // Taller door, same weight: the rate FALLS, because the same torque is reached
+  // over more turns. Weight and height pull in opposite directions.
+  const tall = _v1429({ ...base, door_height_in: 96 });
+  assert.ok(Math.abs(tall.required_torque_inlb - r.required_torque_inlb) < 1e-12);
+  assert.ok(tall.required_ippt < r.required_ippt);
+  assert.ok(Math.abs(tall.required_ippt - 39.27) < 1e-2);
+  // Springs only divide the rate; they never change the required torque.
+  const four = _v1429({ ...base, springs: 4 });
+  assert.ok(Math.abs(four.required_torque_inlb - r.required_torque_inlb) < 1e-12);
+  assert.ok(Math.abs(four.ippt_per_spring - r.ippt_per_spring / 2) < 1e-9);
+  assert.ok("error" in _v1429({ ...base, door_weight_lb: 0 }));
+  assert.ok("error" in _v1429({ ...base, door_height_in: 0 }));
+  assert.ok("error" in _v1429({ ...base, drum_radius_in: 0 }));
+  assert.ok("error" in _v1429({ ...base, springs: 0 }));
+  assert.ok("error" in _v1429({ ...base, door_weight_lb: Infinity }));
+});
+
+import { computeWindowFilmShgc as _v1430 } from "../../calc-construction.js";
+test("bounds: spec-v1430 computeWindowFilmShgc pins the peak, the kWh, and the payback", () => {
+  const base = { area_sqft: 200, shgc_before: 0.7, shgc_after: 0.35, peak_irradiance_btuh_sqft: 230, full_sun_hours: 1200, eer: 12, price_per_kwh: 0.14, cost_per_sqft: 9 };
+  const r = _v1430(base);
+  assert.ok(Math.abs(r.peak_before_btuh - 32200) < 1e-6);
+  assert.ok(Math.abs(r.peak_after_btuh - 16100) < 1e-6);
+  assert.ok(Math.abs(r.peak_reduction_btuh - 16100) < 1e-6);
+  assert.ok(Math.abs(r.peak_reduction_tons - 1.3417) < 1e-4);
+  assert.ok(Math.abs(r.kwh_saved - 1610) < 1e-6);
+  assert.ok(Math.abs(r.dollars_saved - 225.4) < 1e-6);
+  assert.ok(Math.abs(r.payback_years - 7.986) < 1e-3);
+  // The saving is the DIFFERENCE in SHGC, not the level: same delta, same answer.
+  const lower = _v1430({ ...base, shgc_before: 0.5, shgc_after: 0.15 });
+  assert.ok(Math.abs(lower.peak_reduction_btuh - r.peak_reduction_btuh) < 1e-6);
+  assert.ok(Math.abs(lower.payback_years - r.payback_years) < 1e-9);
+  // A better EER means LESS electricity avoided for the same cooling avoided,
+  // so a higher-efficiency building has a LONGER film payback.
+  const efficient = _v1430({ ...base, eer: 16 });
+  assert.ok(efficient.kwh_saved < r.kwh_saved);
+  assert.ok(efficient.payback_years > r.payback_years);
+  assert.ok(Math.abs(efficient.kwh_saved * 16 - r.kwh_saved * 12) < 1e-6);
+  // Payback is independent of area: cost and saving both scale with it.
+  const big = _v1430({ ...base, area_sqft: 1000 });
+  assert.ok(Math.abs(big.payback_years - r.payback_years) < 1e-9);
+  assert.ok("error" in _v1430({ ...base, area_sqft: 0 }));
+  assert.ok("error" in _v1430({ ...base, shgc_before: 1.4 }));
+  assert.ok("error" in _v1430({ ...base, shgc_after: 0.7 }));   // must be LOWER
+  assert.ok("error" in _v1430({ ...base, shgc_after: 0.9 }));
+  assert.ok("error" in _v1430({ ...base, eer: 0 }));
+  assert.ok("error" in _v1430({ ...base, cost_per_sqft: 0 }));
+  assert.ok("error" in _v1430({ ...base, full_sun_hours: Infinity }));
+});
+
+import { computeIguUFactor as _v1431 } from "../../calc-construction.js";
+test("bounds: spec-v1431 computeIguUFactor pins the clear and low-e units against the dew point", () => {
+  const base = { lites: 2, r_per_lite: 0.03, r_gap: 1.02, r_indoor_film: 0.68, r_outdoor_film: 0.17, indoor_temp_f: 70, outdoor_temp_f: 0, indoor_rh_pct: 40 };
+  const clear = _v1431(base);
+  assert.ok(Math.abs(clear.r_total - 1.93) < 1e-9);
+  assert.ok(Math.abs(clear.u_factor - 0.518) < 1e-3);
+  assert.ok(Math.abs(clear.surface_temp_f - 45.34) < 1e-2);
+  assert.ok(Math.abs(clear.dew_point_f - 44.57) < 1e-2);
+  assert.strictEqual(clear.condenses, false);
+  assert.ok(clear.margin_f < 1); // within a degree of running with water on it
+  // The low-e argon unit differs ONLY in the gap, and buys nine degrees of glass.
+  const lowe = _v1431({ ...base, r_gap: 2.13 });
+  assert.ok(Math.abs(lowe.r_total - 3.04) < 1e-9);
+  assert.ok(Math.abs(lowe.u_factor - 0.329) < 1e-3);
+  assert.ok(Math.abs(lowe.surface_temp_f - 54.34) < 1e-2);
+  assert.ok(Math.abs(lowe.surface_temp_f - clear.surface_temp_f - 9.0) < 5e-2);
+  // At an ordinary winter-kitchen 55% the clear unit condenses and the low-e is
+  // the one now within a degree of trouble.
+  const humid = _v1431({ ...base, indoor_rh_pct: 55 });
+  assert.ok(Math.abs(humid.dew_point_f - 53.09) < 1e-2);
+  assert.strictEqual(humid.condenses, true);
+  const loweHumid = _v1431({ ...base, r_gap: 2.13, indoor_rh_pct: 55 });
+  assert.strictEqual(loweHumid.condenses, false);
+  assert.ok(loweHumid.margin_f < 1.5);
+  // The critical RH is the RH whose dew point equals the surface: self-consistent.
+  assert.ok(Math.abs(clear.critical_rh_pct - 41.18) < 1e-2);
+  assert.ok(Math.abs(lowe.critical_rh_pct - 57.57) < 1e-2);
+  const atCritical = _v1431({ ...base, indoor_rh_pct: clear.critical_rh_pct });
+  assert.ok(Math.abs(atCritical.dew_point_f - clear.surface_temp_f) < 1e-6);
+  // The surface temperature does not depend on the RH, and the dew point does
+  // not depend on the glazing.
+  assert.ok(Math.abs(humid.surface_temp_f - clear.surface_temp_f) < 1e-12);
+  assert.ok(Math.abs(lowe.dew_point_f - clear.dew_point_f) < 1e-12);
+  // A single lite has no gap at all, so it is far colder and condenses.
+  const single = _v1431({ ...base, lites: 1 });
+  assert.strictEqual(single.gaps, 0);
+  assert.ok(Math.abs(single.r_total - 0.88) < 1e-9);
+  assert.ok(single.surface_temp_f < clear.surface_temp_f);
+  assert.strictEqual(single.condenses, true);
+  assert.ok("error" in _v1431({ ...base, lites: 0 }));
+  assert.ok("error" in _v1431({ ...base, r_gap: 0 }));
+  assert.ok("error" in _v1431({ ...base, r_indoor_film: 0 }));
+  assert.ok("error" in _v1431({ ...base, outdoor_temp_f: 70 }));
+  assert.ok("error" in _v1431({ ...base, indoor_rh_pct: 0 }));
+  assert.ok("error" in _v1431({ ...base, indoor_rh_pct: 101 }));
+  assert.ok("error" in _v1431({ ...base, r_gap: Infinity }));
+});
+
+import { computeEscalatorCapacity as _v1434 } from "../../calc-construction.js";
+test("bounds: spec-v1434 computeEscalatorCapacity pins width beating speed", () => {
+  const base = { speed_fpm: 100, step_depth_in: 16, persons_per_step: 2, loading_factor: 0.6, weight_per_person_lb: 150, design_flow_pph: 8000 };
+  const r = _v1434(base);
+  assert.ok(Math.abs(r.steps_per_hour - 4500) < 1e-9);
+  assert.ok(Math.abs(r.theoretical_pph - 9000) < 1e-9);
+  assert.ok(Math.abs(r.practical_pph - 5400) < 1e-9);
+  assert.ok(Math.abs(r.step_load_lb - 300) < 1e-9);
+  // 8,000 per hour LOOKS like one unit on the theoretical figure and is two.
+  assert.strictEqual(r.units_needed, 2);
+  assert.strictEqual(r.units_theoretical, 1);
+  assert.strictEqual(r.understated, true);
+  // Speed is a refinement: 20% faster is 20% more, and 6,480 practical.
+  const faster = _v1434({ ...base, speed_fpm: 120 });
+  assert.ok(Math.abs(faster.practical_pph - 6480) < 1e-9);
+  assert.ok(Math.abs(faster.practical_pph / r.practical_pph - 1.2) < 1e-9);
+  // Step WIDTH is the design decision: a 24 in step at the ORIGINAL speed halves
+  // it, so going the other way doubles capacity for no change in the ride.
+  const narrow = _v1434({ ...base, persons_per_step: 1 });
+  assert.ok(Math.abs(narrow.practical_pph - 2700) < 1e-9);
+  assert.ok(Math.abs(r.practical_pph / narrow.practical_pph - 2) < 1e-9);
+  assert.ok(r.practical_pph - narrow.practical_pph > faster.practical_pph - r.practical_pph);
+  // Deeper steps pass fewer of them: throughput is inverse in step depth.
+  const deep = _v1434({ ...base, step_depth_in: 32 });
+  assert.ok(Math.abs(deep.steps_per_hour - r.steps_per_hour / 2) < 1e-9);
+  // With no design flow entered the unit count is reported as absent, not zero.
+  assert.strictEqual(_v1434({ ...base, design_flow_pph: 0 }).units_needed, 0);
+  assert.ok("error" in _v1434({ ...base, speed_fpm: 0 }));
+  assert.ok("error" in _v1434({ ...base, step_depth_in: 0 }));
+  assert.ok("error" in _v1434({ ...base, loading_factor: 0 }));
+  assert.ok("error" in _v1434({ ...base, loading_factor: 1.2 }));
+  assert.ok("error" in _v1434({ ...base, weight_per_person_lb: 0 }));
+  assert.ok("error" in _v1434({ ...base, design_flow_pph: -1 }));
+  assert.ok("error" in _v1434({ ...base, speed_fpm: Infinity }));
+});
+
+import { computeDustCollectionDuct as _v1432 } from "../../calc-shop.js";
+test("bounds: spec-v1432 computeDustCollectionDuct pins rounding DOWN being the correct instinct", () => {
+  const base = { cfm_per_machine: 400, branch_velocity_fpm: 4000, main_velocity_fpm: 4000, machines: 3, simultaneous: 2 };
+  const r = _v1432(base);
+  assert.ok(Math.abs(r.branch_area_sqft - 0.1) < 1e-12);
+  assert.ok(Math.abs(r.branch_diameter_in - 4.282) < 1e-3);
+  assert.strictEqual(r.branch_size_in, 4);
+  assert.ok(Math.abs(r.branch_velocity_actual_fpm - 4584) < 1);
+  assert.strictEqual(r.branch_ok, true);
+  // Rounding UP is exactly the wrong instinct: 5 in at the same flow is 2,934 fpm,
+  // well below the conveying minimum, and that branch fills with chips.
+  assert.strictEqual(r.branch_up_in, 5);
+  assert.ok(Math.abs(r.branch_up_velocity_fpm - 2934) < 1);
+  assert.ok(r.branch_up_velocity_fpm < base.branch_velocity_fpm);
+  // The main is sized on the gates actually open, not on every machine.
+  assert.ok(Math.abs(r.main_cfm - 800) < 1e-9);
+  assert.ok(Math.abs(r.main_diameter_in - 6.056) < 1e-3);
+  assert.strictEqual(r.main_size_in, 6);
+  assert.ok(Math.abs(r.main_velocity_actual_fpm - 4074) < 1);
+  assert.strictEqual(r.main_ok, true);
+  assert.ok(Math.abs(r.all_open_cfm - 1200) < 1e-9);
+  // Sizing the main for all three at once gives 7 in pipe -- and dropping to the
+  // 8 in a shop would actually buy would put it at 2,292 fpm, a settling chamber.
+  const allOpen = _v1432({ ...base, simultaneous: 3 });
+  assert.ok(allOpen.main_size_in > r.main_size_in);
+  assert.ok(Math.abs(800 / (Math.PI * (8 / 12) * (8 / 12) / 4) - 2292) < 1);
+  // The picked size is always at or below the required diameter, by construction.
+  assert.ok(r.branch_size_in <= r.branch_diameter_in);
+  assert.ok(r.main_size_in <= r.main_diameter_in);
+  // Rounding down cannot itself drop below the minimum -- but a machine too small
+  // for the smallest pipe made can. 100 CFM wants 2.14 in, only 3 in is available,
+  // and that branch runs at 2,037 fpm and is flagged rather than silently accepted.
+  const tiny = _v1432({ ...base, cfm_per_machine: 100 });
+  assert.ok(Math.abs(tiny.branch_diameter_in - 2.141) < 1e-3);
+  assert.strictEqual(tiny.branch_size_in, 3);
+  assert.ok(Math.abs(tiny.branch_velocity_actual_fpm - 2037) < 1);
+  assert.strictEqual(tiny.branch_ok, false);
+  assert.ok(tiny.verdict.includes("BELOW"));
+  assert.ok("error" in _v1432({ ...base, cfm_per_machine: 0 }));
+  assert.ok("error" in _v1432({ ...base, branch_velocity_fpm: 0 }));
+  assert.ok("error" in _v1432({ ...base, main_velocity_fpm: 0 }));
+  assert.ok("error" in _v1432({ ...base, machines: 0 }));
+  assert.ok("error" in _v1432({ ...base, simultaneous: 0 }));
+  assert.ok("error" in _v1432({ ...base, simultaneous: 4 })); // more gates than machines
+  assert.ok("error" in _v1432({ ...base, cfm_per_machine: Infinity }));
+});
+
+import { computeCarburetorAltitudeJetting as _v1433 } from "../../calc-mechanic.js";
+test("bounds: spec-v1433 computeCarburetorAltitudeJetting pins the fourth-root diameter rule", () => {
+  const base = { baseline_pressure_inhg: 29.92, baseline_temp_f: 59, actual_pressure_inhg: 22.22, actual_temp_f: 30.5, jet_flow_number: 160, jet_diameter_in: 0.04 };
+  const r = _v1433(base);
+  assert.ok(Math.abs(r.pressure_ratio - 0.7426) < 1e-4);
+  assert.ok(Math.abs(r.temperature_ratio - 1.0581) < 1e-4);
+  assert.ok(Math.abs(r.density_ratio - 0.7858) < 1e-4);
+  assert.ok(Math.abs(r.power_loss_pct - 21.42) < 1e-2);
+  assert.strictEqual(r.richer, true);
+  // Area goes as the SQUARE ROOT of density and diameter as its FOURTH root, and
+  // the two have to be mutually consistent: area is diameter squared.
+  assert.ok(Math.abs(r.area_ratio - Math.sqrt(r.density_ratio)) < 1e-12);
+  assert.ok(Math.abs(r.diameter_ratio ** 2 - r.area_ratio) < 1e-12);
+  assert.ok(Math.abs(r.corrected_jet_diameter_in - 0.03766) < 1e-5);
+  assert.ok(Math.abs(r.corrected_jet_number - 141.8) < 1e-1);
+  // The diameter change is under four thousandths, which is why diameter-measured
+  // jets look insensitive and get under-corrected.
+  assert.ok(base.jet_diameter_in - r.corrected_jet_diameter_in < 0.004);
+  // Temperature pulls the other way and it is worth a full step: the same 8,000 ft
+  // on a 90 F afternoon is a much smaller jet than on a 30 F morning.
+  const hot = _v1433({ ...base, actual_temp_f: 90 });
+  assert.ok(Math.abs(hot.density_ratio - 0.7008) < 1e-4);
+  assert.ok(hot.corrected_jet_number < r.corrected_jet_number);
+  assert.ok(Math.abs(hot.corrected_jet_number - 133.9) < 1e-1);
+  // At the baseline condition nothing changes -- the ratio is exactly one.
+  const same = _v1433({ ...base, actual_pressure_inhg: 29.92, actual_temp_f: 59 });
+  assert.ok(Math.abs(same.density_ratio - 1) < 1e-12);
+  assert.ok(Math.abs(same.corrected_jet_number - 160) < 1e-9);
+  assert.ok(Math.abs(same.corrected_jet_diameter_in - 0.04) < 1e-12);
+  assert.strictEqual(same.richer, false);
+  // Either input alone is enough; the other comes back null rather than zero.
+  assert.strictEqual(_v1433({ ...base, jet_diameter_in: 0 }).corrected_jet_diameter_in, null);
+  assert.strictEqual(_v1433({ ...base, jet_flow_number: 0 }).corrected_jet_number, null);
+  assert.ok("error" in _v1433({ ...base, jet_flow_number: 0, jet_diameter_in: 0 }));
+  assert.ok("error" in _v1433({ ...base, actual_pressure_inhg: 0 }));
+  assert.ok("error" in _v1433({ ...base, baseline_pressure_inhg: 0 }));
+  assert.ok("error" in _v1433({ ...base, actual_temp_f: -500 }));
+  assert.ok("error" in _v1433({ ...base, jet_diameter_in: -1 }));
+  assert.ok("error" in _v1433({ ...base, actual_pressure_inhg: Infinity }));
+});

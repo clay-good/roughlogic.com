@@ -633,6 +633,10 @@
     {"term":"hydrant spacing","target":"hydrant-spacing-count","kind":"industry"},
     {"term":"how many hydrants","target":"hydrant-spacing-count","kind":"question"},
     {"term":"hydrant count for fire flow","target":"hydrant-spacing-count","kind":"industry"},
-    {"term":"maximum distance to a hydrant","target":"hydrant-spacing-count","kind":"industry"}
+    {"term":"maximum distance to a hydrant","target":"hydrant-spacing-count","kind":"industry"},
+    {"term":"door opening force","target":"stairwell-pressurization","kind":"industry"},
+    {"term":"ada door force 5 lbf","target":"stairwell-pressurization","kind":"industry"},
+    {"term":"door closer force limit","target":"stairwell-pressurization","kind":"industry"},
+    {"term":"why is this door so hard to open","target":"stairwell-pressurization","kind":"question"}
   ]
 }

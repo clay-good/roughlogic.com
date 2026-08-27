@@ -92403,6 +92403,562 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "elevator-handling-capacity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Ten-story building, 120 ft rise, three cars at 350 fpm carrying 12 past 7 stops",
+   "source_edition_or_year": "classical round-trip-time traffic analysis",
+   "source_section_or_page": "RTT = 2 x rise / speed + (stops + 1) x stop time + 2 x pax x transfer",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "rise_ft": 120,
+    "car_speed_fpm": 350,
+    "passengers_per_trip": 12,
+    "probable_stops": 7,
+    "stop_time_s": 10,
+    "transfer_time_s": 1.2,
+    "cars": 3,
+    "population": 500,
+    "target_interval_s": 30
+   },
+   "outputs": {
+    "travel_s": {
+     "value": 41.1429,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "stopping_s": {
+     "value": 80,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "transfer_s": {
+     "value": 28.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rtt_s": {
+     "value": 149.943,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "interval_s": {
+     "value": 49.981,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hc_per_car": {
+     "value": 24.0091,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hc_total": {
+     "value": 72.0274,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hc_percent": {
+     "value": 14.4055,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cars_for_target": {
+     "value": 5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "glass-thickness-wind",
+   "source_publisher": "ASTM",
+   "source_title": "5 ft x 8 ft lite of 1/4 in annealed glass at a 30 psf design wind pressure",
+   "source_edition_or_year": "ASTM E1300 glass-type factors",
+   "source_section_or_page": "equivalent annealed pressure = design pressure / type factor",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "width_ft": 5,
+    "height_ft": 8,
+    "design_pressure_psf": 30,
+    "glass_type": "annealed",
+    "deflection_divisor": 175,
+    "thickness_in": 0.25,
+    "lites": 1,
+    "spacer_allowance_psf": 0.33
+   },
+   "outputs": {
+    "area_sqft": {
+     "value": 40,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_load_lb": {
+     "value": 1200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "aspect_ratio": {
+     "value": 1.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "allowable_deflection_in": {
+     "value": 0.342857,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "equivalent_annealed_psf": {
+     "value": 30,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lite_weight_lb": {
+     "value": 131,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "assembly_weight_lb": {
+     "value": 131,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "awning-canopy-load",
+   "source_publisher": "ASCE",
+   "source_title": "12 ft x 20 ft attached canopy, 115 mph basic wind, Cn 1.2 uplift, 30 psf ground snow",
+   "source_edition_or_year": "ASCE 7 Ch. 29 and Ch. 7",
+   "source_section_or_page": "q = 0.00256 V^2 Kz Kzt Kd; pf = 0.7 Ce Ct Is pg",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "projection_ft": 12,
+    "width_ft": 20,
+    "wind_speed_mph": 115,
+    "kz": 0.98,
+    "kzt": 1,
+    "kd": 0.85,
+    "cn_uplift": 1.2,
+    "cn_downward": 0.7,
+    "ground_snow_psf": 30,
+    "ce": 1,
+    "ct": 1,
+    "is": 1,
+    "dead_load_psf": 3.33
+   },
+   "outputs": {
+    "area_sqft": {
+     "value": 240,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "q_psf": {
+     "value": 28.202,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "uplift_psf": {
+     "value": 33.8425,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "uplift_force_lb": {
+     "value": 8122.19,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "snow_pf_psf": {
+     "value": 21,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "snow_force_lb": {
+     "value": 5040,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "net_uplift_lb": {
+     "value": 7322.99,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "garage-door-torsion-spring",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "7 ft, 150 lb door on a 2.0 in effective cable radius with two springs",
+   "source_edition_or_year": "overhead door IPPT convention",
+   "source_section_or_page": "torque = weight x drum radius; rate = torque / turns",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "door_weight_lb": 150,
+    "door_height_in": 84,
+    "drum_radius_in": 2,
+    "springs": 2
+   },
+   "outputs": {
+    "required_torque_inlb": {
+     "value": 300,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "travel_per_turn_in": {
+     "value": 12.5664,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "turns": {
+     "value": 6.68451,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_ippt": {
+     "value": 44.8799,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ippt_per_spring": {
+     "value": 22.4399,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "window-film-shgc",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "200 sq ft of west glass, SHGC 0.70 to 0.35, EER 12, film at $9/sq ft",
+   "source_edition_or_year": "solar heat gain and EER definition",
+   "source_section_or_page": "kWh = avoided cooling BTU / EER",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "area_sqft": 200,
+    "shgc_before": 0.7,
+    "shgc_after": 0.35,
+    "peak_irradiance_btuh_sqft": 230,
+    "full_sun_hours": 1200,
+    "eer": 12,
+    "price_per_kwh": 0.14,
+    "cost_per_sqft": 9
+   },
+   "outputs": {
+    "peak_before_btuh": {
+     "value": 32200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "peak_after_btuh": {
+     "value": 16100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "peak_reduction_btuh": {
+     "value": 16100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "peak_reduction_tons": {
+     "value": 1.34167,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "kwh_saved": {
+     "value": 1610,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "dollars_saved": {
+     "value": 225.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "payback_years": {
+     "value": 7.9858,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "igu-u-factor",
+   "source_publisher": "ASHRAE",
+   "source_title": "Clear double-glazed unit, 1/2 in air gap, 70 F inside and 0 F outside at 40% RH",
+   "source_edition_or_year": "ASHRAE Fundamentals air film resistances",
+   "source_section_or_page": "U = 1/R_total; T_surface = T_in - U x R_indoor film x dT",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "lites": 2,
+    "r_per_lite": 0.03,
+    "r_gap": 1.02,
+    "r_indoor_film": 0.68,
+    "r_outdoor_film": 0.17,
+    "indoor_temp_f": 70,
+    "outdoor_temp_f": 0,
+    "indoor_rh_pct": 40
+   },
+   "outputs": {
+    "r_total": {
+     "value": 1.93,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "u_factor": {
+     "value": 0.518135,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "surface_temp_f": {
+     "value": 45.3368,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "dew_point_f": {
+     "value": 44.5708,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "critical_rh_pct": {
+     "value": 41.1815,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "escalator-capacity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "40 in step escalator at 100 fpm on a 16 in step, 2 persons per step, 0.6 loading",
+   "source_edition_or_year": "escalator traffic design practice",
+   "source_section_or_page": "steps/hr = 3600 x speed / step depth",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "speed_fpm": 100,
+    "step_depth_in": 16,
+    "persons_per_step": 2,
+    "loading_factor": 0.6,
+    "weight_per_person_lb": 150,
+    "design_flow_pph": 8000
+   },
+   "outputs": {
+    "steps_per_hour": {
+     "value": 4500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "theoretical_pph": {
+     "value": 9000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "practical_pph": {
+     "value": 5400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "units_needed": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "step_load_lb": {
+     "value": 300,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dust-collection-duct",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Three machines at 400 CFM, 4,000 fpm minimum, at most two gates open at once",
+   "source_edition_or_year": "industrial ventilation conveying-velocity practice",
+   "source_section_or_page": "area = airflow / velocity, rounded DOWN to a standard size",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "cfm_per_machine": 400,
+    "branch_velocity_fpm": 4000,
+    "main_velocity_fpm": 4000,
+    "machines": 3,
+    "simultaneous": 2
+   },
+   "outputs": {
+    "branch_area_sqft": {
+     "value": 0.1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "branch_diameter_in": {
+     "value": 4.2819,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "branch_size_in": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "branch_velocity_actual_fpm": {
+     "value": 4583.66,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "main_cfm": {
+     "value": 800,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "main_diameter_in": {
+     "value": 6.05552,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "main_size_in": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "main_velocity_actual_fpm": {
+     "value": 4074.37,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "branch_up_velocity_fpm": {
+     "value": 2933.54,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "carburetor-altitude-jetting",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Sea-level standard-day jetting taken to 8,000 ft (22.22 in Hg, 30.5 F)",
+   "source_edition_or_year": "carburetor metering practice",
+   "source_section_or_page": "area ratio = sqrt(density ratio); diameter ratio = density ratio ^ 0.25",
+   "verified_by": "rl",
+   "verified_on": "2026-08-27",
+   "inputs": {
+    "baseline_pressure_inhg": 29.92,
+    "baseline_temp_f": 59,
+    "actual_pressure_inhg": 22.22,
+    "actual_temp_f": 30.5,
+    "jet_flow_number": 160,
+    "jet_diameter_in": 0.04
+   },
+   "outputs": {
+    "pressure_ratio": {
+     "value": 0.742647,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "temperature_ratio": {
+     "value": 1.05814,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "density_ratio": {
+     "value": 0.785827,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "area_ratio": {
+     "value": 0.886469,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "diameter_ratio": {
+     "value": 0.941525,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "corrected_jet_number": {
+     "value": 141.835,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "corrected_jet_diameter_in": {
+     "value": 0.037661,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "power_ratio": {
+     "value": 0.785827,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

@@ -5618,6 +5618,27 @@
     {"term":"mullion deflection","target":"curtain-wall-mullion-deflection","kind":"industry"},
     {"term":"curtain wall stiffness","target":"curtain-wall-mullion-deflection","kind":"industry"},
     {"term":"aama l 175","target":"curtain-wall-mullion-deflection","kind":"industry"},
-    {"term":"mullion moment of inertia","target":"curtain-wall-mullion-deflection","kind":"industry"}
+    {"term":"mullion moment of inertia","target":"curtain-wall-mullion-deflection","kind":"industry"},
+    {"term":"elevator round trip time","target":"elevator-handling-capacity","kind":"industry"},
+    {"term":"elevator handling capacity","target":"elevator-handling-capacity","kind":"industry"},
+    {"term":"elevator interval wait","target":"elevator-handling-capacity","kind":"industry"},
+    {"term":"how many elevators does this building need","target":"elevator-handling-capacity","kind":"question"},
+    {"term":"glass lite wind load","target":"glass-thickness-wind","kind":"industry"},
+    {"term":"equivalent annealed pressure","target":"glass-thickness-wind","kind":"industry"},
+    {"term":"tempered glass strength factor","target":"glass-thickness-wind","kind":"industry"},
+    {"term":"canopy wind uplift","target":"awning-canopy-load","kind":"industry"},
+    {"term":"awning snow load","target":"awning-canopy-load","kind":"industry"},
+    {"term":"will this canopy blow off","target":"awning-canopy-load","kind":"question"},
+    {"term":"garage door spring rate","target":"garage-door-torsion-spring","kind":"industry"},
+    {"term":"torsion spring ippt","target":"garage-door-torsion-spring","kind":"industry"},
+    {"term":"what spring does my garage door need","target":"garage-door-torsion-spring","kind":"question"},
+    {"term":"window film payback","target":"window-film-shgc","kind":"industry"},
+    {"term":"solar film tons saved","target":"window-film-shgc","kind":"industry"},
+    {"term":"is window film worth it","target":"window-film-shgc","kind":"question"},
+    {"term":"insulating glass u factor","target":"igu-u-factor","kind":"industry"},
+    {"term":"low e argon u factor","target":"igu-u-factor","kind":"industry"},
+    {"term":"why are my windows sweating","target":"igu-u-factor","kind":"question"},
+    {"term":"escalator capacity per hour","target":"escalator-capacity","kind":"industry"},
+    {"term":"escalator loading factor","target":"escalator-capacity","kind":"industry"}
   ]
 }

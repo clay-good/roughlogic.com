@@ -4184,3 +4184,76 @@ MECHANIC_RENDERERS["gear-dynamic-tooth-stress"] = _simpleRenderer({
   ],
   compute: computeGearDynamicToothStress,
 });
+
+
+// ===========================================================================
+// spec-v1433: the carburetor tile of the specialty-trades band of the
+// 2026-08-26 trade expansion. See specs/scope-trade-expansion.md.
+//
+// IMPLEMENTATION NOTE ON THE SPEC. spec-v1433's formula block is internally
+// inconsistent: it gives the jet AREA ratio as the density ratio directly and
+// the diameter ratio as density^0.25, and those two cannot both hold, since a
+// jet's area goes as the square of its diameter. The worked example's diameter
+// answer (0.040 -> 0.0377 in at a 0.786 density ratio) is the correct one and
+// its flow-number answer (160 -> 126) is not. Fuel flow through a jet goes as
+// area x sqrt(venturi depression), and the depression itself falls with air
+// density, so delivering fuel in proportion to density needs area to scale as
+// the SQUARE ROOT of the density ratio and diameter as its FOURTH root. That is
+// also what the published altitude jetting charts do -- about 88% of the sea
+// level jet at 9,000 ft, where the density ratio is about 0.76 and its square
+// root is 0.87 -- and it is what this tile computes.
+// ===========================================================================
+
+// dims: in { args: dimensionless } out: { density_ratio: dimensionless, corrected_jet_number: dimensionless, corrected_jet_diameter_in: L }
+export function computeCarburetorAltitudeJetting({ baseline_pressure_inhg = 29.92, baseline_temp_f = 59, actual_pressure_inhg = 0, actual_temp_f = 0, jet_flow_number = 0, jet_diameter_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(baseline_pressure_inhg > 0)) return { error: "Baseline absolute pressure must be positive." };
+  if (!(actual_pressure_inhg > 0)) return { error: "Actual absolute pressure must be positive." };
+  if (!(baseline_temp_f + 459.67 > 0)) return { error: "Baseline temperature must be above absolute zero." };
+  if (!(actual_temp_f + 459.67 > 0)) return { error: "Actual temperature must be above absolute zero." };
+  if (!(jet_flow_number >= 0)) return { error: "Jet flow number cannot be negative." };
+  if (!(jet_diameter_in >= 0)) return { error: "Jet diameter cannot be negative." };
+  if (!(jet_flow_number > 0 || jet_diameter_in > 0)) return { error: "Enter either the jet's flow number or its diameter." };
+  const pressure_ratio = actual_pressure_inhg / baseline_pressure_inhg;
+  const temperature_ratio = (baseline_temp_f + 459.67) / (actual_temp_f + 459.67);
+  const density_ratio = pressure_ratio * temperature_ratio;
+  if (!(density_ratio > 0)) return { error: "Density ratio must be positive." };
+  // Fuel flow = area x sqrt(depression), and the depression falls with density,
+  // so AREA scales as sqrt(density ratio) and DIAMETER as its fourth root.
+  const area_ratio = Math.sqrt(density_ratio);
+  const diameter_ratio = Math.pow(density_ratio, 0.25);
+  const corrected_jet_number = jet_flow_number > 0 ? jet_flow_number * area_ratio : null;
+  const corrected_jet_diameter_in = jet_diameter_in > 0 ? jet_diameter_in * diameter_ratio : null;
+  const power_ratio = density_ratio;
+  const power_loss_pct = (1 - density_ratio) * 100;
+  if (![pressure_ratio, temperature_ratio, density_ratio, area_ratio, diameter_ratio].every(Number.isFinite)) return { error: "Jetting-correction math is not a finite value." };
+  return {
+    pressure_ratio, temperature_ratio, density_ratio, area_ratio, diameter_ratio,
+    corrected_jet_number, corrected_jet_diameter_in, power_ratio, power_loss_pct,
+    richer: density_ratio < 1,
+    note: "What a carbureted engine's main jet has to become when the air gets thin. A carburetor is a fixed-geometry device: it meters fuel in proportion to the airflow through the venturi and it was calibrated for one air density. Take it up a mountain and the air thins while the fuel metering does not, so the mixture goes rich -- and rich costs power on top of the power already lost to the thin air, fouls plugs, and on a two-stroke can load up badly enough to stall. The correction follows the density ratio, which is the pressure ratio times the inverse absolute-temperature ratio, and temperature matters as much as pressure while pulling the other way: cold air is dense, so a cold morning at altitude leans out less than a hot afternoon at the same elevation. The part that gets people is WHICH quantity the ratio applies to. Fuel flow through a jet goes as its area times the square root of the venturi depression, and that depression itself falls with air density -- so jet AREA scales as the SQUARE ROOT of the density ratio, and jet DIAMETER as its FOURTH root. An engine jetted at sea level on a standard day and taken to 8,000 ft sees a 0.743 pressure ratio, a 1.058 temperature ratio, and a 0.786 density ratio: it is breathing 21 percent less air, a jet stamped by flow number goes from 160 to about 142, and a jet measured by diameter goes from 0.040 in to 0.0377 in, a change of less than four thousandths, which is why diameter-measured jets look deceptively insensitive and get under-corrected. Power falls roughly with the density ratio, about 21 percent here, matching the familiar field rule of about 3 percent per thousand feet. Note the temperature term's size: at the same 8,000 ft on a 90 F afternoon the density ratio falls to 0.700 and the engine wants a smaller jet still, a full step from the cold-morning answer at the same elevation. A first-order correction for a fixed-jet carburetor's MAIN circuit. Idle, pilot, and needle circuits have their own calibration and their own altitude behavior, and a needle position or clip change is often needed alongside a main jet. It assumes the engine is otherwise correctly jetted at the baseline, which is frequently not true. Altitude-compensating carburetors, forced induction, and any form of closed-loop electronic control invalidate the whole approach. Two-stroke engines are additionally sensitive because the jetting also carries the lubrication, and running one lean at altitude is how a piston seizes. Exhaust gas temperature, plug reading, and a dynamometer are how jetting is actually confirmed. The engine manufacturer's altitude kit and specifications govern.",
+  };
+}
+
+export const carburetorAltitudeJettingExample = { inputs: { baseline_pressure_inhg: 29.92, baseline_temp_f: 59, actual_pressure_inhg: 22.22, actual_temp_f: 30.5, jet_flow_number: 160, jet_diameter_in: 0.04 } };
+
+MECHANIC_RENDERERS["carburetor-altitude-jetting"] = _simpleRenderer({
+  citation: "Citation: the air-density ratio from the absolute pressure ratio times the inverse absolute-temperature ratio, and the carburetor jet-scaling relation in which fuel flow follows jet area times the square root of the venturi depression while required fuel follows air density -- so jet area scales as the square root of the density ratio and jet diameter as its fourth root, by name. A first-order correction for the MAIN circuit only. Altitude-compensating carburetors, forced induction, and closed-loop electronic control invalidate it. The engine manufacturer's altitude kit and specifications govern.",
+  example: carburetorAltitudeJettingExample.inputs,
+  fields: [
+    { key: "baseline_pressure_inhg", label: "Baseline absolute pressure (in Hg)", kind: "number" },
+    { key: "baseline_temp_f", label: "Baseline temperature (F)", kind: "number", attrs: { step: "any" } },
+    { key: "actual_pressure_inhg", label: "Actual absolute pressure (in Hg)", kind: "number" },
+    { key: "actual_temp_f", label: "Actual temperature (F)", kind: "number", attrs: { step: "any" } },
+    { key: "jet_flow_number", label: "Original jet flow number (0 to skip)", kind: "number" },
+    { key: "jet_diameter_in", label: "Original jet diameter (in, 0 to skip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "d", id: "cajt-out-d", label: "Density ratio", value: (r) => fmt(r.density_ratio, 3) + " = " + fmt(r.pressure_ratio, 3) + " pressure x " + fmt(r.temperature_ratio, 3) + " temperature" },
+    { key: "j", id: "cajt-out-j", label: "Corrected jet flow number", value: (r) => r.corrected_jet_number === null ? "- (enter a flow number)" : fmt(r.corrected_jet_number, 1) + " at the " + fmt(r.area_ratio, 3) + " area ratio" },
+    { key: "b", id: "cajt-out-b", label: "Corrected jet diameter", value: (r) => r.corrected_jet_diameter_in === null ? "- (enter a diameter)" : fmt(r.corrected_jet_diameter_in, 4) + " in at the " + fmt(r.diameter_ratio, 3) + " diameter ratio" },
+    { key: "p", id: "cajt-out-p", label: "Approximate power", value: (r) => fmt(r.power_ratio, 3) + " of baseline, " + fmt(r.power_loss_pct, 1) + "% down" },
+    { key: "n", id: "cajt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCarburetorAltitudeJetting,
+});

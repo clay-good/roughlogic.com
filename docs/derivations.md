@@ -1597,6 +1597,7 @@ cross-check.
 | calc-construction.js | `computeAsphaltSpreadRate` | `{ thickness_in = 2, density_pcf = 145 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAsphaltTackCoatQuantity` | `{ area_sf = 0, residual_rate_gal_sy = 0.04, residue_pct = 60 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAsphaltTonnage` | `{ area_ft2 = 0, depth_in = 0, density_pcf = 145, paving_width_ft = 0 }` | _ | _ | _ |
+| calc-construction.js | `computeAwningCanopyLoad` | `{ projection_ft = 0, width_ft = 0, wind_speed_mph = 0, kz = 0.98, kzt = 1, kd...` | _ | _ | _ |
 | calc-construction.js | `computeBalusterPicketCount` | `{ rail_clear_in = 96, picket_width_in = 1.5, max_gap_in = 4 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeBaseplateGroutVolume` | `{ plate_length_in = 18, plate_width_in = 18, column_area_in2 = 64, grout_thic...` | _ | _ | _ |
 | calc-construction.js | `computeBeamLoading` | `{ load_type, load_value, length_ft, E_psi, b_in, d_in }` | _ | _ | _ |
@@ -1649,6 +1650,8 @@ cross-check.
 | calc-construction.js | `computeEgressTravelDistance` | `{ travel_ft = 0, travel_limit_ft = 300, common_path_ft = 0, common_path_limit...` | _ | _ | _ |
 | calc-construction.js | `computeEgressWindowCheck` | `{ clear_width_in = 0, clear_height_in = 0, sill_height_in = 0, location = "ab...` | _ | _ | _ |
 | calc-construction.js | `computeEgressWindowWell` | `{ well_width_in = 0, well_projection_in = 0, well_depth_in = 0, has_ladder = ...` | _ | _ | _ |
+| calc-construction.js | `computeElevatorHandlingCapacity` | `{ rise_ft = 0, car_speed_fpm = 0, passengers_per_trip = 0, probable_stops = 0...` | _ | _ | _ |
+| calc-construction.js | `computeEscalatorCapacity` | `{ speed_fpm = 0, step_depth_in = 0, persons_per_step = 1, loading_factor = 0....` | _ | _ | _ |
 | calc-construction.js | `computeExcavationBenchPlan` | `{ depth_ft = 0, soil_class = "B", surcharge = false, length_ft = 0, bottom_wi...` | _ | _ | _ |
 | calc-construction.js | `computeExcavationProtectionTrigger` | `{ depth_ft = 0, trench_length_ft = 0, egress_points = 0, stable_rock = "no", ...` | _ | _ | _ |
 | calc-construction.js | `computeExcavationVolume` | `{ length_ft, width_ft, depth_ft, side_slope_angle_deg = 90 }` | _ | _ | _ |
@@ -1664,6 +1667,8 @@ cross-check.
 | calc-construction.js | `computeFormworkPressure` | `{ pour_rate_ft_per_hr = 0, concrete_temp_F = 70, weight_factor = "normal", un...` | _ | _ | _ |
 | calc-construction.js | `computeFormworkTieLoad` | `{ lateral_pressure_psf = 600, h_spacing_ft = 2, v_spacing_ft = 2, tie_swl_lb ...` | _ | _ | _ |
 | calc-construction.js | `computeFoundationWaterproofingTakeoff` | `{ perimeter_ft = 150, below_grade_height_ft = 8, coverage_sf_per_gal = 50, wa...` | _ | _ | _ |
+| calc-construction.js | `computeGarageDoorTorsionSpring` | `{ door_weight_lb = 0, door_height_in = 0, drum_radius_in = 0, springs = 1 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeGlassThicknessWind` | `{ width_ft = 0, height_ft = 0, design_pressure_psf = 0, glass_type = "anneale...` | _ | _ | _ |
 | calc-construction.js | `computeGlassVacuumLift` | `{ area_sf = 32, glass_thickness_in = 0.5, safety_factor = 4, cup_wll_lb = 150...` | _ | _ | _ |
 | calc-construction.js | `computeGlulamVolumeFactor` | `{ span_ft = 0, depth_in = 0, width_in = 0, x = 10, kl = 1.0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeGuardHandrailCheck` | `{ occupancy = "residential", surface_height_in = 0, measured_guard_in = 0, me...` | _ | _ | _ |
@@ -1677,6 +1682,7 @@ cross-check.
 | calc-construction.js | `computeHoopStressThinWall` | `{ P_psi = 0, D_in = 0, t_in = 0, S_allow = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeHousewrapRolls` | `{ wall_area_sf = 4000, roll_coverage_sf = 1350, overlap_waste_pct = 10, faste...` | _ | _ | _ |
 | calc-construction.js | `computeIceBarrierCoverage` | `{ eave_length_ft = 0, overhang_in = 0, pitch_rise = 0, roll_width_in = 36, ro...` | _ | _ | _ |
+| calc-construction.js | `computeIguUFactor` | `{ lites = 2, r_per_lite = 0.03, r_gap = 1.02, r_indoor_film = 0.68, r_outdoor...` | _ | _ | _ |
 | calc-construction.js | `computeInsulationBattCoverage` | `{ area_ft2 = 0, coverage_per_batt = 0, coverage_per_bag = 0, waste_pct = 0 } ...` | _ | _ | _ |
 | calc-construction.js | `computeIntermittentFilletWeld` | `{ w_req_in = 0, w_intermit_in = 0, increment_in = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeJoistCantileverCheck` | `{ backspan_ft = 10, overhang_ft = 2 } = {}` | _ | _ | _ |
@@ -1803,6 +1809,7 @@ cross-check.
 | calc-construction.js | `computeWindPressure` | `{ V_mph, exposure = "C", Kz = 0, Kzt = 1.0, Kd = 0.85, G = 0.85 }` | _ | _ | _ |
 | calc-construction.js | `computeWindSolidSign` | `{ velocity_pressure_psf = 0, gust_factor = 0.85, force_coefficient = 0, solid...` | _ | _ | _ |
 | calc-construction.js | `computeWindSpeedFromVelocityPressure` | `{ velocity_pressure_psf = 0 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeWindowFilmShgc` | `{ area_sqft = 0, shgc_before = 0, shgc_after = 0, peak_irradiance_btuh_sqft =...` | _ | _ | _ |
 | calc-construction.js | `computeWindrowStockpileVolume` | `{ base_width_ft = 0, ridge_length_ft = 0, repose_angle_deg = 37, density_pcf ...` | _ | _ | _ |
 | calc-construction.js | `computeWoodBeamBending` | `{ fb_star_psi = 0, emin_psi = 620000, b_in = 0, d_in = 0, le_in = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeWoodBeamCompressionNotch` | `{ fv_prime_psi = 0, b_in = 0, d_in = 0, dn_in = 0, e_in = 0, v_applied_lb = 0...` | _ | _ | _ |
@@ -2657,6 +2664,7 @@ cross-check.
 | calc-mechanic.js | `computeBoltStretch` | `{ diameter_in = 0, grip_length_in = 0, stretch_thou = 0, material = "steel", ...` | _ | _ | _ |
 | calc-mechanic.js | `computeBrakePadLife` | `{ vehicle_weight_lb = 0, speed_delta_mph = 0, stops_per_mile = 1, pad_thickne...` | _ | _ | _ |
 | calc-mechanic.js | `computeBrakePedalHydraulic` | `{ pedal_force_lb = 0, pedal_ratio = 0, booster_factor = 1, mc_bore_in = 0, ca...` | _ | _ | _ |
+| calc-mechanic.js | `computeCarburetorAltitudeJetting` | `{ baseline_pressure_inhg = 29.92, baseline_temp_f = 59, actual_pressure_inhg ...` | _ | _ | _ |
 | calc-mechanic.js | `computeCentrifugalForce` | `{ weight_lb = 0, radius_in = 0, speed_rpm = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeChamberCcForCr` | `{ bore_in = 0, stroke_in = 0, target_cr = 0, gasket_bore_in = 0, gasket_thick...` | _ | _ | _ |
 | calc-mechanic.js | `computeClimbGradientRoc` | `{ climb_gradient_ft_per_nm = 0, ground_speed_kt = 0 } = {}` | _ | _ | _ |
@@ -3123,6 +3131,7 @@ cross-check.
 | calc-shop.js | `computeCylindricalWedgeVolume` | `{ base_diameter_ft = 0, height_ft = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeDividingHead` | `{ divisions = 0, worm_ratio = 40, circles = "" } = {}` | _ | _ | _ |
 | calc-shop.js | `computeDovetailOverPins` | `{ dovetail_type = "male", known = "flat", dimension_in = 0, pin_dia_in = 0, a...` | _ | _ | _ |
+| calc-shop.js | `computeDustCollectionDuct` | `{ cfm_per_machine = 0, branch_velocity_fpm = 4000, main_velocity_fpm = 3500, ...` | _ | _ | _ |
 | calc-shop.js | `computeEllipseAreaPerimeter` | `{ major_axis = 0, minor_axis = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeEllipsoidVolume` | `{ length_ft = 0, width_ft = 0, height_ft = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeFeedForSurfaceFinish` | `{ target_finish_uin = 0, finish_basis = "ra", nose_radius_in = 0 } = {}` | _ | _ | _ |
@@ -3446,7 +3455,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2032.
+Row count: 2041.
 
 <!-- END function-corpus-v14 -->
 
@@ -4096,7 +4105,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (470 tiles)
+### Group E Construction (477 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4122,6 +4131,7 @@ per spec-v14 §13.1 second paragraph.
 | `at-rest-earth-pressure` | At-Rest Earth Pressure on a Braced Wall (Jaky K0) | Jaky (1944) as compiled in Das / NAVF...; spec-v624 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `atterberg-indices` | Atterberg Plasticity Indices and A-Line Classification | Atterberg limits / USCS A-line; spec-v328 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `attic-ventilation` | Attic Ventilation Net Free Area | IRC R806 attic-ventilation rule; spec-v98 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `awning-canopy-load` | Attached Canopy and Awning Wind Uplift and Snow Load | ASCE; q = 0.00256 V^2 Kz Kzt Kd; pf = 0.7 Ce Ct Is pg | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `baluster-picket-count` | Guard Baluster / Picket Count (4-in Sphere Rule) | Guard baluster spacing (IRC 4 in sphe...; pickets = ceil((96-4)/(1.5+4)) = ceil(16.7) = 17; gaps = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bar-nesting` | Mixed-Length Bar Nesting (Cutting Stock) | one-dimensional cutting stock (first-...; Cut list 4 x 62, 6 x 38, 9 x 27, 12 x 14.5 in; 240 in sto... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `barstock-cutlist` | Bar / Tube Stock Cut List Yield | linear cut-list yield identity (first...; pieces = floor((240+0.125)/(14.5+0.125)) = 16; drop = 240... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4243,7 +4253,9 @@ per spec-v14 §13.1 second paragraph.
 | `egress-window-check` | Egress Window (Emergency Escape Opening) Check | International Code Council; 'Emergency escape and rescue openings shall have a net cl... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `egress-window-well` | Egress Window Well (IRC R310.2.3) | International Code Council; 'The minimum horizontal area of the window well shall be ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `elastic-settlement-allowable-pressure` | Allowable Bearing Pressure for a Settlement Limit | Theory-of-elasticity immediate settle...; 1 in limit, 6 ft footing, Es 250 ksf, nu 0.3, Is 0.82 -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `elevator-handling-capacity` | Elevator Round-Trip Time, Interval, and Handling Capacity | Project (first-principles); RTT = 2 x rise / speed + (stops + 1) x stop time + 2 x pa... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `erosion-blanket-coverage` | Erosion Blanket (RECP) Roll and Staple Takeoff | Lapped-roll takeoff identity (RECP in...; coverage = 18000/9 = 2,000 sy; roll = 100 sy; rolls = cei... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `escalator-capacity` | Escalator Handling Capacity and Step Loading | Project (first-principles); steps/hr = 3600 x speed / step depth | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `excavation` | Excavation Volume | Project (first-principles); vertical (90 deg) -> setback=0; A1=A2=100 ft^2; V = D/3 *... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `excavation-bench-plan` | Excavation Slope and Bench-Step Plan | OSHA; Type B ratio 1:1; bench 4 ft per layer; bottom width 2 ft... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `excavation-protection-trigger` | Excavation Protective System and Egress Triggers (OSHA Subpart P) | Occupational Safety and Health Admini...; 'A stairway, ladder, ramp or other safe means of egress s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4268,6 +4280,8 @@ per spec-v14 §13.1 second paragraph.
 | `foundation-waterproofing-takeoff` | Foundation Waterproofing / Dampproofing Takeoff | Foundation waterproofing/dampproofing...; area = 150*8 = 1200; gal = ceil(1200*1.10/50) = ceil(26.4... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fresh-concrete-temp` | Fresh Concrete Temperature (ACI 305.1) | ACI 305.1 Hot Weather Concreting (bat...; agg 3000 lb@80F, cement 564 lb@150F, water 240 lb@70F, ag... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `frost-depth-berggren` | Frost Penetration Depth (Stefan / Modified Berggren) | Stefan / modified-Berggren frost pene...; L = 144*100*0.15 = 2160; X = sqrt(48*1.0*2000/2160) = 6.6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `garage-door-torsion-spring` | Garage Door Torsion Spring Torque, Turns, and Rate | Project (first-principles); torque = weight x drum radius; rate = torque / turns | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `glass-thickness-wind` | Glass Lite Wind Load, Deflection Limit, and Weight | ASTM; equivalent annealed pressure = design pressure / type factor | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `glass-vacuum-lift` | Glass Weight and Suction-Cup Lifter Count | Suction-cup lifter identity (first-pr...; weight = 32*0.5*13 = 208; cups = ceil(208*4/150) = ceil(5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `glass-weight` | Flat Glass Lite Weight | NGA Glazing Manual glass-weight table...; 60 x 40 in lite of 1/4 in soda-lime -> 16.67 ft2, 54.2 lb... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `glulam-volume-factor` | Glulam Volume Factor Cv (NDS 5.3.6) | NDS 2018 §5.3.6; spec-v448 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4292,6 +4306,7 @@ per spec-v14 §13.1 second paragraph.
 | `housewrap-rolls` | Housewrap (WRB) Rolls, Cap Fasteners, and Seam Tape | Housewrap takeoff identity (first-pri...; rolls = ceil(4000*1.10/1350) = ceil(3.26) = 4; cap = ceil... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydroseed-mix` | Hydroseed Slurry Mix and Tank Count | Slurry loading identity (first-princi...; solids = 3*(5+2000+50) = 6,165 lb; tanks = ceil(6165/(300... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ice-barrier-coverage` | Eave Ice-Barrier Membrane Courses and Rolls | IRC R905.1.2 eave ice-barrier extent ...; spec-v215 section 2.1 pinned example (typical 4/12, 12 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `igu-u-factor` | Insulating Glass U-Factor and Interior Condensation Screen | ASHRAE; U = 1/R_total; T_surface = T_in - U x R_indoor film x dT | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `insulation-batt-coverage` | Insulation Batt Coverage and Count | manufacturer label; spec-v439 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `intermittent-fillet-weld` | Intermittent Fillet Weld Schedule (AISC J2 / AWS) | AISC 360 J2.2b / AWS D1.1; spec-v453 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `interpass-temperature-control` | Interpass Temperature Window and Time Between Passes | Project (first-principles); tau x ln((T1 - ambient)/(T2 - ambient)) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4557,6 +4572,7 @@ per spec-v14 §13.1 second paragraph.
 | `wind-solid-sign` | Wind Force on Solid Freestanding Wall / Sign | ASCE 7-22 Section 29.3 (solid freesta...; qh 17 psf, G 0.85, Cf 1.35, As 64 ft^2, B 8 ft -> F 1248 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wind-speed-from-velocity-pressure` | Basic Wind Speed from Velocity Pressure | ASCE; 25 psf bare velocity pressure -> 98.8 mph equivalent basi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wind-velocity-pressure-exposure-coefficient` | Velocity Pressure Exposure Coefficient Kz (ASCE 7 §26.10) | ASCE 7 §26.10.1 velocity pressure exp...; Kz = 2.01*(50/900)^(2/9.5) = 2.01*(0.055556)^0.21053 = 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `window-film-shgc` | Window Film Solar Heat Gain Reduction and Payback | Project (first-principles); kWh = avoided cooling BTU / EER | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `windrow-stockpile-volume` | Windrow (Elongated) Stockpile Volume and Tonnage | Project (first-principles); triangular prism + end cone | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-feed-deposition` | Wire Feed Speed to Deposition Rate | first-principles wire-volume geometry...; 0.035 in wire, 300 in/min, 0.92 eff -> 4.91 lb/hr melt, 4... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-feed-speed-for-deposition` | Wire Feed Speed for a Target Deposition Rate | first-principles wire-volume geometry...; 6 lb/hr, 0.035 in wire, 0.92 eff -> ~398 in/min, 6.52 lb/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4634,7 +4650,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (97 tiles)
+### Group G Cross-trade (98 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4656,6 +4672,7 @@ per spec-v14 §13.1 second paragraph.
 | `cylindrical-wedge-volume` | Cylindrical Wedge (Ungula) Volume | Project (first-principles); V=(2/3)R^2 H=D^2 H/6=8 ft^3; no pi | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `decimal-to-fraction` | Decimal to Fraction | First-principles tape-measure arithmetic; 2.375 in to nearest 1/16 -> 2-3/8 in (whole 2, 3/8), error 0 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dilution` | Dilution / Mixing Ratio | Project (first-principles); C1*V1 = C2*V2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `dust-collection-duct` | Dust Collection Duct Velocity, Diameter, and Branch Balance | Project (first-principles); area = airflow / velocity, rounded DOWN to a standard size | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ellipse-area-perimeter` | Ellipse Area and Perimeter | Project (first-principles); area pi a b; Ramanujan perimeter | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ellipsoid-volume` | Ellipsoid Volume (Oblong / Oval Solid) | Project (first-principles); V=(4/3)pi abc | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `equal-spacing` | Equal Spacing Layout | First-principles equal-spacing layout...; 60 in run, 1.5 in balusters, 4 in max gap -> 11 balusters... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4800,7 +4817,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (138 tiles)
+### Group K Mechanic (139 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4823,6 +4840,7 @@ per spec-v14 §13.1 second paragraph.
 | `boring-bar-max-overhang` | Boring Bar Max Overhang for a Deflection Limit | Cantilever tool deflection (inverse); 0.75 in steel bar, 100 lb, 0.01545 in allowable -> 6.0 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `brake-pad-life` | Brake Pad Lifespan and Heat Capacity | Project (first-principles) over SAE J...; 4000 lb / 30 mph speed delta / 1 stop/mi / ceramic / 12 m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `brake-pedal-hydraulic` | Brake Pedal Ratio and Line Pressure | hydraulic brake force chain (Pascal's...; spec-v514 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `carburetor-altitude-jetting` | Carburetor Jet Correction for Altitude and Temperature | Project (first-principles); area ratio = sqrt(density ratio); diameter ratio = densit... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `centrifugal-force` | Centrifugal Force of a Rotating Mass | Project (first-principles); F = (W/g) omega^2 r | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `chamber-cc-for-cr` | Chamber Volume for a Target Compression Ratio | SAE engine-geometry identities (inverse); 4.0 x 3.48 in cylinder, 10.73:1 target, 4.1 gasket bore /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `climb-gradient-roc` | Climb Gradient to Rate of Climb | FAA TERPS / AIM (departure climb grad...; 300 ft/nm gradient at 120 kt -> 300 x 120 / 60 = 600 ft/m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5400,6 +5418,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1781. Fixture-covered or reference-cadence: 1781 / 1781.
+Tile count: 1790. Fixture-covered or reference-cadence: 1790 / 1790.
 
 <!-- END tile-index-v14 -->

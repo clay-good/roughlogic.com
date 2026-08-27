@@ -456,6 +456,14 @@ const TOOL_MODULES = (() => {
     "abatement-containment",
   ]);
   declare("./calc-construction.js", "CONSTRUCTION_RENDERERS", [
+    // trade expansion v1425-v1434
+    "elevator-handling-capacity",
+    "glass-thickness-wind",
+    "awning-canopy-load",
+    "garage-door-torsion-spring",
+    "window-film-shgc",
+    "igu-u-factor",
+    "escalator-capacity",
     "stairs", "roof-pitch", "rafter", "square-footage", "board-footage",
     "concrete", "shotcrete-rebound-quantity", "rebar", "lumber-spans", "fastener-pullout",
     "beam-loading", "material-quantity",
@@ -924,6 +932,8 @@ const TOOL_MODULES = (() => {
   // natural group letter (K, G, or E) while living in calc-shop.js behind
   // SHOP_RENDERERS (group letter independent of module, the v28/v36 precedent).
   declare("./calc-shop.js", "SHOP_RENDERERS", [
+    // trade expansion v1432
+    "dust-collection-duct",
     // Group K (machinist)
     "machining-time", "material-removal-rate", "turning-surface-finish", "feed-for-surface-finish",
     "taper-calc", "taper-diameter", "dovetail-over-pins", "tailstock-setover", "dividing-head",
@@ -985,6 +995,8 @@ const TOOL_MODULES = (() => {
   ]);
   // v4 Group K: Mechanic - Auto, Marine, Aviation.
   declare("./calc-mechanic.js", "MECHANIC_RENDERERS", [
+    // trade expansion v1433
+    "carburetor-altitude-jetting",
     "prop-slip", "displacement-cr", "dynamic-compression-ratio", "chamber-cc-for-cr", "bolt-stretch",
     "driveshaft-crit", "driveshaft-max-length", "fuel-range", "tire-gearing", "brake-pad-life",
     "ujoint-operating-angle",

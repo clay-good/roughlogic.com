@@ -84,6 +84,15 @@ the total cut to **twelve**. spec-v1423 (infinite-bus transformer secondary faul
 `ambient-ampacity-adjust`. Neither would have been caught by comparing names. **Every remaining band gets
 the formula screen before any code is written.**
 
+That screen caught a **thirteenth** in the specialty-trades band. spec-v1427 (door opening force against the
+2010 ADA Standards 404.2.9 limit of 5 lbf) is already computed by `stairwell-pressurization`, which derives the
+pressure force at the knob from exactly `5.2 x W x A x dP / (2 x (W - d))`, adds the closer force, checks the
+total against an opening-force limit that is a **user input**, and returns the maximum pressure the door
+tolerates at that closer setting. Entering 5 lbf as the limit *is* the accessibility check; only the default
+differed. A name screen would never have seen it -- one is named for a stairwell and a fan, the other for a
+door and a person. The follow-up recorded against the existing tile is a set of search aliases, so that a
+reader looking for door opening force reaches it.
+
 
 Their spec numbers were reused for nine verified-new tiles: band saw blade pitch, tube bend wall
 thinning, ISO 1940 balance grade, bearing regrease interval, hydraulic reservoir and cooler duty,
@@ -145,6 +154,19 @@ its method and its governing authority by name.
 Each spec carries a worked example whose arithmetic was computed and checked before the spec was
 written, so the fixture that lands with the tile has a verified target.
 
+## 5a. One spec was corrected during implementation
+
+spec-v1433 (carburetor jet correction) shipped with its formula block corrected. As written, the spec gave the
+jet **area** ratio as the density ratio directly and the **diameter** ratio as density^0.25, and those two
+cannot both hold, because a jet's area is the square of its diameter. Fuel flow through a jet goes as area
+times the square root of the venturi depression, and the depression itself falls with air density, so
+delivering fuel in proportion to density requires **area to scale as the square root of the density ratio**
+and **diameter as its fourth root**. The spec's worked example got the diameter right (0.040 -> 0.0377 in at a
+0.786 density ratio) and its flow-number answer wrong (160 -> 126, which is the density ratio applied
+directly). The fourth-root form is also what the published altitude jetting charts do -- roughly 88% of the
+sea-level jet at 9,000 ft, where the density ratio is about 0.76 and its square root is 0.87. The tile
+computes the corrected form, and its bounds row asserts the two ratios stay mutually consistent.
+
 ## 6. Landing order
 
 The bands are independent and can land in any order. Within a band, specs are ordered so that a
@@ -164,4 +186,5 @@ renames an id, or moves a tile between groups.
 | Rotating equipment, hydraulics, curtain wall | v1406-v1409, v1411 | **landed 2026-08-26**, 5 tiles; catalog 1,766 -> 1,771 |
 | HVAC and refrigeration service (Group C) | v1413-v1419 | **landed 2026-08-26**, 7 tiles; catalog 1,771 -> 1,778 |
 | Electrical power system (Group A) | v1420-v1424 | **landed 2026-08-26**, 3 tiles (v1423 and v1424 cut, see below); catalog 1,778 -> 1,781 |
-| Every other band | v1425-v1449 | not yet built |
+| Specialty trades (Groups E, G, K) | v1425-v1434 | **landed 2026-08-27**, 9 tiles (v1427 cut, see below); catalog 1,781 -> 1,790 |
+| Every other band | v1435-v1449 | not yet built |

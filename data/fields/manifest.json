@@ -29,12 +29,12 @@
     {
       "file": "e-1.json",
       "name": "Field descriptors, e-1 runtime shard (generated)",
-      "gzip_size_bytes": 17321
+      "gzip_size_bytes": 18130
     },
     {
       "file": "e-2.json",
       "name": "Field descriptors, e-2 runtime shard (generated)",
-      "gzip_size_bytes": 17420
+      "gzip_size_bytes": 17600
     },
     {
       "file": "f.json",
@@ -44,7 +44,7 @@
     {
       "file": "g.json",
       "name": "Field descriptors, g runtime shard (generated)",
-      "gzip_size_bytes": 5249
+      "gzip_size_bytes": 5386
     },
     {
       "file": "h.json",
@@ -59,7 +59,7 @@
     {
       "file": "k.json",
       "name": "Field descriptors, k runtime shard (generated)",
-      "gzip_size_bytes": 7609
+      "gzip_size_bytes": 7707
     },
     {
       "file": "l.json",

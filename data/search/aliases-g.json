@@ -977,6 +977,9 @@
     {"term":"hydraulic reservoir size","target":"hydraulic-reservoir-cooler","kind":"industry"},
     {"term":"hydraulic heat load","target":"hydraulic-reservoir-cooler","kind":"industry"},
     {"term":"oil cooler sizing","target":"hydraulic-reservoir-cooler","kind":"industry"},
-    {"term":"how big a hydraulic tank","target":"hydraulic-reservoir-cooler","kind":"question"}
+    {"term":"how big a hydraulic tank","target":"hydraulic-reservoir-cooler","kind":"question"},
+    {"term":"dust collection duct size","target":"dust-collection-duct","kind":"industry"},
+    {"term":"conveying velocity wood dust","target":"dust-collection-duct","kind":"industry"},
+    {"term":"shop dust collector main size","target":"dust-collection-duct","kind":"industry"}
   ]
 }
