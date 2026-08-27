@@ -398,3 +398,38 @@ test("spec-v1343: arrowing to a row is a deliberate pick and routes", async ({ p
   await expect(page).toHaveURL(/#[a-z0-9-]+/);
   await expect(page.locator(".pick-card")).toHaveCount(0);
 });
+
+// The answer preview needs THREE async dependencies -- search-discovery.js,
+// data/search/slots.json, and data/search/preview-map.json -- and
+// schedulePreview() bails silently when any is missing. All three are started
+// fire-and-forget by loadAndRender(), so whether the preview appears at all was
+// a race against the reader's typing: finish the query before a dependency
+// lands and nothing re-runs, because the re-render only happens on the next
+// keystroke and a reader who has stopped typing never sends one.
+//
+// ensureDiscovery() had always re-rendered on arrival for exactly this reason;
+// ensureSlots() and ensurePreview() did not, which is why this surfaced on CI
+// as three search-preview tests failing every retry on a docs-only commit --
+// a slow cold runner loses the race consistently, so the retries lose it too.
+//
+// Delaying both fetches makes the race deterministic instead of leaving it to
+// runner speed. Without the late-arrival re-render this test fails; with it the
+// preview fills in when the data lands.
+test("search preview survives its data arriving after the reader stops typing", async ({ page }) => {
+  for (const shard of ["**/data/search/slots.json", "**/data/search/preview-map.json"]) {
+    await page.route(shard, async (route) => {
+      await new Promise((r) => setTimeout(r, 1200));
+      await route.continue();
+    });
+  }
+  await page.goto("/");
+  const input = page.locator("#search-input");
+  await input.click();
+  await input.fill("voltage drop 120v 150 ft 20 amps");
+  // One fill, then no further input: nothing else will re-trigger the preview.
+  const preview = page.locator("#search-result-0 .sr-preview");
+  await expect(preview).toBeVisible({ timeout: 15000 });
+  const text = await preview.textContent();
+  expect(text).toMatch(/drop \d+(\.\d+)? V/);
+  expect(text).not.toMatch(/NaN|Infinity|undefined/);
+});

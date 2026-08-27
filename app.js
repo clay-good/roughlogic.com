@@ -843,6 +843,14 @@ function bindSearch() {
             slotsByTile.set(row.tile, row);
           }
         }
+        // Landing late must not cost the reader the feature. schedulePreview()
+        // needs discovery AND slots AND the preview map, and it bails silently
+        // when one is missing, so a dependency that arrives after the last
+        // render leaves the dropdown permanently without its answer -- nothing
+        // re-runs until the next keystroke, and a reader who has finished
+        // typing never sends one. ensureDiscovery() has always re-rendered for
+        // exactly this reason; slots and the preview map now do the same.
+        if (document.activeElement === input) render(input.value);
       })
       .catch(() => { /* prefill is opt-in; failure is a no-op */ });
   }
@@ -870,7 +878,12 @@ function bindSearch() {
     previewLoading = true;
     fetch("data/search/preview-map.json", { credentials: "omit" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((json) => { if (json && json.tiles) previewMap = json.tiles; })
+      .then((json) => {
+        if (!json || !json.tiles) return;
+        previewMap = json.tiles;
+        // Same late-arrival re-render as ensureSlots(); see the note there.
+        if (document.activeElement === input) render(input.value);
+      })
       .catch(() => { /* preview is opt-in; failure is a no-op */ });
   }
   let previewTimer = 0;
