@@ -104617,6 +104617,106 @@
    "term": "time between weld passes",
    "target": "interpass-temperature-control",
    "kind": "industry"
+  },
+  {
+   "term": "balance grade",
+   "target": "rotor-balance-grade",
+   "kind": "industry"
+  },
+  {
+   "term": "residual unbalance",
+   "target": "rotor-balance-grade",
+   "kind": "industry"
+  },
+  {
+   "term": "iso 1940",
+   "target": "rotor-balance-grade",
+   "kind": "industry"
+  },
+  {
+   "term": "how much unbalance is allowed",
+   "target": "rotor-balance-grade",
+   "kind": "question"
+  },
+  {
+   "term": "bearing grease quantity",
+   "target": "bearing-regrease",
+   "kind": "industry"
+  },
+  {
+   "term": "relubrication interval",
+   "target": "bearing-regrease",
+   "kind": "industry"
+  },
+  {
+   "term": "how much grease in a bearing",
+   "target": "bearing-regrease",
+   "kind": "question"
+  },
+  {
+   "term": "regrease schedule",
+   "target": "bearing-regrease",
+   "kind": "industry"
+  },
+  {
+   "term": "plasma consumable cost",
+   "target": "plasma-cut-speed",
+   "kind": "industry"
+  },
+  {
+   "term": "plasma cut time",
+   "target": "plasma-cut-speed",
+   "kind": "industry"
+  },
+  {
+   "term": "electrode and nozzle life",
+   "target": "plasma-cut-speed",
+   "kind": "industry"
+  },
+  {
+   "term": "cost per pierce",
+   "target": "plasma-cut-speed",
+   "kind": "industry"
+  },
+  {
+   "term": "hydraulic reservoir size",
+   "target": "hydraulic-reservoir-cooler",
+   "kind": "industry"
+  },
+  {
+   "term": "hydraulic heat load",
+   "target": "hydraulic-reservoir-cooler",
+   "kind": "industry"
+  },
+  {
+   "term": "oil cooler sizing",
+   "target": "hydraulic-reservoir-cooler",
+   "kind": "industry"
+  },
+  {
+   "term": "how big a hydraulic tank",
+   "target": "hydraulic-reservoir-cooler",
+   "kind": "question"
+  },
+  {
+   "term": "mullion deflection",
+   "target": "curtain-wall-mullion-deflection",
+   "kind": "industry"
+  },
+  {
+   "term": "curtain wall stiffness",
+   "target": "curtain-wall-mullion-deflection",
+   "kind": "industry"
+  },
+  {
+   "term": "aama l 175",
+   "target": "curtain-wall-mullion-deflection",
+   "kind": "industry"
+  },
+  {
+   "term": "mullion moment of inertia",
+   "target": "curtain-wall-mullion-deflection",
+   "kind": "industry"
   }
  ]
 }

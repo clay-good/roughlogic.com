@@ -482,6 +482,12 @@ const _TILES = [
   // v54 compound miter for crown molding (calc-shop.js; Group E carpentry)
   ["compound-miter", "E"],
   ["tolerance-stack-rss", "G"], ["cone-flat-pattern", "G"], ["frustum-volume", "G"], ["regular-polygon", "G"], ["ellipse-area-perimeter", "G"], ["spherical-cap-volume", "G"], ["parabolic-segment", "G"], ["pyramid-frustum-volume", "G"], ["torus-volume", "G"], ["ellipsoid-volume", "G"], ["annulus-area", "G"], ["circular-sector", "G"], ["paraboloid-volume", "G"], ["cylindrical-wedge-volume", "G"], ["barrel-volume", "G"], ["tank-volume-dished-heads", "G"], ["spherical-zone-volume", "G"], ["oval-tank-volume", "G"], ["cone-bottom-tank-volume", "G"], ["tapered-tank-volume", "G"], ["windrow-stockpile-volume", "E"], ["flat-top-stockpile-volume", "E"], ["spur-gear-geometry", "K"], ["worm-gear-geometry", "K"], ["gear-undercut-backlash", "K"], ["gear-identification", "K"], ["gear-chordal-thickness", "K"],
+  // spec-v1406..v1411: the 2026-08-26 trade-expansion rotating-equipment, hydraulics, and curtain wall band.
+  ["rotor-balance-grade", "G"],
+  ["bearing-regrease", "G"],
+  ["plasma-cut-speed", "G"],
+  ["hydraulic-reservoir-cooler", "G"],
+  ["curtain-wall-mullion-deflection", "E"],
   // spec-v511 interference press-fit pressure and holding force
   ["press-fit-pressure", "G"],
   ["press-fit-interference-for-force", "G"],

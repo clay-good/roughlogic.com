@@ -966,6 +966,12 @@ const RELATED = {
   "water-closet-location": ["grab-bar-layout", "accessible-toilet-compartment", "fixture-clearance-check", "lavatory-tub-clearance"],
   "lavatory-tub-clearance": ["knee-toe-clearance", "water-closet-location", "accessible-shower-check", "reach-range"],
   "ramp-detail-check": ["ada-ramp-slope", "handrail-geometry", "accessible-route-width", "floor-level-change"],
+  // spec-v1406..v1411: the 2026-08-26 trade-expansion rotating-equipment, hydraulics, and curtain wall band.
+  "rotor-balance-grade": ["gear-cascade","bearing-regrease","hp-from-torque"],
+  "bearing-regrease": ["rotor-balance-grade","gear-cascade"],
+  "plasma-cut-speed": ["machining-time","bar-nesting","barstock-cutlist"],
+  "hydraulic-reservoir-cooler": ["hydraulic-pump-horsepower","hydraulic-line-velocity","hydraulic-motor-torque-speed"],
+  "curtain-wall-mullion-deflection": ["steel-inertia-for-deflection","wind-solid-sign","joist-deflection"],
   "sign-character-height": ["accessible-parking-count", "accessible-toilet-compartment", "ada-ramp-slope", "reach-range"],
   "reach-range": ["sign-character-height", "accessible-toilet-compartment", "grab-bar-layout", "protruding-object-check"],
   "protruding-object-check": ["reach-range", "sign-character-height", "accessible-route-width", "egress-capacity"],

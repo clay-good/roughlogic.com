@@ -2475,3 +2475,285 @@ function _v1155renderCylinderStorageSeparation(inputRegion, outputRegion, citati
   for (const x of [bp, bn, up, vc]) x.select.addEventListener("change", update);
 }
 SHOP_RENDERERS["cylinder-storage-separation"] = _v1155renderCylinderStorageSeparation;
+
+// ===========================================================================
+// spec-v1406..v1409: the rotating-equipment and hydraulics band of the
+// 2026-08-26 trade expansion. See specs/scope-trade-expansion.md.
+// (The curtain wall mullion tile, v1411, lives in calc-construction.js.)
+// ===========================================================================
+
+// Compact renderer factory, copied from the sibling calc-firesprinkler.js
+// factory (number and select inputs; same schema shape). Non-exported, so it
+// adds no v14 derivation-corpus row.
+function _simpleRenderer(spec) {
+  const _rlRender = function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      let field;
+      if (f.kind === "select") field = makeSelect(f.label, f.id || f.key, f.options);
+      else field = makeNumber(f.label, f.id || f.key, f.attrs || { step: "any", min: "0" });
+      fields[f.key] = field;
+      if (f.default !== undefined) {
+        if (f.kind === "select") field.select.value = f.default;
+        else field.input.value = String(f.default);
+      }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key];
+        else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) {
+        if (f.kind === "select") params[f.key] = fields[f.key].select.value;
+        else params[f.key] = Number(fields[f.key].input.value) || 0;
+      }
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) {
+      const el = f.kind === "select" ? fields[f.key].select : fields[f.key].input;
+      el.addEventListener(f.kind === "select" ? "change" : "input", update);
+    }
+  };
+
+  _rlRender.schema = {
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
+    citation: spec.citation ?? null,
+    scope: spec.scope ?? null,
+  };
+  return _rlRender;
+}
+
+// ===================== spec-v1406: permissible residual unbalance =====================
+// dims: in { args: dimensionless } out: { omega_rad_s: T^-1, e_permissible: dimensionless, u_permissible: dimensionless, correction_mass_g: M }
+export function computeRotorBalanceGrade({ balance_grade = 6.3, rpm = 0, rotor_mass_kg = 0, planes = 2, correction_radius_mm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(balance_grade > 0)) return { error: "Balance grade must be positive." };
+  if (!(rpm > 0)) return { error: "Operating speed must be positive." };
+  if (!(rotor_mass_kg > 0)) return { error: "Rotor mass must be positive." };
+  if (!(planes >= 1)) return { error: "Correction planes must be at least 1." };
+  if (!(correction_radius_mm > 0)) return { error: "Correction radius must be positive." };
+  // Permissible eccentricity is INVERSELY proportional to speed: doubling the rotor speed
+  // halves the allowable unbalance, which is why a speed change forces a rebalance.
+  const omega_rad_s = 2 * Math.PI * rpm / 60;
+  const e_permissible = balance_grade * 1000 / omega_rad_s;
+  const u_permissible = e_permissible * rotor_mass_kg;
+  const per_plane = u_permissible / planes;
+  const correction_mass_g = per_plane / correction_radius_mm;
+  if (![omega_rad_s, e_permissible, u_permissible, per_plane, correction_mass_g].every(Number.isFinite)) return { error: "Balance-grade math is not a finite value." };
+  return {
+    omega_rad_s,
+    e_permissible,
+    u_permissible,
+    per_plane,
+    correction_mass_g,
+    note: "The residual unbalance a rotor is allowed at its operating speed, and what that works out to in grams on the balancing machine. A balance grade is defined as the permissible eccentricity multiplied by the angular velocity, expressed in millimetres per second, so a grade of 6.3 means the center of mass may sit off the axis by however much gives 6.3 mm/s of rim velocity at operating speed. The grades are a published ladder: G6.3 for general machinery, pumps, and fans; G2.5 for machine tool drives, turbines, and better electric motors; G1 and G0.4 for grinding spindles and precision equipment. The important consequence is in the division. Permissible eccentricity is inversely proportional to speed, so DOUBLING the rotor speed HALVES the allowable unbalance -- a fan balanced to G6.3 at 1,800 rpm and then run at 3,600 rpm is not at G6.3 any more, it is at G12.6, one full grade coarser, and it will vibrate accordingly. That is why rebalancing is required after a speed change and why a two-speed machine is balanced to its high speed. The last lines translate the tolerance into something an operator can act on: a 50 kg rotor at 3,600 rpm to G6.3, corrected in two planes at a 150 mm radius, allows 836 g-mm total, 418 per plane, which is 2.79 g at that radius -- about the mass of a small washer, and a good sense of how little material puts a rotor out of tolerance. A tolerance calculation; ISO 1940 in full, the machine's own vibration criteria, and the balancing machine's readout govern.",
+  };
+}
+
+export const rotorBalanceGradeExample = { inputs: { balance_grade: 6.3, rpm: 3600, rotor_mass_kg: 50, planes: 2, correction_radius_mm: 150 } };
+
+SHOP_RENDERERS["rotor-balance-grade"] = _simpleRenderer({
+  citation: "Citation: ISO 1940-1 permissible residual unbalance -- the balance grade G is the permissible eccentricity times the angular velocity in mm/s, so e = G x 1000 / omega in g-mm per kg -- cited by name and not reproduced. The grade ladder (G6.3 general machinery, G2.5 machine tools and turbines, G1 and finer for precision spindles) is named, and the grade is entered rather than looked up here. ISO 1940 in full, the machine's vibration criteria, and the balancing machine's readout govern.",
+  example: rotorBalanceGradeExample.inputs,
+  fields: [
+    { key: "balance_grade", label: "Balance grade G (6.3 general, 2.5 machine tool)", kind: "number" },
+    { key: "rpm", label: "Operating speed (rpm)", kind: "number" },
+    { key: "rotor_mass_kg", label: "Rotor mass (kg)", kind: "number" },
+    { key: "planes", label: "Correction planes", kind: "number" },
+    { key: "correction_radius_mm", label: "Correction radius (mm)", kind: "number" },
+  ],
+  outputs: [
+    { key: "w", id: "rbg-out-w", label: "Angular velocity", value: (r) => fmt(r.omega_rad_s, 1) + " rad/s" },
+    { key: "e", id: "rbg-out-e", label: "Permissible eccentricity", value: (r) => fmt(r.e_permissible, 2) + " g-mm per kg" },
+    { key: "u", id: "rbg-out-u", label: "Permissible residual unbalance", value: (r) => fmt(r.u_permissible, 0) + " g-mm total, " + fmt(r.per_plane, 0) + " g-mm per plane" },
+    { key: "m", id: "rbg-out-m", label: "Correction mass at that radius", value: (r) => fmt(r.correction_mass_g, 2) + " g per plane" },
+    { key: "n", id: "rbg-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRotorBalanceGrade,
+});
+
+// ===================== spec-v1407: bearing regrease quantity and interval =====================
+// dims: in { args: dimensionless } out: { grease_grams: M, base_interval_hr: T, corrected_interval_hr: T }
+export function computeBearingRegrease({ od_mm = 0, width_mm = 0, bore_mm = 0, rpm = 0, correction_factor = 1.0, duty_hours_per_day = 24 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(od_mm > 0)) return { error: "Bearing outside diameter must be positive." };
+  if (!(width_mm > 0)) return { error: "Bearing width must be positive." };
+  if (!(bore_mm > 0)) return { error: "Bearing bore must be positive." };
+  if (!(bore_mm < od_mm)) return { error: "The bore must be smaller than the outside diameter." };
+  if (!(rpm > 0)) return { error: "Operating speed must be positive." };
+  if (!(correction_factor > 0 && correction_factor <= 1)) return { error: "Correction factor must be above 0 and at most 1 -- it only ever shortens the base interval." };
+  if (!(duty_hours_per_day > 0 && duty_hours_per_day <= 24)) return { error: "Duty hours per day must be above 0 and at most 24." };
+  // Over-greasing is NOT conservative: excess grease is churned, it heats, and it either
+  // bleeds out or cooks into a varnish that starves the bearing.
+  const grease_grams = 0.005 * od_mm * width_mm;
+  const base_interval_hr = 14000000 / (rpm * Math.sqrt(bore_mm)) - 4 * bore_mm;
+  if (!(base_interval_hr > 0)) {
+    return { error: "At this speed and bore the relation gives no relubrication interval -- the bearing is past the grease-lubrication range and wants oil or a continuous system." };
+  }
+  const corrected_interval_hr = base_interval_hr * correction_factor;
+  const interval_days = corrected_interval_hr / duty_hours_per_day;
+  if (![grease_grams, base_interval_hr, corrected_interval_hr, interval_days].every(Number.isFinite)) return { error: "Regrease math is not a finite value." };
+  return {
+    grease_grams,
+    base_interval_hr,
+    corrected_interval_hr,
+    interval_days,
+    note: "How much grease a bearing takes and how often, which are two numbers commonly wrong in the field in opposite directions. The quantity is proportional to the bearing's outside diameter times its width -- essentially to the free volume inside it -- and it comes out much smaller than people expect: a 110 mm by 27 mm bearing takes about 15 grams, not a cartridge. Over-greasing is not the conservative choice it feels like, because excess grease is churned by the rolling elements, it heats, and it either bleeds out or cooks into a varnish that starves the bearing. A great many lubrication failures are over-lubrication. The interval falls with both speed and bore, and the base relation applies to a horizontal, moderately loaded bearing at normal temperature; the correction factor cuts it hard from there. Roughly halve it for every fifteen degrees Celsius above about 70 C, halve it again for a vertical shaft, and cut it substantially for heavy load, contamination, or vibration -- so two identical bearings in different service can have intervals a factor of ten apart. A 6310 at 1,800 rpm horizontal takes 14.9 g every 900 hours, about five weeks of continuous running; put the same bearing on a vertical shaft in a hot room and it is roughly 225 hours, and a schedule built on the base number would be four times too slow. A planning figure; the bearing manufacturer's own relubrication chart, the grease's specification, and a condition-monitoring program govern.",
+  };
+}
+
+export const bearingRegreaseExample = { inputs: { od_mm: 110, width_mm: 27, bore_mm: 50, rpm: 1800, correction_factor: 1.0, duty_hours_per_day: 24 } };
+
+SHOP_RENDERERS["bearing-regrease"] = _simpleRenderer({
+  citation: "Citation: grease quantity from the bearing's free volume, G = 0.005 x OD x width in grams from millimetres, and the standard relubrication-interval relation 14,000,000 / (rpm x sqrt(bore)) - 4 x bore for a horizontal, moderately loaded bearing at normal temperature, by name -- published bearing-maintenance practice, cited not reproduced. The correction factor for temperature, orientation, load, and contamination is entered. The bearing manufacturer's own relubrication chart and a condition-monitoring program govern.",
+  example: bearingRegreaseExample.inputs,
+  fields: [
+    { key: "od_mm", label: "Bearing outside diameter (mm)", kind: "number" },
+    { key: "width_mm", label: "Bearing width (mm)", kind: "number" },
+    { key: "bore_mm", label: "Bearing bore (mm)", kind: "number" },
+    { key: "rpm", label: "Operating speed (rpm)", kind: "number" },
+    { key: "correction_factor", label: "Correction factor (1.0 base; 0.5 vertical or hot, 0.25 both)", kind: "number" },
+    { key: "duty_hours_per_day", label: "Operating hours per day", kind: "number" },
+  ],
+  outputs: [
+    { key: "g", id: "brgr-out-g", label: "Grease quantity", value: (r) => fmt(r.grease_grams, 1) + " g" },
+    { key: "b", id: "brgr-out-b", label: "Base interval", value: (r) => fmt(r.base_interval_hr, 0) + " hours" },
+    { key: "c", id: "brgr-out-c", label: "Corrected interval", value: (r) => fmt(r.corrected_interval_hr, 0) + " hours" },
+    { key: "d", id: "brgr-out-d", label: "At the stated duty", value: (r) => "every " + fmt(r.interval_days, 1) + " operating days" },
+    { key: "n", id: "brgr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeBearingRegrease,
+});
+
+// ===================== spec-v1408: plasma cut time, consumable life, cost per part =====================
+// dims: in { args: dimensionless } out: { cut_time_min: T, arc_hours_per_part: T, parts_per_set: dimensionless, cost_per_part: dimensionless }
+export function computePlasmaCutSpeed({ cut_length_in = 0, cut_speed_ipm = 0, pierces_per_part = 0, set_cost = 0, rated_pierces = 0, rated_arc_hours = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(cut_length_in > 0)) return { error: "Cut length per part must be positive." };
+  if (!(cut_speed_ipm > 0)) return { error: "Cut speed must be positive." };
+  if (!(pierces_per_part > 0)) return { error: "Pierces per part must be positive." };
+  if (!(set_cost > 0)) return { error: "Consumable set cost must be positive." };
+  if (!(rated_pierces > 0)) return { error: "Rated pierces per set must be positive." };
+  if (!(rated_arc_hours > 0)) return { error: "Rated arc hours per set must be positive." };
+  // Consumables wear TWO ways and are rated two ways. A sheet full of small holes burns
+  // pierces; a long straight rip burns hours. Which arrives first depends on the part.
+  const cut_time_min = cut_length_in / cut_speed_ipm;
+  const arc_hours_per_part = cut_time_min / 60;
+  const parts_by_pierces = Math.floor(rated_pierces / pierces_per_part);
+  const parts_by_arc_hours = Math.floor(rated_arc_hours / arc_hours_per_part);
+  const parts_per_set = Math.min(parts_by_pierces, parts_by_arc_hours);
+  if (!(parts_per_set >= 1)) return { error: "A single part exhausts a consumable set at these ratings -- check the cut length, the pierce count, and the set's rating." };
+  const governing = parts_by_arc_hours < parts_by_pierces
+    ? "arc hours govern"
+    : parts_by_pierces < parts_by_arc_hours
+      ? "pierces govern"
+      : "both limits arrive together";
+  const cost_per_part = set_cost / parts_per_set;
+  const cost_per_foot = cost_per_part / (cut_length_in / 12);
+  if (![cut_time_min, arc_hours_per_part, cost_per_part, cost_per_foot].every(Number.isFinite)) return { error: "Plasma consumable math is not a finite value." };
+  return {
+    cut_time_min,
+    arc_hours_per_part,
+    parts_by_pierces,
+    parts_by_arc_hours,
+    parts_per_set,
+    governing,
+    cost_per_part,
+    cost_per_foot,
+    note: "What plasma consumables actually cost per part, from the two ways they wear. The electrode and nozzle wear two ways and are rated two ways: each pierce blasts the electrode's hafnium insert, so a set carries a rated number of pierces, and steady cutting erodes it more slowly, so a set also carries a rated number of arc-on hours. Which limit arrives first depends entirely on the part -- a sheet full of small holes burns pierces, and a long straight rip burns hours -- so reporting both and naming the one that governs is what makes the calculation useful for quoting. A shop that costs consumables per pierce will underprice long cuts, and a shop that costs them per hour will underprice hole-intensive ones, and on a production run the difference is real money. A part with 240 in of cut at 40 in/min and 4 pierces takes 6 minutes of arc, which is a tenth of an hour, so a $35 set rated 500 pierces or 3 arc hours gives 125 parts on pierces but only 30 on hours: arc hours govern by a factor of four and the consumable cost is $1.17 a part, not the $0.28 a pierce-based estimate would have said. Reverse the part into a nest of 60 small holes with 30 in of cut and pierces govern instead, at 8 parts per set and $4.38 apiece -- same machine, same material, an order of magnitude apart. A costing estimate; the torch manufacturer's published consumable ratings and cut charts, and the shop's own consumable logs, govern.",
+  };
+}
+
+export const plasmaCutSpeedExample = { inputs: { cut_length_in: 240, cut_speed_ipm: 40, pierces_per_part: 4, set_cost: 35, rated_pierces: 500, rated_arc_hours: 3 } };
+
+SHOP_RENDERERS["plasma-cut-speed"] = _simpleRenderer({
+  citation: "Citation: plasma consumable life from the two ratings a set carries -- pierces and arc-on hours -- with the smaller of the two governing, by name; the ratings and the cut speed for the amperage and thickness come from the torch manufacturer's published cut charts, entered rather than bundled. The manufacturer's ratings and the shop's own consumable logs govern.",
+  example: plasmaCutSpeedExample.inputs,
+  fields: [
+    { key: "cut_length_in", label: "Cut length per part (in)", kind: "number" },
+    { key: "cut_speed_ipm", label: "Cut speed (in/min) for the amperage and thickness", kind: "number" },
+    { key: "pierces_per_part", label: "Pierces per part", kind: "number" },
+    { key: "set_cost", label: "Consumable set cost ($)", kind: "number" },
+    { key: "rated_pierces", label: "Rated pierces per set", kind: "number" },
+    { key: "rated_arc_hours", label: "Rated arc hours per set", kind: "number" },
+  ],
+  outputs: [
+    { key: "t", id: "plcs-out-t", label: "Cut time per part", value: (r) => fmt(r.cut_time_min, 2) + " min (" + fmt(r.arc_hours_per_part, 4) + " arc hours)" },
+    { key: "p", id: "plcs-out-p", label: "Parts per set by pierces", value: (r) => String(r.parts_by_pierces) },
+    { key: "a", id: "plcs-out-a", label: "Parts per set by arc hours", value: (r) => String(r.parts_by_arc_hours) },
+    { key: "g", id: "plcs-out-g", label: "Governing limit", value: (r) => r.governing + " at " + String(r.parts_per_set) + " parts per set" },
+    { key: "c", id: "plcs-out-c", label: "Consumable cost", value: (r) => "$" + fmt(r.cost_per_part, 2) + " per part ($" + fmt(r.cost_per_foot, 3) + " per foot of cut)" },
+    { key: "n", id: "plcs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePlasmaCutSpeed,
+});
+
+// ===================== spec-v1409: hydraulic reservoir size and cooler duty =====================
+// dims: in { args: dimensionless } out: { hydraulic_hp: dimensionless, heat_btu_hr: dimensionless, reservoir_gal: L^3, cooler_duty_btu_hr: dimensionless }
+export function computeHydraulicReservoirCooler({ pump_gpm = 0, pressure_psi = 0, pump_efficiency = 0.85, heat_fraction = 0.25, reservoir_multiplier = 3, reservoir_dissipation_btu_hr = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(pump_gpm > 0)) return { error: "Pump flow must be positive." };
+  if (!(pressure_psi > 0)) return { error: "System pressure must be positive." };
+  if (!(pump_efficiency > 0 && pump_efficiency <= 1)) return { error: "Pump efficiency must be between 0 and 1." };
+  if (!(heat_fraction > 0 && heat_fraction <= 1)) return { error: "Heat fraction must be between 0 and 1." };
+  if (!(reservoir_multiplier > 0)) return { error: "Reservoir multiplier must be positive." };
+  if (!(reservoir_dissipation_btu_hr >= 0)) return { error: "Reservoir dissipation cannot be negative." };
+  // Everything the system does that is NOT useful work becomes heat in the oil.
+  const hydraulic_hp = pump_gpm * pressure_psi / 1714;
+  const input_hp = hydraulic_hp / pump_efficiency;
+  const heat_hp = input_hp * heat_fraction;
+  const heat_btu_hr = heat_hp * 2545;
+  const reservoir_gal = pump_gpm * reservoir_multiplier;
+  const cooler_duty_btu_hr = Math.max(0, heat_btu_hr - reservoir_dissipation_btu_hr);
+  const verdict = cooler_duty_btu_hr > 0
+    ? "a cooler must reject " + fmt(cooler_duty_btu_hr, 0) + " BTU/hr; if neither the tank nor a cooler takes it, the oil temperature climbs until viscosity falls far enough that leakage losses balance the input -- a stable and destructive equilibrium"
+    : "the reservoir sheds the whole heat load at the design oil temperature; no cooler is indicated";
+  if (![hydraulic_hp, input_hp, heat_hp, heat_btu_hr, reservoir_gal, cooler_duty_btu_hr].every(Number.isFinite)) return { error: "Hydraulic heat math is not a finite value." };
+  return {
+    hydraulic_hp,
+    input_hp,
+    heat_hp,
+    heat_btu_hr,
+    reservoir_gal,
+    cooler_duty_btu_hr,
+    verdict,
+    note: "How much heat a hydraulic system makes, how big its reservoir should be, and what is left for a cooler. Everything the system does that is not useful work becomes heat in the oil: pressure drop across valves and lines, relief-valve flow, and pump and motor inefficiency. A quarter of input power is a common figure for a system with ordinary metering losses, and on a system that spends much of its cycle over relief it is far more. The reservoir does three jobs -- de-aerate, settle contamination, and shed heat -- and the classic industrial rule of three times the pump's per-minute flow is really a DWELL TIME rule: it gives the oil about three minutes in the tank to release entrained air before it goes around again. Mobile equipment cannot carry that much oil and runs one to two times instead, which is exactly why mobile systems need coolers and industrial power units often do not. A 20 gpm pump at 2,000 psi is 23.3 hydraulic horsepower and 27.5 at the input at 85% pump efficiency; a quarter of that to heat is 6.9 hp, which is 17,469 BTU/hr, and a 60 gal tank shedding 4,000 leaves 13,469 for a cooler -- a real heat exchanger and a real fan, not an afterthought. Note what the heat fraction does: a system designed so only 15% of input becomes heat needs barely half that rejection. Circuit design, not cooler selection, is where hydraulic heat is actually controlled. A sizing estimate; the component manufacturers' published efficiencies, the duty cycle, and a measured oil temperature govern.",
+  };
+}
+
+export const hydraulicReservoirCoolerExample = { inputs: { pump_gpm: 20, pressure_psi: 2000, pump_efficiency: 0.85, heat_fraction: 0.25, reservoir_multiplier: 3, reservoir_dissipation_btu_hr: 4000 } };
+
+SHOP_RENDERERS["hydraulic-reservoir-cooler"] = _simpleRenderer({
+  citation: "Citation: hydraulic power from gpm x psi / 1,714, the heat fraction of input power converted at 2,545 BTU/hr per horsepower, and the classic reservoir dwell-time rule of three times pump flow for industrial units (one to two for mobile), by name -- public fluid-power practice. The efficiencies, heat fraction, and tank dissipation are entered. The component manufacturers' published efficiencies, the duty cycle, and a measured oil temperature govern.",
+  example: hydraulicReservoirCoolerExample.inputs,
+  fields: [
+    { key: "pump_gpm", label: "Pump flow (gpm)", kind: "number" },
+    { key: "pressure_psi", label: "System pressure (psi)", kind: "number" },
+    { key: "pump_efficiency", label: "Pump and drive efficiency (0-1)", kind: "number" },
+    { key: "heat_fraction", label: "Fraction of input that becomes heat (0.25 typical)", kind: "number" },
+    { key: "reservoir_multiplier", label: "Reservoir multiplier (3 industrial, 1-2 mobile)", kind: "number" },
+    { key: "reservoir_dissipation_btu_hr", label: "Reservoir dissipation at design oil temp (BTU/hr)", kind: "number" },
+  ],
+  outputs: [
+    { key: "h", id: "hyrc-out-h", label: "Power", value: (r) => fmt(r.hydraulic_hp, 1) + " hydraulic hp, " + fmt(r.input_hp, 1) + " hp at the input" },
+    { key: "q", id: "hyrc-out-q", label: "Heat generated", value: (r) => fmt(r.heat_hp, 2) + " hp (" + fmt(r.heat_btu_hr, 0) + " BTU/hr)" },
+    { key: "r", id: "hyrc-out-r", label: "Reservoir volume", value: (r) => fmt(r.reservoir_gal, 0) + " gal" },
+    { key: "c", id: "hyrc-out-c", label: "Required cooler duty", value: (r) => fmt(r.cooler_duty_btu_hr, 0) + " BTU/hr" },
+    { key: "v", id: "hyrc-out-v", label: "What that means", value: (r) => r.verdict },
+    { key: "n", id: "hyrc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHydraulicReservoirCooler,
+});

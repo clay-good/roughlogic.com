@@ -1204,6 +1204,12 @@ export const RENDERER_MAP = {
   "oval-tank-volume": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "cone-bottom-tank-volume": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "tapered-tank-volume": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
+  // spec-v1406..v1411: the 2026-08-26 trade-expansion rotating-equipment, hydraulics, and curtain wall band.
+  "rotor-balance-grade": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
+  "bearing-regrease": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
+  "plasma-cut-speed": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
+  "hydraulic-reservoir-cooler": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
+  "curtain-wall-mullion-deflection": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "press-fit-pressure": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "press-fit-interference-for-force": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "roller-chain-length": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },

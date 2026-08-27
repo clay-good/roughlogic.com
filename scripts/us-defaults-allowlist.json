@@ -373,6 +373,36 @@
       "match": "Plate thickness (mm, the t8/5 model is metric)",
       "family": "weld cooling-time model",
       "justification": "The t8/5 weld cooling-time model has no US customary formulation: EN 1011-2 and every welding-metallurgy reference write it in kJ/mm, degrees Celsius, and millimetres, and a US welding engineer computing it reads those units off the procedure and the literature. Converting the inputs would make the tile disagree with every published worked example of the model."
+    },
+    {
+      "module": "calc-shop.js",
+      "match": "Rotor mass (kg)",
+      "family": "ISO 1940 rotor balancing",
+      "justification": "ISO 1940-1 defines the balance grade itself in millimetres per second and the permissible unbalance in gram-millimetres per kilogram, and a US balancing machine's readout is in those units. A US shop balancing a rotor enters mass in kg and the correction radius in mm because the standard and the machine both do; converting would make the tile disagree with the readout."
+    },
+    {
+      "module": "calc-shop.js",
+      "match": "Correction radius (mm)",
+      "family": "ISO 1940 rotor balancing",
+      "justification": "ISO 1940-1 defines the balance grade itself in millimetres per second and the permissible unbalance in gram-millimetres per kilogram, and a US balancing machine's readout is in those units. A US shop balancing a rotor enters mass in kg and the correction radius in mm because the standard and the machine both do; converting would make the tile disagree with the readout."
+    },
+    {
+      "module": "calc-shop.js",
+      "match": "Bearing outside diameter (mm)",
+      "family": "metric bearing designations",
+      "justification": "Rolling-element bearings are metric worldwide including in the US: a 6310 IS 50 x 110 x 27 mm, and the bore, outside diameter, and width are the designation itself and are stamped on the bearing. A US millwright reads these numbers in millimetres off the part in their hand."
+    },
+    {
+      "module": "calc-shop.js",
+      "match": "Bearing width (mm)",
+      "family": "metric bearing designations",
+      "justification": "Rolling-element bearings are metric worldwide including in the US: a 6310 IS 50 x 110 x 27 mm, and the bore, outside diameter, and width are the designation itself and are stamped on the bearing. A US millwright reads these numbers in millimetres off the part in their hand."
+    },
+    {
+      "module": "calc-shop.js",
+      "match": "Bearing bore (mm)",
+      "family": "metric bearing designations",
+      "justification": "Rolling-element bearings are metric worldwide including in the US: a 6310 IS 50 x 110 x 27 mm, and the bore, outside diameter, and width are the designation itself and are stamped on the bearing. A US millwright reads these numbers in millimetres off the part in their hand."
     }
   ]
 }

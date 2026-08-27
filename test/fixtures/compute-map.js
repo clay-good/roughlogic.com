@@ -880,6 +880,12 @@ export const COMPUTE_MAP = {
   "oval-tank-volume": { module: "../../calc-shop.js", fn: "computeOvalTankVolume" },
   "cone-bottom-tank-volume": { module: "../../calc-shop.js", fn: "computeConeBottomTankVolume" },
   "tapered-tank-volume": { module: "../../calc-shop.js", fn: "computeTaperedTankVolume" },
+  // spec-v1406..v1411: the 2026-08-26 trade-expansion rotating-equipment, hydraulics, and curtain wall band.
+  "rotor-balance-grade": { module: "../../calc-shop.js", fn: "computeRotorBalanceGrade" },
+  "bearing-regrease": { module: "../../calc-shop.js", fn: "computeBearingRegrease" },
+  "plasma-cut-speed": { module: "../../calc-shop.js", fn: "computePlasmaCutSpeed" },
+  "hydraulic-reservoir-cooler": { module: "../../calc-shop.js", fn: "computeHydraulicReservoirCooler" },
+  "curtain-wall-mullion-deflection": { module: "../../calc-construction.js", fn: "computeCurtainWallMullionDeflection" },
   "windrow-stockpile-volume": { module: "../../calc-construction.js", fn: "computeWindrowStockpileVolume" },
   "flat-top-stockpile-volume": { module: "../../calc-construction.js", fn: "computeFlatTopStockpileVolume" },
   "spur-gear-geometry": { module: "../../calc-machining.js", fn: "computeSpurGearGeometry" },

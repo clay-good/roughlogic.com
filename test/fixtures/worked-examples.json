@@ -91769,6 +91769,231 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "rotor-balance-grade",
+   "source_publisher": "ISO",
+   "source_title": "50 kg rotor at 3,600 rpm to G6.3, two planes at a 150 mm radius",
+   "source_edition_or_year": "ISO 1940-1",
+   "source_section_or_page": "permissible residual unbalance",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "balance_grade": 6.3,
+    "rpm": 3600,
+    "rotor_mass_kg": 50,
+    "planes": 2,
+    "correction_radius_mm": 150
+   },
+   "outputs": {
+    "omega_rad_s": {
+     "value": 376.991,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "e_permissible": {
+     "value": 16.7113,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "u_permissible": {
+     "value": 835.563,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "per_plane": {
+     "value": 417.782,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "correction_mass_g": {
+     "value": 2.78521,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bearing-regrease",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "6310 deep-groove ball bearing (110 x 27 x 50 mm) at 1,800 rpm, horizontal",
+   "source_edition_or_year": "bearing maintenance practice",
+   "source_section_or_page": "0.005 OD x width; 14e6 / (rpm sqrt(bore)) - 4 bore",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "od_mm": 110,
+    "width_mm": 27,
+    "bore_mm": 50,
+    "rpm": 1800,
+    "correction_factor": 1,
+    "duty_hours_per_day": 24
+   },
+   "outputs": {
+    "grease_grams": {
+     "value": 14.85,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "base_interval_hr": {
+     "value": 899.944,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "corrected_interval_hr": {
+     "value": 899.944,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "plasma-cut-speed",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "240 in of cut at 40 IPM with 4 pierces, $35 set rated 500 pierces or 3 arc hours",
+   "source_edition_or_year": "consumable life",
+   "source_section_or_page": "the smaller of the two limits governs",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "cut_length_in": 240,
+    "cut_speed_ipm": 40,
+    "pierces_per_part": 4,
+    "set_cost": 35,
+    "rated_pierces": 500,
+    "rated_arc_hours": 3
+   },
+   "outputs": {
+    "cut_time_min": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "arc_hours_per_part": {
+     "value": 0.1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "parts_by_pierces": {
+     "value": 125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "parts_by_arc_hours": {
+     "value": 30,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cost_per_part": {
+     "value": 1.16667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydraulic-reservoir-cooler",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "20 gpm at 2,000 psi, 85% pump, 25% to heat, 3x reservoir shedding 4,000 BTU/hr",
+   "source_edition_or_year": "fluid power practice",
+   "source_section_or_page": "gpm x psi / 1,714; 2,545 BTU/hr per hp",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "pump_gpm": 20,
+    "pressure_psi": 2000,
+    "pump_efficiency": 0.85,
+    "heat_fraction": 0.25,
+    "reservoir_multiplier": 3,
+    "reservoir_dissipation_btu_hr": 4000
+   },
+   "outputs": {
+    "hydraulic_hp": {
+     "value": 23.3372,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "input_hp": {
+     "value": 27.4556,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heat_btu_hr": {
+     "value": 17468.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "reservoir_gal": {
+     "value": 60,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cooler_duty_btu_hr": {
+     "value": 13468.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "curtain-wall-mullion-deflection",
+   "source_publisher": "AAMA",
+   "source_title": "120 in span, 5 ft tributary, 30 psf wind, aluminum at E = 10,000,000 psi",
+   "source_edition_or_year": "AAMA framing deflection",
+   "source_section_or_page": "L/175 up to 13 ft 6 in",
+   "verified_by": "rl",
+   "verified_on": "2026-08-26",
+   "inputs": {
+    "span_in": 120,
+    "tributary_width_ft": 5,
+    "wind_pressure_psf": 30,
+    "modulus_psi": 10000000,
+    "allowable_stress_psi": 12000
+   },
+   "outputs": {
+    "line_load_plf": {
+     "value": 150,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "allowable_deflection_in": {
+     "value": 0.685714,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_i_in4": {
+     "value": 4.92188,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "moment_in_lb": {
+     "value": 22500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

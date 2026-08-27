@@ -5614,6 +5614,10 @@
     {"term":"interpass temperature window","target":"interpass-temperature-control","kind":"industry"},
     {"term":"how long before reheat","target":"interpass-temperature-control","kind":"question"},
     {"term":"preheat window welding","target":"interpass-temperature-control","kind":"industry"},
-    {"term":"time between weld passes","target":"interpass-temperature-control","kind":"industry"}
+    {"term":"time between weld passes","target":"interpass-temperature-control","kind":"industry"},
+    {"term":"mullion deflection","target":"curtain-wall-mullion-deflection","kind":"industry"},
+    {"term":"curtain wall stiffness","target":"curtain-wall-mullion-deflection","kind":"industry"},
+    {"term":"aama l 175","target":"curtain-wall-mullion-deflection","kind":"industry"},
+    {"term":"mullion moment of inertia","target":"curtain-wall-mullion-deflection","kind":"industry"}
   ]
 }

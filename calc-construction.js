@@ -14317,3 +14317,63 @@ CONSTRUCTION_RENDERERS["ramp-detail-check"] = _simpleRenderer({
   ],
   compute: computeRampDetailCheck,
 });
+
+
+// ===================== spec-v1411: curtain wall mullion deflection limit =====================
+// Part of the 2026-08-26 trade expansion. See specs/scope-trade-expansion.md.
+// dims: in { args: dimensionless } out: { line_load_pli: M T^-2, allowable_deflection_in: L, required_i_in4: L^4, moment_in_lb: M L^2 T^-2 }
+export function computeCurtainWallMullionDeflection({ span_in = 0, tributary_width_ft = 0, wind_pressure_psf = 0, modulus_psi = 10000000, allowable_stress_psi = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(span_in > 0)) return { error: "Mullion span must be positive." };
+  if (!(tributary_width_ft > 0)) return { error: "Tributary width must be positive." };
+  if (!(wind_pressure_psf > 0)) return { error: "Design wind pressure must be positive." };
+  if (!(modulus_psi > 0)) return { error: "Elastic modulus must be positive." };
+  if (!(allowable_stress_psi >= 0)) return { error: "Allowable stress cannot be negative." };
+  // The limit is not comfort: glass is rigid and its sealant joints have limited movement
+  // capacity, so a frame that deflects too far breaks the glass or opens the seal.
+  const line_load_plf = wind_pressure_psf * tributary_width_ft;
+  const line_load_pli = line_load_plf / 12;
+  // AAMA: L/175 up to 13 ft 6 in of span, then L/240 + 1/4 in, because on a very long span
+  // a pure ratio would allow more deflection than any sealant can accommodate.
+  const long_span = span_in > 162;
+  const allowable_deflection_in = long_span ? span_in / 240 + 0.25 : span_in / 175;
+  const limit_rule = long_span ? "L/240 + 1/4 in (span over 13 ft 6 in)" : "L/175 (span up to 13 ft 6 in)";
+  const required_i_in4 = 5 * line_load_pli * span_in ** 4 / (384 * modulus_psi * allowable_deflection_in);
+  const moment_in_lb = line_load_pli * span_in ** 2 / 8;
+  const required_s_in3 = allowable_stress_psi > 0 ? moment_in_lb / allowable_stress_psi : null;
+  if (![line_load_pli, allowable_deflection_in, required_i_in4, moment_in_lb].every(Number.isFinite)) return { error: "Mullion-deflection math is not a finite value." };
+  if (required_s_in3 !== null && !Number.isFinite(required_s_in3)) return { error: "Mullion-deflection math is not a finite value." };
+  return {
+    line_load_plf,
+    line_load_pli,
+    allowable_deflection_in,
+    limit_rule,
+    required_i_in4,
+    moment_in_lb,
+    required_s_in3,
+    note: "The stiffness a curtain wall mullion needs to hold its deflection limit, which is what sizes aluminum framing far more often than strength does. A mullion is a simple beam spanning floor to floor, loaded by the wind pressure on the glass either side of it, so the line load is the pressure times the tributary width -- half a bay each way. Aluminum's elastic modulus is about 10 million psi, a third of steel's, which is why aluminum framing is deflection-governed almost without exception: it has plenty of strength and not much stiffness. The deflection limit is not about comfort. Glass is rigid and its sealant joints have limited movement capacity, so a frame that deflects too far either breaks the glass or opens the seal and leaks, and the industry limit is span over 175 for framing supporting glass on ordinary spans, switching to span over 240 plus a quarter inch on longer ones -- because on a very long span a pure ratio would allow a deflection larger than any sealant can accommodate. Note how hard the span drives it: deflection goes as the span to the FOURTH while the allowance goes as the span, so required stiffness scales as the CUBE. A 10 ft span at 5 ft tributary width and 30 psf needs 4.92 in^4; take the same wall to a 13 ft span and it needs 10.8 in^4, more than double for a 30% longer span, and more still past 13 ft 6 in where the limit tightens. Floor-to-floor height is the single most consequential input in a curtain wall's framing cost. A screen, never a stamp: the glazing system manufacturer's published section properties, the project's own wind design, AAMA's requirements in full, and the engineer of record govern.",
+  };
+}
+
+export const curtainWallMullionDeflectionExample = { inputs: { span_in: 120, tributary_width_ft: 5, wind_pressure_psf: 30, modulus_psi: 10000000, allowable_stress_psi: 12000 } };
+
+CONSTRUCTION_RENDERERS["curtain-wall-mullion-deflection"] = _simpleRenderer({
+  citation: "Citation: simple-span uniform-load deflection, I required = 5 w L^4 / (384 E delta), applied to a curtain wall mullion whose line load is the design wind pressure times the tributary width. The deflection limit is AAMA's for framing supporting glass -- L/175 up to a 13 ft 6 in span, L/240 + 1/4 in beyond it -- cited by name and not reproduced. A screen, never a stamp; the glazing system manufacturer's published section properties, the project's wind design, and the engineer of record govern.",
+  example: curtainWallMullionDeflectionExample.inputs,
+  fields: [
+    { key: "span_in", label: "Mullion span, floor to floor (in)", kind: "number" },
+    { key: "tributary_width_ft", label: "Tributary width (ft, half a bay each way)", kind: "number" },
+    { key: "wind_pressure_psf", label: "Design wind pressure (psf)", kind: "number" },
+    { key: "modulus_psi", label: "Elastic modulus (psi, 10,000,000 for aluminum)", kind: "number" },
+    { key: "allowable_stress_psi", label: "Allowable bending stress (psi, 0 to skip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "w", id: "cwmd-out-w", label: "Line load on the mullion", value: (r) => fmt(r.line_load_plf, 1) + " lb/ft (" + fmt(r.line_load_pli, 3) + " lb/in)" },
+    { key: "d", id: "cwmd-out-d", label: "Allowable deflection", value: (r) => fmt(r.allowable_deflection_in, 3) + " in by " + r.limit_rule },
+    { key: "i", id: "cwmd-out-i", label: "Required moment of inertia", value: (r) => fmt(r.required_i_in4, 2) + " in^4" },
+    { key: "m", id: "cwmd-out-m", label: "Bending moment", value: (r) => fmt(r.moment_in_lb, 0) + " in-lb" },
+    { key: "s", id: "cwmd-out-s", label: "Required section modulus", value: (r) => r.required_s_in3 === null ? "-" : fmt(r.required_s_in3, 3) + " in^3 at the stated allowable stress" },
+    { key: "n", id: "cwmd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCurtainWallMullionDeflection,
+});

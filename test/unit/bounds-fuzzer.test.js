@@ -40406,3 +40406,175 @@ test("bounds: spec-v1412 computeInterpassTemperatureControl pins the window and 
   assert.ok("error" in _v1412({ ...base, elapsed_min: -1 }));
   assert.ok("error" in _v1412({ ...base, tau_min: Infinity }));
 });
+
+// ===========================================================================
+// spec-v1406..v1411: the 2026-08-26 trade-expansion rotating-equipment,
+// hydraulics, and curtain wall band.
+// ===========================================================================
+
+import { computeRotorBalanceGrade as _v1406 } from "../../calc-shop.js";
+test("bounds: spec-v1406 computeRotorBalanceGrade pins the inverse-in-speed tolerance", () => {
+  // 50 kg at 3,600 rpm to G6.3: 377 rad/s, 16.71 g-mm/kg, 836 g-mm, 2.79 g per plane.
+  const base = { balance_grade: 6.3, rpm: 3600, rotor_mass_kg: 50, planes: 2, correction_radius_mm: 150 };
+  const r = _v1406(base);
+  assert.ok(Math.abs(r.omega_rad_s - 376.99) < 1e-2);
+  assert.ok(Math.abs(r.e_permissible - 16.711) < 1e-3);
+  assert.ok(Math.abs(r.u_permissible - 835.56) < 1e-2);
+  assert.ok(Math.abs(r.per_plane - 417.78) < 1e-2);
+  assert.ok(Math.abs(r.correction_mass_g - 2.785) < 1e-3);
+  // HALVING the speed DOUBLES every tolerance -- same rotor, same grade.
+  const slow = _v1406({ ...base, rpm: 1800 });
+  assert.ok(Math.abs(slow.correction_mass_g - 2 * r.correction_mass_g) < 1e-9);
+  assert.ok(Math.abs(slow.u_permissible - 2 * r.u_permissible) < 1e-9);
+  // A finer grade tightens it in direct proportion.
+  const fine = _v1406({ ...base, balance_grade: 2.5 });
+  assert.ok(Math.abs(fine.u_permissible / r.u_permissible - 2.5 / 6.3) < 1e-9);
+  // A single-plane correction takes the whole allowance.
+  const onePlane = _v1406({ ...base, planes: 1 });
+  assert.ok(Math.abs(onePlane.per_plane - r.u_permissible) < 1e-9);
+  // A larger correction radius needs proportionally less mass.
+  const wide = _v1406({ ...base, correction_radius_mm: 300 });
+  assert.ok(Math.abs(wide.correction_mass_g - r.correction_mass_g / 2) < 1e-9);
+  assert.ok("error" in _v1406({ ...base, balance_grade: 0 }));
+  assert.ok("error" in _v1406({ ...base, rpm: 0 }));
+  assert.ok("error" in _v1406({ ...base, rotor_mass_kg: 0 }));
+  assert.ok("error" in _v1406({ ...base, planes: 0 }));
+  assert.ok("error" in _v1406({ ...base, correction_radius_mm: 0 }));
+  assert.ok("error" in _v1406({ ...base, rpm: Infinity }));
+});
+
+import { computeBearingRegrease as _v1407 } from "../../calc-shop.js";
+test("bounds: spec-v1407 computeBearingRegrease pins the quantity and the corrected interval", () => {
+  // A 6310 (110 x 27 x 50 mm) at 1,800 rpm horizontal: 14.85 g every 900 hours.
+  const base = { od_mm: 110, width_mm: 27, bore_mm: 50, rpm: 1800, correction_factor: 1.0, duty_hours_per_day: 24 };
+  const r = _v1407(base);
+  assert.ok(Math.abs(r.grease_grams - 14.85) < 1e-9);
+  assert.ok(Math.abs(r.base_interval_hr - 900) < 1e-1);
+  assert.ok(Math.abs(r.corrected_interval_hr - r.base_interval_hr) < 1e-12);
+  assert.ok(Math.abs(r.interval_days - 37.5) < 1e-1);
+  // Vertical AND hot quarters the interval -- the corrections multiply.
+  const bad = _v1407({ ...base, correction_factor: 0.25 });
+  assert.ok(Math.abs(bad.corrected_interval_hr - 225) < 1e-1);
+  assert.ok(Math.abs(bad.corrected_interval_hr - r.corrected_interval_hr / 4) < 1e-9);
+  // The quantity does NOT depend on speed or on the corrections, only on the free volume.
+  assert.ok(Math.abs(_v1407({ ...base, rpm: 3600 }).grease_grams - r.grease_grams) < 1e-12);
+  assert.ok(Math.abs(bad.grease_grams - r.grease_grams) < 1e-12);
+  // The interval falls with speed.
+  assert.ok(_v1407({ ...base, rpm: 3600 }).base_interval_hr < r.base_interval_hr);
+  // A single shift stretches the same hours over more calendar days.
+  const oneShift = _v1407({ ...base, duty_hours_per_day: 8 });
+  assert.ok(Math.abs(oneShift.interval_days - 3 * r.interval_days) < 1e-9);
+  // Past the grease-lubrication range the relation gives no interval at all.
+  assert.ok("error" in _v1407({ ...base, rpm: 20000 }));
+  assert.ok("error" in _v1407({ ...base, od_mm: 0 }));
+  assert.ok("error" in _v1407({ ...base, width_mm: 0 }));
+  assert.ok("error" in _v1407({ ...base, bore_mm: 200 }));
+  assert.ok("error" in _v1407({ ...base, correction_factor: 1.5 }));
+  assert.ok("error" in _v1407({ ...base, duty_hours_per_day: 30 }));
+  assert.ok("error" in _v1407({ ...base, rpm: Infinity }));
+});
+
+import { computePlasmaCutSpeed as _v1408 } from "../../calc-shop.js";
+test("bounds: spec-v1408 computePlasmaCutSpeed pins which limit governs", () => {
+  // 240 in at 40 IPM with 4 pierces: 125 parts on pierces, 30 on arc hours -- hours govern.
+  const base = { cut_length_in: 240, cut_speed_ipm: 40, pierces_per_part: 4, set_cost: 35, rated_pierces: 500, rated_arc_hours: 3 };
+  const r = _v1408(base);
+  assert.ok(Math.abs(r.cut_time_min - 6.0) < 1e-9);
+  assert.ok(Math.abs(r.arc_hours_per_part - 0.10) < 1e-9);
+  assert.strictEqual(r.parts_by_pierces, 125);
+  assert.strictEqual(r.parts_by_arc_hours, 30);
+  assert.strictEqual(r.parts_per_set, 30);
+  assert.ok(r.governing.startsWith("arc hours"));
+  assert.ok(Math.abs(r.cost_per_part - 1.1667) < 1e-3);
+  assert.ok(Math.abs(r.cost_per_foot - 0.0583) < 1e-3);
+  // Reverse the part -- a nest of small holes -- and PIERCES govern, an order of magnitude apart.
+  const holes = _v1408({ ...base, cut_length_in: 30, pierces_per_part: 60 });
+  assert.strictEqual(holes.parts_by_pierces, 8);
+  assert.strictEqual(holes.parts_by_arc_hours, 240);
+  assert.ok(holes.governing.startsWith("pierces"));
+  assert.ok(Math.abs(holes.cost_per_part - 4.375) < 1e-3);
+  assert.ok(holes.cost_per_part > 3 * r.cost_per_part);
+  // A pierce-based estimate on the first part would have said $0.28 -- four times low.
+  assert.ok(Math.abs(base.set_cost / r.parts_by_pierces - 0.28) < 1e-2);
+  // Parts per set are floored to whole parts.
+  const ragged = _v1408({ ...base, pierces_per_part: 7 });
+  assert.strictEqual(ragged.parts_by_pierces, 71);
+  assert.ok("error" in _v1408({ ...base, cut_length_in: 0 }));
+  assert.ok("error" in _v1408({ ...base, cut_speed_ipm: 0 }));
+  assert.ok("error" in _v1408({ ...base, pierces_per_part: 0 }));
+  assert.ok("error" in _v1408({ ...base, set_cost: 0 }));
+  assert.ok("error" in _v1408({ ...base, rated_pierces: 0 }));
+  assert.ok("error" in _v1408({ ...base, rated_arc_hours: 0 }));
+  // A part that exhausts a set on its own is an error, not a zero.
+  assert.ok("error" in _v1408({ ...base, rated_pierces: 2 }));
+  assert.ok("error" in _v1408({ ...base, cut_length_in: Infinity }));
+});
+
+import { computeHydraulicReservoirCooler as _v1409 } from "../../calc-shop.js";
+test("bounds: spec-v1409 computeHydraulicReservoirCooler pins the heat and the cooler duty", () => {
+  // 20 gpm at 2,000 psi: 23.3 hydraulic hp, 27.5 input, 6.86 to heat = 17,469 BTU/hr.
+  const base = { pump_gpm: 20, pressure_psi: 2000, pump_efficiency: 0.85, heat_fraction: 0.25, reservoir_multiplier: 3, reservoir_dissipation_btu_hr: 4000 };
+  const r = _v1409(base);
+  assert.ok(Math.abs(r.hydraulic_hp - 23.337) < 1e-3);
+  assert.ok(Math.abs(r.input_hp - 27.456) < 1e-3);
+  assert.ok(Math.abs(r.heat_hp - 6.864) < 1e-3);
+  assert.ok(Math.abs(r.heat_btu_hr - 17468.6) < 1e-1);
+  assert.ok(Math.abs(r.reservoir_gal - 60) < 1e-9);
+  assert.ok(Math.abs(r.cooler_duty_btu_hr - 13468.6) < 1e-1);
+  // Circuit design, not cooler selection: 15% instead of 25% nearly halves the rejection.
+  const efficient = _v1409({ ...base, heat_fraction: 0.15, reservoir_dissipation_btu_hr: 0 });
+  assert.ok(Math.abs(efficient.heat_btu_hr - 10481.2) < 1e-1);
+  assert.ok(Math.abs(efficient.heat_btu_hr / (r.heat_btu_hr) - 0.15 / 0.25) < 1e-9);
+  // A mobile reservoir at 1x is a third the tank -- and needs a cooler for it.
+  const mobile = _v1409({ ...base, reservoir_multiplier: 1 });
+  assert.ok(Math.abs(mobile.reservoir_gal - 20) < 1e-9);
+  // A tank that sheds the whole load needs no cooler, and the duty floors at zero.
+  const cool = _v1409({ ...base, reservoir_dissipation_btu_hr: 25000 });
+  assert.ok(Math.abs(cool.cooler_duty_btu_hr) < 1e-12);
+  assert.ok(cool.verdict.startsWith("the reservoir sheds"));
+  // Input power always exceeds hydraulic power.
+  assert.ok(r.input_hp > r.hydraulic_hp);
+  assert.ok("error" in _v1409({ ...base, pump_gpm: 0 }));
+  assert.ok("error" in _v1409({ ...base, pressure_psi: 0 }));
+  assert.ok("error" in _v1409({ ...base, pump_efficiency: 1.5 }));
+  assert.ok("error" in _v1409({ ...base, heat_fraction: 0 }));
+  assert.ok("error" in _v1409({ ...base, reservoir_multiplier: 0 }));
+  assert.ok("error" in _v1409({ ...base, reservoir_dissipation_btu_hr: -1 }));
+  assert.ok("error" in _v1409({ ...base, pressure_psi: Infinity }));
+});
+
+import { computeCurtainWallMullionDeflection as _v1411 } from "../../calc-construction.js";
+test("bounds: spec-v1411 computeCurtainWallMullionDeflection pins the cube law and both limit rules", () => {
+  // 120 in span, 5 ft tributary, 30 psf: 12.5 lb/in, 0.686 in allowed, 4.92 in^4 needed.
+  const base = { span_in: 120, tributary_width_ft: 5, wind_pressure_psf: 30, modulus_psi: 10000000, allowable_stress_psi: 12000 };
+  const r = _v1411(base);
+  assert.ok(Math.abs(r.line_load_plf - 150) < 1e-9);
+  assert.ok(Math.abs(r.line_load_pli - 12.5) < 1e-9);
+  assert.ok(Math.abs(r.allowable_deflection_in - 0.6857) < 1e-4);
+  assert.ok(Math.abs(r.required_i_in4 - 4.922) < 1e-3);
+  assert.ok(Math.abs(r.moment_in_lb - 22500) < 1e-9);
+  assert.ok(Math.abs(r.required_s_in3 - 1.875) < 1e-9);
+  assert.ok(r.limit_rule.startsWith("L/175"));
+  // Required stiffness scales as the CUBE of span while the load is unchanged.
+  const longer = _v1411({ ...base, span_in: 156 });
+  assert.ok(Math.abs(longer.required_i_in4 - 10.8134) < 1e-3);
+  assert.ok(Math.abs(longer.required_i_in4 / r.required_i_in4 - (156 / 120) ** 3) < 1e-9);
+  // Past 13 ft 6 in the rule switches, and the allowance stops being a pure ratio.
+  const veryLong = _v1411({ ...base, span_in: 180 });
+  assert.ok(veryLong.limit_rule.startsWith("L/240"));
+  assert.ok(Math.abs(veryLong.allowable_deflection_in - 1.0) < 1e-9);
+  // At exactly 13 ft 6 in the ordinary rule still applies.
+  assert.ok(_v1411({ ...base, span_in: 162 }).limit_rule.startsWith("L/175"));
+  assert.ok(_v1411({ ...base, span_in: 163 }).limit_rule.startsWith("L/240"));
+  // Steel's modulus is three times aluminium's, so it needs a third the moment of inertia.
+  const steel = _v1411({ ...base, modulus_psi: 29000000 });
+  assert.ok(Math.abs(steel.required_i_in4 * 29 - r.required_i_in4 * 10) < 1e-6);
+  // Without an allowable stress the section modulus output is null, not zero.
+  assert.strictEqual(_v1411({ ...base, allowable_stress_psi: 0 }).required_s_in3, null);
+  assert.ok("error" in _v1411({ ...base, span_in: 0 }));
+  assert.ok("error" in _v1411({ ...base, tributary_width_ft: 0 }));
+  assert.ok("error" in _v1411({ ...base, wind_pressure_psf: 0 }));
+  assert.ok("error" in _v1411({ ...base, modulus_psi: 0 }));
+  assert.ok("error" in _v1411({ ...base, allowable_stress_psi: -1 }));
+  assert.ok("error" in _v1411({ ...base, span_in: Infinity }));
+});

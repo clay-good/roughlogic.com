@@ -961,6 +961,22 @@
     {"term":"arc rise from radius and chord","target":"circular-arc-rise-from-radius","kind":"question"},
     {"term":"sagitta from a radius","target":"circular-arc-rise-from-radius","kind":"question"},
     {"term":"rise at midspan of an arc","target":"circular-arc-rise-from-radius","kind":"question"},
-    {"term":"middle ordinate from radius","target":"circular-arc-rise-from-radius","kind":"question"}
+    {"term":"middle ordinate from radius","target":"circular-arc-rise-from-radius","kind":"question"},
+    {"term":"balance grade","target":"rotor-balance-grade","kind":"industry"},
+    {"term":"residual unbalance","target":"rotor-balance-grade","kind":"industry"},
+    {"term":"iso 1940","target":"rotor-balance-grade","kind":"industry"},
+    {"term":"how much unbalance is allowed","target":"rotor-balance-grade","kind":"question"},
+    {"term":"bearing grease quantity","target":"bearing-regrease","kind":"industry"},
+    {"term":"relubrication interval","target":"bearing-regrease","kind":"industry"},
+    {"term":"how much grease in a bearing","target":"bearing-regrease","kind":"question"},
+    {"term":"regrease schedule","target":"bearing-regrease","kind":"industry"},
+    {"term":"plasma consumable cost","target":"plasma-cut-speed","kind":"industry"},
+    {"term":"plasma cut time","target":"plasma-cut-speed","kind":"industry"},
+    {"term":"electrode and nozzle life","target":"plasma-cut-speed","kind":"industry"},
+    {"term":"cost per pierce","target":"plasma-cut-speed","kind":"industry"},
+    {"term":"hydraulic reservoir size","target":"hydraulic-reservoir-cooler","kind":"industry"},
+    {"term":"hydraulic heat load","target":"hydraulic-reservoir-cooler","kind":"industry"},
+    {"term":"oil cooler sizing","target":"hydraulic-reservoir-cooler","kind":"industry"},
+    {"term":"how big a hydraulic tank","target":"hydraulic-reservoir-cooler","kind":"question"}
   ]
 }

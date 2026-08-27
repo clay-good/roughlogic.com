@@ -545,6 +545,8 @@ const TOOL_MODULES = (() => {
     "water-closet-location",
     "lavatory-tub-clearance",
     "ramp-detail-check",
+    // spec-v1411: the 2026-08-26 trade-expansion curtain wall tile.
+    "curtain-wall-mullion-deflection",
     // spec-v332..v334 wood-fastener withdrawal batch.
     "wood-nail-withdrawal", "wood-lag-withdrawal", "wood-screw-withdrawal",
     "cantilever-beam", "section-properties", "combined-stress-axial-bending",
@@ -922,6 +924,11 @@ const TOOL_MODULES = (() => {
     "compound-miter",
     // spec-v399..v400 fabrication shop-math
     "tolerance-stack-rss", "cone-flat-pattern", "frustum-volume", "regular-polygon", "ellipse-area-perimeter", "spherical-cap-volume", "parabolic-segment", "pyramid-frustum-volume", "torus-volume", "ellipsoid-volume", "annulus-area", "circular-sector", "paraboloid-volume", "cylindrical-wedge-volume", "barrel-volume", "tank-volume-dished-heads", "spherical-zone-volume", "oval-tank-volume", "cone-bottom-tank-volume", "tapered-tank-volume",
+    // spec-v1406..v1409: the 2026-08-26 trade-expansion rotating-equipment and hydraulics band.
+    "rotor-balance-grade",
+    "bearing-regrease",
+    "plasma-cut-speed",
+    "hydraulic-reservoir-cooler",
     // spec-v511 interference press-fit pressure and holding force
     "press-fit-pressure", "press-fit-interference-for-force",
     // spec-v512 roller chain length in pitches (ANSI B29.1)
