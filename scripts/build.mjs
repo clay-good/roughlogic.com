@@ -18,6 +18,7 @@ const FILES = [
   "index.html",
   "styles.css",
   "app.js",
+  "tool-modules.js",
   "tools-data.js",
   "sw.js",
   "manual-j-worker.js",

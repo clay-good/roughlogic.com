@@ -2,8 +2,8 @@
 // spec-v1184 gate: keep the MCP field-schema surface honest as the catalog grows.
 //
 // Three assertions:
-//   1. renderer-map.js is fresh — it equals a rebuild from app.js's declare()
-//      table, so the fixture the MCP layer trusts cannot drift from app.js.
+//   1. renderer-map.js is fresh — it equals a rebuild from tool-modules.js's
+//      declare() table, so the fixture the MCP layer trusts cannot drift from it.
 //   2. Schema/compute parity — every tile whose renderer carries a `render.schema`
 //      exposes only field keys that are real parameters of its runnable compute
 //      function. A schema key the compute never destructures is drift (an agent
@@ -48,12 +48,12 @@ function introspect(fn) {
 
 async function main() {
   // --- 1. renderer-map freshness ---
-  const appSrc = readFileSync(new URL("app.js", ROOT), "utf8");
+  const appSrc = readFileSync(new URL("tool-modules.js", ROOT), "utf8");
   const { map: fresh, order } = parseDeclares(appSrc);
   const { RENDERER_MAP } = await import(RMAP_URL.href);
   const checkedIds = Object.keys(RENDERER_MAP);
   if (checkedIds.length !== order.length) {
-    fail(`renderer-map is stale: fixture has ${checkedIds.length} ids, app.js declares ${order.length}. Run \`node scripts/build-renderer-map.mjs\`.`);
+    fail(`renderer-map is stale: fixture has ${checkedIds.length} ids, tool-modules.js declares ${order.length}. Run \`node scripts/build-renderer-map.mjs\`.`);
   }
   for (const id of order) {
     const a = RENDERER_MAP[id], b = fresh[id];

@@ -169,7 +169,8 @@ async function main() {
   }
 
   // Rule 4 (spec-v12 §G.4): renderer-export cross-check. For every
-  // declare("./calc-X.js", "X_RENDERERS", [tile_ids...]) in app.js,
+  // the declare() table in tool-modules.js (extracted from app.js by the
+  // spec-v10 SS H.1/H.2 lazy-shard change),
   // verify the target module exports a renderer registry named
   // X_RENDERERS and that every listed tile_id appears as a key in
   // that registry. The pre-G.4 enforcement was the renderer-wiring
@@ -179,7 +180,7 @@ async function main() {
   let rendererPairsChecked = 0;
   let rendererTileIdsChecked = 0;
   try {
-    const appJs = await readFile(resolve(ROOT, "app.js"), "utf8");
+    const appJs = await readFile(resolve(ROOT, "tool-modules.js"), "utf8");
     // Match: declare("./calc-foo.js", "FOO_RENDERERS", [ "tile-a", "tile-b", ... ])
     const declareRe = /declare\(\s*["']\.\/([a-zA-Z0-9_./-]+\.js)["']\s*,\s*["']([A-Z][A-Z0-9_]*)["']\s*,\s*\[([\s\S]*?)\]\s*\)/g;
     for (const m of appJs.matchAll(declareRe)) {
@@ -188,7 +189,7 @@ async function main() {
       const tileIds = [...m[3].matchAll(/"([a-z0-9-]+)"/g)].map((mm) => mm[1]);
       const targetSrc = await readFile(resolve(ROOT, modulePath), "utf8").catch(() => null);
       if (targetSrc === null) {
-        fail("app.js declare() references " + modulePath + " which does not exist on disk");
+        fail("tool-modules.js declare() references " + modulePath + " which does not exist on disk");
         continue;
       }
       rendererPairsChecked++;
@@ -202,7 +203,7 @@ async function main() {
       );
       if (!exportRe.test(targetSrc)) {
         fail(modulePath + " does not export " + exportName +
-          " (referenced by app.js declare(\"./" + modulePath + "\", \"" + exportName + "\", ...))");
+          " (referenced by tool-modules.js declare(\"./" + modulePath + "\", \"" + exportName + "\", ...))");
         continue;
       }
       // Extract the registry-literal body and the post-hoc assignment

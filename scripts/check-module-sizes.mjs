@@ -38,6 +38,16 @@ const DIST = resolve(ROOT, "dist");
 // from the table use the default cap (DEFAULT_CAP).
 const DEFAULT_CAP = 6 * 1024;
 const CAPS = {
+  // spec-v10 §§H.1/H.2: the tile-id -> renderer-module registry, extracted
+  // from app.js on 2026-08-27 and lazy-loaded on the first tile open. It is
+  // one entry per tile, so it grows with the catalog by design and the
+  // per-tile 5 KB rationale below does not apply -- and like tools-data.js
+  // it is NOT in the home-view payload, which is the entire point of the
+  // extraction: app.js gzipped fell 47,085 -> 22,878 B when this moved out,
+  // and the home-view JS sub-budget went back to its specified 40 KB after
+  // five accommodating bumps. Cap is current (~25 KB gz at 1,804 tiles)
+  // plus generous headroom.
+  "tool-modules.js": 40000,
   // spec-v17 §H.2: the catalog metadata registry, extracted from app.js
   // and lazy-loaded on the first search / tile-route interaction (not
   // per-tile, so the 5 KB per-tile rationale below does not apply). Cap

@@ -1,17 +1,17 @@
 #!/usr/bin/env node
-// Build test/fixtures/renderer-map.js from app.js's TOOL_MODULES declare() table.
+// Build test/fixtures/renderer-map.js from tool-modules.js's TOOL_MODULES table.
 //
 // spec-v1184: the MCP catalog layer needs to reach each tile's renderer to read
 // the field descriptor (`render.schema`) the way it already reaches each tile's
-// compute function via compute-map.js. app.js is the single source of truth for
+// compute function via compute-map.js. tool-modules.js is the single source of truth for
 // which module/export holds a tile's renderer -- it registers them with
 //
 //   declare("./calc-electrical.js", "ELECTRICAL_RENDERERS", ["ohms-law", ...]);
 //
-// This script parses those calls (text, not import: app.js is a browser module
+// This script parses those calls (text, not import: tool-modules.js is a browser module
 // that touches the DOM on load and will not import under Node) and emits a
 // fixture mapping tile id -> { module, exportName }, the mirror of compute-map.js.
-// Module paths are rewritten from app.js's root-relative "./calc-x.js" to the
+// Module paths are rewritten from tool-modules.js's root-relative "./calc-x.js" to the
 // "../../calc-x.js" the fixture needs from test/fixtures/, matching compute-map.
 //
 // Generated file; do not hand-edit. Regenerate with `node scripts/build-renderer-map.mjs`.
@@ -19,7 +19,7 @@
 
 import { readFileSync, writeFileSync } from "node:fs";
 
-const APP_URL = new URL("../app.js", import.meta.url);
+const APP_URL = new URL("../tool-modules.js", import.meta.url);
 const OUT_URL = new URL("../test/fixtures/renderer-map.js", import.meta.url);
 
 // Strip // line comments from a chunk of source without touching string contents.

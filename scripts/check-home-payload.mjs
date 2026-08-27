@@ -36,36 +36,35 @@ const HOME_FILES = [
 
 const BUDGET_BYTES = 100 * 1024;
 
-// Spec-v10 §H.2 per-category sub-budgets (gzipped). The JS sub-budget
-// was bumped 40 -> 42 KB on 2026-05-12 when the v12 Group U / V / W /
-// X / Y TOOLS entries (~15 new rows) pushed app.js gzipped from
-// ~35.5 KB to ~37.4 KB, then re-bumped 42 -> 45 KB on 2026-05-13 when
-// the U / V / W / X / Y expansion batches pushed app.js past 38 KB
-// gzipped, then re-bumped 45 -> 47 KB on 2026-06-01 when the spec-v15
-// Group A + Group G TOOLS rows (nine new tiles) pushed app.js gzipped
-// past 45 KB, then re-bumped 47 -> 49 KB on 2026-06-03 when the spec-v16
-// Group C (HVAC) and Group M (water/wastewater) TOOLS rows (seven new
-// tiles) pushed app.js gzipped past 47 KB. Per spec-v10 §H.1 / §H.2 a
-// TOOLS-extraction into its own lazy-loaded shard remains the preferred
-// long-term remediation; the cap bumps are the documented interim
-// accommodation while the v15 / v16 tile groups are still landing.
+// Spec-v10 §H.2 per-category sub-budgets (gzipped).
 //
-// Re-bumped 49 -> 52 KB on 2026-08-26: the spec-v1350..v1449 trade
-// expansion added 72 tiles across nine bands, and each one costs app.js
-// a tile-id string in a declare() list plus a TOOLS row. That took the
-// home-view JS from ~48.4 KB gzipped to 50.1 KB -- 99.8% of the old
-// 49 KB cap, which would have gone red on the very next tile anyone
-// added. THE TOOLS-EXTRACTION REMEDIATION IS NOW GENUINELY DUE: app.js
-// gzipped is within a few KB of the whole home-view budget's JS share,
-// and the remaining ~28 specs of that expansion will push it further.
-// The cap bump buys room for those; it is not a substitute for the
-// lazy-loaded TOOLS shard spec-v10 SS H.1 / H.2 calls for.
-// Sub-budgets sum to 97 KB; the gap to the overall 100 KB cap is
+// THE JS SUB-BUDGET IS BACK TO ITS SPECIFIED 40 KB. It had been bumped five
+// times -- 40 -> 42 -> 45 -> 47 -> 49 -> 52 KB between 2026-05-12 and
+// 2026-08-26 -- because every tile added to the catalog cost app.js a
+// tile-id string in its inline TOOL_MODULES table, and each bump was
+// recorded as an interim accommodation for the remediation spec-v10
+// §§H.1/H.2 actually calls for: extracting that table into its own
+// lazy-loaded shard.
+//
+// That extraction landed on 2026-08-27. The table is now `tool-modules.js`,
+// imported on the first tile open rather than at boot, and app.js gzipped
+// went from 47,085 B to 22,878 B -- the registry was 24.4 KB of it, 46% of
+// the entire JS sub-budget, for a table the home view never reads. The
+// home-view JS total went from 50,385 B (94.6% of the inflated 52 KB cap)
+// to 26,178 B, which is 64% of the ORIGINAL 40 KB budget.
+//
+// The budget is therefore restored rather than left at its accommodated
+// value, so the gate means what the spec says again. Note what changed and
+// what did not: the home view no longer pays for catalog growth at all, so
+// adding tiles moves tool-modules.js (which has no home-view budget) and
+// leaves this number alone.
+//
+// Sub-budgets sum to 85 KB; the gap to the overall 100 KB cap is
 // intentional slack.
 const SUB_BUDGETS = {
   html: 20 * 1024,
   css: 25 * 1024,
-  js: 52 * 1024,
+  js: 40 * 1024,
 };
 
 let total = 0;

@@ -69,9 +69,12 @@ function scannersFor(rel) {
       // Static + dynamic imports of same-origin .js (relative).
       { match: /from\s+["']\.?\/?([a-zA-Z0-9_./-]+\.(?:js|mjs))["']/g, capture: 1, kind: "js-import" },
       { match: /\bimport\(\s*["']\.?\/?([a-zA-Z0-9_./-]+\.(?:js|mjs))["']\s*\)/g, capture: 1, kind: "js-dynamic-import" },
-      // app.js declare("./calc-X.js", "X_RENDERERS", [...]) helper for
-      // dynamic tile-module registration. The runtime calls
+      // tool-modules.js declare("./calc-X.js", "X_RENDERERS", [...]) helper
+      // for dynamic tile-module registration. The runtime calls
       // import(meta.path) where meta.path is the first declare() arg.
+      // (That table lived inline in app.js until the spec-v10 SS H.1 / H.2
+      // lazy-shard extraction moved it; this scanner is generic over .js
+      // files, so it followed it without a change.)
       { match: /\bdeclare\s*\(\s*["']\.?\/?([a-zA-Z0-9_./-]+\.(?:js|mjs))["']/g, capture: 1, kind: "js-declare" },
       // new Worker("./<x>.js", { type: "module" }) for the v3 §HVAC
       // Manual J background worker (and any future workers).
