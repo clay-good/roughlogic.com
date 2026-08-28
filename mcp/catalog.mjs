@@ -333,6 +333,54 @@ function introspectInputs(fn) {
     .filter(Boolean);
 }
 
+// Whether a compute's parameter list is CLOSED -- a plain object destructure
+// with no rest element, so the keys it accepts are exactly the ones named.
+//
+// `computeGeometry({ shape, ...args })` is not closed: it reads a different set
+// of keys per shape, and every one of them is legitimate. `computeRentVsBuy(inp)`
+// takes a bare object and is not closed either. Neither can be checked against a
+// key list, so neither is.
+function acceptsOnlyNamedKeys(fn) {
+  const src = stripComments(fn.toString());
+  const open = src.indexOf("(");
+  if (open === -1) return false;
+  const brace = src.indexOf("{", open);
+  if (brace === -1 || src.slice(open, brace).includes(")")) return false;
+  let depth = 0, end = -1;
+  for (let i = brace; i < src.length; i++) {
+    if (src[i] === "{") depth++;
+    else if (src[i] === "}") { depth--; if (depth === 0) { end = i; break; } }
+  }
+  if (end === -1) return false;
+  return !src.slice(brace + 1, end).includes("...");
+}
+
+// spec-v1190 companion: an input key the compute cannot receive.
+//
+// `run` spreads the caller's object into the compute, so a key the destructure
+// does not name is dropped without a word and the tile answers from its
+// defaults -- a confident number built on a value the caller believes it
+// supplied. A misspelled `Rr` for `R`, or the key the tile's own PAGE shows for
+// one of the four calculators whose renderer converts units at the boundary
+// (`ambient_F` where the compute takes `ambient_C`), both landed that way.
+//
+// Advisory, like the range warnings beside it: the compute is total and still
+// returns, but the caller is told which of its values never arrived.
+function validateKnownKeys(fn, inputs, advertised) {
+  const warnings = [];
+  if (!inputs || !advertised || !advertised.size) return warnings;
+  if (!acceptsOnlyNamedKeys(fn)) return warnings;
+  for (const key of Object.keys(inputs)) {
+    if (advertised.has(key)) continue;
+    warnings.push({
+      key, rule: "unknown",
+      message: `"${key}" is not an input of this calculator; it was ignored and the ` +
+        `default was used. Call describe_calculator for the keys it accepts.`,
+    });
+  }
+  return warnings;
+}
+
 export async function search({ query = "", trade = "", limit = 30 } = {}) {
   const { TOOLS, aliases } = await load();
   const q = String(query).toLowerCase().trim();
@@ -659,7 +707,20 @@ export async function run({ id, inputs } = {}) {
   // spec-v1190: advisory range warnings for caller-supplied numbers, and the
   // tile's limitation banner. A verified worked example is in-range by
   // construction, so only caller inputs are checked.
-  out.warnings = usedExample ? [] : validateNumbers(schema, args);
+  // The keys the door advertises are the keys `run` can honor: schema fields
+  // where the tile has a consistent one, the compute's own parameters
+  // otherwise, plus anything the worked example names for a signature that
+  // cannot be read. A verified example is correct by construction, so only
+  // caller-supplied inputs are checked.
+  out.warnings = usedExample
+    ? []
+    : validateNumbers(schema, args).concat(
+      validateKnownKeys(
+        fn,
+        args,
+        new Set((await describe({ id })).inputs?.map((f) => f.name ?? f.key) || []),
+      ),
+    );
   out.limitation = getLimitationCopy(id) || null;
   return out;
 }

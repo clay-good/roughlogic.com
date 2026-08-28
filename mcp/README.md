@@ -51,6 +51,16 @@ key the tile's own example sets must be advertised, and that example must run
 clean through `run_calculator`. All three are checked for all 1,804 tiles on
 every build.
 
+`run_calculator` also warns when it is handed a key the calculator cannot
+receive. It spreads the caller's object into the compute, so an unrecognised
+key is dropped silently and the tile answers from its defaults -- a confident
+number built on a value the caller believes it supplied. A misspelling, or the
+key the tile's own page shows for one of the four calculators whose renderer
+converts units at the boundary, both land that way. The warning is advisory and
+the result still comes back. Calculators that legitimately take a
+shape-dependent key set are exempt, since their accepted keys are not a fixed
+list.
+
 `answer_query` reads the `data/fields/` descriptors the website reads, which
 exist for the 1,425 calculators that carry a renderer schema. For the other
 379 it projects the descriptors from `describe_calculator` instead, naming each

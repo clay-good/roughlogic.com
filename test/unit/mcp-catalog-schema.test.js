@@ -478,3 +478,52 @@ test("a coded or list-valued input is never guessed at from a number in the ques
   const r = await answerQuery({ query: "box culvert headwater 36 in span 48 in rise 60 cfs 30 degree wingwall" });
   assert.ok(!("config" in (r.inputs || {})), "config was not filled from a stray number");
 });
+
+// --- an input key the compute cannot receive ---
+//
+// `run` spreads the caller's object into the compute, so a key the destructure
+// does not name is dropped without a word and the tile answers from its
+// defaults: a confident number built on a value the caller believes it supplied.
+
+test("run warns on an input key the calculator cannot receive", async () => {
+  const r = await run({ id: "ohms-law", inputs: { V: 120, I: 10, Rr: 5 } });
+  const w = r.warnings.find((x) => x.key === "Rr");
+  assert.ok(w, "the misspelled key is named");
+  assert.equal(w.rule, "unknown");
+  assert.ok("result" in r, "advisory only -- the compute still answers");
+});
+
+test("run warns when a caller sends the key the tile's own PAGE shows", async () => {
+  // time-alignment is one of four tiles whose renderer converts units at the
+  // boundary: the page asks for ambient_F, the compute takes ambient_C. An
+  // agent replaying the page's example got a different answer and no signal.
+  const r = await run({
+    id: "time-alignment",
+    inputs: { d_main_ft: 80, d_delay_ft: 30, ambient_F: 71.6, haas_offset_ms: 15 },
+  });
+  assert.ok(r.warnings.some((x) => x.key === "ambient_F" && x.rule === "unknown"));
+});
+
+test("a compute that collects a shape-dependent key set is never warned about", async () => {
+  // computeGeometry({ shape, ...args }) reads a different set of keys per
+  // shape and every one is legitimate, so its parameter list cannot be checked
+  // against a key list and is not.
+  const r = await run({ id: "geometry", inputs: { shape: "circle", radius: 5 } });
+  assert.deepEqual(r.warnings.filter((w) => w.rule === "unknown"), []);
+  assert.ok(!r.result.error, "and it still computes");
+});
+
+test("every tile's own worked example runs warning-free through the door", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const raw = JSON.parse(await readFile(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8"));
+  const seen = new Set();
+  const bad = [];
+  for (const row of raw.rows) {
+    if (seen.has(row.tile_id)) continue;
+    seen.add(row.tile_id);
+    // Explicit inputs, so the worked-example shortcut cannot skip the check.
+    const out = await run({ id: row.tile_id, inputs: { ...row.inputs } });
+    for (const w of out.warnings || []) if (w.rule === "unknown") bad.push(`${row.tile_id}.${w.key}`);
+  }
+  assert.deepEqual(bad, []);
+});
