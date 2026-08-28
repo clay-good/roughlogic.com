@@ -276,7 +276,15 @@ export function queryFill(query, rows, opts) {
   const empty = { filled: {}, missing: [], unmatched: [] };
   if (!Array.isArray(rows) || !rows.length) return empty;
 
-  const numberRows = rows.filter((r) => r.k !== "select" && r.k !== "checkbox");
+  // A `text` field is not a numeric field. `tire-gearing` wants a tire size
+  // written `P265/70R17` and `tphc-window` wants a clock time `10:30`; both were
+  // in this list, so the extractor handed them the first bare number it found
+  // and wrote "33" and "10" into them. Neither is a quantity, and no conversion
+  // makes it one -- the governing rule at the top of this file says a wrong
+  // prefill is worse than no prefill. They are still named in the ask card.
+  const numberRows = rows.filter(
+    (r) => r.k !== "select" && r.k !== "checkbox" && r.k !== "text" && r.k !== "textarea",
+  );
   const selectRows = rows.filter((r) => r.k === "select" && Array.isArray(r.o));
 
   // Literal option values are protected from the rewrites. See rewriteQuery.

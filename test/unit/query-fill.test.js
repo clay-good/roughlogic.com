@@ -303,3 +303,38 @@ test("vetoing an option's digits does not disturb the fields around it", async (
   assert.equal(filled.evaporator_psig, "20");
   assert.equal(filled.valve_dp_psi, "100");
 });
+
+// A `text` field is not a numeric field. tire-gearing wants a tire size
+// written `P265/70R17` and tphc-window wants a clock time `10:30`; both sat in
+// the number-row list, so the extractor handed them the first bare number it
+// found and wrote "33" and "10" into them. Neither is a quantity and no
+// conversion makes it one -- and the rule at the top of query-fill.js is that a
+// wrong prefill is worse than no prefill. They are still named in the ask card.
+test("a text field is never filled with a bare number", async () => {
+  const all = {};
+  const dir = resolve(ROOT, "data", "fields");
+  for (const n of await readdir(dir)) {
+    if (n === "manifest.json") continue;
+    Object.assign(all, JSON.parse(await readFile(resolve(dir, n), "utf8")).tiles);
+  }
+  const tire = all["tire-gearing"];
+  assert.ok(tire, "tire-gearing should be indexed");
+  assert.equal(tire.find((r) => r.d === "original_size").k, "text");
+  const t = queryFill(
+    "Original tire size P265/70R17, New tire size 33x12.50R17, Axle ratio 3.73, Target cruise RPM 1800",
+    tire, { name: "Tire Size Change" },
+  ).filled;
+  assert.ok(!("original_size" in t), "the size code is not guessed at from a number");
+  assert.ok(!("new_size" in t));
+  assert.equal(t.target_rpm, "1800", "a real number field on the same tile still fills");
+
+  const tphc = all["tphc-window"];
+  assert.ok(tphc, "tphc-window should be indexed");
+  assert.equal(tphc.find((r) => r.d === "mark_time").k, "text");
+  const w = queryFill(
+    "Mark time 10:30, Window option cold_6, Ambient temperature 75, Product time constant tau 4 hr",
+    tphc, { name: "TPHC Window" },
+  ).filled;
+  assert.ok(!("mark_time" in w), "a clock time is not read as a quantity");
+  assert.equal(w.window_option, "cold_6", "the select on the same tile still fills");
+});
