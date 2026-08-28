@@ -708,7 +708,19 @@ export function outputUnits(id) {
 // fall back rather than print a bare number dressed as a formatted one.
 export function formatWithUnit(unit, raw, val, caption) {
   if (!unit || (!unit.prefix && !unit.suffix)) return null;
-  const body = typeof raw === "number" ? atToolPrecision(raw, val, unit.digits) : val;
+  // `scale` is the factor the renderer applies before printing -- the x100 that
+  // turns a 0.6 ratio into the 60% its page shows. Applying it here is what
+  // lets the unit be kept at all: without it the choice was a wrong number
+  // ("0.6%") or a bare one ("0.6").
+  let body;
+  if (typeof raw === "number" && typeof unit.scale === "number") {
+    const v = raw * unit.scale;
+    body = atToolPrecision(v, String(v), unit.digits);
+  } else if (typeof raw === "number") {
+    body = atToolPrecision(raw, val, unit.digits);
+  } else {
+    body = val;
+  }
   if (body === "" || body == null) return null;
   return (unit.prefix || "") + body + withoutRepeat(unit.suffix, caption);
 }

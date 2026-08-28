@@ -223,6 +223,32 @@ function parseOutputUnit(expr, key) {
   if (suffix.length > 16 || (prefix + suffix).length > 24) return null;
   // A digit next to the number reads as part of it ("1200 3-phase").
   if (/^\s*[\d.]/.test(suffix)) return null;
+  // The affix belongs to whatever the renderer PRINTS, and the segment holding
+  // the key may SCALE it first: `fmt(r.contribution_margin_ratio * 100, 2) +
+  // "%"` prints 60.00%, but recording "%" against the raw 0.6 made the tile
+  // page read "0.6%" -- a sixty-percent margin shown as under one percent.
+  // Seven pages shipped that way (contribution margin ratio, solar collector
+  // efficiency, sling bend efficiency, reeving efficiency, PV capacity factor
+  // and clipping onset, SVI settled fraction), and the same shape turned an
+  // hour into " min" and an ohm into " milliohm".
+  //
+  // A plain numeric scale is recorded, so the page can print the number the
+  // renderer prints rather than dropping the unit. Any OTHER arithmetic --
+  // a reciprocal (`"1 / " + fmt(1 / r.recommended_hp, 0) + " HP"`), a unit
+  // conversion by a named constant -- cannot be reproduced from the raw value
+  // and disqualifies the affix instead. String literals are stripped first so
+  // a hyphen inside one is not read as a minus.
+  const KEY = /r\.[A-Za-z_$][\w$]*/;
+  const scaled = parts[at].match(
+    new RegExp("^fmt\\(\\s*" + KEY.source + "\\s*([*/])\\s*(\\d+(?:\\.\\d+)?)\\s*,\\s*(\\d+)\\s*\\)$"),
+  );
+  if (scaled) {
+    const n = Number(scaled[2]);
+    if (!Number.isFinite(n) || n === 0) return null;
+    return { prefix, suffix, digits: Number(scaled[3]), scale: scaled[1] === "*" ? n : 1 / n };
+  }
+  const keySegment = parts[at].replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g, "");
+  if (/[*/]|(?<![\w$])-|-(?![\w$])/.test(keySegment.replace(/r\.[A-Za-z_$][\w$]*/g, "K"))) return null;
   // How many decimals the calculator itself shows. A page that prints
   // `1.52625` where the tool prints `1.5` is quoting a precision the tool
   // never claims.
@@ -239,6 +265,20 @@ function parseOutputUnits(body) {
   const lines = new Set();
   for (const m of body.matchAll(/\b([A-Za-z_$][\w$]*)\s*=\s*\w*makeOutputLine\(/g)) lines.add(m[1]);
   if (lines.size === 0) return {};
+  // How many display lines mention each key at all -- including the ones the
+  // single-reference rule below skips. A key written by two lines has no
+  // unambiguous SCALE: `riprap-d50` prints D50 on one line and the layer
+  // thickness (`r.d50_in * 1.5`) on another, and reading the 1.5 off the wrong
+  // line reported an 11.7 in stone as 17.6 in. A mis-read affix is usually
+  // harmless -- both lines are inches -- but a mis-read scale is a wrong
+  // number, so only the scale is held to this stricter test.
+  const mentions = new Map();
+  for (const m of body.matchAll(/([A-Za-z_$][\w$]*)\.textContent\s*=\s*([^;]*)/g)) {
+    if (!lines.has(m[1])) continue;
+    for (const k of new Set([...m[2].matchAll(/\br\.([A-Za-z_$][\w$]*)/g)].map((x) => x[1]))) {
+      mentions.set(k, (mentions.get(k) || 0) + 1);
+    }
+  }
   const map = {};
   const seen = new Set();
   for (const m of body.matchAll(/([A-Za-z_$][\w$]*)\.textContent\s*=\s*([^;]*)/g)) {
@@ -248,7 +288,8 @@ function parseOutputUnits(body) {
     if (refs.length !== 1) continue;
     const key = refs[0];
     if (key === "error" || key === "message") continue;
-    const unit = parseOutputUnit(expr, key);
+    let unit = parseOutputUnit(expr, key);
+    if (unit && typeof unit.scale === "number" && (mentions.get(key) || 0) > 1) unit = null;
     // A key two lines write with different units is a key we cannot name.
     if (seen.has(key)) { if (!unit || JSON.stringify(map[key]) !== JSON.stringify(unit)) delete map[key]; continue; }
     seen.add(key);

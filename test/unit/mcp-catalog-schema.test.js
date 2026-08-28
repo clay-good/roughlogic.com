@@ -588,3 +588,28 @@ test("every tile's own worked example runs warning-free through the door", async
   }
   assert.deepEqual(bad, []);
 });
+
+test("an answer unit is applied to the number the renderer actually prints", async () => {
+  // The affixes are extracted from a renderer's display expression, which may
+  // scale the value first. `breakeven` prints
+  // `fmt(r.contribution_margin_ratio * 100, 2) + "%"`, so recording "%" against
+  // the raw 0.6 made the tile page read "0.6%" for a sixty-percent margin.
+  const { formatWithUnit, outputUnits } = await import("../../mcp/catalog.mjs");
+  const u = outputUnits("breakeven").contribution_margin_ratio;
+  assert.equal(u.scale, 100, "the x100 the renderer applies is recorded, not discarded");
+  assert.equal(formatWithUnit(u, 0.6, "0.6", "Contribution margin ratio"), "60%");
+
+  // A scale that cannot be attributed to one line is not recorded at all:
+  // riprap-d50 prints D50 on one line and the layer thickness (d50_in * 1.5) on
+  // another, and reading the 1.5 off the wrong line reported 11.7 in as 17.6.
+  const d50 = outputUnits("riprap-d50").d50_in;
+  assert.ok(!d50 || typeof d50.scale !== "number", "an ambiguous scale is dropped, not guessed");
+});
+
+test("a unit that cannot be reproduced from the raw value is dropped", async () => {
+  // `recirc-loop-sizing` prints `"1 / " + fmt(1 / r.recommended_hp, 0) + " HP"`.
+  // A reciprocal cannot be rebuilt from the raw number, so " HP" is not kept --
+  // it would have printed 0.333 HP where the tool says 1 / 3 HP.
+  const { outputUnits } = await import("../../mcp/catalog.mjs");
+  assert.ok(!outputUnits("recirc-loop-sizing").recommended_hp);
+});
