@@ -131,37 +131,51 @@ async function main() {
     }
   }
 
-  // The field shards are precached one file at a time, not behind a manifest,
-  // so the per-folder check above cannot see them. Their file set is not fixed
-  // either: scripts/build-field-index.mjs writes one shard per group letter
-  // that has an indexed tile, so labelling a field on a group nothing else
-  // covers creates a new shard -- which is exactly how data/fields/q.json
-  // appeared, unlisted, and would have left that group's tiles fetching over
-  // the network on an offline install.
+  // Some data files are precached ONE FILE AT A TIME rather than behind a
+  // per-folder manifest, so the check above cannot see them -- and their file
+  // sets are not fixed. A shard appears the first time a group letter has
+  // something to put in it, which is exactly how data/fields/q.json arrived
+  // unlisted: captioning one field on a group nothing else covered created a
+  // file, and that group's tiles would have fetched over the network on an
+  // offline install.
+  //
+  // Each entry below is a directory plus the filename pattern sw.js lists from
+  // it. The pattern matters: data/search also holds `aliases.json`, the merged
+  // master that the build and the MCP server read and the browser never
+  // fetches, so requiring every file in that directory would be wrong.
+  const SHARDED = [
+    { dir: "fields", label: "data/fields", match: (f) => f.endsWith(".json") && f !== "manifest.json" },
+    { dir: "search", label: "data/search", match: (f) => /^aliases-[A-Za-z0-9_-]+\.json$/.test(f) },
+  ];
+
   let shardChecked = 0;
-  const shardDir = resolve(DATA_DIR, "fields");
-  if (existsSync(shardDir)) {
-    const onDisk = (await readdir(shardDir))
-      .filter((f) => f.endsWith(".json") && f !== "manifest.json")
-      .sort();
+  for (const group of SHARDED) {
+    const dir = resolve(DATA_DIR, group.dir);
+    if (!existsSync(dir)) continue;
+    const onDisk = (await readdir(dir)).filter(group.match).sort();
+    // Pull every quoted "./data/<dir>/<file>" string out of sw.js. Built by
+    // splitting rather than by an assembled regex: the paths contain slashes.
+    const prefix = "./" + group.label + "/";
     const listed = new Set(
-      [...swSource.matchAll(/"\.\/data\/fields\/([A-Za-z0-9_-]+\.json)"/g)]
+      [...swSource.matchAll(/"([^"]+)"/g)]
         .map((m) => m[1])
-        .filter((f) => f !== "manifest.json"),
+        .filter((v) => v.startsWith(prefix))
+        .map((v) => v.slice(prefix.length))
+        .filter(group.match),
     );
     for (const file of onDisk) {
       shardChecked++;
       if (!listed.has(file)) {
         fail(
-          "data/fields/" + file + " exists but is not in sw.js's precache list; add " +
-          "\"./data/fields/" + file + "\" so the shard is available offline.",
+          group.label + "/" + file + " exists but is not in sw.js's precache list; add " +
+          '"./' + group.label + "/" + file + '" so the shard is available offline.',
         );
       }
     }
     for (const file of listed) {
       if (!onDisk.includes(file)) {
         fail(
-          "sw.js precaches data/fields/" + file + ", which no longer exists; a missing " +
+          "sw.js precaches " + group.label + "/" + file + ", which no longer exists; a missing " +
           "precache entry fails the whole SW install, taking every other asset with it.",
         );
       }
@@ -174,7 +188,7 @@ async function main() {
   }
   console.log(
     "check-sw-precache OK: " + dataChecked + " data/<folder>/manifest.json entries, " +
-    shardChecked + " data/fields/ shards, and " +
+    shardChecked + " per-file data shards, and " +
     shellChecked + " calc-*/support .js entries all present in sw.js precache lists.",
   );
 }
