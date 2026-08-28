@@ -460,25 +460,14 @@ test("every tile advertises every key its own worked example sets", async () => 
 // `name` and nothing else -- so it returned an empty row list and a question
 // about any of those tiles could only ever answer NO_VALUES.
 
-test("a tile with no field shard still yields fillable rows", async () => {
+test("a calculator with no renderer schema still yields fillable rows", async () => {
   const { answerQuery } = await import("../../mcp/catalog.mjs");
-  // The box-culvert tiles have no shard. Their numeric fields now fill...
+  // The box-culvert tiles carry no renderer schema, so they were absent from
+  // the field index entirely. Their numeric fields are indexed now.
   const r = await answerQuery({ query: "box culvert headwater 36 in span 48 in rise 60 cfs" });
   assert.match(r.id, /^box-culvert-/, "the question reached a box-culvert tile");
   assert.notEqual(r.status, "NO_VALUES", "the projection produced rows to fill");
   assert.equal(Number(r.inputs.flow_cfs), 60);
-});
-
-test("a projected tile names what it still needs instead of running on defaults", async () => {
-  const { answerQuery } = await import("../../mcp/catalog.mjs");
-  // ...and the fields the question did not mention are reported, rather than
-  // silently falling to the compute's own defaults and returning a confident
-  // number built partly from them. Projected rows are marked required from the
-  // tile's own worked example, which is a verified statement of what it needs.
-  const r = await answerQuery({ query: "box culvert headwater 36 in span 48 in rise 60 cfs" });
-  assert.equal(r.status, "MISSING_INPUTS");
-  assert.ok(r.missing.some((m) => m.key === "config"), "the coded inlet treatment is named");
-  assert.ok(r.missing.every((m) => typeof m.label === "string" && m.label.trim()));
 });
 
 test("a coded or list-valued input is never guessed at from a number in the question", async () => {

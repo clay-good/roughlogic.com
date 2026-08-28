@@ -54,7 +54,7 @@ server. Measured across the whole catalog:
 | Tiles reachable in the search dropdown by their own name | **1,709 / 1,709** (1,704 rank first) |
 | Tiles runnable through the MCP server | **1,709 / 1,709** |
 | Tiles with a publisher-verified worked example | **1,709 / 1,709** |
-| Tiles whose inputs the field index describes (v1339) | 1,331 |
+| Tiles whose inputs the field index describes (v1339) | **1,738** (1,331 at v1339; the 379 schema-less tiles were added 2026-08-28 from the captions they already print) |
 
 Both doors are at 100% **today, by luck rather than by construction** — no gate asserts either
 one. A renamed export, a tile added without a `COMPUTE_MAP` row, or a name that collides its way
@@ -109,7 +109,7 @@ Every spec in this program is held to all four. [v1346](spec-v1346.md) and the e
 
 | | |
 |---|---|
-| **The field registry** | 1,331 tiles carry `render.schema` or a `BESPOKE_SCHEMAS` entry. (`key` is **not** reliably the DOM id — see [v1341](spec-v1341.md); resolve against the live DOM by id, then by rendered label.) |
+| **The field registry** | 1,425 tiles carry `render.schema` or a `BESPOKE_SCHEMAS` entry; the rest are indexed from their printed captions. (`key` is **not** reliably the DOM id — see [v1341](spec-v1341.md); resolve against the live DOM by id, then by rendered label.) |
 | **A quantity parser** | `search-discovery.extractQuantities()` already pulls `{value, unit}` out of a typed query. |
 | **A shared ranker** | `rankTools()` is used by the browser *and* the MCP server, so recall cannot drift between them. |
 | **Deep links that work** | `applyHashState` already dispatches **both** `input` and `change` — the pre-existing bug sophiewell's v754 had to fix does not exist here. |

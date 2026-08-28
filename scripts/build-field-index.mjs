@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 // spec-v1339: build the browser-readable field index.
 //
-// 1,330 of the catalog's 1,709 tiles carry a machine-readable descriptor for
+// 1,425 of the catalog's 1,804 tiles carry a machine-readable descriptor for
 // every input they render -- `render.schema.inputs` on the declarative
 // renderers, and the statically-extracted BESPOKE_SCHEMAS for the
-// hand-written ones. Between them that is 7,322 field descriptors: the key,
-// the human label, the kind, and the select options. Nothing in the browser
-// reads any of it today.
+// hand-written ones: the key, the human label, the kind, and the select
+// options. The other 379 are indexed too, from the captions the calculator
+// itself prints (see the note on unlabelled fields below).
 //
 // The extractor in query-fill.js needs exactly that data to turn a typed
 // question into filled inputs for the whole catalog instead of the 49 tiles
@@ -30,10 +30,26 @@
 //   r  1 when the tile cannot answer without this field (spec-v1342), derived
 //      by blanking it and re-running the tile's own worked example
 //
-// A field with no label is omitted entirely. Those come from the 379 tiles
-// that degrade to compute-parameter introspection, where the extractor would
-// see `area_ft2` and no human text; matching on a machine key would be
-// guessing, and this program refuses rather than guesses.
+// A field with no label is omitted entirely -- matching on a machine key would
+// be guessing, and this program refuses rather than guesses.
+//
+// That once excluded all 379 tiles whose inputs come from compute-parameter
+// introspection, on the grounds that they carry no human text: the extractor
+// would see `area_ft2` and nothing else. They do carry human text. It is the
+// caption the calculator prints beside the field on its own page, which the
+// static shells already render and `inputLabels` already recovers -- the
+// calculator's own words, not a guess at a key. 313 of the 379 are indexed
+// from it; the remaining 66 have list-valued or genuinely unlabelled inputs
+// and are still skipped.
+//
+// Measured with scripts/measure-query-fill.mjs, re-phrasing every tile's own
+// verified example as a question: field recovery 3,301/5,616 -> 4,073/7,101,
+// with WRONG values still 0 under the phrasing the site teaches. Under the
+// harsher --terse phrasing (values only, no field names) recovery rises
+// 1,585 -> 1,894 and wrong values rise 2 -> 8: six same-unit or unitless
+// misassignments on newly indexed fields, which a nameless query cannot
+// disambiguate (horizontal-curve's radius and PI station are both in ft).
+// Accepted deliberately, and the number to watch if this projection changes.
 //
 // Derived, never authoritative: the renderers remain the single source of
 // truth and this file can be regenerated from them at any time.
@@ -58,7 +74,7 @@ const SHARD_GZIP_CAP = 24 * 1024;
 // next day. Bump it deliberately when the descriptor shape changes.
 const EDITION_DATE = "2026-08-20";
 
-const { describe, run } = await import(resolve(ROOT, "mcp", "catalog.mjs"));
+const { describe, run, inputLabels } = await import(resolve(ROOT, "mcp", "catalog.mjs"));
 const { TOOLS } = await import(resolve(ROOT, "tools-data.js"));
 const { unitFromLabel, labelLead } = await import(resolve(ROOT, "field-units.js"));
 const { bucketFor } = await import(resolve(ROOT, "field-bucket.js"));
@@ -136,13 +152,35 @@ async function requiredKeys(id, rows) {
   return out;
 }
 
-function rowFor(field) {
-  if (!field || typeof field.key !== "string" || !field.key) return null;
-  const label = typeof field.label === "string" ? field.label.trim() : "";
+// A value a numeric extractor can be trusted to recover from a typed question:
+// a number, or a string that is entirely one. A list, a date, a coded token or
+// a paragraph is not, however numeric it looks at the front.
+function isPlainNumber(v) {
+  if (typeof v === "number") return Number.isFinite(v);
+  if (typeof v !== "string") return false;
+  const t = v.trim();
+  return t !== "" && Number.isFinite(Number(t));
+}
+
+function rowFor(field, labels, example) {
+  if (!field) return null;
+  // A renderer schema names its fields `key`; an input recovered from a compute
+  // signature names it `name`. Both are the key a caller sends and the DOM id
+  // the browser fills, so both are indexable.
+  const fieldKey = field.key ?? field.name;
+  if (typeof fieldKey !== "string" || !fieldKey) return null;
+  const schemaLabel = typeof field.label === "string" ? field.label.trim() : "";
+  // The 379 tiles that degrade to compute-parameter introspection were skipped
+  // here on the grounds that they carry no human text -- `area_ft2` and nothing
+  // else -- and matching on a machine key would be guessing. They do carry
+  // human text: the caption the calculator prints beside the field on its own
+  // page, which is what the static shells render and what `inputLabels`
+  // recovers. That is the calculator's own words, not a guess at a key.
+  const label = schemaLabel || String((labels && labels[fieldKey]) || "").trim();
   if (!label) return null;                       // no human text -> not indexed
   const lead = labelLead(label);
   if (!lead) return null;
-  const row = { d: field.key, l: lead };
+  const row = { d: fieldKey, l: lead };
   const kind = KINDS.has(field.kind) ? field.kind : null;
   if (kind) row.k = kind;
   const unit = unitFromLabel(label);
@@ -154,6 +192,19 @@ function rowFor(field) {
       .map(String);
     if (values.length) row.o = values;
   }
+  // An introspected input carries no kind and no options, so nothing here says
+  // whether it holds a plain number or something a numeric extractor must not
+  // guess at. Its worked-example value does: where the example holds a list, a
+  // multi-line block, an ISO date, or a coded token ("wingwall_30_75",
+  // "1.5_inch_solid", "4:1"), the extractor scrapes the first number out of the
+  // question and fills the field with it -- 21 confidently wrong values across
+  // these tiles, and a wrong value is worse than no value because it answers.
+  //
+  // Such a field is indexed but marked unfillable: a `select` with no options
+  // is in neither of query-fill's buckets (numberRows excludes every select;
+  // selectRows requires an options array), so nothing can fill it, while it
+  // still carries its label for the ask card that names what is missing.
+  if (!row.k && example && (fieldKey in example) && !isPlainNumber(example[fieldKey])) row.k = "select";
   return row;
 }
 
@@ -164,9 +215,11 @@ for (const tool of TOOLS) {
   let described;
   try { described = await describe({ id: tool.id }); } catch { continue; }
   if (!Array.isArray(described.inputs)) continue;
+  const labels = await inputLabels(tool.id);
+  const example = (described.example && described.example.inputs) || null;
   const rows = [];
   for (const field of described.inputs) {
-    const row = rowFor(field);
+    const row = rowFor(field, labels, example);
     if (row) rows.push(row);
     else fieldsSkipped++;
   }
