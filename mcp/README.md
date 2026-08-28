@@ -40,6 +40,17 @@ straight from the repo (`tools-data.js`, `test/fixtures/compute-map.js`,
 `test/fixtures/worked-examples.json`), so the MCP surface can never drift from
 the site.
 
+Input names come from the calculator's renderer schema where it has one, and
+otherwise from its compute signature. Where the signature cannot be read — a
+few take a bare object, a few collect a shape-dependent key set through a rest
+element — the keys of the publisher-verified worked example fill the gap, so
+`describe_calculator` names every value a caller must supply rather than
+returning an empty list. `scripts/check-both-doors.mjs` holds the door to that
+contract: every advertised name must be a key a caller can actually send, every
+key the tile's own example sets must be advertised, and that example must run
+clean through `run_calculator`. All three are checked for all 1,804 tiles on
+every build.
+
 ## Run it
 
 ```sh

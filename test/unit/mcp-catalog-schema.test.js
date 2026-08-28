@@ -385,3 +385,69 @@ test("worked-example answer rows carry their unit", async () => {
   }
   assert.ok(united >= 2195, `answer rows with a unit fell to ${united} of ${total}; the floor is 2,195`);
 });
+
+// --- the agent door must advertise keys a caller can actually send ---
+//
+// Three tiles shipped advertising an input name no JSON object could carry, so
+// the value never reached the compute and the tile answered from its default.
+// The signature parser was reading the destructure as raw text: a maintainer
+// comment between two parameters became part of the next name, and a renamed
+// key was reported under its local alias.
+
+test("a maintainer comment inside a destructure is not an input name", async () => {
+  // npsh-a's signature carries `// positive if source above pump` between two
+  // parameters. That comment used to swallow `friction_loss_ft`, so an agent
+  // following describe() omitted friction loss and NPSHa came back 2 ft
+  // HIGHER -- reading safer than the truth on a cavitation margin.
+  const d = await describe({ id: "npsh-a" });
+  const names = d.inputs.map((i) => i.name ?? i.key);
+  assert.ok(names.includes("friction_loss_ft"), "friction loss is advertised");
+  assert.ok(names.every((n) => /^[A-Za-z_$][\w$]*$/.test(n)), `malformed name in ${JSON.stringify(names)}`);
+  const withLoss = await run({ id: "npsh-a", inputs: { water_temp_F: 60, source_elevation_relative_ft: 5, friction_loss_ft: 2 } });
+  const without = await run({ id: "npsh-a", inputs: { water_temp_F: 60, source_elevation_relative_ft: 5 } });
+  assert.equal(withLoss.result.H_friction_ft, 2, "the advertised key reaches the compute");
+  assert.ok(without.result.NPSHa_ft - withLoss.result.NPSHa_ft > 1.9, "omitting it overstates NPSHa by the friction head");
+});
+
+test("a renamed destructure advertises the key, not the local alias", async () => {
+  // computeExteriorOpeningProtection destructures `{ protected: prot }`. The
+  // door used to advertise "protected: prot", which an agent cannot send --
+  // so every call read as unprotected and the allowable opening area was
+  // computed against the wrong IBC 705.8 band.
+  const d = await describe({ id: "exterior-opening-protection" });
+  const names = d.inputs.map((i) => i.name ?? i.key);
+  assert.ok(names.includes("protected"));
+  assert.ok(!names.some((n) => n.includes(":")));
+  const inputs = { fsd_ft: 7, wall_area: 400, actual_opening: 60 };
+  const on = await run({ id: "exterior-opening-protection", inputs: { ...inputs, protected: true } });
+  const off = await run({ id: "exterior-opening-protection", inputs: { ...inputs, protected: false } });
+  assert.equal(on.result.allowable_pct, 25);
+  assert.equal(off.result.allowable_pct, 10);
+});
+
+test("a compute whose signature cannot be read still advertises its inputs", async () => {
+  // computeRentVsBuy takes a bare object, so there is no destructure to parse
+  // and the door advertised nothing at all for a tile that needs 13 values.
+  // The publisher-verified worked example supplies the key set instead.
+  const d = await describe({ id: "rent-vs-buy" });
+  const names = d.inputs.map((i) => i.name ?? i.key);
+  assert.ok(names.length >= 13, `advertised only ${names.length} inputs`);
+  for (const key of Object.keys(d.example.inputs)) {
+    assert.ok(names.includes(key), `${key} is advertised`);
+  }
+});
+
+test("every tile advertises every key its own worked example sets", async () => {
+  // The example is authored separately from the signature, so it is an
+  // independent statement of what the tile takes. A key it sets that the door
+  // does not name is a value an agent would omit. Mirrors check-both-doors.
+  const { TOOLS } = await import("../../tools-data.js");
+  const missing = [];
+  for (const t of TOOLS) {
+    const d = await describe({ id: t.id });
+    if (!d.example || !d.example.inputs) continue;
+    const names = new Set((d.inputs || []).map((i) => i.name ?? i.key));
+    for (const k of Object.keys(d.example.inputs)) if (!names.has(k)) missing.push(`${t.id}.${k}`);
+  }
+  assert.deepEqual(missing, []);
+});

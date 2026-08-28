@@ -2,26 +2,37 @@
 // spec-v1346: both-doors coverage lint.
 //
 // A calculator in this catalog is reachable two ways: a person types into the
-// search box on the website, and an agent calls the local MCP server. Today
-// every one of the 1,709 tiles is reachable both ways -- but nothing in the
-// 42-gate chain asserts it, so it is true by luck rather than by
-// construction. A tile added without a COMPUTE_MAP row, a renamed compute
-// export, or a tile name that collides its way out of the top twelve would
-// all pass CI while leaving a calculator unreachable.
+// search box on the website, and an agent calls the local MCP server. Every
+// one of the 1,804 tiles is reachable both ways -- but nothing in the gate
+// chain asserted it, so it was true by luck rather than by construction. A
+// tile added without a COMPUTE_MAP row, a renamed compute export, or a tile
+// name that collides its way out of the top twelve would all pass CI while
+// leaving a calculator unreachable.
 //
-// This gate pins both properties:
+// This gate pins those properties:
 //
 //   SEARCH DOOR  every tile's own name, run through the SAME ranker the
 //                browser dropdown uses, returns that tile in the first 12.
 //   MCP DOOR     every tile resolves through describe(), reports runnable,
 //                and names a compute the server can actually call.
-//   EXAMPLES     every tile carries a publisher-verified worked example,
-//                which is what lets an agent answer in one round trip.
+//   INPUT KEYS   every input the door advertises is a key a caller can send,
+//                and every key the tile's own example sets is advertised.
+//   EXAMPLES     every tile carries a publisher-verified worked example, and
+//                that example actually runs clean through run().
+//
+// Reaching a tile is not the same as being able to USE it. Three tiles
+// advertised an input name no JSON object could carry, because the signature
+// parser read a maintainer comment as a parameter; the value never arrived and
+// the tile answered from its default, which on `npsh-a` meant reporting a
+// cavitation margin 2 ft safer than the truth. Five more advertised nothing at
+// all. The INPUT KEYS assertion is what catches that class, and it leans on
+// the worked example -- authored separately from the signature -- rather than
+// re-parsing the signature the door already parsed.
 //
 // It runs the REAL ranker over the REAL catalog. A gate that reimplements
 // the thing it checks passes while the product is broken.
 //
-// Deliberately NO allowlist. Both numbers are 1,709 of 1,709 today, so an
+// Deliberately NO allowlist. Every number is 1,804 of 1,804 today, so an
 // exemption list would start empty and exist only to absorb the first
 // regression silently. A tile that genuinely cannot be found or run is a
 // spec decision with a written reason, not a line in a JSON file.
@@ -41,9 +52,13 @@ const VERBOSE = process.argv.includes("--verbose");
 // than on whether the tile can be found at all.
 const SEARCH_HORIZON = 12;
 
+// A key a caller can spell in a JSON `inputs` object and have the compute
+// destructure receive.
+const IDENTIFIER = /^[A-Za-z_$][\w$]*$/;
+
 const { normalizeQuery, rankTools } = await import(resolve(ROOT, "search-discovery.js"));
 const { TOOLS } = await import(resolve(ROOT, "tools-data.js"));
-const { describe } = await import(resolve(ROOT, "mcp", "catalog.mjs"));
+const { describe, run } = await import(resolve(ROOT, "mcp", "catalog.mjs"));
 
 // The alias master, not a per-group shard: the browser merges every shard at
 // runtime, so the master is the equivalent corpus.
@@ -61,7 +76,7 @@ try {
 }
 
 const failures = [];
-let searchable = 0, runnable = 0, withExample = 0;
+let searchable = 0, runnable = 0, withExample = 0, exampleRuns = 0;
 
 for (const tool of TOOLS) {
   // --- search door ---
@@ -98,8 +113,66 @@ for (const tool of TOOLS) {
   } else {
     runnable++;
   }
-  if (described.example && described.example.inputs) withExample++;
-  else failures.push(`${tool.id}: EXAMPLE -- no publisher-verified worked example row.`);
+  // Every input the door advertises must be a key a caller can actually send.
+  // A name that is not a JS identifier cannot appear in a `run` call at all,
+  // so the value silently never reaches the compute and the tile answers from
+  // its defaults. Three tiles shipped that way: a maintainer comment inside a
+  // destructure became an input name (`npsh-a` dropped friction loss, and
+  // reported NPSHa 2 ft higher -- safer -- than the truth), and a renamed key
+  // was advertised as `protected: prot` rather than `protected`.
+  //
+  // Deliberately a shape assertion, not a re-parse of the signature: a gate
+  // that reruns the parser it is checking agrees with it by construction.
+  for (const field of described.inputs || []) {
+    const name = field && (field.name ?? field.key);
+    if (typeof name !== "string" || !IDENTIFIER.test(name)) {
+      failures.push(
+        `${tool.id}: MCP -- advertises an input named ${JSON.stringify(name)}, which is not a ` +
+        `key a caller can send. Its value would be dropped and the tile would answer from defaults.`,
+      );
+    }
+  }
+
+  if (described.example && described.example.inputs) {
+    withExample++;
+    // The published example and the compute's signature are authored
+    // separately, so the example is an INDEPENDENT statement of what the tile
+    // takes. Every key it sets must be one the door advertises: a key the
+    // example uses but `describe` never names is a value an agent following
+    // the door's own contract will omit, and the tile answers without it.
+    //
+    // This is the assertion that caught all three shipped defects -- the
+    // signature parser lost `friction_loss_ft` behind a maintainer comment and
+    // `npsh-a` reported NPSHa 2 ft higher (safer) than the truth. Checking the
+    // names are well-formed would not have: the parser drops what it cannot
+    // read, so a lost input goes missing rather than looking wrong.
+    const advertised = new Set((described.inputs || []).map((f) => f && (f.name ?? f.key)));
+    for (const key of Object.keys(described.example.inputs)) {
+      if (!advertised.has(key)) {
+        failures.push(
+          `${tool.id}: MCP -- its own worked example sets "${key}", which describe() does not ` +
+          `advertise. An agent reading the door would omit it and answer from the default.`,
+        );
+      }
+    }
+    // ...and the example must actually survive the door it is published for.
+    // An agent's cheapest first move is to replay the published example; if
+    // that errors, the tile is runnable in name only.
+    try {
+      const out = await run({ id: tool.id, inputs: described.example.inputs });
+      if (!out || !out.result) {
+        failures.push(`${tool.id}: EXAMPLE -- run() returned no result for the published example.`);
+      } else if (out.result.error) {
+        failures.push(`${tool.id}: EXAMPLE -- run() rejected the published example: ${out.result.error}`);
+      } else {
+        exampleRuns++;
+      }
+    } catch (e) {
+      failures.push(`${tool.id}: EXAMPLE -- run() threw on the published example: ${e && e.message ? e.message : e}`);
+    }
+  } else {
+    failures.push(`${tool.id}: EXAMPLE -- no publisher-verified worked example row.`);
+  }
 }
 
 if (failures.length) {
@@ -110,5 +183,6 @@ if (failures.length) {
 
 console.log(
   `check-both-doors OK: ${TOOLS.length} tiles -- ${searchable} searchable ` +
-  `(top ${SEARCH_HORIZON} on their own name), ${runnable} MCP-runnable, ${withExample} with a worked example.`,
+  `(top ${SEARCH_HORIZON} on their own name), ${runnable} MCP-runnable, ${withExample} with a worked ` +
+  `example, ${exampleRuns} of which run clean through the MCP door.`,
 );

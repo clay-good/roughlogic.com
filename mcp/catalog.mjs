@@ -245,11 +245,49 @@ async function importCompute(reg, modCache) {
   return fn;
 }
 
+// Strip `//` and `/* */` comments, leaving string literals alone. A compute's
+// destructure may carry a maintainer note between two parameters, and a
+// comment is not a parameter: without this, `npsh-a` advertised an input named
+// "// positive if source above pump\n  friction_loss_ft", which no caller can
+// spell and the compute therefore never received.
+function stripComments(src) {
+  let out = "";
+  let quote = null;
+  for (let i = 0; i < src.length; i++) {
+    const ch = src[i];
+    if (quote) {
+      out += ch;
+      if (ch === "\\") { out += src[++i] ?? ""; continue; }
+      if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === "'" || ch === '"' || ch === "`") { quote = ch; out += ch; continue; }
+    if (ch === "/" && src[i + 1] === "/") {
+      while (i < src.length && src[i] !== "\n") i++;
+      out += "\n";
+      continue;
+    }
+    if (ch === "/" && src[i + 1] === "*") {
+      i += 2;
+      while (i < src.length && !(src[i] === "*" && src[i + 1] === "/")) i++;
+      i++;
+      out += " ";
+      continue;
+    }
+    out += ch;
+  }
+  return out;
+}
+
+const PARAM_NAME = /^[A-Za-z_$][\w$]*$/;
+
 // Parse the leading object-destructure of a compute function to recover its
 // input parameter names and defaults. Handles every signature shape in the
-// codebase: `({ a, b })`, `({ a = 1, b = "x" } = {})`, nested defaults.
+// codebase: `({ a, b })`, `({ a = 1, b = "x" } = {})`, nested defaults,
+// interleaved comments, and the renamed form `({ protected: prot })` — where
+// the key a caller must send is `protected`, not the local alias.
 function introspectInputs(fn) {
-  const src = fn.toString();
+  const src = stripComments(fn.toString());
   const open = src.indexOf("(");
   if (open === -1) return [];
   const brace = src.indexOf("{", open);
@@ -277,8 +315,14 @@ function introspectInputs(fn) {
   return out
     .map((part) => {
       const eq = part.indexOf("=");
-      const name = (eq === -1 ? part : part.slice(0, eq)).trim();
+      let name = (eq === -1 ? part : part.slice(0, eq)).trim();
       if (!name || name.startsWith("...")) return null;
+      // `protected: prot` renames the key on the way in; the caller still
+      // sends `protected`. Slicing at the colon also yields the right key for
+      // a nested pattern (`opts: { a }` -> `opts`).
+      const colon = name.indexOf(":");
+      if (colon !== -1) name = name.slice(0, colon).trim();
+      if (!PARAM_NAME.test(name)) return null;
       let def;
       if (eq !== -1) {
         const raw = part.slice(eq + 1).trim();
@@ -375,6 +419,27 @@ export async function describe({ id } = {}) {
     } else {
       out.inputs = introspectInputs(fn);
       out.inputs_source = "compute";
+    }
+    // Some computes cannot be read from their signature at all: a few take a
+    // bare object (`computeRentVsBuy(inp)`) and a few collect a shape-dependent
+    // key set through a rest element (`{ shape, ...args }`). Introspection
+    // returns nothing or almost nothing for these, and the door was advertising
+    // an empty input list for tiles that need thirteen values.
+    //
+    // The publisher-verified worked example is a complete, valid input set for
+    // exactly this tile, authored separately from the signature. Any key it
+    // sets that nothing else advertises is added, so `describe` still names
+    // every value a caller must supply. These carry no label or default --
+    // the example itself, returned alongside, is what shows their shape.
+    if (ex && ex.inputs) {
+      const rich = out.inputs_source === "renderer";
+      const known = new Set((out.inputs || []).map((f) => f.name ?? f.key));
+      const fromExample = Object.keys(ex.inputs)
+        .filter((k) => !known.has(k))
+        .map((k) => (rich
+          ? { key: k, label: null, kind: null, options: null, default: null, attrs: null }
+          : { name: k, default: undefined }));
+      if (fromExample.length) out.inputs = [...(out.inputs || []), ...fromExample];
     }
     // spec-v1185: the cited section + formula shown in the browser, retained on
     // the schema even for the unit-wrapper tiles whose inputs degrade.
