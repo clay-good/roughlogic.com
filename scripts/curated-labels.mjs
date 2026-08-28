@@ -63,6 +63,26 @@ export const CURATED_INPUT_LABELS = {
   // A select the renderer builds from a data list, so the options are not in the
   // source for the extractor to read. The caption is.
   "historical-pricing": { commodity: "Commodity" },
+  // The renderer hands its values to a Web Worker through an `inputs` object
+  // rather than calling the compute directly, and routes the floor area through
+  // a local first (`const floor_ft2 = Number(fa.input.value)`) because the
+  // BTU/hr-per-sq-ft context band needs it again. The extractor follows a field
+  // straight into a compute call, not through the extra hop, so the one input
+  // every load calculation starts from had no caption and could not be filled
+  // from a typed question. Both captions are the renderers' own strings.
+  "manual-j-cooling": { floor_area_ft2: "Floor area (ft²)" },
+  "manual-j-heating": { floor_area_ft2: "Floor area (ft²)" },
+  // Same shape: the optional NPSHr is read through a local so an empty box can
+  // mean "not supplied" rather than zero. The friction loss is captioned here
+  // too -- it is mapped straight into the compute call and should have been
+  // read, but the parameter it maps to sat behind a comment in the compute's
+  // own destructure, so the extractor never had a key to look it up by. That
+  // is the same input whose loss made this tile report an available NPSH two
+  // feet higher, and therefore safer, than the truth.
+  "npsh-a": {
+    friction_loss_ft: "Suction friction loss (ft)",
+    npsh_required_ft: "NPSH required (ft, optional)",
+  },
 };
 
 export const CURATED_OUTPUT_LABELS = {
