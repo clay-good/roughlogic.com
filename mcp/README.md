@@ -51,6 +51,16 @@ key the tile's own example sets must be advertised, and that example must run
 clean through `run_calculator`. All three are checked for all 1,804 tiles on
 every build.
 
+`answer_query` reads the `data/fields/` descriptors the website reads, which
+exist for the 1,425 calculators that carry a renderer schema. For the other
+379 it projects the descriptors from `describe_calculator` instead, naming each
+input with the caption the calculator itself prints. A field whose verified
+example holds something a numeric extractor must not guess at -- a list, a
+date, a coded token like `wingwall_30_75` -- is named but never filled, and a
+field the example sets is treated as required. So a question that covers only
+part of a calculator comes back as `MISSING_INPUTS` naming the rest, rather
+than an answer computed partly from defaults.
+
 ## Run it
 
 ```sh

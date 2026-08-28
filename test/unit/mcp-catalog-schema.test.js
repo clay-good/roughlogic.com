@@ -451,3 +451,41 @@ test("every tile advertises every key its own worked example sets", async () => 
   }
   assert.deepEqual(missing, []);
 });
+
+// --- answer_query reaches the tiles that have no field shard ---
+//
+// Only a tile with a renderer schema gets a data/fields shard, so 379 tiles
+// fall to the describe() projection in fieldRowsFor. That projection required
+// both `key` and `label`, and an introspected input has neither -- it has a
+// `name` and nothing else -- so it returned an empty row list and a question
+// about any of those tiles could only ever answer NO_VALUES.
+
+test("a tile with no field shard still yields fillable rows", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  // The box-culvert tiles have no shard. Their numeric fields now fill...
+  const r = await answerQuery({ query: "box culvert headwater 36 in span 48 in rise 60 cfs" });
+  assert.match(r.id, /^box-culvert-/, "the question reached a box-culvert tile");
+  assert.notEqual(r.status, "NO_VALUES", "the projection produced rows to fill");
+  assert.equal(Number(r.inputs.flow_cfs), 60);
+});
+
+test("a projected tile names what it still needs instead of running on defaults", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  // ...and the fields the question did not mention are reported, rather than
+  // silently falling to the compute's own defaults and returning a confident
+  // number built partly from them. Projected rows are marked required from the
+  // tile's own worked example, which is a verified statement of what it needs.
+  const r = await answerQuery({ query: "box culvert headwater 36 in span 48 in rise 60 cfs" });
+  assert.equal(r.status, "MISSING_INPUTS");
+  assert.ok(r.missing.some((m) => m.key === "config"), "the coded inlet treatment is named");
+  assert.ok(r.missing.every((m) => typeof m.label === "string" && m.label.trim()));
+});
+
+test("a coded or list-valued input is never guessed at from a number in the question", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  // `config` wants "wingwall_30_75". A numeric extractor handed a projected row
+  // with no options scrapes the first number it sees and fills the field with
+  // "30" -- a confidently wrong answer. Twenty-one fields did exactly that.
+  const r = await answerQuery({ query: "box culvert headwater 36 in span 48 in rise 60 cfs 30 degree wingwall" });
+  assert.ok(!("config" in (r.inputs || {})), "config was not filled from a stray number");
+});

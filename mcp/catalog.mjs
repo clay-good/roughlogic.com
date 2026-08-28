@@ -677,6 +677,16 @@ export async function run({ id, inputs } = {}) {
 // them rather than re-projecting describe()'s output means an agent and a
 // person cannot disagree about what a tile needs. A missing shard degrades to
 // a projection of describe(), minus requiredness.
+// A value a numeric extractor can be trusted to recover from a typed question:
+// a number, or a string that is entirely one. A list, a date, a coded token or
+// a paragraph is not, however numeric it looks at the front.
+function isPlainNumber(v) {
+  if (typeof v === "number") return Number.isFinite(v);
+  if (typeof v !== "string") return false;
+  const t = v.trim();
+  return t !== "" && Number.isFinite(Number(t));
+}
+
 async function fieldRowsFor(id, group) {
   const { bucketFor } = await import(new URL("../field-bucket.js", import.meta.url).href);
   try {
@@ -687,18 +697,57 @@ async function fieldRowsFor(id, group) {
   try {
     const described = await describe({ id });
     const { unitFromLabel, labelLead } = await import(new URL("../field-units.js", import.meta.url).href);
+    // 379 tiles have no shard, because only a tile with a renderer schema gets
+    // one. Their inputs come back from compute introspection instead: a `name`
+    // and nothing else. This projection used to require `key` AND `label`, so
+    // it dropped every one of them and returned an empty row list -- and a
+    // question about any of those tiles could only ever answer NO_VALUES.
+    //
+    // The calculator's own field captions are already recovered for exactly
+    // this shape (they are what the static shells print), so they supply the
+    // label the introspected input lacks. An input that stays unlabelled is
+    // dropped as before: those are the list-valued inputs (`loads`,
+    // `conductors_by_size`) that a typed question cannot fill anyway.
+    const labels = await inputLabels(id);
+    const example = (described.example && described.example.inputs) || {};
     return (described.inputs || [])
-      .filter((f) => f && f.key && typeof f.label === "string" && f.label.trim())
       .map((f) => {
-        const row = { d: f.key, l: labelLead(f.label) };
+        if (!f) return null;
+        const key = f.key ?? f.name;
+        if (typeof key !== "string" || !key) return null;
+        const label = (typeof f.label === "string" && f.label.trim()) ? f.label : labels[key];
+        if (typeof label !== "string" || !label.trim()) return null;
+        const row = { d: key, l: labelLead(label) };
         if (f.kind) row.k = f.kind;
-        const unit = unitFromLabel(f.label);
+        const unit = unitFromLabel(label);
         if (unit) row.u = unit;
         if (f.kind === "select" && Array.isArray(f.options)) {
           row.o = f.options.map((o) => (o && typeof o === "object" ? o.value : o)).filter((v) => v != null).map(String);
+          return row;
         }
+        // An introspected input carries no kind and no options, so nothing here
+        // says whether it holds a plain number or something a numeric extractor
+        // must not guess at. Its worked-example value does: where the tile's own
+        // verified example holds a list, a multi-line block, an ISO date, or a
+        // coded token ("wingwall_30_75", "1.5_inch_solid", "4:1"), the extractor
+        // scrapes the first number out of the question and fills the field with
+        // it. That produced 21 confidently wrong values across these tiles --
+        // and a wrong value is worse than no value, because it answers.
+        //
+        // Such a field is kept but marked unfillable: a `select` with no options
+        // is in neither of query-fill's two buckets (numberRows excludes every
+        // select; selectRows requires an options array), so nothing can fill it,
+        // and it surfaces by name in MISSING_INPUTS instead.
+        if (!row.k && key in example && !isPlainNumber(example[key])) row.k = "select";
+        // The example is a publisher-verified statement of what the tile needs,
+        // so a field it sets is required. Without this, a projected tile has no
+        // required fields at all and answer_query would run on whatever the
+        // question happened to mention, letting the rest fall to compute
+        // defaults and returning a confident number built partly from them.
+        if (key in example) row.r = true;
         return row;
-      });
+      })
+      .filter(Boolean);
   } catch { return []; }
 }
 
