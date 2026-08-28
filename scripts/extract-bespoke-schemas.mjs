@@ -149,10 +149,21 @@ function factoryAliases(src) {
     return [...out];
   };
   const alt = (names) => names.map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
-  return { outLine: alt(of("makeOutputLine")), fmt: alt(of("fmt")) };
+  return {
+    outLine: alt(of("makeOutputLine")),
+    fmt: alt(of("fmt")),
+    number: alt(of("makeNumber")),
+    select: alt(of("makeSelect")),
+    // The loose input pass models the text/row factories too.
+    anyInput: alt([...of("makeNumber"), ...of("makeSelect"), ...of("makeText"),
+                   ...of("makeTextarea"), ...of("makeRowField")]),
+  };
 }
 
-const DEFAULT_ALIASES = { outLine: "makeOutputLine", fmt: "fmt" };
+const DEFAULT_ALIASES = {
+  outLine: "makeOutputLine", fmt: "fmt", number: "makeNumber", select: "makeSelect",
+  anyInput: "make(?:Number|Select|Text|Textarea|RowField)",
+};
 
 // Which variable a renderer holds its compute result in. The reads below were
 // anchored on a literal `r.`, but plenty of renderers call it something else --
@@ -369,11 +380,11 @@ function argAt(src, from, n) {
 // Find `NAME = makeSelect("label", "id", OPTS)` / `makeNumber("label","id",ATTRS)`
 // declarations in a render function body, keyed by the local variable NAME.
 // `ns` is the renderer module's namespace, used to resolve non-literal OPTS.
-function parseFields(body, ns) {
+function parseFields(body, ns, aliases = DEFAULT_ALIASES) {
   const fields = new Map();
   // makeSelect: the options argument is balanced-parsed, then evaluated against
   // the module namespace; a literal array falls back to the regex scrape.
-  const re = /\b([A-Za-z_$][\w$]*)\s*=\s*makeSelect\(\s*("(?:[^"\\]|\\.)*")\s*,\s*("(?:[^"\\]|\\.)*")\s*,/g;
+  const re = new RegExp("\\b([A-Za-z_$][\\w$]*)\\s*=\\s*(?:\\w*(?:" + aliases.select + "))\\(\\s*(\"(?:[^\"\\\\]|\\\\.)*\")\\s*,\\s*(\"(?:[^\"\\\\]|\\\\.)*\")\\s*,", "g");
   let m;
   while ((m = re.exec(body))) {
     const expr = argAt(body, m.index + m[0].length, 0);
@@ -383,7 +394,8 @@ function parseFields(body, ns) {
   }
   // makeNumber(label, id[, attrs]) -- three args (the id is required); attrs is
   // the optional 4th capture.
-  for (const m of body.matchAll(/\b([A-Za-z_$][\w$]*)\s*=\s*makeNumber\(\s*("(?:[^"\\]|\\.)*")\s*,\s*("(?:[^"\\]|\\.)*")\s*(?:,\s*(\{[^}]*\}))?\s*\)/g)) {
+  const NUM_RE = new RegExp("\\b([A-Za-z_$][\\w$]*)\\s*=\\s*(?:\\w*(?:" + aliases.number + "))\\(\\s*(\"(?:[^\"\\\\]|\\\\.)*\")\\s*,\\s*(\"(?:[^\"\\\\]|\\\\.)*\")\\s*(?:,\\s*(\\{[^}]*\\}))?\\s*\\)", "g");
+  for (const m of body.matchAll(NUM_RE)) {
     if (fields.has(m[1])) continue;
     let attrs = null;
     if (m[4]) { try { attrs = JSON.parse(m[4].replace(/([{,]\s*)([A-Za-z_]\w*):/g, '$1"$2":').replace(/'/g, '"')); } catch { attrs = null; } }
@@ -431,9 +443,10 @@ function parseComputeCall(body) {
 // the factory (`_v26makeNumber`, `_v8w_makeNumber`), and anchoring on a bare
 // `make` skipped every one of those renderers.
 const LOOSE_FACTORY = /\b([A-Za-z_$][\w$]*)\s*=\s*[\w$]*make(?:Number|Select|Text|Textarea|RowField)\(\s*("(?:[^"\\]|\\.)*")\s*,/g;
-function parseFieldsLoose(body) {
+function parseFieldsLoose(body, aliases = DEFAULT_ALIASES) {
   const fields = new Map();
-  for (const m of body.matchAll(LOOSE_FACTORY)) {
+  const RE = new RegExp("\\b([A-Za-z_$][\\w$]*)\\s*=\\s*(?:\\w*(?:" + aliases.anyInput + "))\\(\\s*(\"(?:[^\"\\\\]|\\\\.)*\")\\s*,", "g");
+  for (const m of body.matchAll(RE)) {
     if (fields.has(m[1])) continue;
     let label;
     try { label = JSON.parse(m[2]); } catch { continue; }
@@ -521,7 +534,7 @@ async function main() {
     if (Object.keys(outMap).length) outLabels[id] = outMap;
     const unitMap = parseOutputUnits(body, aliases);
     if (Object.keys(unitMap).length) outUnits[id] = unitMap;
-    const fields = parseFields(body, rmod);
+    const fields = parseFields(body, rmod, aliases);
     const callMap = parseComputeCall(body);
     const params = await computeParams(COMPUTE_MAP[id]);
     // Labels first, and from the loose map as well: they are display-only, so
@@ -529,7 +542,7 @@ async function main() {
     // below. Strict wins where both resolve.
     if (params) {
       const loose = parseComputeCallLoose(body);
-      const looseFields = parseFieldsLoose(body);
+      const looseFields = parseFieldsLoose(body, aliases);
       const labelMap = {};
       for (const { name: key } of params) {
         const ref = callMap.get(key) || loose.get(key);

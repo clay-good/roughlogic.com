@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The same rename blind spot on the input side, where it costs the search box.** Having fixed it for answer captions, the identical assumption turned out to sit on the field readers -- and there it was stricter still: the pass that builds a calculator's **field schema** matched a literal `makeSelect(` / `makeNumber(` with no tolerance for a prefix *or* a rename, and the looser label pass tolerated only a prefix. `rope-ma` builds its dropdown with `_msF(...)`, so it exposed no fields at all.
+
+  Both passes now resolve the module's own import names. **47 more calculators expose a real field schema (1,429 to 1,476)** -- labelled, typed, and enum-validated at the agent door instead of bare parameter names, so `run_calculator` rejects a bad dropdown value by name rather than computing on it. 21 more carry field labels.
+
+  That flows straight into the website's one-box: the field index covers **1,763 calculators, up from 1,743**, and 7,184 fields, up from 7,121. Measured by re-phrasing every calculator's own verified example as a question, recovery rises on all three phrasings -- **4,085 to 4,154** on the default, 4,610 to 4,680 on the taught phrasing, 1,897 to 1,942 on the harshest -- with **wrong values unchanged at 0, 0 and 7**.
+
+  47 renderer citations dropped out of their fallback fixture in the same pass, which is correct rather than a loss: those tiles now carry the citation on the schema itself, which the door prefers. Checked directly -- 1,803 of 1,804 calculators still return citation text, and the one that does not is a reference table that never had any. One more hand-authored caption became redundant and was deleted; the page reads its own words now, and gained a fuller label for the field beside it ("Pulley efficiency (0-1)" where it used to say "Efficiency").
+
 - **A renderer that called its result anything other than `r` named none of its answers.** The captions are read by matching `<line>.textContent = ... r.<key> ...`, with the result variable hard-coded as `r`. Twenty-one calculators hold theirs in `res`, `overtime` holds it in `x`, and one uses `rr` -- so their captions were invisible. `overtime`'s four answers ("Regular pay", "Overtime pay", "Double-time pay", "Gross pay") sat one character away from being read, and the page showed bare numbers instead.
 
   The variable is now taken from the renderer's own `const <name> = compute...(...)` binding. Where a renderer holds results from **two different** compute functions the reads fall back to `r` alone, because a key can mean one thing in each and a caption attached to the wrong number is worse than no caption. **Calculators naming their answers: 1,768 of 1,804, up from 1,730**; 42 more carry captions and 28 more carry units. The remaining 36 build their captions by an expression a static read cannot follow.

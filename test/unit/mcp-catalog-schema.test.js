@@ -640,3 +640,17 @@ test("a renderer that calls its result something other than r is still read", as
     assert.ok(labels.includes(want), `names "${want}"`);
   }
 });
+
+test("a renderer that renames the INPUT factories still exposes a field schema", async () => {
+  // The same rename blind spot as the answer side, on the side that feeds
+  // run()'s input contract and the website's one-box. `rope-ma` builds its
+  // dropdown with `_msF(...)` -- makeSelect under another name -- so the strict
+  // parser, which matched the literal `makeSelect(`, saw no fields at all.
+  const d = await describe({ id: "rope-ma" });
+  assert.equal(d.inputs_source, "renderer");
+  const rig = d.inputs.find((i) => i.key === "rig");
+  assert.equal(rig.kind, "select", "the dropdown is typed, not a bare param");
+  assert.ok(rig.options.length > 1, "and its options resolve");
+  // A typed select is also an enforced one.
+  await assert.rejects(() => run({ id: "rope-ma", inputs: { rig: "not-a-rig" } }), /Allowed/);
+});

@@ -40,7 +40,6 @@ export const CURATED_INPUT_LABELS = {
     r16: "Cumulative retained on #16 (%)", r30: "Cumulative retained on #30 (%)",
     r50: "Cumulative retained on #50 (%)", r100: "Cumulative retained on #100 (%)",
   },
-  "rope-ma": { rig: "Rigging system" },
   // UL 1561 harmonic spectrum, each current as a fraction of the fundamental.
   "transformer-k-factor": {
     i1: "Fundamental current (per unit)", i3: "3rd harmonic (per unit)",
