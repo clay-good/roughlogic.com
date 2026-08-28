@@ -808,8 +808,16 @@ function bindSearch() {
         aliasRows = merged.slice();
         // Refresh the open dropdown so just-loaded aliases become searchable.
         if (document.activeElement === input) render(input.value);
-      } catch { /* alias autocomplete is opt-in; failure is a no-op */ }
+      } catch { /* one group failing leaves the rest searchable */ }
     }));
+    // A transient failure must not cost the session its aliases. Without them
+    // the ranking is visibly worse -- "asphalt tonnage 2400 sq ft" leads with a
+    // carpet takeoff -- and the only recovery was a full reload, because
+    // `aliasLoaded` was already latched. `ensureDiscovery` has always released
+    // its flag on failure so the next keystroke retries; this does the same
+    // when NOTHING loaded. Partial success keeps what arrived rather than
+    // re-fetching every group on each keystroke.
+    if (!aliasRows.length) aliasLoaded = false;
   }
 
   // The spec-v589 pure ranking layer (normalizeQuery / rankTools) loads
@@ -852,7 +860,9 @@ function bindSearch() {
         // exactly this reason; slots and the preview map now do the same.
         if (document.activeElement === input) render(input.value);
       })
-      .catch(() => { /* prefill is opt-in; failure is a no-op */ });
+      // Release the latch so the next keystroke retries, as ensureDiscovery
+      // does; a blip on the first search otherwise disables prefill until reload.
+      .catch(() => { slotsLoading = false; });
   }
 
   // Prefill hash for a picked tile: numbers-with-units in the typed query
@@ -884,7 +894,9 @@ function bindSearch() {
         // Same late-arrival re-render as ensureSlots(); see the note there.
         if (document.activeElement === input) render(input.value);
       })
-      .catch(() => { /* preview is opt-in; failure is a no-op */ });
+      // Same latch release: a blip otherwise costs the session its answer
+      // previews entirely, with no retry but a reload.
+      .catch(() => { previewLoading = false; });
   }
   let previewTimer = 0;
   let previewSeq = 0;

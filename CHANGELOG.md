@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **One failed fetch on the first search cost the whole page session its aliases, its prefill, and its answer previews.** The search box lazy-loads four things on first interaction. `ensureDiscovery` releases its "loading" flag if the import fails, so the next keystroke retries. The other three never did: `ensureAliases` latched `aliasLoaded = true` before its fetches resolved, and `ensureSlots` / `ensurePreview` swallowed the failure with the flag still set. A single transient blip -- a dropped request on a phone, a slow cold load -- and that page was stuck until a full reload, with no sign anything was wrong.
+
+  The aliases are the visible one. Without them, **"asphalt tonnage 2400 sq ft 3 in deep 12 ft wide" leads with a carpet takeoff** instead of Asphalt Tonnage. That is not hypothetical: it is what a CI runner saw, on a commit that changed no browser code at all. All three retries failed identically, which is the signature of a race with no recovery path rather than a flake.
+
+  All three now release their latch on failure, the way `ensureDiscovery` always has. Partial success is kept rather than re-fetched, so only a run in which nothing at all arrived retries.
+
+  Pinned by an integration test that makes the failure deterministic instead of hoping CI timing reproduces it: abort the alias fetches, assert the ranking is the degraded one, let them through, type one more character, and assert it corrects itself. Verified red without the fix -- failing all three attempts with the exact "Carpet Square-Yard and Linear-Foot Takeoff" the CI runner reported -- and green with it.
+
 - **Three coverage figures the docs quote had drifted, and nothing was watching them.** `docs/data-sources.md` still said the browser's field index "reaches 1,739 of 1,804 rather than the 1,425 that carry a schema" -- both numbers had moved (to 1,763 and 1,476), and the same figures in `mcp/README.md` were being hand-edited on every change. Numbers stated in prose rot silently; that is what the README count gate already exists to prevent, so these join it.
 
   `check-readme-counts` now derives the field-index and schema-coverage counts from the generated artefacts themselves and pins them wherever the prose quotes them, label-anchored the same way the catalog counts are. `check-both-doors` pins the count of calculators that name their answers, since it already computes it.

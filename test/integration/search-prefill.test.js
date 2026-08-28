@@ -454,3 +454,34 @@ test("a shape-changing select does not orphan the fields prefilled after it", as
   // 20 x 10 x 4in = 66.67 ft^3; the tile answers rather than showing zero.
   await expect(page.locator("#co-out-cf")).toHaveText(/66\.67/);
 });
+
+// A transient failure fetching the alias shards must not cost the session its
+// aliases. Without them the ranking is visibly worse: this very query leads
+// with a carpet takeoff instead of Asphalt Tonnage, which is what a CI runner
+// saw when the shards did not arrive in time. `aliasLoaded` was latched before
+// the fetches resolved, so the only recovery was a full page reload --
+// `ensureDiscovery` has always released its flag on failure, and now these do
+// too.
+test("spec-v590: a failed alias fetch is retried on the next keystroke", async ({ page }) => {
+  let failNext = true;
+  await page.route("**/data/search/aliases-*.json", (route) => {
+    if (failNext) return route.abort();
+    return route.continue();
+  });
+
+  await page.goto("/");
+  const input = page.locator("#search-input");
+  await input.click();
+  await input.fill(ASK_QUERY);
+
+  // With no aliases the ranking is the degraded one, and it stays that way.
+  const top = page.locator("#search-results .search-result").first().locator(".sr-name");
+  await expect(top).not.toHaveText("Asphalt Tonnage");
+
+  // Let the shards through and type one more character: the latch must have
+  // been released, so the aliases load and the ranking corrects itself.
+  failNext = false;
+  await input.press("End");
+  await input.type(" ");
+  await expect(top).toHaveText("Asphalt Tonnage");
+});

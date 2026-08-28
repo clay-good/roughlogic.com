@@ -81,12 +81,17 @@ test("the matcher folds alias-term matches into the results", async () => {
   assert.match(t, /al\.term\.includes\(q\)/);
 });
 
-test("alias autocomplete failure is a no-op (does not block search)", async () => {
+test("alias autocomplete failure is a no-op, and does not latch", async () => {
   const t = await readApp();
-  // The fetch is wrapped in try/catch; failure is silent so the rest of
-  // search works offline / in the failure case.
+  // Each group's fetch is wrapped in try/catch, so one failing group leaves
+  // the rest of search working -- offline included.
   assert.match(
     t,
-    /catch\s*\{\s*\/\*\s*alias autocomplete is opt-in;\s*failure is a no-op\s*\*\/\s*\}/,
+    /catch\s*\{\s*\/\*\s*one group failing leaves the rest searchable\s*\*\/\s*\}/,
   );
+  // ...but a run in which NOTHING loaded must release the latch, or one blip
+  // costs the session its aliases until a reload and the ranking stays
+  // visibly worse. `ensureDiscovery` has always released its flag on failure.
+  // The behaviour itself is pinned by the spec-v590 retry integration test.
+  assert.match(t, /if \(!aliasRows\.length\) aliasLoaded = false;/);
 });
