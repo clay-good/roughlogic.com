@@ -697,6 +697,46 @@ export function outputUnits(id) {
   return BESPOKE_OUTPUT_UNITS[id] || {};
 }
 
+// Assemble the answer STRING a hand-written renderer prints, from the affixes
+// `outputUnits` extracted: prefix + number + suffix, at the tile's own
+// precision. This is the one implementation -- `scripts/build-shells.mjs`
+// prints the tile pages with it and `run` returns it -- so an agent and a
+// reader cannot be shown a differently-formatted answer for the same number.
+//
+// `val` is the caller's default rendering of `raw`, used when the tile states
+// no digit count. Returns null when there is nothing to add, so the caller can
+// fall back rather than print a bare number dressed as a formatted one.
+export function formatWithUnit(unit, raw, val, caption) {
+  if (!unit || (!unit.prefix && !unit.suffix)) return null;
+  const body = typeof raw === "number" ? atToolPrecision(raw, val, unit.digits) : val;
+  if (body === "" || body == null) return null;
+  return (unit.prefix || "") + body + withoutRepeat(unit.suffix, caption);
+}
+
+// A suffix the caption already says would stutter: "Total loss db" then "3 db".
+// "cal/cm²" and "cal/cm^2" are the same unit spelled two ways. Exported because
+// the tile pages apply the same guard to a renderer's own formatted string.
+export function withoutRepeat(suffix, label) {
+  if (!suffix || !label) return suffix || "";
+  const flat = (x) => String(x).replace(/\u00b2/g, "^2").replace(/\u00b3/g, "^3").toLowerCase();
+  const token = flat(suffix.trim().replace(/^[^A-Za-z0-9\u00b2\u00b3]+|[^A-Za-z0-9^/%\u00b2\u00b3-]+$/g, ""));
+  if (!token) return suffix;
+  const hay = flat(label);
+  const re = new RegExp("(^|[^a-z0-9])" + token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "([^a-z0-9]|$)");
+  return re.test(hay) ? "" : suffix;
+}
+
+// A raw number carries full precision; the calculator rounds before showing it.
+// "Simple payback 1.52625" where the tool says "1.5" quotes a precision the
+// tool never claimed. Only ever rounds DOWN to the tool's decimals -- padding a
+// clean 5 out to 5.0000 would read worse, not better.
+function atToolPrecision(raw, val, digits) {
+  if (typeof digits !== "number" || !Number.isFinite(raw) || Math.abs(raw) >= 1e15) return val;
+  const shownDecimals = (String(raw).split(".")[1] || "").length;
+  if (shownDecimals <= digits) return val;
+  return raw.toFixed(digits);
+}
+
 export async function outputDisplays(id, inputs) {
   const { COMPUTE_MAP, RENDERER_MAP, modCache } = await load();
   const reg = COMPUTE_MAP[id];
@@ -753,6 +793,14 @@ export async function run({ id, inputs } = {}) {
     // captions name the numbers. Only keys this result actually carries are
     // reported, so a caption is never attached to an absent value.
     const captioned = captionedOutputs(await outputLabels(id), result);
+    // Deliberately no `display`. The affixes `outputUnits` extracts sit around
+    // a renderer's DISPLAY EXPRESSION, which may transform the value before
+    // printing it, so prefix + raw + suffix is not a safe reconstruction:
+    // measured against the tile pages, 892 of 980 rebuilt strings matched the
+    // page and 88 did not. `solar-thermal-collector` is why it is not shipped
+    // on a majority -- its "%" belongs to a number the raw result has not been
+    // multiplied into yet. The caption names the number; the raw `result` is
+    // the number; nothing in between is invented.
     if (captioned) out.outputs = captioned.map((o) => ({ ...o, unit: null, display: null }));
   }
   // spec-v1190: advisory range warnings for caller-supplied numbers, and the

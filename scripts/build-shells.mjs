@@ -454,27 +454,12 @@ function displayFor(display, val, raw, label) {
 
 // "Arc-flash boundary (in)" has already said inches; repeating it after the
 // number reads like a stutter. Drop a suffix the caption already carries.
-function withoutRepeat(suffix, label) {
-  if (!suffix || !label) return suffix;
-  // "cal/cm²" and "cal/cm^2" are the same unit spelled two ways.
-  const flat = (x) => String(x).replace(/\u00b2/g, "^2").replace(/\u00b3/g, "^3").toLowerCase();
-  const token = flat(suffix.trim().replace(/^[^A-Za-z0-9\u00b2\u00b3]+|[^A-Za-z0-9^/%\u00b2\u00b3-]+$/g, ""));
-  if (!token) return suffix;
-  const hay = flat(label);
-  const re = new RegExp("(^|[^a-z0-9])" + token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "([^a-z0-9]|$)");
-  return re.test(hay) ? "" : suffix;
-}
-
-// A fixture holds a full-precision number; the calculator rounds it before
-// showing it. `Simple payback 1.52625` where the tool says `1.5` quotes a
-// precision the tool never claimed. Only ever rounds DOWN to the tool's
-// decimals -- padding a clean 5 out to 5.0000 would read worse, not better.
-function atToolPrecision(raw, val, digits) {
-  if (typeof digits !== "number" || !Number.isFinite(raw) || Math.abs(raw) >= 1e15) return val;
-  const shownDecimals = (String(raw).split(".")[1] || "").length;
-  if (shownDecimals <= digits) return val;
-  return raw.toFixed(digits);
-}
+// The answer-string formatter lives in mcp/catalog.mjs so the tile pages and
+// the MCP door cannot format the same number two different ways. Bound from the
+// dynamic import below rather than imported statically, to keep this script's
+// existing lazy-load of the catalog.
+let formatWithUnit = () => null;
+let withoutRepeat = (suffix) => suffix || "";
 
 function exampleRows(obj, labels, displays, units) {
   return Object.entries(obj || {})
@@ -491,7 +476,7 @@ function exampleRows(obj, labels, displays, units) {
       // prints); a hand-written renderer's extracted unit second.
       const unit = units && units[k];
       const shown = (displays && displayFor(displays[k], val, raw, caption))
-        || (unit && typeof raw === "number" ? unit.prefix + atToolPrecision(raw, val, unit.digits) + withoutRepeat(unit.suffix, caption) : null)
+        || (typeof raw === "number" ? formatWithUnit(unit, raw, val, caption) : null)
         || val;
       // A named row prints the name and the number, nothing else. The raw field
       // name is the API's, not the reader's: it used to trail 5,396 of the
@@ -1181,7 +1166,10 @@ async function main() {
   // The field labels the browser prints above each input, resolved through the
   // same MCP catalog layer the agent surface reads, so the label on a shell and
   // the label in the calculator can never drift. ~140 ms for the whole catalog.
-  const { inputLabels, outputLabels, outputDisplays, outputUnits } = await import(resolve(ROOT, "mcp/catalog.mjs"));
+  const catalog = await import(resolve(ROOT, "mcp/catalog.mjs"));
+  const { inputLabels, outputLabels, outputDisplays, outputUnits } = catalog;
+  formatWithUnit = catalog.formatWithUnit;
+  withoutRepeat = catalog.withoutRepeat;
 
   let shellCount = 0;
   // Per-tile shells.
