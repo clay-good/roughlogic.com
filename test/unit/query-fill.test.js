@@ -255,3 +255,51 @@ test("a tile's own name does not veto the value beside it", async () => {
   assert.equal(bare.run_width_ft, "20");
   assert.equal(bare.spacing_in, "16");
 });
+
+// A select's option value can carry a number inside a larger token. The token
+// fills its own select correctly, but the quantity scanner also read `16 in`
+// out of the middle of `16in_box` and let that compete for a NUMBER field: on
+// truss-capacity it put 1.33 ft -- 16 inches converted -- into the span and
+// left the reader's real `40 ft` unmatched. Reversing the word order gave the
+// right answer, which is the signature of a value winning on position.
+test("a number inside a select option never fills a number field", async () => {
+  const rows = [
+    { d: "truss_model", l: "Truss model", k: "select", o: ["12in_box", "16in_box", "20p5in_ladder"] },
+    { d: "span_ft", l: "Span", k: "number", u: "ft", r: 1 },
+  ];
+  for (const q of ["16in_box 40 ft", "40 ft 16in_box", "truss model 16in_box span 40 ft"]) {
+    const filled = queryFill(q, rows).filled;
+    assert.equal(filled.span_ft, "40", `span from ${JSON.stringify(q)}`);
+    assert.equal(filled.truss_model, "16in_box");
+  }
+});
+
+// ...but an ALL-NUMERIC option is a value the reader may well be typing, and
+// Phase B0 exists to let a quantity fill that kind of select. Masking those
+// would break it.
+test("an all-numeric select option is still fillable from the question", async () => {
+  const rows = [
+    { d: "n", l: "Sample size n", k: "number" },
+    { d: "confidence_pct", l: "Confidence level", k: "select", o: ["80", "90", "95", "98", "99"] },
+  ];
+  assert.equal(queryFill("confidence level 95 sample size n 100", rows).filled.confidence_pct, "95");
+});
+
+// The veto marks the quantity spent rather than deleting it. Phase A reads the
+// words BETWEEN consecutive numbers to find a field name, so removing one
+// widens the next window: deleting the `410` inside `R_410A` re-homed
+// head-pressure-control's evaporator pressure and lost it.
+test("vetoing an option's digits does not disturb the fields around it", async () => {
+  const rows = [
+    { d: "refrigerant", l: "Refrigerant", k: "select", o: ["R_410A", "R_32", "R_22"] },
+    { d: "evaporator_psig", l: "Evaporator saturation pressure", k: "number", u: "psig" },
+    { d: "valve_dp_psi", l: "Expansion valve required drop", k: "number", u: "psi" },
+  ];
+  const filled = queryFill(
+    "Refrigerant R_410A, Evaporator saturation pressure 20 psig, Expansion valve required drop 100 psi",
+    rows,
+  ).filled;
+  assert.equal(filled.refrigerant, "R_410A");
+  assert.equal(filled.evaporator_psig, "20");
+  assert.equal(filled.valve_dp_psi, "100");
+});

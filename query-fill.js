@@ -310,7 +310,39 @@ export function queryFill(query, rows, opts) {
     opts && typeof opts.name === "string" ? labelTerms(opts.name) : [],
   );
 
+  // A select's own option value can carry a number inside a larger token --
+  // `16in_box`, `20p5in_ladder`. The token is protected from the rewrites and
+  // fills its select correctly, but the quantity scanner still reads `16 in`
+  // out of the middle of it and lets that compete for a NUMBER field. On
+  // `truss-capacity` the option outbid the reader: `16in_box 40 ft` put 1.33 ft
+  // -- 16 inches converted -- into the span and left the real `40 ft`
+  // unmatched. Reversing the word order gave the right answer, which is the
+  // signature of a value winning on position rather than on meaning.
+  //
+  // Only options that are more than a bare number are masked. An all-numeric
+  // option ("80", "95") is a VALUE the reader may well be typing, and Phase B0
+  // exists precisely to let a quantity fill that kind of select.
+  const optionSpans = [];
+  const hay = text.toLowerCase();
+  for (const r of selectRows) {
+    for (const o of r.o) {
+      const needle = String(o).toLowerCase();
+      if (!/\d/.test(needle) || /^\d+(\.\d+)?$/.test(needle)) continue;
+      for (let at = hay.indexOf(needle); at !== -1; at = hay.indexOf(needle, at + needle.length)) {
+        optionSpans.push([at, at + needle.length]);
+      }
+    }
+  }
+  // Vetoed, NOT removed. Phase A reads the words BETWEEN consecutive numbers to
+  // find a field name, so dropping one from the list widens the next window and
+  // re-homes values that had nothing to do with the option: deleting the `410`
+  // inside `R_410A` cost `head-pressure-control` its evaporator pressure. The
+  // quantity stays where it is and is simply spent before any phase can use it.
   const quantities = extractQuantities(text, { withIndex: true });
+  const suppressed = new Set();
+  quantities.forEach((qty, qi) => {
+    if (optionSpans.some(([s, e]) => qty.index >= s && qty.end <= e)) suppressed.add(qi);
+  });
   const filled = {};
   const claimed = new Set();       // quantity indexes already spent
   const unmatched = [];
@@ -326,6 +358,7 @@ export function queryFill(query, rows, opts) {
   quantities.forEach((qty, qi) => {
     const window = text.slice(prevEnd, qty.index);
     prevEnd = qty.end;
+    if (suppressed.has(qi)) return;
     const wanted = windowTerms(window);
     for (const w of nameWords) wanted.delete(w);
     if (!wanted.size) return;
@@ -382,7 +415,7 @@ export function queryFill(query, rows, opts) {
   // through Phase A's veto into Phase B, which matches the bare `in` against
   // the tile's Pipe OD field and writes a 2 into it. A weaker rule must never
   // get to re-home a fragment a stronger rule already refused.
-  const burned = new Set();
+  const burned = new Set(suppressed);
   for (const [qi, hits] of rowsFor) if (hits.length > 1) burned.add(qi);
 
   // Resolve only the unambiguous pairs: one field wanted by one fragment, and
@@ -537,7 +570,7 @@ export function queryFill(query, rows, opts) {
   }
 
   quantities.forEach((qty, qi) => {
-    if (!claimed.has(qi)) unmatched.push(String(qty.value) + (qty.unit ? " " + qty.unit : ""));
+    if (!claimed.has(qi) && !suppressed.has(qi)) unmatched.push(String(qty.value) + (qty.unit ? " " + qty.unit : ""));
   });
 
   return {
