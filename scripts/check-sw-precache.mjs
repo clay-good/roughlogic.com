@@ -131,12 +131,50 @@ async function main() {
     }
   }
 
+  // The field shards are precached one file at a time, not behind a manifest,
+  // so the per-folder check above cannot see them. Their file set is not fixed
+  // either: scripts/build-field-index.mjs writes one shard per group letter
+  // that has an indexed tile, so labelling a field on a group nothing else
+  // covers creates a new shard -- which is exactly how data/fields/q.json
+  // appeared, unlisted, and would have left that group's tiles fetching over
+  // the network on an offline install.
+  let shardChecked = 0;
+  const shardDir = resolve(DATA_DIR, "fields");
+  if (existsSync(shardDir)) {
+    const onDisk = (await readdir(shardDir))
+      .filter((f) => f.endsWith(".json") && f !== "manifest.json")
+      .sort();
+    const listed = new Set(
+      [...swSource.matchAll(/"\.\/data\/fields\/([A-Za-z0-9_-]+\.json)"/g)]
+        .map((m) => m[1])
+        .filter((f) => f !== "manifest.json"),
+    );
+    for (const file of onDisk) {
+      shardChecked++;
+      if (!listed.has(file)) {
+        fail(
+          "data/fields/" + file + " exists but is not in sw.js's precache list; add " +
+          "\"./data/fields/" + file + "\" so the shard is available offline.",
+        );
+      }
+    }
+    for (const file of listed) {
+      if (!onDisk.includes(file)) {
+        fail(
+          "sw.js precaches data/fields/" + file + ", which no longer exists; a missing " +
+          "precache entry fails the whole SW install, taking every other asset with it.",
+        );
+      }
+    }
+  }
+
   if (failed) {
     console.error("check-sw-precache: see failures above. Edit sw.js to close the gap.");
     process.exit(1);
   }
   console.log(
-    "check-sw-precache OK: " + dataChecked + " data/<folder>/manifest.json entries and " +
+    "check-sw-precache OK: " + dataChecked + " data/<folder>/manifest.json entries, " +
+    shardChecked + " data/fields/ shards, and " +
     shellChecked + " calc-*/support .js entries all present in sw.js precache lists.",
   );
 }

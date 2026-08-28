@@ -433,3 +433,24 @@ test("search preview survives its data arriving after the reader stops typing", 
   expect(text).toMatch(/drop \d+(\.\d+)? V/);
   expect(text).not.toMatch(/NaN|Infinity|undefined/);
 });
+
+// A select can REBUILD the form. `concrete` renders its dimension boxes only
+// for the chosen shape, tearing the old ones out of the DOM and making new
+// ones, so a prefill that resolved every element up front and then wrote the
+// shape left the rest of its writes landing on detached nodes: three empty
+// boxes captioned "from your question", above an answer of zero.
+test("a shape-changing select does not orphan the fields prefilled after it", async ({ page }) => {
+  await page.goto("/");
+  const input = page.locator("#search-input");
+  await input.click();
+  await input.fill("concrete volume slab length 20 ft width 10 ft thickness 4 in");
+  const option = page.locator("#search-results [role=option]", { hasText: /^Concrete Volume/ }).first();
+  await option.click();
+
+  await expect(page.locator("#co-s")).toHaveValue("slab");
+  await expect(page.locator("#co-length_ft")).toHaveValue("20");
+  await expect(page.locator("#co-width_ft")).toHaveValue("10");
+  await expect(page.locator("#co-thickness_in")).toHaveValue("4");
+  // 20 x 10 x 4in = 66.67 ft^3; the tile answers rather than showing zero.
+  await expect(page.locator("#co-out-cf")).toHaveText(/66\.67/);
+});

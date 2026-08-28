@@ -49,6 +49,20 @@ export const CURATED_INPUT_LABELS = {
     i13: "13th harmonic (per unit)",
   },
   "unit-converter": { to: "Convert to" },
+  // Shape-dispatched renderers: the tile builds its dimension boxes only after
+  // a shape is chosen, and passes them to the compute through a rest element
+  // (`computeArea({ shape, ...dims })`). The extractor reads a compute CALL, and
+  // there is no call site naming these keys, so it correctly declines. The
+  // labels below are the ones the renderer itself passes to `make(...)` for the
+  // shape each tile's own worked example uses. Without them the field index
+  // could not carry the dimensions at all, and "square footage 20 ft by 10 ft"
+  // -- about the most typed question this site takes -- filled nothing.
+  "square-footage": { length_ft: "Length (ft)", width_ft: "Width (ft)" },
+  "concrete": { length_ft: "Length (ft)", width_ft: "Width (ft)", thickness_in: "Thickness (in)" },
+  "metal-weight": { thickness_in: "Thickness (in)" },
+  // A select the renderer builds from a data list, so the options are not in the
+  // source for the extractor to read. The caption is.
+  "historical-pricing": { commodity: "Commodity" },
 };
 
 export const CURATED_OUTPUT_LABELS = {

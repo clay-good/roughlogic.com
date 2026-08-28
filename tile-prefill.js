@@ -58,13 +58,13 @@ export function applyQueryPrefill({ region, tool, params, query, provenanceText 
     // The tile's own name goes in so the words the reader typed to FIND this
     // calculator are not mistaken for the names of its fields.
     const { filled } = mod.queryFill(query, rows, { name: tool.name });
-    const resolved = resolveFields(region, rows);
     const marked = new Set();
-    for (const [key, value] of Object.entries(filled)) {
+
+    const write = (key, value, resolved) => {
       const el = resolved.get(key);
-      if (!el || !el.id) continue;
+      if (!el || !el.id) return;
       // A deep link's values are the reader's, not ours to revise.
-      if (Object.prototype.hasOwnProperty.call(params, el.id)) continue;
+      if (Object.prototype.hasOwnProperty.call(params, el.id)) return;
       if (el.type === "checkbox") el.checked = value === "1" || value === "true";
       else el.value = String(value);
       // Renderers are split on which event they listen to; dispatch both,
@@ -72,7 +72,28 @@ export function applyQueryPrefill({ region, tool, params, query, provenanceText 
       el.dispatchEvent(new Event("input", { bubbles: true }));
       el.dispatchEvent(new Event("change", { bubbles: true }));
       marked.add(el.id);
+    };
+
+    // A select can REBUILD the form. `concrete` and `square-footage` render
+    // their dimension boxes only for the chosen shape, tearing the old ones out
+    // of the DOM and making new ones, so every element resolved before that
+    // point is detached: the writes land on orphans and the reader sees empty
+    // boxes captioned "from your question" above an answer of zero.
+    //
+    // So the shape-changing fields are written first, and everything else is
+    // resolved against the DOM the form settled into. Writing them in one pass
+    // and hoping the order works is what produced the empty boxes.
+    const kindOf = new Map(rows.map((r) => [r.d, r.k]));
+    const structural = [], plain = [];
+    for (const entry of Object.entries(filled)) {
+      (kindOf.get(entry[0]) === "select" ? structural : plain).push(entry);
     }
+    if (structural.length) {
+      const first = resolveFields(region, rows);
+      for (const [key, value] of structural) write(key, value, first);
+    }
+    const resolved = resolveFields(region, rows);
+    for (const [key, value] of plain) write(key, value, resolved);
     // Fields the hash filled from the same typed question are the reader's
     // words too, so they are captioned alongside.
     for (const key of Object.keys(params)) if (key !== "v") marked.add(key);
