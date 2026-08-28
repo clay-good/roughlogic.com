@@ -19,6 +19,9 @@
 //                and every key the tile's own example sets is advertised.
 //   EXAMPLES     every tile carries a publisher-verified worked example, and
 //                that example actually runs clean through run().
+//   ANSWER KEYS  every caption-sourced output the door names is a key that
+//                example's result actually carries, so no answer is described
+//                that is not there.
 //
 // Reaching a tile is not the same as being able to USE it. Three tiles
 // advertised an input name no JSON object could carry, because the signature
@@ -77,6 +80,7 @@ try {
 
 const failures = [];
 let searchable = 0, runnable = 0, withExample = 0, exampleRuns = 0;
+let withOutputs = 0;
 
 for (const tool of TOOLS) {
   // --- search door ---
@@ -166,6 +170,33 @@ for (const tool of TOOLS) {
         failures.push(`${tool.id}: EXAMPLE -- run() rejected the published example: ${out.result.error}`);
       } else {
         exampleRuns++;
+        // ANSWER KEYS. The input assertions above say a caller can hand the
+        // tile its values; this says the tile's answer can be read.
+        //
+        // Only for `outputs_source: "captions"` -- the 961 tiles whose answer
+        // names come from the captions the renderer prints, keyed by the
+        // compute's own result key so a caller can join them straight onto
+        // `result`. A schema-sourced output is keyed by the renderer's DISPLAY
+        // LINE instead ("pd", "cf"), which is a different and equally
+        // deliberate key space: 703 of the 708 schema tiles key that way, and
+        // `run` hands those lines their formatted `display` string. Asserting
+        // one key space against the other would be a category error.
+        //
+        // The captions are extracted from display code, where an expression can
+        // name an input element or a mode the tile is not in. On a shell page
+        // such a caption is a no-op with nothing to label; advertised through
+        // the door it is a claim about an answer that does not exist.
+        const carried = out.result;
+        for (const o of (described.outputs_source === "captions" ? described.outputs : []) || []) {
+          if (!o || typeof o.key !== "string") continue;
+          if (!Object.prototype.hasOwnProperty.call(carried, o.key)) {
+            failures.push(
+              `${tool.id}: MCP -- advertises an output "${o.key}" (${JSON.stringify(o.label)}) ` +
+              `that its own worked example does not produce. The door names an answer that is not there.`,
+            );
+          }
+        }
+        withOutputs += (described.outputs || []).length ? 1 : 0;
       }
     } catch (e) {
       failures.push(`${tool.id}: EXAMPLE -- run() threw on the published example: ${e && e.message ? e.message : e}`);
@@ -184,5 +215,5 @@ if (failures.length) {
 console.log(
   `check-both-doors OK: ${TOOLS.length} tiles -- ${searchable} searchable ` +
   `(top ${SEARCH_HORIZON} on their own name), ${runnable} MCP-runnable, ${withExample} with a worked ` +
-  `example, ${exampleRuns} of which run clean through the MCP door.`,
+  `example, ${exampleRuns} of which run clean through the MCP door; ${withOutputs} name their answers.`,
 );

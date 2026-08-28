@@ -87,6 +87,7 @@ const TOOLS = [
         trades: { type: "array", items: { type: "string" } }, desc: { type: "string" },
         runnable: { type: "boolean" },
         inputs_source: { type: "string", enum: ["renderer", "compute"] },
+        outputs_source: { type: ["string", "null"], enum: ["renderer", "captions", null] },
         inputs: { type: "array", description: "Field descriptors (key, label, kind, options, default, attrs) or compute params." },
         outputs: { type: "array", items: { type: "object", properties: { key: { type: "string" }, label: { type: "string" }, unit: { type: ["string", "null"] } } } },
         example: { type: "object" },

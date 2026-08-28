@@ -51,10 +51,43 @@ test("describe outputs carry label + unit but never leak the format closure", as
   assert.ok(d.outputs.every((o) => typeof o.label === "string" && !("format" in o)));
 });
 
-test("a bespoke-renderer tile has no rendered outputs and does not crash", async () => {
-  const r = await run({ id: "anchor-embedment" }); // bespoke, options do not resolve statically (no schema)
-  assert.ok(!("outputs" in r));
-  assert.ok(r.result && typeof r.result === "object");
+test("a bespoke-renderer tile still names its answers from its printed captions", async () => {
+  // No schema means no format closure, so no display string -- but the caption
+  // the calculator prints above each number is extracted for its own page, and
+  // the door reports it keyed by the compute result key.
+  const d = await describe({ id: "final-grade-needed" });
+  assert.equal(d.inputs_source, "compute", "no schema for this renderer");
+  assert.equal(d.outputs_source, "captions");
+  const needed = d.outputs.find((o) => o.key === "needed_pct");
+  assert.equal(needed.label, "Needed final score");
+  assert.equal(needed.unit, null, "an extracted display affix is not a unit and is not reported as one");
+
+  const r = await run({ id: "final-grade-needed" });
+  const row = r.outputs.find((o) => o.key === "needed_pct");
+  assert.equal(row.label, "Needed final score");
+  assert.equal(row.display, null, "a bespoke renderer has no format closure");
+  assert.ok("needed_pct" in r.result, "and the key joins straight onto the raw result");
+});
+
+test("a captioned output is never a key the result does not carry", async () => {
+  // The captions are extracted from display code, which can name an input
+  // element or a mode the tile is not in. On a page that caption has nothing to
+  // label; through the door it would be a claim about an answer that is absent.
+  const r = await run({ id: "conduit-90-stub" });
+  for (const o of r.outputs || []) {
+    assert.ok(Object.prototype.hasOwnProperty.call(r.result, o.key),
+      `advertised output ${o.key} is absent from the result`);
+  }
+});
+
+test("a schema tile keeps its display-line outputs and marks their source", async () => {
+  // The two key spaces are deliberate and distinguishable: a schema output is
+  // keyed by the renderer's display line and carries a formatted string; a
+  // captioned output is keyed by the compute result key and carries none.
+  const d = await describe({ id: "pull-box-sizing" });
+  assert.equal(d.outputs_source, "renderer");
+  const r = await run({ id: "pull-box-sizing", inputs: { pull_type: "straight", largest_raceway_in: 3, other_raceways_in: 0 } });
+  assert.equal(r.outputs.find((o) => o.key === "g").display, "24.0 in (straight pull)");
 });
 
 test("run warns on an out-of-range number but still returns a result (spec-v1190)", async () => {

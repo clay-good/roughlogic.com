@@ -161,6 +161,39 @@ function describeOutputs(schema) {
   return schema.outputs.map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null }));
 }
 
+// Answer captions for a tile whose renderer earns no schema (375 of them, most
+// of the hand-written renderers). The caption the calculator prints above each
+// number on its own page is already extracted for the website's tile shells;
+// `outputLabels` merges that with the curated floor. Without it `describe` and
+// `run` returned no outputs at all for those tiles, so an agent got a result
+// object of bare keys -- `needed_pct` -- while the page beside it said "Needed
+// final score".
+//
+// Unlike the input side, reading the extracted captions here is safe: an output
+// key is read, never sent, so a caption can never advertise something `run`
+// cannot honor. (That is why BESPOKE_LABELS must still stay out of the input
+// list -- see inputLabels.)
+//
+// No unit and no display string: a bespoke renderer carries no format closure,
+// and the extracted affixes are display wrapping ("eta^2 = ", " $"), not units.
+// Reporting one as a unit would be a guess; `outputUnits(id)` exposes them as
+// what they are for a caller that wants them.
+//
+// `result` is the evidence that a captioned key is a number this tile really
+// produces. The captions are extracted from display code, and ten of them
+// across the catalog name something no result carries -- a caption read off an
+// input element, or a key from a mode the extractor blended in. On a shell page
+// such a caption is a harmless no-op with nothing to label; advertised here it
+// would be a claim about an answer that does not exist. So a caption is
+// reported only for a key the tile is observed to produce: the caller's own
+// result for `run`, and the worked example's result for `describe`.
+function captionedOutputs(captions, result) {
+  if (!result) return undefined;
+  const keys = Object.keys(captions)
+    .filter((k) => Object.prototype.hasOwnProperty.call(result, k));
+  return keys.length ? keys.map((k) => ({ key: k, label: captions[k] })) : undefined;
+}
+
 // The allowed values of a select field, tolerating both the {value,label}
 // option shape the factories use and a bare-string option.
 function selectValues(field) {
@@ -468,6 +501,17 @@ export async function describe({ id } = {}) {
       out.inputs = introspectInputs(fn);
       out.inputs_source = "compute";
     }
+    if (!out.outputs) {
+      // The worked example is this tile's own verified input set, so the keys
+      // it produces are the keys the tile answers with.
+      let exResult = null;
+      if (ex && ex.inputs) { try { exResult = fn({ ...ex.inputs }); } catch { exResult = null; } }
+      const captioned = captionedOutputs(await outputLabels(id), exResult);
+      if (captioned) out.outputs = captioned.map((o) => ({ ...o, unit: null }));
+      out.outputs_source = captioned ? "captions" : null;
+    } else {
+      out.outputs_source = "renderer";
+    }
     // Some computes cannot be read from their signature at all: a few take a
     // bare object (`computeRentVsBuy(inp)`) and a few collect a shape-dependent
     // key set through a rest element (`{ shape, ...args }`). Introspection
@@ -704,6 +748,13 @@ export async function run({ id, inputs } = {}) {
   // each with its unit and the formatted display string.
   const outputs = renderOutputs(schema, result);
   if (outputs) out.outputs = outputs;
+  else {
+    // A bespoke renderer has no schema and no format closure, but its printed
+    // captions name the numbers. Only keys this result actually carries are
+    // reported, so a caption is never attached to an absent value.
+    const captioned = captionedOutputs(await outputLabels(id), result);
+    if (captioned) out.outputs = captioned.map((o) => ({ ...o, unit: null, display: null }));
+  }
   // spec-v1190: advisory range warnings for caller-supplied numbers, and the
   // tile's limitation banner. A verified worked example is in-range by
   // construction, so only caller inputs are checked.

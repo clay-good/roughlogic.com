@@ -68,6 +68,27 @@ accept **either** family and convert internally, so the page's own numbers run
 straight through the door, warning-free, to the answer the page shows. Send one
 family or the other; where both are given, the US key wins.
 
+`describe_calculator` names the answers as well as the inputs, and says which
+of two key spaces it is using. A calculator with a field schema reports its
+**display lines** -- the rows a person reads down the page -- so `outputs_source`
+is `renderer`, the keys are the renderer's own line ids, and `run_calculator`
+fills each one's `display` with the formatted string the page shows ("24.0 in
+(straight pull)"). The hand-written renderers have no schema and no format
+closure, so for those the door reports the **caption the calculator prints above
+each number**, keyed by the compute's own result key: `outputs_source` is
+`captions`, `display` is null, and the key joins straight onto `result`. Either
+way, a key is named only where the calculator is observed to produce it -- the
+worked example's result for `describe_calculator`, the caller's own result for
+`run_calculator` -- so the door never names an answer that is not there.
+`check-both-doors.mjs` holds that. **1,669 of 1,804 calculators name their
+answers.** The remaining 135 return them unlabelled; their captions are built by
+an expression a static read cannot follow.
+
+Captioned outputs carry no `unit`. A hand-written renderer's answer wrapping is
+extracted as the prefix and suffix it literally is -- `"$"`, `" CFU/mL"`, but
+also `"eta^2 = "` -- and calling that a unit would be a guess. `outputUnits(id)`
+in `catalog.mjs` exposes them as what they are.
+
 `answer_query` reads the `data/fields/` descriptors the website reads, which
 exist for 1,743 calculators. For the other 61 it projects the descriptors from
 `describe_calculator` instead, naming each input with the caption the
