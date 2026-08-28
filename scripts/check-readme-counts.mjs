@@ -40,7 +40,27 @@ async function liveCounts() {
   // trusting a number someone typed once.
   const pkg = JSON.parse(await readFile(resolve(ROOT, "package.json"), "utf8"));
   const gates = String(pkg.scripts.lint || "").split("&&").filter((c) => c.trim()).length;
-  return { tiles, groups, modules, sitemap, gates };
+  // Coverage figures the prose quotes: how many calculators the browser's
+  // field index reaches, and how many carry a field schema. Both are stated in
+  // docs and in mcp/README.md, and both drifted -- data-sources.md still said
+  // the index reached 1,739 of the 1,425 that carry a schema, long after both
+  // numbers had moved. Read from the generated artefacts themselves.
+  const shardDir = resolve(ROOT, "data", "fields");
+  const indexed = new Set();
+  for (const f of await readdir(shardDir)) {
+    if (f === "manifest.json" || !f.endsWith(".json")) continue;
+    const shard = JSON.parse(await readFile(resolve(shardDir, f), "utf8"));
+    for (const id of Object.keys(shard.tiles || shard)) indexed.add(id);
+  }
+  const coverage = JSON.parse(
+    await readFile(resolve(ROOT, "test", "fixtures", "renderer-schema-coverage.json"), "utf8"),
+  );
+  return {
+    tiles, groups, modules, sitemap, gates,
+    indexedTiles: indexed.size,
+    schemaTiles: coverage.covered_count,
+    unindexedTiles: tiles - indexed.size,
+  };
 }
 
 // For a label-anchored pattern, collect every number that precedes/follows
@@ -105,6 +125,14 @@ async function main() {
   checked += checkPattern(readme, /is ([\d,]+) small, single-purpose calculators/g, live.tiles, "tile count (README lede)", errors);
   const mcpReadme = await readFile(resolve(ROOT, "mcp", "README.md"), "utf8");
   checked += checkPattern(mcpReadme, /\*\*([\d,]+) trades calculators\*\*/g, live.tiles, "tile count (mcp/README.md)", errors);
+
+  // Field-index and schema-coverage figures, wherever the prose quotes them.
+  // These move on every extractor improvement and were being hand-edited.
+  const dataSources = await readFile(resolve(ROOT, "docs", "data-sources.md"), "utf8");
+  checked += checkPattern(dataSources, /index reaches ([\d,]+) of [\d,]+/g, live.indexedTiles, "field-index tile count (docs/data-sources.md)", errors);
+  checked += checkPattern(dataSources, /rather than the ([\d,]+) that carry a schema/g, live.schemaTiles, "schema-carrying tile count (docs/data-sources.md)", errors);
+  checked += checkPattern(mcpReadme, /descriptors the website reads, which\s*\nexist for ([\d,]+) calculators/g, live.indexedTiles, "field-index tile count (mcp/README.md)", errors);
+  checked += checkPattern(mcpReadme, /For the other ([\d,]+) it projects/g, live.unindexedTiles, "un-indexed tile count (mcp/README.md)", errors);
 
   // Tile count: the /tools/ shell-diagram node and the prose "(N)".
   // ("static shells" also labels the /groups/ node, so anchor on the path.)

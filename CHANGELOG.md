@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Three coverage figures the docs quote had drifted, and nothing was watching them.** `docs/data-sources.md` still said the browser's field index "reaches 1,739 of 1,804 rather than the 1,425 that carry a schema" -- both numbers had moved (to 1,763 and 1,476), and the same figures in `mcp/README.md` were being hand-edited on every change. Numbers stated in prose rot silently; that is what the README count gate already exists to prevent, so these join it.
+
+  `check-readme-counts` now derives the field-index and schema-coverage counts from the generated artefacts themselves and pins them wherever the prose quotes them, label-anchored the same way the catalog counts are. `check-both-doors` pins the count of calculators that name their answers, since it already computes it.
+
+  Each new assertion was verified by seeding a wrong number and watching it go red, then restoring it -- a pattern that matches nothing would pass forever, which is the failure mode a prose-anchored gate is most prone to. The wording is checked too: change "calculators name their answers" and the gate fails saying so, rather than quietly matching nothing.
+
 - **The same rename blind spot on the input side, where it costs the search box.** Having fixed it for answer captions, the identical assumption turned out to sit on the field readers -- and there it was stricter still: the pass that builds a calculator's **field schema** matched a literal `makeSelect(` / `makeNumber(` with no tolerance for a prefix *or* a rename, and the looser label pass tolerated only a prefix. `rope-ma` builds its dropdown with `_msF(...)`, so it exposed no fields at all.
 
   Both passes now resolve the module's own import names. **47 more calculators expose a real field schema (1,429 to 1,476)** -- labelled, typed, and enum-validated at the agent door instead of bare parameter names, so `run_calculator` rejects a bad dropdown value by name rather than computing on it. 21 more carry field labels.

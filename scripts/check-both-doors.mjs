@@ -206,6 +206,29 @@ for (const tool of TOOLS) {
   }
 }
 
+// The MCP README quotes how many calculators name their answers, and that
+// figure moves on every extractor improvement -- it went 708 -> 1,768 in one
+// session of them, hand-edited each time. This gate already computes it, so it
+// is the right place to pin the prose to it.
+{
+  const readmePath = resolve(ROOT, "mcp", "README.md");
+  const prose = await readFile(readmePath, "utf8");
+  const named = /\*\*([\d,]+) of ([\d,]+) calculators name their\s*\nanswers\.\*\*/.exec(prose);
+  const remaining = /The remaining ([\d,]+) return them unlabelled/.exec(prose);
+  const num = (x) => Number(String(x).replace(/,/g, ""));
+  if (!named) {
+    failures.push("mcp/README.md: could not find the \"N of M calculators name their answers\" figure. Did the wording change? Update this gate with it.");
+  } else {
+    if (num(named[1]) !== withOutputs) failures.push(`mcp/README.md: states ${num(named[1])} calculators name their answers, live is ${withOutputs}.`);
+    if (num(named[2]) !== TOOLS.length) failures.push(`mcp/README.md: states a catalog of ${num(named[2])}, live is ${TOOLS.length}.`);
+  }
+  if (!remaining) {
+    failures.push("mcp/README.md: could not find the \"The remaining N return them unlabelled\" figure. Did the wording change? Update this gate with it.");
+  } else if (num(remaining[1]) !== TOOLS.length - withOutputs) {
+    failures.push(`mcp/README.md: states ${num(remaining[1])} unlabelled, live is ${TOOLS.length - withOutputs}.`);
+  }
+}
+
 if (failures.length) {
   for (const f of failures) console.error("ERROR: " + f);
   console.error(`check-both-doors FAILED with ${failures.length} unreachable tile(s).`);
