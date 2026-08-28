@@ -54,17 +54,24 @@ every build.
 `run_calculator` also warns when it is handed a key the calculator cannot
 receive. It spreads the caller's object into the compute, so an unrecognised
 key is dropped silently and the tile answers from its defaults -- a confident
-number built on a value the caller believes it supplied. A misspelling, or the
-key the tile's own page shows for one of the four calculators whose renderer
-converts units at the boundary, both land that way. The warning is advisory and
-the result still comes back. Calculators that legitimately take a
-shape-dependent key set are exempt, since their accepted keys are not a fixed
-list.
+number built on a value the caller believes it supplied. A misspelling lands
+that way. The warning is advisory and the result still comes back. Calculators
+that legitimately take a shape-dependent key set are exempt, since their
+accepted keys are not a fixed list.
+
+The key a calculator's own page shows is never one of those misses. Four
+calculators sit on a correlation published in metric while facing the US user
+in the units the trade works in -- dyno correction (in Hg / deg F over
+mbar / deg C), the two flocculation G tiles (hp / gal / deg F over
+W / m^3 / deg C), and speaker time alignment (deg F over deg C). Their computes
+accept **either** family and convert internally, so the page's own numbers run
+straight through the door, warning-free, to the answer the page shows. Send one
+family or the other; where both are given, the US key wins.
 
 `answer_query` reads the `data/fields/` descriptors the website reads, which
-exist for the 1,425 calculators that carry a renderer schema. For the other
-379 it projects the descriptors from `describe_calculator` instead, naming each
-input with the caption the calculator itself prints. A field whose verified
+exist for 1,743 calculators. For the other 61 it projects the descriptors from
+`describe_calculator` instead, naming each input with the caption the
+calculator itself prints. A field whose verified
 example holds something a numeric extractor must not guess at -- a list, a
 date, a coded token like `wingwall_30_75` -- is named but never filled, and a
 field the example sets is treated as required. So a question that covers only

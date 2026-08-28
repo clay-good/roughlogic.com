@@ -2679,7 +2679,7 @@ cross-check.
 | calc-mechanic.js | `computeDriveshaftCritical` | `{ od_in = 0, wall_in = 0, length_in = 0, material = "steel" }` | _ | _ | _ |
 | calc-mechanic.js | `computeDriveshaftMaxLength` | `{ target_rpm = 0, od_in = 0, wall_in = 0, material = "steel" } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeDynamicCompressionRatio` | `{ bore_in = 4.030, stroke_in = 3.75, rod_length_in = 6.0, static_cr = 10.5, i...` | _ | _ | _ |
-| calc-mechanic.js | `computeDynoCorrectionSae` | `{ observed_hp = 0, baro_mbar = 0, air_temp_c = 25, humidity_pct = 0 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeDynoCorrectionSae` | `{ observed_hp = 0, baro_mbar = 0, baro_inhg = null, air_temp_c = 25, air_temp...` | _ | _ | _ |
 | calc-mechanic.js | `computeEngineBmep` | `{ torque_lb_ft = 0, displacement_cid = 0, cycle_type = "four_stroke" } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeEngineFuelBurnGph` | `{ horsepower = 0, bsfc_lb_hp_hr = 0, density_lb_gal = 0, tank_gal = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeEtHorsepower` | `{ weight_lb = 0, et_s = 0 } = {}` | _ | _ | _ |
@@ -3255,7 +3255,7 @@ cross-check.
 | calc-stage.js | `computeSpeakerImpedance` | `{ topology, z_ohm, count, series_per_branch, branches, amp_min_ohm, power_w }` | _ | _ | _ |
 | calc-stage.js | `computeSpeedOfSoundAir` | `{ temperature_f = 68 } = {}` | _ | _ | _ |
 | calc-stage.js | `computeStageDeckLiveLoad` | `{ length_ft = 0, width_ft = 0, legs = 4, design_psf = 125, deck_dead_lb = 0, ...` | _ | _ | _ |
-| calc-stage.js | `computeTimeAlignment` | `{ d_main_ft = 0, d_delay_ft = 0, ambient_C = 20, haas_offset_ms = 15 }` | _ | _ | _ |
+| calc-stage.js | `computeTimeAlignment` | `{ d_main_ft = 0, d_delay_ft = 0, ambient_C = 20, ambient_F = null, haas_offse...` | _ | _ | _ |
 | calc-stage.js | `computeTrussCapacity` | `{ truss_model = "16in_box", span_ft = 0, point_loads = [] }` | _ | _ | _ |
 | calc-stage.js | `computeVideoWallDataRate` | `{ width_px = 0, height_px = 0, bit_depth = 8, refresh_hz = 60, pixels_per_por...` | _ | _ | _ |
 | calc-stage.js | `computeWinchFleetAngle` | `{ lateral_offset = 0, lead_distance = 0 } = {}` | _ | _ | _ |
@@ -3321,7 +3321,7 @@ cross-check.
 | calc-treatment.js | `computeDesignFlowPeaking` | `{ population = 0, per_capita_gpcd = 100 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeDigesterGasProduction` | `{ vs_fed_lb_day = 0, vs_reduction_pct = 0, gas_yield_ft3_lb = 15, methane_pct...` | _ | _ | _ |
 | calc-treatment.js | `computeDigesterVsLoading` | `{ feed_flow_gpd = 0, percent_ts = 0, percent_vs = 0, digester_ft3 = 0 } = {}` | _ | _ | _ |
-| calc-treatment.js | `computeFlocculationGValue` | `{ power_input_w = 0, basin_volume_m3 = 0, water_temp_c = 15, detention_time_s...` | _ | _ | _ |
+| calc-treatment.js | `computeFlocculationGValue` | `{ power_input_w = 0, power_input_hp = null, basin_volume_m3 = 0, basin_volume...` | _ | _ | _ |
 | calc-treatment.js | `computeFlocculatorPaddlePower` | `{ paddle_radius_ft = 0, wheel_rpm = 0, paddle_area_ft2 = 0, drag_coeff = 1.8,...` | _ | _ | _ |
 | calc-treatment.js | `computeLangelierIndex` | `{ ph = 0, temp = 0, temp_unit = "C", ca_mgl = 0, alk_mgl = 0, tds_mgl = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeOilWaterSeparatorSizing` | `{ flow_gpm = 50, oil_sg = 0.85, droplet_micron = 150, water_viscosity_cp = 1....` | _ | _ | _ |

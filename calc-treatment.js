@@ -1174,11 +1174,27 @@ function _waterViscosity(t) {
   }
   return null;
 }
-// dims: in { power_input_w: M L^2 T^-3, basin_volume_m3: L^3, water_temp_c: dimensionless, detention_time_s: T } out: { g_value: dimensionless, gt_value: dimensionless }
-export function computeFlocculationGValue({ power_input_w = 0, basin_volume_m3 = 0, water_temp_c = 15, detention_time_s = 0 } = {}) {
-  const p = Number(power_input_w) || 0;
-  const v = Number(basin_volume_m3) || 0;
-  const t = Number(water_temp_c);
+// spec-v593 US entry path: the page asks hp / gal / deg F, the Camp-Stein
+// correlation is published in W / m^3 / deg C. Both compute families are
+// accepted -- the US key wins when present -- so the field keys the page shows
+// are real compute parameters and the agent door advertises the same units a
+// person sees. Fixtures stay correlation-native.
+const _FGV_W_PER_HP = 745.699872;
+const _FGV_M3_PER_GAL = 0.003785411784;
+// A US field counts as supplied whenever the caller names it at all -- an
+// empty page field must fail its own guard, not fall through to the metric
+// default. (Number(null) is 0, so a finiteness test cannot decide this.)
+const _fgvGiven = (v) => v !== null && v !== undefined;
+// dims: in { power_input_w: M L^2 T^-3, power_input_hp: M L^2 T^-3, basin_volume_m3: L^3, basin_volume_gal: L^3, water_temp_c: dimensionless, water_temp_f: dimensionless, detention_time_s: T } out: { g_value: dimensionless, gt_value: dimensionless, power_input_w: M L^2 T^-3, basin_volume_m3: L^3, water_temp_c: dimensionless }
+export function computeFlocculationGValue({ power_input_w = 0, power_input_hp = null, basin_volume_m3 = 0, basin_volume_gal = null, water_temp_c = 15, water_temp_f = null, detention_time_s = 0 } = {}) {
+  const useHp = _fgvGiven(power_input_hp), useGal = _fgvGiven(basin_volume_gal), useF = _fgvGiven(water_temp_f);
+  const hp = Number(power_input_hp), gal = Number(basin_volume_gal), tF = Number(water_temp_f);
+  if (useHp && !(hp > 0 && Number.isFinite(hp))) return { error: "Power input must be positive (hp)." };
+  if (useGal && !(gal > 0 && Number.isFinite(gal))) return { error: "Basin volume must be positive (gal)." };
+  if (useF && (!Number.isFinite(tF) || tF < 32 || tF > 104)) return { error: "Water temperature must be between 32 and 104 F (the 0-40 C viscosity-table range)." };
+  const p = useHp ? hp * _FGV_W_PER_HP : Number(power_input_w) || 0;
+  const v = useGal ? gal * _FGV_M3_PER_GAL : Number(basin_volume_m3) || 0;
+  const t = useF ? (tF - 32) * 5 / 9 : Number(water_temp_c);
   const dt = Number(detention_time_s) || 0;
   if (!(p > 0 && Number.isFinite(p))) return { error: "Power input must be positive (W)." };
   if (!(v > 0 && Number.isFinite(v))) return { error: "Basin volume must be positive (m^3)." };
@@ -1191,18 +1207,19 @@ export function computeFlocculationGValue({ power_input_w = 0, basin_volume_m3 =
   const band = g_value >= 500 ? "rapid mix (500-1,000 range)" : g_value >= 20 && g_value <= 70 ? "flocculation (20-70 band)" : g_value < 20 ? "below the flocculation floor (weak mixing)" : "between flocculation and rapid mix";
   return {
     mu, g_value, gt_value, band,
+    // the page's "SI equivalents" line reads these back, so the correlation's
+    // native values travel with the result whichever unit family came in.
+    power_input_w: p, basin_volume_m3: v, water_temp_c: t,
     note: "G depends on the water temperature through viscosity, so cold water yields a LOWER G for the same paddle power and can drop flocculation below the 20-per-second floor. Too high a G in the flocculation basin shears the floc apart - the reason rapid mix (G 500-1,000) and flocculation (G 20-70) are staged, not merged. Gt characterizes the whole basin (10^4 to 10^5 typical). The viscosity is taken from a water-property table at the given temperature; the treatment-process design governs.",
   };
 }
 // Correlation-native (SI) example -- the Camp-Stein compute keeps this signature
 // and the test fixtures stay in this form.
 export const flocculationGValueExample = { inputs: { power_input_w: 300, basin_volume_m3: 100, water_temp_c: 10, detention_time_s: 1200 } };
-// spec-v593: the USER-FACING fields are hp / gallons / deg F, converted to the
-// correlation's native W / m^3 / deg C at the renderer boundary. The math and
-// citation above stay metric-native; the SI equivalents are echoed as an output
-// line so the metric entry path stays one read away.
-const _FGV_W_PER_HP = 745.699872;
-const _FGV_M3_PER_GAL = 0.003785411784;
+// spec-v593: the USER-FACING fields are hp / gallons / deg F. The compute above
+// takes either family, so the renderer simply hands its field values through.
+// The math and citation stay metric-native; the SI equivalents are echoed as an
+// output line so the metric entry path stays one read away.
 const renderFlocculationGValue = _rPool({
   citation: "Citation: Camp-Stein velocity gradient (Camp & Stein; Ten States Standards), by name. G = sqrt(P / (mu x V)); Gt = G x detention_time; mu is water dynamic viscosity at the given temperature. Bands: rapid mix G 500-1,000/s, flocculation G 20-70/s, Gt 10^4-10^5. Cold water is more viscous, so the same paddle delivers a lower G in winter; too high a G in flocculation shears the floc. The treatment-process design governs.",
   example: { power_input_hp: 0.4, basin_volume_gal: 26400, water_temp_f: 50, detention_time_s: 1200 },
@@ -1218,32 +1235,26 @@ const renderFlocculationGValue = _rPool({
     { key: "si", id: "fgv-out-si", label: "SI equivalents", value: (r) => "P " + fmt(r.power_input_w, 1) + " W, V " + fmt(r.basin_volume_m3, 1) + " m^3, T " + fmt(r.water_temp_c, 1) + " C" },
     { key: "n", id: "fgv-out-n", label: "Note", value: (r) => r.note },
   ],
-  compute: (inp = {}) => {
-    const hp = Number(inp.power_input_hp) || 0;
-    const gal = Number(inp.basin_volume_gal) || 0;
-    const tF = Number(inp.water_temp_f);
-    if (!(hp > 0 && Number.isFinite(hp))) return { error: "Power input must be positive (hp)." };
-    if (!(gal > 0 && Number.isFinite(gal))) return { error: "Basin volume must be positive (gal)." };
-    if (!Number.isFinite(tF) || tF < 32 || tF > 104) return { error: "Water temperature must be between 32 and 104 F (the 0-40 C viscosity-table range)." };
-    const power_input_w = hp * _FGV_W_PER_HP;
-    const basin_volume_m3 = gal * _FGV_M3_PER_GAL;
-    const water_temp_c = (tF - 32) * 5 / 9;
-    const r = computeFlocculationGValue({ power_input_w, basin_volume_m3, water_temp_c, detention_time_s: inp.detention_time_s });
-    return r.error ? r : Object.assign({ power_input_w, basin_volume_m3, water_temp_c }, r);
-  },
+  compute: computeFlocculationGValue,
 });
 TREATMENT_RENDERERS["flocculation-g-value"] = renderFlocculationGValue;
 
 // --- spec-v621 M: Tapered flocculation multi-stage G schedule (`tapered-flocculation-g`) ---
 // P_stage = G_stage^2 x mu(T) x V_stage (Camp-Stein inverted). Stage 3 G = 0 models a 2-stage train. Gt = mean(G) x total_time.
-// dims: in { stage1_g_per_s: dimensionless, stage2_g_per_s: dimensionless, stage3_g_per_s: dimensionless, stage_volume_m3: L^3, water_temp_c: dimensionless, total_detention_min: T } out: { stage1_power_w: M L^2 T^-3, stage2_power_w: M L^2 T^-3, stage3_power_w: M L^2 T^-3, total_power_w: M L^2 T^-3, mean_g: dimensionless, gt_value: dimensionless }
-export function computeTaperedFlocculationG({ stage1_g_per_s = 0, stage2_g_per_s = 0, stage3_g_per_s = 0, stage_volume_m3 = 0, water_temp_c = 15, total_detention_min = 0 } = {}) {
+// dims: in { stage1_g_per_s: dimensionless, stage2_g_per_s: dimensionless, stage3_g_per_s: dimensionless, stage_volume_m3: L^3, stage_volume_gal: L^3, water_temp_c: dimensionless, water_temp_f: dimensionless, total_detention_min: T } out: { stage1_power_w: M L^2 T^-3, stage2_power_w: M L^2 T^-3, stage3_power_w: M L^2 T^-3, total_power_w: M L^2 T^-3, mean_g: dimensionless, gt_value: dimensionless }
+export function computeTaperedFlocculationG({ stage1_g_per_s = 0, stage2_g_per_s = 0, stage3_g_per_s = 0, stage_volume_m3 = 0, stage_volume_gal = null, water_temp_c = 15, water_temp_f = null, total_detention_min = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   const g1 = Number(stage1_g_per_s) || 0;
   const g2 = Number(stage2_g_per_s) || 0;
   const g3 = Number(stage3_g_per_s) || 0;
-  const V = Number(stage_volume_m3) || 0;
-  const t = Number(water_temp_c);
+  // spec-v593 US entry path: the page asks gal / deg F, the Camp-Stein
+  // correlation is published in m^3 / deg C. The US key wins when present.
+  const useGal = _fgvGiven(stage_volume_gal), useF = _fgvGiven(water_temp_f);
+  const gal = Number(stage_volume_gal), tF = Number(water_temp_f);
+  if (useGal && !(gal > 0 && Number.isFinite(gal))) return { error: "Stage volume must be positive (gal)." };
+  if (useF && (!Number.isFinite(tF) || tF < 32 || tF > 104)) return { error: "Water temperature must be between 32 and 104 F (the 0-40 C viscosity-table range)." };
+  const V = useGal ? gal * _FGV_M3_PER_GAL : Number(stage_volume_m3) || 0;
+  const t = useF ? (tF - 32) * 5 / 9 : Number(water_temp_c);
   const tmin = Number(total_detention_min) || 0;
   if (!(g1 > 0)) return { error: "Stage 1 G must be positive (per second)." };
   if (!(g2 > 0)) return { error: "Stage 2 G must be positive (per second)." };
@@ -1286,16 +1297,7 @@ const renderTaperedFlocculationG = _rPool({
     { key: "g", id: "tfg-out-g", label: "Mean G / composite Gt", value: (r) => fmt(r.mean_g, 1) + " per s, Gt " + fmt(r.gt_value, 0) },
     { key: "n", id: "tfg-out-n", label: "Note", value: (r) => r.note },
   ],
-  compute: (inp = {}) => {
-    const gal = Number(inp.stage_volume_gal) || 0;
-    const tF = Number(inp.water_temp_f);
-    if (!(gal > 0 && Number.isFinite(gal))) return { error: "Stage volume must be positive (gal)." };
-    if (!Number.isFinite(tF) || tF < 32 || tF > 104) return { error: "Water temperature must be between 32 and 104 F (the 0-40 C viscosity-table range)." };
-    return computeTaperedFlocculationG({
-      stage1_g_per_s: inp.stage1_g_per_s, stage2_g_per_s: inp.stage2_g_per_s, stage3_g_per_s: inp.stage3_g_per_s,
-      stage_volume_m3: gal * _FGV_M3_PER_GAL, water_temp_c: (tF - 32) * 5 / 9, total_detention_min: inp.total_detention_min,
-    });
-  },
+  compute: computeTaperedFlocculationG,
 });
 TREATMENT_RENDERERS["tapered-flocculation-g"] = renderTaperedFlocculationG;
 

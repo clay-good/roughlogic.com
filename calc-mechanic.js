@@ -3219,12 +3219,21 @@ MECHANIC_RENDERERS["brake-pedal-hydraulic"] = _simpleRenderer({
 
 // ===================== spec-v515: SAE J1349 dyno correction factor =====================
 
-// dims: in { observed_hp: M L^2 T^-3, baro_mbar: M L^-1 T^-2, air_temp_c: T, humidity_pct: dimensionless } out: { vapor_mbar: M L^-1 T^-2, p_dry_mbar: M L^-1 T^-2, cf: dimensionless, corrected_hp: M L^2 T^-3, in_window: dimensionless }
-export function computeDynoCorrectionSae({ observed_hp = 0, baro_mbar = 0, air_temp_c = 25, humidity_pct = 0 } = {}) {
+const _DCS_MBAR_PER_INHG = 33.8638866667;
+// A US field counts as supplied whenever the caller names it at all -- an
+// empty page field must fail its own guard, not fall through to the metric
+// default. (Number(null) is 0, so a finiteness test cannot decide this.)
+const _dcsGiven = (v) => v !== null && v !== undefined;
+
+// dims: in { observed_hp: M L^2 T^-3, baro_mbar: M L^-1 T^-2, baro_inhg: M L^-1 T^-2, air_temp_c: T, air_temp_f: T, humidity_pct: dimensionless } out: { vapor_mbar: M L^-1 T^-2, p_dry_mbar: M L^-1 T^-2, cf: dimensionless, corrected_hp: M L^2 T^-3, in_window: dimensionless }
+export function computeDynoCorrectionSae({ observed_hp = 0, baro_mbar = 0, baro_inhg = null, air_temp_c = 25, air_temp_f = null, humidity_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const p = Number(observed_hp) || 0;
-  const baro = Number(baro_mbar) || 0;
-  const t = Number(air_temp_c);
+  // spec-v593 US entry path: the page asks in Hg / deg F, the J1349 correlation
+  // is published in mbar / deg C. Either family may be supplied; the US key
+  // wins when present, so the page's own numbers run through the agent door.
+  const baro = _dcsGiven(baro_inhg) ? Number(baro_inhg) * _DCS_MBAR_PER_INHG : Number(baro_mbar) || 0;
+  const t = _dcsGiven(air_temp_f) ? (Number(air_temp_f) - 32) * 5 / 9 : Number(air_temp_c);
   const rh = Number(humidity_pct) || 0;
   if (!(p > 0)) return { error: "Observed power must be positive (hp)." };
   if (!(baro > 0)) return { error: "Barometric pressure must be positive (mbar)." };
@@ -3245,11 +3254,11 @@ export function computeDynoCorrectionSae({ observed_hp = 0, baro_mbar = 0, air_t
 }
 export const dynoCorrectionSaeExample = { inputs: { observed_hp: 400, baro_mbar: 980, air_temp_c: 30, humidity_pct: 0 } };
 
-// spec-v593: the tile faces the US user in in Hg / deg F and converts at the
-// renderer boundary to the metric reference the J1349 correlation is published
-// in (1 in Hg = 33.8638866667 mbar; deg C = (deg F - 32) x 5/9). The compute
-// keeps its metric-native signature; fixtures stay correlation-native.
-const _DCS_MBAR_PER_INHG = 33.8638866667;
+// spec-v593: the tile faces the US user in in Hg / deg F; the J1349 correlation
+// is published in mbar / deg C (1 in Hg = 33.8638866667 mbar; deg C =
+// (deg F - 32) x 5/9). The compute accepts BOTH families, so the field keys the
+// page shows are real compute parameters and the agent door advertises the same
+// units a person sees. Fixtures stay correlation-native.
 MECHANIC_RENDERERS["dyno-correction-sae"] = _simpleRenderer({
   citation: "Citation: SAE J1349 dyno correction factor (STD per SAE J607): P_dry = baro - vapor(temp, RH); CF = 1.18 x (990 / P_dry_mbar) x sqrt((temp_C + 273)/298) - 0.18; corrected = observed x CF. Corrects to a standard dry day; the pressure must be dry (vapor removed); valid ~15-35 C, 900-1050 mbar; STD (J607) runs ~4% higher. A comparison aid; the dyno and correction basis govern.",
   example: { observed_hp: 400, baro_inhg: 28.94, air_temp_f: 86, humidity_pct: 0 },
@@ -3265,12 +3274,7 @@ MECHANIC_RENDERERS["dyno-correction-sae"] = _simpleRenderer({
     { key: "cp", id: "dcs-out-cp", label: "Corrected power (SAE)", value: (r) => fmt(r.corrected_hp, 1) + " hp" },
     { key: "n", id: "dcs-out-n", label: "Note", value: (r) => r.note },
   ],
-  compute: (p) => computeDynoCorrectionSae({
-    observed_hp: p.observed_hp,
-    baro_mbar: p.baro_inhg * _DCS_MBAR_PER_INHG,
-    air_temp_c: (p.air_temp_f - 32) * 5 / 9,
-    humidity_pct: p.humidity_pct,
-  }),
+  compute: computeDynoCorrectionSae,
 });
 
 // ===================== spec-v516: aircraft weight and balance (CG envelope) =====================

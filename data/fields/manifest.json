@@ -59,7 +59,7 @@
     {
       "file": "k.json",
       "name": "Field descriptors, k runtime shard (generated)",
-      "gzip_size_bytes": 9272
+      "gzip_size_bytes": 9340
     },
     {
       "file": "l.json",
@@ -69,12 +69,12 @@
     {
       "file": "m.json",
       "name": "Field descriptors, m runtime shard (generated)",
-      "gzip_size_bytes": 4150
+      "gzip_size_bytes": 4296
     },
     {
       "file": "n.json",
       "name": "Field descriptors, n runtime shard (generated)",
-      "gzip_size_bytes": 3407
+      "gzip_size_bytes": 3458
     },
     {
       "file": "o.json",

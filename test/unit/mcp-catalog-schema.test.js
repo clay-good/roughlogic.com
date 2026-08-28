@@ -177,14 +177,35 @@ test("a bespoke-renderer tile degrades to compute introspection, no crash", asyn
   assert.match(d.citation.text, /Citation:/);
 });
 
-test("a tile whose renderer wraps compute with unit conversion degrades to the runnable params", async () => {
-  // dyno-correction-sae's fields are US units (baro_inhg) but its compute-map
-  // fn takes SI params (baro_mbar); describe must advertise what run honors.
+test("a US-facing tile over a metric correlation advertises the units its page shows", async () => {
+  // dyno-correction-sae's fields are US units (baro_inhg) over a correlation
+  // published in SI (baro_mbar). The compute takes BOTH families, so the door
+  // advertises the page's own keys -- with labels, units and output
+  // descriptors -- instead of degrading to bare SI param names.
   const d = await describe({ id: "dyno-correction-sae" });
-  assert.equal(d.inputs_source, "compute");
-  const keys = d.inputs.map((i) => i.name);
-  assert.ok(keys.includes("baro_mbar"), "advertises the compute param, not the renderer field key");
-  assert.ok(!keys.includes("baro_inhg"));
+  assert.equal(d.inputs_source, "renderer");
+  const keys = d.inputs.map((i) => i.key ?? i.name);
+  assert.ok(keys.includes("baro_inhg"), "advertises the key the page asks for");
+  assert.ok(keys.includes("baro_mbar"), "and still names the correlation-native alternate");
+  const inhg = d.inputs.find((i) => i.key === "baro_inhg");
+  assert.match(inhg.label, /in Hg/, "carrying the unit in its label");
+  assert.ok(d.outputs && d.outputs.length, "and the outputs a person sees");
+});
+
+test("the two unit families of a US-facing tile agree", async () => {
+  // The page's example and the correlation-native fixture are the same
+  // physical air; both must reach the same correction factor through run().
+  const us = await run({
+    id: "dyno-correction-sae",
+    inputs: { observed_hp: 400, baro_inhg: 28.94, air_temp_f: 86, humidity_pct: 0 },
+  });
+  const si = await run({
+    id: "dyno-correction-sae",
+    inputs: { observed_hp: 400, baro_mbar: 28.94 * 33.8638866667, air_temp_c: 30, humidity_pct: 0 },
+  });
+  assert.ok(!us.result.error && !si.result.error);
+  assert.ok(Math.abs(us.result.cf - si.result.cf) < 1e-12, "same correction factor either way");
+  assert.deepEqual(us.warnings, [], "and the page's own keys draw no unknown-key warning");
 });
 
 test("a number that spells a select option is accepted and normalized to that option", async () => {
@@ -493,15 +514,22 @@ test("run warns on an input key the calculator cannot receive", async () => {
   assert.ok("result" in r, "advisory only -- the compute still answers");
 });
 
-test("run warns when a caller sends the key the tile's own PAGE shows", async () => {
-  // time-alignment is one of four tiles whose renderer converts units at the
-  // boundary: the page asks for ambient_F, the compute takes ambient_C. An
-  // agent replaying the page's example got a different answer and no signal.
-  const r = await run({
+test("the key the tile's own PAGE shows is honored, not warned about", async () => {
+  // time-alignment was one of four tiles whose renderer converted units at the
+  // boundary: the page asked for ambient_F, the compute took ambient_C, and an
+  // agent replaying the page's example got a different answer. The compute now
+  // takes either, so the page's key computes the page's answer.
+  const f = await run({
     id: "time-alignment",
     inputs: { d_main_ft: 80, d_delay_ft: 30, ambient_F: 71.6, haas_offset_ms: 15 },
   });
-  assert.ok(r.warnings.some((x) => x.key === "ambient_F" && x.rule === "unknown"));
+  const c = await run({
+    id: "time-alignment",
+    inputs: { d_main_ft: 80, d_delay_ft: 30, ambient_C: 22, haas_offset_ms: 15 },
+  });
+  assert.deepEqual(f.warnings, [], "the page's key is a real input");
+  assert.ok(Math.abs(f.result.recommended_delay_ms - c.result.recommended_delay_ms) < 1e-9,
+    "71.6 F is 22 C and answers the same");
 });
 
 test("a compute that collects a shape-dependent key set is never warned about", async () => {

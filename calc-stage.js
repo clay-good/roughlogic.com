@@ -134,18 +134,22 @@ export const trussExample = {
 // delay_ms = (d_main - d_delay) / c * 1000
 // Convert ft <-> m as needed.
 
-// dims: in { d_main_ft: L, d_delay_ft: L, ambient_C: T, haas_offset_ms: T }
+// dims: in { d_main_ft: L, d_delay_ft: L, ambient_C: T, ambient_F: T, haas_offset_ms: T }
 //        out: { c_m_s: L T^-1, ms_difference: T, recommended_delay_ms: T }
 // (Temperature and time both surface as `T` per the spec-v14 §7.1
 // base-token shortcut; speed of sound is length / time.)
-export function computeTimeAlignment({ d_main_ft = 0, d_delay_ft = 0, ambient_C = 20, haas_offset_ms = 15 }) {
+export function computeTimeAlignment({ d_main_ft = 0, d_delay_ft = 0, ambient_C = 20, ambient_F = null, haas_offset_ms = 15 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   haas_offset_ms = Number(haas_offset_ms);
   if (!(d_main_ft >= 0)) return { error: "Main distance must be non-negative." };
   if (!(d_delay_ft >= 0)) return { error: "Delay distance must be non-negative." };
   const d_main_m = d_main_ft * 0.3048;
   const d_delay_m = d_delay_ft * 0.3048;
-  const c_m_s = 331.3 + 0.606 * ambient_C;
+  // spec-v593 US entry path: the page asks deg F, the published speed-of-sound
+  // form is in deg C. The US key wins when present, so the page's own numbers
+  // run through the agent door unchanged.
+  const t_c = (ambient_F !== null && ambient_F !== undefined) ? (Number(ambient_F) - 32) * 5 / 9 : Number(ambient_C);
+  const c_m_s = 331.3 + 0.606 * t_c;
   const ms_difference = ((d_main_m - d_delay_m) / c_m_s) * 1000;
   const recommended_delay_ms = ms_difference + haas_offset_ms;
   return { c_m_s, ms_difference, recommended_delay_ms };
@@ -431,8 +435,8 @@ function renderTrussCapacity(inputRegion, outputRegion, citationEl) {
 
 const renderTimeAlignment = _r({
   citation: "Citation: Public speed-of-sound formula c (m/s) = 331.3 + 0.606 * T_C. Haas-window 10-30 ms keeps image at the stage.",
-  // v593: US-facing deg F field; converted to deg C at the boundary for the
-  // published speed-of-sound form (71.6 F = 22 C, matching the metric fixture).
+  // v593: US-facing deg F field; the compute accepts deg F as well as deg C for
+  // the published speed-of-sound form (71.6 F = 22 C, matching the metric fixture).
   example: { ...timeAlignmentExample.inputs, ambient_F: 71.6 },
   fields: [
     { key: "d_main_ft", label: "Distance from mains (ft)", kind: "number" },
@@ -445,7 +449,7 @@ const renderTimeAlignment = _r({
     { key: "d", id: "ta-out-d", label: "Time difference", value: (r) => fmt(r.ms_difference, 2) + " ms" },
     { key: "r", id: "ta-out-r", label: "Recommended delay", value: (r) => fmt(r.recommended_delay_ms, 1) + " ms" },
   ],
-  compute: (p) => computeTimeAlignment({ d_main_ft: p.d_main_ft, d_delay_ft: p.d_delay_ft, ambient_C: (p.ambient_F - 32) * 5 / 9, haas_offset_ms: p.haas_offset_ms }),
+  compute: computeTimeAlignment,
 });
 
 function renderDMX(inputRegion, outputRegion, citationEl) {
