@@ -154,7 +154,33 @@ function factoryAliases(src) {
 
 const DEFAULT_ALIASES = { outLine: "makeOutputLine", fmt: "fmt" };
 
+// Which variable a renderer holds its compute result in. The reads below were
+// anchored on a literal `r.`, but plenty of renderers call it something else --
+// `res` in twenty-one of the tiles that named no answers, `x` in `overtime`,
+// whose four captions ("Regular pay", "Overtime pay", ...) sat one character
+// away from being read.
+//
+// Only bindings that come from the SAME compute function are accepted. A
+// renderer holding two different result objects could have a key that means one
+// thing in each, and a caption attached to the wrong one is worse than none.
+function resultVars(body) {
+  const byFn = new Map();
+  for (const m of body.matchAll(/\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*([\w$]*compute[A-Za-z0-9_$]*)\s*\(/g)) {
+    if (!byFn.has(m[2])) byFn.set(m[2], new Set());
+    byFn.get(m[2]).add(m[1]);
+  }
+  if (byFn.size !== 1) return ["r"];
+  const names = new Set([...byFn.values()][0]);
+  names.add("r");
+  return [...names];
+}
+
+// `(?:r|res)\.` -- the result reads, for whichever names this renderer uses.
+const resultRefRe = (vars, flags) =>
+  new RegExp("\\b(?:" + vars.map((v) => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") + ")\\.([A-Za-z_$][\\w$]*)", flags);
+
 function parseOutputLabels(body, aliases = DEFAULT_ALIASES) {
+  const REF_RE = resultRefRe(resultVars(body), "g");
   const lines = new Map();
   const LINE_RE = new RegExp("\\b([A-Za-z_$][\\w$]*)\\s*=\\s*(?:\\w*(?:" + aliases.outLine + "))\\(\\s*[A-Za-z_$][\\w$]*\\s*,\\s*(\"(?:[^\"\\\\]|\\\\.)*\")", "g");
   for (const m of body.matchAll(LINE_RE)) {
@@ -166,7 +192,7 @@ function parseOutputLabels(body, aliases = DEFAULT_ALIASES) {
   for (const m of body.matchAll(/([A-Za-z_$][\w$]*)\.textContent\s*=\s*([^;]*)/g)) {
     const label = lines.get(m[1]);
     if (label === undefined) continue;
-    const refs = [...new Set([...m[2].matchAll(/\br\.([A-Za-z_$][\w$]*)/g)].map((x) => x[1]))];
+    const refs = [...new Set([...m[2].matchAll(REF_RE)].map((x) => x[1]))];
     if (refs.length === 0) continue;
     // A line that shows more than one result ("300 gpm @ 0.2 gpm/ft^2") is
     // captioned for the value it leads with -- "Total gpm" names total_gpm --
@@ -216,15 +242,16 @@ function splitTopLevel(expr) {
 }
 
 const STRING_LITERAL = /^"((?:[^"\\]|\\.)*)"$|^'((?:[^'\\]|\\.)*)'$/;
-function parseOutputUnit(expr, key, aliases = DEFAULT_ALIASES) {
+function parseOutputUnit(expr, key, aliases = DEFAULT_ALIASES, vars = ["r"]) {
+  const VAR = "(?:" + vars.map((v) => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") + ")";
   // A conditional line says different things about the same number; whichever
   // branch we picked would be wrong half the time.
   if (splitTopLevel(expr).length === 1 && expr.includes("?")) return null;
   const parts = splitTopLevel(expr);
   if (parts.length < 2) return null;
-  const at = parts.findIndex((x) => x.includes("r." + key));
+  const at = parts.findIndex((x) => vars.some((v) => x.includes(v + "." + key)));
   if (at < 0) return null;
-  if (parts.some((x, i) => i !== at && x.includes("r."))) return null;
+  if (parts.some((x, i) => i !== at && vars.some((v) => x.includes(v + ".")))) return null;
   if (parts[at].includes("?")) return null;
   const lit = (x) => {
     const m = STRING_LITERAL.exec(x);
@@ -261,7 +288,7 @@ function parseOutputUnit(expr, key, aliases = DEFAULT_ALIASES) {
   // conversion by a named constant -- cannot be reproduced from the raw value
   // and disqualifies the affix instead. String literals are stripped first so
   // a hyphen inside one is not read as a minus.
-  const KEY = /r\.[A-Za-z_$][\w$]*/;
+  const KEY = { source: VAR + "\\.[A-Za-z_$][\\w$]*" };
   const FMT = "(?:" + aliases.fmt + ")";
   const scaled = parts[at].match(
     new RegExp("^" + FMT + "\\(\\s*" + KEY.source + "\\s*([*/])\\s*(\\d+(?:\\.\\d+)?)\\s*,\\s*(\\d+)\\s*\\)$"),
@@ -272,11 +299,11 @@ function parseOutputUnit(expr, key, aliases = DEFAULT_ALIASES) {
     return { prefix, suffix, digits: Number(scaled[3]), scale: scaled[1] === "*" ? n : 1 / n };
   }
   const keySegment = parts[at].replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g, "");
-  if (/[*/]|(?<![\w$])-|-(?![\w$])/.test(keySegment.replace(/r\.[A-Za-z_$][\w$]*/g, "K"))) return null;
+  if (/[*/]|(?<![\w$])-|-(?![\w$])/.test(keySegment.replace(new RegExp(VAR + "\\.[A-Za-z_$][\\w$]*", "g"), "K"))) return null;
   // How many decimals the calculator itself shows. A page that prints
   // `1.52625` where the tool prints `1.5` is quoting a precision the tool
   // never claims.
-  const d = parts[at].match(new RegExp("\\b" + FMT + "\\(\\s*r\\.[A-Za-z_$][\\w$]*\\s*,\\s*(\\d+)\\s*\\)\\s*$"));
+  const d = parts[at].match(new RegExp("\\b" + FMT + "\\(\\s*" + VAR + "\\.[A-Za-z_$][\\w$]*\\s*,\\s*(\\d+)\\s*\\)\\s*$"));
   const digits = d ? Number(d[1]) : null;
   return digits === null ? { prefix, suffix } : { prefix, suffix, digits };
 }
@@ -286,6 +313,8 @@ function parseOutputUnit(expr, key, aliases = DEFAULT_ALIASES) {
 // a line whose caption is ambiguous can still have an unambiguous unit, and a
 // captioned line can have none.
 function parseOutputUnits(body, aliases = DEFAULT_ALIASES) {
+  const vars = resultVars(body);
+  const REF_RE = () => resultRefRe(vars, "g");
   const lines = new Set();
   const LINE_RE = new RegExp("\\b([A-Za-z_$][\\w$]*)\\s*=\\s*(?:\\w*(?:" + aliases.outLine + "))\\(", "g");
   for (const m of body.matchAll(LINE_RE)) lines.add(m[1]);
@@ -300,7 +329,7 @@ function parseOutputUnits(body, aliases = DEFAULT_ALIASES) {
   const mentions = new Map();
   for (const m of body.matchAll(/([A-Za-z_$][\w$]*)\.textContent\s*=\s*([^;]*)/g)) {
     if (!lines.has(m[1])) continue;
-    for (const k of new Set([...m[2].matchAll(/\br\.([A-Za-z_$][\w$]*)/g)].map((x) => x[1]))) {
+    for (const k of new Set([...m[2].matchAll(REF_RE())].map((x) => x[1]))) {
       mentions.set(k, (mentions.get(k) || 0) + 1);
     }
   }
@@ -309,11 +338,11 @@ function parseOutputUnits(body, aliases = DEFAULT_ALIASES) {
   for (const m of body.matchAll(/([A-Za-z_$][\w$]*)\.textContent\s*=\s*([^;]*)/g)) {
     if (!lines.has(m[1])) continue;
     const expr = m[2].trim();
-    const refs = [...new Set([...expr.matchAll(/\br\.([A-Za-z_$][\w$]*)/g)].map((x) => x[1]))];
+    const refs = [...new Set([...expr.matchAll(REF_RE())].map((x) => x[1]))];
     if (refs.length !== 1) continue;
     const key = refs[0];
     if (key === "error" || key === "message") continue;
-    let unit = parseOutputUnit(expr, key, aliases);
+    let unit = parseOutputUnit(expr, key, aliases, vars);
     if (unit && typeof unit.scale === "number" && (mentions.get(key) || 0) > 1) unit = null;
     // A key two lines write with different units is a key we cannot name.
     if (seen.has(key)) { if (!unit || JSON.stringify(map[key]) !== JSON.stringify(unit)) delete map[key]; continue; }

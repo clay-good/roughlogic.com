@@ -805,14 +805,18 @@ export async function run({ id, inputs } = {}) {
     // captions name the numbers. Only keys this result actually carries are
     // reported, so a caption is never attached to an absent value.
     const captioned = captionedOutputs(await outputLabels(id), result);
-    // Deliberately no `display`. The affixes `outputUnits` extracts sit around
-    // a renderer's DISPLAY EXPRESSION, which may transform the value before
-    // printing it, so prefix + raw + suffix is not a safe reconstruction:
-    // measured against the tile pages, 892 of 980 rebuilt strings matched the
-    // page and 88 did not. `solar-thermal-collector` is why it is not shipped
-    // on a majority -- its "%" belongs to a number the raw result has not been
-    // multiplied into yet. The caption names the number; the raw `result` is
-    // the number; nothing in between is invented.
+    // Deliberately no `display`. Rebuilding one as prefix + raw + suffix was
+    // measured against the tile pages twice. The first attempt matched 892 of
+    // 980 rows, and the misses were real defects -- an affix sitting around a
+    // display expression that SCALES the value first, which is now recorded and
+    // fixed. Re-measured after that fix it is 1,061 of 1,151, and the remaining
+    // 90 are a different, duller problem: the renderers' own `fmt` groups
+    // thousands ("$81,939.67" against a rebuilt "$81939.67") and plenty of
+    // lines print two numbers at once ("0.500 ft (6.00 in)"). Neither is
+    // recoverable from an affix, so the door states what it knows -- the
+    // caption names the number, `result` is the number -- and invents nothing
+    // in between. `outputUnits(id)` exposes the affixes for a caller that wants
+    // to format its own.
     if (captioned) out.outputs = captioned.map((o) => ({ ...o, unit: null, display: null }));
   }
   // spec-v1190: advisory range warnings for caller-supplied numbers, and the

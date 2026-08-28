@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A renderer that called its result anything other than `r` named none of its answers.** The captions are read by matching `<line>.textContent = ... r.<key> ...`, with the result variable hard-coded as `r`. Twenty-one calculators hold theirs in `res`, `overtime` holds it in `x`, and one uses `rr` -- so their captions were invisible. `overtime`'s four answers ("Regular pay", "Overtime pay", "Double-time pay", "Gross pay") sat one character away from being read, and the page showed bare numbers instead.
+
+  The variable is now taken from the renderer's own `const <name> = compute...(...)` binding. Where a renderer holds results from **two different** compute functions the reads fall back to `r` alone, because a key can mean one thing in each and a caption attached to the wrong number is worse than no caption. **Calculators naming their answers: 1,768 of 1,804, up from 1,730**; 42 more carry captions and 28 more carry units. The remaining 36 build their captions by an expression a static read cannot follow.
+
+  Two hand-authored captions on `affinity-laws` became redundant and were deleted: the renderer's own "CFM" and "kW" now come through, which is the documented contract -- the curated layer is a floor for what cannot be read, and the calculator's own wording wins where it can be.
+
 - **Twelve modules import the shared output factory under their own name, and the extractor could not see through it.** A calculator's answer captions are read out of its renderer by matching `makeOutputLine(...)`. Twelve of the `calc-*.js` modules import it renamed -- `import { makeOutputLine as _moG, fmt as _fmtG }` -- so the match found nothing and **73 calculators named none of their answers**, on both the tile page and the agent door, with the captions sitting in the source the whole time. `rainwater-yield` returned a bare number where its own renderer says **"Annual yield"** and **"gal"**.
 
   The import renames only ever appear in an import clause, so reading them out of each module is exact rather than a guess. **Calculators naming their answers: 1,730 of 1,804, up from 1,669**; 67 more carry captions and 53 more carry units. Five hand-authored captions became redundant and were deleted -- the calculator's own wording now covers them, and one of the five (`search-track-spacing`) is more precise for it: "Single-pass POD" rather than "Probability of detection".

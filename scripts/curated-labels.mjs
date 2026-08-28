@@ -86,7 +86,6 @@ export const CURATED_INPUT_LABELS = {
 };
 
 export const CURATED_OUTPUT_LABELS = {
-  "affinity-laws": { CFM: "Airflow at the new speed (CFM)", kW: "Shaft power at the new speed (kW)" },
   "aggregate": { pcf: "Material density (pcf)" },
   "air-density-correction": { DF: "Density factor DF" },
   "arrhenius-equation": { q10: "Q10 temperature coefficient" },

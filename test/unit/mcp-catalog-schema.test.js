@@ -627,3 +627,16 @@ test("a renderer that imports the output factory under its own name is still rea
   const { outputUnits } = await import("../../mcp/catalog.mjs");
   assert.equal(outputUnits("rainwater-yield").annual_gal.suffix, " gal", "and the unit beside it");
 });
+
+test("a renderer that calls its result something other than r is still read", async () => {
+  // The caption reads were anchored on a literal `r.`, but `overtime` holds its
+  // result in `x` and twenty-one other tiles use `res` -- so four captions
+  // ("Regular pay", "Overtime pay", "Double-time pay", "Gross pay") sat one
+  // character away from being read, and the tile named none of its answers.
+  const d = await describe({ id: "overtime" });
+  assert.equal(d.outputs_source, "captions");
+  const labels = d.outputs.map((o) => o.label);
+  for (const want of ["Regular pay", "Overtime pay", "Gross pay"]) {
+    assert.ok(labels.includes(want), `names "${want}"`);
+  }
+});
