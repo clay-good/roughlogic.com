@@ -80,8 +80,8 @@ each number**, keyed by the compute's own result key: `outputs_source` is
 way, a key is named only where the calculator is observed to produce it -- the
 worked example's result for `describe_calculator`, the caller's own result for
 `run_calculator` -- so the door never names an answer that is not there.
-`check-both-doors.mjs` holds that. **1,669 of 1,804 calculators name their
-answers.** The remaining 135 return them unlabelled; their captions are built by
+`check-both-doors.mjs` holds that. **1,730 of 1,804 calculators name their
+answers.** The remaining 74 return them unlabelled; their captions are built by
 an expression a static read cannot follow.
 
 Captioned outputs carry no `unit`. A hand-written renderer's answer wrapping is

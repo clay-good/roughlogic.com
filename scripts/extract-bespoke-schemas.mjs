@@ -132,9 +132,32 @@ function evalOptions(expr, ns) {
 // that mixes two ("7.45 V (3.1%)") names neither, and is skipped rather than
 // attributed to whichever came first. A caption two keys share is dropped for
 // the same reason the input pass drops one.
-function parseOutputLabels(body) {
+// A module may import the shared factories under its own names --
+// `import { makeOutputLine as _moG, fmt as _fmtG }` -- and twelve of them do.
+// Anchoring on the literal `makeOutputLine` therefore read no output lines at
+// all for those renderers, so 73 tiles named none of their answers even though
+// their captions are right there in the source. (The same shape once cost the
+// INPUT side 47 pages; there it was a prefix, `_v26makeNumber`, which a `\w*`
+// still matched. A rename to `_v26makeOut` it cannot.)
+//
+// The renames only ever appear in an import clause, so scanning the module text
+// for them is exact.
+function factoryAliases(src) {
+  const of = (name) => {
+    const out = new Set([name]);
+    for (const m of src.matchAll(new RegExp("\\b" + name + "\\s+as\\s+([A-Za-z_$][\\w$]*)", "g"))) out.add(m[1]);
+    return [...out];
+  };
+  const alt = (names) => names.map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
+  return { outLine: alt(of("makeOutputLine")), fmt: alt(of("fmt")) };
+}
+
+const DEFAULT_ALIASES = { outLine: "makeOutputLine", fmt: "fmt" };
+
+function parseOutputLabels(body, aliases = DEFAULT_ALIASES) {
   const lines = new Map();
-  for (const m of body.matchAll(/\b([A-Za-z_$][\w$]*)\s*=\s*\w*makeOutputLine\(\s*[A-Za-z_$][\w$]*\s*,\s*("(?:[^"\\]|\\.)*")/g)) {
+  const LINE_RE = new RegExp("\\b([A-Za-z_$][\\w$]*)\\s*=\\s*(?:\\w*(?:" + aliases.outLine + "))\\(\\s*[A-Za-z_$][\\w$]*\\s*,\\s*(\"(?:[^\"\\\\]|\\\\.)*\")", "g");
+  for (const m of body.matchAll(LINE_RE)) {
     lines.set(m[1], JSON.parse(m[2]));
   }
   if (lines.size === 0) return {};
@@ -193,7 +216,7 @@ function splitTopLevel(expr) {
 }
 
 const STRING_LITERAL = /^"((?:[^"\\]|\\.)*)"$|^'((?:[^'\\]|\\.)*)'$/;
-function parseOutputUnit(expr, key) {
+function parseOutputUnit(expr, key, aliases = DEFAULT_ALIASES) {
   // A conditional line says different things about the same number; whichever
   // branch we picked would be wrong half the time.
   if (splitTopLevel(expr).length === 1 && expr.includes("?")) return null;
@@ -239,8 +262,9 @@ function parseOutputUnit(expr, key) {
   // and disqualifies the affix instead. String literals are stripped first so
   // a hyphen inside one is not read as a minus.
   const KEY = /r\.[A-Za-z_$][\w$]*/;
+  const FMT = "(?:" + aliases.fmt + ")";
   const scaled = parts[at].match(
-    new RegExp("^fmt\\(\\s*" + KEY.source + "\\s*([*/])\\s*(\\d+(?:\\.\\d+)?)\\s*,\\s*(\\d+)\\s*\\)$"),
+    new RegExp("^" + FMT + "\\(\\s*" + KEY.source + "\\s*([*/])\\s*(\\d+(?:\\.\\d+)?)\\s*,\\s*(\\d+)\\s*\\)$"),
   );
   if (scaled) {
     const n = Number(scaled[2]);
@@ -252,7 +276,7 @@ function parseOutputUnit(expr, key) {
   // How many decimals the calculator itself shows. A page that prints
   // `1.52625` where the tool prints `1.5` is quoting a precision the tool
   // never claims.
-  const d = parts[at].match(/\bfmt\(\s*r\.[A-Za-z_$][\w$]*\s*,\s*(\d+)\s*\)\s*$/);
+  const d = parts[at].match(new RegExp("\\b" + FMT + "\\(\\s*r\\.[A-Za-z_$][\\w$]*\\s*,\\s*(\\d+)\\s*\\)\\s*$"));
   const digits = d ? Number(d[1]) : null;
   return digits === null ? { prefix, suffix } : { prefix, suffix, digits };
 }
@@ -261,9 +285,10 @@ function parseOutputUnit(expr, key) {
 // but keep the units instead of the captions. Independent of the caption pass:
 // a line whose caption is ambiguous can still have an unambiguous unit, and a
 // captioned line can have none.
-function parseOutputUnits(body) {
+function parseOutputUnits(body, aliases = DEFAULT_ALIASES) {
   const lines = new Set();
-  for (const m of body.matchAll(/\b([A-Za-z_$][\w$]*)\s*=\s*\w*makeOutputLine\(/g)) lines.add(m[1]);
+  const LINE_RE = new RegExp("\\b([A-Za-z_$][\\w$]*)\\s*=\\s*(?:\\w*(?:" + aliases.outLine + "))\\(", "g");
+  for (const m of body.matchAll(LINE_RE)) lines.add(m[1]);
   if (lines.size === 0) return {};
   // How many display lines mention each key at all -- including the ones the
   // single-reference rule below skips. A key written by two lines has no
@@ -288,7 +313,7 @@ function parseOutputUnits(body) {
     if (refs.length !== 1) continue;
     const key = refs[0];
     if (key === "error" || key === "message") continue;
-    let unit = parseOutputUnit(expr, key);
+    let unit = parseOutputUnit(expr, key, aliases);
     if (unit && typeof unit.scale === "number" && (mentions.get(key) || 0) > 1) unit = null;
     // A key two lines write with different units is a key we cannot name.
     if (seen.has(key)) { if (!unit || JSON.stringify(map[key]) !== JSON.stringify(unit)) delete map[key]; continue; }
@@ -439,6 +464,12 @@ async function main() {
   const { RENDERER_MAP } = await import(new URL("test/fixtures/renderer-map.js", ROOT).href);
   const { COMPUTE_MAP } = await import(CMAP_URL.href);
   const modCache = new Map();
+  const aliasCache = new Map();
+  const moduleAliases = (rel) => {
+    let a = aliasCache.get(rel);
+    if (!a) { a = factoryAliases(readFileSync(new URL(rel, CMAP_URL), "utf8")); aliasCache.set(rel, a); }
+    return a;
+  };
   const imp = async (rel) => { const u = new URL(rel, CMAP_URL).href; let m = modCache.get(u); if (!m) { m = await import(u); modCache.set(u, m); } return m; };
 
   const emitted = {};
@@ -456,9 +487,10 @@ async function main() {
     if (!rf) continue;
     if (rf.schema) { stats.alreadySchema++; continue; }
     const body = rf.toString();
-    const outMap = parseOutputLabels(body);
+    const aliases = moduleAliases(rreg.module);
+    const outMap = parseOutputLabels(body, aliases);
     if (Object.keys(outMap).length) outLabels[id] = outMap;
-    const unitMap = parseOutputUnits(body);
+    const unitMap = parseOutputUnits(body, aliases);
     if (Object.keys(unitMap).length) outUnits[id] = unitMap;
     const fields = parseFields(body, rmod);
     const callMap = parseComputeCall(body);

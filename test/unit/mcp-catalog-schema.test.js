@@ -613,3 +613,17 @@ test("a unit that cannot be reproduced from the raw value is dropped", async () 
   const { outputUnits } = await import("../../mcp/catalog.mjs");
   assert.ok(!outputUnits("recirc-loop-sizing").recommended_hp);
 });
+
+test("a renderer that imports the output factory under its own name is still read", async () => {
+  // Twelve modules do `import { makeOutputLine as _moG, fmt as _fmtG }`, and
+  // the extractor anchored on the literal name -- so it read NO output lines at
+  // all for those renderers and 73 tiles named none of their answers. The
+  // captions were in the source the whole time. (The input side hit the same
+  // shape once: there it was a prefix a `\w*` still matched, `_v26makeNumber`.
+  // A rename to `_v26makeOut` it cannot.)
+  const d = await describe({ id: "rainwater-yield" }); // calc-cross.js, uses _moG
+  assert.equal(d.outputs_source, "captions");
+  assert.ok(d.outputs.some((o) => o.label === "Annual yield"), "reads the renamed factory's caption");
+  const { outputUnits } = await import("../../mcp/catalog.mjs");
+  assert.equal(outputUnits("rainwater-yield").annual_gal.suffix, " gal", "and the unit beside it");
+});
