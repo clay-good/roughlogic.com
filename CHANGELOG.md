@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The correctness contract listed three of its eight verification phases as "planned". All three shipped and gate CI.** `docs/correctness.md` is the document that states what "verified" means for a calculator's answer, phase by phase. Phases B, C and D -- per-tile cross-check against published values, dimensional analysis, and domain-edge bounds -- were each marked `(planned)`. `check-cross-validation.mjs`, `check-dimensions.mjs` and `check-bounds.mjs` all exist, all run in `npm run lint`, and all pass. A reader assessing the correctness posture would have concluded three eighths of it was unbuilt.
+
+  Phase B also named `test/unit/cross-validation.test.js`, which does not exist; the verification is done by the script. Checked every inline file path across the living docs for the same rot: 102 references, and the only other two dead ones are in `launch-checklist.md`, which declares itself a frozen per-release snapshot and correctly records suites retired years ago.
+
+  No gate was added for that class. Distinguishing a live reference from a deliberately frozen historical one needs a per-file allowlist, and an allowlist is what absorbs the next regression silently.
+
 - **The threat model described the shells' CSP wrongly, and its "by construction" claim was not constructed.** It said each shell "carries the same `<meta http-equiv=\"Content-Security-Policy\">` tag the home document carries". It does not: a shell's `script-src` is `'self'` alone, granting neither the inline boot-script hash nor the Turnstile origins the app's policy needs. The reality is stricter than the document claimed, but a reader would have concluded the shells permit an inline script and a third-party origin. Corrected, with the reason: a page that runs no JavaScript has no business permitting any.
 
   The neighbouring commitment, "Shells carry zero JavaScript ... the TBT for every shell is 0 ms by construction", was checked by nothing. `check-shells` parses the JSON-LD block for validity, so an executable `<script>` would have passed straight through that reader and taken the zero-TBT claim and the stricter-CSP rationale with it. It now fails on any script tag on any shell that is not that data block, seed-tested red.
