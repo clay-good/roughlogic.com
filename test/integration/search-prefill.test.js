@@ -27,14 +27,33 @@ const CASES = [
   },
 ];
 
+// The dropdown's ranking and its computed preview both depend on data the page
+// only fetches on first interaction: 21 per-group alias shards (256 KB in
+// total), plus the slot and preview maps. On a loaded runner those can outlast
+// the default 5 s expect timeout, and the assertion then reports a ranking bug
+// that is really a fetch still in flight -- which is exactly how a green suite
+// went red on commits touching no browser code at all.
+//
+// So wait for the data instead of racing it. The waiter is registered BEFORE
+// the interaction that triggers the fetch, because waitForResponse only sees
+// responses that arrive after it is attached. This is a precondition, not a
+// softened assertion: the ranking still has to be right once the data is in,
+// and a real regression still fails.
+function awaitSearchData(page, ...parts) {
+  return Promise.all(parts.map((part) =>
+    page.waitForResponse((r) => r.url().includes(part) && r.ok(), { timeout: 30000 })));
+}
+
 // spec-v592: the computed answer renders inside the dropdown on the
 // top-ranked row once the slots map, and Escape clears it with the rest
 // of the dropdown.
 test("search preview: flagship query shows a computed answer in the dropdown", async ({ page }) => {
   await page.goto("/");
   const input = page.locator("#search-input");
+  const ready = awaitSearchData(page, "slots.json", "preview-map.json");
   await input.click();
   await input.fill("voltage drop 120v 150 ft 20 amps");
+  await ready;
   const preview = page.locator("#search-result-0 .sr-preview");
   await expect(preview).toBeVisible();
   const text = await preview.textContent();
@@ -167,8 +186,10 @@ const ASK_QUERY = "asphalt tonnage 2400 sq ft 3 in deep 12 ft wide";
 test("spec-v1342 ask card: asks for the missing value, naming its unit", async ({ page }) => {
   await page.goto("/");
   const input = page.locator("#search-input");
+  const ranked = awaitSearchData(page, "aliases-e.json");
   await input.click();
   await input.fill(ASK_QUERY);
+  await ranked;
   await expect(page.locator("#search-results .search-result").first().locator(".sr-name"))
     .toHaveText("Asphalt Tonnage");
   await input.press("Enter");
@@ -193,8 +214,10 @@ test("spec-v1342 ask card: asks for the missing value, naming its unit", async (
 test("spec-v1342 ask card: answering it computes and dismisses", async ({ page }) => {
   await page.goto("/");
   const input = page.locator("#search-input");
+  const ranked = awaitSearchData(page, "aliases-e.json");
   await input.click();
   await input.fill(ASK_QUERY);
+  await ranked;
   await expect(page.locator("#search-results .search-result").first().locator(".sr-name"))
     .toHaveText("Asphalt Tonnage");
   await input.press("Enter");
@@ -217,8 +240,10 @@ test("spec-v1342 ask card: it is a shortcut, never a gate", async ({ page }) => 
   // stays interactive underneath the card the entire time.
   await page.goto("/");
   const input = page.locator("#search-input");
+  const ranked = awaitSearchData(page, "aliases-e.json");
   await input.click();
   await input.fill(ASK_QUERY);
+  await ranked;
   await expect(page.locator("#search-results .search-result").first().locator(".sr-name"))
     .toHaveText("Asphalt Tonnage");
   await input.press("Enter");

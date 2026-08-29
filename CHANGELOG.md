@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Four search tests raced the data they were asserting on, and went red on commits that touched no browser code.** The dropdown's ranking and its computed preview both depend on data the page fetches only on first interaction: 21 per-group alias shards, 256 KB in total, plus the slot and preview maps. The tests typed a query and asserted the top result immediately. On a loaded runner the shards outlast the 5-second default, so the assertion reported a ranking bug -- "asphalt tonnage 2400 sq ft" leading with a carpet takeoff -- that was really a fetch still in flight. Twice this made a green suite go red on commits confined to build scripts, fixtures and docs.
+
+  Each now waits for the data it depends on, with the waiter registered before the interaction that triggers the fetch, since `waitForResponse` only sees responses attached after it. That is a precondition rather than a softened assertion: the ranking still has to be right once the data lands, and a genuine regression still fails.
+
+  Proven against the actual failure mode rather than assumed: with the group-E shard delayed 8 seconds, the old form fails at 5.6s and the new one passes at 8.3s.
+
 - **Twenty-one calculators answered a yes/no question with a bare "0".** `ltv` asked **"PMI required?"** and the tile page answered **`0`**. `truss-capacity` reported its pass/fail as `1`. A worked-example fixture records a boolean as 0 or 1, and the page printed that literally, so a reader met a raw flag where the calculator itself says "No" and "PASS". The live app was right throughout; the divergence was on the static page, the same shape as the percent bug above.
 
   The renderers state both words in one place -- `oPMI.textContent = r.pmi_required ? "Yes (LTV > 80%)" : "No";` -- so the page now uses the calculator's own wording. 48 calculators' yes/no answers are extracted; the affected rows drop from 22 to 7.
