@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A test of mine was passing for the wrong reason, because the service worker defeated it.** The spec added earlier in this release aborts the alias fetches, asserts the ranking is the degraded one, then lets them through and checks it corrects. It flaked, and the cause was not timing: the service worker precaches all 21 alias shards and serves them from its own cache, which `page.route` cannot intercept. With the worker installed, aborting the network proves nothing, because the shards arrive anyway.
+
+  That is the app working exactly as designed, and it is why the offline promise holds. It also meant the test's premise was false whenever the worker won the race, which is what made it look intermittent. It now runs in a context with service workers blocked, so the network is the only path the aliases have. Four consecutive runs green, and still red when the fix it guards is removed.
+
+  The same race caught one more spec, `spec-v1343: choosing an option routes to that calculator`: whether that query is ambiguous enough to raise the pick card depends on the ranking, so it now waits for the shards its candidates come from.
+
 - **154 more calculators expose a field schema, from a precaution that measurement retired.** The extractor has two readers for the link between a compute parameter and its on-screen field. The strict one insists on `key: VAR.input.value`; the loose one also accepts the same linkage wearing a helper, `span_ft: readNum(span.input)`. The loose reader fed labels only, on the reasoning that a schema reaches `run_calculator` and a mis-parse there would advertise an input the calculator cannot receive. 188 calculators were skipped for it.
 
   Two things already bound that risk. A bad **key** cannot survive: the door drops any schema whose keys are not real compute parameters, and `check-both-doors` asserts every advertised name is sendable and every worked-example key is advertised, across all 1,804. What remained was a bad **label** on a good key, and that is measurable, so it was measured rather than argued: all three query-fill lenses come back **identical** (4,154 / 4,680 / 1,942 recovered at 0 / 0 / 7 wrong), 277 unit-suffixed keys were checked against their labels with one heuristic false positive, and 36 pairs were read by hand.

@@ -383,8 +383,16 @@ test("spec-v1343: a vague query asks instead of guessing", async ({ page }) => {
 test("spec-v1343: choosing an option routes to that calculator", async ({ page }) => {
   await page.goto("/");
   const input = page.locator("#search-input");
+  // Whether "pressure drop" is AMBIGUOUS enough to raise the pick card depends
+  // on the ranking, and the ranking depends on the alias shards. Its candidates
+  // come from groups C, G and B, so wait for those three before asking whether
+  // the card appeared -- every group's shard is fetched regardless of the query,
+  // so this cannot hang. Without it the test races its own data and reports a
+  // missing card that is really a fetch in flight.
+  const ranked = awaitSearchData(page, "aliases-c.json", "aliases-g.json", "aliases-b.json");
   await input.click();
   await input.fill("pressure drop");
+  await ranked;
   await expect(page.locator(".search-result").first()).toBeVisible();
   await input.press("Enter");
   await expect(page.locator(".pick-card")).toBeVisible();
@@ -487,8 +495,23 @@ test("a shape-changing select does not orphan the fields prefilled after it", as
 // the fetches resolved, so the only recovery was a full page reload --
 // `ensureDiscovery` has always released its flag on failure, and now these do
 // too.
-test("spec-v590: a failed alias fetch is retried on the next keystroke", async ({ page }) => {
+test("spec-v590: a failed alias fetch is retried on the next keystroke", async ({ browser }) => {
+  // A context with service workers BLOCKED. The worker precaches all 21 alias
+  // shards and serves them from its own cache, which page.route cannot
+  // intercept -- so with it installed, aborting the network fetch proves
+  // nothing: the shards arrive anyway. That is the app working as designed, and
+  // it made this test pass for the wrong reason and then flake. Blocking the
+  // worker leaves the network as the only path the aliases have, which is the
+  // path this test is about.
+  const context = await browser.newContext({ serviceWorkers: "block" });
+  const page = await context.newPage();
   let failNext = true;
+  // The service worker precaches all 21 alias shards and serves them from its
+  // own cache, which page.route cannot intercept -- so with the worker allowed
+  // to install, aborting the network fetch proves nothing: the shards arrive
+  // anyway and the "degraded" ranking is not degraded. That is the app working
+  // as designed, and it made this test pass for the wrong reason. Keep the
+  // worker out so the abort is the only path the aliases have.
   await page.route("**/data/search/aliases-*.json", (route) => {
     if (failNext) return route.abort();
     return route.continue();
@@ -509,4 +532,5 @@ test("spec-v590: a failed alias fetch is retried on the next keystroke", async (
   await input.press("End");
   await input.type(" ");
   await expect(top).toHaveText("Asphalt Tonnage");
+  await context.close();
 });
