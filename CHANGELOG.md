@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Arrowing to a row and pressing Enter could do something else entirely.** Every one of the four lazily-loaded search dependencies re-renders the dropdown when it arrives, which is what keeps the ranking honest. But `render()` ended by resetting the reader's choice: `userPicked = false; setActive(0)`. So a reader who arrowed to the third row and pressed Enter a moment later, as the alias shards landed, had their choice silently discarded -- the highlight jumped back to the first row and Enter fell through to the ambiguity card instead of opening what they picked. The slower the connection, the likelier it was.
+
+  A re-render caused by data arriving now keeps a deliberate selection; one caused by typing still clears it, because a new query genuinely invalidates the old choice.
+
+  Found from a flaky test rather than a report: the arrow-key spec failed in a full run with the URL still at `/`, which is exactly this. Pinned by holding the shards back 1.5 s, arrowing while they are in flight, and asserting the choice survives. Verified red without the fix.
+
 - **The dev server refused the site's own canonical URLs.** `/tools/voltage-drop/` -- the shape this site publishes in its sitemap, its JSON-LD and every shell's `<link rel=canonical>` -- answered **403** locally. Only `/` was mapped to an index; every other directory fell through to a "not a file" refusal. It works in production, where the edge resolves a directory, so the two differed exactly where a maintainer is most likely to go looking at a shell.
 
   Found by trying to use it: opening a tile page in a browser to eyeball the boolean rendering from earlier in this release, and getting an empty pane.

@@ -807,7 +807,7 @@ function bindSearch() {
         merged.push(...rows);
         aliasRows = merged.slice();
         // Refresh the open dropdown so just-loaded aliases become searchable.
-        if (document.activeElement === input) render(input.value);
+        if (document.activeElement === input) render(input.value, true);
       } catch { /* one group failing leaves the rest searchable */ }
     }));
     // A transient failure must not cost the session its aliases. Without them
@@ -829,7 +829,7 @@ function bindSearch() {
     discoveryLoading = true;
     import("./search-discovery.js").then((mod) => {
       discovery = mod;
-      if (document.activeElement === input) render(input.value);
+      if (document.activeElement === input) render(input.value, true);
     }).catch(() => { discoveryLoading = false; });
   }
 
@@ -858,7 +858,7 @@ function bindSearch() {
         // re-runs until the next keystroke, and a reader who has finished
         // typing never sends one. ensureDiscovery() has always re-rendered for
         // exactly this reason; slots and the preview map now do the same.
-        if (document.activeElement === input) render(input.value);
+        if (document.activeElement === input) render(input.value, true);
       })
       // Release the latch so the next keystroke retries, as ensureDiscovery
       // does; a blip on the first search otherwise disables prefill until reload.
@@ -892,7 +892,7 @@ function bindSearch() {
         if (!json || !json.tiles) return;
         previewMap = json.tiles;
         // Same late-arrival re-render as ensureSlots(); see the note there.
-        if (document.activeElement === input) render(input.value);
+        if (document.activeElement === input) render(input.value, true);
       })
       // Same latch release: a blip otherwise costs the session its answer
       // previews entirely, with no retry but a reload.
@@ -1078,7 +1078,10 @@ function bindSearch() {
     });
   }
 
-  function render(query) {
+  // `fromData` marks a re-render caused by lazily-loaded search data arriving,
+  // rather than by the reader typing. The difference matters: a new query
+  // invalidates any row the reader had chosen, but data landing must not.
+  function render(query, fromData) {
     clearChildren(list);
     matches = searchTools(query);
     if (matches.length === 0) {
@@ -1140,6 +1143,15 @@ function bindSearch() {
       if (i === 0 && lastRanked) schedulePreview(tool, query, item);
     });
     setExpanded(true);
+    // A reader who has arrowed to a row has made a deliberate choice, and the
+    // alias shards can land a moment later. Resetting here threw that choice
+    // away silently: the highlight jumped back to the first row and their Enter
+    // did something other than what they had selected -- on a slow connection,
+    // the more data still in flight, the likelier it was.
+    if (fromData && userPicked && activeIndex >= 0 && activeIndex < matches.length) {
+      setActive(activeIndex);
+      return;
+    }
     userPicked = false;
     setActive(0);
   }
