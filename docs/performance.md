@@ -42,6 +42,29 @@ The home-view payload budget (100 KB after gzip) is enforced separately by `scri
 
 Two §H.2 extractions produced that headroom, and they are the same move made twice. The first pulled the ~30 KB `TOOLS` catalog registry out of `app.js` into a lazy-loaded `tools-data.js`. The second, on 2026-08-27, pulled the `TOOL_MODULES` tile-id-to-renderer table into a lazy-loaded `tool-modules.js`: it had reached **24.4 KB gzipped, 46% of the whole JS sub-budget**, for a table the home view never reads, and it grew by one id per tile. `app.js` gzipped fell 47,085 → 22,878 B. Between May and August the JS sub-budget had been raised five times (40 → 42 → 45 → 47 → 49 → 52 KB) to accommodate that growth; the extraction let it be **restored to its specified 40 KB**. The structural result is that the home view no longer pays for catalog growth at all -- a new tile adds a row to `tools-data.js` and an id to `tool-modules.js`, neither of which is in the first-paint payload.
 
+## The catalog registry is the next real budget problem
+
+`tools-data.js` holds one row per tile and is **1,090,548 B raw / 397,907 B gzipped**, at 92.5% of the 430,000 B cap in `check-module-sizes`. That cap has been raised at nearly every expansion band (most recently 400,000 to 430,000 one band earlier), and at roughly 220 gzipped bytes per tile another ~145 tiles reaches it again. Raising it once more is the cheapest move available and it is the reason the file is this size.
+
+Measured composition, 2026-08-29:
+
+| field | bytes | share |
+| --- | --- | --- |
+| `desc` | 861,836 | 79.0% |
+| `name` | 73,020 | 6.7% |
+| `id` | 37,676 | 3.5% |
+| `trades` | 36,836 | 3.4% |
+| `group` | 5,412 | 0.5% |
+
+Descriptions are four fifths of it. Without them the registry gzips to **47,224 B** rather than 397,907 B.
+
+Two paths pay that today, and neither needs all of it:
+
+- **A deep link** (`/index.html#<id>`, what search results and shared links point at) loads the whole catalog before it can validate the id and read one row's name and description. It needs 1 of 1,804.
+- **The first search keystroke** loads it too, because `toolMatches` searches `name + " " + desc`. This one genuinely wants every description.
+
+So the deep-link case is a clean win and the search case is a tradeoff. Splitting descriptions into lazily-loaded shards would take the deep-link critical path from 397,907 B to roughly 47,224 B plus one small shard, but search would rank on names and aliases alone until the descriptions arrived, which changes results a reader may already be looking at. That tradeoff is a product decision, not a refactor, which is why this section states the numbers rather than making the change.
+
 ## Page weight strategy
 
 - Single index.html, single styles.css, single app.js. No bundler in the runtime path.
