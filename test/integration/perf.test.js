@@ -35,6 +35,16 @@
 //      values that signal a real regression rather than a slow-3G
 //      artifact (e.g. LCP > 10s on a static page is broken). These
 //      fail the build.
+//
+// Prerendered shells (added 2026-08-29). Until then this file measured the
+// home view and nothing else, so the deep-linked and crawled surface -- the
+// static /tools/<id>/ and /groups/<slug>/ documents -- was measured by
+// nothing at all. That was invisible while Lighthouse CI ran, because
+// lighthouserc.json checked exactly those URLs; the job was removed on
+// 2026-08-23 over an unpatched @lhci/cli advisory (see docs/performance.md)
+// and the coverage went with it. The three URLs below are the ones that
+// config named, so what this restores is the coverage that was lost rather
+// than a budget invented here.
 
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -170,3 +180,73 @@ test("perf: home view meets FCP / LCP / TBT / CLS budgets on slow-3G", async ({ 
 
   await ctx.close();
 });
+
+// --- Prerendered shells ---
+//
+// Mirrors the URL set lighthouserc.json asserted before the Lighthouse job was
+// removed: one tile shell from a v1 calculator, one from a lazy-loaded module,
+// and one group index. These are zero-JS static documents, so their paint is
+// dominated by the profile's 400 ms RTT rather than by anything on the page --
+// which is why the thresholds here are not the tight numbers lighthouserc.json
+// used (those were a desktop preset on a 1.6 Mbit link, not slow-3G).
+//
+// Thresholds come from measurement, not from a target someone liked. Measured
+// 2026-08-29 under this profile: run in isolation these shells are remarkably
+// stable -- seven runs each gave FCP 1,856-1,864 ms for both tile shells and
+// 2,708-2,716 ms for the group index, TBT and CLS zero throughout. Run inside
+// the suite the same tile shell came back at 2,628 ms, so the variance that
+// matters is harness contention, not the page. Advisory is set above the worst
+// in-suite reading rather than above the tidy isolated median, because an
+// advisory that cries wolf on harness noise is one people learn to scroll past.
+// The hard tier sits at roughly double that: "the document did not arrive"
+// territory, not "the page got a little heavier".
+const SHELLS = [
+  { url: "/tools/wire-ampacity/", label: "tile shell (v1 calculator)", advisory_ms: 3200, hard_ms: 5000 },
+  { url: "/tools/friction-loss/", label: "tile shell (lazy-loaded module)", advisory_ms: 3200, hard_ms: 5000 },
+  { url: "/groups/electrical/", label: "group index", advisory_ms: 3800, hard_ms: 6500 },
+];
+
+// No TBT assertion here, deliberately. The obvious one to write is "a shell
+// runs no script, so TBT must be zero" -- but seeding a 600 ms blocking script
+// into a built shell and re-running this file left TBT at 0, because a
+// parser-blocking script that runs before captureVitals registers its observer
+// is never attributed as a long task. The assertion would have passed while the
+// page it describes was broken. Script on a shell is check-shells' rule, and
+// that one does fail on the same seed: "carries an executable <script>. Shells
+// ship zero JavaScript".
+const SHELL_CLS_ADVISORY = 0.05;
+const SHELL_CLS_HARD = 0.25;
+
+for (const shell of SHELLS) {
+  test(`perf: ${shell.url} meets shell paint budgets on slow-3G`, async ({ browser }) => {
+    const ctx = await browser.newContext();
+    const p = await ctx.newPage();
+    const cdp = await ctx.newCDPSession(p);
+    await cdp.send("Network.enable");
+    await cdp.send("Network.emulateNetworkConditions", NET);
+    await cdp.send("Emulation.setCPUThrottlingRate", { rate: CPU_THROTTLE });
+
+    await p.goto(shell.url, { waitUntil: "networkidle" });
+    const v = await captureVitals(p);
+
+    console.log(`perf vitals (${shell.label} ${shell.url} / slow-3G):`, JSON.stringify(v));
+
+    // Advisory tier: warn, do not fail. Same policy as the home view.
+    if (v.fcp_ms > shell.advisory_ms) {
+      console.warn(`perf WARN: ${shell.url} FCP ${v.fcp_ms} over advisory ${shell.advisory_ms}`);
+    }
+    if (v.lcp_ms > shell.advisory_ms) {
+      console.warn(`perf WARN: ${shell.url} LCP ${v.lcp_ms} over advisory ${shell.advisory_ms}`);
+    }
+    if (v.cls > SHELL_CLS_ADVISORY) {
+      console.warn(`perf WARN: ${shell.url} CLS ${v.cls} over advisory ${SHELL_CLS_ADVISORY}`);
+    }
+
+    // Hard tier.
+    expect(v.fcp_ms, `${shell.url} FCP exceeded hard-fail threshold`).toBeLessThan(shell.hard_ms);
+    expect(v.lcp_ms, `${shell.url} LCP exceeded hard-fail threshold`).toBeLessThan(shell.hard_ms);
+    expect(v.cls, `${shell.url} CLS exceeded hard-fail threshold`).toBeLessThan(SHELL_CLS_HARD);
+
+    await ctx.close();
+  });
+}
