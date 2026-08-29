@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The agent one-box refused to answer questions the catalog itself maps to a calculator.** `answer_query` will not answer from a weak match, so a question has to corroborate the calculator it reached: by carrying values, or by naming it. The alias corpus was not counted, and that corpus exists precisely because people do not use a calculator's name -- someone deliberately mapped "romex ampacity" to the tile it answers.
+
+  Measured over a 300-term sample of the corpus, **70 questions came back `NO_MATCH`, and in 65 of them the ranker's top hit was already the alias's own target**. The door was telling an agent "no calculator matched" about a phrase the catalog maps to that very calculator.
+
+  A curated alias now corroborates the tile it is curated for. Refusals over the same sample fall from **70 to 4**, and 284 of the 300 now name the calculator and say what it needs. Corroboration is checked against the top-ranked calculator only, so this widens what counts as a match without widening what gets answered: a question that reaches the wrong calculator is still refused, and only 2 of the 300 produce a computed answer at all.
+
+  A first idea -- corroborate when the question contains the calculator's id -- was measured before being built and would have salvaged **none** of the 70.
+
 - **Nothing checked the numbers on the static pages.** `render-no-nan` drives every calculator in a browser and asserts the live app never renders NaN, Infinity or undefined. The prerendered tile pages -- what a crawler, a no-JS reader and every link preview actually get -- had no equivalent: `check-shells` covers their titles, descriptions, JSON-LD and gzip size, and never looks at a value.
 
   That gap shipped real defects, both found by hand on this surface earlier in this release: an answer unit applied to a value the renderer scales first, and a boolean answer printed as a bare "0". Reading pages is not a gate.

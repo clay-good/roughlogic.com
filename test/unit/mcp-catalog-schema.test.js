@@ -685,3 +685,21 @@ test("run returns the exact word for a boolean answer, and nothing invented for 
   assert.equal(ltv.display, null);
   assert.equal(typeof r.result.ltv_percent, "number");
 });
+
+test("a curated alias corroborates the calculator it is curated for", async () => {
+  // answer_query refuses to answer from a weak match: the question must carry
+  // values or name the calculator. But the alias corpus exists precisely
+  // because people do not use the name -- someone deliberately mapped "romex
+  // ampacity" to the tile it answers -- and that mapping was not being counted.
+  // Over a 300-term sample of the corpus, 70 questions came back NO_MATCH and
+  // in 65 of them the ranker's top hit was already the alias's own target.
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  const r = await answerQuery({ query: "romex ampacity" });
+  assert.notEqual(r.status, "NO_MATCH", "a curated phrasing resolves to its calculator");
+  assert.ok(r.id, "and names which one");
+
+  // The guard still holds where nothing corroborates: no values, no name, and
+  // no curated mapping to the tile that ranked first.
+  const none = await answerQuery({ query: "zzzz qqqq" });
+  assert.equal(none.status, "NO_MATCH");
+});

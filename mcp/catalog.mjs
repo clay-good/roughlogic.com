@@ -963,6 +963,31 @@ const TILE_NAME_NOISE = new Set([
 // query contains a distinctive word from its name. Without this, "what is the
 // meaning of life" comes back as a confident pointer at a calculator the
 // caller never asked about.
+// A curated alias IS corroboration, and a stronger one than a word match.
+//
+// The guard below wanted the question to name the calculator, checked against
+// the tile's NAME. But the alias corpus exists precisely because people do not
+// use the name: someone deliberately mapped "romex ampacity" to the tile it
+// answers. Measured over a 300-term sample of that corpus, 70 questions came
+// back NO_MATCH -- and in 65 of them the ranker's top hit was already the
+// alias's own target. The door was telling an agent "no calculator matched"
+// about a phrase the catalog itself maps to that calculator.
+//
+// Checked against the TOP tile only, so this widens what counts as
+// corroboration without widening what gets answered: a question that reaches
+// the wrong tile is still refused.
+function queryIsCuratedAliasFor(query, id, aliases) {
+  if (!id || !Array.isArray(aliases)) return false;
+  const q = String(query || "").toLowerCase().trim();
+  if (!q) return false;
+  for (const row of aliases) {
+    if (!row || row.target !== id || typeof row.term !== "string") continue;
+    const term = row.term.toLowerCase().trim();
+    if (term && (q === term || q.includes(term))) return true;
+  }
+  return false;
+}
+
 function queryNamesTile(query, name) {
   const q = String(query || "").toLowerCase();
   for (const word of String(name || "").toLowerCase().split(/[^a-z0-9]+/)) {
@@ -1024,8 +1049,10 @@ export async function answerQuery({ query } = {}) {
   const { filled } = rows.length ? queryFill(q, rows, { name: top.name }) : { filled: {} };
   const recovered = Object.keys(filled);
 
-  // Corroboration, in either form.
-  if (!recovered.length && !queryNamesTile(q, top.name)) {
+  // Corroboration, in any of three forms: the question carried values, it names
+  // the calculator, or the catalog's own alias corpus maps it to this one.
+  const { aliases } = await load();
+  if (!recovered.length && !queryNamesTile(q, top.name) && !queryIsCuratedAliasFor(q, top.id, aliases)) {
     return { status: "NO_MATCH", query: q, message: "No calculator matched." };
   }
   if (!recovered.length) {

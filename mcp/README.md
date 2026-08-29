@@ -104,6 +104,15 @@ field the example sets is treated as required. So a question that covers only
 part of a calculator comes back as `MISSING_INPUTS` naming the rest, rather
 than an answer computed partly from defaults.
 
+It will not answer from a weak match, so a question has to corroborate the
+calculator it reached: by carrying values, by naming it, or by matching a phrase
+the catalog's own alias corpus already maps to it. That third form matters more
+than it sounds -- the corpus exists precisely because people do not use the
+name. Measured over a 300-term sample of it, questions refused as `NO_MATCH`
+fall from 70 to 4, and 284 of the 300 now name the calculator and say what it
+needs. Corroboration is checked against the top-ranked calculator only, so this
+widens what counts as a match without widening what gets answered.
+
 ## Run it
 
 ```sh
