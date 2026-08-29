@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The correctness contract claimed two machine checks that do not exist.** `docs/correctness.md` said the Phase C lint "asserts the expression's left-hand side and right-hand side have the same dimension", and that it "asserts that every conversion coefficient used in any calc-*.js module is present in the Group G crosswalk to twelve significant figures". Neither is true, and the first was disproved by giving `dyno-correction-sae` a deliberately wrong annotation -- power declared as a length, pressure as a time -- and watching the lint pass. The lint's own source says so plainly: it "does not balance ratios".
+
+  What Phase C really gives is worth having and is now what the document says: every one of 2,059 exported functions carries a parseable dimension annotation, and a malformed one fails the build. Whether a declaration is physically *right* is settled by the written derivation and the reviewer in Phase G. Balancing it from source would need a CAS, which this project deliberately does not depend on.
+
+  The crosswalk claim is corrected to what exists: round-trip identity to 1e-12 and specific inline constants checked against the shared converter, as curated invariants in the Phase F test file, not an exhaustive sweep.
+
+  Phase D was checked the same way and needs no correction: 1,798 fuzzer tests, and the gate asserts every corpus row has one.
+
 - **A test guarding this release's `answer_query` change passed with the change deleted.** Mutation-testing this release's own work found it: remove the curated-alias corroboration and the test still went green. Its query was `"romex ampacity"`, and the calculator it reaches is named "...Ampacity...", so the name check already vouched for it. The alias path was never what made that test pass.
 
   It now uses `"how far will a stream reach"`, which shares no word with the name of the calculator it reaches (`projectile-range`) and carries no values, so the curated mapping is the only thing that can corroborate it. Verified red with the corroboration removed and green with it.

@@ -30,7 +30,7 @@ spec. This document is the operational summary.
 | --- | --- | --- | --- |
 | A | Every exported calculator function has a corpus row. | `## Function corpus (v14)` table in [derivations.md](derivations.md). | `npm run audit:corpus` (wired into `npm run lint`). |
 | B | Each calculator's output for a fixture input is within tolerance of an independent published value. | Per-row fixture in [../test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json). | [../scripts/check-cross-validation.mjs](../scripts/check-cross-validation.mjs), wired into `npm run lint` (also `npm run audit:cross-validation`). |
-| C | The dimensional skeleton of each expression balances input dimensions against output dimension. | `// dims:` annotation in the source. | [../scripts/check-dimensions.mjs](../scripts/check-dimensions.mjs), wired into `npm run lint` (also `npm run audit:dimensions`). |
+| C | Every exported function declares its input and output dimensions, in a parseable annotation. (Whether the declaration is *correct* is Phase G; the lint checks shape, not physics.) | `// dims:` annotation in the source. | [../scripts/check-dimensions.mjs](../scripts/check-dimensions.mjs), wired into `npm run lint` (also `npm run audit:dimensions`). |
 | D | Each calculator returns a finite sensible value at every documented domain edge. | Per-row domain band in the corpus. | [../scripts/check-bounds.mjs](../scripts/check-bounds.mjs), wired into `npm run lint` (also `npm run audit:bounds`). |
 | E | Iterative / transcendental methods converge to a stable bit pattern. | [../test/unit/numerical-stability.test.js](../test/unit/numerical-stability.test.js) (pure-math scaffolding landed; calc-module iteratives append). | `npm test`. |
 | F | Tiles that share a computation agree to the floating-point floor; round-trip conversions are identity-preserving. | [../test/unit/cross-tile-invariants.test.js](../test/unit/cross-tile-invariants.test.js) (pure-math primitives + monotonicity scaffolding landed; cross-group invariants append). | `npm test`. |
@@ -105,15 +105,29 @@ published page.
 Every calculator function carries a one-line dimension
 annotation in a leading comment naming each input's physical
 dimension using the SI base-unit short codes and the output's
-dimension as a product / ratio expression. The lint reads the
-annotations and asserts the expression's left-hand side and
-right-hand side have the same dimension. The lint is
-conservative; it does not attempt floating-point verification.
+dimension as a product / ratio expression.
 
-The Group G unit converter is the canonical unit-conversion
-table; the lint asserts that every conversion coefficient used
-in any calc-*.js module is present in the Group G crosswalk to
-twelve significant figures.
+What the lint asserts is that the annotation is **present and
+parseable**, in the grammar above, for every exported function:
+2,059 of 2,059 across 58 modules, and a malformed annotation
+fails the build. It does **not** evaluate whether the annotation
+is physically right, and it does not balance the inputs against
+the output -- doing that from source would need a CAS, which is
+a third-party dependency this project does not take. The
+annotation is a written, machine-checked-for-shape statement of
+intent; whether it is *correct* is settled by the written
+derivation and the reviewer in Phase G.
+
+The Group G unit converter at `calc-cross.js:convertUnit` is the
+canonical crosswalk every module reaches through. Its round-trip
+identity is asserted to 1e-12 relative, and where a module
+carries its own inline constant for a shared quantity, that
+constant is asserted against the crosswalk to its truncation
+floor -- CFM to m^3/s to seven figures, for instance. Those are
+curated invariants in
+[../test/unit/cross-tile-invariants.test.js](../test/unit/cross-tile-invariants.test.js)
+(Phase F), not an exhaustive sweep of every coefficient in the
+catalog.
 
 ## Bounds and edge cases (Phase D)
 
