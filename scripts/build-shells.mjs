@@ -460,8 +460,9 @@ function displayFor(display, val, raw, label) {
 // existing lazy-load of the catalog.
 let formatWithUnit = () => null;
 let withoutRepeat = (suffix) => suffix || "";
+let outputBooleans = () => ({});
 
-function exampleRows(obj, labels, displays, units) {
+function exampleRows(obj, labels, displays, units, bools) {
   return Object.entries(obj || {})
     .map(([k, v]) => {
       const val = exampleValue(v);
@@ -475,7 +476,15 @@ function exampleRows(obj, labels, displays, units) {
       // The formatter's own string first (it is exactly what the calculator
       // prints); a hand-written renderer's extracted unit second.
       const unit = units && units[k];
+      // A boolean answer: the fixture records it as 0/1 and printing that
+      // literally asked "PMI required?" and answered "0". The renderer states
+      // both words itself, so the page says what the calculator says.
+      const bool = bools && bools[k];
+      const asBool = bool && (raw === true || raw === false || raw === 0 || raw === 1)
+        ? (raw === true || raw === 1 ? bool.t : bool.f)
+        : null;
       const shown = (displays && displayFor(displays[k], val, raw, caption))
+        || asBool
         || (typeof raw === "number" ? formatWithUnit(unit, raw, val, caption) : null)
         || val;
       // A named row prints the name and the number, nothing else. The raw field
@@ -778,7 +787,7 @@ function shellFooter(depth = 2) {
   ].join("\n");
 }
 
-function tileShell(tool, tools, groupNames, relatedMap, examples, labels, outLabels, outDisplays, outUnits) {
+function tileShell(tool, tools, groupNames, relatedMap, examples, labels, outLabels, outDisplays, outUnits, outBools) {
   const professionNoun = PROFESSION_NOUN[tool.trades[0]] || "Trades";
   const groupLabel = groupNames[tool.group] || tool.group;
   const groupSlug = GROUP_SLUG[tool.group] || tool.group.toLowerCase();
@@ -826,7 +835,7 @@ function tileShell(tool, tools, groupNames, relatedMap, examples, labels, outLab
         .filter((k, i, all) => all.indexOf(k) === i)
         .filter((k) => exampleValue((example.inputs || {})[k] ?? (example.outputs || {})[k]) !== "")
     : [];
-  const outputRows = example ? exampleRows(example.outputs, outLabels, outDisplays, outUnits) : "";
+  const outputRows = example ? exampleRows(example.outputs, outLabels, outDisplays, outUnits, outBools) : "";
   const assumptionRows = (citation && Array.isArray(citation.assumptions) ? citation.assumptions : [])
     .map((a) => `      <li><span>${escapeHtml(a.name)}</span> <b>${escapeHtml(a.value)}</b><small>${escapeHtml(a.source)}</small></li>`)
     .join("\n");
@@ -1170,6 +1179,7 @@ async function main() {
   const { inputLabels, outputLabels, outputDisplays, outputUnits } = catalog;
   formatWithUnit = catalog.formatWithUnit;
   withoutRepeat = catalog.withoutRepeat;
+  outputBooleans = catalog.outputBooleans;
 
   let shellCount = 0;
   // Per-tile shells.
@@ -1181,7 +1191,8 @@ async function main() {
     const ex = examples.get(tool.id);
     const outDisplays = ex ? await outputDisplays(tool.id, ex.inputs) : {};
     const outUnits = outputUnits(tool.id);
-    const html = tileShell(tool, tools, groupNames, relatedMap, examples, labels, outLabels, outDisplays, outUnits);
+    const outBools = outputBooleans(tool.id);
+    const html = tileShell(tool, tools, groupNames, relatedMap, examples, labels, outLabels, outDisplays, outUnits, outBools);
     const out = resolve(DIST, "tools", tool.id, "index.html");
     await mkdir(dirname(out), { recursive: true });
     await writeFile(out, html, "utf8");

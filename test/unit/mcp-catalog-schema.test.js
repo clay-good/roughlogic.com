@@ -654,3 +654,18 @@ test("a renderer that renames the INPUT factories still exposes a field schema",
   // A typed select is also an enforced one.
   await assert.rejects(() => run({ id: "rope-ma", inputs: { rig: "not-a-rig" } }), /Allowed/);
 });
+
+test("a boolean answer is printed in the calculator's own words", async () => {
+  // A worked-example fixture records a boolean as 0 or 1, and the tile page
+  // printed that literally: `ltv` asked "PMI required?" and answered "0" where
+  // the calculator says "No". The renderer states both words in one place.
+  const { outputBooleans } = await import("../../mcp/catalog.mjs");
+  assert.deepEqual(outputBooleans("ltv").pmi_required, { t: "Yes (LTV > 80%)", f: "No" });
+  assert.deepEqual(outputBooleans("truss-capacity").pass, { t: "PASS", f: "FAIL" });
+
+  // Only a COMPLETE ternary is taken. `sprinkler-density` writes
+  // `r.meets_minimum === null ? "n/a" : (r.meets_minimum ? "yes" : "no (" + ...)`
+  // -- the false branch is a fragment, and printing it alone would leave the
+  // answer truncated mid-sentence, so the tile is refused rather than guessed.
+  assert.ok(!outputBooleans("sprinkler-density").meets_minimum);
+});

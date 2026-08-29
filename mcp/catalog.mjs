@@ -35,6 +35,8 @@ try {
 let BESPOKE_SCHEMAS = {};
 let BESPOKE_OUTPUT_UNITS = {};
 try { ({ BESPOKE_OUTPUT_UNITS } = await import("../test/fixtures/bespoke-output-units.js")); } catch { BESPOKE_OUTPUT_UNITS = {}; }
+let BESPOKE_OUTPUT_BOOLS = {};
+try { ({ BESPOKE_OUTPUT_BOOLS } = await import("../test/fixtures/bespoke-output-bools.js")); } catch { BESPOKE_OUTPUT_BOOLS = {}; }
 try { ({ BESPOKE_SCHEMAS } = await import("../test/fixtures/bespoke-schemas.js")); } catch { BESPOKE_SCHEMAS = {}; }
 // Display-only field labels for renderers that earn no schema. Read by
 // inputLabels() alone -- never by describe(), which must keep advertising only
@@ -695,6 +697,13 @@ export async function outputLabels(id) {
 // closure; this covers the rest, for a caller that has the number already.
 export function outputUnits(id) {
   return BESPOKE_OUTPUT_UNITS[id] || {};
+}
+
+// The two words a hand-written renderer prints for a BOOLEAN answer, keyed by
+// result key: `{ t, f }`. A worked example records a boolean as 0 or 1, so the
+// tile page printed `PMI required? 0` where the calculator says "No".
+export function outputBooleans(id) {
+  return BESPOKE_OUTPUT_BOOLS[id] || {};
 }
 
 // Assemble the answer STRING a hand-written renderer prints, from the affixes

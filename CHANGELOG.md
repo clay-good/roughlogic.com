@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Twenty-one calculators answered a yes/no question with a bare "0".** `ltv` asked **"PMI required?"** and the tile page answered **`0`**. `truss-capacity` reported its pass/fail as `1`. A worked-example fixture records a boolean as 0 or 1, and the page printed that literally, so a reader met a raw flag where the calculator itself says "No" and "PASS". The live app was right throughout; the divergence was on the static page, the same shape as the percent bug above.
+
+  The renderers state both words in one place -- `oPMI.textContent = r.pmi_required ? "Yes (LTV > 80%)" : "No";` -- so the page now uses the calculator's own wording. 48 calculators' yes/no answers are extracted; the affected rows drop from 22 to 7.
+
+  The seven that remain are refused on purpose. `sprinkler-density` writes `r.meets_minimum === null ? "n/a" : (r.meets_minimum ? "yes" : "no (" + minimum + ")")` -- a nested conditional whose false branch is a fragment, and printing that alone would leave the answer truncated mid-sentence. Only a complete `flag ? "A" : "B";` is taken. A blanket "Yes"/"No" for the rest was considered and rejected: the page renders the fixture's recorded value, which cannot tell a boolean `0` from a numeric zero, and a wrong word beside a number is worse than a bare digit.
+
 - **One failed fetch on the first search cost the whole page session its aliases, its prefill, and its answer previews.** The search box lazy-loads four things on first interaction. `ensureDiscovery` releases its "loading" flag if the import fails, so the next keystroke retries. The other three never did: `ensureAliases` latched `aliasLoaded = true` before its fetches resolved, and `ensureSlots` / `ensurePreview` swallowed the failure with the flag still set. A single transient blip -- a dropped request on a phone, a slow cold load -- and that page was stuck until a full reload, with no sign anything was wrong.
 
   The aliases are the visible one. Without them, **"asphalt tonnage 2400 sq ft 3 in deep 12 ft wide" leads with a carpet takeoff** instead of Asphalt Tonnage. That is not hypothetical: it is what a CI runner saw, on a commit that changed no browser code at all. All three retries failed identically, which is the signature of a race with no recovery path rather than a flake.
