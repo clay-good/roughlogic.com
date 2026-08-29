@@ -607,7 +607,30 @@ async function main() {
       for (const [k, v] of Object.entries(labelMap)) if (uses.get(v) > 1) delete labelMap[k];
       if (Object.keys(labelMap).length) labels[id] = labelMap;
     }
-    if (!callMap || callMap.size === 0) { stats.skip_no_call++; continue; }
+    // Fall back to the loose key->field map when the strict one finds nothing.
+    //
+    // The strict pass insists on `key: VAR.input.value`, and the loose one also
+    // accepts the same linkage wearing a helper -- `span_ft: readNum(span.input)`.
+    // The loose map fed LABELS ONLY, on the reasoning that a schema reaches
+    // run() and a mis-parse there would advertise an input run cannot honor.
+    //
+    // Two things bound that risk, and they are both already in place. A bad KEY
+    // cannot survive: `schemaIfConsistent` drops any schema whose keys are not
+    // real compute params, and check-both-doors asserts every advertised name is
+    // sendable and every example key is advertised, on all 1,804 tiles. What is
+    // left is a bad LABEL on a good key, and that is measurable -- so it was
+    // measured rather than assumed:
+    //
+    //   - all three query-fill lenses UNCHANGED: 4,154 / 4,680 / 1,942 recovered
+    //     at 0 / 0 / 7 wrong, identical to before;
+    //   - 277 unit-suffixed keys checked against their labels across the 154
+    //     newly-covered tiles, with one heuristic false positive
+    //     (`feed_ipr_in` -> "Feed per revolution f (IPR)", which is right);
+    //   - 36 key/label pairs read by hand, all correct.
+    //
+    // skip_no_call falls from 188 to 32.
+    const effectiveCallMap = (callMap && callMap.size) ? callMap : parseComputeCallLoose(body);
+    if (!effectiveCallMap || effectiveCallMap.size === 0) { stats.skip_no_call++; continue; }
     if (!params) { stats.skip_no_call++; continue; }
 
     // Include every compute param we can confidently map to a parsed field
@@ -618,7 +641,7 @@ async function main() {
     let typeMismatch = false, hasSelect = false, anyUnmapped = false;
     const inputs = [];
     for (const { name: key, defType, defValue } of params) {
-      const ref = callMap.get(key);
+      const ref = effectiveCallMap.get(key);
       if (!ref) { anyUnmapped = true; continue; } // param not sourced from a field
       let field = fields.get(ref.var);
       if (!field) { anyUnmapped = true; continue; }

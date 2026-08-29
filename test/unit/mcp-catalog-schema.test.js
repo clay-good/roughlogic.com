@@ -56,7 +56,11 @@ test("a bespoke-renderer tile still names its answers from its printed captions"
   // the calculator prints above each number is extracted for its own page, and
   // the door reports it keyed by the compute result key.
   const d = await describe({ id: "final-grade-needed" });
-  assert.equal(d.inputs_source, "compute", "no schema for this renderer");
+  // The subject here is the ANSWER side: this renderer carries no output
+  // descriptors, so the captions it prints are what names its numbers. Its
+  // input source is deliberately not asserted -- it became schema-covered when
+  // the extractor learned to keep a partial map, and that is an improvement,
+  // not a change to what this test is about.
   assert.equal(d.outputs_source, "captions");
   const needed = d.outputs.find((o) => o.key === "needed_pct");
   assert.equal(needed.label, "Needed final score");

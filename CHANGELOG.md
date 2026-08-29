@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **154 more calculators expose a field schema, from a precaution that measurement retired.** The extractor has two readers for the link between a compute parameter and its on-screen field. The strict one insists on `key: VAR.input.value`; the loose one also accepts the same linkage wearing a helper, `span_ft: readNum(span.input)`. The loose reader fed labels only, on the reasoning that a schema reaches `run_calculator` and a mis-parse there would advertise an input the calculator cannot receive. 188 calculators were skipped for it.
+
+  Two things already bound that risk. A bad **key** cannot survive: the door drops any schema whose keys are not real compute parameters, and `check-both-doors` asserts every advertised name is sendable and every worked-example key is advertised, across all 1,804. What remained was a bad **label** on a good key, and that is measurable, so it was measured rather than argued: all three query-fill lenses come back **identical** (4,154 / 4,680 / 1,942 recovered at 0 / 0 / 7 wrong), 277 unit-suffixed keys were checked against their labels with one heuristic false positive, and 36 pairs were read by hand.
+
+  **Calculators exposing a field schema: 1,571 to 1,725.** Skipped-for-no-readable-call: 188 to 32.
+
 - **95 calculators were refused a field schema on a rule that had outlived its reason.** The extractor kept a partial schema for a tile with a dropdown, but refused one for a purely numeric tile unless every compute parameter mapped to a field, on the stated grounds that "introspection alone is just as good". That was true when a schema's only payoff was its enum values. It stopped being true once a schema also carried the field's **label** and its **min/max**: a compute signature has no captions to give, and those bounds are what let `run_calculator` warn on an out-of-range value.
 
   **Calculators exposing a field schema: 1,476 to 1,571.** `abatement-containment` now answers with "Containment length (ft)" and a floor of 0 where it used to answer with a bare parameter name.
