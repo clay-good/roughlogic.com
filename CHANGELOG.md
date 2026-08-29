@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Two thirds of an earlier fix in this release had no test at all.** The lazy-loader repair released three latches so a failed fetch is retried. Only the alias one was pinned. Deleting `slotsLoading = false` and `previewLoading = false` broke **nothing**: 6,392 unit tests and all 26 search specs stayed green, so a revert would have been silent.
+
+  The preview latch now has a spec, verified in both directions: it passes normally and fails with the release removed.
+
+  The slots one has a shape assertion instead, and the reason is worth recording. A behavioural test was written for it and then **deleted, because it passed with `slots.json` permanently blocked**: the hash params it asserted come from the `data/fields` index, which arrived after the slot table and covers that query without it. A test that passes whether or not the feature works is worse than no test, because it reads as coverage.
+
 - **A test of mine was passing for the wrong reason, because the service worker defeated it.** The spec added earlier in this release aborts the alias fetches, asserts the ranking is the degraded one, then lets them through and checks it corrects. It flaked, and the cause was not timing: the service worker precaches all 21 alias shards and serves them from its own cache, which `page.route` cannot intercept. With the worker installed, aborting the network proves nothing, because the shards arrive anyway.
 
   That is the app working exactly as designed, and it is why the offline promise holds. It also meant the test's premise was false whenever the worker won the race, which is what made it look intermittent. It now runs in a context with service workers blocked, so the network is the only path the aliases have. Four consecutive runs green, and still red when the fix it guards is removed.

@@ -95,3 +95,17 @@ test("alias autocomplete failure is a no-op, and does not latch", async () => {
   // The behaviour itself is pinned by the spec-v590 retry integration test.
   assert.match(t, /if \(!aliasRows\.length\) aliasLoaded = false;/);
 });
+
+test("every lazy search loader releases its latch on failure", async () => {
+  const t = await readApp();
+  // ensureDiscovery always did; the other three did not, so one blip cost the
+  // session its aliases, its prefill and its answer previews until a reload.
+  // The alias and preview releases are pinned behaviourally by integration
+  // specs. The SLOTS one is not: a behavioural test for it passed with
+  // slots.json permanently blocked, because the data/fields index now supplies
+  // the same hash params, so this shape assertion is what catches a revert.
+  assert.match(t, /catch\(\(\) => \{ discoveryLoading = false; \}\)/);
+  assert.match(t, /catch\(\(\) => \{ slotsLoading = false; \}\)/);
+  assert.match(t, /catch\(\(\) => \{ previewLoading = false; \}\)/);
+  assert.match(t, /if \(!aliasRows\.length\) aliasLoaded = false;/);
+});

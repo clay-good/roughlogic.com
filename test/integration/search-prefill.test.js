@@ -534,3 +534,45 @@ test("spec-v590: a failed alias fetch is retried on the next keystroke", async (
   await expect(top).toHaveText("Asphalt Tonnage");
   await context.close();
 });
+
+// The alias retry above is one of THREE latches released on failure. The other
+// two were unprotected: removing `slotsLoading = false` and
+// `previewLoading = false` broke no test at all, so a revert would have been
+// silent. Both are observable, so both are asserted here rather than left to a
+// source-shape check.
+//
+// Service workers are blocked for the same reason as the alias spec: sw.js
+// precaches slots.json and preview-map.json, and a worker-served response never
+// reaches page.route, so with it installed the abort proves nothing.
+test("spec-v592: a failed preview-map fetch is retried on the next keystroke", async ({ browser }) => {
+  const context = await browser.newContext({ serviceWorkers: "block" });
+  const page = await context.newPage();
+  let failNext = true;
+  await page.route("**/data/search/preview-map.json", (route) =>
+    (failNext ? route.abort() : route.continue()));
+
+  await page.goto("/");
+  const input = page.locator("#search-input");
+  await input.click();
+  await input.fill("voltage drop 120v 150 ft 20 amps");
+
+  // With the map missing, schedulePreview bails and no answer appears.
+  const preview = page.locator("#search-result-0 .sr-preview");
+  await expect(preview).toHaveCount(0);
+
+  // Let it through and type once more: the latch must have been released, so
+  // the fetch is retried and the computed answer arrives.
+  failNext = false;
+  await input.press("End");
+  await input.type(" ");
+  await expect(preview).toBeVisible({ timeout: 15000 });
+  await expect(preview).toContainText(/drop \d+(\.\d+)? V/);
+  await context.close();
+});
+
+// A behavioural test for the SLOTS latch was written and then deleted, because
+// it passed with slots.json permanently blocked: the hash params it asserted
+// come from the data/fields index (spec-v1339), which arrived after the slot
+// table (spec-v591) and covers this query without it. The test proved nothing.
+// The latch release is asserted by shape in alias-autocomplete-wiring instead,
+// which at least catches a revert.
