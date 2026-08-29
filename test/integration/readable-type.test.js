@@ -43,7 +43,14 @@ function probe() {
     const cls = (el.getAttribute("class") || "").split(" ")[0];
     // The site footer is chrome, not content: it is meta by position, and its
     // spans carry no class to name.
-    const meta = !!el.closest(".site-footer, .shell-footer, footer");
+    // Deliberate meta on the prerendered shells, each pinned AT the 0.9375rem
+    // meta floor rather than below it: the breadcrumb is a label about where
+    // you are, `.shell-assume` is the assumption footnote under the answer, and
+    // `.shell-related-desc` is a muted one-liner describing a DIFFERENT
+    // calculator in a list. None is the page's own reading content.
+    const meta = !!el.closest(
+      ".site-footer, .shell-footer, footer, .shell-breadcrumb, .shell-assume, .shell-related-desc",
+    );
     out.push({ px, meta, sel: el.tagName.toLowerCase() + "." + cls, text: el.textContent.trim().slice(0, 60) });
   }
   return out;

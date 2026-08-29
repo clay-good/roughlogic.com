@@ -1638,6 +1638,15 @@ input[aria-invalid="true"] {
 .shell-page .shell-detail {
   overflow-wrap: anywhere;
 }
+/* A <code> with no rule of its own renders at the browser's monospace default,
+   which is about 13 px -- below even the 0.9375rem meta floor. The API field
+   names on `.shell-source` ("Field names used by the API: V, I, R, P") were
+   doing exactly that. Set at the READING floor, not the meta one: `.shell-source`
+   also carries the citation line, which is reference prose a person reads, so
+   the class cannot be waved through as meta. */
+.shell-page code {
+  font-size: 1rem;
+}
 .shell-page .shell-detail {
   margin: 0;
   color: var(--fg-muted);

@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The readable-type gate had never actually checked the prerendered shells.** It visits `/tools/ohms-law/` and `/groups/electrical/` by name, but the dev server answered **403** for those directory URLs, so the sweep found no elements there and passed. Two of its three static targets were silently empty for as long as it has existed. Fixing the dev server (above) un-blinded it, and it failed immediately.
+
+  One real violation, and it is exactly the class this gate was built for: a `<code>` with no font-size rule of its own renders at the browser's monospace default, about **13 px**, below even the 0.9375rem meta floor. The API field-name line on every tile shell ("Field names used by the API: `V`, `I`, `R`, `P`") was doing that. Shell `<code>` is now set at the reading floor rather than the meta one, because `.shell-source` also carries the citation line, which is reference prose a person reads.
+
+  The rest were deliberate meta pinned exactly at the meta floor, not below it: the breadcrumb, the assumption footnote, and the muted one-liner describing a *different* calculator in a list. Those are now declared meta by container, the way the footer already was, rather than raised.
+
+  Re-checked what a type change can break: 1,920 mobile checks across 1,826 shells still show zero horizontal scroll at 320 px, and the gzip caps still hold.
+
 - **Arrowing to a row and pressing Enter could do something else entirely.** Every one of the four lazily-loaded search dependencies re-renders the dropdown when it arrives, which is what keeps the ranking honest. But `render()` ended by resetting the reader's choice: `userPicked = false; setActive(0)`. So a reader who arrowed to the third row and pressed Enter a moment later, as the alias shards landed, had their choice silently discarded -- the highlight jumped back to the first row and Enter fell through to the ambiguity card instead of opening what they picked. The slower the connection, the likelier it was.
 
   A re-render caused by data arriving now keeps a deliberate selection; one caused by typing still clears it, because a new query genuinely invalidates the old choice.
