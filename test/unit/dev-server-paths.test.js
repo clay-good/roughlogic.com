@@ -11,15 +11,28 @@ import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
 import { existsSync } from "node:fs";
+import { createServer } from "node:net";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
-const PORT = 8099;
-const base = `http://localhost:${PORT}`;
+
+// Ask the OS for a free port rather than naming one. 8080 is the Playwright
+// webServer and 8099 is check-shell-mobile's http-server, so any fixed choice
+// is a collision waiting for someone to run two things at once -- which is
+// exactly what a developer does.
+async function freePort() {
+  const srv = createServer();
+  await new Promise((res) => srv.listen(0, "127.0.0.1", res));
+  const { port } = srv.address();
+  await new Promise((res) => srv.close(res));
+  return port;
+}
 
 async function withServer(run) {
   if (!existsSync(resolve(ROOT, "dist", "index.html"))) return "no-dist";
+  const PORT = await freePort();
+  const base = `http://localhost:${PORT}`;
   const proc = spawn(process.execPath, [resolve(ROOT, "scripts", "dev.mjs")], {
     cwd: ROOT, env: { ...process.env, PORT: String(PORT) }, stdio: ["ignore", "pipe", "pipe"],
   });
@@ -31,7 +44,7 @@ async function withServer(run) {
         await new Promise((r) => setTimeout(r, 150));
       }
     }
-    return await run();
+    return await run(base);
   } finally {
     proc.kill("SIGTERM");
     await once(proc, "exit").catch(() => {});
@@ -39,7 +52,7 @@ async function withServer(run) {
 }
 
 test("dev server resolves a directory to index.html, and still refuses traversal", async () => {
-  const outcome = await withServer(async () => {
+  const outcome = await withServer(async (base) => {
     const code = async (p) => (await fetch(base + p, { redirect: "manual" })).status;
 
     // The canonical url shape this site publishes in its sitemap, its JSON-LD
