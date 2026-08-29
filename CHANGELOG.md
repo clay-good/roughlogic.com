@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Correcting a correction: Phase B credited the wrong mechanism, and it was mine.** Earlier in this release the Phase B row was updated to point at `check-cross-validation.mjs`, replacing a reference to a test file that does not exist. That was an improvement on a dead link but still wrong about what verifies the answers, and it was written without checking.
+
+  Seeding a 5% error into `voltage-drop` settles it: `check-cross-validation.mjs` stays **green**. That script is a tolerance-*policy* lint, and its own source says so -- it flags a fixture whose declared tolerance exceeds the ceiling without a written justification, 1,731 of them. It never compares a computed value to the published one.
+
+  What catches the seeded error is `test/unit/worked-examples-runner.test.js`, which runs every fixture through its compute. The row now names both, because both are load-bearing and they check different things.
+
 - **The correctness contract claimed two machine checks that do not exist.** `docs/correctness.md` said the Phase C lint "asserts the expression's left-hand side and right-hand side have the same dimension", and that it "asserts that every conversion coefficient used in any calc-*.js module is present in the Group G crosswalk to twelve significant figures". Neither is true, and the first was disproved by giving `dyno-correction-sae` a deliberately wrong annotation -- power declared as a length, pressure as a time -- and watching the lint pass. The lint's own source says so plainly: it "does not balance ratios".
 
   What Phase C really gives is worth having and is now what the document says: every one of 2,059 exported functions carries a parseable dimension annotation, and a malformed one fails the build. Whether a declaration is physically *right* is settled by the written derivation and the reviewer in Phase G. Balancing it from source would need a CAS, which this project deliberately does not depend on.
