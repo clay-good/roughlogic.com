@@ -228,10 +228,27 @@ function lintShellCsp(html, where, errors) {
   }
 }
 
+// docs/threat-model.md: "Shells carry zero JavaScript. No <script> tag on any
+// shell beyond the inline <script type=\"application/ld+json\"> block, which is
+// a non-executable data block per the HTML spec. The TBT for every shell is 0 ms
+// by construction."
+//
+// "By construction" was the whole argument, and nothing checked the
+// construction. The JSON-LD is parsed here for validity, so an executable
+// <script> would have slipped past that reader untouched -- and taken the zero
+// -TBT claim and the shells' stricter CSP rationale with it.
+function lintShellNoScript(html, where, errors) {
+  for (const m of html.matchAll(/<script([^>]*)>/gi)) {
+    if (/type\s*=\s*["']application\/ld\+json["']/i.test(m[1])) continue;
+    errors.push(where + ": carries an executable <script" + m[1] + ">. Shells ship zero JavaScript (docs/threat-model.md).");
+  }
+}
+
 async function lintShell(path, kind, errors) {
   const html = await readFile(path, "utf8");
   const where = path.slice(DIST.length + 1);
   lintShellCsp(html, where, errors);
+  lintShellNoScript(html, where, errors);
 
   // Title.
   const titleMatch = html.match(/<title>([^<]*)<\/title>/i);
@@ -450,7 +467,7 @@ async function main() {
     "check-shells OK: " + tileCount + " tile shells + " + groupCount + " group shells + 1 catalog hub; " +
     "all titles <= " + TITLE_CAP + " chars, descriptions <= " + DESCRIPTION_CAP + " chars, " +
     "JSON-LD valid against allowlist, gzip under " + TILE_GZIP_CAP + " / " + GROUP_GZIP_CAP + " B caps, " +
-    "every shell CSP present and unweakened."
+    "every shell CSP present and unweakened, and no executable script on any shell."
   );
 }
 

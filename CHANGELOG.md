@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The threat model described the shells' CSP wrongly, and its "by construction" claim was not constructed.** It said each shell "carries the same `<meta http-equiv=\"Content-Security-Policy\">` tag the home document carries". It does not: a shell's `script-src` is `'self'` alone, granting neither the inline boot-script hash nor the Turnstile origins the app's policy needs. The reality is stricter than the document claimed, but a reader would have concluded the shells permit an inline script and a third-party origin. Corrected, with the reason: a page that runs no JavaScript has no business permitting any.
+
+  The neighbouring commitment, "Shells carry zero JavaScript ... the TBT for every shell is 0 ms by construction", was checked by nothing. `check-shells` parses the JSON-LD block for validity, so an executable `<script>` would have passed straight through that reader and taken the zero-TBT claim and the stricter-CSP rationale with it. It now fails on any script tag on any shell that is not that data block, seed-tested red.
+
+  No shell was wrong: all 1,825 script tags across 1,826 pages are the non-executable JSON-LD data block.
+
 - **Eight documented security headers, and only the CSP was checked.** `check-csp` pulls the `Content-Security-Policy:` line out of `_headers` and stops there. The rest of that file is the site's edge security posture, and `docs/threat-model.md` commits to it by name: `Referrer-Policy: no-referrer`, `X-Frame-Options: DENY`, a `Permissions-Policy` disabling camera, microphone, geolocation, payment, USB and accelerometer. `deployment.md` and the launch checklist repeat them. Nothing asserted any of it, so they were controls only until someone edited the file.
 
   All nine are now checked by exact value rather than presence, because `X-Frame-Options: SAMEORIGIN` would satisfy a presence check while granting precisely what the threat model refuses. Seed-tested red three ways: a weakened value, a loosened value, and a removed line.

@@ -173,15 +173,24 @@ group (`/groups/<slug>/index.html`, 24 shells), plus a regenerated
 no new network call at runtime, and no new client-side storage**. The
 threat surface is unchanged from v12.
 
-- **Shells inherit the same CSP** as the home document. Each shell
-  carries the same `<meta http-equiv="Content-Security-Policy">` tag
-  the home document carries, and the shells are served from the same
-  origin so the [../_headers](../_headers) CSP applies. `default-src
-  'self'`, `connect-src 'self'`, `worker-src 'self'` are unchanged.
+- **Shells carry a STRICTER CSP than the home document.** Each shell
+  carries its own `<meta http-equiv="Content-Security-Policy">`, and
+  the shells are served from the same origin so the
+  [../_headers](../_headers) CSP applies on top. `default-src 'self'`,
+  `connect-src 'self'`, `worker-src 'self'` match the home document,
+  but a shell's `script-src` is `'self'` alone: it grants neither the
+  inline boot-script hash nor the Turnstile origins the app's policy
+  needs, because a shell runs no script of its own (see below). A page
+  with no JavaScript has no business permitting any. Both the presence
+  of that policy and the fact that its `script-src` has not been
+  widened are asserted by
+  [../scripts/check-shells.mjs](../scripts/check-shells.mjs).
 - **Shells carry zero JavaScript.** No `<script>` tag on any shell
   beyond the inline `<script type="application/ld+json">` block, which
   is a non-executable data block per the HTML spec. The TBT for every
-  shell is 0 ms by construction.
+  shell is 0 ms by construction -- and the construction is now checked:
+  [../scripts/check-shells.mjs](../scripts/check-shells.mjs) fails on any
+  `<script>` on any shell that is not that data block.
 - **JSON-LD blocks are static, validated, and grep-checked.** The
   generator in [../scripts/build-shells.mjs](../scripts/build-shells.mjs)
   escapes `<`, `>`, and `&` to their `\u` form in every text field so a
