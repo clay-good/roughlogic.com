@@ -184,9 +184,54 @@ function containsBannedWord(s) {
   return null;
 }
 
+// The CSP the shells carry. It is deliberately STRICTER than the edge policy in
+// _headers: a shell ships zero JavaScript, so it needs neither the inline
+// boot-script hash nor the Turnstile origins the SPA's policy allows. A page
+// with no script has no business permitting one.
+//
+// `check-csp` pins the other two copies -- the <meta> in index.html and the
+// edge header -- and never looks at these, which is a third hand-maintained
+// copy across 1,804 pages. What matters is not that the string never changes
+// but that it never WEAKENS, so the directives that would matter are asserted
+// by name rather than by comparing the whole policy.
+const SHELL_CSP_REQUIRED = [
+  "default-src 'self'",
+  "script-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+];
+// Any of these in a shell's script-src would let a page that runs no script of
+// its own run someone else's.
+const SHELL_CSP_FORBIDDEN = [/'unsafe-inline'/, /'unsafe-eval'/, /\*/, /https?:/];
+
+function lintShellCsp(html, where, errors) {
+  const meta = html.match(/<meta[^>]+http-equiv=["']Content-Security-Policy["'][^>]*>/i);
+  if (!meta) {
+    errors.push(where + ": no Content-Security-Policy meta. Shells carry their own, stricter than the edge header.");
+    return;
+  }
+  // The policy is full of single quotes (`'self'`, `'none'`), so a character
+  // class of ["'] terminates on the first one inside a double-quoted attribute
+  // and reports a policy that looks empty. Match the delimiter explicitly.
+  const content = (meta[0].match(/content="([^"]*)"/i) || meta[0].match(/content='([^']*)'/i) || [])[1] || "";
+  for (const directive of SHELL_CSP_REQUIRED) {
+    if (!content.includes(directive)) {
+      errors.push(where + ": shell CSP is missing `" + directive + "`.");
+    }
+  }
+  const scriptSrc = (content.match(/script-src([^;]*)/) || [])[1] || "";
+  for (const bad of SHELL_CSP_FORBIDDEN) {
+    if (bad.test(scriptSrc)) {
+      errors.push(where + ": shell CSP script-src has been weakened (" + bad + " in `script-src" + scriptSrc + "`). A shell runs no script of its own.");
+    }
+  }
+}
+
 async function lintShell(path, kind, errors) {
   const html = await readFile(path, "utf8");
   const where = path.slice(DIST.length + 1);
+  lintShellCsp(html, where, errors);
 
   // Title.
   const titleMatch = html.match(/<title>([^<]*)<\/title>/i);
@@ -404,7 +449,8 @@ async function main() {
   console.log(
     "check-shells OK: " + tileCount + " tile shells + " + groupCount + " group shells + 1 catalog hub; " +
     "all titles <= " + TITLE_CAP + " chars, descriptions <= " + DESCRIPTION_CAP + " chars, " +
-    "JSON-LD valid against allowlist, gzip under " + TILE_GZIP_CAP + " / " + GROUP_GZIP_CAP + " B caps."
+    "JSON-LD valid against allowlist, gzip under " + TILE_GZIP_CAP + " / " + GROUP_GZIP_CAP + " B caps, " +
+    "every shell CSP present and unweakened."
   );
 }
 

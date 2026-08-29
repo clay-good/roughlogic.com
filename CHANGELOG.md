@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A third copy of the Content-Security-Policy, on 1,804 pages, with no gate on it.** `check-csp` pins the two hand-maintained copies it knows about, the `<meta>` in `index.html` and the edge header in `_headers`, and never looks at the built shells. Those carry their own policy, deliberately stricter than the edge one: a shell ships zero JavaScript, so it needs neither the inline boot-script hash nor the Turnstile origins the app's policy allows.
+
+  `check-shells` now asserts every shell carries that policy and that its `script-src` has not been weakened, naming the directives that matter rather than comparing the whole string, since what matters is not that it never changes but that it never loosens. All five ways it can rot were seed-tested red: `unsafe-inline`, an external host, a wildcard, a dropped `base-uri`, and a removed meta tag.
+
+  No page was wrong: all 1,804 tile shells, 21 group shells and the catalog hub already carry an identical, correct policy.
+
 - **"Works offline" is the README's headline promise, and nothing verified it in a browser.** `sw.js` has good unit coverage of its SOURCE -- cache names keyed by the build hash, an atomic install, a navigation fallback, a precache list checked against the files on disk in both directions -- but no test had ever cut the network and asked for a calculator.
 
   That distinction has bitten here before: a `data/fields/` shard once shipped unlisted in the precache, which would have left one group's tiles fetching over a network that is not there. A file-list gate caught that one. Nothing would have caught a regression in the serving path itself.
