@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **"Works offline" is the README's headline promise, and nothing verified it in a browser.** `sw.js` has good unit coverage of its SOURCE -- cache names keyed by the build hash, an atomic install, a navigation fallback, a precache list checked against the files on disk in both directions -- but no test had ever cut the network and asked for a calculator.
+
+  That distinction has bitten here before: a `data/fields/` shard once shipped unlisted in the precache, which would have left one group's tiles fetching over a network that is not there. A file-list gate caught that one. Nothing would have caught a regression in the serving path itself.
+
+  There are now two specs that install the worker for real, go offline, and then load the home view and compute an answer. They pass in a few hundred milliseconds, which looks like they are not doing anything -- so the file records the control that proves otherwise: block `sw.js` from registering, go offline, and the reload fails outright with `net::ERR_INTERNET_DISCONNECTED`. The assertions depend on the worker, not on a browser cache quietly serving them.
+
 - **Two agent-facing errors named the mistake but not the fix.** An unknown calculator id returned `unknown calculator id: volts-drop` and stopped there, where the rest of this surface says how to recover ("Call describe_calculator for the keys it accepts"). It now says to call `search_calculators`. The resource-uri error was worse: it interpolated the raw argument rather than the string it actually read, so a caller passing an object got `unknown resource uri: [object Object]`, naming neither the mistake nor the fix. It now quotes what it read and lists the three valid forms.
 
   Found by making the mistake: reading all 82 MCP resources with the wrong calling convention produced 82 identical `[object Object]` errors and no clue which end was wrong. The resources themselves are fine, all 82 read and parse.
