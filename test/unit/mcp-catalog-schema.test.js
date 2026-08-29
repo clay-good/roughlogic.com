@@ -703,3 +703,15 @@ test("a curated alias corroborates the calculator it is curated for", async () =
   const none = await answerQuery({ query: "zzzz qqqq" });
   assert.equal(none.status, "NO_MATCH");
 });
+
+test("a rejected id or uri names the fix, and reports what was actually read", async () => {
+  const { readResource } = await import("../../mcp/catalog.mjs");
+  // An unknown id is the agent's most likely mistake, so say how to find a real
+  // one rather than only that this one is wrong.
+  await assert.rejects(() => describe({ id: "volts-drop" }), /unknown calculator id: "volts-drop"\. Call search_calculators/);
+  await assert.rejects(() => run({ id: "volts-drop" }), /Call search_calculators/);
+  // The uri error used to interpolate the raw argument, so a caller that passed
+  // an object got "unknown resource uri: [object Object]" -- naming neither the
+  // mistake nor the fix.
+  await assert.rejects(() => readResource("roughlogic://nope"), /Valid forms are/);
+});

@@ -6,6 +6,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Two agent-facing errors named the mistake but not the fix.** An unknown calculator id returned `unknown calculator id: volts-drop` and stopped there, where the rest of this surface says how to recover ("Call describe_calculator for the keys it accepts"). It now says to call `search_calculators`. The resource-uri error was worse: it interpolated the raw argument rather than the string it actually read, so a caller passing an object got `unknown resource uri: [object Object]`, naming neither the mistake nor the fix. It now quotes what it read and lists the three valid forms.
+
+  Found by making the mistake: reading all 82 MCP resources with the wrong calling convention produced 82 identical `[object Object]` errors and no clue which end was wrong. The resources themselves are fine, all 82 read and parse.
+
 - **The agent one-box refused to answer questions the catalog itself maps to a calculator.** `answer_query` will not answer from a weak match, so a question has to corroborate the calculator it reached: by carrying values, or by naming it. The alias corpus was not counted, and that corpus exists precisely because people do not use a calculator's name -- someone deliberately mapped "romex ampacity" to the tile it answers.
 
   Measured over a 300-term sample of the corpus, **70 questions came back `NO_MATCH`, and in 65 of them the ranker's top hit was already the alias's own target**. The door was telling an agent "no calculator matched" about a phrase the catalog maps to that very calculator.

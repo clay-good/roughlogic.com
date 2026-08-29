@@ -469,7 +469,7 @@ export async function search({ query = "", trade = "", limit = 30 } = {}) {
 export async function describe({ id } = {}) {
   const { COMPUTE_MAP, RENDERER_MAP, examples, byId, modCache } = await load();
   const meta = byId.get(id);
-  if (!meta) throw new Error(`unknown calculator id: ${id}`);
+  if (!meta) throw new Error(`unknown calculator id: ${JSON.stringify(id)}. Call search_calculators to find one.`);
 
   const reg = COMPUTE_MAP[id];
   const exRows = examples.get(id) || [];
@@ -784,7 +784,7 @@ export async function outputDisplays(id, inputs) {
 
 export async function run({ id, inputs } = {}) {
   const { COMPUTE_MAP, RENDERER_MAP, examples, modCache, byId } = await load();
-  if (!byId.has(id)) throw new Error(`unknown calculator id: ${id}`);
+  if (!byId.has(id)) throw new Error(`unknown calculator id: ${JSON.stringify(id)}. Call search_calculators to find one.`);
   const reg = COMPUTE_MAP[id];
   if (!reg) throw new Error(`calculator "${id}" has no compute function wired (reference/lookup tile)`);
 
@@ -1132,7 +1132,13 @@ export async function readResource(uri) {
   if (u === "roughlogic://catalog") return jsonResource(u, await search({}));
   if ((m = u.match(/^roughlogic:\/\/trade\/(.+)$/))) return jsonResource(u, await search({ trade: decodeURIComponent(m[1]) }));
   if ((m = u.match(/^roughlogic:\/\/calculator\/(.+)$/))) return jsonResource(u, await describe({ id: decodeURIComponent(m[1]) }));
-  throw new Error(`unknown resource uri: ${uri}`);
+  // Report what was actually READ, not the raw argument: a caller that passed
+  // an object got "unknown resource uri: [object Object]", which names
+  // neither the mistake nor the fix. Name the forms that exist instead.
+  throw new Error(
+    `unknown resource uri: ${JSON.stringify(u)}. Valid forms are "roughlogic://catalog", ` +
+    `"roughlogic://trade/<trade>", and "roughlogic://calculator/<id>". Call resources/list for the first two.`,
+  );
 }
 
 export async function runMany({ calls } = {}) {
