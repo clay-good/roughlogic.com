@@ -41,6 +41,21 @@ function metaCsp(html) {
   return m ? m[1] : null;
 }
 
+// The edge security headers docs/threat-model.md commits to, with the values it
+// commits to. Kept beside the CSP check because they are the same posture and
+// the same hand-maintained file.
+const REQUIRED_EDGE_HEADERS = {
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Referrer-Policy": "no-referrer",
+  "Cross-Origin-Opener-Policy": "same-origin",
+  "Cross-Origin-Embedder-Policy": "require-corp",
+  "Cross-Origin-Resource-Policy": "same-origin",
+  "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), accelerometer=(), gyroscope=(), magnetometer=()",
+  "X-DNS-Prefetch-Control": "off",
+};
+
 // Pull the `Content-Security-Policy:` value from the _headers file.
 function headerCsp(text) {
   const m = text.match(/Content-Security-Policy:\s*(.+)/i);
@@ -96,6 +111,25 @@ async function main() {
   const expected = inline.length === 1
     ? "'sha256-" + createHash("sha256").update(inline[0], "utf8").digest("base64") + "'"
     : null;
+
+  // The CSP is not the only security header _headers carries, and it was the
+  // only one anything checked. docs/threat-model.md commits to the rest by name
+  // -- "Referrer-Policy: no-referrer", "X-Frame-Options: DENY", a
+  // Permissions-Policy that disables camera, microphone, geolocation, payment,
+  // USB and accelerometer -- and deployment.md and the launch checklist repeat
+  // them. A documented control nothing asserts is a control until someone edits
+  // the file.
+  //
+  // Exact values, not merely presence: `X-Frame-Options: SAMEORIGIN` would pass
+  // a presence check while granting exactly what the threat model refuses.
+  for (const [name, value] of Object.entries(REQUIRED_EDGE_HEADERS)) {
+    const line = headers.match(new RegExp("^\\s*" + name + ":\\s*(.+)$", "mi"));
+    if (!line) {
+      errors.push(`_headers: no ${name} line. docs/threat-model.md commits to it.`);
+    } else if (line[1].trim() !== value) {
+      errors.push(`_headers: ${name} is "${line[1].trim()}", expected "${value}" (docs/threat-model.md).`);
+    }
+  }
 
   const cspMeta = metaCsp(html);
   const cspHeader = headerCsp(headers);
@@ -158,6 +192,7 @@ async function main() {
   }
   console.log(
     "check-csp OK: boot-script sha256 " + expected + " matches script-src in index.html <meta>, _headers, and scripts/dev.mjs; " +
+    Object.keys(REQUIRED_EDGE_HEADERS).length + " edge security headers match docs/threat-model.md; " +
     "default-src / connect-src / object-src locked to self/none; only the reviewed Turnstile script/frame origin is external.",
   );
 }

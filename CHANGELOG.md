@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Eight documented security headers, and only the CSP was checked.** `check-csp` pulls the `Content-Security-Policy:` line out of `_headers` and stops there. The rest of that file is the site's edge security posture, and `docs/threat-model.md` commits to it by name: `Referrer-Policy: no-referrer`, `X-Frame-Options: DENY`, a `Permissions-Policy` disabling camera, microphone, geolocation, payment, USB and accelerometer. `deployment.md` and the launch checklist repeat them. Nothing asserted any of it, so they were controls only until someone edited the file.
+
+  All nine are now checked by exact value rather than presence, because `X-Frame-Options: SAMEORIGIN` would satisfy a presence check while granting precisely what the threat model refuses. Seed-tested red three ways: a weakened value, a loosened value, and a removed line.
+
+  Nothing was wrong: `_headers` already matches the threat model exactly. This is a gate around something already true.
+
 - **A third copy of the Content-Security-Policy, on 1,804 pages, with no gate on it.** `check-csp` pins the two hand-maintained copies it knows about, the `<meta>` in `index.html` and the edge header in `_headers`, and never looks at the built shells. Those carry their own policy, deliberately stricter than the edge one: a shell ships zero JavaScript, so it needs neither the inline boot-script hash nor the Turnstile origins the app's policy allows.
 
   `check-shells` now asserts every shell carries that policy and that its `script-src` has not been weakened, naming the directives that matter rather than comparing the whole string, since what matters is not that it never changes but that it never loosens. All five ways it can rot were seed-tested red: `unsafe-inline`, an external host, a wildcard, a dropped `base-uri`, and a removed meta tag.
