@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Nothing checked the numbers on the static pages.** `render-no-nan` drives every calculator in a browser and asserts the live app never renders NaN, Infinity or undefined. The prerendered tile pages -- what a crawler, a no-JS reader and every link preview actually get -- had no equivalent: `check-shells` covers their titles, descriptions, JSON-LD and gzip size, and never looks at a value.
+
+  That gap shipped real defects, both found by hand on this surface earlier in this release: an answer unit applied to a value the renderer scales first, and a boolean answer printed as a bare "0". Reading pages is not a gate.
+
+  `check-shell-values.mjs` now fails on any rendered input or answer value that is NaN, Infinity, undefined, `[object Object]`, or empty, across all 12,632 rows on 1,804 pages. Each of the five modes was seed-tested red and restored green. It runs after the build in CI, beside the other dist-reading checks.
+
+  Deliberately not gated: a JSON literal and the words true/false. Six JSON rows are the honest rendering for a data-keyed map or a nested shape, and true/false is a checkbox input's value, so gating either would need an allowlist -- and an allowlist that starts nearly empty exists only to absorb the first regression silently.
+
 - **A list input printed as JSON on the page while the calculator's own box showed commas.** `search-probability` ships its field pre-filled with the string `30, 40, 50`; the tile page printed `[30,40,50]`, a form that field would not accept as typed. Three more captions say "comma-separated" or "comma or space separated" outright, and printed a bracketed array underneath. 13 rows across 12 pages.
 
   Arrays of bare values now read as the separated list the field takes. This revisits a deliberate earlier choice, which left them as JSON on the grounds that they are not a table of labelled fields: true, but they are not JSON to the reader either, and the field's own default value settles what the right form is.

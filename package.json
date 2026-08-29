@@ -40,6 +40,7 @@
     "check:readme-counts": "node scripts/check-readme-counts.mjs",
     "check:dist": "node scripts/check-dist.mjs",
     "check:shells": "node scripts/check-shells.mjs",
+    "check:shell-values": "node scripts/check-shell-values.mjs",
     "check:free-access": "node scripts/check-free-access.mjs",
     "check:module-sizes": "node scripts/check-module-sizes.mjs",
     "check:shell-mobile": "node scripts/check-shell-mobile.mjs",
