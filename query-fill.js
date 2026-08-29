@@ -27,6 +27,7 @@
 import { extractQuantities } from "./search-discovery.js";
 import { canonicalUnit, unitsCompatible, convertUnit } from "./field-units.js";
 import { bucketFor } from "./field-bucket.js";
+import { verifyShard } from "./integrity.js";
 
 // ---------------------------------------------------------------------------
 // Query rewrites.
@@ -606,7 +607,9 @@ export async function loadFields(tileId, group) {
       try {
         const r = await fetch(`data/fields/${bucket}.json`, { credentials: "omit" });
         if (!r.ok) return null;
-        const json = await r.json();
+        const text = await r.text();
+        await verifyShard("fields", `${bucket}.json`, text);
+        const json = JSON.parse(text);
         return json && json.tiles ? json.tiles : null;
       } catch {
         return null;

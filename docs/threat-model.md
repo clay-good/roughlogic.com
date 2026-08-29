@@ -36,7 +36,9 @@ Controls:
 - Zero runtime dependencies. The site is plain HTML, CSS, and vanilla JavaScript.
 - Build-time tooling is minimal Node built-ins where possible.
 - Data shards are committed to the repository and reviewed in pull requests.
-- A startup integrity check (integrity.js) loads data/integrity.json and verifies SHA-256 of each per-folder manifest.json via SubtleCrypto. Mismatch produces a console error and a non-blocking banner naming the affected dataset, so a tampered shard is visible to the user before any calculation depends on it.
+- A startup integrity check (integrity.js) loads data/integrity.json and verifies SHA-256 of each per-folder manifest.json via SubtleCrypto. All 19 data folders are anchored there.
+- Each shard is then verified against the hash its own manifest records, by `verifyShard(folder, file, text)` in integrity.js, at every runtime fetch: the WMM coefficients, the historical commodity series, the real-estate loan-limit and FMR shards, the search alias / slot / preview shards, and the field-descriptor shards. Either failure produces a console error and a non-blocking banner naming the affected file, so a tampered shard is visible to the user before any calculation depends on it.
+- Until 2026-08-29 the second bullet was not true, though this document asserted it: nothing hashed a shard, so altering a data file while leaving its manifest alone produced no banner at all. Two shard folders (`search`, `fields`) were not anchored in data/integrity.json either, and all 46 of their recorded shard hashes were the placeholder string `"pending"` -- which satisfied check-manifests' "every listed shard has a recorded hash" while recording nothing. [scripts/check-integrity-coverage.mjs](../scripts/check-integrity-coverage.mjs) now fails the lint if any folder goes unanchored, any shard loses its hash, or any recorded hash stops matching the file, because verifyShard deliberately skips a shard with no recorded hash rather than accusing it.
 
 ### T3. Network exfiltration
 
@@ -54,7 +56,7 @@ Threat: A data shard is modified in transit or in a stale CDN cache and serves w
 
 Controls:
 - HTTPS enforced; HSTS preloaded with one-year max-age.
-- Subresource integrity is provided by the same-origin check and the per-manifest SHA-256 verified at startup.
+- Data-shard integrity is provided by the same-origin check, the per-manifest SHA-256 verified at startup, and the per-shard SHA-256 verified at fetch. The site's own HTML, CSS, and JavaScript carry no `integrity=` attribute; they are same-origin and covered by HTTPS and CSP, not by SRI.
 - Visible data version stamps on every reference utility view.
 
 ### T5. Clickjacking

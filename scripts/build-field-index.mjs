@@ -54,6 +54,7 @@
 // Derived, never authoritative: the renderers remain the single source of
 // truth and this file can be regenerated from them at any time.
 
+import { createHash } from "node:crypto";
 import { readFile, writeFile, mkdir, readdir } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -259,7 +260,7 @@ for (const [g, tiles] of [...shards].sort()) {
     );
     process.exit(1);
   }
-  written.push({ g, tiles: Object.keys(tiles).length, gz });
+  written.push({ g, tiles: Object.keys(tiles).length, gz, text });
   if (CHECK) {
     let existing = null;
     try { existing = await readFile(path, "utf8"); } catch { existing = null; }
@@ -290,9 +291,17 @@ if (!CHECK) {
 // data/<folder>/manifest.json is required of every data folder by
 // check-manifests (edition + asOf + a recorded hash per shard) and by
 // check-sw-precache (the manifest must be named in sw.js DATA_MANIFESTS).
-// Hashes are "pending", the same convention the generated alias shards use:
-// a pinned hash on a derived file churns every time its source changes, and
-// the drift gate below (--check) is what actually holds these honest.
+// Hashes are the real SHA-256 of each shard. They used to be "pending" -- the
+// same convention the alias shards used -- on the argument that a pinned hash
+// on a derived file churns whenever its source does. That is true and small
+// (the shards are committed, so they churn anyway), and the placeholder cost
+// two real things: check-manifests' "every listed shard has a recorded hash"
+// passed on a word, and integrity.js had nothing to verify a fetched shard
+// against. --check still gates the shard CONTENT; the hash gates the runtime.
+function sha256Hex(text) {
+  return createHash("sha256").update(text, "utf8").digest("hex");
+}
+
 const manifestPath = resolve(OUT_DIR, "manifest.json");
 const manifestText = JSON.stringify({
   name: "fields",
@@ -313,7 +322,7 @@ const manifestText = JSON.stringify({
     name: `Field descriptors, ${w.g} runtime shard (generated)`,
     gzip_size_bytes: w.gz,
   })),
-  hashes: Object.fromEntries(written.map((w) => [`${w.g}.json`, "pending"])),
+  hashes: Object.fromEntries(written.map((w) => [`${w.g}.json`, sha256Hex(w.text)])),
 }, null, 2) + "\n";
 
 // Deterministic view of the manifest for the --check comparison: every field

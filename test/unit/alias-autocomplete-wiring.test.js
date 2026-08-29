@@ -19,7 +19,11 @@ test("bindSearch lazy-loads the per-group alias shards via ensureAliases", async
   // Per-group shards (spec-v590 split remediation): every group's shard
   // fetches in parallel, with the privacy-preserving credentials posture
   // per spec §6.3, and folds in as it arrives.
-  assert.match(t, /fetch\("data\/search\/aliases-" \+ String\(g\)\.toLowerCase\(\) \+ "\.json",\s*\{\s*credentials:\s*"omit"\s*\}\)/);
+  // The shard filename is built once and reused for both the fetch and the
+  // integrity check, so the bytes verified are necessarily the bytes fetched.
+  assert.match(t, /const file = "aliases-" \+ String\(g\)\.toLowerCase\(\) \+ "\.json";/);
+  assert.match(t, /fetch\("data\/search\/" \+ file,\s*\{\s*credentials:\s*"omit"\s*\}\)/);
+  assert.match(t, /await verifyShard\("search", file, text\);/);
   assert.match(t, /const groups = \[\.\.\.new Set\(TOOLS\.map\(\(t\) => t\.group\)\)\];/);
   // ensureAliases is triggered on first focus (not at load) so the
   // home-view first paint is not delayed by an alias fetch. Since

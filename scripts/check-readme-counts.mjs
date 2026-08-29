@@ -55,23 +55,38 @@ async function liveCounts() {
   const coverage = JSON.parse(
     await readFile(resolve(ROOT, "test", "fixtures", "renderer-schema-coverage.json"), "utf8"),
   );
+  // docs/performance.md quotes the shape of the data pipeline. It said "117
+  // entries across 18 dataset folders" while the live figures were 119 and 19,
+  // and its module bullet said 24 against a live 57 -- enumerating three
+  // modules spec-v107 had already deleted. Derive both from the artefacts.
+  const expectedHashes = JSON.parse(
+    await readFile(resolve(ROOT, "scripts", "expected-hashes.json"), "utf8"),
+  );
+  const integrity = JSON.parse(await readFile(resolve(ROOT, "data", "integrity.json"), "utf8"));
   return {
     tiles, groups, modules, sitemap, gates,
     indexedTiles: indexed.size,
     schemaTiles: coverage.covered_count,
     unindexedTiles: tiles - indexed.size,
+    dataEntries: Object.keys(expectedHashes.hashes || {}).length,
+    dataFolders: Object.keys(integrity.manifests || {}).length,
   };
 }
 
 // For a label-anchored pattern, collect every number that precedes/follows
 // the stable label and assert each equals `expected`.
 function checkPattern(readme, re, expected, label, errors) {
+  // The label already names the file when it is not the README, and a message
+  // that opens "README:" while pointing at docs/performance.md is the same
+  // class of defect this gate exists to catch.
+  const where = /\(([^)]+\.md)\)/.exec(label);
+  const source = where ? where[1] : "README.md";
   let m, found = 0;
   while ((m = re.exec(readme))) {
     found++;
     const n = Number(String(m[1]).replace(/,/g, ""));
     if (n !== expected) {
-      errors.push(`README: "${m[0].replace(/\\n/g, "\\n").trim()}" states ${n}, but the live ${label} is ${expected}.`);
+      errors.push(`${source}: "${m[0].replace(/\\n/g, "\\n").trim()}" states ${n}, but the live ${label.replace(/\s*\([^)]+\.md\)$/, "")} is ${expected}.`);
     }
   }
   return found;
@@ -133,6 +148,12 @@ async function main() {
   checked += checkPattern(dataSources, /rather than the ([\d,]+) that carry a schema/g, live.schemaTiles, "schema-carrying tile count (docs/data-sources.md)", errors);
   checked += checkPattern(mcpReadme, /descriptors the website reads, which\s*\nexist for ([\d,]+) calculators/g, live.indexedTiles, "field-index tile count (mcp/README.md)", errors);
   checked += checkPattern(mcpReadme, /For the other ([\d,]+) it projects/g, live.unindexedTiles, "un-indexed tile count (mcp/README.md)", errors);
+
+  // docs/performance.md: the calc-module count and the data-pipeline shape.
+  const perf = await readFile(resolve(ROOT, "docs", "performance.md"), "utf8");
+  checked += checkPattern(perf, /\((\d+) `calc-\*\.js` files/g, live.modules, "calc-* module count (docs/performance.md)", errors);
+  checked += checkPattern(perf, /\*\*([\d,]+) integrity-checked entries/g, live.dataEntries, "integrity-checked entry count (docs/performance.md)", errors);
+  checked += checkPattern(perf, /entries across ([\d,]+) dataset folders/g, live.dataFolders, "dataset folder count (docs/performance.md)", errors);
 
   // Tile count: the /tools/ shell-diagram node and the prose "(N)".
   // ("static shells" also labels the /groups/ node, so anchor on the path.)

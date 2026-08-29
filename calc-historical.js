@@ -11,6 +11,7 @@
 // Strict no-alerts, no-subscriptions. Source and series ID are stamped on
 // every datapoint via the bundled shard.
 
+import { verifyShard } from "./integrity.js";
 import { DEBOUNCE_MS, debounce, makeSelect, makeNumber, fmt, attachExampleButton } from "./ui-fields.js";
 
 // Catalog of bundled commodity series. The `file` is the same-origin shard
@@ -119,7 +120,9 @@ async function loadCommodityShard(file) {
     try {
       const r = await fetch("data/historical/commodities/" + file, { cache: "default" });
       if (!r.ok) return null;
-      return await r.json();
+      const text = await r.text();
+      await verifyShard("historical", "commodities/" + file, text);
+      return JSON.parse(text);
     } catch {
       return null;
     }

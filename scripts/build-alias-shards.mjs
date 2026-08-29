@@ -26,6 +26,7 @@
 // Deterministic: output depends only on aliases.json + tools-data.js.
 // Pure read-and-write; no network, no third-party imports.
 
+import { createHash } from "node:crypto";
 import { readFile, writeFile, readdir, unlink } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -42,6 +43,10 @@ const CHECK = process.argv.includes("--check");
 function fail(msg) {
   console.error("build-alias-shards: " + msg);
   process.exit(1);
+}
+
+function sha256Hex(text) {
+  return createHash("sha256").update(text, "utf8").digest("hex");
 }
 
 function gzipSize(text) {
@@ -108,9 +113,19 @@ async function main() {
   const keptShards = (manifest.shards || []).filter(
     (s) => s.file !== "aliases.json" && !/^aliases-[a-z]\.json$/.test(s.file)
   );
+  // Everything in this folder that is NOT an alias shard -- slots.json and
+  // preview-map.json, written by other scripts. They carried "pending" too, so
+  // hash them off disk here; this script is the only writer of this manifest,
+  // and check-integrity-coverage fails the lint if a later regeneration of one
+  // of those files leaves its hash behind.
   const keptHashes = {};
-  for (const [k, v] of Object.entries(manifest.hashes || {})) {
-    if (k !== "aliases.json" && !/^aliases-[a-z]\.json$/.test(k)) keptHashes[k] = v;
+  for (const k of Object.keys(manifest.hashes || {})) {
+    if (k === "aliases.json" || /^aliases-[a-z]\.json$/.test(k)) continue;
+    try {
+      keptHashes[k] = sha256Hex(await readFile(resolve(SEARCH_DIR, k), "utf8"));
+    } catch {
+      keptHashes[k] = (manifest.hashes || {})[k];
+    }
   }
   const aliasShardEntries = letters.map((l) => {
     const file = "aliases-" + l.toLowerCase() + ".json";
@@ -129,9 +144,16 @@ async function main() {
     ...aliasShardEntries,
     ...keptShards,
   ];
+  // Real SHA-256 per shard, not the old "pending" placeholder. The placeholder
+  // satisfied check-manifests' "every listed shard has a recorded hash" while
+  // recording nothing, and it left the runtime with no way to tell a tampered
+  // alias shard from a good one: integrity.js's verifyShard has to look the
+  // hash up here. The churn objection that motivated "pending" is real but
+  // small -- these shards are committed, so they already churn whenever the
+  // catalog moves, and the hash line churns with them, no more often.
   manifest.hashes = {
-    "aliases.json": (manifest.hashes || {})["aliases.json"] || "pending",
-    ...Object.fromEntries(aliasShardEntries.map((s) => [s.file, "pending"])),
+    "aliases.json": sha256Hex(masterRaw),
+    ...Object.fromEntries([...expected].map(([file, content]) => [file, sha256Hex(content)])),
     ...keptHashes,
   };
   const manifestOut = JSON.stringify(manifest, null, 2) + "\n";

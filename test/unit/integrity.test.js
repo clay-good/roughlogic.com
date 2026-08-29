@@ -124,3 +124,46 @@ test("verifyManifestIntegrity checks every folder recorded in integrity.json", a
     );
   }
 });
+
+// --- verifyShard: the shards themselves, not just the manifest ---
+//
+// The startup pass above only ever proved a manifest was the build's own. A
+// tampered shard with an untouched manifest produced no banner, which is not
+// what docs/threat-model.md says happens. These three cases pin the fix: a
+// good shard is silent, a flipped byte banners, and a shard the manifest does
+// not list is skipped rather than falsely accused.
+
+test("verifyShard passes a shard whose bytes match the manifest hash", async () => {
+  const shard = JSON.stringify({ rows: [1, 2, 3] }) + "\n";
+  const manifestText = JSON.stringify({ name: "realestate", hashes: { "loan-limits.json": sha256Hex(shard) } });
+  const { main } = setupGlobals({ manifests: {} }, { realestate: manifestText });
+  const mod = await import("../../integrity.js?case=shard-ok");
+  const r = await mod.verifyShard("realestate", "loan-limits.json", shard);
+  assert.equal(r.ok, true);
+  assert.equal(r.skipped, false);
+  assert.equal(main.children.length, 0, "a good shard must not banner");
+});
+
+test("verifyShard flags a shard with a flipped byte and banners", async () => {
+  const shard = JSON.stringify({ rows: [1, 2, 3] }) + "\n";
+  const tampered = shard.replace("3", "9");
+  assert.notEqual(tampered, shard, "seed must actually change the shard");
+  const manifestText = JSON.stringify({ name: "realestate", hashes: { "loan-limits.json": sha256Hex(shard) } });
+  const { main } = setupGlobals({ manifests: {} }, { realestate: manifestText });
+  const mod = await import("../../integrity.js?case=shard-bad");
+  const r = await mod.verifyShard("realestate", "loan-limits.json", tampered);
+  assert.equal(r.ok, false);
+  assert.equal(r.mismatch.reason, "shard-hash-mismatch");
+  assert.equal(r.mismatch.expected, sha256Hex(shard));
+  assert.ok(main.children[0].textContent.includes("loan-limits.json"));
+});
+
+test("verifyShard skips a shard the manifest does not record", async () => {
+  const manifestText = JSON.stringify({ name: "realestate", hashes: {} });
+  const { main } = setupGlobals({ manifests: {} }, { realestate: manifestText });
+  const mod = await import("../../integrity.js?case=shard-unlisted");
+  const r = await mod.verifyShard("realestate", "not-in-manifest.json", "anything");
+  assert.equal(r.skipped, true);
+  assert.equal(r.ok, true);
+  assert.equal(main.children.length, 0, "an unrecorded shard must not banner");
+});

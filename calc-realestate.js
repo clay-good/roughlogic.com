@@ -12,6 +12,7 @@
 // Every tile carries GOVERNANCE.real_estate ("lender governs final
 // underwriting; appraiser governs final value") in citations.js.
 
+import { verifyShard } from "./integrity.js";
 import { DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeOutputLine, attachExampleButton, fmt } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
@@ -1510,7 +1511,9 @@ async function loadShard(file) {
     try {
       const r = await fetch("data/realestate/" + file, { cache: "default" });
       if (!r.ok) return null;
-      return await r.json();
+      const text = await r.text();
+      await verifyShard("realestate", file, text);
+      return JSON.parse(text);
     } catch {
       return null;
     }

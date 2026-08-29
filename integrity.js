@@ -57,6 +57,48 @@ export async function verifyManifestIntegrity() {
   return { skipped: false, mismatches };
 }
 
+// Per-shard verification. The startup pass above only proves each folder's
+// manifest.json is the one the build produced; it never looks at the shards,
+// so an altered data file with an untouched manifest used to load unnoticed.
+// verifyShard closes that: the caller hands over the exact text it fetched and
+// the manifest's recorded hash decides. Non-blocking, like the startup pass --
+// refusing the data would turn a stale service-worker cache into a dead
+// calculator. scripts/check-integrity-coverage.mjs keeps the recorded hash set
+// complete; docs/threat-model.md has the history.
+const manifestCache = new Map();
+
+async function loadManifest(folder) {
+  if (!manifestCache.has(folder)) {
+    manifestCache.set(folder, (async () => {
+      try {
+        const r = await fetch("data/" + folder + "/manifest.json", { cache: "default" });
+        if (!r.ok) return null;
+        return JSON.parse(await r.text());
+      } catch {
+        return null;
+      }
+    })());
+  }
+  return manifestCache.get(folder);
+}
+
+export async function verifyShard(folder, file, text) {
+  if (!globalThis.crypto || !crypto.subtle || typeof crypto.subtle.digest !== "function") {
+    return { skipped: true, ok: true };
+  }
+  const m = await loadManifest(folder);
+  // No recorded hash is not a failure: inventing a mismatch would banner the
+  // innocent. The coverage gate is what makes the recorded set complete.
+  const want = m && m.hashes && m.hashes[file];
+  if (!want) return { skipped: true, ok: true };
+  const got = await sha256Hex(text);
+  if (got === want) return { skipped: false, ok: true };
+  const mismatch = { folder, file, reason: "shard-hash-mismatch", expected: want, got };
+  showIntegrityBanner([{ folder: folder + "/" + file, reason: "shard-hash-mismatch" }]);
+  console.error("integrity: shard failed verification", mismatch);
+  return { skipped: false, ok: false, mismatch };
+}
+
 async function sha256Hex(s) {
   const enc = new TextEncoder().encode(s);
   const buf = await crypto.subtle.digest("SHA-256", enc);

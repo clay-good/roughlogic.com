@@ -6,7 +6,7 @@
 // only what the home view needs (this module + integrity.js). Calculator
 // renderers, hash-state, data-stamp, and pure-math come in dynamically
 // when the user opens a tool.
-import { verifyManifestIntegrity } from "./integrity.js";
+import { verifyManifestIntegrity, verifyShard } from "./integrity.js";
 import { parseHashRoute } from "./routing.js";
 import { leadSentence, restOfDescription } from "./text-lead.js";
 
@@ -794,9 +794,12 @@ function bindSearch() {
     const groups = [...new Set(TOOLS.map((t) => t.group))];
     await Promise.all(groups.map(async (g) => {
       try {
-        const r = await fetch("data/search/aliases-" + String(g).toLowerCase() + ".json", { credentials: "omit" });
+        const file = "aliases-" + String(g).toLowerCase() + ".json";
+        const r = await fetch("data/search/" + file, { credentials: "omit" });
         if (!r.ok) return;
-        const json = await r.json();
+        const text = await r.text();
+        await verifyShard("search", file, text);
+        const json = JSON.parse(text);
         if (!json || !Array.isArray(json.aliases)) return;
         const rows = [];
         for (const row of json.aliases) {
@@ -842,7 +845,8 @@ function bindSearch() {
     if (slotsByTile || slotsLoading) return;
     slotsLoading = true;
     fetch("data/search/slots.json", { credentials: "omit" })
-      .then((r) => (r.ok ? r.json() : null))
+      .then((r) => (r.ok ? r.text() : null))
+      .then(async (t) => (t === null ? null : (await verifyShard("search", "slots.json", t), JSON.parse(t))))
       .then((json) => {
         if (!json || !Array.isArray(json.tiles)) return;
         slotsByTile = new Map();
@@ -887,7 +891,8 @@ function bindSearch() {
     if (previewMap || previewLoading) return;
     previewLoading = true;
     fetch("data/search/preview-map.json", { credentials: "omit" })
-      .then((r) => (r.ok ? r.json() : null))
+      .then((r) => (r.ok ? r.text() : null))
+      .then(async (t) => (t === null ? null : (await verifyShard("search", "preview-map.json", t), JSON.parse(t))))
       .then((json) => {
         if (!json || !json.tiles) return;
         previewMap = json.tiles;

@@ -1,6 +1,7 @@
 // Group P: Field, Backcountry, and SAR (utilities 227-232).
 // See spec-v4.md section 2.7.
 
+import { verifyShard } from "./integrity.js";
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeText, makeTextarea,
   makeOutputLine, attachExampleButton, fmt,
@@ -1028,7 +1029,11 @@ async function loadWmmCoefficients() {
     try {
       const res = await fetch("data/field/wmm/coefficients.json", { cache: "default" });
       if (!res.ok) return null;
-      return await res.json();
+      const text = await res.text();
+      // The boot check proves data/field/manifest.json is the build's own; it
+      // never looked at the shard the declination actually comes from.
+      await verifyShard("field", "wmm/coefficients.json", text);
+      return JSON.parse(text);
     } catch {
       return null;
     }

@@ -6,6 +6,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The integrity check never looked at a shard.** `integrity.js` verified each `data/<folder>/manifest.json` against `data/integrity.json` and stopped there. Every shard fetch on the site went straight from `fetch` to `JSON.parse`, so altering a data file while leaving its manifest alone produced no banner at all -- even though the manifest already records that shard's SHA-256, and docs/threat-model.md said a tampered shard is visible to the user before any calculation depends on it.
+
+  Two more gaps sat behind it. `data/search` and `data/fields` were not in `data/integrity.json`, so their manifests were never verified either; and all 46 of their recorded shard hashes were the literal string `"pending"`, which satisfied check-manifests' "every listed shard has a recorded hash" while recording nothing.
+
+  `verifyShard(folder, file, text)` now decides, and every runtime shard fetch calls it: the WMM coefficients, the historical commodity series, the loan-limit and FMR shards, the search alias / slot / preview shards, and the field-descriptor shards. Both generators write real hashes. Both folders are anchored. Verified in a browser against a deliberately altered alias shard: the banner names `search/aliases-e.json (shard-hash-mismatch)` and search keeps working, which is the intended non-blocking posture -- refusing the data would turn a stale service-worker cache into a dead calculator.
+
+  New gate `scripts/check-integrity-coverage.mjs` (lint 48 -> 49) holds it: every data folder anchored with a current hash, every shard carrying a real SHA-256 that matches the file, no placeholder anywhere. It has to exist because `verifyShard` skips a shard with no recorded hash rather than accusing it, so the check is only worth as much as the recorded set is complete. Seed-verified three ways: a flipped byte in `loan-limits.json`, a restored `"pending"`, and an un-anchored folder each fail it, and `check-manifests` passes the placeholder that this one rejects.
+
+- **docs/performance.md described a catalog two thirds smaller than the one that shipped.** It said 24 `calc-*.js` modules against a live 57, and enumerated three that spec-v107 deleted; and 117 integrity-checked entries across 18 dataset folders against 119 across 19. `check-readme-counts` now pins all three, so the doc cannot drift again, and its error messages name the file they actually read instead of always saying "README".
+
 - **A gate reported 2,860 tiles swept, in a catalog of 1,804.** `check-tile-contract` iterates worked-example rows, and a calculator can publish several, so it was reporting its row count as a tile count and overstating catalog coverage by more than half. Nothing was wrong with the sweep itself; the line describing it was. It now reads "2,860 worked-example row(s) across 1,804 calculators", which is what it actually did.
 
   Same class as the correctness-contract claims corrected earlier in this release: a message that says something other than what it measures, in output an auditor would quote.
