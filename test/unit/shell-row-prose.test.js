@@ -31,9 +31,28 @@ test("a row too long to print keeps the first row and says how many follow", () 
   assert.ok(out.length <= 120, `degraded value is still ${out.length} chars`);
 });
 
+test("an array of bare values reads as the comma-separated list the field takes", () => {
+  // These were left as JSON on the grounds that they are not a table of
+  // labelled fields. True, but they are not JSON to the reader either:
+  // `search-probability` ships its own box pre-filled with the string
+  // "30, 40, 50" while the page printed `[30,40,50]`, a form that field would
+  // not take as typed, and three more captions say "comma-separated" outright.
+  assert.equal(exampleValue([30, 40, 50]), "30, 40, 50");
+  assert.equal(exampleValue([12000, 17000, 17000]), "12000, 17000, 17000");
+});
+
+test("a bare object of scalars reads as one row of labelled fields", () => {
+  assert.equal(exampleValue({ water_closet_private: 1, lavatory: 2 }),
+    "water closet private 1, lavatory 2");
+  // ...but only when the keys are field NAMES. `box-fill` is keyed by wire
+  // size, where the key is data and "12 6" would read as nonsense.
+  assert.match(exampleValue({ 12: 6 }), /^\{/);
+});
+
 test("shapes prose cannot read still fall back rather than guess", () => {
-  // Nested rows and arrays of bare values are not a table of fields; JSON is
-  // still the honest rendering for them.
+  // A nested row is not a table of flat fields; JSON is still honest for it.
   assert.match(exampleValue([{ a: { b: 1 } }]), /^\[/);
-  assert.match(exampleValue([1, 2, 3]), /^\[/);
+  // And a value that already contains the separator would be ambiguous read
+  // back as a list.
+  assert.match(exampleValue(["a,b", "c"]), /^\[/);
 });

@@ -239,8 +239,27 @@ function structuredValue(raw) {
   // page gave them something they cannot read and would never paste, on 38
   // rows across 45 pages. Read it back as prose in the same words the fields
   // use, and it says the same thing in less room.
+  // An array of bare values is a comma-separated LIST, and the field says so:
+  // `search-probability` ships its own box pre-filled with the string
+  // "30, 40, 50", while the page printed `[30,40,50]` -- a form that field
+  // would not take as typed. Three more captions say "comma-separated" or
+  // "comma or space separated" outright. So render the separator the reader
+  // uses, not the JSON the value happens to be stored as.
+  const list = bareListAsProse(raw);
+  if (list && list.length <= STRUCTURED_CAP) return list;
   const prose = rowsAsProse(raw);
   if (prose && prose.length <= STRUCTURED_CAP) return prose;
+  // A bare object of scalars is one row of labelled fields, so it reads the
+  // same way: `sanitary-dfu` says "water closet private 1, lavatory 2" rather
+  // than a quoted map. Only when every key is an IDENTIFIER, though --
+  // `box-fill` is keyed by wire size (`{"12": 6}`), where the key is data and
+  // "12 6" would read as nonsense.
+  if (raw && typeof raw === "object" && !Array.isArray(raw)
+      && Object.keys(raw).length > 0
+      && Object.keys(raw).every((k) => /^[A-Za-z_][\w]*$/.test(k))) {
+    const one = rowsAsProse([raw]);
+    if (one && one.length <= STRUCTURED_CAP) return one;
+  }
   const json = JSON.stringify(raw, (k, x) => (typeof x === "number" ? readableNumber(x) : x));
   if (json.length <= STRUCTURED_CAP) return json;
   if (Array.isArray(raw)) {
@@ -255,6 +274,21 @@ function structuredValue(raw) {
     return rest > 0 ? `${head}, and ${rest} more` : `${head}`;
   }
   return shapeOf(raw);
+}
+
+// "12000, 17000, 17000" for an array of plain numbers or strings -- the form
+// the field itself is filled with. Returns null for anything else (a row of
+// labelled fields, a nested shape) so the readers below still get their turn.
+function bareListAsProse(raw) {
+  if (!Array.isArray(raw) || raw.length === 0) return null;
+  const out = [];
+  for (const v of raw) {
+    if (v === null || typeof v === "object") return null;
+    if (typeof v === "number") { if (!Number.isFinite(v)) return null; out.push(String(readableNumber(v))); }
+    else if (typeof v === "string") { if (v.includes(",")) return null; out.push(v); }
+    else return null;
+  }
+  return out.join(", ");
 }
 
 // "cfm 4, duty cycle 0.5; cfm 3, duty cycle 0.4" for an array of flat rows,

@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A list input printed as JSON on the page while the calculator's own box showed commas.** `search-probability` ships its field pre-filled with the string `30, 40, 50`; the tile page printed `[30,40,50]`, a form that field would not accept as typed. Three more captions say "comma-separated" or "comma or space separated" outright, and printed a bracketed array underneath. 13 rows across 12 pages.
+
+  Arrays of bare values now read as the separated list the field takes. This revisits a deliberate earlier choice, which left them as JSON on the grounds that they are not a table of labelled fields: true, but they are not JSON to the reader either, and the field's own default value settles what the right form is.
+
+  A bare object of scalars now reads as one row of labelled fields too, so `sanitary-dfu` says "water closet private 1, lavatory 1, bathtub 1". Only where every key is a field NAME: `box-fill` is keyed by wire size (`{"12": 6}`), where the key is data and "12 6" would read as nonsense, so it stays as it was. `rebar-schedule` keeps its JSON as well, because one of its values is a nested array rather than a scalar. Both refusals are pinned by tests.
+
 - **The agent door now hands back the word for a yes/no answer.** `run_calculator` returned `pmi_required: false` and nothing else, so a caller had to invent its own wording for a question the calculator already answers in words. It now returns the calculator's own string, `"No"`, beside the raw boolean.
 
   This is the one output a hand-written renderer's display can be given without rebuilding it. Both words are literals in the renderer, so the string for the state a result is in is verbatim what the page prints; checked against the rendered pages, 15 of 15 identical. Numbers stay bare, for the reason recorded above: their affixes sit around an expression that may scale the value first.
