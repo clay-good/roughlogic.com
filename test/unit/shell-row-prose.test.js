@@ -5,7 +5,7 @@
 // accept pasted back. These pin the prose rendering that replaced it.
 import test from "node:test";
 import assert from "node:assert/strict";
-import { exampleValue } from "../../scripts/build-shells.mjs";
+import { exampleValue, exampleRows } from "../../scripts/build-shells.mjs";
 
 test("an array of flat rows reads as prose, not JSON", () => {
   assert.equal(
@@ -55,4 +55,25 @@ test("shapes prose cannot read still fall back rather than guess", () => {
   // And a value that already contains the separator would be ambiguous read
   // back as a list.
   assert.match(exampleValue(["a,b", "c"]), /^\[/);
+});
+
+test("a boolean with no renderer wording still reads as a word, not a digit", async () => {
+  // Some tiles publish a flag their renderer folds into a combined verdict line
+  // and never prints on its own, so there are no words of the calculator's to
+  // borrow: `gcwr-check` answered "Within both limits" with 1.
+  //
+  // The type comes from the COMPUTE, not from the digit on the page. A fixture
+  // records a boolean as 0 or 1, and by render time the type is gone -- and `0`
+  // is a legitimate count or factor on plenty of other rows, which is why this
+  // cannot be inferred from the value. build-shells asks each tile what its
+  // result keys actually are and passes the boolean ones in.
+  const flags = new Set(["ok"]);
+  assert.equal(exampleRows({ ok: { value: 1 } }, { ok: "Within both limits" }, null, null, null, flags),
+    "      <li><span>Within both limits</span> <b>Yes</b></li>");
+  assert.equal(exampleRows({ ok: { value: 0 } }, { ok: "Within both limits" }, null, null, null, flags),
+    "      <li><span>Within both limits</span> <b>No</b></li>");
+
+  // Without that signal the same 0 stays a 0: it could be a count.
+  assert.match(exampleRows({ n: { value: 0 } }, { n: "Fixture units" }, null, null, null, undefined),
+    /<b>0<\/b>/);
 });

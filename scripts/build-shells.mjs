@@ -184,6 +184,26 @@ async function addComputedExamples(byTile) {
   // enter grade 5 and then stopped, when the compute had the answer in hand
   // -- the band for the grade they entered. Where the compute returns a
   // flat, printable value beside the table, the page prints it.
+  // Which result keys are BOOLEAN, asked of the compute rather than inferred
+  // from the value on the page. A fixture records a boolean as 0 or 1, so by the
+  // time a row is rendered the type is gone -- and `0` could equally be a count
+  // or a factor, which is why this cannot be guessed from the digit. The
+  // renderers state the words for most booleans (bespoke-output-bools.js); this
+  // covers the rest, where a tile publishes a flag its renderer folds into a
+  // combined verdict line and never prints on its own. `gcwr-check` answered
+  // "Within both limits" with **1**.
+  for (const [id, row] of byTile) {
+    if (!row.inputs || !Object.keys(row.inputs).length) continue;
+    try {
+      const { run } = await import(new URL("../mcp/catalog.mjs", import.meta.url).href);
+      const out = await run({ id, inputs: { ...row.inputs } });
+      const result = out && out.result;
+      if (!result || typeof result !== "object") continue;
+      const flags = Object.keys(result).filter((k) => typeof result[k] === "boolean");
+      if (flags.length) booleanKeys.set(id, new Set(flags));
+    } catch { /* a tile that cannot run keeps its raw values */ }
+  }
+
   for (const [id, row] of byTile) {
     if (!row.inputs || !Object.keys(row.inputs).length) continue;
     if (row.outputs && Object.keys(row.outputs).length) continue;
@@ -492,11 +512,13 @@ function displayFor(display, val, raw, label) {
 // the MCP door cannot format the same number two different ways. Bound from the
 // dynamic import below rather than imported statically, to keep this script's
 // existing lazy-load of the catalog.
+// tile id -> Set of result keys the compute returns as booleans.
+const booleanKeys = new Map();
 let formatWithUnit = () => null;
 let withoutRepeat = (suffix) => suffix || "";
 let outputBooleans = () => ({});
 
-function exampleRows(obj, labels, displays, units, bools) {
+export function exampleRows(obj, labels, displays, units, bools, flags) {
   return Object.entries(obj || {})
     .map(([k, v]) => {
       const val = exampleValue(v);
@@ -514,8 +536,13 @@ function exampleRows(obj, labels, displays, units, bools) {
       // literally asked "PMI required?" and answered "0". The renderer states
       // both words itself, so the page says what the calculator says.
       const bool = bools && bools[k];
-      const asBool = bool && (raw === true || raw === false || raw === 0 || raw === 1)
-        ? (raw === true || raw === 1 ? bool.t : bool.f)
+      const isFlag = raw === true || raw === false || raw === 0 || raw === 1;
+      // The renderer's own words first; a plain Yes / No only where the compute
+      // says the key is a boolean and the renderer never gave it words of its
+      // own. Never inferred from the digit: `0` is a count on plenty of rows.
+      const asBool = !isFlag ? null
+        : bool ? (raw === true || raw === 1 ? bool.t : bool.f)
+        : (flags && flags.has(k)) ? (raw === true || raw === 1 ? "Yes" : "No")
         : null;
       const shown = (displays && displayFor(displays[k], val, raw, caption))
         || asBool
@@ -869,7 +896,7 @@ function tileShell(tool, tools, groupNames, relatedMap, examples, labels, outLab
         .filter((k, i, all) => all.indexOf(k) === i)
         .filter((k) => exampleValue((example.inputs || {})[k] ?? (example.outputs || {})[k]) !== "")
     : [];
-  const outputRows = example ? exampleRows(example.outputs, outLabels, outDisplays, outUnits, outBools) : "";
+  const outputRows = example ? exampleRows(example.outputs, outLabels, outDisplays, outUnits, outBools, booleanKeys.get(tool.id)) : "";
   const assumptionRows = (citation && Array.isArray(citation.assumptions) ? citation.assumptions : [])
     .map((a) => `      <li><span>${escapeHtml(a.name)}</span> <b>${escapeHtml(a.value)}</b><small>${escapeHtml(a.source)}</small></li>`)
     .join("\n");

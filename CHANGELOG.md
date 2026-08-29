@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The last seven bare-boolean answers now read as words too.** Earlier in this release the renderers' own yes/no wording was extracted, taking `PMI required? 0` to `No` and covering 48 calculators. Seven rows resisted, because those tiles publish a flag the renderer folds into a combined verdict line and never prints on its own: there were no words of the calculator's to borrow. `gcwr-check` answered **"Within both limits"** with **1**.
+
+  The obstacle was type, not wording. A fixture records a boolean as 0 or 1, so by render time the type is gone, and `0` is a legitimate count or factor on plenty of other rows. It was declined at the time for exactly that reason. The answer is to stop inferring: the page build now asks each calculator what its result keys actually are and renders a plain Yes / No only for the ones the compute reports as boolean, and only where the renderer supplied no wording of its own.
+
+  Answer rows printing a boolean as a bare digit: **22, then 7, now 0.**
+
 - **The correctness contract listed three of its eight verification phases as "planned". All three shipped and gate CI.** `docs/correctness.md` is the document that states what "verified" means for a calculator's answer, phase by phase. Phases B, C and D -- per-tile cross-check against published values, dimensional analysis, and domain-edge bounds -- were each marked `(planned)`. `check-cross-validation.mjs`, `check-dimensions.mjs` and `check-bounds.mjs` all exist, all run in `npm run lint`, and all pass. A reader assessing the correctness posture would have concluded three eighths of it was unbuilt.
 
   Phase B also named `test/unit/cross-validation.test.js`, which does not exist; the verification is done by the script. Checked every inline file path across the living docs for the same rot: 102 references, and the only other two dead ones are in `launch-checklist.md`, which declares itself a frozen per-release snapshot and correctly records suites retired years ago.
