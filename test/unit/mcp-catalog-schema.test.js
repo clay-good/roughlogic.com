@@ -669,3 +669,19 @@ test("a boolean answer is printed in the calculator's own words", async () => {
   // answer truncated mid-sentence, so the tile is refused rather than guessed.
   assert.ok(!outputBooleans("sprinkler-density").meets_minimum);
 });
+
+test("run returns the exact word for a boolean answer, and nothing invented for a number", async () => {
+  // A boolean is the one case where the door can hand back a display string
+  // without rebuilding anything: the renderer states both words as literals, so
+  // the string for this state is verbatim what the page prints.
+  const r = await run({ id: "ltv" });
+  const pmi = r.outputs.find((o) => o.key === "pmi_required");
+  assert.equal(pmi.display, "No");
+  assert.equal(r.result.pmi_required, false, "and it agrees with the raw result");
+
+  // Numbers stay bare. Their affixes sit around a display expression that may
+  // scale the value, so prefix + raw + suffix is not the page's string.
+  const ltv = r.outputs.find((o) => o.key === "ltv_percent");
+  assert.equal(ltv.display, null);
+  assert.equal(typeof r.result.ltv_percent, "number");
+});

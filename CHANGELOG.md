@@ -6,6 +6,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The agent door now hands back the word for a yes/no answer.** `run_calculator` returned `pmi_required: false` and nothing else, so a caller had to invent its own wording for a question the calculator already answers in words. It now returns the calculator's own string, `"No"`, beside the raw boolean.
+
+  This is the one output a hand-written renderer's display can be given without rebuilding it. Both words are literals in the renderer, so the string for the state a result is in is verbatim what the page prints; checked against the rendered pages, 15 of 15 identical. Numbers stay bare, for the reason recorded above: their affixes sit around an expression that may scale the value first.
+
 - **Four search tests raced the data they were asserting on, and went red on commits that touched no browser code.** The dropdown's ranking and its computed preview both depend on data the page fetches only on first interaction: 21 per-group alias shards, 256 KB in total, plus the slot and preview maps. The tests typed a query and asserted the top result immediately. On a loaded runner the shards outlast the 5-second default, so the assertion reported a ranking bug -- "asphalt tonnage 2400 sq ft" leading with a carpet takeoff -- that was really a fetch still in flight. Twice this made a green suite go red on commits confined to build scripts, fixtures and docs.
 
   Each now waits for the data it depends on, with the waiter registered before the interaction that triggers the fetch, since `waitForResponse` only sees responses attached after it. That is a precondition rather than a softened assertion: the ranking still has to be right once the data lands, and a genuine regression still fails.

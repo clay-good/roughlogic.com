@@ -84,6 +84,11 @@ worked example's result for `describe_calculator`, the caller's own result for
 answers.** The remaining 36 return them unlabelled; their captions are built by
 an expression a static read cannot follow.
 
+A boolean answer is the one case where a captioned output carries a `display`.
+The renderer states both words as literals (`flag ? "PASS" : "FAIL"`), so the
+string for the state a result is in is verbatim what the page prints, not a
+reconstruction. Numbers stay bare.
+
 Captioned outputs carry no `unit`. A hand-written renderer's answer wrapping is
 extracted as the prefix and suffix it literally is -- `"$"`, `" CFU/mL"`, but
 also `"eta^2 = "` -- and calling that a unit would be a guess. `outputUnits(id)`

@@ -814,7 +814,13 @@ export async function run({ id, inputs } = {}) {
     // captions name the numbers. Only keys this result actually carries are
     // reported, so a caption is never attached to an absent value.
     const captioned = captionedOutputs(await outputLabels(id), result);
-    // Deliberately no `display`. Rebuilding one as prefix + raw + suffix was
+    // A BOOLEAN answer is the exception, and it is not a reconstruction: the
+    // renderer states both words as literals (`flag ? "PASS" : "FAIL"`), so the
+    // string for the state this result is in is exactly what the page prints --
+    // verified against the rendered pages, 15 of 15 identical. Numbers are the
+    // ones that cannot be rebuilt.
+    //
+    // Deliberately no `display` for anything else. Rebuilding one as prefix + raw + suffix was
     // measured against the tile pages twice. The first attempt matched 892 of
     // 980 rows, and the misses were real defects -- an affix sitting around a
     // display expression that SCALES the value first, which is now recorded and
@@ -826,7 +832,15 @@ export async function run({ id, inputs } = {}) {
     // caption names the number, `result` is the number -- and invents nothing
     // in between. `outputUnits(id)` exposes the affixes for a caller that wants
     // to format its own.
-    if (captioned) out.outputs = captioned.map((o) => ({ ...o, unit: null, display: null }));
+    if (captioned) {
+      const words = outputBooleans(id);
+      out.outputs = captioned.map((o) => {
+        const v = result[o.key];
+        const w = words[o.key];
+        const display = (typeof v === "boolean" && w) ? (v ? w.t : w.f) : null;
+        return { ...o, unit: null, display };
+      });
+    }
   }
   // spec-v1190: advisory range warnings for caller-supplied numbers, and the
   // tile's limitation banner. A verified worked example is in-range by
