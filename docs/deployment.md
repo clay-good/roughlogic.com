@@ -46,7 +46,7 @@ its document root.
 2. https://securityheaders.com returns A+.
 3. The CSP blocks third-party connections in the browser console.
 4. The service worker registers and the page loads after going offline.
-5. Lighthouse CI in `.github/workflows/ci.yml` continues to pass on every push.
+5. The three CI jobs in `.github/workflows/ci.yml` continue to pass on every push. (A Lighthouse job stood here until 2026-08-23; it was removed over an unpatched advisory in `@lhci/cli`. See [performance.md](performance.md) for what gates performance now.)
 
 ## v0.2.0 release notes
 

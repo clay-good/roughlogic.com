@@ -1,8 +1,8 @@
 # Performance Budget
 
-roughlogic.com targets the same performance budget as encryptalotta and sophiewell, applied from v1. The build fails when any score drops below 95.
+roughlogic.com targets the same performance budget as encryptalotta and sophiewell, applied from v1. These are design targets: the Lighthouse job that asserted them was removed on 2026-08-23 over a dependency advisory, and "How the budget is enforced" below lists what actually gates a push.
 
-## Budget targets (Slow 4G in Chrome DevTools / Lighthouse mobile preset)
+## Budget targets (design; Slow 4G in Chrome DevTools / Lighthouse mobile preset)
 
 - First Contentful Paint (FCP) under 1.0 second
 - Largest Contentful Paint (LCP) under 1.5 seconds
@@ -12,7 +12,7 @@ roughlogic.com targets the same performance budget as encryptalotta and sophiewe
 - Total transfer size under 100 KB for the home view
 - Total transfer size under 250 KB for any utility view including its primary data shard
 
-## Scores
+## Scores (design targets; not measured in CI since 2026-08-23, see below)
 
 - Lighthouse Performance score >= 95
 - Lighthouse Accessibility score >= 95
@@ -21,7 +21,20 @@ roughlogic.com targets the same performance budget as encryptalotta and sophiewe
 
 ## How the budget is enforced
 
-`lighthouserc.json` configures Lighthouse CI with the assertions above. The GitHub Actions workflow `.github/workflows/ci.yml` runs Lighthouse CI on the home view and five representative utility views (Ohm's Law, Refrigerant P-T, Friction Loss, Color Codes, Service Load: picked to cover a v1 calculator, a Group H reference page, and a v2 dynamic-loaded calculator) on every push and pull request. The build fails if any assertion is violated.
+**Lighthouse CI no longer runs.** It was removed from `.github/workflows/ci.yml` on 2026-08-23 (commit 88e7ea7f) because `@lhci/cli`'s latest release still carries an unpatched high-severity archive-traversal advisory, and a build gate is not worth a known-vulnerable dependency in the pipeline. Nothing has measured a Lighthouse *score* since. The targets and scores listed above are the design budget, not a CI assertion; until 2026-08-29 this section said the build failed on them, which was not true after the removal. `lighthouserc.json` is kept so the assertions can be reinstated if the advisory clears.
+
+What does gate performance today, on every push:
+
+| gate | where | what fails the build |
+| --- | --- | --- |
+| `check-home-payload` | `npm run lint` | home-view total over 100 KB gzipped, or any per-asset sub-budget (HTML 20 KB / CSS 25 KB / JS 40 KB) |
+| `check-module-sizes` | `npm run lint` | any `calc-*.js` or support lib over its recorded gzip cap |
+| `check-shells` | integration job | any prerendered shell over its 6 KB / 68 KB gzip cap |
+| `perf.test.js` | integration job | home-view FCP / LCP / TBT / CLS past the hard-fail tier |
+
+`perf.test.js` measures under a harsher profile than the table above (Chrome's Slow-3G preset plus a 4x CPU throttle, not Slow 4G), so its numbers are deliberately looser, and it runs a documented three-tier policy: the spec-v10 §10.3 targets (FCP 1.5 s / LCP 2.5 s / TBT 200 ms / CLS 0.05) warn, a 10% drift against `test/perf-baseline.json` warns, and only egregious values (FCP 5 s / LCP 10 s / TBT 1,000 ms / CLS 0.25) fail. It covers the home view only -- the five representative utility views Lighthouse used to check are not measured by anything.
+
+`scripts/check-ci-claims.mjs` pins the job list in README.md to the jobs `ci.yml` actually defines, so a job removed for a good reason cannot leave a claim behind again.
 
 The home-view payload budget (100 KB after gzip) is enforced separately by `scripts/check-home-payload.mjs`, wired into `npm run lint`. The script gzips index.html, styles.css, app.js, integrity.js, theme.js, and routing.js (the files actually loaded on first paint; calculator modules and support libs are dynamic-imported on first tool open) and fails the build if the total exceeds 102400 bytes. As of 2026-08-29 (1,804 tiles) the home-view payload is **46,709 B** (45.6% of budget). Per spec-v10 §H.2 the per-asset sub-budgets are HTML 20 KB / CSS 25 KB / JS 40 KB; the JS sub-budget is the tightest at **67.6%** of cap (27,697 B of 40,960 B).
 
@@ -85,7 +98,7 @@ asserted ≥ 100 on the shell URLs per spec-v13 §12.3.
 
 ## Periodic review
 
-The maintainer re-runs Lighthouse CI on the live site after every release. If the budget is at risk, options in priority order:
+Because no CI job measures a Lighthouse score any more, the score check is a manual step: the maintainer runs Lighthouse against the live site after every release, from the browser's own DevTools panel rather than the `@lhci/cli` package the pipeline dropped. If the budget is at risk, options in priority order:
 
 1. Reduce the JS shipped on the home view (lazy-load more calculator modules behind dynamic import).
 2. Pre-compress data shards and serve from same-origin cache.
