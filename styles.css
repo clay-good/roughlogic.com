@@ -2112,3 +2112,12 @@ textarea.is-autofilled {
   color: var(--fg-dim);
   overflow-wrap: anywhere;
 }
+
+/* Deep-link layout reservation. See applyRoute() in app.js: a tile view lands
+   in two passes, so without a reserved height the footer jumps when the
+   calculator arrives. Measured CLS on a slow-3G deep link fell from 0.247 to
+   0.101 with the height held. Scoped to tool routes; the home view already
+   measures 0.000 and must not gain a scrollbar it does not need. */
+html[data-route="tool"] main {
+  min-height: 100vh;
+}

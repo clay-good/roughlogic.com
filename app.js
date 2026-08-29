@@ -344,11 +344,21 @@ function applyRoute() {
   if (state.route.view === "tool") {
     home.hidden = true;
     view.hidden = false;
+    // Reserve the page's height BEFORE the tile's content lands. A tile view
+    // builds in two passes -- title and lead synchronously, then the fields and
+    // answer once the renderer module resolves -- so on a deep link the footer
+    // sits high, then gets shoved down when the calculator arrives. Measured on
+    // slow-3G that was a CLS of 0.173 to 0.247 depending on the tile, against a
+    // 0.05 budget and Core Web Vitals' 0.25 "poor" line. Holding main at full
+    // viewport height for the duration of a tool route puts the footer where it
+    // will end up, so the later content fills reserved space instead of pushing.
+    document.documentElement.setAttribute("data-route", "tool");
     renderToolView(state.route.id, state.route.params);
     updateHeadForTool(state.route.id);
   } else {
     home.hidden = false;
     view.hidden = true;
+    document.documentElement.removeAttribute("data-route");
     clearChildren(view);
     updateHeadForHome();
   }

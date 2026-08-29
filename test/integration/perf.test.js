@@ -250,3 +250,87 @@ for (const shell of SHELLS) {
     await ctx.close();
   });
 }
+
+// --- SPA tile routes ---
+//
+// The hash routes a reader reaches from search and from a shared link. Neither
+// the home-view test nor the shell tests covered them, and that hid a real
+// defect: a tile view builds in two passes (title and lead synchronously, then
+// fields and answer once the renderer module resolves), so the footer sat high
+// and got shoved down when the calculator arrived. Measured CLS on slow-3G was
+// 0.173 / 0.180 / 0.247 for the three routes below -- against a 0.05 budget,
+// with 0.25 the Core Web Vitals "poor" line. Reserving the page height for the
+// duration of a tool route (applyRoute + the html[data-route="tool"] rule in
+// styles.css) took them to 0.056 / 0.060 / 0.101.
+//
+// The CLS thresholds are deliberately set between those two ranges. A hard tier
+// at 0.25 would have sat above the defect it exists to catch, which is a
+// threshold that looks like a gate and is not one; 0.15 is above the worst
+// measured value today and below the best value before the fix, so the
+// regression that motivated this test would fail it.
+const SPA_ROUTES = [
+  { url: "/index.html#wire-ampacity", label: "v1 calculator" },
+  { url: "/index.html#friction-loss", label: "lazy-loaded module" },
+  { url: "/index.html#manual-j-cooling", label: "Web Worker tile" },
+];
+// These run on the faster profile lighthouserc.json used (1,638 kbps / 150 ms
+// RTT, same 4x CPU throttle), not slow-3G. The shift being measured comes from
+// the STAGED ARRIVAL of the SPA's modules, not from how slow each stage is, so
+// the profile does not change the number: both routes give the same CLS to
+// three decimals on either profile. What it changes is the cost. A cold deep
+// link blocks on tools-data.js -- 398 KB of catalog the page needs one row of
+// -- which took 17.9 s of the 23 s on slow-3G. Three specs each holding a
+// throttled context that long starved the worker pool and made unrelated specs
+// time out in newPage(). On this profile the same measurement takes 8.3 s.
+const SPA_NET = {
+  offline: false,
+  downloadThroughput: (1638.4 * 1024) / 8,
+  uploadThroughput: (768 * 1024) / 8,
+  latency: 150,
+};
+const SPA_CLS_ADVISORY = 0.12;
+const SPA_CLS_HARD = 0.15;
+const SPA_FCP_ADVISORY_MS = 2000;
+const SPA_FCP_HARD_MS = 4000;
+
+for (const route of SPA_ROUTES) {
+  test(`perf: ${route.url} holds its layout on a staged load`, async ({ browser }) => {
+    const ctx = await browser.newContext();
+    const p = await ctx.newPage();
+    const cdp = await ctx.newCDPSession(p);
+    await cdp.send("Network.enable");
+    await cdp.send("Network.emulateNetworkConditions", SPA_NET);
+    await cdp.send("Emulation.setCPUThrottlingRate", { rate: CPU_THROTTLE });
+
+    // Not networkidle. Under this profile that waits out the whole catalog and
+    // holds a throttled context open for ~24 s, three times over -- enough to
+    // starve the worker pool and make unrelated specs time out in newPage().
+    // What this test needs is the tile's LATE content, because the shift being
+    // measured is the second render pass landing. Waiting for the proof block
+    // (appended once the renderer module resolves) and then letting
+    // captureVitals settle for its second covers the same window in a third of
+    // the time. Verified to produce the same CLS values as networkidle did.
+    await p.goto(route.url, { waitUntil: "load" });
+    await p.locator("#view-region details.proof").waitFor({ state: "attached", timeout: 25_000 });
+    const v = await captureVitals(p);
+    console.log(`perf vitals (SPA route ${route.label} ${route.url} / fast-3G):`, JSON.stringify(v));
+
+    // The reservation itself, asserted directly. If applyRoute stops setting
+    // the attribute, or the rule is dropped from styles.css, the CLS numbers
+    // would drift back slowly and confusingly; this says why in one line.
+    const reserved = await p.evaluate(() => document.documentElement.getAttribute("data-route"));
+    expect(reserved, "a tool route must mark the document so main reserves its height").toBe("tool");
+
+    if (v.cls > SPA_CLS_ADVISORY) {
+      console.warn(`perf WARN: ${route.url} CLS ${v.cls} over advisory ${SPA_CLS_ADVISORY}`);
+    }
+    if (v.fcp_ms > SPA_FCP_ADVISORY_MS) {
+      console.warn(`perf WARN: ${route.url} FCP ${v.fcp_ms} over advisory ${SPA_FCP_ADVISORY_MS}`);
+    }
+
+    expect(v.cls, `${route.url} CLS exceeded hard-fail threshold`).toBeLessThan(SPA_CLS_HARD);
+    expect(v.fcp_ms, `${route.url} FCP exceeded hard-fail threshold`).toBeLessThan(SPA_FCP_HARD_MS);
+
+    await ctx.close();
+  });
+}
