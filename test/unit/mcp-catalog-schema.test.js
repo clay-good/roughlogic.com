@@ -698,9 +698,15 @@ test("a curated alias corroborates the calculator it is curated for", async () =
   // Over a 300-term sample of the corpus, 70 questions came back NO_MATCH and
   // in 65 of them the ranker's top hit was already the alias's own target.
   const { answerQuery } = await import("../../mcp/catalog.mjs");
-  const r = await answerQuery({ query: "romex ampacity" });
+  // The query has to be one ONLY the alias path can corroborate. "romex
+  // ampacity" was the first choice and was a bad one: the tile it reaches is
+  // named "...Ampacity...", so the name check already corroborated it and the
+  // test passed with the alias path deleted. This phrasing shares no word with
+  // its calculator's name and carries no values, so the curated mapping is the
+  // only thing that can vouch for it.
+  const r = await answerQuery({ query: "how far will a stream reach" });
   assert.notEqual(r.status, "NO_MATCH", "a curated phrasing resolves to its calculator");
-  assert.ok(r.id, "and names which one");
+  assert.equal(r.id, "projectile-range");
 
   // The guard still holds where nothing corroborates: no values, no name, and
   // no curated mapping to the tile that ranked first.

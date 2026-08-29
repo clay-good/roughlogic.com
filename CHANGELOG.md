@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A test guarding this release's `answer_query` change passed with the change deleted.** Mutation-testing this release's own work found it: remove the curated-alias corroboration and the test still went green. Its query was `"romex ampacity"`, and the calculator it reaches is named "...Ampacity...", so the name check already vouched for it. The alias path was never what made that test pass.
+
+  It now uses `"how far will a stream reach"`, which shares no word with the name of the calculator it reaches (`projectile-range`) and carries no values, so the curated mapping is the only thing that can corroborate it. Verified red with the corroboration removed and green with it.
+
+  The remaining behaviour changes in this release were mutation-tested too, and all six are genuinely caught: the display scale, the bare-list rendering, the object-to-prose rendering, the boolean type fallback, the boolean wording, and the captioned-outputs fallback.
+
 - **Two thirds of an earlier fix in this release had no test at all.** The lazy-loader repair released three latches so a failed fetch is retried. Only the alias one was pinned. Deleting `slotsLoading = false` and `previewLoading = false` broke **nothing**: 6,392 unit tests and all 26 search specs stayed green, so a revert would have been silent.
 
   The preview latch now has a spec, verified in both directions: it passes normally and fails with the release removed.
