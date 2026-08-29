@@ -6,6 +6,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A gate reported 2,860 tiles swept, in a catalog of 1,804.** `check-tile-contract` iterates worked-example rows, and a calculator can publish several, so it was reporting its row count as a tile count and overstating catalog coverage by more than half. Nothing was wrong with the sweep itself; the line describing it was. It now reads "2,860 worked-example row(s) across 1,804 calculators", which is what it actually did.
+
+  Same class as the correctness-contract claims corrected earlier in this release: a message that says something other than what it measures, in output an auditor would quote.
+
 - **The readable-type gate had never actually checked the prerendered shells.** It visits `/tools/ohms-law/` and `/groups/electrical/` by name, but the dev server answered **403** for those directory URLs, so the sweep found no elements there and passed. Two of its three static targets were silently empty for as long as it has existed. Fixing the dev server (above) un-blinded it, and it failed immediately.
 
   One real violation, and it is exactly the class this gate was built for: a `<code>` with no font-size rule of its own renders at the browser's monospace default, about **13 px**, below even the 0.9375rem meta floor. The API field-name line on every tile shell ("Field names used by the API: `V`, `I`, `R`, `P`") was doing that. Shell `<code>` is now set at the reading floor rather than the meta one, because `.shell-source` also carries the citation line, which is reference prose a person reads.

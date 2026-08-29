@@ -66,7 +66,7 @@ try {
   process.exit(1);
 }
 
-const { tier1, tier2, ran, skipped } = result;
+const { tier1, tier2, ran, tiles, skipped } = result;
 const currentSigs = new Set(tier2.map((r) => r.sig));
 
 if (UPDATE) {
@@ -82,7 +82,7 @@ if (UPDATE) {
     sigs,
   };
   writeFileSync(BASELINE, JSON.stringify(payload, null, 2) + "\n");
-  console.log(`check-tile-contract: baseline rewritten - ${sigs.length} Tier-2 entries across ${ran} tiles.`);
+  console.log(`check-tile-contract: baseline rewritten - ${sigs.length} Tier-2 entries across ${ran} row(s) / ${tiles} calculators.`);
   process.exit(0);
 }
 
@@ -112,7 +112,7 @@ if (regressions.length > 0) {
 if (failed) process.exit(1);
 
 // Green. Report the standing backlog and any newly-cleared entries.
-console.log(`check-tile-contract OK: ${ran} tiles swept (${skipped} unregistered), 0 Tier-1 crashers, ${currentSigs.size} Tier-2 backlog entr${currentSigs.size === 1 ? "y" : "ies"} (baseline ${baseline.sigs.length}).`);
+console.log(`check-tile-contract OK: ${ran} worked-example row(s) across ${tiles} calculators swept (${skipped} unregistered row(s)), 0 Tier-1 crashers, ${currentSigs.size} Tier-2 backlog entr${currentSigs.size === 1 ? "y" : "ies"} (baseline ${baseline.sigs.length}).`);
 if (cleared.length > 0) {
   console.log(`  ${cleared.length} baseline entr${cleared.length === 1 ? "y" : "ies"} now cleared - tighten the ratchet with: node scripts/check-tile-contract.mjs --update-baseline`);
 }

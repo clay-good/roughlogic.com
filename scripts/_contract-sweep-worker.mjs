@@ -6,10 +6,11 @@
 import { parentPort } from "node:worker_threads";
 import { runContractSweep } from "../test/fixtures/tile-contract.js";
 
-const { tier1, tier2, ran, skipped } = await runContractSweep();
+const { tier1, tier2, ran, tiles, skipped } = await runContractSweep();
 parentPort.postMessage({
   tier1: tier1.map((r) => ({ sig: r.sig, message: r.message })),
   tier2: tier2.map((r) => ({ sig: r.sig, message: r.message })),
   ran,
+  tiles,
   skipped,
 });

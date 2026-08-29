@@ -154,12 +154,18 @@ export async function runContractSweep() {
   const records = [];
   let ran = 0;
   let skipped = 0;
+  // Rows, not tiles: a tile can publish several worked examples, so the sweep
+  // runs 2,860 rows across 1,804 calculators. Both are reported, because
+  // quoting the row count as a tile count overstates catalog coverage by half.
+  const tiles = new Set();
   for (const row of rows) {
     if (!COMPUTE_MAP[row.tile_id]) { skipped += 1; continue; }
     records.push(...(await sweepRow(row)));
+    tiles.add(row.tile_id);
     ran += 1;
   }
   return {
+    tiles: tiles.size,
     records,
     tier1: records.filter((r) => r.tier === 1),
     tier2: records.filter((r) => r.tier === 2),
