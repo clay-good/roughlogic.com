@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The dev server refused the site's own canonical URLs.** `/tools/voltage-drop/` -- the shape this site publishes in its sitemap, its JSON-LD and every shell's `<link rel=canonical>` -- answered **403** locally. Only `/` was mapped to an index; every other directory fell through to a "not a file" refusal. It works in production, where the edge resolves a directory, so the two differed exactly where a maintainer is most likely to go looking at a shell.
+
+  Found by trying to use it: opening a tile page in a browser to eyeball the boolean rendering from earlier in this release, and getting an empty pane.
+
+  Directories now resolve to `index.html` as the edge does. The traversal guards are re-run against the file actually served rather than the directory that was asked for, so the resolved `index.html` gets the same containment, symlink and realpath checks any other path would. Probed: encoded traversal, relative traversal and a reach for a source file all still 404, a directory with no index is 404 rather than a listing, and a missing tile is 404.
+
+  `tooling-security.test.js` pattern-matches the server's source for those guards, which cannot tell whether they are applied to the file actually served. A behavioural test now starts the server and asks it, and was verified red with the change removed.
+
 - **Correcting a correction: Phase B credited the wrong mechanism, and it was mine.** Earlier in this release the Phase B row was updated to point at `check-cross-validation.mjs`, replacing a reference to a test file that does not exist. That was an improvement on a dead link but still wrong about what verifies the answers, and it was written without checking.
 
   Seeding a 5% error into `voltage-drop` settles it: `check-cross-validation.mjs` stays **green**. That script is a tolerance-*policy* lint, and its own source says so -- it flags a fixture whose declared tolerance exceeds the ceiling without a written justification, 1,731 of them. It never compares a computed value to the published one.

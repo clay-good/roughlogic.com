@@ -55,13 +55,30 @@ createServer(async (req, res) => {
     const url = new URL(req.url || "/", "http://localhost");
     let p = decodeURIComponent(url.pathname);
     if (p === "/" || p === "") p = "/index.html";
-    const file = resolve(ROOT, "." + p);
-    const rel = relative(ROOT, file);
+    let file = resolve(ROOT, "." + p);
+    let rel = relative(ROOT, file);
     if (!rel || rel.startsWith("..") || isAbsolute(rel)) { res.writeHead(403); res.end(); return; }
     let st;
     try { st = await lstat(file); } catch (error) {
       if (error && error.code === "ENOENT") { res.writeHead(404); res.end("Not found"); return; }
       throw error;
+    }
+    // A directory resolves to its index.html, the way the edge does. Without
+    // this, `/tools/voltage-drop/` -- the CANONICAL url this site publishes in
+    // its own sitemap, its JSON-LD and every shell's <link rel=canonical> --
+    // answered 403 locally while working in production. Only `/` was mapped.
+    //
+    // The traversal guards are re-run against the file actually served rather
+    // than the directory that was asked for, so index.html gets the same
+    // containment, symlink and realpath checks any other path would.
+    if (st.isDirectory()) {
+      file = resolve(file, "index.html");
+      rel = relative(ROOT, file);
+      if (!rel || rel.startsWith("..") || isAbsolute(rel)) { res.writeHead(403); res.end(); return; }
+      try { st = await lstat(file); } catch (error) {
+        if (error && error.code === "ENOENT") { res.writeHead(404); res.end("Not found"); return; }
+        throw error;
+      }
     }
     if (!st.isFile() || st.isSymbolicLink()) { res.writeHead(403); res.end(); return; }
     const canonical = await realpath(file);
