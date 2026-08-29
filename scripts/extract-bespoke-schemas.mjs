@@ -644,11 +644,18 @@ async function main() {
     }
     if (typeMismatch) { stats.skip_numeric_select++; continue; }
     if (inputs.length === 0) { stats.skip_no_fields = (stats.skip_no_fields || 0) + 1; continue; }
-    // A select tile may map a subset: the enum values are the payoff, and the
-    // catalog completes the input list from compute introspection so nothing is
-    // under-reported. A pure-numeric tile with no select earns its schema only
-    // by mapping EVERY param (otherwise introspection alone is just as good).
-    if (!hasSelect && anyUnmapped) { stats.skip_incomplete_numeric = (stats.skip_incomplete_numeric || 0) + 1; continue; }
+    // A partial schema is kept, for a numeric tile as well as a select one.
+    //
+    // The old rule refused a pure-numeric tile that did not map EVERY param, on
+    // the grounds that "introspection alone is just as good". That was true when
+    // a schema's only payoff was its enum values. It is not true now: a schema
+    // also carries the field's LABEL and its min/max, which introspection cannot
+    // give (it reads a compute signature, which has no captions), and those feed
+    // the range warnings on `run` and the field index the website's one-box
+    // reads. `describe` already completes a partial schema from introspection,
+    // so the unmapped params are still named -- richly where known, plainly
+    // where not.
+    void anyUnmapped;
     const citation = parseCitation(body);
     emitted[id] = citation ? { inputs, citation } : { inputs };
     stats.emitted++;

@@ -715,3 +715,25 @@ test("a rejected id or uri names the fix, and reports what was actually read", a
   // mistake nor the fix.
   await assert.rejects(() => readResource("roughlogic://nope"), /Valid forms are/);
 });
+
+test("a partly-mapped numeric tile still earns its labels", async () => {
+  // The extractor used to refuse a pure-numeric tile unless EVERY compute
+  // param mapped to a field, reasoning that "introspection alone is just as
+  // good". That held when a schema's only payoff was its enum values. It does
+  // not now: a schema also carries the field's LABEL and its min/max, and a
+  // compute signature has no captions to give.
+  const d = await describe({ id: "abatement-containment" });
+  assert.equal(d.inputs_source, "renderer");
+  const len = d.inputs.find((f) => f.key === "room_len_ft");
+  assert.equal(len.label, "Containment length (ft)");
+  assert.equal(len.attrs.min, "0", "and the bound that lets run() warn on a bad value");
+
+  // The params the parser could not map are still named -- describe completes a
+  // partial schema from introspection, so nothing is under-reported. This is
+  // what makes keeping a partial schema safe rather than lossy.
+  const example = d.example && d.example.inputs;
+  const advertised = new Set(d.inputs.map((f) => f.key ?? f.name));
+  for (const key of Object.keys(example || {})) {
+    assert.ok(advertised.has(key), `example key ${key} is still advertised`);
+  }
+});

@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **95 calculators were refused a field schema on a rule that had outlived its reason.** The extractor kept a partial schema for a tile with a dropdown, but refused one for a purely numeric tile unless every compute parameter mapped to a field, on the stated grounds that "introspection alone is just as good". That was true when a schema's only payoff was its enum values. It stopped being true once a schema also carried the field's **label** and its **min/max**: a compute signature has no captions to give, and those bounds are what let `run_calculator` warn on an out-of-range value.
+
+  **Calculators exposing a field schema: 1,476 to 1,571.** `abatement-containment` now answers with "Containment length (ft)" and a floor of 0 where it used to answer with a bare parameter name.
+
+  Keeping a partial schema is safe because `describe_calculator` already completes one from introspection, so the unmapped parameters are still named. `check-both-doors` holds that: every key each tile's own worked example sets is still advertised, on all 1,804.
+
+  95 renderer citations dropped out of their fallback fixture in the same pass, exactly as when 47 did earlier in this release: those tiles now carry the citation on the schema, which the door prefers. Verified rather than assumed -- 1,803 of 1,804 still return citation text, and the one that does not is a reference table that never had any.
+
 - **The last seven bare-boolean answers now read as words too.** Earlier in this release the renderers' own yes/no wording was extracted, taking `PMI required? 0` to `No` and covering 48 calculators. Seven rows resisted, because those tiles publish a flag the renderer folds into a combined verdict line and never prints on its own: there were no words of the calculator's to borrow. `gcwr-check` answered **"Within both limits"** with **1**.
 
   The obstacle was type, not wording. A fixture records a boolean as 0 or 1, so by render time the type is gone, and `0` is a legitimate count or factor on plenty of other rows. It was declined at the time for exactly that reason. The answer is to stop inferring: the page build now asks each calculator what its result keys actually are and renders a plain Yes / No only for the ones the compute reports as boolean, and only where the renderer supplied no wording of its own.
