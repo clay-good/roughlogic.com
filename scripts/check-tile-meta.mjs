@@ -2,7 +2,7 @@
 // v10 Phase B.2 per-tile meta lint (spec-v10.md §4.2).
 //
 // Validates tile-meta.js entries:
-//   - Every meta `id` is a real tile id from app.js TOOLS.
+//   - Every meta `id` is a real tile id from the tools-data.js TOOLS array.
 //   - The meta `id` field matches the registry key.
 //   - The meta `group` matches TOOLS[].group.
 //   - `simplified: true` tiles also appear in the limitation-banner

@@ -3,7 +3,7 @@
 //
 // Validates:
 //   - Every `target` in data/search/aliases.json is a real tile id from
-//     the TOOLS array in app.js.
+//     the TOOLS array in tools-data.js.
 //   - No alias term collides with a tile id (a term is a free-text
 //     query that should resolve via the alias path; if it is itself a
 //     tile id, the alias is redundant or worse, conflicting).

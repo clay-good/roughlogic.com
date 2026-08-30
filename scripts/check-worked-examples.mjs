@@ -2,7 +2,7 @@
 // v10 Phase C.2 worked-example registry lint (spec-v10.md §5.2).
 //
 // Validates the schema of every row in test/fixtures/worked-examples.json.
-// Reports per-tile coverage against the live TOOLS array in app.js.
+// Reports per-tile coverage against the live TOOLS array in tools-data.js.
 //
 // **Graduated state (2026-05-18, spec-v14 Phase B closeout):** coverage
 // reached 100 percent (385 / 385 tiles, 390 fixtures) at the v13 close

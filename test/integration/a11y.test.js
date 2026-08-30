@@ -19,12 +19,14 @@ import { dirname, join } from "node:path";
 //
 // The parse is intentionally narrow: it scans the literal `{ id: "..."`
 // tokens between the `const TOOLS = [` header and its closing bracket
+// in tools-data.js, where the registry has lived since it was lifted out
+// of app.js on 2026-08-27
 // (matched as a substring of `export const TOOLS = [`). This avoids
 // running the module at test-import time.
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const APP_JS = readFileSync(join(__dirname, "..", "..", "tools-data.js"), "utf8");
-function readToolIdsFromAppJs(src) {
+const TOOLS_DATA = readFileSync(join(__dirname, "..", "..", "tools-data.js"), "utf8");
+function readToolIds(src) {
   const start = src.indexOf("const TOOLS = [");
   if (start < 0) throw new Error("a11y.test.js: TOOLS array not found in tools-data.js");
   // Walk forward to the matching closing bracket of the TOOLS array.
@@ -45,7 +47,7 @@ function readToolIdsFromAppJs(src) {
   while ((m = re.exec(body)) !== null) ids.push(m[1]);
   return ids;
 }
-const TOOL_IDS = readToolIdsFromAppJs(APP_JS);
+const TOOL_IDS = readToolIds(TOOLS_DATA);
 const ROUTES = [{ name: "home", hash: "" }].concat(
   TOOL_IDS.map((id) => ({ name: id, hash: id }))
 );

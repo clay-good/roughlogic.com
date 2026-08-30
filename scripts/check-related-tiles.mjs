@@ -7,7 +7,7 @@
 // The validation moved with it.
 //
 // Asserts, for every entry in ./related-tiles.mjs `RELATED`:
-//   - the key is a real tile id from app.js TOOLS,
+//   - the key is a real tile id from the tools-data.js TOOLS array,
 //   - the value is an array of strings,
 //   - no entry references the tile itself,
 //   - no entry is a duplicate within the array,

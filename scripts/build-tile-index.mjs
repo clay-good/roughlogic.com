@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // spec-v14 §13.1 Phase I per-tile derivation index.
 //
-// Walks the TOOLS array in app.js and the worked-examples fixture
+// Walks the TOOLS array in tools-data.js and the worked-examples fixture
 // registry, then emits a deterministic per-tile index section into
 // docs/derivations.md. The index names every TOOLS tile_id with its
 // group, the source publisher / section that the v10 cross-validation
