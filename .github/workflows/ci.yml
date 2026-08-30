@@ -81,6 +81,13 @@ jobs:
       # on a 320px phone viewport.
       - name: Build site
         run: npm run build
+      # The per-module gzip budget reads dist/, and `npm run lint` in the test
+      # job runs BEFORE any build, so this gate has been skipping there with a
+      # WARN and exit 0 since it was written -- its own comment says so. It has
+      # therefore never enforced a cap in CI, and on 2026-08-30 an over-cap
+      # module went green through it. Run it here, where dist/ exists.
+      - name: Per-module gzip budget (needs dist/)
+        run: npm run check:module-sizes
       - name: dist/ integrity gate (no dangling same-origin references)
         run: npm run check:dist
       - name: Prerendered shell content gate (titles, JSON-LD, citation, gzip)

@@ -19,9 +19,13 @@
 //   WARN when a module is within 90% of its cap (early signal).
 //   OK otherwise.
 //
-// Pure read-and-report; reads from dist/. The script will skip
-// gracefully if dist/ has not been built (CI runs npm run build before
-// npm run lint when needed).
+// Pure read-and-report; reads from dist/. It skips gracefully when dist/ is
+// absent, which is what `npm run lint` hits in CI's test job -- lint runs
+// before any build there, so for a long time this gate no-opped in CI and
+// enforced nothing but a local habit. On 2026-08-30 an over-cap module went
+// green through it. The integration job now runs it after `npm run build`
+// (see .github/workflows/ci.yml), so the skip is a local-convenience path
+// rather than the CI path.
 
 import { readFile, readdir, stat } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
