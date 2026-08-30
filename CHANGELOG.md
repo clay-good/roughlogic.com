@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Added
+
+- **Eight code sections that returned nothing now reach the calculator that implements them.** Yesterday's work made `240.21` and `62.2` answer correctly on both doors; it did not ask which other sections a reader might type. Reading each tile's own citation for a `§`-prefixed section number, then checking what the doors return for it, found eight that are cited verbatim by exactly one tile in the catalog and answered by neither door: `130.5` (NFPA 70E arc-flash risk assessment) -> Arc Flash Screen, `250.53` -> Grounding Electrode, `430.6(A)` and `430.22` -> Motor Branch From Nameplate, `304.5` -> Combustion Air, `408.36` -> Panel Rebalance, `506.3` -> Allowable Area, `705.3` -> Exterior Opening Protection.
+
+  Curated from the tiles' own citations rather than invented: each alias is a section the maintainer already wrote into that tile's citation string, and each returned an empty result before. Sections that more than one tile cites, or that a different published document numbers the same way, were left alone -- an agent handed a plausible wrong tile cannot tell it is wrong, while an empty list it can act on. Both doors agree on all eight; four are pinned by name in `test/unit/door-parity.test.js`, and the ranking harness is unchanged at 99.73% / 99.83% / 99.83%.
+
 ### Fixed
 
 - **The architecture document had no entry for the agent door.** `docs/architecture.md` described the SPA, the data pipeline, the shells, integrity and persistence, and said nothing about the MCP server -- a first-class surface the README leads with, with its own directory, its own gate, and 1,804 tiles behind it. Added, including the part worth writing down: the two doors share `rankTools` AND, since today, `fallbackSearch`, and the three gates that hold that. Also qualified the maintainer-quickstart line that listed "ngram bans" among what `npm run lint` runs -- that gate is fingerprint-based and skips in the public repo, which `docs/audit-trail.md` already said and the quickstart did not.

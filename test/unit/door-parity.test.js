@@ -74,6 +74,12 @@ test("trade shorthand and code sections reach the tile a human mapped them to", 
   assert.equal(top("200a"), "battery-runtime");
   assert.equal(top("240.21"), "feeder-tap-rule");
   assert.equal(top("62.2"), "ashrae-622-ventilation");
+  // Sections added 2026-08-30 from the tiles' own citations, each of which
+  // returned nothing at all before: one tile in the catalog cites it verbatim.
+  assert.equal(top("130.5"), "arc-flash-screen");
+  assert.equal(top("250.53"), "grounding-electrode");
+  assert.equal(top("430.22"), "motor-branch-from-nameplate");
+  assert.equal(top("705.3"), "exterior-opening-protection");
 });
 
 // An alias prefix counts only on a whole leading phrase. Matching a bare

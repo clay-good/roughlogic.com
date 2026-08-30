@@ -5651,6 +5651,8 @@
     {"term":"floating floor last row","target":"flooring-takeoff","kind":"industry"},
     {"term":"laminate row layout","target":"flooring-takeoff","kind":"industry"},
     {"term":"balanced rip first row","target":"flooring-takeoff","kind":"industry"},
-    {"term":"will my last row be a sliver","target":"flooring-takeoff","kind":"question"}
+    {"term":"will my last row be a sliver","target":"flooring-takeoff","kind":"question"},
+    {"term":"506.3","target":"allowable-area","kind":"industry"},
+    {"term":"705.3","target":"exterior-opening-protection","kind":"industry"}
   ]
 }

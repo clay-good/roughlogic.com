@@ -2114,6 +2114,7 @@
     {"term":"head pressure control","target":"head-pressure-control","kind":"industry"},
     {"term":"low ambient operation","target":"head-pressure-control","kind":"industry"},
     {"term":"flooded condenser charge","target":"head-pressure-control","kind":"industry"},
-    {"term":"winter charge refrigerant","target":"head-pressure-control","kind":"industry"}
+    {"term":"winter charge refrigerant","target":"head-pressure-control","kind":"industry"},
+    {"term":"304.5","target":"combustion-air-max-input","kind":"industry"}
   ]
 }

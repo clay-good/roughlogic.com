@@ -105322,6 +105322,46 @@
    "term": "will my last row be a sliver",
    "target": "flooring-takeoff",
    "kind": "question"
+  },
+  {
+   "term": "408.36",
+   "target": "panel-rebalance",
+   "kind": "industry"
+  },
+  {
+   "term": "250.53",
+   "target": "grounding-electrode",
+   "kind": "industry"
+  },
+  {
+   "term": "430.6(a)",
+   "target": "motor-branch-from-nameplate",
+   "kind": "industry"
+  },
+  {
+   "term": "430.22",
+   "target": "motor-branch-from-nameplate",
+   "kind": "industry"
+  },
+  {
+   "term": "130.5",
+   "target": "arc-flash-screen",
+   "kind": "industry"
+  },
+  {
+   "term": "304.5",
+   "target": "combustion-air-max-input",
+   "kind": "industry"
+  },
+  {
+   "term": "506.3",
+   "target": "allowable-area",
+   "kind": "industry"
+  },
+  {
+   "term": "705.3",
+   "target": "exterior-opening-protection",
+   "kind": "industry"
   }
  ]
 }

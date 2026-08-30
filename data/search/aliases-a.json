@@ -2721,6 +2721,11 @@
     {"term":"let through i2t","target":"fuse-let-through","kind":"industry"},
     {"term":"current limiting fuse protection","target":"fuse-let-through","kind":"industry"},
     {"term":"series rating","target":"fuse-let-through","kind":"industry"},
-    {"term":"does the fuse protect this wire","target":"fuse-let-through","kind":"question"}
+    {"term":"does the fuse protect this wire","target":"fuse-let-through","kind":"question"},
+    {"term":"408.36","target":"panel-rebalance","kind":"industry"},
+    {"term":"250.53","target":"grounding-electrode","kind":"industry"},
+    {"term":"430.6(a)","target":"motor-branch-from-nameplate","kind":"industry"},
+    {"term":"430.22","target":"motor-branch-from-nameplate","kind":"industry"},
+    {"term":"130.5","target":"arc-flash-screen","kind":"industry"}
   ]
 }
