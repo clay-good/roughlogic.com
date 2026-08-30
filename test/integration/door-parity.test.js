@@ -25,6 +25,9 @@ const CASES = [
   { query: "12/2", id: "wire-ampacity" },
   { query: "240.21", id: "feeder-tap-rule" },
   { query: "62.2", id: "ashrae-622-ventilation" },
+  // Added with the eight sections curated from the tiles' own citations; this
+  // one answered nothing on either door before.
+  { query: "130.5", id: "arc-flash-screen" },
 ];
 
 for (const c of CASES) {
