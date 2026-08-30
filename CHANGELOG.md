@@ -6,6 +6,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Verified the size gate now bites in CI, then found one more stale count.** The integration job's log shows it measuring real modules -- `search-discovery.js 11150 B / 12000 B (92.9%)` -- where the test job's lint still prints the skip line, which is the proof the new step is what does the work rather than an assumption that it does.
+
+  While confirming the docs still describe the current state, `docs/architecture.md` said the module set "has since grown to 56 modules" against a live 57. Fixed, and pinned in `check-readme-counts` alongside the other module-count claims, so it drifts no further. Seed-verified.
+
 - **The per-module size gate had never enforced a cap in CI.** It reads `dist/`, and `npm run lint` in the test job runs before any build, so it printed `WARN: dist/ not present ... Skipping` and exited 0 every time. Its own header comment says as much. The consequence showed up the same day: an over-cap `search-discovery.js` went green through CI, and the only thing that caught it was a developer running lint locally after a build. Verified by moving `dist/` aside -- the gate exits 0 with a warning, while `check-dist` correctly exits 1. Also checked the neighbours: `check-home-payload`, `check-sw-precache`, `check-manifests` and `check-integrity-coverage` all read source and are unaffected, so this was the one blind gate, not a class.
 
   The integration job now runs `npm run check:module-sizes` after `npm run build`, where `dist/` exists. Seed-verified against the actual mistake: with the cap back at 11,000 the gate fails on the built module at 11,170 B, which is the push it should have stopped.

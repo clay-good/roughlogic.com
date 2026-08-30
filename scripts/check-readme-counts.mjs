@@ -207,6 +207,11 @@ async function main() {
   checked += checkPattern(mcpReadme, /descriptors the website reads, which\s*\nexist for ([\d,]+) calculators/g, live.indexedTiles, "field-index tile count (mcp/README.md)", errors);
   checked += checkPattern(mcpReadme, /For the other ([\d,]+) it projects/g, live.unindexedTiles, "un-indexed tile count (mcp/README.md)", errors);
 
+  // docs/architecture.md states the module count in prose too, and it had
+  // drifted to 56 against a live 57.
+  const arch = await readFile(resolve(ROOT, "docs", "architecture.md"), "utf8");
+  checked += checkPattern(arch, /set has since grown to\s+(\d+)\s*\n?modules/g, live.modules, "calc-* module count (docs/architecture.md)", errors);
+
   // docs/performance.md: the calc-module count and the data-pipeline shape.
   const perf = await readFile(resolve(ROOT, "docs", "performance.md"), "utf8");
   checked += checkPattern(perf, /\((\d+) `calc-\*\.js` files/g, live.modules, "calc-* module count (docs/performance.md)", errors);

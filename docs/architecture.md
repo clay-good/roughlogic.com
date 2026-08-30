@@ -114,7 +114,7 @@ There is no sessionStorage, cookies, or IndexedDB. localStorage is used by `them
 ## v2 module layout
 
 The v2 expansion (spec-v2.md) added the first lazy-loaded module past
-the original seven trade calc-* modules. The set has since grown to 56
+the original seven trade calc-* modules. The set has since grown to 57
 modules; the authoritative current inventory is the
 repo-root `calc-*.js` set, each with a documented gzip cap in
 `scripts/check-module-sizes.mjs`.
