@@ -220,7 +220,7 @@ outcome. The audit trail is append-only and public.
 | `npm run test:unit` | Same as `npm test`. |
 | `npm run test:e2e` | Playwright integration tests. |
 | `npm run test:a11y` | axe-core accessibility tests. |
-| `npm run lint` | grep checks, ngram bans, v6 discipline, v8 manifest discipline, v10 citation freshness, citation-strings sync check, discoverability, worked-examples coverage, tile-meta coverage, v12 G.2 wiring + G.4 renderer-export lints, module sizes, home payload budget. |
+| `npm run lint` | grep checks, ngram bans (fingerprint-based; skips in the public repo, where the private hash list is absent), v6 discipline, v8 manifest discipline, v10 citation freshness, citation-strings sync check, discoverability, worked-examples coverage, tile-meta coverage, v12 G.2 wiring + G.4 renderer-export lints, module sizes, home payload budget. |
 | `npm run check:dist` | spec-v12 G.3 dist/-vs-runtime cross-check. Walks every shipped HTML / JS / CSS / JSON under `dist/` and resolves every same-origin reference; dangling references fail. Wired into `npm run audit` as the fourth stage. |
 | `npm run data:refresh` | Run the data pipeline. Regenerates shards and `expected-hashes.json`. |
 | `npm run data:verify` | Verifies shard SHA-256 hashes against `expected-hashes.json`. |
