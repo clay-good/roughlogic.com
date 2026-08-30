@@ -6875,7 +6875,7 @@
   },
   {
    "term": "insulation heat loss",
-   "target": "pipe-heat-loss-radial",
+   "target": "insulation-heat-loss",
    "kind": "redirect"
   },
   {
@@ -7065,7 +7065,7 @@
   },
   {
    "term": "lumen method",
-   "target": "lux-to-footcandle",
+   "target": "lumen-method",
    "kind": "adjacent"
   },
   {
@@ -7975,7 +7975,7 @@
   },
   {
    "term": "orifice flow",
-   "target": "septic-lpp-orifice",
+   "target": "orifice-flow",
    "kind": "industry"
   },
   {
@@ -9005,7 +9005,7 @@
   },
   {
    "term": "chlorine demand",
-   "target": "pool-turnover",
+   "target": "chlorine-demand",
    "kind": "industry"
   },
   {
@@ -9210,7 +9210,7 @@
   },
   {
    "term": "gross rent multiplier",
-   "target": "rental-worksheet",
+   "target": "gross-rent-multiplier",
    "kind": "industry"
   },
   {
@@ -12715,7 +12715,7 @@
   },
   {
    "term": "guy wire tension",
-   "target": "spanline-sag-tension",
+   "target": "guy-wire-tension",
    "kind": "adjacent"
   },
   {
@@ -17790,7 +17790,7 @@
   },
   {
    "term": "occupant load",
-   "target": "internal-heat-gains",
+   "target": "occupant-load",
    "kind": "industry"
   },
   {
@@ -20540,7 +20540,7 @@
   },
   {
    "term": "box culvert headwater",
-   "target": "box-culvert-inlet-control",
+   "target": "box-culvert-headwater",
    "kind": "industry"
   },
   {
@@ -25960,7 +25960,7 @@
   },
   {
    "term": "affinity laws",
-   "target": "fan-affinity-laws",
+   "target": "affinity-laws",
    "kind": "industry"
   },
   {
@@ -27865,7 +27865,7 @@
   },
   {
    "term": "coil face area",
-   "target": "coil-face-velocity",
+   "target": "coil-face-area",
    "kind": "industry"
   },
   {
@@ -28850,7 +28850,7 @@
   },
   {
    "term": "pool heater size",
-   "target": "pool-heater-btu",
+   "target": "pool-heater-size",
    "kind": "industry"
   },
   {
@@ -37990,7 +37990,7 @@
   },
   {
    "term": "tapered tank volume",
-   "target": "frustum-volume",
+   "target": "tapered-tank-volume",
    "kind": "industry"
   },
   {
@@ -38275,7 +38275,7 @@
   },
   {
    "term": "oval tank volume",
-   "target": "ellipsoid-volume",
+   "target": "oval-tank-volume",
    "kind": "industry"
   },
   {

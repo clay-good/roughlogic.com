@@ -105,7 +105,7 @@
     {"term":"catenary sag","target":"spanline-sag-tension","kind":"adjacent"},
     {"term":"wire rope span","target":"spanline-sag-tension","kind":"adjacent"},
     {"term":"span tension","target":"spanline-sag-tension","kind":"industry"},
-    {"term":"guy wire tension","target":"spanline-sag-tension","kind":"adjacent"},
+    {"term":"guy wire tension","target":"guy-wire-tension","kind":"adjacent"},
     {"term":"minimum sag","target":"spanline-sag-for-tension","kind":"industry"},
     {"term":"sag for a tension limit","target":"spanline-sag-for-tension","kind":"industry"},
     {"term":"how much sag do i need","target":"spanline-sag-for-tension","kind":"adjacent"},

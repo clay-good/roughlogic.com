@@ -922,6 +922,7 @@
     {"term":"omega0 collector","target":"diaphragm-collector-force","kind":"redirect"},
     {"term":"drag strut force","target":"diaphragm-collector-force","kind":"industry"},
     {"term":"shear transfer","target":"diaphragm-collector-force","kind":"adjacent"},
+    {"term":"occupant load","target":"occupant-load","kind":"industry"},
     {"term":"moment gradient factor cb","target":"steel-cb","kind":"industry"},
     {"term":"compute cb for lateral torsional buckling","target":"steel-cb","kind":"question"},
     {"term":"aisc f1-1 cb","target":"steel-cb","kind":"industry"},

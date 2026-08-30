@@ -142,7 +142,7 @@
     {"term":"emt fill","target":"conduit-fill","kind":"industry"},
     {"term":"footcandles","target":"lux-to-footcandle","kind":"industry"},
     {"term":"lux to fc","target":"lux-to-footcandle","kind":"redirect"},
-    {"term":"lumen method","target":"lux-to-footcandle","kind":"adjacent"},
+    {"term":"lumen method","target":"lumen-method","kind":"adjacent"},
     {"term":"parallel conductors","target":"parallel-conductor-derate","kind":"industry"},
     {"term":"paralleled feeders","target":"parallel-conductor-derate","kind":"redirect"},
     {"term":"conductors in parallel","target":"parallel-conductor-derate","kind":"adjacent"},

@@ -21,7 +21,7 @@
     {"term":"rent vs buy","target":"rent-vs-buy","kind":"industry"},
     {"term":"should i rent or buy","target":"rent-vs-buy","kind":"adjacent"},
     {"term":"buy or rent npv","target":"rent-vs-buy","kind":"redirect"},
-    {"term":"gross rent multiplier","target":"rental-worksheet","kind":"industry"},
+    {"term":"gross rent multiplier","target":"gross-rent-multiplier","kind":"industry"},
     {"term":"grm","target":"rental-worksheet","kind":"industry"},
     {"term":"income approach valuation","target":"rental-worksheet","kind":"adjacent"},
     {"term":"depreciation recapture","target":"depreciation-recapture","kind":"industry"},
