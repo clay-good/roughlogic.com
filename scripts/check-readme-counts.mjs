@@ -63,7 +63,14 @@ async function liveCounts() {
     await readFile(resolve(ROOT, "scripts", "expected-hashes.json"), "utf8"),
   );
   const integrity = JSON.parse(await readFile(resolve(ROOT, "data", "integrity.json"), "utf8"));
+  // The launch checklist quotes the citation-strings row count in three
+  // places. It said 52 of 52 against a live 70 -- the number moved 18 rows and
+  // the "alignment floor" line moved not at all. Read it from the artefact.
+  const citationStrings = JSON.parse(
+    await readFile(resolve(ROOT, "docs", "citation-strings.generated.json"), "utf8"),
+  )._row_count;
   return {
+    citationStrings,
     tiles, groups, modules, sitemap, gates,
     indexedTiles: indexed.size,
     schemaTiles: coverage.covered_count,
@@ -219,6 +226,13 @@ async function main() {
   checked += checkPattern(deploy, /all (\d+) calc-\* modules from/g, live.modules, "calc-* module count (docs/deployment.md)", errors);
 
   // docs/performance.md: the calc-module count and the data-pipeline shape.
+  // docs/launch-checklist.md: the citation-strings row count, in all three
+  // places it appears.
+  const launch = await readFile(resolve(ROOT, "docs", "launch-checklist.md"), "utf8");
+  checked += checkPattern(launch, /\*\*(\d+) rows \/ \d+ tiles\*\*/g, live.citationStrings, "citation-strings row count (docs/launch-checklist.md)", errors);
+  checked += checkPattern(launch, /holds \*\*(\d+) of \d+\*\* markdown rows/g, live.citationStrings, "citation-strings row count (docs/launch-checklist.md)", errors);
+  checked += checkPattern(launch, /Citation alignment floor: (\d+) of \d+ markdown rows/g, live.citationStrings, "citation-strings row count (docs/launch-checklist.md)", errors);
+
   const perf = await readFile(resolve(ROOT, "docs", "performance.md"), "utf8");
   checked += checkPattern(perf, /\((\d+) `calc-\*\.js` files/g, live.modules, "calc-* module count (docs/performance.md)", errors);
   checked += checkPattern(perf, /\*\*([\d,]+) integrity-checked entries/g, live.dataEntries, "integrity-checked entry count (docs/performance.md)", errors);

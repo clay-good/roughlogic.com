@@ -12,6 +12,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The launch checklist still quoted 52 citation-strings rows against a live 70.** Three lines in `docs/launch-checklist.md` -- the A.3 entry, the runtime-audit sentence and the "citation alignment floor" -- were stamped 2026-05-11 and never moved while the artefact grew by 18 rows. Fixed and pinned: `check-readme-counts` reads `_row_count` out of `docs/citation-strings.generated.json` and anchors all three, taking it to 32 label-anchored counts. Seed-verified.
+
 - **`check-dist` printed the same three orphan warnings on every build.** `.well-known/mcp.json`, `AGENTS.md` and `llms.txt` are fetched by well-known path and linked from nothing, so the orphan pass flagged them every time and nobody read the list any more -- which is how a fourth, genuinely dead file would have arrived unnoticed. The three are named in `ORPHAN_EXEMPT` alongside `robots.txt` and `sitemap.xml`, where they belonged, and an orphan is now a **failure** rather than a warning. Seed-verified with a stray file in `dist/`.
 
 - **Every uncurated tile page in a group pointed at the same five calculators.** The related-tiles block falls back when `scripts/related-tiles.mjs` has no entry, and the fallback was "the first 5 other tiles in the same group, by TOOLS order" -- literally identical for all 167 uncurated tiles. Sheet-Metal Gauge to Decimal Thickness sent readers to stair stringers, roof pitch, rafters, square footage and board footage. It also squeezed the internal link graph flat: **482 of the 1,804 tiles received no related link from any tile page**, while `square-footage` collected 50.
