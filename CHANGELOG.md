@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The offline promise was tested on a calculator that needs no data.** Both existing offline specs use `ohms-law`, which is pure arithmetic. A tile that READS a shard is a different path, and that path gained a step on 2026-08-29: every shard fetch now hands its bytes to `verifyShard`, which fetches the folder's manifest to look the hash up. Offline that fetch cannot succeed. The design returns null and skips rather than throwing or accusing, but "by design" and "verified" are different claims, and the README's headline promises the second one.
+
+  Now verified: `loan-limits` renders offline, returns the shard's own content (San Francisco, $1,209,750), and shows no integrity banner -- a failed manifest fetch must never be reported to a reader as tampering.
+
+  Worth knowing what carries it. `sw.js` precaches `data/realestate/manifest.json` but **not** `loan-limits.json`; the shard comes from the runtime `DATA_CACHE`, which the fetch handler populates cache-first on first read. So a data-backed tile is offline-capable for a reader who has opened it before, which is what the test models by warming it. Checked against the same control the neighbouring specs use: with the worker blocked, the offline reload fails outright with `net::ERR_INTERNET_DISCONNECTED`, so none of this is the HTTP cache passing the test for the wrong reason.
+
 - **The README's worked example is now pinned to the tile it quotes.** The front page shows Voltage Drop's example in full -- six inputs, two answers -- as the first concrete thing a reader sees, and the page it points at is live. Nothing checked that they agreed, so a change to that tile's example or its labels would have left the README quoting an answer the site no longer gives. `check-readme-counts` now compares the table against the tile's own prerendered shell. Seed-verified both ways: dropping an input row and altering an answer each fail with the two lists printed side by side.
 
   Written after briefly "fixing" a row that was already there. I had printed the first forty lines of the README, the table runs past line forty, and I concluded an input was missing and added it -- producing a duplicate. Reading part of a file and concluding something is absent is precisely the error a gate should absorb, so it seemed worth building the gate rather than just reverting the edit.
