@@ -84,11 +84,18 @@ Two constraints any split has to respect, both found by looking rather than by r
 
 A third shape, measured 2026-08-30, that the group-shard analysis above did not try: **keep one catalog and put only the LEAD SENTENCE in it**, moving the rest of each description to the lazily-fetched shards.
 
+Measured by rebuilding the `TOOLS` array as a JS module literal in the same
+shape the file ships (bare keys, one row per line) and gzipping it, so the rows
+compare against each other. The same method rebuilds the file as it stands at
+392,828 B against the 397,907 B it actually ships, the difference being the
+comments and group headers; the 47,224 B quoted above was measured another way
+and is not directly comparable to the third row here.
+
 | | gzipped | deep link vs today |
 | --- | --- | --- |
 | catalog as it ships (full `desc`) | 397,907 B | -- |
-| catalog carrying `leadSentence(desc)` only | **113,050 B** | 72% smaller |
-| catalog carrying no description at all | 52,009 B | 87% smaller |
+| catalog carrying `leadSentence(desc)` only | **113,612 B** | 71% smaller |
+| catalog carrying no description at all | 52,351 B | 87% smaller |
 | rest-of-description map, all tiles | 302,631 B | fetched lazily |
 
 What makes the middle row interesting is what a deep link does *after* the fetch. A tile view needs three things out of `desc`: the meta description, the lead under the title, and the Details body. The first two are the lead sentence. So a lead-carrying catalog renders the tile **in one pass with no second request** -- which matters because the 2026-08-29 CLS fix exists to stop tile routes rendering in two stages, and a split that puts the lead behind a second fetch reintroduces exactly that. The no-description row is 2.2x smaller again but pays a second blocking hop before the page can show its own lead.
