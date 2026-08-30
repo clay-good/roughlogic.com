@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **"triangle sas" was answered by the three-sides solver.** SSS, SAS and ASA are distinct methods whose names sit one edit apart, and the tile id was not in the search corpus, so the token "sas" matched nothing anywhere. That is exactly the condition the bounded typo fallback waits for: it mapped "sas" onto "sss" and a question about two sides and the included angle got the wrong solver. Silently swapping one geometry method for another is worse than returning nothing.
+
+  The id is identifying text and now sits in the corpus alongside the name, aliases, trade and description. All three solvers answer their own method. Tiles ranking first for their own id: **1,759 -> 1,781 of 1,804 (97.51% -> 98.73%)**.
+
+  The weight was chosen by sweeping it against all three ground truths rather than picked. At 3, level with the name, the id out-competes real name matches and "how many 12 awg wires in 1/2 inch conduit" went to `awg-wire-geometry` over the curated `conduit-fill`; at 1 it is too weak and nine other curated rows fall. **At 2, level with the aliases, curated alias top-1 is exactly unchanged at 20,928 and the id rate is the best of the three.** Both edge cases are pinned in tests.
+
 - **Queries that name a direction were answered by the opposite direction.** The exact-id bonus compared the query against a de-hyphenated id, but an id carries stopwords the query loses: `septic-tank-for-interval` became "septic tank for interval" while the query normalized to "septic tank interval", so the bonus never fired on precisely the queries that spell out a direction, and the inverse sibling won instead. Ids now normalize the same way queries do. Tiles ranking first for their own id: **1,745 -> 1,759 of 1,804 (96.73% -> 97.51%)**, with curated aliases and name ranking both unchanged.
 
   The first version of this was wrong and a test I wrote earlier the same day caught it. Stripping stopwords makes ids collide the same way alias terms do -- `backflow-sizing` also normalizes to "backflow" -- so both it and the tile whose id IS "backflow" claimed the bonus, tied, and the alphabetical tiebreak handed the query to the wrong one. The harness still showed +14 overall, because the gain hid the loss. An exact de-hyphenated match now always wins, and a normalized-only match earns the bonus only when it is the one tile that normalizes that way: same +14, no regression.

@@ -238,8 +238,19 @@ export function editDistance1(a, b) {
 }
 
 // Field weights per matched query token (spec-v589 §2).
-const FIELD_WEIGHTS = { name: 3, alias: 2, trade: 2, desc: 1 };
-const FIELD_ORDER = ["name", "alias", "trade", "desc"];
+// The id is identifying text and belongs in the corpus. Left out, a token that
+// lives only in an id matched nothing anywhere, which handed it to the typo
+// fallback: "triangle sas" matched no tile on "sas", so edit distance mapped it
+// onto triangle-sss and the SSS solver answered a question about SAS. The
+// geometry family is full of three-letter method names one edit apart, and
+// silently swapping one for another is worse than returning nothing.
+// Weighted at 2, with the aliases, not at 3 with the name: a sweep of 1/2/3
+// against all three ground truths puts 2 alone at zero alias regression and
+// the best id rate. At 3 the id out-competes real name matches ("how many 12
+// awg wires in 1/2 inch conduit" went to awg-wire-geometry over conduit-fill);
+// at 1 it is too weak to hold nine other curated rows.
+const FIELD_WEIGHTS = { name: 3, id: 2, alias: 2, trade: 2, desc: 1 };
+const FIELD_ORDER = ["name", "id", "alias", "trade", "desc"];
 
 // Per-tool tokenized corpus, cached on the tool object. The cache entry
 // remembers the aliases array (identity + length) it was built against so
@@ -302,6 +313,7 @@ function corpusFor(tool, aliases, aliasEntry) {
       aliasesRef: aliases,
       aliasLen,
       name: tokenize(tool.name, true),
+      id: tokenize(tool.id.replace(/-/g, " "), true),
       // Pure-number alias tokens are illustrative ("wire for 100 amp
       // subpanel 150 feet away"), not identifying: left in the corpus
       // they let any coincidental number in a query outrank the true

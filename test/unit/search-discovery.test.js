@@ -457,3 +457,25 @@ test("an id containing stopwords still earns the exact-id bonus", async () => {
     assert.equal(ranked[0].tool.id, id, `"${phrase}" should rank its own tile first`);
   }
 });
+
+test("each triangle solver answers its own method, not a sibling one edit away", async () => {
+  const { aliases: ALIASES, TOOLS } = await rankingFixture();
+  // SSS / SAS / ASA are distinct methods whose names sit one edit apart. The
+  // id was not in the search corpus, so "sas" matched nothing anywhere, the
+  // bounded typo fallback mapped it onto "sss", and a question about two sides
+  // and the included angle was answered by the three-sides solver.
+  for (const method of ["sss", "sas", "asa"]) {
+    const ranked = rankTools(normalizeQuery(`triangle ${method}`).tokens, TOOLS, ALIASES, { limit: 3 });
+    assert.equal(ranked[0].tool.id, `triangle-${method}`,
+      `"triangle ${method}" must not be answered by a different triangle solver`);
+  }
+});
+
+test("the id corpus does not out-compete a real name match", async () => {
+  const { aliases: ALIASES, TOOLS } = await rankingFixture();
+  // Weighting the id with the name (3) instead of the aliases (2) sent this
+  // curated row to awg-wire-geometry, whose id carries both "awg" and "wire".
+  const ranked = rankTools(
+    normalizeQuery("how many 12 awg wires in 1/2 inch conduit").tokens, TOOLS, ALIASES, { limit: 3 });
+  assert.equal(ranked[0].tool.id, "conduit-fill");
+});
