@@ -337,8 +337,8 @@ test("spec-v1337 chips: a chip fills the box and leaves the results open", async
   const query = await chip.getAttribute("data-q");
   await chip.click();
   await expect(page.locator("#search-input")).toHaveValue(query);
-  await expect(page.locator("#search-results")).toBeVisible();
-  await expect(page.locator(".search-result").first()).toBeVisible();
+  await expect(page.locator("#search-results")).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator(".search-result").first()).toBeVisible({ timeout: 30_000 });
 });
 
 test("spec-v1337 chips: every chip routes to a real tile with values", async ({ page }) => {
@@ -368,6 +368,14 @@ test("spec-v1337 chips: 48px touch targets", async ({ page }) => {
   }
 });
 
+// The dropdown assertions below carry an explicit timeout for the same reason
+// the flagship preview does: awaitSearchData waits on the shard RESPONSES, but
+// rendering the rows from them is the reader's own machine doing work, and it
+// is the part that runs long. Measured here, the first .search-result appears
+// 88 ms after the keystroke unthrottled, 5,114 ms at a 4x CPU throttle and
+// 7,732 ms at 6x -- past the 5 s default, which is how three of these routing
+// specs flaked across today's runs. A dropdown that never renders still fails.
+
 // spec-v1343: two or three plain choices when the query is ambiguous.
 
 test("spec-v1343: a vague query asks instead of guessing", async ({ page }) => {
@@ -377,7 +385,7 @@ test("spec-v1343: a vague query asks instead of guessing", async ({ page }) => {
   const input = page.locator("#search-input");
   await input.click();
   await input.fill("pressure drop");
-  await expect(page.locator(".search-result").first()).toBeVisible();
+  await expect(page.locator(".search-result").first()).toBeVisible({ timeout: 30_000 });
   await input.press("Enter");
 
   const card = page.locator(".pick-card");
@@ -406,7 +414,7 @@ test("spec-v1343: choosing an option routes to that calculator", async ({ page }
   await input.click();
   await input.fill("pressure drop");
   await ranked;
-  await expect(page.locator(".search-result").first()).toBeVisible();
+  await expect(page.locator(".search-result").first()).toBeVisible({ timeout: 30_000 });
   await input.press("Enter");
   await expect(page.locator(".pick-card")).toBeVisible();
 
@@ -438,7 +446,7 @@ test("spec-v1343: arrowing to a row is a deliberate pick and routes", async ({ p
   const input = page.locator("#search-input");
   await input.click();
   await input.fill("pressure drop");
-  await expect(page.locator(".search-result").first()).toBeVisible();
+  await expect(page.locator(".search-result").first()).toBeVisible({ timeout: 30_000 });
   await input.press("ArrowDown");
   await input.press("Enter");
   await expect(page).toHaveURL(/#[a-z0-9-]+/);
@@ -474,7 +482,7 @@ test("search preview survives its data arriving after the reader stops typing", 
   await input.fill("voltage drop 120v 150 ft 20 amps");
   // One fill, then no further input: nothing else will re-trigger the preview.
   const preview = page.locator("#search-result-0 .sr-preview");
-  await expect(preview).toBeVisible({ timeout: 15000 });
+  await expect(preview).toBeVisible({ timeout: 30_000 });
   const text = await preview.textContent();
   expect(text).toMatch(/drop \d+(\.\d+)? V/);
   expect(text).not.toMatch(/NaN|Infinity|undefined/);
@@ -566,8 +574,19 @@ test("spec-v592: a failed preview-map fetch is retried on the next keystroke", a
 
   await page.goto("/");
   const input = page.locator("#search-input");
+  // This context blocks the service worker AND intercepts one shard, so every
+  // other shard is fetched cold; it is the slowest spec in the file. Its flake
+  // was "element(s) not found" for the preview, but the missing element was the
+  // ROW: with the alias shards still in flight there is no #search-result-0 to
+  // carry a preview, and the 15 s budget was already running. The retry itself
+  // is sound -- measured, the preview returns 193 ms after the second keystroke
+  // unthrottled and 240 ms at a 4x CPU throttle -- so wait for the rows rather
+  // than widen the budget and hope.
+  const ranked = awaitSearchData(page, "aliases-e.json");
   await input.click();
   await input.fill("voltage drop 120v 150 ft 20 amps");
+  await ranked;
+  await expect(page.locator(".search-result").first()).toBeVisible({ timeout: 30_000 });
 
   // With the map missing, schedulePreview bails and no answer appears.
   const preview = page.locator("#search-result-0 .sr-preview");
