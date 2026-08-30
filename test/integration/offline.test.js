@@ -72,13 +72,20 @@ test("offline: a calculator backed by a data shard still computes", async ({ pag
   // rather than throwing or accusing -- but "by design" and "verified" are not
   // the same claim, and the README promises the second one.
   //
-  // Note what carries the shard: sw.js precaches data/realestate/manifest.json
-  // but NOT loan-limits.json. The shard is served from the runtime DATA_CACHE,
-  // which the fetch handler populates cache-first on first read, so this works
-  // for a reader who has opened the tile before -- which is what warming it
-  // below models. Confirmed against the same control the tests above use: with
-  // the worker blocked, the offline reload fails outright with
+  // The tile is warmed online first, which is what a reader who has opened it
+  // before would have done, and confirmed against the same control the tests
+  // above use: with the worker blocked, the offline reload fails outright with
   // net::ERR_INTERNET_DISCONNECTED, so nothing here is the HTTP cache.
+  //
+  // The assertion is the matched COUNTY, not the dollar figure. Both matter:
+  // sw.js does not name loan-limits.json anywhere, so the shard reaches this
+  // page through the runtime DATA_CACHE rather than the precache, and if it
+  // failed to arrive the compute falls back to the bundled baseline instead of
+  // erroring. That fallback publishes ceiling_high_cost_one_unit_usd, which is
+  // 1,209,750 -- the SAME number as the San Francisco row. Asserting the
+  // dollars alone would pass with the shard entirely absent. The county lookup
+  // ("San Francisco (CA, FIPS 06075)") exists only in the shard's
+  // high_cost_counties_one_unit table, so it is what actually pins this.
   await installWorker(page);
   await page.goto("/#loan-limits");
   await expect(page.locator("#view-region h1")).toBeVisible();
@@ -94,7 +101,7 @@ test("offline: a calculator backed by a data shard still computes", async ({ pag
     await page.locator("#view-region button").filter({ hasText: /example/i }).first().click();
     // The shard's own content, not just a rendered shell: this county and this
     // limit come out of data/realestate/loan-limits.json.
-    await expect(out).toContainText(/San Francisco/, { timeout: 15000 });
+    await expect(out).toContainText(/San Francisco \(CA, FIPS 06075\)/, { timeout: 15000 });
     await expect(out).toContainText(/1,209,750/);
     await expect(out).not.toContainText(/NaN|Infinity|undefined/);
     // A failed manifest fetch must not be reported to the reader as tampering.
