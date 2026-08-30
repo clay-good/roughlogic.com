@@ -12,6 +12,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Every uncurated tile page in a group pointed at the same five calculators.** The related-tiles block falls back when `scripts/related-tiles.mjs` has no entry, and the fallback was "the first 5 other tiles in the same group, by TOOLS order" -- literally identical for all 167 uncurated tiles. Sheet-Metal Gauge to Decimal Thickness sent readers to stair stringers, roof pitch, rafters, square footage and board footage. It also squeezed the internal link graph flat: **482 of the 1,804 tiles received no related link from any tile page**, while `square-footage` collected 50.
+
+  The fallback now ranks the tile's own name against its group siblings through the same `rankTools` the search box uses -- deterministic, build-time, no new dependency. Sheet-Metal Gauge now points at bend springback, duct metal weight, press-brake maximum thickness, coil length and minimum bend radius. The 185 curated entries carrying only one or two links (spec-v13 §5.2 asks for three to six) are padded the same way, with every editorial pick kept first and in order.
+
+  | | before | after |
+  | --- | --- | --- |
+  | tiles receiving at least one related link | 1,322 | **1,535** |
+  | tiles receiving none | 482 | **269** |
+  | links on the heaviest receiver | 50 | **30** |
+
+  `test/unit/related-tiles-fallback.test.js` pins it: curated entries lead in registry order for every curated tile, a short list reaches three, Sheet-Metal Gauge is named, and uncurated tiles in a group must not all end up with the same five links -- which is the regression that would bring the old fallback back. Shell gzip caps, 320 px sweep, dist cross-check and shell values all re-run clean.
+
 - **The alias file's own schema line did not mention its largest kind.** `data/search/aliases.json` declares `kind: 'industry' | 'redirect' | 'adjacent'`, and `question` -- 13,688 of 21,072 rows, 65% of the file -- was not among them. Anyone reading the authoring master to add a row was reading a vocabulary that had not been true for a long time. Fixed, and `check-alias-targets` now enforces it by reading the vocabulary out of the `_schema` line itself rather than restating it, so the two cannot drift apart in either direction. Seed-verified with a row carrying `kind: "typo"`.
 
 - **The free-access probe reported two dead links against a live publisher.** `check-free-access` is the opt-in network probe behind the site's "every answer cites a source you can read for free" promise. It HEADs each cited publisher URL and falls back to GET on a 405 or 501 -- but not when the HEAD simply fails, and `ncei.noaa.gov` closes the connection on one: `curl -I` returns 200, node's `fetch` throws "other side closed". So both NCEI rows came back `WARN ERR (fetch failed)` for a host the data pipeline downloads the World Magnetic Model from every week. The fallback now also fires when HEAD throws, on a fresh timeout budget so a genuine timeout is not retried into a second 15 s wait. Probe reads **25 OK / 1 WARN**, up from 23/3; the remaining warning is `codes.iccsafe.org` returning 403 to any robot, which is what it has always done.

@@ -25,6 +25,7 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { CITATIONS } from "../citations.js";
 import { leadSentence, restOfDescription } from "../text-lead.js";
+import { normalizeQuery, rankTools } from "../search-discovery.js";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = resolve(ROOT, "dist");
@@ -669,26 +670,51 @@ function buildTitle(tool, professionNoun, capChars) {
 }
 
 // Pick 3-6 related tiles per spec-v13 §5.2 + §9.1. When the per-tile
-// related-tiles registry in scripts/related-tiles.mjs has entries for
-// the tile, those entries win and are rendered in the order the
-// registry records (the editorial cross-references that the citation
-// graph + worked-example narratives already imply). When the registry
-// has no entries (the default for the long tail), fall back to "the
-// first 5 other tiles in the same group, by TOOLS order".
-function relatedTiles(tool, tools, related) {
+// related-tiles registry in scripts/related-tiles.mjs has entries for the tile,
+// those entries win, in the order the registry records them (the editorial
+// cross-references the citation graph and worked-example narratives imply).
+//
+// 167 tiles have no entry, and the fallback for them used to be "the first 5
+// other tiles in the same group, by TOOLS order" -- which is the SAME five for
+// every uncurated tile in that group. Sheet-Metal Gauge pointed a reader at
+// stair stringers and roof pitch; every uncurated construction tile pointed at
+// those same five. It also concentrated the internal link graph: 482 of the
+// 1,804 tiles received no related link from any tile page, while
+// `square-footage` received 50.
+//
+// The fallback now ranks the tile's own name against its group siblings
+// through the same `rankTools` the search box uses, and pads from group order
+// when a short name ranks fewer than five. Deterministic (the ranker settles
+// ties alphabetically), build-time only, and no new dependency. Sheet-Metal
+// Gauge now points at bend springback, duct metal weight and press-brake
+// thickness. Tiles receiving at least one related link: 1,322 -> 1,498; the
+// heaviest receiver drops from 50 links to 30.
+export function relatedTiles(tool, tools, related) {
+  const byId = new Map(tools.map((t) => [t.id, t]));
   const curated = related && Array.isArray(related[tool.id]) ? related[tool.id] : [];
-  if (curated.length > 0) {
-    const byId = new Map(tools.map((t) => [t.id, t]));
-    const out = [];
-    for (const id of curated) {
-      const t = byId.get(id);
-      if (t) out.push(t);
-    }
-    if (out.length > 0) return out;
+  const out = [];
+  const seen = new Set([tool.id]);
+  for (const id of curated) {
+    const t = byId.get(id);
+    if (t && !seen.has(t.id)) { out.push(t); seen.add(t.id); }
   }
-  return tools
-    .filter((t) => t.group === tool.group && t.id !== tool.id)
-    .slice(0, 5);
+  // §5.2 asks for 3-6, and 185 curated entries carry one or two. Those are not
+  // wrong, just short: the editorial picks stay first and in order, and the
+  // ranker fills to three. An uncurated tile starts from nothing and fills to
+  // five.
+  const want = out.length > 0 ? 3 : 5;
+  if (out.length >= want) return out;
+  const pool = tools.filter((t) => t.group === tool.group && !seen.has(t.id));
+  const { tokens } = normalizeQuery(tool.name);
+  for (const r of tokens.length ? rankTools(tokens, pool, [], { limit: want }) : []) {
+    if (out.length >= want) break;
+    if (!seen.has(r.tool.id)) { out.push(r.tool); seen.add(r.tool.id); }
+  }
+  for (const t of pool) {
+    if (out.length >= want) break;
+    if (!seen.has(t.id)) { out.push(t); seen.add(t.id); }
+  }
+  return out;
 }
 
 // spec-v13 Phase C: JSON-LD structured data block. Returns the
