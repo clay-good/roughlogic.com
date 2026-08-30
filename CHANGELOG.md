@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The agent door returned nothing for "12/2".** That is the commonest romex spec there is, and it appears in no tile's id, name or description -- so with `rankTools` empty for an all-digit query, the substring fallback had nothing to match and handed back an empty list. The site, meanwhile, answered Wire Ampacity, off the curated alias "12/2 wire max amps". Same for "200a" and the 200 Ah battery-runtime question.
+
+  The agent fallback now asks the aliases the same two ways the browser's combobox does: exactly, through `resolveQuery`, then by prefix, through `matchAliasPrefix`. Both doors now return the same tile for both queries.
+
+  Where the browser has nothing either -- "240v", "14-2" -- the agent stays empty rather than guessing. The site shows its browse-all-trades fallback there, which is a dead end offered honestly; the agent equivalent is an empty result, not a plausible-looking wrong tile.
+
 - **The two doors disagreed on every code section, and the shared module was supposed to prevent exactly that.** `rankTools` returns **nothing** for a query made only of digit-led tokens: those are values, they carry no coverage, and every candidate is filtered out. So every code-section query fell through to `search()`'s substring fallback, ordered by catalog position. An agent asking for `240.21` got `transformer-conductor-protection`; a reader typing it into the site got the feeder-tap rule a human had mapped it to. `62.2` gave the agent `blower-door-ach50` and the reader ASHRAE 62.2. The comment above that fallback says the ranker is shared "so agent and browser recall cannot drift" -- this is where it drifted, in the one place the shared ranker declines to answer.
 
   The fallback now asks the aliases first, through the same `resolveQuery` the browser's combobox uses. All **32** numeric alias terms now return the curated target first on both doors, and the two agree on every one.

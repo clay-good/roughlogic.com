@@ -139,3 +139,33 @@ test("both doors agree on a code-section query", async () => {
     assert.equal(browser && browser.match, row.target, `browser: "${row.term}"`);
   }
 });
+
+test("trade shorthand reaches the same tile on both doors", async () => {
+  // "12/2" appears in no tile's id, name or description, so the substring
+  // fallback returned NOTHING for the commonest romex spec there is, while the
+  // site answered Wire Ampacity off the alias "12/2 wire max amps". The agent
+  // fallback now asks the aliases the same two ways the browser does: exactly,
+  // then by prefix.
+  const { search } = await import("../../mcp/catalog.mjs");
+  const { matchAliasPrefix } = await import("../../search-discovery.js");
+  const { readFile } = await import("node:fs/promises");
+  const { resolve, dirname } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const root = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
+  const { aliases } = JSON.parse(await readFile(resolve(root, "data", "search", "aliases.json"), "utf8"));
+
+  for (const q of ["12/2", "200a"]) {
+    const out = await search({ query: q, limit: 3 });
+    const first = (out.results || [])[0];
+    const browser = matchAliasPrefix(q, aliases, 3)[0];
+    assert.ok(browser, `"${q}" should still have an alias-prefix match to compare against`);
+    assert.equal(first && first.id, browser.target, `"${q}" must agree with the browser`);
+  }
+  // Where the browser has nothing either, an empty list is the honest answer
+  // and must not become a guess.
+  for (const q of ["240v", "14-2"]) {
+    assert.equal(matchAliasPrefix(q, aliases, 3).length, 0);
+    const out = await search({ query: q, limit: 3 });
+    assert.equal((out.results || []).length, 0, `"${q}" should stay empty, not guess`);
+  }
+});

@@ -14,7 +14,7 @@
 // run() of a tile in that module, exactly as the worked-example runner does.
 
 import { readFile } from "node:fs/promises";
-import { normalizeQuery, rankTools, resolveQuery } from "../search-discovery.js";
+import { normalizeQuery, rankTools, resolveQuery, matchAliasPrefix } from "../search-discovery.js";
 import { getLimitationCopy } from "../limitation-banner.js";
 // spec-v1185: the curated per-tile cross-links the browser shows as "related
 // tiles". Build-time data; a missing/unreadable module degrades to no related.
@@ -459,16 +459,36 @@ export async function search({ query = "", trade = "", limit = 30 } = {}) {
     // ASHRAE 62.2 tiles a human had mapped them to. The comment above says this
     // module is shared so agent and browser recall cannot drift; this is where
     // it drifted.
-    const resolved = resolveQuery(q, aliases, pool.map((t) => t.id));
     const terms = q.split(/\s+/).filter(Boolean);
     matches = pool.filter((t) => {
       if (!terms.length) return true;
       const hay = `${t.id} ${t.name} ${t.desc}`.toLowerCase();
       return terms.every((term) => hay.includes(term));
     });
-    if (resolved && resolved.match) {
-      const target = pool.find((t) => t.id === resolved.match);
-      if (target) matches = [target, ...matches.filter((t) => t.id !== target.id)];
+    // Ahead of the substring pass, the two questions the browser's combobox
+    // asks: is this exactly a committed alias, and does any alias START with
+    // it. Trade shorthand needs the second one -- "12/2" appears in no tile's
+    // id, name or description, so substring matching returned NOTHING for the
+    // commonest romex spec there is, while the site answered Wire Ampacity off
+    // the alias "12/2 wire max amps". Same for "200a" and the 200 Ah battery
+    // question. Where the browser has nothing either ("240v", "14-2") it shows
+    // its browse fallback, and the agent still gets an empty list, which is the
+    // honest answer rather than a guess.
+    const front = [];
+    const resolved = resolveQuery(q, aliases, pool.map((t) => t.id));
+    if (resolved && resolved.match) front.push(resolved.match);
+    for (const row of matchAliasPrefix(q, aliases, 5)) {
+      if (row && typeof row.target === "string") front.push(row.target);
+    }
+    if (front.length) {
+      const seen = new Set();
+      const promoted = [];
+      for (const id of front) {
+        if (seen.has(id)) continue;
+        const tool = pool.find((t) => t.id === id);
+        if (tool) { seen.add(id); promoted.push(tool); }
+      }
+      matches = [...promoted, ...matches.filter((t) => !seen.has(t.id))];
     }
   }
 
