@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Queries that name a direction were answered by the opposite direction.** The exact-id bonus compared the query against a de-hyphenated id, but an id carries stopwords the query loses: `septic-tank-for-interval` became "septic tank for interval" while the query normalized to "septic tank interval", so the bonus never fired on precisely the queries that spell out a direction, and the inverse sibling won instead. Ids now normalize the same way queries do. Tiles ranking first for their own id: **1,745 -> 1,759 of 1,804 (96.73% -> 97.51%)**, with curated aliases and name ranking both unchanged.
+
+  The first version of this was wrong and a test I wrote earlier the same day caught it. Stripping stopwords makes ids collide the same way alias terms do -- `backflow-sizing` also normalizes to "backflow" -- so both it and the tile whose id IS "backflow" claimed the bonus, tied, and the alphabetical tiebreak handed the query to the wrong one. The harness still showed +14 overall, because the gain hid the loss. An exact de-hyphenated match now always wins, and a normalized-only match earns the bonus only when it is the one tile that normalizes that way: same +14, no regression.
+
+  Recorded as a known miss rather than fixed: "triangle sas" returns the SSS solver. Verified identical before and after this change, so it is pre-existing and a different mechanism.
+
+  `search-discovery.js` cap 10,000 -> 11,000 B. The prose was trimmed to the minimum first and the module was still 42 B over, so this is code rather than comments. Lazy-loaded; the home-view payload is unchanged at 47,209 B.
+
 - **A ranking measurement harness, and two changes it stopped me from shipping.** `scripts/measure-ranking.mjs` scores `rankTools` -- the ranker both doors use -- against three ground truths taken from the project's own data rather than invented: every curated alias phrase should reach the tile a human mapped it to (21,025 rows), every tile should rank first for its own name, and every tile should rank first for its own id. Run it before and after any change to `search-discovery.js`; a change that raises one number and lowers another is a trade, and this is how you see the price.
 
   It immediately paid for itself. Alias terms are unique but their normalized forms are not: stopword stripping collapses `"wire size"`, `"what wire size"`, `"what size wire"` and `"best wire size"` all to the single key `"wire"`, and the index hands that key to whichever row appears **first in the file**. That is `"best wire size"` pointing at a machinist's three-wire thread-measurement tool, so an electrician typing "wire size" gets it while three curated rows saying otherwise lose their bonus silently. 45 normalized keys collide onto different targets, costing 49 curated rows.

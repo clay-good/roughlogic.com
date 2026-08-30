@@ -445,3 +445,15 @@ test("the id bonus does not promote a tile the query merely contains", async () 
   const mcl = rankTools(normalizeQuery("max circuit length for voltage drop").tokens, TOOLS, ALIASES, { limit: 3 });
   assert.equal(mcl[0].tool.id, "max-circuit-length-for-vd");
 });
+
+test("an id containing stopwords still earns the exact-id bonus", async () => {
+  const { aliases: ALIASES, TOOLS } = await rankingFixture();
+  // "septic-tank-for-interval" normalizes to "septic tank interval", and so
+  // does the query. Comparing the raw de-hyphenated id would never match,
+  // which is why the direction-naming queries lost to their inverse siblings.
+  for (const id of ["septic-tank-for-interval", "cash-on-cash"]) {
+    const phrase = id.replace(/-/g, " ");
+    const ranked = rankTools(normalizeQuery(phrase).tokens, TOOLS, ALIASES, { limit: 3 });
+    assert.equal(ranked[0].tool.id, id, `"${phrase}" should rank its own tile first`);
+  }
+});

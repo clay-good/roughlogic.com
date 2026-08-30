@@ -269,6 +269,30 @@ function aliasIndex(aliases) {
   return entry;
 }
 
+// An id carries stopwords the query loses, so it compares normalized too:
+// "conductivity-from-tds" must match "conductivity tds" or the bonus never
+// fires on direction-naming queries. Stripping makes ids collide, though --
+// "backflow-sizing" also normalizes to "backflow" -- so an exact de-hyphenated
+// match always wins, and a normalized-only one counts only when unique.
+const _idPhraseCache = new Map();
+const _normIdOwners = new Map();
+function idPhrases(tools) {
+  if (_normIdOwners.size) return;
+  for (const t of tools) {
+    if (!t || typeof t.id !== "string") continue;
+    const raw = t.id.replace(/-/g, " ");
+    const norm = normalizeQuery(raw).tokens.join(" ");
+    _idPhraseCache.set(t.id, { raw, norm });
+    _normIdOwners.set(norm, (_normIdOwners.get(norm) || 0) + 1);
+  }
+}
+function idBonusApplies(tool, joined) {
+  const p = _idPhraseCache.get(tool.id);
+  if (!p) return false;
+  if (p.raw === joined) return true;
+  return p.norm === joined && _normIdOwners.get(p.norm) === 1;
+}
+
 function corpusFor(tool, aliases, aliasEntry) {
   let c = _corpusCache.get(tool);
   const aliasLen = Array.isArray(aliases) ? aliases.length : 0;
@@ -377,6 +401,7 @@ export function rankTools(tokens, tools, aliases, opts) {
       ? Math.floor(opts.limit)
       : 12;
   const aliasEntry = aliasIndex(aliases);
+  idPhrases(tools);
   const joined = tokens.join(" ");
   // Verbatim-alias bonus: the normalized query IS one tile's committed
   // alias phrase, so that tile is what the user asked for. Terms are
@@ -398,7 +423,7 @@ export function rankTools(tokens, tools, aliases, opts) {
   for (const tool of tools) {
     if (!tool || typeof tool !== "object" || typeof tool.id !== "string") continue;
     const corpus = corpusFor(tool, aliases, aliasEntry);
-    const idPhrase = tool.id.replace(/-/g, " ");
+
     const weights = new Array(tokens.length);
     let score = 0;
     let coverage = 0;
@@ -451,7 +476,7 @@ export function rankTools(tokens, tools, aliases, opts) {
     // wins over it -- a human already said where that phrase goes, and
     // applying both bonuses ties them back onto the alphabetical tiebreak.
     // See test/unit/search-discovery.test.js for the measured numbers.
-    if (idPhrase === joined && verbatimTarget === undefined) score += 4;
+    if (verbatimTarget === undefined && idBonusApplies(tool, joined)) score += 4;
     if (verbatimTarget === tool.id) score += 4;
     scored.push({ tool, corpus, weights, score, coverage, viaTypo: false, namesInFull });
   }
