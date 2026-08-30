@@ -120,6 +120,63 @@ async function checkIndexHtml(expectedTiles, errors) {
   return found;
 }
 
+
+// The README quotes one calculator's worked example in full -- the first
+// concrete thing a reader sees, and the page it points at is live. Nothing
+// pinned it, so a change to voltage-drop's example or its labels would leave
+// the front page quoting an answer the site no longer gives. Compare the table
+// against the tile's own prerendered shell, which is what the README claims to
+// be showing.
+//
+// (Written after briefly "fixing" a row that was already there: the table runs
+// past the window I had printed, so it looked short. Reading half a file and
+// concluding something is missing is exactly what a gate is for.)
+async function checkReadmeExample(readme, errors) {
+  const shellPath = resolve(ROOT, "dist", "tools", "voltage-drop", "index.html");
+  let shell;
+  try {
+    shell = await readFile(shellPath, "utf8");
+  } catch {
+    return 0; // no build present; the post-build gates cover that case
+  }
+  const pairsFrom = (html, label) => {
+    const start = html.indexOf(label);
+    if (start === -1) return [];
+    const block = html.slice(start, html.indexOf("</ul>", start));
+    return [...block.matchAll(/<li><span>([^<]+)<\/span> <b>([^<]+)<\/b><\/li>/g)]
+      .map((m) => [m[1].trim(), m[2].trim()]);
+  };
+  const shellIn = pairsFrom(shell, "You enter");
+  const shellOut = pairsFrom(shell, "You get");
+  if (!shellIn.length || !shellOut.length) return 0;
+
+  // README table rows: "| <in label> | <in value> | <out label> | <out value> |"
+  const table = readme.slice(readme.indexOf("| You enter |"));
+  const rows = [...table.slice(0, table.indexOf("\n\n")).matchAll(/^\|([^|]*)\|([^|]*)\|([^|]*)\|([^|]*)\|$/gm)]
+    .map((m) => m.slice(1).map((c) => c.trim()))
+    .filter((c) => c[0] && c[0] !== "You enter" && !/^-+$/.test(c[0]));
+  const readmeIn = rows.filter((c) => c[0] && c[1]).map((c) => [c[0], c[1]]);
+  const readmeOut = rows.filter((c) => c[2] && c[3]).map((c) => [c[2], c[3]]);
+
+  const fmt = (pairs) => pairs.map(([k, v]) => k + " = " + v).join("; ");
+  if (fmt(readmeIn) !== fmt(shellIn)) {
+    errors.push(
+      `README.md: the Voltage Drop example's "You enter" rows do not match the live tile page.\n` +
+        `      README: ${fmt(readmeIn)}\n      tile:   ${fmt(shellIn)}`,
+    );
+  }
+  // The shell prints every output; the README quotes the headline ones. Each
+  // row it does quote has to be right, and in the tile's own order.
+  const shellOutHead = shellOut.slice(0, readmeOut.length);
+  if (fmt(readmeOut) !== fmt(shellOutHead)) {
+    errors.push(
+      `README.md: the Voltage Drop example's "You get" rows do not match the live tile page.\n` +
+        `      README: ${fmt(readmeOut)}\n      tile:   ${fmt(shellOutHead)}`,
+    );
+  }
+  return readmeIn.length + readmeOut.length;
+}
+
 async function main() {
   const readme = await readFile(resolve(ROOT, "README.md"), "utf8");
   const live = await liveCounts();
@@ -127,6 +184,7 @@ async function main() {
   let checked = 0;
 
   checked += await checkIndexHtml(live.tiles, errors);
+  checked += await checkReadmeExample(readme, errors);
 
   // AGENTS.md (spec-v1194) states the catalog size for agents landing in the
   // repo; anchor on its labels so the numbers cannot rot.
