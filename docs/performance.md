@@ -82,7 +82,22 @@ Two constraints any split has to respect, both found by looking rather than by r
 - **`TOOLS` array order is load-bearing.** `constant-notes.js` decodes a bitmap positionally (`TOOLS.filter((t, i) => bit i)`), so 1,053 tiles' constant notes are keyed to catalog *position*, not id. An index shard preserves that; a per-group-only split would not. Reordering two tiles with different bits does flip the notes onto the wrong tiles, and `extract-constant-notes --check` correctly fails when it happens (verified by seeding exactly that swap; a swap between two tiles with the *same* bit correctly passes, because nothing changed).
 - The largest group shard is 107 KB, so group E would want sub-shards the way `data/fields` already splits `e-1` / `e-2`.
 
-The blocker is blast radius, not the search tradeoff: this rewrites how the browser loads the catalog on both the routing and search paths. The numbers and constraints are here so the decision is one step away.
+A third shape, measured 2026-08-30, that the group-shard analysis above did not try: **keep one catalog and put only the LEAD SENTENCE in it**, moving the rest of each description to the lazily-fetched shards.
+
+| | gzipped | deep link vs today |
+| --- | --- | --- |
+| catalog as it ships (full `desc`) | 397,907 B | -- |
+| catalog carrying `leadSentence(desc)` only | **113,050 B** | 72% smaller |
+| catalog carrying no description at all | 52,009 B | 87% smaller |
+| rest-of-description map, all tiles | 302,631 B | fetched lazily |
+
+What makes the middle row interesting is what a deep link does *after* the fetch. A tile view needs three things out of `desc`: the meta description, the lead under the title, and the Details body. The first two are the lead sentence. So a lead-carrying catalog renders the tile **in one pass with no second request** -- which matters because the 2026-08-29 CLS fix exists to stop tile routes rendering in two stages, and a split that puts the lead behind a second fetch reintroduces exactly that. The no-description row is 2.2x smaller again but pays a second blocking hop before the page can show its own lead.
+
+It also sidesteps the constraint above for free: it is the same array in the same order with fewer fields per row, so the `constant-notes.js` positional bitmap is untouched.
+
+Sharding the rest by the first letter of the id gives 24 shards with the largest at 53,574 B -- half the largest per-group shard, because group E's 479 tiles spread across the alphabet. Total bytes for a search that awaits everything: 415,681 B against 397,907 today, 4.5% more, in parallel.
+
+The blocker is blast radius, not the search tradeoff: this rewrites how the browser loads the catalog on both the routing and search paths. The numbers and constraints are here so the decision is one step away. **It remains a product decision and is deliberately not taken here** -- what is written down is the measurement, so whoever takes it is choosing between shapes rather than guessing.
 
 ## Page weight strategy
 
