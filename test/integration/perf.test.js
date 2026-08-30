@@ -200,10 +200,22 @@ test("perf: home view meets FCP / LCP / TBT / CLS budgets on slow-3G", async ({ 
 // advisory that cries wolf on harness noise is one people learn to scroll past.
 // The hard tier sits at roughly double that: "the document did not arrive"
 // territory, not "the page got a little heavier".
+// The two index pages here are the heaviest static documents the site serves
+// and the two that matter most to a stranger arriving from a search engine, so
+// they are the ones worth measuring. /groups/construction/ is the top landing
+// page and the largest group index (45,019 B gzipped, 65% of the check-shells
+// cap, 2.2x /groups/electrical/, which this list used to name instead).
+// /tools/ is the catalog hub the whole one-box program is gated on
+// (specs/scope-one-box.md) at 47,555 B, and nothing measured it at all.
+// Measured 2026-08-29: 2,796 and 2,844 ms median, CLS 0.000 on both. Size turns
+// out to cost little here -- construction is 3% slower than electrical for
+// 2.2x the bytes, because the profile's 400 ms RTT dominates a single static
+// document -- but "it is fine today" is the reason to pin it, not to skip it.
 const SHELLS = [
   { url: "/tools/wire-ampacity/", label: "tile shell (v1 calculator)", advisory_ms: 3200, hard_ms: 5000 },
   { url: "/tools/friction-loss/", label: "tile shell (lazy-loaded module)", advisory_ms: 3200, hard_ms: 5000 },
-  { url: "/groups/electrical/", label: "group index", advisory_ms: 3800, hard_ms: 6500 },
+  { url: "/groups/construction/", label: "largest group index / top landing page", advisory_ms: 3800, hard_ms: 6500 },
+  { url: "/tools/", label: "catalog hub", advisory_ms: 3800, hard_ms: 6500 },
 ];
 
 // No TBT assertion here, deliberately. The obvious one to write is "a shell

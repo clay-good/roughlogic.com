@@ -6,6 +6,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The perf suite measured the small pages and skipped the big ones.** Shell coverage landed on `/groups/electrical/` (20,517 B gzipped) while the two heaviest static documents on the site went unmeasured: `/groups/construction/`, the top landing page and largest group index at 45,019 B, and `/tools/`, the catalog hub at 47,555 B that the whole one-box program is gated on. Both are now covered and `/groups/electrical/` is retired from the list, so the gate tests the worst case rather than a middling one.
+
+  Neither is slow today: 2,796 and 2,844 ms median with CLS 0.000, and construction paints only 3% slower than electrical for 2.2x the bytes, because a single static document's paint is dominated by the profile's 400 ms RTT rather than its size. "It is fine today" is the reason to pin it, not to skip it. Seed-verified: 1.5 MB of blocking CSS in the hub fails the hard tier.
+
 - **The catalog registry, measured.** `tools-data.js` is 1,090,548 B raw / 397,907 B gzipped and sits at 92.5% of a cap that has been raised at nearly every expansion band. `desc` is **79%** of it; without descriptions the registry gzips to 47,224 B instead of 397,907 B. Both a deep link and the first search keystroke pull all of it, and the deep link needs 1 row of 1,804.
 
   Written up in docs/performance.md rather than acted on, with the split sized: an index of `id` + `group` + `trades` is 19,422 B, the median description shard 11,198 B, so a median deep link goes from 397,907 B to 30,620 B (92% smaller) and the worst group from 397,907 to 126,829 B.
