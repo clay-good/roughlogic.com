@@ -211,6 +211,12 @@ async function main() {
   // drifted to 56 against a live 57.
   const arch = await readFile(resolve(ROOT, "docs", "architecture.md"), "utf8");
   checked += checkPattern(arch, /set has since grown to\s+(\d+)\s*\n?modules/g, live.modules, "calc-* module count (docs/architecture.md)", errors);
+  // The same count sits in the architecture diagram, and in the file list
+  // docs/deployment.md tells a deployer to copy. Pinning only the prose
+  // sentence left both saying 56 against a live 57 the day after that fix.
+  checked += checkPattern(arch, /dynamic-import: (\d+) calc-\* modules/g, live.modules, "calc-* module count (docs/architecture.md diagram)", errors);
+  const deploy = await readFile(resolve(ROOT, "docs", "deployment.md"), "utf8");
+  checked += checkPattern(deploy, /all (\d+) calc-\* modules from/g, live.modules, "calc-* module count (docs/deployment.md)", errors);
 
   // docs/performance.md: the calc-module count and the data-pipeline shape.
   const perf = await readFile(resolve(ROOT, "docs", "performance.md"), "utf8");

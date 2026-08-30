@@ -53,7 +53,7 @@ active. Cache version is keyed to the build hash.
 |  |  +------------+  +-----------+  +---------------------+   | |
 |  |  | pinned     |  | theme     |  | offline / print     |   | |
 |  |  +------------+  +-----------+  +---------------------+   | |
-|  |   dynamic-import: 56 calc-* modules (the repo-root        | |
+|  |   dynamic-import: 57 calc-* modules (the repo-root        | |
 |  |   calc-*.js set, one per trade bench; each holds a        | |
 |  |   documented gzip cap in check-module-sizes.mjs) plus     | |
 |  |   citations / tile-meta / limitation-banner /             | |
