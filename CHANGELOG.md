@@ -12,6 +12,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`check-dist` printed the same three orphan warnings on every build.** `.well-known/mcp.json`, `AGENTS.md` and `llms.txt` are fetched by well-known path and linked from nothing, so the orphan pass flagged them every time and nobody read the list any more -- which is how a fourth, genuinely dead file would have arrived unnoticed. The three are named in `ORPHAN_EXEMPT` alongside `robots.txt` and `sitemap.xml`, where they belonged, and an orphan is now a **failure** rather than a warning. Seed-verified with a stray file in `dist/`.
+
 - **Every uncurated tile page in a group pointed at the same five calculators.** The related-tiles block falls back when `scripts/related-tiles.mjs` has no entry, and the fallback was "the first 5 other tiles in the same group, by TOOLS order" -- literally identical for all 167 uncurated tiles. Sheet-Metal Gauge to Decimal Thickness sent readers to stair stringers, roof pitch, rafters, square footage and board footage. It also squeezed the internal link graph flat: **482 of the 1,804 tiles received no related link from any tile page**, while `square-footage` collected 50.
 
   The fallback now ranks the tile's own name against its group siblings through the same `rankTools` the search box uses -- deterministic, build-time, no new dependency. Sheet-Metal Gauge now points at bend springback, duct metal weight, press-brake maximum thickness, coil length and minimum bend radius. The 185 curated entries carrying only one or two links (spec-v13 §5.2 asks for three to six) are padded the same way, with every editorial pick kept first and in order.

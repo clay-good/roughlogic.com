@@ -179,6 +179,13 @@ async function main() {
     "build-info.json",
     "favicon.svg",
     "site.webmanifest",
+    // Fetched by well-known path, never linked: MCP client discovery, the
+    // agent-instruction conventions. Listed here rather than left as a standing
+    // warning -- three permanent warnings on every build are how a fourth,
+    // genuinely dead file arrives unnoticed.
+    ".well-known/mcp.json",
+    "AGENTS.md",
+    "llms.txt",
   ]);
   const orphans = [];
   for (const rel of files) {
@@ -202,19 +209,21 @@ async function main() {
     if (!referenced.has(rel)) orphans.push(rel);
   }
   if (orphans.length > 0) {
-    console.warn("check-dist: " + orphans.length + " orphan file(s) shipped to dist/ but not referenced by any HTML / JS / CSS:");
-    for (const o of orphans) console.warn("  - " + o);
+    console.error("check-dist: " + orphans.length + " orphan file(s) shipped to dist/ but not referenced by any HTML / JS / CSS:");
+    for (const o of orphans) console.error("  - " + o);
+    console.error("Either reference the file, stop shipping it, or add it to ORPHAN_EXEMPT with the reason it is fetched by path.");
+    failed = true;
   }
 
   if (failed) {
     console.error("");
-    console.error("check-dist: at least one dangling reference. fix the above and re-run.");
+    console.error("check-dist: at least one dangling reference or orphan file. fix the above and re-run.");
     process.exit(1);
   }
   console.log("v12 dist/-vs-runtime cross-check OK (" +
     files.length + " files in dist/; " +
     totalRefsChecked + " same-origin references resolved; " +
-    orphans.length + " orphan warning(s) [G.3]).");
+    orphans.length + " orphans, which is now a failure not a warning [G.3]).");
 }
 
 await main();
