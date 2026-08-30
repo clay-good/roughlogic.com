@@ -78,33 +78,35 @@ function extractFreeAccessRefs(text) {
   return [...refs].sort();
 }
 
-async function probe(url) {
-  // node fetch with a short-ish timeout. Some publishers (icc, nfpa)
-  // are slow; allow 15 s.
+const UA = { "User-Agent": "roughlogic-free-access-probe/1.0 (maintenance)" };
+
+// One request with its own 15 s budget. Publishers (icc, nfpa) are slow.
+async function request(url, method) {
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), 15000);
   try {
-    let r = await fetch(url, {
-      method: "HEAD",
-      redirect: "follow",
-      signal: controller.signal,
-      headers: { "User-Agent": "roughlogic-free-access-probe/1.0 (maintenance)" },
-    });
-    if (r.status === 405 || r.status === 501) {
-      // HEAD not allowed; retry with GET.
-      r = await fetch(url, {
-        method: "GET",
-        redirect: "follow",
-        signal: controller.signal,
-        headers: { "User-Agent": "roughlogic-free-access-probe/1.0 (maintenance)" },
-      });
-    }
-    return { ok: r.ok, status: r.status, finalUrl: r.url };
+    const r = await fetch(url, { method, redirect: "follow", signal: controller.signal, headers: UA });
+    return { r, aborted: false };
   } catch (e) {
-    return { ok: false, status: 0, error: String(e && e.message ? e.message : e) };
+    return { error: e, aborted: controller.signal.aborted };
   } finally {
     clearTimeout(t);
   }
+}
+
+async function probe(url) {
+  let { r, error, aborted } = await request(url, "HEAD");
+  // Retry with GET on a 405/501, and ALSO when HEAD simply fails. ncei.noaa.gov
+  // closes the connection on a HEAD -- curl -I gets a 200, node's fetch throws
+  // "other side closed" -- so the probe reported two dead links against a host
+  // the data pipeline downloads from every week. A probe that cries wolf on a
+  // live publisher is worse than one that runs less often.
+  const headRefused = !r || r.status === 405 || r.status === 501;
+  if (headRefused && !aborted) {
+    ({ r, error } = await request(url, "GET"));
+  }
+  if (!r) return { ok: false, status: 0, error: String(error && error.message ? error.message : error) };
+  return { ok: r.ok, status: r.status, finalUrl: r.url };
 }
 
 function hostOf(url) {
