@@ -45,6 +45,29 @@
 // elsewhere), so some of that 0.46% is the alias file, not the ranker. Treat
 // the alias rate as a REGRESSION guard, not a score to maximise.
 //
+// A gap these three sets do NOT cover, and one attempt to cover it that failed.
+//
+// Conversational queries whose distinctive word is absent from the catalog rank
+// badly and nothing here sees it. "furnace size for a 2000 square foot house"
+// returns Roofing Squares: the query normalizes to furnace|2000|square|feet|
+// house, "square" is a strong name match for Roofing Squares, and the word
+// "furnace" appears nowhere in manual-j-heating's name, description or aliases.
+// No weighting scheme fixes that -- there is no link to promote. It is a
+// vocabulary gap, and curated aliases are the mechanism for it. Note the near
+// misses: "how much concrete for a 24x24 garage slab" IS a curated alias for
+// `concrete`, but "how much concrete for a 10x12 slab" does not inherit it,
+// because the verbatim bonus needs the whole normalized phrase to match.
+//
+// The obvious way to measure that generalization -- perturb the numbers in
+// every alias phrase and require the target to survive -- does not work, and is
+// recorded here so it is not rebuilt. It scores 82.04% of 1,615 rows, but the
+// residue is mostly the perturbation being wrong rather than the ranker: "60
+// degree thread depth", "4-20ma scaling", "260/280 ratio", "50 to 1 mix" and
+// "118 degree point" all carry numbers that IDENTIFY the calculator rather than
+// feed it, so changing them should change the answer. Separating identifying
+// numbers from quantities is a judgement call per row, which makes this a
+// curation task, not a derivable ground truth.
+//
 // Deterministic, offline, read-only. Not a gate: it reports, it does not fail.
 
 import { readFile } from "node:fs/promises";
