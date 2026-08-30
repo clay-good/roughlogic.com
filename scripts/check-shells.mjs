@@ -455,6 +455,37 @@ async function main() {
     errors.push("groups/: missing group shells directory.");
   }
 
+  // The sitemap and the shells are generated from the same TOOLS list, one
+  // after the other, which is exactly the reasoning that let a tampered data
+  // shard through: generated together is not the same as checked together. A
+  // sitemap entry with no page behind it is a 404 handed to a crawler; a shell
+  // missing from the sitemap is a page no crawler is told about. Both
+  // directions, cheaply.
+  let sitemapUrls = 0;
+  const sitemapPath = resolve(DIST, "sitemap.xml");
+  if (!existsSync(sitemapPath)) {
+    errors.push("sitemap.xml: missing.");
+  } else {
+    const xml = await readFile(sitemapPath, "utf8");
+    const locs = [...xml.matchAll(/<loc>https:\/\/roughlogic\.com([^<]*)<\/loc>/g)].map((m) => m[1]);
+    sitemapUrls = locs.length;
+    const listed = new Set(locs);
+    for (const loc of locs) {
+      const file = resolve(DIST, ("." + (loc.endsWith("/") ? loc + "index.html" : loc)).replace(/^\.\//, ""));
+      if (!existsSync(file)) errors.push("sitemap.xml lists " + loc + ", which has no page in dist/.");
+    }
+    for (const t of tools) {
+      if (!listed.has("/tools/" + t.id + "/")) errors.push("tools/" + t.id + "/ is built but absent from sitemap.xml.");
+    }
+    if (!listed.has("/tools/")) errors.push("the catalog hub /tools/ is absent from sitemap.xml.");
+    if (existsSync(groupsDir)) {
+      for (const slug of await readdir(groupsDir)) {
+        if (!existsSync(resolve(groupsDir, slug, "index.html"))) continue;
+        if (!listed.has("/groups/" + slug + "/")) errors.push("groups/" + slug + "/ is built but absent from sitemap.xml.");
+      }
+    }
+  }
+
   if (errors.length > 0) {
     console.error("check-shells: " + errors.length + " issue(s):");
     for (const e of errors) console.error("  - " + e);
@@ -467,7 +498,8 @@ async function main() {
     "check-shells OK: " + tileCount + " tile shells + " + groupCount + " group shells + 1 catalog hub; " +
     "all titles <= " + TITLE_CAP + " chars, descriptions <= " + DESCRIPTION_CAP + " chars, " +
     "JSON-LD valid against allowlist, gzip under " + TILE_GZIP_CAP + " / " + GROUP_GZIP_CAP + " B caps, " +
-    "every shell CSP present and unweakened, and no executable script on any shell."
+    "every shell CSP present and unweakened, no executable script on any shell, and " +
+    sitemapUrls + " sitemap URLs matched one-for-one against the built pages."
   );
 }
 

@@ -163,6 +163,16 @@ for groups and tiles, and `<priority>` of 1.0 home /
 0.8 group / 0.7 tile. (The changelog page that earlier carried its
 own sitemap entry was retired in the search-first home refactor.)
 
+`check-shells` matches the sitemap against `dist/` in both
+directions: every `<loc>` must have a page behind it, and every
+built tile, group and the catalog hub must appear in the sitemap.
+The two are generated from the same TOOLS list one after the
+other, which is the same "generated together" reasoning that once
+let a tampered data shard through -- generated together is not
+checked together. A dangling `<loc>` is a 404 handed to a crawler;
+a shell missing from the sitemap is a page no crawler is told
+about.
+
 [../robots.txt](../robots.txt) is unchanged from pre-v13: it allows
 all crawlers and points at the sitemap. No `Disallow` directive,
 no crawl delay, no AI-specific opinion.
