@@ -72,6 +72,7 @@ const same = (a, b) => {
 };
 
 const diverged = [];
+const unresolvedIds = [];
 let compared = 0;
 let unresolved = 0;
 
@@ -99,7 +100,7 @@ for (const [id, reg] of Object.entries(COMPUTE_MAP)) {
     || mod[Object.keys(mod).find((k) => k.toLowerCase() === name.toLowerCase())]
     || mod[byTile]
     || mod[Object.keys(mod).find((k) => k.toLowerCase() === byTile.toLowerCase())];
-  if (!ex || !ex.inputs) { unresolved++; continue; }
+  if (!ex || !ex.inputs) { unresolved++; unresolvedIds.push(id); continue; }
   compared++;
   const diffs = [];
   for (const [k, v] of Object.entries(row.inputs)) {
@@ -138,5 +139,9 @@ if (fixedSinceBaseline.length) {
   console.error(`check-example-parity: ${fixedSinceBaseline.length} tile(s) are fixed but still listed in the baseline; run \`node scripts/check-example-parity.mjs --write\` and commit:`);
   for (const id of fixedSinceBaseline) console.error(`  - ${id}`);
   process.exit(1);
+}
+if (process.argv.includes("--list-unresolved")) {
+  for (const id of unresolvedIds.slice().sort()) console.log(id);
+  process.exit(0);
 }
 console.log(`check-example-parity OK: ${compared} tiles compared, ${diverged.length} known divergences (baseline), 0 new (${unresolved} tiles have no example export to compare).`);

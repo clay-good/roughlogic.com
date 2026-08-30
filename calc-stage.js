@@ -331,7 +331,11 @@ export function computeRiggingCheck({ hardware = "sling_5_8_steel", configuratio
   };
 }
 
-export const riggingExample = { inputs: { hardware: "sling_5_8_steel", configuration: "basket", load_lb: 5000, included_angle_deg: 60, n_legs: 2 } };
+// Named off the compute function (computeRiggingCheck -> riggingCheckExample)
+// so check-example-parity resolves it: as `riggingExample` it did not, and the
+// tool quietly opened a basket hitch at 5,000 lb while the page printed the
+// verified vertical 1,500 lb case.
+export const riggingCheckExample = { inputs: { hardware: "sling_5_8_steel", configuration: "vertical", load_lb: 1500, included_angle_deg: 60, n_legs: 2 } };
 
 // --- Renderers ---
 
@@ -532,7 +536,7 @@ const renderSPL = _r({
 
 const renderRiggingCheck = _r({
   citation: "Notice: A qualified and competent rigger governs. Math aid only. Citation: ASME B30 series by section number only.",
-  example: riggingExample.inputs,
+  example: riggingCheckExample.inputs,
   fields: [
     { key: "hardware", label: "Hardware", kind: "select", options: Object.keys(RIGGING_HARDWARE).map((k) => ({ value: k, label: RIGGING_HARDWARE[k].label })) },
     { key: "configuration", label: "Configuration", kind: "select", options: [{ value: "vertical", label: "Vertical" }, { value: "basket", label: "Basket" }, { value: "bridle", label: "Bridle" }, { value: "choker", label: "Choker" }] },

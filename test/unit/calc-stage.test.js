@@ -8,7 +8,7 @@ import {
   computeDMX, dmxExample,
   computeNeutralImbalance, neutralImbalanceExample,
   computeSPL, splExample, SPL_MODES,
-  computeRiggingCheck, riggingExample, RIGGING_HARDWARE,
+  computeRiggingCheck, riggingCheckExample, RIGGING_HARDWARE,
   STAGE_RENDERERS,
 } from "../../calc-stage.js";
 
@@ -75,7 +75,7 @@ test("SPL: same distance returns same SPL", () => { const r = computeSPL({ L1_dB
 test("SPL: greater distance smaller SPL", () => { const a = computeSPL({ L1_dB: 100, d1: 1, d2: 5, mode: "free_field" }); const b = computeSPL({ L1_dB: 100, d1: 1, d2: 50, mode: "free_field" }); assert.ok(b.L2_freefield_dB < a.L2_freefield_dB); });
 
 // 221 Rigging check
-test("Rigging: example pass", () => { const r = computeRiggingCheck(riggingExample.inputs); assert.ok(typeof r.pass === "boolean"); });
+test("Rigging: example pass", () => { const r = computeRiggingCheck(riggingCheckExample.inputs); assert.ok(typeof r.pass === "boolean"); });
 test("Rigging: vertical = load / n", () => { const r = computeRiggingCheck({ hardware: "shackle_3_4_5T", configuration: "vertical", load_lb: 1000, included_angle_deg: 0, n_legs: 2 }); assert.equal(r.tension_per_leg_lb, 500); });
 test("Rigging: choker derate 0.75", () => { const r = computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "choker", load_lb: 1000, included_angle_deg: 60, n_legs: 2 }); assert.equal(r.derate_factor, 0.75); });
 test("Rigging: wide angle blows up tension", () => { const r = computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "basket", load_lb: 1000, included_angle_deg: 179, n_legs: 2 }); assert.ok(r.tension_per_leg_lb > 30000); });

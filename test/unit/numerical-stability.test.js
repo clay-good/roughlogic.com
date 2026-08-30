@@ -1017,7 +1017,7 @@ test("computeStatistics: bit-stable mean + median + sd_sample at the spec exampl
 
 import { computePropSlip, propSlipExample } from "../../calc-mechanic.js";
 import { computeDrawbarPower, drawbarPowerExample } from "../../calc-agriculture.js";
-import { computeRiggingCheck, riggingExample } from "../../calc-stage.js";
+import { computeRiggingCheck } from "../../calc-stage.js";
 import { computeYieldEP, yieldEPExample } from "../../calc-kitchen.js";
 
 test("computePropSlip: bit-stable theoretical_kt + slip_percent at the spec example (4500 rpm, 1.85:1, 19 in pitch, 35 kt GPS)", () => {
@@ -1046,7 +1046,10 @@ test("computeRiggingCheck: bit-stable tension_per_leg + safety_factor at the spe
   // geometry gives 5000 / (2 * cos 30) = 2886.75 lb/leg. safety_factor =
   // effective_wll / tension = 6700 / 2886.75 = 2.32. Pins the sling-geometry
   // arithmetic.
-  const r = computeRiggingCheck(riggingExample.inputs);
+  // Inputs stated literally, not read from the tile's example. The example
+  // moved to the page's verified VERTICAL case (a vertical hitch has no leg
+  // geometry), and this pin exists for the cos(angle/2) arithmetic.
+  const r = computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "basket", load_lb: 5000, included_angle_deg: 60, n_legs: 2 });
   assert.equal(bits(r.tension_per_leg_lb), "40a68d80b06a8664", `tension_per_leg=${r.tension_per_leg_lb}`);
   assert.equal(bits(r.safety_factor), "4002914d3a641ee3", `safety_factor=${r.safety_factor}`);
 });
