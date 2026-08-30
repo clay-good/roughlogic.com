@@ -389,7 +389,11 @@ test("spec-v1343: a vague query asks instead of guessing", async ({ page }) => {
   await input.press("Enter");
 
   const card = page.locator(".pick-card");
-  await expect(card).toBeVisible();
+  // Same explicit budget as the row assertion above. This flaked once in a
+  // suite run that took 25 minutes against a normal 13, and passes in 2-3 s
+  // three times running on an idle machine, so it is the 5 s default meeting a
+  // loaded runner rather than anything about the card.
+  await expect(card).toBeVisible({ timeout: 30_000 });
   const picks = card.locator(".pick");
   expect(await picks.count()).toBeGreaterThanOrEqual(2);
   expect(await picks.count()).toBeLessThanOrEqual(3);
