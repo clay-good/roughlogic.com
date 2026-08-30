@@ -6,6 +6,20 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Searching "concrete" did not return the calculator named Concrete Volume.** Not in the top three, not in the top twenty, on the browser search box and the agent door alike. Every "Concrete ..." tile ties on coverage and score for a one-word query, so the decision fell to the alphabetical tiebreak and a tile whose id and name-head are literally the query lost to twenty siblings that merely start with the word.
+
+  A query matching a tile's whole id now earns the same bonus a committed alias phrase does, and for the same reason: ids are globally unique, so at most one tile can claim it, and typing a calculator's id names it as plainly as an alias would. A committed alias still wins over it -- a human already said where that phrase goes.
+
+  Measured against three ground truths built from the project's own data, before and after:
+
+  | | before | after |
+  | --- | --- | --- |
+  | tile ranks first for its own id (1,804) | 92.29% | **96.73%** |
+  | tile ranks first for its own name (1,804) | 99.78% | 99.78% |
+  | curated alias phrase reaches its target (21,025) | 99.54% | 99.54% |
+
+  80 tiles gained, nothing lost. The first attempt cost 15 curated alias rows to buy 94 id matches, by tying the alias bonus against the id bonus and dropping both onto the alphabetical tiebreak; deferring to the alias keeps the curation intact and nearly all of the gain. The two regressions `search-discovery.js` explicitly warns about are pinned in tests: "friction loss 200 ft of hose at 150 gpm" still returns the fire-hose tile, and "max circuit length for voltage drop" still returns Max Circuit Length.
+
 - **The perf suite measured the small pages and skipped the big ones.** Shell coverage landed on `/groups/electrical/` (20,517 B gzipped) while the two heaviest static documents on the site went unmeasured: `/groups/construction/`, the top landing page and largest group index at 45,019 B, and `/tools/`, the catalog hub at 47,555 B that the whole one-box program is gated on. Both are now covered and `/groups/electrical/` is retired from the list, so the gate tests the worst case rather than a middling one.
 
   Neither is slow today: 2,796 and 2,844 ms median with CLS 0.000, and construction paints only 3% slower than electrical for 2.2x the bytes, because a single static document's paint is dominated by the profile's 400 ms RTT rather than its size. "It is fine today" is the reason to pin it, not to skip it. Seed-verified: 1.5 MB of blocking CSS in the hub fails the hard tier.

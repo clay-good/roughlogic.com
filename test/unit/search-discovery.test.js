@@ -395,3 +395,53 @@ test("a qualifying word after the name still lets coverage decide", async () => 
   assert.equal(rank("friction loss 200 ft of hose at 150 gpm")[0], "fire-friction");
   assert.equal(rank("friction loss 150 gpm 100 ft")[0], "friction-loss");
 });
+
+// --- exact-id ranking (2026-08-29) ---
+//
+// A short id used to lose to its own longer siblings on the alphabetical
+// tiebreak: every "Concrete ..." tile ties on coverage and score for the
+// one-word query "concrete", so the tile whose id and name-head are literally
+// "concrete" (Concrete Volume) did not appear in the top TWENTY, on the browser
+// search box and the agent door alike. 139 of 1,804 tiles failed to rank first
+// for their own identifier; after the bonus, 59 do.
+async function rankingFixture() {
+  const { aliases } = await loadShards();
+  const { TOOLS } = await import("../../tools-data.js");
+  return { aliases, TOOLS };
+}
+
+test("a query that is a tile's whole id ranks that tile first", async () => {
+  const { aliases: ALIASES, TOOLS } = await rankingFixture();
+  const tokens = normalizeQuery("concrete").tokens;
+  const ranked = rankTools(tokens, TOOLS, ALIASES, { limit: 5 });
+  assert.equal(ranked[0].tool.id, "concrete",
+    "the tile whose id IS the query must win over siblings that merely start with the word");
+});
+
+test("exact-id ranking holds for other short ids that lost to longer siblings", async () => {
+  const { aliases: ALIASES, TOOLS } = await rankingFixture();
+  for (const id of ["slope", "backflow", "service-load"]) {
+    const ranked = rankTools(normalizeQuery(id.replace(/-/g, " ")).tokens, TOOLS, ALIASES, { limit: 3 });
+    assert.equal(ranked[0].tool.id, id, `"${id}" should rank its own tile first`);
+  }
+});
+
+test("a committed alias phrase still beats an id match on the same query", async () => {
+  const { aliases: ALIASES, TOOLS } = await rankingFixture();
+  // "expansion tank" is both the id `expansion-tank` and a curated alias for
+  // `wh-expansion-tank`. Curation wins: a human already said where it goes.
+  // Applying both bonuses tied them and dropped the decision onto the
+  // alphabetical tiebreak, which cost 15 curated alias rows their target.
+  const ranked = rankTools(normalizeQuery("expansion tank").tokens, TOOLS, ALIASES, { limit: 3 });
+  assert.equal(ranked[0].tool.id, "wh-expansion-tank");
+});
+
+test("the id bonus does not promote a tile the query merely contains", async () => {
+  const { aliases: ALIASES, TOOLS } = await rankingFixture();
+  // Both of these are called out in search-discovery.js as regressions to
+  // avoid, and both involve a tile id appearing inside a longer query.
+  const hose = rankTools(normalizeQuery("friction loss 200 ft of hose at 150 gpm").tokens, TOOLS, ALIASES, { limit: 3 });
+  assert.equal(hose[0].tool.id, "fire-friction");
+  const mcl = rankTools(normalizeQuery("max circuit length for voltage drop").tokens, TOOLS, ALIASES, { limit: 3 });
+  assert.equal(mcl[0].tool.id, "max-circuit-length-for-vd");
+});

@@ -398,6 +398,7 @@ export function rankTools(tokens, tools, aliases, opts) {
   for (const tool of tools) {
     if (!tool || typeof tool !== "object" || typeof tool.id !== "string") continue;
     const corpus = corpusFor(tool, aliases, aliasEntry);
+    const idPhrase = tool.id.replace(/-/g, " ");
     const weights = new Array(tokens.length);
     let score = 0;
     let coverage = 0;
@@ -443,6 +444,14 @@ export function rankTools(tokens, tools, aliases, opts) {
       tokens
         .slice(corpus.namePhrase.split(" ").length)
         .every((t, i) => soft[i + corpus.namePhrase.split(" ").length] || STOPWORDS.has(t) || canonicalUnit(t) !== null);
+    // The query IS this calculator's id: same reasoning and weight as the
+    // verbatim-alias bonus, since ids are unique too. Without it a short id
+    // loses to its longer siblings on the alphabetical tiebreak ("concrete"
+    // did not return Concrete Volume in the top twenty). A committed alias
+    // wins over it -- a human already said where that phrase goes, and
+    // applying both bonuses ties them back onto the alphabetical tiebreak.
+    // See test/unit/search-discovery.test.js for the measured numbers.
+    if (idPhrase === joined && verbatimTarget === undefined) score += 4;
     if (verbatimTarget === tool.id) score += 4;
     scored.push({ tool, corpus, weights, score, coverage, viaTypo: false, namesInFull });
   }
