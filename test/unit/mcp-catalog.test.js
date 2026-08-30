@@ -97,3 +97,17 @@ test("spec-v1344: one incidental word is not a reader naming a calculator", asyn
   const vd = await answerQuery({ query: "voltage drop" });
   assert.equal(vd.id, "voltage-drop");
 });
+
+test("a curated alias promotes its tile over an uncorroborated top hit", async () => {
+  // Corroboration is asked of ONE tile, so which one decides the answer.
+  // Asking only rank 0 meant a phrase a human had mapped came back NO_MATCH
+  // with the right calculator sitting at rank 1. Both cases in the corpus are
+  // code sections, where every token is digit-led and therefore a VALUE to the
+  // ranker, carrying no coverage, so the candidates tie on everything else.
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  for (const [q, want] of [["240.21", "feeder-tap-rule"], ["62.2", "ashrae-622-ventilation"]]) {
+    const out = await answerQuery({ query: q });
+    assert.notEqual(out.status, "NO_MATCH", `${q} should reach a calculator`);
+    assert.equal(out.id, want);
+  }
+});

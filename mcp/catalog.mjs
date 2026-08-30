@@ -1044,9 +1044,22 @@ export async function answerQuery({ query } = {}) {
   const q = String(query || "").trim();
   if (!q) return { status: "NO_MATCH", query: q, message: "Pass a plain-language question." };
 
-  const { byId } = await load();
+  const { byId, aliases: aliasRows } = await load();
   const ranked = await search({ query: q, limit: 3 });
-  const top = ranked && ranked.results && ranked.results[0];
+  const results = (ranked && ranked.results) || [];
+  // Corroboration is only ever asked of ONE tile, so which one it asks about
+  // decides the answer. Asking only rank 0 meant a curated phrase whose tile
+  // came second returned NO_MATCH with the right calculator sitting right
+  // there: "240.21" ranks transformer-conductor-protection above the
+  // feeder-tap-rule a human mapped it to, and "62.2" ranks blower-door-ach50
+  // above ashrae-622-ventilation, because a digit-led token is a VALUE to the
+  // ranker and carries no coverage, so the tiles tie on everything else.
+  //
+  // Only the CURATED form gets to promote a lower rank. The naming heuristic
+  // does not: it is a guess, and consulting it three times instead of once
+  // would be three chances for a nonsense question to find a pointer.
+  const top =
+    results.find((r) => queryIsCuratedAliasFor(q, r.id, aliasRows)) || results[0];
   if (!top) return { status: "NO_MATCH", query: q, message: "No calculator matched." };
 
   const tool = byId.get(top.id);
