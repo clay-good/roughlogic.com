@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A ranking measurement harness, and two changes it stopped me from shipping.** `scripts/measure-ranking.mjs` scores `rankTools` -- the ranker both doors use -- against three ground truths taken from the project's own data rather than invented: every curated alias phrase should reach the tile a human mapped it to (21,025 rows), every tile should rank first for its own name, and every tile should rank first for its own id. Run it before and after any change to `search-discovery.js`; a change that raises one number and lowers another is a trade, and this is how you see the price.
+
+  It immediately paid for itself. Alias terms are unique but their normalized forms are not: stopword stripping collapses `"wire size"`, `"what wire size"`, `"what size wire"` and `"best wire size"` all to the single key `"wire"`, and the index hands that key to whichever row appears **first in the file**. That is `"best wire size"` pointing at a machinist's three-wire thread-measurement tool, so an electrician typing "wire size" gets it while three curated rows saying otherwise lose their bonus silently. 45 normalized keys collide onto different targets, costing 49 curated rows.
+
+  File order is a bad tiebreak, so both obvious repairs were tried and **both measured worse**: awarding nobody the bonus when rows disagree took curated alias top-1 from 20,928 to 20,917 for 4 id matches; awarding it to the target the most rows name took it to 20,921 for 2. Neither shipped. The two colliding phrasings are both legitimate -- a machinist really does ask what size wires to measure a thread with -- so this is genuine cross-trade ambiguity, not a miscurated row to delete.
+
+  One caution recorded with the harness: the 97 alias misses are not all defects. Several are cases where the ranker's answer looks better than the curated one ("occupant load" returns the tile named Occupant Load, while the alias points elsewhere), so part of that 0.46% is the alias file rather than the ranker. Treat the alias rate as a regression guard, not a score to maximise.
+
 - **Searching "concrete" did not return the calculator named Concrete Volume.** Not in the top three, not in the top twenty, on the browser search box and the agent door alike. Every "Concrete ..." tile ties on coverage and score for a one-word query, so the decision fell to the alphabetical tiebreak and a tile whose id and name-head are literally the query lost to twenty siblings that merely start with the word.
 
   A query matching a tile's whole id now earns the same bonus a committed alias phrase does, and for the same reason: ids are globally unique, so at most one tile can claim it, and typing a calculator's id names it as plainly as an alias would. A committed alias still wins over it -- a human already said where that phrase goes.
