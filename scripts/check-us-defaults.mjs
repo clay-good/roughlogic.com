@@ -51,11 +51,32 @@ const METRIC_LABEL_TOKENS = new Set([
 const METRIC_OPTION_RE = /\b(celsius|kilometres|kilometers|metres|meters|deg c)\b/i;
 const US_OPTION_RE = /\b(fahrenheit|miles|feet|deg f)\b/i;
 
+// An entry exempts a hit when its module matches and its token appears in the
+// hit. A blanket module-wide exemption is spelled "*" and must name a module --
+// it used to be spelled by accident, as an empty `match`, because
+// `hit.includes("")` is always true. One row did exactly that and switched the
+// whole check off for calc-lab.js while reading, in a list of 71, like one more
+// token exemption. Blanket is a legitimate answer for a module that is SI by
+// professional practice; it just has to be said out loud.
+for (const e of allowlist.entries) {
+  if (typeof e.match !== "string" || e.match === "") {
+    console.error(
+      'FAIL: us-defaults allowlist entry for ' + e.module + ' has an empty `match`, which exempts every ' +
+      'label in scope. Use "*" for a deliberate module-wide exemption.',
+    );
+    process.exit(1);
+  }
+  if (e.match === "*" && e.module === "*") {
+    console.error('FAIL: us-defaults allowlist entry with module "*" and match "*" would exempt the whole catalog.');
+    process.exit(1);
+  }
+}
+
 function allowed(file, hit) {
   return allowlist.entries.some(
     (e) =>
       (e.module === "*" || e.module === file) &&
-      hit.toLowerCase().includes(e.match.toLowerCase()),
+      (e.match === "*" || hit.toLowerCase().includes(e.match.toLowerCase())),
   );
 }
 
@@ -133,5 +154,6 @@ if (errors.length) {
 }
 console.log(
   "check-us-defaults OK: " + files.length + " calc modules scanned; no metric-defaulted selects, " +
-  "no unallowlisted metric field labels (" + allowlist.entries.length + " reviewed allowlist entries).",
+  "no unallowlisted metric field labels (" + allowlist.entries.length + " reviewed allowlist entries, " +
+  allowlist.entries.filter((e) => e.match === "*").length + " of them module-wide).",
 );

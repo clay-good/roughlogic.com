@@ -58,9 +58,9 @@
     },
     {
       "module": "calc-lab.js",
-      "match": "",
+      "match": "*",
       "family": "lab and IH practice",
-      "justification": "US lab practice is SI throughout: mL, uL, mg, g/mol, M, g/mL, cm cuvette paths, mm rotors."
+      "justification": "Module-wide: US lab practice is SI throughout (mL, uL, mg, g/mol, M, g/mL, cm cuvette paths, mm rotors). Spelled \"*\" since 2026-08-30; it was an empty string, which exempted the module by accident rather than by decision."
     },
     {
       "module": "calc-kitchen.js",
@@ -79,12 +79,6 @@
       "match": "Northing (m)",
       "family": "standards defined in SI",
       "justification": "UTM easting/northing are defined in meters."
-    },
-    {
-      "module": "calc-field.js",
-      "match": "(km, WMM",
-      "family": "standards defined in SI",
-      "justification": "The World Magnetic Model takes altitude in km."
     },
     {
       "module": "calc-lowvoltage.js",
