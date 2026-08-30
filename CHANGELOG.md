@@ -12,6 +12,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **CI ran the 1,806-test accessibility sweep twice on every push.** The `accessibility` job greps `a11y:` and runs the axe-core pass over all 1,804 routes; the `integration` job then ran `npm run test:e2e`, the *whole* suite, which includes those same 1,806 tests. On the last green run that was 27 minutes of the accessibility job and 39 of the integration job, overlapping almost entirely.
+
+  The integration job now runs `--grep-invert 'a11y:'`. The two greps partition the suite exactly -- **1,806 + 1,964 = 3,770**, verified with `--list` -- so coverage is identical and `npm run test:e2e` still runs everything locally. `check-ci-claims` asserts the two patterns stay each other's complement and that the workflow still calls the split script, because a pattern that drifts leaves specs in a gap no job runs, which looks exactly like a green build. Seed-verified by changing one pattern.
+
+  Also added `cache: npm` to the two Playwright jobs, which had been re-downloading every dependency from the registry on each run while the `test` job cached them.
+
 - **Measured a third shape for the catalog split, and left the decision alone.** `docs/performance.md` already carried the per-group analysis of the 397,907 B a deep link pays for one tile's row. It did not measure the option that keeps a single catalog and puts only the **lead sentence** in it: **113,050 B, 72% smaller**, and -- the part that matters -- the tile still renders in one pass, where a split that puts the lead behind a second fetch reintroduces the two-stage render the 2026-08-29 CLS work exists to stop. It also leaves the `constant-notes.js` positional bitmap untouched for free, being the same array in the same order. Sharding the remainder by first letter of id gives 24 shards with the largest at 53,574 B, half the largest per-group shard. Written into the existing analysis rather than acted on: which shape to take is a product decision.
 
 ### Fixed

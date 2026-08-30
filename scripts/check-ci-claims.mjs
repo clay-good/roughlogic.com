@@ -110,6 +110,32 @@ async function main() {
     }
   }
 
+  // The two Playwright jobs partition the suite by title: `test:a11y` runs
+  // `--grep 'a11y:'` and the integration job runs `--grep-invert` of the same
+  // pattern. If the two ever stop being each other's complement, specs fall
+  // into the gap and no job runs them -- a coverage hole that looks exactly
+  // like a green build. Split 2026-08-30 to stop running the 1,806-test axe
+  // sweep twice per push.
+  const pkgJson = JSON.parse(await readFile(resolve(ROOT, "package.json"), "utf8"));
+  const a11yScript = String(pkgJson.scripts["test:a11y"] || "");
+  const ciScript = String(pkgJson.scripts["test:e2e:ci"] || "");
+  const a11yPattern = (a11yScript.match(/--grep\s+'([^']+)'/) || [])[1];
+  const ciPattern = (ciScript.match(/--grep-invert\s+'([^']+)'/) || [])[1];
+  if (!a11yPattern || !ciPattern) {
+    errors.push(
+      "could not read the grep patterns out of package.json (`test:a11y` --grep and `test:e2e:ci` --grep-invert); " +
+        "the two Playwright jobs are supposed to partition the suite by title.",
+    );
+  } else if (a11yPattern !== ciPattern) {
+    errors.push(
+      `test:a11y greps '${a11yPattern}' while test:e2e:ci inverts '${ciPattern}'. They must be the same pattern, ` +
+        "or specs fall into the gap between the two jobs and nothing runs them.",
+    );
+  }
+  if (!/npm run test:e2e:ci/.test(yaml)) {
+    errors.push("the integration job no longer runs `npm run test:e2e:ci`; check it still complements the accessibility job.");
+  }
+
   if (errors.length) {
     console.error("check-ci-claims FAILED:");
     for (const e of errors) console.error("  - " + e);

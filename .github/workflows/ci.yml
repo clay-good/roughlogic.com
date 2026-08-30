@@ -42,6 +42,7 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 20
+          cache: npm
       - name: Install Playwright and axe-core
         run: |
           npm ci --ignore-scripts --no-audit --no-fund
@@ -64,6 +65,7 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 20
+          cache: npm
       - name: Install Playwright and axe-core
         # Chromium runs the whole suite; WebKit (the iOS Safari engine) re-runs
         # only the responsive-stress sweep via the `webkit-responsive` project
@@ -72,8 +74,15 @@ jobs:
         run: |
           npm ci --ignore-scripts --no-audit --no-fund
           ./node_modules/.bin/playwright install --with-deps chromium webkit
-      - name: Run integration tests (full suite)
-        run: npm run test:e2e
+      # Everything EXCEPT the `a11y:` sweep, which the accessibility job above
+      # runs in full. Until 2026-08-30 both jobs ran it: 1,806 of the suite's
+      # 3,770 tests were an axe-core pass over all 1,804 routes, executed twice
+      # per push. `test:a11y` greps `a11y:` and this greps its inverse, so the
+      # two jobs still partition the suite exactly -- 1,806 + 1,964 = 3,770 --
+      # and `npm run test:e2e` still runs the whole thing locally.
+      # check-ci-claims asserts the two greps stay complementary.
+      - name: Run integration tests (everything the a11y job does not)
+        run: npm run test:e2e:ci
       # spec-v18 §6: prerendered-shell 320px horizontal-scroll gate. Needs a
       # built dist/ and a headless browser; the integration job already has
       # Playwright + chromium, so build dist/ and run the audit here. Fails
