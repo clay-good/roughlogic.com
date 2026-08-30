@@ -426,14 +426,31 @@ test("exact-id ranking holds for other short ids that lost to longer siblings", 
   }
 });
 
-test("a committed alias phrase still beats an id match on the same query", async () => {
+test("a tile's own name outranks an alias that claims the same phrase", async () => {
   const { aliases: ALIASES, TOOLS } = await rankingFixture();
-  // "expansion tank" is both the id `expansion-tank` and a curated alias for
-  // `wh-expansion-tank`. Curation wins: a human already said where it goes.
-  // Applying both bonuses tied them and dropped the decision onto the
-  // alphabetical tiebreak, which cost 15 curated alias rows their target.
-  const ranked = rankTools(normalizeQuery("expansion tank").tokens, TOOLS, ALIASES, { limit: 3 });
-  assert.equal(ranked[0].tool.id, "wh-expansion-tank");
+  // This was decided the other way earlier the same day, when "expansion tank"
+  // was the only case in view: it is the id `expansion-tank` AND a curated
+  // alias for `wh-expansion-tank`, and deferring to the curator is defensible
+  // there. Then the same shape turned up where it is not defensible -- "pump
+  // sizing" is mapped to septic-pumpout-interval while a tile is named Pump
+  // Sizing, and "tip out" to nozzle-flow-pressure. Typing a calculator's exact
+  // name and being handed a different calculator is wrong however the mapping
+  // got there, and one rule has to cover both cases.
+  for (const [q, want] of [["pump sizing", "pump-sizing"], ["expansion tank", "expansion-tank"]]) {
+    const ranked = rankTools(normalizeQuery(q).tokens, TOOLS, ALIASES, { limit: 3 });
+    assert.equal(ranked[0].tool.id, want, `"${q}" should rank its own tile first`);
+  }
+});
+
+test("a curated alias still outranks mere coverage", async () => {
+  const { aliases: ALIASES, TOOLS } = await rankingFixture();
+  // "how many btu to heat 1500 sq ft" is a curated alias for manual-j-heating
+  // and lost to manual-j-COOLING, which covers "btu", "heat", "square" and
+  // "feet" through its own description. The +4 verbatim score bonus could not
+  // help, because coverage sorts ahead of score.
+  const ranked = rankTools(
+    normalizeQuery("how many btu to heat 1500 sq ft").tokens, TOOLS, ALIASES, { limit: 3 });
+  assert.equal(ranked[0].tool.id, "manual-j-heating");
 });
 
 test("the id bonus does not promote a tile the query merely contains", async () => {

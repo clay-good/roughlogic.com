@@ -6,6 +6,20 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A curated question lost to a sibling that merely shared more words.** "how many btu to heat 1500 sq ft" is a committed alias for `manual-j-heating` and returned **manual-j-COOLING** -- on both doors -- because the cooling tile's description covers "btu", "heat", "square" and "feet", and coverage sorts ahead of score, so the verbatim alias's +4 could never reach it. The site showed the cooling tile first too. A human wrote that exact question and pointed it at the heating calculator; that is worth more than one extra incidental word.
+
+  A committed alias is now its own sort key, ahead of coverage, the same way `namesInFull` already was and for the same reason the comment there gives. Worth **40 curated rows** on its own.
+
+  That alone cost six rows where an alias claims a phrase another tile is *named* after -- "pump sizing" is mapped to `septic-pumpout-interval` while a tile is named Pump Sizing, "tip out" to `nozzle-flow-pressure`. Typing a calculator's exact name and being handed a different calculator is wrong however the mapping got there, so the query matching a tile's whole name or id sorts above the alias.
+
+  | | before | after |
+  | --- | --- | --- |
+  | curated alias reaches target (21,025) | 20,934 | **20,955** |
+  | tile first for its own name (1,804) | 1,801 | 1,801 |
+  | tile first for its own id (1,804) | 1,782 | **1,801 (99.83%)** |
+
+  This reverses a narrower rule from earlier the same day, and a test with it. When the exact-id bonus was written the only case in view was "expansion tank" -- both a tile id and a curated alias for `wh-expansion-tank` -- where deferring to the curator is defensible. "pump sizing" is the same shape and is not defensible, and one rule has to cover both. The test now states the reversal and pins both cases.
+
 - **The agent door returned nothing for "12/2".** That is the commonest romex spec there is, and it appears in no tile's id, name or description -- so with `rankTools` empty for an all-digit query, the substring fallback had nothing to match and handed back an empty list. The site, meanwhile, answered Wire Ampacity, off the curated alias "12/2 wire max amps". Same for "200a" and the 200 Ah battery-runtime question.
 
   The agent fallback now asks the aliases the same two ways the browser's combobox does: exactly, through `resolveQuery`, then by prefix, through `matchAliasPrefix`. Both doors now return the same tile for both queries.
