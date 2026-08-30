@@ -93,6 +93,54 @@ function toIdSet(toolIds) {
   return new Set();
 }
 
+// The one fallback both doors use when the ranker declines to answer.
+// rankTools returns nothing for an all-digit-led query -- values carry no
+// coverage -- so every code section and trade spec ("240.21", "12/2") lands
+// here. Each door used to write its own pass and they disagreed on the first
+// result for 287 of the 500 such queries the alias file implies. Order below
+// is the catalog's hierarchy: curated, then named, then merely mentioned.
+export function fallbackSearch(query, tools, aliases, limit) {
+  const q = typeof query === "string" ? query.trim().toLowerCase() : "";
+  if (!q) return [];
+  const list = Array.isArray(tools) ? tools : [];
+  const rows = Array.isArray(aliases) ? aliases : [];
+  const cap = Number.isFinite(limit) && limit > 0 ? Math.floor(limit) : 12;
+  const byId = new Map(list.map((t) => [t.id, t]));
+  const seen = new Set();
+  const out = [];
+  const add = (t) => { if (t && !seen.has(t.id)) { seen.add(t.id); out.push(t); } };
+
+  // 1. A human said this query means this tile: exact id, or exact alias.
+  const exact = resolveQuery(q, rows, [...byId.keys()]);
+  if (exact) add(byId.get(exact.match));
+  // 2. A committed alias starts with it, on a whole leading phrase ("12/2" ->
+  //    "12/2 wire max amps"). A bare character prefix would promote whichever
+  //    alias happens to sit first in the file.
+  for (const row of matchAliasPrefix(q, rows, 5)) {
+    const rest = row.term.slice(q.length);
+    if (rest === "" || /^\s/.test(rest)) add(byId.get(row.target));
+  }
+  // 3. The tile is named this. Prefix hits first, then alphabetical.
+  const named = list.filter((t) => String(t.name).toLowerCase().includes(q));
+  named.sort((a, b) => {
+    const ap = String(a.name).toLowerCase().startsWith(q) ? 0 : 1;
+    const bp = String(b.name).toLowerCase().startsWith(q) ? 0 : 1;
+    return ap - bp || String(a.name).localeCompare(String(b.name));
+  });
+  named.forEach(add);
+  // 4. Every word of the query appears somewhere on the tile.
+  const terms = q.split(/\s+/).filter(Boolean);
+  for (const t of list) {
+    const hay = `${t.id} ${t.name} ${t.desc}`.toLowerCase();
+    if (terms.every((term) => hay.includes(term))) add(t);
+  }
+  // 5. Some alias mentions it mid-phrase.
+  for (const row of rows) {
+    if (row && typeof row.term === "string" && row.term.toLowerCase().includes(q)) add(byId.get(row.target));
+  }
+  return out.slice(0, cap);
+}
+
 // ---------------------------------------------------------------------------
 // spec-v589: deterministic natural-language ranking.
 // ---------------------------------------------------------------------------

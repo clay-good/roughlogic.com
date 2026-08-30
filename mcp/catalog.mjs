@@ -14,7 +14,7 @@
 // run() of a tile in that module, exactly as the worked-example runner does.
 
 import { readFile } from "node:fs/promises";
-import { normalizeQuery, rankTools, resolveQuery, matchAliasPrefix } from "../search-discovery.js";
+import { normalizeQuery, rankTools, fallbackSearch } from "../search-discovery.js";
 import { getLimitationCopy } from "../limitation-banner.js";
 // spec-v1185: the curated per-tile cross-links the browser shows as "related
 // tiles". Build-time data; a missing/unreadable module degrades to no related.
@@ -438,8 +438,8 @@ export async function search({ query = "", trade = "", limit = 30 } = {}) {
 
   // spec-v589: the browser combobox's deterministic NL ranker, shared via
   // search-discovery.js so agent and browser recall cannot drift. If the
-  // query normalizes to nothing (stopwords only) or ranks nothing, fall
-  // back to the original AND-of-substrings pass.
+  // query normalizes to nothing (stopwords only) or ranks nothing, fall back
+  // to the shared pass the combobox uses in the same situation.
   let matches = null;
   if (q) {
     const { tokens } = normalizeQuery(q);
@@ -449,47 +449,14 @@ export async function search({ query = "", trade = "", limit = 30 } = {}) {
     }
   }
   if (!matches) {
-    // Before the substring pass, ask the aliases -- the same question the
-    // browser's combobox asks through resolveQuery. rankTools returns NOTHING
-    // for a query made only of digit-led tokens, because those are values and
-    // carry no coverage, so every code section falls to this fallback: "240.21",
-    // "690.45", "5252", "62.2". Ordered by substring alone the agent got
-    // transformer-conductor-protection for 240.21 and blower-door-ach50 for
-    // 62.2, while a reader typing the same into the site got the feeder-tap and
-    // ASHRAE 62.2 tiles a human had mapped them to. The comment above says this
-    // module is shared so agent and browser recall cannot drift; this is where
-    // it drifted.
-    const terms = q.split(/\s+/).filter(Boolean);
-    matches = pool.filter((t) => {
-      if (!terms.length) return true;
-      const hay = `${t.id} ${t.name} ${t.desc}`.toLowerCase();
-      return terms.every((term) => hay.includes(term));
-    });
-    // Ahead of the substring pass, the two questions the browser's combobox
-    // asks: is this exactly a committed alias, and does any alias START with
-    // it. Trade shorthand needs the second one -- "12/2" appears in no tile's
-    // id, name or description, so substring matching returned NOTHING for the
-    // commonest romex spec there is, while the site answered Wire Ampacity off
-    // the alias "12/2 wire max amps". Same for "200a" and the 200 Ah battery
-    // question. Where the browser has nothing either ("240v", "14-2") it shows
-    // its browse fallback, and the agent still gets an empty list, which is the
-    // honest answer rather than a guess.
-    const front = [];
-    const resolved = resolveQuery(q, aliases, pool.map((t) => t.id));
-    if (resolved && resolved.match) front.push(resolved.match);
-    for (const row of matchAliasPrefix(q, aliases, 5)) {
-      if (row && typeof row.target === "string") front.push(row.target);
-    }
-    if (front.length) {
-      const seen = new Set();
-      const promoted = [];
-      for (const id of front) {
-        if (seen.has(id)) continue;
-        const tool = pool.find((t) => t.id === id);
-        if (tool) { seen.add(id); promoted.push(tool); }
-      }
-      matches = [...promoted, ...matches.filter((t) => !seen.has(t.id))];
-    }
+    // One shared pass, in search-discovery.js, so the two doors cannot answer
+    // a digit-led query differently -- which they did, on 287 of the 500 such
+    // queries the alias file implies, for as long as each door wrote its own.
+    // Uncapped here so `total` still counts every match; the slice below is
+    // what limits the reply, and the shared order makes that slice a prefix of
+    // what the browser shows.
+    // A trade filter with no query is a browse, not a search: the whole pool.
+    matches = q ? fallbackSearch(q, pool, aliases, pool.length) : pool;
   }
 
   return {

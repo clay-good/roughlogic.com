@@ -973,6 +973,10 @@ function bindSearch() {
           return ranked.map((r) => r.tool);
         }
       }
+      // The ranker declined -- a digit-led query carries no coverage. The
+      // shared pass answers it identically for the agent door; the local pass
+      // below is only for the moments before the module lands.
+      return discovery.fallbackSearch(q, TOOLS, aliasRows, 12);
     }
     const seen = new Set();
     const out = [];
