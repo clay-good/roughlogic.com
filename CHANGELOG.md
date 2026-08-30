@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The two doors disagreed on every code section, and the shared module was supposed to prevent exactly that.** `rankTools` returns **nothing** for a query made only of digit-led tokens: those are values, they carry no coverage, and every candidate is filtered out. So every code-section query fell through to `search()`'s substring fallback, ordered by catalog position. An agent asking for `240.21` got `transformer-conductor-protection`; a reader typing it into the site got the feeder-tap rule a human had mapped it to. `62.2` gave the agent `blower-door-ach50` and the reader ASHRAE 62.2. The comment above that fallback says the ranker is shared "so agent and browser recall cannot drift" -- this is where it drifted, in the one place the shared ranker declines to answer.
+
+  The fallback now asks the aliases first, through the same `resolveQuery` the browser's combobox uses. All **32** numeric alias terms now return the curated target first on both doors, and the two agree on every one.
+
+  Searching by code section is not an edge case for this audience -- NEC 240.21, ASHRAE 62.2, NEC 690.45, 314.28, 220.82 are how the work is actually looked up.
+
 - **A code section a human had already mapped returned "no calculator matched".** `answerQuery` asks for corroboration about exactly one tile, and it asked only about rank 0 -- so when the ranker put a different tile first, a phrase committed to the alias file answered NO_MATCH with the right calculator sitting at rank 1. Typing `240.21` got nothing while NEC 240.21's feeder-tap-rule tile was one row down; `62.2` got nothing while ASHRAE 62.2's ventilation tile was one row down. Both are code sections, where every token is digit-led and therefore a VALUE to the ranker rather than a content word, so the candidates tie on everything else and the order is close to arbitrary.
 
   The corroborated tile is now chosen from the top three rather than assumed to be the first. **Only the curated form promotes a lower rank**: the naming heuristic is a guess, and consulting a guess three times instead of once would be three chances for a nonsense question to find a pointer rather than one. A phrase somebody committed to the alias file is not a guess.

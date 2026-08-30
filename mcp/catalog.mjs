@@ -14,7 +14,7 @@
 // run() of a tile in that module, exactly as the worked-example runner does.
 
 import { readFile } from "node:fs/promises";
-import { normalizeQuery, rankTools } from "../search-discovery.js";
+import { normalizeQuery, rankTools, resolveQuery } from "../search-discovery.js";
 import { getLimitationCopy } from "../limitation-banner.js";
 // spec-v1185: the curated per-tile cross-links the browser shows as "related
 // tiles". Build-time data; a missing/unreadable module degrades to no related.
@@ -449,12 +449,27 @@ export async function search({ query = "", trade = "", limit = 30 } = {}) {
     }
   }
   if (!matches) {
+    // Before the substring pass, ask the aliases -- the same question the
+    // browser's combobox asks through resolveQuery. rankTools returns NOTHING
+    // for a query made only of digit-led tokens, because those are values and
+    // carry no coverage, so every code section falls to this fallback: "240.21",
+    // "690.45", "5252", "62.2". Ordered by substring alone the agent got
+    // transformer-conductor-protection for 240.21 and blower-door-ach50 for
+    // 62.2, while a reader typing the same into the site got the feeder-tap and
+    // ASHRAE 62.2 tiles a human had mapped them to. The comment above says this
+    // module is shared so agent and browser recall cannot drift; this is where
+    // it drifted.
+    const resolved = resolveQuery(q, aliases, pool.map((t) => t.id));
     const terms = q.split(/\s+/).filter(Boolean);
     matches = pool.filter((t) => {
       if (!terms.length) return true;
       const hay = `${t.id} ${t.name} ${t.desc}`.toLowerCase();
       return terms.every((term) => hay.includes(term));
     });
+    if (resolved && resolved.match) {
+      const target = pool.find((t) => t.id === resolved.match);
+      if (target) matches = [target, ...matches.filter((t) => t.id !== target.id)];
+    }
   }
 
   return {

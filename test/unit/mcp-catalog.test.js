@@ -111,3 +111,31 @@ test("a curated alias promotes its tile over an uncorroborated top hit", async (
     assert.equal(out.id, want);
   }
 });
+
+test("both doors agree on a code-section query", async () => {
+  // rankTools returns NOTHING for a query of only digit-led tokens -- they are
+  // values, they carry no coverage, so every candidate is filtered out. Every
+  // code section therefore lands in search()'s fallback, and ordered by
+  // substring alone the agent got transformer-conductor-protection for 240.21
+  // and blower-door-ach50 for 62.2, while a reader typing the same into the
+  // site got the tiles a human had mapped them to. search-discovery.js is
+  // shared "so agent and browser recall cannot drift"; this is where it did.
+  const { search } = await import("../../mcp/catalog.mjs");
+  const { resolveQuery } = await import("../../search-discovery.js");
+  const { TOOLS } = await import("../../tools-data.js");
+  const { readFile } = await import("node:fs/promises");
+  const { resolve, dirname } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const root = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
+  const { aliases } = JSON.parse(await readFile(resolve(root, "data", "search", "aliases.json"), "utf8"));
+  const ids = TOOLS.map((t) => t.id);
+  const numeric = aliases.filter((r) => r && typeof r.term === "string" && /^\s*\d[\d.\-/]*\s*$/.test(r.term));
+  assert.ok(numeric.length >= 20, `expected the corpus to carry code sections, found ${numeric.length}`);
+  for (const row of numeric) {
+    const out = await search({ query: row.term, limit: 3 });
+    const first = (out.results || [])[0];
+    const browser = resolveQuery(row.term, aliases, ids);
+    assert.equal(first && first.id, row.target, `agent door: "${row.term}"`);
+    assert.equal(browser && browser.match, row.target, `browser: "${row.term}"`);
+  }
+});
