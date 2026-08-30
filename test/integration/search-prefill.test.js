@@ -55,7 +55,16 @@ test("search preview: flagship query shows a computed answer in the dropdown", a
   await input.fill("voltage drop 120v 150 ft 20 amps");
   await ready;
   const preview = page.locator("#search-result-0 .sr-preview");
-  await expect(preview).toBeVisible();
+  // The data being in is not the same as the preview being drawn: the last
+  // step imports the tile's calculator module and runs it, and there is no
+  // response left to wait on. Measured on this machine, the preview appears
+  // 795 ms after the keystroke unthrottled and 5,880 ms at a 4x CPU throttle,
+  // so the default 5 s expect timeout is under the real cost of a loaded
+  // runner -- and the failure it reports is "element(s) not found", which
+  // reads as a ranking bug rather than a slow machine. This is still a real
+  // assertion: a preview that never renders fails it. The suite's timing
+  // guarantees live in perf.test.js, not here.
+  await expect(preview).toBeVisible({ timeout: 30_000 });
   const text = await preview.textContent();
   expect(text).toMatch(/drop \d+(\.\d+)? V/);
   expect(text).not.toMatch(/NaN|Infinity|undefined/);
@@ -338,10 +347,14 @@ test("spec-v1337 chips: every chip routes to a real tile with values", async ({ 
   for (let i = 0; i < count; i++) {
     await page.goto("/");
     await page.locator(".hero-chip").nth(i).click();
-    await expect(page.locator(".search-result").first()).toBeVisible();
+    // Same lazily-fetched search data as the flagship preview above, and the
+    // same reason for an explicit timeout: a chip opens results only once the
+    // alias shards land, and prefill draws provenance only once the field
+    // shard does. Loaded, that outlasts the 5 s default.
+    await expect(page.locator(".search-result").first()).toBeVisible({ timeout: 30_000 });
     await page.locator("#search-input").press("Enter");
     await expect(page).toHaveURL(/#[a-z0-9-]+\?v=1&/);
-    await expect(page.locator(".field-provenance").first()).toBeVisible();
+    await expect(page.locator(".field-provenance").first()).toBeVisible({ timeout: 30_000 });
   }
 });
 

@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **CI went red on a test that was measuring the runner, not the code.** `search preview: flagship query shows a computed answer in the dropdown` failed all three attempts on a run that took 39.2 minutes against a normal 12, reporting "element(s) not found" for the preview -- which reads as a ranking regression on a commit that had just changed ranking. It was not one: the ranking for that query is byte-identical across every commit in the series, `voltage-drop` first throughout.
+
+  Measured instead of assumed. The preview appears **795 ms** after the keystroke unthrottled, **5,880 ms** at a 4x CPU throttle, and 5,084 ms at 8x -- so the default 5 s `expect` timeout sits under the real cost on a loaded runner. The file already carries a comment about exactly this failure mode and an `awaitSearchData` helper for it, but that waits on responses, and the last step here has no response left to wait on: it imports the tile's calculator module and runs it.
+
+  The preview assertion and the two chip assertions with the same dependency now carry an explicit 30 s timeout, matching the data waiter. They still assert the real thing -- a preview that never renders still fails, and the answer text is still matched against `/drop \d+ V/`. Timing guarantees belong to `perf.test.js`, which measures them deliberately.
+
 - **"triangle sas" was answered by the three-sides solver.** SSS, SAS and ASA are distinct methods whose names sit one edit apart, and the tile id was not in the search corpus, so the token "sas" matched nothing anywhere. That is exactly the condition the bounded typo fallback waits for: it mapped "sas" onto "sss" and a question about two sides and the included angle got the wrong solver. Silently swapping one geometry method for another is worse than returning nothing.
 
   The id is identifying text and now sits in the corpus alongside the name, aliases, trade and description. All three solvers answer their own method. Tiles ranking first for their own id: **1,759 -> 1,781 of 1,804 (97.51% -> 98.73%)**.
