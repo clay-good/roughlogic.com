@@ -123,11 +123,16 @@ Every tile shell links:
   in [../scripts/related-tiles.mjs](../scripts/related-tiles.mjs)
   (a build-time-only module the SPA never sees; lifted out of
   tile-meta.js on 2026-05-18 so the runtime tile-meta.js stops
-  growing with the editorial map). The Phase E third expansion on
-  2026-05-18 brought the registry to 385 / 385 tiles, so every
-  shell now ships curated cross-references. The "first 5 in same
-  group" fallback in build-shells.mjs remains in place as a safety
-  net for a future tile that lands before its registry entry.
+  growing with the editorial map). The registry covers 1,638 of the
+  1,804 tiles; the catalog outgrew the Phase E expansion that once
+  covered it entirely. The remaining 167, and the 185 curated
+  entries that hold fewer than three links, are filled out at build
+  time by ranking the tile's own name against its group siblings
+  through the same `rankTools` the search box uses. Until
+  2026-08-30 the fallback was "the first 5 in the same group", which
+  handed every uncurated tile in a group the same five links and
+  left 482 tiles receiving no related link from any tile page; it is
+  269 now, and the heaviest receiver dropped from 50 links to 30.
 - Sideways from the SPA's hash-route view by way of the canonical
   link.
 
@@ -137,7 +142,11 @@ sequences the citation graph already records) and filled in the
 long tail in the Phase E third expansion. The
 [../scripts/check-related-tiles.mjs](../scripts/check-related-tiles.mjs)
 lint validates every curated entry (real TOOLS id, no self-
-reference, no duplicates, cap 6 per §9.1).
+reference, no duplicates, cap 6 per §9.1); it says nothing about
+coverage, which is what
+[../test/unit/related-tiles-fallback.test.js](../test/unit/related-tiles-fallback.test.js)
+now holds -- including the assertion that uncurated tiles in a group
+must not all end up with the same list.
 
 ## Sitemap (Phase F)
 
