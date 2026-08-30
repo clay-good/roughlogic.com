@@ -350,7 +350,7 @@ const CAPS = {
   // ("300 ft-lb" was reading as 300 FEET) and the full-name-opens-the-query
   // sort key. Both are single rules inside the one ranking pass; splitting
   // the ranker would put a sort key in a different file from the sort.
-  "search-discovery.js": 11000, // exact-id ranking 2026-08-29 (10000 -> 11000): the id bonus and its collision guard put the module 42 B over after the prose was already trimmed to the minimum, so this is code, not comments. Lazy-loaded and outside the home-view payload (unchanged at 47,209 B). Raised ~10% rather than split: the ranker is one cohesive algorithm and the split axis would cut it mid-scoring.
+  "search-discovery.js": 12000, // sort-order ranking 2026-08-30 (11000 -> 12000): the name/id/alias sort keys ahead of coverage, after the explanatory comment was already cut to seven lines. Code, not prose. Lazy-loaded and outside the home-view payload. // exact-id ranking 2026-08-29 (10000 -> 11000): the id bonus and its collision guard put the module 42 B over after the prose was already trimmed to the minimum, so this is code, not comments. Lazy-loaded and outside the home-view payload (unchanged at 47,209 B). Raised ~10% rather than split: the ranker is one cohesive algorithm and the split axis would cut it mid-scoring.
   // v10 Phase B.2 per-tile meta-object registry. Grows incrementally
   // toward full TOOLS coverage; cap raised in lockstep. Bumped from
   // 7000 -> 9000 B on 2026-05-18 (spec-v13 Phase E seed of 55

@@ -6,6 +6,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Pushed a red lint, then fixed it.** The sort-order commit took `search-discovery.js` to 11,431 B against its 11,000 B cap and I pushed it anyway: `npm run lint` printed `LINT=1` in the same output block as the passing test count, and I read the test line. The cap check reads `dist/`, so the reassuring 99.7% I had checked minutes earlier was a stale build from before the edit. Comment trimmed to seven lines first (prose in a shipped module is real bytes, for the third time today), which recovered 261 B but not the 431 needed, so the cap goes 11,000 to 12,000 with the note the gate asks for. This is code, not prose. Lazy-loaded; the home-view payload is unchanged at 47,209 B.
+
 - **A curated question lost to a sibling that merely shared more words.** "how many btu to heat 1500 sq ft" is a committed alias for `manual-j-heating` and returned **manual-j-COOLING** -- on both doors -- because the cooling tile's description covers "btu", "heat", "square" and "feet", and coverage sorts ahead of score, so the verbatim alias's +4 could never reach it. The site showed the cooling tile first too. A human wrote that exact question and pointed it at the heating calculator; that is worth more than one extra incidental word.
 
   A committed alias is now its own sort key, ahead of coverage, the same way `namesInFull` already was and for the same reason the comment there gives. Worth **40 curated rows** on its own.

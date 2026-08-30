@@ -562,23 +562,13 @@ export function rankTools(tokens, tools, aliases, opts) {
   // Then curation, because a committed alias phrase for this exact query is a
   // human decision -- without it the share rule pulled seven curated rows off
   // their target. Then the share heuristic, then name order so it stays total.
-  // A committed alias phrase outranks COVERAGE, because a human writing this
-  // exact question and pointing it at a tile knows more than a sibling that
-  // shares one more incidental word. "how many btu to heat 1500 sq ft" is a
-  // curated alias for manual-j-heating and lost to manual-j-COOLING, which
-  // covers "btu", "heat", "square" and "feet" through its own description; the
-  // +4 verbatim score bonus could not help, because coverage sorts first.
-  // Worth 40 curated rows.
-  //
-  // The query being a tile's whole NAME or ID beats even that. Some aliases
-  // claim a phrase another tile is named after -- "pump sizing" is mapped to
-  // septic-pumpout-interval, "tip out" to nozzle-flow-pressure -- and typing a
-  // calculator's exact name to be handed a different calculator is wrong
-  // however the mapping got there. This reverses the narrower rule the exact-id
-  // bonus was given earlier the same day, when the only case in view was
-  // "expansion tank" (a tile id, and a curated alias for wh-expansion-tank).
-  // That one is defensible either way; "pump sizing" is not, and one rule has
-  // to cover both.
+  // Order: named in full, then the query IS this tile's name or id, then a
+  // committed alias, then coverage. The alias sits above coverage because a
+  // human writing that exact question beats a sibling sharing one more
+  // incidental word ("how many btu to heat 1500 sq ft" went to manual-j-COOLING
+  // on word overlap). Name and id sit above the alias because some aliases
+  // claim a phrase another tile is named after ("pump sizing"). See the tests
+  // and CHANGELOG for the measured trade.
   out.sort(
     (a, b) =>
       (b.namesInFull ? 1 : 0) - (a.namesInFull ? 1 : 0) ||
