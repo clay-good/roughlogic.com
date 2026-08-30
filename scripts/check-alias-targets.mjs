@@ -47,8 +47,25 @@ const idByNormName = new Map(
   TOOLS.filter((t) => nameCounts.get(norm(t.name)) === 1).map((t) => [norm(t.name), t.id])
 );
 
+// The `kind` vocabulary, read out of the file's own `_schema` line rather than
+// restated here, so the two cannot drift apart -- which they had: the schema
+// named three kinds while `question` accounted for 13,688 of the 21,072 rows,
+// the largest kind in the file and the only one it did not mention.
+const declaredKinds = new Set(
+  [...String(master._schema || "").matchAll(/'([a-z]+)'/g)].map((m) => m[1])
+);
+
 const errors = [];
 let constrained = 0;
+if (declaredKinds.size === 0) {
+  errors.push("  data/search/aliases.json `_schema` no longer names any kind; the vocabulary check has nothing to enforce");
+}
+for (const row of master.aliases || []) {
+  if (!row || typeof row.kind !== "string") continue;
+  if (!declaredKinds.has(row.kind)) {
+    errors.push(`  "${row.term}" has kind "${row.kind}", which the file's own _schema does not name (${[...declaredKinds].join(", ")})`);
+  }
+}
 for (const row of master.aliases || []) {
   if (!row || typeof row.term !== "string" || typeof row.target !== "string") continue;
   if (!byId.has(row.target)) continue; // build-alias-shards --check owns dangling targets
@@ -64,9 +81,9 @@ for (const row of master.aliases || []) {
 }
 
 if (errors.length) {
-  console.error(`check-alias-targets FAILED: ${errors.length} alias row(s) name one calculator and point at another:`);
+  console.error(`check-alias-targets FAILED with ${errors.length} problem(s):`);
   for (const e of errors) console.error(e);
-  console.error("Re-point the row in data/search/aliases.json and rerun scripts/build-alias-shards.mjs.");
+  console.error("Fix the row in data/search/aliases.json (re-point the target, or use a kind the _schema names) and rerun scripts/build-alias-shards.mjs.");
   process.exit(1);
 }
-console.log(`check-alias-targets OK: ${constrained} of ${(master.aliases || []).length} alias terms name a tile exactly, and every one of them targets it.`);
+console.log(`check-alias-targets OK: ${constrained} of ${(master.aliases || []).length} alias terms name a tile exactly and every one targets it; every row carries one of the ${declaredKinds.size} kinds the file declares.`);
