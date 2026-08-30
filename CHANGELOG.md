@@ -6,6 +6,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Ten modules were fully annotated and still exempt from the annotation gate.** `check-dimensions` graduates modules to fail-on-missing one at a time, against a hand-listed set -- and that set held 48 of 58 while coverage stood at **2,059 of 2,059 functions**. So `calc-rigging.js`, `calc-gas.js`, `calc-pipefit.js`, `calc-motor.js`, `calc-shop.js`, `calc-fab.js`, `calc-earthwork.js`, `calc-layout.js`, `calc-lowvoltage.js` and `calc-metalair.js` had nothing left to graduate for, and a new export landing in any of them would have drawn a warning rather than a failure. The gate's own summary line said "0 function(s) without an annotation pending per-module graduation", which reads like completeness and was not.
+
+  The list is deleted rather than completed: an allowlist naming every module is a hole waiting for module 59. Every module is fail-on-missing now. Seed-verified by removing one annotation from `calc-rigging.js` -- formerly exempt, now the gate names the function and exits 1. `docs/correctness.md` and the contributor checklist say so.
+
 - **Thirteen aliases named one calculator and pointed at another.** "lumen method" routed to the lux/footcandle converter while a tile ID'd `lumen-method` existed; "occupant load" to internal heat gains while the IBC 1004.5 tile existed; "gross rent multiplier" to the Schedule E worksheet; "chlorine demand" to pool turnover; "orifice flow" to a septic lateral. Every one was written before the sibling tile it names had landed.
 
   This is not only a routing miss. `aliasIndex` folds each term into its TARGET tile's ranking corpus, so a mis-pointed row teaches the ranker that the phrase is vocabulary belonging to the wrong calculator and scores that tile up for it. The reader never saw the wrong answer -- the exact-name/id sort key that landed earlier today already put the id-matching tile first -- so these rows were invisible and wrong at the same time, which is how they survived.

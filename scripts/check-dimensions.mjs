@@ -227,18 +227,18 @@ async function main() {
     " functions annotated (" + pct.toFixed(1) + "%) across " + SOURCES.length + " module(s).",
   );
 
-  // Per-module graduation: pure-math.js graduated to fail-on-missing
-  // at the 2026-05-19 Phase C expansion close (every export carries an
-  // annotation). The calc-*.js modules remain warn-on-missing; each
-  // graduates as its annotation coverage closes in lockstep with the
-  // per-row corpus annotations per spec-v14 §16.2.
-  const GRADUATED_MODULES = new Set(["pure-math.js", "calc-historical.js", "calc-kitchen.js", "calc-stage.js", "calc-mechanic.js", "calc-machining.js", "calc-water.js", "calc-lab.js", "calc-agriculture.js", "calc-arborist.js", "calc-trucking.js", "calc-accounting.js", "calc-field.js", "calc-survey.js", "calc-feeder.js", "calc-powerquality.js", "calc-drainage.js", "calc-septic.js", "calc-velocity.js", "calc-treatment.js", "calc-references.js", "calc-restoration.js", "calc-demo.js", "calc-service.js", "calc-realestate.js", "calc-fire.js", "calc-rescue.js", "calc-edu.js", "calc-cross.js", "calc-hvac.js", "calc-refrigerant.js", "calc-hvacsystems.js", "calc-plumbing.js", "calc-plumbingtakeoff.js", "calc-electrical.js", "calc-solar.js", "calc-construction.js", "calc-civil.js", "calc-steel.js", "calc-firesprinkler.js", "calc-concrete.js", "calc-geotech.js", "calc-masonry.js", "calc-lateral.js", "calc-finish.js", "calc-elecdesign.js", "calc-hvacservice.js", "calc-disinfect.js"]);
-  const graduatedMissing = missing.filter((m) => {
-    const mod = m.split(":")[0].trim();
-    return GRADUATED_MODULES.has(mod);
-  });
-  for (const gm of graduatedMissing) {
-    errors.push("graduated module " + gm + " missing dims annotation (pure-math.js is fail-on-missing per spec-v14 §16.2 Phase C ratchet).");
+  // Graduation is COMPLETE. pure-math.js went fail-on-missing at the
+  // 2026-05-19 Phase C close and the calc-*.js modules followed one at a time,
+  // each as its coverage closed, against a hand-listed GRADUATED_MODULES set.
+  // On 2026-08-30 that set held 48 of the 58 modules while coverage stood at
+  // 2,059 of 2,059 functions -- so ten modules (calc-rigging, calc-gas,
+  // calc-pipefit, calc-motor, calc-shop, calc-fab, calc-earthwork,
+  // calc-layout, calc-lowvoltage, calc-metalair) were fully annotated and
+  // still exempt, and a new unannotated export in any of them would have
+  // warned rather than failed. The list is gone rather than completed: an
+  // allowlist that names every module is a hole waiting for module 59.
+  for (const gm of missing) {
+    errors.push(gm + " is missing its dims annotation (fail-on-missing for every module per spec-v14 §16.2 Phase C ratchet).");
   }
 
   if (errors.length > 0) {
@@ -248,19 +248,9 @@ async function main() {
     );
     process.exit(1);
   }
-  // Calc-module missing annotations are reported as a single-line
-  // summary, not per-row warnings, until each module graduates.
-  const ungraduatedMissing = missing.filter((m) => {
-    const mod = m.split(":")[0].trim();
-    return !GRADUATED_MODULES.has(mod);
-  });
-  if (ungraduatedMissing.length > 0 && ungraduatedMissing.length <= 5) {
-    for (const m of ungraduatedMissing) console.warn("WARN: missing dims annotation: " + m);
-  }
-  const gradList = [...GRADUATED_MODULES].sort().join(", ");
   console.log(
-    "v14 dimensional-analysis lint OK (graduated [" + gradList + "]; " +
-    ungraduatedMissing.length + " calc-module function(s) without an annotation pending per-module graduation per spec-v14 §16.2).",
+    "v14 dimensional-analysis lint OK (fail-on-missing across all " + SOURCES.length +
+    " modules per spec-v14 §16.2 Phase C ratchet; graduation complete 2026-08-30).",
   );
 }
 

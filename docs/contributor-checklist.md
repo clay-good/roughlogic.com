@@ -30,8 +30,10 @@ phase docs ([edition-rollover.md](edition-rollover.md),
   spec-v10 §§H.1/H.2) (the `check-wiring` lint
   fails if a `TOOLS` id has no declared renderer).
 - [ ] A `// dims:` dimensional-analysis annotation sits immediately
-  above the exported compute function (the Phase C lint requires one
-  per exported function).
+  above the exported compute function. The Phase C lint requires one
+  per exported function and, since the 2026-08-30 graduation close,
+  FAILS on a missing one in every module -- including a brand-new
+  `calc-*.js`.
 - [ ] Tile is wired into the supporting registries (each enforced by
   a lint gate): `[id, group]` in `_TILES`
   [../tile-meta.js](../tile-meta.js); `{ module, fn }` in
