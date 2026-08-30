@@ -68,6 +68,28 @@
 // numbers from quantities is a judgement call per row, which makes this a
 // curation task, not a derivable ground truth.
 //
+// A third rejected change, and the one that came closest.
+//
+// Ties are common and the alphabetical fallback settles them by accident: "how
+// much concrete for a 10x12 slab" gives EVERY concrete tile coverage 2 and
+// score 5 ("concrete" on the name, "slab" on an alias), so dozens tie and the
+// answer came out in name order, with the tile actually named Concrete Volume
+// nowhere near the top. Breaking those ties by how much of the tile's own name
+// the query accounted for fixes it, and after two refinements -- an exact-id
+// match wins the tie, then a committed alias, then the share -- all three
+// numbers here improved at once: aliases 20,928 -> 20,934, names 1,800 ->
+// 1,801, ids 1,781 -> 1,782 with top-3 reaching 1,804 of 1,804.
+//
+// It still did not ship. A different guard caught it: test/unit/mcp-catalog.js
+// asserts that nonsense is NO_MATCH and never a confident pointer (spec-v1344),
+// and reordering the tie surfaced a tile that answers "what is the meaning of
+// life" with hepa-filter-life. Every scoring input was unchanged -- only the
+// order of equal-scoring rows moved -- so the ranking is not more wrong, but
+// the nonsense guard turns out to be sensitive to tie order, and a confident
+// pointer for a nonsense question is worse than a mediocre one for a real
+// query. Anyone retrying this needs to make the NO_MATCH decision robust to tie
+// order FIRST; the three numbers above say the rest of the idea is sound.
+//
 // Deterministic, offline, read-only. Not a gate: it reports, it does not fail.
 
 import { readFile } from "node:fs/promises";
