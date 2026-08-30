@@ -16,6 +16,17 @@
 // the reload fails outright with net::ERR_INTERNET_DISCONNECTED, so the
 // assertions below are known to depend on the worker rather than on Playwright
 // or the HTTP cache quietly serving them.
+//
+// One boundary on what these can prove, found by trying to measure the COLD
+// case -- a reader who goes offline having never opened a data-backed tile.
+// Playwright's context.setOffline() covers page-initiated requests: probed from
+// page.evaluate, three never-cached shards all come back 504 from the worker's
+// own offline branch, which is the correct behaviour. It does NOT reliably
+// cover the fetches the service worker itself makes: the same shard probes 504
+// before the tile asks for it and 200 immediately after, offline throughout,
+// so something serviced that request. The cold case is therefore NOT measurable
+// with this harness and no test here claims it. What is claimed below is the
+// warm path, which is what "works offline after the first load" promises.
 import { test, expect } from "@playwright/test";
 
 async function installWorker(page) {

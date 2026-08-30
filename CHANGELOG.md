@@ -6,6 +6,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A boundary on what the offline tests can prove, written down instead of guessed at.** Trying to measure the cold case -- a reader who goes offline having never opened a data-backed tile -- produced results that would not reproduce: the same shard probed 504 before the tile asked for it and 200 immediately after, offline throughout. `context.setOffline()` covers page-initiated requests (three never-cached shards all return 504 from the worker's own offline branch, which is correct) but does not reliably cover the fetches the service worker itself makes. So the cold case is not measurable with this harness, and the test file now says so rather than implying coverage it does not have. What the specs claim is the warm path, which is what "works offline after the first load" actually promises.
+
 - **The offline promise was tested on a calculator that needs no data.** Both existing offline specs use `ohms-law`, which is pure arithmetic. A tile that READS a shard is a different path, and that path gained a step on 2026-08-29: every shard fetch now hands its bytes to `verifyShard`, which fetches the folder's manifest to look the hash up. Offline that fetch cannot succeed. The design returns null and skips rather than throwing or accusing, but "by design" and "verified" are different claims, and the README's headline promises the second one.
 
   Now verified: `loan-limits` renders offline, returns the shard's own content (San Francisco, $1,209,750), and shows no integrity banner -- a failed manifest fetch must never be reported to a reader as tampering.
