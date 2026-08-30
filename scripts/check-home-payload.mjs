@@ -112,6 +112,27 @@ for (const cat of ["html", "css", "js"]) {
   }
 }
 
+// docs/performance.md quotes the measured payload in two places. Both said
+// 47,209 B against a live 47,307 -- drift small enough that nobody would catch
+// it by reading, and large enough to compound. Checked with a 2% band rather
+// than byte-exactly: a stated figure exists to tell a reader the order of
+// magnitude, and a pin that fails on 98 bytes of CSS would be edited out of
+// the way rather than obeyed.
+const DOC = resolve(ROOT, "docs", "performance.md");
+const docText = await readFile(DOC, "utf8");
+const stated = [...docText.matchAll(/payload (?:is|gzips to) \*\*([\d,]+) B\*\*/g)].map((m) => Number(m[1].replace(/,/g, "")));
+if (stated.length === 0) {
+  failures.push("docs/performance.md no longer states the home-view payload; the drift check has nothing to compare.");
+}
+for (const n of stated) {
+  if (Math.abs(n - total) > total * 0.02) {
+    failures.push(
+      "docs/performance.md states a home-view payload of " + n + " B; the live figure is " + total +
+      " B, more than 2% away. Update the prose.",
+    );
+  }
+}
+
 if (total > BUDGET_BYTES) {
   failures.push(
     "Total payload: " + total + " B exceeds " + BUDGET_BYTES + " B (spec section 11.1).",

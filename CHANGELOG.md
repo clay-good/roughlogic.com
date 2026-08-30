@@ -12,6 +12,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The documented home-view payload had drifted, and nothing would ever have said so.** `docs/performance.md` states the measured figure in two places; both read 47,209 B against a live 47,307. Updated, and `check-home-payload` now compares the stated figure to the one it just measured -- within a **2% band**, deliberately, because a stated number exists to tell a reader the order of magnitude and a pin that fails on 98 bytes of CSS gets edited out of the way rather than obeyed. It also fails if the prose stops stating a figure at all, so the check cannot go quiet. Seed-verified at 60,000 B.
+
 - **The launch checklist still quoted 52 citation-strings rows against a live 70.** Three lines in `docs/launch-checklist.md` -- the A.3 entry, the runtime-audit sentence and the "citation alignment floor" -- were stamped 2026-05-11 and never moved while the artefact grew by 18 rows. Fixed and pinned: `check-readme-counts` reads `_row_count` out of `docs/citation-strings.generated.json` and anchors all three, taking it to 32 label-anchored counts. Seed-verified.
 
 - **`check-dist` printed the same three orphan warnings on every build.** `.well-known/mcp.json`, `AGENTS.md` and `llms.txt` are fetched by well-known path and linked from nothing, so the orphan pass flagged them every time and nobody read the list any more -- which is how a fourth, genuinely dead file would have arrived unnoticed. The three are named in `ORPHAN_EXEMPT` alongside `robots.txt` and `sitemap.xml`, where they belonged, and an orphan is now a **failure** rather than a warning. Seed-verified with a stray file in `dist/`.
