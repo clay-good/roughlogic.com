@@ -84,9 +84,9 @@ published and is the AHJ-relevant edition for at least one US state:
 - State adoption is the slowest part of the rollover. Some
   jurisdictions still enforce NEC 2017 in 2026. Use the spec-v10
   §F.3 dual-edition window until 50% population-weighted adoption.
-- Tiles affected: every Group A tile plus generator-sizing,
-  pv-string-sizing, ev-charging, service-load-standard, panel-
-  rebalance.
+- Tiles affected: every Group A tile plus `generator-sizing`,
+  `pv-string-sizing`, `ev-charger-load`, `service-load-standard`,
+  `panel-rebalance`.
 
 ### IPC / IRC / IBC / IMC / IFC / IFGC
 
@@ -133,38 +133,14 @@ published and is the AHJ-relevant edition for at least one US state:
 - Not free-access; cite by edition only. Tiles affected:
   stopping-sight-distance, road-grade-stopping.
 
-### CDC Field Triage Guidelines (Group V, spec-v12 §6)
+### Retired: CDC Field Triage (Group V) and FAA AC 00-45 (Group W)
 
-- Cycle: ~5 years. Current 2021 (National Expert Panel on Field
-  Triage revision). The 2011 and 2006 editions preceded it; the
-  next revision is not on a fixed calendar but typically follows
-  the 5-year EMSC / ACS-COT review window.
-- Free-access portal: cdc.gov/mmwr (the guideline ships as an
-  MMWR Recommendations and Reports issue) and the National
-  Expert Panel's published revision.
-- Tiles affected: every Group V triage tile that cites the field-
-  triage decision steps (`field-triage-decision`, `step-1-physiologic`,
-  `step-2-anatomic`, `step-3-mechanism`, `step-4-special`). The
-  Group V notice (`NOTICE_EMS`) plus the spec-v10 §B.1 limitation
-  banner govern; the EMS medical director governs adoption of the
-  current edition for the local agency.
-- Annual recheck per spec-v12 §16; full rollover only when the
-  National Expert Panel publishes a new revision.
-
-### FAA AC 00-45 (Aviation Weather Services, Group W, spec-v12 §7)
-
-- Cycle: irregular; every few years. Current AC 00-45H Change 2.
-  The FAA does not pre-announce the next change; watch the
-  Federal Register and the FAA Drafts and Notices page.
-- Free-access portal: faa.gov/regulations_policies/advisory_circulars.
-- Tiles affected: every Group W tile that decodes METAR / TAF /
-  PIREP / SIGMET / G-AIRMET (`metar-decode`, `taf-decode`,
-  `pirep-decode`, `density-altitude`, `crosswind-component`). The
-  underlying physics does not change between AC revisions but
-  the formatting conventions and station-identifier rules do;
-  re-walk the TOC on every change.
-- Annual recheck per spec-v12 §16; full rollover when the FAA
-  publishes a new change.
+Both stanzas were deleted on 2026-08-30. Groups V (EMS / pre-hospital) and W
+(aviation) no longer exist and neither do the tiles they named --
+`field-triage-decision`, `metar-decode`, `taf-decode`, `pirep-decode` and their
+siblings. The entries survived the retirement and read as live maintenance
+obligations, complete with an annual recheck. `scripts/check-doc-links.mjs`
+now fails on any "Tiles affected" line naming a tile that does not exist.
 
 ## Anti-patterns
 

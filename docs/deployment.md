@@ -77,7 +77,11 @@ infrastructure changes are required:
   extended to include the five new calculator modules
   (`calc-vet.js`, `calc-ems.js`, `calc-aviation.js`,
   `calc-realestate.js`, `calc-edu.js`) so offline navigation to a
-  Group U / V / W / X / Y tile still hits the cache. The cache
+  v12-group tile still hits the cache. (A v12-era note: the
+  Veterinary, EMS and Aviation benches were retired in spec-v107
+  and the first three of those modules no longer exist. The live
+  precache list is whatever `scripts/check-sw-precache.mjs`
+  asserts.) The cache
   name remains keyed by build hash; the new shell list takes
   effect on the next deploy. `scripts/check-dist.mjs` (Phase G.3)
   asserts every precached path exists in `dist/`.

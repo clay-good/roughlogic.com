@@ -14,12 +14,16 @@ The variant is selected in `app.js` (the `view-tool` mounting path). Per-id over
 | Tax-law (v5) | `NOTICE_TAX_LAW` | "Estimate only. Confirm with the current IRS publication or a CPA before filing." |
 | Legal-information (v5) | `NOTICE_LEGAL` | "Legal information, not legal advice. Verify with current state code and an attorney." |
 | Bench-science (v5) | `NOTICE_LAB` | "Check your lab's SOP before pipetting. A bad dilution ruins the run." |
-| Veterinary (v12) | `NOTICE_VETERINARY` | "Math aid for the veterinary team. The attending veterinarian governs the prescription, fluid plan, and feeding plan; the RVT / LVT governs administration. Verify against the current drug formulary and the in-clinic findings." |
-| EMS / Pre-hospital (v12) | `NOTICE_EMS` | "Math aid for the field provider. The receiving facility's physician governs disposition; the EMS medical director governs scope of practice; the agency protocol governs the call. This tile does not substitute for online medical command." |
-| Aviation (v12) | `NOTICE_AVIATION` | "Math aid for flight planning. Pilot-in-command and the airplane flight manual or POH govern. Verify against the AFM loading graph, performance chart, or current weather brief." |
 | Real estate (v12) | `NOTICE_REAL_ESTATE` | "Estimate only. The lender governs underwriting; the appraiser governs value." |
 | Education (v12) | `NOTICE_EDUCATION` | "Estimate only. The classroom teacher governs placement and assessment calls." |
 | Worker-safety (per-tool) | inlined per renderer | e.g., utility 268 lab-safety carries "If a chemical spill exceeds your lab's spill-kit capacity or involves an unknown agent, stop, evacuate, and call your environmental health and safety office or 911." |
+
+Groups S (legal), U (veterinary), V (EMS) and W (aviation) were retired, and their
+`NOTICE_LEGAL`-adjacent variants went with them: `NOTICE_VETERINARY`, `NOTICE_EMS`
+and `NOTICE_AVIATION` no longer exist in `app.js`. `NOTICE_LEGAL` survives, reached
+only through the `sales-tax-nexus` per-id override. `scripts/check-notice-variants.mjs`
+now holds this file to the selector in `app.js` in both directions, so a retired
+variant cannot linger here again.
 
 ## Selection rules
 
@@ -31,11 +35,7 @@ The selector in `app.js` runs in this order:
 2. **Per-group rules.**
    - Group Q (historical) -> `NOTICE_HISTORICAL`
    - Group R (accounting / tax) -> `NOTICE_TAX_LAW`
-   - Group S (legal) -> `NOTICE_LEGAL`
    - Group T (lab) -> `NOTICE_LAB`
-   - Group U (veterinary) -> `NOTICE_VETERINARY` (v12 §5; Group U tiles also render the spec-v10 §B.1 limitation banner below the notice per the spec-v12 §13.1 override)
-   - Group V (EMS / pre-hospital) -> `NOTICE_EMS` (v12 §6; Group V tiles also render the spec-v10 §B.1 limitation banner below the notice per the spec-v12 §13.1 override)
-   - Group W (aviation) -> `NOTICE_AVIATION` (v12 §7)
    - Group X (real estate) -> `NOTICE_REAL_ESTATE` (v12 §8)
    - Group Y (educators) -> `NOTICE_EDUCATION` (v12 §9)
 3. **Fire-ground rule.** Group F -> `NOTICE_FIRE`, and so does any tile outside Group F whose `trades` array includes `fire` **unless** it is also tagged for electrical *and* plumbing *and* HVAC. That six-trade tag means "every trade", not "the fireground": it is how `sales-tax`, `loan-payment`, `unit-converter`, `timesheet`, and 16 others ended up telling a reader that incident command governed their answer. Those fall through to the default. The 33 tiles that keep the variant are the genuinely fire- and SAR-adjacent ones (ladder angle, fall-protection clearance, search track spacing, NAC voltage drop).
@@ -46,7 +46,7 @@ The selector in `app.js` runs in this order:
 1. Add a `NOTICE_<NAME>` constant near the top of `app.js`.
 2. Add the matching `GOVERNANCE.<name>` entry in `citations.js` so the v6 reference block on each tile renders the same wording from the structured citation.
 3. Wire the selection rule in the same priority block in `app.js`.
-4. Update this file with the wording and the rule.
+4. Update this file with the wording and the rule. `scripts/check-notice-variants.mjs` fails if the constant, its wording, or its selection rule is missing here -- or if this file names one `app.js` no longer defines.
 5. Verify with `npm test` (the v6 audit asserts every tile id has a `CITATIONS` entry whose `governance` matches one of the bundled variants).
 
 ## What a notice is for

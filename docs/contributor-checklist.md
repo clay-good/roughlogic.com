@@ -81,15 +81,11 @@ phase docs ([edition-rollover.md](edition-rollover.md),
 - [ ] Home-view payload remains under the 100 KB gzipped cap.
 - [ ] CHANGELOG stanza added under "Unreleased" naming the tile,
   group, citation, and worked example.
-- [ ] If the tile is in Group U (Veterinary) or Group V (EMS /
-  Pre-hospital), it renders the spec-v10 §B.1 limitation banner
-  with the professional-governs notice (veterinarian governs /
-  medical director and receiving facility govern) per the
-  spec-v12 §13.1 override and a CANONICAL banner entry in
-  [../limitation-banner.js](../limitation-banner.js).
-- [ ] If the tile is in Group W / X / Y, it carries cite-strong
-  governance verbiage (PIC governs / lender governs / teacher
-  governs) in the source-stamp; no §B.1 banner needed.
+- [ ] If the tile is in Group X (Real Estate) or Group Y
+  (Educators), it carries cite-strong governance verbiage (lender
+  governs / teacher governs) in the source-stamp; no §B.1 banner
+  needed. (The §B.1 limitation-banner step this list used to carry
+  applied to Groups U, V and W, all retired.)
 - [ ] If the tile sweeps mobile at 320 / 375 / 414 / 760 px
   cleanly (no horizontal scroll, `overflow-wrap: anywhere` on
   long URLs, `inputmode` on numeric inputs) per the spec-v12

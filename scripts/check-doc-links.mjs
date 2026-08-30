@@ -41,8 +41,20 @@ async function livingDocs() {
 // [text](target) and [text](target "title"); target has no whitespace.
 const LINK_RE = /\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g;
 
+// A "Tiles affected:" line is a reference too, and it can dangle the same way a
+// path can. docs/edition-rollover.md carried two whole rollover stanzas -- with
+// annual-recheck obligations -- for the retired Group V triage tiles and Group W
+// aviation decoders, naming `field-triage-decision`, `metar-decode`,
+// `taf-decode` and `pirep-decode` long after none of them existed. Scoped to
+// that line so an honest sentence ELSEWHERE saying a tile was retired does not
+// trip it, the way the Lighthouse claim detector had to be scoped.
+const BACKTICKED_RE = /`([a-z][a-z0-9]*(?:-[a-z0-9]+)+)`/g;
+
 async function main() {
   let checked = 0;
+  let tileRefs = 0;
+  const { TOOLS } = await import(new URL("../tools-data.js", import.meta.url).href);
+  const liveIds = new Set(TOOLS.map((t) => t.id));
   const files = await livingDocs();
   for (const rel of files) {
     const text = await readFile(resolve(ROOT, rel), "utf8");
@@ -60,13 +72,24 @@ async function main() {
         );
       }
     }
+    // A stanza can span several lines; keep the bullet with its continuation
+    // lines before reading the ids out of it.
+    for (const block of text.split(/\n(?=[-*#] |\n)/)) {
+      if (!/^[-*]\s*Tiles affected:/.test(block.trimStart())) continue;
+      for (const m of block.matchAll(BACKTICKED_RE)) {
+        tileRefs += 1;
+        if (!liveIds.has(m[1])) {
+          errors.push(rel + " 'Tiles affected' names '" + m[1] + "', which is not a tile");
+        }
+      }
+    }
   }
   if (errors.length > 0) {
     for (const e of errors) console.error("ERROR: " + e);
     console.error(
       "check-doc-links FAILED: " +
         errors.length +
-        " broken relative link(s) across " +
+        " broken reference(s) across " +
         files.length +
         " living docs.",
     );
@@ -77,7 +100,7 @@ async function main() {
       checked +
       " relative links across " +
       files.length +
-      " living docs all resolve (CHANGELOG.md and specs/ excluded as append-only records).",
+      " living docs all resolve, and " + tileRefs + " tile id(s) named in Tiles-affected lines are live (CHANGELOG.md and specs/ excluded as append-only records).",
   );
 }
 

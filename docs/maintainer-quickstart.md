@@ -115,13 +115,10 @@ Tests live in `test/unit/` and `test/integration/`.
    §"v12 per-module budgets"); the lint warns within 10 % of cap.
    The spec-v10 §H.1 5 KB *per-tile* cap remains the design target
    for the tile's contribution to its module.
-10. If the tile is in Group U (Veterinary) or Group V (EMS /
-    Pre-hospital), wire the spec-v10 §B.1 limitation banner with
-    the spec-v12 §13.1 override governance language ("veterinarian
-    governs" / "medical director and receiving facility govern")
-    via a CANONICAL entry in [../limitation-banner.js](../limitation-banner.js).
-    Group W / X / Y tiles use cite-strong governance verbiage in
-    the source-stamp instead of a banner. The Phase F.2
+10. Group X (Real Estate) and Group Y (Educators) tiles use
+    cite-strong governance verbiage in the source-stamp rather than
+    a limitation banner. (Groups U, V and W are retired; the banner
+    override this step used to describe applied to them.) The Phase F.2
     mobile-responsive sweep at 320 / 375 / 414 / 760 px per
     [mobile-responsive.md](mobile-responsive.md) is required for
     every new tile.

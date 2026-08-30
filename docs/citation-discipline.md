@@ -116,26 +116,11 @@ The structured §3 reference block in `citations.js` is the deeper source - this
 | hos-math | "Notice: Math aid for personal verification. The ELD on the truck is the legal record. Citation: per FMCSA 49 CFR 395 (Hours of Service). Free at ecfr.gov." |
 | bridge-formula | "Citation: per 23 CFR 658.17 (Federal Bridge Formula). W = 500 (LN/(N-1) + 12N + 36) for any consecutive axle group N >= 2. State limits may be lower than federal. Free at ecfr.gov." |
 
-### calc-vet.js (Group U, v12 §5)
+### Retired: calc-vet.js (Group U), calc-ems.js (Group V), calc-aviation.js (Group W)
 
-Per spec-v12 §13.1 every Group U tile renders the v10 §B.1 limitation banner naming the attending veterinarian as the governance authority. Source-stamp strings are representative; the deeper per-tile reference block lives in [../citations.js](../citations.js) under `CITATIONS["vet-*"]`.
-
-| Tile | Source-stamp |
-| --- | --- |
-
-### calc-ems.js (Group V, v12 §6)
-
-Per spec-v12 §13.1 every Group V tile renders the v10 §B.1 limitation banner naming the EMS medical director and the receiving facility as the governance authority. The cite-strong receiving-facility verbiage is in the source-stamp; the medical-director notice is in the banner.
-
-| Tile | Source-stamp |
-| --- | --- |
-
-### calc-aviation.js (Group W, v12 §7)
-
-Group W does not render the §B.1 limitation banner; the cite-strong aviation governance verbiage names the pilot-in-command (PIC) and the airplane flight manual (AFM) / pilot's operating handbook (POH) directly.
-
-| Tile | Source-stamp |
-| --- | --- |
+Removed 2026-08-30. All three modules and their groups were retired; the sections
+here had stood since, each with an empty source-stamp table under a paragraph
+describing governance for tiles that no longer exist.
 
 ### calc-realestate.js (Group X, v12 §8)
 

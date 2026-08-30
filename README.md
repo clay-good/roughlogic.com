@@ -71,7 +71,7 @@ One calculator is one formula on one screen. (In the source and the gate names b
 
 ## Why you can trust the answers
 
-The hard part of a calculator catalog is not the arithmetic. It is proving, at scale, that every tile stays correct as the catalog grows. That is a build problem here: `npm run lint` runs 51 static gates before a change can land.
+The hard part of a calculator catalog is not the arithmetic. It is proving, at scale, that every tile stays correct as the catalog grows. That is a build problem here: `npm run lint` runs 52 static gates before a change can land.
 
 | Gate | What it guarantees |
 |---|---|
@@ -86,6 +86,7 @@ The hard part of a calculator catalog is not the arithmetic. It is proving, at s
 | `check-tile-contract` | every tile is registered, crash-free, and matches its declared I/O shape |
 | `check-shell-mobile` | zero horizontal scroll on every page at 320 px and 200% text zoom |
 | `check-feedback-loop` | every current and future calculator retains the shared defensive D1 reporting path |
+| `check-notice-variants` | the notice naming who governs each answer matches what `docs/notice-variants.md` says it is |
 
 CI adds three jobs per push: `test` (lint + unit tests + data-integrity verification), then `accessibility` (axe-core at 320 px) and `integration` (the full Playwright suite, plus the built-shell gates) in parallel. A fourth Lighthouse job was removed on 2026-08-23 over an unpatched advisory in `@lhci/cli`; see [docs/performance.md](docs/performance.md) for what gates performance in its place. At runtime, `integrity.js` re-verifies the SHA-256 of every data manifest against `data/integrity.json`, and each shard against the hash its own manifest records, before the data reaches a calculation; the read-only posture means the worst case is a visible warning, never silent corruption.
 
@@ -105,7 +106,7 @@ The home payload gzips to well under the 100 KB budget. Opening a calculator dyn
 npm ci             # exact locked dev tooling; the site has zero runtime deps
 npm run dev        # build, then serve only dist/ on loopback
 npm run build      # emit dist/ (SPA + static shells + sitemap)
-npm run lint       # the full static-gate chain (51 checks)
+npm run lint       # the full static-gate chain (52 checks)
 npm test           # unit tests (node --test)
 npm run test:e2e   # Playwright integration suite (needs a browser)
 ```
