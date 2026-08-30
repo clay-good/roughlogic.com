@@ -6,6 +6,19 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The nonsense guard held by luck, so it was made to hold by rule -- and that unblocked the tie-break.** `answerQuery` corroborates only the single top-ranked tile, and `queryNamesTile` accepted **one** shared word of four or more characters. "what is the meaning of life" shares exactly "life" with HEPA Filter Life and nothing else, so whether spec-v1344's promise held came down to which of many equally-scoring tiles sorted first alphabetically. Naming a calculator now takes half its distinctive name words, rounded up: Voltage Drop still needs only "voltage" ("drop" is noise), HEPA Filter Life needs two of three. Measured across 900 curated alias phrases, the NO_MATCH rate is **unchanged at 0.11%** -- the stricter rule costs real questions nothing.
+
+  With the guard robust, the tie-break rejected in the previous entry ships. Ties are settled by how much of the tile's own name the query accounted for, ordered id first, then a committed alias, then the share, with name order still last so it stays total. "how much concrete for a 10x12 slab" returns Concrete Volume, verified in a browser, where dozens of tiles previously tied on coverage 2 / score 5 and came out alphabetically.
+
+  | | before | after |
+  | --- | --- | --- |
+  | curated alias reaches target (21,025) | 20,928 | **20,934** |
+  | tile first for its own name (1,804) | 1,800 | **1,801** |
+  | tile first for its own id (1,804) | 1,781 | **1,782** |
+  | id top-3 | 1,803 | **1,804 of 1,804** |
+
+  One test probe was wrong and got fixed rather than the code: "the filter of my life" shares two of three words with HEPA Filter Life, which is a reader naming it, not nonsense. The three probes now each share exactly one word.
+
 - **A ranking improvement that measured well on every ground truth, and still should not ship.** Ties are common and the alphabetical fallback settles them by accident: "how much concrete for a 10x12 slab" gives every concrete tile coverage 2 and score 5 -- "concrete" on the name, "slab" on an alias -- so dozens tie and the answer comes out in name order, with the tile actually named Concrete Volume nowhere near the top. Breaking ties by how much of the tile's own name the query accounted for fixed that, and after two refinements (exact-id match wins the tie, then a committed alias, then the share) **all three ground truths improved at once**: curated aliases 20,928 to 20,934, names 1,800 to 1,801, ids 1,781 to 1,782 with top-3 reaching 1,804 of 1,804.
 
   A different guard caught it. `test/unit/mcp-catalog.test.js` asserts that nonsense is NO_MATCH and never a confident pointer (spec-v1344), and reordering the tie surfaced a tile that answers "what is the meaning of life" with `hepa-filter-life`. No scoring input changed -- only the order of equal-scoring rows -- so the ranking is not more wrong, but the nonsense guard is sensitive to tie order, and a confident pointer for a nonsense question is worse than a mediocre one for a real query. Reverted, with the numbers and the prerequisite recorded in `scripts/measure-ranking.mjs`: make the NO_MATCH decision robust to tie order first, then the rest of the idea is sound.

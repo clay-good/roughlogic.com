@@ -479,3 +479,29 @@ test("the id corpus does not out-compete a real name match", async () => {
     normalizeQuery("how many 12 awg wires in 1/2 inch conduit").tokens, TOOLS, ALIASES, { limit: 3 });
   assert.equal(ranked[0].tool.id, "conduit-fill");
 });
+
+test("a tie is broken by how much of the tile's name the query accounted for", async () => {
+  const { aliases: ALIASES, TOOLS } = await rankingFixture();
+  // Every concrete tile ties on this query: coverage 2, score 5, "concrete"
+  // on the name and "slab" on an alias. Dozens of them, settled by name order,
+  // which left the tile actually named Concrete Volume out of the top six.
+  const ranked = rankTools(
+    normalizeQuery("how much concrete for a 10x12 slab").tokens, TOOLS, ALIASES, { limit: 3 });
+  assert.equal(ranked[0].tool.id, "concrete");
+});
+
+test("the tie-break does not outrank an exact id or a committed alias", async () => {
+  const { aliases: ALIASES, TOOLS } = await rankingFixture();
+  // Order within a tie is id, then curation, then share. "wind chill" is an id
+  // and must not go to the inverse solver; the fire-hose and max-circuit-length
+  // queries are the two regressions search-discovery.js warns about.
+  const cases = [
+    ["friction loss 200 ft of hose at 150 gpm", "fire-friction"],
+    ["max circuit length for voltage drop", "max-circuit-length-for-vd"],
+    ["backflow", "backflow"],
+  ];
+  for (const [q, want] of cases) {
+    const r = rankTools(normalizeQuery(q).tokens, TOOLS, ALIASES, { limit: 3 });
+    assert.equal(r[0].tool.id, want, `"${q}" should still rank ${want} first`);
+  }
+});

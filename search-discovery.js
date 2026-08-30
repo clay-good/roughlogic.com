@@ -537,11 +537,39 @@ export function rankTools(tokens, tools, aliases, opts) {
   // A calculator the query NAMED IN FULL first; then full-coverage
   // candidates, then best token coverage; ties break by score desc, then
   // name: a total, deterministic order.
+  // Ties are common and the alphabetical fallback decided them by accident.
+  // "how much concrete for a 10x12 slab" gives every concrete tile the same
+  // coverage 2 and score 5 -- "concrete" on the name, "slab" on an alias --
+  // so dozens of them tie and the answer came out in name order, with the tile
+  // actually named Concrete Volume nowhere near the top. Break those ties by
+  // how much of the tile's OWN NAME the query accounted for: matching one word
+  // of two says more than matching one of six. Alphabetical stays last so the
+  // order is still total and deterministic.
+  for (const row of out) {
+    const parts = row.corpus.nameParts;
+    if (!parts.length) { row.nameShare = 0; continue; }
+    let hit = 0;
+    for (const part of parts) {
+      for (let i = 0; i < tokens.length; i++) {
+        if (row.weights[i] > 0 && coversNamePart(tokens[i], part, typoEligible[i])) { hit++; break; }
+      }
+    }
+    row.nameShare = hit / parts.length;
+  }
+  // Tie order, most specific first. A tile the query NAMES outright wins: the
+  // query "wind chill" is the id wind-chill, and an alias claiming that phrase
+  // for wind-chill-wind-speed must not send a reader to the inverse solver.
+  // Then curation, because a committed alias phrase for this exact query is a
+  // human decision -- without it the share rule pulled seven curated rows off
+  // their target. Then the share heuristic, then name order so it stays total.
   out.sort(
     (a, b) =>
       (b.namesInFull ? 1 : 0) - (a.namesInFull ? 1 : 0) ||
       b.coverage - a.coverage ||
       b.score - a.score ||
+      (idBonusApplies(b.tool, joined) ? 1 : 0) - (idBonusApplies(a.tool, joined) ? 1 : 0) ||
+      (b.tool.id === verbatimTarget ? 1 : 0) - (a.tool.id === verbatimTarget ? 1 : 0) ||
+      b.nameShare - a.nameShare ||
       String(a.tool.name).localeCompare(String(b.tool.name)),
   );
   return out

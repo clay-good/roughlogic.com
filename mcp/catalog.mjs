@@ -990,11 +990,19 @@ function queryIsCuratedAliasFor(query, id, aliases) {
 
 function queryNamesTile(query, name) {
   const q = String(query || "").toLowerCase();
-  for (const word of String(name || "").toLowerCase().split(/[^a-z0-9]+/)) {
-    if (word.length < 4 || TILE_NAME_NOISE.has(word)) continue;
-    if (q.includes(word)) return true;
-  }
-  return false;
+  const distinctive = String(name || "")
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((w) => w.length >= 4 && !TILE_NAME_NOISE.has(w));
+  if (!distinctive.length) return false;
+  const hit = distinctive.filter((w) => q.includes(w)).length;
+  // One incidental word out of several is not a reader naming a calculator.
+  // "what is the meaning of life" shares "life" with HEPA Filter Life and
+  // nothing else, and that was enough to call the question corroborated and
+  // hand back a confident pointer. Half the tile's distinctive words, rounded
+  // up, is: Voltage Drop needs "voltage" ("drop" is noise), Concrete Volume
+  // needs one of two, HEPA Filter Life needs two of three.
+  return hit >= Math.ceil(distinctive.length / 2);
 }
 
 // queryFill returns strings, because it also feeds the DOM and the URL hash.

@@ -77,3 +77,23 @@ test("spec-v1344: the same question twice gives the same answer", async () => {
   const b = await answerQuery({ query: q });
   assert.deepEqual(a.result, b.result);
 });
+
+test("spec-v1344: one incidental word is not a reader naming a calculator", async () => {
+  // The nonsense guard used to depend on which of many equally-scoring tiles
+  // happened to sort first: "what is the meaning of life" shares exactly one
+  // word with HEPA Filter Life, and a single shared word was enough to call
+  // the question corroborated. Whether that tile reached rank 0 was down to
+  // alphabetical order, so the guard held by luck rather than by rule.
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  // Each of these shares exactly ONE distinctive word with a multi-word tile
+  // name and nothing else. ("the filter of my life" is deliberately NOT here:
+  // it shares two of HEPA Filter Life's three, which is a reader naming it.)
+  for (const q of ["what is the meaning of life", "a life well lived", "what a lovely filter"]) {
+    const out = await answerQuery({ query: q });
+    assert.equal(out.status, "NO_MATCH", `${q} -> ${out.status} ${out.id || ""}`);
+  }
+  // And the rule still lets a real naming through: "drop" is noise, so
+  // Voltage Drop is named by "voltage" alone.
+  const vd = await answerQuery({ query: "voltage drop" });
+  assert.equal(vd.id, "voltage-drop");
+});
