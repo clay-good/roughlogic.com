@@ -21,16 +21,21 @@ export default defineConfig({
   // WebKit (the iOS Safari engine). WebKit's flexbox `min-width` and sub-pixel
   // rounding diverge from Chromium, and roughly half of US mobile traffic is
   // iOS Safari, so the no-horizontal-scroll guarantee is the one axis worth
-  // verifying on a second engine. Only responsive-stress re-runs on WebKit
-  // (testMatch) so the rest of the integration job stays Chromium-only and
-  // bounded. The `webkit-responsive` browser must be installed in CI
+  // verifying on a second engine -- as is "the proof prints", which relied on
+  // a rule only Chromium honours. Only responsive-stress and shell-print
+  // re-run on WebKit (testMatch) so the rest of the integration job stays
+  // Chromium-only and bounded. The `webkit-responsive` browser must be
+  // installed in CI
   // (`npx playwright install --with-deps webkit`).
   projects: [
     { name: "chromium" },
     {
       name: "webkit-responsive",
       use: { browserName: "webkit" },
-      testMatch: /responsive-stress\.test\.js$/,
+      // shell-print rides along for the same reason: the proof stopped
+      // printing on every engine but Chromium and a Chromium-only pass is
+      // what hid it.
+      testMatch: /(responsive-stress|shell-print)\.test\.js$/,
     },
   ],
   webServer: {

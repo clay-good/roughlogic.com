@@ -91,6 +91,20 @@ roughlogic.com targets WCAG 2.2 Level AA. The following checklist is the project
 - The hardened safety notice on utility 268 (lab-safety quick-read) appears at the top of the output region with `role="note"` and remains visible even if the user scrolls past the GHS pictogram list. The notice is asserted by [test/unit/calc-references-v5.test.js](../test/unit/calc-references-v5.test.js).
 - **Glossary tooltip (utility 271)** uses `role="tooltip"` and `aria-describedby` linking the input element to the tooltip span. The tooltip opens on `mouseenter` and on `focus`, closes on `mouseleave`, `blur`, and `Escape`. Per WCAG 2.2 success criterion 1.4.13 (Content on Hover or Focus), the tooltip is dismissable (Escape), hoverable (the tooltip itself stays in the DOM during hover), and persistent until the trigger is moved away from. Verified by the `keydown` Escape handler in `attachGlossaryTooltip`.
 - **CSV export button (utility 269)** is a real `<button>` with text "Copy CSV", an `aria-label="Download table as CSV"`, and the same 48 px touch target as the existing copy buttons. The download is an anchor `click()` event with no popup or new window.
+- **The shells print their proof from a copy, not from the disclosure.** The
+  collapsed "Details, formula, and sources" block has to print in full: paper
+  has no disclosure to click, and the formula and its authority are what the
+  page carries. On the SPA, `app.js` sets `open` on `beforeprint`. A shell runs
+  zero JavaScript, so it had only the `::details-content` print rule -- which
+  Chromium honours and no other engine does. Measured 2026-08-31: printing a
+  tile shell in WebKit dropped the formula and every source line. Nothing in
+  CSS can open a closed `<details>`, so each shell now carries a
+  `.shell-print-proof` copy, `display: none` on screen and `aria-hidden` so no
+  screen reader is read the same paragraphs twice; in print media the
+  `<details>` is hidden and the copy takes its place, on every engine.
+  [../test/integration/shell-print.test.js](../test/integration/shell-print.test.js)
+  runs on Chromium **and** WebKit, because a Chromium-only pass is exactly what
+  hid this.
 - **Print-table CSS (utility 270)** uses `@media print` rules scoped under `.tabular-tool`. The `thead { display: table-header-group; }` rule ensures the column header repeats on every printed page so a multi-page amortization or PCR master-mix table remains readable.
 - All v5 calculator views render with a single `<h1>` per the existing pattern, descending `<h2>` per logical section, and `<dl>` / `<table>` for tabular output. The numeric inputs use `inputmode="decimal"` and named `<label>` elements; voice input ("five thousand" -> 5000) works on every Group R and Group T tile.
 

@@ -1337,17 +1337,30 @@ input[aria-invalid="true"] {
     text-decoration: underline !important;
   }
   /* A printed page has no disclosure to click, so the proof must print in
-     full. app.js also sets `open` on beforeprint; this covers browsers that
-     print without firing the event. */
+     full. On the SPA, app.js sets `open` on beforeprint and the
+     ::details-content rule below covers browsers that print without firing the
+     event. A SHELL runs zero JavaScript, so it had only the CSS -- and no
+     engine but Chromium supports ::details-content: measured 2026-08-31,
+     printing a tile shell in WebKit dropped the formula and every source line.
+     Nothing in CSS can open a closed <details>, so the shell prints from a
+     copy: .shell-print-proof, which is display:none on screen. */
   .proof, .shell-proof {
     background: white !important;
     color: black !important;
     border-color: #999 !important;
   }
-  .proof::details-content,
-  .shell-proof::details-content {
+  .proof::details-content {
     content-visibility: visible;
     block-size: auto;
+  }
+  .shell-page .shell-proof {
+    display: none !important;
+  }
+  .shell-page .shell-print-proof {
+    display: block !important;
+  }
+  .shell-page .shell-print-proof-title {
+    font-weight: 600;
   }
   .proof > summary,
   .shell-proof > summary {
@@ -1781,6 +1794,11 @@ input[aria-invalid="true"] {
    formula. It needs the same gap the reference rows get. */
 .shell-page .shell-proof .shell-detail {
   margin-bottom: var(--space-3);
+}
+
+/* Printed-page copy of the proof; see the @media print block for why. */
+.shell-page .shell-print-proof {
+  display: none;
 }
 
 .shell-page .shell-related-desc {

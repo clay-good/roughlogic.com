@@ -1136,6 +1136,32 @@ function tileShell(tool, tools, groupNames, relatedByTile, examples, labels, out
       assumptionRows ? '    </ul>' : '',
       '  </details>',
     ].filter(Boolean).join("\n") : '',
+    // The proof has to print in full: a sheet of paper has no disclosure to
+    // click, and the formula and its authority are the reference content the
+    // page exists to carry. styles.css tried to do that by making the closed
+    // <details> render in print media -- which works in Chromium and in NO
+    // other engine. Measured 2026-08-31: printing a tile shell in WebKit drops
+    // the formula and every source line. The SPA papers over this by setting
+    // `open` on beforeprint; a shell runs zero JavaScript and cannot.
+    //
+    // So print from a copy instead. The <details> is hidden in print media and
+    // this block takes its place, on every engine and with no script. It is
+    // display:none on screen and aria-hidden, so a screen reader is not read
+    // the same paragraphs twice, and the <details> count the one-disclosure
+    // gate pins is unchanged -- this is a <div>.
+    (detail || citation) ? [
+      '  <div class="shell-print-proof" aria-hidden="true">',
+      '    <p class="shell-print-proof-title">Details, formula, and sources</p>',
+      detail ? `    <p class="shell-detail">${escapeHtml(detail)}</p>` : '',
+      citation ? `    <p class="shell-formula">${escapeHtml(citation.formula)}</p>` : '',
+      citation ? `    <p class="shell-source">${escapeHtml(citation.edition)}</p>` : '',
+      citation && citation.freeAccess ? `    <p class="shell-source">${escapeHtml(citation.freeAccess)}</p>` : '',
+      citation && citation.governance ? `    <p class="shell-source">${escapeHtml(citation.governance)}</p>` : '',
+      assumptionRows ? '    <ul class="shell-io shell-assume">' : '',
+      assumptionRows,
+      assumptionRows ? '    </ul>' : '',
+      '  </div>',
+    ].filter(Boolean).join("\n") : '',
     relatedItems ? [
       '  <section class="shell-section" aria-label="Related tools">',
       '    <h2>Related tools</h2>',
