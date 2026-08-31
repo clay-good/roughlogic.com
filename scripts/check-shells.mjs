@@ -374,6 +374,23 @@ async function lintShell(path, kind, errors) {
     for (const a of answers) {
       if (!String(a.value).trim()) errors.push(where + ": worked-example answer '" + a.label + "' is blank.");
     }
+
+    // 20 tiles take no inputs; their whole value is the table they print, and
+    // until 2026-08-31 none of it reached the static page -- the shell was the
+    // tile name and one sentence. The builder now renders what the tile
+    // computes on no inputs, in three shapes (a string, a list of rows, a list
+    // of rows carrying nested lists). A result shape it does not recognise
+    // renders nothing, which looks exactly like the stub it replaced, so a
+    // page with no example must carry a Reference section with rows in it.
+    if (!/aria-label="Example"/.test(html)) {
+      const ref = html.match(/aria-label="Reference"[\s\S]*?<\/section>/);
+      const rows = ref ? (ref[0].match(/<li>/g) || []).length : 0;
+      if (!ref) {
+        errors.push(where + ": no worked example and no Reference section. A reference page must print its reference content.");
+      } else if (rows < 2) {
+        errors.push(where + ": Reference section renders " + rows + " row(s). The builder did not recognise this tile's result shape.");
+      }
+    }
   }
 
   // Gzip size budget.
@@ -498,7 +515,8 @@ async function main() {
     "check-shells OK: " + tileCount + " tile shells + " + groupCount + " group shells + 1 catalog hub; " +
     "all titles <= " + TITLE_CAP + " chars, descriptions <= " + DESCRIPTION_CAP + " chars, " +
     "JSON-LD valid against allowlist, gzip under " + TILE_GZIP_CAP + " / " + GROUP_GZIP_CAP + " B caps, " +
-    "every shell CSP present and unweakened, no executable script on any shell, and " +
+    "every shell CSP present and unweakened, no executable script on any shell, " +
+    "every page without a worked example printing its reference content, and " +
     sitemapUrls + " sitemap URLs matched one-for-one against the built pages."
   );
 }

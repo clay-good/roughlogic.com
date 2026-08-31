@@ -124,7 +124,7 @@ function rowSummary(desc) {
 // check-worked-examples lint is fail-on-missing -- so the shell can print the
 // exact inputs a reader types and the exact outputs they get back, instead of
 // describing the calculation in the abstract. Keyed to the first row per tile.
-async function loadWorkedExamples() {
+export async function loadWorkedExamples() {
   const raw = JSON.parse(await readFile(resolve(ROOT, "test/fixtures/worked-examples.json"), "utf8"));
   const rows = Array.isArray(raw) ? raw : (raw.examples || raw.rows || []);
   const byTile = new Map();
@@ -669,6 +669,106 @@ function buildTitle(tool, professionNoun, capChars) {
   return kept + "..." + brand;
 }
 
+// 20 tile pages carry no worked example because their tiles take no inputs:
+// OSHA Top-10, the knot and hand-signal references, Lockout/Tagout Steps, the
+// GFCI/AFCI table. Their whole value is the table itself -- and the shell
+// printed the tile name, one lead sentence, and nothing else. The prerender
+// exists so "the cited reference content would otherwise be invisible to
+// general web search" (README); on exactly the pages that are nothing BUT
+// reference content, none of it was on the page. A crawler and a no-JS reader
+// got a stub.
+//
+// The content comes from running the tile on no inputs, the same call
+// `run_calculator` makes, so the page and the agent door cannot disagree about
+// what the reference says. Three shapes cover all 20 results: a string, a list
+// of flat rows, and a list of rows that each carry a nested list. Anything else
+// is skipped rather than guessed at -- and `check-shells` fails a reference
+// page that renders nothing, so a new shape has to be handled, not dropped.
+function referenceScalar(v) {
+  if (v === null || v === undefined) return "";
+  if (typeof v === "string") return v;
+  if (typeof v === "number") return Number.isFinite(v) ? String(readableNumber(v)) : "";
+  if (typeof v === "boolean") return v ? "Yes" : "No";
+  if (Array.isArray(v) && v.every((x) => typeof x === "string")) return v.join("; ");
+  return "";
+}
+
+// One row of a reference table, in the same three-slot shape the worked-example
+// rows use, so the 320px audit and the readable-type floor already cover it:
+// the first field leads, the second is the answer, the rest trail as
+// "Label: value".
+function referenceRow(item) {
+  const cells = Object.entries(item)
+    .map(([k, v]) => [k, referenceScalar(v)])
+    .filter(([, v]) => v !== "");
+  if (!cells.length) return "";
+  // The S500 class table numbers each row and then names it "Class 1", which
+  // renders as "1 | Class 1". Drop a leading cell the next one already states
+  // as a whole word -- token equality, not substring, or the OSHA rank "1"
+  // would vanish into "29 CFR 1926.501".
+  if (cells.length > 1 && cells[1][1].split(/\s+/).includes(cells[0][1])) cells.shift();
+  const lead = cells[0][1];
+  const rest = cells.slice(1);
+  const answer = rest.length ? rest[0][1] : "";
+  const tail = rest.slice(1).map(([k, v]) => `${humanizeKey(k) || k}: ${v}`).join("; ");
+  return [
+    `      <li><span>${escapeHtml(lead)}</span>`,
+    answer ? ` <b>${escapeHtml(answer)}</b>` : "",
+    tail ? `<small>${escapeHtml(tail)}</small>` : "",
+    "</li>",
+  ].join("");
+}
+
+function referenceList(rows) {
+  const items = rows.map(referenceRow).filter(Boolean);
+  if (!items.length) return "";
+  return ['    <ul class="shell-io">', ...items, "    </ul>"].join("\n");
+}
+
+export function referenceBlock(result) {
+  const out = [];
+  for (const [key, value] of Object.entries(result || {})) {
+    const scalar = referenceScalar(value);
+    if (scalar) { out.push(`    <p class="shell-source">${escapeHtml(scalar)}</p>`); continue; }
+    if (Array.isArray(value) && value.length && value.every((v) => v && typeof v === "object" && !Array.isArray(v))) {
+      // A row carrying its own nested list (Wire / Pipe / Gas Color Codes: one
+      // list per wiring system) becomes a labelled sub-list, not a flattened
+      // row that reads as one long sentence.
+      const nested = value.every((v) => Object.values(v).some((x) => Array.isArray(x) && x.length && typeof x[0] === "object"));
+      if (nested) {
+        for (const row of value) {
+          const label = Object.values(row).find((x) => typeof x === "string");
+          const sub = Object.values(row).find((x) => Array.isArray(x) && x.length && typeof x[0] === "object");
+          const list = referenceList(sub);
+          if (!list) continue;
+          if (label) out.push(`    <p class="shell-io-label">${escapeHtml(label)}</p>`);
+          out.push(list);
+        }
+        continue;
+      }
+      const list = referenceList(value);
+      if (!list) continue;
+      const label = humanizeKey(key);
+      if (label) out.push(`    <p class="shell-io-label">${escapeHtml(label)}</p>`);
+      out.push(list);
+      continue;
+    }
+    // An object of named lists (the inspection checklist, one list per trade).
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      for (const [name, entries] of Object.entries(value)) {
+        if (!Array.isArray(entries) || !entries.length) continue;
+        const rows = entries
+          .map((e) => (typeof e === "string" ? `      <li><span>${escapeHtml(e)}</span></li>` : referenceRow(e)))
+          .filter(Boolean);
+        if (!rows.length) continue;
+        out.push(`    <p class="shell-io-label">${escapeHtml(humanizeKey(name) || name)}</p>`);
+        out.push(['    <ul class="shell-io">', ...rows, "    </ul>"].join("\n"));
+      }
+    }
+  }
+  return out.join("\n");
+}
+
 // spec-v13 §9.1 caps a related-tiles block at six entries.
 const RELATED_CAP = 6;
 
@@ -921,7 +1021,7 @@ function shellFooter(depth = 2) {
   ].join("\n");
 }
 
-function tileShell(tool, tools, groupNames, relatedByTile, examples, labels, outLabels, outDisplays, outUnits, outBools) {
+function tileShell(tool, tools, groupNames, relatedByTile, examples, labels, outLabels, outDisplays, outUnits, outBools, refContent) {
   const professionNoun = PROFESSION_NOUN[tool.trades[0]] || "Trades";
   const groupLabel = groupNames[tool.group] || tool.group;
   const groupSlug = GROUP_SLUG[tool.group] || tool.group.toLowerCase();
@@ -1009,6 +1109,12 @@ function tileShell(tool, tools, groupNames, relatedByTile, examples, labels, out
       outputRows ? '    </ul>' : '',
       '  </section>',
     ].filter(Boolean).join("\n") : '',
+    (!inputRows && refContent) ? [
+      '  <section class="shell-section" aria-label="Reference">',
+      '    <h2>Reference</h2>',
+      refContent,
+      '  </section>',
+    ].join("\n") : '',
     // ONE disclosure holds everything the reader may want after the answer:
     // the scope prose, the formula, the source lines, the API field names, and
     // the assumptions. It used to be two adjacent <details> -- "More about
@@ -1328,7 +1434,18 @@ async function main() {
     const outDisplays = ex ? await outputDisplays(tool.id, ex.inputs) : {};
     const outUnits = outputUnits(tool.id);
     const outBools = outputBooleans(tool.id);
-    const html = tileShell(tool, tools, groupNames, relatedByTile, examples, labels, outLabels, outDisplays, outUnits, outBools);
+    // A tile with no worked-example inputs is a reference page; its content is
+    // whatever it computes on nothing, which is what the agent door returns too.
+    let refContent = "";
+    if (!examples.get(tool.id) || !Object.keys(examples.get(tool.id).inputs || {}).length) {
+      try {
+        const ran = await catalog.run({ id: tool.id, inputs: {} });
+        refContent = referenceBlock(ran && ran.result);
+      } catch {
+        refContent = "";
+      }
+    }
+    const html = tileShell(tool, tools, groupNames, relatedByTile, examples, labels, outLabels, outDisplays, outUnits, outBools, refContent);
     const out = resolve(DIST, "tools", tool.id, "index.html");
     await mkdir(dirname(out), { recursive: true });
     await writeFile(out, html, "utf8");

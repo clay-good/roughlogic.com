@@ -71,6 +71,16 @@ Per spec-v13 §5.2:
   entry (the v19/v22 coverage gate), so every tile shell carries it;
   `check-shells.mjs` fails the build on a tile shell missing the block.
 - Audience block naming the profession.
+- Reference block, on the 20 tiles that take no inputs and therefore
+  carry no worked example (OSHA Top-10, the knot and hand-signal
+  references, Lockout/Tagout Steps, the GFCI/AFCI table). Their whole
+  value is the table itself, and until 2026-08-31 none of it reached
+  the static page. The builder renders what the tile computes on no
+  inputs -- the same call `run_calculator` makes, so the page and the
+  agent door cannot disagree about what the reference says.
+  `check-shells` fails a page that has no worked example and prints no
+  reference rows, so an unrecognised result shape has to be handled
+  rather than silently rendering the old stub.
 - Related tiles block (curated per the Phase E registry, filled out
   by ranking the tile's name against its group siblings, then
   balanced by the catalog-wide inbound pass below).
