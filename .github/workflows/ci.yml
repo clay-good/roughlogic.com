@@ -68,18 +68,21 @@ jobs:
           cache: npm
       - name: Install Playwright and axe-core
         # Chromium runs the whole suite; WebKit (the iOS Safari engine) re-runs
-        # only the responsive-stress sweep via the `webkit-responsive` project
-        # in playwright.config.js, so the no-horizontal-scroll guarantee is
-        # verified on both engines.
+        # the responsive-stress sweep and the shell-print spec via the
+        # `webkit-responsive` project in playwright.config.js, so the
+        # no-horizontal-scroll guarantee and "the proof prints" are both
+        # verified on a second engine. The print rule the shells relied on was
+        # Chromium-only, and a Chromium-only pass is what hid that.
         run: |
           npm ci --ignore-scripts --no-audit --no-fund
           ./node_modules/.bin/playwright install --with-deps chromium webkit
       # Everything EXCEPT the `a11y:` sweep, which the accessibility job above
-      # runs in full. Until 2026-08-30 both jobs ran it: 1,806 of the suite's
-      # 3,770 tests were an axe-core pass over all 1,804 routes, executed twice
-      # per push. `test:a11y` greps `a11y:` and this greps its inverse, so the
-      # two jobs still partition the suite exactly -- 1,806 + 1,964 = 3,770 --
-      # and `npm run test:e2e` still runs the whole thing locally.
+      # runs in full. Until 2026-08-30 both jobs ran it: the axe-core pass over
+      # all 1,804 routes was executed twice per push. `test:a11y` greps `a11y:`
+      # and this greps its inverse, so the two jobs partition the suite exactly
+      # -- 1,875 + 1,972 = 3,847 as of 2026-08-31 -- and `npm run test:e2e`
+      # still runs the whole thing locally. check-ci-claims pins the axe pass's
+      # stated size in README within 5%; the totals here are prose.
       # check-ci-claims asserts the two greps stay complementary.
       - name: Run integration tests (everything the a11y job does not)
         run: npm run test:e2e:ci

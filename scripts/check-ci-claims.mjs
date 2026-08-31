@@ -24,6 +24,7 @@
 // only structure read). Standalone Node 20, built-ins only.
 
 import { readFile } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -132,6 +133,45 @@ async function main() {
         "or specs fall into the gap between the two jobs and nothing runs them.",
     );
   }
+  // README states how big the axe pass is. That figure drifted the day the
+  // shell sweep was added -- it said 1,806 against a live 1,875 -- which is the
+  // same shape as every other unwatched number on this site. Pinned against the
+  // count Playwright itself reports, in a band: a stated figure exists to tell a
+  // reader the order of magnitude, and an exact pin that fails on every new
+  // tile gets edited out of the way rather than obeyed. It also fails if the
+  // prose stops stating a figure at all, so the check cannot go quiet.
+  const claimed = readme.match(/the ([\d,]+)-test axe pass/);
+  if (!claimed) {
+    errors.push("README no longer states the size of the axe pass; the figure is the thing this check watches.");
+  } else if (a11yPattern) {
+    let live = null;
+    try {
+      // `--no-install` so this can never reach for the network: a gate that
+      // installs things is a gate that can pass for the wrong reason. npx still
+      // resolves an ancestor node_modules, which is what a git worktree has.
+      // `--list` launches no browser, so this runs in the lint job, which
+      // installs none.
+      const out = execFileSync("npx", [
+        "--no-install", "playwright", "test",
+        "--config", "test/integration/playwright.config.js",
+        "--grep", a11yPattern, "--list",
+      ], { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+      const m = out.match(/Total:\s+(\d+)\s+tests/);
+      if (m) live = Number(m[1]);
+    } catch {
+      live = null;
+    }
+    if (live === null) {
+      errors.push("could not count the axe pass with `playwright --list`; the README figure is unverified, which is not the same as correct.");
+    } else {
+      const stated = Number(claimed[1].replace(/,/g, ""));
+      const drift = Math.abs(live - stated) / live;
+      if (drift > 0.05) {
+        errors.push(`README says the axe pass is ${claimed[1]} tests; it is ${live} (${(drift * 100).toFixed(1)}% off).`);
+      }
+    }
+  }
+
   if (!/npm run test:e2e:ci/.test(yaml)) {
     errors.push("the integration job no longer runs `npm run test:e2e:ci`; check it still complements the accessibility job.");
   }
@@ -142,7 +182,7 @@ async function main() {
     process.exit(1);
   }
   console.log(
-    `check-ci-claims OK: README names all ${jobs.length} CI jobs (${jobs.join(", ")}) and no doc claims a gate the workflow does not run.`,
+    `check-ci-claims OK: README names all ${jobs.length} CI jobs (${jobs.join(", ")}), states the axe pass within 5% of its live size, and no doc claims a gate the workflow does not run.`,
   );
 }
 
