@@ -56,6 +56,7 @@ const add = (url, why) => { if (!routes.has(url)) routes.set(url, why); };
 
 add("/", "home");
 add("/tools/", "catalog hub");
+add("/404.html", "not-found page");
 for (const g of [...new Set(TOOLS.map((t) => t.group))].sort()) {
   add(`/groups/${GROUP_SLUG[g] || g.toLowerCase()}/`, `group hub ${g}`);
   const first = TOOLS.find((t) => t.group === g);

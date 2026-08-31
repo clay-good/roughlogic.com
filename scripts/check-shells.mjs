@@ -457,6 +457,30 @@ async function main() {
     errors.push("tools/index.html: missing catalog hub (spec-v1345).");
   }
 
+  // dist/404.html. Cloudflare Pages serves it, with a 404 status, at whatever
+  // path was missed -- so every path in it must be ROOT-ABSOLUTE. A relative
+  // "styles.css" would resolve under the bad URL and 404 alongside it, which is
+  // an unstyled page in exactly the moment a reader is already lost. It also
+  // has to say noindex: a 404 that invites indexing is a 404 in the index.
+  const notFound = resolve(DIST, "404.html");
+  if (!existsSync(notFound)) {
+    errors.push("404.html: missing. Cloudflare Pages serves it for every unmatched path.");
+  } else {
+    await lintShell(notFound, "group", errors);
+    const html = await readFile(notFound, "utf8");
+    const relative = [...html.matchAll(/(?:href|src)="(?!https?:|#|\/)([^"]+)"/g)].map((m) => m[1]);
+    if (relative.length) {
+      errors.push("404.html: " + relative.length + " relative path(s) (" + relative.slice(0, 3).join(", ") +
+        "). It is served at the missed URL, so every path must start with '/'.");
+    }
+    if (!/name="robots"\s+content="noindex/.test(html)) {
+      errors.push("404.html: missing a noindex robots meta.");
+    }
+    if (!html.includes('href="/tools/"')) {
+      errors.push("404.html: does not link the catalog hub, which is the way back.");
+    }
+  }
+
   // Walk dist/groups/* shells.
   const groupsDir = resolve(DIST, "groups");
   if (existsSync(groupsDir)) {
@@ -512,7 +536,7 @@ async function main() {
   const tileCount = tools.length;
   const groupCount = existsSync(groupsDir) ? (await readdir(groupsDir)).length : 0;
   console.log(
-    "check-shells OK: " + tileCount + " tile shells + " + groupCount + " group shells + 1 catalog hub; " +
+    "check-shells OK: " + tileCount + " tile shells + " + groupCount + " group shells + 1 catalog hub + 1 not-found page; " +
     "all titles <= " + TITLE_CAP + " chars, descriptions <= " + DESCRIPTION_CAP + " chars, " +
     "JSON-LD valid against allowlist, gzip under " + TILE_GZIP_CAP + " / " + GROUP_GZIP_CAP + " B caps, " +
     "every shell CSP present and unweakened, no executable script on any shell, " +

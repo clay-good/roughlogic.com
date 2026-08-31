@@ -170,6 +170,27 @@ now holds -- including the assertion that uncurated tiles in a group
 must not all end up with the same list, and that every tile but
 `historical-pricing` receives at least one inbound link.
 
+## Not-found page
+
+[../scripts/build-shells.mjs](../scripts/build-shells.mjs) emits
+`dist/404.html`. Cloudflare Pages serves it, with a 404 status, for any
+path that matches no file -- a retired tile id, a mistyped URL, a stale
+external link into a catalog that has renumbered twice. The site
+shipped none until 2026-08-31, so those readers got the platform's
+default: no wordmark, no search, no way back into 1,804 calculators.
+
+Every path on the page is **root-absolute**. It is served AT THE MISSED
+URL, so a relative `styles.css` would resolve to `/tools/typo/styles.css`
+and 404 alongside it -- an unstyled page in the moment a reader is
+already lost. It carries `noindex,follow`: a 404 that invites indexing
+is a 404 in the index. It is not in the sitemap and nothing links to it,
+which is why [../scripts/check-dist.mjs](../scripts/check-dist.mjs)
+exempts it from the orphan check -- a 404 page reached by a link is a
+broken link.
+
+`check-shells` lints it under the group cap and additionally fails on
+any relative path, a missing noindex, or a missing link to `/tools/`.
+
 ## Sitemap (Phase F)
 
 [../sitemap.xml](../sitemap.xml) is regenerated at build time by

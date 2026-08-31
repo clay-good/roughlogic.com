@@ -186,6 +186,9 @@ async function main() {
     ".well-known/mcp.json",
     "AGENTS.md",
     "llms.txt",
+    // Served by Cloudflare Pages for any path that matches no file. Nothing
+    // links to it by design -- a 404 page reached by a link is a broken link.
+    "404.html",
   ]);
   const orphans = [];
   for (const rel of files) {

@@ -945,7 +945,7 @@ function groupJsonLd(groupLabel, groupSlug, tilesInGroup, title, description, ca
   ];
 }
 
-function shellHead({ title, description, canonical, ogType, ogImage }) {
+function shellHead({ title, description, canonical, ogType, ogImage, robots }) {
   return [
     '<!doctype html>',
     '<html lang="en">',
@@ -954,7 +954,7 @@ function shellHead({ title, description, canonical, ogType, ogImage }) {
     '<meta name="viewport" content="width=device-width, initial-scale=1">',
     '<meta http-equiv="Content-Security-Policy" content="default-src \'self\'; script-src \'self\'; style-src \'self\' \'unsafe-inline\'; img-src \'self\' data:; connect-src \'self\'; form-action \'self\'; base-uri \'self\'; object-src \'none\'; worker-src \'self\'">',
     '<meta name="referrer" content="no-referrer">',
-    '<meta name="robots" content="index,follow">',
+    `<meta name="robots" content="${escapeHtml(robots || "index,follow")}">`,
     `<meta name="description" content="${escapeHtml(description)}">`,
     `<title>${escapeHtml(title)}</title>`,
     `<link rel="canonical" href="${escapeHtml(canonical)}">`,
@@ -974,7 +974,11 @@ function shellHead({ title, description, canonical, ogType, ogImage }) {
 
 function shellStylesAndIcons(depth) {
   // depth = number of "../" segments to walk up to dist root.
-  const prefix = "../".repeat(depth);
+  // A number is a depth below dist root; a string is used verbatim, which is
+  // how 404.html gets ROOT-ABSOLUTE paths -- Cloudflare Pages serves that one
+  // document at whatever URL was missed, so a relative "styles.css" would
+  // resolve under the bad path and 404 alongside it.
+  const prefix = typeof depth === "string" ? depth : "../".repeat(depth);
   return [
     `<link rel="stylesheet" href="${prefix}styles.css">`,
     `<link rel="icon" type="image/svg+xml" href="${prefix}favicon.svg">`,
@@ -982,7 +986,11 @@ function shellStylesAndIcons(depth) {
 }
 
 function shellHeader(depth) {
-  const prefix = "../".repeat(depth);
+  // A number is a depth below dist root; a string is used verbatim, which is
+  // how 404.html gets ROOT-ABSOLUTE paths -- Cloudflare Pages serves that one
+  // document at whatever URL was missed, so a relative "styles.css" would
+  // resolve under the bad path and 404 alongside it.
+  const prefix = typeof depth === "string" ? depth : "../".repeat(depth);
   return [
     '<header class="site-header" role="banner">',
     '  <div class="header-inner">',
@@ -996,7 +1004,11 @@ function shellHeader(depth) {
 }
 
 function shellFooter(depth = 2) {
-  const prefix = "../".repeat(depth);
+  // A number is a depth below dist root; a string is used verbatim, which is
+  // how 404.html gets ROOT-ABSOLUTE paths -- Cloudflare Pages serves that one
+  // document at whatever URL was missed, so a relative "styles.css" would
+  // resolve under the bad path and 404 alongside it.
+  const prefix = typeof depth === "string" ? depth : "../".repeat(depth);
   return [
     '<footer class="site-footer" role="contentinfo">',
     '  <div class="footer-badges">',
@@ -1277,6 +1289,66 @@ function groupShell(group, tools, groupNames) {
 //
 // Every count is computed from the live TOOLS array, so nothing here can drift
 // the way a hand-typed count does and no check-readme-counts surface is needed.
+// dist/404.html. Cloudflare Pages serves this document, with a 404 status, for
+// any path that matches no file -- a retired tile id, a mistyped URL, a stale
+// external link into a catalog that has renumbered twice. Until 2026-08-31 the
+// site shipped none, so those readers got the platform's default: no wordmark,
+// no search, no way back into 1,804 calculators.
+//
+// Every path on this page is ROOT-ABSOLUTE. The document is served AT THE
+// MISSED URL, so a relative "styles.css" would resolve to
+// /tools/typo/styles.css and 404 alongside it -- the same trap that made the
+// offline navigation fallback render unstyled.
+//
+// noindex: a 404 that invites indexing is a 404 in the index.
+function notFoundShell(tools, groupNames) {
+  const order = [...new Set(tools.map((t) => t.group))].sort();
+  const labelFor = (g) => groupNames[g] || ("Group " + g);
+  const title = "Page not found - Rough Logic";
+  const description =
+    "That page is not here. Every one of the " + tools.length +
+    " free trade calculators on Rough Logic is one link away.";
+  const head = shellHead({
+    title,
+    description,
+    canonical: SITE_URL + "/",
+    ogType: "website",
+    robots: "noindex,follow",
+  });
+  // A WebPage item, because every shell carries structured data and the gate
+  // that checks it is shared. Nothing here invites indexing: the robots meta
+  // above says noindex, and the canonical points at the home page.
+  const jsonld = jsonLdBlock([
+    { "@context": "https://schema.org", "@type": "WebPage", name: title, description, url: SITE_URL + "/" },
+  ]);
+  const body = [
+    '<body class="shell-page">',
+    shellHeader("/"),
+    '<main id="main" class="shell-main">',
+    '  <h1 class="shell-h1">Page not found</h1>',
+    `  <p class="shell-lead">That page is not here. Every one of the ${tools.length} calculators is one link away.</p>`,
+    '  <p class="shell-run">',
+    '    <a class="shell-run-link" href="/tools/">Browse all calculators</a>',
+    '  </p>',
+    '  <section class="shell-section" aria-label="Trades">',
+    '    <h2>Or start with a trade</h2>',
+    '    <ul class="shell-related shell-tile-list">',
+    order.map((g) => {
+      const slug = GROUP_SLUG[g] || g.toLowerCase();
+      const n = tools.filter((t) => t.group === g).length;
+      return `      <li><a href="/groups/${escapeHtml(slug)}/">${escapeHtml(labelFor(g))}</a><span class="shell-related-desc"> - ${n} calculators</span></li>`;
+    }).join("\n"),
+    '    </ul>',
+    '  </section>',
+    '</main>',
+    shellFooter("/"),
+    '</body>',
+    '</html>',
+    '',
+  ].join("\n");
+  return [head, shellStylesAndIcons("/"), jsonld, '</head>', body].join("\n");
+}
+
 function toolsIndexShell(tools, groupNames) {
   const canonical = SITE_URL + "/tools/";
   const byGroup = new Map();
@@ -1488,6 +1560,8 @@ async function main() {
     await writeFile(out, html, "utf8");
     groupCount += 1;
   }
+
+  await writeFile(resolve(DIST, "404.html"), notFoundShell(tools, groupNames), "utf8");
 
   // spec-v1345: the catalog hub at /tools/index.html.
   const toolsIndexOut = resolve(DIST, "tools", "index.html");
