@@ -71,8 +71,9 @@ Per spec-v13 §5.2:
   entry (the v19/v22 coverage gate), so every tile shell carries it;
   `check-shells.mjs` fails the build on a tile shell missing the block.
 - Audience block naming the profession.
-- Related tiles block (curated per the Phase E registry, fallback to
-  "first 5 in same group" by TOOLS order).
+- Related tiles block (curated per the Phase E registry, filled out
+  by ranking the tile's name against its group siblings, then
+  balanced by the catalog-wide inbound pass below).
 - Posture block restating the AHJ-governs / professional-governs
   stance.
 - Footer matching the home document's footer plus the inline
@@ -131,8 +132,18 @@ Every tile shell links:
   through the same `rankTools` the search box uses. Until
   2026-08-30 the fallback was "the first 5 in the same group", which
   handed every uncurated tile in a group the same five links and
-  left 482 tiles receiving no related link from any tile page; it is
-  269 now, and the heaviest receiver dropped from 50 links to 30.
+  left 482 tiles receiving no related link from any tile page; the
+  ranked fallback brought that to 269, and the heaviest receiver
+  dropped from 50 links to 30.
+- Sideways *into* every tile, which the per-tile lists alone do not
+  guarantee. `relatedGraph` in the shell builder runs one pass over
+  the whole catalog after the per-tile lists are built: each tile
+  that received no link is appended to the list of the one group
+  sibling that ranks it highest and still has room under the cap of
+  six. 268 of the 269 find a host; `historical-pricing` cannot,
+  being the only tile in group Q. The graph now carries 6,387 edges
+  across 1,804 tiles, a mean of 3.5 inbound links per tile, and the
+  heaviest receiver is unchanged at 30.
 - Sideways from the SPA's hash-route view by way of the canonical
   link.
 
@@ -146,7 +157,8 @@ reference, no duplicates, cap 6 per §9.1); it says nothing about
 coverage, which is what
 [../test/unit/related-tiles-fallback.test.js](../test/unit/related-tiles-fallback.test.js)
 now holds -- including the assertion that uncurated tiles in a group
-must not all end up with the same list.
+must not all end up with the same list, and that every tile but
+`historical-pricing` receives at least one inbound link.
 
 ## Sitemap (Phase F)
 

@@ -669,6 +669,9 @@ function buildTitle(tool, professionNoun, capChars) {
   return kept + "..." + brand;
 }
 
+// spec-v13 §9.1 caps a related-tiles block at six entries.
+const RELATED_CAP = 6;
+
 // Pick 3-6 related tiles per spec-v13 §5.2 + §9.1. When the per-tile
 // related-tiles registry in scripts/related-tiles.mjs has entries for the tile,
 // those entries win, in the order the registry records them (the editorial
@@ -715,6 +718,50 @@ export function relatedTiles(tool, tools, related) {
     if (!seen.has(t.id)) { out.push(t); seen.add(t.id); }
   }
   return out;
+}
+
+// Per-tile lists answer "what else should this reader see"; they say nothing
+// about "who sends a reader HERE". Ranking every tile against its siblings left
+// 269 of the 1,804 tiles receiving no related link from any tile page, while
+// `square-footage` received 30 -- a tile nobody links to is reachable only from
+// its group hub and the search box.
+//
+// This pass runs once over the whole catalog: it builds every tile's list, then
+// for each tile that received nothing, appends it to the list of the one group
+// sibling that ranks it highest and still has room under spec-v13 §9.1's cap of
+// six. That is the same ranker the fallback uses, read in the other direction,
+// so the host page gains a link a reader of that page would plausibly want:
+// "Combustion Air" picks up "Max Appliance Input from Room Volume".
+//
+// Curated entries are never displaced -- the adopted tile is appended after
+// everything already in the list. Orphans are processed in TOOLS order and the
+// ranker settles ties alphabetically, so the graph is deterministic.
+//
+// 268 of the 269 find a host. `historical-pricing` cannot: it is the only tile
+// in group Q, and a related link crossing groups would point a reader out of
+// the trade they are working in.
+export function relatedGraph(tools, related) {
+  const lists = new Map(tools.map((t) => [t.id, relatedTiles(t, tools, related)]));
+  const inbound = new Map(tools.map((t) => [t.id, 0]));
+  for (const list of lists.values()) {
+    for (const r of list) inbound.set(r.id, (inbound.get(r.id) || 0) + 1);
+  }
+  for (const tool of tools) {
+    if (inbound.get(tool.id) > 0) continue;
+    const pool = tools.filter((t) => (
+      t.group === tool.group &&
+      t.id !== tool.id &&
+      lists.get(t.id).length < RELATED_CAP &&
+      !lists.get(t.id).some((x) => x.id === tool.id)
+    ));
+    if (!pool.length) continue;
+    const { tokens } = normalizeQuery(tool.name);
+    const ranked = tokens.length ? rankTools(tokens, pool, [], { limit: 1 }) : [];
+    const host = ranked.length ? ranked[0].tool : pool[0];
+    lists.get(host.id).push(tool);
+    inbound.set(tool.id, 1);
+  }
+  return lists;
 }
 
 // spec-v13 Phase C: JSON-LD structured data block. Returns the
@@ -874,14 +921,14 @@ function shellFooter(depth = 2) {
   ].join("\n");
 }
 
-function tileShell(tool, tools, groupNames, relatedMap, examples, labels, outLabels, outDisplays, outUnits, outBools) {
+function tileShell(tool, tools, groupNames, relatedByTile, examples, labels, outLabels, outDisplays, outUnits, outBools) {
   const professionNoun = PROFESSION_NOUN[tool.trades[0]] || "Trades";
   const groupLabel = groupNames[tool.group] || tool.group;
   const groupSlug = GROUP_SLUG[tool.group] || tool.group.toLowerCase();
   const title = buildTitle(tool, professionNoun, 70);
   const description = metaDescription(tool, professionNoun);
   const canonical = `${SITE_URL}/tools/${tool.id}/`;
-  const related = relatedTiles(tool, tools, relatedMap);
+  const related = relatedByTile.get(tool.id) || [];
   // spec-v45: the cited formula + source-stamp, prerendered into the static
   // shell so the reference content crawlers index is the actual math, not just
   // the tile name. Every tile has a CITATIONS entry (the v19/v22 coverage gate).
@@ -1258,6 +1305,8 @@ async function main() {
   // to "first 5 in same group".
   const relatedMod = await import(resolve(ROOT, "scripts/related-tiles.mjs"));
   const relatedMap = relatedMod.RELATED || {};
+  // One pass over the catalog so no tile page ends up with zero inbound links.
+  const relatedByTile = relatedGraph(tools, relatedMap);
   const examples = await loadWorkedExamples();
   // The field labels the browser prints above each input, resolved through the
   // same MCP catalog layer the agent surface reads, so the label on a shell and
@@ -1279,7 +1328,7 @@ async function main() {
     const outDisplays = ex ? await outputDisplays(tool.id, ex.inputs) : {};
     const outUnits = outputUnits(tool.id);
     const outBools = outputBooleans(tool.id);
-    const html = tileShell(tool, tools, groupNames, relatedMap, examples, labels, outLabels, outDisplays, outUnits, outBools);
+    const html = tileShell(tool, tools, groupNames, relatedByTile, examples, labels, outLabels, outDisplays, outUnits, outBools);
     const out = resolve(DIST, "tools", tool.id, "index.html");
     await mkdir(dirname(out), { recursive: true });
     await writeFile(out, html, "utf8");

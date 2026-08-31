@@ -9,7 +9,7 @@
 // `rankTools` the search box uses.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { relatedTiles } from "../../scripts/build-shells.mjs";
+import { relatedTiles, relatedGraph } from "../../scripts/build-shells.mjs";
 import { RELATED } from "../../scripts/related-tiles.mjs";
 import { TOOLS } from "../../tools-data.js";
 
@@ -79,4 +79,47 @@ test("every tile gets at least three related links", () => {
     if (n < Math.min(3, siblings)) thin.push(`${t.id}: ${n} of ${siblings} possible`);
   }
   assert.deepEqual(thin, [], `tiles with too few related links:\n${thin.join("\n")}`);
+});
+
+// Per-tile lists say what a reader should see next; they say nothing about who
+// sends a reader to a given page. Ranking every tile against its siblings still
+// left 269 tiles receiving no related link from anywhere, so `relatedGraph`
+// runs one catalog-wide pass that adopts each of them onto the sibling that
+// ranks it highest.
+test("every tile receives at least one related link from some other tile", () => {
+  const lists = relatedGraph(TOOLS, RELATED);
+  const inbound = new Map(TOOLS.map((t) => [t.id, 0]));
+  for (const list of lists.values()) {
+    for (const r of list) inbound.set(r.id, inbound.get(r.id) + 1);
+  }
+  const orphans = [...inbound].filter(([, n]) => n === 0).map(([id]) => id);
+  // historical-pricing is the only tile in group Q, so no same-group sibling
+  // can host it. Every other tile must be reachable.
+  assert.deepEqual(orphans, ["historical-pricing"]);
+});
+
+test("adoption never displaces a curated pick or breaks the cap of six", () => {
+  const lists = relatedGraph(TOOLS, RELATED);
+  const wrong = [];
+  for (const tool of TOOLS) {
+    const got = lists.get(tool.id).map((t) => t.id);
+    if (got.length > 6) wrong.push(`${tool.id}: ${got.length} entries`);
+    if (got.includes(tool.id)) wrong.push(`${tool.id}: relates to itself`);
+    if (new Set(got).size !== got.length) wrong.push(`${tool.id}: duplicate entry`);
+    const base = relatedTiles(tool, TOOLS, RELATED).map((t) => t.id);
+    if (got.slice(0, base.length).join(",") !== base.join(",")) {
+      wrong.push(`${tool.id}: adoption reordered [${base}] into [${got}]`);
+    }
+    for (const id of got) {
+      if (TOOLS.find((t) => t.id === id).group !== tool.group && !(RELATED[tool.id] || []).includes(id)) {
+        wrong.push(`${tool.id}: ${id} is outside the group and not curated`);
+      }
+    }
+  }
+  assert.deepEqual(wrong, []);
+});
+
+test("the graph is deterministic across runs", () => {
+  const shape = (m) => [...m].map(([id, l]) => `${id}:${l.map((t) => t.id).join(",")}`).join("|");
+  assert.equal(shape(relatedGraph(TOOLS, RELATED)), shape(relatedGraph(TOOLS, RELATED)));
 });
