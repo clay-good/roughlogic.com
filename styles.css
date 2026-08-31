@@ -1694,6 +1694,17 @@ input[aria-invalid="true"] {
 .shell-page .shell-related a:focus {
   text-decoration: underline;
 }
+/* A group hub prints "<link> - one line about the tile", which makes each link
+   a LINK IN A TEXT BLOCK: WCAG 1.4.1 then requires it be distinguishable from
+   the prose around it without relying on color, and the accent measures 2.45:1
+   against that prose where 3:1 is the floor. Every one of the 21 group hubs
+   failed axe on it -- including /groups/construction/, the site's top landing
+   page -- because nothing had ever swept a static shell. A tile shell's related
+   list is links only, with no surrounding text, so it is not affected and keeps
+   the quieter underline-on-hover treatment. */
+.shell-page .shell-tile-list a {
+  text-decoration: underline;
+}
 /* The worked example: `key = value` rows for what a reader types and what
    comes back. Same numbers the live tool's "Test with example" button loads,
    and the same field names the MCP `calculate` tool takes. */

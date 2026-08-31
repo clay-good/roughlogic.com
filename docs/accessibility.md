@@ -136,13 +136,26 @@ is unchanged.
 - **JSON-LD blocks are data, not content.** Screen readers ignore the
   inline `<script type="application/ld+json">` block; the `<head>`-only
   position keeps it out of the document reading order entirely.
-- **axe-core verification:** the shells pass the same axe-core ruleset
-  the SPA passes (the [scripts/check-shells.mjs](../scripts/check-shells.mjs)
-  lint asserts the structural invariants that prevent the most common
-  violations; the Lighthouse CI run from
-  [../lighthouserc.json](../lighthouserc.json) audits two representative
-  tile shells and one group shell against the Lighthouse Accessibility
-  category with the ≥ 95 threshold).
+- **axe-core verification:** this said "the shells pass the same
+  axe-core ruleset the SPA passes" from spec-v13 until 2026-08-31, and
+  nothing checked it. The axe sweep in
+  [../test/integration/a11y.test.js](../test/integration/a11y.test.js)
+  runs 1,804 routes that are all SPA hash routes; the shells are a
+  different document, and the Lighthouse run this used to cite was
+  removed from CI on 2026-08-23. When the claim was finally measured,
+  **all 21 group hubs failed WCAG 1.4.1** -- each tile link sits in a
+  text block ("<link> - one line about the tile") and was distinguished
+  from the prose only by color, at 2.45:1 against a 3:1 floor.
+  [../test/integration/shell-a11y.test.js](../test/integration/shell-a11y.test.js)
+  now sweeps the shells with the same ruleset: the home page, the
+  catalog hub, all 21 group hubs, one tile shell per group, every
+  reference page, and three structural outliers (longest name, a name
+  needing HTML escaping, the widest worked example). It does **not**
+  sweep the other ~1,730 tile shells, which come from one generator and
+  differ only in text; volume lives in the SPA sweep.
+  [../scripts/check-shells.mjs](../scripts/check-shells.mjs) continues
+  to assert the structural invariants that prevent the most common
+  violations.
 
 ## Verification
 

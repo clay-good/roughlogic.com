@@ -64,7 +64,7 @@ const PROFESSION_NOUN = {
 };
 
 // Group slug used in `/groups/<slug>/index.html`. Spec-v13 §8.1.
-const GROUP_SLUG = {
+export const GROUP_SLUG = {
   A: "electrical",
   B: "plumbing",
   C: "hvac",
@@ -1214,7 +1214,7 @@ function groupShell(group, tools, groupNames) {
     `  <p class="shell-run"><a class="shell-run-link" href="../../#group=${escapeHtml(group)}">Open the live group view</a></p>`,
     '  <section class="shell-section" aria-label="Tools in this group">',
     '    <h2>Tools in this group</h2>',
-    '    <ul class="shell-related">',
+    '    <ul class="shell-related shell-tile-list">',
     items,
     '    </ul>',
     '  </section>',
