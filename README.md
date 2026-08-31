@@ -94,7 +94,7 @@ CI adds three jobs per push: `test` (lint + unit tests + data-integrity verifica
 
 Calculator execution is a client-side, offline-first static site with no accounts or analytics. One isolated Cloudflare Worker accepts user-initiated problem reports into D1; Turnstile loads only after the report dialog opens, and static requests remain asset-first.
 
-The browser loads `index.html` + `styles.css` + `app.js` (router, search, theme, URL-hash state), which dynamic-imports one of 57 per-group calculator modules (`calc-*.js`) on first open, which reads the sharded JSON in `data/`. A service worker (`sw.js`) caches the shell and data shards keyed to the build hash, so the site works offline after the first load.
+The browser loads `index.html` + `styles.css` + `app.js` (router, search, theme, URL-hash state), which dynamic-imports one of 57 per-group calculator modules (`calc-*.js`) on first open, which reads the sharded JSON in `data/`. A service worker (`sw.js`) caches the shell and data shards keyed to the build hash, so the site works offline after the first load. The 1,826 static shells are not precached -- that is not a precache -- so a shell URL opened offline redirects to the app at the root, carrying the tile as the hash, which is why a bookmarked `/tools/ohms-law/` opens Ohm's Law rather than a page whose relative stylesheet 404s.
 
 At build time only (never in production), `build-data.mjs` refreshes the integrity-hashed data shards from NIST, NOAA, NCEI WMM, FHFA, HUD, and published bulletins, and `build-shells.mjs` emits one zero-JS crawlable static shell per tile (1804) and per group, plus a sitemap that carries 1827 URLs.
 

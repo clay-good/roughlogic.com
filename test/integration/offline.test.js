@@ -121,3 +121,47 @@ test("offline: a calculator backed by a data shard still computes", async ({ pag
     await context.setOffline(false);
   }
 });
+
+// A reader who bookmarks a tile page bookmarks the SHELL url, /tools/<id>/ --
+// that is what a search result links to and what the address bar shows. The
+// 1,804 tile shells are not precached (the group hubs and the catalog hub are),
+// so opening one offline falls to the service worker's navigation fallback.
+// That fallback used to hand back index.html AT THE SHELL URL, and every asset
+// in index.html is a RELATIVE path: styles.css and app.js resolved to
+// /tools/<id>/styles.css and 504'd. Measured 2026-08-31 -- an unstyled page
+// showing the home view's "Field math, answered.", not the calculator asked
+// for. It now redirects to the root with the tile as the hash.
+test("offline: a bookmarked tile shell URL opens that calculator, styled", async ({ page, context }) => {
+  await installWorker(page);
+  await context.setOffline(true);
+  try {
+    await page.goto("/tools/ohms-law/");
+    await expect(page).toHaveURL(/\/#ohms-law$/);
+    await expect(page).toHaveTitle(/Ohm.s Law/);
+    await expect(page.locator("h1", { hasText: "Ohm's Law" })).toBeVisible();
+    // The stylesheet resolved: an unstyled document leaves the body background
+    // transparent, which is how the old fallback presented.
+    const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    expect(bg).not.toBe("rgba(0, 0, 0, 0)");
+  } finally {
+    await context.setOffline(false);
+  }
+});
+
+test("offline: a group hub URL lands on the working app, not a broken page", async ({ page, context }) => {
+  // No shell is precached -- 1,826 pages is not a precache -- so every shell
+  // URL takes the same fallback. A group hub has no hash route of its own, so
+  // it lands on the home view, which is the app with its search box, rather
+  // than on index.html served under /groups/<slug>/ with its stylesheet 404ing.
+  await installWorker(page);
+  await context.setOffline(true);
+  try {
+    await page.goto("/groups/electrical/");
+    await expect(page).toHaveURL(/localhost:8080\/$/);
+    await expect(page.locator("#search-input")).toBeVisible();
+    const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    expect(bg).not.toBe("rgba(0, 0, 0, 0)");
+  } finally {
+    await context.setOffline(false);
+  }
+});

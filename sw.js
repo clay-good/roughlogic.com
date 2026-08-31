@@ -253,6 +253,27 @@ async function cacheFirst(cacheName, request) {
     // If the request is a navigation, serve the shell.
     if (request.mode === "navigate") {
       const shell = await caches.open(SHELL_CACHE);
+      // No static shell is precached -- 1,826 pages is not a precache -- so a
+      // reader who bookmarks /tools/ohms-law/ and opens it offline lands here.
+      // Handing them index.html AT THAT URL was worse than it looked: every
+      // asset in that document is a RELATIVE path, so styles.css and app.js
+      // resolved to /tools/ohms-law/styles.css and 504'd. Measured
+      // 2026-08-31: an unstyled page showing the home view's "Field math,
+      // answered.", not the calculator that was asked for.
+      //
+      // Redirect to the root instead, carrying the tile as the hash the SPA
+      // already routes on. The root document IS precached, its relative paths
+      // resolve, and the reader gets the calculator they navigated to. Never
+      // redirect the root itself: that is the one navigation that must fall
+      // through to the cached document, and redirecting it would loop.
+      const url = new URL(request.url);
+      const scope = new URL(self.registration.scope);
+      const rest = url.pathname.slice(scope.pathname.length);
+      if (rest && rest !== "index.html") {
+        const tile = rest.match(/^tools\/([a-z0-9-]+)\/?$/);
+        const target = new URL(scope.pathname + (tile ? "#" + tile[1] : ""), url.origin);
+        return Response.redirect(target.href, 302);
+      }
       const fallback = await shell.match("./index.html");
       if (fallback) return fallback;
     }
