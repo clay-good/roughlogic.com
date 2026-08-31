@@ -143,7 +143,7 @@ const TOOLS = [
         query: { type: "string" },
         id: { type: "string" },
         name: { type: "string" },
-        via: { type: "string", description: "'registry' when the field index answered." },
+        via: { type: "string", description: "'registry' when the field index answered; 'reference' when the tile takes no inputs and its content is the answer." },
         inputs: { type: "object", description: "The values recovered from the question." },
         missing: { type: "array", items: { type: "object", properties: { key: { type: "string" }, label: { type: "string" }, unit: { type: ["string", "null"] } } } },
         result: { type: "object" },

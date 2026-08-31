@@ -1078,6 +1078,23 @@ export async function answerQuery({ query } = {}) {
   if (!recovered.length && !queryNamesTile(q, top.name) && !queryIsCuratedAliasFor(q, top.id, aliases)) {
     return { status: "NO_MATCH", query: q, message: "No calculator matched." };
   }
+  // 21 tiles have no inputs at all: OSHA Top-10, the knot and hand-signal
+  // references, the WMM model stamp. Their content IS the answer. Sending an
+  // agent NO_VALUES with "call describe_calculator for its inputs" points it at
+  // an empty list, so a question the catalog can answer completely came back as
+  // a dead end. Corroboration has already been established above -- the query
+  // names this tile or a curated alias maps to it -- so running it on no inputs
+  // is not a guess.
+  if (!recovered.length && !rows.length) {
+    try {
+      const out = await run({ id: top.id, inputs: {} });
+      return { ...out, status: "OK", query: q, name: top.name, via: "reference" };
+    } catch {
+      // Fall through to NO_VALUES rather than inventing an error status: a
+      // reference tile that cannot run on nothing is a tile with inputs the
+      // field index failed to project, which is what NO_VALUES already says.
+    }
+  }
   if (!recovered.length) {
     return {
       status: "NO_VALUES", query: q, id: top.id, name: top.name,

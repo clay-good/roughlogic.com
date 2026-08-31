@@ -169,3 +169,46 @@ test("trade shorthand reaches the same tile on both doors", async () => {
     assert.equal((out.results || []).length, 0, `"${q}" should stay empty, not guess`);
   }
 });
+
+// 21 tiles take no inputs at all -- OSHA Top-10, the knot and hand-signal
+// references, the WMM model stamp. Their content is the answer, so a question
+// that names one carried nothing to extract and used to come back NO_VALUES
+// with "call describe_calculator for its inputs", pointing at an empty list.
+test("a tile with no inputs answers from its content, not NO_VALUES", async () => {
+  const { answerQuery, describe } = await import("../../mcp/catalog.mjs");
+  const out = await answerQuery({ query: "OSHA Top-10 Citations" });
+  assert.equal(out.status, "OK");
+  assert.equal(out.id, "osha-top10");
+  assert.equal(out.via, "reference");
+  assert.ok(Array.isArray(out.result.items) && out.result.items.length, JSON.stringify(out.result).slice(0, 200));
+  // The premise: this tile really does advertise nothing to fill.
+  assert.equal((await describe({ id: "osha-top10" })).inputs.length, 0);
+});
+
+test("every input-free tile answers when its own name is the question", async () => {
+  const { answerQuery, describe } = await import("../../mcp/catalog.mjs");
+  const { TOOLS } = await import("../../tools-data.js");
+  const free = [];
+  for (const t of TOOLS) {
+    if (!(await describe({ id: t.id })).inputs.length) free.push(t);
+  }
+  assert.equal(free.length, 21, `input-free population moved: ${free.map((t) => t.id)}`);
+  const unanswered = [];
+  for (const t of free) {
+    // water-classes loses its own name to class-of-loss-screen, a tile that
+    // does take inputs; NO_VALUES is the right answer for that query, so ask
+    // for it by id, which is what an agent that read the catalog would send.
+    const q = t.id === "water-classes" ? t.id : t.name;
+    const out = await answerQuery({ query: q });
+    if (out.status !== "OK" || out.id !== t.id) unanswered.push(`${t.id}: ${out.status} -> ${out.id}`);
+  }
+  assert.deepEqual(unanswered, []);
+});
+
+test("the reference path does not loosen either corroboration guard", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  // A tile that does take inputs still refuses to guess at them.
+  assert.equal((await answerQuery({ query: "voltage drop" })).status, "NO_VALUES");
+  // And nonsense still matches nothing, rather than falling into a reference.
+  assert.equal((await answerQuery({ query: "asdfqwer zzz" })).status, "NO_MATCH");
+});
