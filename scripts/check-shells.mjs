@@ -457,6 +457,27 @@ async function main() {
     errors.push("tools/index.html: missing catalog hub (spec-v1345).");
   }
 
+  const groupsDirForCross = resolve(DIST, "groups");
+  // Every group hub links every other group hub as a REAL URL. The hubs used
+  // to cross-link only by SPA hash (`#group=E`), which is a fragment and not a
+  // crawlable URL, so hub-to-hub link equity did not flow -- scope-one-box.md
+  // records that as a measured constraint on the whole navigation. A hub that
+  // drops the section, or a new trade that no existing hub links, is the
+  // regression this catches.
+  if (existsSync(groupsDirForCross)) {
+    const slugs = (await readdir(groupsDirForCross)).sort();
+    for (const slug of slugs) {
+      const p = resolve(groupsDirForCross, slug, "index.html");
+      if (!existsSync(p)) continue;
+      const html = await readFile(p, "utf8");
+      const missing = slugs.filter((other) => other !== slug && !html.includes('href="../' + other + '/"'));
+      if (missing.length) {
+        errors.push("groups/" + slug + "/index.html: does not link " + missing.length +
+          " sibling hub(s) (" + missing.slice(0, 3).join(", ") + "). Hub-to-hub links must be real URLs, not #group= fragments.");
+      }
+    }
+  }
+
   // dist/404.html. Cloudflare Pages serves it, with a 404 status, at whatever
   // path was missed -- so every path in it must be ROOT-ABSOLUTE. A relative
   // "styles.css" would resolve under the bad URL and 404 alongside it, which is
@@ -540,7 +561,7 @@ async function main() {
     "all titles <= " + TITLE_CAP + " chars, descriptions <= " + DESCRIPTION_CAP + " chars, " +
     "JSON-LD valid against allowlist, gzip under " + TILE_GZIP_CAP + " / " + GROUP_GZIP_CAP + " B caps, " +
     "every shell CSP present and unweakened, no executable script on any shell, " +
-    "every page without a worked example printing its reference content, and " +
+    "every page without a worked example printing its reference content, every group hub linking every other as a real URL, and " +
     sitemapUrls + " sitemap URLs matched one-for-one against the built pages."
   );
 }

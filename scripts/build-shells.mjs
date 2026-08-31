@@ -1237,6 +1237,16 @@ function groupShell(group, tools, groupNames) {
   const items = tilesInGroup.map((t) => (
     `      <li><a href="../../tools/${escapeHtml(t.id)}/">${escapeHtml(t.name)}</a><span class="shell-related-desc"> - ${escapeHtml(rowSummary(t.desc))}</span></li>`
   )).join("\n");
+  const siblingHubs = [...new Set(tools.map((t) => t.group))]
+    .filter((g) => g !== group)
+    .sort()
+    .map((g) => {
+      const slug = GROUP_SLUG[g] || g.toLowerCase();
+      const label = groupNames[g] || ("Group " + g);
+      const n = tools.filter((t) => t.group === g).length;
+      return `      <li><a href="../${escapeHtml(slug)}/">${escapeHtml(label)}</a><span class="shell-related-desc"> - ${n} calculators</span></li>`;
+    })
+    .join("\n");
   const body = [
     '<body class="shell-page">',
     header,
@@ -1254,6 +1264,19 @@ function groupShell(group, tools, groupNames) {
     '    <h2>Tools in this group</h2>',
     '    <ul class="shell-related shell-tile-list">',
     items,
+    '    </ul>',
+    '  </section>',
+    // The hubs used to cross-link only by SPA hash -- `../../#group=E`, which
+    // is a fragment, not a crawlable URL. scope-one-box.md records the
+    // consequence as a measured fact: hub-to-hub link equity does not flow, and
+    // each hub is reachable only from its own tiles, the home nav and the
+    // sitemap. /groups/construction/ is the site's top organic landing page, so
+    // the fix is the charter's safe half -- addition. Every hub now links every
+    // other hub as a real URL, with its live count.
+    '  <section class="shell-section" aria-label="Other trades">',
+    '    <h2>Other trades</h2>',
+    '    <ul class="shell-related shell-tile-list">',
+    siblingHubs,
     '    </ul>',
     '  </section>',
     '</main>',

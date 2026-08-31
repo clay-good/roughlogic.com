@@ -156,6 +156,15 @@ Every tile shell links:
   heaviest receiver is unchanged at 30.
 - Sideways from the SPA's hash-route view by way of the canonical
   link.
+- Hub to hub. Until 2026-08-31 the group hubs cross-linked only by SPA
+  hash (`../../#group=E`), which is a fragment and not a crawlable URL,
+  so hub-to-hub link equity did not flow at all --
+  [../specs/scope-one-box.md](../specs/scope-one-box.md) records that
+  as one of three measured facts constraining the navigation. Each hub
+  now carries an "Other trades" section linking the other 20 as real
+  URLs with their live counts. Addition, which the charter names as the
+  safe half; the home nav is untouched. `check-shells` fails a hub that
+  drops a sibling.
 
 The curated registry seeded the highest-traffic semantic edges
 first (the spec.md §10 / spec-v3 §HVAC / v6 §F worked-example
