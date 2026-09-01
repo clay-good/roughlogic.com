@@ -8,7 +8,7 @@
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
     "@playwright/test": "1.62.1",
-    "wrangler": "4.125.0"
+    "wrangler": "4.127.1"
   },
   "engines": {
     "node": ">=20"
