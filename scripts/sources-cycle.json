@@ -1,6 +1,6 @@
 {
   "_comment": "v10 Phase A.1 source-cycle table. One row per cited standard listing the publishing body, the current edition, the cycle in years, the next-expected release date (best estimate), and a free-access URL. Used by scripts/check-citation-freshness.mjs to flag manifests whose 'edition' string is more than one cycle behind the current publication of that standard. spec-v22 CF-03: when 'next_expected' is in the past, the row must carry a 'last_verified' (ISO date >= next_expected) re-stamp -- the 'verified, not yet released' acknowledgement -- or the freshness gate fails. Update on each rollover (see docs/citation-freshness-ledger.md).",
-  "_updated": "2026-06-05",
+  "_updated": "2026-09-01",
   "standards": [
     {
       "id": "nec",
@@ -20,7 +20,9 @@
       "current_edition": "2024",
       "current_release": "2023-09",
       "cycle_years": 3,
-      "next_expected": "2026-09",
+      "next_expected": "2027-01",
+      "last_verified": "2026-09-01",
+      "verification_note": "2027 I-Code final vote completed August 2026; the editions publish in stages over the rest of 2026 and early 2027. Verified 2026-09-01: the 2027 edition is NOT yet published, so 2024 remains the current published edition. next_expected advanced to this source's own anticipated month -- 2027 IPC staged over late 2026 / early 2027.",
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
       "match_terms": ["IPC "]
     },
@@ -30,7 +32,9 @@
       "current_edition": "2024",
       "current_release": "2023-09",
       "cycle_years": 3,
-      "next_expected": "2026-09",
+      "next_expected": "2027-02",
+      "last_verified": "2026-09-01",
+      "verification_note": "2027 I-Code final vote completed August 2026; the editions publish in stages over the rest of 2026 and early 2027. Verified 2026-09-01: the 2027 edition is NOT yet published, so 2024 remains the current published edition. next_expected advanced to this source's own anticipated month -- 2027 IRC anticipated February 2027.",
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
       "match_terms": ["IRC "]
     },
@@ -40,7 +44,9 @@
       "current_edition": "2024",
       "current_release": "2023-09",
       "cycle_years": 3,
-      "next_expected": "2026-09",
+      "next_expected": "2026-10",
+      "last_verified": "2026-09-01",
+      "verification_note": "2027 I-Code final vote completed August 2026; the editions publish in stages over the rest of 2026 and early 2027. Verified 2026-09-01: the 2027 edition is NOT yet published, so 2024 remains the current published edition. next_expected advanced to this source's own anticipated month -- 2027 IBC anticipated September 2026.",
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
       "match_terms": ["IBC "]
     },
@@ -50,7 +56,9 @@
       "current_edition": "2024",
       "current_release": "2023-09",
       "cycle_years": 3,
-      "next_expected": "2026-09",
+      "next_expected": "2027-01",
+      "last_verified": "2026-09-01",
+      "verification_note": "2027 I-Code final vote completed August 2026; the editions publish in stages over the rest of 2026 and early 2027. Verified 2026-09-01: the 2027 edition is NOT yet published, so 2024 remains the current published edition. next_expected advanced to this source's own anticipated month -- 2027 IMC staged over late 2026 / early 2027.",
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
       "match_terms": ["IMC "]
     },
@@ -60,7 +68,9 @@
       "current_edition": "2024",
       "current_release": "2023-09",
       "cycle_years": 3,
-      "next_expected": "2026-09",
+      "next_expected": "2026-10",
+      "last_verified": "2026-09-01",
+      "verification_note": "2027 I-Code final vote completed August 2026; the editions publish in stages over the rest of 2026 and early 2027. Verified 2026-09-01: the 2027 edition is NOT yet published, so 2024 remains the current published edition. next_expected advanced to this source's own anticipated month -- 2027 IFC anticipated September 2026.",
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
       "match_terms": ["IFC "]
     },
@@ -70,7 +80,9 @@
       "current_edition": "2024",
       "current_release": "2023-09",
       "cycle_years": 3,
-      "next_expected": "2026-09",
+      "next_expected": "2027-01",
+      "last_verified": "2026-09-01",
+      "verification_note": "2027 I-Code final vote completed August 2026; the editions publish in stages over the rest of 2026 and early 2027. Verified 2026-09-01: the 2027 edition is NOT yet published, so 2024 remains the current published edition. next_expected advanced to this source's own anticipated month -- 2027 IFGC staged over late 2026 / early 2027.",
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
       "match_terms": ["IFGC "]
     },

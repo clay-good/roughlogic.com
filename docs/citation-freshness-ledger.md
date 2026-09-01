@@ -27,12 +27,12 @@ row's `next_expected` has passed without a `last_verified` re-stamp (CF-03).
 | id | source | edition cited (bundled) | current edition | last verified | status |
 |----|--------|-------------------------|-----------------|---------------|--------|
 | `nec` | NEC (NFPA 70) | 2023 | 2026 | 2026-06-05 | disclosed-lag |
-| `ipc` | International Plumbing Code | 2021 | 2024 | 2026-06-05 | disclosed-lag |
-| `irc` | International Residential Code | 2021 | 2024 | 2026-06-05 | disclosed-lag |
-| `ibc` | International Building Code | 2021 | 2024 | 2026-06-05 | disclosed-lag |
-| `imc` | International Mechanical Code | 2021 | 2024 | 2026-06-05 | disclosed-lag |
-| `ifc` | International Fire Code | 2021 | 2024 | 2026-06-05 | disclosed-lag |
-| `ifgc` | International Fuel Gas Code | 2021 | 2024 | 2026-06-05 | disclosed-lag |
+| `ipc` | International Plumbing Code | 2021 | 2024 (2027 voted, not published) | 2026-09-01 | disclosed-lag |
+| `irc` | International Residential Code | 2021 | 2024 (2027 voted, not published) | 2026-09-01 | disclosed-lag |
+| `ibc` | International Building Code | 2021 | 2024 (2027 voted, not published) | 2026-09-01 | disclosed-lag |
+| `imc` | International Mechanical Code | 2021 | 2024 (2027 voted, not published) | 2026-09-01 | disclosed-lag |
+| `ifc` | International Fire Code | 2021 | 2024 (2027 voted, not published) | 2026-09-01 | disclosed-lag |
+| `ifgc` | International Fuel Gas Code | 2021 | 2024 (2027 voted, not published) | 2026-09-01 | disclosed-lag |
 | `ashrae-62-1` | ASHRAE 62.1 | 2022 | 2022 (monitoring 2025) | 2026-06-05 | acknowledged-stale |
 | `ashrae-62-2` | ASHRAE 62.2 | 2022 | 2022 (monitoring 2025) | 2026-06-05 | acknowledged-stale |
 | `ashrae-90-1` | ASHRAE 90.1 | 2022 | 2022 (monitoring 2025) | 2026-06-05 | acknowledged-stale |
@@ -52,6 +52,18 @@ row's `next_expected` has passed without a `last_verified` re-stamp (CF-03).
   `IPC_DISCLOSURE`, `IFGC_DISCLOSURE`) already name 2024 as the newer adopted
   edition, so this is correctly **disclosed-lag**. The 2024 value refresh is its
   own future data pass.
+
+- **ICC I-codes, 2026-09-01 re-stamp (CF-03):** all six rows carried
+  `next_expected: 2026-09`, which passed at UTC midnight on 2026-09-01 and
+  turned `main` red -- the gate working as designed. Verified against ICC's
+  published schedule: the **2027 I-Codes completed their final vote in August
+  2026 and are published in stages over the rest of 2026 and early 2027**, with
+  the IBC and IFC anticipated September 2026 and the IRC February 2027. So the
+  2027 edition does **not** exist yet and 2024 remains the current published
+  edition; the rows are re-stamped `last_verified: 2026-09-01` and each
+  `next_expected` is advanced to that source's own anticipated month
+  (IBC / IFC 2026-10, IPC / IMC / IFGC 2027-01, IRC 2027-02) rather than to one
+  date for all six. Advance `current_edition` on confirmed publication.
 - **ASHRAE 62.1 / 62.2 / 90.1 (CF-02):** `next_expected` (2025-10 / 2025-12)
   passed. Re-stamped **acknowledged-stale** with `last_verified: 2026-06-05` and
   a quarterly re-verify action; bundled values follow the 2022 editions and the
