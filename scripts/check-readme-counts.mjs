@@ -83,7 +83,19 @@ async function liveCounts() {
     .filter((f) => f.endsWith(".test.js")).length;
   const integrationSpecs = (await readdir(resolve(ROOT, "test", "integration")))
     .filter((f) => f.endsWith(".test.js")).length;
+  // The two shell gzip caps. docs/architecture.md and docs/deployment.md both
+  // stated "6 KB / 12 KB" long after the group cap moved past 12 KB -- it has
+  // been raised (and once lowered) nine times, and deployment.md was claiming
+  // the hubs sit "well under" a cap the largest one had exceeded since
+  // 2026-06-24. Read them from the gate that enforces them.
+  const shellsSrc = await readFile(resolve(ROOT, "scripts", "check-shells.mjs"), "utf8");
+  const capOf = (name) => {
+    const m = new RegExp(name + "\\s*=\\s*(\\d+)\\s*\\*\\s*1024").exec(shellsSrc);
+    return m ? Number(m[1]) * 1024 : 0;
+  };
   return {
+    tileGzipCap: capOf("TILE_GZIP_CAP"),
+    groupGzipCap: capOf("GROUP_GZIP_CAP"),
     citationStrings, unitSuites, integrationSpecs,
     tiles, groups, modules, sitemap, gates,
     indexedTiles: indexed.size,
@@ -257,6 +269,12 @@ async function main() {
   checked += checkPattern(launch, /\*\*(\d+) live lint gates\*\*/g, live.gates, "lint gate count (docs/launch-checklist.md)", errors);
   checked += checkPattern(launch, /\*\*(\d+) live unit suites\*\*/g, live.unitSuites, "unit suite count (docs/launch-checklist.md)", errors);
   checked += checkPattern(launch, /\*\*(\d+) live integration specs\*\*/g, live.integrationSpecs, "integration spec count (docs/launch-checklist.md)", errors);
+
+  // The shell gzip caps, wherever the prose states them.
+  checked += checkPattern(arch, /\*\*(\d+) B\*\* per tile shell/g, live.tileGzipCap, "tile shell gzip cap (docs/architecture.md)", errors);
+  checked += checkPattern(arch, /\*\*(\d+) B\*\* per group hub/g, live.groupGzipCap, "group hub gzip cap (docs/architecture.md)", errors);
+  checked += checkPattern(deploy, /\*\*(\d+) B\*\* per tile shell/g, live.tileGzipCap, "tile shell gzip cap (docs/deployment.md)", errors);
+  checked += checkPattern(deploy, /\*\*(\d+) B\*\* per group hub/g, live.groupGzipCap, "group hub gzip cap (docs/deployment.md)", errors);
 
   const perf = await readFile(resolve(ROOT, "docs", "performance.md"), "utf8");
   checked += checkPattern(perf, /\((\d+) `calc-\*\.js` files/g, live.modules, "calc-* module count (docs/performance.md)", errors);

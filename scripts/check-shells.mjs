@@ -16,7 +16,10 @@
 //     pointing at schema.org, every type drawn from the closed
 //     allowlist in spec-v13 §7).
 //   - Every shell's gzipped size is within the spec-v13 §5.4 6 KB cap
-//     for tile shells and the §8.3 12 KB cap for group shells.
+//     for tile shells and the §8.3 group-hub cap for group shells. Both
+//     numbers are stated in docs/architecture.md and docs/deployment.md and
+//     pinned there by check-readme-counts, because this comment said "12 KB"
+//     for the two months after the group cap first moved past it.
 //   - No banned marketing language in titles or descriptions (the
 //     spec-v13 §11.3 forbidden-word list).
 //

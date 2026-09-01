@@ -147,8 +147,15 @@ required:
   uncompressed (385 tile shells at ~5 KB each + 24 group shells at
   ~15 KB each + sitemap expansion). At v13 close `dist/` ships 591
   files / ~5,633 KB. Cloudflare Pages serves the shells gzipped at
-  edge; per-shell over-the-wire cost is ~1.8 KB (tile) / ~3.9 KB
-  (group), both well under the §5.4 / §8.3 6 KB / 12 KB caps.
+  edge. The v13-close figures above are a frozen snapshot; the live
+  caps are **6144 B** per tile shell and **69632 B** per group hub
+  (§5.4 / §8.3), and the group cap has been raised nine times as the
+  catalog grew, most recently *down* from 116 KB to 68 KB on
+  2026-08-16 when the hubs stopped printing each tile's full
+  description. `check-readme-counts` pins both numbers here so they
+  cannot drift from `check-shells.mjs` again: this line read "6 KB /
+  12 KB" until 2026-09-01, and the largest group hub had been over
+  12 KB since 2026-06-24.
 - **Service-worker precache unchanged.** The shells are not added to
   `sw.js` `SHELL_FILES`; they are reached by crawlers and by direct
   navigation, not by SPA route changes. The SPA does not navigate
