@@ -404,7 +404,14 @@ const KEY_UNITS = new Map(Object.entries({
 const KEY_UNITS_CASED = new Map(Object.entries({ A: "A", V: "V", F: "\u00b0F", C: "\u00b0C", W: "W", nT: "nT" }));
 // A denominator ("lb_hr" = lb/hr) is only ever the LAST token of a key.
 const KEY_PER_UNITS = new Map(Object.entries({ min: "min", day: "day", s: "s", hr: "hr", sf: "ft\u00b2", yr: "yr" }));
-const KEY_ACRONYMS = new Set(["awg", "nec", "ada", "ocpd", "fla", "mca", "mocp", "rh", "cg", "tds", "bod", "tss",
+const KEY_ACRONYMS = new Set([
+  // Added 2026-09-01: each of these was rendering title-cased somewhere a
+  // reader could see it, or would have on the first tile that labelled it.
+  // Only unambiguous all-caps trade acronyms; mixed-case symbols (GCpi, Mmax,
+  // Vmax, kvar) and ambiguous four-letter keys (cplh, splh, rctf) are left
+  // alone deliberately, since upper-casing those would be a different error.
+  "afci", "gfci", "acfm", "scfm", "afue", "bsfc", "dscr", "hspf", "piti", "shgc",
+  "awg", "nec", "ada", "ocpd", "fla", "mca", "mocp", "rh", "cg", "tds", "bod", "tss",
   "srt", "hrt", "vslr", "sor", "wor", "apf", "uv", "led", "hvac", "pdp", "gpp", "wsfu", "dfu", "ach", "shr",
   "eer", "cop", "stc", "emt", "pvc", "rmc", "imc", "cmu", "srw", "spt", "cbr", "usc", "aashto", "asd", "lrfd",
   "asce", "aisc", "aci", "nds", "du"]);
@@ -416,6 +423,12 @@ const KEY_ACRONYMS = new Set(["awg", "nec", "ada", "ocpd", "fla", "mca", "mocp",
 // printing the key itself rather than a worse guess.
 export function humanizeKey(key) {
   const parts = String(key).split("_").filter(Boolean);
+  // An acronym is an acronym whether or not it has company. The one-word path
+  // below title-cases, so `afci` came out "Afci" and `scfm` came out "Scfm" on
+  // the two pages that print them as labels -- and `vslr` and `wsfu` did the
+  // same despite already being on the list, because this early return never
+  // consulted it. Check it first, for one word and for many.
+  if (parts.length === 1 && KEY_ACRONYMS.has(parts[0].toLowerCase())) return parts[0].toUpperCase();
   // A one-word key is already English ("ratio", "efficiency"); it only needs
   // to be capitalized so it reads as a caption beside the others. Anything
   // shorter is a symbol ("df", "ka") and says more as itself.

@@ -75,3 +75,35 @@ test("`db` is never treated as a unit: it is dry-bulb and beam depth too", () =>
   assert.equal(humanizeKey("leaving_db_F"), "Leaving db (°F)");
   assert.equal(humanizeKey("beam_depth_db_in"), "Beam depth db (in)");
 });
+
+test("an acronym is upper-cased whether or not it has company", () => {
+  // The one-word path title-cased and never consulted the acronym list, so
+  // `afci` rendered "Afci" and `scfm` rendered "Scfm" on the two pages that
+  // print them as labels. `vslr` and `wsfu` did the same despite already
+  // being on the list.
+  assert.equal(humanizeKey("afci"), "AFCI");
+  assert.equal(humanizeKey("scfm"), "SCFM");
+  assert.equal(humanizeKey("vslr"), "VSLR");
+  assert.equal(humanizeKey("wsfu"), "WSFU");
+  // Unchanged where the acronym already had company.
+  assert.equal(humanizeKey("nec_ref"), "NEC ref");
+});
+
+test("an ordinary word is still title-cased, not shouted", () => {
+  // The acronym check must not swallow the one-word English path.
+  assert.equal(humanizeKey("ratio"), "Ratio");
+  assert.equal(humanizeKey("efficiency"), "Efficiency");
+  assert.equal(humanizeKey("occupancy"), "Occupancy");
+  // And a short symbol still says more as itself than as a caption.
+  assert.equal(humanizeKey("df"), null);
+});
+
+test("no mixed-case symbol was swept into the acronym list", () => {
+  // GCpi, Mmax, Vmax and kvar are symbols with a deliberate case, and
+  // upper-casing them would be a different error from the one being fixed.
+  // cplh / splh / rctf are ambiguous four-letter keys, left alone.
+  for (const k of ["gcpi", "mmax", "vmax", "kvar", "cplh", "splh", "rctf"]) {
+    const v = humanizeKey(k);
+    assert.notEqual(v, k.toUpperCase(), `${k} was upper-cased; it is not an unambiguous acronym`);
+  }
+});

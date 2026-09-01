@@ -11,9 +11,13 @@ test("an array of flat rows reads as prose, not JSON", () => {
   assert.equal(
     exampleValue([{ cfm: 4, duty_cycle: 0.5 }, { cfm: 3, duty_cycle: 0.4 }]),
     "cfm 4, duty cycle 0.5; cfm 3, duty cycle 0.4");
+  // AWG, not awg: `humanizeKey` consults the acronym list on a one-word key
+  // as of 2026-09-01. This assertion pinned the older "awg", which was the
+  // raw key falling through because the one-word path returned null for a
+  // three-letter token before ever looking at the list.
   assert.equal(
     exampleValue([{ insulation: "THHN", awg: "12", count: 4 }]),
-    "insulation THHN, awg 12, count 4");
+    "insulation THHN, AWG 12, count 4");
 });
 
 test("no worked-example value renders as a JSON literal", () => {
