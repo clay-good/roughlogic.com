@@ -576,20 +576,22 @@ export function exampleRows(obj, labels, displays, units, bools, flags) {
 // already parses, extended with the `trades` array and the `desc`
 // string. Returns an array of { id, name, group, trades, desc }.
 async function loadTools() {
-  const text = await readFile(resolve(ROOT, "tools-data.js"), "utf8");
-  const tools = [];
-  const re = /\{\s*id:\s*"([a-z0-9-]+)"\s*,\s*name:\s*"((?:[^"\\]|\\.)+)"\s*,\s*group:\s*"([^"]+)"\s*,\s*trades:\s*\[([^\]]*)\]\s*,\s*desc:\s*"((?:[^"\\]|\\.)+)"\s*\}/g;
-  for (const m of text.matchAll(re)) {
-    const trades = [...m[4].matchAll(/"([^"]+)"/g)].map((tm) => tm[1]);
-    tools.push({
-      id: m[1],
-      name: m[2].replace(/\\"/g, '"').replace(/\\\\/g, "\\"),
-      group: m[3],
-      trades,
-      desc: m[5].replace(/\\"/g, '"').replace(/\\\\/g, "\\"),
-    });
-  }
-  return tools;
+  // Read the registry as a module rather than scraping it with a regex. The
+  // scraper decoded \" and \\ and nothing else, so a name or desc written with
+  // a JavaScript unicode escape came through raw: six tiles printed
+  // `R315.3\u0027s`, `DRYER MAKER\u0027S` and `\u002220 feet\u0022` as visible
+  // text on the page, in the meta description, in og:description, in
+  // twitter:description and in the JSON-LD. The browser never showed it,
+  // because the browser parses the file as JavaScript -- which is exactly what
+  // this now does. tools-data.js is pure data with no side effects.
+  const mod = await import(pathToFileURL(resolve(ROOT, "tools-data.js")).href);
+  return (mod.TOOLS || []).map((t) => ({
+    id: t.id,
+    name: t.name,
+    group: t.group,
+    trades: Array.isArray(t.trades) ? t.trades : [],
+    desc: t.desc,
+  }));
 }
 
 // Parse the GROUP_NAMES object out of app.js. Matches the const declaration
@@ -643,11 +645,18 @@ export function capDescription(text) {
 // an admissible verb get a "Reference for" prefix so the snippet reads
 // as a verb-first sentence.
 function metaDescription(tool, professionNoun) {
-  const verb = /^(Compute|Estimate|Convert|Look up|Decode|Plain|Determine|Find|Calculate|Size|Solve|Output|Resolve|Standard|Quick|Plain-English|Plain English|Read|Show|Return|List|Build|Render|Tabulate|Map|Score|Rate|Predict|Project|Sketch|Sketches|Lookup)\b/i;
+  // The tile's own opening sentence, unedited. It used to be rewritten first:
+  // a description not starting with one of two dozen allowlisted verbs got
+  // "Reference for " glued on and its first letter lowercased, per the §11.1
+  // rule that the snippet should lead with the verb. That fired on 1,786 of
+  // 1,804 tiles -- the descs were rewritten into complete sentences in the
+  // 2026-08-17 maintainer-voice pass, and a complete sentence does not start
+  // with an allowlisted verb -- and it produced broken English at scale:
+  // "Reference for a stair that satisfies the building code can fail the ADA",
+  // "Reference for sizes the power supply and standby battery". It never
+  // delivered the rule either: "Reference for" is a noun, so the snippet led
+  // with a verb on the 18 tiles the prefix skipped and on none of the rest.
   let lead = tool.desc.trim();
-  if (!verb.test(lead)) {
-    lead = "Reference for " + lead.charAt(0).toLowerCase() + lead.slice(1);
-  }
   if (!lead.endsWith(".")) lead += ".";
   const tail = "Client-side, ad-free, account-free reference for " + professionNoun.toLowerCase() + ".";
   const combined = lead + " " + tail;

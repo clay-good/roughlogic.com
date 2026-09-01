@@ -235,6 +235,30 @@ function lintDescriptionWordBoundary(desc, where, errors, tool) {
   }
 }
 
+// The snippet a searcher reads must be the tile's own opening sentence, not a
+// rewrite of it. Until 2026-09-01 a description that did not start with one of
+// two dozen allowlisted verbs got "Reference for " glued on and its first
+// letter lowercased -- 1,786 of 1,804 tiles, since the descs were rewritten
+// into complete sentences and a complete sentence does not open with an
+// allowlisted verb. The result was ungrammatical on a large fraction of the
+// catalog ("Reference for a stair that satisfies the building code can fail the
+// ADA") and never delivered the verb-first rule it existed for, "Reference for"
+// being a noun. Assert the rendered description opens with `desc` verbatim, so
+// no future rewrite can get between the maintainer's words and the reader.
+function lintDescriptionIsTheTilesOwnWords(desc, where, errors, tool) {
+  if (!tool || !tool.desc) return;
+  const src = tool.desc.trim();
+  const rendered = unescapeHtml(desc).replace(/\.\.\.$/, "");
+  const n = Math.min(src.length, rendered.length);
+  if (n < 12) return;
+  if (rendered.slice(0, n) !== src.slice(0, n)) {
+    errors.push(
+      where + ": meta description does not open with the tile's own desc. " +
+      "Rendered '" + rendered.slice(0, 48) + "...', desc '" + src.slice(0, 48) + "...'."
+    );
+  }
+}
+
 function unescapeHtml(s) {
   return s
     .replace(/&lt;/g, "<")
@@ -242,6 +266,30 @@ function unescapeHtml(s) {
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&amp;/g, "&");
+}
+
+// A JavaScript unicode escape that reached the page as text. tools-data.js is
+// JavaScript, so a maintainer can write `R315.3\u0027s` or `\u002220 feet\u0022`
+// in a name or a desc and the browser renders an apostrophe or a quote. The
+// shell builder used to scrape that file with a regex that decoded \" and \\ and
+// nothing else, so six tiles shipped the escape itself -- in the visible lead,
+// the meta description, og:description, twitter:description and the JSON-LD.
+// Inside a JSON-LD block, \u003c / \u003e / \u0026 are the deliberate escaping
+// that stops a tile name closing the <script>; everything else is a leak.
+function lintNoRawUnicodeEscape(html, where, errors) {
+  const blocks = html.match(/<script type="application\/ld\+json">[\s\S]*?<\/script>/g) || [];
+  let outside = html;
+  for (const b of blocks) outside = outside.replace(b, "");
+  const leaked = outside.match(/\\u[0-9a-fA-F]{4}/g);
+  if (leaked) {
+    errors.push(where + ": literal JavaScript escape(s) in the page text: " + [...new Set(leaked)].join(", ") + ".");
+  }
+  for (const b of blocks) {
+    const bad = b.match(/\\u(?!003c|003e|0026)[0-9a-fA-F]{4}/gi);
+    if (bad) {
+      errors.push(where + ": literal JavaScript escape(s) in the JSON-LD block: " + [...new Set(bad)].join(", ") + ".");
+    }
+  }
 }
 
 function lintShellCsp(html, where, errors) {
@@ -287,6 +335,7 @@ async function lintShell(path, kind, errors, tool) {
   const html = await readFile(path, "utf8");
   const where = path.slice(DIST.length + 1);
   lintShellCsp(html, where, errors);
+  lintNoRawUnicodeEscape(html, where, errors);
   lintShellNoScript(html, where, errors);
 
   // Title.
@@ -320,6 +369,7 @@ async function lintShell(path, kind, errors, tool) {
       errors.push(where + ": meta description contains banned marketing word '" + bannedD + "'.");
     }
     lintDescriptionWordBoundary(desc, where, errors, tool);
+    lintDescriptionIsTheTilesOwnWords(desc, where, errors, tool);
   }
 
   // Canonical.

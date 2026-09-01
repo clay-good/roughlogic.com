@@ -95,10 +95,26 @@ Title format: `{Tile Name} - {Profession Noun} - Rough Logic`. Cap
 70 characters; the generator falls back to `{Name} - Rough Logic`
 then to a truncated name as needed, preserving the brand suffix.
 
-Description format: two to three sentences, verb-first. The first
-sentence names the calculation and the inputs. Cap 220 characters
-measured against the HTML-escaped string. Tiles whose `desc` does
-not lead with an admissible verb get a "Reference for" prefix.
+Description format: two to three sentences. The first sentence names
+the calculation and the inputs. Cap 220 characters measured against
+the HTML-escaped string.
+
+The description is the tile's own `desc`, **unedited** (2026-09-01).
+Until then, a `desc` that did not open with one of two dozen
+allowlisted verbs got "Reference for " glued on and its first letter
+lowercased, per an earlier reading of the §11.1 verb-first rule. That
+fired on 1,786 of 1,804 tiles -- the descs were rewritten into complete
+sentences in the 2026-08-17 maintainer-voice pass, and a complete
+sentence does not open with an allowlisted verb -- and it produced
+ungrammatical snippets at scale: "Reference for a stair that satisfies
+the building code can fail the ADA", "Reference for sizes the power
+supply and standby battery". It never delivered the rule either:
+"Reference for" is a noun, so the snippet led with a verb on the 18
+tiles the prefix skipped and on none of the rest. Verb-first is now an
+authoring rule for `desc` itself, not something the build imposes;
+`check-shells` asserts every rendered description opens with the tile's
+`desc` verbatim, so nothing can get between the maintainer's words and
+the reader again.
 
 Overflow rule (2026-09-01). A tile description is the tile's opening
 sentence plus a closing "Client-side, ad-free, account-free reference

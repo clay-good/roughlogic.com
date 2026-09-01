@@ -6,6 +6,7 @@
 // The only description gate was the 220-char cap, which a mid-word cut passes.
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { capDescription, DESCRIPTION_CAP } from "../../scripts/build-shells.mjs";
 
 const LONG =
@@ -59,4 +60,17 @@ test("a single unbroken token still yields something, not an empty string", () =
   const out = capDescription("x".repeat(400));
   assert.ok(out.length > 100, `collapsed to ${out.length} characters`);
   assert.ok(out.endsWith("..."));
+});
+
+// The snippet a searcher reads is the tile's own opening sentence. It used to
+// be rewritten: a desc not opening with one of two dozen allowlisted verbs got
+// "Reference for " glued on and its first letter lowercased -- 1,786 of 1,804
+// tiles, producing "Reference for a stair that satisfies the building code can
+// fail the ADA". Nothing may reintroduce a prefix.
+test("the shell builder holds no description prefix", async () => {
+  const src = await readFile(new URL("../../scripts/build-shells.mjs", import.meta.url), "utf8");
+  const fn = src.slice(src.indexOf("function metaDescription("));
+  const body = fn.slice(0, fn.indexOf("\n}\n"));
+  assert.doesNotMatch(body, /"Reference for "\s*\+/, "metaDescription prepends a prefix to the tile's desc");
+  assert.doesNotMatch(body, /toLowerCase\(\)\s*\+\s*lead\.slice/, "metaDescription lowercases the desc's first letter");
 });
