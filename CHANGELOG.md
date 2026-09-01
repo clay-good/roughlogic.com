@@ -34,6 +34,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Four tile pages printed "n/a" as a source line.** Under "Details, formula, and sources" -- the disclosure whose entire job is to tell a reader where the number came from -- `markup`, `material-cost`, `time-and-materials` and `tip-out` each rendered a standalone paragraph reading `n/a`, on both the static page and in the browser. The field was `freeAccess`, and the citation gate's check for it was "present and non-empty", which `"n/a"` satisfies.
+
+  The other 1,800 tiles write a sentence, including every one with no licensed source to name: "No code citation required.", "First-principles physics; no licensed source required.", "The ideal-transformer ratios are standard first-principles circuit relations; the voltages come from the nameplate." That is the convention -- say the thing rather than abbreviate it away -- and the four now follow it, each naming what the reader's own figures are and what governs them (house policy and wage-and-hour rules for `tip-out`, the contract for `time-and-materials`).
+
+  `check-citation-coverage` now fails a required field that is present but says nothing -- `n/a`, `none`, `TBD`, `null`, a bare dash. Seed-verified. Found by reading the shortest disclosure in the catalog rather than by grepping for anything.
+
 - **Two docs told a deployer the group hubs sit "well under" a cap the largest one had exceeded since 2026-06-24.** `docs/architecture.md` and `docs/deployment.md` both stated the shell gzip budget as "6 KB / 12 KB". The tile cap is still 6144 B, but the group-hub cap has moved nine times as the catalog grew -- 12 -> 14 -> 17 -> 20 -> 24 -> 30 -> 34 -> 36 -> 116, then *down* to 68 KB on 2026-08-16 when the hubs stopped printing each tile's full description. The live cap is 69632 B and the largest hub, `/groups/construction/`, gzips to 45,761 B. `check-shells.mjs`'s own header comment carried the stale 12 KB too.
 
   All three corrected, and both caps are now read out of `check-shells.mjs` by `check-readme-counts` and asserted against the prose in both documents -- seed-verified by moving the cap to 80 KB, which reddens both. That takes the pinned-count total from 39 to 43.

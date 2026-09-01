@@ -17,6 +17,8 @@
 //       direction of the check-tile-meta TOOLS->CITATIONS lint).
 //     - A CITATIONS entry is missing any of the four required fields
 //       formula / edition / freeAccess / governance (spec-v19 §2.2).
+//     - A required field is a placeholder that renders to the reader as a
+//       source line but says nothing ("n/a", "none", "TBD", "-").
 //     - A field carries a raw http(s):// scheme (spec-v19 §4.1); the
 //       convention is bare domains, linkified at render.
 //     - An edition-note disclosure constant attached to a tile that does
@@ -493,11 +495,26 @@ async function main() {
   // synthesize, so they are asserted per-tile in calc-*.test.js, not here.
   const { CITATIONS } = await import(pathToFileURL(CITATIONS_JS).href);
   const REQUIRED = ["formula", "edition", "freeAccess", "governance"];
+  // A value that is present, non-empty, and tells the reader nothing.
+  const PLACEHOLDER = /^\s*(n\.?\s*\/?\s*a\.?|none\.?|null|undefined|-+|—+|tbd\.?|todo\.?|pending\.?|\?+)\s*$/i;
   for (const [id, entry] of Object.entries(CITATIONS)) {
     for (const f of REQUIRED) {
       const v = entry[f];
       if (v == null || String(v).trim() === "") {
         errors.push("CITATIONS tile '" + id + "' is missing required field '" + f + "' (spec-v19 §2.2).");
+      } else if (PLACEHOLDER.test(String(v))) {
+        // Present, non-empty, and says nothing. Four tiles carried
+        // `freeAccess: "n/a"`, which the tile page rendered as a standalone
+        // line reading "n/a" under "Details, formula, and sources" -- on a
+        // disclosure whose entire job is to tell the reader where the number
+        // came from. The empty-string check above passes it happily. The
+        // other 1,800 tiles write a sentence, including the ones with no
+        // licensed source to name ("No code citation required.",
+        // "First-principles physics; no licensed source required."), which is
+        // the convention: say the thing, do not abbreviate it away.
+        errors.push("CITATIONS tile '" + id + "' field '" + f + "' is the placeholder " +
+          JSON.stringify(String(v).trim()) + ". This renders to the reader as a source line; " +
+          "write the sentence instead -- a tile with no licensed source says so in words.");
       }
     }
     // §4.1: citation data fields cite bare domains, linkified at render time.

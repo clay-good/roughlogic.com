@@ -6451,7 +6451,7 @@ export const CITATIONS = {
   "material-cost": {
     formula: "Total cost = quantity × unit_price + tax + shipping. Pure arithmetic.",
     edition: "Engineering-practice arithmetic.",
-    freeAccess: "n/a",
+    freeAccess: "No licensed source required. The total is definitional arithmetic; the quantity, unit price, tax rate, and shipping are the user's own figures.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (arithmetic).",
     assumptions: [],
@@ -6459,7 +6459,7 @@ export const CITATIONS = {
   "markup": {
     formula: "Selling price = cost × (1 + markup_pct). Margin % = (price − cost) / price × 100. Pure arithmetic.",
     edition: "Engineering-practice arithmetic.",
-    freeAccess: "n/a",
+    freeAccess: "No licensed source required. Markup and margin are definitional arithmetic; the cost and the target percentage are the user's own figures.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (arithmetic).",
     assumptions: [],
@@ -6467,7 +6467,7 @@ export const CITATIONS = {
   "time-and-materials": {
     formula: "Total billable = labor_hours × hourly_rate × (1 + OT_factor) + materials_cost × (1 + markup_pct) + travel.",
     edition: "Engineering-practice billing convention.",
-    freeAccess: "n/a",
+    freeAccess: "No licensed source required. The total is definitional arithmetic; the rates, prices, and markup are the user's own figures, and the contract governs which of them are billable.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (arithmetic).",
     assumptions: [],
@@ -6485,7 +6485,7 @@ export const CITATIONS = {
   "tip-out": {
     formula: "Per-person split = total / count, optionally weighted by tip-out points per role.",
     edition: "Engineering-practice arithmetic.",
-    freeAccess: "n/a",
+    freeAccess: "No licensed source required. The split is definitional arithmetic; the pool, the roles, and the point weights come from house policy and from the wage-and-hour rules that govern tip pooling.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (arithmetic).",
     assumptions: [],
