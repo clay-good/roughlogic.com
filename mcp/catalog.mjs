@@ -990,13 +990,30 @@ function queryIsCuratedAliasFor(query, id, aliases) {
   return false;
 }
 
+// A tile whose name carries no word of four characters or more. Three do:
+// Ohm's Law, CFM per Ton, Tip Out. The four-character floor above left them
+// with an empty distinctive set, so queryNamesTile returned false for every
+// question -- including the tile's own name typed exactly. `answer_query
+// ("ohms law")` came back "No calculator matched." while `search_calculators`
+// ranked ohms-law first for the same string.
+//
+// The floor exists so one incidental short word cannot corroborate a
+// question. Requiring EVERY word of a short name is stricter than that, not
+// looser, so the guard survives. Matched at a token boundary rather than by
+// substring, because "out" is inside "output" and "about" while "tip out" is
+// not; a trailing plural is allowed so "ohms" answers for "ohm".
+function everyShortWordPresent(q, words) {
+  const short = words.filter((w) => w.length >= 2 && !TILE_NAME_NOISE.has(w));
+  if (!short.length) return false;
+  const tokens = new Set(q.split(/[^a-z0-9]+/).filter(Boolean));
+  return short.every((w) => tokens.has(w) || tokens.has(w + "s"));
+}
+
 function queryNamesTile(query, name) {
   const q = String(query || "").toLowerCase();
-  const distinctive = String(name || "")
-    .toLowerCase()
-    .split(/[^a-z0-9]+/)
-    .filter((w) => w.length >= 4 && !TILE_NAME_NOISE.has(w));
-  if (!distinctive.length) return false;
+  const words = String(name || "").toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+  const distinctive = words.filter((w) => w.length >= 4 && !TILE_NAME_NOISE.has(w));
+  if (!distinctive.length) return everyShortWordPresent(q, words);
   const hit = distinctive.filter((w) => q.includes(w)).length;
   // One incidental word out of several is not a reader naming a calculator.
   // "what is the meaning of life" shares "life" with HEPA Filter Life and

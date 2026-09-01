@@ -34,6 +34,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`answer_query("ohms law")` answered "No calculator matched."** The agent door corroborates a question before pointing at a calculator: the question carried values, or it names the tile, or a curated alias maps to it. "Names the tile" counted the tile's words of four characters or more, so one incidental short word could not corroborate anything. Three tiles have no such word at all -- **Ohm's Law**, **CFM per Ton**, **Tip Out** -- and the filter left an empty set, so the test returned false for every question ever asked about them, including each tile's own name typed exactly. `search_calculators` ranked `ohms-law` first for that same string the whole time: one door refusing what the other put at the top.
+
+  A name made only of short words now has to appear in the question **in full**, matched at token boundaries so `output` does not answer for Tip Out and `the law of the land` does not answer for Ohm's Law. That is stricter than the four-character rule, not looser, so the guard it replaces survives intact.
+
+  Swept over **all 22,837 tile names and curated alias phrases**: 3 answers changed, all three from `NO_MATCH` to the right calculator, 0 regressions. `check-both-doors` and `door-parity` unchanged; the ranking harness unchanged at 99.83% / 100.00%. Both halves of the fix seed-verified separately -- reverting the fallback and swapping token matching for substring matching each redden `test/unit/answer-query-short-names.test.js`, which also pins that exactly three tiles reach this path, so a rename that adds a fourth is a deliberate edit.
+
+  Found by asking the agent door ten questions a tradesperson would actually type.
+
 - **The new-tile checklist was wrong in both directions.** `docs/contributor-checklist.md` lists the registries a new tile has to be wired into. That list was written by hand, and by 2026-09-01 it omitted two registries that hold every one of the 1,804 tile ids and demanded work for one that does not.
 
   Missing: `test/fixtures/renderer-map.js` -- never named at all -- and `test/fixtures/worked-examples.json`, mentioned only as "a worked-example fixture" under the unit-test line, which is a different artefact. Both verified mandatory by removing a live tile from each and watching a gate go red: dropping `ohms-law` from the renderer map reddens `check-curated-labels` (its example rows then print bare keys with no caption), and dropping its rows from the worked-example registry reddens `check-worked-examples`, which is fail-on-missing. A contributor following the list hit two failures it did not predict.

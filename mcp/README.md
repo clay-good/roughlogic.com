@@ -113,6 +113,18 @@ fall from 70 to 4, and 284 of the 300 now name the calculator and say what it
 needs. Corroboration is checked against the top-ranked calculator only, so this
 widens what counts as a match without widening what gets answered.
 
+"Naming it" counts a tile's words of four characters or more, so one incidental
+short word cannot corroborate a question. Three tiles have no such word at all
+-- **Ohm's Law**, **CFM per Ton**, **Tip Out** -- and until 2026-09-01 that left
+the test with nothing to check and returned false for every question, including
+the tile's own name typed exactly: `answer_query("ohms law")` answered "No
+calculator matched." while `search_calculators` ranked `ohms-law` first for the
+same string. A name made only of short words now has to appear in the question
+in full, matched at token boundaries so `output` does not answer for Tip Out --
+stricter than the four-character rule, not looser. Swept over all 22,837 tile
+names and curated alias phrases: three answers changed, all three from
+`NO_MATCH` to the right calculator, and nothing regressed.
+
 ## Run it
 
 ```sh
