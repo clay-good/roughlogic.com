@@ -1,0 +1,37 @@
+{
+  "_comment": "Free-text questions of the kind a tradesperson types, with bindings the query text itself rules out. scripts/measure-query-fill.mjs builds its corpus from each tile's worked example, so every number in it is labelled, in field order, with no distractors -- which is why it reports zero wrong values while these reproduce. Each row asserts what a number must NOT become, because that is what the query text settles on its own; which tile ought to answer is a separate question this fixture deliberately does not take a position on.",
+  "_updated": "2026-09-01",
+  "_schema": "rows[]: { query, tile, mustNotBind: { field: value }, why }",
+  "rows": [
+    {
+      "query": "wire size for a 50 amp circuit 90 feet away",
+      "tile": "wire-ampacity",
+      "mustNotBind": { "insulation_rating_C": "90" },
+      "why": "90 is the run length in feet. Binding it to the conductor's insulation temperature rating is wrong and plausible: 90 C is a real rating, so an agent has nothing to notice."
+    },
+    {
+      "query": "fall protection anchor for a 310 lb worker and 6 ft free fall",
+      "tile": "fall-arrest-anchorage",
+      "mustNotBind": { "workers_attached": "6" },
+      "why": "6 is the free-fall distance in feet. Bound to a headcount it sizes an anchorage for six workers."
+    },
+    {
+      "query": "control joints for a 20x30 slab 4 inches thick",
+      "tile": "control-joint-spacing",
+      "mustNotBind": { "slab_thickness_in": "20" },
+      "why": "20 is a plan dimension with no unit; the thickness is written with one, four inches, in the same sentence."
+    },
+    {
+      "query": "how many studs for a 40 ft wall 16 on center",
+      "tile": "assembly-r-value",
+      "mustNotBind": { "stud_depth_in": "480" },
+      "why": "480 inches is the 40 ft wall length converted into a stud-depth field. Feet and inches share a dimension; a wall and a stud do not share a meaning."
+    },
+    {
+      "query": "how many 4x8 sheets for a 24 by 40 floor",
+      "tile": "metal-deck-takeoff",
+      "mustNotBind": { "sheet_length_ft": "0.666666666667" },
+      "why": "Eight inches converted to feet, into a field for the length of a sheet. No sheet is 0.67 ft long."
+    }
+  ]
+}

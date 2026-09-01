@@ -125,6 +125,31 @@ stricter than the four-character rule, not looser. Swept over all 22,837 tile
 names and curated alias phrases: three answers changed, all three from
 `NO_MATCH` to the right calculator, and nothing regressed.
 
+### What the extractor is not measured on
+
+`scripts/measure-query-fill.mjs` reports **0 wrong values** across 1,763 tiles,
+and that is true of the corpus it measures: every number labelled, in field
+order, taken from each tile's own worked example. It carries no distractors, so
+it cannot see the case where a question holds more numbers than the tile has
+fields.
+
+Five of five hand-written trade questions do bind a value the query text rules
+out. `wire size for a 50 amp circuit 90 feet away` puts **90 into the
+conductor's insulation temperature rating**, where 90 C is a real value and an
+agent has nothing to notice. `how many studs for a 40 ft wall 16 on center`
+puts **480 inches into a stud-depth field**, the wall length converted. Every
+one has the same shape: a number carrying a unit is converted into a field of
+the same *dimension* but a different *meaning* -- feet and inches share a
+dimension, a wall and a stud do not share a meaning.
+
+`npm run audit:free-text-fill` measures it against
+`test/fixtures/free-text-queries.json`, and `test/unit/free-text-fill.test.js`
+pins the count both ways: it cannot rise, and it cannot fall without the
+constant being lowered to match, so the number always says what the door does.
+The extractor itself is untouched -- it is a tuned module whose history
+includes guards that cost more recoveries than they saved, so this measures the
+gap rather than gambling on closing it.
+
 ## Run it
 
 ```sh
