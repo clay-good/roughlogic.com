@@ -163,6 +163,15 @@ already pinned by `check-readme-counts`: "1,804 free calculators for
 the trades. Type the job the way you'd say it, and you get the number,
 the inputs, and the source."
 
+The SPA carried a second copy. `app.js` rewrites the description on every
+route change, and its `HOME_DESC` was still the literal `"Rough Logic"`,
+so the home route wrote it straight back over the corrected tag: right in
+the file a crawler reads, wrong on the page a person is looking at. Both
+now carry the same sentence, and `check-readme-counts` asserts the two
+strings are identical -- which also keeps the tile count inside the
+`app.js` copy honest, since the file copy is already pinned. Found by
+opening the built page in a browser rather than by reading either file.
+
 It happened because `check-shells` visits every generated shell and
 never visited `dist/index.html`. It could not run its full lint there --
 the home page is the SPA, so it carries executable script and no CSP

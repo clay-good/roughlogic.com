@@ -34,6 +34,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The home page still described itself as "Rough Logic" -- in the browser.** Earlier today the static `index.html` was corrected, and `check-shells` grew a home-head lint that reads `dist/index.html` and passed it. Opening the built page in a browser showed `og:description` and `twitter:description` carrying the real sentence and `<meta name="description">` reading `Rough Logic` again: `app.js` rewrites the description on every route change, and its `HOME_DESC` constant was still the old string, so the home route wrote it straight back over the tag.
+
+  Right in the file a crawler reads; wrong on the page a person is looking at. The gate could not tell, because it reads a file and not a running page -- which is the same shape as the defect it was written for, one surface watched and a second one not.
+
+  Both now carry the same sentence, and `check-readme-counts` asserts the two strings are **identical**, which also keeps the tile count inside the `app.js` copy honest since the file copy is already pinned. Seed-verified by putting the old string back. Home-view payload 47.0% of budget, up 0.2 points.
+
+  Found by opening the page, not by reading either file. The first browser reading said "Rough Logic" too and was wrong -- a cached `app.js`, the documented trap; the check had to be re-run on a fresh port before it meant anything.
+
 - **Two extractor experiments recorded as not taken, so the next attempt does not spend them again.** Both remaining free-text mis-bindings are now traced to a cause. `how many studs for a 40 ft wall 16 on center` puts 480 inches into a stud-depth field because `assembly-r-value` carries exactly one field with a unit, so the unit-agreement phase converts the wall length into it unopposed; `how many 4x8 sheets` sits inside the lumber bound, and a 4x8 is a plausible timber as well as a sheet.
 
   Requiring label support for a same-family conversion does not separate the stud case: the reader did write "studs", just about a different number.

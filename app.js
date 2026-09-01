@@ -367,7 +367,15 @@ function applyRoute() {
 // spec-v13 §5.5: SPA sets <title>, meta description, and
 // <link rel="canonical"> to match the per-tile shell at /tools/<id>/
 // when a tile opens; reverts to home values on return.
-const HOME_DESC = "Rough Logic";
+// The same sentence index.html carries in its <meta name="description">, and
+// the same one the page opens with. It has to be repeated here because the SPA
+// rewrites the description on every route change, so the home route wrote
+// "Rough Logic" straight back over the real one -- correct in the file a
+// crawler reads, wrong on the page a person is looking at. check-readme-counts
+// asserts the two strings are identical, which also keeps the count in this
+// one honest.
+const HOME_DESC =
+  "1,804 free calculators for the trades. Type the job the way you'd say it, and you get the number, the inputs, and the source.";
 const HOME_TITLE = "Rough Logic";
 // Production origin for the canonical link. The SPA must emit an ABSOLUTE
 // canonical (matching the prerendered /tools/<id>/ and /groups/<slug>/

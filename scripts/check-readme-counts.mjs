@@ -136,6 +136,39 @@ function checkPattern(readme, re, expected, label, errors) {
 // ...". Anchor on that stable label and assert the (comma-grouped) number
 // equals the live tile count, so a landing that forgets to bump the home
 // view fails the lint chain instead of silently advertising a stale figure.
+// The home page describes itself twice: once in index.html's <meta
+// name="description">, which is what a crawler and a link preview read, and
+// once in app.js's HOME_DESC, which the SPA writes over the top of it on every
+// home render. Both were the literal string "Rough Logic" until 2026-09-01.
+// Fixing only the file left the running page still saying it, and the gate
+// that watches the file could not tell -- it reads dist/index.html, not a
+// browser. So: assert the two are the same string. That also pins the tile
+// count inside the app.js copy, transitively, since the file copy is pinned
+// above.
+async function checkHomeDescription(errors) {
+  const html = await readFile(resolve(ROOT, "index.html"), "utf8");
+  const app = await readFile(resolve(ROOT, "app.js"), "utf8");
+  const meta = /<meta\s+name="description"\s+content="([^"]*)"/.exec(html);
+  const home = /const HOME_DESC\s*=\s*\n?\s*"((?:[^"\\]|\\.)*)"/.exec(app);
+  if (!meta) {
+    errors.push('index.html: no <meta name="description"> to compare against app.js HOME_DESC.');
+    return 0;
+  }
+  if (!home) {
+    errors.push("app.js: could not read HOME_DESC. Did the declaration change shape?");
+    return 0;
+  }
+  const fromFile = meta[1].replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, "&");
+  const fromApp = home[1].replace(/\\"/g, '"');
+  if (fromFile !== fromApp) {
+    errors.push(
+      "app.js HOME_DESC and index.html's meta description differ. The SPA writes HOME_DESC over " +
+      "the meta tag on every home render, so a reader sees the app.js one and a crawler sees the " +
+      "file one.\n    file: " + JSON.stringify(fromFile) + "\n    app.js: " + JSON.stringify(fromApp));
+  }
+  return 1;
+}
+
 async function checkIndexHtml(expectedTiles, errors) {
   const html = await readFile(resolve(ROOT, "index.html"), "utf8");
   const re = /([\d,]+) free calculators for/g;
@@ -223,6 +256,7 @@ async function main() {
   let checked = 0;
 
   checked += await checkIndexHtml(live.tiles, errors);
+  checked += await checkHomeDescription(errors);
   checked += await checkReadmeExample(readme, errors);
 
   // AGENTS.md (spec-v1194) states the catalog size for agents landing in the
