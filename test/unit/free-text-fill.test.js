@@ -34,7 +34,14 @@ import { measureFreeTextFill } from "../../scripts/measure-free-text-fill.mjs";
 //        into Workers attached, a count. It now fills Free fall distance, and
 //        the 310 lands in Anchorage capacity, which it never used to reach:
 //        catalog-wide recovery rose 4,154 -> 4,349 of 7,184 fields.
-const CEILING = 3;
+//   2 -- 2026-09-01, after the nominal-lumber rewrite stopped reading every
+//        AxB in the language as a stick of wood. `20x30 slab 4 inches thick`
+//        had become "nominal width 20 in nominal depth 30 in slab 4 inches
+//        thick", which handed the 20 an inch the reader never wrote -- and an
+//        invented inch beats a real one, so the 20 took Slab thickness and the
+//        four inches went unused. Bounded to 12, the largest nominal
+//        dimension lumber is sold in.
+const CEILING = 2;
 
 test("free-text extraction does not get worse", async () => {
   const { rows, violations } = await measureFreeTextFill();
@@ -137,4 +144,30 @@ test("a field with no unit still takes a number with no unit", async () => {
   const out = queryFill("bedrooms 4 length 200 ft", rows, { name: "Septic Tank" }).filled;
   assert.equal(out.bedrooms, "4", `bedrooms is ${out.bedrooms}`);
   assert.equal(out.length_ft, "200", `length_ft is ${out.length_ft}`);
+});
+
+test("an AxB larger than lumber is left alone", async () => {
+  // A slab, a room and a floor are written in feet; only the lumber is in
+  // inches. Reading "20x30" as nominal lumber invented an inch and cost the
+  // reader the four inches they actually wrote.
+  const { rewriteQuery } = await import("../../query-fill.js");
+  const untouched = new Set();
+  for (const q of ["a 20x30 slab", "12x14 room", "24x40 floor"]) {
+    assert.equal(rewriteQuery(q, untouched, untouched), q, `${q} was rewritten as lumber`);
+  }
+});
+
+test("nominal lumber is still rewritten", async () => {
+  // The rule exists for these and they must keep working: the tiles that care
+  // about nominal-versus-actual ask for the nominal size and convert it
+  // themselves.
+  const { rewriteQuery } = await import("../../query-fill.js");
+  const untouched = new Set();
+  for (const [q, want] of [
+    ["a 2x6 wall", "a nominal width 2 in nominal depth 6 in wall"],
+    ["a 2x10 joist", "a nominal width 2 in nominal depth 10 in joist"],
+    ["4x4 post", "nominal width 4 in nominal depth 4 in post"],
+  ]) {
+    assert.equal(rewriteQuery(q, untouched, untouched), want);
+  }
 });

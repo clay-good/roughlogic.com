@@ -147,7 +147,16 @@ dimension, a wall and a stud do not share a meaning.
 pins the count both ways: it cannot rise, and it cannot fall without the
 constant being lowered to match, so the number always says what the door does.
 
-**Five to three.** Two of the five are fixed.
+**Five to two.** Three of the five are fixed.
+
+The nominal-lumber rewrite read every `AxB` in the language as a stick of
+wood. `20x30 slab 4 inches thick` became "nominal width 20 in nominal depth 30
+in slab 4 inches thick", which handed the 20 an inch the reader never wrote --
+and an invented inch beats a real one, so the 20 took Slab thickness and the
+four inches went unused. The rewrite is now bounded to 12, the largest nominal
+dimension lumber is sold in: a slab, a room and a floor are written in feet,
+and only the lumber is in inches. `2x6`, `2x10` and `4x4` still rewrite;
+catalog-wide recovery is unchanged.
 
 A name beside a number is evidence; a unit *on* the number is stronger, and
 the name-then-value phase weighed only the first. `310 lb worker and 6 ft free
@@ -175,7 +184,7 @@ narrowing it to the unit would have broken `pipe-volume`, whose size dropdown
 declares no unit in its label at all. Recovery across all 1,763 tiles is
 unchanged by that one.
 
-The three that remain are not fixed. Each reaches a different phase, and the
+The two that remain are not fixed. Each reaches a different phase, and the
 first attempt at a general guard -- requiring label support for a same-family
 conversion in the unit-agreement fallback -- moved neither number and was
 reverted rather than shipped.

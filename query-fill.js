@@ -90,7 +90,18 @@ const REWRITES = [
   [/(-?\d+(?:\.\d+)?)\s*(?:°|deg(?:rees)?)\s*f\b/g, (m, n) => `${n} degf`],
   // Nominal lumber. Not converted to actual dimensions -- the tiles that care
   // about the difference ask for the nominal size and do that themselves.
-  [/\b(\d+)\s*x\s*(\d+)\b/g, (m, w, d) => `nominal width ${w} in nominal depth ${d} in`],
+  //
+  // Bounded to 12, because nominal lumber is not sold larger and the pattern
+  // was reading every AxB in the language as a stick of wood. `20x30 slab 4
+  // inches thick` became "nominal width 20 in nominal depth 30 in slab 4
+  // inches thick", which handed the 20 a unit of inches the reader never
+  // wrote -- and an invented inch then beats a real one, so the 20 took the
+  // Slab thickness field and the reader's four inches went unused. A slab, a
+  // room and a floor are written in feet; only the lumber is in inches.
+  [/\b(\d+)\s*x\s*(\d+)\b/g, (m, w, d) =>
+    (Number(w) <= NOMINAL_LUMBER_MAX_IN && Number(d) <= NOMINAL_LUMBER_MAX_IN
+      ? `nominal width ${w} in nominal depth ${d} in`
+      : m)],
 ];
 
 // "6", "1/2", and "6 1/2" all have to come back as a number.
@@ -107,6 +118,10 @@ function frac(s) {
 // and nothing in the string says which. It is left ALONE by the rewrites and
 // vetoed at fill time unless the tile's own fields disambiguate it, because a
 // misread pitch is a wrong rafter length.
+// The largest nominal dimension US lumber is sold in. A 2x12 is a joist; a
+// 20x30 is a slab, and reading it as a stick of wood invents an inch.
+const NOMINAL_LUMBER_MAX_IN = 12;
+
 const AMBIGUOUS_PAIR = /\b\d+\s*\/\s*\d+\b/;
 
 // Words that put a query in a temperature context, licensing the bare-letter

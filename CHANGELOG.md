@@ -34,6 +34,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Every `AxB` in the language was read as a stick of lumber.** `20x30 slab 4 inches thick` became "nominal width 20 in nominal depth 30 in slab 4 inches thick" before anything looked at it. That handed the 20 a unit of inches the reader never wrote -- and an invented inch beats a real one, so the 20 took the Slab thickness field and the four inches the reader did write went unused. `12x14 room` and `24x40 floor` got the same treatment.
+
+  The rewrite is now bounded to **12**, the largest nominal dimension US lumber is sold in. A slab, a room and a floor are written in feet; only the lumber is in inches. `2x6`, `2x10` and `4x4` still rewrite, and the tiles that care about nominal-versus-actual still get the nominal size they ask for.
+
+  Free-text wrong bindings **3 -> 2**; catalog-wide recovery **unchanged** at 4,349 / 7,184 fields, `check-both-doors`, `door-parity` and the ranking harness unchanged. Seed-verified by unbounding the constant, which reddens three assertions. Both halves pinned: the lumber forms that must still rewrite, and the slab, room and floor forms that must not.
+
+  This is the second of the three remaining mis-bindings traced to its cause rather than guessed at. The two left are a same-family conversion putting a 40 ft wall into a stud-depth field as 480 in, and `4x8 sheets`, which is inside the lumber bound and needs the word beside it to tell a sheet from a timber.
+
 - **A distance in feet filled a headcount, and fixing it recovered 195 more fields catalog-wide.** `fall protection anchor for a 310 lb worker and 6 ft free fall` put the 6 into Workers attached -- a count -- because the word "worker" sat in front of it, on a tile that carries a Free fall distance measured in feet. A name beside a number is evidence; a unit **on** the number is stronger, and the name-then-value phase weighed only the first.
 
   A unit-bearing quantity may no longer name a field that declares no unit while some other unfilled field is measured in a unit it fits. Narrow on purpose: a unitless field still wins a unitless number, and still wins when nothing else on the tile could hold this one.
