@@ -35,6 +35,22 @@ Threat: A compromised dependency injects malicious code into the shipped bundle.
 Controls:
 - Zero runtime dependencies. The site is plain HTML, CSS, and vanilla JavaScript.
 - Build-time tooling is minimal Node built-ins where possible.
+- **The build fetches nothing.** No script that runs in `npm run build`,
+  `npm run lint`, or `npm run data:refresh` contacts a host off the machine.
+  Every value in `data/` -- NIST constants, NOAA design temperatures, the
+  NCEI WMM coefficients, FHFA loan limits, HUD fair-market rents, published
+  bulletin tables -- is transcribed into an in-tree constant by a maintainer
+  and reviewed in a diff, and `scripts/build-data.mjs` emits the shards
+  deterministically from those constants. A constant in the repository is
+  auditable in a pull request forever; a value pulled from a URL during a
+  build is whatever that URL served that morning, with no record of what it
+  said the morning before. `scripts/check-build-hermetic.mjs` fails on any
+  undeclared network call in `scripts/` or `mcp/`; the one declared call is
+  the opt-in free-access URL probe, which is outside the build and the lint
+  chain. Until 2026-09-01 the README claimed the opposite -- that the data
+  shards were refreshed *from* those publishers at build time -- against a
+  pipeline with no network call in it, and nothing watched either the claim
+  or the property.
 - Data shards are committed to the repository and reviewed in pull requests.
 - A startup integrity check (integrity.js) loads data/integrity.json and verifies SHA-256 of each per-folder manifest.json via SubtleCrypto. All 19 data folders are anchored there.
 - Each shard is then verified against the hash its own manifest records, by `verifyShard(folder, file, text)` in integrity.js, at every runtime fetch: the WMM coefficients, the historical commodity series, the real-estate loan-limit and FMR shards, the search alias / slot / preview shards, and the field-descriptor shards. Either failure produces a console error and a non-blocking banner naming the affected file, so a tampered shard is visible to the user before any calculation depends on it.

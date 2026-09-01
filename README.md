@@ -71,7 +71,7 @@ One calculator is one formula on one screen. (In the source and the gate names b
 
 ## Why you can trust the answers
 
-The hard part of a calculator catalog is not the arithmetic. It is proving, at scale, that every tile stays correct as the catalog grows. That is a build problem here: `npm run lint` runs 52 static gates before a change can land.
+The hard part of a calculator catalog is not the arithmetic. It is proving, at scale, that every tile stays correct as the catalog grows. That is a build problem here: `npm run lint` runs 53 static gates before a change can land.
 
 | Gate | What it guarantees |
 |---|---|
@@ -86,6 +86,7 @@ The hard part of a calculator catalog is not the arithmetic. It is proving, at s
 | `check-tile-contract` | every tile is registered, crash-free, and matches its declared I/O shape |
 | `check-shell-mobile` | zero horizontal scroll on every page at 320 px and 200% text zoom |
 | `check-feedback-loop` | every current and future calculator retains the shared defensive D1 reporting path |
+| `check-build-hermetic` | the build fetches nothing; every value in `data/` is an in-tree constant, reviewable in a diff |
 | `check-notice-variants` | the notice naming who governs each answer matches what `docs/notice-variants.md` says it is |
 
 CI adds three jobs per push: `test` (lint + unit tests + data-integrity verification), then `accessibility` (the axe-core sweep over every SPA route, plus the shell sweep that covers each static page shape) and `integration` (the rest of the Playwright suite, plus the built-shell gates) in parallel. The two split the suite by title rather than both running it, so the 1,875-test axe pass executes once per push, not twice; `npm run test:e2e` still runs everything locally. A fourth Lighthouse job was removed on 2026-08-23 over an unpatched advisory in `@lhci/cli`; see [docs/performance.md](docs/performance.md) for what gates performance in its place. At runtime, `integrity.js` re-verifies the SHA-256 of every data manifest against `data/integrity.json`, and each shard against the hash its own manifest records, before the data reaches a calculation; the read-only posture means the worst case is a visible warning, never silent corruption.
@@ -96,7 +97,7 @@ Calculator execution is a client-side, offline-first static site with no account
 
 The browser loads `index.html` + `styles.css` + `app.js` (router, search, theme, URL-hash state), which dynamic-imports one of 57 per-group calculator modules (`calc-*.js`) on first open, which reads the sharded JSON in `data/`. A service worker (`sw.js`) caches the shell and data shards keyed to the build hash, so the site works offline after the first load. The 1,826 static shells are not precached -- that is not a precache -- so a shell URL opened offline redirects to the app at the root, carrying the tile as the hash, which is why a bookmarked `/tools/ohms-law/` opens Ohm's Law rather than a page whose relative stylesheet 404s.
 
-At build time only (never in production), `build-data.mjs` refreshes the integrity-hashed data shards from NIST, NOAA, NCEI WMM, FHFA, HUD, and published bulletins, and `build-shells.mjs` emits one zero-JS crawlable static shell per tile (1804) and per group, the catalog hub, the not-found page Cloudflare Pages serves for every unmatched path, plus a sitemap that carries 1827 URLs, each dated from a committed content-hash ledger rather than the build clock, so a page that has not changed does not claim it has.
+At build time only (never in production), `build-data.mjs` emits the integrity-hashed data shards. It fetches nothing: every value it writes -- NIST constants, NOAA design temperatures, the NCEI WMM coefficients, FHFA loan limits, HUD fair-market rents, published bulletin tables -- is transcribed into an in-tree constant by a maintainer and reviewed in a diff, so what the build produces is a deterministic function of the repository and of nothing else. `check-build-hermetic` fails on any undeclared network call in the build or the lint chain. And `build-shells.mjs` emits one zero-JS crawlable static shell per tile (1804) and per group, the catalog hub, the not-found page Cloudflare Pages serves for every unmatched path, plus a sitemap that carries 1827 URLs, each dated from a committed content-hash ledger rather than the build clock, so a page that has not changed does not claim it has.
 
 The home payload gzips to well under the 100 KB budget. Opening a calculator dynamic-imports only that trade's module and only the data shards it needs. See [docs/architecture.md](docs/architecture.md) and [docs/seo.md](docs/seo.md).
 
@@ -106,7 +107,7 @@ The home payload gzips to well under the 100 KB budget. Opening a calculator dyn
 npm ci             # exact locked dev tooling; the site has zero runtime deps
 npm run dev        # build, then serve only dist/ on loopback
 npm run build      # emit dist/ (SPA + static shells + sitemap)
-npm run lint       # the full static-gate chain (52 checks)
+npm run lint       # the full static-gate chain (53 checks)
 npm test           # unit tests (node --test)
 npm run test:e2e   # Playwright integration suite (needs a browser)
 ```

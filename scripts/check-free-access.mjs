@@ -85,6 +85,10 @@ async function request(url, method) {
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), 15000);
   try {
+    // NETWORK: this gate's whole job is to ask a publisher's server whether the
+    // free-access URL a tile cites still answers 200. It is opt-in
+    // (`npm run check:free-access`) and deliberately outside `npm run lint` and
+    // the build, so nothing that produces dist/ depends on it.
     const r = await fetch(url, { method, redirect: "follow", signal: controller.signal, headers: UA });
     return { r, aborted: false };
   } catch (e) {
