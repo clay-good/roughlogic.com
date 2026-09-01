@@ -408,6 +408,18 @@ export function queryFill(query, rows, opts) {
       }
       if (!matched) continue;
       if (valueFor(qty, row, text) === null) continue;   // unit disagreement
+      // A name beside the number is evidence; a unit ON the number is stronger,
+      // and this phase weighed only the first. "310 lb worker and 6 ft free
+      // fall" put the 6 into Workers attached -- a count -- because "worker"
+      // sat in front of it, on a tile carrying a Free fall distance in feet.
+      // So a unit-bearing quantity may not name a unitless field while some
+      // other unfilled field is measured in a unit it fits. Narrow on purpose:
+      // a unitless field still wins a unitless number, and still wins when
+      // nothing else could hold this one.
+      if (!rowUnit(row)) {
+        const qtyUnit = canonicalUnit(rawUnitOf(qty, text));
+        if (qtyUnit && rows.some((r) => !(r.d in filled) && rowUnit(r) && unitsCompatible(qtyUnit, rowUnit(r)))) continue;
+      }
       hits.push(row.d);
     }
     if (!hits.length) return;

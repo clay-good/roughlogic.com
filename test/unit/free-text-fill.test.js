@@ -28,7 +28,13 @@ import { measureFreeTextFill } from "../../scripts/measure-free-text-fill.mjs";
 //        quantity whose dimension the tile measures nowhere. That is the
 //        `wire size for a 50 amp circuit 90 feet away` case, which put 90 into
 //        an insulation rating whose options are 60 / 75 / 90.
-const CEILING = 4;
+//   3 -- 2026-09-01, after Phase A stopped letting a field with no unit take a
+//        number that carries one while a field measured in that unit sat
+//        unfilled beside it. `310 lb worker and 6 ft free fall` had put the 6
+//        into Workers attached, a count. It now fills Free fall distance, and
+//        the 310 lands in Anchorage capacity, which it never used to reach:
+//        catalog-wide recovery rose 4,154 -> 4,349 of 7,184 fields.
+const CEILING = 3;
 
 test("free-text extraction does not get worse", async () => {
   const { rows, violations } = await measureFreeTextFill();
@@ -86,4 +92,49 @@ test("the case Phase B0 exists for still fills", async () => {
     const filled = (r && r.inputs) || {};
     assert.ok(filled.nominal_size, `"${q}" left the size dropdown unfilled`);
   }
+});
+
+test("a unit on the number beats a name beside it", async () => {
+  // "310 lb worker and 6 ft free fall" put the 6 into Workers attached, a
+  // count, because "worker" sat in front of it -- while the same tile carries
+  // a Free fall distance measured in feet, which is what the reader wrote.
+  // Phase A weighed the adjacent word and never the number's own unit.
+  const { queryFill } = await import("../../query-fill.js");
+  const rows = [
+    { d: "workers_attached", l: "Workers attached to this anchorage", k: "number", r: 1 },
+    { d: "free_fall_ft", l: "Free fall distance", u: "ft", k: "number" },
+    { d: "anchorage_capacity_lb", l: "Anchorage capacity", u: "lb", k: "number" },
+  ];
+  const out = queryFill("fall protection anchor for a 310 lb worker and 6 ft free fall", rows, {
+    name: "Fall Arrest Anchorage",
+  }).filled;
+  assert.ok(!("workers_attached" in out), `bound workers_attached=${out.workers_attached} from a distance in feet`);
+  assert.equal(out.free_fall_ft, "6", `free_fall_ft is ${out.free_fall_ft}`);
+  assert.equal(out.anchorage_capacity_lb, "310", `anchorage_capacity_lb is ${out.anchorage_capacity_lb}`);
+});
+
+test("through the live tile the wrong value is gone, not replaced", async () => {
+  // The live fall-arrest-anchorage carries TWO fields in feet and THREE in
+  // pounds, so once the word "worker" stops handing the 6 to a count, no
+  // single field can claim either number and the extractor refuses -- which is
+  // this module's governing rule, that a wrong prefill is worse than none.
+  // The agent gets NO_MATCH where it used to get a pointer carrying a wrong
+  // value. Recorded here rather than left as a surprise.
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  const r = await answerQuery({ query: "fall protection anchor for a 310 lb worker and 6 ft free fall" });
+  assert.ok(!(r.inputs && "workers_attached" in r.inputs), "still binds a distance to a headcount");
+});
+
+test("a field with no unit still takes a number with no unit", async () => {
+  // The guard is narrow on purpose: it fires only when the number carries a
+  // unit AND another unfilled field is measured in it. A plain count still
+  // fills from a plain number beside its name.
+  const { queryFill } = await import("../../query-fill.js");
+  const rows = [
+    { d: "bedrooms", l: "Bedrooms", k: "number", r: 1 },
+    { d: "length_ft", l: "Length (ft)", u: "ft", k: "number" },
+  ];
+  const out = queryFill("bedrooms 4 length 200 ft", rows, { name: "Septic Tank" }).filled;
+  assert.equal(out.bedrooms, "4", `bedrooms is ${out.bedrooms}`);
+  assert.equal(out.length_ft, "200", `length_ft is ${out.length_ft}`);
 });

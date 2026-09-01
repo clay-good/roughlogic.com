@@ -147,7 +147,23 @@ dimension, a wall and a stud do not share a meaning.
 pins the count both ways: it cannot rise, and it cannot fall without the
 constant being lowered to match, so the number always says what the door does.
 
-**Five to four.** The insulation-rating case is fixed. A unit-bearing number
+**Five to three.** Two of the five are fixed.
+
+A name beside a number is evidence; a unit *on* the number is stronger, and
+the name-then-value phase weighed only the first. `310 lb worker and 6 ft free
+fall` put the 6 into Workers attached -- a count -- because "worker" sat in
+front of it, on a tile carrying a Free fall distance measured in feet. A
+unit-bearing quantity may no longer name a unitless field while some other
+unfilled field is measured in a unit it fits. Catalog-wide recovery **rose**,
+4,154 -> 4,349 of 7,184 fields, because a number that used to be captured by
+the wrong field now reaches the right one and leaves the count free for the
+number that belongs to it. On that particular tile -- two fields in feet,
+three in pounds -- neither number can be placed unambiguously once the wrong
+binding is gone, so the door now answers `NO_MATCH` where it used to hand back
+a pointer carrying a wrong value. That is this module's governing rule
+working, not an accident: a wrong prefill is worse than no prefill.
+
+And the insulation-rating case is fixed. A unit-bearing number
 may fill a numeric dropdown -- a bare one may not, since the unit is the
 corroboration -- but the phase never asked *which* unit, so any unit at all
 let a value through that matched an option. It now also requires the tile to
@@ -157,9 +173,9 @@ was written for keeps filling, while `wire-ampacity` measures amps, degrees
 and counts and has no home for a distance. Same dimension, not same unit --
 narrowing it to the unit would have broken `pipe-volume`, whose size dropdown
 declares no unit in its label at all. Recovery across all 1,763 tiles is
-unchanged at 4,154 / 7,184 fields.
+unchanged by that one.
 
-The four that remain are not fixed. Each reaches a different phase, and the
+The three that remain are not fixed. Each reaches a different phase, and the
 first attempt at a general guard -- requiring label support for a same-family
 conversion in the unit-agreement fallback -- moved neither number and was
 reverted rather than shipped.

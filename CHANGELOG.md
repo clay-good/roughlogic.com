@@ -34,6 +34,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A distance in feet filled a headcount, and fixing it recovered 195 more fields catalog-wide.** `fall protection anchor for a 310 lb worker and 6 ft free fall` put the 6 into Workers attached -- a count -- because the word "worker" sat in front of it, on a tile that carries a Free fall distance measured in feet. A name beside a number is evidence; a unit **on** the number is stronger, and the name-then-value phase weighed only the first.
+
+  A unit-bearing quantity may no longer name a field that declares no unit while some other unfilled field is measured in a unit it fits. Narrow on purpose: a unitless field still wins a unitless number, and still wins when nothing else on the tile could hold this one.
+
+  Free-text wrong bindings **4 -> 3**, and catalog-wide recovery **rose** from **4,154 to 4,349 of 7,184 fields** (57.8% -> 60.5%); tiles recovering nothing fell from 171 to 152. That is the same mechanism read forwards: a number captured by the wrong field now reaches the right one, and leaves the count free for the number that belongs to it. `check-both-doors`, `door-parity` and the ranking harness are unchanged, and the recovery harness still reports 0 wrong.
+
+  Worth stating plainly: on that particular tile -- two fields in feet, three in pounds -- neither number can be placed unambiguously once the wrong binding is gone, so `answer_query` now returns `NO_MATCH` where it used to hand back a pointer carrying a wrong value. That is this module's governing rule working rather than an accident, and it is pinned as such: a wrong prefill is worse than no prefill.
+
+  `query-fill.js` went 69 B over its 12,000 B gzip cap. Tightening the comment did not recover it, and stripping the reasoning to save 69 bytes is the wrong trade in a file whose cap history says four times over that "the argument for WHY the rule fires where it does is the part worth keeping". Cap raised to 13,000 with that note, matching `search-discovery.js`; the module is lazy-loaded on first search interaction and absent from the home-view payload, which is unchanged at 46.8%. **`check:module-sizes` caught it locally** -- it only reached the audit chain earlier today, and this is the first thing it stopped.
+
 - **"wire size for a 50 amp circuit 90 feet away" put 90 into the conductor's insulation temperature rating.** Its options are 60 / 75 / 90, so the value matched one; 90 C is a real rating, so nothing downstream looked wrong. The phase that did it lets a unit-bearing number fill a numeric dropdown -- a bare number may not, since the unit is what corroborates that the number means anything -- but it never asked **which** unit. Any unit at all was enough.
 
   It now also requires the tile to measure something in that dimension. `pipe-volume` has a Length in feet, so a pipe size in inches is a length among lengths and the case this phase was written for keeps filling -- before it existed, `pipe volume 4 in 50 ft` answered 2.24 gal for a 1-inch pipe and said nothing about having dropped the 4. `wire-ampacity` measures amps, degrees and counts, and has no home for a distance.
