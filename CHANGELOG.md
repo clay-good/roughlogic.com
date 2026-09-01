@@ -34,6 +34,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Two extractor experiments recorded as not taken, so the next attempt does not spend them again.** Both remaining free-text mis-bindings are now traced to a cause. `how many studs for a 40 ft wall 16 on center` puts 480 inches into a stud-depth field because `assembly-r-value` carries exactly one field with a unit, so the unit-agreement phase converts the wall length into it unopposed; `how many 4x8 sheets` sits inside the lumber bound, and a 4x8 is a plausible timber as well as a sheet.
+
+  Requiring label support for a same-family conversion does not separate the stud case: the reader did write "studs", just about a different number.
+
+  Dropping same-family conversion altogether takes the count from **2 to 1** and leaves `measure-query-fill` **completely unchanged** at 4,349 / 7,184 fields, 0 wrong. That reads as a free win and it is not. The recovery corpus is built from worked examples, so every number in it carries the field's *own* unit and no same-family conversion is ever exercised -- the harness structurally cannot see what removing it would cost, which is a reader writing 3 ft into a field measured in inches. Refusing that is a real capability loss neither harness measures, so the change is **not made**, and the reason is written into the fixture rather than left for someone to rediscover as an apparently costless improvement.
+
+  This is the same trap as the earlier `WRONG values 0` reading, in the opposite direction: a number that means less than it appears to.
+
 - **Every `AxB` in the language was read as a stick of lumber.** `20x30 slab 4 inches thick` became "nominal width 20 in nominal depth 30 in slab 4 inches thick" before anything looked at it. That handed the 20 a unit of inches the reader never wrote -- and an invented inch beats a real one, so the 20 took the Slab thickness field and the four inches the reader did write went unused. `12x14 room` and `24x40 floor` got the same treatment.
 
   The rewrite is now bounded to **12**, the largest nominal dimension US lumber is sold in. A slab, a room and a floor are written in feet; only the lumber is in inches. `2x6`, `2x10` and `4x4` still rewrite, and the tiles that care about nominal-versus-actual still get the nominal size they ask for.

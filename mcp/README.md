@@ -184,10 +184,22 @@ narrowing it to the unit would have broken `pipe-volume`, whose size dropdown
 declares no unit in its label at all. Recovery across all 1,763 tiles is
 unchanged by that one.
 
-The two that remain are not fixed. Each reaches a different phase, and the
-first attempt at a general guard -- requiring label support for a same-family
-conversion in the unit-agreement fallback -- moved neither number and was
-reverted rather than shipped.
+The two that remain are not fixed, and both are traced rather than mysterious.
+`how many studs for a 40 ft wall 16 on center` puts 480 inches into a
+stud-depth field: `assembly-r-value` carries exactly one field with a unit, so
+the unit-agreement phase converts the wall length into it unopposed. `how many
+4x8 sheets` sits inside the lumber bound, and a 4x8 is a plausible timber as
+well as a sheet, so separating them needs the word beside the number.
+
+Two attempts are on record as **not taken**, so the next one does not spend
+them again. Requiring label support for a same-family conversion does not
+separate the stud case -- the reader did write "studs", just about a different
+number. Dropping same-family conversion altogether takes the count from 2 to 1
+and leaves the recovery harness completely unchanged, which reads as free and
+is not: that harness is built from worked examples, so every number in it
+carries the field's own unit and no conversion is ever exercised. It cannot see
+what removing it would cost, which is a reader writing 3 ft into a field
+measured in inches.
 
 ## Run it
 

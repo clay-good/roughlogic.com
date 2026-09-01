@@ -2,6 +2,7 @@
   "_comment": "Free-text questions of the kind a tradesperson types, with bindings the query text itself rules out. scripts/measure-query-fill.mjs builds its corpus from each tile's worked example, so every number in it is labelled, in field order, with no distractors -- which is why it reports zero wrong values while these reproduce. Each row asserts what a number must NOT become, because that is what the query text settles on its own; which tile ought to answer is a separate question this fixture deliberately does not take a position on.",
   "_updated": "2026-09-01",
   "_schema": "rows[]: { query, tile, mustNotBind: { field: value }, why }",
+  "_experiment_not_taken": "Dropping the same-family unit conversion in the unit-agreement phase (fill only on an EXACT unit match) takes the wrong bindings below from 2 to 1 and leaves measure-query-fill.mjs completely unchanged: 4,349 / 7,184 fields, 0 wrong. That reads as free, and it is not. The recovery corpus is built from worked examples, so every number in it carries the field's OWN unit and no same-family conversion is ever exercised -- the harness cannot see what removing it would cost, which is a reader writing 3 ft into a field measured in inches. Refusing that is a real capability loss neither harness measures. Recorded so the next attempt does not spend the experiment again, and does not mistake an unmeasured cost for no cost.",
   "rows": [
     {
       "query": "wire size for a 50 amp circuit 90 feet away",
