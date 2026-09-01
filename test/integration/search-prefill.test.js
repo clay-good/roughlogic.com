@@ -199,8 +199,11 @@ test("spec-v1342 ask card: asks for the missing value, naming its unit", async (
   await input.click();
   await input.fill(ASK_QUERY);
   await ranked;
+  // The 30 s budget the rest of this file uses for anything gated on a lazy
+  // shard: `ranked` resolving means the response landed, not that the ranker
+  // has re-run and repainted, and on a loaded runner those are seconds apart.
   await expect(page.locator("#search-results .search-result").first().locator(".sr-name"))
-    .toHaveText("Asphalt Tonnage");
+    .toHaveText("Asphalt Tonnage", { timeout: 30_000 });
   await input.press("Enter");
 
   const card = page.locator(".ask-card");
@@ -254,9 +257,9 @@ test("spec-v1342 ask card: it is a shortcut, never a gate", async ({ page }) => 
   await input.fill(ASK_QUERY);
   await ranked;
   await expect(page.locator("#search-results .search-result").first().locator(".sr-name"))
-    .toHaveText("Asphalt Tonnage");
+    .toHaveText("Asphalt Tonnage", { timeout: 30_000 });
   await input.press("Enter");
-  await expect(page.locator(".ask-card")).toBeVisible();
+  await expect(page.locator(".ask-card")).toBeVisible({ timeout: 30_000 });
 
   await page.locator("#density_pcf").fill("150");
   await expect(page.locator(".ask-card")).toHaveCount(0);
@@ -553,10 +556,21 @@ test("spec-v590: a failed alias fetch is retried on the next keystroke", async (
 
   // Let the shards through and type one more character: the latch must have
   // been released, so the aliases load and the ranking corrects itself.
+  //
+  // The correction waits on a NETWORK fetch of a shard this spec deliberately
+  // aborted once, in a context with the service worker blocked so every other
+  // shard is fetched cold too. On 2026-09-01 that ran past the 5 s default
+  // expect timeout on a loaded CI runner and failed all three attempts, which
+  // reads exactly like a race but was the clock -- the same diagnosis the
+  // preview-map spec below already carries. Wait for the shard, the way that
+  // spec does, rather than widening the budget and hoping; the waiter is
+  // registered BEFORE the keystroke that triggers the fetch.
   failNext = false;
+  const reranked = awaitSearchData(page, "aliases-e.json");
   await input.press("End");
   await input.type(" ");
-  await expect(top).toHaveText("Asphalt Tonnage");
+  await reranked;
+  await expect(top).toHaveText("Asphalt Tonnage", { timeout: 30_000 });
   await context.close();
 });
 
