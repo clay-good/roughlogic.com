@@ -69,8 +69,17 @@ async function liveCounts() {
   const citationStrings = JSON.parse(
     await readFile(resolve(ROOT, "docs", "citation-strings.generated.json"), "utf8"),
   )._row_count;
+  // The launch checklist's "Current state" section is the only part of that
+  // file kept live; every section above it is a frozen snapshot. Its suite
+  // counts are the files themselves, so read them rather than trusting a
+  // number someone typed once -- which is exactly how the v0.14 section came
+  // to report 385 tiles and 24 calc modules four months after both moved.
+  const unitSuites = (await readdir(resolve(ROOT, "test", "unit")))
+    .filter((f) => f.endsWith(".test.js")).length;
+  const integrationSpecs = (await readdir(resolve(ROOT, "test", "integration")))
+    .filter((f) => f.endsWith(".test.js")).length;
   return {
-    citationStrings,
+    citationStrings, unitSuites, integrationSpecs,
     tiles, groups, modules, sitemap, gates,
     indexedTiles: indexed.size,
     schemaTiles: coverage.covered_count,
@@ -232,6 +241,17 @@ async function main() {
   checked += checkPattern(launch, /\*\*(\d+) rows \/ \d+ tiles\*\*/g, live.citationStrings, "citation-strings row count (docs/launch-checklist.md)", errors);
   checked += checkPattern(launch, /holds \*\*(\d+) of \d+\*\* markdown rows/g, live.citationStrings, "citation-strings row count (docs/launch-checklist.md)", errors);
   checked += checkPattern(launch, /Citation alignment floor: (\d+) of \d+ markdown rows/g, live.citationStrings, "citation-strings row count (docs/launch-checklist.md)", errors);
+
+  // docs/launch-checklist.md "Current state": the one maintained section of a
+  // file whose every other section is a frozen snapshot. Anchored on "live
+  // <thing>" so the figures are asserted rather than remembered.
+  checked += checkPattern(launch, /\*\*([\d,]+) live tiles\*\*/g, live.tiles, "tile count (docs/launch-checklist.md)", errors);
+  checked += checkPattern(launch, /\*\*(\d+) live groups\*\*/g, live.groups, "group count (docs/launch-checklist.md)", errors);
+  checked += checkPattern(launch, /\*\*(\d+) live calc modules\*\*/g, live.modules, "calc-* module count (docs/launch-checklist.md)", errors);
+  checked += checkPattern(launch, /\*\*([\d,]+) live sitemap URLs\*\*/g, live.sitemap, "sitemap URL count (docs/launch-checklist.md)", errors);
+  checked += checkPattern(launch, /\*\*(\d+) live lint gates\*\*/g, live.gates, "lint gate count (docs/launch-checklist.md)", errors);
+  checked += checkPattern(launch, /\*\*(\d+) live unit suites\*\*/g, live.unitSuites, "unit suite count (docs/launch-checklist.md)", errors);
+  checked += checkPattern(launch, /\*\*(\d+) live integration specs\*\*/g, live.integrationSpecs, "integration spec count (docs/launch-checklist.md)", errors);
 
   const perf = await readFile(resolve(ROOT, "docs", "performance.md"), "utf8");
   checked += checkPattern(perf, /\((\d+) `calc-\*\.js` files/g, live.modules, "calc-* module count (docs/performance.md)", errors);

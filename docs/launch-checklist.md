@@ -7,11 +7,17 @@ Per spec.md section 14 step 22. This is the written report. Items are categorize
 > launch report (220 unit tests, 53 files / 290 KB dist, filter-button
 > rows). Subsequent sections capture the diff against the prior release:
 > v0.2.0 (spec-v2 platform additions), v0.9.0 (v5 expansion), v0.10
-> (platform hardening), v0.11 / v0.12 (Groups U / V / W / X / Y). When
-> numbers in earlier sections disagree with later sections, **the latest
-> per-release section is the current state**. The "Build numbers
-> (v0.12, refreshed YYYY-MM-DD)" block under v0.11 / v0.12 is the live
-> snapshot.
+> (platform hardening), v0.11 / v0.12 (Groups U / V / W / X / Y), v0.13
+> (spec-v13 discoverability), v0.14 (spec-v14 correctness). Those sections
+> are history and are **not** maintained; the figures in them were true on
+> the dates they name and are wrong now.
+>
+> **For the current state, read [Current state](#current-state) at the
+> bottom of this file.** It is the only section kept live, and its counts
+> are pinned by [../scripts/check-readme-counts.mjs](../scripts/check-readme-counts.mjs)
+> so they cannot rot the way the frozen sections did: the last of those,
+> v0.14, dated 2026-05-22, still reports 385 tiles and 24 calc modules
+> against a catalog that has since grown past four times that.
 
 ## Cross-browser rendering and operation
 
@@ -399,3 +405,54 @@ The `npm run audit` pre-PR gate reports all 6 stages OK against `main`. Standard
 Six v14 campaigns are complete as of 2026-05-22: Phase C (dimensional-analysis annotation, 658/658), Phase D (bounds-fuzzer coverage, 655/655), Phase E (numerical-stability pins on every spec-v14 §9.1 iterative method), Phase F (cross-tile invariants: §10.1 four-of-five shared-computation classes pinned at the bit / consumer level with the IRS-mileage row carrying a shard / JS-const bijection pin; §10.2 round-trip identities complete; §10.3 twenty-eight monotonicity sweeps across sixteen catalog groups), and Phase I §13.1 (per-tile derivation-index, 385/385 with the lint graduated to fail-on-missing). Phase G citation-to-formula round-trip scaffolding (the [scripts/check-citation-coverage.mjs](../scripts/check-citation-coverage.mjs) inverse-map lint) landed 2026-05-19 and stays in measurement mode pending the per-group reviewer pass; the 2026-05-22 source-pattern expansion (first pass: +17 new patterns -- OSHA, NIOSH, AWWA, EPA, USDA / USDA NRCS, HUD, FNMA / Fannie Mae, FHFA, CFPB, FRCP, AAFP, ACEP, ACVIM, AVMA, AAEP, AVECCT, NFPA 14 / NFPA 1981 / NFPA 70; second pass: +26 more patterns -- NEMA, IEEE numbered standards, ASME, SMACNA, ASTM, AASHTO, ACI, AISC, APA Engineered Wood, IMC, ICC-ES, CRC Handbook, wire/cable manufacturer datasheets, Bussmann/Eaton, Hydraulic Institute, WEF, NWS, ICAO, AOPA, NFPA 96 / 25 / 72 / 101 / 70E, ICC/IECC, CRSI, SAE, DOL, SSA, ACVECC, ASA Physical Status, APSP, NSPF, NDS, Joukowsky 1898; third pass: +25 more patterns -- ASHRAE Handbook generic, ASPE, PDI, CTI, ANSI, FEMA, CALFIRE, ICC 500, FCC, NFPA 1006 / 1670 / 1 / 11, refrigerant manufacturers DuPont / Honeywell / Chemours / Arkema / Solvay, equipment manufacturers Watts / Dow, AOAC, DOT, AREMA, NGS, OpenIntro / A&S, IUPAC, NREL, ENERGY STAR, DOE, AIA, USDA FGIS, ACVECC / AVECCT; fourth pass: +69 more patterns -- IRS Publication / Form / Schedule (with plural fix), 26 USC / IRC, 29 USC / FLSA, 23 / 24 / 29 / 49 CFR, FMVSS, ACCA Manual S, NFA / IFSTA / NFPA 1901 / 1965 fire-service training surface, AWS / Machinery's Handbook / BIA / NCMA / USG / GA-216 / ARMA / CAGI / NHLA / WWPA construction-trade surface, IICRC S520, ASHRAE 34 / 170, Incoterms, ABYC, NMFTA / NMFC, FAA AC, AIARE, ARCSA, ASABE, ADA / ICC A117.1, GSA Federal Travel Regulation, AACRAO, Marzano, readability formulas SMOG / Coleman-Liau / Flesch / Kincaid, medical-protocol surface ATLS / PALS / APLS / AARC / ABA-ABLS / Surviving Sepsis / Holliday-Segar / Merck Veterinary Manual / IDEXX / Antech / Abaxis / DiBartola / Wells / Apgar / Lund-Browder, landmark clinical studies Kothari / Kline / Allgower / Figge / Payne / Baxter / Vandromme / Mutschler, US Army Field Manual, Wayfair, refrigerated-trailer / trailer / belt / tooling / driveline / fire-apparatus / baseboard / HVAC equipment manufacturers, Dave Dodson Reading Smoke, Slant/Fin, generic ISO numbered standards, Fed. R. Civ. P. long form, per-state statutory code forms CA / NY / TX / AK / NV, landmark mathematical / statistical works Bessel / Cramer / Wald, US Census / SBA, Jeppesen / ASA Pilot's Manual, FAA Aeronautical Chart User's Guide, Feldman-Nelson / Senger vet reproduction, Steel Square / Audel's carpentry, plus the NOAA WMM pattern broadened to match the `WMM<year>` short form) plus an "untracked tiles" measurement step moves tracked-edge coverage from 117 -> 201 -> 280 -> 328 -> **478** tile-source edges across 29 -> 46 -> 72 -> 91 -> **160** tracked sources. Per-tile coverage: 42.3% -> 54.8% -> 63.9% -> **87.0%** (335 / 385 tiles; 50 untracked, all in the first-principles / classical geometry / engineering-practice / original-plain-English-summary category that has no specific publisher to track per spec-v14 §6.2).
 
 Phase H (per-group reviewer signoff) lands incrementally per the open-solicitations table in [docs/audit-trail.md](audit-trail.md); Phase B's per-row independent-published-source upgrade (gates 2 + 3 at "all rows verified against an independent published worked example") rides the same review pass. Phase F's residual work shrank in the 2026-05-22 closeout: the IRS-mileage per-consumer pins for Groups G / P / R landed (four new tests in [test/unit/cross-tile-invariants.test.js](../test/unit/cross-tile-invariants.test.js): the calc-cross scalar matches a STANDARD_MILEAGE_RATES business rate, computeMileageCost / computeTimesheet arithmetic identities, computeMileageRollup cross-consumer identity), closing the last of the five spec-v14 §10.1 shared-computation classes. The remaining Phase F residual is per-tile §10.3 monotonicity sweeps for any newly-landed monotonic compute function and per-consumer pins for any future Group J trucking owner-operator-expense tile that takes IRS_STANDARD_MILEAGE_RATE as a default. The phase order is fixed per spec-v14 §16.1; the per-phase artifact list is in [docs/correctness.md](correctness.md).
+
+## Current state
+
+Refreshed 2026-09-01 at v0.401.1. Unlike every section above, this one is
+maintained: the counts are label-anchored and asserted against the live
+artefacts by [../scripts/check-readme-counts.mjs](../scripts/check-readme-counts.mjs),
+which runs in `npm run lint`. A count that drifts fails the build rather
+than sitting here misinforming a reader for three months.
+
+### Catalog
+
+| Figure | Live |
+| --- | --- |
+| Calculators (tiles) in `TOOLS` | **1804 live tiles** |
+| Active catalog groups | **21 live groups** |
+| `calc-*.js` modules | **57 live calc modules** |
+| Sitemap URLs (one per tile, one per group hub, home, catalog hub) | **1827 live sitemap URLs** |
+
+### Gates
+
+| Figure | Live |
+| --- | --- |
+| Static gates in the `npm run lint` chain | **52 live lint gates** |
+| Unit-test suite files under `test/unit/` | **149 live unit suites** |
+| Playwright spec files under `test/integration/` | **16 live integration specs** |
+
+CI runs three jobs per push: `test` (lint, unit tests, data-integrity
+verification), then `accessibility` and `integration` in parallel. The
+two Playwright jobs partition the suite by title rather than both running
+it. Post-build gates -- per-module gzip budget, `check:dist`,
+`check:shells`, `check:shell-values`, `check:lastmod`, and the 320 px
+shell audit -- run in the `integration` job, after the build, because the
+lint job runs before any build and a gate that reads `dist/` there reads
+nothing. See the CI table in [../README.md](../README.md).
+
+### What is still a gate rather than a pass
+
+These are the rows above that can only be verified against the deployed
+environment, and they are unchanged in kind since v0.1.0: W3C validation,
+Mozilla Observatory and securityheaders.com grades, cross-browser and
+cross-device operation, and Search Console / Bing Webmaster submission.
+The per-group reviewer signoffs tracked in
+[audit-trail.md](audit-trail.md) remain open; that table, not this file,
+is their record.
+
+A fourth CI job ran Lighthouse until 2026-08-23, when it was removed over
+an unpatched advisory in `@lhci/cli`. It has not been restored, and the
+v0.13 row above that cites `lighthouserc.json` describes a gate that no
+longer runs -- which is what "frozen snapshot" means for every section
+above this one. [performance.md](performance.md) records what gates
+performance in its place.
