@@ -1127,6 +1127,16 @@ export function groupLead(count) {
   return `${count} ${what} in your browser. Free, no account.`;
 }
 
+// A catalog count runs to four digits, and the site writes those with a
+// thousands separator everywhere a person reads one -- the home page's own
+// description says "1,804 free calculators". The generated pages did not: the
+// catalog hub's <title>, h1, description, og/twitter and JSON-LD all said
+// "1804", as did the 404 page. Same number, two spellings, on the two pages a
+// reader is most likely to land on cold.
+function commaNumber(n) {
+  return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 function groupShell(group, tools, groupNames) {
   const groupLabel = groupNames[group] || group;
   const groupSlug = GROUP_SLUG[group] || group.toLowerCase();
@@ -1182,7 +1192,19 @@ function groupShell(group, tools, groupNames) {
     '  </nav>',
     `  <h1 class="shell-h1">${escapeHtml(groupLabel)}</h1>`,
     `  <p class="shell-lead">${escapeHtml(groupLead(tilesInGroup.length))}</p>`,
-    `  <p class="shell-run"><a class="shell-run-link" href="../../#group=${escapeHtml(group)}">Open the live group view</a></p>`,
+    // This link read "Open the live group view" and pointed at
+    // `../../#group=<letter>` until 2026-09-02. The SPA has no group route --
+    // parseHashRoute knows `#`, `#home` and `#<tile-id>`, and everything else
+    // falls through to the home view -- so the primary call to action on all
+    // 21 hubs, which are the site's top organic landing pages, dropped the
+    // reader on the generic home page with an inert hash in the URL bar. The
+    // group view it named was retired with the home tile grid in the
+    // search-first refactor; the link outlived it.
+    //
+    // Not rebuilt: a filtered list inside the SPA is what THIS page already
+    // is, statically and crawlably. So the link says what the app actually
+    // does with a catalog this size, and goes where that happens.
+    `  <p class="shell-run"><a class="shell-run-link" href="../../">Search all ${commaNumber(tools.length)} calculators</a></p>`,
     '  <section class="shell-section" aria-label="Tools in this group">',
     '    <h2>Tools in this group</h2>',
     '    <ul class="shell-related shell-tile-list">',
@@ -1252,7 +1274,7 @@ function notFoundShell(tools, groupNames) {
   const labelFor = (g) => groupNames[g] || ("Group " + g);
   const title = "Page not found - Rough Logic";
   const description =
-    "That page is not here. Every one of the " + tools.length +
+    "That page is not here. Every one of the " + commaNumber(tools.length) +
     " free trade calculators on Rough Logic is one link away.";
   const head = shellHead({
     title,
@@ -1272,7 +1294,7 @@ function notFoundShell(tools, groupNames) {
     shellHeader("/"),
     '<main id="main" class="shell-main">',
     '  <h1 class="shell-h1">Page not found</h1>',
-    `  <p class="shell-lead">That page is not here. Every one of the ${tools.length} calculators is one link away.</p>`,
+    `  <p class="shell-lead">That page is not here. Every one of the ${commaNumber(tools.length)} calculators is one link away.</p>`,
     '  <p class="shell-run">',
     '    <a class="shell-run-link" href="/tools/">Browse all calculators</a>',
     '  </p>',
@@ -1331,9 +1353,9 @@ function toolsIndexShell(tools, groupNames) {
     ].join("\n");
   }).join("\n");
 
-  const title = "All " + tools.length + " Calculators - Rough Logic";
+  const title = "All " + commaNumber(tools.length) + " Calculators - Rough Logic";
   const description =
-    "Every one of the " + tools.length + " free trade calculators on Rough Logic, grouped by trade. " +
+    "Every one of the " + commaNumber(tools.length) + " free trade calculators on Rough Logic, grouped by trade. " +
     "Runs in your browser. No signup, no ads, no tracking, no AI.";
 
   const jsonld = jsonLdBlock([
@@ -1374,7 +1396,7 @@ function toolsIndexShell(tools, groupNames) {
     '<body class="shell-page">',
     shellHeader(1),
     '<main class="shell-main tools-index">',
-    `  <h1 class="shell-h1">All ${tools.length} calculators</h1>`,
+    `  <h1 class="shell-h1">All ${commaNumber(tools.length)} calculators</h1>`,
     '  <p class="shell-lede">Every calculator on Rough Logic, grouped by trade. If you already know what you need, asking is faster.</p>',
     '  <p class="ti-cta"><a class="shell-run-link" href="../">Ask for it instead</a></p>',
     '  <nav class="ti-jump" aria-label="Jump to a trade">',

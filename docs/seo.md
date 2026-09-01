@@ -81,6 +81,15 @@ trade the map spelled `realestate` / `edu` while every tile spelled it
 `real-estate` / `education`. `test/unit/shell-meta.test.js` now sweeps the map
 in both directions -- no tile without a noun, no key without a tile.
 
+Every hash a shell emits is checked by `check-shells` against the route it
+claims. A same-document anchor must match an id in that document; a
+cross-document hash (`../../#<id>`) is a link into the SPA, so its fragment
+must be `""`, `home`, or a live tile id -- what `parseHashRoute` actually
+routes. The rule exists because all 21 group hubs carried "Open the live group
+view" pointing at `../../#group=<letter>` after the SPA's group view was
+retired, and `check-dist` cannot see that: it resolves the href to `/`, which
+exists.
+
 - Header with the wordmark and a "Tools index" link back to home.
 - Breadcrumb (Home > Group > Tile).
 - One `<h1>` with the tile name.

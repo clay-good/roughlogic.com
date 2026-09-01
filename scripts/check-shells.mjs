@@ -373,6 +373,10 @@ function lintShellNoScript(html, where, errors) {
   }
 }
 
+// The tile ids parseHashRoute will route. Populated in main() before any
+// shell is linted.
+const routableIds = new Set();
+
 async function lintShell(path, kind, errors, tool) {
   const html = await readFile(path, "utf8");
   const where = path.slice(DIST.length + 1);
@@ -476,6 +480,44 @@ async function lintShell(path, kind, errors, tool) {
           else if (v && typeof v === "object") stack.push(v);
         }
       }
+    }
+  }
+
+  // Every hash a shell emits has to be a route that exists. Two kinds, checked
+  // as two different things:
+  //
+  //   - A same-document anchor (`href="#g-electrical"`) must match an id in
+  //     the same document.
+  //   - A CROSS-document hash (`href="../../#voltage-drop"`) is a link into
+  //     the SPA, and its fragment has to be something parseHashRoute can
+  //     route: "", "home", or a live tile id, optionally followed by `?params`.
+  //
+  // The second rule exists because the group hubs -- the site's top organic
+  // landing pages -- carried "Open the live group view" pointing at
+  // `../../#group=<letter>` after the SPA's group view was retired with the
+  // home tile grid. parseHashRoute has no group route, so the primary call to
+  // action on all 21 hubs silently dropped the reader on the generic home page
+  // with an inert hash in the URL bar. check-dist could not see it: it
+  // resolves `../../#group=A` to `/`, which exists.
+  const idsInDoc = new Set([...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
+  for (const m of html.matchAll(/href="([^"]*#[^"]*)"/g)) {
+    const href = m[1];
+    const hashAt = href.indexOf("#");
+    const doc = href.slice(0, hashAt);
+    const frag = href.slice(hashAt + 1);
+    if (doc === "") {
+      if (frag && !idsInDoc.has(frag)) {
+        errors.push(where + ': in-page anchor "#' + frag + '" matches no id in this document.');
+      }
+      continue;
+    }
+    const route = frag.split("?")[0];
+    if (route === "" || route === "home") continue;
+    if (!routableIds.has(route)) {
+      errors.push(
+        where + ': link "' + href + '" points at SPA hash "#' + route + '", which parseHashRoute cannot route ' +
+          "(it knows \"\", \"home\", and live tile ids). The reader lands on the home view instead.",
+      );
     }
   }
 
@@ -627,6 +669,8 @@ async function main() {
     console.error("check-shells: could not parse TOOLS from app.js.");
     process.exit(1);
   }
+
+  for (const t of tools) routableIds.add(t.id);
 
   const errors = [];
 

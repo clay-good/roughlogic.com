@@ -34,6 +34,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The primary call to action on all 21 group hubs was a dead link.** Each hub carried "Open the live group view" pointing at `../../#group=<letter>`. The SPA has no group route -- `parseHashRoute` knows `#`, `#home` and `#<tile-id>`, and everything else falls through to the home view -- so the reader landed on the generic home page with an inert `#group=A` sitting in the URL bar. The group view the link named was retired with the home tile grid in the search-first refactor; the link outlived it. `/groups/construction/` is the site's top organic landing page, so this was the main action on the pages most likely to be someone's first.
+
+  `check-dist` could not see it: it resolves `../../#group=A` to `/`, which exists. So the gate is new and it is about hashes specifically -- every hash a shell emits must be a route that exists, checked as two kinds. A same-document anchor (`#g-electrical`) must match an id in that document; a cross-document hash (`../../#voltage-drop`) is a link into the SPA and its fragment must be something `parseHashRoute` can route. Both halves seed-verified at 21 errors each.
+
+  The link now says `Search all 1,804 calculators` and goes to the app. A filtered list inside the SPA was not rebuilt, because that is what the hub page already is -- statically, and crawlably.
+
+- **The catalog hub and the 404 page wrote the catalog count without a thousands separator.** "All 1804 Calculators" in the `<title>`, the h1, the meta description, og/twitter and the JSON-LD, and "Every one of the 1804 free trade calculators" on both. The home page's own description says "1,804". Same number, two spellings, on the two pages a cold reader is most likely to land on. Both now read 1,804, from one helper over the live count.
+
+
 - **The SPA and the prerendered shell described the same URL differently on most of the catalog.** A tile has two surfaces: the static page at `/tools/<id>/`, and the SPA route `/#<id>`, whose `<head>` app.js rewrites on every navigation. A comment above that code has claimed since spec-v13 §5.5 that the SPA sets those tags "to match the per-tile shell". Measured against the built shells: **1,396 of 1,804 titles and 1,685 of 1,804 descriptions differed.** The SPA wrote `name + " - Rough Logic"` and the raw `desc`; the shell wrote the §11.2 profession noun, the "Client-side, ad-free, account-free reference for ..." tail, and both spec caps.
 
   This is the same shape as yesterday's home-page defect one route up, and it survived for the same reason: `check-shells` reads `dist/tools/<id>/index.html`, a **file**, and nothing read the running page. A unit test did watch the SPA -- and pinned `setHeadMeta("description", tool.desc)`, which is to say it pinned the defect. A source-text test holds the shape it is handed.
