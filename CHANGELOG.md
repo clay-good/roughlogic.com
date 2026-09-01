@@ -34,6 +34,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The first file an agent reads said the server has four tools. It has five.** `AGENTS.md` -- the file a coding agent opens before it does anything else in this repo -- said "Four tools" above a list of five, and `mcp/README.md` said "four meta-tools" on line 13 while line 149 of the same document said five. `run_calculators` landed with the batch work and neither count moved. The agent surface was described wrong in the two places whose whole job is describing it.
+
+  Both corrected, and pinned: a unit test reads the tool names out of `mcp/server.mjs` and fails if any doc that counts tools counts them wrong, or if a doc that names the tool set omits one -- so a renamed tool cannot leave a document pointing an agent at something that no longer answers. Both failure modes seed-verified. `AGENTS.md` also now says that the 21 input-free tiles answer `answer_query` from their own content, which is what changed under it today.
+
 - **`main` went red at UTC midnight on a date, not a commit.** All six ICC I-code rows in `scripts/sources-cycle.json` carried `next_expected: 2026-09`, and spec-v22 CF-03 fails the freshness gate when that date passes with no re-stamp. It passed on 2026-09-01 and the `test` job went red, skipping `accessibility` and `integration` behind it. The gate worked exactly as designed: it is there so an edition cannot roll past unnoticed.
 
   Checked against ICC's published schedule rather than assumed: the **2027 I-Codes completed their final vote in August 2026 and publish in stages over the rest of 2026 and early 2027**, with the IBC and IFC anticipated September 2026 and the IRC February 2027. So the 2027 edition does not exist yet, 2024 remains the current published edition, and the honest answer is CF-03's own "verified, not yet released" acknowledgement -- `last_verified: 2026-09-01` on each row, with a note recording the evidence.

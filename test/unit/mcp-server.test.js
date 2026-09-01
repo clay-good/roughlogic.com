@@ -166,3 +166,34 @@ test("MCP serializes a bounded request queue and honors stdout backpressure", as
   assert.match(source, /once\(process\.stdout, "drain"\)/);
   assert.doesNotMatch(source, /\bhandle\(item\);/);
 });
+
+// The docs an agent reads BEFORE it connects: AGENTS.md is the first file a
+// coding agent opens in this repo, and mcp/README.md is what a human wires the
+// client from. Both stated "four tools" while five shipped -- `run_calculators`
+// landed with the batch work and neither count moved. Nothing checked them, so
+// the agent surface was described wrong in the two places describing it.
+test("every doc that counts the MCP tools counts them right, and names them all", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const src = await readFile(new URL("../../mcp/server.mjs", import.meta.url), "utf8");
+  const names = [...src.matchAll(/^\s{4}name: "([a-z_]+)",$/gm)].map((m) => m[1]);
+  assert.ok(names.length >= 5, `could not read the tool list from server.mjs: ${names}`);
+  const WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+  const expected = WORDS[names.length];
+  const wrong = [];
+  for (const doc of ["AGENTS.md", "mcp/README.md", "README.md", "docs/architecture.md"]) {
+    const text = await readFile(new URL("../../" + doc, import.meta.url), "utf8");
+    for (const m of text.matchAll(/\b(zero|one|two|three|four|five|six|seven|eight|nine|ten)\b[^.\n]{0,20}?\b(?:meta-)?tools\b/gi)) {
+      if (m[1].toLowerCase() !== expected) {
+        wrong.push(`${doc}: "${m[0].trim()}" but the server exposes ${names.length}`);
+      }
+    }
+    // And the names themselves, so a renamed tool cannot leave a doc pointing
+    // an agent at a tool that no longer answers.
+    if (/`search_calculators`/.test(text)) {
+      for (const n of names) {
+        if (!text.includes("`" + n + "`")) wrong.push(`${doc}: does not name ${n}`);
+      }
+    }
+  }
+  assert.deepEqual(wrong, []);
+});

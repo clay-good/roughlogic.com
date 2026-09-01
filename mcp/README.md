@@ -10,7 +10,7 @@ step, no dependencies beyond Node 18+.
 
 ## Tools
 
-The catalog is exposed as four meta-tools (not one tool per calculator, which
+The catalog is exposed as five meta-tools (not one tool per calculator, which
 would overwhelm a client's tool list):
 
 | Tool | Purpose |
