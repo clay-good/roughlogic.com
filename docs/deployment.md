@@ -48,7 +48,7 @@ its document root.
 4. The service worker registers and the page loads after going offline.
    Then, still offline, open a tile shell URL (`/tools/ohms-law/`): it must
    land on `/#ohms-law` with the calculator on screen and the stylesheet
-   applied. No shell is precached -- 1,826 pages is not a precache -- so that
+   applied. No shell is precached -- **1826 static shells** is not a precache -- so that
    redirect is the whole offline story for a bookmarked page.
 5. A path that matches no file (`/tools/not-a-tile/`) returns the site's own
    404 page -- wordmark, "Page not found", and links to `/tools/` and every

@@ -40,6 +40,11 @@ async function liveCounts() {
   // sitemap = one URL per tile + one per active group + home + the
   // spec-v1345 catalog hub at /tools/.
   const sitemap = tiles + groups + 2;
+  // The static shells themselves: every sitemap URL except home, which is the
+  // SPA and not a generated shell. docs/architecture.md and docs/deployment.md
+  // both state this to explain why the service worker does not precache them,
+  // and it moves with every tile added.
+  const shells = tiles + groups + 1;
   // The README tells a reader how many gates stand between a change and a
   // landing. That is the `npm run lint` chain itself, so read it rather than
   // trusting a number someone typed once.
@@ -94,6 +99,7 @@ async function liveCounts() {
     return m ? Number(m[1]) * 1024 : 0;
   };
   return {
+    shells,
     tileGzipCap: capOf("TILE_GZIP_CAP"),
     groupGzipCap: capOf("GROUP_GZIP_CAP"),
     citationStrings, unitSuites, integrationSpecs,
@@ -269,6 +275,14 @@ async function main() {
   checked += checkPattern(launch, /\*\*(\d+) live lint gates\*\*/g, live.gates, "lint gate count (docs/launch-checklist.md)", errors);
   checked += checkPattern(launch, /\*\*(\d+) live unit suites\*\*/g, live.unitSuites, "unit suite count (docs/launch-checklist.md)", errors);
   checked += checkPattern(launch, /\*\*(\d+) live integration specs\*\*/g, live.integrationSpecs, "integration spec count (docs/launch-checklist.md)", errors);
+
+  // The static-shell total, stated in both documents to explain why the
+  // service worker does not precache them, and the tile-shell count in the
+  // accessibility doc's note on what the shell a11y sweep does not visit.
+  checked += checkPattern(arch, /\*\*(\d+) static shells\*\*/g, live.shells, "static shell count (docs/architecture.md)", errors);
+  checked += checkPattern(deploy, /\*\*(\d+) static shells\*\*/g, live.shells, "static shell count (docs/deployment.md)", errors);
+  const a11y = await readFile(resolve(ROOT, "docs", "accessibility.md"), "utf8");
+  checked += checkPattern(a11y, /\*\*([\d,]+) tile shells\*\*/g, live.tiles, "tile shell count (docs/accessibility.md)", errors);
 
   // The shell gzip caps, wherever the prose states them.
   checked += checkPattern(arch, /\*\*(\d+) B\*\* per tile shell/g, live.tileGzipCap, "tile shell gzip cap (docs/architecture.md)", errors);

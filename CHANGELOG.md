@@ -34,6 +34,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Three more doc counts that move with every tile added, and nothing watched.** `docs/architecture.md` and `docs/deployment.md` each state the static-shell total to explain why the service worker does not precache them; `docs/accessibility.md` states how many tile shells the shell a11y sweep does *not* visit, and said "~1,730" against a live 1,804. All three now read from the artefacts through `check-readme-counts`, taking its pinned-count total from 43 to 46. Seed-verified in both directions -- adding a tile moves the numbers, and editing one of the numbers alone reddens the gate.
+
 - **A page printed "Afci:" where it meant "AFCI:".** `humanizeKey` reads a machine key back as English for any row a calculator has not captioned itself, and it consults an acronym list so `nec_ref` reads "NEC ref". The one-word path never reached that list: it title-cased and returned, so `afci` came out "Afci" on `/tools/gfci-afci-reference/` and `scfm` came out "Scfm" on `/tools/pneumatic-cylinder-scfm/`. `vslr` and `wsfu` had the same fault despite already being on the list.
 
   Three pages in the built site, so a small defect -- but on a reference page whose whole content is a table of code requirements, an electrician reads "Afci" as a typo in the thing they came to check. The one-word path now checks the list first, and ten unambiguous trade acronyms were added to it (AFCI, GFCI, ACFM, SCFM, AFUE, BSFC, DSCR, HSPF, PITI, SHGC). Mixed-case symbols with a deliberate case -- GCpi, Mmax, Vmax, kvar -- and ambiguous four-letter keys -- cplh, splh, rctf -- were left alone and are pinned as left alone, because upper-casing those would be a different error.
