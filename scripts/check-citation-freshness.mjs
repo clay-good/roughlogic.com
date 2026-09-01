@@ -68,6 +68,10 @@ async function main() {
   const standards = cycle.standards || [];
   const today = new Date();
 
+  // How long an "acknowledged-stale" re-stamp is good for. The ledger's own
+  // words are "a quarterly re-verify action", so a quarter.
+  const RESTAMP_MAX_DAYS = 92;
+
   // spec-v22 §6 (CF-03): a passed `next_expected` demands either a new edition
   // (the row advanced so next_expected is in the future) or an explicit
   // "verified, not yet released" re-stamp via `last_verified` >= next_expected.
@@ -81,6 +85,23 @@ async function main() {
         "sources-cycle.json: '" + s.name + "' next_expected " + s.next_expected +
           " has passed with no re-stamp. Confirm a new edition (advance the row) or add " +
           "'last_verified' >= next_expected (the 'verified, not yet released' acknowledgement) per spec-v22 CF-03."
+      );
+      continue;
+    }
+    // A re-stamp that never expires is a row silenced forever. On 2026-06-05
+    // four rows were acknowledged-stale with a "re-verify each quarter" note;
+    // three months later nothing had asked again, and two of the three ASHRAE
+    // standards had in fact published their 2025 editions while the ledger
+    // still called 2022 current. The acknowledgement buys a quarter -- the
+    // cadence the ledger itself promises -- not silence. Advance the row on
+    // publication, or re-stamp with today's date and say what was checked.
+    const age = daysBetween(verified, today);
+    if (age > RESTAMP_MAX_DAYS) {
+      errors.push(
+        "sources-cycle.json: '" + s.name + "' is acknowledged-stale on a re-stamp " + age +
+          " days old (" + s.last_verified + "), past the " + RESTAMP_MAX_DAYS +
+          "-day re-verify cadence docs/citation-freshness-ledger.md promises. Confirm the current edition " +
+          "and either advance the row or re-stamp 'last_verified' with what you checked."
       );
     }
   }

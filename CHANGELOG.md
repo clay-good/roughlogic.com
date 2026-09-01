@@ -34,6 +34,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **An "acknowledged-stale" re-stamp silenced a source forever, and two standards published while nobody was asking.** CF-03 lets a maintainer keep a row green past its `next_expected` by stamping `last_verified` -- the "verified, not yet released" acknowledgement. The stamp never aged. Four rows were acknowledged-stale on 2026-06-05 with a written "re-verify each quarter" action; three months later nothing had asked again, which is precisely the state the ledger says it exists to make impossible.
+
+  Asked on 2026-09-01, against the publishers: **ASHRAE 62.1-2025, 62.2-2025 and 90.1-2025 are all published.** The ledger had been calling 2022 current for three months. The rows now carry `current_edition: 2025`, which makes their status **disclosed-lag** -- the bundled values still follow the 2022 editions and the citations name the newer one; refreshing those values is a data pass of its own. The AASHTO Green Book 8th edition is genuinely still unpublished (NCHRP 07-29, the project developing it, was scheduled to complete 2026-03-31), so it stays acknowledged-stale, re-stamped and re-dated.
+
+  And the hole is closed: a re-stamp now **expires after 92 days** -- the quarterly cadence `docs/citation-freshness-ledger.md` already promised, enforced rather than described. A row that is still acknowledged-stale on an older stamp fails the gate with the age in the message. Seed-verified, and a unit test asserts the same rule against the live file so it cannot drift back to permanent silence.
+
 - **The first file an agent reads said the server has four tools. It has five.** `AGENTS.md` -- the file a coding agent opens before it does anything else in this repo -- said "Four tools" above a list of five, and `mcp/README.md` said "four meta-tools" on line 13 while line 149 of the same document said five. `run_calculators` landed with the batch work and neither count moved. The agent surface was described wrong in the two places whose whole job is describing it.
 
   Both corrected, and pinned: a unit test reads the tool names out of `mcp/server.mjs` and fails if any doc that counts tools counts them wrong, or if a doc that names the tool set omits one -- so a renamed tool cannot leave a document pointing an agent at something that no longer answers. Both failure modes seed-verified. `AGENTS.md` also now says that the 21 input-free tiles answer `answer_query` from their own content, which is what changed under it today.

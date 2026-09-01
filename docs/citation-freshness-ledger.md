@@ -33,12 +33,12 @@ row's `next_expected` has passed without a `last_verified` re-stamp (CF-03).
 | `imc` | International Mechanical Code | 2021 | 2024 (2027 voted, not published) | 2026-09-01 | disclosed-lag |
 | `ifc` | International Fire Code | 2021 | 2024 (2027 voted, not published) | 2026-09-01 | disclosed-lag |
 | `ifgc` | International Fuel Gas Code | 2021 | 2024 (2027 voted, not published) | 2026-09-01 | disclosed-lag |
-| `ashrae-62-1` | ASHRAE 62.1 | 2022 | 2022 (monitoring 2025) | 2026-06-05 | acknowledged-stale |
-| `ashrae-62-2` | ASHRAE 62.2 | 2022 | 2022 (monitoring 2025) | 2026-06-05 | acknowledged-stale |
-| `ashrae-90-1` | ASHRAE 90.1 | 2022 | 2022 (monitoring 2025) | 2026-06-05 | acknowledged-stale |
+| `ashrae-62-1` | ASHRAE 62.1 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
+| `ashrae-62-2` | ASHRAE 62.2 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
+| `ashrae-90-1` | ASHRAE 90.1 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
 | `fda-food-code` | FDA Food Code | 2022 | 2022 | 2026-06-05 | current |
 | `wmm` | NOAA World Magnetic Model | WMM2025 | WMM2025 (expires 2030-01-01) | 2026-06-05 | current |
-| `aashto-greenbook` | AASHTO Green Book | 2018 (7th ed.) | 7th ed. (monitoring 8th) | 2026-06-05 | acknowledged-stale |
+| `aashto-greenbook` | AASHTO Green Book | 2018 (7th ed.) | 7th ed. (8th in development) | 2026-09-01 | acknowledged-stale |
 
 ## Dispositions (spec-v22 §2)
 
@@ -64,13 +64,27 @@ row's `next_expected` has passed without a `last_verified` re-stamp (CF-03).
   `next_expected` is advanced to that source's own anticipated month
   (IBC / IFC 2026-10, IPC / IMC / IFGC 2027-01, IRC 2027-02) rather than to one
   date for all six. Advance `current_edition` on confirmed publication.
-- **ASHRAE 62.1 / 62.2 / 90.1 (CF-02):** `next_expected` (2025-10 / 2025-12)
-  passed. Re-stamped **acknowledged-stale** with `last_verified: 2026-06-05` and
-  a quarterly re-verify action; bundled values follow the 2022 editions and the
-  citations disclose it. Advance the rows on confirmation of the 2025 editions.
-- **AASHTO Green Book (CF-02):** `next_expected` (2025-10) passed. Re-stamped
-  **acknowledged-stale** with `last_verified: 2026-06-05`; bundled defaults
-  follow the 2018 7th edition. Advance on confirmation of the 8th edition.
+- **ASHRAE 62.1 / 62.2 / 90.1 (CF-02), superseded 2026-09-01:** the 2026-06-05
+  disposition re-stamped these **acknowledged-stale** with a quarterly re-verify
+  action. Nothing asked again for three months, because a re-stamp used to
+  silence a row permanently. Asked on 2026-09-01: **all three 2025 editions are
+  published** -- 62.1-2025, 62.2-2025 (16 addenda, MERV 6 -> MERV 11) and
+  90.1-2025 (105 addenda). The rows now carry `current_edition: 2025`, so the
+  status is **disclosed-lag**: bundled values still follow the 2022 editions and
+  the citations name the newer edition. Refreshing those values is a data pass
+  of its own, tracked separately.
+- **AASHTO Green Book (CF-02), re-verified 2026-09-01:** the 8th edition is
+  still **not published**. NCHRP 07-29, the research project developing it, was
+  scheduled to complete 2026-03-31, and publication follows that rather than
+  precedes it. Remains **acknowledged-stale** on the 2018 7th edition, re-stamped
+  with `next_expected: 2027-01`.
+- **A re-stamp now expires (CF-03, 2026-09-01).** The four rows above sat quiet
+  for three months on a stamp that never aged, while two of the three ASHRAE
+  standards had in fact published. `check-citation-freshness` now fails a row
+  whose `last_verified` is more than **92 days** old while `next_expected` is
+  still in the past -- the quarterly cadence this document already promised, now
+  enforced rather than described. The acknowledgement buys a quarter, not
+  silence.
 
 ## Verified current / well-disclosed, not in the cycle table (spec-v22 §2)
 

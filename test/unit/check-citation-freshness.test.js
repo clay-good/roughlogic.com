@@ -15,6 +15,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import {
+  readFileSync,
   mkdtempSync,
   writeFileSync,
   mkdirSync,
@@ -133,4 +134,25 @@ test("lint warns when 'asOf' is older than 365 days", () => {
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+// CF-03's re-stamp used to be permanent: once `last_verified` cleared the
+// passed `next_expected`, the row never spoke again. Four rows were
+// acknowledged-stale on 2026-06-05 with a "re-verify each quarter" note, and
+// three months later nothing had asked -- while two of the three ASHRAE
+// standards had in fact published their 2025 editions and the ledger still
+// called 2022 current. The acknowledgement buys a quarter, not silence.
+test("CF-03: a re-stamp older than the promised quarter fails the gate", () => {
+  const rows = JSON.parse(readFileSync(resolve(ROOT, "scripts", "sources-cycle.json"), "utf8")).standards;
+  const today = new Date();
+  const stale = [];
+  for (const s of rows) {
+    const next = s.next_expected ? new Date(s.next_expected + "-01T00:00:00Z") : null;
+    if (!next || next >= today) continue;
+    const verified = s.last_verified ? new Date(s.last_verified + "T00:00:00Z") : null;
+    assert.ok(verified, `${s.id}: acknowledged-stale with no last_verified`);
+    const age = Math.floor((today - verified) / 86400000);
+    if (age > 92) stale.push(`${s.id}: re-stamp ${age} days old`);
+  }
+  assert.deepEqual(stale, [], "a row cannot sit acknowledged-stale on a stamp older than a quarter");
 });
