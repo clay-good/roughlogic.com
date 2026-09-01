@@ -28,6 +28,7 @@ import { existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { gzipSync } from "node:zlib";
+import { assertFullCatalogParse } from "./catalog-size.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = resolve(ROOT, "dist");
@@ -168,6 +169,10 @@ async function loadTools() {
   const mod = await import(pathToFileURL(resolve(ROOT, "tools-data.js")).href);
   const descById = new Map((mod.TOOLS || []).map((t) => [t.id, t.desc]));
   for (const t of tools) t.desc = descById.get(t.id);
+  // The regex above matches a fixed field order. A tile it skips is a shell
+  // this gate never lints, and a sweep over 1,700 of 1,804 reports exactly
+  // what a sweep over all of them reports: nothing.
+  await assertFullCatalogParse(tools.length, "check-shells");
   return tools;
 }
 

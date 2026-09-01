@@ -231,6 +231,32 @@ When a tile is retired:
 5. The sitemap regenerates.
 6. The CHANGELOG records the retirement and the date.
 
+## A gate must cover the whole catalog (2026-09-01)
+
+Five scripts read `tools-data.js` as text and pull the tiles out with a
+regular expression matching a fixed field order -- `{ id: "...", name:
+"...", group: "..." }`. A tile written with its fields in another order,
+or carrying an escape the pattern does not allow, is skipped without a
+word. A tile a gate skips is a tile that gate never checked, and a sweep
+that covered 1,700 of 1,804 prints exactly what a sweep that covered all
+1,804 prints: an OK line.
+
+Each of those parsers now calls `assertFullCatalogParse` from
+[../scripts/catalog-size.mjs](../scripts/catalog-size.mjs), which compares
+what the regex found against the module's own `TOOLS.length` -- the only
+count that cannot drift with the file's formatting -- and exits non-zero
+naming the shortfall. The five: `check-tile-meta`, `check-related-tiles`,
+`check-readme-counts`, `check-shells`, and `build.mjs`, the last because
+the number it derives is what `llms.txt` and `.well-known/mcp.json` tell
+every agent the catalog holds. All five were reading the full catalog at
+the time the guard was added; the point is that nothing would have said
+so if they had not been.
+
+There is no exemption list, deliberately. A parser added later either
+imports the guard or fails
+[../test/unit/catalog-parse-coverage.test.js](../test/unit/catalog-parse-coverage.test.js),
+which walks `scripts/` and looks for one.
+
 ## What this document does not do
 
 - It does not enumerate every fixture; the fixtures live in

@@ -23,12 +23,17 @@
 import { readFile, readdir } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { assertFullCatalogParse } from "./catalog-size.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 async function liveCounts() {
   const toolsData = await readFile(resolve(ROOT, "tools-data.js"), "utf8");
   const tiles = (toolsData.match(/^\s*\{ id: "/gm) || []).length;
+  // Every count this gate pins into the README and the docs is derived from
+  // that line-start match, so a tile the match misses would quietly lower the
+  // number the docs are held to. Check it against the module itself.
+  await assertFullCatalogParse(tiles, "check-readme-counts");
   const groups = new Set([...toolsData.matchAll(/group: "([A-Z])"/g)].map((m) => m[1])).size;
   const files = await readdir(ROOT);
   const modules = files.filter((f) => /^calc-.*\.js$/.test(f)).length;

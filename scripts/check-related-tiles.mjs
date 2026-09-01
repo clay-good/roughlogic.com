@@ -21,6 +21,7 @@
 import { readFile } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { assertFullCatalogParse } from "./catalog-size.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -29,6 +30,7 @@ async function loadToolIds() {
   const ids = new Set();
   const re = /\{\s*id:\s*"([a-z0-9-]+)"\s*,\s*name:\s*"[^"]+"\s*,\s*group:\s*"([^"]+)"/g;
   for (const m of text.matchAll(re)) ids.add(m[1]);
+  await assertFullCatalogParse(ids.size, "check-related-tiles");
   return ids;
 }
 

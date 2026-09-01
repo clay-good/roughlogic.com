@@ -14,6 +14,7 @@
 import { readFile } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { assertFullCatalogParse } from "./catalog-size.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -23,6 +24,7 @@ async function loadToolMeta() {
   // Capture id + group from each TOOLS entry: { id: "...", name: "...", group: "X", ... }
   const re = /\{\s*id:\s*"([a-z0-9-]+)"\s*,\s*name:\s*"[^"]+"\s*,\s*group:\s*"([^"]+)"/g;
   for (const m of text.matchAll(re)) ids.set(m[1], m[2]);
+  await assertFullCatalogParse(ids.size, "check-tile-meta");
   return ids;
 }
 

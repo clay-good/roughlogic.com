@@ -34,6 +34,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Five gates could quietly stop covering part of the catalog, and would have printed an OK line while doing it.** They read `tools-data.js` as text and pull the tiles out with a regular expression matching a fixed field order -- `{ id: "...", name: "...", group: "..." }`. A tile written with its fields in another order is skipped without a word, and a tile a gate skips is a tile that gate never checked: a sweep over 1,700 of 1,804 prints exactly what a sweep over all 1,804 prints.
+
+  All five were in fact reading the whole catalog when this was written -- this is not a coverage bug being fixed, it is a class of silent failure being closed. Each parser now calls `assertFullCatalogParse`, which compares what the regex found against the module's own `TOOLS.length` and exits non-zero naming the shortfall. `build.mjs` is in the set because the count it derives is what `llms.txt` and `.well-known/mcp.json` tell every agent the catalog holds, so a tile it misses is a calculator no agent ever learns exists.
+
+  Seed-verified by adding one tile written group-first: valid JavaScript, invisible to every one of the five patterns. Before the guard it vanished silently from all of them; now all five fail and name the missing tile. No exemption list, deliberately -- a parser added later either imports the guard or fails `test/unit/catalog-parse-coverage.test.js`, which walks `scripts/` looking for one.
+
+  Found while fixing the shell builder's own copy of that regex, which decoded `\"` and `\\` and nothing else.
+
 - **86 truncated page titles ended mid-word, in the blue link text of a search result.** The `<title>` is what a searcher clicks and what the browser tab is labelled with, and a tile name over the 70-character cap gets an ellipsis. The cut landed wherever the character loop stopped: "ASCE 7 ASD Load Combinations: Governing Demand and Ne...", "Compressor Volumetric Efficiency (Clearance Re-Expans...", "Accessible Shower Compartment Types (2010 ADA Standar...". Same defect as the meta description above, in the same file, found by turning the same question on the sibling string -- and the only title gate was the 70-character cap, which a mid-word cut passes perfectly.
 
   The cut now backs off to a word boundary, then to before an unclosed `(` so a title never trails a parenthetical it does not finish. Mid-word titles **86 -> 0**; titles carrying an unclosed bracket **many -> 3**, the three being names where dropping the parenthetical would cost the reader the standard reference ("Seismic Base Shear (ASCE 7 §12.8...") for a typographic wart. Both back-offs are guarded by a floor so neither can eat a name down to something unrecognisable.

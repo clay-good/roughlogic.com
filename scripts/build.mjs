@@ -185,6 +185,11 @@ async function emitAgentDiscovery() {
   const { renderLlmsTxt, renderMcpManifest } = await import("./agent-discovery.mjs");
   const toolsData = await readFile(resolve(ROOT, "tools-data.js"), "utf8");
   const tiles = (toolsData.match(/^\s*\{ id: "/gm) || []).length;
+  // This number is what llms.txt and .well-known/mcp.json tell every agent the
+  // catalog holds, so a tile the match misses is a calculator the agent never
+  // learns exists. Check it against the module itself.
+  const { assertFullCatalogParse } = await import("./catalog-size.mjs");
+  await assertFullCatalogParse(tiles, "build (agent discovery)");
   const files = await readdir(ROOT);
   const modules = files.filter((f) => /^calc-.*\.js$/.test(f)).length;
   const version = JSON.parse(await readFile(resolve(ROOT, "package.json"), "utf8")).version;
