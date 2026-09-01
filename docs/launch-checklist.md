@@ -427,7 +427,7 @@ than sitting here misinforming a reader for three months.
 
 | Figure | Live |
 | --- | --- |
-| Static gates in the `npm run lint` chain | **53 live lint gates** |
+| Static gates in the `npm run lint` chain | **54 live lint gates** |
 | Unit-test suite files under `test/unit/` | **151 live unit suites** |
 | Playwright spec files under `test/integration/` | **16 live integration specs** |
 

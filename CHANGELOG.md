@@ -34,6 +34,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The new-tile checklist was wrong in both directions.** `docs/contributor-checklist.md` lists the registries a new tile has to be wired into. That list was written by hand, and by 2026-09-01 it omitted two registries that hold every one of the 1,804 tile ids and demanded work for one that does not.
+
+  Missing: `test/fixtures/renderer-map.js` -- never named at all -- and `test/fixtures/worked-examples.json`, mentioned only as "a worked-example fixture" under the unit-test line, which is a different artefact. Both verified mandatory by removing a live tile from each and watching a gate go red: dropping `ohms-law` from the renderer map reddens `check-curated-labels` (its example rows then print bare keys with no caption), and dropping its rows from the worked-example registry reddens `check-worked-examples`, which is fail-on-missing. A contributor following the list hit two failures it did not predict.
+
+  Overstated: `scripts/related-tiles.mjs`, presented among registries "each enforced by a lint gate". **130 live tiles have no curated entry** and the lint is green -- a tile the map leaves short is filled from its group siblings by `rankTools`. The list was asking for work no gate requires.
+
+  A registry that holds every tile id is one a new tile must be added to. That is a fact about the repository rather than about anyone's memory, so the new `check-tile-registries` (lint gate 54) reads it off the files: every registry at 100% coverage must be named in the checklist, and no partial one may be presented there as mandatory. Both directions seed-verified.
+
 - **`npm run audit` ran two of CI's six post-build gates, and the checklist said ticking it was sufficient.** `docs/contributor-checklist.md` tells a contributor that `npm run audit` is the single-shot gate and "ticking the box at the top is sufficient when the gate is green." It chained lint, test, build, `check:dist`, `check:shells`, `data:verify`. CI runs four more after its build -- `check:module-sizes`, `check:shell-values`, `check:lastmod`, `check:shell-mobile` -- so a contributor could watch "all 6 stages passed" and go red on any of them. `check:module-sizes` is the gate that was found blind in CI on 2026-08-30; it was still missing from the local chain that was supposed to catch it first.
 
   The audit chain is now nine stages and matches CI except for one: `check:shell-mobile` drives 1,826 shells through a headless browser at 320 px and takes about five minutes, which would make the gate something contributors skip. It is named as an exception in `scripts/audit.mjs`, printed on every green audit run, and the checklist now tells a contributor to run it before a layout or type change.

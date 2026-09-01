@@ -71,7 +71,7 @@ One calculator is one formula on one screen. (In the source and the gate names b
 
 ## Why you can trust the answers
 
-The hard part of a calculator catalog is not the arithmetic. It is proving, at scale, that every tile stays correct as the catalog grows. That is a build problem here: `npm run lint` runs 53 static gates before a change can land.
+The hard part of a calculator catalog is not the arithmetic. It is proving, at scale, that every tile stays correct as the catalog grows. That is a build problem here: `npm run lint` runs 54 static gates before a change can land.
 
 | Gate | What it guarantees |
 |---|---|
@@ -86,6 +86,7 @@ The hard part of a calculator catalog is not the arithmetic. It is proving, at s
 | `check-tile-contract` | every tile is registered, crash-free, and matches its declared I/O shape |
 | `check-shell-mobile` | zero horizontal scroll on every page at 320 px and 200% text zoom |
 | `check-feedback-loop` | every current and future calculator retains the shared defensive D1 reporting path |
+| `check-tile-registries` | the new-tile checklist names every registry that holds all 1,804 ids, and calls no partial one mandatory |
 | `check-build-hermetic` | the build fetches nothing; every value in `data/` is an in-tree constant, reviewable in a diff |
 | `check-notice-variants` | the notice naming who governs each answer matches what `docs/notice-variants.md` says it is |
 
@@ -107,7 +108,7 @@ The home payload gzips to well under the 100 KB budget. Opening a calculator dyn
 npm ci             # exact locked dev tooling; the site has zero runtime deps
 npm run dev        # build, then serve only dist/ on loopback
 npm run build      # emit dist/ (SPA + static shells + sitemap)
-npm run lint       # the full static-gate chain (53 checks)
+npm run lint       # the full static-gate chain (54 checks)
 npm test           # unit tests (node --test)
 npm run test:e2e   # Playwright integration suite (needs a browser)
 ```

@@ -34,13 +34,27 @@ phase docs ([edition-rollover.md](edition-rollover.md),
   per exported function and, since the 2026-08-30 graduation close,
   FAILS on a missing one in every module -- including a brand-new
   `calc-*.js`.
-- [ ] Tile is wired into the supporting registries (each enforced by
-  a lint gate): `[id, group]` in `_TILES`
-  [../tile-meta.js](../tile-meta.js); `{ module, fn }` in
+- [ ] Tile is wired into the registries that hold **every** tile id. Each
+  one was verified mandatory on 2026-09-01 by removing a live tile from it
+  and watching a gate go red:
+  `[id, group]` in `_TILES` [../tile-meta.js](../tile-meta.js);
+  `{ module, fn }` in
   [../test/fixtures/compute-map.js](../test/fixtures/compute-map.js);
-  a 3-6 id entry in [../scripts/related-tiles.mjs](../scripts/related-tiles.mjs);
+  `{ module, exportName }` in
+  [../test/fixtures/renderer-map.js](../test/fixtures/renderer-map.js)
+  (**omitting this fails `check-curated-labels`**, since the tile's
+  worked-example rows then print bare keys with no caption);
+  at least one row in
+  [../test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json)
+  keyed by `tile_id` (**`check-worked-examples` is fail-on-missing**; the
+  unit-test fixture below is a separate thing and does not satisfy it);
   and 3-5 unique search aliases in
   [../data/search/aliases.json](../data/search/aliases.json).
+- [ ] Optionally, a 3-6 id entry in
+  [../scripts/related-tiles.mjs](../scripts/related-tiles.mjs). This one is
+  **not** required -- 130 live tiles have no curated entry and the lint is
+  green, because a tile the map leaves short is filled from its group
+  siblings by `rankTools`. This list called it mandatory until 2026-09-01.
 - [ ] v14 corpus + tile-index regenerated (`node
   scripts/build-corpus.mjs`, `node scripts/build-tile-index.mjs`; the
   `--check` forms run in `npm run lint`).
