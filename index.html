@@ -120,8 +120,17 @@
       <button type="button" class="hero-chip" data-q="friction loss 200 ft of hose at 150 gpm">friction loss 200 ft, 150 gpm</button>
     </div>
 
+    <!-- What a reader without JavaScript is told. This said only that the site
+         requires JavaScript, which stopped being the whole truth when the
+         prerendered pages landed: every calculator has a static page at
+         /tools/<id>/ carrying its worked example, its formula and its source,
+         and none of those pages loads a line of script. Telling a no-JS reader
+         the site needs JS, on a site with 1,804 pages that do not, sent them
+         away from something that would have worked. The link is the point of
+         the notice now; check-shells fails a <noscript> that does not carry
+         it. -->
     <noscript>
-      <p class="noscript-notice">roughlogic requires JavaScript to render the calculators. Every calculation runs locally in your browser. No data leaves your device.</p>
+      <p class="noscript-notice">Running the calculators needs JavaScript, and every calculation runs locally in your browser -- no data leaves your device. Without it, <a href="/tools/">every calculator still has a page</a> with its worked example, its formula and its source.</p>
     </noscript>
 
   </section>

@@ -20,6 +20,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **The no-JavaScript notice sent readers away from 1,804 pages that would have worked.** The home page's `<noscript>` said the site "requires JavaScript to render the calculators" -- true when it was written, and not the whole truth since the prerendered pages landed: every calculator has a static page at `/tools/<id>/` carrying its worked example, its formula and its source, and not one of them loads a line of script. A reader with JavaScript off was told to go away by a site that had a working answer for them.
+
+  The notice now links `/tools/` and says what is behind it. `check-shells` fails a home page whose `<noscript>` is missing or does not carry that link, seed-verified by removing the anchor. Checked in a browser with JavaScript disabled at 320 px: the link renders, and the page still has no horizontal scroll.
+
+
 - **The doc describing what a tile shell contains listed three parts no shell has had since August.** `docs/seo.md`'s "What each shell contains" named a "Tools index" link in the header, an Audience block and a Posture block; all three were deleted in the 2026-08-16 presentation overhaul. The prose outlived the page by four months because nothing read the two side by side -- the same shape as the axe-pass size and the module count before it.
 
   The list is now a table whose right-hand column is a literal marker, and `check-shells` **reads that table** and asserts every marker is present in a 40-shell sample. Removing a part from the builder now fails the gate until the row goes too, and a row invented for a part that does not exist fails immediately. Seed-verified by adding a `class="tools-index-link"` row: 41 errors. Ten parts are covered; the worked example and the reference block are deliberately left out of the table, being the two that are conditional on whether a tile takes inputs.

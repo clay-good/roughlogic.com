@@ -619,6 +619,23 @@ async function lintHomeHead(path, errors) {
     return;
   }
   const html = await readFile(path, "utf8");
+
+  // What a reader without JavaScript is told. The notice said only that the
+  // site requires JavaScript, which stopped being the whole truth when the
+  // prerendered pages landed: every calculator has a static page under /tools/
+  // carrying its worked example, formula and source, and none loads a line of
+  // script. A no-JS reader was sent away from 1,804 pages that would have
+  // worked. The link out is the point of the notice, so it is what is checked.
+  const noscript = (html.match(/<noscript>([\s\S]*?)<\/noscript>/) || [])[1];
+  if (!noscript) {
+    errors.push(where + ": no <noscript> block; a reader without JavaScript is told nothing.");
+  } else if (!/href="\/tools\/"/.test(noscript)) {
+    errors.push(
+      where + ': the <noscript> notice does not link /tools/. Every calculator has a static page ' +
+        "that needs no JavaScript; a reader without it must be pointed at them, not just told the site needs JS.",
+    );
+  }
+
   const title = (html.match(/<title>([^<]*)<\/title>/) || [])[1] || "";
   const desc = pickAttr(html, '<meta[^>]*name="description"', "content");
   const og = pickAttr(html, '<meta[^>]*property="og:description"', "content");
