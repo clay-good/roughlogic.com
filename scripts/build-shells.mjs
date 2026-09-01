@@ -691,12 +691,33 @@ function buildTitle(tool, professionNoun, capChars) {
   // title over the cap (brand and "..." carry no escapable characters).
   const budget = capChars - brand.length - 3;
   if (budget < 4) return tool.name + brand;
+  return truncateName(tool.name, budget, escLen) + "..." + brand;
+}
+
+// Cut a tile name to fit the title cap. The <title> is the blue link text in
+// a search result and the label on the browser tab, and until 2026-09-01 the
+// cut landed wherever the character loop stopped: 86 of the 133 truncated
+// titles ended mid-word ("ASCE 7 ASD Load Combinations: Governing Demand and
+// Ne...", "Compressor Volumetric Efficiency (Clearance Re-Expans..."), the
+// same defect the meta description carried. Two back-offs, in order:
+//   1. to a word boundary, so the ellipsis follows a whole word;
+//   2. to before an unclosed "(", so the title never trails an opened
+//      parenthetical it does not finish -- "Accessible Shower Compartment
+//      Types..." reads as a name, "...Types (2010 ADA Standar..." does not.
+// Each back-off is skipped if it would eat so much of the name that the
+// reader could no longer tell which calculator this is.
+export function truncateName(name, budget, escLen = (s) => s.length) {
   let kept = "";
-  for (const ch of tool.name) {
+  for (const ch of name) {
     if (escLen(kept + ch) > budget) break;
     kept += ch;
   }
-  return kept + "..." + brand;
+  const floor = Math.floor(budget * 0.4);
+  const sp = kept.lastIndexOf(" ");
+  if (sp > floor) kept = kept.slice(0, sp);
+  const open = kept.lastIndexOf("(");
+  if (open > floor && kept.indexOf(")", open) === -1) kept = kept.slice(0, open);
+  return kept.replace(/[.,;:\s([-]+$/, "");
 }
 
 // 20 tile pages carry no worked example because their tiles take no inputs:

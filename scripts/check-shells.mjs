@@ -213,6 +213,29 @@ const SHELL_CSP_REQUIRED = [
 // its own run someone else's.
 const SHELL_CSP_FORBIDDEN = [/'unsafe-inline'/, /'unsafe-eval'/, /\*/, /https?:/];
 
+// The <title> is the blue link text in a search result and the label on the
+// browser tab. A tile name over the 70-character cap gets an ellipsis, and
+// until 2026-09-01 the cut landed wherever the character loop stopped: 86 of
+// the 133 truncated titles ended mid-word ("ASCE 7 ASD Load Combinations:
+// Governing Demand and Ne..."). Same defect as the meta description, same
+// file, and the only title gate was the length cap, which a mid-word cut
+// passes. Cross-check the stem against the tile's own name in TOOLS.
+function lintTitleWordBoundary(title, where, errors, tool) {
+  if (!tool || !tool.name) return;
+  const marker = "... - Rough Logic";
+  const plain = unescapeHtml(title);
+  if (!plain.endsWith(marker)) return;
+  const stem = plain.slice(0, -marker.length);
+  if (!tool.name.startsWith(stem)) {
+    errors.push(where + ": truncated <title> '" + stem + "' is not a prefix of the tile name '" + tool.name + "'.");
+    return;
+  }
+  const next = tool.name[stem.length];
+  if (/[A-Za-z0-9]/.test(stem.slice(-1)) && /[A-Za-z0-9]/.test(next || "")) {
+    errors.push(where + ": <title> ellipsis falls mid-word ('" + stem.slice(-24) + "' cuts '" + tool.name.slice(stem.length - 6, stem.length + 10) + "').");
+  }
+}
+
 // A description that overflows the cap gets an ellipsis. Until 2026-09-01 the
 // cut landed wherever the shave loop stopped, so 734 of 1,804 tile pages ended
 // mid-word -- "...flags expec..." -- and that fragment was what the search
@@ -351,6 +374,7 @@ async function lintShell(path, kind, errors, tool) {
   if (!title.endsWith(" - Rough Logic")) {
     errors.push(where + ": <title> does not end with ' - Rough Logic'.");
   }
+  lintTitleWordBoundary(title, where, errors, tool);
   const bannedT = containsBannedWord(title);
   if (bannedT) {
     errors.push(where + ": <title> contains banned marketing word '" + bannedT + "'.");

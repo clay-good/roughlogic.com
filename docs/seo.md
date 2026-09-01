@@ -95,6 +95,20 @@ Title format: `{Tile Name} - {Profession Noun} - Rough Logic`. Cap
 70 characters; the generator falls back to `{Name} - Rough Logic`
 then to a truncated name as needed, preserving the brand suffix.
 
+Truncation rule (2026-09-01), matching the description's. The cut
+backs off first to a word boundary, then to before an unclosed `(`,
+so a title never trails a parenthetical it does not finish. Before
+this, 86 of the 133 truncated titles ended mid-word -- "ASCE 7 ASD
+Load Combinations: Governing Demand and Ne...", "Compressor
+Volumetric Efficiency (Clearance Re-Expans..." -- in the blue link
+text of a search result and on the browser tab. Each back-off is
+skipped where it would eat so much of the name that a reader could
+no longer tell which calculator it is; three titles keep an unclosed
+bracket for that reason, trading a typographic wart for the standard
+reference a reader scans for. `check-shells` cross-checks each
+truncated title against the tile's name in `TOOLS`;
+`test/unit/shell-title-truncation.test.js` pins both back-offs.
+
 Description format: two to three sentences. The first sentence names
 the calculation and the inputs. Cap 220 characters measured against
 the HTML-escaped string.
