@@ -34,14 +34,6 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
-- **The home page still described itself as "Rough Logic" -- in the browser.** Earlier today the static `index.html` was corrected, and `check-shells` grew a home-head lint that reads `dist/index.html` and passed it. Opening the built page in a browser showed `og:description` and `twitter:description` carrying the real sentence and `<meta name="description">` reading `Rough Logic` again: `app.js` rewrites the description on every route change, and its `HOME_DESC` constant was still the old string, so the home route wrote it straight back over the tag.
-
-  Right in the file a crawler reads; wrong on the page a person is looking at. The gate could not tell, because it reads a file and not a running page -- which is the same shape as the defect it was written for, one surface watched and a second one not.
-
-  Both now carry the same sentence, and `check-readme-counts` asserts the two strings are **identical**, which also keeps the tile count inside the `app.js` copy honest since the file copy is already pinned. Seed-verified by putting the old string back. Home-view payload 47.0% of budget, up 0.2 points.
-
-  Found by opening the page, not by reading either file. The first browser reading said "Rough Logic" too and was wrong -- a cached `app.js`, the documented trap; the check had to be re-run on a fresh port before it meant anything.
-
 - **Two extractor experiments recorded as not taken, so the next attempt does not spend them again.** Both remaining free-text mis-bindings are now traced to a cause. `how many studs for a 40 ft wall 16 on center` puts 480 inches into a stud-depth field because `assembly-r-value` carries exactly one field with a unit, so the unit-agreement phase converts the wall length into it unopposed; `how many 4x8 sheets` sits inside the lumber bound, and a 4x8 is a plausible timber as well as a sheet.
 
   Requiring label support for a same-family conversion does not separate the stud case: the reader did write "studs", just about a different number.
@@ -112,11 +104,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
   `check-csp` already recomputed the boot-script hash and asserted the eight edge headers match this document. It now also asserts that **every directive in the live policy, and every external origin in it, is named in the threat model**. Prose stays prose; nothing in the policy can go unmentioned. Both failure modes seed-verified: renaming the directive in the doc, and renaming the origin.
 
-- **The home page described itself as "Rough Logic".** Not as a title -- as its *description*. `<meta name="description">`, `og:description` and `twitter:description` on `https://roughlogic.com/` were each the literal string `Rough Logic`: the brand name, three times, on the site's front door and in the preview card of every link to it anyone has ever shared in Slack, iMessage or anywhere else. The JSON-LD block on the same page carried a real sentence the whole time.
+- **The home page described itself as "Rough Logic".** Not as a title -- as its *description*. `<meta name="description">`, `og:description` and `twitter:description` on `https://roughlogic.com/` were each the literal string `Rough Logic`: the brand name, three times, on the site's front door and in the preview card of every link to it anyone has ever shared. The JSON-LD block on the same page carried a real sentence the whole time.
 
-  All three now carry the home lede -- "1,804 free calculators for the trades. Type the job the way you'd say it, and you get the number, the inputs, and the source." -- which is the sentence the page opens with, already pinned to the live tile count by `check-readme-counts`. Home-view payload 46.8% of budget, up 0.1 points.
+  All three now carry the home lede -- "1,804 free calculators for the trades. Type the job the way you'd say it, and you get the number, the inputs, and the source." -- which is the sentence the page opens with, already pinned to the live tile count by `check-readme-counts`.
 
   It happened because `check-shells` walks every generated shell and had never visited `dist/index.html`. It cannot run its full lint there -- the home page is the SPA, so it carries executable script and no CSP meta, both of which that lint forbids -- so the page was left out entirely, and a head no gate reads is a head that rots. There is now a narrow home-head lint: description present, within the cap, more than a handful of words, not the page title repeated, and matching `og:description` and `twitter:description` exactly, because a link preview reads those and not the meta description. It seed-verified itself on its first run, against the not-yet-rebuilt `dist/`.
+
+  **And then the fix was still only half done.** Opening the built page in a browser showed the two social tags carrying the real sentence and `<meta name="description">` reading `Rough Logic` again: `app.js` rewrites the description on every route change, and its `HOME_DESC` constant was still the old string, so the home route wrote it straight back over the tag. Right in the file a crawler reads; wrong on the page a person is looking at -- and the new gate could not tell, because it reads a file and not a running page, which is the same shape as the defect it was written for. Both copies now carry the same sentence and `check-readme-counts` asserts the two strings are **identical**, which also keeps the tile count inside the `app.js` copy honest. Home-view payload 47.0% of budget.
+
+  Found by opening the page, not by reading either file. The first browser reading said "Rough Logic" too and was wrong -- a cached `app.js`, the documented trap; the check had to be re-run on a fresh port before it meant anything.
 
 - **Three more doc counts that move with every tile added, and nothing watched.** `docs/architecture.md` and `docs/deployment.md` each state the static-shell total to explain why the service worker does not precache them; `docs/accessibility.md` states how many tile shells the shell a11y sweep does *not* visit, and said "~1,730" against a live 1,804. All three now read from the artefacts through `check-readme-counts`, taking its pinned-count total from 43 to 46. Seed-verified in both directions -- adding a tile moves the numbers, and editing one of the numbers alone reddens the gate.
 
