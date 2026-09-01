@@ -473,6 +473,19 @@ export function queryFill(query, rows, opts) {
       if (!qtyUnit) return;                                // a bare number is not evidence
       // A number field measured in exactly this unit is the better home.
       if (numberRows.some((r) => !(r.d in filled) && rowUnit(r) === qtyUnit)) return;
+      // The unit corroborates that the number means something. It does not
+      // corroborate that it means something HERE, and this phase never asked.
+      // `wire size for a 50 amp circuit 90 feet away` put 90 into the
+      // Insulation rating select, whose options are 60 / 75 / 90 -- because the
+      // value matched an option and the reader had written a unit, any unit.
+      // 90 C is a real rating, so nothing downstream looks wrong.
+      //
+      // A tile that measures nothing in this dimension has no home for the
+      // quantity at all. pipe-volume does -- its Length is in feet, so a pipe
+      // size in inches is a length among lengths and the case this phase was
+      // written for still fills. wire-ampacity measures amps, degrees and
+      // counts, and a distance in feet belongs to none of them.
+      if (!rows.some((r) => rowUnit(r) && unitsCompatible(qtyUnit, rowUnit(r)))) return;
       const takers = [];
       for (const row of numericSelects) {
         if (row.d in filled) continue;

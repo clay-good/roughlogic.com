@@ -146,9 +146,23 @@ dimension, a wall and a stud do not share a meaning.
 `test/fixtures/free-text-queries.json`, and `test/unit/free-text-fill.test.js`
 pins the count both ways: it cannot rise, and it cannot fall without the
 constant being lowered to match, so the number always says what the door does.
-The extractor itself is untouched -- it is a tuned module whose history
-includes guards that cost more recoveries than they saved, so this measures the
-gap rather than gambling on closing it.
+
+**Five to four.** The insulation-rating case is fixed. A unit-bearing number
+may fill a numeric dropdown -- a bare one may not, since the unit is the
+corroboration -- but the phase never asked *which* unit, so any unit at all
+let a value through that matched an option. It now also requires the tile to
+measure *something* in that dimension: `pipe-volume` has a Length in feet, so
+a pipe size in inches is still a length among lengths and the case the phase
+was written for keeps filling, while `wire-ampacity` measures amps, degrees
+and counts and has no home for a distance. Same dimension, not same unit --
+narrowing it to the unit would have broken `pipe-volume`, whose size dropdown
+declares no unit in its label at all. Recovery across all 1,763 tiles is
+unchanged at 4,154 / 7,184 fields.
+
+The four that remain are not fixed. Each reaches a different phase, and the
+first attempt at a general guard -- requiring label support for a same-family
+conversion in the unit-agreement fallback -- moved neither number and was
+reverted rather than shipped.
 
 ## Run it
 
