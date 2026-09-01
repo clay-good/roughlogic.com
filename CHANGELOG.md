@@ -34,6 +34,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **734 of 1,804 tile pages advertised themselves with a cut-off word.** A meta description over the 220-character cap gets an ellipsis, and the cap loop planted it wherever it happened to land: `...flags expec...`, `...the marine allow...`, `...OR FRACTION OF SIX of those -- so 100 s...`. That fragment is not a detail of the HTML. It is the string the search snippet shows, and the same string is copied into `og:description`, into `twitter:description`, and into the JSON-LD `description` a crawler reads -- four surfaces, one broken sentence, on 41% of the catalog.
+
+  Nothing was looking at it. The only description gate was the length cap, which a mid-word cut satisfies perfectly; the sibling helper that trims a group-hub row (`rowSummary`) had backed off to a word boundary since the day it was written, and the meta-description path simply never got the same treatment.
+
+  Two changes. The cut now backs off to a word boundary, the way `rowSummary` does. And when the tile's opening sentence plus the closing "Client-side, ad-free, account-free reference for {profession}." overruns the cap, the closing sentence is now dropped **whole** rather than clipped -- a reader gets one complete sentence instead of two broken ones, and only a tile whose opening sentence alone overruns is cut at all. The 21 group hubs follow the same rule and now end on a complete sentence, every one of them.
+
+  Mid-word descriptions: **734 -> 0**, measured by cross-checking each rendered stem back against the tile's own `desc` in `TOOLS`. `check-shells` runs that same cross-check on every build and names it in its summary line; seed-verified by restoring the old cut, which reddens it with 700 findings. `test/unit/shell-description-cap.test.js` pins the helper against a sweep of cut points, the escaped-length cap, and the single-unbroken-token case, and fails under the same seed.
+
 - **`docs/performance.md` contradicted itself about a cap and quoted shell sizes from 385 tiles ago.** The per-shell budget section still said the prerender emits "385 shells" and "24 shells" against a live 1,804 and 21, and put the group-shell cap at **12 KB** while the table at the top of the same file says 68 KB -- the cap was raised when the catalog outgrew it and only one of the two places that state it moved. Its "live measurements at v13 close" (tile shells ~1.8 KB, group shells ~3.9 KB) were three campaigns stale.
 
   Re-measured from the built `dist/`: tile shells **2,476 B gzipped at the median, 3,779 B at the largest**; group shells **5,249 B median, 45,762 B largest**. The two figures the file quotes for the heaviest documents a stranger downloads had drifted too -- and one of them because a change earlier in this same release made the page bigger.

@@ -160,6 +160,14 @@ async function loadTools() {
   for (const m of text.matchAll(re)) {
     tools.push({ id: m[1], name: m[2], group: m[3] });
   }
+  // The regex above deliberately stops at `group` -- a tile `desc` runs to
+  // hundreds of characters with embedded quotes and escapes, and is not worth
+  // parsing by hand. lintDescriptionWordBoundary needs the real source string,
+  // so read it from the module itself; tools-data.js is pure data with no
+  // side effects.
+  const mod = await import(pathToFileURL(resolve(ROOT, "tools-data.js")).href);
+  const descById = new Map((mod.TOOLS || []).map((t) => [t.id, t.desc]));
+  for (const t of tools) t.desc = descById.get(t.id);
   return tools;
 }
 
@@ -205,6 +213,37 @@ const SHELL_CSP_REQUIRED = [
 // its own run someone else's.
 const SHELL_CSP_FORBIDDEN = [/'unsafe-inline'/, /'unsafe-eval'/, /\*/, /https?:/];
 
+// A description that overflows the cap gets an ellipsis. Until 2026-09-01 the
+// cut landed wherever the shave loop stopped, so 734 of 1,804 tile pages ended
+// mid-word -- "...flags expec..." -- and that fragment was what the search
+// snippet, og:description, twitter:description and the JSON-LD description all
+// carried. Nothing looked at it: the only description gate was the 220-char cap,
+// which a mid-word cut satisfies perfectly. Cross-check the rendered stem back
+// against the tile's own `desc` in TOOLS: if the source continues the word the
+// stem ends on, the ellipsis was planted inside a word.
+function lintDescriptionWordBoundary(desc, where, errors, tool) {
+  if (!tool || !tool.desc || !desc.endsWith("...")) return;
+  const stem = unescapeHtml(desc).slice(0, -3);
+  const probe = stem.slice(-40);
+  if (probe.length < 40) return;
+  const at = tool.desc.trim().indexOf(probe);
+  if (at < 0) return;
+  const end = at + probe.length;
+  const source = tool.desc.trim();
+  if (/[A-Za-z0-9]/.test(source[end - 1] || "") && /[A-Za-z0-9]/.test(source[end] || "")) {
+    errors.push(where + ": meta description ellipsis falls mid-word ('..." + probe.slice(-24) + "...' cuts '" + source.slice(end - 8, end + 12) + "').");
+  }
+}
+
+function unescapeHtml(s) {
+  return s
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, "&");
+}
+
 function lintShellCsp(html, where, errors) {
   const meta = html.match(/<meta[^>]+http-equiv=["']Content-Security-Policy["'][^>]*>/i);
   if (!meta) {
@@ -244,7 +283,7 @@ function lintShellNoScript(html, where, errors) {
   }
 }
 
-async function lintShell(path, kind, errors) {
+async function lintShell(path, kind, errors, tool) {
   const html = await readFile(path, "utf8");
   const where = path.slice(DIST.length + 1);
   lintShellCsp(html, where, errors);
@@ -280,6 +319,7 @@ async function lintShell(path, kind, errors) {
     if (bannedD) {
       errors.push(where + ": meta description contains banned marketing word '" + bannedD + "'.");
     }
+    lintDescriptionWordBoundary(desc, where, errors, tool);
   }
 
   // Canonical.
@@ -443,7 +483,7 @@ async function main() {
       errors.push("tools/" + t.id + "/index.html: missing tile shell.");
       continue;
     }
-    await lintShell(p, "tile", errors);
+    await lintShell(p, "tile", errors, t);
   }
 
   // spec-v1345: the catalog hub at dist/tools/index.html. Linted under the
@@ -591,7 +631,8 @@ async function main() {
   const groupCount = existsSync(groupsDir) ? (await readdir(groupsDir)).length : 0;
   console.log(
     "check-shells OK: " + tileCount + " tile shells + " + groupCount + " group shells + 1 catalog hub + 1 not-found page; " +
-    "all titles <= " + TITLE_CAP + " chars, descriptions <= " + DESCRIPTION_CAP + " chars, " +
+    "all titles <= " + TITLE_CAP + " chars, descriptions <= " + DESCRIPTION_CAP + " chars and never " +
+    "cut mid-word, " +
     "JSON-LD valid against allowlist, gzip under " + TILE_GZIP_CAP + " / " + GROUP_GZIP_CAP + " B caps, " +
     "every shell CSP present and unweakened, no executable script on any shell, " +
     "every page without a worked example printing its reference content, every group hub linking every other as a real URL, " +

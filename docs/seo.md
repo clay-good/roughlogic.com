@@ -100,6 +100,22 @@ sentence names the calculation and the inputs. Cap 220 characters
 measured against the HTML-escaped string. Tiles whose `desc` does
 not lead with an admissible verb get a "Reference for" prefix.
 
+Overflow rule (2026-09-01). A tile description is the tile's opening
+sentence plus a closing "Client-side, ad-free, account-free reference
+for {profession}." When the pair overruns the cap the closing sentence
+is dropped whole rather than clipped, so the reader gets a complete
+first sentence; only when that sentence alone overruns is it cut, and
+the cut backs off to a word boundary before the ellipsis. A group hub
+follows the same rule with its own closing sentence. Before this,
+the cap loop shaved four characters at a time and planted the ellipsis
+wherever it landed: 734 of 1,804 tile pages ended mid-word
+("...flags expec...") in the search snippet, in `og:description`, in
+`twitter:description` and in the JSON-LD `description`, and the only
+description gate was the length cap, which a mid-word cut passes.
+`check-shells` now cross-checks each truncated description back
+against the tile's own `desc` and fails if the ellipsis fell inside a
+word; `test/unit/shell-description-cap.test.js` pins the helper.
+
 No marketing language. The
 [../scripts/check-shells.mjs](../scripts/check-shells.mjs) lint
 screens unambiguously-marketing words; the §11.3 list also names

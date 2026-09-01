@@ -604,6 +604,31 @@ async function loadGroupNames() {
   return out;
 }
 
+// The spec-v13 §6.2 / Phase G hard cap on a meta description, measured
+// *after HTML escaping* -- the escaped attribute string is what the search
+// snippet and the check-shells lint both read.
+export const DESCRIPTION_CAP = 220;
+
+// Cut a description down to DESCRIPTION_CAP. The old loop shaved four
+// characters at a time and appended "..." wherever it landed, which left
+// 734 of 1,804 tile pages ending mid-word ("...flags expec...") in the
+// snippet, in og:description, in twitter:description, and in the JSON-LD
+// description. Back off to a word boundary the way rowSummary does, so the
+// ellipsis always follows a whole word.
+export function capDescription(text) {
+  if (escapeHtml(text).length <= DESCRIPTION_CAP) return text;
+  // Reserve the three characters the ellipsis itself costs.
+  let cut = text;
+  while (escapeHtml(cut).length > DESCRIPTION_CAP - 3 && cut.length > 10) {
+    cut = cut.slice(0, -4);
+  }
+  const sp = cut.lastIndexOf(" ");
+  // Only honour the boundary if a usable amount of text survives it; a
+  // description made of one very long token would otherwise collapse.
+  if (sp > DESCRIPTION_CAP * 0.4) cut = cut.slice(0, sp);
+  return cut.replace(/[.,;:\s-]+$/, "") + "...";
+}
+
 // One-line shell description expanded from the tile's `desc` field per
 // spec-v13 §11.1 (verb-first, names the calculation and the inputs).
 // The desc fields in TOOLS already begin with a verb in the great
@@ -624,17 +649,12 @@ function metaDescription(tool, professionNoun) {
   }
   if (!lead.endsWith(".")) lead += ".";
   const tail = "Client-side, ad-free, account-free reference for " + professionNoun.toLowerCase() + ".";
-  let combined = lead + " " + tail;
-  // Truncate against the escaped length so the value the lint reads
-  // out of the rendered <meta content="..."> stays under the cap.
-  while (escapeHtml(combined).length > 220 && combined.length > 10) {
-    combined = combined.slice(0, -4) + "...";
-    // Strip the ".." we just appended on the next pass; the slice loop
-    // converges as long as it shaves at least one raw character per
-    // iteration.
-    combined = combined.replace(/\.\.\.+$/, "...");
-  }
-  return combined;
+  const combined = lead + " " + tail;
+  if (escapeHtml(combined).length <= DESCRIPTION_CAP) return combined;
+  // The pair does not fit. A whole sentence beats a clipped pair, so drop
+  // the tail before cutting into the lead the searcher actually wants.
+  if (escapeHtml(lead).length <= DESCRIPTION_CAP) return lead;
+  return capDescription(lead);
 }
 
 // Build a shell title with the spec-v13 §11.2 profession noun, falling
@@ -1214,14 +1234,17 @@ function groupShell(group, tools, groupNames) {
   if (tilesInGroup.length === 0) return null;
   const title = `${groupLabel} Calculators - Rough Logic`;
   const sample = tilesInGroup.slice(0, 3).map((t) => t.name).join(", ");
-  let description = `Calculators and reference tools for ${groupLabel.toLowerCase()}: ${sample}, and more. Free, client-side, ad-free, account-free reference for the trades and adjacent professions.`;
+  const groupHead = `Calculators and reference tools for ${groupLabel.toLowerCase()}: ${sample}, and more.`;
+  const groupTail = "Free, client-side, ad-free, account-free reference for the trades and adjacent professions.";
   // Cap against the escaped length (check-shells reads the escaped <meta
   // content>), mirroring metaDescription and buildTitle: a sample tile name
   // with an apostrophe or ampersand escapes to more bytes than its raw form,
-  // so a raw-length cap can let the rendered description slip past 220.
-  while (escapeHtml(description).length > 220 && description.length > 10) {
-    description = description.slice(0, -4) + "...";
-    description = description.replace(/\.\.\.+$/, "...");
+  // so a raw-length cap can let the rendered description slip past 220. As on
+  // a tile page, the tail is dropped whole rather than clipped, so the hub
+  // never advertises itself with half a sentence.
+  let description = groupHead + " " + groupTail;
+  if (escapeHtml(description).length > DESCRIPTION_CAP) {
+    description = escapeHtml(groupHead).length <= DESCRIPTION_CAP ? groupHead : capDescription(groupHead);
   }
   const canonical = `${SITE_URL}/groups/${groupSlug}/`;
   const head = shellHead({
