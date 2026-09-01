@@ -7,7 +7,18 @@ import assert from "node:assert/strict";
 import { firstSentence, leadSentence, restOfDescription } from "../../text-lead.js";
 import { TOOLS } from "../../tools-data.js";
 
-const LEAD_CAP = 160;
+// The module's own cap, not a second copy of it: this constant read 160 while
+// text-lead.js read 120, so the one assertion using it was 40 characters
+// looser than the rule it was meant to check.
+const LEAD_CAP = 120;
+// A lead cut at a clause or comma seam is `sentence.slice(0, at) + "."`, and
+// `at` is checked against the cap before the period is appended -- so a seam
+// landing exactly on the cap yields one character more. Five tiles do that
+// today. Tightening the seam budget by one was tried and rejected: it costs
+// real words on four of them ("...depth-of-discharge, and round-trip
+// efficiency" loses its last term) and forces the fifth from a clean sentence
+// onto an ellipsis, all to satisfy a soft layout target by one character.
+const LEAD_MAX = LEAD_CAP + 1;
 
 test("firstSentence does not split inside a standard reference", () => {
   const d = "The panel-zone strength takes (1.4 - Pr/Pc) (Eq. J10-10) past 0.4 Pc. A second sentence follows.";
@@ -271,4 +282,36 @@ test("a lead that names the thing in words drops the equation trailing it", () =
     leadSentence("Horsepower, kilowatts, and a selector across HP, torque, and RPM via HP = Torque * RPM / 5252."),
     "Horsepower, kilowatts, and a selector across HP, torque, and RPM via HP = Torque * RPM / 5252.",
   );
+});
+
+// Nothing asserted the cap over the catalog. text-lead.js enforced it on
+// itself, this file's copy of the number had drifted to 160, and the one
+// assertion using it ran against a single hand-written sentence. A splitter
+// regression is visible on 1,804 public pages at once.
+test("no public lead overruns the cap", () => {
+  const over = TOOLS
+    .map((t) => [leadSentence(t.desc).length, t.id])
+    .filter(([n]) => n > LEAD_MAX)
+    .sort((a, b) => b[0] - a[0]);
+  assert.deepEqual(over, [], `leads past ${LEAD_MAX} chars: ${over.map(([n, id]) => `${id}=${n}`).join(", ")}`);
+});
+
+test("the leads that sit at the cap are the five known seam cases", () => {
+  // Pinned by name so a splitter change that quietly adds a sixth is visible,
+  // and so removing one is a deliberate edit rather than a silent drift.
+  const atMax = TOOLS.filter((t) => leadSentence(t.desc).length === LEAD_MAX).map((t) => t.id).sort();
+  assert.deepEqual(atMax, [
+    "block-redirect-max-angle",
+    "off-grid-battery",
+    "parabolic-segment",
+    "scaffold-platform-check",
+    "steam-boiler-blowdown",
+  ]);
+});
+
+test("the mean lead stays well inside the cap", () => {
+  // The cap is the ceiling; the design target is a line a reader takes in at a
+  // glance. Mean was 103 before the 2026-08-18 enforcement pass and is 80 now.
+  const mean = TOOLS.reduce((a, t) => a + leadSentence(t.desc).length, 0) / TOOLS.length;
+  assert.ok(mean < 90, `mean lead ran to ${mean.toFixed(1)} chars`);
 });
