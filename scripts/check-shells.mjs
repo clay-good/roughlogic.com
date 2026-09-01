@@ -659,6 +659,46 @@ async function lintHomeHead(path, errors) {
   }
 }
 
+// docs/seo.md's "What each shell contains" table is a promise about the page,
+// and until 2026-09-02 it named three parts no shell had carried since the
+// 2026-08-16 presentation overhaul: a "Tools index" link in the header, an
+// Audience block and a Posture block. Prose describing a page outlived the
+// page by four months because nothing read them side by side.
+//
+// So read them side by side. Each row's right-hand column is a literal marker;
+// every one must appear in EVERY tile shell. Removing a part from the builder
+// now fails here until the row goes too, and a row invented for a part that
+// does not exist fails immediately.
+async function lintDocumentedShellParts(shellPaths, errors) {
+  const doc = await readFile(resolve(ROOT, "docs", "seo.md"), "utf8");
+  const section = doc.slice(doc.indexOf("## What each shell contains"));
+  const table = section.slice(0, section.indexOf("\n\n", section.indexOf("| Part | Marker |")));
+  const markers = [...table.matchAll(/\|\s*`([^`]+)`\s*\|\s*$/gm)].map((m) => m[1]);
+  if (markers.length < 5) {
+    errors.push(
+      "docs/seo.md: could not read the 'What each shell contains' marker table (found " +
+        markers.length + " row(s)). It is the gate's input; do not reshape it without updating check-shells.",
+    );
+    return 0;
+  }
+  // Sampled across the catalog rather than 1,804 x 10 substring passes: the
+  // markers come from ONE builder, so a missing one is missing everywhere.
+  const step = Math.max(1, Math.floor(shellPaths.length / 40));
+  const sample = shellPaths.filter((_, i) => i % step === 0);
+  for (const path of sample) {
+    const html = await readFile(path, "utf8");
+    for (const marker of markers) {
+      if (!html.includes(marker)) {
+        errors.push(
+          path.slice(DIST.length + 1) + ": docs/seo.md lists " + JSON.stringify(marker) +
+            " as part of every tile shell, and this shell does not carry it.",
+        );
+      }
+    }
+  }
+  return markers.length;
+}
+
 async function main() {
   if (!existsSync(DIST)) {
     console.error("check-shells: dist/ does not exist. Run `npm run build` first.");
@@ -673,6 +713,7 @@ async function main() {
   for (const t of tools) routableIds.add(t.id);
 
   const errors = [];
+  const tileShellPaths = [];
 
   // Every tile must have a shell.
   for (const t of tools) {
@@ -681,8 +722,10 @@ async function main() {
       errors.push("tools/" + t.id + "/index.html: missing tile shell.");
       continue;
     }
+    tileShellPaths.push(p);
     await lintShell(p, "tile", errors, t);
   }
+  const documentedParts = await lintDocumentedShellParts(tileShellPaths, errors);
 
   // The home page. Every other public document on the site is linted above or
   // below this line; dist/index.html was not, because it is the SPA and not a
@@ -841,6 +884,7 @@ async function main() {
   const groupCount = existsSync(groupsDir) ? (await readdir(groupsDir)).length : 0;
   console.log(
     "check-shells OK: " + tileCount + " tile shells + " + groupCount + " group shells + 1 catalog hub + 1 not-found page + the home page; " +
+    "every one of the " + documentedParts + " shell parts docs/seo.md documents present on a 40-shell sample, " +
     "all titles <= " + TITLE_CAP + " chars, descriptions <= " + DESCRIPTION_CAP + " chars and never " +
     "cut mid-word, " +
     "JSON-LD valid against allowlist, gzip under " + TILE_GZIP_CAP + " / " + GROUP_GZIP_CAP + " B caps, " +

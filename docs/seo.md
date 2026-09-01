@@ -49,15 +49,56 @@ calculator" button.
 
 ## What each shell contains
 
-Per spec-v13 §5.2:
+Per spec-v13 §5.2.
 
-- `<head>`: charset, viewport, the same CSP `<meta http-equiv>` the
-  home document carries, `<title>` (per §6.1 authoring rules),
-  `<meta name="description">` (per §6.2), `<link rel="canonical">`
-  to the shell's own URL, Open Graph + Twitter Card meta, a
-  `<script type="application/ld+json">` block with a
-  `WebApplication` + `BreadcrumbList` (tile shells) or
-  `CollectionPage` + `BreadcrumbList` + `ItemList` (group shells).
+`<head>`: charset, viewport, the same CSP `<meta http-equiv>` the home document
+carries, `<title>` (per §6.1 authoring rules), `<meta name="description">`
+(per §6.2), `<link rel="canonical">` to the shell's own URL, Open Graph +
+Twitter Card meta, and a `<script type="application/ld+json">` block with a
+`WebApplication` + `BreadcrumbList` (tile shells) or `CollectionPage` +
+`BreadcrumbList` + `ItemList` (group shells).
+
+The body. **Every marker in the right-hand column is asserted present in every
+tile shell by `check-shells`**, and the gate reads this table -- so a part that
+is removed from the page has to be removed here too. Until 2026-09-02 this list
+named a "Tools index" link in the header, an Audience block and a Posture
+block; all three were deleted in the 2026-08-16 presentation overhaul, and the
+prose describing the page outlived the page by four months.
+
+| Part | Marker |
+| --- | --- |
+| Header with the wordmark, linking home | `class="site-header"` |
+| Breadcrumb (Home > Group > Tile) | `class="shell-breadcrumb"` |
+| One `<h1>` with the tile name | `class="shell-h1"` |
+| Lead paragraph with the tile description | `class="shell-lead"` |
+| "Run the calculator" link into the SPA hash form | `class="shell-run-link"` |
+| The cited formula (spec-v45) | `class="shell-formula"` |
+| The source stamp behind it | `class="shell-source"` |
+| One disclosure holding the details, formula and sources | `aria-label="Details, formula, and sources"` |
+| Related tiles | `class="shell-related"` |
+| Footer with the inline disclaimer | `class="shell-disclaimer"` |
+
+Two parts are conditional and so are not in the table. The **worked example**
+is on every tile that takes inputs. The **reference block** replaces it on the
+20 tiles that take none (OSHA Top-10, the knot and hand-signal references,
+Lockout/Tagout Steps, the GFCI/AFCI table): their whole value is the table
+itself, and until 2026-08-31 none of it reached the static page. The builder
+renders what the tile computes on no inputs -- the same call `run_calculator`
+makes, so the page and the agent door cannot disagree about what the reference
+says. `check-shells` fails a page that has no worked example and prints no
+reference rows, so an unrecognised result shape has to be handled rather than
+silently rendering the old stub.
+
+The spec-v45 formula and source block prerenders the actual reference content
+-- the math and its authority -- into the static shell, so what a crawler and
+an offline reader get is more than the tile name. Every tile has a `CITATIONS`
+entry (the v19/v22 coverage gate), so every tile shell carries it.
+
+The related-tiles block is curated per the Phase E registry, filled out by
+ranking the tile's name against its group siblings, then balanced by the
+catalog-wide inbound pass below.
+
+### The two surfaces one tile has
 
 The `<title>` and `<meta name="description">` are built by
 [shell-meta.js](../shell-meta.js), which lives in the repo root rather than in
@@ -89,37 +130,6 @@ routes. The rule exists because all 21 group hubs carried "Open the live group
 view" pointing at `../../#group=<letter>` after the SPA's group view was
 retired, and `check-dist` cannot see that: it resolves the href to `/`, which
 exists.
-
-- Header with the wordmark and a "Tools index" link back to home.
-- Breadcrumb (Home > Group > Tile).
-- One `<h1>` with the tile name.
-- Lead paragraph with the tile description.
-- "Run the calculator" link to the SPA hash form.
-- Formula and source block (spec-v45): the cited formula and the
-  source-stamp (the `formula` and `edition` fields from `CITATIONS`,
-  HTML-escaped). This prerenders the actual reference content -- the math
-  and its authority -- into the static shell so it is crawlable and
-  readable offline, not just the tile name. Every tile has a `CITATIONS`
-  entry (the v19/v22 coverage gate), so every tile shell carries it;
-  `check-shells.mjs` fails the build on a tile shell missing the block.
-- Audience block naming the profession.
-- Reference block, on the 20 tiles that take no inputs and therefore
-  carry no worked example (OSHA Top-10, the knot and hand-signal
-  references, Lockout/Tagout Steps, the GFCI/AFCI table). Their whole
-  value is the table itself, and until 2026-08-31 none of it reached
-  the static page. The builder renders what the tile computes on no
-  inputs -- the same call `run_calculator` makes, so the page and the
-  agent door cannot disagree about what the reference says.
-  `check-shells` fails a page that has no worked example and prints no
-  reference rows, so an unrecognised result shape has to be handled
-  rather than silently rendering the old stub.
-- Related tiles block (curated per the Phase E registry, filled out
-  by ranking the tile's name against its group siblings, then
-  balanced by the catalog-wide inbound pass below).
-- Posture block restating the AHJ-governs / professional-governs
-  stance.
-- Footer matching the home document's footer plus the inline
-  disclaimer.
 
 ## Authoring rules (Phase B)
 

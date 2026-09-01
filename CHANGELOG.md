@@ -20,6 +20,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **The doc describing what a tile shell contains listed three parts no shell has had since August.** `docs/seo.md`'s "What each shell contains" named a "Tools index" link in the header, an Audience block and a Posture block; all three were deleted in the 2026-08-16 presentation overhaul. The prose outlived the page by four months because nothing read the two side by side -- the same shape as the axe-pass size and the module count before it.
+
+  The list is now a table whose right-hand column is a literal marker, and `check-shells` **reads that table** and asserts every marker is present in a 40-shell sample. Removing a part from the builder now fails the gate until the row goes too, and a row invented for a part that does not exist fails immediately. Seed-verified by adding a `class="tools-index-link"` row: 41 errors. Ten parts are covered; the worked example and the reference block are deliberately left out of the table, being the two that are conditional on whether a tile takes inputs.
+
+
 - **The README's stated axe-pass size was watched by nothing, and had already drifted.** It said "the 1,806-test axe pass" against a live 1,875 the moment the shell sweep landed -- the same shape as the home-payload figure and the module count before it. `check-ci-claims` now counts the pass with `playwright --list` (no browser launched, so it runs in the lint job) and fails if the README is more than **5%** off, or if the prose stops stating a figure at all. A band rather than an exact pin, deliberately: every new tile adds one route to that sweep, and a number that fails on each tile addition gets edited out of the way rather than obeyed. `npx --no-install`, so the gate can never reach for the network -- a gate that installs things can pass for the wrong reason. Both failure modes seed-verified.
 
   The workflow's own comment carried the stale arithmetic too (`1,806 + 1,964 = 3,770`); it now reads `1,875 + 1,972 = 3,847` and says which figure is pinned and which is prose.
