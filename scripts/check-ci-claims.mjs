@@ -176,6 +176,33 @@ async function main() {
     errors.push("the integration job no longer runs `npm run test:e2e:ci`; check it still complements the accessibility job.");
   }
 
+  // The contributor checklist tells a reader that ticking `npm run audit` is
+  // sufficient. That is only true while the audit chain covers what CI runs
+  // after its build. Until 2026-09-01 it covered two of six, so a contributor
+  // could see "all 6 stages passed" and go red in CI on four different gates.
+  // Assert the two lists agree, with the one browser-driven gate named as a
+  // deliberate exception rather than left as a silent difference.
+  const auditSrc = await readFile(resolve(ROOT, "scripts", "audit.mjs"), "utf8");
+  const auditStages = new Set(
+    [...auditSrc.matchAll(/\{\s*name:\s*"([^"]+)"/g)].map((m) => m[1]),
+  );
+  const notRunHere = /const NOT_RUN_HERE = "([a-z:-]+)/.exec(auditSrc);
+  const exempt = notRunHere ? notRunHere[1] : null;
+  const ciPostBuild = [...yaml.matchAll(/run:\s*npm run (check:[a-z-]+)/g)].map((m) => m[1]);
+  for (const gate of new Set(ciPostBuild)) {
+    if (auditStages.has(gate)) continue;
+    if (gate === exempt) continue;
+    errors.push(
+      `scripts/audit.mjs does not run ${gate}, which ${WORKFLOW} runs after its build. ` +
+      `docs/contributor-checklist.md says ticking \`npm run audit\` is sufficient, so either add ` +
+      `the stage or name it in that file's NOT_RUN_HERE with the reason.`);
+  }
+  if (exempt && !(await readFile(resolve(ROOT, "docs", "contributor-checklist.md"), "utf8")).includes(exempt)) {
+    errors.push(
+      `scripts/audit.mjs exempts ${exempt} but docs/contributor-checklist.md does not tell a ` +
+      `contributor to run it. An exemption nobody states is a gate nobody runs.`);
+  }
+
   if (errors.length) {
     console.error("check-ci-claims FAILED:");
     for (const e of errors) console.error("  - " + e);

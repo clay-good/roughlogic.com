@@ -164,12 +164,23 @@ phase docs ([edition-rollover.md](edition-rollover.md),
 
 ## Universal gates (every PR)
 
-- [ ] `npm run audit` passes (single-shot gate chains lint -> test ->
-  build -> check:dist -> check:shells -> data:verify in the canonical
-  order; six stages as of spec-v13 Phase G, which added the shell
-  content gate after check:dist). The line items below are what
-  `npm run audit` runs; ticking the box at the top is sufficient
-  when the gate is green.
+- [ ] `npm run audit` passes (single-shot gate chain, canonical order:
+  lint -> test -> build -> check:dist -> check:shells ->
+  check:module-sizes -> check:shell-values -> check:lastmod ->
+  data:verify). Nine stages as of 2026-09-01, when the four post-build
+  gates CI runs and this chain did not were added to it -- until then a
+  contributor could see "all 6 stages passed" and still go red in CI.
+  The line items below are what `npm run audit` runs; ticking the box at
+  the top is sufficient when the gate is green.
+- [ ] If any built page changed, `npm run stamp:lastmod` and commit
+  `scripts/page-lastmod.json`. That ledger dates each sitemap URL from a
+  hash of the bytes it serves, so a changed page carries today's
+  `<lastmod>` and an unchanged one keeps its own. `check:lastmod` names
+  the URLs when it is stale.
+- [ ] `npm run check:shell-mobile` before any layout or type change. It
+  is the one CI post-build gate `npm run audit` does not run: it drives
+  1,826 shells through a headless browser at 320 px and takes about five
+  minutes.
 - [ ] `npm run lint` clean.
 - [ ] `npm test` passing (full unit suite).
 - [ ] `npm run build` clean (dist/ produced).

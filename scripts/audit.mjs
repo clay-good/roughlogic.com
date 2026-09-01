@@ -47,8 +47,23 @@ const STAGES = [
   // after build so it can read the freshly generated shells in
   // dist/tools/<id>/ and dist/groups/<slug>/.
   { name: "check:shells", cmd: ["npm", "run", "check:shells"] },
+  // The rest of what CI runs after its build. This gate is the one a
+  // contributor is told to tick instead of running the chain by hand, so
+  // anything CI checks after building has to be here or the promise is
+  // false: until 2026-09-01 four of CI's six post-build gates were absent,
+  // and a contributor could see "all 6 stages passed" and still go red.
+  { name: "check:module-sizes", cmd: ["npm", "run", "check:module-sizes"] },
+  { name: "check:shell-values", cmd: ["npm", "run", "check:shell-values"] },
+  { name: "check:lastmod", cmd: ["npm", "run", "check:lastmod"] },
   { name: "data:verify", cmd: ["npm", "run", "data:verify"] },
 ];
+
+// The one CI post-build gate this chain does not run. check:shell-mobile
+// drives 1,826 shells through a headless browser at 320px and takes four to
+// five minutes; putting it here would make the gate something contributors
+// skip. Named here and in docs/contributor-checklist.md rather than left as
+// a silent difference, because a gap nobody states is a gap nobody runs.
+const NOT_RUN_HERE = "check:shell-mobile (needs a headless browser; ~5 min -- run `npm run check:shell-mobile` before a layout or type change)";
 
 function banner(stage, status) {
   // ASCII-only per the global typographic policy.
@@ -91,3 +106,4 @@ if (failures > 0) {
   process.exit(1);
 }
 console.log("\nv10 audit OK: all " + STAGES.length + " stages passed.");
+console.log("Not run here: " + NOT_RUN_HERE);
