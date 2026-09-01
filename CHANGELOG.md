@@ -34,6 +34,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The threat model told a security reviewer the site permits no third-party script.** `docs/threat-model.md` T3 transcribes the Content-Security-Policy as a control a reader can audit, and it listed `script-src 'self'` with no `frame-src` at all. The live `_headers` policy has carried `script-src 'self' https://challenges.cloudflare.com 'sha256-...'` and `frame-src https://challenges.cloudflare.com` since the report form landed in spec-v1348, three months earlier. The opening paragraph said "no third-party network calls at runtime" for the same three months.
+
+  Both corrected, and stated precisely rather than softened: Turnstile on the "report a problem" form is the site's entire third-party surface, it loads only when a reader opens that form, and a reader who never opens it contacts no origin but this one. The `fetch` claim in the same bullet list survives verification -- the form posts to `/api/reports`, same-origin, served by a Worker route -- so it stays, with the distinction spelled out.
+
+  `check-csp` already recomputed the boot-script hash and asserted the eight edge headers match this document. It now also asserts that **every directive in the live policy, and every external origin in it, is named in the threat model**. Prose stays prose; nothing in the policy can go unmentioned. Both failure modes seed-verified: renaming the directive in the doc, and renaming the origin.
+
 - **The home page described itself as "Rough Logic".** Not as a title -- as its *description*. `<meta name="description">`, `og:description` and `twitter:description` on `https://roughlogic.com/` were each the literal string `Rough Logic`: the brand name, three times, on the site's front door and in the preview card of every link to it anyone has ever shared in Slack, iMessage or anywhere else. The JSON-LD block on the same page carried a real sentence the whole time.
 
   All three now carry the home lede -- "1,804 free calculators for the trades. Type the job the way you'd say it, and you get the number, the inputs, and the source." -- which is the sentence the page opens with, already pinned to the live tile count by `check-readme-counts`. Home-view payload 46.8% of budget, up 0.1 points.

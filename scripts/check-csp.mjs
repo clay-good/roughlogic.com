@@ -185,6 +185,31 @@ async function main() {
     }
   }
 
+  // docs/threat-model.md T3 transcribes the CSP for a reader auditing the
+  // site. That transcription said `script-src 'self'` alone and named no
+  // frame-src for the three months after the Turnstile exception landed, so a
+  // reviewer reading it concluded the site permits no third-party script.
+  // Assert every directive the live policy carries, and every external origin
+  // in it, is named in that document -- prose stays prose, but nothing in the
+  // policy can go unmentioned.
+  const threat = await readFile(resolve(ROOT, "docs", "threat-model.md"), "utf8");
+  for (const [dir, toks] of Object.entries(cspHeader ? parseCsp(cspHeader) : {})) {
+    if (dir === "report-uri" || dir === "report-to") continue;
+    if (!threat.includes("`" + dir + " ") && !threat.includes("`" + dir + "`")) {
+      errors.push(
+        "docs/threat-model.md does not name the `" + dir + "` directive that _headers sets. " +
+        "A CSP a reader cannot see in the threat model is a control they cannot audit.");
+    }
+    for (const tok of toks) {
+      if (!isExternalOrigin(tok) || tok.startsWith("'")) continue;
+      if (!threat.includes(tok)) {
+        errors.push(
+          "docs/threat-model.md does not name the external origin " + tok + " that _headers allows in " +
+          dir + ". Every third party the policy admits has to be visible in the threat model.");
+      }
+    }
+  }
+
   if (errors.length) {
     console.error("check-csp FAILED:");
     for (const e of errors) console.error("  - " + e);
@@ -193,7 +218,8 @@ async function main() {
   console.log(
     "check-csp OK: boot-script sha256 " + expected + " matches script-src in index.html <meta>, _headers, and scripts/dev.mjs; " +
     Object.keys(REQUIRED_EDGE_HEADERS).length + " edge security headers match docs/threat-model.md; " +
-    "default-src / connect-src / object-src locked to self/none; only the reviewed Turnstile script/frame origin is external.",
+    "default-src / connect-src / object-src locked to self/none; only the reviewed Turnstile script/frame origin is external; " +
+    "and every directive and external origin in the live policy is named in docs/threat-model.md.",
   );
 }
 

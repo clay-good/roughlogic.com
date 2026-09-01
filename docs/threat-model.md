@@ -1,6 +1,6 @@
 # Threat Model
 
-roughlogic.com is a single-page static web application with no server, no account system, no analytics, and no third-party network calls at runtime. This document enumerates the threats that apply and the controls that mitigate them.
+roughlogic.com is a single-page static web application with no server, no account system, and no analytics. It makes one third-party request at runtime, and only on demand: opening the "report a problem" form loads the Cloudflare Turnstile widget from `challenges.cloudflare.com`. A reader who never opens that form contacts no origin but this one. Nothing else on any page reaches off-origin -- no fonts, no CDN, no telemetry, no LLM call. This paragraph read "no third-party network calls at runtime" until 2026-09-01, which stopped being true when the report form landed. This document enumerates the threats that apply and the controls that mitigate them.
 
 ## Assets
 
@@ -61,10 +61,27 @@ Controls:
 Threat: A bug or injected script attempts to exfiltrate user input or referrer information.
 
 Controls:
-- CSP `connect-src 'self'`, `default-src 'self'`, `script-src 'self'`, `style-src 'self' 'unsafe-inline'`, `img-src 'self' data:`, `form-action 'self'`, `base-uri 'self'`, `frame-ancestors 'none'`, `object-src 'none'`.
+- CSP `default-src 'self'`, `connect-src 'self'`, `style-src 'self' 'unsafe-inline'`,
+  `img-src 'self' data:`, `form-action 'self'`, `base-uri 'self'`,
+  `frame-ancestors 'none'`, `object-src 'none'`, `worker-src 'self'`.
+- `script-src 'self'` **plus** `https://challenges.cloudflare.com` and the
+  sha256 of the one inline boot script, and `frame-src
+  https://challenges.cloudflare.com`. That is the whole third-party surface
+  of the site and it exists for one thing: the Turnstile widget on the
+  "report a problem" form (spec-v1348). It loads only when a reader opens
+  that form, and a reader who never does never contacts Cloudflare's
+  challenge origin at all. This bullet transcribed `script-src 'self'`
+  alone until 2026-09-01, three months after the exception landed, and
+  omitted `frame-src` entirely -- so a reviewer reading this document
+  concluded the site permits no third-party script. `check-csp` now
+  asserts that this transcription matches [../_headers](../_headers)
+  directive for directive, in addition to pinning the boot-script hash.
 - `Referrer-Policy: no-referrer`.
 - `Permissions-Policy` disables camera, microphone, geolocation, payment, USB, and accelerometer.
-- The application makes no `fetch` calls to non-same-origin URLs.
+- The application makes no `fetch` calls to non-same-origin URLs. The report
+  form posts to `/api/reports`, same-origin, which a Cloudflare Worker route
+  serves. The Turnstile exception above is a `<script src>` and an iframe,
+  not a `fetch`.
 
 ### T4. Stale or tampered data
 
