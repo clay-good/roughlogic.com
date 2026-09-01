@@ -197,6 +197,7 @@ main {
   display: flex;
   align-items: baseline;
   gap: 10px;
+  min-height: 48px;   /* the 48 px touch floor; the wordmark link was 36 tall */
   text-decoration: none;
   color: var(--fg);
   flex: 0 0 auto;
@@ -729,11 +730,18 @@ label {
   overflow-wrap: anywhere;
 }
 
+/* 48 px tall, not 46. docs/accessibility.md promises "at least 48 by 48
+   pixels ... for gloved-hand operation" -- stricter than WCAG 2.2 SC 2.5.8's
+   24 px on purpose, for the audience this site has -- and these came out two
+   pixels short of the site's own floor. min-height rather than more padding,
+   so the number is stated where it is meant rather than falling out of a font
+   size. test/integration/touch-targets.test.js holds it. */
 input[type="number"],
 input[type="text"],
 select,
 textarea {
   width: 100%;
+  min-height: 48px;
   padding: 12px 14px;
   background: var(--bg-primary);
   color: var(--fg);
@@ -1132,6 +1140,7 @@ input[aria-invalid="true"] {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-height: 48px;   /* the 48 px touch floor; padding alone gave 46 */
   padding: 10px 18px;
   background: var(--bg-secondary);
   color: var(--fg);
@@ -1670,9 +1679,35 @@ input[aria-invalid="true"] {
   color: var(--fg-muted);
   margin-right: var(--space-2);
 }
+/* WCAG 2.2 SC 2.5.8: a standalone link in a list is a navigation target, not
+   prose, so the inline exception does not cover it -- and stacked 18 px links
+   are 18 px apart, so the spacing exception does not either. On a tile shell
+   the related list is bare anchors with no description beside them, which is
+   exactly that case, on 1,804 pages. Same for the limitation banner's "Free
+   access:" link, which is the whole content of its own paragraph, and for the
+   catalog page's per-trade lists, which are 1,804 bare anchors. 24 px, not
+   the site's 48 px floor: these are secondary reference links, not the
+   controls a reader operates to do the work. */
+.shell-related a,
+.limitation-link a,
+.ti-jump a,
+.ti-list a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
+
+/* A breadcrumb link is a navigation target, not prose, so WCAG 2.2 SC 2.5.8's
+   inline exception does not cover it: it needs 24 CSS px. The text alone gave
+   18. Kept at the 24 px floor rather than the site's 48 px one, which is for
+   the controls a reader operates to do the work -- a 48 px crumb would treble
+   the height of a row that exists to orient, not to be tapped often. */
 .shell-page .shell-breadcrumb a {
   color: var(--accent);
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
 }
 .shell-page .shell-breadcrumb a:hover,
 .shell-page .shell-breadcrumb a:focus {
@@ -1930,9 +1965,15 @@ input[aria-invalid="true"] {
 /* The group heading links its hub. These are real crawlable URLs and the
    first thing on the site to pass link equity between the group pages,
    which otherwise reference each other only by SPA hash. */
+/* The catalog page's group headings are its primary navigation -- the whole
+   point of /tools/ is finding the neighbourhood before the name -- so these
+   take the 48 px floor. The heading text alone gave 38. */
 .ti-hub {
   color: var(--fg);
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
 }
 
 .ti-hub:hover,

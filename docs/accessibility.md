@@ -25,7 +25,27 @@ roughlogic.com targets WCAG 2.2 Level AA. The following checklist is the project
 
 ## Touch
 
-- Touch targets at least 48 by 48 pixels (slightly larger than the WCAG minimum of 44) for gloved-hand operation.
+Two floors, and `test/integration/touch-targets.test.js` measures both at a
+390 px phone viewport, on the live views **and** the prerendered pages -- which
+share one stylesheet but not one set of markup. Nothing measured them until
+2026-09-02, and the promise below had been false the whole time: every text
+field was 46 px, the footer badges 46, the header wordmark 36, the catalog
+page's group headings 38, and a shell's breadcrumb, related-tile and
+catalog-list links 18. axe-core does not cover this -- SC 2.5.8 carries an
+inline exception and a spacing exception a static rule cannot decide, so it
+leaves target size alone.
+
+- **48 by 48 pixels** on the controls a reader operates to do the work: text
+  fields, selects, textareas, buttons, disclosure summaries, and the primary
+  navigation links styled as controls (the header wordmark, the footer badges,
+  "Run the calculator", the catalog page's trade headings). Stricter than
+  WCAG 2.2 SC 2.5.8's 24 px on purpose, for gloved-hand operation.
+- **24 by 24 pixels**, SC 2.5.8's Level AA minimum, on every other target.
+- The one exception the test honours is the one the success criterion names: a
+  link sitting **inside a sentence**, whose size is set by the prose around it.
+  A link that is the whole content of its list item or paragraph is not that,
+  and does not get the exception -- which is what a tile page's related-tiles
+  list and the catalog page's per-trade lists are.
 - Adequate spacing between adjacent targets to prevent accidental activation.
 
 ## Forms and inputs
