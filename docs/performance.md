@@ -32,7 +32,7 @@ What does gate performance today, on every push:
 | `check-shells` | integration job | any prerendered shell over its 6 KB / 68 KB gzip cap |
 | `perf.test.js` | integration job | home-view FCP / LCP / TBT / CLS past the hard-fail tier |
 
-`perf.test.js` measures under a harsher profile than the table above (Chrome's Slow-3G preset plus a 4x CPU throttle, not Slow 4G), so its numbers are deliberately looser, and it runs a documented three-tier policy: the spec-v10 §10.3 targets (FCP 1.5 s / LCP 2.5 s / TBT 200 ms / CLS 0.05) warn, a 10% drift against `test/perf-baseline.json` warns, and only egregious values (FCP 5 s / LCP 10 s / TBT 1,000 ms / CLS 0.25) fail. Since 2026-08-29 it also covers the prerendered shells, restoring the surface Lighthouse used to check: the two tile shells `lighthouserc.json` still names, plus the two heaviest static documents the site serves, which are also the two that matter most to a stranger arriving from a search engine. `/groups/construction/` is the top landing page and the largest group index (45,019 B gzipped, 65% of the check-shells cap, 2.2x the `/groups/electrical/` this list originally named), and `/tools/` is the catalog hub the one-box program is gated on (47,555 B), which nothing measured at all. Size costs little on these: construction paints 3% slower than electrical for 2.2x the bytes, because the 400 ms RTT dominates a single static document. Their thresholds are measured rather than inherited, because that config ran a desktop preset on a 1.6 Mbit link while this file runs Slow-3G with a 4x CPU throttle.
+`perf.test.js` measures under a harsher profile than the table above (Chrome's Slow-3G preset plus a 4x CPU throttle, not Slow 4G), so its numbers are deliberately looser, and it runs a documented three-tier policy: the spec-v10 §10.3 targets (FCP 1.5 s / LCP 2.5 s / TBT 200 ms / CLS 0.05) warn, a 10% drift against `test/perf-baseline.json` warns, and only egregious values (FCP 5 s / LCP 10 s / TBT 1,000 ms / CLS 0.25) fail. Since 2026-08-29 it also covers the prerendered shells, restoring the surface Lighthouse used to check: the two tile shells `lighthouserc.json` still names, plus the two heaviest static documents the site serves, which are also the two that matter most to a stranger arriving from a search engine. `/groups/construction/` is the top landing page and the largest group index (45,762 B gzipped, 66% of the check-shells cap, 2.2x the `/groups/electrical/` this list originally named), and `/tools/` is the catalog hub the one-box program is gated on (47,824 B), which nothing measured at all. Size costs little on these: construction paints 3% slower than electrical for 2.2x the bytes, because the 400 ms RTT dominates a single static document. Their thresholds are measured rather than inherited, because that config ran a desktop preset on a 1.6 Mbit link while this file runs Slow-3G with a 4x CPU throttle.
 
 Two limits worth knowing. The shell tests assert paint and layout shift but **not** total blocking time: seeding a 600 ms blocking script into a built shell left TBT at 0, because a parser-blocking script that runs before the observer registers is never attributed as a long task, so that assertion would have passed on a broken page. Script on a shell is `check-shells`' rule instead, and it does fail on that seed. The SPA's own tile views -- the hash routes a reader reaches from search and from a shared link -- are covered too, and adding that coverage found a defect: a tile view builds in two passes, so the footer sat high and got shoved down when the calculator arrived, for a CLS of 0.173 to 0.247 against a 0.05 budget (0.25 is Core Web Vitals' "poor" line). Reserving the page height for the duration of a tool route took those to 0.056 / 0.060 / 0.101. The CLS thresholds sit between the two ranges on purpose: a hard tier at 0.25 would have sat above the defect it exists to catch.
 
@@ -128,8 +128,9 @@ The §14.3 starter estimates (vet 22 KB / ems 25 KB / aviation 18 KB / realestat
 ## v13 per-shell budgets (spec-v13 §12.1)
 
 Spec-v13 added a build-time prerender step that emits one static HTML
-shell per tile (`/tools/<id>/index.html`, 385 shells) and one per group
-(`/groups/<slug>/index.html`, 24 shells). The shells are separate
+shell per tile (`/tools/<id>/index.html`, 1,804 shells) and one per
+group (`/groups/<slug>/index.html`, 21 shells), plus the catalog hub at
+`/tools/` and the not-found page at `/404.html`. The shells are separate
 documents from the SPA home view, served as static files by Cloudflare
 Pages and reached primarily by search crawlers and direct deep links.
 
@@ -145,11 +146,21 @@ Per-shell targets:
 
 Payload caps enforced by [../scripts/check-shells.mjs](../scripts/check-shells.mjs):
 
-- Tile shell: 6 KB gzipped.
-- Group shell: 12 KB gzipped.
+- Tile shell: 6,144 B gzipped.
+- Group shell: 69,632 B gzipped. This section said 12 KB until
+  2026-09-01, contradicting the table at the top of this file: the cap
+  was raised when the catalog outgrew it, and only one of the two places
+  that state it moved. The catalog hub and the not-found page are linted
+  under the group cap.
 
-Live measurements at v13 close: tile shells ~1.8 KB gzipped / ~5.4 KB
-raw, group shells ~3.9 KB gzipped / ~15.2 KB raw; both well under cap.
+Live measurements 2026-09-01, from the built `dist/`: **tile shells
+2,476 B gzipped at the median and 3,779 B at the largest**
+(`carburetor-altitude-jetting`); **group shells 5,249 B at the median
+and 45,762 B at the largest** (`/groups/construction/`, which carries
+479 tile rows). Both under cap, and both larger than the v13-close
+figures this section used to quote -- tile shells carry the worked
+example, the citation, and since 2026-08-31 a print-only copy of the
+proof, and group hubs carry every sibling hub.
 Aggregate `dist/` growth from v12 → v13 is roughly 2.5 MB uncompressed
 (385 tile shells + 24 group shells + sitemap expansion). The
 `scripts/build-shells.mjs` step is build-time only and does not

@@ -457,6 +457,39 @@ async function main() {
     errors.push("tools/index.html: missing catalog hub (spec-v1345).");
   }
 
+  // docs/performance.md states the gzipped size of the two heaviest static
+  // documents on the site, because they are what a stranger arriving from a
+  // search engine actually downloads. Both figures had drifted by 2026-09-01 --
+  // one of them because a change in this very build made the page bigger -- and
+  // nothing was watching. Pinned in a band, for the reason check-home-payload
+  // gives: a stated figure exists to tell a reader the order of magnitude, and
+  // an exact pin that fails on a one-line content edit gets edited out of the
+  // way rather than obeyed. It also fails if the prose stops stating a figure.
+  const perfDocPath = resolve(ROOT, "docs", "performance.md");
+  if (existsSync(perfDocPath)) {
+    const perf = await readFile(perfDocPath, "utf8");
+    for (const [label, file, re] of [
+      ["/groups/construction/", resolve(DIST, "groups", "construction", "index.html"),
+        /\/groups\/construction\/[^.]*?\(([\d,]+) B gzipped/],
+      ["/tools/", resolve(DIST, "tools", "index.html"), /catalog hub[^.]*?\(([\d,]+) B\)/],
+    ]) {
+      if (!existsSync(file)) continue;
+      const live = gzipSync(await readFile(file)).length;
+      const m = perf.match(re);
+      if (!m) {
+        errors.push("docs/performance.md: no longer states the gzipped size of " + label +
+          "; that figure is what this check watches.");
+        continue;
+      }
+      const stated = Number(m[1].replace(/,/g, ""));
+      const drift = Math.abs(live - stated) / live;
+      if (drift > 0.05) {
+        errors.push("docs/performance.md says " + label + " is " + m[1] + " B gzipped; it is " +
+          live + " B (" + (drift * 100).toFixed(1) + "% off).");
+      }
+    }
+  }
+
   const groupsDirForCross = resolve(DIST, "groups");
   // Every group hub links every other group hub as a REAL URL. The hubs used
   // to cross-link only by SPA hash (`#group=E`), which is a fragment and not a
@@ -561,7 +594,8 @@ async function main() {
     "all titles <= " + TITLE_CAP + " chars, descriptions <= " + DESCRIPTION_CAP + " chars, " +
     "JSON-LD valid against allowlist, gzip under " + TILE_GZIP_CAP + " / " + GROUP_GZIP_CAP + " B caps, " +
     "every shell CSP present and unweakened, no executable script on any shell, " +
-    "every page without a worked example printing its reference content, every group hub linking every other as a real URL, and " +
+    "every page without a worked example printing its reference content, every group hub linking every other as a real URL, " +
+    "docs/performance.md within 5% of the two heaviest documents it names, and " +
     sitemapUrls + " sitemap URLs matched one-for-one against the built pages."
   );
 }
