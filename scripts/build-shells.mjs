@@ -888,7 +888,13 @@ function shellHead({ title, description, canonical, ogType, ogImage, robots }) {
     `<meta name="twitter:title" content="${escapeHtml(title)}">`,
     `<meta name="twitter:description" content="${escapeHtml(description)}">`,
     '<meta name="color-scheme" content="dark light">',
-    '<meta name="theme-color" content="#0a0a0a">',
+    // Two theme-colors, each behind the scheme it belongs to. A shell loads no
+    // script, so theme.js never runs here and never rewrites this tag the way
+    // it does on the SPA; a single dark value painted the browser chrome black
+    // above a page that, since the prefers-color-scheme block landed, renders
+    // white for a reader whose system asks for light.
+    '<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)">',
+    '<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">',
   ].filter(Boolean).join("\n");
 }
 

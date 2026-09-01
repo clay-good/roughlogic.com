@@ -31,6 +31,16 @@ html, body { margin: 0; padding: 0; }
 
   --border: #333333;
   --border-light: #404040;
+  /* The boundary of a text field, WCAG 2.2 SC 1.4.11 (Non-text Contrast, AA).
+     An empty input has nothing but its edge to say where to type, so that edge
+     needs 3:1 against BOTH what is inside it and what surrounds it. --border
+     gives 1.14:1 against the region a field sits in, which is a line you can
+     barely see -- and axe cannot flag it, because 1.4.11 on an arbitrary
+     border is not machine-decidable. 3.12:1 against the region, 4.30:1 against
+     the field fill; scripts/check-contrast.mjs holds both. Fields only:
+     a button or a chip carries a text label that identifies it without help
+     from its edge, so those keep --border and their existing visual weight. */
+  --border-control: #757575;
 
   --accent-hover: #e0e0e0;
   --focus-ring: #4d90fe;
@@ -235,7 +245,7 @@ main {
   width: 100%;
   background: var(--bg-tertiary);
   color: var(--fg);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-control);
   border-radius: var(--radius);
   font-size: 1rem;
   font-family: inherit;
@@ -727,7 +737,7 @@ textarea {
   padding: 12px 14px;
   background: var(--bg-primary);
   color: var(--fg);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-control);
   border-radius: var(--radius);
   font-size: 1.05rem;
   font-family: inherit;
@@ -1385,6 +1395,7 @@ input[aria-invalid="true"] {
 
   --border: #d0d0d0;
   --border-light: #b8b8b8;
+  --border-control: #767676;   /* 3.71:1 on --bg-tertiary, 4.54:1 on white */
 
   --accent-hover: #2a2a2a;
 
@@ -1398,6 +1409,48 @@ input[aria-invalid="true"] {
   /* Deeper reds that hit WCAG AA on white (5.4:1 and 6.6:1). */
   --error-border: #c0392b;
   --error-text: #a93226;
+}
+
+/* The same palette, for a reader who never runs the toggle -- or never runs
+   any JavaScript at all.
+   theme.js applies data-theme on the SPA, honouring the OS preference on a
+   first visit. The 1,826 prerendered pages under /tools/ and /groups/ load no
+   script, by design, so nothing ever set that attribute on them: every static
+   page rendered the dark palette no matter what the reader's system asked for
+   -- while its own <meta name="color-scheme" content="dark light"> told the
+   browser it handled both. The site said it supported light and then did not,
+   on every page a search engine sends a reader to.
+   Guarded on :not([data-theme="dark"]) so an explicit choice still wins; the
+   SPA always sets the attribute, so this only ever fires where nothing did.
+   scripts/check-contrast.mjs asserts this block declares exactly the same
+   tokens as the one above, so the two cannot drift. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: #e8e8e8;
+
+  --fg: #0a0a0a;
+  --fg-muted: #404040;
+  --fg-dim: #5e5e5e;
+
+  --border: #d0d0d0;
+  --border-light: #b8b8b8;
+  --border-control: #767676;   /* 3.71:1 on --bg-tertiary, 4.54:1 on white */
+
+  --accent-hover: #2a2a2a;
+
+  /* Light-theme accent: deeper blue that clears AA as link text on the
+     light surfaces (5.2:1 on bg-secondary, 5.7:1 on white). */
+  --accent: #0a66c2;
+  --accent-strong: #084b8f;
+
+  --header-bg: rgba(255, 255, 255, 0.85);
+
+  /* Deeper reds that hit WCAG AA on white (5.4:1 and 6.6:1). */
+  --error-border: #c0392b;
+  --error-text: #a93226;
+  }
 }
 
 /* ============================================================

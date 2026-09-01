@@ -49,9 +49,54 @@ roughlogic.com targets WCAG 2.2 Level AA. The following checklist is the project
 
 ## Color and contrast
 
-- Light theme only. Pure white #FFFFFF background. Near-black #0A0A0A primary text. Mid-gray #4A4A4A secondary text. Light gray #DDDDDD borders. Very light gray #F5F5F5 disabled states.
-- No color used as the sole means of conveying information.
-- Contrast ratios verified for body text (7:1+), secondary text (AA+), and borders against background.
+**Two themes ship, and which one a reader gets follows their system.** `:root`
+in `styles.css` carries the dark palette; the light one is declared twice, at
+`:root[data-theme="light"]` for the in-page toggle and again under
+`@media (prefers-color-scheme: light)` for everyone else. On the SPA `theme.js`
+sets `data-theme` before first paint, from the stored preference or the system
+one. The 1,826 prerendered pages load no script at all, so the media query is
+the only thing that reaches them -- and until 2026-09-02 there was none, which
+meant every static page rendered dark whatever the reader's system asked for,
+while its own `<meta name="color-scheme" content="dark light">` told the
+browser it handled both. Each shell now also carries a `theme-color` per
+scheme, so the browser chrome matches the page it sits above.
+
+This section said "Light theme only. Pure white #FFFFFF background. Near-black
+#0A0A0A primary text." until the same day -- the exact inverse of the default,
+under a heading a reader would consult to know whether the site is legible for
+them.
+
+No color is used as the sole means of conveying information.
+
+Every ratio below is computed from the tokens in `styles.css` by
+`scripts/check-contrast.mjs`, which fails the build if a pair drops under its
+floor **or if a number here stops matching the stylesheet**. The floors: 7:1
+for body and secondary text (the project's own promise, stricter than AA's
+4.5:1), 4.5:1 for dim text and links (WCAG 2.2 SC 1.4.3), and 3:1 for a field's
+visual boundary (SC 1.4.11).
+
+| Pair | Dark / light values | Dark | Light |
+| --- | --- | --- | --- |
+| `--fg` on `--bg-primary` | #ffffff/#0a0a0a, #0a0a0a/#ffffff | 19.80:1 | 19.80:1 |
+| `--fg` on `--bg-secondary` | #ffffff/#1a1a1a, #0a0a0a/#f5f5f5 | 17.40:1 | 18.16:1 |
+| `--fg-muted` on `--bg-primary` | #c8c8c8/#0a0a0a, #404040/#ffffff | 11.83:1 | 10.37:1 |
+| `--fg-muted` on `--bg-secondary` | #c8c8c8/#1a1a1a, #404040/#f5f5f5 | 10.40:1 | 9.51:1 |
+| `--fg-dim` on `--bg-primary` | #9a9a9a/#0a0a0a, #5e5e5e/#ffffff | 7.04:1 | 6.48:1 |
+| `--fg-dim` on `--bg-secondary` | #9a9a9a/#1a1a1a, #5e5e5e/#f5f5f5 | 6.19:1 | 5.95:1 |
+| `--accent` on `--bg-primary` | #5aa9ff/#0a0a0a, #0a66c2/#ffffff | 8.06:1 | 5.69:1 |
+| `--error-text` on `--bg-primary` | #ff8c95/#0a0a0a, #a93226/#ffffff | 8.90:1 | 6.62:1 |
+| `--border-control` on `--bg-tertiary` | #757575/#2a2a2a, #767676/#e8e8e8 | 3.12:1 | 3.71:1 |
+| `--border-control` on `--bg-primary` | #757575/#0a0a0a, #767676/#ffffff | 4.30:1 | 4.54:1 |
+| `--border-control` on `--bg-secondary` | #757575/#1a1a1a, #767676/#f5f5f5 | 3.78:1 | 4.17:1 |
+
+`--border-control` is new as of 2026-09-02 and exists for SC 1.4.11. A text
+field that is empty has nothing but its edge to say where to type, so that edge
+has to reach 3:1 against both what is inside it and what surrounds it. The
+fields used `--border`, which is **1.14:1** against the region they sit in --
+a line you can barely see, and one axe-core cannot flag, because whether a
+given border is "required to identify the component" is not machine-decidable.
+Fields only: a button or a chip carries a text label that identifies it without
+help from its edge, so those keep `--border` and their existing weight.
 
 ## Motion and animation
 
