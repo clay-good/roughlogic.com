@@ -545,6 +545,55 @@ export function soleNumber(value) {
   return Number.isFinite(n) ? n : null;
 }
 
+// The head of dist/index.html: present, meaningful, and consistent across the
+// three places a reader or a link preview reads it.
+async function lintHomeHead(path, errors) {
+  const where = "index.html";
+  if (!existsSync(path)) {
+    errors.push(where + ": missing home page.");
+    return;
+  }
+  const html = await readFile(path, "utf8");
+  const title = (html.match(/<title>([^<]*)<\/title>/) || [])[1] || "";
+  const desc = pickAttr(html, '<meta[^>]*name="description"', "content");
+  const og = pickAttr(html, '<meta[^>]*property="og:description"', "content");
+  const tw = pickAttr(html, '<meta[^>]*name="twitter:description"', "content");
+
+  if (!desc) {
+    errors.push(where + ": missing <meta name=\"description\">.");
+  } else {
+    if (desc.length > DESCRIPTION_CAP) {
+      errors.push(where + ": meta description length " + desc.length + " exceeds " + DESCRIPTION_CAP + " cap.");
+    }
+    // The defect this exists for: a description that is the site's own name,
+    // or the page title, says nothing a search snippet or a link preview can
+    // use. Require a sentence -- more than one word, and not the title again.
+    if (unescapeHtml(desc).trim() === unescapeHtml(title).trim()) {
+      errors.push(where + ": meta description is the page title repeated (" + JSON.stringify(desc) + "); write a sentence.");
+    }
+    if (unescapeHtml(desc).trim().split(/\s+/).length < 6) {
+      errors.push(where + ": meta description is " + JSON.stringify(desc) + " -- too short to be a description of anything.");
+    }
+    const banned = containsBannedWord(desc);
+    if (banned) errors.push(where + ": meta description contains banned marketing word '" + banned + "'.");
+  }
+  // A link preview reads og/twitter, not the meta description, so the three
+  // have to agree or a shared link says something the page does not.
+  for (const [name, value] of [["og:description", og], ["twitter:description", tw]]) {
+    if (!value) errors.push(where + ": missing " + name + ".");
+    else if (desc && value !== desc) {
+      errors.push(where + ": " + name + " differs from the meta description; a shared link would preview text the page does not carry.");
+    }
+  }
+  if (!/property=["']og:title["']/.test(html)) errors.push(where + ": missing og:title.");
+  if (!/property=["']og:url["']/.test(html)) errors.push(where + ": missing og:url.");
+  if (!/name=["']twitter:card["']/.test(html)) errors.push(where + ": missing twitter:card.");
+  const canonical = pickAttr(html, '<link[^>]*rel="canonical"', "href");
+  if (canonical !== "https://roughlogic.com/") {
+    errors.push(where + ": canonical is " + JSON.stringify(canonical) + ", expected the site root.");
+  }
+}
+
 async function main() {
   if (!existsSync(DIST)) {
     console.error("check-shells: dist/ does not exist. Run `npm run build` first.");
@@ -567,6 +616,18 @@ async function main() {
     }
     await lintShell(p, "tile", errors, t);
   }
+
+  // The home page. Every other public document on the site is linted above or
+  // below this line; dist/index.html was not, because it is the SPA and not a
+  // generated shell -- it carries executable script and no CSP meta, so the
+  // full lintShell does not apply to it. The result of leaving it out: its
+  // meta description, og:description and twitter:description were all the
+  // literal string "Rough Logic" until 2026-09-01. Not a sentence, not a
+  // description -- the brand name, three times, on the site's front door and
+  // in every link preview anyone ever shared of it. The JSON-LD on the same
+  // page carried a real sentence the whole time. So: a narrow lint for the
+  // head of the one document the shell gates cannot otherwise reach.
+  await lintHomeHead(resolve(DIST, "index.html"), errors);
 
   // spec-v1345: the catalog hub at dist/tools/index.html. Linted under the
   // GROUP cap, not the tile cap -- it is a listing page like a group hub, not
@@ -712,7 +773,7 @@ async function main() {
   const tileCount = tools.length;
   const groupCount = existsSync(groupsDir) ? (await readdir(groupsDir)).length : 0;
   console.log(
-    "check-shells OK: " + tileCount + " tile shells + " + groupCount + " group shells + 1 catalog hub + 1 not-found page; " +
+    "check-shells OK: " + tileCount + " tile shells + " + groupCount + " group shells + 1 catalog hub + 1 not-found page + the home page; " +
     "all titles <= " + TITLE_CAP + " chars, descriptions <= " + DESCRIPTION_CAP + " chars and never " +
     "cut mid-word, " +
     "JSON-LD valid against allowlist, gzip under " + TILE_GZIP_CAP + " / " + GROUP_GZIP_CAP + " B caps, " +

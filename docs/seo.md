@@ -153,6 +153,26 @@ screens unambiguously-marketing words; the §11.3 list also names
 those have legitimate uses in trade math content the tile descs
 carry and are exempted.
 
+The home page (2026-09-01). Its `<meta name="description">`,
+`og:description` and `twitter:description` were all the literal string
+"Rough Logic" -- the brand name, three times, on the site's front door
+and in every link preview anyone ever shared of it. The JSON-LD on the
+same page carried a real sentence the whole time. All three now carry
+the home lede, which is the sentence the page itself opens with and
+already pinned by `check-readme-counts`: "1,804 free calculators for
+the trades. Type the job the way you'd say it, and you get the number,
+the inputs, and the source."
+
+It happened because `check-shells` visits every generated shell and
+never visited `dist/index.html`. It could not run its full lint there --
+the home page is the SPA, so it carries executable script and no CSP
+meta, both of which that lint forbids -- so the page was simply left
+out, and the head no gate reads is the head that rots. There is now a
+narrow home-head lint beside it: description present, within the cap,
+more than a handful of words, not the page title repeated, and matching
+`og:description` and `twitter:description` exactly, since a link preview
+reads those and not the meta description.
+
 ## Structured data (Phase C)
 
 Closed allowlist of schema.org types: `WebApplication`, `WebPage`,
