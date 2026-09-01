@@ -34,6 +34,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Every sitemap URL claimed to have changed today, on every push.** All 1,827 `<lastmod>` values came from the build timestamp, so a crawler pulling `sitemap.xml` saw the entire catalog -- 1,804 tile pages, 21 hubs, the catalog index, the home page -- reporting a same-day modification whatever had actually changed, sitting next to a `<changefreq>` of `monthly` on the same URL. A lastmod that demonstrably does not track content is worse than no lastmod: the signal is dropped for the whole sitemap, and the handful of pages that really did move lose the one hint that says so.
+
+  The date now comes from `scripts/page-lastmod.json`, a committed ledger holding, per URL, a hash of the bytes that URL serves and the date that hash was last stamped. A page whose bytes have not moved keeps its date; a page that has moved gets the day it was re-stamped. The home entry hashes `index.html` together with `tools-data.js`, since the frame alone never changes when a tile is added and the home page visibly does. The ledger lives in `scripts/`, not `data/` -- the build copies `data/` wholesale into `dist/`, which would have shipped 190 KB of build metadata to every visitor.
+
+  `npm run stamp:lastmod` re-stamps it; `npm run check:lastmod` runs in the **integration** job, after the build, and fails if `dist/` has drifted -- naming the URLs -- so a changed page cannot ship with a stale date. Integration and not lint for the reason the per-module budget was moved there on 2026-08-30: the lint job runs before any build, and a gate that reads `dist/` there reads nothing at all. Seed-verified both ways, by appending a comment to one tile shell and to one hub. Mechanism verified by backdating the ledger and rebuilding: the sitemap emitted the ledger's dates, not the build's.
+
+  The first stamp dated all 1,827 URLs to the day it was created, which is all that was knowable then; the ledger converges on the truth from there.
+
 - **734 of 1,804 tile pages advertised themselves with a cut-off word.** A meta description over the 220-character cap gets an ellipsis, and the cap loop planted it wherever it happened to land: `...flags expec...`, `...the marine allow...`, `...OR FRACTION OF SIX of those -- so 100 s...`. That fragment is not a detail of the HTML. It is the string the search snippet shows, and the same string is copied into `og:description`, into `twitter:description`, and into the JSON-LD `description` a crawler reads -- four surfaces, one broken sentence, on 41% of the catalog.
 
   Nothing was looking at it. The only description gate was the length cap, which a mid-word cut satisfies perfectly; the sibling helper that trims a group-hub row (`rowSummary`) had backed off to a word boundary since the day it was written, and the meta-description path simply never got the same treatment.

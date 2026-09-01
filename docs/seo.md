@@ -225,11 +225,38 @@ the shell builder. It enumerates:
 - One URL per group shell.
 - One URL per tile shell.
 
-Each URL carries `<lastmod>` from `dist/build-info.json`,
-`<changefreq>` of `weekly` for home and `monthly`
+Each URL carries `<changefreq>` of `weekly` for home and `monthly`
 for groups and tiles, and `<priority>` of 1.0 home /
 0.8 group / 0.7 tile. (The changelog page that earlier carried its
 own sitemap entry was retired in the search-first home refactor.)
+
+`<lastmod>` per URL (2026-09-01). It used to be the build timestamp
+from `dist/build-info.json`, on every URL. The site rebuilds on every
+push, so a crawler saw all 1,827 pages claiming to have changed today,
+every day, whatever had actually changed -- next to a `<changefreq>` of
+`monthly` on the same URL. A lastmod that demonstrably does not track
+content is worse than none: the signal gets dropped for the whole
+sitemap, and the pages that really did change lose the one hint saying
+so.
+
+The date now comes from [../scripts/page-lastmod.json](../scripts/page-lastmod.json),
+a committed ledger holding, for each URL, a hash of the bytes that URL
+serves and the date that hash was last stamped. A page whose bytes have
+not moved keeps its date. The home entry hashes `index.html` together
+with `tools-data.js`, because the frame alone never changes when a tile
+is added and the home page visibly does.
+
+Re-stamp with `npm run stamp:lastmod` after a build and commit the
+result. `npm run check:lastmod` runs in the integration job, after the
+build, and fails if `dist/` has drifted from the ledger -- naming the
+URLs -- so a changed page cannot ship with a stale date. It is in the
+integration job and not the lint job for the reason
+[performance.md](performance.md) gives about the per-module budget: the
+lint job runs before any build, and a gate that reads `dist/` there
+reads nothing. The first stamp dated all 1,827 URLs to the day the
+ledger was created, which is all that was knowable then; every URL that
+has not changed since keeps that date, and the ledger converges on the
+truth from there.
 
 `check-shells` matches the sitemap against `dist/` in both
 directions: every `<loc>` must have a page behind it, and every

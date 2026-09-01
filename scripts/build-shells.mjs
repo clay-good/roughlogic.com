@@ -23,6 +23,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { loadLedger } from "./build-page-lastmod.mjs";
 import { CITATIONS } from "../citations.js";
 import { leadSentence, restOfDescription } from "../text-lead.js";
 import { normalizeQuery, rankTools } from "../search-discovery.js";
@@ -1492,14 +1493,25 @@ function toolsIndexShell(tools, groupNames) {
   return [head, styles, jsonld, '</head>', body].join("\n");
 }
 
-function buildSitemap(tools, groups, builtIso) {
-  const lastmod = builtIso.slice(0, 10);
+// Per-URL <lastmod>. Every URL used to carry the build timestamp, so a crawler
+// saw all 1,827 pages claiming to have changed today on every push, next to a
+// <changefreq> of `monthly` on the same URL -- a signal a search engine drops
+// wholesale once it can see it does not track content. `lastmodFor` reads the
+// committed scripts/page-lastmod.json ledger, which records the hash of the bytes
+// each URL serves and the date that hash was last stamped, and falls back to
+// the build date for a page the ledger has not caught up with yet.
+function buildSitemap(tools, groups, builtIso, lastmodByPath) {
+  const built = builtIso.slice(0, 10);
+  const lastmodFor = (path) => {
+    const row = lastmodByPath && lastmodByPath[path];
+    return row && row.date ? row.date : built;
+  };
   const lines = ['<?xml version="1.0" encoding="UTF-8"?>'];
   lines.push('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">');
   // Home.
   lines.push('  <url>');
   lines.push(`    <loc>${SITE_URL}/</loc>`);
-  lines.push(`    <lastmod>${lastmod}</lastmod>`);
+  lines.push(`    <lastmod>${lastmodFor("/")}</lastmod>`);
   lines.push('    <changefreq>weekly</changefreq>');
   lines.push('    <priority>1.0</priority>');
   lines.push('  </url>');
@@ -1508,7 +1520,7 @@ function buildSitemap(tools, groups, builtIso) {
     const slug = GROUP_SLUG[g] || g.toLowerCase();
     lines.push('  <url>');
     lines.push(`    <loc>${SITE_URL}/groups/${slug}/</loc>`);
-    lines.push(`    <lastmod>${lastmod}</lastmod>`);
+    lines.push(`    <lastmod>${lastmodFor(`/groups/${slug}/`)}</lastmod>`);
     lines.push('    <changefreq>monthly</changefreq>');
     lines.push('    <priority>0.8</priority>');
     lines.push('  </url>');
@@ -1516,7 +1528,7 @@ function buildSitemap(tools, groups, builtIso) {
   // spec-v1345: the catalog hub.
   lines.push('  <url>');
   lines.push(`    <loc>${SITE_URL}/tools/</loc>`);
-  lines.push(`    <lastmod>${lastmod}</lastmod>`);
+  lines.push(`    <lastmod>${lastmodFor("/tools/")}</lastmod>`);
   lines.push('    <changefreq>weekly</changefreq>');
   lines.push('    <priority>0.9</priority>');
   lines.push('  </url>');
@@ -1524,7 +1536,7 @@ function buildSitemap(tools, groups, builtIso) {
   for (const t of tools) {
     lines.push('  <url>');
     lines.push(`    <loc>${SITE_URL}/tools/${t.id}/</loc>`);
-    lines.push(`    <lastmod>${lastmod}</lastmod>`);
+    lines.push(`    <lastmod>${lastmodFor(`/tools/${t.id}/`)}</lastmod>`);
     lines.push('    <changefreq>monthly</changefreq>');
     lines.push('    <priority>0.7</priority>');
     lines.push('  </url>');
@@ -1626,7 +1638,8 @@ async function main() {
       // Fallthrough to now().
     }
   }
-  const sitemap = buildSitemap(tools, groups, builtIso);
+  const { pages: lastmodByPath } = await loadLedger();
+  const sitemap = buildSitemap(tools, groups, builtIso, lastmodByPath);
   await writeFile(resolve(DIST, "sitemap.xml"), sitemap, "utf8");
 
   console.log(
