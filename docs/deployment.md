@@ -46,7 +46,15 @@ its document root.
 2. https://securityheaders.com returns A+.
 3. The CSP blocks third-party connections in the browser console.
 4. The service worker registers and the page loads after going offline.
-5. The three CI jobs in `.github/workflows/ci.yml` continue to pass on every push. (A Lighthouse job stood here until 2026-08-23; it was removed over an unpatched advisory in `@lhci/cli`. See [performance.md](performance.md) for what gates performance now.)
+   Then, still offline, open a tile shell URL (`/tools/ohms-law/`): it must
+   land on `/#ohms-law` with the calculator on screen and the stylesheet
+   applied. No shell is precached -- 1,826 pages is not a precache -- so that
+   redirect is the whole offline story for a bookmarked page.
+5. A path that matches no file (`/tools/not-a-tile/`) returns the site's own
+   404 page -- wordmark, "Page not found", and links to `/tools/` and every
+   trade hub -- with a 404 status, not Cloudflare's default. Pages serves
+   `/404.html` automatically; nothing configures it.
+6. The three CI jobs in `.github/workflows/ci.yml` continue to pass on every push. (A Lighthouse job stood here until 2026-08-23; it was removed over an unpatched advisory in `@lhci/cli`. See [performance.md](performance.md) for what gates performance now.)
 
 ## v0.2.0 release notes
 
