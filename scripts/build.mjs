@@ -25,6 +25,9 @@ const FILES = [
   "pure-math.js",
   "routing.js",
   "text-lead.js",
+  // The tile <title>/<meta description> rules, shared by build-shells.mjs and
+  // app.js so the shell and the SPA cannot describe one URL differently.
+  "shell-meta.js",
   "hash-state.js",
   "data-stamp.js",
   "clipboard.js",

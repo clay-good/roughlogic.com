@@ -366,7 +366,9 @@ function applyRoute() {
 
 // spec-v13 §5.5: SPA sets <title>, meta description, and
 // <link rel="canonical"> to match the per-tile shell at /tools/<id>/
-// when a tile opens; reverts to home values on return.
+// when a tile opens; reverts to home values on return. Both surfaces build those
+// strings from shell-meta.js, and spa-head-parity.test.js compares them in a
+// browser.
 // The same sentence index.html carries in its <meta name="description">, and
 // the same one the page opens with. It has to be repeated here because the SPA
 // rewrites the description on every route change, so the home route wrote
@@ -393,12 +395,22 @@ function setHeadMeta(name, content) {
   if (!el) { el = document.createElement("meta"); el.setAttribute("name", name); document.head.appendChild(el); }
   el.setAttribute("content", content);
 }
+// The title and description this route's OWN shell at /tools/<id>/ carries.
+// Both used to be built here and diverged from the shell on most of the
+// catalog; shell-meta.js is now the only implementation, and carries the
+// measurement. Imported on demand so the home view never pays for it, and the
+// route is re-checked after the await so a fast second navigation does not get
+// the first one's head.
 function updateHeadForTool(id) {
   const tool = TOOLS.find((t) => t.id === id);
   if (!tool) return updateHeadForHome();
-  document.title = tool.name + " - Rough Logic";
-  setHeadMeta("description", tool.desc);
   setHeadLink("canonical", SITE_ORIGIN + "/tools/" + id + "/");
+  import("./shell-meta.js").then((meta) => {
+    if (state.route.view !== "tool" || state.route.id !== id) return;
+    const head = meta.headForTool(tool);
+    document.title = head.title;
+    setHeadMeta("description", head.description);
+  });
 }
 function updateHeadForHome() {
   document.title = HOME_TITLE;

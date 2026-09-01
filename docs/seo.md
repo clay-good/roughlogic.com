@@ -58,6 +58,29 @@ Per spec-v13 §5.2:
   `<script type="application/ld+json">` block with a
   `WebApplication` + `BreadcrumbList` (tile shells) or
   `CollectionPage` + `BreadcrumbList` + `ItemList` (group shells).
+
+The `<title>` and `<meta name="description">` are built by
+[shell-meta.js](../shell-meta.js), which lives in the repo root rather than in
+the build script because **two** surfaces show a tile at the same canonical
+URL: this shell, and the SPA route `/#<id>`, whose head `app.js` rewrites on
+every navigation. Those were separate implementations until 2026-09-01 and
+disagreed on 1,396 of 1,804 titles and 1,685 of 1,804 descriptions -- the SPA
+wrote `name + " - Rough Logic"` and the raw `desc`, skipping the §11.2
+profession noun, the reference tail and both caps, under a comment claiming it
+matched the shell. There is now one implementation; `check-shells` asserts the
+built shell equals what that module returns, and
+`test/integration/spa-head-parity.test.js` loads both surfaces in a browser and
+compares the rendered head.
+
+The §11.2 profession noun comes from the first entry of the tile's `trades`
+array through that module's `PROFESSION_NOUN` map. An unmapped slug falls back
+silently to "Trades", which is a real noun for the `reference` trade and so
+reads as deliberate everywhere else: 48 slugs were missing on 2026-09-01 and
+485 shells were titled "... - Trades - Rough Logic", including 64 tiles whose
+trade the map spelled `realestate` / `edu` while every tile spelled it
+`real-estate` / `education`. `test/unit/shell-meta.test.js` now sweeps the map
+in both directions -- no tile without a noun, no key without a tile.
+
 - Header with the wordmark and a "Tools index" link back to home.
 - Breadcrumb (Home > Group > Tile).
 - One `<h1>` with the tile name.

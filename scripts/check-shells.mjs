@@ -32,6 +32,11 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { gzipSync } from "node:zlib";
 import { assertFullCatalogParse } from "./catalog-size.mjs";
+// The one implementation of the tile <title>/<meta description> rules, shared
+// with app.js. Compared against here so a second implementation cannot creep
+// back into the build script -- which is how the SPA and the shell came to
+// disagree about 1,396 of 1,804 titles.
+import { headForTool, escapeHtml } from "../shell-meta.js";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = resolve(ROOT, "dist");
@@ -170,8 +175,14 @@ async function loadTools() {
   // so read it from the module itself; tools-data.js is pure data with no
   // side effects.
   const mod = await import(pathToFileURL(resolve(ROOT, "tools-data.js")).href);
-  const descById = new Map((mod.TOOLS || []).map((t) => [t.id, t.desc]));
-  for (const t of tools) t.desc = descById.get(t.id);
+  const rowById = new Map((mod.TOOLS || []).map((t) => [t.id, t]));
+  for (const t of tools) {
+    const row = rowById.get(t.id);
+    t.desc = row && row.desc;
+    // shell-meta.js picks the profession noun off trades[0]; without it every
+    // tile would compare against the "Trades" fallback.
+    t.trades = (row && row.trades) || [];
+  }
   // The regex above matches a fixed field order. A tile it skips is a shell
   // this gate never lints, and a sweep over 1,700 of 1,804 reports exactly
   // what a sweep over all of them reports: nothing.
@@ -383,6 +394,12 @@ async function lintShell(path, kind, errors, tool) {
     errors.push(where + ": <title> does not end with ' - Rough Logic'.");
   }
   lintTitleWordBoundary(title, where, errors, tool);
+  if (kind === "tile" && tool) {
+    const want = headForTool(tool);
+    if (title !== escapeHtml(want.title)) {
+      errors.push(where + ": <title> is not what shell-meta.js builds for this tile. shell=" + JSON.stringify(title) + " shell-meta=" + JSON.stringify(escapeHtml(want.title)));
+    }
+  }
   const bannedT = containsBannedWord(title);
   if (bannedT) {
     errors.push(where + ": <title> contains banned marketing word '" + bannedT + "'.");
@@ -399,6 +416,12 @@ async function lintShell(path, kind, errors, tool) {
     const bannedD = containsBannedWord(desc);
     if (bannedD) {
       errors.push(where + ": meta description contains banned marketing word '" + bannedD + "'.");
+    }
+    if (kind === "tile" && tool) {
+      const want = escapeHtml(headForTool(tool).description);
+      if (desc !== want) {
+        errors.push(where + ": meta description is not what shell-meta.js builds for this tile. shell=" + JSON.stringify(desc) + " shell-meta=" + JSON.stringify(want));
+      }
     }
     lintDescriptionWordBoundary(desc, where, errors, tool);
     lintDescriptionIsTheTilesOwnWords(desc, where, errors, tool);

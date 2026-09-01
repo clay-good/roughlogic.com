@@ -37,17 +37,25 @@ test("updateHeadForHome reverts canonical to the absolute home origin", () => {
   assert.match(APP_JS, /setHeadLink\("canonical",\s*SITE_ORIGIN\s*\+\s*"\/"\)/);
 });
 
-test("updateHeadForTool sets document.title with the brand suffix", () => {
-  assert.match(APP_JS, /document\.title\s*=\s*tool\.name\s*\+\s*" - Rough Logic"/);
+// These two used to pin `tool.name + " - Rough Logic"` and `tool.desc`, which
+// is exactly what the SPA wrote -- and it disagreed with the shell it claims
+// to match on 1,396 of 1,804 titles and 1,685 of 1,804 descriptions. A
+// source-text test pins the shape it is given; this one was given the defect.
+// What it pins now is that the SPA takes both strings from shell-meta.js, the
+// module scripts/build-shells.mjs writes the shell from.
+test("updateHeadForTool takes its title and description from shell-meta.js", () => {
+  assert.match(APP_JS, /import\("\.\/shell-meta\.js"\)/);
+  assert.match(APP_JS, /headForTool\(tool\)/);
+  assert.match(APP_JS, /document\.title\s*=\s*head\.title/);
+  assert.match(APP_JS, /setHeadMeta\("description",\s*head\.description\)/);
+  // The old shape must not come back alongside the new one.
+  assert.doesNotMatch(APP_JS, /document\.title\s*=\s*tool\.name/);
+  assert.doesNotMatch(APP_JS, /setHeadMeta\("description",\s*tool\.desc\)/);
 });
 
 test("updateHeadForHome reverts document.title to the home title", () => {
   assert.match(APP_JS, /document\.title\s*=\s*HOME_TITLE/);
   assert.match(APP_JS, /const HOME_TITLE\s*=\s*"[^"]*Rough Logic"/);
-});
-
-test("updateHeadForTool updates the meta description from tool.desc", () => {
-  assert.match(APP_JS, /setHeadMeta\("description",\s*tool\.desc\)/);
 });
 
 test("setHeadLink + setHeadMeta helpers exist and create the element if missing", () => {

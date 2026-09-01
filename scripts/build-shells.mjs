@@ -27,42 +27,25 @@ import { loadLedger } from "./build-page-lastmod.mjs";
 import { CITATIONS } from "../citations.js";
 import { leadSentence, restOfDescription } from "../text-lead.js";
 import { normalizeQuery, rankTools } from "../search-discovery.js";
+// The tile <title> and <meta name="description"> rules moved to the repo root
+// so app.js can import the SAME code on a tile route. See shell-meta.js: the
+// SPA claimed since spec-v13 §5.5 to match this shell's head and diverged on
+// 1,396 of 1,804 titles and 1,685 of 1,804 descriptions. Re-exported below for
+// the unit tests that already import them from here.
+import {
+  PROFESSION_NOUN,
+  escapeHtml,
+  DESCRIPTION_CAP,
+  capDescription,
+  truncateName,
+  buildTitle,
+  metaDescription,
+} from "../shell-meta.js";
+export { escapeHtml, DESCRIPTION_CAP, capDescription, truncateName };
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = resolve(ROOT, "dist");
 const SITE_URL = "https://roughlogic.com";
-
-// Maps the first entry in a tile's `trades` array to the profession noun
-// rendered in the shell `<title>`. Spec-v13 §11.2: titles carry the
-// profession noun so a search query that names a generic trade
-// ("electrician calculator") matches.
-const PROFESSION_NOUN = {
-  electrical: "Electricians",
-  plumbing: "Plumbers",
-  hvac: "HVAC",
-  restoration: "Restoration",
-  carpentry: "Carpentry",
-  fire: "Fire-ground",
-  trucking: "Truckers",
-  mechanic: "Mechanics",
-  agriculture: "Agriculture",
-  water: "Water Operators",
-  stage: "Stage and Live Production",
-  kitchen: "Kitchen",
-  field: "Field and SAR",
-  reference: "Trades",
-  accounting: "Accounting",
-  "small-business": "Small Business",
-  tax: "Tax",
-  legal: "Legal",
-  lab: "Laboratory",
-  compliance: "Compliance",
-  vet: "Veterinary",
-  ems: "EMS",
-  aviation: "Pilots",
-  realestate: "Real Estate",
-  edu: "Educators",
-};
 
 // Group slug used in `/groups/<slug>/index.html`. Spec-v13 §8.1.
 export const GROUP_SLUG = {
@@ -92,20 +75,6 @@ export const GROUP_SLUG = {
   Y: "educators",
   Z: "rigging-and-heavy-lift",
 };
-
-// Escape a string for embedding inside HTML text content or an attribute.
-// The shells embed only the tile name, the description, and the group
-// label, all of which the existing grep-checks lint already screens for
-// banned glyphs (emoji, em-dash). The escape here is the standard XSS-
-// hardening pass that every static-site generator runs.
-function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
 
 // A group hub lists every tile in the group, so each row has to stay one
 // scannable line even when the tile's opening sentence runs long (these pack
@@ -618,119 +587,6 @@ async function loadGroupNames() {
     out[row[1]] = row[2].replace(/\\"/g, '"');
   }
   return out;
-}
-
-// The spec-v13 §6.2 / Phase G hard cap on a meta description, measured
-// *after HTML escaping* -- the escaped attribute string is what the search
-// snippet and the check-shells lint both read.
-export const DESCRIPTION_CAP = 220;
-
-// Cut a description down to DESCRIPTION_CAP. The old loop shaved four
-// characters at a time and appended "..." wherever it landed, which left
-// 734 of 1,804 tile pages ending mid-word ("...flags expec...") in the
-// snippet, in og:description, in twitter:description, and in the JSON-LD
-// description. Back off to a word boundary the way rowSummary does, so the
-// ellipsis always follows a whole word.
-export function capDescription(text) {
-  if (escapeHtml(text).length <= DESCRIPTION_CAP) return text;
-  // Reserve the three characters the ellipsis itself costs.
-  let cut = text;
-  while (escapeHtml(cut).length > DESCRIPTION_CAP - 3 && cut.length > 10) {
-    cut = cut.slice(0, -4);
-  }
-  const sp = cut.lastIndexOf(" ");
-  // Only honour the boundary if a usable amount of text survives it; a
-  // description made of one very long token would otherwise collapse.
-  if (sp > DESCRIPTION_CAP * 0.4) cut = cut.slice(0, sp);
-  return cut.replace(/[.,;:\s-]+$/, "") + "...";
-}
-
-// One-line shell description expanded from the tile's `desc` field per
-// spec-v13 §11.1 (verb-first, names the calculation and the inputs).
-// The desc fields in TOOLS already begin with a verb in the great
-// majority of cases ("Compute", "Estimate", "Convert", "Look up",
-// "Decode"); the small set that start with a noun get a "Reference for"
-// prefix so the search snippet leads with the verb.
-// Build a meta description that stays within the spec-v13 §6.2 / Phase
-// G 220-character hard cap measured *after HTML escaping* (the value
-// the search-engine snippet reads is the escaped attribute string).
-// Verb-first prefix per §11.1; tiles whose `desc` does not lead with
-// an admissible verb get a "Reference for" prefix so the snippet reads
-// as a verb-first sentence.
-function metaDescription(tool, professionNoun) {
-  // The tile's own opening sentence, unedited. It used to be rewritten first:
-  // a description not starting with one of two dozen allowlisted verbs got
-  // "Reference for " glued on and its first letter lowercased, per the §11.1
-  // rule that the snippet should lead with the verb. That fired on 1,786 of
-  // 1,804 tiles -- the descs were rewritten into complete sentences in the
-  // 2026-08-17 maintainer-voice pass, and a complete sentence does not start
-  // with an allowlisted verb -- and it produced broken English at scale:
-  // "Reference for a stair that satisfies the building code can fail the ADA",
-  // "Reference for sizes the power supply and standby battery". It never
-  // delivered the rule either: "Reference for" is a noun, so the snippet led
-  // with a verb on the 18 tiles the prefix skipped and on none of the rest.
-  let lead = tool.desc.trim();
-  if (!lead.endsWith(".")) lead += ".";
-  const tail = "Client-side, ad-free, account-free reference for " + professionNoun.toLowerCase() + ".";
-  const combined = lead + " " + tail;
-  if (escapeHtml(combined).length <= DESCRIPTION_CAP) return combined;
-  // The pair does not fit. A whole sentence beats a clipped pair, so drop
-  // the tail before cutting into the lead the searcher actually wants.
-  if (escapeHtml(lead).length <= DESCRIPTION_CAP) return lead;
-  return capDescription(lead);
-}
-
-// Build a shell title with the spec-v13 §11.2 profession noun, falling
-// back to a shorter form if the full "{Name} - {Profession Noun} -
-// Rough Logic" exceeds the §6.1 70-character cap. The fallback order
-// preserves the tile name (which the user is searching for) and the
-// brand suffix (which establishes site identity); the profession noun
-// is the optional middle that gets dropped first.
-function buildTitle(tool, professionNoun, capChars) {
-  // The cap is enforced (by check-shells) against the *escaped* <title>
-  // text, so measure against escapeHtml length here too -- a tile name
-  // with an apostrophe/ampersand (e.g. "f'm") escapes to more bytes than
-  // its raw form and would otherwise slip past this cap and fail the gate.
-  const escLen = (s) => escapeHtml(s).length;
-  const brand = " - Rough Logic";
-  const middle = " - " + professionNoun;
-  const full = tool.name + middle + brand;
-  if (escLen(full) <= capChars) return full;
-  const noProf = tool.name + brand;
-  if (escLen(noProf) <= capChars) return noProf;
-  // Truncate the tile name only if both fallbacks still overflow. Keep
-  // " - Rough Logic" so the brand is preserved. Grow the kept name one
-  // character at a time so an escaped char never pushes the rendered
-  // title over the cap (brand and "..." carry no escapable characters).
-  const budget = capChars - brand.length - 3;
-  if (budget < 4) return tool.name + brand;
-  return truncateName(tool.name, budget, escLen) + "..." + brand;
-}
-
-// Cut a tile name to fit the title cap. The <title> is the blue link text in
-// a search result and the label on the browser tab, and until 2026-09-01 the
-// cut landed wherever the character loop stopped: 86 of the 133 truncated
-// titles ended mid-word ("ASCE 7 ASD Load Combinations: Governing Demand and
-// Ne...", "Compressor Volumetric Efficiency (Clearance Re-Expans..."), the
-// same defect the meta description carried. Two back-offs, in order:
-//   1. to a word boundary, so the ellipsis follows a whole word;
-//   2. to before an unclosed "(", so the title never trails an opened
-//      parenthetical it does not finish -- "Accessible Shower Compartment
-//      Types..." reads as a name, "...Types (2010 ADA Standar..." does not.
-// Each back-off is skipped if it would eat so much of the name that the
-// reader could no longer tell which calculator this is.
-export function truncateName(name, budget, escLen = (s) => s.length) {
-  let kept = "";
-  for (const ch of name) {
-    if (escLen(kept + ch) > budget) break;
-    kept += ch;
-  }
-  const floor = Math.floor(budget * 0.4);
-  const sp = kept.lastIndexOf(" ");
-  if (sp > floor) kept = kept.slice(0, sp);
-  const open = kept.lastIndexOf("(");
-  if (open > floor && kept.indexOf(")", open) === -1) kept = kept.slice(0, open);
-  return kept.replace(/[.,;:\s([-]+$/, "");
 }
 
 // 20 tile pages carry no worked example because their tiles take no inputs:
