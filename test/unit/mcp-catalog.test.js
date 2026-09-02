@@ -247,7 +247,7 @@ test("a tile that takes inputs never answers from its own defaults", async () =>
 // their exact name while ranking first for it. An agent that reads the catalog
 // and asks for a tile by the name the catalog gave it should get that tile.
 test("a tile's own exact name outranks a partial curated alias", async () => {
-  const { answerQuery, search } = await import("../../mcp/catalog.mjs");
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
   const { TOOLS } = await import("../../tools-data.js");
 
   // The case that found it, both halves: the shorter phrase still goes where
@@ -256,11 +256,13 @@ test("a tile's own exact name outranks a partial curated alias", async () => {
   assert.equal((await answerQuery({ query: "Water Loss Class and Category" })).id, "water-classes");
 
   // And nothing anywhere in the catalog answers to a different tile when asked
-  // for by its own name while ranking first for it.
+  // for by its own name -- all 1,804, not only the ones that rank first for it.
+  // Two rank SECOND behind a near neighbour ("Markup and Margin" behind the
+  // Markup vs. Margin Converter, "Two-Leg Bridle Leg Tension" behind the Sling
+  // Angle Load Multiplier), and being someone's exact name is a stronger signal
+  // than one rank of separation. 81 tiles failed this before 2026-09-02.
   const stolen = [];
   for (const t of TOOLS) {
-    const ranked = await search({ query: t.name, limit: 3 });
-    if (!ranked.results.length || ranked.results[0].id !== t.id) continue; // a ranking matter, not this
     const out = await answerQuery({ query: t.name });
     if (out.id && out.id !== t.id) stolen.push(`${t.id} ("${t.name}") answered as ${out.id}`);
   }

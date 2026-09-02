@@ -1141,10 +1141,17 @@ export async function answerQuery({ query } = {}) {
   //
   // Exact and whole: same normalized tokens, same order, nothing left over. A
   // partial name still defers to curation, which is the case a human curated.
-  const namesTopExactly = results.length && sameTokens(q, byId.get(results[0].id));
-  const top = namesTopExactly
-    ? results[0]
-    : results.find((r) => queryIsCuratedAliasFor(q, r.id, aliasRows)) || results[0];
+  //
+  // Searched across the top 3, not just rank 0. Two tiles rank SECOND for their
+  // own name behind a near neighbour -- "Markup and Margin" behind the
+  // Markup vs. Margin Converter, "Two-Leg Bridle Leg Tension" behind the Sling
+  // Angle Load Multiplier -- and being someone's exact name is a stronger
+  // signal than one rank of separation. With the sweep across the top 3, all
+  // 1,804 tiles answer to their own name; 81 did not before.
+  const exact = results.find((r) => sameTokens(q, byId.get(r.id)));
+  const top = exact
+    || results.find((r) => queryIsCuratedAliasFor(q, r.id, aliasRows))
+    || results[0];
   if (!top) return { status: "NO_MATCH", query: q, message: "No calculator matched." };
 
   const tool = byId.get(top.id);
