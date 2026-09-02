@@ -157,6 +157,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Every MACRS class life is checked, not two of six.** `MACRS_TABLES` was pinned by two spot tests -- the 5- and 7-year columns totalling 100%. The 3-, 10-, 15- and 20-year columns, including both 150%-declining-balance tables, were unchecked. A column that does not sum to 100% is a transcription error by definition, since the table recovers the whole basis, so the test now sweeps every published class life and also pins the row count to `class_life + 1` (the half-year convention splits the first and last years).
+
+  The percentages also had two homes, the module constant the tile computes from and the shard the page cites as its data stamp, with nothing comparing them -- the same shape as the IRS mileage rate and the GSA M&IE tiers earlier today. They are pinned together now. All six columns were re-derived against IRS Pub 946 Table A-1 in the same pass and are correct; no value changed. Seed-verified by mistyping one 15-year percentage, which reddens both tests.
+
 - **The per-diem M&IE figures were the FY2023 tiers, in a shard stamped FY2026.** GSA's M&IE allowance moves with the fiscal year. The bundled table used **$64 / $69 / $74 / $79 / $84** -- the FY2023 tier set -- while the shard, the citation and the manifest all said FY2026. The published FY2026 tiers are **$68 / $74 / $80 / $86 / $92**, with standard CONUS at $110 lodging / $68 M&IE (unchanged from FY2025, per the GSA August 2025 release). Every reader was **$4/day low at the standard tier and $8/day low at the top** -- a week's travel off by up to $56, on top of the locality gap disclosed earlier today.
 
   The tier values are remapped by rank, which is the honest split: **which tier a state sits in is the project's approximation and did not change; what a tier is worth is GSA's published number and did.** The lodging column is unchanged -- standard CONUS is still $110, and the above-standard values are per-state approximations GSA does not publish in that shape.

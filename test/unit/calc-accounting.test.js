@@ -2,6 +2,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import {
   computeStraightLine, straightLineExample,
   computeMacrs, macrsExample, MACRS_TABLES,
@@ -32,8 +33,35 @@ test("SL: year clamped to life", () => { const r = computeStraightLine({ cost: 1
 
 // 235 MACRS
 test("MACRS: example matches Pub 946 5-yr year-1 (20% of $50k)", () => { const r = computeMacrs(macrsExample.inputs); assert.ok(close(r.year_depreciation, 10000, 0.5)); });
-test("MACRS: 5-yr table totals to 100%", () => { const sum = MACRS_TABLES.half_year[5].reduce((a, b) => a + b, 0); assert.ok(close(sum, 100, 0.01)); });
-test("MACRS: 7-yr table totals to 100%", () => { const sum = MACRS_TABLES.half_year[7].reduce((a, b) => a + b, 0); assert.ok(close(sum, 100, 0.02)); });
+// Every recovery period, not just the two that were spot-checked. A MACRS
+// column that does not sum to 100% is a transcription error by definition --
+// the table recovers the whole basis -- so this catches a mistyped digit in any
+// class life, including the 15- and 20-year 150%-DB tables nobody was checking.
+test("MACRS: every half-year table totals to 100%", () => {
+  const lives = Object.keys(MACRS_TABLES.half_year);
+  assert.ok(lives.length >= 6, "expected the six published class lives, got " + lives.length);
+  for (const life of lives) {
+    const rows = MACRS_TABLES.half_year[life];
+    const sum = rows.reduce((a, b) => a + b, 0);
+    assert.ok(close(sum, 100, 0.02), life + "-year table sums to " + sum + ", not 100");
+    // Half-year convention: the recovery runs one year longer than the class
+    // life, because year one and the last year each take a half year.
+    assert.equal(rows.length, Number(life) + 1, life + "-year table has " + rows.length + " rows");
+  }
+});
+
+// The percentages have two homes -- the module constant the tile computes from
+// and the shard the page cites as its data stamp. The IRS mileage rate and the
+// GSA per-diem tiers both drifted that way; pin these together before they can.
+test("MACRS: the shipped shard agrees with the module table", () => {
+  const shard = JSON.parse(
+    readFileSync(new URL("../../data/accounting/macrs-tables.json", import.meta.url), "utf8"),
+  );
+  assert.equal(shard.convention, "half_year");
+  for (const [life, rows] of Object.entries(shard.tables)) {
+    assert.deepEqual(MACRS_TABLES.half_year[life], rows, life + "-year");
+  }
+});
 test("MACRS: 5-yr full schedule totals to cost", () => { const r = computeMacrs({ cost: 10000, class_life: 5, year_of_interest: 6 }); const tot = r.schedule.reduce((a, b) => a + b.depreciation, 0); assert.ok(close(tot, 10000, 0.5)); });
 test("MACRS: book value at end is ~zero", () => { const r = computeMacrs({ cost: 10000, class_life: 5, year_of_interest: 6 }); assert.ok(Math.abs(r.book_value) < 1); });
 test("MACRS: unknown class errors", () => { assert.ok(computeMacrs({ cost: 1000, class_life: 4 }).error); });
