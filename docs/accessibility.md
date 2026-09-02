@@ -109,6 +109,15 @@ visual boundary (SC 1.4.11).
 | `--border-control` on `--bg-primary` | #757575/#0a0a0a, #767676/#ffffff | 4.30:1 | 4.54:1 |
 | `--border-control` on `--bg-secondary` | #757575/#1a1a1a, #767676/#f5f5f5 | 3.78:1 | 4.17:1 |
 
+The same palette is declared a **third** time inside `@media print`. The print
+rules had forced `body` and three containers to white with black text, and left
+every descendant holding its token -- so printing a calculator with the dark
+theme active put the **answer in white on white paper**, along with the title,
+and filled the input boxes solid black. `print.test.js` never saw it because
+Playwright renders in the light scheme by default: the suite was green on one of
+the two states a reader can be in. It now runs its colour assertions in both,
+and `check-contrast` holds all three copies of the palette identical.
+
 `--border-control` is new as of 2026-09-02 and exists for SC 1.4.11. A text
 field that is empty has nothing but its edge to say where to type, so that edge
 has to reach 3:1 against both what is inside it and what surrounds it. The

@@ -128,6 +128,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Printing a calculator in the dark theme produced a page with no answer on it.** `@media print` forced `body`, the view and the two regions to white with black text -- four elements. Everything inside them takes its colour from a token, and a token still holding the dark value paints white on white paper: the **answer**, the **title**, and the field labels printed invisibly, and the input boxes printed **solid black**. A reader whose system prefers dark, printing a calc sheet to take to the job, got a blank page and a lot of toner.
+
+  `print.test.js` has fifteen tiles under print emulation and never saw it, because Playwright renders in the light colour scheme by default -- the suite was green on **one of the two states a reader can be in**. That is the same shape as the static pages ignoring `prefers-color-scheme` earlier today, on the surface next door.
+
+  The fix redefines the palette inside `@media print` rather than adding a fifth `!important` rule, so it covers every descendant at once -- including the ones nobody thought to enumerate, which is how those four rules came to exist one element at a time. `print.test.js` now asserts the printed colours **in both schemes**: near-black ink on white paper for the answer, the title and the field text, and a white fill behind the inputs. `check-contrast` holds all three copies of the light palette identical, and both failure modes are seed-verified.
+
+  One measured detail worth keeping: switching the emulated media does **not** repaint computed styles in the same tick, and `matchMedia("print").matches` flips **before** they do. A test that reads a colour immediately after `emulateMedia` reads the screen palette -- which is how the first version of this spec failed against the fixed stylesheet. It polls the value it asserts.
+
+
 - **A reader's "4 in thick" matched another tile's spelled-out "four".** `concrete slab 20 ft by 30 ft 4 in thick` -- as plain a trade query as this catalog gets -- returned **Concrete Control Joint Spacing** above Concrete Volume. Token-ablation named the culprit exactly: drop the bare `4` and Concrete Volume wins. The mechanism took longer, and one wrong guess: that tile carries the curated alias *"joint grid for a **four** inch slab"*, and `DIGIT_EQUIV` maps `4` to `four`, so the reader's four inches matched the spelled four in an unrelated phrase. Alias field weight is 2, which was the entire 10-to-9 margin.
 
   `DIGIT_EQUIV` exists so that "3 phase" meets **Three-Phase Power**, and that is a digit standing in for a word in a tile's **name**. The fix keeps exactly that and nothing more: **a digit may borrow its word from a name or an id -- the calculator's identity -- and not from a curated phrase or from prose.** "3 phase power" still returns Three-Phase Power first.

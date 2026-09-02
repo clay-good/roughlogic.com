@@ -95,25 +95,37 @@ async function main() {
   const lightTokens = tokensIn(lightBlock);
   const light = { ...dark, ...lightTokens };
 
-  // The light palette is declared twice: once for the explicit toggle, and once
-  // inside @media (prefers-color-scheme: light) for a reader who never runs it
-  // -- which on the 1,826 prerendered pages means every reader, since those
-  // load no script and so never get a data-theme attribute at all. Two copies
-  // of one palette drift, so they are compared here rather than trusted.
-  const mediaBlock = ruleBlock(css, ':root:not([data-theme="dark"])');
-  if (!mediaBlock) {
-    errors.push(
-      'styles.css: no :root:not([data-theme="dark"]) block. The light palette must also be declared under ' +
-        "@media (prefers-color-scheme: light), or a static page ignores the reader's system preference.",
-    );
-  } else {
-    const mediaTokens = tokensIn(mediaBlock);
-    const keys = new Set([...Object.keys(lightTokens), ...Object.keys(mediaTokens)]);
-    for (const key of [...keys].sort()) {
-      if (lightTokens[key] !== mediaTokens[key]) {
+  // The light palette is declared THREE times, and all three have to agree.
+  //
+  //   1. :root[data-theme="light"]           -- the explicit toggle.
+  //   2. @media (prefers-color-scheme: light) -- a reader who never runs it,
+  //      which on the 1,826 prerendered pages is every reader: those load no
+  //      script and so never get a data-theme attribute at all.
+  //   3. @media print                        -- printing the dark theme put
+  //      white text on white paper. The four !important rules there covered
+  //      body and three containers; every descendant kept its token, so the
+  //      ANSWER did not appear on the page.
+  //
+  // Three copies of one palette drift, so they are compared rather than
+  // trusted.
+  const copies = [
+    [':root:not([data-theme="dark"])', "the prefers-color-scheme block"],
+    ["@media print", "the print block"],
+  ];
+  for (const [selector, what] of copies) {
+    const block = selector === "@media print"
+      ? ruleBlock(css.slice(css.indexOf("@media print")), ":root {")
+      : ruleBlock(css, selector);
+    if (!block) {
+      errors.push(`styles.css: no light-palette copy found for ${what}.`);
+      continue;
+    }
+    const copyTokens = tokensIn(block);
+    for (const key of [...new Set([...Object.keys(lightTokens), ...Object.keys(copyTokens)])].sort()) {
+      if (lightTokens[key] !== copyTokens[key]) {
         errors.push(
           `styles.css: ${key} is ${lightTokens[key] || "absent"} under :root[data-theme="light"] but ` +
-            `${mediaTokens[key] || "absent"} under the prefers-color-scheme block. One palette, two copies.`,
+            `${copyTokens[key] || "absent"} in ${what}. One palette, three copies.`,
         );
       }
     }
@@ -179,7 +191,7 @@ async function main() {
   }
   console.log(
     `check-contrast OK: ${PAIRS.length} colour pair(s) in both themes meet their WCAG floors, ` +
-      "the light palette is identical in its toggle and prefers-color-scheme declarations, " +
+      "the light palette is identical in its toggle, prefers-color-scheme and print declarations, " +
       `and every ratio docs/accessibility.md prints is the one styles.css produces.`,
   );
 }

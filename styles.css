@@ -1337,6 +1337,47 @@ input[aria-invalid="true"] {
    Print stylesheet
    ============================================================ */
 @media print {
+  /* Print the LIGHT palette, whatever the reader is looking at.
+     The rules below already forced `body`, the view and the two regions to
+     white-on-black-text -- but only those four elements. Everything inside
+     them takes its colour from a token, and a token still holding the dark
+     value paints white text on white paper: printing a calculator with the
+     dark theme active produced a page whose ANSWER was invisible, its h1
+     invisible, and its input boxes solid black. print.test.js never saw it
+     because Playwright renders in the light scheme by default, so the suite
+     was green on one of the two states a reader can be in.
+     Redefining the tokens fixes every descendant at once, including the ones
+     nobody thought to enumerate -- which is how the four `!important` rules
+     below came to be, one element at a time.
+     This is the third copy of the light palette; scripts/check-contrast.mjs
+     asserts all three declare the same values. */
+  :root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: #e8e8e8;
+
+  --fg: #0a0a0a;
+  --fg-muted: #404040;
+  --fg-dim: #5e5e5e;
+
+  --border: #d0d0d0;
+  --border-light: #b8b8b8;
+  --border-control: #767676;   /* 3.71:1 on --bg-tertiary, 4.54:1 on white */
+
+  --accent-hover: #2a2a2a;
+
+  /* Light-theme accent: deeper blue that clears AA as link text on the
+     light surfaces (5.2:1 on bg-secondary, 5.7:1 on white). */
+  --accent: #0a66c2;
+  --accent-strong: #084b8f;
+
+  --header-bg: rgba(255, 255, 255, 0.85);
+
+  /* Deeper reds that hit WCAG AA on white (5.4:1 and 6.6:1). */
+  --error-border: #c0392b;
+  --error-text: #a93226;
+  }
+
   .site-header, .primary-nav, .skip-link,
   .copy-btn, .copy-all-btn, .view-copy-reference,
   .integrity-banner,
