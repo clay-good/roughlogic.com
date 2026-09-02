@@ -132,7 +132,7 @@ async function loadCommodityShard(file) {
 }
 
 function renderHistoricalPricing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: monthly history bundled from public BLS PPI / EIA / USDA NASS / FRED series. Each datapoint carries its source and series ID. Reference only; current quotes vary by region and supplier.";
+  citationEl.textContent = "Citation: a modeled monthly series shaped after the named BLS PPI / EIA / USDA NASS / FRED series, not the published values. Read it for magnitude and spread. Reference only; current quotes vary by region and supplier.";
 
   const sel = makeSelect("Commodity", "hp-commodity",
     [{ value: "", label: "Select commodity..." }].concat(COMMODITIES.map((c) => ({ value: c.id, label: c.label + " (" + c.agency + " " + c.series_id + ")" }))));
@@ -226,7 +226,7 @@ function renderHistoricalPricing(inputRegion, outputRegion, citationEl) {
     summary.textContent = cat.label + " - latest " + r.latest_date + ": " + fmt(r.latest, 2) + " " + r.units + " (" + r.placement + ")";
     renderBands(r);
     renderTable(r, r.units);
-    sourceLine.textContent = "Source: " + cat.agency + " series " + cat.series_id + ", " + cat.units + ". Bundled at build time on " + (shard.fetched || "unknown") + ". Reference only; ask your supplier for a current quote.";
+    sourceLine.textContent = "Modeled series shaped after " + cat.agency + " " + cat.series_id + ", " + cat.units + ", built " + (shard.built || shard.fetched || "unknown") + ". These are not the published monthly values: only the shape and the recent level are meant to be read. Reference only; ask your supplier for a current quote.";
   }, DEBOUNCE_MS);
 
   sel.select.addEventListener("input", update);

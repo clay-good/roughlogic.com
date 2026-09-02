@@ -1,8 +1,10 @@
 {
-  "source": "U.S. government publication: EIA series PET.EMD_EPD2D_PTE_NUS_DPG.M. Reference only; ask your supplier for a current quote.",
+  "source": "MODELED reference series shaped after EIA series PET.EMD_EPD2D_PTE_NUS_DPG.M. A maintainer-committed recent reading with a smooth monthly pattern behind it -- NOT the published monthly values. Use it for magnitude and spread; for the series of record, read EIA PET.EMD_EPD2D_PTE_NUS_DPG.M at the source. Reference only; ask your supplier for a current quote.",
+  "basis": "modeled",
   "agency": "EIA",
   "series_id": "PET.EMD_EPD2D_PTE_NUS_DPG.M",
   "units": "USD/gal",
+  "built": "2026-09-02",
   "fetched": "2026-09-02",
   "cadence": "monthly",
   "points": [

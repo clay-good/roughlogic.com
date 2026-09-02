@@ -65,6 +65,48 @@ function scan(text, file) {
   return findings;
 }
 
+// The other half of the same promise: nothing SHIPPED may tell a reader that
+// the build fetched a value. Proving the build makes no network call is worth
+// little if a shard, a citation or a doc still says the numbers were downloaded
+// -- and one did. Every data/historical commodity shard called itself
+// "U.S. government publication: <BLS series id>" and its citation said the
+// series was "build-fetched", over 36 monthly points the build generates from an
+// in-tree anchor. A reader checking a copper price against BLS would have found
+// numbers that were never published. Scan the reader-facing surfaces for a claim
+// of fetching; the shipped word for what the build does is "built".
+const FETCH_CLAIM = /\b(?:build-fetched|fetched (?:from|at build)|downloaded (?:from|at build)|refreshes? .{0,40}\bfrom (?:NIST|NOAA|NCEI|FHFA|HUD|BLS|EIA|USDA|IRS|GSA)\b)/i;
+
+async function scanClaims() {
+  const errors = [];
+  const files = [];
+  for (const f of ["README.md", "AGENTS.md", "CONTRIBUTING.md", "citations.js", "tools-data.js"]) {
+    files.push(f);
+  }
+  for (const f of (await readdir(resolve(ROOT, "docs"))).sort()) {
+    if (f.endsWith(".md")) files.push("docs/" + f);
+  }
+  const dataRoot = resolve(ROOT, "data");
+  const stack = [dataRoot];
+  while (stack.length) {
+    const dir = stack.pop();
+    for (const e of await readdir(dir, { withFileTypes: true })) {
+      const full = resolve(dir, e.name);
+      if (e.isDirectory()) stack.push(full);
+      else if (e.name.endsWith(".json")) files.push(full.slice(ROOT.length + 1));
+    }
+  }
+  for (const rel of files) {
+    const text = await readFile(resolve(ROOT, rel), "utf8");
+    text.split("\n").forEach((line, i) => {
+      // A sentence that DENIES fetching is the point of the rule, not a breach.
+      if (/\bfetches nothing\b|\bnot (?:downloaded|fetched)\b|\bno (?:live |runtime )?fetch\b|check-build-hermetic/i.test(line)) return;
+      const m = line.match(FETCH_CLAIM);
+      if (m) errors.push(rel + ":" + (i + 1) + " claims the build fetched data: '" + m[0] + "'");
+    });
+  }
+  return { errors, count: files.length };
+}
+
 async function main() {
   const dirs = ["scripts", "mcp"];
   const errors = [];
@@ -80,6 +122,17 @@ async function main() {
     }
   }
 
+  const claims = await scanClaims();
+  if (claims.errors.length) {
+    console.error(`check-build-hermetic: ${claims.errors.length} shipped string(s) claim the build fetched data.`);
+    for (const e of claims.errors) console.error("  - " + e);
+    console.error(
+      "  The build fetches nothing, so nothing it produces was downloaded. Say 'built', and say what\n" +
+      "  the value actually is."
+    );
+    process.exit(1);
+  }
+
   if (errors.length) {
     console.error(`check-build-hermetic: ${errors.length} undeclared network call(s).`);
     for (const e of errors) console.error("  - " + e);
@@ -92,7 +145,8 @@ async function main() {
   }
   console.log(
     `check-build-hermetic OK: ${scanned} build and agent script(s) scanned; no undeclared network call ` +
-    `(${declared} declared, the rest local-only). data/ is built from in-tree constants, not fetched.`
+    `(${declared} declared, the rest local-only), and ${claims.count} shipped file(s) carry no claim that ` +
+    `the build fetched a value. data/ is built from in-tree constants, not fetched.`
   );
 }
 

@@ -1,8 +1,10 @@
 {
-  "source": "U.S. government publication: USDA NASS series PWHEAMTUSDM. Reference only; ask your supplier for a current quote.",
+  "source": "MODELED reference series shaped after USDA NASS series PWHEAMTUSDM. A maintainer-committed recent reading with a smooth monthly pattern behind it -- NOT the published monthly values. Use it for magnitude and spread; for the series of record, read USDA NASS PWHEAMTUSDM at the source. Reference only; ask your supplier for a current quote.",
+  "basis": "modeled",
   "agency": "USDA NASS",
   "series_id": "PWHEAMTUSDM",
   "units": "USD/bushel",
+  "built": "2026-09-02",
   "fetched": "2026-09-02",
   "cadence": "monthly",
   "points": [

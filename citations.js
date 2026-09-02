@@ -7447,13 +7447,14 @@ export const CITATIONS = {
   // --- Group Q: Historical Reference Data (priority 11) ---
 
   "historical-pricing": {
-    formula: "Bundled monthly time series per commodity from public BLS PPI / EIA / USDA NASS / FRED federal series. Percentile bands (p25 / p50 / p75 / p90) computed via linear-interpolation type-7 quantile over a user-selected lookback window.",
-    edition: "Mixed federal series, build-fetched at the build date stamped on each shard. BLS PPI series WPU* (industrial commodities); EIA series PET.* / NG.* (retail fuel + city-gate gas); USDA NASS / FRED PWHEAMTUSDM / PMAIZMTUSDM / PSOYBUSDM (agricultural).",
-    freeAccess: "Free at bls.gov/data, eia.gov/dnav, fdc.nal.usda.gov, fred.stlouisfed.org. Series IDs listed verbatim on every shard.",
+    formula: "A MODELED monthly series per commodity, shaped after the named public BLS PPI / EIA / USDA NASS / FRED federal series: a maintainer-committed recent reading, a monthly drift, and a fixed seasonal pattern, materialized over the last 36 months at build time. These are not the published monthly values. Percentile bands (p25 / p50 / p75 / p90) computed via linear-interpolation type-7 quantile over a user-selected lookback window.",
+    edition: "Modeled after mixed federal series, built at the date stamped on each shard. Series named: BLS PPI WPU* (industrial commodities); EIA PET.* / NG.* (retail fuel + city-gate gas); USDA NASS / FRED PWHEAMTUSDM / PMAIZMTUSDM / PSOYBUSDM (agricultural).",
+    freeAccess: "The series of record are free at bls.gov/data, eia.gov/dnav, fdc.nal.usda.gov, fred.stlouisfed.org. Series IDs are listed verbatim on every shard so the real series can be looked up.",
     governance: GOVERNANCE.reference,
-    editionNote: "Single-edition (federal data refreshed at the build date stamped on each commodity shard; build fails if any shard's latest point is more than 30 days behind the build date).",
+    editionNote: "Single-edition. The build fetches nothing -- see check-build-hermetic -- so these shards are generated, not downloaded: the maintainer commits the anchor reading and the shape, and the build materializes 36 backdated monthly points from it. Until 2026-09-02 this page called them federal series values and said they were build-fetched, which was wrong in both halves.",
     assumptions: [
       { name: "Quantile method", value: "linear-interpolation type-7 (matches NumPy / spreadsheet defaults)", source: "Hyndman-Fan 1996" },
+      { name: "The points are modeled", value: "anchor reading + monthly drift + fixed seasonal pattern; only the magnitude and the spread are meant to be read, never an individual month", source: "scripts/build-data.mjs buildHistoricalShard" },
       { name: "No live fetch", value: "true (every datapoint is a same-origin static asset bundled at build time)", source: "spec.md no-runtime-fetch rule" },
     ],
   },

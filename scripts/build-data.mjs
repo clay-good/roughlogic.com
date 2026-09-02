@@ -1227,12 +1227,19 @@ const REEFER_BURN_DATA = {
 
 // --- v4 utility 233: Historical Pricing Context ---
 //
-// Bundled monthly history per commodity from public BLS PPI / EIA / USDA NASS
-// / FRED series. The maintainer commits anchor values (the most recent series
-// reading at the time of the build) and a small monthly delta pattern; the
-// build then materializes 36 backdated monthly points anchored to the build
-// date so the latest point is never more than the cadence stale. Each shard
-// records the federal series ID and the build (fetched) date.
+// A MODELED monthly history per commodity, shaped after public BLS PPI / EIA /
+// USDA NASS / FRED series. The maintainer commits anchor values (the most recent
+// series reading at the time of the build) and a small monthly delta pattern; the
+// build then materializes 36 backdated monthly points anchored to the build date
+// so the latest point is never more than the cadence stale.
+//
+// These are NOT the published monthly values, and nothing that shipped said so
+// until 2026-09-02: the shard called itself "U.S. government publication: <series>",
+// the citation said the data was "build-fetched", and the tile printed the agency
+// and series ID over generated numbers. The build fetches nothing (that is the
+// check-build-hermetic guarantee), so a shard can only ever be generated from an
+// in-tree constant. Every surface now says the series is modeled; the series IDs
+// stay verbatim so a reader can go read the series of record.
 //
 // Provenance (every entry below is a U.S. government publication or the
 // closest publicly available proxy; the series ID is reproduced verbatim
@@ -1284,10 +1291,12 @@ function buildHistoricalShard(c, todayIso) {
     points.push({ date: ym, value: Math.round(value * 100) / 100 });
   }
   return {
-    source: "U.S. government publication: " + c.agency + " series " + c.series_id + ". Reference only; ask your supplier for a current quote.",
+    source: "MODELED reference series shaped after " + c.agency + " series " + c.series_id + ". A maintainer-committed recent reading with a smooth monthly pattern behind it -- NOT the published monthly values. Use it for magnitude and spread; for the series of record, read " + c.agency + " " + c.series_id + " at the source. Reference only; ask your supplier for a current quote.",
+    basis: "modeled",
     agency: c.agency,
     series_id: c.series_id,
     units: c.units,
+    built: todayIso,
     fetched: todayIso,
     cadence: "monthly",
     points,
@@ -1677,7 +1686,7 @@ const DATASETS = [
   // v4 utility 233: historical pricing context. One shard per commodity
   // under data/historical/commodities/. Build fails if any latest point is
   // more than HISTORICAL_FRESHNESS_LIMIT_DAYS behind the build date.
-  { folder: "historical", edition: "BLS PPI / EIA / USDA NASS / FRED federal series; build-fetched " + TODAY + ". Build fails if any shard's latest point is more than 30 days behind the build date.", shards: buildHistoricalDataset(TODAY) },
+  { folder: "historical", edition: "Modeled after BLS PPI / EIA / USDA NASS / FRED federal series (series IDs named verbatim; the monthly values are generated from an in-tree anchor, not downloaded -- the build fetches nothing); built " + TODAY + ". Build fails if any shard's latest point is more than 30 days behind the build date.", shards: buildHistoricalDataset(TODAY) },
   // v5 Group R: Accounting, Tax, and Small-Business (utilities 234-245).
   { folder: "accounting", edition: "IRS Pub 946 (MACRS), Pub 15-T (payroll percentage method), annual Rev. Proc. (Section 179 cap), SSA wage-base announcement (SE tax), IRS Form 1040-ES schedule (estimated tax), IRS standard mileage rate notice. U.S. Census ARTS / SBA published medians (inventory). Per-year entries with verified-on date; verified " + TODAY + ".", shards: [
       { file: "macrs-tables.json", body: MACRS_TABLES_V5, name: "IRS Pub 946 Tables A-1 (200%/150% DB, half-year)" },
