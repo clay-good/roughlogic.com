@@ -349,6 +349,59 @@ async function main() {
     );
   }
 
+  // CF-04 (2026-09-02): the bundled federal dollar figures that reprice every
+  // year on a known calendar. The standards rows above track EDITIONS; nothing
+  // tracked these, and on one day five of them were wrong -- the IRS mileage
+  // rate two tax years old, Section 179 and bonus depreciation still on a
+  // repealed statute, the SSA wage base $900 low, the FHFA/HUD loan limits a
+  // whole cycle behind under a `year: 2026` stamp, and the GSA M&IE tiers three
+  // fiscal years behind. Each shard carried a recent `verified_on`. A stamped
+  // verification date is not evidence anything was verified, so ask the calendar
+  // instead: when did the publisher last speak, and was the value looked at
+  // after that?
+  //
+  // Warns from the publication date and fails only once a SECOND publication has
+  // come and gone, so a row is a full cycle behind before it can turn the build
+  // red -- a date this file already knows about should not ambush anyone at a
+  // UTC midnight, the same reasoning CF-03 carries above.
+  const annual = cycle.annual_figures || [];
+  if (annual.length === 0) {
+    warnings.push("sources-cycle.json carries no 'annual_figures' rows; the annual-figure recheck calendar is not being applied.");
+  }
+  for (const f of annual) {
+    const month = Number(f.publishes_month);
+    if (!(month >= 1 && month <= 12)) {
+      errors.push("sources-cycle.json: annual figure '" + (f.id || "?") + "' has no valid publishes_month.");
+      continue;
+    }
+    const verified = parseDateLoose(f.last_verified);
+    if (!verified) {
+      errors.push("sources-cycle.json: annual figure '" + (f.name || f.id) + "' carries no 'last_verified'.");
+      continue;
+    }
+    // Most recent publication on or before today, and the one before that.
+    let lastPub = new Date(Date.UTC(today.getUTCFullYear(), month - 1, 1));
+    if (lastPub > today) lastPub = new Date(Date.UTC(today.getUTCFullYear() - 1, month - 1, 1));
+    const priorPub = new Date(Date.UTC(lastPub.getUTCFullYear() - 1, month - 1, 1));
+    const iso = (d) => d.toISOString().slice(0, 10);
+    if (verified < priorPub) {
+      errors.push(
+        "sources-cycle.json: '" + (f.name || f.id) + "' has published twice (" + iso(priorPub) + ", " +
+          iso(lastPub) + ") since it was last verified " + f.last_verified + ". The bundled value in " +
+          (f.where || "its shard") + " is at least a full cycle behind; re-verify against " +
+          (f.publisher || "the publisher") + " and re-stamp."
+      );
+      continue;
+    }
+    if (verified < lastPub) {
+      warnings.push(
+        "sources-cycle.json: '" + (f.name || f.id) + "' published its current figures around " + iso(lastPub) +
+          "; the bundled value was last verified " + f.last_verified + ". Re-verify against " +
+          (f.publisher || "the publisher") + " and re-stamp before it turns the build red."
+      );
+    }
+  }
+
   for (const w of warnings) console.warn("WARN: " + w);
   if (errors.length > 0) {
     for (const e of errors) console.error("ERROR: " + e);

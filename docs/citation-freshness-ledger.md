@@ -11,6 +11,24 @@ verified, and a status. `scripts/check-citation-freshness.mjs` fails if any
 tracked source `id` is missing a row here (ledger-completeness, CF-02) or if a
 row's `next_expected` has passed without a `last_verified` re-stamp (CF-03).
 
+Since 2026-09-02 the same file also carries **`annual_figures`**: the bundled
+federal dollar amounts that reprice every year on a known calendar -- the IRS
+standard mileage rate, the Section 179 cap and IRC 168(k) bonus percentage, the
+SSA wage base, the FHFA and HUD loan limits, GSA per-diem, HUD Fair Market
+Rents, and the Pub 15-T brackets. Those rows track a *value*, not an edition,
+and nothing had ever tracked them. On 2026-09-02 five were found wrong at once,
+each under a recent `verified_on` stamp -- the mileage rate two tax years old,
+Section 179 and bonus still on a statute repealed in July 2025, the SSA wage
+base $900 low, the loan limits a whole cycle behind under a `year: 2026` label,
+and the GSA M&IE tiers three fiscal years behind.
+
+**CF-04** asks the calendar instead of the stamp: when did the publisher last
+speak, and was the bundled value looked at after that? It warns from the
+publication month and fails only once a *second* publication has passed, so a
+figure is a full cycle behind before it can turn the build red. Re-verify
+against the publisher, then move `last_verified`; a stamped date is not
+evidence, so the row's `verification_note` should say what was checked.
+
 **Status vocabulary**
 
 - **current** — the bundled edition is the current published edition (or the

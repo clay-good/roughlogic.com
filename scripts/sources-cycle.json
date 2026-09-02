@@ -1,6 +1,6 @@
 {
-  "_comment": "v10 Phase A.1 source-cycle table. One row per cited standard listing the publishing body, the current edition, the cycle in years, the next-expected release date (best estimate), and a free-access URL. Used by scripts/check-citation-freshness.mjs to flag manifests whose 'edition' string is more than one cycle behind the current publication of that standard. spec-v22 CF-03: when 'next_expected' is in the past, the row must carry a 'last_verified' (ISO date >= next_expected) re-stamp -- the 'verified, not yet released' acknowledgement -- or the freshness gate fails. Update on each rollover (see docs/citation-freshness-ledger.md).",
-  "_updated": "2026-09-01",
+  "_comment": "v10 Phase A.1 source-cycle table. One row per cited standard listing the publishing body, the current edition, the cycle in years, the next-expected release date (best estimate), and a free-access URL. Used by scripts/check-citation-freshness.mjs to flag manifests whose 'edition' string is more than one cycle behind the current publication of that standard. spec-v22 CF-03: when 'next_expected' is in the past, the row must carry a 'last_verified' (ISO date >= next_expected) re-stamp -- the 'verified, not yet released' acknowledgement -- or the freshness gate fails. Update on each rollover (see docs/citation-freshness-ledger.md). Since 2026-09-02 the file also carries `annual_figures`: the bundled federal dollar figures that reprice every year on a known calendar (IRS mileage, Section 179, the SSA wage base, FHFA and HUD loan limits, GSA per-diem, HUD FMRs, Pub 15-T). Five of them were found stale on one day; nothing had ever asked when their publisher last spoke.",
+  "_updated": "2026-09-02",
   "standards": [
     {
       "id": "nec",
@@ -12,7 +12,10 @@
       "last_verified": "2026-06-05",
       "verification_note": "NEC 2026 (NFPA 70-2026) published on the standard NFPA three-year cycle. Bundled ampacity/correction values still follow NEC 2023 (disclosed-lag per NEC_DISCLOSURE); the 2026 value refresh is a data change tracked separately.",
       "free_access_url": "https://www.nfpa.org/free-access",
-      "match_terms": ["NEC ", "NFPA 70"]
+      "match_terms": [
+        "NEC ",
+        "NFPA 70"
+      ]
     },
     {
       "id": "ipc",
@@ -24,7 +27,9 @@
       "last_verified": "2026-09-01",
       "verification_note": "2027 I-Code final vote completed August 2026; the editions publish in stages over the rest of 2026 and early 2027. Verified 2026-09-01: the 2027 edition is NOT yet published, so 2024 remains the current published edition. next_expected advanced to this source's own anticipated month -- 2027 IPC staged over late 2026 / early 2027.",
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
-      "match_terms": ["IPC "]
+      "match_terms": [
+        "IPC "
+      ]
     },
     {
       "id": "irc",
@@ -36,7 +41,9 @@
       "last_verified": "2026-09-01",
       "verification_note": "2027 I-Code final vote completed August 2026; the editions publish in stages over the rest of 2026 and early 2027. Verified 2026-09-01: the 2027 edition is NOT yet published, so 2024 remains the current published edition. next_expected advanced to this source's own anticipated month -- 2027 IRC anticipated February 2027.",
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
-      "match_terms": ["IRC "]
+      "match_terms": [
+        "IRC "
+      ]
     },
     {
       "id": "ibc",
@@ -48,7 +55,9 @@
       "last_verified": "2026-09-01",
       "verification_note": "2027 I-Code final vote completed August 2026; the editions publish in stages over the rest of 2026 and early 2027. Verified 2026-09-01: the 2027 edition is NOT yet published, so 2024 remains the current published edition. next_expected advanced to this source's own anticipated month -- 2027 IBC anticipated September 2026.",
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
-      "match_terms": ["IBC "]
+      "match_terms": [
+        "IBC "
+      ]
     },
     {
       "id": "imc",
@@ -60,7 +69,9 @@
       "last_verified": "2026-09-01",
       "verification_note": "2027 I-Code final vote completed August 2026; the editions publish in stages over the rest of 2026 and early 2027. Verified 2026-09-01: the 2027 edition is NOT yet published, so 2024 remains the current published edition. next_expected advanced to this source's own anticipated month -- 2027 IMC staged over late 2026 / early 2027.",
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
-      "match_terms": ["IMC "]
+      "match_terms": [
+        "IMC "
+      ]
     },
     {
       "id": "ifc",
@@ -72,7 +83,9 @@
       "last_verified": "2026-09-01",
       "verification_note": "2027 I-Code final vote completed August 2026; the editions publish in stages over the rest of 2026 and early 2027. Verified 2026-09-01: the 2027 edition is NOT yet published, so 2024 remains the current published edition. next_expected advanced to this source's own anticipated month -- 2027 IFC anticipated September 2026.",
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
-      "match_terms": ["IFC "]
+      "match_terms": [
+        "IFC "
+      ]
     },
     {
       "id": "ifgc",
@@ -84,7 +97,9 @@
       "last_verified": "2026-09-01",
       "verification_note": "2027 I-Code final vote completed August 2026; the editions publish in stages over the rest of 2026 and early 2027. Verified 2026-09-01: the 2027 edition is NOT yet published, so 2024 remains the current published edition. next_expected advanced to this source's own anticipated month -- 2027 IFGC staged over late 2026 / early 2027.",
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
-      "match_terms": ["IFGC "]
+      "match_terms": [
+        "IFGC "
+      ]
     },
     {
       "id": "ashrae-62-1",
@@ -96,7 +111,9 @@
       "last_verified": "2026-09-01",
       "verification_note": "Verified 2026-09-01: ANSI/ASHRAE 62.1-2025 IS PUBLISHED and supersedes 62.1-2022 (ANSI/ASHRAE store listings, ASHRAE announcements). Bundled ventilation-rate values still follow 62.1-2022, which is a value refresh tracked separately; the citation must name 2025 as the current edition. Release month recorded as the 2025 publication window, not a day-precise stamp.",
       "free_access_url": "https://www.ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards",
-      "match_terms": ["ASHRAE 62.1"]
+      "match_terms": [
+        "ASHRAE 62.1"
+      ]
     },
     {
       "id": "ashrae-62-2",
@@ -108,7 +125,9 @@
       "last_verified": "2026-09-01",
       "verification_note": "Verified 2026-09-01: ANSI/ASHRAE 62.2-2025 IS PUBLISHED (16 addenda to the 2022 edition, including MERV 6 -> MERV 11 filtration). Bundled values still follow 62.2-2022; the value refresh is tracked separately.",
       "free_access_url": "https://www.ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards",
-      "match_terms": ["ASHRAE 62.2"]
+      "match_terms": [
+        "ASHRAE 62.2"
+      ]
     },
     {
       "id": "ashrae-90-1",
@@ -120,7 +139,9 @@
       "last_verified": "2026-09-01",
       "verification_note": "Verified 2026-09-01: ANSI/ASHRAE 90.1-2025 IS PUBLISHED (105 addenda to the 2022 edition). Bundled values still follow 90.1-2022; the value refresh is tracked separately.",
       "free_access_url": "https://www.ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards",
-      "match_terms": ["ASHRAE 90.1"]
+      "match_terms": [
+        "ASHRAE 90.1"
+      ]
     },
     {
       "id": "fda-food-code",
@@ -130,7 +151,10 @@
       "cycle_years": 4,
       "next_expected": "2026-12",
       "free_access_url": "https://www.fda.gov/food/retail-food-protection/fda-food-code",
-      "match_terms": ["FDA Food Code", "Food Code"]
+      "match_terms": [
+        "FDA Food Code",
+        "Food Code"
+      ]
     },
     {
       "id": "wmm",
@@ -141,7 +165,10 @@
       "next_expected": "2029-12",
       "expires_on": "2030-01-01",
       "free_access_url": "https://www.ncei.noaa.gov/products/world-magnetic-model",
-      "match_terms": ["WMM", "World Magnetic Model"]
+      "match_terms": [
+        "WMM",
+        "World Magnetic Model"
+      ]
     },
     {
       "id": "aashto-greenbook",
@@ -153,7 +180,92 @@
       "last_verified": "2026-09-01",
       "verification_note": "Verified 2026-09-01: the 8th edition is NOT yet published. NCHRP 07-29, the research project developing it, was scheduled to complete 2026-03-31, so publication follows that rather than precedes it. The 2018 7th edition remains current; bundled geometric-design defaults follow it and the citation discloses it.",
       "free_access_url": "https://store.transportation.org/Item/PublicationDetail?ID=4642",
-      "match_terms": ["AASHTO Green Book", "Green Book"]
+      "match_terms": [
+        "AASHTO Green Book",
+        "Green Book"
+      ]
+    }
+  ],
+  "annual_figures": [
+    {
+      "id": "irs-standard-mileage",
+      "name": "IRS standard mileage rate",
+      "publisher": "IRS",
+      "publishes_month": 12,
+      "covers": "calendar tax year",
+      "where": "data/crosswalks/irs-mileage.json; data/accounting/standard-mileage-rates.json; IRS_STANDARD_MILEAGE_RATE and STANDARD_MILEAGE_RATES",
+      "last_verified": "2026-09-02",
+      "verification_note": "2026 is a split year: 72.5 c/mi from Jan 1 (Notice 2026-10), 76 c/mi from Jul 1 (IR-2026-29). The IRS may revise mid-year, so a December-only recheck is not enough."
+    },
+    {
+      "id": "irs-section-179",
+      "name": "IRC 179 cap / phase-out and IRC 168(k) bonus",
+      "publisher": "IRS",
+      "publishes_month": 11,
+      "covers": "calendar tax year",
+      "where": "data/accounting/section-179-limits.json; SECTION_179_LIMITS",
+      "last_verified": "2026-09-02",
+      "verification_note": "The One Big Beautiful Bill Act rewrote both from 2025: cap $2,500,000 / phase-out $4,000,000 (2026: $2,560,000 / $4,090,000), bonus a permanent 100% for property acquired after 2025-01-19. The bundled table was still the repealed TCJA phase-down until 2026-09-02. Watch for statute changes, not only the annual Rev. Proc."
+    },
+    {
+      "id": "ssa-wage-base",
+      "name": "Social Security contribution and benefit base",
+      "publisher": "SSA",
+      "publishes_month": 10,
+      "covers": "calendar year",
+      "where": "data/accounting/se-tax-parameters.json; SE_TAX_PARAMETERS",
+      "last_verified": "2026-09-02",
+      "verification_note": "Announced with the annual COLA. 2026 is $184,500; the bundled value was $183,600 until 2026-09-02. ssa.gov 403s an automated fetch -- irs.gov/taxtopics/tc751 carries the same figure."
+    },
+    {
+      "id": "fhfa-conforming-loan-limit",
+      "name": "FHFA conforming loan limit values",
+      "publisher": "FHFA",
+      "publishes_month": 11,
+      "covers": "calendar year",
+      "where": "data/realestate/loan-limits.json baseline.conforming_*",
+      "last_verified": "2026-09-02",
+      "verification_note": "2026 baseline $832,750 / $1,066,250 / $1,288,800 / $1,601,750; ceiling $1,249,125. The shard was stamped year 2026 with verified_on 2026-05-16 and carried the 2025 cycle throughout."
+    },
+    {
+      "id": "hud-fha-loan-limit",
+      "name": "HUD FHA single-family mortgage limits",
+      "publisher": "HUD",
+      "publishes_month": 12,
+      "covers": "calendar year",
+      "where": "data/realestate/loan-limits.json baseline.fha_*",
+      "last_verified": "2026-09-02",
+      "verification_note": "Floor is 65% and ceiling 150% of the FHFA conforming baseline; 2026 is $541,287 / $1,249,125 per ML 2025-23. Verify alongside the FHFA row, never separately."
+    },
+    {
+      "id": "gsa-per-diem",
+      "name": "GSA CONUS per-diem rates",
+      "publisher": "GSA",
+      "publishes_month": 8,
+      "covers": "federal fiscal year, effective Oct 1",
+      "where": "data/crosswalks/gsa-perdiem.json; GSA_PERDIEM_RATES",
+      "last_verified": "2026-09-02",
+      "verification_note": "FY2026 standard CONUS $110 lodging / $68 M&IE; M&IE tiers $68 / $74 / $80 / $86 / $92. The bundled M&IE figures were the FY2023 tiers until 2026-09-02. The tier a state sits in is this project's approximation; a tier's value is GSA's."
+    },
+    {
+      "id": "hud-fmr",
+      "name": "HUD Fair Market Rents",
+      "publisher": "HUD PD&R",
+      "publishes_month": 8,
+      "covers": "federal fiscal year, effective Oct 1",
+      "where": "data/realestate/hud-fmr.json",
+      "last_verified": "2026-05-16",
+      "verification_note": "NOT re-verified on 2026-09-02: the per-area figures sit behind the huduser.gov lookup and could not be confirmed from the published summaries. One row is doubted -- the shard names 'San Francisco-Oakland-Berkeley, CA HUD Metro FMR Area', which is the OMB CBSA name, while HUD splits that CBSA into the San Francisco and Oakland-Fremont HMFAs with different FMRs. Confirm against the FY2026 FMR schedule before trusting the 19-area snapshot."
+    },
+    {
+      "id": "irs-pub-15-t",
+      "name": "IRS Publication 15-T percentage-method brackets",
+      "publisher": "IRS",
+      "publishes_month": 12,
+      "covers": "calendar tax year",
+      "where": "data/accounting/pub-15-t-tables.json",
+      "last_verified": "2025-12-01",
+      "verification_note": "The shard declares edition 2025 and the tile discloses the year and that the brackets are single-filer and illustrative. Left as-is on 2026-09-02: it is disclosed rather than stale-and-silent, and this row exists so the next reader is asked."
     }
   ]
 }
