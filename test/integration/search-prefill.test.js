@@ -360,36 +360,51 @@ test("spec-v1337 chips: every chip routes to a real tile with values", async ({ 
     // shard does. Loaded, that outlasts the 5 s default.
     await expect(page.locator(".search-result").first()).toBeVisible({ timeout: 30_000 });
     await page.locator("#search-input").press("Enter");
-    await expect(page).toHaveURL(/#[a-z0-9-]+\?v=1&/);
+    // Explicit, for the reason the block comment below gives: the first row
+    // renders long before the ranking settles under a throttled CI runner, so
+    // the hash this waits for can be 5-8 s away. The assertion is unchanged --
+    // only the patience is.
+    await expect(page).toHaveURL(/#[a-z0-9-]+\?v=1&/, { timeout: 30_000 });
     await expect(page.locator(".field-provenance").first()).toBeVisible({ timeout: 30_000 });
   }
 });
 
-test("spec-v1337 chips: a chip and its own text reach the same tile", async ({ page }) => {
-  // The chips are the site's demonstration of "type the job the way you'd say
-  // it". A chip that shows one query and runs another teaches a sentence that
-  // does not work -- which is what a `data-q` did until 2026-09-02.
-  await page.goto("/");
-  const labels = (await page.locator(".hero-chip").allTextContents()).map((t) => t.trim());
-  for (let i = 0; i < labels.length; i++) {
+// One test per chip, not one test over all four. The four-chip loop does eight
+// full navigations with the 30 s data waits this file documents, which cannot
+// fit inside Playwright's 30 s per-test budget on a loaded CI runner -- it
+// failed there three times while passing locally. Per chip, each gets its own
+// budget, and a failure names which chip broke.
+for (const chipIndex of [0, 1, 2, 3]) {
+  test(`spec-v1337 chips: chip ${chipIndex} and its own text reach the same tile`, async ({ page }) => {
+    // Two full journeys with the lazily-fetched search data in each: ~3.5 s
+    // locally, and this file measures the same work at 5-8x under a throttled
+    // runner. test.slow() triples the budget rather than leaving it one bad
+    // minute from red.
+    test.slow();
+    // The chips are the site's demonstration of "type the job the way you'd say
+    // it". A chip that shows one query and runs another teaches a sentence that
+    // does not work -- which is what a `data-q` did until 2026-09-02, and three
+    // of the four visible labels ranked a different tile first.
     await page.goto("/");
-    await page.locator(".hero-chip").nth(i).click();
+    const label = (await page.locator(".hero-chip").nth(chipIndex).textContent()).trim();
+
+    await page.locator(".hero-chip").nth(chipIndex).click();
     await expect(page.locator(".search-result").first()).toBeVisible({ timeout: 30_000 });
     await page.locator("#search-input").press("Enter");
-    await expect(page).toHaveURL(/#[a-z0-9-]+\?v=1&/);
+    await expect(page).toHaveURL(/#[a-z0-9-]+\?v=1&/, { timeout: 30_000 });
     const viaChip = page.url().split("#")[1].split("?")[0];
 
     await page.goto("/");
-    await page.locator("#search-input").pressSequentially(labels[i], { delay: 10 });
+    await page.locator("#search-input").pressSequentially(label, { delay: 5 });
     await expect(page.locator(".search-result").first()).toBeVisible({ timeout: 30_000 });
     await page.locator("#search-input").press("Enter");
     await expect(page).toHaveURL(/#[a-z0-9-]+/, { timeout: 30_000 });
     const viaTyping = page.url().split("#")[1].split("?")[0];
 
-    expect(viaTyping, `chip ${JSON.stringify(labels[i])} routes to ${viaChip} when clicked but ${viaTyping} when typed`)
+    expect(viaTyping, `chip ${JSON.stringify(label)} routes to ${viaChip} when clicked but ${viaTyping} when typed`)
       .toBe(viaChip);
-  }
-});
+  });
+}
 
 test("spec-v1337 chips: a resting mouse does not choose a row", async ({ page }) => {
   // The rows are rendered under wherever the pointer happens to be sitting
