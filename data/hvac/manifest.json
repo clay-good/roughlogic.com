@@ -1,15 +1,15 @@
 {
   "name": "hvac",
-  "version": "2026-08-24",
-  "fetched": "2026-08-24",
-  "edition": "ASHRAE 62.1-2022; ASHRAE Handbook Fundamentals chapter 21 (duct design) and chapter 25 (insulation); ACCA Manual J 8th ed.; CTI cooling-tower engineering practice; manufacturer P-T tables (DuPont / Honeywell / Chemours / Arkema) and insulation k-values as of 2026-08-24.",
-  "asOf": "2026-08-24",
+  "version": "2026-09-02",
+  "fetched": "2026-09-02",
+  "edition": "ASHRAE 62.1-2022; ASHRAE Handbook Fundamentals chapter 21 (duct design) and chapter 25 (insulation); ACCA Manual J 8th ed.; CTI cooling-tower engineering practice; manufacturer P-T tables (DuPont / Honeywell / Chemours / Arkema) and insulation k-values as of 2026-09-02.",
+  "asOf": "2026-09-02",
   "refresh_cadence": "annual",
   "shards": [
     {
       "file": "refrigerants.json",
       "name": "Refrigerant P-T tables",
-      "gzip_size_bytes": 497
+      "gzip_size_bytes": 493
     },
     {
       "file": "duct-friction.json",
@@ -19,57 +19,57 @@
     {
       "file": "climate-data.json",
       "name": "Climate design temperatures",
-      "gzip_size_bytes": 296
+      "gzip_size_bytes": 295
     },
     {
       "file": "charge-per-foot.json",
       "name": "Refrigerant charge per foot",
-      "gzip_size_bytes": 371
+      "gzip_size_bytes": 370
     },
     {
       "file": "equivalent-lengths.json",
       "name": "Fitting equivalent lengths",
-      "gzip_size_bytes": 371
+      "gzip_size_bytes": 369
     },
     {
       "file": "insulation.json",
       "name": "Insulation conductivity",
-      "gzip_size_bytes": 295
+      "gzip_size_bytes": 294
     },
     {
       "file": "affinity-laws.json",
       "name": "Fan affinity laws (example shard)",
-      "gzip_size_bytes": 235
+      "gzip_size_bytes": 231
     },
     {
       "file": "baseboard-output.json",
       "name": "Hydronic baseboard BTU/ft (manufacturer-attributed)",
-      "gzip_size_bytes": 323
+      "gzip_size_bytes": 322
     },
     {
       "file": "geothermal-soil.json",
       "name": "Geothermal loop benchmarks (DOE)",
-      "gzip_size_bytes": 277
+      "gzip_size_bytes": 276
     },
     {
       "file": "duct-roughness.json",
       "name": "Duct absolute roughness (ASHRAE Fundamentals)",
-      "gzip_size_bytes": 247
+      "gzip_size_bytes": 248
     },
     {
       "file": "duct-fittings.json",
       "name": "Duct fitting loss-coefficient library",
-      "gzip_size_bytes": 336
+      "gzip_size_bytes": 334
     },
     {
       "file": "refrigerant-pt-tables.json",
       "name": "Manufacturer-attributed refrigerant P-T tables",
-      "gzip_size_bytes": 564
+      "gzip_size_bytes": 566
     },
     {
       "file": "insulation-k-values.json",
       "name": "Insulation thermal conductivity (manufacturer-attributed)",
-      "gzip_size_bytes": 379
+      "gzip_size_bytes": 382
     }
   ],
   "hashes": {

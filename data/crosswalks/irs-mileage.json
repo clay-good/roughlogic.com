@@ -1,5 +1,8 @@
 {
   "source": "IRS-published standard mileage rate (U.S. government publication).",
-  "rate_per_mile_dollars": 0.67,
-  "notes": "Update annually. The rate applies to business miles for the current tax year."
+  "rate_per_mile_dollars": 0.76,
+  "edition": "2026 business rate, second half: 76 cents/mi effective 2026-07-01 (IR-2026-29).",
+  "effective_from": "2026-07-01",
+  "verified_on": "2026-09-02",
+  "notes": "Business miles. The IRS revised the 2026 rate mid-year: 72.5 cents/mi for Jan 1 - Jun 30 (Notice 2026-10), then 76 cents/mi from Jul 1 (IR-2026-29). Miles driven in the first half of 2026, or in an earlier year, take that period's rate -- enter it over the default. Update when the IRS publishes the next rate."
 }

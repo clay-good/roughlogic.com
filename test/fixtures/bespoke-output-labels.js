@@ -543,7 +543,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "michaelis-menten": {"velocity":"Velocity","percent_vmax":"Percent of Vmax","note":"Note"},
   "microinverter-branch-count": {"max_microinverters":"Max microinverters per branch","branch_load_a":"Branch continuous load"},
   "mileage-cost": {"gallons":"Gallons used","fuel_cost":"Fuel cost","reimbursement":"IRS reimbursement"},
-  "mileage-rollup": {"business_miles":"Total business miles","deductible_amount":"Deductible amount","standard_rate":"Rate applied"},
+  "mileage-rollup": {"business_miles":"Total business miles","deductible_amount":"Deductible amount","rate_split":"Rate applied"},
   "min-bend-radius": {"r_over_t":"Radius-to-thickness (R/T)","r_min_in":"Minimum inside radius"},
   "min-conductor-for-vd": {"resulting_drop_V":"Resulting drop","ampacity_note":"Ampacity","note":"Note"},
   "mixed-water-temp": {"percent_hot":"Percent hot","notes":"Notes"},

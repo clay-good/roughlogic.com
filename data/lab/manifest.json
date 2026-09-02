@@ -1,30 +1,30 @@
 {
   "name": "lab",
-  "version": "2026-08-24",
-  "fetched": "2026-08-24",
-  "edition": "IUPAC Standard Atomic Weights 2021. Common laboratory buffer pKa values from Good et al. 1966 and CRC Handbook of Chemistry and Physics 95th ed. Manufacturer rotor specifications (Eppendorf, Beckman Coulter, Thermo Fisher). Verified 2026-08-24.",
-  "asOf": "2026-08-24",
+  "version": "2026-09-02",
+  "fetched": "2026-09-02",
+  "edition": "IUPAC Standard Atomic Weights 2021. Common laboratory buffer pKa values from Good et al. 1966 and CRC Handbook of Chemistry and Physics 95th ed. Manufacturer rotor specifications (Eppendorf, Beckman Coulter, Thermo Fisher). Verified 2026-09-02.",
+  "asOf": "2026-09-02",
   "refresh_cadence": "annual",
   "shards": [
     {
       "file": "iupac-atomic-weights.json",
       "name": "IUPAC Standard Atomic Weights 2021",
-      "gzip_size_bytes": 754
+      "gzip_size_bytes": 748
     },
     {
       "file": "buffer-pka.json",
       "name": "Common laboratory buffer pKa values",
-      "gzip_size_bytes": 545
+      "gzip_size_bytes": 541
     },
     {
       "file": "centrifuge-rotors.json",
       "name": "Representative centrifuge rotor radii (manufacturer-attributed)",
-      "gzip_size_bytes": 442
+      "gzip_size_bytes": 441
     }
   ],
   "hashes": {
-    "iupac-atomic-weights.json": "821670910985f6f624196ba7ee0fc1cf69369ab22ce7c1df6586a7d01b72cce4",
-    "buffer-pka.json": "24688501170f3185e2bb92be5082cc186de5d56c407d231e93c487ac1bb42f9e",
-    "centrifuge-rotors.json": "7aa107395c546b61d68794e940b1d63bcf8d20ce8885f3839e685dea17412d23"
+    "iupac-atomic-weights.json": "d4873f728136cc5065de0b08fafbb877f2e00c686c6c9cbe813431f987fc8298",
+    "buffer-pka.json": "76ce2da01aa7b492c2af6bd67df1b57f15d9bebac64b8a3298f51021a5ab7366",
+    "centrifuge-rotors.json": "c535ce78a2e4714e312b7165856e4b207cc3d6c24a3b7cd2bae1ffacc568772e"
   }
 }

@@ -2,6 +2,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import {
   computeLoanPayment,
   computeUpgradeROI,
@@ -183,8 +184,16 @@ test("Mileage: custom IRS rate respected", () => {
   assert.equal(r.reimbursement, 50);
 });
 
-test("Mileage: IRS rate default 0.67", () => {
-  assert.equal(IRS_STANDARD_MILEAGE_RATE, 0.67);
+// The bundled IRS rate has two homes: the constant the calculator actually uses,
+// and data/crosswalks/irs-mileage.json, whose value the tile page cites as its
+// data stamp. Nothing read the shard at compute time, so the two could drift and
+// the page would cite a number the answer was not built from. Pin them together.
+test("Mileage: the IRS default rate is the bundled shard's rate", () => {
+  const shard = JSON.parse(
+    readFileSync(new URL("../../data/crosswalks/irs-mileage.json", import.meta.url), "utf8"),
+  );
+  assert.equal(IRS_STANDARD_MILEAGE_RATE, shard.rate_per_mile_dollars);
+  assert.equal(IRS_STANDARD_MILEAGE_RATE, 0.76); // 2026 second-half rate, IR-2026-29.
 });
 
 test("Mileage: surfaces irs rate in result", () => {

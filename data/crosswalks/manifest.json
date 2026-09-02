@@ -1,56 +1,56 @@
 {
   "name": "crosswalks",
-  "version": "2026-08-24",
-  "fetched": "2026-08-24",
-  "edition": "NIST SP 811 unit factors; IRS 2024 standard mileage rate; GSA FY2026 per-diem; NIOSH 1991 lifting equation; OSHA 29 CFR 1926 Subpart P + 1926.502 fall protection; NWS / OSHA heat-cold-stress formulas; manufacturer connector-decel benchmarks (3M / Capital Safety, MSA, Honeywell-Miller); state revenue rates verified 2026-08-24.",
-  "asOf": "2026-08-24",
+  "version": "2026-09-02",
+  "fetched": "2026-09-02",
+  "edition": "NIST SP 811 unit factors; IRS 2026 standard mileage rate (76 cents/mi effective 2026-07-01); GSA FY2026 per-diem; NIOSH 1991 lifting equation; OSHA 29 CFR 1926 Subpart P + 1926.502 fall protection; NWS / OSHA heat-cold-stress formulas; manufacturer connector-decel benchmarks (3M / Capital Safety, MSA, Honeywell-Miller); state revenue rates verified 2026-09-02.",
+  "asOf": "2026-09-02",
   "refresh_cadence": "quarterly",
   "shards": [
     {
       "file": "unit-conversions.json",
       "name": "Unit conversions",
-      "gzip_size_bytes": 472
+      "gzip_size_bytes": 468
     },
     {
       "file": "state-tax-rates.json",
       "name": "State sales tax rates",
-      "gzip_size_bytes": 400
+      "gzip_size_bytes": 393
     },
     {
       "file": "irs-mileage.json",
       "name": "IRS standard mileage rate",
-      "gzip_size_bytes": 177
+      "gzip_size_bytes": 374
     },
     {
       "file": "gsa-perdiem.json",
       "name": "GSA per-diem rates",
-      "gzip_size_bytes": 558
+      "gzip_size_bytes": 559
     },
     {
       "file": "niosh-coupling.json",
       "name": "NIOSH 1991 lifting coupling multipliers",
-      "gzip_size_bytes": 227
+      "gzip_size_bytes": 225
     },
     {
       "file": "heat-cold-stress.json",
       "name": "Heat / cold stress formulas (NWS / OSHA)",
-      "gzip_size_bytes": 352
+      "gzip_size_bytes": 348
     },
     {
       "file": "osha-trench.json",
       "name": "OSHA trench sloping (29 CFR 1926 Subpart P)",
-      "gzip_size_bytes": 254
+      "gzip_size_bytes": 256
     },
     {
       "file": "fall-protection-benchmarks.json",
       "name": "Manufacturer connector-decel benchmarks for personal fall arrest",
-      "gzip_size_bytes": 398
+      "gzip_size_bytes": 401
     }
   ],
   "hashes": {
     "unit-conversions.json": "9a30ff3dd2f47b0d62f28cf4bc72363741156cb82f2f19a16289d59afaabf5b1",
-    "state-tax-rates.json": "03b38ef58e970bb1d1bfb9a396532031ba7e600666be30e1b917f3a01afca519",
-    "irs-mileage.json": "76c4d0e863fdd71a9d2b76047b0b69abb94c6133b225ce0e35a071a9d4a9c3e4",
+    "state-tax-rates.json": "43b8665959b2b6751f74ef167d19fd19f91ece4da880ac760294fa18981a09fb",
+    "irs-mileage.json": "c383b0739291d724c2ea679fe63d5fad2e5593a4a0c3216574d1fb761323c435",
     "gsa-perdiem.json": "a7578ff49317d32fda4779b32d5776e0c612513344d59d1af13725b374a06976",
     "niosh-coupling.json": "ceb2d1f4928d6c077f568fcff517b7c561899e932e93f9aad23d6097547f2cc5",
     "heat-cold-stress.json": "b869cc9f7ecbeeaaca5f30cdab7d24cbb5e88f0d5b70564585089398dc2a2243",

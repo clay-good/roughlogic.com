@@ -61,12 +61,39 @@ export const SE_TAX_PARAMETERS = {
 // IRS standard mileage rate (business use) per year, cents/mile.
 // Source: IRS annual standard-mileage-rate notice (e.g., Notice 2024-08).
 // data/accounting/standard-mileage-rates.json
+//
+// A year is not always one rate. The IRS may revise mid-year when fuel prices
+// move, and did for 2026: 72.5 cents/mi for Jan 1 - Jun 30 (Notice 2026-10),
+// then 76 cents/mi from Jul 1 (IR-2026-29). A year that splits carries
+// `periods`; `business` is the rate in effect at the end of that year, which is
+// what a trip with no usable date is charged at. Miles are deducted at the rate
+// for the date they were driven, which is why this tile reads the trip dates it
+// was already collecting and printing.
 export const STANDARD_MILEAGE_RATES = {
   2023: { business: 0.655, medical: 0.22, charitable: 0.14, verified_on: "2024-02-01" },
   2024: { business: 0.67,  medical: 0.21, charitable: 0.14, verified_on: "2024-02-01" },
   2025: { business: 0.70,  medical: 0.21, charitable: 0.14, verified_on: "2025-02-01" },
-  2026: { business: 0.72,  medical: 0.22, charitable: 0.14, verified_on: "2026-02-01" },
+  2026: {
+    business: 0.76, medical: 0.235, charitable: 0.14, verified_on: "2026-09-02",
+    periods: [
+      { from: "2026-01-01", business: 0.725, medical: 0.205, charitable: 0.14, notice: "Notice 2026-10" },
+      { from: "2026-07-01", business: 0.76,  medical: 0.235, charitable: 0.14, notice: "IR-2026-29" },
+    ],
+  },
 };
+
+// The rate a given trip date is deducted at. A date outside the selected year,
+// or no date at all, falls back to the year's end-of-year rate.
+function mileageRateForDate(rate_row, isoDate) {
+  if (!rate_row.periods) return rate_row.business;
+  const d = String(isoDate || "");
+  if (!/^\d{4}-\d{2}(-\d{2})?$/.test(d)) return rate_row.business;
+  let rate = rate_row.periods[0].business;
+  for (const p of rate_row.periods) {
+    if (d >= p.from.slice(0, d.length)) rate = p.business;
+  }
+  return rate;
+}
 
 // IRS Form 1040-ES quarterly due dates per year (calendar shown is the
 // statutory date; the user is responsible for weekend/holiday rollover
@@ -530,7 +557,7 @@ export const cccExample = { inputs: { dso: 45, dio: 60, dpo: 30 } };
 // year. Companion to v3 utility 107.
 
 // dims: in { trips: dimensionless, tax_year: dimensionless }
-//        out: { trip_count: dimensionless, business_miles: L, deductible_amount: dimensionless, standard_rate: dimensionless, tax_year: dimensionless, total_miles_implied: L, personal_miles_implied: L, parameters: dimensionless }
+//        out: { trip_count: dimensionless, business_miles: L, deductible_amount: dimensionless, standard_rate: dimensionless, rate_split: dimensionless, tax_year: dimensionless, total_miles_implied: L, personal_miles_implied: L, parameters: dimensionless }
 // (Trip records are caller-typed dimensionless arrays;
 //  business / personal / total-implied miles surface as length `L`
 //  (each odometer reading is a length, the difference is the same
@@ -544,11 +571,13 @@ export function computeMileageRollup({ trips = [], tax_year = 2025 }) {
   if (!rate_row) return { error: "Tax year " + tax_year + " not bundled." };
   const rate = rate_row.business;
   let business_miles = 0;
+  let deductible = 0;
   let total_miles_implied = 0;
   let total_personal_implied = 0;
   for (const t of trips) {
     const m = Number(t.business_miles) || 0;
     business_miles += m;
+    deductible += m * mileageRateForDate(rate_row, t.date);
     const start = Number(t.start_odometer);
     const end = Number(t.end_odometer);
     if (Number.isFinite(start) && Number.isFinite(end) && end >= start) {
@@ -557,10 +586,16 @@ export function computeMileageRollup({ trips = [], tax_year = 2025 }) {
       total_personal_implied += Math.max(0, span - m);
     }
   }
-  const deductible = business_miles * rate;
+  // With one rate for the year the blend is that rate exactly; with a mid-year
+  // revision it is the miles-weighted rate actually applied, which is the number
+  // a reader checking the total against the miles needs to see.
+  const applied_rate = business_miles > 0 ? deductible / business_miles : rate;
   return {
     trip_count: trips.length, business_miles, deductible_amount: deductible,
-    standard_rate: rate, tax_year,
+    standard_rate: applied_rate, tax_year,
+    rate_split: rate_row.periods
+      ? rate_row.periods.map((p) => "$" + p.business.toFixed(3) + "/mi from " + p.from + " (" + p.notice + ")").join("; ")
+      : null,
     total_miles_implied: total_miles_implied || null,
     personal_miles_implied: total_personal_implied || null,
     parameters: rate_row,
@@ -1067,7 +1102,9 @@ function renderMileageRollup(inputRegion, outputRegion, citationEl) {
     if (r.error) { milesOut.textContent = r.error; dedOut.textContent = rateOut.textContent = ""; return; }
     milesOut.textContent = fmt(r.business_miles, 1);
     dedOut.textContent = "$" + fmt(r.deductible_amount, 2);
-    rateOut.textContent = "$" + r.standard_rate.toFixed(3) + " / mile";
+    rateOut.textContent = r.rate_split
+      ? "$" + r.standard_rate.toFixed(3) + " / mile (blended: " + r.rate_split + ")"
+      : "$" + r.standard_rate.toFixed(3) + " / mile";
     if (trips.length === 0) return;
     const table = document.createElement("table");
     const thead = document.createElement("thead");
@@ -1079,7 +1116,8 @@ function renderMileageRollup(inputRegion, outputRegion, citationEl) {
     const tbody = document.createElement("tbody");
     for (const t of trips) {
       const tr = document.createElement("tr");
-      for (const v of [t.date, fmt(t.business_miles, 1), t.purpose, "$" + fmt(t.business_miles * r.standard_rate, 2)]) {
+      const trip_rate = mileageRateForDate(STANDARD_MILEAGE_RATES[Number(yr.select.value)], t.date);
+      for (const v of [t.date, fmt(t.business_miles, 1), t.purpose, "$" + fmt(t.business_miles * trip_rate, 2)]) {
         const td = document.createElement("td"); td.textContent = String(v); tr.appendChild(td);
       }
       tbody.appendChild(tr);

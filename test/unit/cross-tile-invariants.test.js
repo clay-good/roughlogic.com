@@ -8616,7 +8616,7 @@ test("monotonicity: computeNPSHa NPSHa_ft is strictly decreasing in water_temp_F
   assert.ok(badFr.error, `expected error for friction=-1, got ${JSON.stringify(badFr)}`);
 });
 
-test("monotonicity: computeMileageRollup deductible_amount is strictly increasing in summed business_miles at fixed tax_year (linear pin); standard_rate ordering 2023 0.655 < 2024 0.670 < 2025 0.700 < 2026 0.720 (IRS published rate ladder pin); deductible = business_miles * standard_rate exact", () => {
+test("monotonicity: computeMileageRollup deductible_amount is strictly increasing in summed business_miles at fixed tax_year (linear pin); standard_rate ordering 2023 0.655 < 2024 0.670 < 2025 0.700 < 2026 0.760 (IRS published rate ladder pin); deductible = business_miles * standard_rate exact", () => {
   // Group P. deductible = sum(business_miles) * standard_rate.
   let prev = -Infinity;
   for (const miles of [10, 50, 100, 250, 1000, 5000, 25000]) {
@@ -8630,7 +8630,10 @@ test("monotonicity: computeMileageRollup deductible_amount is strictly increasin
       `D at miles=${miles} = ${r.deductible_amount} not greater than prev=${prev}`);
     prev = r.deductible_amount;
   }
-  // Year-rate ordering pin: 2023 0.655 < 2024 0.670 < 2025 0.700 < 2026 0.720.
+  // Year-rate ordering pin: 2023 0.655 < 2024 0.670 < 2025 0.700 < 2026 0.760.
+  // A trip with no date takes the year's end-of-year rate, which for 2026 is the
+  // July revision (IR-2026-29); the mid-year split itself is pinned in
+  // test/unit/calc-accounting.test.js.
   const y23 = computeMileageRollup({ trips: [{ business_miles: 100 }], tax_year: 2023 });
   const y24 = computeMileageRollup({ trips: [{ business_miles: 100 }], tax_year: 2024 });
   const y25 = computeMileageRollup({ trips: [{ business_miles: 100 }], tax_year: 2025 });
@@ -8638,7 +8641,7 @@ test("monotonicity: computeMileageRollup deductible_amount is strictly increasin
   assert.equal(y23.standard_rate, 0.655);
   assert.equal(y24.standard_rate, 0.67);
   assert.equal(y25.standard_rate, 0.70);
-  assert.equal(y26.standard_rate, 0.72);
+  assert.equal(y26.standard_rate, 0.76);
   assert.ok(y23.standard_rate < y24.standard_rate && y24.standard_rate < y25.standard_rate && y25.standard_rate < y26.standard_rate,
     `rate ordering: ${y23.standard_rate} ${y24.standard_rate} ${y25.standard_rate} ${y26.standard_rate}`);
   // Closed-form pin: deductible = business_miles * standard_rate.

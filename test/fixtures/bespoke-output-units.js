@@ -362,7 +362,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "michaelis-menten": {"percent_vmax":{"prefix":"","suffix":"% of Vmax","digits":1}},
   "microinverter-branch-count": {"max_microinverters":{"prefix":"","suffix":" units","digits":0}},
   "mileage-cost": {"gallons":{"prefix":"","suffix":" gal","digits":3},"fuel_cost":{"prefix":"$","suffix":"","digits":2},"reimbursement":{"prefix":"$","suffix":"","digits":2}},
-  "mileage-rollup": {"deductible_amount":{"prefix":"$","suffix":"","digits":2},"standard_rate":{"prefix":"$","suffix":" / mile"}},
+  "mileage-rollup": {"deductible_amount":{"prefix":"$","suffix":"","digits":2}},
   "min-bend-radius": {"r_over_t":{"prefix":"","suffix":" T","digits":2},"r_min_in":{"prefix":"","suffix":" in","digits":3}},
   "mixed-water-temp": {"percent_hot":{"prefix":"","suffix":" %","digits":1}},
   "molarity-from-stock": {"stock_m":{"prefix":"","suffix":" mol/L","digits":2}},

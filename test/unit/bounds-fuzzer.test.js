@@ -6785,9 +6785,9 @@ test("bounds: calc-cross computeMileageCost pins gallons = miles/mpg + fuel_cost
   const r = computeMileageCost({ round_trip_miles: 100, mpg: 25, fuel_price_per_gallon: 4 });
   assert.strictEqual(r.gallons, 4);
   assert.strictEqual(r.fuel_cost, 16);
-  // IRS default rate 0.67/mi -> 67.
-  assert.strictEqual(r.reimbursement, 67);
-  assert.strictEqual(r.irs_rate_per_mile, 0.67);
+  // IRS default rate 0.76/mi -> 76.
+  assert.strictEqual(r.reimbursement, 76);
+  assert.strictEqual(r.irs_rate_per_mile, 0.76);
   // Custom rate override.
   const custom = computeMileageCost({ round_trip_miles: 100, mpg: 25, fuel_price_per_gallon: 4, irs_rate_per_mile: 0.70 });
   assert.strictEqual(custom.reimbursement, 70);

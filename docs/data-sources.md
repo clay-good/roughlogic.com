@@ -397,8 +397,8 @@ The principle from spec.md section 5 governs every entry: the data is either pub
 
 - Source: IRS-published standard mileage rate (U.S. government publication).
 - License: U.S. government publication, public domain.
-- Cadence: Annual update.
-- Shard layout: Flat object with rate per mile in dollars.
+- Cadence: Annual update, and re-checked whenever the IRS issues a mid-year revision. The bundled value is $0.76/mi, the business rate effective 2026-07-01 (IR-2026-29); the first half of 2026 was $0.725/mi (Notice 2026-10).
+- Shard layout: Flat object with rate per mile in dollars, plus `edition`, `effective_from` and `verified_on` naming the period the value covers. The rate is an input on the tile, so miles driven in an earlier period are entered at that period's rate.
 
 ### data/crosswalks/gsa-perdiem.json (v2)
 
@@ -490,7 +490,7 @@ The principle from spec.md section 5 governs every entry: the data is either pub
 - Source: IRS publications (Pub 946 MACRS tables, Pub 15-T percentage method, annual Rev. Proc. for the Section 179 cap, Form 1040-ES due dates, annual standard-mileage-rate notice). SSA annual wage-base announcement. U.S. Census Annual Retail Trade Survey (ARTS) and SBA published industry medians for inventory benchmarks.
 - License: Public domain (federal publications).
 - Cadence: Annual recheck each January for the IRS-driven shards (refresh when the IRS posts the new tax year). Quarterly recheck for inventory benchmarks.
-- Shards: `macrs-tables.json` (per-class-life percentages), `section-179-limits.json` (per-year cap / phase-out / bonus pct), `se-tax-parameters.json` (per-year SS wage base + Additional Medicare threshold by filing status), `estimated-tax-due-dates.json` (per-year four ISO dates), `standard-mileage-rates.json` (per-year business / medical / charitable rates), `inventory-benchmarks.json` (per-industry turnover median), `pub-15-t-tables.json` (single-filer annualized brackets).
+- Shards: `macrs-tables.json` (per-class-life percentages), `section-179-limits.json` (per-year cap / phase-out / bonus pct), `se-tax-parameters.json` (per-year SS wage base + Additional Medicare threshold by filing status), `estimated-tax-due-dates.json` (per-year four ISO dates), `standard-mileage-rates.json` (per-year business / medical / charitable rates; a year the IRS revises mid-year carries a `periods` list, as 2026 does), `inventory-benchmarks.json` (per-industry turnover median), `pub-15-t-tables.json` (single-filer annualized brackets).
 - Privacy: No runtime fetch. All shards bundled at build time.
 
 ### data/legal/*.json (utility 266)

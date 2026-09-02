@@ -1,8 +1,8 @@
 {
-  "source": "IRS annual standard-mileage-rate notice (e.g., Notice 2024-08 for 2024).",
-  "edition": "per-year",
-  "fetched": "2026-08-24",
-  "verified_on": "2026-08-24",
+  "source": "IRS annual standard-mileage-rate notice (e.g., Notice 2024-08 for 2024). A year the IRS revises mid-year carries a periods list; 2026 was revised on July 1.",
+  "edition": "per-year (2026 split: Notice 2026-10, then IR-2026-29)",
+  "fetched": "2026-09-02",
+  "verified_on": "2026-09-02",
   "free_access": "irs.gov/tax-professionals/standard-mileage-rates.",
   "rates_per_mile_usd": {
     "2023": {
@@ -21,9 +21,25 @@
       "charitable": 0.14
     },
     "2026": {
-      "business": 0.72,
-      "medical": 0.22,
-      "charitable": 0.14
+      "business": 0.76,
+      "medical": 0.235,
+      "charitable": 0.14,
+      "periods": [
+        {
+          "from": "2026-01-01",
+          "business": 0.725,
+          "medical": 0.205,
+          "charitable": 0.14,
+          "notice": "Notice 2026-10"
+        },
+        {
+          "from": "2026-07-01",
+          "business": 0.76,
+          "medical": 0.235,
+          "charitable": 0.14,
+          "notice": "IR-2026-29"
+        }
+      ]
     }
   }
 }

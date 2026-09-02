@@ -759,15 +759,16 @@ test("computeFrictionLoss: bit-stable Hazen-Williams pressureLoss_psi at the spe
 
 test("computeMileageCost: bit-stable at the spec example (100 mi, 25 mpg, $4.00/gal)", () => {
   // Group G. gallons = miles/mpg = 4; fuel_cost = 16; reimbursement at the
-  // IRS standard mileage rate = 100 * 0.67 = 67 (integer, exact). Pins
+  // IRS standard mileage rate = 100 * 0.76 = 76 (integer, exact; the 2026
+  // second-half rate, IR-2026-29, transcribed 2026-09-02). Pins
   // (i) the linear-in-miles fuel arithmetic and (ii) the IRS rate
   // surfaced as a scalar; a future shard-update that drifted the rate
   // shifts the bits of reimbursement and irs_rate_per_mile in lockstep.
   const r = computeMileageCost({ round_trip_miles: 100, mpg: 25, fuel_price_per_gallon: 4.0 });
   assert.equal(bits(r.gallons), "4010000000000000", `gallons=${r.gallons}`);
   assert.equal(bits(r.fuel_cost), "4030000000000000", `fuel_cost=${r.fuel_cost}`);
-  assert.equal(bits(r.reimbursement), "4050c00000000000", `reimbursement=${r.reimbursement}`);
-  assert.equal(bits(r.irs_rate_per_mile), "3fe570a3d70a3d71", `irs_rate_per_mile=${r.irs_rate_per_mile}`);
+  assert.equal(bits(r.reimbursement), "4053000000000000", `reimbursement=${r.reimbursement}`);
+  assert.equal(bits(r.irs_rate_per_mile), "3fe851eb851eb852", `irs_rate_per_mile=${r.irs_rate_per_mile}`);
 });
 
 test("computeBridgeFormula: bit-stable total_weight_lb at the spec-v3 Class-8 example (5 axles, 80000 lb)", () => {

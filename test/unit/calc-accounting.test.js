@@ -109,6 +109,38 @@ test("Mileage: example yields positive deduction", () => { const r = computeMile
 test("Mileage: 100 mi @ 2025 rate", () => { const rate = STANDARD_MILEAGE_RATES[2025].business; const r = computeMileageRollup({ trips: [{ business_miles: 100 }], tax_year: 2025 }); assert.ok(close(r.deductible_amount, 100 * rate, 0.01)); });
 test("Mileage: trip count is array length", () => { const r = computeMileageRollup({ trips: [{ business_miles: 5 }, { business_miles: 10 }], tax_year: 2025 }); assert.equal(r.trip_count, 2); });
 test("Mileage: odometer span computes implied total", () => { const r = computeMileageRollup({ trips: [{ business_miles: 50, start_odometer: 1000, end_odometer: 1100 }], tax_year: 2025 }); assert.equal(r.total_miles_implied, 100); assert.equal(r.personal_miles_implied, 50); });
+// The IRS may revise a year's rate mid-year, and did for 2026: 72.5 cents/mi
+// from Jan 1 (Notice 2026-10), 76 cents/mi from Jul 1 (IR-2026-29). A single
+// per-year number is wrong for half the year, so miles are deducted at the rate
+// for the date they were driven -- the date the tile already collects.
+test("Mileage: a 2026 trip before July 1 uses the first-half rate", () => {
+  const r = computeMileageRollup({ trips: [{ date: "2026-03-01", business_miles: 100 }], tax_year: 2026 });
+  assert.ok(close(r.deductible_amount, 72.5, 1e-9));
+});
+test("Mileage: a 2026 trip on or after July 1 uses the revised rate", () => {
+  const jul1 = computeMileageRollup({ trips: [{ date: "2026-07-01", business_miles: 100 }], tax_year: 2026 });
+  const jun30 = computeMileageRollup({ trips: [{ date: "2026-06-30", business_miles: 100 }], tax_year: 2026 });
+  assert.ok(close(jul1.deductible_amount, 76, 1e-9));
+  assert.ok(close(jun30.deductible_amount, 72.5, 1e-9));
+});
+test("Mileage: a split year reports the miles-weighted rate actually applied", () => {
+  const r = computeMileageRollup({
+    trips: [{ date: "2026-03-01", business_miles: 100 }, { date: "2026-08-01", business_miles: 100 }],
+    tax_year: 2026,
+  });
+  assert.ok(close(r.deductible_amount, 148.5, 1e-9));
+  assert.ok(close(r.standard_rate, 0.7425, 1e-9));
+  assert.ok(/Notice 2026-10/.test(r.rate_split) && /IR-2026-29/.test(r.rate_split));
+});
+test("Mileage: a 2026 trip with no usable date takes the end-of-year rate", () => {
+  const r = computeMileageRollup({ trips: [{ business_miles: 100 }], tax_year: 2026 });
+  assert.ok(close(r.deductible_amount, 76, 1e-9));
+});
+test("Mileage: a year with one published rate reports no split", () => {
+  const r = computeMileageRollup({ trips: [{ date: "2025-03-01", business_miles: 100 }], tax_year: 2025 });
+  assert.equal(r.rate_split, null);
+  assert.ok(close(r.standard_rate, 0.70, 1e-9));
+});
 test("Mileage: unbundled year errors", () => { assert.ok(computeMileageRollup({ trips: [{ business_miles: 1 }], tax_year: 1999 }).error); });
 
 // spec-v17 R.3 Home office (simplified vs actual)

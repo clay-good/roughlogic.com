@@ -11749,7 +11749,7 @@
    "source_publisher": "Project (first-principles) over IRS standard mileage rate + FLSA OT rule",
    "source_title": "Weekly timesheet: hours = end - start - lunch; OT = max(0, total - 40); gross = reg * rate + OT * rate * 1.5; reimbursable = miles * IRS rate",
    "source_edition_or_year": "FLSA 29 USC 207 OT identity; IRS 2025 standard mileage $0.67/mi (project bundled)",
-   "source_section_or_page": "Five jobs / 47.5 total hours / 40 reg + 7.5 OT / $25 rate / 170 miles -> $1281.25 gross / $113.90 reimbursable",
+   "source_section_or_page": "Five jobs / 47.5 total hours / 40 reg + 7.5 OT / $25 rate / 170 miles -> $1281.25 gross / $129.20 reimbursable at the 2026 IRS rate",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -11819,7 +11819,7 @@
      }
     },
     "reimbursable": {
-     "value": 113.9,
+     "value": 129.2,
      "tolerance": {
       "abs": 0.01
      }

@@ -6512,10 +6512,10 @@ export const CITATIONS = {
   },
   "mileage-cost": {
     formula: "Gallons = miles / mpg. Fuel cost = gallons × $/gal. IRS reimbursement = miles × IRS_standard_mileage_rate.",
-    edition: "IRS standard mileage rate, 2024 rate bundled ($0.67/mi).",
+    edition: "IRS standard mileage rate, 2026 second-half rate bundled ($0.76/mi, effective 2026-07-01 per IR-2026-29).",
     freeAccess: "Free at irs.gov.",
     governance: GOVERNANCE.general,
-    editionNote: "Single-edition (IRS rate; annual update). This said \"current tax year\" until 2026-09-02 while data/crosswalks/irs-mileage.json carried the 2024 rate and the crosswalks manifest said so -- the page claimed a currency the bundled value did not have. The edition now names the year it ships; refreshing the value to the current one is a maintainer data transcription against irs.gov, tracked separately.",
+    editionNote: "Single-edition (IRS rate; annual update, and the IRS may revise it mid-year -- 2026 was revised on July 1). This said \"current tax year\" until 2026-09-02 while the bundled value was the 2024 rate; the edition now names the period it ships. The value was refreshed to $0.76/mi on 2026-09-02, transcribed against irs.gov (IR-2026-29). The rate is an input on the page, so miles from an earlier period take that period's rate.",
     assumptions: [
       { name: "Rate", value: "data/crosswalks/irs-mileage.json (rate per mile, USD)", source: "IRS-published standard mileage rate" },
     ],

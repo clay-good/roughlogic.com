@@ -781,8 +781,11 @@ const STATE_TAX_RATES = {
 // Crosswalks v2: IRS standard mileage rate (U.S. government publication).
 const IRS_MILEAGE = {
   source: "IRS-published standard mileage rate (U.S. government publication).",
-  rate_per_mile_dollars: 0.67,
-  notes: "Update annually. The rate applies to business miles for the current tax year.",
+  rate_per_mile_dollars: 0.76,
+  edition: "2026 business rate, second half: 76 cents/mi effective 2026-07-01 (IR-2026-29).",
+  effective_from: "2026-07-01",
+  verified_on: "2026-09-02",
+  notes: "Business miles. The IRS revised the 2026 rate mid-year: 72.5 cents/mi for Jan 1 - Jun 30 (Notice 2026-10), then 76 cents/mi from Jul 1 (IR-2026-29). Miles driven in the first half of 2026, or in an earlier year, take that period's rate -- enter it over the default. Update when the IRS publishes the next rate.",
 };
 
 // Crosswalks v2: GSA per-diem rates (U.S. government publication).
@@ -1404,8 +1407,8 @@ const ESTIMATED_TAX_DATA_V5 = {
 };
 
 const STANDARD_MILEAGE_DATA_V5 = {
-  source: "IRS annual standard-mileage-rate notice (e.g., Notice 2024-08 for 2024).",
-  edition: "per-year",
+  source: "IRS annual standard-mileage-rate notice (e.g., Notice 2024-08 for 2024). A year the IRS revises mid-year carries a periods list; 2026 was revised on July 1.",
+  edition: "per-year (2026 split: Notice 2026-10, then IR-2026-29)",
   fetched: TODAY,
   verified_on: TODAY,
   free_access: "irs.gov/tax-professionals/standard-mileage-rates.",
@@ -1413,7 +1416,13 @@ const STANDARD_MILEAGE_DATA_V5 = {
     "2023": { business: 0.655, medical: 0.22, charitable: 0.14 },
     "2024": { business: 0.67,  medical: 0.21, charitable: 0.14 },
     "2025": { business: 0.70,  medical: 0.21, charitable: 0.14 },
-    "2026": { business: 0.72,  medical: 0.22, charitable: 0.14 },
+    "2026": {
+      business: 0.76, medical: 0.235, charitable: 0.14,
+      periods: [
+        { from: "2026-01-01", business: 0.725, medical: 0.205, charitable: 0.14, notice: "Notice 2026-10" },
+        { from: "2026-07-01", business: 0.76,  medical: 0.235, charitable: 0.14, notice: "IR-2026-29" },
+      ],
+    },
   },
 };
 
@@ -1585,7 +1594,7 @@ const DATASETS = [
       { file: "nema-mg1-code-letters.json", body: NEMA_MG1_CODE_LETTERS_DATA, name: "NEMA MG-1 code-letter starting kVA per HP" },
       { file: "dwelling-demand.json", body: DWELLING_DEMAND_DATA, name: "Dwelling demand-factor parameters (NEC 2023 Article 220)" },
     ] },
-  { folder: "plumbing", edition: "IPC 2021; IFGC 2021; Hazen-Williams (AWWA M11, 5th ed.); Manning (USGS WSP-2339, public domain); ASME B31.1 / B31.9 (guided-cantilever expansion-loop method); Joukowsky (1898) / ASCE MOP-49; Hydraulic Institute pump engineering practice; manufacturer specs as of " + TODAY + ".", shards: [
+  { folder: "plumbing", edition: "IPC 2021; IFGC 2021 (IPC 2024 / IFGC 2024 are the current published editions; bundled values follow 2021 and the tile citations disclose it); Hazen-Williams (AWWA M11, 5th ed.); Manning (USGS WSP-2339, public domain); ASME B31.1 / B31.9 (guided-cantilever expansion-loop method); Joukowsky (1898) / ASCE MOP-49; Hydraulic Institute pump engineering practice; manufacturer specs as of " + TODAY + ".", shards: [
       { file: "pipe-properties.json", body: PIPE_PROPERTIES, name: "Pipe properties" },
       { file: "fixture-units.json", body: FIXTURE_UNITS, name: "Fixture units" },
       { file: "gas-pipe-capacity.json", body: GAS_PIPE_CAPACITY, name: "Gas pipe capacity" },
@@ -1623,7 +1632,7 @@ const DATASETS = [
       { file: "mold-conditions.json", body: MOLD_CONDITIONS, name: "Mold growth conditions" },
       { file: "hepa-loading.json", body: HEPA_LOADING, name: "HEPA scrubber loading rates" },
     ] },
-  { folder: "construction", edition: "IRC 2021 / IBC 2021 cited by section number; ASCE 7 formulas applied (no licensed text reproduced); ACI 211 / ACI 318 / ACI 347 cited by name; ASTM A615 + CRSI rebar values; APA span-rating tables (technical-bulletin reuse); ICC-ES AC358 helical-pile Kt; ASME B30.5 / B30.9 + OSHA 29 CFR 1926 Subpart CC for crane-lift; ASTM/SAE bolt grades; AWS deposition; lumber properties from public engineering references; verified " + TODAY + ".", shards: [
+  { folder: "construction", edition: "IRC 2021 / IBC 2021 cited by section number (IRC 2024 / IBC 2024 are the current published editions; bundled values follow 2021 and the tile citations disclose it); ASCE 7 formulas applied (no licensed text reproduced); ACI 211 / ACI 318 / ACI 347 cited by name; ASTM A615 + CRSI rebar values; APA span-rating tables (technical-bulletin reuse); ICC-ES AC358 helical-pile Kt; ASME B30.5 / B30.9 + OSHA 29 CFR 1926 Subpart CC for crane-lift; ASTM/SAE bolt grades; AWS deposition; lumber properties from public engineering references; verified " + TODAY + ".", shards: [
       { file: "lumber-properties.json", body: LUMBER_PROPERTIES, name: "Lumber material properties" },
       { file: "concrete-mixes.json", body: CONCRETE_MIXES, name: "Concrete mixes" },
       { file: "span-derivations.json", body: SPAN_DERIVATIONS, name: "Span derivations" },
@@ -1644,7 +1653,7 @@ const DATASETS = [
       // v7 utility 252.
       { file: "iso-nff.json", body: ISO_NFF_DATA, name: "ISO PPC NFF construction-class F and occupancy Oi (cited by name only)" },
     ] },
-  { folder: "crosswalks", edition: "NIST SP 811 unit factors; IRS 2024 standard mileage rate; GSA FY2026 per-diem; NIOSH 1991 lifting equation; OSHA 29 CFR 1926 Subpart P + 1926.502 fall protection; NWS / OSHA heat-cold-stress formulas; manufacturer connector-decel benchmarks (3M / Capital Safety, MSA, Honeywell-Miller); state revenue rates verified " + TODAY + ".", shards: [
+  { folder: "crosswalks", edition: "NIST SP 811 unit factors; IRS 2026 standard mileage rate (76 cents/mi effective 2026-07-01); GSA FY2026 per-diem; NIOSH 1991 lifting equation; OSHA 29 CFR 1926 Subpart P + 1926.502 fall protection; NWS / OSHA heat-cold-stress formulas; manufacturer connector-decel benchmarks (3M / Capital Safety, MSA, Honeywell-Miller); state revenue rates verified " + TODAY + ".", shards: [
       { file: "unit-conversions.json", body: UNIT_CONVERSIONS, name: "Unit conversions" },
       { file: "state-tax-rates.json", body: STATE_TAX_RATES, name: "State sales tax rates" },
       { file: "irs-mileage.json", body: IRS_MILEAGE, name: "IRS standard mileage rate" },

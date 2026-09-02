@@ -625,7 +625,7 @@ export const upgradeROIExample = {
 
 // --- Utility 107: Mileage and Fuel Cost ---
 
-export const IRS_STANDARD_MILEAGE_RATE = 0.67;
+export const IRS_STANDARD_MILEAGE_RATE = 0.76;
 
 // dims: in { round_trip_miles: L, mpg: dimensionless, fuel_price_per_gallon: dimensionless, irs_rate_per_mile: dimensionless } out: { fuel_cost: dimensionless, irs_deduction: dimensionless }
 export function computeMileageCost({ round_trip_miles, mpg, fuel_price_per_gallon, irs_rate_per_mile = IRS_STANDARD_MILEAGE_RATE }) {
