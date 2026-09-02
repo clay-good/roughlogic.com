@@ -41,6 +41,9 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **The CI partition figures, re-counted.** The workflow's comment explaining why the two Playwright jobs no longer both run the axe sweep carried `1,875 + 1,972 = 3,847 as of 2026-08-31`; today's five new specs moved it to **1,887 + 1,999 = 3,886**. `check-ci-claims` pins the README's axe figure within 5% and calls the workflow totals prose, which is why they drifted quietly -- so they are re-counted with `playwright --list` and re-dated rather than left to age another week.
+
+
 - **A load-bearing code comment quoted a population 4.8x too large.** `scripts/build-field-index.mjs` explains why a field with no human label is left out of the index -- "matching on a machine key would be guessing, and this program refuses rather than guesses" -- and cited "all **379** tiles whose inputs come from compute-parameter introspection ... 313 indexed, the remaining 66 skipped". That population is **79** now, not 379: renderer-schema coverage grew underneath it, and 1,725 of 1,804 tiles expose a schema today. Live: **38 indexed, 41 skipped.**
 
   The reasoning was right and the numbers had aged out from under it, which is the worse failure of the two -- a comment that explains a design decision is what the next person reasons from.
