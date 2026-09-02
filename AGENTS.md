@@ -22,11 +22,11 @@ claude mcp add roughlogic -- node /absolute/path/to/roughlogic.com/mcp/server.mj
 
 Five tools, all read-only and safe to call freely:
 
-- `search_calculators` — find a calculator by keyword and/or trade (no args → trade overview).
-- `describe_calculator` — one tile's inputs (with select options, units, min/max), outputs, worked examples, citation, and any limitation banner.
-- `run_calculator` — evaluate a tile; returns the raw result plus rendered outputs (units + display strings), range warnings, and the limitation banner.
-- `answer_query` — a plain-language question with its numbers in it, answered in one call. Use it instead of chaining search + describe + run when the question already carries its values. The 21 tiles that take no inputs at all (OSHA Top-10, the knot and hand-signal references) answer from their own content, so asking one by name returns the table rather than a request for values. Every other tile refuses: a question that names a calculator but carries no numbers gets `NO_VALUES` and a pointer to `describe_calculator`, never an answer computed from the tile's own defaults.
-- `run_calculators` — up to 50 `{ id, inputs }` calls in one request, for sweeps and comparisons.
+- `search_calculators` -- find a calculator by keyword and/or trade (no args → trade overview).
+- `describe_calculator` -- one tile's inputs (with select options, units, min/max), outputs, worked examples, citation, and any limitation banner.
+- `run_calculator` -- evaluate a tile; returns the raw result plus rendered outputs (units + display strings), range warnings, and the limitation banner.
+- `answer_query` -- a plain-language question with its numbers in it, answered in one call. Use it instead of chaining search + describe + run when the question already carries its values. The 21 tiles that take no inputs at all (OSHA Top-10, the knot and hand-signal references) answer from their own content, so asking one by name returns the table rather than a request for values. Every other tile refuses: a question that names a calculator but carries no numbers gets `NO_VALUES` and a pointer to `describe_calculator`, never an answer computed from the tile's own defaults.
+- `run_calculators` -- up to 50 `{ id, inputs }` calls in one request, for sweeps and comparisons.
 
 Typical flow: `search_calculators` → `describe_calculator` → `run_calculator`. The
 server also serves MCP resources (`roughlogic://catalog`, `roughlogic://trade/{trade}`,
@@ -67,7 +67,7 @@ serialized into URL state, report inputs, or derived output snapshots.
 
 - **US standards only.** No metric-defaulted inputs.
 - **Never reproduce copyrighted tables.** Cite the source and locator; take table values as inputs.
-- **Verify every formula against a primary source** — not against a sibling tile.
+- **Verify every formula against a primary source** -- not against a sibling tile.
 - **No hosted calculator or AI runtime.** The MCP server stays local stdio; only
   the spec-v1348 feedback endpoint may write remotely, and it must remain bounded,
   Turnstile-protected, data-minimized, and fail-closed.

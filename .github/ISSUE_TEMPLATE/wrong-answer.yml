@@ -1,0 +1,59 @@
+name: A calculator's answer looks wrong
+description: The number is wrong, the units are wrong, or the formula does not match the cited standard.
+labels: ["correctness"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is the most valuable report you can file. It gets fixed with a
+        worked-example fixture taken from the source you name, so the same
+        error cannot come back.
+
+        In a hurry? The **Report a problem** button on the calculator's own
+        page sends the URL, inputs and results for you.
+  - type: input
+    id: calculator
+    attributes:
+      label: Which calculator
+      description: Its name, or the URL (which carries your inputs).
+      placeholder: https://roughlogic.com/tools/voltage-drop/
+    validations:
+      required: true
+  - type: textarea
+    id: inputs
+    attributes:
+      label: The inputs you entered
+      placeholder: |
+        Phase: single
+        Material: copper
+        AWG: 10
+        Length one-way (ft): 150
+        Current (A): 20
+        Source voltage (V): 240
+    validations:
+      required: true
+  - type: input
+    id: got
+    attributes:
+      label: The answer you got
+      placeholder: "7.45 V"
+    validations:
+      required: true
+  - type: input
+    id: expected
+    attributes:
+      label: The answer you expected
+      placeholder: "7.2 V"
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: The published source that settles it
+      description: >
+        Standard, edition, table or section number, and a page or free-access
+        URL if you have one. A hand calculation is fine as supporting work, but
+        the fix needs a citable reference.
+      placeholder: "NEC 2023 Ch. 9 Table 8, uncoated copper, 10 AWG stranded"
+    validations:
+      required: true

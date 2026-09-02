@@ -71,7 +71,7 @@ One calculator is one formula on one screen. (In the source and the gate names b
 
 ## Why you can trust the answers
 
-The hard part of a calculator catalog is not the arithmetic. It is proving, at scale, that every tile stays correct as the catalog grows. That is a build problem here: `npm run lint` runs 55 static gates before a change can land.
+The hard part of a calculator catalog is not the arithmetic. It is proving, at scale, that every tile stays correct as the catalog grows. That is a build problem here: `npm run lint` runs 56 static gates before a change can land.
 
 | Gate | What it guarantees |
 |---|---|
@@ -108,12 +108,14 @@ The home payload gzips to well under the 100 KB budget. Opening a calculator dyn
 npm ci             # exact locked dev tooling; the site has zero runtime deps
 npm run dev        # build, then serve only dist/ on loopback
 npm run build      # emit dist/ (SPA + static shells + sitemap)
-npm run lint       # the full static-gate chain (55 checks)
+npm run lint       # the full static-gate chain (56 checks)
 npm test           # unit tests (node --test)
 npm run test:e2e   # Playwright integration suite (needs a browser)
 ```
 
 The repo root holds the SPA entry (`index.html`, `styles.css`, `app.js`, `sw.js`), the `calc-*.js` modules, and shared UI helpers. `data/` holds sharded JSON with per-folder manifests and integrity hashes. `scripts/` holds build and gate tooling (never runs in production). `specs/` is the numbered specification history; `docs/` holds derivations, data sources, architecture, and the audit trail. See [docs/maintainer-quickstart.md](docs/maintainer-quickstart.md) and [docs/contributor-checklist.md](docs/contributor-checklist.md).
+
+Patches welcome. [CONTRIBUTING.md](CONTRIBUTING.md) has the hard constraints (zero runtime dependencies, no network at build time, US standards only) and the one command that has to be green before review. A wrong answer is the most valuable thing you can report: there is an issue template for it that asks for the inputs and the published source that settles it.
 
 ## License
 

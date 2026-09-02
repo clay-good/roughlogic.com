@@ -1,0 +1,42 @@
+name: Suggest a calculator
+description: A trade calculation the catalog does not cover yet.
+labels: ["new-tile"]
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Please search the catalog first: 1,804 calculators is a lot, and most
+        suggestions turn out to be already built under a different name.
+        Building one touches about twenty registries, so agreeing the scope in
+        an issue first saves rework. See docs/contributor-checklist.md.
+  - type: input
+    id: name
+    attributes:
+      label: What should it compute
+      placeholder: "Static regain duct sizing"
+    validations:
+      required: true
+  - type: textarea
+    id: formula
+    attributes:
+      label: The formula, and the source it comes from
+      description: >
+        In scope means: a US published standard or a settled engineering
+        method, verifiable by a reader without buying anything they cannot
+        cite. Name the standard, edition, and section.
+    validations:
+      required: true
+  - type: textarea
+    id: inputs
+    attributes:
+      label: Inputs and outputs
+      description: What a user would type, and what the page should tell them.
+    validations:
+      required: true
+  - type: input
+    id: who
+    attributes:
+      label: Who needs it, and on what job
+      description: One line. This is what decides whether it earns a page.
+    validations:
+      required: true

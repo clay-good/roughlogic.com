@@ -392,6 +392,12 @@ async function main() {
   checked += checkPattern(readme, /runs (\d+) static gates/g, live.gates, "lint gate count", errors);
   checked += checkPattern(readme, /static-gate chain \((\d+) checks\)/g, live.gates, "lint gate count", errors);
 
+  // CONTRIBUTING.md tells a first-time contributor how much has to pass. It is
+  // the same claim the README makes, on the surface GitHub links from the
+  // "Contribute" panel, so it drifts the same way and is pinned the same way.
+  const contributing = await readFile(resolve(ROOT, "CONTRIBUTING.md"), "utf8");
+  checked += checkPattern(contributing, /alone is (\d+) static gates/g, live.gates, "lint gate count (CONTRIBUTING.md)", errors);
+
   // Sitemap URL count: the build diagram node and the prose "carries N URLs".
   checked += checkPattern(readme, /sitemap\.xml\\n(\d+) URLs/g, live.sitemap, "sitemap URL count", errors);
   checked += checkPattern(readme, /carries (\d+) URLs/g, live.sitemap, "sitemap URL count", errors);

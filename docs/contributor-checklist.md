@@ -171,6 +171,10 @@ phase docs ([edition-rollover.md](edition-rollover.md),
 - [ ] No code or data files changed.
 - [ ] Markdown links resolve relative to `docs/` (no broken
   links).
+- [ ] If the change touches `CONTRIBUTING.md`, `SECURITY.md`,
+  `AGENTS.md`, or anything under `.github/`, `check-community-health`
+  covers it: those files sit outside `check-doc-links` (living docs only)
+  and outside the curated `grep-checks` target list.
 - [ ] No emojis, no em-dashes, plain ASCII per the global
   typographic policy.
 - [ ] CHANGELOG stanza if the change is user-facing (new

@@ -1,0 +1,40 @@
+name: Something on the site is broken
+description: A page, control, layout, offline behavior, or the local MCP server misbehaves.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: >
+        For a wrong number, use the correctness template instead. For a
+        suspected vulnerability, do not open an issue: see SECURITY.md.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you saw, and what you expected instead.
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      description: The URL, or the MCP tool name if this is the agent surface.
+      placeholder: https://roughlogic.com/tools/ohms-law/
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Browser or client, and device
+      placeholder: "Safari 18, iPhone 14"
+    validations:
+      required: false
+  - type: checkboxes
+    id: conditions
+    attributes:
+      label: Anything that applies
+      options:
+        - label: It only happens offline (after a first load, with no signal)
+        - label: It only happens in the dark theme
+        - label: It only happens when printing
+        - label: It only happens on a narrow screen
