@@ -107,6 +107,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A unit typed with a space before it was thrown away: `120 v` read as a bare number.** `extractQuantities` accepts a one-letter unit **glued only** -- `120V` is volts, `120 v` is nothing -- so that an article ("a 50 amp circuit") and a dimension separator ("20 x 30") can never be mistaken for units. That rule is right where it lives: the extractor has no idea which tile it is looking at. The cost was recorded yesterday and is now paid: `ohms law 120 v, 10 a` prefilled **nothing**, while `120V 10A` and `120 volts 10 amps` both filled -- and the spaced short form is the phrasing the home page's own example chip advertised.
+
+  `query-fill` **does** have tile context, which is what breaks the tie. A new phase reads the letter back out of the reader's own text and fills only when it canonicalizes to a real unit **and** exactly one unfilled field declares that unit exactly -- no same-family widening, because the evidence is one character. Symmetric on the other side too, which a fixture caught: `120 v 10 v` on Ohm's Law is two candidate **values** for one volts field, as ambiguous as two fields for one value, so one field *and* one value or nothing.
+
+  `query-fill.js`'s gzip cap goes **13,000 -> 14,000 B**: the module landed **10 bytes** over, and shaving the note that explains why one character of evidence buys only an exact match would be paying for a byte with the reasoning. It is lazy-loaded and not in the home-view payload.
+
+  Measured on both harnesses. The terse lens -- values only, no field names, the way someone types in a hurry -- goes **1,943 -> 2,065 of 7,184 fields (27.0% -> 28.7%)**, with tiles recovering nothing falling **585 -> 552**. The named lens is unchanged at 4,350 / 7,184 and **0 wrong**. The terse lens's 7 wrong values are **the same seven rows, character for character**, checked by diffing the lists rather than the counts -- a stable count over a changed set would have looked identical. Free-text bindings stay at the documented 2; `check-both-doors`, `door-parity` and the ranking harness are unchanged.
+
+
 - **81 calculators answered as a different calculator when asked for by name.** `answer_query` lets a **curated alias** promote a tile past rank 1 -- that is how "240.21" reaches the feeder-tap-rule a human mapped it to rather than the transformer tile the ranker puts first. It was also firing when the query was another tile's **published name** and a shorter curated alias happened to sit inside it: asking for `Water Loss Class and Category` returned the class-of-loss **screen**, because "water loss class" is a curated alias for that one -- while the reference tile the name belongs to sat at rank 1.
 
   Measured across the catalog: **81 tiles** answered as a different calculator when asked for by their own exact name. That is the plainest thing an agent can ask -- it read the name out of `search_calculators` and sent it straight back.

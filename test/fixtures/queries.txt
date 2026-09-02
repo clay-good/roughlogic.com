@@ -22,9 +22,27 @@ asphalt-tonnage | asphalt 2400 sq ft 3 in deep 12 ft wide | area_ft2=2400,depth_
 # The field is in feet; the reader said inches. Convert, do not refuse.
 asphalt-tonnage | asphalt paving width 144 in | paving_width_ft=12
 
+# --- a single-letter unit the reader typed with a space ----------------------
+# extractQuantities takes a one-letter unit GLUED only, so an article ("a 50
+# amp circuit") and a dimension separator ("20 x 30") can never read as units.
+# Phase B2 reads the letter back out of the text where the TILE can break the
+# tie: it fills only when the letter is a real unit and exactly one unfilled
+# field declares it, with exactly one value competing for that field. Before
+# this, the phrasing the home page's own example chip advertised filled nothing.
+ohms-law | 120 v 10 a | V=120,I=10
+ohms-law | 120 v | V=120
+# The glued and spelled forms are unchanged, and must stay that way.
+ohms-law | 120V 10A | V=120,I=10
+ohms-law | 120 volts 10 amps | V=120,I=10
+
 # --- the safety cases -------------------------------------------------------
 # Two same-unit fields and no names to tell them apart: fill NEITHER.
 ohms-law | 120 v 10 v | -
+# Two candidate VALUES for one volts field is the same ambiguity seen from the
+# other side, and the reason Phase B2 counts rivals as well as fields.
+ohms-law | 120 v 240 v | -
+# `x` is not a unit, so a dimension pair stays a dimension pair.
+ohms-law | 20 x 30 | -
 # A unit from another family never crosses over.
 asphalt-tonnage | compacted depth 3 gpm | -
 

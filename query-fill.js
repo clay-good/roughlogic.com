@@ -550,6 +550,42 @@ export function queryFill(query, rows, opts) {
     claimed.add(qi);
   });
 
+  // --- Phase B2: a single-letter unit the reader typed with a space ---------
+  //
+  // `extractQuantities` takes a one-letter unit GLUED only -- "120V" is volts,
+  // "120 v" is a bare number -- so an article ("a 50 amp circuit") and a
+  // dimension separator ("20 x 30") can never read as units. Right rule, right
+  // place: that function cannot see the tile. Its cost, measured 2026-09-02:
+  // `ohms law 120 v, 10 a` filled NOTHING, the phrasing the home page's own
+  // example chip advertised.
+  //
+  // Here there IS tile context. The letter is read back out of the reader's
+  // text and fills only when it canonicalizes to a real unit AND exactly one
+  // unfilled field declares that unit EXACTLY -- no same-family widening, since
+  // the evidence is one character. `x` is not a unit, so "20 x 30" is
+  // untouched; "50 amp" is three letters and Phase B already had it.
+  const spacedLetterUnit = (qty) => {
+    if (qty.unit || typeof qty.index !== "number") return null;
+    const after = String(text).slice(qty.index).match(/^[\d.,/]+ ([a-z])(?![a-z0-9])/);
+    return after ? canonicalUnit(after[1]) : null;
+  };
+  quantities.forEach((qty, qi) => {
+    if (claimed.has(qi) || burned.has(qi)) return;
+    const qtyUnit = spacedLetterUnit(qty);       // null when Phase B already had a real unit
+    if (!qtyUnit) return;
+    const exact = numberRows.filter((r) => !(r.d in filled) && rowUnit(r) === qtyUnit);
+    if (exact.length !== 1) return;
+    // Symmetric to the field test, and the fixture that caught it: "120 v 10 v"
+    // on Ohm's Law is two candidate VALUES for one volts field, which is as
+    // ambiguous as two fields for one value. One field and one value, or
+    // nothing.
+    const rivals = quantities.filter((other, oi) =>
+      oi !== qi && !claimed.has(oi) && !burned.has(oi) && spacedLetterUnit(other) === qtyUnit);
+    if (rivals.length) return;
+    filled[exact[0].d] = String(qty.value);
+    claimed.add(qi);
+  });
+
   // --- Phase C: selects ----------------------------------------------------
   // A word-valued option matches on its own. A numeric or single-character
   // option needs the field's own name beside it, because a bare "40" is a
