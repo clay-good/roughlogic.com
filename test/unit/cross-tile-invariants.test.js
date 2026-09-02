@@ -8804,7 +8804,7 @@ test("monotonicity: computeExcavationVolume volume_ft3 is strictly increasing in
   assert.ok(bad.error, `expected error for L=0, got ${JSON.stringify(bad)}`);
 });
 
-test("monotonicity: computeSection179 section_179_deduction is strictly increasing in cost (linear in business_basis until cap binds) AND in taxable_income (limited by income); phase-out pin: dollar_cap shrinks dollar-for-dollar above phaseout_start; 2023-2026 cap-rate ladder pin; bonus_pct year ordering 80 > 60 > 40 > 20", () => {
+test("monotonicity: computeSection179 section_179_deduction is strictly increasing in cost (linear in business_basis until cap binds) AND in taxable_income (limited by income); phase-out pin: dollar_cap shrinks dollar-for-dollar above phaseout_start; 2023-2026 cap ladder pin; bonus_pct by year 80 / 60 / then a permanent 100 from 2025 under OBBBA", () => {
   // Group P. sec179 = min(business_basis, dollar_cap, taxable_income).
   // Strictly increasing in cost while well below caps.
   let prev = -Infinity;
@@ -8816,49 +8816,52 @@ test("monotonicity: computeSection179 section_179_deduction is strictly increasi
       `sec179 at cost=${cost} = ${r.section_179_deduction} not greater than prev=${prev}`);
     prev = r.section_179_deduction;
   }
-  // Cap-binding pin: at cost above the 2025 cap (1,250,000), deduction
-  // stays exactly at the cap (until phaseout starts to shrink it).
-  const atCap = computeSection179({ cost: 1250000, business_use_pct: 100, taxable_income: 2000000, tax_year: 2025 });
-  assert.equal(atCap.dollar_cap, 1250000);
-  assert.equal(atCap.section_179_deduction, 1250000);
-  const justAboveCap = computeSection179({ cost: 1500000, business_use_pct: 100, taxable_income: 2000000, tax_year: 2025 });
-  assert.equal(justAboveCap.dollar_cap, 1250000);
-  assert.equal(justAboveCap.section_179_deduction, 1250000);
-  // Phase-out pin: at cost above phaseout_start (3,130,000 for 2025),
+  // Cap-binding pin: at cost above the 2025 cap (2,500,000, post-OBBBA),
+  // deduction stays exactly at the cap (until phaseout starts to shrink it).
+  const atCap = computeSection179({ cost: 2500000, business_use_pct: 100, taxable_income: 5000000, tax_year: 2025 });
+  assert.equal(atCap.dollar_cap, 2500000);
+  assert.equal(atCap.section_179_deduction, 2500000);
+  const justAboveCap = computeSection179({ cost: 3000000, business_use_pct: 100, taxable_income: 5000000, tax_year: 2025 });
+  assert.equal(justAboveCap.dollar_cap, 2500000);
+  assert.equal(justAboveCap.section_179_deduction, 2500000);
+  // Phase-out pin: at cost above phaseout_start (4,000,000 for 2025),
   // dollar_cap shrinks dollar-for-dollar.
-  const phaseOut = computeSection179({ cost: 3200000, business_use_pct: 100, taxable_income: 2000000, tax_year: 2025 });
-  // overage = 3,200,000 - 3,130,000 = 70,000; dollar_cap = 1,250,000 - 70,000 = 1,180,000.
+  const phaseOut = computeSection179({ cost: 4070000, business_use_pct: 100, taxable_income: 5000000, tax_year: 2025 });
+  // overage = 4,070,000 - 4,000,000 = 70,000; dollar_cap = 2,500,000 - 70,000 = 2,430,000.
   assert.equal(phaseOut.phaseout_overage, 70000);
-  assert.equal(phaseOut.dollar_cap, 1180000);
+  assert.equal(phaseOut.dollar_cap, 2430000);
   // Full phase-out pin: at cost where overage >= cap, dollar_cap = 0.
-  const fullPhase = computeSection179({ cost: 5000000, business_use_pct: 100, taxable_income: 2000000, tax_year: 2025 });
+  const fullPhase = computeSection179({ cost: 6600000, business_use_pct: 100, taxable_income: 9000000, tax_year: 2025 });
   assert.equal(fullPhase.dollar_cap, 0);
   assert.equal(fullPhase.section_179_deduction, 0);
   // Taxable-income limit pin.
   const incomeLimited = computeSection179({ cost: 1000000, business_use_pct: 100, taxable_income: 500000, tax_year: 2025 });
   assert.equal(incomeLimited.section_179_deduction, 500000);
-  // Cap-ladder pin: 2023 1.16M < 2024 1.22M < 2025 1.25M < 2026 1.29M.
+  // Cap-ladder pin: 2023 1.16M < 2024 1.22M < 2025 2.50M < 2026 2.56M. The 2025
+  // step is the One Big Beautiful Bill Act, not an inflation adjustment.
   const y23 = computeSection179({ cost: 2000000, business_use_pct: 100, taxable_income: 5000000, tax_year: 2023 });
   const y24 = computeSection179({ cost: 2000000, business_use_pct: 100, taxable_income: 5000000, tax_year: 2024 });
   const y25 = computeSection179({ cost: 2000000, business_use_pct: 100, taxable_income: 5000000, tax_year: 2025 });
   const y26 = computeSection179({ cost: 2000000, business_use_pct: 100, taxable_income: 5000000, tax_year: 2026 });
   assert.equal(y23.dollar_cap, 1160000);
   assert.equal(y24.dollar_cap, 1220000);
-  assert.equal(y25.dollar_cap, 1250000);
-  assert.equal(y26.dollar_cap, 1290000);
+  assert.equal(y25.dollar_cap, 2500000);
+  assert.equal(y26.dollar_cap, 2560000);
   assert.ok(y23.dollar_cap < y24.dollar_cap && y24.dollar_cap < y25.dollar_cap && y25.dollar_cap < y26.dollar_cap,
     `cap ladder violated`);
-  // Bonus-pct year-ordering pin: 2023 80 > 2024 60 > 2025 40 > 2026 20.
+  // Bonus-pct pin: the TCJA phase-down ran 80 (2023) then 60 (2024); OBBBA made
+  // it a permanent 100 from 2025 for property acquired after 2025-01-19, so the
+  // old strictly-decreasing ladder no longer holds and must not be restored.
   assert.equal(y23.bonus_pct, 80);
   assert.equal(y24.bonus_pct, 60);
-  assert.equal(y25.bonus_pct, 40);
-  assert.equal(y26.bonus_pct, 20);
+  assert.equal(y25.bonus_pct, 100);
+  assert.equal(y26.bonus_pct, 100);
   // business_basis pin: cost * business_use_pct / 100.
   const partial = computeSection179({ cost: 100000, business_use_pct: 60, taxable_income: 200000, tax_year: 2025 });
   assert.equal(partial.business_basis, 60000);
   // bonus_pct override pin: caller can pass custom bonus rate.
-  const customBonus = computeSection179({ cost: 100000, business_use_pct: 100, taxable_income: 200000, tax_year: 2025, bonus_pct: 100 });
-  assert.equal(customBonus.bonus_pct, 100);
+  const customBonus = computeSection179({ cost: 100000, business_use_pct: 100, taxable_income: 200000, tax_year: 2025, bonus_pct: 40 });
+  assert.equal(customBonus.bonus_pct, 40);
   // Decomposition pin: business_basis = section_179 + after_179.
   const r = computeSection179({ cost: 100000, business_use_pct: 100, taxable_income: 200000, tax_year: 2025 });
   assert.ok(Math.abs(r.business_basis - (r.section_179_deduction + (r.bonus_depreciation + r.remaining_basis_for_macrs))) < 1e-9,

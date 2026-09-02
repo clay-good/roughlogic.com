@@ -2970,24 +2970,24 @@ test("bounds: calc-accounting computeMacrs rejects non-positive cost / unknown c
 });
 
 test("bounds: calc-accounting computeSection179 pins the cap + phase-out + taxable-income three-way min and the bonus add-on across the tax-year sweep", () => {
-  // 2025: cap 1.25M, phaseout start 3.13M, bonus 40%.
+  // 2025 post-OBBBA: cap 2.5M, phaseout start 4.0M, bonus 100%.
   const small = computeSection179({ cost: 60000, business_use_pct: 100, taxable_income: 200000, tax_year: 2025 });
   assert.ok(!small.error, JSON.stringify(small));
   assert.strictEqual(small.business_basis, 60000);
-  assert.strictEqual(small.dollar_cap, 1250000);
-  // Three-way min(basis, cap, taxable_income) = min(60000, 1.25M, 200k) = 60000.
+  assert.strictEqual(small.dollar_cap, 2500000);
+  // Three-way min(basis, cap, taxable_income) = min(60000, 2.5M, 200k) = 60000.
   assert.strictEqual(small.section_179_deduction, 60000);
   // After 179 there's nothing left for bonus.
   assert.strictEqual(small.bonus_depreciation, 0);
-  // Phase-out case: basis 3.5M -> overage 370k -> cap reduced to 880k.
-  const phaseout = computeSection179({ cost: 3500000, business_use_pct: 100, taxable_income: 5000000, tax_year: 2025 });
-  assert.strictEqual(phaseout.phaseout_overage, 3500000 - 3130000);
-  assert.strictEqual(phaseout.dollar_cap, 1250000 - 370000);
+  // Phase-out case: basis 4.5M -> overage 500k -> cap reduced to 2.0M.
+  const phaseout = computeSection179({ cost: 4500000, business_use_pct: 100, taxable_income: 9000000, tax_year: 2025 });
+  assert.strictEqual(phaseout.phaseout_overage, 4500000 - 4000000);
+  assert.strictEqual(phaseout.dollar_cap, 2500000 - 500000);
   // Taxable-income limit: basis 100k but taxable income 30k -> sec179 capped at 30k.
   const ti_limit = computeSection179({ cost: 100000, business_use_pct: 100, taxable_income: 30000, tax_year: 2025 });
   assert.strictEqual(ti_limit.section_179_deduction, 30000);
-  // After 179: 70k remaining; bonus 40% * 70k = 28k.
-  assert.ok(Math.abs(ti_limit.bonus_depreciation - 70000 * 0.40) < 1e-9, `bonus identity`);
+  // After 179: 70k remaining; bonus 100% * 70k = 70k.
+  assert.ok(Math.abs(ti_limit.bonus_depreciation - 70000 * 1.00) < 1e-9, `bonus identity`);
   // Business-use percent reduces basis: 50% of 100k = 50k basis.
   const partial = computeSection179({ cost: 100000, business_use_pct: 50, taxable_income: 200000, tax_year: 2025 });
   assert.strictEqual(partial.business_basis, 50000);

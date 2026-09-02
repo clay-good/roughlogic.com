@@ -149,6 +149,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Section 179 and bonus depreciation were still on the repealed TCJA schedule, understating the deduction by more than half.** The One Big Beautiful Bill Act (July 2025) rewrote both. `section-179` shipped a 2025 cap of **$1,250,000** with a **40%** bonus and a 2026 cap of $1,290,000 with 20%. The published figures are **$2,500,000 / $4,000,000 phase-out for 2025** and **$2,560,000 / $4,090,000 for 2026** (IRS Pub 946), with bonus depreciation a **permanent 100%** for qualified property acquired after 2025-01-19 (IRC 168(k), IRS Notice 2026-11). A contractor expensing a $2M machine was told less than half of it was deductible in year one.
+
+  Both years transcribed against irs.gov. 2025 carries the acquisition-window note the statute needs -- property placed in service after 2024-12-31 but before 2025-01-20 still takes 40% (60% for long-production-period property and certain aircraft) -- and the tile prints it beside the bonus figure; the rate has always been overridable. The 2023 and 2024 rows were re-checked and are correct.
+
+  The invariant test had pinned `bonus_pct` as a strictly decreasing ladder, 80 > 60 > 40 > 20. That ladder is the repealed law, so it now pins 80 / 60 / 100 / 100 with a comment saying why it must not be restored -- a monotonic-looking invariant is not evidence of a correct one.
+
+- **The 2026 Social Security wage base was $183,600; it is $184,500.** Found in the same pass over `data/accounting`, confirmed against IRS Topic 751 and the SSA COLA announcement. `se-tax` capped the 12.4% Social Security portion $900 of wages too low.
+
 - **The citation doc was checked against a copy of itself.** `docs/citation-discipline.md` is the declared source of truth for the 70 per-tile source-stamp strings, and `build-citation-strings --check` guards it -- by comparing it to `docs/citation-strings.generated.json`, which is generated *from that same doc*. A copy checked against a copy. Nothing had ever compared a row to the sentence the tile actually prints, and **21 of the 70 had drifted**.
 
   Some were harmless paraphrase. Some were not: `dti` was documented as *"per FNMA Single-Family Selling Guide and FHA Handbook"* while the page prints the section numbers, the conventional 36/45 (up to 50 with compensating factors), the FHA 31/43 and the VA back-end 41. Anyone auditing this site against its own citation doc -- which is the point of publishing one -- was auditing fiction.

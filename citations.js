@@ -7487,13 +7487,13 @@ export const CITATIONS = {
   },
   "section-179": {
     formula: "Section 179 = min(business_basis, dollar_cap, taxable_income). dollar_cap = max(0, annual_cap - max(0, business_basis - phaseout_start)). bonus = (business_basis - sec179) * bonus_pct. Residual basis flows to MACRS.",
-    edition: "IRC 179 cap and phase-out per IRS annual revenue procedures. Bonus depreciation per IRC 168(k). Per-year parameters bundled in SECTION_179_LIMITS (data/accounting/section-179-limits.json).",
+    edition: "IRC 179 cap and phase-out per IRS Publication 946 and the annual revenue procedures; 2025 $2,500,000 / $4,000,000 and 2026 $2,560,000 / $4,090,000 as amended by the One Big Beautiful Bill Act. Bonus depreciation per IRC 168(k), a permanent 100% for qualified property acquired after 2025-01-19 (IRS Notice 2026-11). Per-year parameters bundled in SECTION_179_LIMITS (data/accounting/section-179-limits.json).",
     freeAccess: "Free at irs.gov; cap and phase-out announced in the annual Rev. Proc. (e.g., Rev. Proc. 2024-40 for 2025).",
     governance: GOVERNANCE.tax,
-    editionNote: "Annual cadence: refreshed each January when the IRS posts the inflation-adjusted cap.",
+    editionNote: "Annual cadence: refreshed each January when the IRS posts the inflation-adjusted cap. Until 2026-09-02 this table carried the pre-OBBBA TCJA schedule -- a 2025 cap of $1,250,000 with 40% bonus -- which understated the allowable first-year deduction by more than half. 2023 and 2024 were re-checked and are unaffected.",
     assumptions: [
       { name: "Phase-out", value: "dollar-for-dollar reduction in cap above the threshold", source: "IRC 179(b)(2)" },
-      { name: "Bonus rate", value: "scheduled phase-down (80% / 60% / 40% / 20%) for 2023-2026", source: "TCJA bonus depreciation schedule" },
+      { name: "Bonus rate", value: "TCJA phase-down 80% (2023) / 60% (2024), then a permanent 100% from 2025 under OBBBA for property acquired after 2025-01-19; property placed in service in the 2025-01-01 to 2025-01-19 window takes 40%", source: "IRC 168(k); IRS Notice 2026-11" },
     ],
   },
   "se-tax": {

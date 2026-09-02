@@ -14,12 +14,12 @@
     {
       "file": "section-179-limits.json",
       "name": "Section 179 cap and phase-out, per-year",
-      "gzip_size_bytes": 350
+      "gzip_size_bytes": 534
     },
     {
       "file": "se-tax-parameters.json",
       "name": "Social Security wage base + Additional Medicare threshold, per-year",
-      "gzip_size_bytes": 361
+      "gzip_size_bytes": 363
     },
     {
       "file": "estimated-tax-due-dates.json",
@@ -44,8 +44,8 @@
   ],
   "hashes": {
     "macrs-tables.json": "b83e579be77577343d221fd9790072686d516e311ef71a8588856741f1d343bd",
-    "section-179-limits.json": "dcc6c87a4ec68b12178df297659ae6c405aa82f46c07a070d2527bbf0f7edc04",
-    "se-tax-parameters.json": "b876bd8504525b6b78dc7f325d000c81d2b0753c4a6a6896a6c7a3eaf42e3919",
+    "section-179-limits.json": "1538260b803f5d958bae8435737e571325cba7d6dae51f68e4cee052ec4754a9",
+    "se-tax-parameters.json": "bb655b97896f66848edb548ddc2fde017750b8455150d7a0b3a66a19c2b25c56",
     "estimated-tax-due-dates.json": "b044dabe8fb8755a7f2933c90530c8095280a587f698f58f04e8d3aed54d2385",
     "standard-mileage-rates.json": "fdda097bfedeccacb16726e0cd08801034ed3f58aa0588b433f0e1f13608db20",
     "inventory-benchmarks.json": "0d3938a3bb75687d7ee54eb0b229bad1629eeb5959d45b950bcfc12bb34c8386",

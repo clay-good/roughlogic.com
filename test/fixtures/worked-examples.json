@@ -10378,7 +10378,7 @@
    "tile_id": "section-179",
    "source_publisher": "IRC sec. 179 (annual indexed limits; project bundled)",
    "source_title": "Section 179 expense election: deduction = min(cost, dollar_cap, taxable_income); phaseout above the start threshold",
-   "source_edition_or_year": "Tax year 2025: $1,250,000 dollar cap, $3,130,000 phaseout start, 40% bonus pct",
+   "source_edition_or_year": "Tax year 2025 post-OBBBA: $2,500,000 dollar cap, $4,000,000 phaseout start, 100% bonus pct",
    "source_section_or_page": "$50,000 cost / 100% business use / $200k taxable income / 2025 -> $50,000 sec-179 deduction (well under both caps), $0 remaining basis for MACRS",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
@@ -10396,7 +10396,7 @@
      }
     },
     "dollar_cap": {
-     "value": 1250000,
+     "value": 2500000,
      "tolerance": {
       "abs": 0.01
      }
@@ -10408,7 +10408,7 @@
      }
     },
     "bonus_pct": {
-     "value": 40,
+     "value": 100,
      "tolerance": {
       "abs": 0
      }

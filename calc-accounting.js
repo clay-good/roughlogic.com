@@ -40,11 +40,22 @@ const _finiteGuard = (o) => {
 // Source: IRS annual revenue procedures (Rev. Proc. for inflation-adjusted
 // items). Cite by year. To be refreshed annually each January.
 // data/accounting/section-179-limits.json
+// The One Big Beautiful Bill Act (July 2025) rewrote both halves of this table
+// for 2025 onward: it raised the IRC 179 cap to $2,500,000 with the phase-out at
+// $4,000,000, and made the IRC 168(k) bonus allowance a permanent 100% for
+// qualified property ACQUIRED after 2025-01-19 (IRS Notice 2026-11). Until
+// 2026-09-02 this table still carried the pre-OBBBA TCJA phase-down -- a 2025 cap
+// of $1,250,000 with 40% bonus -- which understated a small business's allowable
+// first-year deduction by more than half. The 2023 and 2024 rows are unaffected
+// and were re-checked as correct.
 export const SECTION_179_LIMITS = {
   2023: { cap: 1160000, phaseout_start: 2890000, bonus_pct: 80, verified_on: "2024-02-01" },
   2024: { cap: 1220000, phaseout_start: 3050000, bonus_pct: 60, verified_on: "2024-02-01" },
-  2025: { cap: 1250000, phaseout_start: 3130000, bonus_pct: 40, verified_on: "2025-02-01" },
-  2026: { cap: 1290000, phaseout_start: 3220000, bonus_pct: 20, verified_on: "2026-02-01" },
+  2025: {
+    cap: 2500000, phaseout_start: 4000000, bonus_pct: 100, verified_on: "2026-09-02",
+    bonus_note: "100% applies to qualified property acquired after 2025-01-19. Property placed in service after 2024-12-31 but before 2025-01-20 takes 40% (60% for long-production-period property and certain aircraft); enter that rate over the default.",
+  },
+  2026: { cap: 2560000, phaseout_start: 4090000, bonus_pct: 100, verified_on: "2026-09-02" },
 };
 
 // Self-employment tax parameters by year.
@@ -55,7 +66,7 @@ export const SE_TAX_PARAMETERS = {
   2023: { ss_wage_base: 160200, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 }, verified_on: "2024-02-01" },
   2024: { ss_wage_base: 168600, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 }, verified_on: "2024-02-01" },
   2025: { ss_wage_base: 176100, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 }, verified_on: "2025-02-01" },
-  2026: { ss_wage_base: 183600, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 }, verified_on: "2026-02-01" },
+  2026: { ss_wage_base: 184500, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 }, verified_on: "2026-09-02" },
 };
 
 // IRS standard mileage rate (business use) per year, cents/mile.
@@ -226,6 +237,7 @@ export function computeSection179({ cost = 0, business_use_pct = 100, taxable_in
     business_basis, dollar_cap, section_179_deduction: sec179,
     bonus_pct: bonus_rate, bonus_depreciation: bonus,
     remaining_basis_for_macrs: remaining_basis,
+    bonus_note: params.bonus_note || null,
     phaseout_overage: overage, parameters: params,
   };
 }
@@ -775,7 +787,7 @@ function renderMacrs(inputRegion, outputRegion, citationEl) {
 }
 
 function renderSection179(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IRC 179 cap and phase-out from IRS annual revenue procedures; bonus depreciation per IRC 168(k). Per-year parameters bundled.";
+  citationEl.textContent = "Citation: IRC 179 cap and phase-out from IRS annual revenue procedures (Pub 946); bonus depreciation per IRC 168(k). The One Big Beautiful Bill Act raised the 2025 cap to $2,500,000 / $4,000,000 phase-out and made bonus a permanent 100% for property acquired after 2025-01-19 (IRS Notice 2026-11); 2026 is $2,560,000 / $4,090,000. Per-year parameters bundled.";
   inputRegion.appendChild(makeNotice(TAX_LAW_NOTICE));
   const s179Term = document.createElement("span"); s179Term.textContent = "Section 179"; inputRegion.appendChild(s179Term); attachGlossaryTooltip(s179Term, "Section_179");
   const bonusTerm = document.createElement("span"); bonusTerm.textContent = "Bonus depreciation"; bonusTerm.style.marginLeft = "12px"; inputRegion.appendChild(bonusTerm); attachGlossaryTooltip(bonusTerm, "bonus_depreciation");
@@ -797,7 +809,7 @@ function renderSection179(inputRegion, outputRegion, citationEl) {
     });
     if (r.error) { s179Out.textContent = r.error; bonusOut.textContent = ""; remOut.textContent = ""; return; }
     s179Out.textContent = "$" + fmt(r.section_179_deduction, 2);
-    bonusOut.textContent = "$" + fmt(r.bonus_depreciation, 2) + " (" + r.bonus_pct + "%)";
+    bonusOut.textContent = "$" + fmt(r.bonus_depreciation, 2) + " (" + r.bonus_pct + "%)" + (r.bonus_note ? " -- " + r.bonus_note : "");
     remOut.textContent = "$" + fmt(r.remaining_basis_for_macrs, 2);
   }, DEBOUNCE_MS);
   for (const el of [cost.input, buPct.input, ti.input, yr.select]) el.addEventListener("input", update);

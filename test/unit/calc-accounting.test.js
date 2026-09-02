@@ -44,7 +44,38 @@ test("S179: small asset fully expensed under cap", () => { const r = computeSect
 test("S179: limited by taxable income", () => { const r = computeSection179({ cost: 60000, business_use_pct: 100, taxable_income: 10000, tax_year: 2025 }); assert.equal(r.section_179_deduction, 10000); });
 test("S179: phaseout reduces cap dollar-for-dollar", () => { const params = SECTION_179_LIMITS[2025]; const r = computeSection179({ cost: params.phaseout_start + 100000, business_use_pct: 100, taxable_income: 5000000, tax_year: 2025 }); assert.ok(r.dollar_cap === Math.max(0, params.cap - 100000)); });
 test("S179: business_use scales basis", () => { const r = computeSection179({ cost: 60000, business_use_pct: 50, taxable_income: 100000, tax_year: 2025 }); assert.equal(r.business_basis, 30000); });
-test("S179: bonus applies to residual after 179", () => { const r = computeSection179({ cost: 5000000, business_use_pct: 100, taxable_income: 5000000, tax_year: 2025 }); const after = r.business_basis - r.section_179_deduction; assert.ok(close(r.bonus_depreciation, after * 0.40, 1)); });
+test("S179: bonus applies to residual after 179", () => { const r = computeSection179({ cost: 5000000, business_use_pct: 100, taxable_income: 5000000, tax_year: 2025 }); const after = r.business_basis - r.section_179_deduction; assert.ok(close(r.bonus_depreciation, after * 1.00, 1)); });
+
+// The One Big Beautiful Bill Act rewrote both halves of this table from 2025.
+// The pre-OBBBA TCJA figures ($1,250,000 cap / 40% bonus for 2025) understated a
+// small business's allowable first-year deduction by more than half, so pin the
+// published numbers rather than only their relationships.
+test("S179: 2025 carries the OBBBA cap and phase-out, not the TCJA ones", () => {
+  assert.equal(SECTION_179_LIMITS[2025].cap, 2500000);
+  assert.equal(SECTION_179_LIMITS[2025].phaseout_start, 4000000);
+  assert.equal(SECTION_179_LIMITS[2025].bonus_pct, 100);
+});
+test("S179: 2026 carries the indexed cap and phase-out", () => {
+  assert.equal(SECTION_179_LIMITS[2026].cap, 2560000);
+  assert.equal(SECTION_179_LIMITS[2026].phaseout_start, 4090000);
+  assert.equal(SECTION_179_LIMITS[2026].bonus_pct, 100);
+});
+test("S179: the 2025 row carries the acquisition-window note, and it reaches the result", () => {
+  const r = computeSection179({ cost: 60000, business_use_pct: 100, taxable_income: 100000, tax_year: 2025 });
+  assert.match(r.bonus_note, /2025-01-19/);
+  assert.equal(computeSection179({ cost: 60000, business_use_pct: 100, taxable_income: 100000, tax_year: 2026 }).bonus_note, null);
+});
+test("S179: 2026 phase-out reduces the cap dollar for dollar above $4,090,000", () => {
+  const r = computeSection179({ cost: 4200000, business_use_pct: 100, taxable_income: 9000000, tax_year: 2026 });
+  assert.equal(r.phaseout_overage, 110000);
+  assert.equal(r.dollar_cap, 2450000);
+});
+// The 2023 and 2024 rows predate OBBBA and were re-checked as correct.
+test("S179: the pre-2025 TCJA rows are unchanged", () => {
+  assert.equal(SECTION_179_LIMITS[2023].bonus_pct, 80);
+  assert.equal(SECTION_179_LIMITS[2024].bonus_pct, 60);
+  assert.equal(SECTION_179_LIMITS[2024].cap, 1220000);
+});
 
 // 237 SE tax
 test("SE: example yields positive SE tax", () => { const r = computeSETax(seTaxExample.inputs); assert.ok(r.se_tax > 0); });

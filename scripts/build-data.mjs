@@ -1374,16 +1374,19 @@ const MACRS_TABLES_V5 = {
 };
 
 const SECTION_179_DATA_V5 = {
-  source: "IRS annual revenue procedures (e.g., Rev. Proc. 2023-34, 2024-40) for the inflation-adjusted Section 179 cap and phase-out threshold; TCJA bonus-depreciation phase-down per IRC 168(k).",
-  edition: "per-year",
+  source: "IRS Publication 946 and the annual revenue procedures for the Section 179 cap and phase-out threshold; IRC 168(k) bonus depreciation, permanent 100% from 2025 under the One Big Beautiful Bill Act (IRS Notice 2026-11).",
+  edition: "per-year (2025 onward reflects the OBBBA amendments, not the TCJA phase-down)",
   fetched: TODAY,
   verified_on: TODAY,
   free_access: "Free at irs.gov.",
   by_year: {
     "2023": { cap_usd: 1160000, phaseout_start_usd: 2890000, bonus_pct: 80 },
     "2024": { cap_usd: 1220000, phaseout_start_usd: 3050000, bonus_pct: 60 },
-    "2025": { cap_usd: 1250000, phaseout_start_usd: 3130000, bonus_pct: 40 },
-    "2026": { cap_usd: 1290000, phaseout_start_usd: 3220000, bonus_pct: 20 },
+    "2025": {
+      cap_usd: 2500000, phaseout_start_usd: 4000000, bonus_pct: 100,
+      bonus_note: "100% applies to qualified property acquired after 2025-01-19. Property placed in service after 2024-12-31 but before 2025-01-20 takes 40% (60% for long-production-period property and certain aircraft).",
+    },
+    "2026": { cap_usd: 2560000, phaseout_start_usd: 4090000, bonus_pct: 100 },
   },
 };
 
@@ -1397,7 +1400,7 @@ const SE_TAX_DATA_V5 = {
     "2023": { ss_wage_base_usd: 160200, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 } },
     "2024": { ss_wage_base_usd: 168600, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 } },
     "2025": { ss_wage_base_usd: 176100, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 } },
-    "2026": { ss_wage_base_usd: 183600, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 } },
+    "2026": { ss_wage_base_usd: 184500, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 } },
   },
 };
 
