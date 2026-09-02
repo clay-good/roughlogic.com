@@ -375,3 +375,42 @@ test("an unreadable unit on a unit-declaring field is still refused", () => {
   const r = queryFill("run length 40 furlongs", rows, { name: "Run" });
   assert.equal(r.filled.length_ft, undefined);
 });
+
+// labelTerms deliberately keeps a short label whole -- "AWG", "GPM", "Run" --
+// so a field named by an acronym can be filled by naming it. windowTerms then
+// dropped every query word under four characters, so the two rules never met:
+// "apr 6.5" left the rate empty on loan-payment. A short query word is admitted
+// only when it names a field on THIS tile, so the floor still drops connectives
+// everywhere else.
+test("a field named by a short word can be filled by naming it", () => {
+  const rows = [
+    num("principal", "Principal", "usd"),
+    num("apr_percent", "APR (%)", "percent"),
+  ];
+  const r = queryFill("loan principal 300000 usd apr 6.5", rows, { name: "Loan Payment" });
+  assert.equal(r.filled.principal, "300000");
+  assert.equal(r.filled.apr_percent, "6.5");
+});
+
+// A short word that names nothing on this tile is still a connective and must
+// not become a matching term.
+test("a short query word that names no field on this tile stays dropped", () => {
+  const rows = [num("length_ft", "Run length", "ft"), num("width_ft", "Width", "ft")];
+  const r = queryFill("run length 40 ft by 20 ft", rows, { name: "Deck" });
+  assert.equal(r.filled.length_ft, "40");
+});
+
+// 21 labels produced NO terms at all, which makes the field unfillable by name
+// whatever the reader types: "Bar size" is three letters plus a stopword,
+// "APR (%)" is an acronym a parenthetical unit hides from the whole-label rule.
+// A label that would contribute nothing falls back to its lead word at a
+// 3-character floor.
+test("no label is left with zero matchable terms when it has a usable word", () => {
+  assert.deepEqual([...labelTerms("Bar size")], ["bar"]);
+  assert.deepEqual([...labelTerms("APR (%)")], ["apr"]);
+  assert.deepEqual([...labelTerms("Run (in)")], ["run"]);
+  // The fallback only ever runs for a label that had nothing; a normal label is
+  // untouched and still yields its full-length terms.
+  assert.ok(labelTerms("Length one-way (ft)").has("length"));
+  assert.ok(!labelTerms("Length one-way (ft)").has("way"));
+});

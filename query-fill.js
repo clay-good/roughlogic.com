@@ -204,6 +204,19 @@ export function labelTerms(labelLead) {
     // Fold a trailing plural so "studs" in a query reaches "stud" in a label.
     if (raw.endsWith("s") && raw.length > 4) out.add(raw.slice(0, -1));
   }
+  // A label the rules above erase entirely can never be filled by name. 21 were:
+  // "Bar size" is three letters plus a stopword, and a parenthetical unit hides
+  // "APR (%)" from the whole-label escape hatch, which needs a single token.
+  // Fall back to the lead word at a 3-character floor, stopwords still applied.
+  // Runs only for a label that had no terms at all.
+  if (out.size === 0) {
+    const lead = cleaned.replace(/\([^)]*\)/g, " ");
+    for (const raw of lead.split(/[^a-z]+/)) {
+      if (raw.length < 3 || TERM_STOPWORDS.has(raw)) continue;
+      out.add(raw);
+      break;
+    }
+  }
   return out;
 }
 
@@ -263,21 +276,17 @@ function rawUnitOf(qty, text) {
   return after ? `${after[1]} ${after[2]}` : raw;
 }
 
-// A number the reader wrote bare takes the NEXT WORD OF THE SENTENCE as its
-// unit -- "asset cost 2000000 business use 100" hands back 2000000 with the
-// "unit" `business`. NON_UNIT_WORDS catches the commonest of those, but it is a
-// 25-word hand-list and English is not. When such a word reaches the refusal
-// below it looks exactly like a unit the reader wrote and we cannot read, so the
-// value is thrown away: `section-179` recovered nothing from "asset cost
-// 2000000 business use 100 taxable income 5000000" even though every field is
-// named in it.
+// A number written bare takes the NEXT WORD OF THE SENTENCE as its unit: "asset
+// cost 2000000 business use 100" hands back 2000000 with the "unit" `business`.
+// That reaches the refusal below looking exactly like a unit we cannot read, so
+// the value is thrown away -- section-179 recovered nothing from a query naming
+// every one of its fields. NON_UNIT_WORDS catches the commonest, but it is a
+// 25-word hand-list and English is not.
 //
-// The tile settles it without guessing. If the word is a term of one of this
-// tile's OWN field labels, it is a field name the reader typed, not a unit --
-// "business" belongs to "Business-use percent", "taxable" to "Taxable income".
-// Checked only AFTER canonicalUnit has failed, so a unit we can read is still a
-// unit, and the result is merely "no unit", which by the rule below never wins
-// on its own and still has to be named to be filled.
+// The tile settles it: a word that is a term of one of this tile's OWN labels is
+// a field name, not a unit ("business" from "Business-use percent"). Checked
+// only AFTER canonicalUnit fails, so a readable unit stays a unit; the result is
+// merely "no unit", which by the rule below never wins on its own.
 function isLabelWord(raw, labelWords) {
   return Boolean(raw) && labelWords instanceof Set && labelWords.has(raw);
 }
@@ -409,6 +418,14 @@ export function queryFill(query, rows, opts) {
     prevEnd = qty.end;
     if (suppressed.has(qi)) return;
     const wanted = windowTerms(window);
+    // labelTerms keeps a short label whole -- "AWG", "GPM", "Run", "APR" -- and
+    // windowTerms dropped every query word under four characters, so the two
+    // never met and "apr 6.5" left the rate empty. Admit a short window word
+    // only when it names a field on THIS tile; the floor still drops
+    // connectives everywhere else.
+    for (const raw of String(window).toLowerCase().split(/[^a-z]+/)) {
+      if (raw.length >= 2 && raw.length < 4 && labelWords.has(raw)) wanted.add(raw);
+    }
     for (const w of nameWords) wanted.delete(w);
     if (!wanted.size) return;
     const hits = [];
