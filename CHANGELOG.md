@@ -46,6 +46,9 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **The README's three screenshots re-shot.** They were taken on 2026-08-21 and today moved every one of them: the home page's example chips carry different text, and the calculator shots show field borders that were 1.14:1 against their surround this morning and are 3.7:1 now. `node scripts/capture-readme-shots.mjs` exists precisely so the answer to "are these current" is a command rather than a judgement -- run after any home or tile layout change.
+
+
 - **Three of the four example chips are back to the phrasing a tradesperson actually types.** They were lengthened this morning so that each chip showed the query it ran, rather than hiding a wordier one behind a `data-q`. That was the honest fix at the time -- the short forms did not work. They do now: the same day's Phase B2 recovers a single-letter unit typed with a space, so `ohms law 120 v, 10 a` fills both fields where it used to fill nothing, and `voltage drop 120v 150 ft 12awg 20a` fills all six.
 
   Measured before restoring, end to end in a browser: 6 of 6 fields on the voltage-drop chip, both on Ohm's Law, 5 of 5 on friction loss, and -- after the ranking fix below -- Asphalt Tonnage with its area and depth. Each chip still shows exactly the query it runs, and `search-prefill` still asserts that per chip.
