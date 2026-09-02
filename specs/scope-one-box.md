@@ -2,7 +2,10 @@
 
 > Status: **IN PROGRESS.** Eleven specs, `spec-v1337` through `spec-v1347`.
 > Adapts the shipped sophiewell.com program (`spec-v751`–`v758`) to this catalog and this
-> catalog's traffic. No tile is added, removed, or renumbered. The catalog stays **1,709**.
+> catalog's traffic. No tile is added, removed, or renumbered **by this program**. (The
+> catalog itself has grown since: **1,709 when this was written, 1,804 as of 2026-09-02**.
+> Every count below was re-measured on that date -- this is the live charter, and a live
+> charter with the counts it was born with is a charter nobody can check.)
 >
 > **Ten of eleven shipped:** v1337, v1338, v1339, v1340, v1341, v1342, v1343, v1344, v1345, v1346.
 > Only v1347 remains, and it is deliberately blocked on Search Console evidence.
@@ -33,9 +36,9 @@ aesthetic grounds, and three measured facts set hard limits on what these specs 
 
 | Measured | Consequence |
 |---|---|
-| **All 1,709 tile shells link their own group hub.** `/groups/construction/` is linked by its 466 tiles. | The hubs are not fragile. The home page's 21 links are a small share of their inbound links. |
-| **The hubs cross-link by SPA hash** — `../../#group=E`, not `/groups/electrical/`. A fragment is not a crawlable URL. | Hub-to-hub link equity does **not** flow today. Removing the home nav would leave each hub reachable only from its own tiles and the sitemap. |
-| ~~**`/tools/` is a 404**~~ — **fixed by [v1345](spec-v1345.md)**: it now lists all 1,709 by trade, links all 21 hubs as real URLs, and is reachable from every page's footer. | The free, zero-risk addition is banked. Subtraction ([v1347](spec-v1347.md)) now has something to wait on. |
+| **All 1,804 tile shells link their own group hub** (re-measured 2026-09-02; 0 exceptions). `/groups/construction/` is linked by its 479 tiles. | The hubs are not fragile. The home page's 21 links are a small share of their inbound links. |
+| ~~**The hubs cross-link by SPA hash**~~ -- **fixed 2026-08-31 (`d5633af9`)**: every hub now carries an "Other trades" section listing the other 20 as real `/groups/<slug>/` URLs with their live counts, and `check-shells` fails a hub that drops a sibling. A second fragment link, the hubs' "Open the live group view" call to action, pointed at a route the SPA no longer has and was replaced on 2026-09-02 (`052c6fdf`). **No `#group=` link remains on the site.** | Hub-to-hub link equity now flows. This was one of the two facts gating v1347; it no longer holds, so the case against removing the home nav rests on the remaining one. |
+| ~~**`/tools/` is a 404**~~ — **fixed by [v1345](spec-v1345.md)**: it now lists all 1,804 by trade, links all 21 hubs as real URLs, and is reachable from every page's footer. | The free, zero-risk addition is banked. Subtraction ([v1347](spec-v1347.md)) now has something to wait on. |
 
 **So the nav change is split in two, and the risky half is gated on evidence.** v1345 adds
 `/tools/` and the footer badge — pure addition, nothing removed, no URL changed. v1337 simplifies
@@ -51,10 +54,10 @@ server. Measured across the whole catalog:
 
 | | |
 |---|---|
-| Tiles reachable in the search dropdown by their own name | **1,709 / 1,709** (1,704 rank first) |
-| Tiles runnable through the MCP server | **1,709 / 1,709** |
-| Tiles with a publisher-verified worked example | **1,709 / 1,709** |
-| Tiles whose inputs the field index describes (v1339) | **1,739** (1,331 at v1339; the schema-less tiles were added 2026-08-28 from the captions they already print) |
+| Tiles reachable in the search dropdown by their own name | **1,804 / 1,804** (1,801 rank first) |
+| Tiles runnable through the MCP server | **1,804 / 1,804** |
+| Tiles with a publisher-verified worked example | **1,804 / 1,804** |
+| Tiles whose inputs the field index describes (v1339) | **1,763 of 1,804** (1,331 at v1339; the schema-less tiles were added 2026-08-28 from the captions they already print; the 41 skipped carry only list-valued or unlabelled inputs) |
 
 Both doors are at 100% **today, by luck rather than by construction** — no gate asserts either
 one. A renamed export, a tile added without a `COMPUTE_MAP` row, or a name that collides its way
@@ -102,7 +105,7 @@ Every spec in this program is held to all four. [v1346](spec-v1346.md) and the e
    shorter copy *and* one less way for the site to drift. (sophiewell retired its equivalent
    surface; we do not need to.)
 4. **Every hub stays reachable without JavaScript.** Today that is the home nav. After v1345 it is
-   the footer badge → `/tools/`, a pre-rendered page — and that path reaches all 1,709 tiles,
+   the footer badge → `/tools/`, a pre-rendered page — and that path reaches all 1,804 tiles,
    where the nav reached 21 hubs.
 
 ## What we already had that sophiewell had to build
@@ -139,7 +142,7 @@ v1346 keeps them reachable and runnable.
   anyone typed. Given that a large share of the 20k/mo appears to be agents, this matters more
   here than it did on sophiewell: agent traffic is exactly the kind that makes query logging look
   cheap and useful.
-- **Not a catalog change.** 1,709 before, 1,709 after. No compute is touched.
+- **Not a catalog change.** The program adds and removes no tile: 1,709 before it and 1,709 after it, and the growth to 1,804 since is the trade-expansion work, not this. No compute is touched.
 - **Not a palette change.**
 
 ## The safety rule that governs all eleven
