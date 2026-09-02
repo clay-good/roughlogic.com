@@ -405,6 +405,7 @@ The principle from spec.md section 5 governs every entry: the data is either pub
 
 - Source: U.S. General Services Administration per-diem rates (public domain).
 - **Per-state, which is not how GSA publishes.** GSA sets per-diem by locality (county or city): one standard CONUS rate plus several hundred non-standard localities set above it. The bundled values approximate standard CONUS, raised where a state is broadly above it. A traveller to a non-standard locality is owed more than this tile shows, so the tile carries a limitation banner and its citation points at the GSA lookup.
+- **M&IE tiers are GSA's published values; the tier a state sits in is the approximation.** FY2026 tiers are $68 / $74 / $80 / $86 / $92 with standard CONUS at $110 lodging / $68 M&IE. The shard carried the FY2023 tiers ($64 / $69 / $74 / $79 / $84) until 2026-09-02 while stamped as the FY2026 cycle, which ran every reader $4 to $8 a day low.
 - License: U.S. government publication, public domain.
 - Cadence: Annual update (federal fiscal year).
 - Shard layout: Object keyed by state (50 + DC) with lodging and m_and_ie rates.

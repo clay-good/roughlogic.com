@@ -24,7 +24,7 @@
     {
       "file": "gsa-perdiem.json",
       "name": "GSA per-diem rates",
-      "gzip_size_bytes": 559
+      "gzip_size_bytes": 744
     },
     {
       "file": "niosh-coupling.json",
@@ -51,7 +51,7 @@
     "unit-conversions.json": "9a30ff3dd2f47b0d62f28cf4bc72363741156cb82f2f19a16289d59afaabf5b1",
     "state-tax-rates.json": "a3fb6b64b08325c4be715ac4b6c014bb326d3881a06913cec47724b0011664bb",
     "irs-mileage.json": "c383b0739291d724c2ea679fe63d5fad2e5593a4a0c3216574d1fb761323c435",
-    "gsa-perdiem.json": "a7578ff49317d32fda4779b32d5776e0c612513344d59d1af13725b374a06976",
+    "gsa-perdiem.json": "6563b50936dee4721959751e76c7c024d6a43450296b8201fe867e37afbb6ce9",
     "niosh-coupling.json": "ceb2d1f4928d6c077f568fcff517b7c561899e932e93f9aad23d6097547f2cc5",
     "heat-cold-stress.json": "b869cc9f7ecbeeaaca5f30cdab7d24cbb5e88f0d5b70564585089398dc2a2243",
     "osha-trench.json": "48a2a605c8b94cba381b5df1280eef6ecf643eef16d6a0055ac84192b6a01f2b",

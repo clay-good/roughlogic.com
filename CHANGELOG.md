@@ -149,6 +149,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The per-diem M&IE figures were the FY2023 tiers, in a shard stamped FY2026.** GSA's M&IE allowance moves with the fiscal year. The bundled table used **$64 / $69 / $74 / $79 / $84** -- the FY2023 tier set -- while the shard, the citation and the manifest all said FY2026. The published FY2026 tiers are **$68 / $74 / $80 / $86 / $92**, with standard CONUS at $110 lodging / $68 M&IE (unchanged from FY2025, per the GSA August 2025 release). Every reader was **$4/day low at the standard tier and $8/day low at the top** -- a week's travel off by up to $56, on top of the locality gap disclosed earlier today.
+
+  The tier values are remapped by rank, which is the honest split: **which tier a state sits in is the project's approximation and did not change; what a tier is worth is GSA's published number and did.** The lodging column is unchanged -- standard CONUS is still $110, and the above-standard values are per-state approximations GSA does not publish in that shape.
+
+  Two tests pin it: every bundled M&IE figure must be one of the five published FY2026 tiers with standard CONUS at $110/$68, and the shipped shard must agree with the module table state by state -- the same two-homes-for-one-number problem the IRS mileage rate had this morning.
+
 - **The sales-tax table is each state's base rate; three surfaces called it the combined state-and-local rate.** `sales-tax` bundles the statewide rate published by each revenue department -- Louisiana 4.45%, Alabama 4%, Texas 6.25%. The module comment, the tile's citation line and the shard's own note all described them as *"average combined state and local rates"*. Louisiana's combined average is near **9.5%**: a job invoiced off that table, by a reader told local tax was already in it, under-collects by more than half.
 
   The citation entry had it right all along (`Tax = subtotal × state_rate`), which is what made the disagreement findable. Every surface now says statewide base rate, says local districts add on top, and points at the override field that already existed for exactly this. No rate changed.

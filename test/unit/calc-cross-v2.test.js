@@ -259,14 +259,14 @@ test("Overtime: 80 hr breakdown", () => {
 
 // --- Utility 109: Per-Diem ---
 
-test("Per-diem: example (TX m_and_ie) $69", () => {
+test("Per-diem: example (TX m_and_ie) is the FY2026 second tier, $74", () => {
   const r = computePerDiem(perDiemExample.inputs);
-  assert.equal(r.rate_dollars, 69);
+  assert.equal(r.rate_dollars, 74);
 });
 
-test("Per-diem: DC m_and_ie $79", () => {
+test("Per-diem: DC m_and_ie is the FY2026 fourth tier, $86", () => {
   const r = computePerDiem({ state: "DC", type: "m_and_ie" });
-  assert.equal(r.rate_dollars, 79);
+  assert.equal(r.rate_dollars, 86);
 });
 
 test("Per-diem: unknown state returns error", () => {
@@ -566,4 +566,28 @@ test("Sales tax: the bundled rates are the statewide base, not a combined averag
   assert.equal(STATE_TAX_RATES.CA, 7.25);
   // Every no-sales-tax state is exactly zero; a combined average would not be.
   for (const s of ["AK", "DE", "MT", "NH", "OR"]) assert.equal(STATE_TAX_RATES[s], 0);
+});
+
+// GSA's M&IE tiers move with the fiscal year. The bundled table carried the
+// FY2023 tiers ($64 / $69 / $74 / $79 / $84) until 2026-09-02, four dollars a
+// day low at the standard tier and eight low at the top -- with the shard
+// stamped as the FY2026 cycle the whole time. Pin the published tier set and the
+// standard CONUS pair; which tier a state sits in stays the approximation the
+// citation says it is.
+test("Per diem: the bundled M&IE figures are the published FY2026 tiers", () => {
+  const tiers = new Set([68, 74, 80, 86, 92]);
+  for (const [state, r] of Object.entries(GSA_PERDIEM_RATES)) {
+    assert.ok(tiers.has(r.m_and_ie), state + " M&IE " + r.m_and_ie + " is not an FY2026 tier");
+  }
+  // Standard CONUS: $110 lodging / $68 M&IE. Alabama sits at the standard tier.
+  assert.deepEqual(GSA_PERDIEM_RATES.AL, { lodging: 110, m_and_ie: 68 });
+});
+
+test("Per diem: the shipped shard agrees with the module table", () => {
+  const shard = JSON.parse(
+    readFileSync(new URL("../../data/crosswalks/gsa-perdiem.json", import.meta.url), "utf8"),
+  );
+  for (const [state, r] of Object.entries(GSA_PERDIEM_RATES)) {
+    assert.deepEqual(shard.rates_by_state[state], r, state);
+  }
 });

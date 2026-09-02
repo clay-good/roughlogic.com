@@ -6824,7 +6824,8 @@ test("bounds: calc-cross computePerDiem returns GSA lodging / M&IE rate lookup o
   assert.strictEqual(r.rate_dollars, 257);
   assert.strictEqual(r.state, "DC");
   const mie = computePerDiem({ state: "DC", type: "m_and_ie" });
-  assert.strictEqual(mie.rate_dollars, 79);
+  // FY2026 M&IE tiers are 68 / 74 / 80 / 86 / 92; DC sits at the fourth.
+  assert.strictEqual(mie.rate_dollars, 86);
   // Rejections.
   assert.ok("error" in computePerDiem({ state: "XX", type: "lodging" }));
   assert.ok("error" in computePerDiem({ state: "DC", type: "wrong" }));

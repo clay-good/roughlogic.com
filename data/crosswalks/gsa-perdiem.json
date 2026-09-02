@@ -1,210 +1,210 @@
 {
-  "source": "U.S. General Services Administration per-diem rates (public domain). Bundled values approximate the standard CONUS rate where state-level values are not specifically published.",
+  "source": "U.S. General Services Administration per-diem rates (public domain). GSA publishes per-diem by LOCALITY, not by state: these per-state values approximate the FY2026 standard CONUS rate ($110 lodging / $68 M&IE), raised where a state is broadly above it. M&IE figures are the published FY2026 tier values ($68 / $74 / $80 / $86 / $92); which tier a state sits in is the approximation.",
   "rates_by_state": {
     "AL": {
       "lodging": 110,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "AK": {
       "lodging": 188,
-      "m_and_ie": 79
+      "m_and_ie": 86
     },
     "AZ": {
       "lodging": 124,
-      "m_and_ie": 69
+      "m_and_ie": 74
     },
     "AR": {
       "lodging": 110,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "CA": {
       "lodging": 168,
-      "m_and_ie": 74
+      "m_and_ie": 80
     },
     "CO": {
       "lodging": 142,
-      "m_and_ie": 69
+      "m_and_ie": 74
     },
     "CT": {
       "lodging": 142,
-      "m_and_ie": 69
+      "m_and_ie": 74
     },
     "DC": {
       "lodging": 257,
-      "m_and_ie": 79
+      "m_and_ie": 86
     },
     "DE": {
       "lodging": 124,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "FL": {
       "lodging": 134,
-      "m_and_ie": 69
+      "m_and_ie": 74
     },
     "GA": {
       "lodging": 124,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "HI": {
       "lodging": 215,
-      "m_and_ie": 84
+      "m_and_ie": 92
     },
     "ID": {
       "lodging": 110,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "IL": {
       "lodging": 158,
-      "m_and_ie": 74
+      "m_and_ie": 80
     },
     "IN": {
       "lodging": 110,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "IA": {
       "lodging": 110,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "KS": {
       "lodging": 110,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "KY": {
       "lodging": 110,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "LA": {
       "lodging": 124,
-      "m_and_ie": 69
+      "m_and_ie": 74
     },
     "ME": {
       "lodging": 134,
-      "m_and_ie": 69
+      "m_and_ie": 74
     },
     "MD": {
       "lodging": 158,
-      "m_and_ie": 74
+      "m_and_ie": 80
     },
     "MA": {
       "lodging": 188,
-      "m_and_ie": 79
+      "m_and_ie": 86
     },
     "MI": {
       "lodging": 124,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "MN": {
       "lodging": 134,
-      "m_and_ie": 69
+      "m_and_ie": 74
     },
     "MS": {
       "lodging": 110,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "MO": {
       "lodging": 110,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "MT": {
       "lodging": 110,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "NE": {
       "lodging": 110,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "NV": {
       "lodging": 142,
-      "m_and_ie": 69
+      "m_and_ie": 74
     },
     "NH": {
       "lodging": 134,
-      "m_and_ie": 69
+      "m_and_ie": 74
     },
     "NJ": {
       "lodging": 158,
-      "m_and_ie": 74
+      "m_and_ie": 80
     },
     "NM": {
       "lodging": 110,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "NY": {
       "lodging": 215,
-      "m_and_ie": 79
+      "m_and_ie": 86
     },
     "NC": {
       "lodging": 124,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "ND": {
       "lodging": 110,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "OH": {
       "lodging": 124,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "OK": {
       "lodging": 110,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "OR": {
       "lodging": 142,
-      "m_and_ie": 74
+      "m_and_ie": 80
     },
     "PA": {
       "lodging": 142,
-      "m_and_ie": 69
+      "m_and_ie": 74
     },
     "RI": {
       "lodging": 158,
-      "m_and_ie": 74
+      "m_and_ie": 80
     },
     "SC": {
       "lodging": 124,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "SD": {
       "lodging": 110,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "TN": {
       "lodging": 124,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "TX": {
       "lodging": 134,
-      "m_and_ie": 69
+      "m_and_ie": 74
     },
     "UT": {
       "lodging": 110,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "VT": {
       "lodging": 134,
-      "m_and_ie": 69
+      "m_and_ie": 74
     },
     "VA": {
       "lodging": 142,
-      "m_and_ie": 69
+      "m_and_ie": 74
     },
     "WA": {
       "lodging": 158,
-      "m_and_ie": 74
+      "m_and_ie": 80
     },
     "WV": {
       "lodging": 110,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "WI": {
       "lodging": 110,
-      "m_and_ie": 64
+      "m_and_ie": 68
     },
     "WY": {
       "lodging": 110,
-      "m_and_ie": 64
+      "m_and_ie": 68
     }
   },
-  "notes": "Bundled rates approximate published GSA values. Verify for the current fiscal year."
+  "notes": "Approximations of published GSA values, not locality rates. The M&IE tiers were the FY2023 set ($64 / $69 / $74 / $79 / $84) until 2026-09-02 and are now the FY2026 tiers. Look up the destination at gsa.gov before filing."
 }

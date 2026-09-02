@@ -6535,7 +6535,7 @@ export const CITATIONS = {
   },
   "per-diem": {
     formula: "Lodging + M&IE looked up by state. GSA publishes per-diem by LOCALITY (county or city), not by state: there is one standard CONUS rate plus several hundred non-standard localities set above it. The bundled per-state values approximate standard CONUS, raised where a state is broadly above it (DC, NY, MA, HI and similar).",
-    edition: "GSA Federal Travel Regulation per-diem rates, FY2026 (effective 2025-10-01).",
+    edition: "GSA Federal Travel Regulation per-diem rates, FY2026 (effective 2025-10-01). M&IE figures are the published FY2026 tier values ($68 / $74 / $80 / $86 / $92); the standard CONUS rate is $110 lodging / $68 M&IE.",
     freeAccess: "Free at gsa.gov/travel/plan-book/per-diem-rates.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (GSA rates; annual update each fiscal year). Named by fiscal year rather than \"current fiscal year\": FY2026 ends 2026-09-30, and a page that calls a fixed table \"current\" is wrong from the day after without changing a character.",

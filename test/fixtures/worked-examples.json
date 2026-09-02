@@ -8642,8 +8642,8 @@
    "tile_id": "per-diem",
    "source_publisher": "U.S. General Services Administration (GSA)",
    "source_title": "FY GSA CONUS per-diem rates (lodging and M&IE) by state",
-   "source_edition_or_year": "GSA CONUS per-diem schedule (state-default rows; locality rates may exceed)",
-   "source_section_or_page": "TX state-default M&IE -> $69/day; table lookup, exercises the string-equality path is not used here (rate is numeric)",
+   "source_edition_or_year": "GSA FY2026 CONUS per-diem schedule (state-default rows; locality rates may exceed)",
+   "source_section_or_page": "TX state-default M&IE -> $74/day (FY2026 second tier); table lookup, exercises the string-equality path is not used here (rate is numeric)",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -8652,7 +8652,7 @@
    },
    "outputs": {
     "rate_dollars": {
-     "value": 69,
+     "value": 74,
      "tolerance": {
       "abs": 0
      }
