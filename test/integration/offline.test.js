@@ -28,6 +28,7 @@
 // with this harness and no test here claims it. What is claimed below is the
 // warm path, which is what "works offline after the first load" promises.
 import { test, expect } from "@playwright/test";
+import { readFileSync } from "node:fs";
 
 async function installWorker(page) {
   await page.goto("/");
@@ -93,10 +94,20 @@ test("offline: a calculator backed by a data shard still computes", async ({ pag
   // page through the runtime DATA_CACHE rather than the precache, and if it
   // failed to arrive the compute falls back to the bundled baseline instead of
   // erroring. That fallback publishes ceiling_high_cost_one_unit_usd, which is
-  // 1,209,750 -- the SAME number as the San Francisco row. Asserting the
-  // dollars alone would pass with the shard entirely absent. The county lookup
-  // ("San Francisco (CA, FIPS 06075)") exists only in the shard's
-  // high_cost_counties_one_unit table, so it is what actually pins this.
+  // the SAME number as the San Francisco row. Asserting the dollars alone would
+  // pass with the shard entirely absent. The county lookup ("San Francisco (CA,
+  // FIPS 06075)") exists only in the shard's high_cost_counties_one_unit table,
+  // so it is what actually pins this.
+  //
+  // The ceiling itself is read from the shard rather than written here as a
+  // literal. It used to be the literal 1,209,750, and this spec went red in CI
+  // on the 2026 FHFA/HUD refresh -- a test failing because a bundled federal
+  // figure was brought up to date is a test asserting the wrong thing.
+  const shard = JSON.parse(
+    readFileSync(new URL("../../data/realestate/loan-limits.json", import.meta.url), "utf8"),
+  );
+  const ceilingText = shard.baseline.ceiling_high_cost_one_unit_usd.toLocaleString("en-US");
+
   await installWorker(page);
   await page.goto("/#loan-limits");
   await expect(page.locator("#view-region h1")).toBeVisible();
@@ -113,7 +124,7 @@ test("offline: a calculator backed by a data shard still computes", async ({ pag
     // The shard's own content, not just a rendered shell: this county and this
     // limit come out of data/realestate/loan-limits.json.
     await expect(out).toContainText(/San Francisco \(CA, FIPS 06075\)/, { timeout: 15000 });
-    await expect(out).toContainText(/1,209,750/);
+    await expect(out).toContainText(ceilingText);
     await expect(out).not.toContainText(/NaN|Infinity|undefined/);
     // A failed manifest fetch must not be reported to the reader as tampering.
     await expect(page.locator("#integrity-banner")).toHaveCount(0);

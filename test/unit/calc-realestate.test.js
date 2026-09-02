@@ -546,7 +546,7 @@ test("all thirteen Group X renderers exposed in REALESTATE_RENDERERS after X.12"
 
 // --- X.8 FHA / VA / conforming loan limits ---
 
-test("computeLoanLimits: San Francisco by name returns high-cost ceiling $1,209,750", () => {
+test("computeLoanLimits: San Francisco by name returns the high-cost ceiling", () => {
   const r = computeLoanLimits({ ...loanLimitsExample.inputs, shard: LOAN_LIMITS_SHARD });
   assert.equal(r.kind, "high_cost");
   assert.equal(r.conforming_one_unit_usd, 1249125);
