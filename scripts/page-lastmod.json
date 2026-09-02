@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "94af7a3f1655b4f7",
+      "sha": "e29d01e7cd04472f",
       "date": "2026-09-02"
     },
     "/tools/": {
@@ -1238,16 +1238,16 @@
       "date": "2026-09-01"
     },
     "/tools/concrete-anchor-pullout/": {
-      "sha": "e2ed11b9c0935de9",
-      "date": "2026-09-01"
+      "sha": "39e1d3d2fa7a8e1a",
+      "date": "2026-09-02"
     },
     "/tools/concrete-anchor-shear-breakout/": {
       "sha": "cd6b079c520c06ce",
       "date": "2026-09-01"
     },
     "/tools/concrete-anchor-steel-strength/": {
-      "sha": "66c38abdf9470266",
-      "date": "2026-09-01"
+      "sha": "e648e746b0e72e2e",
+      "date": "2026-09-02"
     },
     "/tools/concrete-beam-min-flexural-steel/": {
       "sha": "8dca74dc01f457fb",
@@ -1266,8 +1266,8 @@
       "date": "2026-09-01"
     },
     "/tools/concrete-cracked-inertia-doubly/": {
-      "sha": "77daf607b4c5833f",
-      "date": "2026-09-01"
+      "sha": "325dad42900a52e9",
+      "date": "2026-09-02"
     },
     "/tools/concrete-cracked-inertia-tee/": {
       "sha": "037dab55fa5d6bc9",
@@ -1330,8 +1330,8 @@
       "date": "2026-09-01"
     },
     "/tools/concrete-shrinkage-temperature-steel/": {
-      "sha": "c3ede53121c962b4",
-      "date": "2026-09-01"
+      "sha": "da25d393702e887a",
+      "date": "2026-09-02"
     },
     "/tools/concrete-stair-volume/": {
       "sha": "bea17ce4e1729745",
@@ -2454,8 +2454,8 @@
       "date": "2026-09-01"
     },
     "/tools/fire-pump-curve/": {
-      "sha": "3e06667b3906a623",
-      "date": "2026-09-01"
+      "sha": "ffd802fce01eab15",
+      "date": "2026-09-02"
     },
     "/tools/fire-stream-reaction/": {
       "sha": "3821961674f230ed",
@@ -3694,8 +3694,8 @@
       "date": "2026-09-01"
     },
     "/tools/masonry-anchor-shear/": {
-      "sha": "11261e1d6bd82275",
-      "date": "2026-09-01"
+      "sha": "d98575c5101480ab",
+      "date": "2026-09-02"
     },
     "/tools/masonry-control-joint-layout/": {
       "sha": "20bc05e53ef2f309",
@@ -3842,8 +3842,8 @@
       "date": "2026-09-01"
     },
     "/tools/minimum-roof-snow/": {
-      "sha": "350741f468a6a174",
-      "date": "2026-09-01"
+      "sha": "7d0af3d758610e34",
+      "date": "2026-09-02"
     },
     "/tools/mired-gel-shift/": {
       "sha": "401ce11f8d178554",
@@ -4102,8 +4102,8 @@
       "date": "2026-09-01"
     },
     "/tools/one-way-anova/": {
-      "sha": "a4097404ec82299a",
-      "date": "2026-09-01"
+      "sha": "be701152d16b3d4a",
+      "date": "2026-09-02"
     },
     "/tools/open-delta-transformer/": {
       "sha": "4b22a0cc102c551b",
@@ -5306,8 +5306,8 @@
       "date": "2026-09-01"
     },
     "/tools/scaffold-guardrail-check/": {
-      "sha": "b5a697d66b91e280",
-      "date": "2026-09-01"
+      "sha": "b7322038bbb3fa34",
+      "date": "2026-09-02"
     },
     "/tools/scaffold-leg-load/": {
       "sha": "5faf4d122117758b",
@@ -5318,8 +5318,8 @@
       "date": "2026-09-01"
     },
     "/tools/scaffold-platform-check/": {
-      "sha": "251af94213665fdb",
-      "date": "2026-09-01"
+      "sha": "5ce7e1be6ef11528",
+      "date": "2026-09-02"
     },
     "/tools/scaffold-takeoff/": {
       "sha": "43a602f8639af2f4",
@@ -5402,8 +5402,8 @@
       "date": "2026-09-01"
     },
     "/tools/seismic-approximate-period/": {
-      "sha": "808c2a940dc12f43",
-      "date": "2026-09-01"
+      "sha": "2364cc4a08152f87",
+      "date": "2026-09-02"
     },
     "/tools/seismic-base-shear/": {
       "sha": "3ce89cd5e889d7d2",
@@ -5434,8 +5434,8 @@
       "date": "2026-09-01"
     },
     "/tools/seismic-vertical-distribution/": {
-      "sha": "647b6e189d1998e5",
-      "date": "2026-09-01"
+      "sha": "1696e2413ad9c087",
+      "date": "2026-09-02"
     },
     "/tools/selective-coordination-screen/": {
       "sha": "b7941ccfc21a5116",
@@ -6066,8 +6066,8 @@
       "date": "2026-09-01"
     },
     "/tools/standpipe-pdp/": {
-      "sha": "a342056d7f4f0088",
-      "date": "2026-09-01"
+      "sha": "046bda02cdfad0c4",
+      "date": "2026-09-02"
     },
     "/tools/static-pressure-hvac/": {
       "sha": "8d0a2bb152768920",
@@ -6166,8 +6166,8 @@
       "date": "2026-09-01"
     },
     "/tools/steel-effective-length-k/": {
-      "sha": "6995dd0b87dafc0d",
-      "date": "2026-09-01"
+      "sha": "a1667a2c2a984f97",
+      "date": "2026-09-02"
     },
     "/tools/steel-fillet-weld-size/": {
       "sha": "921cbd9cab5ec7ae",
@@ -6194,8 +6194,8 @@
       "date": "2026-09-01"
     },
     "/tools/steel-tau-b-stiffness-reduction/": {
-      "sha": "5c1bf15352309b69",
-      "date": "2026-09-01"
+      "sha": "b1a46c0558222ef7",
+      "date": "2026-09-02"
     },
     "/tools/steel-tension-member/": {
       "sha": "377d91df9647880d",
@@ -7146,8 +7146,8 @@
       "date": "2026-09-01"
     },
     "/tools/wind-gust-effect-factor/": {
-      "sha": "e8fb34b6753340ff",
-      "date": "2026-09-01"
+      "sha": "1b8810ca8eaa1724",
+      "date": "2026-09-02"
     },
     "/tools/wind-mwfrs-pressure/": {
       "sha": "c661834d7cafc9df",
@@ -7170,8 +7170,8 @@
       "date": "2026-09-01"
     },
     "/tools/wind-velocity-pressure-exposure-coefficient/": {
-      "sha": "9a90e48c8a02a8bf",
-      "date": "2026-09-01"
+      "sha": "3177077d3dd209a7",
+      "date": "2026-09-02"
     },
     "/tools/window-film-shgc/": {
       "sha": "ead22fbbad5e5782",

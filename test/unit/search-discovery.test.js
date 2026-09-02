@@ -282,6 +282,27 @@ test("extractQuantities: glued, spaced, fraction, comma, unitless", () => {
   assert.deepEqual(extractQuantities(null), []);
 });
 
+// A pure number inside a tile NAME is part of an identifier, not a word anyone
+// searches for. `R310.2.3` in "Egress Window Well (IRC R310.2.3)" tokenizes to
+// r310, 2, 3 -- and the bare 3 matched a reader's "3 in deep", which is how
+// `asphalt 2400 sq ft, 3 in deep` ranked the window well above Asphalt
+// Tonnage on the site's own example query. Digit-led query tokens were already
+// barred from COVERAGE for exactly this reason; they still added SCORE, and
+// score decides once coverage ties.
+//
+// The same filter has always applied to alias tokens, with the same comment
+// beside it ("pure-number alias tokens are illustrative, not identifying").
+// This extends it to the name, where the evidence is weaker still.
+test("a pure number in a tile name does not rank it", () => {
+  const tools = [
+    { id: "asphalt-tonnage", name: "Asphalt Tonnage", trades: ["construction"], desc: "Tons of mix and truck loads." },
+    { id: "egress-window-well", name: "Egress Window Well (IRC R310.2.3)", trades: ["construction"], desc: "The window well an egress window opens into; 9 sq ft of horizontal area, deep enough for a ladder." },
+  ];
+  const { tokens } = normalizeQuery("asphalt 2400 sq ft, 3 in deep");
+  const ranked = rankTools(tokens, tools, [], { limit: 2 });
+  assert.equal(ranked[0].tool.id, "asphalt-tonnage", JSON.stringify(ranked.map((r) => r.tool.id + ":" + r.score)));
+});
+
 test("extractQuantities: a dimension pair maps nothing", () => {
   const got = extractQuantities("10x12 shed");
   assert.ok(got.every((qty) => qty.unit === null || qty.unit === "shed"));

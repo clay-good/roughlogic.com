@@ -48,7 +48,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 - **Three of the four example chips are back to the phrasing a tradesperson actually types.** They were lengthened this morning so that each chip showed the query it ran, rather than hiding a wordier one behind a `data-q`. That was the honest fix at the time -- the short forms did not work. They do now: the same day's Phase B2 recovers a single-letter unit typed with a space, so `ohms law 120 v, 10 a` fills both fields where it used to fill nothing, and `voltage drop 120v 150 ft 12awg 20a` fills all six.
 
-  Measured before restoring, end to end in a browser: 6 of 6 fields on the voltage-drop chip, both on Ohm's Law, 5 of 5 on friction loss. **The asphalt chip keeps its longer form** -- its short one ranks Egress Window Well first, which is a ranking gap rather than a labelling one, and a chip that teaches a query the site answers *wrongly* is worse than a wordy chip. Each chip still shows exactly the query it runs, and `search-prefill` still asserts that per chip.
+  Measured before restoring, end to end in a browser: 6 of 6 fields on the voltage-drop chip, both on Ohm's Law, 5 of 5 on friction loss, and -- after the ranking fix below -- Asphalt Tonnage with its area and depth. Each chip still shows exactly the query it runs, and `search-prefill` still asserts that per chip.
+
+- **A section number inside a tile's name was ranking it.** `asphalt 2400 sq ft, 3 in deep` returned **Egress Window Well (IRC R310.2.3)** above Asphalt Tonnage, and the reason is the bare **`3`**: that name tokenizes to `r310, 2, 3`, and the reader's "3 in deep" matched the tail of a code citation. Isolated by removing one token at a time -- drop the `3` and Asphalt Tonnage wins; put it back and it loses.
+
+  Digit-led *query* tokens were already barred from **coverage** for exactly this reason, but they still added **score**, and score decides once coverage ties. A pure number inside a tile **name** is part of an identifier, not a word anyone searches for -- which is what the corpus builder has always said about *alias* tokens, in a comment sitting four lines away: "pure-number alias tokens are illustrative, not identifying; left in the corpus they let any coincidental number in a query outrank the true target." The name gets the same filter.
+
+  **The ranking harness does not move at all**: aliases 20,968 / 21,025 (99.73%), names 1,801 / 1,804, ids 1,801 / 1,804, 63 misses -- identical to the baseline. 1,500 sampled curated alias terms still reach their targets with the same single pre-existing exception; `check-both-doors`, `door-parity` and all 36 search specs pass; `240.21`, `62.2`, `130.5` and `12/2` are unchanged.
 
   The home page's own rotating placeholder has been teaching the terse form (`volt drop 12awg 150ft`) the whole time; the chips now agree with it.
 

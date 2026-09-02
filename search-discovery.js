@@ -360,7 +360,7 @@ function corpusFor(tool, aliases, aliasEntry) {
     c = {
       aliasesRef: aliases,
       aliasLen,
-      name: tokenize(tool.name, true),
+      name: tokenize(tool.name, true).filter((t) => !/^\d+(\.\d+)?$/.test(t)),
       id: tokenize(tool.id.replace(/-/g, " "), true),
       // Pure-number alias tokens are illustrative ("wire for 100 amp
       // subpanel 150 feet away"), not identifying: left in the corpus
