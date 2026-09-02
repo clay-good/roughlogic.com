@@ -46,6 +46,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Three of the four example chips are back to the phrasing a tradesperson actually types.** They were lengthened this morning so that each chip showed the query it ran, rather than hiding a wordier one behind a `data-q`. That was the honest fix at the time -- the short forms did not work. They do now: the same day's Phase B2 recovers a single-letter unit typed with a space, so `ohms law 120 v, 10 a` fills both fields where it used to fill nothing, and `voltage drop 120v 150 ft 12awg 20a` fills all six.
+
+  Measured before restoring, end to end in a browser: 6 of 6 fields on the voltage-drop chip, both on Ohm's Law, 5 of 5 on friction loss. **The asphalt chip keeps its longer form** -- its short one ranks Egress Window Well first, which is a ranking gap rather than a labelling one, and a chip that teaches a query the site answers *wrongly* is worse than a wordy chip. Each chip still shows exactly the query it runs, and `search-prefill` still asserts that per chip.
+
+  The home page's own rotating placeholder has been teaching the terse form (`volt drop 12awg 150ft`) the whole time; the chips now agree with it.
+
+
 - **The CI partition figures, re-counted.** The workflow's comment explaining why the two Playwright jobs no longer both run the axe sweep carried `1,875 + 1,972 = 3,847 as of 2026-08-31`; today's five new specs moved it to **1,887 + 1,999 = 3,886**. `check-ci-claims` pins the README's axe figure within 5% and calls the workflow totals prose, which is why they drifted quietly -- so they are re-counted with `playwright --list` and re-dated rather than left to age another week.
 
 
