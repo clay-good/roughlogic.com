@@ -1743,6 +1743,13 @@ const PROSE_LINT_THRESHOLD = 140;
 // Keys whose values are intentionally narrative (original plain-English
 // summaries, attribution / source / notes lines) and therefore exempt from
 // the prose-length cap. Keep this list small; the default is to lint.
+// Folders knowingly past the refresh_cadence they declare. check-manifests warns
+// from one cadence period and fails at four unless the manifest says why, so a
+// row here is a promise being kept honestly rather than quietly broken.
+const STALENESS_NOTES = {
+  legal: "Every post-Wayfair nexus threshold carries verified_on 2025-01-15 against a quarterly recheck cadence -- 20 months as of 2026-09-02. States change these by legislation, not on a calendar, so re-verification is 47 per-state lookups against each department of revenue and is maintainer work, not a build step. The tile already prints each row's citation and verified_on date and tells the reader to confirm with the state before filing. Recheck oldest-first; drop this note when the stamps are current.",
+};
+
 const PROSE_LINT_EXEMPT_KEYS = new Set([
   "source", "license", "notes", "attribution", "summary", "description",
   "edition",
@@ -1847,6 +1854,10 @@ async function buildAll() {
       shards: [],
       hashes: {},
     };
+    // An honest acknowledgement that a folder is past its own declared cadence,
+    // in a file a reviewer sees in a diff rather than in a warning nobody reads.
+    // check-manifests fails a folder four rechecks late unless this is present.
+    if (STALENESS_NOTES[ds.folder]) manifest.staleness_note = STALENESS_NOTES[ds.folder];
 
     for (const shard of ds.shards) {
       const out = formatJson(shard.body);

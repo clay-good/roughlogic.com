@@ -14,5 +14,6 @@
   ],
   "hashes": {
     "sales-tax-nexus.json": "45b0bc800db2e9d5a7b1261cbec91656f22ec0f7d2740880e59f20b84da1333d"
-  }
+  },
+  "staleness_note": "Every post-Wayfair nexus threshold carries verified_on 2025-01-15 against a quarterly recheck cadence -- 20 months as of 2026-09-02. States change these by legislation, not on a calendar, so re-verification is 47 per-state lookups against each department of revenue and is maintainer work, not a build step. The tile already prints each row's citation and verified_on date and tells the reader to confirm with the state before filing. Recheck oldest-first; drop this note when the stamps are current."
 }

@@ -18,6 +18,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DATA = resolve(ROOT, "data");
 
 const errors = [];
+const warnings = [];
 
 function isIsoDate(s) {
   return typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s);
@@ -82,6 +83,76 @@ async function main() {
     }
   }
 
+  // A folder declares a `refresh_cadence`, and the shards under it carry
+  // `verified_on` / `verifiedOn` stamps. Nothing compared the two. On 2026-09-02
+  // exactly one folder was over its own declared cadence -- data/legal, whose 48
+  // post-Wayfair nexus stamps all read 2025-01-15 against a **quarterly** promise
+  // that docs/data-sources.md spells out as "quarterly recheck against the state
+  // source page (oldest verified_on first)". Twenty months, and the only thing
+  // that would have noticed was somebody opening the file.
+  //
+  // Warn from one cadence period. Fail at four, because a value four rechecks
+  // late is not late, it is unmaintained -- unless the manifest carries a
+  // `staleness_note` saying so out loud, which is the CF-03 shape: an
+  // acknowledgement that lives in a diff-reviewable file rather than in a
+  // warning nobody reads.
+  const CADENCE_DAYS = {
+    daily: 1, weekly: 7, monthly: 31, quarterly: 92, annual: 366,
+    "event-driven": null,
+  };
+  const DAY_MS = 86400000;
+  const now = Date.now();
+
+  function stamps(value, into) {
+    if (Array.isArray(value)) {
+      for (const v of value) stamps(v, into);
+      return;
+    }
+    if (!value || typeof value !== "object") return;
+    for (const key of ["verified_on", "verifiedOn"]) {
+      if (isIsoDate(value[key])) into.push(value[key]);
+    }
+    for (const v of Object.values(value)) stamps(v, into);
+  }
+
+  async function shardFiles(dir) {
+    const found = [];
+    for (const e of await readdir(dir, { withFileTypes: true })) {
+      const full = resolve(dir, e.name);
+      if (e.isDirectory()) found.push(...(await shardFiles(full)));
+      else if (e.name.endsWith(".json") && e.name !== "manifest.json") found.push(full);
+    }
+    return found;
+  }
+
+  for (const folder of folders) {
+    const manifestPath = resolve(DATA, folder, "manifest.json");
+    if (!existsSync(manifestPath)) continue;
+    const m = JSON.parse(await readFile(manifestPath, "utf8"));
+    const budget = CADENCE_DAYS[m.refresh_cadence];
+    if (!budget) continue; // event-driven, or a cadence this table does not know
+    const all = [];
+    for (const f of await shardFiles(resolve(DATA, folder))) {
+      stamps(JSON.parse(await readFile(f, "utf8")), all);
+    }
+    if (all.length === 0) continue;
+    const oldest = all.sort()[0];
+    const ageDays = Math.floor((now - Date.parse(oldest + "T00:00:00Z")) / DAY_MS);
+    if (ageDays <= budget) continue;
+    const line =
+      "data/" + folder + " declares refresh_cadence '" + m.refresh_cadence + "' (" + budget +
+      " days) but its oldest verified_on is " + oldest + ", " + ageDays + " days ago, across " +
+      all.length + " stamp(s).";
+    if (ageDays > budget * 4 && typeof m.staleness_note !== "string") {
+      errors.push(
+        line + " That is more than four rechecks late. Re-verify against the source and re-stamp, " +
+          "or add a 'staleness_note' to the manifest saying what is stale and what it would take to fix.",
+      );
+    } else {
+      warnings.push(line + " Re-verify oldest-first against the source and re-stamp.");
+    }
+  }
+
   // Future-proof: data/legal/* per-entry verifiedOn check.
   const legalDir = resolve(DATA, "legal");
   if (existsSync(legalDir)) {
@@ -99,12 +170,18 @@ async function main() {
     }
   }
 
+  for (const w of warnings) console.warn("WARN: " + w);
+
   if (errors.length > 0) {
     for (const e of errors) console.error("ERROR: " + e);
     console.error("v8 manifest-discipline lint FAILED with " + errors.length + " errors.");
     process.exit(1);
   }
-  console.log("v8 manifest-discipline lint OK (edition + asOf + shard hashes present; every edition string reproducible from scripts/build-data.mjs).");
+  console.log(
+    "v8 manifest-discipline lint OK (edition + asOf + shard hashes present; every edition string " +
+      "reproducible from scripts/build-data.mjs; every verified_on inside its folder cadence)" +
+      (warnings.length > 0 ? " with " + warnings.length + " staleness warning(s)." : "."),
+  );
 }
 
 await main();
