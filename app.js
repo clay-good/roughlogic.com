@@ -1407,7 +1407,7 @@ function toggleShortcutOverlay() {
     ["G V", "Voltage Drop"],
     ["G F", "Friction Loss"],
     ["G D", "Duct Sizing"],
-    ["G R", "Refrigerant P-T"],
+    ["G R", "Refrigerant P-T Chart"],
     ["G L", "Lumber Spans"],
     ["G C", "Concrete Volume"],
     ["G T", "Static Pressure"],

@@ -54,6 +54,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The keyboard-shortcut overlay named a tile something the catalog does not call it.** `G R` opens "Refrigerant P-T Chart"; the overlay said "Refrigerant P-T". A small thing, and the reason it is worth recording is where it was found: `docs/accessibility.md` asserts outright that its shortcut list, the live `SHORTCUTS` map in `app.js` and the `?` overlay all agree -- three copies of one table, with a claim of agreement over them and nothing comparing them.
+
+  `test/unit/keyboard-shortcuts.test.js` reads all three and compares them, and checks the two things the strings alone cannot say: that **every destination is a live tile** -- a G-key routing to a renamed id falls through to the home view and looks exactly like a key that was never pressed -- and that the label the overlay shows is that tile's own name. Twelve keys, all live, all now named correctly. Three failure modes seed-verified: a dead route id, a drifted label, and a key dropped from the overlay.
+
+
 - **`mcp/package.json` described a package that cannot exist.** It was not private and carried `files: ["server.mjs", "catalog.mjs", "README.md"]` -- and `catalog.mjs` imports `../search-discovery.js`, `../limitation-banner.js`, `../scripts/` and `../test/fixtures/`, then lazy-imports the `calc-*.js` modules. Reading the repo it sits in is the whole point ("so the agent surface can never drift from the site"), which is exactly why anything published from that file list would install and then fail on its first import. Its version was `0.175.0` while the server reports the **root** package's version over JSON-RPC, `0.401.1`: two numbers a user could read, 226 releases apart.
 
   Now `"private": true`, no `files` list, and one version. `npm link` and `npx roughlogic-mcp` from a checkout are unaffected -- which is what `mcp/README.md` always said, and now says why. `check-readme-counts` holds all three.
