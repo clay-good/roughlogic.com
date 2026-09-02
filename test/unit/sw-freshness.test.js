@@ -8,9 +8,21 @@
 //     progress (the URL hash is preserved across the refresh).
 //   - Old caches are deleted on activation.
 //
-// These are static-source assertions because Playwright is gated.
-// Together with the existing build-sw-patch.test.js (which asserts the
-// dist/ BUILD_HASH is patched at build time), they hold the contract.
+// These are static-source assertions, and they used to be the whole story --
+// this comment read "because Playwright is gated", which stopped being true
+// when the integration suite landed. A source-text test pins the shape it is
+// handed: every string here can be present while the running worker creates
+// the wrong caches or fails to delete the old ones, and the failure mode is
+// the one `_headers` names in its own comment, new HTML paired with stale JS,
+// which "breaks the site for everyone until the TTL expires".
+//
+// test/integration/service-worker.test.js now runs the same contract in a
+// browser: the worker activates and controls the page, its caches are named
+// after the BUILD_HASH the SERVER is serving, every path it precaches is
+// really in one of those caches, and a previous build's caches are gone after
+// the next activation. These assertions stay as the fast source-level half,
+// alongside build-sw-patch.test.js (which asserts dist/ BUILD_HASH is patched
+// at build time).
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
