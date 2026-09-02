@@ -61,6 +61,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The agent door answered 22 value-free questions with numbers it made up.** `answer_query` has a branch for the tiles whose content *is* the answer: OSHA Top-10, the knot and hand-signal references, the WMM model stamp. Asking one by name runs it on `{}` and returns the table, instead of the `NO_VALUES` dead end that tells an agent to go read an empty input list. **21 tiles qualify.** The branch tested `!rows.length` -- the tile's *field-index* rows -- and that is a different set: a tile with no renderer shard, or one whose inputs are list-valued, projects no rows while having plenty of inputs.
+
+  Measured: the proxy fired for **42** tiles. The 22 extra had their **own defaults** run and returned as `status: "OK"`. "Rent vs Buy NPV Comparison" answered a question carrying no numbers with a $400,000 purchase price, $80,000 down and a 6.5% rate -- none of it supplied, and none of it distinguishable by the agent from a real answer. That is precisely the failure this module's governing rule forbids, and the rule was already written down: a wrong answer is worse than no answer.
+
+  The test is now the tile's own `describe()` input list, which is what an agent would be told to call. **42 -> 21**, and the 21 are exactly the input-free set. It missed one in the other direction too: `water-classes` takes no inputs and never reached the branch, because its own name ranks a different tile -- a ranking matter, left alone and now written down rather than conflated with this.
+
+  The positive direction was already gated ("every input-free tile answers when its own name is the question", pinned at 21). The negative direction was not, which is how a proxy could drift to twice the population without a red build. It is now: 21 named tiles that take inputs and project no rows must never answer `via: "reference"`. Seed-verified by restoring the old condition.
+
+
 - **A resting mouse silently chose a search result.** Click one of the home page's example chips, do not touch the mouse, press Enter -- and the site opened Egress Window Well instead of Asphalt Tonnage. The rows render under wherever the pointer happens to be sitting, and a browser dispatches `mouseenter` when layout brings an element beneath a stationary cursor. That was wired to "the reader picked this row", so a pointer that had never moved took the highlight.
 
   It did something worse as well. The same handler sets `userPicked`, and the branch that re-ranks when the alias shards land honours that flag by refusing to move the highlight -- a courtesy for a reader who has deliberately arrowed to a row. So the unmoved pointer both stole the selection and pinned it against the better answer arriving a moment later.

@@ -1059,6 +1059,23 @@ function coerceForCompute(filled, rows) {
   return out;
 }
 
+// Does this tile take any inputs at all? Read from the tile's own describe()
+// contract, which is what an agent would be told to call, rather than from the
+// field index -- see the note in answerQuery for why the two differ.
+const noInputCache = new Map();
+async function tileTakesNoInputs(id) {
+  if (noInputCache.has(id)) return noInputCache.get(id);
+  let answer = false;
+  try {
+    const described = await describe({ id });
+    answer = !((described && described.inputs) || []).length;
+  } catch {
+    answer = false;
+  }
+  noInputCache.set(id, answer);
+  return answer;
+}
+
 export async function answerQuery({ query } = {}) {
   const q = String(query || "").trim();
   if (!q) return { status: "NO_MATCH", query: q, message: "Pass a plain-language question." };
@@ -1102,7 +1119,21 @@ export async function answerQuery({ query } = {}) {
   // a dead end. Corroboration has already been established above -- the query
   // names this tile or a curated alias maps to it -- so running it on no inputs
   // is not a guess.
-  if (!recovered.length && !rows.length) {
+  //
+  // THE TEST IS THE TILE'S INPUT LIST, not its field-index rows. It used to be
+  // `!rows.length`, and those are not the same set: a tile with no renderer
+  // shard, or one whose inputs are list-valued, projects no rows while having
+  // plenty of inputs. Measured 2026-09-02, that proxy fired for 42 tiles when
+  // only 21 qualify. The 22 wrong ones got their OWN DEFAULTS run and returned
+  // as `status: "OK"` -- "Rent vs Buy NPV Comparison" answered a question
+  // carrying no numbers with a $400,000 purchase price, $80,000 down and 6.5%,
+  // none of which the agent supplied and none of which it can tell are
+  // invented. That is the exact failure this module's governing rule forbids: a
+  // wrong answer is worse than no answer, and NO_VALUES is the true one. In the
+  // other direction it missed `water-classes`, a genuine reference tile left
+  // with the dead end this branch exists to remove.
+  const hasNoInputs = await tileTakesNoInputs(top.id);
+  if (!recovered.length && hasNoInputs) {
     try {
       const out = await run({ id: top.id, inputs: {} });
       return { ...out, status: "OK", query: q, name: top.name, via: "reference" };

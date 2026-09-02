@@ -25,7 +25,7 @@ Five tools, all read-only and safe to call freely:
 - `search_calculators` — find a calculator by keyword and/or trade (no args → trade overview).
 - `describe_calculator` — one tile's inputs (with select options, units, min/max), outputs, worked examples, citation, and any limitation banner.
 - `run_calculator` — evaluate a tile; returns the raw result plus rendered outputs (units + display strings), range warnings, and the limitation banner.
-- `answer_query` — a plain-language question with its numbers in it, answered in one call. Use it instead of chaining search + describe + run when the question already carries its values. The 21 tiles that take no inputs at all (OSHA Top-10, the knot and hand-signal references) answer from their own content, so asking one by name returns the table rather than a request for values.
+- `answer_query` — a plain-language question with its numbers in it, answered in one call. Use it instead of chaining search + describe + run when the question already carries its values. The 21 tiles that take no inputs at all (OSHA Top-10, the knot and hand-signal references) answer from their own content, so asking one by name returns the table rather than a request for values. Every other tile refuses: a question that names a calculator but carries no numbers gets `NO_VALUES` and a pointer to `describe_calculator`, never an answer computed from the tile's own defaults.
 - `run_calculators` — up to 50 `{ id, inputs }` calls in one request, for sweeps and comparisons.
 
 Typical flow: `search_calculators` → `describe_calculator` → `run_calculator`. The

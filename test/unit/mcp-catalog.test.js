@@ -205,6 +205,39 @@ test("every input-free tile answers when its own name is the question", async ()
   assert.deepEqual(unanswered, []);
 });
 
+// The other direction, which nothing checked: a tile that DOES take inputs must
+// never fall into the reference path. The branch used to test `!rows.length` --
+// the tile's field-INDEX rows -- and that is a different set from "has no
+// inputs": a tile with no renderer shard, or one whose inputs are list-valued,
+// projects no rows while having plenty of inputs. Measured 2026-09-02 the proxy
+// fired for 42 tiles when 21 qualify, and the 22 extra had their OWN DEFAULTS
+// run and returned as status "OK". "Rent vs Buy NPV Comparison" answered a
+// question carrying no numbers with a $400,000 purchase price, $80,000 down and
+// 6.5% -- none of it supplied, none of it distinguishable by the agent from an
+// answer. NO_VALUES is the true reply, and a wrong answer is worse than none.
+test("a tile that takes inputs never answers from its own defaults", async () => {
+  const { answerQuery, describe } = await import("../../mcp/catalog.mjs");
+  const { TOOLS } = await import("../../tools-data.js");
+  const nameById = new Map(TOOLS.map((t) => [t.id, t.name]));
+  // Every tile that took the reference path wrongly before the fix. Each has
+  // inputs and each projects no field-index rows, which is exactly the gap
+  // between the two conditions.
+  const WITH_INPUTS_BUT_NO_ROWS = [
+    "generator-sizing", "panel-rebalance", "static-pressure-hvac", "equivalent-length",
+    "rebar-schedule", "geometry", "noise-dose", "bridge-formula", "hazmat-placard-threshold",
+    "irrigation-uniformity", "dmx-planner", "lightning-countdown", "rental-worksheet",
+    "loan-limits", "hud-fmr", "rent-vs-buy", "area-by-coordinates",
+    "sailboat-performance-ratios", "occupant-load", "pv-performance-ratio", "bends-between-pulls",
+  ];
+  const guessed = [];
+  for (const id of WITH_INPUTS_BUT_NO_ROWS) {
+    assert.ok((await describe({ id })).inputs.length > 0, `${id} was expected to take inputs`);
+    const out = await answerQuery({ query: nameById.get(id) });
+    if (out.via === "reference") guessed.push(`${id}: answered from defaults ${JSON.stringify(out.inputs).slice(0, 80)}`);
+  }
+  assert.deepEqual(guessed, []);
+});
+
 test("the reference path does not loosen either corroboration guard", async () => {
   const { answerQuery } = await import("../../mcp/catalog.mjs");
   // A tile that does take inputs still refuses to guess at them.
