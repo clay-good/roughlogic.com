@@ -116,9 +116,11 @@ Threat: User input or activity is logged to a third party.
 Controls:
 - No analytics, telemetry, or tracking of any kind.
 - No sessionStorage, cookies, or IndexedDB.
-- localStorage is used by `theme.js` for a single key (`rl-theme`) holding the literal string `"light"`, `"dark"`, or `"high-contrast"` so the user's chosen theme survives reloads without a flash of incorrect color. No other client-side storage mechanism is used. No calculator inputs, pinned set, or bundle data is written to localStorage; all of that lives in the URL hash only (spec.md section 11.5). (The `rl-bigbuttons` key was retired in spec-v11 along with Big Buttons mode.)
+- localStorage is used by `theme.js` for a single key (`rl-theme`) holding the literal string `"light"` or `"dark"` so the user's chosen theme survives reloads without a flash of incorrect color -- and only once the reader works the toggle; following the system preference persists nothing. (A stored `"high-contrast"`, which this line listed as a third value until 2026-09-02, is migrated to `"dark"` on read and can no longer be written.) No other client-side storage mechanism is used. No calculator inputs, pinned set, or bundle data is written to localStorage; all of that lives in the URL hash only (spec.md section 11.5). (The `rl-bigbuttons` key was retired in spec-v11 along with Big Buttons mode.)
+- **Measured, not asserted:** `test/integration/no-tracking.test.js` walks a full journey -- search, a calculator typed into, a worked example, a tile page, a group hub, the catalog, the 404 -- then reads every storage the browser offers and checks that every request went to this origin.
 - Service worker cache holds only same-origin static shell files and bundled data shards.
 - The hash-based pinning and calculator state keep state in the URL only; the user controls when and where it is shared. (Recents was retired in spec-v11.)
+- A control holding identity, contact, address, credential, payment or other private free prose sets `data-report-sensitive="true"`, and `isPrivateControl` in `hash-state.js` keeps it out of the URL, the report inputs, and any derived output snapshot. One control in the catalog qualifies: the crew member's Name on Tip-Out. `test/integration/private-controls.test.js` types a real name into the live tile and checks it reaches neither the URL nor the report payload -- while its non-private sibling does, so the check is of the exclusion and not of a collector that gathered nothing. Seed-verified by removing the attribute.
 
 ### T8. Resource exhaustion on the device
 

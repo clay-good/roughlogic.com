@@ -6,6 +6,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **The private-control rule is now tested end to end.** `AGENTS.md` states it: a control holding identity, contact, address, credential, payment or other private free prose sets `data-report-sensitive="true"`, and such a control "must never be serialized into URL state, report inputs, or derived output snapshots". One control in the catalog qualifies -- the crew member's Name on Tip-Out, which a bartender types real people into. Everything else taking free text is naming an ingredient, a light fixture or a hazmat item.
+
+  The mechanism was unit-tested against a mock DOM. The sentence was not tested at all: nobody had typed a name into the real tile and looked. `test/integration/private-controls.test.js` does, and checks the two ways a value leaves the reader's control -- the URL, which is shareable and lands in browser history, and the report payload, which is the one thing on this site that crosses the network. Each assertion is paired with its non-private sibling (`to-h-0=8`), so a green result means the exclusion worked rather than that the collector gathered nothing. Seed-verified by deleting the attribute: two of three specs red.
+
+  A third spec pins the deliberate consequence, so nobody later "fixes" it: opening the shared link back does **not** restore the name.
+
+
 - **The no-tracking promise is now measured, not just asserted.** The README says "No account, no email, and no tracking"; `docs/hash-state.md` says the URL fragment is the only state the site uses. `check-csp` holds the *policy* that would block a third-party fetch -- and nothing checked what the page actually stores or requests. A policy and a behaviour are different claims: a same-origin beacon path, a cookie set by something added later, a library that opens an IndexedDB on import are none of them CSP violations, and all of them break the promise a reader is trusting.
 
   `test/integration/no-tracking.test.js` drives a full journey -- search, a calculator typed into, a worked example, a tile page, a group hub, the catalog, the 404 -- then reads every storage the browser offers and checks that every request went to this origin. Result: **no cookies, no sessionStorage, no IndexedDB, and an empty localStorage** until the reader works the theme toggle, which writes `rl-theme` and nothing else. Following the system preference persists nothing at all. All three assertions seed-verified by planting a key, a cookie and a third-party image.
@@ -26,6 +33,9 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
   Every path on it is **root-absolute**, because Cloudflare Pages serves that one document AT THE MISSED URL -- a relative `styles.css` would resolve to `/tools/typo/styles.css` and 404 alongside it, leaving an unstyled page in the moment a reader is already lost. That is the same trap as the offline fallback above, found by looking for it. It carries `noindex,follow`, is absent from the sitemap, and is exempt from the orphan check by name, since a 404 page reached by a link is a broken link. `check-shells` fails on any relative path in it, a missing noindex, or a missing link to `/tools/`; the a11y shell sweep covers it as one more page shape.
 
 ### Changed
+
+- **The threat model listed a theme value that can no longer be stored.** T7 said `rl-theme` holds `"light"`, `"dark"`, or `"high-contrast"`; `theme.js` migrates a stored `"high-contrast"` to `"dark"` on read and its `THEMES` array has held two entries for some time. It now also records that the key is written only when the reader works the toggle -- following the system preference persists nothing -- and points at the two specs that measure the section's claims rather than restating them.
+
 
 - **"W3C HTML validator passes on every view" was stated as done and had never been run.** It sat under *Verification* in `docs/accessibility.md`, while `docs/launch-checklist.md` two files over recorded the same item as still open, to be run against the deployed URL. The validator needs the network, which `check-build-hermetic` forbids the build to touch -- so the claim was not just unverified, it was unverifiable where it was written, and being unrunnable is exactly what kept anyone from noticing.
 
