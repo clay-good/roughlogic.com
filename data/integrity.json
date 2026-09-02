@@ -3,7 +3,7 @@
   "manifests": {
     "physical-constants": "e88c2d5927dcd367b763764e213124181ece4a3984f8629a6378ce353ffa6727",
     "electrical": "eca86847fe49b84933d75055c127ef3049e7804223aecf037bd91b904cdf742f",
-    "plumbing": "60db772a2190cbe737e474cb8fc823d7e25b997cc8d7f78e60173382db20939a",
+    "plumbing": "9067426085c71b84ed1ff07f8e1ebfcd64cc8b76f5dcde4ca8af7a8b8c311bf8",
     "hvac": "ac1f138f7b939b38f1dac0843c07d26d8a5d71e57d63ccd535d3d5af79c42203",
     "restoration": "8e80454d76a35a31dc69b4a24dc2dfb705dc2e0a80e648645ff2eb29a9d9c471",
     "construction": "e5258703a856c3f7ba158d2803783ac5fcb0a725dbcef200f06886cade248021",

@@ -59,7 +59,7 @@
     {
       "file": "pump-curves.json",
       "name": "Pump curves (manufacturer-attributed where redistributable)",
-      "gzip_size_bytes": 551
+      "gzip_size_bytes": 618
     },
     {
       "file": "thermal-expansion-coefficients.json",
@@ -78,7 +78,7 @@
     "glycol-curves.json": "c41b74c5334e311809fc62ae728a1b2d181aaee457bc7f04f56477404109617d",
     "backflow-curves.json": "2429ca0cbad8289180b1a42ba4fe636db4e2ecc77c68789eb5a5a9326097df38",
     "pipe-elastic-properties.json": "70e8ee39a251faa435a606de8f2f8e9bc35388d769a345735c4959c4c7b7f11e",
-    "pump-curves.json": "3c98ba39bfb923c320477fe797db797b12ccb442972774bba6c4114387faadef",
+    "pump-curves.json": "79b96ce4cfeb8ea5cc35d277fe84436eed7093fa14cd62a257d5101395f888b2",
     "thermal-expansion-coefficients.json": "900b61a8add706d0f21e9cf94f53c87b3ca76f388325b846017200b7af13e66d"
   }
 }

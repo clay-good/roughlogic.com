@@ -39,7 +39,7 @@ The pipeline never runs in production. It runs in CI on a tiered schedule per sp
 - `data/hvac/refrigerant-pt-tables.json` (v7) - Manufacturer-attributed P-T tables (DuPont / Honeywell / Chemours / Arkema). Quarterly recheck.
 - `data/hvac/insulation-k-values.json` (v7) - Manufacturer-attributed insulation k-values. ASHRAE Fundamentals chapter 25 by name. Quarterly recheck.
 - `data/plumbing/pipe-elastic-properties.json` (v7) - Pipe Young's-modulus values + water bulk modulus / density + Schedule 40 D / t. Cited by engineering reference. Annual recheck.
-- `data/plumbing/pump-curves.json` (v7) - Pump head-vs-flow polylines. Replace composite curves with manufacturer-attributed curves before relying for selection. Quarterly recheck.
+- `data/plumbing/pump-curves.json` (v7) - Pump head-vs-flow polylines. Both bundled curves are engineering-practice composites, not a manufacturer's published curve; each states its own provenance in its attribution field, and the option label says so too. Replace with the manufacturer curve before relying for selection. Quarterly recheck.
 - `data/plumbing/thermal-expansion-coefficients.json` (v7) - Per-material alpha + E + S_a for the guided-cantilever expansion-loop method. ASME B31.1 / B31.9 by name. Annual recheck.
 - `data/electrical/conductor-c-values.json` (v7) — Eaton/Bussmann SPD point-to-point C-value table. Cited by name only. Annual recheck.
 - `data/electrical/nema-mg1-code-letters.json` (v7) — NEMA MG-1 code-letter starting kVA per HP. Cited by NEMA MG-1 by name only. Annual recheck.

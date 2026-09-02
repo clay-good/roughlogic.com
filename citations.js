@@ -1989,13 +1989,14 @@ export const CITATIONS = {
   },
   "pump-operating-point": {
     formula: "Operating point at the intersection of the bundled pump curve H_p(Q) (linearly interpolated polyline) and the system curve H_sys = H_static + k × Q². Solved by binary search on Q in [0, Q_max].",
-    edition: "Hydraulic Institute by name; manufacturer pump curves attributed per entry in data/plumbing/pump-curves.json.",
+    edition: "Hydraulic Institute by name. Both bundled curves are engineering-practice composites, attributed as such per entry in data/plumbing/pump-curves.json; neither is a manufacturer's published curve.",
     freeAccess: "HI standards licensed; manufacturer technical bulletins free at each manufacturer site.",
     governance: GOVERNANCE.plumbing,
-    editionNote: "Single-edition (manufacturer-attributed curves; quarterly recheck per spec-v7 §8 cadence). Ship only curves cleared for redistribution.",
+    editionNote: "Single-edition (quarterly recheck per spec-v7 §8 cadence). Ship only curves cleared for redistribution. Until 2026-09-02 the option label, this citation and the data stamp all said the curves were manufacturer-attributed while each curve's own attribution field said it is a composite -- the reader saw both claims on one screen. The composite curves are a shape to reason with, not a pump to buy.",
     assumptions: [
       { name: "System curve form", value: "H_sys = H_static + k × Q² (turbulent / fully-rough flow)", source: "Hazen-Williams and Darcy-Weisbach Q² scaling" },
       { name: "Curve interpolation", value: "linear between published points (no quadratic / cubic fit)", source: "engineering practice" },
+      { name: "Curve provenance", value: "both bundled curves are engineering-practice composites; replace with the manufacturer curve before selecting a pump", source: "data/plumbing/pump-curves.json attribution field" },
     ],
   },
   "septic-drainfield": {

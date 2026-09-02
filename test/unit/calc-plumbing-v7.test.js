@@ -126,6 +126,24 @@ test("239 negative inputs error", () => {
   assert.ok(computePumpOperatingPoint({ pump: "small_centrifugal_60Hz", static_head_ft: 10, k_friction: -1 }).error);
 });
 
+// The option label a reader picks from and the attribution the same page prints
+// under the answer were saying opposite things: "Small centrifugal, 60 Hz
+// (manufacturer-attributed)" over a curve whose attribution field reads
+// "Engineering-practice composite". A curve nobody published is a fine thing to
+// reason with and a bad thing to buy a pump against, so the label must not claim
+// a provenance the entry itself denies.
+test("239 no pump-curve label claims manufacturer attribution while its own attribution says composite", () => {
+  for (const k of Object.keys(PUMP_CURVES)) {
+    const { name, attribution } = PUMP_CURVES[k];
+    if (!/composite/i.test(attribution)) continue;
+    assert.ok(
+      !/manufacturer-attributed/i.test(name),
+      k + ' is labelled "' + name + '" but its attribution says: ' + attribution,
+    );
+    assert.ok(/composite/i.test(name), k + ' is a composite curve; its label should say so: "' + name + '"');
+  }
+});
+
 test("239 PUMP_CURVES exposes both bundled curves with attribution", () => {
   for (const k of ["small_centrifugal_60Hz", "inline_circulator_3spd"]) {
     assert.ok(PUMP_CURVES[k].name);

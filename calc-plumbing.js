@@ -1552,7 +1552,7 @@ export const waterHammerSurgeExample = {
 
 export const PUMP_CURVES = {
   small_centrifugal_60Hz: {
-    name: "Small centrifugal, 60 Hz (manufacturer-attributed)",
+    name: "Small centrifugal, 60 Hz (composite reference curve)",
     attribution: "Engineering-practice composite (representative end-suction centrifugal). Replace with a manufacturer-attributed curve before relying on this for selection.",
     points: [
       { gpm: 0,   head_ft: 110, eff: 0.0 },
@@ -1566,7 +1566,7 @@ export const PUMP_CURVES = {
     ],
   },
   inline_circulator_3spd: {
-    name: "Inline hydronic circulator (3-speed)",
+    name: "Inline hydronic circulator, 3-speed (composite reference curve)",
     attribution: "Engineering-practice composite (residential hydronic circulator). Replace with manufacturer-attributed curve before relying on it for selection.",
     points: [
       { gpm: 0,  head_ft: 18, eff: 0.0 },
@@ -1715,7 +1715,7 @@ function _v7p_renderWaterHammer(inputRegion, outputRegion, citationEl) {
 }
 
 function _v7p_renderPumpOperatingPoint(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: System curve H_sys = H_static + k Q². Operating point at the intersection with the bundled pump curve. Curves cited per manufacturer name in data/plumbing/pump-curves.json.";
+  citationEl.textContent = "Citation: System curve H_sys = H_static + k Q². Operating point at the intersection with the bundled pump curve. Both bundled curves are engineering-practice composites, not a manufacturer's published curve -- size against the curve for the pump you are actually buying.";
   _v7p_attachEx(inputRegion, () => fillExample(pumpOperatingPointExample.inputs));
   const pump = _v7p_makeSelect("Pump curve", "po-p", Object.keys(PUMP_CURVES).map((k) => ({ value: k, label: PUMP_CURVES[k].name })));
   const stat = _v7p_makeNumber("Static head (ft)", "po-s", { step: "any", min: "0" });

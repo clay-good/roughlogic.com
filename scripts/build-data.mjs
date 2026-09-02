@@ -1087,11 +1087,11 @@ const PIPE_ELASTIC_PROPERTIES_DATA = {
 };
 
 const PUMP_CURVES_DATA = {
-  source: "Pump curves cited per manufacturer name. Replace any composite curve with a manufacturer-attributed curve before relying on it for selection.",
+  source: "Both bundled curves are engineering-practice composites, not a manufacturer's published curve. Each entry states its own provenance in its attribution field. Replace with the manufacturer curve for the pump you are buying before relying on this for selection.",
   description: "Head versus flow polylines (gpm, head_ft, eff). Used in pump-operating-point intersection with H_sys = H_static + k * Q^2.",
   curves: {
     small_centrifugal_60Hz: {
-      name: "Small centrifugal, 60 Hz (manufacturer-attributed)",
+      name: "Small centrifugal, 60 Hz (composite reference curve)",
       attribution: "Engineering-practice composite (representative end-suction centrifugal). Replace before relying for selection.",
       points: [
         { gpm: 0,   head_ft: 110, eff: 0.0 },
@@ -1105,7 +1105,7 @@ const PUMP_CURVES_DATA = {
       ],
     },
     inline_circulator_3spd: {
-      name: "Inline hydronic circulator (3-speed)",
+      name: "Inline hydronic circulator, 3-speed (composite reference curve)",
       attribution: "Engineering-practice composite (residential hydronic circulator). Replace before relying for selection.",
       points: [
         { gpm: 0,  head_ft: 18, eff: 0.0 },
