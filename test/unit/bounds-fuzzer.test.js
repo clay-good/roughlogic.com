@@ -6335,7 +6335,7 @@ test("bounds: calc-realestate computeLoanLimits pins the FHFA + HUD high-cost-co
     va: { full_entitlement_cap_removed_since: "2020-01-01" },
     unknown_county_message: "County not found; baseline applied. Verify at fhfa.gov.",
     high_cost_counties_one_unit: [
-      { state: "CA", county_fips: "06075", county_name: "San Francisco", conforming_usd: 1209750, fha_usd: 1209750 },
+      { state: "CA", county_fips: "06075", county_name: "San Francisco", conforming_usd: 1249125, fha_usd: 1249125 },
     ],
   };
   // FIPS lookup hits the high-cost row.
@@ -6343,7 +6343,7 @@ test("bounds: calc-realestate computeLoanLimits pins the FHFA + HUD high-cost-co
   assert.strictEqual(byFips.kind, "high_cost");
   assert.strictEqual(byFips.state, "CA");
   assert.strictEqual(byFips.county, "San Francisco");
-  assert.strictEqual(byFips.conforming_one_unit_usd, 1209750);
+  assert.strictEqual(byFips.conforming_one_unit_usd, 1249125);
   // State + name lookup also hits.
   const byName = computeLoanLimits({ shard, state: "CA", county_name: "San Francisco" });
   assert.strictEqual(byName.kind, "high_cost");

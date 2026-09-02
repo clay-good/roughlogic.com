@@ -30,11 +30,11 @@ import {
 // Inline minimal shards for the X.8 / X.10 unit tests.
 const LOAN_LIMITS_SHARD = {
   year: 2026,
-  baseline: { conforming_one_unit_usd: 806500, fha_floor_one_unit_usd: 524225, fha_ceiling_one_unit_usd: 1209750, ceiling_high_cost_one_unit_usd: 1209750 },
+  baseline: { conforming_one_unit_usd: 832750, fha_floor_one_unit_usd: 541287, fha_ceiling_one_unit_usd: 1249125, ceiling_high_cost_one_unit_usd: 1249125 },
   va: { full_entitlement_cap_removed_since: "2020-01-01" },
   high_cost_counties_one_unit: [
-    { state: "CA", county_name: "San Francisco", county_fips: "06075", conforming_usd: 1209750, fha_usd: 1209750 },
-    { state: "NY", county_name: "New York",      county_fips: "36061", conforming_usd: 1209750, fha_usd: 1209750 },
+    { state: "CA", county_name: "San Francisco", county_fips: "06075", conforming_usd: 1249125, fha_usd: 1249125 },
+    { state: "NY", county_name: "New York",      county_fips: "36061", conforming_usd: 1249125, fha_usd: 1249125 },
   ],
   unknown_county_message: "Unknown county; consult lender.",
 };
@@ -549,7 +549,7 @@ test("all thirteen Group X renderers exposed in REALESTATE_RENDERERS after X.12"
 test("computeLoanLimits: San Francisco by name returns high-cost ceiling $1,209,750", () => {
   const r = computeLoanLimits({ ...loanLimitsExample.inputs, shard: LOAN_LIMITS_SHARD });
   assert.equal(r.kind, "high_cost");
-  assert.equal(r.conforming_one_unit_usd, 1209750);
+  assert.equal(r.conforming_one_unit_usd, 1249125);
   assert.equal(r.county, "San Francisco");
 });
 
@@ -562,8 +562,8 @@ test("computeLoanLimits: FIPS lookup wins over name", () => {
 test("computeLoanLimits: unknown county falls back to baseline + advisory", () => {
   const r = computeLoanLimits({ state: "TX", county_name: "Some Rural County", shard: LOAN_LIMITS_SHARD });
   assert.equal(r.kind, "baseline");
-  assert.equal(r.conforming_one_unit_usd, 806500);
-  assert.equal(r.fha_one_unit_usd, 524225);
+  assert.equal(r.conforming_one_unit_usd, 832750);
+  assert.equal(r.fha_one_unit_usd, 541287);
   assert.match(r.advisory, /consult lender/i);
 });
 
@@ -766,4 +766,36 @@ test("all nineteen Group X renderers exposed in REALESTATE_RENDERERS after X.2 r
   for (const key of ["mortgage-reserves", "rent-vs-buy", "cap-rate-dscr"]) {
     assert.ok(typeof REALESTATE_RENDERERS[key] === "function", key + " must be registered");
   }
+});
+
+// The shipped shard, not a fixture. The bundled file claimed year 2026 and
+// verified_on 2026-05-16 while carrying the 2025 baseline throughout -- $806,500
+// conforming, $524,225 FHA floor, a $1,209,750 ceiling. A stamped verification
+// date is not evidence the values were checked, so pin the published 2026 ones.
+test("loan-limits: the shipped shard carries the published 2026 FHFA / HUD baseline", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const { resolve, dirname } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const root = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
+  const shard = JSON.parse(await readFile(resolve(root, "data/realestate/loan-limits.json"), "utf8"));
+  assert.equal(shard.year, 2026);
+  assert.equal(shard.baseline.conforming_one_unit_usd, 832750);
+  assert.equal(shard.baseline.conforming_two_unit_usd, 1066250);
+  assert.equal(shard.baseline.conforming_three_unit_usd, 1288800);
+  assert.equal(shard.baseline.conforming_four_unit_usd, 1601750);
+  // HUD sets the floor at 65% and the ceiling at 150% of the conforming baseline.
+  assert.equal(shard.baseline.fha_floor_one_unit_usd, 541287);
+  assert.equal(shard.baseline.fha_ceiling_one_unit_usd, 1249125);
+  assert.equal(
+    shard.baseline.ceiling_high_cost_one_unit_usd,
+    Math.round(shard.baseline.conforming_one_unit_usd * 1.5),
+  );
+  // Only counties AT the national ceiling are bundled; anything between the
+  // floor and the ceiling carries its own published value and must route to the
+  // lookup rather than to a number nobody verified.
+  for (const c of shard.high_cost_counties_one_unit) {
+    assert.equal(c.conforming_usd, shard.baseline.ceiling_high_cost_one_unit_usd, c.county_name);
+    assert.equal(c.fha_usd, shard.baseline.fha_ceiling_one_unit_usd, c.county_name);
+  }
+  assert.match(shard.unknown_county_message, /between the floor and the ceiling/);
 });

@@ -571,6 +571,8 @@ The principle from spec.md section 5 governs every entry: the data is either pub
 
 ### data/realestate/loan-limits.json (v12 §8, X.8 loan-limits)
 
+- **Re-verified 2026-09-02.** The shard was stamped `year: 2026`, `verified_on: 2026-05-16`, and carried the **2025** figures throughout ($806,500 conforming, $524,225 FHA floor, a $1,209,750 ceiling). It now carries the published 2026 baseline: $832,750 / $1,066,250 / $1,288,800 / $1,601,750 conforming, FHA floor $541,287, ceiling $1,249,125. Bundled county rows cover only counties **at** the national ceiling; the four that sat between the floor and the ceiling were removed rather than guessed, and route to the FHFA / HUD lookup.
+
 - Source: Federal Housing Finance Agency, Conforming Loan Limit Values (annual; 2026 values published November 2025) at [fhfa.gov/data/loan-limit-values](https://www.fhfa.gov/data/loan-limit-values). HUD Single-Family Mortgage Limits (annual; 2026 values published December 2025) at [entp.hud.gov/idapp/html/hicostlook.cfm](https://entp.hud.gov/idapp/html/hicostlook.cfm). VA full-entitlement no-cap policy per the Blue Water Navy Vietnam Veterans Act of 2019 (Public Law 116-23).
 - License: Public-domain federal data. No fee, no account.
 - Cadence: Annual rollover each November (FHFA) / December (HUD). Per-shard `refresh_cadence: "annual"` per spec-v12 §H.2.

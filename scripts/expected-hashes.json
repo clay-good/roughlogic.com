@@ -115,9 +115,9 @@
     "cross/manifest.json": "1374c17f00951a89b22faee322e037e88b7c10e0f99d80b842f7bc550f9b5957",
     "field/wmm/coefficients.json": "0e2a631c6b09b945c50421cb16a5a3a9dba4b7ebf5a79528caedbe6e0953bd48",
     "field/manifest.json": "90ccb1beec1cecd36ea7b2e3b639dcec971410e467710dd4426595fc955ab3cf",
-    "realestate/loan-limits.json": "d56ebbf45518ae98088855076a905e239133b7364ecc4dadf8e844b3ba229e54",
+    "realestate/loan-limits.json": "75f1d7df553e72f7a6c90e60739e49ba579cc9d682ecc922123dae8c25f74893",
     "realestate/hud-fmr.json": "f35cf6bf5495b09b833a45685bbcd7d838dced58d5ee35c880e8a690a990c221",
-    "realestate/manifest.json": "ad51cc8b9d6b216b789e8e4b80cb6043c12187c4d9e1ea27d39c083e2fd7e9f8",
+    "realestate/manifest.json": "e666a0619b0164f1c2599f49acd9f46561af4e23cb67b1a2ca0c9b2445b7465b",
     "fields/manifest.json": "0cac1199b5169ee50f4e7fd71c3a9add0026a63bcb42a06867988a85b82ecf31",
     "search/manifest.json": "09fbdf40a44daa61370febb24f60d4de05cf48ee9348b029b97ca4806fc2b4bb"
   }

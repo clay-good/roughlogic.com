@@ -149,6 +149,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The loan-limit shard said 2026 and carried 2025.** `loan-limits` was stamped `year: 2026` and `verified_on: 2026-05-16`, and every figure in it was the 2025 cycle: an $806,500 conforming baseline, a $524,225 FHA floor, a $1,209,750 ceiling on all 28 bundled counties. A borrower checking whether their loan was conforming was told the wrong threshold by **$26,250**.
+
+  The published 2026 values, transcribed against the FHFA announcement (baseline $832,750 / $1,066,250 / $1,288,800 / $1,601,750) and HUD ML 2025-23 (FHA floor $541,287, ceiling $1,249,125). The 24 counties pinned at the national ceiling move with it. The **four that sat between the floor and the ceiling -- San Diego, Ventura, Suffolk MA, King WA -- were removed rather than guessed**: a county limit is 115% of the local median, so it does not scale with the national index, and those counties now route to the same "look it up at fhfa.gov" path an unknown county already took. A missing answer that names its source beats a confident wrong one.
+
+  A stamped `verified_on` is not evidence anything was verified, which is what let a whole cycle slip. A test now pins the shipped shard's baseline to the published figures, checks the FHA ceiling really is 150% of the conforming baseline, and asserts every bundled county row is at the ceiling.
+
 - **Section 179 and bonus depreciation were still on the repealed TCJA schedule, understating the deduction by more than half.** The One Big Beautiful Bill Act (July 2025) rewrote both. `section-179` shipped a 2025 cap of **$1,250,000** with a **40%** bonus and a 2026 cap of $1,290,000 with 20%. The published figures are **$2,500,000 / $4,000,000 phase-out for 2025** and **$2,560,000 / $4,090,000 for 2026** (IRS Pub 946), with bonus depreciation a **permanent 100%** for qualified property acquired after 2025-01-19 (IRC 168(k), IRS Notice 2026-11). A contractor expensing a $2M machine was told less than half of it was deductible in year one.
 
   Both years transcribed against irs.gov. 2025 carries the acquisition-window note the statute needs -- property placed in service after 2024-12-31 but before 2025-01-20 still takes 40% (60% for long-production-period property and certain aircraft) -- and the tile prints it beside the bonus figure; the rate has always been overridable. The 2023 and 2024 rows were re-checked and are correct.
