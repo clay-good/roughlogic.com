@@ -8,12 +8,13 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const readSrc = (name) => readFile(resolve(ROOT, name), "utf8");
+const { listLimitationCopyIds } = await import(resolve(ROOT, "limitation-banner.js"));
 
 test("calc-hvac.js imports the limitation-banner helpers", async () => {
   const t = await readSrc("calc-hvac.js");
@@ -138,4 +139,32 @@ test("renderStairStringer renders the AHJ-governs limitation banner", async () =
     /export function renderStairStringer[\s\S]*?renderLimitationBanner\(inputRegion,\s*getLimitationCopy\("stair-stringer"\)\)/,
   );
   assert.ok(m, "renderStairStringer must call renderLimitationBanner");
+});
+
+// Two doors read the same registry from opposite ends. The browser calls
+// getLimitationCopy(id) inside a renderer; the agent door (mcp/catalog.mjs)
+// looks the copy up by TILE id and returns it from describe_calculator and
+// run_calculator. renderLimitationBanner returns null on a missing copy without
+// throwing, so a mistyped id costs the browser reader the banner while the agent
+// keeps reporting one -- a silent divergence on the safety-relevant sentence.
+// These two assertions close it from both ends, and cover every tile at once
+// rather than the hand-listed ones above.
+test("every getLimitationCopy(...) argument in the shipped modules is a real copy id", async () => {
+  const known = new Set(listLimitationCopyIds());
+  const files = (await readdir(ROOT)).filter((f) => /^calc-.*\.js$/.test(f)).sort();
+  const bad = [];
+  for (const f of files) {
+    const src = await readFile(resolve(ROOT, f), "utf8");
+    for (const m of src.matchAll(/getLimitationCopy\(\s*"([^"]+)"\s*\)/g)) {
+      if (!known.has(m[1])) bad.push(f + ': getLimitationCopy("' + m[1] + '")');
+    }
+  }
+  assert.deepEqual(bad, [], "unknown limitation copy id(s); the banner would silently not render");
+});
+
+test("every limitation copy id is a live tile id", async () => {
+  const { TOOLS } = await import("../../tools-data.js");
+  const live = new Set(TOOLS.map((x) => x.id));
+  const orphans = listLimitationCopyIds().filter((id) => !live.has(id));
+  assert.deepEqual(orphans, [], "limitation copy for tile id(s) that do not exist");
 });
