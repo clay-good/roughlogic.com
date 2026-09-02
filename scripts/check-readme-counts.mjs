@@ -145,6 +145,52 @@ function checkPattern(readme, re, expected, label, errors) {
 // browser. So: assert the two are the same string. That also pins the tile
 // count inside the app.js copy, transitively, since the file copy is pinned
 // above.
+// mcp/package.json describes a package that cannot exist.
+//
+// The MCP server is local-only by design ("No hosting, no network" -- the
+// project's hard rule), and mcp/README.md is careful to say `npx
+// roughlogic-mcp` works "from a checkout". But the manifest was not private
+// and carried `files: ["server.mjs", "catalog.mjs", "README.md"]`, which
+// describes a publishable tarball -- and catalog.mjs imports
+// ../search-discovery.js, ../limitation-banner.js, ../scripts/ and
+// ../test/fixtures/, then lazy-imports the calc-*.js modules. Anything
+// published from that list would install and then fail on its first import.
+// Its version was 0.175.0 while the server reports the ROOT package's version,
+// 0.401.1, so the two numbers a user could read disagreed by 226 releases.
+async function checkMcpManifest(errors) {
+  const root = JSON.parse(await readFile(resolve(ROOT, "package.json"), "utf8"));
+  const mcp = JSON.parse(await readFile(resolve(ROOT, "mcp", "package.json"), "utf8"));
+  let checked = 0;
+
+  checked++;
+  if (mcp.private !== true) {
+    errors.push(
+      'mcp/package.json: not marked "private": true. The server reads the repo it sits in ' +
+        "(catalog.mjs imports ../search-discovery.js, ../scripts/ and ../test/fixtures/), so a published " +
+        "tarball could not run. `npm link` and `npx roughlogic-mcp` from a checkout are unaffected by private.",
+    );
+  }
+
+  checked++;
+  if (mcp.files) {
+    errors.push(
+      "mcp/package.json: carries a `files` list, which describes a publish that cannot work -- " +
+        JSON.stringify(mcp.files) + " omits every module the server imports.",
+    );
+  }
+
+  // server.mjs reports the ROOT version over JSON-RPC (serverInfo.version), so
+  // the manifest beside it must not claim a different one.
+  checked++;
+  if (mcp.version !== root.version) {
+    errors.push(
+      `mcp/package.json: version ${mcp.version} but the server reports the root package's ${root.version} ` +
+        "in serverInfo. One server, one version.",
+    );
+  }
+  return checked;
+}
+
 async function checkHomeDescription(errors) {
   const html = await readFile(resolve(ROOT, "index.html"), "utf8");
   const app = await readFile(resolve(ROOT, "app.js"), "utf8");
@@ -257,6 +303,7 @@ async function main() {
 
   checked += await checkIndexHtml(live.tiles, errors);
   checked += await checkHomeDescription(errors);
+  checked += await checkMcpManifest(errors);
   checked += await checkReadmeExample(readme, errors);
 
   // AGENTS.md (spec-v1194) states the catalog size for agents landing in the

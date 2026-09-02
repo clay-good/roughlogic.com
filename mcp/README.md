@@ -243,6 +243,16 @@ their MCP client at `mcp/server.mjs` as above. There's a `bin` entry too, so
 `npx roughlogic-mcp` works from a checkout (`npm link` first, or run
 `node mcp/server.mjs` directly).
 
+**From a checkout, and only from a checkout.** `catalog.mjs` imports
+`../search-discovery.js`, `../limitation-banner.js`, `../scripts/` and
+`../test/fixtures/`, then lazy-imports the `calc-*.js` modules -- reading the
+repo it sits in is exactly what stops the agent surface drifting from the site.
+So `mcp/package.json` is `"private": true`: a published tarball would install
+and then fail on its first import. It carried a `files` list naming three files
+until 2026-09-02, which described precisely that broken publish, and a version
+of its own that had fallen 226 releases behind the one the server reports in
+`serverInfo`. `check-readme-counts` now holds all three.
+
 ## Quick smoke test
 
 ```sh

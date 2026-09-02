@@ -1,7 +1,8 @@
 {
   "name": "roughlogic-mcp",
-  "version": "0.175.0",
-  "description": "Local MCP server exposing the roughlogic trades calculators (search / describe / run).",
+  "version": "0.401.1",
+  "private": true,
+  "description": "Local MCP server exposing the roughlogic trades calculators (search / describe / run). Runs from a checkout of this repo, which it reads directly; it is not a publishable package.",
   "type": "module",
   "license": "MIT",
   "bin": {
@@ -9,10 +10,5 @@
   },
   "engines": {
     "node": ">=18"
-  },
-  "files": [
-    "server.mjs",
-    "catalog.mjs",
-    "README.md"
-  ]
+  }
 }

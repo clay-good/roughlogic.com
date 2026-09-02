@@ -54,6 +54,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`mcp/package.json` described a package that cannot exist.** It was not private and carried `files: ["server.mjs", "catalog.mjs", "README.md"]` -- and `catalog.mjs` imports `../search-discovery.js`, `../limitation-banner.js`, `../scripts/` and `../test/fixtures/`, then lazy-imports the `calc-*.js` modules. Reading the repo it sits in is the whole point ("so the agent surface can never drift from the site"), which is exactly why anything published from that file list would install and then fail on its first import. Its version was `0.175.0` while the server reports the **root** package's version over JSON-RPC, `0.401.1`: two numbers a user could read, 226 releases apart.
+
+  Now `"private": true`, no `files` list, and one version. `npm link` and `npx roughlogic-mcp` from a checkout are unaffected -- which is what `mcp/README.md` always said, and now says why. `check-readme-counts` holds all three.
+
+  Found by running the README's own smoke test, which works exactly as printed (`R: 12`, `P: 1200`), and then reading the manifest next to it.
+
+
 - **One tile rendered three elements sharing `id="undefined"`.** `pool-calcium-hardness-dose` is built by a spec-driven renderer that passes `o.id` to `makeOutputLine`, and that tile's three outputs were written without one -- so `span.id = undefined` stamped the literal string. Invalid HTML, a duplicate id twice over, and three outputs nothing can address by id. The page looked exactly right, which is why it sat there.
 
   Two fixes, because there were two mistakes: the tile's outputs get real ids like every sibling in that file, and `makeOutputLine` / `makeNoteLine` no longer stamp an id at all when they are handed nothing.
