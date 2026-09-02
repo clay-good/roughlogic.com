@@ -76,9 +76,34 @@ async function main() {
   // (the row advanced so next_expected is in the future) or an explicit
   // "verified, not yet released" re-stamp via `last_verified` >= next_expected.
   // An un-re-stamped passed date is a freshness blind spot and fails the gate.
+  // The gate below fails the moment `next_expected` passes -- which means the
+  // build goes red at a UTC midnight with no commit behind it, and whoever is
+  // next at the keyboard inherits it as a surprise. That has happened: see the
+  // 2026-09-01 CF-03 red. A date this file already knows about should not be
+  // able to ambush anyone, so a row whose date is close and whose re-stamp will
+  // not cover it warns first, for the whole quarter before it is due.
+  const WARN_AHEAD_DAYS = 92;
   for (const s of standards) {
     const next = parseDateLoose(s.next_expected);
-    if (!next || next >= today) continue; // not yet due
+    if (next && next >= today) {
+      const daysAway = daysBetween(today, next);
+      if (daysAway <= WARN_AHEAD_DAYS) {
+        const verified = parseDateLoose(s.last_verified);
+        // A re-stamp only silences the failure if it is dated on or after the
+        // due date AND still inside the re-verify cadence when that date lands.
+        const covered = verified && verified >= next && daysBetween(verified, next) <= RESTAMP_MAX_DAYS;
+        if (!covered) {
+          warnings.push(
+            "sources-cycle.json: '" + s.name + "' is due in " + daysAway + " days (" + s.next_expected +
+              "), and " + (s.last_verified ? "its re-stamp " + s.last_verified + " will not cover that date" :
+                "it carries no 'last_verified' at all") +
+              ". Confirm the edition and either advance the row or re-stamp, before the date turns the build red."
+          );
+        }
+      }
+      continue; // not yet due
+    }
+    if (!next) continue;
     const verified = parseDateLoose(s.last_verified);
     if (!verified || verified < next) {
       errors.push(

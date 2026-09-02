@@ -41,6 +41,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **A citation due date can no longer ambush the build.** CF-03 fails the moment a `sources-cycle.json` row's `next_expected` passes -- which means main turns red at a UTC midnight with no commit behind it, and whoever is next at the keyboard inherits it as a surprise. That is not hypothetical; it happened yesterday.
+
+  `check-citation-freshness` now emits a **non-fatal warning for the 92 days before** a row comes due, whenever the row's existing re-stamp will not cover that date. Three rows are warning today, and the first two are the point: **IBC and IFC come due 2026-10 and were re-stamped 2026-09-01** -- which does *not* cover them, because CF-03 requires `last_verified >= next_expected` by design. Yesterday's verification work was real and the October re-verify is real too; it is now visible a month out instead of arriving as a red build. The third is the FDA Food Code, due 2026-12 with no `last_verified` at all.
+
+  A warning rather than an error on purpose: the work is not late yet, and a gate that fails early teaches people to silence it. Both existing failure paths re-verified unchanged.
+
+
 - **The active one-box charter still listed a constraint that was fixed two days ago.** `specs/scope-one-box.md` names three measured facts that "set hard limits on what these specs may do", and gates its one unshipped spec, v1347 (retire the home trade strip), on them. One of the three -- "the hubs cross-link by SPA hash, and a fragment is not a crawlable URL" -- stopped being true on 2026-08-31 when every hub gained an "Other trades" section of real `/groups/<slug>/` URLs, and the last `#group=` link on the site went with yesterday's dead call-to-action. **There is now no `#group=` link in `dist/` at all.** Anyone reading the charter to decide v1347 would have been reasoning from a fact that no longer holds.
 
   That row is now struck through with what replaced it, and says plainly that the case against removing the home nav rests on the one remaining fact. Every count in the document was re-measured the same day: the catalog it says "stays 1,709" is 1,804; `/groups/construction/` is linked by 479 tiles, not 466; searchable / MCP-runnable / worked-example are 1,804 of 1,804 each; the field index describes 1,763 of them. The counts are dated rather than pinned to a gate on purpose -- a live charter's measurement that says when it was taken ages into an old measurement, while a number a gate reddens on every tile landing gets edited out of the way instead of obeyed.

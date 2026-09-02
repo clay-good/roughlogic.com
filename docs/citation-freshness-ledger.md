@@ -85,6 +85,17 @@ row's `next_expected` has passed without a `last_verified` re-stamp (CF-03).
   still in the past -- the quarterly cadence this document already promised, now
   enforced rather than described. The acknowledgement buys a quarter, not
   silence.
+- **The due date now warns before it fails (2026-09-02).** CF-03 fails the
+  moment `next_expected` passes, which means the build turns red at a UTC
+  midnight with no commit behind it and whoever is next at the keyboard
+  inherits it as a surprise. That has happened. `check-citation-freshness` now
+  emits a **non-fatal warning for the 92 days before** a row is due, whenever
+  the row's existing re-stamp will not cover that date -- and a re-stamp dated
+  *before* the due date never does, by CF-03's own rule. Three rows are warning
+  today: IBC and IFC (due 2026-10, re-stamped 2026-09-01 and so **not**
+  covered -- the October re-verify is real work, now visible a month out) and
+  the FDA Food Code (due 2026-12, carrying no `last_verified` at all). A date
+  this file already knows about should not be able to ambush anyone.
 
 ## Verified current / well-disclosed, not in the cycle table (spec-v22 §2)
 
