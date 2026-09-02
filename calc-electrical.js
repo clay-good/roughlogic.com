@@ -43,12 +43,24 @@ const _finiteGuard = (o) => {
 
 // --- Utility 1: Ohm's Law ---
 
+// The renderer sends all four fields and writes null for the empty ones, so
+// `=== null` read as "unknown" and the browser was always right. An agent sends
+// only what it has -- run_calculator("ohms-law", { V: 120, I: 10 }) -- and those
+// omitted keys arrive as `undefined`, which is not `null`: every derivation
+// guard below failed and the call came back with V and I and no R and no P, no
+// error, on the most famous calculator in the catalog. Ask whether a value is
+// usable instead of comparing it to one particular flavour of absent. A
+// non-finite value (a stray string) is treated as unknown too, which is what
+// `known` above has always done.
+const _ohmUnknown = (x) => !Number.isFinite(x);
+
 // dims: in { V: M L^2 T^-3 I^-1, I: I, R: M L^2 T^-3 I^-2, P: M L^2 T^-3 } out: { V: M L^2 T^-3 I^-1, I: I, R: M L^2 T^-3 I^-2, P: M L^2 T^-3 }
 export function computeOhmsLaw({ V, I, R, P }) {
   const known = [V, I, R, P].filter((x) => x !== null && x !== undefined && Number.isFinite(x));
   if (known.length < 2) return { error: "Provide any two of V, I, R, P." };
   const have = { V, I, R, P };
   const out = { ...have };
+  for (const k of ["V", "I", "R", "P"]) if (_ohmUnknown(out[k])) out[k] = null;
   // Iteratively derive missing values.
   for (let i = 0; i < 4; i++) {
     if (out.V === null && out.I !== null && out.R !== null) out.V = out.I * out.R;

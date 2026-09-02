@@ -9418,6 +9418,28 @@ test("bounds: calc-construction render* sentinels - every exported renderer is a
 
 // --- calc-electrical.js full-module closeout --------------------------------
 
+// Every test here passed the unknowns as explicit nulls, because that is what
+// the renderer does -- it owns all four fields and writes null for the empty
+// ones. An agent owns nothing and sends only what it has, so the unknowns arrive
+// as `undefined`. Until 2026-09-02 the derivation guards compared to `null`, so
+// run_calculator("ohms-law", { V: 120, I: 10 }) returned V and I and no R and no
+// P, with no error, on the catalog's most famous tile. Both entry shapes, and
+// every pair, must give the same answer.
+test("bounds: calc-electrical computeOhmsLaw derives the same answer whether unknowns are null or simply absent", () => {
+  const expected = { V: 120, I: 10, R: 12, P: 1200 };
+  assert.deepStrictEqual(computeOhmsLaw({ V: 120, I: 10 }), expected);
+  assert.deepStrictEqual(computeOhmsLaw({ V: 120, I: 10, R: null, P: null }), expected);
+  // Every pair reaches the same point on the same circuit.
+  assert.deepStrictEqual(computeOhmsLaw({ V: 120, R: 12 }), expected);
+  assert.deepStrictEqual(computeOhmsLaw({ I: 10, R: 12 }), expected);
+  assert.deepStrictEqual(computeOhmsLaw({ V: 120, P: 1200 }), expected);
+  assert.deepStrictEqual(computeOhmsLaw({ I: 10, P: 1200 }), expected);
+  assert.deepStrictEqual(computeOhmsLaw({ R: 12, P: 1200 }), expected);
+  // One known is still one known, and a non-finite value is not a known.
+  assert.ok("error" in computeOhmsLaw({ V: 120 }));
+  assert.ok("error" in computeOhmsLaw({ V: 120, I: "abc" }));
+});
+
 test("bounds: calc-electrical computeOhmsLaw pins V=I*R + P=V*I identities and rejects fewer-than-two knowns", () => {
   // V=12, I=2 -> R=6, P=24 (Ohm's law + power identity).
   const r = computeOhmsLaw({ V: 12, I: 2, R: null, P: null });
