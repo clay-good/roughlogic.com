@@ -163,7 +163,7 @@
     },
     "motor-fla": {
       "group": "calc-electrical.js (Group A)",
-      "stamp": "Citation: Use motor nameplate FLA where available. Reference values per NEC 2023 Tables 430.247-430.250 and NEMA-aligned manufacturer technical bulletins. Free at nfpa.org/freeaccess."
+      "stamp": "Citation: NEC 2023 430.6(A)(1) -- size conductors and overcurrent protection from the Table 430.247-430.250 value, not from the nameplate and not from these figures. 430.6(A)(2): the nameplate FLA is what sizes the overload device. The values below are typical published figures across NEMA-aligned manufacturer bulletins, for a sanity check on magnitude. Free at nfpa.org/freeaccess."
     },
     "nfpa-1142-water-supply": {
       "group": "calc-electrical.js (Group A)",

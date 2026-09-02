@@ -74,6 +74,20 @@ test("calc-electrical.js imports the limitation-banner helpers", async () => {
   );
 });
 
+// motor-fla is not a simplified screen; it is a lookup that gives the WRONG
+// number for the job a reader most likely came for. NEC 430.6(A)(1) requires the
+// Table 430.247-430.250 value for sizing conductors and overcurrent protection,
+// and the tile bundles typical manufacturer figures because the tables are
+// licensed text this project does not reproduce. The citation said those figures
+// stood "in lieu of" the tables until 2026-09-02, the opposite of the rule it cited.
+test("renderMotorFLA renders the NEC-table limitation banner", async () => {
+  const t = await readSrc("calc-electrical.js");
+  const m = t.match(
+    /export function renderMotorFLA[\s\S]*?renderLimitationBanner\(inputRegion,\s*getLimitationCopy\("motor-fla"\)\)/,
+  );
+  assert.ok(m, "renderMotorFLA must call renderLimitationBanner with the motor-fla copy");
+});
+
 test("renderServiceLoad renders the AHJ-governs limitation banner", async () => {
   const t = await readSrc("calc-electrical.js");
   const m = t.match(

@@ -38,6 +38,7 @@ The principle from spec.md section 5 governs every entry: the data is either pub
 ### data/electrical/motor-fla.json
 
 - Source: Compiled from manufacturer technical bulletins for typical NEMA motors. Each entry attributes its publishing manufacturer.
+- **Not the NEC table values.** NEC 430.6(A)(1) requires the Table 430.247-430.250 value -- not the nameplate, and not a manufacturer figure -- for sizing conductors and overcurrent protection, and 430.6(A)(2) requires the nameplate FLA for the overload device. Those tables are licensed text this project does not reproduce, so the tile bundles typical published figures for a magnitude check and carries a limitation banner saying exactly this. The citation said the bundled figures stood "in lieu of" the tables until 2026-09-02, which is the opposite of what 430.6 says.
 - License: Manufacturer technical data with attribution; verify each bulletin permits redistribution before adding.
 - Cadence: Annual review.
 - Shard layout: Horsepower keyed, with voltage and phase variants and the publishing manufacturer.

@@ -290,6 +290,14 @@ export const breakerSizeExample = {
 
 // Compiled from NEMA-aligned manufacturer technical bulletins (typical
 // published values). Refresh from data/electrical/motor-fla.json at build.
+//
+// These are NOT the NEC table values, and the difference is not cosmetic:
+// NEC 430.6(A)(1) requires the Table 430.247-430.250 value -- not the
+// nameplate and not a manufacturer figure -- for sizing conductors and
+// overcurrent protection. The tables are licensed text this project does not
+// reproduce, so the tile bundles typical published values and says so in a
+// limitation banner. Until 2026-09-02 the citation said these values stood
+// "in lieu of" the tables, which is the opposite of what 430.6 says.
 export const MOTOR_FLA_TABLE = {
   0.5: { single_115V: 9.8, single_230V: 4.9, three_208V: 2.4, three_230V: 2.2, three_460V: 1.1 },
   1: { single_115V: 16, single_230V: 8, three_208V: 4.6, three_230V: 4.2, three_460V: 2.1 },
@@ -745,7 +753,8 @@ export function renderBreakerSize(inputRegion, outputRegion, citationEl, params)
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderMotorFLA(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: Use motor nameplate FLA where available. Reference values per NEC 2023 Tables 430.247-430.250 and NEMA-aligned manufacturer technical bulletins. Free at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: NEC 2023 430.6(A)(1) -- size conductors and overcurrent protection from the Table 430.247-430.250 value, not from the nameplate and not from these figures. 430.6(A)(2): the nameplate FLA is what sizes the overload device. The values below are typical published figures across NEMA-aligned manufacturer bulletins, for a sanity check on magnitude. Free at nfpa.org/freeaccess.";
+  renderLimitationBanner(inputRegion, getLimitationCopy("motor-fla"));
   attachExampleButton(inputRegion, () => fillExample({ hp: 5, voltage: "230", phase: "three" }));
 
   const hp = makeSelect("Horsepower", "mf-hp", [

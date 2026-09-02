@@ -51,9 +51,18 @@ test("B.1 breaker-sizing cites NEC 2023 §215.3 / §230.79 / §408.36 + 125% rul
   const t = await readCalc("calc-electrical.js");
   assertCitationContains(t, ["§215.3", "§230.79", "§408.36", "§210.20(A)"], "breaker-sizing");
 });
-test("B.1 motor-fla cites NEC 2023 Tables 430.247-430.250", async () => {
+// The tile bundles typical manufacturer figures, which NEC 430.6(A)(1) does not
+// let you size conductors or overcurrent protection from -- the Table
+// 430.247-430.250 value is what does that, and 430.6(A)(2) makes the nameplate
+// FLA the overload-device value. Naming the tables is not enough; the citation
+// has to name the rule that says these numbers are not the sizing numbers.
+test("B.1 motor-fla cites NEC 430.6 and says its figures are not the sizing values", async () => {
   const t = await readCalc("calc-electrical.js");
-  assertCitationContains(t, ["NEC 2023 Tables 430.247", "nfpa.org/freeaccess"], "motor-fla");
+  assertCitationContains(
+    t,
+    ["430.6(A)(1)", "430.6(A)(2)", "Table 430.247-430.250", "not from the nameplate", "nfpa.org/freeaccess"],
+    "motor-fla",
+  );
 });
 test("B.1 egc-sizing cites NEC 2023 Table 250.122", async () => {
   const t = await readCalc("calc-electrical.js");

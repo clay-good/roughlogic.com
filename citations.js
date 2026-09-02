@@ -1617,13 +1617,14 @@ export const CITATIONS = {
     ],
   },
   "motor-fla": {
-    formula: "FLA from manufacturer technical bulletins (in lieu of NEC 430.247–430.250 nameplate-equivalent tables).",
-    edition: NEC_2023 + " Section 430.6 (FLC); manufacturer specs as of build date.",
+    formula: "Typical full-load amps looked up by horsepower, voltage and phase from figures compiled across NEMA-aligned manufacturer technical bulletins. Not the NEC table values, which are licensed text this project does not reproduce.",
+    edition: NEC_2023 + " Sections 430.6(A)(1) and 430.6(A)(2) by name; manufacturer specs as of build date.",
     freeAccess: NEC_FREE,
     governance: GOVERNANCE.electrical,
     editionNote: NEC_DISCLOSURE,
     assumptions: [
       { name: "Service factor", value: "1.0 unless nameplate states otherwise", source: "NEMA MG 1 by name" },
+      { name: "Not the sizing value", value: "NEC 430.6(A)(1) requires the Table 430.247-430.250 value for conductor and overcurrent sizing, and 430.6(A)(2) the nameplate FLA for the overload device; these typical figures are neither. Until 2026-09-02 this page said they stood in lieu of the tables, which is the opposite of what 430.6 says.", source: "NEC 2023 430.6" },
     ],
   },
   "transformer-sizing": {

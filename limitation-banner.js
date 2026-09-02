@@ -116,6 +116,13 @@ const CANONICAL = {
     who_governs: "The AHJ and the licensed mechanical designer govern.",
     link: "acca.org",
   },
+  "motor-fla": {
+    headline: "Not the NEC table value.",
+    replacement:
+      "NEC 430.6(A)(1) requires the Table 430.247-430.250 value, not the nameplate or a manufacturer figure, for sizing conductors and overcurrent protection. These are typical published values across manufacturers; read the table.",
+    who_governs: "The AHJ and the NEC-adopted edition govern.",
+    link: "nfpa.org/freeaccess",
+  },
   "arc-flash-screen": {
     headline: "Not an IEEE 1584 study.",
     replacement:
