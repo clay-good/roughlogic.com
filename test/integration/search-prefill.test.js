@@ -231,7 +231,13 @@ test("spec-v1342 ask card: answering it computes and dismisses", async ({ page }
   await input.fill(ASK_QUERY);
   await ranked;
   await expect(page.locator("#search-results .search-result").first().locator(".sr-name"))
-    .toHaveText("Asphalt Tonnage");
+    // 30 s, matching its two siblings above and below, which already carry it.
+    // This one did not, and it was the only ask-card assertion that did not --
+    // it went red in CI once the 2026-09-02 mousemove fix stopped a parked
+    // pointer from freezing the list: the ranking now re-renders when the late
+    // alias shards land, which is correct, and correct takes longer than a
+    // frozen first paint. The assertion is unchanged.
+    .toHaveText("Asphalt Tonnage", { timeout: 30_000 });
   await input.press("Enter");
 
   const card = page.locator(".ask-card");
