@@ -256,17 +256,42 @@ test("a tile's own exact name outranks a partial curated alias", async () => {
   assert.equal((await answerQuery({ query: "Water Loss Class and Category" })).id, "water-classes");
 
   // And nothing anywhere in the catalog answers to a different tile when asked
-  // for by its own name -- all 1,804, not only the ones that rank first for it.
+  // for by its own name -- all of them, not only the ones that rank first.
   // Two rank SECOND behind a near neighbour ("Markup and Margin" behind the
   // Markup vs. Margin Converter, "Two-Leg Bridle Leg Tension" behind the Sling
   // Angle Load Multiplier), and being someone's exact name is a stronger signal
   // than one rank of separation. 81 tiles failed this before 2026-09-02.
+  //
+  // One documented exception, and it is the rule working rather than an escape
+  // hatch: "Fan Affinity Laws" is `affinity-laws`'s whole name AND an EXACT
+  // curated term for `fan-affinity-laws` ("Fan Affinity Laws (Speed / Diameter
+  // Change)"). A phrase a human wrote against a tile outranks a phrase that
+  // merely happens to be another tile's name, so curation wins. Anything else
+  // appearing here is a defect.
+  const CURATED_OVER_NAME = new Map([["affinity-laws", "fan-affinity-laws"]]);
   const stolen = [];
   for (const t of TOOLS) {
     const out = await answerQuery({ query: t.name });
-    if (out.id && out.id !== t.id) stolen.push(`${t.id} ("${t.name}") answered as ${out.id}`);
+    if (!out.id || out.id === t.id) continue;
+    if (CURATED_OVER_NAME.get(t.id) === out.id) continue;
+    stolen.push(`${t.id} ("${t.name}") answered as ${out.id}`);
   }
   assert.deepEqual(stolen, []);
+
+  // The seven curated terms that are also some other tile's whole name. The
+  // first version of the exact-name rule sent every one of them to the name
+  // instead of where the human sent it -- found by looking, not by reasoning.
+  for (const [term, target] of [
+    ["pump out", "septic-pumpout-interval"],
+    ["fan affinity laws", "fan-affinity-laws"],
+    ["how to figure total external static pressure", "static-pressure-hvac"],
+    ["wire feed speed for a deposition rate", "wire-feed-speed-for-deposition"],
+    ["two leg bridle tension per leg", "sling-angle"],
+    ["tip size", "nozzle-flow-pressure"],
+    ["markup vs margin", "markup-vs-margin"],
+  ]) {
+    assert.equal((await answerQuery({ query: term })).id, target, `curated term ${JSON.stringify(term)}`);
+  }
 });
 
 test("the reference path does not loosen either corroboration guard", async () => {

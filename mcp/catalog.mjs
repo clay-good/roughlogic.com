@@ -1001,6 +1001,15 @@ const TILE_NAME_NOISE = new Set([
 // Checked against the TOP tile only, so this widens what counts as
 // corroboration without widening what gets answered: a question that reaches
 // the wrong tile is still refused.
+// The query IS this tile's curated term, character for character -- as opposed
+// to merely containing one. See the ordering note in answerQuery.
+function queryIsExactCuratedAliasFor(query, id, aliases) {
+  if (!id || !Array.isArray(aliases)) return false;
+  const q = String(query || "").toLowerCase().trim();
+  if (!q) return false;
+  return aliases.some((row) => row && row.target === id && typeof row.term === "string" && row.term.toLowerCase().trim() === q);
+}
+
 function queryIsCuratedAliasFor(query, id, aliases) {
   if (!id || !Array.isArray(aliases)) return false;
   const q = String(query || "").toLowerCase().trim();
@@ -1148,8 +1157,24 @@ export async function answerQuery({ query } = {}) {
   // Angle Load Multiplier -- and being someone's exact name is a stronger
   // signal than one rank of separation. With the sweep across the top 3, all
   // 1,804 tiles answer to their own name; 81 did not before.
-  const exact = results.find((r) => sameTokens(q, byId.get(r.id)));
-  const top = exact
+  // Three levels of evidence, strongest first.
+  //
+  // 1. The query IS a curated term, exactly. A human wrote that phrase against
+  //    that tile; nothing here outranks it. Seven curated terms happen to
+  //    normalize to some OTHER tile's name -- "markup vs margin" is the Markup
+  //    vs. Margin Converter's phrase and also the Markup and Margin tile's name
+  //    -- and the first version of this rule sent all seven to the name instead
+  //    of where the human sent them. Measured, not reasoned about.
+  // 2. The query is a tile's own whole name. Beats a merely CONTAINED alias:
+  //    queryIsCuratedAliasFor matches on containment, which is how asking for
+  //    "Water Loss Class and Category" landed on the class-of-loss screen,
+  //    because "water loss class" is that tile's curated phrase.
+  // 3. A contained curated alias, then rank order -- the behaviour before all
+  //    of this.
+  const exactAlias = results.find((r) => queryIsExactCuratedAliasFor(q, r.id, aliasRows));
+  const exactName = results.find((r) => sameTokens(q, byId.get(r.id)));
+  const top = exactAlias
+    || exactName
     || results.find((r) => queryIsCuratedAliasFor(q, r.id, aliasRows))
     || results[0];
   if (!top) return { status: "NO_MATCH", query: q, message: "No calculator matched." };
