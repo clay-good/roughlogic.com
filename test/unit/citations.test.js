@@ -122,7 +122,12 @@ test("Group G compliance tiles cite OSHA / ADA / NIOSH / NWS by section", () => 
   assert.match(CITATIONS["wind-chill"].edition, /NWS Wind Chill/);
   assert.match(CITATIONS["ramp-slope"].edition, /ADA Standards/);
   assert.match(CITATIONS["ladder-angle"].edition, /ANSI A14\.7/);
-  assert.match(CITATIONS["mileage-cost"].edition, /IRS-published standard mileage/);
+  // The edition names the YEAR of the rate it ships. It read "IRS-published
+  // standard mileage rate (current tax year)" until 2026-09-02 while the shard
+  // carried the 2024 rate -- a page claiming a currency its bundled value did
+  // not have. check-citation-freshness now fails that shape.
+  assert.match(CITATIONS["mileage-cost"].edition, /IRS standard mileage rate/);
+  assert.match(CITATIONS["mileage-cost"].edition, /\b(19|20)\d{2}\b/);
 });
 
 test("Group G ramp-slope and trench-slope use structural governance; rainwater-yield uses plumbing", () => {

@@ -28,6 +28,7 @@
 // CI integration: invoked by `npm run lint` after check-manifests.
 
 import { readFile, readdir } from "node:fs/promises";
+import { pathToFileURL } from "node:url";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { existsSync } from "node:fs";
@@ -295,6 +296,58 @@ async function main() {
           }
         }
       }
+    }
+  }
+
+  // A citation may not tell the reader it is using "the current tax year" or
+  // "the current fiscal year" over a table that is fixed at build time. The
+  // mileage tile said exactly that while data/crosswalks/irs-mileage.json
+  // carried the 2024 rate and the crosswalks manifest recorded it as "IRS 2024
+  // standard mileage rate" -- two statements in one repo, one of them false, on
+  // a page a reader could take a reimbursement figure off. The per-diem tile
+  // said "current fiscal year" over an FY2026 table that stops being current on
+  // 2026-10-01 without a character changing.
+  //
+  // A fixed table has to name its year. "Current" is only honest where the
+  // value is computed, not bundled.
+  // Deliberately narrow, after a first cut that over-reported four ways.
+  //
+  //   - Only a CALENDAR period -- "current tax year", "current fiscal year",
+  //     "current year". "current edition" is a publication that rolls on its
+  //     own cycle, which is what sources-cycle.json and CF-03 above are for,
+  //     and the MACRS tables it covers are statutory rather than annual.
+  //   - Not a DIRECTIVE. "See irs.gov/forms-pubs for the current edition" tells
+  //     the reader where to find it; that is the opposite of claiming the
+  //     bundled copy is it.
+  //   - Not where the citation also names a year, which is disclosure.
+  // Loaded here, not at module scope: this script is copied into a bare fixture
+  // root by its own unit tests, where citations.js does not exist and a
+  // top-level import would kill it before any manifest is read. Missing is
+  // reported rather than skipped silently -- a check that quietly stops running
+  // is the thing the rest of this file exists to prevent.
+  let CITATIONS = null;
+  try {
+    ({ CITATIONS } = await import(pathToFileURL(resolve(ROOT, "citations.js")).href));
+  } catch {
+    warnings.push("citations.js was not readable from " + ROOT + "; the edition-currency check did not run.");
+  }
+  const CURRENCY_CLAIM = /\bcurrent\s+(tax\s+year|fiscal\s+year|year)\b/i;
+  const DIRECTIVE = /\b(see|at|from|check)\b[^.]*\bcurrent\s+(tax\s+year|fiscal\s+year|year)\b/i;
+  for (const [id, entry] of Object.entries(CITATIONS || {})) {
+    for (const field of ["edition", "editionNote"]) {
+      const text = entry && entry[field];
+      if (typeof text !== "string") continue;
+      // The editionNote is where the reasoning lives, including sentences about
+      // this very rule; only the reader-facing `edition` is held to it.
+      if (field !== "edition") continue;
+      if (!CURRENCY_CLAIM.test(text)) continue;
+      if (DIRECTIVE.test(text)) continue;
+      if (/\b(19|20)\d{2}\b/.test(text)) continue; // names a year as well; that is disclosure, not a claim
+      errors.push(
+        "citations.js: '" + id + "' edition claims " + JSON.stringify(text) +
+          ". A bundled table cannot promise it is current -- name the year or fiscal year it ships " +
+          "(the manifest already records it), or the page is wrong the day the source updates."
+      );
     }
   }
 

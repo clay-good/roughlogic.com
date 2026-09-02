@@ -6512,10 +6512,10 @@ export const CITATIONS = {
   },
   "mileage-cost": {
     formula: "Gallons = miles / mpg. Fuel cost = gallons × $/gal. IRS reimbursement = miles × IRS_standard_mileage_rate.",
-    edition: "IRS-published standard mileage rate (current tax year).",
+    edition: "IRS standard mileage rate, 2024 rate bundled ($0.67/mi).",
     freeAccess: "Free at irs.gov.",
     governance: GOVERNANCE.general,
-    editionNote: "Single-edition (IRS rate; annual update).",
+    editionNote: "Single-edition (IRS rate; annual update). This said \"current tax year\" until 2026-09-02 while data/crosswalks/irs-mileage.json carried the 2024 rate and the crosswalks manifest said so -- the page claimed a currency the bundled value did not have. The edition now names the year it ships; refreshing the value to the current one is a maintainer data transcription against irs.gov, tracked separately.",
     assumptions: [
       { name: "Rate", value: "data/crosswalks/irs-mileage.json (rate per mile, USD)", source: "IRS-published standard mileage rate" },
     ],
@@ -6532,10 +6532,10 @@ export const CITATIONS = {
   },
   "per-diem": {
     formula: "Lodging + M&IE per state from GSA-published per-diem rates (CONUS). DC, NY, MA, HI etc. carry standard-CONUS-plus values.",
-    edition: "GSA Federal Travel Regulation per-diem rates, current fiscal year.",
+    edition: "GSA Federal Travel Regulation per-diem rates, FY2026 (effective 2025-10-01).",
     freeAccess: "Free at gsa.gov/travel/plan-book/per-diem-rates.",
     governance: GOVERNANCE.general,
-    editionNote: "Single-edition (GSA rates; annual update each fiscal year).",
+    editionNote: "Single-edition (GSA rates; annual update each fiscal year). Named by fiscal year rather than \"current fiscal year\": FY2026 ends 2026-09-30, and a page that calls a fixed table \"current\" is wrong from the day after without changing a character.",
     assumptions: [
       { name: "Rate table", value: "data/crosswalks/gsa-perdiem.json keyed to state", source: "GSA-published rate" },
     ],
@@ -7517,10 +7517,10 @@ export const CITATIONS = {
   },
   "payroll-withholding": {
     formula: "Annualize gross. Apply Pub 15-T percentage-method bracket: fed_annual = base + (annual_gross - prev) * rate. Divide by pay periods. FICA: SS = min(gross, wage_base - ytd) * 0.062. Medicare = gross * 0.0145. Additional Medicare = 0.9% above the threshold.",
-    edition: "IRS Publication 15-T (current year), Worksheet 1A (Percentage Method, manual payroll). Single-filer brackets bundled.",
+    edition: "IRS Publication 15-T, 2025 brackets bundled, Worksheet 1A (Percentage Method, manual payroll). Single-filer only.",
     freeAccess: "Free at irs.gov/publications/p15t.",
     governance: GOVERNANCE.tax,
-    editionNote: "Single-filer brackets bundled for the current year; MFJ / HoH and the 2020+ W-4 step-2 path are out of scope for the v5 starter (illustrative).",
+    editionNote: "Single-filer brackets bundled; MFJ / HoH and the 2020+ W-4 step-2 path are out of scope for the v5 starter (illustrative). The edition names the year the shard carries (data/accounting/pub-15-t-tables.json declares \"2025\") rather than saying \"current year\", which it said until 2026-09-02 -- a bundled bracket table cannot promise it is this year's.",
     assumptions: [
       { name: "Filer type", value: "single (illustrative)", source: "Pub 15-T Worksheet 1A" },
       { name: "Standard deduction", value: "baked into the bundled bracket starts", source: "Pub 15-T 2025 percentage-method table" },
