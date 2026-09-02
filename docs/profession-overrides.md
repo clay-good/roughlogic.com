@@ -1,5 +1,20 @@
 # Profession Overrides (spec-v12 §13.1)
 
+> **Status: superseded. Groups U and V no longer ship.** Both benches, along
+> with Group S (Legal) and Group W (Aviation), were retired by spec-v107 under
+> the trades-only charter; `calc-vet.js` and `calc-ems.js` were deleted, and no
+> tile in the catalog carries the `vet` or `ems` trade. The document is kept
+> because §2 instructs any future spec that would re-exclude these professions
+> to cite it, and because §5's argument -- that a limitation banner naming what
+> a tile is NOT is a stronger safety affordance than refusing to ship the tile
+> -- is the reasoning the catalog still applies to every regulated-profession
+> tile it does carry. Read what follows as the record of a decision that was
+> made and later reversed on scope grounds, not as current policy.
+>
+> This header was added on 2026-09-02. Until then the document read as live
+> governance for two benches that had not existed for months.
+
+
 This document records the v12 override of the spec.md / spec-v9 §11 carve-out for "live drug-dosing or clinical decision support" and lays out the bounded scope under which Group U (Veterinary) and Group V (EMS / Pre-hospital) ship in v12. Any future spec proposing to re-exclude these groups must explicitly cite this document and the §13.1 rationale.
 
 ## 1. The exclusion that v12 overrides

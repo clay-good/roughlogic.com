@@ -325,6 +325,10 @@ Status: **complete** - citations.js populated for all twelve Group R tiles (util
 
 ### Group S - Legal Plain-English and Statutory Math (calc-legal.js) - priority 13 (v5)
 
+> **Retired.** Group S and `calc-legal.js` were retired by spec-v107 under the
+> trades-only charter. The status below records the audit as it stood; the
+> module and its tiles no longer ship.
+
 Status: **complete** - citations.js populated for all nine Group S tiles (utilities 246-254). Cites per-state judgment-interest statute (e.g., Cal. Civ. Proc. Code 685.010) by section number; Story v. Livingston (1839) for the U.S. Rule on partial payments; Fed. R. Civ. P. 6(a)(1) / (a)(2) / (a)(3) / (a)(6) for court-day computation; per-state code section for SOTL / landlord-tenant / small-claims; 29 USC 207 / 203(m) FLSA + per-state minimum-wage statute; IRS Rev. Rul. 87-41 (20-factor test) and Dynamex Operations W. v. Superior Court (ABC test). Reference pages (contract clauses, lease terms) carry original-creative-work attribution. Every tile carries the spec-v5.md legal-information governance variant via `GOVERNANCE.legal`.
 
 ### Group T - Bench Science and Laboratory Math (calc-lab.js) - priority 14 (v5)
@@ -341,13 +345,27 @@ Tile counts at v5 audit close: 271 spec-numbered utilities (was 233); 35 new vis
 
 ### Group U - Veterinary (calc-vet.js) - priority 16 (v12)
 
+> **Retired.** Group U and `calc-vet.js` were retired by spec-v107 under the
+> trades-only charter. The status below records the audit as it stood; the
+> module and its tiles no longer ship. See
+> [profession-overrides.md](profession-overrides.md).
+
 Status: **complete** - citations.js populated for all eighteen Group U tiles (U.1-U.18 per spec-v12 §5). Cites Plumb's Veterinary Drug Handbook 10th ed. by name only and FDA-approved labeling via DailyMed (heartworm dose by labeled weight bands); AAHA Canine Vaccination Guidelines (2022 update) and AAFP Feline Vaccination Advisory Panel Report (2020 update); AAHA-AAFP Life Stage Guidelines (2010 canine, 2021 feline, 2019 canine update); ASPCA Animal Poison Control Center published thresholds with the 888-426-4435 hotline reminder; AVMA ASA classification; DiBartola Fluid / Electrolyte / Acid-Base Disorders in Small Animal Practice (4th ed.) for the Holliday-Segar-adapted fluid math; AKC / CHIC databases for breed predispositions; IDEXX / Antech reference ranges for CBC and chemistry. Every tile cites `GOVERNANCE.veterinary` ("Veterinarian governs the prescription and the in-clinic plan") and renders the spec-v10 §B.1 limitation banner per the spec-v12 §13.1 override (see [profession-overrides.md](profession-overrides.md)).
 
 ### Group V - EMS / Pre-hospital (calc-ems.js) - priority 17 (v12)
 
+> **Retired.** Group V and `calc-ems.js` were retired by spec-v107 under the
+> trades-only charter. The status below records the audit as it stood; the
+> module and its tiles no longer ship. See
+> [profession-overrides.md](profession-overrides.md).
+
 Status: **complete** - citations.js populated for all twenty Group V tiles (V.1-V.20 per spec-v12 §6). Cites Teasdale & Jennett, Lancet 1974 (GCS); Baxter, Clinics in Plastic Surgery 1974 + ABA / ATLS (Parkland); Pulaski & Tennison 1947 + Lund & Browder, Annals of Surgery 1944 (Rule of 9s / Lund-Browder); Apgar, Anesthesia & Analgesia 1953 (APGAR); Kothari et al., Ann Emerg Med 1999 + CDC public materials (CPSS); Newport Beach FD / Hoag 1983 + Romig 2002 + CDC Field Triage Guidelines (2021) (START / JumpSTART); APLS pediatric weight formulas (peds wt); Wells et al., Lancet 1997 + NEJM 2003 (Wells DVT); Wells et al., Throm Haemost 2000 + ACEP / ESC (Wells PE); Kline et al., J Throm Haemost 2004 + Ann Emerg Med 2008 (PERC); AHA PALS Provider Manual 2020 (peds vitals); Brott et al., Stroke 1989 + NIH NINDS (NIHSS); first-principles arithmetic with medical-director-governs framing for the IV drip / O2 cylinder / drug concentration tiles. Every tile cites `GOVERNANCE.ems_prehospital` and renders the spec-v10 §B.1 limitation banner per the spec-v12 §13.1 override.
 
 ### Group W - Pilots / Aviation (calc-aviation.js) - priority 18 (v12)
+
+> **Retired.** Group W and `calc-aviation.js` were retired by spec-v107 under
+> the trades-only charter. The status below records the audit as it stood; the
+> module and its tiles no longer ship.
 
 Status: **complete** - citations.js populated for all eighteen Group W tiles (W.1-W.18 per spec-v12 §7). Cites FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Ch. 4 / 16 (density altitude, true airspeed, mag variation TVMDC); standard E6B vector identities + POH demonstrated-crosswind values (crosswind, wind triangle, top-of-descent); FAA AC 00-45H Change 2 + NWS FMH-1 + WMO Manual on Codes (METAR / TAF decoders); 14 CFR §91.211 (hypoxia altitude), §91.151 / §91.167 (fuel planning), §1.1 + §61.5 + Parts 23 / 25 (aircraft category); ICAO Annex 10 (phonetic alphabet); 14 CFR §91.215 (transponder codes); standard turn-rate identities. Every tile cites `GOVERNANCE.aviation` ("PIC and the airplane flight manual govern; verify against the AFM loading graph or table").
 

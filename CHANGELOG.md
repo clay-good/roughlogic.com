@@ -41,6 +41,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **A governance document described two benches that were retired months ago.** `docs/profession-overrides.md` is the spec-v12 §13.1 override that authorized the Veterinary (Group U) and EMS (Group V) benches, and it instructs any future spec proposing to re-exclude those professions to cite it. Groups S, U, V and W were retired by spec-v107 under the trades-only charter: `calc-vet.js` and `calc-ems.js` were deleted, and **no tile in the catalog carries the `vet` or `ems` trade**. The document carried no status at all, so it read as current policy for benches that do not exist.
+
+  It now opens with one, and says why it is kept: §5's argument -- that a limitation banner naming what a tile is NOT beats refusing to ship the tile -- is the reasoning the catalog still applies to every regulated-profession tile it does carry. `docs/v6-audit.md`'s four "Status: **complete**" sections for Groups S, U, V and W get the same treatment. `docs/citation-discipline.md` had recorded the retirement on 2026-08-30; these were the places that had not.
+
+  Found while checking `PROFESSION_NOUN`: five keys in that map -- `vet`, `ems`, `aviation`, `realestate`, `edu` -- matched no tile's trades array, and two of the five turned out to be misspellings rather than retirements. The other three led here.
+
+
 - **The threat model listed a theme value that can no longer be stored.** T7 said `rl-theme` holds `"light"`, `"dark"`, or `"high-contrast"`; `theme.js` migrates a stored `"high-contrast"` to `"dark"` on read and its `THEMES` array has held two entries for some time. It now also records that the key is written only when the reader works the toggle -- following the system preference persists nothing -- and points at the two specs that measure the section's claims rather than restating them.
 
 
