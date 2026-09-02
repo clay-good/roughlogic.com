@@ -114,10 +114,19 @@
          a token over 30 characters fails the 320px sweep. -->
     <div class="hero-examples">
       <span class="hero-examples-label">Try:</span>
-      <button type="button" class="hero-chip" data-q="voltage drop 120v 150 ft 12 awg copper 20a single phase">voltage drop 120v 150 ft 12awg 20a</button>
-      <button type="button" class="hero-chip" data-q="asphalt tonnage 2400 sq ft 3 in deep 12 ft wide">asphalt 2400 sq ft, 3 in deep</button>
-      <button type="button" class="hero-chip" data-q="ohms law 120 volts 10 amps">ohms law 120 v, 10 a</button>
-      <button type="button" class="hero-chip" data-q="friction loss 200 ft of hose at 150 gpm">friction loss 200 ft, 150 gpm</button>
+      <!-- A chip shows the query it runs. Each carried a `data-q` with a
+           longer, more explicit phrasing until 2026-09-02 -- "ohms law 120 v,
+           10 a" ran "ohms law 120 volts 10 amps" -- so the four examples
+           teaching "type the job the way you'd say it" were the one place on
+           the site where typing what is shown does not do what is shown.
+           Measured: three of the four short forms rank a different tile first,
+           and the Ohm's Law one prefills nothing. The chips now carry what
+           they run; check-shells fails a `data-q`, and search-prefill asserts
+           a chip and its own visible text reach the same tile. -->
+      <button type="button" class="hero-chip">voltage drop 120v 150 ft 12 awg copper 20a single phase</button>
+      <button type="button" class="hero-chip">asphalt tonnage 2400 sq ft 3 in deep 12 ft wide</button>
+      <button type="button" class="hero-chip">ohms law 120 volts 10 amps</button>
+      <button type="button" class="hero-chip">friction loss 200 ft of hose at 150 gpm</button>
     </div>
 
     <!-- What a reader without JavaScript is told. This said only that the site

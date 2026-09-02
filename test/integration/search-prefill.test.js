@@ -337,7 +337,11 @@ test("spec-v1337 chips: a chip fills the box and leaves the results open", async
   // the results it had just opened.
   await page.goto("/");
   const chip = page.locator(".hero-chip").first();
-  const query = await chip.getAttribute("data-q");
+  // Its own visible text. These read `data-q` until 2026-09-02, which is to
+  // say they asserted the chip worked using a string the reader never sees --
+  // and the string the reader DOES see ranked a different tile first on three
+  // of the four chips.
+  const query = (await chip.textContent()).trim();
   await chip.click();
   await expect(page.locator("#search-input")).toHaveValue(query);
   await expect(page.locator("#search-results")).toBeVisible({ timeout: 30_000 });
@@ -359,6 +363,50 @@ test("spec-v1337 chips: every chip routes to a real tile with values", async ({ 
     await expect(page).toHaveURL(/#[a-z0-9-]+\?v=1&/);
     await expect(page.locator(".field-provenance").first()).toBeVisible({ timeout: 30_000 });
   }
+});
+
+test("spec-v1337 chips: a chip and its own text reach the same tile", async ({ page }) => {
+  // The chips are the site's demonstration of "type the job the way you'd say
+  // it". A chip that shows one query and runs another teaches a sentence that
+  // does not work -- which is what a `data-q` did until 2026-09-02.
+  await page.goto("/");
+  const labels = (await page.locator(".hero-chip").allTextContents()).map((t) => t.trim());
+  for (let i = 0; i < labels.length; i++) {
+    await page.goto("/");
+    await page.locator(".hero-chip").nth(i).click();
+    await expect(page.locator(".search-result").first()).toBeVisible({ timeout: 30_000 });
+    await page.locator("#search-input").press("Enter");
+    await expect(page).toHaveURL(/#[a-z0-9-]+\?v=1&/);
+    const viaChip = page.url().split("#")[1].split("?")[0];
+
+    await page.goto("/");
+    await page.locator("#search-input").pressSequentially(labels[i], { delay: 10 });
+    await expect(page.locator(".search-result").first()).toBeVisible({ timeout: 30_000 });
+    await page.locator("#search-input").press("Enter");
+    await expect(page).toHaveURL(/#[a-z0-9-]+/, { timeout: 30_000 });
+    const viaTyping = page.url().split("#")[1].split("?")[0];
+
+    expect(viaTyping, `chip ${JSON.stringify(labels[i])} routes to ${viaChip} when clicked but ${viaTyping} when typed`)
+      .toBe(viaChip);
+  }
+});
+
+test("spec-v1337 chips: a resting mouse does not choose a row", async ({ page }) => {
+  // The rows are rendered under wherever the pointer happens to be sitting
+  // after the click, and the browser dispatches `mouseenter` when layout brings
+  // an element beneath a stationary cursor. That was wired to "the reader
+  // picked this row": Enter then opened whichever tile had drifted under the
+  // mouse, and `userPicked` also suppressed the re-rank when the alias shards
+  // landed -- so a pointer that never moved both stole the highlight and
+  // pinned it against the better answer arriving a moment later.
+  //
+  // The mouse is deliberately NOT moved after the click here. That is the bug.
+  await page.goto("/");
+  await page.locator(".hero-chip").nth(1).click();
+  await expect(page.locator(".search-result").first()).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator("#search-input")).toHaveAttribute("aria-activedescendant", "search-result-0", {
+    timeout: 30_000,
+  });
 });
 
 test("spec-v1337 chips: 48px touch targets", async ({ page }) => {

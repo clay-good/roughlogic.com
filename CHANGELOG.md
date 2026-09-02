@@ -61,6 +61,21 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A resting mouse silently chose a search result.** Click one of the home page's example chips, do not touch the mouse, press Enter -- and the site opened Egress Window Well instead of Asphalt Tonnage. The rows render under wherever the pointer happens to be sitting, and a browser dispatches `mouseenter` when layout brings an element beneath a stationary cursor. That was wired to "the reader picked this row", so a pointer that had never moved took the highlight.
+
+  It did something worse as well. The same handler sets `userPicked`, and the branch that re-ranks when the alias shards land honours that flag by refusing to move the highlight -- a courtesy for a reader who has deliberately arrowed to a row. So the unmoved pointer both stole the selection and pinned it against the better answer arriving a moment later.
+
+  `mousemove` instead of `mouseenter`: it fires only when the pointer actually moves, which is exactly the distinction that was missing. Deliberate hovering still highlights and Enter still follows it; clicking a row is unchanged. Pinned by a spec that clicks a chip and then **does not touch the mouse**, which is the shape of the bug; seed-verified by restoring `mouseenter`, which reddens three specs.
+
+- **The four example chips showed one query and ran another.** Each carried a `data-q` with a longer, more explicit phrasing: the chip reading `ohms law 120 v, 10 a` ran `ohms law 120 volts 10 amps`, and `asphalt 2400 sq ft, 3 in deep` ran `asphalt tonnage 2400 sq ft 3 in deep 12 ft wide`. The chips are the site's demonstration of "type the job the way you'd say it", which made them the one place where typing what is shown does not do what is shown.
+
+  Measured, clicking each chip against typing its own visible label character by character: **three of the four short forms rank a different tile first**, and the Ohm's Law one prefills nothing at all. The existing specs could not see it -- they read `data-q`, so they asserted the chip worked using a string the reader never sees.
+
+  The chips now carry the query they run, and a spec checks that a chip and its own visible text reach the same tile. Ranking harness unchanged at 99.73% / 99.83% / 99.83%; the longer labels re-verified at 320 px on Chromium and WebKit.
+
+  Not fixed here, and worth naming: the short forms are what a reader would actually type, and the extractor prefers the explicit ones. That is a ranking and extraction gap, not a labelling one, and it is a separate piece of work.
+
+
 - **The keyboard-shortcut overlay named a tile something the catalog does not call it.** `G R` opens "Refrigerant P-T Chart"; the overlay said "Refrigerant P-T". A small thing, and the reason it is worth recording is where it was found: `docs/accessibility.md` asserts outright that its shortcut list, the live `SHORTCUTS` map in `app.js` and the `?` overlay all agree -- three copies of one table, with a claim of agreement over them and nothing comparing them.
 
   `test/unit/keyboard-shortcuts.test.js` reads all three and compares them, and checks the two things the strings alone cannot say: that **every destination is a live tile** -- a G-key routing to a renamed id falls through to the home view and looks exactly like a key that was never pressed -- and that the label the overlay shows is that tile's own name. Twelve keys, all live, all now named correctly. Three failure modes seed-verified: a dead route id, a drifted label, and a key dropped from the overlay.

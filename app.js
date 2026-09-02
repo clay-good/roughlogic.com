@@ -1110,7 +1110,10 @@ function bindSearch() {
   // demonstrated is exactly what their own typing does.
   for (const chip of document.querySelectorAll(".hero-chip")) {
     chip.addEventListener("click", () => {
-      const q = chip.getAttribute("data-q") || chip.textContent.trim();
+      // The chip's own visible text, and nothing else. It used to prefer a
+      // `data-q` attribute, so the four examples demonstrating "type the job
+      // the way you'd say it" ran a query the reader could not see.
+      const q = chip.textContent.trim();
       input.value = q;
       input.focus();
       loadAndRender();
@@ -1175,7 +1178,24 @@ function bindSearch() {
       item.appendChild(group);
       // mousedown so the route fires before the input-blur close handler.
       item.addEventListener("mousedown", (e) => { e.preventDefault(); pick(tool); });
-      item.addEventListener("mouseenter", () => { userPicked = true; setActive(i); });
+      // mousemove, not mouseenter. A row that RENDERS UNDER A STATIONARY
+      // POINTER gets a mouseenter -- the browser dispatches one when layout
+      // brings an element beneath the cursor -- so the reader's resting mouse
+      // silently claimed a row it had never pointed at, and Enter opened that
+      // one instead of the top match. Clicking the second example chip and
+      // pressing Enter without touching the mouse landed on Egress Window Well
+      // rather than Asphalt Tonnage. Worse, it also set `userPicked`, which the
+      // branch below honours by refusing to re-rank when the alias shards land:
+      // a pointer that never moved both stole the highlight and pinned it
+      // against the better answer arriving a moment later.
+      //
+      // mousemove fires only when the pointer actually moves, which is the
+      // distinction that was missing. The guard keeps the repeat events cheap.
+      item.addEventListener("mousemove", () => {
+        if (activeIndex === i) return;
+        userPicked = true;
+        setActive(i);
+      });
       list.appendChild(item);
       // spec-v592: computed answer preview on the top-ranked row when the
       // typed numbers map onto the tile's slots.
