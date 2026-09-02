@@ -334,21 +334,19 @@ async function main() {
   const CURRENCY_CLAIM = /\bcurrent\s+(tax\s+year|fiscal\s+year|year)\b/i;
   const DIRECTIVE = /\b(see|at|from|check)\b[^.]*\bcurrent\s+(tax\s+year|fiscal\s+year|year)\b/i;
   for (const [id, entry] of Object.entries(CITATIONS || {})) {
-    for (const field of ["edition", "editionNote"]) {
-      const text = entry && entry[field];
-      if (typeof text !== "string") continue;
-      // The editionNote is where the reasoning lives, including sentences about
-      // this very rule; only the reader-facing `edition` is held to it.
-      if (field !== "edition") continue;
-      if (!CURRENCY_CLAIM.test(text)) continue;
-      if (DIRECTIVE.test(text)) continue;
-      if (/\b(19|20)\d{2}\b/.test(text)) continue; // names a year as well; that is disclosure, not a claim
-      errors.push(
-        "citations.js: '" + id + "' edition claims " + JSON.stringify(text) +
-          ". A bundled table cannot promise it is current -- name the year or fiscal year it ships " +
-          "(the manifest already records it), or the page is wrong the day the source updates."
-      );
-    }
+    // `edition` only. `editionNote` is where the reasoning lives, including
+    // sentences about this very rule, and holding it to the rule would forbid
+    // explaining the rule.
+    const text = entry && entry.edition;
+    if (typeof text !== "string") continue;
+    if (!CURRENCY_CLAIM.test(text)) continue;
+    if (DIRECTIVE.test(text)) continue;
+    if (/\b(19|20)\d{2}\b/.test(text)) continue; // names a year as well; that is disclosure, not a claim
+    errors.push(
+      "citations.js: '" + id + "' edition claims " + JSON.stringify(text) +
+        ". A bundled table cannot promise it is current -- name the year or fiscal year it ships " +
+        "(the manifest already records it), or the page is wrong the day the source updates."
+    );
   }
 
   for (const w of warnings) console.warn("WARN: " + w);
