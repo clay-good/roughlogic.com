@@ -730,8 +730,8 @@
       "date": "2026-09-01"
     },
     "/tools/bucket-elevator-capacity/": {
-      "sha": "5b4fc23e52c3e313",
-      "date": "2026-09-01"
+      "sha": "1f02b37d63f6b5fc",
+      "date": "2026-09-02"
     },
     "/tools/buffer-tank-loop-credit/": {
       "sha": "3f759999ba9b97bc",
@@ -878,8 +878,8 @@
       "date": "2026-09-01"
     },
     "/tools/center-of-gravity-2point/": {
-      "sha": "1a587102e761a890",
-      "date": "2026-09-01"
+      "sha": "233abd15d028095c",
+      "date": "2026-09-02"
     },
     "/tools/center-pivot-runtime/": {
       "sha": "8602dc9ec9990c8c",
@@ -2254,8 +2254,8 @@
       "date": "2026-09-01"
     },
     "/tools/ev-charge-time/": {
-      "sha": "f515fb48ea6c8fc0",
-      "date": "2026-09-01"
+      "sha": "a50fa8e0e406fb7d",
+      "date": "2026-09-02"
     },
     "/tools/ev-charger-load/": {
       "sha": "8a850b50f9550f83",
@@ -4098,11 +4098,11 @@
       "date": "2026-09-01"
     },
     "/tools/one-sample-t-test/": {
-      "sha": "8d086894696d38a9",
-      "date": "2026-09-01"
+      "sha": "3356bb5805b3e3bc",
+      "date": "2026-09-02"
     },
     "/tools/one-way-anova/": {
-      "sha": "be701152d16b3d4a",
+      "sha": "4afb7802552c2c7d",
       "date": "2026-09-02"
     },
     "/tools/open-delta-transformer/": {
@@ -5402,7 +5402,7 @@
       "date": "2026-09-01"
     },
     "/tools/seismic-approximate-period/": {
-      "sha": "2364cc4a08152f87",
+      "sha": "66727600b89f0be5",
       "date": "2026-09-02"
     },
     "/tools/seismic-base-shear/": {
@@ -5870,8 +5870,8 @@
       "date": "2026-09-01"
     },
     "/tools/spherical-zone-volume/": {
-      "sha": "8d244404c86ca168",
-      "date": "2026-09-01"
+      "sha": "0a51a3d263368846",
+      "date": "2026-09-02"
     },
     "/tools/spindle-max-mrr/": {
       "sha": "4dca36ce908556b9",
@@ -6470,8 +6470,8 @@
       "date": "2026-09-01"
     },
     "/tools/thermistor-steinhart-hart/": {
-      "sha": "24de7efbf69f4dc2",
-      "date": "2026-09-01"
+      "sha": "5a156140478ee1cb",
+      "date": "2026-09-02"
     },
     "/tools/thi-livestock/": {
       "sha": "dbf36ad639797791",
@@ -6714,16 +6714,16 @@
       "date": "2026-09-01"
     },
     "/tools/triangle-asa/": {
-      "sha": "0fa9f765739f7a08",
-      "date": "2026-09-01"
+      "sha": "c6f81cf0a121b27f",
+      "date": "2026-09-02"
     },
     "/tools/triangle-sas/": {
-      "sha": "75b6adf1db42bf75",
-      "date": "2026-09-01"
+      "sha": "bbffdce8a3e7edbc",
+      "date": "2026-09-02"
     },
     "/tools/triangle-sss/": {
-      "sha": "2b8b23be347c5c8b",
-      "date": "2026-09-01"
+      "sha": "879b4ad13fc2733f",
+      "date": "2026-09-02"
     },
     "/tools/trim-linear-footage/": {
       "sha": "991656f6985acd98",
@@ -6782,8 +6782,8 @@
       "date": "2026-09-01"
     },
     "/tools/two-proportion-z-test/": {
-      "sha": "61876fec7dd587d9",
-      "date": "2026-09-01"
+      "sha": "9b3e6d708c882af8",
+      "date": "2026-09-02"
     },
     "/tools/two-sample-t-test/": {
       "sha": "59f6197965475c6e",

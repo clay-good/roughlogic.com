@@ -415,17 +415,42 @@ function candidatesOf(token) {
     if (token.endsWith("es")) out.push(token.slice(0, -2));
     if (token.endsWith("s")) out.push(token.slice(0, -1));
   }
-  const twin = DIGIT_EQUIV.get(token);
-  if (twin) out.push(twin);
   return out;
 }
 
 // Best field weight for one query token against one tool corpus.
+// A digit may stand in for its word only where that word is part of the
+// calculator's IDENTITY -- its name or its id -- and not where the word merely
+// appears in a curated phrase or in prose.
+//
+// DIGIT_EQUIV exists so "3 phase" meets "Three-Phase Power", and that is a
+// digit standing in for a word in a tile's NAME. `concrete slab 20 ft by 30 ft
+// 4 in thick` is a digit standing for a NUMBER, and it returned Concrete
+// Control Joint Spacing above Concrete Volume because that tile carries the
+// curated alias "joint grid for a FOUR inch slab": the reader's four inches
+// matched the spelled four, worth 2 points, which was the entire 10-to-9
+// margin. Nothing about the reader's query was asking for joint spacing.
+//
+// Tried first and rejected: suppressing the twin when the next token is a unit.
+// `normalizeQuery` drops "in" as a stopword -- it is a preposition as often as
+// an inch -- so "4 in thick" arrives as ["4", "thick"] and the test never
+// fires. Rejected too: suppressing it whenever the query carries any unit,
+// which would break "3 phase 200 amp service".
+const DIGIT_TWIN_FIELDS = ["name", "id"];
+
 function bestFieldWeight(token, corpus) {
   for (const cand of candidatesOf(token)) {
     for (const field of FIELD_ORDER) {
       for (const ct of corpus[field]) {
         if (tokenMatches(cand, ct)) return FIELD_WEIGHTS[field];
+      }
+    }
+  }
+  const twin = DIGIT_EQUIV.get(token);
+  if (twin) {
+    for (const field of DIGIT_TWIN_FIELDS) {
+      for (const ct of corpus[field]) {
+        if (tokenMatches(twin, ct)) return FIELD_WEIGHTS[field];
       }
     }
   }

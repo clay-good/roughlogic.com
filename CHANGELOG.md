@@ -125,6 +125,17 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A reader's "4 in thick" matched another tile's spelled-out "four".** `concrete slab 20 ft by 30 ft 4 in thick` -- as plain a trade query as this catalog gets -- returned **Concrete Control Joint Spacing** above Concrete Volume. Token-ablation named the culprit exactly: drop the bare `4` and Concrete Volume wins. The mechanism took longer, and one wrong guess: that tile carries the curated alias *"joint grid for a **four** inch slab"*, and `DIGIT_EQUIV` maps `4` to `four`, so the reader's four inches matched the spelled four in an unrelated phrase. Alias field weight is 2, which was the entire 10-to-9 margin.
+
+  `DIGIT_EQUIV` exists so that "3 phase" meets **Three-Phase Power**, and that is a digit standing in for a word in a tile's **name**. The fix keeps exactly that and nothing more: **a digit may borrow its word from a name or an id -- the calculator's identity -- and not from a curated phrase or from prose.** "3 phase power" still returns Three-Phase Power first.
+
+  Two narrower rules were tried and rejected first, and both are recorded beside the code so the next person does not spend them again. Suppressing the twin when the next token is a unit does not fire at all: `normalizeQuery` drops "in" as a stopword -- it is a preposition as often as an inch -- so "4 in thick" arrives as `["4", "thick"]`. Suppressing it whenever the query carries any unit would break "3 phase 200 amp service".
+
+  **The ranking harness does not move**: aliases 20,968 / 21,025, names 1,801 / 1,804, ids 1,801 / 1,804, 63 misses -- identical. 1,500 sampled curated alias terms reach their targets with the same single pre-existing exception; `check-both-doors`, `door-parity` and all 36 search specs pass; `240.21`, `62.2`, `130.5` and `12/2` unchanged.
+
+  The unit test asserts the **mechanism** on a two-tile pair built to isolate it, not the outcome on a three-tile fixture: a small fixture scores nothing like the real 1,804-tile corpus, and one that happens to reproduce an outcome is measuring itself. My first attempt at this test did exactly that and failed against the fixed code.
+
+
 - **A unit typed with a space before it was thrown away: `120 v` read as a bare number.** `extractQuantities` accepts a one-letter unit **glued only** -- `120V` is volts, `120 v` is nothing -- so that an article ("a 50 amp circuit") and a dimension separator ("20 x 30") can never be mistaken for units. That rule is right where it lives: the extractor has no idea which tile it is looking at. The cost was recorded yesterday and is now paid: `ohms law 120 v, 10 a` prefilled **nothing**, while `120V 10A` and `120 volts 10 amps` both filled -- and the spaced short form is the phrasing the home page's own example chip advertised.
 
   `query-fill` **does** have tile context, which is what breaks the tie. A new phase reads the letter back out of the reader's own text and fills only when it canonicalizes to a real unit **and** exactly one unfilled field declares that unit exactly -- no same-family widening, because the evidence is one character. Symmetric on the other side too, which a fixture caught: `120 v 10 v` on Ohm's Law is two candidate **values** for one volts field, as ambiguous as two fields for one value, so one field *and* one value or nothing.

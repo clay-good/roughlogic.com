@@ -303,6 +303,38 @@ test("a pure number in a tile name does not rank it", () => {
   assert.equal(ranked[0].tool.id, "asphalt-tonnage", JSON.stringify(ranked.map((r) => r.tool.id + ":" + r.score)));
 });
 
+// A digit stands in for its word only where that word is part of the
+// calculator's identity. "3 phase" must still meet "Three-Phase Power" -- the
+// word is in the NAME -- while a reader's "4 in thick" must not match a spelled
+// four inside a curated phrase belonging to some other tile.
+//
+// The live case: `concrete slab 20 ft by 30 ft 4 in thick` returned Concrete
+// Control Joint Spacing above Concrete Volume, because that tile carries the
+// alias "joint grid for a four inch slab" and the alias field is worth 2 --
+// exactly the 10-to-9 margin. (Asserted here on a pair of tiles built to
+// isolate the rule rather than on that query: a three-tile fixture scores
+// nothing like the real 1,804-tile corpus, and a fixture that happens to
+// reproduce an outcome is measuring itself.)
+test("a digit borrows its word from a name, not from an alias", () => {
+  const viaName = { id: "four-slab", name: "Four Inch Slab Rebar", trades: ["concrete"], desc: "Rebar for a slab." };
+  const viaAlias = { id: "joint-grid", name: "Joint Grid Layout", trades: ["concrete"], desc: "Rebar for a slab." };
+  const tools = [viaName, viaAlias];
+  const aliases = [{ term: "four inch slab", target: "joint-grid", kind: "question" }];
+  const ranked = rankTools(normalizeQuery("4 slab rebar").tokens, tools, aliases, { limit: 2 });
+  const score = new Map(ranked.map((r) => [r.tool.id, r.score]));
+
+  // The digit reaches the word in the NAME and scores there.
+  assert.ok(score.get("four-slab") > score.get("joint-grid"),
+    `name should outscore alias: ${JSON.stringify([...score])}`);
+
+  // And the alias-only tile scores exactly what it would with no digit at all:
+  // the 4 bought it nothing.
+  const withoutDigit = rankTools(normalizeQuery("slab rebar").tokens, tools, aliases, { limit: 2 });
+  const before = new Map(withoutDigit.map((r) => [r.tool.id, r.score]));
+  assert.equal(score.get("joint-grid"), before.get("joint-grid"),
+    "the digit must add nothing through an alias");
+});
+
 test("extractQuantities: a dimension pair maps nothing", () => {
   const got = extractQuantities("10x12 shed");
   assert.ok(got.every((qty) => qty.unit === null || qty.unit === "shed"));
