@@ -64,6 +64,12 @@ test("private controls: a person's name never reaches the report payload", async
 
   expect(payload.hasPerson, `the report payload carried the name: ${payload.json.slice(0, 400)}`).toBe(false);
   expect(payload.sanitizedUrl).not.toContain(PERSON);
+  // docs/calculator-reports.md: "if any private control exists, the rendered
+  // output snapshot is omitted so a derived result cannot repeat or transform
+  // identity data." A split is a function OF the names beside it, so an answer
+  // can carry what the field did not.
+  expect(payload.json, "the output snapshot was sent from a tile carrying a private field")
+    .toContain("Output omitted because this calculator contains a private field");
   // Again, the sibling value proves the collector was actually collecting.
   expect(payload.json, "the payload collected no inputs at all, so the check above proves nothing").toContain("8");
 });
