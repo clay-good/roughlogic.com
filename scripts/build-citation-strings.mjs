@@ -17,7 +17,7 @@
 // The generator is deterministic so `--check` is a reliable
 // in-sync gate.
 
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile, readdir } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { existsSync } from "node:fs";
@@ -102,6 +102,47 @@ function buildJson(rows, srcMtime) {
   };
 }
 
+// The doc is the source of truth for these strings, and until 2026-09-02 nothing
+// compared a row to the string the tile actually prints -- only to the JSON
+// generated from the same doc, a copy checked against a copy. 21 of the 70 rows
+// had drifted: `dti` documented "per FNMA Single-Family Selling Guide and FHA
+// Handbook" while the page printed the section numbers, the 36/45 and 31/43
+// thresholds and the VA back-end 41. A reader auditing the site against the doc
+// would have been auditing fiction.
+//
+// So: every row must be the verbatim citation literal of that tile's own
+// renderer. Renderer is found through the per-group `"<tile-id>": renderFn`
+// dispatch table; the literal is the (possibly `+`-concatenated) string assigned
+// to citationEl.textContent inside it.
+// Two dispatch shapes ship: a `"tile": renderFn,` row inside the group table,
+// and a later `GROUP_RENDERERS["tile"] = renderFn;` assignment for tiles added
+// after the table was written. Reading only the first shape silently skipped
+// 16 tiles, which would have made this gate report drift it could not see.
+const RENDER_ENTRY = /(?:"([a-z0-9-]+)":|\[\s*"([a-z0-9-]+)"\s*\]\s*=)\s*(_?[A-Za-z0-9_]*[Rr]ender[A-Za-z0-9_]*)\s*[,;]/g;
+const CITATION_ASSIGN = /citationEl\.textContent\s*=\s*((?:"(?:[^"\\]|\\.)*"\s*(?:\+\s*)?)+);/;
+const STRING_PART = /"((?:[^"\\]|\\.)*)"/g;
+
+async function rendererCitations() {
+  const byTile = new Map();
+  const files = (await readdir(ROOT)).filter((f) => /^calc-.*\.js$/.test(f)).sort();
+  for (const f of files) {
+    const src = await readFile(resolve(ROOT, f), "utf8");
+    for (const m of src.matchAll(RENDER_ENTRY)) {
+      const tile = m[1] || m[2];
+      if (byTile.has(tile)) continue;
+      const at = src.indexOf("function " + m[3]);
+      if (at < 0) continue;
+      const body = src.slice(at, at + 4000);
+      const c = body.match(CITATION_ASSIGN);
+      if (!c) continue;
+      let s = "";
+      for (const part of c[1].matchAll(STRING_PART)) s += part[1];
+      byTile.set(tile, s.replace(/\\"/g, '"'));
+    }
+  }
+  return byTile;
+}
+
 async function main() {
   if (!existsSync(SRC)) {
     console.error("ERROR: " + SRC + " not found.");
@@ -129,6 +170,28 @@ async function main() {
   const out = JSON.stringify(json, null, 2) + "\n";
 
   if (MODE === "check") {
+    const printed = await rendererCitations();
+    const drift = [];
+    for (const row of rows) {
+      const live = printed.get(row.id);
+      if (live === undefined) {
+        drift.push(row.id + ": no citation literal found in its renderer");
+      } else if (live !== row.stamp) {
+        drift.push(
+          row.id + ": the doc and the page disagree\n      doc:  " + row.stamp.slice(0, 120) +
+            "\n      page: " + live.slice(0, 120),
+        );
+      }
+    }
+    if (drift.length > 0) {
+      for (const d of drift) console.error("ERROR: " + d);
+      console.error(
+        "ERROR: " + drift.length + " of " + rows.length + " row(s) in docs/citation-discipline.md do not match\n" +
+          "  the citation the tile prints. The doc is the source of truth for the wording, so change the\n" +
+          "  renderer to match it, or update the row and rerun `npm run docs:citation-strings`.",
+      );
+      process.exit(1);
+    }
     if (!existsSync(OUT)) {
       console.error("ERROR: " + OUT + " missing. Run `npm run docs:citation-strings`.");
       process.exit(1);
@@ -141,7 +204,8 @@ async function main() {
       process.exit(1);
     }
     console.log(
-      "v10 citation-strings in-sync OK (" + rows.length + " rows / " + Object.keys(sortedStrings).length + " tiles).",
+      "v10 citation-strings in-sync OK (" + rows.length + " rows / " + Object.keys(sortedStrings).length +
+        " tiles; every row is the verbatim citation its renderer prints).",
     );
     return;
   }
