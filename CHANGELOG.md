@@ -49,6 +49,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **One tile rendered three elements sharing `id="undefined"`.** `pool-calcium-hardness-dose` is built by a spec-driven renderer that passes `o.id` to `makeOutputLine`, and that tile's three outputs were written without one -- so `span.id = undefined` stamped the literal string. Invalid HTML, a duplicate id twice over, and three outputs nothing can address by id. The page looked exactly right, which is why it sat there.
+
+  Two fixes, because there were two mistakes: the tile's outputs get real ids like every sibling in that file, and `makeOutputLine` / `makeNoteLine` no longer stamp an id at all when they are handed nothing.
+
+  Then the sweep, since one found by hand implies nothing about 1,803 others: every tile driven in a browser, checked for duplicate ids, ids stamped from a missing value, and `label[for]` pointing at no element. **1,804 tiles, one defect** -- so the catalog really was clean apart from this. The three checks now ride along in `render-no-nan`, which already visits every tile, at no extra navigation. axe covers the label case only where a control ends up with no accessible name at all; a dangling `for` beside an `aria-label` passes it. Seed-verified by restoring both halves of the original defect.
+
+
 - **Touch targets were smaller than the site's own stated floor, everywhere.** `docs/accessibility.md` promises "at least 48 by 48 pixels (slightly larger than the WCAG minimum of 44) for gloved-hand operation" -- a real requirement for this audience, and stricter than WCAG 2.2 SC 2.5.8's 24 px on purpose. Nothing measured it. At a 390 px phone viewport: **every text field was 46 px**, the footer badges 46, the header wordmark 36, the catalog page's trade headings 38, and a shell's breadcrumb, related-tile and catalog-list links **18**.
 
   The 18 px ones are the real failure: SC 2.5.8's inline exception covers a link inside a sentence, and a tile page's related-tiles list is 1,804 pages of bare anchors stacked 18 px apart, which fails the spacing exception too. axe-core sweeps all 1,804 routes and says nothing about any of this, because those two exceptions are not decidable by a static rule.

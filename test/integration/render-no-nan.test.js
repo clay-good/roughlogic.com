@@ -235,6 +235,32 @@ for (const id of TOOL_IDS) {
       }
     }
 
+    // DOM-health: no duplicate id, no id stamped from an undefined value, and
+    // no label pointing at an element that is not there. All three are invalid
+    // HTML, all three break something that addresses an element by id, and the
+    // page looks right anyway -- which is how pool-calcium-hardness-dose
+    // shipped three outputs sharing id="undefined". Its spec-driven renderer
+    // passes `o.id` and that tile's outputs were written without one, so
+    // `span.id = undefined` stamped the string. One tile in 1,804, found by
+    // asking, and asserted here so the next one is found by the build. axe
+    // covers the label rule only when a control ends up with no accessible
+    // name at all; a dangling `for` beside an aria-label passes it.
+    const dom = await page.evaluate(() => {
+      const ids = [...document.querySelectorAll("[id]")].map((e) => e.id);
+      const seen = new Set(), duplicate = new Set();
+      for (const one of ids) { if (seen.has(one)) duplicate.add(one); seen.add(one); }
+      return {
+        duplicate: [...duplicate],
+        placeholderIds: ids.filter((one) => one === "undefined" || one === "null"),
+        danglingLabels: [...document.querySelectorAll("label[for]")]
+          .map((l) => l.getAttribute("for"))
+          .filter((f) => !document.getElementById(f)),
+      };
+    });
+    expect(dom.duplicate, `${id} renders duplicate id(s): ${dom.duplicate.join(", ")}`).toEqual([]);
+    expect(dom.placeholderIds, `${id} renders id="undefined"/"null" -- an id built from a missing value`).toEqual([]);
+    expect(dom.danglingLabels, `${id} has label[for] pointing at no element: ${dom.danglingLabels.join(", ")}`).toEqual([]);
+
     // Renderer-health: no crash during load or example-populate. Read the
     // in-page collector deterministically (no CDP event-delivery race).
     const errors = await page.evaluate(() => window.__renderErrors__ || []);

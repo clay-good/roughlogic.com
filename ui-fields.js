@@ -142,7 +142,14 @@ export function makeOutputLine(parent, label, valueId) {
   lab.textContent = label + ": ";
   row.appendChild(lab);
   const span = document.createElement("span");
-  span.id = valueId;
+  // Only when there is one. `span.id = undefined` stamps the string
+  // "undefined" into the attribute, which is how pool-calcium-hardness-dose
+  // shipped three elements sharing id="undefined": its spec-driven renderer
+  // passes `o.id`, and that tile's outputs were written without one. Invalid
+  // HTML, a duplicate id, and an output nothing can address by id -- and the
+  // page still looked right, so nothing noticed. render-no-nan now sweeps
+  // every tile for it.
+  if (valueId) span.id = valueId;
   span.className = "out-value";
   row.appendChild(span);
   const btn = document.createElement("button");
@@ -167,7 +174,7 @@ function makeNoteLine(parent, label, valueId) {
   sum.textContent = label;
   row.appendChild(sum);
   const span = document.createElement("span");
-  span.id = valueId;
+  if (valueId) span.id = valueId;   // see makeOutputLine: never stamp "undefined"
   span.className = "out-value note-value";
   row.appendChild(span);
   parent.appendChild(row);

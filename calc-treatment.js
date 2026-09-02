@@ -1652,9 +1652,9 @@ TREATMENT_RENDERERS["pool-calcium-hardness-dose"] = _rPool({
     { key: "product_purity_pct", label: "Calcium chloride content (percent: ~77 flake, ~94 anhydrous)" },
   ],
   outputs: [
-    { key: "lb", label: "Calcium chloride", value: (r) => fmt(r.calcium_chloride_lb, 2) + " lb" },
-    { key: "oz", label: "Calcium chloride (oz)", value: (r) => fmt(r.calcium_chloride_oz, 1) + " oz" },
-    { key: "n", label: "Note", value: (r) => r.note },
+    { key: "lb", id: "pchd-out-lb", label: "Calcium chloride", value: (r) => fmt(r.calcium_chloride_lb, 2) + " lb" },
+    { key: "oz", id: "pchd-out-oz", label: "Calcium chloride (oz)", value: (r) => fmt(r.calcium_chloride_oz, 1) + " oz" },
+    { key: "n", id: "pchd-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computePoolCalciumHardnessDose,
 });
