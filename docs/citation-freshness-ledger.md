@@ -54,7 +54,7 @@ evidence, so the row's `verification_note` should say what was checked.
 | `ashrae-62-1` | ASHRAE 62.1 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
 | `ashrae-62-2` | ASHRAE 62.2 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
 | `ashrae-90-1` | ASHRAE 90.1 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
-| `fda-food-code` | FDA Food Code | 2022 | 2022 | 2026-06-05 | current |
+| `fda-food-code` | FDA Food Code | 2022 | 2022 | 2026-09-02 | current |
 | `wmm` | NOAA World Magnetic Model | WMM2025 | WMM2025 (expires 2030-01-01) | 2026-06-05 | current |
 | `aashto-greenbook` | AASHTO Green Book | 2018 (7th ed.) | 7th ed. (8th in development) | 2026-09-01 | acknowledged-stale |
 
@@ -82,6 +82,22 @@ evidence, so the row's `verification_note` should say what was checked.
   `next_expected` is advanced to that source's own anticipated month
   (IBC / IFC 2026-10, IPC / IMC / IFGC 2027-01, IRC 2027-02) rather than to one
   date for all six. Advance `current_edition` on confirmed publication.
+- **FDA Food Code, 2026-09-02 (CF-03):** the row had **no `last_verified` at
+  all**, which meant the gate could only ever fail on it and never be satisfied,
+  and it is due 2026-12. Verified against fda.gov: the **2022 Food Code (10th
+  edition) is still the most recent published edition**, and FDA has said a 2026
+  edition is coming later this year on the four-year interval it moved to after
+  2017. Re-stamped `last_verified: 2026-09-02`. It still warns, correctly -- a
+  re-stamp dated before `next_expected` cannot cover it -- and that warning is
+  now a reminder to look in December rather than a row nobody had ever checked.
+- **ICC I-codes, 2026-09-02 (no re-stamp, deliberately):** the six rows carry
+  ICC's anticipated dates and the IBC / IFC are due within the month. The
+  2026-09-02 pass re-confirmed the *schedule* (IBC / IFC September 2026, IECC
+  2026-12-31, IRC February 2027) but could not confirm non-publication --
+  shop.iccsafe.org 404s and codes.iccsafe.org 403s an automated fetch. **An
+  anticipated date is not a verification**, so `last_verified` stays 2026-09-01,
+  the last date non-publication was actually established, and only the row notes
+  were enriched. Confirm at shop.iccsafe.org when the dates pass.
 - **ASHRAE 62.1 / 62.2 / 90.1 (CF-02), superseded 2026-09-01:** the 2026-06-05
   disposition re-stamped these **acknowledged-stale** with a quarterly re-verify
   action. Nothing asked again for three months, because a re-stamp used to
@@ -112,8 +128,9 @@ evidence, so the row's `verification_note` should say what was checked.
   *before* the due date never does, by CF-03's own rule. Three rows are warning
   today: IBC and IFC (due 2026-10, re-stamped 2026-09-01 and so **not**
   covered -- the October re-verify is real work, now visible a month out) and
-  the FDA Food Code (due 2026-12, carrying no `last_verified` at all). A date
-  this file already knows about should not be able to ambush anyone.
+  the FDA Food Code (due 2026-12; it carried no `last_verified` at all until
+  2026-09-02, and its re-stamp still predates the due date). A date this file
+  already knows about should not be able to ambush anyone.
 
 ## Verified current / well-disclosed, not in the cycle table (spec-v22 §2)
 
