@@ -404,6 +404,7 @@ The principle from spec.md section 5 governs every entry: the data is either pub
 ### data/crosswalks/gsa-perdiem.json (v2)
 
 - Source: U.S. General Services Administration per-diem rates (public domain).
+- **Per-state, which is not how GSA publishes.** GSA sets per-diem by locality (county or city): one standard CONUS rate plus several hundred non-standard localities set above it. The bundled values approximate standard CONUS, raised where a state is broadly above it. A traveller to a non-standard locality is owed more than this tile shows, so the tile carries a limitation banner and its citation points at the GSA lookup.
 - License: U.S. government publication, public domain.
 - Cadence: Annual update (federal fiscal year).
 - Shard layout: Object keyed by state (50 + DC) with lodging and m_and_ie rates.

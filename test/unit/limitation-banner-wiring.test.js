@@ -88,6 +88,27 @@ test("renderMotorFLA renders the NEC-table limitation banner", async () => {
   assert.ok(m, "renderMotorFLA must call renderLimitationBanner with the motor-fla copy");
 });
 
+test("calc-cross.js imports the limitation-banner helpers", async () => {
+  const t = await readSrc("calc-cross.js");
+  assert.match(
+    t,
+    /import\s+\{\s*renderLimitationBanner\s*,\s*getLimitationCopy\s*\}\s+from\s+"\.\/limitation-banner\.js";/,
+  );
+});
+
+// GSA publishes per-diem by locality (county or city), not by state: one standard
+// CONUS rate plus several hundred localities set above it. The tile is keyed to
+// state and approximates standard CONUS, so a traveller to a non-standard
+// locality is owed more than it shows. The shard said "approximate" in its own
+// note; nothing on the page did until 2026-09-02.
+test("renderPerDiem renders the GSA-locality limitation banner", async () => {
+  const t = await readSrc("calc-cross.js");
+  const m = t.match(
+    /export function renderPerDiem[\s\S]*?renderLimitationBanner\(inputRegion,\s*getLimitationCopy\("per-diem"\)\)/,
+  );
+  assert.ok(m, "renderPerDiem must call renderLimitationBanner with the per-diem copy");
+});
+
 test("renderServiceLoad renders the AHJ-governs limitation banner", async () => {
   const t = await readSrc("calc-electrical.js");
   const m = t.match(

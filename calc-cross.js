@@ -327,6 +327,7 @@ import {
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 import { hazenWilliamsFrictionLoss } from "./pure-math.js";
+import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
 // coerces an empty number field to 0 (Number("") === 0), so a NaN or
@@ -989,7 +990,8 @@ export function renderOvertime(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPerDiem(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: GSA-published per-diem rates (U.S. government publication).";
+  citationEl.textContent = "Citation: GSA per-diem rates (U.S. government publication). GSA sets them by locality -- county or city -- not by state; the bundled values approximate the standard CONUS rate, which several hundred listed localities exceed. Look your destination up at gsa.gov/travel/plan-book/per-diem-rates before filing.";
+  renderLimitationBanner(inputRegion, getLimitationCopy("per-diem"));
   const s = makeSelect("State", "pd-s", Object.keys(GSA_PERDIEM_RATES).map((k) => ({ value: k, label: k })));
   const t = makeSelect("Type", "pd-t", [
     { value: "lodging", label: "Lodging" }, { value: "m_and_ie", label: "M&IE" },

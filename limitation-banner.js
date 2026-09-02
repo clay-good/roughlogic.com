@@ -123,6 +123,13 @@ const CANONICAL = {
     who_governs: "The AHJ and the NEC-adopted edition govern.",
     link: "nfpa.org/freeaccess",
   },
+  "per-diem": {
+    headline: "Not a GSA locality rate.",
+    replacement:
+      "GSA sets per-diem by locality (county or city), not by state: several hundred localities are set above the standard CONUS rate. These are per-state approximations of standard CONUS. Look up your destination at gsa.gov before filing.",
+    who_governs: "GSA and your employer's travel policy govern.",
+    link: "gsa.gov/travel/plan-book/per-diem-rates",
+  },
   "arc-flash-screen": {
     headline: "Not an IEEE 1584 study.",
     replacement:

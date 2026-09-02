@@ -6533,13 +6533,14 @@ export const CITATIONS = {
     ],
   },
   "per-diem": {
-    formula: "Lodging + M&IE per state from GSA-published per-diem rates (CONUS). DC, NY, MA, HI etc. carry standard-CONUS-plus values.",
+    formula: "Lodging + M&IE looked up by state. GSA publishes per-diem by LOCALITY (county or city), not by state: there is one standard CONUS rate plus several hundred non-standard localities set above it. The bundled per-state values approximate standard CONUS, raised where a state is broadly above it (DC, NY, MA, HI and similar).",
     edition: "GSA Federal Travel Regulation per-diem rates, FY2026 (effective 2025-10-01).",
     freeAccess: "Free at gsa.gov/travel/plan-book/per-diem-rates.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (GSA rates; annual update each fiscal year). Named by fiscal year rather than \"current fiscal year\": FY2026 ends 2026-09-30, and a page that calls a fixed table \"current\" is wrong from the day after without changing a character.",
     assumptions: [
-      { name: "Rate table", value: "data/crosswalks/gsa-perdiem.json keyed to state", source: "GSA-published rate" },
+      { name: "Rate table", value: "data/crosswalks/gsa-perdiem.json keyed to state; an approximation of standard CONUS, not a locality rate", source: "GSA-published rate" },
+      { name: "Look up the destination", value: "a non-standard locality can be well above standard CONUS, so a per-state figure understates it; check gsa.gov before filing", source: "GSA Federal Travel Regulation per-diem lookup" },
     ],
   },
   "geometry": {
