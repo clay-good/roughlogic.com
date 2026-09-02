@@ -16,6 +16,9 @@
 import { readFile } from "node:fs/promises";
 import { normalizeQuery, rankTools, fallbackSearch } from "../search-discovery.js";
 import { getLimitationCopy } from "../limitation-banner.js";
+// The shared result-key humanizer: the same fallback the static pages use, so
+// a tile that captions nothing still names its answers on both doors.
+import { humanizeKey } from "../key-labels.js";
 // spec-v1185: the curated per-tile cross-links the browser shows as "related
 // tiles". Build-time data; a missing/unreadable module degrades to no related.
 let RELATED = {};
@@ -193,7 +196,27 @@ function captionedOutputs(captions, result) {
   if (!result) return undefined;
   const keys = Object.keys(captions)
     .filter((k) => Object.prototype.hasOwnProperty.call(result, k));
-  return keys.length ? keys.map((k) => ({ key: k, label: captions[k] })) : undefined;
+  if (keys.length) return keys.map((k) => ({ key: k, label: captions[k] }));
+
+  // Nothing captioned. 36 tiles landed here and came back with an EMPTY outputs
+  // list -- an agent calling describe_calculator on the EGC sizer, the UTM
+  // converter or the square-footage tile was told the calculator names nothing,
+  // while those tiles' own static pages had been printing "Egc AWG", "Zone",
+  // "Easting" and "Area (ft²)" the whole time, from key-labels.js, which the
+  // page could reach and this could not. `check-both-doors` counted the gap
+  // ("1,768 name their answers") while both doors are meant to answer alike.
+  //
+  // ONLY when the captioned set is empty. Humanizing every uncaptioned key on
+  // every tile was measured first and rejected: it would add 5,460 keys across
+  // 1,562 tiles, most of them intermediates the curated layers leave out on
+  // purpose (`pass_flag`, `at_step_cap`, `divided_ocpd_A`), and reorder 146
+  // tiles' existing answers. A weaker label where there was none is a fix; a
+  // flood of intermediates where the labels were deliberate is a regression.
+  const fallback = Object.keys(result).filter((k) => k !== "note" && k !== "error");
+  // humanizeKey declines a short symbol-like key on purpose -- its own comment
+  // says a symbol "says more as itself" -- and it returns null there. The key
+  // is then the best label available, so use it rather than advertise a null.
+  return fallback.length ? fallback.map((k) => ({ key: k, label: humanizeKey(k) || k })) : undefined;
 }
 
 // The allowed values of a select field, tolerating both the {value,label}

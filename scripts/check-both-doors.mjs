@@ -197,6 +197,18 @@ for (const tool of TOOLS) {
           }
         }
         withOutputs += (described.outputs || []).length ? 1 : 0;
+        // Every advertised output carries a label. A `{ key, label: null }`
+        // entry tells an agent the tile answers with something and refuses to
+        // say what -- worse than the empty list it replaced, because it looks
+        // like an answer. The humanizer declines short symbol-like keys on
+        // purpose, and the key itself stands in there.
+        for (const o of described.outputs || []) {
+          if (!o || !o.label) {
+            failures.push(
+              `${tool.id}: MCP -- advertises an output ${JSON.stringify(o && o.key)} with no label.`,
+            );
+          }
+        }
       }
     } catch (e) {
       failures.push(`${tool.id}: EXAMPLE -- run() threw on the published example: ${e && e.message ? e.message : e}`);

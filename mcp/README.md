@@ -80,9 +80,22 @@ each number**, keyed by the compute's own result key: `outputs_source` is
 way, a key is named only where the calculator is observed to produce it -- the
 worked example's result for `describe_calculator`, the caller's own result for
 `run_calculator` -- so the door never names an answer that is not there.
-`check-both-doors.mjs` holds that. **1,768 of 1,804 calculators name their
-answers.** The remaining 36 return them unlabelled; their captions are built by
-an expression a static read cannot follow.
+`check-both-doors.mjs` holds that. **1,804 of 1,804 calculators name their
+answers.** The remaining 0 return them unlabelled.
+
+That was 1,768 until 2026-09-02, and the 36 were a gap between the two doors
+rather than a gap in the catalog: their captions are built by an expression a
+static read cannot follow, so `describe_calculator` returned an **empty**
+outputs list -- while those tiles' own static pages had been printing "Egc AWG",
+"Zone", "Easting", "Area (ft²)" the whole time, from a humanizer that lived
+inside the shell builder where only the page could reach it. It now lives at
+`key-labels.js` and both doors use it.
+
+**Only where a tile captions nothing.** Humanizing every uncaptioned key
+everywhere was measured and rejected: it would have added 5,460 keys across
+1,562 tiles, most of them intermediates the curated layers omit on purpose, and
+reordered 146 tiles' existing answers. Measured after the change: **exactly 36
+tiles' `describe` output differs, and no other tile's changed at all.**
 
 A boolean answer is the one case where a captioned output carries a `display`.
 The renderer states both words as literals (`flag ? "PASS" : "FAIL"`), so the
