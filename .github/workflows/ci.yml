@@ -80,7 +80,7 @@ jobs:
       # runs in full. Until 2026-08-30 both jobs ran it: the axe-core pass over
       # all 1,804 routes was executed twice per push. `test:a11y` greps `a11y:`
       # and this greps its inverse, so the two jobs partition the suite exactly
-      # -- 1,887 + 1,999 = 3,886 as of 2026-09-02 -- and `npm run test:e2e`
+      # -- 1,897 + 2,001 = 3,898 as of 2026-09-02 -- and `npm run test:e2e`
       # still runs the whole thing locally. check-ci-claims pins the axe pass's
       # stated size in README within 5%; the totals here are prose.
       # check-ci-claims asserts the two greps stay complementary.

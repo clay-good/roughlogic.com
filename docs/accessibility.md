@@ -249,6 +249,16 @@ is unchanged.
 ## Verification
 
 - axe-core runs in CI on every utility view; the build fails on any new serious or critical violation.
+- That sweep, and the shell sweep beside it, run in the **light** scheme --
+  Playwright's default. `test/integration/a11y-dark.test.js` runs axe over the
+  **dark** palette on one route of each page shape: the SPA home, the catalog
+  hub, the 404, a group hub, a calculator shell, a reference shell with no
+  worked example, and four tile views. A sample rather than a second full pass,
+  because the palettes are two token sets shared by every page -- a contrast
+  violation in one is a violation across that page's whole shape. It exists
+  because the one-scheme blind spot produced two real defects on 2026-09-02:
+  the prerendered pages ignoring `prefers-color-scheme`, and the dark theme
+  printing its answer white on white paper.
 - Manual keyboard-only audit is part of the launch checklist.
 - Manual voice-input audit is part of the launch checklist.
 - The structural half of W3C validation is checked offline on all 1,826

@@ -6,6 +6,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **The axe sweep now runs in the dark palette too.** `a11y.test.js` covers all 1,804 SPA routes and `shell-a11y.test.js` every static page shape -- both in Playwright's default **light** scheme. Colour contrast is one of the things axe checks, this site ships two palettes, and until today **nothing had ever run a contrast check against the dark one**.
+
+  That blind spot produced two real defects earlier the same day: the 1,826 prerendered pages ignoring `prefers-color-scheme`, and the dark theme printing its answer white on white paper. Two is enough.
+
+  `a11y-dark.test.js` runs axe over one route of each page shape -- the SPA home, the catalog hub, the 404, a group hub, a calculator shell, a reference shell with no worked example, and four tile views including an answered one, a worker-backed one and one whose answer is a table. A **sample**, not a second full pass: the palettes are two token sets shared by every page, so a contrast violation in one is a violation across that shape, and the full sweep is 27 minutes against this one's 23 seconds.
+
+  **All ten pass today** -- the useful result, since it says the dark palette was correct and merely unwatched. Seed-verified by darkening `--fg-muted`: all ten red. It asserts the page really is painting the dark palette before trusting the result, by reading the body background rather than by looking for `data-theme` -- the prerendered pages load no script, so nothing ever sets that attribute on them, which is the very mechanism being covered.
+
+
 - **A census of what the query-fill harness cannot reach, and why.** With the terse lens at 28.7%, the obvious question is how much of the remaining 71% is recoverable at all. `measure-query-fill --shapes` now groups the tiles that recovered **nothing** by the reason: of the 552, **356 have two or more fields sharing one unit** ("480 v, 475 v, 470 v" against three volts fields) and **127 have no field declaring a unit at all**. Both are genuinely ambiguous once the field names are gone, which is exactly what terse mode removes.
 
   The tempting fix is positional -- fill same-unit fields in declaration order -- and it is **refused, in the harness, where the next person will look for it**: `phrase()` builds each query by walking the rows in order, so a positional rule would be scored against a query this very file wrote in that order. That measures the harness, not the extractor -- the same trap the label-number note beside it already records. A real reader types the values they have, in the order they think of them.
