@@ -15,6 +15,7 @@ import {
   computeHaversineDistance,
   IRS_STANDARD_MILEAGE_RATE,
   GSA_PERDIEM_RATES,
+  STATE_TAX_RATES,
   loanPaymentExample,
   upgradeROIExample,
   mileageCostExample,
@@ -528,4 +529,41 @@ test("Haversine: 1 deg lon at equator ~ 69 mi", () => {
 test("Haversine: opposite poles ~ pi*R distance", () => {
   const r = computeHaversineDistance({ lat1: -90, lon1: 0, lat2: 90, lon2: 0 });
   assert.ok(close(r.miles, Math.PI * 3958.8, 1));
+});
+
+// The bundled sales-tax rates are each state's statewide BASE rate. Three
+// surfaces called them "average combined state and local rates" until
+// 2026-09-02 -- the module comment, the tile's citation line, and the shard's
+// own note -- while Louisiana's 4.45% state rate sits under a combined average
+// near 9.5%. A job invoiced off the table alone under-collects by more than
+// half, and the page was telling the reader it already included local tax.
+test("Sales tax: no shipped surface calls the bundled rates a combined rate", () => {
+  const root = new URL("../../", import.meta.url);
+  const files = ["calc-cross.js", "citations.js", "data/crosswalks/state-tax-rates.json"];
+  for (const f of files) {
+    const src = readFileSync(new URL(f, root), "utf8");
+    for (const [i, line] of src.split("\n").entries()) {
+      if (!/combined/i.test(line)) continue;
+      // A sentence that DENIES the claim, or records that it used to be made, is
+      // the correction rather than the defect. (check-build-hermetic carries the
+      // same carve-out for the same reason.)
+      if (/until 2026|called (them|these)|used to/i.test(line)) continue;
+      if (/\bnot a combined\b|\bNOT average combined\b|\bis not a combined\b/i.test(line)) continue;
+      assert.ok(
+        !/average combined state[ -]and[ -]local|published average combined/i.test(line),
+        f + ":" + (i + 1) + " calls the statewide base rates a combined rate: " + line.trim().slice(0, 120),
+      );
+    }
+  }
+});
+
+// Spot-check the three states where the base-versus-combined gap is widest, so
+// a future edit cannot quietly swap the table for combined averages without
+// this failing.
+test("Sales tax: the bundled rates are the statewide base, not a combined average", () => {
+  assert.equal(STATE_TAX_RATES.LA, 4.45);
+  assert.equal(STATE_TAX_RATES.AL, 4.0);
+  assert.equal(STATE_TAX_RATES.CA, 7.25);
+  // Every no-sales-tax state is exactly zero; a combined average would not be.
+  for (const s of ["AK", "DE", "MT", "NH", "OR"]) assert.equal(STATE_TAX_RATES[s], 0);
 });

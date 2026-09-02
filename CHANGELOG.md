@@ -149,6 +149,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The sales-tax table is each state's base rate; three surfaces called it the combined state-and-local rate.** `sales-tax` bundles the statewide rate published by each revenue department -- Louisiana 4.45%, Alabama 4%, Texas 6.25%. The module comment, the tile's citation line and the shard's own note all described them as *"average combined state and local rates"*. Louisiana's combined average is near **9.5%**: a job invoiced off that table, by a reader told local tax was already in it, under-collects by more than half.
+
+  The citation entry had it right all along (`Tax = subtotal × state_rate`), which is what made the disagreement findable. Every surface now says statewide base rate, says local districts add on top, and points at the override field that already existed for exactly this. No rate changed.
+
+  A test pins it: no shipped surface may call the bundled rates a combined rate, with the same carve-out `check-build-hermetic` uses for a sentence that *denies* the claim. Seed-verified by restoring the old citation line -- and the first attempt at that seed was a false pass, because replacing only the first sentence left the new denial behind it. A seed that does not change what the gate reads proves nothing.
+
 - **The loan-limit shard said 2026 and carried 2025.** `loan-limits` was stamped `year: 2026` and `verified_on: 2026-05-16`, and every figure in it was the 2025 cycle: an $806,500 conforming baseline, a $524,225 FHA floor, a $1,209,750 ceiling on all 28 bundled counties. A borrower checking whether their loan was conforming was told the wrong threshold by **$26,250**.
 
   The published 2026 values, transcribed against the FHFA announcement (baseline $832,750 / $1,066,250 / $1,288,800 / $1,601,750) and HUD ML 2025-23 (FHA floor $541,287, ceiling $1,249,125). The 24 counties pinned at the national ceiling move with it. The **four that sat between the floor and the ceiling -- San Diego, Ventura, Suffolk MA, King WA -- were removed rather than guessed**: a county limit is 115% of the local median, so it does not scale with the national index, and those counties now route to the same "look it up at fhfa.gov" path an unknown county already took. A missing answer that names its source beats a confident wrong one.

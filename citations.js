@@ -6476,12 +6476,13 @@ export const CITATIONS = {
   },
   "sales-tax": {
     formula: "Tax = subtotal × state_rate. Total = subtotal + tax. State rates from data/crosswalks/state-tax-rates.json.",
-    edition: "Each state revenue department's published rate by state. Verified at build time.",
+    edition: "The statewide base rate published by each state revenue department. Local district rates are not included and are not bundled.",
     freeAccess: "Free at each state revenue-department site.",
     governance: GOVERNANCE.general,
-    editionNote: "Single-edition (state-published rates; monthly recheck).",
+    editionNote: "Single-edition (state-published rates; monthly recheck). Three surfaces called these average combined state-and-local rates until 2026-09-02; they are the statewide base only, and the gap is large in the states that lean on local option taxes.",
     assumptions: [
-      { name: "Rate table", value: "data/crosswalks/state-tax-rates.json", source: "state revenue department per row" },
+      { name: "Rate table", value: "data/crosswalks/state-tax-rates.json; statewide base rate only", source: "state revenue department per row" },
+      { name: "Local rates", value: "counties, cities and special districts add their own; use the override field with the combined rate for the delivery address", source: "state and local taxing authorities" },
     ],
   },
   "tip-out": {

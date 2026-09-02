@@ -766,7 +766,7 @@ const UNIT_CONVERSIONS = {
 const STATE_TAX_RATES = {
   source: "State revenue department published rates. Government-published rates.",
   fetched: TODAY,
-  notes: "Average combined state and local rates. Verify locally for accuracy.",
+  notes: "Statewide base rates as published by each state revenue department -- NOT average combined state-and-local rates. Most states let counties, cities and special districts add on top, which in Louisiana and Alabama roughly doubles the rate. Use the override field with the combined rate for the delivery address.",
   rates: {
     AL: 4.0, AK: 0.0, AZ: 5.6, AR: 6.5, CA: 7.25, CO: 2.9, CT: 6.35, DE: 0.0,
     FL: 6.0, GA: 4.0, HI: 4.0, ID: 6.0, IL: 6.25, IN: 7.0, IA: 6.0, KS: 6.5,
@@ -1746,6 +1746,11 @@ const PROSE_LINT_THRESHOLD = 140;
 const PROSE_LINT_EXEMPT_KEYS = new Set([
   "source", "license", "notes", "attribution", "summary", "description",
   "edition",
+  // A disclosure that qualifies the value sitting next to it, in the same
+  // category as `notes` and `attribution`: the 2025 Section 179 row has to
+  // carry the OBBBA acquisition-date window, because the single bonus_pct
+  // beside it is wrong for property placed in service before 2025-01-20.
+  "bonus_note",
   // Original plain-English summaries by the project author (these shards
   // exist precisely to hold prose; they are explicitly cited as MIT-
   // licensed original creative work).

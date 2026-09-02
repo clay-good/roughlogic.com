@@ -265,8 +265,13 @@ export const tmExample = {
 
 // --- Utility 63: Sales Tax ---
 //
-// Average combined state and local rates from state revenue department
-// publications (data/crosswalks/state-tax-rates.json). Verify locally.
+// Statewide base rates as published by each state revenue department
+// (data/crosswalks/state-tax-rates.json). These are NOT average combined
+// state-and-local rates, which is what three surfaces called them until
+// 2026-09-02: Louisiana's 4.45% state rate sits under a combined average near
+// 9.5%, so a job invoiced off this table alone under-collects by more than half.
+// Local district rates are the reader's to add, which is what the override
+// field is for.
 
 export const STATE_TAX_RATES = {
   AL: 4.0, AK: 0.0, AZ: 5.6, AR: 6.5, CA: 7.25, CO: 2.9, CT: 6.35, DE: 0.0,
@@ -479,7 +484,7 @@ export function renderTimeAndMaterials(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderSalesTax(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: bundled state revenue department published average combined rates. Verify locally for accuracy.";
+  citationEl.textContent = "Citation: the statewide base rate published by each state revenue department. This is not a combined rate -- counties, cities and special districts add on top, and in some states that nearly doubles it. Put the combined rate for the delivery address in the override field.";
   const states = Object.keys(STATE_TAX_RATES).sort();
   const st = makeSelect("State", "sx-st", states.map((s) => ({ value: s, label: s })));
   const sub = makeNumber("Subtotal ($)", "sx-sub", { step: "any", min: "0" });
