@@ -97,6 +97,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **79 calculators answered as a different calculator when asked for by name.** `answer_query` lets a **curated alias** promote a tile past rank 1 -- that is how "240.21" reaches the feeder-tap-rule a human mapped it to rather than the transformer tile the ranker puts first. It was also firing when the query was another tile's **published name** and a shorter curated alias happened to sit inside it: asking for `Water Loss Class and Category` returned the class-of-loss **screen**, because "water loss class" is a curated alias for that one -- while the reference tile the name belongs to sat at rank 1.
+
+  Measured across the catalog: **79 tiles** answered as a different calculator when asked for by their own exact name *while ranking first for it*. That is the plainest thing an agent can ask -- it read the name out of `search_calculators` and sent it straight back.
+
+  An exact whole-name match now wins: same normalized tokens, same order, nothing left over. A **partial** name still defers to curation, which is the case a human actually curated. Both halves pinned by test, along with a catalog-wide sweep asserting no tile answers as another when asked for by its own name. The promotions that exist for it are unchanged -- "240.21" -> Feeder Tap Rule, "62.2" -> ASHRAE 62.2, "water loss class" -> the screen -- and so is nonsense (`NO_MATCH`) and the pre-existing `NO_MATCH` on "12/2", checked before and after so the fix could not be credited with something it did not do.
+
+
 - **36 calculators told an agent they name nothing, while their own pages named everything.** `describe_calculator` returned an **empty** `outputs` list for the EGC sizer, the UTM converter, the square-footage tile, the three-point bridle and 32 others -- and those tiles' static pages had been printing "Egc AWG", "Zone", "Easting", "Area (ft²)" the whole time. The humanizer that produces those labels lived inside `scripts/build-shells.mjs`, where the page could reach it and the agent door could not. `check-both-doors` even counted the gap in its green summary -- "1,768 name their answers" -- while both doors are meant to answer alike.
 
   Same fix as the head divergence this morning: the rule moves to the repo root (`key-labels.js`) and both doors import it. **1,768 -> 1,804 of 1,804.**

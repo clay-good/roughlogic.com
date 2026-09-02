@@ -1099,6 +1099,16 @@ async function tileTakesNoInputs(id) {
   return answer;
 }
 
+// Is this query the tile's own full name, token for token? Normalized through
+// the same pipeline the ranker uses, so punctuation, case and stopwords cannot
+// make an exact name look inexact. See its one caller in answerQuery.
+function sameTokens(query, tool) {
+  if (!tool || !tool.name) return false;
+  const a = normalizeQuery(String(query)).tokens;
+  const b = normalizeQuery(String(tool.name)).tokens;
+  return a.length > 0 && a.length === b.length && a.every((t, i) => t === b[i]);
+}
+
 export async function answerQuery({ query } = {}) {
   const q = String(query || "").trim();
   if (!q) return { status: "NO_MATCH", query: q, message: "Pass a plain-language question." };
@@ -1117,8 +1127,24 @@ export async function answerQuery({ query } = {}) {
   // Only the CURATED form gets to promote a lower rank. The naming heuristic
   // does not: it is a guess, and consulting it three times instead of once
   // would be three chances for a nonsense question to find a pointer.
-  const top =
-    results.find((r) => queryIsCuratedAliasFor(q, r.id, aliasRows)) || results[0];
+  //
+  // ...unless the query IS the top tile's own full name. The promotion is meant
+  // to rescue a curated phrase whose tile ranks second; it was also firing when
+  // the reader typed a calculator's PUBLISHED NAME and a shorter curated alias
+  // happened to sit inside it. Asking for "Water Loss Class and Category"
+  // returned the class-of-loss SCREEN, because "water loss class" is a curated
+  // alias for that one -- and the reference tile was sitting at rank 1.
+  // Measured 2026-09-02: 79 tiles answered as a DIFFERENT calculator when asked
+  // for by their own exact name while ranking first for it. An agent that reads
+  // the catalog and asks for a tile by the name the catalog gave it should get
+  // that tile.
+  //
+  // Exact and whole: same normalized tokens, same order, nothing left over. A
+  // partial name still defers to curation, which is the case a human curated.
+  const namesTopExactly = results.length && sameTokens(q, byId.get(results[0].id));
+  const top = namesTopExactly
+    ? results[0]
+    : results.find((r) => queryIsCuratedAliasFor(q, r.id, aliasRows)) || results[0];
   if (!top) return { status: "NO_MATCH", query: q, message: "No calculator matched." };
 
   const tool = byId.get(top.id);

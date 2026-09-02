@@ -238,6 +238,35 @@ test("a tile that takes inputs never answers from its own defaults", async () =>
   assert.deepEqual(guessed, []);
 });
 
+// A curated alias may promote a tile past rank 1 -- that is how "240.21" reaches
+// the feeder-tap-rule a human mapped it to. It may NOT do so when the query is
+// another tile's own published name and that tile is sitting at rank 1: asking
+// for "Water Loss Class and Category" returned the class-of-loss SCREEN,
+// because "water loss class" is a curated alias for that one. Measured
+// 2026-09-02, 79 tiles answered as a different calculator when asked for by
+// their exact name while ranking first for it. An agent that reads the catalog
+// and asks for a tile by the name the catalog gave it should get that tile.
+test("a tile's own exact name outranks a partial curated alias", async () => {
+  const { answerQuery, search } = await import("../../mcp/catalog.mjs");
+  const { TOOLS } = await import("../../tools-data.js");
+
+  // The case that found it, both halves: the shorter phrase still goes where
+  // the human sent it, and the full name goes to the tile that owns it.
+  assert.equal((await answerQuery({ query: "water loss class" })).id, "class-of-loss-screen");
+  assert.equal((await answerQuery({ query: "Water Loss Class and Category" })).id, "water-classes");
+
+  // And nothing anywhere in the catalog answers to a different tile when asked
+  // for by its own name while ranking first for it.
+  const stolen = [];
+  for (const t of TOOLS) {
+    const ranked = await search({ query: t.name, limit: 3 });
+    if (!ranked.results.length || ranked.results[0].id !== t.id) continue; // a ranking matter, not this
+    const out = await answerQuery({ query: t.name });
+    if (out.id && out.id !== t.id) stolen.push(`${t.id} ("${t.name}") answered as ${out.id}`);
+  }
+  assert.deepEqual(stolen, []);
+});
+
 test("the reference path does not loosen either corroboration guard", async () => {
   const { answerQuery } = await import("../../mcp/catalog.mjs");
   // A tile that does take inputs still refuses to guess at them.
