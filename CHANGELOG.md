@@ -6,6 +6,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **The no-tracking promise is now measured, not just asserted.** The README says "No account, no email, and no tracking"; `docs/hash-state.md` says the URL fragment is the only state the site uses. `check-csp` holds the *policy* that would block a third-party fetch -- and nothing checked what the page actually stores or requests. A policy and a behaviour are different claims: a same-origin beacon path, a cookie set by something added later, a library that opens an IndexedDB on import are none of them CSP violations, and all of them break the promise a reader is trusting.
+
+  `test/integration/no-tracking.test.js` drives a full journey -- search, a calculator typed into, a worked example, a tile page, a group hub, the catalog, the 404 -- then reads every storage the browser offers and checks that every request went to this origin. Result: **no cookies, no sessionStorage, no IndexedDB, and an empty localStorage** until the reader works the theme toggle, which writes `rl-theme` and nothing else. Following the system preference persists nothing at all. All three assertions seed-verified by planting a key, a cookie and a third-party image.
+
+  `docs/hash-state.md` also said "no IndexedDB beyond `rl-theme`", which named the wrong mechanism for the one key there is.
+
+
 - **Eight code sections that returned nothing now reach the calculator that implements them.** Yesterday's work made `240.21` and `62.2` answer correctly on both doors; it did not ask which other sections a reader might type. Reading each tile's own citation for a `§`-prefixed section number, then checking what the doors return for it, found eight that are cited verbatim by exactly one tile in the catalog and answered by neither door: `130.5` (NFPA 70E arc-flash risk assessment) -> Arc Flash Screen, `250.53` -> Grounding Electrode, `430.6(A)` and `430.22` -> Motor Branch From Nameplate, `304.5` -> Combustion Air, `408.36` -> Panel Rebalance, `506.3` -> Allowable Area, `705.3` -> Exterior Opening Protection.
 
   Curated from the tiles' own citations rather than invented: each alias is a section the maintainer already wrote into that tile's citation string, and each returned an empty result before. Sections that more than one tile cites, or that a different published document numbers the same way, were left alone -- an agent handed a plausible wrong tile cannot tell it is wrong, while an empty list it can act on. Both doors agree on all eight; four are pinned by name in `test/unit/door-parity.test.js`, and the ranking harness is unchanged at 99.73% / 99.83% / 99.83%.

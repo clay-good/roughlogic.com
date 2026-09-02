@@ -6,9 +6,21 @@
 > links).
 
 The URL fragment (everything after `#`) is the only state mechanism
-the site uses. There is no localStorage, no sessionStorage, no
-cookies, no IndexedDB beyond `rl-theme`. (The `rl-bigbuttons` key
-was retired in spec-v11 along with Big Buttons mode.) Every
+the site uses. No cookies, no sessionStorage, no IndexedDB, and one
+localStorage key: `rl-theme`, written only when the reader works the
+theme toggle -- following the system preference persists nothing. (The
+`rl-bigbuttons` key was retired in spec-v11 along with Big Buttons
+mode.) This sentence used to read "no IndexedDB beyond `rl-theme`",
+which named the wrong mechanism for the one key there is.
+
+`test/integration/no-tracking.test.js` measures it rather than
+asserting it: a full journey -- search, a calculator typed into, a
+worked example, a tile page, a group hub, the catalog, the 404 -- then
+a read of every storage the browser offers, and a check that every
+request the page made went to this origin. `check-csp` holds the
+*policy* that would block a third-party fetch; this holds the
+*traffic*, which is a different claim. All three assertions
+seed-verified. Every
 shareable bookmark — pinned tiles and calculator inputs — is encoded
 in the hash. (Pre-retirement `#b=` Project Bundle hashes are still
 accepted and silently routed to the home view; the Project Bundle
