@@ -242,4 +242,15 @@ is unchanged.
 - axe-core runs in CI on every utility view; the build fails on any new serious or critical violation.
 - Manual keyboard-only audit is part of the launch checklist.
 - Manual voice-input audit is part of the launch checklist.
-- W3C HTML validator passes on every view.
+- The structural half of W3C validation is checked offline on all 1,826
+  prerendered pages by `check-shells`: exactly one `<main>`, `<header>`,
+  `<footer>`, `<h1>` and `<title>` each, and a `lang` on `<html>` -- the
+  properties [launch-checklist.md](launch-checklist.md) names in that row.
+  `render-no-nan` adds the runtime half on every tile view: no duplicate id,
+  no id stamped from a missing value, no `label[for]` pointing at nothing.
+- The validator **itself** has not been run against the deployed site. It needs
+  the network, which `check-build-hermetic` forbids the build to touch, so it
+  stays a manual step and [launch-checklist.md](launch-checklist.md) still
+  lists it as open. This line said "W3C HTML validator passes on every view"
+  until 2026-09-02 -- stated as done, under Verification, while the checklist
+  two files over recorded it as not yet run.

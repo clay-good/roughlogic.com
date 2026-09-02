@@ -20,6 +20,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **"W3C HTML validator passes on every view" was stated as done and had never been run.** It sat under *Verification* in `docs/accessibility.md`, while `docs/launch-checklist.md` two files over recorded the same item as still open, to be run against the deployed URL. The validator needs the network, which `check-build-hermetic` forbids the build to touch -- so the claim was not just unverified, it was unverifiable where it was written, and being unrunnable is exactly what kept anyone from noticing.
+
+  The structural half **is** checkable offline, and it is what the checklist row actually names: "semantic HTML with single `<main>`, `<header>`, `<footer>`, and one `<h1>` per view". `check-shells` now asserts exactly one `<main>`, `<header>`, `<footer>`, `<h1>` and `<title>` on all 1,826 prerendered pages, plus a `lang` on `<html>`. All 1,826 already passed, which is the useful thing to know: the claim was true and merely unwatched. Seed-verified by emitting a second `<main>`. The doc now says which half runs and which is still a manual step.
+
+
 - **The accessibility doc's colour section described the inverse of what ships.** `docs/accessibility.md` said "Light theme only. Pure white #FFFFFF background. Near-black #0A0A0A primary text." -- under a heading a reader consults to find out whether the site is legible for them. `:root` is the dark palette; light is the override. The section had also quoted contrast ratios nothing recomputed, two bullets after another one describing the `?` overlay as "legible in both dark and light."
 
   It now states both palettes as a table of measured pairs, and `scripts/check-contrast.mjs` (new, in the lint chain) computes every ratio from the tokens in `styles.css`, fails any pair below its floor -- 7:1 for body text, the project's own promise; 4.5:1 for dim text and links; 3:1 for a field's boundary -- and **fails the doc if a number it prints is not the one the stylesheet produces.** Both failure modes seed-verified. This is the contrast half axe cannot cover: axe judges rendered text, and says nothing about a palette's stated intent or about SC 1.4.11.

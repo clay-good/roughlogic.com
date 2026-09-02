@@ -483,6 +483,28 @@ async function lintShell(path, kind, errors, tool) {
     }
   }
 
+  // The structural half of the "passes the W3C HTML validator" row in
+  // docs/launch-checklist.md, which names it exactly: "semantic HTML with
+  // single <main>, <header>, <footer>, and one <h1> per view". The validator
+  // itself needs the network and so cannot run in this build
+  // (check-build-hermetic forbids it), but this part does not, and an
+  // unrunnable check had left the whole claim unwatched -- stated as done in
+  // docs/accessibility.md while the checklist still listed it as open.
+  const once = [
+    ["<main", /<main[\s>]/g],
+    ["<header", /<header[\s>]/g],
+    ["<footer", /<footer[\s>]/g],
+    ["<h1", /<h1[\s>]/g],
+    ["<title>", /<title>/g],
+  ];
+  for (const [name, re] of once) {
+    const n = (html.match(re) || []).length;
+    if (n !== 1) errors.push(where + ": " + n + " " + name + "> element(s); a page gets exactly one.");
+  }
+  if (!/<html lang="[a-z]{2}(-[A-Za-z]+)?"/.test(html)) {
+    errors.push(where + ": <html> carries no lang attribute.");
+  }
+
   // Every hash a shell emits has to be a route that exists. Two kinds, checked
   // as two different things:
   //
