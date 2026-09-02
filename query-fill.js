@@ -263,10 +263,31 @@ function rawUnitOf(qty, text) {
   return after ? `${after[1]} ${after[2]}` : raw;
 }
 
-function valueFor(qty, row, text) {
+// A number the reader wrote bare takes the NEXT WORD OF THE SENTENCE as its
+// unit -- "asset cost 2000000 business use 100" hands back 2000000 with the
+// "unit" `business`. NON_UNIT_WORDS catches the commonest of those, but it is a
+// 25-word hand-list and English is not. When such a word reaches the refusal
+// below it looks exactly like a unit the reader wrote and we cannot read, so the
+// value is thrown away: `section-179` recovered nothing from "asset cost
+// 2000000 business use 100 taxable income 5000000" even though every field is
+// named in it.
+//
+// The tile settles it without guessing. If the word is a term of one of this
+// tile's OWN field labels, it is a field name the reader typed, not a unit --
+// "business" belongs to "Business-use percent", "taxable" to "Taxable income".
+// Checked only AFTER canonicalUnit has failed, so a unit we can read is still a
+// unit, and the result is merely "no unit", which by the rule below never wins
+// on its own and still has to be named to be filled.
+function isLabelWord(raw, labelWords) {
+  return Boolean(raw) && labelWords instanceof Set && labelWords.has(raw);
+}
+
+function valueFor(qty, row, text, labelWords) {
   const fieldUnit = rowUnit(row);
   const raw = rawUnitOf(qty, String(text || ""));
-  const prose = raw !== null && NON_UNIT_WORDS.has(raw);
+  const prose =
+    raw !== null &&
+    (NON_UNIT_WORDS.has(raw) || (canonicalUnit(raw) === null && isLabelWord(raw, labelWords)));
   const qtyUnit = raw && !prose ? canonicalUnit(raw) : null;
   // The reader attached a unit we cannot read, to a field that declares one.
   // Refuse: we do not know whether it agrees, and guessing here is exactly
@@ -321,6 +342,10 @@ export function queryFill(query, rows, opts) {
   const text = rewriteQuery(query, protect, skip);
   if (!text) return { filled: {}, missing: rows.map((r) => r.d), unmatched: [] };
   const termsByRow = new Map(rows.map((r) => [r.d, labelTerms(r.l)]));
+  // Every word that names a field on THIS tile. valueFor uses it to tell a
+  // field name the reader typed from a unit it cannot read.
+  const labelWords = new Set();
+  for (const terms of termsByRow.values()) for (const w of terms) labelWords.add(w);
 
   // Words from the tile's OWN NAME are not field names, and reading them as
   // field names loses the reader's first value: "joist hanger 20 ft 16 in"
@@ -422,7 +447,7 @@ export function queryFill(query, rows, opts) {
         break;
       }
       if (!matched) continue;
-      if (valueFor(qty, row, text) === null) continue;   // unit disagreement
+      if (valueFor(qty, row, text, labelWords) === null) continue;   // unit disagreement
       // A name beside the number is evidence; a unit ON the number is stronger,
       // and this phase weighed only the first. "310 lb worker and 6 ft free
       // fall" put the 6 into Workers attached -- a count -- because "worker"
@@ -462,7 +487,7 @@ export function queryFill(query, rows, opts) {
     if ((proposals.get(key) || []).length !== 1) continue; // field wanted twice
     const row = numberRows.find((r) => r.d === key);
     if (!row) continue;                                   // a select won the name
-    const value = valueFor(quantities[qi], row, text);
+    const value = valueFor(quantities[qi], row, text, labelWords);
     if (value === null) continue;
     filled[key] = value;
     claimed.add(qi);
@@ -544,7 +569,7 @@ export function queryFill(query, rows, opts) {
     const exact = compatible.filter((r) => rowUnit(r) === qtyUnit);
     const candidates = exact.length ? exact : compatible;
     if (candidates.length !== 1) return;
-    const value = valueFor(qty, candidates[0], text);
+    const value = valueFor(qty, candidates[0], text, labelWords);
     if (value === null) return;
     filled[candidates[0].d] = value;
     claimed.add(qi);

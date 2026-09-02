@@ -338,3 +338,40 @@ test("a text field is never filled with a bare number", async () => {
   assert.ok(!("mark_time" in w), "a clock time is not read as a quantity");
   assert.equal(w.window_option, "cold_6", "the select on the same tile still fills");
 });
+
+// A bare number takes the NEXT WORD OF THE SENTENCE as its unit. When that word
+// is not a unit we can read, the extractor refuses the value -- correctly, when
+// the reader really did write a unit, because guessing there is how a
+// temperature lands in a pressure field. But "asset cost 2000000 business use
+// 100" is not a unit attempt: `business` is the next field's name. The tile
+// settles it, so an unreadable word that is a term of one of this tile's own
+// labels counts as prose rather than as a unit.
+test("a bare number followed by another field's NAME is not treated as carrying a unit", () => {
+  const rows = [
+    num("cost", "Asset cost (USD)", "usd"),
+    num("business_use_pct", "Business-use percent", "percent"),
+    num("taxable_income", "Taxable income before the deduction (USD)", "usd"),
+  ];
+  const r = queryFill("asset cost 2000000 business use percent 100 taxable income 5000000", rows, {
+    name: "Section 179 and Bonus Depreciation",
+  });
+  assert.equal(r.filled.cost, "2000000");
+  assert.equal(r.filled.taxable_income, "5000000");
+  assert.equal(r.filled.business_use_pct, "100");
+});
+
+test("money written the way people write money still reaches its field", () => {
+  const rows = [num("cost", "Asset cost (USD)", "usd"), num("taxable_income", "Taxable income (USD)", "usd")];
+  const r = queryFill("asset cost $2,000,000 taxable income $5,000,000", rows, { name: "Section 179" });
+  assert.equal(r.filled.cost, "2000000");
+  assert.equal(r.filled.taxable_income, "5000000");
+});
+
+// The refusal this widened must still hold: a unit the reader wrote and we
+// cannot read, on a field that declares one, is still refused. `furlongs` is
+// not a term of any label here, so nothing downgrades it to prose.
+test("an unreadable unit on a unit-declaring field is still refused", () => {
+  const rows = [num("length_ft", "Run length", "ft")];
+  const r = queryFill("run length 40 furlongs", rows, { name: "Run" });
+  assert.equal(r.filled.length_ft, undefined);
+});
