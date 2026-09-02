@@ -73,7 +73,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
   The chips now carry the query they run, and a spec checks that a chip and its own visible text reach the same tile. Ranking harness unchanged at 99.73% / 99.83% / 99.83%; the longer labels re-verified at 320 px on Chromium and WebKit.
 
-  Not fixed here, and worth naming: the short forms are what a reader would actually type, and the extractor prefers the explicit ones. That is a ranking and extraction gap, not a labelling one, and it is a separate piece of work.
+  Not fixed here, and traced to its cause rather than left as a shrug: `extractQuantities` accepts a **single-letter unit glued only** -- `120V` reads as volts, `120 v` reads as a bare number -- so the spaced short form the chip advertised was the one phrasing the extractor dropped. The rule is deliberate and unit-tested: "10 a" is genuinely ambiguous between ten amps and ten a-something, and the extractor has no tile context to break the tie. The cost is now written beside that assertion, with the note that any fix belongs where the context exists (`mapSlots`) and has to be measured with `scripts/measure-query-fill.mjs` rather than reasoned about.
 
 
 - **The keyboard-shortcut overlay named a tile something the catalog does not call it.** `G R` opens "Refrigerant P-T Chart"; the overlay said "Refrigerant P-T". A small thing, and the reason it is worth recording is where it was found: `docs/accessibility.md` asserts outright that its shortcut list, the live `SHORTCUTS` map in `app.js` and the `?` overlay all agree -- three copies of one table, with a claim of agreement over them and nothing comparing them.

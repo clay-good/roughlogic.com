@@ -263,8 +263,20 @@ test("extractQuantities: glued, spaced, fraction, comma, unitless", () => {
   assert.deepEqual(extractQuantities("1,200 watts"), [{ value: "1200", unit: "watts" }]);
   assert.deepEqual(extractQuantities("about 40"), [{ value: "40", unit: null }]);
   // Single-letter units are glued-only: an article never reads as a unit.
+  //
+  // What that costs, measured 2026-09-02 and written here so the next person
+  // weighing the rule can see the price: `ohms law 120 v, 10 a` prefills
+  // NOTHING, while `120V 10A` and `120 volts 10 amps` both fill. The home
+  // page's example chip advertised the spaced short form until that date --
+  // the one phrasing the site taught was the one the extractor dropped. The
+  // rule is kept anyway: "10 a" is genuinely ambiguous between ten amps and
+  // ten a-something, and `extractQuantities` has no tile context to break the
+  // tie with. Any fix belongs where that context exists (mapSlots), and has to
+  // be measured with scripts/measure-query-fill.mjs, not reasoned about.
   assert.deepEqual(extractQuantities("for a 50 amp circuit"), [{ value: "50", unit: "amp" }]);
   assert.deepEqual(extractQuantities("20 a"), [{ value: "20", unit: null }]);
+  assert.deepEqual(extractQuantities("120 v"), [{ value: "120", unit: null }]);
+  assert.deepEqual(extractQuantities("120v"), [{ value: "120", unit: "v" }]);
   // Identifier-glued digits are not quantities; bad input is empty.
   assert.deepEqual(extractQuantities("ashrae 62.2"), [{ value: "62.2", unit: null }]);
   assert.deepEqual(extractQuantities(null), []);
