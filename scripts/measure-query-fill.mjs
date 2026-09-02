@@ -33,6 +33,13 @@ const SHOW_MISSES = process.argv.includes("--misses");
 // is how a person in a hurry types, and it is the only phrasing that can show
 // a value landing in the wrong field for want of a name to hold it.
 const TERSE = process.argv.includes("--terse");
+// `--shapes` groups the tiles that recovered NOTHING by why. Added 2026-09-02,
+// when the terse lens sat at 28.7% and the obvious question was how much of the
+// remainder is reachable at all. Answer: most of it is not. See the note beside
+// the census printer at the bottom.
+const SHOW_SHAPES = process.argv.includes("--shapes");
+const NONE_SHAPES = new Map();
+const NONE_SAMPLES = new Map();
 // The phrasing the site teaches and the ranker rewards: the calculator's name,
 // then the values. It is the only mode that exercises the rule keeping a tile's
 // own name from being read as a field name.
@@ -118,7 +125,42 @@ for (const [id, rows] of rowsByTile) {
   if (bad) { /* counted below by tile */ }
   if (hit === want.length) all++;
   else if (hit > 0) some++;
-  else none++;
+  else {
+    none++;
+    if (SHOW_SHAPES) {
+      const units = want.map((r) => r.u || null);
+      const kinds = want.map((r) => r.k);
+      const key = kinds.every((k) => k === "select" || k === "checkbox") ? "every field is a select or checkbox"
+        : units.every((u) => !u) ? "no field declares a unit"
+        : units.filter(Boolean).length !== new Set(units.filter(Boolean)).size ? "two or more fields share one unit"
+        : "other";
+      NONE_SHAPES.set(key, (NONE_SHAPES.get(key) || 0) + 1);
+      const seen = NONE_SAMPLES.get(key) || [];
+      if (seen.length < 4) { seen.push(`${id}  q=${JSON.stringify(q).slice(0, 62)}`); NONE_SAMPLES.set(key, seen); }
+    }
+  }
+}
+
+// Why the tiles that recovered nothing recovered nothing.
+//
+// Measured 2026-09-02 in terse mode: 356 of the 552 have TWO OR MORE FIELDS
+// SHARING ONE UNIT ("480 v, 475 v, 470 v" against three volts fields), and 127
+// have NO FIELD DECLARING A UNIT AT ALL. Both are genuinely ambiguous once the
+// field names are gone, which is what terse mode removes.
+//
+// The tempting fix is positional: fill same-unit fields in declaration order.
+// It is refused, and the refusal belongs here rather than in someone's head,
+// because this harness CANNOT HONESTLY MEASURE IT. `phrase()` builds the query
+// by walking `rows` in order, so a positional rule would score against a query
+// this file wrote in exactly that order -- measuring the harness, not the
+// extractor, the same trap the label-number note above records. A real reader
+// types the values they have, in the order they think of them.
+if (SHOW_SHAPES) {
+  console.log("--- tiles that recovered nothing, by shape ---");
+  for (const [k, v] of [...NONE_SHAPES].sort((a, b) => b[1] - a[1])) {
+    console.log(String(v).padStart(5) + "  " + k);
+    for (const sample of NONE_SAMPLES.get(k) || []) console.log("        " + sample);
+  }
 }
 
 const pct = (n, d) => (d ? ((n / d) * 100).toFixed(1) : "0.0") + "%";

@@ -6,6 +6,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **A census of what the query-fill harness cannot reach, and why.** With the terse lens at 28.7%, the obvious question is how much of the remaining 71% is recoverable at all. `measure-query-fill --shapes` now groups the tiles that recovered **nothing** by the reason: of the 552, **356 have two or more fields sharing one unit** ("480 v, 475 v, 470 v" against three volts fields) and **127 have no field declaring a unit at all**. Both are genuinely ambiguous once the field names are gone, which is exactly what terse mode removes.
+
+  The tempting fix is positional -- fill same-unit fields in declaration order -- and it is **refused, in the harness, where the next person will look for it**: `phrase()` builds each query by walking the rows in order, so a positional rule would be scored against a query this very file wrote in that order. That measures the harness, not the extractor -- the same trap the label-number note beside it already records. A real reader types the values they have, in the order they think of them.
+
+
 - **The service-worker contract now runs in a browser.** spec-v10 §H.4 requires that a release bumps `BUILD_HASH`, that the reader gets the fresh shell within one page load, and that **old caches are deleted on activation**. All three were held by reading `sw.js` as text, and that test says why in its own header: "These are static-source assertions because Playwright is gated." Playwright has not been gated for a long time -- there is a full integration suite, and `offline.test.js` already drives a registered worker.
 
   Every string in a source-text test can be present while the running worker creates the wrong caches or keeps the old ones, and the failure mode is the one `_headers` spells out in its own comment: new HTML paired with stale JS, which "breaks the site for everyone until the TTL expires or the cache is purged." `test/integration/service-worker.test.js` checks the running worker instead -- it activates and controls the page; its caches are named after the `BUILD_HASH` **the server is serving**, not the `dev-` placeholder the source keeps; every one of the 157 paths it precaches is really in one of those two caches; and a previous build's caches are gone after the next activation, while the current pair survives.
