@@ -41,6 +41,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **A load-bearing code comment quoted a population 4.8x too large.** `scripts/build-field-index.mjs` explains why a field with no human label is left out of the index -- "matching on a machine key would be guessing, and this program refuses rather than guesses" -- and cited "all **379** tiles whose inputs come from compute-parameter introspection ... 313 indexed, the remaining 66 skipped". That population is **79** now, not 379: renderer-schema coverage grew underneath it, and 1,725 of 1,804 tiles expose a schema today. Live: **38 indexed, 41 skipped.**
+
+  The reasoning was right and the numbers had aged out from under it, which is the worse failure of the two -- a comment that explains a design decision is what the next person reasons from.
+
+  Recorded while checking whether those 41 are a recoverable gap. **They are not, and the attractive fix is the one the comment forbids:** `humanizeKey` would happily turn `bend1_deg` into "Bend1 (deg)", which is good enough to *print* beside an answer and not good enough to *match* a reader's words against. That is now said in as many words, next to the rule, because it is exactly the shortcut a future reader will reach for.
+
+
 - **A citation due date can no longer ambush the build.** CF-03 fails the moment a `sources-cycle.json` row's `next_expected` passes -- which means main turns red at a UTC midnight with no commit behind it, and whoever is next at the keyboard inherits it as a surprise. That is not hypothetical; it happened yesterday.
 
   `check-citation-freshness` now emits a **non-fatal warning for the 92 days before** a row comes due, whenever the row's existing re-stamp will not cover that date. Three rows are warning today, and the first two are the point: **IBC and IFC come due 2026-10 and were re-stamped 2026-09-01** -- which does *not* cover them, because CF-03 requires `last_verified >= next_expected` by design. Yesterday's verification work was real and the October re-verify is real too; it is now visible a month out instead of arriving as a red build. The third is the FDA Food Code, due 2026-12 with no `last_verified` at all.

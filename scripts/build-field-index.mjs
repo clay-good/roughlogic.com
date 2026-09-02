@@ -33,14 +33,25 @@
 // A field with no label is omitted entirely -- matching on a machine key would
 // be guessing, and this program refuses rather than guesses.
 //
-// That once excluded all 379 tiles whose inputs come from compute-parameter
+// That once excluded every tile whose inputs come from compute-parameter
 // introspection, on the grounds that they carry no human text: the extractor
 // would see `area_ft2` and nothing else. They do carry human text. It is the
 // caption the calculator prints beside the field on its own page, which the
 // static shells already render and `inputLabels` already recovers -- the
-// calculator's own words, not a guess at a key. 313 of the 379 are indexed
-// from it; the remaining 66 have list-valued or genuinely unlabelled inputs
-// and are still skipped.
+// calculator's own words, not a guess at a key.
+//
+// That population was 379 when this was written and is **79** as of
+// 2026-09-02, because renderer-schema coverage grew underneath it (1,725 of
+// 1,804 tiles now expose a schema). Of the 79, **38 are indexed** from their
+// printed captions and **41 are skipped** -- the input-free reference tiles,
+// the list-valued inputs a typed question cannot fill, and the handful whose
+// captions `inputLabels` cannot recover at all.
+//
+// Those last are deliberately left out. `humanizeKey` in key-labels.js would
+// happily turn `bend1_deg` into "Bend1 (deg)", and that is good enough to
+// PRINT beside an answer -- it is not good enough to MATCH a reader's words
+// against, which is the rule three lines up: matching on a machine key is
+// guessing, and a wrong prefill is worse than none.
 //
 // Measured with scripts/measure-query-fill.mjs, re-phrasing every tile's own
 // verified example as a question: field recovery 3,301/5,616 -> 4,073/7,101,
