@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **`check-dead-inputs` said "58 modules swept" while five computes were invisible to it.** The gate matches `export function NAME({ ... })` and nothing else, so a compute written with a named object parameter -- `computeHudFmr(input)`, `computeRentVsBuy(inp)` -- is never matched, raises no error, and vanishes into a summary line that reads as full coverage. Its own docstring is careful about this ("every name in that destructuring pattern is, **by construction**, an input the tile collects"); the summary was not.
+
+  Measured: 1,776 of 1,802 `compute*` exports are inspected. Of the 26 that are not, **21 are param-less reference computes** -- `computeColorCodes()`, `computeGFCIReference()` -- which have no inputs and so cannot have a dead one; they are correctly out of scope. **Five take a real object of inputs** and are genuinely unchecked: four in `calc-realestate.js` and one in `calc-solar.js`.
+
+  The summary names those five on every run, and the set is ratcheted: destructure one and lower the budget, add a sixth and the build fails. Seed-verified with a sixth. The README row says the same thing.
+
 - **"Freshness-tracked" was true for 76% of the catalog.** The trust table's `check-citation-coverage` row read: *every tile names a real, dated source, freshness-tracked*. The first half holds exactly -- 1,804 complete citations, all four required fields, no orphans, no raw URL schemes. The second half does not: **425 tiles (23.6%) cite a source no freshness tracker covers**, so nothing puts them on a recheck calendar at all.
 
   The gate had been printing that number on every single lint run -- *"1,379 / 1,804 tile(s) matched at least one tracked source (76.4%); 425 untracked"* -- and nobody carried it into the sentence a reader actually reads. That is the whole shape of today: the measurement existed, the claim above it did not match, and the claim is the layer the reader believes.

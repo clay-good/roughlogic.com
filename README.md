@@ -83,7 +83,7 @@ The hard part of a calculator catalog is not the arithmetic. It is proving, at s
 | `check-example-parity` | the example a page prints is the example its calculator opens (1,673 tiles statically; the 131 that declare theirs inline are driven in a real browser by `test/integration/example-parity-runtime.test.js`, so the claim covers all 1,804) |
 | `check-citation-coverage` | every tile names a real, dated source with all four required fields and no orphans. Freshness tracking is narrower: 1,379 tiles cite a source on a recheck calendar, and **425 cite a source no freshness tracker covers** |
 | `check-derivation-coverage` | every formula has a written derivation |
-| `check-dead-inputs` | no rendered field is silently ignored by the compute function |
+| `check-dead-inputs` | no rendered field is silently ignored by the compute function, across the 1,776 computes that destructure their inputs. Five take a named object parameter the scan cannot see into and are named in the gate's own output |
 | `check-tile-contract` | every tile is registered, crash-free, and matches its declared I/O shape |
 | `check-shell-mobile` | zero horizontal scroll on every page at 320 px and 200% text zoom |
 | `check-feedback-loop` | every current and future calculator retains the shared defensive D1 reporting path |

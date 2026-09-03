@@ -99,8 +99,10 @@ async function main() {
   const files = (await readdir(ROOT)).filter((f) => /^calc-.*\.js$/.test(f) || f === "pure-math.js");
   files.sort();
   const errors = [];
+  const sources = new Map();
   for (const file of files) {
     const src = await readFile(resolve(ROOT, file), "utf8");
+    sources.set(file, src);
     for (const f of findings(src)) {
       errors.push(`${file} :: ${f.fnName} destructures input "${f.name}" but never references it in the body (a control that silently does nothing).`);
     }
@@ -111,7 +113,44 @@ async function main() {
     console.error("  Either use the input in the computation, or remove the field, its example key, and its `// dims:` entry.");
     process.exit(1);
   }
-  console.log(`check-dead-inputs OK: no compute function destructures an input it never uses (${files.length} modules swept).`);
+  // Say what was NOT swept. The regex above matches only
+  // `export function NAME({ ... })`; a compute with a named object parameter --
+  // `computeHudFmr(input)` -- is never matched, produces no error, and the old
+  // summary said "58 modules swept", which reads as full coverage. Twenty-one
+  // param-less reference computes are genuinely out of scope (no inputs, so
+  // none can be dead). Five take a real object of inputs this gate cannot see
+  // into, and that set is ratcheted: convert one to a destructured signature
+  // and lower the budget; adding a sixth is new unchecked surface.
+  const UNCHECKED_WITH_INPUTS = 5;
+  const namedParamComputes = [];
+  for (const file of files) {
+    const src = sources.get(file);
+    const covered = new Set();
+    const dre = /export\s+function\s+([A-Za-z0-9_$]+)\s*\(\s*\{([\s\S]*?)\}\s*(?:=\s*\{\}\s*)?\)\s*\{/g;
+    let d;
+    while ((d = dre.exec(src))) covered.add(d[1]);
+    const are = /export\s+function\s+([A-Za-z0-9_$]+)\s*\(([^)]*)\)/g;
+    let a;
+    while ((a = are.exec(src))) {
+      const name = a[1];
+      const params = a[2].trim();
+      if (!name.startsWith("compute") || covered.has(name) || params === "") continue;
+      namedParamComputes.push(`${file}::${name}`);
+    }
+  }
+  if (namedParamComputes.length > UNCHECKED_WITH_INPUTS) {
+    console.error(
+      `check-dead-inputs FAILED: ${namedParamComputes.length} compute function(s) take a ` +
+      `named object parameter this gate cannot inspect, over a budget of ` +
+      `${UNCHECKED_WITH_INPUTS}: ${namedParamComputes.join(", ")}. Destructure the ` +
+      `signature so a dead input is visible, or raise the budget deliberately.`);
+    process.exit(1);
+  }
+  console.log(
+    `check-dead-inputs OK: no compute function destructures an input it never uses ` +
+    `(${files.length} modules swept). NOT checked here: ${namedParamComputes.length} ` +
+    `compute(s) take a named object parameter the destructuring scan cannot see into ` +
+    `(budget ${UNCHECKED_WITH_INPUTS}) -- ${namedParamComputes.join(", ")}.`);
 }
 
 main().catch((e) => {
