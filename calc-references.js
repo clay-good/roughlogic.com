@@ -470,7 +470,7 @@ export const SALES_TAX_NEXUS = {
   IN: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Ind. Code 6-2.5-2-1(c)", verified_on: "2025-01-15" },
   IA: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Iowa Code 423.14A", verified_on: "2025-01-15" },
   KS: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Kan. Stat. Ann. 79-3702(h)(1)(F)", verified_on: "2025-01-15" },
-  KY: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "Ky. Rev. Stat. 139.340(2)(g)", verified_on: "2025-01-15" },
+  KY: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, combine_note: "2026 Ky. Acts ch. 161 (H.B. 757) sec. 16 struck the 200-transaction prong from KRS 139.340(2)(g) effective 2026-08-01, and sec. 1 struck it from the marketplace-provider test in KRS 139.450; the gross-receipts threshold is now the only test.", citation: "Ky. Rev. Stat. 139.340(2)(g)", verified_on: "2026-09-03" },
   LA: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, combine_note: "2023 La. Acts 375 (H.B. 558) repealed the 200-transaction prong effective 2023-08-01; the sales threshold is now the only test.", citation: "La. Rev. Stat. 47:301(4)(m)", verified_on: "2026-09-03" },
   ME: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Me. Rev. Stat. tit. 36 sec. 1754-B", verified_on: "2025-01-15" },
   MD: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "Md. Code Ann., Tax-Gen. 11-701(b)(2)(iii)", verified_on: "2025-01-15" },

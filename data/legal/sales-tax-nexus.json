@@ -114,10 +114,11 @@
     },
     "KY": {
       "sales_threshold_usd": 100000,
-      "transactions_threshold": 200,
-      "combine": "or",
+      "transactions_threshold": null,
+      "combine": null,
+      "combine_note": "2026 Ky. Acts ch. 161 (H.B. 757) sec. 16 struck the 200-transaction prong from KRS 139.340(2)(g) effective 2026-08-01, and sec. 1 struck it from the marketplace-provider test in KRS 139.450; the gross-receipts threshold is now the only test.",
       "citation": "Ky. Rev. Stat. 139.340(2)(g)",
-      "verified_on": "2025-01-15"
+      "verified_on": "2026-09-03"
     },
     "LA": {
       "sales_threshold_usd": 100000,

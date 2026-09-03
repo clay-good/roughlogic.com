@@ -34,8 +34,9 @@ test("New York and Connecticut require BOTH thresholds", () => {
 test("the three states that repealed their transaction prong carry no count", () => {
   // LA: 2023 Acts 375 eff. 2023-08-01 -- the shard was already wrong when it
   // was stamped verified on 2025-01-15. UT: S.B. 47 eff. 2025-07-01.
-  // IL: P.A. 104-0006 eff. 2026-01-01.
-  for (const [st, act] of [["LA", /Acts 375/], ["UT", /S\.B\. 47/], ["IL", /104-0006/]]) {
+  // IL: P.A. 104-0006 eff. 2026-01-01. KY: 2026 Ky. Acts ch. 161 (H.B. 757)
+  // eff. 2026-08-01, five weeks before this pass.
+  for (const [st, act] of [["LA", /Acts 375/], ["UT", /S\.B\. 47/], ["IL", /104-0006/], ["KY", /ch\. 161/]]) {
     const r = SALES_TAX_NEXUS[st];
     assert.equal(r.transactions_threshold, null, st + " no longer has a transaction threshold");
     assert.equal(r.combine, null);
@@ -45,9 +46,9 @@ test("the three states that repealed their transaction prong carry no count", ()
 });
 
 test("a row re-verified today is not left claiming the old stamp", () => {
-  // The other 42 rows deliberately keep 2025-01-15: they were not re-checked,
+  // The other 41 rows deliberately keep 2025-01-15: they were not re-checked,
   // and the folder's staleness warning should keep firing until they are.
   const rechecked = Object.entries(SALES_TAX_NEXUS).filter(([, v]) => v.verified_on !== "2025-01-15");
-  assert.deepEqual(rechecked.map(([st]) => st).sort(), ["CT", "IL", "LA", "NY", "UT"]);
+  assert.deepEqual(rechecked.map(([st]) => st).sort(), ["CT", "IL", "KY", "LA", "NY", "UT"]);
   for (const [, v] of rechecked) assert.equal(v.verified_on, "2026-09-03");
 });
