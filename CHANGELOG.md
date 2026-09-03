@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **The one phase of the correctness argument that rests on people has never run, and was written in the present tense.** [docs/correctness.md](docs/correctness.md) describes Phase H -- independent per-group reviewer signoff -- as an operating process: *"Every active group A through Y carries one signoff row... A lapsed signoff (more than 100 days) is a build warning; a lapse exceeding 180 days fails the audit."*
+
+  **0 of 19 non-exempt groups are signed off. All 19 are `open`.** No reviewer has signed off on anything, so nothing can lapse and the warning has never fired. `check-audit-trail` has been reporting `signed-off=0` on every lint run throughout.
+
+  Its credential list was stale in both directions besides: it named **S Legal, U Veterinary, V EMS and W Pilots**, none of which are live catalog groups (S was retired with spec-v107), and omitted **Z Rigging and Heavy Lift**, which is live and non-exempt.
+
+  The section now leads with the status and says plainly that a reader should take the rest of the document as machine-checked and this part as intent, keeps the design and the credentials as what is *sought*, and names the live groups. `check-audit-trail` fails if the stated signoff counts drift from the live ones or if the credential list names a retired group. Seed-verified both ways.
+
 - **`check-shell-mobile` failed CI with a reason nobody could read.** The static server it spawns is `npx -y http-server`, and it was spawned with `stdio: "ignore"`. When the server did not come up, the gate waited out its 30-second budget and reported exactly one thing: *"http://localhost:8099 never came up within 30000 ms."* Whatever `npx` or `http-server` had to say -- a cold-cache download still in flight, a port already bound, a registry error -- was discarded before anyone could read it. **A gate that can fail for an unknowable reason gets re-run rather than read**, which is how a real failure would have hidden inside the flake.
 
   It now keeps a bounded tail of the child's output and quotes it in the error, **fails the instant the child exits** rather than waiting out the clock, and allows 60 seconds rather than 30 -- the thing being waited on is a package download on a cold runner. Seed-verified by holding port 8099: the old code would have spent 30 seconds and said nothing useful; it now fails at once with *"the static server exited with code 1"* and the `EADDRINUSE` beneath it.

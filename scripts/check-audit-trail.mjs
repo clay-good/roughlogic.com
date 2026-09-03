@@ -173,6 +173,45 @@ async function main() {
   // status is tracked by maintainers in audit-trail.md, not by this
   // lint. The lint upgrades to "warn if no completed review within
   // 100 days" once spec-v14 §17 launch gate 8 closes.
+  // Phase H is the one part of the correctness argument that rests on people
+  // rather than on a gate, and docs/correctness.md described it in the present
+  // tense -- "every active group carries one signoff row", "a lapsed signoff is
+  // a build warning" -- while 0 of 19 non-exempt groups were signed off and all
+  // 19 were open. Nothing could lapse, so the warning had never fired. Its
+  // credential list was stale too: it named S Legal, U Veterinary, V EMS and
+  // W Pilots, none of which are live groups, and omitted Z Rigging.
+  //
+  // So the doc must state the live signoff numbers, and must name exactly the
+  // live non-exempt groups.
+  const signedOff = statusCounts["signed-off"];
+  const nonExempt = statusByGroup.size - statusCounts.exempt;
+  const correctnessPath = resolve(ROOT, "docs", "correctness.md");
+  const doc = await readFile(correctnessPath, "utf8");
+  const phaseH = doc.slice(doc.indexOf("## Per-group reviewer signoff (Phase H)"));
+  const docErrors = [];
+  const statedSigned = /(\d+) of (\d+) non-exempt groups are\s+signed off/.exec(phaseH.replace(/\*\*/g, ""));
+  if (!statedSigned) {
+    docErrors.push(
+      "docs/correctness.md's Phase H section does not state how many groups are " +
+      "actually signed off. Live: " + signedOff + " of " + nonExempt + ".");
+  } else if (Number(statedSigned[1]) !== signedOff || Number(statedSigned[2]) !== nonExempt) {
+    docErrors.push(
+      "docs/correctness.md's Phase H says " + statedSigned[1] + " of " + statedSigned[2] +
+      " groups signed off; live is " + signedOff + " of " + nonExempt + ".");
+  }
+  for (const dead of ["S Legal", "U Veterinary", "V EMS", "W Pilots"]) {
+    if (phaseH.includes(dead)) {
+      docErrors.push(
+        "docs/correctness.md's Phase H credential list names " + dead +
+        ", which is not a live catalog group.");
+    }
+  }
+  if (docErrors.length > 0) {
+    for (const e of docErrors) console.error("ERROR: " + e);
+    console.error("v14 audit-trail lint FAILED with " + docErrors.length + " error(s).");
+    process.exit(1);
+  }
+
   console.log(
     "v14 audit-trail lint OK (every non-exempt group named; per-group completed-review " +
     "tracking lands with spec-v14 §17 launch gate 8 closeout).",

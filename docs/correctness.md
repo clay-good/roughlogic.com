@@ -171,26 +171,36 @@ a monotonic relationship is a transcription error.
 
 ## Per-group reviewer signoff (Phase H)
 
-Every active group A through Y carries one signoff row in
-[audit-trail.md](audit-trail.md) per quarter. The row names
-the reviewer, the credential, the review date, the fixtures
-covered, and the next-renewal date (90 days from review per
-the v6 cadence). A lapsed signoff (more than 100 days) is a
-build warning; a lapse exceeding 180 days fails the audit.
+**Status: not yet operating. 0 of 19 non-exempt groups are
+signed off; all 19 are `open`.** The structured table exists
+in [audit-trail.md](audit-trail.md), `check-audit-trail`
+asserts every active group has a row in it, and the lapse
+machinery is written -- but no reviewer has signed off on any
+group, so nothing can lapse and the warning has never fired.
+This is the one phase of the correctness argument that rests
+on people rather than on a gate, and it is the one that has
+not happened. A reader weighing how far to trust this catalog
+should read the rest of this document as machine-checked and
+this section as intent.
 
-The credentials sought per group:
+The design, for when it does run: each active group carries
+one signoff row per quarter naming the reviewer, the
+credential, the review date, the fixtures covered, and the
+next-renewal date (90 days from review per the v6 cadence).
+A lapsed signoff (more than 100 days) is a build warning; a
+lapse exceeding 180 days fails the audit.
 
-- Engineering groups (A Electrical, B Plumbing, C HVAC, D
-  Restoration, E Construction, F Fire-ground, G Cross-trade,
-  J Trucking, K Mechanic, L Agriculture, M Water, N Stage,
-  O Kitchen, P Field): PE or equivalent trade certification.
+The credentials sought per group (H Knowledge References and
+Q Historical Reference Data are exempt per spec-v14 §12.1):
+
+- Engineering groups (A Electrical, B Plumbing and Gas,
+  C HVAC, D Restoration, E Construction, F Fire-ground,
+  G Cross-trade, J Trucking, K Mechanic, L Agriculture,
+  M Water and Wastewater, N Stage, O Kitchen, P Field,
+  Z Rigging and Heavy Lift): PE or equivalent trade
+  certification.
 - R Accounting: CPA.
-- S Legal: JD.
 - T Lab: PhD / MS in the relevant discipline.
-- U Veterinary: DVM or RVT / LVT.
-- V EMS: RN, MD, or paramedic with current protocol
-  familiarity.
-- W Pilots: ATP or CFI.
 - X Real Estate: licensed broker, appraiser, or lender.
 - Y Educators: working classroom teacher or curriculum
   specialist.
