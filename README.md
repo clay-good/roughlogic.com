@@ -85,7 +85,7 @@ The hard part of a calculator catalog is not the arithmetic. It is proving, at s
 | `check-derivation-coverage` | **72 formula families** are derived in full in [docs/derivations.md](docs/derivations.md), and every tile is named there. The gate asserts the naming, which the generated per-tile index satisfies -- it does not establish that a given tile's formula is among the 72 |
 | `check-dead-inputs` | no rendered field is silently ignored by the compute function, across the 1,776 computes that destructure their inputs. Five take a named object parameter the scan cannot see into and are named in the gate's own output |
 | `check-tile-contract` | every tile is registered, crash-free, and matches its declared I/O shape |
-| `check-shell-mobile` | zero horizontal scroll on every page at 320 px and 200% text zoom |
+| `check-shell-mobile` | zero page-level horizontal scroll on **every** shell at 320 px portrait. Landscape and 200% text zoom run over a representative sample -- every group hub, the home shell and an evenly-strided slice of tool shells -- because all shells come from one template and the only per-tile variable is string length |
 | `check-feedback-loop` | every current and future calculator retains the shared defensive D1 reporting path |
 | `check-tile-registries` | the new-tile checklist names every registry that holds all 1,804 ids, and calls no partial one mandatory |
 | `check-build-hermetic` | the build fetches nothing; every value in `data/` is an in-tree constant, reviewable in a diff, and no shipped string claims otherwise |

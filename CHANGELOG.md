@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **`check-shell-mobile`: "every page at 320 px and 200% text zoom" was true of the first half only.** Every shell is swept at 320 px portrait. Landscape and 200% text zoom run over a representative sample -- every group hub, the home shell, and an evenly-strided slice of about 25 tool shells. The gate's own summary line has always said so, and the reasoning is sound and written down: all shells come from one template, and the only per-tile variable is string length, which the shared overflow-wrap rule absorbs. The README compressed that into a promise about every page on both axes.
+
+  Unlike the other rows corrected today this one is a wording fix over a defensible practice, so the row now names which axis is exhaustive and which is sampled, and says why. The gate cannot police its own claim -- it needs a browser and is not in `npm run lint` -- so the assertion lives in `check-ci-claims`, which runs on every push.
+
+  That closes a sweep of the whole table. Seven rows overstated, each in the flattering direction; the rest were checked and left alone, including `check-bounds`, `check-build-hermetic`, `check-example-parity` and `check-tile-registries`, which describe themselves accurately.
+
 - **A gate reporting 100% coverage that a generator satisfies by construction.** `check-derivation-coverage` counts a tile as covered when its `tile_id` appears anywhere in [docs/derivations.md](docs/derivations.md). That document ends with a machine-generated per-tile index which lists every tile by definition, so the gate reports 100% for as long as `build-tile-index.mjs` has run. Outside that generated block, **68 of 1,804 tile ids (3.8%) appear in the document at all.**
 
   The README read: *every formula has a written derivation*. What actually exists is worth claiming and is now what the row says: **72 numbered formula families derived in full** -- conductor resistance at temperature, Hazen-Williams, Darcy-Weisbach, psychrometrics, beam mechanics and so on -- each covering a family of tiles. That is real engineering documentation. It is not a per-tile derivation, and the gate does not establish that any given tile's formula is among the 72.

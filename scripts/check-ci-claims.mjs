@@ -308,6 +308,19 @@ async function main() {
     }
   }
 
+  // F. check-shell-mobile needs a browser, so it is not in `npm run lint` and
+  // cannot police its own README row. It sweeps EVERY shell at 320px portrait
+  // but audits landscape and 200% text zoom over a strided sample -- sound,
+  // documented reasoning (one template, string length the only variable), and
+  // not what "every page at 320 px and 200% text zoom" said.
+  const shellRow = readme.split("\n").find((l) => l.includes("`check-shell-mobile`"));
+  if (shellRow && /every page at 320\s*px and 200% text zoom/i.test(shellRow)) {
+    errors.push(
+      "README.md says check-shell-mobile proves every page at both 320px and 200% " +
+      "text zoom. Every shell is swept at 320px portrait; the zoom and landscape " +
+      "axes run over a sample. Say which is which.");
+  }
+
   if (errors.length) {
     console.error("check-ci-claims FAILED:");
     for (const e of errors) console.error("  - " + e);
