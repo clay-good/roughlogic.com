@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **A gate reporting 100% coverage that a generator satisfies by construction.** `check-derivation-coverage` counts a tile as covered when its `tile_id` appears anywhere in [docs/derivations.md](docs/derivations.md). That document ends with a machine-generated per-tile index which lists every tile by definition, so the gate reports 100% for as long as `build-tile-index.mjs` has run. Outside that generated block, **68 of 1,804 tile ids (3.8%) appear in the document at all.**
+
+  The README read: *every formula has a written derivation*. What actually exists is worth claiming and is now what the row says: **72 numbered formula families derived in full** -- conductor resistance at temperature, Hazen-Williams, Darcy-Weisbach, psychrometrics, beam mechanics and so on -- each covering a family of tiles. That is real engineering documentation. It is not a per-tile derivation, and the gate does not establish that any given tile's formula is among the 72.
+
+  Measured in passing and not claimed: the generated function corpus in that file lists 2,055 functions with their parameters, and its Citation, Fixture and Tolerance columns are `_` on **every single row**. The table looks like per-function documentation and is currently a signature index.
+
+  The gate now fails if the README reclaims the per-formula sentence, or if the family count drifts from the live number of numbered sections. Seed-verified both ways.
+
 - **"Every formula is dimensionally consistent" was the strongest claim in the table and the least supported.** `check-dimensions` reads each source, finds the `// dims:` annotation, and fails a malformed one. It never checks an expression against the dimensions it declares. A function may declare `out: L/T`, compute something with dimensions of L/T^2, and pass.
 
   The gate's own docstring has always said so -- *"it does not verify floating-point math (CAS would be a third-party dependency); it verifies the dimensional skeleton at the source level"* -- and `check-dead-inputs` says it too, in passing: *"the dimensions gate only checks that the `// dims:` annotation parses"*. **Two files in this repository described the gate accurately and the README described it as a proof about the arithmetic.** That is the same tell as `check-cross-validation`: where several descriptions of one gate disagree, the flattering one is the one nobody checked.

@@ -120,6 +120,48 @@ async function main() {
     );
     process.exit(1);
   }
+  // What this gate establishes, held where a reader meets it. A tile counts as
+  // covered when its tile_id appears anywhere in docs/derivations.md -- and the
+  // document ends with a machine-generated per-tile index that lists every tile
+  // by construction. Outside that generated block only 68 of 1,804 tile ids
+  // (3.8%) appear at all, so the 100% this gate reports is satisfied by
+  // build-tile-index.mjs having run, not by a derivation existing.
+  //
+  // What IS real is the 72 numbered formula-family sections, each deriving a
+  // formula in full for a family of tiles. That is worth claiming; "every
+  // formula has a written derivation" is not the same sentence.
+  const derivations = await readFile(resolve(ROOT, "docs", "derivations.md"), "utf8");
+  const families = (derivations.match(/^## \d+\. /gm) || []).length;
+  const readmeText = await readFile(resolve(ROOT, "README.md"), "utf8");
+  const row = readmeText.split("\n").find((l) => l.includes("`check-derivation-coverage`"));
+  const derivErrors = [];
+  if (row) {
+    if (/every formula has a written derivation/i.test(row)) {
+      derivErrors.push(
+        "README.md says every formula has a written derivation. This gate asserts a " +
+        "tile_id appears in docs/derivations.md, which the generated per-tile index " +
+        "satisfies for every tile. Say what is actually derived.",
+      );
+    }
+    const stated = /\*\*(\d+) formula families\*\*/.exec(row);
+    if (!stated) {
+      derivErrors.push(
+        "README.md's check-derivation-coverage row does not state how many formula " +
+        "families docs/derivations.md derives. It derives " + families + ".",
+      );
+    } else if (Number(stated[1]) !== families) {
+      derivErrors.push(
+        "README.md says " + stated[1] + " formula families; docs/derivations.md has " +
+        families + " numbered sections.",
+      );
+    }
+  }
+  if (derivErrors.length > 0) {
+    for (const e of derivErrors) console.error("ERROR: " + e);
+    console.error("v14 derivation-coverage lint FAILED with " + derivErrors.length + " error(s).");
+    process.exit(1);
+  }
+
 
   console.log(
     "v14 derivation-coverage lint OK (graduated to fail-on-missing at the 2026-05-22 " +
