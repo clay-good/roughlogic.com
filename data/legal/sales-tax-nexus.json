@@ -160,8 +160,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": 200,
       "combine": "or",
-      "citation": "Minn. Stat. 297A.66 subd. 4a",
-      "verified_on": "2025-01-15"
+      "citation": "Minn. Stat. 297A.66 subd. 1(c)",
+      "verified_on": "2026-09-03"
     },
     "MS": {
       "sales_threshold_usd": 250000,
@@ -181,8 +181,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": 200,
       "combine": "or",
-      "citation": "Neb. Rev. Stat. 77-2701.13",
-      "verified_on": "2025-01-15"
+      "citation": "Neb. Rev. Stat. 77-2701.13(2)(a)-(b)",
+      "verified_on": "2026-09-03"
     },
     "NV": {
       "sales_threshold_usd": 100000,
@@ -231,8 +231,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": 200,
       "combine": "or",
-      "citation": "Ohio Rev. Code 5741.01(I)",
-      "verified_on": "2025-01-15"
+      "citation": "Ohio Rev. Code 5741.01(I)(2)(g)-(h)",
+      "verified_on": "2026-09-03"
     },
     "OK": {
       "sales_threshold_usd": 100000,
@@ -295,15 +295,15 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": 200,
       "combine": "or",
-      "citation": "Vt. Stat. Ann. tit. 32 sec. 9701(9)(F)",
-      "verified_on": "2025-01-15"
+      "citation": "Vt. Stat. Ann. tit. 32 sec. 9701(9)(F)(ii)",
+      "verified_on": "2026-09-03"
     },
     "VA": {
       "sales_threshold_usd": 100000,
       "transactions_threshold": 200,
       "combine": "or",
-      "citation": "Va. Code Ann. 58.1-612.1",
-      "verified_on": "2025-01-15"
+      "citation": "Va. Code Ann. 58.1-612(C)(10)-(11)",
+      "verified_on": "2026-09-03"
     },
     "WA": {
       "sales_threshold_usd": 100000,
@@ -316,8 +316,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": 200,
       "combine": "or",
-      "citation": "W. Va. Code 11-15A-6b",
-      "verified_on": "2025-01-15"
+      "citation": "W. Va. Code 11-15A-6b(a)(1)-(2)",
+      "verified_on": "2026-09-03"
     },
     "WI": {
       "sales_threshold_usd": 100000,

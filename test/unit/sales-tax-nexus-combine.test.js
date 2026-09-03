@@ -46,9 +46,32 @@ test("the three states that repealed their transaction prong carry no count", ()
 });
 
 test("a row re-verified today is not left claiming the old stamp", () => {
-  // The other 41 rows deliberately keep 2025-01-15: they were not re-checked,
+  // The other 35 rows deliberately keep 2025-01-15: they were not re-checked,
   // and the folder's staleness warning should keep firing until they are.
+  // Six of the twelve were read and found CORRECT -- OH, VA, MN, NE, WV, VT --
+  // which is still a verification, and the only kind that lets a stamp move.
   const rechecked = Object.entries(SALES_TAX_NEXUS).filter(([, v]) => v.verified_on !== "2025-01-15");
-  assert.deepEqual(rechecked.map(([st]) => st).sort(), ["CT", "IL", "KY", "LA", "NY", "UT"]);
+  assert.deepEqual(
+    rechecked.map(([st]) => st).sort(),
+    ["CT", "IL", "KY", "LA", "MN", "NE", "NY", "OH", "UT", "VA", "VT", "WV"],
+  );
   for (const [, v] of rechecked) assert.equal(v.verified_on, "2026-09-03");
+});
+
+test("a row read and found correct still cites the provision that was read", () => {
+  // OH, VA, MN, NE, WV and VT were checked against the state's own code text
+  // and needed no change. The citation was tightened to the subsection that
+  // actually carries the two thresholds, so the next reader lands on it.
+  const cites = {
+    OH: /5741\.01\(I\)\(2\)\(g\)-\(h\)/,
+    VA: /58\.1-612\(C\)\(10\)-\(11\)/,
+    NE: /77-2701\.13\(2\)\(a\)-\(b\)/,
+    WV: /11-15A-6b\(a\)\(1\)-\(2\)/,
+  };
+  for (const [st, re] of Object.entries(cites)) {
+    assert.match(SALES_TAX_NEXUS[st].citation, re, st + " must cite the subsection read");
+    assert.equal(SALES_TAX_NEXUS[st].combine, "or", st + " is disjunctive");
+    assert.equal(SALES_TAX_NEXUS[st].sales_threshold_usd, 100000);
+    assert.equal(SALES_TAX_NEXUS[st].transactions_threshold, 200);
+  }
 });
