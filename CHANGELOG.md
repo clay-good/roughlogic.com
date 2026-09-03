@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **`check-shell-mobile` failed CI with a reason nobody could read.** The static server it spawns is `npx -y http-server`, and it was spawned with `stdio: "ignore"`. When the server did not come up, the gate waited out its 30-second budget and reported exactly one thing: *"http://localhost:8099 never came up within 30000 ms."* Whatever `npx` or `http-server` had to say -- a cold-cache download still in flight, a port already bound, a registry error -- was discarded before anyone could read it. **A gate that can fail for an unknowable reason gets re-run rather than read**, which is how a real failure would have hidden inside the flake.
+
+  It now keeps a bounded tail of the child's output and quotes it in the error, **fails the instant the child exits** rather than waiting out the clock, and allows 60 seconds rather than 30 -- the thing being waited on is a package download on a cold runner. Seed-verified by holding port 8099: the old code would have spent 30 seconds and said nothing useful; it now fails at once with *"the static server exited with code 1"* and the `EADDRINUSE` beneath it.
+
+  This is the second time this spawn has been the weak point: the first version slept a fixed 2,500 ms and lost the same race, and was changed to poll. Polling was the right fix and still left the diagnosis missing.
+
 - **`check-shell-mobile`: "every page at 320 px and 200% text zoom" was true of the first half only.** Every shell is swept at 320 px portrait. Landscape and 200% text zoom run over a representative sample -- every group hub, the home shell, and an evenly-strided slice of about 25 tool shells. The gate's own summary line has always said so, and the reasoning is sound and written down: all shells come from one template, and the only per-tile variable is string length, which the shared overflow-wrap rule absorbs. The README compressed that into a promise about every page on both axes.
 
   Unlike the other rows corrected today this one is a wording fix over a defensible practice, so the row now names which axis is exhaustive and which is sampled, and says why. The gate cannot police its own claim -- it needs a browser and is not in `npm run lint` -- so the assertion lives in `check-ci-claims`, which runs on every push.

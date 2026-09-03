@@ -26,14 +26,34 @@ async function exists(p) {
   try { await access(p); return true; } catch { return false; }
 }
 
-async function waitForServer(timeoutMs = 30000) {
+// The first version slept a fixed 2500 ms and lost to a cold `npx` cache; this
+// polls instead. It still lost on 2026-09-03, and the failure said only
+// "never came up within 30000 ms" -- because the child was spawned with
+// stdio: "ignore", so whatever npx or http-server had to say was thrown away.
+// A gate that can fail for an unknowable reason gets re-run rather than read.
+//
+// So: keep the child's output, fail the moment the child exits instead of
+// waiting out the clock, and quote what it said. The budget is also raised,
+// since the thing being waited on is a package download on a cold runner.
+async function waitForServer(server, log, timeoutMs = 60000) {
   const deadline = Date.now() + timeoutMs;
   for (;;) {
+    if (server.exitCode !== null) {
+      throw new Error(
+        `check-shell-mobile: the static server exited with code ${server.exitCode} ` +
+        `before ${BASE} answered.\n--- server output ---\n${log().trim() || "(none)"}`,
+      );
+    }
     try {
       const r = await fetch(BASE + "/", { method: "HEAD" });
       if (r.ok || r.status === 404) return;
     } catch { /* not listening yet */ }
-    if (Date.now() > deadline) throw new Error(`check-shell-mobile: ${BASE} never came up within ${timeoutMs} ms.`);
+    if (Date.now() > deadline) {
+      throw new Error(
+        `check-shell-mobile: ${BASE} never came up within ${timeoutMs} ms.\n` +
+        `--- server output ---\n${log().trim() || "(none -- npx produced nothing, so it is most likely still resolving http-server on a cold cache)"}`,
+      );
+    }
     await new Promise((r) => setTimeout(r, 250));
   }
 }
@@ -54,12 +74,23 @@ async function main() {
     return;
   }
 
-  const server = spawn("npx", ["-y", "http-server", "-p", String(PORT), "-c-1", "dist"], { stdio: "ignore" });
+  const server = spawn("npx", ["-y", "http-server", "-p", String(PORT), "-c-1", "dist"], {
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  // Keep a bounded tail of whatever the child says, so a startup failure is
+  // diagnosable instead of being reported as an anonymous timeout.
+  let serverLog = "";
+  const capture = (chunk) => {
+    serverLog = (serverLog + chunk.toString()).slice(-4000);
+  };
+  server.stdout.on("data", capture);
+  server.stderr.on("data", capture);
+  server.on("error", (err) => capture(`spawn error: ${err.message}\n`));
   // `npx` resolves (and on a cold cache downloads) http-server before the
   // listener exists, which takes well over two seconds on a cold machine. A
   // fixed sleep raced that and failed the whole gate with ERR_CONNECTION_REFUSED
   // on the first route, so poll the port until it actually answers.
-  await waitForServer();
+  await waitForServer(server, () => serverLog);
   try {
     const tools = (await readdir("dist/tools", { withFileTypes: true }))
       .filter((d) => d.isDirectory()).map((d) => `/tools/${d.name}/`);
