@@ -137,6 +137,13 @@ async function main() {
     }
   }
 
+  const byTilePublisher = new Map();
+  for (const row of r.rows) {
+    const list = byTilePublisher.get(row.tile_id) || [];
+    list.push(row.source_publisher || "");
+    byTilePublisher.set(row.tile_id, list);
+  }
+
   const totalTiles = toolIds.size;
   const covered = coveredTiles.size;
   const pct = totalTiles > 0 ? (covered / totalTiles) * 100 : 0;
@@ -156,6 +163,37 @@ async function main() {
         errors.push("tile '" + id + "' has no worked-example fixture (lint upgraded to fail-on-missing).");
       }
     }
+  }
+
+  // The README's trust table said this gate guarantees each tile's example
+  // "reproduces a publisher-verified reference number". For 408 of 1,804 tiles
+  // every row's source_publisher is the project's own first-principles
+  // derivation -- which is the right way to verify V = IR or a footing area,
+  // because no publisher prints a worked example for them, but it is not what
+  // the sentence claimed. The practice was sound; the claim was not.
+  //
+  // So the README has to state the split, and this gate holds it to the live
+  // number. Ratcheted: the first-principles share may shrink freely, and
+  // growing it past the recorded figure means the README is overstating again.
+  const SELF_SOURCED = /^Project\b|first-principles/i;
+  const selfOnlyTiles = [];
+  for (const [tile, publishers] of byTilePublisher) {
+    if (publishers.every((pub) => SELF_SOURCED.test(pub))) selfOnlyTiles.push(tile);
+  }
+  const readme = await readFile(resolve(ROOT, "README.md"), "utf8");
+  const stated = /\b(\d[\d,]*) of them are first-principles\b/.exec(readme);
+  if (!stated) {
+    errors.push(
+      "README.md does not state how many tiles have only first-principles worked " +
+      "examples. The trust table calls these publisher-verified; " + selfOnlyTiles.length +
+      " of " + totalTiles + " are the project showing its own work instead. Say so.",
+    );
+  } else if (Number(stated[1].replace(/,/g, "")) !== selfOnlyTiles.length) {
+    errors.push(
+      "README.md says " + stated[1] + " tiles are first-principles-only; the registry has " +
+      selfOnlyTiles.length + ". Update the sentence -- it is the one that tells a reader " +
+      "how much of this catalog is checked against an outside publisher.",
+    );
   }
 
   for (const w of warnings) console.warn("WARN: " + w);

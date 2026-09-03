@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **The trust table promised "publisher-verified" for 408 tiles nobody publishes an example for.** The README's *"Why you can trust the answers"* table is the most-read thing in this repository, and its `check-worked-examples` row read: *each tile's example reproduces a publisher-verified reference number*. Coverage really is 1,804 of 1,804 and no registry stubs remain -- but for **408 tiles (22.6%)** every row's `source_publisher` is the project's own first-principles derivation.
+
+  The practice is right. Nobody publishes a worked example for Ohm's law, a footing area, or a loan payment; deriving it and showing the work *is* the verification. The sentence was what overstated, and it overstated in the direction that flatters. The row now says what the registry contains, names the 408, and `check-worked-examples` holds the README to the live number -- ratcheted, so the first-principles share may shrink freely and cannot grow past what the README admits.
+
+  Also corrected in the same paragraph: the `test` job description still listed lint, unit tests and data-integrity verification, and had not been updated when the provenance-stamp check joined that job earlier today.
+
 - **The gate whose job is to check claims was satisfied by a pattern, not a behaviour.** Reading each gate's own summary line -- the lens that had just caught the stamp gate reporting *"OK: 0 across 0"* -- turned up three more claims nothing was measuring.
 
   `npm run audit` had grown to nine stages and **five living docs still said six**, listing a chain that stopped at `data:verify`. A contributor reads that sentence to decide what a green audit covers. `check-ci-claims` now compares both the stated count and the spelled-out chain against `scripts/audit.mjs`, and caught four stale sentences the moment it was written. `docs/launch-checklist.md` is deliberately exempt: *"v0.13 ... reports all 6 stages OK"* is a true statement about v0.13, and pinning an append-only release record to today's chain would falsify history -- the same reason `check-doc-links` skips the CHANGELOG.
