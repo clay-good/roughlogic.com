@@ -46,14 +46,15 @@ test("the three states that repealed their transaction prong carry no count", ()
 });
 
 test("a row re-verified today is not left claiming the old stamp", () => {
-  // The other 35 rows deliberately keep 2025-01-15: they were not re-checked,
+  // The other 33 rows deliberately keep 2025-01-15: they were not re-checked,
   // and the folder's staleness warning should keep firing until they are.
-  // Six of the twelve were read and found CORRECT -- OH, VA, MN, NE, WV, VT --
+  // Eight of the fourteen were read and found CORRECT -- OH, VA, MN, NE, WV,
+  // VT, HI and DC --
   // which is still a verification, and the only kind that lets a stamp move.
   const rechecked = Object.entries(SALES_TAX_NEXUS).filter(([, v]) => v.verified_on !== "2025-01-15");
   assert.deepEqual(
     rechecked.map(([st]) => st).sort(),
-    ["CT", "IL", "KY", "LA", "MN", "NE", "NY", "OH", "UT", "VA", "VT", "WV"],
+    ["CT", "DC", "HI", "IL", "KY", "LA", "MN", "NE", "NY", "OH", "UT", "VA", "VT", "WV"],
   );
   for (const [, v] of rechecked) assert.equal(v.verified_on, "2026-09-03");
 });

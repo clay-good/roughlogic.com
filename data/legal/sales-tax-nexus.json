@@ -73,8 +73,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": 200,
       "combine": "or",
-      "citation": "Haw. Rev. Stat. 237-2.5 (GET)",
-      "verified_on": "2025-01-15"
+      "citation": "Haw. Rev. Stat. 237-2.5(a)(1)-(2) (general excise tax)",
+      "verified_on": "2026-09-03"
     },
     "ID": {
       "sales_threshold_usd": 100000,
@@ -337,8 +337,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": 200,
       "combine": "or",
-      "citation": "D.C. Code 47-2002.01(c)",
-      "verified_on": "2025-01-15"
+      "citation": "D.C. Code 47-2001(w), applied by 47-2002.01",
+      "verified_on": "2026-09-03"
     }
   }
 }

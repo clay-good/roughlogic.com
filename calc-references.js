@@ -464,7 +464,7 @@ export const SALES_TAX_NEXUS = {
   CT: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "and", combine_note: "CT DRS Sales and Use Taxes - Nexus: both $100,000 in gross receipts and 200 retail sales are required, so exceeding one alone does not create nexus.", citation: "Conn. Gen. Stat. 12-407(a)(15)(A)(xi)", verified_on: "2026-09-03" },
   FL: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Fla. Stat. 212.0596 (S.B. 50, eff. 2021)", verified_on: "2025-01-15" },
   GA: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "O.C.G.A. 48-8-2(8)(M.1)", verified_on: "2025-01-15" },
-  HI: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "Haw. Rev. Stat. 237-2.5 (GET)", verified_on: "2025-01-15" },
+  HI: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "Haw. Rev. Stat. 237-2.5(a)(1)-(2) (general excise tax)", verified_on: "2026-09-03" },
   ID: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Idaho Code 63-3611(2)", verified_on: "2025-01-15" },
   IL: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, combine_note: "Pub. Act 104-0006 removed the 200-transaction prong effective 2026-01-01, per IDOR Informational Bulletin FY 2026-12; the sales threshold is now the only test.", citation: "35 ILCS 105/2", verified_on: "2026-09-03" },
   IN: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Ind. Code 6-2.5-2-1(c)", verified_on: "2025-01-15" },
@@ -501,7 +501,7 @@ export const SALES_TAX_NEXUS = {
   WV: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "W. Va. Code 11-15A-6b(a)(1)-(2)", verified_on: "2026-09-03" },
   WI: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Wis. Stat. 77.51(13gm)", verified_on: "2025-01-15" },
   WY: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Wyo. Stat. Ann. 39-15-501 (transaction threshold removed 2024)", verified_on: "2025-01-15" },
-  DC: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "D.C. Code 47-2002.01(c)", verified_on: "2025-01-15" },
+  DC: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "D.C. Code 47-2001(w), applied by 47-2002.01", verified_on: "2026-09-03" },
   // States with no general sales tax: DE, MT, NH, OR (no nexus threshold applies).
 };
 
