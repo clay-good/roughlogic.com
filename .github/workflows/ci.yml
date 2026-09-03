@@ -27,6 +27,15 @@ jobs:
         run: npm run test:unit
       - name: Verify data integrity
         run: npm run data:verify
+      # Needs history the depth-1 checkout above does not have, so it fetches
+      # the base branch itself rather than living in `npm run lint`. A stale
+      # data-refresh branch -- one cut before a hand-correction landed on main
+      # -- passes every other gate, because the snapshot it restores is
+      # internally consistent. The stamps are the only tell.
+      - name: Provenance stamps only move forward
+        run: |
+          git fetch --no-tags --depth=200 origin "${{ github.base_ref || github.ref_name }}"
+          DATA_STAMP_BASE=FETCH_HEAD npm run check:data-stamps
 
   # Fast a11y-only signal: axe-core scan over every tile_id in TOOLS plus
   # the home view (spec-v10 §E.3, parameterized at test-import time from

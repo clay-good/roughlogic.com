@@ -60,7 +60,15 @@ jobs:
       - name: Open pull request if data changed
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
-          branch: data-refresh-weekly-${{ github.run_id }}
+          # A FIXED branch name, not one keyed to the run id. Keying it to the
+          # run id opened a fresh pull request every cycle and left the last
+          # one behind: eleven abandoned branches and three open PRs, each a
+          # snapshot of an older main. Merging one silently reverts whatever
+          # landed after it was cut. A fixed branch is force-updated from the
+          # current main every run, so there is exactly one refresh PR and it
+          # is never stale.
+          branch: data-refresh-weekly
+          delete-branch: true
           title: "data: weekly refresh"
           body: ${{ steps.analysis.outputs.body }}
           commit-message: "data: weekly refresh"

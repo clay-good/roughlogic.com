@@ -109,6 +109,16 @@ infrastructure changes are required:
   and open a PR for review when the integrity hashes shift. No
   workflow auto-merges; the maintainer triages every diff. No
   runtime fetches are introduced (spec-v12 §H.4).
+- Each lane pushes to a **fixed** branch (`data-refresh`,
+  `data-refresh-weekly`), force-updated from the current `main`
+  every run, so there is exactly one open refresh PR per lane.
+  Branch names keyed to the run id used to leave the previous
+  one behind, and an abandoned refresh branch is a snapshot of
+  an older `main`: merging it reverts whatever landed after it
+  was cut. `npm run check:data-stamps` is the backstop -- it
+  fails any branch whose `verified_on` / `fetched` / `asOf` /
+  manifest `version` stamps sit behind the base tip, which is
+  what a stale refresh always looks like.
 - New data folder `data/realestate/` (FHFA conforming loan
   limits, HUD Fair Market Rents) shipped with `manifest.json`
   carrying the spec-v12 §H.2 `refresh_cadence` field. Total
