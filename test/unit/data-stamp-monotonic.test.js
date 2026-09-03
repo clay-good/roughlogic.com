@@ -146,3 +146,51 @@ test("the gate refuses to pass when it has no base to compare against", () => {
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test("comparing a commit with itself is refused, not reported OK", () => {
+  // How this gate spent its first day in CI: the workflow resolved the branch
+  // it had just pushed to, so base == HEAD, nothing was in the diff, and it
+  // printed "OK: 0 provenance stamps across 0 modified data files" on every
+  // run. A gate that is green because it looked at nothing is the thing this
+  // gate's own docstring refuses.
+  const { dir } = makeRepo({
+    baseStamp: "2026-09-02",
+    branchStamp: "2026-09-01",
+    branchCap: 1290000,
+  });
+  try {
+    let code = 0;
+    let out = "";
+    try {
+      execFileSync("node", ["scripts/check-data-stamp-monotonic.mjs"], {
+        cwd: dir,
+        encoding: "utf8",
+        env: { ...process.env, DATA_STAMP_BASE: "HEAD" },
+      });
+    } catch (err) {
+      code = err.status;
+      out = (err.stdout || "") + (err.stderr || "");
+    }
+    assert.equal(code, 1, "a self-comparison must fail, not pass");
+    assert.match(out, /is this very commit/);
+    assert.doesNotMatch(out, /check-data-stamp-monotonic OK/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("the workflow compares a push against what it moved from, not the branch tip", async () => {
+  // The wiring is the other half of the bug: on a push, github.ref_name
+  // resolves to the commit just pushed.
+  const { readFile } = await import("node:fs/promises");
+  const yml = await readFile(resolve(ROOT, ".github/workflows/ci.yml"), "utf8");
+  const step = yml.slice(yml.indexOf("Provenance stamps only move forward"));
+  assert.match(step, /github\.event\.before/, "a push must compare against its before-SHA");
+  assert.match(step, /github\.base_ref/, "a pull request must compare against its base branch");
+  assert.match(step, /HEAD\^/, "a branch's first push falls back to the parent commit");
+  assert.doesNotMatch(
+    step.slice(0, step.indexOf("npm run check:data-stamps")),
+    /github\.base_ref \|\| github\.ref_name/,
+    "the ref_name fallback is what made this gate blind",
+  );
+});

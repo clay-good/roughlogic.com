@@ -123,6 +123,23 @@ function main() {
 
   // Files THIS branch changed, relative to where it diverged. Anything main
   // moved on its own is not this branch's business.
+  // A base identical to HEAD compares a commit with itself and finds nothing.
+  // That is how this gate spent its first day in CI: on a push to main it
+  // resolved origin/main, which after the push IS this commit, and reported
+  // "OK: 0 stamps across 0 files" on every run. Green having looked at nothing
+  // is the failure this gate's own contract says it refuses, so refuse it.
+  const head = tryGit(["rev-parse", "HEAD"]);
+  if (head && head === base.sha) {
+    console.error(
+      "check-data-stamp-monotonic FAILED: the base (" +
+        base.ref +
+        ") is this very commit, so there is nothing to compare. On a push, pass " +
+        "the commit the push moved FROM (github.event.before); on a pull request, " +
+        "the base branch. Refusing to report OK on an empty comparison.",
+    );
+    process.exit(1);
+  }
+
   const mergeBase = tryGit(["merge-base", base.sha, "HEAD"]) || base.sha;
   const changed = git(["diff", "--name-only", mergeBase, "--", "data"])
     .split("\n")
