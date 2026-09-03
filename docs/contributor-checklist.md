@@ -185,9 +185,10 @@ phase docs ([edition-rollover.md](edition-rollover.md),
 - [ ] `npm run audit` passes (single-shot gate chain, canonical order:
   lint -> test -> build -> check:dist -> check:shells ->
   check:module-sizes -> check:shell-values -> check:lastmod ->
-  data:verify). Nine stages as of 2026-09-01, when the four post-build
-  gates CI runs and this chain did not were added to it -- until then a
-  contributor could see "all 6 stages passed" and still go red in CI.
+  data:verify -> check:data-stamps). Ten stages: four post-build gates
+  joined on 2026-09-01, and check:data-stamps on 2026-09-03 -- until the
+  first of those a contributor could see "all 6 stages passed" and still
+  go red in CI, and check:data-stamps repeated the mistake for a day.
   The line items below are what `npm run audit` runs; ticking the box at
   the top is sufficient when the gate is green.
 - [ ] If any built page changed, `npm run stamp:lastmod` and commit

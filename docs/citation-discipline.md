@@ -163,7 +163,7 @@ Group Y does not render the §B.1 limitation banner; the teacher-governs and reg
 4. Update the structured `CITATIONS["<tile-id>"]` entry in `citations.js` (formula / edition / freeAccess fields).
 5. If the data shard changed, update the `edition` field in `scripts/build-data.mjs` and the per-shard entry in `docs/data-sources.md`.
 6. Update string assertions in tests that pin the edition year.
-7. Run `npm run audit` (six stages: lint -> test -> build -> check:dist -> check:shells -> data:verify per spec-v12 §G.3 + spec-v13 Phase G). All must pass.
+7. Run `npm run audit` (ten stages: lint -> test -> build -> check:dist -> check:shells -> check:module-sizes -> check:shell-values -> check:lastmod -> data:verify -> check:data-stamps, per spec-v12 §G.3 + spec-v13 Phase G). All must pass.
 
 ## What this file is not
 

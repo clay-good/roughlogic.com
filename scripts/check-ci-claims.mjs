@@ -24,6 +24,7 @@
 // only structure read). Standalone Node 20, built-ins only.
 
 import { readFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -31,7 +32,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const WORKFLOW = ".github/workflows/ci.yml";
 
-const NUMBER_WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8 };
+const NUMBER_WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12 };
 
 // Job keys are the two-space-indented mapping keys under a top-level `jobs:`.
 function workflowJobs(yaml) {
@@ -188,7 +189,13 @@ async function main() {
   );
   const notRunHere = /const NOT_RUN_HERE = "([a-z:-]+)/.exec(auditSrc);
   const exempt = notRunHere ? notRunHere[1] : null;
-  const ciPostBuild = [...yaml.matchAll(/run:\s*npm run (check:[a-z-]+)/g)].map((m) => m[1]);
+  // Match the command anywhere in a `run:` block, not only where it starts the
+  // line. A step written as a multi-line block with an environment prefix --
+  // `DATA_STAMP_BASE="$BASE" npm run check:data-stamps` -- was invisible to the
+  // anchored form, so this gate reported OK while `npm run audit` was missing a
+  // gate CI runs. A claim-checking gate that pattern-matches the happy shape
+  // checks nothing the moment the shape changes.
+  const ciPostBuild = [...yaml.matchAll(/npm run (check:[a-z-]+)/g)].map((m) => m[1]);
   for (const gate of new Set(ciPostBuild)) {
     if (auditStages.has(gate)) continue;
     if (gate === exempt) continue;
@@ -201,6 +208,104 @@ async function main() {
     errors.push(
       `scripts/audit.mjs exempts ${exempt} but docs/contributor-checklist.md does not tell a ` +
       `contributor to run it. An exemption nobody states is a gate nobody runs.`);
+  }
+
+  // D. the stage count docs give for `npm run audit` is the number it runs.
+  // It said "six stages" in three living docs while the chain was nine, and had
+  // been wrong since check:module-sizes, check:shell-values and check:lastmod
+  // were added. A contributor reads that sentence to decide what a green audit
+  // covers, and nothing had ever compared it to the array above.
+  const liveStages = [...auditSrc.matchAll(/\{\s*name:\s*"([^"]+)"/g)].map((m) => m[1]);
+  const stageDocs = [
+    "README.md",
+    "CONTRIBUTING.md",
+    "docs/maintainer-quickstart.md",
+    "docs/v6-audit.md",
+    "docs/contributor-checklist.md",
+    "docs/citation-discipline.md",
+    // docs/launch-checklist.md is deliberately absent. It is an append-only
+    // per-release record -- "v0.13 ... reports all 6 stages OK" is a true
+    // statement about v0.13 -- so pinning it to today's chain would falsify
+    // history, the same reason check-doc-links skips CHANGELOG.md and specs/.
+  ];
+  // The chain itself, wherever a doc spells it out. A count alone is not the
+  // claim a contributor acts on -- docs/contributor-checklist.md listed nine
+  // stage NAMES under a correct-at-the-time count, and the list is what a
+  // reader compares their terminal against. Documents wrap, so normalize
+  // whitespace before matching.
+  const liveChain = liveStages.join(" -> ");
+  const chainHead = liveStages.slice(0, 5).join(" -> ");
+  for (const doc of stageDocs) {
+    const full = resolve(ROOT, doc);
+    if (!existsSync(full)) continue;
+    // Normalize the two ways these docs dress the chain up: backticks around
+    // each stage, and "unit tests" for the stage actually named `test`. Without
+    // this the matcher misses CONTRIBUTING.md entirely -- the same blind spot
+    // as the anchored regex above, one layer along.
+    const flat = (await readFile(full, "utf8"))
+      .replace(/`/g, "")
+      .replace(/\bunit tests\b/g, "test")
+      .replace(/\s+/g, " ");
+    let at = flat.indexOf(chainHead);
+    while (at !== -1) {
+      if (!flat.startsWith(liveChain, at)) {
+        const shown = flat.slice(at, at + liveChain.length + 20);
+        errors.push(
+          `${doc} spells out the \`npm run audit\` chain but it is not the live one. ` +
+          `Found "${shown}...", expected "${liveChain}".`);
+      }
+      at = flat.indexOf(chainHead, at + 1);
+    }
+  }
+
+  for (const doc of stageDocs) {
+    const full = resolve(ROOT, doc);
+    if (!existsSync(full)) continue;
+    const body = await readFile(full, "utf8");
+    for (const line of body.split("\n")) {
+      if (!/npm run audit/.test(line)) continue;
+      const m = /\(?\b([a-z]+|\d+) stages\b/i.exec(line);
+      if (!m) continue;
+      const stated = NUMBER_WORDS[m[1].toLowerCase()] ?? Number(m[1]);
+      if (!Number.isFinite(stated)) continue;
+      if (stated !== liveStages.length) {
+        errors.push(
+          `${doc} says \`npm run audit\` is ${m[1]} stages; scripts/audit.mjs runs ` +
+          `${liveStages.length} (${liveStages.join(" -> ")}). A contributor reads that ` +
+          `sentence to decide what a green audit covers.`);
+      }
+    }
+  }
+
+  // E. a lint gate that can no-op must say so where the count is advertised.
+  // check-ngrams compares text against a private hash list of licensed code
+  // spans that is gitignored by design, so in this repository -- and in this
+  // repository's own CI -- it skips and exits 0. The README and CONTRIBUTING
+  // both advertise the chain as N gates "before a change can land", and one of
+  // those N cannot run for anyone who clones. That is not a bug in the gate;
+  // it is a claim that has to name its own exception.
+  const SKIPPABLE = [
+    { script: "scripts/check-ngrams.mjs", name: "check-ngrams", marker: "banned-ngrams" },
+  ];
+  for (const { script, name, marker } of SKIPPABLE) {
+    const src = await readFile(resolve(ROOT, script), "utf8");
+    if (!/process\.exit\(0\)/.test(src)) {
+      errors.push(
+        `${script} no longer has a skip path, so ${name} is not an exception any ` +
+        `more. Drop it from the SKIPPABLE list here and from the README and ` +
+        `CONTRIBUTING sentences that name it.`);
+      continue;
+    }
+    for (const doc of ["README.md", "CONTRIBUTING.md"]) {
+      const body = await readFile(resolve(ROOT, doc), "utf8");
+      if (!body.includes(name)) {
+        errors.push(
+          `${doc} advertises the lint chain as a gate count but never names ${name}, ` +
+          `which skips whenever ${marker} is absent -- the default outside a ` +
+          `maintainer checkout. A count that includes a gate nobody can run ` +
+          `overstates what stands between a change and a deploy.`);
+      }
+    }
   }
 
   if (errors.length) {

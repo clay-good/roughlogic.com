@@ -56,6 +56,15 @@ const STAGES = [
   { name: "check:shell-values", cmd: ["npm", "run", "check:shell-values"] },
   { name: "check:lastmod", cmd: ["npm", "run", "check:lastmod"] },
   { name: "data:verify", cmd: ["npm", "run", "data:verify"] },
+  // Runs in CI as its own step, so it belongs here too: docs/contributor-
+  // checklist.md promises a green `npm run audit` means CI will be green, and
+  // this gate reached CI without reaching this list. It resolves its own base
+  // (origin/main, else the parent commit), so it needs no configuration.
+  { name: "check:data-stamps", cmd: ["npm", "run", "check:data-stamps"] },
+  // Runs in CI as its own step, so it belongs here too: docs/contributor-
+  // checklist.md promises that a green `npm run audit` means CI will be green,
+  // and this gate was added to CI without being added here. It resolves its own
+  // base (origin/main, else the parent commit), so it needs no configuration.
 ];
 
 // The one CI post-build gate this chain does not run. check:shell-mobile

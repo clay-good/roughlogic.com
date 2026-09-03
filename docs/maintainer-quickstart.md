@@ -91,9 +91,10 @@ Tests live in `test/unit/` and `test/integration/`.
    The `--check` forms of these run in `npm run lint`. Update the
    affected `data/<folder>/manifest.json` (`edition`, `asOf`) and run
    `npm run data:refresh` only if the tile uses a bundled dataset.
-7. Run the full gate: `npm run audit` (six stages: lint -> test ->
-   build -> check:dist -> check:shells -> data:verify, per spec-v12
-   §G.3 + spec-v13 Phase G). Update the catalog counts in **all four**
+7. Run the full gate: `npm run audit` (ten stages: lint -> test ->
+   build -> check:dist -> check:shells -> check:module-sizes ->
+   check:shell-values -> check:lastmod -> data:verify ->
+   check:data-stamps, per spec-v12 §G.3 + spec-v13 Phase G). Update the catalog counts in **all four**
    files the `check-readme-counts` gate reads -- [../README.md](../README.md),
    [../index.html](../index.html) (both the JSON-LD description and the
    home lede), [../AGENTS.md](../AGENTS.md), and
@@ -224,13 +225,13 @@ outcome. The audit trail is append-only and public.
 | `npm run lint` (includes `check-verified-on-ledger`) | Fails if a shard named in [`scripts/sources-cycle.json`](../scripts/sources-cycle.json) is missing `verified_on`, or carries one that differs from the oldest `last_verified` among the rows naming it. `verified_on` is a claim about research and belongs to the ledger; `fetched` is a fact about the build and moves freely. Do not hand-edit a tracked shard's `verified_on` -- update the ledger row and re-run `npm run data:refresh`. |
 | `npm run check:data-stamps` | Fails if any `data/**/*.json` provenance stamp (`verified_on`, `fetched`, `asOf`, `built`, a date-shaped manifest `version`) moves backwards against the base branch tip. Catches a stale data-refresh branch, which would otherwise revert hand-corrections while every other gate stays green. Needs git history, so CI runs it as its own step rather than inside `lint`; set `DATA_STAMP_BASE` to compare against a specific ref. It **fails** if that ref resolves to HEAD, because an empty comparison reported as OK is how it was blind for its first day in CI. |
 | `npm run clean` | Removes `dist/`. |
-| `npm run audit` | Single-shot pre-PR gate (spec-v10 §2 / §14; six stages as of spec-v13 Phase G): chains lint -> test -> build -> check:dist -> check:shells -> data:verify with per-stage banners. Short-circuits on first failure. |
+| `npm run audit` | Single-shot pre-PR gate (spec-v10 §2 / §14; **ten stages**): chains lint -> test -> build -> check:dist -> check:shells -> check:module-sizes -> check:shell-values -> check:lastmod -> data:verify -> check:data-stamps with per-stage banners. Short-circuits on first failure. The count and the chain are gated by `check-ci-claims`, which compares this sentence to `scripts/audit.mjs`. |
 
 ## Per-release ritual
 
 For every minor or patch release:
 
-1. `npm run audit` — must report all 6 stages OK (lint -> test -> build -> check:dist -> check:shells -> data:verify).
+1. `npm run audit` — must report all 10 stages OK (lint -> test -> build -> check:dist -> check:shells -> check:module-sizes -> check:shell-values -> check:lastmod -> data:verify -> check:data-stamps).
 2. Confirm home-view payload is under cap (current
    `check-home-payload` budget: 100 KB gzipped, with the v10 §H.2
    per-asset sub-budgets HTML 20 KB / CSS 25 KB / JS 45 KB enforced

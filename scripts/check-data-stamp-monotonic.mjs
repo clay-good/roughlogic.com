@@ -96,16 +96,25 @@ function* stampPairs(before, after, pointer = "") {
 
 function resolveBase() {
   const explicit = process.env.DATA_STAMP_BASE;
-  const candidates = explicit
-    ? [explicit]
-    : [
-        process.env.GITHUB_BASE_REF && "origin/" + process.env.GITHUB_BASE_REF,
-        "origin/main",
-        "main",
-      ].filter(Boolean);
+  if (explicit) {
+    const sha = tryGit(["rev-parse", "--verify", "--quiet", explicit + "^{commit}"]);
+    return sha ? { ref: explicit, sha, explicit: true } : null;
+  }
+  // Auto-resolution walks candidates and skips any that IS this commit. On
+  // `main` with an up-to-date origin/main that is the common case -- running
+  // `npm run audit` there should compare against the previous commit, not
+  // refuse. An explicitly supplied base equal to HEAD is a different thing: the
+  // caller asked for a comparison that cannot exist, and that stays an error.
+  const head = tryGit(["rev-parse", "HEAD"]);
+  const candidates = [
+    process.env.GITHUB_BASE_REF && "origin/" + process.env.GITHUB_BASE_REF,
+    "origin/main",
+    "main",
+    "HEAD^",
+  ].filter(Boolean);
   for (const ref of candidates) {
     const sha = tryGit(["rev-parse", "--verify", "--quiet", ref + "^{commit}"]);
-    if (sha) return { ref, sha };
+    if (sha && sha !== head) return { ref, sha, explicit: false };
   }
   return null;
 }
@@ -129,7 +138,7 @@ function main() {
   // "OK: 0 stamps across 0 files" on every run. Green having looked at nothing
   // is the failure this gate's own contract says it refuses, so refuse it.
   const head = tryGit(["rev-parse", "HEAD"]);
-  if (head && head === base.sha) {
+  if (base.explicit && head && head === base.sha) {
     console.error(
       "check-data-stamp-monotonic FAILED: the base (" +
         base.ref +
