@@ -75,7 +75,7 @@ The hard part of a calculator catalog is not the arithmetic. It is proving, at s
 
 | Gate | What it guarantees |
 |---|---|
-| `check-dimensions` | every formula is dimensionally consistent |
+| `check-dimensions` | all 2,059 exported calculator functions carry a machine-parsed `// dims:` annotation declaring each input's and the output's SI dimensions, and a malformed one fails the build. It checks the **declaration**, not the arithmetic against it -- verifying the expression would need a CAS, which this repo has no dependency on |
 | `check-cross-validation` | every fixture's declared tolerance is inside its group's ceiling, or carries a written justification (1,731 checks) -- it polices how loose a check is allowed to be, not the numbers themselves |
 | `cross-tile-invariants` (unit test) | tiles that share a computation agree to the floating-point floor, documented inverses round-trip, and monotonic relationships stay monotonic -- 401 assertions across the five shared-computation classes spec-v14 §10 names |
 | `check-bounds` | a fuzzer sweeps each tile's input domain; no NaN/∞, monotonicity where required |

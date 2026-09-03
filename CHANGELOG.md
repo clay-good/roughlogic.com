@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **"Every formula is dimensionally consistent" was the strongest claim in the table and the least supported.** `check-dimensions` reads each source, finds the `// dims:` annotation, and fails a malformed one. It never checks an expression against the dimensions it declares. A function may declare `out: L/T`, compute something with dimensions of L/T^2, and pass.
+
+  The gate's own docstring has always said so -- *"it does not verify floating-point math (CAS would be a third-party dependency); it verifies the dimensional skeleton at the source level"* -- and `check-dead-inputs` says it too, in passing: *"the dimensions gate only checks that the `// dims:` annotation parses"*. **Two files in this repository described the gate accurately and the README described it as a proof about the arithmetic.** That is the same tell as `check-cross-validation`: where several descriptions of one gate disagree, the flattering one is the one nobody checked.
+
+  What is real is worth stating plainly, and now is: all **2,059** exported calculator functions carry a machine-parsed dimension annotation, at 100% coverage with fail-on-missing since 2026-08-30, and a malformed declaration fails the build. That is a genuine and unusual discipline. It is not a proof that the arithmetic obeys it. The gate now fails if the README reclaims the stronger sentence.
+
 - **`check-dead-inputs` said "58 modules swept" while five computes were invisible to it.** The gate matches `export function NAME({ ... })` and nothing else, so a compute written with a named object parameter -- `computeHudFmr(input)`, `computeRentVsBuy(inp)` -- is never matched, raises no error, and vanishes into a summary line that reads as full coverage. Its own docstring is careful about this ("every name in that destructuring pattern is, **by construction**, an input the tile collects"); the summary was not.
 
   Measured: 1,776 of 1,802 `compute*` exports are inspected. Of the 26 that are not, **21 are param-less reference computes** -- `computeColorCodes()`, `computeGFCIReference()` -- which have no inputs and so cannot have a dead one; they are correctly out of scope. **Five take a real object of inputs** and are genuinely unchecked: four in `calc-realestate.js` and one in `calc-solar.js`.

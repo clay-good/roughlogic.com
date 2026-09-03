@@ -241,6 +241,30 @@ async function main() {
     errors.push(gm + " is missing its dims annotation (fail-on-missing for every module per spec-v14 §16.2 Phase C ratchet).");
   }
 
+  // What this gate is FOR, held where a reader meets it. The README's trust
+  // table promised "every formula is dimensionally consistent" -- a property of
+  // the arithmetic that nothing here establishes. This lint parses the `// dims:`
+  // annotation and fails a malformed one; a function may declare `out: L/T`,
+  // compute something with dimensions of L/T^2, and pass. The docstring above has
+  // always said so ("it does not verify floating-point math"); the README did not.
+  const readmeText = await readFile(resolve(ROOT, "README.md"), "utf8");
+  const row = readmeText.split("\n").find((l) => l.includes("`check-dimensions`"));
+  if (row) {
+    if (/every formula is dimensionally consistent/i.test(row)) {
+      errors.push(
+        "README.md says check-dimensions proves every formula is dimensionally " +
+        "consistent. It parses the // dims: annotation and fails a malformed one; " +
+        "it never checks an expression against its declared dimensions.",
+      );
+    }
+    if (!/annotat|declar/i.test(row)) {
+      errors.push(
+        "README.md's check-dimensions row does not say it checks a declaration. " +
+        "Describe the annotation, not a property of the arithmetic nobody verifies.",
+      );
+    }
+  }
+
   if (errors.length > 0) {
     for (const e of errors) console.error("ERROR: " + e);
     console.error(
