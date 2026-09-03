@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **`check-secret-files` only ever looked at the working tree, which stopped being the question when the repo went public.** It asked `git ls-files`. A secret committed once and deleted in the very next commit is gone from the tree and **still readable forever by anyone who clones**. Deleting the file is not a fix and never was; it just makes the problem invisible to the gate.
+
+  The gate now also asks history what was ever **added**, and fails on any secret-shaped path that ever existed -- `.env*`, `.dev.vars*`, `id_rsa` and friends, `.key` / `.pem` / `.p12` / `.pfx`. Every path ever added is 2,018 entries and enumerates in about a third of a second, so it runs on every lint like the rest of the chain. Seed-verified the only way that proves anything here: commit a `.dev.vars`, delete it in the next commit, and watch the gate fail on a file that is no longer in the tree.
+
+  Separately and by hand, **all 16,541 blobs across the full history of 2,447 commits** were read and matched against private-key headers (PEM and OpenSSH), AWS access-key ids, GitHub personal-access tokens in both formats, Slack tokens, Google API keys, and a Cloudflare API-token assignment. **Zero hits.** That is a point-in-time result rather than a standing guarantee -- it takes minutes, so it is not a gate -- and [docs/threat-model.md](docs/threat-model.md) now records what was scanned, what the standing path check does and does not cover, and that a credential found in history must be rotated before it is purged.
+
 - **A folder's `refresh_cadence` is now compared against the dates it actually carries.** Every data folder declares a recheck cadence and the shards under it carry `verified_on` stamps. Nothing had ever compared the two, so a declared cadence was a sentence rather than a commitment.
 
   Run across all nineteen folders, exactly **one** is past its own promise: `data/legal`, whose 48 post-Wayfair nexus stamps all read 2025-01-15 against a **quarterly** cadence that `docs/data-sources.md` spells out as *"quarterly recheck against the state source page, oldest first"*. Twenty months. The only thing that would have noticed was somebody opening the file. That one clean hit and no false positives is why this is a gate and not a report.

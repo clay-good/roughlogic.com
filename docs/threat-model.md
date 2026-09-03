@@ -171,6 +171,32 @@ Controls:
 - `example=1` only programmatically clicks the renderer's "Test with example" button and never executes attacker-supplied script.
 - The URL hash is the only state mechanism for tool data. The single localStorage key `rl-theme` carries the theme preference and nothing else; no sessionStorage, cookies, or IndexedDB is used.
 
+## Public-repository history (2026-09-02)
+
+Publishing the repository made every commit ever made readable by anyone. A
+secret committed once and deleted in the next commit is gone from the working
+tree and still in the clone, so "not tracked today" stopped being the question.
+
+- **Content scan, one-time, by hand.** All **16,541 blobs** across the full
+  history of 2,447 commits were read and matched against private-key headers
+  (PEM and OpenSSH), AWS access-key ids, GitHub personal-access tokens (both
+  formats), Slack tokens, Google API keys, and a Cloudflare API-token
+  assignment. **Zero hits.** This is a point-in-time result, not a standing
+  guarantee; it took minutes and is not a lint gate.
+- **Path check, standing.** `check-secret-files` used to ask `git ls-files`,
+  which only sees the current tree. It now also asks history what was ever
+  **added**, and fails on any secret-shaped path that ever existed. Every path
+  ever added -- 2,018 of them -- enumerates in about a third of a second, so it
+  runs on every lint. It catches the ordinary accident, which is committing a
+  file whose name says what it holds.
+- **What neither covers:** a credential pasted into an ordinary source file
+  under an ordinary name, in a shape none of the patterns above match. The
+  controls against that are review and the no-runtime-secrets posture below --
+  the site ships no keys because it calls nothing that needs one.
+
+If a secret is ever found in history, deleting the file is not a fix. Rotate the
+credential first, then purge with `git filter-repo`, then force-push.
+
 ## Out of scope threats
 
 - Server compromise (no server exists).
