@@ -107,3 +107,42 @@ test("data/legal's manifest agrees with the stamps under it", async () => {
     "the legal manifest must name the date its shards actually carry, got: " + manifest.edition,
   );
 });
+
+test("the MACRS Table A-1 percentages are the published table", async () => {
+  // Verified 2026-09-03 against Publication 946 (2025) page 70, half-year
+  // convention. Statutory since 1986; these rows pin the exact table so a
+  // regenerated shard cannot quietly differ from what was read.
+  const shard = await readJson("data/accounting/macrs-tables.json");
+  assert.equal(shard.convention, "half_year");
+  assert.deepEqual(shard.tables["3"], [33.33, 44.45, 14.81, 7.41]);
+  assert.deepEqual(shard.tables["5"], [20, 32, 19.2, 11.52, 11.52, 5.76]);
+  assert.deepEqual(shard.tables["7"], [14.29, 24.49, 17.49, 12.49, 8.93, 8.92, 8.93, 4.46]);
+  assert.deepEqual(shard.tables["10"], [10, 18, 14.4, 11.52, 9.22, 7.37, 6.55, 6.55, 6.56, 6.55, 3.28]);
+  // The 15- and 20-year rows alternate on the last digit; a "tidied" table is
+  // the failure mode these two assertions exist to catch.
+  assert.deepEqual(shard.tables["15"].slice(6), [5.9, 5.9, 5.91, 5.9, 5.91, 5.9, 5.91, 5.9, 5.91, 2.95]);
+  assert.equal(shard.tables["20"].at(-1), 2.231);
+  assert.equal(shard.tables["20"].length, 21);
+  // Each column sums to 100% of basis; a dropped or duplicated year shows here.
+  for (const [life, rows] of Object.entries(shard.tables)) {
+    const total = rows.reduce((a, b) => a + b, 0);
+    assert.ok(Math.abs(total - 100) < 0.02, life + "-year column sums to " + total + ", not 100");
+  }
+});
+
+test("the estimated-tax due dates are the published 1040-ES schedule", async () => {
+  // Verified 2026-09-03 against the 2026 Form 1040-ES.
+  const shard = await readJson("data/accounting/estimated-tax-due-dates.json");
+  assert.deepEqual(shard.by_year["2026"], ["2026-04-15", "2026-06-15", "2026-09-15", "2027-01-15"]);
+  for (const [year, dates] of Object.entries(shard.by_year)) {
+    assert.equal(dates.length, 4, year + " must carry four dates");
+    // The fourth payment falls in January of the following year, and no
+    // published due date lands on a weekend -- rollover is already applied.
+    assert.ok(dates[3].startsWith(String(Number(year) + 1)), year + " 4th payment is next January");
+    for (const d of dates) {
+      const day = new Date(d + "T00:00:00Z").getUTCDay();
+      assert.ok(day !== 0 && day !== 6, d + " is a weekend; IRS rollover was not applied");
+    }
+    assert.deepEqual([...dates].sort(), dates, year + " dates must be in order");
+  }
+});

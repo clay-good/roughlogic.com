@@ -268,6 +268,26 @@
       "where": "data/accounting/pub-15-t-tables.json",
       "last_verified": "2025-12-01",
       "verification_note": "The shard declares edition 2025 and the tile discloses the year and that the brackets are single-filer and illustrative. Left as-is on 2026-09-02: it is disclosed rather than stale-and-silent, and this row exists so the next reader is asked."
+    },
+    {
+      "id": "irs-macrs-table-a1",
+      "name": "IRS Pub 946 Table A-1 MACRS percentages",
+      "publisher": "IRS",
+      "publishes_month": 2,
+      "covers": "tax year; Pub 946 is revised annually",
+      "where": "data/accounting/macrs-tables.json",
+      "last_verified": "2026-09-03",
+      "verification_note": "Verified 2026-09-03 against Publication 946 (2025), page 70, Table A-1 (half-year convention), fetched as irs.gov/pub/irs-pdf/p946.pdf. All six recovery periods match value for value, including the 15-year 5.90/5.91 and 20-year 4.462/4.461 alternations and the 21st-year 2.231 stub. The percentages are statutory and have not moved since 1986, so the annual ask is whether the bundled TABLE is still the published table, not whether a rate repriced."
+    },
+    {
+      "id": "irs-1040es-due-dates",
+      "name": "IRS Form 1040-ES estimated-tax due dates",
+      "publisher": "IRS",
+      "publishes_month": 1,
+      "covers": "calendar tax year; four dates, the fourth falling in January of the next year",
+      "where": "data/accounting/estimated-tax-due-dates.json",
+      "last_verified": "2026-09-03",
+      "verification_note": "Verified 2026-09-03 against the 2026 Form 1040-ES, fetched as irs.gov/pub/irs-pdf/f1040es.pdf: 1st April 15 2026, 2nd June 15 2026, 3rd Sept 15 2026, 4th Jan 15 2027. Matches the bundled 2026 row exactly. Weekend and federal-holiday rollover is already applied in the published schedule, so the shard must carry the IRS dates rather than compute them."
     }
   ]
 }

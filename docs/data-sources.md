@@ -17,7 +17,7 @@ Two dates on a shard answer two different questions, and only one of them is the
 
 A folder's `manifest.json` carries an `edition` string that names the same kind of date in prose. Those are committed constants, not build dates, for the same reason -- with one exception: `data/historical` says *"built <date>"*, and that series really is materialized at build time. `check-manifests` fails any manifest whose `edition` is not exactly what [`scripts/build-data.mjs`](../scripts/build-data.mjs) produces, so the wording lives in the generator and nowhere else.
 
-Seven shards outside the ledger still carry a generator-written `verified_on`: the four under `data/accounting/` other than the tracked ones, `data/cross/glossary.json`, and the three under `data/lab/`. Adding a ledger row for each is open maintainer work; the honest date is the one someone last checked, not a date to invent.
+Five shards outside the ledger still carry a generator-written `verified_on`: `data/accounting/inventory-benchmarks.json`, `data/cross/glossary.json`, and the three under `data/lab/`. Adding a ledger row for each is open maintainer work, and the way to close one is to read the source and record what was read -- not to re-stamp. `macrs-tables.json` and `estimated-tax-due-dates.json` were closed that way on 2026-09-03 against `irs.gov/pub/irs-pdf/p946.pdf` and `f1040es.pdf`; both PDFs fetch cleanly, so that check is repeatable in minutes.
 
 ## Datasets
 
