@@ -18,7 +18,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
 // Ask the OS for a free port rather than naming one. 8080 is the Playwright
-// webServer and 8099 is check-shell-mobile's http-server, so any fixed choice
+// webServer and 8099 is check-shell-mobile's dev-server instance, so any fixed choice
 // is a collision waiting for someone to run two things at once -- which is
 // exactly what a developer does.
 async function freePort() {

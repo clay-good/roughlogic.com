@@ -35,7 +35,7 @@ async function exists(p) {
 // So: keep the child's output, fail the moment the child exits instead of
 // waiting out the clock, and quote what it said. The budget is also raised,
 // since the thing being waited on is a package download on a cold runner.
-async function waitForServer(server, log, timeoutMs = 60000) {
+async function waitForServer(server, log, timeoutMs = 30000) {
   const deadline = Date.now() + timeoutMs;
   for (;;) {
     if (server.exitCode !== null) {
@@ -51,7 +51,7 @@ async function waitForServer(server, log, timeoutMs = 60000) {
     if (Date.now() > deadline) {
       throw new Error(
         `check-shell-mobile: ${BASE} never came up within ${timeoutMs} ms.\n` +
-        `--- server output ---\n${log().trim() || "(none -- npx produced nothing, so it is most likely still resolving http-server on a cold cache)"}`,
+        `--- server output ---\n${log().trim() || "(none)"}`,
       );
     }
     await new Promise((r) => setTimeout(r, 250));
@@ -74,8 +74,17 @@ async function main() {
     return;
   }
 
-  const server = spawn("npx", ["-y", "http-server", "-p", String(PORT), "-c-1", "dist"], {
+  // Serve dist/ with the repo's own dependency-free dev server rather than
+  // `npx -y http-server`. The npx form had to resolve and install a package
+  // tree at gate time, inside a job whose dependencies were already installed,
+  // and on 2026-09-03 it twice failed to finish -- the second time the captured
+  // output showed it still emitting npm install warnings after 60 seconds.
+  // A gate that needs the network to start can fail for reasons that have
+  // nothing to do with the code it checks. scripts/dev.mjs is loopback-only,
+  // serves the built tree, honours PORT, and starts immediately.
+  const server = spawn(process.execPath, ["scripts/dev.mjs"], {
     stdio: ["ignore", "pipe", "pipe"],
+    env: { ...process.env, PORT: String(PORT) },
   });
   // Keep a bounded tail of whatever the child says, so a startup failure is
   // diagnosable instead of being reported as an anonymous timeout.
