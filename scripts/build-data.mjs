@@ -1823,6 +1823,11 @@ const PROSE_LINT_EXEMPT_KEYS = new Set([
   // carry the OBBBA acquisition-date window, because the single bonus_pct
   // beside it is wrong for property placed in service before 2025-01-20.
   "bonus_note",
+  // Same category: the per-state nexus rows carry a one-sentence disclosure of
+  // how their two thresholds combine (New York and Connecticut require BOTH) or
+  // of the act that repealed one of them. The bare `combine` value beside it is
+  // the machine-readable form; this is the sentence a reader needs.
+  "combine_note",
   // Original plain-English summaries by the project author (these shards
   // exist precisely to hold prose; they are explicitly cited as MIT-
   // licensed original creative work).
