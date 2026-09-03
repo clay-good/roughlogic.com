@@ -179,11 +179,16 @@ async function main() {
     }
   }
 
+  // Collected for the CF-06 reachability check below: a tracked standard has to
+  // appear in at least one of these to be checked at all.
+  const manifestEditions = [];
+
   for (const folder of folders) {
     const manifestPath = resolve(DATA, folder, "manifest.json");
     if (!existsSync(manifestPath)) continue;
     const m = JSON.parse(await readFile(manifestPath, "utf8"));
     const where = "data/" + folder + "/manifest.json";
+    if (typeof m.edition === "string") manifestEditions.push(m.edition);
 
     if (!m.edition || typeof m.edition !== "string" || m.edition.length === 0) {
       errors.push(where + ": missing 'edition' string.");
@@ -346,6 +351,46 @@ async function main() {
       "citations.js: '" + id + "' edition claims " + JSON.stringify(text) +
         ". A bundled table cannot promise it is current -- name the year or fiscal year it ships " +
         "(the manifest already records it), or the page is wrong the day the source updates."
+    );
+  }
+
+  // CF-06 (2026-09-03): a tracked standard whose match_terms hit no manifest
+  // edition is INERT. The staleness loop above only ever reads manifest
+  // `edition` strings, so such a row sits in the ledger looking like coverage
+  // and checks nothing. Six of thirteen were in that state, and they were the
+  // most-cited standards on the site: IMC (54 citation-side mentions), the FDA
+  // Food Code (62), the AASHTO Green Book (80), ASHRAE 90.1 (29). Four of them
+  // were citing a superseded edition with no manifest disclosure at all --
+  // "IMC 2021 Section 603", "ASHRAE 62.2-2019", "IFC 2021 Table B105.1" --
+  // while the identical situation for IPC / IFGC / IRC / IBC was disclosed.
+  // A reader of a plumbing tile was told the current edition is newer; a reader
+  // of an HVAC tile was not.
+  //
+  // So a row must be reachable, or say why it is not. `citation_only: true`
+  // with a reason is the escape hatch, for a standard the site cites but no
+  // bundled shard holds data from -- there is no manifest for it to appear in,
+  // and pretending otherwise would mean editing an edition string to satisfy a
+  // gate rather than to inform a reader.
+  for (const s of standards) {
+    const reachable = (s.match_terms || []).some((t) =>
+      manifestEditions.some((e) => e.includes(t)),
+    );
+    if (reachable) continue;
+    if (s.citation_only) {
+      if (!s.citation_only_reason) {
+        errors.push(
+          "sources-cycle.json: '" + (s.name || s.id) + "' is marked citation_only " +
+            "but carries no citation_only_reason. Say why no manifest names it.",
+        );
+      }
+      continue;
+    }
+    errors.push(
+      "sources-cycle.json: '" + (s.name || s.id) + "' matches no manifest 'edition' string " +
+        "(match_terms " + JSON.stringify(s.match_terms || []) + "), so the edition-staleness " +
+        "check above never runs for it -- the row looks like coverage and checks nothing. " +
+        "Either name the edition in the manifest of the folder whose data it governs, or set " +
+        "citation_only: true with a citation_only_reason.",
     );
   }
 

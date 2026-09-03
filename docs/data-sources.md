@@ -19,6 +19,14 @@ A folder's `manifest.json` carries an `edition` string that names the same kind 
 
 Five shards outside the ledger still carry a generator-written `verified_on`: `data/accounting/inventory-benchmarks.json`, `data/cross/glossary.json`, and the three under `data/lab/`. Adding a ledger row for each is open maintainer work, and the way to close one is to read the source and record what was read -- not to re-stamp. `macrs-tables.json` and `estimated-tax-due-dates.json` were closed that way on 2026-09-03 against `irs.gov/pub/irs-pdf/p946.pdf` and `f1040es.pdf`; both PDFs fetch cleanly, so that check is repeatable in minutes.
 
+## Standards the site cites
+
+[`scripts/sources-cycle.json`](../scripts/sources-cycle.json) tracks the published edition of every standard this site cites. `check-citation-freshness` compares those rows against the `edition` string of each folder manifest, so **a row is only checked if some manifest names it** -- and six rows named nothing, which is why four superseded editions went undisclosed. Where a bundled value follows an older edition on purpose, the manifest says so in these words:
+
+> IMC 2021 cited by section number (IMC 2024 is the current published edition; bundled values follow 2021 and the tile citations disclose it)
+
+A standard the tiles cite but no shard holds data from has no manifest to appear in. Those rows carry `citation_only: true` and a `citation_only_reason`, and the gate fails if the reason is missing. Adding a row without either a manifest mention or that exemption fails the build rather than passing silently.
+
 ## Datasets
 
 ### data/physical-constants/constants.json

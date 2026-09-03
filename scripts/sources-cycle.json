@@ -1,6 +1,6 @@
 {
   "_comment": "v10 Phase A.1 source-cycle table. One row per cited standard listing the publishing body, the current edition, the cycle in years, the next-expected release date (best estimate), and a free-access URL. Used by scripts/check-citation-freshness.mjs to flag manifests whose 'edition' string is more than one cycle behind the current publication of that standard. spec-v22 CF-03: when 'next_expected' is in the past, the row must carry a 'last_verified' (ISO date >= next_expected) re-stamp -- the 'verified, not yet released' acknowledgement -- or the freshness gate fails. Update on each rollover (see docs/citation-freshness-ledger.md). Since 2026-09-02 the file also carries `annual_figures`: the bundled federal dollar figures that reprice every year on a known calendar (IRS mileage, Section 179, the SSA wage base, FHFA and HUD loan limits, GSA per-diem, HUD FMRs, Pub 15-T). Five of them were found stale on one day; nothing had ever asked when their publisher last spoke.",
-  "_updated": "2026-09-02",
+  "_updated": "2026-09-03",
   "standards": [
     {
       "id": "nec",
@@ -156,7 +156,9 @@
         "Food Code"
       ],
       "last_verified": "2026-09-02",
-      "verification_note": "Verified 2026-09-02 against fda.gov: the 2022 Food Code (10th edition) is still the most recent published edition, and FDA has said a 2026 edition is coming later this year on the four-year interval it moved to after 2017. This row had carried no last_verified at all, so the gate could only ever have failed on it, never been satisfied. Recheck at fda.gov/food/retail-food-protection/fda-food-code when next_expected passes."
+      "verification_note": "Verified 2026-09-02 against fda.gov: the 2022 Food Code (10th edition) is still the most recent published edition, and FDA has said a 2026 edition is coming later this year on the four-year interval it moved to after 2017. This row had carried no last_verified at all, so the gate could only ever have failed on it, never been satisfied. Recheck at fda.gov/food/retail-food-protection/fda-food-code when next_expected passes.",
+      "citation_only": true,
+      "citation_only_reason": "No bundled shard holds Food Code data: the retail-food tiles cite it by section for holding temperatures and cooling times and compute from the cited figures inline. There is no manifest for it to appear in, so CF-06 exempts it. The citation text names Food Code 2022, which is the current edition, so nothing is behind today; the ask when a 2026 edition publishes is a citation-text edit, not a data refresh."
     },
     {
       "id": "wmm",
@@ -185,7 +187,9 @@
       "match_terms": [
         "AASHTO Green Book",
         "Green Book"
-      ]
+      ],
+      "citation_only": true,
+      "citation_only_reason": "No bundled shard holds Green Book data: the horizontal-curve and sight-distance tiles apply the geometric formulas and cite the policy by name rather than reproducing its tables, and the citations carry no edition year to compare. There is no manifest for it to appear in, so CF-06 exempts it. Licensed text is never bundled, which is why this stays a by-name citation."
     }
   ],
   "annual_figures": [

@@ -1686,7 +1686,7 @@ const DATASETS = [
       { file: "pump-curves.json", body: PUMP_CURVES_DATA, name: "Pump curves (manufacturer-attributed where redistributable)" },
       { file: "thermal-expansion-coefficients.json", body: THERMAL_EXPANSION_COEFFS_DATA, name: "Pipe thermal-expansion coefficients and guided-cantilever stress allowables" },
     ] },
-  { folder: "hvac", edition: "ASHRAE 62.1-2022; ASHRAE Handbook Fundamentals chapter 21 (duct design) and chapter 25 (insulation); ACCA Manual J 8th ed.; CTI cooling-tower engineering practice; manufacturer P-T tables (DuPont / Honeywell / Chemours / Arkema) and insulation k-values as of " + EDITION_VERIFIED.hvac + ".", shards: [
+  { folder: "hvac", edition: "ASHRAE 62.1-2022; ASHRAE 62.2-2019; ASHRAE 90.1-2022; IMC 2021 cited by section number (ASHRAE 62.1-2025 / 62.2-2025 / 90.1-2025 and IMC 2024 are the current published editions; bundled values follow the editions named here and the tile citations disclose it); ASHRAE Handbook Fundamentals chapter 21 (duct design) and chapter 25 (insulation); ACCA Manual J 8th ed.; CTI cooling-tower engineering practice; manufacturer P-T tables (DuPont / Honeywell / Chemours / Arkema) and insulation k-values as of " + EDITION_VERIFIED.hvac + ".", shards: [
       { file: "refrigerants.json", body: REFRIGERANTS, name: "Refrigerant P-T tables" },
       { file: "duct-friction.json", body: DUCT_FRICTION, name: "Duct friction inputs" },
       { file: "climate-data.json", body: CLIMATE_DATA, name: "Climate design temperatures" },
@@ -1724,7 +1724,7 @@ const DATASETS = [
       { file: "apa-span-ratings.json", body: APA_SPAN_RATINGS_DATA, name: "APA plywood / OSB span-rating tables" },
       { file: "helical-pile-kt.json", body: HELICAL_PILE_KT_DATA, name: "Helical-pile Kt benchmarks (manufacturer-attributed)" },
     ] },
-  { folder: "fire", edition: "NFA hose-friction training materials (U.S. government, public domain); ISO Public Protection Classification fire-flow formulas + NFF construction-class table; verified " + EDITION_VERIFIED.fire + ".", shards: [
+  { folder: "fire", edition: "NFA hose-friction training materials (U.S. government, public domain); ISO Public Protection Classification fire-flow formulas + NFF construction-class table; IFC 2021 Table B105.1 cited by section number (IFC 2024 is the current published edition; bundled values follow 2021 and the tile citations disclose it); verified " + EDITION_VERIFIED.fire + ".", shards: [
       { file: "hose-friction.json", body: HOSE_FRICTION, name: "Fire hose friction coefficients (NFA)" },
       { file: "fire-flow-formulas.json", body: FIRE_FLOW_FORMULAS, name: "Fire flow formulas" },
       // v7 utility 252.

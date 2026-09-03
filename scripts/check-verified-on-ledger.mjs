@@ -59,6 +59,26 @@ function main() {
   const tracked = ledgerVerifiedOn(cycle);
 
   const errors = [];
+
+  // The ledger carries its own `_updated`. Adding a row dated later than that
+  // stamp makes the file's summary older than its contents -- which is the same
+  // defect one level up, and it happened the moment two 2026-09-03 rows landed
+  // under an `_updated` of 2026-09-02.
+  const newest = [...(cycle.standards || []), ...(cycle.annual_figures || [])]
+    .map((r) => r.last_verified)
+    .filter(Boolean)
+    .sort()
+    .at(-1);
+  if (newest && (!cycle._updated || cycle._updated < newest)) {
+    errors.push(
+      "scripts/sources-cycle.json: _updated is " +
+        (cycle._updated || "(missing)") +
+        " but the newest last_verified in the file is " +
+        newest +
+        ". Bump _updated when you record a verification.",
+    );
+  }
+
   for (const [file, { date, id }] of tracked) {
     let shard;
     try {
@@ -102,7 +122,7 @@ function main() {
     console.error(
       "check-verified-on-ledger FAILED: " +
         errors.length +
-        " shard stamp(s) not backed by scripts/sources-cycle.json.\n" +
+        " stamp problem(s) against scripts/sources-cycle.json.\n" +
         "Fix the ledger row if the verification really happened, or let " +
         "scripts/build-data.mjs restamp the shard from the ledger " +
         "(npm run data:refresh).",
