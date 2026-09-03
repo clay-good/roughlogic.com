@@ -414,3 +414,26 @@ test("no label is left with zero matchable terms when it has a usable word", () 
   assert.ok(labelTerms("Length one-way (ft)").has("length"));
   assert.ok(!labelTerms("Length one-way (ft)").has("way"));
 });
+
+// A label that yields no terms is a field no reader can name, so the count is a
+// ratchet rather than an observation. It was 21 before the lead-word fallback
+// and is 9 after. The 9 that remain are irreducible: seven are a single letter
+// or symbol with a parenthetical unit -- E (psi), I (in4), K, Ra, R0, D30, D60 --
+// which no query word under the four-character floor could match anyway, and two
+// are select labels built entirely from stopwords ("Which option", "Input
+// mode"). A new tile must not add a tenth without a deliberate decision.
+test("no new field label is left unnameable (ratchet: 9)", async () => {
+  const { BESPOKE_SCHEMAS } = await import("../fixtures/bespoke-schemas.js");
+  const empty = [];
+  for (const [tile, schema] of Object.entries(BESPOKE_SCHEMAS)) {
+    if (!schema || !Array.isArray(schema.inputs)) continue;
+    for (const f of schema.inputs) {
+      if (!f || !f.label || f.kind === "checkbox") continue;
+      if (labelTerms(f.label).size === 0) empty.push(tile + " :: " + f.label);
+    }
+  }
+  assert.ok(
+    empty.length <= 9,
+    "labels with no matchable term rose to " + empty.length + ":\n  " + empty.join("\n  "),
+  );
+});
