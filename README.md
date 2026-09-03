@@ -81,7 +81,7 @@ The hard part of a calculator catalog is not the arithmetic. It is proving, at s
 | `check-bounds` | a fuzzer sweeps each tile's input domain; no NaN/∞, monotonicity where required |
 | `check-worked-examples` | every tile's example reproduces a reference number it names a source for -- a published worked example where the publisher prints one, and the project's own derivation where none exists. **408 of them are first-principles**: nobody publishes a worked example for Ohm's law or a footing area, so the derivation is the check |
 | `check-example-parity` | the example a page prints is the example its calculator opens (1,673 tiles statically; the 131 that declare theirs inline are driven in a real browser by `test/integration/example-parity-runtime.test.js`, so the claim covers all 1,804) |
-| `check-citation-coverage` | every tile names a real, dated source, freshness-tracked |
+| `check-citation-coverage` | every tile names a real, dated source with all four required fields and no orphans. Freshness tracking is narrower: 1,379 tiles cite a source on a recheck calendar, and **425 cite a source no freshness tracker covers** |
 | `check-derivation-coverage` | every formula has a written derivation |
 | `check-dead-inputs` | no rendered field is silently ignored by the compute function |
 | `check-tile-contract` | every tile is registered, crash-free, and matches its declared I/O shape |

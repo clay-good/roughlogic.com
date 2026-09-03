@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **"Freshness-tracked" was true for 76% of the catalog.** The trust table's `check-citation-coverage` row read: *every tile names a real, dated source, freshness-tracked*. The first half holds exactly -- 1,804 complete citations, all four required fields, no orphans, no raw URL schemes. The second half does not: **425 tiles (23.6%) cite a source no freshness tracker covers**, so nothing puts them on a recheck calendar at all.
+
+  The gate had been printing that number on every single lint run -- *"1,379 / 1,804 tile(s) matched at least one tracked source (76.4%); 425 untracked"* -- and nobody carried it into the sentence a reader actually reads. That is the whole shape of today: the measurement existed, the claim above it did not match, and the claim is the layer the reader believes.
+
+  The row now states both halves and the gate holds the README to the live count, ratcheted on the **untracked** number so bringing a source under tracking is free and letting the untracked set grow is not.
+
+  Three rows of that table have now been corrected in a day -- publisher-verified, cross-validation, freshness-tracked -- and each was wrong in the flattering direction. `check-bounds` was checked too and left alone: its guarantee is delivered, 2,055 of 2,055 corpus functions at 100% coverage and 1,799 fuzz assertions, and only the mechanism attribution is loose. Rewriting a row that is substantively true would be tidying, not fixing.
+
 - **The trust table's most impressive-sounding guarantee was not what that gate does.** The row read: `check-cross-validation` guarantees *"independent tiles computing the same quantity agree numerically"*. It never compares two tiles. By its own docstring it walks the formula corpus, re-asserts fixture coverage that `check-worked-examples` already owns, and polices **how wide a declared tolerance is allowed to be** -- 1,731 checks that a fixture's tolerance sits inside its group's ceiling or carries a written justification.
 
   Cross-tile agreement is real, and it is [test/unit/cross-tile-invariants.test.js](test/unit/cross-tile-invariants.test.js): **401 assertions** over the five shared-computation classes spec-v14 §10 names -- AWG to circular mils, CFM to m^3/s, the NFA hose-friction coefficients, psi to feet of head, and the IRS mileage rate. Shared computations agreeing to the floating-point floor, documented inverses round-tripping, monotonic relationships staying monotonic. A good guarantee, attributed to the wrong mechanism and inflated from five documented classes to the whole catalog.

@@ -601,6 +601,32 @@ async function main() {
     untrackedTiles.length + " untracked.",
   );
 
+  // The README's trust table said this gate guarantees every tile names a real,
+  // dated source, "freshness-tracked". The first half holds -- 1,804 complete
+  // citations, four required fields, no orphans. The second half does not:
+  // 425 tiles cite a source no SOURCE_PATTERN matches, so nothing puts them on
+  // a recheck calendar. This gate has been printing that percentage all along
+  // and nobody carried it into the sentence.
+  //
+  // Ratcheted on the UNTRACKED count: bringing a source under tracking is
+  // welcome and needs only the README number lowered; letting the untracked set
+  // grow past what the README admits fails.
+  const readmeText = await readFile(resolve(ROOT, "README.md"), "utf8");
+  const statedUntracked = /\b([\d,]+) cite a source no freshness tracker covers\b/.exec(readmeText);
+  if (!statedUntracked) {
+    errors.push(
+      "README.md does not say how many tiles cite a source outside the freshness " +
+      "trackers. " + untrackedTiles.length + " of " + citationsMap.size + " do (" +
+      (100 - Number(trackedTilePct)).toFixed(1) + "%), so calling every citation " +
+      "freshness-tracked overstates what this gate can promise.",
+    );
+  } else if (Number(statedUntracked[1].replace(/,/g, "")) !== untrackedTiles.length) {
+    errors.push(
+      "README.md says " + statedUntracked[1] + " tiles cite an untracked source; this run " +
+      "counted " + untrackedTiles.length + ".",
+    );
+  }
+
   const verboseAll = process.argv.includes("--verbose-all");
   if (process.argv.includes("--verbose") || verboseAll) {
     const rows = [...sourceToTiles.entries()].sort((a, b) => b[1].length - a[1].length);
