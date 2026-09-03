@@ -27,7 +27,8 @@
 //
 // Pure read-and-report; no network, no mutation.
 
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
+import { join, relative } from "node:path";
 import { argv } from "node:process";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -117,6 +118,44 @@ function main() {
     }
   }
 
+  // Name what this gate does NOT govern, on every run. Five shards carry a
+  // verified_on that no ledger row backs, so the generator still writes it from
+  // the build date and nothing here can tell whether it means anything. That
+  // fact lived in docs/data-sources.md, which is where an open item goes to be
+  // forgotten. The count is ratcheted: closing one is welcome, adding a sixth
+  // is a new unbacked claim and fails.
+  const UNGOVERNED_BUDGET = 5;
+  const ungoverned = [];
+  (function walk(dir) {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        walk(full);
+      } else if (entry.name.endsWith(".json") && entry.name !== "manifest.json") {
+        let shard;
+        try {
+          shard = JSON.parse(readFileSync(full, "utf8"));
+        } catch {
+          continue;
+        }
+        // `tracked` is keyed by repo-relative path, the form sources-cycle.json
+        // writes; the walk yields absolute. Comparing the two matched nothing
+        // and reported all 15 stamped shards as ungoverned.
+        const rel = relative(ROOT, full).split("\\").join("/");
+        if ((shard.verified_on || shard.verifiedOn) && !tracked.has(rel)) ungoverned.push(rel);
+      }
+    }
+  })(resolve(ROOT, "data"));
+  if (ungoverned.length > UNGOVERNED_BUDGET) {
+    errors.push(
+      ungoverned.length +
+        " shard(s) carry a verified_on that no sources-cycle.json row backs, over a " +
+        "budget of " + UNGOVERNED_BUDGET + ": " + ungoverned.join(", ") +
+        ". An unbacked stamp is written from the build date and means nothing. " +
+        "Add a ledger row recording what was actually checked.",
+    );
+  }
+
   if (errors.length > 0) {
     for (const e of errors) console.error("ERROR: " + e);
     console.error(
@@ -133,7 +172,10 @@ function main() {
   console.log(
     "check-verified-on-ledger OK: " +
       tracked.size +
-      " ledger-tracked shard(s) carry a verified_on equal to their oldest recorded verification.",
+      " ledger-tracked shard(s) carry a verified_on equal to their oldest recorded " +
+      "verification. NOT governed here: " + ungoverned.length +
+      " shard(s) stamp a verified_on with no ledger row (budget " + UNGOVERNED_BUDGET + ")" +
+      (ungoverned.length ? " -- " + ungoverned.join(", ") : "") + ".",
   );
 }
 

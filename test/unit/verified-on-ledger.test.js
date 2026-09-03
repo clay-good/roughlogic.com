@@ -146,3 +146,17 @@ test("the estimated-tax due dates are the published 1040-ES schedule", async () 
     assert.deepEqual([...dates].sort(), dates, year + " dates must be in order");
   }
 });
+
+test("the gate names the shards it does not govern", async () => {
+  // A green summary that does not say what it skipped reads as full coverage.
+  // Five shards stamp a verified_on no ledger row backs, so the generator
+  // still writes it from the build date -- that fact belongs in the gate's
+  // own output, not only in docs/data-sources.md.
+  const src = await readFile(resolve(ROOT, "scripts/check-verified-on-ledger.mjs"), "utf8");
+  assert.match(src, /UNGOVERNED_BUDGET = 5/, "the ungoverned count is ratcheted");
+  assert.match(src, /NOT governed here/, "the OK line must name the uncovered set");
+  // The paths compared must be repo-relative on both sides; comparing an
+  // absolute walk against sources-cycle.json's relative keys matched nothing
+  // and reported every stamped shard as ungoverned.
+  assert.match(src, /relative\(ROOT, full\)/);
+});
