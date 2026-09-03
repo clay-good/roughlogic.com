@@ -171,6 +171,39 @@ async function main() {
     toleranceCheckedCount + " tolerance check(s).",
   );
 
+  // What this gate is FOR, stated where a reader meets it. The README's trust
+  // table used to credit it with "independent tiles computing the same quantity
+  // agree numerically". It does no such thing: it walks the corpus, re-asserts
+  // fixture coverage, and polices how wide a declared tolerance may be. The
+  // cross-tile agreement claim belongs to test/unit/cross-tile-invariants.test.js,
+  // which covers the five shared-computation classes spec-v14 §10 names.
+  // docs/correctness.md had it right all along; only the README overstated.
+  const readmeText = await readFile(resolve(ROOT, "README.md"), "utf8");
+  const row = readmeText.split("\n").find((l) => l.includes("`check-cross-validation`"));
+  if (row) {
+    if (!/toleranc/i.test(row)) {
+      errors.push(
+        "README.md's check-cross-validation row does not mention tolerance, which is " +
+        "the only thing this gate polices. Describe what it checks, not what the name suggests.",
+      );
+    }
+    if (/agree numerically|same quantity/i.test(row)) {
+      errors.push(
+        "README.md credits check-cross-validation with cross-tile agreement. That is " +
+        "test/unit/cross-tile-invariants.test.js, over the five shared-computation " +
+        "classes spec-v14 section 10 names -- not this gate, which never compares two tiles.",
+      );
+    }
+  }
+  const correctness = await readFile(resolve(ROOT, "docs", "correctness.md"), "utf8");
+  const statedChecks = /\(([\d,]+) checks:/.exec(correctness);
+  if (statedChecks && Number(statedChecks[1].replace(/,/g, "")) !== toleranceCheckedCount) {
+    errors.push(
+      "docs/correctness.md says " + statedChecks[1] + " tolerance checks; this run made " +
+      toleranceCheckedCount + ".",
+    );
+  }
+
   if (errors.length > 0) {
     for (const e of errors) console.error("ERROR: " + e);
     console.error("v14 cross-validation lint FAILED with " + errors.length + " errors.");

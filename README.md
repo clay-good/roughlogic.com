@@ -76,7 +76,8 @@ The hard part of a calculator catalog is not the arithmetic. It is proving, at s
 | Gate | What it guarantees |
 |---|---|
 | `check-dimensions` | every formula is dimensionally consistent |
-| `check-cross-validation` | independent tiles computing the same quantity agree numerically |
+| `check-cross-validation` | every fixture's declared tolerance is inside its group's ceiling, or carries a written justification (1,731 checks) -- it polices how loose a check is allowed to be, not the numbers themselves |
+| `cross-tile-invariants` (unit test) | tiles that share a computation agree to the floating-point floor, documented inverses round-trip, and monotonic relationships stay monotonic -- 401 assertions across the five shared-computation classes spec-v14 §10 names |
 | `check-bounds` | a fuzzer sweeps each tile's input domain; no NaN/∞, monotonicity where required |
 | `check-worked-examples` | every tile's example reproduces a reference number it names a source for -- a published worked example where the publisher prints one, and the project's own derivation where none exists. **408 of them are first-principles**: nobody publishes a worked example for Ohm's law or a footing area, so the derivation is the check |
 | `check-example-parity` | the example a page prints is the example its calculator opens (1,673 tiles statically; the 131 that declare theirs inline are driven in a real browser by `test/integration/example-parity-runtime.test.js`, so the claim covers all 1,804) |
