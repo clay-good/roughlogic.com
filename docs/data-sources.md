@@ -4,6 +4,21 @@ Every dataset shipped in data/ is listed here with its canonical source, license
 
 The principle from spec.md section 5 governs every entry: the data is either public domain, a physical or mathematical fact (not copyrightable), a U.S. government publication, a manufacturer technical specification cleared for redistribution, or original creative work by the project author. Licensed code text (NEC, IPC, IRC, ASHRAE Fundamentals, ACCA Manual J, NFPA standards) is never bundled.
 
+## What the date fields mean
+
+Two dates on a shard answer two different questions, and only one of them is the build's to answer.
+
+| Field | Means | Written by |
+| --- | --- | --- |
+| `fetched` | This file was regenerated on this date. | `scripts/build-data.mjs`, every run. |
+| `verified_on` | A human last checked this value against the publisher on this date. | [`scripts/sources-cycle.json`](../scripts/sources-cycle.json), for every shard that file names. |
+
+`verified_on` used to be written by the generator as the build date, which meant every refresh re-certified the whole catalog and the stamp could not go stale. It is now taken from the ledger's `last_verified` -- the **oldest** entry when more than one row names the same file, because a file is only as verified as its least-verified part -- and `check-verified-on-ledger` fails any tracked shard whose stamp disagrees. **Do not hand-edit a tracked shard's `verified_on`**: update the ledger row to record what was actually checked, then re-run `npm run data:refresh`.
+
+A folder's `manifest.json` carries an `edition` string that names the same kind of date in prose. Those are committed constants, not build dates, for the same reason -- with one exception: `data/historical` says *"built <date>"*, and that series really is materialized at build time. `check-manifests` fails any manifest whose `edition` is not exactly what [`scripts/build-data.mjs`](../scripts/build-data.mjs) produces, so the wording lives in the generator and nowhere else.
+
+Seven shards outside the ledger still carry a generator-written `verified_on`: the four under `data/accounting/` other than the tracked ones, `data/cross/glossary.json`, and the three under `data/lab/`. Adding a ledger row for each is open maintainer work; the honest date is the one someone last checked, not a date to invent.
+
 ## Datasets
 
 ### data/physical-constants/constants.json
@@ -495,6 +510,7 @@ The principle from spec.md section 5 governs every entry: the data is either pub
 - License: Public domain (federal publications).
 - Cadence: Annual recheck each January for the IRS-driven shards (refresh when the IRS posts the new tax year). Quarterly recheck for inventory benchmarks.
 - Shards: `macrs-tables.json` (per-class-life percentages), `section-179-limits.json` (per-year cap / phase-out / bonus pct; 2025 onward follows the One Big Beautiful Bill Act -- $2,500,000 / $4,000,000 for 2025 and $2,560,000 / $4,090,000 for 2026, with bonus a permanent 100% for property acquired after 2025-01-19 -- not the TCJA phase-down), `se-tax-parameters.json` (per-year SS wage base + Additional Medicare threshold by filing status; the 2026 base is $184,500 per IRS Topic 751 and the SSA COLA announcement), `estimated-tax-due-dates.json` (per-year four ISO dates), `standard-mileage-rates.json` (per-year business / medical / charitable rates; a year the IRS revises mid-year carries a `periods` list, as 2026 does), `inventory-benchmarks.json` (per-industry turnover median), `pub-15-t-tables.json` (single-filer annualized brackets).
+- `pub-15-t-tables.json` carries `edition: 2025` and `verified_on: 2025-12-01`, the date the ledger records for it. It previously read `verified_on: 2026-09-02` -- a build date, not a verification -- over the same 2025-edition brackets. The tile discloses the year and that the brackets are single-filer and illustrative; the honest stamp is the point, not a claim that the figures are current.
 - Privacy: No runtime fetch. All shards bundled at build time.
 
 ### data/legal/*.json (utility 266)

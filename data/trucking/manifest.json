@@ -1,9 +1,9 @@
 {
   "name": "trucking",
-  "version": "2026-09-02",
-  "fetched": "2026-09-02",
+  "version": "2026-09-03",
+  "fetched": "2026-09-03",
   "edition": "FMCSA 49 CFR 395 (HOS) and 23 CFR 658.17 (Federal Bridge Formula) cited by section; carrier divisors verified 2026-09-02; Thermo King and Carrier Transicold benchmarks per published technical bulletins.",
-  "asOf": "2026-09-02",
+  "asOf": "2026-09-03",
   "refresh_cadence": "annual",
   "shards": [
     {

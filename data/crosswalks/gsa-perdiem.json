@@ -206,5 +206,6 @@
       "m_and_ie": 68
     }
   },
-  "notes": "Approximations of published GSA values, not locality rates. The M&IE tiers were the FY2023 set ($64 / $69 / $74 / $79 / $84) until 2026-09-02 and are now the FY2026 tiers. Look up the destination at gsa.gov before filing."
+  "notes": "Approximations of published GSA values, not locality rates. The M&IE tiers were the FY2023 set ($64 / $69 / $74 / $79 / $84) until 2026-09-02 and are now the FY2026 tiers. Look up the destination at gsa.gov before filing.",
+  "verified_on": "2026-09-02"
 }

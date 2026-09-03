@@ -1,6 +1,6 @@
 {
   "source": "State revenue department published rates. Government-published rates.",
-  "fetched": "2026-09-02",
+  "fetched": "2026-09-03",
   "notes": "Statewide base rates as published by each state revenue department -- NOT average combined state-and-local rates. Most states let counties, cities and special districts add on top, which in Louisiana and Alabama roughly doubles the rate. Use the override field with the combined rate for the delivery address.",
   "rates": {
     "AL": 4,

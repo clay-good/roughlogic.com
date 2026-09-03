@@ -13,7 +13,7 @@ npm run audit
 
 That single command runs the canonical chain (lint -> unit tests -> build ->
 `check:dist` -> `check:shells` -> `check:module-sizes` -> `check:shell-values`
--> `check:lastmod` -> `data:verify`). `npm run lint` alone is 56 static gates.
+-> `check:lastmod` -> `data:verify`). `npm run lint` alone is 57 static gates.
 If you changed layout or type, also run `npm run check:shell-mobile`; it drives
 every static shell through a headless browser at 320 px and is the one CI
 post-build gate `npm run audit` does not include.

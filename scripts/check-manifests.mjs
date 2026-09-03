@@ -59,8 +59,13 @@ async function main() {
   const generator = await readFile(resolve(ROOT, "scripts", "build-data.mjs"), "utf8");
   const undated = (s) => s.replace(/\d{4}-\d{2}-\d{2}/g, "<date>");
   const generated = new Map();
+  // The interpolated token used to be `TODAY` only. Matching it by name meant
+  // this parser encoded HOW the generator was written, and it broke the moment
+  // CF-05 moved those dates to a committed EDITION_VERIFIED map -- reporting
+  // twelve editions as hand-edited drift. Accept any dotted identifier here;
+  // `undated()` blanks whatever it resolves to anyway.
   for (const m of generator.matchAll(
-    /folder:\s*"([a-z-]+)",\s*edition:\s*"((?:[^"\\]|\\.)*)"(?:\s*\+\s*TODAY\s*\+\s*"((?:[^"\\]|\\.)*)")?/g,
+    /folder:\s*"([a-z-]+)",\s*edition:\s*"((?:[^"\\]|\\.)*)"(?:\s*\+\s*[A-Za-z_$][\w$]*(?:\.[\w$]+)*\s*\+\s*"((?:[^"\\]|\\.)*)")?/g,
   )) {
     const raw = (m[2] + (m[3] === undefined ? "" : "<date>" + m[3])).replace(/\\"/g, '"');
     generated.set(m[1], undated(raw));

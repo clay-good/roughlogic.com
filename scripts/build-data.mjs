@@ -37,6 +37,36 @@ const CADENCE_BY_FOLDER = (() => {
   return out;
 })();
 
+// spec-v22 CF-05: `verified_on` records when a HUMAN last checked a bundled
+// figure against the publisher. Every shard body below stamps TODAY, which
+// means each refresh silently re-certifies the entire catalog whether or not
+// anyone looked -- data/accounting/pub-15-t-tables.json claimed verified_on
+// 2026-09-02 while the verification ledger recorded 2025-12-01, nine months
+// earlier, over brackets the shard itself labels edition 2025.
+//
+// So for any shard scripts/sources-cycle.json tracks, the ledger wins: the
+// stamp is the OLDEST last_verified among the rows naming that file, because a
+// file is only as verified as its least-verified part. `fetched` still moves to
+// TODAY -- the file really was regenerated today -- and that is the whole
+// distinction: fetched is a fact about this build, verified_on is a claim about
+// research.
+const LEDGER_VERIFIED_ON = (() => {
+  const raw = JSON.parse(readFileSync(resolve(ROOT, "scripts", "sources-cycle.json"), "utf8"));
+  const out = {};
+  for (const row of [...(raw.annual_figures || []), ...(raw.standards || [])]) {
+    if (!row.last_verified || !row.where) continue;
+    // `where` is prose: "data/a/b.json; data/c/d.json baseline.x_*; CONST_NAME".
+    // Take the json paths and ignore the runtime-constant names beside them.
+    for (const piece of String(row.where).split(";")) {
+      const file = piece.trim().split(/\s+/)[0];
+      if (!file.startsWith("data/") || !file.endsWith(".json")) continue;
+      const key = file.slice("data/".length);
+      if (!out[key] || row.last_verified < out[key]) out[key] = row.last_verified;
+    }
+  }
+  return out;
+})();
+
 // --- Authoritative inputs (cited in docs/data-sources.md) ---
 
 // NIST physical constants (CODATA 2018 published values; physical facts).
@@ -1571,7 +1601,14 @@ const GLOSSARY_DATA_V5 = {
 import { SALES_TAX_NEXUS } from "../calc-references.js";
 
 function buildSalesTaxNexusShard() {
-  const by_state = { verifiedOn: TODAY };
+  // CF-05: this aggregate stamp read TODAY while all 47 per-state entries
+  // beneath it carry 2025-01-15. The rollup must not claim more than the rows
+  // it rolls up, so take the oldest of them.
+  const stamps = Object.values(SALES_TAX_NEXUS)
+    .map((v) => v.verified_on || v.verifiedOn)
+    .filter(Boolean)
+    .sort();
+  const by_state = { verifiedOn: stamps[0] };
   for (const [k, v] of Object.entries(SALES_TAX_NEXUS)) by_state[k] = v;
   return {
     source: "Per-state department of revenue published nexus guidance (post-South Dakota v. Wayfair, Inc., 138 S. Ct. 2080 (2018)).",
@@ -1581,6 +1618,34 @@ function buildSalesTaxNexusShard() {
     by_state,
   };
 }
+
+// CF-05, second layer: twelve manifest `edition` strings interpolated the build
+// date into a prose claim -- "verified <date>", "manufacturer specs as of
+// <date>", "Last revision <date>". Same lie as the shard stamps, one layer out,
+// and `data/legal` made it plain: its manifest read "Verified <today>" while
+// every shard under it carries verified_on 2025-01-15, which check-manifests
+// already warns is 596 days past a quarterly cadence. The manifest contradicted
+// the warning, and the manifest is the layer a reader meets first.
+//
+// These dates are now committed rather than generated. `legal` states what its
+// shards actually say; the rest hold the last date a human was demonstrably in
+// them. The point is that they stop advancing on their own: a claim that
+// re-dates itself every build cannot be audited, and cannot go stale enough for
+// anyone to notice.
+const EDITION_VERIFIED = {
+  electrical: "2026-09-02",
+  plumbing: "2026-09-02",
+  hvac: "2026-09-02",
+  restoration: "2026-09-02",
+  construction: "2026-09-02",
+  fire: "2026-09-02",
+  crosswalks: "2026-09-02",
+  summaries: "2026-09-02",
+  trucking: "2026-09-02",
+  accounting: "2026-09-02",
+  lab: "2026-09-02",
+  legal: "2025-01-15",
+};
 
 // --- Manifests for each per-folder dataset ---
 
@@ -1592,7 +1657,7 @@ const DATASETS = [
       { file: "constants.json", body: PHYSICAL_CONSTANTS, name: "NIST physical constants" },
       { file: "material-properties.json", body: MATERIAL_PROPERTIES, name: "Material properties" },
     ] },
-  { folder: "electrical", edition: "NEC 2023 (NFPA 70); IEEE 802.3bt-2018 PoE; ANSI/IEEE C57 (transformer step series); NEMA MG-1 (motor code letters); Eaton/Bussmann SPD (point-to-point C-values); manufacturer cable specs as of " + TODAY + ".", shards: [
+  { folder: "electrical", edition: "NEC 2023 (NFPA 70); IEEE 802.3bt-2018 PoE; ANSI/IEEE C57 (transformer step series); NEMA MG-1 (motor code letters); Eaton/Bussmann SPD (point-to-point C-values); manufacturer cable specs as of " + EDITION_VERIFIED.electrical + ".", shards: [
       { file: "conductor-properties.json", body: buildConductorProperties(), name: "Conductor properties (AWG)" },
       { file: "ampacity-physics.json", body: AMPACITY_PHYSICS, name: "Ampacity physics methodology" },
       { file: "motor-fla.json", body: MOTOR_FLA, name: "Motor full-load amps" },
@@ -1606,7 +1671,7 @@ const DATASETS = [
       { file: "nema-mg1-code-letters.json", body: NEMA_MG1_CODE_LETTERS_DATA, name: "NEMA MG-1 code-letter starting kVA per HP" },
       { file: "dwelling-demand.json", body: DWELLING_DEMAND_DATA, name: "Dwelling demand-factor parameters (NEC 2023 Article 220)" },
     ] },
-  { folder: "plumbing", edition: "IPC 2021; IFGC 2021 (IPC 2024 / IFGC 2024 are the current published editions; bundled values follow 2021 and the tile citations disclose it); Hazen-Williams (AWWA M11, 5th ed.); Manning (USGS WSP-2339, public domain); ASME B31.1 / B31.9 (guided-cantilever expansion-loop method); Joukowsky (1898) / ASCE MOP-49; Hydraulic Institute pump engineering practice; manufacturer specs as of " + TODAY + ".", shards: [
+  { folder: "plumbing", edition: "IPC 2021; IFGC 2021 (IPC 2024 / IFGC 2024 are the current published editions; bundled values follow 2021 and the tile citations disclose it); Hazen-Williams (AWWA M11, 5th ed.); Manning (USGS WSP-2339, public domain); ASME B31.1 / B31.9 (guided-cantilever expansion-loop method); Joukowsky (1898) / ASCE MOP-49; Hydraulic Institute pump engineering practice; manufacturer specs as of " + EDITION_VERIFIED.plumbing + ".", shards: [
       { file: "pipe-properties.json", body: PIPE_PROPERTIES, name: "Pipe properties" },
       { file: "fixture-units.json", body: FIXTURE_UNITS, name: "Fixture units" },
       { file: "gas-pipe-capacity.json", body: GAS_PIPE_CAPACITY, name: "Gas pipe capacity" },
@@ -1621,7 +1686,7 @@ const DATASETS = [
       { file: "pump-curves.json", body: PUMP_CURVES_DATA, name: "Pump curves (manufacturer-attributed where redistributable)" },
       { file: "thermal-expansion-coefficients.json", body: THERMAL_EXPANSION_COEFFS_DATA, name: "Pipe thermal-expansion coefficients and guided-cantilever stress allowables" },
     ] },
-  { folder: "hvac", edition: "ASHRAE 62.1-2022; ASHRAE Handbook Fundamentals chapter 21 (duct design) and chapter 25 (insulation); ACCA Manual J 8th ed.; CTI cooling-tower engineering practice; manufacturer P-T tables (DuPont / Honeywell / Chemours / Arkema) and insulation k-values as of " + TODAY + ".", shards: [
+  { folder: "hvac", edition: "ASHRAE 62.1-2022; ASHRAE Handbook Fundamentals chapter 21 (duct design) and chapter 25 (insulation); ACCA Manual J 8th ed.; CTI cooling-tower engineering practice; manufacturer P-T tables (DuPont / Honeywell / Chemours / Arkema) and insulation k-values as of " + EDITION_VERIFIED.hvac + ".", shards: [
       { file: "refrigerants.json", body: REFRIGERANTS, name: "Refrigerant P-T tables" },
       { file: "duct-friction.json", body: DUCT_FRICTION, name: "Duct friction inputs" },
       { file: "climate-data.json", body: CLIMATE_DATA, name: "Climate design temperatures" },
@@ -1637,14 +1702,14 @@ const DATASETS = [
       { file: "refrigerant-pt-tables.json", body: REFRIGERANT_PT_TABLES_DATA, name: "Manufacturer-attributed refrigerant P-T tables" },
       { file: "insulation-k-values.json", body: INSULATION_K_VALUES_DATA, name: "Insulation thermal conductivity (manufacturer-attributed)" },
     ] },
-  { folder: "restoration", edition: "IICRC S500 / S520 cited by name; psychrometrics from August-Roche-Magnus; manufacturer HEPA bulletins as of " + TODAY + ".", shards: [
+  { folder: "restoration", edition: "IICRC S500 / S520 cited by name; psychrometrics from August-Roche-Magnus; manufacturer HEPA bulletins as of " + EDITION_VERIFIED.restoration + ".", shards: [
       { file: "psychrometrics.json", body: PSYCHROMETRICS, name: "Psychrometric inputs" },
       { file: "water-classes.json", body: WATER_CLASSES, name: "Water classes and categories" },
       { file: "drying-times.json", body: DRYING_TIMES, name: "Material drying times" },
       { file: "mold-conditions.json", body: MOLD_CONDITIONS, name: "Mold growth conditions" },
       { file: "hepa-loading.json", body: HEPA_LOADING, name: "HEPA scrubber loading rates" },
     ] },
-  { folder: "construction", edition: "IRC 2021 / IBC 2021 cited by section number (IRC 2024 / IBC 2024 are the current published editions; bundled values follow 2021 and the tile citations disclose it); ASCE 7 formulas applied (no licensed text reproduced); ACI 211 / ACI 318 / ACI 347 cited by name; ASTM A615 + CRSI rebar values; APA span-rating tables (technical-bulletin reuse); ICC-ES AC358 helical-pile Kt; ASME B30.5 / B30.9 + OSHA 29 CFR 1926 Subpart CC for crane-lift; ASTM/SAE bolt grades; AWS deposition; lumber properties from public engineering references; verified " + TODAY + ".", shards: [
+  { folder: "construction", edition: "IRC 2021 / IBC 2021 cited by section number (IRC 2024 / IBC 2024 are the current published editions; bundled values follow 2021 and the tile citations disclose it); ASCE 7 formulas applied (no licensed text reproduced); ACI 211 / ACI 318 / ACI 347 cited by name; ASTM A615 + CRSI rebar values; APA span-rating tables (technical-bulletin reuse); ICC-ES AC358 helical-pile Kt; ASME B30.5 / B30.9 + OSHA 29 CFR 1926 Subpart CC for crane-lift; ASTM/SAE bolt grades; AWS deposition; lumber properties from public engineering references; verified " + EDITION_VERIFIED.construction + ".", shards: [
       { file: "lumber-properties.json", body: LUMBER_PROPERTIES, name: "Lumber material properties" },
       { file: "concrete-mixes.json", body: CONCRETE_MIXES, name: "Concrete mixes" },
       { file: "span-derivations.json", body: SPAN_DERIVATIONS, name: "Span derivations" },
@@ -1659,13 +1724,13 @@ const DATASETS = [
       { file: "apa-span-ratings.json", body: APA_SPAN_RATINGS_DATA, name: "APA plywood / OSB span-rating tables" },
       { file: "helical-pile-kt.json", body: HELICAL_PILE_KT_DATA, name: "Helical-pile Kt benchmarks (manufacturer-attributed)" },
     ] },
-  { folder: "fire", edition: "NFA hose-friction training materials (U.S. government, public domain); ISO Public Protection Classification fire-flow formulas + NFF construction-class table; verified " + TODAY + ".", shards: [
+  { folder: "fire", edition: "NFA hose-friction training materials (U.S. government, public domain); ISO Public Protection Classification fire-flow formulas + NFF construction-class table; verified " + EDITION_VERIFIED.fire + ".", shards: [
       { file: "hose-friction.json", body: HOSE_FRICTION, name: "Fire hose friction coefficients (NFA)" },
       { file: "fire-flow-formulas.json", body: FIRE_FLOW_FORMULAS, name: "Fire flow formulas" },
       // v7 utility 252.
       { file: "iso-nff.json", body: ISO_NFF_DATA, name: "ISO PPC NFF construction-class F and occupancy Oi (cited by name only)" },
     ] },
-  { folder: "crosswalks", edition: "NIST SP 811 unit factors; IRS 2026 standard mileage rate (76 cents/mi effective 2026-07-01); GSA FY2026 per-diem; NIOSH 1991 lifting equation; OSHA 29 CFR 1926 Subpart P + 1926.502 fall protection; NWS / OSHA heat-cold-stress formulas; manufacturer connector-decel benchmarks (3M / Capital Safety, MSA, Honeywell-Miller); state revenue rates verified " + TODAY + ".", shards: [
+  { folder: "crosswalks", edition: "NIST SP 811 unit factors; IRS 2026 standard mileage rate (76 cents/mi effective 2026-07-01); GSA FY2026 per-diem; NIOSH 1991 lifting equation; OSHA 29 CFR 1926 Subpart P + 1926.502 fall protection; NWS / OSHA heat-cold-stress formulas; manufacturer connector-decel benchmarks (3M / Capital Safety, MSA, Honeywell-Miller); state revenue rates verified " + EDITION_VERIFIED.crosswalks + ".", shards: [
       { file: "unit-conversions.json", body: UNIT_CONVERSIONS, name: "Unit conversions" },
       { file: "state-tax-rates.json", body: STATE_TAX_RATES, name: "State sales tax rates" },
       { file: "irs-mileage.json", body: IRS_MILEAGE, name: "IRS standard mileage rate" },
@@ -1676,13 +1741,13 @@ const DATASETS = [
       // v7 utility 253.
       { file: "fall-protection-benchmarks.json", body: FALL_PROTECTION_BENCHMARKS_DATA, name: "Manufacturer connector-decel benchmarks for personal fall arrest" },
     ] },
-  { folder: "summaries", edition: "Original plain-English summaries by the project author; MIT-licensed creative work. Last revision " + TODAY + ".", shards: [
+  { folder: "summaries", edition: "Original plain-English summaries by the project author; MIT-licensed creative work. Last revision " + EDITION_VERIFIED.summaries + ".", shards: [
       { file: "summaries.json", body: SUMMARIES, name: "Original plain-English summaries" },
       { file: "v2-references.json", body: V2_REFERENCES, name: "v2 reference summaries (GFCI/AFCI and others)" },
       { file: "v3-references.json", body: V3_REFERENCES, name: "v3 reference summaries (hand signals, OSHA top 10, LOTO, defensible space, storm shelter, triage)" },
     ] },
   // v4 trucking and logistics shards.
-  { folder: "trucking", edition: "FMCSA 49 CFR 395 (HOS) and 23 CFR 658.17 (Federal Bridge Formula) cited by section; carrier divisors verified " + TODAY + "; Thermo King and Carrier Transicold benchmarks per published technical bulletins.", shards: [
+  { folder: "trucking", edition: "FMCSA 49 CFR 395 (HOS) and 23 CFR 658.17 (Federal Bridge Formula) cited by section; carrier divisors verified " + EDITION_VERIFIED.trucking + "; Thermo King and Carrier Transicold benchmarks per published technical bulletins.", shards: [
       { file: "dim-divisors.json", body: DIM_DIVISORS_DATA, name: "Carrier DIM divisors (cited by carrier name only)" },
       { file: "reefer-burn.json", body: REEFER_BURN_DATA, name: "Reefer GPH benchmarks (manufacturer-attributed)" },
     ] },
@@ -1691,7 +1756,7 @@ const DATASETS = [
   // more than HISTORICAL_FRESHNESS_LIMIT_DAYS behind the build date.
   { folder: "historical", edition: "Modeled after BLS PPI / EIA / USDA NASS / FRED federal series (series IDs named verbatim; the monthly values are generated from an in-tree anchor, not downloaded -- the build fetches nothing); built " + TODAY + ". Build fails if any shard's latest point is more than 30 days behind the build date.", shards: buildHistoricalDataset(TODAY) },
   // v5 Group R: Accounting, Tax, and Small-Business (utilities 234-245).
-  { folder: "accounting", edition: "IRS Pub 946 (MACRS), Pub 15-T (payroll percentage method), annual Rev. Proc. (Section 179 cap), SSA wage-base announcement (SE tax), IRS Form 1040-ES schedule (estimated tax), IRS standard mileage rate notice. U.S. Census ARTS / SBA published medians (inventory). Per-year entries with verified-on date; verified " + TODAY + ".", shards: [
+  { folder: "accounting", edition: "IRS Pub 946 (MACRS), Pub 15-T (payroll percentage method), annual Rev. Proc. (Section 179 cap), SSA wage-base announcement (SE tax), IRS Form 1040-ES schedule (estimated tax), IRS standard mileage rate notice. U.S. Census ARTS / SBA published medians (inventory). Per-year entries with verified-on date; verified " + EDITION_VERIFIED.accounting + ".", shards: [
       { file: "macrs-tables.json", body: MACRS_TABLES_V5, name: "IRS Pub 946 Tables A-1 (200%/150% DB, half-year)" },
       { file: "section-179-limits.json", body: SECTION_179_DATA_V5, name: "Section 179 cap and phase-out, per-year" },
       { file: "se-tax-parameters.json", body: SE_TAX_DATA_V5, name: "Social Security wage base + Additional Medicare threshold, per-year" },
@@ -1703,11 +1768,11 @@ const DATASETS = [
   // Legal folder: only the post-Wayfair sales-tax-nexus shard survives
   // spec-v107 (Legal group retired). Its tile lives in the reference group;
   // the shard builds from the runtime module (calc-references.js).
-  { folder: "legal", edition: "Post-Wayfair sales-tax-nexus thresholds from each state's department of revenue. Verified " + TODAY + ".", shards: [
+  { folder: "legal", edition: "Post-Wayfair sales-tax-nexus thresholds from each state's department of revenue. Verified " + EDITION_VERIFIED.legal + ".", shards: [
       { file: "sales-tax-nexus.json", body: buildSalesTaxNexusShard(), name: "Per-state post-Wayfair economic-nexus thresholds" },
     ] },
   // v5 Group T: Bench Science and Laboratory Math (utilities 255-264).
-  { folder: "lab", edition: "IUPAC Standard Atomic Weights 2021. Common laboratory buffer pKa values from Good et al. 1966 and CRC Handbook of Chemistry and Physics 95th ed. Manufacturer rotor specifications (Eppendorf, Beckman Coulter, Thermo Fisher). Verified " + TODAY + ".", shards: [
+  { folder: "lab", edition: "IUPAC Standard Atomic Weights 2021. Common laboratory buffer pKa values from Good et al. 1966 and CRC Handbook of Chemistry and Physics 95th ed. Manufacturer rotor specifications (Eppendorf, Beckman Coulter, Thermo Fisher). Verified " + EDITION_VERIFIED.lab + ".", shards: [
       { file: "iupac-atomic-weights.json", body: IUPAC_WEIGHTS_V5, name: "IUPAC Standard Atomic Weights 2021" },
       { file: "buffer-pka.json", body: BUFFER_PKA_V5, name: "Common laboratory buffer pKa values" },
       { file: "centrifuge-rotors.json", body: CENTRIFUGE_ROTORS_V5, name: "Representative centrifuge rotor radii (manufacturer-attributed)" },
@@ -1860,6 +1925,12 @@ async function buildAll() {
     if (STALENESS_NOTES[ds.folder]) manifest.staleness_note = STALENESS_NOTES[ds.folder];
 
     for (const shard of ds.shards) {
+      // CF-05: the ledger's human-verification date overrides the TODAY the
+      // shard body stamped, for every shard sources-cycle.json tracks.
+      const ledgerKey = ds.folder + "/" + shard.file;
+      if (LEDGER_VERIFIED_ON[ledgerKey]) {
+        shard.body.verified_on = LEDGER_VERIFIED_ON[ledgerKey];
+      }
       const out = formatJson(shard.body);
       const path = resolve(dir, shard.file);
       await ensureDir(dirname(path));
