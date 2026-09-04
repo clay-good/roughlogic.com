@@ -95,8 +95,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Ind. Code 6-2.5-2-1(c)",
-      "verified_on": "2025-01-15"
+      "citation": "Ind. Code 6-2.5-2-1; IN DOR remote-seller FAQ: $100,000 gross revenue, current or preceding calendar year; 200-transaction test removed eff. 2024-01-01 (SEA 228)",
+      "verified_on": "2026-09-04"
     },
     "IA": {
       "sales_threshold_usd": 100000,
@@ -266,8 +266,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "S.D. Codified Laws 10-64-2 (post-Wayfair home state; transaction threshold removed 2023)",
-      "verified_on": "2025-01-15"
+      "citation": "S.D. Codified Laws ch. 10-64 (Wayfair home state); SD DOR Remote Seller Bulletin Aug 2025: >$100,000 gross sales, previous or current calendar year; 200-transaction test repealed eff. 2023-07-01",
+      "verified_on": "2026-09-04"
     },
     "TN": {
       "sales_threshold_usd": 100000,
