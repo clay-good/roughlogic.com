@@ -1600,6 +1600,7 @@ const GLOSSARY_DATA_V5 = {
 
 import { SALES_TAX_NEXUS } from "../calc-references.js";
 import { stalenessNote, collectRowStamps } from "./staleness-notes.mjs";
+import { PROSE_LINT_THRESHOLD, PROSE_LINT_EXEMPT_KEYS } from "./prose-lint-keys.mjs";
 
 function buildSalesTaxNexusShard() {
   // CF-05: this aggregate stamp read TODAY while all 47 per-state entries
@@ -1802,48 +1803,14 @@ async function ensureDir(path) {
 
 // v6 §2.3 / §7 prose-lint: scan every string value inside a shard body for
 // running prose longer than the configured threshold. Numeric keys, short
-// labels, citation strings, and known long-form fields are exempt. The
-// intent is that a careless edit cannot quietly paste licensed code text
-// into a data shard.
-const PROSE_LINT_THRESHOLD = 140;
-// Keys whose values are intentionally narrative (original plain-English
-// summaries, attribution / source / notes lines) and therefore exempt from
-// the prose-length cap. Keep this list small; the default is to lint.
-// Folders knowingly past the refresh_cadence they declare. check-manifests warns
-// from one cadence period and fails at four unless the manifest says why, so a
-// row here is a promise being kept honestly rather than quietly broken.
-// The note's counts and dates are derived from the shard stamps in
-// scripts/staleness-notes.mjs, not asserted here. The hand-written version went
-// false the day the first fourteen states were re-verified and kept telling
-// readers of the public manifest that none had been. check-manifests recomputes
-// the same string and requires the manifest to match.
-
-const PROSE_LINT_EXEMPT_KEYS = new Set([
-  "source", "license", "notes", "attribution", "summary", "description",
-  "edition",
-  // A disclosure that qualifies the value sitting next to it, in the same
-  // category as `notes` and `attribution`: the 2025 Section 179 row has to
-  // carry the OBBBA acquisition-date window, because the single bonus_pct
-  // beside it is wrong for property placed in service before 2025-01-20.
-  "bonus_note",
-  // Same category: the per-state nexus rows carry a one-sentence disclosure of
-  // how their two thresholds combine (New York and Connecticut require BOTH) or
-  // of the act that repealed one of them. The bare `combine` value beside it is
-  // the machine-readable form; this is the sentence a reader needs.
-  "combine_note",
-  // Original plain-English summaries by the project author (these shards
-  // exist precisely to hold prose; they are explicitly cited as MIT-
-  // licensed original creative work).
-  "summaries", "hand_signals", "osha_top10", "loto_steps",
-  "defensible_space", "storm_shelter", "triage",
-  // Formula-glossing keys: the values describe what the variables in a
-  // named public formula stand for. Not prose paste-ins.
-  "iso_needed_fire_flow",
-  // v5 shard prose-fields: short attribution / explanatory strings that
-  // describe what each shard contains or how to access it. Not prose
-  // paste-ins; each is one sentence authored by the project.
-  "note", "free_access", "partial_payment_rule", "self_help_warning",
-]);
+// labels and known long-form fields are exempt. The intent is that a careless
+// edit cannot quietly paste licensed code text into a data shard.
+//
+// `citation` is NOT exempt, though this comment claimed it was until
+// 2026-09-04. The code was right and the comment was wrong: capping citations
+// is what forces a row to name its operative provision and measurement period
+// and put the rest in docs/. Eleven nexus citations hit the cap the day the
+// claim was noticed, and each one was better for being cut.
 
 // Shard paths whose entire bodies are intentionally prose (original
 // plain-English summary shards). The lint scans these files only for
