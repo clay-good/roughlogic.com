@@ -25,6 +25,55 @@ test("IRS forms: example count matches", () => { assert.equal(irsFormIndexExampl
 test("Sales tax nexus: example CA = $500k threshold", () => { const r = computeSalesTaxNexus(salesTaxNexusExample.inputs); assert.equal(r.sales_threshold_usd, 500000); });
 test("Sales tax nexus: 46+ jurisdictions bundled (post-expansion: 50 states + DC minus 4 no-tax)", () => { assert.ok(Object.keys(SALES_TAX_NEXUS).length >= 46); });
 test("Sales tax nexus: every entry has citation + verified_on", () => { for (const v of Object.values(SALES_TAX_NEXUS)) { assert.ok(v.citation); assert.ok(v.verified_on); assert.ok(v.sales_threshold_usd > 0); } });
+// A row with a transaction prong and no explicit `combine` reads as OR.
+//
+// The renderer branches `r.combine === "and" ? "BOTH must be met" : "EITHER one
+// is enough (sales OR transactions)"`, so anything that is not the string "and"
+// -- undefined, null, a typo, a stray "AND" -- tells the reader either prong
+// alone creates nexus. For a conjunctive state that is a false statement about
+// when they owe tax, and it is not hypothetical: this tile shipped exactly that
+// for New York and Connecticut, both of which require BOTH prongs. The rows were
+// corrected; the shape that produced them was not, so a new state added without
+// `combine` would say it again, silently, and every other gate would stay green.
+//
+// So: a transaction prong obliges an explicit "and" or "or".
+test("Sales tax nexus: a transaction prong must declare how it combines", () => {
+  const missing = [];
+  for (const [state, row] of Object.entries(SALES_TAX_NEXUS)) {
+    if (row.transactions_threshold == null) continue;
+    if (row.combine !== "and" && row.combine !== "or") {
+      missing.push(`${state} (transactions_threshold=${row.transactions_threshold}, combine=${JSON.stringify(row.combine)})`);
+    }
+  }
+  assert.deepEqual(missing, [],
+    "these rows would render as \"EITHER one is enough (sales OR transactions)\" by falling through the renderer's else branch");
+});
+
+// The mirror: `combine` without a prong to combine is a leftover from a repeal
+// that did not finish. Four states have repealed their transaction prong (IL,
+// KY, LA, UT) and each keeps a combine_note explaining the repeal while setting
+// combine to null -- which is right, and is why this checks `combine`, not the
+// note.
+test("Sales tax nexus: no row declares a combine rule it has nothing to combine", () => {
+  const stray = Object.entries(SALES_TAX_NEXUS)
+    .filter(([, r]) => r.transactions_threshold == null && (r.combine === "and" || r.combine === "or"))
+    .map(([state, r]) => `${state} (combine=${JSON.stringify(r.combine)}, no transactions_threshold)`);
+  assert.deepEqual(stray, []);
+});
+
+// The repeal notes are the only place a reader learns the prong is gone rather
+// than merely absent, and the renderer prints combine_note unconditionally. If a
+// note ever loses its row, that history disappears from the page silently.
+test("Sales tax nexus: the repealed-prong states keep the note that explains the repeal", () => {
+  for (const state of ["IL", "KY", "LA", "UT"]) {
+    const row = SALES_TAX_NEXUS[state];
+    assert.ok(row, `${state} must stay bundled`);
+    assert.equal(row.transactions_threshold, null, `${state} repealed its transaction prong`);
+    assert.match(row.combine_note || "", /repeal|struck|removed/i,
+      `${state} must say why it has no transaction prong, not just omit one`);
+  }
+});
+
 test("Sales tax nexus: unknown state errors", () => { assert.ok(computeSalesTaxNexus({ state: "ZZ" }).error); });
 
 // 267 OSHA recordkeeping
