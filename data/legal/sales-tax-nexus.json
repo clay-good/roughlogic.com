@@ -146,8 +146,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Mass. Gen. Laws ch. 64H sec. 34",
-      "verified_on": "2025-01-15"
+      "citation": "Mass. Gen. Laws ch. 64H sec. 34 (prior or current TAXABLE year; no transaction test)",
+      "verified_on": "2026-09-04"
     },
     "MI": {
       "sales_threshold_usd": 100000,
@@ -273,8 +273,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Tenn. Code Ann. 67-6-501(b)(1)",
-      "verified_on": "2025-01-15"
+      "citation": "Tenn. Code Ann. ch. 67-6; TN DOR out-of-state dealers page and Important Notice #20-14: $100,000 in Tennessee sales, no transaction test, threshold lowered from $500,000 eff. 2020-10-01",
+      "verified_on": "2026-09-04"
     },
     "TX": {
       "sales_threshold_usd": 500000,
