@@ -25,6 +25,30 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
+// WHERE THIS RULE STOPS, because the distinction is easy to get backwards and
+// the wrong "fix" would be a regression.
+//
+// This file is about factors that are exact BY DEFINITION -- the pound, the
+// gallon, the inch. Writing those to fewer digits is a rounding error with no
+// upside. It is NOT about a coefficient a cited standard prints, even when that
+// coefficient is a rounded irrational. Scanning the catalog for literals near an
+// exact mathematical or physical constant returns 39 of those, and every one is
+// correct as written:
+//
+//   0.7854   SAE J429 / ASME B1.1 print the tensile stress area as
+//            At = 0.7854 (d - 0.9743/n)^2. Substituting PI/4 would make the code
+//            disagree with the standard it cites, on a bolt-strength number.
+//   1.732    the three-phase factor as the NEC voltage-drop formulas are written
+//            and as an electrician computes it.
+//   1.414    ASME B30.9 sling geometry and the ASHRAE vibration relations.
+//   32.174   the conventional US value of g in ft/s^2, as textbooks state it.
+//   3.1416   a worked-example INPUT -- the area of a 2 in round bar, rounded the
+//            way a person types it, not a constant at all.
+//
+// No compute in the catalog uses a truncated PI; every one calls Math.PI.
+// Checked 2026-09-04. If a future pass reaches for these, the question to ask
+// first is whether the number is exact by definition or quoted from a source.
+
 // name -> [exact value, how it is defined]
 const EXACT = {
   G_PER_OZ: [453.59237 / 16, "1 lb = 453.59237 g exactly, 16 oz to the pound"],
