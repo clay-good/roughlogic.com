@@ -206,6 +206,9 @@ console.log(
   "check-guard-only-inputs OK: " + checked + " parameters across " + fnsChecked + " / " + fnsTotal +
   " compute functions (" + (fnsTotal - fnsChecked) + " skipped: param-less reference or non-destructured " +
   "signature). NOT checked here: " + skippedWithInputs.length + " compute(s) take a named object parameter " +
-  "(budget " + SKIPPED_WITH_INPUTS_BUDGET + ") -- " + skippedWithInputs.join(", ") + "; " +
+  "(budget " + SKIPPED_WITH_INPUTS_BUDGET + "; --verbose lists them); " +
   "no unallowlisted guard-only dead inputs (" + allowlist.entries.length + " reviewed allowlist entries).",
 );
+if (process.argv.includes("--verbose")) {
+  console.log("  named-object computes not inspected: " + skippedWithInputs.join(", "));
+}

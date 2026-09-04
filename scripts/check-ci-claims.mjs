@@ -449,7 +449,7 @@ async function main() {
     process.exit(1);
   }
   console.log(
-    `check-ci-claims OK: README names all ${jobs.length} CI jobs (${jobs.join(", ")}), states the axe pass within 5% of its live size, no doc claims a gate the workflow does not run, both data-refresh lanes run the static gates plus the base-TIP stamp check themselves (the PRs they open never run CI), no gate in docs/performance.md's table is claimed under \`npm run lint\` while measuring a dist/ that lint has not built, and scripts/audit.mjs's header names every stage it runs plus every CI stage it does not.`,
+    `check-ci-claims OK: README names all ${jobs.length} CI jobs (${jobs.join(", ")}), states the axe pass within 5% of its live size, no doc claims a gate the workflow does not run, both data-refresh lanes run the static gates plus the base-TIP stamp check themselves (the PRs they open never run CI), docs/performance.md's gate table and scripts/audit.mjs's header both name where each gate actually runs.`,
   );
 }
 

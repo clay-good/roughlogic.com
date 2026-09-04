@@ -183,12 +183,17 @@ async function main() {
     );
     process.exit(1);
   }
+  // Names on failure and behind --verbose; the green line owes a reader the
+  // count and the budget, not a list.
   console.log(
     "check-render-output-keys OK: " + checked + " _simpleRenderer output reference(s) across " +
     modules.length + " calc-* modules resolve to a key their compute returns. NOT checked here: " +
-    skipped + " compute(s) with a spread or opaque return (budget " + SKIPPED_BUDGET + ") -- " +
-    skippedComputes.sort().join(", ") + ".",
+    skipped + " compute(s) with a spread or opaque return (budget " + SKIPPED_BUDGET +
+    "; --verbose lists them, and test/unit/spread-return-outputs.test.js runs them).",
   );
+  if (process.argv.includes("--verbose")) {
+    console.log("  unchecked: " + skippedComputes.sort().join(", "));
+  }
 }
 
 main().catch((e) => {

@@ -127,6 +127,12 @@ if (skipped > SKIPPED_BUDGET) {
     `Destructure the compute signature so its input keys are visible, or raise the budget deliberately.`);
   process.exit(1);
 }
+// The names go in the FAILURE message and behind --verbose, not into every
+// green run: thirty tile ids on a passing line is a wall in the CI log, and the
+// disclosure the summary owes a reader is the count and the budget.
 console.log(`check-fixture-keys OK: ${checked} fixture(s) checked; every input key matches a compute parameter. ` +
   `NOT checked here: ${skipped} fixture(s) whose compute takes a rest param or a non-destructured signature ` +
-  `(budget ${SKIPPED_BUDGET}) -- ${skippedTiles.sort().join(", ")}.`);
+  `(budget ${SKIPPED_BUDGET}; --verbose lists them).`);
+if (process.argv.includes("--verbose")) {
+  console.log("  unchecked: " + skippedTiles.sort().join(", "));
+}
