@@ -65,7 +65,7 @@ test("a row re-verified today is not left claiming the old stamp", () => {
     CA: "2026-09-04", TX: "2026-09-04", AL: "2026-09-04", MS: "2026-09-04",
     FL: "2026-09-04", WA: "2026-09-04",
     SD: "2026-09-04", IN: "2026-09-04",
-    KS: "2026-09-04",
+    KS: "2026-09-04", PA: "2026-09-04",
   };
   const rechecked = Object.entries(SALES_TAX_NEXUS).filter(([, v]) => v.verified_on !== "2025-01-15");
   assert.deepEqual(rechecked.map(([st]) => st).sort(), Object.keys(LEDGER).sort());

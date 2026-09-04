@@ -488,7 +488,7 @@ export const SALES_TAX_NEXUS = {
   ND: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "N.D. Cent. Code 57-39.2-02.2", verified_on: "2025-01-15" },
   OH: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "Ohio Rev. Code 5741.01(I)(2)(g)-(h)", verified_on: "2026-09-03" },
   OK: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Okla. Stat. tit. 68 sec. 1392", verified_on: "2025-01-15" },
-  PA: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "61 Pa. Code 56.18 (rev. 2019)", verified_on: "2025-01-15" },
+  PA: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "72 P.S. Act 13 of 2019; PA DOR Sales & Use Tax Bulletin 2019-01: $100,000 annual PA gross sales, prior calendar year, NO transaction count, eff. 2019-07-01", verified_on: "2026-09-04" },
   RI: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "R.I. Gen. Laws 44-18.2-3(E) ('remote seller' definition)", verified_on: "2026-09-04" },
   SC: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "S.C. Code Ann. 12-36-1340 (Rev. Rul. 18-14)", verified_on: "2025-01-15" },
   SD: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "S.D. Codified Laws ch. 10-64 (Wayfair home state); SD DOR Remote Seller Bulletin Aug 2025: >$100,000 gross sales, previous or current calendar year; 200-transaction test repealed eff. 2023-07-01", verified_on: "2026-09-04" },

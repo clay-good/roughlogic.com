@@ -245,8 +245,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "61 Pa. Code 56.18 (rev. 2019)",
-      "verified_on": "2025-01-15"
+      "citation": "72 P.S. Act 13 of 2019; PA DOR Sales & Use Tax Bulletin 2019-01: $100,000 annual PA gross sales, prior calendar year, NO transaction count, eff. 2019-07-01",
+      "verified_on": "2026-09-04"
     },
     "RI": {
       "sales_threshold_usd": 100000,
