@@ -484,7 +484,7 @@ export const SALES_TAX_NEXUS = {
   NJ: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "N.J. Stat. Ann. 54:32B-3.5 (P.L. 2018 c.132); NJ Div. of Taxation remote-seller FAQ", verified_on: "2026-09-04" },
   NM: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "N.M. Stat. Ann. 7-9-3.3 (gross receipts)", verified_on: "2025-01-15" },
   NY: { sales_threshold_usd: 500000, transactions_threshold: 100,  combine: "and", combine_note: "NYS DTF nexus publication: both thresholds must be met over the preceding four sales tax quarters, so over $500,000 with 100 or fewer sales does not require registration.", citation: "N.Y. Tax Law 1101(b)(8)(iv); TSB-M-19(4)S", verified_on: "2026-09-03" },
-  NC: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "N.C. Gen. Stat. 105-164.8(b)(9)", verified_on: "2025-01-15" },
+  NC: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "N.C. Gen. Stat. 105-164.8; NCDOR remote sales page: gross sales over $100,000 sourced to NC in the previous or current calendar year, no transaction test; registration due 60 days after crossing (eff. 2026-07-02)", verified_on: "2026-09-04" },
   ND: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "N.D. Cent. Code 57-39.2-02.2", verified_on: "2025-01-15" },
   OH: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "Ohio Rev. Code 5741.01(I)(2)(g)-(h)", verified_on: "2026-09-03" },
   OK: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Okla. Stat. tit. 68 sec. 1392", verified_on: "2025-01-15" },
@@ -499,7 +499,7 @@ export const SALES_TAX_NEXUS = {
   VA: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "Va. Code Ann. 58.1-612(C)(10)-(11)", verified_on: "2026-09-03" },
   WA: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Wash. Rev. Code 82.04.067(1)(c)(i) (current or immediately preceding calendar year; 82.08.052 governed only through 2019-12-31)", verified_on: "2026-09-04" },
   WV: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "W. Va. Code 11-15A-6b(a)(1)-(2)", verified_on: "2026-09-03" },
-  WI: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Wis. Stat. 77.51(13gm)", verified_on: "2025-01-15" },
+  WI: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Wis. Stat. 77.51 small-seller exception as amended by 2021 Wis. Act 1; WI DOR remote-sellers FAQ: $100,000 gross sales, previous or current calendar year; 200-transaction test eliminated eff. 2021-02-20", verified_on: "2026-09-04" },
   WY: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Wyo. Stat. Ann. 39-15-501 (transaction threshold removed 2024)", verified_on: "2025-01-15" },
   DC: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "D.C. Code 47-2001(w), applied by 47-2002.01", verified_on: "2026-09-03" },
   // States with no general sales tax: DE, MT, NH, OR (no nexus threshold applies).

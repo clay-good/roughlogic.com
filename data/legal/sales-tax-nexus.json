@@ -217,8 +217,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "N.C. Gen. Stat. 105-164.8(b)(9)",
-      "verified_on": "2025-01-15"
+      "citation": "N.C. Gen. Stat. 105-164.8; NCDOR remote sales page: gross sales over $100,000 sourced to NC in the previous or current calendar year, no transaction test; registration due 60 days after crossing (eff. 2026-07-02)",
+      "verified_on": "2026-09-04"
     },
     "ND": {
       "sales_threshold_usd": 100000,
@@ -323,8 +323,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Wis. Stat. 77.51(13gm)",
-      "verified_on": "2025-01-15"
+      "citation": "Wis. Stat. 77.51 small-seller exception as amended by 2021 Wis. Act 1; WI DOR remote-sellers FAQ: $100,000 gross sales, previous or current calendar year; 200-transaction test eliminated eff. 2021-02-20",
+      "verified_on": "2026-09-04"
     },
     "WY": {
       "sales_threshold_usd": 100000,
