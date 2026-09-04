@@ -80,8 +80,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Idaho Code 63-3611(2)",
-      "verified_on": "2025-01-15"
+      "citation": "Idaho Code 63-3611(h): cumulative gross receipts from sales delivered into Idaho in excess of $100,000, previous or current calendar year; no transaction test",
+      "verified_on": "2026-09-04"
     },
     "IL": {
       "sales_threshold_usd": 100000,
@@ -224,8 +224,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "N.D. Cent. Code 57-39.2-02.2",
-      "verified_on": "2025-01-15"
+      "citation": "N.D. Cent. Code 57-39.2-02.2: gross sales delivered in-state exceed $100,000 in the previous or current calendar year; no transaction test",
+      "verified_on": "2026-09-04"
     },
     "OH": {
       "sales_threshold_usd": 100000,

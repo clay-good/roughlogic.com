@@ -70,6 +70,7 @@ test("a row re-verified today is not left claiming the old stamp", () => {
     WI: "2026-09-04", NC: "2026-09-04",
     AZ: "2026-09-04", IA: "2026-09-04",
     MO: "2026-09-04", NM: "2026-09-04",
+    ID: "2026-09-04", ND: "2026-09-04",
   };
   const rechecked = Object.entries(SALES_TAX_NEXUS).filter(([, v]) => v.verified_on !== "2025-01-15");
   assert.deepEqual(rechecked.map(([st]) => st).sort(), Object.keys(LEDGER).sort());
@@ -123,6 +124,8 @@ test("a corrected citation stays corrected", () => {
     AZ: /42-5044/,
     // Cited 144.605(2)(d); the remote-vendor paragraph is (2)(e).
     MO: /144\.605\(2\)\(e\)/,
+    // Cited 63-3611(2); the remote-seller definition is subsection (h).
+    ID: /63-3611\(h\)/,
     // Cited RCW 82.08.052, which governed only through 2019-12-31 and still
     // carries Washington's repealed 200-transaction language.
     WA: /82\.04\.067/,
