@@ -133,6 +133,7 @@ async function main() {
 
   let checked = 0;
   let skipped = 0;
+  const skippedComputes = [];
   for (const file of modules) {
     const src = await readFile(resolve(ROOT, file), "utf8");
     let idx = 0;
@@ -150,7 +151,7 @@ async function main() {
       const cm = block.match(/compute:\s*(compute\w+)/);
       if (!cm) continue;
       const info = returnInfo(src, cm[1]);
-      if (!info || info.spread || info.unresolvable) { skipped++; continue; }
+      if (!info || info.spread || info.unresolvable) { skipped++; skippedComputes.push(file + "::" + cm[1]); continue; }
       for (const m of block.matchAll(/\br\.(\w+)\b/g)) {
         checked++;
         if (!info.keys.has(m[1])) {
@@ -169,10 +170,24 @@ async function main() {
     console.error("check-render-output-keys: see failures above.");
     process.exit(1);
   }
+  // A skipped compute is one whose every output reference goes unverified -- the
+  // literal-"undefined" bug this gate exists to catch stays invisible there. The
+  // count was printed and never pinned. Ratchet it.
+  const SKIPPED_BUDGET = 7;
+  if (skipped > SKIPPED_BUDGET) {
+    console.error(
+      "check-render-output-keys FAILED: " + skipped + " compute(s) return a spread or an " +
+      "otherwise opaque object, so their renderer output references are unverified, over a budget " +
+      "of " + SKIPPED_BUDGET + ": " + skippedComputes.sort().join(", ") + ". Return an explicit " +
+      "object literal, or raise the budget deliberately.",
+    );
+    process.exit(1);
+  }
   console.log(
     "check-render-output-keys OK: " + checked + " _simpleRenderer output reference(s) across " +
-    modules.length + " calc-* modules resolve to a key their compute returns (" + skipped +
-    " compute(s) skipped: spread or opaque returns).",
+    modules.length + " calc-* modules resolve to a key their compute returns. NOT checked here: " +
+    skipped + " compute(s) with a spread or opaque return (budget " + SKIPPED_BUDGET + ") -- " +
+    skippedComputes.sort().join(", ") + ".",
   );
 }
 

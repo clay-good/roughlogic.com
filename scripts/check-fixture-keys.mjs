@@ -87,13 +87,14 @@ async function loadFn(mod, fnName) {
 
 const problems = [];
 let checked = 0, skipped = 0;
+const skippedTiles = [];
 for (const ex of examples) {
   const map = COMPUTE_MAP[ex.tile_id];
-  if (!map || !ex.inputs) { skipped++; continue; }
+  if (!map || !ex.inputs) { skipped++; skippedTiles.push(ex.tile_id); continue; }
   const fn = await loadFn(map.module, map.fn);
-  if (typeof fn !== "function") { skipped++; continue; }
+  if (typeof fn !== "function") { skipped++; skippedTiles.push(ex.tile_id); continue; }
   const keys = paramKeys(fn);
-  if (keys === "REST" || !keys || keys.size === 0) { skipped++; continue; }
+  if (keys === "REST" || !keys || keys.size === 0) { skipped++; skippedTiles.push(ex.tile_id); continue; }
   checked++;
   const bad = Object.keys(ex.inputs).filter((k) => !keys.has(k));
   if (bad.length) {
@@ -113,4 +114,19 @@ if (problems.length) {
   );
   process.exit(1);
 }
-console.log(`check-fixture-keys OK: ${checked} fixture(s) checked (${skipped} skipped: rest-param or non-destructured signatures); every input key matches a compute parameter.`);
+// A skipped fixture is a fixture whose input keys nothing verifies against the
+// compute's own parameters -- the exact typo this gate exists to catch. The
+// count was printed and never pinned, so it could climb one tile at a time.
+// Ratchet it: fix a signature and lower the budget, add unchecked surface and
+// raise it deliberately.
+const SKIPPED_BUDGET = 31;
+if (skipped > SKIPPED_BUDGET) {
+  console.error(
+    `check-fixture-keys FAILED: ${skipped} fixture(s) are unchecked (rest-param or ` +
+    `non-destructured signature), over a budget of ${SKIPPED_BUDGET}: ${skippedTiles.sort().join(", ")}. ` +
+    `Destructure the compute signature so its input keys are visible, or raise the budget deliberately.`);
+  process.exit(1);
+}
+console.log(`check-fixture-keys OK: ${checked} fixture(s) checked; every input key matches a compute parameter. ` +
+  `NOT checked here: ${skipped} fixture(s) whose compute takes a rest param or a non-destructured signature ` +
+  `(budget ${SKIPPED_BUDGET}) -- ${skippedTiles.sort().join(", ")}.`);

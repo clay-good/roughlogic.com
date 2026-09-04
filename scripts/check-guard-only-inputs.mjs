@@ -117,6 +117,8 @@ let checked = 0;
 let fnsChecked = 0;
 let fnsTotal = 0;
 
+const skippedWithInputs = [];
+
 const files = (await readdir(ROOT))
   .filter((f) => f.startsWith("calc-") && f.endsWith(".js"))
   .sort();
@@ -129,6 +131,15 @@ for (const file of files) {
   // skipped (the latter shared with check-dead-inputs); a rising skip count on
   // a new function is the signal to widen the parser.
   fnsTotal += (src.match(/^export function compute\w+\(/gm) || []).length;
+  // Name the ones this gate cannot see into, so the blind spot is a reviewable
+  // list rather than a bare count. A param-less reference compute has no inputs
+  // and so cannot have a guard-only one; a named-object signature does, and the
+  // parser simply never matches it.
+  for (const m of src.matchAll(/^export function (compute\w+)\(\s*([^)]*)\)/gm)) {
+    const sig = m[2].trim();
+    if (sig === "" || sig.startsWith("{")) continue;
+    skippedWithInputs.push(file + "::" + m[1]);
+  }
   for (const { fn, params, body } of extractFunctions(src)) {
     fnsChecked++;
     const lines = body.split("\n");
@@ -168,8 +179,28 @@ if (errors.length > 0) {
   console.error("check-guard-only-inputs FAILED with " + errors.length + " guard-only dead input(s).");
   process.exit(1);
 }
+// The comment above says a rising skip count is the signal to widen the parser.
+// Nothing was reading it, so the count could rise silently and a new tile
+// written with a named-object signature would leave this gate without anyone
+// noticing. Ratchet the set that actually has inputs: converting one to a
+// destructured signature lowers the budget, adding one raises it deliberately.
+// All 5 were hand-checked clean on 2026-09-04 (renderer-passed keys vs keys the
+// body reads): rental-worksheet, loan-limits, hud-fmr, rent-vs-buy,
+// pv-performance-ratio.
+const SKIPPED_WITH_INPUTS_BUDGET = 5;
+if (skippedWithInputs.length > SKIPPED_WITH_INPUTS_BUDGET) {
+  console.error(
+    "check-guard-only-inputs FAILED: " + skippedWithInputs.length + " compute function(s) take a " +
+    "named object parameter this gate cannot inspect, over a budget of " + SKIPPED_WITH_INPUTS_BUDGET +
+    ": " + skippedWithInputs.join(", ") + ". Destructure the signature so a guard-only input is " +
+    "visible, or raise the budget deliberately.",
+  );
+  process.exit(1);
+}
 console.log(
   "check-guard-only-inputs OK: " + checked + " parameters across " + fnsChecked + " / " + fnsTotal +
-  " compute functions (" + (fnsTotal - fnsChecked) + " skipped: param-less reference or non-destructured signature); " +
+  " compute functions (" + (fnsTotal - fnsChecked) + " skipped: param-less reference or non-destructured " +
+  "signature). NOT checked here: " + skippedWithInputs.length + " compute(s) take a named object parameter " +
+  "(budget " + SKIPPED_WITH_INPUTS_BUDGET + ") -- " + skippedWithInputs.join(", ") + "; " +
   "no unallowlisted guard-only dead inputs (" + allowlist.entries.length + " reviewed allowlist entries).",
 );
