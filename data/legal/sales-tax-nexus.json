@@ -59,8 +59,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Fla. Stat. 212.0596 (S.B. 50, eff. 2021)",
-      "verified_on": "2025-01-15"
+      "citation": "Fla. Stat. 212.0596(1)(b) (S.B. 50, eff. 2021-07-01; TAXABLE remote sales, previous calendar year)",
+      "verified_on": "2026-09-04"
     },
     "GA": {
       "sales_threshold_usd": 100000,
@@ -309,8 +309,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Wash. Rev. Code 82.08.052",
-      "verified_on": "2025-01-15"
+      "citation": "Wash. Rev. Code 82.04.067(1)(c)(i) (current or immediately preceding calendar year; 82.08.052 governed only through 2019-12-31)",
+      "verified_on": "2026-09-04"
     },
     "WV": {
       "sales_threshold_usd": 100000,
