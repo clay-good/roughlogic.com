@@ -11,7 +11,10 @@
 //      metric token while a sibling option is the US counterpart.
 //   2. Metric-labeled fields: a make* field label whose parenthetical
 //      unit matches the metric denylist -- "(m)", "(deg C)", "(kPa)" --
-//      without a matching allowlist entry.
+//      without a matching allowlist entry. Input labels, factory `label:`
+//      properties, AND the output labels makeOutputLine takes after its
+//      region argument -- the last of those was claimed by this header and
+//      not actually scanned until 2026-09-04.
 //
 // The allowlist (scripts/us-defaults-allowlist.json) codifies the spec
 // §2 exception class: metric that IS US trade practice (NEC deg C
@@ -72,12 +75,17 @@ for (const e of allowlist.entries) {
   }
 }
 
+const used = new Set();
 function allowed(file, hit) {
-  return allowlist.entries.some(
-    (e) =>
-      (e.module === "*" || e.module === file) &&
-      (e.match === "*" || hit.toLowerCase().includes(e.match.toLowerCase())),
-  );
+  let any = false;
+  for (const e of allowlist.entries) {
+    if ((e.module === "*" || e.module === file) &&
+        (e.match === "*" || hit.toLowerCase().includes(e.match.toLowerCase()))) {
+      used.add(e);
+      any = true;
+    }
+  }
+  return any;
 }
 
 // Extract the source text of every `name(...)` call, balancing parens.
@@ -125,7 +133,13 @@ for (const file of files) {
   // properties.
   function checkLabel(labelText, line, kind) {
     for (const paren of labelText.matchAll(/\(([^()]*)\)/g)) {
+      // "430.32(C)" and "220.61(C)" are code-section subdivisions, not degrees
+      // Celsius. A parenthetical butted straight against a digit is a citation.
+      if (/\d$/.test(labelText.slice(0, paren.index))) continue;
       const parts = paren[1].split(/[,/;]/).map((p) => p.trim().toLowerCase());
+      // "(A/B/C)" is the three phases and "(A / B / C)" is a triangle's
+      // vertices. A bare "c" alongside other bare letters is a label, not a unit.
+      if (parts.length > 1 && parts.every((pp) => /^[a-z]$/.test(pp))) continue;
       const hit = parts.find((p) => METRIC_LABEL_TOKENS.has(p));
       if (hit && !allowed(file, labelText)) {
         errors.push(
@@ -145,6 +159,33 @@ for (const file of files) {
   for (const m of src.matchAll(/label:\s*"((?:[^"\\]|\\.)*)"/g)) {
     checkLabel(m[1], src.slice(0, m.index).split("\n").length, "field-spec");
   }
+  // Output labels reach makeOutputLine AFTER the region argument, so the
+  // field-builder pattern above -- which requires the string literal right
+  // after the open paren -- never matched one. The gate's own header claims it
+  // covers output specs, and it did cover the factory `label:` form; ten
+  // region-first output labels carrying a metric token were invisible to it.
+  for (const m of src.matchAll(
+    /(\w*[Oo]utput\w*)\(\s*[A-Za-z_$][\w$.]*\s*,\s*"((?:[^"\\]|\\.)*)"\s*,/g,
+  )) {
+    checkLabel(m[2], src.slice(0, m.index).split("\n").length, "output");
+  }
+}
+
+// An exemption that waives nothing is not a reviewed exception, it is a claim
+// nobody can check -- and this file's header says entries are reviewed like
+// citations. On 2026-09-04 seven of 73 matched no finding at all: four named a
+// token combination the scanner can never produce ("uS/cm" splits to
+// "us" + "cm at 25 c", neither a token), and three papered over false positives
+// fixed properly in the same change. Fail on a dead entry so the list stays
+// exactly as large as the exceptions it actually grants.
+for (const e of allowlist.entries) {
+  if (!used.has(e)) {
+    errors.push(
+      "us-defaults allowlist entry " + (e.module || "*") + " match=" + JSON.stringify(e.match) +
+      " waives nothing: no label in the catalog is both flagged and matched by it. Remove it, " +
+      "or fix the `match` string to the label it was written for.",
+    );
+  }
 }
 
 if (errors.length) {
@@ -154,6 +195,7 @@ if (errors.length) {
 }
 console.log(
   "check-us-defaults OK: " + files.length + " calc modules scanned; no metric-defaulted selects, " +
-  "no unallowlisted metric field labels (" + allowlist.entries.length + " reviewed allowlist entries, " +
+  "no unallowlisted metric input, field-spec or output label (" + allowlist.entries.length +
+  " reviewed allowlist entries, every one of them waiving at least one live finding, " +
   allowlist.entries.filter((e) => e.match === "*").length + " of them module-wide).",
 );

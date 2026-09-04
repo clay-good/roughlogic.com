@@ -89,6 +89,7 @@ The hard part of a calculator catalog is not the arithmetic. It is proving, at s
 | `check-shell-mobile` | zero page-level horizontal scroll on **every** shell at 320 px portrait. Landscape and 200% text zoom run over a representative sample -- every group hub, the home shell and an evenly-strided slice of tool shells -- because all shells come from one template and the only per-tile variable is string length |
 | `check-feedback-loop` | every current and future calculator retains the shared defensive D1 reporting path |
 | `check-tile-registries` | the new-tile checklist names every registry that holds all 1,804 ids, and calls no partial one mandatory |
+| `check-us-defaults` | no calculator opens metric-first: every input label, factory field spec **and output label** whose parenthetical carries a metric unit needs a reviewed allowlist entry, and every entry in that allowlist must waive at least one live finding -- a dead exemption fails the build. Output labels went unscanned until 2026-09-04. It is a label heuristic: it cannot judge whether a default *value* is sensible |
 | `check-build-hermetic` | the build fetches nothing; every value in `data/` is an in-tree constant, reviewable in a diff, and no shipped string claims otherwise |
 | `build-citation-strings` | the source stamp a tile prints is the one `docs/citation-discipline.md` documents, word for word |
 | `check-community-health` | the files GitHub renders on the repo page exist, resolve, and parse (a malformed issue form fails silently otherwise) |

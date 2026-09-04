@@ -1,5 +1,5 @@
 {
-  "_comment": "spec-v593 section 2 exception class: metric that IS US trade practice. Each entry waives check-us-defaults findings whose label contains `match` in `module` (module \"*\" = any). Additions are reviewed like citations, against the section-2 acid test: would a US tradesperson read this number in this unit off their own instrument, code table, or product label?",
+  "_comment": "spec-v593 section 2 exception class: metric that IS US trade practice. Each entry waives check-us-defaults findings whose label contains `match` in `module` (module \"*\" = any). Additions are reviewed like citations, against the section-2 acid test: would a US tradesperson read this number in this unit off their own instrument, code table, or product label? Every entry must waive at least one finding no other entry already waives: on 2026-09-04 seven did not (four matched a token combination the scanner can never produce, three were subsumed by a broader entry in the same module) and were removed.",
   "entries": [
     {
       "module": "*",
@@ -27,18 +27,6 @@
     },
     {
       "module": "*",
-      "match": "uS/cm",
-      "family": "water/wastewater operations",
-      "justification": "Conductivity meters read uS/cm at 25 C."
-    },
-    {
-      "module": "*",
-      "match": "(L/x)",
-      "family": "not metric",
-      "justification": "Span deflection ratio L/x (L = span), not liters."
-    },
-    {
-      "module": "*",
       "match": "(g)",
       "family": "not metric (acceleration)",
       "justification": "Peak ground / seismic acceleration in g (gravity), not grams: ASCE 7 and USGS publish in g.",
@@ -46,13 +34,7 @@
     },
     {
       "module": "calc-electrical.js",
-      "match": "(C)",
-      "family": "NEC/IEEE electrical",
-      "justification": "NEC 310/table ambients and conductor ratings are published in deg C columns."
-    },
-    {
-      "module": "calc-electrical.js",
-      "match": "(°C)",
+      "match": "(\u00b0C)",
       "family": "NEC/IEEE electrical",
       "justification": "ICEA P-32-382 conductor short-circuit limits are published in deg C."
     },
@@ -88,12 +70,6 @@
     },
     {
       "module": "calc-lowvoltage.js",
-      "match": "Permanent-link length (m)",
-      "family": "standards defined in SI",
-      "justification": "TIA-568 permanent link is specified in meters."
-    },
-    {
-      "module": "calc-lowvoltage.js",
       "match": "cords (m)",
       "family": "standards defined in SI",
       "justification": "TIA-568 cord budgets are specified in meters."
@@ -103,12 +79,6 @@
       "match": "dB/km",
       "family": "standards defined in SI",
       "justification": "Fiber attenuation is specified in dB/km on every datasheet."
-    },
-    {
-      "module": "calc-lowvoltage.js",
-      "match": "cable temperature (°C)",
-      "family": "standards defined in SI",
-      "justification": "TIA-568 temperature derating tables are published in deg C."
     },
     {
       "module": "calc-earthwork.js",
@@ -190,13 +160,13 @@
     },
     {
       "module": "calc-solar.js",
-      "match": "temp (°C)",
+      "match": "temp (\u00b0C)",
       "family": "power and billing (solar datasheet)",
       "justification": "Module datasheets publish record temps and coefficients in deg C."
     },
     {
       "module": "calc-solar.js",
-      "match": "temperature (°C)",
+      "match": "temperature (\u00b0C)",
       "family": "power and billing (solar datasheet)",
       "justification": "Cell/ambient temperature model inputs are datasheet deg C."
     },
@@ -220,13 +190,13 @@
     },
     {
       "module": "calc-solar.js",
-      "match": "W/m²",
+      "match": "W/m\u00b2",
       "family": "power and billing (solar datasheet)",
       "justification": "Plane-of-array irradiance is published in W/m^2."
     },
     {
       "module": "calc-restoration.js",
-      "match": "spores/m³",
+      "match": "spores/m\u00b3",
       "family": "lab and IH practice",
       "justification": "Spore-trap lab reports count spores per cubic meter."
     },
@@ -247,12 +217,6 @@
       "match": "per cassette (L)",
       "family": "lab and IH practice",
       "justification": "Sampling cassette volumes are specified in liters."
-    },
-    {
-      "module": "calc-restoration.js",
-      "match": "Filter capacity (g)",
-      "family": "product/spec conventions",
-      "justification": "Carbon filter adsorption capacity is published in grams on the product sheet."
     },
     {
       "module": "calc-agriculture.js",
@@ -291,14 +255,8 @@
       "justification": "Loan Estimate section C (services you can shop for), not Celsius."
     },
     {
-      "module": "calc-service.js",
-      "match": "220.61(C)",
-      "family": "not metric",
-      "justification": "NEC subsection letter in a code citation, not Celsius."
-    },
-    {
       "module": "calc-water.js",
-      "match": "Water temperature (°C; 0.5 - 25)",
+      "match": "Water temperature (\u00b0C; 0.5 - 25)",
       "family": "water/wastewater operations",
       "justification": "SWTR CT tables are published against deg C water temperature."
     },
@@ -336,7 +294,7 @@
       "module": "calc-motor.js",
       "match": "Marked temperature rise",
       "family": "electrical / motors",
-      "justification": "The motor nameplate itself marks temperature rise in °C, and NEC 430.32(A)(1) states its 40 °C threshold in °C. The tradesperson reads this number off the nameplate in this unit."
+      "justification": "The motor nameplate itself marks temperature rise in \u00b0C, and NEC 430.32(A)(1) states its 40 \u00b0C threshold in \u00b0C. The tradesperson reads this number off the nameplate in this unit."
     },
     {
       "module": "calc-stage.js",
@@ -421,6 +379,24 @@
       "match": "Metal density (g/cm3)",
       "family": "Faraday's law of electrolysis",
       "justification": "Plating and metallurgical references list metal density in g/cm3 universally, including the ones on a US plating shop's shelf, and it pairs directly with the g/s mass rate Faraday's law produces. A US plater reads 8.9 for nickel off that table; lb/cubic ft would have to be converted back before it could be used."
+    },
+    {
+      "module": "calc-agriculture.js",
+      "match": "Recommendation (kg/ha)",
+      "family": "agronomy",
+      "justification": "A metric COMPANION to the primary US output: the same tile prints \"Blend (lb/acre)\" directly above it, and kg/ha is how agronomic rate recommendations and fertilizer research are published. US-first with a metric sibling, not metric-defaulted."
+    },
+    {
+      "module": "calc-cross.js",
+      "match": "Distance (km)",
+      "family": "navigation",
+      "justification": "A metric COMPANION: the haversine tile prints \"Distance (miles)\" directly above it. Aviation and marine plots read both, and the cited Earth radius is given in mi and km."
+    },
+    {
+      "module": "calc-lowvoltage.js",
+      "match": "Temperature (\u00b0C)",
+      "family": "instrumentation sensor curves",
+      "justification": "RTD (IEC 60751 Callendar-Van Dusen), thermistor Beta, and Steinhart-Hart curves are DEFINED in degrees C -- the coefficients have no Fahrenheit form -- and every one of the three tiles prints \"Temperature (\u00b0F)\" on the next line. Verified 2026-09-04 when output labels were first scanned."
     }
   ]
 }
