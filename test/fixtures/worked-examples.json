@@ -13893,10 +13893,10 @@
   },
   {
    "tile_id": "sales-tax-nexus",
-   "source_publisher": "California (Cal. Rev. & Tax. Code 6203(c); CDTFA guidance)",
+   "source_publisher": "California (Cal. Rev. & Tax. Code 6203; CDTFA Wayfair guidance (eff. 2019-04-01))",
    "source_title": "Per-state economic-nexus thresholds (sales $ + transactions, post-Wayfair)",
-   "source_edition_or_year": "Cal. Rev. & Tax. Code 6203(c) (CA $500,000 sales threshold; no transaction threshold; verified 2025-01-15)",
-   "source_section_or_page": "CA -> $500,000 sales threshold; null transactions threshold; verified 2025-01-15",
+   "source_edition_or_year": "Cal. Rev. & Tax. Code 6203; CDTFA Wayfair guidance (CA $500,000 sales threshold; no transaction threshold; verified 2026-09-04)",
+   "source_section_or_page": "CA -> $500,000 sales threshold; null transactions threshold; verified 2026-09-04",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -13916,13 +13916,13 @@
      }
     },
     "citation": {
-     "value": "Cal. Rev. & Tax. Code 6203(c); CDTFA guidance",
+     "value": "Cal. Rev. & Tax. Code 6203; CDTFA Wayfair guidance (eff. 2019-04-01)",
      "tolerance": {
       "abs": 0
      }
     },
     "verified_on": {
-     "value": "2025-01-15",
+     "value": "2026-09-04",
      "tolerance": {
       "abs": 0
      }

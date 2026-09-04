@@ -37,8 +37,8 @@
       "sales_threshold_usd": 500000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Cal. Rev. & Tax. Code 6203(c); CDTFA guidance",
-      "verified_on": "2025-01-15"
+      "citation": "Cal. Rev. & Tax. Code 6203; CDTFA Wayfair guidance (eff. 2019-04-01)",
+      "verified_on": "2026-09-04"
     },
     "CO": {
       "sales_threshold_usd": 100000,
@@ -280,8 +280,8 @@
       "sales_threshold_usd": 500000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Tex. Tax Code 151.107(a)(8); Comptroller Rule 3.286",
-      "verified_on": "2025-01-15"
+      "citation": "Tex. Tax Code 151.107(a)(8); Comptroller Rule 3.286; Pub. 94-108 (total Texas revenue, preceding 12 months)",
+      "verified_on": "2026-09-04"
     },
     "UT": {
       "sales_threshold_usd": 100000,
