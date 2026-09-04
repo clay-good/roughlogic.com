@@ -85,7 +85,20 @@ const STAGES = [
 // five minutes; putting it here would make the gate something contributors
 // skip. Named here and in docs/contributor-checklist.md rather than left as
 // a silent difference, because a gap nobody states is a gap nobody runs.
-const NOT_RUN_HERE = "check:shell-mobile (needs a headless browser; ~5 min -- run `npm run check:shell-mobile` before a layout or type change)";
+// All three CI stages this command does not run, not just the one. The line
+// used to name check:shell-mobile alone, which read as though it were the only
+// gap; the axe sweep and the rest of the Playwright suite are also ahead of a
+// contributor whose audit came back green. check-ci-claims pins this list to
+// the difference between STAGES and the commands ci.yml actually runs.
+// check-ci-claims reads the FIRST gate name out of this string to know which
+// post-build gate the audit is allowed to skip, so keep check:shell-mobile
+// first. It tolerates the line break; it did not until 2026-09-04, when
+// reformatting this constant made the exemption stop counting and the gate go
+// red. Red was the right failure, but the coupling is worth knowing about.
+const NOT_RUN_HERE =
+  "check:shell-mobile, test:a11y, test:e2e:ci -- all need a headless browser. " +
+  "After `npx playwright install chromium`: `npm run check:shell-mobile` before a layout or type change, " +
+  "`npm run test:e2e` for the other two. A green audit is not a green CI.";
 
 function banner(stage, status) {
   // ASCII-only per the global typographic policy.

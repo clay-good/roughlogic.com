@@ -187,7 +187,12 @@ async function main() {
   const auditStages = new Set(
     [...auditSrc.matchAll(/\{\s*name:\s*"([^"]+)"/g)].map((m) => m[1]),
   );
-  const notRunHere = /const NOT_RUN_HERE = "([a-z:-]+)/.exec(auditSrc);
+  // Tolerate a line break or extra spacing after the `=`. The anchored form
+  // stopped matching the moment the constant was reformatted, which made a
+  // stated exemption look like a missing gate. Same lesson as the `run:` block
+  // above: a parser that encodes one formatting choice checks nothing when the
+  // formatting changes.
+  const notRunHere = /const NOT_RUN_HERE\s*=\s*\n?\s*"([a-z:-]+)/.exec(auditSrc);
   const exempt = notRunHere ? notRunHere[1] : null;
   // Match the command anywhere in a `run:` block, not only where it starts the
   // line. A step written as a multi-line block with an environment prefix --
