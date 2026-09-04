@@ -139,8 +139,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": 200,
       "combine": "or",
-      "citation": "Md. Code Ann., Tax-Gen. 11-701(b)(2)(iii)",
-      "verified_on": "2025-01-15"
+      "citation": "COMAR 03.06.01.33 B(5)(a)-(b) (out-of-State vendor)",
+      "verified_on": "2026-09-04"
     },
     "MA": {
       "sales_threshold_usd": 100000,
@@ -195,8 +195,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": 200,
       "combine": "or",
-      "citation": "N.J. Stat. Ann. 54:32B-3.5",
-      "verified_on": "2025-01-15"
+      "citation": "N.J. Stat. Ann. 54:32B-3.5 (P.L. 2018 c.132); NJ Div. of Taxation remote-seller FAQ",
+      "verified_on": "2026-09-04"
     },
     "NM": {
       "sales_threshold_usd": 100000,

@@ -61,7 +61,7 @@ test("a row re-verified today is not left claiming the old stamp", () => {
     NY: "2026-09-03", OH: "2026-09-03", UT: "2026-09-03", VA: "2026-09-03",
     VT: "2026-09-03", WV: "2026-09-03",
     // Read 2026-09-04 against the state's own published text.
-    NV: "2026-09-04", RI: "2026-09-04",
+    NV: "2026-09-04", RI: "2026-09-04", MD: "2026-09-04", NJ: "2026-09-04",
   };
   const rechecked = Object.entries(SALES_TAX_NEXUS).filter(([, v]) => v.verified_on !== "2025-01-15");
   assert.deepEqual(rechecked.map(([st]) => st).sort(), Object.keys(LEDGER).sort());
@@ -85,6 +85,10 @@ test("a row read and found correct still cites the provision that was read", () 
     // test comes from the Tax Commission's approved regulation, read from the
     // enrolled PDF where new matter is italicised and deletions bracketed.
     NV: /R189-18/,
+    // Maryland's citation was wrong the same way Nevada's was: Tax-Gen
+    // 11-701(b)(2)(iii) is about entering the State to service or repair.
+    MD: /COMAR 03\.06\.01\.33/,
+    NJ: /54:32B-3\.5/,
   };
   for (const [st, re] of Object.entries(cites)) {
     assert.match(SALES_TAX_NEXUS[st].citation, re, st + " must cite the subsection read");
