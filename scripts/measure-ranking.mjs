@@ -12,6 +12,17 @@
 //            repo: 21,000 rows of recorded human intent.
 //   names    every tile should rank first for its own name.
 //   ids      every tile should rank first for its own id, hyphens as spaces.
+//   asked    the phrasing README's very first instruction teaches -- "Type the
+//            job the way you'd say it" -- around each tile's own name. Its
+//            ground truth is not invented either: a tile that already ranks
+//            first for its bare name must still rank first when the words a
+//            person actually types surround it. Tiles that miss on the bare
+//            name are excluded, so this measures the OPENER and nothing else.
+//            It read 100% the day it was written, which is the point: the
+//            primary documented path was working and NOTHING measured it, so a
+//            tokenizer change that stopped stripping "how many" would have
+//            broken it while all three sets above stayed green -- none of them
+//            carries a question word.
 //
 // Run it before and after any change to search-discovery.js and compare all
 // three. A change that raises one and lowers another is a trade, and the
@@ -94,7 +105,7 @@
 
 import { readFile } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SHOW_MISSES = process.argv.includes("--misses");
@@ -141,11 +152,57 @@ for (const row of aliases) {
   if (target) aliasRows.push({ phrase: row.term, target });
 }
 
+// Openers taken from the README's own worked phrasings and the four example
+// questions the home view offers, not from what happened to pass.
+// Three shapes, not a longer list: a leading question word, a leading article,
+// and a trailing noun. Any tokenizer change that stopped stripping filler shows
+// on all three, and the harness is already the slowest thing in the repo -- five
+// forms over every name-winner pushed a full run past five minutes.
+const ASK_FORMS = [
+  (n) => "how many " + n,
+  (n) => "what is the " + n,
+  (n) => n + " calculator",
+];
+
+// Rows for the `asked` set, over every `stride`-th tile. A tile that does not
+// already win on its bare name is skipped: this set measures what the opener
+// costs, and a name that never won cannot lose.
+export function askedRows(stride = 1) {
+  const rows = [];
+  for (let i = 0; i < TOOLS.length; i += stride) {
+    const t = TOOLS[i];
+    if ((rank(t.name) || [])[0] !== t.id) continue;
+    for (const form of ASK_FORMS) rows.push({ phrase: form(t.name), target: t.id });
+  }
+  return rows;
+}
+
+// Returns the phrasings that lose a tile it already won on its bare name.
+export function measureAsked(stride = 1) {
+  const misses = [];
+  for (const { phrase, target } of askedRows(stride)) {
+    const got = rank(phrase);
+    if (!got || got[0] !== target) misses.push({ phrase, target, got: got ? got[0] : null });
+  }
+  return misses;
+}
+
+// The full asked sweep costs about as much as the other three sets combined,
+// so it is opt-in here and the unit test pins a strided sample instead. Default
+// runtime is unchanged from before this set existed.
+const WITH_ASKED = process.argv.includes("--asked");
+
+// Importing this module must not run the sweep: test/unit pins the `asked` set
+// through measureAsked() and would otherwise pay for all three others first.
+const RUN_AS_CLI = process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url;
+if (RUN_AS_CLI) {
 const all = {
   aliases: measure("aliases", aliasRows),
   names: measure("names", TOOLS.map((t) => ({ phrase: t.name, target: t.id }))),
   ids: measure("ids", TOOLS.map((t) => ({ phrase: t.id.replace(/-/g, " "), target: t.id }))),
 };
+if (WITH_ASKED) all.asked = measure("asked", askedRows());
+else console.log("asked    (skipped; pass --asked for the question-phrasing sweep)");
 
 if (SHOW_MISSES) {
   for (const [label, misses] of Object.entries(all)) {
@@ -155,4 +212,5 @@ if (SHOW_MISSES) {
 } else {
   const total = Object.values(all).reduce((a, m) => a + m.length, 0);
   console.log(`\n${total} miss(es) across the three sets; re-run with --misses to list them.`);
+}
 }
