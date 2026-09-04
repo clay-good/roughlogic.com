@@ -91,6 +91,7 @@ Threat: A data shard is modified in transit or in a stale CDN cache and serves w
 Controls:
 - HTTPS enforced; HSTS preloaded with one-year max-age.
 - Data-shard integrity is provided by the same-origin check, the per-manifest SHA-256 verified at startup, and the per-shard SHA-256 verified at fetch. The site's own HTML, CSS, and JavaScript carry no `integrity=` attribute; they are same-origin and covered by HTTPS and CSP, not by SRI.
+- **Measured, not asserted:** `test/integration/integrity-banner.test.js` rewrites `data/integrity.json` in flight so a real manifest fails its recorded hash, and checks that a reader is actually warned -- the banner visible, carrying `role="alert"`, naming the dataset -- and that the page keeps working, because a control that blocks on one corrupted byte is a denial of service rather than a safeguard. Before 2026-09-04 the failure path was proven only at the function level, and the only assertion about the banner was that it is absent when nothing is wrong, which a deleted banner satisfies.
 - Visible data version stamps on every reference utility view.
 
 ### T5. Clickjacking
