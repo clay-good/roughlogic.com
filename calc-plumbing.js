@@ -338,7 +338,7 @@ export function pressureConvert({ value, from, to }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Convert all to Pa first.
   const toPa = {
-    psi: 6894.757293168,
+    psi: 6894.757293168361,
     kPa: 1000,
     bar: 100000,
     in_h2o: 248.84,

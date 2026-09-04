@@ -2677,7 +2677,7 @@ test("monotonicity: computeNoiseDose dose_percent is strictly increasing in hour
 });
 
 test("monotonicity: computeBrakePadLife ke_J is strictly increasing in vehicle_weight_lb at fixed speed (linear pin)", () => {
-  // Group K. KE = 0.5 * m * v^2; m_kg = lb * 0.4536; v_ms = mph *
+  // Group K. KE = 0.5 * m * v^2; m_kg = lb * 0.45359237 (exact); v_ms = mph *
   // 0.4470. Linear in vehicle_weight_lb at fixed speed. Doubling weight
   // doubles ke_J. Also pin quadratic-in-speed: doubling speed quadruples
   // ke_J at fixed weight.

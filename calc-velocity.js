@@ -296,7 +296,7 @@ export function computeDpFlowMeter({ pipe_id_in = 0, bore_in = 0, dp_psi = 0, cd
   const A2 = Math.PI / 4 * d_m * d_m; // throat area, m^2
   const Apipe = Math.PI / 4 * D_m * D_m; // pipe area, m^2
   const beta = d / D;
-  const dp_pa = dp * 6894.757;
+  const dp_pa = dp * 6894.757293168361;
   const rho = rhoUS * 16.018463; // kg/m^3
   const q_m3s = Cd * A2 * Math.sqrt(2 * dp_pa / (rho * (1 - Math.pow(beta, 4))));
   const flow_gpm = q_m3s * 15850.323;

@@ -3040,7 +3040,7 @@ export function computeGroundingElectrodeResistance({
     if (!(A_ft2 > 0)) return { error: "Plate area must be positive (ft^2)." };
     if (!(s_ft > 0)) return { error: "Plate burial depth must be positive (ft)." };
     // Convert: 1 ft^2 = 0.0929 m^2; rho_ohm_m = rho_ohm_cm / 100.
-    const A_m2 = A_ft2 * 0.092903;
+    const A_m2 = A_ft2 * 0.09290304;
     const rho_ohm_m = rho / 100;
     R = (rho_ohm_m / 4) * Math.sqrt(Math.PI / A_m2);
   }
@@ -3819,7 +3819,7 @@ export const luxFootcandleExample = { inputs: { mode: "convert", footcandles: 10
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderLuxFootcandle(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Per the IES Lighting Handbook lumen method and the exact 1 footcandle = 10.764 lux conversion (1 ft^2 = 0.092903 m^2). The room method returns an AVERAGE maintained illuminance, not a point value. Pairs with the lighting-density tile. Public photometric relations.";
+  citationEl.textContent = "Citation: Per the IES Lighting Handbook lumen method and the footcandle-to-lux conversion that follows from the exact 1 ft^2 = 0.09290304 m^2 (1 fc = 10.7639 lux to six figures). The room method returns an AVERAGE maintained illuminance, not a point value. Pairs with the lighting-density tile. Public photometric relations.";
 
   const mode = makeSelect("Mode", "lxfc-mode", [
     { value: "convert", label: "Convert lux <-> footcandle", selected: true },

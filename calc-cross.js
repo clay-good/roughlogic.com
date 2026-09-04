@@ -77,7 +77,7 @@ export const UNITS = {
       kPa: { factor: 1000 },
       MPa: { factor: 1e6 },
       bar: { factor: 100000 },
-      psi: { factor: 6894.757293168 },
+      psi: { factor: 6894.757293168361 },
       atm: { factor: 101325 },
       in_h2o: { factor: 248.84 },
       ft_h2o: { factor: 2989.067 },

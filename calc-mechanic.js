@@ -406,12 +406,12 @@ export function computeBrakePadLife({ vehicle_weight_lb = 0, speed_delta_mph = 0
   let frontPct = Number(front_bias_pct);
   if (!Number.isFinite(frontPct) || frontPct <= 0 || frontPct >= 100) frontPct = 50;
   // Kinetic energy: KE = 0.5 * m * v^2. Convert lb -> kg, mph -> m/s.
-  const m_kg = vehicle_weight_lb * 0.4536;
-  const v_ms = speed_delta_mph * 0.4470;
+  const m_kg = vehicle_weight_lb * 0.45359237;
+  const v_ms = speed_delta_mph * 0.44704;
   const ke_J = 0.5 * m_kg * v_ms * v_ms;
   const ke_kJ = ke_J / 1000;
   // Rotor temp rise per stop (rough): assume ~20% of energy absorbed by rotor; cast iron specific heat ~ 460 J/(kg*K).
-  const rotor_kg = rotor_mass_lb * 0.4536;
+  const rotor_kg = rotor_mass_lb * 0.45359237;
   const rotor_temp_rise_C = rotor_kg > 0 ? (0.20 * ke_J) / (rotor_kg * 460) : null;
   // Pad life: each pad covers ~ ke_kJ * wear_rate per stop.
   const wear_per_stop_mm = ke_kJ * wear_rate;

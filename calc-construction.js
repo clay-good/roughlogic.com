@@ -3866,7 +3866,7 @@ export function computeMetalWeight({ shape, dia_in, id_in, side_in, width_in, he
   if (!(area > 0) || !Number.isFinite(area)) return { error: "Cross-section area is not valid for the given dimensions." };
   const perPiece = area * len * density;
   const totalLb = perPiece * qty;
-  const totalKg = totalLb * 0.453592;
+  const totalKg = totalLb * 0.45359237;
   return {
     cross_section_area_in2: Number.isFinite(area) ? area : null,
     weight_per_piece_lb: Number.isFinite(perPiece) ? perPiece : null,

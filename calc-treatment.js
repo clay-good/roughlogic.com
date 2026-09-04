@@ -1179,7 +1179,7 @@ function _waterViscosity(t) {
 // accepted -- the US key wins when present -- so the field keys the page shows
 // are real compute parameters and the agent door advertises the same units a
 // person sees. Fixtures stay correlation-native.
-const _FGV_W_PER_HP = 745.699872;
+const _FGV_W_PER_HP = 745.6998715822702;
 const _FGV_M3_PER_GAL = 0.003785411784;
 // A US field counts as supplied whenever the caller names it at all -- an
 // empty page field must fail its own guard, not fall through to the metric

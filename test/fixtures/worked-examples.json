@@ -9334,8 +9334,7 @@
       "abs": 0.05
      }
     },
-    "miles_until_worn": {
-     "value": 8173,
+    "miles_until_worn": { "value": 8172,
      "tolerance": {
       "abs": 1
      }

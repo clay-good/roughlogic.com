@@ -4490,8 +4490,11 @@ test("bounds: calc-mechanic computeBrakePadLife pins KE = 0.5 * m * v^2 and the 
           pad_thickness_mm: 12, pad_material, rotor_mass_lb: 18,
         });
         assert.ok(!r.error, `w=${vehicle_weight_lb} v=${speed_delta_mph} ${pad_material}: ${JSON.stringify(r)}`);
-        const m_kg = vehicle_weight_lb * 0.4536;
-        const v_ms = speed_delta_mph * 0.4470;
+        // The pound is exact by definition: 1 lb = 0.45359237 kg. Written as the
+        // definition, not a rounding -- a decimal literal here would pin whatever
+        // the module happens to use, which is how 0.4536 survived in calc-mechanic.
+        const m_kg = vehicle_weight_lb * 0.45359237;
+        const v_ms = speed_delta_mph * 0.44704;
         const expected_ke = 0.5 * m_kg * v_ms * v_ms;
         assert.ok(Math.abs(r.ke_J - expected_ke) < 1e-6, `KE identity`);
         assert.ok(Math.abs(r.ke_kJ - expected_ke / 1000) < 1e-9, `kJ identity`);
