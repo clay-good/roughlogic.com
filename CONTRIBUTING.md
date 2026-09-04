@@ -21,6 +21,14 @@ If you changed layout or type, also run `npm run check:shell-mobile`; it drives
 every static shell through a headless browser at 320 px and is the one CI
 post-build gate `npm run audit` does not include.
 
+A green audit is not a green CI, and the difference is worth knowing before you
+open the pull request: everything that needs a browser stays out of that
+command, so `test:a11y` (the axe-core sweep over every route), `test:e2e:ci`
+(the rest of the Playwright suite) and `check:shell-mobile` run only in CI. If
+you have run `npx playwright install chromium`, `npm run test:e2e` covers the
+first two locally. `check-ci-claims` fails the build if a stage is added to CI
+without either joining the audit chain or being named here.
+
 Then paste the matching section of
 [docs/contributor-checklist.md](docs/contributor-checklist.md) into your PR
 description and tick it. The pull-request template already points at it.

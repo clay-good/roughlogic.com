@@ -6,25 +6,38 @@
 // command that any contributor can run before opening a pull request."
 // Spec-v10 §14 then names it in the per-release ritual.
 //
-// This script chains the gates in the order a fresh contributor wants:
-//   1. lint        - all the static + content checks (grep, ngrams, v6
-//                    discipline, manifests, citation freshness,
-//                    citation-strings in-sync, discoverability,
-//                    worked-examples, tile-meta, wiring (v12 G.2 + G.4),
-//                    module sizes, home-view payload).
-//   2. test        - the full Node:test unit suite.
-//   3. build       - produces dist/.
-//   4. check:dist  - spec-v12 §G.3 dist/-vs-runtime cross-check. Walks
-//                    every shipped HTML / JS / CSS / JSON under dist/
-//                    and resolves every same-origin reference; a
-//                    dangling reference fails CI.
-//   5. check:shells - spec-v13 Phase G shell content gate: every
-//                    prerendered shell carries a within-cap title /
-//                    description, canonical, OG / Twitter, an
-//                    allowlisted JSON-LD block, the spec-v45 formula /
-//                    source citation, and a within-budget gzip size.
-//   6. data:verify - re-checks SHA-256 hashes of every shard against
-//                    scripts/expected-hashes.json.
+// This script chains the gates in the order a fresh contributor wants. The
+// authoritative list is STAGES below, not this comment: it enumerated six
+// stages while STAGES ran ten, so check-ci-claims now compares the two and
+// fails if they drift.
+//
+//   1. lint               - every static + content check (57 gates).
+//   2. test               - the full Node:test unit suite.
+//   3. build              - produces dist/.
+//   4. check:dist         - spec-v12 §G.3 dist/-vs-runtime cross-check: every
+//                           same-origin reference under dist/ resolves.
+//   5. check:shells       - spec-v13 Phase G shell content gate.
+//   6. check:module-sizes - the per-module gzip cap. It measures the BUILT
+//                           copy, which is why it sits here and not in lint,
+//                           where it no-ops for want of a dist/.
+//   7. check:shell-values - no NaN / undefined / empty prerendered answers.
+//   8. check:lastmod      - the per-URL <lastmod> ledger matches dist/.
+//   9. data:verify        - SHA-256 of every shard vs scripts/expected-hashes.json.
+//  10. check:data-stamps  - provenance stamps only move forward vs the base.
+//
+// WHAT THIS DOES NOT RUN, and therefore what a green audit does not promise:
+//
+//   test:a11y          - the axe-core sweep over every route.
+//   test:e2e:ci        - the rest of the Playwright integration suite.
+//   check:shell-mobile - the 320 px prerendered-shell sweep.
+//
+// All three need a browser, so they stay out of a command meant to run
+// anywhere without `playwright install`. That is a deliberate boundary, not an
+// oversight -- but it was an undocumented one, and a contributor who reads
+// "run this before opening a pull request" is entitled to know that a green
+// audit is not a green CI. check-ci-claims pins this list to the difference
+// between STAGES and the commands ci.yml actually runs, so a stage added to CI
+// without a decision here fails the build.
 //
 // Each stage runs in series; a failure short-circuits the audit (the
 // downstream stage probably depends on the earlier one).

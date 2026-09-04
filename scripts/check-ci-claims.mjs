@@ -360,6 +360,43 @@ async function main() {
     }
   }
 
+  // F3. scripts/audit.mjs is what a contributor is told to run before opening a
+  // pull request, so two things about it have to stay true: its header must
+  // enumerate the stages it actually runs, and it must say which of CI's stages
+  // it does NOT run. The header listed six while STAGES ran ten, and said
+  // nothing at all about the three browser stages CI runs and it never will --
+  // so a green audit read as a green CI.
+  const auditPath = resolve(ROOT, "scripts", "audit.mjs");
+  if (existsSync(auditPath)) {
+    const audit = await readFile(auditPath, "utf8");
+    const stages = [...audit.matchAll(/name: "([^"]+)", cmd:/g)].map((m) => m[1]);
+    if (stages.length === 0) {
+      errors.push("scripts/audit.mjs no longer declares a STAGES list this check can read.");
+    } else {
+      const header = audit.slice(0, audit.indexOf("import "));
+      for (const stage of stages) {
+        if (!header.includes(stage)) {
+          errors.push(
+            `scripts/audit.mjs runs the stage "${stage}" but its header does not name it. The header is ` +
+            `what a contributor reads to know what the command covers.`);
+        }
+      }
+      // Everything ci.yml runs that audit does not, named in the header so the
+      // boundary is a decision rather than a gap.
+      const ciCmds = new Set([...yaml.matchAll(/npm run ([a-z0-9:_-]+)/g)].map((m) => m[1]));
+      const covered = new Set(stages.map((n) => (n === "test" ? "test:unit" : n)));
+      covered.add("test:e2e"); // the local alias of test:e2e:ci; CI runs the :ci form
+      for (const cmd of ciCmds) {
+        if (covered.has(cmd) || cmd === "lint") continue;
+        if (!header.includes(cmd)) {
+          errors.push(
+            `ci.yml runs \`npm run ${cmd}\` and scripts/audit.mjs does not, but its header does not say so. ` +
+            `Either add the stage or name it under what a green audit does not promise.`);
+        }
+      }
+    }
+  }
+
   // G. The refresh lane. A pull request opened by a workflow using GITHUB_TOKEN
   // does not trigger further workflow runs, so every data-refresh PR sits at
   // `action_required` with a 0s run that never executes. For months the only
@@ -412,7 +449,7 @@ async function main() {
     process.exit(1);
   }
   console.log(
-    `check-ci-claims OK: README names all ${jobs.length} CI jobs (${jobs.join(", ")}), states the axe pass within 5% of its live size, no doc claims a gate the workflow does not run, both data-refresh lanes run the static gates plus the base-TIP stamp check themselves (the PRs they open never run CI), and no gate in docs/performance.md's table is claimed under \`npm run lint\` while measuring a dist/ that lint has not built.`,
+    `check-ci-claims OK: README names all ${jobs.length} CI jobs (${jobs.join(", ")}), states the axe pass within 5% of its live size, no doc claims a gate the workflow does not run, both data-refresh lanes run the static gates plus the base-TIP stamp check themselves (the PRs they open never run CI), no gate in docs/performance.md's table is claimed under \`npm run lint\` while measuring a dist/ that lint has not built, and scripts/audit.mjs's header names every stage it runs plus every CI stage it does not.`,
   );
 }
 
