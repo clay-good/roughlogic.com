@@ -65,6 +65,7 @@ test("a row re-verified today is not left claiming the old stamp", () => {
     CA: "2026-09-04", TX: "2026-09-04", AL: "2026-09-04", MS: "2026-09-04",
     FL: "2026-09-04", WA: "2026-09-04",
     SD: "2026-09-04", IN: "2026-09-04",
+    KS: "2026-09-04",
   };
   const rechecked = Object.entries(SALES_TAX_NEXUS).filter(([, v]) => v.verified_on !== "2025-01-15");
   assert.deepEqual(rechecked.map(([st]) => st).sort(), Object.keys(LEDGER).sort());
@@ -92,6 +93,7 @@ test("a row read and found correct still cites the provision that was read", () 
     // 11-701(b)(2)(iii) is about entering the State to service or repair.
     MD: /COMAR 03\.06\.01\.33/,
     NJ: /54:32B-3\.5/,
+
   };
   for (const [st, re] of Object.entries(cites)) {
     assert.match(SALES_TAX_NEXUS[st].citation, re, st + " must cite the subsection read");
@@ -99,4 +101,32 @@ test("a row read and found correct still cites the provision that was read", () 
     assert.equal(SALES_TAX_NEXUS[st].sales_threshold_usd, 100000);
     assert.equal(SALES_TAX_NEXUS[st].transactions_threshold, 200);
   }
+});
+
+// The sales-only states read on 2026-09-04. These have no transaction prong, so
+// the assertion above -- which requires 200 and a disjunction -- does not apply
+// to them; putting one here by mistake is how I found that out.
+//
+// Each entry records a citation that was CORRECTED, not merely tightened, so a
+// revert to the old pointer fails rather than passing quietly.
+test("a corrected citation stays corrected", () => {
+  const corrected = {
+    // Cited (h)(1)(F), the constitutional catch-all. SB 50 (2021) put the
+    // $100,000 test in new subparagraph (h)(1)(G), per KDOR Notice 21-17.
+    KS: /79-3702\(h\)\(1\)\(G\)/,
+    // Cited RCW 82.08.052, which governed only through 2019-12-31 and still
+    // carries Washington's repealed 200-transaction language.
+    WA: /82\.04\.067/,
+    // Cited Tax-Gen 11-701(b)(2)(iii), which is about service and repair visits.
+    MD: /COMAR 03\.06\.01\.33/,
+    // Cited NAC 372.030, titled '"Retail sale" defined'.
+    NV: /R189-18/,
+  };
+  for (const [st, re] of Object.entries(corrected)) {
+    assert.match(SALES_TAX_NEXUS[st].citation, re, st + " must keep the corrected citation");
+    assert.equal(SALES_TAX_NEXUS[st].sales_threshold_usd, 100000, st);
+  }
+  // Kansas and Washington are sales-only; Maryland and Nevada are disjunctive.
+  for (const st of ["KS", "WA"]) assert.equal(SALES_TAX_NEXUS[st].transactions_threshold, null, st);
+  for (const st of ["MD", "NV"]) assert.equal(SALES_TAX_NEXUS[st].combine, "or", st);
 });
