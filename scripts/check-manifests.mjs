@@ -4,8 +4,12 @@
 // Verifies that every data/<folder>/manifest.json carries the v6 edition
 // stamp (already enforced by check-v6-discipline) and the v8 asOf date.
 // Verifies that every shard listed in every manifest has a recorded hash.
-// Future-proofs against state-keyed shards by checking that any
-// data/legal/* (when introduced) carries a per-entry verifiedOn date.
+// Checks that every row of a state-keyed data/legal/* shard carries its own
+// verified_on date and that the rollup above them is the oldest of those.
+// Checks that a manifest's staleness_note -- the string that downgrades a
+// four-rechecks-late folder from an error to a warning -- is exactly what
+// scripts/staleness-notes.mjs produces from the stamps on disk, and that
+// docs/data-sources.md's prose restatement of it agrees with the shard.
 //
 // Pure read-and-report; no network, no mutation.
 
@@ -13,6 +17,7 @@ import { readFile, readdir } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { existsSync } from "node:fs";
+import { stalenessNote, collectRowStamps } from "./staleness-notes.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DATA = resolve(ROOT, "data");
@@ -137,8 +142,24 @@ async function main() {
     const budget = CADENCE_DAYS[m.refresh_cadence];
     if (!budget) continue; // event-driven, or a cadence this table does not know
     const all = [];
+    const rowStamps = [];
     for (const f of await shardFiles(resolve(DATA, folder))) {
-      stamps(JSON.parse(await readFile(f, "utf8")), all);
+      const body = JSON.parse(await readFile(f, "utf8"));
+      stamps(body, all);
+      collectRowStamps(body, rowStamps);
+    }
+    // The note is the one thing that downgrades a four-rechecks-late folder from
+    // an error to a warning, and for a year it was hand-written prose nobody
+    // compared to the shards. Recompute it from the stamps and require a match,
+    // the same rule `edition` above already lives under. A note that has gone
+    // false is worse than no note: it is a maintained-looking disclosure.
+    const expectedNote = stalenessNote(folder, rowStamps);
+    if (typeof m.staleness_note === "string" && m.staleness_note !== expectedNote) {
+      errors.push(
+        "data/" + folder + "/manifest.json 'staleness_note' is not what scripts/build-data.mjs " +
+          "produces from the current stamps, so it is either hand-edited or has gone stale. " +
+          "Expected: " + JSON.stringify(expectedNote),
+      );
     }
     if (all.length === 0) continue;
     const oldest = all.sort()[0];
@@ -148,7 +169,7 @@ async function main() {
       "data/" + folder + " declares refresh_cadence '" + m.refresh_cadence + "' (" + budget +
       " days) but its oldest verified_on is " + oldest + ", " + ageDays + " days ago, across " +
       all.length + " stamp(s).";
-    if (ageDays > budget * 4 && typeof m.staleness_note !== "string") {
+    if (ageDays > budget * 4 && m.staleness_note !== expectedNote) {
       errors.push(
         line + " That is more than four rechecks late. Re-verify against the source and re-stamp, " +
           "or add a 'staleness_note' to the manifest saying what is stale and what it would take to fix.",
@@ -165,13 +186,65 @@ async function main() {
     for (const f of files) {
       if (!f.endsWith(".json") || f === "manifest.json") continue;
       const body = JSON.parse(await readFile(resolve(legalDir, f), "utf8"));
-      // Per-state shards typically have a top-level object keyed by state code.
-      for (const k of Object.keys(body)) {
-        const entry = body[k];
-        if (entry && typeof entry === "object" && !Array.isArray(entry) && !isIsoDate(entry.verifiedOn)) {
-          errors.push("data/legal/" + f + " entry '" + k + "' missing per-entry 'verifiedOn' ISO date (v8 §A.3 future-proof).");
+      // This loop used to read only the shard's top-level keys, on the comment's
+      // assumption that "per-state shards typically have a top-level object keyed
+      // by state code". sales-tax-nexus.json does not: its rows live one level
+      // down under `by_state`, and the only top-level object is that map, which
+      // carries the camelCase rollup. So the gate checked exactly one date -- the
+      // rollup -- and deleting a state's `verified_on` outright went green.
+      // Descend into the row map and check the rows.
+      for (const [mapKey, rows] of Object.entries(body)) {
+        if (!rows || typeof rows !== "object" || Array.isArray(rows)) continue;
+        const rowStamps = [];
+        for (const [k, entry] of Object.entries(rows)) {
+          if (!entry || typeof entry !== "object" || Array.isArray(entry)) continue;
+          if (!isIsoDate(entry.verified_on)) {
+            errors.push(
+              "data/legal/" + f + " " + mapKey + "." + k + " is missing a per-entry 'verified_on' " +
+                "ISO date (v8 §A.3). Every row must say when a human last read it against the source.",
+            );
+            continue;
+          }
+          rowStamps.push(entry.verified_on);
+        }
+        if (rowStamps.length === 0) continue;
+        // A rollup must not claim more than the rows it rolls up (CF-05).
+        const oldestRow = rowStamps.sort()[0];
+        if (!isIsoDate(rows.verifiedOn)) {
+          errors.push("data/legal/" + f + " " + mapKey + " is missing the 'verifiedOn' rollup ISO date (v8 §A.3).");
+        } else if (rows.verifiedOn !== oldestRow) {
+          errors.push(
+            "data/legal/" + f + " " + mapKey + ".verifiedOn is " + rows.verifiedOn + " but the oldest row " +
+              "beneath it is " + oldestRow + ". The rollup must be the oldest stamp it summarizes.",
+          );
         }
       }
+    }
+  }
+
+  // docs/data-sources.md restates the legal folder's staleness in prose, and
+  // prose is the layer a reader actually reaches. It already contradicted
+  // itself once -- one bullet said "every row carries verified_on 2025-01-15"
+  // while the bullet above it recorded fourteen rows re-verified. Pin the
+  // sentence to the shard.
+  const sourcesDoc = resolve(ROOT, "docs", "data-sources.md");
+  const nexusShard = resolve(DATA, "legal", "sales-tax-nexus.json");
+  if (existsSync(sourcesDoc) && existsSync(nexusShard)) {
+    const rowStamps = collectRowStamps(JSON.parse(await readFile(nexusShard, "utf8")));
+    const oldest = [...rowStamps].sort()[0];
+    const atOldest = rowStamps.filter((d) => d === oldest).length;
+    const doc = await readFile(sourcesDoc, "utf8");
+    const m = doc.match(/(\d+) of the (\d+) rows still carry `verified_on` (\d{4}-\d{2}-\d{2})/);
+    if (!m) {
+      errors.push(
+        "docs/data-sources.md no longer states the sales-tax-nexus staleness in the form " +
+          "\"<n> of the <total> rows still carry `verified_on` <date>\", so this gate has gone blind.",
+      );
+    } else if (Number(m[1]) !== atOldest || Number(m[2]) !== rowStamps.length || m[3] !== oldest) {
+      errors.push(
+        "docs/data-sources.md says " + m[1] + " of the " + m[2] + " sales-tax-nexus rows still carry " +
+          m[3] + ", but the shard has " + atOldest + " of " + rowStamps.length + " at " + oldest + ".",
+      );
     }
   }
 
@@ -183,8 +256,10 @@ async function main() {
     process.exit(1);
   }
   console.log(
-    "v8 manifest-discipline lint OK (edition + asOf + shard hashes present; every edition string " +
-      "reproducible from scripts/build-data.mjs; every verified_on inside its folder cadence)" +
+    "v8 manifest-discipline lint OK (edition + asOf + shard hashes present; every edition string and " +
+      "staleness_note reproducible from the generators; every data/legal row carries its own " +
+      "verified_on under a rollup that is the oldest of them; docs/data-sources.md agrees with the " +
+      "shard; every verified_on inside its folder cadence)" +
       (warnings.length > 0 ? " with " + warnings.length + " staleness warning(s)." : "."),
   );
 }

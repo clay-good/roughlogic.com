@@ -1599,6 +1599,7 @@ const GLOSSARY_DATA_V5 = {
 // the sales-tax-nexus tile lives in the reference group (calc-references.js). ---
 
 import { SALES_TAX_NEXUS } from "../calc-references.js";
+import { stalenessNote, collectRowStamps } from "./staleness-notes.mjs";
 
 function buildSalesTaxNexusShard() {
   // CF-05: this aggregate stamp read TODAY while all 47 per-state entries
@@ -1811,9 +1812,11 @@ const PROSE_LINT_THRESHOLD = 140;
 // Folders knowingly past the refresh_cadence they declare. check-manifests warns
 // from one cadence period and fails at four unless the manifest says why, so a
 // row here is a promise being kept honestly rather than quietly broken.
-const STALENESS_NOTES = {
-  legal: "Every post-Wayfair nexus threshold carries verified_on 2025-01-15 against a quarterly recheck cadence -- 20 months as of 2026-09-02. States change these by legislation, not on a calendar, so re-verification is 47 per-state lookups against each department of revenue and is maintainer work, not a build step. The tile already prints each row's citation and verified_on date and tells the reader to confirm with the state before filing. Recheck oldest-first; drop this note when the stamps are current.",
-};
+// The note's counts and dates are derived from the shard stamps in
+// scripts/staleness-notes.mjs, not asserted here. The hand-written version went
+// false the day the first fourteen states were re-verified and kept telling
+// readers of the public manifest that none had been. check-manifests recomputes
+// the same string and requires the manifest to match.
 
 const PROSE_LINT_EXEMPT_KEYS = new Set([
   "source", "license", "notes", "attribution", "summary", "description",
@@ -1924,11 +1927,6 @@ async function buildAll() {
       shards: [],
       hashes: {},
     };
-    // An honest acknowledgement that a folder is past its own declared cadence,
-    // in a file a reviewer sees in a diff rather than in a warning nobody reads.
-    // check-manifests fails a folder four rechecks late unless this is present.
-    if (STALENESS_NOTES[ds.folder]) manifest.staleness_note = STALENESS_NOTES[ds.folder];
-
     for (const shard of ds.shards) {
       // CF-05: the ledger's human-verification date overrides the TODAY the
       // shard body stamped, for every shard sources-cycle.json tracks.
@@ -1953,6 +1951,16 @@ async function buildAll() {
         console.error("WARNING: shard exceeds 1 MB after gzip: " + ds.folder + "/" + shard.file);
       }
     }
+
+    // An honest acknowledgement that a folder is past its own declared cadence,
+    // in a file a reviewer sees in a diff rather than in a warning nobody reads.
+    // check-manifests fails a folder four rechecks late unless this is present.
+    // Written after the shard loop so it describes the bytes actually emitted,
+    // including any ledger override applied above.
+    const rowStamps = [];
+    for (const shard of ds.shards) collectRowStamps(shard.body, rowStamps);
+    const note = stalenessNote(ds.folder, rowStamps);
+    if (note) manifest.staleness_note = note;
 
     const manifestText = formatJson(manifest);
     const manifestPath = resolve(dir, "manifest.json");
