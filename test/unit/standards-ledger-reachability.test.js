@@ -44,12 +44,25 @@ test("a superseded edition cited on a tile is disclosed in its folder manifest",
   for (const named of ["IMC 2021", "ASHRAE 62.2-2019", "ASHRAE 90.1-2022"]) {
     assert.ok(hvac.includes(named), "hvac manifest must name the bundled edition " + named);
   }
-  for (const current of ["IMC 2024", "62.2-2025", "90.1-2025", "62.1-2025"]) {
+  // Read the current editions from the ledger rather than restating them. This
+  // assertion hard-coded "IMC 2024" and broke the same day ICC published the
+  // 2027 IMC -- the identical mistake the manifest disclosure had made, in the
+  // test written to guard it.
+  const cycle = await readJson("scripts/sources-cycle.json");
+  const editionOf = (id) => cycle.standards.find((s) => s.id === id).current_edition;
+  for (const current of ["62.2-2025", "90.1-2025", "62.1-2025"]) {
     assert.ok(hvac.includes(current), "hvac manifest must name the current edition " + current);
   }
+  assert.ok(
+    hvac.includes("IMC " + editionOf("imc")),
+    "hvac manifest must name the ledger's current IMC edition (" + editionOf("imc") + ")",
+  );
   const fire = editions.get("fire");
   assert.ok(fire.includes("IFC 2021"), "fire manifest must name the bundled IFC edition");
-  assert.ok(fire.includes("IFC 2024"), "fire manifest must name the current IFC edition");
+  assert.ok(
+    fire.includes("IFC " + editionOf("ifc")),
+    "fire manifest must name the ledger's current IFC edition (" + editionOf("ifc") + ")",
+  );
   // The pattern the older disclosures established, held to here too.
   for (const [folder, text] of [["hvac", hvac], ["fire", fire]]) {
     assert.match(text, /current published edition/, folder + " must use the established disclosure wording");

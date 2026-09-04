@@ -52,8 +52,8 @@
       "current_release": "2023-09",
       "cycle_years": 3,
       "next_expected": "2026-10",
-      "last_verified": "2026-09-01",
-      "verification_note": "2027 I-Code final vote completed August 2026; the editions publish in stages. Publication schedule re-confirmed 2026-09-02 against ICC's announced dates: IBC, IFC and IWUIC anticipated September 2026; IECC 2026-12-31; IRC February 2027. The IPC / IMC / IFGC dates in this file remain estimates. last_verified stays 2026-09-01, the last date non-publication was actually confirmed -- the 2026-09-02 pass reached only the anticipated schedule (shop.iccsafe.org 404s and codes.iccsafe.org 403s an automated fetch), and an anticipated date is not a verification. IBC and IFC are due within the month: when next_expected passes, confirm at shop.iccsafe.org and either advance the row to 2027 or re-stamp last_verified on or after next_expected.",
+      "last_verified": "2026-09-03",
+      "verification_note": "Verified 2026-09-03 against the publisher's own Digital Codes site (codes.iccsafe.org/codes/i-codes/2027-icodes), which states \"Select 2027 I-Codes are available now, with additional titles added to Digital Codes as they are released throughout the year\" and lists seven 2027 titles: IPMC, IPSDC, ISPSC, IZC, IFGC, IMC. The International Building Code is NOT among them, so the 2027 IBC has not published as of this date. This is an actual confirmation of non-publication against the publisher, which the 2026-09-02 pass could not obtain (shop.iccsafe.org 404s and codes.iccsafe.org was 403ing an automated fetch; the page is JS-rendered and was read in a browser). It was anticipated September 2026, so recheck when next_expected 2026-10 passes.",
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
       "match_terms": [
         "IBC "
@@ -62,12 +62,12 @@
     {
       "id": "imc",
       "name": "International Mechanical Code",
-      "current_edition": "2024",
-      "current_release": "2023-09",
+      "current_edition": "2027",
+      "current_release": "2026-09",
       "cycle_years": 3,
-      "next_expected": "2027-01",
-      "last_verified": "2026-09-01",
-      "verification_note": "2027 I-Code final vote completed August 2026; the editions publish in stages. Publication schedule re-confirmed 2026-09-02 against ICC's announced dates: IBC, IFC and IWUIC anticipated September 2026; IECC 2026-12-31; IRC February 2027. The IPC / IMC / IFGC dates in this file remain estimates. last_verified stays 2026-09-01, the last date non-publication was actually confirmed -- the 2026-09-02 pass reached only the anticipated schedule (shop.iccsafe.org 404s and codes.iccsafe.org 403s an automated fetch), and an anticipated date is not a verification. IBC and IFC are due within the month: when next_expected passes, confirm at shop.iccsafe.org and either advance the row to 2027 or re-stamp last_verified on or after next_expected.",
+      "next_expected": "2029-09",
+      "last_verified": "2026-09-03",
+      "verification_note": "Verified 2026-09-03 against the publisher's own Digital Codes site (codes.iccsafe.org/codes/i-codes/2027-icodes), which states \"Select 2027 I-Codes are available now, with additional titles added to Digital Codes as they are released throughout the year\" and lists seven 2027 titles: IPMC, IPSDC, ISPSC, IZC, IFGC, IMC. The 2027 International Mechanical Code is among them and is marked NEW, so the 2027 edition has published. The bundled values still follow the earlier edition and the folder manifest discloses that. Release month recorded as the month it was observed available; ICC does not print a publication date on that page.",
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
       "match_terms": [
         "IMC "
@@ -80,8 +80,8 @@
       "current_release": "2023-09",
       "cycle_years": 3,
       "next_expected": "2026-10",
-      "last_verified": "2026-09-01",
-      "verification_note": "2027 I-Code final vote completed August 2026; the editions publish in stages. Publication schedule re-confirmed 2026-09-02 against ICC's announced dates: IBC, IFC and IWUIC anticipated September 2026; IECC 2026-12-31; IRC February 2027. The IPC / IMC / IFGC dates in this file remain estimates. last_verified stays 2026-09-01, the last date non-publication was actually confirmed -- the 2026-09-02 pass reached only the anticipated schedule (shop.iccsafe.org 404s and codes.iccsafe.org 403s an automated fetch), and an anticipated date is not a verification. IBC and IFC are due within the month: when next_expected passes, confirm at shop.iccsafe.org and either advance the row to 2027 or re-stamp last_verified on or after next_expected.",
+      "last_verified": "2026-09-03",
+      "verification_note": "Verified 2026-09-03 against the publisher's own Digital Codes site (codes.iccsafe.org/codes/i-codes/2027-icodes), which states \"Select 2027 I-Codes are available now, with additional titles added to Digital Codes as they are released throughout the year\" and lists seven 2027 titles: IPMC, IPSDC, ISPSC, IZC, IFGC, IMC. The International Fire Code is NOT among them, so the 2027 IFC has not published as of this date. This is an actual confirmation of non-publication against the publisher, which the 2026-09-02 pass could not obtain (shop.iccsafe.org 404s and codes.iccsafe.org was 403ing an automated fetch; the page is JS-rendered and was read in a browser). It was anticipated September 2026, so recheck when next_expected 2026-10 passes.",
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
       "match_terms": [
         "IFC "
@@ -90,12 +90,12 @@
     {
       "id": "ifgc",
       "name": "International Fuel Gas Code",
-      "current_edition": "2024",
-      "current_release": "2023-09",
+      "current_edition": "2027",
+      "current_release": "2026-09",
       "cycle_years": 3,
-      "next_expected": "2027-01",
-      "last_verified": "2026-09-01",
-      "verification_note": "2027 I-Code final vote completed August 2026; the editions publish in stages. Publication schedule re-confirmed 2026-09-02 against ICC's announced dates: IBC, IFC and IWUIC anticipated September 2026; IECC 2026-12-31; IRC February 2027. The IPC / IMC / IFGC dates in this file remain estimates. last_verified stays 2026-09-01, the last date non-publication was actually confirmed -- the 2026-09-02 pass reached only the anticipated schedule (shop.iccsafe.org 404s and codes.iccsafe.org 403s an automated fetch), and an anticipated date is not a verification. IBC and IFC are due within the month: when next_expected passes, confirm at shop.iccsafe.org and either advance the row to 2027 or re-stamp last_verified on or after next_expected.",
+      "next_expected": "2029-09",
+      "last_verified": "2026-09-03",
+      "verification_note": "Verified 2026-09-03 against the publisher's own Digital Codes site (codes.iccsafe.org/codes/i-codes/2027-icodes), which states \"Select 2027 I-Codes are available now, with additional titles added to Digital Codes as they are released throughout the year\" and lists seven 2027 titles: IPMC, IPSDC, ISPSC, IZC, IFGC, IMC. The 2027 International Fuel Gas Code is among them and is marked NEW, so the 2027 edition has published. The bundled values still follow the earlier edition and the folder manifest discloses that. Release month recorded as the month it was observed available; ICC does not print a publication date on that page.",
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
       "match_terms": [
         "IFGC "

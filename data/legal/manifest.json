@@ -1,9 +1,9 @@
 {
   "name": "legal",
-  "version": "2026-09-03",
-  "fetched": "2026-09-03",
+  "version": "2026-09-04",
+  "fetched": "2026-09-04",
   "edition": "Post-Wayfair sales-tax-nexus thresholds from each state's department of revenue. Verified 2025-01-15.",
-  "asOf": "2026-09-03",
+  "asOf": "2026-09-04",
   "refresh_cadence": "quarterly",
   "shards": [
     {
@@ -13,7 +13,7 @@
     }
   ],
   "hashes": {
-    "sales-tax-nexus.json": "1f0ed62b3e8b96b0412d52768978f289e1a50f2deaac20cc9d00e57c1746e30c"
+    "sales-tax-nexus.json": "8bcf94c986de3072d6ca6224b96e9bd0af503ddac6be36dd6ca218ef6be06720"
   },
   "staleness_note": "Every post-Wayfair nexus threshold carries verified_on 2025-01-15 against a quarterly recheck cadence -- 20 months as of 2026-09-02. States change these by legislation, not on a calendar, so re-verification is 47 per-state lookups against each department of revenue and is maintainer work, not a build step. The tile already prints each row's citation and verified_on date and tells the reader to confirm with the state before filing. Recheck oldest-first; drop this note when the stamps are current."
 }

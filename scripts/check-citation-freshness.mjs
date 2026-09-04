@@ -394,6 +394,31 @@ async function main() {
     );
   }
 
+  // CF-07 (2026-09-03): a manifest that names a tracked standard must name that
+  // standard's CURRENT edition, not just some edition. CF-03 above warns about
+  // this only once a full cycle has elapsed, which for a code on a three-year
+  // cycle means a manifest can advertise a superseded "current published
+  // edition" for three years.
+  //
+  // That is not hypothetical either. The hvac and fire manifests gained their
+  // disclosures on the morning of 2026-09-03 saying IMC 2024 and IFGC 2024 were
+  // current; ICC's own Digital Codes site published the 2027 IMC and 2027 IFGC,
+  // and the sentence was stale by that afternoon. Nothing tied the disclosure
+  // to the ledger, so nothing noticed. All 11 manifest/standard pairs satisfy
+  // this today, so it lands as a hard error with no backlog.
+  for (const folderEdition of manifestEditions) {
+    for (const s of standards) {
+      if (!(s.match_terms || []).some((t) => folderEdition.includes(t))) continue;
+      if (!s.current_edition) continue;
+      if (folderEdition.includes(String(s.current_edition))) continue;
+      errors.push(
+        "a data manifest names '" + (s.name || s.id) + "' but not its current edition '" +
+          s.current_edition + "'. A manifest that discloses which edition it bundles has to " +
+          "name the one it is behind, or the disclosure goes stale the day the publisher moves.",
+      );
+    }
+  }
+
   // CF-04 (2026-09-02): the bundled federal dollar figures that reprice every
   // year on a known calendar. The standards rows above track EDITIONS; nothing
   // tracked these, and on one day five of them were wrong -- the IRS mileage

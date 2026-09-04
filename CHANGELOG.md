@@ -6,6 +6,17 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **ICC published the 2027 IMC and IFGC, and a disclosure written this morning was stale by the afternoon.** The 2026-09-02 pass could not reach ICC at all -- `shop.iccsafe.org` 404s and `codes.iccsafe.org` was refusing an automated fetch -- so four I-Code rows carried an *anticipated* schedule rather than a verification. The site answers now, though it renders its catalogue in JavaScript, so it was read in a browser.
+
+  ICC's 2027 I-Codes page says *"Select 2027 I-Codes are available now"* and lists seven titles: IPMC, IPSDC, ISPSC, IZC, **IFGC** and **IMC**. Two consequences, in opposite directions:
+
+  - **The 2027 IMC and 2027 IFGC have published.** Their ledger rows advance, and the `hvac` and `plumbing` manifests -- whose disclosures were written **earlier the same day** naming IMC 2024 and IFGC 2024 as current -- were already one edition behind. Nothing tied those sentences to the ledger, so nothing noticed.
+  - **The IBC and IFC are not among them**, so the 2027 editions have not published. That is now an actual confirmation of non-publication against the publisher rather than an inference from an announced schedule, and both rows are re-stamped on that basis. They stay due in October, which is correct: the next check has to happen after the date they are expected.
+
+  **CF-07** closes the seam that let a same-day disclosure rot: a manifest naming a tracked standard must name that standard's **current** edition, not merely some edition. CF-03 only warns about this after a full cycle has elapsed, so a manifest could advertise a superseded "current published edition" for three years. All eleven manifest/standard pairs satisfy it today, so it lands as a hard error with no backlog. Seed-verified by rolling the IMC disclosure back a cycle.
+
+  The unit test guarding those disclosures made the same mistake and broke on the same fact: it hard-coded `"IMC 2024"`. It reads the current edition from the ledger now.
+
 - **The one phase of the correctness argument that rests on people has never run, and was written in the present tense.** [docs/correctness.md](docs/correctness.md) describes Phase H -- independent per-group reviewer signoff -- as an operating process: *"Every active group A through Y carries one signoff row... A lapsed signoff (more than 100 days) is a build warning; a lapse exceeding 180 days fails the audit."*
 
   **0 of 19 non-exempt groups are signed off. All 19 are `open`.** No reviewer has signed off on anything, so nothing can lapse and the warning has never fired. `check-audit-trail` has been reporting `signed-off=0` on every lint run throughout.

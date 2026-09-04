@@ -4,8 +4,8 @@
   "agency": "EIA",
   "series_id": "NG.N3050US3.M",
   "units": "USD/Mcf",
-  "built": "2026-09-03",
-  "fetched": "2026-09-03",
+  "built": "2026-09-04",
+  "fetched": "2026-09-04",
   "cadence": "monthly",
   "points": [
     {

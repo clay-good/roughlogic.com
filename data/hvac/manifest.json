@@ -1,9 +1,9 @@
 {
   "name": "hvac",
-  "version": "2026-09-03",
-  "fetched": "2026-09-03",
-  "edition": "ASHRAE 62.1-2022; ASHRAE 62.2-2019; ASHRAE 90.1-2022; IMC 2021 cited by section number (ASHRAE 62.1-2025 / 62.2-2025 / 90.1-2025 and IMC 2024 are the current published editions; bundled values follow the editions named here and the tile citations disclose it); ASHRAE Handbook Fundamentals chapter 21 (duct design) and chapter 25 (insulation); ACCA Manual J 8th ed.; CTI cooling-tower engineering practice; manufacturer P-T tables (DuPont / Honeywell / Chemours / Arkema) and insulation k-values as of 2026-09-02.",
-  "asOf": "2026-09-03",
+  "version": "2026-09-04",
+  "fetched": "2026-09-04",
+  "edition": "ASHRAE 62.1-2022; ASHRAE 62.2-2019; ASHRAE 90.1-2022; IMC 2021 cited by section number (ASHRAE 62.1-2025 / 62.2-2025 / 90.1-2025 and IMC 2027 are the current published editions; bundled values follow the editions named here and the tile citations disclose it); ASHRAE Handbook Fundamentals chapter 21 (duct design) and chapter 25 (insulation); ACCA Manual J 8th ed.; CTI cooling-tower engineering practice; manufacturer P-T tables (DuPont / Honeywell / Chemours / Arkema) and insulation k-values as of 2026-09-02.",
+  "asOf": "2026-09-04",
   "refresh_cadence": "annual",
   "shards": [
     {
