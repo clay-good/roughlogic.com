@@ -5,6 +5,12 @@
 // agent through check-both-doors. This gate asserts that the shared web path
 // still mounts one report control and that its bounded API-only Worker, D1
 // schema, offline shipping, and contributor standard remain wired.
+//
+// It also compares the three places a size limit is stated -- the browser's
+// cap, the Worker's re-check, and the D1 CHECK constraint -- because until
+// 2026-09-04 each named its own number and nothing compared them. Three layers
+// is the right design; three independent numbers is a drift that lands on a
+// reader's bug report as a 500.
 
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
@@ -42,6 +48,74 @@ requireMatch(app, /import\("\.\/report-feedback\.js"\)/,
   "app.js must lazy-load the report client only after the trigger is used");
 requireMatch(client, /maxlength|MAX_NOTE_LENGTH|NOTE_LIMIT/,
   "report client no longer carries a bounded note contract");
+
+// The same three limits are stated in three places, and nothing compared them.
+// The browser caps what a reader can type, the Worker re-checks it because the
+// browser is not trusted, and the D1 schema CHECKs it because the Worker is code
+// that can change. Three layers is the right design; three layers each naming
+// its own number is a drift waiting to happen, and the failure lands on a
+// reader's bug report. Raise the Worker's cap above the schema's and a valid
+// report is accepted, then rejected by SQLite -- a 500, and the report is gone.
+// Raise the client's above the Worker's and the reader is told 400 after typing.
+//
+// The note limit also has to match EXACTLY at all three layers, not merely
+// nest: a browser that allows fewer characters than the Worker accepts is a
+// silently shorter contract than the one the schema documents.
+const LIMIT_SURFACES = [
+  {
+    what: "the 160-character note",
+    column: "note",
+    client: [client, "report-feedback.js", /\bNOTE_LIMIT\s*=\s*(\d+)/],
+    worker: [worker, "report-worker.mjs", /\bMAX_NOTE_LENGTH\s*=\s*(\d+)/],
+    exact: true,
+  },
+  {
+    what: "the page URL",
+    column: "page_url",
+    worker: [worker, "report-worker.mjs", /\bMAX_URL_LENGTH\s*=\s*(\d+)/],
+  },
+  {
+    what: "the rendered output text",
+    column: "output_text",
+    worker: [worker, "report-worker.mjs", /\bMAX_OUTPUT_TEXT_LENGTH\s*=\s*(\d+)/],
+  },
+];
+
+function declaredLimit(source, file, pattern, label) {
+  const m = source.match(pattern);
+  if (!m) {
+    errors.push(`${file} no longer declares ${label}, so this gate cannot compare it to the D1 CHECK.`);
+    return null;
+  }
+  return Number(m[1]);
+}
+
+for (const surface of LIMIT_SURFACES) {
+  const check = migration.match(
+    new RegExp("length\\(" + surface.column + "\\)\\s*<=\\s*(\\d+)"),
+  );
+  if (!check) {
+    errors.push(
+      `migrations/0001_calculator_reports.sql no longer CHECKs the length of ${surface.column}, ` +
+      `so the database has stopped being the backstop for ${surface.what}.`);
+    continue;
+  }
+  const schemaLimit = Number(check[1]);
+  const workerLimit = declaredLimit(...surface.worker, surface.what + " limit");
+  if (workerLimit !== null && workerLimit > schemaLimit) {
+    errors.push(
+      `report-worker.mjs accepts ${surface.what} up to ${workerLimit} characters but the D1 CHECK on ` +
+      `${surface.column} stops at ${schemaLimit}. The Worker would accept the report and the INSERT ` +
+      `would fail, which is a 500 and a lost report.`);
+  }
+  if (!surface.client) continue;
+  const clientLimit = declaredLimit(...surface.client, surface.what + " limit");
+  if (clientLimit !== null && workerLimit !== null && surface.exact && clientLimit !== workerLimit) {
+    errors.push(
+      `report-feedback.js caps ${surface.what} at ${clientLimit} but report-worker.mjs accepts ` +
+      `${workerLimit}. These must be the same number: the browser's cap is what the reader sees.`);
+  }
+}
 requireMatch(client, /calculator_id[\s\S]*page_url[\s\S]*inputs[\s\S]*outputs[\s\S]*turnstile_token/,
   "report client payload lost required reproduction context");
 requireMatch(client, /isPrivateControl[\s\S]*sanitizedReportUrl/,
@@ -122,4 +196,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`check-feedback-loop OK: ${TOOLS.length} calculators inherit one shared report control; defensive API-only Worker, D1, offline shipping, and three-door docs are wired.`);
+console.log(`check-feedback-loop OK: ${TOOLS.length} calculators inherit one shared report control; defensive API-only Worker, D1, offline shipping, and three-door docs are wired; the note, page-URL and output-text limits agree across the browser, the Worker and the D1 CHECK constraints.`);
