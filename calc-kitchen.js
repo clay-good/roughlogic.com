@@ -777,7 +777,7 @@ KITCHEN_RENDERERS["bakers-percentage"] = renderBakersPercentage;
 // the inventory sheet and the bar to find out whether the plates make
 // money. Standard restaurant-accounting identities (COGS = beginning +
 // purchases - ending; prime = COGS + labor) and the US fluid-ounce
-// (29.5735 mL). GOVERNANCE.general (business arithmetic, not food safety).
+// (29.5735295625 mL). GOVERNANCE.general (business arithmetic, not food safety).
 // =====================================================================
 
 // dims: in { beginning_inventory: dimensionless, purchases: dimensionless, ending_inventory: dimensionless, food_sales: dimensionless, theoretical_cost_pct: dimensionless } out: { cogs: dimensionless, food_cost_pct: dimensionless }
@@ -865,7 +865,7 @@ export function computePourCost({ bottle_cost = 0, bottle_size_ml = 0, pour_size
   if (!(bottle_size_ml > 0)) return { error: "Bottle size must be positive." };
   if (!(pour_size_oz > 0)) return { error: "Pour size must be positive." };
   if (!(target_pour_cost_pct > 0)) return { error: "Target pour cost must be positive." };
-  const ML_PER_OZ = 29.5735; // US fluid ounce
+  const ML_PER_OZ = 29.5735295625; // US fluid ounce, exact by definition
   const pours_per_bottle = bottle_size_ml / (pour_size_oz * ML_PER_OZ);
   const cost_per_pour = bottle_cost / pours_per_bottle;
   const drink_cost = cost_per_pour + other_cost_per_drink;
@@ -877,7 +877,7 @@ export function computePourCost({ bottle_cost = 0, bottle_size_ml = 0, pour_size
 }
 export const pourCostExample = { inputs: { bottle_cost: 24, bottle_size_ml: 750, pour_size_oz: 1.5, target_pour_cost_pct: 20, other_cost_per_drink: 0.25 } };
 const renderPourCost = _r({
-  citation: "Citation: First-principles bar cost control. Pours per bottle = bottle size / (pour x 29.5735 mL/oz); suggested price = drink cost / target pour cost.",
+  citation: "Citation: First-principles bar cost control. Pours per bottle = bottle size / (pour x 29.5735295625 mL/oz); suggested price = drink cost / target pour cost.",
   example: pourCostExample.inputs,
   fields: [
     { key: "bottle_cost", label: "Bottle cost ($)", kind: "number" },

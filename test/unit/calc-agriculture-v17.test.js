@@ -235,14 +235,21 @@ test("tank-mix: liquid product converts to gallons and millilitres", () => {
   const r = computeTankMix(tankMixExample.inputs); // 30 pt
   assert.ok(close(r.liquid.gal, 30 / 8, 1e-9)); // 3.75 gal
   assert.ok(close(r.liquid.fl_oz, 30 * 16, 1e-9));
-  assert.ok(close(r.liquid.ml, 30 * 16 * 29.5735, 1e-6));
+  // The US fluid ounce is exact by definition: 1 gal = 3.785411784 L, 128 fl oz
+  // to the gallon. Written as the definition rather than as 29.5735, for the
+  // same reason as the grams assertion below.
+  assert.ok(close(r.liquid.ml, 30 * 16 * ((3.785411784 / 128) * 1000), 1e-6));
   assert.equal(r.dry, null);
 });
 
 test("tank-mix: dry product converts to pounds and grams", () => {
   const r = computeTankMix({ tank_gal: 200, spray_volume_gpa: 20, product_rate_per_acre: 8, product_unit: "oz", field_area_acres: 40 });
   assert.ok(close(r.dry.lb, r.product_per_tank_unit / 16, 1e-9));
-  assert.ok(close(r.dry.g, r.product_per_tank_unit * 28.3495, 1e-6));
+  // The avoirdupois ounce is exact by definition: 1 lb = 453.59237 g. Written
+  // as the definition rather than as 28.3495, which is what this line said
+  // until 2026-09-04 -- a truncation that quietly pinned the module's own
+  // truncated constant in place.
+  assert.ok(close(r.dry.g, r.product_per_tank_unit * (453.59237 / 16), 1e-6));
   assert.equal(r.liquid, null);
 });
 

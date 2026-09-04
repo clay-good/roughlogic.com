@@ -2125,7 +2125,7 @@ MECHANIC_RENDERERS["gear-mph-rpm"] = renderGearMphRpm;
 // spec-v100 K - 2K paint mix ratio (auto-body). From a ratio (4:1 or
 // 4:1:1) and a measured base-paint volume, the hardener and reducer to
 // add and the total batch, the way a painter mixes off a stick.
-// GOVERNANCE.general; ratios are by volume; 29.5735 mL per US fluid
+// GOVERNANCE.general; ratios are by volume; 29.5735295625 mL per US fluid
 // ounce. The product technical data sheet governs ratio/induction/pot
 // life. (cutting-fluid-concentration lands in calc-machining.js.)
 // =====================================================================
@@ -2136,7 +2136,7 @@ export function computePaintMixRatio({ paint_volume_oz = 0, part_paint = 4, part
   if (part_hardener < 0 || part_reducer < 0) return { error: "Hardener and reducer parts must be non-negative." };
   if (!(paint_volume_oz > 0)) return { error: "Base paint volume must be positive." };
   if (!(part_paint > 0)) return { error: "Paint parts must be positive." };
-  const ML_PER_OZ = 29.5735;
+  const ML_PER_OZ = 29.5735295625;
   const hardener_oz = paint_volume_oz * part_hardener / part_paint;
   const reducer_oz = part_reducer > 0 ? paint_volume_oz * part_reducer / part_paint : null;
   const total_oz = paint_volume_oz + hardener_oz + (reducer_oz || 0);
@@ -2148,7 +2148,7 @@ export function computePaintMixRatio({ paint_volume_oz = 0, part_paint = 4, part
 }
 export const paintMixRatioExample = { inputs: { paint_volume_oz: 16, part_paint: 4, part_hardener: 1, part_reducer: 1 } };
 const renderPaintMixRatio = _simpleRenderer({
-  citation: "Citation: Paint manufacturer technical data sheet (mix ratio by volume; induction and pot life off the TDS, by name). 29.5735 mL per US fluid ounce.",
+  citation: "Citation: Paint manufacturer technical data sheet (mix ratio by volume; induction and pot life off the TDS, by name). 29.5735295625 mL per US fluid ounce.",
   example: paintMixRatioExample.inputs,
   fields: [
     { key: "paint_volume_oz", label: "Base / color volume (fl oz)", kind: "number" },

@@ -1076,7 +1076,7 @@ export const CITATIONS = {
   },
 
   "two-stroke-mix": {
-    formula: "oil volume = fuel volume / ratio (gas:oil by volume); 1 US gallon = 128 fl oz; 1 fl oz = 29.5735 mL; oz per gallon = 128 / ratio.",
+    formula: "oil volume = fuel volume / ratio (gas:oil by volume); 1 US gallon = 128 fl oz; 1 fl oz = 29.5735295625 mL; oz per gallon = 128 / ratio.",
     edition: "Two-stroke fuel/oil mixing by volume ratio; first-principles volume arithmetic, public domain. The oil grade and ratio are set by the equipment manufacturer.",
     freeAccess: "Pure arithmetic, public; modern air-cooled two-strokes are commonly 50:1 with a JASO/ISO oil, but the equipment manual governs.",
     governance: GOVERNANCE.general,
@@ -2694,8 +2694,8 @@ export const CITATIONS = {
     governance: GOVERNANCE.pesticide,
     editionNote: "The EPA label governs the rate, carrier volume, re-entry interval (REI), and PPE. Nozzle-output (GPA) calibration is the separate Chemical Application Rate (GPA) tile. Product volume displaces a negligible share of the carrier at label rates. Liquid units in fl oz; dry units in oz (avoirdupois).",
     assumptions: [
-      { name: "Volume conversions", value: "1 gal = 128 fl oz; 1 fl oz = 29.5735 mL", source: "US customary" },
-      { name: "Mass conversions", value: "1 lb = 16 oz; 1 oz = 28.3495 g", source: "avoirdupois" },
+      { name: "Volume conversions", value: "1 gal = 128 fl oz; 1 fl oz = 29.5735295625 mL", source: "US customary" },
+      { name: "Mass conversions", value: "1 lb = 16 oz; 1 oz = 28.349523125 g", source: "avoirdupois" },
       { name: "Boom-spray GPA band", value: "5-30 GPA typical (flagged outside)", source: "NRCS / Extension spray calibration" },
     ],
   },
@@ -13586,8 +13586,8 @@ export const CITATIONS = {
     ],
   },
   "pour-cost": {
-    formula: "Pours per bottle = bottle size mL / (pour oz x 29.5735); cost per pour = bottle cost / pours; suggested price = (cost per pour + add) / target pour cost.",
-    edition: "First-principles bar cost control; US fluid-ounce 29.5735 mL.",
+    formula: "Pours per bottle = bottle size mL / (pour oz x 29.5735295625); cost per pour = bottle cost / pours; suggested price = (cost per pour + add) / target pour cost.",
+    edition: "First-principles bar cost control; US fluid-ounce 29.5735295625 mL.",
     freeAccess: "First-principles; no proprietary source reproduced.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
@@ -14127,8 +14127,8 @@ export const CITATIONS = {
     ],
   },
   "paint-mix-ratio": {
-    formula: "Hardener = base x hardener parts / paint parts; reducer = base x reducer parts / paint parts; total = base + hardener + reducer; mL = oz x 29.5735.",
-    edition: "Paint manufacturer technical data sheet (mix ratio by volume; by name); 29.5735 mL per US fluid ounce.",
+    formula: "Hardener = base x hardener parts / paint parts; reducer = base x reducer parts / paint parts; total = base + hardener + reducer; mL = oz x 29.5735295625.",
+    edition: "Paint manufacturer technical data sheet (mix ratio by volume; by name); 29.5735295625 mL per US fluid ounce.",
     freeAccess: "Mix ratios free on the product technical data sheet.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",

@@ -1510,8 +1510,8 @@ function renderNpkBlend(inputRegion, outputRegion, citationEl) {
 // and totals for a field) the calibration tile does not cover.
 const FL_OZ_PER = { fl_oz: 1, pt: 16, qt: 32, gal: 128 };
 const DRY_OZ_PER = { oz: 1, lb: 16 };
-const ML_PER_FL_OZ = 29.5735;
-const G_PER_OZ = 28.3495;
+const ML_PER_FL_OZ = 29.5735295625;
+const G_PER_OZ = 28.349523125;
 
 // dims: in { args: dimensionless } out: { acres_per_tank: L^2, product_per_tank_unit: dimensionless, tanks_needed: dimensionless, total_carrier_water_gal: L^3 }
 export function computeTankMix({
@@ -1958,7 +1958,7 @@ export function computeTwoStrokeMix({ ratio = 50, fuel_amount = 0, fuel_unit = "
 export const twoStrokeMixExample = { inputs: { ratio: 50, fuel_amount: 1, fuel_unit: "gallon" } };
 
 function renderTwoStrokeMix(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Two-stroke fuel/oil mix - oil volume = fuel volume / ratio (gas:oil by volume); 1 US gallon = 128 fl oz, 1 fl oz = 29.5735 mL - first-principles volume arithmetic, public. Use the oil grade and ratio the equipment maker specifies; the equipment manual governs.";
+  citationEl.textContent = "Citation: Two-stroke fuel/oil mix - oil volume = fuel volume / ratio (gas:oil by volume); 1 US gallon = 128 fl oz, 1 fl oz = 29.5735295625 mL - first-principles volume arithmetic, public. Use the oil grade and ratio the equipment maker specifies; the equipment manual governs.";
   const ratio = makeNumber("Mix ratio (X in X:1)", "tsm-ratio", { step: "any", min: "0" });
   const amt = makeNumber("Fuel amount", "tsm-amt", { step: "any", min: "0" });
   const unit = makeSelect("Fuel unit", "tsm-unit", [

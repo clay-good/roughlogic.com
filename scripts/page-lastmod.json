@@ -4198,8 +4198,8 @@
       "date": "2026-09-01"
     },
     "/tools/paint-mix-ratio/": {
-      "sha": "807ccb21b6e65ca8",
-      "date": "2026-09-01"
+      "sha": "27cd3846f6c2e336",
+      "date": "2026-09-04"
     },
     "/tools/paired-t-test/": {
       "sha": "972be5ef73cf96b7",
@@ -4554,8 +4554,8 @@
       "date": "2026-09-01"
     },
     "/tools/pour-cost/": {
-      "sha": "331e915ad585d246",
-      "date": "2026-09-01"
+      "sha": "a2e56419705f1efd",
+      "date": "2026-09-04"
     },
     "/tools/powder-coating-coverage/": {
       "sha": "121b17a041107247",
@@ -6354,8 +6354,8 @@
       "date": "2026-09-01"
     },
     "/tools/tank-mix/": {
-      "sha": "c5536690d666001a",
-      "date": "2026-09-01"
+      "sha": "58dc95791bf696f7",
+      "date": "2026-09-04"
     },
     "/tools/tank-volume/": {
       "sha": "2504ef89da7246ff",
@@ -6794,8 +6794,8 @@
       "date": "2026-09-04"
     },
     "/tools/two-stroke-mix/": {
-      "sha": "547ecbe99165cbbe",
-      "date": "2026-09-01"
+      "sha": "9b4eccf2fab32f78",
+      "date": "2026-09-04"
     },
     "/tools/two-stroke-mix-ratio-check/": {
       "sha": "77337826ff7578c5",
