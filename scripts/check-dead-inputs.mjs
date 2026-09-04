@@ -121,7 +121,7 @@ async function main() {
   // none can be dead). Five take a real object of inputs this gate cannot see
   // into, and that set is ratcheted: convert one to a destructured signature
   // and lower the budget; adding a sixth is new unchecked surface.
-  const UNCHECKED_WITH_INPUTS = 5;
+  const UNCHECKED_WITH_INPUTS = 4;
   const namedParamComputes = [];
   for (const file of files) {
     const src = sources.get(file);

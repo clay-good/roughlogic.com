@@ -113,7 +113,7 @@ also `"eta^2 = "` -- and calling that a unit would be a guess. `outputUnits(id)`
 in `catalog.mjs` exposes them as what they are.
 
 `answer_query` reads the `data/fields/` descriptors the website reads, which
-exist for 1,763 calculators. For the other 41 it projects the descriptors from
+exist for 1,764 calculators. For the other 40 it projects the descriptors from
 `describe_calculator` instead, naming each input with the caption the
 calculator itself prints. A field whose verified
 example holds something a numeric extractor must not guess at -- a list, a

@@ -119,7 +119,7 @@ if (problems.length) {
 // count was printed and never pinned, so it could climb one tile at a time.
 // Ratchet it: fix a signature and lower the budget, add unchecked surface and
 // raise it deliberately.
-const SKIPPED_BUDGET = 31;
+const SKIPPED_BUDGET = 30;
 if (skipped > SKIPPED_BUDGET) {
   console.error(
     `check-fixture-keys FAILED: ${skipped} fixture(s) are unchecked (rest-param or ` +

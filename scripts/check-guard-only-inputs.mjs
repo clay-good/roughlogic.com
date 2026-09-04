@@ -184,10 +184,15 @@ if (errors.length > 0) {
 // written with a named-object signature would leave this gate without anyone
 // noticing. Ratchet the set that actually has inputs: converting one to a
 // destructured signature lowers the budget, adding one raises it deliberately.
-// All 5 were hand-checked clean on 2026-09-04 (renderer-passed keys vs keys the
-// body reads): rental-worksheet, loan-limits, hud-fmr, rent-vs-buy,
-// pv-performance-ratio.
-const SKIPPED_WITH_INPUTS_BUDGET = 5;
+// The remaining 4 were hand-checked clean on 2026-09-04 (renderer-passed keys vs
+// keys the body reads): rental-worksheet, loan-limits, hud-fmr,
+// pv-performance-ratio. rent-vs-buy was the fifth and is no longer among them --
+// it read 14 named keys and nothing dynamic, so destructuring its signature was
+// a faithful rewrite and the budget came down with it. The four that remain each
+// need the object: rental-worksheet and pv-performance-ratio index it by a
+// variable key, loan-limits and hud-fmr take a data shard rather than a field
+// list.
+const SKIPPED_WITH_INPUTS_BUDGET = 4;
 if (skippedWithInputs.length > SKIPPED_WITH_INPUTS_BUDGET) {
   console.error(
     "check-guard-only-inputs FAILED: " + skippedWithInputs.length + " compute function(s) take a " +

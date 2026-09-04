@@ -2921,7 +2921,7 @@ cross-check.
 | calc-realestate.js | `computePmiCancellationDate` | `{ value = 0, loan = 0, rate_pct = 0, term_months = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `computePropertyTax` | `{ assessed_value, mill_rate, homestead_exemption }` | _ | _ | _ |
 | calc-realestate.js | `computeRentRollVacancy` | `{ potential_gross_rent = 0, vacancy_rate_pct = 0, credit_loss_pct = 0, other_...` | _ | _ | _ |
-| calc-realestate.js | `computeRentVsBuy` | `inp` | _ | _ | _ |
+| calc-realestate.js | `computeRentVsBuy` | `{ purchase_price, down_payment, mortgage_rate_pct, term_years, property_tax_p...` | _ | _ | _ |
 | calc-realestate.js | `computeRentalTotalReturn` | `{ cash_invested_usd = 0, annual_cash_flow_usd = 0, principal_paydown_usd = 0,...` | _ | _ | _ |
 | calc-realestate.js | `computeRentalWorksheet` | `inputs` | _ | _ | _ |
 | calc-realestate.js | `computeRequiredFaceRent` | `{ target_ner = 0, term_periods = 0, free_periods = 0, one_time_credit = 0 } = {}` | _ | _ | _ |

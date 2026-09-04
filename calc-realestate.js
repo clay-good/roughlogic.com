@@ -2001,22 +2001,37 @@ export function renderMortgageReserves(inputRegion, outputRegion, citationEl) {
 //        out: { npv_buy: dimensionless, npv_rent: dimensionless, difference: dimensionless, break_even_years: T, verdict: dimensionless }
 // (All monetary inputs/outputs are dimensionless dollar aggregates per
 //  the §7.1 convention; term and holding period carry T.)
-export function computeRentVsBuy(inp) {
+export function computeRentVsBuy({
+  purchase_price,
+  down_payment,
+  mortgage_rate_pct,
+  term_years,
+  property_tax_pct,
+  insurance_annual,
+  hoa_monthly,
+  maintenance_pct,
+  appreciation_pct,
+  rent_monthly,
+  rent_inflation_pct,
+  investment_return_pct,
+  holding_years,
+  selling_cost_pct,
+}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  const price = Number(inp.purchase_price);
-  const down = Number(inp.down_payment);
-  const rate = Number(inp.mortgage_rate_pct);
-  const term = Number(inp.term_years);
-  const taxPct = Number(inp.property_tax_pct);
-  const ins = Number(inp.insurance_annual) || 0;
-  const hoa = Number(inp.hoa_monthly) || 0;
-  const maintPct = Number(inp.maintenance_pct) || 0;
-  const appr = inp.appreciation_pct === undefined || inp.appreciation_pct === "" ? 3 : Number(inp.appreciation_pct);
-  const rent = Number(inp.rent_monthly);
-  const rentInfl = inp.rent_inflation_pct === undefined || inp.rent_inflation_pct === "" ? 3 : Number(inp.rent_inflation_pct);
-  const ret = inp.investment_return_pct === undefined || inp.investment_return_pct === "" ? 5 : Number(inp.investment_return_pct);
-  const hold = Number(inp.holding_years);
-  const sellPct = inp.selling_cost_pct === undefined || inp.selling_cost_pct === "" ? 6 : Number(inp.selling_cost_pct);
+  const price = Number(purchase_price);
+  const down = Number(down_payment);
+  const rate = Number(mortgage_rate_pct);
+  const term = Number(term_years);
+  const taxPct = Number(property_tax_pct);
+  const ins = Number(insurance_annual) || 0;
+  const hoa = Number(hoa_monthly) || 0;
+  const maintPct = Number(maintenance_pct) || 0;
+  const appr = appreciation_pct === undefined || appreciation_pct === "" ? 3 : Number(appreciation_pct);
+  const rent = Number(rent_monthly);
+  const rentInfl = rent_inflation_pct === undefined || rent_inflation_pct === "" ? 3 : Number(rent_inflation_pct);
+  const ret = investment_return_pct === undefined || investment_return_pct === "" ? 5 : Number(investment_return_pct);
+  const hold = Number(holding_years);
+  const sellPct = selling_cost_pct === undefined || selling_cost_pct === "" ? 6 : Number(selling_cost_pct);
 
   if (!Number.isFinite(price) || price <= 0) return { error: "Enter a positive purchase price." };
   if (!Number.isFinite(down) || down < 0) return { error: "Enter a non-negative down payment." };
