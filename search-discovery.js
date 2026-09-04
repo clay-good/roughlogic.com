@@ -512,12 +512,29 @@ export function rankTools(tokens, tools, aliases, opts) {
     const weights = new Array(tokens.length);
     let score = 0;
     let coverage = 0;
+    // Coverage counted over the tile's IDENTITY only -- name, id, alias, trade
+    // -- and not its prose description. bestFieldWeight already reports where
+    // the token matched (desc is the only weight-1 field), so this is free.
+    //
+    // Coverage sorts ahead of score, so three words matched anywhere beat two
+    // matched on the name, and a long description buys coverage: "how many
+    // sheets of plywood for a 24x40 floor" returned Compressed Gas Cylinder
+    // Storage Separation FIRST, because one sentence of its description warns
+    // that "a sheet of plywood" is the wrong barrier and another mentions
+    // "clear floor" -- three query words from prose saying plywood is NOT the
+    // answer, beating the tile named Wall / Roof Sheathing Panel and Nail
+    // Takeoff. Identity coverage sorts above raw coverage, so a description
+    // match still counts, and still cannot outrank a tile the query names.
+    let identityCoverage = 0;
     for (let i = 0; i < tokens.length; i++) {
       const w = bestFieldWeight(tokens[i], corpus);
       weights[i] = w;
       if (w > 0) {
         score += w;
-        if (!soft[i]) coverage++;
+        if (!soft[i]) {
+          coverage++;
+          if (w > FIELD_WEIGHTS.desc) identityCoverage++;
+        }
         matchedAnywhere[i] = true;
       }
     }
@@ -563,7 +580,7 @@ export function rankTools(tokens, tools, aliases, opts) {
     // See test/unit/search-discovery.test.js for the measured numbers.
     if (verbatimTarget === undefined && idBonusApplies(tool, joined)) score += 4;
     if (verbatimTarget === tool.id) score += 4;
-    scored.push({ tool, corpus, weights, score, coverage, viaTypo: false, namesInFull });
+    scored.push({ tool, corpus, weights, score, coverage, identityCoverage, viaTypo: false, namesInFull });
   }
 
   // Pass 2: bounded typo fallback, only for query tokens of length >= 3
@@ -581,6 +598,7 @@ export function rankTools(tokens, tools, aliases, opts) {
         row.weights[i] = hit.w;
         row.score += hit.w;
         row.coverage++;
+        if (hit.w > FIELD_WEIGHTS.desc) row.identityCoverage++;
         row.viaTypo = true;
         if (!row.typoFixes) row.typoFixes = {};
         row.typoFixes[tokens[i]] = hit.ct;
@@ -648,6 +666,7 @@ export function rankTools(tokens, tools, aliases, opts) {
       (b.corpus.namePhrase === joined ? 1 : 0) - (a.corpus.namePhrase === joined ? 1 : 0) ||
       (idBonusApplies(b.tool, joined) ? 1 : 0) - (idBonusApplies(a.tool, joined) ? 1 : 0) ||
       (b.tool.id === verbatimTarget ? 1 : 0) - (a.tool.id === verbatimTarget ? 1 : 0) ||
+      b.identityCoverage - a.identityCoverage ||
       b.coverage - a.coverage ||
       b.score - a.score ||
       (idBonusApplies(b.tool, joined) ? 1 : 0) - (idBonusApplies(a.tool, joined) ? 1 : 0) ||
