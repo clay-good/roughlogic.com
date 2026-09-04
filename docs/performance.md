@@ -28,7 +28,7 @@ What does gate performance today, on every push:
 | gate | where | what fails the build |
 | --- | --- | --- |
 | `check-home-payload` | `npm run lint` | home-view total over 100 KB gzipped, or any per-asset sub-budget (HTML 20 KB / CSS 25 KB / JS 40 KB) |
-| `check-module-sizes` | integration job | any `calc-*.js` or support lib over its recorded gzip cap. **Not `npm run lint`,** though it is wired there too: the gate measures the BUILT copy, and lint runs before any build, so with no `dist/` it prints `WARN: dist/ not present ... Skipping` and exits 0. It skipped in CI that way from the day it was written until 2026-08-30, when an over-cap module went green through it and `ci.yml` moved the enforcing run into the integration job. This row said `npm run lint` until 2026-09-04 |
+| `check-module-sizes` | integration job | any `calc-*.js` or support lib over its recorded gzip cap, or a capped module absent from `dist/` altogether -- it walks what the build emitted, so before 2026-09-04 a module that stopped being emitted was simply not measured and the summary still read OK. **Not `npm run lint`,** though it is wired there too: the gate measures the BUILT copy, and lint runs before any build, so with no `dist/` it prints `WARN: dist/ not present ... Skipping` and exits 0. It skipped in CI that way from the day it was written until 2026-08-30, when an over-cap module went green through it and `ci.yml` moved the enforcing run into the integration job. This row said `npm run lint` until 2026-09-04 |
 | `check-shells` | integration job | any prerendered shell over its 6 KB / 68 KB gzip cap |
 | `perf.test.js` | integration job | home-view FCP / LCP / TBT / CLS past the hard-fail tier |
 

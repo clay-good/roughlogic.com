@@ -389,6 +389,25 @@ async function main() {
     (e) => e.endsWith(".js") && !EXCLUDE.has(e),
   );
 
+  // "OK" must not be able to mean "I measured 66 of the 67 modules that have a
+  // cap". This gate walks what dist/ CONTAINS, so a capped module that stopped
+  // being emitted is simply not measured and the summary still reads OK -- with
+  // dist/calc-septic.js deleted the run exits 0 without naming it. The
+  // whole-dist-absent case above is a different thing and stays a skip: that is
+  // the documented state `npm run lint` runs in, and docs/performance.md says
+  // so. A dist/ that exists but is missing a capped module is a broken build.
+  const present = new Set(candidates);
+  const unmeasured = Object.keys(CAPS).filter((f) => !present.has(f));
+  if (unmeasured.length > 0) {
+    console.error(
+      "FAIL: " + unmeasured.length + " module(s) carry a gzip cap but are absent from dist/: " +
+      unmeasured.sort().join(", ") + ". Either the build stopped emitting them, in which case the site " +
+      "is broken, or the cap is dead and should be removed with the module.",
+    );
+    process.exitCode = 1;
+    return;
+  }
+
   const rows = [];
   for (const name of candidates) {
     const p = resolve(DIST, name);
