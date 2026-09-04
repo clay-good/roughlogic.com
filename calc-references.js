@@ -455,7 +455,7 @@ export const irsFormIndexExample = { inputs: {}, expected: { count: IRS_FORM_IND
 // local Alaska Remote Seller Sales Tax Commission rules that some
 // localities follow.
 export const SALES_TAX_NEXUS = {
-  AL: { sales_threshold_usd: 250000, transactions_threshold: null, combine: null, citation: "Ala. Admin. Code r. 810-6-2-.90.03 (Simplified Sellers Use Tax)", verified_on: "2025-01-15" },
+  AL: { sales_threshold_usd: 250000, transactions_threshold: null, combine: null, citation: "Ala. Admin. Code r. 810-6-2-.90.03/.90.04 (Simplified Sellers Use Tax; Act 2018-539, eff. 2019-01-01)", verified_on: "2026-09-04" },
   AK: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Alaska Remote Seller Sales Tax Commission (locality-driven; no statewide tax)", verified_on: "2025-01-15" },
   AZ: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Ariz. Rev. Stat. 42-5043 (TPT post-Wayfair)", verified_on: "2025-01-15" },
   AR: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "Ark. Code Ann. 26-52-111", verified_on: "2025-01-15" },
@@ -477,7 +477,7 @@ export const SALES_TAX_NEXUS = {
   MA: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Mass. Gen. Laws ch. 64H sec. 34", verified_on: "2025-01-15" },
   MI: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "Mich. Comp. Laws 205.52b (RAB 2018-16)", verified_on: "2025-01-15" },
   MN: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "Minn. Stat. 297A.66 subd. 1(c)", verified_on: "2026-09-03" },
-  MS: { sales_threshold_usd: 250000, transactions_threshold: null, combine: null, citation: "Miss. Code Ann. 27-65-9 (Notice 72-19-001)", verified_on: "2025-01-15" },
+  MS: { sales_threshold_usd: 250000, transactions_threshold: null, combine: null, citation: "Miss. Code Ann. 27-65-9 (substantial economic presence); MS DOR business-tax FAQ: over $250,000 in ANY twelve-month period, eff. 2018-07-01", verified_on: "2026-09-04" },
   MO: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Mo. Rev. Stat. 144.605(2)(d) (SB 153, eff. 2023)", verified_on: "2025-01-15" },
   NE: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "Neb. Rev. Stat. 77-2701.13(2)(a)-(b)", verified_on: "2026-09-03" },
   NV: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "Nev. Tax Comm'n Reg. LCB File No. R189-18 sec. 2 par. (c), eff. 2018-09-27 (NAC ch. 372, retailers outside this State)", verified_on: "2026-09-04" },

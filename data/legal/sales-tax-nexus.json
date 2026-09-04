@@ -9,8 +9,8 @@
       "sales_threshold_usd": 250000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Ala. Admin. Code r. 810-6-2-.90.03 (Simplified Sellers Use Tax)",
-      "verified_on": "2025-01-15"
+      "citation": "Ala. Admin. Code r. 810-6-2-.90.03/.90.04 (Simplified Sellers Use Tax; Act 2018-539, eff. 2019-01-01)",
+      "verified_on": "2026-09-04"
     },
     "AK": {
       "sales_threshold_usd": 100000,
@@ -167,8 +167,8 @@
       "sales_threshold_usd": 250000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Miss. Code Ann. 27-65-9 (Notice 72-19-001)",
-      "verified_on": "2025-01-15"
+      "citation": "Miss. Code Ann. 27-65-9 (substantial economic presence); MS DOR business-tax FAQ: over $250,000 in ANY twelve-month period, eff. 2018-07-01",
+      "verified_on": "2026-09-04"
     },
     "MO": {
       "sales_threshold_usd": 100000,
