@@ -1901,6 +1901,14 @@ async function buildAll() {
   const expected = {};
   let totalShards = 0;
   const proseLintErrors = [];
+  // Every byte this run produces is buffered and flushed only after the
+  // prose-lint passes. It used to write each shard immediately and throw at the
+  // very end, which meant a FAILING run still left the rejected shards, their
+  // manifests, expected-hashes.json and integrity.json on disk. Seven bad
+  // citations reached main that way: the run threw, the files were already
+  // written, `git add -A` picked them up, and CI never re-runs this script.
+  // A validator that runs after the write is a report, not a gate.
+  const pendingWrites = [];
 
   for (const ds of DATASETS) {
     const dir = resolve(DATA, ds.folder);
@@ -1937,7 +1945,7 @@ async function buildAll() {
       const out = formatJson(shard.body);
       const path = resolve(dir, shard.file);
       await ensureDir(dirname(path));
-      await writeFile(path, out, "utf8");
+      pendingWrites.push([path, out]);
       // v6 prose-lint: scan the in-memory body before hashing.
       const errs = lintProseInShard(ds.folder, shard.file, shard.body);
       for (const e of errs) proseLintErrors.push(e);
@@ -1964,7 +1972,7 @@ async function buildAll() {
 
     const manifestText = formatJson(manifest);
     const manifestPath = resolve(dir, "manifest.json");
-    await writeFile(manifestPath, manifestText, "utf8");
+    pendingWrites.push([manifestPath, manifestText]);
     expected[ds.folder + "/manifest.json"] = sha256Hex(manifestText);
   }
 
@@ -1992,7 +2000,7 @@ async function buildAll() {
   }
 
   // Top-level expected-hashes for verify-integrity.mjs.
-  await writeFile(expectedPath, formatJson({ generated: TODAY, hashes: expected }), "utf8");
+  pendingWrites.push([expectedPath, formatJson({ generated: TODAY, hashes: expected })]);
 
   // Runtime integrity sidecar: only manifest hashes (used by integrity.js
   // at startup to verify each per-folder manifest.json).
@@ -2004,13 +2012,19 @@ async function buildAll() {
     }
   }
   const integrityPath = resolve(DATA, "integrity.json");
-  await writeFile(integrityPath, formatJson({ generated: TODAY, manifests: manifestHashes }), "utf8");
+  pendingWrites.push([integrityPath, formatJson({ generated: TODAY, manifests: manifestHashes })]);
 
   if (proseLintErrors.length > 0) {
     console.error("v6 prose-lint failures:");
     for (const e of proseLintErrors) console.error("  - " + e);
+    console.error(
+      "\nNothing was written. Shorten the offending strings (the citation belongs " +
+        "in the shard; the explanation belongs in docs/) and re-run.",
+    );
     throw new Error("v6 prose-lint failed: " + proseLintErrors.length + " offending strings. Move running prose into a docs/ markdown file or whitelist the field name in PROSE_LINT_EXEMPT_KEYS.");
   }
+
+  for (const [path, text] of pendingWrites) await writeFile(path, text, "utf8");
 
   console.log("build-data: wrote " + totalShards + " shards across " + DATASETS.length + " datasets at " + TODAY + "; prose-lint clean; edition-stamp present on all manifests.");
 }

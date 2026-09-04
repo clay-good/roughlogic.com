@@ -14,7 +14,7 @@ npm run audit
 That single command runs the canonical chain (lint -> unit tests -> build ->
 `check:dist` -> `check:shells` -> `check:module-sizes` -> `check:shell-values`
 -> `check:lastmod` -> `data:verify` -> `check:data-stamps`). `npm run lint`
-alone is 57 static gates, of which 56 run here: `check-ngrams` compares text
+alone is 58 static gates, of which 56 run here: `check-ngrams` compares text
 against a private hash list of licensed code spans that is deliberately not in
 this repository, so it skips with a message and passes.
 If you changed layout or type, also run `npm run check:shell-mobile`; it drives

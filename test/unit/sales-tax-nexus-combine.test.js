@@ -46,8 +46,10 @@ test("the three states that repealed their transaction prong carry no count", ()
 });
 
 test("a row re-verified today is not left claiming the old stamp", () => {
-  // The other 31 rows deliberately keep 2025-01-15: they were not re-checked,
-  // and the folder's staleness warning should keep firing until they are.
+  // Four rows deliberately keep 2025-01-15 -- AR, CO, GA and MI. Every
+  // automated fetch of their code sites returns 403, and none of the four is
+  // stamped from a summary chart: a wrong stamp is worse than a stale one, and
+  // the folder's staleness warning should keep firing until a human reads them.
   // Ten of the sixteen were read and found CORRECT -- OH, VA, MN, NE, WV, VT,
   // HI, DC, RI and NV -- which is still a verification, and the only kind that
   // lets a stamp move.
@@ -71,6 +73,8 @@ test("a row re-verified today is not left claiming the old stamp", () => {
     AZ: "2026-09-04", IA: "2026-09-04",
     MO: "2026-09-04", NM: "2026-09-04",
     ID: "2026-09-04", ND: "2026-09-04",
+    ME: "2026-09-04", OK: "2026-09-04",
+    SC: "2026-09-04", WY: "2026-09-04", AK: "2026-09-04",
   };
   const rechecked = Object.entries(SALES_TAX_NEXUS).filter(([, v]) => v.verified_on !== "2025-01-15");
   assert.deepEqual(rechecked.map(([st]) => st).sort(), Object.keys(LEDGER).sort());
@@ -133,12 +137,52 @@ test("a corrected citation stays corrected", () => {
     MD: /COMAR 03\.06\.01\.33/,
     // Cited NAC 372.030, titled '"Retail sale" defined'.
     NV: /R189-18/,
+    // Cited 12-36-1340, which imposes the DUTY to collect but states no
+    // threshold at all -- its subsection (6) says only "meets constitutional
+    // standards for economic nexus". South Carolina's $100,000 is not
+    // statutory: it is the Department's reading of 12-36-70 in Rev. Rul.
+    // #18-14, and it measures GROSS revenue, including exempt retail sales,
+    // wholesale sales and services that the state could not tax.
+    SC: /12-36-70.*Rev\. Rul\. #18-14/,
+    // Cited bare section 1392, whose subsection (A) is a $10,000 ELECTION for
+    // marketplace facilitators and referrers. The remote-seller duty is (G).
+    OK: /1392\(G\)/,
+    // Cited bare section 1754-B, whose subsections 1 and 1-A were repealed.
+    ME: /1754-B\(1-B\)\(B\)/,
   };
   for (const [st, re] of Object.entries(corrected)) {
     assert.match(SALES_TAX_NEXUS[st].citation, re, st + " must keep the corrected citation");
     assert.equal(SALES_TAX_NEXUS[st].sales_threshold_usd, 100000, st);
   }
   // Kansas and Washington are sales-only; Maryland and Nevada are disjunctive.
-  for (const st of ["KS", "WA"]) assert.equal(SALES_TAX_NEXUS[st].transactions_threshold, null, st);
+  for (const st of ["KS", "WA", "SC", "OK", "ME"]) assert.equal(SALES_TAX_NEXUS[st].transactions_threshold, null, st);
   for (const st of ["MD", "NV"]) assert.equal(SALES_TAX_NEXUS[st].combine, "or", st);
+});
+
+test("Wyoming and Alaska cite the repeal that removed their transaction prong", () => {
+  // Both dropped the 200-transaction test in the 2024 cycle. Wyoming's repeal
+  // is visible in the statute itself: 39-15-501(a)(ii) now reads, in full,
+  // "Repealed by Laws 2024, ch. 67, s. 2." Alaska has no statewide sales tax
+  // at all -- the threshold is set by an intergovernmental commission for its
+  // member municipalities, which is why the citation names a Uniform Code
+  // section and not a state statute.
+  assert.match(SALES_TAX_NEXUS.WY.citation, /39-15-501\(a\)\(i\)/);
+  assert.match(SALES_TAX_NEXUS.WY.citation, /Laws 2024 ch\. 67/);
+  assert.match(SALES_TAX_NEXUS.AK.citation, /Uniform Code sec\. 040\(A\)/);
+  assert.match(SALES_TAX_NEXUS.AK.citation, /no statewide tax/);
+  assert.match(SALES_TAX_NEXUS.AK.citation, /2025-01-01/);
+  for (const st of ["WY", "AK"]) {
+    assert.equal(SALES_TAX_NEXUS[st].transactions_threshold, null, st);
+    assert.equal(SALES_TAX_NEXUS[st].combine, null, st);
+  }
+});
+
+test("the four states left stale are exactly the ones no source would serve", () => {
+  // Named so this cannot quietly grow. If a row joins this set, someone has
+  // let a stamp rot without recording why.
+  const stale = Object.entries(SALES_TAX_NEXUS)
+    .filter(([, v]) => v.verified_on === "2025-01-15")
+    .map(([st]) => st)
+    .sort();
+  assert.deepEqual(stale, ["AR", "CO", "GA", "MI"]);
 });

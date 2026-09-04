@@ -16,8 +16,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Alaska Remote Seller Sales Tax Commission (locality-driven; no statewide tax)",
-      "verified_on": "2025-01-15"
+      "citation": "ARSSTC Uniform Code sec. 040(A) (no statewide tax; member municipalities): $100,000 statewide gross; transaction prong repealed 2025-01-01",
+      "verified_on": "2026-09-04"
     },
     "AZ": {
       "sales_threshold_usd": 100000,
@@ -80,7 +80,7 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Idaho Code 63-3611(h): cumulative gross receipts from sales delivered into Idaho in excess of $100,000, previous or current calendar year; no transaction test",
+      "citation": "Idaho Code 63-3611(h): >$100,000 gross receipts delivered into Idaho, previous or current calendar year",
       "verified_on": "2026-09-04"
     },
     "IL": {
@@ -109,7 +109,7 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Kan. Stat. Ann. 79-3702(h)(1)(G)(i)(b) (SB 50 2021; KDOR Notice 21-17): >$100,000 cumulative gross receipts, current or immediately preceding calendar year",
+      "citation": "Kan. Stat. Ann. 79-3702(h)(1)(G)(i)(b) (SB 50 2021; KDOR Notice 21-17): >$100,000, previous or current calendar year",
       "verified_on": "2026-09-04"
     },
     "KY": {
@@ -132,8 +132,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Me. Rev. Stat. tit. 36 sec. 1754-B",
-      "verified_on": "2025-01-15"
+      "citation": "Me. Rev. Stat. tit. 36 sec. 1754-B(1-B)(B): >$100,000 gross sales into Maine, previous or current calendar year",
+      "verified_on": "2026-09-04"
     },
     "MD": {
       "sales_threshold_usd": 100000,
@@ -174,7 +174,7 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Mo. Rev. Stat. 144.605(2)(e) (SB 153): gross receipts from taxable sales delivered into MO exceed $100,000 in the previous or current calendar year; DOR determines quarterly over a trailing 12 months",
+      "citation": "Mo. Rev. Stat. 144.605(2)(e) (SB 153): >$100,000 taxable sales into MO, previous or current calendar year",
       "verified_on": "2026-09-04"
     },
     "NE": {
@@ -202,7 +202,7 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "NMSA 7-9-3.3; NM Tax & Rev gross receipts overview (FYI-206): at least $100,000 taxable gross receipts in the PREVIOUS calendar year; gross receipts tax, not a sales tax",
+      "citation": "NMSA 7-9-3.3 (gross receipts tax, not sales tax); NM Tax & Rev FYI-206: at least $100,000, previous calendar year",
       "verified_on": "2026-09-04"
     },
     "NY": {
@@ -217,7 +217,7 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "N.C. Gen. Stat. 105-164.8; NCDOR remote sales: >$100,000 sourced to NC, previous or current calendar year; registration 60 days after crossing (eff. 2026-07-02)",
+      "citation": "N.C. Gen. Stat. 105-164.8; NCDOR remote sales: >$100,000 sourced to NC, previous or current calendar year",
       "verified_on": "2026-09-04"
     },
     "ND": {
@@ -238,8 +238,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Okla. Stat. tit. 68 sec. 1392",
-      "verified_on": "2025-01-15"
+      "citation": "Okla. Stat. tit. 68 sec. 1392(G) (SB 513, eff. 2019-11-01): $100,000 in the preceding or current calendar year; no transaction test",
+      "verified_on": "2026-09-04"
     },
     "PA": {
       "sales_threshold_usd": 100000,
@@ -259,14 +259,14 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "S.C. Code Ann. 12-36-1340 (Rev. Rul. 18-14)",
-      "verified_on": "2025-01-15"
+      "citation": "S.C. Code Ann. 12-36-70, applied by SC Rev. Rul. #18-14: $100,000 GROSS revenue incl. exempt and wholesale, prev. or current year",
+      "verified_on": "2026-09-04"
     },
     "SD": {
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "S.D. Codified Laws ch. 10-64; SD DOR Remote Seller Bulletin Aug 2025: >$100,000 gross sales, previous or current calendar year; 200-transaction test repealed 2023-07-01",
+      "citation": "S.D. Codified Laws ch. 10-64; SD DOR bulletin Aug 2025: >$100,000 gross, previous or current calendar year",
       "verified_on": "2026-09-04"
     },
     "TN": {
@@ -323,15 +323,15 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Wis. Stat. 77.51 small-seller exception (2021 Wis. Act 1): >$100,000 gross sales, previous or current calendar year; 200-transaction test ended 2021-02-20",
+      "citation": "Wis. Stat. 77.51 small-seller exception (2021 Wis. Act 1): >$100,000 gross sales, previous or current calendar year",
       "verified_on": "2026-09-04"
     },
     "WY": {
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Wyo. Stat. Ann. 39-15-501 (transaction threshold removed 2024)",
-      "verified_on": "2025-01-15"
+      "citation": "Wyo. Stat. Ann. 39-15-501(a)(i) (200-count prong repealed, Laws 2024 ch. 67 sec. 2): >$100,000, current or preceding year",
+      "verified_on": "2026-09-04"
     },
     "DC": {
       "sales_threshold_usd": 100000,

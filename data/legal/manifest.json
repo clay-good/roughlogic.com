@@ -9,11 +9,11 @@
     {
       "file": "sales-tax-nexus.json",
       "name": "Per-state post-Wayfair economic-nexus thresholds",
-      "gzip_size_bytes": 2821
+      "gzip_size_bytes": 2805
     }
   ],
   "hashes": {
-    "sales-tax-nexus.json": "ec623580dca935d10894a2e3e6bdeb6143d393491aacbf2079b5229292734879"
+    "sales-tax-nexus.json": "5edd659b8e0a7013142dba19455ff759c036f719687f749352fdff7d49bbcb88"
   },
-  "staleness_note": "9 of 47 rows still carry verified_on 2025-01-15; the 38 re-verified since then run to 2026-09-04. States change these by legislation, not on a calendar, so each recheck is a per-state lookup against that department of revenue and is maintainer work, not a build step. The tile prints every row's citation and verified_on date and tells the reader to confirm with the state before filing. Recheck oldest-first; this note is generated from the stamps and goes away when they are current."
+  "staleness_note": "4 of 47 rows still carry verified_on 2025-01-15; the 43 re-verified since then run to 2026-09-04. States change these by legislation, not on a calendar, so each recheck is a per-state lookup against that department of revenue and is maintainer work, not a build step. The tile prints every row's citation and verified_on date and tells the reader to confirm with the state before filing. Recheck oldest-first; this note is generated from the stamps and goes away when they are current."
 }
