@@ -174,8 +174,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Mo. Rev. Stat. 144.605(2)(d) (SB 153, eff. 2023)",
-      "verified_on": "2025-01-15"
+      "citation": "Mo. Rev. Stat. 144.605(2)(e) (SB 153): gross receipts from taxable sales delivered into MO exceed $100,000 in the previous or current calendar year; DOR determines quarterly over a trailing 12 months",
+      "verified_on": "2026-09-04"
     },
     "NE": {
       "sales_threshold_usd": 100000,
@@ -202,8 +202,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "N.M. Stat. Ann. 7-9-3.3 (gross receipts)",
-      "verified_on": "2025-01-15"
+      "citation": "NMSA 7-9-3.3; NM Tax & Rev gross receipts overview (FYI-206): at least $100,000 taxable gross receipts in the PREVIOUS calendar year; gross receipts tax, not a sales tax",
+      "verified_on": "2026-09-04"
     },
     "NY": {
       "sales_threshold_usd": 500000,
