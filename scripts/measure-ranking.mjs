@@ -50,6 +50,26 @@
 //   Also worse. File order is a bad tiebreak and both replacements were worse
 //   than it, so neither shipped.
 //
+//   Direction words. "to" and "from" are STOPWORDS, so an inverse pair collapses
+//   onto one query: "conductivity to tds" and "tds from conductivity" reduce to
+//   the same two words in a different order, and 15 of the alias misses below
+//   are a forward/inverse sibling picked the wrong way round. The direction word
+//   was the only thing saying which number the reader wanted, and tiles are
+//   named the same way the query is phrased -- "TDS from Conductivity",
+//   "Chimney Height for Draft" put their OUTPUT first -- so the hint is easy to
+//   extract: in "A to B" the answer is B, in "B from A" the answer is B.
+//
+//   Extracting it works. Using it does not. Placed as a TIEBREAK (the only
+//   placement that cannot hurt a row decided on real signal) it moves none of
+//   those 15, because they are not ties: "conductivity to tds" normalizes to
+//   "conductivity tds", which is an exact alias term for the OTHER sibling, and
+//   the verbatim-alias key sorts far above any tiebreak. These rows are the
+//   normalized-alias-collision class described above wearing a different hat,
+//   not a direction problem, and the two fixes tried for that collision both
+//   measured worse. Promoting the hint above the verbatim-alias key would mean
+//   a heuristic overriding recorded human intent, which is the wrong trade.
+//   Measured 2026-09-04; not shipped.
+//
 // The residue is not all defect, either. Reading the 97 alias misses, a good
 // share are cases where the ranker's answer looks better than the curated one
 // ("occupant load" returns the tile named Occupant Load; the alias points
