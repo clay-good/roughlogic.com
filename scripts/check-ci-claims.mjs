@@ -321,6 +321,45 @@ async function main() {
       "axes run over a sample. Say which is which.");
   }
 
+  // F2. docs/performance.md names, per gate, WHERE it runs. A gate that reads
+  // dist/ cannot enforce anything under `npm run lint`, because lint runs before
+  // any build: with no dist/ it prints a WARN and exits 0. That is not a
+  // hypothetical -- check-module-sizes skipped in CI that way from the day it
+  // was written until 2026-08-30, when an over-cap module went green through it
+  // and ci.yml moved the enforcing run into the integration job. The table went
+  // on saying `npm run lint` for another five days.
+  //
+  // A gate that fails LOUDLY without dist/ (check-shells exits 1) is a different
+  // thing and stays allowed wherever it is claimed: the failure is visible.
+  const perfDoc = resolve(ROOT, "docs", "performance.md");
+  if (existsSync(perfDoc)) {
+    const perf = await readFile(perfDoc, "utf8");
+    const rows = [...perf.matchAll(/^\|\s*`(check-[a-z-]+)`\s*\|\s*([^|]+?)\s*\|/gm)];
+    if (rows.length === 0) {
+      errors.push(
+        "docs/performance.md no longer has a `| gate | where |` table, so this check has gone blind to " +
+        "where it claims each performance gate runs.");
+    }
+    for (const [, gate, where] of rows) {
+      const gatePath = resolve(ROOT, "scripts", gate + ".mjs");
+      if (!existsSync(gatePath)) {
+        errors.push(`docs/performance.md names ${gate}, but scripts/${gate}.mjs does not exist.`);
+        continue;
+      }
+      if (!/npm run lint/.test(where)) continue;
+      const gateSrc = await readFile(gatePath, "utf8");
+      // Skips on a missing dist/ rather than failing: `npm run lint` is the one
+      // place that is guaranteed to be missing.
+      if (/dist\/? not present|dist\/ does not exist/i.test(gateSrc) && /exit\(0\)|process\.exitCode = 0|return;/.test(gateSrc)
+          && !/process\.exit\(1\)[\s\S]{0,200}dist/i.test(gateSrc)) {
+        errors.push(
+          `docs/performance.md says ${gate} is enforced by \`npm run lint\`, but it measures the built copy and ` +
+          `skips when dist/ is absent -- which is exactly the state lint runs in. Name the job that runs it after ` +
+          `a build, or the table promises a gate that is not gating.`);
+      }
+    }
+  }
+
   // G. The refresh lane. A pull request opened by a workflow using GITHUB_TOKEN
   // does not trigger further workflow runs, so every data-refresh PR sits at
   // `action_required` with a 0s run that never executes. For months the only
@@ -373,7 +412,7 @@ async function main() {
     process.exit(1);
   }
   console.log(
-    `check-ci-claims OK: README names all ${jobs.length} CI jobs (${jobs.join(", ")}), states the axe pass within 5% of its live size, no doc claims a gate the workflow does not run, and both data-refresh lanes run the static gates plus the base-TIP stamp check themselves (the PRs they open never run CI).`,
+    `check-ci-claims OK: README names all ${jobs.length} CI jobs (${jobs.join(", ")}), states the axe pass within 5% of its live size, no doc claims a gate the workflow does not run, both data-refresh lanes run the static gates plus the base-TIP stamp check themselves (the PRs they open never run CI), and no gate in docs/performance.md's table is claimed under \`npm run lint\` while measuring a dist/ that lint has not built.`,
   );
 }
 
