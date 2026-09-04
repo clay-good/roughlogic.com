@@ -6,6 +6,19 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **A tile's prose description could outrank a tile the query names, and fixing it broke a home chip on the first try.** Ranking sorts on how many query words a tile covers before how well it covers them, and "covers" counted a match anywhere -- including the paragraph-long description. `how many sheets of plywood for a 24x40 floor` opened with **Compressed Gas Cylinder Storage Separation**, whose description warns that "a sheet of plywood" is the wrong barrier and elsewhere mentions "clear floor": three query words from prose arguing the opposite, beating the tile named *Wall / Roof Sheathing Panel and Nail Takeoff*.
+
+  Coverage is now counted twice -- over the tile's identity (name, id, alias, trade) and over everything -- with identity sorting one rung above. A description match still counts and simply cannot outrank a tile the query names. Free at runtime: `bestFieldWeight` already reported which field matched.
+
+  **The first attempt shipped and broke the home view.** Reordering the top twelve pulled a tile that ties Ohm's Law on score into that window, and `app.js`'s spec-v1343 ambiguity rule reads nothing but score -- so `ohms law 120 v, 10 a`, one of the four chips the home view uses to demonstrate "type the job the way you'd say it", opened a disambiguation card instead of routing. It was reverted, diagnosed, and re-landed with two fixes:
+
+  - The ambiguity rule now stands down when the query **names** the leader. It stays out of the way of the vague queries it exists for: "pressure drop" does not name *Gas Pipe* Pressure Drop, nor "grounding" *Grounding Electrode Conductor*.
+  - `"Ohm's Law"` tokenized to `["ohm", "s", "law"]`, and no query produces a bare `"s"`, so **six tiles with a possessive in their name could never earn the covered-name signal** -- Ohm's Law, Manning's Equation, Baker's Percentage, Naismith's Rule, Plank's Equation, and the Load's Swing Limit. The possessive is stripped when building name parts; the real single letters stay (Manual J, Delta-T, V-Belt, K-Factor, the section modulus S).
+
+  Measured against all four ranking ground truths -- 21,025 curated aliases, 1,804 names, 1,804 ids, 5,403 question phrasings -- every rate unchanged and all 63 miss rows byte-identical. It also improves the degraded path: with the alias shards blocked, `asphalt tonnage 2400 sq ft 3 in deep` used to lead with a carpet takeoff and now leads with Asphalt Tonnage. That is what invalidated **spec-v590**'s pre-assertion, which used "the ranking is visibly wrong" as a proxy for "the aliases have not loaded"; it now proves the latch directly by waiting on the retried shard request, verified by breaking the latch and watching it fail.
+
+  Two unit tests were the actual lesson. `chip-routing` reads the four chips out of `index.html` and asserts each routes and the vague queries still ask -- it reproduces the regression in 40 ms, where the browser spec that caught it costs a full CI run. `identity-coverage` pins the plywood case and asserts its own premise, so it cannot quietly stop meaning anything. `search-discovery.js`'s gzip cap moves 13000 -> 14000 (measured 13015 B, lazy-loaded, outside the home-view payload).
+
 - **ICC published the 2027 IMC and IFGC, and a disclosure written this morning was stale by the afternoon.** The 2026-09-02 pass could not reach ICC at all -- `shop.iccsafe.org` 404s and `codes.iccsafe.org` was refusing an automated fetch -- so four I-Code rows carried an *anticipated* schedule rather than a verification. The site answers now, though it renders its catalogue in JavaScript, so it was read in a browser.
 
   ICC's 2027 I-Codes page says *"Select 2027 I-Codes are available now"* and lists seven titles: IPMC, IPSDC, ISPSC, IZC, **IFGC** and **IMC**. Two consequences, in opposite directions:

@@ -619,9 +619,22 @@ test("spec-v590: a failed alias fetch is retried on the next keystroke", async (
   await input.click();
   await input.fill(ASK_QUERY);
 
-  // With no aliases the ranking is the degraded one, and it stays that way.
+  // This used to assert the degraded ranking does NOT lead with Asphalt Tonnage,
+  // which was true and is no longer: with no aliases at all the ranker used to
+  // lead with a carpet takeoff, and after the identity-coverage sort key it
+  // leads with Asphalt Tonnage on the tile's own name. The degraded state got
+  // better, so "the ranking is visibly wrong" stopped being a usable signal for
+  // "the aliases have not loaded".
+  //
+  // That assertion was only ever a proxy. What spec-v590 is about is the LATCH:
+  // a failed alias fetch must not cost the session its aliases, so the next
+  // keystroke has to retry. The retry is observed directly below by waiting on
+  // the shard response itself -- if the latch stays set, no request is made and
+  // that wait times out. Assert the results rendered at all, which is what puts
+  // us in the degraded state, and let the latch be proven by the thing that
+  // actually proves it.
   const top = page.locator("#search-results .search-result").first().locator(".sr-name");
-  await expect(top).not.toHaveText("Asphalt Tonnage");
+  await expect(top).toBeVisible({ timeout: 30_000 });
 
   // Let the shards through and type one more character: the latch must have
   // been released, so the aliases load and the ranking corrects itself.

@@ -372,7 +372,13 @@ function corpusFor(tool, aliases, aliasEntry) {
       nameLower: typeof tool.name === "string" ? tool.name.toLowerCase() : "",
       // Signal-bearing name parts for the covered-name bonus: split
       // compounds, drop question-frame words ("with", "for", "a").
-      nameParts: tokenize(tool.name, false).filter((t) => !STOPWORDS.has(t)),
+      // Possessive stripped first: "Ohm's Law" tokenized to ["ohm","s","law"]
+      // and no query yields a bare "s", so the covered-name bonus below could
+      // never fire for it, Manning's, Baker's, Naismith's, Plank's or Load's.
+      // Only `'s` goes, so Manual J, Delta-T, V-Belt, K-Factor and the section
+      // modulus S in "(A, I, S, r)" keep their real single letters.
+      nameParts: tokenize(String(tool.name || "").replace(/['\u2019]s\b/gi, ""), false)
+        .filter((t) => !STOPWORDS.has(t)),
       // The whole name as a normalized phrase, for the containment bonus
       // below: the same tokenizing the query goes through, so "Manual J
       // Cooling Load (Simplified)" and a reader's typing meet in one form.
@@ -512,12 +518,23 @@ export function rankTools(tokens, tools, aliases, opts) {
     const weights = new Array(tokens.length);
     let score = 0;
     let coverage = 0;
+    // Coverage over the tile's IDENTITY -- name, id, alias, trade -- not its
+    // description. Coverage sorts ahead of score, so a long description buys
+    // rank: "how many sheets of plywood for a 24x40 floor" led with Compressed
+    // Gas Cylinder Storage Separation, whose desc warns "a sheet of plywood" is
+    // the wrong barrier and mentions "clear floor". Sorted above raw coverage,
+    // so a desc match still counts and cannot outrank a tile the query names.
+    // Free: bestFieldWeight already says where it matched (desc alone is 1).
+    let identityCoverage = 0;
     for (let i = 0; i < tokens.length; i++) {
       const w = bestFieldWeight(tokens[i], corpus);
       weights[i] = w;
       if (w > 0) {
         score += w;
-        if (!soft[i]) coverage++;
+        if (!soft[i]) {
+          coverage++;
+          if (w > FIELD_WEIGHTS.desc) identityCoverage++;
+        }
         matchedAnywhere[i] = true;
       }
     }
@@ -563,7 +580,7 @@ export function rankTools(tokens, tools, aliases, opts) {
     // See test/unit/search-discovery.test.js for the measured numbers.
     if (verbatimTarget === undefined && idBonusApplies(tool, joined)) score += 4;
     if (verbatimTarget === tool.id) score += 4;
-    scored.push({ tool, corpus, weights, score, coverage, viaTypo: false, namesInFull });
+    scored.push({ tool, corpus, weights, score, coverage, identityCoverage, viaTypo: false, namesInFull });
   }
 
   // Pass 2: bounded typo fallback, only for query tokens of length >= 3
@@ -581,6 +598,7 @@ export function rankTools(tokens, tools, aliases, opts) {
         row.weights[i] = hit.w;
         row.score += hit.w;
         row.coverage++;
+        if (hit.w > FIELD_WEIGHTS.desc) row.identityCoverage++;
         row.viaTypo = true;
         if (!row.typoFixes) row.typoFixes = {};
         row.typoFixes[tokens[i]] = hit.ct;
@@ -603,7 +621,7 @@ export function rankTools(tokens, tools, aliases, opts) {
       }
       if (!hit) { covered = false; break; }
     }
-    if (covered) row.score += 2;
+    if (covered) { row.score += 2; row.coveredName = true; }
   }
 
   const out = scored.filter((r) => r.coverage > 0);
@@ -648,6 +666,7 @@ export function rankTools(tokens, tools, aliases, opts) {
       (b.corpus.namePhrase === joined ? 1 : 0) - (a.corpus.namePhrase === joined ? 1 : 0) ||
       (idBonusApplies(b.tool, joined) ? 1 : 0) - (idBonusApplies(a.tool, joined) ? 1 : 0) ||
       (b.tool.id === verbatimTarget ? 1 : 0) - (a.tool.id === verbatimTarget ? 1 : 0) ||
+      b.identityCoverage - a.identityCoverage ||
       b.coverage - a.coverage ||
       b.score - a.score ||
       (idBonusApplies(b.tool, joined) ? 1 : 0) - (idBonusApplies(a.tool, joined) ? 1 : 0) ||
@@ -662,6 +681,10 @@ export function rankTools(tokens, tools, aliases, opts) {
       score: r.score,
       viaTypo: r.viaTypo,
       typoFixes: r.typoFixes || null,
+      // The query NAMED this calculator: it contains the whole name, or every
+      // signal-bearing word of it. A caller deciding whether the top pick is a
+      // real pick needs that, not just a score -- see app.js's ambiguity guard.
+      named: Boolean(r.namesInFull || r.coveredName),
     }));
 }
 

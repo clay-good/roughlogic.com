@@ -33,6 +33,7 @@ const AMBIGUITY_RATIO = 0.95;
 function asks(query) {
   const rows = rankTools(normalizeQuery(query).tokens, TOOLS, aliases, { limit: 12 });
   if (rows.length < 2 || !rows[0].score) return false;
+  if (rows[0].named) return false;
   return rows.filter((r) => r.score / rows[0].score >= AMBIGUITY_RATIO).length >= 2;
 }
 
@@ -50,5 +51,20 @@ test("the vague queries spec-v1343 names still ask instead of guessing", () => {
   // makes these route, the guard above has grown too broad.
   for (const q of ["pressure drop", "heat loss", "payment", "grounding"]) {
     assert.equal(asks(q), true, `"${q}" should offer a choice, not guess`);
+  }
+});
+
+test("a possessive in a tile name does not cost it the covered-name signal", () => {
+  // "Ohm's Law" tokenized to ["ohm", "s", "law"], and no query produces a bare
+  // "s", so six tiles could never earn the signal that says the reader named
+  // this calculator.
+  for (const [query, id] of [
+    ["ohms law", "ohms-law"],
+    ["mannings equation drainage slope", "manning-slope"],
+    ["bakers percentage", "bakers-percentage"],
+  ]) {
+    const rows = rankTools(normalizeQuery(query).tokens, TOOLS, aliases, { limit: 3 });
+    assert.equal(rows[0].tool.id, id, `"${query}" should rank ${id} first`);
+    assert.equal(rows[0].named, true, `"${query}" names ${id} in full`);
   }
 });

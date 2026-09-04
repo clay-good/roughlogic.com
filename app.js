@@ -1074,6 +1074,19 @@ function bindSearch() {
     // prefill; that is not ambiguity either.
     if (slotsByTile && slotsByTile.has(rows[0].tool.id) && discovery
         && discovery.mapSlots(discovery.extractQuantities(input.value), slotsByTile.get(rows[0].tool.id))) return null;
+    // The query NAMED the leader -- it contains the whole name, or every
+    // signal-bearing word of it. That is not a coincidence of token scores, and
+    // this rule reads nothing but token scores, so without this guard a tile
+    // that ties by accident turns a named request into a question. "ohms law
+    // 120 v, 10 a" -- one of the four chips the home view teaches -- scored 6,
+    // and so did Belt Deflection Tension, on "law" and a couple of stray
+    // letters. The reader was not choosing between Ohm's Law and belt tension.
+    //
+    // It stays out of the way of the vague queries this rule exists for,
+    // because none of them names its leader: "pressure drop" does not cover Gas
+    // Pipe Pressure Drop, "grounding" does not cover Grounding Electrode
+    // Conductor, "payment" does not cover Loan Payment.
+    if (rows[0].named) return null;
     const close = rows.filter((r) => r.score / leader >= AMBIGUITY_RATIO);
     if (close.length < 2) return null;
     // Two where the top pair separates from the rest; three at the outside.
