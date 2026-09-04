@@ -46,17 +46,26 @@ test("the three states that repealed their transaction prong carry no count", ()
 });
 
 test("a row re-verified today is not left claiming the old stamp", () => {
-  // The other 33 rows deliberately keep 2025-01-15: they were not re-checked,
+  // The other 31 rows deliberately keep 2025-01-15: they were not re-checked,
   // and the folder's staleness warning should keep firing until they are.
-  // Eight of the fourteen were read and found CORRECT -- OH, VA, MN, NE, WV,
-  // VT, HI and DC --
-  // which is still a verification, and the only kind that lets a stamp move.
+  // Ten of the sixteen were read and found CORRECT -- OH, VA, MN, NE, WV, VT,
+  // HI, DC, RI and NV -- which is still a verification, and the only kind that
+  // lets a stamp move.
+  //
+  // This is a ledger, not a loose check: each stamp names the day that row was
+  // actually read, so a row cannot join the re-verified set without someone
+  // adding it here.
+  const LEDGER = {
+    CT: "2026-09-03", DC: "2026-09-03", HI: "2026-09-03", IL: "2026-09-03",
+    KY: "2026-09-03", LA: "2026-09-03", MN: "2026-09-03", NE: "2026-09-03",
+    NY: "2026-09-03", OH: "2026-09-03", UT: "2026-09-03", VA: "2026-09-03",
+    VT: "2026-09-03", WV: "2026-09-03",
+    // Read 2026-09-04 against the state's own published text.
+    NV: "2026-09-04", RI: "2026-09-04",
+  };
   const rechecked = Object.entries(SALES_TAX_NEXUS).filter(([, v]) => v.verified_on !== "2025-01-15");
-  assert.deepEqual(
-    rechecked.map(([st]) => st).sort(),
-    ["CT", "DC", "HI", "IL", "KY", "LA", "MN", "NE", "NY", "OH", "UT", "VA", "VT", "WV"],
-  );
-  for (const [, v] of rechecked) assert.equal(v.verified_on, "2026-09-03");
+  assert.deepEqual(rechecked.map(([st]) => st).sort(), Object.keys(LEDGER).sort());
+  for (const [st, v] of rechecked) assert.equal(v.verified_on, LEDGER[st], st + " stamp");
 });
 
 test("a row read and found correct still cites the provision that was read", () => {
@@ -68,6 +77,14 @@ test("a row read and found correct still cites the provision that was read", () 
     VA: /58\.1-612\(C\)\(10\)-\(11\)/,
     NE: /77-2701\.13\(2\)\(a\)-\(b\)/,
     WV: /11-15A-6b\(a\)\(1\)-\(2\)/,
+    // Read 2026-09-04. Rhode Island states the test inside the "remote seller"
+    // definition, so the subsection is the useful pointer.
+    RI: /44-18\.2-3\(E\)/,
+    // Nevada's citation was WRONG, not merely loose: it named NAC 372.030,
+    // which is titled '"Retail sale" defined' and carries no threshold. The
+    // test comes from the Tax Commission's approved regulation, read from the
+    // enrolled PDF where new matter is italicised and deletions bracketed.
+    NV: /R189-18/,
   };
   for (const [st, re] of Object.entries(cites)) {
     assert.match(SALES_TAX_NEXUS[st].citation, re, st + " must cite the subsection read");

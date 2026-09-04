@@ -188,8 +188,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": 200,
       "combine": "or",
-      "citation": "Nev. Admin. Code 372.030",
-      "verified_on": "2025-01-15"
+      "citation": "Nev. Tax Comm'n Reg. LCB File No. R189-18 sec. 2 par. (c), eff. 2018-09-27 (NAC ch. 372, retailers outside this State)",
+      "verified_on": "2026-09-04"
     },
     "NJ": {
       "sales_threshold_usd": 100000,
@@ -252,8 +252,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": 200,
       "combine": "or",
-      "citation": "R.I. Gen. Laws 44-18.2-3",
-      "verified_on": "2025-01-15"
+      "citation": "R.I. Gen. Laws 44-18.2-3(E) ('remote seller' definition)",
+      "verified_on": "2026-09-04"
     },
     "SC": {
       "sales_threshold_usd": 100000,
