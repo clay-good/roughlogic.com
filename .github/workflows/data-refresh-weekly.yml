@@ -40,12 +40,38 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 20
+      # The pipeline and the unit tests are dependency-free, so this job ran for
+      # months with no install at all. The static gates are not quite: for
+      # check-ci-claims to count the axe pass it has to run `playwright --list`.
+      - run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Run data pipeline
         run: npm run data:refresh
       - name: Verify integrity
         run: npm run data:verify
       - name: Run unit tests
         run: npm run test:unit
+      # A pull request opened by a workflow using GITHUB_TOKEN does not trigger
+      # further workflow runs: every data-refresh PR sits at `action_required`
+      # with a 0s CI run that never executes. So the 57 static gates DO NOT run
+      # on a refresh unless somebody clicks approve, and nobody does -- for
+      # months the only checks a refresh faced were data:verify and the unit
+      # tests, two of fifty-nine. The whole point of check-manifests,
+      # check-citation-freshness, check-verified-on-ledger and the base-TIP
+      # provenance check is the data path, and none of them had ever seen it.
+      # Run them here, where the run is triggered by `schedule` and executes.
+      - name: Static gates (the PR this opens will not run them)
+        run: npm run lint
+      # The gate built for exactly this branch: a refresh snapshot cut before a
+      # hand-correction landed on main passes every other check, because what it
+      # restores is internally consistent. Only the stamps show it moved
+      # backwards. This job runs ON main and the regenerated shards are still
+      # uncommitted here -- create-pull-request commits them in the step below --
+      # so the base IS this commit and the comparison is base-vs-working-tree.
+      # DATA_STAMP_WORKTREE=1 says that out loud; without it the gate refuses a
+      # base equal to HEAD, which is the protection that keeps it from going
+      # green on an empty comparison during a push.
+      - name: Provenance stamps only move forward vs main
+        run: DATA_STAMP_WORKTREE=1 DATA_STAMP_BASE=HEAD npm run check:data-stamps
       - name: Generate data change analysis
         id: analysis
         run: |

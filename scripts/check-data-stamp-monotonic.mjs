@@ -137,14 +137,28 @@ function main() {
   // resolved origin/main, which after the push IS this commit, and reported
   // "OK: 0 stamps across 0 files" on every run. Green having looked at nothing
   // is the failure this gate's own contract says it refuses, so refuse it.
+  //
+  // One shape looks like that and is not: the scheduled Data Refresh job runs
+  // ON main, regenerates data/ in the working tree, and must be checked BEFORE
+  // create-pull-request commits anything -- so its base legitimately IS HEAD.
+  // The diff below already compares the base against the working tree, so that
+  // caller sets DATA_STAMP_WORKTREE=1 to say so explicitly. An empty diff there
+  // means the regeneration changed nothing, which is the normal outcome for a
+  // deterministic pipeline and a pass. Guessing from dirtiness instead would
+  // turn every no-op refresh red, and leaving the refusal unconditional is how
+  // this gate spent its first day in CI: on a push to main it resolved
+  // origin/main, which after the push IS this commit, and reported "OK: 0 stamps
+  // across 0 files" on every run.
   const head = tryGit(["rev-parse", "HEAD"]);
-  if (base.explicit && head && head === base.sha) {
+  const worktreeMode = process.env.DATA_STAMP_WORKTREE === "1";
+  if (base.explicit && head && head === base.sha && !worktreeMode) {
     console.error(
       "check-data-stamp-monotonic FAILED: the base (" +
         base.ref +
         ") is this very commit, so there is nothing to compare. On a push, pass " +
         "the commit the push moved FROM (github.event.before); on a pull request, " +
-        "the base branch. Refusing to report OK on an empty comparison.",
+        "the base branch; in a job that regenerates data/ in the working tree, set " +
+        "DATA_STAMP_WORKTREE=1. Refusing to report OK on an empty comparison.",
     );
     process.exit(1);
   }

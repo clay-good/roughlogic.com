@@ -321,13 +321,59 @@ async function main() {
       "axes run over a sample. Say which is which.");
   }
 
+  // G. The refresh lane. A pull request opened by a workflow using GITHUB_TOKEN
+  // does not trigger further workflow runs, so every data-refresh PR sits at
+  // `action_required` with a 0s run that never executes. For months the only
+  // checks a monthly or weekly refresh faced were `data:verify` and the unit
+  // tests -- not check-manifests, not check-citation-freshness, not
+  // check-verified-on-ledger, and not the base-TIP provenance check that exists
+  // for precisely this branch. The gates have to run in the scheduled job,
+  // because nothing downstream of it will run them.
+  for (const wf of [".github/workflows/data-refresh.yml", ".github/workflows/data-refresh-weekly.yml"]) {
+    const path = resolve(ROOT, wf);
+    if (!existsSync(path)) {
+      errors.push(`${wf} is missing; the refresh lane it defines is what this check watches.`);
+      continue;
+    }
+    // Strip comment lines first. The prose above these very steps names each
+    // token, so testing the raw file made every check pass on the comment and
+    // the DATA_STAMP_WORKTREE one silently never fired.
+    const yaml = (await readFile(path, "utf8"))
+      .split("\n")
+      .filter((line) => !/^\s*#/.test(line))
+      .join("\n");
+    if (!/npm run lint\b/.test(yaml)) {
+      errors.push(
+        `${wf} does not run \`npm run lint\`. The pull request it opens will not run CI ` +
+        `(a GITHUB_TOKEN-authored PR triggers no workflow), so a refresh would face the unit ` +
+        `tests and nothing else.`);
+    }
+    if (/check:data-stamps\b/.test(yaml) && !/DATA_STAMP_WORKTREE=1/.test(yaml)) {
+      errors.push(
+        `${wf} runs check:data-stamps without DATA_STAMP_WORKTREE=1. This job runs on main ` +
+        `with the regenerated shards still uncommitted, so the base equals HEAD and the gate ` +
+        `refuses the comparison rather than running it.`);
+    }
+    if (!/check:data-stamps\b/.test(yaml)) {
+      errors.push(
+        `${wf} does not run \`npm run check:data-stamps\`. A refresh snapshot cut before a ` +
+        `hand-correction landed on main passes every other gate, because what it restores is ` +
+        `internally consistent; the stamps are the only tell.`);
+    }
+    if (!/npm ci\b/.test(yaml)) {
+      errors.push(
+        `${wf} does not install dependencies, so \`npm run lint\` cannot reach ` +
+        `\`playwright --list\` and check-ci-claims itself fails inside it.`);
+    }
+  }
+
   if (errors.length) {
     console.error("check-ci-claims FAILED:");
     for (const e of errors) console.error("  - " + e);
     process.exit(1);
   }
   console.log(
-    `check-ci-claims OK: README names all ${jobs.length} CI jobs (${jobs.join(", ")}), states the axe pass within 5% of its live size, and no doc claims a gate the workflow does not run.`,
+    `check-ci-claims OK: README names all ${jobs.length} CI jobs (${jobs.join(", ")}), states the axe pass within 5% of its live size, no doc claims a gate the workflow does not run, and both data-refresh lanes run the static gates plus the base-TIP stamp check themselves (the PRs they open never run CI).`,
   );
 }
 

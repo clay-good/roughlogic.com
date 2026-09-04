@@ -102,8 +102,10 @@ infrastructure changes are required:
   [`.github/workflows/data-refresh-weekly.yml`](../.github/workflows/data-refresh-weekly.yml)
   (cron `0 12 * * 1`), alongside the existing monthly
   [`data-refresh.yml`](../.github/workflows/data-refresh.yml)
-  (`0 12 1 * *`). Both run `npm run data:refresh` + `npm run
-  data:verify`, append a one-line summary to
+  (`0 12 1 * *`). Both run `npm ci`, `npm run data:refresh`, `npm
+  run data:verify`, the unit tests, **`npm run lint` (all 57
+  static gates) and the base-TIP `npm run check:data-stamps`**,
+  append a one-line summary to
   [`scripts/sources.md`](../scripts/sources.md) via
   [`scripts/append-source-diff-log.mjs`](../scripts/append-source-diff-log.mjs),
   and open a PR for review when the integrity hashes shift. No
@@ -118,7 +120,14 @@ infrastructure changes are required:
   was cut. `npm run check:data-stamps` is the backstop -- it
   fails any branch whose `verified_on` / `fetched` / `asOf` /
   manifest `version` stamps sit behind the base tip, which is
-  what a stale refresh always looks like.
+  what a stale refresh always looks like. It has to run **inside
+  the scheduled job**, and until 2026-09-04 it did not: a pull
+  request opened by a workflow using `GITHUB_TOKEN` triggers no
+  further workflow runs, so every refresh PR carried a CI run
+  stuck at `action_required` with a 0s duration, and the backstop
+  named here had never once executed on the branch it was written
+  for. `check-ci-claims` now fails if either refresh lane drops
+  `npm ci`, `npm run lint`, or `check:data-stamps`.
 - New data folder `data/realestate/` (FHFA conforming loan
   limits, HUD Fair Market Rents) shipped with `manifest.json`
   carrying the spec-v12 §H.2 `refresh_cadence` field. Total
