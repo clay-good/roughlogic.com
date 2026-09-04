@@ -68,6 +68,7 @@ test("a row re-verified today is not left claiming the old stamp", () => {
     KS: "2026-09-04", PA: "2026-09-04",
     MA: "2026-09-04", TN: "2026-09-04",
     WI: "2026-09-04", NC: "2026-09-04",
+    AZ: "2026-09-04", IA: "2026-09-04",
   };
   const rechecked = Object.entries(SALES_TAX_NEXUS).filter(([, v]) => v.verified_on !== "2025-01-15");
   assert.deepEqual(rechecked.map(([st]) => st).sort(), Object.keys(LEDGER).sort());
@@ -116,6 +117,9 @@ test("a corrected citation stays corrected", () => {
     // Cited (h)(1)(F), the constitutional catch-all. SB 50 (2021) put the
     // $100,000 test in new subparagraph (h)(1)(G), per KDOR Notice 21-17.
     KS: /79-3702\(h\)\(1\)\(G\)/,
+    // Cited A.R.S. 42-5043, which is liability relief for errors. The
+    // threshold is 42-5044.
+    AZ: /42-5044/,
     // Cited RCW 82.08.052, which governed only through 2019-12-31 and still
     // carries Washington's repealed 200-transaction language.
     WA: /82\.04\.067/,

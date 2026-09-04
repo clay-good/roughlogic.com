@@ -23,8 +23,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Ariz. Rev. Stat. 42-5043 (TPT post-Wayfair)",
-      "verified_on": "2025-01-15"
+      "citation": "Ariz. Rev. Stat. 42-5044: $200,000 (2019), $150,000 (2020), $100,000 (2021 on); previous or current calendar year",
+      "verified_on": "2026-09-04"
     },
     "AR": {
       "sales_threshold_usd": 100000,
@@ -95,21 +95,21 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Ind. Code 6-2.5-2-1; IN DOR remote-seller FAQ: $100,000 gross revenue, current or preceding calendar year; 200-transaction test removed eff. 2024-01-01 (SEA 228)",
+      "citation": "Ind. Code 6-2.5-2-1 (SEA 228): $100,000 gross revenue, current or preceding calendar year; 200-transaction test removed 2024-01-01",
       "verified_on": "2026-09-04"
     },
     "IA": {
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Iowa Code 423.14A",
-      "verified_on": "2025-01-15"
+      "citation": "Iowa Code 423.14A(3)(a): gross revenue EQUAL TO OR EXCEEDING $100,000, immediately preceding or current calendar year",
+      "verified_on": "2026-09-04"
     },
     "KS": {
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Kan. Stat. Ann. 79-3702(h)(1)(G)(i)(b) (SB 50 2021, eff. 2021-07-01; KDOR Notice 21-17). Subparagraph (F) is the constitutional catch-all, not the threshold.",
+      "citation": "Kan. Stat. Ann. 79-3702(h)(1)(G)(i)(b) (SB 50 2021; KDOR Notice 21-17): >$100,000 cumulative gross receipts, current or immediately preceding calendar year",
       "verified_on": "2026-09-04"
     },
     "KY": {
@@ -188,7 +188,7 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": 200,
       "combine": "or",
-      "citation": "Nev. Tax Comm'n Reg. LCB File No. R189-18 sec. 2 par. (c), eff. 2018-09-27 (NAC ch. 372, retailers outside this State)",
+      "citation": "Nev. Tax Comm'n Reg. LCB File No. R189-18 sec. 2(c), eff. 2018-09-27 (NAC ch. 372)",
       "verified_on": "2026-09-04"
     },
     "NJ": {
@@ -217,7 +217,7 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "N.C. Gen. Stat. 105-164.8; NCDOR remote sales page: gross sales over $100,000 sourced to NC in the previous or current calendar year, no transaction test; registration due 60 days after crossing (eff. 2026-07-02)",
+      "citation": "N.C. Gen. Stat. 105-164.8; NCDOR remote sales: >$100,000 sourced to NC, previous or current calendar year; registration 60 days after crossing (eff. 2026-07-02)",
       "verified_on": "2026-09-04"
     },
     "ND": {
@@ -245,7 +245,7 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "72 P.S. Act 13 of 2019; PA DOR Sales & Use Tax Bulletin 2019-01: $100,000 annual PA gross sales, prior calendar year, NO transaction count, eff. 2019-07-01",
+      "citation": "Act 13 of 2019; PA DOR Sales & Use Tax Bulletin 2019-01: $100,000 annual PA gross sales, prior calendar year, no transaction test",
       "verified_on": "2026-09-04"
     },
     "RI": {
@@ -266,14 +266,14 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "S.D. Codified Laws ch. 10-64 (Wayfair home state); SD DOR Remote Seller Bulletin Aug 2025: >$100,000 gross sales, previous or current calendar year; 200-transaction test repealed eff. 2023-07-01",
+      "citation": "S.D. Codified Laws ch. 10-64; SD DOR Remote Seller Bulletin Aug 2025: >$100,000 gross sales, previous or current calendar year; 200-transaction test repealed 2023-07-01",
       "verified_on": "2026-09-04"
     },
     "TN": {
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Tenn. Code Ann. ch. 67-6; TN DOR out-of-state dealers page and Important Notice #20-14: $100,000 in Tennessee sales, no transaction test, threshold lowered from $500,000 eff. 2020-10-01",
+      "citation": "Tenn. Code Ann. ch. 67-6; TN DOR Important Notice #20-14: $100,000 Tennessee sales, no transaction test; lowered from $500,000 on 2020-10-01",
       "verified_on": "2026-09-04"
     },
     "TX": {
@@ -323,7 +323,7 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Wis. Stat. 77.51 small-seller exception as amended by 2021 Wis. Act 1; WI DOR remote-sellers FAQ: $100,000 gross sales, previous or current calendar year; 200-transaction test eliminated eff. 2021-02-20",
+      "citation": "Wis. Stat. 77.51 small-seller exception (2021 Wis. Act 1): >$100,000 gross sales, previous or current calendar year; 200-transaction test ended 2021-02-20",
       "verified_on": "2026-09-04"
     },
     "WY": {
