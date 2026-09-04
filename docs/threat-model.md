@@ -1,12 +1,12 @@
 # Threat Model
 
-roughlogic.com is a single-page static web application with no server, no account system, and no analytics. It makes one third-party request at runtime, and only on demand: opening the "report a problem" form loads the Cloudflare Turnstile widget from `challenges.cloudflare.com`. A reader who never opens that form contacts no origin but this one. Nothing else on any page reaches off-origin -- no fonts, no CDN, no telemetry, no LLM call. This paragraph read "no third-party network calls at runtime" until 2026-09-01, which stopped being true when the report form landed. This document enumerates the threats that apply and the controls that mitigate them.
+roughlogic.com is a single-page static web application with no account system and no analytics. It is served as static files, with **one** server-side component: a Cloudflare Worker at `/api/reports` that accepts an anonymous, user-initiated problem report into a bounded D1 table. Nothing else on the site has a server, and no calculation ever reaches one. This sentence read "no server" until 2026-09-04, which stopped being true when that Worker landed -- the same clause was corrected once already, in the same paragraph, for the same reason, and stopped one phrase short. See T12. It makes one third-party request at runtime, and only on demand: opening the "report a problem" form loads the Cloudflare Turnstile widget from `challenges.cloudflare.com`. A reader who never opens that form contacts no origin but this one. Nothing else on any page reaches off-origin -- no fonts, no CDN, no telemetry, no LLM call. This paragraph read "no third-party network calls at runtime" until 2026-09-01, which stopped being true when the report form landed. This document enumerates the threats that apply and the controls that mitigate them.
 
 ## Assets
 
 - The static shell (index.html, styles.css, app.js, sw.js).
 - The bundled data shards in data/.
-- The user's input values, which never leave the browser.
+- The user's input values. These never leave the browser **except** in a report the reader submits themselves, which sends the displayed URL, inputs, results and an optional note (T12). Everything else -- typing, calculating, browsing -- is local.
 - The integrity of the calculation outputs the user reads.
 
 ## Adversaries
@@ -14,6 +14,7 @@ roughlogic.com is a single-page static web application with no server, no accoun
 - Network attackers between the user and Cloudflare Pages.
 - Authors of malicious scripts that might be injected through compromised dependencies (we have none at runtime) or malicious input.
 - Malicious users attempting to abuse the site to attack other users (cross-site scripting, link injection).
+- A user abusing the one write endpoint: flooding `/api/reports` to exhaust D1 storage, to bury real reports, or to store hostile text for whoever reads the queue (T12).
 - Misuse: a user who treats the calculator's output as code-compliant and skips the inspector's review.
 
 ## Threats and controls
@@ -170,6 +171,50 @@ Controls:
 - `parseHashRoute` falls back to home for unknown tool ids.
 - `example=1` only programmatically clicks the renderer's "Test with example" button and never executes attacker-supplied script.
 - The URL hash is the only state mechanism for tool data. The single localStorage key `rl-theme` carries the theme preference and nothing else; no sessionStorage, cookies, or IndexedDB is used.
+
+### T12. Abuse of the report endpoint (2026-09-04)
+
+`/api/reports` is the only path on the site that writes anywhere, and it takes
+an anonymous POST. The controls below were built with it and went a full cycle
+undocumented here, which is why this entry exists: a reader evaluating the
+endpoint should not have to read `report-worker.mjs` to find out what bounds it.
+
+Every number here is read from `report-worker.mjs`, and `check-feedback-loop`
+fails if any of them drifts from the code or from the D1 `CHECK` that backs it.
+
+- **Nothing is accepted without a human signal.** Cloudflare Turnstile is
+  verified server-side against `siteverify`, scoped to the action
+  `calculator-report`, with the idempotency key set so a token cannot be
+  replayed.
+- **Origin allowlist.** A request whose `Origin` is not configured is refused;
+  the endpoint returns 405 for anything but the method it serves.
+- **Two independent ceilings, per day.** 200 stored reports globally and 5 per
+  reporter, counted in `report_limits`. Rejected *attempts* are counted
+  separately in `report_attempt_limits` at 400 globally and 10 per reporter, so
+  a flood of invalid posts cannot be used to exhaust the stored-report budget
+  and stays cheap to refuse.
+- **Bounded payload, enforced while reading.** 24 KB, cut off by the streaming
+  read and the reader cancelled -- not merely checked against `Content-Length`,
+  which a chunked request need not send. Then per-field: at most 100 fields,
+  labels 120 characters, values 500, the note 160, the URL 8192, the rendered
+  output text 12000. Each of those has a matching D1 `CHECK`.
+- **Duplicates collapse.** A `dedupe_key` of the day plus a SHA-256 of the
+  stored payload is `UNIQUE`, so the same report submitted twice is one row.
+- **Stored text is constrained, not just escaped.** Control characters and
+  bidirectional overrides are rejected outright, so what a maintainer reads out
+  of the queue cannot reorder itself.
+- **Bounded retention.** Reports are deleted after 30 days and the rate-limit
+  counters after 14, on the write path itself rather than on a schedule that
+  might not run.
+- **The response tells an attacker nothing and can do nothing.** Every reply
+  carries `Content-Security-Policy: default-src 'none'; frame-ancestors 'none';
+  sandbox`, `X-Content-Type-Options: nosniff`, `Cross-Origin-Resource-Policy:
+  same-origin`, and `Cache-Control: no-store`.
+
+**Residual risk.** A reporter inside the allowlisted origin who solves Turnstile
+can still file 5 reports a day of whatever passes validation. That is the
+intended capacity of a bug queue, and the ceiling is what keeps the cost of
+abuse bounded rather than zero.
 
 ## Public-repository history (2026-09-02)
 

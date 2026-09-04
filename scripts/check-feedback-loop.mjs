@@ -24,7 +24,7 @@ function requireMatch(text, pattern, message) {
   if (!pattern.test(text)) errors.push(message);
 }
 
-const [app, client, worker, migration, hardeningMigration, wrangler, build, sw, agents, checklist, quickstart] = await Promise.all([
+const [app, client, worker, migration, hardeningMigration, wrangler, build, sw, agents, checklist, quickstart, threatModel] = await Promise.all([
   read("app.js"),
   read("report-feedback.js"),
   read("report-worker.mjs"),
@@ -36,6 +36,7 @@ const [app, client, worker, migration, hardeningMigration, wrangler, build, sw, 
   read("AGENTS.md"),
   read("docs/contributor-checklist.md"),
   read("docs/maintainer-quickstart.md"),
+  read("docs/threat-model.md"),
 ]);
 
 const triggerMounts = app.match(/className\s*=\s*"report-trigger"/g) || [];
@@ -190,10 +191,45 @@ for (const [name, text] of [["AGENTS.md", agents], ["contributor checklist", che
     `${name} must preserve website, MCP, and reporting as the three-door calculator standard`);
 }
 
+// T12 of docs/threat-model.md is the only public description of what bounds the
+// one endpoint on this site that writes anywhere, and it quotes the Worker's
+// ceilings as numbers. A security document that quietly disagrees with the code
+// is worse than one that says nothing, so the numbers are pinned to their
+// constants. The endpoint went a full cycle with no threat entry at all and the
+// document's opening line still said "no server".
+const THREAT_NUMBERS = [
+  ["DAILY_LIMIT_CEILING", /\bDAILY_LIMIT_CEILING\s*=\s*(\d+)/],
+  ["REPORTER_LIMIT_CEILING", /\bREPORTER_LIMIT_CEILING\s*=\s*(\d+)/],
+  ["DAILY_ATTEMPT_LIMIT", /\bDAILY_ATTEMPT_LIMIT\s*=\s*(\d+)/],
+  ["REPORTER_ATTEMPT_LIMIT", /\bREPORTER_ATTEMPT_LIMIT\s*=\s*(\d+)/],
+  ["REPORT_RETENTION_DAYS", /\bREPORT_RETENTION_DAYS\s*=\s*(\d+)/],
+  ["COUNTER_RETENTION_DAYS", /\bCOUNTER_RETENTION_DAYS\s*=\s*(\d+)/],
+];
+if (!/### T12\./.test(threatModel)) {
+  errors.push(
+    "docs/threat-model.md has no T12 entry for the /api/reports endpoint. It is the only path on the " +
+    "site that writes anywhere; it needs a threat entry naming its controls.");
+} else {
+  const t12 = threatModel.slice(threatModel.indexOf("### T12."));
+  const section = t12.slice(0, t12.indexOf("\n## ") === -1 ? t12.length : t12.indexOf("\n## "));
+  for (const [name, pattern] of THREAT_NUMBERS) {
+    const m = worker.match(pattern);
+    if (!m) {
+      errors.push(`report-worker.mjs no longer declares ${name}, so T12 of the threat model cannot be checked against it.`);
+      continue;
+    }
+    if (!new RegExp("\\b" + m[1] + "\\b").test(section)) {
+      errors.push(
+        `docs/threat-model.md T12 does not state ${name} = ${m[1]}, which report-worker.mjs enforces. ` +
+        `A threat model that disagrees with the code is worse than one that says nothing.`);
+    }
+  }
+}
+
 if (errors.length) {
   console.error("check-feedback-loop FAILED:");
   for (const error of errors) console.error("  - " + error);
   process.exit(1);
 }
 
-console.log(`check-feedback-loop OK: ${TOOLS.length} calculators inherit one shared report control; defensive API-only Worker, D1, offline shipping, and three-door docs are wired; the note, page-URL and output-text limits agree across the browser, the Worker and the D1 CHECK constraints.`);
+console.log(`check-feedback-loop OK: ${TOOLS.length} calculators inherit one shared report control; defensive API-only Worker, D1, offline shipping, and three-door docs are wired; the note, page-URL and output-text limits agree across the browser, the Worker and the D1 CHECK constraints; threat-model T12 states the Worker's six ceilings as the Worker enforces them.`);
