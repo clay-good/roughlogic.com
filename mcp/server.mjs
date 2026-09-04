@@ -221,9 +221,27 @@ const PROMPTS = [
 function getPrompt(name, args) {
   const p = PROMPTS.find((x) => x.name === name);
   if (!p) throw new Error(`unknown prompt: ${name}`);
+  // Every template reads its arguments through `?? ""`, so a missing REQUIRED
+  // argument rendered a complete-looking prompt with an empty hole in it:
+  // prompts/get on find-calculator with no arguments returned "Search the
+  // roughlogic catalog for "" with search_calculators", and an agent handed
+  // that will go and search for nothing. The client that omitted the argument
+  // -- or spelled it wrong, which is the same thing from here -- gets no signal
+  // at all. Say so instead.
+  const given = args || {};
+  const missing = (p.arguments || [])
+    .filter((a) => a.required)
+    .filter((a) => given[a.name] == null || String(given[a.name]).trim() === "")
+    .map((a) => a.name);
+  if (missing.length) {
+    throw new Error(
+      `prompt ${name} requires ${missing.map((m) => `"${m}"`).join(", ")}; ` +
+        `got ${Object.keys(given).length ? Object.keys(given).map((k) => `"${k}"`).join(", ") : "no arguments"}`,
+    );
+  }
   return {
     description: p.description,
-    messages: [{ role: "user", content: { type: "text", text: p.template(args || {}) } }],
+    messages: [{ role: "user", content: { type: "text", text: p.template(given) } }],
   };
 }
 

@@ -34,6 +34,11 @@ names. Resources: `roughlogic://catalog` (trade overview), `roughlogic://trade/{
 (one trade's calculators), and the template `roughlogic://calculator/{id}` (one
 tile's full card). Prompts: `find-calculator`, `run-with-inputs`, and
 `size-and-check` — plain templates with argument substitution, no model call.
+A required argument that is missing is an error, not an empty slot: until
+2026-09-04 `prompts/get` on `find-calculator` with no arguments returned
+`Search the roughlogic catalog for "" with search_calculators`, which an agent
+will act on. The error names both what the prompt wants and what it was given,
+because a misspelled argument name looks exactly like a missing one.
 
 The compute functions, their input shapes, and the example values are read
 straight from the repo (`tools-data.js`, `test/fixtures/compute-map.js`,

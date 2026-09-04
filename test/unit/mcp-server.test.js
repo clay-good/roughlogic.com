@@ -82,6 +82,36 @@ test("resources round-trip: list, template, and read a calculator card (spec-v11
   assert.ok(Array.isArray(card.inputs));
 });
 
+// A required prompt argument that is absent used to render a complete-looking
+// prompt with an empty hole in it -- prompts/get on find-calculator with no
+// arguments returned `Search the roughlogic catalog for "" with
+// search_calculators`, and an agent handed that goes and searches for nothing.
+// The failure is silent from the client's side, and a MISSPELLED argument is
+// the same thing from the server's: passing "task" to a prompt that wants
+// "need" looked exactly like passing nothing.
+test("prompts/get refuses a missing required argument instead of rendering an empty slot", async () => {
+  const replies = await rpc([
+    { jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {} } },
+    { jsonrpc: "2.0", id: 2, method: "prompts/get", params: { name: "find-calculator", arguments: {} } },
+    { jsonrpc: "2.0", id: 3, method: "prompts/get", params: { name: "size-and-check" } },
+    { jsonrpc: "2.0", id: 4, method: "prompts/get", params: { name: "find-calculator", arguments: { task: "voltage drop" } } },
+    { jsonrpc: "2.0", id: 5, method: "prompts/get", params: { name: "find-calculator", arguments: { need: "   " } } },
+    // The optional one stays optional: run-with-inputs without `inputs` is the
+    // documented worked-example branch, not an error.
+    { jsonrpc: "2.0", id: 6, method: "prompts/get", params: { name: "run-with-inputs", arguments: { id: "ohms-law" } } },
+  ]);
+  for (const id of [2, 3, 4, 5]) {
+    const r = replies.get(id);
+    assert.ok(r.error, `prompts/get #${id} should be an error, got ${JSON.stringify(r.result)}`);
+    assert.match(r.error.message, /requires/);
+  }
+  // The error has to name the argument, because "got \"task\"" is the whole
+  // difference between a client bug and a server bug.
+  assert.match(replies.get(4).error.message, /"need".*"task"/s);
+  assert.ok(replies.get(6).result, "an omitted OPTIONAL argument is not an error");
+  assert.match(replies.get(6).result.messages[0].content.text, /worked example/);
+});
+
 test("prompts round-trip: list and get with argument substitution (spec-v1186)", async () => {
   const replies = await rpc([
     { jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {} } },
