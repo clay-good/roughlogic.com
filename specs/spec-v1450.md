@@ -1,8 +1,8 @@
-# roughlogic.com Specification v1450 -- Ruling (Equivalent) Span for a Line Section (`calc-lineworker.js`, Group W, line work, 1 New Tile)
+# roughlogic.com Specification v1450 -- Ruling (Equivalent) Span for a Line Section (`calc-lineworker.js`, Group A Electrical, line work, 1 New Tile)
 
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-lineworker.js`**
-> (Group W, overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
+> (Group A, Electrical -- the existing category, hub `/groups/electrical/`; overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >
 > **The gap.** A line section between deadends is strung to ONE tension, but its spans are not equal. The ruling span is the single equivalent span whose sag-tension behaviour the whole section follows, and every stringing chart, sag table, and temperature correction in line work is entered with it. Without it a crew sags to the wrong number in every span but one.
 

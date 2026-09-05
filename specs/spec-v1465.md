@@ -1,8 +1,8 @@
-# roughlogic.com Specification v1465 -- Distribution Feeder I2R Loss and Loss Factor (`calc-lineworker.js`, Group W, line work, 1 New Tile)
+# roughlogic.com Specification v1465 -- Distribution Feeder I2R Loss and Loss Factor (`calc-lineworker.js`, Group A Electrical, line work, 1 New Tile)
 
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-lineworker.js`**
-> (Group W, overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
+> (Group A, Electrical -- the existing category, hub `/groups/electrical/`; overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >
 > **The gap.** Feeder losses are not average current squared times resistance, because losses go as the square of a current that varies all day. The bridge is the loss factor, an empirical function of load factor, and skipping it overstates annual loss energy by a wide margin.
 

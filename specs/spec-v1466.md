@@ -1,8 +1,8 @@
-# roughlogic.com Specification v1466 -- Watt-Hour Meter CT / PT Multiplier (`calc-lineworker.js`, Group W, line work, 1 New Tile)
+# roughlogic.com Specification v1466 -- Watt-Hour Meter CT / PT Multiplier (`calc-lineworker.js`, Group A Electrical, line work, 1 New Tile)
 
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-lineworker.js`**
-> (Group W, overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
+> (Group A, Electrical -- the existing category, hub `/groups/electrical/`; overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >
 > **The gap.** A transformer-rated meter does not read energy, it reads a scaled fraction of it, and the multiplier that converts the register to real kWh is the product of two ratios and a register constant. A wrong multiplier is a billing error that runs undetected for years, in either direction.
 

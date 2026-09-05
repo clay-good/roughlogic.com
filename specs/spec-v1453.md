@@ -1,8 +1,8 @@
-# roughlogic.com Specification v1453 -- Suspension Insulator Uplift Check at a Low Point (`calc-lineworker.js`, Group W, line work, 1 New Tile)
+# roughlogic.com Specification v1453 -- Suspension Insulator Uplift Check at a Low Point (`calc-lineworker.js`, Group A Electrical, line work, 1 New Tile)
 
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-lineworker.js`**
-> (Group W, overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
+> (Group A, Electrical -- the existing category, hub `/groups/electrical/`; overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >
 > **The gap.** In hilly country a suspension structure sitting in a sag between two higher structures can be lifted, not loaded: the conductor's low point falls outside the span and the insulator string tries to go up. Uplift unseats a suspension clamp, inverts a post insulator, and is a listed cause of structure damage. It is a subtraction, and nothing in the catalog does it.
 

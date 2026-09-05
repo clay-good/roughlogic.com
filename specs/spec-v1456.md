@@ -1,8 +1,8 @@
-# roughlogic.com Specification v1456 -- Guy Anchor Holding Capacity in Soil (`calc-lineworker.js`, Group W, line work, 1 New Tile)
+# roughlogic.com Specification v1456 -- Guy Anchor Holding Capacity in Soil (`calc-lineworker.js`, Group A Electrical, line work, 1 New Tile)
 
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-lineworker.js`**
-> (Group W, overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
+> (Group A, Electrical -- the existing category, hub `/groups/electrical/`; overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >
 > **The gap.** `guy-wire-tension` gives the pull in the guy. Nothing says whether the ground will hold it. An anchor that pulls is the failure mode that takes the pole with it, and the holding capacity is a bearing calculation over the helix or plate area at its depth -- with a soil class the installer has to name.
 

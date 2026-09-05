@@ -1,8 +1,8 @@
-# roughlogic.com Specification v1467 -- Counterpoise and Ground Rod Array Resistance (`calc-lineworker.js`, Group W, line work, 1 New Tile)
+# roughlogic.com Specification v1467 -- Counterpoise and Ground Rod Array Resistance (`calc-lineworker.js`, Group A Electrical, line work, 1 New Tile)
 
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-lineworker.js`**
-> (Group W, overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
+> (Group A, Electrical -- the existing category, hub `/groups/electrical/`; overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >
 > **The gap.** `grounding-electrode` does a driven rod. A transmission or distribution structure in rocky ground is grounded with buried horizontal wire instead, and the counterpoise relation is a different formula with a different length dependence -- doubling a rod barely helps, doubling a counterpoise nearly halves the resistance.
 

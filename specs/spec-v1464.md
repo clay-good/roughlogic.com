@@ -1,8 +1,8 @@
-# roughlogic.com Specification v1464 -- Recloser-to-Fuse Coordination Screen (`calc-lineworker.js`, Group W, line work, 1 New Tile)
+# roughlogic.com Specification v1464 -- Recloser-to-Fuse Coordination Screen (`calc-lineworker.js`, Group A Electrical, line work, 1 New Tile)
 
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-lineworker.js`**
-> (Group W, overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
+> (Group A, Electrical -- the existing category, hub `/groups/electrical/`; overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >
 > **The gap.** A recloser's fast curve is supposed to clear a temporary fault before the branch fuse melts, so a tree limb does not cost a customer a fuse change. Whether it does is a comparison of two curves at the fault current, and the multiplier that makes the comparison honest is the part crews get wrong.
 

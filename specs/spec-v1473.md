@@ -1,8 +1,8 @@
-# roughlogic.com Specification v1473 -- Coupling Alignment Tolerance by Speed (`calc-millwright.js`, Group S, millwrighting, 1 New Tile)
+# roughlogic.com Specification v1473 -- Coupling Alignment Tolerance by Speed (`calc-millwright.js`, Group G Cross-Trade Utilities, millwrighting, 1 New Tile)
 
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-millwright.js`**
-> (Group S, millwright, rotating equipment, and pneumatics), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
+> (Group G, Cross-Trade Utilities -- the existing category, hub `/groups/cross-trade/`; millwright, rotating equipment, and pneumatics), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >
 > **The gap.** Rim-and-face and reverse-dial produce numbers. Whether those numbers are good enough depends almost entirely on speed, and the tolerance tightens far faster with rpm than intuition suggests. A 0.005 in offset that is fine at 900 rpm is a failure at 3,600.
 

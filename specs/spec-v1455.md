@@ -1,8 +1,8 @@
-# roughlogic.com Specification v1455 -- Wood Pole Class and Groundline Moment (`calc-lineworker.js`, Group W, line work, 1 New Tile)
+# roughlogic.com Specification v1455 -- Wood Pole Class and Groundline Moment (`calc-lineworker.js`, Group A Electrical, line work, 1 New Tile)
 
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-lineworker.js`**
-> (Group W, overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
+> (Group A, Electrical -- the existing category, hub `/groups/electrical/`; overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >
 > **The gap.** A wood pole is rated by class, and the class is a statement about ONE number: the horizontal load it can take two feet from the top. What a crew actually has is a load at some other height, a groundline circumference off a tape, and a species. Turning those into a percent of capacity is section-modulus arithmetic nobody does in the field, so poles get loaded by habit.
 

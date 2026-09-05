@@ -1,8 +1,8 @@
-# roughlogic.com Specification v1471 -- Machine Thermal Growth Offset for Cold Alignment (`calc-millwright.js`, Group S, millwrighting, 1 New Tile)
+# roughlogic.com Specification v1471 -- Machine Thermal Growth Offset for Cold Alignment (`calc-millwright.js`, Group G Cross-Trade Utilities, millwrighting, 1 New Tile)
 
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-millwright.js`**
-> (Group S, millwright, rotating equipment, and pneumatics), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
+> (Group G, Cross-Trade Utilities -- the existing category, hub `/groups/cross-trade/`; millwright, rotating equipment, and pneumatics), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >
 > **The gap.** A pump aligned cold and running hot is a pump out of alignment, because the hot machine's centerline rises as its supports grow. The correction is a deliberate cold MISalignment, and it is a two-line calculation that gets skipped because nobody has the number handy at the shim pack.
 

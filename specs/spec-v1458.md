@@ -1,8 +1,8 @@
-# roughlogic.com Specification v1458 -- NESC Ice-and-Wind District Loading on a Conductor (`calc-lineworker.js`, Group W, line work, 1 New Tile)
+# roughlogic.com Specification v1458 -- NESC Ice-and-Wind District Loading on a Conductor (`calc-lineworker.js`, Group A Electrical, line work, 1 New Tile)
 
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-lineworker.js`**
-> (Group W, overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
+> (Group A, Electrical -- the existing category, hub `/groups/electrical/`; overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >
 > **The gap.** Everything downstream of a conductor -- sag, tension, pole moment, guy pull -- starts from its resultant weight per foot under the governing load case, and that case is not the bare conductor. NESC defines three loading districts, each a combination of radial ice, wind pressure, temperature, and a constant adder. Building that resultant is four steps of arithmetic done wrong more often than it is done.
 

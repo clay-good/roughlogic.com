@@ -1,8 +1,8 @@
-# roughlogic.com Specification v1470 -- Reverse-Dial Shaft Alignment Shim and Move (`calc-millwright.js`, Group S, millwrighting, 1 New Tile)
+# roughlogic.com Specification v1470 -- Reverse-Dial Shaft Alignment Shim and Move (`calc-millwright.js`, Group G Cross-Trade Utilities, millwrighting, 1 New Tile)
 
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-millwright.js`**
-> (Group S, millwright, rotating equipment, and pneumatics), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
+> (Group G, Cross-Trade Utilities -- the existing category, hub `/groups/cross-trade/`; millwright, rotating equipment, and pneumatics), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >
 > **The gap.** Reverse-dial alignment beats rim-and-face on anything with an axial float or a long span, because both readings are rim readings and neither depends on a face being square. The price is that the moves come from a similar-triangles projection off two planes, which is where crews lose the sign.
 

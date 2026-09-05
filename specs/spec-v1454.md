@@ -1,8 +1,8 @@
-# roughlogic.com Specification v1454 -- Overhead Line Ground Clearance (NESC Table 232-1) (`calc-lineworker.js`, Group W, line work, 1 New Tile)
+# roughlogic.com Specification v1454 -- Overhead Line Ground Clearance (NESC Table 232-1) (`calc-lineworker.js`, Group A Electrical, line work, 1 New Tile)
 
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-lineworker.js`**
-> (Group W, overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
+> (Group A, Electrical -- the existing category, hub `/groups/electrical/`; overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >
 > **The gap.** Clearance is the reason sag matters, and the arithmetic that connects them is a subtraction nobody writes down: the conductor's height above ground is the attachment height minus the sag at the WORST condition, not at the condition it was strung in. Getting the condition wrong is how a line passes at installation and fails at inspection.
 

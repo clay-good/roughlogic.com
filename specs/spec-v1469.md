@@ -1,8 +1,8 @@
-# roughlogic.com Specification v1469 -- Shaft Alignment Offset and Angularity (Rim-and-Face) (`calc-millwright.js`, Group S, millwrighting, 1 New Tile)
+# roughlogic.com Specification v1469 -- Shaft Alignment Offset and Angularity (Rim-and-Face) (`calc-millwright.js`, Group G Cross-Trade Utilities, millwrighting, 1 New Tile)
 
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-millwright.js`**
-> (Group S, millwright, rotating equipment, and pneumatics), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
+> (Group G, Cross-Trade Utilities -- the existing category, hub `/groups/cross-trade/`; millwright, rotating equipment, and pneumatics), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >
 > **The gap.** Shaft misalignment is the largest single cause of premature coupling, seal, and bearing failure on rotating equipment, and the rim-and-face method is how most of it still gets corrected in the field. Two dial readings become four shim and move numbers through arithmetic that is easy to invert by a sign and that no tile in the catalog does.
 

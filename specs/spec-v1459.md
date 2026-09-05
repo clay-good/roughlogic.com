@@ -1,8 +1,8 @@
-# roughlogic.com Specification v1459 -- Conductor Long-Term Creep and Sag Increase (`calc-lineworker.js`, Group W, line work, 1 New Tile)
+# roughlogic.com Specification v1459 -- Conductor Long-Term Creep and Sag Increase (`calc-lineworker.js`, Group A Electrical, line work, 1 New Tile)
 
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-lineworker.js`**
-> (Group W, overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
+> (Group A, Electrical -- the existing category, hub `/groups/electrical/`; overhead line and distribution), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >
 > **The gap.** A conductor sags more in year ten than in year one, at the same temperature and the same load, because aluminium creeps. Utilities handle this by sagging new conductor deliberately HIGH -- but by how much? The answer is a temperature equivalent, and if the crew does not apply it the line is out of clearance years after it passed inspection.
 

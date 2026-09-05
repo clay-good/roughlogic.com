@@ -1,8 +1,8 @@
-# roughlogic.com Specification v1474 -- Vibration Severity Zone (ISO 20816) (`calc-millwright.js`, Group S, millwrighting, 1 New Tile)
+# roughlogic.com Specification v1474 -- Vibration Severity Zone (ISO 20816) (`calc-millwright.js`, Group G Cross-Trade Utilities, millwrighting, 1 New Tile)
 
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-millwright.js`**
-> (Group S, millwright, rotating equipment, and pneumatics), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
+> (Group G, Cross-Trade Utilities -- the existing category, hub `/groups/cross-trade/`; millwright, rotating equipment, and pneumatics), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >
 > **The gap.** An overall vibration reading in inches per second means nothing without a class, and the class depends on machine size and mounting. ISO 20816 puts the reading in a lettered zone that says plainly whether to run it, watch it, or shut it down, and that lookup plus the trend arithmetic is nowhere in the catalog.
 
