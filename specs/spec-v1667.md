@@ -12,7 +12,7 @@ Repository: github.com/clay-good/roughlogic.com -- US standards only.
 
 The v14 dimensional lint, bounds-fuzzer, worked-example registry, and reviewer signoff apply. The v18/v21
 contract: a non-positive source activity, gamma constant, or dose rate limit returns `{ error }`; no numeric field is ever `Infinity`. Citation discipline
-(v19/v22): the inverse square dose rate relation with 10 CFR Parts 20 and 34 and the radiation safety officer named as governing, 0.48.
+(v19/v22): the inverse square dose rate relation with 10 CFR Parts 20 and 34 and the radiation safety officer named as governing, GOVERNANCE.general.
 
 The three doors are inherited, not rebuilt: the website through `renderToolView`, the local MCP server through
 the shared registries, and the **Report a problem** control through the one shared report path. Aliases:
