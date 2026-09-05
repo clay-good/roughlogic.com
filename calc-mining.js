@@ -673,3 +673,343 @@ MINING_RENDERERS["dust-deflagration-vent-area"] = _simpleRenderer({
   ],
   compute: computeDustDeflagrationVentArea,
 });
+
+// ===================== spec-v1517: underground face ventilation =====================
+
+// dims: in { heading_width_ft: L, heading_height_ft: L, fan_airflow_cfm: L^3 T^-1, tubing_efficiency_pct: dimensionless, diesel_units: dimensionless, diesel_cfm_each: L^3 T^-1, min_face_velocity_fpm: L T^-1 } out: { heading_area_sqft: L^2, delivered_cfm: L^3 T^-1, face_velocity_fpm: L T^-1, velocity_required_cfm: L^3 T^-1, diesel_required_cfm: L^3 T^-1, leakage_cfm: L^3 T^-1 }
+export function computeMineFaceVentilation({ heading_width_ft = 0, heading_height_ft = 0, fan_airflow_cfm = 0, tubing_efficiency_pct = 70, diesel_units = 1, diesel_cfm_each = 0, min_face_velocity_fpm = 60 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(heading_width_ft > 0)) return { error: "Heading width must be positive." };
+  if (!(heading_height_ft > 0)) return { error: "Heading height must be positive." };
+  if (!(fan_airflow_cfm > 0)) return { error: "Fan airflow must be positive." };
+  if (!(tubing_efficiency_pct > 0 && tubing_efficiency_pct <= 100)) return { error: "Tubing efficiency must be in (0, 100] percent." };
+  if (!(diesel_units >= 0)) return { error: "Diesel equipment count cannot be negative." };
+  if (!(diesel_cfm_each > 0)) return { error: "Diesel ventilation rate per machine must be positive." };
+  if (!(min_face_velocity_fpm > 0)) return { error: "Minimum face velocity must be positive." };
+  const heading_area_sqft = heading_width_ft * heading_height_ft;
+  const delivered_cfm = fan_airflow_cfm * tubing_efficiency_pct / 100;
+  const leakage_cfm = fan_airflow_cfm - delivered_cfm;
+  const face_velocity_fpm = delivered_cfm / heading_area_sqft;
+  const velocity_required_cfm = heading_area_sqft * min_face_velocity_fpm;
+  const diesel_required_cfm = diesel_units * diesel_cfm_each;
+  const governing_cfm = Math.max(velocity_required_cfm, diesel_required_cfm);
+  const governing = diesel_required_cfm >= velocity_required_cfm ? "diesel dilution" : "face sweep velocity";
+  const velocity_ok = face_velocity_fpm >= min_face_velocity_fpm;
+  const diesel_ok = delivered_cfm >= diesel_required_cfm;
+  const meets_governing = delivered_cfm >= governing_cfm;
+  const max_diesel_units = Math.floor(delivered_cfm / diesel_cfm_each);
+  const efficiency_needed_pct = governing_cfm / fan_airflow_cfm * 100;
+  return {
+    heading_area_sqft, delivered_cfm, leakage_cfm, face_velocity_fpm,
+    velocity_required_cfm, diesel_required_cfm, governing_cfm, governing,
+    velocity_ok, diesel_ok, meets_governing, max_diesel_units, efficiency_needed_pct,
+    verdict: meets_governing
+      ? "the delivered air meets the governing requirement"
+      : "SHORT of the governing requirement by " + fmt(governing_cfm - delivered_cfm, 0) + " cfm",
+    note: "Four requirements compete and the largest wins: enough velocity to sweep the face, enough volume to dilute diesel exhaust for every machine working there, enough to clear blast fumes in the required re-entry time, and enough to control dust and any gas the strata make. Diesel dilution is very often the governing one, because the required air per unit of engine power is large and it is ADDITIVE across machines -- so a heading can pass the velocity check comfortably and still be short. The number that gets missed is TUBING LEAKAGE. A long run with bad couplings delivers a fraction of what the fan moves, and the crew at the face experiences the delivered flow, not the fan's rating. Measuring at the face rather than at the fan is the discipline, the gap between the two is the maintenance finding, and repairing couplings routinely buys more air than a bigger fan would -- with no new fan and no new tubing. The tubing END SETBACK matters as much as the quantity: air discharged too far back does not reach the face at all, it short-circuits and returns along the heading, leaving a dead zone exactly where people work. This is a comparison of delivered airflow against requirements the user supplies. It does not calculate tubing leakage, pressure loss, or fan selection, and it does not determine the required diesel ventilation rate, which is set by regulation per unit of engine power and differs between jurisdictions. It does not evaluate methane or other strata gas, which in gassy mines governs everything and carries its own statutory limits and monitoring, and it does not evaluate radon, silica, or diesel particulate exposure, which are health standards with their own sampling requirements. Underground ventilation is a regulated, engineered system: the mine ventilation plan, the ventilation engineer, and MSHA govern.",
+  };
+}
+const faceVentExample = { inputs: { heading_width_ft: 18, heading_height_ft: 14, fan_airflow_cfm: 25000, tubing_efficiency_pct: 70, diesel_units: 2, diesel_cfm_each: 10000, min_face_velocity_fpm: 60 } };
+MINING_RENDERERS["mine-face-ventilation"] = _simpleRenderer({
+  citation: "Citation: face velocity = delivered airflow / heading cross-section, with the delivered flow being the fan's rating times the tubing efficiency, and the governing requirement being the LARGEST of the sweep-velocity and diesel-dilution demands. The diesel rate per unit of engine power is set by regulation and entered. The mine ventilation plan, the ventilation engineer, and MSHA govern.",
+  example: faceVentExample.inputs,
+  fields: [
+    { key: "heading_width_ft", label: "Heading width (ft)", kind: "number", default: 18 },
+    { key: "heading_height_ft", label: "Heading height (ft)", kind: "number", default: 14 },
+    { key: "fan_airflow_cfm", label: "Fan rated airflow (cfm)", kind: "number", default: 25000 },
+    { key: "tubing_efficiency_pct", label: "Tubing delivery efficiency (%)", kind: "number", default: 70 },
+    { key: "diesel_units", label: "Diesel machines in the heading", kind: "number", default: 2 },
+    { key: "diesel_cfm_each", label: "Ventilation required per machine (cfm)", kind: "number", default: 10000 },
+    { key: "min_face_velocity_fpm", label: "Minimum face sweep velocity (fpm)", kind: "number", default: 60 },
+  ],
+  outputs: [
+    { key: "a", id: "mfv-out-a", label: "Heading cross-section", value: (r) => fmt(r.heading_area_sqft, 0) + " sq ft" },
+    { key: "d", id: "mfv-out-d", label: "Air delivered at the face", value: (r) => fmt(r.delivered_cfm, 0) + " cfm (" + fmt(r.leakage_cfm, 0) + " cfm lost in the tubing)" },
+    { key: "v", id: "mfv-out-v", label: "Face velocity", value: (r) => fmt(r.face_velocity_fpm, 0) + " fpm -- " + (r.velocity_ok ? "meets the sweep minimum" : "BELOW the sweep minimum") },
+    { key: "g", id: "mfv-out-g", label: "Governing requirement", value: (r) => fmt(r.governing_cfm, 0) + " cfm from " + r.governing + " -- " + r.verdict },
+    { key: "m", id: "mfv-out-m", label: "Diesel machines the delivered air supports", value: (r) => fmt(r.max_diesel_units, 0) },
+    { key: "e", id: "mfv-out-e", label: "Tubing efficiency that would clear it", value: (r) => fmt(r.efficiency_needed_pct, 0) + "% -- couplings and repairs, not a bigger fan" },
+    { key: "n", id: "mfv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMineFaceVentilation,
+});
+
+// ===================== spec-v1518: pit dewatering head and staging =====================
+
+// dims: in { static_lift_ft: L, friction_head_ft: L, discharge_pressure_ft: L, head_per_pump_ft: L, suction_lift_ft: L, practical_suction_limit_ft: L, flow_gpm: L^3 T^-1, pump_efficiency_pct: dimensionless } out: { total_head_ft: L, stages: dimensionless, head_per_stage_ft: L, water_hp: M L^2 T^-3, brake_hp: M L^2 T^-3 }
+export function computePitDewateringStaging({ static_lift_ft = 0, friction_head_ft = 0, discharge_pressure_ft = 0, head_per_pump_ft = 0, suction_lift_ft = 0, practical_suction_limit_ft = 25, flow_gpm = 0, pump_efficiency_pct = 65 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(static_lift_ft > 0)) return { error: "Static lift must be positive." };
+  if (!(friction_head_ft >= 0)) return { error: "Friction head cannot be negative." };
+  if (!(discharge_pressure_ft >= 0)) return { error: "Discharge pressure head cannot be negative." };
+  if (!(head_per_pump_ft > 0)) return { error: "Head developed per pump must be positive." };
+  if (!(suction_lift_ft >= 0)) return { error: "Suction lift cannot be negative." };
+  if (!(practical_suction_limit_ft > 0)) return { error: "Practical suction limit must be positive." };
+  if (!(flow_gpm > 0)) return { error: "Flow must be positive." };
+  if (!(pump_efficiency_pct > 0 && pump_efficiency_pct <= 100)) return { error: "Pump efficiency must be in (0, 100] percent." };
+  const total_head_ft = static_lift_ft + friction_head_ft + discharge_pressure_ft;
+  const stages = Math.ceil(total_head_ft / head_per_pump_ft);
+  const head_per_stage_ft = total_head_ft / stages;
+  const suction_ok = suction_lift_ft <= practical_suction_limit_ft;
+  const suction_excess_ft = Math.max(0, suction_lift_ft - practical_suction_limit_ft);
+  // Water horsepower for clear water, and the brake horsepower at the entered
+  // efficiency: gpm x head / 3,960.
+  const water_hp = flow_gpm * total_head_ft / 3960;
+  const brake_hp = water_hp / (pump_efficiency_pct / 100);
+  const static_share_pct = static_lift_ft / total_head_ft * 100;
+  return {
+    total_head_ft, stages, head_per_stage_ft, suction_ok, suction_excess_ft,
+    water_hp, brake_hp, static_share_pct,
+    suction_verdict: suction_ok
+      ? "the suction lift is inside the entered practical limit"
+      : "BEYOND the practical suction lift by " + fmt(suction_excess_ft, 1) + " ft -- the pump will cavitate or fail to prime regardless of its rating, and the fix is to move it down to the sump or use a submersible, not to buy a bigger pump",
+    note: "Total head is static lift plus friction plus any discharge pressure, and in a deep pit the static lift dominates -- a 180 ft pit is 180 ft of head before a single foot of pipe friction. When that exceeds one pump's capability the system is staged: pumps placed on benches, each lifting to the next, each seeing only its share. THE CONSTRAINT THAT SURPRISES PEOPLE IS ON THE SUCTION SIDE. A pump sitting above the water can only lift water to itself by atmospheric pressure, which is about 34 ft in theory and 20 to 25 ft in practice once friction, vapour pressure, and net positive suction head margin are accounted for -- and less at altitude, roughly 17 to 20 ft at 5,000 ft of elevation. That is why deep pit dewatering uses submersibles in the sump or pumps mounted low with flooded suction, and why a plan showing a pump on the rim drawing from the bottom does not work at any horsepower. This is head and staging arithmetic, not a pump selection. It does not size the pump, select the impeller, or evaluate the pump's curve against the system curve, which is where the actual operating point is found; it does not compute net positive suction head available in full, which requires water temperature, altitude, and suction line details and which is the real limit rather than the rule of thumb used here. It does not address the inflow rate the pit actually produces -- groundwater inflow and storm response determine the required capacity and come from a hydrogeological assessment -- and it does not address discharge permitting, sediment control, or water quality, all of which are regulated. The pump manufacturer's curves, the site hydrogeologist, and the discharge permit govern.",
+  };
+}
+const dewateringStagingExample = { inputs: { static_lift_ft: 180, friction_head_ft: 42, discharge_pressure_ft: 0, head_per_pump_ft: 120, suction_lift_ft: 28, practical_suction_limit_ft: 25, flow_gpm: 500, pump_efficiency_pct: 65 } };
+MINING_RENDERERS["pit-dewatering-staging"] = _simpleRenderer({
+  citation: "Citation: total head = static lift + friction + discharge pressure; stages = ceil(total head / the head one pump develops); water horsepower = gpm x head / 3,960 divided by the pump efficiency. The practical suction lift of roughly 20 to 25 ft at sea level is named as a rule of thumb, not a net-positive-suction-head calculation. The pump manufacturer's curves govern.",
+  example: dewateringStagingExample.inputs,
+  fields: [
+    { key: "static_lift_ft", label: "Static lift, water surface to discharge (ft)", kind: "number", default: 180 },
+    { key: "friction_head_ft", label: "Friction head in the pipe run (ft)", kind: "number", default: 42 },
+    { key: "discharge_pressure_ft", label: "Discharge pressure head (ft)", kind: "number", default: 0 },
+    { key: "head_per_pump_ft", label: "Head one pump develops at this flow (ft)", kind: "number", default: 120 },
+    { key: "suction_lift_ft", label: "Suction lift at the worst stage (ft)", kind: "number", default: 28 },
+    { key: "practical_suction_limit_ft", label: "Practical suction lift limit (ft)", kind: "number", default: 25 },
+    { key: "flow_gpm", label: "Required flow (gpm)", kind: "number", default: 500 },
+    { key: "pump_efficiency_pct", label: "Pump efficiency (%)", kind: "number", default: 65 },
+  ],
+  outputs: [
+    { key: "h", id: "pds-out-h", label: "Total dynamic head", value: (r) => fmt(r.total_head_ft, 0) + " ft (" + fmt(r.static_share_pct, 0) + "% of it static lift)" },
+    { key: "s", id: "pds-out-s", label: "Stages required", value: (r) => fmt(r.stages, 0) + " at " + fmt(r.head_per_stage_ft, 0) + " ft each" },
+    { key: "u", id: "pds-out-u", label: "Suction side", value: (r) => r.suction_verdict },
+    { key: "p", id: "pds-out-p", label: "Power for the duty", value: (r) => fmt(r.water_hp, 1) + " water hp, " + fmt(r.brake_hp, 1) + " brake hp at the entered efficiency" },
+    { key: "n", id: "pds-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePitDewateringStaging,
+});
+
+// ===================== spec-v1519: highwall bench geometry =====================
+
+// dims: in { bench_height_ft: L, bench_width_ft: L, face_angle_deg: dimensionless, bench_count: dimensionless, alternative_bench_width_ft: L, target_overall_angle_deg: dimensionless } out: { run_per_bench_ft: L, overall_angle_deg: dimensionless, total_height_ft: L, total_run_ft: L, alternative_overall_angle_deg: dimensionless, width_for_target_ft: L }
+export function computeHighwallBenchGeometry({ bench_height_ft = 0, bench_width_ft = 0, face_angle_deg = 0, bench_count = 1, alternative_bench_width_ft = 0, target_overall_angle_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(bench_height_ft > 0)) return { error: "Bench height must be positive." };
+  if (!(bench_width_ft > 0)) return { error: "Bench width must be positive." };
+  if (!(face_angle_deg > 0 && face_angle_deg < 90)) return { error: "Face angle must be in (0, 90) degrees." };
+  if (!(bench_count >= 1)) return { error: "Bench count must be at least 1." };
+  if (!(alternative_bench_width_ft > 0)) return { error: "Alternative bench width must be positive." };
+  if (!(target_overall_angle_deg > 0 && target_overall_angle_deg < 90)) return { error: "Target overall angle must be in (0, 90) degrees." };
+  const face_run_ft = bench_height_ft / Math.tan(face_angle_deg * Math.PI / 180);
+  const run_per_bench_ft = face_run_ft + bench_width_ft;
+  const overall_angle_deg = Math.atan(bench_height_ft / run_per_bench_ft) * 180 / Math.PI;
+  const total_height_ft = bench_height_ft * bench_count;
+  const total_run_ft = run_per_bench_ft * bench_count;
+  const alternative_run_ft = face_run_ft + alternative_bench_width_ft;
+  const alternative_overall_angle_deg = Math.atan(bench_height_ft / alternative_run_ft) * 180 / Math.PI;
+  const width_for_target_ft = bench_height_ft / Math.tan(target_overall_angle_deg * Math.PI / 180) - face_run_ft;
+  const flattening_deg = face_angle_deg - overall_angle_deg;
+  return {
+    face_run_ft, run_per_bench_ft, overall_angle_deg, total_height_ft, total_run_ft,
+    alternative_overall_angle_deg, width_for_target_ft, flattening_deg,
+    target_reachable: width_for_target_ft > 0,
+    note: "Stack benches and the wall gets flatter overall even though every face is steep. Each bench contributes its own horizontal setback -- the face's own run plus the bench width -- and the overall angle is the total height over the total run. Faces at 65 degrees on generous catch benches can give a wall well under 40 degrees overall, and quoting the FACE angle to a regulator or an engineer instead of the overall one understates the wall substantially. The overall angle is what a slope stability analysis evaluates. Widening benches by a few feet each flattens the whole wall measurably, which costs stripping and buys stability and catchment, and the lever runs both ways: narrowing benches recovers ore, steepens the wall, and reduces catchment all at once. Bench width does two jobs and they are worth separating. Geometrically it sets the overall angle. Operationally it is the CATCH bench that has to stop rock falling from above from reaching people and equipment below, and that requirement -- the Ritchie criterion and the modern work refining it -- often demands a wider bench than the stability analysis alone would. A bench too narrow to catch anything is a bench that only exists on the plan. This is slope geometry only and says NOTHING about whether the wall is stable, which depends on rock mass strength, discontinuity orientation and persistence, groundwater pressure, blast damage to the face, and the failure mode that geometry permits -- planar, wedge, toppling, or circular. A geometrically modest wall in adversely oriented jointing can be far more dangerous than a steep one in massive rock, and only a slope stability analysis by a qualified engineer distinguishes them. It does not evaluate catch bench effectiveness against rockfall, or address ramp design, drainage, scaling, monitoring, or the ground control plan. MSHA ground control requirements, the site's ground control plan, and a qualified geotechnical engineer govern.",
+  };
+}
+const highwallExample = { inputs: { bench_height_ft: 40, bench_width_ft: 30, face_angle_deg: 65, bench_count: 5, alternative_bench_width_ft: 20, target_overall_angle_deg: 35 } };
+MINING_RENDERERS["highwall-bench-geometry"] = _simpleRenderer({
+  citation: "Citation: the bench-stacking geometry by name -- horizontal run per bench = bench height / tan(face angle) + bench width, and the overall slope angle = arctan(bench height / run per bench). Geometry only; MSHA ground control requirements, the site's ground control plan, and a qualified geotechnical engineer govern stability.",
+  example: highwallExample.inputs,
+  fields: [
+    { key: "bench_height_ft", label: "Bench height (ft)", kind: "number", default: 40 },
+    { key: "bench_width_ft", label: "Catch bench width (ft)", kind: "number", default: 30 },
+    { key: "face_angle_deg", label: "Individual face angle (deg)", kind: "number", default: 65 },
+    { key: "bench_count", label: "Number of benches", kind: "number", default: 5 },
+    { key: "alternative_bench_width_ft", label: "Alternative bench width to compare (ft)", kind: "number", default: 20 },
+    { key: "target_overall_angle_deg", label: "Target overall slope angle (deg)", kind: "number", default: 35 },
+  ],
+  outputs: [
+    { key: "r", id: "hbg-out-r", label: "Horizontal run per bench", value: (r) => fmt(r.run_per_bench_ft, 2) + " ft (" + fmt(r.face_run_ft, 2) + " ft of face plus the bench)" },
+    { key: "o", id: "hbg-out-o", label: "Overall slope angle", value: (r) => fmt(r.overall_angle_deg, 2) + " deg, " + fmt(r.flattening_deg, 1) + " deg flatter than the face" },
+    { key: "t", id: "hbg-out-t", label: "Whole wall", value: (r) => fmt(r.total_height_ft, 0) + " ft high over " + fmt(r.total_run_ft, 0) + " ft of run" },
+    { key: "a", id: "hbg-out-a", label: "At the alternative bench width", value: (r) => fmt(r.alternative_overall_angle_deg, 2) + " deg overall" },
+    { key: "w", id: "hbg-out-w", label: "Bench width for the target overall angle", value: (r) => r.target_reachable ? fmt(r.width_for_target_ft, 2) + " ft" : "unreachable -- the face angle alone is flatter than the target" },
+    { key: "n", id: "hbg-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHighwallBenchGeometry,
+});
+
+// ===================== spec-v1521: rock bolt pattern and support pressure =====================
+
+// dims: in { bolt_capacity_lb: M L T^-2, spacing_1_ft: L, spacing_2_ft: L, span_ft: L, rock_unit_weight_pcf: M L^-3, loosened_zone_ft: L, target_support_psf: M L^-1 T^-2 } out: { area_per_bolt_sqft: L^2, support_psf: M L^-1 T^-2, support_psi: M L^-1 T^-2, dead_weight_required_psf: M L^-1 T^-2, spacing_for_target_ft: L, bolt_length_ft: L }
+export function computeRockBoltSupportPressure({ bolt_capacity_lb = 0, spacing_1_ft = 0, spacing_2_ft = 0, span_ft = 0, rock_unit_weight_pcf = 0, loosened_zone_ft = 0, target_support_psf = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(bolt_capacity_lb > 0)) return { error: "Bolt working capacity must be positive." };
+  if (!(spacing_1_ft > 0)) return { error: "Bolt spacing must be positive in both directions." };
+  if (!(spacing_2_ft > 0)) return { error: "Bolt spacing must be positive in both directions." };
+  if (!(span_ft > 0)) return { error: "Span must be positive." };
+  if (!(rock_unit_weight_pcf > 0)) return { error: "Rock unit weight must be positive." };
+  if (!(loosened_zone_ft > 0)) return { error: "Loosened-zone height must be positive." };
+  if (!(target_support_psf > 0)) return { error: "Target support pressure must be positive." };
+  const area_per_bolt_sqft = spacing_1_ft * spacing_2_ft;
+  const support_psf = bolt_capacity_lb / area_per_bolt_sqft;
+  const support_psi = support_psf / _SQIN_PER_SQFT;
+  const dead_weight_required_psf = rock_unit_weight_pcf * loosened_zone_ft;
+  const dead_weight_ratio = support_psf / dead_weight_required_psf;
+  const dead_weight_ok = support_psf >= dead_weight_required_psf;
+  const spacing_for_target_ft = Math.sqrt(bolt_capacity_lb / target_support_psf);
+  const spacing_for_dead_weight_ft = Math.sqrt(bolt_capacity_lb / dead_weight_required_psf);
+  // Length is tied to spacing (about twice it) and to span (about a third),
+  // and the longer of the two governs.
+  const length_from_spacing_ft = 2 * Math.max(spacing_1_ft, spacing_2_ft);
+  const length_from_span_ft = span_ft / 3;
+  const bolt_length_ft = Math.max(length_from_spacing_ft, length_from_span_ft);
+  return {
+    area_per_bolt_sqft, support_psf, support_psi, dead_weight_required_psf,
+    dead_weight_ratio, dead_weight_ok, spacing_for_target_ft, spacing_for_dead_weight_ft,
+    length_from_spacing_ft, length_from_span_ft, bolt_length_ft,
+    verdict: dead_weight_ok
+      ? "the pattern carries the entered loosened zone, with a ratio of " + fmt(dead_weight_ratio, 2)
+      : "FAILS the dead-weight check at a ratio of " + fmt(dead_weight_ratio, 2) + " -- this pattern does not hold the loose ground it is there to hold",
+    note: "Each bolt is responsible for the ground in its own tributary area, so the pressure it supplies is its capacity divided by that area. The relation is what makes patterns comparable: a 5 ft pattern of 15 ton bolts and a 4 ft pattern of 10 ton bolts are not the same thing, and the division says which is stronger in one line. Two rules of thumb travel with it. Bolt LENGTH is tied to spacing, roughly twice it, because bolts closer together than half their length interact to build a compressed rock beam -- which is the actual mechanism in bedded ground -- while bolts spaced further apart act as individual anchors and do not; length is also tied to the span, about a third of it, and the longer of the two governs. And the minimum useful check is DEAD WEIGHT: the pattern must at least hold up the loosened zone it is stitching, so support pressure has to exceed the unit weight of the rock times the height of that zone. A pattern that fails the dead-weight check is not a pattern, whatever else the design says, and because support pressure falls as the SQUARE of spacing, opening a pattern by a foot costs far more than it looks. This is a pressure conversion and a dead-weight screen, not a ground support design. It does not determine the loosened-zone height, which depends on rock mass quality, span, stress, and excavation method and which is the input that dominates the answer; empirical systems such as Q, RMR, or the GSI-based approaches, or a numerical analysis, are what establish it. It does not evaluate bolt type and anchorage, corrosion protection and design life, pull testing and quality assurance, the interaction between bolts and shotcrete or mesh, dynamic loading in burst-prone ground, or wedge and block analysis, which in jointed rock usually governs bolt length and orientation rather than any pressure criterion. Ground support is a life-safety system: MSHA ground control requirements, the site's ground control plan, and a qualified geotechnical engineer govern.",
+  };
+}
+const rockBoltExample = { inputs: { bolt_capacity_lb: 12000, spacing_1_ft: 4, spacing_2_ft: 4, span_ft: 20, rock_unit_weight_pcf: 165, loosened_zone_ft: 6, target_support_psf: 990 } };
+MINING_RENDERERS["rock-bolt-support-pressure"] = _simpleRenderer({
+  citation: "Citation: support pressure = bolt working capacity / the tributary area per bolt, with the dead-weight screen requiring that pressure to exceed the rock unit weight times the loosened-zone height, and bolt length taken as the longer of about twice the spacing and about a third of the span. A screen, not a ground support design: MSHA ground control requirements and a qualified geotechnical engineer govern.",
+  example: rockBoltExample.inputs,
+  fields: [
+    { key: "bolt_capacity_lb", label: "Bolt working capacity (lb)", kind: "number", default: 12000 },
+    { key: "spacing_1_ft", label: "Bolt spacing, one direction (ft)", kind: "number", default: 4 },
+    { key: "spacing_2_ft", label: "Bolt spacing, the other direction (ft)", kind: "number", default: 4 },
+    { key: "span_ft", label: "Excavation span (ft)", kind: "number", default: 20 },
+    { key: "rock_unit_weight_pcf", label: "Rock unit weight (lb per cu ft)", kind: "number", default: 165 },
+    { key: "loosened_zone_ft", label: "Estimated loosened-zone height (ft)", kind: "number", default: 6 },
+    { key: "target_support_psf", label: "Target support pressure (psf)", kind: "number", default: 990 },
+  ],
+  outputs: [
+    { key: "a", id: "rbs-out-a", label: "Area per bolt", value: (r) => fmt(r.area_per_bolt_sqft, 1) + " sq ft" },
+    { key: "p", id: "rbs-out-p", label: "Support pressure", value: (r) => fmt(r.support_psf, 0) + " psf (" + fmt(r.support_psi, 2) + " psi)" },
+    { key: "d", id: "rbs-out-d", label: "Dead-weight check", value: (r) => fmt(r.dead_weight_required_psf, 0) + " psf required -- " + r.verdict },
+    { key: "s", id: "rbs-out-s", label: "Spacing for the target pressure", value: (r) => fmt(r.spacing_for_target_ft, 2) + " ft square (" + fmt(r.spacing_for_dead_weight_ft, 2) + " ft to carry the loosened zone)" },
+    { key: "l", id: "rbs-out-l", label: "Bolt length the geometry implies", value: (r) => fmt(r.bolt_length_ft, 1) + " ft (" + fmt(r.length_from_spacing_ft, 1) + " ft from spacing, " + fmt(r.length_from_span_ft, 1) + " ft from span)" },
+    { key: "n", id: "rbs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRockBoltSupportPressure,
+});
+
+// ===================== spec-v1522: blast fume clearance time =====================
+
+// dims: in { heading_volume_cuft: L^3, delivered_cfm: L^3 T^-1, target_fraction_pct: dimensionless, wait_time_min: T, target_time_min: T } out: { air_change_min: T, air_changes_required: dimensionless, clearance_min: T, remaining_pct_at_wait: dimensionless, airflow_for_target_time_cfm: L^3 T^-1 }
+export function computeBlastFumeClearanceTime({ heading_volume_cuft = 0, delivered_cfm = 0, target_fraction_pct = 1, wait_time_min = 0, target_time_min = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(heading_volume_cuft > 0)) return { error: "Heading volume must be positive." };
+  if (!(delivered_cfm > 0)) return { error: "Delivered airflow must be positive." };
+  if (!(target_fraction_pct > 0 && target_fraction_pct < 100)) return { error: "Target fraction must be in (0, 100) percent." };
+  if (!(wait_time_min > 0)) return { error: "Wait time must be positive." };
+  if (!(target_time_min > 0)) return { error: "Target clearance time must be positive." };
+  const air_change_min = heading_volume_cuft / delivered_cfm;
+  const air_changes_required = Math.log(100 / target_fraction_pct);
+  const clearance_min = air_change_min * air_changes_required;
+  const remaining_pct_at_wait = 100 * Math.exp(-wait_time_min / air_change_min);
+  const wait_is_enough = wait_time_min >= clearance_min;
+  const airflow_for_target_time_cfm = heading_volume_cuft * air_changes_required / target_time_min;
+  const after_one_change_pct = 100 * Math.exp(-1);
+  const after_two_changes_pct = 100 * Math.exp(-2);
+  return {
+    air_change_min, air_changes_required, clearance_min, remaining_pct_at_wait,
+    wait_is_enough, airflow_for_target_time_cfm,
+    after_one_change_pct, after_two_changes_pct,
+    wait_verdict: wait_is_enough
+      ? "the entered wait reaches the target"
+      : "the entered wait leaves " + fmt(remaining_pct_at_wait, 1) + "% of the blast concentration in the heading",
+    note: "Perfect-mixing dilution decays exponentially, so each air change removes the same FRACTION rather than the same amount. One change takes a heading to 37% of the starting concentration, two to 14%, three to 5%, and 4.6 to 1%. That is the shape that makes intuition fail: the first minute does most of the work and the last decade of concentration takes as long as everything before it, so a crew re-entering early on the belief that most of it clears fast is walking into a real fraction of the original fume load. Two field cautions belong with the number. Real headings do not mix perfectly -- dead corners, the muck pile, and a tubing end set too far back all leave pockets that clear far more slowly than the average, which is why the required practice is to TEST the atmosphere with a calibrated instrument before re-entry rather than to trust a clock. And fumes continue to be released from the muck pile and from any misfire long after the shot, so a heading that tests clean at the portal can still be unsafe at the face. The calculation sets the MINIMUM wait; the gas detector sets the actual one. The airflow lever is worth seeing: repairing tubing to raise the delivered flow cuts clearance proportionally, and on a heading turning several rounds a day that is real time. This does not determine the applicable re-entry criterion, which is set by regulation and by the mine's own ventilation plan, and it does not substitute for atmospheric testing, which is the actual requirement and the only thing that establishes a heading is safe. It does not address misfire procedures or the separate waiting periods those require. The mine ventilation plan, the blaster in charge, and MSHA govern.",
+  };
+}
+const fumeClearanceExample = { inputs: { heading_volume_cuft: 48000, delivered_cfm: 17500, target_fraction_pct: 1, wait_time_min: 10, target_time_min: 10 } };
+MINING_RENDERERS["blast-fume-clearance-time"] = _simpleRenderer({
+  citation: "Citation: the perfect-mixing dilution relation by name -- concentration decays as exp(-Q t / V), so one air change reaches 37% and 4.6 changes reach 1% -- with atmospheric testing by calibrated instrument named as the actual re-entry requirement. The mine ventilation plan, the blaster in charge, and MSHA govern.",
+  example: fumeClearanceExample.inputs,
+  fields: [
+    { key: "heading_volume_cuft", label: "Heading volume (cu ft)", kind: "number", default: 48000 },
+    { key: "delivered_cfm", label: "Airflow delivered at the face (cfm)", kind: "number", default: 17500 },
+    { key: "target_fraction_pct", label: "Target, as a percent of the blast concentration", kind: "number", default: 1 },
+    { key: "wait_time_min", label: "Wait being considered (min)", kind: "number", default: 10 },
+    { key: "target_time_min", label: "Clearance time wanted (min)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "a", id: "bfc-out-a", label: "One air change", value: (r) => fmt(r.air_change_min, 2) + " min" },
+    { key: "c", id: "bfc-out-c", label: "Air changes to the target", value: (r) => fmt(r.air_changes_required, 2) },
+    { key: "t", id: "bfc-out-t", label: "Minimum clearance time", value: (r) => fmt(r.clearance_min, 1) + " min -- and the instrument, not the clock, sets the actual wait" },
+    { key: "w", id: "bfc-out-w", label: "At the wait being considered", value: (r) => r.wait_verdict },
+    { key: "s", id: "bfc-out-s", label: "The exponential shape", value: (r) => fmt(r.after_one_change_pct, 0) + "% left after one change, " + fmt(r.after_two_changes_pct, 0) + "% after two" },
+    { key: "q", id: "bfc-out-q", label: "Airflow that would clear it in the target time", value: (r) => fmt(r.airflow_for_target_time_cfm, 0) + " cfm" },
+    { key: "n", id: "bfc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeBlastFumeClearanceTime,
+});
+
+// ===================== spec-v1523: mine hoist rope factor of safety =====================
+
+// dims: in { conveyance_lb: M L T^-2, people_count: dimensionless, person_weight_lb: M L T^-2, rope_length_ft: L, rope_weight_per_ft: M T^-2, rope_count: dimensionless, rope_breaking_lb: M L T^-2, minimum_fs: dimensionless } out: { rope_weight_lb: M L T^-2, payload_lb: M L T^-2, total_load_lb: M L T^-2, factor_of_safety: dimensionless, max_payload_lb: M L T^-2, depth_at_limit_ft: L }
+export function computeHoistRopeSafetyFactor({ conveyance_lb = 0, people_count = 0, person_weight_lb = 180, rope_length_ft = 0, rope_weight_per_ft = 0, rope_count = 0, rope_breaking_lb = 0, minimum_fs = 8 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(conveyance_lb > 0)) return { error: "Conveyance weight must be positive." };
+  if (!(people_count >= 1)) return { error: "Occupant count must be at least 1." };
+  if (!(person_weight_lb > 0)) return { error: "Weight per person must be positive." };
+  if (!(rope_length_ft > 0)) return { error: "Rope length must be positive." };
+  if (!(rope_weight_per_ft > 0)) return { error: "Rope weight per foot must be positive." };
+  if (!(rope_count >= 1)) return { error: "Rope count must be at least 1." };
+  if (!(rope_breaking_lb > 0)) return { error: "Rope breaking strength must be positive." };
+  if (!(minimum_fs > 0)) return { error: "Statutory minimum factor of safety must be positive." };
+  // Every rope hangs the full length, so the count multiplies -- the term the
+  // spec's own formula line carries and its arithmetic dropped.
+  const rope_weight_lb = rope_count * rope_length_ft * rope_weight_per_ft;
+  const payload_lb = people_count * person_weight_lb;
+  const load_without_rope_lb = conveyance_lb + payload_lb;
+  const total_load_lb = load_without_rope_lb + rope_weight_lb;
+  const rope_share_pct = rope_weight_lb / total_load_lb * 100;
+  const breaking_total_lb = rope_count * rope_breaking_lb;
+  const factor_of_safety = breaking_total_lb / total_load_lb;
+  const fs_without_rope = breaking_total_lb / load_without_rope_lb;
+  const overstatement = fs_without_rope - factor_of_safety;
+  const margin = factor_of_safety - minimum_fs;
+  const allowable_load_lb = breaking_total_lb / minimum_fs;
+  const max_payload_lb = allowable_load_lb - (conveyance_lb + rope_weight_lb);
+  const depth_at_limit_ft = (allowable_load_lb - load_without_rope_lb) / (rope_count * rope_weight_per_ft);
+  return {
+    rope_weight_lb, payload_lb, total_load_lb, rope_share_pct, breaking_total_lb,
+    factor_of_safety, fs_without_rope, overstatement, margin,
+    pass: factor_of_safety >= minimum_fs,
+    max_payload_lb: Math.max(0, max_payload_lb),
+    depth_at_limit_ft: Math.max(0, depth_at_limit_ft),
+    verdict: factor_of_safety >= minimum_fs ? "above the entered statutory minimum" : "BELOW the entered statutory minimum",
+    note: "On a shallow shaft the rope's own weight is a footnote; on a deep one it can exceed the payload, and because it hangs from the sheave the whole of it is carried at the top where the factor of safety is checked. A calculation that includes the cage and the people but not the rope produces a comfortable-looking number that is simply wrong, and it is wrong in the UNSAFE direction and by more as the shaft gets deeper. Note also that every rope hangs the full length, so the rope weight carries the rope COUNT as a multiplier -- dropping it is the same class of error as dropping the rope entirely. Depth, not payload, is what consumes the margin: doubling the shaft depth on the same cage and the same people takes a substantial bite out of the factor of safety. The second half matters more in practice. A rope with an adequate factor of safety can still be due for retirement, because ropes are retired on CONDITION and on TIME rather than on calculated stress: broken wires per rope lay, loss of diameter, corrosion, distortion, and in many jurisdictions a maximum service life regardless of condition. A hoist rope that passes this arithmetic and fails the broken-wire count comes out of service, and no factor of safety argument changes that. This is a static calculation. It does not model dynamic loads from acceleration, deceleration, emergency braking, or shock, all of which add substantially and which the statutory factors are partly there to cover; it does not evaluate friction hoist traction, which is a separate and governing check on a Koepe installation, or rope stretch, sheave and drum diameter ratios and their effect on rope life, attachments and terminations, or the brake system. It does not perform the statutory rope inspection. Hoisting people is among the most heavily regulated activities in mining: MSHA, the applicable ASME and state hoisting requirements, the hoist and rope manufacturers, and the mine's hoisting plan govern.",
+  };
+}
+const hoistRopeExample = { inputs: { conveyance_lb: 4200, people_count: 8, person_weight_lb: 180, rope_length_ft: 1400, rope_weight_per_ft: 1.8, rope_count: 4, rope_breaking_lb: 128000, minimum_fs: 8 } };
+MINING_RENDERERS["hoist-rope-safety-factor"] = _simpleRenderer({
+  citation: "Citation: the suspended-load factor of safety -- (rope count x breaking strength) / (conveyance + payload + rope weight below the sheave), where rope weight = count x length x weight per foot -- with the statutory minimum entered because it varies by service and depth and is highest for personnel hoisting. MSHA and the mine's hoisting plan govern.",
+  example: hoistRopeExample.inputs,
+  fields: [
+    { key: "conveyance_lb", label: "Conveyance (cage or skip) weight (lb)", kind: "number", default: 4200 },
+    { key: "people_count", label: "Occupants", kind: "number", default: 8 },
+    { key: "person_weight_lb", label: "Weight allowed per occupant (lb)", kind: "number", default: 180 },
+    { key: "rope_length_ft", label: "Rope length below the sheave (ft)", kind: "number", default: 1400 },
+    { key: "rope_weight_per_ft", label: "Rope weight (lb per ft, each)", kind: "number", default: 1.8 },
+    { key: "rope_count", label: "Number of ropes", kind: "number", default: 4 },
+    { key: "rope_breaking_lb", label: "Rope breaking strength (lb, each)", kind: "number", default: 128000 },
+    { key: "minimum_fs", label: "Statutory minimum factor of safety", kind: "number", default: 8 },
+  ],
+  outputs: [
+    { key: "w", id: "hrs-out-w", label: "Rope weight below the sheave", value: (r) => fmt(r.rope_weight_lb, 0) + " lb -- " + fmt(r.rope_share_pct, 0) + "% of the suspended load" },
+    { key: "t", id: "hrs-out-t", label: "Total suspended load", value: (r) => fmt(r.total_load_lb, 0) + " lb" },
+    { key: "f", id: "hrs-out-f", label: "Factor of safety", value: (r) => fmt(r.factor_of_safety, 2) + " -- " + r.verdict + ", margin " + fmt(r.margin, 2) },
+    { key: "o", id: "hrs-out-o", label: "Leaving the rope out would read", value: (r) => fmt(r.fs_without_rope, 2) + " (" + fmt(r.overstatement, 2) + " better than the truth, in the unsafe direction)" },
+    { key: "m", id: "hrs-out-m", label: "Payload at the statutory minimum", value: (r) => fmt(r.max_payload_lb, 0) + " lb" },
+    { key: "d", id: "hrs-out-d", label: "Depth at which the factor reaches the minimum", value: (r) => fmt(r.depth_at_limit_ft, 0) + " ft of rope" },
+    { key: "n", id: "hrs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHoistRopeSafetyFactor,
+});

@@ -1621,6 +1621,13 @@ export const COMPUTE_MAP = {
   "belt-feeder-capacity": { module: "../../calc-mining.js", fn: "computeBeltFeederCapacity" },
   "dust-collector-air-to-cloth": { module: "../../calc-mining.js", fn: "computeDustCollectorAirToCloth" },
   "dust-deflagration-vent-area": { module: "../../calc-mining.js", fn: "computeDustDeflagrationVentArea" },
+  // spec-v1517..v1523 mining band, part 2
+  "mine-face-ventilation": { module: "../../calc-mining.js", fn: "computeMineFaceVentilation" },
+  "pit-dewatering-staging": { module: "../../calc-mining.js", fn: "computePitDewateringStaging" },
+  "highwall-bench-geometry": { module: "../../calc-mining.js", fn: "computeHighwallBenchGeometry" },
+  "rock-bolt-support-pressure": { module: "../../calc-mining.js", fn: "computeRockBoltSupportPressure" },
+  "blast-fume-clearance-time": { module: "../../calc-mining.js", fn: "computeBlastFumeClearanceTime" },
+  "hoist-rope-safety-factor": { module: "../../calc-mining.js", fn: "computeHoistRopeSafetyFactor" },
   "grounding-electrode-conductor": { module: "../../calc-electrical.js", fn: "computeGroundingElectrodeConductor" },
   "bonding-jumper": { module: "../../calc-electrical.js", fn: "computeBondingJumper" },
   "min-conductor-for-vd": { module: "../../calc-electrical.js", fn: "computeMinConductorForVd" },

@@ -688,6 +688,9 @@ export const TOOL_MODULES = (() => {
     "blast-airblast-overpressure", "blast-stemming-length", "crusher-reduction-ratio",
     "screen-deck-capacity", "belt-feeder-capacity", "dust-collector-air-to-cloth",
     "dust-deflagration-vent-area",
+    // spec-v1517..v1523, part 2 of the same module.
+    "mine-face-ventilation", "pit-dewatering-staging", "highwall-bench-geometry",
+    "rock-bolt-support-pressure", "blast-fume-clearance-time", "hoist-rope-safety-factor",
   ]);
   // spec-v80 cap-relief split: the spec-v25 site-civil / roadway-geometry
   // quartet moved out of calc-construction.js (it sat at 95.0% of its size

@@ -860,6 +860,14 @@ const _TILES = [
   ["belt-feeder-capacity", "E"],
   ["dust-collector-air-to-cloth", "E"],
   ["dust-deflagration-vent-area", "E"],
+  // spec-v1517..v1523 mining band, part 2 (spec-v1520 cut as a duplicate of
+  // shotcrete-rebound-quantity, whose reverse check it became)
+  ["mine-face-ventilation", "E"],
+  ["pit-dewatering-staging", "E"],
+  ["highwall-bench-geometry", "E"],
+  ["rock-bolt-support-pressure", "E"],
+  ["blast-fume-clearance-time", "E"],
+  ["hoist-rope-safety-factor", "E"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   ["grounding-electrode-conductor", "A"],
   ["bonding-jumper", "A"],

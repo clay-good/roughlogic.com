@@ -239,7 +239,7 @@ is unchanged.
   catalog hub, all 21 group hubs, one tile shell per group, every
   reference page, and three structural outliers (longest name, a name
   needing HTML escaping, the widest worked example). It does **not**
-  sweep the remaining tile shells -- **1,843 tile shells** exist and the
+  sweep the remaining tile shells -- **1,849 tile shells** exist and the
   sweep visits one per group -- since they come from one generator and
   differ only in text; volume lives in the SPA sweep.
   [../scripts/check-shells.mjs](../scripts/check-shells.mjs) continues

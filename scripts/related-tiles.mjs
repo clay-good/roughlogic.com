@@ -1505,6 +1505,13 @@ const RELATED = {
   "belt-feeder-capacity": ["belt-conveyor-tension-power","screen-deck-capacity","crusher-reduction-ratio"],
   "dust-collector-air-to-cloth": ["dust-deflagration-vent-area","dust-collection-duct","hood-exhaust"],
   "dust-deflagration-vent-area": ["dust-collector-air-to-cloth","dust-collection-duct","hood-exhaust"],
+  // spec-v1517..v1523: the rest of the mining band.
+  "mine-face-ventilation": ["blast-fume-clearance-time","confined-space-vent","rock-bolt-support-pressure"],
+  "pit-dewatering-staging": ["dewatering-rate","pump-tdh","highwall-bench-geometry"],
+  "highwall-bench-geometry": ["slope-stability-infinite","excavation","rock-bolt-support-pressure"],
+  "rock-bolt-support-pressure": ["highwall-bench-geometry","shotcrete-rebound-quantity","mine-face-ventilation"],
+  "blast-fume-clearance-time": ["mine-face-ventilation","blast-powder-factor","confined-space-vent"],
+  "hoist-rope-safety-factor": ["wire-rope-strength","rope-safety-factor","wire-rope-stretch"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   "grounding-electrode-conductor": ["bonding-jumper","egc-sizing","grounding-electrode"],
   "bonding-jumper": ["grounding-electrode-conductor","egc-sizing","service-load-standard"],

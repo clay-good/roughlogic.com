@@ -43376,3 +43376,298 @@ test("bounds: spec-v1516 computeDustDeflagrationVentArea pins enclosure strength
   assert.ok("error" in _v1516({ ...base, available_vent_area_sqft: 0 }));
   assert.ok("error" in _v1516({ ...base, kst_bar_m_s: Infinity }));
 });
+
+// ===========================================================================
+// spec-v1517..v1523: the rest of the mining band. spec-v1520
+// (shotcrete-rebound-yield) was CUT as a duplicate -- the existing
+// shotcrete-rebound-quantity already computes the identical
+// shot = in-place / (1 - rebound), so the one thing v1520 added that it did
+// not have (the reverse check, and the divide-versus-add trap) landed there
+// as a follow-up instead.
+// ===========================================================================
+
+import { computeMineFaceVentilation as _v1517 } from "../../calc-mining.js";
+test("bounds: spec-v1517 computeMineFaceVentilation pins diesel over velocity", () => {
+  const base = { heading_width_ft: 18, heading_height_ft: 14, fan_airflow_cfm: 25000, tubing_efficiency_pct: 70, diesel_units: 2, diesel_cfm_each: 10000, min_face_velocity_fpm: 60 };
+  const r = _v1517(base);
+  assert.strictEqual(r.heading_area_sqft, 252);
+  assert.ok(Math.abs(r.delivered_cfm - 17500) < 1e-9);
+  assert.ok(Math.abs(r.leakage_cfm - 7500) < 1e-9);
+  assert.ok(Math.abs(r.face_velocity_fpm - 69.444) < 1e-2);
+  // The finding: the velocity check PASSES and the heading is still short,
+  // because diesel dilution governs and it is additive across machines.
+  assert.strictEqual(r.velocity_ok, true);
+  assert.strictEqual(r.diesel_ok, false);
+  assert.strictEqual(r.meets_governing, false);
+  assert.strictEqual(r.governing, "diesel dilution");
+  assert.ok(Math.abs(r.governing_cfm - 20000) < 1e-9);
+  assert.ok(Math.abs(r.velocity_required_cfm - 15120) < 1e-9);
+  assert.strictEqual(r.max_diesel_units, 1);
+  // The fix is couplings, not a fan: 80% tubing efficiency on the SAME fan
+  // clears the requirement.
+  assert.ok(Math.abs(r.efficiency_needed_pct - 80) < 1e-9);
+  const repaired = _v1517({ ...base, tubing_efficiency_pct: r.efficiency_needed_pct });
+  assert.strictEqual(repaired.meets_governing, true);
+  assert.ok(Math.abs(repaired.delivered_cfm - r.governing_cfm) < 1e-9);
+  // With one machine the velocity requirement governs instead.
+  const one = _v1517({ ...base, diesel_units: 1 });
+  assert.strictEqual(one.governing, "face sweep velocity");
+  assert.strictEqual(one.meets_governing, true);
+  // Delivered flow is exactly linear in efficiency; leakage is the remainder.
+  assert.ok(Math.abs(_v1517({ ...base, tubing_efficiency_pct: 35 }).delivered_cfm - r.delivered_cfm / 2) < 1e-9);
+  assert.strictEqual(_v1517({ ...base, tubing_efficiency_pct: 100 }).leakage_cfm, 0);
+  assert.ok("error" in _v1517({ ...base, heading_width_ft: 0 }));
+  assert.ok("error" in _v1517({ ...base, heading_height_ft: 0 }));
+  assert.ok("error" in _v1517({ ...base, fan_airflow_cfm: 0 }));
+  assert.ok("error" in _v1517({ ...base, tubing_efficiency_pct: 0 }));
+  assert.ok("error" in _v1517({ ...base, tubing_efficiency_pct: 101 }));
+  assert.ok("error" in _v1517({ ...base, diesel_units: -1 }));
+  assert.ok("error" in _v1517({ ...base, diesel_cfm_each: 0 }));
+  assert.ok("error" in _v1517({ ...base, min_face_velocity_fpm: 0 }));
+  assert.ok("error" in _v1517({ ...base, fan_airflow_cfm: Infinity }));
+});
+
+import { computePitDewateringStaging as _v1518 } from "../../calc-mining.js";
+test("bounds: spec-v1518 computePitDewateringStaging pins the suction limit", () => {
+  const base = { static_lift_ft: 180, friction_head_ft: 42, discharge_pressure_ft: 0, head_per_pump_ft: 120, suction_lift_ft: 28, practical_suction_limit_ft: 25, flow_gpm: 500, pump_efficiency_pct: 65 };
+  const r = _v1518(base);
+  assert.ok(Math.abs(r.total_head_ft - 222) < 1e-9);
+  assert.strictEqual(r.stages, 2);
+  assert.ok(Math.abs(r.head_per_stage_ft - 111) < 1e-9);
+  assert.ok(Math.abs(r.static_share_pct - 81.081) < 1e-2);
+  assert.ok(Math.abs(r.water_hp - 28.030) < 1e-2);
+  assert.ok(Math.abs(r.brake_hp - 43.124) < 1e-2);
+  // The suction check is the one that stops bad plans, and it is not a
+  // horsepower question -- a bigger pump does not lift water further to
+  // itself.
+  assert.strictEqual(r.suction_ok, false);
+  assert.ok(Math.abs(r.suction_excess_ft - 3) < 1e-9);
+  assert.strictEqual(_v1518({ ...base, suction_lift_ft: 25 }).suction_ok, true);
+  assert.strictEqual(_v1518({ ...base, head_per_pump_ft: 400 }).suction_ok, false);
+  // Altitude tightens it, which is entered rather than assumed.
+  assert.strictEqual(_v1518({ ...base, suction_lift_ft: 19, practical_suction_limit_ft: 18 }).suction_ok, false);
+  // Stages step at the pump's capability, not smoothly.
+  assert.strictEqual(_v1518({ ...base, head_per_pump_ft: 222 }).stages, 1);
+  assert.strictEqual(_v1518({ ...base, head_per_pump_ft: 221 }).stages, 2);
+  assert.strictEqual(_v1518({ ...base, head_per_pump_ft: 74 }).stages, 3);
+  // Each stage sees exactly its share, and the shares sum to the total.
+  assert.ok(Math.abs(r.head_per_stage_ft * r.stages - r.total_head_ft) < 1e-9);
+  // Brake horsepower is exactly water horsepower over the efficiency.
+  assert.ok(Math.abs(r.brake_hp * 0.65 - r.water_hp) < 1e-9);
+  assert.ok("error" in _v1518({ ...base, static_lift_ft: 0 }));
+  assert.ok("error" in _v1518({ ...base, friction_head_ft: -1 }));
+  assert.ok("error" in _v1518({ ...base, head_per_pump_ft: 0 }));
+  assert.ok("error" in _v1518({ ...base, suction_lift_ft: -1 }));
+  assert.ok("error" in _v1518({ ...base, practical_suction_limit_ft: 0 }));
+  assert.ok("error" in _v1518({ ...base, flow_gpm: 0 }));
+  assert.ok("error" in _v1518({ ...base, pump_efficiency_pct: 0 }));
+  assert.ok("error" in _v1518({ ...base, static_lift_ft: Infinity }));
+});
+
+import { computeHighwallBenchGeometry as _v1519 } from "../../calc-mining.js";
+test("bounds: spec-v1519 computeHighwallBenchGeometry pins face against overall", () => {
+  const base = { bench_height_ft: 40, bench_width_ft: 30, face_angle_deg: 65, bench_count: 5, alternative_bench_width_ft: 20, target_overall_angle_deg: 35 };
+  const r = _v1519(base);
+  assert.ok(Math.abs(r.face_run_ft - 18.652) < 1e-2);
+  assert.ok(Math.abs(r.run_per_bench_ft - 48.652) < 1e-2);
+  assert.ok(Math.abs(r.overall_angle_deg - 39.426) < 1e-2);
+  assert.ok(Math.abs(r.total_height_ft - 200) < 1e-9);
+  assert.ok(Math.abs(r.total_run_ft - 243.26) < 1e-1);
+  // Twenty-six degrees of the wall comes from the benches alone, which is
+  // the whole reason quoting the face angle is misleading.
+  assert.ok(Math.abs(r.flattening_deg - 25.574) < 1e-2);
+  assert.ok(r.overall_angle_deg < base.face_angle_deg);
+  // Ten feet of bench width is worth about seven degrees of overall angle.
+  assert.ok(Math.abs(r.alternative_overall_angle_deg - 45.982) < 1e-2);
+  assert.ok(Math.abs(r.alternative_overall_angle_deg - r.overall_angle_deg - 6.556) < 1e-2);
+  const wide = _v1519({ ...base, bench_width_ft: 40 });
+  assert.ok(Math.abs(wide.overall_angle_deg - 34.293) < 1e-2);
+  assert.ok(wide.overall_angle_deg < r.overall_angle_deg);
+  // Run the tile at the width it names and the overall angle lands on the
+  // target exactly.
+  assert.ok(Math.abs(r.width_for_target_ft - 38.474) < 1e-2);
+  const sized = _v1519({ ...base, bench_width_ft: r.width_for_target_ft });
+  assert.ok(Math.abs(sized.overall_angle_deg - base.target_overall_angle_deg) < 1e-9);
+  // A zero-width bench makes the overall angle the face angle exactly.
+  const noBench = _v1519({ ...base, bench_width_ft: 1e-12 });
+  assert.ok(Math.abs(noBench.overall_angle_deg - base.face_angle_deg) < 1e-6);
+  // A target flatter than the face alone can supply is reported, not faked.
+  assert.strictEqual(_v1519({ ...base, target_overall_angle_deg: 80 }).target_reachable, false);
+  assert.ok("error" in _v1519({ ...base, bench_height_ft: 0 }));
+  assert.ok("error" in _v1519({ ...base, bench_width_ft: 0 }));
+  assert.ok("error" in _v1519({ ...base, face_angle_deg: 0 }));
+  assert.ok("error" in _v1519({ ...base, face_angle_deg: 90 }));
+  assert.ok("error" in _v1519({ ...base, bench_count: 0 }));
+  assert.ok("error" in _v1519({ ...base, alternative_bench_width_ft: 0 }));
+  assert.ok("error" in _v1519({ ...base, target_overall_angle_deg: 0 }));
+  assert.ok("error" in _v1519({ ...base, bench_height_ft: Infinity }));
+});
+
+import { computeRockBoltSupportPressure as _v1521 } from "../../calc-mining.js";
+test("bounds: spec-v1521 computeRockBoltSupportPressure pins the dead-weight verdict", () => {
+  const base = { bolt_capacity_lb: 12000, spacing_1_ft: 4, spacing_2_ft: 4, span_ft: 20, rock_unit_weight_pcf: 165, loosened_zone_ft: 6, target_support_psf: 990 };
+  const r = _v1521(base);
+  assert.strictEqual(r.area_per_bolt_sqft, 16);
+  assert.ok(Math.abs(r.support_psf - 750) < 1e-9);
+  assert.ok(Math.abs(r.support_psi - 5.2083) < 1e-3);
+  assert.ok(Math.abs(r.dead_weight_required_psf - 990) < 1e-9);
+  // spec-v1521's worked example labels this case "FAILS, margin 0.76" and
+  // then calls it "Comfortable". 750 psf does NOT carry 990 psf: the verdict
+  // follows the arithmetic, and the ratio is below 1.
+  assert.ok(Math.abs(r.dead_weight_ratio - 0.75758) < 1e-4);
+  assert.strictEqual(r.dead_weight_ok, false);
+  assert.ok(r.dead_weight_ratio < 1);
+  // A shallower loosened zone is what makes this pattern work.
+  const shallow = _v1521({ ...base, loosened_zone_ft: 4 });
+  assert.ok(Math.abs(shallow.dead_weight_required_psf - 660) < 1e-9);
+  assert.strictEqual(shallow.dead_weight_ok, true);
+  // Support pressure falls as the SQUARE of spacing, which is why opening a
+  // pattern costs far more than it looks.
+  assert.ok(Math.abs(_v1521({ ...base, spacing_1_ft: 5, spacing_2_ft: 5 }).support_psf - 480) < 1e-9);
+  assert.ok(Math.abs(_v1521({ ...base, spacing_1_ft: 6, spacing_2_ft: 6 }).support_psf - 12000 / 36) < 1e-9);
+  assert.ok(Math.abs(_v1521({ ...base, spacing_1_ft: 8, spacing_2_ft: 8 }).support_psf - r.support_psf / 4) < 1e-9);
+  // Run it at the spacing it names and the pressure lands on the target.
+  const sized = _v1521({ ...base, spacing_1_ft: r.spacing_for_target_ft, spacing_2_ft: r.spacing_for_target_ft });
+  assert.ok(Math.abs(sized.support_psf - base.target_support_psf) < 1e-6);
+  assert.strictEqual(sized.dead_weight_ok, true);
+  // Length is the longer of the spacing and span rules, and which one wins
+  // switches with the geometry.
+  assert.ok(Math.abs(r.bolt_length_ft - 8) < 1e-9);
+  assert.ok(Math.abs(r.length_from_span_ft - 20 / 3) < 1e-9);
+  assert.ok(Math.abs(_v1521({ ...base, span_ft: 60 }).bolt_length_ft - 20) < 1e-9);
+  assert.ok("error" in _v1521({ ...base, bolt_capacity_lb: 0 }));
+  assert.ok("error" in _v1521({ ...base, spacing_1_ft: 0 }));
+  assert.ok("error" in _v1521({ ...base, spacing_2_ft: 0 }));
+  assert.ok("error" in _v1521({ ...base, span_ft: 0 }));
+  assert.ok("error" in _v1521({ ...base, rock_unit_weight_pcf: 0 }));
+  assert.ok("error" in _v1521({ ...base, loosened_zone_ft: 0 }));
+  assert.ok("error" in _v1521({ ...base, target_support_psf: 0 }));
+  assert.ok("error" in _v1521({ ...base, bolt_capacity_lb: Infinity }));
+});
+
+import { computeBlastFumeClearanceTime as _v1522 } from "../../calc-mining.js";
+test("bounds: spec-v1522 computeBlastFumeClearanceTime pins the exponential shape", () => {
+  const base = { heading_volume_cuft: 48000, delivered_cfm: 17500, target_fraction_pct: 1, wait_time_min: 10, target_time_min: 10 };
+  const r = _v1522(base);
+  assert.ok(Math.abs(r.air_change_min - 2.7429) < 1e-3);
+  assert.ok(Math.abs(r.air_changes_required - Math.log(100)) < 1e-12);
+  assert.ok(Math.abs(r.clearance_min - 12.631) < 1e-2);
+  // Each change removes a FRACTION, not an amount: 37% after one, 14% after
+  // two, and the last decade takes as long as everything before it.
+  assert.ok(Math.abs(r.after_one_change_pct - 36.788) < 1e-2);
+  assert.ok(Math.abs(r.after_two_changes_pct - 13.534) < 1e-2);
+  assert.ok(Math.abs(r.after_two_changes_pct / r.after_one_change_pct - Math.exp(-1)) < 1e-12);
+  // A crew leaving at ten minutes on a 12.6 minute clearance walks into 2.6%
+  // of the blast load -- which the tile says rather than rounding to zero.
+  assert.ok(Math.abs(r.remaining_pct_at_wait - 2.610) < 1e-2);
+  assert.strictEqual(r.wait_is_enough, false);
+  // Waiting the calculated time lands exactly on the target fraction.
+  const waited = _v1522({ ...base, wait_time_min: r.clearance_min });
+  assert.ok(Math.abs(waited.remaining_pct_at_wait - base.target_fraction_pct) < 1e-9);
+  assert.strictEqual(waited.wait_is_enough, true);
+  // Airflow is the lever, and it is exactly inverse: repairing tubing to
+  // 22,500 cfm cuts clearance to 9.8 minutes.
+  const repaired = _v1522({ ...base, delivered_cfm: 22500 });
+  assert.ok(Math.abs(repaired.clearance_min - 9.822) < 1e-2);
+  assert.ok(Math.abs(_v1522({ ...base, delivered_cfm: 35000 }).clearance_min - r.clearance_min / 2) < 1e-9);
+  // Run it at the airflow it names and clearance lands on the target time.
+  const sized = _v1522({ ...base, delivered_cfm: r.airflow_for_target_time_cfm });
+  assert.ok(Math.abs(sized.clearance_min - base.target_time_min) < 1e-9);
+  // A looser target takes fewer changes; a tighter one takes more.
+  assert.ok(_v1522({ ...base, target_fraction_pct: 5 }).clearance_min < r.clearance_min);
+  assert.ok(_v1522({ ...base, target_fraction_pct: 0.1 }).clearance_min > r.clearance_min);
+  assert.ok("error" in _v1522({ ...base, heading_volume_cuft: 0 }));
+  assert.ok("error" in _v1522({ ...base, delivered_cfm: 0 }));
+  assert.ok("error" in _v1522({ ...base, target_fraction_pct: 0 }));
+  assert.ok("error" in _v1522({ ...base, target_fraction_pct: 100 }));
+  assert.ok("error" in _v1522({ ...base, wait_time_min: 0 }));
+  assert.ok("error" in _v1522({ ...base, target_time_min: 0 }));
+  assert.ok("error" in _v1522({ ...base, delivered_cfm: Infinity }));
+});
+
+import { computeHoistRopeSafetyFactor as _v1523 } from "../../calc-mining.js";
+test("bounds: spec-v1523 computeHoistRopeSafetyFactor pins the rope COUNT", () => {
+  const base = { conveyance_lb: 4200, people_count: 8, person_weight_lb: 180, rope_length_ft: 1400, rope_weight_per_ft: 1.8, rope_count: 4, rope_breaking_lb: 128000, minimum_fs: 8 };
+  const r = _v1523(base);
+  // spec-v1523's own formula line says rope weight = length x weight per foot
+  // x NUMBER OF ROPES, and its arithmetic then drops the count: it reports
+  // 2,520 lb where four ropes of 1,400 ft at 1.8 lb/ft weigh 10,080. Its
+  // 8,160 lb load, 31% rope share and FS 62.7 all follow the missing factor.
+  assert.ok(Math.abs(r.rope_weight_lb - 10080) < 1e-9);
+  assert.ok(Math.abs(r.rope_weight_lb - base.rope_count * base.rope_length_ft * base.rope_weight_per_ft) < 1e-12);
+  assert.ok(Math.abs(r.payload_lb - 1440) < 1e-9);
+  assert.ok(Math.abs(r.total_load_lb - 15720) < 1e-9);
+  assert.ok(Math.abs(r.rope_share_pct - 64.122) < 1e-2);
+  assert.ok(Math.abs(r.factor_of_safety - 32.570) < 1e-2);
+  // Leaving the rope out reads far safer than the truth, which is the error
+  // the tile exists to prevent -- and that figure the spec got right.
+  assert.ok(Math.abs(r.fs_without_rope - 90.780) < 1e-2);
+  assert.ok(r.fs_without_rope > r.factor_of_safety);
+  // DEPTH, not payload, consumes the margin.
+  const deep = _v1523({ ...base, rope_length_ft: 2800 });
+  assert.ok(Math.abs(deep.rope_weight_lb - 20160) < 1e-9);
+  assert.ok(Math.abs(deep.total_load_lb - 25800) < 1e-9);
+  assert.ok(Math.abs(deep.factor_of_safety - 19.845) < 1e-2);
+  const loaded = _v1523({ ...base, people_count: 16 });
+  assert.ok(loaded.factor_of_safety > deep.factor_of_safety);
+  // Rope weight is exactly linear in count, length, and weight per foot.
+  assert.ok(Math.abs(_v1523({ ...base, rope_count: 8, rope_breaking_lb: 64000 }).rope_weight_lb - 2 * r.rope_weight_lb) < 1e-9);
+  // Run it at the payload and the depth it names and both land on the
+  // statutory minimum exactly.
+  const atPayload = _v1523({ ...base, people_count: 1, person_weight_lb: r.max_payload_lb });
+  assert.ok(Math.abs(atPayload.factor_of_safety - base.minimum_fs) < 1e-9);
+  const atDepth = _v1523({ ...base, rope_length_ft: r.depth_at_limit_ft });
+  assert.ok(Math.abs(atDepth.factor_of_safety - base.minimum_fs) < 1e-9);
+  assert.strictEqual(r.pass, true);
+  assert.strictEqual(_v1523({ ...base, minimum_fs: 40 }).pass, false);
+  assert.ok("error" in _v1523({ ...base, conveyance_lb: 0 }));
+  assert.ok("error" in _v1523({ ...base, people_count: 0 }));
+  assert.ok("error" in _v1523({ ...base, person_weight_lb: 0 }));
+  assert.ok("error" in _v1523({ ...base, rope_length_ft: 0 }));
+  assert.ok("error" in _v1523({ ...base, rope_weight_per_ft: 0 }));
+  assert.ok("error" in _v1523({ ...base, rope_count: 0 }));
+  assert.ok("error" in _v1523({ ...base, rope_breaking_lb: 0 }));
+  assert.ok("error" in _v1523({ ...base, minimum_fs: 0 }));
+  assert.ok("error" in _v1523({ ...base, rope_length_ft: Infinity }));
+});
+
+// spec-v1520 follow-up: the rebound correction DIVIDES, and the reverse
+// question (what thickness is on the wall from what has been shot) is the one
+// a crew has mid-shift. Both land on the existing shotcrete tile.
+import { computeShotcreteReboundQuantity as _v1520 } from "../../calc-construction.js";
+test("follow-up spec-v1520: rebound divides, and the reverse check reads the wall", () => {
+  const base = { area_sf: 1200, thickness_in: 3, rebound_pct: 22, shot_actual_cy: 12 };
+  const r = _v1520(base);
+  assert.ok(Math.abs(r.in_place_cy - 11.111) < 1e-3);
+  assert.ok(Math.abs(r.shot_cy - 14.245) < 1e-3);
+  // The classic error: 22% rebound does not mean ordering 22% more. Adding
+  // the percentage gives 13.56 cy and leaves the crew 0.69 cy short.
+  assert.ok(Math.abs(r.naive_add_cy - 13.556) < 1e-3);
+  assert.ok(Math.abs(r.shortfall_cy - 0.689) < 1e-3);
+  assert.ok(r.naive_add_cy < r.shot_cy);
+  // The gap widens fast: at 35% rebound the order is 54% above in-place
+  // where adding the percentage is only 35% above it.
+  const heavy = _v1520({ ...base, rebound_pct: 35 });
+  assert.ok(Math.abs(heavy.shot_cy / heavy.in_place_cy - 1 / 0.65) < 1e-12);
+  assert.ok(Math.abs(heavy.shot_cy / heavy.in_place_cy - 1.538) < 1e-3);
+  assert.ok(heavy.shortfall_cy > r.shortfall_cy);
+  // The reverse: 12 cy shot on this arch is 9.36 in place, 2.53 in average
+  // thickness -- short of the 3 in design, which the delivery ticket hides.
+  assert.ok(Math.abs(r.in_place_from_shot_cy - 9.36) < 1e-9);
+  assert.ok(Math.abs(r.achieved_thickness_in - 2.5272) < 1e-3);
+  assert.strictEqual(r.thickness_ok, false);
+  // Shoot the ordered volume and the design thickness is reached exactly.
+  const complete = _v1520({ ...base, shot_actual_cy: r.shot_cy });
+  assert.ok(Math.abs(complete.achieved_thickness_in - base.thickness_in) < 1e-9);
+  assert.strictEqual(complete.thickness_ok, true);
+  // Zero rebound makes every correction the identity.
+  const ideal = _v1520({ ...base, rebound_pct: 0 });
+  assert.ok(Math.abs(ideal.shot_cy - ideal.in_place_cy) < 1e-12);
+  assert.ok(Math.abs(ideal.naive_add_cy - ideal.in_place_cy) < 1e-12);
+  assert.strictEqual(ideal.shortfall_cy, 0);
+  assert.ok(Math.abs(ideal.in_place_from_shot_cy - base.shot_actual_cy) < 1e-12);
+  // Nothing shot yet is a legitimate reading, not an error.
+  assert.ok(!("error" in _v1520({ ...base, shot_actual_cy: 0 })));
+  assert.strictEqual(_v1520({ ...base, shot_actual_cy: 0 }).achieved_thickness_in, 0);
+  assert.ok("error" in _v1520({ ...base, shot_actual_cy: -1 }));
+});

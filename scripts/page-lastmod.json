@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "9476dd187de523f3",
+      "sha": "0bda9d58c5d0e7dd",
       "date": "2026-09-05"
     },
     "/tools/": {
-      "sha": "a143d1acfd6a14df",
+      "sha": "344ef315c83671d5",
       "date": "2026-09-05"
     },
     "/groups/accounting/": {
-      "sha": "e33797df1c176444",
+      "sha": "422d530f6b2e31ad",
       "date": "2026-09-05"
     },
     "/groups/agriculture/": {
-      "sha": "189c34b63991d466",
+      "sha": "6c89f32a926c2b5e",
       "date": "2026-09-05"
     },
     "/groups/construction/": {
-      "sha": "da450e002579f910",
+      "sha": "84b1f5ddbe1f8410",
       "date": "2026-09-05"
     },
     "/groups/cross-trade/": {
-      "sha": "f43d2f56f43ab7cd",
+      "sha": "8bf991c48faae5b4",
       "date": "2026-09-05"
     },
     "/groups/educators/": {
-      "sha": "fefed66223522ac5",
+      "sha": "43d5ebbecf44e210",
       "date": "2026-09-05"
     },
     "/groups/electrical/": {
-      "sha": "e44bb7590c639cb7",
+      "sha": "64f1b93302f93c71",
       "date": "2026-09-05"
     },
     "/groups/field/": {
-      "sha": "24d421482b477d9b",
+      "sha": "ce5c480052e906e6",
       "date": "2026-09-05"
     },
     "/groups/fire-ground/": {
-      "sha": "451aa6a93fd6177a",
+      "sha": "d5db7f87ac8f3dda",
       "date": "2026-09-05"
     },
     "/groups/historical/": {
-      "sha": "559797b5287b6e76",
+      "sha": "cbbdd03a8e80cc08",
       "date": "2026-09-05"
     },
     "/groups/hvac/": {
-      "sha": "108ff2ba68901b9e",
+      "sha": "8d6e044f618e54fa",
       "date": "2026-09-05"
     },
     "/groups/kitchen/": {
-      "sha": "d40890ff83b27402",
+      "sha": "7099d91646891713",
       "date": "2026-09-05"
     },
     "/groups/lab/": {
-      "sha": "e11a52c6ff7eb410",
+      "sha": "2737f4d4a3ad691a",
       "date": "2026-09-05"
     },
     "/groups/mechanic/": {
-      "sha": "6b2790a6cf2d218e",
+      "sha": "4cec1f25788cc305",
       "date": "2026-09-05"
     },
     "/groups/plumbing/": {
-      "sha": "41ca068652b78f30",
+      "sha": "8c699e8ef907adb0",
       "date": "2026-09-05"
     },
     "/groups/real-estate/": {
-      "sha": "f0f9bf5a3ddcb587",
+      "sha": "965ded7b2e63f681",
       "date": "2026-09-05"
     },
     "/groups/references/": {
-      "sha": "a01bb6bca2796e7f",
+      "sha": "4481caccb747cf01",
       "date": "2026-09-05"
     },
     "/groups/restoration/": {
-      "sha": "7a81bea958bb142d",
+      "sha": "826dd4ab836be8db",
       "date": "2026-09-05"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "47642cd855597ca8",
+      "sha": "322b6ce580fda68d",
       "date": "2026-09-05"
     },
     "/groups/stage/": {
-      "sha": "3e1b4c2d314dc59d",
+      "sha": "73665058f1cfb72a",
       "date": "2026-09-05"
     },
     "/groups/trucking/": {
-      "sha": "392fe8d575262fa3",
+      "sha": "6b7e7b2ccc2bda46",
       "date": "2026-09-05"
     },
     "/groups/water/": {
-      "sha": "5a09af061d1be917",
+      "sha": "d80e226b6d826c15",
       "date": "2026-09-05"
     },
     "/tools/aav-install-check/": {
@@ -571,6 +571,10 @@
     },
     "/tools/blast-burden-spacing/": {
       "sha": "bca6961ad69eb70c",
+      "date": "2026-09-05"
+    },
+    "/tools/blast-fume-clearance-time/": {
+      "sha": "b5f5ec6726fd7d4e",
       "date": "2026-09-05"
     },
     "/tools/blast-powder-factor/": {
@@ -2370,8 +2374,8 @@
       "date": "2026-09-01"
     },
     "/tools/excavation-bench-plan/": {
-      "sha": "30316eafbdcc5555",
-      "date": "2026-09-01"
+      "sha": "e5070b783ad9e43e",
+      "date": "2026-09-05"
     },
     "/tools/excavation-protection-trigger/": {
       "sha": "b7d7d17843e82d9c",
@@ -3153,6 +3157,10 @@
       "sha": "d05e62ec49287601",
       "date": "2026-09-04"
     },
+    "/tools/highwall-bench-geometry/": {
+      "sha": "950e583401000e34",
+      "date": "2026-09-05"
+    },
     "/tools/hiking-time/": {
       "sha": "b9dc984a4c258d43",
       "date": "2026-09-01"
@@ -3164,6 +3172,10 @@
     "/tools/historical-pricing/": {
       "sha": "966d92bc64338990",
       "date": "2026-09-02"
+    },
+    "/tools/hoist-rope-safety-factor/": {
+      "sha": "a9dcc69b778c6eb4",
+      "date": "2026-09-05"
     },
     "/tools/hoistway-venting/": {
       "sha": "1ac86ca9e9dc3cc4",
@@ -3957,6 +3969,10 @@
       "sha": "039ebf85fc578341",
       "date": "2026-09-01"
     },
+    "/tools/mine-face-ventilation/": {
+      "sha": "82ab239aac99e101",
+      "date": "2026-09-05"
+    },
     "/tools/minimum-roof-snow/": {
       "sha": "7d0af3d758610e34",
       "date": "2026-09-02"
@@ -4517,6 +4533,10 @@
       "sha": "d826106bd7f5b276",
       "date": "2026-09-01"
     },
+    "/tools/pit-dewatering-staging/": {
+      "sha": "182038fc29420507",
+      "date": "2026-09-05"
+    },
     "/tools/piti/": {
       "sha": "0b776cd1ff727e3e",
       "date": "2026-09-01"
@@ -4946,7 +4966,7 @@
       "date": "2026-09-01"
     },
     "/tools/rail-wear-condemning-limit/": {
-      "sha": "f4fd817b719f4dec",
+      "sha": "ad3007d34468f167",
       "date": "2026-09-05"
     },
     "/tools/rain-load-ponding/": {
@@ -5297,6 +5317,10 @@
       "sha": "38e77c2a2209d18e",
       "date": "2026-09-01"
     },
+    "/tools/rock-bolt-support-pressure/": {
+      "sha": "ef29d2a7c38b7408",
+      "date": "2026-09-05"
+    },
     "/tools/rock-construction-entrance/": {
       "sha": "95bea2778fe9f775",
       "date": "2026-09-01"
@@ -5366,7 +5390,7 @@
       "date": "2026-09-01"
     },
     "/tools/rope-safety-factor/": {
-      "sha": "8bf1f92c447cb26e",
+      "sha": "9b2202f423c976d9",
       "date": "2026-09-05"
     },
     "/tools/rotary-phase-converter-sizing/": {
@@ -5714,8 +5738,8 @@
       "date": "2026-09-01"
     },
     "/tools/shotcrete-rebound-quantity/": {
-      "sha": "2b987eabe6ebc334",
-      "date": "2026-09-01"
+      "sha": "da0959706fce3540",
+      "date": "2026-09-05"
     },
     "/tools/shower-compartment-check/": {
       "sha": "7b11cb98cba9d15a",
@@ -5814,7 +5838,7 @@
       "date": "2026-09-01"
     },
     "/tools/slope-stake-cut-fill/": {
-      "sha": "9d5faac8ad990e35",
+      "sha": "6968466c496c3129",
       "date": "2026-09-05"
     },
     "/tools/slope-staking/": {
@@ -7374,8 +7398,8 @@
       "date": "2026-09-01"
     },
     "/tools/wire-rope-strength/": {
-      "sha": "3ea479abd80adb22",
-      "date": "2026-09-04"
+      "sha": "17e6e47f2ab2a4b3",
+      "date": "2026-09-05"
     },
     "/tools/wire-rope-stretch/": {
       "sha": "71ee184561e073e5",

@@ -1,8 +1,8 @@
 {
- "_comment": "v10 Phase C.1 worked-example registry (spec-v10 \u00a75.1). One or more rows per tile recording a worked example from a primary public source: tile id, source citation, inputs, expected outputs with tolerance. The unit-test runner (when wired in Phase C migration) reads the registry and asserts each tile's output matches within tolerance. This file is the migration target for the existing per-test fixture obligation; tiles are added incrementally.",
+ "_comment": "v10 Phase C.1 worked-example registry (spec-v10 §5.1). One or more rows per tile recording a worked example from a primary public source: tile id, source citation, inputs, expected outputs with tolerance. The unit-test runner (when wired in Phase C migration) reads the registry and asserts each tile's output matches within tolerance. This file is the migration target for the existing per-test fixture obligation; tiles are added incrementally.",
  "_updated": "2026-08-26",
- "_schema": "Each row: { tile_id, source_publisher, source_title, source_edition_or_year, source_section_or_page, verified_by, verified_on (ISO date), inputs (object), outputs (object: { name: { value, tolerance: { abs?, pct? } } }) }. Tolerance defaults per spec-v10 \u00a75.3: code-table 1 percent or 1 unit-of-least-precision; first-principles 0.5 percent; standard-rounded sizes exact match.",
- "_coverage_target": "Spec-v10 \u00a75.2 declares this file the migration target. Every tile must eventually have at least one row. Current coverage is a starter set; new tiles ship a row with their PR per the contributor checklist. The check-worked-examples.mjs linter reports coverage but does not (yet) fail CI on missing rows. Fail-on-missing is enabled when coverage exceeds 80 percent.",
+ "_schema": "Each row: { tile_id, source_publisher, source_title, source_edition_or_year, source_section_or_page, verified_by, verified_on (ISO date), inputs (object), outputs (object: { name: { value, tolerance: { abs?, pct? } } }) }. Tolerance defaults per spec-v10 §5.3: code-table 1 percent or 1 unit-of-least-precision; first-principles 0.5 percent; standard-rounded sizes exact match.",
+ "_coverage_target": "Spec-v10 §5.2 declares this file the migration target. Every tile must eventually have at least one row. Current coverage is a starter set; new tiles ship a row with their PR per the contributor checklist. The check-worked-examples.mjs linter reports coverage but does not (yet) fail CI on missing rows. Fail-on-missing is enabled when coverage exceeds 80 percent.",
  "rows": [
   {
    "tile_id": "ohms-law",
@@ -89,7 +89,7 @@
      "value": 3.1,
      "tolerance": {
       "pct": 10,
-      "justification": "spec-v14 \u00a714.2: the 'percent' output divides drop_V by source_voltage; with 240 V nominal the source-voltage sensitivity carries an additional published-rounding band on top of the underlying drop_V tolerance, so the per-row ceiling is the wider 10 percent rather than the Group A default 5 percent."
+      "justification": "spec-v14 §14.2: the 'percent' output divides drop_V by source_voltage; with 240 V nominal the source-voltage sensitivity carries an additional published-rounding band on top of the underlying drop_V tolerance, so the per-row ceiling is the wider 10 percent rather than the Group A default 5 percent."
      }
     }
    }
@@ -141,7 +141,8 @@
    "inputs": {
     "area_sf": 500,
     "thickness_in": 4,
-    "rebound_pct": 20
+    "rebound_pct": 20,
+    "shot_actual_cy": 7
    },
    "outputs": {
     "in_place_cy": {
@@ -161,6 +162,24 @@
      "tolerance": {
       "abs": 0.001
      }
+    },
+    "naive_add_cy": {
+     "value": 7.40741,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "in_place_from_shot_cy": {
+     "value": 5.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "achieved_thickness_in": {
+     "value": 3.6288,
+     "tolerance": {
+      "pct": 0.5
+     }
     }
    }
   },
@@ -175,13 +194,32 @@
    "inputs": {
     "area_sf": 500,
     "thickness_in": 4,
-    "rebound_pct": 30
+    "rebound_pct": 30,
+    "shot_actual_cy": 7
    },
    "outputs": {
     "shot_cy": {
      "value": 8.8183,
      "tolerance": {
       "abs": 0.001
+     }
+    },
+    "naive_add_cy": {
+     "value": 8.02469,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "in_place_from_shot_cy": {
+     "value": 4.9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "achieved_thickness_in": {
+     "value": 3.1752,
+     "tolerance": {
+      "pct": 0.5
      }
     }
    }
@@ -817,7 +855,7 @@
    "source_publisher": "NFPA",
    "source_title": "NEC continuous-load 125% rule (NEC 210.20(A))",
    "source_edition_or_year": "NEC 2023",
-   "source_section_or_page": "NEC \u00a7210.20(A), \u00a7240.6 standard sizes",
+   "source_section_or_page": "NEC §210.20(A), §240.6 standard sizes",
    "verified_by": "rl",
    "verified_on": "2026-05-10",
    "inputs": {
@@ -2080,7 +2118,7 @@
    "source_publisher": "NFPA",
    "source_title": "NFPA 1142 rural water-supply: 30,000 ft^3 wood-frame dwelling (OHC 7)",
    "source_edition_or_year": "NFPA 1142-2022",
-   "source_section_or_page": "\u00a75 WS = (V * CCN) / OHC = 30000 * 1.5 / 7 = 6,429 gal",
+   "source_section_or_page": "§5 WS = (V * CCN) / OHC = 30000 * 1.5 / 7 = 6,429 gal",
    "verified_by": "rl",
    "verified_on": "2026-07-17",
    "inputs": {
@@ -2675,7 +2713,7 @@
    "tile_id": "chamber-turnover",
    "source_publisher": "IICRC",
    "source_title": "1500 ft^3 drying chamber, 60 ACH target, 1200 air-mover CFM + 250 dehu CFM",
-   "source_edition_or_year": "IICRC S500-2021 \u00a712 (drying process)",
+   "source_edition_or_year": "IICRC S500-2021 §12 (drying process)",
    "source_section_or_page": "actual_ACH = 1450 * 60 / 1500 = 58; required_CFM = 60 * 1500 / 60 = 1500; gap = 50 CFM",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
@@ -2967,7 +3005,7 @@
    "tile_id": "combustion-air",
    "source_publisher": "ICC",
    "source_title": "100,000 Btu/hr appliance in a 4,000 ft^3 room",
-   "source_edition_or_year": "IFGC 2021 \u00a7304 (combustion-air standard rules)",
+   "source_edition_or_year": "IFGC 2021 §304 (combustion-air standard rules)",
    "source_section_or_page": "required_volume = 50 ft^3 per 1000 Btu/hr = 5000 ft^3; 4000 < 5000 -> not adequate by volume; outdoor opening = 25 in^2 (1 in^2 per 4000 Btu/hr); indoor communicating opening = 100 in^2 (the larger, 1 in^2 per 1000 Btu/hr)",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
@@ -3006,7 +3044,7 @@
    "tile_id": "combustion-air-max-input",
    "source_publisher": "ICC",
    "source_title": "max appliance input in a 4,000 ft^3 room by the standard volume method",
-   "source_edition_or_year": "IFGC 2021 \u00a7304.5 (50 ft^3 per 1000 Btu/hr), solved for input",
+   "source_edition_or_year": "IFGC 2021 §304.5 (50 ft^3 per 1000 Btu/hr), solved for input",
    "source_section_or_page": "max input = (4000 / 50) * 1000 = 80,000 Btu/hr; at that input required_volume = 4000 ft^3, exactly adequate",
    "verified_by": "rl",
    "verified_on": "2026-07-14",
@@ -3066,7 +3104,7 @@
    "tile_id": "box-fill",
    "source_publisher": "NFPA",
    "source_title": "22.5 in^3 box with six 12 AWG conductors, one device, internal clamps",
-   "source_edition_or_year": "NEC 2023 \u00a7314.16(B) box-fill rules",
+   "source_edition_or_year": "NEC 2023 §314.16(B) box-fill rules",
    "source_section_or_page": "12 AWG = 2.25 in^3 each; 6 conductors = 13.5; clamps +2.25; one device 2 x 2.25 = 4.5; total fill = 20.25; free = 2.25; passes 22.5",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
@@ -3293,14 +3331,14 @@
      "value": 1.6,
      "tolerance": {
       "pct": 10,
-      "justification": "spec-v14 \u00a714.2: the expected value is the NEC 2023 Chapter 9 Table 8 published value (1.93 ohm/1000 ft at 75 C) hand-corrected to 20 C; the temperature-coefficient alpha for copper carries a published 2 to 3 percent figure-of-merit band per NIST SP 811, and the NEC table itself is rounded to three significant figures, so the compound band on the cross-check is the wider 10 percent rather than the Group A default 5 percent."
+      "justification": "spec-v14 §14.2: the expected value is the NEC 2023 Chapter 9 Table 8 published value (1.93 ohm/1000 ft at 75 C) hand-corrected to 20 C; the temperature-coefficient alpha for copper carries a published 2 to 3 percent figure-of-merit band per NIST SP 811, and the NEC table itself is rounded to three significant figures, so the compound band on the cross-check is the wider 10 percent rather than the Group A default 5 percent."
      }
     },
     "resistance_ohm_per_kft": {
      "value": 1.6,
      "tolerance": {
       "pct": 10,
-      "justification": "spec-v14 \u00a714.2: same per-kft form of the resistance_ohm cross-check; the 10 percent band carries through unchanged because the kft figure is a unit-scaling of the same value."
+      "justification": "spec-v14 §14.2: same per-kft form of the resistance_ohm cross-check; the 10 percent band carries through unchanged because the kft figure is a unit-scaling of the same value."
      }
     }
    }
@@ -3753,7 +3791,7 @@
    "source_publisher": "ICC",
    "source_title": "IMC 507.13 8 ft wall-canopy heavy-duty Type I hood",
    "source_edition_or_year": "IMC 2021",
-   "source_section_or_page": "\u00a7507.13: 400 cfm/ft heavy-duty wall-canopy x 8 ft = 3200 cfm; makeup 0.80 x Q = 2560 cfm",
+   "source_section_or_page": "§507.13: 400 cfm/ft heavy-duty wall-canopy x 8 ft = 3200 cfm; makeup 0.80 x Q = 2560 cfm",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -4190,7 +4228,7 @@
    "tile_id": "outdoor-air-ventilation",
    "source_publisher": "ASHRAE",
    "source_title": "ASHRAE 62.1 single-zone breathing-zone procedure",
-   "source_edition_or_year": "ASHRAE 62.1-2022 \u00a76.2.2.1",
+   "source_edition_or_year": "ASHRAE 62.1-2022 §6.2.2.1",
    "source_section_or_page": "Vbz = Rp*Pz + Ra*Az; Voz = Vbz / E_z",
    "verified_by": "rl",
    "verified_on": "2026-05-10",
@@ -4226,7 +4264,7 @@
    "tile_id": "grounding-electrode",
    "source_publisher": "IEEE / Dwight",
    "source_title": "Dwight 1936 closed-form for driven rod (textbook 8 ft x 5/8 in in 10,000 ohm-cm soil)",
-   "source_edition_or_year": "Dwight 1936; IEEE 142-2007 \u00a74",
+   "source_edition_or_year": "Dwight 1936; IEEE 142-2007 §4",
    "source_section_or_page": "R = (rho / (2*pi*L)) * (ln(8L/d) - 1)",
    "verified_by": "rl",
    "verified_on": "2026-05-10",
@@ -4985,7 +5023,7 @@
    "source_publisher": "NFPA",
    "source_title": "Motor branch-circuit physics: I = HP*746 / (V*eta*PF) with NEC 125% rule",
    "source_edition_or_year": "NEC 2023",
-   "source_section_or_page": "\u00a7430.6(A)(1) reference-FLA tables; \u00a7430.22 125% rule; \u00a7430.32 overload",
+   "source_section_or_page": "§430.6(A)(1) reference-FLA tables; §430.22 125% rule; §430.32 overload",
    "verified_by": "rl",
    "verified_on": "2026-05-10",
    "inputs": {
@@ -5029,7 +5067,7 @@
    "source_publisher": "Lee 1982 / NFPA",
    "source_title": "Ralph Lee closed-form: E(cal/cm^2) = 7.935e-4 * V(volts) * I(amps) * t / D(in)^2 (Lee 2.142e6 J/kV.kA.mm re-expressed)",
    "source_edition_or_year": "Lee, IEEE Trans. on Industry Applications, 1982",
-   "source_section_or_page": "Closed-form Lee equation; NFPA 70E-2024 \u00a7130.5 governs the risk assessment",
+   "source_section_or_page": "Closed-form Lee equation; NFPA 70E-2024 §130.5 governs the risk assessment",
    "verified_by": "rl",
    "verified_on": "2026-05-10",
    "inputs": {
@@ -9334,7 +9372,8 @@
       "abs": 0.05
      }
     },
-    "miles_until_worn": { "value": 8172,
+    "miles_until_worn": {
+     "value": 8172,
      "tolerance": {
       "abs": 1
      }
@@ -11906,13 +11945,13 @@
      }
     },
     "approach_flag": {
-     "value": "in-range (5-10 \u00b0F)",
+     "value": "in-range (5-10 °F)",
      "tolerance": {
       "abs": 0
      }
     },
     "range_flag": {
-     "value": "in-range (8-12 \u00b0F)",
+     "value": "in-range (8-12 °F)",
      "tolerance": {
       "abs": 0
      }
@@ -14619,7 +14658,7 @@
   },
   {
    "tile_id": "significant-figures",
-   "source_publisher": "NIST SP 811 \u00a77 (public)",
+   "source_publisher": "NIST SP 811 §7 (public)",
    "source_title": "Count sig figs; round to N",
    "source_edition_or_year": "NIST SP 811 (2008)",
    "source_section_or_page": "Worked example 0.00347 -> 3 sig figs; rounded to 2 -> 0.0035",
@@ -14898,7 +14937,7 @@
    "tile_id": "bell-curve-zscore",
    "source_publisher": "Abramowitz + Stegun (AMS 55, 1965), formula 26.2.17 (public domain)",
    "source_title": "z-score and percentile from raw / mean / sd; curve letter band",
-   "source_edition_or_year": "AMS 55 \u00a726.2 (1965)",
+   "source_edition_or_year": "AMS 55 §26.2 (1965)",
    "source_section_or_page": "z = (85 - 75)/10 = 1.0; percentile ~ 84.13%; band: A",
    "verified_by": "rl",
    "verified_on": "2026-05-16",
@@ -17112,9 +17151,9 @@
   },
   {
    "tile_id": "trap-seal-loss",
-   "source_publisher": "IPC/UPC \u00a71002 (trap-to-vent)",
+   "source_publisher": "IPC/UPC §1002 (trap-to-vent)",
    "source_title": "Pass if developed distance <= permitted maximum; percent used",
-   "source_edition_or_year": "IPC/UPC \u00a71002 (permitted max user-supplied)",
+   "source_edition_or_year": "IPC/UPC §1002 (permitted max user-supplied)",
    "source_section_or_page": "6 ft used of 8 ft permitted -> pass, 75%",
    "verified_by": "rl",
    "verified_on": "2026-06-06",
@@ -17473,9 +17512,9 @@
   },
   {
    "tile_id": "depreciation-recapture",
-   "source_publisher": "IRS Pub 544 / IRC \u00a71245 / \u00a71250",
-   "source_title": "\u00a71250 unrecaptured = min(gain, straight-line) at the 25% max",
-   "source_edition_or_year": "IRC \u00a71245 / \u00a71250 (current IRS rules)",
+   "source_publisher": "IRS Pub 544 / IRC §1245 / §1250",
+   "source_title": "§1250 unrecaptured = min(gain, straight-line) at the 25% max",
+   "source_edition_or_year": "IRC §1245 / §1250 (current IRS rules)",
    "source_section_or_page": "$100k accum SL, $150k gain -> $100k recaptured at 25% = $25k tax",
    "verified_by": "rl",
    "verified_on": "2026-06-06",
@@ -24350,9 +24389,9 @@
   },
   {
    "tile_id": "fillet-weld-strength",
-   "source_publisher": "AWS D1.1 / AISC 360 \u00a7J2 (by name)",
+   "source_publisher": "AWS D1.1 / AISC 360 §J2 (by name)",
    "source_title": "throat = 0.707*leg; ASD allowable shear 0.30*F_Exx; capacity = stress * throat * length",
-   "source_edition_or_year": "AISC 360 \u00a7J2 / AWS D1.1",
+   "source_edition_or_year": "AISC 360 §J2 / AWS D1.1",
    "source_section_or_page": "1/4 in E70 fillet, 6 in long, ASD -> throat 0.1768 in, 21 ksi, 3712 lb/in, 22.27 kip",
    "verified_by": "rl",
    "verified_on": "2026-06-09",
@@ -24946,7 +24985,7 @@
   },
   {
    "tile_id": "standby-battery-sizing",
-   "source_publisher": "NFPA 72 \u00a710.6 (by name)",
+   "source_publisher": "NFPA 72 §10.6 (by name)",
    "source_title": "Ah = [(I_standby * h_standby) + (I_alarm * h_alarm)] * derate",
    "source_edition_or_year": "NFPA 72 (AHJ-adopted edition governs)",
    "source_section_or_page": "0.5 A x 24 h + 2.0 A x 5 min, derate 1.2 -> (12 + 0.1667) * 1.2 = 14.6 Ah",
@@ -24976,7 +25015,7 @@
   },
   {
    "tile_id": "standby-battery-runtime",
-   "source_publisher": "NFPA 72 \u00a710.6 (by name), inverse",
+   "source_publisher": "NFPA 72 §10.6 (by name), inverse",
    "source_title": "Hs = (battery_Ah/derate - alarm_Ah) / I_standby",
    "source_edition_or_year": "spec-v687 worked example (machine-verified)",
    "source_section_or_page": "14.6 Ah, 0.5 A standby, 2 A / 5 min alarm, derate 1.2 -> 24 h (round-trips standby-battery-sizing)",
@@ -25000,7 +25039,7 @@
   },
   {
    "tile_id": "standby-battery-runtime",
-   "source_publisher": "NFPA 72 \u00a710.6 (by name), inverse",
+   "source_publisher": "NFPA 72 §10.6 (by name), inverse",
    "source_title": "cross-check: a larger 18 Ah battery holds the standby load longer",
    "source_edition_or_year": "spec-v687 cross-check (machine-verified)",
    "source_section_or_page": "18 Ah, same loads and derate -> about 29.7 h",
@@ -25053,7 +25092,7 @@
   },
   {
    "tile_id": "pipe-cold-spring",
-   "source_publisher": "ASME B31.1 \u00a7119 / B31.9 (by name)",
+   "source_publisher": "ASME B31.1 §119 / B31.9 (by name)",
    "source_title": "dL = alpha * L * dT; cold-spring gap = (factor/100) * dL; residual = dL - gap",
    "source_edition_or_year": "first-principles linear expansion (ASME B31)",
    "source_section_or_page": "100 ft carbon steel (alpha 6.5e-6), 50 F to 250 F (dT 200) -> 6.5e-6 * 1200 in * 200 = 1.56 in growth; 50% -> 0.78 in gap",
@@ -25148,7 +25187,7 @@
   },
   {
    "tile_id": "groove-weld-strength",
-   "source_publisher": "AWS D1.1 / AISC 360 \u00a7J2 Table J2.5 (by name)",
+   "source_publisher": "AWS D1.1 / AISC 360 §J2 Table J2.5 (by name)",
    "source_title": "weld-metal shear Fnw = 0.60*FEXX; LRFD design 0.75*0.60*FEXX on the effective throat; capacity = stress * throat * length",
    "source_edition_or_year": "AISC 360 (first-principles J2)",
    "source_section_or_page": "PJP throat 0.25 in, 6 in long, E70, LRFD -> 0.75*0.60*70 = 31.5 ksi; 31.5*1000*0.25*6 = 47,250 lb",
@@ -25178,7 +25217,7 @@
   },
   {
    "tile_id": "groove-weld-length-for-load",
-   "source_publisher": "AWS D1.1 / AISC 360 \u00a7J2 (solved for length)",
+   "source_publisher": "AWS D1.1 / AISC 360 §J2 (solved for length)",
    "source_title": "L = load / (stress_ksi x 1000 x throat)",
    "source_edition_or_year": "AISC 360 (first-principles J2)",
    "source_section_or_page": "100,000 lb LRFD, E70, PJP throat 0.25 in -> 31.5 ksi -> 12.70 in",
@@ -28767,8 +28806,8 @@
   },
   {
    "tile_id": "fine-aggregate-grading",
-   "source_publisher": "ASTM C33/C33M \u00a76 (fine-aggregate grading)",
-   "source_title": "each sieve within its \u00a76.1 band; <=45% retained between consecutive sieves; FM 2.3-3.1",
+   "source_publisher": "ASTM C33/C33M §6 (fine-aggregate grading)",
+   "source_title": "each sieve within its §6.1 band; <=45% retained between consecutive sieves; FM 2.3-3.1",
    "source_edition_or_year": "spec-v1195 worked example (machine-verified)",
    "source_section_or_page": "passing 100/98/85/68/45/18/5 -> retained 2/15/32/55/82/95 -> FM 2.81; widest consecutive gap 27% (#30->#50); conforms",
    "verified_by": "rl",
@@ -32467,7 +32506,7 @@
   },
   {
    "tile_id": "stair-code-check",
-   "source_publisher": "IBC 2021 \u00a71011.5.2 / \u00a71011.2 (by section)",
+   "source_publisher": "IBC 2021 §1011.5.2 / §1011.2 (by section)",
    "source_title": "commercial stair 7 in riser / 11 in tread / 44 in wide -> all dimensional checks pass, 2R+T = 25 in",
    "source_edition_or_year": "spec-v481 worked example (machine-verified)",
    "source_section_or_page": "spec-v481 section 2.1 pinned example",
@@ -32532,7 +32571,7 @@
   },
   {
    "tile_id": "stair-code-check",
-   "source_publisher": "IBC 2021 \u00a71011.5.2 (by section)",
+   "source_publisher": "IBC 2021 §1011.5.2 (by section)",
    "source_title": "cross-check: a 7-3/4 in riser passes IRC but fails IBC (riser_ok 0) - the 3/4 in a remodel gets away with and a TI is red-tagged for",
    "source_edition_or_year": "spec-v481 worked example (machine-verified)",
    "source_section_or_page": "spec-v481 section 2.1 cross-check",
@@ -35237,7 +35276,7 @@
   },
   {
    "tile_id": "ashrae-622-ventilation",
-   "source_publisher": "ASHRAE 62.2-2019 \u00a74.1",
+   "source_publisher": "ASHRAE 62.2-2019 §4.1",
    "source_title": "2,000 ft2 3-bedroom, no credit -> 90 cfm Qtot and fan",
    "source_edition_or_year": "spec-v219 worked example (machine-verified)",
    "source_section_or_page": "spec-v219 section 2.1 pinned example (no credit)",
@@ -35264,7 +35303,7 @@
   },
   {
    "tile_id": "ashrae-622-ventilation",
-   "source_publisher": "ASHRAE 62.2-2019 \u00a74.1",
+   "source_publisher": "ASHRAE 62.2-2019 §4.1",
    "source_title": "cross-check: same house, 35.3 cfm credit -> 54.7 cfm fan",
    "source_edition_or_year": "spec-v219 worked example (machine-verified)",
    "source_section_or_page": "spec-v219 section 2.1 cross-check (with blower-door credit)",
@@ -35697,7 +35736,7 @@
   },
   {
    "tile_id": "asce7-load-combinations",
-   "source_publisher": "ASCE 7 \u00a72.4.1 basic ASD combinations",
+   "source_publisher": "ASCE 7 §2.4.1 basic ASD combinations",
    "source_title": "roof D15/S30/W-25 -> 45 psf governing, 6 psf net uplift",
    "source_edition_or_year": "spec-v225 worked example (machine-verified)",
    "source_section_or_page": "spec-v225 section 2.1 pinned example (roof uplift)",
@@ -35731,7 +35770,7 @@
   },
   {
    "tile_id": "asce7-load-combinations",
-   "source_publisher": "ASCE 7 \u00a72.4.1 basic ASD combinations",
+   "source_publisher": "ASCE 7 §2.4.1 basic ASD combinations",
    "source_title": "cross-check: floor D20/L40/W30 -> 63.5 psf governing, no uplift",
    "source_edition_or_year": "spec-v225 worked example (machine-verified)",
    "source_section_or_page": "spec-v225 section 2.1 cross-check (floor, no uplift)",
@@ -35765,7 +35804,7 @@
   },
   {
    "tile_id": "seismic-approximate-period",
-   "source_publisher": "ASCE 7 \u00a712.8.2.1 approximate fundamental period",
+   "source_publisher": "ASCE 7 §12.8.2.1 approximate fundamental period",
    "source_title": "120 ft steel moment frame, SD1 0.6 -> Ta 1.29 s, Cu Ta 1.81 s (spec-v1214)",
    "source_edition_or_year": "ASCE 7 Table 12.8-2 / 12.8-1",
    "source_section_or_page": "Ta = Ct hn^x = 0.028 x 120^0.8 = 0.028 x 46.06 = 1.290 s; SD1 0.6 >= 0.4 so Cu = 1.4; Cu Ta = 1.806 s.",
@@ -35814,7 +35853,7 @@
   },
   {
    "tile_id": "seismic-base-shear",
-   "source_publisher": "ASCE 7 \u00a712.8 equivalent lateral force",
+   "source_publisher": "ASCE 7 §12.8 equivalent lateral force",
    "source_title": "200 kip, SDS 1.0, R 6.5, 0.3 s -> Cs 0.154, 30.8 kips",
    "source_edition_or_year": "spec-v226 worked example (machine-verified)",
    "source_section_or_page": "spec-v226 section 2.1 pinned example (short period)",
@@ -35845,7 +35884,7 @@
   },
   {
    "tile_id": "seismic-base-shear",
-   "source_publisher": "ASCE 7 \u00a712.8 equivalent lateral force",
+   "source_publisher": "ASCE 7 §12.8 equivalent lateral force",
    "source_title": "cross-check: same building, 1.0 s period cap governs -> Cs 0.092, 18.5 kips",
    "source_edition_or_year": "spec-v226 worked example (machine-verified)",
    "source_section_or_page": "spec-v226 section 2.1 cross-check (period cap)",
@@ -46160,7 +46199,7 @@
   },
   {
    "tile_id": "egress-capacity",
-   "source_publisher": "IBC 2021 \u00a71005.3 / \u00a71006.2 / \u00a71010.1.1",
+   "source_publisher": "IBC 2021 §1005.3 / §1006.2 / §1010.1.1",
    "source_title": "160-occupant sprinklered restaurant, level egress -> 2 exits, 32 in per door",
    "source_edition_or_year": "spec-v243 worked example (machine-verified)",
    "source_section_or_page": "spec-v243 section 2.1 pinned example",
@@ -46195,7 +46234,7 @@
   },
   {
    "tile_id": "egress-capacity",
-   "source_publisher": "IBC 2021 \u00a71005.3 / \u00a71006.2 / \u00a71010.1.1",
+   "source_publisher": "IBC 2021 §1005.3 / §1006.2 / §1010.1.1",
    "source_title": "cross-check: 1,000-occupant sprinklered assembly, stairs -> 3 stairs, 66.7 in each",
    "source_edition_or_year": "spec-v243 worked example (machine-verified)",
    "source_section_or_page": "spec-v243 section 2.1 cross-check",
@@ -46685,7 +46724,7 @@
   },
   {
    "tile_id": "seismic-vertical-distribution",
-   "source_publisher": "ASCE 7-22 \u00a712.8.3 / \u00a712.8.4 (Eqs. 12.8-11/-12/-13)",
+   "source_publisher": "ASCE 7-22 §12.8.3 / §12.8.4 (Eqs. 12.8-11/-12/-13)",
    "source_title": "3-story, V = 200 kips, T = 0.4 s (k = 1) -> Fx 37.0 / 74.1 / 88.9 kips, base story shear 200",
    "source_edition_or_year": "spec-v477 worked example (machine-verified)",
    "source_section_or_page": "spec-v477 section 2.1 pinned example",
@@ -46744,7 +46783,7 @@
   },
   {
    "tile_id": "seismic-vertical-distribution",
-   "source_publisher": "ASCE 7-22 \u00a712.8.3 / \u00a712.8.4 (Eqs. 12.8-11/-12/-13)",
+   "source_publisher": "ASCE 7-22 §12.8.3 / §12.8.4 (Eqs. 12.8-11/-12/-13)",
    "source_title": "cross-check: same building at T = 1.06 s (k = 1.28, the SEAOC/Tedds example period) -> roof force 97.5 kips",
    "source_edition_or_year": "spec-v477 worked example (machine-verified)",
    "source_section_or_page": "spec-v477 section 2.1 cross-check",
@@ -46797,7 +46836,7 @@
   },
   {
    "tile_id": "seismic-overturning-moment",
-   "source_publisher": "ASCE 7-22 \u00a712.8.5 (Overturning) with \u00a712.8.3 distribution and \u00a712.13.4",
+   "source_publisher": "ASCE 7-22 §12.8.5 (Overturning) with §12.8.3 distribution and §12.13.4",
    "source_title": "3-story, V = 200 kips, T = 0.4 s (k = 1), Fx 37/74/89 kips at 12/24/36 ft -> base overturning 5,422 kip-ft, reduced 4,067",
    "source_edition_or_year": "spec-v480 worked example (machine-verified)",
    "source_section_or_page": "spec-v480 section 2.1 pinned example",
@@ -46844,7 +46883,7 @@
   },
   {
    "tile_id": "seismic-overturning-moment",
-   "source_publisher": "ASCE 7-22 \u00a712.8.5 (Overturning) with \u00a712.8.3 distribution and \u00a712.13.4",
+   "source_publisher": "ASCE 7-22 §12.8.5 (Overturning) with §12.8.3 distribution and §12.13.4",
    "source_title": "cross-check: 2-story, V = 100 kips, T = 1.0 s (k = 1.25 interpolated), Fx 34.5/65.5 kips at 10/20 ft -> base overturning 1,655 kip-ft, reduced 1,242",
    "source_edition_or_year": "spec-v480 worked example (machine-verified)",
    "source_section_or_page": "spec-v480 section 2.1 cross-check",
@@ -46981,7 +47020,7 @@
   },
   {
    "tile_id": "allowable-area",
-   "source_publisher": "IBC 2021 \u00a7506.2 / \u00a7506.3 and Table 506.2",
+   "source_publisher": "IBC 2021 §506.2 / §506.3 and Table 506.2",
    "source_title": "VB / B corner-lot office, sprinklered -> 29,250 ft^2 allowable, 25,000 passes",
    "source_edition_or_year": "spec-v251 worked example (machine-verified)",
    "source_section_or_page": "spec-v251 section 2.1 pinned example",
@@ -47018,7 +47057,7 @@
   },
   {
    "tile_id": "allowable-area",
-   "source_publisher": "IBC 2021 \u00a7506.2 / \u00a7506.3 and Table 506.2",
+   "source_publisher": "IBC 2021 §506.2 / §506.3 and Table 506.2",
    "source_title": "cross-check: IIB / A-2 nonsprinklered restaurant, interior lot -> 9,500 ft^2, 12,000 fails",
    "source_edition_or_year": "spec-v251 worked example (machine-verified)",
    "source_section_or_page": "spec-v251 section 2.1 cross-check",
@@ -47055,7 +47094,7 @@
   },
   {
    "tile_id": "egress-travel-distance",
-   "source_publisher": "IBC 2021 \u00a71017 / \u00a71006.2.1 / \u00a71020.5",
+   "source_publisher": "IBC 2021 §1017 / §1006.2.1 / §1020.5",
    "source_title": "sprinklered Group B floor 240 / 68 / 18 vs 300 / 100 / 50 -> all pass",
    "source_edition_or_year": "spec-v252 worked example (machine-verified)",
    "source_section_or_page": "spec-v252 section 2.1 pinned example",
@@ -47092,7 +47131,7 @@
   },
   {
    "tile_id": "egress-travel-distance",
-   "source_publisher": "IBC 2021 \u00a71017 / \u00a71006.2.1 / \u00a71020.5",
+   "source_publisher": "IBC 2021 §1017 / §1006.2.1 / §1020.5",
    "source_title": "cross-check: nonsprinklered S-1 warehouse 260 vs 200 travel limit -> fails",
    "source_edition_or_year": "spec-v252 worked example (machine-verified)",
    "source_section_or_page": "spec-v252 section 2.1 cross-check",
@@ -47994,7 +48033,7 @@
   },
   {
    "tile_id": "column-base-plate",
-   "source_publisher": "AISC Design Guide 1 \u00a73.1 / AISC 360-22 J8",
+   "source_publisher": "AISC Design Guide 1 §3.1 / AISC 360-22 J8",
    "source_title": "W10x49, 400 kip, 14 in square A36 plate, 4 ksi concrete -> A1_req 181, l 3.0, tp 1.06 in",
    "source_edition_or_year": "spec-v268 worked example (machine-verified)",
    "source_section_or_page": "spec-v268 section 2.1 pinned example",
@@ -48050,7 +48089,7 @@
   },
   {
    "tile_id": "column-base-plate",
-   "source_publisher": "AISC Design Guide 1 \u00a73.1 / AISC 360-22 J8",
+   "source_publisher": "AISC Design Guide 1 §3.1 / AISC 360-22 J8",
    "source_title": "cross-check: raise the load to 700 kip -> A1_req 317 > 196 (plate flagged too small), tp 1.41 in",
    "source_edition_or_year": "spec-v268 worked example (machine-verified)",
    "source_section_or_page": "spec-v268 section 2.1 cross-check",
@@ -53989,7 +54028,7 @@
   },
   {
    "tile_id": "wind-gust-effect-factor",
-   "source_publisher": "ASCE 7 \u00a726.11.4 rigid gust-effect factor",
+   "source_publisher": "ASCE 7 §26.11.4 rigid gust-effect factor",
    "source_title": "30 ft tall, 100 ft wide, Exposure C -> G 0.863 (the 0.85 default is slightly unconservative) (spec-v1211)",
    "source_edition_or_year": "ASCE 7 Table 26.11-1 exposure constants",
    "source_section_or_page": "zbar = max(0.6*30, 15) = 18 ft; Iz = 0.20*(33/18)^(1/6) = 0.2213; Lz = 500*(18/33)^(1/5) = 442.9 ft; Q = sqrt(1/(1 + 0.63*(130/442.9)^0.63)) = 0.8801; G = 0.925*(1 + 1.7*3.4*0.2213*0.8801)/(1 + 1.7*3.4*0.2213) = 0.8628.",
@@ -54029,7 +54068,7 @@
   },
   {
    "tile_id": "wind-gust-effect-factor",
-   "source_publisher": "ASCE 7 \u00a726.11.4 (zbar floored at zmin)",
+   "source_publisher": "ASCE 7 §26.11.4 (zbar floored at zmin)",
    "source_title": "cross-check: Exposure B floors zbar at zmin = 30 ft (0.6*30 = 18 < 30) and gives G 0.840",
    "source_edition_or_year": "ASCE 7 Table 26.11-1 (Exposure B: c 0.30, l 320, eps 1/3, zmin 30)",
    "source_section_or_page": "zbar = max(0.6*30, 30) = 30 ft (clamped); rougher terrain and the zmin floor give G = 0.840, just under the 0.85 default.",
@@ -54057,7 +54096,7 @@
   },
   {
    "tile_id": "wind-velocity-pressure-exposure-coefficient",
-   "source_publisher": "ASCE 7 \u00a726.10.1 velocity pressure exposure coefficient",
+   "source_publisher": "ASCE 7 §26.10.1 velocity pressure exposure coefficient",
    "source_title": "Exposure C, 50 ft -> Kz 1.094 (about 11% above the 0.98 the 30 ft stub would use) (spec-v1212)",
    "source_edition_or_year": "ASCE 7 Table 26.10-1 (Exposure C: alpha 9.5, zg 900 ft)",
    "source_section_or_page": "Kz = 2.01*(50/900)^(2/9.5) = 2.01*(0.055556)^0.21053 = 2.01*0.54413 = 1.0937.",
@@ -54078,7 +54117,7 @@
   },
   {
    "tile_id": "wind-velocity-pressure-exposure-coefficient",
-   "source_publisher": "ASCE 7 \u00a726.10.1 (reproduces the repo's 30 ft stub)",
+   "source_publisher": "ASCE 7 §26.10.1 (reproduces the repo's 30 ft stub)",
    "source_title": "cross-check: Exposure C at 30 ft returns 0.982, matching the hard-coded 0.98 stub",
    "source_edition_or_year": "ASCE 7 Table 26.10-1",
    "source_section_or_page": "Kz = 2.01*(30/900)^(2/9.5) = 2.01*0.48870 = 0.9823, the value computeWindPressure hard-codes for Exposure C. Below 15 ft Kz is held at the z = 15 ft value.",
@@ -70422,7 +70461,7 @@
   },
   {
    "tile_id": "concrete-torsion-threshold",
-   "source_publisher": "ACI 318-19 \u00a722.7",
+   "source_publisher": "ACI 318-19 §22.7",
    "source_title": "12x20 in, 4000 psi -> Tth 56,921 in-lb (4.74 ft-kip), neglect 3.56, Tcr 18.97 ft-kip",
    "source_edition_or_year": "spec-v447 worked example (machine-verified)",
    "source_section_or_page": "spec-v447 section 2.1 pinned example",
@@ -70457,7 +70496,7 @@
   },
   {
    "tile_id": "concrete-torsion-threshold",
-   "source_publisher": "ACI 318-19 \u00a722.7",
+   "source_publisher": "ACI 318-19 §22.7",
    "source_title": "18x24 in, 4000 psi -> Tth 140,502 in-lb (11.7 ft-kip)",
    "source_edition_or_year": "spec-v447 cross-check (machine-verified; spec prose 14.6 was a slip, 11.7 is correct)",
    "source_section_or_page": "spec-v447 section 2.1 cross-check",
@@ -70480,7 +70519,7 @@
   },
   {
    "tile_id": "glulam-volume-factor",
-   "source_publisher": "NDS 2018 \u00a75.3.6",
+   "source_publisher": "NDS 2018 §5.3.6",
    "source_title": "5.125x18 in, 20 ft, softwood -> Cv 0.965 (3.5% reduction)",
    "source_edition_or_year": "spec-v448 worked example (machine-verified)",
    "source_section_or_page": "spec-v448 section 2.1 pinned example",
@@ -70504,7 +70543,7 @@
   },
   {
    "tile_id": "glulam-volume-factor",
-   "source_publisher": "NDS 2018 \u00a75.3.6",
+   "source_publisher": "NDS 2018 §5.3.6",
    "source_title": "6.75x24 in, 32 ft, softwood -> Cv 0.870 (13% reduction)",
    "source_edition_or_year": "spec-v448 cross-check (machine-verified)",
    "source_section_or_page": "spec-v448 section 2.1 cross-check",
@@ -72578,7 +72617,7 @@
   },
   {
    "tile_id": "rain-on-snow-surcharge",
-   "source_publisher": "ASCE 7-22 \u00a77.10",
+   "source_publisher": "ASCE 7-22 §7.10",
    "source_title": "Pf 15, Pg 18, low slope -> surcharge applies, total 23 psf",
    "source_edition_or_year": "spec-v468 worked example (machine-verified)",
    "source_section_or_page": "spec-v468 section 2.1 pinned example",
@@ -72602,7 +72641,7 @@
   },
   {
    "tile_id": "rain-on-snow-surcharge",
-   "source_publisher": "ASCE 7-22 \u00a77.10",
+   "source_publisher": "ASCE 7-22 §7.10",
    "source_title": "deep-snow Pg 25 -> surcharge does not apply, total stays 15 psf",
    "source_edition_or_year": "spec-v468 cross-check (machine-verified)",
    "source_section_or_page": "spec-v468 section 2.1 cross-check",
@@ -72626,7 +72665,7 @@
   },
   {
    "tile_id": "sliding-snow-load",
-   "source_publisher": "ASCE 7 \u00a77.9",
+   "source_publisher": "ASCE 7 §7.9",
    "source_title": "upper Pf 20, W 40, lower >=15 ft -> 320 lb/ft over 15 ft = 21.3 psf",
    "source_edition_or_year": "spec-v469 worked example (machine-verified)",
    "source_section_or_page": "spec-v469 section 2.1 pinned example",
@@ -72654,7 +72693,7 @@
   },
   {
    "tile_id": "sliding-snow-load",
-   "source_publisher": "ASCE 7 \u00a77.9",
+   "source_publisher": "ASCE 7 §7.9",
    "source_title": "narrow 10 ft lower roof concentrates 320 lb/ft into 32 psf",
    "source_edition_or_year": "spec-v469 cross-check (machine-verified)",
    "source_section_or_page": "spec-v469 section 2.1 cross-check",
@@ -72676,7 +72715,7 @@
   },
   {
    "tile_id": "minimum-roof-snow",
-   "source_publisher": "ASCE 7 \u00a77.3.4",
+   "source_publisher": "ASCE 7 §7.3.4",
    "source_title": "Pg 15, Is 1.0 -> Pm 15 psf (Pg <= 20 branch)",
    "source_edition_or_year": "spec-v470 worked example (machine-verified)",
    "source_section_or_page": "spec-v470 section 2.1 pinned example",
@@ -72697,7 +72736,7 @@
   },
   {
    "tile_id": "minimum-roof-snow",
-   "source_publisher": "ASCE 7 \u00a77.3.4",
+   "source_publisher": "ASCE 7 §7.3.4",
    "source_title": "Pg 25, Is 1.1 -> Pm caps at 20 x 1.1 = 22 psf",
    "source_edition_or_year": "spec-v470 cross-check (machine-verified)",
    "source_section_or_page": "spec-v470 section 2.1 cross-check",
@@ -78830,7 +78869,7 @@
   },
   {
    "tile_id": "concrete-immediate-deflection",
-   "source_publisher": "ACI 318-19 \u00a724.2.3",
+   "source_publisher": "ACI 318-19 §24.2.3",
    "source_title": "Ie 4662 in^4 (12x20 beam @ 4000 psi), 0.8 kip/ft on a 24 ft simply supported span -> immediate deflection 0.355 in, L/810 (spec-v1279)",
    "source_edition_or_year": "delta = K w L^4 / (Ec Ie), K = 5/384 simple UDL, Ec = 57000 sqrt(f'c)",
    "source_section_or_page": "Ec = 57000 sqrt(4000) = 3,604,997 psi = 3605 ksi. w = 0.8/12 = 0.06667 kip/in, L = 24 x 12 = 288 in. delta = (5/384)(0.06667)(288^4)/(3605 x 4662) = 0.3553 in. Span/deflection = 288/0.3553 = L/810, comfortably inside the L/240 and L/360 limits. This immediate deflection is the input to concrete-longterm-defl.",
@@ -78866,7 +78905,7 @@
   },
   {
    "tile_id": "concrete-immediate-deflection",
-   "source_publisher": "ACI 318-19 \u00a724.2.3",
+   "source_publisher": "ACI 318-19 §24.2.3",
    "source_title": "cross-check: the same beam and load fixed at both ends deflects 0.071 in (L/4052), five times stiffer",
    "source_edition_or_year": "delta = K w L^4 / (Ec Ie), K = 1/384 fixed-fixed UDL",
    "source_section_or_page": "Everything is the same as the simply supported case except the coefficient drops from 5/384 to 1/384: delta = (1/384)(0.06667)(288^4)/(3605 x 4662) = 0.07107 in, exactly one fifth of the simple-span value, and the span/deflection ratio jumps to L/4052. The support fixity is the single biggest lever on deflection.",
@@ -86237,7 +86276,7 @@
    "tile_id": "concrete-cracked-inertia-tee",
    "source_publisher": "Project (first-principles)",
    "source_title": "T-beam cracked Icr, neutral axis in the web",
-   "source_edition_or_year": "ACI 318-19 \u00a719.2.2.1 + cracked transformed section",
+   "source_edition_or_year": "ACI 318-19 §19.2.2.1 + cracked transformed section",
    "source_section_or_page": "web case: bw c^2/2 + (b-bw)hf(c-hf/2) = n As(d-c)",
    "verified_by": "rl",
    "verified_on": "2026-08-10",
@@ -86268,7 +86307,7 @@
    "tile_id": "concrete-cracked-inertia-tee",
    "source_publisher": "Project (first-principles)",
    "source_title": "Rectangular limit (bw=b) matches singly-reinforced Icr",
-   "source_edition_or_year": "ACI 318-19 \u00a719.2.2.1 + cracked transformed section",
+   "source_edition_or_year": "ACI 318-19 §19.2.2.1 + cracked transformed section",
    "source_section_or_page": "reduces to concrete-effective-inertia",
    "verified_by": "rl",
    "verified_on": "2026-08-10",
@@ -93096,7 +93135,7 @@
     "inlet_width_ft": 0.25,
     "inlet_velocity_fps": 50,
     "turns": 5,
-    "gas_viscosity_lb_ft_s": 0.0000124,
+    "gas_viscosity_lb_ft_s": 1.24e-05,
     "gas_density_pcf": 0.075,
     "particle_density_pcf": 90,
     "k_velocity_heads": 8,
@@ -95871,6 +95910,359 @@
     },
     "shortfall_sqft": {
      "value": 4.04283,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mine-face-ventilation",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "18 by 14 ft heading, 25,000 cfm fan at 70% tubing efficiency, two 10,000 cfm diesel machines",
+   "source_edition_or_year": "face velocity = delivered / area; the governing requirement is the larger demand",
+   "source_section_or_page": "the diesel rate per unit of engine power is set by regulation and entered",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "heading_width_ft": 18,
+    "heading_height_ft": 14,
+    "fan_airflow_cfm": 25000,
+    "tubing_efficiency_pct": 70,
+    "diesel_units": 2,
+    "diesel_cfm_each": 10000,
+    "min_face_velocity_fpm": 60
+   },
+   "outputs": {
+    "heading_area_sqft": {
+     "value": 252,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "delivered_cfm": {
+     "value": 17500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "leakage_cfm": {
+     "value": 7500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "face_velocity_fpm": {
+     "value": 69.4444,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "diesel_required_cfm": {
+     "value": 20000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "governing_cfm": {
+     "value": 20000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "efficiency_needed_pct": {
+     "value": 80,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pit-dewatering-staging",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "180 ft static lift with 42 ft of friction on 120 ft pumps, suction lift 28 ft",
+   "source_edition_or_year": "stages = ceil(total head / head per pump); hp = gpm x head / 3,960",
+   "source_section_or_page": "the practical suction lift is a rule of thumb, not an NPSH calculation",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "static_lift_ft": 180,
+    "friction_head_ft": 42,
+    "discharge_pressure_ft": 0,
+    "head_per_pump_ft": 120,
+    "suction_lift_ft": 28,
+    "practical_suction_limit_ft": 25,
+    "flow_gpm": 500,
+    "pump_efficiency_pct": 65
+   },
+   "outputs": {
+    "total_head_ft": {
+     "value": 222,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "stages": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "head_per_stage_ft": {
+     "value": 111,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "suction_excess_ft": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "water_hp": {
+     "value": 28.0303,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "brake_hp": {
+     "value": 43.1235,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "static_share_pct": {
+     "value": 81.0811,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "highwall-bench-geometry",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "40 ft benches with 30 ft catch benches cut at 65 degrees, five high",
+   "source_edition_or_year": "run per bench = height / tan(face) + width; overall = atan(height / run)",
+   "source_section_or_page": "geometry only; a qualified geotechnical engineer governs stability",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "bench_height_ft": 40,
+    "bench_width_ft": 30,
+    "face_angle_deg": 65,
+    "bench_count": 5,
+    "alternative_bench_width_ft": 20,
+    "target_overall_angle_deg": 35
+   },
+   "outputs": {
+    "face_run_ft": {
+     "value": 18.6523,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "run_per_bench_ft": {
+     "value": 48.6523,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "overall_angle_deg": {
+     "value": 39.4257,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_height_ft": {
+     "value": 200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alternative_overall_angle_deg": {
+     "value": 45.9817,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "width_for_target_ft": {
+     "value": 38.4736,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rock-bolt-support-pressure",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "4 by 4 ft pattern of 12,000 lb bolts against a 6 ft loosened zone in 165 pcf rock",
+   "source_edition_or_year": "p = capacity / area per bolt; dead weight = unit weight x zone height",
+   "source_section_or_page": "a screen; a qualified geotechnical engineer governs",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "bolt_capacity_lb": 12000,
+    "spacing_1_ft": 4,
+    "spacing_2_ft": 4,
+    "span_ft": 20,
+    "rock_unit_weight_pcf": 165,
+    "loosened_zone_ft": 6,
+    "target_support_psf": 990
+   },
+   "outputs": {
+    "area_per_bolt_sqft": {
+     "value": 16,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "support_psf": {
+     "value": 750,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "support_psi": {
+     "value": 5.20833,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "dead_weight_required_psf": {
+     "value": 990,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "dead_weight_ratio": {
+     "value": 0.757576,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "spacing_for_target_ft": {
+     "value": 3.48155,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bolt_length_ft": {
+     "value": 8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blast-fume-clearance-time",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "48,000 cu ft heading at 17,500 cfm clearing to 1% of the blast concentration",
+   "source_edition_or_year": "C(t) = C0 exp(-Q t / V); 4.6 air changes reach 1%",
+   "source_section_or_page": "atmospheric testing, not a clock, is the actual requirement",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "heading_volume_cuft": 48000,
+    "delivered_cfm": 17500,
+    "target_fraction_pct": 1,
+    "wait_time_min": 10,
+    "target_time_min": 10
+   },
+   "outputs": {
+    "air_change_min": {
+     "value": 2.742857,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "air_changes_required": {
+     "value": 4.60517,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "clearance_min": {
+     "value": 12.6313,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "remaining_pct_at_wait": {
+     "value": 2.60997,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "airflow_for_target_time_cfm": {
+     "value": 22104.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hoist-rope-safety-factor",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "four-rope hoist, 1,400 ft at 1.8 lb/ft each, 4,200 lb cage and eight people",
+   "source_edition_or_year": "FS = (count x breaking) / (conveyance + payload + count x length x weight per ft)",
+   "source_section_or_page": "the statutory minimum varies by service and depth and is entered",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "conveyance_lb": 4200,
+    "people_count": 8,
+    "person_weight_lb": 180,
+    "rope_length_ft": 1400,
+    "rope_weight_per_ft": 1.8,
+    "rope_count": 4,
+    "rope_breaking_lb": 128000,
+    "minimum_fs": 8
+   },
+   "outputs": {
+    "rope_weight_lb": {
+     "value": 10080,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "payload_lb": {
+     "value": 1440,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_load_lb": {
+     "value": 15720,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rope_share_pct": {
+     "value": 64.1221,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "factor_of_safety": {
+     "value": 32.57,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fs_without_rope": {
+     "value": 90.7801,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "depth_at_limit_ft": {
+     "value": 8105.56,
      "tolerance": {
       "pct": 0.5
      }

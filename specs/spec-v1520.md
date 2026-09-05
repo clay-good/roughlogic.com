@@ -1,6 +1,11 @@
 # roughlogic.com Specification v1520 -- Shotcrete Rebound Loss and Material Yield (`calc-mining.js`, Group E Carpentry and Construction, underground, 1 New Tile)
 
-> **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
+> **Status: CUT 2026-09-05 as a duplicate.** `shotcrete-rebound-quantity` already
+> computes the identical `shot = in-place / (1 - rebound)` on the same
+> `area x thickness / 12 / 27` in-place volume. The one thing this spec added that
+> that calculator did not have -- the reverse check (given the volume actually shot,
+> what thickness is on the wall) and the divide-versus-add trap -- landed there as a
+> follow-up instead. Aliases route this question to it. Single-tile spec. Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-mining.js`**
 > (Group E, Carpentry and Construction -- the existing category, hub `/groups/construction/`; mining, quarry, and drill-and-blast), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >

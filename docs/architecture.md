@@ -87,7 +87,7 @@ active. Cache version is keyed to the build hash.
 
 The on-disk layout matches spec.md section 6 exactly. The key structural rules are:
 
-- A single index.html, styles.css, app.js, and sw.js at the repository root. `sw.js` precaches the app shell and the data manifests; it does **not** precache the **1865 static shells**. A shell URL opened offline therefore takes the navigation fallback, which redirects to the root and carries a tile id through as the hash (`/tools/ohms-law/` -> `/#ohms-law`). Serving index.html at the shell's own URL, as the fallback did until 2026-08-31, left every relative asset path resolving under `/tools/<id>/`, so the reader got an unstyled home view instead of the calculator they asked for.
+- A single index.html, styles.css, app.js, and sw.js at the repository root. `sw.js` precaches the app shell and the data manifests; it does **not** precache the **1871 static shells**. A shell URL opened offline therefore takes the navigation fallback, which redirects to the root and carries a tile id through as the hash (`/tools/ohms-law/` -> `/#ohms-law`). Serving index.html at the shell's own URL, as the fallback did until 2026-08-31, left every relative asset path resolving under `/tools/<id>/`, so the reader got an unstyled home view instead of the calculator they asked for.
 - Per-trade data folders under data/, each with a manifest.json and one or more shard JSON files.
 - Build-time scripts in scripts/ never run in production.
 - Test fixtures and suites under test/.

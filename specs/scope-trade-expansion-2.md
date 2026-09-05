@@ -1,7 +1,7 @@
 # Scope: The 2026-09-05 Trade Expansion (specs v1450-v1749, 300 New Tiles)
 
 > **Status: IN PROGRESS (2026-09-05). Program charter, no catalog change of its own.**
-> **Bands 1-4 have landed: railroad track, elevator and escalator, door hardware and locksmithing, and mining and quarry, 1,804 -> 1,843.**
+> **Bands 1-5 have landed: railroad track, elevator and escalator, door hardware and locksmithing, and mining and quarry (both halves), 1,804 -> 1,849. One spec cut as a duplicate.**
 > Inherits the spec-v106 trades-only charter and every convention through spec-v1449.
 > Each of the 300 tiles is specified in its own file, `spec-v1450.md` through `spec-v1749.md`.
 
@@ -546,8 +546,15 @@ things must happen **before** the first band, not during it:
 | 2 | v1648-v1658 | `calc-elevator.js` (new) | 11 | elevator and escalator equipment; catalog 1,811 -> 1,822 |
 | 3 | v1571-v1581 | `calc-doorhardware.js` (new) | 11 | door hardware and locksmithing; catalog 1,822 -> 1,833; nine group E, two group A |
 | 4 | v1507-v1516 | `calc-mining.js` (new) | 10 | mining, quarry, and drill-and-blast; catalog 1,833 -> 1,843 |
+| 5 | v1517-v1523 | `calc-mining.js` | 6 | the rest of the mining bench; catalog 1,843 -> 1,849. **spec-v1520 CUT** as a duplicate of `shotcrete-rebound-quantity`, whose reverse check it became |
 
-**Seven of the thirty-nine specs built so far were internally wrong and shipped corrected.** Band 4 was clean: all ten worked examples reproduced exactly. In band 1:
+**Nine of the forty-five specs built so far were internally wrong and shipped corrected.**
+Band 4 was clean; band 5 had two. spec-v1521 labels its dead-weight check "FAILS, margin
+0.76" and then calls the same case "Comfortable" -- 750 psf does not carry 990 psf. And
+spec-v1523's own formula line says rope weight = length x weight per foot x NUMBER OF
+ROPES, then drops the count: four ropes of 1,400 ft at 1.8 lb/ft weigh 10,080 lb, not the
+2,520 it reports, and its 8,160 lb load, 31% rope share and FS 62.7 all follow the missing
+factor. **ONE SPEC CUT: v1520.** In band 1:
 spec-v1541's 2,450 lb per degF is not what its own stated inputs give (13.0 x 30,000,000 x
 0.0000065 is 2,535, and 61,262 and 208,292 follow from the wrong figure), and spec-v1545's worked
 example calls a car 15 ft from the main "fouling" against a 13 ft requirement when it is clear.

@@ -877,6 +877,13 @@ export const RENDERER_MAP = {
   "belt-feeder-capacity": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
   "dust-collector-air-to-cloth": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
   "dust-deflagration-vent-area": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
+  // spec-v1517..v1523 mining band, part 2
+  "mine-face-ventilation": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
+  "pit-dewatering-staging": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
+  "highwall-bench-geometry": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
+  "rock-bolt-support-pressure": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
+  "blast-fume-clearance-time": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
+  "hoist-rope-safety-factor": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
   "horizontal-curve": { module: "../../calc-civil.js", exportName: "CIVIL_RENDERERS" },
   "spiral-curve": { module: "../../calc-civil.js", exportName: "CIVIL_RENDERERS" },
   "compound-curve": { module: "../../calc-civil.js", exportName: "CIVIL_RENDERERS" },

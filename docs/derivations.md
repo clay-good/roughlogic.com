@@ -1762,7 +1762,7 @@ cross-check.
 | calc-construction.js | `computeSheathingTakeoff` | `{ area_sf = 1600, waste_pct = 8, sheet_sf = 32, nails_per_sheet = 60 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeShingleNails` | `{ squares = 30, shingles_per_square = 80, nails_per_shingle = 4, nails_per_lb...` | _ | _ | _ |
 | calc-construction.js | `computeShorePostLoad` | `{ slab_in = 0, unit_weight = 150, form_load = 10, live_load = 50, spacing_x =...` | _ | _ | _ |
-| calc-construction.js | `computeShotcreteReboundQuantity` | `{ area_sf = 0, thickness_in = 0, rebound_pct = 20 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeShotcreteReboundQuantity` | `{ area_sf = 0, thickness_in = 0, rebound_pct = 20, shot_actual_cy = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSidingCourseLayout` | `{ wall_height_ft = 0, wall_length_ft = 0, target_exposure_in = 7, board_heigh...` | _ | _ | _ |
 | calc-construction.js | `computeSidingTakeoff` | `{ wall_area_sf = 2000, opening_area_sf = 0, waste_pct = 12, exposure_in = 4 }...` | _ | _ | _ |
 | calc-construction.js | `computeSignCharacterHeight` | `{ baseline_height_in = 0, viewing_distance_in = 0, provided_character_height_...` | _ | _ | _ |
@@ -2773,12 +2773,18 @@ cross-check.
 | calc-mining.js | `computeBeltFeederCapacity` | `{ opening_width_in = 0, opening_height_in = 0, belt_speed_fpm = 0, bulk_densi...` | _ | _ | _ |
 | calc-mining.js | `computeBlastAirblastOverpressure` | `{ distance_ft = 0, charge_per_delay_lb = 0, airblast_k = 0.2, airblast_b = 1....` | _ | _ | _ |
 | calc-mining.js | `computeBlastBurdenSpacing` | `{ hole_diameter_in = 0, burden_ratio = 25, bench_height_ft = 0, spacing_ratio...` | _ | _ | _ |
+| calc-mining.js | `computeBlastFumeClearanceTime` | `{ heading_volume_cuft = 0, delivered_cfm = 0, target_fraction_pct = 1, wait_t...` | _ | _ | _ |
 | calc-mining.js | `computeBlastPowderFactor` | `{ burden_ft = 0, spacing_ft = 0, bench_height_ft = 0, hole_diameter_in = 0, s...` | _ | _ | _ |
 | calc-mining.js | `computeBlastScaledDistancePPV` | `{ distance_ft = 0, charge_per_delay_lb = 0, site_k = 160, site_b = 1.6, ppv_l...` | _ | _ | _ |
 | calc-mining.js | `computeBlastStemmingLength` | `{ burden_ft = 0, hole_diameter_in = 0, proposed_stemming_ft = 0, burden_ratio...` | _ | _ | _ |
 | calc-mining.js | `computeCrusherReductionRatio` | `{ feed_size_in = 0, product_size_in = 0, stages = 2, machine_ratio_low = 3, m...` | _ | _ | _ |
 | calc-mining.js | `computeDustCollectorAirToCloth` | `{ airflow_cfm = 0, bag_count = 0, bag_diameter_in = 0, bag_length_ft = 0, ran...` | _ | _ | _ |
 | calc-mining.js | `computeDustDeflagrationVentArea` | `{ volume_cuft = 0, kst_bar_m_s = 0, p_red_psig = 0, p_stat_psig = 0, length_t...` | _ | _ | _ |
+| calc-mining.js | `computeHighwallBenchGeometry` | `{ bench_height_ft = 0, bench_width_ft = 0, face_angle_deg = 0, bench_count = ...` | _ | _ | _ |
+| calc-mining.js | `computeHoistRopeSafetyFactor` | `{ conveyance_lb = 0, people_count = 0, person_weight_lb = 180, rope_length_ft...` | _ | _ | _ |
+| calc-mining.js | `computeMineFaceVentilation` | `{ heading_width_ft = 0, heading_height_ft = 0, fan_airflow_cfm = 0, tubing_ef...` | _ | _ | _ |
+| calc-mining.js | `computePitDewateringStaging` | `{ static_lift_ft = 0, friction_head_ft = 0, discharge_pressure_ft = 0, head_p...` | _ | _ | _ |
+| calc-mining.js | `computeRockBoltSupportPressure` | `{ bolt_capacity_lb = 0, spacing_1_ft = 0, spacing_2_ft = 0, span_ft = 0, rock...` | _ | _ | _ |
 | calc-mining.js | `computeScreenDeckCapacity` | `{ deck_width_ft = 0, deck_length_ft = 0, base_capacity_tph_per_sqft = 0, over...` | _ | _ | _ |
 | calc-motor.js | `computeMotorAccelerationTime` | `{ inertia_lbft2 = 100, speed_change_rpm = 1750, net_accel_torque_lbft = 50 } ...` | _ | _ | _ |
 | calc-motor.js | `computeMotorFaultContribution` | `{ motor_fla_a = 0, x_subtransient_pu = 0.167, utility_fault_a = 0 } = {}` | _ | _ | _ |
@@ -3508,7 +3514,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2094.
+Row count: 2100.
 
 <!-- END function-corpus-v14 -->
 
@@ -4162,7 +4168,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (516 tiles)
+### Group E Construction (522 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4201,6 +4207,7 @@ per spec-v14 §13.1 second paragraph.
 | `bend-springback` | Sheet-Metal Bend Springback | Machinery's Handbook sheet-metal spri...; x = 1*50000/(29e6*0.1) = 0.017241; Ks = 4x^3-3x+1 = 0.948... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `blast-airblast-overpressure` | Blast Airblast Overpressure and Confinement Screen | Project (first-principles); constants depend on confinement and are entered | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `blast-burden-spacing` | Blast Pattern Burden, Spacing, and Stiffness Ratio | Project (first-principles); published pattern ratio ranges | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `blast-fume-clearance-time` | Heading Blast Fume Clearance Time and Air Changes | Project (first-principles); atmospheric testing, not a clock, is the actual requirement | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `blast-powder-factor` | Blasting Powder Factor and Explosive Load per Hole | Project (first-principles); the blaster in charge and the site blast plan govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `blast-scaled-distance-ppv` | Blast Vibration Scaled Distance and Peak Particle Velocity | Project (first-principles); site constants entered; a seismograph regression is the d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `blast-stemming-length` | Blast Hole Stemming Length and Flyrock Screen | Project (first-principles); flyrock is a fatality mechanism; the blaster in charge go... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4376,7 +4383,9 @@ per spec-v14 §13.1 second paragraph.
 | `header-sizing` | Window / Door Header Sizing (IRC R602.7) | IRC / AWC NDS; w = (snow + 15 dead) x trib = 45 x 14 = 630 plf; double 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `helical-pile` | Helical Pile Torque-to-Capacity | Project (first-principles) over IBC s...; 1.5 in solid square shaft / 5000 ft-lb torque / FOS 2.0 -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `helical-pile-torque` | Helical Pile Acceptance Torque for a Target Capacity | IBC sec. 1810.3.3.1.9 helical-pile to...; 1.5 in solid shaft (Kt 10), 25,000 lb allowable at FOS 2 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `highwall-bench-geometry` | Highwall Bench Width and Overall Slope Angle | Project (first-principles); geometry only; a qualified geotechnical engineer governs ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hip-valley-rafter` | Hip / Valley / Jack Rafter Schedule | Project (first-principles); 14 ft run / 6:12 pitch / 12 in overhang -> common 15.65 f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `hoist-rope-safety-factor` | Mine Hoist Rope Factor of Safety and Depth Limit | Project (first-principles); the statutory minimum varies by service and depth and is ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hoistway-venting` | Hoistway Smoke Venting and Pressurization Screen | Project (first-principles); NFPA 92 and the adopted building code named | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hoop-stress-mawp` | Thin-Wall Vessel Max Allowable Working Pressure | thin-wall / Barlow (inverse); spec-v668 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hoop-stress-thin-wall` | Thin-Wall Pressure Vessel Hoop and Longitudinal Stress | thin-wall / Barlow; spec-v361 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4428,6 +4437,7 @@ per spec-v14 §13.1 second paragraph.
 | `metal-stud-takeoff` | Light-Gauge Steel Stud and Track Takeoff | Steel stud/track takeoff identity (fi...; studs = ceil(50/(16/12)) + 1 + 2*2 = 38 + 1 + 4 = 43; tra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `metal-weight` | Metal Weight by Shape and Alloy | first-principles (volume x density); 1 in x 12 in x 120 in A36 plate -> area 12 in^2, 408.384 lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `min-bend-radius` | Minimum Plate Bend Radius | published forming-limit relation; 1/4 in A36 at 20% elongation -> 1.5 T, 0.375 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `mine-face-ventilation` | Underground Face Airflow, Velocity, and Diesel Dilution | Project (first-principles); the diesel rate per unit of engine power is set by regula... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `minimum-roof-snow` | Minimum Roof Snow Load (ASCE 7 7.3.4) | ASCE 7 §7.3.4; spec-v470 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `mortar-mix` | Mortar Mix and Yield | PCA; 600 modular bricks at 3/8 in joints, Type N -> 20 bags (6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `multi-bend-flat-pattern` | Multi-Bend Flat Pattern (Developed Length) | sheet-metal layout (developed length); spec-v454 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4444,6 +4454,7 @@ per spec-v14 §13.1 second paragraph.
 | `pile-length-for-capacity` | Pile Embedment Length for a Target Capacity (Alpha Method) | Alpha (total-stress) pile method (FHW...; 50 kip target, 16 in pile, cu 1 ksf, alpha 0.55, FS 3 -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-bedding-backfill` | Trench Pipe Bedding and Backfill Take-Off | ASTM D2321 / municipal bedding detail; 100 ft run, 24 in trench, 12 in OD, 4 in bedding, 3 ft co... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-flotation` | Buried Pipe Flotation and Anti-Flotation Backfill | Archimedes flotation identity (first-...; uplift = 62.4*(PI/4)*4^2 = 784.1; FS = 1100/784.1 = 1.40;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `pit-dewatering-staging` | Pit Dewatering Total Head, Staging, and Suction Limit | Project (first-principles); the practical suction lift is a rule of thumb, not an NPS... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `plumbing-fixture-count` | Minimum Plumbing Fixtures by Occupancy (IBC Table 2902.1) | IBC 2021 Table 2902.1 (mirrored in IP...; spec-v244 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `plywood-span` | Plywood and OSB Sheathing Span Rating | APA Engineered Wood Span Ratings (pro...; 24/16 / 0.5 in / roof / 24 in support / 30 psf live + 8 p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `point-load-bearing` | Bearing Length on a Wood Plate | NDS compression perpendicular to grai...; 4000 lb, 3.0-in width, Fc-perp 625 psi -> ~2.133 in bearing | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4496,6 +4507,7 @@ per spec-v14 §13.1 second paragraph.
 | `ripper-production` | Dozer Ripper Loosening Production Rate | Swept-prism production identity (firs...; cross-section = 3*1.5 = 4.5 ft^2; production = 4.5*132*60... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `riprap-d50` | Riprap Median Stone Size (Isbash) | Isbash riprap-sizing equation (public...; D50 = 1.2*64 / (2*32.2*0.86^2*1.65) = 76.8/78.59 = 0.977 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `riprap-tonnage` | Riprap Layer Volume and Tonnage | Layer take-off identity (first-princi...; volume = 500*2/27 = 37.0 cy; tons = 500*2*165/2000 = 82.5 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `rock-bolt-support-pressure` | Rock Bolt Pattern Support Pressure and Dead-Weight Check | Project (first-principles); a screen; a qualified geotechnical engineer governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rock-construction-entrance` | Stabilized Construction Entrance Stone | Pad take-off identity (first-principles); volume = 50*14*0.5/27 = 13.0 cy; tons = 50*14*0.5*100/200... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `roof-ballast-weight` | Ballasted Roof Ballast Weight and Order | Ballasted single-ply roof ballast wei...; lb = 5000 x 12 = 60,000; tons = 30; cy = 60000/100/27 = 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `roof-insulation-fasteners` | Roof Board Fastener and Plate Count by Zone | Roof-board fastener identity (first-p...; fasteners = 100*8 + 20*12 + 5*16 = 800 + 240 + 80 = 1120;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5524,6 +5536,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1843. Fixture-covered or reference-cadence: 1843 / 1843.
+Tile count: 1849. Fixture-covered or reference-cadence: 1849 / 1849.
 
 <!-- END tile-index-v14 -->

@@ -7544,23 +7544,38 @@ CONSTRUCTION_RENDERERS["ready-mix-concrete-order"] = _v431renderReadyMixConcrete
 // A large fraction of shotcrete/gunite bounces off the work (rebound) and never
 // stays, so the order grosses up: shot = in-place / (1 - rebound fraction).
 // dims: in { area_sf: L^2, thickness_in: L, rebound_pct: dimensionless } out: { in_place_cy: L^3, shot_cy: L^3, rebound_cy: L^3 }
-export function computeShotcreteReboundQuantity({ area_sf = 0, thickness_in = 0, rebound_pct = 20 } = {}) {
+export function computeShotcreteReboundQuantity({ area_sf = 0, thickness_in = 0, rebound_pct = 20, shot_actual_cy = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_sf > 0)) return { error: "Area must be positive (ft^2)." };
   if (!(thickness_in > 0)) return { error: "Thickness must be positive (in)." };
   if (!(rebound_pct >= 0) || rebound_pct >= 100) return { error: "Rebound must be between 0 and 100 percent (100 would order infinite material)." };
+  if (!(shot_actual_cy >= 0)) return { error: "Volume actually shot cannot be negative." };
   const in_place_cy = (area_sf * (thickness_in / 12)) / 27;
   const shot_cy = in_place_cy / (1 - rebound_pct / 100);
   const rebound_cy = shot_cy - in_place_cy;
-  if (![in_place_cy, shot_cy, rebound_cy].every(Number.isFinite)) return { error: "Shotcrete math is not a finite value." };
+  // spec-v1520 follow-up: the correction DIVIDES, and adding the rebound
+  // percentage instead is the classic error -- at 22% rebound that is 13.56
+  // cy where 14.25 is needed, most of a truck short. And the reverse is the
+  // question a crew actually has mid-shift: given what has been shot, what
+  // thickness is on the wall?
+  const naive_add_cy = in_place_cy * (1 + rebound_pct / 100);
+  const shortfall_cy = shot_cy - naive_add_cy;
+  const in_place_from_shot_cy = shot_actual_cy * (1 - rebound_pct / 100);
+  const achieved_thickness_in = in_place_from_shot_cy * 27 * 12 / area_sf;
+  if (![in_place_cy, shot_cy, rebound_cy, naive_add_cy, in_place_from_shot_cy, achieved_thickness_in].every(Number.isFinite)) return { error: "Shotcrete math is not a finite value." };
   return {
     in_place_cy,
     shot_cy,
     rebound_cy,
-    note: "Rebound depends on process and orientation - roughly 5-15% for wet-mix vertical work and 15-30% for dry-mix (gunite) overhead. The value comes from the applicator's field record or the spec, not a constant. Rebound must be cleaned out and never worked back into the section. The shot volume is what you order; the in-place volume is what stays on the wall.",
+    naive_add_cy,
+    shortfall_cy,
+    in_place_from_shot_cy,
+    achieved_thickness_in,
+    thickness_ok: achieved_thickness_in >= thickness_in,
+    note: "Rebound depends on process and orientation - roughly 5-15% for wet-mix vertical work and 15-30% for dry-mix (gunite) overhead. The value comes from the applicator's field record or the spec, not a constant. Rebound must be cleaned out and never worked back into the section - it has lost its cement fraction, and incorporating it is a known defect mechanism, so it is genuine loss that has to come off the invert. The shot volume is what you order; the in-place volume is what stays on the wall. THE CORRECTION DIVIDES. A 25% rebound does not mean ordering 25% more, it means ordering 33% more, because the rebound is a fraction of what is SHOT rather than of what stays - and the gap widens fast, so at 35% rebound the order is 54% above the in-place volume. Adding the percentage instead leaves a crew short, often by most of a truck. The reverse is the question mid-shift: given the volume actually shot, the in-place thickness is that volume less rebound spread over the area, and the thickness check should reflect it rather than the delivery ticket.",
   };
 }
-export const shotcreteReboundQuantityExample = { inputs: { area_sf: 500, thickness_in: 4, rebound_pct: 20 } };
+export const shotcreteReboundQuantityExample = { inputs: { area_sf: 500, thickness_in: 4, rebound_pct: 20, shot_actual_cy: 7 } };
 const _v816renderShotcreteReboundQuantity = _simpleRenderer({
   citation: "Citation: rebound gross-up identity by name. shot volume = in-place volume / (1 - rebound fraction), where in-place = area x thickness/12 / 27 and rebound = shot minus in-place over shot. The applicator's field rebound governs.",
   example: shotcreteReboundQuantityExample.inputs,
@@ -7568,11 +7583,14 @@ const _v816renderShotcreteReboundQuantity = _simpleRenderer({
     { key: "area_sf", label: "Area to shoot (ft²)", kind: "number" },
     { key: "thickness_in", label: "In-place section thickness (in)", kind: "number" },
     { key: "rebound_pct", label: "Rebound loss (% of material shot)", kind: "number" },
+    { key: "shot_actual_cy", label: "Volume actually shot so far (cy)", kind: "number" },
   ],
   outputs: [
     { key: "s", id: "src-out-s", label: "Shotcrete to order", value: (r) => _fmtC(r.shot_cy, 2) + " cy shot" },
     { key: "i", id: "src-out-i", label: "In-place volume", value: (r) => _fmtC(r.in_place_cy, 2) + " cy" },
     { key: "r", id: "src-out-r", label: "Rebound (lost)", value: (r) => _fmtC(r.rebound_cy, 2) + " cy" },
+    { key: "a", id: "src-out-a", label: "Adding the percentage instead would order", value: (r) => _fmtC(r.naive_add_cy, 2) + " cy -- " + _fmtC(r.shortfall_cy, 2) + " cy short" },
+    { key: "t", id: "src-out-t", label: "From the volume actually shot", value: (r) => _fmtC(r.in_place_from_shot_cy, 2) + " cy in place, " + _fmtC(r.achieved_thickness_in, 2) + " in average thickness -- " + (r.thickness_ok ? "at or over the design section" : "SHORT of the design section") },
     { key: "n", id: "src-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeShotcreteReboundQuantity,
