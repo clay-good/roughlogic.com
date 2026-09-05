@@ -377,7 +377,7 @@ function applyRoute() {
 // asserts the two strings are identical, which also keeps the count in this
 // one honest.
 const HOME_DESC =
-  "1,822 free calculators for the trades. Type the job the way you'd say it, and you get the number, the inputs, and the source.";
+  "1,833 free calculators for the trades. Type the job the way you'd say it, and you get the number, the inputs, and the source.";
 const HOME_TITLE = "Rough Logic";
 // Production origin for the canonical link. The SPA must emit an ABSOLUTE
 // canonical (matching the prerendered /tools/<id>/ and /groups/<slug>/

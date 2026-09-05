@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1580 -- Slide Gate Operator Force, Duty Cycle, and Travel (`calc-doorhardware.js`, Group E Carpentry and Construction, door hardware, 1 New Tile)
 
-> **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
+> **Status: LANDED 2026-09-05. Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-doorhardware.js`**
 > (Group E, Carpentry and Construction -- the existing category, hub `/groups/construction/`; door hardware and locksmithing), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >

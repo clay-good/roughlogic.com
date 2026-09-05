@@ -836,6 +836,19 @@ const _TILES = [
   ["door-closing-energy", "E"],
   ["governor-tripping-speed", "E"],
   ["guide-rail-bracket-span", "E"],
+  // spec-v1571..v1581 door hardware and locksmithing band (trade expansion 2;
+  // the two electrified-hardware tiles keep group "A")
+  ["door-closer-opening-force", "E"],
+  ["lock-backset-strike-layout", "E"],
+  ["panic-hardware-force", "E"],
+  ["electric-lock-power-budget", "A"],
+  ["maglock-holding-leverage", "A"],
+  ["master-key-bitting-capacity", "E"],
+  ["key-cut-macs-check", "E"],
+  ["door-undercut-transfer-air", "E"],
+  ["fire-door-clearance", "E"],
+  ["gate-operator-duty-cycle", "E"],
+  ["revolving-door-throughput", "E"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   ["grounding-electrode-conductor", "A"],
   ["bonding-jumper", "A"],

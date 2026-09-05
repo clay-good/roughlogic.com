@@ -105812,6 +105812,281 @@
    "term": "seismic guide rail elevator",
    "target": "guide-rail-bracket-span",
    "kind": "industry"
+  },
+  {
+   "term": "door closer size",
+   "target": "door-closer-opening-force",
+   "kind": "industry"
+  },
+  {
+   "term": "door opening force ada",
+   "target": "door-closer-opening-force",
+   "kind": "industry"
+  },
+  {
+   "term": "a156.4 closer sizing",
+   "target": "door-closer-opening-force",
+   "kind": "industry"
+  },
+  {
+   "term": "5 pound opening force",
+   "target": "door-closer-opening-force",
+   "kind": "industry"
+  },
+  {
+   "term": "closer spring adjustment",
+   "target": "door-closer-opening-force",
+   "kind": "industry"
+  },
+  {
+   "term": "lock backset layout",
+   "target": "lock-backset-strike-layout",
+   "kind": "industry"
+  },
+  {
+   "term": "door bore dimensions",
+   "target": "lock-backset-strike-layout",
+   "kind": "industry"
+  },
+  {
+   "term": "strike plate location",
+   "target": "lock-backset-strike-layout",
+   "kind": "industry"
+  },
+  {
+   "term": "2 3/8 versus 2 3/4 backset",
+   "target": "lock-backset-strike-layout",
+   "kind": "industry"
+  },
+  {
+   "term": "cylindrical lock prep",
+   "target": "lock-backset-strike-layout",
+   "kind": "industry"
+  },
+  {
+   "term": "panic hardware force",
+   "target": "panic-hardware-force",
+   "kind": "industry"
+  },
+  {
+   "term": "exit device operating force",
+   "target": "panic-hardware-force",
+   "kind": "industry"
+  },
+  {
+   "term": "15 pound release force",
+   "target": "panic-hardware-force",
+   "kind": "industry"
+  },
+  {
+   "term": "crash bar force limit",
+   "target": "panic-hardware-force",
+   "kind": "industry"
+  },
+  {
+   "term": "fire exit hardware latch",
+   "target": "panic-hardware-force",
+   "kind": "industry"
+  },
+  {
+   "term": "access control power supply sizing",
+   "target": "electric-lock-power-budget",
+   "kind": "industry"
+  },
+  {
+   "term": "maglock standby battery",
+   "target": "electric-lock-power-budget",
+   "kind": "industry"
+  },
+  {
+   "term": "electric strike current draw",
+   "target": "electric-lock-power-budget",
+   "kind": "industry"
+  },
+  {
+   "term": "24 hour standby access control",
+   "target": "electric-lock-power-budget",
+   "kind": "industry"
+  },
+  {
+   "term": "door power budget",
+   "target": "electric-lock-power-budget",
+   "kind": "industry"
+  },
+  {
+   "term": "maglock holding force lever",
+   "target": "maglock-holding-leverage",
+   "kind": "industry"
+  },
+  {
+   "term": "magnetic lock door leverage",
+   "target": "maglock-holding-leverage",
+   "kind": "industry"
+  },
+  {
+   "term": "maglock mounting position",
+   "target": "maglock-holding-leverage",
+   "kind": "industry"
+  },
+  {
+   "term": "effective holding force at handle",
+   "target": "maglock-holding-leverage",
+   "kind": "industry"
+  },
+  {
+   "term": "maglock defeat force",
+   "target": "maglock-holding-leverage",
+   "kind": "industry"
+  },
+  {
+   "term": "master key system capacity",
+   "target": "master-key-bitting-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "bitting capacity locksmith",
+   "target": "master-key-bitting-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "key progression count",
+   "target": "master-key-bitting-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "how many change keys",
+   "target": "master-key-bitting-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "two step progression master key",
+   "target": "master-key-bitting-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "macs key cut check",
+   "target": "key-cut-macs-check",
+   "kind": "industry"
+  },
+  {
+   "term": "maximum adjacent cut specification",
+   "target": "key-cut-macs-check",
+   "kind": "industry"
+  },
+  {
+   "term": "bitting validity check",
+   "target": "key-cut-macs-check",
+   "kind": "industry"
+  },
+  {
+   "term": "uncuttable key bitting",
+   "target": "key-cut-macs-check",
+   "kind": "industry"
+  },
+  {
+   "term": "adjacent cut depth rule",
+   "target": "key-cut-macs-check",
+   "kind": "industry"
+  },
+  {
+   "term": "door undercut airflow",
+   "target": "door-undercut-transfer-air",
+   "kind": "industry"
+  },
+  {
+   "term": "transfer air door gap",
+   "target": "door-undercut-transfer-air",
+   "kind": "industry"
+  },
+  {
+   "term": "undercut free area cfm",
+   "target": "door-undercut-transfer-air",
+   "kind": "industry"
+  },
+  {
+   "term": "transfer grille sizing",
+   "target": "door-undercut-transfer-air",
+   "kind": "industry"
+  },
+  {
+   "term": "door gap velocity noise",
+   "target": "door-undercut-transfer-air",
+   "kind": "industry"
+  },
+  {
+   "term": "fire door clearance limits",
+   "target": "fire-door-clearance",
+   "kind": "industry"
+  },
+  {
+   "term": "nfpa 80 annual inspection",
+   "target": "fire-door-clearance",
+   "kind": "industry"
+  },
+  {
+   "term": "fire door gap 1/8 inch",
+   "target": "fire-door-clearance",
+   "kind": "industry"
+  },
+  {
+   "term": "door bottom clearance 3/4",
+   "target": "fire-door-clearance",
+   "kind": "industry"
+  },
+  {
+   "term": "fire door inspection checklist",
+   "target": "fire-door-clearance",
+   "kind": "industry"
+  },
+  {
+   "term": "slide gate operator sizing",
+   "target": "gate-operator-duty-cycle",
+   "kind": "industry"
+  },
+  {
+   "term": "gate duty cycle",
+   "target": "gate-operator-duty-cycle",
+   "kind": "industry"
+  },
+  {
+   "term": "gate rolling force",
+   "target": "gate-operator-duty-cycle",
+   "kind": "industry"
+  },
+  {
+   "term": "gate operator cycles per day",
+   "target": "gate-operator-duty-cycle",
+   "kind": "industry"
+  },
+  {
+   "term": "gate motor overheating",
+   "target": "gate-operator-duty-cycle",
+   "kind": "industry"
+  },
+  {
+   "term": "revolving door throughput",
+   "target": "revolving-door-throughput",
+   "kind": "industry"
+  },
+  {
+   "term": "turnstile capacity people per hour",
+   "target": "revolving-door-throughput",
+   "kind": "industry"
+  },
+  {
+   "term": "lobby entrance sizing",
+   "target": "revolving-door-throughput",
+   "kind": "industry"
+  },
+  {
+   "term": "speed lane throughput",
+   "target": "revolving-door-throughput",
+   "kind": "industry"
+  },
+  {
+   "term": "entrance queue calculation",
+   "target": "revolving-door-throughput",
+   "kind": "industry"
   }
  ]
 }

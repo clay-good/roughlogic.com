@@ -45,7 +45,15 @@ export default defineConfig({
     cwd: "../..",
     port: 8080,
     reuseExistingServer: !process.env.CI,
-    timeout: 30_000,
+    // `npm run dev` runs `predev` first, which is a full `build.mjs`: it emits
+    // a static shell per tile, so it gets slower every time the catalog does.
+    // At 1,833 tiles it is ~15 s of CPU on an idle machine and comfortably
+    // past 30 s on a busy one, and the failure it produces --
+    // "Timed out waiting 30000ms from config.webServer" -- names neither the
+    // build nor the catalog size, so it reads as a broken server. Raised
+    // 2026-09-05 (30 s -> 180 s) with room for the rest of the
+    // scope-trade-expansion-2 program rather than one band at a time.
+    timeout: 180_000,
   },
   reporter: [["list"]],
 });

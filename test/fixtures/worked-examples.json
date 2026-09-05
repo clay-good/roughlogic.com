@@ -94761,6 +94761,593 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "door-closer-opening-force",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "36 by 84 in interior door, 6.5 lbf measured against a 5 lbf limit, 0.03 in wc across the opening",
+   "source_edition_or_year": "ANSI/BHMA A156.4 size bands; 5.2 lbf per sq ft per in wc",
+   "source_section_or_page": "limits entered from the adopted accessibility and building code",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "door_width_in": 36,
+    "door_height_in": 84,
+    "door_weight_lb": 85,
+    "measured_opening_force_lbf": 6.5,
+    "force_limit_lbf": 5,
+    "measured_closing_time_s": 4.2,
+    "min_closing_time_s": 5,
+    "pressure_difference_inwc": 0.03
+   },
+   "outputs": {
+    "closer_size": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "door_area_sqft": {
+     "value": 21,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pressure_force_lbf": {
+     "value": 1.638,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "closer_force_lbf": {
+     "value": 4.862,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "force_margin_lbf": {
+     "value": -1.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lock-backset-strike-layout",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "1 3/4 in door, 2 3/8 in backset, 2 1/8 in cross bore, bored at 38 in to centre",
+   "source_edition_or_year": "standard cylindrical lock prep dimensions",
+   "source_section_or_page": "the lock manufacturer's template governs",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "backset_in": 2.375,
+    "cross_bore_dia_in": 2.125,
+    "edge_bore_dia_in": 1,
+    "door_thickness_in": 1.75,
+    "lock_height_in": 38,
+    "stile_width_in": 5,
+    "accessible_min_in": 34,
+    "accessible_max_in": 48
+   },
+   "outputs": {
+    "cross_bore_far_side_in": {
+     "value": 3.4375,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "min_stile_required_in": {
+     "value": 3.4375,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "edge_bore_center_from_face_in": {
+     "value": 0.875,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "edge_bore_side_wall_in": {
+     "value": 0.375,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "backset_mismatch_in": {
+     "value": 0.375,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "panic-hardware-force",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "36 in fire-rated stair door: 9 lbf release, 34 lbf to set in motion, 12 lbf to swing",
+   "source_edition_or_year": "egress door operating force limits, each measured separately",
+   "source_section_or_page": "limits entered from the adopted building and fire code",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "release_force_lbf": 9,
+    "set_in_motion_lbf": 34,
+    "swing_force_lbf": 12,
+    "release_limit_lbf": 15,
+    "set_in_motion_limit_lbf": 30,
+    "swing_limit_lbf": 15,
+    "door_leaf_width_in": 36,
+    "actuating_portion_in": 20,
+    "mounting_height_in": 40
+   },
+   "outputs": {
+    "release_margin_lbf": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "set_in_motion_margin_lbf": {
+     "value": -4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "swing_margin_lbf": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_actuating_in": {
+     "value": 18,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "electric-lock-power-budget",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "14 maglocks at 0.45 A holding and 1.5 A inrush, 24 hours of standby at a 0.80 derate",
+   "source_edition_or_year": "amp-hours = steady current x standby hours, divided by the derate",
+   "source_section_or_page": "the fire alarm interface governs the duration",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "device_count": 14,
+    "holding_current_a": 0.45,
+    "inrush_current_a": 1.5,
+    "standby_hours": 24,
+    "battery_derate": 0.8,
+    "supply_rating_a": 12,
+    "installed_battery_ah": 12
+   },
+   "outputs": {
+    "steady_current_a": {
+     "value": 6.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "peak_inrush_a": {
+     "value": 21,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "amp_hours_required": {
+     "value": 151.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "amp_hours_after_derate": {
+     "value": 189,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "batteries_needed": {
+     "value": 16,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "maglock-holding-leverage",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "1,200 lb maglock 3 in from the hinge on a 36 in door, pull at the strike edge",
+   "source_edition_or_year": "force at the handle = rated force x lock distance / handle distance",
+   "source_section_or_page": "the adopted codes govern electrically locked egress",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "rated_holding_lb": 1200,
+    "door_width_in": 36,
+    "lock_distance_from_hinge_in": 3,
+    "handle_distance_from_hinge_in": 36,
+    "gap_derate_pct": 50,
+    "voltage_at_lock": 20,
+    "rated_voltage": 24,
+    "target_resistance_lb": 600
+   },
+   "outputs": {
+    "lever_ratio": {
+     "value": 0.08333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "force_at_handle_lb": {
+     "value": 100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "best_case_force_lb": {
+     "value": 1100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "improvement_factor": {
+     "value": 11,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "effective_force_lb": {
+     "value": 34.722,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rating_needed_lb": {
+     "value": 7200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "master-key-bitting-capacity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "6-pin system, 4 usable depths, two positions mastered on a two-step progression",
+   "source_edition_or_year": "theoretical = depths ^ positions; change keys = (depths / 2) ^ mastered",
+   "source_section_or_page": "the manufacturer's system specification governs",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "cut_positions": 6,
+    "usable_depths": 4,
+    "mastered_positions": 2,
+    "alternative_mastered_positions": 3,
+    "change_keys_required": 40
+   },
+   "outputs": {
+    "theoretical_total": {
+     "value": 4096,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "per_mastered_position": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "change_keys_available": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alternative_change_keys": {
+     "value": 8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin": {
+     "value": -36,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "key-cut-macs-check",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "a 2-9-1-4-6-3 bitting against a MACS of 7",
+   "source_edition_or_year": "the absolute difference between adjacent cuts must not exceed MACS",
+   "source_section_or_page": "the manufacturer's cut specification governs the value",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "depth_1": 2,
+    "depth_2": 9,
+    "depth_3": 1,
+    "depth_4": 4,
+    "depth_5": 6,
+    "depth_6": 3,
+    "macs": 7,
+    "min_depth": 0,
+    "max_depth": 9
+   },
+   "outputs": {
+    "max_difference": {
+     "value": 8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "worst_position": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "failing_pairs": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "at_limit": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "longest_run": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "door-undercut-transfer-air",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "36 in door with a 3/4 in undercut asked for 250 cfm at a 300 fpm ceiling",
+   "source_edition_or_year": "free area x face velocity; 144 sq in per sq ft",
+   "source_section_or_page": "NFPA 80 governs a rated door's clearance",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "door_width_in": 36,
+    "undercut_in": 0.75,
+    "required_cfm": 250,
+    "max_velocity_fpm": 300
+   },
+   "outputs": {
+    "free_area_sqin": {
+     "value": 27,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "free_area_sqft": {
+     "value": 0.1875,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cfm_at_velocity": {
+     "value": 56.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "velocity_at_required_fpm": {
+     "value": 1333.33,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "undercut_needed_in": {
+     "value": 3.3333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "grille_free_area_sqft": {
+     "value": 0.83333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fire-door-clearance",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "wood fire door in a pair at the annual inspection, two clearances out of range",
+   "source_edition_or_year": "NFPA 80 clearance limits, entered from the assembly listing",
+   "source_section_or_page": "the assembly's own listing governs",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "head_in": 0.125,
+    "hinge_jamb_in": 0.125,
+    "strike_jamb_in": 0.1875,
+    "meeting_edge_in": 0.125,
+    "bottom_in": 1.25,
+    "perimeter_limit_in": 0.125,
+    "meeting_limit_in": 0.1875,
+    "bottom_limit_in": 0.75
+   },
+   "outputs": {
+    "strike_margin_in": {
+     "value": -0.0625,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "meeting_margin_in": {
+     "value": 0.0625,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bottom_margin_in": {
+     "value": -0.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "failure_count": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bottom_reduction_needed_in": {
+     "value": 0.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gate-operator-duty-cycle",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "2,400 lb slide gate on 0.1 rollers and a 5% grade, 24 ft at 1 ft/s, 150 cycles a day",
+   "source_edition_or_year": "rolling force = weight x coefficient; duty = run time / window",
+   "source_section_or_page": "UL 325 governs entrapment protection separately",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "gate_weight_lb": 2400,
+    "rolling_coefficient": 0.1,
+    "grade_pct": 5,
+    "gate_length_ft": 24,
+    "operator_speed_fps": 1,
+    "cycles_per_day": 150,
+    "operating_hours": 10,
+    "operator_rated_force_lb": 400,
+    "intermittent_duty_limit_pct": 10
+   },
+   "outputs": {
+    "rolling_force_lb": {
+     "value": 240,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "grade_force_lb": {
+     "value": 119.85,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_force_lb": {
+     "value": 359.85,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "travel_time_s": {
+     "value": 24,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cycle_time_s": {
+     "value": 48,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "run_time_hr": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "duty_cycle_pct": {
+     "value": 20,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "revolving-door-throughput",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "4-wing door at 3 rpm, 2 per compartment, against a 2,000 person building arriving 70% in 20 minutes",
+   "source_edition_or_year": "people/h = rpm x wings x people per compartment x 60",
+   "source_section_or_page": "the adopted codes govern egress credit",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "rpm": 3,
+    "wings": 4,
+    "people_per_compartment": 2,
+    "utilization_pct": 60,
+    "building_population": 2000,
+    "peak_fraction_pct": 70,
+    "peak_window_min": 20,
+    "device_count": 3,
+    "operating_hours": 8
+   },
+   "outputs": {
+    "theoretical_per_hour": {
+     "value": 1440,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "effective_per_hour": {
+     "value": 864,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "peak_people": {
+     "value": 1400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "peak_rate_per_hour": {
+     "value": 4200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "devices_required": {
+     "value": 5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "queue_at_peak": {
+     "value": 536,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "average_rate_per_hour": {
+     "value": 250,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

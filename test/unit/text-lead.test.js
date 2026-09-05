@@ -211,6 +211,8 @@ test("no description body calls a calculator a tile or a sibling", () => {
     "tile-count", "thinset-coverage", "cement-board-takeoff", "flooring-takeoff",
     "pool-tile-coping-perimeter", "suspended-ceiling-grid", "shower-compartment-check",
     "adpi-diffuser-selection",
+    // Floor covering under a rated door: carpet or ceramic tile, the material.
+    "fire-door-clearance",
   ]);
   const offenders = TOOLS
     .filter((t) => !exempt.has(t.id) && jargon.test(restOfDescription(t.desc)))

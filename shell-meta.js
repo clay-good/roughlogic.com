@@ -95,6 +95,13 @@ export const PROFESSION_NOUN = {
   rescue: "Rescue",
   marine: "Marine",
   elevator: "Elevator",
+  // Added 2026-09-05 with the scope-trade-expansion-2 bands. `locksmith` is
+  // the primary trade on two tiles, so its absence would have retitled them
+  // "... - Trades ..."; `railroad` and `lowvoltage` are secondary today and
+  // are mapped now rather than when a tile first leads with one.
+  locksmith: "Locksmiths",
+  railroad: "Railroad",
+  lowvoltage: "Low Voltage",
   mechanical: "Mechanical",
   demolition: "Demolition",
   fireproofing: "Fireproofing",

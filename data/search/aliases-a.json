@@ -2726,6 +2726,16 @@
     {"term":"250.53","target":"grounding-electrode","kind":"industry"},
     {"term":"430.6(a)","target":"motor-branch-from-nameplate","kind":"industry"},
     {"term":"430.22","target":"motor-branch-from-nameplate","kind":"industry"},
-    {"term":"130.5","target":"arc-flash-screen","kind":"industry"}
+    {"term":"130.5","target":"arc-flash-screen","kind":"industry"},
+    {"term":"access control power supply sizing","target":"electric-lock-power-budget","kind":"industry"},
+    {"term":"maglock standby battery","target":"electric-lock-power-budget","kind":"industry"},
+    {"term":"electric strike current draw","target":"electric-lock-power-budget","kind":"industry"},
+    {"term":"24 hour standby access control","target":"electric-lock-power-budget","kind":"industry"},
+    {"term":"door power budget","target":"electric-lock-power-budget","kind":"industry"},
+    {"term":"maglock holding force lever","target":"maglock-holding-leverage","kind":"industry"},
+    {"term":"magnetic lock door leverage","target":"maglock-holding-leverage","kind":"industry"},
+    {"term":"maglock mounting position","target":"maglock-holding-leverage","kind":"industry"},
+    {"term":"effective holding force at handle","target":"maglock-holding-leverage","kind":"industry"},
+    {"term":"maglock defeat force","target":"maglock-holding-leverage","kind":"industry"}
   ]
 }

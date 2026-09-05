@@ -672,6 +672,15 @@ export const TOOL_MODULES = (() => {
     "hydraulic-jack-pressure", "step-chain-tension", "door-closing-energy",
     "governor-tripping-speed", "guide-rail-bracket-span",
   ]);
+  // spec-v1571..v1581: the door hardware and locksmithing bench. Nine keep
+  // group "E"; electric-lock-power-budget and maglock-holding-leverage keep
+  // group "A".
+  declare("./calc-doorhardware.js", "DOORHARDWARE_RENDERERS", [
+    "door-closer-opening-force", "lock-backset-strike-layout", "panic-hardware-force",
+    "electric-lock-power-budget", "maglock-holding-leverage",
+    "master-key-bitting-capacity", "key-cut-macs-check", "door-undercut-transfer-air",
+    "fire-door-clearance", "gate-operator-duty-cycle", "revolving-door-throughput",
+  ]);
   // spec-v80 cap-relief split: the spec-v25 site-civil / roadway-geometry
   // quartet moved out of calc-construction.js (it sat at 95.0% of its size
   // cap, the tightest remaining calculator module) into its own module. All

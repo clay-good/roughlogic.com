@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "de2fa1fccf37b6b9",
+      "sha": "15131674e0d094af",
       "date": "2026-09-05"
     },
     "/tools/": {
-      "sha": "855c39a178476cc9",
+      "sha": "11f73d1621d253d9",
       "date": "2026-09-05"
     },
     "/groups/accounting/": {
-      "sha": "033c2adaca5b753a",
+      "sha": "2f07f0e6dbd8efd5",
       "date": "2026-09-05"
     },
     "/groups/agriculture/": {
-      "sha": "9e9b5bc638fb9aed",
+      "sha": "3e5c725ca4be5c7c",
       "date": "2026-09-05"
     },
     "/groups/construction/": {
-      "sha": "8fea1f371eeeec8a",
+      "sha": "22bc65e264ff0a41",
       "date": "2026-09-05"
     },
     "/groups/cross-trade/": {
-      "sha": "b177b93200c89199",
+      "sha": "814bd22a1f51a987",
       "date": "2026-09-05"
     },
     "/groups/educators/": {
-      "sha": "6ba50b6c14b32b56",
+      "sha": "4c6164c52e5c58af",
       "date": "2026-09-05"
     },
     "/groups/electrical/": {
-      "sha": "0dc942cda763f1f8",
+      "sha": "5a2df90093448eaa",
       "date": "2026-09-05"
     },
     "/groups/field/": {
-      "sha": "9bd79b42c2d8c7e8",
+      "sha": "1d6bf924f34686aa",
       "date": "2026-09-05"
     },
     "/groups/fire-ground/": {
-      "sha": "3927c3d62e47487f",
+      "sha": "4d2269e3668e76d9",
       "date": "2026-09-05"
     },
     "/groups/historical/": {
-      "sha": "8ab6c41c21e8a139",
+      "sha": "a42a15438639fd55",
       "date": "2026-09-05"
     },
     "/groups/hvac/": {
-      "sha": "c7bec4a0528fd7e8",
+      "sha": "5e51e8b364f2fbdd",
       "date": "2026-09-05"
     },
     "/groups/kitchen/": {
-      "sha": "46c0dcaa8b028ce9",
+      "sha": "a20b199affd37251",
       "date": "2026-09-05"
     },
     "/groups/lab/": {
-      "sha": "27ad7d1dd57cf735",
+      "sha": "2e6e53347627444d",
       "date": "2026-09-05"
     },
     "/groups/mechanic/": {
-      "sha": "ea1d6a26ee897009",
+      "sha": "494c451e6a658e10",
       "date": "2026-09-05"
     },
     "/groups/plumbing/": {
-      "sha": "47e6d9d615d1381c",
+      "sha": "5188e303a29c82e9",
       "date": "2026-09-05"
     },
     "/groups/real-estate/": {
-      "sha": "8643014042464f0b",
+      "sha": "5f9ea0f451ee90e1",
       "date": "2026-09-05"
     },
     "/groups/references/": {
-      "sha": "1c613736708bad83",
+      "sha": "dee4666873362117",
       "date": "2026-09-05"
     },
     "/groups/restoration/": {
-      "sha": "bc5f13986a39835b",
+      "sha": "e9b1867853f11c90",
       "date": "2026-09-05"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "461b50771b25b7de",
+      "sha": "fa6a02b744ad0b23",
       "date": "2026-09-05"
     },
     "/groups/stage/": {
-      "sha": "a0a6b7b94db67ef3",
+      "sha": "f8391686db9e2b4e",
       "date": "2026-09-05"
     },
     "/groups/trucking/": {
-      "sha": "47f85214471e6513",
+      "sha": "3a7f28d42c60195f",
       "date": "2026-09-05"
     },
     "/groups/water/": {
-      "sha": "3bfc022fc4d16aa8",
+      "sha": "e03da8dc2e700e54",
       "date": "2026-09-05"
     },
     "/tools/aav-install-check/": {
@@ -342,8 +342,8 @@
       "date": "2026-09-01"
     },
     "/tools/attic-ventilation/": {
-      "sha": "279124762d79899a",
-      "date": "2026-09-04"
+      "sha": "913f9f218a42587a",
+      "date": "2026-09-05"
     },
     "/tools/awg-wire-geometry/": {
       "sha": "faba00c655a2045a",
@@ -1865,6 +1865,10 @@
       "sha": "9cf777c15f3952a3",
       "date": "2026-09-01"
     },
+    "/tools/door-closer-opening-force/": {
+      "sha": "180cb57b2f6a6e93",
+      "date": "2026-09-05"
+    },
     "/tools/door-closing-energy/": {
       "sha": "472546d5b540ea17",
       "date": "2026-09-05"
@@ -1872,6 +1876,10 @@
     "/tools/door-maneuvering-clearance/": {
       "sha": "89e4cf4001042488",
       "date": "2026-09-01"
+    },
+    "/tools/door-undercut-transfer-air/": {
+      "sha": "22335fe18564439b",
+      "date": "2026-09-05"
     },
     "/tools/doubling-time/": {
       "sha": "ec57e5cb6a6422fe",
@@ -2181,6 +2189,10 @@
       "sha": "e7d97b59021c140f",
       "date": "2026-09-01"
     },
+    "/tools/electric-lock-power-budget/": {
+      "sha": "ee501209ca539646",
+      "date": "2026-09-05"
+    },
     "/tools/elevation-pressure-loss/": {
       "sha": "2c7d7243df534c91",
       "date": "2026-09-01"
@@ -2472,6 +2484,10 @@
     "/tools/fire-alarm-nac-voltage-drop/": {
       "sha": "814a6ee090f6f55a",
       "date": "2026-09-04"
+    },
+    "/tools/fire-door-clearance/": {
+      "sha": "cdb40b705ce2d60a",
+      "date": "2026-09-05"
     },
     "/tools/fire-friction/": {
       "sha": "97e427682ed03aeb",
@@ -2768,6 +2784,10 @@
     "/tools/gas-strut-force/": {
       "sha": "9e91b2d36c4be29a",
       "date": "2026-09-01"
+    },
+    "/tools/gate-operator-duty-cycle/": {
+      "sha": "b9f4adcfd92bf5dd",
+      "date": "2026-09-05"
     },
     "/tools/gcwr-check/": {
       "sha": "1fb066a9609f013a",
@@ -3110,7 +3130,7 @@
       "date": "2026-09-02"
     },
     "/tools/hoistway-venting/": {
-      "sha": "c4b06a210ebe2755",
+      "sha": "1ac86ca9e9dc3cc4",
       "date": "2026-09-05"
     },
     "/tools/home-office/": {
@@ -3130,7 +3150,7 @@
       "date": "2026-09-01"
     },
     "/tools/horizontal-curve/": {
-      "sha": "c8e5cb6ca7aba341",
+      "sha": "7252953841f54f32",
       "date": "2026-09-05"
     },
     "/tools/horizontal-sightline-offset/": {
@@ -3421,6 +3441,10 @@
       "sha": "8e270a768ce98eca",
       "date": "2026-09-01"
     },
+    "/tools/key-cut-macs-check/": {
+      "sha": "2f745d0380b6762f",
+      "date": "2026-09-05"
+    },
     "/tools/keyseat-key-size/": {
       "sha": "2d7384bfbdfd23f1",
       "date": "2026-09-01"
@@ -3482,8 +3506,8 @@
       "date": "2026-09-01"
     },
     "/tools/layout-squaring/": {
-      "sha": "700971e2fb43c6b5",
-      "date": "2026-09-01"
+      "sha": "b20001d69f4bed61",
+      "date": "2026-09-05"
     },
     "/tools/leach-field-aggregate/": {
       "sha": "6459dd54f3fcd092",
@@ -3605,6 +3629,10 @@
       "sha": "b32ed9028da991ee",
       "date": "2026-09-01"
     },
+    "/tools/lock-backset-strike-layout/": {
+      "sha": "95f2e8345681e370",
+      "date": "2026-09-05"
+    },
     "/tools/log-limb-weight/": {
       "sha": "76807d2ccf42cbc9",
       "date": "2026-09-01"
@@ -3668,6 +3696,10 @@
     "/tools/mad-irrigation-trigger/": {
       "sha": "ada64b9464e95aa4",
       "date": "2026-09-01"
+    },
+    "/tools/maglock-holding-leverage/": {
+      "sha": "97bec6067f8dc62e",
+      "date": "2026-09-05"
     },
     "/tools/magnetic-declination/": {
       "sha": "714f5e466965880d",
@@ -3784,6 +3816,10 @@
     "/tools/mass-moles/": {
       "sha": "9c3eccced13f5c35",
       "date": "2026-09-01"
+    },
+    "/tools/master-key-bitting-capacity/": {
+      "sha": "7e6b3143f232fe66",
+      "date": "2026-09-05"
     },
     "/tools/master-stream/": {
       "sha": "36ddd95afc66e671",
@@ -4260,6 +4296,10 @@
     "/tools/panel-rebalance/": {
       "sha": "30b9d242cfd93d3a",
       "date": "2026-09-01"
+    },
+    "/tools/panic-hardware-force/": {
+      "sha": "883218fa37afe998",
+      "date": "2026-09-05"
     },
     "/tools/par-level-order/": {
       "sha": "52d6c8d8a5945fae",
@@ -5177,6 +5217,10 @@
       "sha": "991960a74ddcd4d6",
       "date": "2026-09-04"
     },
+    "/tools/revolving-door-throughput/": {
+      "sha": "5d6d14b4d816fceb",
+      "date": "2026-09-05"
+    },
     "/tools/reynolds-number-pipe/": {
       "sha": "25605d74175cfcc1",
       "date": "2026-09-01"
@@ -5298,8 +5342,8 @@
       "date": "2026-09-01"
     },
     "/tools/rough-opening-size/": {
-      "sha": "4f99f4d35a3fef26",
-      "date": "2026-09-01"
+      "sha": "ffac5089e214d624",
+      "date": "2026-09-05"
     },
     "/tools/round-to-rect-duct/": {
       "sha": "6c913fe6855dc943",
@@ -5730,8 +5774,8 @@
       "date": "2026-09-01"
     },
     "/tools/slope-stake-cut-fill/": {
-      "sha": "12806651819260f9",
-      "date": "2026-09-04"
+      "sha": "9d5faac8ad990e35",
+      "date": "2026-09-05"
     },
     "/tools/slope-staking/": {
       "sha": "c50b7f278a93c3a9",
@@ -6258,7 +6302,7 @@
       "date": "2026-09-01"
     },
     "/tools/step-chain-tension/": {
-      "sha": "14875f3fa4c18879",
+      "sha": "2e9b2a386941ee50",
       "date": "2026-09-05"
     },
     "/tools/step-flashing-count/": {
@@ -7126,8 +7170,8 @@
       "date": "2026-09-01"
     },
     "/tools/weld-duty-cycle/": {
-      "sha": "3743bf3d7ee8779c",
-      "date": "2026-09-01"
+      "sha": "0cb9137aa04de45e",
+      "date": "2026-09-05"
     },
     "/tools/weld-group-eccentric/": {
       "sha": "300e504841eb36fd",

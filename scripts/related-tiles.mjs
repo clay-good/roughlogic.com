@@ -1482,6 +1482,18 @@ const RELATED = {
   "door-closing-energy": ["hoistway-venting","governor-tripping-speed","escalator-capacity"],
   "governor-tripping-speed": ["buffer-stroke-speed","rope-safety-factor","guide-rail-bracket-span"],
   "guide-rail-bracket-span": ["buffer-stroke-speed","counterweight-balance","governor-tripping-speed"],
+  // spec-v1571..v1581: the 2026-09-05 trade-expansion door hardware band.
+  "door-closer-opening-force": ["door-clear-width","panic-hardware-force","fire-door-clearance"],
+  "lock-backset-strike-layout": ["door-clear-width","fire-door-clearance","key-cut-macs-check"],
+  "panic-hardware-force": ["door-closer-opening-force","stairwell-pressurization","fire-door-clearance"],
+  "electric-lock-power-budget": ["maglock-holding-leverage","lv-dc-drop","panic-hardware-force"],
+  "maglock-holding-leverage": ["electric-lock-power-budget","panic-hardware-force","door-closer-opening-force"],
+  "master-key-bitting-capacity": ["key-cut-macs-check","lock-backset-strike-layout","door-clear-width"],
+  "key-cut-macs-check": ["master-key-bitting-capacity","lock-backset-strike-layout","door-clear-width"],
+  "door-undercut-transfer-air": ["grille-face-velocity","duct-sizing","fire-door-clearance"],
+  "fire-door-clearance": ["door-closer-opening-force","panic-hardware-force","lock-backset-strike-layout"],
+  "gate-operator-duty-cycle": ["chain-link-fence-takeoff","maglock-holding-leverage","motor-shaft-torque"],
+  "revolving-door-throughput": ["door-clear-width","elevator-handling-capacity","escalator-capacity"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   "grounding-electrode-conductor": ["bonding-jumper","egc-sizing","grounding-electrode"],
   "bonding-jumper": ["grounding-electrode-conductor","egc-sizing","service-load-standard"],

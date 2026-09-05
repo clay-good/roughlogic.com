@@ -42548,3 +42548,447 @@ test("bounds: spec-v1658 computeGuideRailBracketSpan pins the point-load scaling
   assert.ok("error" in _v1658({ ...base, safety_application_load_lb: 0 }));
   assert.ok("error" in _v1658({ ...base, span_ft: Infinity }));
 });
+
+// ===========================================================================
+// spec-v1571..v1581: the 2026-09-05 trade-expansion door hardware and
+// locksmithing band, the third band of that program. Nine tiles keep group
+// "E"; the two electrified-hardware tiles keep group "A".
+// ===========================================================================
+
+import { computeDoorCloserForce as _v1571 } from "../../calc-doorhardware.js";
+test("bounds: spec-v1571 computeDoorCloserForce splits the closer from the building", () => {
+  const base = { door_width_in: 36, door_height_in: 84, door_weight_lb: 85, measured_opening_force_lbf: 6.5, force_limit_lbf: 5, measured_closing_time_s: 4.2, min_closing_time_s: 5, pressure_difference_inwc: 0.03 };
+  const r = _v1571(base);
+  assert.strictEqual(r.closer_size, 2);
+  assert.strictEqual(r.width_size, 2);
+  assert.ok(Math.abs(r.door_area_sqft - 21) < 1e-9);
+  assert.ok(Math.abs(r.pressure_force_lbf - 1.638) < 1e-9);
+  assert.ok(Math.abs(r.closer_force_lbf - 4.862) < 1e-9);
+  assert.ok(Math.abs(r.force_margin_lbf + 1.5) < 1e-9);
+  assert.strictEqual(r.force_ok, false);
+  assert.strictEqual(r.closing_time_ok, false);
+  // The finding the tile exists for: the reading fails, the CLOSER does not,
+  // and turning the spring down would trade a gauge for a latch.
+  assert.strictEqual(r.pressure_explains, true);
+  // With no pressure across the door the same reading is all closer.
+  const still = _v1571({ ...base, pressure_difference_inwc: 0 });
+  assert.strictEqual(still.pressure_force_lbf, 0);
+  assert.ok(Math.abs(still.closer_force_lbf - base.measured_opening_force_lbf) < 1e-9);
+  assert.strictEqual(still.pressure_explains, false);
+  // Pressure force is exactly linear in the pressure and in the door area,
+  // and exactly half the total force on the leaf.
+  assert.ok(Math.abs(_v1571({ ...base, pressure_difference_inwc: 0.06 }).pressure_force_lbf - 2 * r.pressure_force_lbf) < 1e-9);
+  assert.ok(Math.abs(r.pressure_force_lbf - r.door_area_sqft * base.pressure_difference_inwc * 5.2 / 2) < 1e-12);
+  // Size bands: one per six inches of width, stepped up by a heavy leaf and
+  // by a pressure difference, and capped at 6.
+  assert.strictEqual(_v1571({ ...base, door_width_in: 30 }).width_size, 1);
+  assert.strictEqual(_v1571({ ...base, door_width_in: 42 }).width_size, 3);
+  assert.strictEqual(_v1571({ ...base, door_weight_lb: 150 }).closer_size, 3);
+  assert.strictEqual(_v1571({ ...base, pressure_difference_inwc: 0.05 }).closer_size, 3);
+  assert.strictEqual(_v1571({ ...base, door_width_in: 96, door_weight_lb: 200, pressure_difference_inwc: 0.2 }).closer_size, 6);
+  assert.strictEqual(_v1571({ ...base, measured_closing_time_s: 6 }).closing_time_ok, true);
+  assert.ok("error" in _v1571({ ...base, door_width_in: 0 }));
+  assert.ok("error" in _v1571({ ...base, door_height_in: 0 }));
+  assert.ok("error" in _v1571({ ...base, door_weight_lb: 0 }));
+  assert.ok("error" in _v1571({ ...base, measured_opening_force_lbf: 0 }));
+  assert.ok("error" in _v1571({ ...base, force_limit_lbf: 0 }));
+  assert.ok("error" in _v1571({ ...base, measured_closing_time_s: 0 }));
+  assert.ok("error" in _v1571({ ...base, min_closing_time_s: 0 }));
+  assert.ok("error" in _v1571({ ...base, pressure_difference_inwc: -0.01 }));
+  assert.ok("error" in _v1571({ ...base, door_width_in: Infinity }));
+});
+
+import { computeLockBacksetLayout as _v1572 } from "../../calc-doorhardware.js";
+test("bounds: spec-v1572 computeLockBacksetLayout pins the stile the prep needs", () => {
+  const base = { backset_in: 2.375, cross_bore_dia_in: 2.125, edge_bore_dia_in: 1, door_thickness_in: 1.75, lock_height_in: 38, stile_width_in: 5, accessible_min_in: 34, accessible_max_in: 48 };
+  const r = _v1572(base);
+  // 2 3/8 + 2 1/8 / 2 = 3 7/16 in of stile, exactly.
+  assert.ok(Math.abs(r.min_stile_required_in - 3.4375) < 1e-12);
+  assert.ok(Math.abs(r.cross_bore_near_side_in - 1.3125) < 1e-12);
+  assert.strictEqual(r.stile_ok, true);
+  assert.ok(Math.abs(r.edge_bore_center_from_face_in - 0.875) < 1e-12);
+  assert.ok(Math.abs(r.edge_bore_side_wall_in - 0.375) < 1e-12);
+  assert.strictEqual(r.height_ok, true);
+  assert.ok(Math.abs(r.strike_height_in - base.lock_height_in) < 1e-12);
+  // A narrow-stile door rules the prep out, which is the finding.
+  assert.strictEqual(_v1572({ ...base, stile_width_in: 3 }).stile_ok, false);
+  assert.strictEqual(_v1572({ ...base, stile_width_in: 3.4375 }).stile_ok, true);
+  // The backset trap runs both ways and is 3/8 in either direction.
+  assert.ok(Math.abs(r.other_backset_in - 2.75) < 1e-12);
+  assert.ok(Math.abs(r.backset_mismatch_in - 0.375) < 1e-12);
+  const deep = _v1572({ ...base, backset_in: 2.75, stile_width_in: 5 });
+  assert.ok(Math.abs(deep.other_backset_in - 2.375) < 1e-12);
+  assert.ok(Math.abs(deep.backset_mismatch_in - 0.375) < 1e-12);
+  assert.ok(Math.abs(deep.min_stile_required_in - r.min_stile_required_in) < 0.376);
+  // Accessible range: 38 in passes, residential height does not.
+  assert.strictEqual(_v1572({ ...base, lock_height_in: 32 }).height_ok, false);
+  assert.strictEqual(_v1572({ ...base, lock_height_in: 34 }).height_ok, true);
+  assert.strictEqual(_v1572({ ...base, lock_height_in: 48 }).height_ok, true);
+  assert.strictEqual(_v1572({ ...base, lock_height_in: 49 }).height_ok, false);
+  assert.ok("error" in _v1572({ ...base, backset_in: 0 }));
+  assert.ok("error" in _v1572({ ...base, cross_bore_dia_in: 0 }));
+  assert.ok("error" in _v1572({ ...base, edge_bore_dia_in: 0 }));
+  assert.ok("error" in _v1572({ ...base, edge_bore_dia_in: 1.75 }));
+  assert.ok("error" in _v1572({ ...base, door_thickness_in: 0 }));
+  assert.ok("error" in _v1572({ ...base, lock_height_in: 0 }));
+  assert.ok("error" in _v1572({ ...base, stile_width_in: 0 }));
+  assert.ok("error" in _v1572({ ...base, accessible_max_in: 30 }));
+  assert.ok("error" in _v1572({ ...base, backset_in: Infinity }));
+});
+
+import { computePanicHardwareForce as _v1573 } from "../../calc-doorhardware.js";
+test("bounds: spec-v1573 computePanicHardwareForce names what a failure points at", () => {
+  const base = { release_force_lbf: 9, set_in_motion_lbf: 34, swing_force_lbf: 12, release_limit_lbf: 15, set_in_motion_limit_lbf: 30, swing_limit_lbf: 15, door_leaf_width_in: 36, actuating_portion_in: 20, mounting_height_in: 40 };
+  const r = _v1573(base);
+  assert.ok(Math.abs(r.release_margin_lbf - 6) < 1e-9);
+  assert.ok(Math.abs(r.set_in_motion_margin_lbf + 4) < 1e-9);
+  assert.ok(Math.abs(r.swing_margin_lbf - 3) < 1e-9);
+  assert.strictEqual(r.release_ok, true);
+  assert.strictEqual(r.set_in_motion_ok, false);
+  assert.strictEqual(r.swing_ok, true);
+  assert.ok(Math.abs(r.required_actuating_in - 18) < 1e-9);
+  assert.strictEqual(r.actuating_ok, true);
+  assert.strictEqual(r.height_ok, true);
+  // The bar passes and the door fails: the diagnosis must point AWAY from the
+  // device, because replacing the exit device would change nothing.
+  assert.ok(r.points_at.includes("DOOR"));
+  // A failing bar points the other way, and takes precedence.
+  const badBar = _v1573({ ...base, release_force_lbf: 20 });
+  assert.ok(badBar.points_at.includes("DEVICE"));
+  // All-clear says so rather than inventing a culprit.
+  const clean = _v1573({ ...base, set_in_motion_lbf: 25 });
+  assert.strictEqual(clean.all_ok, true);
+  assert.ok(clean.points_at.startsWith("nothing"));
+  // Each limit flips exactly at its own value.
+  assert.strictEqual(_v1573({ ...base, set_in_motion_lbf: 30 }).set_in_motion_ok, true);
+  assert.strictEqual(_v1573({ ...base, set_in_motion_lbf: 30.01 }).set_in_motion_ok, false);
+  // Actuating portion scales with the leaf, and a short bar fails geometry
+  // even when every force passes.
+  assert.ok(Math.abs(_v1573({ ...base, door_leaf_width_in: 48 }).required_actuating_in - 24) < 1e-9);
+  const shortBar = _v1573({ ...base, set_in_motion_lbf: 25, actuating_portion_in: 16 });
+  assert.strictEqual(shortBar.actuating_ok, false);
+  assert.strictEqual(shortBar.all_ok, false);
+  assert.ok(shortBar.points_at.includes("geometry"));
+  assert.strictEqual(_v1573({ ...base, mounting_height_in: 50 }).height_ok, false);
+  assert.strictEqual(_v1573({ ...base, mounting_height_in: 33 }).height_ok, false);
+  assert.ok("error" in _v1573({ ...base, release_force_lbf: 0 }));
+  assert.ok("error" in _v1573({ ...base, set_in_motion_lbf: 0 }));
+  assert.ok("error" in _v1573({ ...base, swing_force_lbf: 0 }));
+  assert.ok("error" in _v1573({ ...base, release_limit_lbf: 0 }));
+  assert.ok("error" in _v1573({ ...base, door_leaf_width_in: 0 }));
+  assert.ok("error" in _v1573({ ...base, actuating_portion_in: 0 }));
+  assert.ok("error" in _v1573({ ...base, mounting_height_in: 0 }));
+  assert.ok("error" in _v1573({ ...base, release_force_lbf: Infinity }));
+});
+
+import { computeElectricLockPowerBudget as _v1574 } from "../../calc-doorhardware.js";
+test("bounds: spec-v1574 computeElectricLockPowerBudget pins the battery as the failure", () => {
+  const base = { device_count: 14, holding_current_a: 0.45, inrush_current_a: 1.5, standby_hours: 24, battery_derate: 0.8, supply_rating_a: 12, installed_battery_ah: 12 };
+  const r = _v1574(base);
+  assert.ok(Math.abs(r.steady_current_a - 6.3) < 1e-9);
+  assert.ok(Math.abs(r.peak_inrush_a - 21) < 1e-9);
+  assert.ok(Math.abs(r.amp_hours_required - 151.2) < 1e-9);
+  assert.ok(Math.abs(r.amp_hours_after_derate - 189) < 1e-9);
+  // The supply covers the steady load COMFORTABLY and cannot cover a
+  // simultaneous release -- which is the alarm case.
+  assert.strictEqual(r.supply_ok, true);
+  assert.strictEqual(r.inrush_ok, false);
+  assert.ok(r.supply_margin_a > 5);
+  // And the battery is the real problem: sixteen of the installed size.
+  assert.strictEqual(r.battery_ok, false);
+  assert.strictEqual(r.batteries_needed, 16);
+  assert.ok(Math.abs(r.battery_margin_ah + 177) < 1e-9);
+  // Halving the standby duration halves the battery exactly.
+  assert.ok(Math.abs(_v1574({ ...base, standby_hours: 12 }).amp_hours_after_derate - r.amp_hours_after_derate / 2) < 1e-9);
+  // No derate at all understates the requirement by exactly the derate.
+  assert.ok(Math.abs(_v1574({ ...base, battery_derate: 1 }).amp_hours_after_derate - r.amp_hours_required) < 1e-9);
+  assert.ok(_v1574({ ...base, battery_derate: 1 }).amp_hours_after_derate < r.amp_hours_after_derate);
+  // A supply with real inrush headroom passes both checks.
+  assert.strictEqual(_v1574({ ...base, supply_rating_a: 25 }).inrush_ok, true);
+  assert.strictEqual(_v1574({ ...base, supply_rating_a: 5 }).supply_ok, false);
+  assert.strictEqual(_v1574({ ...base, installed_battery_ah: 200 }).battery_ok, true);
+  assert.ok("error" in _v1574({ ...base, device_count: 0 }));
+  assert.ok("error" in _v1574({ ...base, holding_current_a: 0 }));
+  assert.ok("error" in _v1574({ ...base, inrush_current_a: 0.1 }));
+  assert.ok("error" in _v1574({ ...base, standby_hours: 0 }));
+  assert.ok("error" in _v1574({ ...base, battery_derate: 0 }));
+  assert.ok("error" in _v1574({ ...base, battery_derate: 1.5 }));
+  assert.ok("error" in _v1574({ ...base, supply_rating_a: 0 }));
+  assert.ok("error" in _v1574({ ...base, installed_battery_ah: 0 }));
+  assert.ok("error" in _v1574({ ...base, device_count: Infinity }));
+});
+
+import { computeMaglockLeverage as _v1575 } from "../../calc-doorhardware.js";
+test("bounds: spec-v1575 computeMaglockLeverage pins lock position as the design", () => {
+  const base = { rated_holding_lb: 1200, door_width_in: 36, lock_distance_from_hinge_in: 3, handle_distance_from_hinge_in: 36, gap_derate_pct: 50, voltage_at_lock: 20, rated_voltage: 24, target_resistance_lb: 600 };
+  const r = _v1575(base);
+  assert.ok(Math.abs(r.lever_ratio - 1 / 12) < 1e-12);
+  assert.ok(Math.abs(r.force_at_handle_lb - 100) < 1e-9);
+  // The identical magnet near the strike edge is eleven times better.
+  assert.ok(Math.abs(r.best_lock_distance_in - 33) < 1e-9);
+  assert.ok(Math.abs(r.best_case_force_lb - 1100) < 1e-9);
+  assert.ok(Math.abs(r.improvement_factor - 11) < 1e-9);
+  // Force at the handle is exactly linear in the lock's distance from the
+  // hinge, and a magnet AT the handle line resists its full rating.
+  assert.ok(Math.abs(_v1575({ ...base, lock_distance_from_hinge_in: 6 }).force_at_handle_lb - 2 * r.force_at_handle_lb) < 1e-9);
+  assert.ok(Math.abs(_v1575({ ...base, lock_distance_from_hinge_in: 36 }).force_at_handle_lb - base.rated_holding_lb) < 1e-9);
+  // Voltage enters as its SQUARE, so 20 V on a 24 V lock costs 31%, not 17%.
+  assert.ok(Math.abs(r.voltage_factor - (20 / 24) ** 2) < 1e-12);
+  assert.ok(Math.abs(r.voltage_factor - 0.69444) < 1e-4);
+  assert.ok(Math.abs(r.effective_force_lb - 100 * 0.5 * (20 / 24) ** 2) < 1e-9);
+  assert.ok(r.effective_force_lb < 36);
+  assert.strictEqual(r.meets_target, false);
+  // Clean and at rated voltage, the losses vanish exactly.
+  const clean = _v1575({ ...base, gap_derate_pct: 0, voltage_at_lock: 24 });
+  assert.ok(Math.abs(clean.effective_force_lb - clean.force_at_handle_lb) < 1e-12);
+  // Over-voltage is capped at the rating rather than credited.
+  assert.strictEqual(_v1575({ ...base, voltage_at_lock: 30 }).voltage_factor, 1);
+  // The rating a target needs at this position is the target over the ratio.
+  assert.ok(Math.abs(r.rating_needed_lb - 7200) < 1e-9);
+  assert.ok(Math.abs(_v1575({ ...base, rated_holding_lb: r.rating_needed_lb }).force_at_handle_lb - base.target_resistance_lb) < 1e-9);
+  assert.ok("error" in _v1575({ ...base, rated_holding_lb: 0 }));
+  assert.ok("error" in _v1575({ ...base, door_width_in: 0 }));
+  assert.ok("error" in _v1575({ ...base, lock_distance_from_hinge_in: 0 }));
+  assert.ok("error" in _v1575({ ...base, lock_distance_from_hinge_in: 40 }));
+  assert.ok("error" in _v1575({ ...base, handle_distance_from_hinge_in: 40 }));
+  assert.ok("error" in _v1575({ ...base, gap_derate_pct: 100 }));
+  assert.ok("error" in _v1575({ ...base, voltage_at_lock: 0 }));
+  assert.ok("error" in _v1575({ ...base, target_resistance_lb: 0 }));
+  assert.ok("error" in _v1575({ ...base, rated_holding_lb: Infinity }));
+});
+
+import { computeMasterKeyCapacity as _v1576 } from "../../calc-doorhardware.js";
+test("bounds: spec-v1576 computeMasterKeyCapacity pins 4,096 against 4", () => {
+  const base = { cut_positions: 6, usable_depths: 4, mastered_positions: 2, alternative_mastered_positions: 3, change_keys_required: 40 };
+  const r = _v1576(base);
+  assert.strictEqual(r.theoretical_total, 4096);
+  assert.strictEqual(r.per_mastered_position, 2);
+  // The whole finding: 4,096 theoretical combinations, FOUR usable change
+  // keys, and a building that needs forty.
+  assert.strictEqual(r.change_keys_available, 4);
+  assert.strictEqual(r.sufficient, false);
+  assert.strictEqual(r.margin, -36);
+  assert.ok(r.change_keys_available < r.theoretical_total / 1000);
+  // Mastering one more position doubles the capacity and weakens the system.
+  assert.strictEqual(r.alternative_change_keys, 8);
+  assert.strictEqual(_v1576({ ...base, mastered_positions: 3 }).change_keys_available, 8);
+  // Capacity is exactly a power of the per-position count.
+  assert.strictEqual(_v1576({ ...base, mastered_positions: 4 }).change_keys_available, 16);
+  // A larger usable depth set moves both numbers, and the theoretical one
+  // moves far faster than the usable one -- the reason it misleads.
+  const wide = _v1576({ ...base, usable_depths: 8 });
+  assert.strictEqual(wide.theoretical_total, 262144);
+  assert.strictEqual(wide.change_keys_available, 16);
+  assert.ok(wide.theoretical_total / r.theoretical_total === 64);
+  assert.ok(wide.change_keys_available / r.change_keys_available === 4);
+  // A system with just enough capacity is flagged as having no room left.
+  const tight = _v1576({ ...base, mastered_positions: 6, change_keys_required: 60 });
+  assert.strictEqual(tight.change_keys_available, 64);
+  assert.strictEqual(tight.sufficient, true);
+  assert.strictEqual(tight.tight, true);
+  const roomy = _v1576({ ...base, mastered_positions: 6, change_keys_required: 10 });
+  assert.strictEqual(roomy.tight, false);
+  assert.ok("error" in _v1576({ ...base, cut_positions: 0 }));
+  assert.ok("error" in _v1576({ ...base, usable_depths: 1 }));
+  assert.ok("error" in _v1576({ ...base, mastered_positions: 0 }));
+  assert.ok("error" in _v1576({ ...base, mastered_positions: 7 }));
+  assert.ok("error" in _v1576({ ...base, alternative_mastered_positions: 7 }));
+  assert.ok("error" in _v1576({ ...base, change_keys_required: 0 }));
+  assert.ok("error" in _v1576({ ...base, cut_positions: Infinity }));
+});
+
+import { computeKeyCutMacs as _v1577 } from "../../calc-doorhardware.js";
+test("bounds: spec-v1577 computeKeyCutMacs pins the uncuttable bitting", () => {
+  const base = { depth_1: 2, depth_2: 9, depth_3: 1, depth_4: 4, depth_5: 6, depth_6: 3, macs: 7, min_depth: 0, max_depth: 9 };
+  const r = _v1577(base);
+  assert.strictEqual(r.bitting, "2-9-1-4-6-3");
+  assert.strictEqual(r.differences, "7, 8, 3, 2, 3");
+  assert.strictEqual(r.max_difference, 8);
+  assert.strictEqual(r.worst_position, 2);
+  assert.strictEqual(r.failing_pairs, 1);
+  assert.strictEqual(r.failing_positions, "2 to 3");
+  assert.strictEqual(r.pass, false);
+  // The 2-to-9 transition sits EXACTLY at MACS and passes; 9-to-1 is one
+  // step over and does not. The rule is inclusive at the limit.
+  assert.strictEqual(r.at_limit, 1);
+  // The other spec bitting is cuttable, with one transition at the limit.
+  const ok = _v1577({ ...base, depth_1: 3, depth_2: 8, depth_3: 1, depth_4: 5, depth_5: 4, depth_6: 6 });
+  assert.strictEqual(ok.bitting, "3-8-1-5-4-6");
+  assert.strictEqual(ok.differences, "5, 7, 4, 1, 2");
+  assert.strictEqual(ok.pass, true);
+  assert.strictEqual(ok.at_limit, 1);
+  assert.strictEqual(ok.max_difference, 7);
+  // Either correction the spec names brings the failing pair to MACS exactly.
+  assert.strictEqual(_v1577({ ...base, depth_3: 2 }).pass, true);
+  assert.strictEqual(_v1577({ ...base, depth_2: 8 }).pass, true);
+  // A looser MACS accepts the same bitting; a tighter one rejects more pairs.
+  assert.strictEqual(_v1577({ ...base, macs: 8 }).pass, true);
+  assert.strictEqual(_v1577({ ...base, macs: 3 }).failing_pairs, 2);
+  // The two collateral checks: a flat bitting and a shallow shoulder cut.
+  const flat = _v1577({ ...base, depth_1: 4, depth_2: 4, depth_3: 4, depth_4: 4, depth_5: 6, depth_6: 3 });
+  assert.strictEqual(flat.longest_run, 4);
+  assert.strictEqual(flat.pass, true);
+  assert.strictEqual(_v1577({ ...base, depth_1: 0 }).shallow_shoulder, true);
+  assert.strictEqual(r.shallow_shoulder, false);
+  assert.ok("error" in _v1577({ ...base, macs: 0 }));
+  assert.ok("error" in _v1577({ ...base, max_depth: 0 }));
+  assert.ok("error" in _v1577({ ...base, min_depth: -1 }));
+  assert.ok("error" in _v1577({ ...base, depth_3: 10 }));
+  assert.ok("error" in _v1577({ ...base, depth_1: -1 }));
+  assert.ok("error" in _v1577({ ...base, depth_4: Infinity }));
+});
+
+import { computeDoorUndercutTransferAir as _v1578 } from "../../calc-doorhardware.js";
+test("bounds: spec-v1578 computeDoorUndercutTransferAir pins the whistle", () => {
+  const base = { door_width_in: 36, undercut_in: 0.75, required_cfm: 250, max_velocity_fpm: 300 };
+  const r = _v1578(base);
+  assert.ok(Math.abs(r.free_area_sqin - 27) < 1e-12);
+  assert.ok(Math.abs(r.free_area_sqft - 0.1875) < 1e-12);
+  assert.ok(Math.abs(r.cfm_at_velocity - 56.25) < 1e-12);
+  // 250 cfm through that gap is 1,333 fpm, more than four times the
+  // threshold: the door whistles.
+  assert.ok(Math.abs(r.velocity_at_required_fpm - 1333.333) < 1e-2);
+  assert.strictEqual(r.noisy, true);
+  assert.ok(r.velocity_at_required_fpm > 4 * base.max_velocity_fpm);
+  // Worked the other way: 3.33 in of undercut, which is not a door.
+  assert.ok(Math.abs(r.undercut_needed_in - 10 / 3) < 1e-9);
+  assert.ok(Math.abs(r.grille_free_area_sqft - 5 / 6) < 1e-9);
+  // Run the tile at the undercut it names and the velocity lands on the
+  // entered ceiling exactly.
+  const sized = _v1578({ ...base, undercut_in: r.undercut_needed_in });
+  assert.ok(Math.abs(sized.velocity_at_required_fpm - base.max_velocity_fpm) < 1e-9);
+  assert.strictEqual(sized.noisy, false);
+  assert.ok(Math.abs(sized.cfm_at_velocity - base.required_cfm) < 1e-9);
+  // Free area and airflow are exactly linear in the undercut; the velocity
+  // required is exactly inverse in it.
+  assert.ok(Math.abs(_v1578({ ...base, undercut_in: 1.5 }).cfm_at_velocity - 2 * r.cfm_at_velocity) < 1e-12);
+  assert.ok(Math.abs(_v1578({ ...base, undercut_in: 1.5 }).velocity_at_required_fpm - r.velocity_at_required_fpm / 2) < 1e-9);
+  // The private-office case passes quietly: 75 cfm through the same gap.
+  const office = _v1578({ ...base, required_cfm: 50 });
+  assert.strictEqual(office.noisy, false);
+  assert.ok(office.shortfall_cfm < 0);
+  assert.ok("error" in _v1578({ ...base, door_width_in: 0 }));
+  assert.ok("error" in _v1578({ ...base, undercut_in: 0 }));
+  assert.ok("error" in _v1578({ ...base, required_cfm: 0 }));
+  assert.ok("error" in _v1578({ ...base, max_velocity_fpm: 0 }));
+  assert.ok("error" in _v1578({ ...base, undercut_in: Infinity }));
+});
+
+import { computeFireDoorClearance as _v1579 } from "../../calc-doorhardware.js";
+test("bounds: spec-v1579 computeFireDoorClearance pins two failures and their causes", () => {
+  const base = { head_in: 0.125, hinge_jamb_in: 0.125, strike_jamb_in: 0.1875, meeting_edge_in: 0.125, bottom_in: 1.25, perimeter_limit_in: 0.125, meeting_limit_in: 0.1875, bottom_limit_in: 0.75 };
+  const r = _v1579(base);
+  // At the limit is a PASS; the head and hinge jamb sit exactly on 1/8 in.
+  assert.strictEqual(r.head_margin_in, 0);
+  assert.strictEqual(r.hinge_margin_in, 0);
+  assert.ok(Math.abs(r.strike_margin_in + 0.0625) < 1e-12);
+  assert.ok(Math.abs(r.meeting_margin_in - 0.0625) < 1e-12);
+  assert.ok(Math.abs(r.bottom_margin_in + 0.5) < 1e-12);
+  assert.strictEqual(r.pass, false);
+  assert.strictEqual(r.failure_count, 2);
+  assert.strictEqual(r.failing_locations, "strike jamb, bottom");
+  // The bottom needs to come down half an inch -- a listed threshold or door
+  // bottom, not a sweep -- and there is no covering headroom while it fails.
+  assert.ok(Math.abs(r.bottom_reduction_needed_in - 0.5) < 1e-12);
+  assert.strictEqual(r.covering_headroom_in, 0);
+  // A compliant door reports how much covering could still go under it.
+  const good = _v1579({ ...base, strike_jamb_in: 0.125, bottom_in: 0.5 });
+  assert.strictEqual(good.pass, true);
+  assert.strictEqual(good.failure_count, 0);
+  assert.strictEqual(good.failing_locations, "none");
+  assert.ok(Math.abs(good.covering_headroom_in - 0.25) < 1e-12);
+  assert.strictEqual(good.bottom_reduction_needed_in, 0);
+  // A hair over the limit fails; exactly at it does not.
+  assert.strictEqual(_v1579({ ...base, strike_jamb_in: 0.125, bottom_in: 0.75 }).pass, true);
+  assert.strictEqual(_v1579({ ...base, strike_jamb_in: 0.125, bottom_in: 0.7501 }).pass, false);
+  // A zero clearance is a legitimate reading, not an error.
+  assert.ok(!("error" in _v1579({ ...base, head_in: 0 })));
+  assert.ok("error" in _v1579({ ...base, head_in: -0.01 }));
+  assert.ok("error" in _v1579({ ...base, bottom_in: -1 }));
+  assert.ok("error" in _v1579({ ...base, perimeter_limit_in: 0 }));
+  assert.ok("error" in _v1579({ ...base, meeting_limit_in: 0 }));
+  assert.ok("error" in _v1579({ ...base, bottom_limit_in: 0 }));
+  assert.ok("error" in _v1579({ ...base, strike_jamb_in: Infinity }));
+});
+
+import { computeGateOperatorDuty as _v1580 } from "../../calc-doorhardware.js";
+test("bounds: spec-v1580 computeGateOperatorDuty pins duty over force", () => {
+  const base = { gate_weight_lb: 2400, rolling_coefficient: 0.1, grade_pct: 5, gate_length_ft: 24, operator_speed_fps: 1, cycles_per_day: 150, operating_hours: 10, operator_rated_force_lb: 400, intermittent_duty_limit_pct: 10 };
+  const r = _v1580(base);
+  assert.ok(Math.abs(r.rolling_force_lb - 240) < 1e-9);
+  assert.ok(Math.abs(r.grade_force_lb - 119.85) < 1e-2);
+  assert.ok(Math.abs(r.travel_time_s - 24) < 1e-9);
+  assert.ok(Math.abs(r.cycle_time_s - 48) < 1e-9);
+  assert.ok(Math.abs(r.run_time_hr - 2) < 1e-9);
+  assert.ok(Math.abs(r.duty_cycle_pct - 20) < 1e-9);
+  // The force is comfortable and the duty is not -- which is the finding.
+  assert.strictEqual(r.force_ok, true);
+  assert.strictEqual(r.continuous_required, true);
+  // A grade that barely looks like one is a third of the total demand.
+  assert.ok(r.grade_share_pct > 30);
+  assert.strictEqual(_v1580({ ...base, grade_pct: 0 }).grade_force_lb, 0);
+  assert.ok(Math.abs(_v1580({ ...base, grade_pct: 0 }).total_force_lb - r.rolling_force_lb) < 1e-12);
+  // Rolling force is exactly linear in weight and coefficient.
+  assert.ok(Math.abs(_v1580({ ...base, gate_weight_lb: 4800 }).rolling_force_lb - 2 * r.rolling_force_lb) < 1e-9);
+  // Duty is exactly linear in cycles and inverse in the operating window,
+  // and a long slow gate spends its duty on travel time.
+  assert.ok(Math.abs(_v1580({ ...base, cycles_per_day: 75 }).duty_cycle_pct - r.duty_cycle_pct / 2) < 1e-9);
+  assert.ok(Math.abs(_v1580({ ...base, operating_hours: 20 }).duty_cycle_pct - r.duty_cycle_pct / 2) < 1e-9);
+  assert.ok(Math.abs(_v1580({ ...base, operator_speed_fps: 2 }).duty_cycle_pct - r.duty_cycle_pct / 2) < 1e-9);
+  // A residential cycle count sits inside an intermittent rating.
+  assert.strictEqual(_v1580({ ...base, cycles_per_day: 20 }).continuous_required, false);
+  assert.strictEqual(_v1580({ ...base, operator_rated_force_lb: 300 }).force_ok, false);
+  assert.ok("error" in _v1580({ ...base, gate_weight_lb: 0 }));
+  assert.ok("error" in _v1580({ ...base, rolling_coefficient: 0 }));
+  assert.ok("error" in _v1580({ ...base, rolling_coefficient: 1.5 }));
+  assert.ok("error" in _v1580({ ...base, grade_pct: -1 }));
+  assert.ok("error" in _v1580({ ...base, gate_length_ft: 0 }));
+  assert.ok("error" in _v1580({ ...base, operator_speed_fps: 0 }));
+  assert.ok("error" in _v1580({ ...base, cycles_per_day: 0 }));
+  assert.ok("error" in _v1580({ ...base, operating_hours: 0 }));
+  assert.ok("error" in _v1580({ ...base, operator_rated_force_lb: 0 }));
+  assert.ok("error" in _v1580({ ...base, intermittent_duty_limit_pct: 0 }));
+  assert.ok("error" in _v1580({ ...base, gate_weight_lb: Infinity }));
+});
+
+import { computeRevolvingDoorThroughput as _v1581 } from "../../calc-doorhardware.js";
+test("bounds: spec-v1581 computeRevolvingDoorThroughput pins the peak against the average", () => {
+  const base = { rpm: 3, wings: 4, people_per_compartment: 2, utilization_pct: 60, building_population: 2000, peak_fraction_pct: 70, peak_window_min: 20, device_count: 3, operating_hours: 8 };
+  const r = _v1581(base);
+  assert.ok(Math.abs(r.theoretical_per_hour - 1440) < 1e-9);
+  assert.ok(Math.abs(r.effective_per_hour - 864) < 1e-9);
+  assert.ok(Math.abs(r.peak_people - 1400) < 1e-9);
+  assert.ok(Math.abs(r.peak_rate_per_hour - 4200) < 1e-9);
+  assert.ok(Math.abs(r.average_rate_per_hour - 250) < 1e-9);
+  // spec-v1581 writes "4,200 / 864 = 4.9 -> 3 doors" and then calls the
+  // answer three. 4.86 rounds UP to FIVE; three leaves 536 people outside.
+  assert.strictEqual(r.devices_required, 5);
+  assert.strictEqual(r.devices_by_average, 1);
+  assert.strictEqual(r.installed_enough, false);
+  assert.ok(Math.abs(r.queue_at_peak - 536) < 1e-9);
+  // The whole error is the factor between the two design cases.
+  assert.ok(Math.abs(r.peak_rate_per_hour / r.average_rate_per_hour - 16.8) < 1e-9);
+  assert.ok(r.devices_required / r.devices_by_average === 5);
+  // Five doors clear the peak with no queue; four do not.
+  const five = _v1581({ ...base, device_count: 5 });
+  assert.strictEqual(five.installed_enough, true);
+  assert.strictEqual(five.queue_at_peak, 0);
+  assert.strictEqual(_v1581({ ...base, device_count: 4 }).installed_enough, false);
+  // Throughput is exactly linear in every term of the compartment relation.
+  assert.ok(Math.abs(_v1581({ ...base, rpm: 6 }).theoretical_per_hour - 2 * r.theoretical_per_hour) < 1e-9);
+  assert.ok(Math.abs(_v1581({ ...base, wings: 8 }).theoretical_per_hour - 2 * r.theoretical_per_hour) < 1e-9);
+  assert.ok(Math.abs(_v1581({ ...base, utilization_pct: 100 }).effective_per_hour - r.theoretical_per_hour) < 1e-9);
+  // A longer peak window is a lower rate and fewer doors.
+  assert.ok(_v1581({ ...base, peak_window_min: 60 }).devices_required < r.devices_required);
+  assert.ok("error" in _v1581({ ...base, rpm: 0 }));
+  assert.ok("error" in _v1581({ ...base, wings: 1 }));
+  assert.ok("error" in _v1581({ ...base, people_per_compartment: 0 }));
+  assert.ok("error" in _v1581({ ...base, utilization_pct: 0 }));
+  assert.ok("error" in _v1581({ ...base, utilization_pct: 101 }));
+  assert.ok("error" in _v1581({ ...base, building_population: 0 }));
+  assert.ok("error" in _v1581({ ...base, peak_fraction_pct: 0 }));
+  assert.ok("error" in _v1581({ ...base, peak_window_min: 0 }));
+  assert.ok("error" in _v1581({ ...base, device_count: 0 }));
+  assert.ok("error" in _v1581({ ...base, operating_hours: 0 }));
+  assert.ok("error" in _v1581({ ...base, rpm: Infinity }));
+});

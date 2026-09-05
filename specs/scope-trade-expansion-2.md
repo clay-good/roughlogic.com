@@ -1,7 +1,7 @@
 # Scope: The 2026-09-05 Trade Expansion (specs v1450-v1749, 300 New Tiles)
 
 > **Status: IN PROGRESS (2026-09-05). Program charter, no catalog change of its own.**
-> **Bands 1 and 2 have landed: v1539-v1545 (railroad track) and v1648-v1658 (elevator and escalator), 1,804 -> 1,822.**
+> **Bands 1-3 have landed: v1539-v1545 (railroad track), v1648-v1658 (elevator and escalator), and v1571-v1581 (door hardware and locksmithing), 1,804 -> 1,833.**
 > Inherits the spec-v106 trades-only charter and every convention through spec-v1449.
 > Each of the 300 tiles is specified in its own file, `spec-v1450.md` through `spec-v1749.md`.
 
@@ -544,8 +544,9 @@ things must happen **before** the first band, not during it:
 | --- | --- | --- | --- | --- |
 | 1 | v1539-v1545 | `calc-rail.js` (new) | 7 | railroad track and equipment; catalog 1,804 -> 1,811 |
 | 2 | v1648-v1658 | `calc-elevator.js` (new) | 11 | elevator and escalator equipment; catalog 1,811 -> 1,822 |
+| 3 | v1571-v1581 | `calc-doorhardware.js` (new) | 11 | door hardware and locksmithing; catalog 1,822 -> 1,833; nine group E, two group A |
 
-**Five of the eighteen specs built so far were internally wrong and shipped corrected.** In band 1:
+**Seven of the twenty-nine specs built so far were internally wrong and shipped corrected.** In band 1:
 spec-v1541's 2,450 lb per degF is not what its own stated inputs give (13.0 x 30,000,000 x
 0.0000065 is 2,535, and 61,262 and 208,292 follow from the wrong figure), and spec-v1545's worked
 example calls a car 15 ft from the main "fouling" against a 13 ft requirement when it is clear.
@@ -557,10 +558,16 @@ its own formula line is `M = P L / 4`, a midspan point load, for which the momen
 and the deflection as its cube. **Recompute every spec example line by line before coding it, and
 check the formula block against the prose that surrounds it.**
 
+Band 3 added two more of the same class. spec-v1574's worked example puts 3.9 V of drop on 300 ft
+of 18 AWG at 0.45 A; the real figure is 1.76 V, and the catalog already computes it correctly in
+`lv-dc-drop`, so that output was routed there rather than duplicated. And spec-v1581 writes
+"doors required = 4,200 / 864 = 4.9 -> 3 doors" and then calls the answer three; 4.86 rounds up to
+FIVE, and three leaves 536 people outside.
+
 **A spec's Inputs list can also contain an input the math cannot use**, which
-`check-guard-only-inputs` fails on. Four have been dropped so far (v1543's FRA class number,
-v1544's shoulder width, v1649's rope weight and compensation, v1652's floor count), each recorded
-in the tile's own scope prose.
+`check-guard-only-inputs` fails on. Six have been dropped so far (v1543's FRA class number,
+v1544's shoulder width, v1649's rope weight and compensation, v1652's floor count, v1574's wire
+run, v1580's wind exposure), each recorded in the tile's own scope prose.
 
 ## 8. See also
 
