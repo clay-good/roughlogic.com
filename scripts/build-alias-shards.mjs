@@ -28,6 +28,7 @@
 
 import { createHash } from "node:crypto";
 import { readFile, writeFile, readdir, unlink } from "node:fs/promises";
+import { stampIntegrityAnchor } from "./stamp-integrity-anchor.mjs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { gzipSync } from "node:zlib";
@@ -242,6 +243,10 @@ async function main() {
     await writeFile(MANIFEST, manifestOut);
     wrote++;
   }
+  // The manifest this script just rewrote is itself anchored in
+  // data/integrity.json, which the runtime checks before trusting any shard
+  // here. Re-stamp it, or every visitor sees the integrity banner.
+  if (await stampIntegrityAnchor("search")) wrote++;
   console.log(
     wrote === 0
       ? "alias shards already current. No changes written."

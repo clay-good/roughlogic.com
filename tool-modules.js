@@ -656,6 +656,13 @@ export const TOOL_MODULES = (() => {
   declare("./calc-disinfect.js", "DISINFECT_RENDERERS", [
     "main-disinfection-chlorine", "well-shock-chlorination",
   ]);
+  // spec-v1539..v1545: the railroad track and equipment bench, a trade the
+  // catalog served with zero tiles. All seven keep group "E".
+  declare("./calc-rail.js", "RAIL_RENDERERS", [
+    "track-superelevation", "degree-of-curve", "cwr-neutral-temperature",
+    "rail-wear-condemning-limit", "track-warp-fra-class",
+    "ballast-section-volume", "turnout-frog-lead",
+  ]);
   // spec-v80 cap-relief split: the spec-v25 site-civil / roadway-geometry
   // quartet moved out of calc-construction.js (it sat at 95.0% of its size
   // cap, the tightest remaining calculator module) into its own module. All

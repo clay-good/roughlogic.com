@@ -71,6 +71,7 @@ const FILES = [
   "calc-elecdesign.js",
   "calc-hvacservice.js",
   "calc-disinfect.js",
+  "calc-rail.js",
   "calc-civil.js",
   "calc-steel.js",
   "calc-concrete.js",

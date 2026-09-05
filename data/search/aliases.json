@@ -105362,6 +105362,181 @@
    "term": "705.3",
    "target": "exterior-opening-protection",
    "kind": "industry"
+  },
+  {
+   "term": "track superelevation",
+   "target": "track-superelevation",
+   "kind": "industry"
+  },
+  {
+   "term": "curve elevation railroad",
+   "target": "track-superelevation",
+   "kind": "industry"
+  },
+  {
+   "term": "cant deficiency track",
+   "target": "track-superelevation",
+   "kind": "industry"
+  },
+  {
+   "term": "maximum speed curve rail",
+   "target": "track-superelevation",
+   "kind": "industry"
+  },
+  {
+   "term": "equilibrium elevation formula",
+   "target": "track-superelevation",
+   "kind": "industry"
+  },
+  {
+   "term": "degree of curve radius",
+   "target": "degree-of-curve",
+   "kind": "industry"
+  },
+  {
+   "term": "railroad curve conversion",
+   "target": "degree-of-curve",
+   "kind": "industry"
+  },
+  {
+   "term": "middle ordinate 62 foot chord",
+   "target": "degree-of-curve",
+   "kind": "industry"
+  },
+  {
+   "term": "chord definition curve",
+   "target": "degree-of-curve",
+   "kind": "industry"
+  },
+  {
+   "term": "string lining curve rail",
+   "target": "degree-of-curve",
+   "kind": "industry"
+  },
+  {
+   "term": "cwr neutral temperature",
+   "target": "cwr-neutral-temperature",
+   "kind": "industry"
+  },
+  {
+   "term": "rail thermal force",
+   "target": "cwr-neutral-temperature",
+   "kind": "industry"
+  },
+  {
+   "term": "sun kink buckling temperature",
+   "target": "cwr-neutral-temperature",
+   "kind": "industry"
+  },
+  {
+   "term": "rail stress free temperature",
+   "target": "cwr-neutral-temperature",
+   "kind": "industry"
+  },
+  {
+   "term": "destress rail temperature",
+   "target": "cwr-neutral-temperature",
+   "kind": "industry"
+  },
+  {
+   "term": "rail wear limit",
+   "target": "rail-wear-condemning-limit",
+   "kind": "industry"
+  },
+  {
+   "term": "gauge face wear rail",
+   "target": "rail-wear-condemning-limit",
+   "kind": "industry"
+  },
+  {
+   "term": "vertical head wear condemning",
+   "target": "rail-wear-condemning-limit",
+   "kind": "industry"
+  },
+  {
+   "term": "rail replacement wear gauge",
+   "target": "rail-wear-condemning-limit",
+   "kind": "industry"
+  },
+  {
+   "term": "combined rail wear criterion",
+   "target": "rail-wear-condemning-limit",
+   "kind": "industry"
+  },
+  {
+   "term": "track warp limit",
+   "target": "track-warp-fra-class",
+   "kind": "industry"
+  },
+  {
+   "term": "fra track class geometry",
+   "target": "track-warp-fra-class",
+   "kind": "industry"
+  },
+  {
+   "term": "cross level twist rail",
+   "target": "track-warp-fra-class",
+   "kind": "industry"
+  },
+  {
+   "term": "62 foot warp measurement",
+   "target": "track-warp-fra-class",
+   "kind": "industry"
+  },
+  {
+   "term": "track geometry defect limit",
+   "target": "track-warp-fra-class",
+   "kind": "industry"
+  },
+  {
+   "term": "ballast section volume",
+   "target": "ballast-section-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "track ballast tonnage",
+   "target": "ballast-section-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "ballast cross section trapezoid",
+   "target": "ballast-section-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "surfacing raise ballast",
+   "target": "ballast-section-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "ballast cubic yards per mile",
+   "target": "ballast-section-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "turnout frog number angle",
+   "target": "turnout-frog-lead",
+   "kind": "industry"
+  },
+  {
+   "term": "frog angle from number",
+   "target": "turnout-frog-lead",
+   "kind": "industry"
+  },
+  {
+   "term": "turnout clearance point",
+   "target": "turnout-frog-lead",
+   "kind": "industry"
+  },
+  {
+   "term": "switch geometry railroad",
+   "target": "turnout-frog-lead",
+   "kind": "industry"
+  },
+  {
+   "term": "diverging track separation",
+   "target": "turnout-frog-lead",
+   "kind": "industry"
   }
  ]
 }

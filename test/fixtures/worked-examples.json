@@ -93831,6 +93831,341 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "track-superelevation",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "4 degree curve, 4 in of actual elevation, 3 in of allowable unbalance",
+   "source_edition_or_year": "equilibrium elevation E = 0.0007 x D x V^2",
+   "source_section_or_page": "49 CFR 213 named for the elevation and unbalance caps",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "degree_of_curve": 4,
+    "speed_mph": 50,
+    "actual_elevation_in": 4,
+    "allowable_unbalance_in": 3,
+    "max_elevation_in": 6,
+    "target_speed_mph": 57
+   },
+   "outputs": {
+    "equilibrium_in": {
+     "value": 7.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "unbalance_in": {
+     "value": 3.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_speed_mph": {
+     "value": 50.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_elevation_in": {
+     "value": 6.0972,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "degree-of-curve",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "4 degree curve by both definitions, with the 62 ft chord field rule",
+   "source_edition_or_year": "chord D = 2 arcsin(50/R); arc R = 18,000 / pi / D",
+   "source_section_or_page": "49 CFR 213 named for the alignment limits not evaluated",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "degree_of_curve": 4,
+    "radius_ft": 1432.4,
+    "chord_length_ft": 62,
+    "central_angle_deg": 20,
+    "measured_ordinate_in": 4
+   },
+   "outputs": {
+    "radius_arc_ft": {
+     "value": 1432.394,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "radius_chord_ft": {
+     "value": 1432.685,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "radius_difference_ft": {
+     "value": 0.291,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "middle_ordinate_in": {
+     "value": 4.025,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "degree_from_ordinate": {
+     "value": 3.975,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "curve_length_ft": {
+     "value": 500.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cwr-neutral-temperature",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "13.0 sq in rail at 30,000,000 psi and 0.0000065 per degF, 95 degF neutral, 95 degF air with a 25 degF sun adder",
+   "source_edition_or_year": "F = A x E x alpha x (T - T neutral)",
+   "source_section_or_page": "49 CFR 213 CWR plan requirements named",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "rail_area_in2": 13.0,
+    "modulus_psi": 30000000,
+    "alpha_per_degf": 6.5e-06,
+    "neutral_temp_f": 95,
+    "air_temp_f": 95,
+    "sun_adder_f": 25
+   },
+   "outputs": {
+    "force_per_degf_lb": {
+     "value": 2535.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rail_temp_f": {
+     "value": 120.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "differential_f": {
+     "value": 25.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "force_per_rail_lb": {
+     "value": 63375.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "force_track_lb": {
+     "value": 126750.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rail-wear-condemning-limit",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "136 lb high rail, 6/16 in vertical and 8/16 in gauge face against a 12/16 in combined limit, 180 MGT since installation",
+   "source_edition_or_year": "combined = vertical + gauge face / 2",
+   "source_section_or_page": "limits entered from the track owner's engineering instructions",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "new_head_height_in": 1.5,
+    "new_head_width_in": 3.0,
+    "new_head_area_in2": 3.9,
+    "vertical_wear_in": 0.375,
+    "gauge_face_wear_in": 0.5,
+    "combined_limit_in": 0.75,
+    "tonnage_mgt": 180
+   },
+   "outputs": {
+    "combined_wear_in": {
+     "value": 0.625,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "remaining_in": {
+     "value": 0.125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wear_rate_in_per_mgt": {
+     "value": 0.0034722,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "remaining_mgt": {
+     "value": 36.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "track-warp-fra-class",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "two cross-level readings 62 ft apart on a curve designed for 4 in of elevation",
+   "source_edition_or_year": "warp = deviation at A - deviation at B, referenced to the designed cross level",
+   "source_section_or_page": "49 CFR 213 named as the source of the class limits, which are entered",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "measured_a_in": 4.6,
+    "designed_a_in": 4.0,
+    "measured_b_in": 3.2,
+    "designed_b_in": 4.0,
+    "distance_ft": 62,
+    "warp_limit_in": 1.75
+   },
+   "outputs": {
+    "deviation_a_in": {
+     "value": 0.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "deviation_b_in": {
+     "value": -0.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "warp_magnitude_in": {
+     "value": 1.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_in": {
+     "value": 0.35,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "warp_per_31ft_in": {
+     "value": 0.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ballast-section-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "8 ft top width, 12 in deep, 1.5 to 1 side slopes, one track mile at 1.40 tons per placed cubic yard",
+   "source_edition_or_year": "trapezoidal prism; 27 cu ft per cu yd, 5,280 ft per mile",
+   "source_section_or_page": "the railroad's standard plans set the section",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "top_width_ft": 8,
+    "depth_in": 12,
+    "side_slope_ratio": 1.5,
+    "length_ft": 5280,
+    "density_ton_per_cy": 1.4,
+    "raise_in": 2
+   },
+   "outputs": {
+    "bottom_width_ft": {
+     "value": 11.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "area_sqft": {
+     "value": 9.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cy_per_mile": {
+     "value": 1857.78,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tons_per_mile": {
+     "value": 2600.89,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "understated_pct": {
+     "value": 15.789,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "turnout-frog-lead",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "number 10 turnout, 13 ft required separation, checked 150 ft beyond the frog",
+   "source_edition_or_year": "F = 2 arcsin(1 / (2 N)); separation = distance / N",
+   "source_section_or_page": "lead entered from the railroad's standard plan",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "frog_number": 10,
+    "distance_beyond_frog_ft": 150,
+    "required_separation_ft": 13,
+    "lead_ft": 78
+   },
+   "outputs": {
+    "frog_angle_deg": {
+     "value": 5.732,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "frog_angle_min": {
+     "value": 343.918,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "separation_at_distance_ft": {
+     "value": 15.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "clearance_point_ft": {
+     "value": 130.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_from_switch_point_ft": {
+     "value": 208.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

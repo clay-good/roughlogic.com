@@ -816,6 +816,14 @@ const _TILES = [
   ["nitrogen-pressure-test", "C"],
   ["main-disinfection-chlorine", "B"],
   ["well-shock-chlorination", "B"],
+  // spec-v1539..v1545 railroad track band (trade expansion 2, Group E)
+  ["track-superelevation", "E"],
+  ["degree-of-curve", "E"],
+  ["cwr-neutral-temperature", "E"],
+  ["rail-wear-condemning-limit", "E"],
+  ["track-warp-fra-class", "E"],
+  ["ballast-section-volume", "E"],
+  ["turnout-frog-lead", "E"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   ["grounding-electrode-conductor", "A"],
   ["bonding-jumper", "A"],

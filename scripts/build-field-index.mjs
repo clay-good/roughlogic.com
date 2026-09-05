@@ -67,6 +67,7 @@
 
 import { createHash } from "node:crypto";
 import { readFile, writeFile, mkdir, readdir } from "node:fs/promises";
+import { stampIntegrityAnchor } from "./stamp-integrity-anchor.mjs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { gzipSync } from "node:zlib";
@@ -356,6 +357,9 @@ if (CHECK) {
   }
 } else {
   await writeFile(manifestPath, manifestText, "utf8");
+// data/fields/manifest.json is anchored in data/integrity.json, and the
+// runtime verifies it there before trusting a field shard. Re-stamp it.
+await stampIntegrityAnchor("fields");
 }
 
 if (drift) process.exit(1);

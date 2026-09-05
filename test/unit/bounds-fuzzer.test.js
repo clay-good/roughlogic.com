@@ -41895,3 +41895,252 @@ test("follow-up spec-v1449: the expansion gap comes off the width before the row
   assert.strictEqual(noPlank.usable_width_in, null);
   assert.ok(noPlank.boxes > 0);
 });
+
+// ===========================================================================
+// spec-v1539..v1545: the 2026-09-05 trade-expansion railroad track band
+// (specs/scope-trade-expansion-2.md), the first band of that program and the
+// first railroad tiles in the catalog.
+// ===========================================================================
+
+import { computeTrackSuperelevation as _v1539 } from "../../calc-rail.js";
+test("bounds: spec-v1539 computeTrackSuperelevation pins the unbalance rule", () => {
+  const base = { degree_of_curve: 4, speed_mph: 50, actual_elevation_in: 4, allowable_unbalance_in: 3, max_elevation_in: 6, target_speed_mph: 57 };
+  const r = _v1539(base);
+  assert.ok(Math.abs(r.equilibrium_in - 7.0) < 1e-9);
+  assert.ok(Math.abs(r.unbalance_in - 3.0) < 1e-9);
+  assert.ok(Math.abs(r.max_speed_mph - 50.0) < 1e-9);
+  assert.ok(Math.abs(r.required_elevation_in - 6.0972) < 1e-3);
+  // The maximum speed is EXACTLY the speed at which unbalance equals the
+  // allowance: run the tile at its own answer and the unbalance lands on 3.
+  const atMax = _v1539({ ...base, speed_mph: r.max_speed_mph });
+  assert.ok(Math.abs(atMax.unbalance_in - base.allowable_unbalance_in) < 1e-9);
+  // The slow freight is the other half of the trade: 25 mph on the same
+  // curve wants 1.75 in and has 4, so it leans onto the LOW rail.
+  const slow = _v1539({ ...base, speed_mph: 25 });
+  assert.ok(Math.abs(slow.equilibrium_in - 1.75) < 1e-9);
+  assert.ok(Math.abs(slow.unbalance_in + 2.25) < 1e-9);
+  assert.ok(slow.condition.startsWith("overbalanced"));
+  // Raising elevation to the 6 in cap buys speed and costs the freight.
+  const raised = _v1539({ ...base, actual_elevation_in: 6 });
+  assert.ok(Math.abs(raised.max_speed_mph - 56.695) < 1e-2);
+  assert.ok(Math.abs(_v1539({ ...base, actual_elevation_in: 6, speed_mph: 25 }).unbalance_in + 4.25) < 1e-9);
+  // Equilibrium is exactly quadratic in speed and exactly linear in degree.
+  assert.ok(Math.abs(_v1539({ ...base, speed_mph: 100 }).equilibrium_in - 4 * r.equilibrium_in) < 1e-9);
+  assert.ok(Math.abs(_v1539({ ...base, degree_of_curve: 8 }).equilibrium_in - 2 * r.equilibrium_in) < 1e-9);
+  // The caps are FLAGGED, not silently enforced.
+  assert.strictEqual(r.over_elevation, false);
+  assert.strictEqual(r.over_unbalance, false);
+  assert.strictEqual(_v1539({ ...base, actual_elevation_in: 7 }).over_elevation, true);
+  assert.strictEqual(_v1539({ ...base, speed_mph: 60 }).over_unbalance, true);
+  assert.ok("error" in _v1539({ ...base, degree_of_curve: 0 }));
+  assert.ok("error" in _v1539({ ...base, speed_mph: 0 }));
+  assert.ok("error" in _v1539({ ...base, actual_elevation_in: -1 }));
+  assert.ok("error" in _v1539({ ...base, allowable_unbalance_in: -1 }));
+  assert.ok("error" in _v1539({ ...base, max_elevation_in: 0 }));
+  assert.ok("error" in _v1539({ ...base, target_speed_mph: 0 }));
+  assert.ok("error" in _v1539({ ...base, degree_of_curve: Infinity }));
+});
+
+import { computeDegreeOfCurve as _v1540 } from "../../calc-rail.js";
+test("bounds: spec-v1540 computeDegreeOfCurve pins chord against arc", () => {
+  const base = { degree_of_curve: 4, radius_ft: 1432.4, chord_length_ft: 62, central_angle_deg: 20, measured_ordinate_in: 4 };
+  const r = _v1540(base);
+  assert.ok(Math.abs(r.radius_arc_ft - 1432.394) < 1e-2);
+  assert.ok(Math.abs(r.radius_chord_ft - 1432.685) < 1e-2);
+  assert.ok(Math.abs(r.radius_difference_ft - 0.291) < 1e-2);
+  assert.ok(Math.abs(r.curve_length_ft - 500) < 1e-9);
+  // The 62 ft chord rule, both ways: a 4 degree curve gives about 4 in of
+  // middle ordinate, and 4 in of measured ordinate gives back about 4 degrees.
+  assert.ok(Math.abs(r.middle_ordinate_in - 4.0) < 0.05);
+  assert.ok(Math.abs(r.degree_from_ordinate - 4.0) < 0.05);
+  // The chord radius is always the LARGER of the two, and the gap grows with
+  // the sharpness of the curve -- the whole reason the definition must be
+  // stated when a radius changes hands.
+  assert.ok(r.radius_chord_ft > r.radius_arc_ft);
+  const sharp = _v1540({ ...base, degree_of_curve: 12 });
+  assert.ok(Math.abs(sharp.radius_arc_ft - 477.465) < 1e-2);
+  assert.ok(Math.abs(sharp.radius_chord_ft - 478.335) < 1e-2);
+  assert.ok(sharp.radius_difference_ft > 3 * r.radius_difference_ft);
+  // Round trip: the degree recovered from the chord radius is the degree in.
+  assert.ok(Math.abs(_v1540({ ...base, radius_ft: r.radius_chord_ft }).degree_from_radius_chord - 4) < 1e-9);
+  assert.ok(Math.abs(_v1540({ ...base, radius_ft: r.radius_arc_ft }).degree_from_radius_arc - 4) < 1e-9);
+  assert.ok("error" in _v1540({ ...base, degree_of_curve: 0 }));
+  assert.ok("error" in _v1540({ ...base, radius_ft: 50 }));
+  assert.ok("error" in _v1540({ ...base, chord_length_ft: 0 }));
+  assert.ok("error" in _v1540({ ...base, central_angle_deg: 0 }));
+  assert.ok("error" in _v1540({ ...base, measured_ordinate_in: 0 }));
+  // A chord longer than the curve's diameter has no middle ordinate.
+  assert.ok("error" in _v1540({ ...base, degree_of_curve: 90, chord_length_ft: 500 }));
+  assert.ok("error" in _v1540({ ...base, degree_of_curve: Infinity }));
+});
+
+import { computeCwrThermalForce as _v1541 } from "../../calc-rail.js";
+test("bounds: spec-v1541 computeCwrThermalForce pins force independent of length", () => {
+  const base = { rail_area_in2: 13.0, modulus_psi: 30000000, alpha_per_degf: 0.0000065, neutral_temp_f: 95, air_temp_f: 95, sun_adder_f: 25 };
+  const r = _v1541(base);
+  // 13.0 x 30,000,000 x 0.0000065 is 2,535 lb per degF, exactly. spec-v1541's
+  // prose says 2,450 and carries that through to 61,262 and 208,292; those
+  // figures are not what its own stated inputs produce, so the fixture is
+  // pinned to the exact arithmetic.
+  assert.ok(Math.abs(r.force_per_degf_lb - 2535) < 1e-9);
+  assert.ok(Math.abs(r.rail_temp_f - 120) < 1e-9);
+  assert.ok(Math.abs(r.differential_f - 25) < 1e-9);
+  assert.ok(Math.abs(r.force_per_rail_lb - 63375) < 1e-9);
+  assert.ok(Math.abs(r.force_track_lb - 126750) < 1e-9);
+  assert.ok(r.state.startsWith("compression"));
+  // The winter mirror: 85 degF below neutral is TENSION of the same size per
+  // degree, which is what pulls a defect apart.
+  const winter = _v1541({ ...base, air_temp_f: 10, sun_adder_f: 0 });
+  assert.ok(Math.abs(winter.differential_f + 85) < 1e-9);
+  assert.ok(Math.abs(winter.force_per_rail_lb - 215475) < 1e-9);
+  assert.ok(winter.state.startsWith("tension"));
+  // At neutral there is no thermal force at all.
+  const atNeutral = _v1541({ ...base, air_temp_f: 70, sun_adder_f: 25 });
+  assert.strictEqual(atNeutral.differential_f, 0);
+  assert.strictEqual(atNeutral.force_per_rail_lb, 0);
+  // Force is exactly linear in area and in the differential, and the track
+  // carries exactly twice one rail.
+  assert.ok(Math.abs(_v1541({ ...base, rail_area_in2: 26 }).force_per_degf_lb - 2 * r.force_per_degf_lb) < 1e-9);
+  assert.ok(Math.abs(_v1541({ ...base, sun_adder_f: 50 }).force_per_rail_lb - 2 * r.force_per_rail_lb) < 1e-9);
+  assert.ok(Math.abs(r.force_track_lb - 2 * r.force_per_rail_lb) < 1e-9);
+  assert.ok("error" in _v1541({ ...base, rail_area_in2: 0 }));
+  assert.ok("error" in _v1541({ ...base, modulus_psi: 0 }));
+  assert.ok("error" in _v1541({ ...base, alpha_per_degf: 0 }));
+  assert.ok("error" in _v1541({ ...base, sun_adder_f: -1 }));
+  assert.ok("error" in _v1541({ ...base, air_temp_f: Infinity }));
+});
+
+import { computeRailWearLimit as _v1542 } from "../../calc-rail.js";
+test("bounds: spec-v1542 computeRailWearLimit pins the combined criterion", () => {
+  const base = { new_head_height_in: 1.5, new_head_width_in: 3.0, new_head_area_in2: 3.9, vertical_wear_in: 0.375, gauge_face_wear_in: 0.5, combined_limit_in: 0.75, tonnage_mgt: 180 };
+  const r = _v1542(base);
+  assert.ok(Math.abs(r.combined_wear_in - 0.625) < 1e-9);
+  assert.ok(Math.abs(r.remaining_in - 0.125) < 1e-9);
+  assert.strictEqual(r.condemned, false);
+  assert.ok(Math.abs(r.wear_rate_in_per_mgt - 0.0034722) < 1e-6);
+  assert.ok(Math.abs(r.remaining_mgt - 36) < 0.1);
+  // Gauge face is weighted at HALF: a rail worn only on the gauge face takes
+  // twice as much wear to reach the same combined number as a vertical one.
+  const gfOnly = _v1542({ ...base, vertical_wear_in: 0, gauge_face_wear_in: 1.25 });
+  const vOnly = _v1542({ ...base, vertical_wear_in: 0.625, gauge_face_wear_in: 0 });
+  assert.ok(Math.abs(gfOnly.combined_wear_in - vOnly.combined_wear_in) < 1e-9);
+  // The verdict flips exactly at the limit, not before it.
+  assert.strictEqual(_v1542({ ...base, combined_limit_in: 0.625 }).condemned, true);
+  assert.strictEqual(_v1542({ ...base, combined_limit_in: 0.626 }).condemned, false);
+  // Twice the tonnage for the same wear is half the rate and twice the life.
+  const slow = _v1542({ ...base, tonnage_mgt: 360 });
+  assert.ok(Math.abs(slow.wear_rate_in_per_mgt - r.wear_rate_in_per_mgt / 2) < 1e-12);
+  assert.ok(Math.abs(slow.remaining_mgt - 2 * r.remaining_mgt) < 1e-6);
+  // A condemned rail has no remaining life to project.
+  assert.strictEqual(_v1542({ ...base, combined_limit_in: 0.5 }).remaining_mgt, 0);
+  assert.ok("error" in _v1542({ ...base, new_head_height_in: 0 }));
+  assert.ok("error" in _v1542({ ...base, new_head_width_in: 0 }));
+  assert.ok("error" in _v1542({ ...base, new_head_area_in2: 0 }));
+  assert.ok("error" in _v1542({ ...base, gauge_face_wear_in: -0.1 }));
+  assert.ok("error" in _v1542({ ...base, vertical_wear_in: 1.5 }));
+  assert.ok("error" in _v1542({ ...base, gauge_face_wear_in: 3.0 }));
+  assert.ok("error" in _v1542({ ...base, combined_limit_in: 0 }));
+  assert.ok("error" in _v1542({ ...base, tonnage_mgt: 0 }));
+  assert.ok("error" in _v1542({ ...base, tonnage_mgt: Infinity }));
+});
+
+import { computeTrackWarp as _v1543 } from "../../calc-rail.js";
+test("bounds: spec-v1543 computeTrackWarp pins the designed-elevation reference", () => {
+  const base = { measured_a_in: 4.6, designed_a_in: 4.0, measured_b_in: 3.2, designed_b_in: 4.0, distance_ft: 62, warp_limit_in: 1.75 };
+  const r = _v1543(base);
+  assert.ok(Math.abs(r.deviation_a_in - 0.6) < 1e-9);
+  assert.ok(Math.abs(r.deviation_b_in + 0.8) < 1e-9);
+  assert.ok(Math.abs(r.warp_magnitude_in - 1.4) < 1e-9);
+  assert.ok(Math.abs(r.margin_in - 0.35) < 1e-9);
+  assert.strictEqual(r.pass, true);
+  assert.ok(Math.abs(r.warp_per_31ft_in - 0.7) < 1e-9);
+  // On a curve with CONSTANT designed elevation the reference cancels, which
+  // is why this reading is the same measured against zero.
+  assert.ok(Math.abs(r.against_zero_in - r.warp_magnitude_in) < 1e-9);
+  // On a SPIRAL it does not cancel, and that is the whole point: 4 in of
+  // elevation running off over 200 ft is 1.24 in of designed change in 62 ft.
+  const spiral = _v1543({ ...base, measured_a_in: 4.0, designed_a_in: 4.0, measured_b_in: 2.76, designed_b_in: 2.76 });
+  assert.strictEqual(spiral.warp_magnitude_in, 0);
+  assert.ok(Math.abs(spiral.against_zero_in - 1.24) < 1e-9);
+  // The verdict flips at the limit, and the sign of the twist does not matter.
+  assert.strictEqual(_v1543({ ...base, warp_limit_in: 1.4 }).pass, true);
+  assert.strictEqual(_v1543({ ...base, warp_limit_in: 1.39 }).pass, false);
+  const flipped = _v1543({ ...base, measured_a_in: 3.2, measured_b_in: 4.6 });
+  assert.ok(Math.abs(flipped.warp_magnitude_in - r.warp_magnitude_in) < 1e-9);
+  assert.ok(Math.abs(flipped.warp_in + r.warp_in) < 1e-9);
+  // The same twist over half the distance is twice as steep on a 31 ft base.
+  assert.ok(Math.abs(_v1543({ ...base, distance_ft: 31 }).warp_per_31ft_in - 2 * r.warp_per_31ft_in) < 1e-9);
+  assert.ok(Math.abs(r.pct_of_limit - 80) < 1e-9);
+  assert.ok("error" in _v1543({ ...base, distance_ft: 0 }));
+  assert.ok("error" in _v1543({ ...base, warp_limit_in: 0 }));
+  assert.ok("error" in _v1543({ ...base, measured_a_in: Infinity }));
+});
+
+import { computeBallastSection as _v1544 } from "../../calc-rail.js";
+test("bounds: spec-v1544 computeBallastSection pins the trapezoid against the box", () => {
+  const base = { top_width_ft: 8, depth_in: 12, side_slope_ratio: 1.5, length_ft: 5280, density_ton_per_cy: 1.4, raise_in: 2 };
+  const r = _v1544(base);
+  assert.ok(Math.abs(r.bottom_width_ft - 11.0) < 1e-9);
+  assert.ok(Math.abs(r.area_sqft - 9.5) < 1e-9);
+  assert.ok(Math.abs(r.cy_per_mile - 1857.78) < 1e-2);
+  assert.ok(Math.abs(r.tons_per_mile - 2600.89) < 1e-2);
+  // The error the tile exists to prevent: a rectangle at the top width is
+  // 8.00 sq ft against a real 9.50, about 16% low, 411 tons a mile missing.
+  assert.ok(Math.abs(r.rectangle_area_sqft - 8.0) < 1e-9);
+  assert.ok(Math.abs(r.understated_pct - 15.789) < 1e-3);
+  assert.ok(Math.abs(r.understated_tons_per_mile - 410.67) < 1e-2);
+  // Flat sides collapse the trapezoid onto the rectangle exactly.
+  const flat = _v1544({ ...base, side_slope_ratio: 0 });
+  assert.ok(Math.abs(flat.area_sqft - flat.rectangle_area_sqft) < 1e-12);
+  assert.strictEqual(flat.understated_pct, 0);
+  // The RAISE is a small fraction of the full section, which is the ordering
+  // decision: 2 in over 3,000 ft is about 148 cu yd, not 1,056.
+  const job = _v1544({ ...base, length_ft: 3000 });
+  assert.ok(Math.abs(job.raise_volume_cy - 148.15) < 1e-2);
+  assert.ok(Math.abs(job.volume_cy - 1055.56) < 1e-2);
+  assert.ok(job.raise_volume_cy < job.volume_cy / 7);
+  // Volume is exactly linear in length; per-mile figures do not move with it.
+  assert.ok(Math.abs(_v1544({ ...base, length_ft: 10560 }).volume_cy - 2 * r.volume_cy) < 1e-9);
+  assert.ok(Math.abs(_v1544({ ...base, length_ft: 100 }).cy_per_mile - r.cy_per_mile) < 1e-9);
+  // A zero raise orders no lift material at all.
+  assert.strictEqual(_v1544({ ...base, raise_in: 0 }).raise_volume_cy, 0);
+  assert.ok("error" in _v1544({ ...base, top_width_ft: 0 }));
+  assert.ok("error" in _v1544({ ...base, depth_in: 0 }));
+  assert.ok("error" in _v1544({ ...base, side_slope_ratio: -1 }));
+  assert.ok("error" in _v1544({ ...base, length_ft: 0 }));
+  assert.ok("error" in _v1544({ ...base, density_ton_per_cy: 0 }));
+  assert.ok("error" in _v1544({ ...base, raise_in: -1 }));
+  assert.ok("error" in _v1544({ ...base, depth_in: Infinity }));
+});
+
+import { computeTurnoutFrogGeometry as _v1545 } from "../../calc-rail.js";
+test("bounds: spec-v1545 computeTurnoutFrogGeometry pins the clearance point", () => {
+  const base = { frog_number: 10, distance_beyond_frog_ft: 150, required_separation_ft: 13, lead_ft: 78 };
+  const r = _v1545(base);
+  assert.ok(Math.abs(r.frog_angle_deg - 5.732) < 1e-3);
+  assert.ok(Math.abs(r.frog_angle_min - 343.918) < 1e-2);
+  assert.ok(Math.abs(r.separation_at_distance_ft - 15.0) < 1e-9);
+  assert.ok(Math.abs(r.clearance_point_ft - 130.0) < 1e-9);
+  assert.ok(Math.abs(r.total_from_switch_point_ft - 208.0) < 1e-9);
+  // spec-v1545's worked example reads 15 ft "short of 13 ft -- so a car
+  // standing there is fouling". 15 ft is PAST 13 ft: the car is clear. The
+  // verdict follows the arithmetic, and the flip is pinned on both sides.
+  assert.strictEqual(r.fouls, false);
+  assert.strictEqual(_v1545({ ...base, distance_beyond_frog_ft: 120 }).fouls, true);
+  assert.strictEqual(_v1545({ ...base, distance_beyond_frog_ft: 130 }).fouls, false);
+  // A number 20 is flatter, and it puts the clearance point twice as far out
+  // -- which is why high-number turnouts consume so much real estate.
+  const twenty = _v1545({ ...base, frog_number: 20 });
+  assert.ok(Math.abs(twenty.clearance_point_ft - 260.0) < 1e-9);
+  assert.ok(twenty.frog_angle_deg < r.frog_angle_deg);
+  assert.ok(Math.abs(twenty.frog_angle_deg - 2.866) < 1e-3);
+  // The small-angle rule of thumb: the exact angle is very close to 1/N rad.
+  assert.ok(Math.abs(r.frog_angle_deg - (1 / 10) * (180 / Math.PI)) < 0.02);
+  // A number 1 frog is the degenerate 60 degree crossing, and it is legal.
+  assert.ok(Math.abs(_v1545({ ...base, frog_number: 1 }).frog_angle_deg - 60) < 1e-9);
+  assert.ok("error" in _v1545({ ...base, frog_number: 0.5 }));
+  assert.ok("error" in _v1545({ ...base, distance_beyond_frog_ft: 0 }));
+  assert.ok("error" in _v1545({ ...base, required_separation_ft: 0 }));
+  assert.ok("error" in _v1545({ ...base, lead_ft: 0 }));
+  assert.ok("error" in _v1545({ ...base, frog_number: Infinity }));
+});

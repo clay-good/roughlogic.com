@@ -1462,6 +1462,14 @@ const RELATED = {
   "nitrogen-pressure-test": ["vacuum-decay-test","superheat-subcool","recovery-cylinder"],
   "main-disinfection-chlorine": ["pipe-volume","hydrostatic-test","well-shock-chlorination"],
   "well-shock-chlorination": ["pipe-volume","main-disinfection-chlorine","disinfection-ct"],
+  // spec-v1539..v1545: the 2026-09-05 trade-expansion railroad track band.
+  "track-superelevation": ["degree-of-curve","spiral-curve","superelevation-safe-curve-speed"],
+  "degree-of-curve": ["track-superelevation","horizontal-curve","spiral-curve"],
+  "cwr-neutral-temperature": ["thermal-stress-restrained","rail-wear-condemning-limit","track-warp-fra-class"],
+  "rail-wear-condemning-limit": ["cwr-neutral-temperature","track-warp-fra-class","degree-of-curve"],
+  "track-warp-fra-class": ["track-superelevation","rail-wear-condemning-limit","ballast-section-volume"],
+  "ballast-section-volume": ["aggregate","stockpile-volume","track-warp-fra-class"],
+  "turnout-frog-lead": ["degree-of-curve","track-superelevation","ballast-section-volume"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   "grounding-electrode-conductor": ["bonding-jumper","egc-sizing","grounding-electrode"],
   "bonding-jumper": ["grounding-electrode-conductor","egc-sizing","service-load-standard"],

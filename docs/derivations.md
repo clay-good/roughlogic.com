@@ -2892,6 +2892,13 @@ cross-check.
 | calc-powerquality.js | `computeRlcReactanceResonance` | `{ frequency_hz = 60, resistance_ohm = 10, inductance_h = 0.05, capacitance_uf...` | _ | _ | _ |
 | calc-powerquality.js | `computeTddIeee519` | `{ isc_a = 0, il_a = 0, measured_tdd_pct = 0 } = {}` | _ | _ | _ |
 | calc-powerquality.js | `computeTransformerKFactor` | `{ i1 = 1, i3 = 0, i5 = 0, i7 = 0, i9 = 0, i11 = 0, i13 = 0 } = {}` | _ | _ | _ |
+| calc-rail.js | `computeBallastSection` | `{ top_width_ft = 0, depth_in = 0, side_slope_ratio = 1.5, length_ft = 0, dens...` | _ | _ | _ |
+| calc-rail.js | `computeCwrThermalForce` | `{ rail_area_in2 = 0, modulus_psi = 30000000, alpha_per_degf = 0.0000065, neut...` | _ | _ | _ |
+| calc-rail.js | `computeDegreeOfCurve` | `{ degree_of_curve = 0, radius_ft = 0, chord_length_ft = 62, central_angle_deg...` | _ | _ | _ |
+| calc-rail.js | `computeRailWearLimit` | `{ new_head_height_in = 0, new_head_width_in = 0, new_head_area_in2 = 0, verti...` | _ | _ | _ |
+| calc-rail.js | `computeTrackSuperelevation` | `{ degree_of_curve = 0, speed_mph = 0, actual_elevation_in = 0, allowable_unba...` | _ | _ | _ |
+| calc-rail.js | `computeTrackWarp` | `{ measured_a_in = 0, designed_a_in = 0, measured_b_in = 0, designed_b_in = 0,...` | _ | _ | _ |
+| calc-rail.js | `computeTurnoutFrogGeometry` | `{ frog_number = 0, distance_beyond_frog_ft = 0, required_separation_ft = 0, l...` | _ | _ | _ |
 | calc-realestate.js | `compute1031Timeline` | `{ sale_close_iso }` | _ | _ | _ |
 | calc-realestate.js | `computeAmortizationSchedule` | `{ principal, apr_percent, term_years, extra_monthly_principal }` | _ | _ | _ |
 | calc-realestate.js | `computeBlendedMortgageRate` | `{ balance_1 = 0, rate_1 = 0, balance_2 = 0, rate_2 = 0 } = {}` | _ | _ | _ |
@@ -3469,7 +3476,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2055.
+Row count: 2062.
 
 <!-- END function-corpus-v14 -->
 
@@ -4121,7 +4128,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (479 tiles)
+### Group E Construction (486 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4148,6 +4155,7 @@ per spec-v14 §13.1 second paragraph.
 | `atterberg-indices` | Atterberg Plasticity Indices and A-Line Classification | Atterberg limits / USCS A-line; spec-v328 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `attic-ventilation` | Attic Ventilation Net Free Area | IRC R806 attic-ventilation rule; spec-v98 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `awning-canopy-load` | Attached Canopy and Awning Wind Uplift and Snow Load | ASCE; q = 0.00256 V^2 Kz Kzt Kd; pf = 0.7 Ce Ct Is pg | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `ballast-section-volume` | Track Ballast Section Volume, Tonnage, and Surfacing Raise | Project (first-principles); the railroad's standard plans set the section | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `baluster-picket-count` | Guard Baluster / Picket Count (4-in Sphere Rule) | Guard baluster spacing (IRC 4 in sphe...; pickets = ceil((96-4)/(1.5+4)) = ceil(16.7) = 17; gaps = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bar-nesting` | Mixed-Length Bar Nesting (Cutting Stock) | one-dimensional cutting stock (first-...; Cut list 4 x 62, 6 x 38, 9 x 27, 12 x 14.5 in; 240 in sto... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `barstock-cutlist` | Bar / Tube Stock Cut List Yield | linear cut-list yield identity (first...; pieces = floor((240+0.125)/(14.5+0.125)) = 16; drop = 240... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4239,10 +4247,12 @@ per spec-v14 §13.1 second paragraph.
 | `curing-compound-coverage` | Concrete Curing Compound Coverage | liquid membrane cure coverage (ASTM C...; gallons = ceil(2500*1/200) = ceil(12.5) = 13; pails = cei... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `curtain-wall-mullion-deflection` | Curtain Wall Mullion Deflection and Required Stiffness | AAMA; L/175 up to 13 ft 6 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `curve-deflection-stakeout` | Curve Deflection-Angle Stakeout | AASHTO Green Book / FM 5-233 (by name); delta = (100/1000)(180/pi) = 5.7296 deg; chord = 1000 sin... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `cwr-neutral-temperature` | Continuous Welded Rail Thermal Force and Neutral Temperature | Project (first-principles); 49 CFR 213 CWR plan requirements named | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cylinder-storage-separation` | Compressed Gas Cylinder Storage Separation (OSHA 1926.350) | Occupational Safety and Health Admini...; 'Oxygen cylinders in storage shall be separated from fuel... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `deck-beam-post` | Deck Beam and Post Sizing (IRC R507) | IRC / AWC NDS; trib = 6 ft; w = 50 x 6 = 300 plf; M = 28,800 lb-in; doub... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `deck-board-takeoff` | Deck Board and Fastener Takeoff | First-principles deck-surface takeoff; 12 x 16 ft deck, 5.5 in boards, 0.25 in gap, 16 in OC, 10... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `deck-ledger-fasteners` | Deck Ledger Fastener Spacing (IRC R507.9) | IRC R507.9 (deck ledger connection); 16 ft ledger at 16 in OC -> floor(192/16)+1 = 13 fasteners | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `degree-of-curve` | Railroad Degree of Curve, Radius, and Middle Ordinate | Project (first-principles); 49 CFR 213 named for the alignment limits not evaluated | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `demo-debris` | Demolition Debris Weight | Project (industry debris-density rules); Wood-frame demo / 25 yd^3 -> 675 ft^3 / 16.875 tons / 30 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dewatering-rate` | Excavation Dewatering Pump Rate | First-principles volume / pumping rate; 20 x 12 pit, draw 3 ft in 30 min, inflow 40 gpm, 25% marg... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `diaphragm-collector-force` | Collector / Drag Strut Axial Force (ASCE 7 12.10) | ASCE 7-22 Section 12.10 (collectors a...; 300 plf dragged 40 ft -> 12000 lb; Omega0 2.5 -> 30000 lb... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4386,6 +4396,7 @@ per spec-v14 §13.1 second paragraph.
 | `press-brake-tonnage` | Press-Brake Air-Bend Tonnage | Press-brake air-bend tonnage chart + ...; T 0.125 in, L 4 ft, V 1 in, mild steel -> 8.9844 tons/ft,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `protruding-object-check` | Protruding Objects and Headroom (2010 ADA Standards 307) | US Department of Justice / US Access ...; 307.2: 'Objects with leading edges more than 27 inches an... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rafter` | Rafter Length | Project (first-principles); Pythagoras on rise / 12 run with overhang | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `rail-wear-condemning-limit` | Rail Head Wear, Combined Limit, and Tonnage to Replacement | Project (first-principles); limits entered from the track owner's engineering instruc... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rain-load-ponding` | Roof Rain Load and Secondary-Drainage Flow (ASCE 7 Ch. 8) | ASCE 7 Ch. 8 + IPC drainage; spec-v224 section 2.1 pinned example (typical scupper) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rain-on-snow-surcharge` | Rain-on-Snow Surcharge (ASCE 7-22 7.10) | ASCE 7-22 §7.10; spec-v468 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ramp-detail-check` | Ramp Cross Slope, Width, and Edge Protection (2010 ADA Standards 405) | US Department of Justice / US Access ...; 405.5: 'The clear width of a ramp run and, where handrail... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4554,10 +4565,13 @@ per spec-v14 §13.1 second paragraph.
 | `thermal-stress-restrained` | Restrained Thermal Stress and Force | mechanics of materials; spec-v360 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `thinset-coverage` | Thin-Set Mortar Coverage | Manufacturer thin-set coverage charts...; spec-v95 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tile-count` | Tile Count and Grout Volume | Project (first-principles); 100 ft^2 with 12x12 tiles, default 1/8 in grout, 10% wast... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `track-superelevation` | Railroad Curve Superelevation, Unbalance, and Maximum Speed | Project (first-principles); 49 CFR 213 named for the elevation and unbalance caps | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `track-warp-fra-class` | Track Cross-Level Deviation and Warp Against a Class Limit | Project (first-principles); 49 CFR 213 named as the source of the class limits, which... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `traffic-taper-length` | Work-Zone Merging Taper Length and Device Count (MUTCD) | MUTCD merging-taper identity (public-...; S >= 45: L = 12*55 = 660 ft; devices = ceil(660/40)+1 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `trim-linear-footage` | Trim Linear Footage and Miters | finish-carpentry practice; spec-v440 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tube-bend-wall-thinning` | Tube Bend Wall Thinning and Bend Ratio | Project (first-principles); wall x CLR / (CLR + OD/2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `turning-clear-floor-space` | Turning Space and Clear Floor Space (2010 ADA Standards 304, 305) | US Department of Justice / US Access ...; 305.3 gives 30 in by 48 in and 305.5 requires it 'positio... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `turnout-frog-lead` | Turnout Frog Angle, Separation, and Clearance Point | Project (first-principles); lead entered from the railroad's standard plan | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `unit-cost-earthwork` | Earthwork Production Unit Cost | Production unit-cost identity (first-...; hourly = 150+65 = 215; unit cost = 215/656 = $0.328/cy | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `valley-flashing-takeoff` | Valley Flashing Takeoff (Metal, Pieces, Ice Barrier) | framing-square 17-inch rule; 6:12 gives sqrt(36+288)/12 = sqrt(324)/12 = 18/12 = exact... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `vapor-barrier-rolls` | Under-Slab Vapor Barrier Rolls and Seam Tape | Roll-takeoff identity (first-principles); rolls = ceil(3000*1.10/1000) = ceil(3.3) = 4; seam tape =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5446,6 +5460,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1804. Fixture-covered or reference-cadence: 1804 / 1804.
+Tile count: 1811. Fixture-covered or reference-cadence: 1811 / 1811.
 
 <!-- END tile-index-v14 -->

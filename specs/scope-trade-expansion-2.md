@@ -1,6 +1,7 @@
 # Scope: The 2026-09-05 Trade Expansion (specs v1450-v1749, 300 New Tiles)
 
-> **Status: PROPOSED (2026-09-05). Program charter, no catalog change of its own.**
+> **Status: IN PROGRESS (2026-09-05). Program charter, no catalog change of its own.**
+> **Band 1 of the program has landed: v1539-v1545, the railroad track bench, 1,804 -> 1,811.**
 > Inherits the spec-v106 trades-only charter and every convention through spec-v1449.
 > Each of the 300 tiles is specified in its own file, `spec-v1450.md` through `spec-v1749.md`.
 
@@ -528,12 +529,26 @@ things must happen **before** the first band, not during it:
 
 1. **Bump every shared-registry gzip cap** (`tools-data`, `citations`, `tile-meta`) for 300 rows,
    per trap 7 of the previous program.
-2. **Land the lazy `TOOLS` shard** (spec-v10 SS H.1/H.2). The home-view JS budget closed the last
+2. ~~**Land the lazy `TOOLS` shard** (spec-v10 SS H.1/H.2). The home-view JS budget closed the last
    program at 94.6% of cap with 1,804 tiles. It does not have room for 300 more, and this is the
-   named preferred remediation. **This program is blocked on it.**
+   named preferred remediation. **This program is blocked on it.**~~ **DONE** (`158b260c`, before
+   this charter was written). `tool-modules.js` is that shard, and the home-view payload sits at
+   50.6% of budget with the first band landed. The block is lifted.
 3. **Register the seventeen new modules** in `tool-modules.js`, the `citations.test.js` per-group
    counts, and `check-module-sizes.mjs`. No `GROUPS` or `GROUP_NAMES` change is needed, because no
    category is added.
+
+### Landing progress
+
+| Band | Specs | Module | Tiles | Commit |
+| --- | --- | --- | --- | --- |
+| 1 | v1539-v1545 | `calc-rail.js` (new) | 7 | railroad track and equipment; catalog 1,804 -> 1,811 |
+
+Two of the seven specs in band 1 were internally wrong and shipped corrected: spec-v1541's
+2,450 lb per degF is not what its own stated inputs give (13.0 x 30,000,000 x 0.0000065 is 2,535,
+and 61,262 and 208,292 follow from the wrong figure), and spec-v1545's worked example calls a car
+15 ft from the main "fouling" against a 13 ft requirement when it is clear. Recompute every spec
+example line by line before coding it.
 
 ## 8. See also
 
