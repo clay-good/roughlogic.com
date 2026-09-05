@@ -2770,6 +2770,16 @@ cross-check.
 | calc-metalair.js | `computeDuctTransitionLength` | `{ large_dim_in = 20, small_dim_in = 12, slope_deg = 15 } = {}` | _ | _ | _ |
 | calc-metalair.js | `computeGrooveWeldLengthForLoad` | `{ applied_load_lb = 0, weld_type = "PJP", effective_throat_in = 0, base_thick...` | _ | _ | _ |
 | calc-metalair.js | `computeGrooveWeldStrength` | `{ weld_type = "PJP", effective_throat_in = 0, base_thickness_in = 0, length_i...` | _ | _ | _ |
+| calc-mining.js | `computeBeltFeederCapacity` | `{ opening_width_in = 0, opening_height_in = 0, belt_speed_fpm = 0, bulk_densi...` | _ | _ | _ |
+| calc-mining.js | `computeBlastAirblastOverpressure` | `{ distance_ft = 0, charge_per_delay_lb = 0, airblast_k = 0.2, airblast_b = 1....` | _ | _ | _ |
+| calc-mining.js | `computeBlastBurdenSpacing` | `{ hole_diameter_in = 0, burden_ratio = 25, bench_height_ft = 0, spacing_ratio...` | _ | _ | _ |
+| calc-mining.js | `computeBlastPowderFactor` | `{ burden_ft = 0, spacing_ft = 0, bench_height_ft = 0, hole_diameter_in = 0, s...` | _ | _ | _ |
+| calc-mining.js | `computeBlastScaledDistancePPV` | `{ distance_ft = 0, charge_per_delay_lb = 0, site_k = 160, site_b = 1.6, ppv_l...` | _ | _ | _ |
+| calc-mining.js | `computeBlastStemmingLength` | `{ burden_ft = 0, hole_diameter_in = 0, proposed_stemming_ft = 0, burden_ratio...` | _ | _ | _ |
+| calc-mining.js | `computeCrusherReductionRatio` | `{ feed_size_in = 0, product_size_in = 0, stages = 2, machine_ratio_low = 3, m...` | _ | _ | _ |
+| calc-mining.js | `computeDustCollectorAirToCloth` | `{ airflow_cfm = 0, bag_count = 0, bag_diameter_in = 0, bag_length_ft = 0, ran...` | _ | _ | _ |
+| calc-mining.js | `computeDustDeflagrationVentArea` | `{ volume_cuft = 0, kst_bar_m_s = 0, p_red_psig = 0, p_stat_psig = 0, length_t...` | _ | _ | _ |
+| calc-mining.js | `computeScreenDeckCapacity` | `{ deck_width_ft = 0, deck_length_ft = 0, base_capacity_tph_per_sqft = 0, over...` | _ | _ | _ |
 | calc-motor.js | `computeMotorAccelerationTime` | `{ inertia_lbft2 = 100, speed_change_rpm = 1750, net_accel_torque_lbft = 50 } ...` | _ | _ | _ |
 | calc-motor.js | `computeMotorFaultContribution` | `{ motor_fla_a = 0, x_subtransient_pu = 0.167, utility_fault_a = 0 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMotorLockedRotorKva` | `{ horsepower = 0, code_letter = "G", voltage_v = 0, phase = 3 } = {}` | _ | _ | _ |
@@ -3498,7 +3508,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2084.
+Row count: 2094.
 
 <!-- END function-corpus-v14 -->
 
@@ -4152,7 +4162,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (506 tiles)
+### Group E Construction (516 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4186,8 +4196,14 @@ per spec-v14 §13.1 second paragraph.
 | `baseplate-grout-volume` | Non-Shrink Grout Volume Under a Base Plate | Base-plate grout-volume identity (fir...; grout = (324-64)*1.5 = 390 in^3; ft^3 = 390/1728*1.10 = 0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `beam-loading` | Beam Loading | Project (first-principles); 200 plf / 12 ft / E = 1.6e6 psi / 4x10 -> M = 3600 lb-ft,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `beam-reactions` | Simple-Span Beam Reactions and Max Moment | Statics / AISC simple-beam diagrams; L 16 ft, w 200 plf -> R 1600 lb, M_max 6400 ft-lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `belt-feeder-capacity` | Belt Feeder Volumetric Capacity and Density Check | Project (first-principles); a feeder relation, not a conveyor's | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bend-allowance` | Sheet Metal Bend Allowance | Project (first-principles); BA = (pi/180) * 90 * (0.125 + 0.44 * 0.06) = 0.2378; setb... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bend-springback` | Sheet-Metal Bend Springback | Machinery's Handbook sheet-metal spri...; x = 1*50000/(29e6*0.1) = 0.017241; Ks = 4x^3-3x+1 = 0.948... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `blast-airblast-overpressure` | Blast Airblast Overpressure and Confinement Screen | Project (first-principles); constants depend on confinement and are entered | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `blast-burden-spacing` | Blast Pattern Burden, Spacing, and Stiffness Ratio | Project (first-principles); published pattern ratio ranges | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `blast-powder-factor` | Blasting Powder Factor and Explosive Load per Hole | Project (first-principles); the blaster in charge and the site blast plan govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `blast-scaled-distance-ppv` | Blast Vibration Scaled Distance and Peak Particle Velocity | Project (first-principles); site constants entered; a seismograph regression is the d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `blast-stemming-length` | Blast Hole Stemming Length and Flyrock Screen | Project (first-principles); flyrock is a fatality mechanism; the blaster in charge go... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `board-footage` | Lumber Board Footage | Project (first-principles); Standard lumber-yard board-foot identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bolt-group-eccentric` | Eccentric Bolt Group in Shear (Elastic Vector Method) | AISC Manual Part 7 (elastic vector me...; spec-v266 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bolt-shear-bearing` | Bolt Shear + Bearing / Tearout Strength (AISC 360 J3) | AISC 360-22 J3.6 / J3.10; spec-v267 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4269,6 +4285,7 @@ per spec-v14 §13.1 second paragraph.
 | `counterweight-balance` | Elevator Counterweight Balance and Unbalanced Load | Project (first-principles); ASME A17.1 governs traction | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `crane-lift-quick` | Crane Lift Plan Quick-Math | ASME B30.5 / manufacturer load-chart ...; 8000 lb load + 200 lb rigging / 2-leg sling at 60 deg fro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `crawl-space-ventilation` | Crawl Space (Under-Floor) Ventilation Net Free Area | International Code Council; 'The minimum net area of ventilation openings shall be no... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `crusher-reduction-ratio` | Crusher Reduction Ratio and Circuit Stage Check | Project (first-principles); machine ranges entered; the manufacturer's data governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `curb-gutter-volume` | Curb-and-Gutter Concrete Volume | Linear-pour identity (first-principles); volume = 2.0*300/27*1.08 = 24.0; cy/100LF = 2.0*100/27 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `curing-compound-coverage` | Concrete Curing Compound Coverage | liquid membrane cure coverage (ASTM C...; gallons = ceil(2500*1/200) = ceil(12.5) = 13; pails = cei... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `curtain-wall-mullion-deflection` | Curtain Wall Mullion Deflection and Required Stiffness | AAMA; L/175 up to 13 ft 6 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4301,7 +4318,9 @@ per spec-v14 §13.1 second paragraph.
 | `duct-wrap-takeoff` | Duct Wrap / Liner Material Takeoff | Duct-wrap takeoff identity (first-pri...; perimeter = 2*(20+12)/12 = 5.33 ft; wrap = 5.33*40*1.15 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dump-truck-loads` | Dump Truck Governing Payload and Load Count | Governing-payload identity (first-pri...; weight-limited = 40000/2800 = 14.29 > 12, payload = 12; l... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dumpster-count` | Roll-Off Dumpster / Haul Count | Roll-off haul-count identity (first-p...; by vol = ceil(60/(30*0.7)) = 3; by wt = ceil(45/8) = 6; h... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `dust-collector-air-to-cloth` | Dust Collector Air-to-Cloth Ratio and Bag Derate | Project (first-principles); ranges entered as broad conventions | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dust-control-water` | Dust-Control Watering Volume and Truck Trips | Dust-control watering identity (first...; area = 2000*20/9 = 4,444 sy; gal/app = 4444*0.5 = 2,222; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `dust-deflagration-vent-area` | Dust Deflagration Vent Area Screen (NFPA 68) | Project (first-principles); Kst comes from testing the actual dust; a qualified engin... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `earthwork-end-area` | Earthwork Volume (End-Area) | FHWA / state-DOT earthwork references...; two 100 ft^2 sections 100 ft apart -> 10000 ft^3 (370.37 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `egress-capacity` | Egress Exit Count and Required Width (IBC 1005.3 / 1006.2) | IBC 2021 §1005.3 / §1006.2 / §1010.1.1; spec-v243 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `egress-travel-distance` | Egress Travel Distance, Common Path, and Dead-End Check (IBC Chapter 10) | IBC 2021 §1017 / §1006.2.1 / §1020.5; spec-v252 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4493,6 +4512,7 @@ per spec-v14 §13.1 second paragraph.
 | `scaffold-mudsill-bearing` | Scaffold Mudsill Bearing Pressure and Sill Length | Bearing-pressure identity / OSHA 1926...; area = 9.25*24/144 = 1.542 ft^2; bearing = 4000/1.542 = 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `scaffold-platform-check` | Scaffold Platform and Planking Check (OSHA 1926.451(b)) | Occupational Safety and Health Admini...; 'Each platform... 10 feet or less in length shall not ext... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `scaffold-takeoff` | Frame Scaffold Material Takeoff | Frame-scaffold takeoff geometry (firs...; bays = ceil(40/7) = 6; frames = 7*3 = 21; braces = 2*6*3 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `screen-deck-capacity` | Vibrating Screen Deck Capacity and Feed Check | Project (first-principles); every factor comes from the screen manufacturer's tables | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sealant-joint-yield` | Caulk / Sealant Cartridge Yield from Joint Size | Sealant cartridge-yield identity (fir...; cross = 0.375*0.25 = 0.09375 in^2; lf/cart = 20.5/0.09375... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `secondary-compression-settlement` | Secondary Compression (Creep) Settlement | Das, Principles of Geotechnical Engin...; C-alpha-eps = C-alpha/(1+ep) = 0.02/1.85 = 0.010811. Ss =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `section-properties` | Cross-Section Properties (A, I, S, r) | mechanics of materials; spec-v342 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5504,6 +5524,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1833. Fixture-covered or reference-cadence: 1833 / 1833.
+Tile count: 1843. Fixture-covered or reference-cadence: 1843 / 1843.
 
 <!-- END tile-index-v14 -->

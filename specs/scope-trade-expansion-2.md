@@ -1,7 +1,7 @@
 # Scope: The 2026-09-05 Trade Expansion (specs v1450-v1749, 300 New Tiles)
 
 > **Status: IN PROGRESS (2026-09-05). Program charter, no catalog change of its own.**
-> **Bands 1-3 have landed: v1539-v1545 (railroad track), v1648-v1658 (elevator and escalator), and v1571-v1581 (door hardware and locksmithing), 1,804 -> 1,833.**
+> **Bands 1-4 have landed: railroad track, elevator and escalator, door hardware and locksmithing, and mining and quarry, 1,804 -> 1,843.**
 > Inherits the spec-v106 trades-only charter and every convention through spec-v1449.
 > Each of the 300 tiles is specified in its own file, `spec-v1450.md` through `spec-v1749.md`.
 
@@ -545,8 +545,9 @@ things must happen **before** the first band, not during it:
 | 1 | v1539-v1545 | `calc-rail.js` (new) | 7 | railroad track and equipment; catalog 1,804 -> 1,811 |
 | 2 | v1648-v1658 | `calc-elevator.js` (new) | 11 | elevator and escalator equipment; catalog 1,811 -> 1,822 |
 | 3 | v1571-v1581 | `calc-doorhardware.js` (new) | 11 | door hardware and locksmithing; catalog 1,822 -> 1,833; nine group E, two group A |
+| 4 | v1507-v1516 | `calc-mining.js` (new) | 10 | mining, quarry, and drill-and-blast; catalog 1,833 -> 1,843 |
 
-**Seven of the twenty-nine specs built so far were internally wrong and shipped corrected.** In band 1:
+**Seven of the thirty-nine specs built so far were internally wrong and shipped corrected.** Band 4 was clean: all ten worked examples reproduced exactly. In band 1:
 spec-v1541's 2,450 lb per degF is not what its own stated inputs give (13.0 x 30,000,000 x
 0.0000065 is 2,535, and 61,262 and 208,292 follow from the wrong figure), and spec-v1545's worked
 example calls a car 15 ft from the main "fouling" against a 13 ft requirement when it is clear.

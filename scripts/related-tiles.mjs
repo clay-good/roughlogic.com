@@ -1494,6 +1494,17 @@ const RELATED = {
   "fire-door-clearance": ["door-closer-opening-force","panic-hardware-force","lock-backset-strike-layout"],
   "gate-operator-duty-cycle": ["chain-link-fence-takeoff","maglock-holding-leverage","motor-shaft-torque"],
   "revolving-door-throughput": ["door-clear-width","elevator-handling-capacity","escalator-capacity"],
+  // spec-v1507..v1516: the 2026-09-05 trade-expansion mining and quarry band.
+  "blast-powder-factor": ["blast-burden-spacing","blast-stemming-length","blast-scaled-distance-ppv"],
+  "blast-burden-spacing": ["blast-powder-factor","blast-stemming-length","blast-airblast-overpressure"],
+  "blast-scaled-distance-ppv": ["blast-airblast-overpressure","blast-powder-factor","blast-stemming-length"],
+  "blast-airblast-overpressure": ["blast-scaled-distance-ppv","blast-stemming-length","blast-powder-factor"],
+  "blast-stemming-length": ["blast-burden-spacing","blast-airblast-overpressure","blast-powder-factor"],
+  "crusher-reduction-ratio": ["screen-deck-capacity","belt-feeder-capacity","aggregate"],
+  "screen-deck-capacity": ["crusher-reduction-ratio","belt-feeder-capacity","fine-aggregate-grading"],
+  "belt-feeder-capacity": ["belt-conveyor-tension-power","screen-deck-capacity","crusher-reduction-ratio"],
+  "dust-collector-air-to-cloth": ["dust-deflagration-vent-area","dust-collection-duct","hood-exhaust"],
+  "dust-deflagration-vent-area": ["dust-collector-air-to-cloth","dust-collection-duct","hood-exhaust"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   "grounding-electrode-conductor": ["bonding-jumper","egc-sizing","grounding-electrode"],
   "bonding-jumper": ["grounding-electrode-conductor","egc-sizing","service-load-standard"],

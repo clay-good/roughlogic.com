@@ -95348,6 +95348,534 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "blast-powder-factor",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "8 by 10 ft pattern, 30 ft bench, 3.5 in holes, ANFO at SG 1.25 in 165 pcf rock",
+   "source_edition_or_year": "loading density = (pi/4) d^2 x 62.4 x SG; PF = charge / tons",
+   "source_section_or_page": "the blaster in charge and the site blast plan govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "burden_ft": 8,
+    "spacing_ft": 10,
+    "bench_height_ft": 30,
+    "hole_diameter_in": 3.5,
+    "subdrill_ft": 2.4,
+    "stemming_ft": 5.6,
+    "explosive_sg": 1.25,
+    "rock_density_pcf": 165,
+    "hole_count": 40
+   },
+   "outputs": {
+    "loading_density_lb_per_ft": {
+     "value": 5.2114,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "charge_length_ft": {
+     "value": 26.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "charge_weight_lb": {
+     "value": 139.667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rock_tons_per_hole": {
+     "value": 198,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "powder_factor_lb_per_ton": {
+     "value": 0.70539,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rock_volume_cy": {
+     "value": 88.889,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blast-burden-spacing",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "3.5 in hole at a burden ratio of 25 on a 30 ft bench",
+   "source_edition_or_year": "B = Kb x d / 12; stiffness = H / B",
+   "source_section_or_page": "published pattern ratio ranges",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "hole_diameter_in": 3.5,
+    "burden_ratio": 25,
+    "bench_height_ft": 30,
+    "spacing_ratio": 1.15,
+    "subdrill_ratio": 0.3,
+    "stemming_ratio": 0.7
+   },
+   "outputs": {
+    "burden_ft": {
+     "value": 7.29167,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "spacing_ft": {
+     "value": 8.38542,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "subdrill_ft": {
+     "value": 2.1875,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "stemming_ft": {
+     "value": 5.10417,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "stiffness_ratio": {
+     "value": 4.11429,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_diameter_in": {
+     "value": 7.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blast-scaled-distance-ppv",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "house 1,200 ft away, 340 lb on the largest delay, generic constants",
+   "source_edition_or_year": "SD = D / sqrt(W); PPV = K x SD^-b",
+   "source_section_or_page": "site constants entered; a seismograph regression is the defensible basis",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "distance_ft": 1200,
+    "charge_per_delay_lb": 340,
+    "site_k": 160,
+    "site_b": 1.6,
+    "ppv_limit_in_s": 1,
+    "required_scaled_distance": 50
+   },
+   "outputs": {
+    "scaled_distance": {
+     "value": 65.0791,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "predicted_ppv_in_s": {
+     "value": 0.20073,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_charge_lb": {
+     "value": 576,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "compliant_distance_ft": {
+     "value": 439.86,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blast-airblast-overpressure",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "structure 1,200 ft away, 340 lb per delay, well stemmed, 20 dB venting penalty",
+   "source_edition_or_year": "cube-root scaled distance; dB = 20 log10(P / 2.9e-9 psi)",
+   "source_section_or_page": "constants depend on confinement and are entered",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "distance_ft": 1200,
+    "charge_per_delay_lb": 340,
+    "airblast_k": 0.2,
+    "airblast_b": 1.2,
+    "limit_db": 133,
+    "confinement_penalty_db": 20
+   },
+   "outputs": {
+    "cube_root_scaled_distance": {
+     "value": 171.931,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "overpressure_db": {
+     "value": 103.124,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "limit_psi": {
+     "value": 0.0129538,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vented_db": {
+     "value": 123.124,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vented_pressure_factor": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "halving_gain_pct": {
+     "value": 25.9921,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blast-stemming-length",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "8 ft burden with 3.5 in holes, loaded to only 4 ft of stemming",
+   "source_edition_or_year": "the larger of 0.7 x burden and 20 hole diameters",
+   "source_section_or_page": "flyrock is a fatality mechanism; the blaster in charge governs",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "burden_ft": 8,
+    "hole_diameter_in": 3.5,
+    "proposed_stemming_ft": 4,
+    "burden_ratio_low": 0.7,
+    "burden_ratio_high": 1.0,
+    "diameter_multiple": 20
+   },
+   "outputs": {
+    "by_burden_ft": {
+     "value": 5.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "by_diameter_ft": {
+     "value": 5.83333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "governing_ft": {
+     "value": 5.83333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "achieved_ratio": {
+     "value": 0.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "stone_min_in": {
+     "value": 0.175,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "stone_max_in": {
+     "value": 0.35,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "crusher-reduction-ratio",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "24 in run-of-quarry to a 0.75 in product across two stages, jaw actually making 6 in",
+   "source_edition_or_year": "R = F / P; circuit ratios multiply",
+   "source_section_or_page": "machine ranges entered; the manufacturer's data governs",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "feed_size_in": 24,
+    "product_size_in": 0.75,
+    "stages": 2,
+    "machine_ratio_low": 3,
+    "machine_ratio_high": 6,
+    "actual_intermediate_in": 6
+   },
+   "outputs": {
+    "total_ratio": {
+     "value": 32,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "per_stage_ratio": {
+     "value": 5.65685,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "first_intermediate_in": {
+     "value": 4.24264,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "stages_required": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "actual_downstream_ratio": {
+     "value": 8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "screen-deck-capacity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "8 by 20 ft second deck at 3.5 TPH per sq ft with five correction factors, fed 400 TPH",
+   "source_edition_or_year": "capacity = area x base rate x the product of the factors",
+   "source_section_or_page": "every factor comes from the screen manufacturer's tables",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "deck_width_ft": 8,
+    "deck_length_ft": 20,
+    "base_capacity_tph_per_sqft": 3.5,
+    "oversize_factor": 1.1,
+    "halfsize_factor": 1.15,
+    "deck_factor": 0.9,
+    "wet_factor": 1.25,
+    "efficiency_factor": 0.95,
+    "actual_feed_tph": 400
+   },
+   "outputs": {
+    "screen_area_sqft": {
+     "value": 160,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "combined_multiplier": {
+     "value": 1.352,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "capacity_tph": {
+     "value": 757.102,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "percent_of_capacity": {
+     "value": 52.833,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "area_required_sqft": {
+     "value": 84.5328,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "belt-feeder-capacity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "36 in feeder with an 8 in gate at 60 fpm on 100 pcf material, and the same setting on 160 pcf ore",
+   "source_edition_or_year": "Q = w x h x v; TPH = Q x density / 2,000",
+   "source_section_or_page": "a feeder relation, not a conveyor's",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "opening_width_in": 36,
+    "opening_height_in": 8,
+    "belt_speed_fpm": 60,
+    "bulk_density_pcf": 100,
+    "target_tph": 400,
+    "alternative_density_pcf": 160
+   },
+   "outputs": {
+    "volumetric_cfh": {
+     "value": 7200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tph": {
+     "value": 360,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_speed_fpm": {
+     "value": 66.6667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_opening_in": {
+     "value": 8.88889,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alternative_tph": {
+     "value": 576,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "density_change_pct": {
+     "value": 60,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dust-collector-air-to-cloth",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "pulse-jet collector, 200 bags at 6 in by 8 ft, 12,000 cfm, 30 bags blanked off",
+   "source_edition_or_year": "cloth area = n x pi x d x L; A/C = CFM / area",
+   "source_section_or_page": "ranges entered as broad conventions",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "airflow_cfm": 12000,
+    "bag_count": 200,
+    "bag_diameter_in": 6,
+    "bag_length_ft": 8,
+    "range_low": 3,
+    "range_high": 5,
+    "bags_out_of_service": 30
+   },
+   "outputs": {
+    "cloth_area_sqft": {
+     "value": 2513.27,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "air_to_cloth": {
+     "value": 4.77465,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "derated_cloth_area_sqft": {
+     "value": 2136.28,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "derated_air_to_cloth": {
+     "value": 5.61723,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "derated_increase_pct": {
+     "value": 17.6471,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_airflow_cfm": {
+     "value": 12566.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dust-deflagration-vent-area",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "3,500 cu ft collector, tested Kst 150 (St1), rated 1.5 psig, panels at 0.5 psig",
+   "source_edition_or_year": "the NFPA 68 vent-area relation",
+   "source_section_or_page": "Kst comes from testing the actual dust; a qualified engineer governs",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "volume_cuft": 3500,
+    "kst_bar_m_s": 150,
+    "p_red_psig": 1.5,
+    "p_stat_psig": 0.5,
+    "length_to_diameter": 2,
+    "stronger_p_red_psig": 5,
+    "available_vent_area_sqft": 12
+   },
+   "outputs": {
+    "volume_m3": {
+     "value": 99.109,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vent_area_sqft": {
+     "value": 16.0428,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vent_area_at_stronger_sqft": {
+     "value": 8.78696,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "stronger_saving_pct": {
+     "value": 45.2277,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "shortfall_sqft": {
+     "value": 4.04283,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

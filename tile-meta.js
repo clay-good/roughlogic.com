@@ -849,6 +849,17 @@ const _TILES = [
   ["fire-door-clearance", "E"],
   ["gate-operator-duty-cycle", "E"],
   ["revolving-door-throughput", "E"],
+  // spec-v1507..v1516 mining, quarry, and drill-and-blast band (trade expansion 2, Group E)
+  ["blast-powder-factor", "E"],
+  ["blast-burden-spacing", "E"],
+  ["blast-scaled-distance-ppv", "E"],
+  ["blast-airblast-overpressure", "E"],
+  ["blast-stemming-length", "E"],
+  ["crusher-reduction-ratio", "E"],
+  ["screen-deck-capacity", "E"],
+  ["belt-feeder-capacity", "E"],
+  ["dust-collector-air-to-cloth", "E"],
+  ["dust-deflagration-vent-area", "E"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   ["grounding-electrode-conductor", "A"],
   ["bonding-jumper", "A"],

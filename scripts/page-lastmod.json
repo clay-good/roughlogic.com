@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "15131674e0d094af",
+      "sha": "9476dd187de523f3",
       "date": "2026-09-05"
     },
     "/tools/": {
-      "sha": "11f73d1621d253d9",
+      "sha": "a143d1acfd6a14df",
       "date": "2026-09-05"
     },
     "/groups/accounting/": {
-      "sha": "2f07f0e6dbd8efd5",
+      "sha": "e33797df1c176444",
       "date": "2026-09-05"
     },
     "/groups/agriculture/": {
-      "sha": "3e5c725ca4be5c7c",
+      "sha": "189c34b63991d466",
       "date": "2026-09-05"
     },
     "/groups/construction/": {
-      "sha": "22bc65e264ff0a41",
+      "sha": "da450e002579f910",
       "date": "2026-09-05"
     },
     "/groups/cross-trade/": {
-      "sha": "814bd22a1f51a987",
+      "sha": "f43d2f56f43ab7cd",
       "date": "2026-09-05"
     },
     "/groups/educators/": {
-      "sha": "4c6164c52e5c58af",
+      "sha": "fefed66223522ac5",
       "date": "2026-09-05"
     },
     "/groups/electrical/": {
-      "sha": "5a2df90093448eaa",
+      "sha": "e44bb7590c639cb7",
       "date": "2026-09-05"
     },
     "/groups/field/": {
-      "sha": "1d6bf924f34686aa",
+      "sha": "24d421482b477d9b",
       "date": "2026-09-05"
     },
     "/groups/fire-ground/": {
-      "sha": "4d2269e3668e76d9",
+      "sha": "451aa6a93fd6177a",
       "date": "2026-09-05"
     },
     "/groups/historical/": {
-      "sha": "a42a15438639fd55",
+      "sha": "559797b5287b6e76",
       "date": "2026-09-05"
     },
     "/groups/hvac/": {
-      "sha": "5e51e8b364f2fbdd",
+      "sha": "108ff2ba68901b9e",
       "date": "2026-09-05"
     },
     "/groups/kitchen/": {
-      "sha": "a20b199affd37251",
+      "sha": "d40890ff83b27402",
       "date": "2026-09-05"
     },
     "/groups/lab/": {
-      "sha": "2e6e53347627444d",
+      "sha": "e11a52c6ff7eb410",
       "date": "2026-09-05"
     },
     "/groups/mechanic/": {
-      "sha": "494c451e6a658e10",
+      "sha": "6b2790a6cf2d218e",
       "date": "2026-09-05"
     },
     "/groups/plumbing/": {
-      "sha": "5188e303a29c82e9",
+      "sha": "41ca068652b78f30",
       "date": "2026-09-05"
     },
     "/groups/real-estate/": {
-      "sha": "5f9ea0f451ee90e1",
+      "sha": "f0f9bf5a3ddcb587",
       "date": "2026-09-05"
     },
     "/groups/references/": {
-      "sha": "dee4666873362117",
+      "sha": "a01bb6bca2796e7f",
       "date": "2026-09-05"
     },
     "/groups/restoration/": {
-      "sha": "e9b1867853f11c90",
+      "sha": "7a81bea958bb142d",
       "date": "2026-09-05"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "fa6a02b744ad0b23",
+      "sha": "47642cd855597ca8",
       "date": "2026-09-05"
     },
     "/groups/stage/": {
-      "sha": "f8391686db9e2b4e",
+      "sha": "3e1b4c2d314dc59d",
       "date": "2026-09-05"
     },
     "/groups/trucking/": {
-      "sha": "3a7f28d42c60195f",
+      "sha": "392fe8d575262fa3",
       "date": "2026-09-05"
     },
     "/groups/water/": {
-      "sha": "e03da8dc2e700e54",
+      "sha": "5a09af061d1be917",
       "date": "2026-09-05"
     },
     "/tools/aav-install-check/": {
@@ -529,6 +529,10 @@
       "sha": "379f5ce7b74ec213",
       "date": "2026-09-01"
     },
+    "/tools/belt-feeder-capacity/": {
+      "sha": "6113800be329558b",
+      "date": "2026-09-05"
+    },
     "/tools/belt-hp-transmitted/": {
       "sha": "7f409571464c2a7c",
       "date": "2026-09-01"
@@ -560,6 +564,26 @@
     "/tools/bifacial-pv-gain/": {
       "sha": "4704175330e9f604",
       "date": "2026-09-01"
+    },
+    "/tools/blast-airblast-overpressure/": {
+      "sha": "9f12b0f847562510",
+      "date": "2026-09-05"
+    },
+    "/tools/blast-burden-spacing/": {
+      "sha": "bca6961ad69eb70c",
+      "date": "2026-09-05"
+    },
+    "/tools/blast-powder-factor/": {
+      "sha": "16996b4a4e01a9f3",
+      "date": "2026-09-05"
+    },
+    "/tools/blast-scaled-distance-ppv/": {
+      "sha": "5ce3e5620befe0ff",
+      "date": "2026-09-05"
+    },
+    "/tools/blast-stemming-length/": {
+      "sha": "0272226583f1511e",
+      "date": "2026-09-05"
     },
     "/tools/blended-mortgage-rate/": {
       "sha": "0e3e1b1a41031e8a",
@@ -1617,6 +1641,10 @@
       "sha": "70e05655f0267624",
       "date": "2026-09-01"
     },
+    "/tools/crusher-reduction-ratio/": {
+      "sha": "113578524386f1d2",
+      "date": "2026-09-05"
+    },
     "/tools/culvert-headwater/": {
       "sha": "3c27e64632cf9a8f",
       "date": "2026-09-01"
@@ -2113,9 +2141,17 @@
       "sha": "31e470be4c3abf6b",
       "date": "2026-09-01"
     },
+    "/tools/dust-collector-air-to-cloth/": {
+      "sha": "3de7498f9933e68f",
+      "date": "2026-09-05"
+    },
     "/tools/dust-control-water/": {
       "sha": "7b973fc14eb46598",
       "date": "2026-09-01"
+    },
+    "/tools/dust-deflagration-vent-area/": {
+      "sha": "15467f2fe84025ad",
+      "date": "2026-09-05"
     },
     "/tools/dynamic-compression-ratio/": {
       "sha": "7ed4a744a768057e",
@@ -5437,6 +5473,10 @@
       "sha": "865696f8a88156ec",
       "date": "2026-09-01"
     },
+    "/tools/screen-deck-capacity/": {
+      "sha": "e2cd8280f61c0401",
+      "date": "2026-09-05"
+    },
     "/tools/screw-conveyor/": {
       "sha": "5166622c963710e1",
       "date": "2026-09-01"
@@ -6254,8 +6294,8 @@
       "date": "2026-09-01"
     },
     "/tools/steel-column-stiffness-ratio-g/": {
-      "sha": "4ccfa1b86897dfd7",
-      "date": "2026-09-04"
+      "sha": "440a3b512b94a09a",
+      "date": "2026-09-05"
     },
     "/tools/steel-doubler-plate/": {
       "sha": "262f524d0efce470",
@@ -7302,7 +7342,7 @@
       "date": "2026-09-01"
     },
     "/tools/windrow-stockpile-volume/": {
-      "sha": "d60dbe43586fdd30",
+      "sha": "d4c696e555560c2e",
       "date": "2026-09-05"
     },
     "/tools/wip-percent-complete/": {

@@ -102,6 +102,7 @@ export const PROFESSION_NOUN = {
   locksmith: "Locksmiths",
   railroad: "Railroad",
   lowvoltage: "Low Voltage",
+  mining: "Mining and Quarry",
   mechanical: "Mechanical",
   demolition: "Demolition",
   fireproofing: "Fireproofing",

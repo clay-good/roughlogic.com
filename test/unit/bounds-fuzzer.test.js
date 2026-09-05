@@ -42992,3 +42992,387 @@ test("bounds: spec-v1581 computeRevolvingDoorThroughput pins the peak against th
   assert.ok("error" in _v1581({ ...base, operating_hours: 0 }));
   assert.ok("error" in _v1581({ ...base, rpm: Infinity }));
 });
+
+// ===========================================================================
+// spec-v1507..v1516: the 2026-09-05 trade-expansion mining, quarry, and
+// drill-and-blast band, the fourth band of that program and the first
+// blasting tiles in the catalog.
+// ===========================================================================
+
+import { computeBlastPowderFactor as _v1507 } from "../../calc-mining.js";
+test("bounds: spec-v1507 computeBlastPowderFactor pins the pattern against the hole", () => {
+  const base = { burden_ft: 8, spacing_ft: 10, bench_height_ft: 30, hole_diameter_in: 3.5, subdrill_ft: 2.4, stemming_ft: 5.6, explosive_sg: 1.25, rock_density_pcf: 165, hole_count: 40 };
+  const r = _v1507(base);
+  assert.ok(Math.abs(r.loading_density_lb_per_ft - 5.2114) < 1e-3);
+  assert.ok(Math.abs(r.charge_length_ft - 26.8) < 1e-9);
+  assert.ok(Math.abs(r.charge_weight_lb - 139.667) < 1e-2);
+  assert.ok(Math.abs(r.rock_tons_per_hole - 198) < 1e-9);
+  assert.ok(Math.abs(r.powder_factor_lb_per_ton - 0.70539) < 1e-4);
+  assert.ok(Math.abs(r.rock_volume_cy - 2400 / 27) < 1e-9);
+  // Opening the pattern buys tons per hole and drops the powder factor,
+  // which is the trade the loader notices before the spreadsheet does.
+  const open = _v1507({ ...base, burden_ft: 9, spacing_ft: 11 });
+  assert.ok(Math.abs(open.rock_tons_per_hole - 245.025) < 1e-2);
+  assert.ok(Math.abs(open.powder_factor_lb_per_ton - 0.57001) < 1e-4);
+  assert.ok(Math.abs(open.charge_weight_lb - r.charge_weight_lb) < 1e-9);
+  // Loading density is exactly quadratic in diameter and exactly linear in
+  // the explosive's specific gravity.
+  assert.ok(Math.abs(_v1507({ ...base, hole_diameter_in: 7 }).loading_density_lb_per_ft - 4 * r.loading_density_lb_per_ft) < 1e-9);
+  assert.ok(Math.abs(_v1507({ ...base, explosive_sg: 2.5 }).loading_density_lb_per_ft - 2 * r.loading_density_lb_per_ft) < 1e-9);
+  // Stemming comes straight out of the charge column, foot for foot.
+  assert.ok(Math.abs(_v1507({ ...base, stemming_ft: 6.6 }).charge_length_ft - (r.charge_length_ft - 1)) < 1e-9);
+  // Whole-shot totals are exactly the per-hole ones times the hole count.
+  assert.ok(Math.abs(r.total_explosive_lb - 40 * r.charge_weight_lb) < 1e-9);
+  assert.ok(Math.abs(r.total_tons - 40 * r.rock_tons_per_hole) < 1e-9);
+  // Stemming longer than the hole is a contradiction, not a negative column.
+  assert.ok("error" in _v1507({ ...base, stemming_ft: 40 }));
+  assert.ok("error" in _v1507({ ...base, burden_ft: 0 }));
+  assert.ok("error" in _v1507({ ...base, spacing_ft: 0 }));
+  assert.ok("error" in _v1507({ ...base, bench_height_ft: 0 }));
+  assert.ok("error" in _v1507({ ...base, hole_diameter_in: 0 }));
+  assert.ok("error" in _v1507({ ...base, subdrill_ft: -1 }));
+  assert.ok("error" in _v1507({ ...base, explosive_sg: 0 }));
+  assert.ok("error" in _v1507({ ...base, rock_density_pcf: 0 }));
+  assert.ok("error" in _v1507({ ...base, hole_count: 0 }));
+  assert.ok("error" in _v1507({ ...base, burden_ft: Infinity }));
+});
+
+import { computeBlastBurdenSpacing as _v1508 } from "../../calc-mining.js";
+test("bounds: spec-v1508 computeBlastBurdenSpacing pins the stiffness check", () => {
+  const base = { hole_diameter_in: 3.5, burden_ratio: 25, bench_height_ft: 30, spacing_ratio: 1.15, subdrill_ratio: 0.3, stemming_ratio: 0.7 };
+  const r = _v1508(base);
+  assert.ok(Math.abs(r.burden_ft - 7.29167) < 1e-4);
+  assert.ok(Math.abs(r.spacing_ft - 8.38542) < 1e-4);
+  assert.ok(Math.abs(r.subdrill_ft - 2.1875) < 1e-4);
+  assert.ok(Math.abs(r.stemming_ft - 5.10417) < 1e-4);
+  assert.ok(Math.abs(r.stiffness_ratio - 4.11429) < 1e-4);
+  assert.strictEqual(r.stiff_ok, true);
+  // A shallow bench with the same holes vents rather than breaks, and the
+  // fix is a SMALLER hole -- the pattern the wrong instinct reaches for
+  // (wider spacing) provably does not move stiffness at all.
+  const shallow = _v1508({ ...base, bench_height_ft: 12 });
+  assert.ok(Math.abs(shallow.stiffness_ratio - 1.64571) < 1e-4);
+  assert.strictEqual(shallow.stiff_ok, false);
+  const wider = _v1508({ ...base, bench_height_ft: 12, spacing_ratio: 1.4 });
+  assert.ok(Math.abs(wider.stiffness_ratio - shallow.stiffness_ratio) < 1e-12);
+  assert.strictEqual(wider.stiff_ok, false);
+  const smaller = _v1508({ ...base, bench_height_ft: 12, hole_diameter_in: 2.5 });
+  assert.ok(Math.abs(smaller.burden_ft - 5.20833) < 1e-4);
+  assert.ok(Math.abs(smaller.stiffness_ratio - 2.304) < 1e-3);
+  assert.strictEqual(smaller.stiff_ok, true);
+  // Every dimension is exactly proportional to the diameter through burden.
+  assert.ok(Math.abs(_v1508({ ...base, hole_diameter_in: 7 }).burden_ft - 2 * r.burden_ft) < 1e-9);
+  assert.ok(Math.abs(_v1508({ ...base, burden_ratio: 50 }).burden_ft - 2 * r.burden_ft) < 1e-9);
+  // The largest hole the bench supports lands stiffness exactly on 2.
+  const atLimit = _v1508({ ...base, hole_diameter_in: r.max_diameter_in });
+  assert.ok(Math.abs(atLimit.stiffness_ratio - 2) < 1e-9);
+  assert.ok(Math.abs(r.max_diameter_in - 7.2) < 1e-9);
+  assert.ok("error" in _v1508({ ...base, hole_diameter_in: 0 }));
+  assert.ok("error" in _v1508({ ...base, burden_ratio: 0 }));
+  assert.ok("error" in _v1508({ ...base, bench_height_ft: 0 }));
+  assert.ok("error" in _v1508({ ...base, spacing_ratio: 0 }));
+  assert.ok("error" in _v1508({ ...base, subdrill_ratio: -1 }));
+  assert.ok("error" in _v1508({ ...base, stemming_ratio: -1 }));
+  assert.ok("error" in _v1508({ ...base, bench_height_ft: Infinity }));
+});
+
+import { computeBlastScaledDistancePPV as _v1509 } from "../../calc-mining.js";
+test("bounds: spec-v1509 computeBlastScaledDistancePPV pins per-delay, not per-shot", () => {
+  const base = { distance_ft: 1200, charge_per_delay_lb: 340, site_k: 160, site_b: 1.6, ppv_limit_in_s: 1, required_scaled_distance: 50 };
+  const r = _v1509(base);
+  assert.ok(Math.abs(r.scaled_distance - 65.0791) < 1e-3);
+  assert.ok(Math.abs(r.predicted_ppv_in_s - 0.20073) < 1e-4);
+  assert.strictEqual(r.ppv_ok, true);
+  assert.strictEqual(r.sd_ok, true);
+  assert.ok(Math.abs(r.max_charge_lb - 576) < 1e-9);
+  assert.ok(Math.abs(r.compliant_distance_ft - 439.86) < 1e-2);
+  // The misuse the tile exists to prevent: reading the whole shot into the
+  // charge field. A 10,000 lb shot on forty 250 lb delays is the vibration
+  // of 250 lb, and the wrong entry overstates PPV several times over.
+  const perShot = _v1509({ ...base, charge_per_delay_lb: 10000 });
+  const perDelay = _v1509({ ...base, charge_per_delay_lb: 250 });
+  assert.ok(perShot.predicted_ppv_in_s > 5 * perDelay.predicted_ppv_in_s);
+  // Run the tile at its own answers and they land exactly on their limits.
+  const atCharge = _v1509({ ...base, charge_per_delay_lb: r.max_charge_lb });
+  assert.ok(Math.abs(atCharge.scaled_distance - base.required_scaled_distance) < 1e-9);
+  const atDistance = _v1509({ ...base, distance_ft: r.compliant_distance_ft });
+  assert.ok(Math.abs(atDistance.predicted_ppv_in_s - base.ppv_limit_in_s) < 1e-9);
+  // Moving the house in cuts the allowable charge as the SQUARE.
+  const close = _v1509({ ...base, distance_ft: 400 });
+  assert.ok(Math.abs(close.max_charge_lb - 64) < 1e-9);
+  assert.ok(Math.abs(r.max_charge_lb / close.max_charge_lb - 9) < 1e-9);
+  assert.strictEqual(close.sd_ok, false);
+  // Scaled distance is exactly linear in distance and inverse in sqrt(W).
+  assert.ok(Math.abs(_v1509({ ...base, distance_ft: 2400 }).scaled_distance - 2 * r.scaled_distance) < 1e-9);
+  assert.ok(Math.abs(_v1509({ ...base, charge_per_delay_lb: 4 * 340 }).scaled_distance - r.scaled_distance / 2) < 1e-9);
+  assert.ok("error" in _v1509({ ...base, distance_ft: 0 }));
+  assert.ok("error" in _v1509({ ...base, charge_per_delay_lb: 0 }));
+  assert.ok("error" in _v1509({ ...base, site_k: 0 }));
+  assert.ok("error" in _v1509({ ...base, site_b: 0 }));
+  assert.ok("error" in _v1509({ ...base, ppv_limit_in_s: 0 }));
+  assert.ok("error" in _v1509({ ...base, required_scaled_distance: 0 }));
+  assert.ok("error" in _v1509({ ...base, distance_ft: Infinity }));
+});
+
+import { computeBlastAirblastOverpressure as _v1510 } from "../../calc-mining.js";
+test("bounds: spec-v1510 computeBlastAirblastOverpressure pins cube root against square root", () => {
+  const base = { distance_ft: 1200, charge_per_delay_lb: 340, airblast_k: 0.2, airblast_b: 1.2, limit_db: 133, confinement_penalty_db: 20 };
+  const r = _v1510(base);
+  assert.ok(Math.abs(r.cube_root_scaled_distance - 171.931) < 1e-2);
+  assert.ok(Math.abs(r.overpressure_db - 103.124) < 1e-2);
+  assert.strictEqual(r.db_ok, true);
+  // 133 dB is a very small pressure: about 0.013 psi against the 2.9e-9 psi
+  // reference, and the tile computes it rather than quoting a rounded one.
+  assert.ok(Math.abs(r.limit_psi - 0.0129538) < 1e-6);
+  // Charge weight is the WEAK lever here. Halving it buys 26% of scaled
+  // distance where the square-root law would have bought 41%.
+  assert.ok(Math.abs(r.halving_gain_pct - (Math.cbrt(2) - 1) * 100) < 1e-9);
+  assert.ok(Math.abs(r.halving_gain_pct - 25.992) < 1e-2);
+  assert.ok(r.halving_gain_pct < (Math.sqrt(2) - 1) * 100);
+  // Confinement is the strong one: 20 dB is EXACTLY ten times the pressure.
+  assert.ok(Math.abs(r.vented_pressure_factor - 10) < 1e-9);
+  assert.ok(Math.abs(r.vented_psi / r.overpressure_psi - 10) < 1e-9);
+  assert.ok(Math.abs(r.vented_db - r.overpressure_db - 20) < 1e-9);
+  assert.strictEqual(r.vented_ok, true);
+  // A bigger venting penalty eventually breaches the limit.
+  assert.strictEqual(_v1510({ ...base, confinement_penalty_db: 40 }).vented_ok, false);
+  assert.strictEqual(_v1510({ ...base, confinement_penalty_db: 0 }).vented_db === r.overpressure_db, true);
+  // Run it at its own compliant distance and the reading lands on the limit.
+  const atDistance = _v1510({ ...base, distance_ft: r.compliant_distance_ft });
+  assert.ok(Math.abs(atDistance.overpressure_db - base.limit_db) < 1e-6);
+  const atCharge = _v1510({ ...base, charge_per_delay_lb: r.max_charge_lb });
+  assert.ok(Math.abs(atCharge.overpressure_db - base.limit_db) < 1e-6);
+  assert.ok("error" in _v1510({ ...base, distance_ft: 0 }));
+  assert.ok("error" in _v1510({ ...base, charge_per_delay_lb: 0 }));
+  assert.ok("error" in _v1510({ ...base, airblast_k: 0 }));
+  assert.ok("error" in _v1510({ ...base, airblast_b: 0 }));
+  assert.ok("error" in _v1510({ ...base, limit_db: 0 }));
+  assert.ok("error" in _v1510({ ...base, confinement_penalty_db: -1 }));
+  assert.ok("error" in _v1510({ ...base, distance_ft: Infinity }));
+});
+
+import { computeBlastStemmingLength as _v1511 } from "../../calc-mining.js";
+test("bounds: spec-v1511 computeBlastStemmingLength pins the larger rule", () => {
+  const base = { burden_ft: 8, hole_diameter_in: 3.5, proposed_stemming_ft: 4, burden_ratio_low: 0.7, burden_ratio_high: 1.0, diameter_multiple: 20 };
+  const r = _v1511(base);
+  assert.ok(Math.abs(r.by_burden_ft - 5.6) < 1e-9);
+  assert.ok(Math.abs(r.by_burden_high_ft - 8) < 1e-9);
+  assert.ok(Math.abs(r.by_diameter_ft - 5.83333) < 1e-4);
+  // The DIAMETER rule governs here, not the burden one -- which is the whole
+  // reason both are computed and the larger taken.
+  assert.ok(Math.abs(r.governing_ft - r.by_diameter_ft) < 1e-12);
+  assert.ok(r.by_diameter_ft > r.by_burden_ft);
+  assert.strictEqual(r.meets_governing, false);
+  assert.ok(Math.abs(r.shortfall_ft - 1.83333) < 1e-4);
+  // A 4 ft load on an 8 ft burden is a ratio of 0.50, well under the range.
+  assert.ok(Math.abs(r.achieved_ratio - 0.5) < 1e-12);
+  assert.strictEqual(r.flyrock_risk, true);
+  // On a wider burden the BURDEN rule takes over, and the governing length
+  // follows whichever is larger without either being hard-coded.
+  const wide = _v1511({ ...base, burden_ft: 12, proposed_stemming_ft: 9 });
+  assert.ok(Math.abs(wide.by_burden_ft - 8.4) < 1e-9);
+  assert.ok(Math.abs(wide.governing_ft - wide.by_burden_ft) < 1e-12);
+  assert.strictEqual(wide.meets_governing, true);
+  assert.strictEqual(wide.flyrock_risk, false);
+  assert.strictEqual(wide.shortfall_ft, 0);
+  // Exactly at the low ratio is not a flyrock flag; a hair under is.
+  assert.strictEqual(_v1511({ ...base, proposed_stemming_ft: 5.6 }).flyrock_risk, false);
+  assert.strictEqual(_v1511({ ...base, proposed_stemming_ft: 5.59 }).flyrock_risk, true);
+  // Stone size is exactly the diameter over 20 and over 10.
+  assert.ok(Math.abs(r.stone_min_in - 0.175) < 1e-12);
+  assert.ok(Math.abs(r.stone_max_in - 0.35) < 1e-12);
+  assert.ok("error" in _v1511({ ...base, burden_ft: 0 }));
+  assert.ok("error" in _v1511({ ...base, hole_diameter_in: 0 }));
+  assert.ok("error" in _v1511({ ...base, proposed_stemming_ft: 0 }));
+  assert.ok("error" in _v1511({ ...base, burden_ratio_low: 0 }));
+  assert.ok("error" in _v1511({ ...base, burden_ratio_high: 0.5 }));
+  assert.ok("error" in _v1511({ ...base, diameter_multiple: 0 }));
+  assert.ok("error" in _v1511({ ...base, burden_ft: Infinity }));
+});
+
+import { computeCrusherReductionRatio as _v1512 } from "../../calc-mining.js";
+test("bounds: spec-v1512 computeCrusherReductionRatio pins that ratios multiply", () => {
+  const base = { feed_size_in: 24, product_size_in: 0.75, stages: 2, machine_ratio_low: 3, machine_ratio_high: 6, actual_intermediate_in: 6 };
+  const r = _v1512(base);
+  assert.ok(Math.abs(r.total_ratio - 32) < 1e-9);
+  assert.ok(Math.abs(r.per_stage_ratio - Math.sqrt(32)) < 1e-12);
+  assert.ok(Math.abs(r.per_stage_ratio - 5.65685) < 1e-4);
+  assert.strictEqual(r.in_range, true);
+  assert.ok(Math.abs(r.first_intermediate_in - 4.24264) < 1e-4);
+  // The stages compose exactly back to the product size, which is what
+  // "ratios multiply" means made checkable.
+  assert.ok(Math.abs(r.second_intermediate_in - base.product_size_in) < 1e-9);
+  const three = _v1512({ ...base, stages: 3 });
+  assert.ok(Math.abs(three.per_stage_ratio - Math.cbrt(32)) < 1e-12);
+  assert.ok(Math.abs(three.per_stage_ratio - 3.17480) < 1e-4);
+  assert.ok(Math.abs(three.first_intermediate_in - 7.55953) < 1e-4);
+  assert.ok(Math.abs(three.second_intermediate_in - 2.38110) < 1e-4);
+  assert.ok(Math.abs(Math.pow(three.per_stage_ratio, 3) - r.total_ratio) < 1e-9);
+  // One stage cannot do it, and the tile says so rather than returning a
+  // number that looks fine.
+  const one = _v1512({ ...base, stages: 1 });
+  assert.ok(Math.abs(one.per_stage_ratio - 32) < 1e-9);
+  assert.strictEqual(one.in_range, false);
+  // The diagnostic: the jaw is making 6 in, not the 4.24 the plan assumed,
+  // so the cone is being asked for 8 to 1 and the cone is not the problem.
+  assert.ok(Math.abs(r.actual_downstream_ratio - 8) < 1e-9);
+  assert.strictEqual(r.downstream_in_range, false);
+  const asPlanned = _v1512({ ...base, actual_intermediate_in: r.first_intermediate_in });
+  assert.ok(Math.abs(asPlanned.actual_downstream_ratio - r.per_stage_ratio) < 1e-9);
+  assert.strictEqual(asPlanned.downstream_in_range, true);
+  assert.strictEqual(r.stages_required, 2);
+  assert.ok("error" in _v1512({ ...base, feed_size_in: 0 }));
+  assert.ok("error" in _v1512({ ...base, product_size_in: 0 }));
+  assert.ok("error" in _v1512({ ...base, product_size_in: 30 }));
+  assert.ok("error" in _v1512({ ...base, stages: 0 }));
+  assert.ok("error" in _v1512({ ...base, machine_ratio_low: 1 }));
+  assert.ok("error" in _v1512({ ...base, machine_ratio_high: 2 }));
+  assert.ok("error" in _v1512({ ...base, actual_intermediate_in: 0.5 }));
+  assert.ok("error" in _v1512({ ...base, feed_size_in: Infinity }));
+});
+
+import { computeScreenDeckCapacity as _v1513 } from "../../calc-mining.js";
+test("bounds: spec-v1513 computeScreenDeckCapacity pins how the factors compound", () => {
+  const base = { deck_width_ft: 8, deck_length_ft: 20, base_capacity_tph_per_sqft: 3.5, oversize_factor: 1.1, halfsize_factor: 1.15, deck_factor: 0.9, wet_factor: 1.25, efficiency_factor: 0.95, actual_feed_tph: 400 };
+  const r = _v1513(base);
+  assert.strictEqual(r.screen_area_sqft, 160);
+  assert.ok(Math.abs(r.combined_multiplier - 1.352) < 1e-4);
+  assert.ok(Math.abs(r.capacity_tph - 757.102) < 1e-2);
+  assert.ok(Math.abs(r.percent_of_capacity - 52.833) < 1e-2);
+  assert.strictEqual(r.over_capacity, false);
+  // The factors are a PRODUCT, so one of them moves capacity by its own
+  // ratio: dropping halfsize from 1.15 to 0.80 costs 30% of the deck.
+  const starved = _v1513({ ...base, halfsize_factor: 0.8 });
+  assert.ok(Math.abs(starved.capacity_tph - 526.68) < 1e-1);
+  assert.ok(Math.abs(starved.capacity_tph / r.capacity_tph - 0.8 / 1.15) < 1e-9);
+  assert.ok(Math.abs(1 - starved.capacity_tph / r.capacity_tph - 0.3043) < 1e-3);
+  // Every factor at 1 is the bare base rate.
+  const bare = _v1513({ ...base, oversize_factor: 1, halfsize_factor: 1, deck_factor: 1, wet_factor: 1, efficiency_factor: 1 });
+  assert.strictEqual(bare.combined_multiplier, 1);
+  assert.ok(Math.abs(bare.capacity_tph - 160 * 3.5) < 1e-9);
+  // Over capacity is the finding that stops a crew chasing stroke and slope.
+  const over = _v1513({ ...base, actual_feed_tph: 900 });
+  assert.strictEqual(over.over_capacity, true);
+  assert.ok(over.headroom_tph < 0);
+  assert.ok(over.area_required_sqft > over.screen_area_sqft);
+  // Run it at the area it names and the deck lands exactly at 100%.
+  const sized = _v1513({ ...base, deck_length_ft: r.area_required_sqft / base.deck_width_ft });
+  assert.ok(Math.abs(sized.percent_of_capacity - 100) < 1e-9);
+  assert.ok("error" in _v1513({ ...base, deck_width_ft: 0 }));
+  assert.ok("error" in _v1513({ ...base, deck_length_ft: 0 }));
+  assert.ok("error" in _v1513({ ...base, base_capacity_tph_per_sqft: 0 }));
+  assert.ok("error" in _v1513({ ...base, halfsize_factor: 0 }));
+  assert.ok("error" in _v1513({ ...base, wet_factor: 0 }));
+  assert.ok("error" in _v1513({ ...base, actual_feed_tph: 0 }));
+  assert.ok("error" in _v1513({ ...base, deck_width_ft: Infinity }));
+});
+
+import { computeBeltFeederCapacity as _v1514 } from "../../calc-mining.js";
+test("bounds: spec-v1514 computeBeltFeederCapacity pins the density trap", () => {
+  const base = { opening_width_in: 36, opening_height_in: 8, belt_speed_fpm: 60, bulk_density_pcf: 100, target_tph: 400, alternative_density_pcf: 160 };
+  const r = _v1514(base);
+  assert.ok(Math.abs(r.cross_section_sqft - 2) < 1e-12);
+  assert.ok(Math.abs(r.volumetric_cfh - 7200) < 1e-9);
+  assert.ok(Math.abs(r.tph - 360) < 1e-9);
+  assert.ok(Math.abs(r.required_speed_fpm - 66.6667) < 1e-3);
+  assert.ok(Math.abs(r.required_opening_in - 8.88889) < 1e-4);
+  // The density trap: the same gate and the same speed on heavier ore is
+  // 60% more tonnage with nothing touched.
+  assert.ok(Math.abs(r.alternative_tph - 576) < 1e-9);
+  assert.ok(Math.abs(r.density_change_pct - 60) < 1e-9);
+  assert.ok(Math.abs(r.alternative_tph / r.tph - 160 / 100) < 1e-12);
+  // Output is exactly linear in speed and exactly linear in the opening --
+  // which is what makes a feeder a metering device.
+  assert.ok(Math.abs(_v1514({ ...base, belt_speed_fpm: 120 }).tph - 2 * r.tph) < 1e-9);
+  assert.ok(Math.abs(_v1514({ ...base, opening_height_in: 16 }).tph - 2 * r.tph) < 1e-9);
+  // Either answer the tile gives for the target reproduces the target.
+  const bySpeed = _v1514({ ...base, belt_speed_fpm: r.required_speed_fpm });
+  assert.ok(Math.abs(bySpeed.tph - base.target_tph) < 1e-9);
+  const byGate = _v1514({ ...base, opening_height_in: r.required_opening_in });
+  assert.ok(Math.abs(byGate.tph - base.target_tph) < 1e-9);
+  assert.ok("error" in _v1514({ ...base, opening_width_in: 0 }));
+  assert.ok("error" in _v1514({ ...base, opening_height_in: 0 }));
+  assert.ok("error" in _v1514({ ...base, belt_speed_fpm: 0 }));
+  assert.ok("error" in _v1514({ ...base, bulk_density_pcf: 0 }));
+  assert.ok("error" in _v1514({ ...base, target_tph: 0 }));
+  assert.ok("error" in _v1514({ ...base, alternative_density_pcf: 0 }));
+  assert.ok("error" in _v1514({ ...base, belt_speed_fpm: Infinity }));
+});
+
+import { computeDustCollectorAirToCloth as _v1515 } from "../../calc-mining.js";
+test("bounds: spec-v1515 computeDustCollectorAirToCloth pins the bag derate", () => {
+  const base = { airflow_cfm: 12000, bag_count: 200, bag_diameter_in: 6, bag_length_ft: 8, range_low: 3, range_high: 5, bags_out_of_service: 30 };
+  const r = _v1515(base);
+  assert.ok(Math.abs(r.cloth_area_sqft - 2513.27) < 1e-2);
+  assert.ok(Math.abs(r.air_to_cloth - 4.77465) < 1e-4);
+  assert.strictEqual(r.in_range, true);
+  // Adding a hood moves the ratio without touching the collector.
+  const hooded = _v1515({ ...base, airflow_cfm: 16000 });
+  assert.ok(Math.abs(hooded.air_to_cloth - 6.36620) < 1e-4);
+  assert.strictEqual(hooded.in_range, false);
+  // Bags out of service move the DENOMINATOR, so the survivors work harder
+  // at unchanged airflow -- which is how bag failures cascade.
+  assert.ok(Math.abs(r.derated_cloth_area_sqft - 2136.28) < 1e-2);
+  assert.ok(Math.abs(r.derated_air_to_cloth - 5.61723) < 1e-4);
+  assert.ok(Math.abs(r.derated_increase_pct - (200 / 170 - 1) * 100) < 1e-9);
+  assert.ok(Math.abs(r.derated_increase_pct - 17.647) < 1e-2);
+  assert.strictEqual(r.derated_in_range, false);
+  assert.strictEqual(_v1515({ ...base, bags_out_of_service: 0 }).derated_increase_pct, 0);
+  // Cloth area is exactly linear in bag count, diameter, and length.
+  assert.ok(Math.abs(_v1515({ ...base, bag_count: 400 }).cloth_area_sqft - 2 * r.cloth_area_sqft) < 1e-9);
+  assert.ok(Math.abs(_v1515({ ...base, bag_length_ft: 16 }).cloth_area_sqft - 2 * r.cloth_area_sqft) < 1e-9);
+  // Run it at the airflow it names and the ratio lands on the range top.
+  const atLimit = _v1515({ ...base, airflow_cfm: r.max_airflow_cfm });
+  assert.ok(Math.abs(atLimit.air_to_cloth - base.range_high) < 1e-9);
+  assert.ok("error" in _v1515({ ...base, airflow_cfm: 0 }));
+  assert.ok("error" in _v1515({ ...base, bag_count: 0 }));
+  assert.ok("error" in _v1515({ ...base, bag_diameter_in: 0 }));
+  assert.ok("error" in _v1515({ ...base, bag_length_ft: 0 }));
+  assert.ok("error" in _v1515({ ...base, range_low: 0 }));
+  assert.ok("error" in _v1515({ ...base, range_high: 1 }));
+  assert.ok("error" in _v1515({ ...base, bags_out_of_service: -1 }));
+  assert.ok("error" in _v1515({ ...base, bags_out_of_service: 200 }));
+  assert.ok("error" in _v1515({ ...base, airflow_cfm: Infinity }));
+});
+
+import { computeDustDeflagrationVentArea as _v1516 } from "../../calc-mining.js";
+test("bounds: spec-v1516 computeDustDeflagrationVentArea pins enclosure strength", () => {
+  const base = { volume_cuft: 3500, kst_bar_m_s: 150, p_red_psig: 1.5, p_stat_psig: 0.5, length_to_diameter: 2, stronger_p_red_psig: 5, available_vent_area_sqft: 12 };
+  const r = _v1516(base);
+  assert.strictEqual(r.dust_class, "St1");
+  assert.ok(Math.abs(r.volume_m3 - 99.109) < 1e-2);
+  assert.ok(Math.abs(r.vent_area_sqft - 16.043) < 1e-2);
+  // The finding: a low enclosure rating demands an impractically large vent,
+  // and building it stronger cuts the requirement far more than anything
+  // else available -- 45% here for a 3.3x strength increase.
+  assert.ok(Math.abs(r.vent_area_at_stronger_sqft - 8.787) < 1e-2);
+  assert.ok(Math.abs(r.stronger_saving_pct - 45.228) < 1e-2);
+  assert.ok(Math.abs(r.vent_area_sqft / r.vent_area_at_stronger_sqft - Math.sqrt(5 / 1.5)) < 1e-9);
+  assert.strictEqual(r.fits, false);
+  assert.ok(Math.abs(r.shortfall_sqft - 4.043) < 1e-2);
+  // Vent area goes as the square root of enclosure strength, linearly with
+  // Kst, and with volume to the three-quarter power.
+  assert.ok(Math.abs(_v1516({ ...base, kst_bar_m_s: 300 }).vent_area_sqft - 2 * r.vent_area_sqft) < 1e-9);
+  assert.ok(Math.abs(_v1516({ ...base, volume_cuft: 7000 }).vent_area_sqft / r.vent_area_sqft - Math.pow(2, 0.75)) < 1e-9);
+  // Dust class follows the tested Kst at its published boundaries.
+  assert.strictEqual(_v1516({ ...base, kst_bar_m_s: 200 }).dust_class, "St1");
+  assert.strictEqual(_v1516({ ...base, kst_bar_m_s: 201 }).dust_class, "St2");
+  assert.strictEqual(_v1516({ ...base, kst_bar_m_s: 301 }).dust_class, "St3");
+  // A long vessel needs more vent than a compact one of the same volume.
+  const elongated = _v1516({ ...base, length_to_diameter: 5 });
+  assert.ok(elongated.vent_area_sqft > r.vent_area_sqft);
+  assert.strictEqual(_v1516({ ...base, length_to_diameter: 1 }).vent_area_sqft, r.vent_area_sqft);
+  // Enough available area is reported as fitting, with no shortfall.
+  const roomy = _v1516({ ...base, available_vent_area_sqft: 20 });
+  assert.strictEqual(roomy.fits, true);
+  assert.strictEqual(roomy.shortfall_sqft, 0);
+  assert.ok("error" in _v1516({ ...base, volume_cuft: 0 }));
+  assert.ok("error" in _v1516({ ...base, kst_bar_m_s: 0 }));
+  assert.ok("error" in _v1516({ ...base, p_red_psig: 0 }));
+  assert.ok("error" in _v1516({ ...base, p_stat_psig: 0 }));
+  assert.ok("error" in _v1516({ ...base, p_stat_psig: 2 }));
+  assert.ok("error" in _v1516({ ...base, length_to_diameter: 0.5 }));
+  assert.ok("error" in _v1516({ ...base, stronger_p_red_psig: 1 }));
+  assert.ok("error" in _v1516({ ...base, available_vent_area_sqft: 0 }));
+  assert.ok("error" in _v1516({ ...base, kst_bar_m_s: Infinity }));
+});

@@ -1,7 +1,7 @@
 # roughlogic MCP server
 
 A local, zero-dependency [Model Context Protocol](https://modelcontextprotocol.io)
-server that exposes the roughlogic catalog of **1,833 trades calculators**
+server that exposes the roughlogic catalog of **1,843 trades calculators**
 (electrical, plumbing, HVAC, construction, restoration, and more) to any MCP
 client — Claude Code, Claude Desktop, Cursor, and the like.
 
@@ -53,7 +53,7 @@ element — the keys of the publisher-verified worked example fill the gap, so
 returning an empty list. `scripts/check-both-doors.mjs` holds the door to that
 contract: every advertised name must be a key a caller can actually send, every
 key the tile's own example sets must be advertised, and that example must run
-clean through `run_calculator`. All three are checked for all 1,833 tiles on
+clean through `run_calculator`. All three are checked for all 1,843 tiles on
 every build.
 
 `run_calculator` also warns when it is handed a key the calculator cannot
@@ -85,7 +85,7 @@ each number**, keyed by the compute's own result key: `outputs_source` is
 way, a key is named only where the calculator is observed to produce it -- the
 worked example's result for `describe_calculator`, the caller's own result for
 `run_calculator` -- so the door never names an answer that is not there.
-`check-both-doors.mjs` holds that. **1,833 of 1,833 calculators name their
+`check-both-doors.mjs` holds that. **1,843 of 1,843 calculators name their
 answers.** The remaining 0 return them unlabelled.
 
 That was 1,768 until 2026-09-02, and the 36 were a gap between the two doors
@@ -113,7 +113,7 @@ also `"eta^2 = "` -- and calling that a unit would be a guess. `outputUnits(id)`
 in `catalog.mjs` exposes them as what they are.
 
 `answer_query` reads the `data/fields/` descriptors the website reads, which
-exist for 1,793 calculators. For the other 40 it projects the descriptors from
+exist for 1,803 calculators. For the other 40 it projects the descriptors from
 `describe_calculator` instead, naming each input with the caption the
 calculator itself prints. A field whose verified
 example holds something a numeric extractor must not guess at -- a list, a

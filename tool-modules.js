@@ -681,6 +681,14 @@ export const TOOL_MODULES = (() => {
     "master-key-bitting-capacity", "key-cut-macs-check", "door-undercut-transfer-air",
     "fire-door-clearance", "gate-operator-duty-cycle", "revolving-door-throughput",
   ]);
+  // spec-v1507..v1516: the mining, quarry, and drill-and-blast bench, a trade
+  // the catalog served with zero tiles. All ten keep group "E".
+  declare("./calc-mining.js", "MINING_RENDERERS", [
+    "blast-powder-factor", "blast-burden-spacing", "blast-scaled-distance-ppv",
+    "blast-airblast-overpressure", "blast-stemming-length", "crusher-reduction-ratio",
+    "screen-deck-capacity", "belt-feeder-capacity", "dust-collector-air-to-cloth",
+    "dust-deflagration-vent-area",
+  ]);
   // spec-v80 cap-relief split: the spec-v25 site-civil / roadway-geometry
   // quartet moved out of calc-construction.js (it sat at 95.0% of its size
   // cap, the tightest remaining calculator module) into its own module. All
