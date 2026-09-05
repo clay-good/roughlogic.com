@@ -2144,6 +2144,17 @@ cross-check.
 | calc-electrical.js | `renderVoltageDropReactance` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-electrical.js | `renderVoltageImbalance` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
 | calc-electrical.js | `renderWireAmpacity` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
+| calc-elevator.js | `computeBufferStroke` | `{ contract_speed_fpm = 0, governor_trip_fpm = 0, permitted_retardation_g = 1,...` | _ | _ | _ |
+| calc-elevator.js | `computeCounterweightBalance` | `{ car_weight_lb = 0, rated_capacity_lb = 0, overbalance_pct = 45, actual_coun...` | _ | _ | _ |
+| calc-elevator.js | `computeDoorClosingEnergy` | `{ door_mass_lb = 0, closing_speed_fps = 0, ke_limit_normal_ftlb = 0, ke_limit...` | _ | _ | _ |
+| calc-elevator.js | `computeElevatorRopeSafetyFactor` | `{ car_weight_lb = 0, rated_load_lb = 0, travelling_cable_lb = 0, rope_count =...` | _ | _ | _ |
+| calc-elevator.js | `computeGovernorTrippingSpeed` | `{ rated_speed_fpm = 0, electrical_trip_fpm = 0, mechanical_trip_fpm = 0, code...` | _ | _ | _ |
+| calc-elevator.js | `computeGuideRailBracketSpan` | `{ span_ft = 0, horizontal_load_lb = 0, section_modulus_in3 = 0, moment_of_ine...` | _ | _ | _ |
+| calc-elevator.js | `computeHoistwayVenting` | `{ hoistway_plan_area_sqft = 0, vent_fraction_pct = 3.5, door_width_in = 0, do...` | _ | _ | _ |
+| calc-elevator.js | `computeHydraulicJackPressure` | `{ bore_in = 0, total_load_lb = 0, car_speed_fpm = 0, pump_flow_gpm = 0, relie...` | _ | _ | _ |
+| calc-elevator.js | `computeMachineRoomHeat` | `{ input_power_kw = 0, efficiency_pct = 85, duty_cycle_pct = 40, controller_st...` | _ | _ | _ |
+| calc-elevator.js | `computeStepChainTension` | `{ total_load_lb = 0, incline_deg = 30, friction_coefficient = 0.03, chain_spe...` | _ | _ | _ |
+| calc-elevator.js | `computeTractionRopingRatio` | `{ roping_ratio = 2, car_speed_fpm = 0, sheave_diameter_in = 0, unbalanced_loa...` | _ | _ | _ |
 | calc-fab.js | `computeBarNesting` | `{ cut_list = "", stock_length_in = 240, kerf_in = 0.125, end_trim_in = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeBarstockCutlist` | `{ stock_length_in = 240, piece_length_in = 14.5, kerf_in = 0.125, pieces_need...` | _ | _ | _ |
 | calc-fab.js | `computeBendSpringback` | `{ tool_radius_in = 1.0, thickness_in = 0.1, yield_strength_psi = 50000, modul...` | _ | _ | _ |
@@ -3476,7 +3487,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2062.
+Row count: 2073.
 
 <!-- END function-corpus-v14 -->
 
@@ -4128,7 +4139,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (486 tiles)
+### Group E Construction (497 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4171,6 +4182,7 @@ per spec-v14 §13.1 second paragraph.
 | `boussinesq-surcharge-wall` | Surcharge Lateral Pressure on a Wall from a Line Load (Boussinesq) | NAVFAC DM-7.2 modified Boussinesq; spec-v310 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `brick-veneer-anchor-spacing` | Brick Veneer Anchor Spacing and Count (TMS 402 / IBC 1405) | TMS 402 / IBC 1405; spec-v369 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `brick-veneer-weep-count` | Brick Veneer Weep-Hole Count (IRC R703.8.6) | brick veneer weep spacing (IRC R703.8.6); weeps = ceil(30*12/33) + 1 = ceil(10.9) + 1 = 11 + 1 = 12 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `buffer-stroke-speed` | Elevator Buffer Stroke and Impact Speed | Project (first-principles); ASME A17.1 retardation limits named | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cabinet-linear-feet` | Kitchen Cabinet Linear-Foot Takeoff | cabinet takeoff arithmetic; 22-ft base run, 5 ft of appliance openings, 2 inside corn... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cantilever-beam` | Cantilever Beam Moment, Shear, and Deflection | Roark / AISC beam diagrams; spec-v341 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `carbon-equivalent` | Carbon Equivalent and Preheat Screen | IIW / AWS D1.1 carbon-equivalent formula; A36-type C 0.25, Mn 0.80 -> CE 0.38333 (0.35-0.55 band) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4241,6 +4253,7 @@ per spec-v14 §13.1 second paragraph.
 | `corner-bead-takeoff` | Corner Bead / Drywall Trim Takeoff | takeoff arithmetic; 9 corners x 8 ft + 2 wrapped 3 x 7 openings, 10-ft stock,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `coulomb-earth-pressure` | Coulomb Active Earth Pressure (Wall Friction and Batter) | Coulomb (1776) as compiled in Das / N...; spec-v628 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `countertop-overhang-support` | Stone Countertop Overhang Support Check | stone-industry support guidance; 12-in overhang, 36-in depth, 3 cm, 8-ft run, 170 pcf -> t... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `counterweight-balance` | Elevator Counterweight Balance and Unbalanced Load | Project (first-principles); ASME A17.1 governs traction | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `crane-lift-quick` | Crane Lift Plan Quick-Math | ASME B30.5 / manufacturer load-chart ...; 8000 lb load + 200 lb rigging / 2-leg sling at 60 deg fro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `crawl-space-ventilation` | Crawl Space (Under-Floor) Ventilation Net Free Area | International Code Council; 'The minimum net area of ventilation openings shall be no... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `curb-gutter-volume` | Curb-and-Gutter Concrete Volume | Linear-pour identity (first-principles); volume = 2.0*300/27*1.08 = 24.0; cy/100LF = 2.0*100/27 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4258,6 +4271,7 @@ per spec-v14 §13.1 second paragraph.
 | `diaphragm-collector-force` | Collector / Drag Strut Axial Force (ASCE 7 12.10) | ASCE 7-22 Section 12.10 (collectors a...; 300 plf dragged 40 ft -> 12000 lb; Omega0 2.5 -> 30000 lb... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `diaphragm-shear` | Wood Diaphragm Unit Shear and Chord Force (SDPWS) | AWC SDPWS flexible-diaphragm model (A...; spec-v272 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `door-clear-width` | Door Clear Width, Thresholds, and Doors in Series (2010 ADA Standards 404.2) | US Department of Justice / US Access ...; 404.2.3: 'Door openings shall provide a clear width of 32... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `door-closing-energy` | Elevator Door Closing Kinetic Energy and Force | Project (first-principles); ASME A17.1 closing energy limits; both entered from the code | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `door-maneuvering-clearance` | Door Maneuvering Clearance, Front Approach (ADA 404.2.4.1) | US Access Board / Department of Justice; 'Maneuvering space on the pull side extends 18 inches min... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dozer-production` | Dozer Slot / Blade Production Rate | Caterpillar Performance Handbook slot...; 8 lcy blade, 100 ft push at 200 fpm, return 400 fpm, 0.05... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drainage-board-takeoff` | Foundation Drainage Board (Dimple Mat) Takeoff | Foundation drainage board (dimple mat...; area = 150 x 8 = 1,200 sf; rolls = ceil(1200 x 1.1 / 200)... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4311,10 +4325,12 @@ per spec-v14 §13.1 second paragraph.
 | `glass-vacuum-lift` | Glass Weight and Suction-Cup Lifter Count | Suction-cup lifter identity (first-pr...; weight = 32*0.5*13 = 208; cups = ceil(208*4/150) = ceil(5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `glass-weight` | Flat Glass Lite Weight | NGA Glazing Manual glass-weight table...; 60 x 40 in lite of 1/4 in soda-lime -> 16.67 ft2, 54.2 lb... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `glulam-volume-factor` | Glulam Volume Factor Cv (NDS 5.3.6) | NDS 2018 §5.3.6; spec-v448 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `governor-tripping-speed` | Elevator Overspeed Governor Tripping Speed Band | Project (first-principles); ASME A17.1; both bounds entered from the code table | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `groove-weld-length-for-load` | Groove Weld Length for an Applied Load | AWS D1.1 / AISC 360 §J2 (solved for l...; 100,000 lb LRFD, E70, PJP throat 0.25 in -> 31.5 ksi -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `groove-weld-strength` | Groove Weld Strength | AWS D1.1 / AISC 360 §J2 Table J2.5 (b...; PJP throat 0.25 in, 6 in long, E70, LRFD -> 0.75*0.60*70 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `guard-handrail-check` | Guard and Handrail Code Check | IRC R312 / R311.7.8 / IBC 1015 (by se...; spec-v113 section 2.1 pinned example (48 in surface, 36 i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `guard-post-load` | Guard Post Load and Base Connection | International Code Council; 'Handrails and guards shall be designed to resist a linea... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `guide-rail-bracket-span` | Elevator Guide Rail Bracket Span, Stress, and Deflection | Project (first-principles); ASME A17.1 governs load cases and allowables | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gutter-downspout` | Gutter and Downspout Sizing | SMACNA / standard residential gutter ...; spec-v98 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gutter-downspout-takeoff` | Gutter LF and Downspout Count Takeoff | Gutter takeoff identity (first-princi...; downspouts=ceil(2400/800)=3; pipe=3*10=30; hangers=ceil(1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `handrail-geometry` | Handrail Height, Grip, and Extensions (2010 ADA Standards 505) | US Department of Justice / US Access ...; 505.7.1: 'Handrail gripping surfaces with a circular cros... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4325,11 +4341,13 @@ per spec-v14 §13.1 second paragraph.
 | `helical-pile` | Helical Pile Torque-to-Capacity | Project (first-principles) over IBC s...; 1.5 in solid square shaft / 5000 ft-lb torque / FOS 2.0 -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `helical-pile-torque` | Helical Pile Acceptance Torque for a Target Capacity | IBC sec. 1810.3.3.1.9 helical-pile to...; 1.5 in solid shaft (Kt 10), 25,000 lb allowable at FOS 2 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hip-valley-rafter` | Hip / Valley / Jack Rafter Schedule | Project (first-principles); 14 ft run / 6:12 pitch / 12 in overhang -> common 15.65 f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `hoistway-venting` | Hoistway Smoke Venting and Pressurization Screen | Project (first-principles); NFPA 92 and the adopted building code named | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hoop-stress-mawp` | Thin-Wall Vessel Max Allowable Working Pressure | thin-wall / Barlow (inverse); spec-v668 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hoop-stress-thin-wall` | Thin-Wall Pressure Vessel Hoop and Longitudinal Stress | thin-wall / Barlow; spec-v361 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `horizontal-curve` | Horizontal Curve Layout | AASHTO Green Book / FM 5-233 (by name); R = 1000 ft, delta = 30 deg -> T 267.95, L 523.60, LC 517... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `horizontal-sightline-offset` | Horizontal Sightline Offset on a Curve (AASHTO) | AASHTO Green Book; spec-v337 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `housewrap-rolls` | Housewrap (WRB) Rolls, Cap Fasteners, and Seam Tape | Housewrap takeoff identity (first-pri...; rolls = ceil(4000*1.10/1350) = ceil(3.26) = 4; cap = ceil... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `hydraulic-jack-pressure` | Hydraulic Elevator Jack Pressure, Flow, and Bore Change | Project (first-principles); ASME A17.1 governs relief settings and testing | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hydroseed-mix` | Hydroseed Slurry Mix and Tank Count | Slurry loading identity (first-princi...; solids = 3*(5+2000+50) = 6,165 lb; tanks = ceil(6165/(300... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ice-barrier-coverage` | Eave Ice-Barrier Membrane Courses and Rolls | IRC R905.1.2 eave ice-barrier extent ...; spec-v215 section 2.1 pinned example (typical 4/12, 12 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `igu-u-factor` | Insulating Glass U-Factor and Interior Condensation Screen | ASHRAE; U = 1/R_total; T_surface = T_in - U x R_indoor film x dT | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4348,6 +4366,7 @@ per spec-v14 §13.1 second paragraph.
 | `liquefaction-screening` | Liquefaction Triggering Screening (Seed-Idriss CSR) | Seed-Idriss; spec-v416 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `loader-production` | Wheel-Loader / Excavator Bucket Production Rate | Caterpillar Performance Handbook cycl...; 3.5 lcy bucket, 0.95 fill, 0.50 min cycle, 50-min hour, 8... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lumber-spans` | Lumber Spans | Project (first-principles) over AWC N...; DF-L No.2 / 2x10 / 50 psf total / 16 in o.c. / L/360 -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `machine-room-heat` | Elevator Machine Room Heat Load and Cooling | Project (first-principles); ASME A17.1 and the manufacturer's environmental limits named | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `masonry-anchor-bolt` | Masonry Headed Anchor Bolt Tension (TMS 402 ASD) | TMS 402 ASD; spec-v449 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `masonry-anchor-embedment` | Masonry Anchor Embedment for a Tension (TMS 402 ASD) | TMS 402 ASD; 5,000 lb tension, 1,500 psi masonry -> 5.73 in embedment;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `masonry-anchor-shear` | Masonry Anchor Bolt in Shear (TMS 402 ASD) | TMS 402-16 ASD (Section 8.1.5.2); 3/4in A307, 1,500 psi, 5 in embed 4 in from edge: Bvb 1,2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4442,6 +4461,7 @@ per spec-v14 §13.1 second paragraph.
 | `roof-pitch` | Roof Pitch | Project (first-principles); Pitch (rise / 12 run); angle = atan(rise/run) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `roof-underlayment-rolls` | Roof Underlayment Roll Count | Roofing underlayment roll-count ident...; rolls = ceil(2500*1.10/1000) = ceil(2.75) = 3 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `roofing-squares` | Roofing Squares and Bundles | Project (industry rule of thumb); 2200 ft^2 roof / 6:12 pitch (12% waste) / architectural s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `rope-safety-factor` | Elevator Suspension Rope Factor of Safety | Project (first-principles); ASME A17.1 speed-dependent minimums named; the minimum is... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rough-opening-size` | Window / Door Rough Opening Size | US framing convention; slab + 2 in wide / + 2.5 in tall -> 38 x 82.5 RO; header ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rusle-soil-loss` | RUSLE Annual Soil Loss | RUSLE (USDA Agriculture Handbook 703); A = 150*0.32*1.5*1.0*1.0 = 72 tons/acre/yr; site = 72*5 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sag-vertical-curve` | Sag Vertical Curve Length for Headlight SSD (AASHTO) | AASHTO Green Book (sag headlight crit...; spec-v636 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4546,6 +4566,7 @@ per spec-v14 §13.1 second paragraph.
 | `steel-tau-b-stiffness-reduction` | Direct-Analysis Stiffness Reduction tau_b (AISC 360 C2.3) | AISC 360-22 Section C2.3 (direct-anal...; Py=50*14.4=720; ratio=1.0*400/720=0.5556; tau_b=4*0.5556*... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-tension-member` | Steel Tension Member: Yield and Rupture with Shear Lag (AISC 360 D2/D3) | AISC 360-22 Chapter D (D2 / D3, Table...; spec-v283 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-web-local-strength` | Steel Web Local Yielding and Crippling (AISC 360 J10) | AISC 360-22 J10.2 / J10.3; spec-v293 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `step-chain-tension` | Escalator Step Chain Tension, Drive Power, and Brake Load | Project (first-principles); ASME A17.1 governs the brake and its stopping distance | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `step-flashing-count` | Roof Step-Flashing Piece Count | Roof step-flashing takeoff (one per s...; pieces = ceil(20*12/5) + 1 = 48 + 1 = 49; order = ceil(49... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stockpile-volume` | Conical Stockpile Volume and Tonnage | Right-circular-cone identity (first-p...; radius = 30; height = 30*tan(37) = 22.6 ft; volume = (1/3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `striping-paint-quantity` | Pavement Marking Paint and Glass Bead Quantity | Pavement-marking quantity identity (f...; area = 5280*4/12 = 1,760 sf; paint = 1760/320 = 5.5 gal; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4567,6 +4588,7 @@ per spec-v14 §13.1 second paragraph.
 | `tile-count` | Tile Count and Grout Volume | Project (first-principles); 100 ft^2 with 12x12 tiles, default 1/8 in grout, 10% wast... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `track-superelevation` | Railroad Curve Superelevation, Unbalance, and Maximum Speed | Project (first-principles); 49 CFR 213 named for the elevation and unbalance caps | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `track-warp-fra-class` | Track Cross-Level Deviation and Warp Against a Class Limit | Project (first-principles); 49 CFR 213 named as the source of the class limits, which... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `traction-roping-ratio` | Elevator Traction Roping Ratio, Torque, and Rope Tension | Project (first-principles); ASME A17.1 and the equipment manufacturer named | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `traffic-taper-length` | Work-Zone Merging Taper Length and Device Count (MUTCD) | MUTCD merging-taper identity (public-...; S >= 45: L = 12*55 = 660 ft; devices = ceil(660/40)+1 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `trim-linear-footage` | Trim Linear Footage and Miters | finish-carpentry practice; spec-v440 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tube-bend-wall-thinning` | Tube Bend Wall Thinning and Bend Ratio | Project (first-principles); wall x CLR / (CLR + OD/2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5460,6 +5482,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1811. Fixture-covered or reference-cadence: 1811 / 1811.
+Tile count: 1822. Fixture-covered or reference-cadence: 1822 / 1822.
 
 <!-- END tile-index-v14 -->

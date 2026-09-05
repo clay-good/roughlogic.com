@@ -663,6 +663,15 @@ export const TOOL_MODULES = (() => {
     "rail-wear-condemning-limit", "track-warp-fra-class",
     "ballast-section-volume", "turnout-frog-lead",
   ]);
+  // spec-v1648..v1658: the elevator and escalator equipment bench. The catalog
+  // had two elevator tiles, both about traffic handling. All eleven keep
+  // group "E".
+  declare("./calc-elevator.js", "ELEVATOR_RENDERERS", [
+    "traction-roping-ratio", "counterweight-balance", "rope-safety-factor",
+    "buffer-stroke-speed", "hoistway-venting", "machine-room-heat",
+    "hydraulic-jack-pressure", "step-chain-tension", "door-closing-energy",
+    "governor-tripping-speed", "guide-rail-bracket-span",
+  ]);
   // spec-v80 cap-relief split: the spec-v25 site-civil / roadway-geometry
   // quartet moved out of calc-construction.js (it sat at 95.0% of its size
   // cap, the tightest remaining calculator module) into its own module. All

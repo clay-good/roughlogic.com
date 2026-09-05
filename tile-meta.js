@@ -824,6 +824,18 @@ const _TILES = [
   ["track-warp-fra-class", "E"],
   ["ballast-section-volume", "E"],
   ["turnout-frog-lead", "E"],
+  // spec-v1648..v1658 elevator and escalator band (trade expansion 2, Group E)
+  ["traction-roping-ratio", "E"],
+  ["counterweight-balance", "E"],
+  ["rope-safety-factor", "E"],
+  ["buffer-stroke-speed", "E"],
+  ["hoistway-venting", "E"],
+  ["machine-room-heat", "E"],
+  ["hydraulic-jack-pressure", "E"],
+  ["step-chain-tension", "E"],
+  ["door-closing-energy", "E"],
+  ["governor-tripping-speed", "E"],
+  ["guide-rail-bracket-span", "E"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   ["grounding-electrode-conductor", "A"],
   ["bonding-jumper", "A"],

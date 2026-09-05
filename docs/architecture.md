@@ -53,7 +53,7 @@ active. Cache version is keyed to the build hash.
 |  |  +------------+  +-----------+  +---------------------+   | |
 |  |  | pinned     |  | theme     |  | offline / print     |   | |
 |  |  +------------+  +-----------+  +---------------------+   | |
-|  |   dynamic-import: 58 calc-* modules (the repo-root        | |
+|  |   dynamic-import: 59 calc-* modules (the repo-root        | |
 |  |   calc-*.js set, one per trade bench; each holds a        | |
 |  |   documented gzip cap in check-module-sizes.mjs) plus     | |
 |  |   citations / tile-meta / limitation-banner /             | |
@@ -87,7 +87,7 @@ active. Cache version is keyed to the build hash.
 
 The on-disk layout matches spec.md section 6 exactly. The key structural rules are:
 
-- A single index.html, styles.css, app.js, and sw.js at the repository root. `sw.js` precaches the app shell and the data manifests; it does **not** precache the **1833 static shells**. A shell URL opened offline therefore takes the navigation fallback, which redirects to the root and carries a tile id through as the hash (`/tools/ohms-law/` -> `/#ohms-law`). Serving index.html at the shell's own URL, as the fallback did until 2026-08-31, left every relative asset path resolving under `/tools/<id>/`, so the reader got an unstyled home view instead of the calculator they asked for.
+- A single index.html, styles.css, app.js, and sw.js at the repository root. `sw.js` precaches the app shell and the data manifests; it does **not** precache the **1844 static shells**. A shell URL opened offline therefore takes the navigation fallback, which redirects to the root and carries a tile id through as the hash (`/tools/ohms-law/` -> `/#ohms-law`). Serving index.html at the shell's own URL, as the fallback did until 2026-08-31, left every relative asset path resolving under `/tools/<id>/`, so the reader got an unstyled home view instead of the calculator they asked for.
 - Per-trade data folders under data/, each with a manifest.json and one or more shard JSON files.
 - Build-time scripts in scripts/ never run in production.
 - Test fixtures and suites under test/.
@@ -125,7 +125,7 @@ There is no sessionStorage, cookies, or IndexedDB. localStorage is used by `them
 ## v2 module layout
 
 The v2 expansion (spec-v2.md) added the first lazy-loaded module past
-the original seven trade calc-* modules. The set has since grown to 58
+the original seven trade calc-* modules. The set has since grown to 59
 modules; the authoritative current inventory is the
 repo-root `calc-*.js` set, each with a documented gzip cap in
 `scripts/check-module-sizes.mjs`.

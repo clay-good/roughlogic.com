@@ -1,7 +1,7 @@
 # Scope: The 2026-09-05 Trade Expansion (specs v1450-v1749, 300 New Tiles)
 
 > **Status: IN PROGRESS (2026-09-05). Program charter, no catalog change of its own.**
-> **Band 1 of the program has landed: v1539-v1545, the railroad track bench, 1,804 -> 1,811.**
+> **Bands 1 and 2 have landed: v1539-v1545 (railroad track) and v1648-v1658 (elevator and escalator), 1,804 -> 1,822.**
 > Inherits the spec-v106 trades-only charter and every convention through spec-v1449.
 > Each of the 300 tiles is specified in its own file, `spec-v1450.md` through `spec-v1749.md`.
 
@@ -543,12 +543,24 @@ things must happen **before** the first band, not during it:
 | Band | Specs | Module | Tiles | Commit |
 | --- | --- | --- | --- | --- |
 | 1 | v1539-v1545 | `calc-rail.js` (new) | 7 | railroad track and equipment; catalog 1,804 -> 1,811 |
+| 2 | v1648-v1658 | `calc-elevator.js` (new) | 11 | elevator and escalator equipment; catalog 1,811 -> 1,822 |
 
-Two of the seven specs in band 1 were internally wrong and shipped corrected: spec-v1541's
-2,450 lb per degF is not what its own stated inputs give (13.0 x 30,000,000 x 0.0000065 is 2,535,
-and 61,262 and 208,292 follow from the wrong figure), and spec-v1545's worked example calls a car
-15 ft from the main "fouling" against a 13 ft requirement when it is clear. Recompute every spec
-example line by line before coding it.
+**Five of the eighteen specs built so far were internally wrong and shipped corrected.** In band 1:
+spec-v1541's 2,450 lb per degF is not what its own stated inputs give (13.0 x 30,000,000 x
+0.0000065 is 2,535, and 61,262 and 208,292 follow from the wrong figure), and spec-v1545's worked
+example calls a car 15 ft from the main "fouling" against a 13 ft requirement when it is clear.
+In band 2: spec-v1652 left an unrendered python format placeholder in its worked example
+(`{21*0.25*5.2:.1f}`, which is 27.3 lbf); spec-v1656 treats 4.0 ft-lb as a REDUCTION target for a
+door already at 2.18 and calls the resulting 36% speed increase a reduction; and spec-v1658 says
+"moment as the square and deflection as the fourth power", which is the uniform-load case, while
+its own formula line is `M = P L / 4`, a midspan point load, for which the moment goes as the span
+and the deflection as its cube. **Recompute every spec example line by line before coding it, and
+check the formula block against the prose that surrounds it.**
+
+**A spec's Inputs list can also contain an input the math cannot use**, which
+`check-guard-only-inputs` fails on. Four have been dropped so far (v1543's FRA class number,
+v1544's shoulder width, v1649's rope weight and compensation, v1652's floor count), each recorded
+in the tile's own scope prose.
 
 ## 8. See also
 

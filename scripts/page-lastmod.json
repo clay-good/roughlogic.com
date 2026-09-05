@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "a22a57a17fdd9ca8",
+      "sha": "de2fa1fccf37b6b9",
       "date": "2026-09-05"
     },
     "/tools/": {
-      "sha": "12a4fd5ee483be54",
+      "sha": "855c39a178476cc9",
       "date": "2026-09-05"
     },
     "/groups/accounting/": {
-      "sha": "12125f6e44b83e37",
+      "sha": "033c2adaca5b753a",
       "date": "2026-09-05"
     },
     "/groups/agriculture/": {
-      "sha": "612117825f293cad",
+      "sha": "9e9b5bc638fb9aed",
       "date": "2026-09-05"
     },
     "/groups/construction/": {
-      "sha": "652f22c26704028c",
+      "sha": "8fea1f371eeeec8a",
       "date": "2026-09-05"
     },
     "/groups/cross-trade/": {
-      "sha": "ad6cd5c642d10eec",
+      "sha": "b177b93200c89199",
       "date": "2026-09-05"
     },
     "/groups/educators/": {
-      "sha": "764bdcac344814e6",
+      "sha": "6ba50b6c14b32b56",
       "date": "2026-09-05"
     },
     "/groups/electrical/": {
-      "sha": "480c51de648871d9",
+      "sha": "0dc942cda763f1f8",
       "date": "2026-09-05"
     },
     "/groups/field/": {
-      "sha": "fcced1de28221395",
+      "sha": "9bd79b42c2d8c7e8",
       "date": "2026-09-05"
     },
     "/groups/fire-ground/": {
-      "sha": "7e9d1b7ca4c8e2ee",
+      "sha": "3927c3d62e47487f",
       "date": "2026-09-05"
     },
     "/groups/historical/": {
-      "sha": "dbdcf5b3cc573686",
+      "sha": "8ab6c41c21e8a139",
       "date": "2026-09-05"
     },
     "/groups/hvac/": {
-      "sha": "c88455bb6848cca7",
+      "sha": "c7bec4a0528fd7e8",
       "date": "2026-09-05"
     },
     "/groups/kitchen/": {
-      "sha": "a98bbf07ade58130",
+      "sha": "46c0dcaa8b028ce9",
       "date": "2026-09-05"
     },
     "/groups/lab/": {
-      "sha": "943ba4ff3b1219d6",
+      "sha": "27ad7d1dd57cf735",
       "date": "2026-09-05"
     },
     "/groups/mechanic/": {
-      "sha": "6f36c774b0124adf",
+      "sha": "ea1d6a26ee897009",
       "date": "2026-09-05"
     },
     "/groups/plumbing/": {
-      "sha": "7dfb40bc46adb96a",
+      "sha": "47e6d9d615d1381c",
       "date": "2026-09-05"
     },
     "/groups/real-estate/": {
-      "sha": "5ff2156b36fe4084",
+      "sha": "8643014042464f0b",
       "date": "2026-09-05"
     },
     "/groups/references/": {
-      "sha": "c7e82f9251f158e5",
+      "sha": "1c613736708bad83",
       "date": "2026-09-05"
     },
     "/groups/restoration/": {
-      "sha": "2c5fa763d1c0e49e",
+      "sha": "bc5f13986a39835b",
       "date": "2026-09-05"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "c20d493ff5c5adb4",
+      "sha": "461b50771b25b7de",
       "date": "2026-09-05"
     },
     "/groups/stage/": {
-      "sha": "add1a52d2e013907",
+      "sha": "a0a6b7b94db67ef3",
       "date": "2026-09-05"
     },
     "/groups/trucking/": {
-      "sha": "876b94ba9b1b86bc",
+      "sha": "47f85214471e6513",
       "date": "2026-09-05"
     },
     "/groups/water/": {
-      "sha": "f25f75f5fbcd92ad",
+      "sha": "3bfc022fc4d16aa8",
       "date": "2026-09-05"
     },
     "/tools/aav-install-check/": {
@@ -736,6 +736,10 @@
     "/tools/bucket-elevator-capacity/": {
       "sha": "5b4fc23e52c3e313",
       "date": "2026-09-04"
+    },
+    "/tools/buffer-stroke-speed/": {
+      "sha": "75fe1508f22fa50c",
+      "date": "2026-09-05"
     },
     "/tools/buffer-tank-loop-credit/": {
       "sha": "3f759999ba9b97bc",
@@ -1553,6 +1557,10 @@
       "sha": "2bec2e6110a7e7ad",
       "date": "2026-09-01"
     },
+    "/tools/counterweight-balance/": {
+      "sha": "3fa9b013d09f5e0c",
+      "date": "2026-09-05"
+    },
     "/tools/covers-per-labor-hour/": {
       "sha": "302b263b3c55a4c0",
       "date": "2026-09-01"
@@ -1856,6 +1864,10 @@
     "/tools/door-clear-width/": {
       "sha": "9cf777c15f3952a3",
       "date": "2026-09-01"
+    },
+    "/tools/door-closing-energy/": {
+      "sha": "472546d5b540ea17",
+      "date": "2026-09-05"
     },
     "/tools/door-maneuvering-clearance/": {
       "sha": "89e4cf4001042488",
@@ -2246,8 +2258,8 @@
       "date": "2026-09-01"
     },
     "/tools/escalator-capacity/": {
-      "sha": "d106dd603837e9a6",
-      "date": "2026-09-04"
+      "sha": "1e77478915e466d8",
+      "date": "2026-09-05"
     },
     "/tools/estimated-tax/": {
       "sha": "32ef8f8546f8d77d",
@@ -2470,8 +2482,8 @@
       "date": "2026-09-02"
     },
     "/tools/fire-stream-reaction/": {
-      "sha": "750fb403202dd675",
-      "date": "2026-09-04"
+      "sha": "3821961674f230ed",
+      "date": "2026-09-05"
     },
     "/tools/fire-tank-sizing/": {
       "sha": "b06a0ddb16be52b7",
@@ -2853,6 +2865,10 @@
       "sha": "89823386650f26d2",
       "date": "2026-09-01"
     },
+    "/tools/governor-tripping-speed/": {
+      "sha": "0e6656f5044f25f0",
+      "date": "2026-09-05"
+    },
     "/tools/gpa-calculator/": {
       "sha": "6428f03b0c74c42b",
       "date": "2026-09-01"
@@ -2956,6 +2972,10 @@
     "/tools/guard-post-load/": {
       "sha": "de7b874d14acb169",
       "date": "2026-09-01"
+    },
+    "/tools/guide-rail-bracket-span/": {
+      "sha": "b119ed0a9f1d0f55",
+      "date": "2026-09-05"
     },
     "/tools/gutter-downspout/": {
       "sha": "0c33dcf6cbbeab36",
@@ -3089,6 +3109,10 @@
       "sha": "966d92bc64338990",
       "date": "2026-09-02"
     },
+    "/tools/hoistway-venting/": {
+      "sha": "c4b06a210ebe2755",
+      "date": "2026-09-05"
+    },
     "/tools/home-office/": {
       "sha": "0c83f503f82da5cb",
       "date": "2026-09-01"
@@ -3180,6 +3204,10 @@
     "/tools/hydraulic-drive-flow-limit/": {
       "sha": "a22f0881d31e5b38",
       "date": "2026-09-01"
+    },
+    "/tools/hydraulic-jack-pressure/": {
+      "sha": "d6b6274c5fcf0aa6",
+      "date": "2026-09-05"
     },
     "/tools/hydraulic-jump/": {
       "sha": "658cf71b127067ed",
@@ -3624,6 +3652,10 @@
     "/tools/lv-dc-drop/": {
       "sha": "2785baf15ac55fcb",
       "date": "2026-09-01"
+    },
+    "/tools/machine-room-heat/": {
+      "sha": "e4f59dc83023eb2f",
+      "date": "2026-09-05"
     },
     "/tools/machining-time/": {
       "sha": "febe0c6445e20035",
@@ -5253,6 +5285,10 @@
       "sha": "8479614c9afc1849",
       "date": "2026-09-01"
     },
+    "/tools/rope-safety-factor/": {
+      "sha": "8bf1f92c447cb26e",
+      "date": "2026-09-05"
+    },
     "/tools/rotary-phase-converter-sizing/": {
       "sha": "d0238268d710032a",
       "date": "2026-09-04"
@@ -5786,8 +5822,8 @@
       "date": "2026-09-01"
     },
     "/tools/soil-permeability/": {
-      "sha": "4b1aa9845372b9d2",
-      "date": "2026-09-04"
+      "sha": "e69f22b77877f969",
+      "date": "2026-09-05"
     },
     "/tools/soil-phase-relations/": {
       "sha": "919e5fa4e4fb9bc5",
@@ -6038,8 +6074,8 @@
       "date": "2026-09-01"
     },
     "/tools/staggered-net-width/": {
-      "sha": "2b53758815797f28",
-      "date": "2026-09-01"
+      "sha": "2eac78ff59029778",
+      "date": "2026-09-05"
     },
     "/tools/stair-code-check/": {
       "sha": "4eb3a0d1303d5d67",
@@ -6220,6 +6256,10 @@
     "/tools/steel-web-local-strength/": {
       "sha": "3331d2685ecd5f93",
       "date": "2026-09-01"
+    },
+    "/tools/step-chain-tension/": {
+      "sha": "14875f3fa4c18879",
+      "date": "2026-09-05"
     },
     "/tools/step-flashing-count/": {
       "sha": "6a20eda298247fed",
@@ -6635,6 +6675,10 @@
     },
     "/tools/track-warp-fra-class/": {
       "sha": "f1e2ec8a53b0c0d9",
+      "date": "2026-09-05"
+    },
+    "/tools/traction-roping-ratio/": {
+      "sha": "e14cc0f1cc6ebbbb",
       "date": "2026-09-05"
     },
     "/tools/tractor-ballast/": {

@@ -94166,6 +94166,601 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "traction-roping-ratio",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "500 fpm car on 2 to 1 roping over a 30 in sheave, 2,000 lb unbalanced",
+   "source_edition_or_year": "rope speed = ratio x car speed; sheave torque = (unbalanced / ratio) x radius",
+   "source_section_or_page": "ASME A17.1 and the equipment manufacturer named",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "roping_ratio": 2,
+    "car_speed_fpm": 500,
+    "sheave_diameter_in": 30,
+    "unbalanced_load_lb": 2000,
+    "suspended_load_lb": 11500,
+    "rope_count": 5,
+    "machine_rated_torque_ftlb": 1500,
+    "alternative_roping_ratio": 1
+   },
+   "outputs": {
+    "rope_speed_fpm": {
+     "value": 1000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sheave_rpm": {
+     "value": 127.324,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sheave_torque_ftlb": {
+     "value": 1250,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tension_per_rope_lb": {
+     "value": 1150,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "power_hp": {
+     "value": 30.303,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_sheave_torque_ftlb": {
+     "value": 2500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "counterweight-balance",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "8,000 lb car, 3,500 lb capacity, 45% overbalance, 9,575 lb counterweight",
+   "source_edition_or_year": "counterweight = car + overbalance x capacity",
+   "source_section_or_page": "ASME A17.1 governs traction",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "car_weight_lb": 8000,
+    "rated_capacity_lb": 3500,
+    "overbalance_pct": 45,
+    "actual_counterweight_lb": 9575,
+    "added_car_weight_lb": 400
+   },
+   "outputs": {
+    "counterweight_required_lb": {
+     "value": 9575,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "unbalanced_empty_lb": {
+     "value": 1575,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "unbalanced_full_lb": {
+     "value": 1925,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "balance_point_lb": {
+     "value": 1575,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "overbalance_actual_pct": {
+     "value": 45,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "modified_overbalance_pct": {
+     "value": 33.571,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rope-safety-factor",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "5 ropes on a 220 ft rise at 0.68 lb/ft, 12,000 lb car, 3,500 lb rated load",
+   "source_edition_or_year": "FS = (count x breaking strength) / total suspended load",
+   "source_section_or_page": "ASME A17.1 speed-dependent minimums named; the minimum is entered",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "car_weight_lb": 12000,
+    "rated_load_lb": 3500,
+    "travelling_cable_lb": 200,
+    "rope_count": 5,
+    "rope_weight_per_ft": 0.68,
+    "rope_breaking_strength_lb": 17900,
+    "rise_ft": 220,
+    "code_minimum_fs": 7.6
+   },
+   "outputs": {
+    "rope_weight_lb": {
+     "value": 748,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "suspended_load_lb": {
+     "value": 16448,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "breaking_total_lb": {
+     "value": 89500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "factor_of_safety": {
+     "value": 5.4414,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fs_without_rope_weight": {
+     "value": 5.7006,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "buffer-stroke-speed",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "500 fpm car tripping mechanically at 575 fpm, one-gravity average retardation",
+   "source_edition_or_year": "stroke = v squared / (2 a)",
+   "source_section_or_page": "ASME A17.1 retardation limits named",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "contract_speed_fpm": 500,
+    "governor_trip_fpm": 575,
+    "permitted_retardation_g": 1,
+    "buffer_rated_stroke_in": 21,
+    "buffer_rated_speed_fpm": 600
+   },
+   "outputs": {
+    "impact_speed_fps": {
+     "value": 9.5833,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "stroke_required_in": {
+     "value": 17.127,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "stroke_at_1g_in": {
+     "value": 17.127,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "retardation_installed_g": {
+     "value": 0.8156,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_speed_for_buffer_fpm": {
+     "value": 636.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hoistway-venting",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "10 by 9 ft hoistway, 36 by 84 in door, 0.10 in wc pressurization",
+   "source_edition_or_year": "vent fraction of plan area; 5.2 lbf per sq ft per in wc on the door",
+   "source_section_or_page": "NFPA 92 and the adopted building code named",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "hoistway_plan_area_sqft": 90,
+    "vent_fraction_pct": 3.5,
+    "door_width_in": 36,
+    "door_height_in": 84,
+    "pressure_diff_inwc": 0.1,
+    "door_force_limit_lbf": 30,
+    "leakage_area_sqft": 2.0
+   },
+   "outputs": {
+    "vent_area_sqft": {
+     "value": 3.15,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "door_area_sqft": {
+     "value": 21,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "door_force_added_lbf": {
+     "value": 10.92,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_pressure_inwc": {
+     "value": 0.2747,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "supply_airflow_cfm": {
+     "value": 1650.71,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "machine-room-heat",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "15 kW machine and drive at 85% efficiency, 40% peak-hour duty cycle",
+   "source_edition_or_year": "Q = input power x (1 - efficiency) at 3,412.142 BTU/h per kW",
+   "source_section_or_page": "ASME A17.1 and the manufacturer's environmental limits named",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "input_power_kw": 15,
+    "efficiency_pct": 85,
+    "duty_cycle_pct": 40,
+    "controller_standby_w": 400,
+    "other_gains_btuh": 6000,
+    "room_volume_cuft": 2000,
+    "ambient_limit_f": 104,
+    "starting_temp_f": 80
+   },
+   "outputs": {
+    "heat_running_btuh": {
+     "value": 7677.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heat_average_btuh": {
+     "value": 3070.9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "controller_btuh": {
+     "value": 1364.86,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_btuh": {
+     "value": 10435.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cooling_tons": {
+     "value": 0.8696,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "connected_overstatement": {
+     "value": 6.6667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydraulic-jack-pressure",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "12 in bore carrying 14,000 lb at 125 fpm, compared against a 10 in bore",
+   "source_edition_or_year": "P = load / area; gpm = area x speed x 12 / 231",
+   "source_section_or_page": "ASME A17.1 governs relief settings and testing",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "bore_in": 12,
+    "total_load_lb": 14000,
+    "car_speed_fpm": 125,
+    "pump_flow_gpm": 734.4,
+    "relief_setting_psi": 150,
+    "alternative_bore_in": 10
+   },
+   "outputs": {
+    "jack_area_sqin": {
+     "value": 113.097,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "working_pressure_psi": {
+     "value": 123.787,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "flow_required_gpm": {
+     "value": 734.398,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_working_pressure_psi": {
+     "value": 178.254,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_pressure_change_pct": {
+     "value": 44,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_speed_from_pump_fpm": {
+     "value": 180.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "step-chain-tension",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "12,000 lb moving load at 30 degrees on 0.03 friction, 100 fpm, two chains",
+   "source_edition_or_year": "gravity = W sin(theta); friction = W cos(theta) x mu",
+   "source_section_or_page": "ASME A17.1 governs the brake and its stopping distance",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "total_load_lb": 12000,
+    "incline_deg": 30,
+    "friction_coefficient": 0.03,
+    "chain_speed_fpm": 100,
+    "chain_count": 2,
+    "alternative_incline_deg": 6
+   },
+   "outputs": {
+    "gravity_lb": {
+     "value": 6000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "friction_lb": {
+     "value": 311.769,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tension_lb": {
+     "value": 6311.77,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "per_chain_lb": {
+     "value": 3155.88,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "power_hp": {
+     "value": 19.127,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "descending_brake_lb": {
+     "value": 5688.23,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_gravity_lb": {
+     "value": 1254.34,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "door-closing-energy",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "140 lb moving door assembly at 1.0 ft/s average closing speed",
+   "source_edition_or_year": "KE = one half x (W / 32.174) x v squared",
+   "source_section_or_page": "ASME A17.1 closing energy limits; both entered from the code",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "door_mass_lb": 140,
+    "closing_speed_fps": 1.0,
+    "ke_limit_normal_ftlb": 7.0,
+    "ke_limit_reduced_ftlb": 2.5,
+    "measured_force_lbf": 25,
+    "force_limit_lbf": 30,
+    "opening_width_in": 42,
+    "added_mass_lb": 20
+   },
+   "outputs": {
+    "kinetic_energy_ftlb": {
+     "value": 2.1757,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "speed_for_reduced_limit_fps": {
+     "value": 1.0719,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "closing_time_s": {
+     "value": 3.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ke_with_added_mass_ftlb": {
+     "value": 2.4865,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "governor-tripping-speed",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "500 fpm car, electrical trip 550 fpm, mechanical trip 575 fpm",
+   "source_edition_or_year": "minimum mechanical trip = 115 percent of rated speed",
+   "source_section_or_page": "ASME A17.1; both bounds entered from the code table",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "rated_speed_fpm": 500,
+    "electrical_trip_fpm": 550,
+    "mechanical_trip_fpm": 575,
+    "code_minimum_pct": 115,
+    "code_maximum_fpm": 690
+   },
+   "outputs": {
+    "minimum_trip_fpm": {
+     "value": 575,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "mechanical_margin_pct": {
+     "value": 15,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "electrical_margin_pct": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "headroom_fpm": {
+     "value": 115,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "impact_speed_fps": {
+     "value": 9.5833,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "implied_buffer_stroke_in": {
+     "value": 17.127,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "guide-rail-bracket-span",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "14 ft span, 900 lb at midspan, 18.5 lb rail section (S 4.0, I 9.3)",
+   "source_edition_or_year": "M = P L / 4; deflection = P L cubed / (48 E I)",
+   "source_section_or_page": "ASME A17.1 governs load cases and allowables",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "span_ft": 14,
+    "horizontal_load_lb": 900,
+    "section_modulus_in3": 4.0,
+    "moment_of_inertia_in4": 9.3,
+    "modulus_psi": 29000000,
+    "allowable_stress_psi": 22000,
+    "deflection_limit_in": 0.25,
+    "safety_application_load_lb": 4500
+   },
+   "outputs": {
+    "moment_inlb": {
+     "value": 37800,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "stress_psi": {
+     "value": 9450,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "deflection_in": {
+     "value": 0.32965,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_span_for_deflection_ft": {
+     "value": 12.767,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "halved_span_moment_inlb": {
+     "value": 18900,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "halved_span_deflection_in": {
+     "value": 0.041206,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "safety_stress_psi": {
+     "value": 47250,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

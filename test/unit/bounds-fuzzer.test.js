@@ -42144,3 +42144,407 @@ test("bounds: spec-v1545 computeTurnoutFrogGeometry pins the clearance point", (
   assert.ok("error" in _v1545({ ...base, lead_ft: 0 }));
   assert.ok("error" in _v1545({ ...base, frog_number: Infinity }));
 });
+
+// ===========================================================================
+// spec-v1648..v1658: the 2026-09-05 trade-expansion elevator and escalator
+// band, the second band of that program. The catalog had two elevator tiles,
+// both about traffic handling; these are the equipment.
+// ===========================================================================
+
+import { computeTractionRopingRatio as _v1648 } from "../../calc-elevator.js";
+test("bounds: spec-v1648 computeTractionRopingRatio pins the factor-of-two torque error", () => {
+  const base = { roping_ratio: 2, car_speed_fpm: 500, sheave_diameter_in: 30, unbalanced_load_lb: 2000, suspended_load_lb: 11500, rope_count: 5, machine_rated_torque_ftlb: 1500, alternative_roping_ratio: 1 };
+  const r = _v1648(base);
+  assert.ok(Math.abs(r.rope_speed_fpm - 1000) < 1e-9);
+  assert.ok(Math.abs(r.sheave_rpm - 127.324) < 1e-3);
+  assert.ok(Math.abs(r.sheave_torque_ftlb - 1250) < 1e-9);
+  assert.ok(Math.abs(r.tension_per_rope_lb - 1150) < 1e-9);
+  assert.ok(Math.abs(r.power_hp - 30.303) < 1e-3);
+  // The whole point: 1 to 1 is EXACTLY twice the torque and half the rpm for
+  // the same car speed, and skipping the division is that same factor of two.
+  assert.ok(Math.abs(r.alt_sheave_torque_ftlb - 2 * r.sheave_torque_ftlb) < 1e-9);
+  assert.ok(Math.abs(r.alt_sheave_rpm - r.sheave_rpm / 2) < 1e-9);
+  assert.ok(Math.abs(r.alt_tension_per_rope_lb - 2 * r.tension_per_rope_lb) < 1e-9);
+  // Power is independent of the roping ratio -- torque and speed trade off.
+  const oneToOne = _v1648({ ...base, roping_ratio: 1 });
+  assert.ok(Math.abs(oneToOne.power_hp - r.power_hp) < 1e-9);
+  assert.ok(Math.abs(oneToOne.sheave_torque_ftlb * oneToOne.sheave_rpm - r.sheave_torque_ftlb * r.sheave_rpm) < 1e-6);
+  assert.strictEqual(r.torque_ok, true);
+  assert.strictEqual(_v1648({ ...base, machine_rated_torque_ftlb: 1000 }).torque_ok, false);
+  assert.ok("error" in _v1648({ ...base, roping_ratio: 0.5 }));
+  assert.ok("error" in _v1648({ ...base, alternative_roping_ratio: 0 }));
+  assert.ok("error" in _v1648({ ...base, car_speed_fpm: 0 }));
+  assert.ok("error" in _v1648({ ...base, sheave_diameter_in: 0 }));
+  assert.ok("error" in _v1648({ ...base, unbalanced_load_lb: 0 }));
+  assert.ok("error" in _v1648({ ...base, suspended_load_lb: 0 }));
+  assert.ok("error" in _v1648({ ...base, rope_count: 0 }));
+  assert.ok("error" in _v1648({ ...base, machine_rated_torque_ftlb: 0 }));
+  assert.ok("error" in _v1648({ ...base, car_speed_fpm: Infinity }));
+});
+
+import { computeCounterweightBalance as _v1649 } from "../../calc-elevator.js";
+test("bounds: spec-v1649 computeCounterweightBalance pins which end governs", () => {
+  const base = { car_weight_lb: 8000, rated_capacity_lb: 3500, overbalance_pct: 45, actual_counterweight_lb: 9575, added_car_weight_lb: 400 };
+  const r = _v1649(base);
+  assert.ok(Math.abs(r.counterweight_required_lb - 9575) < 1e-9);
+  assert.ok(Math.abs(r.unbalanced_empty_lb - 1575) < 1e-9);
+  assert.ok(Math.abs(r.unbalanced_full_lb - 1925) < 1e-9);
+  assert.strictEqual(r.governing, "full car up");
+  // At 50 percent the two ends are EXACTLY equal, at half the capacity.
+  const fifty = _v1649({ ...base, overbalance_pct: 50 });
+  assert.ok(Math.abs(fifty.unbalanced_empty_lb - fifty.unbalanced_full_lb) < 1e-9);
+  assert.ok(Math.abs(fifty.unbalanced_empty_lb - base.rated_capacity_lb / 2) < 1e-9);
+  // Above 50 the EMPTY car governs -- the crossover is the whole trade.
+  assert.strictEqual(_v1649({ ...base, overbalance_pct: 60 }).governing, "empty car up");
+  // The balance point recovers the design overbalance from the actual weight.
+  assert.ok(Math.abs(r.overbalance_actual_pct - 45) < 1e-9);
+  assert.ok(Math.abs(r.balance_point_lb - 1575) < 1e-9);
+  // The maintenance trap: 400 lb of new flooring moves it to 34% of capacity
+  // with nobody touching the counterweight.
+  assert.ok(Math.abs(r.modified_overbalance_pct - 33.5714) < 1e-3);
+  assert.ok(Math.abs(_v1649({ ...base, added_car_weight_lb: 0 }).modified_overbalance_pct - r.overbalance_actual_pct) < 1e-9);
+  assert.ok("error" in _v1649({ ...base, car_weight_lb: 0 }));
+  assert.ok("error" in _v1649({ ...base, rated_capacity_lb: 0 }));
+  assert.ok("error" in _v1649({ ...base, overbalance_pct: 0 }));
+  assert.ok("error" in _v1649({ ...base, overbalance_pct: 101 }));
+  assert.ok("error" in _v1649({ ...base, actual_counterweight_lb: 8000 }));
+  assert.ok("error" in _v1649({ ...base, added_car_weight_lb: -1 }));
+  assert.ok("error" in _v1649({ ...base, car_weight_lb: Infinity }));
+});
+
+import { computeElevatorRopeSafetyFactor as _v1650 } from "../../calc-elevator.js";
+test("bounds: spec-v1650 computeElevatorRopeSafetyFactor pins the rope-weight term", () => {
+  const base = { car_weight_lb: 12000, rated_load_lb: 3500, travelling_cable_lb: 200, rope_count: 5, rope_weight_per_ft: 0.68, rope_breaking_strength_lb: 17900, rise_ft: 220, code_minimum_fs: 7.6 };
+  const r = _v1650(base);
+  assert.ok(Math.abs(r.rope_weight_lb - 748) < 1e-9);
+  assert.ok(Math.abs(r.suspended_load_lb - 16448) < 1e-9);
+  assert.ok(Math.abs(r.breaking_total_lb - 89500) < 1e-9);
+  assert.ok(Math.abs(r.factor_of_safety - 5.4414) < 1e-3);
+  // Leaving the rope weight out reads BETTER than the truth, and by more as
+  // the building gets taller -- which is the whole argument for the term.
+  assert.ok(Math.abs(r.fs_without_rope_weight - 5.7006) < 1e-3);
+  assert.ok(r.fs_without_rope_weight > r.factor_of_safety);
+  assert.ok(Math.abs(r.overstatement - 0.2592) < 1e-3);
+  const tall = _v1650({ ...base, rise_ft: 700 });
+  assert.ok(Math.abs(tall.rope_weight_lb - 2380) < 1e-9);
+  assert.ok(Math.abs(tall.factor_of_safety - 4.9502) < 1e-3);
+  assert.ok(tall.overstatement > 2.8 * r.overstatement); // 0.750 against 0.259
+  // Rope weight is exactly linear in rise, count, and weight per foot.
+  assert.ok(Math.abs(_v1650({ ...base, rope_count: 10 }).rope_weight_lb - 2 * r.rope_weight_lb) < 1e-9);
+  // This rope set is under the entered minimum with an EMPTY car, so there is
+  // no rated load at which it complies.
+  assert.strictEqual(r.pass, false);
+  assert.strictEqual(r.minimum_unreachable, true);
+  assert.strictEqual(r.max_rated_load_lb, 0);
+  const easy = _v1650({ ...base, code_minimum_fs: 5.0 });
+  assert.strictEqual(easy.pass, true);
+  assert.strictEqual(easy.minimum_unreachable, false);
+  // Run the tile at its own answer and the factor lands on the minimum.
+  const atLimit = _v1650({ ...base, code_minimum_fs: 5.0, rated_load_lb: easy.max_rated_load_lb });
+  assert.ok(Math.abs(atLimit.factor_of_safety - 5.0) < 1e-6);
+  assert.ok("error" in _v1650({ ...base, car_weight_lb: 0 }));
+  assert.ok("error" in _v1650({ ...base, rated_load_lb: 0 }));
+  assert.ok("error" in _v1650({ ...base, travelling_cable_lb: -1 }));
+  assert.ok("error" in _v1650({ ...base, rope_count: 0 }));
+  assert.ok("error" in _v1650({ ...base, rope_weight_per_ft: 0 }));
+  assert.ok("error" in _v1650({ ...base, rope_breaking_strength_lb: 0 }));
+  assert.ok("error" in _v1650({ ...base, rise_ft: 0 }));
+  assert.ok("error" in _v1650({ ...base, code_minimum_fs: 0 }));
+  assert.ok("error" in _v1650({ ...base, rise_ft: Infinity }));
+});
+
+import { computeBufferStroke as _v1651 } from "../../calc-elevator.js";
+test("bounds: spec-v1651 computeBufferStroke pins the square law and the governor dependency", () => {
+  const base = { contract_speed_fpm: 500, governor_trip_fpm: 575, permitted_retardation_g: 1, buffer_rated_stroke_in: 21, buffer_rated_speed_fpm: 600 };
+  const r = _v1651(base);
+  assert.ok(Math.abs(r.impact_speed_fps - 9.5833) < 1e-3);
+  assert.ok(Math.abs(r.stroke_required_in - 17.127) < 1e-2);
+  assert.ok(Math.abs(r.stroke_at_1g_in - r.stroke_required_in) < 1e-12);
+  // Double the speed, QUADRUPLE the stroke -- exactly.
+  const fast = _v1651({ ...base, contract_speed_fpm: 1000, governor_trip_fpm: 1150, buffer_rated_stroke_in: 72, buffer_rated_speed_fpm: 1200 });
+  assert.ok(Math.abs(fast.stroke_required_in - 4 * r.stroke_required_in) < 1e-9);
+  assert.ok(Math.abs(fast.stroke_required_in - 68.508) < 1e-2);
+  // The dependency the spec exists to name: a 10 percent governor bump is a
+  // 21 percent stroke increase, so the correct buffer is now short.
+  const bumped = _v1651({ ...base, governor_trip_fpm: 632.5 });
+  assert.ok(Math.abs(bumped.stroke_required_in / r.stroke_required_in - 1.21) < 1e-9);
+  // The stroke is sized on the GOVERNOR trip, so contract speed alone moves
+  // nothing.
+  assert.ok(Math.abs(_v1651({ ...base, contract_speed_fpm: 400 }).stroke_required_in - r.stroke_required_in) < 1e-12);
+  // The installed 21 in buffer covers a 17.1 in requirement, at 0.82 g.
+  assert.strictEqual(r.stroke_ok, true);
+  assert.strictEqual(r.speed_ok, true);
+  assert.ok(Math.abs(r.retardation_installed_g - 0.8156) < 1e-3);
+  assert.ok(r.retardation_installed_g < base.permitted_retardation_g);
+  // Run the tile at the speed it names and the retardation lands on the limit.
+  const atLimit = _v1651({ ...base, governor_trip_fpm: r.max_speed_for_buffer_fpm, buffer_rated_speed_fpm: 700 });
+  assert.ok(Math.abs(atLimit.retardation_installed_g - 1) < 1e-9);
+  assert.strictEqual(_v1651({ ...base, buffer_rated_stroke_in: 12 }).stroke_ok, false);
+  assert.strictEqual(_v1651({ ...base, buffer_rated_speed_fpm: 550 }).speed_ok, false);
+  assert.ok("error" in _v1651({ ...base, contract_speed_fpm: 0 }));
+  assert.ok("error" in _v1651({ ...base, governor_trip_fpm: 400 }));
+  assert.ok("error" in _v1651({ ...base, permitted_retardation_g: 0 }));
+  assert.ok("error" in _v1651({ ...base, buffer_rated_stroke_in: 0 }));
+  assert.ok("error" in _v1651({ ...base, buffer_rated_speed_fpm: 0 }));
+  assert.ok("error" in _v1651({ ...base, governor_trip_fpm: Infinity }));
+});
+
+import { computeHoistwayVenting as _v1652 } from "../../calc-elevator.js";
+test("bounds: spec-v1652 computeHoistwayVenting pins the door as the ceiling", () => {
+  const base = { hoistway_plan_area_sqft: 90, vent_fraction_pct: 3.5, door_width_in: 36, door_height_in: 84, pressure_diff_inwc: 0.10, door_force_limit_lbf: 30, leakage_area_sqft: 2.0 };
+  const r = _v1652(base);
+  assert.ok(Math.abs(r.vent_area_sqft - 3.15) < 1e-9);
+  assert.ok(Math.abs(r.door_area_sqft - 21) < 1e-9);
+  assert.ok(Math.abs(r.door_force_added_lbf - 10.92) < 1e-9);
+  assert.strictEqual(r.force_ok, true);
+  assert.ok(Math.abs(r.supply_airflow_cfm - 1650.71) < 1e-1);
+  // Door force is exactly linear in the pressure: 0.25 in wc is 27.3 lbf,
+  // still inside a 30 lbf limit but most of it.
+  const higher = _v1652({ ...base, pressure_diff_inwc: 0.25 });
+  assert.ok(Math.abs(higher.door_force_added_lbf - 27.3) < 1e-9);
+  assert.strictEqual(higher.force_ok, true);
+  assert.strictEqual(_v1652({ ...base, pressure_diff_inwc: 0.30 }).force_ok, false);
+  // Run the tile at the pressure it names and the door lands on its limit.
+  const atLimit = _v1652({ ...base, pressure_diff_inwc: r.max_pressure_inwc });
+  assert.ok(Math.abs(atLimit.door_force_added_lbf - base.door_force_limit_lbf) < 1e-9);
+  // Flow goes as the SQUARE ROOT of pressure, so holding four times the
+  // pressure takes only twice the air.
+  assert.ok(Math.abs(_v1652({ ...base, pressure_diff_inwc: 0.40 }).supply_airflow_cfm - 2 * r.supply_airflow_cfm) < 1e-6);
+  assert.ok(Math.abs(_v1652({ ...base, leakage_area_sqft: 4.0 }).supply_airflow_cfm - 2 * r.supply_airflow_cfm) < 1e-9);
+  assert.ok("error" in _v1652({ ...base, hoistway_plan_area_sqft: 0 }));
+  assert.ok("error" in _v1652({ ...base, vent_fraction_pct: 0 }));
+  assert.ok("error" in _v1652({ ...base, vent_fraction_pct: 101 }));
+  assert.ok("error" in _v1652({ ...base, door_width_in: 0 }));
+  assert.ok("error" in _v1652({ ...base, door_height_in: 0 }));
+  assert.ok("error" in _v1652({ ...base, pressure_diff_inwc: 0 }));
+  assert.ok("error" in _v1652({ ...base, door_force_limit_lbf: 0 }));
+  assert.ok("error" in _v1652({ ...base, leakage_area_sqft: 0 }));
+  assert.ok("error" in _v1652({ ...base, pressure_diff_inwc: Infinity }));
+});
+
+import { computeMachineRoomHeat as _v1653 } from "../../calc-elevator.js";
+test("bounds: spec-v1653 computeMachineRoomHeat pins losses against connected load", () => {
+  const base = { input_power_kw: 15, efficiency_pct: 85, duty_cycle_pct: 40, controller_standby_w: 400, other_gains_btuh: 6000, room_volume_cuft: 2000, ambient_limit_f: 104, starting_temp_f: 80 };
+  const r = _v1653(base);
+  assert.ok(Math.abs(r.heat_running_btuh - 7677.3) < 0.5);
+  assert.ok(Math.abs(r.heat_average_btuh - 3070.9) < 0.5);
+  assert.ok(Math.abs(r.controller_btuh - 1364.86) < 0.1);
+  assert.ok(Math.abs(r.total_btuh - 10435.8) < 0.5);
+  assert.ok(Math.abs(r.cooling_tons - 0.8696) < 1e-3);
+  // The sizing error: connected power is 6.7 times the loss on an 85 percent
+  // machine, and exactly 1 / (1 - efficiency).
+  assert.ok(Math.abs(r.connected_overstatement - 1 / 0.15) < 1e-9);
+  assert.ok(Math.abs(r.connected_btuh - 51182.1) < 0.5);
+  // A perfectly efficient machine would reject nothing; a 50 percent one
+  // rejects half its input.
+  assert.ok(Math.abs(_v1653({ ...base, efficiency_pct: 50 }).heat_running_btuh - r.heat_running_btuh * (0.5 / 0.15)) < 1e-6);
+  // The other sources are not optional: dropping them loses a third of the load.
+  const machineOnly = _v1653({ ...base, controller_standby_w: 0, other_gains_btuh: 0 });
+  assert.ok(Math.abs(machineOnly.total_btuh - r.heat_average_btuh) < 1e-9);
+  assert.ok(machineOnly.total_btuh < r.total_btuh * 0.35);
+  // Losing cooling in this room reaches the drive's limit in minutes, not
+  // hours -- and that bound ignores envelope loss, so it is the fastest case.
+  assert.ok(Math.abs(r.minutes_to_limit - 4.97) < 1e-2);
+  assert.ok(Math.abs(_v1653({ ...base, room_volume_cuft: 4000 }).minutes_to_limit - 2 * r.minutes_to_limit) < 1e-6);
+  assert.ok("error" in _v1653({ ...base, input_power_kw: 0 }));
+  assert.ok("error" in _v1653({ ...base, efficiency_pct: 0 }));
+  assert.ok("error" in _v1653({ ...base, efficiency_pct: 100 }));
+  assert.ok("error" in _v1653({ ...base, duty_cycle_pct: 0 }));
+  assert.ok("error" in _v1653({ ...base, controller_standby_w: -1 }));
+  assert.ok("error" in _v1653({ ...base, other_gains_btuh: -1 }));
+  assert.ok("error" in _v1653({ ...base, room_volume_cuft: 0 }));
+  assert.ok("error" in _v1653({ ...base, ambient_limit_f: 80 }));
+  assert.ok("error" in _v1653({ ...base, input_power_kw: Infinity }));
+});
+
+import { computeHydraulicJackPressure as _v1654 } from "../../calc-elevator.js";
+test("bounds: spec-v1654 computeHydraulicJackPressure pins the three consequences of a bore change", () => {
+  const base = { bore_in: 12, total_load_lb: 14000, car_speed_fpm: 125, pump_flow_gpm: 734.4, relief_setting_psi: 150, alternative_bore_in: 10 };
+  const r = _v1654(base);
+  assert.ok(Math.abs(r.jack_area_sqin - 113.097) < 1e-3);
+  assert.ok(Math.abs(r.working_pressure_psi - 123.787) < 1e-3);
+  assert.ok(Math.abs(r.flow_required_gpm - 734.398) < 1e-2);
+  // The pump that delivers the required flow reproduces the contract speed.
+  assert.ok(Math.abs(r.speed_from_pump_fpm - 125) < 1e-2);
+  // A 10 in bore: pressure up 44 percent, speed up to 180 fpm, and the relief
+  // valve now sits BELOW the working pressure. Three from one dimension.
+  assert.ok(Math.abs(r.alt_working_pressure_psi - 178.254) < 1e-3);
+  assert.ok(Math.abs(r.alt_pressure_change_pct - 44) < 1e-6);
+  assert.ok(Math.abs(r.alt_speed_from_pump_fpm - 180) < 1e-2);
+  assert.strictEqual(r.alt_relief_ok, false);
+  // Pressure and speed both go as the INVERSE SQUARE of the bore.
+  assert.ok(Math.abs(r.alt_working_pressure_psi / r.working_pressure_psi - (12 / 10) ** 2) < 1e-9);
+  assert.ok(Math.abs(r.alt_speed_from_pump_fpm / r.speed_from_pump_fpm - (12 / 10) ** 2) < 1e-9);
+  // A bigger bore goes the other way, and the relief stays valid.
+  const bigger = _v1654({ ...base, alternative_bore_in: 14 });
+  assert.ok(bigger.alt_working_pressure_psi < r.working_pressure_psi);
+  assert.strictEqual(bigger.alt_relief_ok, true);
+  assert.ok("error" in _v1654({ ...base, bore_in: 0 }));
+  assert.ok("error" in _v1654({ ...base, alternative_bore_in: 0 }));
+  assert.ok("error" in _v1654({ ...base, total_load_lb: 0 }));
+  assert.ok("error" in _v1654({ ...base, car_speed_fpm: 0 }));
+  assert.ok("error" in _v1654({ ...base, pump_flow_gpm: 0 }));
+  assert.ok("error" in _v1654({ ...base, relief_setting_psi: 100 }));
+  assert.ok("error" in _v1654({ ...base, bore_in: Infinity }));
+});
+
+import { computeStepChainTension as _v1655 } from "../../calc-elevator.js";
+test("bounds: spec-v1655 computeStepChainTension pins gravity against friction", () => {
+  const base = { total_load_lb: 12000, incline_deg: 30, friction_coefficient: 0.03, chain_speed_fpm: 100, chain_count: 2, alternative_incline_deg: 6 };
+  const r = _v1655(base);
+  assert.ok(Math.abs(r.gravity_lb - 6000) < 1e-9);
+  assert.ok(Math.abs(r.friction_lb - 311.769) < 1e-3);
+  assert.ok(Math.abs(r.tension_lb - 6311.77) < 1e-2);
+  assert.ok(Math.abs(r.per_chain_lb - 3155.88) < 1e-2);
+  assert.ok(Math.abs(r.power_hp - 19.127) < 1e-3);
+  // At 30 degrees the escalator is essentially a hoist: gravity is 95% of it.
+  assert.ok(Math.abs(r.gravity_share_pct - 95.06) < 1e-2);
+  // On a 6 degree moving walk the two components become comparable, which is
+  // why the same capacity takes a much smaller drive.
+  assert.ok(Math.abs(r.alt_gravity_lb - 1254.34) < 1e-2);
+  assert.ok(Math.abs(r.alt_friction_lb - 358.03) < 1e-2);
+  assert.ok(r.alt_gravity_lb / r.alt_friction_lb < 4);
+  assert.ok(r.alt_tension_lb < r.tension_lb / 3);
+  // Running down loaded, friction acts WITH the brake, so the brake takes the
+  // difference rather than the whole gravity component.
+  assert.ok(Math.abs(r.descending_brake_lb - (r.gravity_lb - r.friction_lb)) < 1e-12);
+  assert.ok(r.descending_brake_lb < r.gravity_lb);
+  assert.ok(Math.abs(r.descending_brake_lb - 5688.23) < 1e-2);
+  // Frictionless: the two directions become the same number.
+  const ideal = _v1655({ ...base, friction_coefficient: 0 });
+  assert.strictEqual(ideal.friction_lb, 0);
+  assert.ok(Math.abs(ideal.descending_brake_lb - ideal.tension_lb) < 1e-12);
+  assert.ok("error" in _v1655({ ...base, total_load_lb: 0 }));
+  assert.ok("error" in _v1655({ ...base, incline_deg: 0 }));
+  assert.ok("error" in _v1655({ ...base, incline_deg: 90 }));
+  assert.ok("error" in _v1655({ ...base, alternative_incline_deg: 0 }));
+  assert.ok("error" in _v1655({ ...base, friction_coefficient: -0.1 }));
+  assert.ok("error" in _v1655({ ...base, chain_speed_fpm: 0 }));
+  assert.ok("error" in _v1655({ ...base, chain_count: 0 }));
+  assert.ok("error" in _v1655({ ...base, incline_deg: Infinity }));
+});
+
+import { computeDoorClosingEnergy as _v1656 } from "../../calc-elevator.js";
+test("bounds: spec-v1656 computeDoorClosingEnergy pins the square on speed", () => {
+  const base = { door_mass_lb: 140, closing_speed_fps: 1.0, ke_limit_normal_ftlb: 7.0, ke_limit_reduced_ftlb: 2.5, measured_force_lbf: 25, force_limit_lbf: 30, opening_width_in: 42, added_mass_lb: 20 };
+  const r = _v1656(base);
+  assert.ok(Math.abs(r.kinetic_energy_ftlb - 2.1757) < 1e-3);
+  assert.strictEqual(r.pass_normal, true);
+  assert.strictEqual(r.pass_reduced, true);
+  assert.strictEqual(r.force_ok, true);
+  // spec-v1656's worked example treats 4.0 ft-lb as a REDUCTION target for a
+  // door already at 2.18, and calls the resulting 36 percent speed INCREASE a
+  // reduction. The relation is general and the sign is reported as it falls:
+  // the speed that lands on the reduced limit here is FASTER than current.
+  assert.ok(Math.abs(r.speed_for_reduced_limit_fps - 1.0719) < 1e-3);
+  assert.ok(r.speed_change_pct > 0);
+  assert.ok(r.closing_time_change_s < 0);
+  // Energy is exactly quadratic in speed and exactly linear in mass.
+  assert.ok(Math.abs(_v1656({ ...base, closing_speed_fps: 2.0 }).kinetic_energy_ftlb - 4 * r.kinetic_energy_ftlb) < 1e-9);
+  assert.ok(Math.abs(_v1656({ ...base, door_mass_lb: 280 }).kinetic_energy_ftlb - 2 * r.kinetic_energy_ftlb) < 1e-9);
+  // A fifth off the speed takes 36 percent off the energy -- the lever.
+  assert.ok(Math.abs(_v1656({ ...base, closing_speed_fps: 0.8 }).kinetic_energy_ftlb / r.kinetic_energy_ftlb - 0.64) < 1e-9);
+  // A heavy door can pass the FORCE limit and fail the ENERGY limit, which is
+  // the whole reason both exist.
+  const heavyInputs = { ...base, door_mass_lb: 400 };
+  const heavy = _v1656(heavyInputs);
+  assert.ok(Math.abs(heavy.kinetic_energy_ftlb - 6.216) < 1e-3);
+  assert.strictEqual(heavy.force_ok, true);
+  assert.strictEqual(heavy.pass_normal, true);
+  assert.strictEqual(heavy.pass_reduced, false);
+  // Slowing it is the fix, and the speed the tile names lands the energy
+  // exactly on the reduced limit -- a real reduction this time.
+  assert.ok(heavy.speed_change_pct < 0);
+  const atLimit = _v1656({ ...heavyInputs, closing_speed_fps: heavy.speed_for_reduced_limit_fps });
+  assert.ok(Math.abs(atLimit.kinetic_energy_ftlb - base.ke_limit_reduced_ftlb) < 1e-9);
+  assert.strictEqual(atLimit.pass_reduced, true);
+  assert.ok(Math.abs(r.ke_with_added_mass_ftlb - 2.4865) < 1e-3);
+  assert.ok(Math.abs(_v1656({ ...base, added_mass_lb: 0 }).ke_with_added_mass_ftlb - r.kinetic_energy_ftlb) < 1e-12);
+  assert.ok("error" in _v1656({ ...base, door_mass_lb: 0 }));
+  assert.ok("error" in _v1656({ ...base, closing_speed_fps: 0 }));
+  assert.ok("error" in _v1656({ ...base, ke_limit_normal_ftlb: 0 }));
+  assert.ok("error" in _v1656({ ...base, ke_limit_reduced_ftlb: 0 }));
+  assert.ok("error" in _v1656({ ...base, ke_limit_reduced_ftlb: 8 }));
+  assert.ok("error" in _v1656({ ...base, measured_force_lbf: -1 }));
+  assert.ok("error" in _v1656({ ...base, force_limit_lbf: 0 }));
+  assert.ok("error" in _v1656({ ...base, opening_width_in: 0 }));
+  assert.ok("error" in _v1656({ ...base, added_mass_lb: -1 }));
+  assert.ok("error" in _v1656({ ...base, door_mass_lb: Infinity }));
+});
+
+import { computeGovernorTrippingSpeed as _v1657 } from "../../calc-elevator.js";
+test("bounds: spec-v1657 computeGovernorTrippingSpeed pins the ordering and the band", () => {
+  const base = { rated_speed_fpm: 500, electrical_trip_fpm: 550, mechanical_trip_fpm: 575, code_minimum_pct: 115, code_maximum_fpm: 690 };
+  const r = _v1657(base);
+  assert.ok(Math.abs(r.minimum_trip_fpm - 575) < 1e-9);
+  assert.ok(Math.abs(r.mechanical_margin_pct - 15) < 1e-9);
+  assert.ok(Math.abs(r.electrical_margin_pct - 10) < 1e-9);
+  assert.ok(Math.abs(r.headroom_fpm - 115) < 1e-9);
+  assert.strictEqual(r.in_band, true);
+  assert.strictEqual(r.ordering_ok, true);
+  // Exactly at the minimum is inside the band; a hair under is not.
+  assert.strictEqual(_v1657({ ...base, mechanical_trip_fpm: 574.9 }).in_band, false);
+  assert.strictEqual(_v1657({ ...base, mechanical_trip_fpm: 690 }).in_band, true);
+  assert.strictEqual(_v1657({ ...base, mechanical_trip_fpm: 690.1 }).in_band, false);
+  // The inverted governor: electrical at or above mechanical removes the
+  // gentle stop, so every overspeed goes straight to a safety application.
+  assert.strictEqual(_v1657({ ...base, electrical_trip_fpm: 575 }).ordering_ok, false);
+  assert.strictEqual(_v1657({ ...base, electrical_trip_fpm: 600 }).ordering_ok, false);
+  // The chain to the buffer: the mechanical trip IS the buffer impact speed,
+  // and it agrees with the buffer tile's one-gravity stroke to the digit.
+  assert.ok(Math.abs(r.impact_speed_fps - 575 / 60) < 1e-12);
+  assert.ok(Math.abs(r.implied_buffer_stroke_in - 17.127) < 1e-2);
+  assert.ok(Math.abs(_v1657({ ...base, mechanical_trip_fpm: 690 }).implied_buffer_stroke_in / r.implied_buffer_stroke_in - (690 / 575) ** 2) < 1e-9);
+  assert.ok("error" in _v1657({ ...base, rated_speed_fpm: 0 }));
+  assert.ok("error" in _v1657({ ...base, electrical_trip_fpm: 0 }));
+  assert.ok("error" in _v1657({ ...base, mechanical_trip_fpm: 0 }));
+  assert.ok("error" in _v1657({ ...base, code_minimum_pct: 99 }));
+  assert.ok("error" in _v1657({ ...base, code_maximum_fpm: 0 }));
+  assert.ok("error" in _v1657({ ...base, code_maximum_fpm: 570 }));
+  assert.ok("error" in _v1657({ ...base, rated_speed_fpm: Infinity }));
+});
+
+import { computeGuideRailBracketSpan as _v1658 } from "../../calc-elevator.js";
+test("bounds: spec-v1658 computeGuideRailBracketSpan pins the point-load scaling", () => {
+  const base = { span_ft: 14, horizontal_load_lb: 900, section_modulus_in3: 4.0, moment_of_inertia_in4: 9.3, modulus_psi: 29000000, allowable_stress_psi: 22000, deflection_limit_in: 0.25, safety_application_load_lb: 4500 };
+  const r = _v1658(base);
+  assert.ok(Math.abs(r.moment_inlb - 37800) < 1e-9);
+  assert.ok(Math.abs(r.stress_psi - 9450) < 1e-9);
+  assert.ok(Math.abs(r.deflection_in - 0.32965) < 1e-4);
+  // Fails on stiffness while passing comfortably on strength -- which is the
+  // situation the tile exists to name.
+  assert.strictEqual(r.deflection_ok, false);
+  assert.strictEqual(r.stress_ok, true);
+  // spec-v1658's prose says "moment as the square and deflection as the fourth
+  // power" -- that is the UNIFORM-load case. Its own formula line is
+  // M = P L / 4, a midspan POINT load, for which the moment goes as the span
+  // and the deflection as its CUBE. Halving the span halves the moment and
+  // gives an EIGHTH of the deflection, not a quarter and a sixteenth.
+  assert.ok(Math.abs(r.halved_span_moment_inlb - r.moment_inlb / 2) < 1e-9);
+  assert.ok(Math.abs(r.halved_span_deflection_in - r.deflection_in / 8) < 1e-12);
+  assert.ok(Math.abs(r.halved_span_deflection_in - 0.041206) < 1e-5);
+  const halved = _v1658({ ...base, span_ft: 7 });
+  assert.ok(Math.abs(halved.moment_inlb - r.halved_span_moment_inlb) < 1e-9);
+  assert.ok(Math.abs(halved.deflection_in - r.halved_span_deflection_in) < 1e-12);
+  assert.strictEqual(halved.deflection_ok, true);
+  // Run the tile at the span it names and the deflection lands on the limit.
+  const atLimit = _v1658({ ...base, span_ft: r.max_span_for_deflection_ft });
+  assert.ok(Math.abs(atLimit.deflection_in - base.deflection_limit_in) < 1e-9);
+  assert.ok(Math.abs(r.max_span_for_deflection_ft - 12.767) < 1e-2);
+  // Matching an eighth of the deflection by SECTION alone takes eight times
+  // the moment of inertia -- the argument for adding a bracket instead.
+  assert.ok(Math.abs(_v1658({ ...base, moment_of_inertia_in4: 9.3 * 8 }).deflection_in - r.deflection_in / 8) < 1e-12);
+  // Safety application governs strength: 4,500 lb is past the allowable.
+  assert.ok(Math.abs(r.safety_stress_psi - 47250) < 1e-9);
+  assert.strictEqual(r.safety_stress_ok, false);
+  assert.ok(Math.abs(r.safety_stress_psi / r.stress_psi - 4500 / 900) < 1e-9);
+  assert.ok("error" in _v1658({ ...base, span_ft: 0 }));
+  assert.ok("error" in _v1658({ ...base, horizontal_load_lb: 0 }));
+  assert.ok("error" in _v1658({ ...base, section_modulus_in3: 0 }));
+  assert.ok("error" in _v1658({ ...base, moment_of_inertia_in4: 0 }));
+  assert.ok("error" in _v1658({ ...base, modulus_psi: 0 }));
+  assert.ok("error" in _v1658({ ...base, allowable_stress_psi: 0 }));
+  assert.ok("error" in _v1658({ ...base, deflection_limit_in: 0 }));
+  assert.ok("error" in _v1658({ ...base, safety_application_load_lb: 0 }));
+  assert.ok("error" in _v1658({ ...base, span_ft: Infinity }));
+});

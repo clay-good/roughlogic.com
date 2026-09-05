@@ -1470,6 +1470,18 @@ const RELATED = {
   "track-warp-fra-class": ["track-superelevation","rail-wear-condemning-limit","ballast-section-volume"],
   "ballast-section-volume": ["aggregate","stockpile-volume","track-warp-fra-class"],
   "turnout-frog-lead": ["degree-of-curve","track-superelevation","ballast-section-volume"],
+  // spec-v1648..v1658: the 2026-09-05 trade-expansion elevator and escalator band.
+  "traction-roping-ratio": ["counterweight-balance","rope-safety-factor","motor-shaft-torque"],
+  "counterweight-balance": ["traction-roping-ratio","rope-safety-factor","machine-room-heat"],
+  "rope-safety-factor": ["traction-roping-ratio","counterweight-balance","wire-rope-strength"],
+  "buffer-stroke-speed": ["governor-tripping-speed","rope-safety-factor","guide-rail-bracket-span"],
+  "hoistway-venting": ["machine-room-heat","stairwell-pressurization","smoke-ejector-cfm"],
+  "machine-room-heat": ["hoistway-venting","traction-roping-ratio","internal-heat-gains"],
+  "hydraulic-jack-pressure": ["counterweight-balance","machine-room-heat","traction-roping-ratio"],
+  "step-chain-tension": ["escalator-capacity","elevator-handling-capacity","guide-rail-bracket-span"],
+  "door-closing-energy": ["hoistway-venting","governor-tripping-speed","escalator-capacity"],
+  "governor-tripping-speed": ["buffer-stroke-speed","rope-safety-factor","guide-rail-bracket-span"],
+  "guide-rail-bracket-span": ["buffer-stroke-speed","counterweight-balance","governor-tripping-speed"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   "grounding-electrode-conductor": ["bonding-jumper","egc-sizing","grounding-electrode"],
   "bonding-jumper": ["grounding-electrode-conductor","egc-sizing","service-load-standard"],
