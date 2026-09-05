@@ -15487,6 +15487,93 @@ export const CITATIONS = {
       { name: "Retirement is on condition and time", value: "a passing factor of safety does not extend a rope's life by one day", source: "MSHA hoisting requirements" },
     ],
   },
+  // spec-v1596..v1604: the 2026-09-05 trade-expansion trenchless band. v1596
+  // and v1604 were cut as duplicates; their new material landed on
+  // hdd-pullback and manning-slope.
+  "hdd-bend-radius": {
+    formula: "product pipe minimum radius in feet = the entered radius-per-inch rule times the pipe diameter in inches; the governing radius is the LARGER of that and the drill rod's; the sag bend consumes R sin(entry angle) of horizontal run and reaches R (1 - cos(entry angle)) of depth.",
+    edition: "The trade rules of thumb by name -- about 100 ft of radius per inch of steel pipe diameter, and roughly 20 to 40 times its own diameter for HDPE -- with the sag-bend geometry from circular-arc trigonometry. Geometry only; the pipe manufacturer, the drilling contractor, and the engineer of record govern.",
+    freeAccess: "Trigonometry on the user's own pipe and path figures; no manufacturer bend table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The rule that matters on a job is that the PIPE, not the rig, usually sets the radius -- and by a lot. A large steel pipe wants a radius of hundreds or thousands of feet where the drill rod may be happy at a hundred and fifty, and a path laid out on the rod's capability will bend the steel past its allowable stress during pullback, where the damage is not always visible. HDPE is the opposite case and it is why HDPE dominates smaller bores: it bends comfortably on twenty to forty times its own diameter, so the rod becomes the constraint again and the path can be much tighter. The consequence people underestimate is how much horizontal distance a large radius consumes: turning from a modest entry angle to horizontal on a thousand-foot radius takes hundreds of feet of run and puts the bore deeper than a short-radius path would. The bend radius therefore decides the entry setback, the depth under the crossing, and often whether the bore fits between the obstacles at all -- a layout consequence settled before anyone mobilises. This does not perform a pipe stress analysis, which is what actually establishes an allowable radius for a given wall, grade, and installation condition, and the multipliers differ by material, by manufacturer, and by whether the pipe is bent during pullback or resting in the hole afterward.",
+    assumptions: [
+      { name: "The pipe usually governs, not the rod", value: "and by a factor that grows with pipe diameter", source: "HDD practice" },
+      { name: "A large radius eats setback", value: "which decides whether the bore fits the site at all", source: "HDD practice" },
+      { name: "The rules of thumb are not a stress analysis", value: "the multipliers differ by material, manufacturer, and installation condition", source: "pipe manufacturer data" },
+    ],
+  },
+  "hdd-fluid-volume": {
+    formula: "hole volume = (pi / 4) x reamed diameter squared x length; annular volume the same on the difference of the squares; fluid required = hole volume x an entered multiplier; spoil for disposal = returns + the cuttings the hole made.",
+    edition: "The bore volume relations by name at 7.48052 gallons per cubic foot and 5.615 cubic ft per barrel, with the fluid requirement expressed as a multiplier of hole volume (commonly 2 to 5, higher in coarse soils) entered from the geotechnical report. The mud engineer, the drilling contractor, and the disposal jurisdiction govern.",
+    freeAccess: "Cylinder volume arithmetic on the user's own bore dimensions; no mud program or manufacturer table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The hole volume itself is the small number; the fluid requirement is a MULTIPLE of it, because fluid is circulated, some is lost to the formation, and the hole is drilled and reamed more than once. Two to three times hole volume is a reasonable planning figure in cohesive ground and it climbs sharply in sand and gravel, where losses can be most of what is pumped -- and that difference is a mobilisation decision made from the geotechnical report rather than discovered on day two. The annular volume is the operationally useful one during pullback: it is the space between the reamed hole and the product pipe, it is what the fluid has to fill and keep filled to carry cuttings and lubricate the pull, and an annulus that is not full is an annulus that is packing off. Disposal is the part that gets underestimated on the estimate. Returns plus cuttings is a substantial volume of regulated waste, it has to be contained rather than allowed to run, and in most jurisdictions it cannot simply be spread, so a bore that budgets for fluid and not for its disposal has budgeted for half the fluid cost. This does not design a mud program, whose viscosity, gel strength, sand content and additive package matter more to hole cleaning and frac-out risk than the volume does, and it does not model losses, which depend entirely on the formation.",
+    assumptions: [
+      { name: "Fluid is a multiple of hole volume", value: "2 to 3 in cohesive ground and much more in sand and gravel", source: "HDD practice" },
+      { name: "The annulus must stay full", value: "an annulus that is not full is one that is packing off", source: "HDD practice" },
+      { name: "Disposal is half the fluid cost", value: "returns plus cuttings is regulated waste that cannot simply be spread", source: "disposal jurisdiction" },
+    ],
+  },
+  "hdd-annular-pressure": {
+    formula: "annular pressure = the mud column at 0.052 psi per foot per pound-per-gallon, plus the annular friction loss; the screening resistance = the soil's overburden pressure plus a cohesion term; the factor of safety is their ratio, evaluated at the SHALLOWEST station.",
+    edition: "The mud-column and overburden relations by name, as a screen. The real limiting pressure comes from a cavity-expansion relation -- the Delft or Luger approach -- driven by the soil's strength and stiffness rather than its weight alone. The drilling contractor, the mud engineer, and the geotechnical engineer of record govern.",
+    freeAccess: "Pressure arithmetic on the user's own soil and fluid figures; no proprietary model is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The mechanism is hydraulic fracture. The fluid in the annulus has a pressure; the soil above it has a strength and a weight. When the fluid pressure exceeds what the soil can resist, it opens a path and follows it, and the path usually goes up. Because the resisting pressure grows with depth, THE DANGER IS ALWAYS AT THE SHALLOW PARTS OF A BORE -- the entry, the exit, and any high point -- not at the deepest point under the crossing, which is where people instinctively worry and where the margin is largest. Annular pressure is not just the mud column. Friction along the annulus adds to it, and that friction rises with pump rate, with a viscous fluid, and with a hole that is not clean and is loading up with cuttings, so a bore that was fine on the pilot can frac out during reaming when the annulus is smaller relative to the flow and the cuttings load is higher. The practical controls follow directly: keep the pump rate no higher than hole cleaning requires, keep the fluid properties right, ream in stages rather than one large pass, and maintain the deepest practical profile through the sensitive zone. Monitoring for returns at the surface during the bore is the last line, not the plan.",
+    assumptions: [
+      { name: "The shallow station governs", value: "resistance grows with depth, so the margin is thinnest at entry, exit, and any high point", source: "HDD practice" },
+      { name: "Friction is the term that changes when reaming", value: "a smaller annulus and a heavier cuttings load raise it above the pilot", source: "mud program" },
+      { name: "This is a screen, not a Delft analysis", value: "the real limiting pressure comes from cavity expansion in the soil's strength and stiffness", source: "geotechnical engineering" },
+    ],
+  },
+  "locate-depth-offset": {
+    formula: "the 45-degree method: the horizontal offset at which the signal halves equals the depth; null symmetry is the difference between the two null offsets over their mean; the current gradient is the drop between two points along the line over the near reading.",
+    edition: "The 45-degree locating method and the null-symmetry and signal-current diagnostics by name. Exposing the utility is what establishes position and depth; the utility owner, the one-call system, and the applicable damage prevention law govern.",
+    freeAccess: "Comparison of readings the technician takes in the field; no instrument's internal model is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The instrument's depth readout is a computation from field strength, and it assumes a single isolated conductor. Put a second utility nearby, a rebar mat overhead, or a poorly grounded signal return in the picture and the field is no longer that of an isolated line, so the computed depth is wrong -- usually SHALLOW, which is the dangerous direction because it makes an excavator believe there is more cover than there is. The 45-degree check is the discipline that catches it: move perpendicular to the line until the signal drops by half, and the horizontal distance moved equals the depth independently of the instrument's own calculation. If the two agree, both are probably right; if they disagree, the field is distorted and the locate should not be trusted at any depth. Null symmetry is the second check and it is free, because the response nulls to either side of the peak and the two nulls should sit at equal offsets. Signal current is the third: a locator that reads current should show it decreasing gradually along the line, and a sharp drop means the signal has left the target and coupled onto something else, so everything located beyond that point may be a different utility entirely -- which is how a crew ends up potholing confidently in the wrong place.",
+    assumptions: [
+      { name: "Distortion reads SHALLOW", value: "which is the dangerous direction: it promises cover that is not there", source: "locating practice" },
+      { name: "The 45-degree method is independent", value: "it does not use the instrument's own depth computation at all", source: "locating practice" },
+      { name: "A sharp current drop means the signal left the line", value: "and everything beyond it may be a different utility", source: "locating practice" },
+    ],
+  },
+  "vacuum-excavation-spoil": {
+    formula: "bank volume = length x width x depth / 27; loose volume = bank x (1 + swell) plus any water added at 7.48052 gallons per cubic foot; tank fills = loose volume / tank capacity, rounded up.",
+    edition: "Prismatic volume with an entered swell factor (commonly 20 to 40%) and the water added for wet cutting, by name. The disposal jurisdiction, the utility owner, the one-call system, and the applicable damage prevention law govern.",
+    freeAccess: "Volume arithmetic on the user's own pit dimensions and swell figure; no regulatory waste classification is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The individual pothole is small and the day's total is not. A keyhole to five feet is a fraction of a cubic yard, but a day of potholing a corridor is thirty of them plus the test pits, and the tank fills up in the middle of the afternoon a long way from the dump site. Swell is what makes the tank fill sooner than the arithmetic suggests: soil excavated from a compacted bank occupies substantially more volume loose, and a wet vacuum system adds the water used to cut, so the material going into the tank can be well over half again the in-place volume. Planning on bank volume produces a schedule that is optimistic by exactly that margin, which is why the fill count is computed both ways. Disposal is the variable that changes the number most. Spoil that can go back in the hole is a short cycle; spoil that must be hauled because it is slurry, because it is contaminated, or because the jurisdiction does not permit returning it, is a haul cycle per tank and a completely different day. This does not evaluate whether spoil may be returned, which is a jurisdictional and contamination question, and it does not replace exposing a utility as the way to establish its position, nor the one-call notification that must precede any of it.",
+    assumptions: [
+      { name: "Swell fills the tank early", value: "twenty to forty percent for most soils, plus the water a wet vacuum adds", source: "excavation practice" },
+      { name: "Disposal decides the day", value: "returnable spoil is a short cycle; hauled slurry is a cycle per tank", source: "disposal jurisdiction" },
+      { name: "Potholing does not replace one-call", value: "the notification and the owner's marks come first", source: "damage prevention law" },
+    ],
+  },
+  "pipe-bursting-pull-load": {
+    formula: "displaced area = (pi / 4)(new diameter squared - old diameter squared), and the displaced volume is that times the run; an indicative pull load = the displaced area times an entered expansion force per square inch, plus an entered drag per foot.",
+    edition: "The displacement relation by name, with the expansion force and drag entered because both depend entirely on the soil. The bursting contractor, the product pipe manufacturer, and the utility owners of everything nearby govern.",
+    freeAccess: "Area and force arithmetic on the user's own pipe sizes and soil-calibrated coefficients; no manufacturer or soil table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The soil has to go somewhere. Replacing a pipe with a larger one forces the difference in cross-section outward into the surrounding ground, and in dense or shallow soil that displacement appears at the surface as heave or sideways as movement of whatever else is buried nearby. That is why the upsize RATIO, not the absolute size, is the number that matters, and why depth of cover is the principal control on whether a burst is safe. The pull load has two parts and both grow with upsize: the bursting head has to expand the ground, which takes a force rising sharply with the displaced area, and the new pipe then drags through the expanded hole. As with directional drilling, the pipe's safe pull rather than the rig's rated pull is usually the governing limit on HDPE, and a pipe pulled beyond its limit may stretch, fail later, or fail its pressure test rather than parting on the spot. The adjacent-utility question is the one that stops jobs: a gas service running parallel a few feet away can be displaced enough to fail, and that risk is assessed before the burst by locating everything nearby and, where necessary, exposing it and monitoring during the pull -- not by any pull load calculation.",
+    assumptions: [
+      { name: "Upsize ratio and cover decide heave", value: "not the absolute size; shallow cover under a street shows at the surface", source: "pipe bursting practice" },
+      { name: "The pipe's safe pull usually governs", value: "not the rig's rated pull, and an over-pulled pipe may fail later", source: "product pipe manufacturer" },
+      { name: "The adjacent utility is not a calculation", value: "it is located, exposed where necessary, and monitored during the pull", source: "utility owners" },
+    ],
+  },
+  "cipp-liner-thickness": {
+    formula: "ASTM F1216 X1.1, partially deteriorated: external pressure = 2 K E C / (1 - nu squared) x (1 / (DR - 1)) cubed / N, with the ovality reduction C = ((1 - q) / (1 + q) squared) cubed and Poisson's ratio 0.3; thickness = host diameter / DR.",
+    edition: "The ASTM F1216 X1.1 groundwater-buckling relation by name, for the partially deteriorated design case only. The fully deteriorated case is a different relation requiring the soil modulus, the live load, and the water buoyancy factor, and is not approximated here. ASTM F1216, the liner manufacturer's tested properties, and the design engineer govern.",
+    freeAccess: "The buckling relation is published engineering; the modulus, ovality, and enhancement factor are the user's own measured and manufacturer-supplied values, and no F1216 table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The two design cases are not variations on a theme. In the partially deteriorated case the host pipe is still structurally sound and the liner's only job is to resist external groundwater pressure trying to buckle it inward, so the thickness comes out modest. In the fully deteriorated case the host is assumed gone and the liner is the pipe, carrying soil load, live load, and groundwater as a standalone structure -- a much thicker section. Choosing the case is an engineering judgment about the host pipe's condition, made from a CCTV survey and the pipe's history rather than from a preference. Two inputs dominate the buckling case. Ovality is the first, and it bites steeply because the reduction factor goes as a cube of a term that falls with out-of-roundness, so a few percent costs real thickness -- and ovality is measured rather than assumed. The second is the modulus, and the trap there is TIME: CIPP creeps, so the fifty-year modulus is roughly half the short-term value, and a design run on the short-term number is unconservative by a large margin. Both are computed here so the penalty is visible rather than argued. Groundwater head is the load, and it is taken at the highest credible level rather than at the level on the day of the survey.",
+    assumptions: [
+      { name: "Ovality goes as a cube", value: "a few percent of out-of-roundness is real thickness, and it is measured not assumed", source: "ASTM F1216" },
+      { name: "Use the LONG-TERM modulus", value: "creep halves it over fifty years, and the short-term number is unconservative", source: "ASTM F1216" },
+      { name: "The fully deteriorated case is a different relation", value: "it needs the soil modulus, live load, and buoyancy factor and is not approximated", source: "ASTM F1216" },
+    ],
+  },
   "main-disinfection-chlorine": {
     formula: "volume_gal = 0.0408 x diameter_in^2 x length_ft; available_cl_lb = (volume / 1,000,000) x dose_mg/L x 8.34; product_lb = available_cl / (product% / 100).",
     edition: "AWWA C651 Disinfecting Water Mains (by name).",

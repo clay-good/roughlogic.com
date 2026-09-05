@@ -1,6 +1,11 @@
 # roughlogic.com Specification v1604 -- Gravity Sewer Slope for Minimum Scour Velocity (`calc-trenchless.js`, Group E Carpentry and Construction, trenchless, 1 New Tile)
 
-> **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
+> **Status: CUT 2026-09-05 as a duplicate.** `manning-slope` already computes the identical
+> minimum slope, `S = (V n / (1.486 R^(2/3)))^2` at `R = D/4`, and already called the result
+> the self-cleansing slope. It hard-coded the velocity at 2.0 ft/s, which is the one thing
+> this spec added that mattered -- agencies require 2.5 and interceptors 3.0 -- so that
+> calculator gained an ENTERED scour velocity and an as-built slope check instead. Aliases
+> route this question to it. Single-tile spec. Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-trenchless.js`**
 > (Group E, Carpentry and Construction -- the existing category, hub `/groups/construction/`; trenchless, hdd, and utility locating), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >

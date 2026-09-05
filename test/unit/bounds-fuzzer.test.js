@@ -43671,3 +43671,376 @@ test("follow-up spec-v1520: rebound divides, and the reverse check reads the wal
   assert.strictEqual(_v1520({ ...base, shot_actual_cy: 0 }).achieved_thickness_in, 0);
   assert.ok("error" in _v1520({ ...base, shot_actual_cy: -1 }));
 });
+
+// ===========================================================================
+// spec-v1596..v1604: the 2026-09-05 trade-expansion trenchless band. TWO of
+// these nine specs were CUT as duplicates and their new material landed on
+// the calculators that already answered the question: v1596 on `hdd-pullback`
+// (which gained the capstan relation and the rig-versus-pipe governing check)
+// and v1604 on `manning-slope` (which gained an entered scour velocity and an
+// as-built slope check).
+// ===========================================================================
+
+import { computeHddBendRadius as _v1597 } from "../../calc-trenchless.js";
+test("bounds: spec-v1597 computeHddBendRadius pins the pipe over the rod", () => {
+  const base = { pipe_diameter_in: 12.75, radius_per_inch_ft: 100, rod_min_radius_ft: 150, entry_angle_deg: 12, required_depth_ft: 25, available_setback_ft: 300 };
+  const r = _v1597(base);
+  // spec-v1597's own rule line says R in FEET is 100 times the diameter in
+  // INCHES, and its prose says a 12 degree entry on a thousand-foot radius
+  // takes "over 200 feet of run". Its worked example then computes
+  // 100 x 12.75 in = 1,275 in = 106 ft and gets a 22 ft run. The rule and the
+  // prose agree with each other and not with the example: 1,275 FEET.
+  assert.ok(Math.abs(r.pipe_min_radius_ft - 1275) < 1e-9);
+  assert.ok(Math.abs(r.governing_radius_ft - 1275) < 1e-9);
+  assert.ok(Math.abs(r.sag_run_ft - 265.087) < 1e-2);
+  assert.ok(Math.abs(r.sag_depth_ft - 27.862) < 1e-2);
+  assert.ok(r.sag_run_ft > 200);
+  // The pipe governs, and by 8.5 times the rod's own limit.
+  assert.ok(Math.abs(r.rod_ratio - 8.5) < 1e-9);
+  assert.strictEqual(r.governs, "the product pipe");
+  // HDPE flips it: at 30 ft of radius per inch the rod becomes the constraint
+  // again, which is why HDPE dominates smaller bores.
+  const hdpe = _v1597({ ...base, radius_per_inch_ft: 3 });
+  assert.ok(Math.abs(hdpe.pipe_min_radius_ft - 38.25) < 1e-9);
+  assert.strictEqual(hdpe.governs, "the drill rod");
+  assert.ok(Math.abs(hdpe.governing_radius_ft - 150) < 1e-9);
+  // The sag bend alone reaches 27.9 ft, past the 25 ft required, so no extra
+  // tangent run is needed; ask for more depth and it is.
+  assert.strictEqual(r.depth_short_ft, 0);
+  assert.strictEqual(r.extra_run_to_depth_ft, 0);
+  const deeper = _v1597({ ...base, required_depth_ft: 40 });
+  assert.ok(deeper.extra_run_to_depth_ft > 0);
+  assert.ok(deeper.run_to_depth_ft > r.run_to_depth_ft);
+  // Setback is the constraint a big radius creates.
+  assert.strictEqual(r.setback_ok, true);
+  assert.strictEqual(_v1597({ ...base, available_setback_ft: 200 }).setback_ok, false);
+  // Radius is exactly linear in diameter, and the sag geometry exactly
+  // trigonometric in it.
+  assert.ok(Math.abs(_v1597({ ...base, pipe_diameter_in: 25.5 }).pipe_min_radius_ft - 2 * r.pipe_min_radius_ft) < 1e-9);
+  assert.ok(Math.abs(r.sag_run_ft - r.governing_radius_ft * Math.sin(12 * Math.PI / 180)) < 1e-9);
+  assert.ok("error" in _v1597({ ...base, pipe_diameter_in: 0 }));
+  assert.ok("error" in _v1597({ ...base, radius_per_inch_ft: 0 }));
+  assert.ok("error" in _v1597({ ...base, rod_min_radius_ft: 0 }));
+  assert.ok("error" in _v1597({ ...base, entry_angle_deg: 0 }));
+  assert.ok("error" in _v1597({ ...base, entry_angle_deg: 90 }));
+  assert.ok("error" in _v1597({ ...base, required_depth_ft: 0 }));
+  assert.ok("error" in _v1597({ ...base, available_setback_ft: 0 }));
+  assert.ok("error" in _v1597({ ...base, pipe_diameter_in: Infinity }));
+});
+
+import { computeHddFluidVolume as _v1598 } from "../../calc-trenchless.js";
+test("bounds: spec-v1598 computeHddFluidVolume pins the multiplier and the spoil", () => {
+  const base = { ream_diameter_in: 20, pipe_diameter_in: 12.75, bore_length_ft: 900, fluid_multiplier: 3, bentonite_lb_per_100gal: 40, pump_rate_gpm: 120, returns_fraction_pct: 70 };
+  const r = _v1598(base);
+  assert.ok(Math.abs(r.hole_volume_gal - 14687.97) < 1e-1);
+  assert.ok(Math.abs(r.hole_volume_bbl - 349.69) < 1e-1);
+  assert.ok(Math.abs(r.annular_volume_gal - 8718.69) < 1e-1);
+  assert.ok(Math.abs(r.fluid_required_gal - 44063.9) < 1e-1);
+  // The soil sets the multiplier, and the difference is a mobilisation
+  // decision: coarse ground at 5x wants two thirds again as much water.
+  const coarse = _v1598({ ...base, fluid_multiplier: 5 });
+  assert.ok(Math.abs(coarse.fluid_required_gal - 73439.8) < 1e-1);
+  assert.ok(Math.abs(coarse.fluid_required_gal / r.fluid_required_gal - 5 / 3) < 1e-12);
+  // The annulus is the hole less the pipe, exactly.
+  assert.ok(Math.abs(r.hole_volume_cuft - r.annular_volume_cuft - Math.PI / 4 * (12.75 / 12) ** 2 * 900) < 1e-9);
+  assert.ok(r.annular_volume_gal < r.hole_volume_gal);
+  // Everything is exactly linear in length, and hole volume quadratic in the
+  // reamed diameter.
+  assert.ok(Math.abs(_v1598({ ...base, bore_length_ft: 1800 }).hole_volume_gal - 2 * r.hole_volume_gal) < 1e-6);
+  assert.ok(Math.abs(_v1598({ ...base, ream_diameter_in: 40 }).hole_volume_gal - 4 * r.hole_volume_gal) < 1e-6);
+  // Spoil is returns plus cuttings, and what does not come back stayed in the
+  // ground -- the two sum to what was pumped.
+  assert.ok(Math.abs(r.returns_gal + r.lost_to_formation_gal - r.fluid_required_gal) < 1e-6);
+  assert.ok(Math.abs(r.spoil_gal - (r.returns_gal + r.hole_volume_gal)) < 1e-9);
+  assert.ok(r.spoil_cy > 200);
+  assert.ok("error" in _v1598({ ...base, ream_diameter_in: 0 }));
+  assert.ok("error" in _v1598({ ...base, pipe_diameter_in: 20 }));
+  assert.ok("error" in _v1598({ ...base, bore_length_ft: 0 }));
+  assert.ok("error" in _v1598({ ...base, fluid_multiplier: 0.5 }));
+  assert.ok("error" in _v1598({ ...base, bentonite_lb_per_100gal: 0 }));
+  assert.ok("error" in _v1598({ ...base, pump_rate_gpm: 0 }));
+  assert.ok("error" in _v1598({ ...base, returns_fraction_pct: 0 }));
+  assert.ok("error" in _v1598({ ...base, bore_length_ft: Infinity }));
+});
+
+import { computeHddAnnularPressure as _v1599 } from "../../calc-trenchless.js";
+test("bounds: spec-v1599 computeHddAnnularPressure pins the shallow station", () => {
+  const base = { cover_depth_ft: 30, shallow_cover_ft: 8, soil_unit_weight_pcf: 120, soil_cohesion_psf: 600, fluid_density_ppg: 9.5, annular_friction_psi: 15, required_fs: 1.5 };
+  const r = _v1599(base);
+  assert.ok(Math.abs(r.overburden_psi - 25) < 1e-9);
+  assert.ok(Math.abs(r.hydrostatic_psi - 14.82) < 1e-9);
+  assert.ok(Math.abs(r.annular_pressure_psi - 29.82) < 1e-9);
+  // The whole finding: resistance grows with depth and annular pressure
+  // barely falls, so the SHALLOW station is where the margin collapses.
+  assert.ok(Math.abs(r.shallow_overburden_psi - 6.6667) < 1e-3);
+  assert.ok(r.shallow_factor_of_safety < r.factor_of_safety);
+  assert.ok(Math.abs(r.shallow_factor_of_safety - 0.5716) < 1e-3);
+  assert.strictEqual(r.shallow_ok, false);
+  // Overburden is exactly linear in depth; the mud column is too, so the
+  // ratio between them is fixed and only the friction term breaks it.
+  assert.ok(Math.abs(_v1599({ ...base, cover_depth_ft: 60 }).overburden_psi - 2 * r.overburden_psi) < 1e-9);
+  // With no friction AND no cohesion both terms are linear in depth, so the
+  // factor of safety is the same everywhere -- which is exactly why the
+  // cohesion term and the friction term are what make the shallow end worse.
+  const plain = _v1599({ ...base, annular_friction_psi: 0, soil_cohesion_psf: 0 });
+  assert.ok(Math.abs(plain.factor_of_safety - plain.shallow_factor_of_safety) < 1e-9);
+  assert.ok(r.factor_of_safety !== r.shallow_factor_of_safety);
+  // Friction alone reverses it: a constant pressure adder hurts the shallow
+  // station far more than the deep one.
+  const frictionOnly = _v1599({ ...base, soil_cohesion_psf: 0 });
+  assert.ok(frictionOnly.shallow_factor_of_safety < frictionOnly.factor_of_safety);
+  // Run it at the fluid density it names and the shallow station lands on the
+  // required factor of safety.
+  const lighter = _v1599({ ...base, fluid_density_ppg: 8.4, annular_friction_psi: 3 });
+  assert.ok(lighter.shallow_factor_of_safety > r.shallow_factor_of_safety);
+  // Friction is the term that rises when reaming, and the tile says how much
+  // the shallow station can take.
+  const allowed = r.shallow_limiting_psi / base.required_fs;
+  const shallowHydrostatic = r.shallow_annular_pressure_psi - base.annular_friction_psi;
+  assert.ok(Math.abs(r.max_friction_psi - (allowed - shallowHydrostatic)) < 1e-9);
+  // Run it at the friction it names and the shallow station lands exactly on
+  // the required factor of safety.
+  const atLimit = _v1599({ ...base, annular_friction_psi: r.max_friction_psi });
+  assert.ok(Math.abs(atLimit.shallow_factor_of_safety - base.required_fs) < 1e-9);
+  assert.ok("error" in _v1599({ ...base, cover_depth_ft: 0 }));
+  assert.ok("error" in _v1599({ ...base, shallow_cover_ft: 40 }));
+  assert.ok("error" in _v1599({ ...base, soil_unit_weight_pcf: 0 }));
+  assert.ok("error" in _v1599({ ...base, soil_cohesion_psf: -1 }));
+  assert.ok("error" in _v1599({ ...base, fluid_density_ppg: 0 }));
+  assert.ok("error" in _v1599({ ...base, annular_friction_psi: -1 }));
+  assert.ok("error" in _v1599({ ...base, required_fs: 0 }));
+  assert.ok("error" in _v1599({ ...base, cover_depth_ft: Infinity }));
+});
+
+import { computeLocateDepthOffset as _v1600 } from "../../calc-trenchless.js";
+test("bounds: spec-v1600 computeLocateDepthOffset pins the three checks", () => {
+  const base = { instrument_depth_in: 52, half_signal_offset_in: 71, left_null_in: 34, right_null_in: 52, current_near_ma: 42, current_far_ma: 19, sharp_drop_pct: 25 };
+  const r = _v1600(base);
+  // The 45-degree method: the half-signal offset IS the depth, computed
+  // without using the instrument's own model at all.
+  assert.strictEqual(r.geometric_depth_in, 71);
+  assert.ok(Math.abs(r.depth_difference_in - 19) < 1e-9);
+  assert.ok(Math.abs(r.depth_disagreement_pct - 36.538) < 1e-2);
+  assert.strictEqual(r.depth_agrees, false);
+  // The instrument reads SHALLOWER than the geometry, which is the dangerous
+  // direction, and the tile says so rather than just reporting a difference.
+  assert.strictEqual(r.reads_shallow, true);
+  assert.strictEqual(r.nulls_symmetric, false);
+  assert.strictEqual(r.current_gradual, false);
+  assert.strictEqual(r.confident, false);
+  // All three checks passing is the only way to a confident locate.
+  const clean = _v1600({ ...base, half_signal_offset_in: 52, right_null_in: 34, current_far_ma: 36 });
+  assert.strictEqual(clean.depth_agrees, true);
+  assert.strictEqual(clean.nulls_symmetric, true);
+  assert.strictEqual(clean.current_gradual, true);
+  assert.strictEqual(clean.confident, true);
+  assert.ok(clean.cause.includes("probably right"));
+  // A sharp current drop takes precedence in the diagnosis, because
+  // everything beyond it may be a different utility.
+  const coupled = _v1600({ ...base, half_signal_offset_in: 52, right_null_in: 34 });
+  assert.strictEqual(coupled.confident, false);
+  assert.ok(coupled.cause.includes("coupled"));
+  assert.ok(Math.abs(r.null_asymmetry_in - 18) < 1e-9);
+  assert.ok(Math.abs(r.current_drop_pct - 54.762) < 1e-2);
+  assert.ok("error" in _v1600({ ...base, instrument_depth_in: 0 }));
+  assert.ok("error" in _v1600({ ...base, half_signal_offset_in: 0 }));
+  assert.ok("error" in _v1600({ ...base, left_null_in: 0 }));
+  assert.ok("error" in _v1600({ ...base, right_null_in: 0 }));
+  assert.ok("error" in _v1600({ ...base, current_near_ma: 0 }));
+  assert.ok("error" in _v1600({ ...base, current_far_ma: 50 }));
+  assert.ok("error" in _v1600({ ...base, sharp_drop_pct: 0 }));
+  assert.ok("error" in _v1600({ ...base, instrument_depth_in: Infinity }));
+});
+
+import { computeVacuumExcavationSpoil as _v1601 } from "../../calc-trenchless.js";
+test("bounds: spec-v1601 computeVacuumExcavationSpoil pins swell against the tank", () => {
+  const base = { pit_length_ft: 8, pit_width_ft: 4, pit_depth_ft: 5, pit_count: 1, swell_pct: 30, water_added_gal: 0, tank_capacity_cy: 12, haul_round_trip_min: 75 };
+  const r = _v1601(base);
+  assert.ok(Math.abs(r.bank_cy_each - 160 / 27) < 1e-9);
+  assert.ok(Math.abs(r.bank_cy_each - 5.926) < 1e-2);
+  assert.ok(Math.abs(r.loose_cy_total - 7.704) < 1e-2);
+  // One test pit is 64% of a twelve yard tank -- the finding that makes the
+  // day's schedule realistic.
+  assert.ok(Math.abs(r.first_pit_tank_pct - 64.198) < 1e-2);
+  assert.strictEqual(r.tank_fills, 1);
+  // Swell is exactly a multiplier on the bank volume, and planning on bank
+  // volume understates the fills, which the tile prints both ways.
+  assert.ok(Math.abs(r.loose_cy_total / r.bank_cy_total - 1.3) < 1e-12);
+  assert.strictEqual(_v1601({ ...base, swell_pct: 0 }).loose_cy_total, r.bank_cy_total);
+  const day = _v1601({ ...base, pit_count: 2 });
+  assert.strictEqual(day.tank_fills, 2);
+  assert.strictEqual(day.bank_only_fills, 1);
+  // Water added for wet cutting goes into the tank too.
+  const wet = _v1601({ ...base, water_added_gal: 1000 });
+  assert.ok(wet.loose_cy_total > r.loose_cy_total);
+  assert.ok(Math.abs(wet.water_cy - 1000 / 7.48052 / 27) < 1e-9);
+  // Haul time follows the fills, which is why disposal changes the day.
+  assert.ok(Math.abs(r.haul_time_min - r.tank_fills * 75) < 1e-9);
+  assert.ok(Math.abs(day.haul_time_min - 150) < 1e-9);
+  assert.ok("error" in _v1601({ ...base, pit_length_ft: 0 }));
+  assert.ok("error" in _v1601({ ...base, pit_width_ft: 0 }));
+  assert.ok("error" in _v1601({ ...base, pit_depth_ft: 0 }));
+  assert.ok("error" in _v1601({ ...base, pit_count: 0 }));
+  assert.ok("error" in _v1601({ ...base, swell_pct: -1 }));
+  assert.ok("error" in _v1601({ ...base, water_added_gal: -1 }));
+  assert.ok("error" in _v1601({ ...base, tank_capacity_cy: 0 }));
+  assert.ok("error" in _v1601({ ...base, haul_round_trip_min: 0 }));
+  assert.ok("error" in _v1601({ ...base, pit_depth_ft: Infinity }));
+});
+
+import { computePipeBurstingPullLoad as _v1602 } from "../../calc-trenchless.js";
+test("bounds: spec-v1602 computePipeBurstingPullLoad pins the displacement", () => {
+  const base = { old_diameter_in: 6, new_diameter_in: 8, run_length_ft: 300, cover_depth_ft: 7, expansion_force_lb_per_sqin: 400, drag_lb_per_ft: 15, pipe_safe_pull_lb: 20000, adjacent_utility_ft: 3 };
+  const r = _v1602(base);
+  assert.ok(Math.abs(r.displaced_area_sqin - 21.991) < 1e-2);
+  assert.ok(Math.abs(r.displaced_area_sqft - 0.1527) < 1e-4);
+  assert.ok(Math.abs(r.displaced_cy - 1.697) < 1e-2);
+  assert.ok(Math.abs(r.upsize_ratio - 4 / 3) < 1e-12);
+  assert.ok(Math.abs(r.pull_load_lb - 13296.46) < 1e-1);
+  assert.strictEqual(r.pull_ok, true);
+  // Cover is the control on heave: seven feet of cover on an 8 in pipe is
+  // ten diameters and dissipates; three feet is not.
+  assert.ok(Math.abs(r.cover_to_diameter - 10.5) < 1e-9);
+  assert.strictEqual(r.heave_risk, false);
+  assert.strictEqual(_v1602({ ...base, cover_depth_ft: 2 }).heave_risk, true);
+  // Displacement is exactly the difference of the squares, so a bigger upsize
+  // costs far more than the diameter step suggests.
+  const bigger = _v1602({ ...base, new_diameter_in: 12 });
+  assert.ok(Math.abs(bigger.displaced_area_sqin / r.displaced_area_sqin - (144 - 36) / (64 - 36)) < 1e-9);
+  assert.ok(bigger.displaced_area_sqin > 3 * r.displaced_area_sqin);
+  assert.strictEqual(bigger.pull_ok, false);
+  // The pull load is exactly the two entered terms.
+  assert.ok(Math.abs(r.expansion_force_lb + r.drag_lb - r.pull_load_lb) < 1e-9);
+  assert.ok(Math.abs(r.drag_lb - 4500) < 1e-9);
+  // The influence zone is a few diameters, and a utility inside it is flagged.
+  assert.ok(Math.abs(r.influence_radius_ft - 2) < 1e-9);
+  assert.strictEqual(r.utility_at_risk, false);
+  assert.strictEqual(_v1602({ ...base, adjacent_utility_ft: 1.5 }).utility_at_risk, true);
+  assert.ok("error" in _v1602({ ...base, old_diameter_in: 0 }));
+  assert.ok("error" in _v1602({ ...base, new_diameter_in: 6 }));
+  assert.ok("error" in _v1602({ ...base, run_length_ft: 0 }));
+  assert.ok("error" in _v1602({ ...base, cover_depth_ft: 0 }));
+  assert.ok("error" in _v1602({ ...base, expansion_force_lb_per_sqin: 0 }));
+  assert.ok("error" in _v1602({ ...base, drag_lb_per_ft: -1 }));
+  assert.ok("error" in _v1602({ ...base, pipe_safe_pull_lb: 0 }));
+  assert.ok("error" in _v1602({ ...base, adjacent_utility_ft: 0 }));
+  assert.ok("error" in _v1602({ ...base, run_length_ft: Infinity }));
+});
+
+import { computeCippLinerThickness as _v1603 } from "../../calc-trenchless.js";
+test("bounds: spec-v1603 computeCippLinerThickness pins creep and ovality", () => {
+  const base = { host_id_in: 24, ovality_pct: 3, groundwater_head_ft: 12, long_term_modulus_psi: 125000, short_term_modulus_psi: 250000, enhancement_factor: 7, safety_factor: 2, alternative_ovality_pct: 5 };
+  const r = _v1603(base);
+  assert.ok(Math.abs(r.external_pressure_psi - 5.2) < 1e-9);
+  assert.ok(Math.abs(r.ovality_factor - 0.76435) < 1e-4);
+  assert.ok(Math.abs(r.dimension_ratio - 53.09) < 1e-2);
+  assert.ok(Math.abs(r.thickness_in - 0.4521) < 1e-3);
+  // The creep trap: the short-term modulus gives a quarter less thickness,
+  // in the unconservative direction.
+  assert.ok(Math.abs(r.short_term_thickness_in - 0.3602) < 1e-3);
+  assert.ok(r.short_term_thickness_in < r.thickness_in);
+  assert.ok(Math.abs(r.creep_penalty_pct - 25.5) < 1e-1);
+  // Doubling the modulus moves thickness by exactly the cube root, which is
+  // why halving it for creep costs 26% rather than 50%.
+  // The cube root acts on (DR - 1), not on the thickness itself, because the
+  // dimension ratio carries a plus one.
+  const shortDr = base.host_id_in / r.short_term_thickness_in;
+  assert.ok(Math.abs((shortDr - 1) / (r.dimension_ratio - 1) - Math.cbrt(2)) < 1e-9);
+  // Ovality bites as a cube of a term that falls with out-of-roundness.
+  assert.ok(Math.abs(r.round_thickness_in - 0.414) < 1e-3);
+  assert.ok(Math.abs(r.alternative_thickness_in - 0.4791) < 1e-3);
+  assert.ok(r.thickness_in > r.round_thickness_in);
+  assert.ok(r.alternative_thickness_in > r.thickness_in);
+  assert.strictEqual(_v1603({ ...base, ovality_pct: 0 }).ovality_factor, 1);
+  // Thickness scales with the square root of pressure and of the safety
+  // factor, through the cube root of the DR relation.
+  assert.ok(Math.abs(_v1603({ ...base, host_id_in: 48 }).thickness_in - 2 * r.thickness_in) < 1e-9);
+  assert.ok(_v1603({ ...base, groundwater_head_ft: 24 }).thickness_in > r.thickness_in);
+  assert.ok(_v1603({ ...base, safety_factor: 3 }).thickness_in > r.thickness_in);
+  assert.ok(_v1603({ ...base, enhancement_factor: 1 }).thickness_in > r.thickness_in);
+  assert.ok("error" in _v1603({ ...base, host_id_in: 0 }));
+  assert.ok("error" in _v1603({ ...base, ovality_pct: 100 }));
+  assert.ok("error" in _v1603({ ...base, groundwater_head_ft: 0 }));
+  assert.ok("error" in _v1603({ ...base, long_term_modulus_psi: 0 }));
+  assert.ok("error" in _v1603({ ...base, short_term_modulus_psi: 100000 }));
+  assert.ok("error" in _v1603({ ...base, enhancement_factor: 0 }));
+  assert.ok("error" in _v1603({ ...base, safety_factor: 0 }));
+  assert.ok("error" in _v1603({ ...base, host_id_in: Infinity }));
+});
+
+// spec-v1596 follow-up: the lumped bend factor is a stand-in for the capstan
+// relation, and the governing limit is the LOWER of the pipe and the rig.
+import { computeHddPullback as _v1596 } from "../../calc-earthwork.js";
+test("follow-up spec-v1596: the capstan relation and the governing pull limit", () => {
+  const base = { eff_weight_plf: 5, length_ft: 800, friction_coeff: 0.3, bend_factor: 1.5, total_bend_deg: 24, fluid_drag_lb: 0, pipe_safe_pull_lb: 20000, rig_rated_pull_lb: 40000 };
+  const r = _v1596(base);
+  // The original first-order answer is unchanged, which is the point of
+  // adding rather than replacing.
+  assert.ok(Math.abs(r.straight_drag_lb - 1200) < 1e-9);
+  assert.ok(Math.abs(r.pullback_lb - 1800) < 1e-9);
+  // The capstan relation computes the multiplier the lumped factor was
+  // standing in for: at 24 degrees and mu 0.3 it is 1.13, so the assumed 1.5
+  // was generous here.
+  assert.ok(Math.abs(r.capstan_factor - Math.exp(0.3 * 24 * Math.PI / 180)) < 1e-12);
+  assert.ok(Math.abs(r.capstan_factor - 1.1339) < 1e-3);
+  assert.ok(r.capstan_pullback_lb < r.pullback_lb);
+  assert.ok(Math.abs(r.governing_pullback_lb - r.pullback_lb) < 1e-9);
+  // On a curvy bore the capstan term overtakes the assumed factor, which is
+  // the direction that matters.
+  const curvy = _v1596({ ...base, total_bend_deg: 120 });
+  assert.ok(curvy.capstan_pullback_lb > curvy.pullback_lb);
+  assert.ok(Math.abs(curvy.governing_pullback_lb - curvy.capstan_pullback_lb) < 1e-9);
+  // Zero bend is a capstan factor of exactly one.
+  assert.strictEqual(_v1596({ ...base, total_bend_deg: 0 }).capstan_factor, 1);
+  // The pipe governs when it is the smaller of the two limits, the rig when
+  // it is, and either alone works.
+  assert.strictEqual(r.governing_limit_lb, 20000);
+  assert.ok(r.governing_limit.includes("pipe"));
+  assert.strictEqual(r.within_limit, true);
+  const rigBound = _v1596({ ...base, pipe_safe_pull_lb: 60000 });
+  assert.strictEqual(rigBound.governing_limit_lb, 40000);
+  assert.ok(rigBound.governing_limit.includes("rig"));
+  assert.strictEqual(_v1596({ ...base, pipe_safe_pull_lb: 0, rig_rated_pull_lb: 0 }).governing_limit_lb, null);
+  assert.strictEqual(_v1596({ ...base, length_ft: 100000 }).within_limit, false);
+  assert.ok("error" in _v1596({ ...base, total_bend_deg: -1 }));
+  assert.ok("error" in _v1596({ ...base, rig_rated_pull_lb: -1 }));
+});
+
+// spec-v1604 follow-up: the scour velocity is entered, not hard-coded at 2,
+// and an as-built slope can be checked against it.
+import { computeManningSlope as _v1604 } from "../../calc-drainage.js";
+test("follow-up spec-v1604: an entered scour velocity and an as-built check", () => {
+  const base = { pipe_diameter_in: 4, target_flow_gpm: 50, material: "pvc", scour_velocity_fps: 2, actual_slope_in_per_ft: 0.25 };
+  const r = _v1604(base);
+  // The default reproduces the behaviour this calculator has always had.
+  const legacy = _v1604({ pipe_diameter_in: 4, target_flow_gpm: 50, material: "pvc" });
+  assert.ok(Math.abs(legacy.slope_self_cleansing_in_per_ft - r.slope_self_cleansing_in_per_ft) < 1e-12);
+  assert.ok(Math.abs(r.slope_self_cleansing_in_per_ft - 0.04837) < 1e-4);
+  // The required velocity is the entered one, and slope goes as its SQUARE,
+  // so a 3 ft/s interceptor requirement is 2.25 times the slope of a 2 ft/s
+  // one -- which is why hard-coding it was the wrong call.
+  const three = _v1604({ ...base, scour_velocity_fps: 3 });
+  assert.ok(Math.abs(three.slope_self_cleansing / r.slope_self_cleansing - 2.25) < 1e-9);
+  const twoFive = _v1604({ ...base, scour_velocity_fps: 2.5 });
+  assert.ok(twoFive.slope_self_cleansing > r.slope_self_cleansing);
+  // The as-built check: a quarter inch per foot on 4 in PVC scours easily.
+  assert.ok(Math.abs(r.actual_velocity_fps - 4.5467) < 1e-3);
+  assert.strictEqual(r.scours, true);
+  assert.strictEqual(r.slope_shortfall_in_per_ft, 0);
+  // Laid at the self-cleansing slope, the velocity lands exactly on the
+  // requirement.
+  const atLimit = _v1604({ ...base, actual_slope_in_per_ft: r.slope_self_cleansing_in_per_ft });
+  assert.ok(Math.abs(atLimit.actual_velocity_fps - base.scour_velocity_fps) < 1e-9);
+  // A hair above the computed slope scours; the exact value lands on the
+  // requirement to within floating point and is not asserted either way.
+  assert.strictEqual(_v1604({ ...base, actual_slope_in_per_ft: r.slope_self_cleansing_in_per_ft * 1.001 }).scours, true);
+  // A flat line silts, and the tile says how much slope it is short.
+  const flat = _v1604({ ...base, actual_slope_in_per_ft: 0.01 });
+  assert.strictEqual(flat.scours, false);
+  assert.ok(flat.slope_shortfall_in_per_ft > 0);
+  assert.ok(Math.abs(flat.slope_shortfall_in_per_ft - (r.slope_self_cleansing_in_per_ft - 0.01)) < 1e-9);
+  // No as-built entered is not an error; it just skips the check.
+  assert.strictEqual(_v1604({ ...base, actual_slope_in_per_ft: 0 }).actual_velocity_fps, 0);
+  assert.ok("error" in _v1604({ ...base, scour_velocity_fps: 0 }));
+  assert.ok("error" in _v1604({ ...base, actual_slope_in_per_ft: -1 }));
+});

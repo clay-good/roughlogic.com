@@ -1512,6 +1512,14 @@ const RELATED = {
   "rock-bolt-support-pressure": ["highwall-bench-geometry","shotcrete-rebound-quantity","mine-face-ventilation"],
   "blast-fume-clearance-time": ["mine-face-ventilation","blast-powder-factor","confined-space-vent"],
   "hoist-rope-safety-factor": ["wire-rope-strength","rope-safety-factor","wire-rope-stretch"],
+  // spec-v1596..v1604: the 2026-09-05 trade-expansion trenchless band.
+  "hdd-bend-radius": ["hdd-pullback","hdd-fluid-volume","hdd-annular-pressure"],
+  "hdd-fluid-volume": ["hdd-annular-pressure","hdd-pullback","annular-grout-volume"],
+  "hdd-annular-pressure": ["hdd-fluid-volume","hdd-bend-radius","hdd-pullback"],
+  "locate-depth-offset": ["vacuum-excavation-spoil","spoil-setback","excavation"],
+  "vacuum-excavation-spoil": ["locate-depth-offset","excavation","spoil-setback"],
+  "pipe-bursting-pull-load": ["hdd-pullback","cipp-liner-thickness","manning-slope"],
+  "cipp-liner-thickness": ["pipe-bursting-pull-load","manning-slope","pipe-partial-flow-depth"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   "grounding-electrode-conductor": ["bonding-jumper","egc-sizing","grounding-electrode"],
   "bonding-jumper": ["grounding-electrode-conductor","egc-sizing","service-load-standard"],

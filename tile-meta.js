@@ -868,6 +868,14 @@ const _TILES = [
   ["rock-bolt-support-pressure", "E"],
   ["blast-fume-clearance-time", "E"],
   ["hoist-rope-safety-factor", "E"],
+  // spec-v1596..v1604 trenchless band (v1596 and v1604 CUT as duplicates)
+  ["hdd-bend-radius", "E"],
+  ["hdd-fluid-volume", "E"],
+  ["hdd-annular-pressure", "E"],
+  ["locate-depth-offset", "E"],
+  ["vacuum-excavation-spoil", "E"],
+  ["pipe-bursting-pull-load", "E"],
+  ["cipp-liner-thickness", "E"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   ["grounding-electrode-conductor", "A"],
   ["bonding-jumper", "A"],

@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "0bda9d58c5d0e7dd",
+      "sha": "f10fc465bbb42e5b",
       "date": "2026-09-05"
     },
     "/tools/": {
-      "sha": "344ef315c83671d5",
+      "sha": "c04f80ad978d5382",
       "date": "2026-09-05"
     },
     "/groups/accounting/": {
-      "sha": "422d530f6b2e31ad",
+      "sha": "e5c1faf948378449",
       "date": "2026-09-05"
     },
     "/groups/agriculture/": {
-      "sha": "6c89f32a926c2b5e",
+      "sha": "132ef71030822119",
       "date": "2026-09-05"
     },
     "/groups/construction/": {
-      "sha": "84b1f5ddbe1f8410",
+      "sha": "2529b8c091746750",
       "date": "2026-09-05"
     },
     "/groups/cross-trade/": {
-      "sha": "8bf991c48faae5b4",
+      "sha": "f9b187c1a7662723",
       "date": "2026-09-05"
     },
     "/groups/educators/": {
-      "sha": "43d5ebbecf44e210",
+      "sha": "9df0dd03c36cc65b",
       "date": "2026-09-05"
     },
     "/groups/electrical/": {
-      "sha": "64f1b93302f93c71",
+      "sha": "9348ff9c16437d8d",
       "date": "2026-09-05"
     },
     "/groups/field/": {
-      "sha": "ce5c480052e906e6",
+      "sha": "31b19fe9f834deaa",
       "date": "2026-09-05"
     },
     "/groups/fire-ground/": {
-      "sha": "d5db7f87ac8f3dda",
+      "sha": "ac74dd966ca2dfc1",
       "date": "2026-09-05"
     },
     "/groups/historical/": {
-      "sha": "cbbdd03a8e80cc08",
+      "sha": "d369bbb8fa836790",
       "date": "2026-09-05"
     },
     "/groups/hvac/": {
-      "sha": "8d6e044f618e54fa",
+      "sha": "4f3379b858d2f3c0",
       "date": "2026-09-05"
     },
     "/groups/kitchen/": {
-      "sha": "7099d91646891713",
+      "sha": "538fdc105011280e",
       "date": "2026-09-05"
     },
     "/groups/lab/": {
-      "sha": "2737f4d4a3ad691a",
+      "sha": "f69bcc3027af82b2",
       "date": "2026-09-05"
     },
     "/groups/mechanic/": {
-      "sha": "4cec1f25788cc305",
+      "sha": "06d17b449e32903b",
       "date": "2026-09-05"
     },
     "/groups/plumbing/": {
-      "sha": "8c699e8ef907adb0",
+      "sha": "00119888b37145a2",
       "date": "2026-09-05"
     },
     "/groups/real-estate/": {
-      "sha": "965ded7b2e63f681",
+      "sha": "b793521082397ebc",
       "date": "2026-09-05"
     },
     "/groups/references/": {
-      "sha": "4481caccb747cf01",
+      "sha": "17808446038e894f",
       "date": "2026-09-05"
     },
     "/groups/restoration/": {
-      "sha": "826dd4ab836be8db",
+      "sha": "1ee823fbbf5a3e46",
       "date": "2026-09-05"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "322b6ce580fda68d",
+      "sha": "b62b72916582ea31",
       "date": "2026-09-05"
     },
     "/groups/stage/": {
-      "sha": "73665058f1cfb72a",
+      "sha": "c9088ae09cba21d2",
       "date": "2026-09-05"
     },
     "/groups/trucking/": {
-      "sha": "6b7e7b2ccc2bda46",
+      "sha": "e7920a2269d44766",
       "date": "2026-09-05"
     },
     "/groups/water/": {
-      "sha": "d80e226b6d826c15",
+      "sha": "513c7653ddd04d83",
       "date": "2026-09-05"
     },
     "/tools/aav-install-check/": {
@@ -1033,6 +1033,10 @@
       "sha": "b2416958eacb1421",
       "date": "2026-09-04"
     },
+    "/tools/cipp-liner-thickness/": {
+      "sha": "3b422c566790ffec",
+      "date": "2026-09-05"
+    },
     "/tools/circle-from-3-points/": {
       "sha": "3bbe265e1dfe4846",
       "date": "2026-09-01"
@@ -1698,7 +1702,7 @@
       "date": "2026-09-04"
     },
     "/tools/cwr-neutral-temperature/": {
-      "sha": "97088e401ffd376a",
+      "sha": "537a0cf9c88e6506",
       "date": "2026-09-05"
     },
     "/tools/cyclone-separator-sizing/": {
@@ -3093,9 +3097,21 @@
       "sha": "1df650f41357e273",
       "date": "2026-09-01"
     },
+    "/tools/hdd-annular-pressure/": {
+      "sha": "901ec8e76834e6fb",
+      "date": "2026-09-05"
+    },
+    "/tools/hdd-bend-radius/": {
+      "sha": "e534733dde7cc55e",
+      "date": "2026-09-05"
+    },
+    "/tools/hdd-fluid-volume/": {
+      "sha": "7d0f6985855efc2e",
+      "date": "2026-09-05"
+    },
     "/tools/hdd-pullback/": {
-      "sha": "bf1badb21e0b0f59",
-      "date": "2026-09-01"
+      "sha": "f2634b1af5c4cbca",
+      "date": "2026-09-05"
     },
     "/tools/head-pressure-control/": {
       "sha": "794ae73daaf97383",
@@ -3677,6 +3693,10 @@
       "sha": "b32ed9028da991ee",
       "date": "2026-09-01"
     },
+    "/tools/locate-depth-offset/": {
+      "sha": "51d72d849cbb9ab2",
+      "date": "2026-09-05"
+    },
     "/tools/lock-backset-strike-layout/": {
       "sha": "95f2e8345681e370",
       "date": "2026-09-05"
@@ -3766,8 +3786,8 @@
       "date": "2026-09-01"
     },
     "/tools/manning-slope/": {
-      "sha": "3c3ec32d047e9390",
-      "date": "2026-09-01"
+      "sha": "5a4f80cda5e1c7ea",
+      "date": "2026-09-05"
     },
     "/tools/manual-d-friction-rate/": {
       "sha": "cd428bc3b965b0b6",
@@ -4456,6 +4476,10 @@
     "/tools/pipe-bedding-backfill/": {
       "sha": "f467b77318cb2070",
       "date": "2026-09-01"
+    },
+    "/tools/pipe-bursting-pull-load/": {
+      "sha": "9529f5585c433f75",
+      "date": "2026-09-05"
     },
     "/tools/pipe-cold-spring/": {
       "sha": "aabf3dc83734e1ac",
@@ -7028,6 +7052,10 @@
     "/tools/vacuum-decay-test/": {
       "sha": "962f3384aa5c1a2e",
       "date": "2026-09-01"
+    },
+    "/tools/vacuum-excavation-spoil/": {
+      "sha": "ae1e0ad4d2ec778a",
+      "date": "2026-09-05"
     },
     "/tools/vacuum-lift-reading/": {
       "sha": "9ed205813c53a694",

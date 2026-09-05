@@ -1050,7 +1050,7 @@ EARTHWORK_RENDERERS["restrained-pipe-length"] = _v832renderRestrainedPipeLength;
 //   pullback_lb = friction_coeff x eff_weight_plf x length_ft x bend_factor + fluid_drag_lb
 //   utilization = safe pull > 0 ? pullback / safe pull : null
 // dims: in { eff_weight_plf: M T^-2, length_ft: L, friction_coeff: dimensionless, bend_factor: dimensionless, fluid_drag_lb: M L T^-2, pipe_safe_pull_lb: M L T^-2 } out: { pullback_lb: M L T^-2, utilization: dimensionless }
-export function computeHddPullback({ eff_weight_plf = 5, length_ft = 800, friction_coeff = 0.3, bend_factor = 1.5, fluid_drag_lb = 0, pipe_safe_pull_lb = 0 } = {}) {
+export function computeHddPullback({ eff_weight_plf = 5, length_ft = 800, friction_coeff = 0.3, bend_factor = 1.5, fluid_drag_lb = 0, pipe_safe_pull_lb = 0, total_bend_deg = 0, rig_rated_pull_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(eff_weight_plf > 0)) return { error: "Effective pipe weight must be positive (lb/ft)." };
   if (!(length_ft > 0)) return { error: "Bore length must be positive (ft)." };
@@ -1058,39 +1058,77 @@ export function computeHddPullback({ eff_weight_plf = 5, length_ft = 800, fricti
   if (!(bend_factor > 0)) return { error: "Bend factor must be positive." };
   if (fluid_drag_lb < 0) return { error: "Fluid drag cannot be negative (lb)." };
   if (pipe_safe_pull_lb < 0) return { error: "Pipe safe pull cannot be negative (lb)." };
-  const pullback_lb = friction_coeff * eff_weight_plf * length_ft * bend_factor + fluid_drag_lb;
-  if (!Number.isFinite(pullback_lb)) return { error: "Pullback math is not a finite value." };
+  if (total_bend_deg < 0) return { error: "Total bend angle cannot be negative (degrees)." };
+  if (rig_rated_pull_lb < 0) return { error: "Rig rated pull cannot be negative (lb)." };
+  const straight_drag_lb = friction_coeff * eff_weight_plf * length_ft;
+  const pullback_lb = straight_drag_lb * bend_factor + fluid_drag_lb;
+  // spec-v1596 follow-up: the lumped bend factor above is a stand-in for the
+  // CAPSTAN relation, which multiplies tension by e^(mu x angle) at every
+  // curve. Computing it from the path's actual total bend angle says whether
+  // the assumed factor is generous or optimistic -- and on a curvy bore it is
+  // usually optimistic, which is the direction that matters.
+  const capstan_factor = Math.exp(friction_coeff * total_bend_deg * Math.PI / 180);
+  const capstan_pullback_lb = straight_drag_lb * capstan_factor + fluid_drag_lb;
+  const governing_pullback_lb = Math.max(pullback_lb, capstan_pullback_lb);
+  if (![pullback_lb, capstan_pullback_lb].every(Number.isFinite)) return { error: "Pullback math is not a finite value." };
   const utilization = pipe_safe_pull_lb > 0 ? pullback_lb / pipe_safe_pull_lb : null;
+  const capstan_utilization = pipe_safe_pull_lb > 0 ? capstan_pullback_lb / pipe_safe_pull_lb : null;
+  // The lower of the pipe's safe pull and the rig's rated pull is what the
+  // pull actually has to fit inside.
+  const limits = [];
+  if (pipe_safe_pull_lb > 0) limits.push({ what: "the product pipe's safe pull", lb: pipe_safe_pull_lb });
+  if (rig_rated_pull_lb > 0) limits.push({ what: "the rig's rated pull", lb: rig_rated_pull_lb });
+  limits.sort((a, b) => a.lb - b.lb);
+  const governing_limit_lb = limits.length ? limits[0].lb : null;
+  const governing_limit = limits.length ? limits[0].what : null;
   return {
+    straight_drag_lb,
     pullback_lb,
+    capstan_factor,
+    capstan_pullback_lb,
+    governing_pullback_lb,
     utilization,
-    note: "A first-order estimate: the full ASTM F1962 model adds capstan/bend and hydrokinetic drag terms this tile omits, so treat the result as a floor. The effective pipe weight already accounts for buoyancy in the drilling fluid (a ballasted or empty pipe can be near neutral). The drilling contractor and the rig's rated thrust govern the pull.",
+    capstan_utilization,
+    governing_limit_lb,
+    governing_limit,
+    within_limit: governing_limit_lb === null ? null : governing_pullback_lb <= governing_limit_lb,
+    note: "A first-order estimate. The effective pipe weight already accounts for buoyancy in the drilling fluid, and it is the term ballasting moves most: an empty HDPE pipe in a fluid-filled hole is strongly buoyant and presses against the top of the bore for its whole length, where filling it with water brings the net weight and the drag with it close to zero. THE LUMPED BEND FACTOR IS A STAND-IN FOR THE CAPSTAN RELATION, which multiplies tension by e raised to (friction x angle) at every curve, so drag along the straight sections compounds rather than adds at each bend. Entering the path's total bend angle computes that multiplier directly and says whether the assumed factor is generous or optimistic -- and on a curvy bore an assumed factor is usually optimistic, which is the direction that matters. That is also why entry and exit angles and the bend radius are pullback decisions rather than layout ones. The limit that governs is usually the PIPE, not the rig. HDPE has a time-dependent allowable stress: it will take a high load briefly and a much lower one for hours, so the safe pull for a pullback lasting a shift is well below any short-term rating. Exceeding it does not necessarily part the pipe on the spot -- it can stretch it, and a pipe pulled beyond its limit may fail later or fail its pressure test. This omits hydrokinetic drag, which is entered as an allowance rather than computed, and it does not model the fluid, the hole condition, or a segmented profile. The drilling contractor, the pipe manufacturer's safe pull for the duration, and the rig's rated thrust govern.",
   };
 }
 
 function _v833renderHddPullback(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: simplified pullback identity by name (ASTM F1962 basis). pullback (lb) = friction x effective weight x length x bend factor + fluid drag. A first-order estimate; the drilling contractor and rig thrust govern.";
+  citationEl.textContent = "Citation: the pullback identity by name (ASTM F1962 basis). pullback (lb) = friction x effective weight x length x bend factor + fluid drag, with the CAPSTAN relation e raised to (friction x total bend angle) computed alongside the lumped bend factor, and the governing limit taken as the LOWER of the product pipe's safe pull and the rig's rated pull. A first-order estimate; the drilling contractor, the pipe manufacturer and rig thrust govern.";
   const ew = makeNumber("Effective pipe weight in fluid (lb/ft)", "hdd-ew", { step: "any", min: "0" });
   const ln = makeNumber("Bore / pull length (ft)", "hdd-ln", { step: "any", min: "0" });
   const fc = makeNumber("Friction coefficient", "hdd-fc", { step: "any", min: "0" });
   const bf = makeNumber("Pull-path bend factor", "hdd-bf", { step: "any", min: "0" });
+  const tb = makeNumber("Total bend angle along the path (deg)", "hdd-tb", { step: "any", min: "0" });
   const fd = makeNumber("Hydrokinetic drag allowance (lb)", "hdd-fd", { step: "any", min: "0" });
   const sp = makeNumber("Pipe safe pull strength (lb, 0 = skip)", "hdd-sp", { step: "any", min: "0" });
-  for (const f of [ew, ln, fc, bf, fd, sp]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { ew.input.value = "5"; ln.input.value = "800"; fc.input.value = "0.3"; bf.input.value = "1.5"; fd.input.value = "0"; sp.input.value = "20000"; update(); });
+  const rp = makeNumber("Rig rated pull (lb, 0 = skip)", "hdd-rp", { step: "any", min: "0" });
+  for (const f of [ew, ln, fc, bf, tb, fd, sp, rp]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ew.input.value = "5"; ln.input.value = "800"; fc.input.value = "0.3"; bf.input.value = "1.5"; tb.input.value = "24"; fd.input.value = "0"; sp.input.value = "20000"; rp.input.value = "40000"; update(); });
   const oPull = makeOutputLine(outputRegion, "Estimated pullback force", "hdd-out-pull");
+  const oCap = makeOutputLine(outputRegion, "With the capstan relation instead", "hdd-out-cap");
   const oUtil = makeOutputLine(outputRegion, "Utilization vs safe pull", "hdd-out-util");
+  const oGov = makeOutputLine(outputRegion, "Governing limit", "hdd-out-gov");
   const update = debounce(() => {
     const r = computeHddPullback({
       eff_weight_plf: ew.input.value === "" ? 5 : Number(ew.input.value), length_ft: ln.input.value === "" ? 800 : Number(ln.input.value),
       friction_coeff: fc.input.value === "" ? 0.3 : Number(fc.input.value), bend_factor: bf.input.value === "" ? 1.5 : Number(bf.input.value),
+      total_bend_deg: tb.input.value === "" ? 0 : Number(tb.input.value),
       fluid_drag_lb: fd.input.value === "" ? 0 : Number(fd.input.value), pipe_safe_pull_lb: sp.input.value === "" ? 0 : Number(sp.input.value),
+      rig_rated_pull_lb: rp.input.value === "" ? 0 : Number(rp.input.value),
     });
-    if (r.error) { oPull.textContent = r.error; oUtil.textContent = "-"; return; }
+    if (r.error) { oPull.textContent = r.error; oCap.textContent = "-"; oUtil.textContent = "-"; oGov.textContent = "-"; return; }
     oPull.textContent = fmt(r.pullback_lb, 0) + " lb";
+    oCap.textContent = fmt(r.capstan_pullback_lb, 0) + " lb at a capstan factor of " + fmt(r.capstan_factor, 2);
     oUtil.textContent = r.utilization === null ? "- (enter a safe pull to check)" : fmt(r.utilization * 100, 0) + "% of safe pull";
+    oGov.textContent = r.governing_limit === null
+      ? "- (enter a safe pull or a rig rating to check)"
+      : fmt(r.governing_limit_lb, 0) + " lb, set by " + r.governing_limit + " -- " + (r.within_limit ? "the pull fits inside it" : "the pull EXCEEDS it");
   }, DEBOUNCE_MS);
-  for (const f of [ew, ln, fc, bf, fd, sp]) f.input.addEventListener("input", update);
+  for (const f of [ew, ln, fc, bf, tb, fd, sp, rp]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["hdd-pullback"] = _v833renderHddPullback;
 

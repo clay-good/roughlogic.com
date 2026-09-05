@@ -345,7 +345,6 @@ export const BESPOKE_OUTPUT_UNITS = {
   "macrs-depreciation": {"year_depreciation":{"prefix":"$","suffix":"","digits":2},"accumulated_depreciation":{"prefix":"$","suffix":"","digits":2},"book_value":{"prefix":"$","suffix":"","digits":2}},
   "mad-irrigation-trigger": {"raw_in":{"prefix":"","suffix":" in","digits":2},"irrigation_interval_days":{"prefix":"","suffix":" days","digits":1}},
   "manning-pipe-capacity": {"v_fps":{"prefix":"","suffix":" ft/s","digits":2}},
-  "manning-slope": {"slope_self_cleansing_in_per_ft":{"prefix":"","suffix":" in/ft","digits":4}},
   "manual-j-cooling": {"total_BTU_hr":{"prefix":"","suffix":" BTU/hr","digits":0},"sensible_BTU_hr":{"prefix":"","suffix":" BTU/hr","digits":0},"latent_BTU_hr":{"prefix":"","suffix":" BTU/hr","digits":0}},
   "manual-j-heating": {"total_BTU_hr":{"prefix":"","suffix":" BTU/hr","digits":0},"conductive_BTU_hr":{"prefix":"","suffix":" BTU/hr","digits":0},"infiltration_BTU_hr":{"prefix":"","suffix":" BTU/hr","digits":0}},
   "manure-cover-savings": {"open_ft3":{"prefix":"","suffix":" ft3","digits":0},"covered_ft3":{"prefix":"","suffix":" ft3","digits":0}},

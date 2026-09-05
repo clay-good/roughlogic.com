@@ -692,6 +692,14 @@ export const TOOL_MODULES = (() => {
     "mine-face-ventilation", "pit-dewatering-staging", "highwall-bench-geometry",
     "rock-bolt-support-pressure", "blast-fume-clearance-time", "hoist-rope-safety-factor",
   ]);
+  // spec-v1596..v1604: the trenchless, HDD and utility locating bench.
+  // v1596 and v1604 were cut as duplicates of hdd-pullback and manning-slope,
+  // which gained their new material instead. All seven keep group "E".
+  declare("./calc-trenchless.js", "TRENCHLESS_RENDERERS", [
+    "hdd-bend-radius", "hdd-fluid-volume", "hdd-annular-pressure",
+    "locate-depth-offset", "vacuum-excavation-spoil", "pipe-bursting-pull-load",
+    "cipp-liner-thickness",
+  ]);
   // spec-v80 cap-relief split: the spec-v25 site-civil / roadway-geometry
   // quartet moved out of calc-construction.js (it sat at 95.0% of its size
   // cap, the tightest remaining calculator module) into its own module. All

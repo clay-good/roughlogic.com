@@ -402,7 +402,7 @@ export const MANNING_ROUGHNESS = {
 };
 
 // dims: in { pipe_diameter_in: L, target_flow_gpm: L^3 T^-1, material: dimensionless } out: { slope_in_per_ft: dimensionless, slope_percent: dimensionless }
-export function computeManningSlope({ pipe_diameter_in = 0, target_flow_gpm = 0, material = "pvc" }) {
+export function computeManningSlope({ pipe_diameter_in = 0, target_flow_gpm = 0, material = "pvc", scour_velocity_fps = 2, actual_slope_in_per_ft = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pipe_diameter_in > 0)) return { error: "Pipe diameter must be positive." };
   if (!(target_flow_gpm >= 0)) return { error: "Target flow must be non-negative." };
@@ -414,7 +414,12 @@ export function computeManningSlope({ pipe_diameter_in = 0, target_flow_gpm = 0,
   const A_half_ft2 = Math.PI * D_ft * D_ft / 8;
   // Self-cleansing velocity 2 ft/s; slope to achieve V_target:
   const slopeForVelocity = (V) => Math.pow((V * n) / (1.486 * Math.pow(R_ft, 2 / 3)), 2);
-  const slope_self_cleansing = slopeForVelocity(2);
+  if (!(scour_velocity_fps > 0)) return { error: "Required scour velocity must be positive." };
+  if (!(actual_slope_in_per_ft >= 0)) return { error: "As-built slope cannot be negative." };
+  // spec-v1604 follow-up: 2.0 ft/s is the conventional minimum, but agencies
+  // differ -- 2.5 ft/s is common and 3.0 ft/s appears on larger interceptors
+  // -- so the velocity is entered rather than assumed.
+  const slope_self_cleansing = slopeForVelocity(scour_velocity_fps);
   // Slope to carry the target flow at half-full:
   // Q (cfs) = V * A_half. 1 gpm = 0.002228 cfs.
   const Q_cfs = target_flow_gpm * 0.002228;
@@ -423,17 +428,28 @@ export function computeManningSlope({ pipe_diameter_in = 0, target_flow_gpm = 0,
     const V_required = Q_cfs / A_half_ft2;
     slope_for_flow = slopeForVelocity(V_required);
   }
+  // The as-built check: what velocity a laid slope actually produces, and
+  // whether it clears the entered scour requirement.
+  const actual_slope = actual_slope_in_per_ft / 12;
+  const actual_velocity_fps = actual_slope > 0 ? (1.486 / n) * Math.pow(R_ft, 2 / 3) * Math.sqrt(actual_slope) : 0;
+  const scours = actual_velocity_fps >= scour_velocity_fps;
+  const slope_shortfall_in_per_ft = Math.max(0, slope_self_cleansing * 12 - actual_slope_in_per_ft);
   return {
     slope_self_cleansing,
     slope_self_cleansing_in_per_ft: slope_self_cleansing * 12,
     slope_for_flow,
     slope_for_flow_in_per_ft: slope_for_flow !== null ? slope_for_flow * 12 : null,
+    scour_velocity_fps,
+    actual_velocity_fps,
+    scours,
+    slope_shortfall_in_per_ft,
     n, D_ft, R_ft, A_half_ft2,
+    note: "The velocity criterion exists to keep grit and solids in suspension, and 2.0 ft/s is the conventional minimum -- but agencies differ, 2.5 ft/s is common, and 3.0 ft/s appears on larger interceptors, so the required velocity belongs entered rather than assumed. The trap is WHERE it is checked. A large-diameter sewer at the head of a system runs at a small depth of flow for years before development fills it, and at that depth the velocity can be far below scour even though the pipe at full flow would be fine; sizing generously and sloping to the full-flow criterion produces a line that silts for its whole life. The modern criterion is TRACTIVE FORCE, which computes the shear stress the flow exerts on the invert rather than its average velocity. It is a better predictor because it responds to the actual depth of flow, and it typically requires steeper slopes on large pipes at low flows than the velocity rule does -- which is exactly the case where the velocity rule is weakest. The partial-flow depth calculator carries that check. What this gives a designer or an inspector is the minimum slope for the pipe and roughness in front of them, and whether an as-built slope meets it. A line laid a hundredth of a foot per foot flat is a maintenance liability for its whole life, and it is far cheaper to find on paper than in a jetting truck's schedule.",
   };
 }
 
 export const manningSlopeExample = {
-  inputs: { pipe_diameter_in: 4, target_flow_gpm: 50, material: "pvc" },
+  inputs: { pipe_diameter_in: 4, target_flow_gpm: 50, material: "pvc", scour_velocity_fps: 2, actual_slope_in_per_ft: 0.25 },
 };
 
 
@@ -444,17 +460,27 @@ export function renderManningSlope(inputRegion, outputRegion, citationEl) {
   const d = makeNumber("Pipe diameter (in)", "mn-d", { step: "any", min: "0" });
   const f = makeNumber("Target flow (gpm)", "mn-f", { step: "any", min: "0" });
   const m = makeSelect("Pipe material", "mn-m", Object.keys(MANNING_ROUGHNESS).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
-  for (const x of [d, f, m]) inputRegion.appendChild(x.wrap);
+  const sv = makeNumber("Required scour velocity (ft/s)", "mn-sv", { step: "any", min: "0" });
+  const as = makeNumber("As-built slope to check (in/ft, 0 = skip)", "mn-as", { step: "any", min: "0" });
+  for (const x of [d, f, m, sv, as]) inputRegion.appendChild(x.wrap);
   const oSC = makeOutputLine(outputRegion, "Self-cleansing slope", "mn-out-sc");
   const oFL = makeOutputLine(outputRegion, "Slope for flow (half-full)", "mn-out-fl");
-  function fillExample(v) { d.input.value = v.pipe_diameter_in; f.input.value = v.target_flow_gpm; m.select.value = v.material; update(); }
+  const oAB = makeOutputLine(outputRegion, "As-built slope against it", "mn-out-ab");
+  function fillExample(v) { d.input.value = v.pipe_diameter_in; f.input.value = v.target_flow_gpm; m.select.value = v.material; sv.input.value = v.scour_velocity_fps; as.input.value = v.actual_slope_in_per_ft; update(); }
   const update = debounce(() => {
-    const r = computeManningSlope({ pipe_diameter_in: Number(d.input.value) || 0, target_flow_gpm: Number(f.input.value) || 0, material: m.select.value });
-    if (r.error) { oSC.textContent = r.error; oFL.textContent = "-"; return; }
-    oSC.textContent = fmt(r.slope_self_cleansing_in_per_ft, 4) + " in/ft";
+    const r = computeManningSlope({
+      pipe_diameter_in: Number(d.input.value) || 0, target_flow_gpm: Number(f.input.value) || 0, material: m.select.value,
+      scour_velocity_fps: sv.input.value === "" ? 2 : Number(sv.input.value),
+      actual_slope_in_per_ft: as.input.value === "" ? 0 : Number(as.input.value),
+    });
+    if (r.error) { oSC.textContent = r.error; oFL.textContent = "-"; oAB.textContent = "-"; return; }
+    oSC.textContent = fmt(r.slope_self_cleansing_in_per_ft, 4) + " in/ft at " + fmt(r.scour_velocity_fps, 2) + " ft/s";
     oFL.textContent = r.slope_for_flow_in_per_ft !== null ? fmt(r.slope_for_flow_in_per_ft, 4) + " in/ft" : "-";
+    oAB.textContent = r.actual_velocity_fps > 0
+      ? fmt(r.actual_velocity_fps, 2) + " ft/s -- " + (r.scours ? "scours" : "SILTS, and it is " + fmt(r.slope_shortfall_in_per_ft, 4) + " in/ft short")
+      : "- (enter an as-built slope to check)";
   }, DEBOUNCE_MS);
-  for (const el of [d.input, f.input, m.select]) el.addEventListener("input", update);
+  for (const el of [d.input, f.input, m.select, sv.input, as.input]) el.addEventListener("input", update);
 }
 
 // dims: in { d_in: L, slope: dimensionless, material: dimensionless } out: { v_fps: L T^-1, q_cfs: L^3 T^-1, q_gpm: L^3 T^-1 }

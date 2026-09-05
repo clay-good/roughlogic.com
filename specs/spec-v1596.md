@@ -1,6 +1,12 @@
 # roughlogic.com Specification v1596 -- Directional Drill Pullback Force and Pipe Stress (`calc-trenchless.js`, Group E Carpentry and Construction, trenchless, 1 New Tile)
 
-> **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
+> **Status: CUT 2026-09-05 as a duplicate.** `hdd-pullback` already answers this field
+> question -- what will this pullback take -- on the same ASTM F1962 basis, and its own note
+> said the lumped bend factor stood in for the capstan and hydrokinetic terms. Rather than
+> ship a second pullback calculator, that one gained what this spec added: the CAPSTAN
+> relation computed from the path's total bend angle beside the assumed factor, and the
+> governing limit taken as the LOWER of the product pipe's safe pull and the rig's rated
+> pull. Aliases route this question to it. Single-tile spec. Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-trenchless.js`**
 > (Group E, Carpentry and Construction -- the existing category, hub `/groups/construction/`; trenchless, hdd, and utility locating), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >

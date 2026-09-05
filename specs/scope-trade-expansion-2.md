@@ -1,7 +1,7 @@
 # Scope: The 2026-09-05 Trade Expansion (specs v1450-v1749, 300 New Tiles)
 
 > **Status: IN PROGRESS (2026-09-05). Program charter, no catalog change of its own.**
-> **Bands 1-5 have landed: railroad track, elevator and escalator, door hardware and locksmithing, and mining and quarry (both halves), 1,804 -> 1,849. One spec cut as a duplicate.**
+> **Bands 1-6 have landed: railroad track, elevator and escalator, door hardware and locksmithing, mining and quarry, and trenchless, 1,804 -> 1,856. Three specs cut as duplicates.**
 > Inherits the spec-v106 trades-only charter and every convention through spec-v1449.
 > Each of the 300 tiles is specified in its own file, `spec-v1450.md` through `spec-v1749.md`.
 
@@ -547,8 +547,14 @@ things must happen **before** the first band, not during it:
 | 3 | v1571-v1581 | `calc-doorhardware.js` (new) | 11 | door hardware and locksmithing; catalog 1,822 -> 1,833; nine group E, two group A |
 | 4 | v1507-v1516 | `calc-mining.js` (new) | 10 | mining, quarry, and drill-and-blast; catalog 1,833 -> 1,843 |
 | 5 | v1517-v1523 | `calc-mining.js` | 6 | the rest of the mining bench; catalog 1,843 -> 1,849. **spec-v1520 CUT** as a duplicate of `shotcrete-rebound-quantity`, whose reverse check it became |
+| 6 | v1596-v1604 | `calc-trenchless.js` (new) | 7 | trenchless, HDD and utility locating; catalog 1,849 -> 1,856. **spec-v1596 and spec-v1604 CUT** as duplicates of `hdd-pullback` and `manning-slope`, both of which gained the material those specs added |
 
-**Nine of the forty-five specs built so far were internally wrong and shipped corrected.**
+**Ten of the fifty-four specs built so far were internally wrong and shipped corrected, and
+THREE have been cut as duplicates.** Band 6 added spec-v1597, whose rule line says a steel
+pipe's minimum bend radius in FEET is 100 times its diameter in INCHES and whose prose says a
+12 degree entry on a thousand-foot radius takes "over 200 feet of run" -- while its worked
+example computes `100 x 12.75 in = 1,275 in = 106 ft` and gets a 22 ft run. The rule and the
+prose agree with each other and not with the example: 1,275 FEET, a 265 ft sag run.
 Band 4 was clean; band 5 had two. spec-v1521 labels its dead-weight check "FAILS, margin
 0.76" and then calls the same case "Comfortable" -- 750 psf does not carry 990 psf. And
 spec-v1523's own formula line says rope weight = length x weight per foot x NUMBER OF

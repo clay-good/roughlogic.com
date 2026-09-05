@@ -1686,6 +1686,9 @@
     {"term":"what orifice letter for relief capacity","target":"steam-prv-area-for-capacity","kind":"question"},
     {"term":"relief area for pounds per hour","target":"steam-prv-area-for-capacity","kind":"question"},
     {"term":"size a steam safety valve orifice","target":"steam-prv-area-for-capacity","kind":"question"},
-    {"term":"napier orifice area for capacity","target":"steam-prv-area-for-capacity","kind":"question"}
+    {"term":"napier orifice area for capacity","target":"steam-prv-area-for-capacity","kind":"question"},
+    {"term":"sewer scour slope","target":"manning-slope","kind":"redirect"},
+    {"term":"minimum slope self cleansing sewer","target":"manning-slope","kind":"redirect"},
+    {"term":"gravity sewer 2 fps velocity","target":"manning-slope","kind":"redirect"}
   ]
 }

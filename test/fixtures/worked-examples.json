@@ -7271,7 +7271,9 @@
    "inputs": {
     "pipe_diameter_in": 4,
     "target_flow_gpm": 50,
-    "material": "pvc"
+    "material": "pvc",
+    "scour_velocity_fps": 2,
+    "actual_slope_in_per_ft": 0.25
    },
    "outputs": {
     "slope_self_cleansing_in_per_ft": {
@@ -58651,7 +58653,9 @@
     "length_ft": 800,
     "friction_coeff": 0.3,
     "bend_factor": 1.5,
-    "pipe_safe_pull_lb": 20000
+    "pipe_safe_pull_lb": 20000,
+    "total_bend_deg": 24,
+    "rig_rated_pull_lb": 40000
    },
    "outputs": {
     "pullback_lb": {
@@ -58664,6 +58668,24 @@
      "value": 0.09,
      "tolerance": {
       "abs": 0.001
+     }
+    },
+    "capstan_factor": {
+     "value": 1.1339,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "capstan_pullback_lb": {
+     "value": 1360.681,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "governing_limit_lb": {
+     "value": 20000,
+     "tolerance": {
+      "pct": 0.5
      }
     }
    }
@@ -58681,13 +58703,33 @@
     "length_ft": 1500,
     "friction_coeff": 0.3,
     "bend_factor": 1.5,
-    "pipe_safe_pull_lb": 20000
+    "pipe_safe_pull_lb": 20000,
+    "total_bend_deg": 24,
+    "rig_rated_pull_lb": 40000
    },
    "outputs": {
     "pullback_lb": {
      "value": 3375,
      "tolerance": {
       "abs": 0.01
+     }
+    },
+    "capstan_factor": {
+     "value": 1.1339,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "capstan_pullback_lb": {
+     "value": 2551.277,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "governing_limit_lb": {
+     "value": 20000,
+     "tolerance": {
+      "pct": 0.5
      }
     }
    }
@@ -96263,6 +96305,370 @@
     },
     "depth_at_limit_ft": {
      "value": 8105.56,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hdd-bend-radius",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "12.75 in steel product pipe at the 100 ft per inch rule, 12 degree entry",
+   "source_edition_or_year": "R(ft) = 100 x D(in); sag run = R sin(angle), depth = R (1 - cos(angle))",
+   "source_section_or_page": "the pipe manufacturer and the engineer of record govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "pipe_diameter_in": 12.75,
+    "radius_per_inch_ft": 100,
+    "rod_min_radius_ft": 150,
+    "entry_angle_deg": 12,
+    "required_depth_ft": 25,
+    "available_setback_ft": 300
+   },
+   "outputs": {
+    "pipe_min_radius_ft": {
+     "value": 1275,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "governing_radius_ft": {
+     "value": 1275,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sag_run_ft": {
+     "value": 265.087,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sag_depth_ft": {
+     "value": 27.8618,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rod_ratio": {
+     "value": 8.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hdd-fluid-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "900 ft bore reamed to 20 in for 12.75 in pipe at a 3x fluid multiplier",
+   "source_edition_or_year": "hole and annular volume; 7.48052 gal per cu ft, 5.615 cu ft per bbl",
+   "source_section_or_page": "the mud engineer and the disposal jurisdiction govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "ream_diameter_in": 20,
+    "pipe_diameter_in": 12.75,
+    "bore_length_ft": 900,
+    "fluid_multiplier": 3,
+    "bentonite_lb_per_100gal": 40,
+    "pump_rate_gpm": 120,
+    "returns_fraction_pct": 70
+   },
+   "outputs": {
+    "hole_volume_gal": {
+     "value": 14687.97,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hole_volume_bbl": {
+     "value": 349.688,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annular_volume_gal": {
+     "value": 8718.69,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fluid_required_gal": {
+     "value": 44063.9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bentonite_lb": {
+     "value": 17625.56,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "spoil_cy": {
+     "value": 225.438,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hdd-annular-pressure",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "30 ft of cover in 120 pcf soil with 9.5 lb/gal fluid, shallow station at 8 ft",
+   "source_edition_or_year": "0.052 psi per ft per ppg mud column plus annular friction, against overburden",
+   "source_section_or_page": "a screen; the Delft or Luger cavity expansion relation is the real limit",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "cover_depth_ft": 30,
+    "shallow_cover_ft": 8,
+    "soil_unit_weight_pcf": 120,
+    "soil_cohesion_psf": 600,
+    "fluid_density_ppg": 9.5,
+    "annular_friction_psi": 15,
+    "required_fs": 1.5
+   },
+   "outputs": {
+    "overburden_psi": {
+     "value": 25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hydrostatic_psi": {
+     "value": 14.82,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annular_pressure_psi": {
+     "value": 29.82,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "shallow_overburden_psi": {
+     "value": 6.6667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "shallow_factor_of_safety": {
+     "value": 0.5716,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "locate-depth-offset",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "instrument reading 52 in against a 71 in half-signal offset, asymmetric nulls",
+   "source_edition_or_year": "the 45-degree method: the half-signal offset equals the depth",
+   "source_section_or_page": "exposing the utility establishes position and depth",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "instrument_depth_in": 52,
+    "half_signal_offset_in": 71,
+    "left_null_in": 34,
+    "right_null_in": 52,
+    "current_near_ma": 42,
+    "current_far_ma": 19,
+    "sharp_drop_pct": 25
+   },
+   "outputs": {
+    "geometric_depth_in": {
+     "value": 71,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "depth_difference_in": {
+     "value": 19,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "depth_disagreement_pct": {
+     "value": 36.5385,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "null_asymmetry_in": {
+     "value": 18,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "current_drop_pct": {
+     "value": 54.7619,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vacuum-excavation-spoil",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "8 by 4 ft test pit to 5 ft at 30% swell into a 12 cu yd tank",
+   "source_edition_or_year": "bank volume / 27, grossed by swell and by any water added",
+   "source_section_or_page": "the disposal jurisdiction governs whether spoil may be returned",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "pit_length_ft": 8,
+    "pit_width_ft": 4,
+    "pit_depth_ft": 5,
+    "pit_count": 1,
+    "swell_pct": 30,
+    "water_added_gal": 0,
+    "tank_capacity_cy": 12,
+    "haul_round_trip_min": 75
+   },
+   "outputs": {
+    "bank_cy_each": {
+     "value": 5.92593,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "loose_cy_total": {
+     "value": 7.7037,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tank_fills": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "first_pit_tank_pct": {
+     "value": 64.1975,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "haul_time_min": {
+     "value": 75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pipe-bursting-pull-load",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "bursting 6 in to 8 in over 300 ft at 7 ft of cover",
+   "source_edition_or_year": "displaced area = (pi/4)(new^2 - old^2)",
+   "source_section_or_page": "the bursting contractor and the adjacent utility owners govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "old_diameter_in": 6,
+    "new_diameter_in": 8,
+    "run_length_ft": 300,
+    "cover_depth_ft": 7,
+    "expansion_force_lb_per_sqin": 400,
+    "drag_lb_per_ft": 15,
+    "pipe_safe_pull_lb": 20000,
+    "adjacent_utility_ft": 3
+   },
+   "outputs": {
+    "displaced_area_sqin": {
+     "value": 21.9911,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "displaced_cy": {
+     "value": 1.69685,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "upsize_ratio": {
+     "value": 1.33333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pull_load_lb": {
+     "value": 13296.46,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cover_to_diameter": {
+     "value": 10.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cipp-liner-thickness",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "24 in host at 3% ovality with 12 ft of groundwater, 125,000 psi long-term modulus",
+   "source_edition_or_year": "ASTM F1216 X1.1 partially deteriorated buckling",
+   "source_section_or_page": "the fully deteriorated case is a different relation and is not computed",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "host_id_in": 24,
+    "ovality_pct": 3,
+    "groundwater_head_ft": 12,
+    "long_term_modulus_psi": 125000,
+    "short_term_modulus_psi": 250000,
+    "enhancement_factor": 7,
+    "safety_factor": 2,
+    "alternative_ovality_pct": 5
+   },
+   "outputs": {
+    "external_pressure_psi": {
+     "value": 5.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ovality_factor": {
+     "value": 0.764346,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "dimension_ratio": {
+     "value": 53.0897,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "thickness_in": {
+     "value": 0.452063,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "short_term_thickness_in": {
+     "value": 0.360235,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alternative_thickness_in": {
+     "value": 0.479124,
      "tolerance": {
       "pct": 0.5
      }

@@ -106512,6 +106512,211 @@
    "term": "in place thickness from shotcrete shot",
    "target": "shotcrete-rebound-quantity",
    "kind": "redirect"
+  },
+  {
+   "term": "hdd bend radius",
+   "target": "hdd-bend-radius",
+   "kind": "industry"
+  },
+  {
+   "term": "directional bore entry angle",
+   "target": "hdd-bend-radius",
+   "kind": "industry"
+  },
+  {
+   "term": "minimum bend radius steel pipe bore",
+   "target": "hdd-bend-radius",
+   "kind": "industry"
+  },
+  {
+   "term": "sag bend setback hdd",
+   "target": "hdd-bend-radius",
+   "kind": "industry"
+  },
+  {
+   "term": "bore path radius rule",
+   "target": "hdd-bend-radius",
+   "kind": "industry"
+  },
+  {
+   "term": "hdd drilling fluid volume",
+   "target": "hdd-fluid-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "bentonite quantity bore",
+   "target": "hdd-fluid-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "annular volume hdd",
+   "target": "hdd-fluid-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "drilling mud gallons per bore",
+   "target": "hdd-fluid-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "hdd spoil disposal volume",
+   "target": "hdd-fluid-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "hdd annular pressure",
+   "target": "hdd-annular-pressure",
+   "kind": "industry"
+  },
+  {
+   "term": "frac out screen drilling",
+   "target": "hdd-annular-pressure",
+   "kind": "industry"
+  },
+  {
+   "term": "inadvertent returns hdd",
+   "target": "hdd-annular-pressure",
+   "kind": "industry"
+  },
+  {
+   "term": "downhole pressure bore",
+   "target": "hdd-annular-pressure",
+   "kind": "industry"
+  },
+  {
+   "term": "hydraulic fracture drilling fluid",
+   "target": "hdd-annular-pressure",
+   "kind": "industry"
+  },
+  {
+   "term": "utility locate depth check",
+   "target": "locate-depth-offset",
+   "kind": "industry"
+  },
+  {
+   "term": "45 degree locate method",
+   "target": "locate-depth-offset",
+   "kind": "industry"
+  },
+  {
+   "term": "locator depth accuracy",
+   "target": "locate-depth-offset",
+   "kind": "industry"
+  },
+  {
+   "term": "null symmetry locating",
+   "target": "locate-depth-offset",
+   "kind": "industry"
+  },
+  {
+   "term": "signal current bleed off",
+   "target": "locate-depth-offset",
+   "kind": "industry"
+  },
+  {
+   "term": "vacuum excavation spoil",
+   "target": "vacuum-excavation-spoil",
+   "kind": "industry"
+  },
+  {
+   "term": "potholing tank fills",
+   "target": "vacuum-excavation-spoil",
+   "kind": "industry"
+  },
+  {
+   "term": "hydrovac spoil volume",
+   "target": "vacuum-excavation-spoil",
+   "kind": "industry"
+  },
+  {
+   "term": "daylighting spoil swell",
+   "target": "vacuum-excavation-spoil",
+   "kind": "industry"
+  },
+  {
+   "term": "vac truck tank capacity",
+   "target": "vacuum-excavation-spoil",
+   "kind": "industry"
+  },
+  {
+   "term": "pipe bursting pull load",
+   "target": "pipe-bursting-pull-load",
+   "kind": "industry"
+  },
+  {
+   "term": "upsize displacement bursting",
+   "target": "pipe-bursting-pull-load",
+   "kind": "industry"
+  },
+  {
+   "term": "static pipe bursting force",
+   "target": "pipe-bursting-pull-load",
+   "kind": "industry"
+  },
+  {
+   "term": "burst heave shallow cover",
+   "target": "pipe-bursting-pull-load",
+   "kind": "industry"
+  },
+  {
+   "term": "adjacent utility pipe bursting",
+   "target": "pipe-bursting-pull-load",
+   "kind": "industry"
+  },
+  {
+   "term": "cipp liner thickness",
+   "target": "cipp-liner-thickness",
+   "kind": "industry"
+  },
+  {
+   "term": "astm f1216 buckling",
+   "target": "cipp-liner-thickness",
+   "kind": "industry"
+  },
+  {
+   "term": "cured in place pipe design",
+   "target": "cipp-liner-thickness",
+   "kind": "industry"
+  },
+  {
+   "term": "liner ovality buckling",
+   "target": "cipp-liner-thickness",
+   "kind": "industry"
+  },
+  {
+   "term": "long term modulus cipp",
+   "target": "cipp-liner-thickness",
+   "kind": "industry"
+  },
+  {
+   "term": "hdd pullback force capstan",
+   "target": "hdd-pullback",
+   "kind": "redirect"
+  },
+  {
+   "term": "directional drill pullback pipe safe pull",
+   "target": "hdd-pullback",
+   "kind": "redirect"
+  },
+  {
+   "term": "capstan effect pullback bore",
+   "target": "hdd-pullback",
+   "kind": "redirect"
+  },
+  {
+   "term": "sewer scour slope",
+   "target": "manning-slope",
+   "kind": "redirect"
+  },
+  {
+   "term": "minimum slope self cleansing sewer",
+   "target": "manning-slope",
+   "kind": "redirect"
+  },
+  {
+   "term": "gravity sewer 2 fps velocity",
+   "target": "manning-slope",
+   "kind": "redirect"
   }
  ]
 }
