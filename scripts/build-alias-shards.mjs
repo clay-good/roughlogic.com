@@ -243,10 +243,12 @@ async function main() {
     await writeFile(MANIFEST, manifestOut);
     wrote++;
   }
-  // The manifest this script just rewrote is itself anchored in
+  // The manifest this script just rewrote is stamped in BOTH hash registries:
   // data/integrity.json, which the runtime checks before trusting any shard
-  // here. Re-stamp it, or every visitor sees the integrity banner.
-  if (await stampIntegrityAnchor("search")) wrote++;
+  // here, and scripts/expected-hashes.json, which `npm run data:verify`
+  // checks in CI. Re-stamp both, or every visitor sees the integrity banner
+  // and the push goes red.
+  wrote += await stampIntegrityAnchor("search");
   console.log(
     wrote === 0
       ? "alias shards already current. No changes written."

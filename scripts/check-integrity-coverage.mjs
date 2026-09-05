@@ -24,9 +24,19 @@
 //   B. every shard file on disk has a real recorded hash in its folder's
 //      manifest, and that hash matches the file;
 //   C. no placeholder ("pending") survives anywhere.
+//   D. every entry scripts/expected-hashes.json carries matches the file on
+//      disk.
 //
 // A failure here means the site would either miss a tampered shard (B/C) or
 // show every visitor a false integrity banner (A). Deterministic, offline.
+//
+// D was added 2026-09-05 after a tile band went red on the FIRST push. There
+// are two hash registries -- the runtime data/integrity.json checked here, and
+// the build's scripts/expected-hashes.json checked by `npm run data:verify`.
+// That is a CI step and is NOT in the lint chain, so re-stamping one and not
+// the other was green through every local gate and red forty minutes later.
+// The two drift for the same reasons and there is no argument for catching one
+// class of it locally and the other only in CI.
 
 import { readFile, readdir } from "node:fs/promises";
 import { resolve, dirname, relative, sep } from "node:path";
@@ -117,6 +127,29 @@ async function main() {
     }
   }
 
+  // D. The build registry. Same files, second list, checked by the CI-only
+  // `npm run data:verify` -- brought into the lint chain here so the two
+  // registries cannot silently diverge between a local run and a push.
+  let expectedChecked = 0;
+  const expectedPath = resolve(ROOT, "scripts", "expected-hashes.json");
+  const expected = JSON.parse(await readFile(expectedPath, "utf8"));
+  for (const [rel, want] of Object.entries(expected.hashes || {})) {
+    const abs = resolve(DATA, rel);
+    if (!existsSync(abs)) {
+      errors.push(`scripts/expected-hashes.json lists data/${rel}, which is not on disk.`);
+      continue;
+    }
+    expectedChecked++;
+    if (!HEX64.test(want)) {
+      errors.push(`scripts/expected-hashes.json records "${want}" for data/${rel} instead of a SHA-256.`);
+    } else if (sha256(await readFile(abs, "utf8")) !== want) {
+      errors.push(
+        `scripts/expected-hashes.json records a stale hash for data/${rel}. ` +
+        "`npm run data:verify` fails in CI on this. Re-stamp it after regenerating this folder.",
+      );
+    }
+  }
+
   // Anchors pointing at folders that no longer carry a manifest.
   for (const folder of Object.keys(anchored)) {
     if (!existsSync(resolve(DATA, folder, "manifest.json"))) {
@@ -131,7 +164,8 @@ async function main() {
   }
   console.log(
     `check-integrity-coverage OK: ${foldersChecked} data folders anchored in data/integrity.json, ` +
-      `${shardsChecked} shards carry a real SHA-256 matching the file on disk.`,
+      `${shardsChecked} shards carry a real SHA-256 matching the file on disk, and ` +
+      `${expectedChecked} scripts/expected-hashes.json entries match theirs (the registry \`npm run data:verify\` reads).`,
   );
 }
 

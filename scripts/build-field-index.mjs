@@ -357,8 +357,9 @@ if (CHECK) {
   }
 } else {
   await writeFile(manifestPath, manifestText, "utf8");
-// data/fields/manifest.json is anchored in data/integrity.json, and the
-// runtime verifies it there before trusting a field shard. Re-stamp it.
+// data/fields/manifest.json is stamped in BOTH hash registries -- the runtime
+// data/integrity.json and the build's scripts/expected-hashes.json, which
+// `npm run data:verify` checks in CI. Re-stamp both.
 await stampIntegrityAnchor("fields");
 }
 
