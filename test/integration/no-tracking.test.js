@@ -90,12 +90,16 @@ test("no-tracking: only the theme toggle writes storage, and only its own key", 
   expect(after).toEqual(["rl-theme"]);
 });
 
-test("no-tracking: every request the page makes goes to this origin", async ({ page }) => {
+test("no-tracking: every request the page makes goes to this origin", async ({ page, baseURL }) => {
+  // The origin comes from the config rather than a literal, so this still
+  // means "this origin" when the suite runs on PORT=<something else> to avoid
+  // adopting another checkout's dev server (see global-setup.js).
+  const origin = baseURL.replace(/\/$/, "") + "/";
   const foreign = new Set();
   page.on("request", (r) => {
     const url = r.url();
     if (url.startsWith("data:") || url.startsWith("blob:") || url.startsWith("about:")) return;
-    if (!url.startsWith("http://localhost:8080/")) foreign.add(new URL(url).origin + new URL(url).pathname);
+    if (!url.startsWith(origin)) foreign.add(new URL(url).origin + new URL(url).pathname);
   });
 
   await walkTheSite(page);

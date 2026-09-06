@@ -21689,6 +21689,92 @@ export const CITATIONS = {
       { name: "Securement is separate and regulated", value: "log loads have their own FMCSA requirements", source: "FMCSA" },
     ],
   },
+  // spec-v1550..v1556: the 2026-09-05 trade-expansion wind-energy band.
+  // Group A, Electrical.
+  "tip-speed-ratio": {
+    formula: "tip speed = pi x rotor diameter x rpm / 60; tip speed ratio = that speed / the hub-height free-stream wind speed; the rpm holding a design ratio = design ratio x wind speed x 60 / (pi x rotor diameter).",
+    edition: "The tip speed ratio definition by name, with 6 to 8 as the design band for a modern three-blade upwind machine and IEC 61400 named for the performance measurement this does not perform. The turbine manufacturer's operating parameters and control strategy govern.",
+    freeAccess: "Kinematics on the machine's own diameter, rotor speed, and an anemometer reading; no manufacturer power curve or control table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Below rated wind a modern machine varies rotor speed to hold the tip speed ratio at its design point, because the power coefficient peaks sharply there and a few units either side costs several percent of output; above rated it stops trying and holds power constant by pitching, so the ratio falls away deliberately. That is why the same low ratio means two opposite things -- above rated it is the machine working correctly, and at the same wind BELOW rated it means the rotor is not being allowed to speed up, which is a controller or converter fault. Tip speed is bounded by things other than aerodynamics: acoustic emission rises steeply with it so noise-constrained sites cap rotor rpm and accept a lower ratio, and leading-edge erosion from rain and dust scales hard with it and is a major maintenance cost on large machines. That is why bigger rotors turn slower. Wind speed must be the hub-height free-stream value: a nacelle anemometer sits in the rotor's wake and reads low, and the manufacturer's transfer function that corrects it is not known here.",
+    assumptions: [
+      { name: "The same ratio means two things", value: "above rated it is correct behaviour; below rated it is a fault", source: "turbine control practice" },
+      { name: "Acoustics caps tip speed", value: "not aerodynamics, which is why large rotors turn slowly", source: "site noise limits" },
+      { name: "A nacelle anemometer reads low", value: "it sits in the rotor wake and needs the manufacturer's transfer function", source: "IEC 61400-12" },
+    ],
+  },
+  "wind-power-density-betz": {
+    formula: "P = 0.5 x rho x A x v cubed, with the mass density taken as the entered weight density divided by g = 32.174 ft/s squared and A the swept area pi/4 x diameter squared; the Betz limit caps the extractable fraction at 16/27 = 0.593.",
+    edition: "The free-stream power relation and the Betz limit of 16/27 by name. Real machines reach a power coefficient of 0.35 to 0.48 including drivetrain losses. The manufacturer's warranted power curve and a site-specific energy assessment govern any production estimate.",
+    freeAccess: "Arithmetic on the user's own rotor diameter, wind speed, and density; the Betz coefficient is a first-principles result, not a proprietary figure.",
+    governance: GOVERNANCE.general,
+    editionNote: "The cube law is the single most important fact in wind energy and the one most often underweighted: a site averaging 20% more wind has 73% more energy in it, and half the wind speed is one eighth the power. That is why met tower data and hub height matter enormously and why moving a machine a short distance to better exposure can beat any equipment choice. Betz then sets the ceiling -- a rotor that extracted all the wind's energy would have to stop the air completely, and stopped air cannot get out of the way of the air behind it, so the optimum slows the flow to a third of its upstream speed and captures 16/27. No rotor of any design beats it, which makes a claimed coefficient above 0.593 an error or a fraud rather than a breakthrough. This is not an energy estimate: annual output depends on the DISTRIBUTION of speeds, and because power is cubic the average of the cubes is much larger than the cube of the average, so a mean speed put into this relation understates energy substantially.",
+    assumptions: [
+      { name: "Power is cubic in speed", value: "20% more wind is 73% more energy; siting beats equipment", source: "first principles" },
+      { name: "Betz is a ceiling, not a target", value: "16/27 follows from conservation of mass and momentum alone", source: "Betz's law" },
+      { name: "A single speed is not an energy estimate", value: "the distribution is what determines annual output", source: "IEC 61400-12" },
+    ],
+  },
+  "wind-shear-hub-height": {
+    formula: "the power law v2 = v1 x (z2 / z1) raised to alpha; alpha derived from two measured levels is ln(v2/v1) / ln(z2/z1); the energy ratio is the speed ratio cubed.",
+    edition: "The power-law wind shear relation by name, with the customary exponents 0.10 over water and smooth ground, 0.14 the open-country default, 0.20 over crops and scattered obstacles, and 0.25 to 0.40 over woodland and suburbs, and IEC 61400-12 named for the hub-height measurement this does not replace. An independent energy assessor governs a bankable estimate.",
+    freeAccess: "Extrapolation between two heights on the user's own anemometer readings; no wind atlas or proprietary shear table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The exponent is the whole calculation and it is site-specific. The 1/7 value of 0.14 that gets used as a default belongs to flat open country in neutral stability; over crops, brush, or trees the profile is much steeper and over water much flatter, so deriving it from two anemometer levels on the same mast is worth far more than any table and is the reason met masts carry multiple levels. The amplification is what makes it consequential: because power is cubic, an exponent wrong by a few hundredths produces a wind speed error of a few percent and an ENERGY error of roughly three times that, and on a twenty-year project that difference is the whole margin. Shear also varies through the day and the year -- nights are typically far more sheared than afternoons because the atmosphere stabilizes -- so a short measurement campaign taken in one season can mislead in both directions. Real profiles are not power laws at all over complex terrain or near forest canopies, where they can be displaced upward or even reversed, and extrapolating more than roughly twice the measurement height is not defensible.",
+    assumptions: [
+      { name: "The exponent is measured, not assumed", value: "two levels on one mast beat any published table", source: "met mast practice" },
+      { name: "A speed error triples in energy", value: "because power goes as the cube of speed", source: "first principles" },
+      { name: "Twice the measurement height is the limit", value: "past that a single power law is not defensible", source: "IEC 61400-12" },
+    ],
+  },
+  "weibull-capacity-factor": {
+    formula: "the Weibull pdf f(v) = (k/c)(v/c) raised to (k-1) times exp of minus (v/c) raised to k; mean speed = c x Gamma(1 + 1/k); energy pattern factor = Gamma(1 + 3/k) / Gamma(1 + 1/k) cubed; annual energy is that distribution integrated against a curve cubic from cut-in to rated and flat to cut-out; capacity factor = annual energy / (rated power x 8,760 hours).",
+    edition: "The two-parameter Weibull distribution, the energy pattern factor, and the capacity-factor definition by name, with IEC 61400-12 named for the measurement campaign that fits the parameters. An independent energy assessor and the manufacturer's warranted power curve govern a bankable estimate.",
+    freeAccess: "An integral over the user's own Weibull parameters and machine ratings; no wind atlas, measured dataset, or manufacturer power curve is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The energy pattern factor is the number that makes the point: at a shape parameter of 2 the mean of the cubes is about 1.9 times the cube of the mean, so an energy estimate built on average wind speed alone is low by nearly half. Every serious wind calculation is an integral of the power curve against the distribution for exactly that reason, and the shape parameter controls how pronounced the effect is. Capacity factor then puts the result in a comparable form -- it is the honest measure of a site and a machine together and it is what makes a large rotor on a modest tower comparable with a small rotor on a tall one; a figure claimed above about 60% onshore deserves the same scepticism as a power coefficient above Betz. The hours matter as much as the energy: a site can look windy on its mean and still spend a large share of the year below cut-in making nothing at all, and a mean speed hides that completely. Fitting the parameters requires a year or more of measured data at or near hub height, and parameters from a wind atlas or a nearby station are indicative only.",
+    assumptions: [
+      { name: "The distribution, not the mean", value: "an average-speed estimate is low by roughly the energy pattern factor", source: "first principles" },
+      { name: "The curve here is an idealisation", value: "cubic to rated then flat; a real machine's curve is not that", source: "manufacturer power curve" },
+      { name: "Losses are 10 to 20% combined", value: "wake, availability, electrical, soiling, icing, curtailment", source: "energy assessment practice" },
+    ],
+  },
+  "turbine-density-correction": {
+    formula: "the ISA barometric relation: density = reference density x 518.67 / (459.67 + degF) x (1 - 6.73e-6 x elevation) raised to 5.258; power scales LINEARLY with the density ratio below rated, and the IEC method instead scales the measured wind speed by the cube root of that ratio.",
+    edition: "The ISA barometric density relation by name against the IEC/ISO reference of 0.0765 lb/cu ft at 59 degF and sea level, with the IEC 61400-12 cube-root wind-speed correction named. The turbine manufacturer's power curve, its stated reference conditions and correction method, and IEC 61400-12 govern.",
+    freeAccess: "A density ratio from the site's own elevation and temperature; no manufacturer power curve is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Power is linear in density and cubic in speed, so the two corrections are applied differently and must not be mixed up. Density falls with altitude and with temperature and both run the same way on a hot summer afternoon at elevation, which is precisely when the grid wants the power most. The practical use is diagnostic: a machine that looks like it is underperforming its curve on a hot day at altitude may be performing exactly as it should, and this correction is what distinguishes a fault from physics. The IEC convention is worth knowing because it is what a performance test uses -- rather than scaling power it scales the measured WIND SPEED by the cube root of the density ratio and reads the standard curve. The two agree where power is roughly cubic in speed and diverge near rated, where the machine is power-limited and density affects only where rated is reached, not the rated value; applying the linear correction to RATED power is wrong. The same ISA relation is what the HVAC air-density calculator uses, so the two agree about the air at a site, against a different reference: a power curve is warranted at 59 degF where standard HVAC air is 70 degF.",
+    assumptions: [
+      { name: "Linear in density, cubic in speed", value: "and the linear form does not apply above rated", source: "turbine physics" },
+      { name: "A performance test scales the speed", value: "by the cube root of the density ratio, not the power", source: "IEC 61400-12" },
+      { name: "Measured pressure beats an elevation estimate", value: "and humidity has a small further effect not modelled", source: "IEC 61400-12" },
+    ],
+  },
+  "yaw-error-loss": {
+    formula: "retained power = cosine of the yaw error raised to the third power, from the rotor seeing only the along-axis wind component carried through the cubic power relation; the squared form is reported beside it, and the acceptable angle is the arccosine of the cube root of one less the acceptable loss.",
+    edition: "The cosine-power yaw loss convention by name, with both the squared and cubed forms reported because the true exponent is machine-specific and lies between 2 and 3. The turbine manufacturer's yaw calibration procedure and the operator's performance engineer govern.",
+    freeAccess: "Trigonometry on the operator's own nacelle position and wind direction records; no manufacturer loss table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "What makes yaw error expensive is persistence, not magnitude. A gust that swings the wind twenty degrees for a minute costs nothing worth measuring; a wind vane reading a few degrees off, all year, costs a few percent of annual revenue on every hour the machine runs -- silently, with no alarm and no visible symptom. Static yaw misalignment is routinely found on machines that have been running for years, and correcting it is a calibration rather than a repair, which makes it among the cheapest faults in the industry to fix and one of the most commonly missed. The field procedure this supports is comparing nacelle position against the free-stream wind direction over a period and looking for a persistent BIAS rather than scatter: scatter is the controller doing its job, a bias is money. The exponent is an approximation and both forms are reported -- real measured losses often fall closer to the squared form at small angles, so the cubed result should be read as the pessimistic bound. It does not account for the increased fatigue loading a persistent misalignment causes, which can matter more than the energy.",
+    assumptions: [
+      { name: "Persistence is the cost, not magnitude", value: "a few degrees all year beats a large gust every time", source: "operations practice" },
+      { name: "A bias is money, scatter is not", value: "scatter is the controller doing its job", source: "operations practice" },
+      { name: "The exponent is between 2 and 3", value: "the cubed form is the pessimistic bound, not the answer", source: "measured yaw loss studies" },
+    ],
+  },
+  "gin-pole-uptower-lift": {
+    formula: "a sheave at the pole head carries the vector sum of the load line and the haul line: resultant = 2 W cos(half the haul angle), with a horizontal component W sin(haul angle) and a moment at the base of that component times the pole length; a direct haul at an angle from vertical instead pulls W divided by the cosine of that angle.",
+    edition: "Single-line rigging statics by name, with the turbine manufacturer's uptower lifting provisions and their rated capacities named as governing. The site lift plan, a qualified rigger, and OSHA govern.",
+    freeAccess: "Statics on the crew's own load and geometry; no manufacturer davit rating or bolt pattern is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The number that surprises people is the head resultant. A sheave at the pole head has the load hanging on one side and the haul line leaving on the other, so the head carries the VECTOR SUM of two tensions rather than one -- with the haul line vertical that is exactly twice the part's weight, and a mounting rated for the part is rated for half of what it is actually being asked to carry. The resultant then falls as the haul line opens away from vertical while the moment at the base rises, so the two effects run opposite ways and the geometry easiest on the mount in one respect is worst in the other. That mount is the part that fails: it is a bracket bolted to a casting or a frame designed for a specific geometry, and the reaction depends on where the crew leads the line in the field. The other configuration -- hauling directly at an angle rather than over a sheave -- raises the line pull by one over the cosine, which is the same relation a sling leg angle follows, and it is reported here so the two cases are not confused. On an uptower lift the crew has limited control over that angle because the ground rigging is hundreds of feet below and the wind is moving the load.",
+    assumptions: [
+      { name: "The head carries about twice the part", value: "a sheave sums two line tensions, not one", source: "rigging statics" },
+      { name: "Resultant and moment run opposite ways", value: "so there is no single best haul angle", source: "rigging statics" },
+      { name: "The manufacturer's provisions govern absolutely", value: "rated capacities, allowable geometries, and permitted wind speeds", source: "turbine service instructions" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

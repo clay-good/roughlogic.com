@@ -159,7 +159,7 @@ test("offline: a bookmarked tile shell URL opens that calculator, styled", async
   }
 });
 
-test("offline: a group hub URL lands on the working app, not a broken page", async ({ page, context }) => {
+test("offline: a group hub URL lands on the working app, not a broken page", async ({ page, context, baseURL }) => {
   // No shell is precached -- 1,826 pages is not a precache -- so every shell
   // URL takes the same fallback. A group hub has no hash route of its own, so
   // it lands on the home view, which is the app with its search box, rather
@@ -168,7 +168,9 @@ test("offline: a group hub URL lands on the working app, not a broken page", asy
   await context.setOffline(true);
   try {
     await page.goto("/groups/electrical/");
-    await expect(page).toHaveURL(/localhost:8080\/$/);
+    // Built from the config's baseURL, not a literal port, so the assertion
+    // still holds when the suite runs on a port of its own.
+    await expect(page).toHaveURL(baseURL.replace(/\/$/, "") + "/");
     await expect(page.locator("#search-input")).toBeVisible();
     const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
     expect(bg).not.toBe("rgba(0, 0, 0, 0)");

@@ -44338,3 +44338,323 @@ test("bounds: spec-v1587 computeLogTruckPayload pins the habit overload", () => 
   assert.ok("error" in _v1587({ ...base, load_volume_mbf: 0 }));
   assert.ok("error" in _v1587({ ...base, tare_lb: Infinity }));
 });
+
+// ===========================================================================
+// spec-v1550..v1556: the 2026-09-05 trade-expansion wind-energy band. Every
+// one of the catalog's fourteen existing "wind" tiles treats wind as a
+// STRUCTURAL load (ASCE 7 velocity pressure, components and cladding, wind on
+// a sign, wind on a suspended load); none treats it as a resource. Nothing
+// was cut. The formula screen's three closest calls and why they held:
+//   `aerodynamic-drag-force` shares the 0.5 rho v^2 kernel but is DRAG on a
+//     bluff body needing a Cd and a FRONTAL area, with power F x v -- not the
+//     flux through a swept area capped by Betz.
+//   `air-density-correction` (calc-hvac.js) computes the SAME ISA density,
+//     which is why v1554 uses that identical relation rather than the
+//     cruder exp(-z/27,000) its spec proposed -- two tiles in one catalog
+//     must not disagree about the air at a site. Its reference is 70 degF
+//     standard HVAC air; a wind power curve is warranted at 59 degF, so the
+//     RATIOS differ by construction and the outputs share nothing.
+//   `sling-angle` computes W / (n cos(theta/2)), which at n = 1 is exactly
+//     v1556's direct-haul line pull -- so that output is labelled as the same
+//     relation, and the tile's weight sits on the sheave resultant and the
+//     mount reaction, which no rigging tile computes.
+// ===========================================================================
+
+import { computeTipSpeedRatio as _v1550 } from "../../calc-wind.js";
+test("bounds: spec-v1550 computeTipSpeedRatio pins the ratio and its two opposite meanings", () => {
+  const base = { rotor_diameter_ft: 380, rotor_rpm: 11.5, wind_speed_mph: 26, design_tsr: 7, tip_speed_cap_fps: 280 };
+  const r = _v1550(base);
+  assert.ok(Math.abs(r.tip_speed_fps - Math.PI * 380 * 11.5 / 60) < 1e-12);
+  assert.ok(Math.abs(r.tip_speed_fps - 228.813) < 1e-2);
+  assert.ok(Math.abs(r.tip_speed_mph - 156.01) < 1e-2);
+  assert.ok(Math.abs(r.tip_speed_ratio - 6.0003) < 1e-3);
+  // The diagnostic the spec is built around: the SAME rotor speed in a 40 mph
+  // wind gives 3.90, which above rated is correct and below rated is a fault.
+  const windy = _v1550({ ...base, wind_speed_mph: 40 });
+  assert.ok(Math.abs(windy.tip_speed_ratio - 3.9002) < 1e-3);
+  assert.ok(Math.abs(windy.tip_speed_fps - r.tip_speed_fps) < 1e-12);
+  // The ratio is exactly inverse in wind speed and exactly linear in rpm.
+  assert.ok(Math.abs(windy.tip_speed_ratio * 40 - r.tip_speed_ratio * 26) < 1e-9);
+  assert.ok(Math.abs(_v1550({ ...base, rotor_rpm: 23 }).tip_speed_ratio - 2 * r.tip_speed_ratio) < 1e-9);
+  // The reverse check round-trips: run the rpm it reports back in and the
+  // ratio lands exactly on the design value.
+  assert.ok(Math.abs(r.rpm_for_design_tsr - 13.4159) < 1e-3);
+  assert.ok(Math.abs(_v1550({ ...base, rotor_rpm: r.rpm_for_design_tsr }).tip_speed_ratio - 7) < 1e-12);
+  // The cap is acoustic, not aerodynamic, and it bounds the rpm and the wind
+  // at which the design ratio can still be held.
+  assert.strictEqual(r.over_tip_cap, false);
+  assert.ok(Math.abs(r.rpm_at_tip_cap - 14.0726) < 1e-3);
+  assert.ok(Math.abs(_v1550({ ...base, rotor_rpm: r.rpm_at_tip_cap }).tip_speed_fps - 280) < 1e-9);
+  assert.strictEqual(_v1550({ ...base, rotor_rpm: 20 }).over_tip_cap, true);
+  assert.ok(_v1550({ ...base, rotor_rpm: 20 }).tip_cap_verdict.startsWith("OVER"));
+  // A bigger rotor at the same tip speed turns slower -- the reason large
+  // machines look slow, stated as an exact inverse in diameter.
+  assert.ok(Math.abs(_v1550({ ...base, rotor_diameter_ft: 760 }).rpm_at_tip_cap - r.rpm_at_tip_cap / 2) < 1e-9);
+  assert.ok("error" in _v1550({ ...base, rotor_diameter_ft: 0 }));
+  assert.ok("error" in _v1550({ ...base, rotor_rpm: 0 }));
+  assert.ok("error" in _v1550({ ...base, wind_speed_mph: 0 }));
+  assert.ok("error" in _v1550({ ...base, design_tsr: 0 }));
+  assert.ok("error" in _v1550({ ...base, tip_speed_cap_fps: 0 }));
+  assert.ok("error" in _v1550({ ...base, rotor_rpm: Infinity }));
+});
+
+import { computeWindPowerDensityBetz as _v1551 } from "../../calc-wind.js";
+test("bounds: spec-v1551 computeWindPowerDensityBetz pins the cube law and refuses to beat Betz", () => {
+  const base = { wind_speed_mph: 20, air_density_pcf: 0.0765, rotor_diameter_ft: 380, power_coefficient: 0.45, alt_wind_speed_mph: 25 };
+  const r = _v1551(base);
+  assert.ok(Math.abs(r.swept_area_ft2 - Math.PI / 4 * 380 * 380) < 1e-9);
+  assert.ok(Math.abs(r.swept_area_ft2 - 113411.5) < 1);
+  assert.ok(Math.abs(r.power_in_wind_kw - 4613.91) < 1e-1);
+  assert.ok(Math.abs(r.power_density_w_ft2 - 40.683) < 1e-2);
+  // Betz is exactly 16/27 of the wind's power, and no input reaches it.
+  assert.ok(Math.abs(r.betz_limit - 16 / 27) < 1e-15);
+  assert.ok(Math.abs(r.betz_power_kw - r.power_in_wind_kw * 16 / 27) < 1e-9);
+  assert.ok(Math.abs(r.extracted_power_kw - r.power_in_wind_kw * 0.45) < 1e-9);
+  assert.ok(r.extracted_power_kw < r.betz_power_kw);
+  // The guard is the point of the tile: a coefficient above 16/27 is refused
+  // outright rather than computed, and exactly 16/27 is allowed.
+  assert.ok("error" in _v1551({ ...base, power_coefficient: 0.65 }));
+  assert.ok("error" in _v1551({ ...base, power_coefficient: 0.5926 + 1e-4 }));
+  assert.ok(!("error" in _v1551({ ...base, power_coefficient: 16 / 27 })));
+  assert.ok(Math.abs(_v1551({ ...base, power_coefficient: 16 / 27 }).coefficient_of_betz_pct - 100) < 1e-9);
+  // The cube law, exactly: half the speed is one eighth the power, and a 25%
+  // increase is 95% more.
+  assert.ok(Math.abs(_v1551({ ...base, alt_wind_speed_mph: 10 }).alt_ratio - 0.125) < 1e-15);
+  assert.ok(Math.abs(r.alt_ratio - 1.953125) < 1e-15);
+  assert.ok(Math.abs(_v1551({ ...base, wind_speed_mph: 40 }).power_in_wind_kw - 8 * r.power_in_wind_kw) < 1e-6);
+  // Power density is per unit area, so it does not move with rotor diameter,
+  // while the power through the disc goes as the square of it.
+  assert.ok(Math.abs(_v1551({ ...base, rotor_diameter_ft: 760 }).power_density_w_ft2 - r.power_density_w_ft2) < 1e-9);
+  assert.ok(Math.abs(_v1551({ ...base, rotor_diameter_ft: 760 }).power_in_wind_kw - 4 * r.power_in_wind_kw) < 1e-6);
+  // And exactly linear in density, which is what makes v1554 a separate step.
+  assert.ok(Math.abs(_v1551({ ...base, air_density_pcf: 0.03825 }).power_in_wind_kw - r.power_in_wind_kw / 2) < 1e-9);
+  assert.ok("error" in _v1551({ ...base, wind_speed_mph: 0 }));
+  assert.ok("error" in _v1551({ ...base, air_density_pcf: 0 }));
+  assert.ok("error" in _v1551({ ...base, rotor_diameter_ft: 0 }));
+  assert.ok("error" in _v1551({ ...base, power_coefficient: 0 }));
+  assert.ok("error" in _v1551({ ...base, alt_wind_speed_mph: 0 }));
+  assert.ok("error" in _v1551({ ...base, wind_speed_mph: Infinity }));
+});
+
+import { computeWindShearHubHeight as _v1552 } from "../../calc-wind.js";
+test("bounds: spec-v1552 computeWindShearHubHeight triples a speed error into energy", () => {
+  const base = { measured_speed_mph: 15, measured_height_ft: 160, hub_height_ft: 330, shear_exponent: 0.2, alt_shear_exponent: 0.14, second_speed_mph: 13.2, second_height_ft: 100 };
+  const r = _v1552(base);
+  assert.ok(Math.abs(r.hub_speed_mph - 15 * Math.pow(330 / 160, 0.2)) < 1e-12);
+  assert.ok(Math.abs(r.hub_speed_mph - 17.3368) < 1e-3);
+  assert.ok(Math.abs(r.energy_ratio - Math.pow(r.speed_ratio, 3)) < 1e-12);
+  assert.ok(Math.abs(r.energy_ratio - 1.54396) < 1e-4);
+  // The amplification the tile exists to show: an exponent 0.06 low costs 12%
+  // of the energy estimate for a 4% difference in speed.
+  assert.ok(Math.abs(r.alt_hub_speed_mph - 16.5999) < 1e-3);
+  assert.ok(Math.abs(r.alt_energy_vs_entered - 0.87783) < 1e-4);
+  const speed_error = Math.abs(1 - r.alt_hub_speed_mph / r.hub_speed_mph);
+  const energy_error = Math.abs(1 - r.alt_energy_vs_entered);
+  assert.ok(energy_error > 2.8 * speed_error && energy_error < 3.2 * speed_error);
+  // An exponent of exactly zero is a flat profile: no gain from height at all.
+  const flat = _v1552({ ...base, shear_exponent: 0 });
+  assert.ok(Math.abs(flat.hub_speed_mph - 15) < 1e-12);
+  assert.ok(Math.abs(flat.energy_ratio - 1) < 1e-12);
+  // The derived exponent round-trips exactly: feed the two levels the power
+  // law itself would produce and it recovers the exponent that made them.
+  const synth = _v1552({ ...base, second_height_ft: 320, second_speed_mph: 15 * Math.pow(320 / 160, 0.2) });
+  assert.ok(Math.abs(synth.derived_exponent - 0.2) < 1e-12);
+  assert.ok(Math.abs(synth.derived_hub_speed_mph - synth.hub_speed_mph) < 1e-9);
+  // The measured pair here says 0.272, not the 0.2 assumed -- which is the
+  // whole argument for a second anemometer.
+  assert.ok(Math.abs(r.derived_exponent - 0.27198) < 1e-4);
+  assert.ok(r.derived_hub_speed_mph > r.hub_speed_mph);
+  // Past twice the measurement height the verdict says so.
+  assert.ok(r.extrapolation_verdict.startsWith("MORE"));
+  assert.ok(!_v1552({ ...base, hub_height_ft: 300 }).extrapolation_verdict.startsWith("MORE"));
+  assert.ok("error" in _v1552({ ...base, measured_speed_mph: 0 }));
+  assert.ok("error" in _v1552({ ...base, measured_height_ft: 0 }));
+  assert.ok("error" in _v1552({ ...base, hub_height_ft: 0 }));
+  assert.ok("error" in _v1552({ ...base, shear_exponent: -0.1 }));
+  assert.ok("error" in _v1552({ ...base, alt_shear_exponent: -0.1 }));
+  assert.ok("error" in _v1552({ ...base, second_speed_mph: 0 }));
+  assert.ok("error" in _v1552({ ...base, second_height_ft: 160 }));
+  assert.ok("error" in _v1552({ ...base, measured_speed_mph: Infinity }));
+});
+
+import { computeWeibullCapacityFactor as _v1553 } from "../../calc-wind.js";
+test("bounds: spec-v1553 computeWeibullCapacityFactor pins the energy pattern factor", () => {
+  const base = { weibull_k: 2, weibull_c_mph: 18, rated_power_kw: 2500, cut_in_mph: 7, rated_speed_mph: 27, cut_out_mph: 55, loss_factor_pct: 15 };
+  const r = _v1553(base);
+  // Gamma(1.5) = sqrt(pi)/2 exactly, so the Rayleigh mean is checkable in
+  // closed form -- which also validates the Lanczos gamma this uses.
+  assert.ok(Math.abs(r.mean_speed_mph - 18 * Math.sqrt(Math.PI) / 2) < 1e-9);
+  assert.ok(Math.abs(r.mean_speed_mph - 15.9521) < 1e-3);
+  // The energy pattern factor at k = 2 is Gamma(2.5)/Gamma(1.5)^3, which is
+  // 6/sqrt(pi)^... in closed form 1.9099. An average-speed estimate is low
+  // by nearly half, which is the whole subject of the tile.
+  assert.ok(Math.abs(r.energy_pattern_factor - 1.90986) < 1e-4);
+  assert.ok(r.energy_pattern_factor > 1.8 && r.energy_pattern_factor < 2.0);
+  // At k = 1 the distribution is exponential and Gamma(4)/Gamma(2)^3 = 6
+  // exactly -- a broad distribution has a far larger pattern factor.
+  assert.ok(Math.abs(_v1553({ ...base, weibull_k: 1 }).energy_pattern_factor - 6) < 1e-6);
+  // Steadier wind reduces it monotonically.
+  assert.ok(_v1553({ ...base, weibull_k: 3 }).energy_pattern_factor < r.energy_pattern_factor);
+  // The hours account for the whole year exactly.
+  assert.ok(Math.abs(r.hours_below_cut_in + r.hours_operating + r.hours_above_cut_out - 8760) < 1e-6);
+  assert.ok(Math.abs(r.hours_below_cut_in - 1229.5) < 1e-1);
+  assert.ok(r.hours_at_rated < r.hours_operating);
+  // Losses are exactly multiplicative, and the capacity factor is the net
+  // energy over the rated-power year.
+  assert.ok(Math.abs(r.net_aep_mwh - r.gross_aep_mwh * 0.85) < 1e-9);
+  assert.ok(Math.abs(r.rated_annual_mwh - 2500 * 8760 / 1000) < 1e-9);
+  assert.ok(Math.abs(r.capacity_factor - r.net_aep_mwh / r.rated_annual_mwh) < 1e-12);
+  assert.ok(Math.abs(r.capacity_factor - 0.26284) < 1e-4);
+  assert.ok(Math.abs(_v1553({ ...base, loss_factor_pct: 0 }).capacity_factor - r.gross_capacity_factor) < 1e-12);
+  // A windier site raises it; the verdict tracks the band.
+  const windy = _v1553({ ...base, weibull_c_mph: 26 });
+  assert.ok(windy.capacity_factor > r.capacity_factor);
+  assert.ok(r.cf_verdict.startsWith("below"));
+  assert.ok("error" in _v1553({ ...base, weibull_k: 0 }));
+  assert.ok("error" in _v1553({ ...base, weibull_c_mph: 0 }));
+  assert.ok("error" in _v1553({ ...base, rated_power_kw: 0 }));
+  assert.ok("error" in _v1553({ ...base, cut_in_mph: 0 }));
+  assert.ok("error" in _v1553({ ...base, rated_speed_mph: 7 }));
+  assert.ok("error" in _v1553({ ...base, cut_out_mph: 27 }));
+  assert.ok("error" in _v1553({ ...base, loss_factor_pct: 100 }));
+  assert.ok("error" in _v1553({ ...base, weibull_c_mph: Infinity }));
+});
+
+import { computeTurbineDensityCorrection as _v1554 } from "../../calc-wind.js";
+test("bounds: spec-v1554 computeTurbineDensityCorrection uses the ISA relation the HVAC tile uses", () => {
+  const base = { elevation_ft: 5200, air_temp_f: 95, reference_density_pcf: 0.0765, measured_power_kw: 1850, curve_power_kw: 2200, wind_speed_mph: 20, alt_air_temp_f: 20 };
+  const r = _v1554(base);
+  // The identical ISA altitude factor `air-density-correction` uses. The spec
+  // proposed exp(-z/27,000), which gives 0.8248 here against 0.8292 -- close,
+  // but it would have left two tiles in one catalog disagreeing about the air
+  // at the same site, so the sibling's relation is used instead.
+  assert.ok(Math.abs(r.altitude_factor - Math.pow(1 - 6.73e-6 * 5200, 5.258)) < 1e-15);
+  assert.ok(Math.abs(r.altitude_factor - 0.82919) < 1e-4);
+  assert.ok(Math.abs(r.temperature_factor - 518.67 / 554.67) < 1e-12);
+  assert.ok(Math.abs(r.site_density_pcf - 0.0593160) < 1e-6);
+  assert.ok(Math.abs(r.density_ratio - 0.775373) < 1e-5);
+  // At the reference condition the ratio is exactly 1 and nothing is corrected.
+  const ref = _v1554({ ...base, elevation_ft: 0, air_temp_f: 59 });
+  assert.ok(Math.abs(ref.density_ratio - 1) < 1e-9);
+  assert.ok(Math.abs(ref.corrected_curve_power_kw - 2200) < 1e-6);
+  assert.ok(Math.abs(ref.iec_speed_factor - 1) < 1e-9);
+  assert.ok(Math.abs(ref.iec_corrected_wind_mph - 20) < 1e-9);
+  // Power is LINEAR in density and the IEC form is the CUBE ROOT of the same
+  // ratio -- the two conventions, provably distinct.
+  assert.ok(Math.abs(r.corrected_curve_power_kw - 2200 * r.density_ratio) < 1e-9);
+  assert.ok(Math.abs(Math.pow(r.iec_speed_factor, 3) - r.density_ratio) < 1e-12);
+  assert.ok(r.iec_speed_factor > r.density_ratio);
+  // The diagnostic: 84% of the raw curve looks like a fault, 108% of the
+  // corrected one is not, and the verdict follows the corrected figure.
+  assert.ok(Math.abs(r.measured_of_curve_pct - 84.09) < 1e-2);
+  assert.ok(Math.abs(r.measured_of_corrected_pct - 108.45) < 1e-2);
+  assert.ok(r.performance_verdict.includes("performing correctly"));
+  assert.ok(_v1554({ ...base, measured_power_kw: 1400 }).performance_verdict.includes("performance question"));
+  // Season moves it as much as altitude: colder air is denser, monotonically.
+  assert.ok(r.alt_vs_entered > 1);
+  assert.ok(Math.abs(r.alt_vs_entered - 1.15636) < 1e-4);
+  assert.ok(_v1554({ ...base, alt_air_temp_f: 110 }).alt_vs_entered < 1);
+  // And density falls monotonically with elevation.
+  assert.ok(_v1554({ ...base, elevation_ft: 9000 }).density_ratio < r.density_ratio);
+  assert.ok("error" in _v1554({ ...base, elevation_ft: -1 }));
+  assert.ok("error" in _v1554({ ...base, air_temp_f: -500 }));
+  assert.ok("error" in _v1554({ ...base, reference_density_pcf: 0 }));
+  assert.ok("error" in _v1554({ ...base, measured_power_kw: 0 }));
+  assert.ok("error" in _v1554({ ...base, curve_power_kw: 0 }));
+  assert.ok("error" in _v1554({ ...base, wind_speed_mph: 0 }));
+  assert.ok("error" in _v1554({ ...base, elevation_ft: Infinity }));
+});
+
+import { computeYawErrorLoss as _v1555 } from "../../calc-wind.js";
+test("bounds: spec-v1555 computeYawErrorLoss pins both exponent conventions", () => {
+  const base = { yaw_error_deg: 12, rated_power_kw: 2500, capacity_factor_pct: 40, energy_price_per_mwh: 40, turbine_count: 30, acceptable_loss_pct: 2 };
+  const r = _v1555(base);
+  assert.ok(Math.abs(r.loss_cubed_pct - 6.41351) < 1e-4);
+  assert.ok(Math.abs(r.loss_squared_pct - 4.32273) < 1e-4);
+  // The cubed form is always the pessimistic one, and both are exactly the
+  // stated powers of the cosine.
+  assert.ok(r.loss_cubed_pct > r.loss_squared_pct);
+  assert.ok(Math.abs(r.retained_cubed - Math.pow(Math.cos(12 * Math.PI / 180), 3)) < 1e-15);
+  assert.ok(Math.abs(r.retained_squared - Math.pow(Math.cos(12 * Math.PI / 180), 2)) < 1e-15);
+  assert.ok(Math.abs(r.retained_cubed / r.retained_squared - Math.cos(12 * Math.PI / 180)) < 1e-12);
+  // Zero error is exactly zero loss on both conventions.
+  const zero = _v1555({ ...base, yaw_error_deg: 0 });
+  assert.ok(Math.abs(zero.loss_cubed_pct) < 1e-12);
+  assert.ok(Math.abs(zero.loss_squared_pct) < 1e-12);
+  assert.strictEqual(zero.lost_usd, 0);
+  // 30 degrees is exactly 1 - (sqrt(3)/2)^3 on the cubed form and exactly
+  // 25% on the squared one, which is a closed-form check on both.
+  const thirty = _v1555({ ...base, yaw_error_deg: 30 });
+  assert.ok(Math.abs(thirty.loss_squared_pct - 25) < 1e-9);
+  assert.ok(Math.abs(thirty.loss_cubed_pct - 35.0481) < 1e-3);
+  // The money is exactly the energy times the price times the fleet.
+  assert.ok(Math.abs(r.annual_mwh - 8760) < 1e-9);
+  assert.ok(Math.abs(r.lost_mwh - r.annual_mwh * r.loss_cubed_pct / 100) < 1e-9);
+  assert.ok(Math.abs(r.lost_usd - 22472.9) < 1e-1);
+  assert.ok(Math.abs(r.fleet_lost_usd - r.lost_usd * 30) < 1e-6);
+  // The chase threshold round-trips: an error at exactly the reported angle
+  // produces exactly the acceptable loss.
+  assert.ok(Math.abs(r.acceptable_angle_deg - 6.64193) < 1e-4);
+  assert.ok(Math.abs(_v1555({ ...base, yaw_error_deg: r.acceptable_angle_deg }).loss_cubed_pct - 2) < 1e-9);
+  assert.ok(r.chase_verdict.includes("past the entered acceptable loss"));
+  assert.ok(_v1555({ ...base, yaw_error_deg: 4 }).chase_verdict.includes("controller doing its job"));
+  assert.ok("error" in _v1555({ ...base, yaw_error_deg: 90 }));
+  assert.ok("error" in _v1555({ ...base, yaw_error_deg: -1 }));
+  assert.ok("error" in _v1555({ ...base, rated_power_kw: 0 }));
+  assert.ok("error" in _v1555({ ...base, capacity_factor_pct: 0 }));
+  assert.ok("error" in _v1555({ ...base, energy_price_per_mwh: -1 }));
+  assert.ok("error" in _v1555({ ...base, turbine_count: 0 }));
+  assert.ok("error" in _v1555({ ...base, acceptable_loss_pct: 0 }));
+  assert.ok("error" in _v1555({ ...base, yaw_error_deg: Infinity }));
+});
+
+import { computeGinPoleUptowerLift as _v1556 } from "../../calc-wind.js";
+test("bounds: spec-v1556 computeGinPoleUptowerLift fixes a degenerate spec formula", () => {
+  const base = { component_weight_lb: 3800, haul_angle_deg: 25, pole_length_ft: 12, mount_rated_lb: 6000, hauled_line_angle_deg: 15 };
+  const r = _v1556(base);
+  // ELEVENTH INTERNALLY WRONG SPEC. spec-v1556 gives the pole compression as
+  // `C = W + T cos(alpha)` with T = W / cos(alpha) on the SAME angle -- which
+  // is identically 2 W for every angle, so it is not a function of the
+  // geometry at all. The correct sheave statics are the vector sum of two
+  // line tensions at the head: 2 W cos(beta/2), which IS 2 W when the haul
+  // line is vertical and falls away as it opens out.
+  assert.ok(Math.abs(r.head_resultant_lb - 2 * 3800 * Math.cos(12.5 * Math.PI / 180)) < 1e-9);
+  assert.ok(Math.abs(r.head_resultant_lb - 7419.85) < 1e-1);
+  assert.ok(Math.abs(_v1556({ ...base, haul_angle_deg: 0 }).head_resultant_lb - 7600) < 1e-9);
+  assert.ok(r.head_resultant_lb < 2 * 3800);
+  assert.ok(_v1556({ ...base, haul_angle_deg: 60 }).head_resultant_lb < r.head_resultant_lb);
+  // The components are consistent with the resultant, exactly.
+  assert.ok(Math.abs(Math.hypot(r.head_horizontal_lb, r.head_vertical_lb) - r.head_resultant_lb) < 1e-9);
+  assert.ok(Math.abs(r.head_horizontal_lb - 3800 * Math.sin(25 * Math.PI / 180)) < 1e-9);
+  assert.ok(Math.abs(r.resultant_multiple - r.head_resultant_lb / 3800) < 1e-12);
+  assert.ok(r.resultant_multiple > 1.9);
+  // The two effects run OPPOSITE ways, which is why there is no best angle:
+  // opening the haul line lowers the resultant and raises the moment.
+  const open = _v1556({ ...base, haul_angle_deg: 60 });
+  assert.ok(open.head_resultant_lb < r.head_resultant_lb);
+  assert.ok(open.mount_moment_ftlb > r.mount_moment_ftlb);
+  assert.ok(Math.abs(r.mount_moment_ftlb - r.head_horizontal_lb * 12) < 1e-9);
+  assert.ok(Math.abs(r.mount_moment_ftlb - 19271.4) < 1e-1);
+  assert.ok(Math.abs(_v1556({ ...base, haul_angle_deg: 0 }).mount_moment_ftlb) < 1e-12);
+  // The mount is over, and the reported maximum part round-trips to exactly
+  // the rating.
+  assert.ok(r.mount_margin_pct < 0);
+  assert.ok(r.mount_verdict.startsWith("OVER"));
+  assert.ok(Math.abs(r.max_component_lb - 3072.84) < 1e-1);
+  assert.ok(Math.abs(_v1556({ ...base, component_weight_lb: r.max_component_lb }).head_resultant_lb - 6000) < 1e-9);
+  assert.ok(_v1556({ ...base, mount_rated_lb: 9000 }).mount_margin_pct > 0);
+  // The direct-haul branch is exactly the sling relation at one leg, which is
+  // why it is labelled as such rather than presented as new.
+  assert.ok(Math.abs(r.direct_line_pull_lb - 3800 / Math.cos(15 * Math.PI / 180)) < 1e-9);
+  assert.ok(Math.abs(r.direct_line_pull_lb - 3934.05) < 1e-1);
+  assert.ok(Math.abs(r.direct_side_load_lb - r.direct_line_pull_lb * Math.sin(15 * Math.PI / 180)) < 1e-9);
+  assert.ok(Math.abs(r.angle_premium_lb - (r.direct_line_pull_lb - 3800)) < 1e-12);
+  assert.ok(Math.abs(_v1556({ ...base, hauled_line_angle_deg: 0 }).angle_premium_lb) < 1e-12);
+  assert.ok("error" in _v1556({ ...base, component_weight_lb: 0 }));
+  assert.ok("error" in _v1556({ ...base, haul_angle_deg: 180 }));
+  assert.ok("error" in _v1556({ ...base, haul_angle_deg: -1 }));
+  assert.ok("error" in _v1556({ ...base, pole_length_ft: 0 }));
+  assert.ok("error" in _v1556({ ...base, mount_rated_lb: 0 }));
+  assert.ok("error" in _v1556({ ...base, hauled_line_angle_deg: 90 }));
+  assert.ok("error" in _v1556({ ...base, component_weight_lb: Infinity }));
+});

@@ -883,6 +883,14 @@ const _TILES = [
   ["bandmill-speed-bite", "L"],
   ["sawmill-residue-yield", "L"],
   ["log-truck-payload", "L"],
+  // spec-v1550..v1556 wind-energy band (Group A)
+  ["tip-speed-ratio", "A"],
+  ["wind-power-density-betz", "A"],
+  ["wind-shear-hub-height", "A"],
+  ["weibull-capacity-factor", "A"],
+  ["turbine-density-correction", "A"],
+  ["yaw-error-loss", "A"],
+  ["gin-pole-uptower-lift", "A"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   ["grounding-electrode-conductor", "A"],
   ["bonding-jumper", "A"],

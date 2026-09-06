@@ -3489,6 +3489,13 @@ cross-check.
 | calc-water.js | `computeWasSrtControl` | `{ aeration_volume_mg = 0, mlss_mg_l = 0, target_srt_days = 0, was_conc_mg_l =...` | _ | _ | _ |
 | calc-water.js | `computeWellDrawdown` | `{ static_level_ft = 0, pumping_level_ft = 0, discharge_gpm = 0, pump_offset_f...` | _ | _ | _ |
 | calc-water.js | `computeWellMaxYield` | `{ specific_capacity_gpm_ft = 0, allowable_drawdown_ft = 0 } = {}` | _ | _ | _ |
+| calc-wind.js | `computeGinPoleUptowerLift` | `{ component_weight_lb = 0, haul_angle_deg = 0, pole_length_ft = 0, mount_rate...` | _ | _ | _ |
+| calc-wind.js | `computeTipSpeedRatio` | `{ rotor_diameter_ft = 0, rotor_rpm = 0, wind_speed_mph = 0, design_tsr = 7, t...` | _ | _ | _ |
+| calc-wind.js | `computeTurbineDensityCorrection` | `{ elevation_ft = 0, air_temp_f = 59, reference_density_pcf = _RHO_REF_PCF, me...` | _ | _ | _ |
+| calc-wind.js | `computeWeibullCapacityFactor` | `{ weibull_k = 2, weibull_c_mph = 0, rated_power_kw = 0, cut_in_mph = 7, rated...` | _ | _ | _ |
+| calc-wind.js | `computeWindPowerDensityBetz` | `{ wind_speed_mph = 0, air_density_pcf = _RHO_REF_PCF, rotor_diameter_ft = 0, ...` | _ | _ | _ |
+| calc-wind.js | `computeWindShearHubHeight` | `{ measured_speed_mph = 0, measured_height_ft = 0, hub_height_ft = 0, shear_ex...` | _ | _ | _ |
+| calc-wind.js | `computeYawErrorLoss` | `{ yaw_error_deg = 0, rated_power_kw = 0, capacity_factor_pct = 40, energy_pri...` | _ | _ | _ |
 | pure-math.js | `C_to_F` | `C` | _ | _ | _ |
 | pure-math.js | `C_to_K` | `C` | _ | _ | _ |
 | pure-math.js | `F_to_C` | `F` | _ | _ | _ |
@@ -3527,7 +3534,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2113.
+Row count: 2120.
 
 <!-- END function-corpus-v14 -->
 
@@ -3595,7 +3602,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (211 tiles)
+### Group A Electrical (218 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3675,6 +3682,7 @@ per spec-v14 §13.1 second paragraph.
 | `generator-motor-starting` | Generator Sizing for Motor Starting | NEC 430.110 + manufacturer locked-rot...; 25 hp Code G + 10 hp Code F + 5 hp Code B motors, 15 kW n... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `generator-sizing` | Generator Sizing | Project (first-principles); Refrigerator (700 / 2200) + Lights (400 / 400) + Sump pum... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gfci-afci-reference` | GFCI / AFCI Requirements Reference | NEC 2023 + project bundled GFCI/AFCI ...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `gin-pole-uptower-lift` | Gin-Pole and Uptower Component Lift Load | Project (first-principles); the turbine manufacturer's uptower lifting provisions gov... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ground-potential-rise` | Ground Potential Rise Screen (IEEE 80) | IEEE Std 80 (ground potential rise); 200-A grid current, 0.5-ohm grid, 200-V tolerable touch -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `grounding-electrode` | Grounding Electrode Resistance (Dwight / IEEE 142) | IEEE / Dwight; R = (rho / (2*pi*L)) * (ln(8L/d) - 1) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `grounding-electrode-conductor` | Grounding Electrode Conductor Sizing | NFPA; spec-v109 section 2.1 pinned example (250 kcmil Cu servic... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -3789,6 +3797,7 @@ per spec-v14 §13.1 second paragraph.
 | `thermistor-beta-temp` | NTC Thermistor Resistance to Temperature (Beta Equation) | NTC thermistor beta (B-parameter) equ...; 1/T = 1/298.15 + (1/3950) ln(20000/10000) -> T = 283.33 K... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `thermistor-steinhart-hart` | NTC Thermistor Steinhart-Hart Equation (3-Constant) | NTC thermistor Steinhart-Hart equatio...; lnR = ln(10000) = 9.21034; 1/T = 1.1253e-3 + 2.3471e-4(9.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `three-phase` | Three-Phase Power | Project (first-principles); V_LL=480 V / I_L=100 A / pf=0.9 -> kVA=83.14 / kW=74.82 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `tip-speed-ratio` | Wind Turbine Tip-Speed Ratio and Rotor Speed | Project (first-principles); the turbine manufacturer's operating parameters govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transformer-conductor-protection` | Transformer Conductor and Overcurrent Protection | NEC Table 450.3(B) and 240.21(C) (by ...; 45 kVA 3-phase 480->208 V -> primary FLA 54.13 A, seconda... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transformer-inrush-point` | Transformer Inrush Coordination Point | transformer energization-inrush coord...; spec-v520 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `transformer-k-factor` | Transformer K-Factor From the Harmonic Spectrum (UL 1561) | UL 1561 / IEEE C57.110; K = sum(Ih^2 h^2)/sum(Ih^2) = 5.455/1.183 = 4.61 -> K-9 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3797,19 +3806,24 @@ per spec-v14 §13.1 second paragraph.
 | `transformer-sizing` | Transformer Sizing | Project (first-principles); 90 kW @ 0.9 pf -> 100 kVA required; next ANSI standard st... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transformer-turns-ratio` | Transformer Turns / Voltage / Current / Impedance Ratio | ideal transformer circuit relations; spec-v806 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `transformer-voltage-regulation` | Transformer Voltage Regulation from %R and %X | transformer voltage-regulation approx...; spec-v494 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `turbine-density-correction` | Wind Turbine Output Air-Density Correction | Project (first-principles); the manufacturer's power curve and IEC 61400-12 govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vfd-energy-savings` | VFD Retrofit Energy and Cost Savings (Affinity Cube Law) | US DOE motor/pump-system energy method; spec-v230 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `vfd-reflected-wave` | VFD Reflected-Wave Cable Length Limit | VFD reflected-wave cable-length limit...; 480 V, 0.1 us rise, 50% velocity, 100 ft -> L_crit 24.6 f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `voltage-drop` | Voltage Drop | Project (first-principles); Standard single-phase voltage-drop derivation; K=12.9 ohm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `voltage-drop-reactance` | Voltage Drop With Reactance | NFPA; Vd = sqrt(3)*I*(R*cos(theta)+X*sin(theta))*L/1000 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `voltage-imbalance` | Voltage Imbalance | NEMA; V_a=480 / V_b=475 / V_c=470 -> avg 475 / max deviation 5 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `weibull-capacity-factor` | Wind Weibull Distribution, Annual Energy, and Capacity Factor | Project (first-principles); IEC 61400-12 and an independent energy assessor govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `welder-arc-circuit-conductor` | Arc-Welder Branch-Circuit Conductor and OCPD (NEC 630.11) | arc-welder circuit sizing (NEC 630.11...; mult = sqrt(0.50) = 0.7071; I_eff = 40*0.7071 = 28.28; OC... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `welder-resistance-circuit-conductor` | Resistance / Spot-Welder Branch-Circuit Conductor and OCPD (NEC 630.31) | resistance-welder circuit sizing (NEC...; mult = sqrt(0.50) = 0.7071; conductor = 100*0.7071 = 70.7... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `wind-power-density-betz` | Wind Power Density, the Betz Limit, and Rotor Output | Project (first-principles); the manufacturer's warranted power curve governs any prod... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `wind-shear-hub-height` | Wind Shear Power-Law Speed at Hub Height | Project (first-principles); IEC 61400-12 and an independent energy assessor govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-ampacity` | Wire Ampacity | NFPA; 12 AWG copper THWN/THHN at 30 C ambient, single conductor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-pulling-lubricant` | Cable-Pulling Lubricant Quantity | Film-coating lubricant estimate (rule...; gallons = 0.0015*400*9*1.0 = 5.4 gal | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wireless-fspl` | Free-Space Path Loss (Wireless Bridge) | Friis transmission equation / ITU-R P...; FSPL = 32.44 + 20 log10(1) + 20 log10(2400) = 32.44 + 0 +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wireless-link-budget` | Wireless Link Budget (EIRP and Fade Margin) | Friis transmission equation / ITU-R P...; EIRP = 20+12-1 = 31 dBm; FSPL = 100.04 dB; Prx = 31 - 100... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `yaw-error-loss` | Wind Turbine Yaw Misalignment Power Loss | Project (first-principles); the manufacturer's yaw calibration procedure governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group B Plumbing (141 tiles)
 
@@ -5562,6 +5576,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1862. Fixture-covered or reference-cadence: 1862 / 1862.
+Tile count: 1869. Fixture-covered or reference-cadence: 1869 / 1869.
 
 <!-- END tile-index-v14 -->

@@ -707,6 +707,14 @@ export const TOOL_MODULES = (() => {
     "lumber-recovery-overrun", "kiln-drying-time", "kiln-charge-water",
     "bandmill-speed-bite", "sawmill-residue-yield", "log-truck-payload",
   ]);
+  // spec-v1550..v1556: the wind-energy bench. Every existing "wind" tile
+  // treats wind as a STRUCTURAL load; these seven treat it as a resource.
+  // All seven keep group "A".
+  declare("./calc-wind.js", "WIND_RENDERERS", [
+    "tip-speed-ratio", "wind-power-density-betz", "wind-shear-hub-height",
+    "weibull-capacity-factor", "turbine-density-correction", "yaw-error-loss",
+    "gin-pole-uptower-lift",
+  ]);
   // spec-v80 cap-relief split: the spec-v25 site-civil / roadway-geometry
   // quartet moved out of calc-construction.js (it sat at 95.0% of its size
   // cap, the tightest remaining calculator module) into its own module. All

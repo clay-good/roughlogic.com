@@ -71,6 +71,7 @@ const SHELL_ASSETS = [
   "./calc-mining.js",
   "./calc-trenchless.js",
   "./calc-sawmill.js",
+  "./calc-wind.js",
   "./calc-civil.js",
   "./calc-steel.js",
   "./calc-concrete.js",

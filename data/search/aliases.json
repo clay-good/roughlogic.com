@@ -106867,6 +106867,181 @@
    "term": "how many mbf per load",
    "target": "log-truck-payload",
    "kind": "industry"
+  },
+  {
+   "term": "tip speed ratio wind turbine",
+   "target": "tip-speed-ratio",
+   "kind": "industry"
+  },
+  {
+   "term": "tsr calculation",
+   "target": "tip-speed-ratio",
+   "kind": "industry"
+  },
+  {
+   "term": "rotor rpm wind speed",
+   "target": "tip-speed-ratio",
+   "kind": "industry"
+  },
+  {
+   "term": "blade tip speed noise",
+   "target": "tip-speed-ratio",
+   "kind": "industry"
+  },
+  {
+   "term": "optimum tsr turbine",
+   "target": "tip-speed-ratio",
+   "kind": "industry"
+  },
+  {
+   "term": "wind power density",
+   "target": "wind-power-density-betz",
+   "kind": "industry"
+  },
+  {
+   "term": "betz limit calculation",
+   "target": "wind-power-density-betz",
+   "kind": "industry"
+  },
+  {
+   "term": "power in the wind cube law",
+   "target": "wind-power-density-betz",
+   "kind": "industry"
+  },
+  {
+   "term": "rotor swept area power",
+   "target": "wind-power-density-betz",
+   "kind": "industry"
+  },
+  {
+   "term": "wind turbine theoretical maximum",
+   "target": "wind-power-density-betz",
+   "kind": "industry"
+  },
+  {
+   "term": "wind shear power law",
+   "target": "wind-shear-hub-height",
+   "kind": "industry"
+  },
+  {
+   "term": "hub height wind speed",
+   "target": "wind-shear-hub-height",
+   "kind": "industry"
+  },
+  {
+   "term": "alpha shear exponent",
+   "target": "wind-shear-hub-height",
+   "kind": "industry"
+  },
+  {
+   "term": "extrapolate wind speed height",
+   "target": "wind-shear-hub-height",
+   "kind": "industry"
+  },
+  {
+   "term": "met tower to hub height",
+   "target": "wind-shear-hub-height",
+   "kind": "industry"
+  },
+  {
+   "term": "weibull wind distribution",
+   "target": "weibull-capacity-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "capacity factor wind turbine",
+   "target": "weibull-capacity-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "energy pattern factor",
+   "target": "weibull-capacity-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "rayleigh wind speed distribution",
+   "target": "weibull-capacity-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "annual energy production wind",
+   "target": "weibull-capacity-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "air density correction wind turbine",
+   "target": "turbine-density-correction",
+   "kind": "industry"
+  },
+  {
+   "term": "altitude derate wind power",
+   "target": "turbine-density-correction",
+   "kind": "industry"
+  },
+  {
+   "term": "power curve density correction",
+   "target": "turbine-density-correction",
+   "kind": "industry"
+  },
+  {
+   "term": "iec density correction",
+   "target": "turbine-density-correction",
+   "kind": "industry"
+  },
+  {
+   "term": "hot day turbine output",
+   "target": "turbine-density-correction",
+   "kind": "industry"
+  },
+  {
+   "term": "yaw error power loss",
+   "target": "yaw-error-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "yaw misalignment turbine",
+   "target": "yaw-error-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "cos cubed yaw loss",
+   "target": "yaw-error-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "nacelle direction bias",
+   "target": "yaw-error-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "static yaw misalignment",
+   "target": "yaw-error-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "gin pole load turbine",
+   "target": "gin-pole-uptower-lift",
+   "kind": "industry"
+  },
+  {
+   "term": "uptower lift rigging",
+   "target": "gin-pole-uptower-lift",
+   "kind": "industry"
+  },
+  {
+   "term": "nacelle davit capacity",
+   "target": "gin-pole-uptower-lift",
+   "kind": "industry"
+  },
+  {
+   "term": "tower crane alternative lift",
+   "target": "gin-pole-uptower-lift",
+   "kind": "industry"
+  },
+  {
+   "term": "uptower component change",
+   "target": "gin-pole-uptower-lift",
+   "kind": "industry"
   }
  ]
 }

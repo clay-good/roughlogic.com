@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "a7016823cc443373",
+      "sha": "d9fbc8def6d46736",
       "date": "2026-09-06"
     },
     "/tools/": {
-      "sha": "4230a650e3e0809c",
+      "sha": "91ffb86939f75aa0",
       "date": "2026-09-06"
     },
     "/groups/accounting/": {
-      "sha": "b1a45118de2c99d8",
+      "sha": "cbd6b761c734a6a0",
       "date": "2026-09-06"
     },
     "/groups/agriculture/": {
-      "sha": "2690feb9ba239875",
+      "sha": "c44843e35b81f4ac",
       "date": "2026-09-06"
     },
     "/groups/construction/": {
-      "sha": "b600d8d13982b7e6",
+      "sha": "1ba053af5a18b60a",
       "date": "2026-09-06"
     },
     "/groups/cross-trade/": {
-      "sha": "5fa11e92d69ed3b9",
+      "sha": "adab669d24af339d",
       "date": "2026-09-06"
     },
     "/groups/educators/": {
-      "sha": "5a82c2fdefe26f23",
+      "sha": "86283ce41d5f52cd",
       "date": "2026-09-06"
     },
     "/groups/electrical/": {
-      "sha": "b81201985d0701bf",
+      "sha": "639d429f4b3f403d",
       "date": "2026-09-06"
     },
     "/groups/field/": {
-      "sha": "ff90cd004448a2eb",
+      "sha": "0ba63a20afff3f4a",
       "date": "2026-09-06"
     },
     "/groups/fire-ground/": {
-      "sha": "097c6411c005e9cb",
+      "sha": "21d3d070cbf59816",
       "date": "2026-09-06"
     },
     "/groups/historical/": {
-      "sha": "c46fc022ed5aa819",
+      "sha": "b933dfa7d3075046",
       "date": "2026-09-06"
     },
     "/groups/hvac/": {
-      "sha": "b7eb63e0dc3c9a4a",
+      "sha": "bf6d3bfb72d04539",
       "date": "2026-09-06"
     },
     "/groups/kitchen/": {
-      "sha": "2068a4292f90415e",
+      "sha": "3074cb59a53b1ffc",
       "date": "2026-09-06"
     },
     "/groups/lab/": {
-      "sha": "2f4c679709b69350",
+      "sha": "600bbe25ab34145f",
       "date": "2026-09-06"
     },
     "/groups/mechanic/": {
-      "sha": "bdb63e3c8a0d938a",
+      "sha": "7436cffe787905ec",
       "date": "2026-09-06"
     },
     "/groups/plumbing/": {
-      "sha": "f9da3166242da364",
+      "sha": "a8b77c714806d9bc",
       "date": "2026-09-06"
     },
     "/groups/real-estate/": {
-      "sha": "6cb9c31080322f46",
+      "sha": "c985c67b85297cd9",
       "date": "2026-09-06"
     },
     "/groups/references/": {
-      "sha": "2a5d90f26425c826",
+      "sha": "558cde88fbfac9a4",
       "date": "2026-09-06"
     },
     "/groups/restoration/": {
-      "sha": "45bb5004cdeaca03",
+      "sha": "242014f58eb55d80",
       "date": "2026-09-06"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "9561741ad7b0b67f",
+      "sha": "a1db33caba06a3f5",
       "date": "2026-09-06"
     },
     "/groups/stage/": {
-      "sha": "a407db29f318f724",
+      "sha": "46e35201009d3cfd",
       "date": "2026-09-06"
     },
     "/groups/trucking/": {
-      "sha": "8d8e7951016e9a1a",
+      "sha": "d6653670d15d7c77",
       "date": "2026-09-06"
     },
     "/groups/water/": {
-      "sha": "15dd30893f77fa28",
+      "sha": "92a9e4b07d3e8c37",
       "date": "2026-09-06"
     },
     "/tools/aav-install-check/": {
@@ -2905,6 +2905,10 @@
       "sha": "187288f142929853",
       "date": "2026-09-01"
     },
+    "/tools/gin-pole-uptower-lift/": {
+      "sha": "e2d1fe353ec1b6cd",
+      "date": "2026-09-06"
+    },
     "/tools/glass-thickness-wind/": {
       "sha": "7d5b1e06d9d58b02",
       "date": "2026-09-01"
@@ -3630,8 +3634,8 @@
       "date": "2026-09-01"
     },
     "/tools/lighting-density/": {
-      "sha": "8763d749cc651667",
-      "date": "2026-09-01"
+      "sha": "f62ab8bce0e537d2",
+      "date": "2026-09-06"
     },
     "/tools/lighting-light-loss-factor/": {
       "sha": "dd2cb0b4ef7e2d9e",
@@ -4122,8 +4126,8 @@
       "date": "2026-09-01"
     },
     "/tools/motor-pole-identification/": {
-      "sha": "8c6ad2f27467c356",
-      "date": "2026-09-04"
+      "sha": "f52087b979345424",
+      "date": "2026-09-06"
     },
     "/tools/motor-rms-hp/": {
       "sha": "09d92d2ef1940aec",
@@ -6010,8 +6014,8 @@
       "date": "2026-09-01"
     },
     "/tools/solar-altitude-angle/": {
-      "sha": "d61867456a1d51d6",
-      "date": "2026-09-04"
+      "sha": "755ed84f9ae70603",
+      "date": "2026-09-06"
     },
     "/tools/solar-azimuth-angle/": {
       "sha": "0b36cd8df1efb9bb",
@@ -6769,6 +6773,10 @@
       "sha": "4b847f015a96fd08",
       "date": "2026-09-01"
     },
+    "/tools/tip-speed-ratio/": {
+      "sha": "196c35b38bc40fb3",
+      "date": "2026-09-06"
+    },
     "/tools/tire-contact-patch/": {
       "sha": "638ba631de8c771a",
       "date": "2026-09-01"
@@ -6984,6 +6992,10 @@
     "/tools/tube-bend-wall-thinning/": {
       "sha": "9845bb76f0e60d67",
       "date": "2026-09-01"
+    },
+    "/tools/turbine-density-correction/": {
+      "sha": "2887c165dc2a3ef6",
+      "date": "2026-09-06"
     },
     "/tools/turbo-max-boost-for-charge-temp/": {
       "sha": "eec5d7313400b8fb",
@@ -7261,6 +7273,10 @@
       "sha": "8d91ddc8dce9ef9e",
       "date": "2026-09-04"
     },
+    "/tools/weibull-capacity-factor/": {
+      "sha": "61a561f8d5e5fc30",
+      "date": "2026-09-06"
+    },
     "/tools/weir-flow/": {
       "sha": "826a18d868b485f1",
       "date": "2026-09-01"
@@ -7389,9 +7405,17 @@
       "sha": "03b824d20ee5549a",
       "date": "2026-09-01"
     },
+    "/tools/wind-power-density-betz/": {
+      "sha": "af9731756e93a378",
+      "date": "2026-09-06"
+    },
     "/tools/wind-pressure/": {
       "sha": "56f79084c8e4498c",
       "date": "2026-09-01"
+    },
+    "/tools/wind-shear-hub-height/": {
+      "sha": "5992a6ce6644895c",
+      "date": "2026-09-06"
     },
     "/tools/wind-solid-sign/": {
       "sha": "13e3ec84eab2c2ad",
@@ -7450,16 +7474,16 @@
       "date": "2026-09-01"
     },
     "/tools/wire-rope-strength/": {
-      "sha": "17e6e47f2ab2a4b3",
-      "date": "2026-09-05"
+      "sha": "a1b896ff00e434ed",
+      "date": "2026-09-06"
     },
     "/tools/wire-rope-stretch/": {
       "sha": "71ee184561e073e5",
       "date": "2026-09-04"
     },
     "/tools/wireless-fspl/": {
-      "sha": "3bdc8c31610ce8c3",
-      "date": "2026-09-04"
+      "sha": "c4cdc81c0971bd6f",
+      "date": "2026-09-06"
     },
     "/tools/wireless-intermod/": {
       "sha": "447ed8577a73a503",
@@ -7536,6 +7560,10 @@
     "/tools/wsfu-demand/": {
       "sha": "2effd97712d6fd26",
       "date": "2026-09-01"
+    },
+    "/tools/yaw-error-loss/": {
+      "sha": "d278320185dfe702",
+      "date": "2026-09-06"
     },
     "/tools/yield-ep/": {
       "sha": "e60214c409d045fb",

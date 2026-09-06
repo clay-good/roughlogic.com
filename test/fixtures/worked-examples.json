@@ -97067,6 +97067,403 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "tip-speed-ratio",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "380 ft rotor at 11.5 rpm in a 26 mph wind, design ratio 7, 280 ft/s tip cap",
+   "source_edition_or_year": "tip speed = pi x D x rpm / 60; TSR = tip speed / (mph x 1.4666667)",
+   "source_section_or_page": "the turbine manufacturer's operating parameters govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "rotor_diameter_ft": 380,
+    "rotor_rpm": 11.5,
+    "wind_speed_mph": 26,
+    "design_tsr": 7,
+    "tip_speed_cap_fps": 280
+   },
+   "outputs": {
+    "tip_speed_fps": {
+     "value": 228.813,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tip_speed_mph": {
+     "value": 156.009,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tip_speed_ratio": {
+     "value": 6.00033,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rpm_for_design_tsr": {
+     "value": 13.4159,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rpm_at_tip_cap": {
+     "value": 14.0726,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wind_at_cap_mph": {
+     "value": 27.2727,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wind-power-density-betz",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "380 ft rotor in a 20 mph wind at 0.0765 lb/cu ft, Cp 0.45, compared at 25 mph",
+   "source_edition_or_year": "P = 0.5 (rho/g) A v^3; Betz = 16/27 = 0.5926",
+   "source_section_or_page": "the manufacturer's warranted power curve governs any production estimate",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "wind_speed_mph": 20,
+    "air_density_pcf": 0.0765,
+    "rotor_diameter_ft": 380,
+    "power_coefficient": 0.45,
+    "alt_wind_speed_mph": 25
+   },
+   "outputs": {
+    "swept_area_ft2": {
+     "value": 113411.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "power_in_wind_kw": {
+     "value": 4613.91,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "power_density_w_ft2": {
+     "value": 40.6829,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "betz_power_kw": {
+     "value": 2734.17,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "extracted_power_kw": {
+     "value": 2076.26,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_ratio": {
+     "value": 1.953125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wind-shear-hub-height",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "15 mph at 160 ft extrapolated to a 330 ft hub at alpha 0.2, against 0.14 and against two measured levels",
+   "source_edition_or_year": "v2 = v1 (z2/z1)^alpha; derived alpha = ln(v2/v1)/ln(z2/z1)",
+   "source_section_or_page": "IEC 61400-12 and an independent energy assessor govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "measured_speed_mph": 15,
+    "measured_height_ft": 160,
+    "hub_height_ft": 330,
+    "shear_exponent": 0.2,
+    "alt_shear_exponent": 0.14,
+    "second_speed_mph": 13.2,
+    "second_height_ft": 100
+   },
+   "outputs": {
+    "hub_speed_mph": {
+     "value": 17.3368,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "speed_ratio": {
+     "value": 1.15579,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "energy_ratio": {
+     "value": 1.54396,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_hub_speed_mph": {
+     "value": 16.5999,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_energy_vs_entered": {
+     "value": 0.877827,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "derived_exponent": {
+     "value": 0.271984,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "weibull-capacity-factor",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Weibull k 2.0, c 18 mph, a 2,500 kW machine cut in 7 / rated 27 / cut out 55, 15% losses",
+   "source_edition_or_year": "mean = c Gamma(1+1/k); EPF = Gamma(1+3/k)/Gamma(1+1/k)^3; AEP integrated against a cubic-to-rated curve",
+   "source_section_or_page": "IEC 61400-12 and an independent energy assessor govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "weibull_k": 2,
+    "weibull_c_mph": 18,
+    "rated_power_kw": 2500,
+    "cut_in_mph": 7,
+    "rated_speed_mph": 27,
+    "cut_out_mph": 55,
+    "loss_factor_pct": 15
+   },
+   "outputs": {
+    "mean_speed_mph": {
+     "value": 15.9521,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "energy_pattern_factor": {
+     "value": 1.90986,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hours_below_cut_in": {
+     "value": 1229.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gross_aep_mwh": {
+     "value": 6772.07,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "net_aep_mwh": {
+     "value": 5756.26,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "capacity_factor": {
+     "value": 0.262843,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "turbine-density-correction",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "5,200 ft at 95 degF against a curve warranted at 0.0765 lb/cu ft, 1,850 kW measured where the curve says 2,200",
+   "source_edition_or_year": "ISA: rho = rho_ref x 518.67/(459.67+F) x (1 - 6.73e-6 z)^5.258; IEC speed factor = cube root of the ratio",
+   "source_section_or_page": "the manufacturer's power curve and IEC 61400-12 govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "elevation_ft": 5200,
+    "air_temp_f": 95,
+    "reference_density_pcf": 0.0765,
+    "measured_power_kw": 1850,
+    "curve_power_kw": 2200,
+    "wind_speed_mph": 20,
+    "alt_air_temp_f": 20
+   },
+   "outputs": {
+    "site_density_pcf": {
+     "value": 0.059316,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "density_ratio": {
+     "value": 0.775373,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "corrected_curve_power_kw": {
+     "value": 1705.82,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "iec_speed_factor": {
+     "value": 0.918693,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "iec_corrected_wind_mph": {
+     "value": 18.3739,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_density_pcf": {
+     "value": 0.0685905,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "yaw-error-loss",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "12 degrees of persistent yaw error on a 2,500 kW machine at a 40% capacity factor, $40/MWh, 30 machines",
+   "source_edition_or_year": "retained = cos^3(error); the squared form reported beside it",
+   "source_section_or_page": "the manufacturer's yaw calibration procedure governs",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "yaw_error_deg": 12,
+    "rated_power_kw": 2500,
+    "capacity_factor_pct": 40,
+    "energy_price_per_mwh": 40,
+    "turbine_count": 30,
+    "acceptable_loss_pct": 2
+   },
+   "outputs": {
+    "loss_cubed_pct": {
+     "value": 6.41351,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "loss_squared_pct": {
+     "value": 4.32273,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annual_mwh": {
+     "value": 8760.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lost_mwh": {
+     "value": 561.823,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lost_usd": {
+     "value": 22472.9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fleet_lost_usd": {
+     "value": 674188.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "acceptable_angle_deg": {
+     "value": 6.64193,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gin-pole-uptower-lift",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "3,800 lb component, haul line 25 degrees off vertical over a 12 ft pole, 6,000 lb mount rating",
+   "source_edition_or_year": "head resultant = 2 W cos(beta/2); horizontal = W sin(beta); direct haul = W / cos(theta)",
+   "source_section_or_page": "the turbine manufacturer's uptower lifting provisions govern absolutely",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "component_weight_lb": 3800,
+    "haul_angle_deg": 25,
+    "pole_length_ft": 12,
+    "mount_rated_lb": 6000,
+    "hauled_line_angle_deg": 15
+   },
+   "outputs": {
+    "head_resultant_lb": {
+     "value": 7419.85,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "head_horizontal_lb": {
+     "value": 1605.95,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "head_vertical_lb": {
+     "value": 7243.97,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "mount_moment_ftlb": {
+     "value": 19271.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_component_lb": {
+     "value": 3072.84,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "direct_line_pull_lb": {
+     "value": 3934.05,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "direct_side_load_lb": {
+     "value": 1018.21,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

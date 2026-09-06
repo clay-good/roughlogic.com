@@ -3,8 +3,16 @@
 
 import { defineConfig } from "@playwright/test";
 
+// The port is overridable so a second checkout of this repository can run the
+// suite without adopting the first one's dev server. globalSetup refuses to
+// run against a server that is not serving this checkout's build; see
+// test/integration/global-setup.js for the run that went green over another
+// worktree's catalog on 2026-09-05.
+const PORT = Number(process.env.PORT) || 8080;
+
 export default defineConfig({
   testDir: ".",
+  globalSetup: "./global-setup.js",
   testMatch: /.*\.test\.js$/,
   // The print-emulation specs (print.test.js) are timing-sensitive under the
   // default parallel worker pool: each spec navigates, flips emulateMedia to
@@ -14,7 +22,7 @@ export default defineConfig({
   // real defect. Retry flaky specs rather than serialize the whole suite.
   retries: process.env.CI ? 2 : 1,
   use: {
-    baseURL: "http://localhost:8080",
+    baseURL: `http://localhost:${PORT}`,
     headless: true,
   },
   // The whole suite runs on Chromium; the responsive-stress sweep ALSO runs on
@@ -43,7 +51,7 @@ export default defineConfig({
     // serves dist/ rather than exposing source, Git metadata, or local secrets.
     command: "npm run dev",
     cwd: "../..",
-    port: 8080,
+    port: PORT,
     reuseExistingServer: !process.env.CI,
     // `npm run dev` runs `predev` first, which is a full `build.mjs`: it emits
     // a static shell per tile, so it gets slower every time the catalog does.

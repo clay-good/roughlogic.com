@@ -1527,6 +1527,14 @@ const RELATED = {
   "bandmill-speed-bite": ["sawmill-residue-yield","lumber-recovery-overrun","cutting-speed-rpm"],
   "sawmill-residue-yield": ["lumber-recovery-overrun","bandmill-speed-bite","chipper-debris"],
   "log-truck-payload": ["log-limb-weight","timber-cruise","axle-load-distribution"],
+  // spec-v1550..v1556: the 2026-09-05 trade-expansion wind-energy band.
+  "tip-speed-ratio": ["wind-power-density-betz","yaw-error-loss","turbine-density-correction"],
+  "wind-power-density-betz": ["weibull-capacity-factor","wind-shear-hub-height","tip-speed-ratio"],
+  "wind-shear-hub-height": ["wind-power-density-betz","weibull-capacity-factor","turbine-density-correction"],
+  "weibull-capacity-factor": ["wind-power-density-betz","wind-shear-hub-height","turbine-density-correction"],
+  "turbine-density-correction": ["air-density-correction","wind-power-density-betz","tip-speed-ratio"],
+  "yaw-error-loss": ["tip-speed-ratio","turbine-density-correction","wind-power-density-betz"],
+  "gin-pole-uptower-lift": ["sling-angle","wind-on-load","guy-wire-tension"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   "grounding-electrode-conductor": ["bonding-jumper","egc-sizing","grounding-electrode"],
   "bonding-jumper": ["grounding-electrode-conductor","egc-sizing","service-load-standard"],
