@@ -715,6 +715,14 @@ export const TOOL_MODULES = (() => {
     "weibull-capacity-factor", "turbine-density-correction", "yaw-error-loss",
     "gin-pole-uptower-lift",
   ]);
+  // spec-v1557..v1562: the commercial and scientific diving bench. The only
+  // breathing-gas tile the catalog had was `scba-cylinder-time`, which has no
+  // notion of ambient pressure -- the one thing every diving gas calculation
+  // turns on. All six keep group "G".
+  declare("./calc-diving.js", "DIVING_RENDERERS", [
+    "no-decompression-limit", "surface-air-consumption", "nitrox-mod",
+    "nitrox-ead", "umbilical-air-supply", "chamber-gas-volume",
+  ]);
   // spec-v80 cap-relief split: the spec-v25 site-civil / roadway-geometry
   // quartet moved out of calc-construction.js (it sat at 95.0% of its size
   // cap, the tightest remaining calculator module) into its own module. All

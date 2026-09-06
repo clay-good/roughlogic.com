@@ -103,6 +103,12 @@ export const PROFESSION_NOUN = {
   railroad: "Railroad",
   lowvoltage: "Low Voltage",
   mining: "Mining and Quarry",
+  // Added 2026-09-06 with the diving band. `diving` leads on six tiles, so
+  // its absence would have retitled them "... - Trades ..."; `safety` is the
+  // secondary there and on ten older tiles and is mapped alongside it rather
+  // than when a tile first leads with one.
+  diving: "Commercial Diving",
+  safety: "Safety",
   mechanical: "Mechanical",
   demolition: "Demolition",
   fireproofing: "Fireproofing",

@@ -1651,6 +1651,13 @@ export const COMPUTE_MAP = {
   "turbine-density-correction": { module: "../../calc-wind.js", fn: "computeTurbineDensityCorrection" },
   "yaw-error-loss": { module: "../../calc-wind.js", fn: "computeYawErrorLoss" },
   "gin-pole-uptower-lift": { module: "../../calc-wind.js", fn: "computeGinPoleUptowerLift" },
+  // spec-v1557..v1562 diving band
+  "no-decompression-limit": { module: "../../calc-diving.js", fn: "computeNoDecompressionLimit" },
+  "surface-air-consumption": { module: "../../calc-diving.js", fn: "computeSurfaceAirConsumption" },
+  "nitrox-mod": { module: "../../calc-diving.js", fn: "computeNitroxMod" },
+  "nitrox-ead": { module: "../../calc-diving.js", fn: "computeNitroxEad" },
+  "umbilical-air-supply": { module: "../../calc-diving.js", fn: "computeUmbilicalAirSupply" },
+  "chamber-gas-volume": { module: "../../calc-diving.js", fn: "computeChamberGasVolume" },
   "grounding-electrode-conductor": { module: "../../calc-electrical.js", fn: "computeGroundingElectrodeConductor" },
   "bonding-jumper": { module: "../../calc-electrical.js", fn: "computeBondingJumper" },
   "min-conductor-for-vd": { module: "../../calc-electrical.js", fn: "computeMinConductorForVd" },

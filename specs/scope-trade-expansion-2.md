@@ -1,7 +1,7 @@
 # Scope: The 2026-09-05 Trade Expansion (specs v1450-v1749, 300 New Tiles)
 
 > **Status: IN PROGRESS (2026-09-05). Program charter, no catalog change of its own.**
-> **Bands 1-8 have landed: railroad track, elevator and escalator, door hardware and locksmithing, mining and quarry, trenchless, sawmill, and wind energy, 1,804 -> 1,869. Three specs cut as duplicates.**
+> **Bands 1-9 have landed: railroad track, elevator and escalator, door hardware and locksmithing, mining and quarry, trenchless, sawmill, wind energy, and diving, 1,804 -> 1,875. Three specs cut as duplicates.**
 > Inherits the spec-v106 trades-only charter and every convention through spec-v1449.
 > Each of the 300 tiles is specified in its own file, `spec-v1450.md` through `spec-v1749.md`.
 
@@ -550,9 +550,14 @@ things must happen **before** the first band, not during it:
 | 6 | v1596-v1604 | `calc-trenchless.js` (new) | 7 | trenchless, HDD and utility locating; catalog 1,849 -> 1,856. **spec-v1596 and spec-v1604 CUT** as duplicates of `hdd-pullback` and `manning-slope`, both of which gained the material those specs added |
 | 7 | v1582-v1587 | `calc-sawmill.js` (new) | 6 | sawmill and forest products; catalog 1,856 -> 1,862. No cut and no internally wrong spec -- the first band of this program with neither |
 | 8 | v1550-v1556 | `calc-wind.js` (new) | 7 | wind energy; catalog 1,862 -> 1,869. No cut. **spec-v1556's pole compression is degenerate** and spec-v1554's barometric relation disagreed with the sibling `air-density-correction`; both corrected |
+| 9 | v1557-v1562 | `calc-diving.js` (new) | 6 | diving; catalog 1,869 -> 1,875. No cut. **THREE internally wrong specs**, two of them about OXYGEN LIMITS, plus a blend-rounding error running through both nitrox tiles |
 
-**Eleven of the sixty-seven specs built so far were internally wrong and shipped
-corrected, and THREE have been cut as duplicates.** Band 7 was clean in both
+**Fourteen of the seventy-three specs built so far were internally wrong and
+shipped corrected, and THREE have been cut as duplicates.** Band 9 alone
+added three, two of them about oxygen partial-pressure limits: spec-v1559
+calls 1.096 ata "past 1.4" while its own MOD says 111 ft, spec-v1560 calls
+EAN35 usable at 100 ft where it is 1.411 ata, and BOTH nitrox specs round a
+blend figure UP, past the limit they were solving for. A blend figure floors. Band 7 was clean in both
 respects. Band 8 added spec-v1556, whose pole compression `C = W + T cos(alpha)`
 is identically 2W at every angle because its own `T = W / cos(alpha)` uses the
 same angle; the correct sheave statics are `2 W cos(beta/2)`. Band 6 added spec-v1597, whose rule line says a steel

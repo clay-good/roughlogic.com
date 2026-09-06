@@ -44658,3 +44658,280 @@ test("bounds: spec-v1556 computeGinPoleUptowerLift fixes a degenerate spec formu
   assert.ok("error" in _v1556({ ...base, hauled_line_angle_deg: 90 }));
   assert.ok("error" in _v1556({ ...base, component_weight_lb: Infinity }));
 });
+
+// ===========================================================================
+// spec-v1557..v1562: the 2026-09-06 trade-expansion diving band. Nothing was
+// cut. The only breathing-gas tile the catalog had was `scba-cylinder-time`,
+// which divides a cylinder's contents by a FIXED consumption rate and has no
+// notion of ambient pressure at all -- the one thing every diving gas
+// calculation turns on, and something a 1-ATA firefighting tool cannot
+// acquire.
+//
+// THREE OF SIX SPECS WERE INTERNALLY WRONG, and a fourth error runs through
+// two of them. Taking the program to FOURTEEN wrong specs in seventy-three:
+//   v1557 left an unrendered python placeholder in its worked example
+//         (`{((1-0.32)/0.79)*(60+33)-33:.0f}`, which is 47.05 ft).
+//   v1559 says EAN32 at 80 ft is "1.10 ata -- past 1.4 and approaching 1.6"
+//         and "does not belong at 80 ft for working diving". It is 1.096 ata,
+//         WELL INSIDE 1.4, and the claim contradicts the 111 ft maximum
+//         operating depth the same spec computed two lines earlier.
+//   v1560 calls EAN35 "a mix that works at 100 ft". Its ppO2 there is 1.411,
+//         over the 1.4 limit the same paragraph cites. EAN34 is the answer.
+//   AND BOTH NITROX SPECS ROUND A BLEND FIGURE TO THE NEAREST WHOLE PERCENT,
+//         which rounds UP and puts the diver past the very limit being solved
+//         for: v1559's "0.409 -> EAN41" is 1.404 ata at 80 ft. A blend figure
+//         FLOORS, and both tiles now do.
+// ===========================================================================
+
+import { computeNoDecompressionLimit as _v1557 } from "../../calc-diving.js";
+test("bounds: spec-v1557 computeNoDecompressionLimit credits residual nitrogen", () => {
+  const base = { planned_depth_ft: 60, table_ndl_min: 55, residual_nitrogen_time_min: 21, planned_bottom_time_min: 30, alt_residual_time_min: 9, oxygen_fraction: 0.32, feet_per_atm: 33 };
+  const r = _v1557(base);
+  assert.strictEqual(r.adjusted_ndl_min, 34);
+  assert.strictEqual(r.credited_bottom_time_min, 51);
+  assert.strictEqual(r.remaining_min, 4);
+  assert.strictEqual(r.exceeds, false);
+  assert.ok(Math.abs(r.residual_share_pct - 38.1818) < 1e-3);
+  // The surface-interval trade, which is the structure of a repetitive plan.
+  assert.strictEqual(r.alt_adjusted_ndl_min, 46);
+  assert.strictEqual(r.surface_interval_gain_min, 12);
+  // Zero residual is the first dive: the adjusted limit IS the table's.
+  const first = _v1557({ ...base, residual_nitrogen_time_min: 0 });
+  assert.strictEqual(first.adjusted_ndl_min, 55);
+  assert.strictEqual(first.credited_bottom_time_min, 30);
+  // Overrunning the table is flagged rather than quietly returned.
+  const over = _v1557({ ...base, planned_bottom_time_min: 40 });
+  assert.strictEqual(over.exceeds, true);
+  assert.ok(over.remaining_min < 0);
+  assert.ok(over.verdict.startsWith("OVER"));
+  // spec-v1557's worked example left an unrendered python placeholder here.
+  // The value it would have printed is 47.05 ft.
+  assert.ok(Math.abs(r.equivalent_air_depth_ft - 47.0506) < 1e-3);
+  // Air is its own equivalent air depth, exactly -- the degenerate case that
+  // proves the relation.
+  const air = _v1557({ ...base, oxygen_fraction: 0.21 });
+  assert.ok(Math.abs(air.equivalent_air_depth_ft - 60) < 1e-9);
+  // A richer mix is always shallower.
+  assert.ok(_v1557({ ...base, oxygen_fraction: 0.36 }).equivalent_air_depth_ft < r.equivalent_air_depth_ft);
+  // A residual at or past the table's limit leaves no dive at all, and says so.
+  assert.ok("error" in _v1557({ ...base, residual_nitrogen_time_min: 55 }));
+  assert.ok("error" in _v1557({ ...base, planned_depth_ft: 0 }));
+  assert.ok("error" in _v1557({ ...base, table_ndl_min: 0 }));
+  assert.ok("error" in _v1557({ ...base, planned_bottom_time_min: 0 }));
+  assert.ok("error" in _v1557({ ...base, oxygen_fraction: 1 }));
+  assert.ok("error" in _v1557({ ...base, feet_per_atm: 0 }));
+  assert.ok("error" in _v1557({ ...base, table_ndl_min: Infinity }));
+});
+
+import { computeSurfaceAirConsumption as _v1558 } from "../../calc-diving.js";
+test("bounds: spec-v1558 computeSurfaceAirConsumption reserves before it plans", () => {
+  const base = { sac_cuft_per_min: 0.65, planned_depth_ft: 80, planned_bottom_time_min: 25, cylinder_volume_cuft: 80, team_size: 2, ascent_rate_fpm: 30, stop_depth_ft: 15, stop_time_min: 3, stress_sac_cuft_per_min: 1.0, feet_per_atm: 33 };
+  const r = _v1558(base);
+  assert.ok(Math.abs(r.depth_ata - (1 + 80 / 33)) < 1e-12);
+  assert.ok(Math.abs(r.rate_at_depth_cuft_min - 0.65 * r.depth_ata) < 1e-12);
+  assert.ok(Math.abs(r.bottom_gas_cuft - 55.6439) < 1e-3);
+  // Rock bottom, both halves and the sum.
+  assert.ok(Math.abs(r.ascent_time_min - 65 / 30) < 1e-12);
+  assert.ok(Math.abs(r.ascent_avg_ata - (1 + 47.5 / 33)) < 1e-12);
+  assert.ok(Math.abs(r.ascent_gas_cuft - 10.5707) < 1e-3);
+  assert.ok(Math.abs(r.stop_gas_cuft - 8.72727) < 1e-4);
+  assert.ok(Math.abs(r.rock_bottom_cuft - (r.ascent_gas_cuft + r.stop_gas_cuft)) < 1e-12);
+  assert.ok(Math.abs(r.rock_bottom_cuft - 19.2980) < 1e-3);
+  // The reserve is a quarter of the cylinder and is subtracted BEFORE the
+  // dive is sized -- 27 min of usable gas, not the 36 the cylinder suggests.
+  assert.ok(Math.abs(r.usable_gas_cuft - (80 - r.rock_bottom_cuft)) < 1e-12);
+  assert.ok(Math.abs(r.reserve_share_pct - 24.1225) < 1e-3);
+  assert.ok(Math.abs(r.max_bottom_time_min - 27.2725) < 1e-3);
+  assert.ok(Math.abs(r.naive_bottom_time_min - 35.9428) < 1e-3);
+  assert.ok(r.max_bottom_time_min < r.naive_bottom_time_min);
+  // Everything is exactly linear in the team size and the elevated rate.
+  assert.ok(Math.abs(_v1558({ ...base, team_size: 4 }).rock_bottom_cuft - 2 * r.rock_bottom_cuft) < 1e-9);
+  assert.ok(Math.abs(_v1558({ ...base, stress_sac_cuft_per_min: 2.0 }).rock_bottom_cuft - 2 * r.rock_bottom_cuft) < 1e-9);
+  // Consumption is exactly linear in absolute pressure, so a surface dive is
+  // exactly the surface rate -- the degenerate case.
+  assert.ok(Math.abs(_v1558({ ...base, planned_depth_ft: 33, stop_depth_ft: 10 }).depth_ata - 2) < 1e-12);
+  // A plan that does not fit says so rather than returning a negative.
+  assert.ok(r.plan_verdict.startsWith("the planned bottom time fits"));
+  assert.ok(_v1558({ ...base, planned_bottom_time_min: 40 }).plan_verdict.includes("does NOT fit"));
+  // A reserve that eats the whole cylinder is an error, not a negative dive.
+  assert.ok("error" in _v1558({ ...base, cylinder_volume_cuft: 15 }));
+  assert.ok("error" in _v1558({ ...base, sac_cuft_per_min: 0 }));
+  assert.ok("error" in _v1558({ ...base, stop_depth_ft: 80 }));
+  assert.ok("error" in _v1558({ ...base, team_size: 0 }));
+  assert.ok("error" in _v1558({ ...base, ascent_rate_fpm: 0 }));
+  assert.ok("error" in _v1558({ ...base, planned_depth_ft: Infinity }));
+});
+
+import { computeNitroxMod as _v1559 } from "../../calc-diving.js";
+test("bounds: spec-v1559 computeNitroxMod contradicts its own spec, and floors the blend", () => {
+  const base = { oxygen_fraction: 0.32, ppo2_limit: 1.4, contingency_ppo2_limit: 1.6, planned_depth_ft: 80, feet_per_atm: 33 };
+  const r = _v1559(base);
+  assert.ok(Math.abs(r.mod_working_ft - 111.375) < 1e-9);
+  assert.ok(Math.abs(r.mod_contingency_ft - 132) < 1e-9);
+  assert.ok(Math.abs(r.ppo2_at_depth - 1.09576) < 1e-4);
+  // THE SPEC'S CLAIM, PINNED AS FALSE. spec-v1559 says this is "past 1.4 and
+  // approaching 1.6" and that the mix "does not belong at 80 ft". It is
+  // comfortably inside, and the spec's own 111 ft MOD says so.
+  assert.ok(r.ppo2_at_depth < 1.4);
+  assert.strictEqual(r.within_working, true);
+  assert.ok(r.depth_verdict.startsWith("INSIDE"));
+  assert.ok(Math.abs(r.margin_ft - (r.mod_working_ft - 80)) < 1e-12);
+  assert.ok(r.margin_ft > 31 && r.margin_ft < 32);
+  // The MOD round-trips: at exactly the MOD the ppO2 is exactly the limit.
+  assert.ok(Math.abs(_v1559({ ...base, planned_depth_ft: r.mod_working_ft }).ppo2_at_depth - 1.4) < 1e-12);
+  // A BLEND FIGURE FLOORS. The exact best mix is 40.9%, so the blend is
+  // EAN40 at 1.370 -- and the spec's "EAN41" would be 1.404, OVER the limit
+  // it was solving for.
+  assert.ok(Math.abs(r.best_mix_fraction - 1.4 / r.depth_ata) < 1e-12);
+  assert.ok(Math.abs(r.best_mix_fraction - 0.408850) < 1e-5);
+  assert.strictEqual(r.best_mix_pct_floor, 40);
+  assert.ok(r.best_mix_ppo2 <= 1.4);
+  assert.ok(Math.abs(r.best_mix_ppo2 - 1.36970) < 1e-4);
+  assert.ok((r.best_mix_pct_floor + 1) / 100 * r.depth_ata > 1.4);
+  // The floored blend is never over the limit, at any depth.
+  for (const d of [30, 60, 90, 130, 190]) {
+    const q = _v1559({ ...base, planned_depth_ft: d });
+    assert.ok(q.best_mix_ppo2 <= 1.4 + 1e-12, "floored blend over the limit at " + d + " ft");
+  }
+  // Air's own limit, and the three verdict bands.
+  assert.ok(Math.abs(r.air_mod_ft - 187) < 1e-9);
+  assert.ok(_v1559({ ...base, planned_depth_ft: 120 }).depth_verdict.startsWith("PAST the working"));
+  assert.ok(_v1559({ ...base, planned_depth_ft: 140 }).depth_verdict.startsWith("PAST the contingency"));
+  // A richer mix always has a shallower MOD.
+  assert.ok(_v1559({ ...base, oxygen_fraction: 0.36 }).mod_working_ft < r.mod_working_ft);
+  assert.ok("error" in _v1559({ ...base, oxygen_fraction: 0 }));
+  assert.ok("error" in _v1559({ ...base, ppo2_limit: 0 }));
+  assert.ok("error" in _v1559({ ...base, contingency_ppo2_limit: 1.2 }));
+  assert.ok("error" in _v1559({ ...base, planned_depth_ft: 0 }));
+  assert.ok("error" in _v1559({ ...base, feet_per_atm: 0 }));
+  assert.ok("error" in _v1559({ ...base, oxygen_fraction: Infinity }));
+});
+
+import { computeNitroxEad as _v1560 } from "../../calc-diving.js";
+test("bounds: spec-v1560 computeNitroxEad runs the oxygen check the spec got wrong", () => {
+  const base = { oxygen_fraction: 0.36, depth_ft: 100, target_ead_ft: 80, ppo2_limit: 1.4, feet_per_atm: 33 };
+  const r = _v1560(base);
+  assert.ok(Math.abs(r.nitrogen_fraction - 0.64) < 1e-12);
+  assert.ok(Math.abs(r.equivalent_air_depth_ft - 74.7468) < 1e-3);
+  assert.ok(Math.abs(r.depth_reduction_ft - (100 - r.equivalent_air_depth_ft)) < 1e-12);
+  // Air is exactly its own equivalent air depth: the check on the relation.
+  assert.ok(Math.abs(_v1560({ ...base, oxygen_fraction: 0.21 }).equivalent_air_depth_ft - 100) < 1e-9);
+  // The nitrogen partial pressure at the EAD equals air's at that same EAD,
+  // which is the definition the relation encodes.
+  const pn2_air_at_ead = 0.79 * (1 + r.equivalent_air_depth_ft / 33);
+  assert.ok(Math.abs(r.pn2_at_depth - pn2_air_at_ead) < 1e-9);
+  // The oxygen half, which the spec got right here and wrong in v1559.
+  assert.ok(Math.abs(r.ppo2_at_depth - 1.45091) < 1e-4);
+  assert.strictEqual(r.oxygen_ok, false);
+  assert.ok(r.oxygen_verdict.startsWith("BUT THE OXYGEN CHECK FAILS"));
+  // spec-v1560 calls EAN35 "a mix that works at 100 ft". It is 1.411 ata,
+  // OVER the 1.4 the same paragraph cites. The floored answer is EAN34.
+  assert.ok(0.35 * r.depth_ata > 1.4);
+  assert.strictEqual(r.deepest_usable_pct_floor, 34);
+  assert.ok(r.deepest_usable_ppo2 <= 1.4);
+  assert.ok(Math.abs(r.deepest_usable_ppo2 - 1.37030) < 1e-4);
+  assert.ok(Math.abs(r.deepest_usable_ead_ft - 78.1139) < 1e-3);
+  // The usable mix is always thinner than the one that failed, and always
+  // buys less extension -- the trade the tile exists to show.
+  assert.ok(r.deepest_usable_pct_floor / 100 < 0.36);
+  assert.ok(r.deepest_usable_ead_ft > r.equivalent_air_depth_ft);
+  // The floored usable mix is never over the limit, at any depth.
+  for (const d of [40, 70, 100, 130]) {
+    const q = _v1560({ ...base, depth_ft: d, target_ead_ft: d - 10 });
+    assert.ok(q.deepest_usable_ppo2 <= 1.4 + 1e-12, "usable mix over the limit at " + d + " ft");
+  }
+  // The target-EAD inverse round-trips exactly.
+  const back = _v1560({ ...base, oxygen_fraction: r.mix_for_target_ead });
+  assert.ok(Math.abs(back.equivalent_air_depth_ft - 80) < 1e-9);
+  assert.ok("error" in _v1560({ ...base, oxygen_fraction: 1 }));
+  assert.ok("error" in _v1560({ ...base, depth_ft: 0 }));
+  assert.ok("error" in _v1560({ ...base, target_ead_ft: 100 }));
+  assert.ok("error" in _v1560({ ...base, ppo2_limit: 0 }));
+  assert.ok("error" in _v1560({ ...base, depth_ft: Infinity }));
+});
+
+import { computeUmbilicalAirSupply as _v1561 } from "../../calc-diving.js";
+test("bounds: spec-v1561 computeUmbilicalAirSupply keeps flow and reserve separate", () => {
+  const base = { diver_count: 3, depth_ft: 100, rate_per_diver_acfm: 1.4, compressor_scfm: 20, alt_depth_ft: 190, reserve_minutes: 10, volume_tank_cuft: 8, tank_pressure_psi: 200, feet_per_atm: 33 };
+  const r = _v1561(base);
+  assert.ok(Math.abs(r.depth_ata - (1 + 100 / 33)) < 1e-12);
+  assert.ok(Math.abs(r.per_diver_acfm - 5.64242) < 1e-4);
+  assert.ok(Math.abs(r.required_acfm - 16.9273) < 1e-3);
+  assert.ok(Math.abs(r.compressor_margin_acfm - (20 - r.required_acfm)) < 1e-12);
+  assert.ok(r.compressor_margin_acfm > 0);
+  assert.ok(r.flow_verdict.includes("margin"));
+  // Nothing changes but depth, and the same spread stops complying.
+  assert.ok(Math.abs(r.alt_required_acfm - 28.3818) < 1e-3);
+  assert.ok(r.alt_required_acfm > 20);
+  assert.ok(_v1561({ ...base, depth_ft: 190 }).flow_verdict.includes("SHORT"));
+  // The operational limit round-trips: at exactly that depth the requirement
+  // is exactly the compressor's capacity.
+  assert.ok(Math.abs(r.max_depth_ft - 124.143) < 1e-2);
+  assert.ok(Math.abs(_v1561({ ...base, depth_ft: r.max_depth_ft }).required_acfm - 20) < 1e-9);
+  // Exactly linear in diver count -- and the standby is one of them.
+  assert.ok(Math.abs(_v1561({ ...base, diver_count: 6 }).required_acfm - 2 * r.required_acfm) < 1e-9);
+  assert.ok(_v1561({ ...base, diver_count: 2 }).required_acfm < r.required_acfm);
+  // The reserve is a SEPARATE calculation and carries its own verdict.
+  assert.ok(Math.abs(r.reserve_required_cuft - 1.4 * r.depth_ata * 10) < 1e-12);
+  assert.ok(Math.abs(r.tank_free_gas_cuft - 8 * 200 / 14.7) < 1e-9);
+  assert.ok(r.reserve_margin_cuft > 0);
+  assert.ok(r.reserve_verdict.includes("covers it"));
+  // A spread that passes the flow check and fails the reserve check: the
+  // exact case the tile exists to catch.
+  const thin = _v1561({ ...base, volume_tank_cuft: 2 });
+  assert.ok(thin.compressor_margin_acfm > 0);
+  assert.ok(thin.reserve_margin_cuft < 0);
+  assert.ok(thin.reserve_verdict.includes("SHORT"));
+  assert.ok("error" in _v1561({ ...base, diver_count: 0 }));
+  assert.ok("error" in _v1561({ ...base, depth_ft: 0 }));
+  assert.ok("error" in _v1561({ ...base, rate_per_diver_acfm: 0 }));
+  assert.ok("error" in _v1561({ ...base, compressor_scfm: 0 }));
+  assert.ok("error" in _v1561({ ...base, reserve_minutes: 0 }));
+  assert.ok("error" in _v1561({ ...base, tank_pressure_psi: 0 }));
+  assert.ok("error" in _v1561({ ...base, depth_ft: Infinity }));
+});
+
+import { computeChamberGasVolume as _v1562 } from "../../calc-diving.js";
+test("bounds: spec-v1562 computeChamberGasVolume puts ventilation ahead of pressurization", () => {
+  const base = { chamber_volume_cuft: 250, treatment_pressure_psig: 60, ventilation_acfm_per_occupant: 2, occupant_count: 2, treatment_minutes: 240, air_inventory_cuft: 8000, oxygen_acfm_per_occupant: 1.0, oxygen_minutes: 120 };
+  const r = _v1562(base);
+  assert.ok(Math.abs(r.treatment_ata - 74.7 / 14.7) < 1e-12);
+  assert.ok(Math.abs(r.pressurize_cuft - 250 * r.treatment_ata) < 1e-9);
+  assert.ok(Math.abs(r.pressurize_cuft - 1270.41) < 1e-1);
+  // Ventilation is the term that dominates, and both shares sum to exactly
+  // one hundred percent.
+  assert.ok(Math.abs(r.ventilation_cuft - 4878.37) < 1e-1);
+  assert.ok(Math.abs(r.total_air_cuft - (r.pressurize_cuft + r.ventilation_cuft)) < 1e-9);
+  assert.ok(Math.abs(r.ventilation_share_pct + r.pressurize_share_pct - 100) < 1e-9);
+  assert.ok(Math.abs(r.ventilation_share_pct - 79.3388) < 1e-3);
+  assert.ok(r.ventilation_cuft > r.pressurize_cuft);
+  // At zero gauge pressure the chamber holds exactly its own volume of free
+  // air: the degenerate case that pins the pressurization relation.
+  const surface = _v1562({ ...base, treatment_pressure_psig: 1e-12 });
+  assert.ok(Math.abs(surface.treatment_ata - 1) < 1e-12);
+  assert.ok(Math.abs(surface.pressurize_cuft - 250) < 1e-9);
+  // Ventilation is exactly linear in duration and in occupants; pressurization
+  // is not a function of either, which is why the split moves with the table.
+  const long = _v1562({ ...base, treatment_minutes: 480 });
+  assert.ok(Math.abs(long.ventilation_cuft - 2 * r.ventilation_cuft) < 1e-9);
+  assert.ok(Math.abs(long.pressurize_cuft - r.pressurize_cuft) < 1e-12);
+  assert.ok(long.ventilation_share_pct > r.ventilation_share_pct);
+  assert.ok(Math.abs(_v1562({ ...base, occupant_count: 4 }).ventilation_cuft - 2 * r.ventilation_cuft) < 1e-9);
+  // The longest supportable treatment round-trips to exactly the inventory.
+  assert.ok(Math.abs(r.longest_treatment_min - 331.074) < 1e-2);
+  assert.ok(Math.abs(_v1562({ ...base, treatment_minutes: r.longest_treatment_min }).total_air_cuft - 8000) < 1e-6);
+  assert.ok(r.longest_treatment_min > 240);
+  assert.ok(r.inventory_verdict.includes("covers this treatment"));
+  assert.ok(_v1562({ ...base, treatment_minutes: 400 }).inventory_verdict.includes("SHORT"));
+  // Oxygen is its own number and scales with the same absolute pressure.
+  assert.ok(Math.abs(r.oxygen_required_cuft - 1.0 * r.treatment_ata * 120) < 1e-12);
+  assert.ok(Math.abs(r.oxygen_required_cuft - 609.796) < 1e-2);
+  assert.ok("error" in _v1562({ ...base, chamber_volume_cuft: 0 }));
+  assert.ok("error" in _v1562({ ...base, treatment_pressure_psig: 0 }));
+  assert.ok("error" in _v1562({ ...base, ventilation_acfm_per_occupant: 0 }));
+  assert.ok("error" in _v1562({ ...base, occupant_count: 0 }));
+  assert.ok("error" in _v1562({ ...base, treatment_minutes: 0 }));
+  assert.ok("error" in _v1562({ ...base, air_inventory_cuft: 0 }));
+  assert.ok("error" in _v1562({ ...base, oxygen_minutes: 0 }));
+  assert.ok("error" in _v1562({ ...base, chamber_volume_cuft: Infinity }));
+});

@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "d9fbc8def6d46736",
+      "sha": "5b6381ff82323d51",
       "date": "2026-09-06"
     },
     "/tools/": {
-      "sha": "91ffb86939f75aa0",
+      "sha": "ee62e91deda2c581",
       "date": "2026-09-06"
     },
     "/groups/accounting/": {
-      "sha": "cbd6b761c734a6a0",
+      "sha": "9f81714cbf1705a7",
       "date": "2026-09-06"
     },
     "/groups/agriculture/": {
-      "sha": "c44843e35b81f4ac",
+      "sha": "8b8493021c2827a4",
       "date": "2026-09-06"
     },
     "/groups/construction/": {
-      "sha": "1ba053af5a18b60a",
+      "sha": "620143425c2e4d8c",
       "date": "2026-09-06"
     },
     "/groups/cross-trade/": {
-      "sha": "adab669d24af339d",
+      "sha": "b4599d66f9430736",
       "date": "2026-09-06"
     },
     "/groups/educators/": {
-      "sha": "86283ce41d5f52cd",
+      "sha": "7529663f7a86c6cf",
       "date": "2026-09-06"
     },
     "/groups/electrical/": {
-      "sha": "639d429f4b3f403d",
+      "sha": "7ccbf6edf7d20261",
       "date": "2026-09-06"
     },
     "/groups/field/": {
-      "sha": "0ba63a20afff3f4a",
+      "sha": "e63b537d8907f862",
       "date": "2026-09-06"
     },
     "/groups/fire-ground/": {
-      "sha": "21d3d070cbf59816",
+      "sha": "3b1bd6593c8889ab",
       "date": "2026-09-06"
     },
     "/groups/historical/": {
-      "sha": "b933dfa7d3075046",
+      "sha": "6ad39ea0066e3fba",
       "date": "2026-09-06"
     },
     "/groups/hvac/": {
-      "sha": "bf6d3bfb72d04539",
+      "sha": "9d52a32b581f628e",
       "date": "2026-09-06"
     },
     "/groups/kitchen/": {
-      "sha": "3074cb59a53b1ffc",
+      "sha": "77936d31a270c73d",
       "date": "2026-09-06"
     },
     "/groups/lab/": {
-      "sha": "600bbe25ab34145f",
+      "sha": "3169e8a6a38989b0",
       "date": "2026-09-06"
     },
     "/groups/mechanic/": {
-      "sha": "7436cffe787905ec",
+      "sha": "69fa0be14641e434",
       "date": "2026-09-06"
     },
     "/groups/plumbing/": {
-      "sha": "a8b77c714806d9bc",
+      "sha": "a8626e3962e80b32",
       "date": "2026-09-06"
     },
     "/groups/real-estate/": {
-      "sha": "c985c67b85297cd9",
+      "sha": "530031720fc2f566",
       "date": "2026-09-06"
     },
     "/groups/references/": {
-      "sha": "558cde88fbfac9a4",
+      "sha": "50870538253857a4",
       "date": "2026-09-06"
     },
     "/groups/restoration/": {
-      "sha": "242014f58eb55d80",
+      "sha": "d1a9bb9b40f6cb50",
       "date": "2026-09-06"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "a1db33caba06a3f5",
+      "sha": "e27222a1904b68af",
       "date": "2026-09-06"
     },
     "/groups/stage/": {
-      "sha": "46e35201009d3cfd",
+      "sha": "32aac4c8422334d0",
       "date": "2026-09-06"
     },
     "/groups/trucking/": {
-      "sha": "d6653670d15d7c77",
+      "sha": "904e7b6c5d149d22",
       "date": "2026-09-06"
     },
     "/groups/water/": {
-      "sha": "92a9e4b07d3e8c37",
+      "sha": "932663916f7196b5",
       "date": "2026-09-06"
     },
     "/tools/aav-install-check/": {
@@ -422,8 +422,8 @@
       "date": "2026-09-01"
     },
     "/tools/barrel-volume/": {
-      "sha": "fdb5e4a93964eade",
-      "date": "2026-09-04"
+      "sha": "66b87cf5a5bca684",
+      "date": "2026-09-06"
     },
     "/tools/barstock-cutlist/": {
       "sha": "a4198647bf9e0c3f",
@@ -956,6 +956,10 @@
     "/tools/chamber-cc-for-cr/": {
       "sha": "7ce378c934a6d5c8",
       "date": "2026-09-01"
+    },
+    "/tools/chamber-gas-volume/": {
+      "sha": "dec34c35731b49c5",
+      "date": "2026-09-06"
     },
     "/tools/chamber-turnover/": {
       "sha": "299b4b95da28780d",
@@ -4225,6 +4229,18 @@
       "sha": "5ce9d465454335ae",
       "date": "2026-09-01"
     },
+    "/tools/nitrox-ead/": {
+      "sha": "e975b2b0701cc18d",
+      "date": "2026-09-06"
+    },
+    "/tools/nitrox-mod/": {
+      "sha": "b637a45aeba5f30f",
+      "date": "2026-09-06"
+    },
+    "/tools/no-decompression-limit/": {
+      "sha": "6298e3b5cad1ea14",
+      "date": "2026-09-06"
+    },
     "/tools/noise-dose/": {
       "sha": "9882a2f56ad74f49",
       "date": "2026-09-01"
@@ -6118,8 +6134,8 @@
       "date": "2026-09-01"
     },
     "/tools/spray-booth-airflow/": {
-      "sha": "9e4a892baa92ce14",
-      "date": "2026-09-04"
+      "sha": "70b8236fd4670964",
+      "date": "2026-09-06"
     },
     "/tools/spray-drift-buffer/": {
       "sha": "24729eb8a21b7515",
@@ -6520,6 +6536,10 @@
     "/tools/surety-bond-premium/": {
       "sha": "038d8b2510a1b678",
       "date": "2026-09-01"
+    },
+    "/tools/surface-air-consumption/": {
+      "sha": "a165abea6124ca21",
+      "date": "2026-09-06"
     },
     "/tools/surface-condensation-risk/": {
       "sha": "81939ee40fa566c8",
@@ -7048,6 +7068,10 @@
     "/tools/ujoint-operating-angle/": {
       "sha": "7e668ec62c12a91e",
       "date": "2026-09-01"
+    },
+    "/tools/umbilical-air-supply/": {
+      "sha": "df109d39da37e3f9",
+      "date": "2026-09-06"
     },
     "/tools/unit-converter/": {
       "sha": "a19618c4811f446a",

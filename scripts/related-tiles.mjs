@@ -1535,6 +1535,13 @@ const RELATED = {
   "turbine-density-correction": ["air-density-correction","wind-power-density-betz","tip-speed-ratio"],
   "yaw-error-loss": ["tip-speed-ratio","turbine-density-correction","wind-power-density-betz"],
   "gin-pole-uptower-lift": ["sling-angle","wind-on-load","guy-wire-tension"],
+  // spec-v1557..v1562: the 2026-09-06 trade-expansion diving band.
+  "no-decompression-limit": ["nitrox-ead","surface-air-consumption","nitrox-mod"],
+  "surface-air-consumption": ["scba-cylinder-time","no-decompression-limit","umbilical-air-supply"],
+  "nitrox-mod": ["nitrox-ead","no-decompression-limit","surface-air-consumption"],
+  "nitrox-ead": ["nitrox-mod","no-decompression-limit","surface-air-consumption"],
+  "umbilical-air-supply": ["surface-air-consumption","chamber-gas-volume","scba-cylinder-time"],
+  "chamber-gas-volume": ["umbilical-air-supply","ideal-gas-law","surface-air-consumption"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   "grounding-electrode-conductor": ["bonding-jumper","egc-sizing","grounding-electrode"],
   "bonding-jumper": ["grounding-electrode-conductor","egc-sizing","service-load-standard"],

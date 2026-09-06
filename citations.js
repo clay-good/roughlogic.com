@@ -21775,6 +21775,79 @@ export const CITATIONS = {
       { name: "The manufacturer's provisions govern absolutely", value: "rated capacities, allowable geometries, and permitted wind speeds", source: "turbine service instructions" },
     ],
   },
+  // spec-v1557..v1562: the 2026-09-06 trade-expansion diving band. Group G.
+  "no-decompression-limit": {
+    formula: "adjusted no-decompression limit = the table's limit for the depth - the residual nitrogen time the table gives for the repetitive group and surface interval; credited bottom time = residual nitrogen time + planned bottom time; a nitrox mix enters the AIR table at the equivalent air depth ((1 - FO2) / 0.79) x (depth + 33) - 33.",
+    edition: "The repetitive-dive bookkeeping by name. NO FORMULA PRODUCES A NO-DECOMPRESSION LIMIT and none is attempted: the limit and the residual are entered from whichever table or algorithm the operation uses, and they must come from the same one. The applicable dive tables or computer algorithm, the diving supervisor, and the operation's diving safety manual govern.",
+    freeAccess: "Subtraction on figures the diver reads from their own table; no dive table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The limit falls very steeply with depth, so the difference between a moderate depth and a deeper one is not a proportional loss of bottom time but a large one -- which is why depth discipline matters more than time discipline on a working dive, and why a few feet deeper than planned can consume the whole margin. Repetitive diving is where the arithmetic lives: a diver surfacing carries residual nitrogen that off-gasses over the surface interval, and the table converts what is left into minutes that count against the next dive as though they had already been spent at that depth. On a short surface interval the adjusted limit can be a small fraction of the headline number, and the trade of surface interval against bottom time is the whole structure of a repetitive dive plan. Different tables and algorithms give materially different answers for the same profile and are validated as complete systems, so mixing a limit from one with a residual from another is not valid. Sea-level tables do not apply at altitude and a separate procedure governs.",
+    assumptions: [
+      { name: "No formula gives an NDL", value: "the table or algorithm does, and this is the bookkeeping around it", source: "dive table practice" },
+      { name: "Limit and residual come from ONE table", value: "mixing sources is not valid", source: "dive table practice" },
+      { name: "Altitude needs a separate procedure", value: "sea-level tables do not apply", source: "altitude diving procedure" },
+    ],
+  },
+  "surface-air-consumption": {
+    formula: "consumption at depth = the measured surface air consumption x the absolute pressure (1 + depth / 33 seawater); rock bottom = the team's elevated rate x the ascent time at the average ascent pressure, plus the stop time at the stop pressure; usable gas = cylinder volume - rock bottom.",
+    edition: "The standard gas-planning relations by name. The operation's diving safety manual, the diving supervisor, and the applicable regulations govern.",
+    freeAccess: "Volume arithmetic on the diver's own measured consumption and cylinder; no proprietary planning table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "A diver's consumption at depth is their surface rate times the absolute pressure, because each breath contains proportionally more gas -- which is why bottom time falls so much faster with depth than people expect. The number worth building a plan around is not gas needed but gas RESERVED: rock bottom is the volume required for the whole team to reach the surface from the deepest point, at a controlled ascent rate, with a stop, sharing gas, and it is computed FIRST and subtracted so the usable gas is what remains. Planning to a fraction like turn-at-a-third happens to approximate this on some dives and badly underestimates it on others, particularly deep ones where the ascent itself consumes a great deal. Surface air consumption is personal and is not constant -- it rises with work rate, cold, stress, and poor trim -- so the reserve is computed at an ELEVATED rate rather than the measured one, and a rate measured on a calm dive underestimates a hard working dive. The average pressure over the ascent is a linear approximation to a real ascent.",
+    assumptions: [
+      { name: "Reserve first, dive second", value: "usable gas is what the reserve leaves, not what the cylinder holds", source: "gas planning practice" },
+      { name: "The reserve uses an elevated rate", value: "a measured calm-dive rate underestimates a real emergency", source: "gas planning practice" },
+      { name: "One stop only", value: "gas for a decompression profile is not computed here", source: "the operation's dive plan" },
+    ],
+  },
+  "nitrox-mod": {
+    formula: "ppO2 = the oxygen fraction x the absolute pressure (1 + depth / 33 seawater); maximum operating depth = 33 x (the ppO2 limit / the oxygen fraction - 1); best mix for a depth = the ppO2 limit / the absolute pressure, FLOORED to a blendable whole percent.",
+    edition: "The oxygen partial-pressure relations by name, with 1.4 ata as the customary working limit and 1.6 ata as a contingency and decompression figure used at rest. The operation's diving safety manual, the applicable training agency or regulatory limits, a gas analysis before every dive, and the diving supervisor govern.",
+    freeAccess: "Partial-pressure arithmetic on the user's own mix and depth; no agency table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Partial pressure is the fraction times the absolute pressure, so a richer mix hits any given oxygen limit SHALLOWER -- more oxygen buys less inert gas and longer no-decompression time, and it buys a hard depth ceiling in exchange. The two limits are not interchangeable. The working limit covers the active portion of a dive and is chosen with margin because exertion, cold, and carbon dioxide retention all raise susceptibility, and because oxygen toxicity at depth presents as a seizure with no reliable prodrome; the higher figure is a contingency and decompression value used at rest, and treating it as a working limit removes the margin that exists precisely because the failure mode underwater is drowning. THE BLEND FIGURE ROUNDS DOWN. The exact best mix is almost never a whole percent, and rounding it up puts the diver past the very limit it was solving for, so the floored blend and the ppO2 it actually produces are what is reported. Whatever the arithmetic returns, the mix must be analysed before use: the number on the cylinder is a label and the analyser is the fact.",
+    assumptions: [
+      { name: "1.4 working, 1.6 contingency", value: "and treating the contingency figure as a working limit removes the margin", source: "nitrox practice" },
+      { name: "A blend figure rounds DOWN", value: "rounding up puts the diver past the limit being solved for", source: "gas blending practice" },
+      { name: "The analyser is the fact", value: "the number on the cylinder is a label", source: "gas analysis practice" },
+    ],
+  },
+  "nitrox-ead": {
+    formula: "EAD = ((1 - FO2) / 0.79) x (depth + 33) - 33 in seawater feet, which holds the nitrogen partial pressure equal to that of air at the equivalent depth; the oxygen check ppO2 = FO2 x (1 + depth / 33) is run on the same inputs, and the richest usable mix is the ppO2 limit / the absolute pressure, floored to a whole percent.",
+    edition: "The equivalent air depth relation by name, for two-gas nitrox only; trimix needs a different treatment and equivalent narcotic depth is a different calculation. The operation's diving safety manual, the applicable tables, a gas analysis before every dive, and the diving supervisor govern.",
+    freeAccess: "Arithmetic on the user's own mix and depth; no dive table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The whole idea is to hold the nitrogen partial pressure constant: a nitrox mix has less nitrogen than air, so at a given depth it loads a diver the way a shallower air dive would, and once that equivalent depth is known an air table or algorithm applies without modification. What it buys is real and bounded, and it buys nothing at all on the oxygen side -- the same mix that extends the nitrogen clock brings the oxygen ceiling UP to meet you, and the two limits close on each other as the mix gets richer. A DIVE PLANNED ON EQUIVALENT AIR DEPTH ALONE HAS SOLVED HALF THE PROBLEM, which is why the oxygen check runs here on the same inputs and is reported beside the answer rather than left to a second calculation someone may not make, and why the richest mix the depth actually permits is given when it fails. That mix is floored to a blendable whole percent for the same reason as the maximum operating depth: rounding a mix up puts the diver past the limit.",
+    assumptions: [
+      { name: "EAD and MOD are read together", value: "a plan built on one of them is not a plan", source: "nitrox practice" },
+      { name: "Two-gas nitrox only", value: "helium has its own kinetics and needs a different treatment", source: "trimix practice" },
+      { name: "The usable mix is floored", value: "rounding up puts the diver past the oxygen limit", source: "gas blending practice" },
+    ],
+  },
+  "umbilical-air-supply": {
+    formula: "required flow = the rate per diver x the absolute pressure (1 + depth / 33 seawater) x the number of divers including the standby; the deepest compliant depth = 33 x (compressor capacity / (rate x divers) - 1); the volume tank's free gas = its capacity x its pressure / 14.7 psi.",
+    edition: "The surface-supplied flow relation by name, with the independent reserve breathing supply named as a SEPARATE regulatory requirement. The rate per diver is set by the applicable regulation, not by arithmetic. The applicable commercial diving regulations, the operation's diving safety manual, and the diving supervisor govern.",
+    freeAccess: "Flow arithmetic on the spread's own equipment figures; no regulatory table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The requirement scales with absolute pressure exactly as a scuba diver's does, so a compressor sized for shallow work falls short in deeper water with no change in the number of divers and no warning that anything has changed. The diver count multiplies it directly and the standby diver counts -- a spread sized for the divers in the water is undersized. The reserve is regulatory rather than engineering and is a separate calculation from the flow: surface-supplied diving requires an independent reserve breathing supply, sized to bring the diver to the surface from the maximum depth including any required decompression, and available without the diver having to do anything to switch to it. A volume tank that meets the flow requirement but not the reserve requirement does not comply, so both margins are reported and passing one is not passing. The useful output for a supervisor is the depth at which the spread stops meeting the requirement, because that is the limit that otherwise gets discovered at the dive station.",
+    assumptions: [
+      { name: "The standby diver counts", value: "a spread sized for the divers in the water is undersized", source: "commercial diving regulations" },
+      { name: "Reserve is separate from flow", value: "meeting one requirement is not meeting the other", source: "commercial diving regulations" },
+      { name: "The rate per diver is regulatory", value: "it depends on jurisdiction, mode of diving, and depth", source: "the applicable regulation" },
+    ],
+  },
+  "chamber-gas-volume": {
+    formula: "free air to pressurize = the chamber's internal volume x the absolute pressure (gauge psi + 14.7) / 14.7; ventilation air = the rate per occupant x the occupants x that same absolute pressure x the treatment duration; the longest supportable treatment = (inventory - pressurization) / the free-air ventilation rate.",
+    edition: "The chamber gas relations by name. The applicable treatment tables, a diving medical officer, the chamber manufacturer, the operation's diving safety manual, and the applicable regulations govern.",
+    freeAccess: "Volume arithmetic on the chamber's own dimensions and the operation's inventory; no treatment table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The pressurization term is one chamber volume of free gas per atmosphere absolute, and it is larger than people expect -- but it is usually the SMALLER half. Ventilation dominates, because carbon dioxide from the occupants has to be flushed continuously and the required ventilation rate is itself multiplied by the absolute pressure, so the two effects compound over a long treatment; the split between them is reported because a supply sized on pressurization alone covers only a fraction of the requirement and the fraction is not intuitive. That is why a treatment table consumes gas out of all proportion to the chamber's size, and why the supply calculation has to cover the LONGEST table the operation might run plus its extensions rather than the shortest -- a chamber with gas for a short table and a patient who needs a long one with extensions is a serious problem discovered under the worst possible circumstances. Oxygen is a separate inventory with its own cylinder bank, and running out of it ends the treatment as surely as running out of air.",
+    assumptions: [
+      { name: "Ventilation dominates, not pressurization", value: "a supply sized on pressurization alone covers a fraction of the need", source: "chamber operations" },
+      { name: "Size against the LONGEST table", value: "plus its extensions, not the shortest", source: "treatment table practice" },
+      { name: "Oxygen is its own inventory", value: "running out of it ends the treatment", source: "chamber operations" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

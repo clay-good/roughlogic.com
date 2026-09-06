@@ -891,6 +891,13 @@ const _TILES = [
   ["turbine-density-correction", "A"],
   ["yaw-error-loss", "A"],
   ["gin-pole-uptower-lift", "A"],
+  // spec-v1557..v1562 diving band (Group G)
+  ["no-decompression-limit", "G"],
+  ["surface-air-consumption", "G"],
+  ["nitrox-mod", "G"],
+  ["nitrox-ead", "G"],
+  ["umbilical-air-supply", "G"],
+  ["chamber-gas-volume", "G"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   ["grounding-electrode-conductor", "A"],
   ["bonding-jumper", "A"],

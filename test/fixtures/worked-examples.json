@@ -97464,6 +97464,410 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "no-decompression-limit",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "60 ft second dive, table NDL 55 min, 21 min residual, 30 min planned, EAN32",
+   "source_edition_or_year": "adjusted = table NDL - residual; EAD = ((1-FO2)/0.79)(d+33)-33",
+   "source_section_or_page": "the applicable dive tables and the diving supervisor govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-06",
+   "inputs": {
+    "planned_depth_ft": 60,
+    "table_ndl_min": 55,
+    "residual_nitrogen_time_min": 21,
+    "planned_bottom_time_min": 30,
+    "alt_residual_time_min": 9,
+    "oxygen_fraction": 0.32,
+    "feet_per_atm": 33
+   },
+   "outputs": {
+    "adjusted_ndl_min": {
+     "value": 34.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "credited_bottom_time_min": {
+     "value": 51.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "remaining_min": {
+     "value": 4.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_adjusted_ndl_min": {
+     "value": 46.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "surface_interval_gain_min": {
+     "value": 12.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "equivalent_air_depth_ft": {
+     "value": 47.0506,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "surface-air-consumption",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "0.65 cu ft/min SAC, 25 min at 80 ft, 80 cu ft cylinder, two divers to a 15 ft stop",
+   "source_edition_or_year": "rate at depth = SAC x (1 + d/33); rock bottom = team x stress rate x (ascent at avg ata + stop at stop ata)",
+   "source_section_or_page": "the operation's diving safety manual and the supervisor govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-06",
+   "inputs": {
+    "sac_cuft_per_min": 0.65,
+    "planned_depth_ft": 80,
+    "planned_bottom_time_min": 25,
+    "cylinder_volume_cuft": 80,
+    "team_size": 2,
+    "ascent_rate_fpm": 30,
+    "stop_depth_ft": 15,
+    "stop_time_min": 3,
+    "stress_sac_cuft_per_min": 1.0,
+    "feet_per_atm": 33
+   },
+   "outputs": {
+    "depth_ata": {
+     "value": 3.42424,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rate_at_depth_cuft_min": {
+     "value": 2.22576,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bottom_gas_cuft": {
+     "value": 55.6439,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ascent_gas_cuft": {
+     "value": 10.5707,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "stop_gas_cuft": {
+     "value": 8.72727,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rock_bottom_cuft": {
+     "value": 19.298,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "usable_gas_cuft": {
+     "value": 60.702,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_bottom_time_min": {
+     "value": 27.2725,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "naive_bottom_time_min": {
+     "value": 35.9428,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "nitrox-mod",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "EAN32 at the 1.4 ata working limit, planned to 80 ft",
+   "source_edition_or_year": "MOD = 33 x (ppO2 limit / FO2 - 1); ppO2 = FO2 x (1 + d/33); best mix floored to a whole percent",
+   "source_section_or_page": "a gas analysis before every dive and the diving supervisor govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-06",
+   "inputs": {
+    "oxygen_fraction": 0.32,
+    "ppo2_limit": 1.4,
+    "contingency_ppo2_limit": 1.6,
+    "planned_depth_ft": 80,
+    "feet_per_atm": 33
+   },
+   "outputs": {
+    "depth_ata": {
+     "value": 3.42424,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ppo2_at_depth": {
+     "value": 1.09576,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "mod_working_ft": {
+     "value": 111.375,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "mod_contingency_ft": {
+     "value": 132.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "best_mix_fraction": {
+     "value": 0.40885,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "best_mix_pct_floor": {
+     "value": 40.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "best_mix_ppo2": {
+     "value": 1.3697,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "air_mod_ft": {
+     "value": 187.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "nitrox-ead",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "EAN36 at 100 ft: 74.7 ft equivalent air depth, and an oxygen check that fails",
+   "source_edition_or_year": "EAD = ((1-FO2)/0.79)(d+33)-33; ppO2 = FO2 x (1 + d/33); usable mix floored to a whole percent",
+   "source_section_or_page": "a gas analysis before every dive and the diving supervisor govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-06",
+   "inputs": {
+    "oxygen_fraction": 0.36,
+    "depth_ft": 100,
+    "target_ead_ft": 80,
+    "ppo2_limit": 1.4,
+    "feet_per_atm": 33
+   },
+   "outputs": {
+    "nitrogen_fraction": {
+     "value": 0.64,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "equivalent_air_depth_ft": {
+     "value": 74.7468,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "depth_reduction_ft": {
+     "value": 25.2532,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pn2_at_depth": {
+     "value": 2.57939,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ppo2_at_depth": {
+     "value": 1.45091,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "deepest_usable_pct_floor": {
+     "value": 34.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "deepest_usable_ppo2": {
+     "value": 1.3703,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "deepest_usable_ead_ft": {
+     "value": 78.1139,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "umbilical-air-supply",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Two divers plus a standby at 100 ft, 1.4 acfm each, against a 20 scfm compressor",
+   "source_edition_or_year": "Q = rate x (1 + d/33) x divers; max depth = 33 x (capacity/(rate x divers) - 1)",
+   "source_section_or_page": "the applicable commercial diving regulations and the supervisor govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-06",
+   "inputs": {
+    "diver_count": 3,
+    "depth_ft": 100,
+    "rate_per_diver_acfm": 1.4,
+    "compressor_scfm": 20,
+    "alt_depth_ft": 190,
+    "reserve_minutes": 10,
+    "volume_tank_cuft": 8,
+    "tank_pressure_psi": 200,
+    "feet_per_atm": 33
+   },
+   "outputs": {
+    "depth_ata": {
+     "value": 4.0303,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "per_diver_acfm": {
+     "value": 5.64242,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_acfm": {
+     "value": 16.9273,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "compressor_margin_acfm": {
+     "value": 3.07273,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_required_acfm": {
+     "value": 28.3818,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_depth_ft": {
+     "value": 124.143,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "reserve_required_cuft": {
+     "value": 56.4242,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tank_free_gas_cuft": {
+     "value": 108.844,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "chamber-gas-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "250 cu ft chamber at 60 psig, two occupants at 2 acfm over a four hour treatment",
+   "source_edition_or_year": "pressurize = V x (psig + 14.7)/14.7; ventilation = rate x occupants x that ata x minutes",
+   "source_section_or_page": "the applicable treatment tables and a diving medical officer govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-06",
+   "inputs": {
+    "chamber_volume_cuft": 250,
+    "treatment_pressure_psig": 60,
+    "ventilation_acfm_per_occupant": 2,
+    "occupant_count": 2,
+    "treatment_minutes": 240,
+    "air_inventory_cuft": 8000,
+    "oxygen_acfm_per_occupant": 1.0,
+    "oxygen_minutes": 120
+   },
+   "outputs": {
+    "treatment_ata": {
+     "value": 5.08163,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pressurize_cuft": {
+     "value": 1270.41,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ventilation_cfm_free": {
+     "value": 20.3265,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ventilation_cuft": {
+     "value": 4878.37,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_air_cuft": {
+     "value": 6148.78,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ventilation_share_pct": {
+     "value": 79.3388,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "oxygen_required_cuft": {
+     "value": 609.796,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "longest_treatment_min": {
+     "value": 331.074,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

@@ -907,6 +907,13 @@ export const RENDERER_MAP = {
   "turbine-density-correction": { module: "../../calc-wind.js", exportName: "WIND_RENDERERS" },
   "yaw-error-loss": { module: "../../calc-wind.js", exportName: "WIND_RENDERERS" },
   "gin-pole-uptower-lift": { module: "../../calc-wind.js", exportName: "WIND_RENDERERS" },
+  // spec-v1557..v1562 diving band
+  "no-decompression-limit": { module: "../../calc-diving.js", exportName: "DIVING_RENDERERS" },
+  "surface-air-consumption": { module: "../../calc-diving.js", exportName: "DIVING_RENDERERS" },
+  "nitrox-mod": { module: "../../calc-diving.js", exportName: "DIVING_RENDERERS" },
+  "nitrox-ead": { module: "../../calc-diving.js", exportName: "DIVING_RENDERERS" },
+  "umbilical-air-supply": { module: "../../calc-diving.js", exportName: "DIVING_RENDERERS" },
+  "chamber-gas-volume": { module: "../../calc-diving.js", exportName: "DIVING_RENDERERS" },
   "horizontal-curve": { module: "../../calc-civil.js", exportName: "CIVIL_RENDERERS" },
   "spiral-curve": { module: "../../calc-civil.js", exportName: "CIVIL_RENDERERS" },
   "compound-curve": { module: "../../calc-civil.js", exportName: "CIVIL_RENDERERS" },
