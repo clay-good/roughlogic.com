@@ -1636,6 +1636,13 @@ export const COMPUTE_MAP = {
   "vacuum-excavation-spoil": { module: "../../calc-trenchless.js", fn: "computeVacuumExcavationSpoil" },
   "pipe-bursting-pull-load": { module: "../../calc-trenchless.js", fn: "computePipeBurstingPullLoad" },
   "cipp-liner-thickness": { module: "../../calc-trenchless.js", fn: "computeCippLinerThickness" },
+  // spec-v1582..v1587 sawmill and forest-products band
+  "lumber-recovery-overrun": { module: "../../calc-sawmill.js", fn: "computeLumberRecoveryOverrun" },
+  "kiln-drying-time": { module: "../../calc-sawmill.js", fn: "computeKilnDryingTime" },
+  "kiln-charge-water": { module: "../../calc-sawmill.js", fn: "computeKilnChargeWater" },
+  "bandmill-speed-bite": { module: "../../calc-sawmill.js", fn: "computeBandmillSpeedBite" },
+  "sawmill-residue-yield": { module: "../../calc-sawmill.js", fn: "computeSawmillResidueYield" },
+  "log-truck-payload": { module: "../../calc-sawmill.js", fn: "computeLogTruckPayload" },
   "grounding-electrode-conductor": { module: "../../calc-electrical.js", fn: "computeGroundingElectrodeConductor" },
   "bonding-jumper": { module: "../../calc-electrical.js", fn: "computeBondingJumper" },
   "min-conductor-for-vd": { module: "../../calc-electrical.js", fn: "computeMinConductorForVd" },

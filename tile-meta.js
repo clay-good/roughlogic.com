@@ -876,6 +876,13 @@ const _TILES = [
   ["vacuum-excavation-spoil", "E"],
   ["pipe-bursting-pull-load", "E"],
   ["cipp-liner-thickness", "E"],
+  // spec-v1582..v1587 sawmill and forest-products band (Group L)
+  ["lumber-recovery-overrun", "L"],
+  ["kiln-drying-time", "L"],
+  ["kiln-charge-water", "L"],
+  ["bandmill-speed-bite", "L"],
+  ["sawmill-residue-yield", "L"],
+  ["log-truck-payload", "L"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   ["grounding-electrode-conductor", "A"],
   ["bonding-jumper", "A"],

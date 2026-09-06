@@ -700,6 +700,13 @@ export const TOOL_MODULES = (() => {
     "locate-depth-offset", "vacuum-excavation-spoil", "pipe-bursting-pull-load",
     "cipp-liner-thickness",
   ]);
+  // spec-v1582..v1587: the sawmill and forest-products bench. The catalog
+  // followed a log to the stump and stopped; these six follow it into the
+  // mill, the kiln, and onto the truck. All six keep group "L".
+  declare("./calc-sawmill.js", "SAWMILL_RENDERERS", [
+    "lumber-recovery-overrun", "kiln-drying-time", "kiln-charge-water",
+    "bandmill-speed-bite", "sawmill-residue-yield", "log-truck-payload",
+  ]);
   // spec-v80 cap-relief split: the spec-v25 site-civil / roadway-geometry
   // quartet moved out of calc-construction.js (it sat at 95.0% of its size
   // cap, the tightest remaining calculator module) into its own module. All

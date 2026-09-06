@@ -1,7 +1,7 @@
 # Scope: The 2026-09-05 Trade Expansion (specs v1450-v1749, 300 New Tiles)
 
 > **Status: IN PROGRESS (2026-09-05). Program charter, no catalog change of its own.**
-> **Bands 1-6 have landed: railroad track, elevator and escalator, door hardware and locksmithing, mining and quarry, and trenchless, 1,804 -> 1,856. Three specs cut as duplicates.**
+> **Bands 1-7 have landed: railroad track, elevator and escalator, door hardware and locksmithing, mining and quarry, trenchless, and sawmill, 1,804 -> 1,862. Three specs cut as duplicates.**
 > Inherits the spec-v106 trades-only charter and every convention through spec-v1449.
 > Each of the 300 tiles is specified in its own file, `spec-v1450.md` through `spec-v1749.md`.
 
@@ -548,9 +548,10 @@ things must happen **before** the first band, not during it:
 | 4 | v1507-v1516 | `calc-mining.js` (new) | 10 | mining, quarry, and drill-and-blast; catalog 1,833 -> 1,843 |
 | 5 | v1517-v1523 | `calc-mining.js` | 6 | the rest of the mining bench; catalog 1,843 -> 1,849. **spec-v1520 CUT** as a duplicate of `shotcrete-rebound-quantity`, whose reverse check it became |
 | 6 | v1596-v1604 | `calc-trenchless.js` (new) | 7 | trenchless, HDD and utility locating; catalog 1,849 -> 1,856. **spec-v1596 and spec-v1604 CUT** as duplicates of `hdd-pullback` and `manning-slope`, both of which gained the material those specs added |
+| 7 | v1582-v1587 | `calc-sawmill.js` (new) | 6 | sawmill and forest products; catalog 1,856 -> 1,862. No cut and no internally wrong spec -- the first band of this program with neither |
 
-**Ten of the fifty-four specs built so far were internally wrong and shipped corrected, and
-THREE have been cut as duplicates.** Band 6 added spec-v1597, whose rule line says a steel
+**Ten of the sixty specs built so far were internally wrong and shipped corrected, and
+THREE have been cut as duplicates.** Band 7 was clean in both respects. Band 6 added spec-v1597, whose rule line says a steel
 pipe's minimum bend radius in FEET is 100 times its diameter in INCHES and whose prose says a
 12 degree entry on a thousand-foot radius takes "over 200 feet of run" -- while its worked
 example computes `100 x 12.75 in = 1,275 in = 106 ft` and gets a 22 ft run. The rule and the

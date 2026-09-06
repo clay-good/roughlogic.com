@@ -1520,6 +1520,13 @@ const RELATED = {
   "vacuum-excavation-spoil": ["locate-depth-offset","excavation","spoil-setback"],
   "pipe-bursting-pull-load": ["hdd-pullback","cipp-liner-thickness","manning-slope"],
   "cipp-liner-thickness": ["pipe-bursting-pull-load","manning-slope","pipe-partial-flow-depth"],
+  // spec-v1582..v1587: the 2026-09-05 trade-expansion sawmill band.
+  "lumber-recovery-overrun": ["timber-cruise","sawmill-residue-yield","board-footage"],
+  "kiln-drying-time": ["kiln-charge-water","wood-emc","lumber-recovery-overrun"],
+  "kiln-charge-water": ["kiln-drying-time","wood-emc","log-limb-weight"],
+  "bandmill-speed-bite": ["sawmill-residue-yield","lumber-recovery-overrun","cutting-speed-rpm"],
+  "sawmill-residue-yield": ["lumber-recovery-overrun","bandmill-speed-bite","chipper-debris"],
+  "log-truck-payload": ["log-limb-weight","timber-cruise","axle-load-distribution"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   "grounding-electrode-conductor": ["bonding-jumper","egc-sizing","grounding-electrode"],
   "bonding-jumper": ["grounding-electrode-conductor","egc-sizing","service-load-standard"],

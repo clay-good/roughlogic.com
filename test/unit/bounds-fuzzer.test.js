@@ -44044,3 +44044,297 @@ test("follow-up spec-v1604: an entered scour velocity and an as-built check", ()
   assert.ok("error" in _v1604({ ...base, scour_velocity_fps: 0 }));
   assert.ok("error" in _v1604({ ...base, actual_slope_in_per_ft: -1 }));
 });
+
+// ===========================================================================
+// spec-v1582..v1587: the 2026-09-05 trade-expansion sawmill and forest
+// products band. Nothing was cut; the formula screen ran against
+// `timber-cruise` (which scales a log and never compares the scale to a
+// tally), `grain-drying-energy` and `grain-shrink-moisture` (both on the WET
+// basis, where the kiln is on the OVEN-DRY basis), `cutting-speed` (a
+// rotating cutter's forward feed, where the bandmill is a linear band's
+// inverse bite), `chipper-debris`, `log-limb-weight`, and
+// `axle-load-distribution`. All six were kept.
+// ===========================================================================
+
+import { computeLumberRecoveryOverrun as _v1582 } from "../../calc-sawmill.js";
+test("bounds: spec-v1582 computeLumberRecoveryOverrun separates the scale rule from the sawing", () => {
+  const base = { scaled_bf: 1000, actual_bf: 1240, log_volume_cuft: 210, benchmark_lrf: 7, avg_log_diameter_in: 10, log_length_ft: 16, kerf_in: 0.180, target_kerf_in: 0.125, board_thickness_in: 1 };
+  const r = _v1582(base);
+  assert.ok(Math.abs(r.overrun_pct - 24) < 1e-9);
+  assert.ok(Math.abs(r.recovery_bf_per_cuft - 1240 / 210) < 1e-12);
+  assert.ok(Math.abs(r.lrf_vs_benchmark_pct + 15.6463) < 1e-3);
+  // Doyle's own rule at 10 in and 16 ft, against International 1/4 on the
+  // same log: the scale bias alone would give 65.6% overrun, so a 24% tally
+  // on small wood is the SCALE, not the mill. That is the spec's whole point
+  // and it is the number nothing else in the catalog reports.
+  assert.ok(Math.abs(r.doyle_bf - 36) < 1e-9);
+  assert.ok(Math.abs(r.international_bf - 59.6) < 1e-9);
+  assert.ok(Math.abs(r.scale_bias_overrun_pct - 65.5556) < 1e-3);
+  assert.ok(r.performance_overrun_pts < 0);
+  assert.ok(r.bias_verdict.includes("scale rule"));
+  // The bias falls monotonically with log diameter -- 65.6% at 10 in, 15.3%
+  // at 20 in -- which is exactly why an overrun figure quoted without the log
+  // size means nothing.
+  const big = _v1582({ ...base, avg_log_diameter_in: 20 });
+  assert.ok(Math.abs(big.scale_bias_overrun_pct - 15.3125) < 1e-3);
+  assert.ok(big.scale_bias_overrun_pct < r.scale_bias_overrun_pct);
+  assert.ok(_v1582({ ...base, avg_log_diameter_in: 14 }).scale_bias_overrun_pct < r.scale_bias_overrun_pct);
+  // On 20 in logs the same 24% tally BEATS the bias, and the verdict flips.
+  assert.ok(big.performance_overrun_pts > 0);
+  assert.ok(big.bias_verdict.includes("sawing"));
+  // Both log rules are exactly linear in length, so the bias is a property
+  // of diameter alone.
+  assert.ok(Math.abs(_v1582({ ...base, log_length_ft: 8 }).scale_bias_overrun_pct - r.scale_bias_overrun_pct) < 1e-9);
+  // Kerf: boards recovered go as (kerf + t) / (target + t), and the sawdust
+  // share is provably that same ratio's complement.
+  assert.ok(Math.abs(r.kerf_gain_pct - ((0.180 + 1) / (0.125 + 1) - 1) * 100) < 1e-12);
+  assert.ok(Math.abs(r.kerf_gain_bf - 1240 * r.kerf_gain_pct / 100) < 1e-12);
+  assert.ok(Math.abs(r.sawdust_share_pct - 15.2542) < 1e-3);
+  assert.ok(Math.abs(r.target_sawdust_share_pct - 11.1111) < 1e-3);
+  // No kerf change reproduces the previous answer exactly: zero gain.
+  assert.ok(Math.abs(_v1582({ ...base, target_kerf_in: 0.180 }).kerf_gain_pct) < 1e-12);
+  // Overrun is exactly zero when the tally matches the scale, and negative
+  // below it (underrun is real on International 1/4 and on big Doyle logs).
+  assert.ok(Math.abs(_v1582({ ...base, actual_bf: 1000 }).overrun_pct) < 1e-12);
+  assert.ok(_v1582({ ...base, actual_bf: 900 }).overrun_pct < 0);
+  assert.ok("error" in _v1582({ ...base, scaled_bf: 0 }));
+  assert.ok("error" in _v1582({ ...base, actual_bf: 0 }));
+  assert.ok("error" in _v1582({ ...base, log_volume_cuft: 0 }));
+  assert.ok("error" in _v1582({ ...base, benchmark_lrf: 0 }));
+  assert.ok("error" in _v1582({ ...base, avg_log_diameter_in: 4 }));
+  assert.ok("error" in _v1582({ ...base, log_length_ft: 0 }));
+  assert.ok("error" in _v1582({ ...base, kerf_in: 0 }));
+  assert.ok("error" in _v1582({ ...base, target_kerf_in: 0 }));
+  assert.ok("error" in _v1582({ ...base, board_thickness_in: 0 }));
+  assert.ok("error" in _v1582({ ...base, scaled_bf: Infinity }));
+});
+
+import { computeKilnDryingTime as _v1583 } from "../../calc-sawmill.js";
+test("bounds: spec-v1583 computeKilnDryingTime splits at fibre saturation and squares the thickness", () => {
+  const base = { mc_initial_pct: 85, mc_final_pct: 8, fsp_mc_pct: 30, rate_above_fsp_ppd: 3.5, rate_below_fsp_ppd: 1.6, equalize_condition_days: 4, thickness_in: 1, alt_thickness_in: 2, thickness_exponent: 1.8 };
+  const r = _v1583(base);
+  assert.ok(Math.abs(r.days_above_fsp - 55 / 3.5) < 1e-12);
+  assert.ok(Math.abs(r.days_below_fsp - 22 / 1.6) < 1e-12);
+  assert.ok(Math.abs(r.drying_days - 29.4643) < 1e-3);
+  assert.ok(Math.abs(r.cycle_days - r.drying_days - 4) < 1e-12);
+  // The last 22 points take almost as long as the first 55 -- 47% of the
+  // drying time for 29% of the points. A single average rate of 2.61 points
+  // per day hides that entirely, and it is 63% above what is actually
+  // available below fibre saturation.
+  assert.ok(Math.abs(r.below_share_pct - 46.6667) < 1e-3);
+  assert.ok(Math.abs(r.linear_rate_ppd - 77 / r.drying_days) < 1e-12);
+  assert.ok(r.linear_rate_ppd > base.rate_below_fsp_ppd);
+  // Thickness is the fact worth carrying: 2 to the 1.8 is 3.48, so 8/4 is
+  // 1.74 TIMES what proportional thinking gives, not equal to it.
+  assert.ok(Math.abs(r.thickness_scale - Math.pow(2, 1.8)) < 1e-12);
+  assert.ok(Math.abs(r.alt_drying_days - r.drying_days * r.thickness_scale) < 1e-12);
+  assert.ok(Math.abs(r.underquote_factor - Math.pow(2, 0.8)) < 1e-12);
+  assert.ok(r.alt_drying_days > 100);
+  assert.ok(Math.abs(r.proportional_days - 2 * r.drying_days) < 1e-12);
+  // An exponent of exactly 1 makes the scaling proportional and the
+  // underquote factor exactly 1 -- the belief the tile exists to correct.
+  const linear = _v1583({ ...base, thickness_exponent: 1 });
+  assert.ok(Math.abs(linear.underquote_factor - 1) < 1e-12);
+  assert.ok(Math.abs(linear.alt_drying_days - 2 * r.drying_days) < 1e-12);
+  // The same thickness is always a scale factor of exactly 1.
+  assert.ok(Math.abs(_v1583({ ...base, alt_thickness_in: 1 }).thickness_scale - 1) < 1e-12);
+  // A run that ends above fibre saturation never enters the slow regime, and
+  // one that starts below it is entirely in the slow regime.
+  const green = _v1583({ ...base, mc_final_pct: 40 });
+  assert.strictEqual(green.days_below_fsp, 0);
+  assert.ok(Math.abs(green.days_above_fsp - 45 / 3.5) < 1e-12);
+  const dry = _v1583({ ...base, mc_initial_pct: 25 });
+  assert.strictEqual(dry.days_above_fsp, 0);
+  assert.ok(Math.abs(dry.days_below_fsp - 17 / 1.6) < 1e-12);
+  assert.ok("error" in _v1583({ ...base, mc_initial_pct: 0 }));
+  assert.ok("error" in _v1583({ ...base, mc_final_pct: 85 }));
+  assert.ok("error" in _v1583({ ...base, mc_final_pct: -1 }));
+  assert.ok("error" in _v1583({ ...base, fsp_mc_pct: 0 }));
+  assert.ok("error" in _v1583({ ...base, rate_above_fsp_ppd: 0 }));
+  assert.ok("error" in _v1583({ ...base, rate_below_fsp_ppd: 0 }));
+  assert.ok("error" in _v1583({ ...base, equalize_condition_days: -1 }));
+  assert.ok("error" in _v1583({ ...base, thickness_in: 0 }));
+  assert.ok("error" in _v1583({ ...base, alt_thickness_in: 0 }));
+  assert.ok("error" in _v1583({ ...base, thickness_exponent: 0 }));
+  assert.ok("error" in _v1583({ ...base, mc_initial_pct: Infinity }));
+});
+
+import { computeKilnChargeWater as _v1584 } from "../../calc-sawmill.js";
+test("bounds: spec-v1584 computeKilnChargeWater is oven-dry basis, and the wrong way is wrong by the moisture content", () => {
+  const base = { green_weight_lb: 40000, mc_initial_pct: 85, mc_final_pct: 8, btu_per_lb_water: 2000, schedule_days: 28, intermediate_mc_pct: 30 };
+  const r = _v1584(base);
+  assert.ok(Math.abs(r.oven_dry_lb - 40000 / 1.85) < 1e-9);
+  assert.ok(Math.abs(r.water_lb - r.oven_dry_lb * 0.77) < 1e-9);
+  assert.ok(Math.abs(r.water_lb - 16648.6) < 0.1);
+  assert.ok(Math.abs(r.water_gal - r.water_lb / 8.3454) < 1e-9);
+  assert.ok(Math.abs(r.energy_mmbtu - 33.2973) < 1e-3);
+  // The identity that makes the error legible: green weight is oven-dry
+  // weight times (1 + MC/100), so applying an oven-dry-basis percentage to a
+  // green weight overstates the water by EXACTLY the initial moisture
+  // content -- 85% here, whatever the final moisture content or the charge.
+  assert.ok(Math.abs(r.wrong_way_lb - 30800) < 1e-9);
+  assert.ok(Math.abs(r.wrong_way_excess_pct - 85) < 1e-9);
+  assert.ok(Math.abs(_v1584({ ...base, mc_final_pct: 15 }).wrong_way_excess_pct - 85) < 1e-9);
+  assert.ok(Math.abs(_v1584({ ...base, green_weight_lb: 90000 }).wrong_way_excess_pct - 85) < 1e-9);
+  assert.ok(Math.abs(_v1584({ ...base, mc_initial_pct: 40, intermediate_mc_pct: 25 }).wrong_way_excess_pct - 40) < 1e-9);
+  // Green weight splits exactly into wood and water.
+  assert.ok(Math.abs(r.oven_dry_lb + r.green_water_lb - 40000) < 1e-9);
+  assert.ok(Math.abs(r.green_water_share_pct - 45.9459) < 1e-3);
+  // Vent load is the water spread over the schedule hours, and the average
+  // rate is the points over the days.
+  assert.ok(Math.abs(r.vent_lb_per_hr - r.water_lb / (28 * 24)) < 1e-12);
+  assert.ok(Math.abs(r.avg_rate_ppd - 77 / 28) < 1e-12);
+  // Most of the water is out before fibre saturation while barely half the
+  // schedule has run: 71% of the water, and 4,757 lb still in the wood.
+  assert.ok(Math.abs(r.pct_water_out_by_intermediate - 71.4286) < 1e-3);
+  assert.ok(Math.abs(r.water_remaining_at_intermediate_lb - 4756.76) < 0.1);
+  assert.ok(Math.abs(r.water_removed_to_intermediate_lb + r.water_remaining_at_intermediate_lb - r.water_lb) < 1e-9);
+  // Everything is exactly linear in charge weight.
+  assert.ok(Math.abs(_v1584({ ...base, green_weight_lb: 80000 }).water_lb - 2 * r.water_lb) < 1e-9);
+  assert.ok("error" in _v1584({ ...base, green_weight_lb: 0 }));
+  assert.ok("error" in _v1584({ ...base, mc_initial_pct: 0 }));
+  assert.ok("error" in _v1584({ ...base, mc_final_pct: -1 }));
+  assert.ok("error" in _v1584({ ...base, mc_final_pct: 85 }));
+  assert.ok("error" in _v1584({ ...base, btu_per_lb_water: 0 }));
+  assert.ok("error" in _v1584({ ...base, schedule_days: 0 }));
+  assert.ok("error" in _v1584({ ...base, intermediate_mc_pct: 8 }));
+  assert.ok("error" in _v1584({ ...base, intermediate_mc_pct: 85 }));
+  assert.ok("error" in _v1584({ ...base, green_weight_lb: Infinity }));
+});
+
+import { computeBandmillSpeedBite as _v1585 } from "../../calc-sawmill.js";
+test("bounds: spec-v1585 computeBandmillSpeedBite pins the bite and the gullet's depth limit", () => {
+  const base = { wheel_diameter_in: 54, wheel_rpm: 580, tooth_spacing_in: 1.75, feed_rate_fpm: 120, target_bite_in: 0.030, kerf_in: 0.100, depth_of_face_in: 12, gullet_capacity_cuin: 0.060 };
+  const r = _v1585(base);
+  assert.ok(Math.abs(r.blade_speed_sfpm - Math.PI * 54 / 12 * 580) < 1e-9);
+  assert.ok(Math.abs(r.blade_speed_sfpm - 8199.56) < 1e-2);
+  assert.ok(Math.abs(r.teeth_per_min - 56225.5) < 1e-1);
+  assert.ok(Math.abs(r.bite_in - 0.0256111) < 1e-6);
+  assert.strictEqual(r.in_typical_band, true);
+  // The inversion is exact: the feed for a target bite, fed back in,
+  // reproduces the target bite.
+  assert.ok(Math.abs(r.feed_for_target_fpm - 140.564) < 1e-3);
+  assert.ok(Math.abs(_v1585({ ...base, feed_rate_fpm: r.feed_for_target_fpm }).bite_in - 0.030) < 1e-12);
+  // Bite is exactly proportional to feed and exactly inverse in blade speed.
+  assert.ok(Math.abs(_v1585({ ...base, feed_rate_fpm: 200 }).bite_in - r.bite_in * 200 / 120) < 1e-12);
+  assert.ok(Math.abs(_v1585({ ...base, feed_rate_fpm: 200 }).bite_in - 0.0426852) < 1e-6);
+  assert.ok(Math.abs(_v1585({ ...base, wheel_rpm: 1160 }).bite_in - r.bite_in / 2) < 1e-12);
+  // Out of band in both directions, and the verdict says which.
+  assert.strictEqual(_v1585({ ...base, feed_rate_fpm: 40 }).in_typical_band, false);
+  assert.ok(_v1585({ ...base, feed_rate_fpm: 40 }).bite_verdict.startsWith("BELOW"));
+  assert.strictEqual(_v1585({ ...base, feed_rate_fpm: 260 }).in_typical_band, false);
+  assert.ok(_v1585({ ...base, feed_rate_fpm: 260 }).bite_verdict.startsWith("ABOVE"));
+  // The gullet is the constraint that depth of face imposes. At this bite it
+  // carries 23.4 in of face, so a 12 in cant is half of it and a 30 in cant
+  // is past it -- the same bite, a different saw problem.
+  assert.ok(Math.abs(r.gullet_load_cuin - r.bite_in * 0.1 * 12) < 1e-12);
+  assert.ok(Math.abs(r.gullet_use_pct - 51.2223) < 1e-3);
+  assert.ok(Math.abs(r.max_face_in - 23.4273) < 1e-3);
+  assert.ok(r.face_verdict.includes("room left"));
+  const deep = _v1585({ ...base, depth_of_face_in: 30 });
+  assert.ok(deep.gullet_use_pct > 100);
+  assert.ok(deep.face_verdict.includes("over capacity"));
+  // The deepest face the gullet supports does not depend on the face
+  // entered, only on the bite and the kerf.
+  assert.ok(Math.abs(deep.max_face_in - r.max_face_in) < 1e-12);
+  // And slowing the feed to the reported limit puts the load exactly at
+  // capacity in that deeper face.
+  const slowed = _v1585({ ...base, depth_of_face_in: 30, feed_rate_fpm: deep.max_feed_at_face_fpm });
+  assert.ok(Math.abs(slowed.gullet_use_pct - 100) < 1e-9);
+  assert.ok("error" in _v1585({ ...base, wheel_diameter_in: 0 }));
+  assert.ok("error" in _v1585({ ...base, wheel_rpm: 0 }));
+  assert.ok("error" in _v1585({ ...base, tooth_spacing_in: 0 }));
+  assert.ok("error" in _v1585({ ...base, feed_rate_fpm: 0 }));
+  assert.ok("error" in _v1585({ ...base, target_bite_in: 0 }));
+  assert.ok("error" in _v1585({ ...base, kerf_in: 0 }));
+  assert.ok("error" in _v1585({ ...base, depth_of_face_in: 0 }));
+  assert.ok("error" in _v1585({ ...base, gullet_capacity_cuin: 0 }));
+  assert.ok("error" in _v1585({ ...base, wheel_rpm: Infinity }));
+});
+
+import { computeSawmillResidueYield as _v1586 } from "../../calc-sawmill.js";
+test("bounds: spec-v1586 computeSawmillResidueYield halves the kerf gain on thick stock", () => {
+  const base = { lumber_recovery_pct: 55, kerf_in: 0.180, target_kerf_in: 0.125, board_thickness_in: 1, alt_board_thickness_in: 2, bark_fraction_pct: 12, annual_lumber_mbf: 10000 };
+  const r = _v1586(base);
+  assert.ok(Math.abs(r.sawdust_share_pct - 0.180 / 1.180 * 100) < 1e-12);
+  assert.ok(Math.abs(r.sawdust_share_pct - 15.2542) < 1e-3);
+  assert.ok(Math.abs(r.target_sawdust_share_pct - 11.1111) < 1e-3);
+  assert.ok(Math.abs(r.gain_pts - 4.14313) < 1e-4);
+  // The point that decides a capital request: the same kerf change is worth
+  // 0.57 times as much on 2 in stock, because the denominator doubles.
+  assert.ok(Math.abs(r.alt_gain_pts - 2.37453) < 1e-4);
+  assert.ok(Math.abs(r.gain_ratio - r.alt_gain_pts / r.gain_pts) < 1e-12);
+  assert.ok(r.gain_ratio > 0.5 && r.gain_ratio < 0.6);
+  // Thicker stock always gains less from the same kerf change; the gain is
+  // strictly decreasing in board thickness.
+  assert.ok(_v1586({ ...base, alt_board_thickness_in: 4 }).gain_ratio < r.gain_ratio);
+  assert.ok(_v1586({ ...base, alt_board_thickness_in: 1 }).gain_ratio === 1);
+  // A year's worth, on the mill's own production.
+  assert.ok(Math.abs(r.annual_gain_bf - 10000 * 1000 * r.gain_pts / 100) < 1e-9);
+  assert.ok(r.annual_gain_bf > 400000);
+  // The split is exact: bark plus sawdust plus chips is the whole residue,
+  // and the residue is what recovery leaves.
+  assert.ok(Math.abs(r.residue_pct - 45) < 1e-12);
+  assert.ok(Math.abs(r.bark_fraction_pct + r.sawdust_of_log_pct + r.chips_of_log_pct - r.residue_pct) < 1e-9);
+  assert.ok(Math.abs(r.sawdust_of_log_pct - r.sawdust_share_pct * 0.88) < 1e-12);
+  assert.ok(r.chips_of_log_pct > r.sawdust_of_log_pct);
+  // No kerf change reproduces the old answer exactly: zero points move.
+  assert.ok(Math.abs(_v1586({ ...base, target_kerf_in: 0.180 }).gain_pts) < 1e-12);
+  // A recovery figure the entered bark and kerf cannot fit is an error, not
+  // a negative chip stream.
+  assert.ok("error" in _v1586({ ...base, lumber_recovery_pct: 80 }));
+  assert.ok("error" in _v1586({ ...base, lumber_recovery_pct: 0 }));
+  assert.ok("error" in _v1586({ ...base, lumber_recovery_pct: 100 }));
+  assert.ok("error" in _v1586({ ...base, kerf_in: 0 }));
+  assert.ok("error" in _v1586({ ...base, target_kerf_in: 0 }));
+  assert.ok("error" in _v1586({ ...base, board_thickness_in: 0 }));
+  assert.ok("error" in _v1586({ ...base, alt_board_thickness_in: 0 }));
+  assert.ok("error" in _v1586({ ...base, bark_fraction_pct: 100 }));
+  assert.ok("error" in _v1586({ ...base, annual_lumber_mbf: 0 }));
+  assert.ok("error" in _v1586({ ...base, kerf_in: Infinity }));
+});
+
+import { computeLogTruckPayload as _v1587 } from "../../calc-sawmill.js";
+test("bounds: spec-v1587 computeLogTruckPayload pins the habit overload", () => {
+  const base = { legal_gross_lb: 80000, tare_lb: 32000, weight_per_mbf_lb: 10500, alt_weight_per_mbf_lb: 13000, seasoned_weight_per_mbf_lb: 11000, load_volume_mbf: 5 };
+  const r = _v1587(base);
+  assert.ok(Math.abs(r.payload_lb - 48000) < 1e-9);
+  assert.ok(Math.abs(r.legal_load_mbf - 48000 / 10500) < 1e-12);
+  assert.ok(Math.abs(r.legal_load_mbf - 4.57143) < 1e-4);
+  assert.ok(Math.abs(r.alt_legal_load_mbf - 3.69231) < 1e-4);
+  assert.ok(Math.abs(r.mbf_difference - 0.879121) < 1e-5);
+  assert.ok(Math.abs(r.seasoned_legal_load_mbf - 4.36364) < 1e-4);
+  // Loading the heavier species to the stake height that was legal for the
+  // lighter one puts the truck 11,429 lb over -- and that overload is
+  // provably the payload times the weight ratio less one.
+  assert.ok(Math.abs(r.overload_if_habit_lb - 11428.6) < 0.1);
+  assert.ok(Math.abs(r.overload_if_habit_lb - r.payload_lb * (13000 / 10500 - 1)) < 1e-9);
+  // Same wood, no overload at all: the habit is only wrong when the wood
+  // changes.
+  assert.ok(Math.abs(_v1587({ ...base, alt_weight_per_mbf_lb: 10500 }).overload_if_habit_lb) < 1e-9);
+  // A lighter compared species gives a NEGATIVE habit figure -- headroom,
+  // not overload -- and a larger legal load.
+  const lighter = _v1587({ ...base, alt_weight_per_mbf_lb: 9000 });
+  assert.ok(lighter.overload_if_habit_lb < 0);
+  assert.ok(lighter.alt_legal_load_mbf > r.legal_load_mbf);
+  // The entered load is over on gross, and the verdict says so by the pound.
+  assert.ok(Math.abs(r.entered_load_lb - 52500) < 1e-9);
+  assert.ok(Math.abs(r.margin_lb + 4500) < 1e-9);
+  assert.ok(Math.abs(r.gross_with_load_lb - 84500) < 1e-9);
+  assert.ok(r.load_verdict.startsWith("OVER"));
+  // Loading exactly the legal load lands exactly on the limit.
+  const exact = _v1587({ ...base, load_volume_mbf: r.legal_load_mbf });
+  assert.ok(Math.abs(exact.margin_lb) < 1e-9);
+  assert.ok(Math.abs(exact.gross_with_load_lb - 80000) < 1e-9);
+  assert.ok(!exact.load_verdict.startsWith("OVER"));
+  // Payload is exactly linear: every pound of tare is a pound of wood.
+  assert.ok(Math.abs(_v1587({ ...base, tare_lb: 33000 }).payload_lb - 47000) < 1e-9);
+  assert.ok("error" in _v1587({ ...base, legal_gross_lb: 0 }));
+  assert.ok("error" in _v1587({ ...base, tare_lb: 0 }));
+  assert.ok("error" in _v1587({ ...base, tare_lb: 80000 }));
+  assert.ok("error" in _v1587({ ...base, weight_per_mbf_lb: 0 }));
+  assert.ok("error" in _v1587({ ...base, alt_weight_per_mbf_lb: 0 }));
+  assert.ok("error" in _v1587({ ...base, seasoned_weight_per_mbf_lb: 0 }));
+  assert.ok("error" in _v1587({ ...base, load_volume_mbf: 0 }));
+  assert.ok("error" in _v1587({ ...base, tare_lb: Infinity }));
+});

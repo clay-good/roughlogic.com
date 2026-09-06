@@ -21615,6 +21615,80 @@ export const CITATIONS = {
       { name: "Installer", value: "medical-gas piping is brazed and certified by ASSE 6010-qualified plumbers/pipefitters; a verifier and the AHJ govern", source: "ASSE 6010 / NFPA 99" },
     ],
   },
+  // spec-v1582..v1587: the 2026-09-05 trade-expansion sawmill and forest
+  // products band. Group L, Agriculture and Forestry.
+  "lumber-recovery-overrun": {
+    formula: "overrun = (tallied board feet - scaled board feet) / scaled x 100; lumber recovery factor = board feet produced / cubic feet of log input; the scale-bias comparison is the Doyle rule (D - 4) squared x length / 16 against the International 1/4 rule (0.22 D squared - 0.71 D) per 4 ft section at the same diameter and length.",
+    edition: "The standard mill definitions of overrun and lumber recovery factor by name, with the public-domain Doyle and International 1/4 log rules. The applicable scaling rule and handbook, the grading rules of the applicable agency, and the mill's own scale and tally records govern.",
+    freeAccess: "Ratio arithmetic on the mill's own scale and tally figures; the log rules used are public-domain formulas, and no proprietary scaling table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Overrun is a property of the SCALE, not only of the mill. Doyle subtracts a fixed slab allowance that is far too large on small logs, so a small log scales at a fraction of what it actually cuts and a mill running small wood on Doyle can show overrun of 50% or more, while the same mill running large logs shows very little. A mill comparing its overrun month to month without tracking log diameter is measuring its log mix rather than its performance, which is why the overrun that Doyle's bias alone would produce at the entered diameter is reported beside the measured one. Lumber recovery factor is the honest efficiency measure because it compares output to actual wood volume rather than to a scaling convention, and it responds to what a mill controls: kerf, sawing accuracy, target sizes and the oversize cut for shrinkage, edging and trimming practice, and how the sawyer breaks down each log. The commercial point follows: overrun on a conservative scale is not free money, because the log price already reflects the scale. Improving recovery is real; improving overrun by buying smaller logs is not. Scaling deductions for defect are a matter of the scaler's judgment and the applicable handbook, and grade recovery -- where hardwood value actually sits -- is not addressed at all.",
+    assumptions: [
+      { name: "Overrun measures the scale rule", value: "and the log mix, at least as much as it measures the mill", source: "log scaling practice" },
+      { name: "Recovery is the comparable number", value: "board feet per cubic foot does not move with the scaling convention", source: "mill practice" },
+      { name: "Grade recovery is where the value is", value: "a mill can raise volume recovery and lose money by degrading grade", source: "the applicable grading agency" },
+    ],
+  },
+  "kiln-drying-time": {
+    formula: "days = the moisture-content points to remove / the schedule's rate in points per day, computed separately above and below the fibre saturation point; the alternative thickness scales the drying time by (thickness ratio) raised to an entered exponent, commonly 1.5 to 2.",
+    edition: "The schedule-rate time relation and the thickness scaling by name, with the Forest Products Laboratory dry-kiln schedules named as what actually governs. The applicable drying schedule, the kiln manufacturer, and the mill's own kiln samples govern.",
+    freeAccess: "Division on the schedule rates the user enters; no published drying schedule is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The thickness law is the fact worth carrying and it is not proportional: moisture has to diffuse to the surface, and doubling the path more than doubles the time, so a mill quoting 8/4 on twice the 4/4 schedule has underquoted by most of a factor of two. It is also why 4/4 and 8/4 should not share a charge -- the schedule that is safe for the thick stock is wasteful for the thin, and the one that suits the thin stock will degrade the thick. The rate is not constant either. Above the fibre saturation point water moves freely and drying is fast; below it, bound water moves by diffusion and the rate collapses, which is why the last twenty points can take as long as the first fifty and why a single average rate applied linearly badly understates the tail of a schedule. Both regimes are computed separately for that reason. Equalizing and conditioning are separate and are not optional on stock that will be machined: equalizing brings the whole charge to a uniform moisture content, conditioning relieves the drying stresses that otherwise cause boards to cup, pinch the saw, or move after machining, and a schedule quoted without them is not a complete schedule. Running faster than the schedule causes checking, honeycomb, collapse, and casehardening, none of it visible until the wood is machined.",
+    assumptions: [
+      { name: "Time goes as thickness to about 1.8", value: "so 8/4 is roughly four times 4/4, not twice", source: "drying practice" },
+      { name: "The rate collapses below fibre saturation", value: "bound water moves by diffusion, and the tail of a schedule is the slow part", source: "FPL dry-kiln schedules" },
+      { name: "This is not a schedule", value: "schedules are species, thickness, and grade specific and specify temperatures step by step", source: "FPL / kiln manufacturer" },
+    ],
+  },
+  "kiln-charge-water": {
+    formula: "oven-dry weight = green weight / (1 + moisture content / 100); water to remove = oven-dry weight x the moisture-content points removed / 100, at 8.3454 lb per US gallon; energy = that mass x an entered BTU per pound of water; vent load = the water divided by the schedule hours.",
+    edition: "The oven-dry-basis moisture relation by name, with the Forest Products Laboratory dry-kiln schedules named as what governs the drying itself. The applicable drying schedule, the kiln manufacturer, and the mill's own kiln samples govern.",
+    freeAccess: "Mass and energy arithmetic on the charge weight and moisture contents the user enters; no published schedule or manufacturer table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The oven-dry basis is the trap. Wood moisture content is water weight divided by OVEN-DRY wood weight, not by total weight, so 100% moisture content means the water weighs as much as the wood, and green hardwood above 100% is entirely ordinary. Computing the water from green weight times the moisture percentage overstates it by exactly the initial moisture content, because green weight is oven-dry weight times one plus that fraction; both figures are reported so the size of that error is visible rather than argued. Once the water tonnage is known everything else follows. The energy is that mass times a heat requirement well above the latent heat of water, because a conventional kiln also heats the wood, heats the kiln, and loses heat out the vents along with the moisture; the vent load is what sizes the venting and, in a dehumidification kiln, the compressor. The third use is schedule sanity: most of the water leaves before fibre saturation and most of the TIME is spent after it, so a charge with twice the water takes far more than twice as long at the same nominal rate. A dehumidification kiln's energy is electrical and follows entirely different arithmetic.",
+    assumptions: [
+      { name: "Moisture content is oven-dry basis", value: "so it can exceed 100%, and green weight times the percentage is wrong", source: "wood science convention" },
+      { name: "Energy is well above latent heat", value: "roughly 1,500 to 2,500 BTU per pound of water for a conventional kiln", source: "kiln manufacturer data" },
+      { name: "The measurement is kiln samples", value: "moisture content is measured with samples and a meter, not calculated", source: "FPL dry-kiln practice" },
+    ],
+  },
+  "bandmill-speed-bite": {
+    formula: "blade speed in surface feet per minute = pi x wheel diameter (in) / 12 x rpm; teeth passing per minute = that speed x 12 / tooth spacing; bite per tooth = feed speed x 12 / teeth per minute; gullet load = bite x kerf x depth of face.",
+    edition: "Standard sawfiling kinematics by name, with the 0.020 to 0.045 in softwood bite band as sawfiling practice. The saw and mill manufacturers' specifications, a qualified filer, and OSHA govern.",
+    freeAccess: "Kinematics on the mill's own wheel, tooth, and feed figures; no manufacturer speed-and-feed chart is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Bite per tooth is what each tooth actually takes and a band's behaviour follows from it. Too small a bite means the tooth is rubbing rather than cutting, which generates heat, work-hardens the tip, and produces the washboard finish that gets blamed on tension; too large a bite overloads the gullet, and a gullet that fills before it exits the cut packs, which is what makes a saw dive. The gullet is the real constraint, and it is why bite and depth of face cannot be considered separately: a bite that is fine in a shallow cant is too much in a deep one, because the gullet has to carry the sawdust across the whole face. That is the arithmetic behind slowing the feed as the cants get bigger, and it is why a mill running mixed sizes at one feed speed has a saw problem on the big logs only. For a filer the useful inversion is the feed speed a target bite implies at the current blade speed and tooth spacing, because feed is a setting the sawyer can act on directly. Gullet capacity is entered rather than derived, since deriving it needs the gullet area and the sawdust bulking factor for the species and moisture. Saw tension, alignment and tracking, tooth geometry, set or swage, blade width and gauge, and strain all matter at least as much as bite and none of them is arithmetic.",
+    assumptions: [
+      { name: "The gullet, not the bite, is the limit", value: "the same bite in a face two and a half times as deep asks for two and a half times the gullet", source: "sawfiling practice" },
+      { name: "Too little bite is not the safe side", value: "a rubbing tooth makes heat, dulling, and washboard", source: "sawfiling practice" },
+      { name: "Feed is the setting a sawyer controls", value: "blade speed and tooth spacing are not adjusted between cants", source: "mill practice" },
+    ],
+  },
+  "sawmill-residue-yield": {
+    formula: "sawdust share of the wood cut = kerf / (kerf + board thickness); residue fraction = 100 less the entered lumber recovery percentage; sawdust as a share of the log = the kerf share applied to the wood inside the bark; chips = the residue less bark and sawdust.",
+    edition: "The kerf sawdust relation by name, with NFPA 664 named for the wood processing dust hazard. The residue buyers' specifications, the mill's own scale records, and NFPA 664 govern.",
+    freeAccess: "A volume split on the recovery, kerf, and bark figures the user enters; no buyer specification or density table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The kerf share is directly computable and it is the one a mill can change: every cut turns a kerf-width slice of log into sawdust, so thin stock makes proportionally far more sawdust than thick, and a wide kerf on thin stock is where wood disappears. The corollary is the part that gets missed before a capital request -- the same kerf change is worth roughly half as much on 2 in stock as on 1 in boards, because the denominator is twice as large, so a mill cutting mostly timbers has much less to gain from a thin-kerf conversion than a mill cutting boards. Chips are the larger stream and the more valuable one where a pulp or panel market exists; that market's size distribution, bark content, and moisture requirements determine whether slabs are worth chipping or are simply fuel, and the revenue per ton differs substantially. Bark is nearly always a cost or a low-value product and is the reason debarking exists, because bark in the chip stream downgrades the whole load. Bulk densities for sawdust, chips, and bark differ widely and change with moisture, so a volume-to-tonnage conversion headed for a scale ticket must use the mill's own measured figures.",
+    assumptions: [
+      { name: "Sawdust is kerf over kerf plus thickness", value: "so the thin-kerf gain is largest on the thinnest stock", source: "first principles" },
+      { name: "Chips are the stream with a market", value: "where a pulp or panel buyer exists; otherwise it is hog fuel", source: "residue market practice" },
+      { name: "Densities are the mill's own", value: "table values are not good enough for a scale ticket", source: "the mill's scale records" },
+    ],
+  },
+  "log-truck-payload": {
+    formula: "payload = legal gross weight - tare weight; the legal load in thousand board feet = payload / the green weight per thousand board feet for the species and condition; the habit overload = the legal load of the lighter wood x the heavier wood's weight per MBF, less the payload.",
+    edition: "The payload relation by name, with the federal bridge formula and the FMCSA log securement requirements named as separate matters this does not evaluate. The applicable state and federal weight limits, the bridge formula, FMCSA securement requirements for logs, and the scaling rule in use govern.",
+    freeAccess: "Subtraction and division on the truck's own tare and the region's own green weight conversion; no state weight table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The gross weight limit is the one everyone quotes and the axle limits are the ones that actually catch trucks: a load within the legal gross can still be over on a tandem or a bridge-formula group if it is placed wrong, and weight distribution on a log load is set by where the butt ends sit, which is a loader decision made in seconds. The variable that makes this a calculation rather than a lookup is green weight per thousand board feet, which moves with species, with the season, and with how long the logs have been decked -- freshly felled winter hardwood can be half again the weight of the same volume of summer-decked softwood. A trucker loading by habit on a mixed-species job is guessing, and the penalty for guessing high is a citation and an off-load at the roadside, so the overload a habitual stake height produces on the heavier wood is reported directly. State and local variations in legal gross, permit loads, seasonal frost-law reductions, and the reduced limits on many forest and county roads are all outside this, as is load securement, which is separately regulated with its own requirements for logs.",
+    assumptions: [
+      { name: "Axle groups often govern below the gross", value: "a load legal on gross can be illegal on a tandem or a bridge-formula group", source: "the federal bridge formula" },
+      { name: "Green weight per MBF is a broad range", value: "a region's own measured conversion is far better than a published figure", source: "regional scaling practice" },
+      { name: "Securement is separate and regulated", value: "log loads have their own FMCSA requirements", source: "FMCSA" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

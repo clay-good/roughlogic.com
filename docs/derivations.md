@@ -3144,6 +3144,12 @@ cross-check.
 | calc-rigging.js | `computeWireRopeDiameterForWll` | `{ wll_required_tons = 0, construction_factor = 46, design_factor = 5 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeWireRopeStrength` | `{ diameter_in = 0, construction_factor = 46, design_factor = 5 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeWireRopeStretch` | `{ load_lb = 0, length_ft = 0, rope_diameter_in = 0, effective_modulus_psi = 1...` | _ | _ | _ |
+| calc-sawmill.js | `computeBandmillSpeedBite` | `{ wheel_diameter_in = 0, wheel_rpm = 0, tooth_spacing_in = 0, feed_rate_fpm =...` | _ | _ | _ |
+| calc-sawmill.js | `computeKilnChargeWater` | `{ green_weight_lb = 0, mc_initial_pct = 0, mc_final_pct = 0, btu_per_lb_water...` | _ | _ | _ |
+| calc-sawmill.js | `computeKilnDryingTime` | `{ mc_initial_pct = 0, mc_final_pct = 0, fsp_mc_pct = 30, rate_above_fsp_ppd =...` | _ | _ | _ |
+| calc-sawmill.js | `computeLogTruckPayload` | `{ legal_gross_lb = 0, tare_lb = 0, weight_per_mbf_lb = 0, alt_weight_per_mbf_...` | _ | _ | _ |
+| calc-sawmill.js | `computeLumberRecoveryOverrun` | `{ scaled_bf = 0, actual_bf = 0, log_volume_cuft = 0, benchmark_lrf = 7, avg_l...` | _ | _ | _ |
+| calc-sawmill.js | `computeSawmillResidueYield` | `{ lumber_recovery_pct = 0, kerf_in = 0, target_kerf_in = 0, board_thickness_i...` | _ | _ | _ |
 | calc-septic.js | `computeLeachFieldAggregate` | `{ num_trenches = 3, trench_length_ft = 60, trench_width_in = 24, stone_depth_...` | _ | _ | _ |
 | calc-septic.js | `computeSepticDoseTank` | `{ daily_flow_gpd, doses_per_day = 4, drainback_gal = 0 } = {}` | _ | _ | _ |
 | calc-septic.js | `computeSepticDrainfield` | `{ design_flow_gpd = 0, application_rate_gpd_per_ft2 = 0, trench_width_ft = 3,...` | _ | _ | _ |
@@ -3521,7 +3527,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2107.
+Row count: 2113.
 
 <!-- END function-corpus-v14 -->
 
@@ -5093,11 +5099,12 @@ per spec-v14 §13.1 second paragraph.
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `worm-gear-geometry` | Worm and Worm-Wheel Geometry | Machinery's Handbook (worm gearing); lead = 0.5 x 1 = 0.5 in; lead angle = atan(0.5/(pi x 2)) ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group L Agriculture (72 tiles)
+### Group L Agriculture (78 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `anhydrous-ammonia-rate` | Anhydrous Ammonia Rate from Target Nitrogen | anhydrous ammonia rate (82-0-0); product = 180/0.82 = 219.5 lb; gal/ac = 219.5/5.15 = 42.6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `bandmill-speed-bite` | Bandmill Blade Speed, Feed, and Bite per Tooth | Project (first-principles); the saw and mill manufacturers, a qualified filer, and OS... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `basal-area-prism` | Basal Area per Acre (Prism Cruise) | USDA Forest Service mensuration / Bit...; BAF-10, 8 trees in, 14 in DBH -> 80 ft^2/ac, 1.069 ft^2/t... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bulk-density` | Soil Bulk Density and Compaction | USDA-NRCS; bulk_density = 200/150 = 1.333 g/cc; porosity = 1 - 1.333... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bunker-silo-capacity` | Bunker (Horizontal) Silo Forage Capacity | NRCS / MWPS forage storage sizing; A = (30+30)/2 x 8 = 240 ft^2; V = 240 x 100 = 24000 ft^3;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5127,9 +5134,13 @@ per spec-v14 §13.1 second paragraph.
 | `irrigation-requirement` | Irrigation Requirement (ET-based, acre-feet) | FAO / USDA NRCS; ET_crop = 1.20*0.25*30 = 9.0 in; net = 9.0-1.0 = 8.0; gro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `irrigation-uniformity` | Irrigation Sprinkler Uniformity | Irrigation Association / ANSI / ASABE...; 8 catch volumes around 100 mL -> mean 99.625 / CU 97.62 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `irrigation-zone-runtime` | Irrigation Zone Runtime and Cycle-and-Soak | Irrigation Association scheduling ref...; spec-v208 section 2.1 pinned example (clay lawn zone) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `kiln-charge-water` | Kiln Charge Water Weight, Energy, and Vent Load | Project (first-principles); the FPL dry-kiln schedules and the mill's own kiln sample... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `kiln-drying-time` | Lumber Kiln Drying Time and Schedule Duration | Project (first-principles); the FPL dry-kiln schedules and the kiln manufacturer govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `livestock-dry-matter-intake` | Livestock Dry-Matter Intake and As-Fed Ration | NRC Nutrient Requirements; spec-v339 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `livestock-water-requirement` | Livestock Water Requirement | NRC / USDA NRCS water-intake guidance...; 50 head, 80 F between (40 F,8 gal) and (90 F,20 gal) -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `log-limb-weight` | Green Log and Limb Weight | USDA FPL Wood Handbook green density; 16 in butt / 16 in top, 8 ft red oak (density 64) -> 11.1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `log-truck-payload` | Log Truck Payload and Legal Load Volume | Project (first-principles); the applicable state and federal weight limits and the br... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `lumber-recovery-overrun` | Sawmill Overrun and Lumber Recovery Factor | Project (first-principles); the applicable scaling rule and handbook govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mad-irrigation-trigger` | Available Water and MAD Irrigation Trigger | FAO-56 / NRCS soil-water reservoir (MAD); TAW = (0.30-0.12)*24 = 4.32; RAW = 0.5*4.32 = 2.16; inter... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `manure-application-rate` | Nutrient-Based Manure Application Rate | USDA NRCS Code 590; spec-v340 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `manure-cover-savings` | Manure Storage Roof Savings (Covered vs Open) | USDA-NRCS Conservation Practice 313 (...; 8,000 ft2 pit, 6-in net precip + 4-in storm -> 6,667 ft3 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5147,6 +5158,7 @@ per spec-v14 §13.1 second paragraph.
 | `quadratic-mean-diameter` | Quadratic Mean Diameter (from a Tally) | USDA Forest Service forest-mensuratio...; Five-tree tally 8, 10, 10, 12, 14 in -> sum_sq 604, QMD s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `reference-et0` | Reference Evapotranspiration ET0 (Hargreaves / FAO-56) | Hargreaves & Samani 1985 / FAO-56 (Ra...; J=197 (mid-July); Tmax=30C, Tmin=15C, Tmean=22.5C, dT=15;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `reineke-sdi` | Reineke Stand Density Index | Reineke Stand Density Index (Reineke ...; 300 TPA, QMD 10 in, SDI_max 400 -> SDI 300, 75% of max (u... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `sawmill-residue-yield` | Sawmill Residue, Sawdust, and Chip Yield | Project (first-principles); the residue buyers' specifications and NFPA 664 govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `seed-rate` | Planting Density and Seed Rate | Project (first-principles); 30 in rows / 32,000 plants/ac target / 1,500 seeds/lb / 9... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sod-takeoff` | Sod Takeoff (Slabs and Pallets) | Turfgrass producer / landscape estima...; spec-v211 section 2.1 pinned example (residential lawn) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spray-drift-buffer` | Downwind Spray Drift Buffer | USDA land-grant extension drift-manag...; Medium droplets (base 20 ft), 15 mph, 30 in boom, 20 in r... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -5550,6 +5562,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1856. Fixture-covered or reference-cadence: 1856 / 1856.
+Tile count: 1862. Fixture-covered or reference-cadence: 1862 / 1862.
 
 <!-- END tile-index-v14 -->

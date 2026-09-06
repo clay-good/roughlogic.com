@@ -2,96 +2,96 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "f10fc465bbb42e5b",
-      "date": "2026-09-05"
+      "sha": "a7016823cc443373",
+      "date": "2026-09-06"
     },
     "/tools/": {
-      "sha": "c04f80ad978d5382",
-      "date": "2026-09-05"
+      "sha": "4230a650e3e0809c",
+      "date": "2026-09-06"
     },
     "/groups/accounting/": {
-      "sha": "e5c1faf948378449",
-      "date": "2026-09-05"
+      "sha": "b1a45118de2c99d8",
+      "date": "2026-09-06"
     },
     "/groups/agriculture/": {
-      "sha": "132ef71030822119",
-      "date": "2026-09-05"
+      "sha": "2690feb9ba239875",
+      "date": "2026-09-06"
     },
     "/groups/construction/": {
-      "sha": "2529b8c091746750",
-      "date": "2026-09-05"
+      "sha": "b600d8d13982b7e6",
+      "date": "2026-09-06"
     },
     "/groups/cross-trade/": {
-      "sha": "f9b187c1a7662723",
-      "date": "2026-09-05"
+      "sha": "5fa11e92d69ed3b9",
+      "date": "2026-09-06"
     },
     "/groups/educators/": {
-      "sha": "9df0dd03c36cc65b",
-      "date": "2026-09-05"
+      "sha": "5a82c2fdefe26f23",
+      "date": "2026-09-06"
     },
     "/groups/electrical/": {
-      "sha": "9348ff9c16437d8d",
-      "date": "2026-09-05"
+      "sha": "b81201985d0701bf",
+      "date": "2026-09-06"
     },
     "/groups/field/": {
-      "sha": "31b19fe9f834deaa",
-      "date": "2026-09-05"
+      "sha": "ff90cd004448a2eb",
+      "date": "2026-09-06"
     },
     "/groups/fire-ground/": {
-      "sha": "ac74dd966ca2dfc1",
-      "date": "2026-09-05"
+      "sha": "097c6411c005e9cb",
+      "date": "2026-09-06"
     },
     "/groups/historical/": {
-      "sha": "d369bbb8fa836790",
-      "date": "2026-09-05"
+      "sha": "c46fc022ed5aa819",
+      "date": "2026-09-06"
     },
     "/groups/hvac/": {
-      "sha": "4f3379b858d2f3c0",
-      "date": "2026-09-05"
+      "sha": "b7eb63e0dc3c9a4a",
+      "date": "2026-09-06"
     },
     "/groups/kitchen/": {
-      "sha": "538fdc105011280e",
-      "date": "2026-09-05"
+      "sha": "2068a4292f90415e",
+      "date": "2026-09-06"
     },
     "/groups/lab/": {
-      "sha": "f69bcc3027af82b2",
-      "date": "2026-09-05"
+      "sha": "2f4c679709b69350",
+      "date": "2026-09-06"
     },
     "/groups/mechanic/": {
-      "sha": "06d17b449e32903b",
-      "date": "2026-09-05"
+      "sha": "bdb63e3c8a0d938a",
+      "date": "2026-09-06"
     },
     "/groups/plumbing/": {
-      "sha": "00119888b37145a2",
-      "date": "2026-09-05"
+      "sha": "f9da3166242da364",
+      "date": "2026-09-06"
     },
     "/groups/real-estate/": {
-      "sha": "b793521082397ebc",
-      "date": "2026-09-05"
+      "sha": "6cb9c31080322f46",
+      "date": "2026-09-06"
     },
     "/groups/references/": {
-      "sha": "17808446038e894f",
-      "date": "2026-09-05"
+      "sha": "2a5d90f26425c826",
+      "date": "2026-09-06"
     },
     "/groups/restoration/": {
-      "sha": "1ee823fbbf5a3e46",
-      "date": "2026-09-05"
+      "sha": "45bb5004cdeaca03",
+      "date": "2026-09-06"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "b62b72916582ea31",
-      "date": "2026-09-05"
+      "sha": "9561741ad7b0b67f",
+      "date": "2026-09-06"
     },
     "/groups/stage/": {
-      "sha": "c9088ae09cba21d2",
-      "date": "2026-09-05"
+      "sha": "a407db29f318f724",
+      "date": "2026-09-06"
     },
     "/groups/trucking/": {
-      "sha": "e7920a2269d44766",
-      "date": "2026-09-05"
+      "sha": "8d8e7951016e9a1a",
+      "date": "2026-09-06"
     },
     "/groups/water/": {
-      "sha": "513c7653ddd04d83",
-      "date": "2026-09-05"
+      "sha": "15dd30893f77fa28",
+      "date": "2026-09-06"
     },
     "/tools/aav-install-check/": {
       "sha": "ffd2b0e38a75491f",
@@ -412,6 +412,10 @@
     "/tools/band-saw-blade-pitch/": {
       "sha": "7399bbd894d5533d",
       "date": "2026-09-01"
+    },
+    "/tools/bandmill-speed-bite/": {
+      "sha": "eb586c530ab159e3",
+      "date": "2026-09-06"
     },
     "/tools/bar-nesting/": {
       "sha": "9fb407f4dbcc14f9",
@@ -1010,8 +1014,8 @@
       "date": "2026-09-01"
     },
     "/tools/chipper-debris/": {
-      "sha": "16566d962023aa37",
-      "date": "2026-09-01"
+      "sha": "9e2a13b2b10852f2",
+      "date": "2026-09-06"
     },
     "/tools/chlorine-cylinder-withdrawal/": {
       "sha": "97ef752506f5f806",
@@ -2474,8 +2478,8 @@
       "date": "2026-09-01"
     },
     "/tools/felling-notch-hinge/": {
-      "sha": "48881b8dc1788669",
-      "date": "2026-09-01"
+      "sha": "32606a7067db3201",
+      "date": "2026-09-06"
     },
     "/tools/fence-estimate/": {
       "sha": "d2928311d01518af",
@@ -3513,6 +3517,14 @@
       "sha": "2d7384bfbdfd23f1",
       "date": "2026-09-01"
     },
+    "/tools/kiln-charge-water/": {
+      "sha": "d79485d3b5c38cde",
+      "date": "2026-09-06"
+    },
+    "/tools/kiln-drying-time/": {
+      "sha": "8ca2b6f87bd6895d",
+      "date": "2026-09-06"
+    },
     "/tools/kingpin-to-axle/": {
       "sha": "a681ab06798ea13b",
       "date": "2026-09-01"
@@ -3705,6 +3717,10 @@
       "sha": "76807d2ccf42cbc9",
       "date": "2026-09-01"
     },
+    "/tools/log-truck-payload/": {
+      "sha": "fd7bae174a52713f",
+      "date": "2026-09-06"
+    },
     "/tools/loop-signal-scaling/": {
       "sha": "b3a5a2f2f3d14347",
       "date": "2026-09-01"
@@ -3720,6 +3736,10 @@
     "/tools/ltv/": {
       "sha": "deaf41152834caed",
       "date": "2026-09-01"
+    },
+    "/tools/lumber-recovery-overrun/": {
+      "sha": "dc5e2651db9439ca",
+      "date": "2026-09-06"
     },
     "/tools/lumber-spans/": {
       "sha": "80919ff7fe89ba6f",
@@ -5484,6 +5504,10 @@
     "/tools/sanitary-dfu/": {
       "sha": "66632defc96e42ba",
       "date": "2026-09-01"
+    },
+    "/tools/sawmill-residue-yield/": {
+      "sha": "c7cd5381ca26f737",
+      "date": "2026-09-06"
     },
     "/tools/scaffold-guardrail-check/": {
       "sha": "b7322038bbb3fa34",

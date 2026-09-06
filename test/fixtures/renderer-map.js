@@ -892,6 +892,13 @@ export const RENDERER_MAP = {
   "vacuum-excavation-spoil": { module: "../../calc-trenchless.js", exportName: "TRENCHLESS_RENDERERS" },
   "pipe-bursting-pull-load": { module: "../../calc-trenchless.js", exportName: "TRENCHLESS_RENDERERS" },
   "cipp-liner-thickness": { module: "../../calc-trenchless.js", exportName: "TRENCHLESS_RENDERERS" },
+  // spec-v1582..v1587 sawmill and forest-products band
+  "lumber-recovery-overrun": { module: "../../calc-sawmill.js", exportName: "SAWMILL_RENDERERS" },
+  "kiln-drying-time": { module: "../../calc-sawmill.js", exportName: "SAWMILL_RENDERERS" },
+  "kiln-charge-water": { module: "../../calc-sawmill.js", exportName: "SAWMILL_RENDERERS" },
+  "bandmill-speed-bite": { module: "../../calc-sawmill.js", exportName: "SAWMILL_RENDERERS" },
+  "sawmill-residue-yield": { module: "../../calc-sawmill.js", exportName: "SAWMILL_RENDERERS" },
+  "log-truck-payload": { module: "../../calc-sawmill.js", exportName: "SAWMILL_RENDERERS" },
   "horizontal-curve": { module: "../../calc-civil.js", exportName: "CIVIL_RENDERERS" },
   "spiral-curve": { module: "../../calc-civil.js", exportName: "CIVIL_RENDERERS" },
   "compound-curve": { module: "../../calc-civil.js", exportName: "CIVIL_RENDERERS" },

@@ -96674,6 +96674,399 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "lumber-recovery-overrun",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "1,000 board feet scaled Doyle, 1,240 tallied, 210 cubic feet of log, 10 in average small end",
+   "source_edition_or_year": "overrun = (tallied - scaled)/scaled; LRF = board feet / cubic feet; Doyle (D-4)^2 x L/16 against International 1/4 (0.22 D^2 - 0.71 D) x L/4",
+   "source_section_or_page": "the applicable scaling rule and handbook govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "scaled_bf": 1000,
+    "actual_bf": 1240,
+    "log_volume_cuft": 210,
+    "benchmark_lrf": 7,
+    "avg_log_diameter_in": 10,
+    "log_length_ft": 16,
+    "kerf_in": 0.18,
+    "target_kerf_in": 0.125,
+    "board_thickness_in": 1
+   },
+   "outputs": {
+    "overrun_pct": {
+     "value": 24.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "recovery_bf_per_cuft": {
+     "value": 5.90476,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "scale_bias_overrun_pct": {
+     "value": 65.5556,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "doyle_bf": {
+     "value": 36.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "international_bf": {
+     "value": 59.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "kerf_gain_pct": {
+     "value": 4.88889,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sawdust_share_pct": {
+     "value": 15.2542,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "kiln-drying-time",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Red oak 4/4, 85% to 8%, 3.5 points per day above fibre saturation and 1.6 below",
+   "source_edition_or_year": "days = points / rate in each regime; thickness scaling = (t2/t1)^exponent at 1.8",
+   "source_section_or_page": "the FPL dry-kiln schedules and the kiln manufacturer govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "mc_initial_pct": 85,
+    "mc_final_pct": 8,
+    "fsp_mc_pct": 30,
+    "rate_above_fsp_ppd": 3.5,
+    "rate_below_fsp_ppd": 1.6,
+    "equalize_condition_days": 4,
+    "thickness_in": 1,
+    "alt_thickness_in": 2,
+    "thickness_exponent": 1.8
+   },
+   "outputs": {
+    "days_above_fsp": {
+     "value": 15.7143,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "days_below_fsp": {
+     "value": 13.75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "drying_days": {
+     "value": 29.4643,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cycle_days": {
+     "value": 33.4643,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "linear_rate_ppd": {
+     "value": 2.61333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "thickness_scale": {
+     "value": 3.4822,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_drying_days": {
+     "value": 102.601,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "kiln-charge-water",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "40,000 lb green red oak charge, 85% to 8% moisture content, 2,000 BTU per pound of water",
+   "source_edition_or_year": "oven-dry = green / (1 + MC/100); water = oven-dry x points / 100; 8.3454 lb per US gallon",
+   "source_section_or_page": "the FPL dry-kiln schedules and the mill's own kiln samples govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "green_weight_lb": 40000,
+    "mc_initial_pct": 85,
+    "mc_final_pct": 8,
+    "btu_per_lb_water": 2000,
+    "schedule_days": 28,
+    "intermediate_mc_pct": 30
+   },
+   "outputs": {
+    "oven_dry_lb": {
+     "value": 21621.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "water_lb": {
+     "value": 16648.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "water_gal": {
+     "value": 1994.95,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "energy_mmbtu": {
+     "value": 33.2973,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wrong_way_lb": {
+     "value": 30800.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wrong_way_excess_lb": {
+     "value": 14151.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wrong_way_excess_pct": {
+     "value": 85.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vent_lb_per_hr": {
+     "value": 24.7748,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bandmill-speed-bite",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "54 in wheels at 580 rpm, 1.75 in tooth spacing, feeding 120 ft/min",
+   "source_edition_or_year": "SFPM = pi x D/12 x rpm; teeth/min = SFPM x 12 / spacing; bite = feed x 12 / teeth per minute",
+   "source_section_or_page": "the saw and mill manufacturers, a qualified filer, and OSHA govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "wheel_diameter_in": 54,
+    "wheel_rpm": 580,
+    "tooth_spacing_in": 1.75,
+    "feed_rate_fpm": 120,
+    "target_bite_in": 0.03,
+    "kerf_in": 0.1,
+    "depth_of_face_in": 12,
+    "gullet_capacity_cuin": 0.06
+   },
+   "outputs": {
+    "blade_speed_sfpm": {
+     "value": 8199.56,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "teeth_per_min": {
+     "value": 56225.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bite_in": {
+     "value": 0.0256111,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "feed_for_target_fpm": {
+     "value": 140.564,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gullet_load_cuin": {
+     "value": 0.0307334,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_face_in": {
+     "value": 23.4273,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sawmill-residue-yield",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "55% lumber recovery, 0.180 in kerf against 0.125 in on 1 in boards, 12% bark",
+   "source_edition_or_year": "sawdust share = kerf / (kerf + thickness); residue = 100 - recovery; chips = residue - bark - sawdust",
+   "source_section_or_page": "the residue buyers' specifications and NFPA 664 govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "lumber_recovery_pct": 55,
+    "kerf_in": 0.18,
+    "target_kerf_in": 0.125,
+    "board_thickness_in": 1,
+    "alt_board_thickness_in": 2,
+    "bark_fraction_pct": 12,
+    "annual_lumber_mbf": 10000
+   },
+   "outputs": {
+    "sawdust_share_pct": {
+     "value": 15.2542,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "target_sawdust_share_pct": {
+     "value": 11.1111,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gain_pts": {
+     "value": 4.14313,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_gain_pts": {
+     "value": 2.37453,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gain_ratio": {
+     "value": 0.573125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "residue_pct": {
+     "value": 45.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sawdust_of_log_pct": {
+     "value": 13.4237,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "chips_of_log_pct": {
+     "value": 19.5763,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annual_gain_bf": {
+     "value": 414313.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "log-truck-payload",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "80,000 lb legal gross, 32,000 lb tare, green Douglas-fir at 10,500 lb/MBF against red oak at 13,000",
+   "source_edition_or_year": "payload = gross - tare; legal load = payload / weight per MBF",
+   "source_section_or_page": "the applicable state and federal weight limits and the bridge formula govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-05",
+   "inputs": {
+    "legal_gross_lb": 80000,
+    "tare_lb": 32000,
+    "weight_per_mbf_lb": 10500,
+    "alt_weight_per_mbf_lb": 13000,
+    "seasoned_weight_per_mbf_lb": 11000,
+    "load_volume_mbf": 5
+   },
+   "outputs": {
+    "payload_lb": {
+     "value": 48000.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "legal_load_mbf": {
+     "value": 4.57143,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_legal_load_mbf": {
+     "value": 3.69231,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "seasoned_legal_load_mbf": {
+     "value": 4.36364,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "mbf_difference": {
+     "value": 0.879121,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "overload_if_habit_lb": {
+     "value": 11428.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "entered_load_lb": {
+     "value": 52500.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_lb": {
+     "value": -4500.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }
