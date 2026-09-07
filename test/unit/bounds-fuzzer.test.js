@@ -45511,3 +45511,271 @@ test("bounds: spec-v1460 computeSaggingReturnWave -- counting waves is the metho
   assert.ok("error" in _v1460({ elapsed_seconds: 0, return_waves: 3, target_sag_ft: 0 }));
   assert.ok("error" in _v1460({ ...base, return_waves: 0 }));
 });
+
+// ===========================================================================
+// spec-v1469..v1477: the 2026-09-07 trade-expansion millwright alignment,
+// vibration, and balance band. All nine landed; nothing was cut.
+//
+// The charter's probe returned ZERO for millwright work. `rotor-balance-grade`
+// in calc-shop.js is the ISO 1940 permissible residual unbalance -- a
+// TOLERANCE, saying when to stop -- and nothing said where to put the weight;
+// the bearing tiles compute L10 life and load and no defect frequency.
+//
+// TWO OF THE NINE SPECS MUDDLE THEIR OWN SIGN CONVENTION, both in the prose
+// rather than the arithmetic, and they get it backwards in OPPOSITE
+// directions -- which is what makes stating the convention in words, rather
+// than leaving a minus sign to be read, worth doing:
+//   v1469 computes a front-foot move of -0.0020 in and a rear of +0.0100 in
+//         and then says "both feet come UP". They are opposite.
+//   v1470 computes +0.0038 in and +0.0362 in -- both positive, both the same
+//         direction -- and calls them "opposite directions, which is the
+//         signature of an angular error large relative to the offset". They
+//         are not opposite, and that signature is not present in its example.
+// Program now twenty-one wrong specs in one hundred.
+// ===========================================================================
+
+import { computeShaftAlignmentRimFace as _v1469 } from "../../calc-millwright.js";
+test("bounds: spec-v1469 computeShaftAlignmentRimFace -- the feet are OPPOSITE, not both up", () => {
+  const base = { rim_tir_in: -0.020, face_tir_in: 0.006, face_diameter_in: 6, front_foot_distance_in: 8, rear_foot_distance_in: 20 };
+  const r = _v1469(base);
+  assert.ok(Math.abs(r.offset_in + 0.010) < 1e-12);
+  assert.ok(Math.abs(r.angularity_in_per_in - 0.001) < 1e-12);
+  assert.ok(Math.abs(r.angularity_mils_per_in - 1.0) < 1e-9);
+  assert.ok(Math.abs(r.front_move_in + 0.002) < 1e-12);
+  assert.ok(Math.abs(r.rear_move_in - 0.010) < 1e-12);
+  assert.ok(Math.abs(r.foot_move_difference_in - 0.012) < 1e-12);
+  // THE CORRECTION: one foot down, one foot up. The spec said both up.
+  assert.strictEqual(r.same_direction, false);
+  assert.ok(/LOWER/.test(r.front_move_words));
+  assert.ok(/RAISE/.test(r.rear_move_words));
+  // The rim reads TWICE the offset: halving it is the whole point.
+  assert.ok(Math.abs(_v1469({ ...base, rim_tir_in: -0.040 }).offset_in + 0.020) < 1e-12);
+  // IDENTITY: with no face reading there is no angle, so both feet move the
+  // same amount and that amount IS the offset.
+  const pure = _v1469({ ...base, face_tir_in: 0 });
+  assert.ok(Math.abs(pure.front_move_in - pure.rear_move_in) < 1e-12);
+  assert.ok(Math.abs(pure.front_move_in - pure.offset_in) < 1e-12);
+  assert.ok(Math.abs(pure.foot_move_difference_in) < 1e-12);
+  // The difference between the feet is exactly the angle times the foot span.
+  assert.ok(Math.abs(r.foot_move_difference_in - r.angularity_in_per_in * (base.rear_foot_distance_in - base.front_foot_distance_in)) < 1e-12);
+  assert.ok("error" in _v1469({ ...base, face_diameter_in: 0 }));
+  assert.ok("error" in _v1469({ ...base, rear_foot_distance_in: 4 }));
+});
+
+import { computeShaftAlignmentReverseDial as _v1470 } from "../../calc-millwright.js";
+test("bounds: spec-v1470 computeShaftAlignmentReverseDial -- the feet are the SAME way, not opposite", () => {
+  const base = { tir_a_in: -0.014, tir_b_in: 0.022, plane_spacing_in: 10, front_foot_distance_in: 6, rear_foot_distance_in: 24, coupling_center_distance_in: 5 };
+  const r = _v1470(base);
+  assert.ok(Math.abs(r.offset_a_in + 0.007) < 1e-12);
+  assert.ok(Math.abs(r.offset_b_in - 0.011) < 1e-12);
+  assert.ok(Math.abs(r.slope_in_per_in - 0.0018) < 1e-12);
+  assert.ok(Math.abs(r.slope_mils_per_in - 1.8) < 1e-9);
+  assert.ok(Math.abs(r.front_move_in - 0.0038) < 1e-12);
+  assert.ok(Math.abs(r.rear_move_in - 0.0362) < 1e-12);
+  // THE CORRECTION: both moves are positive, so both feet come UP. The spec
+  // called them opposite directions.
+  assert.ok(r.front_move_in > 0 && r.rear_move_in > 0);
+  assert.strictEqual(r.same_direction, true);
+  assert.ok(/RAISE/.test(r.front_move_words) && /RAISE/.test(r.rear_move_words));
+  // IDENTITY: the line passes through both measured planes exactly.
+  assert.ok(Math.abs(_v1470({ ...base, front_foot_distance_in: 1e-9, rear_foot_distance_in: 10 }).rear_move_in - r.offset_b_in) < 1e-9);
+  // Equal readings mean a pure offset: zero slope, both feet move alike.
+  const pure = _v1470({ ...base, tir_a_in: 0.012, tir_b_in: 0.012 });
+  assert.ok(Math.abs(pure.slope_in_per_in) < 1e-15);
+  assert.ok(Math.abs(pure.front_move_in - pure.rear_move_in) < 1e-15);
+  assert.ok(Math.abs(pure.coupling_center_offset_in - 0.006) < 1e-12);
+  assert.ok("error" in _v1470({ ...base, plane_spacing_in: 0 }));
+  assert.ok("error" in _v1470({ ...base, rear_foot_distance_in: 2 }));
+});
+
+import { computeAlignmentThermalGrowth as _v1471 } from "../../calc-millwright.js";
+test("bounds: spec-v1471 computeAlignmentThermalGrowth -- only the DIFFERENCE matters", () => {
+  const base = { stationary_support_height_in: 14, stationary_alpha_per_f: 0.0000065, stationary_operating_temp_f: 75, movable_support_height_in: 18, movable_alpha_per_f: 0.0000065, movable_operating_temp_f: 160, ambient_temp_f: 70, tolerance_offset_mils: 2 };
+  const r = _v1471(base);
+  assert.ok(Math.abs(r.movable_growth_in - 0.01053) < 1e-9);
+  assert.ok(Math.abs(r.stationary_growth_in - 0.000455) < 1e-9);
+  assert.ok(Math.abs(r.relative_growth_in - 0.010075) < 1e-9);
+  // The cold target is the NEGATIVE of the relative growth, exactly.
+  assert.ok(Math.abs(r.cold_target_offset_in + r.relative_growth_in) < 1e-15);
+  assert.ok(/LOW/.test(r.cold_target_words));
+  assert.ok(Math.abs(r.tolerance_multiple - 5.0375) < 1e-4);
+  assert.strictEqual(r.within, false);
+  // IDENTITY: two machines that grow equally need NO cold target, however hot.
+  const together = _v1471({ ...base, stationary_support_height_in: 18, stationary_operating_temp_f: 160 });
+  assert.ok(Math.abs(together.relative_growth_in) < 1e-15);
+  assert.ok(Math.abs(together.cold_target_offset_in) < 1e-15);
+  assert.ok(/no cold target/.test(together.cold_target_words));
+  assert.strictEqual(together.within, true);
+  // A movable machine that grows LESS gives the opposite-signed target.
+  const inverted = _v1471({ ...base, movable_operating_temp_f: 71, stationary_operating_temp_f: 300 });
+  assert.ok(inverted.relative_growth_in < 0);
+  assert.ok(/HIGH/.test(inverted.cold_target_words));
+  assert.ok("error" in _v1471({ ...base, movable_support_height_in: 0 }));
+});
+
+import { computeSoftFootCorrection as _v1472 } from "../../calc-millwright.js";
+test("bounds: spec-v1472 computeSoftFootCorrection separates a bad foot from a twisted base", () => {
+  const base = { foot_lf_in: 0.001, foot_rf_in: 0.007, foot_lr_in: 0.002, foot_rr_in: 0.001, threshold_in: 0.002 };
+  const r = _v1472(base);
+  assert.strictEqual(r.worst_foot_name, "RF");
+  assert.ok(Math.abs(r.worst_foot_rise_in - 0.007) < 1e-12);
+  assert.strictEqual(r.failing_feet, 1);
+  assert.ok(Math.abs(r.diagonal_lf_rr_in - 0.002) < 1e-12);
+  assert.ok(Math.abs(r.diagonal_rf_lr_in - 0.009) < 1e-12);
+  assert.ok(Math.abs(r.diagonal_difference_in - 0.007) < 1e-12);
+  assert.ok(/points at RF/.test(r.pattern_verdict));
+  // A foot exactly at the threshold PASSES; a hair over fails.
+  assert.strictEqual(_v1472({ ...base, foot_rf_in: 0.002 }).failing_feet, 0);
+  assert.strictEqual(_v1472({ ...base, foot_rf_in: 0.0021 }).failing_feet, 1);
+  // All four inside the threshold: nothing to shim.
+  const clean = _v1472({ foot_lf_in: 0.001, foot_rf_in: 0.001, foot_lr_in: 0.001, foot_rr_in: 0.001, threshold_in: 0.002 });
+  assert.strictEqual(clean.passes, true);
+  assert.ok(/shim nothing/.test(clean.shim_words));
+  // A twisted base: the rise spread across one diagonal pair, not one foot.
+  const twist = _v1472({ foot_lf_in: 0.006, foot_rf_in: 0.001, foot_lr_in: 0.001, foot_rr_in: 0.006, threshold_in: 0.002 });
+  assert.strictEqual(twist.failing_feet, 2);
+  assert.ok(/twisted or unflat base/.test(twist.pattern_verdict));
+  assert.ok("error" in _v1472({ ...base, foot_rf_in: -0.001 }));
+});
+
+import { computeCouplingAlignmentTolerance as _v1473 } from "../../calc-millwright.js";
+test("bounds: spec-v1473 computeCouplingAlignmentTolerance -- half a thousandth decides it", () => {
+  const base = { rpm: 3600, measured_offset_in: 0.0035, measured_angularity_mils_per_in: 0.8, offset_excellent_in: 0.0015, offset_acceptable_in: 0.003, angularity_excellent_mils_per_in: 0.5, angularity_acceptable_mils_per_in: 1.0, spacer_length_in: 0, spacer_end_offset_in: 0 };
+  const r = _v1473(base);
+  assert.ok(Math.abs(r.offset_pct_of_acceptable - 116.6667) < 1e-3);
+  assert.ok(Math.abs(r.angularity_pct_of_acceptable - 80) < 1e-9);
+  assert.strictEqual(r.offset_passes, false);
+  assert.strictEqual(r.angularity_passes, true);
+  assert.ok(Math.abs(r.offset_over_by_in - 0.0005) < 1e-12);
+  assert.strictEqual(r.passes, false);
+  // Exactly at tolerance passes; a hair over does not.
+  assert.strictEqual(_v1473({ ...base, measured_offset_in: 0.003 }).offset_passes, true);
+  assert.strictEqual(_v1473({ ...base, measured_offset_in: 0.0030001 }).offset_passes, false);
+  // A looser (lower-speed) tolerance takes the same reading inside.
+  const slow = _v1473({ ...base, rpm: 1200, offset_acceptable_in: 0.006, offset_excellent_in: 0.003 });
+  assert.strictEqual(slow.offset_passes, true);
+  // A spacer coupling is judged on SLOPE: a big end-to-end offset over a long
+  // spacer is a small slope, and that is the number that counts.
+  const spacer = _v1473({ ...base, spacer_length_in: 24, spacer_end_offset_in: 0.012 });
+  assert.ok(Math.abs(spacer.spacer_slope_mils_per_in - 0.5) < 1e-9);
+  assert.strictEqual(spacer.spacer_passes, true);
+  assert.strictEqual(_v1473(base).spacer_slope_mils_per_in, null);
+  assert.ok("error" in _v1473({ ...base, offset_acceptable_in: 0 }));
+});
+
+import { computeVibrationSeverityZone as _v1474 } from "../../calc-millwright.js";
+test("bounds: spec-v1474 computeVibrationSeverityZone places the reading and the trend", () => {
+  const base = { reading: 0.135, reading_is_mm_s: 0, boundary_ab: 0.044, boundary_bc: 0.110, boundary_cd: 0.280, previous_reading: 0.062, interval_months: 6 };
+  const r = _v1474(base);
+  assert.strictEqual(r.zone, "C");
+  assert.ok(Math.abs(r.reading_mm_s - 3.429) < 1e-6);
+  assert.ok(Math.abs(r.margin_to_next_zone_in_s - 0.145) < 1e-9);
+  assert.ok(Math.abs(r.change_pct - 117.7419) < 1e-3);
+  assert.strictEqual(r.crossed_a_boundary, true);
+  // Each boundary is inclusive of the lower zone, and one hair over moves up.
+  assert.strictEqual(_v1474({ ...base, reading: 0.110 }).zone, "B");
+  assert.strictEqual(_v1474({ ...base, reading: 0.1101 }).zone, "C");
+  assert.strictEqual(_v1474({ ...base, reading: 0.044 }).zone, "A");
+  assert.strictEqual(_v1474({ ...base, reading: 0.281 }).zone, "D");
+  // IDENTITY: the mm/s path and the in/s path agree on the same physical speed.
+  const mm = _v1474({ ...base, reading: 0.135 * 25.4, reading_is_mm_s: 1, previous_reading: 0 });
+  assert.ok(Math.abs(mm.reading_in_s - 0.135) < 1e-12);
+  assert.strictEqual(mm.zone, "C");
+  // A doubling INSIDE zone B crosses no boundary and is still worth flagging.
+  const inB = _v1474({ ...base, reading: 0.100, previous_reading: 0.050 });
+  assert.strictEqual(inB.zone, "B");
+  assert.strictEqual(inB.crossed_a_boundary, false);
+  assert.ok(Math.abs(inB.change_pct - 100) < 1e-9);
+  assert.ok("error" in _v1474({ ...base, boundary_bc: 0.02 }));
+});
+
+import { computeVibrationForcingFrequencies as _v1475 } from "../../calc-millwright.js";
+test("bounds: spec-v1475 computeVibrationForcingFrequencies flags the 2x / line-frequency trap", () => {
+  const base = { rpm: 1780, blade_count: 7, gear_tooth_count: 31, belt_length_in: 0, sheave_diameter_in: 0, line_frequency_hz: 60, rotor_bar_count: 0 };
+  const r = _v1475(base);
+  assert.ok(Math.abs(r.one_x_hz - 29.6667) < 1e-3);
+  assert.ok(Math.abs(r.two_x_hz - 59.3333) < 1e-3);
+  assert.ok(Math.abs(r.three_x_hz - 89) < 1e-9);
+  assert.ok(Math.abs(r.blade_pass_hz - 207.6667) < 1e-3);
+  assert.ok(Math.abs(r.gear_mesh_hz - 919.6667) < 1e-3);
+  assert.strictEqual(r.twice_line_hz, 120);
+  // Every derived line is an exact multiple of running speed.
+  assert.ok(Math.abs(r.blade_pass_hz / r.one_x_hz - 7) < 1e-12);
+  assert.ok(Math.abs(r.gear_mesh_hz / r.one_x_hz - 31) < 1e-12);
+  // Gear sidebands are spaced at exactly running speed on both shoulders.
+  assert.ok(Math.abs(r.gear_mesh_hz - r.gear_sideband_low_hz - r.one_x_hz) < 1e-9);
+  assert.ok(Math.abs(r.gear_sideband_high_hz - r.gear_mesh_hz - r.one_x_hz) < 1e-9);
+  // Here 2x and twice line are far apart; on a two-pole motor they are not.
+  assert.strictEqual(r.line_trap, false);
+  const twoPole = _v1475({ ...base, rpm: 3540, blade_count: 0, gear_tooth_count: 0 });
+  assert.ok(Math.abs(twoPole.two_x_hz - 118) < 1e-9);
+  assert.ok(Math.abs(twoPole.two_x_to_line_gap_hz - 2) < 1e-9);
+  assert.strictEqual(twoPole.line_trap, true);
+  assert.ok(/cannot separate them/.test(twoPole.line_trap_verdict));
+  // A belt frequency appears only when both belt inputs are given.
+  assert.strictEqual(r.belt_frequency_hz, null);
+  assert.ok(_v1475({ ...base, belt_length_in: 100, sheave_diameter_in: 10 }).belt_frequency_hz > 0);
+  assert.ok("error" in _v1475({ ...base, rpm: 0 }));
+});
+
+import { computeBearingDefectFrequencies as _v1476 } from "../../calc-millwright.js";
+test("bounds: spec-v1476 computeBearingDefectFrequencies -- cage x elements IS the outer race", () => {
+  const base = { rpm: 1780, ball_count: 9, ball_diameter_in: 0.5906, pitch_diameter_in: 2.8346, contact_angle_deg: 0 };
+  const r = _v1476(base);
+  assert.ok(Math.abs(r.shaft_hz - 29.6667) < 1e-3);
+  assert.ok(Math.abs(r.diameter_ratio - 0.20835) < 1e-5);
+  assert.ok(Math.abs(r.ftf_hz - 11.7428) < 1e-3);
+  assert.ok(Math.abs(r.bpfo_hz - 105.6848) < 1e-3);
+  assert.ok(Math.abs(r.bpfi_hz - 161.3152) < 1e-3);
+  assert.ok(Math.abs(r.bsf_hz - 68.1024) < 1e-3);
+  assert.ok(Math.abs(r.bpfo_order - 3.5624) < 1e-3);
+  assert.ok(Math.abs(r.bpfi_order - 5.4376) < 1e-3);
+  // IDENTITY: the cage frequency times the element count is the outer race,
+  // exactly -- the arithmetic check on an entered geometry.
+  assert.ok(Math.abs(r.cage_identity_hz - r.bpfo_hz) < 1e-12);
+  // IDENTITY: BPFO + BPFI = n x shaft speed, because the ratio cancels.
+  assert.ok(Math.abs(r.bpfo_hz + r.bpfi_hz - base.ball_count * r.shaft_hz) < 1e-9);
+  // The inner race is always the faster of the two, by construction.
+  assert.ok(r.bpfi_hz > r.bpfo_hz);
+  // Neither race order is an integer, which is the diagnostic fact itself.
+  assert.ok(Math.abs(r.bpfo_order - Math.round(r.bpfo_order)) > 0.01);
+  assert.ok(Math.abs(r.bpfi_order - Math.round(r.bpfi_order)) > 0.01);
+  // Sidebands are spaced at shaft speed.
+  assert.ok(Math.abs(r.sideband_spacing_hz - r.shaft_hz) < 1e-12);
+  // The 0.4n / 0.6n rules of thumb land within a couple of percent.
+  assert.ok(Math.abs(r.bpfo_approx_error_pct) < 3);
+  assert.ok(Math.abs(r.bpfi_approx_error_pct) < 3);
+  assert.ok("error" in _v1476({ ...base, pitch_diameter_in: 0.4 }));
+  assert.ok("error" in _v1476({ ...base, contact_angle_deg: 90 }));
+});
+
+import { computeSinglePlaneFieldBalance as _v1477 } from "../../calc-millwright.js";
+test("bounds: spec-v1477 computeSinglePlaneFieldBalance solves the trial-weight vector", () => {
+  const base = { original_amplitude: 6.2, original_phase_deg: 45, trial_weight_g: 10, trial_weight_angle_deg: 0, trial_amplitude: 3.8, trial_phase_deg: 160 };
+  const r = _v1477(base);
+  assert.ok(Math.abs(r.effect_magnitude - 8.5319) < 1e-3);
+  assert.ok(Math.abs(r.effect_angle_deg - 201.193) < 1e-2);
+  assert.ok(Math.abs(r.correction_weight_g - 7.2668) < 1e-3);
+  assert.ok(Math.abs(r.correction_angle_deg - 23.807) < 1e-2);
+  assert.strictEqual(r.strong_response, true);
+  // The influence coefficient is the effect per gram, by definition.
+  assert.ok(Math.abs(r.influence_coefficient * base.trial_weight_g - r.effect_magnitude) < 1e-12);
+  assert.ok(Math.abs(r.weight_ratio * base.trial_weight_g - r.correction_weight_g) < 1e-12);
+  // IDENTITY: applying the correction weight at its computed angle produces an
+  // effect that exactly cancels the original reading. Rebuild it from the
+  // influence coefficient and check the residual is zero.
+  const rot = (r.correction_angle_deg - base.trial_weight_angle_deg) * Math.PI / 180;
+  const eAng = r.effect_angle_deg * Math.PI / 180 + rot;
+  const scale = r.correction_weight_g * r.influence_coefficient;
+  const resX = base.original_amplitude * Math.cos(base.original_phase_deg * Math.PI / 180) + scale * Math.cos(eAng);
+  const resY = base.original_amplitude * Math.sin(base.original_phase_deg * Math.PI / 180) + scale * Math.sin(eAng);
+  assert.ok(Math.sqrt(resX * resX + resY * resY) < 1e-9);
+  // A trial that barely moves the needle is reported as unreliable.
+  const weak = _v1477({ ...base, trial_amplitude: 6.3, trial_phase_deg: 46 });
+  assert.strictEqual(weak.strong_response, false);
+  assert.ok(/UNRELIABLE/.test(weak.response_verdict));
+  assert.ok(weak.correction_weight_g > r.correction_weight_g);
+  // A trial that changes nothing at all cannot produce an answer.
+  assert.ok("error" in _v1477({ ...base, trial_amplitude: 6.2, trial_phase_deg: 45 }));
+  assert.ok("error" in _v1477({ ...base, trial_weight_g: 0 }));
+});

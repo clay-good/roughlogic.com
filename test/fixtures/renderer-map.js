@@ -1912,4 +1912,14 @@ export const RENDERER_MAP = {
   "nesc-district-loading": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
   "conductor-creep-elongation": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
   "sagging-return-wave": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
+  // spec-v1469..v1477 millwright band
+  "shaft-alignment-rim-face": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
+  "shaft-alignment-reverse-dial": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
+  "alignment-thermal-growth": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
+  "soft-foot-correction": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
+  "coupling-alignment-tolerance": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
+  "vibration-severity-zone": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
+  "vibration-forcing-frequencies": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
+  "bearing-defect-frequencies": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
+  "single-plane-field-balance": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
 };

@@ -1562,6 +1562,16 @@ const RELATED = {
   "nesc-district-loading": ["conductor-sag-at-temperature","transverse-wind-load-conductor","conductor-blowout"],
   "conductor-creep-elongation": ["conductor-sag-at-temperature","line-ground-clearance-nesc","ruling-span"],
   "sagging-return-wave": ["ruling-span","conductor-sag-at-temperature","line-ground-clearance-nesc"],
+  // spec-v1469..v1477: the 2026-09-07 millwright alignment and vibration band.
+  "shaft-alignment-rim-face": ["shaft-alignment-reverse-dial","soft-foot-correction","coupling-alignment-tolerance"],
+  "shaft-alignment-reverse-dial": ["shaft-alignment-rim-face","coupling-alignment-tolerance","alignment-thermal-growth"],
+  "alignment-thermal-growth": ["shaft-alignment-rim-face","coupling-alignment-tolerance","shaft-alignment-reverse-dial"],
+  "soft-foot-correction": ["shaft-alignment-rim-face","shaft-alignment-reverse-dial","alignment-thermal-growth"],
+  "coupling-alignment-tolerance": ["shaft-alignment-rim-face","shaft-alignment-reverse-dial","vibration-severity-zone"],
+  "vibration-severity-zone": ["vibration-forcing-frequencies","bearing-defect-frequencies","single-plane-field-balance"],
+  "vibration-forcing-frequencies": ["bearing-defect-frequencies","vibration-severity-zone","single-plane-field-balance"],
+  "bearing-defect-frequencies": ["vibration-forcing-frequencies","vibration-severity-zone","bearing-l10-life"],
+  "single-plane-field-balance": ["rotor-balance-grade","vibration-forcing-frequencies","vibration-severity-zone"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   "grounding-electrode-conductor": ["bonding-jumper","egc-sizing","grounding-electrode"],
   "bonding-jumper": ["grounding-electrode-conductor","egc-sizing","service-load-standard"],

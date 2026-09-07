@@ -1119,6 +1119,16 @@ const _TILES = [
   ["nesc-district-loading", "A"],
   ["conductor-creep-elongation", "A"],
   ["sagging-return-wave", "A"],
+  // spec-v1469..v1477 millwright alignment, vibration, and balance band
+  ["shaft-alignment-rim-face", "K"],
+  ["shaft-alignment-reverse-dial", "K"],
+  ["alignment-thermal-growth", "K"],
+  ["soft-foot-correction", "K"],
+  ["coupling-alignment-tolerance", "K"],
+  ["vibration-severity-zone", "K"],
+  ["vibration-forcing-frequencies", "K"],
+  ["bearing-defect-frequencies", "K"],
+  ["single-plane-field-balance", "K"],
 ];
 
 

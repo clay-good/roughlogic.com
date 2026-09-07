@@ -107667,6 +107667,231 @@
    "term": "sag without line of sight",
    "target": "sagging-return-wave",
    "kind": "industry"
+  },
+  {
+   "term": "rim and face alignment",
+   "target": "shaft-alignment-rim-face",
+   "kind": "industry"
+  },
+  {
+   "term": "shaft alignment shim calculation",
+   "target": "shaft-alignment-rim-face",
+   "kind": "industry"
+  },
+  {
+   "term": "dial indicator alignment offset",
+   "target": "shaft-alignment-rim-face",
+   "kind": "industry"
+  },
+  {
+   "term": "coupling offset and angularity",
+   "target": "shaft-alignment-rim-face",
+   "kind": "industry"
+  },
+  {
+   "term": "alignment foot move",
+   "target": "shaft-alignment-rim-face",
+   "kind": "industry"
+  },
+  {
+   "term": "reverse dial alignment",
+   "target": "shaft-alignment-reverse-dial",
+   "kind": "industry"
+  },
+  {
+   "term": "reverse indicator alignment",
+   "target": "shaft-alignment-reverse-dial",
+   "kind": "industry"
+  },
+  {
+   "term": "two plane shaft alignment",
+   "target": "shaft-alignment-reverse-dial",
+   "kind": "industry"
+  },
+  {
+   "term": "spacer coupling alignment move",
+   "target": "shaft-alignment-reverse-dial",
+   "kind": "industry"
+  },
+  {
+   "term": "reverse dial shim",
+   "target": "shaft-alignment-reverse-dial",
+   "kind": "industry"
+  },
+  {
+   "term": "thermal growth alignment",
+   "target": "alignment-thermal-growth",
+   "kind": "industry"
+  },
+  {
+   "term": "cold alignment target offset",
+   "target": "alignment-thermal-growth",
+   "kind": "industry"
+  },
+  {
+   "term": "hot alignment offset",
+   "target": "alignment-thermal-growth",
+   "kind": "industry"
+  },
+  {
+   "term": "machine growth compensation",
+   "target": "alignment-thermal-growth",
+   "kind": "industry"
+  },
+  {
+   "term": "pedestal growth alignment",
+   "target": "alignment-thermal-growth",
+   "kind": "industry"
+  },
+  {
+   "term": "soft foot",
+   "target": "soft-foot-correction",
+   "kind": "industry"
+  },
+  {
+   "term": "soft foot shim",
+   "target": "soft-foot-correction",
+   "kind": "industry"
+  },
+  {
+   "term": "machine foot rocking",
+   "target": "soft-foot-correction",
+   "kind": "industry"
+  },
+  {
+   "term": "soft foot threshold",
+   "target": "soft-foot-correction",
+   "kind": "industry"
+  },
+  {
+   "term": "foot rise indicator",
+   "target": "soft-foot-correction",
+   "kind": "industry"
+  },
+  {
+   "term": "alignment tolerance by speed",
+   "target": "coupling-alignment-tolerance",
+   "kind": "industry"
+  },
+  {
+   "term": "coupling alignment tolerance",
+   "target": "coupling-alignment-tolerance",
+   "kind": "industry"
+  },
+  {
+   "term": "alignment acceptable offset rpm",
+   "target": "coupling-alignment-tolerance",
+   "kind": "industry"
+  },
+  {
+   "term": "precision alignment tolerance",
+   "target": "coupling-alignment-tolerance",
+   "kind": "industry"
+  },
+  {
+   "term": "spacer coupling slope tolerance",
+   "target": "coupling-alignment-tolerance",
+   "kind": "industry"
+  },
+  {
+   "term": "vibration severity zone",
+   "target": "vibration-severity-zone",
+   "kind": "industry"
+  },
+  {
+   "term": "iso 20816 zone",
+   "target": "vibration-severity-zone",
+   "kind": "industry"
+  },
+  {
+   "term": "vibration velocity limit machine class",
+   "target": "vibration-severity-zone",
+   "kind": "industry"
+  },
+  {
+   "term": "overall vibration acceptance",
+   "target": "vibration-severity-zone",
+   "kind": "industry"
+  },
+  {
+   "term": "vibration trend zone",
+   "target": "vibration-severity-zone",
+   "kind": "industry"
+  },
+  {
+   "term": "forcing frequencies vibration",
+   "target": "vibration-forcing-frequencies",
+   "kind": "industry"
+  },
+  {
+   "term": "blade pass frequency",
+   "target": "vibration-forcing-frequencies",
+   "kind": "industry"
+  },
+  {
+   "term": "gear mesh frequency",
+   "target": "vibration-forcing-frequencies",
+   "kind": "industry"
+  },
+  {
+   "term": "twice line frequency vibration",
+   "target": "vibration-forcing-frequencies",
+   "kind": "industry"
+  },
+  {
+   "term": "running speed harmonics",
+   "target": "vibration-forcing-frequencies",
+   "kind": "industry"
+  },
+  {
+   "term": "bearing defect frequencies",
+   "target": "bearing-defect-frequencies",
+   "kind": "industry"
+  },
+  {
+   "term": "bpfo bpfi calculation",
+   "target": "bearing-defect-frequencies",
+   "kind": "industry"
+  },
+  {
+   "term": "ball pass frequency outer race",
+   "target": "bearing-defect-frequencies",
+   "kind": "industry"
+  },
+  {
+   "term": "cage frequency ftf",
+   "target": "bearing-defect-frequencies",
+   "kind": "industry"
+  },
+  {
+   "term": "ball spin frequency bearing",
+   "target": "bearing-defect-frequencies",
+   "kind": "industry"
+  },
+  {
+   "term": "single plane field balance",
+   "target": "single-plane-field-balance",
+   "kind": "industry"
+  },
+  {
+   "term": "trial weight balance",
+   "target": "single-plane-field-balance",
+   "kind": "industry"
+  },
+  {
+   "term": "influence coefficient balancing",
+   "target": "single-plane-field-balance",
+   "kind": "industry"
+  },
+  {
+   "term": "field balance correction weight",
+   "target": "single-plane-field-balance",
+   "kind": "industry"
+  },
+  {
+   "term": "fan balancing trial weight",
+   "target": "single-plane-field-balance",
+   "kind": "industry"
   }
  ]
 }

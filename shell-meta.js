@@ -118,6 +118,7 @@ export const PROFESSION_NOUN = {
   // noun is the first thing buildTitle drops at the 70-char cap, so the tiles
   // that most need naming are the ones that silently lose it.
   "line-work": "Line Work",
+  millwright: "Millwright",
   mechanical: "Mechanical",
   demolition: "Demolition",
   fireproofing: "Fireproofing",

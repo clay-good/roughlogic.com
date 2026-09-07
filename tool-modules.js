@@ -744,6 +744,17 @@ export const TOOL_MODULES = (() => {
     "transverse-wind-load-conductor", "nesc-district-loading",
     "conductor-creep-elongation", "sagging-return-wave",
   ]);
+  // spec-v1469..v1477: the millwright alignment, vibration, and balance bench.
+  // The catalog had `rotor-balance-grade` (an ISO 1940 TOLERANCE) and bearing
+  // life and load, and nothing that turned two dial readings into a shim or
+  // named a line in a spectrum. All nine keep group "K".
+  declare("./calc-millwright.js", "MILLWRIGHT_RENDERERS", [
+    "shaft-alignment-rim-face", "shaft-alignment-reverse-dial",
+    "alignment-thermal-growth", "soft-foot-correction",
+    "coupling-alignment-tolerance", "vibration-severity-zone",
+    "vibration-forcing-frequencies", "bearing-defect-frequencies",
+    "single-plane-field-balance",
+  ]);
   // spec-v80 cap-relief split: the spec-v25 site-civil / roadway-geometry
   // quartet moved out of calc-construction.js (it sat at 95.0% of its size
   // cap, the tightest remaining calculator module) into its own module. All

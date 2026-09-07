@@ -98847,6 +98847,469 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "shaft-alignment-rim-face",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "rim TIR -0.020 in, face TIR +0.006 in on a 6 in sweep, feet 8 and 20 in from the coupling",
+   "source_edition_or_year": "offset = rim TIR / 2; angularity = face TIR / swept diameter; move = offset + angularity x distance",
+   "source_section_or_page": "the machine manufacturer alignment specification governs",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "rim_tir_in": -0.02,
+    "face_tir_in": 0.006,
+    "face_diameter_in": 6,
+    "front_foot_distance_in": 8,
+    "rear_foot_distance_in": 20
+   },
+   "outputs": {
+    "offset_in": {
+     "value": -0.01,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "angularity_in_per_in": {
+     "value": 0.001,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "front_move_in": {
+     "value": -0.002,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rear_move_in": {
+     "value": 0.01,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "foot_move_difference_in": {
+     "value": 0.012,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "shaft-alignment-reverse-dial",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "TIR -0.014 in at plane A and +0.022 in at plane B, 10 in apart, feet at 6 and 24 in",
+   "source_edition_or_year": "offset = TIR / 2 at each plane; slope = (B - A) / spacing; move = offset A + slope x distance",
+   "source_section_or_page": "the machine manufacturer alignment specification governs",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "tir_a_in": -0.014,
+    "tir_b_in": 0.022,
+    "plane_spacing_in": 10,
+    "front_foot_distance_in": 6,
+    "rear_foot_distance_in": 24,
+    "coupling_center_distance_in": 5
+   },
+   "outputs": {
+    "offset_a_in": {
+     "value": -0.007,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "offset_b_in": {
+     "value": 0.011,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "slope_in_per_in": {
+     "value": 0.0018,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "front_move_in": {
+     "value": 0.0038,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rear_move_in": {
+     "value": 0.0362,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "coupling_center_offset_in": {
+     "value": 0.002,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "alignment-thermal-growth",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "pump on an 18 in cast steel pedestal at 160 degF beside a motor on 14 in at 75 degF, ambient 70",
+   "source_edition_or_year": "growth = alpha x support height x temperature rise; cold target = -(movable growth - stationary growth)",
+   "source_section_or_page": "hot alignment verification and the machine manufacturer data govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "stationary_support_height_in": 14,
+    "stationary_alpha_per_f": 0.0000065,
+    "stationary_operating_temp_f": 75,
+    "movable_support_height_in": 18,
+    "movable_alpha_per_f": 0.0000065,
+    "movable_operating_temp_f": 160,
+    "ambient_temp_f": 70,
+    "tolerance_offset_mils": 2
+   },
+   "outputs": {
+    "stationary_growth_in": {
+     "value": 0.000455,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "movable_growth_in": {
+     "value": 0.01053,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "relative_growth_in": {
+     "value": 0.010075,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cold_target_offset_in": {
+     "value": -0.010075,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tolerance_multiple": {
+     "value": 5.0375,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "soft-foot-correction",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "four feet reading 1, 7, 2 and 1 mils against a 2 mil threshold",
+   "source_edition_or_year": "the rise when a foot alone is loosened is its shim; diagonals compared to separate a bad foot from a twisted base",
+   "source_section_or_page": "the machine manufacturer mounting requirements govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "foot_lf_in": 0.001,
+    "foot_rf_in": 0.007,
+    "foot_lr_in": 0.002,
+    "foot_rr_in": 0.001,
+    "threshold_in": 0.002
+   },
+   "outputs": {
+    "worst_foot_rise_in": {
+     "value": 0.007,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "failing_feet": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "diagonal_lf_rr_in": {
+     "value": 0.002,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "diagonal_rf_lr_in": {
+     "value": 0.009,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "diagonal_difference_in": {
+     "value": 0.007,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "coupling-alignment-tolerance",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "3,600 rpm machine at 0.0035 in offset and 0.8 mils/in against 0.003 in and 1.0 mils/in acceptable",
+   "source_edition_or_year": "measured as a percent of the entered acceptable and excellent tolerances for the speed",
+   "source_section_or_page": "the plant precision maintenance standard governs",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "rpm": 3600,
+    "measured_offset_in": 0.0035,
+    "measured_angularity_mils_per_in": 0.8,
+    "offset_excellent_in": 0.0015,
+    "offset_acceptable_in": 0.003,
+    "angularity_excellent_mils_per_in": 0.5,
+    "angularity_acceptable_mils_per_in": 1,
+    "spacer_length_in": 0,
+    "spacer_end_offset_in": 0
+   },
+   "outputs": {
+    "offset_pct_of_acceptable": {
+     "value": 116.667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "angularity_pct_of_acceptable": {
+     "value": 80,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "offset_over_by_in": {
+     "value": 0.0005,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "offset_pct_of_excellent": {
+     "value": 233.333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vibration-severity-zone",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "0.135 in/s rms on Class II boundaries, against 0.062 in/s six months earlier",
+   "source_edition_or_year": "zone from the entered A/B, B/C and C/D boundaries; trend as percent change and rate per month",
+   "source_section_or_page": "ISO 20816 and the plant condition monitoring programme govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "reading": 0.135,
+    "reading_is_mm_s": 0,
+    "boundary_ab": 0.044,
+    "boundary_bc": 0.11,
+    "boundary_cd": 0.28,
+    "previous_reading": 0.062,
+    "interval_months": 6
+   },
+   "outputs": {
+    "reading_in_s": {
+     "value": 0.135,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "reading_mm_s": {
+     "value": 3.429,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_to_next_zone_in_s": {
+     "value": 0.145,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "change_pct": {
+     "value": 117.742,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "change_per_month_in_s": {
+     "value": 0.0121667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vibration-forcing-frequencies",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "1,780 rpm pump, 7-vane impeller, 31-tooth pinion, 60 Hz supply",
+   "source_edition_or_year": "1x = rpm / 60; blade pass = 1x x blades; gear mesh = 1x x teeth; twice line = 2 x supply",
+   "source_section_or_page": "a qualified vibration analyst governs any diagnosis",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "rpm": 1780,
+    "blade_count": 7,
+    "gear_tooth_count": 31,
+    "belt_length_in": 0,
+    "sheave_diameter_in": 0,
+    "line_frequency_hz": 60,
+    "rotor_bar_count": 0
+   },
+   "outputs": {
+    "one_x_hz": {
+     "value": 29.6667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "two_x_hz": {
+     "value": 59.3333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "blade_pass_hz": {
+     "value": 207.667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gear_mesh_hz": {
+     "value": 919.667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "twice_line_hz": {
+     "value": 120,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "two_x_to_line_gap_hz": {
+     "value": 60.6667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bearing-defect-frequencies",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "6311 deep-groove ball bearing, 9 balls of 0.5906 in on a 2.8346 in pitch diameter, 1,780 rpm",
+   "source_edition_or_year": "the four standard defect frequency relations at zero contact angle",
+   "source_section_or_page": "the bearing manufacturer published frequencies and a qualified analyst govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "rpm": 1780,
+    "ball_count": 9,
+    "ball_diameter_in": 0.5906,
+    "pitch_diameter_in": 2.8346,
+    "contact_angle_deg": 0
+   },
+   "outputs": {
+    "shaft_hz": {
+     "value": 29.6667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ftf_hz": {
+     "value": 11.7428,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bpfo_hz": {
+     "value": 105.685,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bpfi_hz": {
+     "value": 161.315,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bsf_hz": {
+     "value": 68.1024,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bpfo_order": {
+     "value": 3.56241,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bpfi_order": {
+     "value": 5.43759,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "single-plane-field-balance",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "fan at 6.2 mils and 45 degrees, taken by a 10 g trial at 0 degrees to 3.8 mils and 160 degrees",
+   "source_edition_or_year": "E = T - O as vectors; correction = trial x |O| / |E|; placed by rotating from E to the direction opposite O",
+   "source_section_or_page": "the machine manufacturer balancing instructions and a qualified technician govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "original_amplitude": 6.2,
+    "original_phase_deg": 45,
+    "trial_weight_g": 10,
+    "trial_weight_angle_deg": 0,
+    "trial_amplitude": 3.8,
+    "trial_phase_deg": 160
+   },
+   "outputs": {
+    "effect_magnitude": {
+     "value": 8.53193,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "effect_angle_deg": {
+     "value": 201.193,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "correction_weight_g": {
+     "value": 7.26682,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "correction_angle_deg": {
+     "value": 23.807,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "influence_coefficient": {
+     "value": 0.853193,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

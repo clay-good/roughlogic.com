@@ -21775,6 +21775,116 @@ export const CITATIONS = {
       { name: "The manufacturer's provisions govern absolutely", value: "rated capacities, allowable geometries, and permitted wind speeds", source: "turbine service instructions" },
     ],
   },
+  // spec-v1469..v1477: the 2026-09-07 trade-expansion millwright alignment,
+  // vibration, and balance band. Group K.
+  "shaft-alignment-rim-face": {
+    formula: "offset at the coupling = rim TIR / 2; angularity = face TIR / the diameter the face indicator swept; move at a foot = offset + angularity x the distance from the coupling face to that foot. Positive raises the foot and adds shim.",
+    edition: "The rim-and-face alignment relations as standard millwright practice, by name. Bracket sag must be measured and subtracted before the readings are used. The machine manufacturer's alignment specification, the coupling manufacturer's data, and the plant's precision maintenance procedure govern.",
+    freeAccess: "Arithmetic on dial indicator readings the millwright takes; no manufacturer table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The rim reading sees pure offset and reads TWICE it, because the indicator crosses the misalignment on both sides of the sweep -- forgetting the divide-by-two is the classic doubling error. The face reading is angularity, a slope once divided by the diameter actually swept. Both project to the feet, and that projection is why a small angle is worse than a large offset: a 0.001 in/in slope is 0.020 in of shim at a foot 20 in away. EVERY MOVE CARRIES AN EXPLICIT CONVENTION stated in words, because a sign left to be read is a sign that gets read wrong. A -0.020 in rim with a +0.006 in face on a 6 in sweep gives a -10.0 mil offset and a 1.00 mils/in slope, which LOWERS the front foot 2.0 mils and RAISES the rear 10.0 -- opposite directions, 12.0 mils apart, and that difference IS the angle. A crew shimming both feet equally to the offset would leave the entire angular error in place. Correct the angle first and the offset second, because moving to fix an angle changes the offset and not the reverse.",
+    assumptions: [
+      { name: "Readings must be taken with the shafts rotated together", value: "otherwise the numbers describe runout or a bent shaft", source: "millwright practice" },
+      { name: "Bracket sag is not corrected here", value: "on a long bracket it easily exceeds the misalignment", source: "millwright practice" },
+      { name: "Soft foot comes first", value: "an alignment number is meaningless while the machine rocks", source: "precision maintenance practice" },
+    ],
+  },
+  "shaft-alignment-reverse-dial": {
+    formula: "centerline offset at each plane = that plane's TIR / 2; slope = (offset B - offset A) / the plane spacing; move at a foot = offset A + slope x the distance from plane A to that foot, measured in the same sense as the plane spacing.",
+    edition: "The reverse-dial alignment relations as standard millwright practice, by name. Both readings are rim readings, so no face measurement is involved and axial float does not affect the result. Bracket sag must be measured and subtracted. The machine manufacturer's alignment specification and the plant's precision maintenance procedure govern.",
+    freeAccess: "Similar-triangles arithmetic on two dial readings; no manufacturer table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Reverse-dial beats rim-and-face on anything with axial float or a long span, because two rim readings at two planes a known distance apart fully describe the misalignment -- two points define a line -- without any face being square. That is why it is the method of choice on long and spacer couplings. Everything after is one line extrapolated to the feet, and the single largest source of error is the direction convention: the distance to a foot is measured in the SAME sense as the plane spacing, and a foot on the far side of plane A carries a negative distance. Readings of -0.014 and +0.022 in ten inches apart give -7.0 and +11.0 mils and a 1.80 mils/in slope, raising the front foot 3.8 mils and the rear 36.2 -- BOTH THE SAME DIRECTION, because the line has already crossed zero before the front foot. Feet moving in opposite directions is a real and different signature, and reading two positive numbers as opposite is how a crew makes an alignment worse.",
+    assumptions: [
+      { name: "Direction convention governs the answer", value: "a foot behind plane A carries a negative distance", source: "millwright practice" },
+      { name: "Bracket sag is not corrected here", value: "and reverse-dial invites long brackets", source: "millwright practice" },
+      { name: "Vertical solve only", value: "the horizontal solve is the same arithmetic on the side readings, corrected by jacking", source: "millwright practice" },
+    ],
+  },
+  "alignment-thermal-growth": {
+    formula: "growth = coefficient of thermal expansion x support height from the mounting plane to the shaft centerline x (operating temperature - ambient); relative growth = movable growth - stationary growth; the cold target offset is the NEGATIVE of the relative growth.",
+    edition: "The support thermal-growth relation as standard millwright practice, by name. Measured hot growth from laser or optical targets beats any calculated value, and a manufacturer's published growth target governs where one exists. The machine manufacturer's data, the plant's precision maintenance procedure, and hot alignment verification govern.",
+    freeAccess: "One line of thermal expansion arithmetic on dimensions and temperatures the user supplies.",
+    governance: GOVERNANCE.general,
+    editionNote: "A pump aligned cold and running hot is a pump out of alignment. Support growth is ordinary thermal expansion of the pedestal between the mounting plane and the shaft centerline, so it depends on that HEIGHT, the material and the rise -- not on the machine's power or size, which is the intuition it defeats. What matters is the DIFFERENCE: machines that grow equally stay aligned however hot they get, and a hot pump on a short pedestal beside a cool motor on a tall one can grow the wrong way entirely, so the correction has a sign that is not guessable. It is applied as a cold TARGET, deliberately out of alignment cold and into alignment hot. An 18 in cast steel pedestal at 6.5e-06 per degF running 90 degF above ambient rises 10.5 mils; skip the correction and the running offset is roughly five times the ~2 mil tolerance of a 3,600 rpm machine, from one line of arithmetic.",
+    assumptions: [
+      { name: "Uniform expansion of one material and one height", value: "transient states during startup are not modelled", source: "millwright practice" },
+      { name: "Pipe strain is not addressed", value: "it moves a pump centerline in ways temperature does not explain", source: "millwright practice" },
+      { name: "Measured growth beats calculated", value: "laser or optical targets taken hot govern", source: "precision maintenance practice" },
+    ],
+  },
+  "soft-foot-correction": {
+    formula: "the rise measured at a foot when that foot alone is loosened, with the other three tight, is the shim that foot needs; the two diagonal sums are compared to separate a single bad foot from a twisted base.",
+    edition: "The soft-foot sweep as standard precision maintenance practice, by name. The 0.002 in (0.05 mm) acceptance figure is common practice and is ENTERED rather than fixed. The machine manufacturer's mounting requirements and the plant's precision maintenance procedure govern.",
+    freeAccess: "Reading four indicator numbers the millwright takes; no manufacturer table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Every alignment number is a lie until soft foot is zero, because a machine that rocks changes shape when the bolts come down. If a loosened foot springs up, the bolt was pulling the machine onto a gap and distorting the frame, and the shim to add is exactly the rise. Working ONE foot at a time isolates each, and repeating the sweep matters because correcting one redistributes the others. Two kinds hide behind the same reading: parallel soft foot is a plain gap and takes a flat shim, angular soft foot is a foot not parallel to the base and takes a stepped or machined shim -- a flat shim under an angular foot only moves the contact point. The diagonal check separates a bad foot from a bad base: 1, 7, 2 and 1 mils give diagonals of 2 and 9, and the whole 7 mil disagreement sits on the one foot. A twisted base instead spreads the rise across a diagonal pair. Aligning before the shim goes in produces a beautiful set of cold readings that change the moment the bolts are torqued.",
+    assumptions: [
+      { name: "Parallel versus angular is an indication, not a determination", value: "that needs a feeler gauge or a step check", source: "millwright practice" },
+      { name: "Grout, base and anchor bolts are not evaluated", value: "voided grout is a common root cause shimming will not fix", source: "millwright practice" },
+      { name: "Pipe strain produces the same symptom", value: "and is not cured by shims", source: "millwright practice" },
+    ],
+  },
+  "coupling-alignment-tolerance": {
+    formula: "measured offset and angularity expressed as a percent of the acceptable and excellent tolerances entered for the operating speed; for a spacer coupling the judged quantity is the SLOPE across the spacer, = end-to-end offset / spacer length.",
+    edition: "The speed-dependent alignment tolerance comparison, with the tolerance values ENTERED rather than shipped because they differ between references and plant standards. Tolerance tightens roughly in inverse proportion to speed because the misalignment is cycled once per revolution. A coupling manufacturer's published capability is NOT a tolerance. The machine manufacturer's alignment specification and the plant's precision maintenance standard govern.",
+    freeAccess: "A ratio against tolerances the user enters from their own adopted standard; no tolerance table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Alignment tolerance is a statement about the cyclic bending the coupling and shaft ends see once per revolution: double the speed and the same misalignment is imposed twice as often, so the allowable falls roughly in proportion, and a 0.005 in offset that is fine at 900 rpm is a failure at 3,600. Two things this catches. A coupling's published capability is not a tolerance -- couplings accommodate far more misalignment than the bearings and seals behind them tolerate, and the machine sets the limit. And for a spacer coupling the meaningful quantity is the SLOPE across the spacer rather than an offset at a plane, so a long spacer legitimately allows a large end-to-end offset while the slope stays tight; judging it by end-to-end offset condemns alignments that are fine. At 3,600 rpm half a thousandth is the difference between inside and outside tolerance, and the same reading at 1,200 rpm sits comfortably in the excellent column.",
+    assumptions: [
+      { name: "No tolerance table is shipped", value: "values differ between references and plant standards", source: "precision maintenance practice" },
+      { name: "A coupling capability is not a tolerance", value: "the bearings and seals set the limit, not the coupling", source: "the coupling manufacturer's data" },
+      { name: "Passing now is not staying passing", value: "thermal growth, pipe strain and soft foot decide that", source: "millwright practice" },
+    ],
+  },
+  "vibration-severity-zone": {
+    formula: "the overall broadband velocity reading is placed in zone A, B, C or D against the three boundary velocities entered for the machine class; 1 mm/s = 0.03937 in/s; the trend is the percent change from a previous reading and its rate per month.",
+    edition: "The ISO 20816 vibration severity zones A/B/C/D, CITED NOT MIRRORED: the class boundaries are entered because they depend on the machine class, the edition, and the plant's adopted limits. Zone A is new-machine condition, B acceptable for unrestricted long-term operation, C unsatisfactory long-term, D severe. ISO 20816, the machine manufacturer's limits, and the plant's condition monitoring programme govern.",
+    freeAccess: "A comparison against boundaries the user enters; no class table from the standard is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "An overall velocity means nothing without a class, because the same velocity means different things on a 10 hp pump and a 2,000 hp compressor on a soft foundation. Within a class the boundaries are fixed velocities, so the reading and the class give the answer with no judgment required -- which is what makes it useful to a technician who is not an analyst. THE ZONE IS A SCREEN, NOT A DIAGNOSIS: zone C says something is wrong and nothing about what. Equally important is the CHANGE, which one reading cannot show: 0.062 to 0.135 in/s in six months is 118% growth and a boundary crossed in one interval, and a machine that has merely doubled inside zone B is telling a clear story. The standard's own guidance treats a significant change as actionable regardless of zone. An overall velocity is also insensitive to the high-frequency energy early bearing damage produces -- a bearing can be failing with the reading firmly in zone B.",
+    assumptions: [
+      { name: "No class boundary table is shipped", value: "boundaries are entered from the adopted edition and class", source: "ISO 20816" },
+      { name: "A screen, not a diagnosis", value: "the forcing and defect frequencies turn a level into a cause", source: "condition monitoring practice" },
+      { name: "Readings taken differently are not comparable", value: "transducer mounting, location and band all change the number", source: "condition monitoring practice" },
+    ],
+  },
+  "vibration-forcing-frequencies": {
+    formula: "running speed 1x = rpm / 60 Hz; blade or vane pass = 1x x the blade count; gear mesh = 1x x the tooth count with sidebands spaced at 1x; belt frequency = 1x x pi x sheave diameter / belt length; twice line frequency = 2 x the supply frequency; rotor bar pass = 1x x the bar count.",
+    edition: "The standard rotating-machinery forcing frequencies as condition monitoring practice, by name. Where to LOOK, not a diagnosis: amplitude, phase, axial content and resonance decide what a peak means. The machine and component manufacturers' data and a qualified vibration analyst govern any diagnosis.",
+    freeAccess: "Multiplication of shaft speed by part counts the user supplies; no spectrum or manufacturer table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Every rotating part announces itself at a frequency tied to shaft speed, so identifying a peak, dividing by running speed, and reading off the integer names the component. The classic confusions are what a technician actually gets wrong: unbalance is 1x and dominantly radial; misalignment is usually 2x with significant AXIAL energy, and it is the axial content rather than the frequency that separates the two in the field; looseness throws a picket fence of harmonics. And a peak at twice line frequency is ELECTRICAL no matter how much it looks like a shaft harmonic -- a genuine trap near 3,540 rpm, where 2x running is about 118 Hz against a 120 Hz supply and a spectrum alone cannot separate them. There the only reliable test is to cut power and watch whether the peak vanishes instantly, because an electrical line dies with the field while a mechanical one coasts down. Gear mesh sidebands are reported because their PRESENCE is the finding: a healthy mesh shows the line without them.",
+    assumptions: [
+      { name: "Where to look, not what is wrong", value: "every one of these lines is present on a healthy machine", source: "condition monitoring practice" },
+      { name: "Amplitude is not evaluated", value: "it is what separates a normal forcing frequency from a problem", source: "condition monitoring practice" },
+      { name: "Resonance is not addressed", value: "it amplifies whatever excites it and can make a small forcing function dominate", source: "condition monitoring practice" },
+    ],
+  },
+  "bearing-defect-frequencies": {
+    formula: "cage FTF = (fr/2)(1 - (d/D) cos a); outer race BPFO = (n/2)(1 - (d/D) cos a) fr; inner race BPFI = (n/2)(1 + (d/D) cos a) fr; ball spin BSF = (D/2d)(1 - ((d/D) cos a)^2) fr, for n rolling elements of diameter d on pitch diameter D at contact angle a.",
+    edition: "The standard rolling-element bearing defect frequency relations as condition monitoring practice, by name. Pure rolling is assumed; real bearings slip, so measured frequencies run one to two percent below these. The bearing manufacturer's published defect frequencies for the specific part number, and a qualified vibration analyst, govern.",
+    freeAccess: "Geometry arithmetic on bearing dimensions the user supplies; no manufacturer frequency table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "A spalled bearing rings at frequencies that are NOT integer multiples of shaft speed, which is why they are hard to spot and why they identify the damaged part precisely. A crack in the stationary outer race is struck by each ball as it rolls past; a crack in the rotating inner race is struck at a higher rate because the race moves toward the balls -- which is why the inner-race frequency exceeds the outer-race one and why the ratio of a peak to shaft speed says WHICH race failed. Two field facts. The non-integer ratio is diagnostic in itself: 3.56 times running speed cannot be anything mechanical except a bearing, because blades, teeth and rotor bars are all whole numbers. And inner-race defects produce SIDEBANDS spaced at running speed, because the defect moves in and out of the load zone once per revolution, so evenly spaced peaks around a non-integer centre are close to a positive identification. When the bearing number is unknown, 0.4 times the element count for the outer race and 0.6 for the inner get close enough to search a spectrum. The cage frequency times the element count equals the outer race frequency exactly, which checks an entered geometry.",
+    assumptions: [
+      { name: "Pure rolling assumed", value: "real slip puts measured frequencies one to two percent low", source: "condition monitoring practice" },
+      { name: "Frequencies are present on a healthy bearing", value: "amplitude, trend and the envelope spectrum find damage, not the frequency", source: "condition monitoring practice" },
+      { name: "Contact angle shifts with axial load", value: "which moves every one of these on an angular-contact bearing", source: "the bearing manufacturer's data" },
+    ],
+  },
+  "single-plane-field-balance": {
+    formula: "effect vector E = T - O by vector subtraction of the trial and original readings; correction weight = trial weight x |O| / |E|; the correction is placed by rotating the trial weight through the angle from E to the direction opposite O; influence coefficient = |E| / trial weight.",
+    edition: "The single-plane trial-weight (influence coefficient) balance method as standard practice, by name. Linear response is assumed, which holds for a rigid rotor below its first critical speed and fails near a resonance. The machine manufacturer's balancing instructions, the applicable balance quality grade, and a qualified balancing technician govern.",
+    freeAccess: "Vector arithmetic on amplitude and phase readings the technician takes; no manufacturer procedure is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE TRIAL WEIGHT IS NOT A GUESS AT THE CORRECTION, it is a probe: it says how the rotor responds to a known weight at a known place. The effect vector is that response, obtained by subtracting the readings as VECTORS rather than as magnitudes, and the correction is then pure proportion -- scale by the ratio of the original vibration to the response, and rotate so the effect points opposite the original. A fan at 6.2 mils and 45 degrees, taken by a 10 g trial at 0 degrees to 3.8 mils and 160 degrees, gives an 8.53 effect at 201 degrees, a 7.27 g correction, and a 24 degree move. Two rules keep it out of trouble. Size the trial to change the reading NOTICEABLY, roughly 30% in amplitude or 30 degrees in phase: too small and the effect is buried in noise and the answer is worthless. And THE TRIAL WEIGHT COMES OFF when the correction goes on -- leaving both is the commonest way a first attempt makes things worse. The influence coefficient is reusable: on the same machine at the same speed it turns every future balance into a single reading with no trial run.",
+    assumptions: [
+      { name: "Linear response assumed", value: "it fails near a resonance, where a balance will not hold", source: "balancing practice" },
+      { name: "Single plane only", value: "a long rotor needs two-plane, and single-plane can make couple unbalance worse", source: "balancing practice" },
+      { name: "It does not verify the fault IS unbalance", value: "misalignment, looseness and a bent shaft all show at 1x", source: "condition monitoring practice" },
+    ],
+  },
   // spec-v1450..v1460: the 2026-09-07 trade-expansion overhead line and
   // distribution band. Group A. The charter's probe returned ZERO tiles here.
   "ruling-span": {

@@ -1998,6 +1998,16 @@ export const COMPUTE_MAP = {
   "nesc-district-loading": { module: "../../calc-lineworker.js", fn: "computeNescDistrictLoading" },
   "conductor-creep-elongation": { module: "../../calc-lineworker.js", fn: "computeConductorCreepElongation" },
   "sagging-return-wave": { module: "../../calc-lineworker.js", fn: "computeSaggingReturnWave" },
+  // spec-v1469..v1477 millwright band
+  "shaft-alignment-rim-face": { module: "../../calc-millwright.js", fn: "computeShaftAlignmentRimFace" },
+  "shaft-alignment-reverse-dial": { module: "../../calc-millwright.js", fn: "computeShaftAlignmentReverseDial" },
+  "alignment-thermal-growth": { module: "../../calc-millwright.js", fn: "computeAlignmentThermalGrowth" },
+  "soft-foot-correction": { module: "../../calc-millwright.js", fn: "computeSoftFootCorrection" },
+  "coupling-alignment-tolerance": { module: "../../calc-millwright.js", fn: "computeCouplingAlignmentTolerance" },
+  "vibration-severity-zone": { module: "../../calc-millwright.js", fn: "computeVibrationSeverityZone" },
+  "vibration-forcing-frequencies": { module: "../../calc-millwright.js", fn: "computeVibrationForcingFrequencies" },
+  "bearing-defect-frequencies": { module: "../../calc-millwright.js", fn: "computeBearingDefectFrequencies" },
+  "single-plane-field-balance": { module: "../../calc-millwright.js", fn: "computeSinglePlaneFieldBalance" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.
