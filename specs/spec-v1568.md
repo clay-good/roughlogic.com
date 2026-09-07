@@ -1,6 +1,14 @@
 # roughlogic.com Specification v1568 -- Condensate Pump Flash and NPSH Margin (`calc-steamplant.js`, Group C HVAC, steam plant, 1 New Tile)
 
-> **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
+> **Status: CUT 2026-09-07 as a duplicate.** `npsh-a` in `calc-hvac.js` has computed
+> `NPSHa = H_atm - H_vapor + H_static - H_friction` since spec-v3, and at saturation the
+> first two terms cancel -- to within 0.05 ft at 212 degF -- so it already returned this
+> spec's answer, and returned it from the general relation rather than from a special case.
+> Rather than ship a second suction-head calculator, that one gained what this spec added:
+> the MARGIN in feet (it returned only a cavitation boolean), the suction friction the
+> arrangement tolerates before the margin is gone, and the static height a stated target
+> margin needs. The worked example below now runs there, and this spec's aliases route to
+> it. Single-tile spec. Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-steamplant.js`**
 > (Group C, HVAC -- the existing category, hub `/groups/hvac/`; steam plant and commercial laundry), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >

@@ -2,96 +2,96 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "5b6381ff82323d51",
-      "date": "2026-09-06"
+      "sha": "47c643f452548b2b",
+      "date": "2026-09-07"
     },
     "/tools/": {
-      "sha": "ee62e91deda2c581",
-      "date": "2026-09-06"
+      "sha": "39010934cdb238a2",
+      "date": "2026-09-07"
     },
     "/groups/accounting/": {
-      "sha": "9f81714cbf1705a7",
-      "date": "2026-09-06"
+      "sha": "9e5d2cf194093a8f",
+      "date": "2026-09-07"
     },
     "/groups/agriculture/": {
-      "sha": "8b8493021c2827a4",
-      "date": "2026-09-06"
+      "sha": "87b0b7de8c497d6c",
+      "date": "2026-09-07"
     },
     "/groups/construction/": {
-      "sha": "620143425c2e4d8c",
-      "date": "2026-09-06"
+      "sha": "0086aefd4fd8d141",
+      "date": "2026-09-07"
     },
     "/groups/cross-trade/": {
-      "sha": "b4599d66f9430736",
-      "date": "2026-09-06"
+      "sha": "de109bbdfed68aa2",
+      "date": "2026-09-07"
     },
     "/groups/educators/": {
-      "sha": "7529663f7a86c6cf",
-      "date": "2026-09-06"
+      "sha": "8fc8c06f5ed63936",
+      "date": "2026-09-07"
     },
     "/groups/electrical/": {
-      "sha": "7ccbf6edf7d20261",
-      "date": "2026-09-06"
+      "sha": "10d5f308af96826d",
+      "date": "2026-09-07"
     },
     "/groups/field/": {
-      "sha": "e63b537d8907f862",
-      "date": "2026-09-06"
+      "sha": "76910303573e3557",
+      "date": "2026-09-07"
     },
     "/groups/fire-ground/": {
-      "sha": "3b1bd6593c8889ab",
-      "date": "2026-09-06"
+      "sha": "ba0a13cfedaa71ce",
+      "date": "2026-09-07"
     },
     "/groups/historical/": {
-      "sha": "6ad39ea0066e3fba",
-      "date": "2026-09-06"
+      "sha": "ef04d6a9cf4d3545",
+      "date": "2026-09-07"
     },
     "/groups/hvac/": {
-      "sha": "9d52a32b581f628e",
-      "date": "2026-09-06"
+      "sha": "a938b59b6db09ebe",
+      "date": "2026-09-07"
     },
     "/groups/kitchen/": {
-      "sha": "77936d31a270c73d",
-      "date": "2026-09-06"
+      "sha": "953a4c69b4d0cf84",
+      "date": "2026-09-07"
     },
     "/groups/lab/": {
-      "sha": "3169e8a6a38989b0",
-      "date": "2026-09-06"
+      "sha": "2b1d54819ed37880",
+      "date": "2026-09-07"
     },
     "/groups/mechanic/": {
-      "sha": "69fa0be14641e434",
-      "date": "2026-09-06"
+      "sha": "66637b9ea16fcb00",
+      "date": "2026-09-07"
     },
     "/groups/plumbing/": {
-      "sha": "a8626e3962e80b32",
-      "date": "2026-09-06"
+      "sha": "72c34e0f13cd5bb7",
+      "date": "2026-09-07"
     },
     "/groups/real-estate/": {
-      "sha": "530031720fc2f566",
-      "date": "2026-09-06"
+      "sha": "a928f836a47bb826",
+      "date": "2026-09-07"
     },
     "/groups/references/": {
-      "sha": "50870538253857a4",
-      "date": "2026-09-06"
+      "sha": "6c11bf557cea0eb3",
+      "date": "2026-09-07"
     },
     "/groups/restoration/": {
-      "sha": "d1a9bb9b40f6cb50",
-      "date": "2026-09-06"
+      "sha": "60171d184ffcfa05",
+      "date": "2026-09-07"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "e27222a1904b68af",
-      "date": "2026-09-06"
+      "sha": "fce0a70ddd30a7b7",
+      "date": "2026-09-07"
     },
     "/groups/stage/": {
-      "sha": "32aac4c8422334d0",
-      "date": "2026-09-06"
+      "sha": "6b5d8abf2e7719bb",
+      "date": "2026-09-07"
     },
     "/groups/trucking/": {
-      "sha": "904e7b6c5d149d22",
-      "date": "2026-09-06"
+      "sha": "03961bbdec3223a0",
+      "date": "2026-09-07"
     },
     "/groups/water/": {
-      "sha": "932663916f7196b5",
-      "date": "2026-09-06"
+      "sha": "997e002d09e6d873",
+      "date": "2026-09-07"
     },
     "/tools/aav-install-check/": {
       "sha": "ffd2b0e38a75491f",
@@ -604,6 +604,10 @@
     "/tools/block-redirect-max-angle/": {
       "sha": "b3767e5129bf264b",
       "date": "2026-09-01"
+    },
+    "/tools/blowdown-heat-recovery/": {
+      "sha": "9657353c58bc9101",
+      "date": "2026-09-07"
     },
     "/tools/blower-door-ach50/": {
       "sha": "37f5ad27d81f877d",
@@ -1741,6 +1745,10 @@
       "sha": "e3a335ce2dd2540f",
       "date": "2026-09-01"
     },
+    "/tools/deaerator-steam-demand/": {
+      "sha": "5d53a8c35ad6f3f3",
+      "date": "2026-09-07"
+    },
     "/tools/debt-yield/": {
       "sha": "6c194b35cd929eba",
       "date": "2026-09-01"
@@ -1790,8 +1798,8 @@
       "date": "2026-09-01"
     },
     "/tools/degree-day-energy/": {
-      "sha": "190799e1a3ed0cc8",
-      "date": "2026-09-01"
+      "sha": "df48db3af614852c",
+      "date": "2026-09-07"
     },
     "/tools/degree-of-curve/": {
       "sha": "b6275fa8a6116fb3",
@@ -2598,8 +2606,8 @@
       "date": "2026-09-01"
     },
     "/tools/flash-steam-pct/": {
-      "sha": "e8b74d32619379ed",
-      "date": "2026-09-04"
+      "sha": "2d81c9275610b496",
+      "date": "2026-09-07"
     },
     "/tools/flat-oval-duct/": {
       "sha": "880df543e9cde89c",
@@ -2753,6 +2761,10 @@
       "sha": "961278e8d4adef8c",
       "date": "2026-09-01"
     },
+    "/tools/fuel-oil-atomizing-viscosity/": {
+      "sha": "144d3f12bd287688",
+      "date": "2026-09-07"
+    },
     "/tools/fuel-range/": {
       "sha": "ab7c1e08a2efa7f7",
       "date": "2026-09-04"
@@ -2814,8 +2826,8 @@
       "date": "2026-09-01"
     },
     "/tools/gas-meter-clock/": {
-      "sha": "5c64644be674e21c",
-      "date": "2026-09-04"
+      "sha": "d41d992a997ac964",
+      "date": "2026-09-07"
     },
     "/tools/gas-meter-clock-target/": {
       "sha": "d0da8e7494f7f58d",
@@ -3585,6 +3597,18 @@
       "sha": "7b790dea530faf62",
       "date": "2026-09-01"
     },
+    "/tools/laundry-cost-per-pound/": {
+      "sha": "e12ba91307a1d359",
+      "date": "2026-09-07"
+    },
+    "/tools/laundry-dryer-evaporation/": {
+      "sha": "f36f00027c71326b",
+      "date": "2026-09-07"
+    },
+    "/tools/laundry-washer-turns/": {
+      "sha": "e4e164ea5d433ed5",
+      "date": "2026-09-07"
+    },
     "/tools/lavatory-tub-clearance/": {
       "sha": "1bafa54038c10aba",
       "date": "2026-09-01"
@@ -4166,8 +4190,8 @@
       "date": "2026-09-04"
     },
     "/tools/multi-bend-flat-pattern/": {
-      "sha": "006ad87ec73a7fdf",
-      "date": "2026-09-04"
+      "sha": "3371b2618565073a",
+      "date": "2026-09-07"
     },
     "/tools/multi-leg-sling/": {
       "sha": "525b2ad9419f40b6",
@@ -5492,6 +5516,10 @@
     "/tools/safe-descent-speed/": {
       "sha": "0ce46ac628542205",
       "date": "2026-09-01"
+    },
+    "/tools/safety-valve-capacity/": {
+      "sha": "8a7e9d6dc9e3d52f",
+      "date": "2026-09-07"
     },
     "/tools/sag-vertical-curve/": {
       "sha": "43337eaed73296b1",
@@ -7062,8 +7090,8 @@
       "date": "2026-09-01"
     },
     "/tools/txv-capacity-check/": {
-      "sha": "6eee4f4b61392b03",
-      "date": "2026-09-01"
+      "sha": "a57269a9a7f30fd8",
+      "date": "2026-09-07"
     },
     "/tools/ujoint-operating-angle/": {
       "sha": "7e668ec62c12a91e",

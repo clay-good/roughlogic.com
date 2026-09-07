@@ -1099,6 +1099,14 @@ const _TILES = [
   ["termination-temp-ampacity", "A"],
   ["ada-ramp-slope", "E"], ["accessible-parking-count", "E"], ["sign-character-height", "E"], ["reach-range", "E"], ["protruding-object-check", "E"], ["accessible-route-width", "E"], ["door-clear-width", "E"], ["floor-level-change", "E"], ["turning-clear-floor-space", "E"], ["handrail-geometry", "E"], ["knee-toe-clearance", "E"], ["flood-opening-area", "E"], ["ada-stair-check", "E"], ["tactile-sign-mounting", "E"], ["drinking-fountain-check", "E"], ["accessible-shower-check", "E"], ["substantial-improvement-check", "E"], ["accessible-parking-geometry", "E"], ["water-closet-location", "E"], ["lavatory-tub-clearance", "E"], ["ramp-detail-check", "E"],
   ["pool-bonding-680-26", "A"],
+  // spec-v1563..v1570 steam plant and commercial laundry band
+  ["laundry-washer-turns", "G"],
+  ["laundry-cost-per-pound", "G"],
+  ["laundry-dryer-evaporation", "G"],
+  ["blowdown-heat-recovery", "C"],
+  ["deaerator-steam-demand", "C"],
+  ["safety-valve-capacity", "C"],
+  ["fuel-oil-atomizing-viscosity", "C"],
 ];
 
 

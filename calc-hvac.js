@@ -1531,6 +1531,7 @@ export function computeNPSHa({
   source_elevation_relative_ft = 0, // positive if source above pump
   friction_loss_ft = 0,
   npsh_required_ft = null,
+  target_margin_ft = 3, // spec-v1568: the margin a hot-condensate pump is set up for
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   source_elevation_relative_ft = Number(source_elevation_relative_ft); friction_loss_ft = Number(friction_loss_ft);
@@ -1542,9 +1543,25 @@ export function computeNPSHa({
   const npsha = H_atm - H_vapor + H_static - friction_loss_ft;
   let cavitation = null;
   if (npsh_required_ft !== null) cavitation = npsha < npsh_required_ft;
+  // spec-v1568 (CUT, its material landed here): the margin itself, the
+  // friction the arrangement tolerates before the margin is gone, and the
+  // static height a target margin needs. On SATURATED liquid -- hot condensate
+  // in a vented receiver -- H_atm and H_vapor cancel exactly, so the available
+  // head is nothing but static minus friction and there is no atmospheric
+  // cushion to absorb a fouling strainer. Additive: every output above is
+  // unchanged, and these are null when no NPSHr is supplied.
+  const at_saturation = Math.abs(H_atm - H_vapor) < 0.5;
+  let npsh_margin_ft = null, max_friction_ft = null, static_for_target_margin_ft = null;
+  if (npsh_required_ft !== null) {
+    npsh_margin_ft = npsha - npsh_required_ft;
+    max_friction_ft = H_atm - H_vapor + H_static - npsh_required_ft;
+    static_for_target_margin_ft = target_margin_ft + npsh_required_ft + friction_loss_ft - (H_atm - H_vapor);
+  }
   return {
     H_atm_ft: H_atm, H_vapor_ft: H_vapor, H_static_ft: H_static,
     H_friction_ft: friction_loss_ft, NPSHa_ft: npsha, cavitation_risk: cavitation,
+    npsh_margin_ft, max_friction_ft, static_for_target_margin_ft,
+    target_margin_ft, at_saturation,
   };
 }
 
@@ -1728,14 +1745,19 @@ function renderNPSHa(inputRegion, outputRegion, citationEl) {
   const s = makeNumber("Source elevation vs pump (ft, + above)", "np-s", { step: "any" });
   const f = makeNumber("Suction friction loss (ft)", "np-f", { step: "any", min: "0" });
   const r = makeNumber("NPSH required (ft, optional)", "np-r", { step: "any", min: "0" });
-  for (const x of [e, w, s, f, r]) inputRegion.appendChild(x.wrap);
+  const tm = makeNumber("Target margin over NPSHr (ft)", "np-tm", { step: "any", min: "0", value: "3" });
+  for (const x of [e, w, s, f, r, tm]) inputRegion.appendChild(x.wrap);
   const oA = makeOutputLine(outputRegion, "Atmospheric head", "np-out-a");
   const oV = makeOutputLine(outputRegion, "Vapor pressure head", "np-out-v");
   const oN = makeOutputLine(outputRegion, "NPSH available", "np-out-n");
   const oC = makeOutputLine(outputRegion, "Cavitation risk", "np-out-c");
+  const oM = makeOutputLine(outputRegion, "Margin over NPSHr", "np-out-m");
+  const oF = makeOutputLine(outputRegion, "Suction friction this arrangement tolerates", "np-out-f");
+  const oS = makeOutputLine(outputRegion, "Static height for the target margin", "np-out-s");
   function fillExample(v) {
     e.input.value = v.elevation_ft; w.input.value = v.water_temp_F; s.input.value = v.source_elevation_relative_ft;
     f.input.value = v.friction_loss_ft; r.input.value = v.npsh_required_ft;
+    if (v.target_margin_ft !== undefined) tm.input.value = v.target_margin_ft;
     update();
   }
   const update = debounce(() => {
@@ -1745,14 +1767,19 @@ function renderNPSHa(inputRegion, outputRegion, citationEl) {
       source_elevation_relative_ft: Number(s.input.value) || 0,
       friction_loss_ft: Number(f.input.value) || 0,
       npsh_required_ft: npshrVal,
+      target_margin_ft: tm.input.value === "" ? 3 : Number(tm.input.value),
     });
-    if (x.error) { oA.textContent = x.error; oV.textContent = "-"; oN.textContent = "-"; oC.textContent = "-"; return; }
+    if (x.error) { oA.textContent = x.error; oV.textContent = "-"; oN.textContent = "-"; oC.textContent = "-"; oM.textContent = "-"; oF.textContent = "-"; oS.textContent = "-"; return; }
     oA.textContent = fmt(x.H_atm_ft, 2) + " ft";
     oV.textContent = fmt(x.H_vapor_ft, 2) + " ft";
     oN.textContent = fmt(x.NPSHa_ft, 2) + " ft";
     oC.textContent = x.cavitation_risk === null ? "(no NPSHr supplied)" : (x.cavitation_risk ? "RISK: NPSHa < NPSHr" : "ok");
+    const sat = x.at_saturation ? " -- at saturation the atmospheric and vapor heads cancel, so this is static minus friction and nothing else" : "";
+    oM.textContent = x.npsh_margin_ft === null ? "(no NPSHr supplied)" : fmt(x.npsh_margin_ft, 2) + " ft" + sat;
+    oF.textContent = x.max_friction_ft === null ? "(no NPSHr supplied)" : fmt(x.max_friction_ft, 2) + " ft before the margin is gone -- a fouling strainer eats this invisibly";
+    oS.textContent = x.static_for_target_margin_ft === null ? "(no NPSHr supplied)" : fmt(x.static_for_target_margin_ft, 2) + " ft of liquid above the pump for " + fmt(x.target_margin_ft, 1) + " ft of margin";
   }, DEBOUNCE_MS);
-  for (const el of [e.input, w.input, s.input, f.input, r.input]) el.addEventListener("input", update);
+  for (const el of [e.input, w.input, s.input, f.input, r.input, tm.input]) el.addEventListener("input", update);
 }
 
 export const HVAC_RENDERERS = {

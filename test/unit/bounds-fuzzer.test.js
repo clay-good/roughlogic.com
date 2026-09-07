@@ -44935,3 +44935,248 @@ test("bounds: spec-v1562 computeChamberGasVolume puts ventilation ahead of press
   assert.ok("error" in _v1562({ ...base, oxygen_minutes: 0 }));
   assert.ok("error" in _v1562({ ...base, chamber_volume_cuft: Infinity }));
 });
+
+// ===========================================================================
+// spec-v1563..v1570: the 2026-09-07 trade-expansion steam plant and commercial
+// laundry band. SEVEN of eight specs landed; spec-v1568 was CUT.
+//
+// THE CUT. spec-v1568 `condensate-pump-flash-npsh` proposed NPSHa for
+// saturated condensate as "static minus friction, because the atmospheric and
+// vapour pressure terms cancel". `npsh-a` in calc-hvac.js already computed
+// H_atm - H_vapor + H_static - H_friction, and at saturation those first two
+// terms DO cancel -- so the existing calculator already returned the spec's
+// answer, and returned it from the general relation rather than from a special
+// case. What it lacked was the arithmetic AROUND the answer: the margin in
+// feet (it returned only a boolean), the suction friction the arrangement
+// tolerates before the margin is gone, and the static height a target margin
+// needs. Those three landed additively on `npsh-a`; every output it had is
+// unchanged, and the spec's search terms redirect there.
+//
+// TWO MORE INTERNALLY WRONG SPECS, taking the program to SIXTEEN in eighty:
+//   v1567 values 677 lb/hr of saved deaerator steam at "roughly $70,000 a
+//         year" and its vent at "$7,800". Both charge steam from the makeup
+//         temperature -- but the boiler's feedwater is already AT the
+//         deaerator saturation temperature, which is what the deaerator is
+//         for. Valued honestly from feedwater the figures are $58,500 and
+//         $6,481.
+//   v1570 says a No. 6 oil at 7,000 SSU/100 degF and 340 SSU/180 degF reaches
+//         150 SSU at "about 205 degF". Its own two points on the ASTM D341
+//         log-log line give 211.6 degF. Its pumping figure (112 vs 111.8) is
+//         right, which is how the fit was confirmed before the target was
+//         corrected.
+// spec-v1566's "about 330 BTU/lb" for 150 psig saturated liquid above 60 degF
+// makeup is 310.5 from the steam tables (338.5 - 28.1); the tile computes it
+// from the entered enthalpies rather than carrying the rounded figure.
+// ===========================================================================
+
+import { computeLaundryWasherTurns as _v1563 } from "../../calc-steamplant.js";
+test("bounds: spec-v1563 computeLaundryWasherTurns charges idle time to the cycle", () => {
+  const base = { machine_capacity_lb: 125, wash_cycle_min: 33, load_unload_min: 5, idle_min: 12, shift_hours: 8, shifts_per_day: 1, machine_count: 3, required_lb_per_day: 4000 };
+  const r = _v1563(base);
+  assert.strictEqual(r.total_cycle_min, 50);
+  assert.strictEqual(r.productive_cycle_min, 38);
+  assert.strictEqual(r.turns_per_shift, 9.6);
+  assert.ok(Math.abs(r.ideal_turns_per_shift - 12.6316) < 1e-3);
+  assert.strictEqual(r.lb_per_shift_per_machine, 1200);
+  assert.ok(Math.abs(r.ideal_lb_per_shift_per_machine - 1578.947) < 1e-2);
+  assert.ok(Math.abs(r.idle_loss_pct - 24) < 1e-6);
+  // The sizing consequence: idle time costs a whole machine.
+  assert.strictEqual(r.machines_required, 4);
+  assert.strictEqual(r.ideal_machines_required, 3);
+  // With no idle at all the two figures collapse into one another.
+  const noIdle = _v1563({ ...base, idle_min: 0 });
+  assert.strictEqual(noIdle.total_cycle_min, noIdle.productive_cycle_min);
+  assert.strictEqual(noIdle.idle_loss_lb_per_day, 0);
+  assert.strictEqual(noIdle.machines_required, noIdle.ideal_machines_required);
+  // Throughput is linear in machines and in shifts.
+  const twoShift = _v1563({ ...base, shifts_per_day: 2 });
+  assert.ok(Math.abs(twoShift.lb_per_day - 2 * r.lb_per_day) < 1e-9);
+  assert.strictEqual(_v1563({ ...base, machine_capacity_lb: 0 }).error !== undefined, true);
+  assert.strictEqual(_v1563({ ...base, shift_hours: -1 }).error !== undefined, true);
+});
+
+import { computeLaundryCostPerPound as _v1564 } from "../../calc-steamplant.js";
+test("bounds: spec-v1564 computeLaundryCostPerPound counts the energy nobody counts", () => {
+  const base = { lb_per_day: 4000, gal_per_lb: 1.8, water_rate_per_gal: 0.006, sewer_rate_per_gal: 0.008, incoming_temp_f: 60, wash_temp_f: 140, hot_fraction: 0.6, heater_efficiency: 0.8, fuel_cost_per_mmbtu: 9, retained_moisture_fraction: 0.45, improved_retained_moisture_fraction: 0.35, dryer_efficiency: 0.7, chem_cost_per_cwt: 4.5, labor_hours_per_day: 16, labor_rate_per_hour: 22, days_per_year: 300 };
+  const r = _v1564(base);
+  assert.ok(Math.abs(r.water_cost_per_lb + r.sewer_cost_per_lb - 0.0252) < 1e-9);
+  assert.ok(Math.abs(r.hot_water_btu_per_lb - 900.72) < 1e-6);
+  assert.ok(Math.abs(r.drying_btu_per_lb - 771.4286) < 1e-3);
+  assert.ok(Math.abs(r.energy_share_of_utilities_pct - 37.3903) < 1e-3);
+  // Labor is over half, which is the point of including it.
+  assert.ok(r.labor_share_pct > 50);
+  // The components sum to the total, exactly.
+  const parts = r.water_cost_per_lb + r.sewer_cost_per_lb + r.hot_water_cost_per_lb + r.drying_cost_per_lb + r.chemistry_cost_per_lb + r.labor_cost_per_lb;
+  assert.ok(Math.abs(parts - r.total_cost_per_lb) < 1e-12);
+  assert.ok(Math.abs(r.cost_per_cwt - 100 * r.total_cost_per_lb) < 1e-9);
+  // Better extraction only touches the drying line.
+  assert.ok(Math.abs(r.extraction_saving_annual - 1851.4286) < 1e-2);
+  const same = _v1564({ ...base, improved_retained_moisture_fraction: 0.45 });
+  assert.ok(Math.abs(same.extraction_saving_annual) < 1e-12);
+  assert.strictEqual(_v1564({ ...base, wash_temp_f: 50 }).error !== undefined, true);
+  assert.strictEqual(_v1564({ ...base, dryer_efficiency: 1.4 }).error !== undefined, true);
+});
+
+import { computeLaundryDryerEvaporation as _v1565 } from "../../calc-steamplant.js";
+test("bounds: spec-v1565 computeLaundryDryerEvaporation sizes the makeup air too", () => {
+  const base = { dry_weight_lb_per_day: 4000, retained_moisture_fraction: 0.45, improved_retained_moisture_fraction: 0.35, dryer_efficiency: 0.7, temp_rise_f: 100, operating_hours_per_day: 8, fuel_cost_per_mmbtu: 9, days_per_year: 300, louver_face_velocity_fpm: 500, louver_free_area_fraction: 0.5 };
+  const r = _v1565(base);
+  assert.strictEqual(r.water_lb_per_day, 1800);
+  assert.ok(Math.abs(r.heat_btu_per_day - 3085714.286) < 1e-2);
+  assert.ok(Math.abs(r.exhaust_cfm - 3571.4286) < 1e-3);
+  // Makeup air IS the exhaust; that identity is the whole building lesson.
+  assert.strictEqual(r.makeup_cfm, r.exhaust_cfm);
+  assert.ok(Math.abs(r.louver_free_area_ft2 - 7.1429) < 1e-3);
+  assert.ok(Math.abs(r.louver_gross_ft2 - 14.2857) < 1e-3);
+  // Ten points of retained moisture is 400 lb of water and $1,851 a year.
+  assert.strictEqual(r.water_saved_lb_per_day, 400);
+  assert.ok(Math.abs(r.extraction_saving_annual - 1851.4286) < 1e-2);
+  // Halving the temperature rise doubles the airflow for the same heat.
+  const half = _v1565({ ...base, temp_rise_f: 50 });
+  assert.ok(Math.abs(half.exhaust_cfm - 2 * r.exhaust_cfm) < 1e-6);
+  assert.ok(Math.abs(half.heat_btu_per_day - r.heat_btu_per_day) < 1e-6);
+  assert.strictEqual(_v1565({ ...base, retained_moisture_fraction: 1 }).error !== undefined, true);
+  assert.strictEqual(_v1565({ ...base, temp_rise_f: 0 }).error !== undefined, true);
+});
+
+import { computeBlowdownHeatRecovery as _v1566 } from "../../calc-steamplant.js";
+test("bounds: spec-v1566 computeBlowdownHeatRecovery agrees with the blowdown-rate calculator", () => {
+  const base = { steam_rate_lb_hr: 20000, cycles_of_concentration: 5, alt_cycles_of_concentration: 10, blowdown_liquid_enthalpy_btu_lb: 338.5, flash_liquid_enthalpy_btu_lb: 196.2, flash_latent_btu_lb: 960.2, makeup_temp_f: 60, heat_exchanger_effectiveness: 0.85, boiler_efficiency: 0.8, fuel_cost_per_mmbtu: 9, hours_per_year: 8000 };
+  const r = _v1566(base);
+  assert.strictEqual(r.blowdown_lb_hr, 5000);
+  assert.strictEqual(r.blowdown_pct_of_steam, 25);
+  // TWO CALCULATORS, ONE MASS BALANCE. `steam-boiler-blowdown` is stated in
+  // ppm and this one in cycles; at the same cycles they must not disagree.
+  const ppm = _v954({ steam_rate_lb_hr: 20000, feedwater_tds_ppm: 100, max_boiler_tds_ppm: 500 });
+  assert.strictEqual(ppm.cycles_of_concentration, 5);
+  assert.ok(Math.abs(ppm.blowdown_rate_lb_hr - r.blowdown_lb_hr) < 1e-9);
+  // The energy balance closes: flash steam plus residual liquid, both above
+  // makeup, account for the whole stream.
+  const gross = r.flash_heat_btuh + r.exchanger_heat_btuh / base.heat_exchanger_effectiveness;
+  assert.ok(Math.abs(gross - r.heat_in_blowdown_btuh) < 1e-6);
+  assert.ok(Math.abs(r.heat_per_lb_btu - 310.5) < 1e-9);
+  assert.ok(Math.abs(r.flash_fraction - 0.148198) < 1e-5);
+  // Treatment removes the pounds: 10 cycles is less than half the blowdown.
+  assert.ok(r.alt_blowdown_lb_hr < r.blowdown_lb_hr / 2);
+  assert.strictEqual(_v1566({ ...base, cycles_of_concentration: 1 }).error !== undefined, true);
+  assert.strictEqual(_v1566({ ...base, flash_liquid_enthalpy_btu_lb: 400 }).error !== undefined, true);
+});
+
+import { computeDeaeratorSteamDemand as _v1567 } from "../../calc-steamplant.js";
+test("bounds: spec-v1567 computeDeaeratorSteamDemand values steam from feedwater, not makeup", () => {
+  const base = { feedwater_lb_hr: 25000, condensate_fraction: 0.6, alt_condensate_fraction: 0.8, condensate_temp_f: 190, makeup_temp_f: 60, da_saturation_temp_f: 227, latent_heat_btu_lb: 960.2, steam_enthalpy_btu_lb: 1156.4, vent_fraction: 0.003, boiler_efficiency: 0.8, fuel_cost_per_mmbtu: 9, hours_per_year: 8000 };
+  const r = _v1567(base);
+  assert.strictEqual(r.mixed_temp_f, 138);
+  assert.strictEqual(r.heat_required_btuh, 2225000);
+  assert.ok(Math.abs(r.heating_steam_lb_hr - 2317.226) < 1e-2);
+  assert.ok(Math.abs(r.heating_steam_pct - 9.2689) < 1e-3);
+  assert.strictEqual(r.alt_mixed_temp_f, 164);
+  assert.ok(Math.abs(r.steam_saved_lb_hr - 676.942) < 1e-2);
+  // A pound of steam costs the enthalpy rise from feedwater already AT the
+  // deaerator saturation temperature -- the latent heat, over the efficiency.
+  assert.ok(Math.abs(r.fuel_per_lb_steam_btu - base.latent_heat_btu_lb / base.boiler_efficiency) < 1e-9);
+  assert.ok(Math.abs(r.condensate_return_annual_saving - 58500) < 1);
+  assert.strictEqual(r.vent_steam_lb_hr, 75);
+  assert.ok(Math.abs(r.vent_annual_cost - 6481.35) < 1);
+  // No improvement in return means no saving, and a closed vent costs nothing
+  // and is said to defeat the deaerator.
+  const same = _v1567({ ...base, alt_condensate_fraction: 0.6 });
+  assert.ok(Math.abs(same.condensate_return_annual_saving) < 1e-9);
+  const shut = _v1567({ ...base, vent_fraction: 0 });
+  assert.strictEqual(shut.vent_steam_lb_hr, 0);
+  assert.ok(/defeats the deaerator/.test(shut.vent_verdict));
+  assert.strictEqual(_v1567({ ...base, da_saturation_temp_f: 100 }).error !== undefined, true);
+});
+
+import { computeSafetyValveCapacity as _v1569 } from "../../calc-steamplant.js";
+test("bounds: spec-v1569 computeSafetyValveCapacity catches the burner uprate", () => {
+  const base = { rated_steaming_capacity_lb_hr: 20700, fuel_input_btuh: 25900000, boiler_efficiency: 0.8, steam_enthalpy_rise_btu_lb: 1000, mawp_psig: 150, accumulation_limit_pct: 6, valve1_set_psig: 150, valve1_capacity_lb_hr: 11500, valve2_set_psig: 155, valve2_capacity_lb_hr: 10200, valve3_set_psig: 0, valve3_capacity_lb_hr: 0, uprated_capacity_lb_hr: 24000 };
+  const r = _v1569(base);
+  assert.strictEqual(r.installed_capacity_lb_hr, 21700);
+  assert.strictEqual(r.valve_count, 2);
+  // The FUEL INPUT governs where it exceeds the plate rating.
+  assert.strictEqual(r.capacity_from_fuel_lb_hr, 20720);
+  assert.strictEqual(r.required_capacity_lb_hr, 20720);
+  assert.strictEqual(r.fuel_governs, true);
+  assert.strictEqual(r.margin_lb_hr, 980);
+  assert.strictEqual(r.passes, true);
+  assert.strictEqual(r.lowest_set_psig, 150);
+  assert.strictEqual(r.lowest_set_compliant, true);
+  assert.strictEqual(r.supplementary_above_mawp, true);
+  assert.ok(Math.abs(r.accumulation_pressure_psig - 159) < 1e-9);
+  // The uprate nobody re-ran the sum for.
+  assert.strictEqual(r.uprated_shortfall_lb_hr, 2300);
+  assert.strictEqual(r.uprate_passes, false);
+  // With no fuel input entered the plate rating governs by itself.
+  const plate = _v1569({ ...base, fuel_input_btuh: 0 });
+  assert.strictEqual(plate.required_capacity_lb_hr, 20700);
+  assert.strictEqual(plate.fuel_governs, false);
+  // A single valve is a valid installation; a third slot adds to the sum.
+  const three = _v1569({ ...base, valve3_set_psig: 155, valve3_capacity_lb_hr: 4000 });
+  assert.strictEqual(three.installed_capacity_lb_hr, 25700);
+  assert.strictEqual(three.uprate_passes, true);
+  assert.strictEqual(_v1569({ ...base, valve1_capacity_lb_hr: 0 }).error !== undefined, true);
+  assert.strictEqual(_v1569({ ...base, valve2_set_psig: 0 }).error !== undefined, true);
+});
+
+import { computeFuelOilAtomizingViscosity as _v1570 } from "../../calc-steamplant.js";
+test("bounds: spec-v1570 computeFuelOilAtomizingViscosity fits ASTM D341 (205 degF was wrong)", () => {
+  const base = { v1_ssu: 7000, t1_f: 100, v2_ssu: 340, t2_f: 180, target_ssu: 150, pumping_limit_ssu: 4000, check_temp_f: 185 };
+  const r = _v1570(base);
+  // The spec said 205 degF. Its own two points give 211.6.
+  assert.ok(Math.abs(r.temp_for_target_f - 211.592) < 1e-2);
+  assert.ok(Math.abs(r.temp_for_pumping_f - 111.811) < 1e-2);
+  assert.ok(Math.abs(r.viscosity_at_check_ssu - 295.428) < 1e-2);
+  assert.ok(Math.abs(r.setpoint_spread_f - (r.temp_for_target_f - r.temp_for_pumping_f)) < 1e-12);
+  assert.strictEqual(r.check_verdict.includes("outside the atomizing band"), true);
+  // The fit passes exactly through its own two data points.
+  const at1 = _v1570({ ...base, check_temp_f: 100 });
+  assert.ok(Math.abs(at1.viscosity_at_check_ssu - 7000) < 1e-6);
+  const at2 = _v1570({ ...base, check_temp_f: 180 });
+  assert.ok(Math.abs(at2.viscosity_at_check_ssu - 340) < 1e-6);
+  // Asking for the data-point viscosity returns the data-point temperature.
+  assert.ok(Math.abs(_v1570({ ...base, target_ssu: 340 }).temp_for_target_f - 180) < 1e-6);
+  // Viscosity falls with temperature, so the slope is positive and the
+  // atomizing setpoint is always the hotter of the two.
+  assert.ok(r.slope_b > 0);
+  assert.ok(r.temp_for_target_f > r.temp_for_pumping_f);
+  // A lighter delivery reaches the same target cooler.
+  const lighter = _v1570({ ...base, v1_ssu: 4000, v2_ssu: 200 });
+  assert.ok(lighter.temp_for_target_f < r.temp_for_target_f);
+  assert.strictEqual(_v1570({ ...base, t2_f: 100 }).error !== undefined, true);
+  // Points entered backwards (viscosity rising with heat) are rejected.
+  assert.strictEqual(_v1570({ ...base, v1_ssu: 340, v2_ssu: 7000 }).error !== undefined, true);
+});
+
+import { computeNPSHa as _v1568 } from "../../calc-hvac.js";
+test("bounds: spec-v1568 (CUT) margin arithmetic on npsh-a, additively", () => {
+  // The spec's own worked example, run through the calculator that already
+  // answered it. Saturated condensate: atmospheric and vapour heads cancel.
+  const hot = { elevation_ft: 0, water_temp_F: 212, source_elevation_relative_ft: 6, friction_loss_ft: 1.8, npsh_required_ft: 3, target_margin_ft: 3 };
+  const r = _v1568(hot);
+  assert.strictEqual(r.at_saturation, true);
+  assert.ok(Math.abs(r.NPSHa_ft - 4.2) < 0.06);
+  assert.ok(Math.abs(r.npsh_margin_ft - 1.2) < 0.06);
+  assert.strictEqual(r.cavitation_risk, false);
+  // Foul the strainer: 1.7 ft more friction and the pump is cavitating. A
+  // cold-water pump with 34 ft of atmospheric head would not have noticed.
+  const fouled = _v1568({ ...hot, friction_loss_ft: 3.5 });
+  assert.ok(fouled.npsh_margin_ft < 0);
+  assert.strictEqual(fouled.cavitation_risk, true);
+  const cold = _v1568({ ...hot, water_temp_F: 60, friction_loss_ft: 3.5 });
+  assert.strictEqual(cold.at_saturation, false);
+  assert.strictEqual(cold.cavitation_risk, false);
+  // The friction the arrangement tolerates does not move when friction does.
+  assert.ok(Math.abs(fouled.max_friction_ft - r.max_friction_ft) < 1e-12);
+  assert.ok(Math.abs(r.max_friction_ft - 2.95) < 0.06);
+  // 9.5 ft of static restores 3 ft of margin against 3.5 ft of friction.
+  assert.ok(Math.abs(fouled.static_for_target_margin_ft - 9.5) < 0.06);
+  // ADDITIVE: every output the calculator had is unchanged, and the new ones
+  // are null when no NPSHr is supplied.
+  const noReq = _v1568({ elevation_ft: 0, water_temp_F: 60, source_elevation_relative_ft: 5, friction_loss_ft: 2, npsh_required_ft: null });
+  assert.strictEqual(noReq.cavitation_risk, null);
+  assert.strictEqual(noReq.npsh_margin_ft, null);
+  assert.strictEqual(noReq.max_friction_ft, null);
+  assert.strictEqual(noReq.static_for_target_margin_ft, null);
+  assert.ok(Math.abs(noReq.NPSHa_ft - 36.308) < 1e-3);
+});

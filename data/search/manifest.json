@@ -9,7 +9,7 @@
     {
       "file": "aliases.json",
       "name": "Search aliases master (authoring source; runtime loads the per-group aliases-<letter>.json shards)",
-      "gzip_size_bytes": 307753
+      "gzip_size_bytes": 308309
     },
     {
       "file": "aliases-a.json",
@@ -24,7 +24,7 @@
     {
       "file": "aliases-c.json",
       "name": "Search aliases, group C runtime shard (generated from aliases.json)",
-      "gzip_size_bytes": 30636
+      "gzip_size_bytes": 30972
     },
     {
       "file": "aliases-d.json",
@@ -44,7 +44,7 @@
     {
       "file": "aliases-g.json",
       "name": "Search aliases, group G runtime shard (generated from aliases.json)",
-      "gzip_size_bytes": 15139
+      "gzip_size_bytes": 15345
     },
     {
       "file": "aliases-h.json",
@@ -128,14 +128,14 @@
     }
   ],
   "hashes": {
-    "aliases.json": "f65d7d06e4be3a6297ab25595a8b3943eae920ee9f73a5c3fe1a5241db6cb921",
+    "aliases.json": "8cc0fb9ace3e714f2a6029a3693d99efbe9d06f4920fbec31cb1743225761365",
     "aliases-a.json": "c0873bc232e9fffceb519579d01a20716f9c290353ca459131135c1062533956",
     "aliases-b.json": "f7046888103f3014d8ebf59480beb5e41729eba0a484690e784829763fcd0950",
-    "aliases-c.json": "71ea7d744750c24d0e37cec4744f83abedd7a599d1276e79f16ecbe61f58c470",
+    "aliases-c.json": "529a0edb5a83c87172715bd61f829304842e4520976c65c8b55a3f6f689483c4",
     "aliases-d.json": "6224c2d6341519a4e1bd34ef10f9501a54504f1868eceb82ee98976a72ca1cca",
     "aliases-e.json": "938e98aca67bdd5b6af80f7541f4ed6a264b508f6a4484bd7e6d5a52f0f2fec0",
     "aliases-f.json": "b3d2df72a7dbb12e27a378ba3266dab9c860c53c81ad0e7c823ccba4abf30476",
-    "aliases-g.json": "2e3bdd7a80fbcb71974b93a0c6d79a9cdbdd587a85a327443b33dfb56ae9d331",
+    "aliases-g.json": "1392766c3e6c4debfaa057449d94fbf9949bd999e575c2830c4b796fc1121a86",
     "aliases-h.json": "8f8e84eb05823c5e73b54c0faee683f97e2d03a5476bd03f19c96cead70e36a5",
     "aliases-j.json": "f420345260c98431efa2054c1aae7d536378a3f1dc3f5abdf54b7631237d7b9a",
     "aliases-k.json": "b90eab69dd72ed1105a3aa293683d19a7987ad282c34656fa0d1056691c81238",

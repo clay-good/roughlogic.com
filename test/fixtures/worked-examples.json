@@ -97868,6 +97868,420 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "laundry-washer-turns",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "125 lb washer-extractor, 38 min of work plus 12 min standing full, 8 hour shift",
+   "source_edition_or_year": "turns = shift minutes / total occupied cycle; lb = capacity x turns x machines; machines = ceil(required / (capacity x turns))",
+   "source_section_or_page": "the equipment manufacturer and the applicable laundry standard govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "machine_capacity_lb": 125,
+    "wash_cycle_min": 33,
+    "load_unload_min": 5,
+    "idle_min": 12,
+    "shift_hours": 8,
+    "shifts_per_day": 1,
+    "machine_count": 3,
+    "required_lb_per_day": 4000
+   },
+   "outputs": {
+    "total_cycle_min": {
+     "value": 50,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "turns_per_shift": {
+     "value": 9.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ideal_turns_per_shift": {
+     "value": 12.6316,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lb_per_shift_per_machine": {
+     "value": 1200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "idle_loss_pct": {
+     "value": 24,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "machines_required": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "laundry-cost-per-pound",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "4,000 lb a day at 1.8 gal/lb, 60 to 140 degF, 45% retained moisture, gas at $9/MMBTU",
+   "source_edition_or_year": "water and sewer per gallon; hot water gal x 8.34 x rise / efficiency; drying retained x 1,200 / efficiency; chemistry per cwt; labor hours x rate",
+   "source_section_or_page": "the utility tariffs, the chemical supplier, and the equipment manufacturer govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "lb_per_day": 4000,
+    "gal_per_lb": 1.8,
+    "water_rate_per_gal": 0.006,
+    "sewer_rate_per_gal": 0.008,
+    "incoming_temp_f": 60,
+    "wash_temp_f": 140,
+    "hot_fraction": 0.6,
+    "heater_efficiency": 0.8,
+    "fuel_cost_per_mmbtu": 9,
+    "retained_moisture_fraction": 0.45,
+    "improved_retained_moisture_fraction": 0.35,
+    "dryer_efficiency": 0.7,
+    "chem_cost_per_cwt": 4.5,
+    "labor_hours_per_day": 16,
+    "labor_rate_per_hour": 22,
+    "days_per_year": 300
+   },
+   "outputs": {
+    "hot_water_btu_per_lb": {
+     "value": 900.72,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "drying_btu_per_lb": {
+     "value": 771.429,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "utilities_cost_per_lb": {
+     "value": 0.0402493,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "energy_share_of_utilities_pct": {
+     "value": 37.3903,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_cost_per_lb": {
+     "value": 0.173249,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "extraction_saving_annual": {
+     "value": 1851.43,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "laundry-dryer-evaporation",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "4,000 lb of linen a day at 45% retained moisture, 70% dryer efficiency, 100 degF rise over an 8 hour shift",
+   "source_edition_or_year": "water = weight x retained; heat = water x 1,200 / efficiency; cfm = BTU/hr / (1.08 x rise)",
+   "source_section_or_page": "the dryer manufacturer, the adopted mechanical code, and NFPA govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "dry_weight_lb_per_day": 4000,
+    "retained_moisture_fraction": 0.45,
+    "improved_retained_moisture_fraction": 0.35,
+    "dryer_efficiency": 0.7,
+    "temp_rise_f": 100,
+    "operating_hours_per_day": 8,
+    "fuel_cost_per_mmbtu": 9,
+    "days_per_year": 300,
+    "louver_face_velocity_fpm": 500,
+    "louver_free_area_fraction": 0.5
+   },
+   "outputs": {
+    "water_lb_per_day": {
+     "value": 1800,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heat_btu_per_day": {
+     "value": 3085710,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "exhaust_cfm": {
+     "value": 3571.43,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "louver_free_area_ft2": {
+     "value": 7.14286,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "louver_gross_ft2": {
+     "value": 14.2857,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "extraction_saving_annual": {
+     "value": 1851.43,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blowdown-heat-recovery",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "20,000 lb/hr of steam at 5 cycles, 150 psig blown down to a 5 psig flash tank, 60 degF makeup",
+   "source_edition_or_year": "blowdown = steam / (cycles - 1); flash fraction = (h_f high - h_f low) / h_fg low; both stages valued at the boiler efficiency",
+   "source_section_or_page": "ASME, the boiler manufacturer, the water treatment program, and the boiler inspector govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "steam_rate_lb_hr": 20000,
+    "cycles_of_concentration": 5,
+    "alt_cycles_of_concentration": 10,
+    "blowdown_liquid_enthalpy_btu_lb": 338.5,
+    "flash_liquid_enthalpy_btu_lb": 196.2,
+    "flash_latent_btu_lb": 960.2,
+    "makeup_temp_f": 60,
+    "heat_exchanger_effectiveness": 0.85,
+    "boiler_efficiency": 0.8,
+    "fuel_cost_per_mmbtu": 9,
+    "hours_per_year": 8000
+   },
+   "outputs": {
+    "blowdown_lb_hr": {
+     "value": 5000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "blowdown_pct_of_steam": {
+     "value": 25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heat_in_blowdown_btuh": {
+     "value": 1552500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "flash_steam_lb_hr": {
+     "value": 740.991,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "recovered_pct": {
+     "value": 93.0786,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_cycles_annual_saving": {
+     "value": 77625,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "deaerator-steam-demand",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "25,000 lb/hr of feedwater at 5 psig, 60% condensate return at 190 degF against 40% makeup at 60 degF",
+   "source_edition_or_year": "mixed temperature from the proportions; heat = flow x (saturation - mixed); steam = heat / latent heat at the operating pressure",
+   "source_section_or_page": "ASME, the deaerator manufacturer, the water treatment program, and the boiler inspector govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "feedwater_lb_hr": 25000,
+    "condensate_fraction": 0.6,
+    "alt_condensate_fraction": 0.8,
+    "condensate_temp_f": 190,
+    "makeup_temp_f": 60,
+    "da_saturation_temp_f": 227,
+    "latent_heat_btu_lb": 960.2,
+    "steam_enthalpy_btu_lb": 1156.4,
+    "vent_fraction": 0.003,
+    "boiler_efficiency": 0.8,
+    "fuel_cost_per_mmbtu": 9,
+    "hours_per_year": 8000
+   },
+   "outputs": {
+    "mixed_temp_f": {
+     "value": 138,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heat_required_btuh": {
+     "value": 2225000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heating_steam_lb_hr": {
+     "value": 2317.23,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heating_steam_pct": {
+     "value": 9.2689,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "steam_saved_lb_hr": {
+     "value": 676.942,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vent_steam_lb_hr": {
+     "value": 75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "safety-valve-capacity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "firetube boiler rated 20,700 lb/hr at 150 psig MAWP, valves stamped 11,500 at 150 and 10,200 at 155",
+   "source_edition_or_year": "required = the greater of the plate rating and fuel input x efficiency / enthalpy rise; installed = the sum of the stamped capacities at the pressures fitted",
+   "source_section_or_page": "ASME BPVC Sections I and IV, the National Board, and the jurisdiction boiler inspector govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "rated_steaming_capacity_lb_hr": 20700,
+    "fuel_input_btuh": 25900000,
+    "boiler_efficiency": 0.8,
+    "steam_enthalpy_rise_btu_lb": 1000,
+    "mawp_psig": 150,
+    "accumulation_limit_pct": 6,
+    "valve1_set_psig": 150,
+    "valve1_capacity_lb_hr": 11500,
+    "valve2_set_psig": 155,
+    "valve2_capacity_lb_hr": 10200,
+    "valve3_set_psig": 0,
+    "valve3_capacity_lb_hr": 0,
+    "uprated_capacity_lb_hr": 24000
+   },
+   "outputs": {
+    "capacity_from_fuel_lb_hr": {
+     "value": 20720,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_capacity_lb_hr": {
+     "value": 20720,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "installed_capacity_lb_hr": {
+     "value": 21700,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_lb_hr": {
+     "value": 980,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "accumulation_pressure_psig": {
+     "value": 159,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "uprated_shortfall_lb_hr": {
+     "value": 2300,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fuel-oil-atomizing-viscosity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "No. 6 oil at 7,000 SSU at 100 degF and 340 SSU at 180 degF, burner wanting 150 SSU",
+   "source_edition_or_year": "ASTM D341 (Walther): log10(log10(v + 0.7)) linear in log10(absolute temperature), fitted through the two data sheet points",
+   "source_section_or_page": "the burner manufacturer, the oil supplier data sheet, and the adopted fire and mechanical codes govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "v1_ssu": 7000,
+    "t1_f": 100,
+    "v2_ssu": 340,
+    "t2_f": 180,
+    "target_ssu": 150,
+    "pumping_limit_ssu": 4000,
+    "check_temp_f": 185
+   },
+   "outputs": {
+    "slope_b": {
+     "value": 3.12603,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "temp_for_target_f": {
+     "value": 211.592,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "temp_for_pumping_f": {
+     "value": 111.811,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "viscosity_at_check_ssu": {
+     "value": 295.428,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "setpoint_spread_f": {
+     "value": 99.7812,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

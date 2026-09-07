@@ -1978,6 +1978,14 @@ export const COMPUTE_MAP = {
   "lavatory-tub-clearance": { module: "../../calc-construction.js", fn: "computeLavatoryTubClearance" },
   "ramp-detail-check": { module: "../../calc-construction.js", fn: "computeRampDetailCheck" },
   "pool-bonding-680-26": { module: "../../calc-references.js", fn: "computePoolBonding68026" },
+  // spec-v1563..v1570 steam plant and commercial laundry band
+  "laundry-washer-turns": { module: "../../calc-steamplant.js", fn: "computeLaundryWasherTurns" },
+  "laundry-cost-per-pound": { module: "../../calc-steamplant.js", fn: "computeLaundryCostPerPound" },
+  "laundry-dryer-evaporation": { module: "../../calc-steamplant.js", fn: "computeLaundryDryerEvaporation" },
+  "blowdown-heat-recovery": { module: "../../calc-steamplant.js", fn: "computeBlowdownHeatRecovery" },
+  "deaerator-steam-demand": { module: "../../calc-steamplant.js", fn: "computeDeaeratorSteamDemand" },
+  "safety-valve-capacity": { module: "../../calc-steamplant.js", fn: "computeSafetyValveCapacity" },
+  "fuel-oil-atomizing-viscosity": { module: "../../calc-steamplant.js", fn: "computeFuelOilAtomizingViscosity" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

@@ -109,6 +109,11 @@ export const PROFESSION_NOUN = {
   // than when a tile first leads with one.
   diving: "Commercial Diving",
   safety: "Safety",
+  // Added 2026-09-07 with the steam plant and commercial laundry band. Each
+  // leads on tiles of its own, and an unmapped lead silently retitles them
+  // "... - Trades ..." rather than failing.
+  laundry: "Laundry",
+  boiler: "Steam Plant",
   mechanical: "Mechanical",
   demolition: "Demolition",
   fireproofing: "Fireproofing",

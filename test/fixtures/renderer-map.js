@@ -1892,4 +1892,12 @@ export const RENDERER_MAP = {
   "three-point-bridle": { module: "../../calc-rigging.js", exportName: "RIGGING_RENDERERS" },
   "beam-clamp-side-pull": { module: "../../calc-rigging.js", exportName: "RIGGING_RENDERERS" },
   "wire-rope-clips": { module: "../../calc-rigging.js", exportName: "RIGGING_RENDERERS" },
+  // spec-v1563..v1570 steam plant and commercial laundry band
+  "laundry-washer-turns": { module: "../../calc-steamplant.js", exportName: "STEAMPLANT_RENDERERS" },
+  "laundry-cost-per-pound": { module: "../../calc-steamplant.js", exportName: "STEAMPLANT_RENDERERS" },
+  "laundry-dryer-evaporation": { module: "../../calc-steamplant.js", exportName: "STEAMPLANT_RENDERERS" },
+  "blowdown-heat-recovery": { module: "../../calc-steamplant.js", exportName: "STEAMPLANT_RENDERERS" },
+  "deaerator-steam-demand": { module: "../../calc-steamplant.js", exportName: "STEAMPLANT_RENDERERS" },
+  "safety-valve-capacity": { module: "../../calc-steamplant.js", exportName: "STEAMPLANT_RENDERERS" },
+  "fuel-oil-atomizing-viscosity": { module: "../../calc-steamplant.js", exportName: "STEAMPLANT_RENDERERS" },
 };

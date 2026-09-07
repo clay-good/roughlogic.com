@@ -1,7 +1,7 @@
 # Scope: The 2026-09-05 Trade Expansion (specs v1450-v1749, 300 New Tiles)
 
 > **Status: IN PROGRESS (2026-09-05). Program charter, no catalog change of its own.**
-> **Bands 1-9 have landed: railroad track, elevator and escalator, door hardware and locksmithing, mining and quarry, trenchless, sawmill, wind energy, and diving, 1,804 -> 1,875. Three specs cut as duplicates.**
+> **Bands 1-10 have landed: railroad track, elevator and escalator, door hardware and locksmithing, mining and quarry, trenchless, sawmill, wind energy, diving, and steam plant with commercial laundry, 1,804 -> 1,882. Four specs cut as duplicates.**
 > Inherits the spec-v106 trades-only charter and every convention through spec-v1449.
 > Each of the 300 tiles is specified in its own file, `spec-v1450.md` through `spec-v1749.md`.
 
@@ -230,7 +230,7 @@ excavation tiles, not in a category invented for it.
 | v1506 | `ground-loop-flow-antifreeze` | Ground Loop Flow, Antifreeze, and Pressure Drop | `calc-buildingperf.js` |
 | v1566 | `blowdown-heat-recovery` | Boiler Blowdown Heat Recovery and Efficiency Gain | `calc-steamplant.js` |
 | v1567 | `deaerator-steam-demand` | Deaerator Steam Demand and Vent Rate | `calc-steamplant.js` |
-| v1568 | `condensate-pump-flash-npsh` | Condensate Pump Flash and NPSH Margin | `calc-steamplant.js` |
+| v1568 | `condensate-pump-flash-npsh` | Condensate Pump Flash and NPSH Margin | **CUT** -- `npsh-a` already answered it; the margin arithmetic landed there additively |
 | v1569 | `safety-valve-capacity` | Boiler Safety Valve Relieving Capacity | `calc-steamplant.js` |
 | v1570 | `fuel-oil-atomizing-viscosity` | Fuel Oil Heating for Atomizing Viscosity | `calc-steamplant.js` |
 | v1622 | `flow-hood-correction` | Flow Hood Reading Correction and Diffuser Airflow | `calc-hvacsystems.js` |

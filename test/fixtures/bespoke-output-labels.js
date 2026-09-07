@@ -591,7 +591,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "noncoincident-load": {"counted_va":"Counted load (VA)","omitted_va":"Omitted load (VA)","note":"Note"},
   "nozzle-flow-pressure": {"new_gpm":"Flow at operating pressure","req_psi":"Pressure for target flow"},
   "npk-blend": {"rec_n_lb_per_acre":"Nutrient recommendation","urea_total_lb":"Total product","warnings":"Notes"},
-  "npsh-a": {"H_atm_ft":"Atmospheric head","H_vapor_ft":"Vapor pressure head","NPSHa_ft":"NPSH available","cavitation_risk":"Cavitation risk"},
+  "npsh-a": {"H_atm_ft":"Atmospheric head","H_vapor_ft":"Vapor pressure head","NPSHa_ft":"NPSH available","cavitation_risk":"Cavitation risk","npsh_margin_ft":"Margin over NPSHr","max_friction_ft":"Suction friction this arrangement tolerates","static_for_target_margin_ft":"Static height for the target margin"},
   "nucleic-acid-a260": {"concentration_ng_ul":"Concentration","note":"Note"},
   "occupant-load": {"total_load":"Total occupant load","per_space":"By space"},
   "od600-cell-count": {"cells_per_ml":"Cell density","note":"Linear-range note"},

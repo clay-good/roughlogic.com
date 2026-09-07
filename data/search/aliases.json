@@ -107192,6 +107192,206 @@
    "term": "chamber pressurization air",
    "target": "chamber-gas-volume",
    "kind": "industry"
+  },
+  {
+   "term": "laundry turns per day",
+   "target": "laundry-washer-turns",
+   "kind": "industry"
+  },
+  {
+   "term": "washer capacity pounds per day",
+   "target": "laundry-washer-turns",
+   "kind": "industry"
+  },
+  {
+   "term": "opl sizing washer",
+   "target": "laundry-washer-turns",
+   "kind": "industry"
+  },
+  {
+   "term": "laundry throughput calculation",
+   "target": "laundry-washer-turns",
+   "kind": "industry"
+  },
+  {
+   "term": "washer extractor turns",
+   "target": "laundry-washer-turns",
+   "kind": "industry"
+  },
+  {
+   "term": "laundry cost per pound",
+   "target": "laundry-cost-per-pound",
+   "kind": "industry"
+  },
+  {
+   "term": "cost per hundredweight laundry",
+   "target": "laundry-cost-per-pound",
+   "kind": "industry"
+  },
+  {
+   "term": "opl operating cost",
+   "target": "laundry-cost-per-pound",
+   "kind": "industry"
+  },
+  {
+   "term": "laundry water sewer energy cost",
+   "target": "laundry-cost-per-pound",
+   "kind": "industry"
+  },
+  {
+   "term": "in house versus outsource laundry",
+   "target": "laundry-cost-per-pound",
+   "kind": "industry"
+  },
+  {
+   "term": "dryer evaporation load",
+   "target": "laundry-dryer-evaporation",
+   "kind": "industry"
+  },
+  {
+   "term": "laundry makeup air",
+   "target": "laundry-dryer-evaporation",
+   "kind": "industry"
+  },
+  {
+   "term": "tumble dryer gas input",
+   "target": "laundry-dryer-evaporation",
+   "kind": "industry"
+  },
+  {
+   "term": "retained moisture extraction",
+   "target": "laundry-dryer-evaporation",
+   "kind": "industry"
+  },
+  {
+   "term": "laundry exhaust cfm",
+   "target": "laundry-dryer-evaporation",
+   "kind": "industry"
+  },
+  {
+   "term": "boiler blowdown heat recovery",
+   "target": "blowdown-heat-recovery",
+   "kind": "industry"
+  },
+  {
+   "term": "blowdown rate cycles of concentration",
+   "target": "blowdown-heat-recovery",
+   "kind": "industry"
+  },
+  {
+   "term": "flash tank blowdown",
+   "target": "blowdown-heat-recovery",
+   "kind": "industry"
+  },
+  {
+   "term": "blowdown energy savings",
+   "target": "blowdown-heat-recovery",
+   "kind": "industry"
+  },
+  {
+   "term": "continuous blowdown sizing",
+   "target": "blowdown-heat-recovery",
+   "kind": "industry"
+  },
+  {
+   "term": "deaerator steam demand",
+   "target": "deaerator-steam-demand",
+   "kind": "industry"
+  },
+  {
+   "term": "da heating steam",
+   "target": "deaerator-steam-demand",
+   "kind": "industry"
+  },
+  {
+   "term": "deaerator vent rate",
+   "target": "deaerator-steam-demand",
+   "kind": "industry"
+  },
+  {
+   "term": "feedwater deaeration",
+   "target": "deaerator-steam-demand",
+   "kind": "industry"
+  },
+  {
+   "term": "oxygen removal boiler feedwater",
+   "target": "deaerator-steam-demand",
+   "kind": "industry"
+  },
+  {
+   "term": "boiler safety valve capacity",
+   "target": "safety-valve-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "relieving capacity boiler",
+   "target": "safety-valve-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "safety valve sizing steam",
+   "target": "safety-valve-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "accumulation test boiler",
+   "target": "safety-valve-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "asme safety valve set pressure",
+   "target": "safety-valve-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "fuel oil atomizing temperature",
+   "target": "fuel-oil-atomizing-viscosity",
+   "kind": "industry"
+  },
+  {
+   "term": "heavy oil viscosity temperature",
+   "target": "fuel-oil-atomizing-viscosity",
+   "kind": "industry"
+  },
+  {
+   "term": "number 6 oil heater setpoint",
+   "target": "fuel-oil-atomizing-viscosity",
+   "kind": "industry"
+  },
+  {
+   "term": "ssu viscosity for burner",
+   "target": "fuel-oil-atomizing-viscosity",
+   "kind": "industry"
+  },
+  {
+   "term": "oil preheat temperature",
+   "target": "fuel-oil-atomizing-viscosity",
+   "kind": "industry"
+  },
+  {
+   "term": "condensate pump npsh",
+   "target": "npsh-a",
+   "kind": "industry"
+  },
+  {
+   "term": "hot well pump cavitation",
+   "target": "npsh-a",
+   "kind": "industry"
+  },
+  {
+   "term": "npsh available saturated condensate",
+   "target": "npsh-a",
+   "kind": "industry"
+  },
+  {
+   "term": "boiler feed pump suction",
+   "target": "npsh-a",
+   "kind": "industry"
+  },
+  {
+   "term": "flashing condensate pump",
+   "target": "npsh-a",
+   "kind": "industry"
   }
  ]
 }

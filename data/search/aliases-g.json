@@ -1042,6 +1042,21 @@
     {"term":"hyperbaric chamber air volume","target":"chamber-gas-volume","kind":"industry"},
     {"term":"chamber ventilation gas","target":"chamber-gas-volume","kind":"industry"},
     {"term":"treatment table gas requirement","target":"chamber-gas-volume","kind":"industry"},
-    {"term":"chamber pressurization air","target":"chamber-gas-volume","kind":"industry"}
+    {"term":"chamber pressurization air","target":"chamber-gas-volume","kind":"industry"},
+    {"term":"laundry turns per day","target":"laundry-washer-turns","kind":"industry"},
+    {"term":"washer capacity pounds per day","target":"laundry-washer-turns","kind":"industry"},
+    {"term":"opl sizing washer","target":"laundry-washer-turns","kind":"industry"},
+    {"term":"laundry throughput calculation","target":"laundry-washer-turns","kind":"industry"},
+    {"term":"washer extractor turns","target":"laundry-washer-turns","kind":"industry"},
+    {"term":"laundry cost per pound","target":"laundry-cost-per-pound","kind":"industry"},
+    {"term":"cost per hundredweight laundry","target":"laundry-cost-per-pound","kind":"industry"},
+    {"term":"opl operating cost","target":"laundry-cost-per-pound","kind":"industry"},
+    {"term":"laundry water sewer energy cost","target":"laundry-cost-per-pound","kind":"industry"},
+    {"term":"in house versus outsource laundry","target":"laundry-cost-per-pound","kind":"industry"},
+    {"term":"dryer evaporation load","target":"laundry-dryer-evaporation","kind":"industry"},
+    {"term":"laundry makeup air","target":"laundry-dryer-evaporation","kind":"industry"},
+    {"term":"tumble dryer gas input","target":"laundry-dryer-evaporation","kind":"industry"},
+    {"term":"retained moisture extraction","target":"laundry-dryer-evaporation","kind":"industry"},
+    {"term":"laundry exhaust cfm","target":"laundry-dryer-evaporation","kind":"industry"}
   ]
 }

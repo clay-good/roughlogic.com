@@ -21775,6 +21775,92 @@ export const CITATIONS = {
       { name: "The manufacturer's provisions govern absolutely", value: "rated capacities, allowable geometries, and permitted wind speeds", source: "turbine service instructions" },
     ],
   },
+  // spec-v1563..v1570: the 2026-09-07 trade-expansion steam plant and commercial
+  // laundry band. Groups G and C. spec-v1568 was CUT to `npsh-a`.
+  "laundry-washer-turns": {
+    formula: "turns per shift = shift hours x 60 / total occupied cycle, where the occupied cycle is the wash cycle + loading and unloading + observed idle waiting; throughput = rated capacity x turns x machines x shifts; machines required = ceil(required pounds per day / (capacity x turns x shifts)).",
+    edition: "Standard on-premise laundry throughput practice, by name. Rated capacity is a machine specification and turns is an operational one; the cycle that matters is the whole time the machine is occupied, not the data-plate wash cycle. The equipment manufacturer's data, the chemical supplier's wash formulas, and any applicable healthcare or food-safety laundry standard govern.",
+    freeAccess: "Arithmetic on cycle times the user measures; no manufacturer table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The idle term is the one nobody measures and it is usually the largest. A 125 lb washer on a 38 minute working cycle turns 12.6 times in an eight hour shift and makes 1,579 lb; let each load stand 12 minutes waiting to be unloaded and the effective cycle is 50 minutes, turns fall to 9.6, and the same machine makes 1,200 lb -- 24% of the machine lost to scheduling rather than to equipment. The sizing consequence is the expensive one: 4,000 lb a day is 2.5 machines on the theoretical figure and 3.3 on the real one, so a plant that sizes on cycle time alone is short from the day it opens. Extraction does not appear in a turns calculation at all -- it does not shorten the wash cycle -- but it shortens the dryer's and cuts the gas bill, which is why a washer decision made only on wash time misses most of its own consequences.",
+    assumptions: [
+      { name: "Turns includes idle time", value: "the machine is occupied while it stands full", source: "on-premise laundry practice" },
+      { name: "Cleanliness and disinfection are not evaluated", value: "temperature, chemistry, and time requirements constrain the cycle", source: "healthcare and food-service laundry standards" },
+      { name: "Linen inventory is not modeled", value: "it is usually what actually limits a plant", source: "on-premise laundry practice" },
+    ],
+  },
+  "laundry-cost-per-pound": {
+    formula: "cost per pound = gal/lb x (water rate + sewer rate) + gal/lb x hot fraction x 8.34 x (wash temp - incoming temp) / heater efficiency x fuel cost + retained moisture x 1,200 / dryer efficiency x fuel cost + chemical cost per hundredweight / 100 + labor hours x labor rate / pounds per day.",
+    edition: "The component cost build-up as standard laundry practice, by name, with the 1,200 BTU per pound of water evaporated figure covering latent heat plus the sensible heat of the water and typical exhaust losses. The utility tariffs, the chemical supplier, and the equipment manufacturer's data govern.",
+    freeAccess: "A cost model from rates and factors the user supplies; no tariff or price list is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Two of the six components are routinely left out and they are the larger half of the utility bill. At 1.8 gallons per pound heated from 60 to 140 degF and 45% retained moisture dried at 70% efficiency, the two energy lines are 37% of the utilities against 63% for the water and sewer people look at. Sewer is often billed on water consumed and is frequently the larger of the two rates, so a reuse system saves on both lines at once. Labor exceeds all of it -- half or more of the cost per pound in most on-premise laundries -- so a figure that omits labor makes in-house laundry look far cheaper than outsourcing, and that is the error that gets made. Gallons per pound and retained moisture vary widely with the equipment and the goods and should be measured rather than assumed.",
+    assumptions: [
+      { name: "1,200 BTU per pound of water", value: "latent plus sensible plus typical exhaust loss", source: "standard laundry practice" },
+      { name: "Depreciation and maintenance excluded", value: "as is linen replacement driven by wash severity", source: "cost model scope" },
+      { name: "Service pricing includes more", value: "linen, delivery, and loss replacement are usually in an outsourced price", source: "commercial laundry practice" },
+    ],
+  },
+  "laundry-dryer-evaporation": {
+    formula: "water to remove = dry weight x retained moisture fraction; heat = water x about 1,200 BTU/lb / dryer efficiency; exhaust cfm = BTU/hr / (1.08 x temperature rise), where 1.08 = 60 min/hr x 0.075 lb/cu ft x 0.24 BTU/lb-F; makeup air = exhaust; louver free area = cfm / face velocity.",
+    edition: "The evaporation load and airflow relations by name, with the adopted mechanical code and NFPA named for dryer exhaust duct sizing, routing, and lint cleaning access -- cited, not mirrored. The dryer manufacturer's fuel consumption per pound of water governs the energy figure.",
+    freeAccess: "Sensible and latent heat arithmetic; no code table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Evaporating water is expensive and mechanical extraction is cheap, and the ratio is roughly ten to one -- which makes retained moisture after extraction the single most consequential number in a laundry's energy bill. Ten points on four thousand pounds of linen is four hundred pounds of water a day that either leaves in the extractor for pennies or leaves in the dryer for dollars. The airflow consequence is the one that causes building problems: 4,000 lb a day at 45% over an eight hour shift is about 3,571 cfm of continuous exhaust and the same 3,571 cfm of makeup the room has to admit -- about 14 sq ft of gross louver at 500 fpm and a 50% free-area fraction. A room with a 4 sq ft transfer grille runs negative and pulls the difference down water heater flues and past every combustion appliance in the mechanical room.",
+    assumptions: [
+      { name: "1,200 BTU per pound of water", value: "a working approximation; the dryer's own fuel per pound of water is better", source: "standard laundry practice" },
+      { name: "Makeup air equals exhaust", value: "the room admits it deliberately or through the building", source: "mechanical code principle" },
+      { name: "Lint is a fire problem, not an airflow one", value: "duct sizing does not make a duct cleanable", source: "the adopted mechanical code and NFPA" },
+    ],
+  },
+  "blowdown-heat-recovery": {
+    formula: "blowdown / steam = feedwater TDS / (boiler TDS - feedwater TDS) = 1 / (cycles - 1); heat in blowdown = blowdown x (saturated liquid enthalpy at boiler pressure - makeup enthalpy); flash fraction = (h_f high - h_f low) / h_fg low; recovered = flash steam x (h_g low - h_makeup) + residual liquid x (h_f low - h_makeup) x exchanger effectiveness.",
+    edition: "The continuous surface blowdown mass balance and the flash relation by name -- the same TDS balance the blowdown-rate calculator uses, stated in cycles rather than in ppm, so the two do not disagree about how much blowdown a boiler makes. Saturated water enthalpies are entered from the steam tables. ASME, the boiler manufacturer, the water treatment program, and the jurisdiction's boiler inspector govern.",
+    freeAccess: "A mass and energy balance on figures the user enters from the steam tables; no chemistry limit is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Blowdown volume is set by chemistry, not by a valve position, so water treatment and blowdown rate are one decision. A plant at 5 cycles blows down 25% of its steam production; at 10 cycles it blows down 11%. The heat is what goes down the drain: 5,000 lb/hr at 150 psig carries about 310 BTU a pound above 60 degF makeup, 1.55 MMBTU an hour, roughly $140,000 a year of fuel at 80% efficiency and $9 per MMBTU over 8,000 hours. Recovery has two stages and both are worth taking, but treatment comes first because it removes the pounds rather than chasing their heat. The achievable cycles are set by the boiler water chemistry limits for the pressure and by the makeup quality; pushing past what the treatment program supports causes scale and carryover, which costs far more than the blowdown saved.",
+    assumptions: [
+      { name: "Cycles are a chemistry limit", value: "not an optimization variable", source: "the water treatment program and the boiler manufacturer" },
+      { name: "Surface blowdown only", value: "the intermittent bottom blowdown that removes sludge is separate", source: "boiler operating practice" },
+      { name: "Sewer discharge temperature is regulated", value: "and is not evaluated here", source: "local discharge limits" },
+    ],
+  },
+  "deaerator-steam-demand": {
+    formula: "mixed incoming temperature = condensate fraction x condensate temperature + (1 - fraction) x makeup temperature; heat = feedwater flow x (deaerator saturation temperature - mixed temperature); heating steam = heat / latent heat at the deaerator pressure; vent steam = throughput x vent fraction.",
+    edition: "The deaerating feedwater heater mixing heat balance by name. Saturation temperature, latent heat, and steam enthalpy are entered from the steam tables for the operating pressure. ASME, the deaerator manufacturer, the water treatment program, and the jurisdiction's boiler inspector govern.",
+    freeAccess: "A mixing heat balance on figures the user enters; no steam table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The heating steam is a real boiler load that steam balances routinely omit, and because it is a mixing calculation the colder the incoming water the more steam it takes -- which is why condensate return moves this number directly. Returning 60% of a 25,000 lb/hr feedwater flow at 190 degF against 40% makeup at 60 degF calls for about 2,318 lb/hr, 9.3% of throughput; raise the return to 80% and the demand falls to 1,641 lb/hr. One caution on valuing that saving: a pound of steam costs the boiler the enthalpy rise from its FEEDWATER, and the feedwater is already at the deaerator's saturation temperature, so charging deaerator steam all the way from the makeup temperature double-counts heat the deaerator is what supplies. The vent fails in both directions -- vented too little the liberated non-condensables stay in the water, vented too much usable steam goes to atmosphere -- and the consequence of getting deaeration wrong is corrosion, not energy, which is why the vent is never closed to save steam.",
+    assumptions: [
+      { name: "Steam is valued from feedwater at saturation", value: "not from the makeup temperature, which double-counts", source: "boiler heat balance" },
+      { name: "Oxygen removal is measured, not calculated", value: "dissolved oxygen measurement establishes performance", source: "water treatment practice" },
+      { name: "Chemical scavenging is required regardless", value: "mechanical deaeration alone does not reach the residual", source: "the water treatment program" },
+    ],
+  },
+  "safety-valve-capacity": {
+    formula: "required relieving capacity = the greater of the boiler's maximum designed steaming capacity and fuel input x efficiency / steam enthalpy rise; installed capacity = the sum of the stamped capacities of the fitted valves at their installed set pressures; accumulation pressure = MAWP x (1 + accumulation limit / 100).",
+    edition: "The ASME Section I and IV relieving-capacity requirement, cited not mirrored: the valves must pass everything the boiler can generate at full fire with the outlet shut, no valve is set above the maximum allowable working pressure except as the code permits for supplementary valves, and pressure must not rise more than the permitted accumulation. ASME BPVC Sections I and IV, the National Board inspection code, the valve manufacturer, and the jurisdiction's boiler inspector govern.",
+    freeAccess: "A comparison of stamped and rated values the user supplies; no code table or valve catalogue is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The requirement is easy to fail after twenty years of modifications. A boiler rated 20,700 lb/hr with valves stamped 11,500 and 10,200 has 21,700 lb/hr installed and passes; uprate the burner to 24,000 lb/hr and the same valves are 2,300 lb/hr short, nothing was done to them, and the boiler is outside its code case. Stamped capacity is at a specific set pressure -- the same valve passes more at a higher one -- so the sum is taken at the pressures actually installed, and a supplementary valve set above the maximum allowable working pressure carries its stamp there. The required capacity is not always the nameplate either: for a fired boiler it is at least the output the fuel input supports. The accumulation test, not this arithmetic, is the demonstration of compliance.",
+    assumptions: [
+      { name: "Stamped capacity is at a set pressure", value: "not a catalogue figure", source: "ASME BPVC Sections I and IV" },
+      { name: "The accumulation test is the demonstration", value: "this is a screen, not a code calculation", source: "the National Board inspection code" },
+      { name: "Valve condition is not evaluated", value: "a valve that has not lifted in years may not lift", source: "boiler inspection practice" },
+    ],
+  },
+  "fuel-oil-atomizing-viscosity": {
+    formula: "ASTM D341 (Walther): log10(log10(v + 0.7)) = A - B log10(T absolute), fitted through two viscosity-temperature points from the oil's data sheet; the temperature for any target viscosity follows by interpolation on that line.",
+    edition: "The ASTM D341 viscosity-temperature relation by name. Typical atomizing viscosity is about 100 to 150 SSU and typical pumping limits about 4,000 SSU; both are entered rather than assumed. The burner manufacturer's atomizing viscosity requirement, the oil supplier's data sheet, the adopted fire and mechanical codes, and the jurisdiction's boiler inspector govern.",
+    freeAccess: "A two-point interpolation on data the user reads off the oil's own sheet; no viscosity chart is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Thin enough is a viscosity number rather than a temperature, and grade designations cover a wide range, so a fixed heater setpoint that works on one delivery smokes on the next. A No. 6 running 7,000 SSU at 100 degF and 340 at 180 wants about 212 degF to reach 150 SSU; a lighter delivery running 4,000 SSU at 100 degF and 200 at 180 reaches the same target at 191 degF. Run the heavier oil at the lighter one's setpoint and it arrives at the burner near 251 SSU, well outside the atomizing band, and it shows at the stack as smoke and unburned carbon. Storage and pumping have their own much looser limit reached at a far lower temperature, and confusing the two is how an oil system ends up designed to pump oil it cannot burn.",
+    assumptions: [
+      { name: "The oil's own data sheet is required", value: "a table value for a grade can be far from a delivery", source: "ASTM D341 practice" },
+      { name: "The target is a band, not a floor", value: "oil too hot can vaporize in the line and starve the burner", source: "burner manufacturer practice" },
+      { name: "Flash point is not evaluated", value: "it limits how hot oil may safely be heated", source: "the adopted fire code and the oil data sheet" },
+    ],
+  },
   // spec-v1557..v1562: the 2026-09-06 trade-expansion diving band. Group G.
   "no-decompression-limit": {
     formula: "adjusted no-decompression limit = the table's limit for the depth - the residual nitrogen time the table gives for the repetitive group and surface interval; credited bottom time = residual nitrogen time + planned bottom time; a nitrox mix enters the AIR table at the equivalent air depth ((1 - FO2) / 0.79) x (depth + 33) - 33.",

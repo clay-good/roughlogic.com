@@ -79,6 +79,7 @@ const FILES = [
   "calc-sawmill.js",
   "calc-wind.js",
   "calc-diving.js",
+  "calc-steamplant.js",
   "calc-civil.js",
   "calc-steel.js",
   "calc-concrete.js",

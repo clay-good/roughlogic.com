@@ -3317,6 +3317,13 @@ cross-check.
 | calc-stage.js | `computeVideoWallDataRate` | `{ width_px = 0, height_px = 0, bit_depth = 8, refresh_hz = 60, pixels_per_por...` | _ | _ | _ |
 | calc-stage.js | `computeWinchFleetAngle` | `{ lateral_offset = 0, lead_distance = 0 } = {}` | _ | _ | _ |
 | calc-stage.js | `computeWirelessIntermod` | `{ f1_mhz = 0, f2_mhz = 0, test_freq_mhz = 0 } = {}` | _ | _ | _ |
+| calc-steamplant.js | `computeBlowdownHeatRecovery` | `{ steam_rate_lb_hr = 0, cycles_of_concentration = 0, alt_cycles_of_concentrat...` | _ | _ | _ |
+| calc-steamplant.js | `computeDeaeratorSteamDemand` | `{ feedwater_lb_hr = 0, condensate_fraction = 0.6, alt_condensate_fraction = 0...` | _ | _ | _ |
+| calc-steamplant.js | `computeFuelOilAtomizingViscosity` | `{ v1_ssu = 0, t1_f = 0, v2_ssu = 0, t2_f = 0, target_ssu = 150, pumping_limit...` | _ | _ | _ |
+| calc-steamplant.js | `computeLaundryCostPerPound` | `{ lb_per_day = 0, gal_per_lb = 0, water_rate_per_gal = 0, sewer_rate_per_gal ...` | _ | _ | _ |
+| calc-steamplant.js | `computeLaundryDryerEvaporation` | `{ dry_weight_lb_per_day = 0, retained_moisture_fraction = 0.45, improved_reta...` | _ | _ | _ |
+| calc-steamplant.js | `computeLaundryWasherTurns` | `{ machine_capacity_lb = 0, wash_cycle_min = 0, load_unload_min = 0, idle_min ...` | _ | _ | _ |
+| calc-steamplant.js | `computeSafetyValveCapacity` | `{ rated_steaming_capacity_lb_hr = 0, fuel_input_btuh = 0, boiler_efficiency =...` | _ | _ | _ |
 | calc-steel.js | `computeBoltGroupEccentric` | `{ load_kip = 0, ecc_in = 0, ncols = 2, nrows = 3, gage_in = 3, pitch_in = 3 }...` | _ | _ | _ |
 | calc-steel.js | `computeBoltShearBearing` | `{ d_in = 0.75, ab_in2 = 0.4418, fnv_ksi = 54, nplanes = 1, t_in = 0.5, fu_ksi...` | _ | _ | _ |
 | calc-steel.js | `computeColumnBasePlate` | `{ pu_kip = 0, fc_ksi = 4, fy_ksi = 36, d_in = 0, bf_in = 0, b_in = 0, n_in = ...` | _ | _ | _ |
@@ -3540,7 +3547,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2126.
+Row count: 2133.
 
 <!-- END function-corpus-v14 -->
 
@@ -3977,7 +3984,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (161 tiles)
+### Group C HVAC (165 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3995,6 +4002,7 @@ per spec-v14 §13.1 second paragraph.
 | `baseboard-length-for-load` | Baseboard Length for a Room Load | Slant/Fin (inverse); 4,800 BTU/hr, 180 F water, 1 gpm, Fine Line 30 (600 BTU/f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `baseboard-output` | Hydronic Baseboard Output | Slant/Fin; 180 F water / 1 gpm / 8 ft of Slant/Fin Fine Line 30 -> 6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `belt-pulley` | Belt Length and Pulley Speed | Project (first-principles); 4 in drive / 8 in driven / 18 in centers / 1750 RPM motor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `blowdown-heat-recovery` | Boiler Blowdown Heat Recovery and Efficiency Gain | Project (first-principles); ASME, the boiler manufacturer, the water treatment progra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `blower-door-ach50` | Blower-Door Air-Tightness (ACH50, Natural Infiltration, Code Check) | IECC R402.4.1.2 + LBL infiltration model; spec-v218 section 2.1 pinned example (first test, FAIL) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `blown-insulation-coverage` | Blown Insulation Coverage | Manufacturer blown-insulation coverag...; spec-v99 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `boiler-pipe-sizing` | Boiler Distribution Pipe Sizing | ASHRAE / Bell & Gossett; GPM = 200000/(500*20) = 20; v(1.265 in) = 5.11 > 4 -> ste... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4030,6 +4038,7 @@ per spec-v14 §13.1 second paragraph.
 | `cooling-tower` | Cooling Tower Approach and Range | CTI ATC-105 cooling-tower test code; 95 F in / 85 F out / 75 F wet-bulb / 300 gpm / 15 kW fan ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `damper-authority` | Control Damper Authority and Leakage | Project (first-principles); damper dP / branch dP; leakage as sqrt(dP) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dcv-co2-ventilation` | Demand-Controlled Ventilation Rate from a CO2 Setpoint | Steady-state single-zone CO2 mass bal...; spec-v277 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `deaerator-steam-demand` | Deaerator Steam Demand and Vent Rate | Project (first-principles); ASME, the deaerator manufacturer, the water treatment pro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `defrost-cycle-sizing` | Evaporator Defrost Heat and Cycle Time | Project (first-principles); 144 BTU/lb latent, 0.5 BTU/lb-F sensible | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `degree-day-energy` | Annual Heating Energy and Fuel Cost from Degree-Days | Degree-day method (ASHRAE / RESNET); spec-v330 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dp-flow-meter` | Differential-Pressure Flow Meter (Orifice / Venturi) | Bernoulli / ISO 5167 primary element ...; d=0.0508 m, A2=0.0020268 m2; dP=6894.76 Pa; rho=999.6 kg/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4066,6 +4075,7 @@ per spec-v14 §13.1 second paragraph.
 | `flat-oval-duct` | Flat-Oval Duct Equivalent Round Diameter | ASHRAE Fundamentals (duct design) / S...; A = (pi/4)(10^2) + 10(20-10) = 78.54 + 100 = 178.54 in^2;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flue-gas-combustion-eff` | Flue-Gas Combustion Efficiency (Stack Loss) | Siegert stack-loss method (DIN combus...; Natural gas, 5% O2, 400 F stack over 70 F air -> CO2 8.90... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flue-gas-dew-point` | Natural-Gas Flue-Gas Water Dew Point | Natural-gas flue-gas water dew point ...; frac = 2/(1 + 9.52 x 1.15) = 0.1674; p = 127.2 mmHg; Anto... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `fuel-oil-atomizing-viscosity` | Fuel Oil Heating for Atomizing Viscosity | Project (first-principles); the burner manufacturer, the oil supplier data sheet, and... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `furnace-airflow-to-rise` | Furnace Airflow to Temperature Rise | First-principles sensible-heat relati...; spec-v655 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `furnace-temp-rise` | Furnace Temperature Rise and Derived Airflow | First-principles sensible-heat relati...; spec-v110 section 2.2 pinned example (70->120 F, 100k inp... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gas-dp-flow-meter` | Gas (Compressible) Differential-Pressure Flow Meter | ISO 5167-2 (compressible orifice flow...; eps=1-(0.351+0.256*0.0625+0.93*0.00390625)(1-0.99^(1/1.4)... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4126,6 +4136,7 @@ per spec-v14 §13.1 second paragraph.
 | `reynolds-number-pipe` | Pipe Flow Reynolds Number and Regime | Reynolds number Re = V D / nu; spec-v305 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `round-to-rect-duct` | Round-to-Rectangular Duct Equivalent | ASHRAE Fundamentals (duct design) / S...; 14 in x 8 in rectangular -> equivalent diameter 11.46 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `run-capacitor-microfarad` | Run Capacitor Microfarad Check | First-principles capacitive reactance...; spec-v104 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `safety-valve-capacity` | Boiler Safety Valve Relieving Capacity | Project (first-principles); ASME BPVC Sections I and IV, the National Board, and the ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `seer-eer` | SEER and EER Conversion | Project (engineering approximation); EER 12 -> SEER 13.44 / SEER2 estimate 12.768 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shr` | Sensible Heat Ratio | ASHRAE Handbook (Fundamentals); 24,000 BTU/hr sensible / 30,000 BTU/hr total -> SHR 0.80 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shr-latent` | Sensible Heat Ratio / Latent Split (ASHRAE) | ASHRAE; Q_s = 1.08 * 1200 * 20 = 25,920; Q_l = 36,000 - 25,920 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4798,7 +4809,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (114 tiles)
+### Group G Cross-trade (117 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4842,6 +4853,9 @@ per spec-v14 §13.1 second paragraph.
 | `hydraulic-cylinder` | Hydraulic Cylinder Force and Speed | NFPA (fluid power); F = P*A; v = GPM*231/(60*A); A_extend = pi*(bore/2)^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hydraulic-reservoir-cooler` | Hydraulic Reservoir Size and Cooler Heat Rejection | Project (first-principles); gpm x psi / 1,714; 2,545 BTU/hr per hp | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ladder-angle` | Ladder Placement Angle | OSHA; OSHA 1926.1053(b)(5) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `laundry-cost-per-pound` | Laundry Water, Sewer, and Energy Cost per Pound | Project (first-principles); the utility tariffs, the chemical supplier, and the equip... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `laundry-dryer-evaporation` | Tumble Dryer Evaporation Load and Makeup Air | Project (first-principles); the dryer manufacturer, the adopted mechanical code, and ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `laundry-washer-turns` | Commercial Laundry Washer Capacity and Turns per Day | Project (first-principles); the equipment manufacturer and the applicable laundry sta... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lifeline-tension` | Horizontal Lifeline Tension and Anchorage (OSHA 1926.502) | roughlogic; At midspan, 2 T sin(theta) = W with sin(theta) = s / sqrt... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `linear-interpolation` | Linear Interpolation | First-principles linear interpolation; (0,10) and (10,30), x = 4 -> y = 18, slope 2 (within range) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `loan-payment` | Loan Payment | Project (first-principles); Closed-form annuity-immediate at monthly rate r = APR/12/100 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5588,6 +5602,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1875. Fixture-covered or reference-cadence: 1875 / 1875.
+Tile count: 1882. Fixture-covered or reference-cadence: 1882 / 1882.
 
 <!-- END tile-index-v14 -->

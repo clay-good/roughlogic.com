@@ -723,6 +723,16 @@ export const TOOL_MODULES = (() => {
     "no-decompression-limit", "surface-air-consumption", "nitrox-mod",
     "nitrox-ead", "umbilical-air-supply", "chamber-gas-volume",
   ]);
+  // spec-v1563..v1570: the steam plant and commercial laundry bench. The
+  // catalog had a blowdown RATE and a Napier orifice pair and nothing that
+  // valued blowdown heat, balanced a deaerator, audited an installed safety
+  // valve set, or fitted an oil viscosity line -- and nothing at all for a
+  // commercial laundry. Three keep group "G", four take group "C".
+  declare("./calc-steamplant.js", "STEAMPLANT_RENDERERS", [
+    "laundry-washer-turns", "laundry-cost-per-pound", "laundry-dryer-evaporation",
+    "blowdown-heat-recovery", "deaerator-steam-demand", "safety-valve-capacity",
+    "fuel-oil-atomizing-viscosity",
+  ]);
   // spec-v80 cap-relief split: the spec-v25 site-civil / roadway-geometry
   // quartet moved out of calc-construction.js (it sat at 95.0% of its size
   // cap, the tightest remaining calculator module) into its own module. All

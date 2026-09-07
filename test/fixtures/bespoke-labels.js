@@ -584,7 +584,7 @@ export const BESPOKE_LABELS = {
   "noncoincident-load": {"load_a_va":"Load A - e.g. electric heat (VA)","load_b_va":"Load B - e.g. air-conditioning (VA)","both_can_run":"Can both run at the same time?"},
   "nozzle-flow-pressure": {"rated_gpm":"Tip rated flow (gpm)","rated_psi":"Rated pressure (psi)","new_psi":"Operating pressure (psi)","target_gpm":"Target flow (gpm, optional)"},
   "npk-blend": {"crop":"Crop","soil_n_lb_per_acre":"Soil-test N credit (lb/acre)","soil_p_lb_per_acre":"Soil-test P2O5 credit (lb/acre)","soil_k_lb_per_acre":"Soil-test K2O credit (lb/acre)","area_acres":"Field area (acres)","bag_weight_lb":"Bag weight (lb)"},
-  "npsh-a": {"elevation_ft":"Site elevation (ft)","water_temp_F":"Water temperature (°F)","source_elevation_relative_ft":"Source elevation vs pump (ft, + above)"},
+  "npsh-a": {"elevation_ft":"Site elevation (ft)","water_temp_F":"Water temperature (°F)","source_elevation_relative_ft":"Source elevation vs pump (ft, + above)","target_margin_ft":"Target margin over NPSHr (ft)"},
   "nucleic-acid-a260": {"a260":"A260 (absorbance at 260 nm)","na_type":"Nucleic-acid type","dilution_factor":"Dilution factor","a280":"A280 (optional, for 260/280 purity)"},
   "od600-cell-count": {"od600":"OD600 reading","factor_cells_per_od":"Conversion factor (cells/mL per OD)","dilution":"Dilution factor"},
   "off-grid-battery": {"daily_load_wh":"Daily load (Wh/day)","days_autonomy":"Days of autonomy","dod_limit":"Depth-of-discharge limit (0-1; 0.5 lead-acid / 0.8 LFP)","system_voltage_v":"System DC voltage","round_trip_efficiency":"Round-trip efficiency (0-1; 0.85 lead-acid / 0.95 LFP)","temperature_derate":"Temperature derate (0-1; 1.0 if none)"},
