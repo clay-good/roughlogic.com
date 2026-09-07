@@ -21775,6 +21775,140 @@ export const CITATIONS = {
       { name: "The manufacturer's provisions govern absolutely", value: "rated capacities, allowable geometries, and permitted wind speeds", source: "turbine service instructions" },
     ],
   },
+  // spec-v1450..v1460: the 2026-09-07 trade-expansion overhead line and
+  // distribution band. Group A. The charter's probe returned ZERO tiles here.
+  "ruling-span": {
+    formula: "ruling span RS = sqrt(sum of L^3 / sum of L) over the spans between deadends; sag in an individual span = sag at the ruling span x (L / RS)^2; field approximation = average span + (2/3)(longest - average).",
+    edition: "The ruling (equivalent) span relation as standard overhead line practice, by name. The utility's stringing charts, sag tables, and construction standards govern.",
+    freeAccess: "Geometry on span lengths the crew measures; no stringing chart is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ruling span is a CUBE-weighted mean, so the long spans dominate it and it is neither the average nor the longest. Two consequences a crew acts on: the stringing chart is entered at the ruling span rather than at the span in front of the truck, and once the section is sagged the sag in any individual span scales as the SQUARE of its own length over the ruling span. On a 300, 450, 380, 520 ft section the ruling span is 435.96 ft against a 412.5 ft average, and sagged to 12.0 ft the individual spans run 5.68 to 17.07 ft -- a factor of three, same conductor, same tension, same day. Pulling every span to the ruling-span sag leaves the short ones badly overtensioned. The tailboard approximation lands at 484.2 ft there, 11.1% high, which is exactly the case its own rule of thumb warns about: close when the spans are similar, drifting when one dominates.",
+    assumptions: [
+      { name: "Equal tension throughout the section", value: "the ruling-span idealization, weakest on steep or very unequal spans", source: "overhead line practice" },
+      { name: "It computes no sag or tension", value: "a reference sag is entered and distributed", source: "tile scope" },
+      { name: "A section is defined by its deadends", value: "not by how many structures it crosses", source: "overhead line practice" },
+    ],
+  },
+  "conductor-sag-at-temperature": {
+    formula: "H2^2 [H2 - H1 + E A alpha (t2 - t1) + w1^2 L^2 E A / (24 H1^2)] = w2^2 L^2 E A / 24, solved for the single positive real root; sag S = w L^2 / (8 H).",
+    edition: "The parabolic change-of-state (change-of-condition) relation by name. Single homogeneous material; ACSR knee-point behaviour and creep are not modelled. The conductor manufacturer's stress-strain data, the utility's sag-tension program and stringing charts, and the applicable NESC edition govern.",
+    freeAccess: "An algebraic solve on conductor properties from the manufacturer's data sheet; no sag-tension chart is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Two effects fight each other when a conductor heats up: the metal grows by free thermal strain, and that growth goes into sag, but sagging lowers the tension and lower tension lets the elastic stretch relax, pulling some length back. Because the sag term carries the tension squared in its denominator the result is a CUBIC in the final tension, with no closed form worth writing on a tailboard. ACSR Drake on a 600 ft ruling span strung to 6,000 lb at 60 degF comes back at 4,380 lb at 120 degF: 27.0% of the tension gone and 3.03 ft of sag gained, taking it from 8.21 to 11.24 ft. That is a 37% sag change from a 27% tension change, because sag is inversely proportional to tension and always moves further. Run backwards it gives the cold case, where the concern is tension climbing toward the conductor's limit rather than clearance; enter a different weight per foot for the second condition and it gives the ice case.",
+    assumptions: [
+      { name: "Parabolic, not catenary", value: "departs on very long or very slack spans", source: "overhead line practice" },
+      { name: "One homogeneous material", value: "ACSR aluminium and steel components are not modelled separately", source: "conductor manufacturer stress-strain data" },
+      { name: "Creep is separate and additive", value: "it is not included here", source: "conductor manufacturer creep data" },
+    ],
+  },
+  "conductor-blowout": {
+    formula: "wind load per foot = wind pressure x conductor diameter / 12; swing angle = atan(wind load per foot / weight per foot); blowout at midspan = sag x sin(swing angle); a wind speed entered instead of a pressure is converted as 0.00256 V^2.",
+    edition: "The transverse blowout relation as standard overhead line practice, by name, with the ASCE 7 velocity-pressure constant 0.00256 -- the same relation the wind-pressure calculator uses, so the two cannot disagree. The applicable NESC edition, the utility's construction standards, and the right-of-way requirements govern.",
+    freeAccess: "Trigonometry on a wind pressure and a sag the user supplies; no clearance table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Ground clearance is checked straight down and nothing checks sideways. A conductor in wind swings out of the plane of the poles like a hinged sheet, and because it does not stretch to do so the horizontal displacement at midspan is the sag times the sine of the swing angle. The swing angle is independent of span and of tension -- it depends only on the ratio of wind load to weight -- but the blowout DISTANCE is proportional to sag, so the long slack spans blow out furthest, on exactly the hot days when vertical clearance is also worst. A light conductor blows out far further than a heavy one in the same wind: Drake at 1.094 lb/ft in a 9 psf wind swings 37.2 degrees and moves 7.26 ft, and at half that weight it swings 56.7 degrees and moves 10.0 ft. That is why small distribution conductor near buildings is the recurring problem.",
+    assumptions: [
+      { name: "Midspan on a level span", value: "insulator restraint near the structures is not modelled", source: "overhead line practice" },
+      { name: "Rigid swing about the chord", value: "differential swing between phases is not evaluated", source: "overhead line practice" },
+      { name: "Galloping and vibration excluded", value: "dynamic response in gusty wind is a separate subject", source: "overhead line practice" },
+    ],
+  },
+  "conductor-uplift-check": {
+    formula: "V_low = w L / 2 - H h / L; V_high = w L / 2 + H h / L; low-point offset from the lower support x0 = L/2 - H h / (w L); uplift begins at H = w L^2 / (2 h).",
+    edition: "The inclined-span vertical reaction relations as standard overhead line practice, by name. Cold, high tension is the governing case. The utility's construction standards, the applicable NESC edition, and the line designer govern.",
+    freeAccess: "A subtraction on span geometry and a tension the user supplies; no assembly table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "In hilly country a suspension structure between two higher structures can be LIFTED rather than loaded, and uplift unseats a suspension clamp and is a listed cause of structure damage. An inclined span's weight does not split evenly: the horizontal tension along the sloped chord adds a downward component at the high support and an equal upward one at the low support. A 500 ft span rising 60 ft at 1.094 lb/ft and 5,000 lb of tension puts 273.5 lb of weight against 600.0 lb of lift, for -326.5 lb, and the low point sits 298 ft OUTSIDE the span -- the same condition stated geometrically. The threshold is w L^2 / (2 h) = 2,279 lb on that span. The condition worsens in COLD weather, because cold means high tension and the tension is the term doing the lifting, which is the opposite of the intuition built on clearance problems. The check must count BOTH adjacent spans, since the real load at the structure is their sum.",
+    assumptions: [
+      { name: "Cold and high tension governs", value: "the opposite of the clearance case", source: "overhead line practice" },
+      { name: "Equal tension in both spans", value: "the ruling-span idealization, weakest on exactly these steep spans", source: "overhead line practice" },
+      { name: "No assembly is selected", value: "a tension assembly or hold-down is a design decision", source: "the utility's construction standards" },
+    ],
+  },
+  "line-ground-clearance-nesc": {
+    formula: "height above ground = attachment height - sag at the maximum condition; margin = that less the required clearance; maximum allowable sag = attachment height - required clearance; minimum attachment height = required clearance + sag.",
+    edition: "The ground-clearance subtraction with the NESC requirement CITED, NOT MIRRORED: no clearance table is shipped, because the requirement depends on voltage, on what is under the line, and on the edition the jurisdiction has adopted. NESC checks at the maximum operating temperature or the final-sag ice condition, whichever sags more. The adopted NESC edition, the utility's construction standards, and the authority having jurisdiction govern.",
+    freeAccess: "A subtraction on a height and a sag; the clearance requirement is entered by the user from their own adopted table.",
+    governance: GOVERNANCE.general,
+    editionNote: "The whole difficulty is choosing the sag. NESC checks clearance at the maximum conductor temperature the line is designed to operate at, or at the final-sag ice condition, whichever gives the greater sag -- not at 60 degF on the day the crew strung it. A line sagged in spring with a comfortable margin can be out of compliance at design temperature, and the difference is routinely several feet: sixty degrees adds about 3 ft on a 600 ft ruling span, and creep adds the equivalent of another forty-odd degrees permanently. One relation is run four ways -- clearance and margin from a sag, maximum sag from a requirement, minimum attachment height from both -- and the margin is reported SIGNED so a failing span reads as a negative number of feet rather than a passing-looking small one. NO TABLE IS SHIPPED, for the same reason the pole-embedment calculator takes lateral bearing as an input: a table copied into a calculator is a table that goes stale silently.",
+    assumptions: [
+      { name: "No NESC clearance table is shipped", value: "it is entered from the adopted edition", source: "the adopted NESC edition" },
+      { name: "Midspan on a level span", value: "the governing point on an inclined span or uneven ground is not found", source: "overhead line practice" },
+      { name: "Which condition governs is not determined", value: "maximum temperature or final-sag ice, whichever sags more", source: "the adopted NESC edition" },
+    ],
+  },
+  "pole-class-groundline-moment": {
+    formula: "groundline diameter d = circumference / pi; section modulus S = pi d^3 / 32; moment capacity = designated fiber stress x S; applied moment = the sum of each horizontal load times its height above the groundline; utilization = applied / capacity.",
+    edition: "The groundline bending check with ANSI O5.1 designated fiber stresses CITED, NOT MIRRORED -- entered by the user (8,000 psi Southern Pine and Douglas Fir, 6,000 psi Western Red Cedar). A screen, not a design: NESC grade-of-construction overload capacity factors are NOT applied. ANSI O5.1, the applicable NESC edition, the utility's construction standards, and a qualified line designer govern.",
+    freeAccess: "Section-modulus arithmetic on a tape reading; no pole class table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "A pole is rated by class, and the class is a statement about one number: the horizontal load it takes two feet from the top. What a crew has is a load at some other height, a circumference off a tape, and a species. Because the section modulus goes as the CUBE of diameter, small differences in circumference are large differences in strength: a Class 3 Southern Pine at 37.5 in has 111,315 ft-lb of capacity and the same pole at 36.5 in has 102,647, a 7.8% loss from one inch of tape. The applied side is a SUM of moments -- conductor tension at the crossarm, wind on the pole, wind on the conductors, a down-guy's reaction -- each at its own height, which is also why a guy attached high is worth so much: it subtracts a large moment where the arm is longest. A groundline circumference on a decayed or hollow pole is a misleading number, and no tape reading reveals that.",
+    assumptions: [
+      { name: "Overload capacity factors are NOT applied", value: "this is a screen, not a grade-of-construction design", source: "the applicable NESC edition" },
+      { name: "Decay and hollow sections are not evaluated", value: "a tape reading does not reveal them", source: "pole inspection practice" },
+      { name: "Fiber stress is a species value entered by the user", value: "8,000 psi pine and fir, 6,000 psi cedar", source: "ANSI O5.1" },
+    ],
+  },
+  "guy-anchor-holding-capacity": {
+    formula: "cohesive Q_u = A (9 c + gamma D); granular Q_u = A gamma D N_q; allowable = ultimate / factor of safety; screw-anchor torque correlation Q_u = K_t x T.",
+    edition: "The deep-anchor uplift bearing relations as standard practice, by name, with the empirical screw-anchor torque correlation reported alongside. Single helix, deep-failure assumption. The anchor manufacturer's data, a geotechnical evaluation of the actual site, the utility's construction standards, and the applicable NESC edition govern.",
+    freeAccess: "A bearing calculation on soil properties the user supplies; no manufacturer capacity table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The guy-tension calculator gives the pull in the guy and nothing says whether the ground will hold it -- and an anchor that pulls is the failure mode that takes the pole with it. In clay the strength is dominated by cohesion and the depth term is small; in sand there is no cohesion and the whole capacity is overburden times a bearing factor that climbs steeply with friction angle. A 12 in helix at 7 ft holds 7,673 lb ultimate in a stiff clay at 1,000 psf and 6,048 lb in a loose sand at N_q = 10: same hardware, same depth, and the soil is the whole variable. For power-installed screw anchors the installing torque is the better number, because it measures the soil that is actually there rather than the soil someone guessed at from a boring two hundred feet away -- and where the two methods disagree by a wide margin THAT DISAGREEMENT IS THE FINDING. A shallow anchor fails by lifting a soil cone to the surface, which is a different and weaker mechanism this does not model.",
+    assumptions: [
+      { name: "Deep-failure assumption", value: "a shallow anchor fails by a weaker cone mechanism not modelled here", source: "anchor design practice" },
+      { name: "Single helix", value: "multiple helices and their spacing rules are not summed", source: "the anchor manufacturer's data" },
+      { name: "The torque factor is manufacturer-specific", value: "it is set by shaft size and is empirical", source: "the anchor manufacturer's data" },
+    ],
+  },
+  "transverse-wind-load-conductor": {
+    formula: "wind pressure p = 0.00256 V^2 where a speed is entered; force on a conductor = p x (diameter / 12) x wind span x conductor count; force on a pole = p x its tapered projected area with the resultant at mid-height; groundline moment = the sum of each force times its height.",
+    edition: "The transverse wind load relations by name, with the ASCE 7 velocity-pressure constant 0.00256 -- the same relation the wind-pressure calculator uses. Round shape factor 1.0; NO gust response, height adjustment, or terrain exposure factor is applied, so this is a screen rather than a design. The applicable NESC edition, the utility's construction standards, and a qualified line designer govern.",
+    freeAccess: "Pressure times projected area on dimensions the user supplies; no wind map or exposure table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The load that governs a distribution structure on a windy day is not the conductor tension, it is the wind on the conductors and on the pole, and both land at different heights and become a moment. The projected area of a cylinder is diameter times length, so a conductor's wind load per foot is its diameter in inches over twelve times the pressure and nothing else. THE LENGTH THAT COUNTS IS THE WIND SPAN, half the span on each side of the structure, which is not the ruling span and not the weight span -- confusing wind span with weight span is the standard error on an angle or hillside structure. The pole carries its own wind on a tapered area with the resultant at mid-height, and while that force is small next to the conductors its moment arm is not: a 9 psf wind on one Drake at a 400 ft wind span gives 332 lb at 38 ft against the pole's 293 lb at 19.5 ft, which is 31% of an 18,335 ft-lb total. Under ice the diameter grows and so does the wind area, which is why the district cases combine ice AND wind.",
+    assumptions: [
+      { name: "Wind span, not ruling span or weight span", value: "the standard error on an angle or hillside structure", source: "overhead line practice" },
+      { name: "No gust, height, or exposure factor", value: "a screen, not a grade-of-construction design", source: "the applicable NESC edition" },
+      { name: "Transverse only", value: "longitudinal deadend loads and angle tension components are not computed", source: "overhead line practice" },
+    ],
+  },
+  "nesc-district-loading": {
+    formula: "iced diameter = bare + 2 x radial ice; ice weight per foot = (pi/4)(iced^2 - bare^2)/144 x 57.3 lb/cu ft; vertical = bare weight + ice weight; horizontal = wind pressure x iced diameter / 12; resultant = sqrt(vertical^2 + horizontal^2) + k.",
+    edition: "The NESC district loading combination CITED BY NAME, not reproduced: the Heavy, Medium, and Light district values (0.50/0.25/0.00 in radial ice, 4/4/9 psf, k of 0.30/0.20/0.05 lb/ft, at 0/15/30 degF) are the district definitions, and which district applies is geography and the adopted edition. Overload capacity factors and the separate extreme-wind and extreme-ice cases are NOT applied. The applicable NESC edition, the utility's construction standards, and a qualified line designer govern.",
+    freeAccess: "Geometry and a vector sum on a conductor's own published diameter and weight; no district map is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Everything downstream of a conductor starts from its resultant weight per foot under the governing case, and that case is not the bare conductor. THE ICE IS AN ANNULUS, not a coating of the bare diameter, so its weight goes as the difference of squares -- half an inch of radial ice nearly doubles the weight of a 1.1 in conductor and more than triples that of a 0.4 in neutral, which is why the light conductors come down first. The wind then acts on the ICED diameter and the two combine as a VECTOR because they act at right angles. Last comes the constant, a flat adder that is not physics but a deliberate margin, and it matters most on the light conductors where it is a large fraction of the total. ACSR Drake runs 2.30x bare weight in the Heavy district, 1.65x in Medium, and 1.30x in Light -- and the Light case has no ice at all, so that entire 30% is the wind vector and the constant.",
+    assumptions: [
+      { name: "District values are cited, not a code reproduction", value: "which district applies is geography and the adopted edition", source: "the applicable NESC edition" },
+      { name: "Overload capacity factors are NOT applied", value: "nor the separate extreme-wind and extreme-ice cases", source: "the applicable NESC edition" },
+      { name: "Ice shedding and unbalanced ice excluded", value: "as are galloping and the longitudinal loads they produce", source: "overhead line practice" },
+    ],
+  },
+  "conductor-creep-elongation": {
+    formula: "equivalent temperature rise = creep strain / coefficient of thermal expansion; the resulting condition is evaluated through the same parabolic change-of-state relation the sag-at-temperature calculation uses, and the stringing sag is that relation run at the design temperature LESS the equivalent rise.",
+    edition: "The creep temperature-equivalent method as standard overhead line practice, by name. The creep strain is an INPUT from the conductor manufacturer's creep data for the conductor, tension, and elapsed time; none is predicted here. The conductor manufacturer's creep and stress-strain data, the utility's sag-tension program and stringing charts, and the applicable NESC edition govern.",
+    freeAccess: "A division and a change-of-state run on a creep strain the user reads off the manufacturer's data; no creep curve is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "A conductor sags more in year ten than in year one, at the same temperature and the same load, because aluminium creeps -- permanent, non-elastic elongation under sustained load, with most of it spent in the first year or two. Steel barely creeps, which is why ACSR creeps less than all-aluminium conductor. The clean way to use it is the temperature equivalent: creep strain over the coefficient of thermal expansion is the temperature rise that would produce the same elongation, so creep becomes just another temperature offset. An ordinary ten-year ACSR strain of 5.0e-04 against an alpha of 1.06e-05 is 47.2 degF -- not a correction but a bigger move than most seasonal swings, running the SAME way as a hot day. The instruction follows: sag the new line as though it were that much COLDER and it arrives at the design sag once the creep is spent. A crew that sags to the design number on installation day has spent the entire clearance margin before the line is a decade old, with nothing having gone wrong.",
+    assumptions: [
+      { name: "The creep strain is an input, not a prediction", value: "it is path-dependent on stress and temperature history", source: "the conductor manufacturer's creep data" },
+      { name: "One homogeneous material", value: "the aluminium and steel components of ACSR are not separated", source: "conductor manufacturer stress-strain data" },
+      { name: "Prestressing procedures not addressed", value: "some utilities spend creep deliberately at installation", source: "the utility's construction standards" },
+    ],
+  },
+  "sagging-return-wave": {
+    formula: "sag S = 12.075 (t / N)^2 with S in feet, t the elapsed seconds and N the number of return waves counted; inverted, t = N sqrt(S / 12.075). The wave speed sqrt(H / m) and the sag are set by the same tension and mass per unit length, which is why the span length cancels out.",
+    edition: "The return-wave (stopwatch) sagging method as standard overhead line practice, by name. Ideal taut string, free span. The utility's stringing charts and construction standards and the crew's own sagging procedure govern.",
+    freeAccess: "One square root on a stopwatch reading; no stringing chart is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Sagging by eye works when a crew can see both structures, and often they cannot. Strike the conductor near one support and a transverse wave runs to the far structure, reflects, and comes back; its speed is set by the tension and the mass per unit length, which are exactly the quantities that set the sag -- so the round-trip time and the sag are two readings of one physical state, AND THE SPAN LENGTH CANCELS OUT ENTIRELY. That is what makes the method work with no line of sight: the crew never needs to know how far away the other pole is. Timing several return waves rather than one is the whole accuracy trick and it is not fussiness: because the relation is squared, for a 12 ft sag three waves want 2.99 seconds and two tenths of error costs 1.66 ft, while one wave wants 1.00 second and the same two tenths costs 5.30 ft, more than three times worse for the identical stopwatch.",
+    assumptions: [
+      { name: "Ideal taut string, free span", value: "it degrades through running blocks, against a hold-down, or before clipping in", source: "overhead line practice" },
+      { name: "The span length cancels", value: "which is the whole point: no line of sight is needed", source: "overhead line practice" },
+      { name: "The target sag comes from elsewhere", value: "the stringing chart at the ruling span and the temperature at that moment", source: "the utility's stringing charts" },
+    ],
+  },
   // spec-v1563..v1570: the 2026-09-07 trade-expansion steam plant and commercial
   // laundry band. Groups G and C. spec-v1568 was CUT to `npsh-a`.
   "laundry-washer-turns": {

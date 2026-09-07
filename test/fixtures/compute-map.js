@@ -1986,6 +1986,18 @@ export const COMPUTE_MAP = {
   "deaerator-steam-demand": { module: "../../calc-steamplant.js", fn: "computeDeaeratorSteamDemand" },
   "safety-valve-capacity": { module: "../../calc-steamplant.js", fn: "computeSafetyValveCapacity" },
   "fuel-oil-atomizing-viscosity": { module: "../../calc-steamplant.js", fn: "computeFuelOilAtomizingViscosity" },
+  // spec-v1450..v1460 overhead line and distribution band
+  "ruling-span": { module: "../../calc-lineworker.js", fn: "computeRulingSpan" },
+  "conductor-sag-at-temperature": { module: "../../calc-lineworker.js", fn: "computeConductorSagAtTemperature" },
+  "conductor-blowout": { module: "../../calc-lineworker.js", fn: "computeConductorBlowout" },
+  "conductor-uplift-check": { module: "../../calc-lineworker.js", fn: "computeConductorUpliftCheck" },
+  "line-ground-clearance-nesc": { module: "../../calc-lineworker.js", fn: "computeLineGroundClearanceNesc" },
+  "pole-class-groundline-moment": { module: "../../calc-lineworker.js", fn: "computePoleClassGroundlineMoment" },
+  "guy-anchor-holding-capacity": { module: "../../calc-lineworker.js", fn: "computeGuyAnchorHoldingCapacity" },
+  "transverse-wind-load-conductor": { module: "../../calc-lineworker.js", fn: "computeTransverseWindLoadConductor" },
+  "nesc-district-loading": { module: "../../calc-lineworker.js", fn: "computeNescDistrictLoading" },
+  "conductor-creep-elongation": { module: "../../calc-lineworker.js", fn: "computeConductorCreepElongation" },
+  "sagging-return-wave": { module: "../../calc-lineworker.js", fn: "computeSaggingReturnWave" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

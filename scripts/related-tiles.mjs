@@ -1550,6 +1550,18 @@ const RELATED = {
   "deaerator-steam-demand": ["blowdown-heat-recovery","condensate-return-sizing","npsh-a"],
   "safety-valve-capacity": ["steam-prv-area-for-capacity","steam-prv-napier","boiler-horsepower"],
   "fuel-oil-atomizing-viscosity": ["oil-burner-firing-rate","boiler-horsepower","steam-pipe-velocity"],
+  // spec-v1450..v1460: the 2026-09-07 overhead line and distribution band.
+  "ruling-span": ["conductor-sag-at-temperature","sagging-return-wave","line-ground-clearance-nesc"],
+  "conductor-sag-at-temperature": ["ruling-span","nesc-district-loading","conductor-creep-elongation"],
+  "conductor-blowout": ["line-ground-clearance-nesc","transverse-wind-load-conductor","conductor-sag-at-temperature"],
+  "conductor-uplift-check": ["conductor-sag-at-temperature","pole-class-groundline-moment","ruling-span"],
+  "line-ground-clearance-nesc": ["conductor-sag-at-temperature","conductor-creep-elongation","conductor-blowout"],
+  "pole-class-groundline-moment": ["transverse-wind-load-conductor","guy-anchor-holding-capacity","pole-embedment-depth"],
+  "guy-anchor-holding-capacity": ["guy-wire-tension","pole-class-groundline-moment","transverse-wind-load-conductor"],
+  "transverse-wind-load-conductor": ["pole-class-groundline-moment","nesc-district-loading","wind-pressure"],
+  "nesc-district-loading": ["conductor-sag-at-temperature","transverse-wind-load-conductor","conductor-blowout"],
+  "conductor-creep-elongation": ["conductor-sag-at-temperature","line-ground-clearance-nesc","ruling-span"],
+  "sagging-return-wave": ["ruling-span","conductor-sag-at-temperature","line-ground-clearance-nesc"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   "grounding-electrode-conductor": ["bonding-jumper","egc-sizing","grounding-electrode"],
   "bonding-jumper": ["grounding-electrode-conductor","egc-sizing","service-load-standard"],

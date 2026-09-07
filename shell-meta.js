@@ -114,6 +114,10 @@ export const PROFESSION_NOUN = {
   // "... - Trades ..." rather than failing.
   laundry: "Laundry",
   boiler: "Steam Plant",
+  // Added 2026-09-07 with the overhead line band. Short on purpose: a long
+  // noun is the first thing buildTitle drops at the 70-char cap, so the tiles
+  // that most need naming are the ones that silently lose it.
+  "line-work": "Line Work",
   mechanical: "Mechanical",
   demolition: "Demolition",
   fireproofing: "Fireproofing",

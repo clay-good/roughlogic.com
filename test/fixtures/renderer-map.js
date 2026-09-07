@@ -1900,4 +1900,16 @@ export const RENDERER_MAP = {
   "deaerator-steam-demand": { module: "../../calc-steamplant.js", exportName: "STEAMPLANT_RENDERERS" },
   "safety-valve-capacity": { module: "../../calc-steamplant.js", exportName: "STEAMPLANT_RENDERERS" },
   "fuel-oil-atomizing-viscosity": { module: "../../calc-steamplant.js", exportName: "STEAMPLANT_RENDERERS" },
+  // spec-v1450..v1460 overhead line and distribution band
+  "ruling-span": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
+  "conductor-sag-at-temperature": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
+  "conductor-blowout": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
+  "conductor-uplift-check": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
+  "line-ground-clearance-nesc": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
+  "pole-class-groundline-moment": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
+  "guy-anchor-holding-capacity": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
+  "transverse-wind-load-conductor": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
+  "nesc-district-loading": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
+  "conductor-creep-elongation": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
+  "sagging-return-wave": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
 };

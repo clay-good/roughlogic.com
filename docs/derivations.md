@@ -2597,6 +2597,17 @@ cross-check.
 | calc-layout.js | `computeTriangleAsa` | `{ angle_a_deg = 0, angle_b_deg = 0, included_side_c = 0 } = {}` | _ | _ | _ |
 | calc-layout.js | `computeTriangleSas` | `{ side_a = 0, side_b = 0, included_angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-layout.js | `computeTriangleSss` | `{ side_a = 0, side_b = 0, side_c = 0 } = {}` | _ | _ | _ |
+| calc-lineworker.js | `computeConductorBlowout` | `{ conductor_diameter_in = 0, weight_lb_per_ft = 0, wind_pressure_psf = 0, win...` | _ | _ | _ |
+| calc-lineworker.js | `computeConductorCreepElongation` | `{ creep_strain = 0, alpha_per_f = 0, span_ft = 0, area_in2 = 0, weight_lb_per...` | _ | _ | _ |
+| calc-lineworker.js | `computeConductorSagAtTemperature` | `{ span_ft = 0, area_in2 = 0, weight1_lb_per_ft = 0, weight2_lb_per_ft = 0, mo...` | _ | _ | _ |
+| calc-lineworker.js | `computeConductorUpliftCheck` | `{ span_ft = 0, elevation_rise_ft = 0, weight_lb_per_ft = 0, tension_lb = 0, b...` | _ | _ | _ |
+| calc-lineworker.js | `computeGuyAnchorHoldingCapacity` | `{ helix_diameter_in = 0, installed_depth_ft = 0, cohesion_psf = 0, friction_b...` | _ | _ | _ |
+| calc-lineworker.js | `computeLineGroundClearanceNesc` | `{ attachment_height_ft = 0, max_condition_sag_ft = 0, required_clearance_ft =...` | _ | _ | _ |
+| calc-lineworker.js | `computeNescDistrictLoading` | `{ bare_diameter_in = 0, bare_weight_lb_per_ft = 0, district = 1, custom_ice_i...` | _ | _ | _ |
+| calc-lineworker.js | `computePoleClassGroundlineMoment` | `{ groundline_circumference_in = 0, fiber_stress_psi = 8000, load_1_lb = 0, he...` | _ | _ | _ |
+| calc-lineworker.js | `computeRulingSpan` | `{ span_1_ft = 0, span_2_ft = 0, span_3_ft = 0, span_4_ft = 0, span_5_ft = 0, ...` | _ | _ | _ |
+| calc-lineworker.js | `computeSaggingReturnWave` | `{ elapsed_seconds = 0, return_waves = 3, target_sag_ft = 0, stopwatch_error_s...` | _ | _ | _ |
+| calc-lineworker.js | `computeTransverseWindLoadConductor` | `{ wind_pressure_psf = 0, wind_speed_mph = 0, conductor_diameter_in = 0, wind_...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeAccessControlPowerSupply` | `{ lock_count = 4, lock_current_a = 0.5, reader_count = 2, reader_current_a = ...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCableSupportJhook` | `{ run_ft = 400, spacing_ft = 4, num_cables = 50, cable_lb_per_ft = 0.035, hoo...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCableTrayFill` | `{ tray_type = "ladder", tray_width_in = 0, cables = [] } = {}` | _ | _ | _ |
@@ -3547,7 +3558,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2133.
+Row count: 2144.
 
 <!-- END function-corpus-v14 -->
 
@@ -3615,7 +3626,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (218 tiles)
+### Group A Electrical (229 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3654,7 +3665,11 @@ per spec-v14 §13.1 second paragraph.
 | `ceiling-speaker-coverage-angle` | Ceiling Speaker Coverage Angle for a Target Spacing | commercial-audio design practice (sol...; spec-v740 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `coax-rg-loss` | Coaxial Cable Attenuation | Belden / CommScope loss curves (by name); 100 ft RG6 @ 1000 MHz (6 dB/100 ft) -> 6 dB; source 0 dBm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `commercial-lighting-load` | Commercial General-Lighting and Receptacle Load (NEC 220.12 / 220.44) | NEC 2023 (NFPA 70); 5,000 ft2 x 3 VA = 15,000 VA lighting; 60 x 180 = 10,800 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `conductor-blowout` | Conductor Blowout and Horizontal Clearance | Project (first-principles); the applicable NESC edition and the right-of-way requirem... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `conductor-creep-elongation` | Conductor Long-Term Creep and Sag Increase | Project (first-principles); the conductor manufacturer creep and stress-strain data g... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `conductor-sag-at-temperature` | Conductor Sag Change With Temperature | Project (first-principles); the conductor manufacturer stress-strain data and the app... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conductor-short-circuit-withstand` | Conductor Short-Circuit Thermal Withstand (Onderdonk / ICEA) | ICEA / Onderdonk; spec-v125 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `conductor-uplift-check` | Suspension Insulator Uplift Check at a Low Point | Project (first-principles); the utility construction standards and the line designer ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conduit-90-stub` | Conduit 90 Stub and Back-to-Back | Ugly's Electrical References (by name); 3/4 in EMT, 8 in stub, 6 in deduct -> 2 in mark | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conduit-expansion-max-run` | PVC Conduit Max Run Before an Expansion Fitting | NFPA; spec-v665 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `conduit-fill` | Conduit Fill | NFPA; Chapter 9 Tables 1, 4, 5; 4 conductors -> 40% fill thresh... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3700,12 +3715,14 @@ per spec-v14 §13.1 second paragraph.
 | `grounding-electrode` | Grounding Electrode Resistance (Dwight / IEEE 142) | IEEE / Dwight; R = (rho / (2*pi*L)) * (ln(8L/d) - 1) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `grounding-electrode-conductor` | Grounding Electrode Conductor Sizing | NFPA; spec-v109 section 2.1 pinned example (250 kcmil Cu servic... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `grounding-grid-conductor` | Ground Grid Conductor Sizing for Fault Current | IEEE; A = I x Kf x sqrt(tc) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `guy-anchor-holding-capacity` | Guy Anchor Holding Capacity in Soil | Project (first-principles); the anchor manufacturer data and a geotechnical evaluatio... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `harmonic-resonance` | Harmonic Parallel-Resonance Order | parallel-resonance order of a PF capa...; spec-v523 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `insulation-resistance-pi` | Insulation Resistance PI / DAR (Megger Test) | Insulation resistance PI / DAR (IEEE ...; DAR = 1040/800 = 1.30; PI = 4160/1040 = 4.0 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lighting-density` | Lighting Power Density | ASHRAE / IECC; 1000 ft^2 office @ 1.0 W/ft^2 -> 1000 W target lighting load | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lighting-light-loss-factor` | Lighting Light-Loss Factor (Maintained/Initial) | IES Lighting Handbook; spec-v365 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lighting-retrofit-savings` | LED Lighting Retrofit Savings and Payback | Energy-and-demand lighting-savings me...; spec-v231 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lighting-uniformity-ratio` | Lighting Illuminance Uniformity Ratio | IES recommended practice; spec-v366 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `line-ground-clearance-nesc` | Overhead Line Ground Clearance | Project (first-principles); the adopted NESC edition and the authority having jurisdi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `loop-signal-scaling` | 4-20 mA Current-Loop Signal Scaling | 4-20 mA current-loop live-zero scalin...; percent = (12-4)/16*100 = 50; value = 0 + 0.5*(100-0) = 50 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `loop-voltage-budget` | Loop-Powered (2-Wire) 4-20 mA Transmitter Voltage Budget | Loop-powered 2-wire 4-20 mA transmitt...; maxR = (24-10.5)/0.020 = 675; V_at = 24 - 0.020*300 = 18;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lumen-method` | Lumen-Method Luminaire Count | IES lumen method (by name).; spec-v101 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3741,6 +3758,7 @@ per spec-v14 §13.1 second paragraph.
 | `multi-load-vd` | Branch Voltage Drop With Multiple Loads | Project (first-principles); 12 AWG copper feeder at 120 V with 5 A @ 50 ft and 10 A @... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `multi-motor-feeder` | Feeder for a Group of Motors (NEC 430.24 / 430.62) | NFPA; spec-v124 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `mwbc-voltage-drop` | Multiwire Branch Circuit (3-Wire) Voltage Drop | three-wire circuit analysis; 12 AWG copper at 75 C, 100 ft one way (R 0.19314 ohm), 16... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `nesc-district-loading` | NESC Ice-and-Wind District Loading on a Conductor | Project (first-principles); the applicable NESC edition and its district map govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `neutral-current-3ph` | Three-Phase Neutral Current | Phasor sum of three 120-degree-displa...; Ia=100, Ib=80, Ic=60 -> I_N = sqrt(1200) = 34.641 A | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `neutral-demand-220-61` | Feeder/Service Neutral Demand Load (NEC 220.61) | NEC 2023 (NFPA 70); 200 A at 100% + 50 A at 70% = 200 + 35 = 235 A | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `neutral-grounding-resistor` | Neutral Grounding Resistor Sizing (IEEE 142) | neutral grounding resistor sizing (IE...; spec-v525 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3756,6 +3774,7 @@ per spec-v14 §13.1 second paragraph.
 | `poe-budget` | PoE Budget and Run Distance | IEEE; Type 2 PSE = 30 W, PD min 25.5 W; 200 ft Cat6 @ 25 C -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `point-illuminance` | Point-Method Illuminance (Inverse-Square + Cosine) | IES Lighting Handbook (point method); angle 0: E = 1000 x cos(0) / 10^2 = 10.0 fc (107.6 lux) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `point-method-required-candela` | Point-Method Required Candela for a Target | IES Lighting Handbook (point method),...; 10 fc target, 10 ft up, nadir -> 1,000 cd (round-trips po... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `pole-class-groundline-moment` | Wood Pole Class and Groundline Moment | Project (first-principles); ANSI O5.1, the applicable NESC edition, and a qualified l... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pool-bonding-680-26` | Swimming-Pool Equipotential Bonding Checklist (NEC 680.26) | NEC 2023 (NFPA 70); permanent pool/spa -> full 8-component 680.26(B)/(C) bond... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `power-factor-billing-savings` | Power-Factor Correction Demand-Billing Savings | Power-triangle demand-billing method; spec-v232 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `power-triangle` | Power Triangle Solver (kW / kVA / kVAR / PF) | IEEE; kVA^2 = kW^2 + kVAR^2; PF = kW/kVA; theta = arccos(PF) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3786,6 +3805,8 @@ per spec-v14 §13.1 second paragraph.
 | `room-cavity-ratio` | Room Cavity Ratio (RCR) for CU Lookup | IES zonal-cavity room cavity ratio; RCR = 5*8*(40+30)/(40*30) = 5*8*70/1200 = 2800/1200 = 2.333 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rotary-phase-converter-sizing` | Rotary Phase Converter Idler Sizing | rotary phase converter idler sizing (...; start = 2*10 = 20; idler = max(20, 15) = 20 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rtd-resistance-to-temp` | RTD (Pt100 / Pt1000) Resistance to Temperature | IEC 60751 platinum RTD (Callendar-Van...; T = (-A + sqrt(A^2 - 4B(1 - 119.397/100)))/(2B), A=3.9083... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `ruling-span` | Ruling (Equivalent) Span for a Line Section | Project (first-principles); the utility stringing charts and construction standards g... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `sagging-return-wave` | Sagging by Stopwatch (Return-Wave Method) | Project (first-principles); the utility stringing charts and the crew sagging procedu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sccr-combination` | Industrial Control Panel SCCR (UL 508A) | UL 508A Supplement SB / NEC 409.110; 65/5/5/10 kA components, 22 kA fault -> panel SCCR 5 kA (... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `selective-coordination-screen` | Overcurrent Selective Coordination Screen | Project (first-principles); breakers coordinate only to the instantaneous pickup | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `service-conductor-sizing` | Dwelling Service/Feeder Conductor at 83% (NEC 310.12) | NEC 2023 310.12 / Table 310.16 (75 degC); spec-v279 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3819,6 +3840,7 @@ per spec-v14 §13.1 second paragraph.
 | `transformer-sizing` | Transformer Sizing | Project (first-principles); 90 kW @ 0.9 pf -> 100 kVA required; next ANSI standard st... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transformer-turns-ratio` | Transformer Turns / Voltage / Current / Impedance Ratio | ideal transformer circuit relations; spec-v806 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `transformer-voltage-regulation` | Transformer Voltage Regulation from %R and %X | transformer voltage-regulation approx...; spec-v494 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `transverse-wind-load-conductor` | Transverse Wind Load on Conductor and Pole | Project (first-principles); the applicable NESC edition and a qualified line designer... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `turbine-density-correction` | Wind Turbine Output Air-Density Correction | Project (first-principles); the manufacturer's power curve and IEC 61400-12 govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vfd-energy-savings` | VFD Retrofit Energy and Cost Savings (Affinity Cube Law) | US DOE motor/pump-system energy method; spec-v230 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `vfd-reflected-wave` | VFD Reflected-Wave Cable Length Limit | VFD reflected-wave cable-length limit...; 480 V, 0.1 us rise, 50% velocity, 100 ft -> L_crit 24.6 f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5602,6 +5624,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1882. Fixture-covered or reference-cadence: 1882 / 1882.
+Tile count: 1893. Fixture-covered or reference-cadence: 1893 / 1893.
 
 <!-- END tile-index-v14 -->

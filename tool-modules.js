@@ -733,6 +733,17 @@ export const TOOL_MODULES = (() => {
     "blowdown-heat-recovery", "deaerator-steam-demand", "safety-valve-capacity",
     "fuel-oil-atomizing-viscosity",
   ]);
+  // spec-v1450..v1460: the overhead line and distribution bench. The charter
+  // probed thirty US trades against the live registry and line work came
+  // back at ZERO -- the closest thing was `spanline-sag-tension`, a rigging
+  // highline at ONE condition. All eleven keep group "A".
+  declare("./calc-lineworker.js", "LINEWORKER_RENDERERS", [
+    "ruling-span", "conductor-sag-at-temperature", "conductor-blowout",
+    "conductor-uplift-check", "line-ground-clearance-nesc",
+    "pole-class-groundline-moment", "guy-anchor-holding-capacity",
+    "transverse-wind-load-conductor", "nesc-district-loading",
+    "conductor-creep-elongation", "sagging-return-wave",
+  ]);
   // spec-v80 cap-relief split: the spec-v25 site-civil / roadway-geometry
   // quartet moved out of calc-construction.js (it sat at 95.0% of its size
   // cap, the tightest remaining calculator module) into its own module. All

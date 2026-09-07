@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "47c643f452548b2b",
+      "sha": "e26b8159daf02314",
       "date": "2026-09-07"
     },
     "/tools/": {
-      "sha": "39010934cdb238a2",
+      "sha": "391d0cf7d0554d30",
       "date": "2026-09-07"
     },
     "/groups/accounting/": {
-      "sha": "9e5d2cf194093a8f",
+      "sha": "45958ca80b14d4d2",
       "date": "2026-09-07"
     },
     "/groups/agriculture/": {
-      "sha": "87b0b7de8c497d6c",
+      "sha": "7e19367aca001da4",
       "date": "2026-09-07"
     },
     "/groups/construction/": {
-      "sha": "0086aefd4fd8d141",
+      "sha": "915c8775e6ee66ec",
       "date": "2026-09-07"
     },
     "/groups/cross-trade/": {
-      "sha": "de109bbdfed68aa2",
+      "sha": "8d86774f5a2f295c",
       "date": "2026-09-07"
     },
     "/groups/educators/": {
-      "sha": "8fc8c06f5ed63936",
+      "sha": "a965060bb0f83689",
       "date": "2026-09-07"
     },
     "/groups/electrical/": {
-      "sha": "10d5f308af96826d",
+      "sha": "f37dda26681e2a6b",
       "date": "2026-09-07"
     },
     "/groups/field/": {
-      "sha": "76910303573e3557",
+      "sha": "5ecb7a21fbc9ad27",
       "date": "2026-09-07"
     },
     "/groups/fire-ground/": {
-      "sha": "ba0a13cfedaa71ce",
+      "sha": "f1b63e7f36885de1",
       "date": "2026-09-07"
     },
     "/groups/historical/": {
-      "sha": "ef04d6a9cf4d3545",
+      "sha": "6733d896f341aae9",
       "date": "2026-09-07"
     },
     "/groups/hvac/": {
-      "sha": "a938b59b6db09ebe",
+      "sha": "3a39d024bb4a6392",
       "date": "2026-09-07"
     },
     "/groups/kitchen/": {
-      "sha": "953a4c69b4d0cf84",
+      "sha": "409906ad18e85ad6",
       "date": "2026-09-07"
     },
     "/groups/lab/": {
-      "sha": "2b1d54819ed37880",
+      "sha": "2de38b70eea91e5d",
       "date": "2026-09-07"
     },
     "/groups/mechanic/": {
-      "sha": "66637b9ea16fcb00",
+      "sha": "833a3d1e25602f7e",
       "date": "2026-09-07"
     },
     "/groups/plumbing/": {
-      "sha": "72c34e0f13cd5bb7",
+      "sha": "117b6f92063f9b55",
       "date": "2026-09-07"
     },
     "/groups/real-estate/": {
-      "sha": "a928f836a47bb826",
+      "sha": "385d5187b52a17f3",
       "date": "2026-09-07"
     },
     "/groups/references/": {
-      "sha": "6c11bf557cea0eb3",
+      "sha": "ff5885ac0aad9a56",
       "date": "2026-09-07"
     },
     "/groups/restoration/": {
-      "sha": "60171d184ffcfa05",
+      "sha": "c8438993b95f889e",
       "date": "2026-09-07"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "fce0a70ddd30a7b7",
+      "sha": "445a535c729f2917",
       "date": "2026-09-07"
     },
     "/groups/stage/": {
-      "sha": "6b5d8abf2e7719bb",
+      "sha": "ba87c0d04daf8a8c",
       "date": "2026-09-07"
     },
     "/groups/trucking/": {
-      "sha": "03961bbdec3223a0",
+      "sha": "240b56e146ac199d",
       "date": "2026-09-07"
     },
     "/groups/water/": {
-      "sha": "997e002d09e6d873",
+      "sha": "153b02f48d003fb4",
       "date": "2026-09-07"
     },
     "/tools/aav-install-check/": {
@@ -1449,9 +1449,25 @@
       "sha": "48a397f8e73b2de5",
       "date": "2026-09-01"
     },
+    "/tools/conductor-blowout/": {
+      "sha": "c03db805e6665bd7",
+      "date": "2026-09-07"
+    },
+    "/tools/conductor-creep-elongation/": {
+      "sha": "b689ff417d91f0dd",
+      "date": "2026-09-07"
+    },
+    "/tools/conductor-sag-at-temperature/": {
+      "sha": "2f46435457e4a577",
+      "date": "2026-09-07"
+    },
     "/tools/conductor-short-circuit-withstand/": {
       "sha": "7ce1072e9be7bd33",
       "date": "2026-09-01"
+    },
+    "/tools/conductor-uplift-check/": {
+      "sha": "7dd5a0ede2cbad17",
+      "date": "2026-09-07"
     },
     "/tools/conduit-90-stub/": {
       "sha": "d1057fdce948afdb",
@@ -2742,8 +2758,8 @@
       "date": "2026-09-04"
     },
     "/tools/fresnel-zone-clearance/": {
-      "sha": "2176a0710fc4e186",
-      "date": "2026-09-04"
+      "sha": "001d02e0e01b7604",
+      "date": "2026-09-07"
     },
     "/tools/friction-loss/": {
       "sha": "f0b80f3470391ea9",
@@ -3058,8 +3074,8 @@
       "date": "2026-09-01"
     },
     "/tools/guard-post-load/": {
-      "sha": "de7b874d14acb169",
-      "date": "2026-09-01"
+      "sha": "d79cf376bb65386f",
+      "date": "2026-09-07"
     },
     "/tools/guide-rail-bracket-span/": {
       "sha": "b119ed0a9f1d0f55",
@@ -3072,6 +3088,10 @@
     "/tools/gutter-downspout-takeoff/": {
       "sha": "2086e9ec80e4873a",
       "date": "2026-09-01"
+    },
+    "/tools/guy-anchor-holding-capacity/": {
+      "sha": "72b443817ce4fa05",
+      "date": "2026-09-07"
     },
     "/tools/guy-wire-tension/": {
       "sha": "0685a95217a0b009",
@@ -3689,6 +3709,10 @@
       "sha": "58c3c06e9f7d15ee",
       "date": "2026-09-01"
     },
+    "/tools/line-ground-clearance-nesc/": {
+      "sha": "24aacb16609bb848",
+      "date": "2026-09-07"
+    },
     "/tools/linear-interpolation/": {
       "sha": "4d4ba88ef41e39da",
       "date": "2026-09-01"
@@ -4154,8 +4178,8 @@
       "date": "2026-09-01"
     },
     "/tools/motor-pole-identification/": {
-      "sha": "f52087b979345424",
-      "date": "2026-09-06"
+      "sha": "afc6d9d8d0d134d9",
+      "date": "2026-09-07"
     },
     "/tools/motor-rms-hp/": {
       "sha": "09d92d2ef1940aec",
@@ -4216,6 +4240,10 @@
     "/tools/nernst-equation/": {
       "sha": "2f40c42807c5a45d",
       "date": "2026-09-04"
+    },
+    "/tools/nesc-district-loading/": {
+      "sha": "41142ba02e2572d9",
+      "date": "2026-09-07"
     },
     "/tools/net-effective-rent/": {
       "sha": "ee8783a1a7460a79",
@@ -4701,6 +4729,10 @@
       "sha": "10988e0eca49fe5d",
       "date": "2026-09-01"
     },
+    "/tools/pole-class-groundline-moment/": {
+      "sha": "d38493f1d2b2af94",
+      "date": "2026-09-07"
+    },
     "/tools/pole-embedment-depth/": {
       "sha": "2357620170e0bc22",
       "date": "2026-09-01"
@@ -4902,8 +4934,8 @@
       "date": "2026-09-04"
     },
     "/tools/pulling-tension/": {
-      "sha": "537eceac7f8ec0a7",
-      "date": "2026-09-01"
+      "sha": "8bb88ac46f048f19",
+      "date": "2026-09-07"
     },
     "/tools/pulse-flowmeter-k-factor/": {
       "sha": "51131e56375a37dc",
@@ -5501,6 +5533,10 @@
       "sha": "35cd81ffeb3a82a5",
       "date": "2026-09-01"
     },
+    "/tools/ruling-span/": {
+      "sha": "fd3b50da4bdb085a",
+      "date": "2026-09-07"
+    },
     "/tools/run-capacitor-microfarad/": {
       "sha": "a4f2812995deb482",
       "date": "2026-09-01"
@@ -5528,6 +5564,10 @@
     "/tools/sag-vertical-curve-comfort/": {
       "sha": "a5484d748671ad64",
       "date": "2026-09-01"
+    },
+    "/tools/sagging-return-wave/": {
+      "sha": "2def1e4560ad8e8c",
+      "date": "2026-09-07"
     },
     "/tools/sailboat-performance-ratios/": {
       "sha": "b5f0343100022e17",
@@ -6098,8 +6138,8 @@
       "date": "2026-09-01"
     },
     "/tools/speaker-70v-line/": {
-      "sha": "ca32849e82c50764",
-      "date": "2026-09-04"
+      "sha": "ea85d03e8e35fd9a",
+      "date": "2026-09-07"
     },
     "/tools/speaker-impedance/": {
       "sha": "efaf3d4d38f8ca16",
@@ -6734,8 +6774,8 @@
       "date": "2026-09-01"
     },
     "/tools/thermistor-steinhart-hart/": {
-      "sha": "5a156140478ee1cb",
-      "date": "2026-09-02"
+      "sha": "42f6eb2975dcccdf",
+      "date": "2026-09-07"
     },
     "/tools/thi-livestock/": {
       "sha": "5ce351a047ea0eee",
@@ -6936,6 +6976,10 @@
     "/tools/transformer-voltage-regulation/": {
       "sha": "b77ef5b6f3bc2916",
       "date": "2026-09-01"
+    },
+    "/tools/transverse-wind-load-conductor/": {
+      "sha": "87f35cc90ed3681d",
+      "date": "2026-09-07"
     },
     "/tools/trap-arm/": {
       "sha": "1763e927593c32b6",

@@ -45180,3 +45180,334 @@ test("bounds: spec-v1568 (CUT) margin arithmetic on npsh-a, additively", () => {
   assert.strictEqual(noReq.static_for_target_margin_ft, null);
   assert.ok(Math.abs(noReq.NPSHa_ft - 36.308) < 1e-3);
 });
+
+// ===========================================================================
+// spec-v1450..v1460: the 2026-09-07 trade-expansion overhead line and
+// distribution band. All eleven landed; nothing was cut.
+//
+// The charter probed thirty US trades against the live registry and line work
+// came back at ZERO. The closest thing was `spanline-sag-tension` -- the static
+// parabola for a rigging highline at ONE condition -- and `guy-wire-tension`,
+// which gives the pull in a guy and says nothing about whether the ground will
+// hold it.
+//
+// THREE MORE INTERNALLY WRONG SPECS, taking the program to NINETEEN in
+// ninety-one, and two of them fail the same way:
+//   v1454 and v1459 BOTH cite spec-v1451's worked example as having bought
+//         "8.0 ft" / "8.02 ft" of sag over sixty degrees. It bought 3.03 ft.
+//         8.21 ft is that example's INITIAL sag, which both specs picked up by
+//         mistake -- the hazard of a cross-reference nobody recomputes.
+//   v1453 puts the uplift threshold at "1,140 lb" where its own relation gives
+//         w L^2 / (2 h) = 2,279 lb. It divided by the elevation term twice.
+//         The test below pins it by identity: at exactly that tension the
+//         vertical load at the low support is 0.
+// spec-v1450 also calls its tailboard approximation "close" at 484.2 ft against
+// an exact 435.96 -- 11.1% high, which is precisely the case its own §2 says
+// the rule drifts on. The tile reports the error and says so.
+// ===========================================================================
+
+import { computeRulingSpan as _v1450 } from "../../calc-lineworker.js";
+test("bounds: spec-v1450 computeRulingSpan is a cube-weighted mean, not an average", () => {
+  const base = { span_1_ft: 300, span_2_ft: 450, span_3_ft: 380, span_4_ft: 520, span_5_ft: 0, span_6_ft: 0, span_7_ft: 0, span_8_ft: 0, ruling_span_sag_ft: 12 };
+  const r = _v1450(base);
+  assert.strictEqual(r.span_count, 4);
+  assert.strictEqual(r.sum_l, 1650);
+  assert.strictEqual(r.sum_l3, 313605000);
+  assert.ok(Math.abs(r.ruling_span_ft - 435.9629) < 1e-3);
+  assert.strictEqual(r.average_span_ft, 412.5);
+  assert.ok(Math.abs(r.field_approximation_ft - 484.1667) < 1e-3);
+  // The approximation is 11.1% high here, which the tile says rather than
+  // calling it close as the spec did.
+  assert.ok(Math.abs(r.approximation_error_pct - 11.0569) < 1e-3);
+  assert.ok(/drifts|use the exact value/.test(r.approximation_verdict));
+  // Sag scales as the SQUARE of span over ruling span: a factor of 3 here.
+  assert.ok(Math.abs(r.shortest_span_sag_ft - 5.6823) < 1e-3);
+  assert.ok(Math.abs(r.longest_span_sag_ft - 17.0722) < 1e-3);
+  assert.ok(Math.abs(r.sag_spread_ratio - 3.0044) < 1e-3);
+  // IDENTITY: all-equal spans make the ruling span, the average, and the
+  // approximation the same number, and every span sags alike.
+  const equal = _v1450({ span_1_ft: 400, span_2_ft: 400, span_3_ft: 400, span_4_ft: 400, ruling_span_sag_ft: 10 });
+  assert.ok(Math.abs(equal.ruling_span_ft - 400) < 1e-9);
+  assert.ok(Math.abs(equal.field_approximation_ft - 400) < 1e-9);
+  assert.ok(Math.abs(equal.approximation_error_pct) < 1e-9);
+  assert.ok(Math.abs(equal.longest_span_sag_ft - 10) < 1e-9);
+  // A single span IS its own ruling span.
+  assert.ok(Math.abs(_v1450({ span_1_ft: 512, ruling_span_sag_ft: 9 }).ruling_span_ft - 512) < 1e-9);
+  assert.ok("error" in _v1450({ span_1_ft: 0, ruling_span_sag_ft: 12 }));
+  assert.ok("error" in _v1450({ span_1_ft: -10, ruling_span_sag_ft: 12 }));
+});
+
+import { computeConductorSagAtTemperature as _v1451 } from "../../calc-lineworker.js";
+test("bounds: spec-v1451 computeConductorSagAtTemperature solves the change-of-state cubic", () => {
+  const base = { span_ft: 600, area_in2: 0.7264, weight1_lb_per_ft: 1.094, weight2_lb_per_ft: 1.094, modulus_psi: 11200000, alpha_per_f: 0.0000106, tension1_lb: 6000, temp1_f: 60, temp2_f: 120, rated_strength_lb: 31500 };
+  const r = _v1451(base);
+  assert.ok(Math.abs(r.sag1_ft - 8.205) < 1e-3);
+  assert.ok(Math.abs(r.tension2_lb - 4380) < 1);
+  assert.ok(Math.abs(r.sag2_ft - 11.2387) < 1e-3);
+  assert.ok(Math.abs(r.sag_increase_ft - 3.0337) < 1e-3);
+  assert.ok(Math.abs(r.tension_change_pct + 26.993) < 1e-2);
+  // The sag ALWAYS moves further than the tension, because sag goes as 1/H.
+  assert.ok(Math.abs(r.sag_increase_pct) > Math.abs(r.tension_change_pct));
+  // IDENTITY: no temperature change and no load change returns the initial
+  // state exactly. This is the strongest available check on the solver.
+  const same = _v1451({ ...base, temp2_f: 60 });
+  assert.ok(Math.abs(same.tension2_lb - 6000) < 1e-6);
+  assert.ok(Math.abs(same.sag_increase_ft) < 1e-9);
+  // The root really satisfies the cubic it came from.
+  const H = r.tension2_lb;
+  assert.ok(Math.abs(H * H * (H + r.cubic_k) - r.cubic_c) / r.cubic_c < 1e-9);
+  // Colder means MORE tension and LESS sag, and the tile says which case it is.
+  const cold = _v1451({ ...base, temp2_f: 0 });
+  assert.ok(cold.tension2_lb > base.tension1_lb);
+  assert.ok(cold.sag2_ft < r.sag1_ft);
+  assert.ok(/colder/.test(cold.direction));
+  // A heavier second condition (ice) sags more at the same temperature.
+  const iced = _v1451({ ...base, temp2_f: 60, weight2_lb_per_ft: 2.5136 });
+  assert.ok(iced.sag2_ft > r.sag1_ft);
+  assert.ok("error" in _v1451({ ...base, tension1_lb: 0 }));
+  assert.ok("error" in _v1451({ ...base, area_in2: 0 }));
+});
+
+import { computeConductorBlowout as _v1452 } from "../../calc-lineworker.js";
+test("bounds: spec-v1452 computeConductorBlowout swings on the load-to-weight ratio alone", () => {
+  const base = { conductor_diameter_in: 1.108, weight_lb_per_ft: 1.094, wind_pressure_psf: 9, wind_speed_mph: 0, sag_ft: 12, still_air_clearance_ft: 10 };
+  const r = _v1452(base);
+  assert.ok(Math.abs(r.wind_load_lb_per_ft - 0.831) < 1e-6);
+  assert.ok(Math.abs(r.swing_angle_deg - 37.2202) < 1e-3);
+  assert.ok(Math.abs(r.blowout_ft - 7.2586) < 1e-3);
+  assert.ok(Math.abs(r.remaining_clearance_ft - 2.7414) < 1e-3);
+  // Half the weight, same wind: 56.6 degrees and 10.02 ft.
+  const light = _v1452({ ...base, weight_lb_per_ft: 0.547 });
+  assert.ok(Math.abs(light.swing_angle_deg - 56.6454) < 1e-3);
+  assert.ok(Math.abs(light.blowout_ft - 10.0234) < 1e-3);
+  // The angle does NOT depend on sag; the distance is linear in it.
+  const slack = _v1452({ ...base, sag_ft: 24 });
+  assert.ok(Math.abs(slack.swing_angle_deg - r.swing_angle_deg) < 1e-12);
+  assert.ok(Math.abs(slack.blowout_ft - 2 * r.blowout_ft) < 1e-9);
+  // The speed path uses the ASCE constant `wind-pressure` uses.
+  const bySpeed = _v1452({ ...base, wind_pressure_psf: 0, wind_speed_mph: 59 });
+  assert.ok(Math.abs(bySpeed.pressure_psf - 0.00256 * 59 * 59) < 1e-12);
+  // Feed the reported exhausting pressure back in and the clearance is zero.
+  const atLimit = _v1452({ ...base, wind_pressure_psf: r.pressure_at_zero_clearance_psf });
+  assert.ok(Math.abs(atLimit.remaining_clearance_ft) < 1e-9);
+  // A clearance larger than the sag can never be exhausted.
+  assert.strictEqual(_v1452({ ...base, still_air_clearance_ft: 20 }).pressure_at_zero_clearance_psf, null);
+  assert.ok("error" in _v1452({ ...base, wind_pressure_psf: 0, wind_speed_mph: 0 }));
+});
+
+import { computeConductorUpliftCheck as _v1453 } from "../../calc-lineworker.js";
+test("bounds: spec-v1453 computeConductorUpliftCheck -- the threshold is 2,279 lb, not 1,140", () => {
+  const base = { span_ft: 500, elevation_rise_ft: 60, weight_lb_per_ft: 1.094, tension_lb: 5000, back_span_ft: 400, back_span_rise_ft: 40 };
+  const r = _v1453(base);
+  assert.ok(Math.abs(r.vertical_load_low_lb + 326.5) < 1e-9);
+  assert.ok(Math.abs(r.vertical_load_high_lb - 873.5) < 1e-9);
+  assert.ok(Math.abs(r.low_point_offset_ft + 298.446) < 1e-3);
+  assert.strictEqual(r.low_point_inside_span, false);
+  assert.strictEqual(r.uplift, true);
+  // THE CORRECTION. The spec said 1,140 lb; w L^2 / (2 h) is 2,279.17, and the
+  // identity check is that the vertical load there is exactly zero.
+  assert.ok(Math.abs(r.uplift_tension_lb - 2279.1667) < 1e-3);
+  const atThreshold = _v1453({ ...base, tension_lb: r.uplift_tension_lb });
+  assert.ok(Math.abs(atThreshold.vertical_load_low_lb) < 1e-9);
+  assert.strictEqual(atThreshold.uplift, false);
+  assert.strictEqual(_v1453({ ...base, tension_lb: r.uplift_tension_lb * 1.001 }).uplift, true);
+  // The two reactions always sum to the conductor weight in the span.
+  assert.ok(Math.abs(r.vertical_load_low_lb + r.vertical_load_high_lb - base.weight_lb_per_ft * base.span_ft) < 1e-9);
+  // Counting the back span, this structure is NOT in uplift -- which is the
+  // point the spec makes about running both spans and never demonstrates.
+  assert.ok(r.structure_vertical_load_lb > 0);
+  assert.strictEqual(r.structure_uplift, false);
+  // Cold (high tension) is the governing case, not hot.
+  assert.ok(_v1453({ ...base, tension_lb: 8000 }).vertical_load_low_lb < r.vertical_load_low_lb);
+  assert.ok("error" in _v1453({ ...base, elevation_rise_ft: 0 }));
+});
+
+import { computeLineGroundClearanceNesc as _v1454 } from "../../calc-lineworker.js";
+test("bounds: spec-v1454 computeLineGroundClearanceNesc runs one relation four ways", () => {
+  const base = { attachment_height_ft: 42, max_condition_sag_ft: 11.5, required_clearance_ft: 18.5 };
+  const r = _v1454(base);
+  assert.ok(Math.abs(r.clearance_ft - 30.5) < 1e-9);
+  assert.ok(Math.abs(r.margin_ft - 12) < 1e-9);
+  assert.ok(Math.abs(r.max_allowable_sag_ft - 23.5) < 1e-9);
+  assert.ok(Math.abs(r.min_attachment_height_ft - 30) < 1e-9);
+  assert.strictEqual(r.passes, true);
+  // The four are one relation: sag headroom and margin are the same number.
+  assert.ok(Math.abs(r.sag_headroom_ft - r.margin_ft) < 1e-9);
+  // Sag exactly to the maximum allowable and the margin is exactly zero.
+  const atLimit = _v1454({ ...base, max_condition_sag_ft: r.max_allowable_sag_ft });
+  assert.ok(Math.abs(atLimit.margin_ft) < 1e-9);
+  assert.strictEqual(atLimit.passes, true);
+  // A failing span reads as a SIGNED negative, not a small positive.
+  const fails = _v1454({ ...base, max_condition_sag_ft: 26 });
+  assert.ok(fails.margin_ft < 0);
+  assert.strictEqual(fails.passes, false);
+  assert.ok(/FAILS/.test(fails.verdict));
+  assert.ok(fails.height_shortfall_ft > 0);
+  // No clearance table is shipped: the requirement must be entered.
+  assert.ok("error" in _v1454({ ...base, required_clearance_ft: 0 }));
+  assert.ok("error" in _v1454({ ...base, max_condition_sag_ft: 50 }));
+});
+
+import { computePoleClassGroundlineMoment as _v1455 } from "../../calc-lineworker.js";
+test("bounds: spec-v1455 computePoleClassGroundlineMoment -- the cube law does not forgive", () => {
+  const base = { groundline_circumference_in: 37.5, fiber_stress_psi: 8000, load_1_lb: 600, height_1_ft: 38, load_2_lb: 0, height_2_ft: 0, load_3_lb: 0, height_3_ft: 0, check_height_ft: 38 };
+  const r = _v1455(base);
+  assert.ok(Math.abs(r.groundline_diameter_in - 11.9366) < 1e-3);
+  assert.ok(Math.abs(r.section_modulus_in3 - 166.972) < 1e-2);
+  assert.ok(Math.abs(r.moment_capacity_ftlb - 111314.78) < 0.1);
+  assert.strictEqual(r.applied_moment_ftlb, 22800);
+  assert.ok(Math.abs(r.utilization_pct - 20.4825) < 1e-3);
+  assert.ok(Math.abs(r.remaining_load_lb - 2329.34) < 0.1);
+  // One inch of tape is roughly eight percent, not one.
+  assert.ok(Math.abs(r.one_inch_less_capacity_ftlb - 102644.96) < 0.1);
+  assert.ok(r.one_inch_loss_pct > 7 && r.one_inch_loss_pct < 9);
+  // Capacity really goes as the CUBE of diameter.
+  const doubled = _v1455({ ...base, groundline_circumference_in: 75 });
+  assert.ok(Math.abs(doubled.moment_capacity_ftlb / r.moment_capacity_ftlb - 8) < 1e-9);
+  // Cedar at 6,000 psi is exactly three quarters of pine at 8,000.
+  const cedar = _v1455({ ...base, fiber_stress_psi: 6000 });
+  assert.ok(Math.abs(cedar.moment_capacity_ftlb / r.moment_capacity_ftlb - 0.75) < 1e-9);
+  // The applied side is a SUM of moments, each at its own height.
+  const three = _v1455({ ...base, load_2_lb: 200, height_2_ft: 30, load_3_lb: 150, height_3_ft: 20 });
+  assert.strictEqual(three.applied_moment_ftlb, 22800 + 200 * 30 + 150 * 20);
+  assert.strictEqual(three.load_count, 3);
+  assert.ok("error" in _v1455({ ...base, load_1_lb: 0 }));
+  assert.ok("error" in _v1455({ ...base, height_1_ft: 0 }));
+});
+
+import { computeGuyAnchorHoldingCapacity as _v1456 } from "../../calc-lineworker.js";
+test("bounds: spec-v1456 computeGuyAnchorHoldingCapacity -- the soil is the whole variable", () => {
+  const base = { helix_diameter_in: 12, installed_depth_ft: 7, cohesion_psf: 1000, friction_bearing_factor: 0, soil_unit_weight_pcf: 110, factor_of_safety: 2, installing_torque_ftlb: 800, torque_factor_per_ft: 10, guy_tension_lb: 707 };
+  const r = _v1456(base);
+  assert.ok(Math.abs(r.helix_area_ft2 - Math.PI / 4) < 1e-12);
+  assert.ok(Math.abs(r.ultimate_capacity_lb - 7673.34) < 0.1);
+  assert.ok(Math.abs(r.allowable_capacity_lb - 3836.67) < 0.1);
+  assert.strictEqual(r.governs, "cohesive");
+  assert.strictEqual(r.torque_capacity_lb, 8000);
+  assert.ok(r.holds);
+  // The same anchor at the same depth in a cohesionless sand.
+  const sand = _v1456({ ...base, cohesion_psf: 0, friction_bearing_factor: 10, installing_torque_ftlb: 0 });
+  assert.ok(Math.abs(sand.ultimate_capacity_lb - 6047.56) < 0.1);
+  assert.ok(Math.abs(sand.allowable_capacity_lb - 3023.78) < 0.1);
+  assert.strictEqual(sand.governs, "granular");
+  assert.strictEqual(sand.torque_capacity_lb, null);
+  // The factor of safety divides and nothing else moves.
+  const fs3 = _v1456({ ...base, factor_of_safety: 3 });
+  assert.ok(Math.abs(fs3.ultimate_capacity_lb - r.ultimate_capacity_lb) < 1e-9);
+  assert.ok(Math.abs(fs3.allowable_capacity_lb * 3 - r.ultimate_capacity_lb) < 1e-9);
+  // A wide disagreement between the two methods IS the finding.
+  const disagree = _v1456({ ...base, installing_torque_ftlb: 200 });
+  assert.ok(/DISAGREEMENT IS THE FINDING/.test(disagree.torque_verdict));
+  // A soil with neither cohesion nor a bearing factor holds nothing.
+  assert.ok("error" in _v1456({ ...base, cohesion_psf: 0, friction_bearing_factor: 0 }));
+  assert.ok("error" in _v1456({ ...base, installed_depth_ft: 0 }));
+});
+
+import { computeTransverseWindLoadConductor as _v1457 } from "../../calc-lineworker.js";
+test("bounds: spec-v1457 computeTransverseWindLoadConductor -- wind span, not ruling span", () => {
+  const base = { wind_pressure_psf: 9, wind_speed_mph: 0, conductor_diameter_in: 1.108, wind_span_ft: 400, conductor_count: 1, conductor_height_ft: 38, pole_top_diameter_in: 8, pole_groundline_diameter_in: 12, pole_height_above_ground_ft: 39 };
+  const r = _v1457(base);
+  assert.ok(Math.abs(r.conductor_force_per_ft_lb - 0.831) < 1e-9);
+  assert.ok(Math.abs(r.conductor_force_lb - 332.4) < 1e-9);
+  assert.ok(Math.abs(r.pole_projected_area_ft2 - 32.5) < 1e-9);
+  assert.ok(Math.abs(r.pole_force_lb - 292.5) < 1e-9);
+  assert.ok(Math.abs(r.pole_resultant_height_ft - 19.5) < 1e-9);
+  assert.ok(Math.abs(r.groundline_moment_ftlb - 18334.95) < 1e-6);
+  // The pole is 31% of the moment, which is not a rounding error.
+  assert.ok(Math.abs(r.pole_share_pct - 31.1086) < 1e-3);
+  // The moment is exactly the sum of the two force-height products.
+  assert.ok(Math.abs(r.conductor_moment_ftlb + r.pole_moment_ftlb - r.groundline_moment_ftlb) < 1e-9);
+  // Three conductors at that height triple the conductor term only.
+  const three = _v1457({ ...base, conductor_count: 3 });
+  assert.ok(Math.abs(three.conductor_force_lb - 3 * r.conductor_force_lb) < 1e-9);
+  assert.ok(Math.abs(three.pole_force_lb - r.pole_force_lb) < 1e-12);
+  // Skipping the pole leaves only the conductor moment.
+  const noPole = _v1457({ ...base, pole_top_diameter_in: 0 });
+  assert.strictEqual(noPole.has_pole, false);
+  assert.strictEqual(noPole.pole_force_lb, 0);
+  assert.ok(Math.abs(noPole.groundline_moment_ftlb - r.conductor_moment_ftlb) < 1e-9);
+  // The speed path uses the same ASCE constant as the blowout tile.
+  assert.ok(Math.abs(_v1457({ ...base, wind_pressure_psf: 0, wind_speed_mph: 59 }).pressure_psf - 0.00256 * 3481) < 1e-12);
+  assert.ok("error" in _v1457({ ...base, wind_span_ft: 0 }));
+});
+
+import { computeNescDistrictLoading as _v1458 } from "../../calc-lineworker.js";
+test("bounds: spec-v1458 computeNescDistrictLoading -- the ice is an annulus", () => {
+  const base = { bare_diameter_in: 1.108, bare_weight_lb_per_ft: 1.094, district: 1, custom_ice_in: 0, custom_wind_psf: 0, custom_k_lb_per_ft: 0, custom_temp_f: 0 };
+  const heavy = _v1458(base);
+  assert.ok(Math.abs(heavy.iced_diameter_in - 2.108) < 1e-9);
+  assert.ok(Math.abs(heavy.ice_weight_lb_per_ft - 1.00516) < 1e-4);
+  assert.ok(Math.abs(heavy.vertical_lb_per_ft - 2.09916) < 1e-4);
+  assert.ok(Math.abs(heavy.horizontal_lb_per_ft - 0.70267) < 1e-4);
+  assert.ok(Math.abs(heavy.resultant_lb_per_ft - 2.51365) < 1e-4);
+  assert.ok(Math.abs(heavy.ratio_to_bare - 2.2977) < 1e-3);
+  const medium = _v1458({ ...base, district: 2 });
+  assert.ok(Math.abs(medium.resultant_lb_per_ft - 1.81024) < 1e-4);
+  const light = _v1458({ ...base, district: 3 });
+  assert.ok(Math.abs(light.resultant_lb_per_ft - 1.42383) < 1e-4);
+  // The Light district has NO ice, so its whole 1.30x is wind and the constant.
+  assert.strictEqual(light.ice_weight_lb_per_ft, 0);
+  assert.strictEqual(light.iced_diameter_in, base.bare_diameter_in);
+  assert.ok(light.ratio_to_bare > 1.29 && light.ratio_to_bare < 1.31);
+  // The resultant is the vector sum PLUS the flat constant, in that order.
+  assert.ok(Math.abs(heavy.resultant_lb_per_ft - heavy.vector_sum_lb_per_ft - 0.30) < 1e-9);
+  // The annulus is why a small conductor suffers most: same ice, more multiple.
+  const small = _v1458({ ...base, bare_diameter_in: 0.4, bare_weight_lb_per_ft: 0.13 });
+  assert.ok(small.ice_multiple > heavy.ice_multiple);
+  // Custom district 0 reproduces Heavy exactly when given Heavy's values.
+  const custom = _v1458({ ...base, district: 0, custom_ice_in: 0.5, custom_wind_psf: 4, custom_k_lb_per_ft: 0.3, custom_temp_f: 0 });
+  assert.ok(Math.abs(custom.resultant_lb_per_ft - heavy.resultant_lb_per_ft) < 1e-12);
+  assert.strictEqual(custom.district_name, "Custom");
+  assert.ok("error" in _v1458({ ...base, district: 7 }));
+});
+
+import { computeConductorCreepElongation as _v1459 } from "../../calc-lineworker.js";
+test("bounds: spec-v1459 computeConductorCreepElongation is a temperature offset", () => {
+  const base = { creep_strain: 0.0005, alpha_per_f: 0.0000106, span_ft: 600, area_in2: 0.7264, weight_lb_per_ft: 1.094, modulus_psi: 11200000, tension1_lb: 6000, design_temp_f: 60 };
+  const r = _v1459(base);
+  assert.ok(Math.abs(r.equivalent_temp_rise_f - 47.1698) < 1e-3);
+  assert.ok(Math.abs(r.sag_design_ft - 8.205) < 1e-3);
+  // Creep runs the SAME way as a hot day: more sag, less tension.
+  assert.ok(r.sag_after_creep_ft > r.sag_design_ft);
+  assert.ok(r.creep_sag_increase_ft > 0);
+  // And the stringing instruction is the mirror: sag HIGH, at a colder
+  // equivalent temperature.
+  assert.ok(r.initial_stringing_sag_ft < r.sag_design_ft);
+  assert.ok(r.initial_stringing_tension_lb > base.tension1_lb);
+  assert.ok(Math.abs(r.string_at_temp_f - (base.design_temp_f - r.equivalent_temp_rise_f)) < 1e-9);
+  assert.ok(Math.abs(r.stringing_offset_ft - (r.sag_design_ft - r.initial_stringing_sag_ft)) < 1e-12);
+  // It agrees with the change-of-state calculator by construction: the
+  // after-creep condition IS that relation run at the offset temperature.
+  const viaSag = _v1451({ span_ft: 600, area_in2: 0.7264, weight1_lb_per_ft: 1.094, weight2_lb_per_ft: 1.094, modulus_psi: 11200000, alpha_per_f: 0.0000106, tension1_lb: 6000, temp1_f: 60, temp2_f: 60 + r.equivalent_temp_rise_f });
+  assert.ok(Math.abs(viaSag.sag2_ft - r.sag_after_creep_ft) < 1e-12);
+  // Halving the strain halves the equivalent temperature exactly.
+  assert.ok(Math.abs(_v1459({ ...base, creep_strain: 0.00025 }).equivalent_temp_rise_f - r.equivalent_temp_rise_f / 2) < 1e-9);
+  assert.ok("error" in _v1459({ ...base, creep_strain: 0 }));
+  assert.ok("error" in _v1459({ ...base, alpha_per_f: 0 }));
+});
+
+import { computeSaggingReturnWave as _v1460 } from "../../calc-lineworker.js";
+test("bounds: spec-v1460 computeSaggingReturnWave -- counting waves is the method", () => {
+  const base = { elapsed_seconds: 0, return_waves: 3, target_sag_ft: 12, stopwatch_error_seconds: 0.2 };
+  const r = _v1460(base);
+  assert.ok(Math.abs(r.target_time_seconds - 2.99067) < 1e-4);
+  assert.ok(Math.abs(r.period_per_wave_seconds - 0.99689) < 1e-4);
+  assert.ok(Math.abs(r.sag_error_ft - 1.65866) < 1e-4);
+  assert.ok(Math.abs(r.single_wave_sag_error_ft - 5.29798) < 1e-4);
+  assert.ok(Math.abs(r.error_advantage - 3.19413) < 1e-4);
+  // Round trip: feed the target time back in and the sag comes back.
+  const back = _v1460({ elapsed_seconds: r.target_time_seconds, return_waves: 3, target_sag_ft: 0, stopwatch_error_seconds: 0.2 });
+  assert.ok(Math.abs(back.sag_from_timing_ft - 12) < 1e-9);
+  // The spec's own sensitivity figure: 3.19 s over 3 waves reads 13.66 ft.
+  const slow = _v1460({ elapsed_seconds: 3.19, return_waves: 3, target_sag_ft: 0, stopwatch_error_seconds: 0.2 });
+  assert.ok(Math.abs(slow.sag_from_timing_ft - 13.6533) < 1e-3);
+  // More waves is strictly less sensitive to the same stopwatch error.
+  const five = _v1460({ ...base, return_waves: 5 });
+  assert.ok(five.sag_error_ft < r.sag_error_ft);
+  assert.ok(five.error_advantage > r.error_advantage);
+  // One wave IS the single-wave case, so the advantage is exactly 1.
+  const one = _v1460({ ...base, return_waves: 1 });
+  assert.ok(Math.abs(one.error_advantage - 1) < 1e-9);
+  assert.ok("error" in _v1460({ elapsed_seconds: 0, return_waves: 3, target_sag_ft: 0 }));
+  assert.ok("error" in _v1460({ ...base, return_waves: 0 }));
+});

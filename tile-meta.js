@@ -1107,6 +1107,18 @@ const _TILES = [
   ["deaerator-steam-demand", "C"],
   ["safety-valve-capacity", "C"],
   ["fuel-oil-atomizing-viscosity", "C"],
+  // spec-v1450..v1460 overhead line and distribution band
+  ["ruling-span", "A"],
+  ["conductor-sag-at-temperature", "A"],
+  ["conductor-blowout", "A"],
+  ["conductor-uplift-check", "A"],
+  ["line-ground-clearance-nesc", "A"],
+  ["pole-class-groundline-moment", "A"],
+  ["guy-anchor-holding-capacity", "A"],
+  ["transverse-wind-load-conductor", "A"],
+  ["nesc-district-loading", "A"],
+  ["conductor-creep-elongation", "A"],
+  ["sagging-return-wave", "A"],
 ];
 
 

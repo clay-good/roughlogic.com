@@ -98282,6 +98282,571 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "ruling-span",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "four-span deadend section of 300, 450, 380 and 520 ft sagged to 12.0 ft at the ruling span",
+   "source_edition_or_year": "RS = sqrt(sum L^3 / sum L); sag in a span = sag_RS x (L / RS)^2; approximation = average + (2/3)(longest - average)",
+   "source_section_or_page": "the utility stringing charts and construction standards govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "span_1_ft": 300,
+    "span_2_ft": 450,
+    "span_3_ft": 380,
+    "span_4_ft": 520,
+    "span_5_ft": 0,
+    "span_6_ft": 0,
+    "span_7_ft": 0,
+    "span_8_ft": 0,
+    "ruling_span_sag_ft": 12
+   },
+   "outputs": {
+    "ruling_span_ft": {
+     "value": 435.963,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "average_span_ft": {
+     "value": 412.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "field_approximation_ft": {
+     "value": 484.167,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "longest_span_sag_ft": {
+     "value": 17.0722,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "shortest_span_sag_ft": {
+     "value": 5.68231,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sag_spread_ratio": {
+     "value": 3.00444,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "conductor-sag-at-temperature",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "ACSR Drake on a 600 ft ruling span strung to 6,000 lb at 60 degF, checked at 120 degF",
+   "source_edition_or_year": "parabolic change of state solved for the positive real root; sag = w L^2 / (8 H)",
+   "source_section_or_page": "the conductor manufacturer stress-strain data and the applicable NESC edition govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "span_ft": 600,
+    "area_in2": 0.7264,
+    "weight1_lb_per_ft": 1.094,
+    "weight2_lb_per_ft": 1.094,
+    "modulus_psi": 11200000,
+    "alpha_per_f": 0.0000106,
+    "tension1_lb": 6000,
+    "temp1_f": 60,
+    "temp2_f": 120,
+    "rated_strength_lb": 31500
+   },
+   "outputs": {
+    "sag1_ft": {
+     "value": 8.205,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tension2_lb": {
+     "value": 4380.42,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sag2_ft": {
+     "value": 11.2387,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sag_increase_ft": {
+     "value": 3.03365,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tension_change_pct": {
+     "value": -26.993,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "conductor-blowout",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "ACSR Drake at 1.108 in and 1.094 lb/ft, 12 ft of sag, 9 psf of wind, 10 ft of still-air clearance",
+   "source_edition_or_year": "wind load per foot = p x d / 12; swing angle = atan(load / weight); blowout = sag x sin(angle)",
+   "source_section_or_page": "the applicable NESC edition and the right-of-way requirements govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "conductor_diameter_in": 1.108,
+    "weight_lb_per_ft": 1.094,
+    "wind_pressure_psf": 9,
+    "wind_speed_mph": 0,
+    "sag_ft": 12,
+    "still_air_clearance_ft": 10
+   },
+   "outputs": {
+    "wind_load_lb_per_ft": {
+     "value": 0.831,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "swing_angle_deg": {
+     "value": 37.2202,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "blowout_ft": {
+     "value": 7.25856,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "remaining_clearance_ft": {
+     "value": 2.74144,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "conductor-uplift-check",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "500 ft span rising 60 ft, 1.094 lb/ft, at a cold 5,000 lb of tension",
+   "source_edition_or_year": "V_low = w L / 2 - H h / L; low point offset = L/2 - H h / (w L); uplift at H = w L^2 / (2 h)",
+   "source_section_or_page": "the utility construction standards and the line designer govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "span_ft": 500,
+    "elevation_rise_ft": 60,
+    "weight_lb_per_ft": 1.094,
+    "tension_lb": 5000,
+    "back_span_ft": 400,
+    "back_span_rise_ft": 40
+   },
+   "outputs": {
+    "vertical_load_low_lb": {
+     "value": -326.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vertical_load_high_lb": {
+     "value": 873.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "low_point_offset_ft": {
+     "value": -298.446,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "uplift_tension_lb": {
+     "value": 2279.17,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "structure_vertical_load_lb": {
+     "value": 392.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "line-ground-clearance-nesc",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "attachment 42 ft up, 11.5 ft of sag at the maximum condition, 18.5 ft required over a road",
+   "source_edition_or_year": "clearance = attachment - sag; margin = clearance - required; max sag = attachment - required",
+   "source_section_or_page": "the adopted NESC edition and the authority having jurisdiction govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "attachment_height_ft": 42,
+    "max_condition_sag_ft": 11.5,
+    "required_clearance_ft": 18.5
+   },
+   "outputs": {
+    "clearance_ft": {
+     "value": 30.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_ft": {
+     "value": 12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_allowable_sag_ft": {
+     "value": 23.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "min_attachment_height_ft": {
+     "value": 30,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pole-class-groundline-moment",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Class 3 Southern Pine measuring 37.5 in at the groundline, 600 lb acting 38 ft up",
+   "source_edition_or_year": "d = C / pi; S = pi d^3 / 32; capacity = fiber stress x S; applied = sum of load x height",
+   "source_section_or_page": "ANSI O5.1, the applicable NESC edition, and a qualified line designer govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "groundline_circumference_in": 37.5,
+    "fiber_stress_psi": 8000,
+    "load_1_lb": 600,
+    "height_1_ft": 38,
+    "load_2_lb": 0,
+    "height_2_ft": 0,
+    "load_3_lb": 0,
+    "height_3_ft": 0,
+    "check_height_ft": 38
+   },
+   "outputs": {
+    "groundline_diameter_in": {
+     "value": 11.9366,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "section_modulus_in3": {
+     "value": 166.972,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "moment_capacity_ftlb": {
+     "value": 111315,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "applied_moment_ftlb": {
+     "value": 22800,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "utilization_pct": {
+     "value": 20.4825,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "remaining_load_lb": {
+     "value": 2329.34,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "guy-anchor-holding-capacity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "12 in helix at 7 ft in a stiff clay at 1,000 psf cohesion, factor of safety 2",
+   "source_edition_or_year": "cohesive Q_u = A (9c + gamma D); allowable = ultimate / FS; torque correlation Q_u = K_t x T",
+   "source_section_or_page": "the anchor manufacturer data and a geotechnical evaluation of the actual site govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "helix_diameter_in": 12,
+    "installed_depth_ft": 7,
+    "cohesion_psf": 1000,
+    "friction_bearing_factor": 0,
+    "soil_unit_weight_pcf": 110,
+    "factor_of_safety": 2,
+    "installing_torque_ftlb": 800,
+    "torque_factor_per_ft": 10,
+    "guy_tension_lb": 707
+   },
+   "outputs": {
+    "helix_area_ft2": {
+     "value": 0.785398,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ultimate_capacity_lb": {
+     "value": 7673.34,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "allowable_capacity_lb": {
+     "value": 3836.67,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "torque_capacity_lb": {
+     "value": 8000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_lb": {
+     "value": 3129.67,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "transverse-wind-load-conductor",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "9 psf on one ACSR Drake at a 400 ft wind span, 45 ft pole standing 39 ft out of the ground",
+   "source_edition_or_year": "F_c = p x (d/12) x wind span; F_p = p x tapered projected area at mid-height; M = sum of F x h",
+   "source_section_or_page": "the applicable NESC edition and a qualified line designer govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "wind_pressure_psf": 9,
+    "wind_speed_mph": 0,
+    "conductor_diameter_in": 1.108,
+    "wind_span_ft": 400,
+    "conductor_count": 1,
+    "conductor_height_ft": 38,
+    "pole_top_diameter_in": 8,
+    "pole_groundline_diameter_in": 12,
+    "pole_height_above_ground_ft": 39
+   },
+   "outputs": {
+    "conductor_force_lb": {
+     "value": 332.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pole_projected_area_ft2": {
+     "value": 32.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pole_force_lb": {
+     "value": 292.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_force_lb": {
+     "value": 624.9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "groundline_moment_ftlb": {
+     "value": 18335,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pole_share_pct": {
+     "value": 31.1086,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "nesc-district-loading",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "ACSR Drake, 1.108 in bare at 1.094 lb/ft, in the NESC Heavy district",
+   "source_edition_or_year": "iced d = bare + 2t; ice weight = (pi/4)(iced^2 - bare^2)/144 x 57.3; resultant = sqrt(v^2 + h^2) + k",
+   "source_section_or_page": "the applicable NESC edition and its district map govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "bare_diameter_in": 1.108,
+    "bare_weight_lb_per_ft": 1.094,
+    "district": 1,
+    "custom_ice_in": 0,
+    "custom_wind_psf": 0,
+    "custom_k_lb_per_ft": 0,
+    "custom_temp_f": 0
+   },
+   "outputs": {
+    "iced_diameter_in": {
+     "value": 2.108,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ice_weight_lb_per_ft": {
+     "value": 1.00507,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vertical_lb_per_ft": {
+     "value": 2.09907,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "horizontal_lb_per_ft": {
+     "value": 0.702667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "resultant_lb_per_ft": {
+     "value": 2.51356,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ratio_to_bare": {
+     "value": 2.29759,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "conductor-creep-elongation",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "5.0e-04 ten-year ACSR creep strain against an alpha of 1.06e-05 per degF on the 600 ft Drake span",
+   "source_edition_or_year": "equivalent temperature rise = creep strain / alpha, then the same change-of-state relation",
+   "source_section_or_page": "the conductor manufacturer creep and stress-strain data govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "creep_strain": 0.0005,
+    "alpha_per_f": 0.0000106,
+    "span_ft": 600,
+    "area_in2": 0.7264,
+    "weight_lb_per_ft": 1.094,
+    "modulus_psi": 11200000,
+    "tension1_lb": 6000,
+    "design_temp_f": 60
+   },
+   "outputs": {
+    "equivalent_temp_rise_f": {
+     "value": 47.1698,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sag_design_ft": {
+     "value": 8.205,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sag_after_creep_ft": {
+     "value": 10.5988,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "creep_sag_increase_ft": {
+     "value": 2.39383,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "initial_stringing_sag_ft": {
+     "value": 6.01185,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sagging-return-wave",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "a 12 ft target sag counted over 3 return waves, with two tenths of a second of stopwatch error",
+   "source_edition_or_year": "S = 12.075 (t / N)^2, inverted as t = N sqrt(S / 12.075)",
+   "source_section_or_page": "the utility stringing charts and the crew sagging procedure govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "elapsed_seconds": 0,
+    "return_waves": 3,
+    "target_sag_ft": 12,
+    "stopwatch_error_seconds": 0.2
+   },
+   "outputs": {
+    "target_time_seconds": {
+     "value": 2.99067,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "period_per_wave_seconds": {
+     "value": 0.99689,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sag_error_ft": {
+     "value": 1.65866,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "single_wave_sag_error_ft": {
+     "value": 5.29798,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "error_advantage": {
+     "value": 3.19413,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }
