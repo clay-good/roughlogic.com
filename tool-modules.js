@@ -754,6 +754,9 @@ export const TOOL_MODULES = (() => {
     "coupling-alignment-tolerance", "vibration-severity-zone",
     "vibration-forcing-frequencies", "bearing-defect-frequencies",
     "single-plane-field-balance",
+    "roller-chain-wear-elongation", "gear-reducer-service-factor",
+    "air-compressor-cfm-sizing", "air-dryer-sizing",
+    "receiver-pump-up-time", "vacuum-evacuation-time",
   ]);
   // spec-v80 cap-relief split: the spec-v25 site-civil / roadway-geometry
   // quartet moved out of calc-construction.js (it sat at 95.0% of its size

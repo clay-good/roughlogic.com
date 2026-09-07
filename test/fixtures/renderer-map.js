@@ -1922,4 +1922,11 @@ export const RENDERER_MAP = {
   "vibration-forcing-frequencies": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
   "bearing-defect-frequencies": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
   "single-plane-field-balance": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
+  // spec-v1478..v1483 millwright drive and compressed-air band
+  "roller-chain-wear-elongation": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
+  "gear-reducer-service-factor": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
+  "air-compressor-cfm-sizing": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
+  "air-dryer-sizing": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
+  "receiver-pump-up-time": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
+  "vacuum-evacuation-time": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
 };

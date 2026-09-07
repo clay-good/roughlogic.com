@@ -2008,6 +2008,13 @@ export const COMPUTE_MAP = {
   "vibration-forcing-frequencies": { module: "../../calc-millwright.js", fn: "computeVibrationForcingFrequencies" },
   "bearing-defect-frequencies": { module: "../../calc-millwright.js", fn: "computeBearingDefectFrequencies" },
   "single-plane-field-balance": { module: "../../calc-millwright.js", fn: "computeSinglePlaneFieldBalance" },
+  // spec-v1478..v1483 millwright drive and compressed-air band
+  "roller-chain-wear-elongation": { module: "../../calc-millwright.js", fn: "computeRollerChainWearElongation" },
+  "gear-reducer-service-factor": { module: "../../calc-millwright.js", fn: "computeGearReducerServiceFactor" },
+  "air-compressor-cfm-sizing": { module: "../../calc-millwright.js", fn: "computeAirCompressorCfmSizing" },
+  "air-dryer-sizing": { module: "../../calc-millwright.js", fn: "computeAirDryerSizing" },
+  "receiver-pump-up-time": { module: "../../calc-millwright.js", fn: "computeReceiverPumpUpTime" },
+  "vacuum-evacuation-time": { module: "../../calc-millwright.js", fn: "computeVacuumEvacuationTime" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

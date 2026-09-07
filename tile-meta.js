@@ -1129,6 +1129,13 @@ const _TILES = [
   ["vibration-forcing-frequencies", "K"],
   ["bearing-defect-frequencies", "K"],
   ["single-plane-field-balance", "K"],
+  // spec-v1478..v1483 millwright drive and compressed-air band
+  ["roller-chain-wear-elongation", "K"],
+  ["gear-reducer-service-factor", "K"],
+  ["air-compressor-cfm-sizing", "K"],
+  ["air-dryer-sizing", "K"],
+  ["receiver-pump-up-time", "K"],
+  ["vacuum-evacuation-time", "K"],
 ];
 
 

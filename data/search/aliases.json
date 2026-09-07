@@ -107892,6 +107892,156 @@
    "term": "fan balancing trial weight",
    "target": "single-plane-field-balance",
    "kind": "industry"
+  },
+  {
+   "term": "roller chain wear",
+   "target": "roller-chain-wear-elongation",
+   "kind": "industry"
+  },
+  {
+   "term": "chain elongation replacement",
+   "target": "roller-chain-wear-elongation",
+   "kind": "industry"
+  },
+  {
+   "term": "chain stretch measurement",
+   "target": "roller-chain-wear-elongation",
+   "kind": "industry"
+  },
+  {
+   "term": "chain wear percent limit",
+   "target": "roller-chain-wear-elongation",
+   "kind": "industry"
+  },
+  {
+   "term": "when to replace roller chain",
+   "target": "roller-chain-wear-elongation",
+   "kind": "industry"
+  },
+  {
+   "term": "gear reducer service factor",
+   "target": "gear-reducer-service-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "gearbox service factor rating",
+   "target": "gear-reducer-service-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "reducer thermal rating",
+   "target": "gear-reducer-service-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "required gearbox horsepower",
+   "target": "gear-reducer-service-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "gearbox sizing shock load",
+   "target": "gear-reducer-service-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "air compressor cfm sizing",
+   "target": "air-compressor-cfm-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "compressor sizing tool demand",
+   "target": "air-compressor-cfm-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "duty cycle air demand",
+   "target": "air-compressor-cfm-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "shop air compressor size",
+   "target": "air-compressor-cfm-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "compressed air leak allowance",
+   "target": "air-compressor-cfm-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "air dryer sizing",
+   "target": "air-dryer-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "compressed air dryer correction factors",
+   "target": "air-dryer-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "desiccant dryer purge",
+   "target": "air-dryer-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "refrigerated dryer capacity derate",
+   "target": "air-dryer-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "pressure dew point dryer",
+   "target": "air-dryer-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "air receiver pump up time",
+   "target": "receiver-pump-up-time",
+   "kind": "industry"
+  },
+  {
+   "term": "receiver draw down time",
+   "target": "receiver-pump-up-time",
+   "kind": "industry"
+  },
+  {
+   "term": "compressed air storage band",
+   "target": "receiver-pump-up-time",
+   "kind": "industry"
+  },
+  {
+   "term": "air tank cover duration",
+   "target": "receiver-pump-up-time",
+   "kind": "industry"
+  },
+  {
+   "term": "pump down time receiver",
+   "target": "receiver-pump-up-time",
+   "kind": "industry"
+  },
+  {
+   "term": "vacuum pump down time",
+   "target": "vacuum-evacuation-time",
+   "kind": "industry"
+  },
+  {
+   "term": "evacuation time chamber",
+   "target": "vacuum-evacuation-time",
+   "kind": "industry"
+  },
+  {
+   "term": "vacuum decade time",
+   "target": "vacuum-evacuation-time",
+   "kind": "industry"
+  },
+  {
+   "term": "ultimate pressure leak rate",
+   "target": "vacuum-evacuation-time",
+   "kind": "industry"
+  },
+  {
+   "term": "how long to pump down",
+   "target": "vacuum-evacuation-time",
+   "kind": "industry"
   }
  ]
 }

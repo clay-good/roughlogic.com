@@ -1572,6 +1572,13 @@ const RELATED = {
   "vibration-forcing-frequencies": ["bearing-defect-frequencies","vibration-severity-zone","single-plane-field-balance"],
   "bearing-defect-frequencies": ["vibration-forcing-frequencies","vibration-severity-zone","bearing-l10-life"],
   "single-plane-field-balance": ["rotor-balance-grade","vibration-forcing-frequencies","vibration-severity-zone"],
+  // spec-v1478..v1483: the 2026-09-07 millwright drive and compressed-air band.
+  "roller-chain-wear-elongation": ["roller-chain-length","gear-reducer-service-factor","vibration-forcing-frequencies"],
+  "gear-reducer-service-factor": ["roller-chain-wear-elongation","vibration-severity-zone","motor-shaft-torque"],
+  "air-compressor-cfm-sizing": ["receiver-pump-up-time","air-dryer-sizing","air-receiver"],
+  "air-dryer-sizing": ["air-compressor-cfm-sizing","receiver-pump-up-time","air-receiver"],
+  "receiver-pump-up-time": ["air-receiver","air-compressor-cfm-sizing","air-dryer-sizing"],
+  "vacuum-evacuation-time": ["vacuum-decay-test","air-compressor-cfm-sizing","receiver-pump-up-time"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   "grounding-electrode-conductor": ["bonding-jumper","egc-sizing","grounding-electrode"],
   "bonding-jumper": ["grounding-electrode-conductor","egc-sizing","service-load-standard"],

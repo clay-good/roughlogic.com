@@ -21775,6 +21775,80 @@ export const CITATIONS = {
       { name: "The manufacturer's provisions govern absolutely", value: "rated capacities, allowable geometries, and permitted wind speeds", source: "turbine service instructions" },
     ],
   },
+  // spec-v1478..v1483: the 2026-09-07 trade-expansion millwright drive and
+  // compressed-air band. Group K.
+  "roller-chain-wear-elongation": {
+    formula: "nominal length = chain pitch x the number of pitches measured; elongation = (measured - nominal) / nominal; allowable length = nominal x (1 + the limit).",
+    edition: "The roller chain wear-elongation check as standard drive maintenance practice, by name. The 1.5% replacement figure for a normal hardened-tooth sprocket and the 3.0% accepted on large, slow, low-tooth-count drives are ENTERED, not fixed. Chain and sprockets are replaced as a set. The chain and sprocket manufacturers' data and the drive designer govern.",
+    freeAccess: "A tape measurement against a nominal length; no manufacturer table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Roller chain does not stretch, it WEARS: the pin and bushing clearances grow and the chain gets longer. MEASURING OVER TWELVE OR MORE PITCHES RATHER THAN ONE IS THE WHOLE ACCURACY TRICK, because the wear per joint is tiny and only accumulates into something a tape can read over a span -- a #50 chain 2.13% elongated shows only 13.3 thousandths of difference across a single pitch, which nothing in a plant resolves reliably. The 1.5% figure is not arbitrary. A chain riding a sprocket is a polygon, and as the pitch grows the chain contacts fewer teeth and rides higher up the flanks; past roughly 1.5% on a normal tooth count it begins to jump and the teeth wear into a hooked profile. Once that happens the sprocket is scrap too, and a new chain on a hooked sprocket wears out in a fraction of its life -- which is why a replace verdict is also an instruction to inspect the teeth, and why chain and sprockets go on as a set.",
+    assumptions: [
+      { name: "The limit is entered, not fixed", value: "3.0% is accepted on large, slow, low-tooth-count drives", source: "drive maintenance practice" },
+      { name: "The sprockets are not inspected here", value: "and that is the other half of the decision", source: "drive maintenance practice" },
+      { name: "Overload damage does not show as elongation", value: "nor do fatigue and plate cracking", source: "the chain manufacturer's data" },
+    ],
+  },
+  "gear-reducer-service-factor": {
+    formula: "required catalog rating = transmitted power x the service factor for the driver character, driven-machine shock class and duty hours; the catalog MECHANICAL and THERMAL ratings are compared separately and the LOWER governs; the maximum transmitted power = the governing rating / the service factor.",
+    edition: "The gear reducer service-factor selection as standard practice, by name. The service factor is ENTERED because published tables differ between manufacturers and standards, and the shock classification of a driven machine is a judgment the manufacturer's table makes rather than a formula. The gear reducer manufacturer's catalog ratings, service factor tables, and thermal derating data govern.",
+    freeAccess: "A multiplication and a comparison against catalog values the user reads off the manufacturer's own data.",
+    governance: GOVERNANCE.general,
+    editionNote: "A 25 hp motor does not need a 25 hp gearbox, and choosing on motor nameplate alone is the standard way a reducer fails in eighteen months. The service factor converts an average transmitted power into the PEAK the teeth and bearings see, from the character of the prime mover, the shock character of the driven machine, and the duty hours -- factors near 1.0 for a uniform load on short duty, past 2.0 for heavy shock around the clock. THE TRAP IS THE THERMAL RATING. A gearbox has two INDEPENDENT ratings: mechanical, set by the teeth and bearings, and thermal, set by how much heat the case sheds at ambient -- and on continuously running units the thermal rating is frequently the lower. A 60 hp box that passes a 50 hp mechanical requirement with a 1.20 margin but carries a 42 hp thermal rating is 8 hp short, and the fix is a cooling fan, an oil cooler, or a larger case rather than a bigger gearset, because the gears were never the problem. No service factor catches that; it is a separate check against a separate number.",
+    assumptions: [
+      { name: "The service factor is entered, not derived", value: "published tables differ by manufacturer and standard", source: "the gear reducer manufacturer's data" },
+      { name: "Thermal and mechanical are independent", value: "and the thermal one often governs on continuous duty", source: "the gear reducer manufacturer's data" },
+      { name: "Overhung load is not evaluated", value: "a chain or belt drive's side load is a common failure cause no power rating addresses", source: "the gear reducer manufacturer's data" },
+    ],
+  },
+  "air-compressor-cfm-sizing": {
+    formula: "average demand = the sum over tools of quantity x rated CFM x duty cycle; with leaks = that x (1 + leak allowance); design CFM = that x (1 + growth allowance); motor power is approximated at about 4 CFM per horsepower for a two-stage unit at 100 psig.",
+    edition: "The duty-weighted compressed-air demand build-up as standard practice, by name. The duty-weighted sum is the SAME relation the air receiver calculator uses, so the two cannot disagree about what a set of tools draws. A tool's rated CFM is its consumption with the trigger down. The compressor and tool manufacturers' data govern.",
+    freeAccess: "A weighted sum on tool ratings and duty cycles the user supplies; no manufacturer table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Sizing from the sum of nameplate ratings buys a machine two or three times too big, and sizing from the largest tool buys one that cannot keep up. Almost nothing runs at 100% duty: an impact wrench on an assembly line might see 50%, a blow gun 10%. A shop with two impact wrenches at 5 cfm and 50%, a sander at 12 cfm and 70%, and a blow gun at 3 cfm and 10% averages 13.70 cfm against a 25 cfm connected load -- 4.7 hp of real need against the 6.3 hp the connected figure would buy, and an oversized compressor short-cycles and wears itself out. THE LEAK ALLOWANCE IS THE HONEST PART. A typical industrial system leaks 10 to 20% of its output and a neglected one leaks 30% or more, so a compressor sized with no leak budget is undersized on the day it is installed. It is carried explicitly rather than buried, because a leak allowance you can see is one you might fix -- and fixing it is far cheaper than the horsepower it buys.",
+    assumptions: [
+      { name: "Duty cycles are estimates until logged", value: "a metered week beats any table", source: "compressed air practice" },
+      { name: "Rated CFM is not corrected to working pressure", value: "a tool rated at 90 psig draws more at 100", source: "the tool manufacturer's data" },
+      { name: "Altitude is not corrected", value: "it reduces the mass delivered at the same volumetric rating", source: "compressed air practice" },
+    ],
+  },
+  "air-dryer-sizing": {
+    formula: "the inlet temperature, operating pressure and ambient correction factors MULTIPLY: corrected capacity = rated x their product, and required rating = actual flow / their product; a regenerative desiccant dryer's compressor load = actual flow / (1 - purge fraction).",
+    edition: "The compressed-air dryer correction-factor method as standard practice, by name, with the factors taken from the dryer manufacturer's OWN tables because they differ by model and technology. A refrigerated dryer holds roughly a 35 to 40 degF pressure dew point and cannot go below freezing without icing. The dryer manufacturer's correction tables and dew point ratings, and the requirements of the air application, govern.",
+    freeAccess: "A product of correction factors the user reads off the manufacturer's table; no factor table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "A dryer's catalog number is stated at one set of conditions -- typically 100 psig, 100 degF inlet, 100 degF ambient -- and a plant almost never sits at all three. BECAUSE THE CORRECTIONS MULTIPLY, three individually modest factors compound: 0.80 x 1.10 x 0.95 is 0.836, so a 200 scfm nameplate delivers only 167 scfm and the honest requirement is 239. A dryer selected on its badge number is the reason water comes out of the drops. The choice between refrigerated and desiccant is a DEW POINT decision, not a capacity one: anything running outdoors, feeding an unheated line, or supplying instrument or breathing air needs desiccant. The cost of desiccant is the purge, and a heatless regenerative unit diverts around 15% of its throughput to regenerate the offline tower -- capacity that must be ADDED to the compressor sizing rather than subtracted from the dryer's, so delivering 200 scfm through a 15% purge means the compressor supplies 235.",
+    assumptions: [
+      { name: "Correction factors are entered, not supplied", value: "they differ by model and by dryer technology", source: "the dryer manufacturer's tables" },
+      { name: "Pre- and after-filters are not sized", value: "and oil carryover destroys a desiccant bed", source: "the dryer manufacturer's data" },
+      { name: "Drain traps are not addressed", value: "and they are where most compressed-air moisture problems originate", source: "compressed air practice" },
+    ],
+  },
+  "receiver-pump-up-time": {
+    formula: "pump-up time = V (p2 - p1) / (14.7 x compressor scfm); draw-down time = V (cut-out - cut-in) / (14.7 x net demand); usable free air = V x band / 14.7; receiver required = duration x 14.7 x net demand / the band.",
+    edition: "The receiver storage relation as standard practice, by name: the ideal gas law in shop units, with 14.7 converting psig to atmospheres. The receiver-sizing form is the SAME relation the air receiver calculator uses, rearranged, so the two cannot disagree. Constant temperature assumed. The compressor and receiver manufacturers' data and the applicable pressure vessel code govern.",
+    freeAccess: "Ideal-gas arithmetic on a volume and a pressure band; no manufacturer table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "A receiver is a buffer, and the consequence people miss is that its usefulness depends on the pressure BAND you are willing to give up, NOT on the tank. Widening the cut-in to cut-out band from 20 to 40 psi doubles the usable storage out of the same vessel -- free capacity, paid for in slightly lower minimum pressure. That is what makes the draw-down form the useful one: a shop with a sandblaster or a large intermittent tool does not need a compressor that covers the peak, it needs a receiver big enough to cover the peak's DURATION while the compressor catches up, and that is far cheaper than sizing the compressor to the peak. A 120 cu ft receiver on a 35 psi band against a 30 scfm net demand gives 9.52 minutes of cover, so a tool running two minutes at a time is amply covered and about 25 cu ft would have sufficed. Real filling heats the air, so a receiver reading its cut-out pressure hot falls back as it cools and the compressor restarts -- pump-up times run slightly optimistic for that reason.",
+    assumptions: [
+      { name: "Constant temperature assumed", value: "real filling heats the air and the pressure falls back as it cools", source: "compressed air practice" },
+      { name: "An air receiver is a pressure vessel", value: "with drain, relief and inspection obligations not addressed here", source: "the applicable pressure vessel code" },
+      { name: "Piping storage is not counted", value: "on a large system it is real and sometimes substantial", source: "compressed air practice" },
+    ],
+  },
+  "vacuum-evacuation-time": {
+    formula: "evacuation time t = (V / S) ln(p1 / p2), so each decade costs 2.303 V / S and the total is spread evenly across log10(p1/p2) decades; the leak-limited ultimate pressure = leak rate / effective pumping speed, where effective speed = rated speed x the line's conductance efficiency.",
+    edition: "The isothermal volume pump-down relation as standard vacuum practice, by name. Real pumps lose speed near their ultimate, so this runs optimistic at the low end. The pump manufacturer's speed curve and the system designer govern.",
+    freeAccess: "A logarithm on a volume and a pumping speed; no pump curve is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Pump-down time is LOGARITHMIC, not linear, and that single fact governs every vacuum job: each decade of pressure costs the same time as the last, so 760 torr to 76 takes as long as 76 to 7.6. That is why a system which seemed fast in the first minute takes an hour to reach setpoint, and why the instinct built on the first thirty seconds is always wrong. A 15 cu ft chamber on a 25 cfm pump reaches 1 torr in about 4 minutes across 2.88 decades at 1.38 minutes each, and the next decade down to 0.1 torr costs another 1.38. The pump's rated speed is not the speed at the chamber -- the connecting line has a finite conductance -- so an efficiency is entered rather than assumed. LEAKAGE SETS AN ULTIMATE PRESSURE no pumping time will beat: the leak rate over the effective speed. If that ultimate sits BELOW the target the target is reachable and the leak only costs time near the end; if it sits ABOVE, the system never gets there. A pump-down curve that flattens short of target is therefore a leak MEASUREMENT, and the flattening pressure times the pumping speed is the leak rate.",
+    assumptions: [
+      { name: "Rated speed is assumed constant", value: "real pumps lose speed near the ultimate, so this runs optimistic low down", source: "the pump manufacturer's speed curve" },
+      { name: "Outgassing is not modelled", value: "it dominates below roughly 1e-3 torr", source: "vacuum practice" },
+      { name: "Water vapour load is not modelled", value: "it is the usual reason a chamber slower today than yesterday", source: "vacuum practice" },
+    ],
+  },
   // spec-v1469..v1477: the 2026-09-07 trade-expansion millwright alignment,
   // vibration, and balance band. Group K.
   "shaft-alignment-rim-face": {

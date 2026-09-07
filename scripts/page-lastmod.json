@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "163e665c9dc045a3",
+      "sha": "c7429a4f0dbbf88c",
       "date": "2026-09-07"
     },
     "/tools/": {
-      "sha": "2cfcf455876f821a",
+      "sha": "b546ea27ca020c8d",
       "date": "2026-09-07"
     },
     "/groups/accounting/": {
-      "sha": "5b01db1144fb3432",
+      "sha": "49b09555e50ef583",
       "date": "2026-09-07"
     },
     "/groups/agriculture/": {
-      "sha": "6d06b2437cefa7ad",
+      "sha": "3e3566c70c6ab0c9",
       "date": "2026-09-07"
     },
     "/groups/construction/": {
-      "sha": "054d8cee0fa336d9",
+      "sha": "58a95d110fa12f3c",
       "date": "2026-09-07"
     },
     "/groups/cross-trade/": {
-      "sha": "3559333fa122e176",
+      "sha": "0ca55edda516e8f8",
       "date": "2026-09-07"
     },
     "/groups/educators/": {
-      "sha": "9c614ec785ab0cb8",
+      "sha": "e67b85ee98c894dd",
       "date": "2026-09-07"
     },
     "/groups/electrical/": {
-      "sha": "8900680f5d5ef6c4",
+      "sha": "030263adb289ef43",
       "date": "2026-09-07"
     },
     "/groups/field/": {
-      "sha": "ed4d735b2b756600",
+      "sha": "c20722cf20a21348",
       "date": "2026-09-07"
     },
     "/groups/fire-ground/": {
-      "sha": "dbaf2e640745d61d",
+      "sha": "f936dd133fd2e3b3",
       "date": "2026-09-07"
     },
     "/groups/historical/": {
-      "sha": "78252ede6db109e4",
+      "sha": "a7ffa393535205df",
       "date": "2026-09-07"
     },
     "/groups/hvac/": {
-      "sha": "ccfacb2467990d49",
+      "sha": "8d00d39cdf187a09",
       "date": "2026-09-07"
     },
     "/groups/kitchen/": {
-      "sha": "2dd20b8d24b60a65",
+      "sha": "e00eb1c1b655d422",
       "date": "2026-09-07"
     },
     "/groups/lab/": {
-      "sha": "dda8a9dd5d2a6373",
+      "sha": "47df5eb91e4c9d46",
       "date": "2026-09-07"
     },
     "/groups/mechanic/": {
-      "sha": "bfd3107c27023dbb",
+      "sha": "c007568704341011",
       "date": "2026-09-07"
     },
     "/groups/plumbing/": {
-      "sha": "b00092c39a4eea8a",
+      "sha": "86dc0ae191009af4",
       "date": "2026-09-07"
     },
     "/groups/real-estate/": {
-      "sha": "d02eb9be958388a4",
+      "sha": "a03edaba116a11f2",
       "date": "2026-09-07"
     },
     "/groups/references/": {
-      "sha": "03f3621c2dee0993",
+      "sha": "4387390940f1726b",
       "date": "2026-09-07"
     },
     "/groups/restoration/": {
-      "sha": "05084cddf036accb",
+      "sha": "1ee9e801acec72a3",
       "date": "2026-09-07"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "ee543e4a7000fa5d",
+      "sha": "b16412d7a288e47a",
       "date": "2026-09-07"
     },
     "/groups/stage/": {
-      "sha": "ef9ac77f32120cdb",
+      "sha": "f4e68fa74d136bca",
       "date": "2026-09-07"
     },
     "/groups/trucking/": {
-      "sha": "22087deeb848c683",
+      "sha": "f649c65264988350",
       "date": "2026-09-07"
     },
     "/groups/water/": {
-      "sha": "ad8864c958195c7d",
+      "sha": "26484318d7fd02eb",
       "date": "2026-09-07"
     },
     "/tools/aav-install-check/": {
@@ -189,9 +189,17 @@
       "sha": "c73d077fb84dd1ca",
       "date": "2026-09-04"
     },
+    "/tools/air-compressor-cfm-sizing/": {
+      "sha": "9321252977752f62",
+      "date": "2026-09-07"
+    },
     "/tools/air-density-correction/": {
       "sha": "1d93924c4ac50f73",
       "date": "2026-09-01"
+    },
+    "/tools/air-dryer-sizing/": {
+      "sha": "ba0d1d4cc9514404",
+      "date": "2026-09-07"
     },
     "/tools/air-leak-cost/": {
       "sha": "9841298e70d8cd8f",
@@ -2754,8 +2762,8 @@
       "date": "2026-09-04"
     },
     "/tools/free-fall-drop/": {
-      "sha": "195675516857def5",
-      "date": "2026-09-04"
+      "sha": "78e7cb791a84a28a",
+      "date": "2026-09-07"
     },
     "/tools/freezing-time-plank/": {
       "sha": "483cddc4952c4122",
@@ -2908,6 +2916,10 @@
     "/tools/gear-mph-rpm/": {
       "sha": "3c42f42eba0005a7",
       "date": "2026-09-01"
+    },
+    "/tools/gear-reducer-service-factor/": {
+      "sha": "764222ae2b328c13",
+      "date": "2026-09-07"
     },
     "/tools/gear-tooth-bending-stress/": {
       "sha": "fb7fe01ed13a6efd",
@@ -3430,8 +3442,8 @@
       "date": "2026-09-01"
     },
     "/tools/impact-load-factor/": {
-      "sha": "1a1363c4617970ff",
-      "date": "2026-09-04"
+      "sha": "c8e2359759374e8f",
+      "date": "2026-09-07"
     },
     "/tools/inclined-plane-force/": {
       "sha": "d7fb02c5b36a3e7e",
@@ -4690,8 +4702,8 @@
       "date": "2026-09-07"
     },
     "/tools/planetary-gear-ratio/": {
-      "sha": "57626c64277a8ef7",
-      "date": "2026-09-01"
+      "sha": "ad7c4449f636beaa",
+      "date": "2026-09-07"
     },
     "/tools/plant-spacing-count/": {
       "sha": "d84b6f225c5e6e4d",
@@ -4906,8 +4918,8 @@
       "date": "2026-09-01"
     },
     "/tools/projectile-range/": {
-      "sha": "38dda51c9d8b6ad8",
-      "date": "2026-09-04"
+      "sha": "ccada12f542b71fe",
+      "date": "2026-09-07"
     },
     "/tools/projector-brightness/": {
       "sha": "80d9b76b7403b589",
@@ -5245,6 +5257,10 @@
       "sha": "dd395ee2a5fe453d",
       "date": "2026-09-01"
     },
+    "/tools/receiver-pump-up-time/": {
+      "sha": "168ffcda9f6c74f2",
+      "date": "2026-09-07"
+    },
     "/tools/recipe-scale/": {
       "sha": "44841255c1e69d09",
       "date": "2026-09-01"
@@ -5464,6 +5480,10 @@
     "/tools/roller-chain-length/": {
       "sha": "a123eee7bddeb250",
       "date": "2026-09-01"
+    },
+    "/tools/roller-chain-wear-elongation/": {
+      "sha": "009f8c288029b9a3",
+      "date": "2026-09-07"
     },
     "/tools/roller-jack-force/": {
       "sha": "0d64cfae70f18e44",
@@ -7212,6 +7232,10 @@
     "/tools/vacuum-decay-test/": {
       "sha": "962f3384aa5c1a2e",
       "date": "2026-09-01"
+    },
+    "/tools/vacuum-evacuation-time/": {
+      "sha": "5a63bd57e2190c33",
+      "date": "2026-09-07"
     },
     "/tools/vacuum-excavation-spoil/": {
       "sha": "ae1e0ad4d2ec778a",

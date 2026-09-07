@@ -99310,6 +99310,321 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "roller-chain-wear-elongation",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "#50 chain at 0.625 in pitch measured 7.66 in across 12 pitches against a 1.5% limit",
+   "source_edition_or_year": "nominal = pitch x pitches; elongation = (measured - nominal) / nominal; allowable = nominal x (1 + limit)",
+   "source_section_or_page": "the chain and sprocket manufacturers data govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "chain_pitch_in": 0.625,
+    "pitches_measured": 12,
+    "measured_length_in": 7.66,
+    "elongation_limit_pct": 1.5,
+    "sprocket_teeth": 19
+   },
+   "outputs": {
+    "nominal_length_in": {
+     "value": 7.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "elongation_in": {
+     "value": 0.16,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "elongation_pct": {
+     "value": 2.13333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "allowable_length_in": {
+     "value": 7.6125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "per_pitch_wear_in": {
+     "value": 0.0133333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gear-reducer-service-factor",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "25 hp motor on a reciprocating compressor 24 hours a day at a 2.00 service factor, 60 hp mechanical and 42 hp thermal",
+   "source_edition_or_year": "required = transmitted x service factor; the lower of the mechanical and thermal catalog ratings governs",
+   "source_section_or_page": "the gear reducer manufacturer catalog and thermal derating data govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "transmitted_hp": 25,
+    "service_factor": 2,
+    "catalog_mechanical_hp": 60,
+    "catalog_thermal_hp": 42,
+    "nameplate_selection_hp": 30
+   },
+   "outputs": {
+    "required_hp": {
+     "value": 50,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "mechanical_margin": {
+     "value": 1.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "governing_rating_hp": {
+     "value": 42,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "shortfall_hp": {
+     "value": 8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_transmitted_hp": {
+     "value": 21,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "nameplate_shortfall_pct": {
+     "value": 40,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "air-compressor-cfm-sizing",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "two impact wrenches at 5 cfm and 50%, a sander at 12 cfm and 70%, a blow gun at 3 cfm and 10%, 15% leaks and 20% growth",
+   "source_edition_or_year": "average = sum(qty x cfm x duty); with leaks and growth applied in turn; motor at 4 cfm per hp",
+   "source_section_or_page": "the compressor and tool manufacturers data govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "tool1_qty": 2,
+    "tool1_cfm": 5,
+    "tool1_duty": 0.5,
+    "tool2_qty": 1,
+    "tool2_cfm": 12,
+    "tool2_duty": 0.7,
+    "tool3_qty": 1,
+    "tool3_cfm": 3,
+    "tool3_duty": 0.1,
+    "tool4_qty": 0,
+    "tool4_cfm": 0,
+    "tool4_duty": 0,
+    "leak_allowance_pct": 15,
+    "growth_allowance_pct": 20,
+    "cfm_per_hp": 4
+   },
+   "outputs": {
+    "connected_cfm": {
+     "value": 25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "average_cfm": {
+     "value": 13.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "with_leaks_cfm": {
+     "value": 15.755,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "design_cfm": {
+     "value": 18.906,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "motor_hp": {
+     "value": 4.7265,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "connected_hp": {
+     "value": 6.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "air-dryer-sizing",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "200 scfm with correction factors of 0.8 inlet, 1.1 pressure and 0.95 ambient, and a 15% desiccant purge",
+   "source_edition_or_year": "the corrections multiply; required rating = actual / the product; compressor load = actual / (1 - purge)",
+   "source_section_or_page": "the dryer manufacturer correction tables and dew point ratings govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "actual_scfm": 200,
+    "temp_correction": 0.8,
+    "pressure_correction": 1.1,
+    "ambient_correction": 0.95,
+    "candidate_rated_scfm": 200,
+    "purge_fraction": 0.15
+   },
+   "outputs": {
+    "combined_factor": {
+     "value": 0.836,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_rated_scfm": {
+     "value": 239.234,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "candidate_delivers_scfm": {
+     "value": 167.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "purge_scfm": {
+     "value": 35.2941,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "compressor_load_scfm": {
+     "value": 235.294,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "receiver-pump-up-time",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "120 cu ft receiver, 175 to 140 psig band, 30 scfm net demand, filled from 0 to 175 psig by a 42 scfm compressor",
+   "source_edition_or_year": "t = V x pressure change / (14.7 x flow); receiver required = duration x 14.7 x demand / band",
+   "source_section_or_page": "the compressor and receiver manufacturers data and the pressure vessel code govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "receiver_volume_ft3": 120,
+    "fill_start_psig": 0,
+    "fill_end_psig": 175,
+    "compressor_scfm": 42,
+    "cut_out_psig": 175,
+    "cut_in_psig": 140,
+    "net_demand_scfm": 30,
+    "required_cover_minutes": 2
+   },
+   "outputs": {
+    "pump_up_minutes": {
+     "value": 34.0136,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "draw_down_minutes": {
+     "value": 9.52381,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "draw_down_seconds": {
+     "value": 571.429,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "usable_free_air_ft3": {
+     "value": 285.714,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "receiver_required_ft3": {
+     "value": 25.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vacuum-evacuation-time",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "15 cu ft chamber on a 25 cfm pump from 760 torr to 1 torr, with a 5 torr-cfm leak",
+   "source_edition_or_year": "t = (V / S) ln(p1 / p2); per decade = 2.303 V / S; ultimate = leak rate / effective speed",
+   "source_section_or_page": "the pump manufacturer speed curve and the system designer govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-07",
+   "inputs": {
+    "chamber_volume_ft3": 15,
+    "pump_speed_cfm": 25,
+    "start_pressure_torr": 760,
+    "target_pressure_torr": 1,
+    "leak_rate_torr_cfm": 5,
+    "conductance_efficiency": 1
+   },
+   "outputs": {
+    "evacuation_minutes": {
+     "value": 3.97999,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "minutes_per_decade": {
+     "value": 1.38155,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "decades": {
+     "value": 2.88081,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ultimate_pressure_torr": {
+     "value": 0.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "blocking_leak_torr_cfm": {
+     "value": 25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

@@ -2787,13 +2787,19 @@ cross-check.
 | calc-metalair.js | `computeDuctTransitionLength` | `{ large_dim_in = 20, small_dim_in = 12, slope_deg = 15 } = {}` | _ | _ | _ |
 | calc-metalair.js | `computeGrooveWeldLengthForLoad` | `{ applied_load_lb = 0, weld_type = "PJP", effective_throat_in = 0, base_thick...` | _ | _ | _ |
 | calc-metalair.js | `computeGrooveWeldStrength` | `{ weld_type = "PJP", effective_throat_in = 0, base_thickness_in = 0, length_i...` | _ | _ | _ |
+| calc-millwright.js | `computeAirCompressorCfmSizing` | `{ tool1_qty = 0, tool1_cfm = 0, tool1_duty = 0, tool2_qty = 0, tool2_cfm = 0,...` | _ | _ | _ |
+| calc-millwright.js | `computeAirDryerSizing` | `{ actual_scfm = 0, temp_correction = 1, pressure_correction = 1, ambient_corr...` | _ | _ | _ |
 | calc-millwright.js | `computeAlignmentThermalGrowth` | `{ stationary_support_height_in = 0, stationary_alpha_per_f = 0.0000065, stati...` | _ | _ | _ |
 | calc-millwright.js | `computeBearingDefectFrequencies` | `{ rpm = 0, ball_count = 0, ball_diameter_in = 0, pitch_diameter_in = 0, conta...` | _ | _ | _ |
 | calc-millwright.js | `computeCouplingAlignmentTolerance` | `{ rpm = 0, measured_offset_in = 0, measured_angularity_mils_per_in = 0, offse...` | _ | _ | _ |
+| calc-millwright.js | `computeGearReducerServiceFactor` | `{ transmitted_hp = 0, service_factor = 1, catalog_mechanical_hp = 0, catalog_...` | _ | _ | _ |
+| calc-millwright.js | `computeReceiverPumpUpTime` | `{ receiver_volume_ft3 = 0, fill_start_psig = 0, fill_end_psig = 0, compressor...` | _ | _ | _ |
+| calc-millwright.js | `computeRollerChainWearElongation` | `{ chain_pitch_in = 0, pitches_measured = 0, measured_length_in = 0, elongatio...` | _ | _ | _ |
 | calc-millwright.js | `computeShaftAlignmentReverseDial` | `{ tir_a_in = 0, tir_b_in = 0, plane_spacing_in = 0, front_foot_distance_in = ...` | _ | _ | _ |
 | calc-millwright.js | `computeShaftAlignmentRimFace` | `{ rim_tir_in = 0, face_tir_in = 0, face_diameter_in = 0, front_foot_distance_...` | _ | _ | _ |
 | calc-millwright.js | `computeSinglePlaneFieldBalance` | `{ original_amplitude = 0, original_phase_deg = 0, trial_weight_g = 0, trial_w...` | _ | _ | _ |
 | calc-millwright.js | `computeSoftFootCorrection` | `{ foot_lf_in = 0, foot_rf_in = 0, foot_lr_in = 0, foot_rr_in = 0, threshold_i...` | _ | _ | _ |
+| calc-millwright.js | `computeVacuumEvacuationTime` | `{ chamber_volume_ft3 = 0, pump_speed_cfm = 0, start_pressure_torr = 760, targ...` | _ | _ | _ |
 | calc-millwright.js | `computeVibrationForcingFrequencies` | `{ rpm = 0, blade_count = 0, gear_tooth_count = 0, belt_length_in = 0, sheave_...` | _ | _ | _ |
 | calc-millwright.js | `computeVibrationSeverityZone` | `{ reading = 0, reading_is_mm_s = 0, boundary_ab = 0.044, boundary_bc = 0.110,...` | _ | _ | _ |
 | calc-mining.js | `computeBeltFeederCapacity` | `{ opening_width_in = 0, opening_height_in = 0, belt_speed_fpm = 0, bulk_densi...` | _ | _ | _ |
@@ -3567,7 +3573,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2153.
+Row count: 2159.
 
 <!-- END function-corpus-v14 -->
 
@@ -5026,13 +5032,15 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (148 tiles)
+### Group K Mechanic (154 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `abyc-dc-wire` | ABYC E-11 Marine DC Wire Sizing | ABYC E-11 DC wire sizing by voltage drop; spec-v517 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `acme-thread-depth` | Acme (29-degree) Thread Depth and Dimensions | General-purpose Acme thread (Machiner...; pitch = 1/5 = 0.200; depth = 0.200/2 + 0.010 = 0.110; pit... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `aerodynamic-drag-force` | Aerodynamic Drag Force and Power | Project (first-principles); F = 1/2 rho V^2 Cd A | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `air-compressor-cfm-sizing` | Air Compressor CFM and Duty Sizing From Tool Demand | Project (first-principles); the compressor and tool manufacturers data govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `air-dryer-sizing` | Refrigerated and Desiccant Air Dryer Sizing | Project (first-principles); the dryer manufacturer correction tables and dew point ra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `aircraft-weight-balance` | Aircraft Weight and Balance (CG Envelope) | station-moment weight and balance (FA...; spec-v516 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `alignment-thermal-growth` | Machine Thermal Growth Offset for Cold Alignment | Project (first-principles); hot alignment verification and the machine manufacturer d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `alternator-charging-load` | Alternator Charging Load Balance | automotive-electrical practice; spec-v464 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5094,6 +5102,7 @@ per spec-v14 §13.1 second paragraph.
 | `gear-dynamic-tooth-stress` | Gear Tooth Dynamic (Barth) Bending Stress | W. H. Dornfeld, Fairfield University ...; 'A 43-tooth, 20 deg PA, full involute spur, 8 per inch di... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gear-identification` | Gear Identification (Pitch from Teeth and OD) | Machinery's Handbook / AGMA (inverse ...; spec-v649 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gear-mph-rpm` | Gear-Ratio MPH from RPM | Drivetrain kinematics + SAE J267 tire...; 2500 RPM, 1:1, 3.55 axle, 28.5-in tire -> 59.71 MPH | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `gear-reducer-service-factor` | Gear Reducer Service Factor and Required Rating | Project (first-principles); the gear reducer manufacturer catalog and thermal deratin... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gear-tooth-bending-stress` | Gear Tooth Bending Stress (Lewis) | Lewis beam-strength equation (Wilfred...; y = 0.154 - 0.912/20 = 0.1084; pc = pi/8 = 0.392699 in; s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gear-undercut-backlash` | Gear Undercut Minimum Teeth and Backlash | involute gear geometry (Machinery's H...; Nmin = 2(1.0)/sin^2(20) = 17.097 -> 18 teeth, so 14 teeth... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `glidepath-descent-rate` | Glidepath Rate of Descent | FAA Instrument Flying Handbook; TERPS...; 120 kt on a 3.0 deg glidepath -> 637 ft/min, 318 ft/nm (T... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5129,8 +5138,10 @@ per spec-v14 §13.1 second paragraph.
 | `rack-and-pinion` | Rack and Pinion Travel, Speed, and Force | Project (first-principles); rack and pinion | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `radial-chip-thinning` | Radial Chip Thinning Feed Compensation | Radial chip thinning geometry; spec-v317 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `reaming-drill-allowance` | Reaming Prebore (Drill) Allowance | machine-reaming stock allowance (Mach...; 0.5 in is in the 1/4-1/2 band (0.015); drill = 0.500 - 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `receiver-pump-up-time` | Air Receiver Pump-Up and Pump-Down Time | Project (first-principles); the compressor and receiver manufacturers data and the pr... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `reserve-capacity-amp-hours` | Battery Reserve Capacity to Amp-Hours | BCI / SAE J537 reserve capacity; RC 120 min at the 25 A / 10.5 V / 80 F reserve rate -> 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `roller-chain-length` | Roller Chain Length in Pitches (ANSI B29.1) | ANSI B29.1 roller-chain length; spec-v512 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `roller-chain-wear-elongation` | Roller Chain Wear Elongation Replacement Check | Project (first-principles); the chain and sprocket manufacturers data govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sacrificial-anode-life` | Sacrificial Anode Service Life | Sacrificial-anode life by Faraday's l...; 5 lb zinc (354 A-h/lb), 0.85 utilization, 0.15 A -> 1.14 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sailboat-performance-ratios` | Sailboat Performance Ratios (SA/D and DLR) | Sailboat performance ratios (SA/D and...; SA/D = 500 / (10000/64)^(2/3) = 500/29.0 = 17.24; DLR = (... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `scotch-yoke-motion` | Scotch-Yoke Simple Harmonic Motion | Project (first-principles); peak v = r*omega, peak a = r*omega^2; omega = 2 pi N/60 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5169,6 +5180,7 @@ per spec-v14 §13.1 second paragraph.
 | `turning-surface-finish` | Theoretical Surface Finish | First-principles scallop geometry + M...; f 0.005 IPR, r 1/32 in -> Rt 100 uin, Ra 25 uin | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ujoint-operating-angle` | Driveline U-Joint Operating Angle and Cancellation | Cardan (Hooke) U-joint kinematics + c...; variation = 1/cos(10) - cos(10) = 1.01543 - 0.98481 = 0.0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `universal-joint-speed` | Universal Joint (Cardan) Speed Variation | Project (first-principles); Cardan velocity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `vacuum-evacuation-time` | Vacuum Pump Evacuation (Pump-Down) Time | Project (first-principles); the pump manufacturer speed curve and the system designer... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `valve-flow-coefficient` | Valve Flow Coefficient (Cv) | ISA-75.01 / Crane TP-410 (control-val...; Cv 10, dP 25 psi, SG 1 -> Q = 10 * sqrt(25) = 50 gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vehicle-road-load-power` | Vehicle Road-Load Force and Power | Project (first-principles); F_total = aero + rolling + grade | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `vibration-forcing-frequencies` | Vibration Forcing Frequencies (1x, Blade Pass, Gear Mesh) | Project (first-principles); a qualified vibration analyst governs any diagnosis | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5642,6 +5654,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1902. Fixture-covered or reference-cadence: 1902 / 1902.
+Tile count: 1908. Fixture-covered or reference-cadence: 1908 / 1908.
 
 <!-- END tile-index-v14 -->

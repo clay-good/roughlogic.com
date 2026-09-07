@@ -45779,3 +45779,204 @@ test("bounds: spec-v1477 computeSinglePlaneFieldBalance solves the trial-weight 
   assert.ok("error" in _v1477({ ...base, trial_amplitude: 6.2, trial_phase_deg: 45 }));
   assert.ok("error" in _v1477({ ...base, trial_weight_g: 0 }));
 });
+
+// ===========================================================================
+// spec-v1478..v1483: the 2026-09-07 trade-expansion millwright drive and
+// compressed-air band, the second half of calc-millwright.js. All six landed;
+// nothing was cut.
+//
+// `air-receiver` in calc-hvac.js ALREADY OWNED two of these relations -- its
+// duty-weighted `demand_scfm` is v1480's demand line, and its `receiver_ft3`
+// is v1482's receiver-sizing line. Both specs still land, because what they
+// add is genuinely absent (v1480's leak and growth allowances, connected load
+// and motor power; v1482's pump-up and draw-down TIME, which `air-receiver`
+// takes as an INPUT and never produces) -- and both reuse the identical
+// relation so the two calculators cannot disagree.
+//
+// TWO MORE INTERNALLY WRONG SPECS, and they fail the SAME way: a threshold
+// comparison stated backwards. Program now twenty-three in one hundred and six.
+//   v1482 computes 9.52 minutes of draw-down cover and then says "if the tool
+//         runs for two minutes at a time, THE RECEIVER IS TOO SMALL". Nine and
+//         a half minutes is nearly five times what a two-minute tool needs,
+//         and its own 25 cu ft figure is the volume required for those two
+//         minutes -- so the 120 cu ft tank is generously sized, not short.
+//   v1483 computes a leak-limited ultimate of 0.20 torr and then says "no
+//         amount of additional pumping time reaches 1 torr". 0.20 torr is
+//         BELOW 1 torr; the target is reachable. It would take a 25 torr-cfm
+//         leak, five times the one given, to block it.
+// ===========================================================================
+
+import { computeRollerChainWearElongation as _v1478 } from "../../calc-millwright.js";
+test("bounds: spec-v1478 computeRollerChainWearElongation -- the span is what makes it readable", () => {
+  const base = { chain_pitch_in: 0.625, pitches_measured: 12, measured_length_in: 7.66, elongation_limit_pct: 1.5, sprocket_teeth: 19 };
+  const r = _v1478(base);
+  assert.ok(Math.abs(r.nominal_length_in - 7.5) < 1e-12);
+  assert.ok(Math.abs(r.elongation_pct - 2.13333) < 1e-4);
+  assert.ok(Math.abs(r.allowable_length_in - 7.6125) < 1e-12);
+  assert.ok(Math.abs(r.remaining_allowance_in + 0.0475) < 1e-9);
+  assert.strictEqual(r.replace, true);
+  // The per-pitch wear is 13.3 thousandths, which is the whole argument for
+  // measuring across twelve.
+  assert.ok(Math.abs(r.per_pitch_wear_in - 0.0133333) < 1e-6);
+  // IDENTITY: a chain measuring exactly nominal has zero elongation, and one
+  // measuring exactly the allowable length sits exactly at the limit.
+  const nom = _v1478({ ...base, measured_length_in: 7.5 });
+  assert.ok(Math.abs(nom.elongation_pct) < 1e-12);
+  assert.strictEqual(nom.replace, false);
+  const atLimit = _v1478({ ...base, measured_length_in: 7.6125 });
+  assert.ok(Math.abs(atLimit.elongation_pct - 1.5) < 1e-9);
+  assert.strictEqual(atLimit.replace, false);
+  assert.ok(Math.abs(atLimit.remaining_allowance_in) < 1e-9);
+  // A looser limit for a low-tooth-count drive keeps the same chain.
+  assert.strictEqual(_v1478({ ...base, elongation_limit_pct: 3.0 }).replace, false);
+  assert.ok("error" in _v1478({ ...base, measured_length_in: 3 }));
+  assert.ok("error" in _v1478({ ...base, chain_pitch_in: 0 }));
+});
+
+import { computeGearReducerServiceFactor as _v1479 } from "../../calc-millwright.js";
+test("bounds: spec-v1479 computeGearReducerServiceFactor -- the thermal rating governs", () => {
+  const base = { transmitted_hp: 25, service_factor: 2.0, catalog_mechanical_hp: 60, catalog_thermal_hp: 42, nameplate_selection_hp: 30 };
+  const r = _v1479(base);
+  assert.strictEqual(r.required_hp, 50);
+  assert.ok(Math.abs(r.mechanical_margin - 1.2) < 1e-12);
+  assert.strictEqual(r.mechanical_passes, true);
+  // It passes mechanically and FAILS overall, which is the point of the tile.
+  assert.strictEqual(r.governing_rating_hp, 42);
+  assert.strictEqual(r.thermal_governs, true);
+  assert.strictEqual(r.passes, false);
+  assert.strictEqual(r.shortfall_hp, 8);
+  assert.ok(/NOT a bigger gearset/.test(r.thermal_verdict));
+  assert.ok(Math.abs(r.nameplate_shortfall_pct - 40) < 1e-9);
+  // IDENTITY: the maximum transmitted power, put back through the service
+  // factor, is exactly the governing rating.
+  assert.ok(Math.abs(r.max_transmitted_hp * base.service_factor - r.governing_rating_hp) < 1e-12);
+  // With no thermal rating entered the mechanical one governs and it passes.
+  const mechOnly = _v1479({ ...base, catalog_thermal_hp: 0 });
+  assert.strictEqual(mechOnly.has_thermal, false);
+  assert.strictEqual(mechOnly.governing_rating_hp, 60);
+  assert.strictEqual(mechOnly.passes, true);
+  // A thermal rating above the mechanical does not govern.
+  assert.strictEqual(_v1479({ ...base, catalog_thermal_hp: 80 }).thermal_governs, false);
+  // A service factor of 1.0 makes the requirement the transmitted power.
+  assert.strictEqual(_v1479({ ...base, service_factor: 1 }).required_hp, 25);
+  assert.ok("error" in _v1479({ ...base, service_factor: 0.8 }));
+});
+
+import { computeAirCompressorCfmSizing as _v1480 } from "../../calc-millwright.js";
+import { computeAirReceiver as _v3air } from "../../calc-hvac.js";
+test("bounds: spec-v1480 computeAirCompressorCfmSizing agrees with the air receiver calculator on demand", () => {
+  const base = { tool1_qty: 2, tool1_cfm: 5, tool1_duty: 0.5, tool2_qty: 1, tool2_cfm: 12, tool2_duty: 0.7, tool3_qty: 1, tool3_cfm: 3, tool3_duty: 0.1, tool4_qty: 0, tool4_cfm: 0, tool4_duty: 0, leak_allowance_pct: 15, growth_allowance_pct: 20, cfm_per_hp: 4 };
+  const r = _v1480(base);
+  assert.strictEqual(r.connected_cfm, 25);
+  assert.ok(Math.abs(r.average_cfm - 13.7) < 1e-9);
+  assert.ok(Math.abs(r.with_leaks_cfm - 15.755) < 1e-9);
+  assert.ok(Math.abs(r.design_cfm - 18.906) < 1e-9);
+  assert.ok(Math.abs(r.motor_hp - 4.7265) < 1e-9);
+  assert.ok(Math.abs(r.connected_hp - 6.25) < 1e-12);
+  assert.ok(Math.abs(r.largest_tool_hp - 3) < 1e-12);
+  // TWO CALCULATORS, ONE DEMAND RELATION. `air-receiver` sums the same
+  // duty-weighted product from a tool list; at the same tools they must agree.
+  const recv = _v3air({ tools: [{ cfm: 5, duty_cycle: 0.5 }, { cfm: 5, duty_cycle: 0.5 }, { cfm: 12, duty_cycle: 0.7 }, { cfm: 3, duty_cycle: 0.1 }], pump_scfm: 20, p_high_psi: 175, p_low_psi: 140 });
+  assert.ok(Math.abs(recv.demand_scfm - r.average_cfm) < 1e-9);
+  // Zero allowances collapse the chain onto the average demand.
+  const bare = _v1480({ ...base, leak_allowance_pct: 0, growth_allowance_pct: 0 });
+  assert.ok(Math.abs(bare.design_cfm - bare.average_cfm) < 1e-12);
+  assert.ok(Math.abs(bare.leak_cfm) < 1e-12);
+  // 100% duty on every tool makes the average equal the connected load.
+  const full = _v1480({ ...base, tool1_duty: 1, tool2_duty: 1, tool3_duty: 1, leak_allowance_pct: 0, growth_allowance_pct: 0 });
+  assert.ok(Math.abs(full.average_cfm - full.connected_cfm) < 1e-12);
+  assert.ok(Math.abs(full.peak_to_average - 1) < 1e-12);
+  assert.ok("error" in _v1480({ ...base, tool1_duty: 1.5 }));
+  assert.ok("error" in _v1480({ ...base, tool1_qty: 0, tool2_qty: 0, tool3_qty: 0 }));
+});
+
+import { computeAirDryerSizing as _v1481 } from "../../calc-millwright.js";
+test("bounds: spec-v1481 computeAirDryerSizing -- the corrections MULTIPLY", () => {
+  const base = { actual_scfm: 200, temp_correction: 0.8, pressure_correction: 1.1, ambient_correction: 0.95, candidate_rated_scfm: 200, purge_fraction: 0.15 };
+  const r = _v1481(base);
+  assert.ok(Math.abs(r.combined_factor - 0.836) < 1e-12);
+  assert.ok(Math.abs(r.required_rated_scfm - 239.2344) < 1e-3);
+  assert.ok(Math.abs(r.candidate_delivers_scfm - 167.2) < 1e-9);
+  assert.strictEqual(r.candidate_ok, false);
+  assert.ok(Math.abs(r.compressor_load_scfm - 235.2941) < 1e-3);
+  assert.ok(Math.abs(r.purge_scfm - 35.2941) < 1e-3);
+  // IDENTITY: a dryer rated exactly at the required figure delivers exactly
+  // the actual flow.
+  const right = _v1481({ ...base, candidate_rated_scfm: r.required_rated_scfm });
+  assert.ok(Math.abs(right.candidate_delivers_scfm - base.actual_scfm) < 1e-9);
+  assert.strictEqual(right.candidate_ok, true);
+  // All corrections at 1.0 means no derate at all.
+  const none = _v1481({ ...base, temp_correction: 1, pressure_correction: 1, ambient_correction: 1, purge_fraction: 0 });
+  assert.ok(Math.abs(none.combined_factor - 1) < 1e-12);
+  assert.ok(Math.abs(none.required_rated_scfm - base.actual_scfm) < 1e-12);
+  assert.ok(Math.abs(none.purge_scfm) < 1e-12);
+  assert.ok(Math.abs(none.compressor_load_scfm - base.actual_scfm) < 1e-12);
+  // The purge is ADDED to the compressor load, never subtracted.
+  assert.ok(r.compressor_load_scfm > base.actual_scfm);
+  assert.ok("error" in _v1481({ ...base, purge_fraction: 1 }));
+  assert.ok("error" in _v1481({ ...base, temp_correction: 0 }));
+});
+
+import { computeReceiverPumpUpTime as _v1482 } from "../../calc-millwright.js";
+test("bounds: spec-v1482 computeReceiverPumpUpTime -- 9.5 minutes of cover is AMPLE for a 2 minute tool", () => {
+  const base = { receiver_volume_ft3: 120, fill_start_psig: 0, fill_end_psig: 175, compressor_scfm: 42, cut_out_psig: 175, cut_in_psig: 140, net_demand_scfm: 30, required_cover_minutes: 2 };
+  const r = _v1482(base);
+  assert.ok(Math.abs(r.draw_down_minutes - 9.5238) < 1e-3);
+  assert.ok(Math.abs(r.draw_down_seconds - 571.4286) < 1e-3);
+  assert.strictEqual(r.band_psi, 35);
+  // THE CORRECTION: the spec called this receiver "too small" for a two-minute
+  // tool. It covers nearly five times that, and 25.2 cu ft would have done.
+  assert.strictEqual(r.covers, true);
+  assert.ok(/AMPLE/.test(r.cover_verdict));
+  assert.ok(Math.abs(r.receiver_required_ft3 - 25.2) < 1e-9);
+  assert.ok(r.receiver_required_ft3 < base.receiver_volume_ft3);
+  assert.ok(r.draw_down_minutes > 4 * base.required_cover_minutes);
+  // The spec's own 240 cu ft fill example.
+  assert.ok(Math.abs(_v1482({ ...base, receiver_volume_ft3: 240 }).pump_up_minutes - 68.0272) < 1e-3);
+  // IDENTITY: the required receiver, put back in, delivers exactly the cover.
+  const sized = _v1482({ ...base, receiver_volume_ft3: r.receiver_required_ft3 });
+  assert.ok(Math.abs(sized.draw_down_minutes - base.required_cover_minutes) < 1e-9);
+  // Doubling the BAND doubles the usable air and the cover, from the same tank.
+  const wide = _v1482({ ...base, cut_in_psig: 105 });
+  assert.ok(Math.abs(wide.band_psi - 70) < 1e-12);
+  assert.ok(Math.abs(wide.usable_free_air_ft3 - 2 * r.usable_free_air_ft3) < 1e-9);
+  assert.ok(Math.abs(wide.draw_down_minutes - 2 * r.draw_down_minutes) < 1e-9);
+  // A genuinely short receiver reports SHORT and names the tank needed.
+  const small = _v1482({ ...base, receiver_volume_ft3: 20 });
+  assert.strictEqual(small.covers, false);
+  assert.ok(/SHORT/.test(small.cover_verdict));
+  assert.ok("error" in _v1482({ ...base, receiver_volume_ft3: 0 }));
+});
+
+import { computeVacuumEvacuationTime as _v1483 } from "../../calc-millwright.js";
+test("bounds: spec-v1483 computeVacuumEvacuationTime -- a 0.20 torr ultimate DOES reach 1 torr", () => {
+  const base = { chamber_volume_ft3: 15, pump_speed_cfm: 25, start_pressure_torr: 760, target_pressure_torr: 1, leak_rate_torr_cfm: 5, conductance_efficiency: 1 };
+  const r = _v1483(base);
+  assert.ok(Math.abs(r.evacuation_minutes - 3.98) < 1e-2);
+  assert.ok(Math.abs(r.minutes_per_decade - 1.38155) < 1e-4);
+  assert.ok(Math.abs(r.decades - 2.88081) < 1e-4);
+  assert.ok(Math.abs(r.ultimate_pressure_torr - 0.2) < 1e-12);
+  // THE CORRECTION: the spec said no amount of pumping reaches 1 torr. The
+  // ultimate is 0.20 torr, five times BELOW the target.
+  assert.strictEqual(r.reaches_target, true);
+  assert.ok(r.ultimate_pressure_torr < base.target_pressure_torr);
+  assert.ok(/is reachable/.test(r.leak_verdict));
+  // It would take a 25 torr-cfm leak to block it -- and at exactly that leak
+  // the ultimate IS the target.
+  assert.ok(Math.abs(r.blocking_leak_torr_cfm - 25) < 1e-12);
+  const blocked = _v1483({ ...base, leak_rate_torr_cfm: 30 });
+  assert.strictEqual(blocked.reaches_target, false);
+  assert.ok(/NO amount/.test(blocked.leak_verdict));
+  // IDENTITY: the total time is exactly the decades times the per-decade time.
+  assert.ok(Math.abs(r.evacuation_minutes - r.decades * r.minutes_per_decade) < 1e-9);
+  // Each decade costs the same: 760 -> 76 takes as long as 76 -> 7.6.
+  const first = _v1483({ ...base, start_pressure_torr: 760, target_pressure_torr: 76, leak_rate_torr_cfm: 0 });
+  const second = _v1483({ ...base, start_pressure_torr: 76, target_pressure_torr: 7.6, leak_rate_torr_cfm: 0 });
+  assert.ok(Math.abs(first.evacuation_minutes - second.evacuation_minutes) < 1e-12);
+  assert.ok(Math.abs(first.evacuation_minutes - r.minutes_per_decade) < 1e-9);
+  // Halving the line conductance doubles the time and doubles the ultimate.
+  const choked = _v1483({ ...base, conductance_efficiency: 0.5 });
+  assert.ok(Math.abs(choked.evacuation_minutes - 2 * r.evacuation_minutes) < 1e-9);
+  assert.ok(Math.abs(choked.ultimate_pressure_torr - 2 * r.ultimate_pressure_torr) < 1e-12);
+  assert.ok("error" in _v1483({ ...base, target_pressure_torr: 800 }));
+});

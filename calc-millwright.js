@@ -675,3 +675,387 @@ MILLWRIGHT_RENDERERS["single-plane-field-balance"] = _simpleRenderer({
   ],
   compute: computeSinglePlaneFieldBalance,
 });
+
+// ============ spec-v1478: roller chain wear elongation ============
+
+// dims: in { chain_pitch_in: L, pitches_measured: dimensionless, measured_length_in: L, elongation_limit_pct: dimensionless, sprocket_teeth: dimensionless } out: { nominal_length_in: L, elongation_pct: dimensionless, elongation_in: L, allowable_length_in: L, remaining_allowance_in: L }
+export function computeRollerChainWearElongation({ chain_pitch_in = 0, pitches_measured = 0, measured_length_in = 0, elongation_limit_pct = 1.5, sprocket_teeth = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(chain_pitch_in > 0)) return { error: "Chain pitch must be positive (in)." };
+  if (!(pitches_measured >= 1)) return { error: "Measure across at least one pitch -- and twelve or more is what makes the reading resolvable." };
+  if (!(measured_length_in > 0)) return { error: "The measured length must be positive (in)." };
+  if (!(elongation_limit_pct > 0)) return { error: "The elongation limit must be positive (percent)." };
+  if (sprocket_teeth < 0) return { error: "Sprocket tooth count cannot be negative." };
+  const nominal_length_in = chain_pitch_in * pitches_measured;
+  if (!(measured_length_in >= nominal_length_in * 0.9)) return { error: "The measured length is far below nominal: check the pitch, the pitch count, and that the measurement runs pin centre to pin centre." };
+  const elongation_in = measured_length_in - nominal_length_in;
+  const elongation_pct = elongation_in / nominal_length_in * 100;
+  const allowable_length_in = nominal_length_in * (1 + elongation_limit_pct / 100);
+  const remaining_allowance_in = allowable_length_in - measured_length_in;
+  // Measuring one pitch instead of twelve is why the span matters: the wear
+  // per joint is below what a tape in a plant can resolve.
+  const per_pitch_wear_in = elongation_in / pitches_measured;
+  const outs = [nominal_length_in, elongation_pct, elongation_in, allowable_length_in, remaining_allowance_in];
+  if (!outs.every(Number.isFinite)) return { error: "Chain elongation math is not a finite value." };
+  const replace = elongation_pct > elongation_limit_pct;
+  return {
+    nominal_length_in, measured_length_in, elongation_in, elongation_pct,
+    allowable_length_in, remaining_allowance_in, per_pitch_wear_in,
+    elongation_limit_pct, sprocket_teeth, pitches_measured, chain_pitch_in, replace,
+    verdict: replace
+      ? "REPLACE: " + fmt(elongation_pct, 2) + "% against a " + fmt(elongation_limit_pct, 2) + "% limit, " + fmt(-remaining_allowance_in, 3) + " in past the allowable length -- and inspect the sprockets, because a chain this far gone has probably hooked the teeth"
+      : "keep: " + fmt(elongation_pct, 2) + "% against a " + fmt(elongation_limit_pct, 2) + "% limit, with " + fmt(remaining_allowance_in, 3) + " in of allowance left",
+    span_verdict: "measuring ONE pitch would read " + fmt(per_pitch_wear_in * 1000, 1) + " thousandths of wear, which no tape in a plant resolves -- the " + fmt(pitches_measured, 0) + " pitch span is what makes it readable",
+    note: "Roller chain does not stretch, it WEARS: the pin and bushing clearances grow and the chain gets longer, so the replacement decision is a tape measure over a known number of pitches and one percentage. Measure across the run with the chain pulled taut, pin centre to pin centre, and compare against pitch times the count. MEASURING OVER TWELVE OR MORE PITCHES RATHER THAN ONE IS THE WHOLE ACCURACY TRICK -- the wear per joint is tiny and only accumulates into something a tape can read over a span. A #50 chain at 0.625 in pitch reading 7.66 in over twelve pitches is 2.13% elongated; the same chain measured over ONE pitch would show 13.3 thousandths of difference, which nothing in a plant will resolve reliably. The 1.5% figure is not arbitrary. A chain riding a sprocket is a polygon, and as the pitch grows the chain contacts fewer teeth and rides higher up the flanks; past roughly 1.5% on a normal tooth count it begins to jump, and the sprocket teeth wear into a hooked profile. Once that happens the sprocket is scrap too, and a new chain on a hooked sprocket wears out in a fraction of its life -- which is why chain and sprockets are replaced as a SET and why a replace verdict here is also an instruction to inspect the teeth. The threshold rises for sprockets with many teeth, where the chain has more engagement to lose before it climbs, and 3.0% is accepted on large, slow, low-tooth-count drives; the limit is entered rather than fixed for that reason. This is one measurement against one limit. It does not inspect the sprockets, which is the other half of the decision and which no length reading reveals; it does not evaluate lubrication, which is what actually determines the wear rate and whose failure is the usual root cause; and it does not address elongation from a single overload event, chain fatigue, or plate cracking, none of which shows as elongation and any of which can fail a chain that measures fine. It does not size a chain or select a replacement. The chain and sprocket manufacturers' data and the drive designer govern.",
+  };
+}
+const rollerChainWearElongationExample = { inputs: { chain_pitch_in: 0.625, pitches_measured: 12, measured_length_in: 7.66, elongation_limit_pct: 1.5, sprocket_teeth: 19 } };
+MILLWRIGHT_RENDERERS["roller-chain-wear-elongation"] = _simpleRenderer({
+  citation: "Citation: the roller chain wear-elongation check by name -- nominal length = pitch x the number of pitches measured, elongation = (measured - nominal) / nominal, and the allowable length = nominal x (1 + the limit). The 1.5% replacement figure for a normal hardened-tooth sprocket and the 3.0% accepted on large, slow, low-tooth-count drives are standard practice and are ENTERED, not fixed. Chain and sprockets are replaced as a set. The chain and sprocket manufacturers' data and the drive designer govern.",
+  example: rollerChainWearElongationExample.inputs,
+  fields: [
+    { key: "chain_pitch_in", label: "Chain pitch (in)", kind: "number", default: 0.625 },
+    { key: "pitches_measured", label: "Pitches measured across", kind: "number", default: 12 },
+    { key: "measured_length_in", label: "Measured length pin centre to pin centre (in)", kind: "number", default: 7.66 },
+    { key: "elongation_limit_pct", label: "Elongation limit (percent)", kind: "number", default: 1.5 },
+    { key: "sprocket_teeth", label: "Sprocket teeth (0 to skip)", kind: "number", default: 19 },
+  ],
+  outputs: [
+    { key: "n", id: "rcw-out-n", label: "Nominal length", value: (r) => fmt(r.nominal_length_in, 4) + " in across " + fmt(r.pitches_measured, 0) + " pitches" },
+    { key: "e", id: "rcw-out-e", label: "Elongation", value: (r) => fmt(r.elongation_pct, 2) + "%, which is " + fmt(r.elongation_in, 3) + " in over the span" },
+    { key: "a", id: "rcw-out-a", label: "Allowable length", value: (r) => fmt(r.allowable_length_in, 4) + " in at the " + fmt(r.elongation_limit_pct, 2) + "% limit" },
+    { key: "v", id: "rcw-out-v", label: "Verdict", value: (r) => r.verdict },
+    { key: "s", id: "rcw-out-s", label: "Why the span matters", value: (r) => r.span_verdict },
+    { key: "z", id: "rcw-out-z", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRollerChainWearElongation,
+});
+
+// ============ spec-v1479: gear reducer service factor ============
+
+// dims: in { transmitted_hp: M L^2 T^-3, service_factor: dimensionless, catalog_mechanical_hp: M L^2 T^-3, catalog_thermal_hp: M L^2 T^-3, nameplate_selection_hp: M L^2 T^-3 } out: { required_hp: M L^2 T^-3, mechanical_margin: dimensionless, governing_rating_hp: M L^2 T^-3, shortfall_hp: M L^2 T^-3, max_transmitted_hp: M L^2 T^-3 }
+export function computeGearReducerServiceFactor({ transmitted_hp = 0, service_factor = 1, catalog_mechanical_hp = 0, catalog_thermal_hp = 0, nameplate_selection_hp = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(transmitted_hp > 0)) return { error: "Transmitted power must be positive (hp)." };
+  if (!(service_factor >= 1)) return { error: "The service factor must be at least 1.0 -- it converts an average transmitted power into the peak the teeth and bearings actually see." };
+  if (!(catalog_mechanical_hp > 0)) return { error: "The catalog mechanical rating must be positive (hp)." };
+  if (catalog_thermal_hp < 0) return { error: "The catalog thermal rating cannot be negative (hp)." };
+  if (nameplate_selection_hp < 0) return { error: "The nameplate-only selection cannot be negative (hp)." };
+  const required_hp = transmitted_hp * service_factor;
+  const mechanical_margin = catalog_mechanical_hp / required_hp;
+  const mechanical_passes = catalog_mechanical_hp >= required_hp;
+  // A gearbox has TWO independent ratings, and on a continuously running unit
+  // the thermal one is frequently the lower.
+  const has_thermal = catalog_thermal_hp > 0;
+  const governing_rating_hp = has_thermal ? Math.min(catalog_mechanical_hp, catalog_thermal_hp) : catalog_mechanical_hp;
+  const thermal_governs = has_thermal && catalog_thermal_hp < catalog_mechanical_hp;
+  const governing_margin = governing_rating_hp / required_hp;
+  const passes = governing_rating_hp >= required_hp;
+  const shortfall_hp = passes ? 0 : required_hp - governing_rating_hp;
+  const max_transmitted_hp = governing_rating_hp / service_factor;
+  const nameplate_shortfall_pct = nameplate_selection_hp > 0
+    ? (required_hp - nameplate_selection_hp) / required_hp * 100 : null;
+  const outs = [required_hp, mechanical_margin, governing_rating_hp, max_transmitted_hp];
+  if (!outs.every(Number.isFinite)) return { error: "Service factor math is not a finite value." };
+  return {
+    required_hp, service_factor, transmitted_hp,
+    mechanical_margin, mechanical_passes, governing_rating_hp, governing_margin,
+    thermal_governs, has_thermal, passes, shortfall_hp, max_transmitted_hp,
+    catalog_mechanical_hp, catalog_thermal_hp, nameplate_shortfall_pct,
+    verdict: passes
+      ? "PASSES with a margin of " + fmt(governing_margin, 2) + " on the governing " + (thermal_governs ? "THERMAL" : "mechanical") + " rating"
+      : "FAILS by " + fmt(shortfall_hp, 1) + " hp on the governing " + (thermal_governs ? "THERMAL" : "mechanical") + " rating",
+    thermal_verdict: !has_thermal
+      ? "(no thermal rating entered -- and on a continuously running unit it is frequently the LOWER of the two, so it is worth finding)"
+      : thermal_governs
+        ? "the THERMAL rating of " + fmt(catalog_thermal_hp, 1) + " hp governs, below the " + fmt(catalog_mechanical_hp, 1) + " hp mechanical -- the fix is a cooling fan, an oil cooler, or a larger case, NOT a bigger gearset"
+        : "the mechanical rating governs; the " + fmt(catalog_thermal_hp, 1) + " hp thermal rating has room",
+    nameplate_verdict: nameplate_shortfall_pct === null
+      ? "(no nameplate-only selection entered)"
+      : nameplate_shortfall_pct > 0
+        ? "selecting on the motor nameplate would have bought " + fmt(nameplate_selection_hp, 1) + " hp, which is " + fmt(nameplate_shortfall_pct, 0) + "% under the " + fmt(required_hp, 1) + " hp actually required"
+        : "the nameplate-only selection happens to cover the requirement here, which the service factor is what proves",
+    note: "A 25 hp motor does not need a 25 hp gearbox. It needs a gearbox whose catalog rating covers the transmitted power multiplied by a service factor, and choosing on motor nameplate alone is the standard way a reducer fails in eighteen months. The service factor is an empirical multiplier that converts an average transmitted power into the PEAK the gear teeth and bearings actually see, and it has three inputs: the character of the prime mover, since an electric motor is smooth and a single-cylinder engine is not; the shock character of the driven machine, since a centrifugal pump is uniform and a jaw crusher is heavy shock; and the duty hours, because a reducer running continuously has no time to shed heat or recover. Factors near 1.0 apply to a uniform load on short duty and climb past 2.0 for heavy shock around the clock. A 25 hp motor driving a reciprocating compressor 24 hours a day at a service factor of 2.00 needs a 50 hp catalog rating, and a 60 hp box passes with a margin of 1.20. THE TRAP IS THE THERMAL RATING. A gearbox has two INDEPENDENT ratings -- mechanical, set by the teeth and bearings, and thermal, set by how much heat the case can shed at ambient -- and on continuously running units the thermal rating is frequently the lower of the two. That same 60 hp box carrying a 42 hp thermal rating at 104 degF ambient is 8 hp short, and the fix is a cooling fan, an oil cooler, or a larger case rather than a bigger gearset, because the gears were never the problem. No service factor catches that: it is a separate check against a separate number, which is why both are entered here and the lower governs. The service factor itself is ENTERED and not derived, because published tables differ between manufacturers and between standards, and the classification of a driven machine is a judgment the manufacturer's table makes rather than a formula. This does not select a reducer, compute a ratio, or evaluate the gearing, bearings, seals, or shaft loads -- an overhung load from a chain or belt drive is a common cause of reducer failure that no power rating addresses. It does not check the thermal rating against a specific ambient, which needs the manufacturer's own derating curve, and it does not address lubrication, which is what determines whether either rating is achieved. The gear reducer manufacturer's catalog ratings, service factor tables, and thermal derating data govern.",
+  };
+}
+const gearReducerServiceFactorExample = { inputs: { transmitted_hp: 25, service_factor: 2.0, catalog_mechanical_hp: 60, catalog_thermal_hp: 42, nameplate_selection_hp: 30 } };
+MILLWRIGHT_RENDERERS["gear-reducer-service-factor"] = _simpleRenderer({
+  citation: "Citation: the gear reducer service-factor selection by name -- required rating = transmitted power x the service factor for the driver character, driven-machine shock class, and duty hours -- with the catalog MECHANICAL and THERMAL ratings compared separately and the LOWER governing. The service factor is entered because published tables differ between manufacturers and standards. The gear reducer manufacturer's catalog ratings, service factor tables, and thermal derating data govern.",
+  example: gearReducerServiceFactorExample.inputs,
+  fields: [
+    { key: "transmitted_hp", label: "Transmitted power (hp)", kind: "number", default: 25 },
+    { key: "service_factor", label: "Service factor from the manufacturer's table", kind: "number", default: 2.0 },
+    { key: "catalog_mechanical_hp", label: "Catalog mechanical rating (hp)", kind: "number", default: 60 },
+    { key: "catalog_thermal_hp", label: "Catalog thermal rating at ambient (hp, 0 to skip)", kind: "number", default: 42 },
+    { key: "nameplate_selection_hp", label: "What a nameplate-only choice would buy (hp, 0 to skip)", kind: "number", default: 30 },
+  ],
+  outputs: [
+    { key: "r", id: "grs-out-r", label: "Required catalog rating", value: (r) => fmt(r.required_hp, 1) + " hp -- " + fmt(r.transmitted_hp, 1) + " hp transmitted times a service factor of " + fmt(r.service_factor, 2) },
+    { key: "m", id: "grs-out-m", label: "Against the mechanical rating", value: (r) => fmt(r.catalog_mechanical_hp, 1) + " hp, a margin of " + fmt(r.mechanical_margin, 2) + " -- " + (r.mechanical_passes ? "passes" : "FAILS") },
+    { key: "t", id: "grs-out-t", label: "The thermal trap", value: (r) => r.thermal_verdict },
+    { key: "v", id: "grs-out-v", label: "Verdict", value: (r) => r.verdict },
+    { key: "x", id: "grs-out-x", label: "Most this unit will carry", value: (r) => fmt(r.max_transmitted_hp, 1) + " hp of transmitted power at this service factor" },
+    { key: "p", id: "grs-out-p", label: "Choosing on the nameplate", value: (r) => r.nameplate_verdict },
+    { key: "n", id: "grs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGearReducerServiceFactor,
+});
+
+// ============ spec-v1480: air compressor CFM and duty sizing ============
+
+// dims: in { tool1_qty: dimensionless, tool1_cfm: L^3 / T, tool1_duty: dimensionless, tool2_qty: dimensionless, tool2_cfm: L^3 / T, tool2_duty: dimensionless, tool3_qty: dimensionless, tool3_cfm: L^3 / T, tool3_duty: dimensionless, tool4_qty: dimensionless, tool4_cfm: L^3 / T, tool4_duty: dimensionless, leak_allowance_pct: dimensionless, growth_allowance_pct: dimensionless, cfm_per_hp: L^3 / T } out: { connected_cfm: L^3 / T, average_cfm: L^3 / T, with_leaks_cfm: L^3 / T, design_cfm: L^3 / T, motor_hp: M L^2 T^-3 }
+export function computeAirCompressorCfmSizing({ tool1_qty = 0, tool1_cfm = 0, tool1_duty = 0, tool2_qty = 0, tool2_cfm = 0, tool2_duty = 0, tool3_qty = 0, tool3_cfm = 0, tool3_duty = 0, tool4_qty = 0, tool4_cfm = 0, tool4_duty = 0, leak_allowance_pct = 15, growth_allowance_pct = 20, cfm_per_hp = 4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const tools = [[tool1_qty, tool1_cfm, tool1_duty], [tool2_qty, tool2_cfm, tool2_duty], [tool3_qty, tool3_cfm, tool3_duty], [tool4_qty, tool4_cfm, tool4_duty]];
+  if (tools.some(([q, c, d]) => q < 0 || c < 0 || d < 0)) return { error: "Tool quantity, CFM, and duty cycle cannot be negative." };
+  if (tools.some(([, , d]) => d > 1)) return { error: "Duty cycle is a fraction between 0 and 1 -- a blow gun is about 0.10, an assembly-line impact wrench about 0.50." };
+  const active = tools.filter(([q, c]) => q > 0 && c > 0);
+  if (active.length === 0) return { error: "Enter at least one tool with a quantity and a rated CFM." };
+  if (leak_allowance_pct < 0 || growth_allowance_pct < 0) return { error: "Leak and growth allowances cannot be negative (percent)." };
+  if (!(cfm_per_hp > 0)) return { error: "The CFM per horsepower figure must be positive (about 4 for a two-stage unit at 100 psig)." };
+  // A tool's rated CFM is its consumption while the trigger is DOWN, and
+  // almost nothing runs at 100% duty. The same duty-weighted sum the air
+  // receiver calculator uses, so the two cannot disagree about demand.
+  const connected_cfm = active.reduce((a, [q, c]) => a + q * c, 0);
+  const average_cfm = active.reduce((a, [q, c, d]) => a + q * c * d, 0);
+  const with_leaks_cfm = average_cfm * (1 + leak_allowance_pct / 100);
+  const design_cfm = with_leaks_cfm * (1 + growth_allowance_pct / 100);
+  const motor_hp = design_cfm / cfm_per_hp;
+  const peak_to_average = average_cfm > 0 ? connected_cfm / average_cfm : 0;
+  const connected_hp = connected_cfm / cfm_per_hp;
+  const largest_tool_cfm = active.reduce((a, [, c]) => (c > a ? c : a), active[0][1]);
+  const largest_tool_hp = largest_tool_cfm / cfm_per_hp;
+  const oversize_ratio = design_cfm > 0 ? connected_cfm / design_cfm : 0;
+  const outs = [connected_cfm, average_cfm, with_leaks_cfm, design_cfm, motor_hp, peak_to_average];
+  if (!outs.every(Number.isFinite)) return { error: "Compressor sizing math is not a finite value." };
+  return {
+    connected_cfm, average_cfm, with_leaks_cfm, design_cfm, motor_hp,
+    peak_to_average, connected_hp, largest_tool_cfm, largest_tool_hp,
+    oversize_ratio, leak_allowance_pct, growth_allowance_pct, cfm_per_hp, tool_count: active.length,
+    leak_cfm: with_leaks_cfm - average_cfm, growth_cfm: design_cfm - with_leaks_cfm,
+    oversize_verdict: "sizing to the connected load buys " + fmt(connected_hp, 1) + " hp, " + fmt(oversize_ratio, 2) + " times what the shop needs -- and an oversized compressor short-cycles and wears itself out",
+    undersize_verdict: "sizing to the single largest tool buys " + fmt(largest_tool_hp, 1) + " hp, which starves the moment two things run at once",
+    note: "Compressor sizing from the sum of tool nameplate ratings buys a machine two or three times too big, and sizing from the largest tool buys one that cannot keep up. A tool's rated CFM is its consumption WHILE THE TRIGGER IS DOWN, and almost nothing runs at 100% duty: an impact wrench on an assembly line might see 50%, a blow gun sees 10%. Weighting each tool by its realistic duty and summing is what produces a compressor that neither short-cycles nor starves, and the receiver is what absorbs the difference between average demand and instantaneous peaks. A shop with two impact wrenches at 5 cfm and 50% duty, a sander at 12 cfm and 70%, and a blow gun at 3 cfm and 10% averages 13.70 cfm -- against a connected load of 25 cfm, which would buy 6.3 hp for a shop that needs about 4.7. THE LEAK ALLOWANCE IS THE HONEST PART. A typical industrial system leaks 10 to 20% of its output and a neglected one leaks 30% or more, so a compressor sized with no leak budget is undersized on the day it is installed. It is carried explicitly here rather than buried, because a leak allowance you can see is a leak allowance you might fix -- and fixing it is far cheaper than the horsepower it buys. The duty-weighted demand relation is the same one the air receiver calculator uses, so the two cannot disagree about what a set of tools actually draws. This sizes on tool demand the user supplies, and every input is an estimate: duty cycles in particular are guesses until somebody logs them, and a metered week beats any table. It does not correct rated CFM to the actual working pressure, which matters because a tool rated at 90 psig draws more at 100; it does not correct for altitude, which reduces the mass a compressor delivers at the same volumetric rating; and it does not address the distribution piping, whose pressure drop can starve a tool the compressor is perfectly capable of feeding. It does not size the receiver, the dryer, or the aftercooler, select between reciprocating, rotary screw and centrifugal, or evaluate duty rating -- a machine that can make the CFM but is not rated for continuous duty will not last. The compressor and tool manufacturers' data govern.",
+  };
+}
+const airCompressorCfmSizingExample = { inputs: { tool1_qty: 2, tool1_cfm: 5, tool1_duty: 0.5, tool2_qty: 1, tool2_cfm: 12, tool2_duty: 0.7, tool3_qty: 1, tool3_cfm: 3, tool3_duty: 0.1, tool4_qty: 0, tool4_cfm: 0, tool4_duty: 0, leak_allowance_pct: 15, growth_allowance_pct: 20, cfm_per_hp: 4 } };
+MILLWRIGHT_RENDERERS["air-compressor-cfm-sizing"] = _simpleRenderer({
+  citation: "Citation: the duty-weighted compressed-air demand build-up by name -- average demand = the sum over tools of quantity x rated CFM x duty cycle (the same relation the air receiver calculator uses), then multiplied by a leak allowance and a future-growth allowance, with motor power approximated at about 4 CFM per horsepower for a two-stage unit at 100 psig. Rated CFM is consumption with the trigger down. The compressor and tool manufacturers' data govern.",
+  example: airCompressorCfmSizingExample.inputs,
+  fields: [
+    { key: "tool1_qty", label: "Tool 1 quantity", kind: "number", default: 2 },
+    { key: "tool1_cfm", label: "Tool 1 rated CFM at working pressure", kind: "number", default: 5 },
+    { key: "tool1_duty", label: "Tool 1 duty cycle (0-1)", kind: "number", default: 0.5 },
+    { key: "tool2_qty", label: "Tool 2 quantity (0 if unused)", kind: "number", default: 1 },
+    { key: "tool2_cfm", label: "Tool 2 rated CFM", kind: "number", default: 12 },
+    { key: "tool2_duty", label: "Tool 2 duty cycle (0-1)", kind: "number", default: 0.7 },
+    { key: "tool3_qty", label: "Tool 3 quantity (0 if unused)", kind: "number", default: 1 },
+    { key: "tool3_cfm", label: "Tool 3 rated CFM", kind: "number", default: 3 },
+    { key: "tool3_duty", label: "Tool 3 duty cycle (0-1)", kind: "number", default: 0.1 },
+    { key: "tool4_qty", label: "Tool 4 quantity (0 if unused)", kind: "number", default: 0 },
+    { key: "tool4_cfm", label: "Tool 4 rated CFM", kind: "number", default: 0 },
+    { key: "tool4_duty", label: "Tool 4 duty cycle (0-1)", kind: "number", default: 0 },
+    { key: "leak_allowance_pct", label: "Leak allowance (percent)", kind: "number", default: 15 },
+    { key: "growth_allowance_pct", label: "Future growth allowance (percent)", kind: "number", default: 20 },
+    { key: "cfm_per_hp", label: "CFM per horsepower at system pressure", kind: "number", default: 4 },
+  ],
+  outputs: [
+    { key: "a", id: "acs-out-a", label: "Duty-weighted average demand", value: (r) => fmt(r.average_cfm, 2) + " cfm across " + fmt(r.tool_count, 0) + " tool types -- against a connected load of " + fmt(r.connected_cfm, 1) + " cfm" },
+    { key: "l", id: "acs-out-l", label: "With leaks", value: (r) => fmt(r.with_leaks_cfm, 2) + " cfm -- the " + fmt(r.leak_allowance_pct, 0) + "% allowance is " + fmt(r.leak_cfm, 2) + " cfm you could fix instead of buy" },
+    { key: "d", id: "acs-out-d", label: "Design CFM", value: (r) => fmt(r.design_cfm, 2) + " cfm after " + fmt(r.growth_allowance_pct, 0) + "% growth" },
+    { key: "m", id: "acs-out-m", label: "Motor", value: (r) => fmt(r.motor_hp, 1) + " hp at " + fmt(r.cfm_per_hp, 1) + " cfm per hp" },
+    { key: "o", id: "acs-out-o", label: "If you sized on the connected load", value: (r) => r.oversize_verdict },
+    { key: "u", id: "acs-out-u", label: "If you sized on the biggest tool", value: (r) => r.undersize_verdict },
+    { key: "n", id: "acs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAirCompressorCfmSizing,
+});
+
+// ============ spec-v1482: air receiver pump-up and draw-down time ============
+
+// dims: in { receiver_volume_ft3: L^3, fill_start_psig: M L^-1 T^-2, fill_end_psig: M L^-1 T^-2, compressor_scfm: L^3 / T, cut_out_psig: M L^-1 T^-2, cut_in_psig: M L^-1 T^-2, net_demand_scfm: L^3 / T, required_cover_minutes: T } out: { pump_up_minutes: T, draw_down_minutes: T, usable_free_air_ft3: L^3, receiver_required_ft3: L^3, band_psi: M L^-1 T^-2 }
+export function computeReceiverPumpUpTime({ receiver_volume_ft3 = 0, fill_start_psig = 0, fill_end_psig = 0, compressor_scfm = 0, cut_out_psig = 0, cut_in_psig = 0, net_demand_scfm = 0, required_cover_minutes = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ATM = 14.7;
+  if (!(receiver_volume_ft3 > 0)) return { error: "Receiver volume must be positive (cu ft)." };
+  if (fill_start_psig < 0 || fill_end_psig < 0 || cut_out_psig < 0 || cut_in_psig < 0) return { error: "Pressures cannot be negative (psig)." };
+  if (compressor_scfm < 0 || net_demand_scfm < 0 || required_cover_minutes < 0) return { error: "Flows and the required cover cannot be negative." };
+  const has_fill = fill_end_psig > fill_start_psig && compressor_scfm > 0;
+  const pump_up_minutes = has_fill
+    ? receiver_volume_ft3 * (fill_end_psig - fill_start_psig) / (ATM * compressor_scfm) : null;
+  // The useful air is the pressure BAND, not the tank: widening the band from
+  // 20 to 40 psi doubles the usable storage out of the same vessel.
+  const band_psi = cut_out_psig - cut_in_psig;
+  const has_band = band_psi > 0;
+  const usable_free_air_ft3 = has_band ? receiver_volume_ft3 * band_psi / ATM : null;
+  const draw_down_minutes = has_band && net_demand_scfm > 0
+    ? receiver_volume_ft3 * band_psi / (ATM * net_demand_scfm) : null;
+  // Same relation the air receiver sizing calculator uses, rearranged: a
+  // receiver for a stated demand over a stated duration.
+  const receiver_required_ft3 = has_band && net_demand_scfm > 0 && required_cover_minutes > 0
+    ? required_cover_minutes * ATM * net_demand_scfm / band_psi : null;
+  const outs = [receiver_volume_ft3];
+  if (!outs.every(Number.isFinite)) return { error: "Receiver time math is not a finite value." };
+  if (pump_up_minutes === null && draw_down_minutes === null) return { error: "Enter a fill (a rising pressure pair and a compressor flow) or a draw-down (a cut-out above a cut-in, and a net demand)." };
+  const covers = draw_down_minutes !== null && required_cover_minutes > 0 ? draw_down_minutes >= required_cover_minutes : null;
+  return {
+    pump_up_minutes, draw_down_minutes, usable_free_air_ft3, receiver_required_ft3,
+    band_psi, receiver_volume_ft3, net_demand_scfm, required_cover_minutes,
+    draw_down_seconds: draw_down_minutes === null ? null : draw_down_minutes * 60,
+    covers,
+    cover_verdict: draw_down_minutes === null
+      ? "(no draw-down entered)"
+      : required_cover_minutes <= 0
+        ? fmt(draw_down_minutes, 2) + " minutes of cover, and no required duration entered to judge it against"
+        : covers
+          ? fmt(draw_down_minutes, 2) + " minutes of cover against the " + fmt(required_cover_minutes, 2) + " minutes required -- AMPLE, and " + fmt(receiver_required_ft3, 1) + " cu ft would have done it against the " + fmt(receiver_volume_ft3, 1) + " cu ft fitted"
+          : "SHORT: " + fmt(draw_down_minutes, 2) + " minutes of cover against the " + fmt(required_cover_minutes, 2) + " minutes required -- and the fix is " + fmt(receiver_required_ft3, 1) + " cu ft of tank, not a bigger compressor",
+    band_verdict: !has_band
+      ? "(no pressure band entered)"
+      : "the usable air is the BAND, not the tank: " + fmt(usable_free_air_ft3, 1) + " cu ft of free air out of a " + fmt(receiver_volume_ft3, 1) + " cu ft vessel over " + fmt(band_psi, 1) + " psi. Double the band and you double the storage, free",
+    note: "A receiver is a buffer, and the two numbers that describe it are how long the compressor takes to fill it and how long the plant can draw from it before pressure falls to the cut-in. Both come from one relation, which is just the ideal gas law in shop units: the free air stored is the volume times the pressure band in atmospheres, and 14.7 converts psig to atmospheres. THE CONSEQUENCE PEOPLE MISS IS THAT A RECEIVER'S USEFULNESS DEPENDS ON THE BAND YOU ARE WILLING TO GIVE UP, NOT ON THE TANK. Widening the cut-in to cut-out band from 20 to 40 psi doubles the usable storage out of the same vessel -- free capacity, paid for in slightly lower minimum pressure. That is what makes the draw-down form the useful one. A shop with a sandblaster or a large intermittent tool does not need a compressor that covers the peak; it needs a receiver big enough to cover the peak's DURATION while the compressor catches up between uses, and sizing that way is far cheaper than sizing the compressor to the peak. A 120 cu ft receiver on a 35 psi band supplying a tool that draws 30 scfm more than the compressor makes gives 9.52 minutes of cover -- so a tool that runs two minutes at a time is amply covered, and only about 25 cu ft of tank would have been needed for it. The receiver-sizing form is the same relation the air receiver calculator uses, rearranged, so the two cannot disagree. This is ideal-gas arithmetic at constant temperature. Real filling heats the air, so a receiver that reads its cut-out pressure hot will fall back as it cools and the compressor will restart -- pump-up times run slightly optimistic for that reason. It does not size the compressor, evaluate the piping between compressor and receiver, or address the drain, relief valve, and pressure vessel code requirements that a receiver carries; an air receiver is a pressure vessel with inspection obligations in most jurisdictions. It does not account for the storage in the distribution piping itself, which on a large system is real and sometimes substantial. The compressor and receiver manufacturers' data and the applicable pressure vessel code govern.",
+  };
+}
+const receiverPumpUpTimeExample = { inputs: { receiver_volume_ft3: 120, fill_start_psig: 0, fill_end_psig: 175, compressor_scfm: 42, cut_out_psig: 175, cut_in_psig: 140, net_demand_scfm: 30, required_cover_minutes: 2 } };
+MILLWRIGHT_RENDERERS["receiver-pump-up-time"] = _simpleRenderer({
+  citation: "Citation: the receiver storage relation by name, the ideal gas law in shop units -- pump-up time = V (p2 - p1) / (14.7 x compressor scfm), draw-down time = V (cut-out - cut-in) / (14.7 x net demand), and the receiver required = duration x 14.7 x net demand / the pressure band, which is the same relation the air receiver calculator uses. Constant temperature assumed. The compressor and receiver manufacturers' data and the applicable pressure vessel code govern.",
+  example: receiverPumpUpTimeExample.inputs,
+  fields: [
+    { key: "receiver_volume_ft3", label: "Receiver volume (cu ft)", kind: "number", default: 120 },
+    { key: "fill_start_psig", label: "Fill start pressure (psig)", kind: "number", default: 0 },
+    { key: "fill_end_psig", label: "Fill end pressure (psig)", kind: "number", default: 175 },
+    { key: "compressor_scfm", label: "Compressor delivered flow (scfm)", kind: "number", default: 42 },
+    { key: "cut_out_psig", label: "Cut-out pressure (psig)", kind: "number", default: 175 },
+    { key: "cut_in_psig", label: "Cut-in pressure (psig)", kind: "number", default: 140 },
+    { key: "net_demand_scfm", label: "Net demand above what the compressor makes (scfm)", kind: "number", default: 30 },
+    { key: "required_cover_minutes", label: "Duration the peak must be covered (min, 0 to skip)", kind: "number", default: 2 },
+  ],
+  outputs: [
+    { key: "p", id: "rpu-out-p", label: "Pump-up time", value: (r) => r.pump_up_minutes === null ? "(no fill entered)" : fmt(r.pump_up_minutes, 2) + " minutes" },
+    { key: "d", id: "rpu-out-d", label: "Draw-down time", value: (r) => r.draw_down_minutes === null ? "(no draw-down entered)" : fmt(r.draw_down_minutes, 2) + " minutes (" + fmt(r.draw_down_seconds, 0) + " s) of cover" },
+    { key: "u", id: "rpu-out-u", label: "Usable stored air", value: (r) => r.band_verdict },
+    { key: "c", id: "rpu-out-c", label: "Against the peak you must cover", value: (r) => r.cover_verdict },
+    { key: "n", id: "rpu-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeReceiverPumpUpTime,
+});
+
+// ============ spec-v1481: refrigerated and desiccant air dryer sizing ============
+
+// dims: in { actual_scfm: L^3 / T, temp_correction: dimensionless, pressure_correction: dimensionless, ambient_correction: dimensionless, candidate_rated_scfm: L^3 / T, purge_fraction: dimensionless } out: { combined_factor: dimensionless, required_rated_scfm: L^3 / T, candidate_delivers_scfm: L^3 / T, purge_scfm: L^3 / T, compressor_load_scfm: L^3 / T }
+export function computeAirDryerSizing({ actual_scfm = 0, temp_correction = 1, pressure_correction = 1, ambient_correction = 1, candidate_rated_scfm = 0, purge_fraction = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(actual_scfm > 0)) return { error: "Actual air flow must be positive (scfm)." };
+  for (const [n, v] of [["inlet temperature", temp_correction], ["pressure", pressure_correction], ["ambient", ambient_correction]]) {
+    if (!(v > 0)) return { error: "The " + n + " correction factor must be positive -- take it from the dryer manufacturer's table." };
+  }
+  if (candidate_rated_scfm < 0) return { error: "A candidate dryer's rated capacity cannot be negative (scfm)." };
+  if (!(purge_fraction >= 0 && purge_fraction < 1)) return { error: "Purge must be at least 0 and below 1 (a heatless regenerative dryer runs about 0.15)." };
+  // The corrections MULTIPLY, so three individually modest factors compound.
+  const combined_factor = temp_correction * pressure_correction * ambient_correction;
+  const required_rated_scfm = actual_scfm / combined_factor;
+  const candidate_delivers_scfm = candidate_rated_scfm > 0 ? candidate_rated_scfm * combined_factor : null;
+  const candidate_shortfall_scfm = candidate_delivers_scfm === null ? null : actual_scfm - candidate_delivers_scfm;
+  const candidate_ok = candidate_delivers_scfm === null ? null : candidate_delivers_scfm >= actual_scfm;
+  // The purge is real compressor capacity that must be ADDED to the compressor
+  // sizing, not subtracted from the dryer's.
+  const compressor_load_scfm = purge_fraction > 0 ? actual_scfm / (1 - purge_fraction) : actual_scfm;
+  const purge_scfm = compressor_load_scfm - actual_scfm;
+  const outs = [combined_factor, required_rated_scfm, compressor_load_scfm, purge_scfm];
+  if (!outs.every(Number.isFinite)) return { error: "Dryer sizing math is not a finite value." };
+  return {
+    combined_factor, required_rated_scfm, candidate_rated_scfm, candidate_delivers_scfm,
+    candidate_shortfall_scfm, candidate_ok, purge_fraction, purge_scfm, compressor_load_scfm,
+    actual_scfm, derate_pct: (1 - combined_factor) * 100,
+    candidate_verdict: candidate_delivers_scfm === null
+      ? "(no candidate dryer entered)"
+      : candidate_ok
+        ? "a " + fmt(candidate_rated_scfm, 0) + " scfm nameplate delivers " + fmt(candidate_delivers_scfm, 1) + " scfm here, which covers the " + fmt(actual_scfm, 0) + " scfm required"
+        : "a " + fmt(candidate_rated_scfm, 0) + " scfm nameplate delivers only " + fmt(candidate_delivers_scfm, 1) + " scfm here and passes wet air downstream -- " + fmt(candidate_shortfall_scfm, 1) + " scfm short. Select above " + fmt(required_rated_scfm, 0) + " scfm",
+    purge_verdict: purge_fraction <= 0
+      ? "(no purge entered -- a refrigerated dryer has none; a heatless regenerative desiccant unit runs about 15%)"
+      : "at " + fmt(purge_fraction * 100, 0) + "% purge the compressor must supply " + fmt(compressor_load_scfm, 1) + " scfm to deliver " + fmt(actual_scfm, 0) + " to the plant -- " + fmt(purge_scfm, 1) + " scfm of compressor capacity that exists only to dry air, and it is ADDED to the compressor sizing, not subtracted from the dryer's",
+    note: "A refrigerated dryer's catalog number is stated at one set of conditions -- typically 100 psig inlet, 100 degF inlet air, 100 degF ambient -- and a plant almost never sits at all three. Every correction runs the same way: hotter inlet air carries far more water and derates the dryer, lower pressure means more actual volume per unit mass and derates it, and a hotter ambient hurts the condenser and derates it again. BECAUSE THEY MULTIPLY, three individually modest factors compound: 0.80 times 1.10 times 0.95 is 0.836, so a 200 scfm nameplate delivers only 167 scfm and the honest requirement is 239. A dryer selected on its badge number is the reason water comes out of the drops. The choice between refrigerated and desiccant is a DEW POINT decision, not a capacity one. A refrigerated dryer holds roughly a 35 to 40 degF pressure dew point and cannot go below freezing without icing, so anything running outdoors, feeding an unheated line, or supplying instrument or breathing air needs desiccant. The cost of desiccant is the purge: a heatless regenerative dryer diverts around 15% of its own throughput to regenerate the offline tower, and that purge is real compressor capacity which must be ADDED to the compressor sizing rather than subtracted from the dryer's -- delivering 200 scfm to the plant through a 15% purge means the compressor supplies 235. This applies correction factors the user takes from the manufacturer's own tables; it does not supply them, because they differ by model and by dryer technology and a generic table is the thing that goes stale. It does not select a dryer, determine the required pressure dew point for the application, or evaluate whether a refrigerated unit will ice; it does not size the pre-filters and after-filters that a desiccant bed requires and without which the bed is destroyed by oil carryover; and it does not address drain traps, which are where most compressed-air moisture problems actually originate. It does not compute the moisture load itself. The dryer manufacturer's correction tables and dew point ratings, and the requirements of the air application, govern.",
+  };
+}
+const airDryerSizingExample = { inputs: { actual_scfm: 200, temp_correction: 0.8, pressure_correction: 1.1, ambient_correction: 0.95, candidate_rated_scfm: 200, purge_fraction: 0.15 } };
+MILLWRIGHT_RENDERERS["air-dryer-sizing"] = _simpleRenderer({
+  citation: "Citation: the compressed-air dryer correction-factor method by name -- the inlet temperature, operating pressure and ambient corrections MULTIPLY, so corrected capacity = rated x the product and required rating = actual flow / the product. The factors are taken from the dryer manufacturer's own tables, which differ by model and technology. A heatless regenerative desiccant dryer's purge is added to the compressor load, not subtracted from the dryer's. The dryer manufacturer's correction tables and dew point ratings govern.",
+  example: airDryerSizingExample.inputs,
+  fields: [
+    { key: "actual_scfm", label: "Actual air flow to be dried (scfm)", kind: "number", default: 200 },
+    { key: "temp_correction", label: "Inlet temperature correction factor", kind: "number", default: 0.8 },
+    { key: "pressure_correction", label: "Operating pressure correction factor", kind: "number", default: 1.1 },
+    { key: "ambient_correction", label: "Ambient temperature correction factor", kind: "number", default: 0.95 },
+    { key: "candidate_rated_scfm", label: "Candidate dryer nameplate (scfm, 0 to skip)", kind: "number", default: 200 },
+    { key: "purge_fraction", label: "Desiccant purge fraction (0 for refrigerated)", kind: "number", default: 0.15 },
+  ],
+  outputs: [
+    { key: "c", id: "ads-out-c", label: "Combined correction", value: (r) => fmt(r.combined_factor, 4) + " -- the three factors MULTIPLY, so this is a " + fmt(r.derate_pct, 1) + "% derate from three individually modest numbers" },
+    { key: "r", id: "ads-out-r", label: "Required nameplate rating", value: (r) => fmt(r.required_rated_scfm, 1) + " scfm to deliver " + fmt(r.actual_scfm, 0) + " scfm at these conditions" },
+    { key: "d", id: "ads-out-d", label: "The candidate dryer", value: (r) => r.candidate_verdict },
+    { key: "p", id: "ads-out-p", label: "Desiccant purge", value: (r) => r.purge_verdict },
+    { key: "n", id: "ads-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAirDryerSizing,
+});
+
+// ============ spec-v1483: vacuum pump evacuation time ============
+
+// dims: in { chamber_volume_ft3: L^3, pump_speed_cfm: L^3 / T, start_pressure_torr: M L^-1 T^-2, target_pressure_torr: M L^-1 T^-2, leak_rate_torr_cfm: dimensionless, conductance_efficiency: dimensionless } out: { evacuation_minutes: T, minutes_per_decade: T, decades: dimensionless, ultimate_pressure_torr: M L^-1 T^-2, effective_speed_cfm: L^3 / T }
+export function computeVacuumEvacuationTime({ chamber_volume_ft3 = 0, pump_speed_cfm = 0, start_pressure_torr = 760, target_pressure_torr = 0, leak_rate_torr_cfm = 0, conductance_efficiency = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(chamber_volume_ft3 > 0)) return { error: "Chamber volume must be positive (cu ft)." };
+  if (!(pump_speed_cfm > 0)) return { error: "Pump speed must be positive (cfm)." };
+  if (!(start_pressure_torr > 0)) return { error: "Starting pressure must be positive (torr)." };
+  if (!(target_pressure_torr > 0)) return { error: "Target pressure must be positive (torr)." };
+  if (!(target_pressure_torr < start_pressure_torr)) return { error: "The target pressure must be below the starting pressure." };
+  if (leak_rate_torr_cfm < 0) return { error: "Leak rate cannot be negative (torr-cfm)." };
+  if (!(conductance_efficiency > 0 && conductance_efficiency <= 1)) return { error: "Conductance efficiency must be over 0 and at most 1 -- the line and its fittings never deliver the pump's full rated speed at the chamber." };
+  const effective_speed_cfm = pump_speed_cfm * conductance_efficiency;
+  // Pump-down is LOGARITHMIC: each decade costs the same time as the last.
+  const evacuation_minutes = (chamber_volume_ft3 / effective_speed_cfm) * Math.log(start_pressure_torr / target_pressure_torr);
+  const minutes_per_decade = (chamber_volume_ft3 / effective_speed_cfm) * Math.LN10;
+  const decades = Math.log10(start_pressure_torr / target_pressure_torr);
+  // A pump-down that flattens out short of target is reporting a leak, and the
+  // flattening pressure says how big it is.
+  const ultimate_pressure_torr = leak_rate_torr_cfm > 0 ? leak_rate_torr_cfm / effective_speed_cfm : 0;
+  const reaches_target = ultimate_pressure_torr < target_pressure_torr;
+  const outs = [evacuation_minutes, minutes_per_decade, decades, effective_speed_cfm];
+  if (!outs.every(Number.isFinite)) return { error: "Evacuation time math is not a finite value." };
+  // The leak rate that would exactly block the target.
+  const blocking_leak_torr_cfm = target_pressure_torr * effective_speed_cfm;
+  return {
+    evacuation_minutes, minutes_per_decade, decades, effective_speed_cfm,
+    ultimate_pressure_torr, reaches_target, blocking_leak_torr_cfm,
+    target_pressure_torr, start_pressure_torr, leak_rate_torr_cfm,
+    next_decade_minutes: minutes_per_decade,
+    leak_verdict: leak_rate_torr_cfm <= 0
+      ? "(no leak entered -- and a pump-down that flattens out short of target IS a leak measurement: the flattening pressure says how big it is)"
+      : reaches_target
+        ? "a " + fmt(leak_rate_torr_cfm, 2) + " torr-cfm leak puts the ultimate at " + fmt(ultimate_pressure_torr, 3) + " torr, which is BELOW the " + fmt(target_pressure_torr, 3) + " torr target -- the target is reachable, and the leak only costs time near the end. It would take " + fmt(blocking_leak_torr_cfm, 1) + " torr-cfm to block it"
+        : "a " + fmt(leak_rate_torr_cfm, 2) + " torr-cfm leak puts the ultimate at " + fmt(ultimate_pressure_torr, 3) + " torr, ABOVE the " + fmt(target_pressure_torr, 3) + " torr target -- NO amount of additional pumping time reaches it. Find the leak",
+    note: "Pump-down time is LOGARITHMIC, not linear, and that single fact governs every vacuum job. Each decade of pressure costs the same time as the last, so getting from 760 torr to 76 takes as long as getting from 76 to 7.6 -- which is why a system that seemed fast in the first minute takes an hour to reach its setpoint, and why the instinct built on the first thirty seconds is always wrong. A 15 cu ft chamber on a 25 cfm pump reaches 1 torr from atmosphere in about 4 minutes, spread evenly across 2.88 decades at 1.38 minutes each, and going one decade further to 0.1 torr costs another 1.38 -- the same as the first decade, which took the pressure from 760 down to 76. The pump's rated speed is not the speed at the chamber. The connecting line and its fittings have a finite conductance, and on a long or narrow line the effective speed can be a fraction of the rating, so the conductance efficiency is entered here rather than assumed at one. LEAKAGE SETS AN ULTIMATE PRESSURE that no amount of pumping time will beat: the leak rate divided by the effective speed. If that ultimate sits BELOW the target the target is reachable and the leak only costs time near the end; if it sits ABOVE the target, the system will never get there and more time is wasted time. A pump-down curve that flattens out short of the target is therefore a leak MEASUREMENT, and the flattening pressure times the pumping speed is the leak rate. This is the ideal isothermal volume relation. It assumes the pump holds its rated speed across the whole pressure range, which no real pump does -- speed falls off near the ultimate, so real pump-downs run longer than this at the low end. It does not model outgassing from chamber walls and elastomer seals, which dominates below roughly 1e-3 torr and which no volume calculation captures; it does not handle water vapour load, which is the usual reason a chamber that pumped down fine yesterday is slow today; and it does not size a pump, select a pump type for a pressure range, or evaluate a trap or foreline. The pump manufacturer's speed curve and the system designer govern.",
+  };
+}
+const vacuumEvacuationTimeExample = { inputs: { chamber_volume_ft3: 15, pump_speed_cfm: 25, start_pressure_torr: 760, target_pressure_torr: 1, leak_rate_torr_cfm: 5, conductance_efficiency: 1 } };
+MILLWRIGHT_RENDERERS["vacuum-evacuation-time"] = _simpleRenderer({
+  citation: "Citation: the isothermal volume pump-down relation by name -- t = (V / S) ln(p1 / p2), so each decade costs t = 2.303 V / S and the time is spread evenly across the decades -- with the leak-limited ultimate pressure = leak rate / effective pumping speed. Rated speed is corrected by an entered conductance efficiency because the connecting line never delivers it in full. Real pumps lose speed near the ultimate, so this runs optimistic at the low end. The pump manufacturer's speed curve and the system designer govern.",
+  example: vacuumEvacuationTimeExample.inputs,
+  fields: [
+    { key: "chamber_volume_ft3", label: "Chamber volume (cu ft)", kind: "number", default: 15 },
+    { key: "pump_speed_cfm", label: "Pump rated speed (cfm)", kind: "number", default: 25 },
+    { key: "start_pressure_torr", label: "Starting pressure (torr, 760 is atmosphere)", kind: "number", default: 760 },
+    { key: "target_pressure_torr", label: "Target pressure (torr)", kind: "number", default: 1 },
+    { key: "leak_rate_torr_cfm", label: "Leak rate (torr-cfm, 0 to skip)", kind: "number", default: 5 },
+    { key: "conductance_efficiency", label: "Line conductance efficiency (0-1)", kind: "number", default: 1 },
+  ],
+  outputs: [
+    { key: "t", id: "vet-out-t", label: "Evacuation time", value: (r) => fmt(r.evacuation_minutes, 2) + " minutes from " + fmt(r.start_pressure_torr, 0) + " to " + fmt(r.target_pressure_torr, 3) + " torr" },
+    { key: "d", id: "vet-out-d", label: "Per decade", value: (r) => fmt(r.minutes_per_decade, 2) + " minutes each, across " + fmt(r.decades, 2) + " decades -- and the NEXT decade costs the same again, which is the fact that governs every vacuum job" },
+    { key: "s", id: "vet-out-s", label: "Effective pumping speed", value: (r) => fmt(r.effective_speed_cfm, 2) + " cfm at the chamber -- the line's conductance is why this is not the pump's rating" },
+    { key: "l", id: "vet-out-l", label: "Leak-limited ultimate", value: (r) => r.leak_verdict },
+    { key: "n", id: "vet-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeVacuumEvacuationTime,
+});
