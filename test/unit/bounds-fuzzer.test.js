@@ -48045,3 +48045,452 @@ test("bounds: spec-v1690 cut -- nam-sizing gains negative pressure, airflow unto
   assert.ok(Math.abs(harder.makeup_velocity_fpm - 2 * neg.makeup_velocity_fpm) < 1e-9);
   assert.ok("error" in _v1690host({ room_volume_ft3: 8000, target_ach: 4, filter_loading_derate_pct: 100 }));
 });
+
+// ===========================================================================
+// spec-v1484..v1494: the 2026-09-08 trade-expansion industrial refrigeration
+// band, in the new calc-refrigeration.js. Ten tiles.
+//
+// ONE SPEC WAS CUT and one was WRONG:
+//   spec-v1486 -> `evaporator-td-dtd`, which has computed the design TD and
+//     the humidity band since spec-v434. Q = UA x TD, the coil capacity at a
+//     published rating TD, and the TD a load needs landed on that tile rather
+//     than in a second one that would print the same band from the same TD.
+//   spec-v1487's PRIMARY example is right to the digit, but its RETROFIT case
+//     is not: it reports 1,608 BTU/h of internal load where the stated
+//     retrofit gives 1,487.7, and a meter saving of 270 W where it is 222.
+//     The arithmetic here is the one the assertions below pin.
+// ===========================================================================
+
+import {
+  computeAmmoniaChargeInventory as _v1484,
+  computeTwoStageInterstagePressure as _v1485,
+  computeRefrigeratedCaseLoad as _v1487,
+  computeFreezerUnderfloorHeat as _v1488,
+  computeCondenserTdHeadPressure as _v1489,
+  computeReceiverPumpdownCapacity as _v1490,
+  computeSecondaryGlycolLoop as _v1491,
+  computeCo2TranscriticalPressure as _v1492,
+  computeRefrigerationReliefCapacity as _v1493,
+  computeMachineryRoomVentilation as _v1494,
+} from "../../calc-refrigeration.js";
+
+test("bounds: spec-v1484 computeAmmoniaChargeInventory -- the piping is the term a vessel-only tally misses", () => {
+  const base = { receiver_volume_gal: 1200, receiver_fill_fraction: 0.30, receiver_density_lb_ft3: 37.2, recirculator_volume_gal: 900, recirculator_fill_fraction: 0.60, recirculator_density_lb_ft3: 42.4, piping_volume_ft3: 780, piping_liquid_fraction: 0.25, piping_density_lb_ft3: 40.0, threshold_lb: 10000 };
+  const r = _v1484(base);
+  // IDENTITY: each term is exactly V x fill x density, gallons at 1728/231.
+  assert.ok(Math.abs(r.receiver_lb - 1200 / (1728 / 231) * 0.30 * 37.2) < 1e-9);
+  assert.ok(Math.abs(r.piping_lb - 780 * 0.25 * 40.0) < 1e-9);
+  assert.ok(Math.abs(r.total_lb - (r.receiver_lb + r.recirculator_lb + r.piping_lb)) < 1e-9);
+  assert.ok(Math.abs(r.vessel_total_lb + r.piping_lb - r.total_lb) < 1e-9);
+  // The spec's headline: the piping holds more than both vessels together.
+  assert.equal(r.piping_beats_vessels, true);
+  assert.ok(r.piping_lb > r.vessel_total_lb);
+  assert.equal(r.over_threshold, true);
+  assert.ok(Math.abs(r.margin_lb - (10000 - r.total_lb)) < 1e-9);
+  assert.ok(Math.abs(r.pct_of_threshold - r.total_lb / 100) < 1e-9);
+  // A vessel-only tally would have reported under 5,000 lb and believed
+  // itself exempt; the full sum is over. That gap is the tile.
+  assert.ok(r.vessel_total_lb < 10000 && r.total_lb > 10000);
+  // Charge is LINEAR in every volume: doubling the piping doubles its term.
+  const twice = _v1484({ ...base, piping_volume_ft3: 1560 });
+  assert.ok(Math.abs(twice.piping_lb - 2 * r.piping_lb) < 1e-9);
+  // The boundary is tested off it, not on it: at 0.999x and 1.001x of the
+  // threshold the verdict flips, without asking whether == is > or >=.
+  const under = _v1484({ ...base, threshold_lb: r.total_lb * 1.001 });
+  const over = _v1484({ ...base, threshold_lb: r.total_lb * 0.999 });
+  assert.equal(under.over_threshold, false);
+  assert.equal(over.over_threshold, true);
+  // The additional volume that would cross it is reported only while under,
+  // and adding exactly that much lands on the threshold.
+  assert.equal(r.additional_cuft_to_cross, 0);
+  const head = _v1484({ ...base, piping_volume_ft3: 400 });
+  assert.equal(head.over_threshold, false);
+  assert.ok(head.additional_cuft_to_cross > 0);
+  const crossed = _v1484({ ...base, piping_volume_ft3: 400 + head.additional_cuft_to_cross });
+  assert.ok(Math.abs(crossed.total_lb - 10000) < 1e-6);
+  // Zero everywhere is an error, not a zero charge.
+  assert.ok(_v1484({ receiver_volume_gal: 0, piping_volume_ft3: 0 }).error);
+  assert.ok(_v1484({ ...base, receiver_fill_fraction: 1.5 }).error);
+});
+
+test("bounds: spec-v1485 computeTwoStageInterstagePressure -- the geometric mean is always below the arithmetic", () => {
+  const base = { low_psig: 15, high_psig: 185, intermediate_load_psig: 0 };
+  const r = _v1485(base);
+  // IDENTITY: the interstage is the geometric mean of the ABSOLUTE pressures.
+  assert.ok(Math.abs(r.interstage_psia - Math.sqrt(29.7 * 199.7)) < 1e-9);
+  // IDENTITY: equal ratios in both stages, which is what makes it optimal.
+  assert.ok(Math.abs(r.stage_ratio - r.p_high_psia / r.interstage_psia) < 1e-9);
+  assert.ok(Math.abs(r.stage_ratio * r.stage_ratio - r.single_stage_ratio) < 1e-9);
+  // The geometric mean is strictly below the arithmetic mean whenever the two
+  // pressures differ -- the inequality the tile exists to make visible.
+  assert.ok(r.interstage_psig < r.arithmetic_mean_psig);
+  assert.ok(r.arithmetic_excess_psi > 0);
+  // And setting it at the arithmetic mean unbalances the stages: the booster
+  // takes the larger ratio, which is the hot-discharge symptom.
+  assert.ok(r.arithmetic_low_ratio > r.arithmetic_high_ratio);
+  assert.ok(Math.abs(r.arithmetic_low_ratio * r.arithmetic_high_ratio - r.single_stage_ratio) < 1e-9);
+  // Equal pressures collapse the means together -- the degenerate case where
+  // there is nothing to split.
+  const flat = _v1485({ low_psig: 100, high_psig: 100.0001 });
+  assert.ok(Math.abs(flat.interstage_psig - flat.arithmetic_mean_psig) < 1e-4);
+  assert.ok(Math.abs(flat.stage_ratio - 1) < 1e-4);
+  // An intermediate load between the two is reported with its own split.
+  const withLoad = _v1485({ ...base, intermediate_load_psig: 40 });
+  assert.equal(withLoad.intermediate_in_range, true);
+  assert.ok(Math.abs(withLoad.intermediate_low_ratio * withLoad.intermediate_high_ratio - r.single_stage_ratio) < 1e-9);
+  // One outside the range is refused rather than used.
+  assert.equal(_v1485({ ...base, intermediate_load_psig: 300 }).intermediate_in_range, false);
+  assert.ok(_v1485({ low_psig: 185, high_psig: 15 }).error);
+  assert.ok(_v1485({ low_psig: -20, high_psig: 185 }).error);
+});
+
+test("bounds: spec-v1487 computeRefrigeratedCaseLoad -- every internal watt is paid twice", () => {
+  const base = { case_length_ft: 12, infiltration_btuh_per_ft: 780, transmission_btuh_per_ft: 95, product_btuh: 1200, lights_w: 240, fan_w: 310, antisweat_w: 180, antisweat_run_fraction: 0.60, defrost_w: 0, defrost_run_fraction: 0, retrofit_lights_w: 90, retrofit_antisweat_run_fraction: 0.20 };
+  const r = _v1487(base);
+  // IDENTITY: the four terms sum to the total, and the electric term is the
+  // average watts times the exact 3.412141633 BTU/h per watt.
+  assert.ok(Math.abs(r.internal_electric_w - (240 + 310 + 180 * 0.60)) < 1e-9);
+  assert.ok(Math.abs(r.internal_btuh - r.internal_electric_w * 3.412141633) < 1e-9);
+  assert.ok(Math.abs(r.total_btuh - (r.infiltration_btuh + r.transmission_btuh + r.product_btuh + r.internal_btuh)) < 1e-9);
+  assert.ok(Math.abs(r.infiltration_btuh - 12 * 780) < 1e-9);
+  // THE SPEC'S RETROFIT CASE IS WRONG AND THIS IS THE RIGHT ANSWER. The spec
+  // states 1,608 BTU/h internal and a 270 W meter saving; the retrofit it
+  // describes -- 90 W of lights and a 0.20 anti-sweat run fraction -- gives
+  // 436 W and 1,487.7 BTU/h, and a meter saving of 222 W.
+  assert.ok(Math.abs(r.retrofit_internal_w - (90 + 310 + 180 * 0.20)) < 1e-9);
+  assert.ok(Math.abs(r.retrofit_internal_w - 436) < 1e-9);
+  assert.ok(Math.abs(r.meter_saving_w - 222) < 1e-9);
+  assert.ok(Math.abs(r.retrofit_internal_btuh - 436 * 3.412141633) < 1e-9);
+  assert.ok(Math.abs(r.load_reduction_btuh - r.meter_saving_w * 3.412141633) < 1e-9);
+  // The saving is collected twice: the load reduction and the meter saving are
+  // the SAME watts, once as heat and once as electricity.
+  assert.ok(r.load_reduction_btuh > 0 && r.meter_saving_w > 0);
+  assert.ok(Math.abs(r.total_btuh - r.retrofit_total_btuh - r.load_reduction_btuh) < 1e-9);
+  // Only the internal term moves; infiltration, transmission and product are
+  // untouched by a retrofit that changes no refrigeration equipment.
+  assert.ok(Math.abs(r.retrofit_total_btuh - (r.infiltration_btuh + r.transmission_btuh + r.product_btuh + r.retrofit_internal_btuh)) < 1e-9);
+  // On THIS case infiltration is the largest term, and the tile computes that
+  // rather than asserting it -- shrink it and the flag goes false.
+  assert.equal(r.infiltration_is_largest, true);
+  assert.equal(_v1487({ ...base, infiltration_btuh_per_ft: 10 }).infiltration_is_largest, false);
+  // Load is linear in case length.
+  const long = _v1487({ ...base, case_length_ft: 24 });
+  assert.ok(Math.abs(long.infiltration_btuh - 2 * r.infiltration_btuh) < 1e-9);
+  // No retrofit entered leaves the retrofit total equal to the total.
+  const none = _v1487({ ...base, retrofit_lights_w: 0, retrofit_antisweat_run_fraction: 0.60 });
+  assert.equal(none.has_retrofit, false);
+  assert.ok(Math.abs(none.retrofit_total_btuh - none.total_btuh) < 1e-9);
+  assert.ok(_v1487({ ...base, case_length_ft: 0 }).error);
+  assert.ok(_v1487({ ...base, antisweat_run_fraction: 1.2 }).error);
+});
+
+test("bounds: spec-v1488 computeFreezerUnderfloorHeat -- small, continuous, and non-negotiable", () => {
+  const base = { floor_area_ft2: 6000, room_temp_f: -10, target_soil_temp_f: 45, u_factor: 0.045, tube_output_btuh_per_ft: 12, energy_rate_per_kwh: 0.09, hours_per_year: 8760 };
+  const r = _v1488(base);
+  // IDENTITY: Q = U A TD, and the watts are that over the exact conversion.
+  assert.ok(Math.abs(r.td_f - 55) < 1e-9);
+  assert.ok(Math.abs(r.heat_loss_btuh - 0.045 * 6000 * 55) < 1e-9);
+  assert.ok(Math.abs(r.watts - r.heat_loss_btuh / 3.412141633) < 1e-9);
+  assert.ok(Math.abs(r.watts_per_ft2 - r.watts / 6000) < 1e-9);
+  // The spec's point: it is a fraction of a watt per square foot, because the
+  // insulation above is doing the real work.
+  assert.ok(r.watts_per_ft2 < 1);
+  // IDENTITY: tube length x output = the load, and the spacing is the area
+  // each foot serves.
+  assert.ok(Math.abs(r.tube_length_ft * 12 - r.heat_loss_btuh) < 1e-9);
+  assert.ok(Math.abs(r.spacing_in - 6000 / r.tube_length_ft * 12) < 1e-9);
+  // IDENTITY: annual energy is the continuous load over the hours.
+  assert.ok(Math.abs(r.annual_kwh - r.watts / 1000 * 8760) < 1e-9);
+  assert.ok(Math.abs(r.annual_cost - r.annual_kwh * 0.09) < 1e-9);
+  // Load is linear in area and in TD; halving the TD halves the load and
+  // doubles the on-centre spacing.
+  const half = _v1488({ ...base, target_soil_temp_f: 17.5 });
+  assert.ok(Math.abs(half.heat_loss_btuh - r.heat_loss_btuh / 2) < 1e-9);
+  assert.ok(Math.abs(half.spacing_in - 2 * r.spacing_in) < 1e-9);
+  // The design constraint, tested off the boundary rather than on it.
+  assert.equal(r.soil_above_freezing, true);
+  assert.equal(_v1488({ ...base, target_soil_temp_f: 32.001 }).soil_above_freezing, true);
+  assert.equal(_v1488({ ...base, target_soil_temp_f: 31.999 }).soil_above_freezing, false);
+  // No tube basis entered leaves the grid unanswered rather than infinite.
+  const noTube = _v1488({ ...base, tube_output_btuh_per_ft: 0 });
+  assert.equal(noTube.has_tube_basis, false);
+  assert.equal(noTube.tube_length_ft, 0);
+  assert.equal(noTube.spacing_in, 0);
+  // A soil target below the room temperature is not a smaller load, it is a
+  // different problem, and it is refused.
+  assert.ok(_v1488({ ...base, target_soil_temp_f: -20 }).error);
+  assert.ok(_v1488({ ...base, u_factor: 0 }).error);
+});
+
+test("bounds: spec-v1489 computeCondenserTdHeadPressure -- the basis is the answer", () => {
+  const base = { condenser_type: "evaporative", ambient_f: 78, design_td_f: 20, alternate_ambient_f: 78, alternate_td_f: 15, power_pct_per_deg_f: 1.75, compressor_hp: 300, annual_hours: 6000, energy_rate_per_kwh: 0.09 };
+  const r = _v1489(base);
+  // IDENTITY: condensing = ambient + TD, on whichever basis was selected.
+  assert.ok(Math.abs(r.condensing_f - 98) < 1e-9);
+  assert.equal(r.basis_label, "WET bulb");
+  assert.equal(_v1489({ ...base, condenser_type: "air_cooled" }).basis_label, "DRY bulb");
+  // THE SPEC'S CENTRAL CLAIM, COMPUTED: an evaporative unit at a WIDER TD on
+  // a 78 degF wet bulb condenses COOLER than an air-cooled unit at a TIGHTER
+  // TD on the 95 degF dry bulb of the same day. The basis, not the TD, wins.
+  const air = _v1489({ ...base, condenser_type: "air_cooled", ambient_f: 95, design_td_f: 15 });
+  assert.ok(air.condensing_f > r.condensing_f);
+  assert.ok(Math.abs(air.condensing_f - r.condensing_f - 12) < 1e-9);
+  // IDENTITY: the power change is the condensing change times the sensitivity.
+  assert.ok(Math.abs(r.condensing_change_f - (r.alternate_condensing_f - r.condensing_f)) < 1e-9);
+  assert.ok(Math.abs(r.power_change_pct - r.condensing_change_f * 1.75) < 1e-9);
+  assert.ok(Math.abs(r.condensing_change_f + 5) < 1e-9);
+  assert.ok(Math.abs(r.power_change_pct + 8.75) < 1e-9);
+  // A tighter TD LOWERS condensing and SAVES power -- the sign is driven off a
+  // boolean rather than off the sentence.
+  assert.equal(r.condensing_falls, true);
+  assert.ok(r.power_change_pct < 0);
+  assert.ok(r.annual_cost_change < 0);
+  // IDENTITY: the annual energy is the machine's kW times the percent change
+  // times the hours, at the exact hp conversion.
+  assert.ok(Math.abs(r.annual_kwh_change - 300 * 0.745699872 * (r.power_change_pct / 100) * 6000) < 1e-9);
+  // The other direction: a wider TD raises condensing and costs power.
+  const worse = _v1489({ ...base, alternate_td_f: 25 });
+  assert.equal(worse.condensing_falls, false);
+  assert.ok(worse.power_change_pct > 0);
+  assert.ok(worse.annual_cost_change > 0);
+  // No alternative entered means no change, not a change of zero cost.
+  const none = _v1489({ ...base, alternate_ambient_f: 0, alternate_td_f: 0 });
+  assert.equal(none.has_alternate, false);
+  assert.ok(Math.abs(none.condensing_change_f) < 1e-12);
+  assert.ok(_v1489({ ...base, design_td_f: 0 }).error);
+});
+
+test("bounds: spec-v1490 computeReceiverPumpdownCapacity -- the fill limit is the whole point", () => {
+  const base = { receiver_volume_gal: 1000, existing_liquid_gal: 220, fill_limit_fraction: 0.80, liquid_density_lb_ft3: 36.9, charge_to_pump_lb: 2400 };
+  const r = _v1490(base);
+  // IDENTITY: density per gallon is the cubic-foot density over 1728/231.
+  assert.ok(Math.abs(r.density_lb_gal - 36.9 / (1728 / 231)) < 1e-9);
+  assert.ok(Math.abs(r.limit_gal - 800) < 1e-9);
+  assert.ok(Math.abs(r.available_gal - (800 - 220)) < 1e-9);
+  assert.ok(Math.abs(r.required_gal - 2400 / r.density_lb_gal) < 1e-9);
+  assert.ok(Math.abs(r.resulting_fill_pct - (220 + r.required_gal) / 10) < 1e-9);
+  assert.ok(Math.abs(r.spare_gal - (r.available_gal - r.required_gal)) < 1e-9);
+  assert.equal(r.fits, true);
+  // IDENTITY the other way: the maximum charge, fed back in, exactly fills to
+  // the limit and still fits.
+  assert.ok(Math.abs(r.max_charge_lb - r.available_gal * r.density_lb_gal) < 1e-9);
+  const atMax = _v1490({ ...base, charge_to_pump_lb: r.max_charge_lb });
+  assert.ok(Math.abs(atMax.resulting_fill_pct - 80) < 1e-6);
+  // Tested off the boundary in both directions rather than on it.
+  assert.equal(_v1490({ ...base, charge_to_pump_lb: r.max_charge_lb * 0.999 }).fits, true);
+  assert.equal(_v1490({ ...base, charge_to_pump_lb: r.max_charge_lb * 1.001 }).fits, false);
+  // The spec's August case: the same job with the receiver already at 400 gal
+  // does NOT fit, and that is the difference worth knowing a day early.
+  const august = _v1490({ ...base, existing_liquid_gal: 400 });
+  assert.equal(august.fits, false);
+  assert.ok(Math.abs(august.available_gal - 400) < 1e-9);
+  assert.ok(august.spare_gal < 0);
+  // A receiver already past its limit accepts nothing.
+  const full = _v1490({ ...base, existing_liquid_gal: 900 });
+  assert.equal(full.already_over_limit, true);
+  assert.equal(full.max_charge_lb, 0);
+  assert.equal(full.fits, false);
+  // Warmer liquid is less dense, so the SAME charge takes MORE room -- which
+  // is why the limit is evaluated at the warmest expected temperature.
+  const warm = _v1490({ ...base, liquid_density_lb_ft3: 34 });
+  assert.ok(warm.required_gal > r.required_gal);
+  assert.ok(_v1490({ ...base, existing_liquid_gal: 1200 }).error);
+  assert.ok(_v1490({ ...base, fill_limit_fraction: 0 }).error);
+});
+
+test("bounds: spec-v1491 computeSecondaryGlycolLoop -- the correction the 500 constant hides", () => {
+  const base = { load_btuh: 1200000, delta_t_f: 10, glycol_cp: 0.85, glycol_sg: 1.04, head_ft: 70, pump_efficiency: 0.70, chiller_approach_f: 6, coil_approach_f: 4, compressor_pct_per_deg_f: 2.2, annual_hours: 6000, energy_rate_per_kwh: 0.09 };
+  const r = _v1491(base);
+  // IDENTITY: the water basis is Q/(500 dT) and the fluid factor is 500 SG cp.
+  assert.ok(Math.abs(r.water_gpm - 240) < 1e-9);
+  assert.ok(Math.abs(r.fluid_factor - 500 * 1.04 * 0.85) < 1e-9);
+  assert.ok(Math.abs(r.glycol_gpm - 1200000 / (r.fluid_factor * 10)) < 1e-9);
+  assert.ok(Math.abs(r.tons - 100) < 1e-9);
+  // Because SG x cp is BELOW one, the corrected flow is HIGHER, not lower --
+  // the sign the correction is most often got backwards.
+  assert.ok(1.04 * 0.85 < 1);
+  assert.ok(r.glycol_gpm > r.water_gpm);
+  assert.ok(r.flow_increase_pct > 0);
+  assert.ok(Math.abs(r.flow_increase_pct - (r.glycol_gpm / r.water_gpm - 1) * 100) < 1e-9);
+  // Water itself is the identity case: SG = cp = 1 gives the water factor and
+  // no correction at all.
+  const water = _v1491({ ...base, glycol_cp: 1, glycol_sg: 1 });
+  assert.ok(Math.abs(water.fluid_factor - 500) < 1e-9);
+  assert.ok(Math.abs(water.glycol_gpm - water.water_gpm) < 1e-9);
+  assert.ok(Math.abs(water.flow_increase_pct) < 1e-9);
+  // IDENTITY: pump bhp = gpm x head x SG / (3960 x eta), and it carries the
+  // GLYCOL flow, not the water flow.
+  assert.ok(Math.abs(r.pump_bhp - r.glycol_gpm * 70 * 1.04 / (3960 * 0.70)) < 1e-9);
+  assert.ok(Math.abs(r.annual_kwh - r.pump_bhp * 0.745699872 * 6000) < 1e-9);
+  // IDENTITY: the temperature penalty is both approaches, and the compressor
+  // penalty is that times the entered sensitivity.
+  assert.ok(Math.abs(r.total_approach_f - 10) < 1e-9);
+  assert.ok(Math.abs(r.compressor_penalty_pct - 22) < 1e-9);
+  assert.equal(r.has_approach, true);
+  // Neither approach entered is no penalty, and it says so rather than
+  // reporting a zero that reads like a measurement.
+  const dx = _v1491({ ...base, chiller_approach_f: 0, coil_approach_f: 0 });
+  assert.equal(dx.has_approach, false);
+  assert.equal(dx.compressor_penalty_pct, 0);
+  // A wider loop delta-T shrinks the flow and the pumping, which is the design
+  // lever: flow is inversely proportional to delta-T.
+  const wide = _v1491({ ...base, delta_t_f: 20 });
+  assert.ok(Math.abs(wide.glycol_gpm - r.glycol_gpm / 2) < 1e-9);
+  assert.ok(Math.abs(wide.pump_bhp - r.pump_bhp / 2) < 1e-9);
+  assert.ok(_v1491({ ...base, delta_t_f: 0 }).error);
+  assert.ok(_v1491({ ...base, pump_efficiency: 1.5 }).error);
+});
+
+test("bounds: spec-v1492 computeCo2TranscriticalPressure -- the correlation is withheld where it has no meaning", () => {
+  const base = { ambient_f: 95, gas_cooler_approach_f: 5, evaporating_psig: 300 };
+  const r = _v1492(base);
+  // IDENTITY: the outlet is ambient + approach, and degC is the exact
+  // conversion of it.
+  assert.ok(Math.abs(r.gc_outlet_f - 100) < 1e-9);
+  assert.ok(Math.abs(r.gc_outlet_c - (100 - 32) * 5 / 9) < 1e-9);
+  assert.equal(r.is_transcritical, true);
+  // IDENTITY: the published correlation, in bar, then converted exactly.
+  assert.ok(Math.abs(r.p_opt_bar - (2.6 * r.gc_outlet_c + 7.54)) < 1e-9);
+  assert.ok(Math.abs(r.p_opt_psia - r.p_opt_bar * (100000 / 6894.757293168361)) < 1e-9);
+  assert.ok(Math.abs(r.p_opt_psig - (r.p_opt_psia - 14.7)) < 1e-9);
+  // The pressures are why transcritical CO2 needs ratings nothing else does.
+  assert.ok(r.p_opt_psig > 1400);
+  assert.ok(Math.abs(r.pressure_ratio - r.p_opt_psia / (300 + 14.7)) < 1e-9);
+  // BELOW the critical temperature the relation is WITHHELD, not printed with
+  // a caveat -- a controller applying it there would command hundreds of psi
+  // too much.
+  const cold = _v1492({ ...base, ambient_f: 55 });
+  assert.equal(cold.is_transcritical, false);
+  assert.equal(cold.p_opt_psig, 0);
+  assert.equal(cold.p_opt_bar, 0);
+  assert.equal(cold.pressure_ratio, 0);
+  // The regime boundary, tested either side of 87.8 degF rather than on it.
+  assert.equal(_v1492({ ambient_f: 87.81, gas_cooler_approach_f: 0 }).is_transcritical, true);
+  assert.equal(_v1492({ ambient_f: 87.79, gas_cooler_approach_f: 0 }).is_transcritical, false);
+  // The optimum rises monotonically with the outlet temperature, which is why
+  // the control floats it against that temperature.
+  let last = -1;
+  for (const amb of [88, 95, 105, 115]) {
+    const x = _v1492({ ...base, ambient_f: amb, gas_cooler_approach_f: 0 });
+    assert.ok(x.p_opt_psig > last);
+    last = x.p_opt_psig;
+  }
+  assert.ok(_v1492({ ...base, gas_cooler_approach_f: -5 }).error);
+});
+
+test("bounds: spec-v1493 computeRefrigerationReliefCapacity -- the piping half fails more often than the valve", () => {
+  const base = { vessel_diameter_ft: 4, vessel_length_ft: 16, f_constant: 0.5, valve_rated_lb_min: 45, pipe_straight_length_ft: 60, fitting_equivalent_length_ft: 25, max_allowable_equivalent_length_ft: 120 };
+  const r = _v1493(base);
+  // IDENTITY: C = f x D x L, on the SHELL, never on the contents.
+  assert.ok(Math.abs(r.dl_product_ft2 - 64) < 1e-9);
+  assert.ok(Math.abs(r.required_lb_min - 32) < 1e-9);
+  assert.ok(Math.abs(r.required_lb_min - 0.5 * 4 * 16) < 1e-9);
+  assert.ok(Math.abs(r.margin_ratio - 45 / 32) < 1e-9);
+  assert.equal(r.valve_adequate, true);
+  // A long thin vessel and a short fat one of the same VOLUME need different
+  // relief, because D x L is not volume. Same volume, different requirement.
+  const thin = _v1493({ ...base, vessel_diameter_ft: 2, vessel_length_ft: 64 });
+  assert.ok(Math.abs(thin.dl_product_ft2 - 128) < 1e-9);
+  assert.ok(thin.required_lb_min > r.required_lb_min);
+  // IDENTITY: the equivalent length is the straight run plus the fittings.
+  assert.ok(Math.abs(r.equivalent_length_ft - 85) < 1e-9);
+  assert.ok(Math.abs(r.length_margin_ft - 35) < 1e-9);
+  assert.equal(r.piping_adequate, true);
+  assert.equal(r.system_adequate, true);
+  // THE POINT OF THE TILE: a valve that PASSES on capacity can still leave the
+  // vessel unprotected on discharge piping, and the system verdict says so.
+  const choked = _v1493({ ...base, pipe_straight_length_ft: 200 });
+  assert.equal(choked.valve_adequate, true);
+  assert.equal(choked.piping_adequate, false);
+  assert.equal(choked.system_adequate, false);
+  assert.ok(choked.length_margin_ft < 0);
+  // Both boundaries tested off themselves rather than on them.
+  assert.equal(_v1493({ ...base, valve_rated_lb_min: 32.032 }).valve_adequate, true);
+  assert.equal(_v1493({ ...base, valve_rated_lb_min: 31.968 }).valve_adequate, false);
+  assert.equal(_v1493({ ...base, fitting_equivalent_length_ft: 59.94 }).piping_adequate, true);
+  assert.equal(_v1493({ ...base, fitting_equivalent_length_ft: 60.06 }).piping_adequate, false);
+  // No piping entered leaves that half unanswered; the system verdict then
+  // rests on the valve alone and the note says the check is missing.
+  const noPipe = _v1493({ ...base, pipe_straight_length_ft: 0, fitting_equivalent_length_ft: 0, max_allowable_equivalent_length_ft: 0 });
+  assert.equal(noPipe.has_piping_check, false);
+  assert.equal(noPipe.system_adequate, true);
+  assert.ok(_v1493({ ...base, f_constant: 0 }).error);
+  assert.ok(_v1493({ ...base, vessel_diameter_ft: 0 }).error);
+});
+
+test("bounds: spec-v1494 computeMachineryRoomVentilation -- the square root is the shape", () => {
+  const base = { largest_system_charge_lb: 2400, room_length_ft: 40, room_width_ft: 30, room_height_ft: 16, louver_face_velocity_fpm: 500, louver_free_area_fraction: 0.5, installed_fan_cfm: 5000 };
+  const r = _v1494(base);
+  // IDENTITY: Q = 100 sqrt(G).
+  assert.ok(Math.abs(r.required_exhaust_cfm - 100 * Math.sqrt(2400)) < 1e-9);
+  assert.ok(Math.abs(r.room_volume_ft3 - 19200) < 1e-9);
+  assert.ok(Math.abs(r.air_changes_per_hour - r.required_exhaust_cfm * 60 / 19200) < 1e-9);
+  // THE SHAPE: doubling the charge multiplies the requirement by sqrt(2), not
+  // by 2 -- the whole reason the rate dilutes rather than handles the charge.
+  const twice = _v1494({ ...base, largest_system_charge_lb: 4800 });
+  assert.ok(Math.abs(twice.required_exhaust_cfm / r.required_exhaust_cfm - Math.SQRT2) < 1e-9);
+  const half = _v1494({ ...base, largest_system_charge_lb: 1200 });
+  assert.ok(Math.abs(half.required_exhaust_cfm / r.required_exhaust_cfm - 1 / Math.SQRT2) < 1e-9);
+  // IDENTITY: free area is the flow over the face velocity; the gross louver
+  // is that over the free-area fraction, so it is always the larger.
+  assert.ok(Math.abs(r.louver_free_area_ft2 - r.required_exhaust_cfm / 500) < 1e-9);
+  assert.ok(Math.abs(r.gross_louver_area_ft2 - r.louver_free_area_ft2 / 0.5) < 1e-9);
+  assert.ok(r.gross_louver_area_ft2 > r.louver_free_area_ft2);
+  // IDENTITY the other way: the charge a fan covers is the relation inverted,
+  // and feeding it back in reproduces the fan exactly.
+  assert.ok(Math.abs(r.charge_covered_lb - (5000 / 100) ** 2) < 1e-9);
+  const back = _v1494({ ...base, largest_system_charge_lb: r.charge_covered_lb });
+  assert.ok(Math.abs(back.required_exhaust_cfm - 5000) < 1e-9);
+  assert.equal(r.fan_adequate, true);
+  // Tested off the boundary in both directions.
+  assert.equal(_v1494({ ...base, installed_fan_cfm: r.required_exhaust_cfm * 1.001 }).fan_adequate, true);
+  assert.equal(_v1494({ ...base, installed_fan_cfm: r.required_exhaust_cfm * 0.999 }).fan_adequate, false);
+  // No room entered leaves the air-change contrast unanswered rather than
+  // dividing by zero.
+  const noRoom = _v1494({ ...base, room_length_ft: 0 });
+  assert.equal(noRoom.has_room, false);
+  assert.equal(noRoom.air_changes_per_hour, 0);
+  assert.ok(Number.isFinite(noRoom.required_exhaust_cfm));
+  assert.ok(_v1494({ ...base, largest_system_charge_lb: 0 }).error);
+  assert.ok(_v1494({ ...base, louver_free_area_fraction: 0 }).error);
+});
+
+import { computeEvaporatorTdDtd as _v1486host } from "../../calc-refrigerant.js";
+test("bounds: spec-v1486 cut -- evaporator-td-dtd gains capacity, TD and band untouched", () => {
+  // The tile answered the TD and the humidity band before spec-v1486 was cut
+  // to it. The three new inputs default to zero, and at zero the old answer
+  // must be exactly what it was -- the test that makes a cut safe to land.
+  const before = _v1486host({ box_temp_f: 35, sst_f: 25 });
+  assert.ok(Math.abs(before.dtd - 10) < 1e-12);
+  assert.equal(before.band, "~90% RH (produce, flowers, cut greens)");
+  assert.equal(before.has_ua, false);
+  assert.equal(before.has_load, false);
+  assert.equal(before.capacity_at_dtd_btuh, 0);
+  assert.equal(before.capacity_at_rating_btuh, 0);
+  // With a coil entered: IDENTITY Q = UA x TD, linear in TD, which is the
+  // relation the cut spec was built on.
+  const r = _v1486host({ box_temp_f: 35, sst_f: 25, design_load_btuh: 24000, coil_ua_btuh_f: 2600, rating_td_f: 12 });
+  assert.ok(Math.abs(r.dtd - before.dtd) < 1e-12);
+  assert.equal(r.band, before.band);
+  assert.ok(Math.abs(r.capacity_at_dtd_btuh - 2600 * 10) < 1e-9);
+  assert.ok(Math.abs(r.capacity_at_rating_btuh - 2600 * 12) < 1e-9);
+  assert.ok(Math.abs(r.capacity_ratio - 10 / 12) < 1e-12);
+  // HALVING THE TD HALVES THE CAPACITY, which is why a low-TD coil is
+  // expensive: the same load then needs twice the surface.
+  const halfTd = _v1486host({ box_temp_f: 30, sst_f: 25, coil_ua_btuh_f: 2600 });
+  assert.ok(Math.abs(halfTd.capacity_at_dtd_btuh - r.capacity_at_dtd_btuh / 2) < 1e-9);
+  assert.ok(Math.abs(halfTd.dtd - r.dtd / 2) < 1e-12);
+  // IDENTITY inverted: the TD the load needs, fed back as a suction
+  // temperature, makes the coil exactly carry the load.
+  assert.equal(r.load_met, true);
+  assert.ok(Math.abs(r.td_required_f - 24000 / 2600) < 1e-9);
+  const at = _v1486host({ box_temp_f: 35, sst_f: 35 - r.td_required_f, design_load_btuh: 24000, coil_ua_btuh_f: 2600 });
+  assert.ok(Math.abs(at.capacity_at_dtd_btuh - 24000) < 1e-6);
+  // A coil too small for the load is reported as such, off the boundary.
+  assert.equal(_v1486host({ box_temp_f: 35, sst_f: 25, design_load_btuh: 25974, coil_ua_btuh_f: 2600 }).load_met, true);
+  assert.equal(_v1486host({ box_temp_f: 35, sst_f: 25, design_load_btuh: 26026, coil_ua_btuh_f: 2600 }).load_met, false);
+  // The UA a load needs at this TD is the same relation the third way round.
+  assert.ok(Math.abs(r.ua_required_btuh_f - 24000 / 10) < 1e-9);
+  // A suction at or above the box temperature is still an error, unchanged.
+  assert.ok(_v1486host({ box_temp_f: 25, sst_f: 35 }).error);
+});

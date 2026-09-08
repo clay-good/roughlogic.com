@@ -1265,6 +1265,18 @@ export const TOOL_MODULES = (() => {
     "tractor-ballast",
     "anhydrous-ammonia-rate",
   ]);
+  // spec-v1484..v1494: the industrial refrigeration bench (Group C). Separate
+  // from calc-refrigerant.js, which holds the SERVICE bench -- superheat,
+  // charge, recovery, TXV, defrost -- sized around a technician at a comfort
+  // or walk-in system. These ten are the plant side: PSM charge inventory,
+  // two-stage interstage, ASHRAE 15 relief and machinery-room ventilation,
+  // and the CO2 transcritical high-side optimum.
+  declare("./calc-refrigeration.js", "REFRIGERATION_RENDERERS", [
+    "ammonia-charge-inventory", "two-stage-interstage-pressure", "refrigerated-case-load",
+    "freezer-underfloor-heat", "condenser-td-head-pressure", "receiver-pumpdown-capacity",
+    "secondary-glycol-loop", "co2-transcritical-pressure", "refrigeration-relief-capacity",
+    "machinery-room-ventilation",
+  ]);
   // v87 cap-relief split: the v68 tree-care / arborist-rigging bench moved out
   // of calc-agriculture.js (95.1% of cap) into calc-arborist.js. All five KEEP
   // group "L" (a tile's group letter is independent of its module, the

@@ -922,7 +922,7 @@ function _v698renderProductPullDownTime(inputRegion, outputRegion, citationEl) {
 REFRIGERANT_RENDERERS["product-pull-down-time"] = _v698renderProductPullDownTime;
 
 // dims: in { box_temp_f: T, sst_f: T } out: { dtd: T }
-export function computeEvaporatorTdDtd({ box_temp_f = 0, sst_f = 0 } = {}) {
+export function computeEvaporatorTdDtd({ box_temp_f = 0, sst_f = 0, design_load_btuh = 0, coil_ua_btuh_f = 0, rating_td_f = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const box = Number(box_temp_f);
   const sst = Number(sst_f);
@@ -934,30 +934,68 @@ export function computeEvaporatorTdDtd({ box_temp_f = 0, sst_f = 0 } = {}) {
   else if (dtd <= 12) band = "~80-85% RH (general walk-in cooler)";
   else if (dtd <= 16) band = "~75-80% RH (meat, packaged goods)";
   else band = "<70% RH (low-humidity / frozen storage)";
+  // spec-v1486 (CUT to this tile): coil capacity is very nearly LINEAR in TD,
+  // Q = UA x TD, which is the arithmetic behind the humidity band above. That
+  // linearity is what makes a low-TD coil expensive: halving the TD doubles the
+  // surface needed for the same load. All three of these inputs default to
+  // zero, and at zero the answer above is exactly what it was before.
+  const has_ua = coil_ua_btuh_f > 0;
+  const capacity_at_dtd_btuh = has_ua ? coil_ua_btuh_f * dtd : 0;
+  const has_rating_td = has_ua && rating_td_f > 0;
+  const capacity_at_rating_btuh = has_rating_td ? coil_ua_btuh_f * rating_td_f : 0;
+  const capacity_ratio = has_rating_td ? dtd / rating_td_f : 0;
+  const has_load = design_load_btuh > 0;
+  // The two questions a coil selection actually asks: does this coil carry the
+  // load at this TD, and what TD would it need to.
+  const load_met = has_ua && has_load && capacity_at_dtd_btuh >= design_load_btuh;
+  const ua_required_btuh_f = has_load ? design_load_btuh / dtd : 0;
+  const td_required_f = has_ua && has_load ? design_load_btuh / coil_ua_btuh_f : 0;
+  const ua_ratio_vs_rating = has_rating_td && ua_required_btuh_f > 0 ? ua_required_btuh_f / coil_ua_btuh_f : 0;
+  const capacity_verdict = !has_ua
+    ? "(no coil UA entered)"
+    : has_load
+      ? (load_met
+        ? "the coil makes " + fmt(capacity_at_dtd_btuh, 0) + " BTU/h at this TD against a " + fmt(design_load_btuh, 0) + " BTU/h load -- it carries it, and would still do so down to a " + fmt(td_required_f, 1) + " F TD"
+        : "the coil makes only " + fmt(capacity_at_dtd_btuh, 0) + " BTU/h at this TD against a " + fmt(design_load_btuh, 0) + " BTU/h load -- it needs a " + fmt(td_required_f, 1) + " F TD to carry it, or " + fmt(ua_required_btuh_f, 0) + " BTU/h-F of UA at the TD entered")
+      : "the coil makes " + fmt(capacity_at_dtd_btuh, 0) + " BTU/h at this TD";
+  const rating_verdict = !has_rating_td
+    ? "(no rating TD entered)"
+    : "at its " + fmt(rating_td_f, 1) + " F rating TD the same coil makes " + fmt(capacity_at_rating_btuh, 0) + " BTU/h, so running it at " + fmt(dtd, 1) + " F delivers " + fmt(capacity_ratio * 100, 0) + "% of the rated capacity -- capacity is linear in TD, which is what a lower TD costs in coil";
+  if (![capacity_at_dtd_btuh, capacity_at_rating_btuh, ua_required_btuh_f, td_required_f].every(Number.isFinite)) return { error: "Evaporator capacity math is not a finite value." };
   return {
     dtd, band,
-    note: "Evaporator design TD (DTD) = box temperature - the saturated suction temperature at the coil, the single number that sets the resulting box humidity. A small TD (a coil running close to the box temperature) holds a high relative humidity for produce and flowers; a large TD dries the air, which suits packaged or frozen goods but wilts produce. Common bands: <=10 F ~90% RH, 10-12 F ~80-85%, 12-16 F ~75-80%, >16 F <70%. Coil selection trades TD (humidity) against coil size (a smaller TD needs more coil). A selection aid; the coil manufacturer's rating at the design TD governs.",
+    has_ua, capacity_at_dtd_btuh, has_rating_td, capacity_at_rating_btuh, capacity_ratio,
+    has_load, load_met, ua_required_btuh_f, td_required_f, ua_ratio_vs_rating,
+    capacity_verdict, rating_verdict,
+    note: "Evaporator design TD (DTD) = box temperature - the saturated suction temperature at the coil, the single number that sets the resulting box humidity. A small TD (a coil running close to the box temperature) holds a high relative humidity for produce and flowers; a large TD dries the air, which suits packaged or frozen goods but wilts produce. Common bands: <=10 F ~90% RH, 10-12 F ~80-85%, 12-16 F ~75-80%, >16 F <70%. Coil selection trades TD (humidity) against coil size (a smaller TD needs more coil). A selection aid; the coil manufacturer's rating at the design TD governs. Capacity is the other half of the same choice and it is very nearly LINEAR in TD: Q = UA x TD, so halving the TD roughly doubles the coil surface needed for the same load. That is why the cheap design is a high TD, and what it costs is water -- a colder coil surface condenses and freezes more moisture out of the room air, the room's relative humidity falls, and the product loses weight. For a produce cooler that weight loss is the revenue. In a freezer the same physics appears as frost: a high TD frosts the coil faster, which drives more defrost cycles, and each defrost puts heat into the room that the plant then removes again. Entering a coil UA and a design load reports the capacity at this TD, the capacity at the coil's own published rating TD for comparison, and the TD the coil would need to carry the load -- so the capital cost of a lower TD sits next to what it buys. Those three inputs are optional and default to zero; with them empty this is the TD and humidity band alone.",
   };
 }
-export const evaporatorTdDtdExample = { inputs: { box_temp_f: 35, sst_f: 25 } };
+export const evaporatorTdDtdExample = { inputs: { box_temp_f: 35, sst_f: 25, design_load_btuh: 24000, coil_ua_btuh_f: 2600, rating_td_f: 12 } };
 function _v434renderEvaporatorTdDtd(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Evaporator design TD (DTD) = box temperature - saturated suction temperature, which sets the box humidity: a small TD holds high RH (produce), a large TD dries the air (packaged/frozen). A selection aid; the coil manufacturer's rating at the design TD governs.";
   const box = makeNumber("Box (room) temperature (°F)", "etd-box", { step: "any" });
   const sst = makeNumber("Saturated suction temperature (°F)", "etd-sst", { step: "any" });
-  for (const f of [box, sst]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { box.input.value = "35"; sst.input.value = "25"; update(); });
+  const load = makeNumber("Design load (BTU/h, 0 to skip the capacity check)", "etd-load", { step: "any", min: "0" });
+  const ua = makeNumber("Coil UA (BTU/h per °F, 0 to skip)", "etd-ua", { step: "any", min: "0" });
+  const rtd = makeNumber("Coil published rating TD (°F, 0 to skip)", "etd-rtd", { step: "any", min: "0" });
+  for (const f of [box, sst, load, ua, rtd]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { box.input.value = "35"; sst.input.value = "25"; load.input.value = "24000"; ua.input.value = "2600"; rtd.input.value = "12"; update(); });
   const oD = makeOutputLine(outputRegion, "Design TD (DTD)", "etd-out-d");
   const oB = makeOutputLine(outputRegion, "Expected humidity band", "etd-out-b");
+  const oC = makeOutputLine(outputRegion, "Capacity at this TD", "etd-out-c");
+  const oR = makeOutputLine(outputRegion, "Against the rating TD", "etd-out-r");
   const oNote = makeOutputLine(outputRegion, "Note", "etd-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeEvaporatorTdDtd({ box_temp_f: readNum(box.input), sst_f: readNum(sst.input) });
-    if (r.error) { oD.textContent = r.error; oB.textContent = "-"; oNote.textContent = ""; return; }
+    const r = computeEvaporatorTdDtd({ box_temp_f: readNum(box.input), sst_f: readNum(sst.input), design_load_btuh: readNum(load.input), coil_ua_btuh_f: readNum(ua.input), rating_td_f: readNum(rtd.input) });
+    if (r.error) { oD.textContent = r.error; oB.textContent = "-"; oC.textContent = "-"; oR.textContent = "-"; oNote.textContent = ""; return; }
     oD.textContent = fmt(r.dtd, 1) + " F";
     oB.textContent = r.band;
+    oC.textContent = r.capacity_verdict;
+    oR.textContent = r.rating_verdict;
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
-  for (const f of [box, sst]) f.input.addEventListener("input", update);
+  for (const f of [box, sst, load, ua, rtd]) f.input.addEventListener("input", update);
 }
 REFRIGERANT_RENDERERS["evaporator-td-dtd"] = _v434renderEvaporatorTdDtd;
 

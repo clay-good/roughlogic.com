@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "ae78c6a83be9d854",
+      "sha": "977a9bb6d3b2318d",
       "date": "2026-09-08"
     },
     "/tools/": {
-      "sha": "71c42070ea32fb58",
+      "sha": "b30ef60b49862838",
       "date": "2026-09-08"
     },
     "/groups/accounting/": {
-      "sha": "2c44fbfb11247dc5",
+      "sha": "5b34f4f214f6cabc",
       "date": "2026-09-08"
     },
     "/groups/agriculture/": {
-      "sha": "dd0faca5f8f35b9b",
+      "sha": "e749075cdf38a53c",
       "date": "2026-09-08"
     },
     "/groups/construction/": {
-      "sha": "547b7dcbb2afd8e4",
+      "sha": "8a2fae5fbbea010f",
       "date": "2026-09-08"
     },
     "/groups/cross-trade/": {
-      "sha": "dca2fffbd6e26d62",
+      "sha": "df415fd8f4a4c220",
       "date": "2026-09-08"
     },
     "/groups/educators/": {
-      "sha": "681be9d9b9e578c8",
+      "sha": "a2d062b475ac5633",
       "date": "2026-09-08"
     },
     "/groups/electrical/": {
-      "sha": "2b6bbd52d2598dba",
+      "sha": "e84a0687e5ec2b19",
       "date": "2026-09-08"
     },
     "/groups/field/": {
-      "sha": "b33d16b35cb09a81",
+      "sha": "09656a12a3b519e5",
       "date": "2026-09-08"
     },
     "/groups/fire-ground/": {
-      "sha": "b7f2282f82fc3a0a",
+      "sha": "08feb3d49229a6d4",
       "date": "2026-09-08"
     },
     "/groups/historical/": {
-      "sha": "903c699963ed5aee",
+      "sha": "6fc5fd55b627f570",
       "date": "2026-09-08"
     },
     "/groups/hvac/": {
-      "sha": "bc7d4813308b1d1e",
+      "sha": "92df61abf9892800",
       "date": "2026-09-08"
     },
     "/groups/kitchen/": {
-      "sha": "161d5bacc3e485f7",
+      "sha": "c790b3c2dcc6c89d",
       "date": "2026-09-08"
     },
     "/groups/lab/": {
-      "sha": "1020fb7074bb058f",
+      "sha": "fa5e6b8ae11aa732",
       "date": "2026-09-08"
     },
     "/groups/mechanic/": {
-      "sha": "83ca411259984c94",
+      "sha": "03d063c26a667e2f",
       "date": "2026-09-08"
     },
     "/groups/plumbing/": {
-      "sha": "2f3ddd897de373cd",
+      "sha": "fb82bf03754ed50a",
       "date": "2026-09-08"
     },
     "/groups/real-estate/": {
-      "sha": "0c9182ffd9347b0b",
+      "sha": "c08ad35a4b3b449b",
       "date": "2026-09-08"
     },
     "/groups/references/": {
-      "sha": "b24c626a0f6640ba",
+      "sha": "d004ea923eaab970",
       "date": "2026-09-08"
     },
     "/groups/restoration/": {
-      "sha": "ae73e67b4e422870",
+      "sha": "ea3f03c90f23e9a6",
       "date": "2026-09-08"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "681686d15082efce",
+      "sha": "e8146475e64fa188",
       "date": "2026-09-08"
     },
     "/groups/stage/": {
-      "sha": "c4741a29323a2f44",
+      "sha": "cc9ed9f6c2154ebe",
       "date": "2026-09-08"
     },
     "/groups/trucking/": {
-      "sha": "7632a359509f863d",
+      "sha": "64fa5f09768e6a7b",
       "date": "2026-09-08"
     },
     "/groups/water/": {
-      "sha": "782fab60107bec61",
+      "sha": "8686b964944b1b48",
       "date": "2026-09-08"
     },
     "/tools/aav-install-check/": {
@@ -248,6 +248,10 @@
     "/tools/ambient-ampacity-adjust/": {
       "sha": "c6b84143382f6790",
       "date": "2026-09-01"
+    },
+    "/tools/ammonia-charge-inventory/": {
+      "sha": "576547ecb52a707d",
+      "date": "2026-09-08"
     },
     "/tools/amortization-schedule/": {
       "sha": "39434d6b262b95ef",
@@ -1161,6 +1165,10 @@
       "sha": "b453d52324568a2d",
       "date": "2026-09-01"
     },
+    "/tools/co2-transcritical-pressure/": {
+      "sha": "c97386d32751eee7",
+      "date": "2026-09-08"
+    },
     "/tools/coagulant-dose/": {
       "sha": "dd68c4fd8e791ab6",
       "date": "2026-09-01"
@@ -1290,8 +1298,8 @@
       "date": "2026-09-01"
     },
     "/tools/compressor-displacement/": {
-      "sha": "3ac6593cc5a4af0d",
-      "date": "2026-09-01"
+      "sha": "e12d5688c0fe433f",
+      "date": "2026-09-08"
     },
     "/tools/compressor-short-cycle/": {
       "sha": "fae899ea3bee8b51",
@@ -1476,6 +1484,10 @@
     "/tools/condenser-heat-rejection/": {
       "sha": "d6a7b40abd98cb49",
       "date": "2026-09-01"
+    },
+    "/tools/condenser-td-head-pressure/": {
+      "sha": "128039383e4b3a98",
+      "date": "2026-09-08"
     },
     "/tools/condensing-flue-condensate/": {
       "sha": "48a1f66ef68562eb",
@@ -1858,8 +1870,8 @@
       "date": "2026-09-01"
     },
     "/tools/defrost-cycle-sizing/": {
-      "sha": "565113dca9ca4265",
-      "date": "2026-09-01"
+      "sha": "7a94422eb1548943",
+      "date": "2026-09-08"
     },
     "/tools/degree-day-energy/": {
       "sha": "df48db3af614852c",
@@ -2698,8 +2710,8 @@
       "date": "2026-09-04"
     },
     "/tools/flexible-pipe-deflection/": {
-      "sha": "bafb59148a96795e",
-      "date": "2026-09-04"
+      "sha": "490b0359215af896",
+      "date": "2026-09-08"
     },
     "/tools/float-method-flow/": {
       "sha": "fd822b4467d6a09e",
@@ -2805,6 +2817,10 @@
       "sha": "78e7cb791a84a28a",
       "date": "2026-09-07"
     },
+    "/tools/freezer-underfloor-heat/": {
+      "sha": "6b0fb9489370dd11",
+      "date": "2026-09-08"
+    },
     "/tools/freezing-time-plank/": {
       "sha": "483cddc4952c4122",
       "date": "2026-09-01"
@@ -2886,8 +2902,8 @@
       "date": "2026-09-01"
     },
     "/tools/gas-dp-flow-meter/": {
-      "sha": "ead380ea912901a1",
-      "date": "2026-09-01"
+      "sha": "7ebbca3277eb398d",
+      "date": "2026-09-08"
     },
     "/tools/gas-fuel-conversion/": {
       "sha": "1254b3b56d44f1bb",
@@ -3442,12 +3458,12 @@
       "date": "2026-09-01"
     },
     "/tools/hydronic-gpm-deltat/": {
-      "sha": "397ac3a21129642b",
-      "date": "2026-09-04"
+      "sha": "37cf914a271daac5",
+      "date": "2026-09-08"
     },
     "/tools/hydronic-injection-mixing/": {
-      "sha": "c99a8c3fa5cf48a8",
-      "date": "2026-09-01"
+      "sha": "3204ee6732eaf121",
+      "date": "2026-09-08"
     },
     "/tools/hydronic-system-volume/": {
       "sha": "58e0aa1639a902cb",
@@ -3502,8 +3518,8 @@
       "date": "2026-09-01"
     },
     "/tools/indirect-evaporative-cooling/": {
-      "sha": "dca484ae96b34971",
-      "date": "2026-09-04"
+      "sha": "0c2164d672e49aae",
+      "date": "2026-09-08"
     },
     "/tools/infiltration-load/": {
       "sha": "66b7961213084e72",
@@ -3917,6 +3933,10 @@
       "sha": "e4f59dc83023eb2f",
       "date": "2026-09-05"
     },
+    "/tools/machinery-room-ventilation/": {
+      "sha": "a71d50f74d653223",
+      "date": "2026-09-08"
+    },
     "/tools/machining-time/": {
       "sha": "febe0c6445e20035",
       "date": "2026-09-01"
@@ -4190,8 +4210,8 @@
       "date": "2026-09-01"
     },
     "/tools/moist-air-enthalpy/": {
-      "sha": "b86cb179f113926a",
-      "date": "2026-09-04"
+      "sha": "70ddaaf29f1524df",
+      "date": "2026-09-08"
     },
     "/tools/moisture-dry-goal/": {
       "sha": "c0c72014d0eb7817",
@@ -5361,6 +5381,10 @@
       "sha": "168ffcda9f6c74f2",
       "date": "2026-09-07"
     },
+    "/tools/receiver-pumpdown-capacity/": {
+      "sha": "4db6486c9b0d59c0",
+      "date": "2026-09-08"
+    },
     "/tools/recipe-scale/": {
       "sha": "44841255c1e69d09",
       "date": "2026-09-01"
@@ -5437,9 +5461,17 @@
       "sha": "1b0ebfa3a8eea036",
       "date": "2026-09-01"
     },
+    "/tools/refrigerated-case-load/": {
+      "sha": "dbca995ab2ab729b",
+      "date": "2026-09-08"
+    },
     "/tools/refrigeration-cop/": {
       "sha": "b68367b8d05b9c96",
       "date": "2026-09-01"
+    },
+    "/tools/refrigeration-relief-capacity/": {
+      "sha": "102f753d01995f48",
+      "date": "2026-09-08"
     },
     "/tools/regular-polygon/": {
       "sha": "fe55705e653d0390",
@@ -5824,6 +5856,10 @@
     "/tools/secondary-compression-settlement/": {
       "sha": "746fbd7e488377d3",
       "date": "2026-09-04"
+    },
+    "/tools/secondary-glycol-loop/": {
+      "sha": "b3e0cf5e8aec6b90",
+      "date": "2026-09-08"
     },
     "/tools/section-121-exclusion/": {
       "sha": "20ed6c0dd431ad26",
@@ -7361,6 +7397,10 @@
       "sha": "6ef0021b2baf92d3",
       "date": "2026-09-04"
     },
+    "/tools/two-stage-interstage-pressure/": {
+      "sha": "a532af5a6d4bc187",
+      "date": "2026-09-08"
+    },
     "/tools/two-stroke-mix/": {
       "sha": "9b4eccf2fab32f78",
       "date": "2026-09-04"
@@ -7370,8 +7410,8 @@
       "date": "2026-09-01"
     },
     "/tools/txv-capacity-check/": {
-      "sha": "a57269a9a7f30fd8",
-      "date": "2026-09-07"
+      "sha": "6eee4f4b61392b03",
+      "date": "2026-09-08"
     },
     "/tools/ujoint-operating-angle/": {
       "sha": "7e668ec62c12a91e",
@@ -7534,8 +7574,8 @@
       "date": "2026-09-01"
     },
     "/tools/walk-in-cooler-load/": {
-      "sha": "17aa27b9ce5b1fd4",
-      "date": "2026-09-01"
+      "sha": "6ccb77b6193b08da",
+      "date": "2026-09-08"
     },
     "/tools/walk-in-door-infiltration/": {
       "sha": "1868c5834f8ebfd0",
@@ -7718,8 +7758,8 @@
       "date": "2026-09-01"
     },
     "/tools/wet-bulb-psychrometer/": {
-      "sha": "e8c404eca220370e",
-      "date": "2026-09-04"
+      "sha": "ea1026b1f2003bbd",
+      "date": "2026-09-08"
     },
     "/tools/wh-expansion-tank/": {
       "sha": "5e56ba732c581364",

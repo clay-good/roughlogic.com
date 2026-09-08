@@ -1,5 +1,11 @@
 # roughlogic.com Specification v1486 -- Evaporator TD, Capacity, and Coil Humidity Effect (`calc-refrigeration.js`, Group C HVAC, industrial refrigeration, 1 New Tile)
 
+> **Status: CUT 2026-09-08 -- DUPLICATE. This tile was not built.** The formula screen for the
+> 2026-09-08 industrial refrigeration band found the headline of this question already answered by
+> `evaporator-td-dtd` in `calc-refrigerant.js`, which has computed TD = box temperature - saturated suction and the resulting humidity band since spec-v434. A second tile printing the same band from the same TD would be a duplicate of the visible answer, so the half this spec had that the shipped tile lacked -- capacity Q = UA x TD, the capacity at the coil's own published rating TD for comparison, the UA a load implies, and the TD the coil would need to carry a stated load -- landed on `evaporator-td-dtd` instead. Those three inputs default to zero, and with them empty the old answer is unchanged.
+>
+> The specification below is kept as the record of the screen. Do not implement it.
+>
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-refrigeration.js`**
 > (Group C, HVAC -- the existing category, hub `/groups/hvac/`; industrial and commercial refrigeration), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.

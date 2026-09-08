@@ -1562,6 +1562,17 @@ const RELATED = {
   "nesc-district-loading": ["conductor-sag-at-temperature","transverse-wind-load-conductor","conductor-blowout"],
   "conductor-creep-elongation": ["conductor-sag-at-temperature","line-ground-clearance-nesc","ruling-span"],
   "sagging-return-wave": ["ruling-span","conductor-sag-at-temperature","line-ground-clearance-nesc"],
+  // spec-v1484..v1494: industrial refrigeration band.
+  "ammonia-charge-inventory": ["machinery-room-ventilation","refrigeration-relief-capacity","receiver-pumpdown-capacity"],
+  "two-stage-interstage-pressure": ["compression-ratio-refrig","refrigeration-cop","condenser-td-head-pressure"],
+  "refrigerated-case-load": ["walk-in-cooler-load","product-pull-down-load","evaporator-td-dtd"],
+  "freezer-underfloor-heat": ["frost-depth-berggren","walk-in-cooler-load","snowmelt-load"],
+  "condenser-td-head-pressure": ["condenser-heat-rejection","approach-delta-t","head-pressure-control"],
+  "receiver-pumpdown-capacity": ["recovery-cylinder","ammonia-charge-inventory","refrigeration-relief-capacity"],
+  "secondary-glycol-loop": ["hydronic-gpm-deltat","glycol-mix","chilled-water-delta-t"],
+  "co2-transcritical-pressure": ["compression-ratio-refrig","head-pressure-control","condenser-td-head-pressure"],
+  "refrigeration-relief-capacity": ["machinery-room-ventilation","ammonia-charge-inventory","safety-valve-capacity"],
+  "machinery-room-ventilation": ["ammonia-charge-inventory","refrigeration-relief-capacity","refrigerant-leak-rate"],
   // spec-v1696..v1700, v1691..v1693: arboriculture and abatement band.
   "crown-reduction-leaf-area": ["crown-pruning-dose","trunk-decay-strength","tree-protection-zone"],
   "root-ball-size-weight": ["soil-volume-for-canopy","tree-protection-zone","log-limb-weight"],

@@ -22093,6 +22093,128 @@ export const CITATIONS = {
       { name: "The target sag comes from elsewhere", value: "the stringing chart at the ruling span and the temperature at that moment", source: "the utility's stringing charts" },
     ],
   },
+  // spec-v1484..v1494: the 2026-09-08 trade-expansion industrial refrigeration
+  // band, in the new calc-refrigeration.js. spec-v1486 was cut to evaporator-td-dtd.
+  "ammonia-charge-inventory": {
+    formula: "charge per vessel m = V x liquid fill fraction x liquid density at that vessel's own operating temperature, summed over the vessels and the pipe runs; the margin is the threshold quantity minus that total, and the volume that would cross it is that margin divided by the piping's liquid fraction times its density.",
+    edition: "The IIAR per-vessel charge inventory by name, against the 10,000 lb threshold quantity for anhydrous ammonia in OSHA PSM (29 CFR 1910.119, Appendix A) and the EPA RMP rule (40 CFR 68.130). Liquid ammonia density is strongly temperature dependent -- roughly 37 lb/cu ft in a warm receiver against about 42 at minus 20 degF -- so densities are ENTERED per vessel. It does not read a P and ID, estimate pipe volume from a line list, or determine regulatory coverage.",
+    freeAccess: "A sum of volumes times densities; no standard text is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The threshold is a cliff rather than a slope. Below it a plant has ordinary obligations; above it it has a written process safety management program, process hazard analyses, mechanical integrity, management of change, and an offsite consequence analysis. The useful question during a retrofit is therefore not what the charge is but how much headroom is left. The piping term is the one that surprises people: a plant counting only its vessels can believe itself exempt while the pipe runs carry more than the vessels do, so which is larger is COMPUTED here rather than asserted.",
+    assumptions: [
+      { name: "Densities are entered per vessel", value: "liquid ammonia density varies strongly with temperature", source: "the plant's own property data" },
+      { name: "Pipe volume is entered", value: "it is not estimated from a line list or a P and ID", source: "the plant's charge calculation of record" },
+      { name: "Coverage is not determined here", value: "the threshold is a quantity, not a compliance opinion", source: "29 CFR 1910.119 and 40 CFR 68" },
+    ],
+  },
+  "two-stage-interstage-pressure": {
+    formula: "interstage pressure = sqrt(P_low_absolute x P_high_absolute), the geometric mean, which makes the ratio equal in both stages; stage ratio = interstage / P_low = P_high / interstage; the arithmetic mean and the ratios it would produce are reported for contrast.",
+    edition: "The equal-stage-ratio optimum for multistage compression as refrigeration practice states it. Gauge pressures are converted at the 14.7 psi standard atmosphere the trade uses. It does not select compressors, size an intercooler, compute discharge temperature, or judge whether two-staging is warranted.",
+    freeAccess: "One square root on two pressures the reader reads off a gauge.",
+    governance: GOVERNANCE.general,
+    editionNote: "Compression work per stage follows the pressure RATIO rather than the pressure difference, so total work is least when both stages carry the same ratio -- and equal ratios put the interstage at the GEOMETRIC mean, always below the arithmetic mean the eye reaches for. The optimum is a starting point rather than an answer: where there is a substantial intermediate-temperature load, the interstage is set at that load's saturation pressure instead, because feeding it from the intermediate beats pulling it down to the low stage and compressing it back.",
+    assumptions: [
+      { name: "Gauge to absolute at 14.7 psi", value: "the refrigeration convention, not the 14.696 standard atmosphere", source: "refrigeration gauge practice" },
+      { name: "Equal ratios are the optimum", value: "true for ideal isentropic stages with perfect intercooling", source: "the compressor manufacturer's selection data" },
+      { name: "It does not select machines", value: "compressors come in discrete sizes and matching real equipment beats matching a theoretical optimum", source: "the refrigeration engineer of record" },
+    ],
+  },
+  "refrigerated-case-load": {
+    formula: "total = infiltration per foot x length + transmission per foot x length + product + internal electric, with the internal electric summed at each term's own run fraction and converted at 3.412141633 BTU/h per watt.",
+    edition: "The display-case load summed as ASHRAE Refrigeration practice writes it, with the watt-to-BTU/h conversion exact by definition. Infiltration and transmission are ENTERED per foot from the case manufacturer's published data, because they depend on the air curtain design, the discharge velocity, and the store's own humidity. It does not model the air curtain, size the evaporator or rack, or compute compressor power at the suction condition.",
+    freeAccess: "A sum of four terms and one exact unit conversion.",
+    governance: GOVERNANCE.general,
+    editionNote: "Every watt consumed inside the refrigerated envelope is removed twice -- once as electricity paid at the meter, once as heat paid at the compressor. Case lights, fan motors, anti-sweat heaters and defrost therefore cost roughly their own wattage again in refrigeration, which is why LED retrofits and anti-sweat controls pay back faster in refrigeration than the lighting arithmetic alone suggests. Which of the four terms is largest depends on the case, so the split is REPORTED rather than asserted.",
+    assumptions: [
+      { name: "Infiltration and transmission are entered per foot", value: "they depend on the air curtain, discharge velocity and store humidity", source: "the case manufacturer's published data" },
+      { name: "Run fractions are entered", value: "anti-sweat and defrost duty vary with control strategy and store conditions", source: "the store's own controls" },
+      { name: "It does not compute compressor power", value: "a low-temperature suction makes the second payment worse than the first", source: "the rack manufacturer's performance data" },
+    ],
+  },
+  "freezer-underfloor-heat": {
+    formula: "Q = U x A x (target soil temperature - room temperature); watts = Q / 3.412141633; tube length = Q / the entered output per foot; on-centre spacing = area / tube length, in inches; annual energy = watts x hours.",
+    edition: "The steady-state below-slab heat loss as freezer floor practice writes it, with the frost-heave mechanism as ASHRAE Refrigeration describes it: soil moisture freezing beneath a low-temperature room expands and heaves the slab, so the soil is held above 32 degF. The assembly U-factor and the tube output are ENTERED. It does not model transient frost penetration, soil moisture or groundwater, and it does not size the insulation.",
+    freeAccess: "One steady-state conduction relation and one exact unit conversion.",
+    governance: GOVERNANCE.general,
+    editionNote: "The mechanism is slow: a freezer pulls heat out of the ground continuously, the frost line advances over months and years, and freezing soil moisture expands. The heave is not uniform, so the slab cracks, and by the time it is visible the ice lens is established. Two sizing facts follow -- the load is small because the insulation above is doing the real work, so the answer is a modest system that must run reliably rather than a large one; and the design is fail-conscious, since an electric grid cast into the slab cannot be repaired without demolishing the freezer.",
+    assumptions: [
+      { name: "Steady state", value: "transient frost penetration and soil moisture are not modelled", source: "the geotechnical report" },
+      { name: "The assembly U-factor is entered", value: "it depends on the insulation, the slab and the sub-base", source: "the insulation design" },
+      { name: "It does not lay out the grid", value: "header and manifold design and serviceability are the real decision", source: "the refrigeration engineer of record" },
+    ],
+  },
+  "condenser-td-head-pressure": {
+    formula: "condensing temperature = ambient on the correct basis + TD; the change between two cases is that difference, and the compressor power change is that difference times the entered percent per degF; annual energy = compressor kW x that percent x hours, at 0.745699872 kW/hp.",
+    edition: "Condensing temperature = ambient + TD as condenser practice writes it, with the basis distinction ASHRAE Refrigeration states: air-cooled TD from the DRY bulb, evaporative TD from the WET bulb. The compressor power sensitivity is ENTERED (commonly one and a half to two percent per degF) because it depends on refrigerant, suction condition and machine. It does not size the condenser, compute the heat of rejection, or look up saturation pressure.",
+    freeAccess: "One sum, one difference, and one entered sensitivity.",
+    governance: GOVERNANCE.general,
+    editionNote: "The basis is the part most often got wrong. An air-cooled condenser's TD is measured from the dry bulb and an evaporative condenser's from the wet bulb, which in most US summers runs well below it -- so an evaporative unit at a wider TD can still condense cooler than an air-cooled unit at a tighter one, and reading a TD against the wrong basis produces a diagnosis off by the entire wet-bulb depression. Capacity is roughly linear in TD but compressor power responds to condensing TEMPERATURE, so adding surface until the TD drops a few degrees cuts power continuously for the life of the plant.",
+    assumptions: [
+      { name: "The basis is selected, not inferred", value: "air-cooled from dry bulb, evaporative from wet bulb", source: "ASHRAE Refrigeration" },
+      { name: "The power sensitivity is entered", value: "it depends on refrigerant, suction condition and compressor", source: "the compressor's own performance data" },
+      { name: "It does not size the condenser", value: "the manufacturer's rated capacity at the design condition governs", source: "the condenser manufacturer" },
+    ],
+  },
+  "receiver-pumpdown-capacity": {
+    formula: "available volume = receiver volume x fill limit - existing liquid; required volume = charge / (liquid density / 7.48052 gal per cu ft); the resulting fill is the sum over the receiver volume; the maximum charge is the available volume times that density.",
+    edition: "The receiver fill-limit check as IIAR 2 and ASHRAE 15 practice writes it, evaluated at the WARMEST expected liquid temperature because the hazard is hydrostatic overpressure from liquid thermal expansion in a vessel with no vapor space. The customary limit is four fifths of the volume and is ENTERED. Gallons convert at 1728/231 cubic inches per gallon, exact by definition. It does not size a relief valve or check the vessel's pressure rating.",
+    freeAccess: "One volume balance and one density; no standard text is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The fill limit is the whole point. A receiver filled solid with liquid and then warmed has no vapor space to absorb the liquid's thermal expansion, and the pressure rise is enormous and fast -- a vessel rupture rather than a relief-valve event where there is no liquid-side relief path. The limit is therefore evaluated at the warmest liquid temperature the receiver could credibly see, because the dangerous case is a shut-down plant sitting in a hot machine room. The practical use is a go or no-go before the shutdown: the alternative to discovering it mid-job is a rented recovery vessel, or venting, which is a reportable release.",
+    assumptions: [
+      { name: "Density at the warm condition", value: "the answer is most sensitive to this input", source: "the plant's property data" },
+      { name: "The fill limit is entered", value: "the customary limit is four fifths of the vessel volume", source: "IIAR 2 and ASHRAE 15" },
+      { name: "Not the recovery-cylinder rule", value: "recovery-cylinder covers a portable DOT cylinder on stamped water capacity", source: "EPA Section 608 practice" },
+    ],
+  },
+  "secondary-glycol-loop": {
+    formula: "water-basis flow = Q / (500 x dT); the fluid factor is 500 x specific gravity x specific heat and the corrected flow is Q / (fluid factor x dT); pump bhp = gpm x head x specific gravity / (3,960 x efficiency); the temperature penalty is the chiller approach plus the coil approach, times the entered percent per degF.",
+    edition: "The water-side transport relation with the SG x cp correction for a secondary fluid, and pump brake horsepower as pump practice writes it. The 500 constant is 8.33 lb/gal x 60 min/h x water's specific heat of 1.0, and 3,960 is 33,000 ft-lb/min per hp over that same water basis. Fluid properties, head and the approach temperatures are ENTERED. It does not compute viscosity or pressure drop, size the pump or chiller, or set freeze protection.",
+    freeAccess: "Two flow relations and one pump relation; no proprietary fluid data is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The flow correction is the part that gets skipped. The familiar 500 constant is water's number, and because a glycol solution's SG x cp product is below one the same duty at the same delta-T needs MORE flow, not less. The fluid factor reported here is exactly the input hydronic-gpm-deltat asks the user to supply, so this computes what that tile takes on faith. The temperature penalty compounds separately: a glycol coil sees fluid warmer than the refrigerant by the chiller's approach, so the evaporator runs colder for the same room, and every degree is compressor power. That is the honest price of the charge reduction a secondary loop buys.",
+    assumptions: [
+      { name: "Fluid properties are entered", value: "specific heat and specific gravity vary with glycol type, concentration and temperature", source: "the fluid manufacturer's data" },
+      { name: "Head is entered", value: "viscosity at low temperature raises it substantially and is not computed here", source: "the piping design" },
+      { name: "The compressor sensitivity is entered", value: "it depends on refrigerant, suction condition and machine", source: "the compressor's performance data" },
+    ],
+  },
+  "co2-transcritical-pressure": {
+    formula: "gas cooler outlet = ambient + approach; the cycle is transcritical when that outlet exceeds CO2's 87.8 degF critical temperature; above it the optimum high-side pressure is 2.6 x the outlet in degC + 7.54, in bar, converted at 1 bar = 100,000 Pa and 1 psi = 6,894.757293168361 Pa.",
+    edition: "CO2's critical point at 87.8 degF and about 1,071 psia, with the widely used transcritical optimum-pressure correlation. The correlation applies only above the critical temperature and is WITHHELD below it rather than printed with a caveat. It does not compute COP, capacity or discharge temperature, and does not model flash-gas bypass or ejectors.",
+    freeAccess: "One published correlation and two exact pressure conversions.",
+    governance: GOVERNANCE.general,
+    editionNote: "Above the critical point there is no condensation, so the high side is a single-phase gas being cooled and pressure and temperature become INDEPENDENT -- unlike a condenser, where fixing one fixes the other. Raising discharge pressure at a fixed outlet temperature increases the refrigerating effect per pound and also increases compressor work; the two cross, and the crossing point is the optimum. It depends almost entirely on the gas cooler OUTLET temperature, so the control strategy is to measure that and float the high side continuously. On a cool day the cycle reverts to subcritical condensing, where a controller still applying the transcritical formula would command a pressure hundreds of psi above what the cycle needs.",
+    assumptions: [
+      { name: "A correlation, not a cycle model", value: "COP, capacity and discharge temperature are not computed", source: "the equipment manufacturer's control algorithm" },
+      { name: "Withheld below the critical temperature", value: "the relation has no meaning where the high side condenses", source: "CO2 property data" },
+      { name: "The approach is entered", value: "gas cooler approach depends on the coil and the ambient conditions", source: "the gas cooler manufacturer" },
+    ],
+  },
+  "refrigeration-relief-capacity": {
+    formula: "required capacity C = f x D x L in lb/min of air, with D the vessel diameter and L the length in feet; the margin is the entered valve rating over that; the discharge equivalent length is the straight run plus the fittings, compared against the maximum the valve supports.",
+    edition: "The required relieving capacity as ANSI/ASHRAE 15 and IIAR 2 write it, the D x L product standing for the shell area the fire case heats, with f taken from the standard's own table and ENTERED. The maximum discharge equivalent length the valve supports at its set pressure is ENTERED from the valve manufacturer's published table. It does not select the valve, size a common header for simultaneous relief, compute back pressure from first principles, or address hydrostatic relief.",
+    freeAccess: "One product and one length comparison; no table from the standard is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The D x L term is the vessel's external surface in disguise, because the governing case is a fire heating the shell and boiling the contents -- which is why a long thin vessel and a short fat one of the same VOLUME need different relief, and why relief sizing never asks how much refrigerant is inside. The second half is the discharge piping and it fails more often than the valve: a valve's rated capacity is achievable only if the downstream piping does not build enough back pressure to choke it. A correctly sized valve on undersized discharge piping is an undersized relief system, with a valve that is stamped correctly, inspected annually, and still will not do its job.",
+    assumptions: [
+      { name: "f is entered from the standard's table", value: "it carries the refrigerant's latent heat and vapor properties, so ammonia, R-22 and CO2 differ", source: "ANSI/ASHRAE 15" },
+      { name: "The maximum discharge length is entered", value: "it comes from the valve manufacturer's table at the set pressure", source: "the valve manufacturer" },
+      { name: "It does not size a common header", value: "simultaneous relief of several vessels is a separate analysis", source: "IIAR 2 and the pressure-vessel code" },
+    ],
+  },
+  "machinery-room-ventilation": {
+    formula: "required emergency exhaust Q = 100 x sqrt(G) in cfm, with G the mass in pounds of the largest single system's charge; air changes = Q x 60 / room volume; louver free area = Q / face velocity, and the gross louver is that over the free-area fraction; the charge an installed fan covers is (cfm/100) squared.",
+    edition: "The emergency mechanical ventilation rate as ANSI/ASHRAE 15 states it, carried by IIAR 2 for ammonia machinery rooms. Louver face velocity and free-area fraction are ENTERED. It does not size the separate continuous ventilation rate for occupied heat removal, set refrigerant-detector locations or setpoints, evaluate the discharge location, or determine whether a machinery room is required.",
+    freeAccess: "One square root and one area; no standard text is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Two features of the relation carry the engineering. The square root means doubling the charge multiplies the requirement by about 1.41 rather than 2, because the rate dilutes a credible release to a survivable concentration rather than handling the entire charge. And it is the LARGEST SINGLE SYSTEM that governs rather than the sum in the room, because the design event is one system failing. The number that actually fails inspections is makeup air: a large exhaust fan in a tight room depressurizes it, rides up its curve, and delivers a fraction of the design. Detection is the other half -- ventilation that has to be started by a person already overcome is not a safety system.",
+    assumptions: [
+      { name: "Louver face velocity and free area are entered", value: "they depend on the louver selected and its pressure drop", source: "the louver manufacturer" },
+      { name: "The continuous rate is separate", value: "occupied heat removal is a different and much smaller requirement", source: "ANSI/ASHRAE 15" },
+      { name: "Detection is not computed", value: "the detector, its setpoint and the alarm are part of the same design", source: "ASHRAE 15 and IIAR 2" },
+    ],
+  },
   // spec-v1696..v1700 and v1691..v1693: the 2026-09-08 trade-expansion
   // arboriculture and abatement band. v1690, v1694 and v1695 were cut.
   "crown-reduction-leaf-area": {

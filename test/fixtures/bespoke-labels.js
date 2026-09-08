@@ -324,7 +324,7 @@ export const BESPOKE_LABELS = {
   "evaporation-load": {"area_ft2":"Affected floor area (ft2)","water_class":"Water class","load_factor":"Load factor (gal/ft2, blank = class default)","first24_fraction":"First-24-hour fraction (0-1)","derating":"Dehumidifier derating factor (0-1)"},
   "evaporative-cooler-effectiveness": {"dry_bulb_F":"Entering dry-bulb (°F)","wet_bulb_F":"Entering wet-bulb (°F)","effectiveness":"Pad saturation effectiveness (0-1)"},
   "evaporative-cooling": {"evaporation_rate_lb_hr":"Evaporation rate (lb/hr)","hfg_btu_per_lb":"Latent heat (BTU/lb)"},
-  "evaporator-td-dtd": {"box_temp_f":"Box (room) temperature (°F)","sst_f":"Saturated suction temperature (°F)"},
+  "evaporator-td-dtd": {"box_temp_f":"Box (room) temperature (°F)","sst_f":"Saturated suction temperature (°F)","design_load_btuh":"Design load (BTU/h, 0 to skip the capacity check)","coil_ua_btuh_f":"Coil UA (BTU/h per °F, 0 to skip)","rating_td_f":"Coil published rating TD (°F, 0 to skip)"},
   "excavation": {"length_ft":"Length (ft)","width_ft":"Width (ft)","depth_ft":"Depth (ft)","side_slope_angle_deg":"Side-slope angle (deg, 90 = vertical)"},
   "excavation-bench-plan": {"depth_ft":"Trench depth (ft)","soil_class":"Soil class (OSHA Appendix B)","surcharge":"Surcharge load near trench","length_ft":"Excavation length (ft)","bottom_width_ft":"Bottom width (ft; default 2)"},
   "excess-air-o2": {"measured_o2_pct":"Flue-gas O2 (%, dry air-free)","measured_co2_pct":"Flue-gas CO2 (%, 0 to use the O2 form)","co2max_pct":"Fuel CO2max (%: 11.7 gas / 13.7 propane / 15.3 oil)"},

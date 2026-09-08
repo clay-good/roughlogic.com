@@ -1119,6 +1119,17 @@ const _TILES = [
   ["nesc-district-loading", "A"],
   ["conductor-creep-elongation", "A"],
   ["sagging-return-wave", "A"],
+  // spec-v1484..v1494 industrial refrigeration band (new calc-refrigeration.js)
+  ["ammonia-charge-inventory", "C"],
+  ["two-stage-interstage-pressure", "C"],
+  ["refrigerated-case-load", "C"],
+  ["freezer-underfloor-heat", "C"],
+  ["condenser-td-head-pressure", "C"],
+  ["receiver-pumpdown-capacity", "C"],
+  ["secondary-glycol-loop", "C"],
+  ["co2-transcritical-pressure", "C"],
+  ["refrigeration-relief-capacity", "C"],
+  ["machinery-room-ventilation", "C"],
   // spec-v1696..v1700, v1691..v1693 arboriculture and abatement band
   ["crown-reduction-leaf-area", "L"],
   ["root-ball-size-weight", "L"],

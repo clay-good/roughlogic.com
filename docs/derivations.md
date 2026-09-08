@@ -3098,7 +3098,7 @@ cross-check.
 | calc-refrigerant.js | `computeCondenserCopForHeatRejection` | `{ q_evap = 0, target_thr = 0, unit_tons = 0 } = {}` | _ | _ | _ |
 | calc-refrigerant.js | `computeCondenserHeatRejection` | `{ q_evap = 0, unit_tons = 0, cop = 0 } = {}` | _ | _ | _ |
 | calc-refrigerant.js | `computeDefrostCycleSizing` | `{ frost_lb = 0, coil_temp_f = -10, coil_mass_lb = 0, coil_specific_heat = 0.1...` | _ | _ | _ |
-| calc-refrigerant.js | `computeEvaporatorTdDtd` | `{ box_temp_f = 0, sst_f = 0 } = {}` | _ | _ | _ |
+| calc-refrigerant.js | `computeEvaporatorTdDtd` | `{ box_temp_f = 0, sst_f = 0, design_load_btuh = 0, coil_ua_btuh_f = 0, rating...` | _ | _ | _ |
 | calc-refrigerant.js | `computeFlashGasSubcool` | `{ vertical_lift_ft = 0, friction_dp_psi = 0, static_gradient = 0.43, pt_slope...` | _ | _ | _ |
 | calc-refrigerant.js | `computeHeadPressureControl` | `{ refrigerant = "R_410A", evaporator_psig = 0, valve_dp_psi = 0, line_losses_...` | _ | _ | _ |
 | calc-refrigerant.js | `computeProductPullDownLoad` | `{ mass_lb = 0, cp_above = 0, t_enter_f = 0, t_storage_f = 0, t_freeze_f = 0, ...` | _ | _ | _ |
@@ -3118,6 +3118,16 @@ cross-check.
 | calc-refrigerant.js | `renderRefrigerantCharge` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-refrigerant.js | `renderRefrigerantPT` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-refrigerant.js | `renderSuperheatSubcool` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-refrigeration.js | `computeAmmoniaChargeInventory` | `{ receiver_volume_gal = 0, receiver_fill_fraction = 0, receiver_density_lb_ft...` | _ | _ | _ |
+| calc-refrigeration.js | `computeCo2TranscriticalPressure` | `{ ambient_f = 0, gas_cooler_approach_f = 0, evaporating_psig = 0 } = {}` | _ | _ | _ |
+| calc-refrigeration.js | `computeCondenserTdHeadPressure` | `{ condenser_type = "air_cooled", ambient_f = 0, design_td_f = 0, alternate_am...` | _ | _ | _ |
+| calc-refrigeration.js | `computeFreezerUnderfloorHeat` | `{ floor_area_ft2 = 0, room_temp_f = 0, target_soil_temp_f = 0, u_factor = 0, ...` | _ | _ | _ |
+| calc-refrigeration.js | `computeMachineryRoomVentilation` | `{ largest_system_charge_lb = 0, room_length_ft = 0, room_width_ft = 0, room_h...` | _ | _ | _ |
+| calc-refrigeration.js | `computeReceiverPumpdownCapacity` | `{ receiver_volume_gal = 0, existing_liquid_gal = 0, fill_limit_fraction = 0.8...` | _ | _ | _ |
+| calc-refrigeration.js | `computeRefrigeratedCaseLoad` | `{ case_length_ft = 0, infiltration_btuh_per_ft = 0, transmission_btuh_per_ft ...` | _ | _ | _ |
+| calc-refrigeration.js | `computeRefrigerationReliefCapacity` | `{ vessel_diameter_ft = 0, vessel_length_ft = 0, f_constant = 0, valve_rated_l...` | _ | _ | _ |
+| calc-refrigeration.js | `computeSecondaryGlycolLoop` | `{ load_btuh = 0, delta_t_f = 0, glycol_cp = 1, glycol_sg = 1, head_ft = 0, pu...` | _ | _ | _ |
+| calc-refrigeration.js | `computeTwoStageInterstagePressure` | `{ low_psig = 0, high_psig = 0, intermediate_load_psig = 0 } = {}` | _ | _ | _ |
 | calc-rescue.js | `computeConfinedSpacePurge` | `{ volume_ft3 = 0, blower_cfm = 0, target_purges = 7 }` | _ | _ | _ |
 | calc-rescue.js | `computeFallArrestAnchorage` | `{ workers_attached = 1, anchorage_capacity_lb = 0, design_route = "prescripti...` | _ | _ | _ |
 | calc-rescue.js | `computeFallArrestClearance` | `{ free_fall_distance_ft = 0, deceleration_distance_ft = 0, worker_height_ft =...` | _ | _ | _ |
@@ -3623,7 +3633,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2209.
+Row count: 2219.
 
 <!-- END function-corpus-v14 -->
 
@@ -4078,7 +4088,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (165 tiles)
+### Group C HVAC (175 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4089,6 +4099,7 @@ per spec-v14 §13.1 second paragraph.
 | `air-leak-cost` | Compressed-Air Leak Load and Annual Cost (Load/Unload Test) | US DOE Compressed Air Challenge load/...; spec-v239 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `air-pressure-setpoint-savings` | Compressed-Air Discharge-Pressure Setpoint Savings | Isentropic compression-power ratio (D...; spec-v241 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `air-receiver` | Compressed Air Receiver Sizing | Compressed Air & Gas Institute (CAGI)...; Three tools (4 cfm @ 0.5 + 3 cfm @ 0.4 + 8 cfm @ 0.3) = 5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `ammonia-charge-inventory` | Ammonia Refrigeration Charge Inventory and PSM Threshold | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `approach-delta-t` | Approach and Delta-T Diagnostics | ACCA / manufacturer commissioning bul...; Outdoor 90 F / condenser sat 105 F -> approach 15 F (norm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ashrae-622-ventilation` | ASHRAE 62.2 Whole-House Mechanical Ventilation Rate | ASHRAE 62.2-2019 §4.1; spec-v219 section 2.1 pinned example (no credit) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `assembly-r-value` | Wall Assembly R-Value | ASHRAE Handbook of Fundamentals paral...; spec-v99 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4108,6 +4119,7 @@ per spec-v14 §13.1 second paragraph.
 | `chimney-draft` | Theoretical Chimney Draft | ASHRAE Handbook HVAC Systems / NFPA 211; 30 ft stack, 60 F ambient, 400 F mean flue, 14.7 psia -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `chimney-height-for-draft` | Chimney Height for a Target Draft | ASHRAE Handbook HVAC Systems / NFPA 2...; 0.1046 in wc net, 60 F ambient, 400 F mean flue, 14.7 psi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `co-air-free` | Air-Free CO Correction | ANSI Z21 / BPI field practice; 60 ppm measured at 8% O2 -> 60 x 20.9 / 12.9 = 97 ppm air... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `co2-transcritical-pressure` | CO2 Transcritical Gas Cooler Optimum Pressure | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `coil-bypass-factor` | Coil Bypass Factor and Apparatus Dew Point | ASHRAE Fundamentals; spec-v377 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `coil-face-area` | Cooling Coil Face Area for a Target Velocity | coil-selection practice; spec-v701 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `coil-face-velocity` | Cooling Coil Face Velocity and Carryover Check | coil-selection practice; spec-v409 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4127,6 +4139,7 @@ per spec-v14 §13.1 second paragraph.
 | `condensate-trap-depth` | Condensate Drain Trap Depth from Fan Static | Trane condensate-trapping bulletin; 2.0 in w.c. worst-case negative static, 1-in drain, 0.5-i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `condenser-cop-for-heat-rejection` | COP Implied by the Heat of Rejection | THR = Q_evap (1 + 1/COP), solved for COP; spec-v761 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `condenser-heat-rejection` | Condenser Total Heat of Rejection | Total heat of rejection THR = Q_evap ...; spec-v322 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `condenser-td-head-pressure` | Condenser TD and Condensing Temperature (Dry or Wet Bulb) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `condensing-flue-condensate` | Condensing Appliance Flue Condensate Rate | Condensing appliance flue condensate ...; water = 1 therm/hr x 9.4 = 9.4 lb/hr; condensate = 9.4 x ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cooling-coil-total-load` | Cooling Coil Total Load from Enthalpy Difference | ASHRAE Fundamentals; spec-v376 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cooling-tower` | Cooling Tower Approach and Range | CTI ATC-105 cooling-tower test code; 95 F in / 85 F out / 75 F wet-bulb / 300 gpm / 15 kW fan ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4169,6 +4182,7 @@ per spec-v14 §13.1 second paragraph.
 | `flat-oval-duct` | Flat-Oval Duct Equivalent Round Diameter | ASHRAE Fundamentals (duct design) / S...; A = (pi/4)(10^2) + 10(20-10) = 78.54 + 100 = 178.54 in^2;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flue-gas-combustion-eff` | Flue-Gas Combustion Efficiency (Stack Loss) | Siegert stack-loss method (DIN combus...; Natural gas, 5% O2, 400 F stack over 70 F air -> CO2 8.90... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flue-gas-dew-point` | Natural-Gas Flue-Gas Water Dew Point | Natural-gas flue-gas water dew point ...; frac = 2/(1 + 9.52 x 1.15) = 0.1674; p = 127.2 mmHg; Anto... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `freezer-underfloor-heat` | Freezer Slab Underfloor Heat and Frost Heave | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fuel-oil-atomizing-viscosity` | Fuel Oil Heating for Atomizing Viscosity | Project (first-principles); the burner manufacturer, the oil supplier data sheet, and... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `furnace-airflow-to-rise` | Furnace Airflow to Temperature Rise | First-principles sensible-heat relati...; spec-v655 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `furnace-temp-rise` | Furnace Temperature Rise and Derived Airflow | First-principles sensible-heat relati...; spec-v110 section 2.2 pinned example (70->120 F, 100k inp... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4194,6 +4208,7 @@ per spec-v14 §13.1 second paragraph.
 | `insulation-thickness-for-heat-loss` | Pipe Insulation Thickness for a Target Heat Loss | Fourier cylindrical-shell conduction ...; od 2 in, k 0.25, 200 vs 70 F, target 40 BTU/hr-ft -> 0.53... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `internal-heat-gains` | Internal Heat Gains: People, Lighting, Equipment | ASHRAE / ACCA Manual J internal gains; spec-v228 section 2.1 pinned example (small office) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `isolator-deflection` | Isolator Static Deflection for a Target Isolation | ASHRAE Fundamentals, Sound and Vibrat...; spec-v633 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `machinery-room-ventilation` | Refrigeration Machinery Room Ventilation (ASHRAE 15) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `manual-d-friction-rate` | Manual D Friction Rate (Available Static Pressure) | ACCA Manual D; spec-v408 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `manual-j-cooling` | Manual J Cooling Load (Simplified) | ACCA Manual J residential cooling-loa...; 1500 ft^2 / 1200 wall / 200 window / 4 occupants / 95 out... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `manual-j-heating` | Manual J Heating Load (Simplified) | ACCA Manual J residential heating-loa...; 1500 ft^2 / 1200 wall / 200 window / 1500 ceiling / 10 ou... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4216,6 +4231,7 @@ per spec-v14 §13.1 second paragraph.
 | `pump-specific-speed` | Pump Specific Speed and Impeller Type | Hydraulic Institute specific speed; spec-v307 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pump-suction-specific-speed` | Pump Suction Specific Speed (Nss) | Hydraulic Institute suction specific ...; spec-v629 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `radiant-floor-output` | Radiant Floor Heat Output | radiant-panel practice; spec-v442 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `receiver-pumpdown-capacity` | Refrigerant Receiver Pump-Down Capacity | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `recovery-cylinder` | Recovery-Cylinder 80% Fill | DOT / AHRI 700 / EPA Section 608 reco...; spec-v102 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `refrigerant-charge` | Refrigerant Charge Weighing | Chemours / Honeywell published refrig...; R-410A / 25 ft of 3/8 in + 5 ft of 1/2 in -> 15 + 4.75 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `refrigerant-charging` | Refrigerant Superheat / Subcooling (psig-psia toggle) | ACCA / NATE refrigerant-charging meth...; R_410A / 130 psig suction / 50 F suction-line / 350 psig ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4226,17 +4242,21 @@ per spec-v14 §13.1 second paragraph.
 | `refrigerant-pt` | Refrigerant P-T Chart | Chemours / Honeywell published P-T bu...; R-410A / 118 psig -> 40 F sat temp; pure table lookup | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `refrigerant-recovery-time` | Refrigerant Recovery Time and Phase Split | Project (first-principles); charge divided by phase rate | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `refrigerant-velocity` | Refrigerant Line Velocity and Oil Return | ASHRAE Refrigeration Handbook (line s...; 600 lb/hr / 0.5 ft^3/lb / 0.75 in ID -> 1629.75 fpm (suct... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `refrigerated-case-load` | Refrigerated Display Case Load and Internal Electric | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `refrigeration-cop` | Refrigeration COP and Carnot Limit | Refrigeration COP and Carnot limit; spec-v321 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `refrigeration-relief-capacity` | Refrigeration Pressure-Relief Discharge Capacity (ASHRAE 15) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `reynolds-number-pipe` | Pipe Flow Reynolds Number and Regime | Reynolds number Re = V D / nu; spec-v305 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `round-to-rect-duct` | Round-to-Rectangular Duct Equivalent | ASHRAE Fundamentals (duct design) / S...; 14 in x 8 in rectangular -> equivalent diameter 11.46 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `run-capacitor-microfarad` | Run Capacitor Microfarad Check | First-principles capacitive reactance...; spec-v104 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `safety-valve-capacity` | Boiler Safety Valve Relieving Capacity | Project (first-principles); ASME BPVC Sections I and IV, the National Board, and the ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `secondary-glycol-loop` | Secondary Coolant (Glycol) Loop Flow and Pump Penalty | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `seer-eer` | SEER and EER Conversion | Project (engineering approximation); EER 12 -> SEER 13.44 / SEER2 estimate 12.768 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shr` | Sensible Heat Ratio | ASHRAE Handbook (Fundamentals); 24,000 BTU/hr sensible / 30,000 BTU/hr total -> SHR 0.80 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shr-latent` | Sensible Heat Ratio / Latent Split (ASHRAE) | ASHRAE; Q_s = 1.08 * 1200 * 20 = 25,920; Q_l = 36,000 - 25,920 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `snowmelt-load` | Hydronic Snowmelt Load and Boiler Sizing (ASHRAE) | ASHRAE snow-melting flux / Chapman IP...; spec-v478 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `static-pressure-hvac` | Static Pressure | ACCA Manual D / ASHRAE Fundamentals; filter 0.10 + coil 0.30 + supply duct 0.20 + return duct ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `superheat-subcool` | Superheat and Subcool | AHRI / manufacturer P-T charts; R-410A at 118 psig saturates at ~40 F; suction line at 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `two-stage-interstage-pressure` | Two-Stage Refrigeration Interstage Pressure | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `txv-capacity-check` | TXV Capacity Correction and Valve Sizing | Project (first-principles); sqrt(actual dP / rated dP) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vacuum-decay-test` | Vacuum Decay (Blank-Off) Test | First-principles standing-decay (blan...; spec-v105 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `valve-authority` | Control Valve Authority (Beta) | Control valve authority (beta); beta = 5/(5+3) = 5/8 = 0.625 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5754,6 +5774,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1958. Fixture-covered or reference-cadence: 1958 / 1958.
+Tile count: 1968. Fixture-covered or reference-cadence: 1968 / 1968.
 
 <!-- END tile-index-v14 -->

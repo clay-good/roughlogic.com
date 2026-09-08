@@ -102196,6 +102196,576 @@
    }
   },
   {
+   "tile_id": "ammonia-charge-inventory",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Ammonia Refrigeration Charge Inventory and PSM Threshold -- the spec-v1484 worked example, recomputed",
+   "source_edition_or_year": "spec-v1484 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "receiver_volume_gal": 1200,
+    "receiver_fill_fraction": 0.3,
+    "receiver_density_lb_ft3": 37.2,
+    "recirculator_volume_gal": 900,
+    "recirculator_fill_fraction": 0.6,
+    "recirculator_density_lb_ft3": 42.4,
+    "piping_volume_ft3": 780,
+    "piping_liquid_fraction": 0.25,
+    "piping_density_lb_ft3": 40,
+    "threshold_lb": 10000
+   },
+   "outputs": {
+    "receiver_lb": {
+     "value": 1790.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "recirculator_lb": {
+     "value": 3060.75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "piping_lb": {
+     "value": 7800,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_lb": {
+     "value": 12651,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_lb": {
+     "value": -2651,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pct_of_threshold": {
+     "value": 126.51,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "two-stage-interstage-pressure",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Two-Stage Refrigeration Interstage Pressure -- the spec-v1485 worked example, recomputed",
+   "source_edition_or_year": "spec-v1485 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "low_psig": 15,
+    "high_psig": 185,
+    "intermediate_load_psig": 0
+   },
+   "outputs": {
+    "interstage_psia": {
+     "value": 77.01357,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "interstage_psig": {
+     "value": 62.31357,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "stage_ratio": {
+     "value": 2.59305,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "single_stage_ratio": {
+     "value": 6.72391,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "arithmetic_mean_psig": {
+     "value": 100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "refrigerated-case-load",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Refrigerated Display Case Load and Internal Electric -- the spec-v1487 worked example, recomputed",
+   "source_edition_or_year": "spec-v1487 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "case_length_ft": 12,
+    "infiltration_btuh_per_ft": 780,
+    "transmission_btuh_per_ft": 95,
+    "product_btuh": 1200,
+    "lights_w": 240,
+    "fan_w": 310,
+    "antisweat_w": 180,
+    "antisweat_run_fraction": 0.6,
+    "defrost_w": 0,
+    "defrost_run_fraction": 0,
+    "retrofit_lights_w": 90,
+    "retrofit_antisweat_run_fraction": 0.2
+   },
+   "outputs": {
+    "infiltration_btuh": {
+     "value": 9360,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "transmission_btuh": {
+     "value": 1140,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "internal_electric_w": {
+     "value": 658,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "internal_btuh": {
+     "value": 2245.18919,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_btuh": {
+     "value": 13945.18919,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "internal_pct": {
+     "value": 16.1001,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "retrofit_total_btuh": {
+     "value": 13187.69375,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "meter_saving_w": {
+     "value": 222,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "freezer-underfloor-heat",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Freezer Slab Underfloor Heat and Frost Heave -- the spec-v1488 worked example, recomputed",
+   "source_edition_or_year": "spec-v1488 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "floor_area_ft2": 6000,
+    "room_temp_f": -10,
+    "target_soil_temp_f": 45,
+    "u_factor": 0.045,
+    "tube_output_btuh_per_ft": 12,
+    "energy_rate_per_kwh": 0.09,
+    "hours_per_year": 8760
+   },
+   "outputs": {
+    "td_f": {
+     "value": 55,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heat_loss_btuh": {
+     "value": 14850,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "watts": {
+     "value": 4352.10539,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "watts_per_ft2": {
+     "value": 0.72535,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tube_length_ft": {
+     "value": 1237.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "spacing_in": {
+     "value": 58.18182,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annual_kwh": {
+     "value": 38124.44324,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annual_cost": {
+     "value": 3431.19989,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "condenser-td-head-pressure",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Condenser TD and Condensing Temperature -- the spec-v1489 worked example, recomputed",
+   "source_edition_or_year": "spec-v1489 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "condenser_type": "evaporative",
+    "ambient_f": 78,
+    "design_td_f": 20,
+    "alternate_ambient_f": 78,
+    "alternate_td_f": 15,
+    "power_pct_per_deg_f": 1.75,
+    "compressor_hp": 300,
+    "annual_hours": 6000,
+    "energy_rate_per_kwh": 0.09
+   },
+   "outputs": {
+    "condensing_f": {
+     "value": 98,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alternate_condensing_f": {
+     "value": 93,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "condensing_change_f": {
+     "value": -5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "power_change_pct": {
+     "value": -8.75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "receiver-pumpdown-capacity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Refrigerant Receiver Pump-Down Capacity -- the spec-v1490 worked example, recomputed",
+   "source_edition_or_year": "spec-v1490 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "receiver_volume_gal": 1000,
+    "existing_liquid_gal": 220,
+    "fill_limit_fraction": 0.8,
+    "liquid_density_lb_ft3": 36.9,
+    "charge_to_pump_lb": 2400
+   },
+   "outputs": {
+    "density_lb_gal": {
+     "value": 4.93281,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "available_gal": {
+     "value": 580,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_gal": {
+     "value": 486.53785,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "resulting_fill_pct": {
+     "value": 70.65379,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "spare_gal": {
+     "value": 93.46215,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_charge_lb": {
+     "value": 2861.03125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "secondary-glycol-loop",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Secondary Coolant (Glycol) Loop Flow and Pump Penalty -- the spec-v1491 worked example, recomputed",
+   "source_edition_or_year": "spec-v1491 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "load_btuh": 1200000,
+    "delta_t_f": 10,
+    "glycol_cp": 0.85,
+    "glycol_sg": 1.04,
+    "head_ft": 70,
+    "pump_efficiency": 0.7,
+    "chiller_approach_f": 6,
+    "coil_approach_f": 4,
+    "compressor_pct_per_deg_f": 2.2,
+    "annual_hours": 6000,
+    "energy_rate_per_kwh": 0.09
+   },
+   "outputs": {
+    "water_gpm": {
+     "value": 240,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "glycol_gpm": {
+     "value": 271.49321,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "flow_increase_pct": {
+     "value": 13.12217,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fluid_factor": {
+     "value": 442,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pump_bhp": {
+     "value": 7.13012,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_approach_f": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "compressor_penalty_pct": {
+     "value": 22,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "co2-transcritical-pressure",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "CO2 Transcritical Gas Cooler Optimum Pressure -- the spec-v1492 worked example, recomputed",
+   "source_edition_or_year": "spec-v1492 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "ambient_f": 95,
+    "gas_cooler_approach_f": 5,
+    "evaporating_psig": 300
+   },
+   "outputs": {
+    "gc_outlet_f": {
+     "value": 100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gc_outlet_c": {
+     "value": 37.77778,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "p_opt_bar": {
+     "value": 105.76222,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "p_opt_psia": {
+     "value": 1533.95134,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "p_opt_psig": {
+     "value": 1519.25134,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pressure_ratio": {
+     "value": 4.87433,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "refrigeration-relief-capacity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Refrigeration Pressure-Relief Discharge Capacity (ASHRAE 15) -- the spec-v1493 worked example, recomputed",
+   "source_edition_or_year": "spec-v1493 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "vessel_diameter_ft": 4,
+    "vessel_length_ft": 16,
+    "f_constant": 0.5,
+    "valve_rated_lb_min": 45,
+    "pipe_straight_length_ft": 60,
+    "fitting_equivalent_length_ft": 25,
+    "max_allowable_equivalent_length_ft": 120
+   },
+   "outputs": {
+    "dl_product_ft2": {
+     "value": 64,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_lb_min": {
+     "value": 32,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_ratio": {
+     "value": 1.40625,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "equivalent_length_ft": {
+     "value": 85,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "length_margin_ft": {
+     "value": 35,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "machinery-room-ventilation",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Refrigeration Machinery Room Ventilation (ASHRAE 15) -- the spec-v1494 worked example, recomputed",
+   "source_edition_or_year": "spec-v1494 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "largest_system_charge_lb": 2400,
+    "room_length_ft": 40,
+    "room_width_ft": 30,
+    "room_height_ft": 16,
+    "louver_face_velocity_fpm": 500,
+    "louver_free_area_fraction": 0.5,
+    "installed_fan_cfm": 5000
+   },
+   "outputs": {
+    "required_exhaust_cfm": {
+     "value": 4898.97949,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "room_volume_ft3": {
+     "value": 19200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "air_changes_per_hour": {
+     "value": 15.30931,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "louver_free_area_ft2": {
+     "value": 9.79796,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gross_louver_area_ft2": {
+     "value": 19.59592,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "charge_covered_lb": {
+     "value": 2500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "crown-reduction-leaf-area",
    "source_publisher": "Project (first-principles)",
    "source_title": "Crown Reduction and Leaf Area Removed -- the spec-v1696 worked example, recomputed",

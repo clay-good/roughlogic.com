@@ -323,7 +323,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "evaporation-load": {"load_gal":"Initial water load","first24_pints":"First-24-hour removal target","aham_pints":"Suggested AHAM pints"},
   "evaporative-cooler-effectiveness": {"leaving_db_F":"Leaving dry-bulb","temp_drop_F":"Temperature drop","wet_bulb_depression_F":"Wet-bulb depression (max drop)","note":"Note"},
   "evaporative-cooling": {"cooling_btu_hr":"Cooling effect","cooling_tons":"Cooling effect (tons)"},
-  "evaporator-td-dtd": {"dtd":"Design TD (DTD)","band":"Expected humidity band","note":"Note"},
+  "evaporator-td-dtd": {"dtd":"Design TD (DTD)","band":"Expected humidity band","capacity_verdict":"Capacity at this TD","rating_verdict":"Against the rating TD","note":"Note"},
   "excavation": {"volume_ft3":"Volume","cubic_yards":"Cubic yards","top_length_ft":"Top dimensions"},
   "excavation-bench-plan": {"ratio_label":"Slope ratio (H:V)","top_width_ft":"Top width (ft)","spoil_volume_yd3":"Spoil volume (yd^3)","footprint_ft2":"Surface footprint (ft^2)","warnings":"Notes"},
   "excess-air-o2": {"excess_air_pct":"Excess air","in_band":"Within the 15-25% target band?","note":"Note"},
