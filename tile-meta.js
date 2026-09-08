@@ -1119,6 +1119,15 @@ const _TILES = [
   ["nesc-district-loading", "A"],
   ["conductor-creep-elongation", "A"],
   ["sagging-return-wave", "A"],
+  // spec-v1640..v1647 marine and aviation band
+  ["metacentric-height", "K"],
+  ["marine-shaft-diameter", "K"],
+  ["house-battery-alternator", "K"],
+  ["travel-lift-sling-placement", "K"],
+  ["dock-piling-lateral", "K"],
+  ["control-cable-tension", "K"],
+  ["propeller-track-balance", "K"],
+  ["aviation-fuel-weight", "K"],
   // spec-v1717..v1726 air quality band (new calc-airquality.js)
   ["stack-emission-pte", "G"],
   ["opacity-six-minute", "G"],

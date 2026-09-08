@@ -1141,6 +1141,11 @@ export const TOOL_MODULES = (() => {
   ]);
   // v4 Group K: Mechanic - Auto, Marine, Aviation.
   declare("./calc-mechanic.js", "MECHANIC_RENDERERS", [
+    // spec-v1640..v1647: the marine and aviation band.
+    "metacentric-height", "marine-shaft-diameter", "house-battery-alternator",
+    "travel-lift-sling-placement", "dock-piling-lateral", "control-cable-tension",
+    "propeller-track-balance", "aviation-fuel-weight",
+
     // trade expansion v1433
     "carburetor-altitude-jetting",
     "prop-slip", "displacement-cr", "dynamic-compression-ratio", "chamber-cc-for-cr", "bolt-stretch",

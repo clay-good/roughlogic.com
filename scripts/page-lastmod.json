@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "c2ded8534d9112ea",
+      "sha": "0c5e89813fb0294d",
       "date": "2026-09-08"
     },
     "/tools/": {
-      "sha": "748565a4a2cb8def",
+      "sha": "042f4bd0f58806df",
       "date": "2026-09-08"
     },
     "/groups/accounting/": {
-      "sha": "3d83502ac087058d",
+      "sha": "f1664c8a15a60682",
       "date": "2026-09-08"
     },
     "/groups/agriculture/": {
-      "sha": "bd1e4062316671ed",
+      "sha": "ba05b7d7b80749db",
       "date": "2026-09-08"
     },
     "/groups/construction/": {
-      "sha": "3fb8a9dd5c4847e0",
+      "sha": "c9f82915f7be7095",
       "date": "2026-09-08"
     },
     "/groups/cross-trade/": {
-      "sha": "5abc6797d5143dbf",
+      "sha": "100e3cf996e191f7",
       "date": "2026-09-08"
     },
     "/groups/educators/": {
-      "sha": "59470a10e5a894a1",
+      "sha": "588010225ced44db",
       "date": "2026-09-08"
     },
     "/groups/electrical/": {
-      "sha": "fa9a3c44763eb357",
+      "sha": "91a91b799f4d5f05",
       "date": "2026-09-08"
     },
     "/groups/field/": {
-      "sha": "13322315d483180c",
+      "sha": "69218c8b35aef522",
       "date": "2026-09-08"
     },
     "/groups/fire-ground/": {
-      "sha": "ef132984c83e1b8c",
+      "sha": "943c95e3b4ebf41f",
       "date": "2026-09-08"
     },
     "/groups/historical/": {
-      "sha": "ca1cfbf768867e09",
+      "sha": "db60a972fc55ca9a",
       "date": "2026-09-08"
     },
     "/groups/hvac/": {
-      "sha": "00fe99ea8b058337",
+      "sha": "f6ae4bfd2bbe7977",
       "date": "2026-09-08"
     },
     "/groups/kitchen/": {
-      "sha": "3e538b8ec3dcb7e3",
+      "sha": "dee74b04c2bfdf6d",
       "date": "2026-09-08"
     },
     "/groups/lab/": {
-      "sha": "bdfdb26647ceb756",
+      "sha": "e59eaba841f85ad4",
       "date": "2026-09-08"
     },
     "/groups/mechanic/": {
-      "sha": "2e4ca40ab1c24945",
+      "sha": "1de36fdd951a8bc0",
       "date": "2026-09-08"
     },
     "/groups/plumbing/": {
-      "sha": "4f3a30110e92e7e0",
+      "sha": "c2e39d0f723ec675",
       "date": "2026-09-08"
     },
     "/groups/real-estate/": {
-      "sha": "237df820894c1923",
+      "sha": "8a1950f76423747f",
       "date": "2026-09-08"
     },
     "/groups/references/": {
-      "sha": "a4a1032d6471673d",
+      "sha": "10a5bc71a2166d88",
       "date": "2026-09-08"
     },
     "/groups/restoration/": {
-      "sha": "0f7c347608a14180",
+      "sha": "73925efa79c25f21",
       "date": "2026-09-08"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "c106c7875be97100",
+      "sha": "cb1c2d7aa1d6c47b",
       "date": "2026-09-08"
     },
     "/groups/stage/": {
-      "sha": "c802b61255ccaab6",
+      "sha": "dab70fa8ec993ce5",
       "date": "2026-09-08"
     },
     "/groups/trucking/": {
-      "sha": "644da683909b356b",
+      "sha": "910c95d171c10a3a",
       "date": "2026-09-08"
     },
     "/groups/water/": {
-      "sha": "9d774568a961fc66",
+      "sha": "715b92ab4b44d154",
       "date": "2026-09-08"
     },
     "/tools/aav-install-check/": {
@@ -367,6 +367,10 @@
     },
     "/tools/attic-ventilation/": {
       "sha": "682b5ea7af24384a",
+      "date": "2026-09-08"
+    },
+    "/tools/aviation-fuel-weight/": {
+      "sha": "3d3ba80fd01d75d2",
       "date": "2026-09-08"
     },
     "/tools/awg-wire-geometry/": {
@@ -698,8 +702,8 @@
       "date": "2026-09-08"
     },
     "/tools/boring-bar-deflection/": {
-      "sha": "0436407292207b1e",
-      "date": "2026-09-01"
+      "sha": "82bdb8138db4d5fc",
+      "date": "2026-09-08"
     },
     "/tools/boring-bar-max-overhang/": {
       "sha": "28e5a9bd0b96eef3",
@@ -1629,6 +1633,10 @@
       "sha": "8900493181966bdd",
       "date": "2026-09-01"
     },
+    "/tools/control-cable-tension/": {
+      "sha": "6dd4863c92f249f7",
+      "date": "2026-09-08"
+    },
     "/tools/control-joint-spacing/": {
       "sha": "dbc72ab407b44c24",
       "date": "2026-09-04"
@@ -2025,6 +2033,10 @@
       "sha": "16932c725606b778",
       "date": "2026-09-01"
     },
+    "/tools/dock-piling-lateral/": {
+      "sha": "cdf750d3d4771c53",
+      "date": "2026-09-08"
+    },
     "/tools/door-clear-width/": {
       "sha": "9cf777c15f3952a3",
       "date": "2026-09-01"
@@ -2394,8 +2406,8 @@
       "date": "2026-09-01"
     },
     "/tools/endurance-limit-marin/": {
-      "sha": "a4e3f2a667ad2e7e",
-      "date": "2026-09-04"
+      "sha": "34bc0ae4c16e32ea",
+      "date": "2026-09-08"
     },
     "/tools/engine-bmep/": {
       "sha": "8478cecea72f865a",
@@ -2726,8 +2738,8 @@
       "date": "2026-09-04"
     },
     "/tools/flange-coupling-torque/": {
-      "sha": "b28e91bd6cdc0fca",
-      "date": "2026-09-07"
+      "sha": "36fec6cd0b4e130d",
+      "date": "2026-09-08"
     },
     "/tools/flange-rating/": {
       "sha": "88acc37148671383",
@@ -2906,8 +2918,8 @@
       "date": "2026-09-07"
     },
     "/tools/fuel-range/": {
-      "sha": "ab7c1e08a2efa7f7",
-      "date": "2026-09-04"
+      "sha": "50cb09b02ac6649f",
+      "date": "2026-09-08"
     },
     "/tools/fuel-surcharge/": {
       "sha": "79f4383230eec783",
@@ -3417,6 +3429,10 @@
       "sha": "59ee1e213a486cce",
       "date": "2026-09-08"
     },
+    "/tools/house-battery-alternator/": {
+      "sha": "b3ea0838bbb6bb45",
+      "date": "2026-09-08"
+    },
     "/tools/housewrap-rolls/": {
       "sha": "0d3c45da297b24c0",
       "date": "2026-09-01"
@@ -3558,8 +3574,8 @@
       "date": "2026-09-01"
     },
     "/tools/impact-load-factor/": {
-      "sha": "c8e2359759374e8f",
-      "date": "2026-09-07"
+      "sha": "5dd9595bcf6b5236",
+      "date": "2026-09-08"
     },
     "/tools/inclined-plane-force/": {
       "sha": "d7fb02c5b36a3e7e",
@@ -4069,6 +4085,10 @@
       "sha": "54c2c878899cfbe8",
       "date": "2026-09-01"
     },
+    "/tools/marine-shaft-diameter/": {
+      "sha": "d4ce968b0c7fbdcf",
+      "date": "2026-09-08"
+    },
     "/tools/markup/": {
       "sha": "bfa60e0ba10cb93a",
       "date": "2026-09-01"
@@ -4208,6 +4228,10 @@
     "/tools/menu-engineering/": {
       "sha": "614cac35eba345a5",
       "date": "2026-09-01"
+    },
+    "/tools/metacentric-height/": {
+      "sha": "429822a75f179fb7",
+      "date": "2026-09-08"
     },
     "/tools/metal-deck-takeoff/": {
       "sha": "6e5ce870ebc87843",
@@ -4762,8 +4786,8 @@
       "date": "2026-09-08"
     },
     "/tools/pile-axial-capacity/": {
-      "sha": "d8e4eff456bb7550",
-      "date": "2026-09-01"
+      "sha": "878c5b3dc15ec4e5",
+      "date": "2026-09-08"
     },
     "/tools/pile-group-efficiency/": {
       "sha": "0c4e68d88861d3e3",
@@ -5138,8 +5162,12 @@
       "date": "2026-09-01"
     },
     "/tools/prop-slip/": {
-      "sha": "fdf25834d14f8042",
-      "date": "2026-09-01"
+      "sha": "829b1af50b615358",
+      "date": "2026-09-08"
+    },
+    "/tools/propeller-track-balance/": {
+      "sha": "8a71296c33436324",
+      "date": "2026-09-08"
     },
     "/tools/property-tax/": {
       "sha": "dcfee4cc0d36af19",
@@ -5910,8 +5938,8 @@
       "date": "2026-09-01"
     },
     "/tools/scotch-yoke-motion/": {
-      "sha": "7c6298415ffa21e4",
-      "date": "2026-09-07"
+      "sha": "c1b2ec29256da177",
+      "date": "2026-09-08"
     },
     "/tools/screen-deck-capacity/": {
       "sha": "e2cd8280f61c0401",
@@ -6126,8 +6154,8 @@
       "date": "2026-09-01"
     },
     "/tools/shaft-torsion/": {
-      "sha": "e0bf226cdec87702",
-      "date": "2026-09-01"
+      "sha": "4ec6635406c84f98",
+      "date": "2026-09-08"
     },
     "/tools/shear-flow-connector-spacing/": {
       "sha": "e20371f6253a8957",
@@ -6610,8 +6638,8 @@
       "date": "2026-09-01"
     },
     "/tools/sprocket-pitch-diameter/": {
-      "sha": "86c703e1da75cce0",
-      "date": "2026-09-01"
+      "sha": "bfaa3828c4cba1d8",
+      "date": "2026-09-08"
     },
     "/tools/spt-bearing-capacity/": {
       "sha": "5d4387a2aae64bc1",
@@ -7380,6 +7408,10 @@
     "/tools/trapezoidal-channel-flow/": {
       "sha": "d60387b532d4965e",
       "date": "2026-09-01"
+    },
+    "/tools/travel-lift-sling-placement/": {
+      "sha": "12ac19244f2e7010",
+      "date": "2026-09-08"
     },
     "/tools/traverse-closure/": {
       "sha": "f807a4ec42015a10",

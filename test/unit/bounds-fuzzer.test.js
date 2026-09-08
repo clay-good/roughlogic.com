@@ -49728,3 +49728,326 @@ test("bounds: spec-v1726 computePlumeRiseBriggs -- 185 ft, not the asserted hund
   assert.ok(_v1726({ ...base, exit_temp_f: 60 }).error);
   assert.ok(_v1726({ ...base, wind_mph: 0 }).error);
 });
+
+// ===========================================================================
+// spec-v1640..v1647: the 2026-09-08 trade-expansion marine and aviation band,
+// in the existing calc-mechanic.js. Eight tiles, nothing cut.
+//
+// TWO SPECS ARE DEFECTIVE, and both are unfinished-edit shapes:
+//   v1640 opens "displacing 42,000 lb with KM 2.6 ft and KG 3.1 ft" and then
+//     mid-sentence takes KG as 2.1 -- because 3.1 gives a NEGATIVE GM and an
+//     unstable vessel. Both are inputs here and the sign is a verdict.
+//   v1647 puts 95 degF at "roughly 44 degF above the 15 degC (59 degF)
+//     reference". It is 36. Every number after it follows the wrong
+//     difference: the spec reports 6.628 lb/gal and a 46 lb shortfall where
+//     its own described arithmetic gives 6.653 and 36.9 lb.
+//
+// AND TWO SIGN ERRORS IN THIS CODE were caught before landing: the marine
+// shaft example carried a rule factor two orders of magnitude off (0.35 where
+// the inch form needs about 3.4, giving a 0.23 in shaft), and the control
+// cable target had its correction the wrong way round, calling for MORE
+// tension on a cold morning where the chart calls for less.
+// ===========================================================================
+
+import {
+  computeMetacentricHeight as _v1640,
+  computeMarineShaftDiameter as _v1641,
+  computeHouseBatteryAlternator as _v1642,
+  computeTravelLiftSlingPlacement as _v1643,
+  computeDockPilingLateral as _v1644,
+  computeControlCableTension as _v1645,
+  computePropellerTrackBalance as _v1646,
+  computeAviationFuelWeight as _v1647,
+} from "../../calc-mechanic.js";
+
+test("bounds: spec-v1640 computeMetacentricHeight -- a difference of similar numbers", () => {
+  const base = { km_ft: 2.6, kg_ft: 2.1, displacement_lb: 42000, added_weight_lb: 900, added_kg_ft: 9.5, free_surface_moment_ftlb: 0, heel_angle_deg: 10 };
+  const r = _v1640(base);
+  // IDENTITY: GM is the difference, and the new KG is the weighted mean.
+  assert.ok(Math.abs(r.gm_ft - (2.6 - 2.1)) < 1e-12);
+  assert.ok(Math.abs(r.new_kg_ft - (42000 * 2.1 + 900 * 9.5) / 42900) < 1e-12);
+  assert.ok(Math.abs(r.new_gm_ft - (2.6 - r.new_kg_ft)) < 1e-12);
+  assert.ok(Math.abs(r.new_kg_ft - 2.2552) < 1e-4);
+  // THE SPEC'S POINT: 2% of displacement takes 31% of the stability, because
+  // it went on HIGH. The percentage is the number that matters.
+  assert.ok(Math.abs(r.weight_fraction_pct - 900 / 42000 * 100) < 1e-12);
+  assert.ok(Math.abs(r.gm_loss_pct - 31.05) < 0.01);
+  assert.ok(r.gm_loss_pct > 14 * r.weight_fraction_pct);
+  assert.equal(r.raises_kg, true);
+  // THE SAME WEIGHT LOW RAISES GM -- the identity that shows the height, not
+  // the weight, is what did it.
+  const low = _v1640({ ...base, added_kg_ft: 0.5 });
+  assert.ok(low.new_gm_ft > r.gm_ft);
+  assert.equal(low.raises_kg, false);
+  // A weight added exactly AT the current centre of gravity moves nothing.
+  const neutral = _v1640({ ...base, added_kg_ft: 2.1 });
+  assert.ok(Math.abs(neutral.new_kg_ft - 2.1) < 1e-12);
+  assert.ok(Math.abs(neutral.new_gm_ft - r.gm_ft) < 1e-12);
+  // THE SPEC'S OWN FIRST FIGURE: KG 3.1 against KM 2.6 is a NEGATIVE GM, and
+  // the verdict says so rather than reporting a righting arm.
+  const unstable = _v1640({ ...base, kg_ft: 3.1, added_weight_lb: 0 });
+  assert.ok(unstable.gm_ft < 0);
+  assert.equal(unstable.effective_is_positive, false);
+  assert.ok(unstable.stability_verdict.includes("NEGATIVE"));
+  // Free surface reduces the effective GM by exactly moment / displacement,
+  // and it does not depend on how much liquid is in the tank.
+  const fsm = _v1640({ ...base, free_surface_moment_ftlb: 4290 });
+  assert.ok(Math.abs(fsm.free_surface_correction_ft - 4290 / 42900) < 1e-12);
+  assert.ok(Math.abs(fsm.effective_gm_ft - (fsm.new_gm_ft - 0.1)) < 1e-12);
+  // IDENTITY: at 90 degrees the small-angle righting arm is exactly GM.
+  const ninety = _v1640({ ...base, heel_angle_deg: 90 });
+  assert.ok(Math.abs(ninety.gz_ft - ninety.effective_gm_ft) < 1e-12);
+  assert.ok(Math.abs(_v1640({ ...base, heel_angle_deg: 0 }).gz_ft) < 1e-12);
+  assert.ok(_v1640({ ...base, km_ft: 0 }).error);
+});
+
+test("bounds: spec-v1641 computeMarineShaftDiameter -- torsion is not the criterion", () => {
+  const base = { engine_hp: 350, shaft_rpm: 1200, shaft_diameter_in: 2.0, allowable_stress_psi: 12000, rule_factor: 3.4, repower_hp: 500 };
+  const r = _v1641(base);
+  // IDENTITY: torque and torsional stress, both matching the spec exactly.
+  assert.ok(Math.abs(r.torque_inlb - 63025 * 350 / 1200) < 1e-9);
+  assert.ok(Math.abs(r.torque_inlb - 18382.29) < 0.01);
+  assert.ok(Math.abs(r.torsional_stress_psi - 16 * r.torque_inlb / (Math.PI * 8)) < 1e-9);
+  assert.ok(Math.abs(r.torsional_stress_psi - 11702.5) < 0.5);
+  // IDENTITY: the torsion diameter, fed back as a shaft, produces exactly the
+  // allowable stress -- the round trip that catches a units error.
+  const atAllowable = _v1641({ ...base, shaft_diameter_in: r.torsion_diameter_in });
+  assert.ok(Math.abs(atAllowable.torsional_stress_psi - 12000) < 1e-6);
+  // THE POINT: the rule diameter GOVERNS and torsion under-calls it.
+  assert.ok(Math.abs(r.rule_diameter_in - 3.4 * Math.cbrt(350 / 1200)) < 1e-12);
+  assert.equal(r.rule_governs, true);
+  assert.ok(r.rule_diameter_in > r.torsion_diameter_in);
+  // And the 2.0 in shaft passes torsion while failing the rule, which is the
+  // whole reason both are reported.
+  assert.ok(r.torsional_stress_psi < 12000);
+  assert.ok(2.0 < r.rule_diameter_in);
+  // THE CUBE ROOT: 43% more power is only 12.6% more shaft, exactly.
+  assert.ok(Math.abs(r.power_ratio - 500 / 350) < 1e-12);
+  assert.ok(Math.abs(r.diameter_ratio - Math.cbrt(500 / 350)) < 1e-12);
+  assert.ok(Math.abs(r.repower_diameter_in - r.rule_diameter_in * r.diameter_ratio) < 1e-9);
+  assert.ok(r.diameter_ratio < 1.15);
+  // Torque is exactly linear in power and inverse in shaft speed.
+  assert.ok(Math.abs(_v1641({ ...base, engine_hp: 700 }).torque_inlb - 2 * r.torque_inlb) < 1e-9);
+  assert.ok(Math.abs(_v1641({ ...base, shaft_rpm: 2400 }).torque_inlb - r.torque_inlb / 2) < 1e-9);
+  // Doubling the diameter cuts the stress to an eighth -- the cube.
+  assert.ok(Math.abs(_v1641({ ...base, shaft_diameter_in: 4.0 }).torsional_stress_psi - r.torsional_stress_psi / 8) < 1e-9);
+  assert.ok(_v1641({ ...base, shaft_rpm: 0 }).error);
+});
+
+test("bounds: spec-v1642 computeHouseBatteryAlternator -- the nameplate hour is the optimistic one", () => {
+  const base = { daily_consumption_ah: 180, bank_ah: 400, usable_dod: 0.5, alternator_a: 105, acceptance_fraction: 0.6, bulk_target_soc_pct: 85 };
+  const r = _v1642(base);
+  // IDENTITY: usable capacity and autonomy.
+  assert.ok(Math.abs(r.usable_ah - 400 * 0.5) < 1e-12);
+  assert.ok(Math.abs(r.autonomy_days - 200 / 180) < 1e-12);
+  assert.ok(Math.abs(r.bulk_hours - 180 / 105) < 1e-12);
+  // IDENTITY inverted: the bank a full day needs, fed back in, gives exactly
+  // one day of autonomy.
+  const oneDay = _v1642({ ...base, bank_ah: r.bank_for_one_day_ah });
+  assert.ok(Math.abs(oneDay.autonomy_days - 1) < 1e-12);
+  // Acceptance below 1 makes the real recharge LONGER than the nameplate,
+  // exactly in proportion.
+  assert.ok(Math.abs(r.realistic_hours - r.bulk_hours / 0.6) < 1e-12);
+  assert.ok(r.realistic_hours > r.bulk_hours);
+  const full = _v1642({ ...base, acceptance_fraction: 1 });
+  assert.ok(Math.abs(full.realistic_hours - full.bulk_hours) < 1e-12);
+  assert.ok(Math.abs(full.extra_hours) < 1e-12);
+  // Lithium's deeper usable fraction is more bank from the same nameplate.
+  const lfp = _v1642({ ...base, usable_dod: 0.8 });
+  assert.ok(Math.abs(lfp.usable_ah - 320) < 1e-12);
+  assert.ok(lfp.autonomy_days > r.autonomy_days);
+  assert.ok(Math.abs(lfp.autonomy_days / r.autonomy_days - 0.8 / 0.5) < 1e-12);
+  // Autonomy is linear in bank and inverse in consumption.
+  assert.ok(Math.abs(_v1642({ ...base, bank_ah: 800 }).autonomy_days - 2 * r.autonomy_days) < 1e-12);
+  assert.ok(Math.abs(_v1642({ ...base, daily_consumption_ah: 360 }).autonomy_days - r.autonomy_days / 2) < 1e-12);
+  assert.ok(_v1642({ ...base, usable_dod: 1.5 }).error);
+  assert.ok(_v1642({ ...base, acceptance_fraction: 0 }).error);
+});
+
+test("bounds: spec-v1643 computeTravelLiftSlingPlacement -- half the weight is the wrong check", () => {
+  const base = { displacement_lb: 28000, sling_spacing_ft: 18, cg_from_fwd_ft: 10, sling_wll_lb: 14000, sling_angle_deg: 70 };
+  const r = _v1643(base);
+  // IDENTITY: the two slings sum to the displacement, and each carries the
+  // distance from the OTHER sling over the spacing.
+  assert.ok(Math.abs(r.fwd_sling_lb + r.aft_sling_lb - 28000) < 1e-9);
+  assert.ok(Math.abs(r.aft_sling_lb - 28000 * 10 / 18) < 1e-9);
+  assert.ok(Math.abs(r.fwd_sling_lb - 28000 * 8 / 18) < 1e-9);
+  assert.ok(Math.abs(r.difference_lb - 3111.11) < 0.01);
+  // The sling NEARER the centre of gravity carries more: the CG is 8 ft from
+  // the aft sling and 10 from the forward, and the aft one governs.
+  assert.ok(r.cg_from_aft_ft < base.cg_from_fwd_ft);
+  assert.equal(r.aft_carries_more, true);
+  // THE POINT: the governing sling is over its limit and a half-the-weight
+  // check would have passed.
+  assert.equal(r.within_wll, false);
+  assert.equal(r.even_split_would_pass, true);
+  assert.ok(r.governing_lb > 14000);
+  // The half-the-weight check lands EXACTLY on the 14,000 lb rating here, so
+  // it reads as "at capacity, fine" while the sling that actually carries the
+  // load is 11% over it. That is the failure mode in its purest form.
+  assert.ok(r.even_split_lb <= 14000);
+  assert.ok(Math.abs(r.even_split_lb - 14000) < 1e-9);
+  assert.ok(r.governing_lb / 14000 > 1.10);
+  // A centred CG splits it exactly evenly and the difference is zero.
+  const centred = _v1643({ ...base, cg_from_fwd_ft: 9 });
+  assert.ok(Math.abs(centred.fwd_sling_lb - centred.aft_sling_lb) < 1e-9);
+  assert.ok(Math.abs(centred.difference_lb) < 1e-9);
+  assert.ok(Math.abs(centred.governing_lb - 14000) < 1e-9);
+  // Convergence: at 90 degrees there is no horizontal component and the sling
+  // tension is exactly the vertical load.
+  const vertical = _v1643({ ...base, sling_angle_deg: 90 });
+  assert.equal(vertical.has_convergence, false);
+  assert.ok(Math.abs(vertical.sling_tension_lb - vertical.governing_lb) < 1e-9);
+  assert.ok(Math.abs(r.horizontal_component_lb - r.governing_lb / Math.tan(70 * Math.PI / 180)) < 1e-9);
+  assert.ok(r.sling_tension_lb > r.governing_lb);
+  // A centre of gravity outside the slings is refused rather than given a
+  // negative reaction.
+  assert.ok(_v1643({ ...base, cg_from_fwd_ft: 20 }).error);
+  assert.ok(_v1643({ ...base, sling_angle_deg: 0 }).error);
+});
+
+test("bounds: spec-v1644 computeDockPilingLateral -- scour attacks from both directions", () => {
+  const base = { lateral_load_lb: 1200, height_above_mudline_ft: 6, pile_diameter_in: 12, soil_lateral_bearing_psf_per_ft: 150, scour_ft: 2, existing_embedment_ft: 10 };
+  const r = _v1644(base);
+  // IDENTITY: the moment, and the code's own embedment relation.
+  assert.ok(Math.abs(r.moment_ftlb - 1200 * 6) < 1e-9);
+  assert.ok(Math.abs(r.a_term - 2.34 * 1200 / (150 * 1)) < 1e-9);
+  assert.ok(Math.abs(r.embedment_ft - 0.5 * r.a_term * (1 + Math.sqrt(1 + 4.36 * 6 / r.a_term))) < 1e-9);
+  // SCOUR LENGTHENS THE CANTILEVER AND DEEPENS THE DRIVE, both at once.
+  assert.ok(Math.abs(r.scoured_height_ft - 8) < 1e-12);
+  assert.ok(Math.abs(r.scoured_moment_ftlb - 1200 * 8) < 1e-9);
+  assert.ok(r.scoured_embedment_ft > r.embedment_ft);
+  assert.ok(Math.abs(r.total_depth_needed_ft - (r.scoured_embedment_ft + 2)) < 1e-9);
+  // The extra depth exceeds the scour itself, because the longer cantilever
+  // demands more embedment on top of the lost ground.
+  assert.ok(r.extra_depth_ft > base.scour_ft);
+  // With no scour the two agree exactly.
+  const noScour = _v1644({ ...base, scour_ft: 0 });
+  assert.ok(Math.abs(noScour.total_depth_needed_ft - noScour.embedment_ft) < 1e-12);
+  assert.ok(Math.abs(noScour.extra_depth_ft) < 1e-12);
+  // Embedment falls with better soil and rises with the load's height.
+  assert.ok(_v1644({ ...base, soil_lateral_bearing_psf_per_ft: 600 }).embedment_ft < r.embedment_ft);
+  assert.ok(_v1644({ ...base, height_above_mudline_ft: 12 }).embedment_ft > r.embedment_ft);
+  // A wider pile needs less depth, because the width is in the denominator.
+  assert.ok(_v1644({ ...base, pile_diameter_in: 24 }).embedment_ft < r.embedment_ft);
+  // The adequacy verdict, tested off the boundary in both directions.
+  assert.equal(r.adequate, false);
+  assert.equal(_v1644({ ...base, existing_embedment_ft: r.total_depth_needed_ft * 1.001 }).adequate, true);
+  assert.equal(_v1644({ ...base, existing_embedment_ft: r.total_depth_needed_ft * 0.999 }).adequate, false);
+  assert.ok(_v1644({ ...base, soil_lateral_bearing_psf_per_ft: 0 }).error);
+});
+
+test("bounds: spec-v1645 computeControlCableTension -- rigging cold calls for LESS", () => {
+  const base = { nominal_tension_lb: 70, reference_temp_f: 70, ambient_temp_f: 30, cable_area_in2: 0.0069, cable_modulus_psi: 12000000, structure_alpha_per_f: 0.0000128, cable_alpha_per_f: 0.0000065, service_temp_f: 90 };
+  const r = _v1645(base);
+  // IDENTITY: the differential strain and the tension it represents.
+  assert.ok(Math.abs(r.temp_difference_f - (30 - 70)) < 1e-12);
+  assert.ok(Math.abs(r.alpha_difference - (0.0000128 - 0.0000065)) < 1e-15);
+  assert.ok(Math.abs(r.differential_strain - r.alpha_difference * -40) < 1e-15);
+  assert.ok(Math.abs(r.tension_change_lb - r.differential_strain * 0.0069 * 12000000) < 1e-9);
+  // THE SIGN THAT WAS WRONG AND IS NOW PINNED: rigging BELOW the reference
+  // calls for a target BELOW nominal, because the system tightens as it warms.
+  assert.equal(r.colder_than_reference, true);
+  assert.ok(r.target_at_ambient_lb < 70);
+  assert.ok(r.tension_change_lb < 0);
+  // And rigging ABOVE the reference calls for a target ABOVE nominal.
+  const hot = _v1645({ ...base, ambient_temp_f: 110 });
+  assert.equal(hot.colder_than_reference, false);
+  assert.ok(hot.target_at_ambient_lb > 70);
+  // At the reference the target is exactly nominal, with no correction.
+  const atRef = _v1645({ ...base, ambient_temp_f: 70 });
+  assert.ok(Math.abs(atRef.target_at_ambient_lb - 70) < 1e-12);
+  assert.ok(Math.abs(atRef.tension_change_lb) < 1e-12);
+  // IDENTITY: rigging to the computed target at ambient gives exactly nominal
+  // back at the reference -- the round trip the sign error broke.
+  const backAtRef = r.target_at_ambient_lb + r.alpha_difference * (70 - 30) * 0.0069 * 12000000;
+  assert.ok(Math.abs(backAtRef - 70) < 1e-9);
+  // The service error: rigged to nominal cold and left in the sun, it is OVER.
+  assert.equal(r.over_tension, true);
+  assert.ok(r.tension_when_warm_lb > 70);
+  assert.ok(Math.abs(r.tension_when_warm_lb - (70 + r.alpha_difference * 60 * 0.0069 * 12000000)) < 1e-9);
+  // The other direction: rigged hot and flown cold, it is slack.
+  const flownCold = _v1645({ ...base, ambient_temp_f: 100, service_temp_f: 0 - 20 });
+  assert.equal(flownCold.over_tension, false);
+  assert.ok(flownCold.tension_when_warm_lb < 70);
+  // A cable and structure with the SAME expansion has no correction at all.
+  const same = _v1645({ ...base, structure_alpha_per_f: 0.0000065 });
+  assert.ok(Math.abs(same.tension_change_lb) < 1e-12);
+  assert.ok(Math.abs(same.target_at_ambient_lb - 70) < 1e-12);
+  assert.ok(_v1645({ ...base, cable_modulus_psi: 0 }).error);
+});
+
+test("bounds: spec-v1646 computePropellerTrackBalance -- track first, then weight", () => {
+  const base = { track_in: 0.045, track_limit_in: 0.0625, initial_ips: 0.42, initial_phase_deg: 155, trial_weight_g: 12, trial_phase_deg: 0, result_ips: 0.19, result_phase_deg: 260, target_ips: 0.2 };
+  const r = _v1646(base);
+  // Track is checked first and is within limits here, so weight is the fix.
+  assert.ok(Math.abs(r.track_margin_in - (0.0625 - 0.045)) < 1e-12);
+  assert.equal(r.track_ok, true);
+  assert.equal(_v1646({ ...base, track_in: 0.08 }).track_ok, false);
+  // Tested off the boundary rather than on it.
+  assert.equal(_v1646({ ...base, track_in: 0.0625 * 0.999 }).track_ok, true);
+  assert.equal(_v1646({ ...base, track_in: 0.0625 * 1.001 }).track_ok, false);
+  // IDENTITY: the effect vector is the DIFFERENCE of the two readings.
+  const ix = 0.42 * Math.cos(155 * Math.PI / 180), iy = 0.42 * Math.sin(155 * Math.PI / 180);
+  const rx = 0.19 * Math.cos(260 * Math.PI / 180), ry = 0.19 * Math.sin(260 * Math.PI / 180);
+  assert.ok(Math.abs(r.effect_ips - Math.hypot(rx - ix, ry - iy)) < 1e-9);
+  assert.ok(Math.abs(r.correction_weight_g - 12 * 0.42 / r.effect_ips) < 1e-9);
+  assert.ok(Math.abs(r.correction_weight_g - 10.004) < 0.01);
+  assert.ok(Math.abs(r.correction_phase_deg - 21.36) < 0.05);
+  // THE CLOSING IDENTITY: the correction weight, applied at its angle, has an
+  // effect that exactly cancels the original vibration vector.
+  const perGram = r.effect_ips / 12;
+  const lag = r.effect_phase_deg - 0;
+  const corrAngle = r.correction_phase_deg + lag;
+  const cx = r.correction_weight_g * perGram * Math.cos(corrAngle * Math.PI / 180);
+  const cy = r.correction_weight_g * perGram * Math.sin(corrAngle * Math.PI / 180);
+  assert.ok(Math.abs(ix + cx) < 1e-9);
+  assert.ok(Math.abs(iy + cy) < 1e-9);
+  // A trial weight that changes nothing tells you nothing, and says so rather
+  // than dividing by zero.
+  const useless = _v1646({ ...base, result_ips: 0.42, result_phase_deg: 155 });
+  assert.equal(useless.trial_useful, false);
+  assert.equal(useless.correction_weight_g, 0);
+  // Doubling the trial weight halves the correction, because the effect per
+  // gram doubles.
+  const doubled = _v1646({ ...base, trial_weight_g: 24 });
+  assert.ok(Math.abs(doubled.correction_weight_g - 2 * r.correction_weight_g) < 1e-9);
+  assert.ok(_v1646({ ...base, track_limit_in: 0 }).error);
+});
+
+test("bounds: spec-v1647 computeAviationFuelWeight -- 95 minus 59 is 36, not 44", () => {
+  const base = { gallons: 380, standard_density_lb_gal: 6.75, reference_temp_f: 59, fuel_temp_f: 95, density_change_pct_per_10f: 0.4, arm_in: 120, required_weight_lb: 2565 };
+  const r = _v1647(base);
+  // THE SPEC'S ERROR, PINNED: the difference is 36 degF, and the spec used 44.
+  assert.ok(Math.abs(r.temp_difference_f - 36) < 1e-12);
+  assert.ok(Math.abs(r.temp_difference_f - (95 - 59)) < 1e-12);
+  // IDENTITY: density and weight follow from that difference.
+  assert.ok(Math.abs(r.actual_density_lb_gal - 6.75 * (1 - 0.004 * 36 / 10)) < 1e-12);
+  assert.ok(Math.abs(r.actual_density_lb_gal - 6.6528) < 1e-4);
+  assert.ok(Math.abs(r.standard_weight_lb - 380 * 6.75) < 1e-9);
+  assert.ok(Math.abs(r.actual_weight_lb - 380 * r.actual_density_lb_gal) < 1e-9);
+  assert.ok(Math.abs(r.weight_difference_lb + 36.94) < 0.01);
+  // The spec's 6.628 lb/gal and 46 lb follow the wrong difference; both of
+  // this tile's figures are strictly closer to standard than the spec's.
+  assert.ok(r.actual_density_lb_gal > 6.628);
+  assert.ok(Math.abs(r.weight_difference_lb) < 46);
+  // Warm fuel is LIGHTER, and the flag says which way it went.
+  assert.equal(r.warmer, true);
+  assert.ok(r.actual_weight_lb < r.standard_weight_lb);
+  const cold = _v1647({ ...base, fuel_temp_f: 20 });
+  assert.equal(cold.warmer, false);
+  assert.ok(cold.actual_weight_lb > cold.standard_weight_lb);
+  // At the reference there is no correction at all.
+  const atRef = _v1647({ ...base, fuel_temp_f: 59 });
+  assert.ok(Math.abs(atRef.actual_density_lb_gal - 6.75) < 1e-12);
+  assert.ok(Math.abs(atRef.weight_difference_lb) < 1e-9);
+  // IDENTITY inverted: the gallons a target weight needs, fed back in, weigh
+  // exactly that -- and it is MORE gallons than the standard density implies.
+  const back = _v1647({ ...base, gallons: r.gallons_for_weight });
+  assert.ok(Math.abs(back.actual_weight_lb - 2565) < 1e-6);
+  assert.ok(r.gallons_for_weight > r.gallons_at_standard);
+  // The moment moves with the weight, which is why a fuel error moves the CG.
+  assert.ok(Math.abs(r.actual_moment_inlb - r.actual_weight_lb * 120) < 1e-9);
+  assert.ok(Math.abs(r.moment_difference_inlb - r.weight_difference_lb * 120) < 1e-9);
+  assert.ok(_v1647({ ...base, gallons: 0 }).error);
+});

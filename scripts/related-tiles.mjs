@@ -1562,6 +1562,15 @@ const RELATED = {
   "nesc-district-loading": ["conductor-sag-at-temperature","transverse-wind-load-conductor","conductor-blowout"],
   "conductor-creep-elongation": ["conductor-sag-at-temperature","line-ground-clearance-nesc","ruling-span"],
   "sagging-return-wave": ["ruling-span","conductor-sag-at-temperature","line-ground-clearance-nesc"],
+  // spec-v1640..v1647: marine and aviation band.
+  "metacentric-height": ["hull-displacement","travel-lift-sling-placement","sailboat-performance-ratios"],
+  "marine-shaft-diameter": ["shaft-diameter-for-torsion","prop-pitch-selection","prop-slip"],
+  "house-battery-alternator": ["alternator-charging-load","abyc-dc-wire","battery-runtime"],
+  "travel-lift-sling-placement": ["metacentric-height","sling-angle","multi-leg-sling"],
+  "dock-piling-lateral": ["pole-embedment-depth","pile-length-for-capacity","travel-lift-sling-placement"],
+  "control-cable-tension": ["propeller-track-balance","aircraft-weight-balance","aviation-fuel-weight"],
+  "propeller-track-balance": ["single-plane-field-balance","vibration-severity-zone","control-cable-tension"],
+  "aviation-fuel-weight": ["aircraft-weight-balance","control-cable-tension","density-altitude"],
   // spec-v1717..v1726: air quality band.
   "stack-emission-pte": ["opacity-six-minute","coating-voc-compliance","plume-rise-briggs"],
   "opacity-six-minute": ["stack-emission-pte","esp-deutsch-efficiency","baghouse-cleaning-interval"],

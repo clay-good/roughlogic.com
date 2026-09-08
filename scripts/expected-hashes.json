@@ -118,7 +118,7 @@
     "realestate/loan-limits.json": "75f1d7df553e72f7a6c90e60739e49ba579cc9d682ecc922123dae8c25f74893",
     "realestate/hud-fmr.json": "f35cf6bf5495b09b833a45685bbcd7d838dced58d5ee35c880e8a690a990c221",
     "realestate/manifest.json": "e666a0619b0164f1c2599f49acd9f46561af4e23cb67b1a2ca0c9b2445b7465b",
-    "fields/manifest.json": "c6fc34f9445b2dc1a0754c5b0c736a1733ff746ca037f4b19e7cc034970557de",
-    "search/manifest.json": "a845c3d364b966e1698fed0843505fc1dcb40942fff2b05c0ebd2eb0dcdf1734"
+    "fields/manifest.json": "1f16920e30eaac40cec0a6f8262d60b2d4e53c0e4fca5a016800bc193b6a724f",
+    "search/manifest.json": "4805c09ea0047d3aa92890a29e1b5bfb73d00b900d6497313acb0969aa2ce675"
   }
 }

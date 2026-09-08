@@ -102196,6 +102196,422 @@
    }
   },
   {
+   "tile_id": "metacentric-height",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Vessel Metacentric Height and Righting Arm -- the spec-v1640 worked example, recomputed",
+   "source_edition_or_year": "spec-v1640 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "km_ft": 2.6,
+    "kg_ft": 2.1,
+    "displacement_lb": 42000,
+    "added_weight_lb": 900,
+    "added_kg_ft": 9.5,
+    "free_surface_moment_ftlb": 0,
+    "heel_angle_deg": 10
+   },
+   "outputs": {
+    "gm_ft": {
+     "value": 0.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "new_kg_ft": {
+     "value": 2.25524,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "new_gm_ft": {
+     "value": 0.34476,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gm_loss_pct": {
+     "value": 31.04895,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "weight_fraction_pct": {
+     "value": 2.14286,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gz_ft": {
+     "value": 0.05987,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "marine-shaft-diameter",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Marine Propeller Shaft Diameter -- the spec-v1641 worked example, recomputed",
+   "source_edition_or_year": "spec-v1641 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "engine_hp": 350,
+    "shaft_rpm": 1200,
+    "shaft_diameter_in": 2,
+    "allowable_stress_psi": 12000,
+    "rule_factor": 3.4,
+    "repower_hp": 500
+   },
+   "outputs": {
+    "torque_inlb": {
+     "value": 18382.29167,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "torsional_stress_psi": {
+     "value": 11702.53034,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "torsion_diameter_in": {
+     "value": 1.98334,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rule_diameter_in": {
+     "value": 2.2548,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "diameter_ratio": {
+     "value": 1.12625,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "repower_diameter_in": {
+     "value": 2.53946,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "house-battery-alternator",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Marine House Battery and Alternator Recharge -- the spec-v1642 worked example, recomputed",
+   "source_edition_or_year": "spec-v1642 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "daily_consumption_ah": 180,
+    "bank_ah": 400,
+    "usable_dod": 0.5,
+    "alternator_a": 105,
+    "acceptance_fraction": 0.6,
+    "bulk_target_soc_pct": 85
+   },
+   "outputs": {
+    "usable_ah": {
+     "value": 200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "autonomy_days": {
+     "value": 1.11111,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bulk_hours": {
+     "value": 1.71429,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "realistic_hours": {
+     "value": 2.85714,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bank_for_one_day_ah": {
+     "value": 360,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "travel-lift-sling-placement",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Travel-Lift Sling Placement -- the spec-v1643 worked example, recomputed",
+   "source_edition_or_year": "spec-v1643 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "displacement_lb": 28000,
+    "sling_spacing_ft": 18,
+    "cg_from_fwd_ft": 10,
+    "sling_wll_lb": 14000,
+    "sling_angle_deg": 70
+   },
+   "outputs": {
+    "fwd_sling_lb": {
+     "value": 12444.44444,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "aft_sling_lb": {
+     "value": 15555.55556,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "aft_share_pct": {
+     "value": 55.55556,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "difference_lb": {
+     "value": 3111.11111,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "horizontal_component_lb": {
+     "value": 5661.7592,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sling_tension_lb": {
+     "value": 16553.87646,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dock-piling-lateral",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Dock Piling Embedment and Lateral Load -- the spec-v1644 worked example, recomputed",
+   "source_edition_or_year": "spec-v1644 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "lateral_load_lb": 1200,
+    "height_above_mudline_ft": 6,
+    "pile_diameter_in": 12,
+    "soil_lateral_bearing_psf_per_ft": 150,
+    "scour_ft": 2,
+    "existing_embedment_ft": 10
+   },
+   "outputs": {
+    "moment_ftlb": {
+     "value": 7200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "embedment_ft": {
+     "value": 23.8527,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "scoured_moment_ftlb": {
+     "value": 9600,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "scoured_embedment_ft": {
+     "value": 25.19818,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_depth_needed_ft": {
+     "value": 27.19818,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "control-cable-tension",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Aircraft Control Cable Tension -- the spec-v1645 worked example, recomputed",
+   "source_edition_or_year": "spec-v1645 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "nominal_tension_lb": 70,
+    "reference_temp_f": 70,
+    "ambient_temp_f": 30,
+     "cable_area_in2": 0.0069,
+    "cable_modulus_psi": 12000000,
+    "structure_alpha_per_f": 0.0000128,
+    "cable_alpha_per_f": 0.0000065,
+    "service_temp_f": 90
+   },
+   "outputs": {
+    "temp_difference_f": {
+     "value": -40,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tension_change_lb": {
+     "value": -20.8656,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "target_at_ambient_lb": {
+     "value": 49.1344,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tension_when_warm_lb": {
+     "value": 101.2984,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "propeller-track-balance",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Propeller Track and Balance -- the spec-v1646 worked example, recomputed",
+   "source_edition_or_year": "spec-v1646 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "track_in": 0.045,
+    "track_limit_in": 0.0625,
+    "initial_ips": 0.42,
+    "initial_phase_deg": 155,
+    "trial_weight_g": 12,
+    "trial_phase_deg": 0,
+    "result_ips": 0.19,
+    "result_phase_deg": 260,
+    "target_ips": 0.2
+   },
+   "outputs": {
+    "track_margin_in": {
+     "value": 0.0175,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "effect_ips": {
+     "value": 0.50379,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "effect_phase_deg": {
+     "value": 313.63621,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "correction_weight_g": {
+     "value": 10.00411,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "correction_phase_deg": {
+     "value": 21.36379,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "aviation-fuel-weight",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Aviation Fuel Weight vs Temperature -- the spec-v1647 worked example, recomputed",
+   "source_edition_or_year": "spec-v1647 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "gallons": 380,
+    "standard_density_lb_gal": 6.75,
+    "reference_temp_f": 59,
+    "fuel_temp_f": 95,
+    "density_change_pct_per_10f": 0.4,
+    "arm_in": 120,
+    "required_weight_lb": 2565
+   },
+   "outputs": {
+    "temp_difference_f": {
+     "value": 36,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "actual_density_lb_gal": {
+     "value": 6.6528,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "standard_weight_lb": {
+     "value": 2565,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "actual_weight_lb": {
+     "value": 2528.064,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "weight_difference_lb": {
+     "value": -36.936,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gallons_for_weight": {
+     "value": 385.55195,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "stack-emission-pte",
    "source_publisher": "Project (first-principles)",
    "source_title": "Stack Emission Rate and Potential to Emit -- the spec-v1717 worked example, recomputed",

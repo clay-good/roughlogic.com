@@ -22093,6 +22093,104 @@ export const CITATIONS = {
       { name: "The target sag comes from elsewhere", value: "the stringing chart at the ruling span and the temperature at that moment", source: "the utility's stringing charts" },
     ],
   },
+  // spec-v1640..v1647: the 2026-09-08 trade-expansion marine and aviation
+  // band, in the existing calc-mechanic.js. Eight tiles, nothing cut.
+  "metacentric-height": {
+    formula: "GM = KM - KG; a weight addition gives new KG = (W KG + w kg) / (W + w); the free surface correction is the free surface moment over displacement and reduces the effective GM; and the righting arm at a small angle is GZ = GM sin(theta).",
+    edition: "The small-angle stability relations as naval architecture states them. KM comes off the hull's hydrostatic curves at the loaded draft and is ENTERED; the free surface moment needs each tank's geometry and is ENTERED. A SMALL-ANGLE screen only, valid while the metacentre is effectively stationary, roughly the first 10 to 15 degrees. It does not compute KM, does not compute the free surface moment, and does not evaluate the stability CRITERIA any authority applies, which concern the area under the righting arm curve rather than GM alone.",
+    freeAccess: "One difference and one moment balance; no hydrostatic table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "GM is a DIFFERENCE between two numbers of similar size, so a modest change in KG is a large percentage change in stability -- which is why a refit adding a few hundred pounds high can matter more than one adding a ton low. Free surface is the effect that surprises people, because it depends on the tank's WIDTH CUBED rather than on how much liquid is in it: a wide shallow tank half full costs far more than a narrow deep one holding the same volume. A negative GM is not a small problem -- the vessel is unstable upright and lolls to an angle of heel -- so the sign is a computed verdict here rather than a number to interpret.",
+    assumptions: [
+      { name: "KM is entered", value: "it is a property of the hull form at the loaded draft", source: "the vessel's hydrostatic curves" },
+      { name: "Small angles only", value: "beyond roughly 10 to 15 degrees the righting arm comes from cross curves", source: "a naval architect" },
+      { name: "Not a criteria check", value: "stability rules concern the righting arm curve's area, not GM alone", source: "the applicable rules and the stability booklet" },
+    ],
+  },
+  "marine-shaft-diameter": {
+    formula: "torque T = 63,025 hp / rpm; torsional stress tau = 16 T / (pi d^3) and the diameter that satisfies an allowable is its cube-root inverse; the classification rule diameter is d = F x cube root(hp / rpm), and the repower ratio is the cube root of the power ratio.",
+    edition: "Shaft torque and torsional stress as machinery practice writes them, against the classification-society rule form whose constant embeds an allowance for the propeller's BENDING and for corrosion -- which is why the rule diameter governs and torsion alone under-calls it. The rule factor is ENTERED from the society's table for the shaft material. It does not compute shaft whirling or critical speed, bearing spacing, thrust and its bearing, the coupling or keyway, or alignment.",
+    freeAccess: "One torque relation and one published rule form.",
+    governance: GOVERNANCE.general,
+    editionNote: "A propeller shaft is not loaded in torsion alone. The propeller hangs on the end of an overhung shaft supported at the strut, and its weight plus hydrodynamic side loads put bending into the shaft that a torsion-only calculation misses entirely -- which is why the rule figure is almost always larger, and why both are reported here so a reader who computed the torsion number elsewhere can see what it leaves out. The cube root is what makes a repower interesting: a large power increase calls for a small proportional diameter increase, which sounds negligible and is often a whole nominal size, at which point the coupling, stern tube, bearings and stuffing box all change with it.",
+    assumptions: [
+      { name: "The rule factor is entered", value: "bronze, Aquamet and stainless allowables differ substantially", source: "the classification society's table" },
+      { name: "Torsion is shown, not used", value: "it cannot see the propeller's bending or the corrosion allowance", source: "ABYC P-6 and the society's rules" },
+      { name: "No whirling or critical speed", value: "bearing spacing sets those and is a separate calculation", source: "a marine engineer" },
+    ],
+  },
+  "house-battery-alternator": {
+    formula: "usable capacity = bank amp-hours x the usable depth of discharge; autonomy = usable / daily consumption; the bulk recharge time = consumption / the alternator's rating, and the realistic time = consumption / (rating x the average acceptance).",
+    edition: "The house bank balance as marine electrical practice writes it. The acceptance fraction is ENTERED because it depends on chemistry, age, temperature and the charge profile. It does not model the acceptance curve, size the alternator, its belt or its regulator, evaluate solar or wind contribution, or size the charging wire.",
+    freeAccess: "A capacity, a division, and one entered acceptance fraction.",
+    governance: GOVERNANCE.general,
+    editionNote: "The usable fraction differs by chemistry -- about half for flooded lead acid, considerably more for lithium -- so a bank sized on nameplate amp-hours rather than usable ones is half the bank it looks like. The charging side is where the surprises are: a rated alternator delivers its rating only during bulk, and the battery's own acceptance limits the current as it approaches full, so the nameplate hours figure is the optimistic end of a range. The consequence is a habit rather than an event: boats run the engine for the bulk portion, see the ammeter fall off, shut down, and leave the bank in a partial state of charge day after day -- and chronic partial state of charge is what kills flooded banks.",
+    assumptions: [
+      { name: "Acceptance is entered", value: "it depends on chemistry, age, temperature and the charge profile", source: "the battery manufacturer's charge acceptance data" },
+      { name: "Loads are entered", value: "the consumption side is bookkeeping this does not do for you", source: "the boat's own load list" },
+      { name: "Lithium changes the arithmetic", value: "it accepts near full current to a high state of charge and needs alternator temperature protection", source: "ABYC E-11" },
+    ],
+  },
+  "travel-lift-sling-placement": {
+    formula: "each sling carries the displacement times the distance from the OTHER sling to the centre of gravity, over the sling spacing; sling tension = the vertical load / sin(angle) and the inward horizontal component = the vertical load / tan(angle).",
+    edition: "The two-sling static split as rigging practice writes it. The centre of gravity is ENTERED and is rarely documented. It does not evaluate the hull's local capacity at the sling positions, size the slings or their protection, or address the lift's own stability, tyre loading or ground bearing.",
+    freeAccess: "Simple statics on two supports.",
+    governance: GOVERNANCE.general,
+    editionNote: "The split, not half the displacement, is the number to check -- and the machine's own capacity check is usually made against half, which passes a lift the governing sling cannot take. Where the slings LAND is the part that damages boats and it is not arithmetic: a sling under a shaft, strut, folding propeller, transducer or thruster tunnel destroys the appendage, and one under an unsupported panel between frames crushes it. That constraint usually decides everything, so the answer to an uneven split is normally slings rated for the actual load rather than a repositioning that puts a sling under the shaft.",
+    assumptions: [
+      { name: "The centre of gravity is entered", value: "it is where the whole calculation starts and is rarely documented", source: "the boat's own records" },
+      { name: "No local hull capacity", value: "a correctly loaded sling in the wrong place still damages the boat", source: "the documented lifting points" },
+      { name: "Two slings only", value: "a four-point or cradle lift distributes differently", source: "the yard's rigging procedure" },
+    ],
+  },
+  "dock-piling-lateral": {
+    formula: "the nonconstrained embedment d = 0.5 A (1 + sqrt(1 + 4.36 h / A)) with A = 2.34 P / (S1 b); scour lengthens the cantilever by the scour depth and the pile must be driven that much deeper below the ORIGINAL mudline on top of the deeper embedment the longer cantilever demands.",
+    edition: "The nonconstrained lateral embedment relation the building code gives for posts and poles, applied to a marine pile, with the soil's lateral bearing ENTERED from the geotechnical information for the site rather than inferred from the driving record. It does not compute berthing energy, wind or current loading, or ice; it does not check the pile's own bending capacity or its section loss to marine borers, address pile group effects, evaluate uplift or axial capacity, or account for a sloping mudline.",
+    freeAccess: "One code relation evaluated twice; no code text is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Driving to refusal establishes AXIAL capacity against a hard layer and says nothing about the lateral resistance in the soft material above, which is what resists a boat pushing sideways -- so a piling that refused on a shallow hard stratum can be axially sound and laterally inadequate at the same time. Scour attacks from both directions at once: it lowers the effective mudline so the cantilever lengthens and the moment rises, while the embedment below it shortens. Both effects are computed here because the combined answer is materially deeper than either alone suggests. And the loads are larger than they look, since berthing energy goes as the SQUARE of approach speed.",
+    assumptions: [
+      { name: "The lateral load is entered", value: "berthing energy, wind, current and ice are not computed here", source: "a marine structural engineer" },
+      { name: "Soil bearing from the geotechnical report", value: "the driving record says nothing about lateral resistance", source: "the geotechnical report" },
+      { name: "Full section assumed", value: "marine borers consume untreated or damaged timber below the waterline", source: "the inspection record" },
+    ],
+  },
+  "control-cable-tension": {
+    formula: "the tension change is (alpha_structure - alpha_cable) x the temperature difference x the cable's metallic area x its effective modulus; the target at an ambient temperature is the nominal plus that change, and rigging to nominal instead leaves the system off by the change to the service temperature.",
+    edition: "The differential thermal expansion that makes a rigging chart necessary -- an aluminium airframe expands roughly twice as much as a steel cable per degree, so tension RISES as the aircraft warms. Coefficients, cable area and effective modulus are ENTERED; a stranded cable's effective modulus is well below solid steel's and varies with construction and pre-stretch. An ESTIMATE of the correction's magnitude, NOT the chart.",
+    freeAccess: "One differential-expansion relation on entered properties.",
+    governance: GOVERNANCE.general,
+    editionNote: "Rigging to the nominal tension on a hot ramp leaves the system slack when it cools, and rigging to nominal on a cold morning leaves it over-tensioned in the sun -- which is why the chart gives a lower target at low temperature and a higher one at high. The two error directions fail differently and neither is a small deviation: over-tension loads pulleys and bearings continuously and raises control forces, while under-tension gives lost motion at the surface and reduced flutter margin. The instrument belongs in the same conversation: a tensiometer reading is only correct if the riser and calibration card match the cable's diameter AND construction, and no temperature correction rescues a reading taken on the wrong card.",
+    assumptions: [
+      { name: "An estimate, not the chart", value: "the maintenance manual's own rigging chart is the authority", source: "the aircraft maintenance manual" },
+      { name: "Effective modulus is entered", value: "a stranded cable's is well below solid steel's and varies with pre-stretch", source: "the cable manufacturer" },
+      { name: "The reading needs the right card", value: "riser and calibration card must match diameter and construction", source: "the tensiometer's calibration card" },
+    ],
+  },
+  "propeller-track-balance": {
+    formula: "track is compared against the manufacturer's limit; for balance the EFFECT vector is the trial reading minus the original, and the correction is the trial weight scaled by the ratio of the original to that effect, rotated so its effect opposes the original.",
+    edition: "The track check against the manufacturer's limit and the single-plane trial-weight vector method. Readings are ENTERED from a calibrated analyser. It does not measure anything, validate the phase reference or tachometer pickup, address two-plane balancing, distinguish propeller imbalance from an engine or mount problem at the same frequency, or set the limits.",
+    freeAccess: "One vector subtraction and one scaling.",
+    governance: GOVERNANCE.general,
+    editionNote: "Track and balance are DIFFERENT faults with different fixes and both produce vibration, which is why the track verdict comes before the balance arithmetic. Out of track means the blades sweep different planes, so each meets the air differently and the propeller generates a once-per-revolution AERODYNAMIC imbalance that no amount of weight corrects; out of balance is a mass distribution problem and that is what weight corrects. The effect vector is the DIFFERENCE between the two readings rather than the second reading, and a trial weight that produces no change in the vector has told you nothing -- which is reported rather than divided by. A static bench check finds a gross asymmetry and cannot find a dynamic couple.",
+    assumptions: [
+      { name: "Track first", value: "a balance run on an out-of-track propeller chases a moving target", source: "the propeller manufacturer's limit" },
+      { name: "Single plane", value: "a dynamic couple needs two-plane balancing", source: "the analyser's own procedure" },
+      { name: "Readings are entered", value: "the phase reference and tachometer pickup are not validated here", source: "a certificated mechanic" },
+    ],
+  },
+  "aviation-fuel-weight": {
+    formula: "weight = gallons x the density at the ACTUAL fuel temperature, where that density is the reference-temperature value reduced by the entered change rate over the computed temperature difference; gallons for a target weight is that relation inverted, and the moment is the weight times the arm.",
+    edition: "Fuel weight at the actual temperature rather than at the reference, with the temperature DIFFERENCE computed from two entered temperatures. Densities and the coefficient are ENTERED because they vary by fuel and batch, and a fuel receipt or a refueller's densitometer beats any table. It does not perform weight and balance, check the centre of gravity envelope, account for unusable fuel, tank geometry or attitude, address expansion and ullage, or convert between the mass and volume bases used in different countries.",
+    freeAccess: "One multiplication and one linear temperature correction.",
+    governance: GOVERNANCE.general,
+    editionNote: "The trap is WHICH DENSITY. Published densities are quoted at a reference temperature, and fuel from an above-ground tank on a hot day is materially less dense -- so a given number of gallons weighs less than the table says. The consequences run in two directions and they are not the same kind of error: loading to a WEIGHT by counting gallons at standard density puts less fuel aboard than intended, which shortens range, while UNDERSTATING fuel weight on a load sheet reports less weight aboard than there is, which is the direction that matters. A fuel weight error moves the centre of gravity as well as the gross weight, which is why the moment is reported when an arm is entered.",
+    assumptions: [
+      { name: "Density and coefficient are entered", value: "they vary by fuel and by batch", source: "the fuel supplier's density data" },
+      { name: "A linear correction", value: "the real density curve is not exactly linear", source: "the fuel specification" },
+      { name: "Not weight and balance", value: "the centre of gravity envelope is checked elsewhere", source: "the aircraft flight manual" },
+    ],
+  },
   // spec-v1717..v1726: the 2026-09-08 trade-expansion air quality band, in
   // the new calc-airquality.js. Ten tiles, nothing cut.
   "stack-emission-pte": {

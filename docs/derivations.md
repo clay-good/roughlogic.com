@@ -2759,6 +2759,7 @@ cross-check.
 | calc-mechanic.js | `computeAircraftWeightBalance` | `{ empty_weight_lb = 0, empty_arm_in = 0, front_weight_lb = 0, front_arm_in = ...` | _ | _ | _ |
 | calc-mechanic.js | `computeAlternatorChargingLoad` | `{ total_load_a = 0, alternator_a = 0, idle_frac = 0.5, cruise_frac = 0.9 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeAnchorRodeScope` | `{ water_depth_ft = 0, bow_height_ft = 0, scope_ratio = 7, boat_loa_ft = 0 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeAviationFuelWeight` | `{ gallons = 0, standard_density_lb_gal = _MEC_JET_A_LB_GAL, reference_temp_f ...` | _ | _ | _ |
 | calc-mechanic.js | `computeBandBrakeTorque` | `{ slack_tension_lbf = 0, wrap_angle_deg = 0, friction_coefficient = 0, drum_r...` | _ | _ | _ |
 | calc-mechanic.js | `computeBeltDeflectionTension` | `{ center_distance_in = 0, large_sheave_dia_in = 0, small_sheave_dia_in = 0, m...` | _ | _ | _ |
 | calc-mechanic.js | `computeBoltStretch` | `{ diameter_in = 0, grip_length_in = 0, stretch_thou = 0, material = "steel", ...` | _ | _ | _ |
@@ -2768,12 +2769,14 @@ cross-check.
 | calc-mechanic.js | `computeCentrifugalForce` | `{ weight_lb = 0, radius_in = 0, speed_rpm = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeChamberCcForCr` | `{ bore_in = 0, stroke_in = 0, target_cr = 0, gasket_bore_in = 0, gasket_thick...` | _ | _ | _ |
 | calc-mechanic.js | `computeClimbGradientRoc` | `{ climb_gradient_ft_per_nm = 0, ground_speed_kt = 0 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeControlCableTension` | `{ nominal_tension_lb = 0, reference_temp_f = 70, ambient_temp_f = 70, cable_a...` | _ | _ | _ |
 | calc-mechanic.js | `computeCoolingSystemFlow` | `{ q_btuh = 0, dt_f = 0, coolant = "water" } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeCrosswindComponent` | `{ runway_heading_deg = 0, wind_dir_deg = 0, wind_speed_kt = 0, gust_kt = 0, m...` | _ | _ | _ |
 | calc-mechanic.js | `computeCrouchHpForSpeed` | `{ target_speed_mph = 0, displacement_lb = 0, hull_constant = 190 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeCrouchPlaningSpeed` | `{ displacement_lb = 0, shaft_hp = 0, hull_constant = 190 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeDensityAltitude` | `{ field_elevation_ft = 0, altimeter_in_hg = 29.92, oat_f = 59 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeDisplacementCR` | `{ bore_in = 0, stroke_in = 0, cylinders = 0, chamber_cc = 0, gasket_bore_in =...` | _ | _ | _ |
+| calc-mechanic.js | `computeDockPilingLateral` | `{ lateral_load_lb = 0, height_above_mudline_ft = 0, pile_diameter_in = 0, soi...` | _ | _ | _ |
 | calc-mechanic.js | `computeDriveshaftCritical` | `{ od_in = 0, wall_in = 0, length_in = 0, material = "steel" }` | _ | _ | _ |
 | calc-mechanic.js | `computeDriveshaftMaxLength` | `{ target_rpm = 0, od_in = 0, wall_in = 0, material = "steel" } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeDynamicCompressionRatio` | `{ bore_in = 4.030, stroke_in = 3.75, rod_length_in = 6.0, static_cr = 10.5, i...` | _ | _ | _ |
@@ -2790,6 +2793,7 @@ cross-check.
 | calc-mechanic.js | `computeGearToothBendingStress` | `{ transmitted_load_lb = 0, diametral_pitch_1_in = 0, face_width_in = 0, numbe...` | _ | _ | _ |
 | calc-mechanic.js | `computeGlidepathDescentRate` | `{ ground_speed_kt = 0, glidepath_angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeHelicalSpringRate` | `{ wire_diameter_in = 0, mean_coil_diameter_in = 0, active_coils = 0, material...` | _ | _ | _ |
+| calc-mechanic.js | `computeHouseBatteryAlternator` | `{ daily_consumption_ah = 0, bank_ah = 0, usable_dod = 0.5, alternator_a = 0, ...` | _ | _ | _ |
 | calc-mechanic.js | `computeHpFromTorque` | `{ solve_for = "hp", torque_lbft = 0, rpm = 0, hp = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeHullDisplacement` | `{ lwl_ft = 30, bwl_ft = 10, draft_ft = 4, block_coefficient = 0.5, water_dens...` | _ | _ | _ |
 | calc-mechanic.js | `computeHullSpeed` | `{ lwl_ft = 0, actual_speed_kn = 0 } = {}` | _ | _ | _ |
@@ -2804,13 +2808,16 @@ cross-check.
 | calc-mechanic.js | `computeInjectorFlowAtPressure` | `{ rated_flow_ccmin = 0, rated_pressure_psi = 43.5, rail_pressure_psi = 43.5, ...` | _ | _ | _ |
 | calc-mechanic.js | `computeInjectorMaxHp` | `{ inj_flow = 0, flow_unit = "lbh", n_cyl = 0, duty = 0.80, bsfc = 0.50 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeInjectorSize` | `{ hp = 0, bsfc = 0.50, n_cyl = 0, duty = 0.80 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeMarineShaftDiameter` | `{ engine_hp = 0, shaft_rpm = 0, shaft_diameter_in = 0, allowable_stress_psi =...` | _ | _ | _ |
 | calc-mechanic.js | `computeMaxRpmFromPistonSpeed` | `{ stroke_in = 0, mps_limit_fpm = 4000 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeMeanPistonSpeed` | `{ stroke_in = 0, rpm = 0 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeMetacentricHeight` | `{ km_ft = 0, kg_ft = 0, displacement_lb = 0, added_weight_lb = 0, added_kg_ft...` | _ | _ | _ |
 | calc-mechanic.js | `computePaintMixRatio` | `{ paint_volume_oz = 0, part_paint = 4, part_hardener = 1, part_reducer = 0 } ...` | _ | _ | _ |
 | calc-mechanic.js | `computePlanetaryGearRatio` | `{ sun_teeth = 0, ring_teeth = 0, input_speed_rpm = 0, configuration = "ring-f...` | _ | _ | _ |
 | calc-mechanic.js | `computeProjectileRange` | `{ velocity_fps = 0, angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computePropPitchSelection` | `{ current_pitch_in = 0, current_wot_rpm = 0, target_wot_rpm = 0, rpm_per_inch...` | _ | _ | _ |
 | calc-mechanic.js | `computePropSlip` | `{ rpm = 0, gear_ratio = 1, pitch_in = 0, gps_speed_kt = 0 }` | _ | _ | _ |
+| calc-mechanic.js | `computePropellerTrackBalance` | `{ track_in = 0, track_limit_in = 0.0625, initial_ips = 0, initial_phase_deg =...` | _ | _ | _ |
 | calc-mechanic.js | `computeReserveCapacityAmpHours` | `{ rc_minutes = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeSacrificialAnodeLife` | `{ anode_material = "zinc", anode_mass_lb = 0, current_draw_a = 0, utilization...` | _ | _ | _ |
 | calc-mechanic.js | `computeSailboatPerformanceRatios` | `{ sail_area_sqft = 500, displacement_lb = 10000, lwl_ft = 30 } = {}` | _ | _ | _ |
@@ -2827,6 +2834,7 @@ cross-check.
 | calc-mechanic.js | `computeTorqueAdapterCorrection` | `{ target_torque_ftlb = 0, wrench_length_in = 0, adapter_length_in = 0, adapte...` | _ | _ | _ |
 | calc-mechanic.js | `computeTorsionSpringRate` | `{ wire_diameter_in = 0, mean_coil_diameter_in = 0, active_coils = 0, deflecti...` | _ | _ | _ |
 | calc-mechanic.js | `computeTrapSpeedHorsepower` | `{ weight_lb = 0, trap_mph = 0 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeTravelLiftSlingPlacement` | `{ displacement_lb = 0, sling_spacing_ft = 0, cg_from_fwd_ft = 0, sling_wll_lb...` | _ | _ | _ |
 | calc-mechanic.js | `computeTrueAirspeed` | `{ cas_kt = 0, density_altitude_ft = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeTurboMaxBoostForChargeTemp` | `{ max_charge_temp_f = 0, inlet_temp_f = 0, compressor_eff_pct = 70, ambient_p...` | _ | _ | _ |
 | calc-mechanic.js | `computeTurboPressureRatio` | `{ boost_psi = 0, ambient_psia = 14.7, inlet_temp_f = 0, compressor_eff_pct = ...` | _ | _ | _ |
@@ -3663,7 +3671,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2249.
+Row count: 2257.
 
 <!-- END function-corpus-v14 -->
 
@@ -5204,7 +5212,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (154 tiles)
+### Group K Mechanic (162 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5217,6 +5225,7 @@ per spec-v14 §13.1 second paragraph.
 | `alignment-thermal-growth` | Machine Thermal Growth Offset for Cold Alignment | Project (first-principles); hot alignment verification and the machine manufacturer d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `alternator-charging-load` | Alternator Charging Load Balance | automotive-electrical practice; spec-v464 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `anchor-rode-scope` | Anchor Rode Scope and Swing Radius | anchor rode scope and swing radius (s...; spec-v505 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `aviation-fuel-weight` | Aviation Fuel Weight vs Temperature and Load Sheet | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ballnose-feed-cusp` | Ballnose Feed-Direction Cusp and the Governing Finish | ballnose cusp geometry (CAM / mold ma...; R = 0.25 in. Across the passes at a 0.030 in stepover: h ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ballnose-scallop-height` | Ballnose Milling Scallop Height from Stepover | Ballnose scallop geometry; spec-v319 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `band-brake-torque` | Band Brake / Capstan Torque | Project (first-principles); T1 = T2 e^(mu theta) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5235,6 +5244,7 @@ per spec-v14 §13.1 second paragraph.
 | `centrifugal-force` | Centrifugal Force of a Rotating Mass | Project (first-principles); F = (W/g) omega^2 r | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `chamber-cc-for-cr` | Chamber Volume for a Target Compression Ratio | SAE engine-geometry identities (inverse); 4.0 x 3.48 in cylinder, 10.73:1 target, 4.1 gasket bore /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `climb-gradient-roc` | Climb Gradient to Rate of Climb | FAA TERPS / AIM (departure climb grad...; 300 ft/nm gradient at 120 kt -> 300 x 120 / 60 = 600 ft/m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `control-cable-tension` | Aircraft Control Cable Tension and Temperature Correction | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cooling-system-flow` | Cooling-System Coolant Flow for a Heat Load | heat-transfer first principles; spec-v398 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `counterbore-depth` | Counterbore Depth and Thread Engagement Left | Project (first-principles); one diameter of engagement into steel | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `countersink-depth` | Countersink Diameter and Cutting Depth | Machinery's Handbook countersinking; spec-v509 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5250,6 +5260,7 @@ per spec-v14 §13.1 second paragraph.
 | `disk-clutch-torque` | Disk Clutch / Brake Friction Torque | Project (first-principles); disk clutch torque | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `displacement-cr` | Engine Displacement and Compression Ratio | Project (first-principles) over stand...; 4.0 bore / 3.48 stroke / 8 cyl / 64 cc chamber / 4.1 gask... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dividing-head` | Dividing-Head Simple Indexing | First-principles indexing arithmetic ...; N 9 on a 40:1 head -> 4 turns + 4/9; on a 54-hole circle ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `dock-piling-lateral` | Dock Piling Embedment and Lateral Load | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dovetail-over-pins` | Dovetail Slide Measurement Over Rods | Machinery's Handbook (Checking a Dove...; k = 0.500 x (1 + cot(30 deg)) = 0.500 x (1 + 1.73205) = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drill-feed-thrust` | Drill Speed, Feed, Power, and Torque | Project (first-principles); RPM = 3.82 SFM / D; torque = 63,025 hp / RPM | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `drill-point-angle-from-length` | Drill Point Angle from Tip Length | First-principles drill-point geometry...; 0.5-in drill, 0.15-in tip -> 118.1-deg point (59.0-deg lip) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5280,6 +5291,7 @@ per spec-v14 §13.1 second paragraph.
 | `glidepath-descent-rate` | Glidepath Rate of Descent | FAA Instrument Flying Handbook; TERPS...; 120 kt on a 3.0 deg glidepath -> 637 ft/min, 318 ft/nm (T... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `grinding-wheel-rpm` | Grinding Wheel Surface Speed and Max Safe RPM | grinding wheel surface-speed identity...; max_rpm = 6500*12/(pi*7) = 3547; actual_sfpm = pi*7*3450/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `helical-spring-rate` | Helical Compression Spring Rate | Machinery's Handbook / Shigley; k = 11.5e6 x 0.080^4 / (8 x 0.75^3 x 8) = 471.04 / 27.0 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `house-battery-alternator` | Marine House Battery Load and Alternator Recharge | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hp-from-torque` | Horsepower from Torque and RPM | Classical mechanical power (Watt) + S...; 400 lb-ft at 5000 RPM -> 380.8 HP | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hull-displacement` | Hull Displacement and Block Coefficient | Hull displacement (Archimedes + block...; vol = 30*10*4*0.5 = 600; wt = 600*64 = 38400; long tons =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hull-speed` | Displacement Hull Speed and Speed/Length Ratio | displacement hull-speed relation (Fro...; spec-v502 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5297,9 +5309,11 @@ per spec-v14 §13.1 second paragraph.
 | `keyseat-key-size` | Shaft Key and Keyseat Size (ANSI B17.1) | ANSI B17.1 Keys and Keyseats; spec-v513 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `knurl-blank-diameter` | Knurling Blank Diameter for Clean Tracking | knurl tracking rule (first-principles); teeth = round(pi*0.75*21) = round(49.48) = 49; blank = 49... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `machining-time` | Cut Time per Pass | First-principles cutting time + Machi...; 6 in at 500 RPM x 0.010 IPR -> 5 IPM, 1.2 min/pass, 4 pas... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `marine-shaft-diameter` | Marine Propeller Shaft Diameter for Torque | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `material-removal-rate` | Material Removal Rate | First-principles swept-volume geometr...; 0.5 x 0.1 x 10 IPM -> 0.5 in3/min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `max-rpm-from-piston-speed` | Max RPM from a Piston-Speed Limit | Mean piston speed (engine building), ...; spec-v660 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `mean-piston-speed` | Mean Piston Speed and RPM-Limit Reading | Mean piston speed (engine building); spec-v324 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `metacentric-height` | Vessel Metacentric Height and Righting Arm | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `paint-mix-ratio` | 2K Paint Mix Ratio | Paint manufacturer technical data she...; spec-v100 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `plain-bearing-pressure-pv` | Plain (Sleeve) Bearing Pressure and PV | Project (first-principles); P=W/(LD), PV=P*V | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `planetary-gear-ratio` | Planetary (Epicyclic) Gear Ratio | Project (first-principles); Willis epicyclic ratio | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5307,6 +5321,7 @@ per spec-v14 §13.1 second paragraph.
 | `projectile-range` | Projectile Range, Height, and Flight Time | Project (first-principles); R = v^2 sin(2 theta)/g | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `prop-pitch-selection` | Marine Propeller Pitch Selection | outboard prop selection practice; spec-v462 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `prop-slip` | Marine Prop Slip | Project (first-principles); theoretical_kt = (4500/1.85) * 19 / 1215.2 = 38.03; slip ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `propeller-track-balance` | Propeller Track, Balance, and Vibration Limit | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rack-and-pinion` | Rack and Pinion Travel, Speed, and Force | Project (first-principles); rack and pinion | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `radial-chip-thinning` | Radial Chip Thinning Feed Compensation | Radial chip thinning geometry; spec-v317 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `reaming-drill-allowance` | Reaming Prebore (Drill) Allowance | machine-reaming stock allowance (Mach...; 0.5 in is in the 1/4-1/2 band (0.015); drill = 0.500 - 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5345,6 +5360,7 @@ per spec-v14 §13.1 second paragraph.
 | `torque-adapter-correction` | Torque Wrench Extension / Crowfoot Correction | Standard torque-adapter correction (S...; spec-v485 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `torsion-spring-rate` | Helical Torsion Spring Rate and Torque | Project (first-principles); k = d^4 E/(10.8 D Na) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `trap-speed-horsepower` | Horsepower from Quarter-Mile Trap Speed | Hale quarter-mile trap-speed relation; spec-v325 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `travel-lift-sling-placement` | Travel-Lift Sling Placement and Hull Load | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `true-airspeed` | True Airspeed from CAS and Density Altitude | FAA PHAK / ICAO Standard Atmosphere (...; sigma = (1 - 6.87535e-6 x 8000)^4.2559 = (0.945)^4.2559 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `turbo-max-boost-for-charge-temp` | Max Boost Before a Charge-Air Temperature Limit | turbocharger charge-air-temperature m...; 250 F limit, 80 F inlet, 70% eff, 14.7 psia -> 15.0 psi m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `turbo-pressure-ratio` | Turbocharger Pressure Ratio and Charge-Air Temp | turbocharger pressure-ratio and charg...; spec-v506 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5834,6 +5850,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1998. Fixture-covered or reference-cadence: 1998 / 1998.
+Tile count: 2006. Fixture-covered or reference-cadence: 2006 / 2006.
 
 <!-- END tile-index-v14 -->
