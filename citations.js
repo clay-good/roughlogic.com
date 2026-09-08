@@ -22093,6 +22093,81 @@ export const CITATIONS = {
       { name: "The target sag comes from elsewhere", value: "the stringing chart at the ruling span and the temperature at that moment", source: "the utility's stringing charts" },
     ],
   },
+  // spec-v1610..v1615: the 2026-09-08 trade-expansion traffic, work zone, and
+  // pavement band. Three of the band's nine specs were cut as duplicates and
+  // their new material landed on the calculators that already answered them.
+  "skip-line-layout": {
+    formula: "cycle = stripe length + gap length; stripes per mile = 5,280 / cycle; painted length = stripe count x stripe length; painted fraction = stripe / cycle; inverted for maintenance, cycle in place = measured length / counted stripes.",
+    edition: "The MUTCD broken-line cycle convention as standard practice, by name. NO PATTERN IS SHIPPED: stripe and gap lengths, widths and colours are set by the MUTCD and the agency's standard drawings and vary by marking type and road class. Material quantity is a separate calculation that takes the painted length produced here. The adopted MUTCD and its state supplement, the agency's standard drawings, and the project specification govern.",
+    freeAccess: "Two divisions on lengths the reader enters; no marking pattern table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "On the common 10 ft stripe with a 30 ft gap the cycle is 40 ft, a mile carries 132 stripes and 1,320 feet of paint, and exactly a quarter of the run is painted. Change to a 15 ft stripe and a 25 ft gap and the cycle is STILL 40 ft, the mile still carries 132 stripes, and the paint goes to 1,980 feet -- half again the material for a line a driver would struggle to tell apart. The layout reference matters more than the arithmetic: a skip line laid out from wherever the truck started puts a stripe across a driveway, and once a run is laid the pattern behind it is fixed. For maintenance the inversion runs the other way -- count the stripes, measure the length, and the division gives the cycle in place, which the new work should match rather than defaulting to 40 ft.",
+    assumptions: [
+      { name: "A uniform skip pattern only", value: "lane, centre, edge and dotted extension lines are different patterns with different rules", source: "the adopted MUTCD and the agency's standard drawings" },
+      { name: "Material quantity is separate", value: "it takes the painted length produced here plus width and coverage", source: "the project specification" },
+      { name: "No-passing zones, arrows and symbols are not laid out", value: "a real striping job includes them", source: "the agency's standard drawings" },
+    ],
+  },
+  "speed-hump-geometry": {
+    formula: "ramp length = (total length - flat top) / 2; ramp slope = height / ramp length; wheel vertical acceleration over a parabolic ramp = 8 x height x speed squared / transition length squared, constant across the ramp; the comfort speed is that relation inverted at an entered acceleration limit; the ground clearance required is the crest height less the parabolic profile height under the design vehicle's wheels.",
+    edition: "The parabolic vertical-deflection geometry as standard traffic calming practice, by name, with ITE traffic calming guidance and the agency's standard drawings named as governing dimensions. Emergency response delay is NOT quantified; it needs the fire department's own apparatus and route data. The agency's standard drawings, ITE traffic calming guidance, the fire department, and the adopted MUTCD for signing and marking govern.",
+    freeAccess: "A slope, one squared term and a parabola evaluated at the wheelbase; no agency standard drawing is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "A parabola has a constant second derivative, so the vertical acceleration a wheel feels is constant across the ramp and works out to eight times the height times the square of the speed over the square of the transition length. Length therefore matters more than height, because it enters squared: doubling the length quarters the acceleration while halving the height only halves it. A classic twelve foot hump three inches high reaches a quarter of gravity at about sixteen miles an hour, which is why it works. THE FLAT TOP IS A SEPARATE MECHANISM. A table with the same height and the same ramp slope has the same ramp acceleration and a materially higher tolerable speed, because a short hump lifts one axle at a time and pitches the vehicle while a flat top long enough for the whole wheelbase removes that -- which is what the ground clearance output measures.",
+    assumptions: [
+      { name: "A parabolic profile", value: "circular-arc devices differ modestly", source: "the agency's standard drawings" },
+      { name: "Device dimensions are entered", value: "taking them from another jurisdiction is a common source of devices that do not perform", source: "ITE traffic calming guidance" },
+      { name: "Emergency response delay is not quantified", value: "each short hump costs an apparatus seconds, and a corridor of them costs real time", source: "the fire department's apparatus and route data" },
+    ],
+  },
+  "intersection-sight-triangle": {
+    formula: "departure sight distance b = 1.47 x major road speed (mph) x total time gap (s), with the gap increased by an entered allowance for each additional lane crossed; the triangle is that leg along the major road against the decision point setback along the minor road, and its area is half their product.",
+    edition: "The AASHTO departure sight distance relation and time gap values by name, with the AASHTO Green Book cited and the roughly 3 ft to 8 ft vertical obstruction window named. NO GAP TABLE IS SHIPPED: the gap depends on the manoeuvre, the design vehicle, the lanes crossed and the approach grade. The available distance is a field measurement at the actual driver eye height and object height. The AASHTO Green Book, the agency's design standards, and the roadway engineer govern.",
+    freeAccess: "One multiplication on a time gap the reader takes from the Green Book; no gap table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The time gap is the whole design and it is behavioural rather than physical: it is how long a driver needs to start, accelerate and clear the through lane without making an approaching driver slow. A passenger car turning left from a stop onto a two-lane road takes about seven and a half seconds; a single-unit truck about nine and a half, which at 45 mph is a hundred and thirty feet further in each direction -- so an intersection designed on the car gap and later serving trucks is deficient without anything having changed on the ground. Keeping the triangle clear is a maintenance obligation as much as a design one: landscaping grows, snow banks accumulate, and a permitted sign can defeat a properly designed intersection years later. Obstruction is judged roughly between three and eight feet above the road, so a low wall or a high canopy may sit inside the triangle while a hedge at four feet defeats it.",
+    assumptions: [
+      { name: "The time gap is entered, not tabulated here", value: "it depends on the manoeuvre, design vehicle, lanes crossed and grade", source: "the AASHTO Green Book" },
+      { name: "Stop-controlled departure only", value: "signalized, yield-controlled and roundabout intersections each have their own criteria", source: "the AASHTO Green Book" },
+      { name: "The available distance is measured in the field", value: "at the actual driver eye height and object height", source: "the agency's design standards" },
+    ],
+  },
+  "pavement-structural-number": {
+    formula: "SN = sum over layers of (layer coefficient x thickness x drainage coefficient), with the drainage coefficient applying only to unbound layers; the equivalency for a substitution is the ratio of the two layers' rates.",
+    edition: "The AASHTO 93 structural number relation by name. Layer coefficients (asphalt about 0.44, crushed base about 0.14, subbase about 0.11) and drainage coefficients (0.8 to 1.2 in ordinary conditions) are AGENCY VALUES and are entered, not shipped. The required SN comes from the AASHTO 93 design equation -- design ESALs, reliability, standard deviation, subgrade resilient modulus and serviceability loss -- and is NOT solved here. The agency's pavement design manual, the geotechnical investigation, and the pavement engineer govern.",
+    freeAccess: "A weighted sum of three layers on coefficients the reader supplies; no agency coefficient table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The layer coefficients are what make the trade visible. An inch of asphalt is worth roughly three inches of crushed base and four of subbase, so a contractor substituting base for asphalt has to add three or four times the thickness to stay equivalent -- often cheaper, often perfectly sound, and not a judgment call but one division. The drainage coefficient quietly punishes bad detailing and applies only to the unbound layers: drop a base from 1.0 to 0.8 and eight inches of rock gives up most of a quarter point of structural number without losing an inch of material. AASHTO 93 is empirical, from the AASHO Road Test of the late nineteen fifties, and mechanistic-empirical design supersedes it in many agencies and gives different answers.",
+    assumptions: [
+      { name: "Layer coefficients are agency-specific", value: "generic values where an agency publishes its own give a wrong answer", source: "the agency's pavement design manual" },
+      { name: "The required SN is entered, not solved", value: "the AASHTO 93 equation needs ESALs, reliability, standard deviation, modulus and serviceability loss", source: "AASHTO 93" },
+      { name: "Flexible pavement only", value: "rigid pavement, thickness minimums and construction tolerances are outside it", source: "the agency's pavement design manual" },
+    ],
+  },
+  "subgrade-cbr-thickness": {
+    formula: "cover thickness = alpha x sqrt( wheel load x ( 1/(8.1 x CBR) - 1/(pi x tire pressure) ) ), with the coverage factor alpha = 0.23 log10(coverages) + 0.15; resilient modulus Mr = 1,500 x CBR; the geosynthetic value is that thickness reduced by an entered percentage.",
+    edition: "The Corps of Engineers CBR cover equation by name, with the widely used Mr = 1,500 x CBR correlation, which is reasonable for fine-grained soils at low CBR and drifts above about CBR 10. NO COVER CHART IS SHIPPED; agency charts differ between the construction-platform and pavement-design cases. The geosynthetic thickness reduction is ENTERED from the manufacturer's design method. The geotechnical investigation, the agency's design manual, and the geotechnical engineer govern.",
+    freeAccess: "One square root and one logarithm on a CBR the reader measures; no agency cover chart is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Cover falls steeply as CBR rises, so measuring the subgrade rather than assuming it is worth a great deal: assuming CBR 5 on ground that tests at 2 produces a section that pumps and ruts before the first winter. Traffic enters only as a logarithm, so a haul road carrying ten times the passes needs about a quarter more rock rather than ten times as much. The sensitivity is computed rather than asserted because it is routinely overstated -- going from CBR 3 to CBR 10 at a fixed wheel load cuts the rock by about half, not by four. Below about CBR 3 the calculation still returns a thickness and the subgrade deforms under construction traffic anyway; that is an undercut, a stabilization, or a designed working platform, and this says so.",
+    assumptions: [
+      { name: "A screening estimate, not an agency chart", value: "charts differ between agencies and between platform and pavement cases", source: "the agency's design manual" },
+      { name: "CBR is a crude index", value: "sensitive to moisture and compaction at the time of testing; a summer value is not a spring value", source: "the geotechnical investigation" },
+      { name: "The geosynthetic reduction is entered", value: "it must come from the manufacturer's design method and the specification", source: "the manufacturer's design method" },
+    ],
+  },
+  "esal-traffic-loading": {
+    formula: "load equivalency factor = (axle load / 18,000 lb) to the fourth power; design lane ESALs = AADT x truck fraction x directional factor x lane factor x ESALs per truck x 365 x the compounded growth series ((1+g)^n - 1)/g, which becomes simply n years at zero growth.",
+    edition: "The AASHTO load equivalency concept and the fourth-power approximation by name. The published AASHTO factors depend on axle configuration -- single, tandem, tridem -- on the pavement's structural number and on the terminal serviceability, and give different values than a plain fourth power. ESALs per truck, the distribution factors and the growth rate are ENTERED, ideally from weigh-in-motion or classification counts. The agency's pavement design manual, the traffic data, and the pavement engineer govern.",
+    freeAccess: "A fourth power and a geometric series on factors the reader supplies; no AASHTO equivalency table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The fourth power reorders every intuition about pavement. A 2,000 lb car axle has an equivalency factor near 0.00015, so roughly six and a half thousand car axles equal one standard truck axle: a road carrying twenty thousand cars and two hundred trucks a day gets essentially all its damage from the one percent that are trucks. Overload is the same fact pointed at enforcement -- an axle at 22,000 lb rather than 18,000 does about 2.23 times the damage, more than double for a twenty-two percent overload. The growth term compounds and is easy to understate: two percent over twenty years is a factor of only 1.22 on the final year's traffic but about 24.3 on the cumulative loading, and using first-year traffic without the series badly undersizes a pavement.",
+    assumptions: [
+      { name: "The fourth power is an approximation", value: "published AASHTO factors depend on axle configuration, structural number and terminal serviceability", source: "the agency's pavement design manual" },
+      { name: "ESALs per truck are entered", value: "they should come from weigh-in-motion or classification counts, not assumed averages", source: "the traffic data" },
+      { name: "Mechanistic-empirical design does not use ESALs", value: "it takes the load spectrum directly", source: "the agency's pavement design manual" },
+    ],
+  },
   // spec-v1461..v1467: the 2026-09-08 trade-expansion second overhead line and
   // distribution band. Three of the seven specs read a threshold backwards or
   // mislabelled a unit; every threshold here is a computed verdict.

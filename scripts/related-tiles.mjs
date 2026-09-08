@@ -1562,6 +1562,13 @@ const RELATED = {
   "nesc-district-loading": ["conductor-sag-at-temperature","transverse-wind-load-conductor","conductor-blowout"],
   "conductor-creep-elongation": ["conductor-sag-at-temperature","line-ground-clearance-nesc","ruling-span"],
   "sagging-return-wave": ["ruling-span","conductor-sag-at-temperature","line-ground-clearance-nesc"],
+  // spec-v1610..v1615: the 2026-09-08 traffic, work zone, and pavement band.
+  "skip-line-layout": ["striping-paint-quantity","paint-coverage","asphalt-spread-rate"],
+  "speed-hump-geometry": ["intersection-sight-triangle","vertical-curve","asphalt-tonnage"],
+  "intersection-sight-triangle": ["stopping-sight-distance","horizontal-sightline-offset","ssd-design-speed"],
+  "pavement-structural-number": ["esal-traffic-loading","subgrade-cbr-thickness","asphalt-tonnage"],
+  "subgrade-cbr-thickness": ["pavement-structural-number","esal-traffic-loading","relative-compaction"],
+  "esal-traffic-loading": ["pavement-structural-number","subgrade-cbr-thickness","bridge-formula"],
   // spec-v1461..v1467: the 2026-09-08 second overhead line and distribution band.
   "transformer-diversity-loading": ["transformer-kva-sizing","transformer-loading-efficiency","feeder-loss-load-factor"],
   "capacitor-bank-voltage-rise": ["pf-correction","capacitor-bank-for-resonance-order","regulator-tap-bandwidth"],

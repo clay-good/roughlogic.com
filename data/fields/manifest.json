@@ -29,12 +29,17 @@
     {
       "file": "e-1.json",
       "name": "Field descriptors, e-1 runtime shard (generated)",
-      "gzip_size_bytes": 24297
+      "gzip_size_bytes": 21315
     },
     {
       "file": "e-2.json",
       "name": "Field descriptors, e-2 runtime shard (generated)",
-      "gzip_size_bytes": 21278
+      "gzip_size_bytes": 10828
+    },
+    {
+      "file": "e-3.json",
+      "name": "Field descriptors, e-3 runtime shard (generated)",
+      "gzip_size_bytes": 15607
     },
     {
       "file": "f.json",
@@ -54,7 +59,7 @@
     {
       "file": "j.json",
       "name": "Field descriptors, j runtime shard (generated)",
-      "gzip_size_bytes": 3209
+      "gzip_size_bytes": 3236
     },
     {
       "file": "k.json",
@@ -122,12 +127,13 @@
     "b.json": "ca48386d62ccc21ddfd344a425e7f5569d9470e0a482cf463d35b68d9dbece99",
     "c.json": "d580ec2cccfaf40773c931b5b631f1ff7f2cf554af4c5878b35637c66f79f8ed",
     "d.json": "1f5e9834244802a442f8865fc1eef44aaa6dc61e1721df49df5424577441252c",
-    "e-1.json": "0eb139d3fcd396652f5e56a605c4928784e3f4c27920a4be85ee6e995bba3b32",
-    "e-2.json": "8414a2ed5427b8097b8b8d8747caecaa2a3733d6220c4612512a9ff0c0d58fc6",
+    "e-1.json": "acf17d7ee1c3b55c37da4f7c35acbef3bdb9643ea04d86d1e4bac3126d719157",
+    "e-2.json": "3407a43a08f41ba480833c251b47894181e93d0f2f3571fe7e1b3ebaa1eed48a",
+    "e-3.json": "9667bcab1bfb4b469bc3b2b0463c0b2d9a3f0637be928efe3e4573ab1d851cd8",
     "f.json": "f51c517cd60418ef32b7284cd6600b0a603b1c32af4ce538229507d0d2eef430",
     "g.json": "611d0dbaae9557bc9798e19638b0dd73a643c447daa9d7e1759cba61d019c520",
     "h.json": "492450310773cfd07c08de94568b08c9d15638251c728b0e70a001aa7fc85358",
-    "j.json": "521943f096406c9d76aaf352a2683f670a141a3f37edf31bdf6c62a9a642ec45",
+    "j.json": "5bfd0fa0b1626deded95d8728efb4f21811b243a0b64c4a203d77e29ad032f15",
     "k.json": "1286bdf142a3eea4558b0eba9d0994bf337548fdf034ba41a032d1e952842377",
     "l.json": "279e54ea60e67a927db26ba14865ff396409a38d9f7708e7737050c925488b99",
     "m.json": "b8e52133cdf203b325169bbc766cc3d954271a28eb80e66477e03ba2b9dc3502",

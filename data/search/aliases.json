@@ -108217,6 +108217,156 @@
    "term": "counterpoise wire length",
    "target": "counterpoise-resistance",
    "kind": "industry"
+  },
+  {
+   "term": "skip line layout",
+   "target": "skip-line-layout",
+   "kind": "industry"
+  },
+  {
+   "term": "broken lane line cycle",
+   "target": "skip-line-layout",
+   "kind": "industry"
+  },
+  {
+   "term": "stripes per mile",
+   "target": "skip-line-layout",
+   "kind": "industry"
+  },
+  {
+   "term": "pavement marking pattern cycle",
+   "target": "skip-line-layout",
+   "kind": "industry"
+  },
+  {
+   "term": "skip stripe count",
+   "target": "skip-line-layout",
+   "kind": "industry"
+  },
+  {
+   "term": "speed hump geometry",
+   "target": "speed-hump-geometry",
+   "kind": "industry"
+  },
+  {
+   "term": "speed table design",
+   "target": "speed-hump-geometry",
+   "kind": "industry"
+  },
+  {
+   "term": "traffic calming device height",
+   "target": "speed-hump-geometry",
+   "kind": "industry"
+  },
+  {
+   "term": "speed hump ramp slope",
+   "target": "speed-hump-geometry",
+   "kind": "industry"
+  },
+  {
+   "term": "hump versus table",
+   "target": "speed-hump-geometry",
+   "kind": "industry"
+  },
+  {
+   "term": "intersection sight triangle",
+   "target": "intersection-sight-triangle",
+   "kind": "industry"
+  },
+  {
+   "term": "departure sight distance",
+   "target": "intersection-sight-triangle",
+   "kind": "industry"
+  },
+  {
+   "term": "clear sight triangle landscaping",
+   "target": "intersection-sight-triangle",
+   "kind": "industry"
+  },
+  {
+   "term": "aashto time gap",
+   "target": "intersection-sight-triangle",
+   "kind": "industry"
+  },
+  {
+   "term": "sight distance stop controlled intersection",
+   "target": "intersection-sight-triangle",
+   "kind": "industry"
+  },
+  {
+   "term": "pavement structural number",
+   "target": "pavement-structural-number",
+   "kind": "industry"
+  },
+  {
+   "term": "aashto 93 sn",
+   "target": "pavement-structural-number",
+   "kind": "industry"
+  },
+  {
+   "term": "layer coefficient pavement",
+   "target": "pavement-structural-number",
+   "kind": "industry"
+  },
+  {
+   "term": "pavement section equivalency",
+   "target": "pavement-structural-number",
+   "kind": "industry"
+  },
+  {
+   "term": "flexible pavement design thickness",
+   "target": "pavement-structural-number",
+   "kind": "industry"
+  },
+  {
+   "term": "cbr aggregate thickness",
+   "target": "subgrade-cbr-thickness",
+   "kind": "industry"
+  },
+  {
+   "term": "subgrade cbr cover",
+   "target": "subgrade-cbr-thickness",
+   "kind": "industry"
+  },
+  {
+   "term": "haul road rock thickness",
+   "target": "subgrade-cbr-thickness",
+   "kind": "industry"
+  },
+  {
+   "term": "geogrid thickness reduction",
+   "target": "subgrade-cbr-thickness",
+   "kind": "industry"
+  },
+  {
+   "term": "resilient modulus from cbr",
+   "target": "subgrade-cbr-thickness",
+   "kind": "industry"
+  },
+  {
+   "term": "esal calculation",
+   "target": "esal-traffic-loading",
+   "kind": "industry"
+  },
+  {
+   "term": "load equivalency factor",
+   "target": "esal-traffic-loading",
+   "kind": "industry"
+  },
+  {
+   "term": "fourth power law pavement",
+   "target": "esal-traffic-loading",
+   "kind": "industry"
+  },
+  {
+   "term": "design esals pavement",
+   "target": "esal-traffic-loading",
+   "kind": "industry"
+  },
+  {
+   "term": "truck traffic pavement damage",
+   "target": "esal-traffic-loading",
+   "kind": "industry"
   }
  ]
 }

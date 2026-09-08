@@ -10738,7 +10738,7 @@ const MUTCD_SIGN_SPACING_FT = {
   expressway: { label: "Expressway / Freeway", a: 1000, b: 1500, c: 2640 },
 };
 // dims: in { road_type: dimensionless, sign_count: dimensionless, speed_mph: L T^-1 } out: { a_ft: L, b_ft: L, c_ft: L, first_sign_ft: L, total_ft: L }
-export function computeAdvanceWarningSignSpacing({ road_type = "rural", sign_count = 3, speed_mph = 0 } = {}) {
+export function computeAdvanceWarningSignSpacing({ road_type = "rural", sign_count = 3, speed_mph = 0, approach_volume_vph = 0, flagger_cycle_min = 0, vehicle_spacing_ft = 25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const row = MUTCD_SIGN_SPACING_FT[road_type];
   const n = Number(sign_count) || 0;
@@ -10746,6 +10746,12 @@ export function computeAdvanceWarningSignSpacing({ road_type = "rural", sign_cou
   if (!row) return { error: "Road type must be urban-low, urban-high, rural, or expressway." };
   if (!(n >= 1 && n <= 3) || !Number.isInteger(n)) return { error: "Sign count must be 1, 2, or 3 (Table 6C-1 dimensions cover a three-sign series)." };
   if (v < 0) return { error: "Speed cannot be negative (mph); enter 0 to skip the rural placement cross-check." };
+  const vol = Number(approach_volume_vph) || 0;
+  const cyc = Number(flagger_cycle_min) || 0;
+  const spacing = Number(vehicle_spacing_ft) || 0;
+  if (vol < 0) return { error: "Approach volume cannot be negative (vehicles per hour); enter 0 to skip the flagger queue estimate." };
+  if (cyc < 0) return { error: "The flagger cycle cannot be negative (min); enter 0 to skip the queue estimate." };
+  if (vol > 0 && cyc > 0 && !(spacing > 0)) return { error: "Enter a stopped-vehicle spacing (ft) to turn the queue into a length." };
   const a_ft = row.a, b_ft = row.b, c_ft = row.c;
   const positions_ft = [a_ft];
   if (n >= 2) positions_ft.push(a_ft + b_ft);
@@ -10759,11 +10765,29 @@ export function computeAdvanceWarningSignSpacing({ road_type = "rural", sign_cou
     speed_rule_max_ft = 12 * v;
     speed_rule_ok = first_sign_ft >= speed_rule_min_ft;
   }
+  // spec-v1609 was cut here rather than built: its sign spacing and its
+  // 8-to-12-times-speed check were already this calculation. What it had that
+  // this did not is the QUEUE, which is the half that decides whether the
+  // signing works at all -- a flagger operation on a busy two-lane road can
+  // back traffic past the advance signs, and then drivers meet stopped
+  // traffic with no warning at all. Entering nothing leaves the answer as it
+  // was.
+  let queued_vehicles = null, queue_length_ft = null, queue_passes_first_sign = null, queue_verdict = null;
+  if (vol > 0 && cyc > 0) {
+    queued_vehicles = vol / 60 * cyc;
+    queue_length_ft = queued_vehicles * spacing;
+    queue_passes_first_sign = queue_length_ft > first_sign_ft;
+    queue_verdict = queue_passes_first_sign
+      ? "THE QUEUE OUTRUNS THE SIGNING: about " + Math.round(queued_vehicles) + " vehicles stop, roughly " + Math.round(queue_length_ft) + " ft of queue against an advance warning area of " + first_sign_ft + " ft. Drivers meet stopped traffic before they meet the first sign, which is a capacity problem wearing a signing problem's clothes"
+      : "The queue stays inside the signing: about " + Math.round(queued_vehicles) + " vehicles stop, roughly " + Math.round(queue_length_ft) + " ft of queue inside the " + first_sign_ft + " ft advance warning area";
+  }
   if (![a_ft, b_ft, c_ft, first_sign_ft, total_ft].every(Number.isFinite)) return { error: "Sign-spacing math did not produce a finite value." };
   return {
     road_label: row.label, a_ft, b_ft, c_ft, positions_ft, sign_count: n,
     first_sign_ft, total_ft, open_highway_ok,
     speed_rule_min_ft, speed_rule_max_ft, speed_rule_ok,
+    approach_volume_vph: vol, flagger_cycle_min: cyc, vehicle_spacing_ft: spacing,
+    queued_vehicles, queue_length_ft, queue_passes_first_sign, queue_verdict,
     note: "Read the series BACKWARD from how it is signed: the A dimension runs from the transition or point of restriction to the sign CLOSEST to the work, and the third sign - the farthest upstream - is the FIRST one a driver actually sees. The distances here are measured upstream from the transition, so the last number is where the advance warning area begins: " + total_ft + " ft ahead of the taper. Rural placement carries a separate guidance: the first warning sign should sit 8 to 12 times the speed limit in mph"
       + (speed_rule_min_ft !== null ? " (" + speed_rule_min_ft + " to " + speed_rule_max_ft + " ft at the speed entered, and this layout puts it at " + first_sign_ft + " ft)" : "")
       + ", and for open highway conditions the advance warning area should extend 1,500 ft or more"
@@ -10779,12 +10803,16 @@ CONSTRUCTION_RENDERERS["advance-warning-sign-spacing"] = _simpleRenderer({
     { key: "road_type", label: "Road type", kind: "select", options: [{ value: "rural", label: "Rural (500/500/500)", selected: true }, { value: "urban-low", label: "Urban low speed (100/100/100)" }, { value: "urban-high", label: "Urban high speed (350/350/350)" }, { value: "expressway", label: "Expressway / Freeway (1000/1500/2640)" }] },
     { key: "sign_count", label: "Signs in the series (1-3)", kind: "number" },
     { key: "speed_mph", label: "Speed limit (mph, 0 = skip the 8-12x check)", kind: "number", default: 0 },
+    { key: "approach_volume_vph", label: "Approach volume (vehicles/hour, 0 = skip the flagger queue)", kind: "number", default: 0 },
+    { key: "flagger_cycle_min", label: "Flagger cycle time (min, 0 = skip the queue)", kind: "number", default: 0 },
+    { key: "vehicle_spacing_ft", label: "Stopped vehicle spacing (ft)", kind: "number", default: 25 },
   ],
   outputs: [
     { key: "abc", id: "aws-out-abc", label: "Table 6C-1 sign spacings", value: (r) => r.road_label + " -- A " + fmt(r.a_ft, 0) + " ft, B " + fmt(r.b_ft, 0) + " ft, then " + fmt(r.c_ft, 0) + " ft" },
     { key: "pos", id: "aws-out-pos", label: "Sign positions upstream of the transition", value: (r) => r.positions_ft.map((p) => fmt(p, 0) + " ft").join(", ") },
     { key: "tot", id: "aws-out-tot", label: "Advance warning area begins", value: (r) => fmt(r.total_ft, 0) + " ft ahead of the taper" + (r.open_highway_ok ? " (meets the 1,500 ft open-highway guidance)" : "") },
     { key: "sp", id: "aws-out-sp", label: "Rural 8-12x speed check", value: (r) => (r.speed_rule_min_ft === null ? "not checked (enter a speed)" : fmt(r.speed_rule_min_ft, 0) + "-" + fmt(r.speed_rule_max_ft, 0) + " ft suggested - " + (r.speed_rule_ok ? "layout meets it" : "layout is SHORTER than the guidance")) },
+    { key: "q", id: "aws-out-q", label: "Flagger queue", value: (r) => r.queue_verdict === null ? "(enter an approach volume and a flagger cycle to estimate it)" : r.queue_verdict },
     { key: "n", id: "aws-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeAdvanceWarningSignSpacing,
@@ -10869,7 +10897,7 @@ CONSTRUCTION_RENDERERS["formwork-member-spacing"] = _simpleRenderer({
 //   binder     B = (2.244 H T V + S + A) / R     gal/SY
 // The T, E, and S factors are DOT table lookups and are entered, with their published ranges named.
 // dims: in { median_size_in: L, flakiness_index_pct: dimensionless, loose_unit_weight_pcf: M L^-3, bulk_specific_gravity: dimensionless, wastage_factor: dimensionless, traffic_factor: dimensionless, surface_factor_gal_sy: L, absorption_gal_sy: L, residual_asphalt: dimensionless } out: { ald_in: L, voids: dimensionless, aggregate_lb_sy: M L^-2, binder_gal_sy: L }
-export function computeChipSealMcleod({ median_size_in = 0, flakiness_index_pct = 0, loose_unit_weight_pcf = 0, bulk_specific_gravity = 2.65, wastage_factor = 1.05, traffic_factor = 0.75, surface_factor_gal_sy = 0.02, absorption_gal_sy = 0, residual_asphalt = 0.67 } = {}) {
+export function computeChipSealMcleod({ median_size_in = 0, flakiness_index_pct = 0, loose_unit_weight_pcf = 0, bulk_specific_gravity = 2.65, wastage_factor = 1.05, traffic_factor = 0.75, surface_factor_gal_sy = 0.02, absorption_gal_sy = 0, residual_asphalt = 0.67, project_area_sy = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const M = Number(median_size_in) || 0;
   const FI = Number(flakiness_index_pct);
@@ -10889,6 +10917,8 @@ export function computeChipSealMcleod({ median_size_in = 0, flakiness_index_pct 
   if (!Number.isFinite(S) || S < 0) return { error: "Surface condition factor cannot be negative (gal/SY)." };
   if (!Number.isFinite(A) || A < 0) return { error: "Aggregate absorption factor cannot be negative (gal/SY)." };
   if (!(R > 0 && R <= 1)) return { error: "Residual asphalt must be over 0 and up to 1 (about 0.67 for a typical emulsion; 1.0 for asphalt cement)." };
+  const area_sy = Number(project_area_sy) || 0;
+  if (area_sy < 0) return { error: "Project area cannot be negative (SY); enter 0 to skip the project quantities." };
   const ald_in = M / (1.139285 + 0.011506 * FI);
   const voids = 1 - W / (62.4 * G);
   if (!(voids > 0 && voids < 1)) return { error: "The voids calculation is out of range - check the loose unit weight against the specific gravity (W must be under 62.4 x G)." };
@@ -10898,8 +10928,17 @@ export function computeChipSealMcleod({ median_size_in = 0, flakiness_index_pct 
   const binder_gal_per_1000sy = binder_gal_sy * 1000;
   const residual_gal_sy = binder_gal_sy * R;
   if (![ald_in, voids, aggregate_lb_sy, binder_gal_sy].every(Number.isFinite)) return { error: "Chip seal math did not produce a finite value." };
+  // spec-v1616 was cut here rather than built: it specified the same McLeod
+  // method this already carries -- and specified it wrong, with a binder
+  // constant an order of magnitude off and an aggregate expression that does
+  // not reproduce its own stated answer. What it had that this did not is a
+  // project area, so that lands here. Entering nothing leaves the rates as
+  // they were.
+  const project_aggregate_tons = area_sy > 0 ? aggregate_lb_sy * area_sy / 2000 : null;
+  const project_binder_gal = area_sy > 0 ? binder_gal_sy * area_sy : null;
   return {
     ald_in, voids, aggregate_lb_sy, binder_gal_sy, aggregate_ton_per_1000sy, binder_gal_per_1000sy, residual_gal_sy,
+    project_area_sy: area_sy, project_aggregate_tons, project_binder_gal,
     note: "A chip seal is designed ONE STONE THICK, which is why the controlling dimension is the average least dimension rather than the sieve size: traffic rolls each stone onto its flattest face, so the mat ends up as deep as the stones are thin. That is what the flakiness index buys you - " + FI + "% flat particles pulls the effective thickness from " + (M / 1.139285).toFixed(3) + " in down to " + ald_in.toFixed(3) + " in, and both the aggregate and the binder follow it. "
       + "The aggregate rate is fixed by geometry and does NOT change with binder type or pavement condition; only the binder does. Note the direction that surprises people: HEAVIER traffic wants LESS binder, because traffic itself embeds the stone - the traffic factor runs about 0.85 under 100 vehicles per day down to about 0.60 over 2,000. Too much binder bleeds and flushes, too little loses the chips, and there is not much room between them. "
       + "The traffic, wastage, and surface-condition factors are DOT table lookups entered here rather than shipped, because they vary by agency. Binder is EMULSION gallons at the residual content entered (" + residual_gal_sy.toFixed(4) + " gal/SY residual); enter 1.0 for asphalt cement. Design values, and the field almost always adjusts the binder after a test strip - the agency's own design procedure and the test strip govern.",
@@ -10919,12 +10958,14 @@ CONSTRUCTION_RENDERERS["chip-seal-mcleod"] = _simpleRenderer({
     { key: "surface_factor_gal_sy", label: "Surface condition factor S (gal/SY)", kind: "number" },
     { key: "absorption_gal_sy", label: "Aggregate absorption A (gal/SY)", kind: "number" },
     { key: "residual_asphalt", label: "Residual asphalt R (0.67 emulsion, 1.0 AC)", kind: "number" },
+    { key: "project_area_sy", label: "Project area (SY, 0 to skip the totals)", kind: "number", default: 0 },
   ],
   outputs: [
     { key: "h", id: "csm-out-h", label: "Average least dimension (mat thickness)", value: (r) => fmt(r.ald_in, 4) + " in" },
     { key: "v", id: "csm-out-v", label: "Voids in the loose aggregate", value: (r) => fmt(r.voids * 100, 1) + "%" },
     { key: "c", id: "csm-out-c", label: "Aggregate application rate", value: (r) => fmt(r.aggregate_lb_sy, 2) + " lb/SY (" + fmt(r.aggregate_ton_per_1000sy, 2) + " tons per 1,000 SY)" },
     { key: "b", id: "csm-out-b", label: "Binder application rate", value: (r) => fmt(r.binder_gal_sy, 4) + " gal/SY emulsion (" + fmt(r.binder_gal_per_1000sy, 0) + " gal per 1,000 SY; " + fmt(r.residual_gal_sy, 4) + " gal/SY residual)" },
+    { key: "q", id: "csm-out-q", label: "Project quantities", value: (r) => r.project_aggregate_tons === null ? "(enter a project area for the totals)" : fmt(r.project_aggregate_tons, 1) + " tons of chips and " + fmt(r.project_binder_gal, 0) + " gal of binder over " + fmt(r.project_area_sy, 0) + " SY" },
     { key: "n", id: "csm-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeChipSealMcleod,

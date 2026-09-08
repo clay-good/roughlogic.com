@@ -1,5 +1,11 @@
 # roughlogic.com Specification v1616 -- Chip Seal Aggregate and Emulsion Application Rate (`calc-civil.js`, Group E Carpentry and Construction, traffic control, 1 New Tile)
 
+> **Status: CUT 2026-09-08 -- DUPLICATE. This tile was not built.** The formula screen for the
+> 2026-09-08 traffic, work zone, and pavement band found this question already answered by
+> `chip-seal-mcleod`. That tile carries the same McLeod method -- and carries it correctly, where this spec does not. The published binder relation is B = (2.244 x ALD x T x V + S + A) / R; this spec writes 0.4 in place of 2.244, which puts its worked example near 0.12 gal/SY of emulsion where the method gives 0.33. Its aggregate expression, ALD x loose unit weight x (1 - voids) x 3, returns 37.5 lb/SY where the method's C = 46.8 (1 - 0.4 V) x ALD x G x E returns about 26 -- and the spec's own text claims 25. The existing tile also derives the average least dimension from median size and flakiness index rather than taking it as an input. What the spec had that the tile did not is a project area, so `chip-seal-mcleod` gained one and reports total tons and total gallons. Its rates are unchanged.
+>
+> The specification below is kept as the record of the screen. Do not implement it.
+>
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-civil.js`**
 > (Group E, Carpentry and Construction -- the existing category, hub `/groups/construction/`; traffic, work zone, and pavement), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.

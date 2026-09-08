@@ -889,7 +889,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "steam-prv-area-for-capacity": {"required_area_in2":"Required orifice / seat area","choke_threshold_psia":"Choke threshold (0.58 x P1)","note":"Note"},
   "steam-prv-napier": {"choked":"Flow regime","steam_capacity_lb_hr":"Steam capacity","note":"Note"},
   "steam-trap-sizing": {"condensate_lbhr":"Running condensate load","req_capacity_lbhr":"Required trap capacity"},
-  "stopping-sight-distance": {"perception_reaction_ft":"Perception-reaction distance (ft)","braking_distance_ft":"Braking distance (ft)","total_ssd_ft":"Total SSD (ft)","warnings":"Notes"},
+  "stopping-sight-distance": {"perception_reaction_ft":"Perception-reaction distance (ft)","braking_distance_ft":"Braking distance (ft)","total_ssd_ft":"Total SSD (ft)","distance_verdict":"Against the distance available","warnings":"Notes"},
   "stormwater-detention-volume": {"q_in_cfs":"Peak inflow","storage_cf":"Required storage","note":"Note"},
   "stormwater-max-drainage-area": {"runoff_coefficient":"Runoff coefficient","max_area_ft2":"Max tributary area","note":"Note"},
   "stormwater-rational": {"runoff_coefficient":"Runoff coefficient"},

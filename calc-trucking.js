@@ -808,6 +808,7 @@ export function computeStoppingSightDistance({
   reaction_time_s = 2.5,
   friction = 0.35,
   grade = 0.0,
+  available_distance_ft = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   grade = Number(grade);
@@ -819,6 +820,8 @@ export function computeStoppingSightDistance({
   if (!Number.isFinite(t) || !(t > 0)) return { error: "Perception-reaction time must be positive (s)." };
   if (!Number.isFinite(f) || !(f > -1)) return { error: "Friction coefficient must be a number > -1." };
   if (f + g <= 0) return { error: "Effective deceleration (f + g) must be positive; the vehicle cannot stop under these conditions." };
+  const avail = Number(available_distance_ft) || 0;
+  if (avail < 0) return { error: "Available distance cannot be negative (ft)." };
 
   const d_pr_ft = 1.47 * v * t;
   const d_br_ft = (v * v) / (30 * (f + g));
@@ -829,6 +832,20 @@ export function computeStoppingSightDistance({
   if (f < 0.05) warnings.push("Friction coefficient below 0.05 indicates essentially uncontrolled conditions; do not drive in these conditions.");
   if (Math.abs(g) > 0.10) warnings.push("Grade magnitude above 10% is at the extreme of the AASHTO design range; consult the state-DOT specifics.");
 
+  // spec-v1608 was cut here rather than built: a work zone's longitudinal
+  // buffer IS this stopping distance, grade term and all, and the MUTCD
+  // tabulates it by speed. What the cut spec had that this did not is the
+  // comparison against the room the site actually offers, so that lands here.
+  // Entering nothing leaves the answer exactly as it was.
+  const available_distance_ft_out = avail > 0 ? avail : null;
+  const distance_shortfall_ft = avail > 0 ? Math.max(0, d_total_ft - avail) : null;
+  const distance_adequate = avail > 0 ? avail >= d_total_ft : null;
+  const distance_verdict = avail > 0
+    ? (avail >= d_total_ft
+      ? "ADEQUATE: " + fmt(avail, 0) + " ft available against " + fmt(d_total_ft, 0) + " ft required, " + fmt(avail - d_total_ft, 0) + " ft to spare"
+      : "SHORT by " + fmt(d_total_ft - avail, 0) + " ft: " + fmt(avail, 0) + " ft available against " + fmt(d_total_ft, 0) + " ft required. Lower the speed through the zone, or occupy the gap with a shadow vehicle and attenuator -- moving the cones closer is not one of the options")
+    : null;
+
   return {
     perception_reaction_ft: d_pr_ft,
     braking_distance_ft: d_br_ft,
@@ -837,6 +854,10 @@ export function computeStoppingSightDistance({
     reaction_time_s: t,
     friction,
     grade,
+    available_distance_ft: available_distance_ft_out,
+    distance_shortfall_ft,
+    distance_adequate,
+    distance_verdict,
     warnings,
   };
 }
@@ -895,7 +916,9 @@ export function renderStoppingSightDistance(inputRegion, outputRegion, citationE
   f.input.value = "0.35";
   const g = makeNumber("Grade (decimal; + uphill, - downhill)", "ssd-g", { step: "any", value: "0" });
   g.input.value = "0";
-  for (const fld of [v, tpr, cond, f, g]) inputRegion.appendChild(fld.wrap);
+  const avail = makeNumber("Available distance to check against (ft; 0 to skip)", "ssd-avail", { step: "any", min: "0", value: "0" });
+  avail.input.value = "0";
+  for (const fld of [v, tpr, cond, f, g, avail]) inputRegion.appendChild(fld.wrap);
 
   cond.select.addEventListener("change", () => {
     const p = SSD_FRICTION_DEFAULTS[cond.select.value];
@@ -912,6 +935,7 @@ export function renderStoppingSightDistance(inputRegion, outputRegion, citationE
   const oPR = makeOutputLine(outputRegion, "Perception-reaction distance (ft)", "ssd-out-pr");
   const oBR = makeOutputLine(outputRegion, "Braking distance (ft)", "ssd-out-br");
   const oT = makeOutputLine(outputRegion, "Total SSD (ft)", "ssd-out-t");
+  const oA = makeOutputLine(outputRegion, "Against the distance available", "ssd-out-a");
   const oW = makeOutputLine(outputRegion, "Notes", "ssd-out-w");
 
   function readNum(input) {
@@ -925,17 +949,19 @@ export function renderStoppingSightDistance(inputRegion, outputRegion, citationE
       reaction_time_s: readNum(tpr.input),
       friction: readNum(f.input),
       grade: readNum(g.input),
+      available_distance_ft: readNum(avail.input) ?? 0,
     });
     if (r.error) {
-      oPR.textContent = r.error; oBR.textContent = ""; oT.textContent = ""; oW.textContent = "";
+      oPR.textContent = r.error; oBR.textContent = ""; oT.textContent = ""; oA.textContent = ""; oW.textContent = "";
       return;
     }
     oPR.textContent = fmt(r.perception_reaction_ft, 1) + " ft";
     oBR.textContent = fmt(r.braking_distance_ft, 1) + " ft";
     oT.textContent = fmt(r.total_ssd_ft, 1) + " ft";
+    oA.textContent = r.distance_verdict === null ? "(no available distance entered -- this is also the work-zone longitudinal buffer, so enter the room between the taper and the work space to check it)" : r.distance_verdict;
     oW.textContent = r.warnings.length > 0 ? r.warnings.join(" ") : "AASHTO physics formula; state DOT design SSD tables round these numbers.";
   }, DEBOUNCE_MS);
-  for (const fld of [v.input, tpr.input, f.input, g.input]) fld.addEventListener("input", update);
+  for (const fld of [v.input, tpr.input, f.input, g.input, avail.input]) fld.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }

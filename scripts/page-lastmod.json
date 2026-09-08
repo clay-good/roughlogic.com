@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "5908d4675781e07a",
+      "sha": "ab509941a903e8a0",
       "date": "2026-09-08"
     },
     "/tools/": {
-      "sha": "cc1f6d80a79ecbf3",
+      "sha": "d1d9265be7e70cfa",
       "date": "2026-09-08"
     },
     "/groups/accounting/": {
-      "sha": "527999af027c59f7",
+      "sha": "3e80cbe3ef519370",
       "date": "2026-09-08"
     },
     "/groups/agriculture/": {
-      "sha": "43d8e1ec2bc7be9f",
+      "sha": "d7f974f8f9d5d4c3",
       "date": "2026-09-08"
     },
     "/groups/construction/": {
-      "sha": "51db9c4e1c16721f",
+      "sha": "39e47136341d052c",
       "date": "2026-09-08"
     },
     "/groups/cross-trade/": {
-      "sha": "fc1e0a8ad01b0977",
+      "sha": "8fbe2a277dbf4340",
       "date": "2026-09-08"
     },
     "/groups/educators/": {
-      "sha": "9fb32e2e1c5ad983",
+      "sha": "84056065f5c673c2",
       "date": "2026-09-08"
     },
     "/groups/electrical/": {
-      "sha": "c376d0e2bd995af3",
+      "sha": "32bb795ec3631970",
       "date": "2026-09-08"
     },
     "/groups/field/": {
-      "sha": "8277d2083edf7184",
+      "sha": "f98ff06a0d3f61cc",
       "date": "2026-09-08"
     },
     "/groups/fire-ground/": {
-      "sha": "794da9b468cc4365",
+      "sha": "07a5ddfdcadad3e3",
       "date": "2026-09-08"
     },
     "/groups/historical/": {
-      "sha": "5a08de7ee17caf6a",
+      "sha": "3b8c0ffdd6514919",
       "date": "2026-09-08"
     },
     "/groups/hvac/": {
-      "sha": "5f874e0a2bceada8",
+      "sha": "4ee9ad87ac362b36",
       "date": "2026-09-08"
     },
     "/groups/kitchen/": {
-      "sha": "a26a9a4febc26af3",
+      "sha": "a676c1a249899d35",
       "date": "2026-09-08"
     },
     "/groups/lab/": {
-      "sha": "74178cb18ef7547e",
+      "sha": "02aab448d2031257",
       "date": "2026-09-08"
     },
     "/groups/mechanic/": {
-      "sha": "71b1d1ab2900da51",
+      "sha": "2c6a4a3d3bdee214",
       "date": "2026-09-08"
     },
     "/groups/plumbing/": {
-      "sha": "4c5be2a595535feb",
+      "sha": "84b0c85c790bef45",
       "date": "2026-09-08"
     },
     "/groups/real-estate/": {
-      "sha": "c53c7b30693425c6",
+      "sha": "6caf27f4ff07e9a7",
       "date": "2026-09-08"
     },
     "/groups/references/": {
-      "sha": "d29f2b5bdb2c6c11",
+      "sha": "a1347881c88298b6",
       "date": "2026-09-08"
     },
     "/groups/restoration/": {
-      "sha": "b7a601ca0b42cd5f",
+      "sha": "550788a6d8f63809",
       "date": "2026-09-08"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "b0834e54cd66b198",
+      "sha": "4eb308c8c7bd2999",
       "date": "2026-09-08"
     },
     "/groups/stage/": {
-      "sha": "abf4cf62c4ee5565",
+      "sha": "c712a61d98eed9e5",
       "date": "2026-09-08"
     },
     "/groups/trucking/": {
-      "sha": "ff7e841198d5bf83",
+      "sha": "2fff861d0f709377",
       "date": "2026-09-08"
     },
     "/groups/water/": {
-      "sha": "71d9386c4720c6f4",
+      "sha": "7d85af0e38a052d6",
       "date": "2026-09-08"
     },
     "/tools/aav-install-check/": {
@@ -882,8 +882,8 @@
       "date": "2026-09-01"
     },
     "/tools/carpet-seam-layout/": {
-      "sha": "c4bb9c3103488bf6",
-      "date": "2026-09-01"
+      "sha": "a143cbea93b527ba",
+      "date": "2026-09-08"
     },
     "/tools/carpet-takeoff/": {
       "sha": "5748422d03b56572",
@@ -2373,6 +2373,10 @@
       "sha": "37c55031ba14d904",
       "date": "2026-09-01"
     },
+    "/tools/esal-traffic-loading/": {
+      "sha": "03f92b7f738708d8",
+      "date": "2026-09-08"
+    },
     "/tools/escalator-capacity/": {
       "sha": "1e77478915e466d8",
       "date": "2026-09-05"
@@ -3521,6 +3525,10 @@
       "sha": "ff53da25319f65a4",
       "date": "2026-09-01"
     },
+    "/tools/intersection-sight-triangle/": {
+      "sha": "b803bd4ecb28fac5",
+      "date": "2026-09-08"
+    },
     "/tools/inventory-turnover/": {
       "sha": "8ebd63ee3e856ff6",
       "date": "2026-09-01"
@@ -4532,6 +4540,10 @@
     "/tools/pavement-milling-production/": {
       "sha": "4901fe17929c9bdf",
       "date": "2026-09-01"
+    },
+    "/tools/pavement-structural-number/": {
+      "sha": "934a9520ed122598",
+      "date": "2026-09-08"
     },
     "/tools/paver-patio/": {
       "sha": "f7ce345c85661f91",
@@ -5993,6 +6005,10 @@
       "sha": "65d0d3f676ca4b85",
       "date": "2026-09-07"
     },
+    "/tools/skip-line-layout/": {
+      "sha": "79f1b3d520c172ff",
+      "date": "2026-09-08"
+    },
     "/tools/slab-dowel-schedule/": {
       "sha": "79c242a3c885314d",
       "date": "2026-09-04"
@@ -6224,6 +6240,10 @@
     "/tools/specific-energy/": {
       "sha": "a73e6094151f3335",
       "date": "2026-09-01"
+    },
+    "/tools/speed-hump-geometry/": {
+      "sha": "a7dabcd1a873262c",
+      "date": "2026-09-08"
     },
     "/tools/speed-of-sound-air/": {
       "sha": "6c35f46ffb7f6347",
@@ -6632,6 +6652,10 @@
     "/tools/stud-notch-bore-limit/": {
       "sha": "bc93bac36d3ea716",
       "date": "2026-09-01"
+    },
+    "/tools/subgrade-cbr-thickness/": {
+      "sha": "1cda71ff28e54c49",
+      "date": "2026-09-08"
     },
     "/tools/submerged-earth-pressure/": {
       "sha": "25ea65390283007d",
@@ -7638,8 +7662,8 @@
       "date": "2026-09-01"
     },
     "/tools/wire-feed-deposition/": {
-      "sha": "dde0998bd65e54c6",
-      "date": "2026-09-01"
+      "sha": "e8d1da5456dc62c2",
+      "date": "2026-09-08"
     },
     "/tools/wire-feed-speed-for-deposition/": {
       "sha": "5783c54c68df7de5",

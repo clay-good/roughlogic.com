@@ -1119,6 +1119,13 @@ const _TILES = [
   ["nesc-district-loading", "A"],
   ["conductor-creep-elongation", "A"],
   ["sagging-return-wave", "A"],
+  // spec-v1610..v1615 traffic, work zone, and pavement band
+  ["skip-line-layout", "E"],
+  ["speed-hump-geometry", "E"],
+  ["intersection-sight-triangle", "E"],
+  ["pavement-structural-number", "E"],
+  ["subgrade-cbr-thickness", "E"],
+  ["esal-traffic-loading", "E"],
   // spec-v1461..v1467 second overhead line and distribution band
   ["transformer-diversity-loading", "A"],
   ["capacitor-bank-voltage-rise", "A"],

@@ -1,5 +1,11 @@
 # roughlogic.com Specification v1608 -- Work Zone Longitudinal Buffer Space (`calc-civil.js`, Group E Carpentry and Construction, traffic control, 1 New Tile)
 
+> **Status: CUT 2026-09-08 -- DUPLICATE. This tile was not built.** The formula screen for the
+> 2026-09-08 traffic, work zone, and pavement band found this question already answered by
+> `stopping-sight-distance`. Its relation, its grade term and its worked example are all that tile's: 55 mph at f = 0.35 on level pavement is 490 ft in both. The MUTCD tabulates the longitudinal buffer by speed anyway, and this spec concedes that the tabulated value is what a traffic control plan is held to. What the spec had that the existing tile did not is the comparison against the room a site actually offers, so `stopping-sight-distance` gained an optional available-distance input, the shortfall, and the shadow-vehicle substitution in words. Its answer with that input left at zero is unchanged.
+>
+> The specification below is kept as the record of the screen. Do not implement it.
+>
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-civil.js`**
 > (Group E, Carpentry and Construction -- the existing category, hub `/groups/construction/`; traffic, work zone, and pavement), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.

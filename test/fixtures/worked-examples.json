@@ -100034,6 +100034,357 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "skip-line-layout",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "a 10 ft stripe with a 30 ft gap over one mile, checked against 99 stripes counted on 3,300 ft in place",
+   "source_edition_or_year": "cycle = stripe + gap; stripes per mile = 5,280 / cycle; painted fraction = stripe / cycle",
+   "source_section_or_page": "the adopted MUTCD, the agency standard drawings and the project specification govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "stripe_length_ft": 10,
+    "gap_length_ft": 30,
+    "run_length_ft": 5280,
+    "start_offset_ft": 0,
+    "counted_stripes": 99,
+    "counted_length_ft": 3300
+   },
+   "outputs": {
+    "cycle_length_ft": {
+     "value": 40,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "stripes_in_run": {
+     "value": 132,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "stripes_per_mile": {
+     "value": 132,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "painted_length_ft": {
+     "value": 1320,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "painted_fraction_pct": {
+     "value": 25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "implied_cycle_ft": {
+     "value": 33.33333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "speed-hump-geometry",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "a 12 ft parabolic speed hump 3 in high, crossed at 25 mph by a 120 in wheelbase with 5 in of clearance",
+   "source_edition_or_year": "ramp slope = height / ramp length; vertical acceleration = 8 x height x speed squared / transition length squared",
+   "source_section_or_page": "the agency standard drawings, ITE traffic calming guidance and the fire department govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "height_in": 3,
+    "total_length_ft": 12,
+    "flat_top_length_ft": 0,
+    "crossing_speed_mph": 25,
+    "comfort_limit_g": 0.25,
+    "wheelbase_in": 120,
+    "ground_clearance_in": 5,
+    "target_ramp_slope_pct": 5
+   },
+   "outputs": {
+    "ramp_length_ft": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ramp_slope_pct": {
+     "value": 4.16667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vertical_accel_g": {
+     "value": 0.58037,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "comfort_speed_mph": {
+     "value": 16.40806,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "clearance_required_in": {
+     "value": 2.08333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ramp_length_for_target_ft": {
+     "value": 5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "intersection-sight-triangle",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "a passenger car turning left from a stop onto a 45 mph two-lane road at a 7.5 s AASHTO gap, with 380 ft measured each way",
+   "source_edition_or_year": "departure sight distance b = 1.47 x speed (mph) x time gap (s)",
+   "source_section_or_page": "the AASHTO Green Book, the agency design standards and the roadway engineer govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "major_speed_mph": 45,
+    "time_gap_s": 7.5,
+    "extra_lanes": 0,
+    "added_gap_per_lane_s": 0.5,
+    "setback_ft": 15,
+    "available_left_ft": 380,
+    "available_right_ft": 380
+   },
+   "outputs": {
+    "total_time_gap_s": {
+     "value": 7.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_distance_ft": {
+     "value": 496.125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "triangle_area_ft2": {
+     "value": 3720.9375,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "shortfall_left_ft": {
+     "value": 116.125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "shortfall_right_ft": {
+     "value": 116.125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "adequate_speed_mph": {
+     "value": 34.46712,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pavement-structural-number",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "4 in of asphalt over 8 in of base over 10 in of subbase, the subbase drainage-penalised to 0.8, against a required SN of 3.00",
+   "source_edition_or_year": "SN = sum of (layer coefficient x thickness x drainage coefficient), the drainage term on unbound layers only",
+   "source_section_or_page": "the agency pavement design manual and the pavement engineer govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "ac_thickness_in": 4,
+    "ac_coefficient": 0.44,
+    "base_thickness_in": 8,
+    "base_coefficient": 0.14,
+    "base_drainage": 1,
+    "subbase_thickness_in": 10,
+    "subbase_coefficient": 0.11,
+    "subbase_drainage": 0.8,
+    "required_sn": 3
+   },
+   "outputs": {
+    "sn_surface": {
+     "value": 1.76,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sn_base": {
+     "value": 1.12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sn_subbase": {
+     "value": 0.88,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sn_total": {
+     "value": 3.76,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sn_margin": {
+     "value": 0.76,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "base_per_inch_of_ac_in": {
+     "value": 3.14286,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "subbase_per_inch_of_ac_in": {
+     "value": 5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "subgrade-cbr-thickness",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "a CBR 6 subgrade under a 9,000 lb wheel at 80 psi for 5,000 coverages, compared against CBR 3",
+   "source_edition_or_year": "Corps of Engineers cover equation with alpha = 0.23 log10(coverages) + 0.15; Mr = 1,500 x CBR",
+   "source_section_or_page": "the geotechnical investigation, the agency design manual and the geotechnical engineer govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "cbr_pct": 6,
+    "wheel_load_lb": 9000,
+    "tire_pressure_psi": 80,
+    "coverages": 5000,
+    "geosynthetic_reduction_pct": 30,
+    "alternate_cbr_pct": 3
+   },
+   "outputs": {
+    "alpha_factor": {
+     "value": 1.00076,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "thickness_in": {
+     "value": 12.23125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "thickness_with_geosynthetic_in": {
+     "value": 8.56187,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "resilient_modulus_psi": {
+     "value": 9000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alternate_thickness_in": {
+     "value": 18.30495,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sensitivity_ratio": {
+     "value": 1.49657,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "esal-traffic-loading",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "12,000 AADT at 6% trucks, 0.5 directional and 0.9 lane factors, 1.2 ESALs per truck, 2% growth over 20 years",
+   "source_edition_or_year": "LEF = (axle / 18,000)^4; design ESALs = first-year ESALs x ((1+g)^n - 1)/g",
+   "source_section_or_page": "the agency pavement design manual, the traffic data and the pavement engineer govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "aadt": 12000,
+    "truck_percent": 6,
+    "directional_factor": 0.5,
+    "lane_factor": 0.9,
+    "esals_per_truck": 1.2,
+    "growth_percent": 2,
+    "design_life_years": 20,
+    "car_axle_lb": 2000,
+    "overload_axle_lb": 22000
+   },
+   "outputs": {
+    "trucks_per_day_design_lane": {
+     "value": 324,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "first_year_esals": {
+     "value": 141912,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "growth_factor": {
+     "value": 24.29737,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "design_esals": {
+     "value": 3448088.3429,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "car_esals": {
+     "value": 13722.51453,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "car_share_pct": {
+     "value": 0.3964,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "overload_lef": {
+     "value": 2.23152,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

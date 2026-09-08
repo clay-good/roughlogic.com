@@ -46241,3 +46241,329 @@ test("bounds: spec-v1467 computeCounterpoiseResistance -- doubling the wire near
   assert.ok("error" in _v1467({ ...base, coupling_penalty: 0.8 }));
   assert.ok("error" in _v1467({ ...base, wire_diameter_in: 0 }));
 });
+
+// ===========================================================================
+// spec-v1610..v1615: the 2026-09-08 trade-expansion traffic, work zone, and
+// pavement band. Six tiles into the existing calc-civil.js, all group E.
+//
+// THREE OF THE BAND'S NINE SPECS WERE CUT as duplicates, all three found by
+// the formula screen rather than by name, and each one's genuinely new
+// material landed additively on the calculator that already answered it:
+//   spec-v1608 -> `stopping-sight-distance` (an available-distance check)
+//   spec-v1609 -> `advance-warning-sign-spacing` (the flagger queue)
+//   spec-v1616 -> `chip-seal-mcleod` (project quantities)
+// Those three additions are asserted at the bottom of this block, together
+// with the assertion that matters most for an additive change: the old
+// answer is unchanged when the new input is left at zero.
+// ===========================================================================
+
+import { computeSkipLineLayout as _v1610 } from "../../calc-civil.js";
+test("bounds: spec-v1610 computeSkipLineLayout -- the same cycle, half again the paint", () => {
+  const base = { stripe_length_ft: 10, gap_length_ft: 30, run_length_ft: 5280, start_offset_ft: 0, counted_stripes: 99, counted_length_ft: 3300 };
+  const r = _v1610(base);
+  assert.ok(Math.abs(r.cycle_length_ft - 40) < 1e-12);
+  assert.equal(r.stripes_in_run, 132);
+  assert.ok(Math.abs(r.stripes_per_mile - 132) < 1e-12);
+  assert.ok(Math.abs(r.painted_length_ft - 1320) < 1e-9);
+  assert.ok(Math.abs(r.painted_fraction_pct - 25) < 1e-12);
+  assert.ok(Math.abs(r.implied_cycle_ft - 33.3333333) < 1e-6);
+  assert.equal(r.matches_counted, false);
+  // The note's central claim: a 15/25 pattern is the SAME cycle and the same
+  // stripe count, and half again the paint.
+  const wide = _v1610({ ...base, stripe_length_ft: 15, gap_length_ft: 25 });
+  assert.ok(Math.abs(wide.cycle_length_ft - r.cycle_length_ft) < 1e-12);
+  assert.equal(wide.stripes_in_run, r.stripes_in_run);
+  assert.ok(Math.abs(wide.painted_length_ft - 1980) < 1e-9);
+  assert.ok(Math.abs(wide.painted_length_ft - r.painted_length_ft - 660) < 1e-9);
+  // Painted fraction is stripe over cycle, so it never depends on the run.
+  const short = _v1610({ ...base, run_length_ft: 800 });
+  assert.ok(Math.abs(short.painted_fraction_pct - r.painted_fraction_pct) < 1e-12);
+  // A counted run that matches the entered pattern reads as matching.
+  const same = _v1610({ ...base, counted_stripes: 132, counted_length_ft: 5280 });
+  assert.ok(Math.abs(same.implied_cycle_ft - 40) < 1e-12);
+  assert.equal(same.matches_counted, true);
+  // The offset pushes the whole run along and can cost a stripe.
+  const offset = _v1610({ ...base, start_offset_ft: 20 });
+  assert.ok(Math.abs(offset.first_stripe_start_ft - 20) < 1e-12);
+  assert.ok(offset.stripes_in_run <= r.stripes_in_run);
+  assert.ok("error" in _v1610({ ...base, run_length_ft: 20 }));
+  assert.ok("error" in _v1610({ ...base, gap_length_ft: 0 }));
+});
+
+import { computeSpeedHumpGeometry as _v1611 } from "../../calc-civil.js";
+test("bounds: spec-v1611 computeSpeedHumpGeometry -- 3 in over 6 ft is 4.17%, not 3.5%", () => {
+  const hump = { height_in: 3, total_length_ft: 12, flat_top_length_ft: 0, crossing_speed_mph: 25, comfort_limit_g: 0.25, wheelbase_in: 120, ground_clearance_in: 5, target_ramp_slope_pct: 5 };
+  const r = _v1611(hump);
+  // spec-v1611 prints 3.5% for 3 in over 6 ft. 0.25 ft over 6 ft is 4.167%.
+  assert.ok(Math.abs(r.ramp_length_ft - 6) < 1e-12);
+  assert.ok(Math.abs(r.ramp_slope_pct - 4.16666667) < 1e-6);
+  assert.ok(Math.abs(r.vertical_accel_g - 0.58037050) < 1e-6);
+  assert.ok(Math.abs(r.comfort_speed_mph - 16.4080640) < 1e-5);
+  assert.ok(Math.abs(r.clearance_required_in - 2.08333333) < 1e-6);
+  assert.equal(r.clears, true);
+  assert.equal(r.sits_on_flat, false);
+  // The spec's own comparison: a 22 ft table with a 10 ft flat top and the
+  // same height has the SAME ramp and the SAME ramp slope.
+  const table = _v1611({ ...hump, total_length_ft: 22, flat_top_length_ft: 10 });
+  assert.ok(Math.abs(table.ramp_length_ft - r.ramp_length_ft) < 1e-12);
+  assert.ok(Math.abs(table.ramp_slope_pct - r.ramp_slope_pct) < 1e-12);
+  assert.ok(Math.abs(table.vertical_accel_g - r.vertical_accel_g) < 1e-12);
+  // And the flat top, not the height, is what the wheelbase feels: a 120 in
+  // wheelbase sits entirely on a 10 ft flat, so nothing is lifted at all.
+  assert.equal(table.sits_on_flat, true);
+  assert.ok(Math.abs(table.clearance_required_in) < 1e-12);
+  // Length enters squared and height linearly: double the length quarters the
+  // acceleration, halve the height halves it.
+  const longer = _v1611({ ...hump, total_length_ft: 24 });
+  assert.ok(Math.abs(longer.vertical_accel_g - r.vertical_accel_g / 4) < 1e-12);
+  const lower = _v1611({ ...hump, height_in: 1.5 });
+  assert.ok(Math.abs(lower.vertical_accel_g - r.vertical_accel_g / 2) < 1e-12);
+  // The comfort speed fed back in lands exactly on the comfort limit.
+  const at = _v1611({ ...hump, crossing_speed_mph: r.comfort_speed_mph });
+  assert.ok(Math.abs(at.vertical_accel_g - hump.comfort_limit_g) < 1e-9);
+  // A wheelbase longer than the device is lifted by the full height.
+  const longVehicle = _v1611({ ...hump, wheelbase_in: 200, ground_clearance_in: 2 });
+  assert.ok(Math.abs(longVehicle.clearance_required_in - hump.height_in) < 1e-12);
+  assert.equal(longVehicle.clears, false);
+  assert.ok(longVehicle.clearance_verdict.startsWith("GROUNDS OUT"));
+  // The ramp for a target slope, fed back in, gives that slope exactly.
+  const target = _v1611({ ...hump, total_length_ft: 2 * r.ramp_length_for_target_ft });
+  assert.ok(Math.abs(target.ramp_slope_pct - hump.target_ramp_slope_pct) < 1e-9);
+  assert.ok("error" in _v1611({ ...hump, flat_top_length_ft: 12 }));
+  assert.ok("error" in _v1611({ ...hump, height_in: 0 }));
+});
+
+import { computeIntersectionSightTriangle as _v1612 } from "../../calc-civil.js";
+test("bounds: spec-v1612 computeIntersectionSightTriangle -- the truck gap is 132 ft further", () => {
+  const base = { major_speed_mph: 45, time_gap_s: 7.5, extra_lanes: 0, added_gap_per_lane_s: 0.5, setback_ft: 15, available_left_ft: 380, available_right_ft: 380 };
+  const r = _v1612(base);
+  assert.ok(Math.abs(r.required_distance_ft - 496.125) < 1e-6);
+  assert.ok(Math.abs(r.shortfall_left_ft - 116.125) < 1e-6);
+  assert.ok(Math.abs(r.adequate_speed_mph - 34.4671202) < 1e-5);
+  assert.equal(r.adequate, false);
+  // The truck gap, which is the point of the tile.
+  const truck = _v1612({ ...base, time_gap_s: 9.5 });
+  assert.ok(Math.abs(truck.required_distance_ft - 628.425) < 1e-6);
+  assert.ok(Math.abs(truck.required_distance_ft - r.required_distance_ft - 132.3) < 1e-6);
+  assert.ok(Math.abs(truck.shortfall_left_ft - 248.425) < 1e-6);
+  // Distance is exactly linear in both speed and gap.
+  const fast = _v1612({ ...base, major_speed_mph: 90 });
+  assert.ok(Math.abs(fast.required_distance_ft - 2 * r.required_distance_ft) < 1e-9);
+  // Each extra lane adds exactly its allowance to the gap.
+  const wide = _v1612({ ...base, extra_lanes: 2 });
+  assert.ok(Math.abs(wide.total_time_gap_s - (base.time_gap_s + 2 * base.added_gap_per_lane_s)) < 1e-12);
+  // The speed the available distance suits, fed back in, needs exactly it.
+  const at = _v1612({ ...base, major_speed_mph: r.adequate_speed_mph });
+  assert.ok(Math.abs(at.required_distance_ft - base.available_left_ft) < 1e-9);
+  assert.equal(at.adequate, true);
+  // A measured distance longer than required reads as adequate.
+  const clear = _v1612({ ...base, available_left_ft: 700, available_right_ft: 700 });
+  assert.equal(clear.adequate, true);
+  assert.ok(Math.abs(clear.shortfall_left_ft) < 1e-12);
+  assert.ok(clear.verdict.startsWith("ADEQUATE"));
+  // With nothing measured there is nothing to judge, and it says so.
+  const unmeasured = _v1612({ ...base, available_left_ft: 0, available_right_ft: 0 });
+  assert.equal(unmeasured.adequate, null);
+  assert.ok("error" in _v1612({ ...base, time_gap_s: 0 }));
+  assert.ok("error" in _v1612({ ...base, major_speed_mph: 0 }));
+});
+
+import { computePavementStructuralNumber as _v1613 } from "../../calc-civil.js";
+test("bounds: spec-v1613 computePavementStructuralNumber -- 3.14 in of base per inch of asphalt", () => {
+  const base = { ac_thickness_in: 4, ac_coefficient: 0.44, base_thickness_in: 8, base_coefficient: 0.14, base_drainage: 1.0, subbase_thickness_in: 10, subbase_coefficient: 0.11, subbase_drainage: 0.8, required_sn: 3.0 };
+  const r = _v1613(base);
+  assert.ok(Math.abs(r.sn_surface - 1.76) < 1e-9);
+  assert.ok(Math.abs(r.sn_base - 1.12) < 1e-9);
+  assert.ok(Math.abs(r.sn_subbase - 0.88) < 1e-9);
+  assert.ok(Math.abs(r.sn_total - 3.76) < 1e-9);
+  assert.ok(Math.abs(r.sn_margin - 0.76) < 1e-9);
+  assert.equal(r.meets_required, true);
+  assert.ok(Math.abs(r.base_per_inch_of_ac_in - 3.14285714) < 1e-6);
+  assert.ok(Math.abs(r.subbase_per_inch_of_ac_in - 5) < 1e-9);
+  // The substitution is exact: take an inch of asphalt out, put the computed
+  // base back in, and the structural number is unchanged.
+  const swapped = _v1613({ ...base, ac_thickness_in: 3, base_thickness_in: base.base_thickness_in + r.base_per_inch_of_ac_in });
+  assert.ok(Math.abs(swapped.sn_total - r.sn_total) < 1e-9);
+  // The drainage penalty the note quantifies: 1.0 to 0.8 on 8 in of base.
+  const wet = _v1613({ ...base, base_drainage: 0.8 });
+  assert.ok(Math.abs(r.sn_total - wet.sn_total - 0.224) < 1e-9);
+  assert.ok(Math.abs(wet.sn_total - 3.536) < 1e-9);
+  assert.equal(wet.meets_required, true);
+  // A bound surface course carries no drainage term, so nothing about the
+  // unbound coefficients can touch it.
+  assert.ok(Math.abs(wet.sn_surface - r.sn_surface) < 1e-12);
+  // Short of the requirement, the two make-up thicknesses each close it.
+  const thin = _v1613({ ...base, ac_thickness_in: 1 });
+  assert.equal(thin.meets_required, false);
+  const fixedAc = _v1613({ ...base, ac_thickness_in: 1 + thin.added_ac_needed_in });
+  assert.ok(Math.abs(fixedAc.sn_total - base.required_sn) < 1e-9);
+  const fixedBase = _v1613({ ...base, ac_thickness_in: 1, base_thickness_in: base.base_thickness_in + thin.added_base_needed_in });
+  assert.ok(Math.abs(fixedBase.sn_total - base.required_sn) < 1e-9);
+  assert.ok("error" in _v1613({ ...base, base_drainage: 1.5 }));
+  assert.ok("error" in _v1613({ ...base, ac_thickness_in: 0 }));
+});
+
+import { computeSubgradeCbrThickness as _v1614 } from "../../calc-civil.js";
+test("bounds: spec-v1614 computeSubgradeCbrThickness -- CBR 3 to 10 is half the rock, not a quarter", () => {
+  const base = { cbr_pct: 6, wheel_load_lb: 9000, tire_pressure_psi: 80, coverages: 5000, geosynthetic_reduction_pct: 30, alternate_cbr_pct: 3 };
+  const r = _v1614(base);
+  assert.ok(Math.abs(r.alpha_factor - 1.00076312) < 1e-6);
+  assert.ok(Math.abs(r.thickness_in - 12.2312460) < 1e-5);
+  assert.ok(Math.abs(r.thickness_with_geosynthetic_in - 8.56187222) < 1e-5);
+  assert.ok(Math.abs(r.resilient_modulus_psi - 9000) < 1e-9);
+  assert.ok(Math.abs(r.alternate_thickness_in - 18.3049535) < 1e-5);
+  // spec-v1614 says CBR 3 wants "roughly twice" the CBR 6 thickness and that
+  // CBR 3 to CBR 10 is "a factor of four in rock quantity". It is 1.50x and
+  // 2.11x, and the tile reports the real numbers.
+  assert.ok(Math.abs(r.sensitivity_ratio - 1.49657296) < 1e-6);
+  const soft = _v1614({ ...base, cbr_pct: 3, alternate_cbr_pct: 10 });
+  assert.ok(Math.abs(soft.thickness_in / soft.alternate_thickness_in - 2.1078332) < 1e-6);
+  // Thickness rises with the LOGARITHM of coverages, so ten times the passes
+  // is nowhere near ten times the rock.
+  const busy = _v1614({ ...base, coverages: 50000 });
+  assert.ok(busy.thickness_in / r.thickness_in < 1.3);
+  assert.ok(Math.abs(busy.alpha_factor - (r.alpha_factor + 0.23)) < 1e-9);
+  // The modulus correlation is exactly 1,500 x CBR, and it flags above 10.
+  const stiff = _v1614({ ...base, cbr_pct: 15, alternate_cbr_pct: 0 });
+  assert.ok(Math.abs(stiff.resilient_modulus_psi - 22500) < 1e-9);
+  assert.equal(stiff.modulus_correlation_reliable, false);
+  assert.equal(stiff.alternate_thickness_in, null);
+  // No geosynthetic is the bare thickness, exactly.
+  const bare = _v1614({ ...base, geosynthetic_reduction_pct: 0 });
+  assert.ok(Math.abs(bare.thickness_with_geosynthetic_in - bare.thickness_in) < 1e-12);
+  assert.ok(Math.abs(bare.geosynthetic_saving_in) < 1e-12);
+  // The practical floor is a threshold reported in words, not a curve.
+  const veryPoor = _v1614({ ...base, cbr_pct: 2 });
+  assert.equal(veryPoor.needs_improvement, true);
+  assert.ok(veryPoor.verdict.startsWith("BELOW THE PRACTICAL FLOOR"));
+  assert.ok(veryPoor.thickness_in > 0);
+  assert.equal(r.needs_improvement, false);
+  assert.ok("error" in _v1614({ ...base, cbr_pct: 0 }));
+  assert.ok("error" in _v1614({ ...base, geosynthetic_reduction_pct: 100 }));
+});
+
+import { computeEsalTrafficLoading as _v1615 } from "../../calc-civil.js";
+test("bounds: spec-v1615 computeEsalTrafficLoading -- 94% of the vehicles, 0.4% of the damage", () => {
+  const base = { aadt: 12000, truck_percent: 6, directional_factor: 0.5, lane_factor: 0.9, esals_per_truck: 1.2, growth_percent: 2, design_life_years: 20, car_axle_lb: 2000, overload_axle_lb: 22000 };
+  const r = _v1615(base);
+  assert.ok(Math.abs(r.trucks_per_day_design_lane - 324) < 1e-9);
+  assert.ok(Math.abs(r.first_year_esals - 141912) < 1e-6);
+  assert.ok(Math.abs(r.growth_factor - 24.2973698) < 1e-6);
+  assert.ok(Math.abs(r.design_esals - 3448088.31) < 1e-1);
+  assert.ok(Math.abs(r.car_esals - 13722.5152) < 1e-3);
+  assert.ok(Math.abs(r.car_share_pct - 0.39639700) < 1e-6);
+  assert.ok(Math.abs(r.car_vehicle_share_pct - 94) < 1e-9);
+  // spec-v1615 left two unrendered python placeholders where these belong.
+  assert.ok(Math.abs(r.overload_lef - 2.23151960) < 1e-6);
+  assert.ok(Math.abs(r.overload_excess_pct - 123.151960) < 1e-4);
+  // The fourth-power definition: the standard axle is exactly 1.0.
+  const std = _v1615({ ...base, overload_axle_lb: 18000 });
+  assert.ok(Math.abs(std.overload_lef - 1) < 1e-12);
+  assert.ok(Math.abs(std.overload_excess_pct) < 1e-9);
+  // Doubling the axle is exactly sixteen times the damage.
+  const dbl = _v1615({ ...base, overload_axle_lb: 36000 });
+  assert.ok(Math.abs(dbl.overload_lef - 16) < 1e-9);
+  // Roughly six and a half thousand car axles per standard axle.
+  assert.ok(Math.abs(r.car_axles_per_standard_axle - 6561) < 1);
+  // At zero growth the series is exactly the design life in years.
+  const flat = _v1615({ ...base, growth_percent: 0 });
+  assert.ok(Math.abs(flat.growth_factor - base.design_life_years) < 1e-12);
+  assert.ok(Math.abs(flat.design_esals - flat.first_year_esals * 20) < 1e-6);
+  // And the growth series is far larger than the final year's multiplier,
+  // which is the mistake the note names.
+  assert.ok(r.growth_factor > Math.pow(1.02, 20) * 10);
+  // ESALs are exactly linear in AADT, truck share and the two factors.
+  const twice = _v1615({ ...base, aadt: 24000 });
+  assert.ok(Math.abs(twice.design_esals - 2 * r.design_esals) < 1e-6);
+  assert.ok("error" in _v1615({ ...base, truck_percent: 0 }));
+  assert.ok("error" in _v1615({ ...base, design_life_years: 0 }));
+});
+
+// --- the three cut specs' material, landed on the calculators that own them ---
+
+import { computeStoppingSightDistance as _v1608host } from "../../calc-trucking.js";
+test("bounds: spec-v1608 cut -- stopping-sight-distance gains the available-distance check", () => {
+  const base = { speed_mph: 55, reaction_time_s: 2.5, friction: 0.35, grade: 0 };
+  // The old answer is unchanged, which is what makes this additive.
+  const r = _v1608host(base);
+  assert.ok(Math.abs(r.perception_reaction_ft - 202.125) < 1e-9);
+  assert.ok(Math.abs(r.braking_distance_ft - 288.095238) < 1e-6);
+  assert.ok(Math.abs(r.total_ssd_ft - 490.220238) < 1e-6);
+  assert.equal(r.available_distance_ft, null);
+  assert.equal(r.distance_verdict, null);
+  assert.equal(r.distance_adequate, null);
+  // spec-v1608's own worked example: the same zone on a 4% downgrade wants
+  // 527 ft, and a site offering 350 ft is 177 ft short.
+  const down = _v1608host({ ...base, grade: -0.04, available_distance_ft: 350 });
+  assert.ok(Math.abs(down.total_ssd_ft - 527.3938172) < 1e-6);
+  assert.ok(Math.abs(down.total_ssd_ft - r.total_ssd_ft - 37.1735792) < 1e-6);
+  assert.ok(Math.abs(down.distance_shortfall_ft - 177.3938172) < 1e-6);
+  assert.equal(down.distance_adequate, false);
+  assert.ok(down.distance_verdict.startsWith("SHORT by 177 ft"));
+  // And the spec's fix: 45 mph on that downgrade wants 383 ft.
+  const slower = _v1608host({ ...base, speed_mph: 45, grade: -0.04 });
+  assert.ok(Math.abs(slower.total_ssd_ft - 383.1169355) < 1e-6);
+  // An available distance at least the requirement reads adequate, and a
+  // shortfall is never negative.
+  const ok = _v1608host({ ...base, available_distance_ft: 600 });
+  assert.equal(ok.distance_adequate, true);
+  assert.ok(Math.abs(ok.distance_shortfall_ft) < 1e-12);
+  assert.ok("error" in _v1608host({ ...base, available_distance_ft: -1 }));
+});
+
+import { computeAdvanceWarningSignSpacing as _v1609host } from "../../calc-construction.js";
+test("bounds: spec-v1609 cut -- advance-warning-sign-spacing gains the flagger queue", () => {
+  const base = { road_type: "rural", sign_count: 3, speed_mph: 55 };
+  const r = _v1609host(base);
+  // Unchanged without the new inputs.
+  assert.equal(r.first_sign_ft, 1500);
+  assert.equal(r.total_ft, 1500);
+  assert.equal(r.open_highway_ok, true);
+  assert.equal(r.queue_verdict, null);
+  assert.equal(r.queued_vehicles, null);
+  // spec-v1609's own queue: 400 vehicles per hour on a 4 minute cycle stops
+  // about 27 vehicles, roughly 667 ft, inside the 1,500 ft advance area.
+  const q = _v1609host({ ...base, approach_volume_vph: 400, flagger_cycle_min: 4, vehicle_spacing_ft: 25 });
+  assert.ok(Math.abs(q.queued_vehicles - 26.6666667) < 1e-6);
+  assert.ok(Math.abs(q.queue_length_ft - 666.666667) < 1e-5);
+  assert.equal(q.queue_passes_first_sign, false);
+  assert.ok(q.queue_verdict.startsWith("The queue stays inside"));
+  // The failure the spec names: a busier road backs traffic past the signing.
+  const busy = _v1609host({ ...base, approach_volume_vph: 1200, flagger_cycle_min: 4, vehicle_spacing_ft: 25 });
+  assert.equal(busy.queue_passes_first_sign, true);
+  assert.ok(busy.queue_verdict.startsWith("THE QUEUE OUTRUNS THE SIGNING"));
+  // Queue length is exactly linear in volume, cycle and spacing.
+  assert.ok(Math.abs(busy.queue_length_ft - 3 * q.queue_length_ft) < 1e-6);
+  // An urban-low layout has a much shorter advance area, so the same queue
+  // outruns it -- which is the interaction the two halves exist to show.
+  const urban = _v1609host({ road_type: "urban-low", sign_count: 3, speed_mph: 30, approach_volume_vph: 400, flagger_cycle_min: 4, vehicle_spacing_ft: 25 });
+  assert.equal(urban.first_sign_ft, 300);
+  assert.equal(urban.queue_passes_first_sign, true);
+  assert.ok("error" in _v1609host({ ...base, approach_volume_vph: -1 }));
+  assert.ok("error" in _v1609host({ ...base, approach_volume_vph: 400, flagger_cycle_min: 4, vehicle_spacing_ft: 0 }));
+});
+
+import { computeChipSealMcleod as _v1616host } from "../../calc-construction.js";
+test("bounds: spec-v1616 cut -- chip-seal-mcleod gains project quantities, rates untouched", () => {
+  const base = { median_size_in: 0.375, flakiness_index_pct: 18, loose_unit_weight_pcf: 95, bulk_specific_gravity: 2.65, wastage_factor: 1.05, traffic_factor: 0.75, surface_factor_gal_sy: 0.02, absorption_gal_sy: 0, residual_asphalt: 0.67 };
+  const r = _v1616host(base);
+  // The rates are byte-for-byte what they were before the addition.
+  assert.ok(Math.abs(r.aggregate_lb_sy - 30.0964132) < 1e-6);
+  assert.ok(Math.abs(r.binder_gal_sy - 0.327540648) < 1e-8);
+  assert.equal(r.project_aggregate_tons, null);
+  assert.equal(r.project_binder_gal, null);
+  // spec-v1616 specified this same McLeod method and specified it wrong: its
+  // binder relation reads 0.4 x ALD x E x V where the method's constant is
+  // 2.244, so its example lands near 0.12 gal/SY of emulsion against the
+  // 0.33 this returns. The published relation is what ships.
+  assert.ok(r.binder_gal_sy > 0.25);
+  const p = _v1616host({ ...base, project_area_sy: 20000 });
+  assert.ok(Math.abs(p.aggregate_lb_sy - r.aggregate_lb_sy) < 1e-12);
+  assert.ok(Math.abs(p.binder_gal_sy - r.binder_gal_sy) < 1e-12);
+  assert.ok(Math.abs(p.project_aggregate_tons - 300.964132) < 1e-5);
+  assert.ok(Math.abs(p.project_binder_gal - 6550.81297) < 1e-4);
+  // The totals agree with the per-1,000-SY figures the tile already reported.
+  assert.ok(Math.abs(p.project_aggregate_tons - r.aggregate_ton_per_1000sy * 20) < 1e-9);
+  assert.ok(Math.abs(p.project_binder_gal - r.binder_gal_per_1000sy * 20) < 1e-9);
+  assert.ok("error" in _v1616host({ ...base, project_area_sy: -1 }));
+});

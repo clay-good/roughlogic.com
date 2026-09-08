@@ -179,6 +179,7 @@ const DATA_MANIFESTS = [
   "./data/fields/d.json",
   "./data/fields/e-1.json",
   "./data/fields/e-2.json",
+  "./data/fields/e-3.json",
   "./data/fields/f.json",
   "./data/fields/g.json",
   "./data/fields/h.json",

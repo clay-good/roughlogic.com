@@ -1,5 +1,11 @@
 # roughlogic.com Specification v1609 -- Flagger Station Advance Warning Distance (`calc-civil.js`, Group E Carpentry and Construction, traffic control, 1 New Tile)
 
+> **Status: CUT 2026-09-08 -- DUPLICATE. This tile was not built.** The formula screen for the
+> 2026-09-08 traffic, work zone, and pavement band found this question already answered by
+> `advance-warning-sign-spacing`. That tile already reads MUTCD Table 6C-1 by road type, places all three signs, totals the advance warning area, and runs the 8-to-12-times-speed rural cross-check -- which is this spec's first half. Its second half, the sight-distance check, is `stopping-sight-distance`. What was genuinely new is the QUEUE: a flagger operation on a busy two-lane road can back traffic past the advance signs, and then drivers meet stopped traffic with no warning at all. `advance-warning-sign-spacing` gained the approach volume, the flagger cycle, the queue length, and the verdict on whether the queue outruns the signing. Its answer without those inputs is unchanged.
+>
+> The specification below is kept as the record of the screen. Do not implement it.
+>
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-civil.js`**
 > (Group E, Carpentry and Construction -- the existing category, hub `/groups/construction/`; traffic, work zone, and pavement), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.

@@ -772,6 +772,8 @@ export const TOOL_MODULES = (() => {
     "curve-deflection-stakeout",
     "superelevation", "superelevation-safe-curve-speed", "vertical-curve-sight-distance", "horizontal-sightline-offset",
     "sag-vertical-curve", "sag-vertical-curve-comfort",
+    "skip-line-layout", "speed-hump-geometry", "intersection-sight-triangle",
+    "pavement-structural-number", "subgrade-cbr-thickness", "esal-traffic-loading",
   ]);
   // spec-v254..v256 AISC 360 steel-member trio + spec-v266..v268 steel-connection
   // trio: a new lazy Group E cluster (the steel-member companion to the wood-framing
