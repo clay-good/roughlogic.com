@@ -48494,3 +48494,418 @@ test("bounds: spec-v1486 cut -- evaporator-td-dtd gains capacity, TD and band un
   // A suction at or above the box temperature is still an error, unchanged.
   assert.ok(_v1486host({ box_temp_f: 25, sst_f: 35 }).error);
 });
+
+// ===========================================================================
+// spec-v1524..v1533: the 2026-09-08 trade-expansion oil, gas and pipeline
+// band, in the new calc-oilgas.js. Ten tiles, nothing cut.
+//
+// SIX DEFECTS ACROSS FIVE OF THE TEN SPECS, the highest rate of the program,
+// and three of them run in the dangerous direction:
+//   v1525 squares the GAUGE pressures where its own formula block says psia.
+//   v1527 calls 2.98 ft/s "comfortably inside" a 3 to 12 ft/s tool window.
+//   v1528 calls a computed 1.11 A "under 1 amps".
+//   v1529 calls a defect acceptable whose SAFE pressure is 140 psi BELOW the
+//     MAOP it is compared against -- and applies the parabolic Folias form to
+//     a 20 in defect whose A of 10.0 is far outside that form's validity.
+//   v1531 leaves an unrendered python placeholder (the sixth in this program).
+//   v1532 says "weight up to 13.2 ppg" for a 13.25 ppg kill weight, then
+//     describes ROUNDING UP to 13.0 -- which is down -- and prints the
+//     resulting -125 psi as pressure the rounding "adds".
+// Every verdict below is driven off a boolean the compute returns.
+// ===========================================================================
+
+import {
+  computePipelineMaoBarlow as _v1524,
+  computeGasPipelineFlow as _v1525,
+  computeLiquidPipelineStationSpacing as _v1526,
+  computePigBatchVolume as _v1527,
+  computeCathodicAnodeCountLife as _v1528,
+  computeCorrodedPipeB31g as _v1529,
+  computeCasingCementVolume as _v1530,
+  computeMudHydrostaticPressure as _v1531,
+  computeKillMudWeight as _v1532,
+  computeAnnularVelocityCleaning as _v1533,
+} from "../../calc-oilgas.js";
+
+test("bounds: spec-v1524 computePipelineMaoBarlow -- the design factor is a property of the route", () => {
+  const base = { od_in: 12.75, wall_in: 0.25, smys_psi: 52000, class_location: "class_1", joint_factor: 1.0, temperature_factor: 1.0, operating_pressure_psig: 1468, target_pressure_psig: 0 };
+  const r = _v1524(base);
+  // IDENTITY: Barlow at yield, then the code multipliers.
+  assert.ok(Math.abs(r.barlow_yield_psi - 2 * 52000 * 0.25 / 12.75) < 1e-9);
+  assert.ok(Math.abs(r.maop_psig - r.barlow_yield_psi * 0.72) < 1e-9);
+  assert.ok(Math.abs(r.maop_class_1 - r.maop_psig) < 1e-12);
+  // The reclassification the tile exists for: the SAME pipe, unchanged, in
+  // Class 3. The ratio of the two MAOPs is exactly the ratio of the factors.
+  const c3 = _v1524({ ...base, class_location: "class_3" });
+  assert.ok(Math.abs(c3.maop_psig / r.maop_psig - 0.50 / 0.72) < 1e-12);
+  assert.ok(Math.abs(r.maop_class_3 - c3.maop_psig) < 1e-9);
+  // And at Class 3 the pressure it was legally running at is now over MAOP.
+  assert.equal(r.within_maop, true);
+  assert.equal(c3.within_maop, false);
+  // IDENTITY: hoop stress from the operating pressure is Barlow inverted, so
+  // at exactly the yield pressure the hoop stress is exactly SMYS.
+  const atYield = _v1524({ ...base, operating_pressure_psig: r.barlow_yield_psi });
+  assert.ok(Math.abs(atYield.pct_smys - 100) < 1e-9);
+  // At the Class 1 MAOP the hoop stress is exactly the design factor of SMYS.
+  // The example enters the ROUNDED 1,468 psig, so check it at the exact MAOP.
+  const atMaop = _v1524({ ...base, operating_pressure_psig: r.maop_psig });
+  assert.ok(Math.abs(atMaop.pct_smys - 72) < 1e-9);
+  assert.ok(Math.abs(r.pct_smys - 71.99) < 0.01);
+  // IDENTITY inverted: the wall a target pressure needs, fed back in, makes
+  // the MAOP exactly that target.
+  const t = _v1524({ ...base, target_pressure_psig: 1468 });
+  assert.ok(t.wall_required_in > 0);
+  const back = _v1524({ ...base, wall_in: t.wall_required_in });
+  assert.ok(Math.abs(back.maop_psig - 1468) < 1e-6);
+  // MAOP is linear in wall and in SMYS, and inverse in diameter.
+  assert.ok(Math.abs(_v1524({ ...base, wall_in: 0.50 }).maop_psig - 2 * r.maop_psig) < 1e-9);
+  assert.ok(Math.abs(_v1524({ ...base, od_in: 25.5 }).maop_psig - r.maop_psig / 2) < 1e-9);
+  // A joint factor below 1 lowers it directly -- the pre-1970 pipe case.
+  assert.ok(_v1524({ ...base, joint_factor: 0.8 }).maop_psig < r.maop_psig);
+  assert.ok(_v1524({ ...base, wall_in: 7 }).error);
+  assert.ok(_v1524({ ...base, class_location: "class_9" }).error);
+});
+
+test("bounds: spec-v1525 computeGasPipelineFlow -- the driving term is on ABSOLUTE pressures", () => {
+  const base = { equation: "panhandle_a", id_in: 15.5, length_mi: 42, inlet_psig: 850, outlet_psig: 600, gravity: 0.60, flowing_temp_f: 60, z_factor: 1.0, efficiency: 0.92, alternate_id_in: 19.25 };
+  const r = _v1525(base);
+  // IDENTITY: gauge converts at 14.7 and the driving term is the difference of
+  // the SQUARES of the ABSOLUTE pressures. The spec squared the gauge values,
+  // which understates the term by over 7,000 psia-squared here.
+  assert.ok(Math.abs(r.inlet_psia - 864.7) < 1e-9);
+  assert.ok(Math.abs(r.outlet_psia - 614.7) < 1e-9);
+  assert.ok(Math.abs(r.squared_difference - (864.7 * 864.7 - 614.7 * 614.7)) < 1e-6);
+  assert.ok(r.squared_difference > 850 * 850 - 600 * 600);
+  // Flow scales as the bracket to the equation's own exponent. Raising the
+  // outlet 100 psi cuts the driving term far more than it cuts the pressure.
+  const higher = _v1525({ ...base, outlet_psig: 700 });
+  assert.ok(higher.squared_difference < r.squared_difference);
+  assert.ok(Math.abs(higher.q_mmscfd / r.q_mmscfd - Math.pow(higher.squared_difference / r.squared_difference, 0.5394)) < 1e-9);
+  // Weymouth's bracket exponent is exactly one half, so its flow is exactly
+  // proportional to the square root of the driving term.
+  const w = _v1525({ ...base, equation: "weymouth" });
+  const w2 = _v1525({ ...base, equation: "weymouth", outlet_psig: 700 });
+  assert.ok(Math.abs(w2.q_scfd / w.q_scfd - Math.sqrt(higher.squared_difference / r.squared_difference)) < 1e-9);
+  // Both equations are reported and the selection only swaps which is which.
+  assert.equal(r.equation_label, "Panhandle A");
+  assert.equal(w.equation_label, "Weymouth");
+  assert.ok(Math.abs(r.alternate_q_scfd - w.q_scfd) < 1e-6);
+  assert.ok(Math.abs(w.alternate_q_scfd - r.q_scfd) < 1e-6);
+  // DIAMETER DOMINATES: capacity is exactly the diameter ratio to the
+  // equation's exponent, and doubling the LENGTH costs only about 30%.
+  assert.ok(Math.abs(r.diameter_capacity_ratio - Math.pow(19.25 / 15.5, 2.6182)) < 1e-12);
+  const twiceLong = _v1525({ ...base, length_mi: 84 });
+  assert.ok(Math.abs(twiceLong.q_scfd / r.q_scfd - Math.pow(0.5, 0.5394)) < 1e-9);
+  assert.ok(twiceLong.q_scfd / r.q_scfd > 0.68 && twiceLong.q_scfd / r.q_scfd < 0.70);
+  // Flow is exactly linear in efficiency, which is where a real line differs.
+  assert.ok(Math.abs(_v1525({ ...base, efficiency: 0.46 }).q_scfd - r.q_scfd / 2) < 1e-6);
+  assert.ok(_v1525({ ...base, inlet_psig: 600, outlet_psig: 850 }).error);
+  assert.ok(_v1525({ ...base, efficiency: 1.5 }).error);
+});
+
+test("bounds: spec-v1526 computeLiquidPipelineStationSpacing -- friction is quadratic in flow", () => {
+  const base = { total_length_mi: 120, friction_gradient_ft_per_mi: 12, elevation_change_ft: 400, maop_head_ft: 2300, min_suction_head_ft: 150, flow_bpd: 60000, alternate_flow_bpd: 90000 };
+  const r = _v1526(base);
+  // IDENTITY: the head budget and the two gradients that spend it.
+  assert.ok(Math.abs(r.available_head_ft - (2300 - 150)) < 1e-9);
+  assert.ok(Math.abs(r.elevation_gradient_ft_per_mi - 400 / 120) < 1e-12);
+  assert.ok(Math.abs(r.combined_gradient_ft_per_mi - (12 + 400 / 120)) < 1e-12);
+  assert.ok(Math.abs(r.max_spacing_mi - r.available_head_ft / r.combined_gradient_ft_per_mi) < 1e-9);
+  assert.equal(r.station_count, 1);
+  // Spacing times the combined gradient is exactly the head available -- the
+  // identity that says a station at maximum spacing spends everything it has.
+  assert.ok(Math.abs(r.max_spacing_mi * r.combined_gradient_ft_per_mi - r.available_head_ft) < 1e-9);
+  // A line exactly one maximum-spacing long takes one station and uses it all.
+  const atLimit = _v1526({ ...base, total_length_mi: r.max_spacing_mi, elevation_change_ft: r.elevation_gradient_ft_per_mi * r.max_spacing_mi });
+  assert.equal(atLimit.station_count, 1);
+  assert.ok(Math.abs(atLimit.head_used_per_station_ft - r.available_head_ft) < 1e-6);
+  // FRICTION GOES AS THE SQUARE OF FLOW: 1.5x the throughput is 2.25x the
+  // friction gradient, exactly, and here it forces a second station.
+  assert.ok(Math.abs(r.alternate_gradient_ft_per_mi - 12 * 1.5 * 1.5) < 1e-12);
+  assert.ok(Math.abs(r.alternate_gradient_ft_per_mi - 27) < 1e-12);
+  assert.equal(r.alternate_station_count, 2);
+  assert.ok(r.alternate_spacing_mi < r.max_spacing_mi);
+  // Elevation is head spent regardless of flow, so it does NOT scale: the
+  // alternate combined gradient keeps the same elevation term.
+  assert.ok(Math.abs((r.alternate_gradient_ft_per_mi + r.elevation_gradient_ft_per_mi) - r.available_head_ft / r.alternate_spacing_mi) < 1e-9);
+  // A downhill line whose fall outruns friction is refused rather than given a
+  // negative spacing -- that is a slack-flow and surge problem, not a spacing one.
+  assert.ok(_v1526({ ...base, elevation_change_ft: -3000 }).error);
+  // On a steep climb elevation becomes the LARGER term, and the flag says so.
+  assert.equal(r.elevation_dominates, false);
+  assert.equal(_v1526({ ...base, elevation_change_ft: 3000 }).elevation_dominates, true);
+  assert.ok(_v1526({ ...base, min_suction_head_ft: 2400 }).error);
+});
+
+test("bounds: spec-v1527 computePigBatchVolume -- 2.98 ft/s is BELOW a 3 ft/s window", () => {
+  const base = { id_in: 15.5, length_mi: 42, flow_bpd: 60000, tool_min_fps: 3, tool_max_fps: 12 };
+  const r = _v1527(base);
+  // IDENTITY: the cylinder, at the exact 42 x 231 / 1728 cubic feet per barrel.
+  const ft3PerMile = Math.PI / 4 * (15.5 / 12) ** 2 * 5280;
+  assert.ok(Math.abs(r.ft3_per_mile - ft3PerMile) < 1e-9);
+  assert.ok(Math.abs(r.bbl_per_mile - ft3PerMile / (42 * 231 / 1728)) < 1e-9);
+  assert.ok(Math.abs(r.total_bbl - r.bbl_per_mile * 42) < 1e-9);
+  // IDENTITY: velocity is flow over volume-per-length, and travel time closes
+  // the loop back to the length exactly.
+  assert.ok(Math.abs(r.velocity_mph - 60000 / 24 / r.bbl_per_mile) < 1e-9);
+  assert.ok(Math.abs(r.velocity_fps - r.velocity_mph * 5280 / 3600) < 1e-9);
+  assert.ok(Math.abs(r.travel_time_h * r.velocity_mph - 42) < 1e-9);
+  // THE SPEC'S ERROR, PINNED: 2.98 ft/s is BELOW a 3 ft/s minimum, not
+  // "comfortably inside" the window.
+  assert.ok(r.velocity_fps < 3);
+  assert.equal(r.above_min, false);
+  assert.equal(r.below_max, true);
+  assert.equal(r.in_window, false);
+  // And the flow that would fix it, fed back in, lands exactly on the minimum.
+  const fixed = _v1527({ ...base, flow_bpd: r.flow_for_min_bpd });
+  assert.ok(Math.abs(fixed.velocity_fps - 3) < 1e-9);
+  assert.equal(fixed.in_window, true);
+  // Both ends of the window, tested off the boundary rather than on it.
+  assert.equal(_v1527({ ...base, flow_bpd: r.flow_for_min_bpd * 1.001 }).in_window, true);
+  assert.equal(_v1527({ ...base, flow_bpd: r.flow_for_min_bpd * 0.999 }).in_window, false);
+  assert.equal(_v1527({ ...base, flow_bpd: r.flow_for_max_bpd * 0.999 }).in_window, true);
+  const tooFast = _v1527({ ...base, flow_bpd: r.flow_for_max_bpd * 1.001 });
+  assert.equal(tooFast.in_window, false);
+  assert.equal(tooFast.below_max, false);
+  assert.equal(tooFast.above_min, true);
+  // The spec's low-throughput case: 20,000 bbl/day is under a third of the
+  // minimum window speed.
+  assert.ok(Math.abs(_v1527({ ...base, flow_bpd: 20000 }).velocity_fps - r.velocity_fps / 3) < 1e-9);
+  assert.ok(_v1527({ ...base, tool_min_fps: 12, tool_max_fps: 3 }).error);
+});
+
+test("bounds: spec-v1528 computeCathodicAnodeCountLife -- 1.11 A is not under one amp", () => {
+  const base = { od_in: 12.75, length_mi: 42, coating_efficiency_pct: 99.9, current_density_ma_per_ft2: 1.5, anode_weight_lb: 50, consumption_lb_per_a_yr: 1.0, utilization: 0.85, current_per_anode_a: 3, degraded_efficiency_pct: 99, target_life_years: 20 };
+  const r = _v1528(base);
+  // IDENTITY: the cylinder's surface, the bare fraction, and the current.
+  assert.ok(Math.abs(r.total_area_ft2 - Math.PI * (12.75 / 12) * 42 * 5280) < 1e-6);
+  assert.ok(Math.abs(r.bare_area_ft2 - r.total_area_ft2 * 0.001) < 1e-9);
+  assert.ok(Math.abs(r.current_required_a - r.bare_area_ft2 * 1.5 / 1000) < 1e-12);
+  // THE SPEC'S PROSE, PINNED: the computed current is ABOVE one amp.
+  assert.ok(r.current_required_a > 1);
+  assert.ok(Math.abs(r.current_required_a - 1.1103) < 1e-3);
+  // THE SENSITIVITY THAT MATTERS: demand is exactly proportional to bare area,
+  // so 99.9% to 99% efficiency is exactly a tenfold current increase.
+  assert.ok(Math.abs(r.current_multiple - 10) < 1e-9);
+  assert.ok(Math.abs(r.degraded_current_a - 10 * r.current_required_a) < 1e-9);
+  // IDENTITY: anode life is mass over consumption, and it does not depend on
+  // the line at all -- only on the anode and its own current.
+  assert.ok(Math.abs(r.anode_life_years - 50 * 0.85 / (1.0 * 3)) < 1e-12);
+  assert.ok(Math.abs(_v1528({ ...base, length_mi: 200 }).anode_life_years - r.anode_life_years) < 1e-12);
+  // Halving the current per anode exactly doubles that anode's life.
+  assert.ok(Math.abs(_v1528({ ...base, current_per_anode_a: 1.5 }).anode_life_years - 2 * r.anode_life_years) < 1e-9);
+  // The count covers the demand and never over-divides it.
+  assert.ok(r.anode_count * 3 >= r.current_required_a);
+  assert.ok((r.anode_count - 1) * 3 < r.current_required_a);
+  // IDENTITY: the mass for a target life, consumed at the design current for
+  // exactly that many years and derated by utilization.
+  assert.ok(Math.abs(r.mass_for_target_lb - 1.0 * r.current_required_a * 20 / 0.85) < 1e-9);
+  // A coating that is not worse than the design case is not a degradation.
+  assert.equal(_v1528({ ...base, degraded_efficiency_pct: 99.95 }).has_degraded, false);
+  assert.ok(_v1528({ ...base, coating_efficiency_pct: 100 }).error);
+  assert.ok(_v1528({ ...base, utilization: 0 }).error);
+});
+
+test("bounds: spec-v1529 computeCorrodedPipeB31g -- the SAFE pressure is what governs", () => {
+  const base = { od_in: 12.75, wall_in: 0.25, smys_psi: 52000, defect_depth_in: 0.105, defect_length_in: 4.0, safety_factor: 1.39, maop_psig: 1468 };
+  const r = _v1529(base);
+  // IDENTITY: depth ratio, flow stress, the A parameter, and the Folias factor.
+  assert.ok(Math.abs(r.depth_pct - 42) < 1e-9);
+  assert.ok(Math.abs(r.flow_stress_psi - 1.1 * 52000) < 1e-9);
+  assert.ok(Math.abs(r.a_parameter - 0.893 * 4 / Math.sqrt(12.75 * 0.25)) < 1e-12);
+  assert.ok(Math.abs(r.folias_m - Math.sqrt(1 + 0.8 * 16 / (12.75 * 0.25))) < 1e-12);
+  assert.equal(r.is_parabolic, true);
+  // IDENTITY: safe pressure is the failure pressure over the safety factor.
+  assert.ok(Math.abs(r.safe_pressure_psi * 1.39 - r.failure_pressure_psi) < 1e-9);
+  // THE SPEC'S ERROR, PINNED. The failure pressure IS above the MAOP, and the
+  // SAFE pressure is 140 psi BELOW it -- so the anomaly does not pass.
+  assert.ok(r.failure_pressure_psi > 1468);
+  assert.ok(r.safe_pressure_psi < 1468);
+  assert.ok(Math.abs(r.margin_psi + 140.06) < 0.5);
+  assert.equal(r.acceptable, false);
+  // THE BRANCH, PINNED. The spec stretched the same defect to 20 in and kept
+  // using the parabolic form; at A = 10.0 the RECTANGULAR form applies, and it
+  // carries no bulging factor at all.
+  const long = _v1529({ ...base, defect_length_in: 20 });
+  assert.ok(Math.abs(long.a_parameter - 10.0) < 0.01);
+  assert.equal(long.is_parabolic, false);
+  assert.ok(Math.abs(long.failure_pressure_psi - r.flow_stress_psi * (2 * 0.25 / 12.75) * (1 - 0.42)) < 1e-9);
+  assert.ok(long.failure_pressure_psi < r.failure_pressure_psi);
+  // LENGTH IS DOING THE WORK: at a fixed depth the failure pressure never
+  // rises as the defect lengthens, and it falls STRICTLY while the parabolic
+  // branch applies. Past the branch the rectangular form is independent of
+  // length, so it is a FLOOR rather than a continuing decline -- which is
+  // exactly why carrying the parabolic form past A = 4 keeps producing
+  // numbers that look like an answer.
+  let last = Infinity;
+  for (const L of [1, 2, 4, 8, 16, 32]) {
+    const x = _v1529({ ...base, defect_length_in: L });
+    assert.ok(x.failure_pressure_psi <= last + 1e-9);
+    if (x.is_parabolic) assert.ok(x.failure_pressure_psi < last);
+    last = x.failure_pressure_psi;
+  }
+  const rect16 = _v1529({ ...base, defect_length_in: 16 });
+  const rect32 = _v1529({ ...base, defect_length_in: 32 });
+  assert.equal(rect16.is_parabolic, false);
+  assert.ok(Math.abs(rect16.failure_pressure_psi - rect32.failure_pressure_psi) < 1e-9);
+  // The branch boundary, tested either side of A = 4 rather than on it.
+  const lenAt4 = 4 * Math.sqrt(12.75 * 0.25) / 0.893;
+  assert.equal(_v1529({ ...base, defect_length_in: lenAt4 * 0.999 }).is_parabolic, true);
+  assert.equal(_v1529({ ...base, defect_length_in: lenAt4 * 1.001 }).is_parabolic, false);
+  // The 80% screening limit is absolute: past it there is no evaluation.
+  assert.equal(r.over_depth_limit, false);
+  const deep = _v1529({ ...base, defect_depth_in: 0.2001 });
+  assert.equal(deep.over_depth_limit, true);
+  assert.equal(deep.acceptable, false);
+  // Acceptance flips either side of the MAOP, off the boundary.
+  assert.equal(_v1529({ ...base, maop_psig: r.safe_pressure_psi * 0.999 }).acceptable, true);
+  assert.equal(_v1529({ ...base, maop_psig: r.safe_pressure_psi * 1.001 }).acceptable, false);
+  assert.ok(_v1529({ ...base, defect_depth_in: 0.3 }).error);
+});
+
+test("bounds: spec-v1530 computeCasingCementVolume -- the annulus is a difference of squares", () => {
+  const base = { hole_dia_in: 12.25, casing_od_in: 9.625, casing_id_in: 8.535, cement_column_ft: 4200, excess_pct: 35, float_collar_ft: 4160, slurry_yield_ft3_per_sack: 1.18, low_excess_pct: 25, high_excess_pct: 60 };
+  const r = _v1530(base);
+  // IDENTITY: both capacities on the 1029.4 constant.
+  assert.ok(Math.abs(r.annular_capacity_bbl_ft - (12.25 ** 2 - 9.625 ** 2) / 1029.4) < 1e-12);
+  assert.ok(Math.abs(r.casing_capacity_bbl_ft - 8.535 ** 2 / 1029.4) < 1e-12);
+  assert.ok(Math.abs(r.annular_volume_bbl - r.annular_capacity_bbl_ft * 4200) < 1e-9);
+  assert.ok(Math.abs(r.slurry_volume_bbl - r.annular_volume_bbl * 1.35) < 1e-9);
+  assert.ok(Math.abs(r.displacement_bbl - r.casing_capacity_bbl_ft * 4160) < 1e-9);
+  // A DIFFERENCE OF SQUARES is far more sensitive to the HOLE than the casing:
+  // a quarter-inch of hole costs more annulus than a quarter-inch of casing
+  // saves, and both moves are computed rather than asserted.
+  const biggerHole = _v1530({ ...base, hole_dia_in: 12.5 });
+  const biggerCasing = _v1530({ ...base, casing_od_in: 9.875 });
+  assert.ok(biggerHole.annular_volume_bbl > r.annular_volume_bbl);
+  assert.ok(biggerCasing.annular_volume_bbl < r.annular_volume_bbl);
+  assert.ok((biggerHole.annular_volume_bbl - r.annular_volume_bbl) > (r.annular_volume_bbl - biggerCasing.annular_volume_bbl));
+  // IDENTITY: the excess spread is exactly the annular volume times the
+  // difference of the two excesses, and it converts back to feet of column.
+  assert.ok(Math.abs(r.excess_spread_bbl - r.annular_volume_bbl * (0.60 - 0.25)) < 1e-9);
+  assert.ok(Math.abs(r.spread_column_ft - r.excess_spread_bbl / r.annular_capacity_bbl_ft) < 1e-9);
+  assert.ok(Math.abs(r.high_slurry_bbl - r.low_slurry_bbl - r.excess_spread_bbl) < 1e-9);
+  // Zero excess is the theoretical volume exactly.
+  assert.ok(Math.abs(_v1530({ ...base, excess_pct: 0 }).slurry_volume_bbl - r.annular_volume_bbl) < 1e-9);
+  // Sacks always cover the slurry and never over-count by a whole sack.
+  assert.ok(r.sacks * 1.18 >= r.slurry_volume_ft3);
+  assert.ok((r.sacks - 1) * 1.18 < r.slurry_volume_ft3);
+  // Casing that does not fit the hole is refused, not given a negative annulus.
+  assert.ok(_v1530({ ...base, casing_od_in: 12.5 }).error);
+  assert.ok(_v1530({ ...base, casing_id_in: 10 }).error);
+});
+
+test("bounds: spec-v1531 computeMudHydrostaticPressure -- vertical depth, never measured", () => {
+  const base = { mud_weight_ppg: 12.5, tvd_ft: 9800, measured_depth_ft: 12000, formation_pressure_psi: 6100 };
+  const r = _v1531(base);
+  // IDENTITY: gradient and hydrostatic on TRUE VERTICAL depth.
+  assert.ok(Math.abs(r.gradient_psi_ft - 0.052 * 12.5) < 1e-12);
+  assert.ok(Math.abs(r.hydrostatic_psi - 0.052 * 12.5 * 9800) < 1e-9);
+  assert.ok(Math.abs(r.overbalance_psi - (r.hydrostatic_psi - 6100)) < 1e-9);
+  assert.equal(r.is_overbalanced, true);
+  // IDENTITY: the equivalent mud weight of a pressure, fed back in as a mud
+  // weight, reproduces that pressure exactly -- the relation inverted.
+  const back = _v1531({ ...base, mud_weight_ppg: r.formation_emw_ppg });
+  assert.ok(Math.abs(back.hydrostatic_psi - 6100) < 1e-6);
+  assert.ok(Math.abs(back.overbalance_psi) < 1e-6);
+  assert.equal(back.is_overbalanced, false);
+  // THE ERROR THE TILE EXISTS FOR, as a number: the measured-depth reading is
+  // exactly the gradient over the extra depth, which is the placeholder the
+  // spec left unrendered (0.052 x 12.5 x 2,200 = 1,430 psi).
+  assert.ok(Math.abs(r.md_error_psi - 0.052 * 12.5 * (12000 - 9800)) < 1e-9);
+  assert.ok(Math.abs(r.md_error_psi - 1430) < 1e-9);
+  assert.ok(Math.abs(r.md_apparent_overbalance_psi - (r.overbalance_psi + r.md_error_psi)) < 1e-9);
+  assert.ok(r.md_apparent_overbalance_psi > 6 * r.overbalance_psi);
+  // Overbalance is linear in mud weight, and the sense flips at balance --
+  // tested off the balance point in both directions, not on it.
+  assert.equal(_v1531({ ...base, mud_weight_ppg: r.formation_emw_ppg * 1.001 }).is_overbalanced, true);
+  assert.equal(_v1531({ ...base, mud_weight_ppg: r.formation_emw_ppg * 0.999 }).is_overbalanced, false);
+  // A vertical well has no measured-depth error at all.
+  assert.equal(_v1531({ ...base, measured_depth_ft: 9800 }).has_md, false);
+  assert.ok(_v1531({ ...base, measured_depth_ft: 5000 }).error);
+  assert.ok(_v1531({ ...base, tvd_ft: 0 }).error);
+});
+
+test("bounds: spec-v1532 computeKillMudWeight -- a kill weight rounded DOWN is a flowing well", () => {
+  const base = { original_mw_ppg: 12.5, tvd_ft: 9800, sidpp_psi: 380, scr_pressure_psi: 600, safety_margin_ppg: 0, rounded_mw_ppg: 13.0, drillpipe_capacity_bbl_ft: 0.01776, measured_depth_ft: 9800, pump_output_bbl_stroke: 0.117, pump_spm: 30 };
+  const r = _v1532(base);
+  // IDENTITY: the kill weight, and the formation pressure it balances.
+  assert.ok(Math.abs(r.kill_mw_ppg - (12.5 + 380 / (0.052 * 9800))) < 1e-12);
+  assert.ok(Math.abs(r.formation_pressure_psi - (380 + 0.052 * 12.5 * 9800)) < 1e-9);
+  // THE CLOSING IDENTITY: the kill weight's own hydrostatic at TVD is exactly
+  // the formation pressure -- which is what "balances with no surface
+  // pressure" means, and the spec's 13.2 ppg would not do it.
+  assert.ok(Math.abs(0.052 * r.kill_mw_ppg * 9800 - r.formation_pressure_psi) < 1e-9);
+  assert.ok(r.kill_mw_ppg > 13.2);
+  assert.ok(Math.abs(r.kill_mw_ppg - 13.2457) < 1e-3);
+  // IDENTITY: the circulating pressures.
+  assert.ok(Math.abs(r.icp_psi - (380 + 600)) < 1e-9);
+  assert.ok(Math.abs(r.fcp_psi - 600 * (r.kill_mw_ppg / 12.5)) < 1e-9);
+  assert.ok(r.fcp_psi > 600 && r.fcp_psi < r.icp_psi);
+  // THE SPEC'S ERROR, PINNED: 13.0 ppg is BELOW the 13.25 required. The change
+  // is NEGATIVE bottom-hole pressure, and the boolean says which way it went.
+  assert.equal(r.rounded_is_below, true);
+  assert.ok(r.rounded_bhp_change_psi < 0);
+  assert.ok(Math.abs(r.rounded_bhp_change_psi - 0.052 * (13.0 - r.kill_mw_ppg) * 9800) < 1e-9);
+  // Rounding genuinely UP is positive, and the boolean flips.
+  const up = _v1532({ ...base, rounded_mw_ppg: 13.5 });
+  assert.equal(up.rounded_is_below, false);
+  assert.ok(up.rounded_bhp_change_psi > 0);
+  // At exactly the kill weight the change is zero, and either side of it the
+  // boolean is tested off the boundary rather than on it.
+  assert.ok(Math.abs(_v1532({ ...base, rounded_mw_ppg: r.kill_mw_ppg }).rounded_bhp_change_psi) < 1e-9);
+  assert.equal(_v1532({ ...base, rounded_mw_ppg: r.kill_mw_ppg * 1.001 }).rounded_is_below, false);
+  assert.equal(_v1532({ ...base, rounded_mw_ppg: r.kill_mw_ppg * 0.999 }).rounded_is_below, true);
+  // A safety margin ADDS, and it raises the final circulating pressure with it.
+  const margin = _v1532({ ...base, safety_margin_ppg: 0.3 });
+  assert.ok(Math.abs(margin.kill_mw_with_margin_ppg - (r.kill_mw_ppg + 0.3)) < 1e-12);
+  assert.ok(margin.fcp_psi > r.fcp_psi);
+  assert.ok(Math.abs(margin.icp_psi - r.icp_psi) < 1e-12);
+  // Zero shut-in pressure means the well is already balanced: no weight-up.
+  const dead = _v1532({ ...base, sidpp_psi: 0 });
+  assert.ok(Math.abs(dead.kill_mw_ppg - 12.5) < 1e-12);
+  assert.ok(Math.abs(dead.weight_up_ppg) < 1e-12);
+  assert.ok(Math.abs(dead.fcp_psi - 600) < 1e-9);
+  // IDENTITY: strokes to the bit.
+  assert.ok(Math.abs(r.strokes_to_bit - 0.01776 * 9800 / 0.117) < 1e-9);
+  assert.ok(Math.abs(r.minutes_to_bit - r.strokes_to_bit / 30) < 1e-9);
+  assert.ok(_v1532({ ...base, safety_margin_ppg: -1 }).error);
+});
+
+test("bounds: spec-v1533 computeAnnularVelocityCleaning -- transport ratio, not velocity alone", () => {
+  const base = { hole_dia_in: 8.75, pipe_od_in: 5.0, flow_gpm: 420, slip_velocity_ft_min: 30, measured_depth_ft: 9800, pump_output_bbl_stroke: 0.117, pump_spm: 30, target_velocity_ft_min: 0 };
+  const r = _v1533(base);
+  // IDENTITY: velocity and capacity share the same difference of squares.
+  assert.ok(Math.abs(r.annular_area_in2 - (8.75 ** 2 - 5 ** 2)) < 1e-12);
+  assert.ok(Math.abs(r.annular_velocity_ft_min - 24.5 * 420 / r.annular_area_in2) < 1e-9);
+  assert.ok(Math.abs(r.annular_capacity_bbl_ft - r.annular_area_in2 / 1029.4) < 1e-12);
+  assert.ok(Math.abs(r.transport_ratio - (r.annular_velocity_ft_min - 30) / r.annular_velocity_ft_min) < 1e-12);
+  assert.equal(r.cuttings_rise, true);
+  // THE SPEC'S BIG-HOLE CASE: the same rate in a 12.25 in hole. The velocity
+  // falls to well UNDER half, not "nearly half".
+  const big = _v1533({ ...base, hole_dia_in: 12.25, target_velocity_ft_min: 200 });
+  assert.ok(Math.abs(big.annular_velocity_ft_min - 24.5 * 420 / (12.25 ** 2 - 25)) < 1e-9);
+  assert.ok(big.annular_velocity_ft_min < r.annular_velocity_ft_min / 2);
+  assert.ok(big.transport_ratio < r.transport_ratio);
+  // IDENTITY inverted: the flow for a target velocity, fed back in, hits it.
+  const back = _v1533({ ...base, hole_dia_in: 12.25, flow_gpm: big.flow_for_target_gpm });
+  assert.ok(Math.abs(back.annular_velocity_ft_min - 200) < 1e-9);
+  // Velocity is exactly linear in flow; capacity does not depend on flow.
+  assert.ok(Math.abs(_v1533({ ...base, flow_gpm: 840 }).annular_velocity_ft_min - 2 * r.annular_velocity_ft_min) < 1e-9);
+  assert.ok(Math.abs(_v1533({ ...base, flow_gpm: 840 }).annular_capacity_bbl_ft - r.annular_capacity_bbl_ft) < 1e-12);
+  // Transport ratio is bounded above by 1 and reaches it only at zero slip.
+  assert.ok(r.transport_ratio < 1);
+  assert.ok(Math.abs(_v1533({ ...base, slip_velocity_ft_min: 0 }).transport_ratio) < 1e-12);
+  // A slip velocity at or above the annular velocity means nothing is being
+  // transported, and the boolean says so rather than printing a bare number.
+  const stalled = _v1533({ ...base, slip_velocity_ft_min: r.annular_velocity_ft_min * 1.001 });
+  assert.equal(stalled.cuttings_rise, false);
+  assert.ok(stalled.transport_ratio < 0);
+  assert.equal(_v1533({ ...base, slip_velocity_ft_min: r.annular_velocity_ft_min * 0.999 }).cuttings_rise, true);
+  // IDENTITY: bottoms up is the annular volume over the pump output.
+  assert.ok(Math.abs(r.annular_volume_bbl - r.annular_capacity_bbl_ft * 9800) < 1e-9);
+  assert.ok(Math.abs(r.bottoms_up_strokes - r.annular_volume_bbl / 0.117) < 1e-9);
+  assert.ok(Math.abs(r.bottoms_up_min - r.bottoms_up_strokes / 30) < 1e-9);
+  assert.ok(_v1533({ ...base, pipe_od_in: 9 }).error);
+  assert.ok(_v1533({ ...base, flow_gpm: 0 }).error);
+});

@@ -1562,6 +1562,17 @@ const RELATED = {
   "nesc-district-loading": ["conductor-sag-at-temperature","transverse-wind-load-conductor","conductor-blowout"],
   "conductor-creep-elongation": ["conductor-sag-at-temperature","line-ground-clearance-nesc","ruling-span"],
   "sagging-return-wave": ["ruling-span","conductor-sag-at-temperature","line-ground-clearance-nesc"],
+  // spec-v1524..v1533: oil, gas and pipeline band.
+  "pipeline-mao-barlow": ["hoop-stress-thin-wall","corroded-pipe-b31g","pipe-pressure-rating"],
+  "gas-pipeline-flow": ["gas-pipe-max-flow","pipeline-mao-barlow","liquid-pipeline-station-spacing"],
+  "liquid-pipeline-station-spacing": ["pump-tdh","elevation-pressure-loss","gas-pipeline-flow"],
+  "pig-batch-volume": ["pipe-volume","liquid-pipeline-station-spacing","corroded-pipe-b31g"],
+  "cathodic-anode-count-life": ["sacrificial-anode-life","corroded-pipe-b31g","pipeline-mao-barlow"],
+  "corroded-pipe-b31g": ["pipeline-mao-barlow","cathodic-anode-count-life","hoop-stress-thin-wall"],
+  "casing-cement-volume": ["annular-velocity-cleaning","annular-grout-volume","mud-hydrostatic-pressure"],
+  "mud-hydrostatic-pressure": ["kill-mud-weight","annular-velocity-cleaning","casing-cement-volume"],
+  "kill-mud-weight": ["mud-hydrostatic-pressure","annular-velocity-cleaning","casing-cement-volume"],
+  "annular-velocity-cleaning": ["mud-hydrostatic-pressure","casing-cement-volume","kill-mud-weight"],
   // spec-v1484..v1494: industrial refrigeration band.
   "ammonia-charge-inventory": ["machinery-room-ventilation","refrigeration-relief-capacity","receiver-pumpdown-capacity"],
   "two-stage-interstage-pressure": ["compression-ratio-refrig","refrigeration-cop","condenser-td-head-pressure"],

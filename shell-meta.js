@@ -68,6 +68,7 @@ export const PROFESSION_NOUN = {
   machining: "Machining",
   surveying: "Surveyors",
   pipefitting: "Pipefitters",
+  "oil-gas": "Oil and Gas",
   roofing: "Roofers",
   masonry: "Masonry",
   "low-voltage": "Low Voltage",

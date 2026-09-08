@@ -1119,6 +1119,17 @@ const _TILES = [
   ["nesc-district-loading", "A"],
   ["conductor-creep-elongation", "A"],
   ["sagging-return-wave", "A"],
+  // spec-v1524..v1533 oil, gas and pipeline band (new calc-oilgas.js)
+  ["pipeline-mao-barlow", "E"],
+  ["gas-pipeline-flow", "E"],
+  ["liquid-pipeline-station-spacing", "E"],
+  ["pig-batch-volume", "E"],
+  ["cathodic-anode-count-life", "E"],
+  ["corroded-pipe-b31g", "E"],
+  ["casing-cement-volume", "E"],
+  ["mud-hydrostatic-pressure", "E"],
+  ["kill-mud-weight", "E"],
+  ["annular-velocity-cleaning", "E"],
   // spec-v1484..v1494 industrial refrigeration band (new calc-refrigeration.js)
   ["ammonia-charge-inventory", "C"],
   ["two-stage-interstage-pressure", "C"],

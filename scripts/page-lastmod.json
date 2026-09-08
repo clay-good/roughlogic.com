@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "977a9bb6d3b2318d",
+      "sha": "ba0baa795752a660",
       "date": "2026-09-08"
     },
     "/tools/": {
-      "sha": "b30ef60b49862838",
+      "sha": "eb85d248b109dab7",
       "date": "2026-09-08"
     },
     "/groups/accounting/": {
-      "sha": "5b34f4f214f6cabc",
+      "sha": "4f42568974d2dbf3",
       "date": "2026-09-08"
     },
     "/groups/agriculture/": {
-      "sha": "e749075cdf38a53c",
+      "sha": "41402692143c1add",
       "date": "2026-09-08"
     },
     "/groups/construction/": {
-      "sha": "8a2fae5fbbea010f",
+      "sha": "41982ac54ab8ab8f",
       "date": "2026-09-08"
     },
     "/groups/cross-trade/": {
-      "sha": "df415fd8f4a4c220",
+      "sha": "8102c06b4a87fe53",
       "date": "2026-09-08"
     },
     "/groups/educators/": {
-      "sha": "a2d062b475ac5633",
+      "sha": "ce2cb1f0d33cb251",
       "date": "2026-09-08"
     },
     "/groups/electrical/": {
-      "sha": "e84a0687e5ec2b19",
+      "sha": "68ae026f505e5468",
       "date": "2026-09-08"
     },
     "/groups/field/": {
-      "sha": "09656a12a3b519e5",
+      "sha": "a50f9b8a1b4320b9",
       "date": "2026-09-08"
     },
     "/groups/fire-ground/": {
-      "sha": "08feb3d49229a6d4",
+      "sha": "f158498624fed358",
       "date": "2026-09-08"
     },
     "/groups/historical/": {
-      "sha": "6fc5fd55b627f570",
+      "sha": "6f20d01f39125807",
       "date": "2026-09-08"
     },
     "/groups/hvac/": {
-      "sha": "92df61abf9892800",
+      "sha": "8df7bad453e6aa55",
       "date": "2026-09-08"
     },
     "/groups/kitchen/": {
-      "sha": "c790b3c2dcc6c89d",
+      "sha": "c1e2bed2496b8c37",
       "date": "2026-09-08"
     },
     "/groups/lab/": {
-      "sha": "fa5e6b8ae11aa732",
+      "sha": "b2d3840f98c8ccb1",
       "date": "2026-09-08"
     },
     "/groups/mechanic/": {
-      "sha": "03d063c26a667e2f",
+      "sha": "ef1a40dfcc7d1114",
       "date": "2026-09-08"
     },
     "/groups/plumbing/": {
-      "sha": "fb82bf03754ed50a",
+      "sha": "cdde45a522754975",
       "date": "2026-09-08"
     },
     "/groups/real-estate/": {
-      "sha": "c08ad35a4b3b449b",
+      "sha": "044a0ecbb34cb41f",
       "date": "2026-09-08"
     },
     "/groups/references/": {
-      "sha": "d004ea923eaab970",
+      "sha": "f4509429bd414a64",
       "date": "2026-09-08"
     },
     "/groups/restoration/": {
-      "sha": "ea3f03c90f23e9a6",
+      "sha": "984ae03a62a51926",
       "date": "2026-09-08"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "e8146475e64fa188",
+      "sha": "764f45f7bed205d5",
       "date": "2026-09-08"
     },
     "/groups/stage/": {
-      "sha": "cc9ed9f6c2154ebe",
+      "sha": "ae5bdac3cdc48b0e",
       "date": "2026-09-08"
     },
     "/groups/trucking/": {
-      "sha": "64fa5f09768e6a7b",
+      "sha": "b17d3872dcab14b1",
       "date": "2026-09-08"
     },
     "/groups/water/": {
-      "sha": "8686b964944b1b48",
+      "sha": "2737094a5051de51",
       "date": "2026-09-08"
     },
     "/tools/aav-install-check/": {
@@ -280,6 +280,10 @@
     "/tools/annular-grout-volume/": {
       "sha": "dfb4537667a1d016",
       "date": "2026-09-01"
+    },
+    "/tools/annular-velocity-cleaning/": {
+      "sha": "892dd4f4c54b15a5",
+      "date": "2026-09-08"
     },
     "/tools/annulus-area/": {
       "sha": "212223f331114d6d",
@@ -909,6 +913,10 @@
       "sha": "51124e1732547331",
       "date": "2026-09-01"
     },
+    "/tools/casing-cement-volume/": {
+      "sha": "dc1e22ca7f50e611",
+      "date": "2026-09-08"
+    },
     "/tools/category-deterioration/": {
       "sha": "eef7af5b0e1adbcd",
       "date": "2026-09-01"
@@ -916,6 +924,10 @@
     "/tools/category-weighted-grade/": {
       "sha": "dd3b2b685db1f023",
       "date": "2026-09-01"
+    },
+    "/tools/cathodic-anode-count-life/": {
+      "sha": "159c83e2ca4630ad",
+      "date": "2026-09-08"
     },
     "/tools/cattle-heart-girth-weight/": {
       "sha": "e35995d58cedd522",
@@ -1633,6 +1645,10 @@
       "sha": "055318d77cce3382",
       "date": "2026-09-01"
     },
+    "/tools/corroded-pipe-b31g/": {
+      "sha": "a2b3045087a265d8",
+      "date": "2026-09-08"
+    },
     "/tools/cost-of-waiting/": {
       "sha": "b86f30077d71d685",
       "date": "2026-09-01"
@@ -2266,7 +2282,7 @@
       "date": "2026-09-01"
     },
     "/tools/earthwork-end-area/": {
-      "sha": "1b461dc4f783da53",
+      "sha": "5f66262e60cb9a63",
       "date": "2026-09-08"
     },
     "/tools/economic-conductor-sizing/": {
@@ -2558,8 +2574,8 @@
       "date": "2026-09-04"
     },
     "/tools/fdc-supply-check/": {
-      "sha": "b1a1827e226755a7",
-      "date": "2026-09-01"
+      "sha": "2a641af13134e0cf",
+      "date": "2026-09-08"
     },
     "/tools/feed-conversion-ratio/": {
       "sha": "5576a04a3ee8f27c",
@@ -2936,6 +2952,10 @@
     "/tools/gas-pipe-sizing/": {
       "sha": "a84c064b7f3c51f3",
       "date": "2026-09-01"
+    },
+    "/tools/gas-pipeline-flow/": {
+      "sha": "37ec8c422e820d4f",
+      "date": "2026-09-08"
     },
     "/tools/gas-strut-force/": {
       "sha": "9e91b2d36c4be29a",
@@ -3649,6 +3669,10 @@
       "sha": "2d7384bfbdfd23f1",
       "date": "2026-09-01"
     },
+    "/tools/kill-mud-weight/": {
+      "sha": "d92ac626d3549432",
+      "date": "2026-09-08"
+    },
     "/tools/kiln-charge-water/": {
       "sha": "d79485d3b5c38cde",
       "date": "2026-09-06"
@@ -3832,6 +3856,10 @@
     "/tools/liquefaction-screening/": {
       "sha": "a1741b7c203be05f",
       "date": "2026-09-01"
+    },
+    "/tools/liquid-pipeline-station-spacing/": {
+      "sha": "96dc823b66feb552",
+      "date": "2026-09-08"
     },
     "/tools/litter-carry-team/": {
       "sha": "dc2a734af93ff444",
@@ -4341,6 +4369,10 @@
       "sha": "88b092bcdae61093",
       "date": "2026-09-01"
     },
+    "/tools/mud-hydrostatic-pressure/": {
+      "sha": "f5e6124f5e68e4d9",
+      "date": "2026-09-08"
+    },
     "/tools/mulch-topsoil-volume/": {
       "sha": "26f1868469cbb0b7",
       "date": "2026-09-04"
@@ -4685,6 +4717,10 @@
       "sha": "019feb1fab1e45e7",
       "date": "2026-09-01"
     },
+    "/tools/pig-batch-volume/": {
+      "sha": "a96cbac4b2800136",
+      "date": "2026-09-08"
+    },
     "/tools/pile-axial-capacity/": {
       "sha": "d8e4eff456bb7550",
       "date": "2026-09-01"
@@ -4784,6 +4820,10 @@
     "/tools/pipe-volume/": {
       "sha": "d826106bd7f5b276",
       "date": "2026-09-01"
+    },
+    "/tools/pipeline-mao-barlow/": {
+      "sha": "3eea631541c6edee",
+      "date": "2026-09-08"
     },
     "/tools/pit-dewatering-staging/": {
       "sha": "182038fc29420507",

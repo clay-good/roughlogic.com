@@ -22093,6 +22093,128 @@ export const CITATIONS = {
       { name: "The target sag comes from elsewhere", value: "the stringing chart at the ruling span and the temperature at that moment", source: "the utility's stringing charts" },
     ],
   },
+  // spec-v1524..v1533: the 2026-09-08 trade-expansion oil, gas and pipeline
+  // band, in the new calc-oilgas.js. Ten tiles, nothing cut.
+  "pipeline-mao-barlow": {
+    formula: "Barlow at yield P = 2 S t / D, then the code multipliers: MAOP = that x design factor F x longitudinal joint factor E x temperature derating factor T; hoop stress at an operating pressure = P D / (2 t), reported as a percent of SMYS; and the wall a target pressure needs is that relation inverted.",
+    edition: "Barlow's relation with the design factors 49 CFR 192.105 and 192.111 and ASME B31.8 apply -- F by class location at 0.72, 0.60, 0.50 and 0.40, the longitudinal joint factor E, and the temperature derating factor T. A design screen on NOMINAL wall. It does not establish the MAOP of record, which depends on pressure test history, manufacturing and construction records and the grandfathering provisions; it does not evaluate seam integrity, cyclic fatigue, dents or gouges; and it does not cover liquid lines, designed under ASME B31.4 and 49 CFR 195.",
+    freeAccess: "One multiplication and three factors read off a table; no code text is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The design factor is a property of the ROUTE rather than of the pipe. As development grows around a line its class location changes, the allowable factor drops, and a line compliant at 0.72 in open country is not compliant at 0.50 once a subdivision is built beside it -- a recalculation triggered by population rather than by anything happening to the steel. That is why the MAOP at every class location is reported rather than only the one selected. The joint factor catches older pipe: pre-1970 electric-resistance-welded and furnace-welded seams carry factors below 1.0, and applying 1.0 to a 1950s line overstates its MAOP directly.",
+    assumptions: [
+      { name: "Nominal wall", value: "corrosion changes the thickness this multiplies, and a line with measured metal loss is governed by a remaining-strength evaluation", source: "ASME B31G" },
+      { name: "The joint factor is entered", value: "it depends on the pipe's vintage and manufacturing process", source: "49 CFR 192.113" },
+      { name: "Not the MAOP of record", value: "test history, records and grandfathering establish that", source: "the operator's integrity management program" },
+    ],
+  },
+  "gas-pipeline-flow": {
+    formula: "Weymouth Q = 433.5 (Tb/Pb) [(P1^2 - P2^2)/(G T L Z)]^0.5 d^2.667 E and Panhandle A Q = 435.87 (Tb/Pb)^1.0788 [(P1^2 - P2^2)/(G^0.8539 T L Z)]^0.5394 d^2.6182 E, both in SCF/day with inches, miles, degrees Rankine and psia; the capacity ratio for another diameter is that diameter ratio raised to the equation's own exponent.",
+    edition: "The Weymouth and Panhandle A transmission equations as published, at a 14.73 psia and 520 degR base, with gauge pressures converted at 14.7 psi -- the equations require ABSOLUTE pressures and using gauge understates the driving term. Compressibility and pipeline efficiency are ENTERED. A steady-state, isothermal, single-phase screen at uniform elevation: it does not handle elevation change, two-phase or liquid-bearing flow, transients and line pack, or compressor station hydraulics.",
+    freeAccess: "Two published equations evaluated on entered inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Both say the same physical thing: flow is driven by the difference of the SQUARES of the absolute pressures, not by the pressure difference. Diameter then dominates everything else, going as roughly the 2.6 to 2.67 power, so a modest increase in size is a large increase in capacity while doubling the length costs only about 30% of the flow. That exponent is why looping a line is such an effective way to add capacity. The two equations can differ substantially on the same segment, which is why both are shown and neither is presented as the answer.",
+    assumptions: [
+      { name: "Absolute pressures", value: "the driving term is P1 squared minus P2 squared on psia, not on gauge", source: "the published equations" },
+      { name: "Compressibility is entered", value: "assuming 1.0 at transmission pressure overstates flow", source: "the gas analysis" },
+      { name: "Uniform elevation", value: "elevation change, two-phase flow and line pack are not modelled", source: "the operator's hydraulic model" },
+    ],
+  },
+  "liquid-pipeline-station-spacing": {
+    formula: "available head = MAOP head - minimum suction head; elevation gradient = net elevation change / length; combined gradient = friction + elevation; maximum spacing = available head / combined gradient; stations = ceiling of length over spacing; and at another throughput the friction gradient scales as the SQUARE of the flow ratio.",
+    edition: "The steady-state liquid pipeline head balance as ASME B31.4 and 49 CFR 195 practice writes it. The friction gradient is ENTERED, from a Darcy-Weisbach or Hazen-Williams calculation at the design flow, viscosity and roughness. It does not compute that gradient, size pumps or drivers, model batching and the different gradients each product produces, or analyse SURGE.",
+    freeAccess: "One head balance and one quadratic scaling; no code text is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Liquid is incompressible, so unlike a gas line the pressure profile is a straight line falling at the friction gradient and tilted by terrain -- which makes elevation matter enormously, and on a mountain crossing the static term can exceed the friction term entirely. Two constraints bracket every station: discharge cannot exceed MAOP, and suction must stay above the minimum that keeps the pump out of cavitation and the line out of slack flow. Friction goes as the square of flow, which is the shape of the economics -- the last increment of throughput is always the most expensive.",
+    assumptions: [
+      { name: "The friction gradient is entered", value: "it depends on viscosity, roughness and flow, which this does not take", source: "a Darcy-Weisbach or Hazen-Williams calculation" },
+      { name: "Steady state only", value: "surge transients from a valve closure or pump trip routinely exceed this profile everywhere", source: "a transient surge analysis" },
+      { name: "One product", value: "batching gives each product its own gradient", source: "the operator's hydraulic model" },
+    ],
+  },
+  "pig-batch-volume": {
+    formula: "line volume V = (pi/4) d^2 L converted at 42 gallons of 231 cubic inches per barrel; pig velocity = flow / volume per unit length; travel time = length / velocity; and the flow that reaches a target velocity is that relation inverted.",
+    edition: "The geometry of a cylinder with the exact petroleum-barrel conversion, and pig velocity as flow over area. The inline inspection tool's velocity window is ENTERED from the vendor's specification. It assumes a constant inside diameter and a full line, and does not model bypass around the pig, the differential pressure driving it, tool wear, or the batch interface mixing length.",
+    freeAccess: "One cylinder volume and one exact unit conversion.",
+    governance: GOVERNANCE.general,
+    editionNote: "A pipeline is a very long cylinder and its volume is larger than intuition suggests -- the number that sizes the receiver, the tankage and the displacement batch at once. Velocity matters for more than scheduling: too slow and a cleaning pig can stall or its bypass lets debris past, too fast and an inspection tool's sensors cannot sample properly and the run has to be repeated. The window check is therefore reported as a verdict COMPUTED from the velocity, naming which end was missed and the throughput that would fix it, because a velocity a little under a minimum reads as acceptable at a glance and is not.",
+    assumptions: [
+      { name: "Constant inside diameter", value: "a real line has fittings, bends and diameter changes", source: "the line's own records" },
+      { name: "The tool window is entered", value: "every tool has its own specification", source: "the inline inspection vendor" },
+      { name: "No bypass model", value: "a cleaning pig's bypass changes both velocity and cleaning", source: "the pigging procedure" },
+    ],
+  },
+  "cathodic-anode-count-life": {
+    formula: "required current = bare surface area x current density, with bare area = pi x diameter x length x (1 - coating efficiency); anode count = required current / current per anode; anode life = weight x utilization / (consumption rate x current per anode); and the mass for a target life is that relation inverted on the total demand.",
+    edition: "The cathodic protection current balance as NACE / AMPP practice writes it. Current density, coating efficiency, and the anode's consumption rate and output are ENTERED, because they depend on soil resistivity, moisture, temperature, coating type and condition, and the bed design. It does not design the ground bed or its resistance, size the rectifier voltage, evaluate interference with foreign structures, address stray current or AC corrosion, or set the protection criteria.",
+    freeAccess: "An area, a current density, and a mass over a consumption rate.",
+    governance: GOVERNANCE.general,
+    editionNote: "Everything turns on how much steel is actually exposed, which is why coating is the primary corrosion control and cathodic protection is the secondary system handling what the coating misses. The sensitivity is severe and worth seeing as a number: because demand is proportional to bare area, a coating falling from 99.9 to 99% efficiency multiplies the current requirement tenfold, and a coating most people would still call good can leave a correctly sized rectifier unable to protect the far end. Galvanic magnesium is consumed roughly twenty times faster per ampere than impressed-current high-silicon cast iron, which is why galvanic suits small well-coated jobs and impressed current suits everything larger.",
+    assumptions: [
+      { name: "Current density is entered", value: "it depends on soil resistivity, moisture, temperature and coating condition", source: "a soil survey and NACE / AMPP practice" },
+      { name: "No ground bed design", value: "bed resistance and rectifier voltage are a separate calculation", source: "a qualified corrosion engineer" },
+      { name: "Protection criteria are not set here", value: "the potential criteria and interference are the survey's job", source: "a close-interval potential survey" },
+    ],
+  },
+  "corroded-pipe-b31g": {
+    formula: "flow stress = 1.1 x SMYS; A = 0.893 L / sqrt(D t) selects the branch; at A at or below 4.0 the parabolic form P = S_flow (2t/D)[1 - (2/3)(d/t)]/[1 - (2/3)(d/t)/M] with M = sqrt(1 + 0.8 L^2/(D t)), above it the rectangular form P = S_flow (2t/D)(1 - d/t); safe pressure = that divided by the safety factor; and depth past 80% of wall is unacceptable regardless of length.",
+    edition: "The original ASME B31G criterion by name, including the A parameter that selects between its two branches and the 80% screening limit. Acceptance is read against the SAFE pressure, not the predicted failure pressure. It screens a single area of general metal loss on nominal wall: it does not evaluate cracks, gouges, dents, seam or girth weld anomalies, interacting defects, or corrosion under external loading, and it is not a fitness-for-service assessment. Modified B31G and RSTRENG typically permit more on the same defect.",
+    freeAccess: "One published criterion evaluated on measured dimensions.",
+    governance: GOVERNANCE.general,
+    editionNote: "A corroded area behaves like a blunt flaw whose severity depends on how deep it is relative to the wall AND how long it is relative to the pipe's ability to bulge around it, which is why anomalies are ranked by predicted failure pressure rather than by depth. Two things are easy to get wrong and are therefore computed here. B31G is a TWO-BRANCH criterion and the parabolic form with its bulging factor applies only while A is at or below 4.0; carrying it beyond that overstates remaining strength on exactly the long defects that matter most. And the acceptance is read against the SAFE pressure rather than the failure pressure -- a defect whose failure pressure sits above MAOP can still fail the screen once the safety factor is applied.",
+    assumptions: [
+      { name: "Nominal wall and a single defect", value: "interacting defects and clusters need a different treatment", source: "ASME B31G" },
+      { name: "General metal loss only", value: "cracks, gouges, dents and weld anomalies are outside the criterion", source: "a fitness-for-service assessment" },
+      { name: "Conservative by design", value: "RSTRENG with a river-bottom profile usually permits more", source: "the operator's integrity management program" },
+    ],
+  },
+  "casing-cement-volume": {
+    formula: "annular capacity bbl/ft = (D_hole^2 - D_casing^2) / 1029.4 and pipe capacity bbl/ft = ID^2 / 1029.4; slurry = annular capacity x column length x (1 + excess); sacks = slurry in cubic feet / the yield per sack; displacement = casing capacity x depth to the float collar.",
+    edition: "The oilfield capacity relations as every well-control manual writes them, with the 1029.4 constant converting square inches over a foot into barrels, and barrels at 42 gallons of 231 cubic inches, exact by definition. Excess and slurry yield are ENTERED. It does not design the slurry, its density, thickening time or free water, evaluate centralisation and mud removal, account for compressibility or losses to the formation, or address stage tools.",
+    freeAccess: "Two capacities and a volume; no service company data is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The annulus is a difference of SQUARES, so it is far more sensitive to hole size than to casing size, and an oversized or washed-out hole eats cement fast. Excess is where the honesty lives: a gauge hole needs little and a washed-out shale section can need double, so the spread between a reasonable low and high assumption is reported in barrels AND in feet of column, because that spread is the real uncertainty in where the top of cement lands. Getting the DISPLACEMENT wrong fails in both directions -- over-displacing pumps cement past the float and back up the annulus from the wrong end, under-displacing leaves cement inside the casing to drill out.",
+    assumptions: [
+      { name: "A gauge hole apart from the entered excess", value: "a caliper log turns excess from a guess into a measurement", source: "the caliper log" },
+      { name: "A clean concentric annulus", value: "centralisation and mud removal decide whether the cement bonds", source: "the cementing program" },
+      { name: "No losses to the formation", value: "compressibility and losses are not modelled", source: "the service company's job design" },
+    ],
+  },
+  "mud-hydrostatic-pressure": {
+    formula: "P = 0.052 x mud weight x TRUE VERTICAL depth; gradient = 0.052 x mud weight; overbalance = hydrostatic - formation pressure; equivalent mud weight = pressure / (0.052 x TVD); and the measured-depth error is that same gradient over the extra depth.",
+    edition: "The mud hydrostatic relation as every well-control manual writes it, where 0.052 is the pounds-per-gallon-per-foot to psi conversion (exactly 0.0519481). The STATIC column only: it excludes equivalent circulating density, surge and swab, cuttings loading, gas cutting, and downhole temperature and compressibility effects on density, and it does not evaluate the fracture gradient.",
+    freeAccess: "One multiplication and one conversion constant.",
+    governance: GOVERNANCE.general,
+    editionNote: "Pressure comes from the VERTICAL height of fluid, so a well drilled to twelve thousand feet of measured depth that is only nine thousand eight hundred true vertical has the hydrostatic of nine thousand eight hundred -- and a crew reaching for measured depth believes it has hundreds of psi of overbalance it does not have. That error is COMPUTED here rather than warned about, because the difference between a warning and a number is whether anyone acts on it. Everything in well control is this one line rearranged, and getting the sense of the comparison right is the whole job, so the verdict is driven off a boolean rather than off the sign of a subtraction.",
+    assumptions: [
+      { name: "True vertical depth", value: "measured depth on a deviated well overstates hydrostatic directly", source: "the directional survey" },
+      { name: "Static column only", value: "equivalent circulating density, surge and swab are excluded", source: "the drilling program" },
+      { name: "No fracture gradient", value: "a weight the formation holds may not be one the shoe holds", source: "the leak-off or formation integrity test" },
+    ],
+  },
+  "kill-mud-weight": {
+    formula: "kill mud weight = original weight + SIDPP / (0.052 x TVD); formation pressure = SIDPP + 0.052 x original weight x TVD; initial circulating pressure = SIDPP + slow-circulating-rate pressure; final circulating pressure = SCR pressure x (kill weight / original weight); strokes to the bit = drillpipe capacity x measured depth / pump output.",
+    edition: "The driller's-method kill sheet as every well-control manual writes it. For a vertical or near-vertical well with a clean drillpipe column: it does not compute kick tolerance or the equivalent mud weight at the shoe, handle a plugged or wet string, account for influx type and migration, model the annulus pressure profile or the choke schedule, or check the fracture gradient.",
+    freeAccess: "One kill sheet's arithmetic; no operator procedure is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Shut-in drillpipe pressure is the amount by which formation pressure exceeds the hydrostatic already in the hole, read at surface through a column of clean mud, and converting it back into density gives the weight that balances the formation with no surface pressure at all. The rounding question is where this gets dangerous: a kill weight rounded DOWN -- to a tidier number, or to what is already mixed -- leaves the well underbalanced by the difference, and arithmetic that looks like it adds pressure actually subtracts it. The direction is therefore reported as a verdict computed from the two weights rather than as a signed number a reader has to interpret. Rounding UP is the safe direction and has its own limit, since excessive kill weight risks fracturing the shoe.",
+    assumptions: [
+      { name: "Driller's method, clean drillpipe", value: "a plugged or wet string invalidates the surface reading", source: "the operator's well control procedures" },
+      { name: "No kick tolerance or shoe check", value: "the equivalent mud weight at the shoe is a separate calculation", source: "the certified kill sheet" },
+      { name: "Vertical or near-vertical", value: "influx migration and the annulus profile are not modelled", source: "a qualified well-control supervisor" },
+    ],
+  },
+  "annular-velocity-cleaning": {
+    formula: "annular velocity ft/min = 24.5 x gpm / (D_hole^2 - D_pipe^2); annular capacity bbl/ft = (D_hole^2 - D_pipe^2) / 1029.4; transport ratio = (annular velocity - slip velocity) / annular velocity; bottoms up = annular volume / pump output; and the flow for a target velocity is the first relation inverted.",
+    edition: "The oilfield annular relations as every drilling and well-control manual writes them. Slip velocity is ENTERED because it depends on cutting size and density and on mud rheology. A vertical-hole screen with a concentric annulus: it does not compute slip velocity, model cuttings beds or eccentricity on a deviated well, account for pipe rotation, evaluate equivalent circulating density or the pressure the rate costs, or address hole washout.",
+    freeAccess: "A velocity, a capacity, and a ratio.",
+    governance: GOVERNANCE.general,
+    editionNote: "Because the annular area is a difference of SQUARES, velocity changes fast with hole size: the rate that cleans a small hole around a given pipe is nowhere near enough in a large one, which is why rate has to rise with every larger section. The number that matters is transport ratio rather than velocity alone -- how much faster the mud rises than the cuttings fall. On a high-angle well none of this is sufficient: cuttings form a bed on the low side and mechanical agitation from rotation is what removes them, so a horizontal section that looks clean by this arithmetic can still be packing off. That is the limit of the calculation and it is a real one.",
+    assumptions: [
+      { name: "Slip velocity is entered", value: "it depends on cutting size and density and on mud rheology", source: "the mud engineer" },
+      { name: "Vertical hole, concentric annulus", value: "cuttings beds and eccentricity on a deviated well are not modelled", source: "the directional driller" },
+      { name: "No circulating pressure", value: "the equivalent circulating density the rate costs is separate", source: "the drilling program" },
+    ],
+  },
   // spec-v1484..v1494: the 2026-09-08 trade-expansion industrial refrigeration
   // band, in the new calc-refrigeration.js. spec-v1486 was cut to evaporator-td-dtd.
   "ammonia-charge-inventory": {

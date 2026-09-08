@@ -1265,6 +1265,17 @@ export const TOOL_MODULES = (() => {
     "tractor-ballast",
     "anhydrous-ammonia-rate",
   ]);
+  // spec-v1524..v1533: the oil, gas and pipeline bench (Group E). Two benches
+  // in one module because they share a vocabulary and a reader: the
+  // transmission and integrity side (MAOP, gas flow, station spacing, pigging,
+  // cathodic protection, B31G) and the wellsite side (cement volume, mud
+  // hydrostatic, kill sheet, annular velocity).
+  declare("./calc-oilgas.js", "OILGAS_RENDERERS", [
+    "pipeline-mao-barlow", "gas-pipeline-flow", "liquid-pipeline-station-spacing",
+    "pig-batch-volume", "cathodic-anode-count-life", "corroded-pipe-b31g",
+    "casing-cement-volume", "mud-hydrostatic-pressure", "kill-mud-weight",
+    "annular-velocity-cleaning",
+  ]);
   // spec-v1484..v1494: the industrial refrigeration bench (Group C). Separate
   // from calc-refrigerant.js, which holds the SERVICE bench -- superheat,
   // charge, recovery, TXV, defrost -- sized around a technician at a comfort

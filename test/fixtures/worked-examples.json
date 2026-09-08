@@ -102196,6 +102196,574 @@
    }
   },
   {
+   "tile_id": "pipeline-mao-barlow",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Pipeline Maximum Allowable Operating Pressure (Barlow) -- the spec-v1524 worked example, recomputed",
+   "source_edition_or_year": "spec-v1524 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "od_in": 12.75,
+    "wall_in": 0.25,
+    "smys_psi": 52000,
+    "class_location": "class_1",
+    "joint_factor": 1,
+    "temperature_factor": 1,
+    "operating_pressure_psig": 1468,
+    "target_pressure_psig": 0
+   },
+   "outputs": {
+    "barlow_yield_psi": {
+     "value": 2039.21569,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "maop_psig": {
+     "value": 1468.23529,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "maop_class_3": {
+     "value": 1019.60784,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hoop_stress_psi": {
+     "value": 37434,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pct_smys": {
+     "value": 71.98846,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gas-pipeline-flow",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Gas Pipeline Flow (Weymouth and Panhandle A) -- the spec-v1525 worked example, recomputed",
+   "source_edition_or_year": "spec-v1525 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "equation": "panhandle_a",
+    "id_in": 15.5,
+    "length_mi": 42,
+    "inlet_psig": 850,
+    "outlet_psig": 600,
+    "gravity": 0.6,
+    "flowing_temp_f": 60,
+    "z_factor": 1,
+    "efficiency": 0.92,
+    "alternate_id_in": 19.25
+   },
+   "outputs": {
+    "inlet_psia": {
+     "value": 864.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "outlet_psia": {
+     "value": 614.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "squared_difference": {
+     "value": 369850,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "q_mmscfd": {
+     "value": 142.74784,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "diameter_capacity_ratio": {
+     "value": 1.76348,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "liquid-pipeline-station-spacing",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Liquid Pipeline Pump Station Spacing -- the spec-v1526 worked example, recomputed",
+   "source_edition_or_year": "spec-v1526 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "total_length_mi": 120,
+    "friction_gradient_ft_per_mi": 12,
+    "elevation_change_ft": 400,
+    "maop_head_ft": 2300,
+    "min_suction_head_ft": 150,
+    "flow_bpd": 60000,
+    "alternate_flow_bpd": 90000
+   },
+   "outputs": {
+    "available_head_ft": {
+     "value": 2150,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "elevation_gradient_ft_per_mi": {
+     "value": 3.33333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "combined_gradient_ft_per_mi": {
+     "value": 15.33333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_spacing_mi": {
+     "value": 140.21739,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "station_count": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alternate_gradient_ft_per_mi": {
+     "value": 27,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alternate_spacing_mi": {
+     "value": 70.87912,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pig-batch-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Pipeline Pigging Volume and Velocity -- the spec-v1527 worked example, recomputed",
+   "source_edition_or_year": "spec-v1527 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "id_in": 15.5,
+    "length_mi": 42,
+    "flow_bpd": 60000,
+    "tool_min_fps": 3,
+    "tool_max_fps": 12
+   },
+   "outputs": {
+    "bbl_per_mile": {
+     "value": 1232.27369,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_bbl": {
+     "value": 51755.49497,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "velocity_mph": {
+     "value": 2.02877,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "velocity_fps": {
+     "value": 2.97553,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "travel_time_h": {
+     "value": 20.7022,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "flow_for_min_bpd": {
+     "value": 60493.43568,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cathodic-anode-count-life",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Cathodic Protection Anode Count and Life -- the spec-v1528 worked example, recomputed",
+   "source_edition_or_year": "spec-v1528 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "od_in": 12.75,
+    "length_mi": 42,
+    "coating_efficiency_pct": 99.9,
+    "current_density_ma_per_ft2": 1.5,
+    "anode_weight_lb": 50,
+    "consumption_lb_per_a_yr": 1,
+    "utilization": 0.85,
+    "current_per_anode_a": 3,
+    "degraded_efficiency_pct": 99,
+    "target_life_years": 20
+   },
+   "outputs": {
+    "total_area_ft2": {
+     "value": 740222.06104,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bare_area_ft2": {
+     "value": 740.22206,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "current_required_a": {
+     "value": 1.11033,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "anode_life_years": {
+     "value": 14.16667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "degraded_current_a": {
+     "value": 11.10333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "current_multiple": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "corroded-pipe-b31g",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Corroded Pipe Remaining Strength (ASME B31G) -- the spec-v1529 worked example, recomputed",
+   "source_edition_or_year": "spec-v1529 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "od_in": 12.75,
+    "wall_in": 0.25,
+    "smys_psi": 52000,
+    "defect_depth_in": 0.105,
+    "defect_length_in": 4,
+    "safety_factor": 1.39,
+    "maop_psig": 1468
+   },
+   "outputs": {
+    "depth_pct": {
+     "value": 42,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "a_parameter": {
+     "value": 2.00072,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "folias_m": {
+     "value": 2.23957,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "flow_stress_psi": {
+     "value": 57200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "failure_pressure_psi": {
+     "value": 1845.83181,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "safe_pressure_psi": {
+     "value": 1327.93656,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_psi": {
+     "value": -140.06344,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "casing-cement-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Well Casing and Annulus Cement Volume -- the spec-v1530 worked example, recomputed",
+   "source_edition_or_year": "spec-v1530 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "hole_dia_in": 12.25,
+    "casing_od_in": 9.625,
+    "casing_id_in": 8.535,
+    "cement_column_ft": 4200,
+    "excess_pct": 35,
+    "float_collar_ft": 4160,
+    "slurry_yield_ft3_per_sack": 1.18,
+    "low_excess_pct": 25,
+    "high_excess_pct": 60
+   },
+   "outputs": {
+    "annular_capacity_bbl_ft": {
+     "value": 0.05578,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "casing_capacity_bbl_ft": {
+     "value": 0.07077,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annular_volume_bbl": {
+     "value": 234.28393,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "slurry_volume_bbl": {
+     "value": 316.2833,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "displacement_bbl": {
+     "value": 294.38537,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "excess_spread_bbl": {
+     "value": 81.99937,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mud-hydrostatic-pressure",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Drilling Mud Weight and Hydrostatic Pressure -- the spec-v1531 worked example, recomputed",
+   "source_edition_or_year": "spec-v1531 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "mud_weight_ppg": 12.5,
+    "tvd_ft": 9800,
+    "measured_depth_ft": 12000,
+    "formation_pressure_psi": 6100
+   },
+   "outputs": {
+    "gradient_psi_ft": {
+     "value": 0.65,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hydrostatic_psi": {
+     "value": 6370,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "overbalance_psi": {
+     "value": 270,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "formation_emw_ppg": {
+     "value": 11.97017,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "md_hydrostatic_psi": {
+     "value": 7800,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "md_error_psi": {
+     "value": 1430,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "kill-mud-weight",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Well Control Kill Mud Weight and Circulating Pressure -- the spec-v1532 worked example, recomputed",
+   "source_edition_or_year": "spec-v1532 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "original_mw_ppg": 12.5,
+    "tvd_ft": 9800,
+    "sidpp_psi": 380,
+    "scr_pressure_psi": 600,
+    "safety_margin_ppg": 0,
+    "rounded_mw_ppg": 13,
+    "drillpipe_capacity_bbl_ft": 0.01776,
+    "measured_depth_ft": 9800,
+    "pump_output_bbl_stroke": 0.117,
+    "pump_spm": 30
+   },
+   "outputs": {
+    "formation_pressure_psi": {
+     "value": 6750,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "kill_mw_ppg": {
+     "value": 13.24568,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "icp_psi": {
+     "value": 980,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fcp_psi": {
+     "value": 635.79278,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "strokes_to_bit": {
+     "value": 1487.58974,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rounded_bhp_change_psi": {
+     "value": -125.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "annular-velocity-cleaning",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Annular Velocity and Hole Cleaning -- the spec-v1533 worked example, recomputed",
+   "source_edition_or_year": "spec-v1533 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "hole_dia_in": 8.75,
+    "pipe_od_in": 5,
+    "flow_gpm": 420,
+    "slip_velocity_ft_min": 30,
+    "measured_depth_ft": 9800,
+    "pump_output_bbl_stroke": 0.117,
+    "pump_spm": 30,
+    "target_velocity_ft_min": 0
+   },
+   "outputs": {
+    "annular_velocity_ft_min": {
+     "value": 199.56364,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "transport_ratio": {
+     "value": 0.84967,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annular_capacity_bbl_ft": {
+     "value": 0.05009,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annular_volume_bbl": {
+     "value": 490.88061,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bottoms_up_strokes": {
+     "value": 4195.56077,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bottoms_up_min": {
+     "value": 139.85203,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "ammonia-charge-inventory",
    "source_publisher": "Project (first-principles)",
    "source_title": "Ammonia Refrigeration Charge Inventory and PSM Threshold -- the spec-v1484 worked example, recomputed",

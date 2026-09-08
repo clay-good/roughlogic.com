@@ -101,6 +101,7 @@ const FILES = [
   "calc-mechanic.js",
   "calc-machining.js",
   "calc-agriculture.js",
+  "calc-oilgas.js",
   "calc-refrigeration.js",
   "calc-arborist.js",
   "calc-water.js",
