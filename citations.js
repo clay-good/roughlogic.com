@@ -22093,6 +22093,104 @@ export const CITATIONS = {
       { name: "The target sag comes from elsewhere", value: "the stringing chart at the ruling span and the temperature at that moment", source: "the utility's stringing charts" },
     ],
   },
+  // spec-v1696..v1700 and v1691..v1693: the 2026-09-08 trade-expansion
+  // arboriculture and abatement band. v1690, v1694 and v1695 were cut.
+  "crown-reduction-leaf-area": {
+    formula: "crown projection area = pi/4 x diameter squared, so it goes as the SQUARE of the radius; leaf area is distributed by radial shell with the entered majority share in the outer third of the radius, and the reduction removes the outer shell first; the reduction that just reaches the dose cap is that relation bisected.",
+    edition: "The crown projection and leaf-area distribution relations by name, checked against the ANSI A300 live crown removal dose -- about 25% of the live crown in a season for a mature tree, less for young, over-mature and stressed trees. The outer-third share is ENTERED: it varies by species, age, light exposure and prior management. A geometric estimate on a circular crown projection; it does not measure leaf area, select cuts, or assess the tree. ANSI A300 Part 1, the ISA Best Management Practices, and a qualified arborist govern.",
+    freeAccess: "Two areas and a share the reader supplies; no A300 text is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The geometry compounds twice. Crown projection goes as the SQUARE of the radius, so taking a fifth off the radius takes over a third of the projected area -- and LEAVES ARE ON THE OUTSIDE, so the shell that cut removes is the densest part of the crown. A reduction described as a few feet off the ends can therefore remove far more leaf area than the feet suggest, and the amplification between the two is the figure a client and an arborist argue about. Heavy reduction triggers epicormic sprouting -- weakly attached shoots that must be managed for years -- and topping is not pruning at all: it removes leaf area indiscriminately and creates a decay entry at every cut.",
+    assumptions: [
+      { name: "The outer-third share is entered", value: "it varies by species, age, light exposure and prior management", source: "a qualified arborist" },
+      { name: "A circular projection in radial shells", value: "no real crown is that, and leaf area is not measured here", source: "the ISA Best Management Practices" },
+      { name: "It does not select cuts", value: "a reduction is made to laterals large enough to assume the terminal role", source: "ANSI A300 Part 1" },
+    ],
+  },
+  "root-ball-size-weight": {
+    formula: "ball diameter = trunk caliper x the entered inches of ball per inch of caliper; ball depth = that diameter x the depth ratio; volume as a flat-bottomed cylinder pi/4 d^2 h; weight = volume x soil density; and the caliper a handling limit carries is the cube root of that relation.",
+    edition: "The ANSI Z60.1 root ball proportions by name -- roughly 10 to 12 in of ball diameter per inch of caliper for shade trees, with the depth commonly 0.60 to 0.75 of the diameter -- and moist loam at roughly 100 to 110 pcf. The proportions differ for conifers, multi-stem plants and large-caliper stock and are entered. It does not address rigging, lifting by the ball rather than the trunk, planting depth, backfill, or aftercare. ANSI Z60.1, the project specification, and a qualified arborist or nursery professional govern.",
+    freeAccess: "One cylinder volume and one density; no ANSI table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The weight is the number people get wrong, and by a wide margin: a six inch caliper tree carries well over three tons of soil, which is a crane or a large tree spade rather than a crew and a cart. WEIGHT GOES AS THE CUBE OF CALIPER at a fixed ratio, because diameter, depth and width all scale with it, so doubling the caliper is eight times the weight and the handling method changes long before the tree looks twice as big. The ratio itself is a trade between survival and handling -- a larger ball keeps more roots and costs more to move -- which is why the standard gives a range. A ball dug wet is far heavier than the same ball at normal moisture.",
+    assumptions: [
+      { name: "Proportions are entered per stock type", value: "conifers, multi-stem and large-caliper stock differ", source: "ANSI Z60.1" },
+      { name: "No rigging or lifting method", value: "a ball must be lifted by the BALL, never by the trunk", source: "a qualified arborist" },
+      { name: "No planting depth or aftercare", value: "the root flare goes at grade, and irrigation decides survival", source: "the project specification" },
+    ],
+  },
+  "tree-cabling-rating": {
+    formula: "placement = the entered fraction of the distance from the defect to the branch tips; the force a cable carries scales as the inverse of its moment arm, so force = design load x (defect-to-tips / placement height) / the cable count; and the SYSTEM rating is the minimum of the cable, its terminations and its anchors.",
+    edition: "The ANSI A300 Part 3 cabling placement convention by name -- about two thirds of the way from the defect to the branch tips. THE DESIGN LOAD IS ENTERED and is not computed: it depends on crown area above the defect, wind, relative stem movement and dynamic amplification, and published guidance gives ranges by trunk and crown size. Cabling manages a risk rather than fixing a defect, and creates an obligation to inspect annually and after significant weather. ANSI A300 Part 3, the ISA Best Management Practices for tree support systems, the hardware manufacturer's ratings, and a qualified arborist govern.",
+    freeAccess: "One lever ratio and one minimum; no hardware table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "A cable restrains a MOMENT, so where it sits decides the force it carries: one placed at a third of the way carries twice the force of one at two thirds, and that is where cable and hardware failures concentrate. It is entirely a placement decision made on the ground before anyone climbs. THE SYSTEM IS THE WEAKEST OF ITS PARTS, and the part people rate is the cable -- anchor capacity in living wood depends on the species, the wood's condition at that point and the installation, and an anchor in decayed wood beside the defect being braced is the failure nobody inspected for. Static steel and dynamic synthetic systems are different tools rather than grades of one.",
+    assumptions: [
+      { name: "The design load is entered", value: "crown area, wind and dynamic amplification decide it", source: "the ISA Best Management Practices" },
+      { name: "The system is the minimum of three ratings", value: "cable, terminations and anchors, and it is often not the cable", source: "the hardware manufacturer's ratings" },
+      { name: "It does not assess the defect", value: "or decide whether cabling is appropriate rather than removal", source: "a qualified arborist" },
+    ],
+  },
+  "stump-grinding-volume": {
+    formula: "in-place volume = pi/4 x the GROUND diameter squared x the depth, where the ground diameter includes the root flare and is wider than the visible stump; chips = that times the swell factor; the hole holds its own in-place volume and the rest is excess; and the backfill settles by an entered fraction, which is the topping needed later.",
+    edition: "The stump grinding volume relations by name, with chips swelling to 1.5 to 2 times their in-place volume. Depth is set by the objective: 6 to 8 in for turf, deeper for replanting. Chips are high in carbon and tie up nitrogen, so replanting in the same hole means replacing them with soil. IT DOES NOT LOCATE UTILITIES, which is what matters most before a grinder starts. The utility locate, the site conditions, and the operator's judgment govern.",
+    freeAccess: "Two cylinder volumes and a swell factor; no production data is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The grind is wider than the stump, and estimating on the visible diameter is where the job goes wrong before it starts: a stump has a root flare the grinder has to take, and because volume goes as the SQUARE of diameter a two foot stump is well over twice the material at a three foot grind. Chips swell and then settle: the hole cannot hold what came out of it, and the part that goes back settles as it decomposes, so a hole backfilled level is a depression a season later and the topping is a second visit. And chips are not soil -- decomposing them takes nitrogen out of the surrounding soil, so a tree planted into a chip-filled hole competes with the decomposition of the last one.",
+    assumptions: [
+      { name: "The ground diameter is entered", value: "it includes the flare and is wider than the visible stump", source: "the operator's judgment" },
+      { name: "No utility locate", value: "which is the thing that matters most before a grinder starts", source: "the utility locate" },
+      { name: "Lateral roots beyond the grind are not addressed", value: "they decay and can leave voids well outside the ground area", source: "the site conditions" },
+    ],
+  },
+  "soil-volume-for-canopy": {
+    formula: "canopy projection area = pi/4 x the mature canopy diameter squared; soil required = that area x the entered cubic feet of usable soil per square foot of canopy; and the canopy a given pit actually supports is that relation inverted on the usable pit volume.",
+    edition: "The urban soil volume guidance by name -- commonly 1.5 to 2 cubic feet of usable soil per square foot of intended mature canopy projection. The ratio varies with species, climate, soil type, rainfall and irrigation and is ENTERED; published guidance spans a wide range and a number at the low end is not a safe default. Soil compacted for paving support is not soil roots can use, which is what the usable fraction is for. It does not design the soil or evaluate structural soil and suspended pavement systems. The urban forestry standard in use, the landscape architect, and a qualified arborist govern.",
+    freeAccess: "One area and one multiplication; no urban forestry manual is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "A tree's mature size is set by the soil it has, not by the species on the plan, and canopy area goes as the SQUARE of the diameter -- so a tree meant to reach twenty five feet across needs the better part of a thousand cubic feet of soil, where a five by five pit three feet deep is seventy five. The tree does not fail: it grows to what its soil supports and stops, which is read as a species or maintenance problem years later, so the supported canopy is reported beside the requirement. Compacted soil is not soil, and the solutions -- connected trenches, structural soil, suspended pavement -- are structural rather than horticultural, which is why this belongs in the site design.",
+    assumptions: [
+      { name: "The ratio is entered", value: "it varies with species, climate, soil, rainfall and irrigation", source: "the urban forestry standard in use" },
+      { name: "Compacted soil does not count", value: "soil compacted for paving support is past what roots can penetrate", source: "the landscape architect" },
+      { name: "It does not design the soil", value: "composition, drainage, aeration and rooting depth decide usability", source: "a qualified arborist" },
+    ],
+  },
+  "abatement-waste-containers": {
+    formula: "in-place volume = area x thickness; bulked volume = that times a bulking factor of about 1.5 to 2.5; bag count = bulked volume / (bag volume x the fill fraction); WEIGHT follows the IN-PLACE volume, because bulking is air; container count = bulked volume / the container volume.",
+    edition: "The abatement waste quantity relations by name. Removed material does not repack to its in-place density and double bagging adds air around every bag; a bag must be gooseneck-sealed and hand-carried, so it is not filled to its nominal capacity. Containers are usually governed by VOLUME rather than by their weight rating. The waste is regulated, manifested, and goes to a permitted facility. It does not classify the waste or select a facility. The applicable EPA, OSHA and state regulations, the project design and specifications, and the licensed abatement contractor govern.",
+    freeAccess: "Three multiplications on a bulking factor the reader supplies; no regulation text is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The bulking factor is the term estimates miss, and it misses in the direction that runs a job out of containers on the last day with regulated waste on the floor. Bags are also not filled to their nominal capacity -- a bag has to be sealed, wiped down, passed through a decontamination unit and carried out by hand -- and the two effects together commonly put the real bag count at several times a naive in-place calculation. WEIGHT FOLLOWS THE IN-PLACE VOLUME because bulking is air, and weight is what matters for staging floor loading, for the hoist that moves the waste out, and for the scale ticket.",
+    assumptions: [
+      { name: "The bulking factor is entered", value: "it depends on the material and how it comes off", source: "the licensed abatement contractor" },
+      { name: "Weight from in-place, not bulked", value: "and wet material and encapsulant add more", source: "the project specifications" },
+      { name: "It does not classify the waste", value: "or determine whether the material is regulated", source: "the applicable EPA, OSHA and state regulations" },
+    ],
+  },
+  "lead-dust-clearance": {
+    formula: "dust loading = the laboratory's recovered micrograms / the measured wiped area, compared against the limit for that surface type; the laboratory result a wipe can carry and still pass is the limit times the wiped area.",
+    edition: "The lead dust clearance identity by name. Floors, interior window sills and window troughs each carry their OWN limit and the limits have been tightened over time, so the limit is ENTERED from the rule as adopted. Analysis is by an accredited laboratory and field screening is not clearance; clearance is performed by someone independent of the party that did the work. It does not set the sampling protocol, the sample count or locations, or who may perform clearance. The applicable EPA and HUD rules as adopted, the accredited laboratory, and the certified risk assessor or inspector govern.",
+    freeAccess: "One division on a laboratory result; no regulatory limit table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The limits are small enough that surfaces which look and feel clean routinely fail -- lead dust is invisible at these loadings, and a floor a supervisor would sign off by eye can be several times over. The laboratory result a wipe can carry and still pass is reported for that reason: it turns an abstract limit into the amount of dust actually allowed on a square foot, which is startlingly little. THE WIPED AREA HAS TO BE MEASURED because it is the denominator, which is why a template is used. Field blanks are part of the sample set and not an optional extra: a blank showing lead invalidates the batch, which is the point of it.",
+    assumptions: [
+      { name: "The limit is entered per surface type", value: "floors, sills and troughs differ and the limits have tightened", source: "the applicable EPA and HUD rules as adopted" },
+      { name: "The wiped area must be measured", value: "a guessed area is wrong by whatever the guess was wrong by", source: "the sampling protocol" },
+      { name: "Field screening is not clearance", value: "analysis is by an accredited laboratory", source: "the certified risk assessor or inspector" },
+    ],
+  },
+  "silica-ventilation-screen": {
+    formula: "8-hour time-weighted average = the measured concentration x the sampled minutes / 480; the control efficiency that brings an exposure to the limit is 1 - PEL/TWA; and the task time that would is PEL x 480 / the measured concentration.",
+    edition: "The OSHA 29 CFR 1926.1153 respirable crystalline silica limits by name -- a PEL of 50 micrograms per cubic metre as an 8-hour TWA and an action level of 25 that triggers monitoring obligations. Table 1 lists construction tasks with specified engineering controls, and implementing them FULLY exempts the employer from exposure assessment. Control efficiencies are ENTERED and are not a property of a tool. A single sample is not an exposure assessment, and this does not select respiratory protection or address medical surveillance. OSHA 29 CFR 1926.1153 and its Table 1, the employer's exposure control plan, and a qualified industrial hygienist govern.",
+    freeAccess: "One weighted average and two inversions; no OSHA table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The averaging is what people get wrong in both directions: a high concentration over a short task averages down across the shift, and a moderate concentration sustained all day does not -- so THE TASK TIME IS A CONTROL, and the task time that would bring an exposure to the limit is reported beside the control efficiency that would. The action level is not a safe line, it is a trigger: crossing it starts monitoring obligations, and an employer treating it as the number to stay under has misread which limit does what. Engineering controls come before respirators as a requirement rather than a preference, and both water suppression and local exhaust fail quietly -- a saw run with the water off looks exactly like a controlled operation.",
+    assumptions: [
+      { name: "A screen, not an exposure assessment", value: "that needs calibrated equipment, a sampling strategy and an accredited laboratory", source: "a qualified industrial hygienist" },
+      { name: "Control efficiencies are entered", value: "they depend on the shroud, the airflow, the filter condition and the operator", source: "the employer's exposure control plan" },
+      { name: "Table 1 is a separate path", value: "implementing the listed controls fully exempts the employer from assessment", source: "OSHA 29 CFR 1926.1153" },
+    ],
+  },
   // spec-v1738..v1744 and v1637..v1639: the 2026-09-08 trade-expansion
   // groundwater, survey technology, and commercial kitchen band. spec-v1737 was
   // cut to well-drawdown.

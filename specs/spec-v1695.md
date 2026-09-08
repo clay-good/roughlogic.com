@@ -1,5 +1,11 @@
 # roughlogic.com Specification v1695 -- Tree Trunk Strength Loss and Failure Screen (`calc-arborist.js`, Group L Agriculture and Forestry, arboriculture, 1 New Tile)
 
+> **Status: CUT 2026-09-08 -- DUPLICATE. This tile was not built.** The formula screen for the
+> 2026-09-08 arboriculture and abatement band found this question already answered by
+> `trunk-decay-strength` in `calc-arborist.js`. That tile screens the same hollow trunk. The two differ only in CONVENTION: it uses Wagener's rule, where strength loss goes as the CUBE of the hollow-to-diameter ratio and which is the named arboricultural screen, while this spec uses the section modulus of a hollow circle, which gives the FOURTH power. Both are in use and they do not agree -- at a 24 in trunk with a 4 in shell they give 29.6% and 19.8%. Two tiles disagreeing about the same trunk would be worse than one reporting both, so the fourth-power figure landed beside the cube, and the note now says which convention is which.
+>
+> The specification below is kept as the record of the screen. Do not implement it.
+>
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-arborist.js`**
 > (Group L, Agriculture and Forestry -- the existing category, hub `/groups/agriculture/`; arboriculture and landscape), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.

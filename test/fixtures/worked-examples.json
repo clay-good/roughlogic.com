@@ -102194,6 +102194,475 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "crown-reduction-leaf-area",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Crown Reduction and Leaf Area Removed -- the spec-v1696 worked example, recomputed",
+   "source_edition_or_year": "spec-v1696 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "crown_radius_ft": 20,
+    "reduction_ft": 4,
+    "outer_third_leaf_share": 0.75,
+    "live_crown_cap_pct": 25
+   },
+   "outputs": {
+    "original_area_ft2": {
+     "value": 1256.63706,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "reduced_area_ft2": {
+     "value": 804.24772,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "area_removed_pct": {
+     "value": 36,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "radius_removed_pct": {
+     "value": 20,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "leaf_area_removed_pct": {
+     "value": 48.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "amplification": {
+     "value": 1.35,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "radius_for_cap_ft": {
+     "value": 1.94658,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "root-ball-size-weight",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Tree Root Ball Diameter and Weight (ANSI Z60.1) -- the spec-v1697 worked example, recomputed",
+   "source_edition_or_year": "spec-v1697 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "caliper_in": 6,
+    "ball_per_caliper_in": 10,
+    "depth_ratio": 0.65,
+    "soil_density_pcf": 105,
+    "handling_limit_lb": 2000
+   },
+   "outputs": {
+    "ball_diameter_in": {
+     "value": 60,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ball_diameter_ft": {
+     "value": 5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ball_depth_ft": {
+     "value": 3.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ball_volume_ft3": {
+     "value": 63.8136,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ball_weight_lb": {
+     "value": 6700.42808,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ball_weight_tons": {
+     "value": 3.35021,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "caliper_for_limit_in": {
+     "value": 4.00984,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tree-cabling-rating",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Tree Cabling Placement and System Rating (ANSI A300) -- the spec-v1698 worked example, recomputed",
+   "source_edition_or_year": "spec-v1698 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "defect_to_tips_ft": 24,
+    "placement_fraction": 0.6667,
+    "alternative_placement_ft": 8,
+    "design_load_lb": 1200,
+    "cable_rating_lb": 4000,
+    "termination_rating_lb": 3600,
+    "anchor_rating_lb": 2800,
+    "cable_count": 1
+   },
+   "outputs": {
+    "placement_height_ft": {
+     "value": 16.0008,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "force_at_placement_lb": {
+     "value": 1799.91,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "force_at_alternative_lb": {
+     "value": 3600,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "force_multiple": {
+     "value": 2.0001,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "system_rating_lb": {
+     "value": 2800,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "utilization_pct": {
+     "value": 64.2825,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "stump-grinding-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Stump Grinding Volume, Chip Yield, and Backfill -- the spec-v1699 worked example, recomputed",
+   "source_edition_or_year": "spec-v1699 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "stump_diameter_in": 24,
+    "grind_diameter_in": 36,
+    "grind_depth_in": 12,
+    "swell_factor": 1.8,
+    "settlement_fraction": 0.3
+   },
+   "outputs": {
+    "stump_only_volume_ft3": {
+     "value": 3.14159,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "in_place_volume_ft3": {
+     "value": 7.06858,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "flare_multiple": {
+     "value": 2.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "chip_volume_ft3": {
+     "value": 12.72345,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "backfill_volume_ft3": {
+     "value": 7.06858,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "excess_volume_ft3": {
+     "value": 5.65487,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "topping_volume_ft3": {
+     "value": 2.12058,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "soil-volume-for-canopy",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Soil Volume Required for a Target Canopy -- the spec-v1700 worked example, recomputed",
+   "source_edition_or_year": "spec-v1700 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "canopy_diameter_ft": 25,
+    "soil_per_canopy_ft3_per_ft2": 2,
+    "pit_length_ft": 5,
+    "pit_width_ft": 5,
+    "pit_depth_ft": 3,
+    "usable_fraction": 1
+   },
+   "outputs": {
+    "canopy_area_ft2": {
+     "value": 490.87385,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "soil_required_ft3": {
+     "value": 981.7477,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "soil_required_cy": {
+     "value": 36.36103,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pit_volume_ft3": {
+     "value": 75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "usable_pit_volume_ft3": {
+     "value": 75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "provision_pct": {
+     "value": 7.63944,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "supported_canopy_ft": {
+     "value": 6.90988,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "abatement-waste-containers",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Abatement Waste Bulking, Bags, and Containers -- the spec-v1691 worked example, recomputed",
+   "source_edition_or_year": "spec-v1691 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "area_ft2": 2000,
+    "thickness_in": 1,
+    "bulking_factor": 2,
+    "bag_volume_ft3": 3,
+    "bag_fill_fraction": 0.7,
+    "material_density_pcf": 30,
+    "container_volume_yd3": 20
+   },
+   "outputs": {
+    "in_place_volume_ft3": {
+     "value": 166.66667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bulked_volume_ft3": {
+     "value": 333.33333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bulked_volume_yd3": {
+     "value": 12.34568,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "usable_bag_volume_ft3": {
+     "value": 2.1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bag_count": {
+     "value": 159,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "naive_bag_count": {
+     "value": 56,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "waste_weight_lb": {
+     "value": 5000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lead-dust-clearance",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Lead Dust Clearance Loading and Wipe Count -- the spec-v1692 worked example, recomputed",
+   "source_edition_or_year": "spec-v1692 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "lab_result_ug": 12,
+    "wipe_area_ft2": 1,
+    "clearance_limit_ug_ft2": 10,
+    "rooms": 4,
+    "surfaces_per_room": 3,
+    "blanks_per_job": 1
+   },
+   "outputs": {
+    "dust_loading_ug_ft2": {
+     "value": 12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "limit_margin_ug_ft2": {
+     "value": -2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "loading_ratio": {
+     "value": 1.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_lab_result_ug": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wipe_count": {
+     "value": 12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_samples": {
+     "value": 13,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "silica-ventilation-screen",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Respirable Silica Exposure and Control Screen -- the spec-v1693 worked example, recomputed",
+   "source_edition_or_year": "spec-v1693 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "measured_concentration_ug_m3": 180,
+    "sample_minutes": 240,
+    "shift_minutes": 480,
+    "pel_ug_m3": 50,
+    "action_level_ug_m3": 25,
+    "control_efficiency_pct": 80
+   },
+   "outputs": {
+    "twa_ug_m3": {
+     "value": 90,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pel_ratio": {
+     "value": 1.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "over_pel_by_ug_m3": {
+     "value": 40,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "controlled_twa_ug_m3": {
+     "value": 18,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_efficiency_pct": {
+     "value": 44.44444,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_task_minutes": {
+     "value": 133.33333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

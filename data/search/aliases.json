@@ -109092,6 +109092,206 @@
    "term": "kitchen backdraft combustion",
    "target": "kitchen-makeup-air-deficit",
    "kind": "industry"
+  },
+  {
+   "term": "crown reduction leaf area",
+   "target": "crown-reduction-leaf-area",
+   "kind": "industry"
+  },
+  {
+   "term": "pruning dose leaf area",
+   "target": "crown-reduction-leaf-area",
+   "kind": "industry"
+  },
+  {
+   "term": "crown radius reduction percent",
+   "target": "crown-reduction-leaf-area",
+   "kind": "industry"
+  },
+  {
+   "term": "ansi a300 crown removal",
+   "target": "crown-reduction-leaf-area",
+   "kind": "industry"
+  },
+  {
+   "term": "reduction versus leaf area",
+   "target": "crown-reduction-leaf-area",
+   "kind": "industry"
+  },
+  {
+   "term": "root ball diameter caliper",
+   "target": "root-ball-size-weight",
+   "kind": "industry"
+  },
+  {
+   "term": "root ball weight ansi z60",
+   "target": "root-ball-size-weight",
+   "kind": "industry"
+  },
+  {
+   "term": "balled and burlapped weight",
+   "target": "root-ball-size-weight",
+   "kind": "industry"
+  },
+  {
+   "term": "tree ball handling weight",
+   "target": "root-ball-size-weight",
+   "kind": "industry"
+  },
+  {
+   "term": "nursery stock ball size",
+   "target": "root-ball-size-weight",
+   "kind": "industry"
+  },
+  {
+   "term": "tree cabling placement",
+   "target": "tree-cabling-rating",
+   "kind": "industry"
+  },
+  {
+   "term": "ansi a300 cable two thirds",
+   "target": "tree-cabling-rating",
+   "kind": "industry"
+  },
+  {
+   "term": "tree support system rating",
+   "target": "tree-cabling-rating",
+   "kind": "industry"
+  },
+  {
+   "term": "codominant stem cable",
+   "target": "tree-cabling-rating",
+   "kind": "industry"
+  },
+  {
+   "term": "tree cable anchor rating",
+   "target": "tree-cabling-rating",
+   "kind": "industry"
+  },
+  {
+   "term": "stump grinding volume",
+   "target": "stump-grinding-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "stump grind chip yield",
+   "target": "stump-grinding-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "root flare grind diameter",
+   "target": "stump-grinding-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "stump hole backfill settlement",
+   "target": "stump-grinding-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "grinding depth turf replant",
+   "target": "stump-grinding-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "soil volume for canopy",
+   "target": "soil-volume-for-canopy",
+   "kind": "industry"
+  },
+  {
+   "term": "urban tree soil volume",
+   "target": "soil-volume-for-canopy",
+   "kind": "industry"
+  },
+  {
+   "term": "tree pit soil requirement",
+   "target": "soil-volume-for-canopy",
+   "kind": "industry"
+  },
+  {
+   "term": "structural soil canopy",
+   "target": "soil-volume-for-canopy",
+   "kind": "industry"
+  },
+  {
+   "term": "soil volume per square foot canopy",
+   "target": "soil-volume-for-canopy",
+   "kind": "industry"
+  },
+  {
+   "term": "abatement waste bags",
+   "target": "abatement-waste-containers",
+   "kind": "industry"
+  },
+  {
+   "term": "asbestos waste bulking factor",
+   "target": "abatement-waste-containers",
+   "kind": "industry"
+  },
+  {
+   "term": "abatement container count",
+   "target": "abatement-waste-containers",
+   "kind": "industry"
+  },
+  {
+   "term": "double bagged waste volume",
+   "target": "abatement-waste-containers",
+   "kind": "industry"
+  },
+  {
+   "term": "regulated waste bag count",
+   "target": "abatement-waste-containers",
+   "kind": "industry"
+  },
+  {
+   "term": "lead dust clearance loading",
+   "target": "lead-dust-clearance",
+   "kind": "industry"
+  },
+  {
+   "term": "lead wipe micrograms per square foot",
+   "target": "lead-dust-clearance",
+   "kind": "industry"
+  },
+  {
+   "term": "hud lead clearance limit",
+   "target": "lead-dust-clearance",
+   "kind": "industry"
+  },
+  {
+   "term": "lead dust wipe count",
+   "target": "lead-dust-clearance",
+   "kind": "industry"
+  },
+  {
+   "term": "clearance testing lead",
+   "target": "lead-dust-clearance",
+   "kind": "industry"
+  },
+  {
+   "term": "respirable silica twa",
+   "target": "silica-ventilation-screen",
+   "kind": "industry"
+  },
+  {
+   "term": "osha silica pel action level",
+   "target": "silica-ventilation-screen",
+   "kind": "industry"
+  },
+  {
+   "term": "silica table 1 controls",
+   "target": "silica-ventilation-screen",
+   "kind": "industry"
+  },
+  {
+   "term": "silica exposure task time",
+   "target": "silica-ventilation-screen",
+   "kind": "industry"
+  },
+  {
+   "term": "crystalline silica screen",
+   "target": "silica-ventilation-screen",
+   "kind": "industry"
   }
  ]
 }

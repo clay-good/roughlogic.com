@@ -463,6 +463,7 @@ export const TOOL_MODULES = (() => {
   // tightest remaining calc module) into calc-demo.js. All three keep
   // group: "D" (group letter independent of module, the v42/v70..v76 precedent).
   declare("./calc-demo.js", "DEMO_RENDERERS", [
+    "abatement-waste-containers", "lead-dust-clearance", "silica-ventilation-screen",
     // v60
     "moisture-dry-goal", "flood-cut-quantity",
     // v69 asbestos / lead abatement containment take-off
@@ -1269,6 +1270,7 @@ export const TOOL_MODULES = (() => {
   // group "L" (a tile's group letter is independent of its module, the
   // v42/v70..v86 precedent); ids, citations, examples, and behavior unchanged.
   declare("./calc-arborist.js", "ARBORIST_RENDERERS", [
+    "crown-reduction-leaf-area", "root-ball-size-weight", "tree-cabling-rating", "stump-grinding-volume", "soil-volume-for-canopy",
     "log-limb-weight", "tree-rigging-shock", "felling-notch-hinge",
     "porta-wrap-friction", "chipper-debris",
     // spec-v563

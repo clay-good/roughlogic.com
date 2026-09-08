@@ -1119,6 +1119,15 @@ const _TILES = [
   ["nesc-district-loading", "A"],
   ["conductor-creep-elongation", "A"],
   ["sagging-return-wave", "A"],
+  // spec-v1696..v1700, v1691..v1693 arboriculture and abatement band
+  ["crown-reduction-leaf-area", "L"],
+  ["root-ball-size-weight", "L"],
+  ["tree-cabling-rating", "L"],
+  ["stump-grinding-volume", "L"],
+  ["soil-volume-for-canopy", "L"],
+  ["abatement-waste-containers", "D"],
+  ["lead-dust-clearance", "D"],
+  ["silica-ventilation-screen", "D"],
   // spec-v1738..v1744, v1637..v1639 groundwater, survey, and kitchen band
   ["seepage-travel-time", "E"],
   ["well-point-spacing", "E"],

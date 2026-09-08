@@ -574,7 +574,7 @@ export const BESPOKE_LABELS = {
   "multi-load-vd": {"material":"Conductor material","awg":"AWG","source_voltage_V":"Source voltage (V)"},
   "multi-motor-feeder": {"largest_flc_a":"Largest motor FLC (A, table value)","sum_other_flc_a":"Sum of other motor FLCs (A)","largest_branch_ocpd_a":"Largest motor branch OCPD (A)"},
   "mwbc-voltage-drop": {"awg":"Conductor size (AWG)","material":"Conductor material","one_way_length_ft":"One-way circuit length (ft)","load_a_amps":"Leg A load (A)","load_b_amps":"Leg B load (A)","source_volts":"Source volts, line to neutral","temperature_C":"Conductor temperature (°C)"},
-  "nam-sizing": {"room_volume_ft3":"Room volume (ft³)","target_ach":"Target air changes per hour"},
+  "nam-sizing": {"room_volume_ft3":"Room volume (ft³)","target_ach":"Target air changes per hour","filter_loading_derate_pct":"HEPA loading derate (%, 0 to skip)","target_negative_wc":"Negative pressure target (in wc, 0 to skip)","makeup_opening_ft2":"Makeup air opening (ft², 0 to skip)"},
   "nernst-equation": {"standard_potential_v":"Standard potential E0 (V)","electrons_n":"Electrons transferred n","reaction_quotient":"Reaction quotient Q","temperature_c":"Temperature (°C)"},
   "net-effective-rent": {"face_rent":"Face (base) rent ($/period, e.g. $/SF/yr)","term_periods":"Lease term (periods)","free_periods":"Free-rent periods","one_time_credit":"One-time TI / concession credit ($, 0 = none)"},
   "neutral-current-3ph": {"ia_A":"Phase A current (A)","ib_A":"Phase B current (A)","ic_A":"Phase C current (A)","triplen_pct":"Per-phase triplen (3rd-harmonic) content (%, optional)"},

@@ -1,5 +1,11 @@
 # roughlogic.com Specification v1690 -- Abatement Containment Negative Air and Air Changes (`calc-demo.js`, Group D Water Damage and Mold Restoration, abatement, 1 New Tile)
 
+> **Status: CUT 2026-09-08 -- DUPLICATE. This tile was not built.** The formula screen for the
+> 2026-09-08 arboriculture and abatement band found this question already answered by
+> `nam-sizing` in `calc-restoration.js`. That tile has computed required CFM = room volume x ACH / 60 and the machine count since spec-v43. What the spec had that it did not is the OTHER half of a containment -- the negative pressure, which is a separate requirement from the air change rate, and the fact that a machine's rated airflow is a CLEAN-FILTER figure that falls as the HEPA loads. `nam-sizing` gained a filter-loading derate, a negative pressure target, and the makeup-air opening that target needs, because a containment cannot go negative unless air can get in. Its answer with those inputs left at zero is unchanged.
+>
+> The specification below is kept as the record of the screen. Do not implement it.
+>
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-demo.js`**
 > (Group D, Water Damage and Mold Restoration -- the existing category, hub `/groups/restoration/`; abatement and demolition), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.

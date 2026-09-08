@@ -1,5 +1,11 @@
 # roughlogic.com Specification v1694 -- Demolition Debris Volume to Tonnage and Containers (`calc-demo.js`, Group D Water Damage and Mold Restoration, abatement, 1 New Tile)
 
+> **Status: CUT 2026-09-08 -- DUPLICATE. This tile was not built.** The formula screen for the
+> 2026-09-08 arboriculture and abatement band found this question already answered by
+> `demo-debris` and `dumpster-count` in `calc-construction.js` together. `demo-debris` converts a demolition volume to tonnage by structure type, and `dumpster-count` counts containers with weight and volume each able to govern. Between them they answer this spec completely, and unusually for this program there was nothing left over to land: no follow-on was made, because none was warranted.
+>
+> The specification below is kept as the record of the screen. Do not implement it.
+>
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-demo.js`**
 > (Group D, Water Damage and Mold Restoration -- the existing category, hub `/groups/restoration/`; abatement and demolition), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.

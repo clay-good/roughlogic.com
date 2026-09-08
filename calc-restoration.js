@@ -512,11 +512,17 @@ export const NAM_UNIT_SIZES_CFM = [500, 1000, 2000];
 //  `L^3 T^-1`. The recommendations array enumerates the standard
 //  500 / 1000 / 2000 CFM unit sizes (each `L^3 T^-1` internally)
 //  with dimensionless unit counts.)
-export function computeNAMSizing({ room_volume_ft3, target_ach = 6 }) {
+export function computeNAMSizing({ room_volume_ft3, target_ach = 6, filter_loading_derate_pct = 0, target_negative_wc = 0, makeup_opening_ft2 = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const v = Number(room_volume_ft3) || 0;
   const ach = Number(target_ach) || 0;
   if (v <= 0 || ach <= 0) return { error: "Provide positive volume and ACH." };
+  const derate = Number(filter_loading_derate_pct) || 0;
+  const negWc = Number(target_negative_wc) || 0;
+  const makeup = Number(makeup_opening_ft2) || 0;
+  if (derate < 0 || derate >= 100) return { error: "The filter loading derate must be at least 0 and below 100 percent." };
+  if (negWc < 0) return { error: "The negative pressure target cannot be negative (in wc)." };
+  if (makeup < 0) return { error: "The makeup opening area cannot be negative (sq ft)." };
   const required_cfm = (v * ach) / 60;
   // Recommend NAM count using the largest unit that divides cleanly, then
   // size up. We pick the smallest unit count that meets demand.
@@ -525,7 +531,32 @@ export function computeNAMSizing({ room_volume_ft3, target_ach = 6 }) {
     units_needed: Math.ceil(required_cfm / unit),
     total_cfm: Math.ceil(required_cfm / unit) * unit,
   }));
-  return { required_cfm, recommendations };
+  // spec-v1690 negative-air-ach was CUT here rather than built: the airflow
+  // above IS its relation, and the machine count is these recommendations.
+  // What it had that this did not is the OTHER half of a containment -- the
+  // negative pressure, which is a separate requirement from the air change
+  // rate, and the fact that a machine's rated airflow is a CLEAN-FILTER
+  // figure that falls as the HEPA loads. Leaving the new inputs at zero
+  // leaves the answer as it was.
+  const clean_filter_cfm = required_cfm;
+  const rated_cfm_needed = derate > 0 ? required_cfm / (1 - derate / 100) : null;
+  // A containment cannot go negative unless air can get in. The opening a
+  // given flow needs at a given pressure follows the orifice relation for
+  // air, with 4,005 the standard velocity-pressure constant in fpm and in wc.
+  const makeup_velocity_fpm = (negWc > 0) ? 4005 * Math.sqrt(negWc) : null;
+  const makeup_area_needed_ft2 = (makeup_velocity_fpm !== null && makeup_velocity_fpm > 0)
+    ? required_cfm / makeup_velocity_fpm
+    : null;
+  const makeup_adequate = (makeup_area_needed_ft2 !== null && makeup > 0)
+    ? makeup >= makeup_area_needed_ft2
+    : null;
+  return {
+    required_cfm, recommendations, clean_filter_cfm,
+    filter_loading_derate_pct: derate, rated_cfm_needed,
+    target_negative_wc: negWc > 0 ? negWc : null,
+    makeup_velocity_fpm, makeup_area_needed_ft2,
+    makeup_opening_ft2: makeup > 0 ? makeup : null, makeup_adequate,
+  };
 }
 
 export const namSizingExample = {
@@ -627,29 +658,42 @@ export function renderStandingWater(inputRegion, outputRegion, citationEl) {
 //        out: { dom_side_effect: dimensionless }
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderNAMSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Required CFM = room volume * ACH / 60. Typical NAM unit sizes 500 / 1000 / 2000 CFM (manufacturer technical bulletins).";
+  citationEl.textContent = "Citation: Required CFM = room volume x ACH / 60, by name. Typical NAM unit sizes 500 / 1000 / 2000 CFM (manufacturer technical bulletins). A machine's rated airflow is a CLEAN-FILTER figure and falls as the HEPA loads, so the rated capacity needed is the requirement divided by (1 - the derate). The NEGATIVE PRESSURE is a separate requirement from the air change rate, commonly 0.02 in wc and continuously monitored, and a containment cannot go negative unless makeup air can enter: the opening a flow needs follows the orifice relation, velocity = 4,005 x sqrt(in wc). The applicable standard, the project design, and the licensed contractor govern.";
   const v = makeNumber("Room volume (ft³)", "nam-v", { step: "any", min: "0" });
   const ach = makeNumber("Target air changes per hour", "nam-ach", { step: "any", min: "0", value: "6" });
   ach.input.value = "6";
-  for (const f of [v, ach]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { v.input.value = "8000"; ach.input.value = "6"; update(); });
+  const derate = makeNumber("HEPA loading derate (%, 0 to skip)", "nam-derate", { step: "any", min: "0", value: "0" });
+  derate.input.value = "0";
+  const negwc = makeNumber("Negative pressure target (in wc, 0 to skip)", "nam-negwc", { step: "any", min: "0", value: "0" });
+  negwc.input.value = "0";
+  const makeup = makeNumber("Makeup air opening (ft\u00b2, 0 to skip)", "nam-makeup", { step: "any", min: "0", value: "0" });
+  makeup.input.value = "0";
+  for (const f of [v, ach, derate, negwc, makeup]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { v.input.value = "8000"; ach.input.value = "6"; derate.input.value = "0"; negwc.input.value = "0"; makeup.input.value = "0"; update(); });
   const oC = makeOutputLine(outputRegion, "Required CFM", "nam-out-c");
   const o500 = makeOutputLine(outputRegion, "Using 500 CFM units", "nam-out-500");
   const o1000 = makeOutputLine(outputRegion, "Using 1000 CFM units", "nam-out-1000");
   const o2000 = makeOutputLine(outputRegion, "Using 2000 CFM units", "nam-out-2000");
+  const oRated = makeOutputLine(outputRegion, "Rated capacity to allow for filter loading", "nam-out-rated");
+  const oNeg = makeOutputLine(outputRegion, "Makeup air for the negative pressure", "nam-out-neg");
   const update = debounce(() => {
     const r = computeNAMSizing({
       room_volume_ft3: Number(v.input.value) || 0,
       target_ach: Number(ach.input.value) || 0,
+      filter_loading_derate_pct: Number(derate.input.value) || 0,
+      target_negative_wc: Number(negwc.input.value) || 0,
+      makeup_opening_ft2: Number(makeup.input.value) || 0,
     });
-    if (r.error) { oC.textContent = r.error; o500.textContent = "-"; o1000.textContent = "-"; o2000.textContent = "-"; return; }
+    if (r.error) { oC.textContent = r.error; o500.textContent = "-"; o1000.textContent = "-"; o2000.textContent = "-"; oRated.textContent = "-"; oNeg.textContent = "-"; return; }
     oC.textContent = fmt(r.required_cfm, 0) + " CFM";
     const get = (cfm) => r.recommendations.find((x) => x.unit_cfm === cfm);
     o500.textContent = get(500).units_needed + " unit(s) (" + get(500).total_cfm + " CFM)";
     o1000.textContent = get(1000).units_needed + " unit(s) (" + get(1000).total_cfm + " CFM)";
     o2000.textContent = get(2000).units_needed + " unit(s) (" + get(2000).total_cfm + " CFM)";
+    oRated.textContent = r.rated_cfm_needed === null ? "(enter a HEPA loading derate) -- a machine is rated at a CLEAN filter and delivers less as it loads" : fmt(r.rated_cfm_needed, 0) + " CFM rated to still deliver " + fmt(r.required_cfm, 0) + " at a " + fmt(r.filter_loading_derate_pct, 0) + "% derate";
+    oNeg.textContent = r.makeup_area_needed_ft2 === null ? "(enter a negative pressure target) -- pressure is a SEPARATE requirement from the air change rate, and a containment cannot go negative unless air can get in" : fmt(r.makeup_area_needed_ft2, 2) + " ft\u00b2 of opening at " + fmt(r.makeup_velocity_fpm, 0) + " fpm for " + fmt(r.target_negative_wc, 3) + " in wc" + (r.makeup_adequate === null ? "" : r.makeup_adequate ? " -- the entered opening is adequate" : " -- the entered opening is SMALLER than that, so the pressure will overshoot and the flow fall short");
   }, DEBOUNCE_MS);
-  for (const el of [v.input, ach.input]) el.addEventListener("input", update);
+  for (const el of [v.input, ach.input, derate.input, negwc.input, makeup.input]) el.addEventListener("input", update);
 }
 
 // dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }

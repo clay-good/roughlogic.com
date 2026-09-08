@@ -1501,14 +1501,19 @@ cross-check.
 | calc-arborist.js | `computeBasalAreaPrism` | `{ baf = 0, in_tree_count = 0, dbh_in = 0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeChipperDebris` | `{ green_weight_lb, chip_density_lcy = 550, box_capacity_cy } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeCrownPruningDose` | `{ live_foliage = 0, removed_foliage = 0, maturity_class = "mature" } = {}` | _ | _ | _ |
+| calc-arborist.js | `computeCrownReductionLeafArea` | `{ crown_radius_ft = 0, reduction_ft = 0, outer_third_leaf_share = 0.75, live_...` | _ | _ | _ |
 | calc-arborist.js | `computeFellingNotchHinge` | `{ cut_dia_in, notch_pct = 22, open_face = 70 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeFirewoodCord` | `{ length_ft = 0, height_ft = 0, depth_ft = 0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeLogLimbWeight` | `{ butt_dia_in, top_dia_in, length_ft, species = "generic_hardwood", density =...` | _ | _ | _ |
 | calc-arborist.js | `computePortaWrapFriction` | `{ load_lb, mu = 0.20, wraps = 3 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeQuadraticMeanDiameter` | `{ tally = "" } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeReinekeSdi` | `{ trees_per_acre = 0, qmd_in = 0, sdi_max = 0 } = {}` | _ | _ | _ |
+| calc-arborist.js | `computeRootBallSizeWeight` | `{ caliper_in = 0, ball_per_caliper_in = 10, depth_ratio = 0.65, soil_density_...` | _ | _ | _ |
+| calc-arborist.js | `computeSoilVolumeForCanopy` | `{ canopy_diameter_ft = 0, soil_per_canopy_ft3_per_ft2 = 2, pit_length_ft = 0,...` | _ | _ | _ |
+| calc-arborist.js | `computeStumpGrindingVolume` | `{ stump_diameter_in = 0, grind_diameter_in = 0, grind_depth_in = 0, swell_fac...` | _ | _ | _ |
 | calc-arborist.js | `computeThinningTargetTpa` | `{ sdi_max = 0, target_pct = 0, qmd_in = 0, current_tpa = 0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeTreeAppraisalCtla` | `{ dbh_in = 0, unit_cost_per_sq_in = 60, species_pct = 100, condition_pct = 10...` | _ | _ | _ |
+| calc-arborist.js | `computeTreeCablingRating` | `{ defect_to_tips_ft = 0, placement_fraction = 0.6667, alternative_placement_f...` | _ | _ | _ |
 | calc-arborist.js | `computeTreeCrzEncroachment` | `{ dbh_in = 0, radius_factor = 1.0, limit_distance_ft = 0, species_tolerance =...` | _ | _ | _ |
 | calc-arborist.js | `computeTreeHeightClinometer` | `{ horizontal_distance_ft = 0, top_reading_pct = 0, base_reading_pct = 0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeTreeOpenCavity` | `{ diameter_in = 0, shell_thick_in = 0, opening_width_in = 0 } = {}` | _ | _ | _ |
@@ -1921,8 +1926,11 @@ cross-check.
 | calc-cross.js | `renderUnitConverter` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-cross.js | `renderUpgradeROI` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-demo.js | `computeAbatementContainment` | `{ room_len_ft, room_wid_ft, room_ht_ft, ach_target = 4, nam_cfm = 1500, debri...` | _ | _ | _ |
+| calc-demo.js | `computeAbatementWasteContainers` | `{ area_ft2 = 0, thickness_in = 0, bulking_factor = 2, bag_volume_ft3 = 3, bag...` | _ | _ | _ |
 | calc-demo.js | `computeFloodCutQuantity` | `{ wall_run_lf, cut_height_in = 24, two_sided = false, insulated = false } = {}` | _ | _ | _ |
+| calc-demo.js | `computeLeadDustClearance` | `{ lab_result_ug = 0, wipe_area_ft2 = 1, clearance_limit_ug_ft2 = 0, rooms = 0...` | _ | _ | _ |
 | calc-demo.js | `computeMoistureDryGoal` | `{ reference_reading, affected_reading, acceptable_delta = 4 } = {}` | _ | _ | _ |
+| calc-demo.js | `computeSilicaVentilationScreen` | `{ measured_concentration_ug_m3 = 0, sample_minutes = 0, shift_minutes = 480, ...` | _ | _ | _ |
 | calc-disinfect.js | `computeMainDisinfectionChlorine` | `{ diameter_in = 0, length_ft = 0, dose_mg_l = 25, product_pct = 65 } = {}` | _ | _ | _ |
 | calc-disinfect.js | `computeWellShockChlorination` | `{ casing_diameter_in = 0, water_column_ft = 0, target_ppm = 100, bleach_pct =...` | _ | _ | _ |
 | calc-diving.js | `computeChamberGasVolume` | `{ chamber_volume_cuft = 0, treatment_pressure_psig = 0, ventilation_acfm_per_...` | _ | _ | _ |
@@ -3153,7 +3161,7 @@ cross-check.
 | calc-restoration.js | `computeMoldConditions` | `` | _ | _ | _ |
 | calc-restoration.js | `computeMoldRemediationLevel` | `{ affected_area_ft2, porous = false, hvac_involved = false, vulnerable_occupa...` | _ | _ | _ |
 | calc-restoration.js | `computeMoldRisk` | `{ rh_percent, temperature_F, hours_elevated }` | _ | _ | _ |
-| calc-restoration.js | `computeNAMSizing` | `{ room_volume_ft3, target_ach = 6 }` | _ | _ | _ |
+| calc-restoration.js | `computeNAMSizing` | `{ room_volume_ft3, target_ach = 6, filter_loading_derate_pct = 0, target_nega...` | _ | _ | _ |
 | calc-restoration.js | `computeOzoneShockTreatment` | `{ structure_volume_ft3 = 0, rated_volume_per_unit = 2000, treatment_time_hr =...` | _ | _ | _ |
 | calc-restoration.js | `computePPE` | `{ category }` | _ | _ | _ |
 | calc-restoration.js | `computePsychrometric` | `{ temperature_F, RH_percent, atmospheric_pressure_hPa = 1013.25 }` | _ | _ | _ |
@@ -3615,7 +3623,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2201.
+Row count: 2209.
 
 <!-- END function-corpus-v14 -->
 
@@ -4240,11 +4248,12 @@ per spec-v14 §13.1 second paragraph.
 | `window-overhang-shade` | Window Overhang Shading (Profile Angle and Shade Line) | ASHRAE Handbook-Fundamentals (Fenestr...; spec-v1012 section 2.1 pinned example; tan(profile) = tan... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `window-solar-heat-gain` | Window Solar Heat Gain and Conduction Cooling Load | ASHRAE / ACCA Manual J fenestration; spec-v227 section 2.1 pinned example (west window) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group D Restoration (53 tiles)
+### Group D Restoration (56 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `abatement-containment` | Asbestos / Lead Abatement Containment Take-Off | EPA NESHAP 40 CFR 61 M / OSHA 1926.1101; 20 x 15 x 9 containment, 4 ACH, 1,500 cfm machines, 3 cy ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `abatement-waste-containers` | Abatement Waste Bulking, Bags, and Containers | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `air-movers` | Air Mover Placement | IICRC S500-2021 air-mover sizing tabl...; 600 ft^2 / Class 2 -> 6 air movers / 15,000 total cfm / c... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `air-sample-volume` | Air Sample Run Time and Volume | ASTM D7391 spore-trap method; cassett...; 15 L/min, 75 L, 3 cassettes -> 5.0 min (300 s) each, 225 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `antimicrobial-dilution` | Antimicrobial Mix and Coverage | FIFRA / EPA-registered product label;...; 400 ft2 at 200 ft2/gal, 4 oz/gal, 1.5 gal tank -> 2.0 gal... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4277,6 +4286,7 @@ per spec-v14 §13.1 second paragraph.
 | `hardwood-floor-drying-mat` | Hardwood Floor Drying-Mat System Sizing | ANSI/IICRC S500 Class 4 specialty drying; 120 ft^2 at 6 ft^2/mat, 16 mats/unit -> 20 mats, 2 units | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hepa-filter-life` | HEPA Scrubber Filter Life | EPA / IICRC S520 HEPA loading practic...; 1000 cfm / 8 hr/day / medium / 5-day job / $80 filter -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hydroxyl-sizing` | Hydroxyl Generator Sizing by Volume (IICRC S700) | ANSI/IICRC S700 volume-and-coverage s...; 12,000 ft^3 / 6,000 ft^3 per unit -> 2 generators | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `lead-dust-clearance` | Lead Dust Clearance Loading and Wipe Count | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `moisture-dry-goal` | Dry Standard vs Affected Reading | IICRC S500-2021 dry-standard concept; reference 12, affected 35, delta-allow 4 -> delta 23, con... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mold` | Mold Growth Conditions | EPA / IICRC S520-2024 mold-risk practice; 80% RH / 75 F / 60 hr elevated -> high risk; exercises th... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mold-cleaning-labor` | Mold Surface Remediation Labor and HEPA Vacuuming | ANSI/IICRC S520 source removal; 500 ft^2 at 100 ft^2/hr, 2 passes, crew 2 -> 10.0 labor-h... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4287,6 +4297,7 @@ per spec-v14 §13.1 second paragraph.
 | `ppe` | PPE Selection | OSHA / IICRC S500 PPE category schedule; Category 1 -> nitrile gloves, safety glasses, work clothi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `psychrometric` | Psychrometric Calculator | ASHRAE Handbook (Fundamentals); 75 F @ 50% RH -> dew point ~55.1 F, ~64.5 GPP (grains per... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sewage-loss-disposal` | Category 3 Loss Disposal Volume, Containers, and Routing | Project (first-principles); loose = in place x bulking factor | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `silica-ventilation-screen` | Respirable Silica Exposure and Control Screen | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `smoke-residue-method` | Smoke Residue Type and Cleaning Method Screen | ANSI/IICRC S700 residue-method mapping; dry residue -> dry-sponge then dry/wet cleaning | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `soot-cleaning-takeoff` | Dry-Sponge Soot Cleaning Takeoff and Seal Coat | ANSI/IICRC S700 fire and smoke restor...; 1200 ft^2 at 100 ft^2/sponge, 150 ft^2/hr, seal -> 12, 8.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spore-io-ratio` | Indoor/Outdoor Spore Ratio Clearance Screen | ANSI/IICRC S520 (indoor/outdoor clear...; 800 vs 1,500 spores/m^3, no marker -> 0.53 ratio, support... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5272,7 +5283,7 @@ per spec-v14 §13.1 second paragraph.
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `worm-gear-geometry` | Worm and Worm-Wheel Geometry | Machinery's Handbook (worm gearing); lead = 0.5 x 1 = 0.5 in; lead angle = atan(0.5/(pi x 2)) ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group L Agriculture (78 tiles)
+### Group L Agriculture (83 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5288,6 +5299,7 @@ per spec-v14 §13.1 second paragraph.
 | `corn-yield-estimate` | Pre-Harvest Corn Yield (Yield Component Method) | Pre-harvest corn yield (yield compone...; kernels/ear = 16 x 35 = 560; bu/ac = 32 x 560 / 90 = 17,9... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `crop-yield` | Crop Yield and Harvest Loss | USDA NASS yield-strip identity (proje...; Corn / 2 rows @ 30 in / 50 ft strip / 8 lb / 18% moisture... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `crown-pruning-dose` | Live Crown Removal Limit (Pruning Dose) | ANSI A300 Part 1 / ISA BMP - Pruning; 15 of 100 live foliage, mature -> 15% removal, cap 25% (w... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `crown-reduction-leaf-area` | Crown Reduction and Leaf Area Removed | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `drawbar-power` | Tractor Drawbar Power | ASABE; DBHP = pull * mph / 375 = 4500 * 4.5 / 375 = 54; PTO ~= 5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `drawbar-pull` | Tractor Drawbar Pull from Power | ASABE (inverse); 75 PTO hp at 4.5 mph on firm soil (0.72) -> 54 drawbar hp... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dressing-percentage` | Carcass Dressing Percentage and Freezer Yield | Carcass dressing percentage and freez...; dressing = 744/1200 x 100 = 62.0%; boneless = 744 x 0.67 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5331,20 +5343,24 @@ per spec-v14 §13.1 second paragraph.
 | `quadratic-mean-diameter` | Quadratic Mean Diameter (from a Tally) | USDA Forest Service forest-mensuratio...; Five-tree tally 8, 10, 10, 12, 14 in -> sum_sq 604, QMD s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `reference-et0` | Reference Evapotranspiration ET0 (Hargreaves / FAO-56) | Hargreaves & Samani 1985 / FAO-56 (Ra...; J=197 (mid-July); Tmax=30C, Tmin=15C, Tmean=22.5C, dT=15;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `reineke-sdi` | Reineke Stand Density Index | Reineke Stand Density Index (Reineke ...; 300 TPA, QMD 10 in, SDI_max 400 -> SDI 300, 75% of max (u... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `root-ball-size-weight` | Tree Root Ball Diameter and Weight (ANSI Z60.1) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sawmill-residue-yield` | Sawmill Residue, Sawdust, and Chip Yield | Project (first-principles); the residue buyers' specifications and NFPA 664 govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `seed-rate` | Planting Density and Seed Rate | Project (first-principles); 30 in rows / 32,000 plants/ac target / 1,500 seeds/lb / 9... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sod-takeoff` | Sod Takeoff (Slabs and Pallets) | Turfgrass producer / landscape estima...; spec-v211 section 2.1 pinned example (residential lawn) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `soil-volume-for-canopy` | Soil Volume Required for a Target Canopy | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spray-drift-buffer` | Downwind Spray Drift Buffer | USDA land-grant extension drift-manag...; Medium droplets (base 20 ft), 15 mph, 30 in boom, 20 in r... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `sprayer-calibration` | Sprayer 1/128-Acre Calibration | USDA Cooperative Extension Service; travel_distance_ft = 43560/128 / boom_width; gpa = oz_per... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sprayer-field-capacity` | Sprayer Field Capacity and Spray Time | USDA land-grant extension sprayer fie...; 30 ft boom, 6 mph, 70% eff, 80 acres, 300 gal tank, 15 GP... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `sprinkler-gpm-for-precip` | Sprinkler Zone Flow for a Target Precip Rate | Irrigation Association / Rain Bird / ...; spec-v736 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sprinkler-precip-rate` | Sprinkler Precipitation Rate | Irrigation Association / Rain Bird / ...; spec-v207 section 2.1 pinned example (rotor lawn zone) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `stump-grinding-volume` | Stump Grinding Volume, Chip Yield, and Backfill | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tank-mix` | Pesticide Tank-Mix and Acres per Tank | EPA / USDA NRCS; acres/tank = 300/15 = 20; product/tank = 20*1.5 = 30 pt; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thi-livestock` | Temperature-Humidity Index (Livestock) | USDA-ARS / K-State Extension; THI = T_F - (0.55 - 0.0055*RH) * (T_F - 58) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thinning-target-tpa` | Thinning Target TPA From a Target SDI | Reineke 1933 / USDA FS stocking-guide...; SDI_max 450 at 35%, QMD 10 in, current 300 TPA -> target ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `timber-cruise` | Timber Cruise (Doyle / Scribner / International 1/4) | Project (first-principles); Doyle rule (public-domain timber-cruising convention) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tractor-ballast` | Tractor Ballast for a Target Weight-to-Power Ratio | tractor ballasting rule (ASABE); target = 125*180 = 22500; change = 22500 - 18000 = 4500 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tree-appraisal-ctla` | Tree Appraisal by the CTLA Trunk Formula | CTLA trunk formula method; 24 in DBH -> trunk area pi/4 x 576 = 452.39 sq in; basic ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `tree-cabling-rating` | Tree Cabling Placement and System Rating (ANSI A300) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tree-crz-encroachment` | Critical Root Zone Encroachment Percent | ANSI A300 Part 5 tree protection / ar...; 20-in DBH, 1.0 ft/in factor (R 20 ft), limit line 5 ft fr... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tree-height-clinometer` | Clinometer Tree Height (Percent-Slope) | USDA Forest Service mensuration / hyp...; H = 100 x (58 - (-4))/100 = 62 ft (58 ft above eye + 4 ft... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tree-open-cavity` | Open-Cavity Trunk Strength Loss (Smiley & Fraedrich) | Smiley & Fraedrich (1992) open-cavity...; 24-in trunk, 3-in wall, 8-in opening -> R 0.106, open los... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5738,6 +5754,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1950. Fixture-covered or reference-cadence: 1950 / 1950.
+Tile count: 1958. Fixture-covered or reference-cadence: 1958 / 1958.
 
 <!-- END tile-index-v14 -->

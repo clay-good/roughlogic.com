@@ -1562,6 +1562,15 @@ const RELATED = {
   "nesc-district-loading": ["conductor-sag-at-temperature","transverse-wind-load-conductor","conductor-blowout"],
   "conductor-creep-elongation": ["conductor-sag-at-temperature","line-ground-clearance-nesc","ruling-span"],
   "sagging-return-wave": ["ruling-span","conductor-sag-at-temperature","line-ground-clearance-nesc"],
+  // spec-v1696..v1700, v1691..v1693: arboriculture and abatement band.
+  "crown-reduction-leaf-area": ["crown-pruning-dose","trunk-decay-strength","tree-protection-zone"],
+  "root-ball-size-weight": ["soil-volume-for-canopy","tree-protection-zone","log-limb-weight"],
+  "tree-cabling-rating": ["trunk-decay-strength","crown-reduction-leaf-area","wire-rope-strength"],
+  "stump-grinding-volume": ["chipper-debris","mulch-topsoil-volume","soil-volume-for-canopy"],
+  "soil-volume-for-canopy": ["root-ball-size-weight","tree-protection-zone","mulch-topsoil-volume"],
+  "abatement-waste-containers": ["nam-sizing","dumpster-count","lead-dust-clearance"],
+  "lead-dust-clearance": ["abatement-waste-containers","silica-ventilation-screen","nam-sizing"],
+  "silica-ventilation-screen": ["lead-dust-clearance","dust-collection-duct","nam-sizing"],
   // spec-v1738..v1744, v1637..v1639: groundwater, survey, and kitchen band.
   "seepage-travel-time": ["well-point-spacing","soil-permeability","well-drawdown"],
   "well-point-spacing": ["dewatering-rate","seepage-travel-time","trench-slope"],

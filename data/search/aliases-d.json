@@ -726,6 +726,21 @@
     {"term":"how long to extract this loss","target":"water-extraction-rate","kind":"question"},
     {"term":"category 3 disposal","target":"sewage-loss-disposal","kind":"industry"},
     {"term":"sewage loss debris","target":"sewage-loss-disposal","kind":"industry"},
-    {"term":"contaminated debris bags","target":"sewage-loss-disposal","kind":"industry"}
+    {"term":"contaminated debris bags","target":"sewage-loss-disposal","kind":"industry"},
+    {"term":"abatement waste bags","target":"abatement-waste-containers","kind":"industry"},
+    {"term":"asbestos waste bulking factor","target":"abatement-waste-containers","kind":"industry"},
+    {"term":"abatement container count","target":"abatement-waste-containers","kind":"industry"},
+    {"term":"double bagged waste volume","target":"abatement-waste-containers","kind":"industry"},
+    {"term":"regulated waste bag count","target":"abatement-waste-containers","kind":"industry"},
+    {"term":"lead dust clearance loading","target":"lead-dust-clearance","kind":"industry"},
+    {"term":"lead wipe micrograms per square foot","target":"lead-dust-clearance","kind":"industry"},
+    {"term":"hud lead clearance limit","target":"lead-dust-clearance","kind":"industry"},
+    {"term":"lead dust wipe count","target":"lead-dust-clearance","kind":"industry"},
+    {"term":"clearance testing lead","target":"lead-dust-clearance","kind":"industry"},
+    {"term":"respirable silica twa","target":"silica-ventilation-screen","kind":"industry"},
+    {"term":"osha silica pel action level","target":"silica-ventilation-screen","kind":"industry"},
+    {"term":"silica table 1 controls","target":"silica-ventilation-screen","kind":"industry"},
+    {"term":"silica exposure task time","target":"silica-ventilation-screen","kind":"industry"},
+    {"term":"crystalline silica screen","target":"silica-ventilation-screen","kind":"industry"}
   ]
 }

@@ -47708,3 +47708,340 @@ test("bounds: spec-v1737 cut -- well-drawdown gains storativity, Cooper-Jacob un
   assert.ok(Math.abs(farther.storativity - obs.storativity / 4) < 1e-12);
   assert.ok("error" in _v1737host({ static_level_ft: 50, pumping_level_ft: 80, discharge_gpm: 250, observation_distance_ft: -1 }));
 });
+
+// ===========================================================================
+// spec-v1696..v1700 and spec-v1691..v1693: the 2026-09-08 trade-expansion
+// arboriculture and abatement band. Eight tiles across two existing modules.
+//
+// THREE OF THE BAND'S ELEVEN SPECS WERE CUT as duplicates:
+//   spec-v1690 -> `nam-sizing`, which already computed CFM = volume x ACH / 60
+//     and the machine count. It gained the negative pressure and the HEPA
+//     loading derate.
+//   spec-v1694 -> `demo-debris` and `dumpster-count` together, which answer it
+//     completely; nothing was left to add.
+//   spec-v1695 -> `trunk-decay-strength`, which screens the same hollow trunk.
+//     The two differ only in convention -- Wagener's cube against the
+//     section-modulus fourth power -- so the fourth-power figure landed beside
+//     the cube rather than in a second tile that would disagree with the first.
+// ===========================================================================
+
+import { computeCrownReductionLeafArea as _v1696 } from "../../calc-arborist.js";
+test("bounds: spec-v1696 computeCrownReductionLeafArea -- the geometry compounds twice", () => {
+  const base = { crown_radius_ft: 20, reduction_ft: 4, outer_third_leaf_share: 0.75, live_crown_cap_pct: 25 };
+  const r = _v1696(base);
+  assert.ok(Math.abs(r.original_area_ft2 - Math.PI * 400) < 1e-9);
+  assert.ok(Math.abs(r.radius_removed_pct - 20) < 1e-12);
+  assert.ok(Math.abs(r.area_removed_pct - 36) < 1e-9);
+  assert.ok(r.leaf_area_removed_pct > r.area_removed_pct);
+  assert.ok(r.amplification > 1);
+  assert.equal(r.within_cap, false);
+  // A fifth off the radius is over a third of the AREA, because area goes as
+  // the square -- 1 - 0.8^2 = 0.36 exactly.
+  assert.ok(Math.abs(r.area_removed_pct - (1 - 0.8 * 0.8) * 100) < 1e-9);
+  // Leaf area removed rises monotonically with the reduction and reaches
+  // everything when the whole crown goes.
+  let last = -1;
+  for (const cut of [1, 2, 4, 8, 12, 19]) {
+    const x = _v1696({ ...base, reduction_ft: cut });
+    assert.ok(x.leaf_area_removed_pct > last);
+    last = x.leaf_area_removed_pct;
+    assert.ok(x.leaf_area_removed_pct <= 100 + 1e-9);
+  }
+  // The reduction that just reaches the cap, fed back in, lands on the cap.
+  assert.ok(r.radius_for_cap_ft > 0 && r.radius_for_cap_ft < base.reduction_ft);
+  const at = _v1696({ ...base, reduction_ft: r.radius_for_cap_ft });
+  assert.ok(Math.abs(at.leaf_area_removed_pct - base.live_crown_cap_pct) < 1e-6);
+  // With foliage spread evenly the amplification disappears: leaf area
+  // removed is exactly the area removed.
+  const evenShare = 1 - (2 / 3) * (2 / 3);
+  const even = _v1696({ ...base, outer_third_leaf_share: evenShare });
+  assert.ok(Math.abs(even.leaf_area_removed_pct - even.area_removed_pct) < 1e-6);
+  assert.ok(Math.abs(even.amplification - 1) < 1e-6);
+  assert.ok("error" in _v1696({ ...base, reduction_ft: 20 }));
+  assert.ok("error" in _v1696({ ...base, outer_third_leaf_share: 0 }));
+});
+
+import { computeRootBallSizeWeight as _v1697 } from "../../calc-arborist.js";
+test("bounds: spec-v1697 computeRootBallSizeWeight -- weight goes as the cube of caliper", () => {
+  const base = { caliper_in: 6, ball_per_caliper_in: 10, depth_ratio: 0.65, soil_density_pcf: 105, handling_limit_lb: 2000 };
+  const r = _v1697(base);
+  assert.ok(Math.abs(r.ball_diameter_in - 60) < 1e-12);
+  assert.ok(Math.abs(r.ball_diameter_ft - 5) < 1e-12);
+  assert.ok(Math.abs(r.ball_depth_ft - 3.25) < 1e-12);
+  assert.ok(Math.abs(r.ball_volume_ft3 - 63.8135) < 1e-3);
+  assert.ok(Math.abs(r.ball_weight_lb - 6700.4) < 0.5);
+  // spec-v1697 calls this "over 3.4 tons". It is 3.35.
+  assert.ok(Math.abs(r.ball_weight_tons - 3.3502) < 1e-3);
+  assert.ok(r.ball_weight_tons < 3.4);
+  assert.equal(r.within_handling, false);
+  // Weight is exactly cubic in caliper at a fixed ratio: double the caliper
+  // is eight times the weight.
+  const twice = _v1697({ ...base, caliper_in: 12 });
+  assert.ok(Math.abs(twice.ball_weight_lb - 8 * r.ball_weight_lb) < 1e-6);
+  // And exactly linear in soil density.
+  assert.ok(Math.abs(_v1697({ ...base, soil_density_pcf: 210 }).ball_weight_lb - 2 * r.ball_weight_lb) < 1e-6);
+  // The caliper a handling limit carries, fed back in, lands on the limit.
+  const at = _v1697({ ...base, caliper_in: r.caliper_for_limit_in });
+  assert.ok(Math.abs(at.ball_weight_lb - base.handling_limit_lb) < 1e-3);
+  // A larger ball ratio is more weight for the same tree.
+  const bigger = _v1697({ ...base, ball_per_caliper_in: 12 });
+  assert.ok(bigger.ball_weight_lb > r.ball_weight_lb);
+  assert.ok("error" in _v1697({ ...base, depth_ratio: 1.5 }));
+  assert.ok("error" in _v1697({ ...base, caliper_in: 0 }));
+});
+
+import { computeTreeCablingRating as _v1698 } from "../../calc-arborist.js";
+test("bounds: spec-v1698 computeTreeCablingRating -- a low cable carries twice the force", () => {
+  const base = { defect_to_tips_ft: 24, placement_fraction: 0.6667, alternative_placement_ft: 8, design_load_lb: 1200, cable_rating_lb: 4000, termination_rating_lb: 3600, anchor_rating_lb: 2800, cable_count: 1 };
+  const r = _v1698(base);
+  assert.ok(Math.abs(r.placement_height_ft - 16.0008) < 1e-3);
+  assert.ok(Math.abs(r.force_at_placement_lb - 1800) < 1);
+  assert.ok(Math.abs(r.force_at_alternative_lb - 3600) < 1e-6);
+  // spec-v1698's headline: a cable at a third carries twice the force of one
+  // at two thirds, because it works at half the lever.
+  assert.ok(Math.abs(r.force_multiple - 2) < 1e-3);
+  // The system rating is the MINIMUM of the three, and it is the anchors here.
+  assert.ok(Math.abs(r.system_rating_lb - 2800) < 1e-12);
+  assert.equal(r.weakest, "the anchors");
+  assert.equal(r.within_rating, true);
+  // Force is exactly inverse in the placement height and linear in the load.
+  const high = _v1698({ ...base, placement_fraction: 1 });
+  assert.ok(Math.abs(high.force_at_placement_lb - base.design_load_lb) < 1e-9);
+  assert.ok(Math.abs(_v1698({ ...base, design_load_lb: 2400 }).force_at_placement_lb - 2 * r.force_at_placement_lb) < 1e-6);
+  // Two cables share the load exactly.
+  const two = _v1698({ ...base, cable_count: 2 });
+  assert.ok(Math.abs(two.force_at_placement_lb - r.force_at_placement_lb / 2) < 1e-9);
+  // A weaker cable becomes the weakest link, and the tile names it.
+  const weakCable = _v1698({ ...base, cable_rating_lb: 1000 });
+  assert.ok(Math.abs(weakCable.system_rating_lb - 1000) < 1e-12);
+  assert.equal(weakCable.weakest, "the cable");
+  assert.equal(weakCable.within_rating, false);
+  assert.ok(weakCable.verdict.startsWith("OVER RATING"));
+  assert.ok("error" in _v1698({ ...base, placement_fraction: 0 }));
+  assert.ok("error" in _v1698({ ...base, design_load_lb: 0 }));
+});
+
+import { computeStumpGrindingVolume as _v1699 } from "../../calc-arborist.js";
+test("bounds: spec-v1699 computeStumpGrindingVolume -- the flare is most of the job", () => {
+  const base = { stump_diameter_in: 24, grind_diameter_in: 36, grind_depth_in: 12, swell_factor: 1.8, settlement_fraction: 0.3 };
+  const r = _v1699(base);
+  assert.ok(Math.abs(r.stump_only_volume_ft3 - Math.PI) < 1e-6);
+  assert.ok(Math.abs(r.in_place_volume_ft3 - Math.PI * 9 / 4) < 1e-6);
+  // The flare multiple is exactly the square of the diameter ratio.
+  assert.ok(Math.abs(r.flare_multiple - (36 / 24) ** 2) < 1e-9);
+  assert.ok(Math.abs(r.flare_multiple - 2.25) < 1e-9);
+  assert.ok(Math.abs(r.chip_volume_ft3 - r.in_place_volume_ft3 * 1.8) < 1e-9);
+  // The hole holds its own in-place volume and the rest is excess, so the two
+  // always sum to the chips produced.
+  assert.ok(Math.abs(r.backfill_volume_ft3 + r.excess_volume_ft3 - r.chip_volume_ft3) < 1e-9);
+  assert.ok(Math.abs(r.backfill_volume_ft3 - r.in_place_volume_ft3) < 1e-9);
+  // At a swell of exactly one the chips fit and nothing is left over.
+  const noSwell = _v1699({ ...base, swell_factor: 1 });
+  assert.ok(Math.abs(noSwell.excess_volume_ft3) < 1e-12);
+  assert.ok(Math.abs(noSwell.backfill_volume_ft3 - noSwell.in_place_volume_ft3) < 1e-9);
+  // Settlement is exactly what has to be topped later.
+  assert.ok(Math.abs(r.settled_volume_ft3 - r.backfill_volume_ft3 * 0.7) < 1e-9);
+  assert.ok(Math.abs(r.topping_volume_ft3 - (r.in_place_volume_ft3 - r.settled_volume_ft3)) < 1e-9);
+  const noSettle = _v1699({ ...base, settlement_fraction: 0 });
+  assert.ok(Math.abs(noSettle.topping_volume_ft3) < 1e-9);
+  // A grind at the stump diameter has no flare multiple at all.
+  const noFlare = _v1699({ ...base, grind_diameter_in: base.stump_diameter_in });
+  assert.ok(Math.abs(noFlare.flare_multiple - 1) < 1e-12);
+  assert.ok("error" in _v1699({ ...base, grind_diameter_in: 12 }));
+  assert.ok("error" in _v1699({ ...base, swell_factor: 0.5 }));
+});
+
+import { computeSoilVolumeForCanopy as _v1700 } from "../../calc-arborist.js";
+test("bounds: spec-v1700 computeSoilVolumeForCanopy -- the pit provides 8 percent of it", () => {
+  const base = { canopy_diameter_ft: 25, soil_per_canopy_ft3_per_ft2: 2, pit_length_ft: 5, pit_width_ft: 5, pit_depth_ft: 3, usable_fraction: 1 };
+  const r = _v1700(base);
+  assert.ok(Math.abs(r.canopy_area_ft2 - Math.PI / 4 * 625) < 1e-9);
+  assert.ok(Math.abs(r.canopy_area_ft2 - 490.8739) < 1e-3);
+  assert.ok(Math.abs(r.soil_required_ft3 - 981.7477) < 1e-3);
+  assert.ok(Math.abs(r.pit_volume_ft3 - 75) < 1e-12);
+  assert.ok(Math.abs(r.provision_pct - 7.6395) < 1e-3);
+  assert.equal(r.adequate, false);
+  // The canopy the pit supports, fed back in, needs exactly the pit volume.
+  const supported = _v1700({ ...base, canopy_diameter_ft: r.supported_canopy_ft });
+  assert.ok(Math.abs(supported.soil_required_ft3 - r.usable_pit_volume_ft3) < 1e-6);
+  const justUnder = _v1700({ ...base, canopy_diameter_ft: r.supported_canopy_ft * 0.999 });
+  assert.equal(justUnder.adequate, true);
+  const justOver = _v1700({ ...base, canopy_diameter_ft: r.supported_canopy_ft * 1.001 });
+  assert.equal(justOver.adequate, false);
+  // Requirement is exactly quadratic in canopy diameter and linear in the ratio.
+  assert.ok(Math.abs(_v1700({ ...base, canopy_diameter_ft: 50 }).soil_required_ft3 - 4 * r.soil_required_ft3) < 1e-6);
+  assert.ok(Math.abs(_v1700({ ...base, soil_per_canopy_ft3_per_ft2: 1 }).soil_required_ft3 - r.soil_required_ft3 / 2) < 1e-9);
+  // Compacted soil does not count: halving the usable fraction halves what
+  // the pit provides, and halves the canopy area it supports.
+  const compacted = _v1700({ ...base, usable_fraction: 0.5 });
+  assert.ok(Math.abs(compacted.usable_pit_volume_ft3 - r.usable_pit_volume_ft3 / 2) < 1e-9);
+  assert.ok(Math.abs(compacted.supported_area_ft2 - r.supported_area_ft2 / 2) < 1e-9);
+  assert.ok("error" in _v1700({ ...base, usable_fraction: 0 }));
+  assert.ok("error" in _v1700({ ...base, canopy_diameter_ft: 0 }));
+});
+
+import { computeAbatementWasteContainers as _v1691 } from "../../calc-demo.js";
+test("bounds: spec-v1691 computeAbatementWasteContainers -- bulking is air, so weight follows in place", () => {
+  const base = { area_ft2: 2000, thickness_in: 1, bulking_factor: 2, bag_volume_ft3: 3, bag_fill_fraction: 0.7, material_density_pcf: 30, container_volume_yd3: 20 };
+  const r = _v1691(base);
+  assert.ok(Math.abs(r.in_place_volume_ft3 - 2000 / 12) < 1e-9);
+  assert.ok(Math.abs(r.bulked_volume_ft3 - 2 * r.in_place_volume_ft3) < 1e-9);
+  assert.ok(Math.abs(r.usable_bag_volume_ft3 - 2.1) < 1e-12);
+  assert.equal(r.bag_count, Math.ceil(r.bulked_volume_ft3 / 2.1));
+  assert.equal(r.container_count, 1);
+  // WEIGHT FOLLOWS THE IN-PLACE VOLUME, so bulking does not touch it.
+  assert.ok(Math.abs(r.waste_weight_lb - r.in_place_volume_ft3 * 30) < 1e-9);
+  const bulkier = _v1691({ ...base, bulking_factor: 3 });
+  assert.ok(Math.abs(bulkier.waste_weight_lb - r.waste_weight_lb) < 1e-9);
+  assert.ok(bulkier.bulked_volume_ft3 > r.bulked_volume_ft3);
+  assert.ok(bulkier.bag_count > r.bag_count);
+  // The naive count -- in-place volume in full bags -- understates it badly,
+  // which is the comparison the note is about.
+  assert.ok(r.bag_count > r.naive_bag_count);
+  assert.ok(Math.abs(r.bag_multiple - r.bag_count / r.naive_bag_count) < 1e-9);
+  assert.ok(r.bag_multiple > 2.5);
+  // At a bulking factor of one and a full bag the two counts coincide.
+  const naive = _v1691({ ...base, bulking_factor: 1, bag_fill_fraction: 1 });
+  assert.equal(naive.bag_count, naive.naive_bag_count);
+  assert.ok("error" in _v1691({ ...base, bulking_factor: 0.8 }));
+  assert.ok("error" in _v1691({ ...base, bag_fill_fraction: 1.5 }));
+});
+
+import { computeLeadDustClearance as _v1692 } from "../../calc-demo.js";
+test("bounds: spec-v1692 computeLeadDustClearance -- the limit is a startlingly small amount of dust", () => {
+  const base = { lab_result_ug: 12, wipe_area_ft2: 1, clearance_limit_ug_ft2: 10, rooms: 4, surfaces_per_room: 3, blanks_per_job: 1 };
+  const r = _v1692(base);
+  assert.ok(Math.abs(r.dust_loading_ug_ft2 - 12) < 1e-12);
+  assert.equal(r.passes, false);
+  assert.ok(Math.abs(r.limit_margin_ug_ft2 - -2) < 1e-12);
+  assert.ok(Math.abs(r.loading_ratio - 1.2) < 1e-12);
+  assert.ok(Math.abs(r.max_lab_result_ug - 10) < 1e-12);
+  assert.equal(r.wipe_count, 12);
+  assert.equal(r.total_samples, 13);
+  // The wiped area is the denominator, so getting it wrong moves the result
+  // in exact proportion -- which is why a template is used.
+  const doubleArea = _v1692({ ...base, wipe_area_ft2: 2 });
+  assert.ok(Math.abs(doubleArea.dust_loading_ug_ft2 - r.dust_loading_ug_ft2 / 2) < 1e-12);
+  assert.equal(doubleArea.passes, true);
+  // And the laboratory result a wipe can carry scales with it too.
+  assert.ok(Math.abs(doubleArea.max_lab_result_ug - 2 * r.max_lab_result_ug) < 1e-12);
+  // The max result, fed back in, lands exactly on the limit and passes.
+  const at = _v1692({ ...base, lab_result_ug: r.max_lab_result_ug });
+  assert.ok(Math.abs(at.dust_loading_ug_ft2 - base.clearance_limit_ug_ft2) < 1e-12);
+  assert.equal(at.passes, true);
+  assert.ok(Math.abs(at.loading_ratio - 1) < 1e-12);
+  // A tighter limit fails the same wipe, which is what a superseded number
+  // hides.
+  const tighter = _v1692({ ...base, clearance_limit_ug_ft2: 5 });
+  assert.equal(tighter.passes, false);
+  assert.ok(Math.abs(tighter.loading_ratio - 2.4) < 1e-12);
+  assert.ok("error" in _v1692({ ...base, wipe_area_ft2: 0 }));
+  assert.ok("error" in _v1692({ ...base, clearance_limit_ug_ft2: 0 }));
+});
+
+import { computeSilicaVentilationScreen as _v1693 } from "../../calc-demo.js";
+test("bounds: spec-v1693 computeSilicaVentilationScreen -- task time is a control", () => {
+  const base = { measured_concentration_ug_m3: 180, sample_minutes: 240, shift_minutes: 480, pel_ug_m3: 50, action_level_ug_m3: 25, control_efficiency_pct: 80 };
+  const r = _v1693(base);
+  assert.ok(Math.abs(r.twa_ug_m3 - 90) < 1e-12);
+  assert.ok(Math.abs(r.pel_ratio - 1.8) < 1e-12);
+  assert.equal(r.over_pel, true);
+  assert.equal(r.over_action_level, true);
+  assert.ok(Math.abs(r.required_efficiency_pct - (1 - 50 / 90) * 100) < 1e-9);
+  assert.ok(Math.abs(r.controlled_twa_ug_m3 - 18) < 1e-9);
+  assert.equal(r.controlled_over_pel, false);
+  assert.ok(Math.abs(r.max_task_minutes - 50 * 480 / 180) < 1e-9);
+  // The TWA is exactly linear in concentration and in sampled time.
+  assert.ok(Math.abs(_v1693({ ...base, measured_concentration_ug_m3: 360 }).twa_ug_m3 - 2 * r.twa_ug_m3) < 1e-9);
+  assert.ok(Math.abs(_v1693({ ...base, sample_minutes: 120 }).twa_ug_m3 - r.twa_ug_m3 / 2) < 1e-9);
+  // A full shift at the measured concentration IS that concentration.
+  const allShift = _v1693({ ...base, sample_minutes: 480 });
+  assert.ok(Math.abs(allShift.twa_ug_m3 - base.measured_concentration_ug_m3) < 1e-9);
+  // The task time that reaches the PEL, fed back in, lands on it exactly.
+  const at = _v1693({ ...base, sample_minutes: r.max_task_minutes });
+  assert.ok(Math.abs(at.twa_ug_m3 - base.pel_ug_m3) < 1e-9);
+  // The required efficiency, applied, lands on the PEL exactly.
+  const controlled = _v1693({ ...base, control_efficiency_pct: r.required_efficiency_pct });
+  assert.ok(Math.abs(controlled.controlled_twa_ug_m3 - base.pel_ug_m3) < 1e-9);
+  // Between the action level and the PEL the verdict names both, because the
+  // action level is a trigger rather than a safe line.
+  const between = _v1693({ ...base, sample_minutes: 100 });
+  assert.equal(between.over_pel, false);
+  assert.equal(between.over_action_level, true);
+  assert.ok(between.verdict.startsWith("OVER THE ACTION LEVEL, UNDER THE PEL"));
+  // Under both, nothing is triggered.
+  const low = _v1693({ ...base, sample_minutes: 40 });
+  assert.equal(low.over_action_level, false);
+  assert.ok(low.verdict.startsWith("UNDER THE ACTION LEVEL"));
+  assert.ok(Math.abs(low.required_efficiency_pct) < 1e-12);
+  assert.ok("error" in _v1693({ ...base, sample_minutes: 600 }));
+  assert.ok("error" in _v1693({ ...base, control_efficiency_pct: 100 }));
+});
+
+import { computeTrunkDecayStrength as _v1695host } from "../../calc-arborist.js";
+test("bounds: spec-v1695 cut -- trunk-decay-strength reports both conventions", () => {
+  const r = _v1695host({ diameter_in: 24, shell_thick_in: 4 });
+  // Wagener's cube, which this tile has always reported, is unchanged.
+  assert.ok(Math.abs(r.hollow_d_in - 16) < 1e-12);
+  assert.ok(Math.abs(r.loss_pct - (16 ** 3 / 24 ** 3) * 100) < 1e-9);
+  assert.ok(Math.abs(r.loss_pct - 29.6296) < 1e-3);
+  assert.ok(Math.abs(r.t_over_r - 1 / 3) < 1e-9);
+  assert.equal(r.concern, false);
+  // spec-v1695's convention -- the section modulus of a hollow circle, which
+  // gives the fourth power -- now sits beside it.
+  assert.ok(Math.abs(r.section_modulus_loss_pct - (16 ** 4 / 24 ** 4) * 100) < 1e-9);
+  assert.ok(Math.abs(r.section_modulus_loss_pct - 19.7531) < 1e-3);
+  // The fourth power is ALWAYS the smaller of the two, at every hollow.
+  for (const t of [1, 2, 4, 6, 8, 11] ) {
+    const x = _v1695host({ diameter_in: 24, shell_thick_in: t });
+    if (x.error) continue;
+    assert.ok(x.section_modulus_loss_pct < x.loss_pct);
+    assert.ok(Math.abs(x.convention_difference_pct - (x.loss_pct - x.section_modulus_loss_pct)) < 1e-12);
+  }
+  // spec-v1695's own claim: a hollow at half the diameter loses about 6% on
+  // the fourth power -- and 12.5% on Wagener's cube, which is the whole
+  // reason both are named.
+  const half = _v1695host({ diameter_in: 24, shell_thick_in: 6 });
+  assert.ok(Math.abs(half.hollow_d_in - 12) < 1e-12);
+  assert.ok(Math.abs(half.section_modulus_loss_pct - 6.25) < 1e-9);
+  assert.ok(Math.abs(half.loss_pct - 12.5) < 1e-9);
+  // The Mattheck trigger still fires on the shell ratio, not on either loss.
+  const thin = _v1695host({ diameter_in: 24, shell_thick_in: 3 });
+  assert.equal(thin.concern, true);
+  assert.ok("error" in _v1695host({ diameter_in: 24, shell_thick_in: 12 }));
+});
+
+import { computeNAMSizing as _v1690host } from "../../calc-restoration.js";
+test("bounds: spec-v1690 cut -- nam-sizing gains negative pressure, airflow untouched", () => {
+  // The old answer is unchanged with none of the new inputs.
+  const r = _v1690host({ room_volume_ft3: 8000, target_ach: 6 });
+  assert.ok(Math.abs(r.required_cfm - 800) < 1e-9);
+  assert.equal(r.recommendations.length, 3);
+  assert.equal(r.rated_cfm_needed, null);
+  assert.equal(r.makeup_area_needed_ft2, null);
+  assert.equal(r.target_negative_wc, null);
+  // spec-v1690's own relation, which was already here: CFM = volume x ACH / 60.
+  const four = _v1690host({ room_volume_ft3: 8000, target_ach: 4 });
+  assert.ok(Math.abs(four.required_cfm - 8000 * 4 / 60) < 1e-9);
+  // A machine is rated at a CLEAN filter, so the rated capacity needed is the
+  // requirement divided by what is left after the derate.
+  const derated = _v1690host({ room_volume_ft3: 8000, target_ach: 4, filter_loading_derate_pct: 30 });
+  assert.ok(Math.abs(derated.rated_cfm_needed - four.required_cfm / 0.7) < 1e-9);
+  assert.ok(derated.rated_cfm_needed > derated.required_cfm);
+  assert.ok(Math.abs(derated.required_cfm - four.required_cfm) < 1e-12);
+  // Makeup air: velocity = 4,005 sqrt(in wc), and the opening is the flow
+  // over it. A containment cannot go negative unless air can get in.
+  const neg = _v1690host({ room_volume_ft3: 8000, target_ach: 4, target_negative_wc: 0.02, makeup_opening_ft2: 1.5 });
+  assert.ok(Math.abs(neg.makeup_velocity_fpm - 4005 * Math.sqrt(0.02)) < 1e-9);
+  assert.ok(Math.abs(neg.makeup_area_needed_ft2 - neg.required_cfm / neg.makeup_velocity_fpm) < 1e-9);
+  assert.equal(neg.makeup_adequate, true);
+  // A smaller opening than that is reported as inadequate.
+  const tight = _v1690host({ room_volume_ft3: 8000, target_ach: 4, target_negative_wc: 0.02, makeup_opening_ft2: 0.5 });
+  assert.equal(tight.makeup_adequate, false);
+  // A higher pressure target needs a SMALLER opening for the same flow,
+  // because the velocity through it rises.
+  const harder = _v1690host({ room_volume_ft3: 8000, target_ach: 4, target_negative_wc: 0.08 });
+  assert.ok(harder.makeup_area_needed_ft2 < neg.makeup_area_needed_ft2);
+  assert.ok(Math.abs(harder.makeup_velocity_fpm - 2 * neg.makeup_velocity_fpm) < 1e-9);
+  assert.ok("error" in _v1690host({ room_volume_ft3: 8000, target_ach: 4, filter_loading_derate_pct: 100 }));
+});

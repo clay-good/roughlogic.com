@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "78b4c0848f6c2aed",
+      "sha": "ae78c6a83be9d854",
       "date": "2026-09-08"
     },
     "/tools/": {
-      "sha": "c0f86b1b9cfc9244",
+      "sha": "71c42070ea32fb58",
       "date": "2026-09-08"
     },
     "/groups/accounting/": {
-      "sha": "d8c627c0d656bb93",
+      "sha": "2c44fbfb11247dc5",
       "date": "2026-09-08"
     },
     "/groups/agriculture/": {
-      "sha": "33ed7e40c3cf901f",
+      "sha": "dd0faca5f8f35b9b",
       "date": "2026-09-08"
     },
     "/groups/construction/": {
-      "sha": "b269f476d8604b76",
+      "sha": "547b7dcbb2afd8e4",
       "date": "2026-09-08"
     },
     "/groups/cross-trade/": {
-      "sha": "12816ba7efcaaa4b",
+      "sha": "dca2fffbd6e26d62",
       "date": "2026-09-08"
     },
     "/groups/educators/": {
-      "sha": "020e58ce5c9266ca",
+      "sha": "681be9d9b9e578c8",
       "date": "2026-09-08"
     },
     "/groups/electrical/": {
-      "sha": "2f0df268cfb997a5",
+      "sha": "2b6bbd52d2598dba",
       "date": "2026-09-08"
     },
     "/groups/field/": {
-      "sha": "0db843e6c42997bf",
+      "sha": "b33d16b35cb09a81",
       "date": "2026-09-08"
     },
     "/groups/fire-ground/": {
-      "sha": "ddb470b5b052252d",
+      "sha": "b7f2282f82fc3a0a",
       "date": "2026-09-08"
     },
     "/groups/historical/": {
-      "sha": "77d8c8cfe69801ea",
+      "sha": "903c699963ed5aee",
       "date": "2026-09-08"
     },
     "/groups/hvac/": {
-      "sha": "aa9ab007963dfa36",
+      "sha": "bc7d4813308b1d1e",
       "date": "2026-09-08"
     },
     "/groups/kitchen/": {
-      "sha": "4bbfa6fccfbc0343",
+      "sha": "161d5bacc3e485f7",
       "date": "2026-09-08"
     },
     "/groups/lab/": {
-      "sha": "aa998b9ee5a83972",
+      "sha": "1020fb7074bb058f",
       "date": "2026-09-08"
     },
     "/groups/mechanic/": {
-      "sha": "e99829be216ab4da",
+      "sha": "83ca411259984c94",
       "date": "2026-09-08"
     },
     "/groups/plumbing/": {
-      "sha": "23ba31b77e4508ad",
+      "sha": "2f3ddd897de373cd",
       "date": "2026-09-08"
     },
     "/groups/real-estate/": {
-      "sha": "b567befd6b09545a",
+      "sha": "0c9182ffd9347b0b",
       "date": "2026-09-08"
     },
     "/groups/references/": {
-      "sha": "76cad9a61a03ecec",
+      "sha": "b24c626a0f6640ba",
       "date": "2026-09-08"
     },
     "/groups/restoration/": {
-      "sha": "e02c2c74701aec43",
+      "sha": "ae73e67b4e422870",
       "date": "2026-09-08"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "3dba03ea03886c33",
+      "sha": "681686d15082efce",
       "date": "2026-09-08"
     },
     "/groups/stage/": {
-      "sha": "5408c4acebf1939e",
+      "sha": "c4741a29323a2f44",
       "date": "2026-09-08"
     },
     "/groups/trucking/": {
-      "sha": "135ef375a60d488c",
+      "sha": "7632a359509f863d",
       "date": "2026-09-08"
     },
     "/groups/water/": {
-      "sha": "98d703fd9dfb64f7",
+      "sha": "782fab60107bec61",
       "date": "2026-09-08"
     },
     "/tools/aav-install-check/": {
@@ -100,6 +100,10 @@
     "/tools/abatement-containment/": {
       "sha": "80d7fbe074593ffb",
       "date": "2026-09-01"
+    },
+    "/tools/abatement-waste-containers/": {
+      "sha": "85d5d5587fd97ca2",
+      "date": "2026-09-08"
     },
     "/tools/abrasive-blast/": {
       "sha": "6f45497d3b786476",
@@ -806,8 +810,8 @@
       "date": "2026-09-01"
     },
     "/tools/bulk-density/": {
-      "sha": "2d8f5bf0e432b10c",
-      "date": "2026-09-04"
+      "sha": "b2146d9c032d1a5f",
+      "date": "2026-09-08"
     },
     "/tools/bunker-silo-capacity/": {
       "sha": "2c93466e0602c131",
@@ -1046,8 +1050,8 @@
       "date": "2026-09-01"
     },
     "/tools/chipper-debris/": {
-      "sha": "9e2a13b2b10852f2",
-      "date": "2026-09-06"
+      "sha": "f087b05c8806914d",
+      "date": "2026-09-08"
     },
     "/tools/chlorine-cylinder-withdrawal/": {
       "sha": "97ef752506f5f806",
@@ -1106,8 +1110,8 @@
       "date": "2026-09-04"
     },
     "/tools/class-of-loss-screen/": {
-      "sha": "eb42b5daee72f490",
-      "date": "2026-09-01"
+      "sha": "53b7f9824c0bd031",
+      "date": "2026-09-08"
     },
     "/tools/clausius-clapeyron/": {
       "sha": "91b7fefc21b955be",
@@ -1566,8 +1570,8 @@
       "date": "2026-09-01"
     },
     "/tools/containment-air-balance/": {
-      "sha": "4a51f022c5bdee3d",
-      "date": "2026-09-04"
+      "sha": "d764360670c11487",
+      "date": "2026-09-08"
     },
     "/tools/contents-packout-inventory/": {
       "sha": "c61409e09c565e86",
@@ -1716,6 +1720,10 @@
     "/tools/crown-pruning-dose/": {
       "sha": "70e05655f0267624",
       "date": "2026-09-01"
+    },
+    "/tools/crown-reduction-leaf-area/": {
+      "sha": "a819bc10633e1116",
+      "date": "2026-09-08"
     },
     "/tools/crusher-reduction-ratio/": {
       "sha": "113578524386f1d2",
@@ -2438,8 +2446,8 @@
       "date": "2026-09-01"
     },
     "/tools/evaporation-load/": {
-      "sha": "a0263e5994af1c38",
-      "date": "2026-09-04"
+      "sha": "13fe60242691f4b1",
+      "date": "2026-09-08"
     },
     "/tools/evaporative-cooler-effectiveness/": {
       "sha": "90b8567690a8972c",
@@ -3712,6 +3720,10 @@
     "/tools/leach-field-aggregate/": {
       "sha": "6459dd54f3fcd092",
       "date": "2026-09-01"
+    },
+    "/tools/lead-dust-clearance/": {
+      "sha": "1c248d69090ee6c3",
+      "date": "2026-09-08"
     },
     "/tools/led-tape-max-run/": {
       "sha": "501438299f7cc580",
@@ -5633,6 +5645,10 @@
       "sha": "51ac90d6e7396f01",
       "date": "2026-09-01"
     },
+    "/tools/root-ball-size-weight/": {
+      "sha": "f5d509ed9e7e6021",
+      "date": "2026-09-08"
+    },
     "/tools/rope-ma/": {
       "sha": "8479614c9afc1849",
       "date": "2026-09-01"
@@ -6065,6 +6081,10 @@
       "sha": "abbb09dd9325729d",
       "date": "2026-09-01"
     },
+    "/tools/silica-ventilation-screen/": {
+      "sha": "dcc2406d40eec0df",
+      "date": "2026-09-08"
+    },
     "/tools/sill-plate-anchor-count/": {
       "sha": "a48c90aa8452b87d",
       "date": "2026-09-01"
@@ -6260,6 +6280,10 @@
     "/tools/soil-vertical-effective-stress/": {
       "sha": "e3e87bcd6641cd98",
       "date": "2026-09-01"
+    },
+    "/tools/soil-volume-for-canopy/": {
+      "sha": "038c5e5cc9d326a2",
+      "date": "2026-09-08"
     },
     "/tools/solar-altitude-angle/": {
       "sha": "755ed84f9ae70603",
@@ -6737,6 +6761,10 @@
       "sha": "bc93bac36d3ea716",
       "date": "2026-09-01"
     },
+    "/tools/stump-grinding-volume/": {
+      "sha": "22bc572af21c625f",
+      "date": "2026-09-08"
+    },
     "/tools/subgrade-cbr-thickness/": {
       "sha": "1cda71ff28e54c49",
       "date": "2026-09-08"
@@ -7213,6 +7241,10 @@
       "sha": "136f24d2039feb10",
       "date": "2026-09-01"
     },
+    "/tools/tree-cabling-rating/": {
+      "sha": "69864d826f2dc922",
+      "date": "2026-09-08"
+    },
     "/tools/tree-crz-encroachment/": {
       "sha": "c7741016e4744fa7",
       "date": "2026-09-01"
@@ -7222,8 +7254,8 @@
       "date": "2026-09-01"
     },
     "/tools/tree-open-cavity/": {
-      "sha": "abd8aba084e08723",
-      "date": "2026-09-01"
+      "sha": "2b5cad8491b9a834",
+      "date": "2026-09-08"
     },
     "/tools/tree-protection-zone/": {
       "sha": "a9670b5c6ad9510d",
@@ -7274,8 +7306,8 @@
       "date": "2026-09-04"
     },
     "/tools/trunk-decay-strength/": {
-      "sha": "87d3d0140cab2bcc",
-      "date": "2026-09-01"
+      "sha": "79bf3b629fbbdb2d",
+      "date": "2026-09-08"
     },
     "/tools/trunk-min-shell-thickness/": {
       "sha": "b7d85f59f8461c9c",
