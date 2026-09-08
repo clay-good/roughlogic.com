@@ -1119,6 +1119,16 @@ const _TILES = [
   ["nesc-district-loading", "A"],
   ["conductor-creep-elongation", "A"],
   ["sagging-return-wave", "A"],
+  // spec-v1617..v1621 concrete placement and tilt-up; v1546..v1549 rail logistics
+  ["concrete-pump-line-pressure", "E"],
+  ["boom-pump-reach", "E"],
+  ["post-tension-elongation", "E"],
+  ["tilt-up-lift-stress", "E"],
+  ["tilt-up-brace-load", "E"],
+  ["railcar-load-limit", "J"],
+  ["tonnage-rating-grade", "J"],
+  ["train-brake-reduction", "J"],
+  ["clearance-plate-envelope", "J"],
   // spec-v1610..v1615 traffic, work zone, and pavement band
   ["skip-line-layout", "E"],
   ["speed-hump-geometry", "E"],

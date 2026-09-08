@@ -100385,6 +100385,517 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "concrete-pump-line-pressure",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Concrete Pump Line Pressure and Reach Limit -- the spec-v1617 worked example, recomputed",
+   "source_edition_or_year": "spec-v1617 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "horizontal_length_ft": 320,
+    "vertical_lift_ft": 60,
+    "unit_weight_pcf": 150,
+    "friction_psi_per_100ft": 4.5,
+    "bend_count": 6,
+    "bend_equivalent_ft": 10,
+    "hose_length_ft": 25,
+    "hose_friction_multiple": 3,
+    "pump_rated_psi": 1100
+   },
+   "outputs": {
+    "static_psi": {
+     "value": 62.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "friction_psi": {
+     "value": 20.475,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "equivalent_length_ft": {
+     "value": 455,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_psi": {
+     "value": 82.975,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_psi": {
+     "value": 1017.025,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "additional_line_ft": {
+     "value": 22600.55556,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "boom-pump-reach",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Concrete Boom Pump Reach and Setup Radius -- the spec-v1618 worked example, recomputed",
+   "source_edition_or_year": "spec-v1618 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "boom_reach_ft": 110,
+    "required_distance_ft": 95,
+    "required_height_ft": 45,
+    "boom_centre_offset_ft": 8,
+    "outrigger_load_lb": 40000,
+    "outrigger_pad_area_ft2": 4,
+    "power_line_distance_ft": 25,
+    "required_line_clearance_ft": 20
+   },
+   "outputs": {
+    "reach_at_height_ft": {
+     "value": 100.3743,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "reach_lost_to_height_ft": {
+     "value": 9.6257,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "reach_margin_ft": {
+     "value": 5.3743,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_height_at_distance_ft": {
+     "value": 55.45268,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "outrigger_pressure_psf": {
+     "value": 10000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "power_line_margin_ft": {
+     "value": 5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "post-tension-elongation",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Post-Tension Tendon Elongation and Jacking Force -- the spec-v1619 worked example, recomputed",
+   "source_edition_or_year": "spec-v1619 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "strand_area_in2": 0.153,
+    "modulus_psi": 28000000,
+    "tendon_length_ft": 120,
+    "jacking_stress_ksi": 202.5,
+    "curvature_friction": 0.2,
+    "angular_change_rad": 0.3,
+    "wobble_per_ft": 0.0002,
+    "anchor_set_in": 0.25,
+    "measured_elongation_in": 8.35,
+    "tolerance_pct": 7
+   },
+   "outputs": {
+    "jacking_force_lb": {
+     "value": 30982.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "far_end_force_lb": {
+     "value": 28486.27889,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "average_force_lb": {
+     "value": 29716.91795,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "theoretical_elongation_in": {
+     "value": 9.98888,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "expected_measured_in": {
+     "value": 9.73888,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "elongation_difference_pct": {
+     "value": -14.26119,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tilt-up-lift-stress",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Tilt-Up Panel Lifting Stress and Insert Layout -- the spec-v1620 worked example, recomputed",
+   "source_edition_or_year": "spec-v1620 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "panel_width_ft": 8,
+    "panel_height_ft": 24,
+    "thickness_in": 7.25,
+    "unit_weight_pcf": 150,
+    "lift_day_strength_psi": 2200,
+    "insert_rows": 2,
+    "insert_columns": 2,
+    "suction_fraction": 0,
+    "safety_factor": 1.5
+   },
+   "outputs": {
+    "panel_weight_lb": {
+     "value": 17400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "load_per_insert_lb": {
+     "value": 4350,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "span_between_rows_ft": {
+     "value": 12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bending_stress_psi": {
+     "value": 186.2069,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "modulus_of_rupture_psi": {
+     "value": 351.78118,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "allowable_stress_psi": {
+     "value": 234.52079,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tilt-up-brace-load",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Tilt-Up Panel Temporary Brace Load and Count -- the spec-v1621 worked example, recomputed",
+   "source_edition_or_year": "spec-v1621 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "panel_width_ft": 24,
+    "panel_height_ft": 24,
+    "wind_pressure_psf": 12,
+    "resultant_height_ft": 12,
+    "brace_attachment_height_ft": 16,
+    "brace_angle_deg": 55,
+    "brace_count": 3,
+    "brace_capacity_lb": 4000,
+    "alternate_angle_deg": 45
+   },
+   "outputs": {
+    "wind_force_lb": {
+     "value": 6912,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lateral_per_brace_lb": {
+     "value": 1728,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "axial_per_brace_lb": {
+     "value": 3012.67606,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "anchor_vertical_lb": {
+     "value": 2467.83976,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "anchor_offset_ft": {
+     "value": 11.20332,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alternate_axial_lb": {
+     "value": 2443.76104,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "railcar-load-limit",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Railcar Load Limit, Route Limit, and Cube -- the spec-v1546 worked example, recomputed",
+   "source_edition_or_year": "spec-v1546 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "gross_rail_load_lb": 286000,
+    "light_weight_lb": 63000,
+    "lading_net_lb": 200000,
+    "cubic_capacity_ft3": 5200,
+    "lading_density_pcf": 30,
+    "route_gross_rail_load_lb": 263000
+   },
+   "outputs": {
+    "load_limit_lb": {
+     "value": 223000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gross_on_rail_lb": {
+     "value": 263000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "utilization_pct": {
+     "value": 89.6861,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "remaining_capacity_lb": {
+     "value": 23000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "route_load_limit_lb": {
+     "value": 200000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cube_limited_weight_lb": {
+     "value": 156000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tonnage-rating-grade",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Locomotive Tonnage Rating on a Ruling Grade -- the spec-v1547 worked example, recomputed",
+   "source_edition_or_year": "spec-v1547 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "tractive_effort_lb": 140000,
+    "ruling_grade_pct": 1.2,
+    "rolling_resistance_lb_per_ton": 3,
+    "curve_degrees": 3,
+    "weight_on_drivers_lb": 1680000,
+    "adhesion_factor": 0.3,
+    "alternate_grade_pct": 0.5
+   },
+   "outputs": {
+    "grade_resistance_lb_per_ton": {
+     "value": 24,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "curve_resistance_lb_per_ton": {
+     "value": 2.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_resistance_lb_per_ton": {
+     "value": 29.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "adhesion_limited_te_lb": {
+     "value": 504000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tonnage_rating_tons": {
+     "value": 4761.90476,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "level_tonnage_tons": {
+     "value": 25925.92593,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "train-brake-reduction",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Train Air Brake Reduction and Cylinder Pressure -- the spec-v1548 worked example, recomputed",
+   "source_edition_or_year": "spec-v1548 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "charged_pressure_psi": 90,
+    "reduction_psi": 30,
+    "cylinder_ratio": 2.5,
+    "full_service_reduction_psi": 26,
+    "car_count": 100,
+    "propagation_rate_cars_per_second": 10
+   },
+   "outputs": {
+    "brake_pipe_psi": {
+     "value": 60,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cylinder_psi": {
+     "value": 65,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "remaining_reduction_psi": {
+     "value": 0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "full_service_cylinder_psi": {
+     "value": 65,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wasted_reduction_psi": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "propagation_seconds": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "clearance-plate-envelope",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Railcar Curve Swing and Clearance Envelope -- the spec-v1549 worked example, recomputed",
+   "source_edition_or_year": "spec-v1549 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "truck_centres_ft": 73,
+    "car_length_ft": 89,
+    "car_width_in": 126,
+    "degree_of_curve": 5,
+    "clearance_to_obstruction_in": 132,
+    "required_clearance_in": 6
+   },
+   "outputs": {
+    "radius_ft": {
+     "value": 1145.91559,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "mid_ordinate_in": {
+     "value": 6.97564,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "end_overhang_in": {
+     "value": 3.39292,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "effective_half_width_in": {
+     "value": 69.97564,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "remaining_clearance_in": {
+     "value": 62.02436,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sharpest_curve_deg": {
+     "value": 45.15712,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

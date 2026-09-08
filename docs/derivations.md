@@ -1536,6 +1536,7 @@ cross-check.
 | calc-civil.js | `computeSuperelevationSafeCurveSpeed` | `{ R_ft, e, f } = {}` | _ | _ | _ |
 | calc-civil.js | `computeVerticalCurve` | `{ g1_pct, g2_pct, length_ft, pvi_station_ft, pvi_elevation_ft, eval_station_f...` | _ | _ | _ |
 | calc-civil.js | `computeVerticalCurveSightDistance` | `{ A_pct, S_ft, C } = {}` | _ | _ | _ |
+| calc-concrete.js | `computeBoomPumpReach` | `{ boom_reach_ft = 0, required_distance_ft = 0, required_height_ft = 0, boom_c...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteAnchorBlowout` | `{ edge_distance_in = 0, head_bearing_area_in2 = 0, fc_psi = 0, embedment_in =...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteAnchorBreakout` | `{ embedment_in = 0, fc_psi = 0, edge_distance_in = 0, anchor_type = "cast-in"...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteAnchorInteraction` | `{ nua_lb = 0, vua_lb = 0, phi_nn_lb = 0, phi_vn_lb = 0 } = {}` | _ | _ | _ |
@@ -1558,6 +1559,7 @@ cross-check.
 | calc-concrete.js | `computeConcreteLongtermDefl` | `{ immediate_defl_in = 0, duration_months = 60, comp_steel_ratio = 0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteModulusOfRupture` | `{ fc_psi = 4000, lambda = 1.0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcretePremixBags` | `{ length_ft = 4, width_ft = 4, thickness_in = 4, bag_yield_ft3 = 0.60, waste_...` | _ | _ | _ |
+| calc-concrete.js | `computeConcretePumpLinePressure` | `{ horizontal_length_ft = 0, vertical_lift_ft = 0, unit_weight_pcf = 150, fric...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteShrinkageTemperatureSteel` | `{ h_in = 0, b_in = 12, grade_ksi = 60 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteStairVolume` | `{ num_risers = 4, riser_in = 7, tread_in = 11, width_in = 48, throat_in = 4 }...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteStrengthFromModulus` | `{ ec_psi = 0, wc_pcf = 145 } = {}` | _ | _ | _ |
@@ -1565,6 +1567,7 @@ cross-check.
 | calc-concrete.js | `computeConcreteTorsionThreshold` | `{ fc_psi = 4000, b_in = 0, h_in = 0, lambda = 1.0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeCuringCompoundCoverage` | `{ slab_area_sf = 2500, coats = 1, coverage_sf_per_gal = 200, waste_pct = 0 } ...` | _ | _ | _ |
 | calc-concrete.js | `computeFreshConcreteTemp` | `{ agg_weight_lb = 0, agg_temp_f = 0, cement_weight_lb = 0, cement_temp_f = 0,...` | _ | _ | _ |
+| calc-concrete.js | `computePostTensionElongation` | `{ strand_area_in2 = 0, modulus_psi = 0, tendon_length_ft = 0, jacking_stress_...` | _ | _ | _ |
 | calc-concrete.js | `computeRcBeamFlexure` | `{ fc = 4000, fy = 60000, as_in2 = 0, b = 0, d = 0, mu = 0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeRcBeamShear` | `{ fc = 4000, fyt = 60000, bw = 0, d = 0, av_in2 = 0, vu = 0, lambda = 1.0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeRcColumnAxial` | `{ b_in = 0, h_in = 0, fc_psi = 4000, fy_psi = 60000, ast_in2 = 0 } = {}` | _ | _ | _ |
@@ -1583,6 +1586,8 @@ cross-check.
 | calc-concrete.js | `computeRcTBeamFlexure` | `{ fc_psi = 4000, fy_psi = 60000, as_in2 = 0, bw_in = 0, hf_in = 0, d_in = 0, ...` | _ | _ | _ |
 | calc-concrete.js | `computeSlabDowelSchedule` | `{ joint_length_ft = 40, slab_thickness_in = 6, dowel_spacing_in = 12, edge_cl...` | _ | _ | _ |
 | calc-concrete.js | `computeTBeamEffectiveFlangeWidth` | `{ bw_in = 0, hf_in = 0, ln_in = 0, sw_in = 0, beam_type = "interior" } = {}` | _ | _ | _ |
+| calc-concrete.js | `computeTiltUpBraceLoad` | `{ panel_width_ft = 0, panel_height_ft = 0, wind_pressure_psf = 0, resultant_h...` | _ | _ | _ |
+| calc-concrete.js | `computeTiltUpLiftStress` | `{ panel_width_ft = 0, panel_height_ft = 0, thickness_in = 0, unit_weight_pcf ...` | _ | _ | _ |
 | calc-construction.js | `computeAbrasiveBlast` | `{ nozzle_bore_in, pressure_psi = 100, area_ft2, lb_per_ft2 = 8 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAccessibleParkingCount` | `{ total_spaces = 0, facility_count = 1, provided_accessible = 0, provided_van...` | _ | _ | _ |
 | calc-construction.js | `computeAccessibleParkingGeometry` | `{ space_type = "van", space_width_in = 0, aisle_width_in = 0, space_length_in...` | _ | _ | _ |
@@ -2976,11 +2981,15 @@ cross-check.
 | calc-powerquality.js | `computeTddIeee519` | `{ isc_a = 0, il_a = 0, measured_tdd_pct = 0 } = {}` | _ | _ | _ |
 | calc-powerquality.js | `computeTransformerKFactor` | `{ i1 = 1, i3 = 0, i5 = 0, i7 = 0, i9 = 0, i11 = 0, i13 = 0 } = {}` | _ | _ | _ |
 | calc-rail.js | `computeBallastSection` | `{ top_width_ft = 0, depth_in = 0, side_slope_ratio = 1.5, length_ft = 0, dens...` | _ | _ | _ |
+| calc-rail.js | `computeClearancePlateEnvelope` | `{ truck_centres_ft = 0, car_length_ft = 0, car_width_in = 0, degree_of_curve ...` | _ | _ | _ |
 | calc-rail.js | `computeCwrThermalForce` | `{ rail_area_in2 = 0, modulus_psi = 30000000, alpha_per_degf = 0.0000065, neut...` | _ | _ | _ |
 | calc-rail.js | `computeDegreeOfCurve` | `{ degree_of_curve = 0, radius_ft = 0, chord_length_ft = 62, central_angle_deg...` | _ | _ | _ |
 | calc-rail.js | `computeRailWearLimit` | `{ new_head_height_in = 0, new_head_width_in = 0, new_head_area_in2 = 0, verti...` | _ | _ | _ |
+| calc-rail.js | `computeRailcarLoadLimit` | `{ gross_rail_load_lb = 0, light_weight_lb = 0, lading_net_lb = 0, cubic_capac...` | _ | _ | _ |
+| calc-rail.js | `computeTonnageRatingGrade` | `{ tractive_effort_lb = 0, ruling_grade_pct = 0, rolling_resistance_lb_per_ton...` | _ | _ | _ |
 | calc-rail.js | `computeTrackSuperelevation` | `{ degree_of_curve = 0, speed_mph = 0, actual_elevation_in = 0, allowable_unba...` | _ | _ | _ |
 | calc-rail.js | `computeTrackWarp` | `{ measured_a_in = 0, designed_a_in = 0, measured_b_in = 0, designed_b_in = 0,...` | _ | _ | _ |
+| calc-rail.js | `computeTrainBrakeReduction` | `{ charged_pressure_psi = 90, reduction_psi = 0, cylinder_ratio = 2.5, full_se...` | _ | _ | _ |
 | calc-rail.js | `computeTurnoutFrogGeometry` | `{ frog_number = 0, distance_beyond_frog_ft = 0, required_separation_ft = 0, l...` | _ | _ | _ |
 | calc-realestate.js | `compute1031Timeline` | `{ sale_close_iso }` | _ | _ | _ |
 | calc-realestate.js | `computeAmortizationSchedule` | `{ principal, apr_percent, term_years, extra_monthly_principal }` | _ | _ | _ |
@@ -3586,7 +3595,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2172.
+Row count: 2181.
 
 <!-- END function-corpus-v14 -->
 
@@ -4269,7 +4278,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (535 tiles)
+### Group E Construction (540 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4316,6 +4325,7 @@ per spec-v14 §13.1 second paragraph.
 | `bolt-group-eccentric` | Eccentric Bolt Group in Shear (Elastic Vector Method) | AISC Manual Part 7 (elastic vector me...; spec-v266 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bolt-shear-bearing` | Bolt Shear + Bearing / Tearout Strength (AISC 360 J3) | AISC 360-22 J3.6 / J3.10; spec-v267 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bolt-torque` | Bolt Torque to Clamp Load | Project (first-principles); F = 85000 * 0.1419 * 0.75 = 9046 lb; T_in_lb = 0.20 * 0.5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `boom-pump-reach` | Concrete Boom Pump Reach and Setup Radius | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `boussinesq-surcharge-wall` | Surcharge Lateral Pressure on a Wall from a Line Load (Boussinesq) | NAVFAC DM-7.2 modified Boussinesq; spec-v310 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `brick-veneer-anchor-spacing` | Brick Veneer Anchor Spacing and Count (TMS 402 / IBC 1405) | TMS 402 / IBC 1405; spec-v369 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `brick-veneer-weep-count` | Brick Veneer Weep-Hole Count (IRC R703.8.6) | brick veneer weep spacing (IRC R703.8.6); weeps = ceil(30*12/33) + 1 = ceil(10.9) + 1 = 11 + 1 = 12 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4374,6 +4384,7 @@ per spec-v14 §13.1 second paragraph.
 | `concrete-modulus-of-rupture` | Concrete Modulus of Rupture fr (ACI 318-19 19.2.3) | ACI 318-19 19.2.3; spec-v379 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-pour-rate` | Concrete Pour Rate, Rate of Rise, and Delivery Cadence | Rate-of-rise identity (first-principles); rate of rise = 20*27/100 = 5.4 ft/hr; pour = 44.44/20 = 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-premix-bags` | Bagged Concrete Count for a Small Pour | Bagged (premix) concrete count for a ...; volume = 4 x 4 x 4/12 = 5.333; bags = ceil(5.333 x 1.10 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `concrete-pump-line-pressure` | Concrete Pump Line Pressure and Reach Limit | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `concrete-sawcut-footage` | Concrete Control-Joint Saw-Cut Footage | Control-joint saw-cut-footage identit...; panels_l=ceil(60/12)=5, panels_w=ceil(40/12)=4; joint=(5-... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-shrinkage-temperature-steel` | Shrinkage and Temperature Reinforcement (ACI 318-19 24.4) | ACI 318-19 24.4; spec-v380 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-stair-volume` | Concrete Stair / Stoop Volume Takeoff | concrete stair volume geometry (first...; steps = 4*0.5*7*11 = 154; rake = sqrt(28^2+44^2) = 52.15;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4571,6 +4582,7 @@ per spec-v14 §13.1 second paragraph.
 | `pole-embedment-depth` | Embedded Post / Pole Depth for Lateral Load (IBC 1807.3) | IBC; P 200 lb at h 4 ft, b 0.5 ft, 150 psf/ft, isolated (x2), ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `polymeric-sand-bags` | Polymeric Paver Joint Sand Bag Count | Polymeric joint-sand bag-count identi...; bags = ceil(400*1.05/75) = ceil(5.6) = 6 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `post-hole-concrete` | Concrete per Post Hole | Cylinder-volume geometry less post di...; spec-v94 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `post-tension-elongation` | Post-Tension Tendon Elongation and Jacking Force | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `powered-attic-ventilator` | Powered Attic Ventilator Sizing | attic-fan sizing practice; spec-v467 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `press-brake-max-thickness` | Press-Brake Max Bendable Thickness | Press-brake air-bend tonnage chart + ...; 100 tons, V 0.5 in, L 4 ft, mild steel -> 0.1474 in max t... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `press-brake-tonnage` | Press-Brake Air-Bend Tonnage | Press-brake air-bend tonnage chart + ...; T 0.125 in, L 4 ft, V 1 in, mild steel -> 8.9844 tons/ft,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4753,6 +4765,8 @@ per spec-v14 §13.1 second paragraph.
 | `thermal-stress-restrained` | Restrained Thermal Stress and Force | mechanics of materials; spec-v360 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `thinset-coverage` | Thin-Set Mortar Coverage | Manufacturer thin-set coverage charts...; spec-v95 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tile-count` | Tile Count and Grout Volume | Project (first-principles); 100 ft^2 with 12x12 tiles, default 1/8 in grout, 10% wast... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `tilt-up-brace-load` | Tilt-Up Panel Temporary Brace Load and Count | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `tilt-up-lift-stress` | Tilt-Up Panel Lifting Stress and Insert Layout | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `track-superelevation` | Railroad Curve Superelevation, Unbalance, and Maximum Speed | Project (first-principles); 49 CFR 213 named for the elevation and unbalance caps | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `track-warp-fra-class` | Track Cross-Level Deviation and Warp Against a Class Limit | Project (first-principles); 49 CFR 213 named as the source of the class limits, which... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `traction-roping-ratio` | Elevator Traction Roping Ratio, Torque, and Rope Tension | Project (first-principles); ASME A17.1 and the equipment manufacturer named | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5014,7 +5028,7 @@ per spec-v14 §13.1 second paragraph.
 | `tool-maintenance` | Tool Maintenance Intervals | Project bundled tool maintenance sche...; Reference compute returns the per-attribute table; runner... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 | `triage-quickread` | Field First Aid Triage Quick-Read | START / SALT triage protocols (projec...; Returns 4 categories + notice + citation; tested on the n... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 
-### Group J Trucking (39 tiles)
+### Group J Trucking (43 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5023,6 +5037,7 @@ per spec-v14 §13.1 second paragraph.
 | `bridge-formula` | Federal Bridge Formula and Axle Weights | FHWA; 23 CFR 658.17 Table B | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bridge-formula-min-spacing` | Bridge Formula Minimum Axle Spread | FHWA (Federal Bridge Formula B, solve...; spec-v656 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cargo-securement-wll` | Cargo Securement Working-Load-Limit Check | FMCSA 49 CFR 393.100-393.136; 8000 lb, 4 tiedowns x 1500 lb -> 6000 lb aggregate >= 400... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `clearance-plate-envelope` | Railcar Curve Swing and Clearance Envelope | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cost-per-mile` | Operating Cost Per Mile | ATRI cost-per-mile bucket methodology; $6000/10,000 mi, $4.00/gal at 6.5 mpg, $0.18 maint, $0.65... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `deadhead-percent` | Deadhead Percentage and Effective Rate | Freight-economics arithmetic + FMCSA ...; 800 loaded / 120 deadhead / $1840 -> 13.04% deadhead, $2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `deck-point-load-dunnage` | Trailer Deck Point Load and Dunnage Spread | Project (first-principles); load / bearing length along the trailer | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5046,6 +5061,7 @@ per spec-v14 §13.1 second paragraph.
 | `maintenance-reserve` | Maintenance Reserve per Mile | First-principles owner-operator reser...; spec-v91 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `oversize-permit-screen` | Oversize and Overweight Permit Threshold Screen | Project (first-principles); excess on each of four dimensions | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pallet-loadout` | Pallet Cube and Trailer Loadout | GMA pallet (48 x 40 in) + 53 ft dry-v...; 12 x 10 x 8 in case @ 25 lb / 48 cases per pallet -> 26 p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `railcar-load-limit` | Railcar Load Limit, Route Limit, and Cube | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `reefer-burn` | Reefer Fuel Burn and Run Time | Thermo King published technical bulle...; Continuous SB / 50 gal tank / 24 hr / moderate / 1200 mi ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `safe-descent-speed` | Safe Downgrade Descent Speed and Brake Load | Project (first-principles); P = W x v x grade / 550 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ssd-design-speed` | Max Design Speed from Sight Distance | AASHTO (inverse); 490.225 ft sight distance, dry level (f 0.35, t 2.5 s) ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5053,7 +5069,9 @@ per spec-v14 §13.1 second paragraph.
 | `stopping-sight-distance` | Stopping Sight Distance (AASHTO) | AASHTO; d_pr = 1.47*v*t_pr; d_br = v^2 / (30*(f+g)) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tiedown-count` | Minimum Tiedown Count and Aggregate WLL | FMCSA; 393.110 count rule and 393.106 aggregate WLL | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tire-load-check` | Tire Load-Rating Check (per Axle) | 49 CFR 393.75 + DOT sidewall marking; spec-v115 section 2.2 pinned example (capacity 12,350, ut... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `tonnage-rating-grade` | Locomotive Tonnage Rating on a Ruling Grade | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `train-brake-reduction` | Train Air Brake Reduction and Cylinder Pressure | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `truck-off-tracking` | Low-Speed Off-Tracking (Swept Path) | AASHTO Green Book (low-speed off-trac...; OT = 50 - sqrt(2500 - 400) = 50 - 45.826 = 4.174 ft; effe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5680,6 +5698,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1921. Fixture-covered or reference-cadence: 1921 / 1921.
+Tile count: 1930. Fixture-covered or reference-cadence: 1930 / 1930.
 
 <!-- END tile-index-v14 -->

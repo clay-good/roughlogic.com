@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "ab509941a903e8a0",
+      "sha": "17df00aed69229a4",
       "date": "2026-09-08"
     },
     "/tools/": {
-      "sha": "d1d9265be7e70cfa",
+      "sha": "34c4a48df1dc8bbf",
       "date": "2026-09-08"
     },
     "/groups/accounting/": {
-      "sha": "3e80cbe3ef519370",
+      "sha": "339724c75e0b0680",
       "date": "2026-09-08"
     },
     "/groups/agriculture/": {
-      "sha": "d7f974f8f9d5d4c3",
+      "sha": "54047d7effd2552f",
       "date": "2026-09-08"
     },
     "/groups/construction/": {
-      "sha": "39e47136341d052c",
+      "sha": "0cc3f52ec3738719",
       "date": "2026-09-08"
     },
     "/groups/cross-trade/": {
-      "sha": "8fbe2a277dbf4340",
+      "sha": "4699de438200e36c",
       "date": "2026-09-08"
     },
     "/groups/educators/": {
-      "sha": "84056065f5c673c2",
+      "sha": "ba1f607505e7aa9c",
       "date": "2026-09-08"
     },
     "/groups/electrical/": {
-      "sha": "32bb795ec3631970",
+      "sha": "c337685af9f63933",
       "date": "2026-09-08"
     },
     "/groups/field/": {
-      "sha": "f98ff06a0d3f61cc",
+      "sha": "be169068d14a3947",
       "date": "2026-09-08"
     },
     "/groups/fire-ground/": {
-      "sha": "07a5ddfdcadad3e3",
+      "sha": "d3b7b86aea62c00d",
       "date": "2026-09-08"
     },
     "/groups/historical/": {
-      "sha": "3b8c0ffdd6514919",
+      "sha": "2539df48ce66598f",
       "date": "2026-09-08"
     },
     "/groups/hvac/": {
-      "sha": "4ee9ad87ac362b36",
+      "sha": "1db74e93f5bdcb9f",
       "date": "2026-09-08"
     },
     "/groups/kitchen/": {
-      "sha": "a676c1a249899d35",
+      "sha": "4ab6c270f0717019",
       "date": "2026-09-08"
     },
     "/groups/lab/": {
-      "sha": "02aab448d2031257",
+      "sha": "f462015c3e743b9e",
       "date": "2026-09-08"
     },
     "/groups/mechanic/": {
-      "sha": "2c6a4a3d3bdee214",
+      "sha": "cfa60068b0192e10",
       "date": "2026-09-08"
     },
     "/groups/plumbing/": {
-      "sha": "84b0c85c790bef45",
+      "sha": "6d54255dda7c1918",
       "date": "2026-09-08"
     },
     "/groups/real-estate/": {
-      "sha": "6caf27f4ff07e9a7",
+      "sha": "9b5d3300e7d7aeb5",
       "date": "2026-09-08"
     },
     "/groups/references/": {
-      "sha": "a1347881c88298b6",
+      "sha": "1959a701bd0e41b0",
       "date": "2026-09-08"
     },
     "/groups/restoration/": {
-      "sha": "550788a6d8f63809",
+      "sha": "2357fdd53eec00bf",
       "date": "2026-09-08"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "4eb308c8c7bd2999",
+      "sha": "0056e8ea4caf0745",
       "date": "2026-09-08"
     },
     "/groups/stage/": {
-      "sha": "c712a61d98eed9e5",
+      "sha": "76a0e3b062352e96",
       "date": "2026-09-08"
     },
     "/groups/trucking/": {
-      "sha": "2fff861d0f709377",
+      "sha": "9a891ed6089d963b",
       "date": "2026-09-08"
     },
     "/groups/water/": {
-      "sha": "7d85af0e38a052d6",
+      "sha": "2f4842e3c6e344f7",
       "date": "2026-09-08"
     },
     "/tools/aav-install-check/": {
@@ -182,8 +182,8 @@
       "date": "2026-09-01"
     },
     "/tools/air-brake-pushrod-stroke/": {
-      "sha": "c6c5c7cff8f310e4",
-      "date": "2026-09-01"
+      "sha": "b0752cbd00353a59",
+      "date": "2026-09-08"
     },
     "/tools/air-changes-hour/": {
       "sha": "c73d077fb84dd1ca",
@@ -677,6 +677,10 @@
       "sha": "1d55fb81f9d2c5a8",
       "date": "2026-09-01"
     },
+    "/tools/boom-pump-reach/": {
+      "sha": "447656901e09d1cd",
+      "date": "2026-09-08"
+    },
     "/tools/boring-bar-deflection/": {
       "sha": "0436407292207b1e",
       "date": "2026-09-01"
@@ -974,8 +978,8 @@
       "date": "2026-09-01"
     },
     "/tools/chain-link-fence-takeoff/": {
-      "sha": "3e9bb9f21bc861eb",
-      "date": "2026-09-01"
+      "sha": "b6da2248d3285f32",
+      "date": "2026-09-08"
     },
     "/tools/chamber-cc-for-cr/": {
       "sha": "7ce378c934a6d5c8",
@@ -1112,6 +1116,10 @@
     "/tools/cleanout-layout/": {
       "sha": "b818cc7928db2112",
       "date": "2026-09-01"
+    },
+    "/tools/clearance-plate-envelope/": {
+      "sha": "6624d6631fbae75f",
+      "date": "2026-09-08"
     },
     "/tools/climb-gradient-roc/": {
       "sha": "4db83be93cfc88f0",
@@ -1390,12 +1398,16 @@
       "date": "2026-09-04"
     },
     "/tools/concrete-pour-rate/": {
-      "sha": "c75f442578f3f353",
-      "date": "2026-09-04"
+      "sha": "f0a4a71b531a03b8",
+      "date": "2026-09-08"
     },
     "/tools/concrete-premix-bags/": {
       "sha": "e269337b5971523d",
       "date": "2026-09-04"
+    },
+    "/tools/concrete-pump-line-pressure/": {
+      "sha": "afada09eba1c720c",
+      "date": "2026-09-08"
     },
     "/tools/concrete-sawcut-footage/": {
       "sha": "de8ce77e82869702",
@@ -2786,8 +2798,8 @@
       "date": "2026-09-01"
     },
     "/tools/freight-density/": {
-      "sha": "9d0a236d2f019329",
-      "date": "2026-09-01"
+      "sha": "7c8df45008e2f0c9",
+      "date": "2026-09-08"
     },
     "/tools/fresh-concrete-temp/": {
       "sha": "cffee79c01df7044",
@@ -3422,8 +3434,8 @@
       "date": "2026-09-04"
     },
     "/tools/hydroplaning-speed/": {
-      "sha": "075cb858f5edafb9",
-      "date": "2026-09-01"
+      "sha": "1a45d399c64b639e",
+      "date": "2026-09-08"
     },
     "/tools/hydroseed-mix/": {
       "sha": "dadac5bb75b68c48",
@@ -4466,8 +4478,8 @@
       "date": "2026-09-01"
     },
     "/tools/oversize-permit-screen/": {
-      "sha": "a82b581480813437",
-      "date": "2026-09-01"
+      "sha": "58a29354f0b0aa90",
+      "date": "2026-09-08"
     },
     "/tools/overtime/": {
       "sha": "987792d8c963589e",
@@ -4861,6 +4873,10 @@
       "sha": "2b7c17d2e5ddc7b8",
       "date": "2026-09-01"
     },
+    "/tools/post-tension-elongation/": {
+      "sha": "f506ced8d08084a9",
+      "date": "2026-09-08"
+    },
     "/tools/pounds-formula/": {
       "sha": "eb2c25f9d7050338",
       "date": "2026-09-01"
@@ -5140,6 +5156,10 @@
     "/tools/rail-wear-condemning-limit/": {
       "sha": "ad3007d34468f167",
       "date": "2026-09-05"
+    },
+    "/tools/railcar-load-limit/": {
+      "sha": "f6436f294a214e01",
+      "date": "2026-09-08"
     },
     "/tools/rain-load-ponding/": {
       "sha": "01a5cd8e5101dec2",
@@ -6933,6 +6953,14 @@
       "sha": "17dbda1572618f3f",
       "date": "2026-09-01"
     },
+    "/tools/tilt-up-brace-load/": {
+      "sha": "61e63ff7775ee061",
+      "date": "2026-09-08"
+    },
+    "/tools/tilt-up-lift-stress/": {
+      "sha": "dc68e88fc3e1fb03",
+      "date": "2026-09-08"
+    },
     "/tools/timber-cruise/": {
       "sha": "d1a5f29006e91fbd",
       "date": "2026-09-01"
@@ -6980,6 +7008,10 @@
     "/tools/tolerance-stack-rss/": {
       "sha": "386b5016f9853ec9",
       "date": "2026-09-01"
+    },
+    "/tools/tonnage-rating-grade/": {
+      "sha": "1b2655e3b3354aa5",
+      "date": "2026-09-08"
     },
     "/tools/tool-maintenance/": {
       "sha": "27328233b35b1690",
@@ -7040,6 +7072,10 @@
     "/tools/trailer-tongue-weight/": {
       "sha": "54f575909cbe7bdd",
       "date": "2026-09-01"
+    },
+    "/tools/train-brake-reduction/": {
+      "sha": "a5e20d59701de466",
+      "date": "2026-09-08"
     },
     "/tools/transformer-conductor-protection/": {
       "sha": "e94be785db54da67",
@@ -7158,12 +7194,12 @@
       "date": "2026-09-01"
     },
     "/tools/truck-startability/": {
-      "sha": "bc119597de56a51a",
-      "date": "2026-09-01"
+      "sha": "c91760126579883d",
+      "date": "2026-09-08"
     },
     "/tools/truck-swept-path-width/": {
-      "sha": "ec3192cb828e5b66",
-      "date": "2026-09-01"
+      "sha": "b8a9d001d4a54109",
+      "date": "2026-09-08"
     },
     "/tools/true-airspeed/": {
       "sha": "f08bd713a3b241c7",

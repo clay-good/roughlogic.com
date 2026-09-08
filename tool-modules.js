@@ -659,6 +659,7 @@ export const TOOL_MODULES = (() => {
   // spec-v1539..v1545: the railroad track and equipment bench, a trade the
   // catalog served with zero tiles. All seven keep group "E".
   declare("./calc-rail.js", "RAIL_RENDERERS", [
+    "railcar-load-limit", "tonnage-rating-grade", "train-brake-reduction", "clearance-plate-envelope",
     "track-superelevation", "degree-of-curve", "cwr-neutral-temperature",
     "rail-wear-condemning-limit", "track-warp-fra-class",
     "ballast-section-volume", "turnout-frog-lead",
@@ -801,6 +802,7 @@ export const TOOL_MODULES = (() => {
   // Group E cluster, the RC companion to calc-steel.js one material over.
   // All three KEEP group "E" (module independent of group letter).
   declare("./calc-concrete.js", "CONCRETE_RENDERERS", [
+    "concrete-pump-line-pressure", "boom-pump-reach", "post-tension-elongation", "tilt-up-lift-stress", "tilt-up-brace-load",
     "rc-beam-flexure", "rc-tbeam-flexure", "rc-beam-shear", "rc-development-length",
     "concrete-torsion-threshold",
     // spec-v284..v286 member depth batch

@@ -1562,6 +1562,16 @@ const RELATED = {
   "nesc-district-loading": ["conductor-sag-at-temperature","transverse-wind-load-conductor","conductor-blowout"],
   "conductor-creep-elongation": ["conductor-sag-at-temperature","line-ground-clearance-nesc","ruling-span"],
   "sagging-return-wave": ["ruling-span","conductor-sag-at-temperature","line-ground-clearance-nesc"],
+  // spec-v1617..v1621 concrete placement and tilt-up; v1546..v1549 rail logistics.
+  "concrete-pump-line-pressure": ["boom-pump-reach","ready-mix-concrete-order","asphalt-spread-rate"],
+  "boom-pump-reach": ["concrete-pump-line-pressure","crane-ground-bearing","crane-load-radius-boom"],
+  "post-tension-elongation": ["tilt-up-lift-stress","rc-development-length","concrete-strength-gain"],
+  "tilt-up-lift-stress": ["tilt-up-brace-load","concrete-strength-gain","crane-lift-quick"],
+  "tilt-up-brace-load": ["tilt-up-lift-stress","wind-pressure","shore-post-load"],
+  "railcar-load-limit": ["tonnage-rating-grade","clearance-plate-envelope","freight-density"],
+  "tonnage-rating-grade": ["railcar-load-limit","haul-road-resistance","train-brake-reduction"],
+  "train-brake-reduction": ["tonnage-rating-grade","railcar-load-limit","air-brake-pushrod-stroke"],
+  "clearance-plate-envelope": ["degree-of-curve","railcar-load-limit","track-superelevation"],
   // spec-v1610..v1615: the 2026-09-08 traffic, work zone, and pavement band.
   "skip-line-layout": ["striping-paint-quantity","paint-coverage","asphalt-spread-rate"],
   "speed-hump-geometry": ["intersection-sight-triangle","vertical-curve","asphalt-tonnage"],

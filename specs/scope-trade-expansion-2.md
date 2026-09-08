@@ -1,7 +1,7 @@
 # Scope: The 2026-09-05 Trade Expansion (specs v1450-v1749, 300 New Tiles)
 
 > **Status: IN PROGRESS (2026-09-05). Program charter, no catalog change of its own.**
-> **Bands 1-15 have landed: railroad track, elevator and escalator, door hardware and locksmithing, mining and quarry, trenchless, sawmill, wind energy, diving, steam plant with commercial laundry, overhead line and distribution, millwright alignment, vibration, drives and compressed air, the distribution side of line work, and traffic, work zone and pavement, 1,804 -> 1,921. Seven specs cut as duplicates.**
+> **Bands 1-15 have landed: railroad track, elevator and escalator, door hardware and locksmithing, mining and quarry, trenchless, sawmill, wind energy, diving, steam plant with commercial laundry, overhead line and distribution, millwright alignment, vibration, drives and compressed air, the distribution side of line work, traffic, work zone and pavement, and the concrete placement and rail logistics band, 1,804 -> 1,930. Seven specs cut as duplicates.**
 > Inherits the spec-v106 trades-only charter and every convention through spec-v1449.
 > Each of the 300 tiles is specified in its own file, `spec-v1450.md` through `spec-v1749.md`.
 

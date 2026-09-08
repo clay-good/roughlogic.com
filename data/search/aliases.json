@@ -108367,6 +108367,231 @@
    "term": "truck traffic pavement damage",
    "target": "esal-traffic-loading",
    "kind": "industry"
+  },
+  {
+   "term": "concrete pump line pressure",
+   "target": "concrete-pump-line-pressure",
+   "kind": "industry"
+  },
+  {
+   "term": "pumping concrete friction loss",
+   "target": "concrete-pump-line-pressure",
+   "kind": "industry"
+  },
+  {
+   "term": "concrete line plug pressure",
+   "target": "concrete-pump-line-pressure",
+   "kind": "industry"
+  },
+  {
+   "term": "boom pump pressure calculation",
+   "target": "concrete-pump-line-pressure",
+   "kind": "industry"
+  },
+  {
+   "term": "concrete pump reach limit",
+   "target": "concrete-pump-line-pressure",
+   "kind": "industry"
+  },
+  {
+   "term": "concrete boom pump reach",
+   "target": "boom-pump-reach",
+   "kind": "industry"
+  },
+  {
+   "term": "boom reach at height",
+   "target": "boom-pump-reach",
+   "kind": "industry"
+  },
+  {
+   "term": "pump truck setup radius",
+   "target": "boom-pump-reach",
+   "kind": "industry"
+  },
+  {
+   "term": "boom pump outrigger load",
+   "target": "boom-pump-reach",
+   "kind": "industry"
+  },
+  {
+   "term": "concrete placement reach check",
+   "target": "boom-pump-reach",
+   "kind": "industry"
+  },
+  {
+   "term": "post tension elongation",
+   "target": "post-tension-elongation",
+   "kind": "industry"
+  },
+  {
+   "term": "tendon elongation check",
+   "target": "post-tension-elongation",
+   "kind": "industry"
+  },
+  {
+   "term": "jacking force strand",
+   "target": "post-tension-elongation",
+   "kind": "industry"
+  },
+  {
+   "term": "pt friction wobble loss",
+   "target": "post-tension-elongation",
+   "kind": "industry"
+  },
+  {
+   "term": "prestress elongation tolerance",
+   "target": "post-tension-elongation",
+   "kind": "industry"
+  },
+  {
+   "term": "tilt up lifting stress",
+   "target": "tilt-up-lift-stress",
+   "kind": "industry"
+  },
+  {
+   "term": "tilt up insert layout",
+   "target": "tilt-up-lift-stress",
+   "kind": "industry"
+  },
+  {
+   "term": "panel pick stress",
+   "target": "tilt-up-lift-stress",
+   "kind": "industry"
+  },
+  {
+   "term": "tilt up modulus of rupture",
+   "target": "tilt-up-lift-stress",
+   "kind": "industry"
+  },
+  {
+   "term": "day of lift strength panel",
+   "target": "tilt-up-lift-stress",
+   "kind": "industry"
+  },
+  {
+   "term": "tilt up brace load",
+   "target": "tilt-up-brace-load",
+   "kind": "industry"
+  },
+  {
+   "term": "tilt up bracing count",
+   "target": "tilt-up-brace-load",
+   "kind": "industry"
+  },
+  {
+   "term": "panel brace axial load",
+   "target": "tilt-up-brace-load",
+   "kind": "industry"
+  },
+  {
+   "term": "tilt up deadman anchor",
+   "target": "tilt-up-brace-load",
+   "kind": "industry"
+  },
+  {
+   "term": "erection wind bracing",
+   "target": "tilt-up-brace-load",
+   "kind": "industry"
+  },
+  {
+   "term": "railcar load limit",
+   "target": "railcar-load-limit",
+   "kind": "industry"
+  },
+  {
+   "term": "gross rail load stencil",
+   "target": "railcar-load-limit",
+   "kind": "industry"
+  },
+  {
+   "term": "railcar light weight capacity",
+   "target": "railcar-load-limit",
+   "kind": "industry"
+  },
+  {
+   "term": "286k car route limit",
+   "target": "railcar-load-limit",
+   "kind": "industry"
+  },
+  {
+   "term": "railcar cube versus weight",
+   "target": "railcar-load-limit",
+   "kind": "industry"
+  },
+  {
+   "term": "locomotive tonnage rating",
+   "target": "tonnage-rating-grade",
+   "kind": "industry"
+  },
+  {
+   "term": "ruling grade tonnage",
+   "target": "tonnage-rating-grade",
+   "kind": "industry"
+  },
+  {
+   "term": "train resistance lb per ton",
+   "target": "tonnage-rating-grade",
+   "kind": "industry"
+  },
+  {
+   "term": "adhesion limited tractive effort",
+   "target": "tonnage-rating-grade",
+   "kind": "industry"
+  },
+  {
+   "term": "helper district tonnage",
+   "target": "tonnage-rating-grade",
+   "kind": "industry"
+  },
+  {
+   "term": "train air brake reduction",
+   "target": "train-brake-reduction",
+   "kind": "industry"
+  },
+  {
+   "term": "brake pipe reduction cylinder pressure",
+   "target": "train-brake-reduction",
+   "kind": "industry"
+  },
+  {
+   "term": "full service reduction",
+   "target": "train-brake-reduction",
+   "kind": "industry"
+  },
+  {
+   "term": "freight brake equalizing",
+   "target": "train-brake-reduction",
+   "kind": "industry"
+  },
+  {
+   "term": "train brake propagation",
+   "target": "train-brake-reduction",
+   "kind": "industry"
+  },
+  {
+   "term": "railcar clearance envelope",
+   "target": "clearance-plate-envelope",
+   "kind": "industry"
+  },
+  {
+   "term": "car body curve swing",
+   "target": "clearance-plate-envelope",
+   "kind": "industry"
+  },
+  {
+   "term": "mid ordinate railcar overhang",
+   "target": "clearance-plate-envelope",
+   "kind": "industry"
+  },
+  {
+   "term": "dimensional load clearance rail",
+   "target": "clearance-plate-envelope",
+   "kind": "industry"
+  },
+  {
+   "term": "railcar end overhang curve",
+   "target": "clearance-plate-envelope",
+   "kind": "industry"
   }
  ]
 }

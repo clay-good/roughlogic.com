@@ -444,3 +444,328 @@ RAIL_RENDERERS["turnout-frog-lead"] = _simpleRenderer({
   ],
   compute: computeTurnoutFrogGeometry,
 });
+
+// ===========================================================================
+// spec-v1546..v1549: the 2026-09-08 trade-expansion rail logistics half.
+// Four tiles finish `calc-rail.js`, all group J -- the track half of this
+// module is group E, and a tile's group letter is independent of its module.
+//
+//   v1546 railcar-load-limit      v1548 train-brake-reduction
+//   v1547 tonnage-rating-grade    v1549 clearance-plate-envelope
+//
+// ONE SPEC WAS INTERNALLY WRONG, and it is the threshold-backwards failure
+// this program keeps finding. spec-v1547 computes an adhesion-limited
+// tractive effort of 302,400 lb on wet rail and says "the tonnage rating
+// falls to 10,286 tons". The consist's ACTUAL tractive effort is 140,000 lb,
+// which is far below 302,400 -- so adhesion never governs in that example,
+// the rating stays 4,762 tons, and 10,286 is HIGHER than the number it is
+// said to have fallen from. The tile takes the LOWER of the two and prints
+// which one governs.
+//
+// spec-v1549 calls its curve "4 degree (R = 1,146 ft)". 5,729.58 / 4 is
+// 1,432 ft; 1,146 ft is a FIVE degree curve. Its arithmetic follows 1,146
+// consistently, so the degree is what is wrong. It also reports 62.0 in of
+// remaining clearance as "less than five inches".
+
+// Train resistance in pounds per ton. 20 lb/ton per 1% of grade is just the
+// component of weight along the slope, and it is the SAME constant
+// `haul-road-resistance` uses for a truck on a haul road, so the two cannot
+// disagree about what a grade costs. 0.8 lb/ton per degree of curve is the
+// long-standing railroad allowance.
+const _GRADE_RESISTANCE_LB_PER_TON_PER_PCT = 20;
+const _CURVE_RESISTANCE_LB_PER_TON_PER_DEG = 0.8;
+
+// ============ spec-v1546: railcar load limit ============
+
+// dims: in { gross_rail_load_lb: M L T^-2, light_weight_lb: M L T^-2, lading_net_lb: M L T^-2, cubic_capacity_ft3: L^3, lading_density_pcf: M L^-3, route_gross_rail_load_lb: M L T^-2 } out: { load_limit_lb: M L T^-2, gross_on_rail_lb: M L T^-2, utilization_pct: dimensionless, remaining_capacity_lb: M L T^-2, route_load_limit_lb: M L T^-2, cube_limited_weight_lb: M L T^-2 }
+export function computeRailcarLoadLimit({ gross_rail_load_lb = 0, light_weight_lb = 0, lading_net_lb = 0, cubic_capacity_ft3 = 0, lading_density_pcf = 0, route_gross_rail_load_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(gross_rail_load_lb > 0)) return { error: "Gross rail load must be positive (lb)." };
+  if (!(light_weight_lb > 0)) return { error: "Light weight must be positive (lb) -- read it off the car's stencil." };
+  if (!(light_weight_lb < gross_rail_load_lb)) return { error: "Light weight cannot equal or exceed the gross rail load; the car would have no capacity." };
+  if (lading_net_lb < 0) return { error: "Lading net weight cannot be negative (lb)." };
+  if (cubic_capacity_ft3 < 0) return { error: "Cubic capacity cannot be negative (cu ft)." };
+  if (lading_density_pcf < 0) return { error: "Lading density cannot be negative (pcf)." };
+  if (route_gross_rail_load_lb < 0) return { error: "The route gross rail load cannot be negative (lb)." };
+  const load_limit_lb = gross_rail_load_lb - light_weight_lb;
+  const gross_on_rail_lb = light_weight_lb + lading_net_lb;
+  const utilization_pct = lading_net_lb > 0 ? lading_net_lb / load_limit_lb * 100 : 0;
+  const remaining_capacity_lb = load_limit_lb - lading_net_lb;
+  const within_car = gross_on_rail_lb <= gross_rail_load_lb;
+  // The constraint that gets missed: the ROUTE's own limit, which is invisible
+  // on the car and which the stencil knows nothing about.
+  const route_load_limit_lb = route_gross_rail_load_lb > 0 ? route_gross_rail_load_lb - light_weight_lb : null;
+  const governing_load_limit_lb = route_load_limit_lb === null ? load_limit_lb : Math.min(load_limit_lb, route_load_limit_lb);
+  const route_shortfall_lb = route_load_limit_lb === null ? null : load_limit_lb - route_load_limit_lb;
+  const within_route = route_gross_rail_load_lb > 0 ? gross_on_rail_lb <= route_gross_rail_load_lb : null;
+  const route_governs = route_load_limit_lb !== null && route_load_limit_lb < load_limit_lb;
+  // Weight or cube: light bulky lading fills the car before it reaches the
+  // load limit, dense lading reaches the limit with the car half empty.
+  const cube_limited_weight_lb = (cubic_capacity_ft3 > 0 && lading_density_pcf > 0) ? cubic_capacity_ft3 * lading_density_pcf : null;
+  const cube_governs = cube_limited_weight_lb === null ? null : cube_limited_weight_lb < governing_load_limit_lb;
+  const outs = [load_limit_lb, gross_on_rail_lb, remaining_capacity_lb];
+  if (!outs.every(Number.isFinite)) return { error: "Load limit math is not a finite value." };
+  const verdict = within_car
+    ? "INSIDE the car at " + fmt(gross_on_rail_lb, 0) + " lb on rail against " + fmt(gross_rail_load_lb, 0) + " lb, " + fmt(utilization_pct, 1) + "% of the load limit"
+    : "OVERLOADED: " + fmt(gross_on_rail_lb, 0) + " lb on rail against a " + fmt(gross_rail_load_lb, 0) + " lb car, " + fmt(gross_on_rail_lb - gross_rail_load_lb, 0) + " lb over";
+  const route_verdict = within_route === null
+    ? "Enter the route's maximum gross rail load. It is frequently below the car's, and the difference is invisible on the car."
+    : within_route
+      ? "INSIDE the route limit of " + fmt(route_gross_rail_load_lb, 0) + " lb" + (route_governs ? ", which allows " + fmt(route_load_limit_lb, 0) + " lb of lading -- " + fmt(route_shortfall_lb, 0) + " lb LESS than the stencil" : "")
+      : "OVER THE ROUTE at " + fmt(gross_on_rail_lb, 0) + " lb against " + fmt(route_gross_rail_load_lb, 0) + " lb. Loading to the stencil has overloaded the ROUTE, not the car, and that distinction is invisible on the car itself";
+  const governs_verdict = cube_governs === null
+    ? "Enter a cubic capacity and a lading density to see whether weight or cube governs."
+    : cube_governs
+      ? "CUBE GOVERNS: the car fills at " + fmt(cube_limited_weight_lb, 0) + " lb, well under the " + fmt(governing_load_limit_lb, 0) + " lb allowed, so the weight capacity is irrelevant for this commodity"
+      : "WEIGHT GOVERNS: the car reaches " + fmt(governing_load_limit_lb, 0) + " lb with " + fmt(governing_load_limit_lb / lading_density_pcf, 0) + " cu ft loaded, of " + fmt(cubic_capacity_ft3, 0) + " available";
+  return {
+    gross_rail_load_lb, light_weight_lb, load_limit_lb, lading_net_lb, gross_on_rail_lb,
+    utilization_pct, remaining_capacity_lb, within_car, route_gross_rail_load_lb,
+    route_load_limit_lb, governing_load_limit_lb, route_shortfall_lb, within_route,
+    route_governs, cubic_capacity_ft3, lading_density_pcf, cube_limited_weight_lb,
+    cube_governs, verdict, route_verdict, governs_verdict,
+    note: "The car's stencil gives light weight and load limit, and their sum is the gross rail load the car is built for. Load limit is what a shipper may put in, and it is a property of the SPECIFIC CAR rather than of its class: light weights differ between cars of the same nominal rating, and a repaired or rebuilt car can be several hundred pounds heavier than its sister and has exactly that much less capacity. Reading the stencil on the car in front of you, rather than the class, is the whole discipline. THE CONSTRAINT THAT GETS MISSED IS THE ROUTE. A 286,000 lb car is not permitted everywhere: bridges and track on light density lines and on many short lines are rated below it, and a car loaded to its own limit can be refused, restricted, or held. The governing gross rail load is the LOWER of the car's and the route's, and a shipper loading to the stencil without checking the route has overloaded the route rather than the car -- a distinction that is completely invisible on the car itself, because the stencil has no idea where the car is going. THE OTHER EVERYDAY QUESTION IS WHETHER WEIGHT OR CUBE GOVERNS. A car has a cubic capacity as well as a weight limit, and light bulky lading fills the car long before it reaches the load limit while dense lading reaches the limit with the car half empty. Which one binds is what sizes a shipment and what decides whether a different car type would carry more, and it changes with the commodity rather than with the car. Common gross rail load classes run 220,000, 263,000, 286,000, and 315,000 lb. This is the load limit arithmetic and the two checks around it. It does not address weight distribution within the car, which has its own limits -- a load concentrated over one truck can overload it while the car's gross is fine -- or eccentric and off-centre loading, load securement, or the AAR loading rules for the commodity. It does not determine whether a specific route accepts a specific car, which is a routing question for the carrier, and it does not address dimensional or excess-height loads, high-wide clearance, or the open-top loading rules. The car's stencil, the AAR loading rules, the carrier's route restrictions, and the shipper's own weighing govern.",
+  };
+}
+const railcarLoadLimitExample = { inputs: { gross_rail_load_lb: 286000, light_weight_lb: 63000, lading_net_lb: 200000, cubic_capacity_ft3: 5200, lading_density_pcf: 30, route_gross_rail_load_lb: 263000 } };
+RAIL_RENDERERS["railcar-load-limit"] = _simpleRenderer({
+  citation: "Citation: the railcar load limit identity by name -- load limit = gross rail load - light weight, gross on rail = light weight + lading, with the governing limit taken as the LOWER of the car's and the route's -- and the cube-versus-weight check as cubic capacity x lading density against that limit. Common gross rail load classes are 220,000, 263,000, 286,000 and 315,000 lb. Light weight and load limit come from the car's own stencil, not from its class. The car's stencil, the AAR loading rules, the carrier's route restrictions, and the shipper's weighing govern.",
+  example: railcarLoadLimitExample.inputs,
+  fields: [
+    { key: "gross_rail_load_lb", label: "Car gross rail load (lb)", kind: "number", default: 286000 },
+    { key: "light_weight_lb", label: "Light weight from the stencil (lb)", kind: "number", default: 63000 },
+    { key: "lading_net_lb", label: "Lading net weight (lb)", kind: "number", default: 200000 },
+    { key: "cubic_capacity_ft3", label: "Cubic capacity (cu ft, 0 to skip)", kind: "number", default: 5200 },
+    { key: "lading_density_pcf", label: "Lading density (pcf, 0 to skip)", kind: "number", default: 30 },
+    { key: "route_gross_rail_load_lb", label: "Route maximum gross rail load (lb, 0 to skip)", kind: "number", default: 263000 },
+  ],
+  outputs: [
+    { key: "l", id: "rll-out-l", label: "Load limit", value: (r) => fmt(r.load_limit_lb, 0) + " lb of lading -- " + fmt(r.gross_rail_load_lb, 0) + " less the " + fmt(r.light_weight_lb, 0) + " lb stencilled light weight" },
+    { key: "v", id: "rll-out-v", label: "Against the car", value: (r) => r.verdict },
+    { key: "r", id: "rll-out-r", label: "Against the route", value: (r) => r.route_verdict },
+    { key: "c", id: "rll-out-c", label: "Remaining capacity", value: (r) => fmt(r.remaining_capacity_lb, 0) + " lb on the car" + (r.route_load_limit_lb === null ? "" : ", " + fmt(r.route_load_limit_lb - r.lading_net_lb, 0) + " lb on the route") },
+    { key: "g", id: "rll-out-g", label: "Weight or cube", value: (r) => r.governs_verdict },
+    { key: "n", id: "rll-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRailcarLoadLimit,
+});
+
+// ============ spec-v1547: locomotive tonnage rating on a ruling grade ============
+
+// dims: in { tractive_effort_lb: M L T^-2, ruling_grade_pct: dimensionless, rolling_resistance_lb_per_ton: M L T^-2, curve_degrees: dimensionless, weight_on_drivers_lb: M L T^-2, adhesion_factor: dimensionless, alternate_grade_pct: dimensionless } out: { grade_resistance_lb_per_ton: M L T^-2, curve_resistance_lb_per_ton: M L T^-2, total_resistance_lb_per_ton: M L T^-2, adhesion_limited_te_lb: M L T^-2, governing_te_lb: M L T^-2, tonnage_rating_tons: M }
+export function computeTonnageRatingGrade({ tractive_effort_lb = 0, ruling_grade_pct = 0, rolling_resistance_lb_per_ton = 3, curve_degrees = 0, weight_on_drivers_lb = 0, adhesion_factor = 0.3, alternate_grade_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(tractive_effort_lb > 0)) return { error: "Available tractive effort must be positive (lb)." };
+  if (ruling_grade_pct < 0) return { error: "The ruling grade cannot be negative (%); a descending ruling grade is a braking problem, not a tonnage one." };
+  if (!(rolling_resistance_lb_per_ton > 0)) return { error: "Rolling resistance must be positive (lb per ton)." };
+  if (curve_degrees < 0) return { error: "Curvature cannot be negative (degrees)." };
+  if (weight_on_drivers_lb < 0) return { error: "Weight on drivers cannot be negative (lb)." };
+  if (!(adhesion_factor > 0 && adhesion_factor <= 1)) return { error: "The adhesion factor must be greater than zero and no more than one." };
+  if (alternate_grade_pct < 0) return { error: "The comparison grade cannot be negative (%)." };
+  const grade_resistance_lb_per_ton = _GRADE_RESISTANCE_LB_PER_TON_PER_PCT * ruling_grade_pct;
+  const curve_resistance_lb_per_ton = _CURVE_RESISTANCE_LB_PER_TON_PER_DEG * curve_degrees;
+  const total_resistance_lb_per_ton = grade_resistance_lb_per_ton + rolling_resistance_lb_per_ton + curve_resistance_lb_per_ton;
+  if (!(total_resistance_lb_per_ton > 0)) return { error: "Total resistance is not positive; check the grade, rolling resistance, and curvature." };
+  // A locomotive cannot deliver more tractive effort than friction between
+  // wheel and rail allows. The rating follows whichever is LOWER.
+  const adhesion_limited_te_lb = weight_on_drivers_lb > 0 ? weight_on_drivers_lb * adhesion_factor : null;
+  const adhesion_governs = adhesion_limited_te_lb !== null && adhesion_limited_te_lb < tractive_effort_lb;
+  const governing_te_lb = adhesion_governs ? adhesion_limited_te_lb : tractive_effort_lb;
+  const tonnage_rating_tons = governing_te_lb / total_resistance_lb_per_ton;
+  const rating_on_te_alone_tons = tractive_effort_lb / total_resistance_lb_per_ton;
+  const level_resistance_lb_per_ton = rolling_resistance_lb_per_ton + curve_resistance_lb_per_ton;
+  const level_tonnage_tons = governing_te_lb / level_resistance_lb_per_ton;
+  const grade_penalty_x = level_tonnage_tons > 0 ? level_tonnage_tons / tonnage_rating_tons : null;
+  const alternate_resistance_lb_per_ton = alternate_grade_pct > 0
+    ? _GRADE_RESISTANCE_LB_PER_TON_PER_PCT * alternate_grade_pct + rolling_resistance_lb_per_ton + curve_resistance_lb_per_ton
+    : null;
+  const alternate_tonnage_tons = alternate_resistance_lb_per_ton === null ? null : governing_te_lb / alternate_resistance_lb_per_ton;
+  const drivers_needed_for_te_lb = tractive_effort_lb / adhesion_factor;
+  const outs = [grade_resistance_lb_per_ton, total_resistance_lb_per_ton, tonnage_rating_tons, level_tonnage_tons];
+  if (!outs.every(Number.isFinite)) return { error: "Tonnage rating math is not a finite value." };
+  const adhesion_verdict = adhesion_limited_te_lb === null
+    ? "Enter the weight on drivers to check whether the locomotives can actually put this tractive effort down."
+    : adhesion_governs
+      ? "ADHESION GOVERNS: " + fmt(weight_on_drivers_lb, 0) + " lb on drivers at " + fmt(adhesion_factor * 100, 0) + "% delivers only " + fmt(adhesion_limited_te_lb, 0) + " lb, below the " + fmt(tractive_effort_lb, 0) + " lb rating. The train stalls before the engines run out of power -- helpers or doubling the hill"
+      : "TRACTIVE EFFORT GOVERNS: " + fmt(weight_on_drivers_lb, 0) + " lb on drivers at " + fmt(adhesion_factor * 100, 0) + "% could put down " + fmt(adhesion_limited_te_lb, 0) + " lb, above the " + fmt(tractive_effort_lb, 0) + " lb the consist makes, so adhesion is NOT the limit here";
+  return {
+    tractive_effort_lb, ruling_grade_pct, rolling_resistance_lb_per_ton, curve_degrees,
+    grade_resistance_lb_per_ton, curve_resistance_lb_per_ton, total_resistance_lb_per_ton,
+    weight_on_drivers_lb, adhesion_factor, adhesion_limited_te_lb, adhesion_governs,
+    governing_te_lb, tonnage_rating_tons, rating_on_te_alone_tons,
+    level_resistance_lb_per_ton, level_tonnage_tons, grade_penalty_x,
+    alternate_grade_pct, alternate_resistance_lb_per_ton, alternate_tonnage_tons,
+    drivers_needed_for_te_lb, adhesion_verdict,
+    note: "Twenty pounds per ton per percent of grade is the number to carry: it is just the component of weight along the slope, and it dwarfs everything else on the list. On the level a train resists at three to five pounds per ton; put it on a one percent grade and grade resistance alone adds twenty, so a modest hill multiplies the required pull several times over. THAT IS WHY THE RULING GRADE SETS THE TRAIN. The steepest sustained grade on the route, curve resistance included, determines the tonnage rating for the whole run, and a single short hill sets the makeup for hundreds of level miles behind it. Curvature adds about eight tenths of a pound per ton per degree, which is small beside a grade and large beside nothing, and it belongs in the ruling grade calculation rather than beside it. THE SECOND CONSTRAINT IS ADHESION AND IT IS A SEPARATE CEILING. A locomotive cannot deliver more tractive effort than friction between wheel and rail allows -- roughly twenty five to thirty five percent of the weight on its drivers with modern adhesion control, and much less on wet, leafy, or contaminated rail. The rating follows whichever of the two is LOWER, and which one governs is reported here in words, because it is easy to compute an adhesion limit, find it larger than the consist's own tractive effort, and mistakenly use it. A tonnage rating that assumes tractive effort the locomotives cannot put down is a train that stalls, and the fall-back on a rated hill is helpers or doubling the hill -- both planned from this same arithmetic. A steady-state rating at constant speed. It does not address acceleration, starting resistance -- which is higher than running resistance and is why a train that stalls may be unable to restart on a grade -- train dynamics, slack action, or drawbar and coupler limits, which cap how much tonnage may be pulled behind a given point regardless of power. It does not compute the Davis or any other speed-dependent resistance formula: rolling resistance is entered, and it rises at low speed and again at high speed. It says nothing about braking, dynamic brake capacity, or the descending side of the hill, which is a different and often harder problem. The railroad's own tonnage tables, the locomotive builder's tractive effort curves, and the operating department govern.",
+  };
+}
+const tonnageRatingGradeExample = { inputs: { tractive_effort_lb: 140000, ruling_grade_pct: 1.2, rolling_resistance_lb_per_ton: 3, curve_degrees: 3, weight_on_drivers_lb: 1680000, adhesion_factor: 0.3, alternate_grade_pct: 0.5 } };
+RAIL_RENDERERS["tonnage-rating-grade"] = _simpleRenderer({
+  citation: "Citation: the train resistance components by name -- grade resistance 20 lb/ton per 1% (the same constant the haul-road resistance calculation uses, so the two cannot disagree about what a grade costs), rolling resistance entered, and curve resistance about 0.8 lb/ton per degree -- with the tonnage rating = governing tractive effort / total resistance. The adhesion ceiling is weight on drivers x an adhesion factor (roughly 0.25 to 0.35 dry with modern control, much less on wet or contaminated rail), and the rating follows the LOWER of the two. Steady state at constant speed; no starting resistance, slack action, drawbar limits, or braking. The railroad's own tonnage tables, the locomotive builder's tractive effort curves, and the operating department govern.",
+  example: tonnageRatingGradeExample.inputs,
+  fields: [
+    { key: "tractive_effort_lb", label: "Available tractive effort (lb)", kind: "number", default: 140000 },
+    { key: "ruling_grade_pct", label: "Ruling grade (%)", kind: "number", default: 1.2 },
+    { key: "rolling_resistance_lb_per_ton", label: "Rolling resistance (lb per ton)", kind: "number", default: 3 },
+    { key: "curve_degrees", label: "Curvature on the ruling grade (degrees)", kind: "number", default: 3 },
+    { key: "weight_on_drivers_lb", label: "Locomotive weight on drivers (lb, 0 to skip)", kind: "number", default: 1680000 },
+    { key: "adhesion_factor", label: "Adhesion factor (0 to 1)", kind: "number", default: 0.3 },
+    { key: "alternate_grade_pct", label: "Comparison grade (%, 0 to skip)", kind: "number", default: 0.5 },
+  ],
+  outputs: [
+    { key: "r", id: "trg-out-r", label: "Resistance", value: (r) => fmt(r.total_resistance_lb_per_ton, 2) + " lb/ton -- grade " + fmt(r.grade_resistance_lb_per_ton, 1) + ", rolling " + fmt(r.rolling_resistance_lb_per_ton, 1) + ", curve " + fmt(r.curve_resistance_lb_per_ton, 1) },
+    { key: "t", id: "trg-out-t", label: "Tonnage rating", value: (r) => fmt(r.tonnage_rating_tons, 0) + " tons over that hill" },
+    { key: "a", id: "trg-out-a", label: "Adhesion", value: (r) => r.adhesion_verdict },
+    { key: "l", id: "trg-out-l", label: "The hill, not the railroad", value: (r) => "on level track the same power moves " + fmt(r.level_tonnage_tons, 0) + " tons at " + fmt(r.level_resistance_lb_per_ton, 2) + " lb/ton -- " + fmt(r.grade_penalty_x, 1) + "x as much" },
+    { key: "c", id: "trg-out-c", label: "At the comparison grade", value: (r) => r.alternate_tonnage_tons === null ? "(no comparison grade entered)" : fmt(r.alternate_tonnage_tons, 0) + " tons at " + fmt(r.alternate_grade_pct, 2) + "%, " + fmt(r.alternate_resistance_lb_per_ton, 2) + " lb/ton" },
+    { key: "d", id: "trg-out-d", label: "Drivers needed for this tractive effort", value: (r) => fmt(r.drivers_needed_for_te_lb, 0) + " lb at " + fmt(r.adhesion_factor * 100, 0) + "% adhesion" },
+    { key: "n", id: "trg-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTonnageRatingGrade,
+});
+
+// ============ spec-v1548: train air brake reduction ============
+
+// dims: in { charged_pressure_psi: M L^-1 T^-2, reduction_psi: M L^-1 T^-2, cylinder_ratio: dimensionless, full_service_reduction_psi: M L^-1 T^-2, car_count: dimensionless, propagation_rate_cars_per_second: dimensionless } out: { brake_pipe_psi: M L^-1 T^-2, cylinder_psi: M L^-1 T^-2, remaining_reduction_psi: M L^-1 T^-2, full_service_cylinder_psi: M L^-1 T^-2, wasted_reduction_psi: M L^-1 T^-2, propagation_seconds: T }
+export function computeTrainBrakeReduction({ charged_pressure_psi = 90, reduction_psi = 0, cylinder_ratio = 2.5, full_service_reduction_psi = 26, car_count = 0, propagation_rate_cars_per_second = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(charged_pressure_psi > 0)) return { error: "Brake pipe charged pressure must be positive (psi)." };
+  if (reduction_psi < 0) return { error: "The service reduction cannot be negative (psi)." };
+  if (!(reduction_psi <= charged_pressure_psi)) return { error: "The reduction cannot exceed the charged pressure; that is a complete venting, not a service reduction." };
+  if (!(cylinder_ratio > 0)) return { error: "The cylinder-to-reduction ratio must be positive." };
+  if (!(full_service_reduction_psi > 0)) return { error: "The full-service reduction point must be positive (psi)." };
+  if (car_count < 0) return { error: "Car count cannot be negative." };
+  if (car_count > 0 && !(propagation_rate_cars_per_second > 0)) return { error: "Enter a propagation rate in cars per second to estimate the delay to the rear." };
+  const brake_pipe_psi = charged_pressure_psi - reduction_psi;
+  // Cylinder pressure rises with the reduction until the auxiliary reservoir
+  // and the cylinder equalize, which is what full service means. Past that
+  // point further reduction is air spent for nothing.
+  const effective_reduction_psi = Math.min(reduction_psi, full_service_reduction_psi);
+  const cylinder_psi = effective_reduction_psi * cylinder_ratio;
+  const full_service_cylinder_psi = full_service_reduction_psi * cylinder_ratio;
+  const at_or_past_full_service = reduction_psi >= full_service_reduction_psi;
+  const remaining_reduction_psi = Math.max(0, full_service_reduction_psi - reduction_psi);
+  const wasted_reduction_psi = Math.max(0, reduction_psi - full_service_reduction_psi);
+  const remaining_cylinder_psi = full_service_cylinder_psi - cylinder_psi;
+  const equalizing_reservoir_psi = brake_pipe_psi;
+  const propagation_seconds = car_count > 0 ? car_count / propagation_rate_cars_per_second : null;
+  const outs = [brake_pipe_psi, cylinder_psi, full_service_cylinder_psi, remaining_reduction_psi];
+  if (!outs.every(Number.isFinite)) return { error: "Brake reduction math is not a finite value." };
+  const verdict = at_or_past_full_service
+    ? (wasted_reduction_psi > 0
+      ? "PAST FULL SERVICE: the last " + fmt(wasted_reduction_psi, 1) + " psi of reduction bought NOTHING -- the cylinders were already at " + fmt(full_service_cylinder_psi, 1) + " psi at " + fmt(full_service_reduction_psi, 0) + " psi of reduction, and that air still has to be pumped back before the brakes will release"
+      : "AT FULL SERVICE: " + fmt(cylinder_psi, 1) + " psi in the cylinders, and there is no more service braking available. Anything further is emergency")
+    : "IN SERVICE RANGE: " + fmt(cylinder_psi, 1) + " psi in the cylinders, with " + fmt(remaining_reduction_psi, 1) + " psi of reduction still available -- worth " + fmt(remaining_cylinder_psi, 1) + " psi more in the cylinders";
+  return {
+    charged_pressure_psi, reduction_psi, brake_pipe_psi, cylinder_ratio,
+    effective_reduction_psi, cylinder_psi, full_service_reduction_psi,
+    full_service_cylinder_psi, at_or_past_full_service, remaining_reduction_psi,
+    remaining_cylinder_psi, wasted_reduction_psi, equalizing_reservoir_psi,
+    car_count, propagation_rate_cars_per_second, propagation_seconds, verdict,
+    note: "A freight brake pipe is charged to a regulated pressure, commonly 90 psi, and the brakes apply when that pressure DROPS. The multiplication is roughly two and a half: a ten pound brake pipe reduction produces about twenty five pounds in the brake cylinders. That continues until the auxiliary reservoir and the brake cylinder equalize, which happens at around a twenty six pound reduction, and BEYOND THAT POINT ADDITIONAL REDUCTION PRODUCES NO ADDITIONAL BRAKING. An engineer who keeps reducing past full service has spent the air and gained nothing, which is the situation that precedes losing a train on a grade -- so the wasted reduction is reported here as its own number rather than left to be inferred. THE PART THAT HAS NO FORMULA MATTERS MOST, AND IT IS RECHARGE TIME. Releasing the brakes requires pumping the brake pipe back up from the head end, and on a long train that takes minutes -- during which the rear of the train may still be applying while the head end is already releasing. That is why cycle braking on a descending grade is dangerous and why dynamic brake, not air, is the primary means of controlling a train downhill. Nothing here estimates recharge; it reports the approximate cylinder pressure and the full service point so the remaining air is visible as a quantity rather than as a feeling. Propagation is the same effect on the way in. A reduction takes time to travel to the rear, so the head end is braking before the tail is, which is what produces slack run-in, and the same delay on release means the rear is still applied while the head end pulls. The propagation estimate here is a rate the reader enters against the car count, not a model of the brake pipe. AN APPROXIMATION OF A SYSTEM WITH MANY VARIABLES. The cylinder ratio depends on the brake equipment, the piston travel, the cylinder and reservoir volumes, and the brake rigging ratio, and it differs between car types and between empty and loaded cars on an empty-load device. This does not model emergency applications, which vent the pipe rapidly and reach a higher cylinder pressure than full service, retainers, hand brakes, dynamic brake, or the interaction between them. It does not calculate stopping distance, which depends on tonnage, grade, speed, brake shoe condition, wheel condition, and the percentage of operative brakes, and it is not a substitute for the air brake test. It says nothing about a train's ability to hold or stop on any particular grade. The railroad's air brake and train handling rules, the equipment manufacturer's data, and 49 CFR 232 govern.",
+  };
+}
+const trainBrakeReductionExample = { inputs: { charged_pressure_psi: 90, reduction_psi: 30, cylinder_ratio: 2.5, full_service_reduction_psi: 26, car_count: 100, propagation_rate_cars_per_second: 10 } };
+RAIL_RENDERERS["train-brake-reduction"] = _simpleRenderer({
+  citation: "Citation: the freight air brake service relations by name -- brake cylinder pressure is about 2.5 times the brake pipe reduction until the auxiliary reservoir and the cylinder equalize at full service, commonly a 26 psi reduction from a 90 psi charged pipe, beyond which further reduction adds no braking. The cylinder ratio depends on the brake equipment, piston travel, cylinder and reservoir volumes and rigging ratio and is ENTERED. Emergency applications, retainers, hand brakes, dynamic brake, recharge time and stopping distance are all outside it. The railroad's air brake and train handling rules, the equipment manufacturer's data, and 49 CFR 232 govern.",
+  example: trainBrakeReductionExample.inputs,
+  fields: [
+    { key: "charged_pressure_psi", label: "Brake pipe charged pressure (psi)", kind: "number", default: 90 },
+    { key: "reduction_psi", label: "Service reduction made (psi)", kind: "number", default: 30 },
+    { key: "cylinder_ratio", label: "Cylinder pressure per psi of reduction", kind: "number", default: 2.5 },
+    { key: "full_service_reduction_psi", label: "Full-service reduction point (psi)", kind: "number", default: 26 },
+    { key: "car_count", label: "Cars in the train (0 to skip propagation)", kind: "number", default: 100 },
+    { key: "propagation_rate_cars_per_second", label: "Propagation rate (cars per second)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "p", id: "tbr-out-p", label: "Brake pipe now", value: (r) => fmt(r.brake_pipe_psi, 1) + " psi, down from " + fmt(r.charged_pressure_psi, 0) },
+    { key: "c", id: "tbr-out-c", label: "Brake cylinder", value: (r) => fmt(r.cylinder_psi, 1) + " psi" },
+    { key: "v", id: "tbr-out-v", label: "Against full service", value: (r) => r.verdict },
+    { key: "f", id: "tbr-out-f", label: "Full service is", value: (r) => fmt(r.full_service_reduction_psi, 0) + " psi of reduction, worth " + fmt(r.full_service_cylinder_psi, 1) + " psi in the cylinders" },
+    { key: "t", id: "tbr-out-t", label: "Propagation to the rear", value: (r) => r.propagation_seconds === null ? "(no car count entered)" : "about " + fmt(r.propagation_seconds, 1) + " s over " + fmt(r.car_count, 0) + " cars -- the head end brakes before the tail does, which is where slack run-in comes from" },
+    { key: "n", id: "tbr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTrainBrakeReduction,
+});
+
+// ============ spec-v1549: railcar clearance plate and dynamic envelope ============
+
+// dims: in { truck_centres_ft: L, car_length_ft: L, car_width_in: L, degree_of_curve: dimensionless, clearance_to_obstruction_in: L, required_clearance_in: L } out: { radius_ft: L, mid_ordinate_in: L, end_overhang_in: L, effective_half_width_in: L, remaining_clearance_in: L, sharpest_curve_deg: dimensionless }
+export function computeClearancePlateEnvelope({ truck_centres_ft = 0, car_length_ft = 0, car_width_in = 0, degree_of_curve = 0, clearance_to_obstruction_in = 0, required_clearance_in = 6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(truck_centres_ft > 0)) return { error: "The distance between truck centres must be positive (ft)." };
+  if (!(car_length_ft > 0)) return { error: "Car or load length must be positive (ft)." };
+  if (!(car_length_ft >= truck_centres_ft)) return { error: "The car cannot be shorter than the distance between its truck centres." };
+  if (!(car_width_in > 0)) return { error: "Car or load width must be positive (in)." };
+  if (!(degree_of_curve > 0)) return { error: "Degree of curve must be positive." };
+  if (clearance_to_obstruction_in < 0) return { error: "The measured clearance cannot be negative (in)." };
+  if (required_clearance_in < 0) return { error: "The required clearance cannot be negative (in)." };
+  const radius_ft = _DEG_ARC_CONST / degree_of_curve;
+  // A long rigid car on a curve is a chord across an arc. Its CENTRE sits
+  // inside the arc by the mid-ordinate of its truck-centre span; its CORNERS
+  // swing outside it. Both matter, in opposite directions.
+  const mid_ordinate_ft = truck_centres_ft * truck_centres_ft / (8 * radius_ft);
+  const mid_ordinate_in = mid_ordinate_ft * 12;
+  const overhang_ft = (car_length_ft - truck_centres_ft) / 2;
+  const end_overhang_ft = (car_length_ft * car_length_ft - truck_centres_ft * truck_centres_ft) / (8 * radius_ft);
+  const end_overhang_in = end_overhang_ft * 12;
+  const half_width_in = car_width_in / 2;
+  const effective_half_width_in = half_width_in + Math.max(mid_ordinate_in, end_overhang_in);
+  const inside_half_width_in = half_width_in + mid_ordinate_in;
+  const outside_half_width_in = half_width_in + end_overhang_in;
+  const remaining_clearance_in = clearance_to_obstruction_in > 0 ? clearance_to_obstruction_in - effective_half_width_in : null;
+  const fits = remaining_clearance_in === null ? null : remaining_clearance_in >= required_clearance_in;
+  // Worked backwards: the sharpest curve that still leaves the required
+  // clearance, given the measured distance to the obstruction.
+  let sharpest_curve_deg = null;
+  if (clearance_to_obstruction_in > 0) {
+    const allowable_swing_in = clearance_to_obstruction_in - required_clearance_in - half_width_in;
+    if (allowable_swing_in > 0) {
+      const allowable_swing_ft = allowable_swing_in / 12;
+      const radius_for_mid = truck_centres_ft * truck_centres_ft / (8 * allowable_swing_ft);
+      const radius_for_end = (car_length_ft * car_length_ft - truck_centres_ft * truck_centres_ft) / (8 * allowable_swing_ft);
+      const controlling_radius_ft = Math.max(radius_for_mid, radius_for_end);
+      sharpest_curve_deg = _DEG_ARC_CONST / controlling_radius_ft;
+    }
+  }
+  const outs = [radius_ft, mid_ordinate_in, end_overhang_in, effective_half_width_in];
+  if (!outs.every(Number.isFinite)) return { error: "Clearance envelope math is not a finite value." };
+  const verdict = fits === null
+    ? "Measure the distance from track centre to the obstruction to check it."
+    : fits
+      ? "FITS with " + fmt(remaining_clearance_in, 1) + " in of clearance against a required " + fmt(required_clearance_in, 1) + " in -- the car occupies " + fmt(effective_half_width_in, 1) + " in from track centre on this curve"
+      : (remaining_clearance_in < 0
+        ? "DOES NOT FIT: the car occupies " + fmt(effective_half_width_in, 1) + " in from track centre and the obstruction is at " + fmt(clearance_to_obstruction_in, 1) + " in. It STRIKES by " + fmt(-remaining_clearance_in, 1) + " in"
+        : "TOO TIGHT: " + fmt(remaining_clearance_in, 1) + " in of clearance against a required " + fmt(required_clearance_in, 1) + " in. A different route, a different car, or a shift of the load on the deck");
+  return {
+    truck_centres_ft, car_length_ft, car_width_in, degree_of_curve, radius_ft,
+    mid_ordinate_ft, mid_ordinate_in, overhang_ft, end_overhang_ft, end_overhang_in,
+    half_width_in, inside_half_width_in, outside_half_width_in, effective_half_width_in,
+    clearance_to_obstruction_in, required_clearance_in, remaining_clearance_in,
+    fits, sharpest_curve_deg, verdict,
+    note: "A long rigid car on a curve is a chord across an arc. Its centre sits INSIDE the arc by the mid-ordinate of its truck-centre span, and its corners swing OUTSIDE it. Both matter and they matter in opposite directions: the middle of the car is the problem on the inside of a curve, near a platform or a signal, and the ends are the problem on the outside, near a structure or an adjacent track -- so a car that clears a platform may still catch a pole on the other side of the same curve. THE SWING GROWS WITH THE SQUARE OF LENGTH, which is the whole reason this is a routing question and not a car question. An eighty-nine foot car swings nearly six times as far as a forty-five foot one on the same curve, on identical track. That is why long cars, multi-level autoracks, and long flat loads carry routing restrictions that an ordinary boxcar does not, and why a dimensional load moves on an approved route rather than on any route -- the track is the same, the car is not. The job in the field is a fast go or no-go: given the car, the curve, and the measured distance to the obstruction, does it fit, and if not by how much. That last number is what decides whether the answer is a different route, a different car, or a shift of the load on the deck, and it is worth having before the car is loaded rather than after. The sharpest curve the load can negotiate at a stated clearance is the same relation worked backwards. A GEOMETRIC SCREEN ON ONE CURVE AND ONE OBSTRUCTION. It does not reproduce the AAR clearance plates, which define tangent-track envelopes by height as well as width and which the load has to fit inside before any of this applies. It does not account for superelevation, which leans a car toward the inside of a curve and moves the whole envelope; for lateral play in the trucks, worn centre plates, spring travel, or dynamic sway, all of which add to the static geometry; for the vertical envelope over crests and sags; or for the height of the obstruction against the height of the load, which is a separate check and often the governing one. Clearances measured from a nominal track centre do not account for track that has shifted. Dimensional and excess-dimension loads move under the carrier's clearance department and their approved route, and that approval is not this arithmetic. The AAR clearance plates and loading rules, the carrier's clearance department and route approval, and a field measurement govern.",
+  };
+}
+const clearancePlateEnvelopeExample = { inputs: { truck_centres_ft: 73, car_length_ft: 89, car_width_in: 126, degree_of_curve: 5, clearance_to_obstruction_in: 132, required_clearance_in: 6 } };
+RAIL_RENDERERS["clearance-plate-envelope"] = _simpleRenderer({
+  citation: "Citation: the chord-offset relations by name -- R = 5,729.58 / degree of curve (the arc definition, the same one the degree-of-curve calculation uses); the car centre's mid-ordinate = truck centres squared / (8 R), swinging toward the INSIDE of the curve; and the end overhang = (car length squared - truck centres squared) / (8 R), swinging toward the OUTSIDE. A geometric screen on one curve and one obstruction: it does not reproduce the AAR clearance plates, or account for superelevation, truck lateral play, spring travel, dynamic sway, or the vertical envelope. The AAR clearance plates and loading rules, the carrier's clearance department and route approval, and a field measurement govern.",
+  example: clearancePlateEnvelopeExample.inputs,
+  fields: [
+    { key: "truck_centres_ft", label: "Distance between truck centres (ft)", kind: "number", default: 73 },
+    { key: "car_length_ft", label: "Car or load length over ends (ft)", kind: "number", default: 89 },
+    { key: "car_width_in", label: "Car or load width (in)", kind: "number", default: 126 },
+    { key: "degree_of_curve", label: "Degree of curve", kind: "number", default: 5 },
+    { key: "clearance_to_obstruction_in", label: "Track centre to the obstruction (in, 0 to skip)", kind: "number", default: 132 },
+    { key: "required_clearance_in", label: "Required clearance (in)", kind: "number", default: 6 },
+  ],
+  outputs: [
+    { key: "r", id: "cpe-out-r", label: "Curve radius", value: (r) => fmt(r.radius_ft, 0) + " ft at " + fmt(r.degree_of_curve, 2) + " degrees" },
+    { key: "m", id: "cpe-out-m", label: "Mid-ordinate at the car centre", value: (r) => fmt(r.mid_ordinate_in, 2) + " in toward the INSIDE of the curve -- the platform and signal side" },
+    { key: "e", id: "cpe-out-e", label: "End overhang", value: (r) => fmt(r.end_overhang_in, 2) + " in toward the OUTSIDE -- the structure and adjacent-track side" },
+    { key: "w", id: "cpe-out-w", label: "Effective half width", value: (r) => fmt(r.effective_half_width_in, 1) + " in from track centre, against " + fmt(r.half_width_in, 1) + " in on tangent" },
+    { key: "v", id: "cpe-out-v", label: "Against the obstruction", value: (r) => r.verdict },
+    { key: "s", id: "cpe-out-s", label: "Sharpest curve this load can take", value: (r) => r.sharpest_curve_deg === null ? "(no measured clearance, or none available at this width)" : (r.sharpest_curve_deg > 30 ? "sharper than any track this car would run on (" + fmt(r.sharpest_curve_deg, 0) + " degrees), so this obstruction does not restrict it" : fmt(r.sharpest_curve_deg, 2) + " degrees at the required clearance") },
+    { key: "n", id: "cpe-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeClearancePlateEnvelope,
+});

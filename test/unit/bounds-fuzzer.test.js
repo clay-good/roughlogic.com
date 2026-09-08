@@ -46567,3 +46567,356 @@ test("bounds: spec-v1616 cut -- chip-seal-mcleod gains project quantities, rates
   assert.ok(Math.abs(p.project_binder_gal - r.binder_gal_per_1000sy * 20) < 1e-9);
   assert.ok("error" in _v1616host({ ...base, project_area_sy: -1 }));
 });
+
+// ===========================================================================
+// spec-v1617..v1621 and spec-v1546..v1549: the 2026-09-08 trade-expansion
+// concrete placement and tilt-up band, and the rail logistics half that
+// finishes calc-rail.js. Nine tiles into two existing modules, nothing cut.
+//
+// THREE SPECS WERE INTERNALLY WRONG:
+//   spec-v1617 gives the static head as "about 0.043 psi per foot of rise per
+//     pcf". It is 1/144 = 0.00694, and its own "roughly 1 psi per foot for
+//     normal weight concrete" confirms it: 150/144 = 1.04.
+//   spec-v1619 states E = 2.8e7 psi and prints 10.23 in of elongation, which
+//     is the answer for 2.85e7. At the stated modulus it is 10.41 in.
+//   spec-v1547 computes an adhesion-limited 302,400 lb on wet rail and says
+//     "the tonnage rating falls to 10,286 tons". The consist makes 140,000 lb,
+//     which is far BELOW 302,400, so adhesion never governs there and the
+//     rating stays 4,762 -- and 10,286 is higher than the number it is said to
+//     have fallen from. Which of the two governs is now a computed boolean.
+// ===========================================================================
+
+import { computeConcretePumpLinePressure as _v1617 } from "../../calc-concrete.js";
+test("bounds: spec-v1617 computeConcretePumpLinePressure -- 1.04 psi per foot, not 0.043", () => {
+  const base = { horizontal_length_ft: 320, vertical_lift_ft: 60, unit_weight_pcf: 150, friction_psi_per_100ft: 4.5, bend_count: 6, bend_equivalent_ft: 10, hose_length_ft: 25, hose_friction_multiple: 3, pump_rated_psi: 1100 };
+  const r = _v1617(base);
+  // 150 pcf over 144 sq in to the sq ft is 1.0417 psi per foot of rise.
+  assert.ok(Math.abs(r.psi_per_ft_of_lift - 1.04166667) < 1e-8);
+  assert.ok(Math.abs(r.static_psi - 62.5) < 1e-9);
+  assert.ok(Math.abs(r.equivalent_length_ft - 455) < 1e-9);
+  assert.ok(Math.abs(r.friction_psi - 20.475) < 1e-9);
+  assert.ok(Math.abs(r.total_psi - 82.975) < 1e-9);
+  assert.equal(r.within_rating, true);
+  // Equivalent length is the sum of its three parts, always.
+  assert.ok(Math.abs(r.equivalent_length_ft - (base.horizontal_length_ft + r.bend_equivalent_total_ft + r.hose_equivalent_ft)) < 1e-12);
+  assert.ok(Math.abs(r.friction_psi - (r.line_psi + r.bend_psi + r.hose_psi)) < 1e-9);
+  // Static head is exactly linear in lift and in unit weight.
+  const twiceLift = _v1617({ ...base, vertical_lift_ft: 120 });
+  assert.ok(Math.abs(twiceLift.static_psi - 2 * r.static_psi) < 1e-9);
+  const light = _v1617({ ...base, unit_weight_pcf: 75 });
+  assert.ok(Math.abs(light.static_psi - r.static_psi / 2) < 1e-9);
+  // Six bends at ten equivalent feet each is sixty feet, and hose at three
+  // times its length is seventy five -- the field's own bookkeeping.
+  assert.ok(Math.abs(r.bend_equivalent_total_ft - 60) < 1e-12);
+  assert.ok(Math.abs(r.hose_equivalent_ft - 75) < 1e-12);
+  // The additional line available, added on, lands exactly on the rating.
+  const atLimit = _v1617({ ...base, horizontal_length_ft: base.horizontal_length_ft + r.additional_line_ft });
+  assert.ok(Math.abs(atLimit.total_psi - base.pump_rated_psi) < 1e-6);
+  // The stiff-mix case: a four-times friction rise on a longer line.
+  const stiff = _v1617({ ...base, horizontal_length_ft: 520, friction_psi_per_100ft: 20 });
+  assert.ok(Math.abs(stiff.line_psi - 104) < 1e-9);
+  assert.equal(stiff.within_rating, true);
+  assert.ok("error" in _v1617({ ...base, friction_psi_per_100ft: 0 }));
+  assert.ok("error" in _v1617({ ...base, hose_friction_multiple: 0.5 }));
+});
+
+import { computeBoomPumpReach as _v1618 } from "../../calc-concrete.js";
+test("bounds: spec-v1618 computeBoomPumpReach -- ten feet of reach lost to elevation", () => {
+  const base = { boom_reach_ft: 110, required_distance_ft: 95, required_height_ft: 45, boom_centre_offset_ft: 8, outrigger_load_lb: 40000, outrigger_pad_area_ft2: 4, power_line_distance_ft: 25, required_line_clearance_ft: 20 };
+  const r = _v1618(base);
+  assert.ok(Math.abs(r.reach_at_height_ft - 100.374300) < 1e-5);
+  assert.ok(Math.abs(r.reach_lost_to_height_ft - 9.6257005) < 1e-6);
+  assert.ok(Math.abs(r.reach_margin_ft - 5.3742995) < 1e-6);
+  assert.equal(r.reaches, true);
+  assert.ok(Math.abs(r.outrigger_pressure_psf - 10000) < 1e-9);
+  assert.equal(r.power_line_clear, true);
+  // The circle is symmetric: the height available at the required distance
+  // and the distance available at that height satisfy the same triangle.
+  assert.ok(Math.abs(r.reach_at_height_ft ** 2 + base.required_height_ft ** 2 - base.boom_reach_ft ** 2) < 1e-6);
+  assert.ok(Math.abs(r.max_height_at_distance_ft ** 2 + base.required_distance_ft ** 2 - base.boom_reach_ft ** 2) < 1e-6);
+  // At ground level the whole reach is horizontal, exactly.
+  const flat = _v1618({ ...base, required_height_ft: 0 });
+  assert.ok(Math.abs(flat.reach_at_height_ft - base.boom_reach_ft) < 1e-12);
+  assert.ok(Math.abs(flat.reach_lost_to_height_ft) < 1e-12);
+  // Ten feet further out and the same boom does not reach.
+  const far = _v1618({ ...base, required_distance_ft: 105 });
+  assert.equal(far.reaches, false);
+  assert.ok(far.verdict.startsWith("DOES NOT REACH"));
+  // Inside the clearance envelope is reported as such regardless of reach.
+  const nearLines = _v1618({ ...base, power_line_distance_ft: 12 });
+  assert.equal(nearLines.power_line_clear, false);
+  assert.ok(nearLines.power_line_verdict.startsWith("INSIDE THE CLEARANCE ENVELOPE"));
+  assert.equal(nearLines.reaches, true);
+  assert.ok("error" in _v1618({ ...base, required_height_ft: 110 }));
+  assert.ok("error" in _v1618({ ...base, outrigger_pad_area_ft2: 0 }));
+});
+
+import { computePostTensionElongation as _v1619 } from "../../calc-concrete.js";
+test("bounds: spec-v1619 computePostTensionElongation -- the average force, not the jacking force", () => {
+  const base = { strand_area_in2: 0.153, modulus_psi: 28000000, tendon_length_ft: 120, jacking_stress_ksi: 202.5, curvature_friction: 0.2, angular_change_rad: 0.3, wobble_per_ft: 0.0002, anchor_set_in: 0.25, measured_elongation_in: 8.35, tolerance_pct: 7 };
+  const r = _v1619(base);
+  assert.ok(Math.abs(r.jacking_force_lb - 30982.5) < 1e-6);
+  assert.ok(Math.abs(r.decay_exponent - 0.084) < 1e-12);
+  assert.ok(Math.abs(r.far_end_ratio - 0.91943126) < 1e-7);
+  assert.ok(Math.abs(r.average_ratio - 0.95915171) < 1e-7);
+  // spec-v1619 prints 10.23 in for a straight tendon at a stated E of 2.8e7.
+  // At that modulus it is 10.41; 10.23 is the answer for 2.85e7.
+  assert.ok(Math.abs(r.no_friction_elongation_in - 10.4142857) < 1e-6);
+  assert.ok(Math.abs(r.theoretical_elongation_in - 9.98888) < 1e-4);
+  assert.ok(Math.abs(r.expected_measured_in - 9.73888) < 1e-4);
+  assert.ok(Math.abs(r.elongation_difference_pct - -14.261188) < 1e-4);
+  assert.equal(r.within_tolerance, false);
+  assert.ok(r.verdict.startsWith("INVESTIGATE, DO NOT GROUT"));
+  // A straight tendon with no wobble has no decay at all, so the average IS
+  // the jacking force -- the limit of the integral, with no special case.
+  const straight = _v1619({ ...base, angular_change_rad: 0, wobble_per_ft: 0 });
+  assert.ok(Math.abs(straight.average_ratio - 1) < 1e-12);
+  assert.ok(Math.abs(straight.far_end_ratio - 1) < 1e-12);
+  assert.ok(Math.abs(straight.theoretical_elongation_in - straight.no_friction_elongation_in) < 1e-12);
+  // The average always sits between the far-end force and the jacking force.
+  assert.ok(r.average_ratio > r.far_end_ratio);
+  assert.ok(r.average_ratio < 1);
+  // Elongation is exactly linear in length and inverse in modulus.
+  const longTendon = _v1619({ ...base, tendon_length_ft: 240, wobble_per_ft: 0, angular_change_rad: 0 });
+  assert.ok(Math.abs(longTendon.theoretical_elongation_in - 2 * straight.theoretical_elongation_in) < 1e-9);
+  const stiffer = _v1619({ ...base, modulus_psi: 56000000 });
+  assert.ok(Math.abs(stiffer.theoretical_elongation_in - r.theoretical_elongation_in / 2) < 1e-9);
+  // A measurement at exactly the expected value is dead centre.
+  const perfect = _v1619({ ...base, measured_elongation_in: r.expected_measured_in });
+  assert.ok(Math.abs(perfect.elongation_difference_pct) < 1e-9);
+  assert.equal(perfect.within_tolerance, true);
+  // Long is investigated as well as short, with a different reason given.
+  const longMeasure = _v1619({ ...base, measured_elongation_in: r.expected_measured_in * 1.2 });
+  assert.equal(longMeasure.within_tolerance, false);
+  assert.ok(longMeasure.verdict.includes("Long means"));
+  assert.ok("error" in _v1619({ ...base, modulus_psi: 0 }));
+  assert.ok("error" in _v1619({ ...base, tolerance_pct: 0 }));
+});
+
+import { computeTiltUpLiftStress as _v1620 } from "../../calc-concrete.js";
+test("bounds: spec-v1620 computeTiltUpLiftStress -- one more row cuts the bending by 56%", () => {
+  const base = { panel_width_ft: 8, panel_height_ft: 24, thickness_in: 7.25, unit_weight_pcf: 150, lift_day_strength_psi: 2200, insert_rows: 2, insert_columns: 2, suction_fraction: 0, safety_factor: 1.5 };
+  const r = _v1620(base);
+  assert.ok(Math.abs(r.panel_weight_lb - 17400) < 1e-6);
+  assert.ok(Math.abs(r.load_per_insert_lb - 4350) < 1e-9);
+  assert.ok(Math.abs(r.span_between_rows_ft - 12) < 1e-12);
+  assert.ok(Math.abs(r.modulus_of_rupture_psi - 351.781181) < 1e-5);
+  assert.ok(Math.abs(r.allowable_stress_psi - 234.520787) < 1e-5);
+  assert.ok(Math.abs(r.bending_stress_psi - 186.206897) < 1e-5);
+  assert.equal(r.within_capacity, true);
+  // The spec's headline: moment goes as the span squared, so three rows over
+  // two is 64/144 -- a 56% cut, not a third.
+  const three = _v1620({ ...base, insert_rows: 3 });
+  assert.ok(Math.abs(three.span_between_rows_ft - 8) < 1e-12);
+  assert.ok(Math.abs(three.bending_stress_psi / r.bending_stress_psi - 64 / 144) < 1e-9);
+  assert.ok(Math.abs((1 - three.bending_stress_psi / r.bending_stress_psi) * 100 - 55.5555556) < 1e-6);
+  // The strength trap: the same panel at 28 days looks 26% stronger.
+  const twentyEight = _v1620({ ...base, lift_day_strength_psi: 4000 });
+  assert.ok(Math.abs(twentyEight.modulus_of_rupture_psi - 474.341649) < 1e-5);
+  assert.ok(Math.abs((1 - r.modulus_of_rupture_psi / twentyEight.modulus_of_rupture_psi) * 100 - 25.8380151) < 1e-6);
+  // Suction multiplies the load that reaches the inserts and the crane.
+  const sticky = _v1620({ ...base, suction_fraction: 1 });
+  assert.ok(Math.abs(sticky.lift_load_lb - 2 * r.panel_weight_lb) < 1e-9);
+  assert.ok(Math.abs(sticky.load_per_insert_lb - 2 * r.load_per_insert_lb) < 1e-9);
+  assert.ok(Math.abs(sticky.bending_stress_psi - 2 * r.bending_stress_psi) < 1e-9);
+  // Rows required, fed back in, brings it inside capacity.
+  const thin = _v1620({ ...base, lift_day_strength_psi: 800 });
+  assert.equal(thin.within_capacity, false);
+  const fixed = _v1620({ ...base, lift_day_strength_psi: 800, insert_rows: thin.rows_required });
+  assert.equal(fixed.within_capacity, true);
+  assert.ok("error" in _v1620({ ...base, insert_rows: 1 }));
+  assert.ok("error" in _v1620({ ...base, lift_day_strength_psi: 0 }));
+});
+
+import { computeTiltUpBraceLoad as _v1621 } from "../../calc-concrete.js";
+test("bounds: spec-v1621 computeTiltUpBraceLoad -- the resultant height, not the brace count alone", () => {
+  const base = { panel_width_ft: 24, panel_height_ft: 24, wind_pressure_psf: 12, resultant_height_ft: 12, brace_attachment_height_ft: 16, brace_angle_deg: 55, brace_count: 3, brace_capacity_lb: 4000, alternate_angle_deg: 45 };
+  const r = _v1621(base);
+  assert.ok(Math.abs(r.wind_force_lb - 6912) < 1e-9);
+  assert.ok(Math.abs(r.total_lateral_lb - 5184) < 1e-9);
+  assert.ok(Math.abs(r.lateral_per_brace_lb - 1728) < 1e-9);
+  assert.ok(Math.abs(r.axial_per_brace_lb - 3012.67614) < 1e-4);
+  assert.ok(Math.abs(r.alternate_axial_lb - 2443.76100) < 1e-4);
+  assert.equal(r.within_capacity, true);
+  // The lateral load is NOT the wind force over the brace count: the
+  // resultant at 12 ft carried by braces at 16 ft scales it by 12/16.
+  assert.ok(Math.abs(r.total_lateral_lb - r.wind_force_lb * 12 / 16) < 1e-9);
+  assert.ok(Math.abs(r.lateral_per_brace_lb - r.wind_force_lb / base.brace_count) > 500);
+  // A brace attached at the resultant height carries the wind force itself.
+  const level = _v1621({ ...base, brace_attachment_height_ft: 12 });
+  assert.ok(Math.abs(level.total_lateral_lb - level.wind_force_lb) < 1e-9);
+  // At 45 degrees the axial load is exactly the lateral times root two, and
+  // the anchor sits exactly at the attachment height.
+  const fortyFive = _v1621({ ...base, brace_angle_deg: 45 });
+  assert.ok(Math.abs(fortyFive.axial_per_brace_lb - r.lateral_per_brace_lb * Math.SQRT2) < 1e-6);
+  assert.ok(Math.abs(fortyFive.anchor_offset_ft - base.brace_attachment_height_ft) < 1e-9);
+  // Flatter carries less axially and reaches further into the slab.
+  assert.ok(r.alternate_axial_lb < r.axial_per_brace_lb);
+  assert.ok(r.alternate_offset_ft > r.anchor_offset_ft);
+  // The horizontal anchor component is the lateral load, and the axial is
+  // the vector sum of the two components.
+  assert.ok(Math.abs(r.anchor_horizontal_lb - r.lateral_per_brace_lb) < 1e-12);
+  assert.ok(Math.abs(Math.hypot(r.anchor_horizontal_lb, r.anchor_vertical_lb) - r.axial_per_brace_lb) < 1e-6);
+  // Braces required, fed back in, brings it inside the rating.
+  const gusty = _v1621({ ...base, wind_pressure_psf: 30 });
+  assert.equal(gusty.within_capacity, false);
+  const braced = _v1621({ ...base, wind_pressure_psf: 30, brace_count: gusty.braces_required });
+  assert.equal(braced.within_capacity, true);
+  assert.ok("error" in _v1621({ ...base, brace_angle_deg: 90 }));
+  assert.ok("error" in _v1621({ ...base, wind_pressure_psf: 0 }));
+});
+
+import { computeRailcarLoadLimit as _v1546 } from "../../calc-rail.js";
+test("bounds: spec-v1546 computeRailcarLoadLimit -- the route limit is invisible on the car", () => {
+  const base = { gross_rail_load_lb: 286000, light_weight_lb: 63000, lading_net_lb: 200000, cubic_capacity_ft3: 5200, lading_density_pcf: 30, route_gross_rail_load_lb: 263000 };
+  const r = _v1546(base);
+  assert.ok(Math.abs(r.load_limit_lb - 223000) < 1e-9);
+  assert.ok(Math.abs(r.gross_on_rail_lb - 263000) < 1e-9);
+  assert.ok(Math.abs(r.utilization_pct - 89.6860987) < 1e-6);
+  assert.ok(Math.abs(r.remaining_capacity_lb - 23000) < 1e-9);
+  assert.ok(Math.abs(r.route_load_limit_lb - 200000) < 1e-9);
+  assert.ok(Math.abs(r.route_shortfall_lb - 23000) < 1e-9);
+  assert.equal(r.within_car, true);
+  assert.equal(r.route_governs, true);
+  // Cube versus weight: 5,200 cu ft at 30 pcf fills at 156,000 lb, well under
+  // the 200,000 the route allows, so cube governs and the weight is moot.
+  assert.ok(Math.abs(r.cube_limited_weight_lb - 156000) < 1e-9);
+  assert.equal(r.cube_governs, true);
+  assert.ok(r.governs_verdict.startsWith("CUBE GOVERNS"));
+  // A dense commodity flips it.
+  const dense = _v1546({ ...base, lading_density_pcf: 60 });
+  assert.equal(dense.cube_governs, false);
+  assert.ok(dense.governs_verdict.startsWith("WEIGHT GOVERNS"));
+  // The governing limit is the LOWER of the two, always.
+  assert.ok(Math.abs(r.governing_load_limit_lb - Math.min(r.load_limit_lb, r.route_load_limit_lb)) < 1e-12);
+  const lightRoute = _v1546({ ...base, route_gross_rail_load_lb: 315000 });
+  assert.equal(lightRoute.route_governs, false);
+  assert.ok(Math.abs(lightRoute.governing_load_limit_lb - lightRoute.load_limit_lb) < 1e-12);
+  // Loading to the stencil overloads a restricted route.
+  const overRoute = _v1546({ ...base, lading_net_lb: 223000 });
+  assert.equal(overRoute.within_car, true);
+  assert.equal(overRoute.within_route, false);
+  assert.ok(overRoute.route_verdict.startsWith("OVER THE ROUTE"));
+  // A heavier light weight is exactly that much less capacity.
+  const rebuilt = _v1546({ ...base, light_weight_lb: 63500 });
+  assert.ok(Math.abs(r.load_limit_lb - rebuilt.load_limit_lb - 500) < 1e-9);
+  assert.ok("error" in _v1546({ ...base, light_weight_lb: 300000 }));
+  assert.ok("error" in _v1546({ ...base, gross_rail_load_lb: 0 }));
+});
+
+import { computeTonnageRatingGrade as _v1547 } from "../../calc-rail.js";
+test("bounds: spec-v1547 computeTonnageRatingGrade -- adhesion does NOT govern at 30%", () => {
+  const base = { tractive_effort_lb: 140000, ruling_grade_pct: 1.2, rolling_resistance_lb_per_ton: 3, curve_degrees: 3, weight_on_drivers_lb: 1680000, adhesion_factor: 0.3, alternate_grade_pct: 0.5 };
+  const r = _v1547(base);
+  assert.ok(Math.abs(r.grade_resistance_lb_per_ton - 24) < 1e-12);
+  assert.ok(Math.abs(r.curve_resistance_lb_per_ton - 2.4) < 1e-12);
+  assert.ok(Math.abs(r.total_resistance_lb_per_ton - 29.4) < 1e-12);
+  assert.ok(Math.abs(r.tonnage_rating_tons - 4761.90476) < 1e-4);
+  assert.ok(Math.abs(r.level_tonnage_tons - 25925.9259) < 1e-3);
+  assert.ok(Math.abs(r.grade_penalty_x - 5.44444444) < 1e-7);
+  assert.ok(Math.abs(r.drivers_needed_for_te_lb - 466666.667) < 1e-2);
+  // spec-v1547 says the rating "falls to 10,286 tons" on wet rail. At 30%
+  // adhesion the units could put down 504,000 lb -- far MORE than the 140,000
+  // the consist makes -- so adhesion never governs and the rating is unchanged.
+  assert.ok(Math.abs(r.adhesion_limited_te_lb - 504000) < 1e-9);
+  assert.equal(r.adhesion_governs, false);
+  assert.ok(Math.abs(r.governing_te_lb - base.tractive_effort_lb) < 1e-12);
+  assert.ok(Math.abs(r.tonnage_rating_tons - r.rating_on_te_alone_tons) < 1e-12);
+  assert.ok(r.adhesion_verdict.startsWith("TRACTIVE EFFORT GOVERNS"));
+  // When adhesion DOES bind, the rating FALLS -- the direction the spec's
+  // sentence claimed while its arithmetic went the other way.
+  const wet = _v1547({ ...base, adhesion_factor: 0.05 });
+  assert.equal(wet.adhesion_governs, true);
+  assert.ok(Math.abs(wet.adhesion_limited_te_lb - 84000) < 1e-9);
+  assert.ok(wet.tonnage_rating_tons < r.tonnage_rating_tons);
+  assert.ok(Math.abs(wet.tonnage_rating_tons - 2857.14286) < 1e-4);
+  assert.ok(wet.adhesion_verdict.startsWith("ADHESION GOVERNS"));
+  // At exactly the consist's tractive effort the two coincide.
+  const edge = _v1547({ ...base, weight_on_drivers_lb: base.tractive_effort_lb / base.adhesion_factor });
+  assert.ok(Math.abs(edge.adhesion_limited_te_lb - base.tractive_effort_lb) < 1e-6);
+  assert.ok(Math.abs(edge.tonnage_rating_tons - r.tonnage_rating_tons) < 1e-6);
+  // Twenty pounds per ton per percent, exactly, and the level case drops only
+  // the grade term.
+  const flat = _v1547({ ...base, ruling_grade_pct: 0 });
+  assert.ok(Math.abs(flat.total_resistance_lb_per_ton - r.level_resistance_lb_per_ton) < 1e-12);
+  assert.ok(Math.abs(flat.tonnage_rating_tons - r.level_tonnage_tons) < 1e-9);
+  const steeper = _v1547({ ...base, ruling_grade_pct: 2.4 });
+  assert.ok(Math.abs(steeper.grade_resistance_lb_per_ton - 2 * r.grade_resistance_lb_per_ton) < 1e-12);
+  assert.ok("error" in _v1547({ ...base, adhesion_factor: 0 }));
+  assert.ok("error" in _v1547({ ...base, tractive_effort_lb: 0 }));
+});
+
+import { computeTrainBrakeReduction as _v1548 } from "../../calc-rail.js";
+test("bounds: spec-v1548 computeTrainBrakeReduction -- past full service the air buys nothing", () => {
+  const base = { charged_pressure_psi: 90, reduction_psi: 30, cylinder_ratio: 2.5, full_service_reduction_psi: 26, car_count: 100, propagation_rate_cars_per_second: 10 };
+  const r = _v1548(base);
+  assert.ok(Math.abs(r.brake_pipe_psi - 60) < 1e-12);
+  assert.ok(Math.abs(r.cylinder_psi - 65) < 1e-12);
+  assert.ok(Math.abs(r.wasted_reduction_psi - 4) < 1e-12);
+  assert.equal(r.at_or_past_full_service, true);
+  assert.ok(r.verdict.startsWith("PAST FULL SERVICE"));
+  assert.ok(Math.abs(r.propagation_seconds - 10) < 1e-12);
+  // The spec's own ladder, each rung at 2.5 psi of cylinder per psi of pipe.
+  for (const [red, cyl] of [[6, 15], [10, 25], [20, 50], [26, 65]]) {
+    const x = _v1548({ ...base, reduction_psi: red });
+    assert.ok(Math.abs(x.cylinder_psi - cyl) < 1e-9, "reduction " + red);
+    assert.ok(Math.abs(x.brake_pipe_psi - (90 - red)) < 1e-12);
+  }
+  // Past full service the cylinder pressure is FLAT -- 30 and 40 psi of
+  // reduction give the identical cylinder pressure, and the excess is waste.
+  const forty = _v1548({ ...base, reduction_psi: 40 });
+  assert.ok(Math.abs(forty.cylinder_psi - r.cylinder_psi) < 1e-12);
+  assert.ok(Math.abs(forty.wasted_reduction_psi - 14) < 1e-12);
+  assert.ok(Math.abs(forty.remaining_reduction_psi) < 1e-12);
+  // Inside the service range the remaining reduction is what is left to give.
+  const light = _v1548({ ...base, reduction_psi: 10 });
+  assert.equal(light.at_or_past_full_service, false);
+  assert.ok(Math.abs(light.remaining_reduction_psi - 16) < 1e-12);
+  assert.ok(Math.abs(light.remaining_cylinder_psi - 40) < 1e-12);
+  assert.ok(Math.abs(light.wasted_reduction_psi) < 1e-12);
+  assert.ok(light.verdict.startsWith("IN SERVICE RANGE"));
+  // A longer train takes proportionally longer to propagate.
+  const long = _v1548({ ...base, car_count: 150 });
+  assert.ok(Math.abs(long.propagation_seconds - 15) < 1e-12);
+  assert.ok("error" in _v1548({ ...base, reduction_psi: 100 }));
+  assert.ok("error" in _v1548({ ...base, cylinder_ratio: 0 }));
+});
+
+import { computeClearancePlateEnvelope as _v1549 } from "../../calc-rail.js";
+test("bounds: spec-v1549 computeClearancePlateEnvelope -- 1,146 ft is a FIVE degree curve", () => {
+  const base = { truck_centres_ft: 73, car_length_ft: 89, car_width_in: 126, degree_of_curve: 5, clearance_to_obstruction_in: 132, required_clearance_in: 6 };
+  const r = _v1549(base);
+  // spec-v1549 calls this "a 4 degree curve (R = 1,146 ft)". 5,729.58 / 4 is
+  // 1,432 ft; 1,146 is five degrees, and its own arithmetic follows 1,146.
+  assert.ok(Math.abs(r.radius_ft - 1145.91559) < 1e-4);
+  assert.ok(Math.abs(r.mid_ordinate_in - 6.97564470) < 1e-6);
+  assert.ok(Math.abs(r.end_overhang_in - 3.39292007) < 1e-6);
+  assert.ok(Math.abs(r.effective_half_width_in - 69.9756447) < 1e-6);
+  // And it reports 62.0 in of remaining clearance as "less than five inches".
+  // 62 in is over five FEET, and this fits comfortably.
+  assert.ok(Math.abs(r.remaining_clearance_in - 62.0243553) < 1e-6);
+  assert.equal(r.fits, true);
+  // A four degree curve really is 1,432 ft, and the swing is proportionally
+  // smaller -- the two are exactly inverse in radius.
+  const four = _v1549({ ...base, degree_of_curve: 4 });
+  assert.ok(Math.abs(four.radius_ft - 1432.39449) < 1e-4);
+  assert.ok(Math.abs(four.mid_ordinate_in * 5 - r.mid_ordinate_in * 4) < 1e-9);
+  // Length is the lever: a 45 ft car on 30 ft truck centres swings about a
+  // fifth as far on the same curve.
+  const short = _v1549({ ...base, truck_centres_ft: 30, car_length_ft: 45 });
+  assert.ok(Math.abs(short.mid_ordinate_in - 1.17809725) < 1e-6);
+  assert.ok(r.mid_ordinate_in / short.mid_ordinate_in > 5.5);
+  // Swing goes as the square of the truck centres, exactly.
+  const doubled = _v1549({ ...base, truck_centres_ft: 146, car_length_ft: 178 });
+  assert.ok(Math.abs(doubled.mid_ordinate_in - 4 * r.mid_ordinate_in) < 1e-9);
+  // A car with no overhang beyond its trucks has no end swing at all.
+  const noOverhang = _v1549({ ...base, car_length_ft: base.truck_centres_ft });
+  assert.ok(Math.abs(noOverhang.end_overhang_in) < 1e-12);
+  // An obstruction inside the swept width is reported as a strike.
+  const tight = _v1549({ ...base, clearance_to_obstruction_in: 66 });
+  assert.equal(tight.fits, false);
+  assert.ok(tight.verdict.startsWith("DOES NOT FIT"));
+  assert.ok(tight.remaining_clearance_in < 0);
+  assert.ok("error" in _v1549({ ...base, car_length_ft: 50 }));
+  assert.ok("error" in _v1549({ ...base, degree_of_curve: 0 }));
+});

@@ -22093,6 +22093,116 @@ export const CITATIONS = {
       { name: "The target sag comes from elsewhere", value: "the stringing chart at the ruling span and the temperature at that moment", source: "the utility's stringing charts" },
     ],
   },
+  // spec-v1617..v1621 and v1546..v1549: the 2026-09-08 trade-expansion concrete
+  // placement and tilt-up band, and the rail logistics half.
+  "concrete-pump-line-pressure": {
+    formula: "total pressure = static + friction. Static gradient = unit weight (pcf) / 144, so normal weight concrete is 1.04 psi per foot of rise; friction = equivalent length x the entered loss per 100 ft, with bends counted as an equivalent length each and flexible hose as a multiple of its own length.",
+    edition: "The static and friction components of a concrete pump line by name, with ACI 304.2R for pumping and the pump manufacturer's ratings named. NO FRICTION CHART IS SHIPPED: the loss per 100 ft depends on slump, aggregate, fines, admixtures, temperature and line condition, and published charts give ranges. The limit compared against is the pump's rated CONCRETE pressure, not its hydraulic pressure. ACI 304.2R, the pump manufacturer's ratings, the concrete supplier's mix design, and the contractor's competent person govern.",
+    freeAccess: "A division and a multiplication on a friction value the reader takes off a pumping chart; no chart is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The static term is the easy one and often the larger on a high pour: a unit weight in pcf over 144 square inches to the square foot is the pressure gradient per foot of rise, which for normal weight concrete is 1.04, so a fifteen storey lift is more than 150 psi before any friction. Bends and reducers are the quiet killers and are handled the way the field handles them, as equivalent feet of straight line: each 90 degree bend is worth several feet and flexible hose several times its own length, which is why a line threading a congested site hits the pump's limit at a fraction of its nominal reach. The output worth having is the additional line still available, because a crew that discovers the limit by plugging the line loses the pour.",
+    assumptions: [
+      { name: "The friction value is entered", value: "it depends on slump, aggregate, fines, admixtures, temperature and line condition", source: "a pumping chart for the mix and line" },
+      { name: "Pumpability is a mix question", value: "a marginal mix blocks regardless of calculated pressure", source: "the concrete supplier's mix design" },
+      { name: "Line restraint is not addressed", value: "a line under pressure that separates whips; couplings and exclusion zones are safety requirements", source: "the equipment manufacturer and OSHA" },
+    ],
+  },
+  "boom-pump-reach": {
+    formula: "horizontal reach at a height = sqrt(total reach squared - height squared), the circle approximation; outrigger bearing pressure = load / pad area; power line margin = measured distance - the required clearance.",
+    edition: "The reach geometry approximation by name, with the manufacturer's reach diagram and OSHA 1926.1408 named as governing. A multi-section boom's real envelope is a published reach diagram with configuration-dependent limits and dead zones, not a circle. Sizing outrigger mats against an allowable bearing needs a geotechnical source and is a separate calculation. The pump manufacturer's reach and load charts, OSHA, and the contractor's competent person govern.",
+    freeAccess: "One square root on two numbers off a spec sheet; no reach diagram is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "A boom pump's advertised reach is a vertical number and a horizontal number that cannot both be achieved at once. The circle gives the horizontal distance available at a working height and the amount lost to elevation, which is the figure that surprises people reading a spec sheet: a boom advertised at 110 ft gives about 100 ft at 45 ft up. THE TWO CONSTRAINTS THAT DECIDE A SETUP ARE ALMOST NEVER REACH. Outrigger loads are concentrated and large, and one outrigger over a utility vault or soft backfill is how a pump goes over; and power line clearance is absolute, so a setup that reaches beautifully and puts the boom inside the clearance envelope is not a setup.",
+    assumptions: [
+      { name: "A circle, not the reach diagram", value: "real envelopes have dead zones and configuration-dependent limits", source: "the manufacturer's reach diagram" },
+      { name: "Mats are not sized here", value: "that needs the actual outrigger loads and an allowable bearing", source: "a geotechnical assessment" },
+      { name: "Power line clearance is absolute", value: "it governs the setup independently of reach", source: "OSHA 1926.1408 and the utility" },
+    ],
+  },
+  "post-tension-elongation": {
+    formula: "theoretical elongation = average force x length / (area x modulus), with force decaying along the tendon as exp(-(mu x alpha + K x)) and the average taken as the integral (1 - decay ratio) / exponent; the expected measured value is that less the anchor set, checked at an entered tolerance.",
+    edition: "The post-tensioning elongation relation by name, with about 7% as the usual two-sided acceptance. Friction and wobble coefficients belong to the specific duct and tendon system and come from the post-tensioning supplier; strand area and modulus come from the mill certificate for the reel installed. The supplier's stressing calculations and elongation tables, ACI 318 and the PTI manuals, the mill certificates, and the engineer of record govern.",
+    freeAccess: "One exponential and one division on properties from a mill certificate; no supplier elongation table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Elongation measures the tendon's whole length responding to the force actually in it, which is why it catches what a gauge cannot: a gauge reads what the jack is pushing, and a tendon binding in a crushed duct shows up as elongation short of theoretical while the gauge reads exactly the specified pressure. The elongation follows the AVERAGE force along the length, not the jacking force, and using the jacking force directly overstates the expected stretch by most of a 7% allowance -- which makes a perfectly good tendon look like a failing one. The tolerance is two-sided: short means the force is not getting there, long means a wrong area, a wrong modulus, or slip. Both require investigation before grouting, because after grouting nothing can be corrected.",
+    assumptions: [
+      { name: "Friction and wobble are entered", value: "they belong to the specific duct and tendon system", source: "the post-tensioning supplier" },
+      { name: "Strand area and modulus from the mill certificate", value: "catalogue values where a certificate exists is a way tendons appear out of tolerance", source: "the mill certificate for the reel installed" },
+      { name: "One prismatic member at a single average force", value: "no force profile, elastic shortening, relaxation, creep or sequence effects", source: "the supplier's stressing calculations" },
+    ],
+  },
+  "tilt-up-lift-stress": {
+    formula: "panel weight = area x thickness x unit weight; the panel spans between insert rows as a simply supported one-way strip so the moment goes as the square of that span; section modulus = b t squared / 6; and the allowable is the ACI 318 modulus of rupture f_r = 7.5 sqrt(f'c) at the DAY-OF-LIFT strength, divided by an entered safety factor.",
+    edition: "The tilt-up lifting stress relations by name, with ACI 318's modulus of rupture taken at the day's cylinder breaks rather than the mix design. Suction from the casting slab is an entered fraction of panel weight. A screening calculation on a solid rectangular panel: it does not select inserts, size rigging, or handle openings. The insert manufacturer's engineering, ACI 551 and TCA guidance, the specialty engineer who stamps the lift and bracing design, and the day's cylinder breaks govern.",
+    freeAccess: "A weight, a moment and a square root on a cylinder break; no insert catalogue or lift design is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The panel is a slab spanning between its insert rows during the pick, carrying its own weight at right angles to how it will eventually work. Because moment grows with the SQUARE of the span between rows, going from two rows to three cuts it by more than half rather than by a third, which is why insert counts climb faster than panels grow. THE STRENGTH THAT MATTERS IS THE DAY-OF-LIFT STRENGTH: a mix at 4,000 psi at 28 days may be at 2,200 on day five, and the modulus of rupture scales with the square root, so lift-day capacity is around three quarters of a 28 day calculation. Cylinder breaks on the day authorize a pick. Suction is the other force and is not small -- a panel that has not released cleanly puts far more than its own weight into the inserts.",
+    assumptions: [
+      { name: "A solid rectangular panel", value: "openings, reveals and returns change the moment distribution completely", source: "the specialty engineer's lift design" },
+      { name: "Inserts are not selected", value: "capacity, edge distance, embedment, shear cone and reinforcement are the manufacturer's design", source: "the insert manufacturer's engineering" },
+      { name: "Day-of-lift strength is entered", value: "from the day's cylinder breaks, not the mix design", source: "the day's cylinder breaks" },
+    ],
+  },
+  "tilt-up-brace-load": {
+    formula: "wind force = panel area x the erection design wind pressure; the lateral load at the braces = wind force x (height to the resultant / brace attachment height), divided among the braces; axial = lateral / cos(angle from horizontal); the anchor components are the lateral horizontally and axial x sin(angle) vertically, with the anchor offset = attachment height / tan(angle).",
+    edition: "The temporary bracing relations by name. The erection design wind pressure and the shutdown wind speed come from the bracing design and the applicable standard, not from here. It does not design the brace, which is a rated component with its own slenderness and connection limits, or the slab anchor, which needs the slab's thickness, strength on the day, edge distance and the anchor manufacturer's data. The specialty engineer who stamps the bracing design, the brace manufacturer, ACI 551 and TCA guidance, and the site's competent person govern.",
+    freeAccess: "One trigonometric ratio on a wind pressure the bracing design supplies; no brace or anchor table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The temporary condition is genuinely the design case for a tilt-up building: a panel standing free is a large sail on a small base and only the braces hold it. The lateral load is not the wind force divided by the braces -- the resultant acts at its own height and the braces attach at theirs, so the load scales by the ratio. The brace angle trades two things and neither is universally right: steeper takes more axial load for the same lateral force but needs less floor area, flatter carries less and pushes its anchor further out where the slab may be thinner or greener. THE ELEMENT THAT GOVERNS MOST OFTEN IS NOT THE BRACE but the floor slab anchor, and the vertical component is the one that pulls an anchor out of a thin slab.",
+    assumptions: [
+      { name: "The erection wind pressure is entered", value: "it and the shutdown wind speed come from the bracing design", source: "the applicable standard and the bracing design" },
+      { name: "The brace is not designed", value: "slenderness and connection limits are the manufacturer's", source: "the brace manufacturer" },
+      { name: "The anchor is not designed", value: "it needs slab thickness, strength on the day, and edge distance", source: "the anchor manufacturer's data" },
+    ],
+  },
+  "railcar-load-limit": {
+    formula: "load limit = gross rail load - light weight; gross on rail = light weight + lading; the governing limit is the LOWER of the car's and the route's; and the cube check is cubic capacity x lading density against that limit.",
+    edition: "The railcar load limit identity by name. Common gross rail load classes are 220,000, 263,000, 286,000 and 315,000 lb. Light weight and load limit come from the car's own stencil, not from its class -- a rebuilt car can be several hundred pounds heavier than its sister. The car's stencil, the AAR loading rules, the carrier's route restrictions, and the shipper's own weighing govern.",
+    freeAccess: "Two subtractions and a multiplication on figures read off the car; no AAR loading rule is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Load limit is a property of the SPECIFIC CAR rather than of its class, so reading the stencil on the car in front of you is the whole discipline. THE CONSTRAINT THAT GETS MISSED IS THE ROUTE: a 286,000 lb car is not permitted everywhere, and the governing gross rail load is the lower of the car's and the route's. A shipper loading to the stencil without checking the route has overloaded the route rather than the car, a distinction completely invisible on the car itself. The other everyday question is whether weight or cube governs, which changes with the commodity rather than with the car.",
+    assumptions: [
+      { name: "The stencil, not the class", value: "light weights differ between cars of the same rating", source: "the car's own stencil" },
+      { name: "Weight distribution is not checked", value: "a load over one truck can overload it while the gross is fine", source: "the AAR loading rules" },
+      { name: "Route acceptance is a carrier question", value: "this compares limits, it does not clear a routing", source: "the carrier's route restrictions" },
+    ],
+  },
+  "tonnage-rating-grade": {
+    formula: "total resistance = 20 lb/ton per 1% of grade + the entered rolling resistance + 0.8 lb/ton per degree of curve; tonnage rating = governing tractive effort / total resistance, where the governing effort is the LOWER of the consist's tractive effort and the adhesion ceiling (weight on drivers x adhesion factor).",
+    edition: "The train resistance components by name, with the 20 lb/ton per 1% grade constant shared with the haul-road resistance calculation so the two cannot disagree about what a grade costs. Adhesion runs roughly 0.25 to 0.35 dry with modern control and much less on wet or contaminated rail. Steady state at constant speed: no starting resistance, slack action, drawbar limits, or braking. The railroad's own tonnage tables, the locomotive builder's tractive effort curves, and the operating department govern.",
+    freeAccess: "Three multiplications and a division; no railroad tonnage table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Twenty pounds per ton per percent of grade is just the component of weight along the slope, and it dwarfs everything else: on the level a train resists at three to five pounds per ton, and a one percent grade adds twenty. That is why the ruling grade sets the tonnage rating for a whole run and why a single short hill sets the makeup for hundreds of level miles. THE SECOND CONSTRAINT IS ADHESION AND IT IS A SEPARATE CEILING -- the rating follows whichever of the two is lower, and which one governs is reported in words, because it is easy to compute an adhesion limit, find it larger than the consist's own tractive effort, and mistakenly use it.",
+    assumptions: [
+      { name: "Steady state at constant speed", value: "no acceleration, starting resistance, slack action or drawbar limits", source: "the operating department" },
+      { name: "Rolling resistance is entered", value: "it rises at low speed and again at high speed; no Davis formula is applied", source: "the railroad's own data" },
+      { name: "Nothing about braking", value: "the descending side of the hill is a different and often harder problem", source: "the railroad's train handling rules" },
+    ],
+  },
+  "train-brake-reduction": {
+    formula: "brake pipe = charged pressure - reduction; brake cylinder = the reduction, capped at the full-service point, times an entered cylinder ratio of about 2.5; anything beyond the full-service reduction is wasted air with no additional braking.",
+    edition: "The freight air brake service relations by name. The cylinder ratio depends on the brake equipment, piston travel, cylinder and reservoir volumes and rigging ratio, and differs between car types and between empty and loaded cars, so it is ENTERED. Emergency applications, retainers, hand brakes, dynamic brake, recharge time and stopping distance are all outside it. The railroad's air brake and train handling rules, the equipment manufacturer's data, and 49 CFR 232 govern.",
+    freeAccess: "One multiplication and one cap; no brake equipment data or railroad rule book is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "A freight brake pipe is charged to a regulated pressure and the brakes apply when it DROPS, at roughly two and a half psi of cylinder per psi of reduction. That continues until the auxiliary reservoir and the cylinder equalize at around a 26 psi reduction, and BEYOND THAT POINT ADDITIONAL REDUCTION PRODUCES NO ADDITIONAL BRAKING -- so the wasted reduction is reported as its own number. The part that has no formula matters most: releasing requires pumping the pipe back up from the head end, which on a long train takes minutes, and that is why dynamic brake rather than air is the primary means of controlling a train downhill.",
+    assumptions: [
+      { name: "The cylinder ratio is entered", value: "it differs by brake equipment, piston travel and empty-load device", source: "the equipment manufacturer's data" },
+      { name: "No emergency, retainers, or dynamic brake", value: "and no recharge time, which is the part that matters most", source: "the railroad's air brake rules" },
+      { name: "No stopping distance", value: "that needs tonnage, grade, speed, shoe and wheel condition and the percent of operative brakes", source: "49 CFR 232 and the railroad's rules" },
+    ],
+  },
+  "clearance-plate-envelope": {
+    formula: "R = 5,729.58 / degree of curve (arc definition); the car centre's mid-ordinate = truck centres squared / (8 R), swinging toward the INSIDE; the end overhang = (car length squared - truck centres squared) / (8 R), swinging toward the OUTSIDE; the effective half width adds the larger of the two to half the car width.",
+    edition: "The chord-offset relations by name, using the same arc-definition constant as the degree-of-curve calculation. A geometric screen on one curve and one obstruction: it does not reproduce the AAR clearance plates, which define tangent-track envelopes by height as well as width, and it does not account for superelevation, truck lateral play, spring travel, dynamic sway, or the vertical envelope. The AAR clearance plates and loading rules, the carrier's clearance department and route approval, and a field measurement govern.",
+    freeAccess: "Two squares over a radius; no AAR clearance plate is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "A long rigid car on a curve is a chord across an arc: its centre sits INSIDE the arc and its corners swing OUTSIDE it, and both matter in opposite directions -- the middle is the problem near a platform, the ends near a structure or an adjacent track. THE SWING GROWS WITH THE SQUARE OF LENGTH, so an 89 ft car swings nearly six times as far as a 45 ft one on the same curve. That is why long cars and long flat loads carry routing restrictions an ordinary boxcar does not: the track is the same, the car is not.",
+    assumptions: [
+      { name: "A geometric screen on one curve", value: "no AAR plate, and the load must fit the tangent envelope first", source: "the AAR clearance plates" },
+      { name: "No superelevation or truck play", value: "both move the envelope beyond the static geometry", source: "the carrier's clearance department" },
+      { name: "Width only, not height", value: "the vertical envelope is a separate and often governing check", source: "a field measurement and route approval" },
+    ],
+  },
   // spec-v1610..v1615: the 2026-09-08 trade-expansion traffic, work zone, and
   // pavement band. Three of the band's nine specs were cut as duplicates and
   // their new material landed on the calculators that already answered them.
