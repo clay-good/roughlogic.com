@@ -99625,6 +99625,415 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "transformer-diversity-loading",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "a 25 kVA pot serving 8 homes at a 9.5 kVA individual peak and a 0.62 coincidence factor",
+   "source_edition_or_year": "diversified demand = customers x individual peak x coincidence factor; IEEE C57.91 named for loading beyond nameplate",
+   "source_section_or_page": "the utility transformer loading guide and the manufacturer ratings govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "customers": 8,
+    "individual_peak_kva": 9.5,
+    "diversity_factor": 0.62,
+    "continuous_rating_kva": 25,
+    "short_time_rating_kva": 50,
+    "average_demand_kva": 18
+   },
+   "outputs": {
+    "connected_kva": {
+     "value": 76,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "diversified_kva": {
+     "value": 47.12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "continuous_loading_pct": {
+     "value": 188.48,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "customers_at_continuous": {
+     "value": 4.24448,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "headroom_customers": {
+     "value": -3.75552,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "classic_diversity_factor": {
+     "value": 1.6129,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "load_factor": {
+     "value": 0.382,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "capacitor-bank-voltage-rise",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "a 600 kVAR bank on a 12.47 kV feeder with 2.4 ohms of reactance to the substation",
+   "source_edition_or_year": "percent rise = kVAR x X / (10 x kV squared); ANSI C84.1 Range A named for the limit",
+   "source_section_or_page": "ANSI C84.1, IEEE 1036 and a distribution power-flow study govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "bank_kvar": 600,
+    "line_voltage_kv": 12.47,
+    "reactance_to_source_ohm": 2.4,
+    "peak_load_voltage_v": 118,
+    "light_load_voltage_v": 124,
+    "upper_limit_v": 126
+   },
+   "outputs": {
+    "rise_pct": {
+     "value": 0.92604,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rise_volts_120_base": {
+     "value": 1.11125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "leading_current_a": {
+     "value": 27.77948,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "light_load_result_v": {
+     "value": 125.11125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "peak_load_result_v": {
+     "value": 119.11125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_bank_kvar": {
+     "value": 1079.86736,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "regulator-tap-bandwidth",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "a 120 V base regulator with a 2.0 V bandwidth at tap plus 6, compensation R 3 V and X 6 V at rated CT current",
+   "source_edition_or_year": "ANSI 32-step ranging, 5/8 of one percent per step; volts per step = 0.00625 x base voltage; ANSI C57.15 named",
+   "source_section_or_page": "ANSI C57.15, IEEE 1783 and the regulator control manual govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "base_voltage_v": 120,
+    "bandwidth_v": 2,
+    "tap_position": 6,
+    "load_current_a": 200,
+    "power_factor": 0.9,
+    "ldc_r_volts": 3,
+    "ldc_x_volts": 6,
+    "ct_rating_a": 200
+   },
+   "outputs": {
+    "volts_per_step": {
+     "value": 0.75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bandwidth_steps": {
+     "value": 2.66667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "full_range_v": {
+     "value": 12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "output_voltage_v": {
+     "value": 124.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "simulated_drop_v": {
+     "value": 5.31534,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "recloser-fuse-coordination",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "a branch fuse at 1,200 A of fault current, fast curve 0.045 s against a 0.080 s minimum melt, two fast operations",
+   "source_edition_or_year": "heated fast time = fast curve x fuse heating factor, held below minimum melt; IEEE C37.230 named",
+   "source_section_or_page": "the manufacturer time-current curves and the utility protection engineer govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "fault_current_a": 1200,
+    "fast_curve_s": 0.045,
+    "slow_curve_s": 0.4,
+    "fuse_min_melt_s": 0.08,
+    "fuse_total_clear_s": 0.14,
+    "heating_factor": 1.35,
+    "system_frequency_hz": 60
+   },
+   "outputs": {
+    "heated_fast_s": {
+     "value": 0.06075,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "coordination_ratio": {
+     "value": 1.31687,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_s": {
+     "value": 0.01925,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_cycles": {
+     "value": 1.155,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "longest_fast_curve_s": {
+     "value": 0.05926,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "blowing_margin_s": {
+     "value": 0.26,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "feeder-loss-load-factor",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "4.2 miles of conductor at 0.29 ohms per mile peaking at 180 A per phase, load factor 0.55",
+   "source_edition_or_year": "loss factor = 0.3 x load factor + 0.7 x load factor squared, applied to a three-phase I2R peak loss over 8,760 hours",
+   "source_section_or_page": "the utility loss study and its metered load data govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "peak_current_a": 180,
+    "resistance_ohm_per_mile": 0.29,
+    "length_miles": 4.2,
+    "load_factor": 0.55,
+    "energy_cost_per_kwh": 0.09,
+    "peak_demand_kw": 3887
+   },
+   "outputs": {
+    "total_resistance_ohm": {
+     "value": 1.218,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "peak_loss_kw": {
+     "value": 118.3896,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "loss_factor": {
+     "value": 0.37675,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annual_loss_kwh": {
+     "value": 390724.74857,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annual_cost": {
+     "value": 35165.22737,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "peak_all_year_kwh": {
+     "value": 1037092.896,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "loss_percent_of_delivered": {
+     "value": 2.08636,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "meter-ct-pt-multiplier",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "a 200:5 CT and a 7200:120 PT on a register constant of 1.0, reading 1,480 kWh and a 4.1 kW demand at 12.47 kV",
+   "source_edition_or_year": "multiplier = CT ratio x PT ratio x register constant; ANSI C12.1 named",
+   "source_section_or_page": "ANSI C12.1, the instrument transformer test reports and the utility metering standard govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "ct_primary_a": 200,
+    "ct_secondary_a": 5,
+    "pt_primary_v": 7200,
+    "pt_secondary_v": 120,
+    "register_constant": 1,
+    "register_reading_kwh": 1480,
+    "demand_register_kw": 4.1,
+    "service_voltage_kv": 12.47
+   },
+   "outputs": {
+    "ct_ratio": {
+     "value": 40,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pt_ratio": {
+     "value": 60,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "multiplier": {
+     "value": 2400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "billed_kwh": {
+     "value": 3552000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "implied_demand_kw": {
+     "value": 9840,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "implied_current_a": {
+     "value": 455.58353,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ct_utilization_pct": {
+     "value": 227.79177,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "counterpoise-resistance",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "four 100 ft radials of 1/2 in wire buried 6 in deep in 10,000 ohm-cm soil, coupling penalty 1.5",
+   "source_edition_or_year": "R = rho / (pi L) x [ ln( 2L / sqrt(d x h) ) - 1 ] in centimetre units; IEEE 80 and IEEE 81 named",
+   "source_section_or_page": "IEEE 80, IEEE 81 for measurement and the utility grounding standard govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "soil_resistivity_ohm_cm": 10000,
+    "length_ft": 100,
+    "burial_depth_in": 6,
+    "wire_diameter_in": 0.5,
+    "radials": 4,
+    "coupling_penalty": 1.5,
+    "target_resistance_ohm": 5
+   },
+   "outputs": {
+    "single_wire_ohm": {
+     "value": 6.51023,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ideal_parallel_ohm": {
+     "value": 1.62756,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "array_ohm": {
+     "value": 2.44134,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "coupling_cost_ohm": {
+     "value": 0.81378,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "double_length_ohm": {
+     "value": 3.61705,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "doubling_improvement_x": {
+     "value": 1.79987,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "length_for_target_ft": {
+     "value": 42.03943,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

@@ -1119,6 +1119,14 @@ const _TILES = [
   ["nesc-district-loading", "A"],
   ["conductor-creep-elongation", "A"],
   ["sagging-return-wave", "A"],
+  // spec-v1461..v1467 second overhead line and distribution band
+  ["transformer-diversity-loading", "A"],
+  ["capacitor-bank-voltage-rise", "A"],
+  ["regulator-tap-bandwidth", "A"],
+  ["recloser-fuse-coordination", "A"],
+  ["feeder-loss-load-factor", "A"],
+  ["meter-ct-pt-multiplier", "A"],
+  ["counterpoise-resistance", "A"],
   // spec-v1469..v1477 millwright alignment, vibration, and balance band
   ["shaft-alignment-rim-face", "K"],
   ["shaft-alignment-reverse-dial", "K"],

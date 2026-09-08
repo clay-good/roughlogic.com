@@ -1998,6 +1998,13 @@ export const COMPUTE_MAP = {
   "nesc-district-loading": { module: "../../calc-lineworker.js", fn: "computeNescDistrictLoading" },
   "conductor-creep-elongation": { module: "../../calc-lineworker.js", fn: "computeConductorCreepElongation" },
   "sagging-return-wave": { module: "../../calc-lineworker.js", fn: "computeSaggingReturnWave" },
+  "transformer-diversity-loading": { module: "../../calc-lineworker.js", fn: "computeTransformerDiversityLoading" },
+  "capacitor-bank-voltage-rise": { module: "../../calc-lineworker.js", fn: "computeCapacitorBankVoltageRise" },
+  "regulator-tap-bandwidth": { module: "../../calc-lineworker.js", fn: "computeRegulatorTapBandwidth" },
+  "recloser-fuse-coordination": { module: "../../calc-lineworker.js", fn: "computeRecloserFuseCoordination" },
+  "feeder-loss-load-factor": { module: "../../calc-lineworker.js", fn: "computeFeederLossLoadFactor" },
+  "meter-ct-pt-multiplier": { module: "../../calc-lineworker.js", fn: "computeMeterCtPtMultiplier" },
+  "counterpoise-resistance": { module: "../../calc-lineworker.js", fn: "computeCounterpoiseResistance" },
   // spec-v1469..v1477 millwright band
   "shaft-alignment-rim-face": { module: "../../calc-millwright.js", fn: "computeShaftAlignmentRimFace" },
   "shaft-alignment-reverse-dial": { module: "../../calc-millwright.js", fn: "computeShaftAlignmentReverseDial" },

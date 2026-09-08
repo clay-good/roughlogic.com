@@ -1562,6 +1562,14 @@ const RELATED = {
   "nesc-district-loading": ["conductor-sag-at-temperature","transverse-wind-load-conductor","conductor-blowout"],
   "conductor-creep-elongation": ["conductor-sag-at-temperature","line-ground-clearance-nesc","ruling-span"],
   "sagging-return-wave": ["ruling-span","conductor-sag-at-temperature","line-ground-clearance-nesc"],
+  // spec-v1461..v1467: the 2026-09-08 second overhead line and distribution band.
+  "transformer-diversity-loading": ["transformer-kva-sizing","transformer-loading-efficiency","feeder-loss-load-factor"],
+  "capacitor-bank-voltage-rise": ["pf-correction","capacitor-bank-for-resonance-order","regulator-tap-bandwidth"],
+  "regulator-tap-bandwidth": ["capacitor-bank-voltage-rise","transformer-voltage-regulation","voltage-drop"],
+  "recloser-fuse-coordination": ["selective-coordination-screen","fuse-let-through","transformer-inrush-point"],
+  "feeder-loss-load-factor": ["transformer-loading-efficiency","transformer-diversity-loading","capacitor-bank-voltage-rise"],
+  "meter-ct-pt-multiplier": ["transformer-turns-ratio","dc-shunt-sizing","feeder-loss-load-factor"],
+  "counterpoise-resistance": ["grounding-electrode","soil-resistivity-wenner","ground-potential-rise"],
   // spec-v1469..v1477: the 2026-09-07 millwright alignment and vibration band.
   "shaft-alignment-rim-face": ["shaft-alignment-reverse-dial","soft-foot-correction","coupling-alignment-tolerance"],
   "shaft-alignment-reverse-dial": ["shaft-alignment-rim-face","coupling-alignment-tolerance","alignment-thermal-growth"],

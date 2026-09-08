@@ -2597,16 +2597,23 @@ cross-check.
 | calc-layout.js | `computeTriangleAsa` | `{ angle_a_deg = 0, angle_b_deg = 0, included_side_c = 0 } = {}` | _ | _ | _ |
 | calc-layout.js | `computeTriangleSas` | `{ side_a = 0, side_b = 0, included_angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-layout.js | `computeTriangleSss` | `{ side_a = 0, side_b = 0, side_c = 0 } = {}` | _ | _ | _ |
+| calc-lineworker.js | `computeCapacitorBankVoltageRise` | `{ bank_kvar = 0, line_voltage_kv = 0, reactance_to_source_ohm = 0, peak_load_...` | _ | _ | _ |
 | calc-lineworker.js | `computeConductorBlowout` | `{ conductor_diameter_in = 0, weight_lb_per_ft = 0, wind_pressure_psf = 0, win...` | _ | _ | _ |
 | calc-lineworker.js | `computeConductorCreepElongation` | `{ creep_strain = 0, alpha_per_f = 0, span_ft = 0, area_in2 = 0, weight_lb_per...` | _ | _ | _ |
 | calc-lineworker.js | `computeConductorSagAtTemperature` | `{ span_ft = 0, area_in2 = 0, weight1_lb_per_ft = 0, weight2_lb_per_ft = 0, mo...` | _ | _ | _ |
 | calc-lineworker.js | `computeConductorUpliftCheck` | `{ span_ft = 0, elevation_rise_ft = 0, weight_lb_per_ft = 0, tension_lb = 0, b...` | _ | _ | _ |
+| calc-lineworker.js | `computeCounterpoiseResistance` | `{ soil_resistivity_ohm_cm = 0, length_ft = 0, burial_depth_in = 0, wire_diame...` | _ | _ | _ |
+| calc-lineworker.js | `computeFeederLossLoadFactor` | `{ peak_current_a = 0, resistance_ohm_per_mile = 0, length_miles = 0, load_fac...` | _ | _ | _ |
 | calc-lineworker.js | `computeGuyAnchorHoldingCapacity` | `{ helix_diameter_in = 0, installed_depth_ft = 0, cohesion_psf = 0, friction_b...` | _ | _ | _ |
 | calc-lineworker.js | `computeLineGroundClearanceNesc` | `{ attachment_height_ft = 0, max_condition_sag_ft = 0, required_clearance_ft =...` | _ | _ | _ |
+| calc-lineworker.js | `computeMeterCtPtMultiplier` | `{ ct_primary_a = 0, ct_secondary_a = 5, pt_primary_v = 0, pt_secondary_v = 12...` | _ | _ | _ |
 | calc-lineworker.js | `computeNescDistrictLoading` | `{ bare_diameter_in = 0, bare_weight_lb_per_ft = 0, district = 1, custom_ice_i...` | _ | _ | _ |
 | calc-lineworker.js | `computePoleClassGroundlineMoment` | `{ groundline_circumference_in = 0, fiber_stress_psi = 8000, load_1_lb = 0, he...` | _ | _ | _ |
+| calc-lineworker.js | `computeRecloserFuseCoordination` | `{ fault_current_a = 0, fast_curve_s = 0, slow_curve_s = 0, fuse_min_melt_s = ...` | _ | _ | _ |
+| calc-lineworker.js | `computeRegulatorTapBandwidth` | `{ base_voltage_v = 120, bandwidth_v = 0, tap_position = 0, load_current_a = 0...` | _ | _ | _ |
 | calc-lineworker.js | `computeRulingSpan` | `{ span_1_ft = 0, span_2_ft = 0, span_3_ft = 0, span_4_ft = 0, span_5_ft = 0, ...` | _ | _ | _ |
 | calc-lineworker.js | `computeSaggingReturnWave` | `{ elapsed_seconds = 0, return_waves = 3, target_sag_ft = 0, stopwatch_error_s...` | _ | _ | _ |
+| calc-lineworker.js | `computeTransformerDiversityLoading` | `{ customers = 0, individual_peak_kva = 0, diversity_factor = 0, continuous_ra...` | _ | _ | _ |
 | calc-lineworker.js | `computeTransverseWindLoadConductor` | `{ wind_pressure_psf = 0, wind_speed_mph = 0, conductor_diameter_in = 0, wind_...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeAccessControlPowerSupply` | `{ lock_count = 4, lock_current_a = 0.5, reader_count = 2, reader_current_a = ...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCableSupportJhook` | `{ run_ft = 400, spacing_ft = 4, num_cables = 50, cable_lb_per_ft = 0.035, hoo...` | _ | _ | _ |
@@ -3573,7 +3580,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2159.
+Row count: 2166.
 
 <!-- END function-corpus-v14 -->
 
@@ -3641,7 +3648,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (229 tiles)
+### Group A Electrical (236 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3673,6 +3680,7 @@ per spec-v14 §13.1 second paragraph.
 | `camera-lens-fov` | Camera Lens FOV and Pixel Density (DORI) | IEC 62676-4 DORI; spec-v456 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `camera-max-distance-for-ppf` | Camera Max Distance for a Pixel Density (DORI) | IEC 62676-4 DORI (solved for the dist...; spec-v741 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `capacitor-bank-for-resonance-order` | Max PF Capacitor Bank to Keep Resonance Off a Harmonic | parallel-resonance order of a PF capa...; 200 MVA bus, target order 4.7 (below the 5th) -> 9.05 MVA... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `capacitor-bank-voltage-rise` | Line Capacitor Bank Voltage Rise | Project (first-principles); ANSI C84.1, IEEE 1036 and a distribution power-flow study... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `capacitor-discharge-time` | Capacitor Discharge Time and Bleed Resistor (NEC 460.6) | NEC 2023 460.6; spec-v495 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cctv-retention-days` | CCTV Retention Days from Disk Capacity | first-principles NVR/VMS bitrate acco...; 16000 GB disk, 8 cameras at 4 Mbps, 24 h -> 16000 / (8 * ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cctv-storage` | IP Camera / NVR Storage and Bandwidth | first-principles NVR/VMS bitrate acco...; 1 camera at 4 Mbps, 24 h, 30 days -> 4 * 10.8 * 30 = 1296 GB | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3695,6 +3703,7 @@ per spec-v14 §13.1 second paragraph.
 | `conduit-thermal-expansion` | PVC Conduit Thermal Expansion (NEC 352.44) | NFPA; spec-v126 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `continuous-load-ocpd` | Continuous-Load OCPD and Conductor at 125% (NEC 210.20 / 215.3) | NEC 2023 210.20(A) / 215.3 / 240.6(A); spec-v280 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `copper-resistance` | Conductor Resistance at Temperature | NFPA; NEC Table 8 gives 1.93 ohm/1000 ft at 75 C uncoated coppe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `counterpoise-resistance` | Counterpoise and Radial Ground Array Resistance | Project (first-principles); IEEE 80, IEEE 81 for measurement and the utility groundin... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dc-shunt-sizing` | DC Ammeter Shunt Sizing | DC current-shunt sizing (Ohm's law); R = 0.05/100 = 0.0005 ohm; I = 100*25/50 = 50 A; P = 100*... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `delta-wye-line-phase` | Wye / Delta Line-to-Phase Voltage and Current | First-principles three-phase theory; spec-v128 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dp-flow-signal-scaling` | DP (Square-Root) Flow Transmitter 4-20 mA Scaling | DP flow transmitter square-root extra...; fraction = (12-4)/16 = 0.5; flow% = sqrt(0.5) = 70.71%; v... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3714,6 +3723,7 @@ per spec-v14 §13.1 second paragraph.
 | `ev-load-management-ems` | EV Load-Management (EVEMS) Diversified Load (NEC 625.42) | NEC 2023 625.42(A) / 2026 625.48; Four 40 A chargers, 80 A EVEMS -> 200 A un-managed, 100 A... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ev-range-per-hour` | EV Range Added per Hour of Charging | EV range added per hour of AC charging; range/hr = 7.7*0.88*3.5 = 23.716; hours = 100/23.716 = 4.217 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `existing-load-220-87` | Existing-Facility Load by Peak Demand (NEC 220.87) | NEC 2023 220.87; spec-v519 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `feeder-loss-load-factor` | Distribution Feeder I2R Loss and Loss Factor | Project (first-principles); the utility loss study and its metered load data govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `feeder-tap-rule` | Feeder Tap Conductor 10-ft / 25-ft Rule (NEC 240.21(B)) | NEC 2023 (NFPA 70); 400 A feeder, 22 ft tap -> 25-ft rule, min = 400/3 = 133.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fiber-loss-budget` | Fiber Optic Loss Budget | TIA-568 / TIA-526 / IEEE 802.3 (by name); 300 m OM4 @ 850 nm (3.0 dB/km, 2 connectors @ 0.75 dB) ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fiber-max-length` | Fiber Max Length for a Loss Budget | TIA-568 / IEEE 802.3 (by name), inverse; 2.6 dB budget, OM4 3.0 dB/km, 2 connectors @ 0.75 dB -> 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3749,6 +3759,7 @@ per spec-v14 §13.1 second paragraph.
 | `maglock-holding-leverage` | Maglock Effective Holding Force at the Door Handle | Project (first-principles); the adopted codes govern electrically locked egress | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `max-circuit-length-for-vd` | Maximum Circuit Length for a Voltage-Drop Target | Max circuit length for a voltage-drop...; VD = 0.03*120 = 3.6; L = 3.6*6530/(2*12.9*20) = 23508/516... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `max-grid-resistance-for-touch` | Max Grounding-Grid Resistance for the GPR Screen (IEEE 80) | IEEE Std 80 (ground potential rise); 200-V tolerable touch, 200-A grid current -> 1.0 ohm max ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `meter-ct-pt-multiplier` | Watt-Hour Meter CT / PT Multiplier | Project (first-principles); ANSI C12.1, the instrument transformer test reports and t... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `microinverter-branch-count` | Max Microinverters per AC Branch Circuit (NEC 705.60) | max microinverters per AC branch (NEC...; limit = 20*0.80 = 16 A; N = floor(16/1.21) = floor(13.22)... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `min-conductor-for-vd` | Minimum Conductor Size for a Voltage-Drop Target | First-principles I x R voltage drop (...; spec-v109 section 2.3 (20 A, 150 ft one-way, 120 V, 3 per... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-acceleration-time` | Motor Across-the-Line Acceleration Time | Motor across-the-line acceleration ti...; t = WK^2*dN/(308*T_net) = 100*1750/(308*50) = 11.36 s | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3813,7 +3824,9 @@ per spec-v14 §13.1 second paragraph.
 | `pv-string-sizing` | Solar PV String Sizing | NFPA; Module 40 V Voc / 33 V Vmp / 0.3%/C at -10 C record low a... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `raceway-expansion-fitting` | PVC Raceway Expansion Fitting | NEC Article 352.44 / Table 352.44 (by...; 100 ft PVC, dT 100 F -> 3.38e-5 * 1200 in * 100 = 4.056 i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `range-demand-220-55` | Household Range Demand Load (NEC Table 220.55 Col. C) | NEC 2023 (NFPA 70); 1 range Column C = 8 kW (not 12); demand 8 kW = 33.3 A at... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `recloser-fuse-coordination` | Recloser-to-Fuse Coordination Screen | Project (first-principles); the manufacturer time-current curves and the utility prot... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `reduced-voltage-starter` | Reduced-Voltage Starter Current and Torque | reduced-voltage-starter current and t...; spec-v522 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `regulator-tap-bandwidth` | Line Voltage Regulator Tap and Bandwidth | Project (first-principles); ANSI C57.15, IEEE 1783 and the regulator control manual g... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rlc-reactance-resonance` | Series R-L-C Reactance, Impedance, and Resonant Frequency | Series R-L-C reactance / impedance / ...; XL=2pi*60*0.05=18.85; XC=1/(2pi*60*50e-6)=53.05; Z=sqrt(1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rolling-sphere-protection` | Lightning Rolling-Sphere Zone of Protection | NFPA 780 (rolling-sphere method); 30 ft mast, 150 ft sphere -> sqrt(9000 - 900) = sqrt(8100... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rooftop-temp-adder` | Rooftop Conduit Sunlight Ambient Adder (NEC 310.15(B)(2)) | NEC 2023 (NFPA 70); 95 F on the roof (<7/8 in) + 60 F adder = 155 F (~68 C) -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3848,6 +3861,7 @@ per spec-v14 §13.1 second paragraph.
 | `three-phase` | Three-Phase Power | Project (first-principles); V_LL=480 V / I_L=100 A / pf=0.9 -> kVA=83.14 / kW=74.82 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tip-speed-ratio` | Wind Turbine Tip-Speed Ratio and Rotor Speed | Project (first-principles); the turbine manufacturer's operating parameters govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transformer-conductor-protection` | Transformer Conductor and Overcurrent Protection | NEC Table 450.3(B) and 240.21(C) (by ...; 45 kVA 3-phase 480->208 V -> primary FLA 54.13 A, seconda... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `transformer-diversity-loading` | Distribution Transformer Diversified Loading | Project (first-principles); the utility transformer loading guide and the manufacture... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transformer-inrush-point` | Transformer Inrush Coordination Point | transformer energization-inrush coord...; spec-v520 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `transformer-k-factor` | Transformer K-Factor From the Harmonic Spectrum (UL 1561) | UL 1561 / IEEE C57.110; K = sum(Ih^2 h^2)/sum(Ih^2) = 5.455/1.183 = 4.61 -> K-9 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `transformer-kva-sizing` | Transformer kVA Sizing and FLA | NFPA / ANSI/IEEE C57; Loads {25 kVA, 18 kVA, 7500 W @ 0.85 pf = 8.82 kVA, 15 kV... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5654,6 +5668,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1908. Fixture-covered or reference-cadence: 1908 / 1908.
+Tile count: 1915. Fixture-covered or reference-cadence: 1915 / 1915.
 
 <!-- END tile-index-v14 -->

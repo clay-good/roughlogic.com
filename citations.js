@@ -22093,6 +22093,93 @@ export const CITATIONS = {
       { name: "The target sag comes from elsewhere", value: "the stringing chart at the ruling span and the temperature at that moment", source: "the utility's stringing charts" },
     ],
   },
+  // spec-v1461..v1467: the 2026-09-08 trade-expansion second overhead line and
+  // distribution band. Three of the seven specs read a threshold backwards or
+  // mislabelled a unit; every threshold here is a computed verdict.
+  "transformer-diversity-loading": {
+    formula: "diversified demand = customer count x individual customer peak x coincidence factor; loading = diversified demand / rating; the classic diversity factor is the reciprocal of the coincidence factor; customers to the continuous rating = rating / (individual peak x coincidence factor).",
+    edition: "The diversified-demand relation as standard distribution practice, by name, with IEEE C57.91 named for loading beyond nameplate. NO DIVERSITY CURVE IS SHIPPED: the factor is entered from the utility's own metered data. Loss of life is not computed. The utility's transformer loading guide, IEEE C57.91, and the transformer manufacturer's ratings govern.",
+    freeAccess: "Two multiplications and a division on a coincidence factor the reader supplies; no utility diversity curve is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "A 25 kVA pot serving eight houses is not serving eight times one house's peak, because the peaks do not coincide. Sizing on connected load oversizes the transformer enormously; the coincidence factor is what closes the gap, and it strengthens as the group grows -- from near 1.0 at one customer toward roughly 0.4 to 0.6 for a large residential group. Each utility carries its own curve from its own metering, which is why none is shipped here. The two names for the quantity are swapped constantly and both are reported: coincidence factor at most one, classic diversity factor its reciprocal and at least one. Distribution transformers are also allowed past nameplate for a few hours because their thermal time constant is measured in hours, so loading is reported against both a continuous and an entered short-time rating.",
+    assumptions: [
+      { name: "The coincidence factor is an input, not a curve", value: "it is specific to a utility's housing stock and climate", source: "the utility's metered load data" },
+      { name: "Loss of life is not computed", value: "it needs a full load cycle against an ambient profile", source: "IEEE C57.91" },
+      { name: "One customer class", value: "EV charging and electric heat break residential diversity assumptions", source: "the utility's transformer loading guide" },
+    ],
+  },
+  "capacitor-bank-voltage-rise": {
+    formula: "percent rise = bank kVAR x reactance from the source to the bank / (10 x line-to-line kV squared); rise in volts on a 120 V base = percent rise x 1.2; leading current = kVAR / (sqrt(3) x kV); the largest fixed bank is the relation worked backwards against the headroom at light load.",
+    edition: "The distribution capacitor voltage-rise relation as standard practice, by name, with ANSI C84.1 Range A named for the limit the result is tested against. The limit and both pre-switching voltages are entered because the adopted range and the feeder's profile are local. ANSI C84.1, IEEE 1036, the utility's capacitor application guide, and a distribution power-flow study govern.",
+    freeAccess: "One multiplication and one division; no ANSI voltage table is reproduced, the limit is entered.",
+    governance: GOVERNANCE.general,
+    editionNote: "A capacitor injects leading reactive current, and that current flowing back through the reactance between the bank and the source raises the voltage at the point of connection. The further out the bank sits the bigger its voltage effect and the smaller its loss-reduction effect per kVAR, so the two goals pull in opposite directions. The case that binds is light load: a fixed bank sized for peak-load power factor is still connected at three in the morning, when the drop it was cancelling is gone and the rise it produces is the whole story. That is why the result is reported at both conditions and why the largest bank that still fits under the limit at light load is worked out rather than argued.",
+    assumptions: [
+      { name: "Steady state, one bank, radial feeder", value: "no switching transient, inrush, or restrike", source: "IEEE 1036" },
+      { name: "The voltage limit is entered", value: "the adopted ANSI C84.1 range is local", source: "ANSI C84.1" },
+      { name: "No harmonic resonance check", value: "that is a separate screen and the other way a bank sizing fails", source: "IEEE 1036" },
+    ],
+  },
+  "regulator-tap-bandwidth": {
+    formula: "volts per tap step = 0.00625 x base voltage (32 steps of 5/8 of one percent, plus or minus ten percent); bandwidth in steps = bandwidth / volts per step, which must exceed one; output at a tap = base x (1 + 0.00625 x tap); line drop compensation drop = (load current / CT rating) x (R x cos phi + X x sin phi).",
+    edition: "ANSI 32-step regulator ranging and the line drop compensation relation, by name, with ANSI C57.15 named. One single-phase step regulator, steady state. The time delay is not set here and reverse power flow is out of scope. ANSI C57.15, IEEE 1783, the regulator manufacturer's control manual, and the utility's voltage regulation practice govern.",
+    freeAccess: "A multiplication by the ANSI step fraction and one trigonometric term; no manufacturer control table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The bandwidth is a deadband, not a target: the control does nothing while the sensed voltage stays inside it and moves one tap when it leaves. The hard rule is that the bandwidth must exceed one tap step, because a deadband narrower than the regulator's own correction overshoots on every operation and has to come straight back -- hunting, which spends a tap changer's rated operations in a fraction of its life. Practice is about one and a half to two steps, which on a 120 V base is 1.5 to 2.0 V against a 0.750 V step. Line drop compensation subtracts a synthetic drop proportional to load current so the control holds voltage at a point out on the feeder; the R and X dials are in volts at rated CT secondary current.",
+    assumptions: [
+      { name: "One single-phase regulator, steady state", value: "cascaded regulators need the time delay this does not set", source: "IEEE 1783" },
+      { name: "The R and X settings are entered", value: "they should be derived from the impedance to the regulation point", source: "the utility's voltage regulation practice" },
+      { name: "No reverse power flow", value: "generation behind the regulator breaks the compensation logic", source: "IEEE 1783" },
+    ],
+  },
+  "recloser-fuse-coordination": {
+    formula: "heated fast-curve time = recloser fast-curve time x fuse heating factor, which must stay below the fuse minimum-melt time; coordination ratio = minimum melt / heated fast; the fuse-blowing check is fuse total clearing time below the recloser slow-curve time; margin is reported in seconds and in cycles at the entered system frequency.",
+    edition: "The fuse-saving coordination criterion with fuse heating factors, by name, and IEEE C37.230 named. Heating factors near 1.2 for one fast operation and 1.35 for two are in common use and are ENTERED. NO RECLOSER OR FUSE CURVE DATA IS SHIPPED: both times are read off the manufacturer's published time-current characteristics. A screen, not a protection study. The manufacturer's curves, IEEE C37.230, and the utility's protection engineer govern.",
+    freeAccess: "One multiplication and one ratio on times the reader takes off published curves; no time-current characteristic is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Fuse saving works when the recloser's fast curve, multiplied by a heating factor that accounts for the fuse element retaining heat between operations, still sits below the fuse's minimum-melt curve at the maximum fault current on the branch. Two fast operations heat the element more than one, which is why the factor rises with the number of shots. The band is bounded at BOTH ends and that is the part missed: coordination holds only between the minimum fault current where the fuse still clears inside the slow curve and the maximum where the heated fast curve still beats minimum melt. On a modern feeder with high available fault current at the head, the upper bound often falls inside the zone the scheme is supposed to protect.",
+    assumptions: [
+      { name: "Curve times are read off the manufacturer's characteristics", value: "no curve data is shipped, because it changes", source: "the manufacturer's time-current curves" },
+      { name: "One fault current, not a sweep", value: "finding where coordination begins and ends is a protection study", source: "IEEE C37.230" },
+      { name: "No asymmetry, pre-loading, or ambient correction", value: "and no fuse damage curve distinct from minimum melt", source: "the fuse manufacturer's data" },
+    ],
+  },
+  "feeder-loss-load-factor": {
+    formula: "peak loss = 3 x peak current squared x total resistance; loss factor = 0.3 x load factor + 0.7 x load factor squared; annual loss energy = peak loss x loss factor x 8,760 hours; energy delivered = peak demand x load factor x 8,760 hours.",
+    edition: "The three-phase I2R loss relation and the standard distribution loss-factor approximation, by name. The 0.3 and 0.7 coefficients are a widely used approximation rather than a measurement, and utilities carry their own. Load treated as concentrated at the far end, so the answer is an upper bound. The utility's loss study and its metered load data govern.",
+    freeAccess: "A square, a blend of two terms, and a multiplication by the hours in a year; no utility loss study is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Loss is quadratic in a current that varies all day, so the average of the square is not the square of the average, and the ratio between them is the loss factor. It is bounded by the square of the load factor at one end and the load factor itself at the other -- a perfectly flat load loses at the load factor, a load that is either at peak or off loses at its square -- and the 0.3 / 0.7 blend is the long-standing utility approximation between them. Taking peak loss for all 8,760 hours reads several times too high; using the load factor alone is still tens of percent high. The consequence runs the way people do not expect: a poor load factor means the savings from reconductoring or capacitor placement are SMALLER than a peak-based estimate promises.",
+    assumptions: [
+      { name: "Load concentrated at the far end", value: "a uniformly distributed load loses about a third as much", source: "distribution loss practice" },
+      { name: "Conductor loss only", value: "transformer core and copper losses are usually the larger share", source: "the utility's loss study" },
+      { name: "The 0.3 / 0.7 coefficients are an approximation", value: "utilities carry their own from metered data", source: "the utility's loss study" },
+    ],
+  },
+  "meter-ct-pt-multiplier": {
+    formula: "CT ratio = CT primary / CT secondary; PT ratio = PT primary / PT secondary; multiplier = CT ratio x PT ratio x register constant; billed energy = register reading x multiplier; implied primary current = implied demand / (sqrt(3) x line-to-line service voltage), held against the CT primary rating.",
+    edition: "The transformer-rated metering multiplier relation, by name, with ANSI C12.1 named. Accuracy class, burden, polarity, ratio-correction and phase-angle-correction factors, and transformer-loss compensation are not applied. ANSI C12.1, the instrument transformer test reports, and the utility's metering standard govern.",
+    freeAccess: "A product of two ratios and one plausibility division; no metering standard text is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "A transformer-rated meter does not read energy, it reads a scaled fraction of it. The multiplier is a pure product, and that is exactly why it goes wrong: swapping a 200:5 current transformer for a 400:5 during a load upgrade doubles the correct multiplier, and if the billing record is not changed with it the customer is billed half, indefinitely. Neither error announces itself, because the meter keeps working and the register keeps advancing. The check that catches it is dimensional rather than clerical: turn the metered demand into an implied primary current at the service voltage and hold it against the current transformer that is supposed to be carrying it. A multiplier off by a factor of two puts the implied load somewhere the service physically cannot go.",
+    assumptions: [
+      { name: "Ratio arithmetic only", value: "accuracy class, burden and polarity are not verified", source: "the instrument transformer test reports" },
+      { name: "Balanced three-phase at the entered voltage", value: "the plausibility current assumes it", source: "the utility's metering standard" },
+      { name: "No transformer-loss compensation", value: "low-side metering of a customer-owned transformer is a separate adjustment", source: "ANSI C12.1" },
+    ],
+  },
+  "counterpoise-resistance": {
+    formula: "R = rho / (pi L) x [ ln( 2 L / sqrt(d x h) ) - 1 ] with rho in ohm-cm and L, d and h in centimetres; the array value is the single-wire resistance divided by the radial count and multiplied by an entered mutual-coupling penalty; the length for a target resistance is that relation bisected.",
+    edition: "The buried horizontal electrode (counterpoise) resistance relation, by name, with IEEE 80 and IEEE 81 named for measurement. Resistivity is read in ohm-cm to match the driven-rod and four-pin resistivity calculations. The mutual-coupling penalty is ENTERED, not modeled. Power-frequency resistance in uniform soil, NOT impulse impedance. IEEE 80, IEEE 81, and the utility's grounding standard govern.",
+    freeAccess: "One logarithm on a resistivity the reader measures; no soil table or grounding standard text is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "A driven rod is the standard electrode and in rock it is not an option. A buried horizontal conductor sheds current along its entire length, so its resistance falls roughly as one over length with a logarithmic correction: doubling a counterpoise nearly halves the resistance, where doubling a driven rod barely helps because each additional foot reaches ground no less resistive than the last. Multiple radials do not divide the resistance by their count -- each wire sits in the others' potential field -- and the mutual-coupling penalty grows with the count and shrinks with the spread. It is entered rather than modeled, so comparing two arrays is only honest when each is given its own penalty: hold one fixed across both and more radials win on paper every time. Both the ideal parallel value and the coupled one are reported so the penalty is visible rather than assumed away. This is power-frequency resistance and NOT the impulse impedance that governs lightning performance, which is lower for a short counterpoise and higher for a long one.",
+    assumptions: [
+      { name: "Uniform soil", value: "a two-layer structure changes the answer substantially", source: "IEEE 81, a four-pin survey at several spacings" },
+      { name: "Power frequency, not impulse", value: "a surge does not have time to reach the far end of a long counterpoise", source: "IEEE 80" },
+      { name: "The mutual-coupling penalty is entered", value: "it depends on radial length and spread", source: "the utility's grounding standard" },
+    ],
+  },
   // spec-v1563..v1570: the 2026-09-07 trade-expansion steam plant and commercial
   // laundry band. Groups G and C. spec-v1568 was CUT to `npsh-a`.
   "laundry-washer-turns": {

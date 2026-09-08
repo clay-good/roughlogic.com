@@ -85,6 +85,26 @@ export const CURATED_INPUT_LABELS = {
 };
 
 export const CURATED_OUTPUT_LABELS = {
+  // spec-v1461..v1467, the second overhead line and distribution band. These
+  // keys carry a unit letter the key-label reader does not treat as a unit
+  // (a lower-case `v` for volts, `a` for amperes) or an instrument-transformer
+  // initialism the sentence-caser lower-cases into a word ("Ct", "Pt").
+  "capacitor-bank-voltage-rise": {
+    rise_volts_120_base: "Rise on a 120 V base (V)",
+    light_load_result_v: "Feeder head at light load (V)",
+    peak_load_result_v: "Feeder head at peak load (V)",
+  },
+  "regulator-tap-bandwidth": {
+    full_range_v: "Full regulating range, either way (V)",
+    output_voltage_v: "Output at this tap (V)",
+    simulated_drop_v: "Line drop compensation, simulated drop (V)",
+  },
+  "meter-ct-pt-multiplier": {
+    ct_ratio: "CT ratio",
+    pt_ratio: "PT ratio",
+    implied_current_a: "Implied primary current (A)",
+    ct_utilization_pct: "Share of the CT primary rating (%)",
+  },
   "aggregate": { pcf: "Material density (pcf)" },
   "air-density-correction": { DF: "Density factor DF" },
   "arrhenius-equation": { q10: "Q10 temperature coefficient" },

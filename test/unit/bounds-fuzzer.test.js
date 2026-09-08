@@ -45980,3 +45980,264 @@ test("bounds: spec-v1483 computeVacuumEvacuationTime -- a 0.20 torr ultimate DOE
   assert.ok(Math.abs(choked.ultimate_pressure_torr - 2 * r.ultimate_pressure_torr) < 1e-12);
   assert.ok("error" in _v1483({ ...base, target_pressure_torr: 800 }));
 });
+
+// ===========================================================================
+// spec-v1461..v1467: the 2026-09-08 trade-expansion second overhead line and
+// distribution band. Seven tiles into the existing calc-lineworker.js;
+// nothing cut.
+//
+// Three of the seven specs were internally wrong and two of them the same way
+// the millwright band's were -- correct arithmetic, then a sentence pointing
+// the wrong way. spec-v1462 computes 124 + 1.11 = 125.1 V and calls that past
+// a 126 V limit; spec-v1466 computes an implied 456 A behind a 200:5 CT and
+// calls it comfortably inside it; spec-v1467 labels its soil 100 ohm-metre
+// and then puts 100 into a foot-based relation, which is 3.28x off. Every
+// threshold in this band is asserted here as a computed boolean, not as prose.
+// ===========================================================================
+
+import { computeTransformerDiversityLoading as _v1461 } from "../../calc-lineworker.js";
+test("bounds: spec-v1461 computeTransformerDiversityLoading -- connected load is not diversified demand", () => {
+  const base = { customers: 8, individual_peak_kva: 9.5, diversity_factor: 0.62, continuous_rating_kva: 25, short_time_rating_kva: 50, average_demand_kva: 18 };
+  const r = _v1461(base);
+  assert.ok(Math.abs(r.connected_kva - 76) < 1e-9);
+  assert.ok(Math.abs(r.diversified_kva - 47.12) < 1e-9);
+  assert.ok(Math.abs(r.continuous_loading_pct - 188.48) < 1e-9);
+  assert.ok(Math.abs(r.connected_loading_pct - 304) < 1e-9);
+  assert.ok(Math.abs(r.headroom_customers - -3.75551784) < 1e-6);
+  assert.ok(Math.abs(r.load_factor - 0.38200339) < 1e-6);
+  // The verdict is driven off the boolean, so the words cannot disagree.
+  assert.equal(r.within_continuous, false);
+  assert.equal(r.within_short_time, true);
+  assert.ok(r.verdict.startsWith("OVER the continuous rating"));
+  assert.ok(r.verdict.includes("INSIDE the entered 50 kVA short-time rating"));
+  // A coincidence factor of one IS the connected load, exactly.
+  const none = _v1461({ ...base, diversity_factor: 1 });
+  assert.ok(Math.abs(none.diversified_kva - none.connected_kva) < 1e-12);
+  assert.ok(Math.abs(none.classic_diversity_factor - 1) < 1e-12);
+  // The two names are reciprocals of each other, always.
+  assert.ok(Math.abs(r.classic_diversity_factor * r.diversity_factor - 1) < 1e-12);
+  // At exactly the customer count the rating supports, headroom is zero and
+  // loading is 100%.
+  const at = _v1461({ ...base, customers: r.customers_at_continuous });
+  assert.ok(Math.abs(at.headroom_customers) < 1e-9);
+  assert.ok(Math.abs(at.continuous_loading_pct - 100) < 1e-9);
+  const under = _v1461({ ...base, customers: r.customers_at_continuous * 0.999 });
+  assert.equal(under.within_continuous, true);
+  assert.ok(under.verdict.startsWith("UNDER the continuous rating"));
+  assert.ok("error" in _v1461({ ...base, diversity_factor: 1.2 }));
+  assert.ok("error" in _v1461({ ...base, customers: 0 }));
+});
+
+import { computeCapacitorBankVoltageRise as _v1462 } from "../../calc-lineworker.js";
+test("bounds: spec-v1462 computeCapacitorBankVoltageRise -- 125.1 V is INSIDE a 126 V limit", () => {
+  const base = { bank_kvar: 600, line_voltage_kv: 12.47, reactance_to_source_ohm: 2.4, peak_load_voltage_v: 118, light_load_voltage_v: 124, upper_limit_v: 126 };
+  const r = _v1462(base);
+  assert.ok(Math.abs(r.rise_pct - 0.92603966) < 1e-6);
+  assert.ok(Math.abs(r.rise_volts_120_base - 1.11124759) < 1e-6);
+  assert.ok(Math.abs(r.leading_current_a - 27.7794841) < 1e-5);
+  assert.ok(Math.abs(r.light_load_result_v - 125.111248) < 1e-5);
+  // spec-v1462 calls this "past the ANSI C84.1 Range A limit of 126". It is
+  // 0.89 V short of it, and the tile says so.
+  assert.equal(r.within_limit_light, true);
+  assert.ok(r.verdict.startsWith("INSIDE the limit at light load"));
+  assert.ok(Math.abs(r.light_load_margin_v - 0.88875241) < 1e-6);
+  // The rise is linear in the bank rating and in the reactance.
+  const dbl = _v1462({ ...base, bank_kvar: 1200 });
+  assert.ok(Math.abs(dbl.rise_pct - 2 * r.rise_pct) < 1e-12);
+  const stiff = _v1462({ ...base, reactance_to_source_ohm: 1.2 });
+  assert.ok(Math.abs(stiff.rise_pct - r.rise_pct / 2) < 1e-12);
+  // The largest bank fed back in lands EXACTLY on the limit at light load.
+  const at = _v1462({ ...base, bank_kvar: r.max_bank_kvar });
+  assert.ok(Math.abs(at.light_load_result_v - base.upper_limit_v) < 1e-9);
+  assert.equal(at.within_limit_light, true);
+  // A bank of zero raises nothing.
+  const off = _v1462({ ...base, bank_kvar: 0 });
+  assert.ok(Math.abs(off.rise_pct) < 1e-12);
+  assert.ok("error" in _v1462({ ...base, reactance_to_source_ohm: 0 }));
+  assert.ok("error" in _v1462({ ...base, bank_kvar: -1 }));
+});
+
+import { computeRegulatorTapBandwidth as _v1463 } from "../../calc-lineworker.js";
+test("bounds: spec-v1463 computeRegulatorTapBandwidth -- a deadband narrower than one step hunts", () => {
+  const base = { base_voltage_v: 120, bandwidth_v: 2.0, tap_position: 6, load_current_a: 200, power_factor: 0.9, ldc_r_volts: 3, ldc_x_volts: 6, ct_rating_a: 200 };
+  const r = _v1463(base);
+  assert.ok(Math.abs(r.volts_per_step - 0.75) < 1e-12);
+  assert.ok(Math.abs(r.bandwidth_steps - 2.66666667) < 1e-6);
+  assert.ok(Math.abs(r.full_range_v - 12) < 1e-12);
+  assert.ok(Math.abs(r.output_voltage_v - 124.5) < 1e-12);
+  assert.ok(Math.abs(r.simulated_drop_v - 5.31533936) < 1e-6);
+  assert.equal(r.hunting_risk, false);
+  // Full range is exactly 10% of base either way, which is the ANSI ranging.
+  assert.ok(Math.abs(r.full_range_v / base.base_voltage_v - 0.10) < 1e-12);
+  const top = _v1463({ ...base, tap_position: 16 });
+  assert.ok(Math.abs(top.output_voltage_v - base.base_voltage_v * 1.1) < 1e-12);
+  const bottom = _v1463({ ...base, tap_position: -16 });
+  assert.ok(Math.abs(bottom.output_voltage_v - base.base_voltage_v * 0.9) < 1e-12);
+  // A bandwidth of exactly one tap step is the hunting boundary, and the
+  // verdict is driven off the same boolean the number is.
+  const edge = _v1463({ ...base, bandwidth_v: r.volts_per_step });
+  assert.ok(Math.abs(edge.bandwidth_steps - 1) < 1e-12);
+  assert.equal(edge.hunting_risk, true);
+  assert.ok(edge.verdict.startsWith("HUNTING RISK"));
+  const narrow = _v1463({ ...base, bandwidth_v: 0.6 });
+  assert.equal(narrow.hunting_risk, true);
+  // At unity power factor the X dial contributes nothing at all.
+  const unity = _v1463({ ...base, power_factor: 1 });
+  assert.ok(Math.abs(unity.simulated_drop_v - base.ldc_r_volts) < 1e-12);
+  // No load current is no compensation, so the far end sags the full drop.
+  const idle = _v1463({ ...base, load_current_a: 0 });
+  assert.ok(Math.abs(idle.simulated_drop_v) < 1e-12);
+  assert.ok("error" in _v1463({ ...base, tap_position: 17 }));
+  assert.ok("error" in _v1463({ ...base, bandwidth_v: 0 }));
+});
+
+import { computeRecloserFuseCoordination as _v1464 } from "../../calc-lineworker.js";
+test("bounds: spec-v1464 computeRecloserFuseCoordination -- the heating factor is what eats the margin", () => {
+  const base = { fault_current_a: 1200, fast_curve_s: 0.045, slow_curve_s: 0.4, fuse_min_melt_s: 0.08, fuse_total_clear_s: 0.14, heating_factor: 1.35, system_frequency_hz: 60 };
+  const r = _v1464(base);
+  assert.ok(Math.abs(r.heated_fast_s - 0.06075) < 1e-9);
+  assert.ok(Math.abs(r.coordination_ratio - 1.31687243) < 1e-6);
+  assert.ok(Math.abs(r.margin_s - 0.01925) < 1e-9);
+  assert.ok(Math.abs(r.margin_cycles - 1.155) < 1e-9);
+  assert.equal(r.fuse_saving_holds, true);
+  assert.equal(r.fuse_blowing_holds, true);
+  // One fast operation instead of two: the spec's own comparison figure.
+  const one = _v1464({ ...base, heating_factor: 1.2 });
+  assert.ok(Math.abs(one.heated_fast_s - 0.054) < 1e-9);
+  assert.ok(Math.abs(one.coordination_ratio - 1.48148148) < 1e-6);
+  // A heating factor of one is the naive comparison, and it is the ratio of
+  // the two published times exactly.
+  const naive = _v1464({ ...base, heating_factor: 1 });
+  assert.ok(Math.abs(naive.heated_fast_s - base.fast_curve_s) < 1e-12);
+  assert.ok(Math.abs(naive.coordination_ratio - base.fuse_min_melt_s / base.fast_curve_s) < 1e-12);
+  // The longest fast curve that still coordinates puts the ratio at exactly 1.
+  const at = _v1464({ ...base, fast_curve_s: r.longest_fast_curve_s });
+  assert.ok(Math.abs(at.coordination_ratio - 1) < 1e-12);
+  assert.ok(Math.abs(at.margin_s) < 1e-15);
+  assert.equal(at.fuse_saving_holds, false);
+  assert.ok(at.verdict.startsWith("FUSE SAVING FAILS"));
+  // Raise the fault current far enough and the curves cross: a slower fuse.
+  const hot = _v1464({ ...base, fuse_min_melt_s: 0.05 });
+  assert.equal(hot.fuse_saving_holds, false);
+  // The fuse-blowing end is bounded independently of the fast curve.
+  const slowFuse = _v1464({ ...base, fuse_total_clear_s: 0.5 });
+  assert.equal(slowFuse.fuse_blowing_holds, false);
+  assert.ok("error" in _v1464({ ...base, heating_factor: 0.9 }));
+  assert.ok("error" in _v1464({ ...base, fuse_total_clear_s: 0.05 }));
+});
+
+import { computeFeederLossLoadFactor as _v1465 } from "../../calc-lineworker.js";
+test("bounds: spec-v1465 computeFeederLossLoadFactor -- the loss factor sits between LF and LF squared", () => {
+  const base = { peak_current_a: 180, resistance_ohm_per_mile: 0.29, length_miles: 4.2, load_factor: 0.55, energy_cost_per_kwh: 0.09, peak_demand_kw: 3887 };
+  const r = _v1465(base);
+  assert.ok(Math.abs(r.total_resistance_ohm - 1.218) < 1e-12);
+  assert.ok(Math.abs(r.peak_loss_kw - 118.3896) < 1e-9);
+  assert.ok(Math.abs(r.loss_factor - 0.37675) < 1e-12);
+  assert.ok(Math.abs(r.annual_loss_kwh - 390724.751) < 1e-2);
+  assert.ok(Math.abs(r.annual_cost - 35165.2276) < 1e-2);
+  assert.ok(Math.abs(r.peak_overstatement_x - 2.65427975) < 1e-6);
+  assert.ok(Math.abs(r.load_factor_overstatement_pct - 45.9854011) < 1e-6);
+  assert.ok(Math.abs(r.loss_percent_of_delivered - 2.08636161) < 1e-6);
+  // The bounds the approximation lives between, at every load factor.
+  for (const lf of [0.1, 0.25, 0.4, 0.55, 0.7, 0.9]) {
+    const x = _v1465({ ...base, load_factor: lf });
+    assert.ok(x.loss_factor >= lf * lf - 1e-12);
+    assert.ok(x.loss_factor <= lf + 1e-12);
+  }
+  // A perfectly flat load loses at its load factor: 0.3 + 0.7 is exactly one.
+  const flat = _v1465({ ...base, load_factor: 1 });
+  assert.ok(Math.abs(flat.loss_factor - 1) < 1e-12);
+  assert.ok(Math.abs(flat.annual_loss_kwh - flat.peak_all_year_kwh) < 1e-6);
+  assert.ok(Math.abs(flat.peak_overstatement_x - 1) < 1e-12);
+  // Loss is quadratic in current and linear in length.
+  const dbl = _v1465({ ...base, peak_current_a: 360 });
+  assert.ok(Math.abs(dbl.peak_loss_kw - 4 * r.peak_loss_kw) < 1e-9);
+  const long = _v1465({ ...base, length_miles: 8.4 });
+  assert.ok(Math.abs(long.peak_loss_kw - 2 * r.peak_loss_kw) < 1e-9);
+  assert.ok("error" in _v1465({ ...base, load_factor: 0 }));
+  assert.ok("error" in _v1465({ ...base, length_miles: 0 }));
+});
+
+import { computeMeterCtPtMultiplier as _v1466 } from "../../calc-lineworker.js";
+test("bounds: spec-v1466 computeMeterCtPtMultiplier -- 456 A is NOT inside a 200 A CT", () => {
+  const base = { ct_primary_a: 200, ct_secondary_a: 5, pt_primary_v: 7200, pt_secondary_v: 120, register_constant: 1, register_reading_kwh: 1480, demand_register_kw: 4.1, service_voltage_kv: 12.47 };
+  const r = _v1466(base);
+  assert.ok(Math.abs(r.ct_ratio - 40) < 1e-12);
+  assert.ok(Math.abs(r.pt_ratio - 60) < 1e-12);
+  assert.ok(Math.abs(r.multiplier - 2400) < 1e-12);
+  assert.ok(Math.abs(r.billed_kwh - 3552000) < 1e-6);
+  assert.ok(Math.abs(r.implied_demand_kw - 9840) < 1e-9);
+  assert.ok(Math.abs(r.implied_current_a - 455.583532) < 1e-5);
+  // spec-v1466 calls that "comfortably inside a 200 A CT". It is 2.28 TIMES
+  // the CT primary rating, which is the failure the check exists to catch.
+  assert.equal(r.within_ct_rating, false);
+  assert.ok(Math.abs(r.ct_utilization_pct - 227.791766) < 1e-5);
+  assert.ok(r.verdict.startsWith("NOT PLAUSIBLE"));
+  // The CT swap the note describes: 200:5 to 400:5 doubles the multiplier,
+  // exactly, and every bill written on the old one is half.
+  const swapped = _v1466({ ...base, ct_primary_a: 400 });
+  assert.ok(Math.abs(swapped.multiplier - 2 * r.multiplier) < 1e-12);
+  assert.ok(Math.abs(swapped.billed_kwh - 2 * r.billed_kwh) < 1e-6);
+  // A demand that puts the implied current exactly at the CT primary rating
+  // is the boundary, and it reads as plausible.
+  const atRating = base.ct_primary_a * Math.sqrt(3) * base.service_voltage_kv / r.multiplier;
+  const edge = _v1466({ ...base, demand_register_kw: atRating });
+  assert.ok(Math.abs(edge.implied_current_a - base.ct_primary_a) < 1e-9);
+  assert.ok(Math.abs(edge.ct_utilization_pct - 100) < 1e-9);
+  const under = _v1466({ ...base, demand_register_kw: atRating * 0.999 });
+  assert.equal(under.within_ct_rating, true);
+  assert.ok(under.verdict.startsWith("PLAUSIBLE"));
+  const over = _v1466({ ...base, demand_register_kw: atRating * 1.001 });
+  assert.equal(over.within_ct_rating, false);
+  // Without a demand reading there is no check to run, and it says so rather
+  // than inventing a verdict.
+  const noDemand = _v1466({ ...base, demand_register_kw: 0 });
+  assert.equal(noDemand.within_ct_rating, null);
+  assert.equal(noDemand.implied_current_a, null);
+  assert.ok("error" in _v1466({ ...base, ct_secondary_a: 0 }));
+  assert.ok("error" in _v1466({ ...base, register_constant: 0 }));
+});
+
+import { computeCounterpoiseResistance as _v1467 } from "../../calc-lineworker.js";
+test("bounds: spec-v1467 computeCounterpoiseResistance -- doubling the wire nearly halves it", () => {
+  const base = { soil_resistivity_ohm_cm: 10000, length_ft: 100, burial_depth_in: 6, wire_diameter_in: 0.5, radials: 4, coupling_penalty: 1.5, target_resistance_ohm: 5 };
+  const r = _v1467(base);
+  // spec-v1467 prints 1.98 ohms for "100 ohm-metre" soil. 100 ohm-m is
+  // 10,000 ohm-cm, not 100 ohm-ft, and the answer is 6.51 ohms.
+  assert.ok(Math.abs(r.single_wire_ohm - 6.51022858) < 1e-6);
+  assert.ok(Math.abs(r.ideal_parallel_ohm - 1.62755715) < 1e-6);
+  assert.ok(Math.abs(r.array_ohm - 2.44133572) < 1e-6);
+  assert.ok(Math.abs(r.double_length_ohm - 3.61704935) < 1e-6);
+  assert.ok(Math.abs(r.doubling_improvement_x - 1.79987281) < 1e-6);
+  assert.equal(r.meets_target, true);
+  // Resistance is exactly linear in resistivity, which is what makes the
+  // spec's unit slip a clean factor: 3,048 ohm-cm IS 100 ohm-ft, and that is
+  // where the 1.98 came from.
+  const asOhmFeet = _v1467({ ...base, soil_resistivity_ohm_cm: 100 * 30.48 });
+  assert.ok(Math.abs(asOhmFeet.single_wire_ohm - 1.98431769) < 1e-6);
+  assert.ok(Math.abs(asOhmFeet.single_wire_ohm * (10000 / 3048) - r.single_wire_ohm) < 1e-9);
+  // A single radial has nothing to couple with, so the penalty is ignored.
+  const one = _v1467({ ...base, radials: 1 });
+  assert.ok(Math.abs(one.array_ohm - one.single_wire_ohm) < 1e-12);
+  assert.ok(Math.abs(one.coupling_cost_ohm) < 1e-12);
+  assert.ok(Math.abs(one.coupling_penalty - 1) < 1e-12);
+  // A penalty of one is the ideal parallel value, exactly.
+  const ideal = _v1467({ ...base, coupling_penalty: 1 });
+  assert.ok(Math.abs(ideal.array_ohm - ideal.ideal_parallel_ohm) < 1e-12);
+  // The length that reaches a target, fed back in, lands on that target.
+  const wanted = _v1467({ ...base, target_resistance_ohm: 1.5 });
+  assert.ok(wanted.length_for_target_ft > 0);
+  const back = _v1467({ ...base, length_ft: wanted.length_for_target_ft, target_resistance_ohm: 1.5 });
+  assert.ok(Math.abs(back.array_ohm - 1.5) < 1e-6);
+  // The trap the note names: hold ONE penalty fixed across two arrays and
+  // more radials win on paper every time, even against twice the wire each.
+  const four = _v1467({ ...base, radials: 4, length_ft: 200 });
+  const eight = _v1467({ ...base, radials: 8, length_ft: 100 });
+  assert.ok(eight.array_ohm < four.array_ohm);
+  // Give the eight-radial array the larger penalty it actually earns and the
+  // comparison turns over, which is why the penalty is entered per array.
+  const eightHonest = _v1467({ ...base, radials: 8, length_ft: 100, coupling_penalty: 2.4 });
+  assert.ok(four.array_ohm < eightHonest.array_ohm);
+  assert.ok("error" in _v1467({ ...base, coupling_penalty: 0.8 }));
+  assert.ok("error" in _v1467({ ...base, wire_diameter_in: 0 }));
+});

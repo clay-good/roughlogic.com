@@ -743,6 +743,10 @@ export const TOOL_MODULES = (() => {
     "pole-class-groundline-moment", "guy-anchor-holding-capacity",
     "transverse-wind-load-conductor", "nesc-district-loading",
     "conductor-creep-elongation", "sagging-return-wave",
+    "transformer-diversity-loading", "capacitor-bank-voltage-rise",
+    "regulator-tap-bandwidth", "recloser-fuse-coordination",
+    "feeder-loss-load-factor", "meter-ct-pt-multiplier",
+    "counterpoise-resistance",
   ]);
   // spec-v1469..v1477: the millwright alignment, vibration, and balance bench.
   // The catalog had `rotor-balance-grade` (an ISO 1940 TOLERANCE) and bearing

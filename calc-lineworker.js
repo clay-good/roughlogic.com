@@ -888,3 +888,515 @@ LINEWORKER_RENDERERS["sagging-return-wave"] = _simpleRenderer({
   ],
   compute: computeSaggingReturnWave,
 });
+
+// ===========================================================================
+// spec-v1461..v1467: the 2026-09-08 trade-expansion second lineworker band --
+// the distribution side of line work. The first band was mechanical: sag,
+// tension, ice, wind, poles and guys. This one is what the same crew does
+// once the wire is up -- loading a pot, switching a bank, setting a
+// regulator, coordinating a fuse, costing the losses, checking a meter
+// multiplier, and grounding a structure in rock.
+//
+//   v1461 transformer-diversity-loading   v1465 feeder-loss-load-factor
+//   v1462 capacitor-bank-voltage-rise     v1466 meter-ct-pt-multiplier
+//   v1463 regulator-tap-bandwidth         v1467 counterpoise-resistance
+//   v1464 recloser-fuse-coordination
+//
+// THREE OF THE SEVEN SPECS WERE INTERNALLY WRONG, and two of them the same
+// way the millwright band's were -- correct arithmetic followed by a sentence
+// that points the wrong way:
+//   spec-v1462 computes 124 + 1.11 = 125.1 V and calls that "past the ANSI
+//     C84.1 Range A limit of 126". 125.1 is INSIDE 126, by 0.9 V.
+//   spec-v1466 computes an implied 456 A behind a 200:5 CT and calls it
+//     "comfortably inside a 200 A CT". 456 A is 2.3 TIMES that CT's primary
+//     rating -- which is exactly the failure the plausibility check exists to
+//     catch, so the worked example here is kept and reported as a FAIL.
+//   spec-v1467 calls its soil "100 ohm-metre" and then puts 100 into a
+//     foot-based relation. 100 ohm-m is 10,000 ohm-cm, not 100 ohm-ft, and
+//     the resistance is 6.51 ohms rather than the 1.98 the spec prints.
+// Every threshold in this band is therefore reported as a computed verdict in
+// WORDS, driven off a boolean the compute returns, so that a number and the
+// sentence beside it cannot disagree.
+//
+// Soil resistivity is entered in ohm-cm here because `grounding-electrode`
+// and `soil-resistivity-wenner` already read it that way, and two grounding
+// calculators must not disagree about the dirt under one structure.
+
+// ============ spec-v1461: distribution transformer diversified loading ============
+
+// dims: in { customers: dimensionless, individual_peak_kva: M L^2 T^-3, diversity_factor: dimensionless, continuous_rating_kva: M L^2 T^-3, short_time_rating_kva: M L^2 T^-3, average_demand_kva: M L^2 T^-3 } out: { connected_kva: M L^2 T^-3, diversified_kva: M L^2 T^-3, continuous_loading_pct: dimensionless, short_time_loading_pct: dimensionless, headroom_customers: dimensionless, load_factor: dimensionless }
+export function computeTransformerDiversityLoading({ customers = 0, individual_peak_kva = 0, diversity_factor = 0, continuous_rating_kva = 0, short_time_rating_kva = 0, average_demand_kva = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(customers >= 1)) return { error: "Customer count must be at least one." };
+  if (!(individual_peak_kva > 0)) return { error: "Individual customer peak demand must be positive (kVA)." };
+  if (!(diversity_factor > 0 && diversity_factor <= 1)) return { error: "The coincidence (diversity) factor must be greater than zero and no more than one." };
+  if (!(continuous_rating_kva > 0)) return { error: "Transformer continuous rating must be positive (kVA)." };
+  if (short_time_rating_kva < 0) return { error: "Short-time rating cannot be negative (kVA)." };
+  if (average_demand_kva < 0) return { error: "Average demand cannot be negative (kVA)." };
+  const connected_kva = customers * individual_peak_kva;
+  const diversified_kva = connected_kva * diversity_factor;
+  const continuous_loading_pct = diversified_kva / continuous_rating_kva * 100;
+  const connected_loading_pct = connected_kva / continuous_rating_kva * 100;
+  const short_time_loading_pct = short_time_rating_kva > 0 ? diversified_kva / short_time_rating_kva * 100 : null;
+  // The classic "diversity factor" of the textbooks is connected over
+  // diversified and is at least one; the "coincidence factor" is its
+  // reciprocal and is at most one. The input here is the coincidence factor,
+  // which is the number utilities actually tabulate, and both are reported
+  // because the two names get swapped constantly.
+  const classic_diversity_factor = 1 / diversity_factor;
+  const customers_at_continuous = continuous_rating_kva / (individual_peak_kva * diversity_factor);
+  const headroom_customers = customers_at_continuous - customers;
+  const load_factor = average_demand_kva > 0 ? average_demand_kva / diversified_kva : null;
+  const within_continuous = continuous_loading_pct <= 100;
+  const within_short_time = short_time_rating_kva > 0 ? diversified_kva <= short_time_rating_kva : null;
+  const outs = [connected_kva, diversified_kva, continuous_loading_pct, customers_at_continuous, headroom_customers];
+  if (!outs.every(Number.isFinite)) return { error: "Diversified-loading math is not a finite value." };
+  const verdict = within_continuous
+    ? "UNDER the continuous rating: " + fmt(continuous_loading_pct, 1) + "% of " + fmt(continuous_rating_kva, 0) + " kVA, with room for " + fmt(headroom_customers, 1) + " more customers at this coincidence factor"
+    : "OVER the continuous rating: " + fmt(continuous_loading_pct, 1) + "% of " + fmt(continuous_rating_kva, 0) + " kVA, which is " + fmt(-headroom_customers, 1) + " customers past it"
+      + (within_short_time === true ? " but INSIDE the entered " + fmt(short_time_rating_kva, 0) + " kVA short-time rating, so the question is duration and loss of life, not nameplate" : within_short_time === false ? " and OVER the entered " + fmt(short_time_rating_kva, 0) + " kVA short-time rating as well" : "");
+  return {
+    customers, individual_peak_kva, diversity_factor, continuous_rating_kva, short_time_rating_kva,
+    connected_kva, diversified_kva, continuous_loading_pct, connected_loading_pct, short_time_loading_pct,
+    classic_diversity_factor, customers_at_continuous, headroom_customers, load_factor,
+    within_continuous, within_short_time, verdict,
+    note: "A 25 kVA pot serving eight houses is not serving eight times one house's peak, because the peaks do not coincide. Sizing a distribution transformer on connected load oversizes it enormously, and the term that closes the gap is the coincidence factor. Diversity strengthens as the group grows: two houses on one transformer coincide badly, thirty houses hardly coincide at all, so the factor falls from near 1.0 at a single customer toward an asymptote somewhere around 0.4 to 0.6 for a large residential group. Each utility carries its own curve, derived from its own metered data, and NO CURVE IS SHIPPED HERE for the same reason no clearance table is: a factor that is right for one system's housing stock and climate is wrong for another's, and a shipped curve would be believed. The two names for this quantity are swapped constantly and both are reported: the coincidence factor is diversified over connected and is at most one, the classic diversity factor is its reciprocal and is at least one. Distribution transformers are also allowed to run past nameplate for a few hours, because their thermal time constant is measured in hours -- a pot that peaks above 100% for two evening hours and sits at 40% overnight can have an entirely ordinary loss of life. That is why loading is reported against both the continuous rating and an entered short-time rating, and why load factor is worth carrying beside peak: peak alone says nothing about how long the peak lasts. What this does not do is decide whether a given overload is acceptable. Loss of life needs a full load cycle against an ambient profile through IEEE C57.91, and a short-time rating used without that study is a guess with a number on it. Electric vehicle charging and electric heat break residential diversity assumptions badly, and are exactly the case where an old factor misleads: several vehicles on one pot charge on the same timer, which is coincidence rather than diversity. One transformer, one customer class, one factor supplied by the reader. Secondary voltage drop is a separate calculation. The utility's transformer loading guide, IEEE C57.91, and the transformer manufacturer's ratings govern.",
+  };
+}
+const transformerDiversityLoadingExample = { inputs: { customers: 8, individual_peak_kva: 9.5, diversity_factor: 0.62, continuous_rating_kva: 25, short_time_rating_kva: 50, average_demand_kva: 18 } };
+LINEWORKER_RENDERERS["transformer-diversity-loading"] = _simpleRenderer({
+  citation: "Citation: the diversified-demand relation by name -- diversified demand = customer count x individual peak x coincidence factor, with the classic diversity factor reported as its reciprocal -- and IEEE C57.91 named for loading beyond nameplate. NO DIVERSITY CURVE IS SHIPPED: the factor is entered from the utility's own metered data, because a curve right for one system's housing stock is wrong for another's. Loss of life is not computed; it needs a full load cycle against an ambient profile. The utility's transformer loading guide, IEEE C57.91, and the transformer manufacturer's ratings govern.",
+  example: transformerDiversityLoadingExample.inputs,
+  fields: [
+    { key: "customers", label: "Customers served", kind: "number", default: 8 },
+    { key: "individual_peak_kva", label: "Individual customer peak demand (kVA)", kind: "number", default: 9.5 },
+    { key: "diversity_factor", label: "Coincidence factor for that group size (0 to 1)", kind: "number", default: 0.62 },
+    { key: "continuous_rating_kva", label: "Transformer continuous rating (kVA)", kind: "number", default: 25 },
+    { key: "short_time_rating_kva", label: "Short-time rating (kVA, 0 to skip)", kind: "number", default: 50 },
+    { key: "average_demand_kva", label: "Average demand (kVA, 0 to skip)", kind: "number", default: 18 },
+  ],
+  outputs: [
+    { key: "c", id: "tdl-out-c", label: "Connected load", value: (r) => fmt(r.connected_kva, 1) + " kVA -- " + fmt(r.connected_loading_pct, 0) + "% of the rating, which is the number that sells an oversized transformer" },
+    { key: "d", id: "tdl-out-d", label: "Diversified demand", value: (r) => fmt(r.diversified_kva, 2) + " kVA -- " + fmt(r.continuous_loading_pct, 1) + "% of the continuous rating" },
+    { key: "v", id: "tdl-out-v", label: "Against the ratings", value: (r) => r.verdict },
+    { key: "s", id: "tdl-out-s", label: "Short-time loading", value: (r) => r.short_time_loading_pct === null ? "(no short-time rating entered)" : fmt(r.short_time_loading_pct, 1) + "% of " + fmt(r.short_time_rating_kva, 0) + " kVA" },
+    { key: "h", id: "tdl-out-h", label: "Customers to the continuous rating", value: (r) => fmt(r.customers_at_continuous, 1) + " at this coincidence factor -- " + fmt(r.headroom_customers, 1) + " from where you are. Each new customer also lowers the factor slightly, which a straight division misses" },
+    { key: "f", id: "tdl-out-f", label: "Both names for the factor", value: (r) => "coincidence " + fmt(r.diversity_factor, 3) + ", classic diversity factor " + fmt(r.classic_diversity_factor, 3) + (r.load_factor === null ? "" : "; load factor " + fmt(r.load_factor, 3)) },
+    { key: "n", id: "tdl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTransformerDiversityLoading,
+});
+
+// ============ spec-v1462: line capacitor bank voltage rise ============
+
+// dims: in { bank_kvar: M L^2 T^-3, line_voltage_kv: M L^2 T^-3 I^-1, reactance_to_source_ohm: M L^2 T^-3 I^-2, peak_load_voltage_v: M L^2 T^-3 I^-1, light_load_voltage_v: M L^2 T^-3 I^-1, upper_limit_v: M L^2 T^-3 I^-1 } out: { rise_pct: dimensionless, rise_volts_120_base: M L^2 T^-3 I^-1, leading_current_a: I, peak_load_result_v: M L^2 T^-3 I^-1, light_load_result_v: M L^2 T^-3 I^-1, max_bank_kvar: M L^2 T^-3 }
+export function computeCapacitorBankVoltageRise({ bank_kvar = 0, line_voltage_kv = 0, reactance_to_source_ohm = 0, peak_load_voltage_v = 118, light_load_voltage_v = 124, upper_limit_v = 126 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(line_voltage_kv > 0)) return { error: "Line-to-line system voltage must be positive (kV)." };
+  if (!(reactance_to_source_ohm > 0)) return { error: "Line reactance from the source to the bank must be positive (ohm)." };
+  if (bank_kvar < 0) return { error: "Bank rating cannot be negative (kVAR)." };
+  if (!(peak_load_voltage_v > 0)) return { error: "Pre-switching voltage at peak load must be positive (V on a 120 V base)." };
+  if (!(light_load_voltage_v > 0)) return { error: "Pre-switching voltage at light load must be positive (V on a 120 V base)." };
+  if (!(upper_limit_v > 0)) return { error: "The upper voltage limit must be positive (V on a 120 V base)." };
+  // The standard distribution relation. kVAR x X / (10 kV^2) lands in percent
+  // directly: the 10 carries the kVAR-to-VAR and volt-to-kilovolt scaling
+  // together with the factor of 100 that makes it a percentage.
+  const rise_pct = bank_kvar * reactance_to_source_ohm / (10 * line_voltage_kv * line_voltage_kv);
+  const rise_volts_120_base = rise_pct * 120 / 100;
+  const leading_current_a = bank_kvar / (Math.sqrt(3) * line_voltage_kv);
+  const peak_load_result_v = peak_load_voltage_v + rise_volts_120_base;
+  const light_load_result_v = light_load_voltage_v + rise_volts_120_base;
+  const light_load_margin_v = upper_limit_v - light_load_result_v;
+  const within_limit_light = light_load_result_v <= upper_limit_v;
+  const within_limit_peak = peak_load_result_v <= upper_limit_v;
+  // Working the relation backwards at the binding condition, which is light
+  // load: the largest fixed bank whose rise still fits under the limit.
+  const headroom_v = Math.max(0, upper_limit_v - light_load_voltage_v);
+  const max_bank_kvar = headroom_v / 120 * 100 * 10 * line_voltage_kv * line_voltage_kv / reactance_to_source_ohm;
+  const outs = [rise_pct, rise_volts_120_base, leading_current_a, peak_load_result_v, light_load_result_v, max_bank_kvar];
+  if (!outs.every(Number.isFinite)) return { error: "Capacitor voltage-rise math is not a finite value." };
+  const verdict = within_limit_light
+    ? "INSIDE the limit at light load: " + fmt(light_load_result_v, 2) + " V against " + fmt(upper_limit_v, 1) + " V, with " + fmt(light_load_margin_v, 2) + " V to spare"
+    : "OVER the limit at light load: " + fmt(light_load_result_v, 2) + " V against " + fmt(upper_limit_v, 1) + " V, " + fmt(-light_load_margin_v, 2) + " V past it -- which is the case for switching this bank rather than fixing it";
+  return {
+    bank_kvar, line_voltage_kv, reactance_to_source_ohm, upper_limit_v,
+    rise_pct, rise_volts_120_base, leading_current_a,
+    peak_load_voltage_v, light_load_voltage_v, peak_load_result_v, light_load_result_v,
+    light_load_margin_v, within_limit_light, within_limit_peak, max_bank_kvar, verdict,
+    note: "Switching a capacitor bank onto a feeder raises the voltage, and the rise is what decides whether the bank helps the end of the line or pushes the head of it over limit. A capacitor injects leading reactive current; that current flowing back through the reactance between the bank and the source raises the voltage at the point of connection. The rise depends on the reactance BETWEEN the bank and the source, so the further out the bank sits the bigger its voltage effect and the smaller its loss-reduction effect per kVAR -- the two goals pull in opposite directions, and this one line of arithmetic is where the trade shows. The number that gets people is the light-load case, and it is the reason this reports the result at two conditions rather than one. A fixed bank sized for peak-load power factor is still connected at three in the morning, when the load is a fifth of peak, the drop it was cancelling is gone, and the rise it produces is the whole story. A feeder head sitting comfortably at peak can be over the ANSI C84.1 Range A upper limit at light load with the same bank, the same reactance, and nothing having changed but the hour. That is why banks get switched rather than fixed, and the largest bank that still fits under the limit at light load is reported so the size question is answered rather than argued. Steady state, one bank, one location, radial feeder. It does not model switching transients, which is where capacitor problems actually live: inrush on back-to-back switching, restrike across the switch contacts, and the voltage magnification that damages customer equipment and trips adjustable-speed drives. It does not check harmonic resonance, which is a separate screen and the other reason a bank sizing fails. It does not produce a voltage profile along the feeder or coordinate the bank against a regulator's bandwidth, and a bank inside a regulator's zone will interact with it. ANSI C84.1, IEEE 1036, the utility's capacitor application guide, and a distribution power-flow study govern.",
+  };
+}
+const capacitorBankVoltageRiseExample = { inputs: { bank_kvar: 600, line_voltage_kv: 12.47, reactance_to_source_ohm: 2.4, peak_load_voltage_v: 118, light_load_voltage_v: 124, upper_limit_v: 126 } };
+LINEWORKER_RENDERERS["capacitor-bank-voltage-rise"] = _simpleRenderer({
+  citation: "Citation: the distribution capacitor voltage-rise relation by name -- percent rise = bank kVAR x reactance to the source / (10 x line-to-line kV squared) -- with ANSI C84.1 Range A named for the voltage limit the result is tested against. The limit and both pre-switching voltages are entered, because the adopted range and the feeder's own profile are local. Steady state; no switching transient, no harmonic resonance check, no feeder voltage profile. ANSI C84.1, IEEE 1036, the utility's capacitor application guide, and a distribution power-flow study govern.",
+  example: capacitorBankVoltageRiseExample.inputs,
+  fields: [
+    { key: "bank_kvar", label: "Bank rating (kVAR)", kind: "number", default: 600 },
+    { key: "line_voltage_kv", label: "Line-to-line system voltage (kV)", kind: "number", default: 12.47 },
+    { key: "reactance_to_source_ohm", label: "Line reactance, source to bank (ohm)", kind: "number", default: 2.4 },
+    { key: "peak_load_voltage_v", label: "Pre-switching voltage at peak load (V on a 120 V base)", kind: "number", default: 118 },
+    { key: "light_load_voltage_v", label: "Pre-switching voltage at light load (V on a 120 V base)", kind: "number", default: 124 },
+    { key: "upper_limit_v", label: "Upper voltage limit (V on a 120 V base)", kind: "number", default: 126 },
+  ],
+  outputs: [
+    { key: "p", id: "cbv-out-p", label: "Voltage rise", value: (r) => fmt(r.rise_pct, 2) + "% -- " + fmt(r.rise_volts_120_base, 2) + " V on a 120 V base, a bit over one regulator tap step" },
+    { key: "v", id: "cbv-out-v", label: "At light load", value: (r) => r.verdict },
+    { key: "k", id: "cbv-out-k", label: "At peak load", value: (r) => fmt(r.peak_load_result_v, 2) + " V, " + (r.within_limit_peak ? "inside" : "OVER") + " the " + fmt(r.upper_limit_v, 1) + " V limit -- the condition the bank was sized for, and not the one that binds" },
+    { key: "i", id: "cbv-out-i", label: "Leading current the bank draws", value: (r) => fmt(r.leading_current_a, 2) + " A" },
+    { key: "m", id: "cbv-out-m", label: "Largest fixed bank that fits", value: (r) => fmt(r.max_bank_kvar, 0) + " kVAR at this location, judged at light load. Anything larger has to be switched" },
+    { key: "n", id: "cbv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCapacitorBankVoltageRise,
+});
+
+// ============ spec-v1463: step voltage regulator tap and bandwidth ============
+
+// dims: in { base_voltage_v: M L^2 T^-3 I^-1, bandwidth_v: M L^2 T^-3 I^-1, tap_position: dimensionless, load_current_a: I, power_factor: dimensionless, ldc_r_volts: M L^2 T^-3 I^-1, ldc_x_volts: M L^2 T^-3 I^-1, ct_rating_a: I } out: { volts_per_step: M L^2 T^-3 I^-1, bandwidth_steps: dimensionless, band_half_v: M L^2 T^-3 I^-1, full_range_v: M L^2 T^-3 I^-1, output_voltage_v: M L^2 T^-3 I^-1, simulated_drop_v: M L^2 T^-3 I^-1 }
+export function computeRegulatorTapBandwidth({ base_voltage_v = 120, bandwidth_v = 0, tap_position = 0, load_current_a = 0, power_factor = 0.9, ldc_r_volts = 0, ldc_x_volts = 0, ct_rating_a = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(base_voltage_v > 0)) return { error: "Base voltage must be positive (V)." };
+  if (!(bandwidth_v > 0)) return { error: "Bandwidth must be positive (V)." };
+  if (!(Math.abs(tap_position) <= 16)) return { error: "Tap position must be between -16 and +16 -- an ANSI regulator has 32 steps." };
+  if (load_current_a < 0) return { error: "Load current cannot be negative (A)." };
+  if (!(power_factor > 0 && power_factor <= 1)) return { error: "Power factor must be greater than zero and no more than one." };
+  if (ldc_r_volts < 0 || ldc_x_volts < 0) return { error: "Line drop compensation settings cannot be negative (V)." };
+  if (ct_rating_a < 0) return { error: "CT rating cannot be negative (A)." };
+  if (load_current_a > 0 && !(ct_rating_a > 0)) return { error: "Enter the CT rating to scale the line drop compensation to the load current." };
+  // ANSI ranging: 32 steps of 5/8 of one percent, plus or minus 10 percent.
+  const volts_per_step = 0.00625 * base_voltage_v;
+  const bandwidth_steps = bandwidth_v / volts_per_step;
+  const hunting_risk = bandwidth_steps <= 1;
+  const band_half_v = bandwidth_v / 2;
+  const full_range_v = 16 * volts_per_step;
+  const full_range_pct = 10;
+  const output_voltage_v = base_voltage_v * (1 + 0.00625 * tap_position);
+  const tap_change_v = output_voltage_v - base_voltage_v;
+  // Line drop compensation. The R and X dials are in volts at RATED CT
+  // secondary current, so the simulated drop scales with the current ratio.
+  const current_ratio = ct_rating_a > 0 ? load_current_a / ct_rating_a : 0;
+  const sin_phi = Math.sqrt(Math.max(0, 1 - power_factor * power_factor));
+  const simulated_drop_v = current_ratio * (ldc_r_volts * power_factor + ldc_x_volts * sin_phi);
+  const terminal_for_set_point_v = output_voltage_v + simulated_drop_v;
+  const outs = [volts_per_step, bandwidth_steps, band_half_v, full_range_v, output_voltage_v, simulated_drop_v];
+  if (!outs.every(Number.isFinite)) return { error: "Regulator tap math is not a finite value." };
+  const verdict = hunting_risk
+    ? "HUNTING RISK: " + fmt(bandwidth_steps, 2) + " tap steps of bandwidth is at or below one step, so a correction overshoots out the far side of the deadband and has to come straight back. Widen it to at least " + fmt(volts_per_step * 1.5, 2) + " V"
+    : "OK: " + fmt(bandwidth_steps, 2) + " tap steps of bandwidth, inside the usual 1.5 to 2 step practice at " + fmt(volts_per_step, 3) + " V per step";
+  return {
+    base_voltage_v, bandwidth_v, tap_position, volts_per_step, bandwidth_steps, hunting_risk,
+    band_half_v, full_range_v, full_range_pct, output_voltage_v, tap_change_v,
+    load_current_a, ct_rating_a, current_ratio, power_factor, sin_phi,
+    ldc_r_volts, ldc_x_volts, simulated_drop_v, terminal_for_set_point_v, verdict,
+    note: "A step voltage regulator has three settings that interact -- set voltage, bandwidth, and time delay -- and getting them wrong produces either a feeder that sags at the end or a tap changer that wears itself out. An ANSI regulator ranges over 32 steps of five-eighths of one percent each, plus or minus ten percent, so on a 120 V base one step is 0.750 V and the full range is 12.0 V. THE BANDWIDTH IS A DEADBAND, not a target: the control does nothing while the sensed voltage stays inside it and moves one tap when it leaves. The first hard rule is that the bandwidth must exceed one tap step. A deadband narrower than the regulator's own correction means every operation overshoots out the far side and has to come straight back, which is hunting, and it spends a tap changer's rated operations in a fraction of its life. Ordinary practice is about one and a half to two steps, which on a 120 V base is a bandwidth somewhere near 1.5 to 2.0 V. Line drop compensation makes the regulator hold voltage at a point out on the feeder rather than at its own terminals, by subtracting a synthetic drop proportional to load current so the control sees what the regulation point sees. The R and X dials are in volts at rated CT secondary current and they encode the impedance out to that point, so the simulated drop reported here scales with the ratio of actual current to CT rating and with the load power factor. Set them too high and the regulator overcorrects at peak; set them to zero and the far end of the feeder sags exactly as far as the line drops. One single-phase regulator, steady state, ANSI 32-step ranging. It does not set the time delay, which is the third setting and the one that coordinates cascaded regulators and a regulator against a switched capacitor -- a downstream device must be slower than the upstream one or they fight each other. It does not derive the R and X settings from the impedance to the regulation point, which is where they should come from, and it does not produce a feeder voltage profile. Reverse power flow from distributed generation behind the regulator breaks the compensation logic entirely and needs a reverse-sensing mode this knows nothing about. ANSI C57.15, IEEE 1783, the regulator manufacturer's control manual, and the utility's voltage regulation practice govern.",
+  };
+}
+const regulatorTapBandwidthExample = { inputs: { base_voltage_v: 120, bandwidth_v: 2.0, tap_position: 6, load_current_a: 200, power_factor: 0.9, ldc_r_volts: 3, ldc_x_volts: 6, ct_rating_a: 200 } };
+LINEWORKER_RENDERERS["regulator-tap-bandwidth"] = _simpleRenderer({
+  citation: "Citation: ANSI 32-step regulator ranging by name -- 32 steps of 5/8 of one percent, plus or minus 10 percent, so volts per step = 0.00625 x base voltage -- with ANSI C57.15 named, and the line drop compensation relation drop = (I / CT rating) x (R x cos phi + X x sin phi) with the R and X dials in volts at rated CT secondary current. The bandwidth-above-one-step rule is reported as a computed verdict rather than assumed. ANSI C57.15, IEEE 1783, the regulator manufacturer's control manual, and the utility's voltage regulation practice govern.",
+  example: regulatorTapBandwidthExample.inputs,
+  fields: [
+    { key: "base_voltage_v", label: "Base voltage (V)", kind: "number", default: 120 },
+    { key: "bandwidth_v", label: "Bandwidth (V)", kind: "number", default: 2.0 },
+    { key: "tap_position", label: "Tap position (-16 to +16)", kind: "number", default: 6, attrs: { step: "any", min: "-16", max: "16" } },
+    { key: "load_current_a", label: "Load current (A)", kind: "number", default: 200 },
+    { key: "power_factor", label: "Load power factor (0 to 1)", kind: "number", default: 0.9 },
+    { key: "ldc_r_volts", label: "Line drop compensation R (V at rated CT current)", kind: "number", default: 3 },
+    { key: "ldc_x_volts", label: "Line drop compensation X (V at rated CT current)", kind: "number", default: 6 },
+    { key: "ct_rating_a", label: "CT rating (A)", kind: "number", default: 200 },
+  ],
+  outputs: [
+    { key: "s", id: "rtb-out-s", label: "Volts per tap step", value: (r) => fmt(r.volts_per_step, 3) + " V -- full range " + fmt(r.full_range_v, 2) + " V either way, which is the " + fmt(r.full_range_pct, 0) + "% an ANSI regulator ranges over" },
+    { key: "b", id: "rtb-out-b", label: "Bandwidth check", value: (r) => r.verdict },
+    { key: "d", id: "rtb-out-d", label: "The deadband", value: (r) => "plus or minus " + fmt(r.band_half_v, 2) + " V around the set voltage" },
+    { key: "o", id: "rtb-out-o", label: "Output at this tap", value: (r) => fmt(r.output_voltage_v, 2) + " V, " + (r.tap_change_v >= 0 ? "up " : "down ") + fmt(Math.abs(r.tap_change_v), 2) + " V from base at tap " + fmt(r.tap_position, 0) },
+    { key: "l", id: "rtb-out-l", label: "Line drop compensation", value: (r) => r.simulated_drop_v === 0 ? "no compensation (zero current or zero settings) -- the far end sags exactly as far as the line drops" : fmt(r.simulated_drop_v, 2) + " V of simulated drop at " + fmt(r.current_ratio, 2) + "x rated CT current, so the regulator holds its terminals " + fmt(r.simulated_drop_v, 2) + " V high to keep the regulation point on target" },
+    { key: "n", id: "rtb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRegulatorTapBandwidth,
+});
+
+// ============ spec-v1464: recloser-to-fuse coordination screen ============
+
+// dims: in { fault_current_a: I, fast_curve_s: T, slow_curve_s: T, fuse_min_melt_s: T, fuse_total_clear_s: T, heating_factor: dimensionless, system_frequency_hz: T^-1 } out: { heated_fast_s: T, coordination_ratio: dimensionless, margin_s: T, margin_cycles: dimensionless, longest_fast_curve_s: T, blowing_margin_s: T }
+export function computeRecloserFuseCoordination({ fault_current_a = 0, fast_curve_s = 0, slow_curve_s = 0, fuse_min_melt_s = 0, fuse_total_clear_s = 0, heating_factor = 1.35, system_frequency_hz = 60 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(fault_current_a > 0)) return { error: "Fault current at the branch must be positive (A)." };
+  if (!(fast_curve_s > 0)) return { error: "The recloser fast-curve time must be positive (s)." };
+  if (!(slow_curve_s > 0)) return { error: "The recloser slow-curve time must be positive (s)." };
+  if (!(fuse_min_melt_s > 0)) return { error: "Fuse minimum-melt time must be positive (s)." };
+  if (!(fuse_total_clear_s > 0)) return { error: "Fuse total-clearing time must be positive (s)." };
+  if (!(heating_factor >= 1)) return { error: "The fuse heating factor cannot be below one -- the element retains heat between operations, it does not shed extra." };
+  if (!(system_frequency_hz > 0)) return { error: "System frequency must be positive (Hz)." };
+  if (!(fuse_total_clear_s >= fuse_min_melt_s)) return { error: "Total clearing time cannot be shorter than minimum melt for the same fuse." };
+  const heated_fast_s = fast_curve_s * heating_factor;
+  const coordination_ratio = fuse_min_melt_s / heated_fast_s;
+  const fuse_saving_holds = coordination_ratio > 1;
+  const margin_s = fuse_min_melt_s - heated_fast_s;
+  const margin_cycles = margin_s * system_frequency_hz;
+  // The other end of the band: the fuse-blowing scheme wants the fuse to
+  // clear entirely before the recloser's slow curve operates.
+  const fuse_blowing_holds = fuse_total_clear_s < slow_curve_s;
+  const blowing_margin_s = slow_curve_s - fuse_total_clear_s;
+  const blowing_margin_cycles = blowing_margin_s * system_frequency_hz;
+  // The longest fast curve that would still coordinate, and the headroom as a
+  // multiple, so a crew can see how much room the setting actually has.
+  const longest_fast_curve_s = fuse_min_melt_s / heating_factor;
+  const outs = [heated_fast_s, coordination_ratio, margin_s, margin_cycles, longest_fast_curve_s, blowing_margin_s];
+  if (!outs.every(Number.isFinite)) return { error: "Coordination-screen math is not a finite value." };
+  const verdict = fuse_saving_holds
+    ? "FUSE SAVING HOLDS at " + fmt(fault_current_a, 0) + " A: the heated fast curve at " + fmt(heated_fast_s, 4) + " s clears " + fmt(margin_s, 4) + " s -- " + fmt(margin_cycles, 2) + " cycles -- ahead of minimum melt"
+    : "FUSE SAVING FAILS at " + fmt(fault_current_a, 0) + " A: the heated fast curve at " + fmt(heated_fast_s, 4) + " s is " + fmt(-margin_s, 4) + " s PAST minimum melt, so the fuse is damaged or blown by the fast operation";
+  const blowing_verdict = fuse_blowing_holds
+    ? "FUSE BLOWING HOLDS: total clear " + fmt(fuse_total_clear_s, 3) + " s beats the slow curve at " + fmt(slow_curve_s, 3) + " s by " + fmt(blowing_margin_s, 3) + " s"
+    : "FUSE BLOWING FAILS: total clear " + fmt(fuse_total_clear_s, 3) + " s is not inside the slow curve at " + fmt(slow_curve_s, 3) + " s, so the recloser locks out on a branch fault";
+  return {
+    fault_current_a, fast_curve_s, slow_curve_s, fuse_min_melt_s, fuse_total_clear_s,
+    heating_factor, system_frequency_hz, heated_fast_s, coordination_ratio,
+    fuse_saving_holds, margin_s, margin_cycles, fuse_blowing_holds,
+    blowing_margin_s, blowing_margin_cycles, longest_fast_curve_s, verdict, blowing_verdict,
+    note: "A recloser's fast curve is supposed to clear a temporary fault before the branch fuse melts, so a tree limb costs nobody a fuse change. Whether it does is a comparison of two published curves at one fault current, and the multiplier that makes the comparison honest is the part crews get wrong. Fuse saving works when the fast-curve time, MULTIPLIED BY A HEATING FACTOR that accounts for the element retaining heat between operations, still sits below the fuse's minimum-melt time at the maximum fault current on the branch. Two fast operations heat the element more than one, which is why the factor rises with the number of fast shots -- roughly 1.2 for one and 1.35 for two are the figures in common use, and both are entered here rather than assumed, because they belong to the fuse family. A comparison made without the factor looks comfortable and is not. The band is bounded at BOTH ends and that is the part missed. Coordination holds only between the minimum fault current where the fuse still clears inside the recloser's slow curve and the maximum fault current where the heated fast curve still beats minimum melt. Outside that window the scheme does not work, and on a modern feeder with high available fault current at the head, the upper bound often falls inside the zone the scheme is supposed to protect. Both ends are therefore screened here: the fuse-saving check against minimum melt and the fuse-blowing check of total clearing against the slow curve. The margin is reported in cycles as well as seconds because that is the unit protection people argue in. This is a comparison of times a reader takes off the published time-current characteristics at one current. NO CURVE DATA IS SHIPPED -- recloser and fuse curves are manufacturer publications that change, and a copy would go stale silently -- and it does not sweep the current range to find where coordination begins and ends, which is what a protection study does. It ignores asymmetry, pre-loading of the fuse by load current, ambient temperature, and fuse damage curves distinct from minimum melt, and it says nothing about sectionalizers downstream, substation relays upstream, or distributed generation changing the current the fuse actually sees. A screen, not a study: the manufacturer's time-current curves, IEEE C37.230, and the utility's protection engineer govern.",
+  };
+}
+const recloserFuseCoordinationExample = { inputs: { fault_current_a: 1200, fast_curve_s: 0.045, slow_curve_s: 0.4, fuse_min_melt_s: 0.08, fuse_total_clear_s: 0.14, heating_factor: 1.35, system_frequency_hz: 60 } };
+LINEWORKER_RENDERERS["recloser-fuse-coordination"] = _simpleRenderer({
+  citation: "Citation: the fuse-saving coordination criterion by name -- heated fast-curve time = fast curve x fuse heating factor, which must stay below the fuse minimum-melt time, with the fuse-blowing criterion that total clearing must beat the slow curve -- and IEEE C37.230 named. Heating factors near 1.2 for one fast operation and 1.35 for two are in common use and are ENTERED, not assumed. NO RECLOSER OR FUSE CURVE DATA IS SHIPPED: both times are read off the manufacturer's published time-current characteristics at the fault current in question. A screen, not a protection study. The manufacturer's curves, IEEE C37.230, and the utility's protection engineer govern.",
+  example: recloserFuseCoordinationExample.inputs,
+  fields: [
+    { key: "fault_current_a", label: "Fault current at the branch (A)", kind: "number", default: 1200 },
+    { key: "fast_curve_s", label: "Recloser fast-curve time at that current (s)", kind: "number", default: 0.045 },
+    { key: "slow_curve_s", label: "Recloser slow-curve time at that current (s)", kind: "number", default: 0.4 },
+    { key: "fuse_min_melt_s", label: "Fuse minimum-melt time at that current (s)", kind: "number", default: 0.08 },
+    { key: "fuse_total_clear_s", label: "Fuse total-clearing time at that current (s)", kind: "number", default: 0.14 },
+    { key: "heating_factor", label: "Fuse heating factor (1.2 one fast shot, 1.35 two)", kind: "number", default: 1.35 },
+    { key: "system_frequency_hz", label: "System frequency (Hz)", kind: "number", default: 60 },
+  ],
+  outputs: [
+    { key: "h", id: "rfc-out-h", label: "Heated fast-curve time", value: (r) => fmt(r.heated_fast_s, 4) + " s -- " + fmt(r.fast_curve_s, 4) + " s multiplied by the " + fmt(r.heating_factor, 2) + " heating factor" },
+    { key: "c", id: "rfc-out-c", label: "Coordination ratio", value: (r) => fmt(r.coordination_ratio, 2) + " against minimum melt" },
+    { key: "v", id: "rfc-out-v", label: "Fuse saving", value: (r) => r.verdict },
+    { key: "b", id: "rfc-out-b", label: "Fuse blowing", value: (r) => r.blowing_verdict },
+    { key: "l", id: "rfc-out-l", label: "Longest fast curve that still coordinates", value: (r) => fmt(r.longest_fast_curve_s, 4) + " s at this current and this heating factor" },
+    { key: "n", id: "rfc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRecloserFuseCoordination,
+});
+
+// ============ spec-v1465: distribution feeder I2R loss and loss factor ============
+
+// dims: in { peak_current_a: I, resistance_ohm_per_mile: M L^2 T^-3 I^-2, length_miles: L, load_factor: dimensionless, energy_cost_per_kwh: dimensionless, peak_demand_kw: M L^2 T^-3 } out: { total_resistance_ohm: M L^2 T^-3 I^-2, peak_loss_kw: M L^2 T^-3, loss_factor: dimensionless, annual_loss_kwh: M L^2 T^-2, annual_cost: dimensionless, loss_percent_of_delivered: dimensionless }
+export function computeFeederLossLoadFactor({ peak_current_a = 0, resistance_ohm_per_mile = 0, length_miles = 0, load_factor = 0, energy_cost_per_kwh = 0, peak_demand_kw = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(peak_current_a > 0)) return { error: "Peak current per phase must be positive (A)." };
+  if (!(resistance_ohm_per_mile > 0)) return { error: "Conductor resistance must be positive (ohm per mile)." };
+  if (!(length_miles > 0)) return { error: "Feeder length must be positive (miles)." };
+  if (!(load_factor > 0 && load_factor <= 1)) return { error: "Load factor must be greater than zero and no more than one." };
+  if (energy_cost_per_kwh < 0) return { error: "Energy cost cannot be negative." };
+  if (peak_demand_kw < 0) return { error: "Peak demand cannot be negative (kW)." };
+  const HOURS_PER_YEAR = 8760;
+  const total_resistance_ohm = resistance_ohm_per_mile * length_miles;
+  const peak_loss_kw = 3 * peak_current_a * peak_current_a * total_resistance_ohm / 1000;
+  // The standard 0.3 / 0.7 blend between the two bounds. A perfectly flat
+  // load loses at the load factor; a load that is either at peak or off
+  // loses at its square; every real load sits between them.
+  const loss_factor = 0.3 * load_factor + 0.7 * load_factor * load_factor;
+  const annual_loss_kwh = peak_loss_kw * loss_factor * HOURS_PER_YEAR;
+  const annual_cost = annual_loss_kwh * energy_cost_per_kwh;
+  const peak_all_year_kwh = peak_loss_kw * HOURS_PER_YEAR;
+  const using_load_factor_kwh = peak_loss_kw * load_factor * HOURS_PER_YEAR;
+  const peak_overstatement_x = annual_loss_kwh > 0 ? peak_all_year_kwh / annual_loss_kwh : null;
+  const load_factor_overstatement_pct = annual_loss_kwh > 0 ? (using_load_factor_kwh / annual_loss_kwh - 1) * 100 : null;
+  const delivered_kwh = peak_demand_kw > 0 ? peak_demand_kw * load_factor * HOURS_PER_YEAR : null;
+  const loss_percent_of_delivered = delivered_kwh > 0 ? annual_loss_kwh / delivered_kwh * 100 : null;
+  const outs = [total_resistance_ohm, peak_loss_kw, loss_factor, annual_loss_kwh, annual_cost];
+  if (!outs.every(Number.isFinite)) return { error: "Feeder loss math is not a finite value." };
+  return {
+    peak_current_a, total_resistance_ohm, peak_loss_kw, load_factor, loss_factor,
+    annual_loss_kwh, annual_cost, energy_cost_per_kwh, peak_all_year_kwh,
+    using_load_factor_kwh, peak_overstatement_x, load_factor_overstatement_pct,
+    delivered_kwh, loss_percent_of_delivered, hours_per_year: HOURS_PER_YEAR,
+    note: "Feeder losses are not average current squared times resistance, and the gap is wide enough to change a decision. Loss is quadratic in current while the current varies all day, so the average of the square is not the square of the average, and the ratio between them is the LOSS FACTOR. It is bounded at both ends by quantities anyone can name: a perfectly flat load loses at its load factor, a load that is either at peak or entirely off loses at the square of it, and every real load sits between. The long-standing utility approximation blends the two as 0.3 times load factor plus 0.7 times its square, and that blend is what turns a peak loss into an annual energy. Take the peak loss for all 8,760 hours and the answer comes out several times too high; use the load factor alone and it is still tens of percent high. The practical consequence cuts in a direction people do not expect. A feeder with a poor load factor loses much LESS energy than its peak loss suggests, which means the savings from reconductoring, from moving a capacitor bank, or from balancing phases are smaller than a peak-based estimate promises. The economic case for any of them has to be built on the loss factor, not on the peak, and a payback computed the other way will not arrive. Conductor loss on one balanced three-phase feeder with the load treated as CONCENTRATED AT THE FAR END. A real feeder has load distributed along it, and for a uniformly distributed load the effective loss is about a third of the concentrated value -- a correction large enough to matter and one this does not apply, so read the answer as an upper bound unless the load genuinely is at the end. It does not include transformer core and copper losses, which on a distribution system are usually the larger share of total losses, nor neutral, secondary, or service losses, nor unbalance, nor the temperature dependence of the conductor's own resistance. The 0.3 and 0.7 coefficients are a widely used approximation rather than a measurement, and utilities carry their own. The utility's loss study and its metered load data govern.",
+  };
+}
+const feederLossLoadFactorExample = { inputs: { peak_current_a: 180, resistance_ohm_per_mile: 0.29, length_miles: 4.2, load_factor: 0.55, energy_cost_per_kwh: 0.09, peak_demand_kw: 3887 } };
+LINEWORKER_RENDERERS["feeder-loss-load-factor"] = _simpleRenderer({
+  citation: "Citation: the three-phase I2R loss relation and the standard distribution loss-factor approximation by name -- loss factor = 0.3 x load factor + 0.7 x load factor squared, bounded below by the square and above by the load factor itself -- applied over 8,760 hours. The coefficients are a widely used approximation, not a measurement, and utilities carry their own. Load treated as concentrated at the far end, so the answer is an upper bound. The utility's loss study and metered load data govern.",
+  example: feederLossLoadFactorExample.inputs,
+  fields: [
+    { key: "peak_current_a", label: "Peak current per phase (A)", kind: "number", default: 180 },
+    { key: "resistance_ohm_per_mile", label: "Conductor resistance (ohm per mile)", kind: "number", default: 0.29 },
+    { key: "length_miles", label: "Feeder length (miles)", kind: "number", default: 4.2 },
+    { key: "load_factor", label: "Load factor (0 to 1)", kind: "number", default: 0.55 },
+    { key: "energy_cost_per_kwh", label: "Energy cost per kWh", kind: "number", default: 0.09 },
+    { key: "peak_demand_kw", label: "Feeder peak demand (kW, 0 to skip the loss percentage)", kind: "number", default: 3887 },
+  ],
+  outputs: [
+    { key: "r", id: "flf-out-r", label: "Total resistance", value: (r) => fmt(r.total_resistance_ohm, 3) + " ohms" },
+    { key: "p", id: "flf-out-p", label: "Peak loss", value: (r) => fmt(r.peak_loss_kw, 2) + " kW at " + fmt(r.peak_current_a, 0) + " A per phase" },
+    { key: "l", id: "flf-out-l", label: "Loss factor", value: (r) => fmt(r.loss_factor, 3) + " from a load factor of " + fmt(r.load_factor, 2) },
+    { key: "e", id: "flf-out-e", label: "Annual loss energy", value: (r) => fmt(r.annual_loss_kwh, 0) + " kWh a year" + (r.energy_cost_per_kwh > 0 ? ", " + fmt(r.annual_cost, 0) + " at the entered price" : "") },
+    { key: "c", id: "flf-out-c", label: "What the shortcuts would have said", value: (r) => "peak loss for all 8,760 hours reads " + fmt(r.peak_all_year_kwh, 0) + " kWh, " + fmt(r.peak_overstatement_x, 1) + "x too high; the load factor alone reads " + fmt(r.using_load_factor_kwh, 0) + " kWh, still " + fmt(r.load_factor_overstatement_pct, 0) + "% high" },
+    { key: "d", id: "flf-out-d", label: "Share of energy delivered", value: (r) => r.loss_percent_of_delivered === null ? "(no peak demand entered)" : fmt(r.loss_percent_of_delivered, 2) + "% of the " + fmt(r.delivered_kwh, 0) + " kWh this feeder delivers in a year" },
+    { key: "n", id: "flf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFeederLossLoadFactor,
+});
+
+// ============ spec-v1466: watt-hour meter CT / PT multiplier ============
+
+// dims: in { ct_primary_a: I, ct_secondary_a: I, pt_primary_v: M L^2 T^-3 I^-1, pt_secondary_v: M L^2 T^-3 I^-1, register_constant: dimensionless, register_reading_kwh: M L^2 T^-2, demand_register_kw: M L^2 T^-3, service_voltage_kv: M L^2 T^-3 I^-1 } out: { ct_ratio: dimensionless, pt_ratio: dimensionless, multiplier: dimensionless, billed_kwh: M L^2 T^-2, implied_demand_kw: M L^2 T^-3, implied_current_a: I }
+export function computeMeterCtPtMultiplier({ ct_primary_a = 0, ct_secondary_a = 5, pt_primary_v = 0, pt_secondary_v = 120, register_constant = 1, register_reading_kwh = 0, demand_register_kw = 0, service_voltage_kv = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(ct_primary_a > 0)) return { error: "CT primary rating must be positive (A)." };
+  if (!(ct_secondary_a > 0)) return { error: "CT secondary rating must be positive (A)." };
+  if (!(pt_primary_v > 0)) return { error: "PT primary rating must be positive (V)." };
+  if (!(pt_secondary_v > 0)) return { error: "PT secondary rating must be positive (V)." };
+  if (!(register_constant > 0)) return { error: "The register constant must be positive." };
+  if (register_reading_kwh < 0) return { error: "Register reading cannot be negative (kWh)." };
+  if (demand_register_kw < 0) return { error: "Demand register reading cannot be negative (kW)." };
+  if (service_voltage_kv < 0) return { error: "Service voltage cannot be negative (kV)." };
+  const ct_ratio = ct_primary_a / ct_secondary_a;
+  const pt_ratio = pt_primary_v / pt_secondary_v;
+  const multiplier = ct_ratio * pt_ratio * register_constant;
+  const billed_kwh = register_reading_kwh * multiplier;
+  const implied_demand_kw = demand_register_kw * multiplier;
+  // The dimensional check that catches a wrong multiplier: turn the metered
+  // demand into a primary current and hold it against the CT that is supposed
+  // to be carrying it. A multiplier off by a factor of two puts the implied
+  // load somewhere the installation physically cannot go.
+  const implied_current_a = (demand_register_kw > 0 && service_voltage_kv > 0)
+    ? implied_demand_kw * 1000 / (Math.sqrt(3) * service_voltage_kv * 1000)
+    : null;
+  const ct_utilization_pct = implied_current_a === null ? null : implied_current_a / ct_primary_a * 100;
+  const within_ct_rating = implied_current_a === null ? null : implied_current_a <= ct_primary_a;
+  const outs = [ct_ratio, pt_ratio, multiplier, billed_kwh, implied_demand_kw];
+  if (!outs.every(Number.isFinite)) return { error: "Metering multiplier math is not a finite value." };
+  const verdict = within_ct_rating === null
+    ? "Enter a demand register reading and the service voltage to run the plausibility check."
+    : within_ct_rating
+      ? "PLAUSIBLE: the implied " + fmt(implied_current_a, 1) + " A is " + fmt(ct_utilization_pct, 0) + "% of the " + fmt(ct_primary_a, 0) + " A CT primary, which is a load this installation can actually carry"
+      : "NOT PLAUSIBLE: the implied " + fmt(implied_current_a, 1) + " A is " + fmt(ct_utilization_pct, 0) + "% of the " + fmt(ct_primary_a, 0) + " A CT primary. A CT does not pass " + fmt(ct_utilization_pct / 100, 2) + " times its rating in normal service, so the multiplier, the CT record, or the register reading is wrong -- and this is exactly the discrepancy the check exists to surface";
+  return {
+    ct_primary_a, ct_secondary_a, pt_primary_v, pt_secondary_v, register_constant,
+    ct_ratio, pt_ratio, multiplier, register_reading_kwh, billed_kwh,
+    demand_register_kw, implied_demand_kw, implied_current_a, ct_utilization_pct,
+    within_ct_rating, service_voltage_kv, verdict,
+    note: "A transformer-rated meter does not read energy, it reads a scaled fraction of it, and the multiplier that converts the register to real kilowatt-hours is the product of two instrument transformer ratios and a register constant. The multiplier is a pure product, and that is exactly why it goes wrong: swapping a 200:5 current transformer for a 400:5 during a load upgrade doubles the correct multiplier, and if the billing record is not changed with it the customer is billed half, indefinitely. The same happens with a potential transformer changed on a voltage conversion. Neither error announces itself, because the meter keeps working and the register keeps advancing -- there is nothing to see in the field, and a billing error of this kind commonly runs for years in either direction before anyone catches it. THE CHECK THAT CATCHES IT IS DIMENSIONAL RATHER THAN CLERICAL. Take the metered demand, multiply it out to the primary, turn it into a current at the service voltage, and hold that current against the current transformer that is supposed to be carrying it. A multiplier off by a factor of two puts the implied load somewhere the service physically cannot go, and the discrepancy shows up in one line of arithmetic rather than in an audit. A current transformer is not passing two or three times its primary rating in normal service, so an implied current above it means the multiplier, the CT record, or the reading is wrong. This is the multiplier arithmetic for a transformer-rated installation and the plausibility check on it. It does not verify instrument transformer accuracy class, burden, or polarity: a reversed CT polarity, or a current transformer paired with the wrong phase's potential transformer, produces a wrong reading that no multiplier fixes and that this cannot see. It does not detect a meter wired to the wrong phase, a shorted CT secondary, or a blown PT fuse, which are the field failures. Ratio-correction and phase-angle-correction factors from the instrument transformer test report are not applied, and transformer-loss compensation, used where the metering sits on the low side of a customer-owned transformer, is a separate adjustment. ANSI C12.1, the instrument transformer test reports, and the utility's metering standard govern.",
+  };
+}
+const meterCtPtMultiplierExample = { inputs: { ct_primary_a: 200, ct_secondary_a: 5, pt_primary_v: 7200, pt_secondary_v: 120, register_constant: 1, register_reading_kwh: 1480, demand_register_kw: 4.1, service_voltage_kv: 12.47 } };
+LINEWORKER_RENDERERS["meter-ct-pt-multiplier"] = _simpleRenderer({
+  citation: "Citation: the transformer-rated metering multiplier relation by name -- multiplier = CT ratio x PT ratio x register constant, billed energy = register reading x multiplier -- with ANSI C12.1 named. The plausibility check turns the metered demand into an implied primary current at the entered service voltage and holds it against the CT primary rating. Accuracy class, burden, polarity, ratio-correction and phase-angle-correction factors, and transformer-loss compensation are not applied. ANSI C12.1, the instrument transformer test reports, and the utility's metering standard govern.",
+  example: meterCtPtMultiplierExample.inputs,
+  fields: [
+    { key: "ct_primary_a", label: "CT primary rating (A)", kind: "number", default: 200 },
+    { key: "ct_secondary_a", label: "CT secondary rating (A)", kind: "number", default: 5 },
+    { key: "pt_primary_v", label: "PT primary rating (V)", kind: "number", default: 7200 },
+    { key: "pt_secondary_v", label: "PT secondary rating (V)", kind: "number", default: 120 },
+    { key: "register_constant", label: "Register constant", kind: "number", default: 1 },
+    { key: "register_reading_kwh", label: "Register reading (kWh)", kind: "number", default: 1480 },
+    { key: "demand_register_kw", label: "Demand register reading (kW, 0 to skip the check)", kind: "number", default: 4.1 },
+    { key: "service_voltage_kv", label: "Service voltage, line to line (kV)", kind: "number", default: 12.47 },
+  ],
+  outputs: [
+    { key: "r", id: "mcm-out-r", label: "The two ratios", value: (r) => "CT " + fmt(r.ct_ratio, 1) + " to 1, PT " + fmt(r.pt_ratio, 1) + " to 1" },
+    { key: "m", id: "mcm-out-m", label: "Billing multiplier", value: (r) => fmt(r.multiplier, 1) + " -- CT ratio x PT ratio x a register constant of " + fmt(r.register_constant, 3) },
+    { key: "b", id: "mcm-out-b", label: "Billed energy", value: (r) => fmt(r.billed_kwh, 0) + " kWh from a register reading of " + fmt(r.register_reading_kwh, 0) },
+    { key: "d", id: "mcm-out-d", label: "Implied primary demand", value: (r) => fmt(r.implied_demand_kw, 0) + " kW" + (r.implied_current_a === null ? "" : ", which is " + fmt(r.implied_current_a, 1) + " A at " + fmt(r.service_voltage_kv, 2) + " kV three-phase") },
+    { key: "p", id: "mcm-out-p", label: "Plausibility check", value: (r) => r.verdict },
+    { key: "n", id: "mcm-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMeterCtPtMultiplier,
+});
+
+// ============ spec-v1467: counterpoise and radial ground array resistance ============
+
+// dims: in { soil_resistivity_ohm_cm: M L^3 T^-3 I^-2, length_ft: L, burial_depth_in: L, wire_diameter_in: L, radials: dimensionless, coupling_penalty: dimensionless, target_resistance_ohm: M L^2 T^-3 I^-2 } out: { single_wire_ohm: M L^2 T^-3 I^-2, array_ohm: M L^2 T^-3 I^-2, ideal_parallel_ohm: M L^2 T^-3 I^-2, coupling_cost_ohm: M L^2 T^-3 I^-2, length_for_target_ft: L }
+export function computeCounterpoiseResistance({ soil_resistivity_ohm_cm = 0, length_ft = 0, burial_depth_in = 0, wire_diameter_in = 0, radials = 1, coupling_penalty = 1.5, target_resistance_ohm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(soil_resistivity_ohm_cm > 0)) return { error: "Soil resistivity must be positive (ohm-cm)." };
+  if (!(length_ft > 0)) return { error: "Counterpoise length must be positive (ft)." };
+  if (!(burial_depth_in > 0)) return { error: "Burial depth must be positive (in)." };
+  if (!(wire_diameter_in > 0)) return { error: "Conductor diameter must be positive (in)." };
+  if (!(radials >= 1)) return { error: "There must be at least one radial." };
+  if (!(coupling_penalty >= 1)) return { error: "The mutual-coupling penalty cannot be below one -- radials interfere with each other, they do not help each other." };
+  if (target_resistance_ohm < 0) return { error: "Target resistance cannot be negative (ohm)." };
+  const CM_PER_FT = 30.48;
+  const CM_PER_IN = 2.54;
+  const d_cm = wire_diameter_in * CM_PER_IN;
+  const h_cm = burial_depth_in * CM_PER_IN;
+  // Horizontal buried electrode, Dwight form: the wire sheds current along its
+  // whole length, so resistance falls roughly as one over length with a
+  // logarithmic correction. That is a different length dependence from a
+  // driven rod, where each extra foot reaches ground no less resistive.
+  const singleWire = (Lft) => {
+    const L_cm = Lft * CM_PER_FT;
+    const logTerm = Math.log(2 * L_cm / Math.sqrt(d_cm * h_cm)) - 1;
+    if (!(logTerm > 0)) return Number.NaN;
+    return soil_resistivity_ohm_cm / (Math.PI * L_cm) * logTerm;
+  };
+  const single_wire_ohm = singleWire(length_ft);
+  if (!Number.isFinite(single_wire_ohm)) return { error: "The wire is too short relative to its depth and diameter for the horizontal-electrode relation; lengthen it or check the units." };
+  const penalty = radials > 1 ? coupling_penalty : 1;
+  const ideal_parallel_ohm = single_wire_ohm / radials;
+  const array_ohm = ideal_parallel_ohm * penalty;
+  const coupling_cost_ohm = array_ohm - ideal_parallel_ohm;
+  const double_length_ohm = singleWire(2 * length_ft);
+  const doubling_improvement_x = Number.isFinite(double_length_ohm) && double_length_ohm > 0 ? single_wire_ohm / double_length_ohm : null;
+  // Length per radial to reach a target, bisected on the same relation --
+  // resistance falls monotonically with length, so a bracket and a halving
+  // converge without a closed form.
+  let length_for_target_ft = null;
+  if (target_resistance_ohm > 0) {
+    const arrayAt = (Lft) => {
+      const R1 = singleWire(Lft);
+      return Number.isFinite(R1) ? R1 / radials * penalty : Infinity;
+    };
+    let lo = 1, hi = Math.max(2 * length_ft, 10);
+    for (let i = 0; i < 60 && arrayAt(hi) > target_resistance_ohm; i++) hi *= 2;
+    if (arrayAt(hi) <= target_resistance_ohm) {
+      for (let i = 0; i < 200; i++) {
+        const mid = (lo + hi) / 2;
+        if (arrayAt(mid) > target_resistance_ohm) lo = mid; else hi = mid;
+      }
+      length_for_target_ft = (lo + hi) / 2;
+    }
+  }
+  const meets_target = target_resistance_ohm > 0 ? array_ohm <= target_resistance_ohm : null;
+  const outs = [single_wire_ohm, ideal_parallel_ohm, array_ohm, coupling_cost_ohm];
+  if (!outs.every(Number.isFinite)) return { error: "Counterpoise math is not a finite value." };
+  const verdict = meets_target === null
+    ? "Enter a target resistance to size the wire."
+    : meets_target
+      ? "MEETS the " + fmt(target_resistance_ohm, 2) + " ohm target at " + fmt(array_ohm, 2) + " ohms"
+      : "MISSES the " + fmt(target_resistance_ohm, 2) + " ohm target at " + fmt(array_ohm, 2) + " ohms" + (length_for_target_ft === null ? " -- no practical length reaches it in this soil, so lower the resistivity with treatment or add radials" : ", which wants " + fmt(length_for_target_ft, 0) + " ft per radial instead of " + fmt(length_ft, 0));
+  return {
+    soil_resistivity_ohm_cm, length_ft, burial_depth_in, wire_diameter_in, radials,
+    coupling_penalty: penalty, single_wire_ohm, ideal_parallel_ohm, array_ohm,
+    coupling_cost_ohm, double_length_ohm, doubling_improvement_x,
+    target_resistance_ohm, length_for_target_ft, meets_target, verdict,
+    note: "A driven rod is the standard electrode and in rock it is not an option. A transmission or distribution structure on a ridgeline, on frozen ground, or in shallow soil over bedrock is grounded with buried horizontal wire instead, and the counterpoise relation has a different length dependence from a rod's -- which is the whole reason to reach for it. A buried horizontal conductor sheds current along its entire length, so its resistance falls roughly as one over length with a logarithmic correction: DOUBLING A COUNTERPOISE NEARLY HALVES THE RESISTANCE, where doubling a driven rod barely helps, because each additional foot of rod reaches ground no less resistive than the last. Multiple radials do not divide the resistance by their count, and assuming they do is the ordinary way this gets oversold. Each wire sits in the others' potential field, so the current it sheds has to fight ground that its neighbours have already raised. The mutual-coupling penalty grows with the number of radials and shrinks as they are spread further apart, and it is ENTERED here rather than modeled, because it belongs to the length and spread of the particular array. That has a consequence worth stating plainly: comparing four long radials against eight short ones of the same total wire is only honest if each array is given ITS OWN penalty. Hold one penalty fixed across both and more radials win on paper every time, which is precisely the assumption that oversells a radial array in the field. Both numbers are reported -- the ideal parallel value and the coupled one -- so the penalty is visible rather than assumed away. Resistivity is read in ohm-cm, the same unit the driven-rod and four-pin resistivity calculations use, so two grounding answers for one structure cannot disagree about the dirt. A horizontal electrode in UNIFORM soil at power frequency. Soil is almost never uniform, and a two-layer structure -- conductive topsoil over rock, or the reverse -- changes the answer substantially; a four-pin survey run at several spacings is what reveals it, and one spacing does not. This gives power-frequency resistance and NOT the impulse impedance that governs lightning performance, which is lower than this for a short counterpoise and HIGHER for a long one, because a surge does not have time to reach the far end before the stroke is over. Seasonal variation with moisture and frost is large and is not modeled, and a resistivity measured in a wet spring is not the number the line lives with in February. It does not evaluate step and touch potential or ground potential rise, which are separate screens, and it does not size the conductor for fault current. IEEE 80, IEEE 81 for measurement, and the utility's grounding standard govern.",
+  };
+}
+const counterpoiseResistanceExample = { inputs: { soil_resistivity_ohm_cm: 10000, length_ft: 100, burial_depth_in: 6, wire_diameter_in: 0.5, radials: 4, coupling_penalty: 1.5, target_resistance_ohm: 5 } };
+LINEWORKER_RENDERERS["counterpoise-resistance"] = _simpleRenderer({
+  citation: "Citation: the buried horizontal electrode (counterpoise) resistance relation by name -- R = rho / (pi L) x [ ln( 2L / sqrt(d x h) ) - 1 ] with rho in ohm-cm and L, d and h in centimetres -- with IEEE 80 and IEEE 81 named. Resistivity is read in ohm-cm to match the driven-rod and four-pin resistivity calculations. The mutual-coupling penalty for multiple radials is ENTERED, not modeled: it depends on radial length and spread. Power-frequency resistance in uniform soil, NOT impulse impedance. IEEE 80, IEEE 81 for measurement, and the utility's grounding standard govern.",
+  example: counterpoiseResistanceExample.inputs,
+  fields: [
+    { key: "soil_resistivity_ohm_cm", label: "Soil resistivity (ohm-cm)", kind: "number", default: 10000 },
+    { key: "length_ft", label: "Length of one radial (ft)", kind: "number", default: 100 },
+    { key: "burial_depth_in", label: "Burial depth (in)", kind: "number", default: 6 },
+    { key: "wire_diameter_in", label: "Conductor diameter (in)", kind: "number", default: 0.5 },
+    { key: "radials", label: "Number of radials", kind: "number", default: 4 },
+    { key: "coupling_penalty", label: "Mutual-coupling penalty (1 = none)", kind: "number", default: 1.5 },
+    { key: "target_resistance_ohm", label: "Target resistance (ohm, 0 to skip)", kind: "number", default: 5 },
+  ],
+  outputs: [
+    { key: "s", id: "cpr-out-s", label: "One radial on its own", value: (r) => fmt(r.single_wire_ohm, 2) + " ohms at " + fmt(r.length_ft, 0) + " ft" },
+    { key: "a", id: "cpr-out-a", label: "The array as built", value: (r) => fmt(r.array_ohm, 2) + " ohms from " + fmt(r.radials, 0) + " radial" + (r.radials === 1 ? "" : "s") },
+    { key: "i", id: "cpr-out-i", label: "What the coupling costs", value: (r) => "the ideal parallel value is " + fmt(r.ideal_parallel_ohm, 2) + " ohms, so the " + fmt(r.coupling_penalty, 2) + "x penalty adds " + fmt(r.coupling_cost_ohm, 2) + " ohms. Radials interfere; they do not simply divide" },
+    { key: "d", id: "cpr-out-d", label: "Doubling the length", value: (r) => r.doubling_improvement_x === null ? "-" : fmt(r.double_length_ohm, 2) + " ohms at " + fmt(2 * r.length_ft, 0) + " ft -- " + fmt(r.doubling_improvement_x, 2) + "x better, which is the one-over-length behaviour a driven rod does not have" },
+    { key: "t", id: "cpr-out-t", label: "Against the target", value: (r) => r.verdict },
+    { key: "n", id: "cpr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCounterpoiseResistance,
+});

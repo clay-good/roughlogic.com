@@ -1912,6 +1912,13 @@ export const RENDERER_MAP = {
   "nesc-district-loading": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
   "conductor-creep-elongation": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
   "sagging-return-wave": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
+  "transformer-diversity-loading": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
+  "capacitor-bank-voltage-rise": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
+  "regulator-tap-bandwidth": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
+  "recloser-fuse-coordination": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
+  "feeder-loss-load-factor": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
+  "meter-ct-pt-multiplier": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
+  "counterpoise-resistance": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
   // spec-v1469..v1477 millwright band
   "shaft-alignment-rim-face": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
   "shaft-alignment-reverse-dial": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },

@@ -2,96 +2,96 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "c7429a4f0dbbf88c",
-      "date": "2026-09-07"
+      "sha": "5908d4675781e07a",
+      "date": "2026-09-08"
     },
     "/tools/": {
-      "sha": "b546ea27ca020c8d",
-      "date": "2026-09-07"
+      "sha": "cc1f6d80a79ecbf3",
+      "date": "2026-09-08"
     },
     "/groups/accounting/": {
-      "sha": "49b09555e50ef583",
-      "date": "2026-09-07"
+      "sha": "527999af027c59f7",
+      "date": "2026-09-08"
     },
     "/groups/agriculture/": {
-      "sha": "3e3566c70c6ab0c9",
-      "date": "2026-09-07"
+      "sha": "43d8e1ec2bc7be9f",
+      "date": "2026-09-08"
     },
     "/groups/construction/": {
-      "sha": "58a95d110fa12f3c",
-      "date": "2026-09-07"
+      "sha": "51db9c4e1c16721f",
+      "date": "2026-09-08"
     },
     "/groups/cross-trade/": {
-      "sha": "0ca55edda516e8f8",
-      "date": "2026-09-07"
+      "sha": "fc1e0a8ad01b0977",
+      "date": "2026-09-08"
     },
     "/groups/educators/": {
-      "sha": "e67b85ee98c894dd",
-      "date": "2026-09-07"
+      "sha": "9fb32e2e1c5ad983",
+      "date": "2026-09-08"
     },
     "/groups/electrical/": {
-      "sha": "030263adb289ef43",
-      "date": "2026-09-07"
+      "sha": "c376d0e2bd995af3",
+      "date": "2026-09-08"
     },
     "/groups/field/": {
-      "sha": "c20722cf20a21348",
-      "date": "2026-09-07"
+      "sha": "8277d2083edf7184",
+      "date": "2026-09-08"
     },
     "/groups/fire-ground/": {
-      "sha": "f936dd133fd2e3b3",
-      "date": "2026-09-07"
+      "sha": "794da9b468cc4365",
+      "date": "2026-09-08"
     },
     "/groups/historical/": {
-      "sha": "a7ffa393535205df",
-      "date": "2026-09-07"
+      "sha": "5a08de7ee17caf6a",
+      "date": "2026-09-08"
     },
     "/groups/hvac/": {
-      "sha": "8d00d39cdf187a09",
-      "date": "2026-09-07"
+      "sha": "5f874e0a2bceada8",
+      "date": "2026-09-08"
     },
     "/groups/kitchen/": {
-      "sha": "e00eb1c1b655d422",
-      "date": "2026-09-07"
+      "sha": "a26a9a4febc26af3",
+      "date": "2026-09-08"
     },
     "/groups/lab/": {
-      "sha": "47df5eb91e4c9d46",
-      "date": "2026-09-07"
+      "sha": "74178cb18ef7547e",
+      "date": "2026-09-08"
     },
     "/groups/mechanic/": {
-      "sha": "c007568704341011",
-      "date": "2026-09-07"
+      "sha": "71b1d1ab2900da51",
+      "date": "2026-09-08"
     },
     "/groups/plumbing/": {
-      "sha": "86dc0ae191009af4",
-      "date": "2026-09-07"
+      "sha": "4c5be2a595535feb",
+      "date": "2026-09-08"
     },
     "/groups/real-estate/": {
-      "sha": "a03edaba116a11f2",
-      "date": "2026-09-07"
+      "sha": "c53c7b30693425c6",
+      "date": "2026-09-08"
     },
     "/groups/references/": {
-      "sha": "4387390940f1726b",
-      "date": "2026-09-07"
+      "sha": "d29f2b5bdb2c6c11",
+      "date": "2026-09-08"
     },
     "/groups/restoration/": {
-      "sha": "1ee9e801acec72a3",
-      "date": "2026-09-07"
+      "sha": "b7a601ca0b42cd5f",
+      "date": "2026-09-08"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "b16412d7a288e47a",
-      "date": "2026-09-07"
+      "sha": "b0834e54cd66b198",
+      "date": "2026-09-08"
     },
     "/groups/stage/": {
-      "sha": "f4e68fa74d136bca",
-      "date": "2026-09-07"
+      "sha": "abf4cf62c4ee5565",
+      "date": "2026-09-08"
     },
     "/groups/trucking/": {
-      "sha": "f649c65264988350",
-      "date": "2026-09-07"
+      "sha": "ff7e841198d5bf83",
+      "date": "2026-09-08"
     },
     "/groups/water/": {
-      "sha": "26484318d7fd02eb",
-      "date": "2026-09-07"
+      "sha": "71d9386c4720c6f4",
+      "date": "2026-09-08"
     },
     "/tools/aav-install-check/": {
       "sha": "ffd2b0e38a75491f",
@@ -853,6 +853,10 @@
       "sha": "276e25b9280d56df",
       "date": "2026-09-01"
     },
+    "/tools/capacitor-bank-voltage-rise/": {
+      "sha": "7e620a7f11e1a362",
+      "date": "2026-09-08"
+    },
     "/tools/capacitor-discharge-time/": {
       "sha": "163510008f13472e",
       "date": "2026-09-01"
@@ -918,8 +922,8 @@
       "date": "2026-09-01"
     },
     "/tools/cctv-storage/": {
-      "sha": "4c688f41b8a832c4",
-      "date": "2026-09-04"
+      "sha": "7b926f4c57248ab2",
+      "date": "2026-09-08"
     },
     "/tools/ceiling-speaker-coverage/": {
       "sha": "3657efe2bfb2e355",
@@ -1616,6 +1620,10 @@
     "/tools/counterbore-depth/": {
       "sha": "6d56f0ec6ab6263a",
       "date": "2026-09-01"
+    },
+    "/tools/counterpoise-resistance/": {
+      "sha": "76cc520173f4674f",
+      "date": "2026-09-08"
     },
     "/tools/countersink-depth/": {
       "sha": "4ebea421df70ae5d",
@@ -2382,8 +2390,8 @@
       "date": "2026-09-07"
     },
     "/tools/ev-charge-cost/": {
-      "sha": "9043dd2262e71758",
-      "date": "2026-09-01"
+      "sha": "4be858cf75d4e213",
+      "date": "2026-09-08"
     },
     "/tools/ev-charge-time/": {
       "sha": "a50fa8e0e406fb7d",
@@ -2520,6 +2528,10 @@
     "/tools/feed-for-surface-finish/": {
       "sha": "abe76c765243eb85",
       "date": "2026-09-01"
+    },
+    "/tools/feeder-loss-load-factor/": {
+      "sha": "2b895e14fa0c5eb3",
+      "date": "2026-09-08"
     },
     "/tools/feeder-tap-rule/": {
       "sha": "7f3630c8d04bbe56",
@@ -3074,8 +3086,8 @@
       "date": "2026-09-01"
     },
     "/tools/grounding-electrode/": {
-      "sha": "5301e1d6034feb4d",
-      "date": "2026-09-04"
+      "sha": "5d7f08f96ccb7b9e",
+      "date": "2026-09-08"
     },
     "/tools/grounding-electrode-conductor/": {
       "sha": "e2a16cf000ea16a3",
@@ -3138,8 +3150,8 @@
       "date": "2026-09-01"
     },
     "/tools/harmonic-resonance/": {
-      "sha": "97bb7d09932dd407",
-      "date": "2026-09-01"
+      "sha": "dbda95b0309cb1f2",
+      "date": "2026-09-08"
     },
     "/tools/haul-cycle-production/": {
       "sha": "0b31bc1aae2005d9",
@@ -4065,6 +4077,10 @@
       "sha": "411a471ad0a039b2",
       "date": "2026-09-04"
     },
+    "/tools/meter-ct-pt-multiplier/": {
+      "sha": "be93c20f93ed8ac6",
+      "date": "2026-09-08"
+    },
     "/tools/michaelis-menten/": {
       "sha": "feb0648035d8b5c9",
       "date": "2026-09-01"
@@ -4958,8 +4974,8 @@
       "date": "2026-09-04"
     },
     "/tools/pulling-tension/": {
-      "sha": "8bb88ac46f048f19",
-      "date": "2026-09-07"
+      "sha": "5f4672396c5c5067",
+      "date": "2026-09-08"
     },
     "/tools/pulse-flowmeter-k-factor/": {
       "sha": "51131e56375a37dc",
@@ -5273,6 +5289,10 @@
       "sha": "7d782a183000bea5",
       "date": "2026-09-01"
     },
+    "/tools/recloser-fuse-coordination/": {
+      "sha": "29cfdeb1f794b574",
+      "date": "2026-09-08"
+    },
     "/tools/recovery-cylinder/": {
       "sha": "4828c2e70763fd74",
       "date": "2026-09-01"
@@ -5340,6 +5360,10 @@
     "/tools/regular-polygon/": {
       "sha": "fe55705e653d0390",
       "date": "2026-09-04"
+    },
+    "/tools/regulator-tap-bandwidth/": {
+      "sha": "94ce98ca29baa427",
+      "date": "2026-09-08"
     },
     "/tools/reineke-sdi/": {
       "sha": "6e246929bc91a402",
@@ -5766,8 +5790,8 @@
       "date": "2026-09-02"
     },
     "/tools/selective-coordination-screen/": {
-      "sha": "b7941ccfc21a5116",
-      "date": "2026-09-01"
+      "sha": "9b9099e4560431ac",
+      "date": "2026-09-08"
     },
     "/tools/self-leveler-bags/": {
       "sha": "3c4623ca7d862a8f",
@@ -6186,8 +6210,8 @@
       "date": "2026-09-01"
     },
     "/tools/speaker-70v-line/": {
-      "sha": "ea85d03e8e35fd9a",
-      "date": "2026-09-07"
+      "sha": "4e78137e67381bbf",
+      "date": "2026-09-08"
     },
     "/tools/speaker-impedance/": {
       "sha": "efaf3d4d38f8ca16",
@@ -6997,6 +7021,10 @@
       "sha": "e94be785db54da67",
       "date": "2026-09-01"
     },
+    "/tools/transformer-diversity-loading/": {
+      "sha": "7681d4d524aa79a0",
+      "date": "2026-09-08"
+    },
     "/tools/transformer-inrush-point/": {
       "sha": "895903baef01b8dc",
       "date": "2026-09-01"
@@ -7638,8 +7666,8 @@
       "date": "2026-09-04"
     },
     "/tools/wireless-fspl/": {
-      "sha": "c4cdc81c0971bd6f",
-      "date": "2026-09-06"
+      "sha": "588fa7367f67e81d",
+      "date": "2026-09-08"
     },
     "/tools/wireless-intermod/": {
       "sha": "447ed8577a73a503",
