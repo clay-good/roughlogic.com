@@ -102196,6 +102196,519 @@
    }
   },
   {
+   "tile_id": "stack-emission-pte",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Stack Emission Rate and Potential to Emit -- the spec-v1717 worked example, recomputed",
+   "source_edition_or_year": "spec-v1717 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "hourly_rate_lb_h": 11,
+    "actual_hours_per_year": 2000,
+    "permitted_hours_per_year": 0,
+    "major_threshold_tpy": 100,
+    "control_efficiency_pct": 0,
+    "control_enforceable": "no"
+   },
+   "outputs": {
+    "actual_tpy": {
+     "value": 11,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pte_tpy": {
+     "value": 48.18,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pte_ratio": {
+     "value": 4.38,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hours_for_minor": {
+     "value": 18181.81818,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "opacity-six-minute",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Visible Emission Opacity Six-Minute Average -- the spec-v1718 worked example, recomputed",
+   "source_edition_or_year": "spec-v1718 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "readings_sum_pct": 305,
+    "reading_count": 24,
+    "peak_reading_pct": 60,
+    "limit_pct": 20,
+    "steady_reading_pct": 22
+   },
+   "outputs": {
+    "block_average_pct": {
+     "value": 12.70833,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_pct": {
+     "value": 7.29167,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "readings_at_peak_allowed": {
+     "value": 8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "baghouse-cleaning-interval",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Baghouse Pressure Drop and Cleaning Interval -- the spec-v1719 worked example, recomputed",
+   "source_edition_or_year": "spec-v1719 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "baseline_inwc": 3.9,
+    "trigger_inwc": 6,
+    "cycle_minutes": 14,
+    "original_baseline_inwc": 2,
+    "original_cycle_minutes": 45,
+    "elapsed_months": 6,
+    "operating_hours_per_day": 24,
+    "cleaning_mode": "on_demand"
+   },
+   "outputs": {
+    "working_range_inwc": {
+     "value": 2.1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "baseline_rise_inwc": {
+     "value": 1.9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "baseline_rise_pct": {
+     "value": 95,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "range_lost_pct": {
+     "value": 47.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "months_to_trigger": {
+     "value": 6.63158,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cycle_change_pct": {
+     "value": -68.88889,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pulses_per_day": {
+     "value": 102.85714,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "scrubber-lg-ratio",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Wet Scrubber Liquid-to-Gas Ratio -- the spec-v1720 worked example, recomputed",
+   "source_edition_or_year": "spec-v1720 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "gas_acfm": 15000,
+    "lg_ratio_gpm_per_1000": 10,
+    "pump_head_ft": 40,
+    "pump_efficiency": 0.65,
+    "specific_gravity": 1,
+    "annual_hours": 6000,
+    "energy_rate_per_kwh": 0.1,
+    "alternate_lg_ratio": 20,
+    "pressure_drop_inwc": 6,
+    "fan_efficiency": 0.65,
+    "scrubber_type": "packed_tower"
+   },
+   "outputs": {
+    "liquid_gpm": {
+     "value": 150,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pump_bhp": {
+     "value": 2.331,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fan_bhp": {
+     "value": 21.78438,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alternate_liquid_gpm": {
+     "value": 300,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alternate_pump_bhp": {
+     "value": 4.662,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thermal-oxidizer-residence",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Thermal Oxidizer Residence Time -- the spec-v1721 worked example, recomputed",
+   "source_edition_or_year": "spec-v1721 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "inlet_scfm": 8000,
+    "chamber_temp_f": 1600,
+    "standard_temp_f": 70,
+    "required_residence_s": 0.75,
+    "chamber_volume_ft3": 389
+   },
+   "outputs": {
+    "expansion_factor": {
+     "value": 3.88859,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "actual_acfm": {
+     "value": 31108.72808,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "volume_required_ft3": {
+     "value": 388.8591,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "actual_residence_s": {
+     "value": 0.75027,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "standard_basis_residence_s": {
+     "value": 0.19287,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "coating-voc-compliance",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Coating VOC Content and Compliance -- the spec-v1722 worked example, recomputed",
+   "source_edition_or_year": "spec-v1722 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "coating_gal": 1,
+    "voc_lb": 0.5,
+    "water_gal": 0.55,
+    "exempt_gal": 0,
+    "thinner_gal": 0.2,
+    "thinner_voc_lb_per_gal": 7,
+    "limit_lb_per_gal": 2.8
+   },
+   "outputs": {
+    "voc_as_supplied": {
+     "value": 0.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "voc_less_water": {
+     "value": 1.11111,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "applied_voc_less_water": {
+     "value": 2.92308,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "governing_voc": {
+     "value": 2.92308,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_lb_per_gal": {
+     "value": -0.12308,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spcc-containment-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "SPCC Secondary Containment Volume -- the spec-v1723 worked example, recomputed",
+   "source_edition_or_year": "spec-v1723 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "largest_tank_gal": 12000,
+    "freeboard_pct": 10,
+    "dike_length_ft": 80,
+    "dike_width_ft": 60,
+    "dike_height_ft": 3,
+    "other_tank_count": 3,
+    "other_tank_diameter_ft": 12,
+    "other_equipment_ft3": 0
+   },
+   "outputs": {
+    "required_gal": {
+     "value": 13200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_ft3": {
+     "value": 1764.58333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gross_ft3": {
+     "value": 14400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "displacement_ft3": {
+     "value": 1017.87602,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "net_gal": {
+     "value": 100105.23912,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "displacement_pct": {
+     "value": 7.06858,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "esp-deutsch-efficiency",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "ESP Collection Efficiency (Deutsch) -- the spec-v1724 worked example, recomputed",
+   "source_edition_or_year": "spec-v1724 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "plate_area_ft2": 12000,
+    "gas_acfm": 60000,
+    "migration_velocity_fps": 0.2,
+    "target_efficiency_pct": 99
+   },
+   "outputs": {
+    "deutsch_exponent": {
+     "value": 2.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "efficiency_pct": {
+     "value": 90.9282,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "penetration_pct": {
+     "value": 9.0718,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "area_for_target_ft2": {
+     "value": 23025.85093,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "area_per_decade_ft2": {
+     "value": 11512.92546,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "area_999": {
+     "value": 34538.77639,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "carbon-bed-life",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Activated Carbon Adsorber Bed Life -- the spec-v1725 worked example, recomputed",
+   "source_edition_or_year": "spec-v1725 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "carbon_lb": 2000,
+    "working_capacity_pct": 10,
+    "loading_lb_h": 1.4,
+    "operating_hours_per_day": 8,
+    "degraded_capacity_pct": 6
+   },
+   "outputs": {
+    "bed_capacity_lb": {
+     "value": 200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bed_life_hours": {
+     "value": 142.85714,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bed_life_days": {
+     "value": 5.95238,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "operating_days": {
+     "value": 17.85714,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "degraded_life_hours": {
+     "value": 85.71429,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "life_lost_pct": {
+     "value": 40,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "plume-rise-briggs",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Stack Plume Rise (Briggs) -- the spec-v1726 worked example, recomputed",
+   "source_edition_or_year": "spec-v1726 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "stack_height_ft": 120,
+    "stack_diameter_ft": 5,
+    "exit_velocity_fps": 55,
+    "exit_temp_f": 350,
+    "ambient_temp_f": 60,
+    "wind_mph": 12
+   },
+   "outputs": {
+    "buoyancy_flux": {
+     "value": 34.18993,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "plume_rise_ft": {
+     "value": 185.26864,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "effective_height_ft": {
+     "value": 305.26864,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "height_ratio": {
+     "value": 2.54391,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "concentration_factor": {
+     "value": 6.47145,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "double_wind_rise_ft": {
+     "value": 92.63432,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "flow-hood-correction",
    "source_publisher": "Project (first-principles)",
    "source_title": "Flow Hood Reading Correction -- the spec-v1622 worked example, recomputed",

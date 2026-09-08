@@ -22093,6 +22093,128 @@ export const CITATIONS = {
       { name: "The target sag comes from elsewhere", value: "the stringing chart at the ruling span and the temperature at that moment", source: "the utility's stringing charts" },
     ],
   },
+  // spec-v1717..v1726: the 2026-09-08 trade-expansion air quality band, in
+  // the new calc-airquality.js. Ten tiles, nothing cut.
+  "stack-emission-pte": {
+    formula: "actual emissions = rate x actual hours / 2,000 lb per ton; potential to emit = the same rate x 8,760 hours / 2,000, at maximum design capacity; a permitted hours limit substitutes for the 8,760, and the hours that put potential exactly at the threshold is that relation inverted.",
+    edition: "Potential to emit as EPA's permitting programs define it -- the maximum capacity to emit at 8,760 hours a year at full design capacity, with control equipment and operational limits counted only where they are FEDERALLY ENFORCEABLE. The hourly rate is ENTERED from an emission factor, a stack test or manufacturer data. A screening calculation: it does not select the emission factor, apply source-category-specific rules for what counts, address fugitive emissions, aggregate emission units, or determine applicability of any permitting program.",
+    freeAccess: "One rate times one number of hours; no emission factor table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The 8,760 hours is what surprises everyone. A source running one shift a day still has a potential computed as though it ran every hour of the year, because it COULD absent an enforceable restriction -- so a boiler used only for winter heating has a potential based on year-round continuous firing. The way out is a synthetic minor limit: a federally enforceable condition on hours, throughput or fuel, against which potential is recomputed. The trade is that the limit is enforceable, carries recordkeeping and reporting, and exceeding it is a violation rather than a busy month. Control equipment counts only when its operation is federally enforceable, which is why that is a separate input: a baghouse installed but not required by any permit condition does not reduce potential to emit.",
+    assumptions: [
+      { name: "The hourly rate is entered", value: "it comes from an emission factor, a stack test or manufacturer data and carries that uncertainty", source: "the source's own test data" },
+      { name: "Control must be enforceable", value: "installed equipment no permit requires does not reduce potential", source: "the permit" },
+      { name: "Not an applicability determination", value: "source-category rules, fugitives and aggregation are outside this", source: "the reviewing authority" },
+    ],
+  },
+  "opacity-six-minute": {
+    formula: "block average = the sum of the readings divided by their count, with 24 readings at 15-second intervals making one six-minute block; the readings at a stated peak a block could carry is the limit times the count over that peak.",
+    edition: "EPA Method 9 (40 CFR Part 60 Appendix A) by name -- readings at 15-second intervals, 24 to a six-minute block, and the block's ARITHMETIC MEAN compared against the limit. The block sum and the limit are ENTERED. It does not validate the observation conditions (sun position, background, distance and angle are specified by the method and a reading outside them is not valid), the observer's certification and its expiry, the applicable limit or its short-duration exceptions, or whether continuous opacity monitoring data would govern instead.",
+    freeAccess: "One arithmetic mean; no method text is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The six-minute block is what makes a short puff and a steady haze different findings. A soot blow producing a very dark plume for thirty seconds contributes two readings to a block of twenty-four and the average can remain compliant; a faint plume that never clears contributes twenty-four readings at a lower value and can exceed the same limit. Operators who judge by the worst moment consistently misread which condition is the violation, so both cases are computed side by side. Method 9's observation conditions are as binding as the arithmetic: a reading taken with the sun in the wrong quadrant or against a bright sky is not a valid reading regardless of what the observer saw, which is why an operator's own observation is not equivalent to a certified one.",
+    assumptions: [
+      { name: "Observation conditions are not validated", value: "sun position, background, distance and angle are specified by the method", source: "EPA Method 9" },
+      { name: "Certification lapses", value: "observers recertify on a stated interval and a lapsed reading is not enforceable", source: "the reviewing authority" },
+      { name: "Short-duration exceptions are not applied", value: "many standards allow one period per hour at a higher opacity", source: "the applicable subpart" },
+    ],
+  },
+  "baghouse-cleaning-interval": {
+    formula: "working range = trigger pressure minus the clean-bag baseline; the baseline rise against an earlier log is the blinding diagnostic, and at the observed rate the months until the baseline reaches the trigger is the remaining range over that rate; pulses per day = operating hours x 60 / the cycle time.",
+    edition: "Fabric filter cleaning practice as baghouse operation states it -- a healthy collector cycles between a stable clean-bag BASELINE and its cleaning trigger, and a rising baseline means the cake is not releasing (blinding), which is irreversible; the trigger sets the peak, so the peak shows nothing. On-demand cleaning by differential pressure is preferred over timer cleaning. Pressures and cycle times are ENTERED from the plant's own log. It does not compute pressure drop from air-to-cloth ratio and dust loading, predict or diagnose blinding, size the pulse system, or evaluate emissions.",
+    freeAccess: "Two pressures and a cycle time from the plant's own log.",
+    governance: GOVERNANCE.general,
+    editionNote: "The BASELINE is the diagnostic and the peak is not, because the trigger sets the peak: a collector whose baseline has climbed shows an unchanged peak the entire time. What has changed is the working range, which shrinks from one end, so the cycle shortens and the collector pulses more often -- and that shortening is visible on any cleaning log even where the baseline was not recorded. Over-cleaning is the opposite error and it is what timer cleaning produces: it removes the residual cake that does most of the fine filtration, emissions rise briefly after each pulse, the fabric is flexed more often and fails sooner, and compressed air is spent for nothing.",
+    assumptions: [
+      { name: "Pressures are entered", value: "this reads a log rather than modelling the collector", source: "the plant's own cleaning log" },
+      { name: "Blinding is detected, not predicted", value: "its causes are moisture, a sticky dust, or operating below the gas dew point", source: "the bag supplier" },
+      { name: "No emissions estimate", value: "a pulse briefly raises outlet loading and that is not modelled", source: "the stack test" },
+    ],
+  },
+  "scrubber-lg-ratio": {
+    formula: "liquid gpm = gas acfm / 1,000 x the L/G ratio; pump brake horsepower = gpm x head x specific gravity / (3,960 x efficiency); fan brake horsepower = acfm x in wc / (6,356 x efficiency).",
+    edition: "The wet scrubber liquid-to-gas ratio as air pollution control practice writes it, with the customary pump and fan horsepower relations. It does not predict removal efficiency, which depends on contactor design, chemistry, particle size distribution and solubility and is MEASURED rather than calculated; it does not size the packing or vessel, compute blowdown rate or the resulting chemistry, or address mist eliminators, reheat and the visible plume.",
+    freeAccess: "One ratio and two horsepower relations.",
+    governance: GOVERNANCE.general,
+    editionNote: "Which mechanism the ratio serves depends on what the scrubber is removing. In a venturi removing PARTICULATE the gas energy past the throat atomizes the liquid and removal follows the PRESSURE DROP, with the ratio supplying the liquid that pressure drop works on; in a packed tower absorbing a GAS, removal follows contact with a continuously renewed surface, so the ratio and the packing height are the controls and pressure drop is a cost. Fine particulate is where the energy cost becomes severe, because submicron removal rises steeply with pressure drop and pressure drop is fan power spent continuously. And a wet scrubber does not destroy the pollutant, it TRANSFERS it to water, which then has to be treated or hauled.",
+    assumptions: [
+      { name: "Removal is not predicted", value: "it depends on contactor design, chemistry and particle size and is measured", source: "the scrubber manufacturer's performance data" },
+      { name: "Blowdown is not computed", value: "dissolved material accumulates and the purge rate sets the chemistry", source: "the water treatment design" },
+      { name: "The water stream is a real cost", value: "the pollutant is transferred, not destroyed", source: "the discharge permit" },
+    ],
+  },
+  "thermal-oxidizer-residence": {
+    formula: "expansion factor = chamber absolute temperature / the reference absolute temperature; actual flow = inlet standard flow x that factor; chamber volume = actual flow x required residence / 60; and the residence an entered chamber delivers is that relation inverted.",
+    edition: "Residence time = chamber volume / the ACTUAL gas flow at chamber conditions, with the ideal-gas expansion taken on absolute temperature (degrees Rankine, offset 459.67). The three T's of thermal destruction -- temperature, time and turbulence -- are all required and only time is computed here. It does not compute destruction efficiency, which is MEASURED by stack test, model the kinetics of any compound, size the burner or heat recovery, address flame arrestor and lower-explosive-limit constraints on the inlet, or evaluate combustion products.",
+    freeAccess: "One ideal-gas ratio and one volume.",
+    governance: GOVERNANCE.general,
+    editionNote: "The gas expansion is the arithmetic trap and it is close to a factor of four at ordinary operating temperatures: gas at 1,600 degF occupies nearly four times the volume it did at 70, so it moves through the chamber that much faster. A chamber sized on the inlet flow in STANDARD cubic feet therefore gives a residence time several times what the unit achieves. Temperature and time trade against each other but not freely -- destruction is kinetic, so the relationship is exponential in temperature and roughly linear in time, and a modest temperature shortfall takes a large time increase to make up. Turbulence is not in the arithmetic at all: a chamber with the right volume and the wrong mixing has dead zones and short-circuits.",
+    assumptions: [
+      { name: "Ideal gas", value: "real gas behaviour at chamber conditions is not modelled", source: "the oxidizer manufacturer" },
+      { name: "Turbulence is not computed", value: "mixing decides whether the volume is usable", source: "the burner and chamber design" },
+      { name: "Destruction efficiency is measured", value: "it is a stack test result, not a calculation", source: "the permit" },
+    ],
+  },
+  "coating-voc-compliance": {
+    formula: "VOC as supplied = lb of VOC / gallons of coating; VOC less water = the same VOC / (gallons of coating minus water minus exempt solvent); as applied adds the thinner's VOC to the numerator and its volume to the denominator, with the water unchanged.",
+    edition: "The VOC content bases as coating rules define them, with less water the regulatory basis in most rules. Volumes and masses are ENTERED from the technical data sheet. It does not determine which compounds are exempt (the list is specific and changes), apply transfer-efficiency credits some rules allow, address limits expressed per gallon of SOLIDS, compute emissions from usage, or determine which rule applies.",
+    freeAccess: "Two divisions on numbers from a data sheet.",
+    governance: GOVERNANCE.general,
+    editionNote: "The less-water basis exists to prevent compliance by dilution: measuring VOC per gallon as supplied would let anyone pass by adding water, without reducing the solvent applied per square foot. The consequence is that waterborne coatings can fail limits they appear to pass -- a coating that is mostly water with a modest coalescing solvent has a low VOC as supplied and a high VOC less water, because the denominator is small. Thinning moves it further: the thinner adds VOC to the numerator and volume to the denominator, but that volume is not water so it does not come back out, and a coating with comfortable margin as supplied can exceed its limit as applied.",
+    assumptions: [
+      { name: "Exempt compounds are entered", value: "the list is specific and changes, and similarity is not exemption", source: "the applicable rule" },
+      { name: "No transfer efficiency credit", value: "some rules credit high-efficiency application equipment separately", source: "the coating rule" },
+      { name: "Not a usage-based emission estimate", value: "this is content, not tons", source: "the permit" },
+    ],
+  },
+  "spcc-containment-volume": {
+    formula: "required volume = the largest single container's capacity x (1 + freeboard); gross dike volume = length x width x wall height; displacement = the volume of tanks and equipment standing inside up to that height; net capacity = gross minus displacement, at 1728/231 cubic inches per gallon.",
+    edition: "Secondary containment sizing as SPCC practice states it -- capacity for the LARGEST SINGLE container plus freeboard, with NET capacity being gross minus the displacement of everything inside. It treats the dike as a rectangular prism. It does not determine SPCC applicability or the required freeboard, address the alternative sized-containment provisions for loading racks, mobile containers or oil-filled equipment, evaluate imperviousness or drainage control, or substitute for the PE certification the rule requires.",
+    freeAccess: "One volume minus another; no rule text is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The requirement is the LARGEST SINGLE container plus freeboard, not the sum of the tanks, because the design event is one container failing. The DISPLACEMENT subtraction is what gets missed: a dike sized to hold the largest tank looks adequate until the other tanks, their ring foundations and a pump skid are counted, and on a congested tank farm that displacement can turn a comfortable margin into a deficiency. Two conditions matter as much as the volume and neither is arithmetic -- a dike with an open drain valve has NO capacity, and containment must be sufficiently impervious to hold the oil long enough to recover it.",
+    assumptions: [
+      { name: "A rectangular prism", value: "sloped walls and irregular footprints are not modelled", source: "the site drawings" },
+      { name: "Freeboard is entered", value: "the applicable storm event or percentage is a rule question", source: "40 CFR Part 112" },
+      { name: "Not a compliance determination", value: "the PE certification the rule requires is not replaced", source: "the certifying professional engineer" },
+    ],
+  },
+  "esp-deutsch-efficiency": {
+    formula: "Deutsch: efficiency = 1 - exp(-A w / Q) with the flow on a per-second basis; the area a target needs is -ln(1 - target) x Q / w; and the area per factor of ten off the penetration is ln(10) x Q / w, the same for every decade.",
+    edition: "The Deutsch equation for electrostatic precipitator collection. The migration velocity is ENTERED because it depends on particle size, field strength and above all dust RESISTIVITY, and in practice is fitted from the performance of a similar installation rather than predicted. A screening calculation: it does not model resistivity, back corona, gas conditioning, rapping re-entrainment, sneakage or gas distribution, and it does not size the fields, transformer-rectifier sets or hoppers.",
+    freeAccess: "One exponential; no manufacturer data is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Each equal increment of plate area removes the same FRACTION of the remaining penetration rather than the same amount of dust, so efficiency approaches 100% asymptotically and going from 99 to 99.9% requires exactly as much additional plate as going from zero to 90% did. That is why high-efficiency precipitators are enormous and why the last increment is the expensive one. The migration velocity is the weak input: it is fitted backwards from a similar installation on a similar dust, so a Deutsch calculation is only as good as the velocity it was given. Resistivity is the dominant variable in real performance and cuts both ways -- too high and back corona destroys collection, too low and particles re-entrain.",
+    assumptions: [
+      { name: "Migration velocity is entered", value: "it is fitted from performance, not predicted from first principles", source: "a similar installation on a similar dust" },
+      { name: "Resistivity is not modelled", value: "it is the dominant variable and is managed by conditioning", source: "the precipitator manufacturer" },
+      { name: "Rapping re-entrainment is not included", value: "measured efficiency commonly falls short of the Deutsch value", source: "the stack test" },
+    ],
+  },
+  "carbon-bed-life": {
+    formula: "bed capacity = carbon mass x working capacity; bed life = that capacity / the solvent loading rate; operating days = the life in hours over the hours worked per day; and the degraded case is the same arithmetic at a lower working capacity.",
+    edition: "Adsorber bed life as activated carbon practice writes it, with working capacity ENTERED at the ACTUAL operating conditions because water competes for adsorption sites and capacity falls with humidity and with temperature. It does not derive working capacity from an isotherm, model the mass transfer zone, size the bed for residence time or face velocity, address regeneration and the recovered solvent, evaluate bed fires, or address the vessel and ducting.",
+    freeAccess: "One mass over one rate.",
+    governance: GOVERNANCE.general,
+    editionNote: "Humidity is the term that surprises people: water competes for the same adsorption sites, so a stream at high relative humidity can cut the working capacity by a third or more, and a bed sized on dry-air data reaches breakthrough far sooner than its schedule expects. Breakthrough is a CLIFF, which is what makes bed life different from filter life -- the bed removes essentially everything until its mass transfer zone reaches the outlet, then the outlet concentration rises quickly toward the inlet. A bed at 95% of its life is performing perfectly and one at 105% is doing nothing, so there is no gradual degradation to notice and outlet monitoring rather than a timer is the only reliable detection.",
+    assumptions: [
+      { name: "Working capacity is entered", value: "it depends on solvent, concentration, temperature and humidity", source: "the carbon supplier's isotherm data" },
+      { name: "The mass transfer zone is not modelled", value: "its length decides how sharp the breakthrough is", source: "the adsorber designer" },
+      { name: "Bed fires are not evaluated", value: "a real hazard with ketones and high-temperature regeneration", source: "the process safety review" },
+    ],
+  },
+  "plume-rise-briggs": {
+    formula: "buoyancy flux F = g v d^2 (Ts - Ta) / (4 Ts) in SI; neutral-condition final rise = 21.425 F^0.75 / u below a 55 m^4/s^3 flux and 38.71 F^0.6 / u at or above it; effective height = stack height plus that rise, and rise is exactly inverse in wind speed.",
+    edition: "The Briggs plume rise relations by name, published in SI and converted at 0.3048 m per foot and 1,609.344 m per mile, both exact. A screening estimate for a BUOYANT plume: it does not compute momentum rise for a cool high-velocity plume, transitional rise close to the stack, atmospheric stability effects, building DOWNWASH, or any ground-level concentration.",
+    freeAccess: "One published correlation and two exact length conversions.",
+    governance: GOVERNANCE.general,
+    editionNote: "Plume rise is frequently LARGER than the stack itself, so the effective release height -- which is what governs ground-level concentration -- can be double the physical stack. Ignoring it makes a dispersion estimate wildly conservative and assuming too much makes it dangerously optimistic, and since concentration falls roughly with the square of effective height the error compounds. Wind is the term that trades against itself: a strong wind dilutes the plume more but also bends it over and reduces the rise, and the rise is exactly inverse in wind speed. DOWNWASH is the limit that bounds this hardest -- a stack too short relative to nearby buildings has its plume pulled into the building wake, which can eliminate the rise entirely, and no buoyancy calculation will say so.",
+    assumptions: [
+      { name: "Neutral conditions, final rise", value: "stability suppresses or enhances rise and is not modelled", source: "the applicable modelling guideline" },
+      { name: "Buoyant plumes only", value: "momentum rise for a cool high-velocity plume is a different relation", source: "a regulatory dispersion model" },
+      { name: "Downwash is not modelled", value: "a short stack near buildings can lose its rise entirely", source: "good engineering practice stack height rules" },
+    ],
+  },
   // spec-v1622..v1631: the 2026-09-08 trade-expansion HVAC test-and-balance
   // and hydronic systems band. Ten tiles, nothing cut.
   "flow-hood-correction": {

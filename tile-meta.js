@@ -1119,6 +1119,17 @@ const _TILES = [
   ["nesc-district-loading", "A"],
   ["conductor-creep-elongation", "A"],
   ["sagging-return-wave", "A"],
+  // spec-v1717..v1726 air quality band (new calc-airquality.js)
+  ["stack-emission-pte", "G"],
+  ["opacity-six-minute", "G"],
+  ["baghouse-cleaning-interval", "G"],
+  ["scrubber-lg-ratio", "G"],
+  ["thermal-oxidizer-residence", "G"],
+  ["coating-voc-compliance", "G"],
+  ["spcc-containment-volume", "G"],
+  ["esp-deutsch-efficiency", "G"],
+  ["carbon-bed-life", "G"],
+  ["plume-rise-briggs", "G"],
   // spec-v1622..v1631 HVAC test-and-balance and hydronic systems band
   ["flow-hood-correction", "C"],
   ["fan-system-effect", "C"],

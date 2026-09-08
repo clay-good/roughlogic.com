@@ -49319,3 +49319,412 @@ test("bounds: spec-v1631 computePlenumReturnDrop -- the pinch point is the retur
   assert.ok(Math.abs(_v1631({ ...base, pinch_clear_in: 28 }).pinch_velocity_fpm - r.pinch_velocity_fpm / 2) < 1e-9);
   assert.ok(_v1631({ ...base, pinch_clear_in: 0 }).error);
 });
+
+// ===========================================================================
+// spec-v1717..v1726: the 2026-09-08 trade-expansion air quality band, in the
+// new calc-airquality.js. Ten tiles, nothing cut.
+//
+// FOUR OF THE TEN SPECS ARE DEFECTIVE:
+//   v1717's worked example is an unfinished edit -- it opens at 5.5 lb/h,
+//     trails off mid-sentence, restarts at 11.0 "for clarity" -- and the
+//     example it lands on does not demonstrate its own point: a potential to
+//     emit of 48.2 tons against a 100 ton threshold is still MINOR.
+//   v1718's own 24 readings sum to 305, not the 300 it states, so its average
+//     is 12.71% rather than 12.5%. The conclusion survives; the sum does not.
+//   v1725 left THREE unrendered python placeholders (5.95 days, 18 operating
+//     days, 40 percent shorter) -- the seventh, eighth and ninth of this
+//     program. All three are computed and pinned below.
+//   v1726 declines to compute its own headline. It asserts the rise is "on the
+//     order of a hundred feet" for 220 ft of effective height; Briggs on its
+//     own inputs gives 185 ft and 305 ft, and its "factor of about four" on
+//     concentration is 6.5.
+// ===========================================================================
+
+import {
+  computeStackEmissionPte as _v1717,
+  computeOpacitySixMinute as _v1718,
+  computeBaghouseCleaningInterval as _v1719,
+  computeScrubberLgRatio as _v1720,
+  computeThermalOxidizerResidence as _v1721,
+  computeCoatingVocCompliance as _v1722,
+  computeSpccContainmentVolume as _v1723,
+  computeEspDeutschEfficiency as _v1724,
+  computeCarbonBedLife as _v1725,
+  computePlumeRiseBriggs as _v1726,
+} from "../../calc-airquality.js";
+
+test("bounds: spec-v1717 computeStackEmissionPte -- 8,760 hours whatever the plant runs", () => {
+  const base = { hourly_rate_lb_h: 11.0, actual_hours_per_year: 2000, permitted_hours_per_year: 0, major_threshold_tpy: 100, control_efficiency_pct: 0, control_enforceable: "no" };
+  const r = _v1717(base);
+  // IDENTITY: both figures are the same rate over different hours, at 2,000 lb.
+  assert.ok(Math.abs(r.actual_tpy - 11.0 * 2000 / 2000) < 1e-12);
+  assert.ok(Math.abs(r.pte_tpy - 11.0 * 8760 / 2000) < 1e-9);
+  assert.ok(Math.abs(r.pte_ratio - 8760 / 2000) < 1e-12);
+  assert.ok(r.pte_tpy > r.actual_tpy);
+  // THE SPEC'S EXAMPLE DOES NOT DEMONSTRATE ITS POINT: 48.2 tons against a 100
+  // ton threshold is still minor, so this source is not major either way.
+  assert.ok(Math.abs(r.pte_tpy - 48.18) < 0.01);
+  assert.equal(r.actual_is_major, false);
+  assert.equal(r.pte_is_major, false);
+  // A rate that DOES make the point: at 25 lb/h the actual stays minor and the
+  // potential does not, which is the case the spec meant to show.
+  const shows = _v1717({ ...base, hourly_rate_lb_h: 25 });
+  assert.equal(shows.actual_is_major, false);
+  assert.equal(shows.pte_is_major, true);
+  // IDENTITY: the hours that put potential exactly at the threshold, fed back
+  // in as a permitted limit, land exactly on it.
+  const atLimit = _v1717({ ...base, hourly_rate_lb_h: 25, permitted_hours_per_year: shows.hours_for_minor });
+  assert.ok(Math.abs(atLimit.pte_with_limit_tpy - 100) < 1e-9);
+  // And either side of it the synthetic minor verdict flips, off the boundary.
+  assert.equal(_v1717({ ...base, hourly_rate_lb_h: 25, permitted_hours_per_year: shows.hours_for_minor * 0.999 }).limit_makes_minor, true);
+  assert.equal(_v1717({ ...base, hourly_rate_lb_h: 25, permitted_hours_per_year: shows.hours_for_minor * 1.001 }).limit_makes_minor, false);
+  // UNENFORCEABLE CONTROL COUNTS FOR NOTHING -- the flag, not the percentage,
+  // is what decides.
+  const notEnforceable = _v1717({ ...base, control_efficiency_pct: 99 });
+  assert.equal(notEnforceable.control_counts, false);
+  assert.ok(Math.abs(notEnforceable.pte_tpy - r.pte_tpy) < 1e-12);
+  const enforceable = _v1717({ ...base, control_efficiency_pct: 99, control_enforceable: "yes" });
+  assert.equal(enforceable.control_counts, true);
+  assert.ok(Math.abs(enforceable.pte_tpy - r.pte_tpy * 0.01) < 1e-9);
+  // A source running every hour has actual equal to potential exactly.
+  const continuous = _v1717({ ...base, actual_hours_per_year: 8760 });
+  assert.ok(Math.abs(continuous.actual_tpy - continuous.pte_tpy) < 1e-9);
+  assert.ok(_v1717({ ...base, actual_hours_per_year: 9000 }).error);
+  assert.ok(_v1717({ ...base, control_efficiency_pct: 100 }).error);
+});
+
+test("bounds: spec-v1718 computeOpacitySixMinute -- the block average, not the worst moment", () => {
+  const base = { readings_sum_pct: 305, reading_count: 24, peak_reading_pct: 60, limit_pct: 20, steady_reading_pct: 22 };
+  const r = _v1718(base);
+  // THE SPEC'S SUM IS WRONG: its own readings total 305, giving 12.708%, not
+  // the 300 and 12.5% it states.
+  const specReadings = [5, 5, 10, 10, 45, 60, 55, 20, 10, 5, 5, 5, 5, 10, 5, 5, 5, 5, 5, 10, 5, 5, 5, 5];
+  assert.equal(specReadings.length, 24);
+  assert.equal(specReadings.reduce((a, b) => a + b, 0), 305);
+  assert.ok(Math.abs(r.block_average_pct - 305 / 24) < 1e-12);
+  assert.ok(Math.abs(r.block_average_pct - 12.7083) < 1e-4);
+  // The conclusion survives the correction: still comfortably compliant.
+  assert.equal(r.complies, true);
+  assert.ok(Math.abs(r.margin_pct - (20 - 305 / 24)) < 1e-12);
+  // THE METHOD'S WHOLE POINT: a 60% reading sits inside a compliant block,
+  // while a steady 22% -- never as dark at any instant -- is a violation.
+  assert.equal(r.peak_over_limit, true);
+  assert.equal(r.complies, true);
+  assert.equal(r.steady_complies, false);
+  assert.equal(r.steady_darker_than_peak, false);
+  // IDENTITY: a block whose readings are all one value averages exactly it.
+  const uniform = _v1718({ ...base, readings_sum_pct: 22 * 24, steady_reading_pct: 0 });
+  assert.ok(Math.abs(uniform.block_average_pct - 22) < 1e-12);
+  assert.equal(uniform.complies, false);
+  // IDENTITY inverted: the readings at the peak a block can carry, taken as
+  // the whole block with the rest at zero, lands at or under the limit.
+  assert.ok(Math.abs(r.readings_at_peak_allowed - Math.floor(20 * 24 / 60)) < 1e-12);
+  const atCapacity = _v1718({ ...base, readings_sum_pct: r.readings_at_peak_allowed * 60 });
+  assert.ok(atCapacity.block_average_pct <= 20 + 1e-9);
+  assert.equal(atCapacity.complies, true);
+  const overCapacity = _v1718({ ...base, readings_sum_pct: (r.readings_at_peak_allowed + 1) * 60 });
+  assert.equal(overCapacity.complies, false);
+  // The limit boundary, tested off it in both directions.
+  assert.equal(_v1718({ ...base, readings_sum_pct: 20 * 24 * 0.999 }).complies, true);
+  assert.equal(_v1718({ ...base, readings_sum_pct: 20 * 24 * 1.001 }).complies, false);
+  // A short block is flagged rather than silently treated as a full one.
+  assert.equal(r.full_block, true);
+  assert.equal(_v1718({ ...base, reading_count: 12, readings_sum_pct: 150 }).full_block, false);
+  assert.ok(_v1718({ ...base, readings_sum_pct: 2500 }).error);
+  assert.ok(_v1718({ ...base, reading_count: 24.5 }).error);
+});
+
+test("bounds: spec-v1719 computeBaghouseCleaningInterval -- the baseline, not the peak", () => {
+  const base = { baseline_inwc: 3.9, trigger_inwc: 6.0, cycle_minutes: 14, original_baseline_inwc: 2.0, original_cycle_minutes: 45, elapsed_months: 6, operating_hours_per_day: 24, cleaning_mode: "on_demand" };
+  const r = _v1719(base);
+  // IDENTITY: the working range and the baseline rise.
+  assert.ok(Math.abs(r.working_range_inwc - (6.0 - 3.9)) < 1e-9);
+  assert.ok(Math.abs(r.baseline_rise_inwc - (3.9 - 2.0)) < 1e-9);
+  assert.ok(Math.abs(r.baseline_rise_pct - 95) < 1e-9);
+  assert.equal(r.blinding, true);
+  // THE DIAGNOSTIC THE SPEC MAKES: the TRIGGER never moved, so the peak shows
+  // nothing -- the whole finding is in the baseline and the range it consumed.
+  assert.ok(Math.abs(r.range_lost_pct - r.baseline_rise_inwc / (6.0 - 2.0) * 100) < 1e-9);
+  assert.ok(r.range_lost_pct > 45 && r.range_lost_pct < 50);
+  // IDENTITY: at the observed rate, the months to reach the trigger.
+  assert.ok(Math.abs(r.rise_per_month - 1.9 / 6) < 1e-12);
+  assert.ok(Math.abs(r.months_to_trigger - r.working_range_inwc / r.rise_per_month) < 1e-9);
+  // And feeding that many more months forward lands the baseline at the
+  // trigger, where the collector can no longer complete a cycle.
+  const future = 3.9 + r.rise_per_month * r.months_to_trigger;
+  assert.ok(Math.abs(future - 6.0) < 1e-9);
+  assert.ok(_v1719({ ...base, baseline_inwc: 6.0 }).error);
+  // The cycle shortens as the range shrinks, and pulses rise with it.
+  assert.equal(r.cycle_shortening, true);
+  assert.ok(Math.abs(r.cycle_change_pct - (14 - 45) / 45 * 100) < 1e-9);
+  assert.ok(Math.abs(r.pulses_per_day - 24 * 60 / 14) < 1e-9);
+  assert.ok(r.pulses_per_day > r.original_pulses_per_day);
+  // A healthy collector -- baseline unchanged -- is not blinding.
+  const healthy = _v1719({ ...base, baseline_inwc: 2.0, cycle_minutes: 45 });
+  assert.equal(healthy.blinding, false);
+  assert.ok(Math.abs(healthy.baseline_rise_inwc) < 1e-12);
+  assert.equal(healthy.cycle_shortening, false);
+  // Blinding is tested off the boundary rather than on it.
+  assert.equal(_v1719({ ...base, baseline_inwc: 2.001 }).blinding, true);
+  assert.equal(_v1719({ ...base, baseline_inwc: 1.999 }).blinding, false);
+  // Cleaning mode is a named case, not a silent default.
+  assert.equal(r.is_timer, false);
+  assert.equal(_v1719({ ...base, cleaning_mode: "timer" }).is_timer, true);
+  assert.ok(_v1719({ ...base, operating_hours_per_day: 25 }).error);
+});
+
+test("bounds: spec-v1720 computeScrubberLgRatio -- liquid is linear in L/G", () => {
+  const base = { gas_acfm: 15000, lg_ratio_gpm_per_1000: 10, pump_head_ft: 40, pump_efficiency: 0.65, specific_gravity: 1.0, annual_hours: 6000, energy_rate_per_kwh: 0.10, alternate_lg_ratio: 20, pressure_drop_inwc: 6, fan_efficiency: 0.65, scrubber_type: "packed_tower" };
+  const r = _v1720(base);
+  // IDENTITY: circulation and the two horsepower relations.
+  assert.ok(Math.abs(r.liquid_gpm - 15000 / 1000 * 10) < 1e-12);
+  assert.ok(Math.abs(r.pump_bhp - 150 * 40 * 1.0 / (3960 * 0.65)) < 1e-12);
+  assert.ok(Math.abs(r.fan_bhp - 15000 * 6 / (6356 * 0.65)) < 1e-9);
+  // Liquid and pumping are both exactly linear in the ratio, so doubling the
+  // ratio doubles both -- while removal rises with diminishing returns.
+  assert.ok(Math.abs(r.alternate_liquid_gpm - 2 * r.liquid_gpm) < 1e-9);
+  assert.ok(Math.abs(r.alternate_pump_bhp - 2 * r.pump_bhp) < 1e-9);
+  assert.ok(Math.abs(r.liquid_ratio - 2) < 1e-12);
+  // Pumping is linear in head and in specific gravity too.
+  assert.ok(Math.abs(_v1720({ ...base, pump_head_ft: 80 }).pump_bhp - 2 * r.pump_bhp) < 1e-9);
+  assert.ok(Math.abs(_v1720({ ...base, specific_gravity: 1.2 }).pump_bhp - 1.2 * r.pump_bhp) < 1e-9);
+  // Fan power is linear in pressure drop -- which is why a venturi chasing
+  // fine particulate is an expensive machine to run.
+  assert.ok(Math.abs(_v1720({ ...base, pressure_drop_inwc: 30 }).fan_bhp - 5 * r.fan_bhp) < 1e-9);
+  // IDENTITY: annual energy is the total power over the hours.
+  assert.ok(Math.abs(r.total_kw - (r.pump_kw + r.fan_kw)) < 1e-12);
+  assert.ok(Math.abs(r.annual_kwh - r.total_kw * 6000) < 1e-9);
+  assert.ok(Math.abs(r.annual_cost - r.annual_kwh * 0.10) < 1e-9);
+  // The type is a named case that changes which variable is described as
+  // controlling, and nothing numeric.
+  assert.equal(r.is_venturi, false);
+  const venturi = _v1720({ ...base, scrubber_type: "venturi" });
+  assert.equal(venturi.is_venturi, true);
+  assert.ok(Math.abs(venturi.liquid_gpm - r.liquid_gpm) < 1e-12);
+  assert.ok(_v1720({ ...base, lg_ratio_gpm_per_1000: 0 }).error);
+  assert.ok(_v1720({ ...base, pump_efficiency: 1.5 }).error);
+});
+
+test("bounds: spec-v1721 computeThermalOxidizerResidence -- the expansion is nearly fourfold", () => {
+  const base = { inlet_scfm: 8000, chamber_temp_f: 1600, standard_temp_f: 70, required_residence_s: 0.75, chamber_volume_ft3: 389 };
+  const r = _v1721(base);
+  // IDENTITY: the expansion is the ratio of ABSOLUTE temperatures.
+  assert.ok(Math.abs(r.chamber_r - (1600 + 459.67)) < 1e-9);
+  assert.ok(Math.abs(r.standard_r - (70 + 459.67)) < 1e-9);
+  assert.ok(Math.abs(r.expansion_factor - r.chamber_r / r.standard_r) < 1e-12);
+  assert.ok(r.expansion_factor > 3.8 && r.expansion_factor < 3.9);
+  assert.ok(Math.abs(r.actual_acfm - 8000 * r.expansion_factor) < 1e-9);
+  assert.ok(Math.abs(r.volume_required_ft3 - r.actual_acfm * 0.75 / 60) < 1e-9);
+  // THE TRAP, COMPUTED: sizing on the standard flow gives a chamber whose real
+  // residence is short by exactly the expansion factor.
+  assert.ok(Math.abs(r.standard_basis_volume_ft3 - 8000 * 0.75 / 60) < 1e-9);
+  assert.ok(Math.abs(r.standard_basis_residence_s * r.expansion_factor - 0.75) < 1e-9);
+  assert.ok(r.standard_basis_residence_s < 0.75 / 3);
+  // IDENTITY: the required volume, fed back in, delivers exactly the required
+  // residence.
+  const sized = _v1721({ ...base, chamber_volume_ft3: r.volume_required_ft3 });
+  assert.ok(Math.abs(sized.actual_residence_s - 0.75) < 1e-9);
+  assert.equal(sized.residence_adequate, true);
+  // Tested off the boundary in both directions.
+  assert.equal(_v1721({ ...base, chamber_volume_ft3: r.volume_required_ft3 * 1.001 }).residence_adequate, true);
+  assert.equal(_v1721({ ...base, chamber_volume_ft3: r.volume_required_ft3 * 0.999 }).residence_adequate, false);
+  // Volume is linear in flow and in the required residence.
+  assert.ok(Math.abs(_v1721({ ...base, inlet_scfm: 16000 }).volume_required_ft3 - 2 * r.volume_required_ft3) < 1e-9);
+  assert.ok(Math.abs(_v1721({ ...base, required_residence_s: 1.5 }).volume_required_ft3 - 2 * r.volume_required_ft3) < 1e-9);
+  // A hotter chamber expands the gas further and needs MORE volume for the
+  // same residence, which is the counterintuitive direction.
+  assert.ok(_v1721({ ...base, chamber_temp_f: 1800 }).volume_required_ft3 > r.volume_required_ft3);
+  assert.ok(_v1721({ ...base, chamber_temp_f: 50 }).error);
+  assert.ok(_v1721({ ...base, inlet_scfm: 0 }).error);
+});
+
+test("bounds: spec-v1722 computeCoatingVocCompliance -- the denominator is the whole story", () => {
+  const base = { coating_gal: 1.0, voc_lb: 0.5, water_gal: 0.55, exempt_gal: 0, thinner_gal: 0.2, thinner_voc_lb_per_gal: 7.0, limit_lb_per_gal: 2.8 };
+  const r = _v1722(base);
+  // IDENTITY: the two bases differ only in the denominator.
+  assert.ok(Math.abs(r.voc_as_supplied - 0.5 / 1.0) < 1e-12);
+  assert.ok(Math.abs(r.less_water_gal - (1.0 - 0.55)) < 1e-12);
+  assert.ok(Math.abs(r.voc_less_water - 0.5 / 0.45) < 1e-12);
+  assert.ok(Math.abs(r.basis_ratio - 1.0 / 0.45) < 1e-12);
+  assert.ok(r.voc_less_water > r.voc_as_supplied);
+  // With no water and no exempt solvent the two bases are the SAME number --
+  // the identity that shows the rule only bites on waterborne coatings.
+  const solvent = _v1722({ ...base, water_gal: 0, thinner_gal: 0 });
+  assert.ok(Math.abs(solvent.voc_less_water - solvent.voc_as_supplied) < 1e-12);
+  assert.ok(Math.abs(solvent.basis_ratio - 1) < 1e-12);
+  // THINNING RAISES IT ON BOTH COUNTS, and the as-applied figure governs.
+  assert.ok(Math.abs(r.applied_voc_lb - (0.5 + 0.2 * 7.0)) < 1e-12);
+  assert.ok(Math.abs(r.applied_voc_less_water - 1.9 / (1.2 - 0.55)) < 1e-12);
+  assert.ok(r.applied_voc_less_water > r.voc_less_water);
+  assert.ok(Math.abs(r.governing_voc - r.applied_voc_less_water) < 1e-12);
+  // THE SPEC'S POINT: it fails the limit as applied, and the LABEL number
+  // would have suggested it passed by a wide margin.
+  assert.equal(r.complies, false);
+  assert.equal(r.label_would_pass, true);
+  assert.ok(r.voc_as_supplied < base.limit_lb_per_gal);
+  // Unthinned, the same coating complies comfortably against the same limit.
+  const unthinned = _v1722({ ...base, thinner_gal: 0 });
+  assert.equal(unthinned.complies, true);
+  assert.equal(unthinned.has_thinner, false);
+  // The limit boundary, off it in both directions.
+  assert.equal(_v1722({ ...base, limit_lb_per_gal: r.governing_voc * 1.001 }).complies, true);
+  assert.equal(_v1722({ ...base, limit_lb_per_gal: r.governing_voc * 0.999 }).complies, false);
+  // More water is a SMALLER denominator and a larger regulatory number, which
+  // is exactly the dilution the basis exists to defeat.
+  assert.ok(_v1722({ ...base, water_gal: 0.8, thinner_gal: 0 }).voc_less_water > unthinned.voc_less_water);
+  assert.ok(_v1722({ ...base, water_gal: 1.0 }).error);
+});
+
+test("bounds: spec-v1723 computeSpccContainmentVolume -- displacement is the missed term", () => {
+  const base = { largest_tank_gal: 12000, freeboard_pct: 10, dike_length_ft: 80, dike_width_ft: 60, dike_height_ft: 3, other_tank_count: 3, other_tank_diameter_ft: 12, other_equipment_ft3: 0 };
+  const r = _v1723(base);
+  // IDENTITY: the requirement, the gross volume, and the displacement.
+  assert.ok(Math.abs(r.required_gal - 12000 * 1.10) < 1e-9);
+  assert.ok(Math.abs(r.required_ft3 - r.required_gal / (1728 / 231)) < 1e-9);
+  assert.ok(Math.abs(r.gross_ft3 - 80 * 60 * 3) < 1e-9);
+  assert.ok(Math.abs(r.tank_displacement_ft3 - 3 * (Math.PI / 4) * 144 * 3) < 1e-9);
+  assert.ok(Math.abs(r.net_ft3 - (r.gross_ft3 - r.displacement_ft3)) < 1e-9);
+  assert.equal(r.adequate, true);
+  // The requirement is the LARGEST SINGLE container, so adding more tanks of
+  // the same size raises the DISPLACEMENT and never the requirement.
+  const crowded = _v1723({ ...base, other_tank_count: 6 });
+  assert.ok(Math.abs(crowded.required_gal - r.required_gal) < 1e-12);
+  assert.ok(crowded.displacement_ft3 > r.displacement_ft3);
+  assert.ok(crowded.net_gal < r.net_gal);
+  // THE MISSED TERM MADE VISIBLE: a dike whose GROSS volume passes and whose
+  // NET volume does not, which is the failure the displacement term exists to
+  // catch and the one a gross-only check ships.
+  const tight = _v1723({ ...base, dike_length_ft: 30, dike_width_ft: 20, dike_height_ft: 3.2, other_tank_count: 2, other_tank_diameter_ft: 10 });
+  assert.ok(tight.gross_gal > tight.required_gal);
+  assert.equal(tight.gross_would_pass, true);
+  assert.ok(tight.net_gal < tight.required_gal);
+  assert.equal(tight.adequate, false);
+  assert.ok(tight.displacement_ft3 > 0);
+  // IDENTITY: the wall height needed, fed back in, lands exactly on the
+  // requirement -- displacement scales with height, so this is not trivial.
+  const raised = _v1723({ ...base, dike_height_ft: r.height_needed_ft });
+  assert.ok(Math.abs(raised.net_gal - raised.required_gal) < 1e-6);
+  assert.ok(Math.abs(raised.margin_gal) < 1e-6);
+  // Zero freeboard is exactly the tank's own capacity.
+  assert.ok(Math.abs(_v1723({ ...base, freeboard_pct: 0 }).required_gal - 12000) < 1e-12);
+  // Displacement that fills the dike leaves no capacity, and is refused
+  // rather than reported as negative.
+  assert.ok(_v1723({ ...base, other_equipment_ft3: 20000 }).error);
+  assert.ok(_v1723({ ...base, other_tank_count: 2.5 }).error);
+});
+
+test("bounds: spec-v1724 computeEspDeutschEfficiency -- every nine costs the same plate", () => {
+  const base = { plate_area_ft2: 12000, gas_acfm: 60000, migration_velocity_fps: 0.2, target_efficiency_pct: 99.0 };
+  const r = _v1724(base);
+  // IDENTITY: the Deutsch exponent and the efficiency it gives.
+  assert.ok(Math.abs(r.gas_cfs - 1000) < 1e-9);
+  assert.ok(Math.abs(r.deutsch_exponent - 12000 * 0.2 / 1000) < 1e-12);
+  assert.ok(Math.abs(r.efficiency_pct - (1 - Math.exp(-2.4)) * 100) < 1e-9);
+  assert.ok(Math.abs(r.efficiency_pct + r.penetration_pct - 100) < 1e-9);
+  // THE IDENTITY THAT IS THE WHOLE ECONOMICS: each factor of ten off the
+  // penetration costs exactly the same plate area, so the area from 99 to 99.9
+  // EQUALS the area from 0 to 90.
+  assert.ok(Math.abs(r.area_per_decade_ft2 - Math.log(10) * 1000 / 0.2) < 1e-9);
+  assert.ok(Math.abs(r.area_99 - 2 * r.area_90) < 1e-9);
+  assert.ok(Math.abs(r.area_999 - 3 * r.area_90) < 1e-9);
+  assert.ok(Math.abs((r.area_999 - r.area_99) - r.area_90) < 1e-9);
+  // Those areas reproduce their own efficiencies exactly.
+  for (const [area, pct] of [[r.area_90, 90], [r.area_99, 99], [r.area_999, 99.9]]) {
+    const x = _v1724({ ...base, plate_area_ft2: area });
+    assert.ok(Math.abs(x.efficiency_pct - pct) < 1e-6);
+  }
+  // IDENTITY inverted: the area a target needs, fed back in, hits the target.
+  const sized = _v1724({ ...base, plate_area_ft2: r.area_for_target_ft2 });
+  assert.ok(Math.abs(sized.efficiency_pct - 99.0) < 1e-6);
+  assert.ok(Math.abs(r.additional_area_ft2 - (r.area_for_target_ft2 - 12000)) < 1e-9);
+  // Efficiency rises monotonically with area and approaches 100 without
+  // reaching it. The sweep stops at 100,000 sq ft because past roughly there
+  // the penetration underflows a double and the arithmetic -- not the
+  // physics -- returns exactly 100.
+  let last = -1;
+  for (const A of [1000, 5000, 12000, 30000, 100000]) {
+    const x = _v1724({ ...base, plate_area_ft2: A });
+    assert.ok(x.efficiency_pct > last);
+    assert.ok(x.efficiency_pct < 100);
+    last = x.efficiency_pct;
+  }
+  // Doubling the flow halves the exponent, which is the same as halving area.
+  const doubleFlow = _v1724({ ...base, gas_acfm: 120000 });
+  const halfArea = _v1724({ ...base, plate_area_ft2: 6000 });
+  assert.ok(Math.abs(doubleFlow.efficiency_pct - halfArea.efficiency_pct) < 1e-9);
+  assert.ok(_v1724({ ...base, target_efficiency_pct: 100 }).error);
+  assert.ok(_v1724({ ...base, migration_velocity_fps: 0 }).error);
+});
+
+test("bounds: spec-v1725 computeCarbonBedLife -- the three placeholders, computed", () => {
+  const base = { carbon_lb: 2000, working_capacity_pct: 10, loading_lb_h: 1.4, operating_hours_per_day: 8, degraded_capacity_pct: 6 };
+  const r = _v1725(base);
+  // IDENTITY: capacity, and life as capacity over the loading rate.
+  assert.ok(Math.abs(r.bed_capacity_lb - 2000 * 0.10) < 1e-12);
+  assert.ok(Math.abs(r.bed_life_hours - 200 / 1.4) < 1e-9);
+  // THE THREE PLACEHOLDERS spec-v1725 LEFT UNRENDERED, computed and pinned:
+  // {200/1.4/24:.1f} days, {200/1.4/8:.0f} operating days, and the percentage
+  // shorter that humidity costs.
+  assert.ok(Math.abs(r.bed_life_days - 200 / 1.4 / 24) < 1e-9);
+  assert.ok(Math.abs(r.bed_life_days - 5.95) < 0.01);
+  assert.ok(Math.abs(r.operating_days - 200 / 1.4 / 8) < 1e-9);
+  assert.ok(Math.abs(r.operating_days - 17.86) < 0.01);
+  assert.ok(Math.abs(r.degraded_life_hours - 120 / 1.4) < 1e-9);
+  assert.ok(Math.abs(r.life_lost_pct - 40) < 1e-9);
+  // IDENTITY: life lost is exactly the capacity ratio, so a 40% capacity cut
+  // is a 40% life cut -- linear, with no threshold anywhere.
+  assert.ok(Math.abs(r.life_lost_pct - (1 - 6 / 10) * 100) < 1e-9);
+  assert.ok(Math.abs(r.degraded_life_hours / r.bed_life_hours - 6 / 10) < 1e-12);
+  // Life is linear in carbon mass and inverse in loading.
+  assert.ok(Math.abs(_v1725({ ...base, carbon_lb: 4000 }).bed_life_hours - 2 * r.bed_life_hours) < 1e-9);
+  assert.ok(Math.abs(_v1725({ ...base, loading_lb_h: 2.8 }).bed_life_hours - r.bed_life_hours / 2) < 1e-9);
+  // A degraded capacity that is not worse than the design one is not a
+  // degradation, and the flag says so rather than reporting a negative loss.
+  const same = _v1725({ ...base, degraded_capacity_pct: 10 });
+  assert.equal(same.has_degraded, false);
+  assert.equal(same.life_lost_pct, 0);
+  assert.equal(_v1725({ ...base, degraded_capacity_pct: 12 }).has_degraded, false);
+  assert.equal(_v1725({ ...base, degraded_capacity_pct: 9.99 }).has_degraded, true);
+  assert.ok(_v1725({ ...base, working_capacity_pct: 0 }).error);
+  assert.ok(_v1725({ ...base, operating_hours_per_day: 25 }).error);
+});
+
+test("bounds: spec-v1726 computePlumeRiseBriggs -- 185 ft, not the asserted hundred", () => {
+  const base = { stack_height_ft: 120, stack_diameter_ft: 5, exit_velocity_fps: 55, exit_temp_f: 350, ambient_temp_f: 60, wind_mph: 12 };
+  const r = _v1726(base);
+  // IDENTITY: the buoyancy flux in SI, and the branch it selects.
+  const vMs = 55 * 0.3048, dM = 5 * 0.3048;
+  const tsK = (350 + 459.67) * 5 / 9, taK = (60 + 459.67) * 5 / 9;
+  assert.ok(Math.abs(r.buoyancy_flux - 9.80665 * vMs * dM * dM * (tsK - taK) / (4 * tsK)) < 1e-9);
+  assert.equal(r.is_low_flux, true);
+  assert.ok(r.buoyancy_flux < 55);
+  // THE SPEC ASSERTED "on the order of a hundred feet" AND 220 ft EFFECTIVE.
+  // Briggs on its own inputs gives 185 and 305.
+  assert.ok(Math.abs(r.plume_rise_ft - 185.3) < 0.5);
+  assert.ok(Math.abs(r.effective_height_ft - 305.3) < 0.5);
+  assert.ok(r.plume_rise_ft > 150);
+  assert.ok(Math.abs(r.effective_height_ft - (120 + r.plume_rise_ft)) < 1e-9);
+  // AND ITS "factor of about four" ON CONCENTRATION IS 6.5.
+  assert.ok(Math.abs(r.concentration_factor - (r.effective_height_ft / 120) ** 2) < 1e-12);
+  assert.ok(Math.abs(r.concentration_factor - 6.47) < 0.05);
+  assert.ok(r.concentration_factor > 5);
+  // The rise here exceeds the stack itself, which is the tile's headline.
+  assert.equal(r.rise_exceeds_stack, true);
+  // IDENTITY: rise is exactly inverse in wind, so doubling it halves the rise.
+  const windy = _v1726({ ...base, wind_mph: 24 });
+  assert.ok(Math.abs(windy.plume_rise_ft - r.plume_rise_ft / 2) < 1e-9);
+  assert.ok(Math.abs(r.double_wind_rise_ft - windy.plume_rise_ft) < 1e-9);
+  assert.ok(Math.abs(r.double_wind_effective_ft - windy.effective_height_ft) < 1e-9);
+  // Flux is linear in velocity and in the temperature excess, and quadratic in
+  // diameter -- so a wider stack lifts far more than a faster one.
+  assert.ok(Math.abs(_v1726({ ...base, exit_velocity_fps: 110 }).buoyancy_flux - 2 * r.buoyancy_flux) < 1e-9);
+  assert.ok(Math.abs(_v1726({ ...base, stack_diameter_ft: 10 }).buoyancy_flux - 4 * r.buoyancy_flux) < 1e-9);
+  // A large enough flux crosses the 55 break and switches exponent.
+  const big = _v1726({ ...base, stack_diameter_ft: 20, exit_velocity_fps: 100 });
+  assert.equal(big.is_low_flux, false);
+  assert.ok(big.buoyancy_flux > 55);
+  // A plume no warmer than ambient is not buoyant, and is refused rather than
+  // given a rise of zero that reads like an answer.
+  assert.ok(_v1726({ ...base, exit_temp_f: 60 }).error);
+  assert.ok(_v1726({ ...base, wind_mph: 0 }).error);
+});

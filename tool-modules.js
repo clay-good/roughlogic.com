@@ -1271,6 +1271,17 @@ export const TOOL_MODULES = (() => {
     "tractor-ballast",
     "anhydrous-ammonia-rate",
   ]);
+  // spec-v1717..v1726: the air quality and emissions bench (Group G). Two
+  // threads: the REGULATORY number is rarely the one a plant tracks (potential
+  // to emit at 8,760 hours, VOC less water, a six-minute opacity average), and
+  // the control equipment is governed by exponentials and expansions that make
+  // intuition unreliable (Deutsch, the oxidizer gas expansion, breakthrough).
+  declare("./calc-airquality.js", "AIRQUALITY_RENDERERS", [
+    "stack-emission-pte", "opacity-six-minute", "baghouse-cleaning-interval",
+    "scrubber-lg-ratio", "thermal-oxidizer-residence", "coating-voc-compliance",
+    "spcc-containment-volume", "esp-deutsch-efficiency", "carbon-bed-life",
+    "plume-rise-briggs",
+  ]);
   // spec-v1524..v1533: the oil, gas and pipeline bench (Group E). Two benches
   // in one module because they share a vocabulary and a reader: the
   // transmission and integrity side (MAOP, gas flow, station spacing, pigging,

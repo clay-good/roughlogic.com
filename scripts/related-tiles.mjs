@@ -1562,6 +1562,17 @@ const RELATED = {
   "nesc-district-loading": ["conductor-sag-at-temperature","transverse-wind-load-conductor","conductor-blowout"],
   "conductor-creep-elongation": ["conductor-sag-at-temperature","line-ground-clearance-nesc","ruling-span"],
   "sagging-return-wave": ["ruling-span","conductor-sag-at-temperature","line-ground-clearance-nesc"],
+  // spec-v1717..v1726: air quality band.
+  "stack-emission-pte": ["opacity-six-minute","coating-voc-compliance","plume-rise-briggs"],
+  "opacity-six-minute": ["stack-emission-pte","esp-deutsch-efficiency","baghouse-cleaning-interval"],
+  "baghouse-cleaning-interval": ["dust-collector-air-to-cloth","esp-deutsch-efficiency","opacity-six-minute"],
+  "scrubber-lg-ratio": ["cyclone-separator-sizing","thermal-oxidizer-residence","esp-deutsch-efficiency"],
+  "thermal-oxidizer-residence": ["carbon-bed-life","scrubber-lg-ratio","coating-voc-compliance"],
+  "coating-voc-compliance": ["spray-booth-airflow","carbon-bed-life","stack-emission-pte"],
+  "spcc-containment-volume": ["concrete-washout-volume","tank-volume","stack-emission-pte"],
+  "esp-deutsch-efficiency": ["baghouse-cleaning-interval","cyclone-separator-sizing","opacity-six-minute"],
+  "carbon-bed-life": ["thermal-oxidizer-residence","hepa-filter-life","coating-voc-compliance"],
+  "plume-rise-briggs": ["chimney-height-for-draft","stack-emission-pte","opacity-six-minute"],
   // spec-v1622..v1631: HVAC test-and-balance and hydronic systems band.
   "flow-hood-correction": ["pitot-traverse-cfm","proportional-balance-ratio","traverse-closure"],
   "fan-system-effect": ["fan-affinity-laws","duct-leakage","flow-hood-correction"],
