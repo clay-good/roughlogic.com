@@ -61,6 +61,60 @@ function _v9_pressureAtAltitude_kPa(z_ft) {
   return 101.325 * Math.pow(1 - 2.25577e-5 * z_m, 5.2559);
 }
 
+// Compact renderer factory, copied verbatim from calc-arborist.js (same
+// ui-fields imports) per the new-module convention; only the inner render
+// function's name differs, so the schema-coverage gates read it unchanged.
+function _simpleRenderer(spec) {
+  const _hsRender = function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      let field;
+      if (f.kind === "select") field = makeSelect(f.label, f.id || f.key, f.options);
+      else field = makeNumber(f.label, f.id || f.key, f.attrs || { step: "any", min: "0" });
+      fields[f.key] = field;
+      if (f.default !== undefined) {
+        if (f.kind === "select") field.select.value = f.default;
+        else field.input.value = String(f.default);
+      }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key];
+        else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) {
+        if (f.kind === "select") params[f.key] = fields[f.key].select.value;
+        else params[f.key] = Number(fields[f.key].input.value) || 0;
+      }
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) {
+      const el = f.kind === "select" ? fields[f.key].select : fields[f.key].input;
+      el.addEventListener(f.kind === "select" ? "change" : "input", update);
+    }
+  };
+
+  _hsRender.schema = {
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
+    citation: spec.citation ?? null,
+    scope: spec.scope ?? null,
+  };
+  return _hsRender;
+}
+
 export const HVACSYSTEMS_RENDERERS = {};
 
 // =====================================================================
@@ -1543,3 +1597,906 @@ function _v980renderValveAuthority(inputRegion, outputRegion, citationEl) {
   for (const f of [vd, cd]) f.input.addEventListener("input", update);
 }
 HVACSYSTEMS_RENDERERS["valve-authority"] = _v980renderValveAuthority;
+
+// spec-v1622..v1631 constants. Leading-underscore names of their own: several
+// are HVAC CONVENTIONS rather than definitions, and pinning them to a shared
+// catalog name would make one cited relation disagree with another.
+//
+// Exact by definition: 1 mechanical hp = 550 ft-lbf/s = 745.6998715822702 W.
+const _HS_KW_PER_HP = 0.745699872;
+// The sensible-heat constant, 1.08 = 0.075 lb/cu ft x 0.24 BTU/lb-degF x 60
+// min/h, at sea level and standard air.
+const _HS_SENSIBLE_CONST = 1.08;
+// The total-heat (enthalpy) constant, 4.5 = 0.075 lb/cu ft x 60 min/h.
+const _HS_TOTAL_HEAT_CONST = 4.5;
+// The water-side transport constant, 500 = 8.33 lb/gal x 60 min/h x 1.0
+// BTU/lb-degF. The catalog's water DENSITY constants are 8.34 and 8.3454;
+// this is the customary 500 the relation is written with.
+const _HS_WATER_CONST = 500;
+// Feet of head per psi for water at ordinary temperature, as the trade writes
+// it: 2.31 ft/psi.
+const _HS_FT_PER_PSI = 2.31;
+
+// =====================================================================
+// spec-v1622..v1631: the HVAC test-and-balance and hydronic systems band.
+// =====================================================================
+//
+// spec-v1622: flow hood reading correction and diffuser airflow.
+//
+// The spec's own worked example contradicts its conclusion. With a 0.94 factor
+// on 16,000 cfm of readings, the CORRECTED total is 15,040 -- so the balancer
+// working UNCORRECTED sees a system at design, and it is the correction that
+// reveals the shortfall. The spec says the opposite. Nothing here asserts a
+// direction: the correction's effect is computed and named from the factor.
+// dims: in { hood_reading_cfm: L^3 T^-1, correction_factor: dimensionless, reference_traverse_cfm: L^3 T^-1, design_cfm: L^3 T^-1, system_reading_total_cfm: L^3 T^-1 } out: { corrected_cfm: L^3 T^-1, derived_factor: dimensionless, pct_of_design: dimensionless, uncorrected_pct_of_design: dimensionless, system_corrected_cfm: L^3 T^-1, system_error_cfm: L^3 T^-1 }
+export function computeFlowHoodCorrection({
+  hood_reading_cfm = 0, correction_factor = 1, reference_traverse_cfm = 0,
+  design_cfm = 0, system_reading_total_cfm = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(hood_reading_cfm > 0)) return { error: "The hood reading must be positive (cfm)." };
+  if (!(correction_factor > 0)) return { error: "The correction factor must be positive." };
+  if (reference_traverse_cfm < 0) return { error: "A reference traverse reading cannot be negative (cfm)." };
+  if (design_cfm < 0) return { error: "Design airflow cannot be negative (cfm)." };
+  if (system_reading_total_cfm < 0) return { error: "The system reading total cannot be negative (cfm)." };
+  // A factor established on the actual system from a traverse comparison beats
+  // one taken from a table, so it is derived here when a reference is entered.
+  const has_reference = reference_traverse_cfm > 0;
+  const derived_factor = has_reference ? reference_traverse_cfm / hood_reading_cfm : 0;
+  const factor_used = has_reference ? derived_factor : correction_factor;
+  const corrected_cfm = hood_reading_cfm * factor_used;
+  // The direction is COMPUTED, not asserted: a factor above one means the hood
+  // was reading low, below one means it was reading high.
+  const hood_reads_low = factor_used > 1;
+  const correction_pct = (factor_used - 1) * 100;
+  const direction_verdict = Math.abs(factor_used - 1) < 1e-12
+    ? "the factor is 1.00, so the hood reading stands as measured"
+    : hood_reads_low
+      ? "the factor is above 1, so the hood was reading LOW by " + fmt(Math.abs(correction_pct), 1) + "% and the correction RAISES the reading -- the back pressure a hood adds in series with the diffuser is the usual cause"
+      : "the factor is below 1, so the hood was reading HIGH by " + fmt(Math.abs(correction_pct), 1) + "% and the correction LOWERS the reading";
+  const has_design = design_cfm > 0;
+  const pct_of_design = has_design ? corrected_cfm / design_cfm * 100 : 0;
+  const uncorrected_pct_of_design = has_design ? hood_reading_cfm / design_cfm * 100 : 0;
+  const design_verdict = !has_design
+    ? "(no design airflow entered)"
+    : fmt(pct_of_design, 0) + "% of design corrected, against " + fmt(uncorrected_pct_of_design, 0) + "% uncorrected -- a " + fmt(Math.abs(pct_of_design - uncorrected_pct_of_design), 0) + " point difference on the report for this outlet alone";
+  // The systematic case. A factor applied across a whole report does not
+  // average out, because the error is in one direction on every reading.
+  const has_system = system_reading_total_cfm > 0;
+  const system_corrected_cfm = has_system ? system_reading_total_cfm * factor_used : 0;
+  const system_error_cfm = system_corrected_cfm - system_reading_total_cfm;
+  const system_verdict = !has_system
+    ? "(no system reading total entered)"
+    : "across the whole report, " + fmt(system_reading_total_cfm, 0) + " cfm of readings correct to " + fmt(system_corrected_cfm, 0) + " cfm, a " + fmt(Math.abs(system_error_cfm), 0) + " cfm " + (system_error_cfm > 0 ? "increase" : "reduction") + " -- the error is systematic and in one direction, so it does not average out";
+  if (![corrected_cfm, derived_factor, pct_of_design, uncorrected_pct_of_design, system_corrected_cfm, system_error_cfm].every(Number.isFinite)) return { error: "Flow hood correction math is not a finite value." };
+  return {
+    corrected_cfm, factor_used, has_reference, derived_factor,
+    hood_reads_low, correction_pct, direction_verdict,
+    has_design, pct_of_design, uncorrected_pct_of_design, design_verdict,
+    has_system, system_corrected_cfm, system_error_cfm, system_verdict,
+    note: "The airflow a balancing hood reading actually represents, once its correction factor is applied. A hood is a resistance in series with the diffuser, and adding resistance to a system reduces the flow through it -- so a hood commonly reads LOW, and how much depends on how much authority the diffuser had to begin with. On a stiff system with plenty of pressure available the effect is small; on a soft one, a long flex run, a nearly closed damper, or a fan riding a flat part of its curve, it can be large. The correction factor is therefore not a property of the hood alone, which is why entering a reference traverse reading here DERIVES the factor from the system in front of you rather than taking one from a table. That is the better practice: traverse three or four representative branches, compare against the sum of the hood readings on their outlets, and apply the ratio to the rest. One exercise calibrates the whole report. The direction of the correction is computed rather than assumed, because it can run either way: a factor above one means the hood was reading low and the correction raises the number, below one means the reverse. What matters more than the direction is that the error is SYSTEMATIC -- it is the same sign on every reading -- so it does not average out across a report, and an uncorrected total misstates the whole system by the same proportion it misstates one outlet. The placement failures are simpler and larger than any correction factor: a hood that does not seal to the ceiling leaks and reads low, and one used on a linear slot or a perforated face without the right adapter has an unrepresentative velocity profile across its sensor grid. Both are worth checking before any factor is applied, and neither is captured here. This does not measure anything, select a hood or adapter, or model the back pressure from the hood's own resistance and the diffuser's pressure-flow curve. A duct traverse is the reference measurement, the hood manufacturer's data and AABC or NEBB procedure govern, and the balancer's own judgment decides when a reading is not usable at all.",
+  };
+}
+export const flowHoodCorrectionExample = { inputs: { hood_reading_cfm: 420, correction_factor: 0.94, reference_traverse_cfm: 0, design_cfm: 400, system_reading_total_cfm: 16000 } };
+HVACSYSTEMS_RENDERERS["flow-hood-correction"] = _simpleRenderer({
+  citation: "Citation: the balancing-hood correction as AABC and NEBB field practice states it -- corrected flow = reading x correction factor, with the factor best established on the actual system by comparing hood readings against a duct traverse rather than taken from a table. A hood is a resistance in series with the diffuser, so it commonly reads low, and the magnitude depends on the diffuser's available pressure. It does not model the back pressure from the hood's own resistance, select a hood or adapter, or capture placement failures (an unsealed hood, or a linear slot without the right adapter). A duct traverse is the reference measurement; the hood manufacturer's data and the balancing procedure in force govern.",
+  example: flowHoodCorrectionExample.inputs,
+  fields: [
+    { key: "hood_reading_cfm", label: "Hood reading (cfm)", kind: "number" },
+    { key: "correction_factor", label: "Correction factor", kind: "number", default: 1 },
+    { key: "reference_traverse_cfm", label: "Reference traverse on the same outlet (cfm, 0 to use the factor)", kind: "number" },
+    { key: "design_cfm", label: "Design airflow (cfm, 0 to skip)", kind: "number" },
+    { key: "system_reading_total_cfm", label: "Total of all hood readings on the report (cfm, 0 to skip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "c", id: "fhc-out-c", label: "Corrected airflow", value: (r) => fmt(r.corrected_cfm, 0) + " cfm at a factor of " + fmt(r.factor_used, 3) + (r.has_reference ? ", derived from the reference traverse" : "") },
+    { key: "d", id: "fhc-out-d", label: "Which way it corrects", value: (r) => r.direction_verdict },
+    { key: "g", id: "fhc-out-g", label: "Against design", value: (r) => r.design_verdict },
+    { key: "s", id: "fhc-out-s", label: "Across the report", value: (r) => r.system_verdict },
+    { key: "n", id: "fhc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFlowHoodCorrection,
+});
+
+// =====================================================================
+// spec-v1623: fan system effect and installed performance.
+// =====================================================================
+//
+// A fan's rated curve is measured with ideal inlet and outlet conditions, and
+// a real installation rarely provides them. The straight-duct requirement is
+// the AMCA effective duct length: about 2.5 equivalent diameters at 2,500 fpm,
+// plus one more per additional 1,000 fpm.
+// dims: in { flow_cfm: L^3 T^-1, outlet_width_in: L, outlet_height_in: L, straight_duct_ft: L, fan_curve_tp_inwg: M L^-1 T^-2, measured_tp_inwg: M L^-1 T^-2 } out: { outlet_area_ft2: L^2, outlet_velocity_fpm: L T^-1, equivalent_diameter_ft: L, effective_length_ft: L, length_shortfall_ft: L, pressure_shortfall_inwg: M L^-1 T^-2 }
+export function computeFanSystemEffect({
+  flow_cfm = 0, outlet_width_in = 0, outlet_height_in = 0, straight_duct_ft = 0,
+  inlet_condition = "clear", fan_curve_tp_inwg = 0, measured_tp_inwg = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(flow_cfm > 0)) return { error: "Fan airflow must be positive (cfm)." };
+  if (!(outlet_width_in > 0)) return { error: "Outlet width must be positive (in)." };
+  if (!(outlet_height_in > 0)) return { error: "Outlet height must be positive (in)." };
+  if (straight_duct_ft < 0) return { error: "Straight duct length cannot be negative (ft)." };
+  if (fan_curve_tp_inwg < 0 || measured_tp_inwg < 0) return { error: "Pressures cannot be negative (in wg)." };
+  const outlet_area_ft2 = outlet_width_in * outlet_height_in / 144;
+  const outlet_velocity_fpm = flow_cfm / outlet_area_ft2;
+  // The equivalent round diameter of the outlet, which is what the effective
+  // duct length is counted in.
+  const equivalent_diameter_ft = Math.sqrt(4 * outlet_area_ft2 / Math.PI);
+  // AMCA's effective duct length: 2.5 diameters at 2,500 fpm and below, plus
+  // one diameter for each additional 1,000 fpm.
+  const diameters_required = outlet_velocity_fpm <= 2500
+    ? 2.5
+    : 2.5 + (outlet_velocity_fpm - 2500) / 1000;
+  const effective_length_ft = diameters_required * equivalent_diameter_ft;
+  const length_shortfall_ft = effective_length_ft - straight_duct_ft;
+  const length_adequate = straight_duct_ft >= effective_length_ft;
+  const length_fraction = effective_length_ft > 0 ? straight_duct_ft / effective_length_ft : 0;
+  const outlet_verdict = length_adequate
+    ? "the " + fmt(straight_duct_ft, 1) + " ft of straight duct meets the " + fmt(effective_length_ft, 1) + " ft effective length at this velocity, so no outlet system effect applies"
+    : "only " + fmt(straight_duct_ft, 1) + " ft of straight duct against the " + fmt(effective_length_ft, 1) + " ft needed (" + fmt(length_fraction * 100, 0) + "% of it) -- an OUTLET system effect applies, because the blast area has not expanded to the full duct and the static regain does not occur";
+  // The inlet case, which is worse and more common. The factor is a named
+  // condition rather than a number, because AMCA's tables depend on the
+  // geometry in ways a single coefficient cannot carry.
+  const inlet_is_swirl = inlet_condition === "elbow_with_swirl";
+  const inlet_is_elbow = inlet_condition === "elbow_against_swirl" || inlet_is_swirl;
+  const inlet_verdict = inlet_condition === "clear"
+    ? "the inlet is clear, so no inlet system effect is claimed here"
+    : inlet_is_swirl
+      ? "an inlet elbow spinning the air WITH the wheel rotation is the WORST case: the wheel does less work on air already moving with it, and this loss is invisible in any measurement taken downstream of the fan"
+      : "an inlet elbow close to the fan delivers air unevenly across the wheel; the penalty depends on the clearance and the elbow geometry, and it is invisible downstream of the fan";
+  // The diagnostic: measured static above the curve at design flow is the
+  // signature. Speeding the fan up raises the loss with the flow.
+  const has_pressures = fan_curve_tp_inwg > 0 && measured_tp_inwg > 0;
+  const pressure_shortfall_inwg = has_pressures ? measured_tp_inwg - fan_curve_tp_inwg : 0;
+  const measured_exceeds_curve = has_pressures && pressure_shortfall_inwg > 0;
+  const diagnostic_verdict = !has_pressures
+    ? "(no fan curve and measured pressures entered)"
+    : measured_exceeds_curve
+      ? "the measured total pressure is " + fmt(pressure_shortfall_inwg, 3) + " in wg ABOVE the curve at this flow, which is the system effect signature -- speeding the fan up raises the flow AND the loss with it, so the fix is a duct modification rather than more rpm"
+      : "the measured total pressure is at or below the curve at this flow, so a system effect is not the explanation for a shortfall here";
+  if (![outlet_area_ft2, outlet_velocity_fpm, equivalent_diameter_ft, effective_length_ft, length_shortfall_ft, pressure_shortfall_inwg].every(Number.isFinite)) return { error: "Fan system effect math is not a finite value." };
+  return {
+    outlet_area_ft2, outlet_velocity_fpm, equivalent_diameter_ft,
+    diameters_required, effective_length_ft, length_shortfall_ft, length_adequate, length_fraction, outlet_verdict,
+    inlet_is_elbow, inlet_is_swirl, inlet_verdict,
+    has_pressures, pressure_shortfall_inwg, measured_exceeds_curve, diagnostic_verdict,
+    note: "Whether a fan installation gives the fan the inlet and outlet conditions its rated curve assumes, and what it costs when it does not. System effect exists because a catalogue curve is measured with ideal approach and discharge, and a real installation rarely provides them. The outlet case is about recovery: air leaves a centrifugal fan through a small blast area at high velocity and needs straight duct to expand and convert that velocity into static pressure. AMCA's effective duct length is about two and a half equivalent diameters at 2,500 fpm, plus one more diameter per additional 1,000 fpm; cut that short with an elbow or a transition and the recovery does not happen, so the fan delivers less static than its curve says at the same flow. The inlet case is worse and more common. An elbow directly at the inlet delivers air unevenly across the wheel, and an elbow that pre-spins the air in the DIRECTION OF ROTATION reduces the pressure the fan can develop, because the wheel is doing less work on air that is already moving with it. That loss is invisible in any measurement taken downstream of the fan, which is why it goes unfound. The reason this belongs in a balancer's hands rather than only a designer's is diagnostic. A fan running at design speed, drawing design amps, short on flow, and showing MORE static pressure than the design calculated is very often a system effect problem -- and no amount of speeding it up fixes the underlying loss, it just spends more energy on it. Speeding the fan up raises the flow and raises the loss with it. Identifying it points at a duct modification, a turning vane, or a different elbow orientation, which is the actual fix and usually the cheaper one. This computes the effective duct length and reports whether the installation meets it; it does NOT compute the system effect pressure penalty itself, because AMCA's factors depend on the specific geometry, the blast area ratio and the elbow orientation in ways no single coefficient carries. AMCA Publication 201, the fan manufacturer's rated curve, and the balancing agency's own measurements govern.",
+  };
+}
+export const fanSystemEffectExample = { inputs: { flow_cfm: 12000, outlet_width_in: 30, outlet_height_in: 24, straight_duct_ft: 3.0, inlet_condition: "elbow_with_swirl", fan_curve_tp_inwg: 2.5, measured_tp_inwg: 2.9 } };
+HVACSYSTEMS_RENDERERS["fan-system-effect"] = _simpleRenderer({
+  citation: "Citation: AMCA Publication 201 (Fans and Systems) by name -- the effective duct length of about 2.5 equivalent outlet diameters at 2,500 fpm plus one diameter per additional 1,000 fpm, below which an outlet system effect applies, and the inlet conditions (an elbow close to the inlet, worst when it spins the air WITH the wheel rotation) that reduce the pressure the fan can develop. It reports whether the installation meets the effective length; it does NOT compute the system effect pressure penalty, because AMCA's factors depend on the specific geometry, blast area ratio and elbow orientation. The fan manufacturer's rated curve and the balancing agency's measurements govern.",
+  example: fanSystemEffectExample.inputs,
+  fields: [
+    { key: "flow_cfm", label: "Fan airflow (cfm)", kind: "number" },
+    { key: "outlet_width_in", label: "Fan outlet width (in)", kind: "number" },
+    { key: "outlet_height_in", label: "Fan outlet height (in)", kind: "number" },
+    { key: "straight_duct_ft", label: "Straight duct at the discharge (ft)", kind: "number" },
+    { key: "inlet_condition", label: "Inlet condition", kind: "select", default: "clear", options: [{ value: "clear", label: "Clear inlet (no elbow close by)" }, { value: "elbow_against_swirl", label: "Elbow at the inlet, against the rotation" }, { value: "elbow_with_swirl", label: "Elbow at the inlet, spinning WITH the rotation (worst)" }] },
+    { key: "fan_curve_tp_inwg", label: "Fan curve total pressure at this flow (in wg, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "measured_tp_inwg", label: "Measured total pressure (in wg)", kind: "number", attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "v", id: "fse-out-v", label: "Outlet velocity", value: (r) => fmt(r.outlet_velocity_fpm, 0) + " fpm through " + fmt(r.outlet_area_ft2, 2) + " sq ft" },
+    { key: "e", id: "fse-out-e", label: "Effective duct length needed", value: (r) => fmt(r.effective_length_ft, 1) + " ft (" + fmt(r.diameters_required, 2) + " x the " + fmt(r.equivalent_diameter_ft, 2) + " ft equivalent diameter)" },
+    { key: "o", id: "fse-out-o", label: "At the outlet", value: (r) => r.outlet_verdict },
+    { key: "i", id: "fse-out-i", label: "At the inlet", value: (r) => r.inlet_verdict },
+    { key: "d", id: "fse-out-d", label: "Diagnostic", value: (r) => r.diagnostic_verdict },
+    { key: "n", id: "fse-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFanSystemEffect,
+});
+
+// =====================================================================
+// spec-v1624: proportional balancing ratio method.
+// =====================================================================
+//
+// Air systems are COUPLED: closing a damper at one outlet raises the pressure
+// available to every other outlet on the branch. Proportional balancing
+// exploits the coupling instead of fighting it -- equalize ratios first, which
+// is a stable target, then set the whole branch with one damper.
+//
+// The reference is the LOWEST ratio and it is left wide open, because it has
+// the least pressure available; throttling to match a HIGH outlet would mean
+// opening the low one beyond fully open, which is not available. Helper above
+// the exports so the v14 lint reads the annotation, returning an expression
+// rather than a bare identifier.
+const _hsRatio = (measured, design) => (design > 0 ? measured / design : 0);
+// dims: in { design_1_cfm: L^3 T^-1, measured_1_cfm: L^3 T^-1, design_2_cfm: L^3 T^-1, measured_2_cfm: L^3 T^-1, design_3_cfm: L^3 T^-1, measured_3_cfm: L^3 T^-1, design_4_cfm: L^3 T^-1, measured_4_cfm: L^3 T^-1, design_5_cfm: L^3 T^-1, measured_5_cfm: L^3 T^-1, design_6_cfm: L^3 T^-1, measured_6_cfm: L^3 T^-1 } out: { reference_ratio: dimensionless, branch_design_cfm: L^3 T^-1, branch_measured_cfm: L^3 T^-1, branch_after_equalizing_cfm: L^3 T^-1, branch_adjustment_factor: dimensionless }
+export function computeProportionalBalanceRatio({
+  design_1_cfm = 0, measured_1_cfm = 0, design_2_cfm = 0, measured_2_cfm = 0,
+  design_3_cfm = 0, measured_3_cfm = 0, design_4_cfm = 0, measured_4_cfm = 0,
+  design_5_cfm = 0, measured_5_cfm = 0, design_6_cfm = 0, measured_6_cfm = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const pairs = [
+    ["A", design_1_cfm, measured_1_cfm], ["B", design_2_cfm, measured_2_cfm],
+    ["C", design_3_cfm, measured_3_cfm], ["D", design_4_cfm, measured_4_cfm],
+    ["E", design_5_cfm, measured_5_cfm], ["F", design_6_cfm, measured_6_cfm],
+  ];
+  for (const [label, design, measured] of pairs) {
+    if (design < 0 || measured < 0) return { error: "Outlet " + label + ": flows cannot be negative (cfm)." };
+    if (design === 0 && measured > 0) return { error: "Outlet " + label + " has a measured flow but no design flow, so it has no ratio." };
+  }
+  const active = pairs.filter(([, design]) => design > 0);
+  if (active.length < 2) return { error: "Enter at least two outlets with a design flow -- proportional balancing is about the relationship between terminals." };
+  const rows = active.map(([label, design, measured]) => ({ label, design, measured, ratio: _hsRatio(measured, design) }));
+  const branch_design_cfm = rows.reduce((s, r) => s + r.design, 0);
+  const branch_measured_cfm = rows.reduce((s, r) => s + r.measured, 0);
+  // The reference is the LOWEST ratio and it is left alone.
+  let reference = rows[0];
+  for (const r of rows) if (r.ratio < reference.ratio) reference = r;
+  const reference_ratio = reference.ratio;
+  const reference_label = reference.label;
+  if (!(reference_ratio > 0)) return { error: "Every outlet needs a positive measured flow before ratios can be equalized." };
+  // Target each outlet at the reference ratio; the reference itself does not move.
+  const targets = rows.map((r) => ({
+    label: r.label, ratio: r.ratio, design: r.design, measured: r.measured,
+    target: r.design * reference_ratio,
+    is_reference: r.label === reference_label,
+    throttle_cfm: r.measured - r.design * reference_ratio,
+  }));
+  const branch_after_equalizing_cfm = branch_design_cfm * reference_ratio;
+  const branch_adjustment_factor = reference_ratio > 0 ? 1 / reference_ratio : 0;
+  const ratio_spread = Math.max(...rows.map((r) => r.ratio)) - reference_ratio;
+  const already_proportional = ratio_spread < 0.01;
+  const rows_text = targets.map((t) => t.label + " " + fmt(t.ratio, 2) + (t.is_reference ? " (REFERENCE, leave wide open)" : " -> " + fmt(t.target, 0) + " cfm")).join("; ");
+  const method_verdict = already_proportional
+    ? "the outlets are already within a hundredth of each other in ratio, so equalizing has nothing to do -- go straight to the branch damper"
+    : "throttle every outlet to the " + fmt(reference_ratio, 2) + " ratio that outlet " + reference_label + " sets, leaving " + reference_label + " wide open; then open the branch damper by a factor of " + fmt(branch_adjustment_factor, 3) + " to bring the whole set to design";
+  if (![reference_ratio, branch_design_cfm, branch_measured_cfm, branch_after_equalizing_cfm, branch_adjustment_factor].every(Number.isFinite)) return { error: "Proportional balancing math is not a finite value." };
+  return {
+    outlet_count: rows.length, rows_text, reference_label, reference_ratio,
+    branch_design_cfm, branch_measured_cfm, branch_after_equalizing_cfm,
+    branch_adjustment_factor, ratio_spread, already_proportional, method_verdict,
+    note: "The proportional balancing method for a branch of air terminals, worked as a set rather than one outlet at a time. Air systems are COUPLED: closing a damper at one outlet raises the pressure available to every other outlet on the branch, so an outlet set exactly to design will not be at design once the next one is adjusted. Balancing outlet by outlet chases that coupling around the branch, sometimes for hours, and often never converges. Proportional balancing exploits the coupling instead of fighting it. If every outlet sits at the same FRACTION of its design, then any change in branch flow scales them all by the same factor and the ratios are preserved. So the balancer equalizes ratios first, which is a stable target, and only then opens the branch damper to bring the whole set to 100 percent. One adjustment at the end sets everything. The reference outlet is the LOWEST ratio and it is left wide open, because it is the one with the least pressure available -- throttling everything to match a HIGH outlet would mean opening the low one beyond fully open, which is not available. That single rule is what makes the method converge, and it is the part that gets done backwards by someone balancing from the first outlet on the drawing. The targets reported here are where each outlet should read once equalized, and the branch adjustment factor is what the branch damper then has to deliver. Measured flows are ENTERED and should be corrected hood readings or traverse values rather than raw ones, because a systematic instrument error shifts every ratio together and moves the reference. This does not model the damper positions, the branch pressure, or the interaction between branches on a common trunk; a system with too little pressure at the reference outlet cannot be balanced by this or any other method, and that is a design or fan problem the method will reveal rather than solve. The AABC or NEBB procedure in force and the balancer's own judgment govern.",
+  };
+}
+export const proportionalBalanceRatioExample = { inputs: { design_1_cfm: 250, measured_1_cfm: 310, design_2_cfm: 300, measured_2_cfm: 285, design_3_cfm: 200, measured_3_cfm: 250, design_4_cfm: 400, measured_4_cfm: 365, design_5_cfm: 250, measured_5_cfm: 300, design_6_cfm: 0, measured_6_cfm: 0 } };
+HVACSYSTEMS_RENDERERS["proportional-balance-ratio"] = _simpleRenderer({
+  citation: "Citation: the proportional balancing method as AABC and NEBB procedure states it -- compute ratio = measured / design at every terminal, take the LOWEST ratio as the reference and leave it wide open, throttle the others to match it, then set the branch with one damper. Once the ratios are equal a change in branch flow scales every outlet by the same factor, which is what makes the target stable. Measured flows are ENTERED and should be corrected readings. It does not model damper positions, branch pressure, or interaction between branches on a common trunk, and a branch with too little pressure at the reference outlet cannot be balanced by any method. The balancing procedure in force and the balancer's judgment govern.",
+  example: proportionalBalanceRatioExample.inputs,
+  fields: [
+    { key: "design_1_cfm", label: "Outlet A design (cfm)", kind: "number" },
+    { key: "measured_1_cfm", label: "Outlet A measured (cfm)", kind: "number" },
+    { key: "design_2_cfm", label: "Outlet B design (cfm)", kind: "number" },
+    { key: "measured_2_cfm", label: "Outlet B measured (cfm)", kind: "number" },
+    { key: "design_3_cfm", label: "Outlet C design (cfm, 0 if unused)", kind: "number" },
+    { key: "measured_3_cfm", label: "Outlet C measured (cfm)", kind: "number" },
+    { key: "design_4_cfm", label: "Outlet D design (cfm, 0 if unused)", kind: "number" },
+    { key: "measured_4_cfm", label: "Outlet D measured (cfm)", kind: "number" },
+    { key: "design_5_cfm", label: "Outlet E design (cfm, 0 if unused)", kind: "number" },
+    { key: "measured_5_cfm", label: "Outlet E measured (cfm)", kind: "number" },
+    { key: "design_6_cfm", label: "Outlet F design (cfm, 0 if unused)", kind: "number" },
+    { key: "measured_6_cfm", label: "Outlet F measured (cfm)", kind: "number" },
+  ],
+  outputs: [
+    { key: "r", id: "pbr-out-r", label: "Ratios", value: (r) => r.rows_text },
+    { key: "f", id: "pbr-out-f", label: "Reference outlet", value: (r) => "outlet " + r.reference_label + " at " + fmt(r.reference_ratio, 3) + ", the lowest -- leave it wide open" },
+    { key: "m", id: "pbr-out-m", label: "Method", value: (r) => r.method_verdict },
+    { key: "b", id: "pbr-out-b", label: "Branch", value: (r) => fmt(r.branch_measured_cfm, 0) + " cfm measured against " + fmt(r.branch_design_cfm, 0) + " design; once equalized it reads " + fmt(r.branch_after_equalizing_cfm, 0) + " cfm, and the branch damper then opens by " + fmt(r.branch_adjustment_factor, 3) },
+    { key: "n", id: "pbr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeProportionalBalanceRatio,
+});
+
+// =====================================================================
+// spec-v1625: pump impeller trim for a balanced flow.
+// =====================================================================
+//
+// The trim relations are NOT the same as the speed-change affinity laws they
+// resemble. Trimming changes the impeller's geometry relative to its casing
+// rather than scaling the whole machine, so the correspondence is approximate
+// and the manufacturer's trim curves are the authority.
+// dims: in { current_diameter_in: L, current_flow_gpm: L^3 T^-1, required_flow_gpm: L^3 T^-1, current_head_ft: L, required_head_ft: L, max_diameter_in: L, min_trim_fraction: dimensionless, motor_hp: M L^2 T^-3, annual_hours: T, energy_rate_per_kwh: dimensionless } out: { required_diameter_in: L, trim_in: L, trim_pct: dimensionless, head_at_trim_ft: L, power_ratio: dimensionless, annual_kwh_saved: M L^2 T^-2, annual_cost_saved: dimensionless }
+export function computePumpImpellerTrim({
+  current_diameter_in = 0, current_flow_gpm = 0, required_flow_gpm = 0,
+  current_head_ft = 0, required_head_ft = 0, max_diameter_in = 0, min_trim_fraction = 0.75,
+  motor_hp = 0, annual_hours = 0, energy_rate_per_kwh = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(current_diameter_in > 0)) return { error: "Current impeller diameter must be positive (in)." };
+  if (!(current_flow_gpm > 0)) return { error: "Current flow must be positive (gpm)." };
+  if (!(required_flow_gpm > 0)) return { error: "Required flow must be positive (gpm)." };
+  if (!(required_flow_gpm <= current_flow_gpm)) return { error: "Required flow must be at or below the current flow -- trimming an impeller cannot increase it." };
+  if (current_head_ft < 0 || required_head_ft < 0) return { error: "Heads cannot be negative (ft)." };
+  if (max_diameter_in < 0) return { error: "Maximum casing diameter cannot be negative (in)." };
+  if (!(min_trim_fraction > 0 && min_trim_fraction <= 1)) return { error: "The minimum trim fraction must be above 0 and at most 1." };
+  if (motor_hp < 0 || annual_hours < 0 || energy_rate_per_kwh < 0) return { error: "Motor power, hours, and rate cannot be negative." };
+  if (annual_hours > 8784) return { error: "Annual hours cannot exceed 8,784." };
+  // Trim affinity: flow with diameter directly, head with the square, power
+  // with the cube.
+  const diameter_ratio = required_flow_gpm / current_flow_gpm;
+  const required_diameter_in = current_diameter_in * diameter_ratio;
+  const trim_in = current_diameter_in - required_diameter_in;
+  const trim_pct = trim_in / current_diameter_in * 100;
+  const head_at_trim_ft = current_head_ft * diameter_ratio * diameter_ratio;
+  const power_ratio = diameter_ratio * diameter_ratio * diameter_ratio;
+  const power_reduction_pct = (1 - power_ratio) * 100;
+  // The practical limit. Below roughly three quarters of the casing's maximum
+  // diameter the efficiency falls off and the relations degrade.
+  const has_max = max_diameter_in > 0;
+  const fraction_of_max = has_max ? required_diameter_in / max_diameter_in : 0;
+  const below_practical_limit = has_max && fraction_of_max < min_trim_fraction;
+  const limit_verdict = !has_max
+    ? "(no maximum casing diameter entered, so the practical trim limit is not checked)"
+    : below_practical_limit
+      ? "the trimmed diameter is " + fmt(fraction_of_max * 100, 1) + "% of the casing maximum, BELOW the " + fmt(min_trim_fraction * 100, 0) + "% practical limit -- efficiency falls off, the trim relations degrade, and the manufacturer will usually recommend a different pump or a smaller casing instead"
+      : "the trimmed diameter is " + fmt(fraction_of_max * 100, 1) + "% of the casing maximum, inside the " + fmt(min_trim_fraction * 100, 0) + "% practical limit";
+  // The head check, which is the one that decides whether the trim is usable.
+  const has_head_check = current_head_ft > 0 && required_head_ft > 0;
+  const head_adequate = has_head_check && head_at_trim_ft >= required_head_ft;
+  const head_margin_ft = head_at_trim_ft - required_head_ft;
+  const head_verdict = !has_head_check
+    ? "(no current and required head entered)"
+    : head_adequate
+      ? "at the trimmed diameter the pump still makes " + fmt(head_at_trim_ft, 1) + " ft against the " + fmt(required_head_ft, 1) + " ft required, with " + fmt(head_margin_ft, 1) + " ft to spare"
+      : "at the trimmed diameter the pump makes only " + fmt(head_at_trim_ft, 1) + " ft against the " + fmt(required_head_ft, 1) + " ft required, " + fmt(-head_margin_ft, 1) + " ft SHORT -- the trim delivers the flow and not the head, so it is not usable as computed";
+  // The saving, which is continuous and needs no control action.
+  const has_cost = motor_hp > 0 && annual_hours > 0;
+  const current_kwh = has_cost ? motor_hp * _HS_KW_PER_HP * annual_hours : 0;
+  const trimmed_kwh = current_kwh * power_ratio;
+  const annual_kwh_saved = current_kwh - trimmed_kwh;
+  const annual_cost_saved = annual_kwh_saved * energy_rate_per_kwh;
+  const excess_head_ft = has_head_check ? current_head_ft - required_head_ft : 0;
+  const cost_verdict = !has_cost
+    ? "(no motor power and annual hours entered)"
+    : fmt(annual_kwh_saved, 0) + " kWh a year, $" + fmt(annual_cost_saved, 0) + " at the entered rate -- and it persists for the life of the pump with no control action, unlike throttling, which burns the excess head across a valve continuously";
+  if (![required_diameter_in, trim_in, trim_pct, head_at_trim_ft, power_ratio, annual_kwh_saved, annual_cost_saved].every(Number.isFinite)) return { error: "Impeller trim math is not a finite value." };
+  return {
+    diameter_ratio, required_diameter_in, trim_in, trim_pct,
+    head_at_trim_ft, power_ratio, power_reduction_pct,
+    has_max, fraction_of_max, below_practical_limit, limit_verdict,
+    has_head_check, head_adequate, head_margin_ft, excess_head_ft, head_verdict,
+    has_cost, current_kwh, trimmed_kwh, annual_kwh_saved, annual_cost_saved, cost_verdict,
+    note: "The impeller diameter a pump needs to deliver a lower flow without throttling, and what trimming to it saves. The affinity relations for a TRIM are not quite the ones for a speed change, even though they look the same: flow scales with diameter directly, head with the square and power with the cube, but the correspondence is approximate because trimming changes the impeller's geometry relative to its casing rather than scaling the whole machine. The manufacturer's published trim curves are the authority; these relations give a first estimate accurate enough to decide whether trimming is worth pursuing at all. The saving is real and continuous. A pump throttled to reduce flow is developing head the system does not need and then destroying it across a balance valve, and that head times that flow is power converted directly into water temperature. A trimmed impeller never develops the excess head in the first place, so the saving persists for the life of the pump with no control action and nothing to fall out of adjustment. Because power goes as the CUBE of the diameter ratio, a modest trim is a large power reduction -- which is what makes the machine-shop cost pay back in months rather than years. Two checks decide whether the trim is usable, and both are computed here rather than left as caveats. The first is head: the trimmed pump must still make the required HEAD at the required flow, not merely the flow, and a trim that delivers one without the other is not a solution. The second is the practical limit: below roughly three quarters of the casing's maximum diameter the gap between impeller tip and casing grows, the hydraulic match degrades, efficiency falls off, and the affinity estimate itself becomes unreliable -- at which point the manufacturer will usually recommend a different pump or a smaller casing. This is an estimate against published curves: it does not read a pump curve, compute efficiency at the trimmed condition, check NPSH available against the new requirement, or address the minimum flow the pump needs. The pump manufacturer's trim curves and the mechanical engineer of record govern.",
+  };
+}
+export const pumpImpellerTrimExample = { inputs: { current_diameter_in: 9.5, current_flow_gpm: 520, required_flow_gpm: 430, current_head_ft: 95, required_head_ft: 62, max_diameter_in: 10.5, min_trim_fraction: 0.75, motor_hp: 15, annual_hours: 6000, energy_rate_per_kwh: 0.10 } };
+HVACSYSTEMS_RENDERERS["pump-impeller-trim"] = _simpleRenderer({
+  citation: "Citation: the impeller-trim affinity relations as pump practice writes them -- Q2/Q1 = D2/D1, H2/H1 = (D2/D1)^2, P2/P1 = (D2/D1)^3 -- noting that a TRIM is not a speed change: it alters the impeller's geometry relative to its casing, so the correspondence is APPROXIMATE and the manufacturer's published trim curves are the authority. The practical limit of roughly 75 to 80 percent of the casing maximum is ENTERED. Horsepower converts at 0.745699872 kW/hp. It does not read a pump curve, compute efficiency at the trimmed condition, check NPSH available, or address the pump's minimum flow. The pump manufacturer's trim curves and the mechanical engineer of record govern.",
+  example: pumpImpellerTrimExample.inputs,
+  fields: [
+    { key: "current_diameter_in", label: "Current impeller diameter (in)", kind: "number" },
+    { key: "current_flow_gpm", label: "Current flow (gpm)", kind: "number" },
+    { key: "required_flow_gpm", label: "Required flow (gpm)", kind: "number" },
+    { key: "current_head_ft", label: "Current head at that flow (ft, 0 to skip the head check)", kind: "number" },
+    { key: "required_head_ft", label: "Head the system requires (ft)", kind: "number" },
+    { key: "max_diameter_in", label: "Maximum impeller diameter for the casing (in, 0 to skip)", kind: "number" },
+    { key: "min_trim_fraction", label: "Minimum practical trim (fraction of maximum)", kind: "number", default: 0.75 },
+    { key: "motor_hp", label: "Motor power (hp, 0 to skip the saving)", kind: "number" },
+    { key: "annual_hours", label: "Annual operating hours", kind: "number" },
+    { key: "energy_rate_per_kwh", label: "Energy rate ($/kWh)", kind: "number" },
+  ],
+  outputs: [
+    { key: "d", id: "pit-out-d", label: "Required diameter", value: (r) => fmt(r.required_diameter_in, 2) + " in, a " + fmt(r.trim_in, 2) + " in trim (" + fmt(r.trim_pct, 1) + "%)" },
+    { key: "p", id: "pit-out-p", label: "Power at the trim", value: (r) => fmt(r.power_ratio * 100, 0) + "% of current, a " + fmt(r.power_reduction_pct, 0) + "% reduction from the cube relation" },
+    { key: "h", id: "pit-out-h", label: "Head check", value: (r) => r.head_verdict },
+    { key: "l", id: "pit-out-l", label: "Practical limit", value: (r) => r.limit_verdict },
+    { key: "s", id: "pit-out-s", label: "Annual saving", value: (r) => r.cost_verdict },
+    { key: "n", id: "pit-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePumpImpellerTrim,
+});
+
+// =====================================================================
+// spec-v1626: coil capacity verification from measured air and water.
+// =====================================================================
+//
+// spec-v1626 computes an 18% air-to-water disagreement and calls the coil
+// "fine" -- against its OWN stated 5 to 10% criterion. The tolerance is an
+// input here and the verdict is a boolean, so the sentence cannot disagree
+// with the arithmetic.
+// dims: in { airflow_cfm: L^3 T^-1, entering_air_db_f: T, leaving_air_db_f: T, enthalpy_drop_btu_lb: L^2 T^-2, water_gpm: L^3 T^-1, entering_water_f: T, leaving_water_f: T, fluid_factor: dimensionless, design_capacity_btuh: M L^2 T^-3, tolerance_pct: dimensionless } out: { air_sensible_btuh: M L^2 T^-3, air_total_btuh: M L^2 T^-3, water_btuh: M L^2 T^-3, balance_difference_pct: dimensionless, sensible_only_difference_pct: dimensionless }
+export function computeCoilCapacityVerification({
+  airflow_cfm = 0, entering_air_db_f = 0, leaving_air_db_f = 0, enthalpy_drop_btu_lb = 0,
+  water_gpm = 0, entering_water_f = 0, leaving_water_f = 0, fluid_factor = 500,
+  design_capacity_btuh = 0, tolerance_pct = 10,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(airflow_cfm > 0)) return { error: "Airflow must be positive (cfm)." };
+  if (!(water_gpm > 0)) return { error: "Water flow must be positive (gpm)." };
+  if (!(fluid_factor > 0)) return { error: "The fluid factor must be positive (500 for water)." };
+  if (enthalpy_drop_btu_lb < 0) return { error: "The enthalpy drop cannot be negative (BTU/lb) -- enter its magnitude." };
+  if (design_capacity_btuh < 0) return { error: "Design capacity cannot be negative (BTU/h)." };
+  if (!(tolerance_pct > 0)) return { error: "The heat-balance tolerance must be positive (%)." };
+  // Both sides as magnitudes, so the tile serves a heating or a cooling coil.
+  const air_dt_f = Math.abs(leaving_air_db_f - entering_air_db_f);
+  const water_dt_f = Math.abs(leaving_water_f - entering_water_f);
+  if (!(air_dt_f > 0)) return { error: "The air temperatures must differ -- there is no capacity to verify." };
+  if (!(water_dt_f > 0)) return { error: "The water temperatures must differ -- there is no capacity to verify." };
+  const air_sensible_btuh = _HS_SENSIBLE_CONST * airflow_cfm * air_dt_f;
+  const water_btuh = fluid_factor * water_gpm * water_dt_f;
+  // The enthalpy path, which is the only valid air side on a WET coil.
+  const has_enthalpy = enthalpy_drop_btu_lb > 0;
+  const air_total_btuh = has_enthalpy ? _HS_TOTAL_HEAT_CONST * airflow_cfm * enthalpy_drop_btu_lb : 0;
+  const air_used_btuh = has_enthalpy ? air_total_btuh : air_sensible_btuh;
+  const latent_btuh = has_enthalpy ? air_total_btuh - air_sensible_btuh : 0;
+  const balance_difference_pct = Math.abs(water_btuh - air_used_btuh) / water_btuh * 100;
+  const sensible_only_difference_pct = Math.abs(water_btuh - air_sensible_btuh) / water_btuh * 100;
+  // The verdict, against the ENTERED tolerance rather than an assumed one.
+  const balances = balance_difference_pct <= tolerance_pct;
+  const air_reads_high = air_used_btuh > water_btuh;
+  const balance_verdict = balances
+    ? "the two sides agree within " + fmt(balance_difference_pct, 1) + "%, inside the " + fmt(tolerance_pct, 1) + "% tolerance -- agreement between two independent measurements is strong evidence that both are right"
+    : air_reads_high
+      ? "the two sides disagree by " + fmt(balance_difference_pct, 1) + "%, OUTSIDE the " + fmt(tolerance_pct, 1) + "% tolerance, with the AIR side high -- which points at an overstated airflow measurement, or air bypassing the coil so the leaving temperature is not representative"
+      : "the two sides disagree by " + fmt(balance_difference_pct, 1) + "%, OUTSIDE the " + fmt(tolerance_pct, 1) + "% tolerance, with the WATER side high -- which usually means the flow measurement is wrong, or the temperature sensors are too close together for the delta being measured";
+  const method_verdict = !has_enthalpy
+    ? "no enthalpy drop entered, so the air side is SENSIBLE ONLY. On a wet cooling coil that is not comparable with the water side, which carries the latent heat too -- a report comparing sensible air against total water is comparing two different quantities"
+    : "the air side is computed from ENTHALPY, which is the only valid basis on a wet coil; the sensible-only figure would have differed from the water side by " + fmt(sensible_only_difference_pct, 1) + "%, and " + fmt(latent_btuh, 0) + " BTU/h of that gap is latent heat the sensible calculation cannot see";
+  const has_design = design_capacity_btuh > 0;
+  const air_pct_design = has_design ? air_used_btuh / design_capacity_btuh * 100 : 0;
+  const water_pct_design = has_design ? water_btuh / design_capacity_btuh * 100 : 0;
+  const design_verdict = !has_design
+    ? "(no design capacity entered)"
+    : "air side " + fmt(air_pct_design, 0) + "% of design, water side " + fmt(water_pct_design, 0) + "%";
+  if (![air_sensible_btuh, air_total_btuh, water_btuh, balance_difference_pct, sensible_only_difference_pct].every(Number.isFinite)) return { error: "Coil capacity math is not a finite value." };
+  return {
+    air_dt_f, water_dt_f, air_sensible_btuh, has_enthalpy, air_total_btuh, air_used_btuh, latent_btuh,
+    water_btuh, balance_difference_pct, sensible_only_difference_pct,
+    balances, air_reads_high, tolerance_pct, balance_verdict, method_verdict,
+    has_design, air_pct_design, water_pct_design, design_verdict,
+    note: "A coil's delivered capacity computed twice, from the air and from the water, and what the disagreement between them means. Two independent measurements are the whole value of the exercise: each uses different instruments, different quantities and different assumptions, so agreement is strong evidence that both are right, and disagreement localises the problem rather than merely flagging it. Air side high against water side points at an overstated airflow measurement, or at air bypassing the coil so the leaving temperature is not representative. Water side high usually means the flow measurement is wrong, or the temperature sensors are too close together for the delta being measured. The sensible-versus-total distinction is the trap on a cooling coil, and it is the one that produces false alarms. A wet coil is removing latent heat, and a sensible-only air-side calculation will fall well short of the water-side total for no reason except the method -- so on a wet coil the air side must be computed from ENTHALPY, which needs wet-bulb measurements on both sides. A report comparing sensible air against total water is comparing two different quantities and will condemn a coil that is working. What it does NOT license is calling any disagreement acceptable once the method is corrected: the tolerance is entered here and the verdict is computed against it, because a balance that is still outside tolerance after switching to enthalpy is a real finding, not a rounding difference. The instrument that most often fails is the water temperature difference. A modest delta measured with sensors accurate to a degree each carries a large percentage uncertainty, and on a low-delta system that uncertainty can be most of the disagreement -- which means the water-side measurement is weakest exactly where hydronic systems tend to run. This computes capacities from ENTERED measurements at a sea-level standard-air basis; it does not correct for altitude or non-standard density, derive enthalpy from dry-bulb and wet-bulb readings, assess instrument accuracy, or evaluate the coil's cleanliness, circuiting or approach. The coil manufacturer's rated capacity at the design condition and the balancing agency's own procedure govern.",
+  };
+}
+export const coilCapacityVerificationExample = { inputs: { airflow_cfm: 8000, entering_air_db_f: 80, leaving_air_db_f: 58, enthalpy_drop_btu_lb: 5.5, water_gpm: 40, entering_water_f: 44, leaving_water_f: 56, fluid_factor: 500, design_capacity_btuh: 240000, tolerance_pct: 10 } };
+HVACSYSTEMS_RENDERERS["coil-capacity-verification"] = _simpleRenderer({
+  citation: "Citation: the coil heat balance as ASHRAE and balancing practice writes it -- air sensible Q = 1.08 x CFM x dT (1.08 = 0.075 lb/cu ft x 0.24 BTU/lb-degF x 60 min/h), air total Q = 4.5 x CFM x dh on a WET coil, and water Q = 500 x GPM x dT (500 = 8.33 lb/gal x 60 min/h x 1.0), with the two sides expected to agree within a stated tolerance. The tolerance and the fluid factor are ENTERED. Sea-level standard air: it does not correct for altitude or non-standard density, derive enthalpy from dry-bulb and wet-bulb readings, assess instrument accuracy, or evaluate coil cleanliness, circuiting or approach. The coil manufacturer's rated capacity and the balancing procedure govern.",
+  example: coilCapacityVerificationExample.inputs,
+  fields: [
+    { key: "airflow_cfm", label: "Airflow (cfm)", kind: "number" },
+    { key: "entering_air_db_f", label: "Entering air dry bulb (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "leaving_air_db_f", label: "Leaving air dry bulb (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "enthalpy_drop_btu_lb", label: "Enthalpy change across the coil (BTU/lb, 0 for sensible only)", kind: "number" },
+    { key: "water_gpm", label: "Water flow (gpm)", kind: "number" },
+    { key: "entering_water_f", label: "Entering water (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "leaving_water_f", label: "Leaving water (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "fluid_factor", label: "Fluid factor (500 water, lower for glycol)", kind: "number", default: 500 },
+    { key: "design_capacity_btuh", label: "Coil design capacity (BTU/h, 0 to skip)", kind: "number" },
+    { key: "tolerance_pct", label: "Heat balance tolerance (%)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "a", id: "ccv2-out-a", label: "Air side", value: (r) => r.has_enthalpy ? fmt(r.air_total_btuh, 0) + " BTU/h total from enthalpy (" + fmt(r.air_sensible_btuh, 0) + " sensible, " + fmt(r.latent_btuh, 0) + " latent)" : fmt(r.air_sensible_btuh, 0) + " BTU/h sensible only" },
+    { key: "w", id: "ccv2-out-w", label: "Water side", value: (r) => fmt(r.water_btuh, 0) + " BTU/h across a " + fmt(r.water_dt_f, 1) + " °F rise" },
+    { key: "b", id: "ccv2-out-b", label: "Heat balance", value: (r) => r.balance_verdict },
+    { key: "m", id: "ccv2-out-m", label: "Method", value: (r) => r.method_verdict },
+    { key: "g", id: "ccv2-out-g", label: "Against design", value: (r) => r.design_verdict },
+    { key: "n", id: "ccv2-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCoilCapacityVerification,
+});
+
+// =====================================================================
+// spec-v1627: valve actuator close-off pressure and torque.
+// =====================================================================
+//
+// The differential a valve must close against is NOT the one it sees at design
+// flow. As other valves close, the pump rides up its curve and the pressure
+// across the remaining valves rises toward shutoff head -- so the worst case is
+// MINIMUM system flow, the condition a designer computing at design never looks
+// at, and the condition in which the valve is most likely to be commanded shut.
+// dims: in { seat_area_in2: L^2, design_differential_psi: M L^-1 T^-2, minimum_flow_differential_psi: M L^-1 T^-2, actuator_closeoff_psi: M L^-1 T^-2, spring_closeoff_psi: M L^-1 T^-2 } out: { design_seat_force_lb: M L T^-2, worst_case_seat_force_lb: M L T^-2, actuator_force_lb: M L T^-2, force_shortfall_lb: M L T^-2 }
+export function computeValveActuatorCloseOff({
+  seat_area_in2 = 0, design_differential_psi = 0, minimum_flow_differential_psi = 0,
+  actuator_closeoff_psi = 0, spring_closeoff_psi = 0, is_spring_return = "no",
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(seat_area_in2 > 0)) return { error: "The effective seat area must be positive (sq in)." };
+  if (design_differential_psi < 0 || minimum_flow_differential_psi < 0) return { error: "Differential pressures cannot be negative (psi)." };
+  if (actuator_closeoff_psi < 0 || spring_closeoff_psi < 0) return { error: "Actuator ratings cannot be negative (psi)." };
+  if (!(minimum_flow_differential_psi > 0)) return { error: "Enter the differential at MINIMUM system flow -- that is the condition close-off is selected against." };
+  const design_seat_force_lb = design_differential_psi * seat_area_in2;
+  const worst_case_seat_force_lb = minimum_flow_differential_psi * seat_area_in2;
+  const differential_rise_psi = minimum_flow_differential_psi - design_differential_psi;
+  const has_design = design_differential_psi > 0;
+  const rise_ratio = has_design ? minimum_flow_differential_psi / design_differential_psi : 0;
+  const design_understates = has_design && minimum_flow_differential_psi > design_differential_psi;
+  const trap_verdict = !has_design
+    ? "(no design differential entered)"
+    : design_understates
+      ? "at DESIGN flow the differential is only " + fmt(design_differential_psi, 1) + " psi and the seat force " + fmt(design_seat_force_lb, 0) + " lb, so an actuator selected on that basis looks generous -- it is " + fmt(rise_ratio, 1) + " times short of the minimum-flow condition"
+      : "the design differential is at or above the minimum-flow differential entered, which is unusual; check that the minimum-flow value is the pump's near-shutoff condition";
+  // The driven rating.
+  const has_driven = actuator_closeoff_psi > 0;
+  const actuator_force_lb = has_driven ? actuator_closeoff_psi * seat_area_in2 : 0;
+  const force_shortfall_lb = worst_case_seat_force_lb - actuator_force_lb;
+  const driven_adequate = has_driven && actuator_closeoff_psi >= minimum_flow_differential_psi;
+  const driven_verdict = !has_driven
+    ? "(no actuator close-off rating entered)"
+    : driven_adequate
+      ? "the actuator's " + fmt(actuator_closeoff_psi, 1) + " psi rating develops " + fmt(actuator_force_lb, 0) + " lb against the " + fmt(worst_case_seat_force_lb, 0) + " lb required, so it holds"
+      : "the actuator's " + fmt(actuator_closeoff_psi, 1) + " psi rating develops only " + fmt(actuator_force_lb, 0) + " lb against the " + fmt(worst_case_seat_force_lb, 0) + " lb required, " + fmt(force_shortfall_lb, 0) + " lb SHORT -- the valve floats off its seat and passes flow with the actuator fully commanded closed, which reads as a control fault rather than a valve fault";
+  // The spring direction, which is often much lower and is the failure case.
+  const is_spring = is_spring_return === "yes";
+  const has_spring_rating = spring_closeoff_psi > 0;
+  const spring_force_lb = has_spring_rating ? spring_closeoff_psi * seat_area_in2 : 0;
+  const spring_adequate = is_spring && has_spring_rating && spring_closeoff_psi >= minimum_flow_differential_psi;
+  const spring_verdict = !is_spring
+    ? "(not a spring-return actuator)"
+    : !has_spring_rating
+      ? "spring return selected but no spring close-off rating entered -- it is a DIFFERENT and usually lower number than the driven rating, and it is the one that governs on a power failure"
+      : spring_adequate
+        ? "the spring close-off of " + fmt(spring_closeoff_psi, 1) + " psi also holds the " + fmt(minimum_flow_differential_psi, 1) + " psi differential, so the valve closes on a power failure too"
+        : "the spring close-off is only " + fmt(spring_closeoff_psi, 1) + " psi against the " + fmt(minimum_flow_differential_psi, 1) + " psi differential: the valve holds ON COMMAND and LEAKS on a power failure or a fire alarm shutdown, which is precisely when a closed valve matters most";
+  const overall_adequate = driven_adequate && (!is_spring || spring_adequate);
+  if (![design_seat_force_lb, worst_case_seat_force_lb, actuator_force_lb, force_shortfall_lb, spring_force_lb].every(Number.isFinite)) return { error: "Close-off math is not a finite value." };
+  return {
+    design_seat_force_lb, worst_case_seat_force_lb, differential_rise_psi, rise_ratio,
+    has_design, design_understates, trap_verdict,
+    has_driven, actuator_force_lb, force_shortfall_lb, driven_adequate, driven_verdict,
+    is_spring, has_spring_rating, spring_force_lb, spring_adequate, spring_verdict,
+    overall_adequate,
+    note: "Whether a control valve's actuator can actually hold the valve shut against the pressure the system puts across it. The differential a valve must close against is not the differential it sees at design flow, and that is the whole trap. As other valves on the system close, the pump rides up its curve and the pressure across the remaining valves rises toward the pump's shutoff head -- so the worst case for close-off is MINIMUM system flow, which is the condition a designer computing at design flow never looks at, and it is also the condition in which a valve is most likely to be commanded closed. On a system with many two-way valves and no differential pressure control, that rise can be large. The consequence of getting it wrong is subtle rather than dramatic, which is why it goes unfound for years. The valve strokes, the actuator reports closed, and a small flow continues past the seat -- so a coil stays warm, a zone overheats in the cooling season, and the problem reads as a control fault. Checking the actuator's close-off rating against the actual differential is what identifies it, and it is a nameplate comparison rather than a diagnosis. Spring-return actuators deserve their own line, which is why the spring rating is a separate input here. Their close-off in the SPRING direction is set by the spring rather than by the motor, and is often much lower than the driven rating -- so a valve can close reliably on command and leak on a power failure or a fire alarm shutdown, which is precisely the moment a closed valve matters. A single pass or fail on the driven rating hides that, so both are reported. Seat force is pressure times the EFFECTIVE seat area, which is entered from the valve manufacturer's data rather than computed from the nominal size; on a rotary valve, close-off is published as a torque and this force basis does not apply. This does not size the valve or its Cv, compute the differential at minimum flow (which needs the pump curve and the system), evaluate valve authority, or address cavitation and flashing. The valve and actuator manufacturer's close-off tables and the controls engineer of record govern.",
+  };
+}
+export const valveActuatorCloseOffExample = { inputs: { seat_area_in2: 12, design_differential_psi: 8, minimum_flow_differential_psi: 45, actuator_closeoff_psi: 20, spring_closeoff_psi: 0, is_spring_return: "no" } };
+HVACSYSTEMS_RENDERERS["valve-actuator-close-off"] = _simpleRenderer({
+  citation: "Citation: valve close-off as control-valve practice states it -- seat force = differential pressure x effective seat area, selected against the differential at MINIMUM system flow (when other valves have closed and the pump has ridden toward shutoff head), not at design flow. A spring-return actuator's close-off in the spring direction is a separate and usually lower rating than its driven one. The effective seat area and both ratings are ENTERED from the manufacturer's tables; on a rotary valve close-off is published as a TORQUE and this force basis does not apply. It does not size the valve or its Cv, compute the minimum-flow differential (which needs the pump curve and the system), evaluate valve authority, or address cavitation. The manufacturer's close-off tables and the controls engineer govern.",
+  example: valveActuatorCloseOffExample.inputs,
+  fields: [
+    { key: "seat_area_in2", label: "Effective seat area (sq in)", kind: "number" },
+    { key: "design_differential_psi", label: "Differential at design flow (psi, 0 to skip)", kind: "number" },
+    { key: "minimum_flow_differential_psi", label: "Differential at minimum system flow (psi)", kind: "number" },
+    { key: "actuator_closeoff_psi", label: "Actuator close-off rating, driven (psi, 0 to skip)", kind: "number" },
+    { key: "is_spring_return", label: "Spring return?", kind: "select", default: "no", options: [{ value: "no", label: "No (driven both ways)" }, { value: "yes", label: "Yes (spring closes it)" }] },
+    { key: "spring_closeoff_psi", label: "Spring-direction close-off rating (psi)", kind: "number" },
+  ],
+  outputs: [
+    { key: "f", id: "vac-out-f", label: "Seat force required", value: (r) => fmt(r.worst_case_seat_force_lb, 0) + " lb at minimum system flow" },
+    { key: "t", id: "vac-out-t", label: "The design-flow trap", value: (r) => r.trap_verdict },
+    { key: "d", id: "vac-out-d", label: "Against the actuator", value: (r) => r.driven_verdict },
+    { key: "s", id: "vac-out-s", label: "On a power failure", value: (r) => r.spring_verdict },
+    { key: "n", id: "vac-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeValveActuatorCloseOff,
+});
+
+// =====================================================================
+// spec-v1628: chiller staging point and part-load efficiency.
+// =====================================================================
+//
+// The crossover exists because chiller efficiency is NOT monotonic in load.
+// The kW/ton curve is entered at four part-load points and interpolated
+// linearly between them; the auxiliaries are what people leave out and they
+// frequently move the answer. Helper above the exports, returning an
+// expression rather than a bare identifier.
+const _hsInterpKwTon = (pct, p30, p50, p75, p100) => (
+  pct <= 30 ? p30
+    : pct <= 50 ? p30 + (p50 - p30) * (pct - 30) / 20
+      : pct <= 75 ? p50 + (p75 - p50) * (pct - 50) / 25
+        : p75 + (p100 - p75) * (pct - 75) / 25
+);
+// dims: in { machine_tons: L^3 T^-1, plant_load_tons: L^3 T^-1, kw_per_ton_100: dimensionless, kw_per_ton_75: dimensionless, kw_per_ton_50: dimensionless, kw_per_ton_30: dimensionless, auxiliary_kw_per_machine: M L^2 T^-3, staging_setpoint_pct: dimensionless } out: { one_machine_kw: M L^2 T^-3, two_machine_kw: M L^2 T^-3, crossover_tons: L^3 T^-1, crossover_pct_of_machine: dimensionless, setpoint_error_tons: L^3 T^-1 }
+export function computeChillerStagingPoint({
+  machine_tons = 0, plant_load_tons = 0,
+  kw_per_ton_100 = 0, kw_per_ton_75 = 0, kw_per_ton_50 = 0, kw_per_ton_30 = 0,
+  auxiliary_kw_per_machine = 0, staging_setpoint_pct = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(machine_tons > 0)) return { error: "Machine capacity must be positive (tons)." };
+  if (!(plant_load_tons > 0)) return { error: "Plant load must be positive (tons)." };
+  if (!(kw_per_ton_100 > 0 && kw_per_ton_75 > 0 && kw_per_ton_50 > 0 && kw_per_ton_30 > 0)) return { error: "Every kW/ton curve point must be positive." };
+  if (auxiliary_kw_per_machine < 0) return { error: "Auxiliary power cannot be negative (kW)." };
+  if (staging_setpoint_pct < 0 || staging_setpoint_pct > 200) return { error: "The staging setpoint must be between 0 and 200 percent of one machine." };
+  if (plant_load_tons > 2 * machine_tons) return { error: "The plant load exceeds what two machines can carry -- this compares one machine against two." };
+  const one_pct = plant_load_tons / machine_tons * 100;
+  const two_pct = plant_load_tons / (2 * machine_tons) * 100;
+  const one_available = plant_load_tons <= machine_tons;
+  const one_kw_ton = _hsInterpKwTon(one_pct, kw_per_ton_30, kw_per_ton_50, kw_per_ton_75, kw_per_ton_100);
+  const two_kw_ton = _hsInterpKwTon(two_pct, kw_per_ton_30, kw_per_ton_50, kw_per_ton_75, kw_per_ton_100);
+  const one_compressor_kw = one_available ? plant_load_tons * one_kw_ton : 0;
+  const two_compressor_kw = plant_load_tons * two_kw_ton;
+  const one_machine_kw = one_available ? one_compressor_kw + auxiliary_kw_per_machine : 0;
+  const two_machine_kw = two_compressor_kw + 2 * auxiliary_kw_per_machine;
+  const two_wins = one_available ? two_machine_kw < one_machine_kw : true;
+  const saving_kw = one_available ? Math.abs(one_machine_kw - two_machine_kw) : 0;
+  const load_verdict = !one_available
+    ? "at " + fmt(plant_load_tons, 0) + " tons one machine cannot carry the load at all, so two must run"
+    : two_wins
+      ? "TWO machines win at " + fmt(plant_load_tons, 0) + " tons: " + fmt(two_machine_kw, 0) + " kW against " + fmt(one_machine_kw, 0) + " kW, saving " + fmt(saving_kw, 0) + " kW"
+      : "ONE machine wins at " + fmt(plant_load_tons, 0) + " tons: " + fmt(one_machine_kw, 0) + " kW against " + fmt(two_machine_kw, 0) + " kW, saving " + fmt(saving_kw, 0) + " kW";
+  // Search for the crossover: the highest load at which one machine still
+  // beats two. Stepping in tons rather than assuming the curve is monotonic,
+  // because it is not.
+  let crossover_tons = 0;
+  const step = machine_tons / 200;
+  for (let load = step; load <= machine_tons; load += step) {
+    const p1 = load * _hsInterpKwTon(load / machine_tons * 100, kw_per_ton_30, kw_per_ton_50, kw_per_ton_75, kw_per_ton_100) + auxiliary_kw_per_machine;
+    const p2 = load * _hsInterpKwTon(load / (2 * machine_tons) * 100, kw_per_ton_30, kw_per_ton_50, kw_per_ton_75, kw_per_ton_100) + 2 * auxiliary_kw_per_machine;
+    if (p1 <= p2) crossover_tons = load;
+  }
+  const crossover_pct_of_machine = crossover_tons / machine_tons * 100;
+  const crossover_verdict = crossover_tons <= 0
+    ? "two machines beat one at every load in range, which usually means the auxiliary penalty is small against a steeply rising kW/ton curve"
+    : crossover_tons >= machine_tons - step
+      ? "one machine beats two right up to its full capacity, so the second machine should not start until the load exceeds one machine"
+      : "the crossover is at " + fmt(crossover_tons, 0) + " tons, " + fmt(crossover_pct_of_machine, 0) + "% of a single machine -- below it one machine uses less, above it two do";
+  // The setpoint check, which is the practical output.
+  const has_setpoint = staging_setpoint_pct > 0;
+  const setpoint_tons = machine_tons * staging_setpoint_pct / 100;
+  const setpoint_error_tons = setpoint_tons - crossover_tons;
+  const stages_too_early = has_setpoint && crossover_tons > 0 && setpoint_tons < crossover_tons;
+  const setpoint_verdict = !has_setpoint
+    ? "(no staging setpoint entered)"
+    : crossover_tons <= 0
+      ? "no crossover was found in range, so the setpoint cannot be checked against one"
+      : stages_too_early
+        ? "a setpoint of " + fmt(staging_setpoint_pct, 0) + "% brings the second machine on at " + fmt(setpoint_tons, 0) + " tons, " + fmt(-setpoint_error_tons, 0) + " tons BELOW the crossover -- two machines and two sets of auxiliaries run where one machine and one set would use less, for a large part of the season"
+        : "a setpoint of " + fmt(staging_setpoint_pct, 0) + "% brings the second machine on at " + fmt(setpoint_tons, 0) + " tons, at or above the " + fmt(crossover_tons, 0) + " ton crossover";
+  if (![one_machine_kw, two_machine_kw, crossover_tons, crossover_pct_of_machine, setpoint_error_tons].every(Number.isFinite)) return { error: "Chiller staging math is not a finite value." };
+  return {
+    one_pct, two_pct, one_available, one_kw_ton, two_kw_ton,
+    one_compressor_kw, two_compressor_kw, auxiliary_kw_per_machine,
+    one_machine_kw, two_machine_kw, two_wins, saving_kw, load_verdict,
+    crossover_tons, crossover_pct_of_machine, crossover_verdict,
+    has_setpoint, setpoint_tons, setpoint_error_tons, stages_too_early, setpoint_verdict,
+    note: "The plant load at which running two chillers uses less power than running one, and whether the staging setpoint in the controller matches it. The crossover exists because chiller efficiency is not monotonic in load. Many centrifugal machines are most efficient somewhere between 40 and 70 percent load rather than at 100, because condenser water is colder at part load and the lift is lower -- so two machines at half load can beat one at full. Below their best point efficiency falls off again, and eventually one machine at a moderate load beats two machines running badly. Screw and scroll machines behave differently, which is why the curve is entered at four part-load points here rather than assumed. The auxiliaries are what people leave out and they frequently move the answer. Starting a second chiller starts its chilled water pump, its condenser water pump and often a tower cell, and those add power before the compressor does anything -- so the second machine has to save more than its own auxiliaries before it pays for itself. On a plant with constant-speed pumps that penalty can push the crossover well above where the compressor curves alone would put it, which is exactly the case a curve-only comparison gets wrong. The crossover is found by searching the load range rather than by solving, because the curve is not monotonic and a solver would find the wrong root. The practical output is the comparison against the setpoint actually programmed: a plant staged at a habitual fraction of a machine that crosses over somewhere else is running the wrong number of machines for a large part of the season, and that is a setpoint change rather than a capital project. This compares one machine against two on an ENTERED kW/ton curve interpolated linearly between the given points, plus a flat auxiliary power per machine started. It does not model condenser water temperature, tower staging and fan power, the effect of variable-speed pumping, minimum run times, demand limiting, or thermal storage; it does not use IPLV, which is a weighted single number useful for comparing machines and not for staging them; and it does not address the flow and bypass constraints that staging also has to satisfy. The chiller manufacturer's part-load data at the actual condenser conditions and the plant's controls engineer govern.",
+  };
+}
+export const chillerStagingPointExample = { inputs: { machine_tons: 500, plant_load_tons: 450, kw_per_ton_100: 0.62, kw_per_ton_75: 0.55, kw_per_ton_50: 0.52, kw_per_ton_30: 0.61, auxiliary_kw_per_machine: 45, staging_setpoint_pct: 80 } };
+HVACSYSTEMS_RENDERERS["chiller-staging-point"] = _simpleRenderer({
+  citation: "Citation: the chiller staging comparison as central-plant practice writes it -- one machine's power = load x kW/ton at its percent load plus one set of auxiliaries, against two machines at half that percent load plus two sets -- with the kW/ton curve ENTERED at four part-load points and interpolated linearly, because efficiency is not monotonic in load and centrifugal, screw and scroll machines differ. The crossover is found by searching the load range rather than solving, since the curve is not monotonic. It does not model condenser water temperature, tower staging and fan power, variable-speed pumping, minimum run times, demand limiting or thermal storage, and it does not use IPLV, which is for comparing machines rather than staging them. The chiller manufacturer's part-load data and the plant's controls engineer govern.",
+  example: chillerStagingPointExample.inputs,
+  fields: [
+    { key: "machine_tons", label: "Capacity of one machine (tons)", kind: "number" },
+    { key: "plant_load_tons", label: "Plant load (tons)", kind: "number" },
+    { key: "kw_per_ton_100", label: "kW/ton at 100% load", kind: "number", attrs: { step: "any" } },
+    { key: "kw_per_ton_75", label: "kW/ton at 75% load", kind: "number", attrs: { step: "any" } },
+    { key: "kw_per_ton_50", label: "kW/ton at 50% load", kind: "number", attrs: { step: "any" } },
+    { key: "kw_per_ton_30", label: "kW/ton at 30% load", kind: "number", attrs: { step: "any" } },
+    { key: "auxiliary_kw_per_machine", label: "Auxiliary kW per machine started (pumps, tower cell)", kind: "number" },
+    { key: "staging_setpoint_pct", label: "Staging setpoint (% of one machine, 0 to skip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "l", id: "csp-out-l", label: "At this load", value: (r) => r.load_verdict },
+    { key: "o", id: "csp-out-o", label: "One machine", value: (r) => !r.one_available ? "cannot carry the load" : fmt(r.one_machine_kw, 0) + " kW at " + fmt(r.one_pct, 0) + "% load, " + fmt(r.one_kw_ton, 3) + " kW/ton plus " + fmt(r.auxiliary_kw_per_machine, 0) + " kW of auxiliaries" },
+    { key: "t", id: "csp-out-t", label: "Two machines", value: (r) => fmt(r.two_machine_kw, 0) + " kW at " + fmt(r.two_pct, 0) + "% load each, " + fmt(r.two_kw_ton, 3) + " kW/ton" },
+    { key: "c", id: "csp-out-c", label: "Crossover", value: (r) => r.crossover_verdict },
+    { key: "s", id: "csp-out-s", label: "Against the setpoint", value: (r) => r.setpoint_verdict },
+    { key: "n", id: "csp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeChillerStagingPoint,
+});
+
+// =====================================================================
+// spec-v1629: variable primary chilled water minimum flow bypass.
+// =====================================================================
+//
+// The bypass exists to protect the MACHINE, not to control temperature. The
+// interaction with staging is the part that catches plants out: two chillers
+// running have twice the minimum flow of one.
+// dims: in { machine_design_gpm: L^3 T^-1, minimum_flow_fraction: dimensionless, machines_running: dimensionless, system_flow_gpm: L^3 T^-1, bypass_differential_psi: M L^-1 T^-2, design_differential_psi: M L^-1 T^-2 } out: { minimum_per_machine_gpm: L^3 T^-1, combined_minimum_gpm: L^3 T^-1, bypass_gpm: L^3 T^-1, required_cv: dimensionless, cv_at_design_differential: dimensionless }
+export function computeVariablePrimaryBypass({
+  machine_design_gpm = 0, minimum_flow_fraction = 0.45, machines_running = 1,
+  system_flow_gpm = 0, bypass_differential_psi = 0, design_differential_psi = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(machine_design_gpm > 0)) return { error: "Design flow per machine must be positive (gpm)." };
+  if (!(minimum_flow_fraction > 0 && minimum_flow_fraction <= 1)) return { error: "The evaporator minimum flow fraction must be above 0 and at most 1." };
+  if (!(machines_running >= 1)) return { error: "At least one machine must be running." };
+  if (!Number.isInteger(machines_running)) return { error: "The number of machines running must be a whole number." };
+  if (system_flow_gpm < 0) return { error: "System flow cannot be negative (gpm)." };
+  if (bypass_differential_psi < 0 || design_differential_psi < 0) return { error: "Differential pressures cannot be negative (psi)." };
+  const minimum_per_machine_gpm = machine_design_gpm * minimum_flow_fraction;
+  const combined_minimum_gpm = minimum_per_machine_gpm * machines_running;
+  const bypass_needed = system_flow_gpm < combined_minimum_gpm;
+  const bypass_gpm = bypass_needed ? combined_minimum_gpm - system_flow_gpm : 0;
+  const pump_flow_gpm = Math.max(system_flow_gpm, combined_minimum_gpm);
+  const wasted_fraction = pump_flow_gpm > 0 ? bypass_gpm / pump_flow_gpm : 0;
+  const bypass_verdict = !bypass_needed
+    ? "no bypass is needed: the system is moving " + fmt(system_flow_gpm, 0) + " gpm against a combined minimum of " + fmt(combined_minimum_gpm, 0) + " gpm"
+    : "the bypass must pass " + fmt(bypass_gpm, 0) + " gpm: the system needs only " + fmt(system_flow_gpm, 0) + " gpm and " + fmt(machines_running, 0) + " machine" + (machines_running === 1 ? "" : "s") + " require " + fmt(combined_minimum_gpm, 0) + ", so the pumps move " + fmt(pump_flow_gpm, 0) + " gpm to serve a " + fmt(system_flow_gpm, 0) + " gpm load and " + fmt(wasted_fraction * 100, 0) + "% of the flow does no work";
+  // The staging interaction, computed rather than warned about: what the same
+  // system flow would need with one fewer machine running.
+  const has_fewer = machines_running > 1;
+  const fewer_minimum_gpm = has_fewer ? minimum_per_machine_gpm * (machines_running - 1) : 0;
+  const fewer_bypass_gpm = has_fewer && system_flow_gpm < fewer_minimum_gpm ? fewer_minimum_gpm - system_flow_gpm : 0;
+  const staging_would_fix = has_fewer && bypass_needed && fewer_bypass_gpm < bypass_gpm;
+  const staging_verdict = !has_fewer
+    ? "(one machine running, so there is no machine to stage off)"
+    : staging_would_fix
+      ? "staging one machine OFF drops the combined minimum to " + fmt(fewer_minimum_gpm, 0) + " gpm and the bypass to " + fmt(fewer_bypass_gpm, 0) + " gpm -- the staging logic and the bypass logic have to be designed together, because a plant that stages up at low load and does not stage back down promptly burns pumping energy circulating water that does no work"
+      : "staging one machine off would not reduce the bypass at this system flow";
+  // Valve sizing. The differential at the bypass is near pump shutoff, which
+  // is HIGH, so the required Cv is smaller than a design-differential sizing
+  // suggests -- and sizing on design differential oversizes the valve.
+  const has_bypass_dp = bypass_differential_psi > 0 && bypass_gpm > 0;
+  const required_cv = has_bypass_dp ? bypass_gpm / Math.sqrt(bypass_differential_psi) : 0;
+  const has_design_dp = design_differential_psi > 0 && bypass_gpm > 0;
+  const cv_at_design_differential = has_design_dp ? bypass_gpm / Math.sqrt(design_differential_psi) : 0;
+  const oversize_ratio = has_bypass_dp && has_design_dp && required_cv > 0 ? cv_at_design_differential / required_cv : 0;
+  const cv_verdict = !has_bypass_dp
+    ? "(no bypass flow required, or no differential entered)"
+    : "a Cv of " + fmt(required_cv, 0) + " at the " + fmt(bypass_differential_psi, 1) + " psi the pumps develop at this low flow" + (has_design_dp ? "; sizing it at the " + fmt(design_differential_psi, 1) + " psi design differential instead would call for a Cv of " + fmt(cv_at_design_differential, 0) + ", " + fmt(oversize_ratio, 2) + " times larger -- an oversized bypass valve controls badly at the small openings it actually works at" : "");
+  if (![minimum_per_machine_gpm, combined_minimum_gpm, bypass_gpm, required_cv, cv_at_design_differential].every(Number.isFinite)) return { error: "Bypass math is not a finite value." };
+  return {
+    minimum_per_machine_gpm, combined_minimum_gpm, bypass_needed, bypass_gpm,
+    pump_flow_gpm, wasted_fraction, bypass_verdict,
+    has_fewer, fewer_minimum_gpm, fewer_bypass_gpm, staging_would_fix, staging_verdict,
+    has_bypass_dp, required_cv, has_design_dp, cv_at_design_differential, oversize_ratio, cv_verdict,
+    note: "The bypass a variable primary plant needs to hold its chillers above minimum flow, and the valve that passes it. The bypass exists to protect the MACHINE, not to control temperature, and that distinction explains everything about how it behaves. Below the evaporator's minimum flow the water in the tubes goes laminar, heat transfer collapses, leaving-temperature control becomes unstable, and the low-temperature safety trips -- and on some machines repeated low-flow operation damages tubes. So the bypass opens whenever system demand falls below what the running chillers require, and the pump moves water in a circle to keep the machines happy. The interaction with STAGING is the part that catches plants out, and it is arithmetic rather than judgment: two chillers running have twice the minimum flow of one. A plant that stages up at low load can find itself with a system flow far below the combined minimum and a bypass valve wide open, burning pumping energy to circulate water that does no work at all. That is an argument for staging down promptly, and it means the staging logic and the bypass logic have to be designed together rather than separately -- so what staging one machine off would do to the bypass is computed here beside the current condition. Sizing the valve is the straightforward part with one counter-intuitive turn. It must pass the largest bypass flow, which occurs at minimum system load with the maximum number of machines that could be running -- and at that condition the pumps are near shutoff, so the differential is HIGH and the required Cv is SMALLER than a sizing at design differential would suggest. Sizing on the design differential oversizes the valve, and an oversized bypass valve controls badly at the small openings it actually spends its life at. Minimum flow fractions are ENTERED from the chiller manufacturer, because they vary by machine and by evaporator design. This does not model the control sequence, the sensor location the bypass modulates from, the check valve and flow measurement a variable primary plant needs, or the transient during a stage change, which is when low-flow trips actually happen. The chiller manufacturer's minimum flow data and the plant's designer govern.",
+  };
+}
+export const variablePrimaryBypassExample = { inputs: { machine_design_gpm: 1000, minimum_flow_fraction: 0.45, machines_running: 2, system_flow_gpm: 600, bypass_differential_psi: 24, design_differential_psi: 12 } };
+HVACSYSTEMS_RENDERERS["variable-primary-bypass"] = _simpleRenderer({
+  citation: "Citation: the variable primary chilled water minimum-flow bypass as central-plant practice writes it -- minimum per machine = design flow x the evaporator minimum fraction, combined minimum = that times the machines running, bypass = combined minimum minus system flow, and valve Cv = bypass gpm / sqrt(differential psi) at the differential the pumps develop at that LOW flow (near shutoff, so higher than design). The evaporator minimum fraction is ENTERED from the chiller manufacturer. It does not model the control sequence, the sensor location, the check valve and flow measurement a variable primary plant needs, or the transient during a stage change. The chiller manufacturer's minimum flow data and the plant designer govern.",
+  example: variablePrimaryBypassExample.inputs,
+  fields: [
+    { key: "machine_design_gpm", label: "Design evaporator flow per machine (gpm)", kind: "number" },
+    { key: "minimum_flow_fraction", label: "Evaporator minimum flow (fraction of design)", kind: "number", default: 0.45 },
+    { key: "machines_running", label: "Machines running", kind: "number", default: 1, attrs: { step: "1", min: "1" } },
+    { key: "system_flow_gpm", label: "System (load) flow (gpm)", kind: "number" },
+    { key: "bypass_differential_psi", label: "Differential across the bypass at this flow (psi, 0 to skip Cv)", kind: "number" },
+    { key: "design_differential_psi", label: "Design differential for comparison (psi, 0 to skip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "m", id: "vpb-out-m", label: "Minimum flow", value: (r) => fmt(r.minimum_per_machine_gpm, 0) + " gpm per machine, " + fmt(r.combined_minimum_gpm, 0) + " gpm combined" },
+    { key: "b", id: "vpb-out-b", label: "Bypass", value: (r) => r.bypass_verdict },
+    { key: "s", id: "vpb-out-s", label: "Staging interaction", value: (r) => r.staging_verdict },
+    { key: "c", id: "vpb-out-c", label: "Valve sizing", value: (r) => r.cv_verdict },
+    { key: "n", id: "vpb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeVariablePrimaryBypass,
+});
+
+// =====================================================================
+// spec-v1630: louver free area, velocity, and water penetration.
+// =====================================================================
+//
+// Free area ratio is the number that turns a louver from a hole into a
+// component. A conventional stationary louver passes roughly 35 to 50 percent
+// of its gross face, so sizing on GROSS area understates the velocity by a
+// factor of two or more -- which is how rain gets into a mechanical room that
+// was designed correctly on paper.
+// dims: in { width_ft: L, height_ft: L, free_area_ratio: dimensionless, airflow_cfm: L^3 T^-1, water_penetration_fpm: L T^-1, allowable_velocity_fpm: L T^-1 } out: { gross_area_ft2: L^2, free_area_ft2: L^2, free_velocity_fpm: L T^-1, gross_velocity_fpm: L T^-1, gross_sized_free_velocity_fpm: L T^-1, gross_area_for_allowable_ft2: L^2 }
+export function computeLouverFreeArea({
+  width_ft = 0, height_ft = 0, free_area_ratio = 0.45, airflow_cfm = 0,
+  water_penetration_fpm = 0, allowable_velocity_fpm = 0, application = "intake",
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(width_ft > 0)) return { error: "Louver width must be positive (ft)." };
+  if (!(height_ft > 0)) return { error: "Louver height must be positive (ft)." };
+  if (!(free_area_ratio > 0 && free_area_ratio <= 1)) return { error: "The free area ratio must be above 0 and at most 1." };
+  if (!(airflow_cfm > 0)) return { error: "Airflow must be positive (cfm)." };
+  if (water_penetration_fpm < 0 || allowable_velocity_fpm < 0) return { error: "Velocity limits cannot be negative (fpm)." };
+  const gross_area_ft2 = width_ft * height_ft;
+  const free_area_ft2 = gross_area_ft2 * free_area_ratio;
+  const free_velocity_fpm = airflow_cfm / free_area_ft2;
+  // The error the tile exists for: the velocity a gross-area sizing implies,
+  // and the free-area velocity that sizing actually produces.
+  const gross_velocity_fpm = airflow_cfm / gross_area_ft2;
+  const is_intake = application === "intake";
+  const limit_fpm = is_intake ? water_penetration_fpm : allowable_velocity_fpm;
+  const has_limit = limit_fpm > 0;
+  const within_limit = has_limit && free_velocity_fpm <= limit_fpm;
+  const gross_sized_free_velocity_fpm = has_limit ? limit_fpm / free_area_ratio : 0;
+  const limit_verdict = !has_limit
+    ? is_intake
+      ? "(no beginning-point-of-water-penetration velocity entered -- it is an AMCA 500-L tested property of the specific louver, not a rule of thumb)"
+      : "(no allowable velocity entered)"
+    : within_limit
+      ? fmt(free_velocity_fpm, 0) + " fpm through the free area against a " + fmt(limit_fpm, 0) + " fpm limit, with " + fmt(limit_fpm - free_velocity_fpm, 0) + " fpm of margin"
+      : fmt(free_velocity_fpm, 0) + " fpm through the free area, PAST the " + fmt(limit_fpm, 0) + " fpm limit by " + fmt(free_velocity_fpm - limit_fpm, 0) + " fpm" + (is_intake ? " -- rain is carried through" : " -- the pressure drop and the noise both go with the square of this velocity");
+  const gross_error_verdict = !has_limit
+    ? "(no limit entered to size against)"
+    : "sizing to the " + fmt(limit_fpm, 0) + " fpm limit on GROSS area instead would run " + fmt(gross_sized_free_velocity_fpm, 0) + " fpm through the free area -- " + fmt(1 / free_area_ratio, 2) + " times the limit, because the air does not know about the blades";
+  // The size a stated limit actually requires.
+  const free_area_needed_ft2 = has_limit ? airflow_cfm / limit_fpm : 0;
+  const gross_area_for_allowable_ft2 = has_limit ? free_area_needed_ft2 / free_area_ratio : 0;
+  const size_verdict = !has_limit
+    ? "(no limit entered)"
+    : fmt(free_area_needed_ft2, 1) + " sq ft of FREE area is needed at the limit, which at this free area ratio is " + fmt(gross_area_for_allowable_ft2, 1) + " sq ft gross -- against the " + fmt(gross_area_ft2, 1) + " sq ft entered";
+  const application_note = is_intake
+    ? "an INTAKE is governed by water penetration, a tested AMCA 500-L property; drainable-blade designs carry that point far higher than conventional ones, which is why a drainable louver can be smaller for the same airflow and why substituting a cheaper louver of the same size is a performance change"
+    : "a RELIEF or exhaust louver is governed by pressure drop and noise rather than water penetration, because air is leaving -- so a louver sized to an intake velocity limit will be unnecessarily large for this application";
+  if (![gross_area_ft2, free_area_ft2, free_velocity_fpm, gross_velocity_fpm, gross_sized_free_velocity_fpm, gross_area_for_allowable_ft2].every(Number.isFinite)) return { error: "Louver math is not a finite value." };
+  return {
+    gross_area_ft2, free_area_ft2, free_velocity_fpm, gross_velocity_fpm,
+    is_intake, has_limit, limit_fpm, within_limit, limit_verdict,
+    gross_sized_free_velocity_fpm, gross_error_verdict,
+    free_area_needed_ft2, gross_area_for_allowable_ft2, size_verdict, application_note,
+    note: "The velocity air actually reaches through a louver, which is not the velocity its gross size suggests. Free area ratio is the number that turns a louver from a hole into a component: a conventional stationary louver passes roughly 35 to 50 percent of its gross face, so sizing on gross area understates the real velocity by a factor of two or more -- and the resulting velocity is double what was intended, which is how rain gets into a mechanical room that was designed correctly on paper. The limit that governs an INTAKE is water penetration, and it is a tested property rather than a rule of thumb. AMCA 500-L establishes the velocity at which a specific louver begins to pass water, and drainable-blade designs carry that point far higher than conventional ones. That is why a drainable louver can be smaller for the same airflow, and why substituting a cheaper louver of the same size late in a job is a performance change rather than a purchasing decision. RELIEF and exhaust louvers are a different problem: water penetration matters less because air is leaving, so they are limited instead by pressure drop and by the noise a high free-area velocity generates -- and a louver sized to an intake's velocity limit will be unnecessarily large for a relief application. Both the free area ratio and the penetration velocity are ENTERED from the specific louver's published AMCA data, because they are properties of its blade design and depth and cannot be assumed from its size. The gross-area error is computed here rather than described: sizing to a velocity limit on gross area runs the free area at that limit divided by the free area ratio, which is the number that puts water in the room. This does not compute the pressure drop, which rises with the square of free-area velocity and needs the louver's own curve; it does not address the sand trap, bird screen or insect screen that further reduce free area, the wind-driven rain performance which is a separate AMCA 550 test, or the drain and gutter provisions a wet climate needs. The louver manufacturer's AMCA-certified data and the mechanical engineer of record govern.",
+  };
+}
+export const louverFreeAreaExample = { inputs: { width_ft: 4, height_ft: 4, free_area_ratio: 0.45, airflow_cfm: 3600, water_penetration_fpm: 700, allowable_velocity_fpm: 0, application: "intake" } };
+HVACSYSTEMS_RENDERERS["louver-free-area"] = _simpleRenderer({
+  citation: "Citation: louver free area and face velocity as AMCA practice writes it -- free area = gross area x the free area ratio, free-area velocity = cfm / free area -- against the beginning point of water penetration established by AMCA 500-L testing for the SPECIFIC louver. The free area ratio and the penetration velocity are ENTERED from the louver's published certified data, because they are properties of its blade design and depth. It does not compute pressure drop (which rises with the square of free-area velocity and needs the louver's own curve), account for sand traps, bird or insect screens that further reduce free area, address wind-driven rain performance (a separate AMCA 550 test), or size drains and gutters. The louver manufacturer's AMCA-certified data and the mechanical engineer of record govern.",
+  example: louverFreeAreaExample.inputs,
+  fields: [
+    { key: "width_ft", label: "Louver width (ft)", kind: "number" },
+    { key: "height_ft", label: "Louver height (ft)", kind: "number" },
+    { key: "free_area_ratio", label: "Free area ratio (0-1)", kind: "number", default: 0.45 },
+    { key: "airflow_cfm", label: "Airflow (cfm)", kind: "number" },
+    { key: "application", label: "Application", kind: "select", default: "intake", options: [{ value: "intake", label: "Intake (governed by water penetration)" }, { value: "relief", label: "Relief or exhaust (governed by pressure drop and noise)" }] },
+    { key: "water_penetration_fpm", label: "Beginning point of water penetration (fpm, AMCA 500-L)", kind: "number" },
+    { key: "allowable_velocity_fpm", label: "Allowable velocity for a relief louver (fpm)", kind: "number" },
+  ],
+  outputs: [
+    { key: "a", id: "lfa-out-a", label: "Areas", value: (r) => fmt(r.gross_area_ft2, 2) + " sq ft gross, " + fmt(r.free_area_ft2, 2) + " sq ft free" },
+    { key: "v", id: "lfa-out-v", label: "Free-area velocity", value: (r) => fmt(r.free_velocity_fpm, 0) + " fpm (the gross-area figure of " + fmt(r.gross_velocity_fpm, 0) + " fpm is fiction)" },
+    { key: "l", id: "lfa-out-l", label: "Against the limit", value: (r) => r.limit_verdict },
+    { key: "e", id: "lfa-out-e", label: "The gross-area error", value: (r) => r.gross_error_verdict },
+    { key: "s", id: "lfa-out-s", label: "Size the limit requires", value: (r) => r.size_verdict },
+    { key: "p", id: "lfa-out-p", label: "Application", value: (r) => r.application_note },
+    { key: "n", id: "lfa-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeLouverFreeArea,
+});
+
+// =====================================================================
+// spec-v1631: ceiling plenum return path pressure drop.
+// =====================================================================
+//
+// The plenum is a duct whose cross-section is whatever the structure left
+// over, and its restriction is concentrated where that cross-section pinches.
+// dims: in { return_cfm: L^3 T^-1, pinch_width_ft: L, pinch_clear_in: L, target_velocity_fpm: L T^-1, measured_room_to_plenum_inwg: M L^-1 T^-2, measured_plenum_to_shaft_inwg: M L^-1 T^-2, assumed_return_inwg: M L^-1 T^-2 } out: { pinch_area_ft2: L^2, pinch_velocity_fpm: L T^-1, area_for_target_ft2: L^2, width_for_target_ft: L, measured_total_inwg: M L^-1 T^-2, static_shortfall_inwg: M L^-1 T^-2 }
+export function computePlenumReturnDrop({
+  return_cfm = 0, pinch_width_ft = 0, pinch_clear_in = 0, target_velocity_fpm = 400,
+  measured_room_to_plenum_inwg = 0, measured_plenum_to_shaft_inwg = 0, assumed_return_inwg = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(return_cfm > 0)) return { error: "Return airflow must be positive (cfm)." };
+  if (!(pinch_width_ft > 0)) return { error: "The width of the restricted section must be positive (ft)." };
+  if (!(pinch_clear_in > 0)) return { error: "The clear height at the restriction must be positive (in)." };
+  if (!(target_velocity_fpm > 0)) return { error: "The target plenum velocity must be positive (fpm)." };
+  if (measured_room_to_plenum_inwg < 0 || measured_plenum_to_shaft_inwg < 0 || assumed_return_inwg < 0) return { error: "Pressures cannot be negative (in wg)." };
+  const pinch_area_ft2 = pinch_width_ft * (pinch_clear_in / 12);
+  const pinch_velocity_fpm = return_cfm / pinch_area_ft2;
+  const within_target = pinch_velocity_fpm <= target_velocity_fpm;
+  const velocity_ratio = pinch_velocity_fpm / target_velocity_fpm;
+  const velocity_verdict = within_target
+    ? fmt(pinch_velocity_fpm, 0) + " fpm at the restriction, inside the " + fmt(target_velocity_fpm, 0) + " fpm target"
+    : fmt(pinch_velocity_fpm, 0) + " fpm at the restriction, " + fmt(velocity_ratio, 1) + " times the " + fmt(target_velocity_fpm, 0) + " fpm target -- that single pinch point IS the return path, and the pressure drop across it will be substantial";
+  // What the target actually requires, expressed as the width the air has to
+  // come through at the same clear height.
+  const area_for_target_ft2 = return_cfm / target_velocity_fpm;
+  const width_for_target_ft = area_for_target_ft2 / (pinch_clear_in / 12);
+  const bays_needed = pinch_width_ft > 0 ? width_for_target_ft / pinch_width_ft : 0;
+  const size_verdict = fmt(area_for_target_ft2, 1) + " sq ft is needed at the target, which at " + fmt(pinch_clear_in, 1) + " in clear means " + fmt(width_for_target_ft, 0) + " ft of width -- " + fmt(bays_needed, 1) + " times the " + fmt(pinch_width_ft, 1) + " ft entered, so the air has to come through that many bays rather than one, and the design question is whether the openings and the routing actually let it";
+  // The static consequence, which is what makes this a balancing issue rather
+  // than a design curiosity.
+  const has_measured = measured_room_to_plenum_inwg > 0 || measured_plenum_to_shaft_inwg > 0;
+  const measured_total_inwg = measured_room_to_plenum_inwg + measured_plenum_to_shaft_inwg;
+  const static_shortfall_inwg = has_measured ? measured_total_inwg - assumed_return_inwg : 0;
+  const understated = has_measured && static_shortfall_inwg > 0;
+  const static_verdict = !has_measured
+    ? "(no measured pressure differences entered -- measuring room to plenum and plenum to shaft is what localizes the restriction)"
+    : understated
+      ? "the return path measures " + fmt(measured_total_inwg, 3) + " in wg against the " + fmt(assumed_return_inwg, 3) + " in wg the design assumed, so the fan is carrying " + fmt(static_shortfall_inwg, 3) + " in wg it was not sized for -- it delivers less than design at a higher static than expected, which looks like a supply-side problem and is not"
+      : "the measured return path of " + fmt(measured_total_inwg, 3) + " in wg is at or below what the design assumed, so it is not the explanation for a fan shortfall";
+  const split_verdict = !has_measured
+    ? "(no measured pressures entered)"
+    : measured_room_to_plenum_inwg > measured_plenum_to_shaft_inwg
+      ? "most of the drop is between the ROOM and the plenum (" + fmt(measured_room_to_plenum_inwg, 3) + " against " + fmt(measured_plenum_to_shaft_inwg, 3) + " in wg), so the grille or ceiling opening is the restriction"
+      : "most of the drop is between the PLENUM and the shaft (" + fmt(measured_plenum_to_shaft_inwg, 3) + " against " + fmt(measured_room_to_plenum_inwg, 3) + " in wg), so the travel path and the shaft entry are the restriction";
+  if (![pinch_area_ft2, pinch_velocity_fpm, area_for_target_ft2, width_for_target_ft, measured_total_inwg, static_shortfall_inwg].every(Number.isFinite)) return { error: "Plenum return math is not a finite value." };
+  return {
+    pinch_area_ft2, pinch_velocity_fpm, within_target, velocity_ratio, velocity_verdict,
+    area_for_target_ft2, width_for_target_ft, bays_needed, size_verdict,
+    has_measured, measured_total_inwg, static_shortfall_inwg, understated, static_verdict, split_verdict,
+    note: "The velocity a ceiling return plenum reaches where its cross-section pinches, and what an underestimated return path costs the fan. A plenum is a duct whose cross-section is whatever the structure left over, and its restriction is concentrated at the places where that cross-section narrows: a beam line, a duct crossing the return path, a bundle of conduit, or the opening into the return shaft. Air does not distribute itself evenly through a plenum -- it takes the easiest path -- so a return that measures fine near the shaft can be starved at the far corner of the floor, and the velocity at the pinch is the number that says whether that is happening. The static consequence is what makes this a balancing issue rather than a design curiosity. If the fan's external static was calculated assuming a negligible return path and the plenum actually costs a measurable fraction of an inch, the fan delivers less than design at a HIGHER static than expected -- which looks like a supply-side problem and is not, and which sends people to the supply duct, the filters and the coil while the restriction sits above the ceiling. Measuring the pressure difference between the room and the plenum, and between the plenum and the shaft, is what localizes it, and the split between those two says whether the grille or the travel path is the culprit. The other consequence is pressure relationships. A restricted return path makes the ceiling plenum more negative relative to the space, which pulls air from wherever it can -- adjacent floors, shafts and the exterior -- and can undo the intended pressurization of the space entirely, which matters most in exactly the buildings that were pressurized deliberately. This computes velocity at an ENTERED restriction and what a target velocity would require; it does NOT compute the pressure drop, which depends on the shape of every obstruction, the approach conditions and the path length in ways a plenum's irregular geometry does not reduce to a coefficient. It does not model the distribution of flow across multiple bays, the fire and smoke dampers in the path, or the effect of the plenum on the return air temperature. Measurement is the reliable method here; the mechanical engineer of record and the balancing agency govern.",
+  };
+}
+export const plenumReturnDropExample = { inputs: { return_cfm: 18000, pinch_width_ft: 4, pinch_clear_in: 14, target_velocity_fpm: 400, measured_room_to_plenum_inwg: 0.04, measured_plenum_to_shaft_inwg: 0.11, assumed_return_inwg: 0.02 } };
+HVACSYSTEMS_RENDERERS["plenum-return-drop"] = _simpleRenderer({
+  citation: "Citation: the ceiling return plenum treated as a low-velocity duct whose restriction is at its pinch point -- velocity = cfm / the clear area there, against the commonly cited 300 to 500 fpm plenum target -- with the static consequence read from measured room-to-plenum and plenum-to-shaft differences. It computes velocity and the area a target requires; it does NOT compute the pressure drop, which depends on the shape of every obstruction, the approach conditions and the path length in ways a plenum's irregular geometry does not reduce to a coefficient. It does not model flow distribution across bays, fire and smoke dampers in the path, or the plenum's effect on return air temperature. Measurement is the reliable method; the mechanical engineer of record and the balancing agency govern.",
+  example: plenumReturnDropExample.inputs,
+  fields: [
+    { key: "return_cfm", label: "Return airflow through the path (cfm)", kind: "number" },
+    { key: "pinch_width_ft", label: "Width at the restriction (ft)", kind: "number" },
+    { key: "pinch_clear_in", label: "Clear height at the restriction (in)", kind: "number" },
+    { key: "target_velocity_fpm", label: "Target plenum velocity (fpm)", kind: "number", default: 400 },
+    { key: "measured_room_to_plenum_inwg", label: "Measured room to plenum (in wg, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "measured_plenum_to_shaft_inwg", label: "Measured plenum to shaft (in wg)", kind: "number", attrs: { step: "any" } },
+    { key: "assumed_return_inwg", label: "Return path the design assumed (in wg)", kind: "number", attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "v", id: "prd-out-v", label: "Velocity at the pinch", value: (r) => r.velocity_verdict },
+    { key: "s", id: "prd-out-s", label: "For the target velocity", value: (r) => r.size_verdict },
+    { key: "t", id: "prd-out-t", label: "Static consequence", value: (r) => r.static_verdict },
+    { key: "l", id: "prd-out-l", label: "Where the drop is", value: (r) => r.split_verdict },
+    { key: "n", id: "prd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePlenumReturnDrop,
+});

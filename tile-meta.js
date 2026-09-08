@@ -1119,6 +1119,17 @@ const _TILES = [
   ["nesc-district-loading", "A"],
   ["conductor-creep-elongation", "A"],
   ["sagging-return-wave", "A"],
+  // spec-v1622..v1631 HVAC test-and-balance and hydronic systems band
+  ["flow-hood-correction", "C"],
+  ["fan-system-effect", "C"],
+  ["proportional-balance-ratio", "C"],
+  ["pump-impeller-trim", "C"],
+  ["coil-capacity-verification", "C"],
+  ["valve-actuator-close-off", "C"],
+  ["chiller-staging-point", "C"],
+  ["variable-primary-bypass", "C"],
+  ["louver-free-area", "C"],
+  ["plenum-return-drop", "C"],
   // spec-v1524..v1533 oil, gas and pipeline band (new calc-oilgas.js)
   ["pipeline-mao-barlow", "E"],
   ["gas-pipeline-flow", "E"],

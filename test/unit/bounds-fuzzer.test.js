@@ -48909,3 +48909,413 @@ test("bounds: spec-v1533 computeAnnularVelocityCleaning -- transport ratio, not 
   assert.ok(_v1533({ ...base, pipe_od_in: 9 }).error);
   assert.ok(_v1533({ ...base, flow_gpm: 0 }).error);
 });
+
+// ===========================================================================
+// spec-v1622..v1631: the 2026-09-08 trade-expansion HVAC test-and-balance and
+// hydronic systems band, in the existing calc-hvacsystems.js. Nothing cut.
+//
+// THREE SPECS ARGUE WITH THEIR OWN ARITHMETIC:
+//   v1622 says a hood reads LOW and a report of uncorrected readings is
+//     systematically low -- then uses a 0.94 factor, which means the hood read
+//     HIGH, and concludes that the UNCORRECTED balancer "sees a system 6%
+//     short" when uncorrected reads at design and it is the CORRECTION that
+//     reveals the shortfall. The direction is computed here from the factor.
+//   v1626 states a 5 to 10% heat-balance criterion, computes 17.5% after
+//     correcting the method, and calls the coil "fine". The tolerance is an
+//     input and the verdict is a boolean.
+//   v1628's part-load figures do not reproduce from linear interpolation of
+//     its own curve (0.585 where 90% gives 0.592, 0.525 where 45% gives
+//     0.5425). Its CONCLUSION survives; its numbers do not.
+// And v1625's own worked trim lands at 74.8% of the casing maximum -- just
+// under the 75 to 80% practical limit the same spec names.
+// ===========================================================================
+
+import {
+  computeFlowHoodCorrection as _v1622,
+  computeFanSystemEffect as _v1623,
+  computeProportionalBalanceRatio as _v1624,
+  computePumpImpellerTrim as _v1625,
+  computeCoilCapacityVerification as _v1626,
+  computeValveActuatorCloseOff as _v1627,
+  computeChillerStagingPoint as _v1628,
+  computeVariablePrimaryBypass as _v1629,
+  computeLouverFreeArea as _v1630,
+  computePlenumReturnDrop as _v1631,
+} from "../../calc-hvacsystems.js";
+
+test("bounds: spec-v1622 computeFlowHoodCorrection -- the direction is computed, not asserted", () => {
+  const base = { hood_reading_cfm: 420, correction_factor: 0.94, reference_traverse_cfm: 0, design_cfm: 400, system_reading_total_cfm: 16000 };
+  const r = _v1622(base);
+  // IDENTITY: corrected = reading x factor, and the report scales identically.
+  assert.ok(Math.abs(r.corrected_cfm - 420 * 0.94) < 1e-9);
+  assert.ok(Math.abs(r.system_corrected_cfm - 16000 * 0.94) < 1e-9);
+  assert.ok(Math.abs(r.system_error_cfm - (r.system_corrected_cfm - 16000)) < 1e-9);
+  // THE SPEC'S CONTRADICTION, PINNED. A 0.94 factor means the hood read HIGH,
+  // and the correction LOWERS both the outlet and the report.
+  assert.equal(r.hood_reads_low, false);
+  assert.ok(r.corrected_cfm < 420);
+  assert.ok(r.system_error_cfm < 0);
+  // So the UNCORRECTED report reads at design and the CORRECTED one is short,
+  // which is the opposite of what the spec concludes.
+  assert.ok(Math.abs(r.uncorrected_pct_of_design - 105) < 1e-9);
+  assert.ok(r.pct_of_design < 100);
+  // A factor above one runs the other way, and the flag follows it.
+  const low = _v1622({ ...base, correction_factor: 1.08 });
+  assert.equal(low.hood_reads_low, true);
+  assert.ok(low.corrected_cfm > 420);
+  assert.ok(low.system_error_cfm > 0);
+  // A factor of exactly one changes nothing, tested off the boundary too.
+  const unity = _v1622({ ...base, correction_factor: 1 });
+  assert.ok(Math.abs(unity.corrected_cfm - 420) < 1e-9);
+  assert.equal(_v1622({ ...base, correction_factor: 1.001 }).hood_reads_low, true);
+  assert.equal(_v1622({ ...base, correction_factor: 0.999 }).hood_reads_low, false);
+  // IDENTITY: a reference traverse DERIVES the factor, and using it reproduces
+  // the traverse exactly -- which is the whole point of calibrating on site.
+  const ref = _v1622({ ...base, reference_traverse_cfm: 395 });
+  assert.equal(ref.has_reference, true);
+  assert.ok(Math.abs(ref.derived_factor - 395 / 420) < 1e-12);
+  assert.ok(Math.abs(ref.corrected_cfm - 395) < 1e-9);
+  assert.ok(_v1622({ ...base, hood_reading_cfm: 0 }).error);
+  assert.ok(_v1622({ ...base, correction_factor: 0 }).error);
+});
+
+test("bounds: spec-v1623 computeFanSystemEffect -- the effective duct length grows with velocity", () => {
+  const base = { flow_cfm: 12000, outlet_width_in: 30, outlet_height_in: 24, straight_duct_ft: 3.0, inlet_condition: "elbow_with_swirl", fan_curve_tp_inwg: 2.5, measured_tp_inwg: 2.9 };
+  const r = _v1623(base);
+  // IDENTITY: area, velocity, and the equivalent round diameter.
+  assert.ok(Math.abs(r.outlet_area_ft2 - 5) < 1e-12);
+  assert.ok(Math.abs(r.outlet_velocity_fpm - 2400) < 1e-9);
+  assert.ok(Math.abs(r.equivalent_diameter_ft - Math.sqrt(4 * 5 / Math.PI)) < 1e-12);
+  // AMCA: 2.5 diameters at or below 2,500 fpm, plus one per extra 1,000 fpm.
+  assert.ok(Math.abs(r.diameters_required - 2.5) < 1e-12);
+  assert.ok(Math.abs(r.effective_length_ft - 2.5 * r.equivalent_diameter_ft) < 1e-12);
+  assert.equal(r.length_adequate, false);
+  assert.ok(r.length_fraction < 0.5);
+  // Above 2,500 fpm the requirement grows, exactly one diameter per 1,000 fpm.
+  const fast = _v1623({ ...base, flow_cfm: 12000 * 3500 / 2400 });
+  assert.ok(Math.abs(fast.outlet_velocity_fpm - 3500) < 1e-6);
+  assert.ok(Math.abs(fast.diameters_required - 3.5) < 1e-9);
+  const faster = _v1623({ ...base, flow_cfm: 12000 * 4500 / 2400 });
+  assert.ok(Math.abs(faster.diameters_required - r.diameters_required - 2) < 1e-9);
+  // The 2,500 fpm break, tested either side rather than on it.
+  const under = _v1623({ ...base, flow_cfm: 12000 * 2499 / 2400 });
+  const over = _v1623({ ...base, flow_cfm: 12000 * 2501 / 2400 });
+  assert.ok(Math.abs(under.diameters_required - 2.5) < 1e-9);
+  assert.ok(over.diameters_required > 2.5);
+  // Enough straight duct removes the outlet effect, off the boundary.
+  assert.equal(_v1623({ ...base, straight_duct_ft: r.effective_length_ft * 1.001 }).length_adequate, true);
+  assert.equal(_v1623({ ...base, straight_duct_ft: r.effective_length_ft * 0.999 }).length_adequate, false);
+  // The diagnostic: measured static ABOVE the curve is the signature.
+  assert.equal(r.measured_exceeds_curve, true);
+  assert.ok(Math.abs(r.pressure_shortfall_inwg - 0.4) < 1e-9);
+  assert.equal(_v1623({ ...base, measured_tp_inwg: 2.4 }).measured_exceeds_curve, false);
+  // The inlet condition is a named case, not a silent default.
+  assert.equal(r.inlet_is_swirl, true);
+  assert.equal(_v1623({ ...base, inlet_condition: "clear" }).inlet_is_elbow, false);
+  assert.ok(_v1623({ ...base, outlet_width_in: 0 }).error);
+});
+
+test("bounds: spec-v1624 computeProportionalBalanceRatio -- the LOW outlet is the reference", () => {
+  const base = { design_1_cfm: 250, measured_1_cfm: 310, design_2_cfm: 300, measured_2_cfm: 285, design_3_cfm: 200, measured_3_cfm: 250, design_4_cfm: 400, measured_4_cfm: 365, design_5_cfm: 250, measured_5_cfm: 300, design_6_cfm: 0, measured_6_cfm: 0 };
+  const r = _v1624(base);
+  // The reference is the LOWEST ratio -- D at 365/400 -- not the first or the
+  // highest. Getting this backwards is what makes the method not converge.
+  assert.equal(r.outlet_count, 5);
+  assert.equal(r.reference_label, "D");
+  assert.ok(Math.abs(r.reference_ratio - 365 / 400) < 1e-12);
+  for (const [d, m] of [[250, 310], [300, 285], [200, 250], [250, 300]]) {
+    assert.ok(m / d >= r.reference_ratio);
+  }
+  // IDENTITY: once every outlet is at the reference ratio, the branch reads
+  // exactly design x that ratio, and the branch damper's factor is its
+  // reciprocal -- which is what makes one adjustment set everything.
+  assert.ok(Math.abs(r.branch_design_cfm - 1400) < 1e-9);
+  assert.ok(Math.abs(r.branch_measured_cfm - 1510) < 1e-9);
+  assert.ok(Math.abs(r.branch_after_equalizing_cfm - 1400 * r.reference_ratio) < 1e-9);
+  assert.ok(Math.abs(r.branch_adjustment_factor * r.reference_ratio - 1) < 1e-12);
+  assert.ok(Math.abs(r.branch_after_equalizing_cfm * r.branch_adjustment_factor - 1400) < 1e-9);
+  // A set already in proportion has nothing to equalize, and the flag says so.
+  const proportional = _v1624({ design_1_cfm: 100, measured_1_cfm: 90, design_2_cfm: 200, measured_2_cfm: 180 });
+  assert.equal(proportional.already_proportional, true);
+  assert.ok(Math.abs(proportional.reference_ratio - 0.9) < 1e-12);
+  assert.ok(Math.abs(proportional.ratio_spread) < 1e-12);
+  // The reference does not move: feeding the targets back in leaves it lowest
+  // and the spread at zero.
+  const after = _v1624({
+    design_1_cfm: 250, measured_1_cfm: 250 * r.reference_ratio,
+    design_2_cfm: 300, measured_2_cfm: 300 * r.reference_ratio,
+    design_3_cfm: 200, measured_3_cfm: 200 * r.reference_ratio,
+    design_4_cfm: 400, measured_4_cfm: 365,
+    design_5_cfm: 250, measured_5_cfm: 250 * r.reference_ratio,
+  });
+  assert.ok(Math.abs(after.ratio_spread) < 1e-9);
+  assert.ok(Math.abs(after.reference_ratio - r.reference_ratio) < 1e-12);
+  assert.ok(Math.abs(after.branch_measured_cfm - r.branch_after_equalizing_cfm) < 1e-6);
+  // One outlet is not a balancing problem, and a measured flow with no design
+  // has no ratio.
+  assert.ok(_v1624({ design_1_cfm: 250, measured_1_cfm: 310 }).error);
+  assert.ok(_v1624({ ...base, design_6_cfm: 0, measured_6_cfm: 100 }).error);
+});
+
+test("bounds: spec-v1625 computePumpImpellerTrim -- power goes as the cube of the trim", () => {
+  const base = { current_diameter_in: 9.5, current_flow_gpm: 520, required_flow_gpm: 430, current_head_ft: 95, required_head_ft: 62, max_diameter_in: 10.5, min_trim_fraction: 0.75, motor_hp: 15, annual_hours: 6000, energy_rate_per_kwh: 0.10 };
+  const r = _v1625(base);
+  // IDENTITY: the three affinity relations on the diameter ratio.
+  const ratio = 430 / 520;
+  assert.ok(Math.abs(r.diameter_ratio - ratio) < 1e-12);
+  assert.ok(Math.abs(r.required_diameter_in - 9.5 * ratio) < 1e-12);
+  assert.ok(Math.abs(r.head_at_trim_ft - 95 * ratio * ratio) < 1e-9);
+  assert.ok(Math.abs(r.power_ratio - ratio ** 3) < 1e-12);
+  assert.ok(Math.abs(r.trim_pct - r.trim_in / 9.5 * 100) < 1e-12);
+  // A 17% trim is a 43% power cut, because the exponent is three.
+  assert.ok(Math.abs(r.trim_pct - 17.31) < 0.01);
+  assert.ok(Math.abs(r.power_reduction_pct - 43.45) < 0.01);
+  assert.ok(r.power_reduction_pct > 2 * r.trim_pct);
+  // IDENTITY: the saving is the motor's energy times one minus the ratio.
+  assert.ok(Math.abs(r.current_kwh - 15 * 0.745699872 * 6000) < 1e-6);
+  assert.ok(Math.abs(r.annual_kwh_saved - r.current_kwh * (1 - r.power_ratio)) < 1e-9);
+  assert.ok(Math.abs(r.annual_cost_saved - r.annual_kwh_saved * 0.10) < 1e-9);
+  // No trim at all is the identity case: nothing changes and nothing is saved.
+  const none = _v1625({ ...base, required_flow_gpm: 520 });
+  assert.ok(Math.abs(none.required_diameter_in - 9.5) < 1e-12);
+  assert.ok(Math.abs(none.power_ratio - 1) < 1e-12);
+  assert.ok(Math.abs(none.annual_kwh_saved) < 1e-9);
+  assert.ok(Math.abs(none.head_at_trim_ft - 95) < 1e-9);
+  // THE SPEC'S OWN EXAMPLE IS BELOW THE LIMIT IT NAMES: 7.86 in against a 10.5
+  // in casing maximum is 74.8%, under the 75% practical limit.
+  assert.ok(Math.abs(r.fraction_of_max - r.required_diameter_in / 10.5) < 1e-12);
+  assert.ok(r.fraction_of_max < 0.75);
+  assert.equal(r.below_practical_limit, true);
+  // Tested off the boundary in both directions.
+  assert.equal(_v1625({ ...base, min_trim_fraction: r.fraction_of_max * 0.999 }).below_practical_limit, false);
+  assert.equal(_v1625({ ...base, min_trim_fraction: r.fraction_of_max * 1.001 }).below_practical_limit, true);
+  // The head check is separate from the flow, and it can fail on its own.
+  assert.equal(r.head_adequate, true);
+  assert.equal(_v1625({ ...base, required_head_ft: 80 }).head_adequate, false);
+  // Trimming cannot raise flow, and that is refused rather than extrapolated.
+  assert.ok(_v1625({ ...base, required_flow_gpm: 600 }).error);
+  assert.ok(_v1625({ ...base, min_trim_fraction: 0 }).error);
+});
+
+test("bounds: spec-v1626 computeCoilCapacityVerification -- 17.5% is not inside a 10% tolerance", () => {
+  const base = { airflow_cfm: 8000, entering_air_db_f: 80, leaving_air_db_f: 58, enthalpy_drop_btu_lb: 5.5, water_gpm: 40, entering_water_f: 44, leaving_water_f: 56, fluid_factor: 500, design_capacity_btuh: 240000, tolerance_pct: 10 };
+  const r = _v1626(base);
+  // IDENTITY: the three constants against the measured deltas.
+  assert.ok(Math.abs(r.air_sensible_btuh - 1.08 * 8000 * 22) < 1e-9);
+  assert.ok(Math.abs(r.air_total_btuh - 4.5 * 8000 * 5.5) < 1e-9);
+  assert.ok(Math.abs(r.water_btuh - 500 * 40 * 12) < 1e-9);
+  assert.ok(Math.abs(r.latent_btuh - (r.air_total_btuh - r.air_sensible_btuh)) < 1e-9);
+  // Switching to enthalpy narrows the gap, which is the spec's real point.
+  assert.ok(r.balance_difference_pct < r.sensible_only_difference_pct);
+  assert.ok(Math.abs(r.balance_difference_pct - 17.5) < 0.01);
+  // THE SPEC'S ERROR, PINNED: 17.5% is OUTSIDE the 10% tolerance, so the coil
+  // is not "fine" -- correcting the METHOD does not license the remainder.
+  assert.equal(r.balances, false);
+  assert.ok(r.balance_difference_pct > base.tolerance_pct);
+  // The verdict flips with the tolerance, tested off the boundary both ways.
+  assert.equal(_v1626({ ...base, tolerance_pct: r.balance_difference_pct * 1.001 }).balances, true);
+  assert.equal(_v1626({ ...base, tolerance_pct: r.balance_difference_pct * 0.999 }).balances, false);
+  // The direction of the disagreement is a boolean, because it names a
+  // different fault each way.
+  assert.equal(r.air_reads_high, false);
+  const airHigh = _v1626({ ...base, airflow_cfm: 16000 });
+  assert.equal(airHigh.air_reads_high, true);
+  // With no enthalpy entered the air side is sensible only, and on this wet
+  // coil that is the larger disagreement -- the comparison the spec warns about.
+  const sensible = _v1626({ ...base, enthalpy_drop_btu_lb: 0 });
+  assert.equal(sensible.has_enthalpy, false);
+  assert.ok(Math.abs(sensible.balance_difference_pct - r.sensible_only_difference_pct) < 1e-9);
+  assert.ok(sensible.balance_difference_pct > r.balance_difference_pct);
+  // A perfect balance is exactly zero difference and passes any tolerance.
+  const exact = _v1626({ ...base, enthalpy_drop_btu_lb: 240000 / (4.5 * 8000) });
+  assert.ok(Math.abs(exact.balance_difference_pct) < 1e-9);
+  assert.equal(exact.balances, true);
+  // A glycol fluid factor scales the water side exactly.
+  assert.ok(Math.abs(_v1626({ ...base, fluid_factor: 450 }).water_btuh - r.water_btuh * 0.9) < 1e-9);
+  assert.ok(_v1626({ ...base, leaving_air_db_f: 80 }).error);
+  assert.ok(_v1626({ ...base, tolerance_pct: 0 }).error);
+});
+
+test("bounds: spec-v1627 computeValveActuatorCloseOff -- design flow is not the worst case", () => {
+  const base = { seat_area_in2: 12, design_differential_psi: 8, minimum_flow_differential_psi: 45, actuator_closeoff_psi: 20, spring_closeoff_psi: 0, is_spring_return: "no" };
+  const r = _v1627(base);
+  // IDENTITY: force is pressure times area, on both differentials.
+  assert.ok(Math.abs(r.design_seat_force_lb - 8 * 12) < 1e-12);
+  assert.ok(Math.abs(r.worst_case_seat_force_lb - 45 * 12) < 1e-12);
+  assert.ok(Math.abs(r.actuator_force_lb - 20 * 12) < 1e-12);
+  assert.ok(Math.abs(r.force_shortfall_lb - (540 - 240)) < 1e-12);
+  // THE TRAP: the design-flow force is a fraction of the real one, so an
+  // actuator chosen on it looks generous and is not.
+  assert.equal(r.design_understates, true);
+  assert.ok(Math.abs(r.rise_ratio - 45 / 8) < 1e-12);
+  assert.ok(r.design_seat_force_lb < r.actuator_force_lb);
+  assert.ok(r.worst_case_seat_force_lb > r.actuator_force_lb);
+  assert.equal(r.driven_adequate, false);
+  // The verdict is read against the MINIMUM-flow differential, off the
+  // boundary in both directions.
+  assert.equal(_v1627({ ...base, actuator_closeoff_psi: 45.045 }).driven_adequate, true);
+  assert.equal(_v1627({ ...base, actuator_closeoff_psi: 44.955 }).driven_adequate, false);
+  // The spring direction is a SEPARATE rating and can fail where the driven
+  // one passes -- holds on command, leaks on a power failure.
+  const spring = _v1627({ ...base, actuator_closeoff_psi: 45, is_spring_return: "yes", spring_closeoff_psi: 25 });
+  assert.equal(spring.driven_adequate, true);
+  assert.equal(spring.spring_adequate, false);
+  assert.equal(spring.overall_adequate, false);
+  const bothOk = _v1627({ ...base, actuator_closeoff_psi: 45, is_spring_return: "yes", spring_closeoff_psi: 50 });
+  assert.equal(bothOk.overall_adequate, true);
+  // Force is exactly linear in seat area, which is why the effective area and
+  // not the nominal size is what matters.
+  assert.ok(Math.abs(_v1627({ ...base, seat_area_in2: 24 }).worst_case_seat_force_lb - 2 * r.worst_case_seat_force_lb) < 1e-9);
+  assert.ok(_v1627({ ...base, minimum_flow_differential_psi: 0 }).error);
+  assert.ok(_v1627({ ...base, seat_area_in2: 0 }).error);
+});
+
+test("bounds: spec-v1628 computeChillerStagingPoint -- the auxiliaries move the crossover", () => {
+  const base = { machine_tons: 500, plant_load_tons: 450, kw_per_ton_100: 0.62, kw_per_ton_75: 0.55, kw_per_ton_50: 0.52, kw_per_ton_30: 0.61, auxiliary_kw_per_machine: 45, staging_setpoint_pct: 80 };
+  const r = _v1628(base);
+  // IDENTITY: the load percentages, and linear interpolation of the entered
+  // curve. The spec used 0.585 at 90% and 0.525 at 45%; the curve gives 0.592
+  // and 0.5425, and the CONCLUSION is unchanged.
+  assert.ok(Math.abs(r.one_pct - 90) < 1e-12);
+  assert.ok(Math.abs(r.two_pct - 45) < 1e-12);
+  assert.ok(Math.abs(r.one_kw_ton - (0.55 + (0.62 - 0.55) * 15 / 25)) < 1e-12);
+  assert.ok(Math.abs(r.two_kw_ton - (0.61 + (0.52 - 0.61) * 15 / 20)) < 1e-12);
+  assert.ok(Math.abs(r.one_machine_kw - (450 * r.one_kw_ton + 45)) < 1e-9);
+  assert.ok(Math.abs(r.two_machine_kw - (450 * r.two_kw_ton + 90)) < 1e-9);
+  assert.equal(r.two_wins, false);
+  // The curve points reproduce exactly at their own load percentages.
+  for (const [pct, kwton] of [[30, 0.61], [50, 0.52], [75, 0.55], [100, 0.62]]) {
+    const x = _v1628({ ...base, plant_load_tons: 500 * pct / 100 });
+    assert.ok(Math.abs(x.one_kw_ton - kwton) < 1e-12);
+  }
+  // THE AUXILIARIES MOVE THE CROSSOVER, which is the whole point: with them at
+  // zero the second machine pays for itself much sooner.
+  const noAux = _v1628({ ...base, auxiliary_kw_per_machine: 0 });
+  assert.ok(noAux.crossover_tons < r.crossover_tons);
+  assert.ok(Math.abs(noAux.one_machine_kw - 450 * r.one_kw_ton) < 1e-9);
+  // With auxiliaries, two machines cost exactly one extra set.
+  assert.ok(Math.abs(r.two_machine_kw - noAux.two_machine_kw - 90) < 1e-9);
+  assert.ok(Math.abs(r.one_machine_kw - noAux.one_machine_kw - 45) < 1e-9);
+  // At the crossover the two options are within a step of each other, and
+  // either side of it the winner flips.
+  assert.ok(r.crossover_tons > 0 && r.crossover_tons <= 500);
+  const below = _v1628({ ...base, plant_load_tons: r.crossover_tons * 0.95 });
+  assert.equal(below.two_wins, false);
+  // The setpoint check is against the COMPUTED crossover, not a habit.
+  assert.ok(Math.abs(r.setpoint_tons - 400) < 1e-9);
+  assert.equal(r.stages_too_early, true);
+  assert.ok(r.setpoint_tons < r.crossover_tons);
+  assert.equal(_v1628({ ...base, staging_setpoint_pct: 99 }).stages_too_early, r.crossover_tons > 495);
+  // A load one machine cannot carry leaves two as the only option.
+  const big = _v1628({ ...base, plant_load_tons: 600 });
+  assert.equal(big.one_available, false);
+  assert.equal(big.one_machine_kw, 0);
+  assert.equal(big.two_wins, true);
+  assert.ok(_v1628({ ...base, plant_load_tons: 1200 }).error);
+  assert.ok(_v1628({ ...base, kw_per_ton_50: 0 }).error);
+});
+
+test("bounds: spec-v1629 computeVariablePrimaryBypass -- two machines have twice the minimum", () => {
+  const base = { machine_design_gpm: 1000, minimum_flow_fraction: 0.45, machines_running: 2, system_flow_gpm: 600, bypass_differential_psi: 24, design_differential_psi: 12 };
+  const r = _v1629(base);
+  // IDENTITY: the minimum scales with the machines running, exactly.
+  assert.ok(Math.abs(r.minimum_per_machine_gpm - 450) < 1e-12);
+  assert.ok(Math.abs(r.combined_minimum_gpm - 900) < 1e-12);
+  assert.ok(Math.abs(r.bypass_gpm - (900 - 600)) < 1e-12);
+  assert.equal(r.bypass_needed, true);
+  // THE TRAP, COMPUTED: the same system flow needs NO bypass with one machine.
+  const one = _v1629({ ...base, machines_running: 1 });
+  assert.equal(one.bypass_needed, false);
+  assert.equal(one.bypass_gpm, 0);
+  assert.ok(Math.abs(one.combined_minimum_gpm - r.combined_minimum_gpm / 2) < 1e-12);
+  assert.equal(r.staging_would_fix, true);
+  assert.ok(Math.abs(r.fewer_bypass_gpm - one.bypass_gpm) < 1e-12);
+  // A third of the pumped flow does no work at this condition.
+  assert.ok(Math.abs(r.pump_flow_gpm - 900) < 1e-12);
+  assert.ok(Math.abs(r.wasted_fraction - 300 / 900) < 1e-12);
+  // IDENTITY: Cv = gpm / sqrt(psi), and sizing at HALF the differential asks
+  // for exactly sqrt(2) times the Cv -- an oversized valve.
+  assert.ok(Math.abs(r.required_cv - 300 / Math.sqrt(24)) < 1e-9);
+  assert.ok(Math.abs(r.cv_at_design_differential - 300 / Math.sqrt(12)) < 1e-9);
+  assert.ok(Math.abs(r.oversize_ratio - Math.SQRT2) < 1e-9);
+  assert.ok(r.cv_at_design_differential > r.required_cv);
+  // The bypass boundary, tested either side rather than on it.
+  assert.equal(_v1629({ ...base, system_flow_gpm: 900.9 }).bypass_needed, false);
+  assert.equal(_v1629({ ...base, system_flow_gpm: 899.1 }).bypass_needed, true);
+  // Zero system flow means the whole minimum goes round the bypass.
+  const dead = _v1629({ ...base, system_flow_gpm: 0 });
+  assert.ok(Math.abs(dead.bypass_gpm - 900) < 1e-12);
+  assert.ok(Math.abs(dead.wasted_fraction - 1) < 1e-12);
+  assert.ok(_v1629({ ...base, machines_running: 1.5 }).error);
+  assert.ok(_v1629({ ...base, minimum_flow_fraction: 1.5 }).error);
+});
+
+test("bounds: spec-v1630 computeLouverFreeArea -- the air does not know about the blades", () => {
+  const base = { width_ft: 4, height_ft: 4, free_area_ratio: 0.45, airflow_cfm: 3600, water_penetration_fpm: 700, allowable_velocity_fpm: 0, application: "intake" };
+  const r = _v1630(base);
+  // IDENTITY: free area, and the two velocities.
+  assert.ok(Math.abs(r.gross_area_ft2 - 16) < 1e-12);
+  assert.ok(Math.abs(r.free_area_ft2 - 16 * 0.45) < 1e-12);
+  assert.ok(Math.abs(r.free_velocity_fpm - 3600 / 7.2) < 1e-9);
+  assert.ok(Math.abs(r.gross_velocity_fpm - 3600 / 16) < 1e-9);
+  // THE ERROR THE TILE EXISTS FOR: the real velocity is exactly the gross-area
+  // figure divided by the free area ratio, always larger.
+  assert.ok(Math.abs(r.free_velocity_fpm - r.gross_velocity_fpm / 0.45) < 1e-9);
+  assert.ok(r.free_velocity_fpm > r.gross_velocity_fpm);
+  // And sizing to a limit on gross area runs the free area at limit / ratio.
+  assert.ok(Math.abs(r.gross_sized_free_velocity_fpm - 700 / 0.45) < 1e-9);
+  assert.ok(r.gross_sized_free_velocity_fpm > 700);
+  assert.equal(r.within_limit, true);
+  // IDENTITY inverted: the free area a limit needs, fed back as a louver of
+  // that gross size, lands exactly on the limit.
+  const sized = _v1630({ ...base, width_ft: r.gross_area_for_allowable_ft2 / 4, height_ft: 4 });
+  assert.ok(Math.abs(sized.free_velocity_fpm - 700) < 1e-6);
+  assert.ok(Math.abs(sized.free_area_ft2 - r.free_area_needed_ft2) < 1e-9);
+  // The limit, tested either side rather than on it.
+  assert.equal(_v1630({ ...base, airflow_cfm: 700 * 7.2 * 0.999 }).within_limit, true);
+  assert.equal(_v1630({ ...base, airflow_cfm: 700 * 7.2 * 1.001 }).within_limit, false);
+  // A free area ratio of 1 is the degenerate case where gross IS free.
+  const open = _v1630({ ...base, free_area_ratio: 1 });
+  assert.ok(Math.abs(open.free_velocity_fpm - open.gross_velocity_fpm) < 1e-12);
+  // A relief louver reads against its own limit, not the penetration velocity.
+  const relief = _v1630({ ...base, application: "relief", allowable_velocity_fpm: 400 });
+  assert.equal(relief.is_intake, false);
+  assert.ok(Math.abs(relief.limit_fpm - 400) < 1e-12);
+  assert.equal(relief.within_limit, false);
+  assert.ok(_v1630({ ...base, free_area_ratio: 0 }).error);
+});
+
+test("bounds: spec-v1631 computePlenumReturnDrop -- the pinch point is the return path", () => {
+  const base = { return_cfm: 18000, pinch_width_ft: 4, pinch_clear_in: 14, target_velocity_fpm: 400, measured_room_to_plenum_inwg: 0.04, measured_plenum_to_shaft_inwg: 0.11, assumed_return_inwg: 0.02 };
+  const r = _v1631(base);
+  // IDENTITY: area and velocity at the restriction.
+  assert.ok(Math.abs(r.pinch_area_ft2 - 4 * 14 / 12) < 1e-12);
+  assert.ok(Math.abs(r.pinch_velocity_fpm - 18000 / r.pinch_area_ft2) < 1e-9);
+  assert.equal(r.within_target, false);
+  assert.ok(r.pinch_velocity_fpm > 9 * base.target_velocity_fpm);
+  // IDENTITY inverted: the area a target needs, and the width that implies at
+  // the same clear height -- fed back in, it lands exactly on the target.
+  assert.ok(Math.abs(r.area_for_target_ft2 - 18000 / 400) < 1e-9);
+  assert.ok(Math.abs(r.width_for_target_ft - r.area_for_target_ft2 / (14 / 12)) < 1e-9);
+  const opened = _v1631({ ...base, pinch_width_ft: r.width_for_target_ft });
+  assert.ok(Math.abs(opened.pinch_velocity_fpm - 400) < 1e-9);
+  assert.equal(opened.within_target, true);
+  // The target boundary, off it in both directions.
+  assert.equal(_v1631({ ...base, pinch_width_ft: r.width_for_target_ft * 1.001 }).within_target, true);
+  assert.equal(_v1631({ ...base, pinch_width_ft: r.width_for_target_ft * 0.999 }).within_target, false);
+  // IDENTITY: the two measured differences sum to the path the fan carries,
+  // and the shortfall is what the design left out.
+  assert.ok(Math.abs(r.measured_total_inwg - 0.15) < 1e-9);
+  assert.ok(Math.abs(r.static_shortfall_inwg - (0.15 - 0.02)) < 1e-9);
+  assert.equal(r.understated, true);
+  // A design that allowed for the whole path is not understated.
+  assert.equal(_v1631({ ...base, assumed_return_inwg: 0.2 }).understated, false);
+  // The split localizes the restriction, and it flips with the measurements.
+  const grille = _v1631({ ...base, measured_room_to_plenum_inwg: 0.12, measured_plenum_to_shaft_inwg: 0.03 });
+  assert.ok(grille.split_verdict.includes("ROOM"));
+  assert.ok(r.split_verdict.includes("PLENUM"));
+  // Velocity is exactly linear in flow and inverse in clear height.
+  assert.ok(Math.abs(_v1631({ ...base, return_cfm: 36000 }).pinch_velocity_fpm - 2 * r.pinch_velocity_fpm) < 1e-9);
+  assert.ok(Math.abs(_v1631({ ...base, pinch_clear_in: 28 }).pinch_velocity_fpm - r.pinch_velocity_fpm / 2) < 1e-9);
+  assert.ok(_v1631({ ...base, pinch_clear_in: 0 }).error);
+});

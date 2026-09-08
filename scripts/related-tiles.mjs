@@ -1562,6 +1562,17 @@ const RELATED = {
   "nesc-district-loading": ["conductor-sag-at-temperature","transverse-wind-load-conductor","conductor-blowout"],
   "conductor-creep-elongation": ["conductor-sag-at-temperature","line-ground-clearance-nesc","ruling-span"],
   "sagging-return-wave": ["ruling-span","conductor-sag-at-temperature","line-ground-clearance-nesc"],
+  // spec-v1622..v1631: HVAC test-and-balance and hydronic systems band.
+  "flow-hood-correction": ["pitot-traverse-cfm","proportional-balance-ratio","traverse-closure"],
+  "fan-system-effect": ["fan-affinity-laws","duct-leakage","flow-hood-correction"],
+  "proportional-balance-ratio": ["flow-hood-correction","vav-box-airflow","adpi-diffuser-selection"],
+  "pump-impeller-trim": ["pump-tdh","vfd-energy-savings","pump-specific-speed"],
+  "coil-capacity-verification": ["chiller-tons","coil-face-velocity","hydronic-gpm-deltat"],
+  "valve-actuator-close-off": ["valve-authority","variable-primary-bypass","pump-impeller-trim"],
+  "chiller-staging-point": ["chiller-tons","variable-primary-bypass","coil-capacity-verification"],
+  "variable-primary-bypass": ["chiller-staging-point","valve-actuator-close-off","chiller-tons"],
+  "louver-free-area": ["machinery-room-ventilation","plenum-return-drop","filter-pressure-drop"],
+  "plenum-return-drop": ["louver-free-area","fan-system-effect","duct-leakage"],
   // spec-v1524..v1533: oil, gas and pipeline band.
   "pipeline-mao-barlow": ["hoop-stress-thin-wall","corroded-pipe-b31g","pipe-pressure-rating"],
   "gas-pipeline-flow": ["gas-pipe-max-flow","pipeline-mao-barlow","liquid-pipeline-station-spacing"],
@@ -1583,7 +1594,7 @@ const RELATED = {
   "secondary-glycol-loop": ["hydronic-gpm-deltat","glycol-mix","chilled-water-delta-t"],
   "co2-transcritical-pressure": ["compression-ratio-refrig","head-pressure-control","condenser-td-head-pressure"],
   "refrigeration-relief-capacity": ["machinery-room-ventilation","ammonia-charge-inventory","safety-valve-capacity"],
-  "machinery-room-ventilation": ["ammonia-charge-inventory","refrigeration-relief-capacity","refrigerant-leak-rate"],
+  "machinery-room-ventilation": ["louver-free-area","ammonia-charge-inventory","refrigeration-relief-capacity"],
   // spec-v1696..v1700, v1691..v1693: arboriculture and abatement band.
   "crown-reduction-leaf-area": ["crown-pruning-dose","trunk-decay-strength","tree-protection-zone"],
   "root-ball-size-weight": ["soil-volume-for-canopy","tree-protection-zone","log-limb-weight"],

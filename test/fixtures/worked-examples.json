@@ -102196,6 +102196,550 @@
    }
   },
   {
+   "tile_id": "flow-hood-correction",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Flow Hood Reading Correction -- the spec-v1622 worked example, recomputed",
+   "source_edition_or_year": "spec-v1622 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "hood_reading_cfm": 420,
+    "correction_factor": 0.94,
+    "reference_traverse_cfm": 0,
+    "design_cfm": 400,
+    "system_reading_total_cfm": 16000
+   },
+   "outputs": {
+    "corrected_cfm": {
+     "value": 394.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pct_of_design": {
+     "value": 98.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "uncorrected_pct_of_design": {
+     "value": 105,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "system_corrected_cfm": {
+     "value": 15040,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "system_error_cfm": {
+     "value": -960,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fan-system-effect",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Fan System Effect and Installed Performance -- the spec-v1623 worked example, recomputed",
+   "source_edition_or_year": "spec-v1623 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "flow_cfm": 12000,
+    "outlet_width_in": 30,
+    "outlet_height_in": 24,
+    "straight_duct_ft": 3,
+    "inlet_condition": "elbow_with_swirl",
+    "fan_curve_tp_inwg": 2.5,
+    "measured_tp_inwg": 2.9
+   },
+   "outputs": {
+    "outlet_area_ft2": {
+     "value": 5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "outlet_velocity_fpm": {
+     "value": 2400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "equivalent_diameter_ft": {
+     "value": 2.52313,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "effective_length_ft": {
+     "value": 6.30783,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "length_shortfall_ft": {
+     "value": 3.30783,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "proportional-balance-ratio",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Proportional Balancing Ratio Method -- the spec-v1624 worked example, recomputed",
+   "source_edition_or_year": "spec-v1624 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "design_1_cfm": 250,
+    "measured_1_cfm": 310,
+    "design_2_cfm": 300,
+    "measured_2_cfm": 285,
+    "design_3_cfm": 200,
+    "measured_3_cfm": 250,
+    "design_4_cfm": 400,
+    "measured_4_cfm": 365,
+    "design_5_cfm": 250,
+    "measured_5_cfm": 300,
+    "design_6_cfm": 0,
+    "measured_6_cfm": 0
+   },
+   "outputs": {
+    "reference_ratio": {
+     "value": 0.9125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "branch_design_cfm": {
+     "value": 1400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "branch_measured_cfm": {
+     "value": 1510,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "branch_after_equalizing_cfm": {
+     "value": 1277.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "branch_adjustment_factor": {
+     "value": 1.09589,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pump-impeller-trim",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Pump Impeller Trim for a Balanced Flow -- the spec-v1625 worked example, recomputed",
+   "source_edition_or_year": "spec-v1625 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "current_diameter_in": 9.5,
+    "current_flow_gpm": 520,
+    "required_flow_gpm": 430,
+    "current_head_ft": 95,
+    "required_head_ft": 62,
+    "max_diameter_in": 10.5,
+    "min_trim_fraction": 0.75,
+    "motor_hp": 15,
+    "annual_hours": 6000,
+    "energy_rate_per_kwh": 0.1
+   },
+   "outputs": {
+    "required_diameter_in": {
+     "value": 7.85577,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "trim_in": {
+     "value": 1.64423,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "trim_pct": {
+     "value": 17.30769,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "power_ratio": {
+     "value": 0.56545,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "head_at_trim_ft": {
+     "value": 64.96117,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annual_kwh_saved": {
+     "value": 29163.85063,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annual_cost_saved": {
+     "value": 2916.38506,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "coil-capacity-verification",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Coil Capacity Verification -- the spec-v1626 worked example, recomputed",
+   "source_edition_or_year": "spec-v1626 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "airflow_cfm": 8000,
+    "entering_air_db_f": 80,
+    "leaving_air_db_f": 58,
+    "enthalpy_drop_btu_lb": 5.5,
+    "water_gpm": 40,
+    "entering_water_f": 44,
+    "leaving_water_f": 56,
+    "fluid_factor": 500,
+    "design_capacity_btuh": 240000,
+    "tolerance_pct": 10
+   },
+   "outputs": {
+    "air_sensible_btuh": {
+     "value": 190080,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "air_total_btuh": {
+     "value": 198000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "water_btuh": {
+     "value": 240000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "balance_difference_pct": {
+     "value": 17.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sensible_only_difference_pct": {
+     "value": 20.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "latent_btuh": {
+     "value": 7920,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "valve-actuator-close-off",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Valve Actuator Close-Off Pressure -- the spec-v1627 worked example, recomputed",
+   "source_edition_or_year": "spec-v1627 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "seat_area_in2": 12,
+    "design_differential_psi": 8,
+    "minimum_flow_differential_psi": 45,
+    "actuator_closeoff_psi": 20,
+    "spring_closeoff_psi": 0,
+    "is_spring_return": "no"
+   },
+   "outputs": {
+    "design_seat_force_lb": {
+     "value": 96,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "worst_case_seat_force_lb": {
+     "value": 540,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "actuator_force_lb": {
+     "value": 240,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "force_shortfall_lb": {
+     "value": 300,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rise_ratio": {
+     "value": 5.625,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "chiller-staging-point",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Chiller Staging Point and Part-Load Efficiency -- the spec-v1628 worked example, recomputed",
+   "source_edition_or_year": "spec-v1628 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "machine_tons": 500,
+    "plant_load_tons": 450,
+    "kw_per_ton_100": 0.62,
+    "kw_per_ton_75": 0.55,
+    "kw_per_ton_50": 0.52,
+    "kw_per_ton_30": 0.61,
+    "auxiliary_kw_per_machine": 45,
+    "staging_setpoint_pct": 80
+   },
+   "outputs": {
+    "one_pct": {
+     "value": 90,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "two_pct": {
+     "value": 45,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "one_machine_kw": {
+     "value": 311.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "two_machine_kw": {
+     "value": 334.125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "crossover_tons": {
+     "value": 490,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "setpoint_tons": {
+     "value": 400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "variable-primary-bypass",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Variable Primary Minimum Flow Bypass -- the spec-v1629 worked example, recomputed",
+   "source_edition_or_year": "spec-v1629 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "machine_design_gpm": 1000,
+    "minimum_flow_fraction": 0.45,
+    "machines_running": 2,
+    "system_flow_gpm": 600,
+    "bypass_differential_psi": 24,
+    "design_differential_psi": 12
+   },
+   "outputs": {
+    "minimum_per_machine_gpm": {
+     "value": 450,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "combined_minimum_gpm": {
+     "value": 900,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bypass_gpm": {
+     "value": 300,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_cv": {
+     "value": 61.23724,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cv_at_design_differential": {
+     "value": 86.60254,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "louver-free-area",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Louver Free Area, Velocity, and Water Penetration -- the spec-v1630 worked example, recomputed",
+   "source_edition_or_year": "spec-v1630 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "width_ft": 4,
+    "height_ft": 4,
+    "free_area_ratio": 0.45,
+    "airflow_cfm": 3600,
+    "water_penetration_fpm": 700,
+    "allowable_velocity_fpm": 0,
+    "application": "intake"
+   },
+   "outputs": {
+    "gross_area_ft2": {
+     "value": 16,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "free_area_ft2": {
+     "value": 7.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "free_velocity_fpm": {
+     "value": 500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gross_velocity_fpm": {
+     "value": 225,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gross_sized_free_velocity_fpm": {
+     "value": 1555.55556,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "free_area_needed_ft2": {
+     "value": 5.14286,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "plenum-return-drop",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Ceiling Plenum Return Path -- the spec-v1631 worked example, recomputed",
+   "source_edition_or_year": "spec-v1631 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "return_cfm": 18000,
+    "pinch_width_ft": 4,
+    "pinch_clear_in": 14,
+    "target_velocity_fpm": 400,
+    "measured_room_to_plenum_inwg": 0.04,
+    "measured_plenum_to_shaft_inwg": 0.11,
+    "assumed_return_inwg": 0.02
+   },
+   "outputs": {
+    "pinch_area_ft2": {
+     "value": 4.66667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pinch_velocity_fpm": {
+     "value": 3857.14286,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "area_for_target_ft2": {
+     "value": 45,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "width_for_target_ft": {
+     "value": 38.57143,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "measured_total_inwg": {
+     "value": 0.15,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "static_shortfall_inwg": {
+     "value": 0.13,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pipeline-mao-barlow",
    "source_publisher": "Project (first-principles)",
    "source_title": "Pipeline Maximum Allowable Operating Pressure (Barlow) -- the spec-v1524 worked example, recomputed",

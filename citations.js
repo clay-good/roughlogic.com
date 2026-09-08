@@ -22093,6 +22093,128 @@ export const CITATIONS = {
       { name: "The target sag comes from elsewhere", value: "the stringing chart at the ruling span and the temperature at that moment", source: "the utility's stringing charts" },
     ],
   },
+  // spec-v1622..v1631: the 2026-09-08 trade-expansion HVAC test-and-balance
+  // and hydronic systems band. Ten tiles, nothing cut.
+  "flow-hood-correction": {
+    formula: "corrected flow = hood reading x correction factor; where a reference traverse is entered the factor is DERIVED as traverse / reading; the report total corrects by the same factor, and the difference is the systematic error the uncorrected report carried.",
+    edition: "The balancing-hood correction as AABC and NEBB field practice states it, with the factor best established on the actual system by comparing hood readings against a duct traverse rather than taken from a table. It does not model the back pressure from the hood's own resistance, select a hood or adapter, or capture placement failures such as an unsealed hood or a linear slot without the right adapter.",
+    freeAccess: "One multiplication and one ratio; no manufacturer table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "A hood is a resistance in series with the diffuser, and adding resistance to a system reduces the flow through it, so a hood commonly reads LOW -- but how much depends on the diffuser's available pressure, and the direction can run either way, so it is COMPUTED from the factor here rather than asserted. What matters more than the direction is that the error is SYSTEMATIC: it is the same sign on every reading, so it does not average out across a report and an uncorrected total misstates the whole system by the same proportion it misstates one outlet.",
+    assumptions: [
+      { name: "The factor is not a property of the hood alone", value: "it depends on the diffuser and the system's available pressure", source: "a duct traverse on the same system" },
+      { name: "Placement failures are not captured", value: "an unsealed hood or a missing slot adapter is larger than any factor", source: "the balancer's own inspection" },
+      { name: "It measures nothing", value: "this corrects a reading you took", source: "AABC or NEBB procedure" },
+    ],
+  },
+  "fan-system-effect": {
+    formula: "outlet velocity = flow / outlet area; equivalent diameter = sqrt(4 A / pi); AMCA's effective duct length is 2.5 equivalent diameters at 2,500 fpm and below, plus one diameter per additional 1,000 fpm; the installed straight length is compared against it, and measured total pressure above the curve at the same flow is the diagnostic signature.",
+    edition: "AMCA Publication 201 (Fans and Systems) by name -- the effective duct length below which an outlet system effect applies, and the inlet conditions that reduce the pressure a fan can develop, worst when an elbow spins the air WITH the wheel rotation. It reports whether the installation meets the effective length; it does NOT compute the system effect pressure penalty, because AMCA's factors depend on the specific geometry, blast area ratio and elbow orientation.",
+    freeAccess: "One velocity, one diameter, and one length comparison.",
+    governance: GOVERNANCE.general,
+    editionNote: "A catalogue fan curve is measured with ideal approach and discharge and a real installation rarely provides them. Air leaves a centrifugal fan through a small blast area at high velocity and needs straight duct to expand and convert that velocity into static pressure; cut that short and the recovery does not happen. The inlet case is worse and more common, and it is invisible in any measurement taken downstream of the fan. The diagnostic value is the point: a fan at design speed, drawing design amps, short on flow and showing MORE static than designed is very often a system effect, and speeding it up raises the flow and the loss with it.",
+    assumptions: [
+      { name: "The penalty itself is not computed", value: "AMCA's factors depend on geometry a single coefficient cannot carry", source: "AMCA Publication 201" },
+      { name: "The inlet effect is named, not quantified", value: "it depends on clearance, elbow geometry and swirl direction", source: "the fan manufacturer" },
+      { name: "Catalogue curve conditions", value: "the rated curve assumes ideal inlet and outlet", source: "the fan manufacturer's rated data" },
+    ],
+  },
+  "proportional-balance-ratio": {
+    formula: "ratio = measured / design at every terminal; the LOWEST ratio is the reference and is left wide open; every other terminal is throttled to design x that reference ratio; the branch then reads design x the reference ratio, and the branch damper opens by the reciprocal of it.",
+    edition: "The proportional balancing method as AABC and NEBB procedure states it. Measured flows are ENTERED and should be corrected readings, because a systematic instrument error shifts every ratio together and moves the reference. It does not model damper positions, branch pressure, or interaction between branches on a common trunk, and a branch with too little pressure at the reference outlet cannot be balanced by this or any other method.",
+    freeAccess: "A set of ratios and one multiplication each.",
+    governance: GOVERNANCE.general,
+    editionNote: "Air systems are COUPLED: closing a damper at one outlet raises the pressure available to every other outlet on the branch, so an outlet set exactly to design will not be at design once the next is adjusted. Proportional balancing exploits the coupling instead of fighting it -- once every outlet sits at the same fraction of design, any change in branch flow scales them all by the same factor and the ratios are preserved. The reference is the LOWEST ratio and it is left wide open, because throttling everything to match a HIGH outlet would mean opening the low one beyond fully open, which is not available. That single rule is what makes the method converge.",
+    assumptions: [
+      { name: "Measured flows should be corrected", value: "a systematic instrument error moves the reference", source: "flow-hood correction or a traverse" },
+      { name: "One branch at a time", value: "interaction between branches on a common trunk is not modelled", source: "the balancing procedure in force" },
+      { name: "It cannot create pressure", value: "a branch short of pressure at the reference outlet is a design or fan problem", source: "the mechanical engineer of record" },
+    ],
+  },
+  "pump-impeller-trim": {
+    formula: "trim affinity: Q2/Q1 = D2/D1, H2/H1 = (D2/D1)^2, P2/P1 = (D2/D1)^3; the required diameter is the current one times the flow ratio; the head at the trimmed diameter is checked against the head required; and the annual saving is the motor power times one minus the power ratio, over the operating hours.",
+    edition: "The impeller-trim affinity relations as pump practice writes them, noting that a TRIM is not a speed change: it alters the impeller's geometry relative to its casing, so the correspondence is APPROXIMATE and the manufacturer's published trim curves are the authority. The practical limit of roughly 75 to 80% of the casing maximum is ENTERED. It does not read a pump curve, compute efficiency at the trimmed condition, check NPSH available, or address minimum flow.",
+    freeAccess: "Three affinity ratios and one energy calculation.",
+    governance: GOVERNANCE.general,
+    editionNote: "A pump throttled to reduce flow develops head the system does not need and destroys it across a balance valve, converting power directly into water temperature. A trimmed impeller never develops the excess head at all, so the saving persists for the life of the pump with no control action. Because power goes as the CUBE of the diameter ratio, a modest trim is a large power reduction. Two checks decide whether the trim is usable and both are computed rather than left as caveats: the trimmed pump must still make the required HEAD at the required flow, and below roughly three quarters of the casing maximum the efficiency falls off and the affinity estimate itself becomes unreliable.",
+    assumptions: [
+      { name: "The trim relations are approximate", value: "trimming changes geometry relative to the casing, unlike a speed change", source: "the manufacturer's trim curves" },
+      { name: "No efficiency at the trimmed point", value: "efficiency falls as the tip-to-casing gap grows", source: "the pump manufacturer" },
+      { name: "NPSH is not checked", value: "the new operating point has its own requirement", source: "the mechanical engineer of record" },
+    ],
+  },
+  "coil-capacity-verification": {
+    formula: "air sensible Q = 1.08 x CFM x dT; air total Q = 4.5 x CFM x dh on a wet coil; water Q = fluid factor x GPM x dT with 500 for water; the heat balance difference is the gap between the air side used and the water side, as a percentage of the water side, judged against an entered tolerance.",
+    edition: "The coil heat balance as ASHRAE and balancing practice writes it, where 1.08 is 0.075 lb/cu ft x 0.24 BTU/lb-degF x 60 min/h, 4.5 is 0.075 x 60, and 500 is 8.33 lb/gal x 60 x 1.0. The tolerance and the fluid factor are ENTERED. Sea-level standard air: it does not correct for altitude or non-standard density, derive enthalpy from dry-bulb and wet-bulb readings, assess instrument accuracy, or evaluate coil cleanliness, circuiting or approach.",
+    freeAccess: "Three constants and two temperature differences.",
+    governance: GOVERNANCE.general,
+    editionNote: "Two independent measurements are the whole value of the exercise: agreement is strong evidence that both are right, and disagreement LOCALISES the problem. Air side high points at an overstated airflow or at air bypassing the coil; water side high usually means the flow measurement is wrong or the sensors are too close together for the delta. The sensible-versus-total distinction is the trap, because a sensible-only air side will fall short of a wet coil's water side for no reason but the method -- and correcting the method does NOT license calling any remaining disagreement acceptable, which is why the tolerance is entered and the verdict computed against it.",
+    assumptions: [
+      { name: "Sea-level standard air", value: "1.08 and 4.5 carry a 0.075 lb/cu ft density", source: "ASHRAE Fundamentals" },
+      { name: "Enthalpy is entered, not derived", value: "it needs wet-bulb readings on both sides", source: "the balancer's psychrometric readings" },
+      { name: "The water delta is the weak measurement", value: "a small delta with degree-accurate sensors carries large uncertainty", source: "the instrument calibration" },
+    ],
+  },
+  "valve-actuator-close-off": {
+    formula: "seat force = differential pressure x effective seat area, evaluated at the differential at MINIMUM system flow rather than at design; the actuator's rated close-off is converted to a force the same way and compared; the spring-direction rating is compared separately.",
+    edition: "Valve close-off as control-valve practice states it. The effective seat area and both actuator ratings are ENTERED from the manufacturer's tables; on a rotary valve close-off is published as a TORQUE and this force basis does not apply. It does not size the valve or its Cv, compute the minimum-flow differential (which needs the pump curve and the system), evaluate valve authority, or address cavitation and flashing.",
+    freeAccess: "One product and one comparison; no manufacturer table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The differential a valve must close against is not the one it sees at design flow. As other valves close, the pump rides up its curve and the pressure across the remaining valves rises toward shutoff head, so the worst case is MINIMUM system flow -- the condition a designer computing at design never looks at, and the condition in which the valve is most likely to be commanded shut. The consequence of getting it wrong is subtle: the valve strokes, the actuator reports closed, and a small flow continues past the seat, so a zone overheats and the problem reads as a control fault. Spring-return actuators get their own line because their spring-direction close-off is often much lower, which means a valve that holds on command can leak on a power failure.",
+    assumptions: [
+      { name: "The effective seat area is entered", value: "it is not the nominal valve size", source: "the valve manufacturer's data" },
+      { name: "Rotary valves use torque", value: "the force basis here does not apply to ball or butterfly valves", source: "the actuator manufacturer" },
+      { name: "The minimum-flow differential is entered", value: "it needs the pump curve and the system to compute", source: "the controls engineer of record" },
+    ],
+  },
+  "chiller-staging-point": {
+    formula: "one machine's power = load x kW/ton at its percent load plus one set of auxiliaries; two machines = load x kW/ton at half that percent load plus two sets; the kW/ton curve is interpolated linearly between four entered part-load points, and the crossover is found by SEARCHING the load range because the curve is not monotonic.",
+    edition: "The chiller staging comparison as central-plant practice writes it, with the kW/ton curve ENTERED at four part-load points because efficiency is not monotonic in load and centrifugal, screw and scroll machines differ. It does not model condenser water temperature, tower staging and fan power, variable-speed pumping, minimum run times, demand limiting or thermal storage, and it does not use IPLV, which is for comparing machines rather than staging them.",
+    freeAccess: "A curve the reader supplies, interpolated and searched.",
+    governance: GOVERNANCE.general,
+    editionNote: "Many centrifugal machines are most efficient between roughly 40 and 70% load rather than at 100, because condenser water is colder at part load and the lift is lower -- so two machines at half load can beat one at full, and below their best point efficiency falls off again. The auxiliaries are what people leave out and they frequently move the answer: a second chiller starts its chilled water pump, its condenser water pump and often a tower cell, so it must save more than its own auxiliaries before it pays for itself. The crossover is SEARCHED rather than solved, because a non-monotonic curve would send a solver to the wrong root.",
+    assumptions: [
+      { name: "The curve is entered", value: "machine type and condenser conditions change it entirely", source: "the chiller manufacturer's part-load data" },
+      { name: "Auxiliaries are a flat per-machine figure", value: "variable-speed pumping and tower staging are not modelled", source: "the plant's controls engineer" },
+      { name: "Not IPLV", value: "a weighted single number is for comparison, not for staging", source: "AHRI 550/590" },
+    ],
+  },
+  "variable-primary-bypass": {
+    formula: "minimum per machine = design evaporator flow x the minimum fraction; combined minimum = that times the machines running; bypass = combined minimum minus system flow when the system falls below it; valve Cv = bypass gpm / sqrt(differential psi) at the differential the pumps develop at that low flow.",
+    edition: "The variable primary chilled water minimum-flow bypass as central-plant practice writes it. The evaporator minimum fraction is ENTERED from the chiller manufacturer, because it varies by machine and evaporator design. It does not model the control sequence, the sensor location the bypass modulates from, the check valve and flow measurement a variable primary plant needs, or the transient during a stage change, which is when low-flow trips actually happen.",
+    freeAccess: "One flow balance and one valve-sizing relation.",
+    governance: GOVERNANCE.general,
+    editionNote: "The bypass protects the MACHINE rather than controlling temperature: below the evaporator's minimum the water goes laminar, heat transfer collapses, control becomes unstable, the low-temperature safety trips, and on some machines repeated low-flow operation damages tubes. The interaction with STAGING is arithmetic rather than judgment -- two chillers running have twice the minimum flow of one -- so a plant that stages up at low load and does not stage back down promptly circulates water that does no work at all. Valve sizing has one counter-intuitive turn: the worst bypass condition is near pump shutoff, so the differential is HIGH and the required Cv is SMALLER than a design-differential sizing suggests, and an oversized bypass valve controls badly at the small openings it lives at.",
+    assumptions: [
+      { name: "The minimum fraction is entered", value: "it varies by machine and evaporator design", source: "the chiller manufacturer" },
+      { name: "No control sequence", value: "the sensor location and the modulation are the designer's", source: "the plant designer" },
+      { name: "Steady state", value: "the stage-change transient is when low-flow trips happen", source: "the controls engineer" },
+    ],
+  },
+  "louver-free-area": {
+    formula: "free area = gross area x the free area ratio; free-area velocity = cfm / free area; the free area a limit requires = cfm / that limit, and the gross louver it implies is that over the free area ratio; sizing to a limit on GROSS area instead runs the free area at the limit divided by the free area ratio.",
+    edition: "Louver free area and face velocity as AMCA practice writes it, against the beginning point of water penetration established by AMCA 500-L testing for the SPECIFIC louver. The free area ratio and the penetration velocity are ENTERED from the louver's published certified data. It does not compute pressure drop, account for sand traps, bird or insect screens that further reduce free area, address wind-driven rain performance (a separate AMCA 550 test), or size drains and gutters.",
+    freeAccess: "Two areas and a velocity; no certified rating table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Free area ratio is the number that turns a louver from a hole into a component. A conventional stationary louver passes roughly 35 to 50% of its gross face, so sizing on gross area understates the real velocity by a factor of two or more -- which is how rain gets into a mechanical room that was designed correctly on paper, and that error is computed here rather than described. The limit that governs an INTAKE is water penetration, a tested property rather than a rule of thumb, and drainable-blade designs carry it far higher -- so substituting a cheaper louver of the same size late in a job is a performance change rather than a purchasing decision. Relief louvers are limited by pressure drop and noise instead, so an intake velocity limit oversizes them.",
+    assumptions: [
+      { name: "The free area ratio is entered", value: "it is a property of the blade design and depth", source: "the louver's AMCA-certified data" },
+      { name: "The penetration velocity is tested", value: "AMCA 500-L establishes it per louver, not per type", source: "the louver manufacturer" },
+      { name: "Screens are not accounted for", value: "bird, insect and sand screens further reduce free area", source: "the mechanical engineer of record" },
+    ],
+  },
+  "plenum-return-drop": {
+    formula: "velocity at the restriction = return cfm / the clear area there; the area a target velocity requires = cfm / that target, and the width it implies at the same clear height; the measured room-to-plenum and plenum-to-shaft differences sum to the return path the fan actually carries.",
+    edition: "The ceiling return plenum treated as a low-velocity duct whose restriction is at its pinch point, against the commonly cited 300 to 500 fpm plenum target. It computes velocity and the area a target requires; it does NOT compute the pressure drop, which depends on the shape of every obstruction, the approach conditions and the path length in ways a plenum's irregular geometry does not reduce to a coefficient. It does not model flow distribution across bays, fire and smoke dampers in the path, or the plenum's effect on return air temperature.",
+    freeAccess: "One velocity and one area; measurement is the reliable method.",
+    governance: GOVERNANCE.general,
+    editionNote: "A plenum is a duct whose cross-section is whatever the structure left over, and air does not distribute itself evenly through it -- it takes the easiest path, so a return that measures fine near the shaft can be starved at the far corner. The static consequence is what makes this a balancing issue: if the fan's external static assumed a negligible return and the plenum actually costs a measurable fraction of an inch, the fan delivers less than design at a HIGHER static than expected, which looks like a supply-side problem and is not. Measuring room to plenum and plenum to shaft is what localises it, and the split says whether the grille or the travel path is the culprit. The other consequence is pressure relationships: a restricted return makes the plenum more negative than the space and can undo the intended pressurization entirely.",
+    assumptions: [
+      { name: "The pressure drop is not computed", value: "an irregular plenum geometry does not reduce to a coefficient", source: "measurement in the field" },
+      { name: "One pinch point", value: "flow distribution across multiple bays is not modelled", source: "the mechanical engineer of record" },
+      { name: "Dampers are not in the path model", value: "fire and smoke dampers add their own resistance", source: "the smoke control design" },
+    ],
+  },
   // spec-v1524..v1533: the 2026-09-08 trade-expansion oil, gas and pipeline
   // band, in the new calc-oilgas.js. Ten tiles, nothing cut.
   "pipeline-mao-barlow": {

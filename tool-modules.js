@@ -391,6 +391,12 @@ export const TOOL_MODULES = (() => {
   // calc-hvacsystems.js. They keep group: "C" (group letter independent of
   // module, the v42/v70..v80 precedent).
   declare("./calc-hvacsystems.js", "HVACSYSTEMS_RENDERERS", [
+    // spec-v1622..v1631: the test-and-balance and hydronic systems band.
+    "flow-hood-correction", "fan-system-effect", "proportional-balance-ratio",
+    "pump-impeller-trim", "coil-capacity-verification", "valve-actuator-close-off",
+    "chiller-staging-point", "variable-primary-bypass", "louver-free-area",
+    "plenum-return-drop",
+
     "chiller-tons", "hx-lmtd-ntu", "air-changes-hour",
     "boiler-pipe-sizing", "compressor-short-cycle", "humidifier-capacity",
     "filter-pressure-drop",
