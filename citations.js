@@ -22093,6 +22093,128 @@ export const CITATIONS = {
       { name: "The target sag comes from elsewhere", value: "the stringing chart at the ruling span and the temperature at that moment", source: "the utility's stringing charts" },
     ],
   },
+  // spec-v1679, v1681..v1689: the 2026-09-08 trade-expansion sheet metal,
+  // masonry, and scaffold band. spec-v1680 was cut to pipe-miter-cut.
+  "square-to-round-development": {
+    formula: "true length of an element line = sqrt(plan distance squared + height squared); the developed curved edge is the sum of the chords across the elements, each chord being 2 R sin(pi / N) for N elements, which must come back to pi x diameter.",
+    edition: "Triangulation development of a square-to-round transition by name. Seam and lap allowances are added to the developed shape, not part of it. It gives the governing true lengths, the element chord, the circumference check and the sheet size; it does not emit pattern coordinates or develop an eccentric transition's unequal elements individually. SMACNA's duct construction standards, the shop's layout practice, and a test piece govern.",
+    freeAccess: "One hypotenuse and one sine on dimensions the reader has; no pattern or standard text is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Triangulation is the method and TRUE LENGTH is the only idea in it. Any line on a square-to-round that is neither vertical nor horizontal appears shorter in every orthogonal view than it really is, so laying out from plan dimensions produces a pattern too small and a fitting that will not close. The circle is divided into elements because a curve cannot be triangulated directly, and each element develops as a straight chord -- so the developed edge is an inscribed polygon and always SHORT of the true circumference. More elements close that gap and cost layout time, and the shortfall at the entered count is reported so the choice is made with a number. The check at the end is worth doing every time: finding an error on the bench costs a sheet, finding it at the fitting costs the fitting.",
+    assumptions: [
+      { name: "A concentric transition's governing elements", value: "an offset makes every element different and needs all of them", source: "the shop's layout practice" },
+      { name: "No bend allowance", value: "the metal thickness and forming method are not in it", source: "SMACNA duct construction standards" },
+      { name: "Gauge, stiffening and seam type are not selected", value: "those follow the duct pressure class", source: "SMACNA duct construction standards" },
+    ],
+  },
+  "standing-seam-takeoff": {
+    formula: "panel count = building width / COVERAGE width, rounded up; clips per panel = panel length / clip spacing + 1; fasteners = clips x fasteners per clip; seam length = (panels - 1) x panel length.",
+    edition: "The standing seam takeoff identities by name. CLIP SPACING IS NOT DETERMINED HERE: it comes from the tested assembly's rated uplift resistance against the design pressure for each roof zone, with corners and edges much closer than the field. A takeoff on a simple rectangular plane; hips, valleys, flashing, closures and trim are not counted. The panel manufacturer's tested assembly and installation instructions, the wind design for the building, and the roofing contractor govern.",
+    freeAccess: "Two divisions on a coverage width and a clip spacing the reader has; no manufacturer table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "COVERAGE WIDTH IS THE NUMBER THAT MATTERS AND IT IS NOT THE PANEL WIDTH. A sixteen inch coverage panel is roll-formed from a wider sheet and the difference goes into the seam, so ordering on the sheet width comes up several panels short with the last one landing well before the rake. CLIP SPACING IS A STRUCTURAL OUTPUT rather than an installer's choice: the clips hold the roof down against uplift, and corners and edges need much closer spacing than the field. A roof clipped at a uniform field spacing is under-attached exactly where the wind is strongest, which is the pattern seen after wind events -- the field intact and the perimeter gone.",
+    assumptions: [
+      { name: "Clip spacing is entered, not designed", value: "it comes from the tested assembly against the zone's design pressure", source: "the wind design for the building" },
+      { name: "A simple rectangular plane", value: "hips, valleys and transitions are most of the labour and much of the material", source: "the roofing contractor" },
+      { name: "Panel gauge and profile are not selected", value: "the span and load determine them", source: "the panel manufacturer's data" },
+    ],
+  },
+  "metal-roof-thermal-movement": {
+    formula: "movement = coefficient of thermal expansion x length x temperature swing, taken on the PANEL temperature range; the movement at an end is that end's share of the length from the fixed point; the longest panel a clip supports is its travel divided by the movement per unit length.",
+    edition: "The thermal expansion relation by name, with steel about 6.5e-06 per degF, aluminium about 1.28e-05 and copper about 9.8e-06. The PANEL range is much wider than the air range: a 140 to 180 degF swing is ordinary. It checks clip TRAVEL, not clip capacity. The panel manufacturer's expansion and clip data, SMACNA and the metal building manufacturers' guidance, and the roofing contractor govern.",
+    freeAccess: "One multiplication on a coefficient and a temperature range; no manufacturer clip table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The panel temperature range is much wider than the air temperature range, and that is what makes the movement large: a dark panel in summer sun reaches well above ambient and on a clear winter night radiates below it. Aluminium moves about twice as far as steel for the same swing. THE FIXED POINT DETERMINES WHERE THE MOVEMENT GOES -- each panel is anchored at one location and expands away from it, so a panel fixed at its middle halves the movement at each end, which on very long panels is often the cheapest fix available. The failure is progressive rather than sudden: clips reach the limit of their travel, the movement goes into the clip and then into the fastener holes, and the roof loses its attachment years later in what looks like poor workmanship.",
+    assumptions: [
+      { name: "Panel temperature range is entered", value: "it varies with colour, slope, orientation, insulation and climate", source: "the panel manufacturer's data" },
+      { name: "Travel, not capacity", value: "a clip adequate in travel can be inadequate in uplift", source: "the panel manufacturer's tested assembly" },
+      { name: "One free straight run", value: "eave and ridge details, flashing and sealant carry the same movement", source: "SMACNA and the metal building manufacturers' guidance" },
+    ],
+  },
+  "mortar-batch-c270": {
+    formula: "ASTM C270 proportions are BY VOLUME: the batch scales from the cement at one cubic foot and 94 lb per bag, with hydrated lime at about 1.25 cu ft and 50 lb per bag, and sand between 2.25 and 3.0 times the sum of the cementitious volumes. A working half cubic foot per shovel converts the sand to shovels.",
+    edition: "The ASTM C270 proportion specification by name. NO TYPE TABLE IS SHIPPED: the cement and lime volumes for Types M, S, N and O come from C270 itself and differ between the portland-lime, masonry-cement and mortar-cement systems. Proportion-specified and property-specified mortars are not interchangeable, and field-tested mortar is tested to different acceptance than laboratory mortar. Water is not computed; it is added to workability. ASTM C270, the project specification, and the mason of record govern.",
+    freeAccess: "Three multiplications on proportions the reader takes from the specification; no C270 table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE COUNTERINTUITIVE RULE IS THE IMPORTANT ONE: a stronger mortar is often a worse mortar. Mortar is meant to be the sacrificial element so that movement cracks the joint, which is repointable, rather than the unit, which is not -- and repointing soft historic brick with a hard Type S or M mortar is a well documented way to destroy the brick. The proportion versus property distinction matters at the mixer: a proportion-specified mortar is batched to the volumes and never tested for strength, and field results routinely come in below laboratory values for the same mortar, which is a common and expensive misunderstanding. Sand is the term most often abused because it is measured by shovel, and running at the high end produces a harsh mortar that masons correct with water.",
+    assumptions: [
+      { name: "Proportions are entered per type", value: "they differ between the portland-lime, masonry-cement and mortar-cement systems", source: "ASTM C270" },
+      { name: "Water is not computed", value: "it is added to workability and is the mason's judgment", source: "the mason of record" },
+      { name: "Shovel counts are a working figure", value: "about half a cubic foot of damp sand, no substitute for a batch box", source: "the project specification" },
+    ],
+  },
+  "grout-lift-pour-height": {
+    formula: "lifts in a pour = pour height / lift height rounded up; the fluid pressure at the base of a pour = grout unit weight x pour height, about 140 pcf for grout; cleanouts are required above a threshold pour height.",
+    edition: "The TMS 602 grout placement limits by name -- the LIFT limit governs consolidation and the POUR limit governs the wall's resistance to fluid grout pressure. NO LIMIT TABLE IS SHIPPED: the maximum lift and pour heights depend on the grout space least dimension, the unit type, fine or coarse grout, and whether cleanouts are provided, and come from the adopted edition. TMS 602 as adopted, the project specification, and the inspector govern.",
+    freeAccess: "A division and a multiplication on limits the reader takes from the adopted code; no limit table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Two limits control two different failures and they are constantly confused. The LIFT limit is about consolidation: grout deeper than can be properly vibrated leaves voids, and a void in a grouted cell means the reinforcement is not embedded. The POUR limit is about the wall's own strength while the grout is fluid: freshly grouted masonry is holding back a liquid column at roughly 140 pcf, and a pour higher than the wall can resist blows it out. Cleanouts are the provision that gets omitted and then required -- a wall built without them and discovered at inspection has to be opened at the base, which is entirely avoidable by checking the pour height before laying. Consolidation is a two-step requirement, because the grout settles as the masonry absorbs water and reconsolidation closes the void left at the top of the lift.",
+    assumptions: [
+      { name: "Code limits are entered", value: "they depend on grout space, unit type, grout type and cleanouts", source: "TMS 602 as adopted" },
+      { name: "No wall capacity check", value: "whether a specific wall resists a specific pour depends on units, mortar, joint age and bracing", source: "the project engineer" },
+      { name: "Not a grout quantity", value: "volume, aggregate, slump and self-consolidating grout are separate", source: "the project specification" },
+    ],
+  },
+  "masonry-cleaning-dilution": {
+    formula: "diluted solution = area / coverage; one part concentrate to N parts water is one part in N+1, so concentrate = diluted / (N+1) and water is the remainder; prewet and rinse water are counted at their own rates per 100 sq ft.",
+    edition: "The dilution and coverage identities by name. NO CLEANER, DILUTION OR COVERAGE IS SHIPPED: all three come from the manufacturer for the specific unit, and a test panel is required rather than advisable. Acid attacks polished stone, limestone, marble, many coloured and glazed units, and metal the runoff reaches. The cleaner manufacturer's instructions, the project specification, a test panel, and the applicable environmental rules govern.",
+    freeAccess: "Two divisions on a dilution and a coverage rate the reader has; no product data is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE CONCENTRATION IS A PROPERTY OF THE MASONRY RATHER THAN OF THE SOILING. Acid cleaners attack the cement paste in the mortar and the surface of many units, so the correct dilution is the weakest that removes the soiling, established on a test panel -- and strengthening it because the wall is dirty is the standard way to burn a facade, with damage that appears after the scaffold is down and is permanent. Prewetting keeps the cleaner on the surface rather than letting dry masonry draw it in, where it attacks the mortar from within and leaves salts that migrate out for years. Rinsing is a quantity as well as an action: residual cleaner keeps working, and an inadequate rinse produces damage that shows up days later on a wall that looked finished.",
+    assumptions: [
+      { name: "Dilution and coverage are the manufacturer's", value: "for the specific unit, and a test panel is required", source: "the cleaner manufacturer's instructions" },
+      { name: "Some units must never see acid", value: "polished stone, limestone, marble, coloured and glazed units, and metal below", source: "the project specification" },
+      { name: "Containment and disposal are regulated", value: "and are not addressed here", source: "the applicable environmental rules" },
+    ],
+  },
+  "scaffold-tie-spacing": {
+    formula: "height-to-base ratio = height / the minimum base dimension, with outriggers substituting their effective base; the maximum free-standing height is the limit ratio times that base, so the first tie goes at or below it; tie rows and ties per row follow the entered spacings.",
+    edition: "The OSHA 1926.451(c)(1) height-to-base rule by name -- a supported scaffold whose height exceeds four times its minimum base dimension must be restrained from tipping. Tie SPACINGS are entered from the manufacturer's instructions and the applicable requirements; the tie's own capacity and its anchorage are separate and usually govern. Sheeting multiplies the lateral load and requires a re-evaluated pattern. OSHA 29 CFR 1926 Subpart L, the scaffold manufacturer's instructions, and the competent person govern.",
+    freeAccess: "One ratio and two divisions; no manufacturer tie table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The 4-to-1 ratio is a THRESHOLD rather than a design: it is the point at which a scaffold can no longer be relied on to stand on its own. The first tie therefore goes at or BELOW that height, and a scaffold erected past the ratio with its first tie higher has an unbraced length below it that is exactly the failure geometry. Outriggers work by widening the base, which is the denominator, so they raise the free-standing height directly. Sheeting changes the problem entirely -- a wrapped scaffold is a sail, and wrapping an erected scaffold without re-evaluating the ties is a recognized cause of collapses. And the tie itself has to go to something: a tie anchored to a window frame, a gutter or trim is not resisting a lateral load, and a tie pattern correct on the drawing and anchored to cladding is a scaffold with no ties at all.",
+    assumptions: [
+      { name: "Tie spacings are entered", value: "they come from the manufacturer's instructions for the type and height", source: "the scaffold manufacturer's instructions" },
+      { name: "Tie and anchor capacity are separate", value: "and are usually what governs", source: "the competent person" },
+      { name: "No wind calculation", value: "the sheeted flag is a reminder, and the re-evaluated pattern comes from a qualified person", source: "OSHA 29 CFR 1926 Subpart L" },
+    ],
+  },
+  "mast-climber-platform-load": {
+    formula: "utilization against the platform's total rating and against the ZONE rating for the load's position; the moment about the mast = load x distance; the tie force = that moment divided by the mast tie spacing.",
+    edition: "The cantilever load-distribution relations by name. ZONE RATINGS ARE THE MANUFACTURER'S and are entered: cantilever ends carry a small fraction of the platform's rating, and a load within the total can exceed a zone. It does not compute wind load, mast capacity, erected height limits, or tie anchorage into the structure. The manufacturer's load chart and erection manual, the competent person, and the erector's engineering govern.",
+    freeAccess: "Two ratios and one moment on ratings the reader takes from the load chart; no chart is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "A mast climber is a CANTILEVER, and the manufacturer's capacity is stated for a defined load distribution. Placing the same total at the outboard edge produces a moment the platform and mast were never rated for even though the scale says the load is within capacity -- which is why manufacturers publish load charts by ZONE rather than as a single figure. Masonry work is the case that stresses it: a platform staged with cubes of block by a forklift at whatever spot is accessible can exceed a zone's rating while the total stays comfortably under. The mast ties are where the moment ends up, so the tie pattern is part of the load path and not an incidental -- and ties anchored into cladding rather than structure are the failure no load chart can see.",
+    assumptions: [
+      { name: "Zone ratings are the manufacturer's", value: "they differ between machines and configurations", source: "the manufacturer's load chart" },
+      { name: "No wind load", value: "on the platform or on any sheeting", source: "the erector's engineering" },
+      { name: "No mast or anchorage capacity", value: "the base, foundation and tie anchorage are separate", source: "the manufacturer's erection manual" },
+    ],
+  },
+  "suspended-scaffold-counterweight": {
+    formula: "rated load x outboard arm = counterweight x inboard arm, so the required counterweight = rated load x (outboard / inboard) x the factor of safety; the achieved factor is the resisting moment over the overturning moment.",
+    edition: "The outrigger moment balance by name, with 4:1 against overturning the common requirement. The load used is the platform's RATED load, not its empty weight and not what happens to be on it. Counterweights must be non-flowable and secured to the outrigger, and a TIEBACK to independent structural anchorage is required IN ADDITION and is not a substitute. OSHA 29 CFR 1926 Subpart L, the manufacturer's instructions, and the qualified person who designs the rigging govern.",
+    freeAccess: "One lever ratio and one multiplication; no manufacturer rigging table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE LEVER RATIO IS WHAT MAKES THE COUNTERWEIGHT LARGE, and it is why crews underestimate it: the physical weight looks absurd next to the platform. An outrigger reaching eighteen inches inboard and six feet outboard carries a four-to-one disadvantage before any factor of safety, and a four-to-one factor on top puts the requirement into the tens of thousands of pounds per outrigger. The load to use is the platform's RATED load, because the counterweight has to hold it down whether or not today's crew intends to use it. Two requirements sit alongside the weight and are not substitutes for it: counterweights must be non-flowable and secured, because a counterweight that walks away is the classic failure, and a tieback to independent anchorage is required in addition.",
+    assumptions: [
+      { name: "The RATED load, not today's load", value: "a counterweight sized for two workers fails the day someone stages material", source: "the manufacturer's instructions" },
+      { name: "A static balance on one outrigger", value: "the roof's ability to take the concentrated loads is a separate question", source: "the qualified person who designs the rigging" },
+      { name: "Tieback and anchorage not evaluated", value: "required in addition to the counterweight, and not a parapet clamp on a cornice", source: "OSHA 29 CFR 1926 Subpart L" },
+    ],
+  },
+  "shoring-reshoring-load": {
+    formula: "the load a new pour puts into the stack = slab dead + formwork + construction live, shared EQUALLY among the connected levels under the standard equal-stiffness assumption, so each supporting slab carries its own dead load plus that share; a backshore adds the slab's own dead load to what is redistributed.",
+    edition: "The ACI 347.2R shoring and reshoring load distribution by name, taken at the standard first-order EQUAL STIFFNESS assumption. A RESHORE is placed after the slab above has deflected and carries only later loads; a BACKSHORE never permitted that deflection and still carries a share of the dead load. The slab's capacity must come from FIELD-CURED cylinders at its age today. A screen, not a sequence analysis. ACI 347 and ACI 347.2R, the shoring designer's sequence drawings, the field-cured cylinder breaks, and the engineer of record govern.",
+    freeAccess: "One sum and one division; no shoring design or sequence drawing is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "A slab poured on shores does not load the slab directly below it; it loads the whole stack the shores connect. THE DISTINCTION BETWEEN RESHORING AND BACKSHORING IS THE ONE THAT GETS LOST and it changes the arithmetic completely -- a reshore is installed after the slab above has been allowed to deflect and carry its own weight, a backshore was not, so it still carries a share of that dead load. Getting it wrong is not conservative in a predictable direction. The consequence is a slab loaded beyond its capacity at its age, and construction loads are often the largest loads a slab will ever see. The strength to use is FIELD-CURED cylinders that saw the same conditions: a slab poured in cold weather is far behind lab cylinders in a warm tank, and stripping to a laboratory strength on a cold weather pour is stripping to a strength the slab does not have.",
+    assumptions: [
+      { name: "Equal stiffness across the levels", value: "a real analysis follows the sequence and each slab's stiffness at its actual age", source: "the shoring designer's sequence drawings" },
+      { name: "Capacity from field-cured cylinders", value: "laboratory-cured cylinders say nothing about a cold weather pour", source: "the field-cured cylinder breaks" },
+      { name: "Shores are not designed", value: "and punching, deflection and stripping times are separate", source: "ACI 347 and the engineer of record" },
+    ],
+  },
   // spec-v1617..v1621 and v1546..v1549: the 2026-09-08 trade-expansion concrete
   // placement and tilt-up band, and the rail logistics half.
   "concrete-pump-line-pressure": {

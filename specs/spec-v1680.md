@@ -1,5 +1,16 @@
 # roughlogic.com Specification v1680 -- Gored Elbow Segment Angles and Development (`calc-metalair.js`, Group E Carpentry and Construction, sheet metal, 1 New Tile)
 
+> **Status: CUT 2026-09-08 -- DUPLICATE. This tile was not built.** The formula screen for the
+> 2026-09-08 sheet metal, masonry, and scaffold band found this question already answered by
+> `pipe-miter-cut` in `calc-fab.js`. That tile computes the identical geometry -- the turn per
+> joint as the total over (pieces - 1), the cut angle as half of that from square, and the
+> cutback as OD x tan of it -- and its note already carries the end-half-gore rule this spec
+> calls "the whole trick". What the spec had that the tile did not is the THROAT and HEEL
+> lengths of each gore and the developed material for the elbow, so `pipe-miter-cut` gained
+> those. Its answer with the centreline radius left at zero is unchanged.
+>
+> The specification below is kept as the record of the screen. Do not implement it.
+>
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-metalair.js`**
 > (Group E, Carpentry and Construction -- the existing category, hub `/groups/construction/`; sheet metal and architectural metal), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.

@@ -14857,3 +14857,326 @@ CONSTRUCTION_RENDERERS["escalator-capacity"] = _simpleRenderer({
   ],
   compute: computeEscalatorCapacity,
 });
+
+// ===========================================================================
+// spec-v1686..v1689: the 2026-09-08 trade-expansion scaffold and shoring band.
+// Four tiles, all group E, into this existing module.
+//
+// spec-v1687 left an unrendered python placeholder `{5200*24:,.0f}` in its
+// worked example (it is 124,800 ft-lb) -- the third occurrence of that defect
+// in this program, after spec-v1652 and spec-v1615.
+//
+// `scaffold-leg-load` shares the number 4 with v1686 and means something
+// different by it: there it is the OSHA 4:1 SAFETY FACTOR on a component
+// rating, here it is the 4:1 HEIGHT-TO-BASE ratio. `shore-post-load` computes
+// a single level's shore load from tributary area and its own citation says
+// reshoring and multi-level distribution are a separate analysis -- which is
+// what v1689 is.
+
+// ============ spec-v1686: scaffold tie spacing and height-to-base ratio ============
+
+// dims: in { scaffold_height_ft: L, base_width_ft: L, outrigger_base_ft: L, max_ratio: dimensionless, vertical_tie_spacing_ft: L, horizontal_tie_spacing_ft: L, scaffold_run_ft: L, sheeted: dimensionless } out: { height_to_base_ratio: dimensionless, max_free_standing_ft: L, first_tie_height_ft: L, tie_rows: dimensionless, ties_per_row: dimensionless, tie_count: dimensionless }
+export function computeScaffoldTieSpacing({ scaffold_height_ft = 0, base_width_ft = 0, outrigger_base_ft = 0, max_ratio = 4, vertical_tie_spacing_ft = 0, horizontal_tie_spacing_ft = 0, scaffold_run_ft = 0, sheeted = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(scaffold_height_ft > 0)) return { error: "Scaffold height must be positive (ft)." };
+  if (!(base_width_ft > 0)) return { error: "The minimum base dimension must be positive (ft)." };
+  if (outrigger_base_ft < 0) return { error: "The outrigger effective base cannot be negative (ft)." };
+  if (!(max_ratio > 0)) return { error: "The height-to-base limit must be positive; OSHA sets 4:1 for a free-standing scaffold." };
+  if (vertical_tie_spacing_ft < 0 || horizontal_tie_spacing_ft < 0) return { error: "A tie spacing cannot be negative (ft)." };
+  if (scaffold_run_ft < 0) return { error: "The scaffold run cannot be negative (ft)." };
+  if (sheeted < 0) return { error: "The sheeted flag is 1 or 0." };
+  const effective_base_ft = Math.max(base_width_ft, outrigger_base_ft);
+  const height_to_base_ratio = scaffold_height_ft / effective_base_ft;
+  const bare_ratio = scaffold_height_ft / base_width_ft;
+  const max_free_standing_ft = max_ratio * effective_base_ft;
+  const max_free_standing_bare_ft = max_ratio * base_width_ft;
+  const ties_required = scaffold_height_ft > max_free_standing_ft;
+  // The first tie goes at or BELOW the height where the ratio is reached; a
+  // scaffold with its first tie higher has unbraced length past the limit.
+  const first_tie_height_ft = ties_required ? max_free_standing_ft : null;
+  const tie_rows = (ties_required && vertical_tie_spacing_ft > 0)
+    ? Math.ceil((scaffold_height_ft - max_free_standing_ft) / vertical_tie_spacing_ft) + 1
+    : (ties_required ? null : 0);
+  const ties_per_row = (scaffold_run_ft > 0 && horizontal_tie_spacing_ft > 0)
+    ? Math.floor(scaffold_run_ft / horizontal_tie_spacing_ft) + 1
+    : null;
+  const tie_count = (tie_rows !== null && ties_per_row !== null) ? tie_rows * ties_per_row : null;
+  // The base outriggers would have to reach for this height to stand alone.
+  const base_to_eliminate_ties_ft = scaffold_height_ft / max_ratio;
+  const outrigger_reach_needed_ft = Math.max(0, base_to_eliminate_ties_ft - base_width_ft);
+  const outriggers_sufficient = outrigger_base_ft > 0 ? outrigger_base_ft >= base_to_eliminate_ties_ft : null;
+  const is_sheeted = sheeted >= 0.5;
+  const outs = [effective_base_ft, height_to_base_ratio, max_free_standing_ft, base_to_eliminate_ties_ft];
+  if (!outs.every(Number.isFinite)) return { error: "Scaffold tie math is not a finite value." };
+  const verdict = ties_required
+    ? "TIES REQUIRED: " + fmt(height_to_base_ratio, 1) + ":1 against a " + fmt(max_ratio, 0) + ":1 limit, so the FIRST tie goes at or below " + fmt(max_free_standing_ft, 1) + " ft. A first tie higher than that leaves unbraced height past the free-standing limit, which is the geometry that folds"
+    : "FREE-STANDING: " + fmt(height_to_base_ratio, 1) + ":1 is inside the " + fmt(max_ratio, 0) + ":1 limit at an effective base of " + fmt(effective_base_ft, 1) + " ft, so no ties are required by the ratio";
+  const outrigger_verdict = outrigger_base_ft > 0
+    ? (outriggers_sufficient
+      ? "Outriggers to " + fmt(outrigger_base_ft, 1) + " ft carry this height free-standing, against the " + fmt(base_to_eliminate_ties_ft, 1) + " ft needed"
+      : "Outriggers to " + fmt(outrigger_base_ft, 1) + " ft raise the free-standing limit to " + fmt(max_free_standing_ft, 1) + " ft, still short of " + fmt(scaffold_height_ft, 1) + " ft -- this scaffold needs BOTH outriggers and ties")
+    : "Outriggers taking the effective base to " + fmt(base_to_eliminate_ties_ft, 1) + " ft would carry this height free-standing, which is " + fmt(outrigger_reach_needed_ft, 1) + " ft of reach beyond the " + fmt(base_width_ft, 1) + " ft frame";
+  const sheeting_verdict = is_sheeted
+    ? "SHEETED: a scaffold wrapped in netting or shrink wrap is a sail, and the lateral load on the ties multiplies several times over. A tie pattern adequate for open frames does not carry it, and the correct action is a re-evaluated pattern from the manufacturer or a qualified person -- not the same ties with the wrap added"
+    : "Open frames. If this scaffold is later wrapped, the tie pattern has to be re-evaluated before the wrap goes on, not after";
+  return {
+    scaffold_height_ft, base_width_ft, outrigger_base_ft, effective_base_ft,
+    height_to_base_ratio, bare_ratio, max_ratio, max_free_standing_ft,
+    max_free_standing_bare_ft, ties_required, first_tie_height_ft,
+    vertical_tie_spacing_ft, horizontal_tie_spacing_ft, scaffold_run_ft,
+    tie_rows, ties_per_row, tie_count, base_to_eliminate_ties_ft,
+    outrigger_reach_needed_ft, outriggers_sufficient, sheeted: is_sheeted ? 1 : 0,
+    verdict, outrigger_verdict, sheeting_verdict,
+    note: "THE 4-TO-1 RATIO IS A THRESHOLD RATHER THAN A DESIGN. It is the point at which a scaffold can no longer be relied on to stand on its own, and everything above it depends on ties. The first tie therefore goes at or BELOW that height, and a scaffold erected past the ratio with its first tie somewhere higher has an unbraced length below it that is exactly the failure geometry -- the tie pattern above is irrelevant to a column that has already gone. OUTRIGGERS WORK BY WIDENING THE BASE, which is the denominator, so they raise the free-standing height directly and proportionally. A five foot wide frame is limited to twenty feet free-standing; outriggers taking the effective base to ten feet double it to forty. That is often cheaper and faster than tying, and it is why outrigger frames exist -- but the arithmetic has to be run, because a scaffold that still exceeds the ratio with outriggers on needs both. SHEETING CHANGES THE PROBLEM ENTIRELY. A scaffold covered in netting or shrink wrap becomes a sail, and the lateral load on the ties can multiply several times over. A tie pattern adequate for open frames does not carry it, and wrapping an already-erected scaffold without re-evaluating the ties is a recognized cause of collapses. The flag here is a reminder, not a wind calculation: the re-evaluated pattern comes from the manufacturer or a qualified person. AND THE TIE ITSELF HAS TO GO TO SOMETHING. A tie anchored to a window frame, a gutter, a downspout, or a piece of architectural trim is not resisting a lateral load, and that is a common finding -- the tie pattern is correct on paper, every tie is present, and every one of them is anchored to something that cannot hold it. Each tie has to reach structure capable of the load, and a tie pattern correct on the drawing and anchored to cladding is a scaffold with no ties at all. A ratio check and a tie count at spacings the reader supplies. IT IS NOT A SCAFFOLD DESIGN. Tie spacings come from the manufacturer's instructions and the applicable OSHA requirements for the scaffold type and height, and they vary; the tie's own capacity and the anchor's capacity are separate and are usually what governs. It does not compute wind load, sheeted or open; it does not address the foundation, the leg loads, the planking, the guardrails, or the access, each of which has its own requirement; and it does not cover suspended, mast climbing, or system scaffolds, whose rules differ. Scaffolds are erected and altered under the supervision of a competent person, and one is required here. OSHA 29 CFR 1926 Subpart L, the scaffold manufacturer's instructions, and the competent person govern.",
+  };
+}
+const scaffoldTieSpacingExample = { inputs: { scaffold_height_ft: 60, base_width_ft: 5, outrigger_base_ft: 10, max_ratio: 4, vertical_tie_spacing_ft: 20, horizontal_tie_spacing_ft: 30, scaffold_run_ft: 90, sheeted: 0 } };
+CONSTRUCTION_RENDERERS["scaffold-tie-spacing"] = _simpleRenderer({
+  citation: "Citation: the OSHA 1926.451(c)(1) height-to-base rule by name -- a supported scaffold whose height exceeds four times its minimum base dimension must be restrained from tipping, so the first tie goes at or below four times the effective base, and outriggers raise that limit by widening the base. Tie SPACINGS are entered from the manufacturer's instructions and the applicable requirements for the scaffold type; the tie's own capacity and its anchorage are separate and usually govern. Sheeting multiplies the lateral load and requires a re-evaluated pattern. OSHA 29 CFR 1926 Subpart L, the scaffold manufacturer's instructions, and the competent person govern.",
+  example: scaffoldTieSpacingExample.inputs,
+  fields: [
+    { key: "scaffold_height_ft", label: "Scaffold height (ft)", kind: "number", default: 60 },
+    { key: "base_width_ft", label: "Minimum base dimension (ft)", kind: "number", default: 5 },
+    { key: "outrigger_base_ft", label: "Effective base with outriggers (ft, 0 for none)", kind: "number", default: 10 },
+    { key: "max_ratio", label: "Height-to-base limit", kind: "number", default: 4 },
+    { key: "vertical_tie_spacing_ft", label: "Vertical tie spacing (ft, 0 to skip the count)", kind: "number", default: 20 },
+    { key: "horizontal_tie_spacing_ft", label: "Horizontal tie spacing (ft, 0 to skip)", kind: "number", default: 30 },
+    { key: "scaffold_run_ft", label: "Scaffold run (ft, 0 to skip)", kind: "number", default: 90 },
+    { key: "sheeted", label: "Sheeted or wrapped (1 yes, 0 no)", kind: "number", default: 0, attrs: { step: "1", min: "0", max: "1" } },
+  ],
+  outputs: [
+    { key: "r", id: "sts-out-r", label: "Height to base", value: (r) => fmt(r.height_to_base_ratio, 1) + ":1 at an effective base of " + fmt(r.effective_base_ft, 1) + " ft" + (r.outrigger_base_ft > 0 ? " (" + fmt(r.bare_ratio, 1) + ":1 on the " + fmt(r.base_width_ft, 1) + " ft frame alone)" : "") },
+    { key: "v", id: "sts-out-v", label: "Ties", value: (r) => r.verdict },
+    { key: "c", id: "sts-out-c", label: "Tie count", value: (r) => r.tie_count === null ? "(enter the spacings and the run for a count)" : fmt(r.tie_count, 0) + " ties -- " + fmt(r.tie_rows, 0) + " rows at " + fmt(r.vertical_tie_spacing_ft, 0) + " ft vertically, " + fmt(r.ties_per_row, 0) + " per row at " + fmt(r.horizontal_tie_spacing_ft, 0) + " ft along a " + fmt(r.scaffold_run_ft, 0) + " ft run" },
+    { key: "o", id: "sts-out-o", label: "Outriggers", value: (r) => r.outrigger_verdict },
+    { key: "s", id: "sts-out-s", label: "Sheeting", value: (r) => r.sheeting_verdict },
+    { key: "n", id: "sts-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeScaffoldTieSpacing,
+});
+
+// ============ spec-v1687: mast climbing work platform load distribution ============
+
+// dims: in { platform_length_ft: L, cantilever_length_ft: L, rated_capacity_lb: M L T^-2, zone_rated_capacity_lb: M L T^-2, load_lb: M L T^-2, load_centroid_ft: L, tie_spacing_ft: L, tie_capacity_lb: M L T^-2 } out: { total_utilization_pct: dimensionless, zone_utilization_pct: dimensionless, moment_ft_lb: M L^2 T^-2, distributed_moment_ft_lb: M L^2 T^-2, tie_force_lb: M L T^-2, max_load_at_position_lb: M L T^-2 }
+export function computeMastClimberPlatformLoad({ platform_length_ft = 0, cantilever_length_ft = 0, rated_capacity_lb = 0, zone_rated_capacity_lb = 0, load_lb = 0, load_centroid_ft = 0, tie_spacing_ft = 0, tie_capacity_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(platform_length_ft > 0)) return { error: "Platform length must be positive (ft)." };
+  if (cantilever_length_ft < 0) return { error: "Cantilever length cannot be negative (ft)." };
+  if (!(2 * cantilever_length_ft < platform_length_ft)) return { error: "The two cantilever ends cannot take up the whole platform; the mast bay is what is left between them." };
+  if (!(rated_capacity_lb > 0)) return { error: "The platform's rated live load must be positive (lb)." };
+  if (zone_rated_capacity_lb < 0) return { error: "A zone rating cannot be negative (lb)." };
+  if (!(load_lb > 0)) return { error: "The load must be positive (lb)." };
+  if (load_centroid_ft < 0) return { error: "The load's distance from the mast cannot be negative (ft)." };
+  if (!(load_centroid_ft <= platform_length_ft / 2)) return { error: "The load cannot sit beyond the end of the platform." };
+  if (tie_spacing_ft < 0) return { error: "Mast tie spacing cannot be negative (ft)." };
+  if (tie_capacity_lb < 0) return { error: "Tie capacity cannot be negative (lb)." };
+  const half_platform_ft = platform_length_ft / 2;
+  const total_utilization_pct = load_lb / rated_capacity_lb * 100;
+  const within_total = load_lb <= rated_capacity_lb;
+  // A mast climber is a cantilever, and the rating is stated for a defined
+  // distribution. The same total at the outboard end is a different structure.
+  const moment_ft_lb = load_lb * load_centroid_ft;
+  // Spread evenly over the platform, the centroid of each half sits at a
+  // quarter of the length, and the two halves oppose -- so the moment about a
+  // centre mast is essentially nothing.
+  const distributed_moment_ft_lb = 0;
+  const on_cantilever = cantilever_length_ft > 0 && load_centroid_ft > half_platform_ft - cantilever_length_ft;
+  const zone_utilization_pct = zone_rated_capacity_lb > 0 ? load_lb / zone_rated_capacity_lb * 100 : null;
+  const within_zone = zone_rated_capacity_lb > 0 ? load_lb <= zone_rated_capacity_lb : null;
+  const max_load_at_position_lb = zone_rated_capacity_lb > 0 && on_cantilever ? zone_rated_capacity_lb : rated_capacity_lb;
+  // The moment ends up in the ties to the building at their spacing.
+  const tie_force_lb = tie_spacing_ft > 0 ? moment_ft_lb / tie_spacing_ft : null;
+  const tie_utilization_pct = (tie_force_lb !== null && tie_capacity_lb > 0) ? tie_force_lb / tie_capacity_lb * 100 : null;
+  const tie_ok = (tie_force_lb !== null && tie_capacity_lb > 0) ? tie_force_lb <= tie_capacity_lb : null;
+  const outs = [total_utilization_pct, moment_ft_lb, max_load_at_position_lb];
+  if (!outs.every(Number.isFinite)) return { error: "Mast climber load math is not a finite value." };
+  const total_verdict = within_total
+    ? "TOTAL WITHIN RATING: " + fmt(load_lb, 0) + " lb against " + fmt(rated_capacity_lb, 0) + " lb, " + fmt(total_utilization_pct, 0) + "% -- and the scale is not the check"
+    : "TOTAL OVER RATING: " + fmt(load_lb, 0) + " lb against " + fmt(rated_capacity_lb, 0) + " lb";
+  const zone_verdict = within_zone === null
+    ? "Enter the zone's rated capacity from the manufacturer's load chart. Cantilever ends carry a small fraction of the platform's rating."
+    : within_zone
+      ? "ZONE WITHIN RATING: " + fmt(load_lb, 0) + " lb against a zone rating of " + fmt(zone_rated_capacity_lb, 0) + " lb, " + fmt(zone_utilization_pct, 0) + "%"
+      : "ZONE EXCEEDED WHILE THE TOTAL IS WITHIN CAPACITY: " + fmt(load_lb, 0) + " lb on a zone rated " + fmt(zone_rated_capacity_lb, 0) + " lb, " + fmt(zone_utilization_pct, 0) + "% of it. The scale says the load is fine and the structure says it is not -- this is the case the load chart exists for";
+  const tie_verdict = tie_ok === null
+    ? "Enter the mast tie spacing and capacity to carry the moment into the ties."
+    : tie_ok
+      ? "TIES OK: " + fmt(tie_force_lb, 0) + " lb per tie at " + fmt(tie_spacing_ft, 0) + " ft spacing, against " + fmt(tie_capacity_lb, 0) + " lb rated, " + fmt(tie_utilization_pct, 0) + "%"
+      : "TIES OVERLOADED: " + fmt(tie_force_lb, 0) + " lb per tie at " + fmt(tie_spacing_ft, 0) + " ft spacing, against " + fmt(tie_capacity_lb, 0) + " lb rated. Everything the platform carries ends up here";
+  return {
+    platform_length_ft, cantilever_length_ft, half_platform_ft, rated_capacity_lb,
+    zone_rated_capacity_lb, load_lb, load_centroid_ft, on_cantilever,
+    total_utilization_pct, within_total, zone_utilization_pct, within_zone,
+    moment_ft_lb, distributed_moment_ft_lb, max_load_at_position_lb,
+    tie_spacing_ft, tie_capacity_lb, tie_force_lb, tie_utilization_pct, tie_ok,
+    total_verdict, zone_verdict, tie_verdict,
+    note: "A MAST CLIMBER IS A CANTILEVER, and the manufacturer's capacity is stated for a defined load distribution. Placing the same total load at the outboard edge, or all of it on one cantilevered end, produces a moment the platform and mast were never rated for even though the scale says the load is within capacity. That distinction is the difference between the rated number and a safe load, and it is why manufacturers publish load charts BY ZONE rather than as a single figure -- a platform with a six thousand pound rating does not have six thousand pounds of capacity anywhere on it. MASONRY WORK IS THE CASE THAT STRESSES IT. A platform staged with cubes of block and a mixer is carrying a very large concentrated load, placed by a forklift at whatever spot is accessible, and it is easy to exceed a zone's rating while the total remains comfortably under the platform's. Marking the platform with its zone limits, and staging to them, is what keeps that from being a judgment made by whoever is driving the lift -- and it is why the material delivery sequence on a mast climber job is a safety document rather than a logistics one. THE MAST TIES ARE WHERE THE MOMENT ENDS UP. Everything the platform carries, and everything the wind pushes, becomes a load in the ties to the building at their spacing, so the tie pattern is part of the load path and not an incidental detail. Ties anchored into cladding rather than structure, or spaced beyond the manufacturer's interval, are the failure that no load chart can see. The same load spread evenly across the platform produces essentially no moment about a centre mast and leaves every zone within its rating -- same weight, same platform, entirely different structure. A screening comparison of a load and its position against ratings the reader takes from the manufacturer's load chart. IT IS NOT A LOAD CHART and it does not generate one: zone boundaries and zone ratings are the manufacturer's, they differ between machines and between configurations, and a chart from a similar machine is not this machine's chart. It does not compute wind load on the platform or on any sheeting, evaluate the mast's own capacity or its erected height limits, or address the base, the foundation, or the tie anchorage into the structure. It does not cover twin-mast configurations, bridging, or platform extensions, each of which has its own chart. The manufacturer's load chart and erection manual, the competent person, and the erector's engineering govern.",
+  };
+}
+const mastClimberPlatformLoadExample = { inputs: { platform_length_ft: 40, cantilever_length_ft: 8, rated_capacity_lb: 6000, zone_rated_capacity_lb: 1500, load_lb: 5200, load_centroid_ft: 16, tie_spacing_ft: 25, tie_capacity_lb: 4000 } };
+CONSTRUCTION_RENDERERS["mast-climber-platform-load"] = _simpleRenderer({
+  citation: "Citation: the cantilever load-distribution relations by name -- utilization against the platform's total rating and against the ZONE rating for the load's position, the moment about the mast as load x distance, and the tie force as that moment over the mast tie spacing. ZONE RATINGS ARE THE MANUFACTURER'S and are entered: cantilever ends carry a small fraction of the platform's rating, and a load within the total can exceed a zone. It does not compute wind load, mast capacity, or tie anchorage. The manufacturer's load chart and erection manual, the competent person, and the erector's engineering govern.",
+  example: mastClimberPlatformLoadExample.inputs,
+  fields: [
+    { key: "platform_length_ft", label: "Platform length (ft)", kind: "number", default: 40 },
+    { key: "cantilever_length_ft", label: "Cantilever length at each end (ft)", kind: "number", default: 8 },
+    { key: "rated_capacity_lb", label: "Platform rated live load (lb)", kind: "number", default: 6000 },
+    { key: "zone_rated_capacity_lb", label: "Zone rated capacity at the load's position (lb, 0 to skip)", kind: "number", default: 1500 },
+    { key: "load_lb", label: "Load placed (lb)", kind: "number", default: 5200 },
+    { key: "load_centroid_ft", label: "Load centroid from the mast (ft)", kind: "number", default: 16 },
+    { key: "tie_spacing_ft", label: "Mast tie spacing (ft, 0 to skip)", kind: "number", default: 25 },
+    { key: "tie_capacity_lb", label: "Tie rated capacity (lb, 0 to skip)", kind: "number", default: 4000 },
+  ],
+  outputs: [
+    { key: "t", id: "mcpl-out-t", label: "Against the platform rating", value: (r) => r.total_verdict },
+    { key: "z", id: "mcpl-out-z", label: "Against the zone rating", value: (r) => r.zone_verdict },
+    { key: "m", id: "mcpl-out-m", label: "Moment about the mast", value: (r) => fmt(r.moment_ft_lb, 0) + " ft-lb from " + fmt(r.load_lb, 0) + " lb at " + fmt(r.load_centroid_ft, 1) + " ft" + (r.on_cantilever ? ", which is out on a cantilever end" : ", inside the mast bay") },
+    { key: "d", id: "mcpl-out-d", label: "The same load spread evenly", value: (r) => "about " + fmt(r.distributed_moment_ft_lb, 0) + " ft-lb about a centre mast, and every zone within its rating. Same weight, same platform, entirely different structure" },
+    { key: "k", id: "mcpl-out-k", label: "Into the ties", value: (r) => r.tie_verdict },
+    { key: "n", id: "mcpl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMastClimberPlatformLoad,
+});
+
+// ============ spec-v1688: suspended scaffold outrigger counterweight ============
+
+// dims: in { rated_load_lb: M L T^-2, outboard_arm_ft: L, inboard_arm_ft: L, factor_of_safety: dimensionless, counterweight_unit_lb: M L T^-2, target_counterweight_lb: M L T^-2 } out: { lever_ratio: dimensionless, overturning_moment_ft_lb: M L^2 T^-2, required_counterweight_lb: M L T^-2, counterweight_units: dimensionless, resisting_moment_ft_lb: M L^2 T^-2, inboard_for_target_ft: L }
+export function computeSuspendedScaffoldCounterweight({ rated_load_lb = 0, outboard_arm_ft = 0, inboard_arm_ft = 0, factor_of_safety = 4, counterweight_unit_lb = 0, target_counterweight_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(rated_load_lb > 0)) return { error: "The platform's RATED load must be positive (lb) -- not its empty weight, and not what happens to be on it today." };
+  if (!(outboard_arm_ft > 0)) return { error: "The outboard arm must be positive (ft)." };
+  if (!(inboard_arm_ft > 0)) return { error: "The inboard arm must be positive (ft)." };
+  if (!(factor_of_safety >= 1)) return { error: "The factor of safety cannot be below one; 4:1 against overturning is the common requirement." };
+  if (counterweight_unit_lb < 0) return { error: "The counterweight unit weight cannot be negative (lb)." };
+  if (target_counterweight_lb < 0) return { error: "The target counterweight cannot be negative (lb)." };
+  const lever_ratio = outboard_arm_ft / inboard_arm_ft;
+  const overturning_moment_ft_lb = rated_load_lb * outboard_arm_ft;
+  const balance_counterweight_lb = rated_load_lb * lever_ratio;
+  const required_counterweight_lb = balance_counterweight_lb * factor_of_safety;
+  const counterweight_units = counterweight_unit_lb > 0 ? Math.ceil(required_counterweight_lb / counterweight_unit_lb) : null;
+  const provided_counterweight_lb = counterweight_units === null ? required_counterweight_lb : counterweight_units * counterweight_unit_lb;
+  const resisting_moment_ft_lb = provided_counterweight_lb * inboard_arm_ft;
+  const achieved_fos = overturning_moment_ft_lb > 0 ? resisting_moment_ft_lb / overturning_moment_ft_lb : null;
+  // Worked backwards: the inboard arm that would bring the counterweight to a
+  // target, which is the lever the arithmetic actually gives you to pull.
+  const inboard_for_target_ft = target_counterweight_lb > 0
+    ? rated_load_lb * outboard_arm_ft * factor_of_safety / target_counterweight_lb
+    : null;
+  const outs = [lever_ratio, overturning_moment_ft_lb, required_counterweight_lb, resisting_moment_ft_lb];
+  if (!outs.every(Number.isFinite)) return { error: "Counterweight math is not a finite value." };
+  const verdict = "REQUIRED: " + fmt(required_counterweight_lb, 0) + " lb per outrigger -- " + fmt(rated_load_lb, 0) + " lb of rated load at a " + fmt(lever_ratio, 2) + ":1 lever disadvantage, times a " + fmt(factor_of_safety, 1) + ":1 factor"
+    + (counterweight_units === null ? "" : ", which is " + fmt(counterweight_units, 0) + " units of " + fmt(counterweight_unit_lb, 0) + " lb (" + fmt(provided_counterweight_lb, 0) + " lb provided, " + fmt(achieved_fos, 2) + ":1 achieved)");
+  return {
+    rated_load_lb, outboard_arm_ft, inboard_arm_ft, lever_ratio, factor_of_safety,
+    overturning_moment_ft_lb, balance_counterweight_lb, required_counterweight_lb,
+    counterweight_unit_lb, counterweight_units, provided_counterweight_lb,
+    resisting_moment_ft_lb, achieved_fos, target_counterweight_lb, inboard_for_target_ft, verdict,
+    note: "THE LEVER RATIO IS WHAT MAKES THE COUNTERWEIGHT LARGE, and it is why crews consistently underestimate it: the physical weight looks absurd next to the platform. An outrigger reaching eighteen inches inboard and six feet outboard carries a four-to-one disadvantage before any factor of safety, so a fifteen hundred pound suspended load needs six thousand pounds just to balance -- and a four-to-one factor against overturning puts the requirement into the tens of thousands per outrigger. Shortening the outboard reach or lengthening the inboard arm are the only two levers, and the inboard arm needed for a target counterweight is reported here because that is the one a crew can usually move. THE LOAD TO USE IS THE PLATFORM'S RATED LOAD, not what happens to be on it. The scaffold is designed to carry that load and the counterweight has to hold it down whether or not today's crew intends to use it -- a counterweight sized for two workers is inadequate the day someone stages material, and nobody re-runs the arithmetic before doing that. TWO REQUIREMENTS SIT ALONGSIDE THE WEIGHT AND ARE NOT SUBSTITUTES FOR IT. Counterweights must be non-flowable and secured to the outrigger: sand bags, water containers, masonry units, and loose material are prohibited because they leak, are removed, or get borrowed for other work, and a counterweight that walks away is the classic failure on this equipment. And a TIEBACK to independent structural anchorage is required in addition to the counterweight, so that the outrigger cannot slide or rotate even if the counterweight is disturbed. The anchorage that tieback goes to has its own requirement and is not a parapet clamp on a cornice. A static moment balance on one outrigger. It does not design the outrigger, the beam, its bearing on the roof, or the roof's ability to take the concentrated loads at both ends -- a counterweight of this size sitting on a roof is itself a structural question. It does not address the tieback capacity or its anchorage, the suspension ropes, the hoists, the secondary lines, or the personal fall arrest that is required independently of everything here. It does not cover parapet clamps, roof cars, or transportable outrigger systems, each of which has its own criteria. Suspended scaffolds kill people. OSHA 29 CFR 1926 Subpart L, the manufacturer's instructions, and the qualified person who designs the rigging govern.",
+  };
+}
+const suspendedScaffoldCounterweightExample = { inputs: { rated_load_lb: 1500, outboard_arm_ft: 6, inboard_arm_ft: 1.5, factor_of_safety: 4, counterweight_unit_lb: 50, target_counterweight_lb: 12000 } };
+CONSTRUCTION_RENDERERS["suspended-scaffold-counterweight"] = _simpleRenderer({
+  citation: "Citation: the outrigger moment balance by name -- rated load x outboard arm = counterweight x inboard arm, so the required counterweight = rated load x (outboard / inboard) x the factor of safety, with 4:1 against overturning the common requirement. The load used is the platform's RATED load, not its empty weight. Counterweights must be non-flowable and secured, and a tieback to independent structural anchorage is required IN ADDITION and is not a substitute. OSHA 29 CFR 1926 Subpart L, the manufacturer's instructions, and the qualified person who designs the rigging govern.",
+  example: suspendedScaffoldCounterweightExample.inputs,
+  fields: [
+    { key: "rated_load_lb", label: "Platform RATED load (lb)", kind: "number", default: 1500 },
+    { key: "outboard_arm_ft", label: "Outboard arm (ft)", kind: "number", default: 6 },
+    { key: "inboard_arm_ft", label: "Inboard arm (ft)", kind: "number", default: 1.5 },
+    { key: "factor_of_safety", label: "Factor of safety against overturning", kind: "number", default: 4 },
+    { key: "counterweight_unit_lb", label: "Counterweight unit weight (lb, 0 to skip the count)", kind: "number", default: 50 },
+    { key: "target_counterweight_lb", label: "Target counterweight to solve the arm for (lb, 0 to skip)", kind: "number", default: 12000 },
+  ],
+  outputs: [
+    { key: "l", id: "ssc-out-l", label: "Lever disadvantage", value: (r) => fmt(r.lever_ratio, 2) + ":1 -- " + fmt(r.outboard_arm_ft, 2) + " ft out against " + fmt(r.inboard_arm_ft, 2) + " ft in" },
+    { key: "m", id: "ssc-out-m", label: "Overturning moment", value: (r) => fmt(r.overturning_moment_ft_lb, 0) + " ft-lb at the rated load" },
+    { key: "v", id: "ssc-out-v", label: "Counterweight required", value: (r) => r.verdict },
+    { key: "b", id: "ssc-out-b", label: "Bare balance, before the factor", value: (r) => fmt(r.balance_counterweight_lb, 0) + " lb would only just hold it -- the factor is what makes it safe" },
+    { key: "i", id: "ssc-out-i", label: "Inboard arm for a target", value: (r) => r.inboard_for_target_ft === null ? "(no target entered)" : fmt(r.inboard_for_target_ft, 2) + " ft of inboard arm brings the requirement to " + fmt(r.target_counterweight_lb, 0) + " lb. Lengthening the inboard arm is usually the only lever a crew can move" },
+    { key: "n", id: "ssc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSuspendedScaffoldCounterweight,
+});
+
+// ============ spec-v1689: slab shoring and reshoring load distribution ============
+
+// dims: in { slab_dead_psf: M L^-1 T^-2, construction_live_psf: M L^-1 T^-2, form_dead_psf: M L^-1 T^-2, connected_levels: dimensionless, backshored: dimensionless, governing_slab_capacity_psf: M L^-1 T^-2, governing_slab_strength_psi: M L^-1 T^-2 } out: { new_pour_load_psf: M L^-1 T^-2, redistributed_load_psf: M L^-1 T^-2, share_per_level_psf: M L^-1 T^-2, governing_level_load_psf: M L^-1 T^-2, capacity_margin_psf: M L^-1 T^-2, levels_required: dimensionless }
+export function computeShoringReshoringLoad({ slab_dead_psf = 0, construction_live_psf = 0, form_dead_psf = 0, connected_levels = 0, backshored = 0, governing_slab_capacity_psf = 0, governing_slab_strength_psi = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(slab_dead_psf > 0)) return { error: "The slab dead load must be positive (psf)." };
+  if (construction_live_psf < 0) return { error: "Construction live load cannot be negative (psf)." };
+  if (form_dead_psf < 0) return { error: "Formwork dead load cannot be negative (psf)." };
+  if (!(connected_levels >= 1)) return { error: "There must be at least one supporting level connected by shores." };
+  if (backshored < 0) return { error: "The backshore flag is 1 or 0." };
+  if (governing_slab_capacity_psf < 0) return { error: "The governing slab's capacity cannot be negative (psf)." };
+  if (governing_slab_strength_psi < 0) return { error: "The governing slab's strength cannot be negative (psi)." };
+  const N = Math.round(connected_levels);
+  const is_backshored = backshored >= 0.5;
+  // The new pour is what the shores put into the stack: wet concrete, the
+  // forms, and the crew and equipment on them.
+  const new_pour_load_psf = slab_dead_psf + form_dead_psf + construction_live_psf;
+  // A RESHORE is placed after the slab above has been stripped and allowed to
+  // deflect, so that slab already carries its own weight and the reshore takes
+  // only what is added afterwards. A BACKSHORE never permitted that
+  // deflection, so the slab's own dead load is still in the stack.
+  const redistributed_load_psf = new_pour_load_psf + (is_backshored ? slab_dead_psf : 0);
+  // Equal stiffness across the connected slabs is the standard simplifying
+  // assumption, and it makes the share a straight division.
+  const share_per_level_psf = redistributed_load_psf / N;
+  const governing_level_load_psf = slab_dead_psf + share_per_level_psf;
+  const capacity_margin_psf = governing_slab_capacity_psf > 0 ? governing_slab_capacity_psf - governing_level_load_psf : null;
+  const within_capacity = governing_slab_capacity_psf > 0 ? governing_level_load_psf <= governing_slab_capacity_psf : null;
+  const utilization_pct = governing_slab_capacity_psf > 0 ? governing_level_load_psf / governing_slab_capacity_psf * 100 : null;
+  // Levels needed to bring the governing slab inside capacity. Below its own
+  // dead load no number of levels helps, which is a different problem.
+  const headroom_psf = governing_slab_capacity_psf - slab_dead_psf;
+  const levels_required = (governing_slab_capacity_psf > 0 && headroom_psf > 0)
+    ? Math.max(1, Math.ceil(redistributed_load_psf / headroom_psf))
+    : null;
+  const capacity_below_dead = governing_slab_capacity_psf > 0 && headroom_psf <= 0;
+  // The same stack read the other way, so the distinction is visible.
+  const other_case_load_psf = slab_dead_psf + (new_pour_load_psf + (is_backshored ? 0 : slab_dead_psf)) / N;
+  const outs = [new_pour_load_psf, redistributed_load_psf, share_per_level_psf, governing_level_load_psf];
+  if (!outs.every(Number.isFinite)) return { error: "Shoring distribution math is not a finite value." };
+  const verdict = within_capacity === null
+    ? "Enter the governing slab's capacity at its age today to check it."
+    : capacity_below_dead
+      ? "THE SLAB CANNOT CARRY ITS OWN WEIGHT at " + fmt(governing_slab_capacity_psf, 0) + " psf against a " + fmt(slab_dead_psf, 0) + " psf dead load. No number of shoring levels fixes that; the slab is too young to strip at all"
+      : within_capacity
+        ? "WITHIN CAPACITY: the governing level carries " + fmt(governing_level_load_psf, 0) + " psf against " + fmt(governing_slab_capacity_psf, 0) + " psf at its age today, " + fmt(utilization_pct, 0) + "%"
+        : "OVERLOADED by " + fmt(-capacity_margin_psf, 0) + " psf: the governing level carries " + fmt(governing_level_load_psf, 0) + " psf against " + fmt(governing_slab_capacity_psf, 0) + " psf at its age today. " + fmt(levels_required, 0) + " connected levels are needed instead of " + fmt(N, 0);
+  const case_verdict = is_backshored
+    ? "BACKSHORED: the slabs were stripped and reshored without permitting deflection, so each still carries a share of the dead load above it. Read as reshores instead, the governing level would carry " + fmt(other_case_load_psf, 0) + " psf"
+    : "RESHORED: the slabs were stripped and allowed to deflect first, so each already carries its own weight and the shores take only what is added afterwards. Read as backshores instead, the governing level would carry " + fmt(other_case_load_psf, 0) + " psf";
+  return {
+    slab_dead_psf, construction_live_psf, form_dead_psf, new_pour_load_psf,
+    connected_levels: N, backshored: is_backshored ? 1 : 0, redistributed_load_psf,
+    share_per_level_psf, governing_level_load_psf, governing_slab_capacity_psf,
+    capacity_margin_psf, within_capacity, utilization_pct, levels_required,
+    capacity_below_dead, governing_slab_strength_psi, other_case_load_psf,
+    verdict, case_verdict,
+    note: "A slab poured on shores does not load the slab directly below it; it loads the whole stack of levels the shores connect, and the load is shared among them. THE DISTINCTION BETWEEN RESHORING AND BACKSHORING IS THE ONE THAT GETS LOST, and it changes the arithmetic completely. A RESHORE is installed after the slab above has been stripped and allowed to DEFLECT and carry its own weight, so it carries only loads added afterwards. A BACKSHORE is installed without permitting that deflection -- typically by stripping and reshoring in small areas -- so it continues to carry a share of the slab's own dead load as well. Treating a backshore as a reshore, or the reverse, misallocates the load through the whole stack, and both readings are computed here so the difference is a number rather than a word. GETTING IT WRONG IS NOT CONSERVATIVE IN A PREDICTABLE DIRECTION: it can under-count the load on a level or over-count it, and the design of the sequence depends on which it is. THE CONSEQUENCE IS A SLAB LOADED BEYOND ITS CAPACITY AT ITS AGE. A young slab has a fraction of its 28 day strength, and construction loads -- the wet concrete above, plus the forms, plus the crew and equipment -- are often the largest loads the slab will ever see in its life. Multi-storey construction failures during placement are a recognized category and the shoring sequence is usually at the centre of them. The governing level is the youngest supporting slab, because it is the one whose capacity today is furthest below its design capacity. AND THE STRENGTH TO USE IS FIELD-CURED CYLINDERS that experienced the same conditions as the slab, not laboratory-cured ones. A slab poured in cold weather is far behind lab cylinders that sat in a warm curing tank, and stripping to a laboratory strength on a cold weather pour is stripping to a strength the slab does not have. That is the trap that turns a correct calculation into a collapse. EQUAL STIFFNESS ACROSS THE CONNECTED SLABS IS THE SIMPLIFYING ASSUMPTION HERE and it is the standard first-order one, which makes the share a straight division by the number of connected levels. A real analysis follows the construction sequence step by step, tracks each slab's stiffness at its actual age, and accounts for shore stiffness and for the fact that the lower slabs are older and stiffer and therefore take more than an equal share. This is a screen against that, not a substitute for it. It does not design the shores, which is a separate calculation from tributary area, or evaluate slab punching, deflection, or cracking under construction load; it does not set stripping times; and it does not address post-tensioned slabs, whose stripping and reshoring rules differ, or the lateral bracing of the shoring stack. ACI 347 and ACI 347.2R, the shoring designer's sequence drawings, the field-cured cylinder breaks, and the engineer of record govern.",
+  };
+}
+const shoringReshoringLoadExample = { inputs: { slab_dead_psf: 100, construction_live_psf: 50, form_dead_psf: 10, connected_levels: 3, backshored: 0, governing_slab_capacity_psf: 200, governing_slab_strength_psi: 2500 } };
+CONSTRUCTION_RENDERERS["shoring-reshoring-load"] = _simpleRenderer({
+  citation: "Citation: the ACI 347.2R shoring and reshoring load distribution by name, taken at the standard first-order EQUAL STIFFNESS assumption -- the load a new pour puts into the stack is shared equally among the connected levels, so each supporting slab carries its own dead load plus that share. A RESHORE is placed after the slab above has deflected and carries only later loads; a BACKSHORE never permitted that deflection and still carries a share of the dead load, and both readings are reported. The slab's capacity must come from FIELD-CURED cylinders at its age today, not laboratory-cured ones. A screen, not a sequence analysis. ACI 347 and ACI 347.2R, the shoring designer's sequence drawings, the field-cured cylinder breaks, and the engineer of record govern.",
+  example: shoringReshoringLoadExample.inputs,
+  fields: [
+    { key: "slab_dead_psf", label: "Slab dead load (psf)", kind: "number", default: 100 },
+    { key: "construction_live_psf", label: "Construction live load (psf)", kind: "number", default: 50 },
+    { key: "form_dead_psf", label: "Formwork dead load (psf)", kind: "number", default: 10 },
+    { key: "connected_levels", label: "Levels connected by shores", kind: "number", default: 3 },
+    { key: "backshored", label: "Backshored rather than reshored (1 yes, 0 no)", kind: "number", default: 0, attrs: { step: "1", min: "0", max: "1" } },
+    { key: "governing_slab_capacity_psf", label: "Governing slab capacity at its age today (psf, 0 to skip)", kind: "number", default: 200 },
+    { key: "governing_slab_strength_psi", label: "Governing slab strength from field-cured cylinders (psi)", kind: "number", default: 2500 },
+  ],
+  outputs: [
+    { key: "p", id: "srl-out-p", label: "What the new pour puts in", value: (r) => fmt(r.new_pour_load_psf, 0) + " psf -- " + fmt(r.slab_dead_psf, 0) + " of wet slab, " + fmt(r.form_dead_psf, 0) + " of forms, " + fmt(r.construction_live_psf, 0) + " of crew and equipment" },
+    { key: "s", id: "srl-out-s", label: "Share per level", value: (r) => fmt(r.share_per_level_psf, 1) + " psf across " + fmt(r.connected_levels, 0) + " connected levels, of " + fmt(r.redistributed_load_psf, 0) + " psf redistributed" },
+    { key: "g", id: "srl-out-g", label: "The governing level carries", value: (r) => fmt(r.governing_level_load_psf, 1) + " psf -- its own " + fmt(r.slab_dead_psf, 0) + " psf plus its share" },
+    { key: "v", id: "srl-out-v", label: "Against its capacity today", value: (r) => r.verdict },
+    { key: "c", id: "srl-out-c", label: "Reshore or backshore", value: (r) => r.case_verdict },
+    { key: "n", id: "srl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeShoringReshoringLoad,
+});

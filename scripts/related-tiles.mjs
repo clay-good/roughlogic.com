@@ -1562,6 +1562,17 @@ const RELATED = {
   "nesc-district-loading": ["conductor-sag-at-temperature","transverse-wind-load-conductor","conductor-blowout"],
   "conductor-creep-elongation": ["conductor-sag-at-temperature","line-ground-clearance-nesc","ruling-span"],
   "sagging-return-wave": ["ruling-span","conductor-sag-at-temperature","line-ground-clearance-nesc"],
+  // spec-v1679, v1681..v1689: sheet metal, masonry, and scaffold band.
+  "square-to-round-development": ["cone-flat-pattern","duct-transition-length","pipe-miter-cut"],
+  "standing-seam-takeoff": ["metal-roof-thermal-movement","metal-roof-panels","sheathing-takeoff"],
+  "metal-roof-thermal-movement": ["standing-seam-takeoff","pipe-expansion","metal-roof-panels"],
+  "mortar-batch-c270": ["mortar-mix","masonry-count","masonry-prism-fm"],
+  "grout-lift-pour-height": ["cmu-grout-volume","masonry-count","mortar-batch-c270"],
+  "masonry-cleaning-dilution": ["masonry-count","mortar-batch-c270","paint-coverage"],
+  "scaffold-tie-spacing": ["scaffold-leg-load","scaffold-mudsill-bearing","scaffold-takeoff"],
+  "mast-climber-platform-load": ["suspended-scaffold-counterweight","scaffold-tie-spacing","scaffold-leg-load"],
+  "suspended-scaffold-counterweight": ["mast-climber-platform-load","scaffold-leg-load","crane-ground-bearing"],
+  "shoring-reshoring-load": ["shore-post-load","concrete-strength-gain","tilt-up-lift-stress"],
   // spec-v1617..v1621 concrete placement and tilt-up; v1546..v1549 rail logistics.
   "concrete-pump-line-pressure": ["boom-pump-reach","ready-mix-concrete-order","asphalt-spread-rate"],
   "boom-pump-reach": ["concrete-pump-line-pressure","crane-ground-bearing","crane-load-radius-boom"],

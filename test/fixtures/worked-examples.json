@@ -100896,6 +100896,648 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "square-to-round-development",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Square-to-Round Transition Development -- the spec-v1679 worked example, recomputed",
+   "source_edition_or_year": "spec-v1679 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "square_side_in": 20,
+    "round_diameter_in": 14,
+    "height_in": 16,
+    "offset_in": 0,
+    "elements_per_quadrant": 8,
+    "seam_allowance_in": 0.5
+   },
+   "outputs": {
+    "plan_corner_distance_in": {
+     "value": 7.14214,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "corner_true_length_in": {
+     "value": 17.5217,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "midpoint_true_length_in": {
+     "value": 16.27882,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "circumference_in": {
+     "value": 43.9823,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "developed_arc_in": {
+     "value": 43.91168,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "arc_shortfall_in": {
+     "value": 0.07062,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sheet_length_in": {
+     "value": 58.03456,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "standing-seam-takeoff",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Standing Seam Metal Panel and Clip Takeoff -- the spec-v1681 worked example, recomputed",
+   "source_edition_or_year": "spec-v1681 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "building_width_ft": 42,
+    "run_length_ft": 30,
+    "coverage_width_in": 16,
+    "sheet_width_in": 18,
+    "field_clip_spacing_in": 24,
+    "perimeter_clip_spacing_in": 12,
+    "perimeter_panels": 4,
+    "fasteners_per_clip": 2,
+    "eave_ridge_allowance_in": 6,
+    "waste_pct": 5
+   },
+   "outputs": {
+    "panel_count": {
+     "value": 32,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "panels_if_ordered_on_sheet": {
+     "value": 28,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "panel_length_ft": {
+     "value": 30.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_panel_ft": {
+     "value": 976,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "field_clip_count": {
+     "value": 448,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "perimeter_clip_count": {
+     "value": 124,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "clip_count": {
+     "value": 572,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fastener_count": {
+     "value": 1144,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "metal-roof-thermal-movement",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Metal Roof Thermal Movement and Sliding Clip Range -- the spec-v1682 worked example, recomputed",
+   "source_edition_or_year": "spec-v1682 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "panel_length_ft": 120,
+    "alpha_per_f": 0.0000128,
+    "temp_swing_f": 140,
+    "fixed_point_fraction": 0,
+    "clip_travel_in": 1.5
+   },
+   "outputs": {
+    "total_movement_in": {
+     "value": 2.58048,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "movement_up_slope_in": {
+     "value": 2.58048,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "governing_movement_in": {
+     "value": 2.58048,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "travel_margin_in": {
+     "value": -1.08048,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_panel_length_ft": {
+     "value": 69.75446,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "centre_fixed_movement_in": {
+     "value": 1.29024,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mortar-batch-c270",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Mortar Batch Proportions by Volume (ASTM C270) -- the spec-v1683 worked example, recomputed",
+   "source_edition_or_year": "spec-v1683 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "cement_volumes": 1,
+    "lime_volumes": 0.5,
+    "sand_ratio": 2.5,
+    "cement_bags": 1,
+    "unit_strength_psi": 3000,
+    "mortar_strength_psi": 1800
+   },
+   "outputs": {
+    "cement_cuft": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lime_cuft": {
+     "value": 0.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cementitious_cuft": {
+     "value": 1.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sand_cuft": {
+     "value": 3.75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sand_min_cuft": {
+     "value": 3.375,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sand_max_cuft": {
+     "value": 4.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lime_bags": {
+     "value": 0.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sand_shovels": {
+     "value": 7.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "batch_yield_cuft": {
+     "value": 5.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "grout-lift-pour-height",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "CMU Grout Lift and Pour Height Limits -- the spec-v1684 worked example, recomputed",
+   "source_edition_or_year": "spec-v1684 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "pour_height_ft": 5,
+    "lift_height_ft": 5,
+    "max_pour_height_ft": 5.33,
+    "max_lift_height_ft": 5.33,
+    "grout_unit_weight_pcf": 140,
+    "cleanout_threshold_ft": 5.33
+   },
+   "outputs": {
+    "lifts_in_pour": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "actual_lift_ft": {
+     "value": 5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "base_pressure_psf": {
+     "value": 700,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "base_pressure_psi": {
+     "value": 4.86111,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pressure_at_limit_psi": {
+     "value": 5.18194,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pour_margin_ft": {
+     "value": 0.33,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lift_margin_ft": {
+     "value": 0.33,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "masonry-cleaning-dilution",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Masonry Cleaning Dilution, Coverage, and Rinse -- the spec-v1685 worked example, recomputed",
+   "source_edition_or_year": "spec-v1685 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "area_ft2": 2400,
+    "dilution_parts_water": 5,
+    "coverage_ft2_per_gal": 150,
+    "prewet_gal_per_100ft2": 5,
+    "rinse_gal_per_100ft2": 12,
+    "acid_safe_unit": 1
+   },
+   "outputs": {
+    "diluted_gal": {
+     "value": 16,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "concentrate_gal": {
+     "value": 2.66667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "water_gal": {
+     "value": 13.33333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "concentrate_pct": {
+     "value": 16.66667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "prewet_gal": {
+     "value": 120,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rinse_gal": {
+     "value": 288,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_water_gal": {
+     "value": 421.33333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "scaffold-tie-spacing",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Scaffold Tie Spacing and Height-to-Base Ratio -- the spec-v1686 worked example, recomputed",
+   "source_edition_or_year": "spec-v1686 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "scaffold_height_ft": 60,
+    "base_width_ft": 5,
+    "outrigger_base_ft": 10,
+    "max_ratio": 4,
+    "vertical_tie_spacing_ft": 20,
+    "horizontal_tie_spacing_ft": 30,
+    "scaffold_run_ft": 90,
+    "sheeted": 0
+   },
+   "outputs": {
+    "effective_base_ft": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "height_to_base_ratio": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bare_ratio": {
+     "value": 12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_free_standing_ft": {
+     "value": 40,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_free_standing_bare_ft": {
+     "value": 20,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tie_rows": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ties_per_row": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tie_count": {
+     "value": 8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "base_to_eliminate_ties_ft": {
+     "value": 15,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mast-climber-platform-load",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Mast Climbing Work Platform Zone Load -- the spec-v1687 worked example, recomputed",
+   "source_edition_or_year": "spec-v1687 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "platform_length_ft": 40,
+    "cantilever_length_ft": 8,
+    "rated_capacity_lb": 6000,
+    "zone_rated_capacity_lb": 1500,
+    "load_lb": 5200,
+    "load_centroid_ft": 16,
+    "tie_spacing_ft": 25,
+    "tie_capacity_lb": 4000
+   },
+   "outputs": {
+    "total_utilization_pct": {
+     "value": 86.66667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "zone_utilization_pct": {
+     "value": 346.66667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "moment_ft_lb": {
+     "value": 83200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_load_at_position_lb": {
+     "value": 1500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tie_force_lb": {
+     "value": 3328,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tie_utilization_pct": {
+     "value": 83.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "suspended-scaffold-counterweight",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Suspended Scaffold Outrigger Counterweight -- the spec-v1688 worked example, recomputed",
+   "source_edition_or_year": "spec-v1688 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "rated_load_lb": 1500,
+    "outboard_arm_ft": 6,
+    "inboard_arm_ft": 1.5,
+    "factor_of_safety": 4,
+    "counterweight_unit_lb": 50,
+    "target_counterweight_lb": 12000
+   },
+   "outputs": {
+    "lever_ratio": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "overturning_moment_ft_lb": {
+     "value": 9000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "balance_counterweight_lb": {
+     "value": 6000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_counterweight_lb": {
+     "value": 24000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "counterweight_units": {
+     "value": 480,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "resisting_moment_ft_lb": {
+     "value": 36000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "achieved_fos": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "inboard_for_target_ft": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "shoring-reshoring-load",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Slab Shoring and Reshoring Load Distribution -- the spec-v1689 worked example, recomputed",
+   "source_edition_or_year": "spec-v1689 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "slab_dead_psf": 100,
+    "construction_live_psf": 50,
+    "form_dead_psf": 10,
+    "connected_levels": 3,
+    "backshored": 0,
+    "governing_slab_capacity_psf": 200,
+    "governing_slab_strength_psi": 2500
+   },
+   "outputs": {
+    "new_pour_load_psf": {
+     "value": 160,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "redistributed_load_psf": {
+     "value": 160,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "share_per_level_psf": {
+     "value": 53.33333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "governing_level_load_psf": {
+     "value": 153.33333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "capacity_margin_psf": {
+     "value": 46.66667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "utilization_pct": {
+     "value": 76.66667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "other_case_load_psf": {
+     "value": 186.66667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

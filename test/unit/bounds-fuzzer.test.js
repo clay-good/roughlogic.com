@@ -46920,3 +46920,414 @@ test("bounds: spec-v1549 computeClearancePlateEnvelope -- 1,146 ft is a FIVE deg
   assert.ok("error" in _v1549({ ...base, car_length_ft: 50 }));
   assert.ok("error" in _v1549({ ...base, degree_of_curve: 0 }));
 });
+
+// ===========================================================================
+// spec-v1679, v1681..v1689: the 2026-09-08 trade-expansion sheet metal,
+// masonry, and scaffold band. Ten tiles across three existing modules.
+//
+// spec-v1680 gored-elbow-angles WAS CUT: `pipe-miter-cut` in calc-fab.js
+// already computes the identical miter geometry and its note already carries
+// the end-half-gore rule the spec calls "the whole trick". What it lacked --
+// the throat and heel lengths and the developed material -- landed there, and
+// is asserted at the bottom of this block together with the assertion that
+// matters for an additive change: the old answer is unchanged.
+//
+// spec-v1687 left an unrendered python placeholder in its worked example,
+// the third occurrence in this program after spec-v1652 and spec-v1615.
+// ===========================================================================
+
+import { computeSquareToRoundDevelopment as _v1679 } from "../../calc-metalair.js";
+test("bounds: spec-v1679 computeSquareToRoundDevelopment -- the plan view understates every element", () => {
+  const base = { square_side_in: 20, round_diameter_in: 14, height_in: 16, offset_in: 0, elements_per_quadrant: 8, seam_allowance_in: 0.5 };
+  const r = _v1679(base);
+  assert.ok(Math.abs(r.plan_corner_distance_in - 7.14213562) < 1e-6);
+  assert.ok(Math.abs(r.corner_true_length_in - 17.5217041) < 1e-5);
+  assert.ok(Math.abs(r.midpoint_true_length_in - 16.2788206) < 1e-5);
+  assert.ok(Math.abs(r.circumference_in - 43.9822972) < 1e-5);
+  assert.ok(Math.abs(r.developed_arc_in - 43.9116787) < 1e-5);
+  assert.ok(r.arc_shortfall_in > 0);
+  // Every true length is the hypotenuse of its plan distance and the height,
+  // which is the only idea in the method.
+  assert.ok(Math.abs(Math.hypot(r.plan_corner_distance_in, base.height_in) - r.corner_true_length_in) < 1e-9);
+  assert.ok(Math.abs(Math.hypot(r.plan_midpoint_distance_in, base.height_in) - r.midpoint_true_length_in) < 1e-9);
+  // The developed edge is an inscribed polygon, so it is ALWAYS short of the
+  // circumference, and more elements close the gap monotonically.
+  let last = Infinity;
+  for (const n of [2, 4, 8, 16, 32]) {
+    const x = _v1679({ ...base, elements_per_quadrant: n });
+    assert.ok(x.developed_arc_in < x.circumference_in);
+    assert.ok(x.arc_shortfall_in < last);
+    last = x.arc_shortfall_in;
+  }
+  // A flat transition with no height has true lengths equal to its plan.
+  const flat = _v1679({ ...base, height_in: 0.0000001 });
+  assert.ok(Math.abs(flat.corner_true_length_in - flat.plan_corner_distance_in) < 1e-6);
+  // A square and a circle of the same across-flats put the midpoint element
+  // at zero plan distance, so its true length is exactly the height.
+  const tangent = _v1679({ ...base, round_diameter_in: base.square_side_in });
+  assert.ok(Math.abs(tangent.plan_midpoint_distance_in) < 1e-12);
+  assert.ok(Math.abs(tangent.midpoint_true_length_in - base.height_in) < 1e-12);
+  assert.ok("error" in _v1679({ ...base, elements_per_quadrant: 1 }));
+  assert.ok("error" in _v1679({ ...base, height_in: 0 }));
+});
+
+import { computeStandingSeamTakeoff as _v1681 } from "../../calc-metalair.js";
+test("bounds: spec-v1681 computeStandingSeamTakeoff -- ordering on the sheet width comes up short", () => {
+  const base = { building_width_ft: 42, run_length_ft: 30, coverage_width_in: 16, sheet_width_in: 18, field_clip_spacing_in: 24, perimeter_clip_spacing_in: 12, perimeter_panels: 4, fasteners_per_clip: 2, eave_ridge_allowance_in: 6, waste_pct: 5 };
+  const r = _v1681(base);
+  assert.equal(r.panel_count, 32);
+  assert.equal(r.panels_if_ordered_on_sheet, 28);
+  assert.equal(r.panels_short, 4);
+  assert.ok(Math.abs(r.panel_length_ft - 30.5) < 1e-12);
+  assert.equal(r.clips_per_field_panel, 16);
+  assert.equal(r.field_clip_count, 448);
+  assert.equal(r.perimeter_clip_count, 124);
+  assert.equal(r.fastener_count, r.clip_count * 2);
+  assert.ok(r.coverage_verdict.startsWith("ORDERING ON THE SHEET WIDTH"));
+  // Panel count is the width over the COVERAGE, always rounded up.
+  assert.equal(r.panel_count, Math.ceil(base.building_width_ft * 12 / base.coverage_width_in));
+  // Edge and corner zones carry more clips per panel than the field, which is
+  // the whole reason the two are counted separately.
+  assert.ok(r.clips_per_perimeter_panel > r.clips_per_field_panel);
+  // With no separate perimeter spacing the two zones are the same.
+  const uniform = _v1681({ ...base, perimeter_clip_spacing_in: 0 });
+  assert.equal(uniform.clips_per_perimeter_panel, uniform.clips_per_field_panel);
+  assert.equal(uniform.clip_count, uniform.panel_count * uniform.clips_per_field_panel);
+  // Halving the clip spacing roughly doubles the clips.
+  const tight = _v1681({ ...base, field_clip_spacing_in: 12, perimeter_clip_spacing_in: 12 });
+  assert.ok(tight.clip_count > 1.9 * uniform.clip_count / 1.0 - uniform.panel_count);
+  // Seams are one fewer than the panels; the two rakes are not seams.
+  assert.equal(r.seam_count, r.panel_count - 1);
+  // Waste is applied to the panel footage and nothing else.
+  assert.ok(Math.abs(r.total_panel_with_waste_ft - r.total_panel_ft * 1.05) < 1e-9);
+  assert.ok("error" in _v1681({ ...base, sheet_width_in: 12 }));
+  assert.ok("error" in _v1681({ ...base, coverage_width_in: 0 }));
+});
+
+import { computeMetalRoofThermalMovement as _v1682 } from "../../calc-metalair.js";
+test("bounds: spec-v1682 computeMetalRoofThermalMovement -- fixing at the middle halves it", () => {
+  const base = { panel_length_ft: 120, alpha_per_f: 0.0000128, temp_swing_f: 140, fixed_point_fraction: 0, clip_travel_in: 1.5 };
+  const r = _v1682(base);
+  assert.ok(Math.abs(r.total_movement_in - 2.58048) < 1e-9);
+  assert.ok(Math.abs(r.governing_movement_in - 2.58048) < 1e-9);
+  assert.equal(r.travel_adequate, false);
+  assert.ok(Math.abs(r.centre_fixed_movement_in - 1.29024) < 1e-9);
+  // Fixed at the eave, all the movement goes to the ridge and none the other
+  // way; fixed at the middle, exactly half each way.
+  assert.ok(Math.abs(r.movement_down_slope_in) < 1e-12);
+  const middle = _v1682({ ...base, fixed_point_fraction: 0.5 });
+  assert.ok(Math.abs(middle.movement_up_slope_in - middle.movement_down_slope_in) < 1e-12);
+  assert.ok(Math.abs(middle.governing_movement_in - r.total_movement_in / 2) < 1e-12);
+  // The two ends always sum to the total, wherever the fixed point sits.
+  for (const f of [0, 0.25, 0.5, 0.75, 1]) {
+    const x = _v1682({ ...base, fixed_point_fraction: f });
+    assert.ok(Math.abs(x.movement_up_slope_in + x.movement_down_slope_in - x.total_movement_in) < 1e-12);
+  }
+  // Movement is exactly linear in length, swing and coefficient.
+  assert.ok(Math.abs(_v1682({ ...base, panel_length_ft: 240 }).total_movement_in - 2 * r.total_movement_in) < 1e-9);
+  assert.ok(Math.abs(_v1682({ ...base, temp_swing_f: 70 }).total_movement_in - r.total_movement_in / 2) < 1e-9);
+  // Steel moves about half as far as aluminium over the same swing.
+  const steel = _v1682({ ...base, alpha_per_f: 0.0000065 });
+  assert.ok(steel.total_movement_in < 0.55 * r.total_movement_in);
+  // The longest panel the clip supports, fed back in, uses exactly its travel.
+  const at = _v1682({ ...base, panel_length_ft: r.max_panel_length_ft });
+  assert.ok(Math.abs(at.governing_movement_in - base.clip_travel_in) < 1e-9);
+  // And fixing at the middle doubles that supported length, exactly.
+  const midMax = _v1682({ ...base, fixed_point_fraction: 0.5 });
+  assert.ok(Math.abs(midMax.max_panel_length_ft - 2 * r.max_panel_length_ft) < 1e-6);
+  assert.ok("error" in _v1682({ ...base, fixed_point_fraction: 1.5 }));
+  assert.ok("error" in _v1682({ ...base, temp_swing_f: 0 }));
+});
+
+import { computeMortarBatchC270 as _v1683 } from "../../calc-masonry.js";
+test("bounds: spec-v1683 computeMortarBatchC270 -- a mortar harder than the unit destroys the unit", () => {
+  const base = { cement_volumes: 1, lime_volumes: 0.5, sand_ratio: 2.5, cement_bags: 1, unit_strength_psi: 3000, mortar_strength_psi: 1800 };
+  const r = _v1683(base);
+  assert.ok(Math.abs(r.cement_cuft - 1) < 1e-12);
+  assert.ok(Math.abs(r.lime_cuft - 0.5) < 1e-12);
+  assert.ok(Math.abs(r.cementitious_cuft - 1.5) < 1e-12);
+  assert.ok(Math.abs(r.sand_cuft - 3.75) < 1e-12);
+  assert.ok(Math.abs(r.sand_min_cuft - 3.375) < 1e-12);
+  assert.ok(Math.abs(r.sand_max_cuft - 4.5) < 1e-12);
+  assert.equal(r.sand_in_range, true);
+  assert.equal(r.compatible, true);
+  assert.ok(Math.abs(r.lime_bags - 0.4) < 1e-12);
+  assert.ok(Math.abs(r.sand_shovels - 7.5) < 1e-12);
+  // Sand is always the entered multiple of the cementitious total, and the
+  // range bounds bracket it when it is in range.
+  assert.ok(Math.abs(r.sand_cuft - base.sand_ratio * r.cementitious_cuft) < 1e-12);
+  assert.ok(r.sand_cuft >= r.sand_min_cuft && r.sand_cuft <= r.sand_max_cuft);
+  // The batch scales exactly with the cement bags.
+  const triple = _v1683({ ...base, cement_bags: 3 });
+  assert.ok(Math.abs(triple.sand_cuft - 3 * r.sand_cuft) < 1e-9);
+  assert.ok(Math.abs(triple.cementitious_cuft - 3 * r.cementitious_cuft) < 1e-9);
+  // Out of range in both directions is named, not just flagged.
+  const harsh = _v1683({ ...base, sand_ratio: 3.5 });
+  assert.equal(harsh.sand_in_range, false);
+  assert.ok(harsh.sand_verdict.startsWith("OVER-SANDED"));
+  const rich = _v1683({ ...base, sand_ratio: 2 });
+  assert.equal(rich.sand_in_range, false);
+  assert.ok(rich.sand_verdict.startsWith("UNDER-SANDED"));
+  // The rule that runs against instinct: a mortar stronger than the unit.
+  const hard = _v1683({ ...base, unit_strength_psi: 1500, mortar_strength_psi: 2500 });
+  assert.equal(hard.compatible, false);
+  assert.ok(hard.compat_verdict.startsWith("MORTAR HARDER THAN THE UNIT"));
+  // A lime-free batch is all cement, and the yield follows.
+  const noLime = _v1683({ ...base, lime_volumes: 0 });
+  assert.ok(Math.abs(noLime.lime_cuft) < 1e-12);
+  assert.ok(Math.abs(noLime.cementitious_cuft - noLime.cement_cuft) < 1e-12);
+  assert.ok("error" in _v1683({ ...base, cement_volumes: 0 }));
+  assert.ok("error" in _v1683({ ...base, cement_bags: 0 }));
+});
+
+import { computeGroutLiftPourHeight as _v1684 } from "../../calc-masonry.js";
+test("bounds: spec-v1684 computeGroutLiftPourHeight -- the pour limit is a blowout limit", () => {
+  const base = { pour_height_ft: 5, lift_height_ft: 5, max_pour_height_ft: 5.33, max_lift_height_ft: 5.33, grout_unit_weight_pcf: 140, cleanout_threshold_ft: 5.33 };
+  const r = _v1684(base);
+  assert.equal(r.lifts_in_pour, 1);
+  assert.ok(Math.abs(r.base_pressure_psf - 700) < 1e-9);
+  assert.ok(Math.abs(r.base_pressure_psi - 4.86111111) < 1e-6);
+  assert.equal(r.pour_ok, true);
+  assert.equal(r.lift_ok, true);
+  assert.equal(r.cleanouts_required, false);
+  // Pressure is exactly linear in pour height: doubling the pour doubles it.
+  const tall = _v1684({ ...base, pour_height_ft: 10, lift_height_ft: 5, max_pour_height_ft: 12, max_lift_height_ft: 5.33 });
+  assert.ok(Math.abs(tall.base_pressure_psi - 2 * r.base_pressure_psi) < 1e-9);
+  assert.equal(tall.lifts_in_pour, 2);
+  assert.ok(Math.abs(tall.actual_lift_ft - 5) < 1e-12);
+  assert.equal(tall.cleanouts_required, true);
+  assert.ok(tall.cleanout_verdict.startsWith("CLEANOUTS REQUIRED"));
+  // A pour past the limit is the blowout case, named as such.
+  const over = _v1684({ ...base, pour_height_ft: 12, lift_height_ft: 5, max_lift_height_ft: 5.33 });
+  assert.equal(over.pour_ok, false);
+  assert.ok(over.pour_verdict.startsWith("POUR OVER THE LIMIT"));
+  // A lift past the limit is a consolidation failure, named differently.
+  const deep = _v1684({ ...base, lift_height_ft: 5, max_lift_height_ft: 4 });
+  assert.equal(deep.lift_ok, false);
+  assert.ok(deep.lift_verdict.startsWith("LIFT OVER THE LIMIT"));
+  // The lift count always covers the pour, and never over-divides it.
+  for (const [pour, lift] of [[5, 5], [10, 4], [16, 5], [3, 3]]) {
+    const x = _v1684({ ...base, pour_height_ft: pour, lift_height_ft: lift, max_pour_height_ft: 30, max_lift_height_ft: 30 });
+    assert.ok(x.lifts_in_pour * lift >= pour - 1e-9);
+    assert.ok((x.lifts_in_pour - 1) * lift < pour);
+  }
+  assert.ok("error" in _v1684({ ...base, lift_height_ft: 8 }));
+  assert.ok("error" in _v1684({ ...base, max_pour_height_ft: 0 }));
+});
+
+import { computeMasonryCleaningDilution as _v1685 } from "../../calc-masonry.js";
+test("bounds: spec-v1685 computeMasonryCleaningDilution -- one part in six, not one part in five", () => {
+  const base = { area_ft2: 2400, dilution_parts_water: 5, coverage_ft2_per_gal: 150, prewet_gal_per_100ft2: 5, rinse_gal_per_100ft2: 12, acid_safe_unit: 1 };
+  const r = _v1685(base);
+  assert.ok(Math.abs(r.diluted_gal - 16) < 1e-12);
+  assert.ok(Math.abs(r.concentrate_gal - 2.66666667) < 1e-6);
+  assert.ok(Math.abs(r.water_gal - 13.3333333) < 1e-6);
+  assert.ok(Math.abs(r.prewet_gal - 120) < 1e-9);
+  assert.ok(Math.abs(r.rinse_gal - 288) < 1e-9);
+  assert.ok(Math.abs(r.total_water_gal - 421.333333) < 1e-5);
+  // One part concentrate to N parts water is one part in N+1 of the mix --
+  // the arithmetic people get wrong in the direction of too strong.
+  assert.equal(r.total_parts, base.dilution_parts_water + 1);
+  assert.ok(Math.abs(r.concentrate_gal + r.water_gal - r.diluted_gal) < 1e-12);
+  assert.ok(Math.abs(r.concentrate_pct - 100 / 6) < 1e-9);
+  // Neat concentrate is a dilution of zero parts water, which this refuses --
+  // but one part water is a 50/50 mix, exactly.
+  const half = _v1685({ ...base, dilution_parts_water: 1 });
+  assert.ok(Math.abs(half.concentrate_gal - half.water_gal) < 1e-12);
+  assert.ok(Math.abs(half.concentrate_pct - 50) < 1e-12);
+  // A weaker dilution uses less concentrate over the same area, always.
+  const weak = _v1685({ ...base, dilution_parts_water: 10 });
+  assert.ok(weak.concentrate_gal < r.concentrate_gal);
+  assert.ok(Math.abs(weak.diluted_gal - r.diluted_gal) < 1e-12);
+  // Everything scales exactly with area.
+  const twice = _v1685({ ...base, area_ft2: 4800 });
+  assert.ok(Math.abs(twice.total_water_gal - 2 * r.total_water_gal) < 1e-9);
+  // The unit that must not see acid is named rather than merely flagged.
+  const stone = _v1685({ ...base, acid_safe_unit: 0 });
+  assert.equal(stone.acid_ok, false);
+  assert.ok(stone.compat_verdict.startsWith("DO NOT ACID CLEAN"));
+  assert.ok("error" in _v1685({ ...base, dilution_parts_water: 0 }));
+  assert.ok("error" in _v1685({ ...base, coverage_ft2_per_gal: 0 }));
+});
+
+import { computeScaffoldTieSpacing as _v1686 } from "../../calc-construction.js";
+test("bounds: spec-v1686 computeScaffoldTieSpacing -- outriggers move the denominator", () => {
+  const base = { scaffold_height_ft: 60, base_width_ft: 5, outrigger_base_ft: 10, max_ratio: 4, vertical_tie_spacing_ft: 20, horizontal_tie_spacing_ft: 30, scaffold_run_ft: 90, sheeted: 0 };
+  const r = _v1686(base);
+  assert.ok(Math.abs(r.bare_ratio - 12) < 1e-12);
+  assert.ok(Math.abs(r.height_to_base_ratio - 6) < 1e-12);
+  assert.ok(Math.abs(r.max_free_standing_bare_ft - 20) < 1e-12);
+  assert.ok(Math.abs(r.max_free_standing_ft - 40) < 1e-12);
+  assert.equal(r.ties_required, true);
+  assert.ok(Math.abs(r.first_tie_height_ft - 40) < 1e-12);
+  assert.ok(Math.abs(r.base_to_eliminate_ties_ft - 15) < 1e-12);
+  assert.equal(r.outriggers_sufficient, false);
+  assert.equal(r.tie_count, r.tie_rows * r.ties_per_row);
+  // Outriggers raise the free-standing limit in exact proportion to the base.
+  assert.ok(Math.abs(r.max_free_standing_ft / r.max_free_standing_bare_ft - base.outrigger_base_ft / base.base_width_ft) < 1e-12);
+  // A scaffold inside the ratio needs no ties by the ratio.
+  const low = _v1686({ ...base, scaffold_height_ft: 18 });
+  assert.equal(low.ties_required, false);
+  assert.equal(low.tie_rows, 0);
+  assert.equal(low.first_tie_height_ft, null);
+  assert.ok(low.verdict.startsWith("FREE-STANDING"));
+  // At exactly the limit height the scaffold is still free-standing.
+  const edge = _v1686({ ...base, scaffold_height_ft: r.max_free_standing_ft });
+  assert.equal(edge.ties_required, false);
+  assert.ok(Math.abs(edge.height_to_base_ratio - base.max_ratio) < 1e-12);
+  // Outriggers wide enough carry the height alone, and the tile says so.
+  const wide = _v1686({ ...base, outrigger_base_ft: 15 });
+  assert.equal(wide.outriggers_sufficient, true);
+  assert.equal(wide.ties_required, false);
+  // Sheeting is reported as a separate finding regardless of the ratio.
+  const wrapped = _v1686({ ...base, sheeted: 1 });
+  assert.equal(wrapped.sheeted, 1);
+  assert.ok(wrapped.sheeting_verdict.startsWith("SHEETED"));
+  assert.ok("error" in _v1686({ ...base, base_width_ft: 0 }));
+  assert.ok("error" in _v1686({ ...base, max_ratio: 0 }));
+});
+
+import { computeMastClimberPlatformLoad as _v1687 } from "../../calc-construction.js";
+test("bounds: spec-v1687 computeMastClimberPlatformLoad -- the total passes and the zone does not", () => {
+  const base = { platform_length_ft: 40, cantilever_length_ft: 8, rated_capacity_lb: 6000, zone_rated_capacity_lb: 1500, load_lb: 5200, load_centroid_ft: 16, tie_spacing_ft: 25, tie_capacity_lb: 4000 };
+  const r = _v1687(base);
+  assert.ok(Math.abs(r.total_utilization_pct - 86.6666667) < 1e-6);
+  assert.equal(r.within_total, true);
+  assert.ok(Math.abs(r.zone_utilization_pct - 346.666667) < 1e-5);
+  assert.equal(r.within_zone, false);
+  assert.equal(r.on_cantilever, true);
+  // spec-v1687 left an unrendered python placeholder where this belongs, and
+  // the position it was computed at -- "a mean distance of, say, 24 ft from
+  // the mast" -- is off the end of its own 40 ft platform, whose mast is at
+  // the centre. The furthest anything can sit is 20 ft, and this refuses 24.
+  assert.ok(Math.abs(r.moment_ft_lb - 83200) < 1e-9);
+  assert.ok("error" in _v1687({ ...base, load_centroid_ft: 24 }));
+  assert.ok(Math.abs(_v1687({ ...base, load_centroid_ft: 20 }).moment_ft_lb - 104000) < 1e-9);
+  assert.ok(Math.abs(r.tie_force_lb - 3328) < 1e-9);
+  assert.equal(r.tie_ok, true);
+  assert.ok(r.zone_verdict.startsWith("ZONE EXCEEDED WHILE THE TOTAL IS WITHIN CAPACITY"));
+  // The moment is exactly linear in load and in distance.
+  assert.ok(Math.abs(_v1687({ ...base, load_lb: 2600 }).moment_ft_lb - r.moment_ft_lb / 2) < 1e-9);
+  // At the mast there is no moment at all, and the zone question goes away.
+  const centred = _v1687({ ...base, load_centroid_ft: 0, zone_rated_capacity_lb: 6000 });
+  assert.ok(Math.abs(centred.moment_ft_lb) < 1e-12);
+  assert.equal(centred.on_cantilever, false);
+  assert.equal(centred.within_zone, true);
+  // Inside the mast bay is not on a cantilever, and the boundary is exact.
+  const atBoundary = _v1687({ ...base, load_centroid_ft: base.platform_length_ft / 2 - base.cantilever_length_ft });
+  assert.equal(atBoundary.on_cantilever, false);
+  // Closer tie spacing carries less force per tie, in exact proportion.
+  const closeTies = _v1687({ ...base, tie_spacing_ft: 12.5 });
+  assert.ok(Math.abs(closeTies.tie_force_lb - 2 * r.tie_force_lb) < 1e-9);
+  assert.ok("error" in _v1687({ ...base, load_centroid_ft: 25 }));
+  assert.ok("error" in _v1687({ ...base, cantilever_length_ft: 20 }));
+});
+
+import { computeSuspendedScaffoldCounterweight as _v1688 } from "../../calc-construction.js";
+test("bounds: spec-v1688 computeSuspendedScaffoldCounterweight -- the lever ratio comes before the factor", () => {
+  const base = { rated_load_lb: 1500, outboard_arm_ft: 6, inboard_arm_ft: 1.5, factor_of_safety: 4, counterweight_unit_lb: 50, target_counterweight_lb: 12000 };
+  const r = _v1688(base);
+  assert.ok(Math.abs(r.lever_ratio - 4) < 1e-12);
+  assert.ok(Math.abs(r.overturning_moment_ft_lb - 9000) < 1e-9);
+  assert.ok(Math.abs(r.balance_counterweight_lb - 6000) < 1e-9);
+  assert.ok(Math.abs(r.required_counterweight_lb - 24000) < 1e-9);
+  assert.equal(r.counterweight_units, 480);
+  assert.ok(Math.abs(r.achieved_fos - 4) < 1e-9);
+  assert.ok(Math.abs(r.inboard_for_target_ft - 3) < 1e-9);
+  // A bare balance is exactly a factor of one: the moments are equal.
+  const bare = _v1688({ ...base, factor_of_safety: 1, counterweight_unit_lb: 0 });
+  assert.ok(Math.abs(bare.resisting_moment_ft_lb - bare.overturning_moment_ft_lb) < 1e-6);
+  assert.ok(Math.abs(bare.achieved_fos - 1) < 1e-9);
+  assert.ok(Math.abs(bare.required_counterweight_lb - r.balance_counterweight_lb) < 1e-9);
+  // The requirement is exactly linear in the load and in the factor.
+  assert.ok(Math.abs(_v1688({ ...base, rated_load_lb: 3000 }).required_counterweight_lb - 2 * r.required_counterweight_lb) < 1e-9);
+  assert.ok(Math.abs(_v1688({ ...base, factor_of_safety: 8 }).required_counterweight_lb - 2 * r.required_counterweight_lb) < 1e-9);
+  // Doubling the inboard arm halves the counterweight -- the one lever a crew
+  // can usually move.
+  const longer = _v1688({ ...base, inboard_arm_ft: 3 });
+  assert.ok(Math.abs(longer.required_counterweight_lb - r.required_counterweight_lb / 2) < 1e-9);
+  // And the inboard arm solved for a target, fed back in, hits that target.
+  const at = _v1688({ ...base, inboard_arm_ft: r.inboard_for_target_ft });
+  assert.ok(Math.abs(at.required_counterweight_lb - base.target_counterweight_lb) < 1e-6);
+  // Rounding up to whole units never provides less than required.
+  assert.ok(r.provided_counterweight_lb >= r.required_counterweight_lb - 1e-9);
+  const odd = _v1688({ ...base, counterweight_unit_lb: 70 });
+  assert.ok(odd.provided_counterweight_lb >= odd.required_counterweight_lb);
+  assert.ok(odd.achieved_fos >= base.factor_of_safety);
+  assert.ok("error" in _v1688({ ...base, factor_of_safety: 0.5 }));
+  assert.ok("error" in _v1688({ ...base, inboard_arm_ft: 0 }));
+});
+
+import { computeShoringReshoringLoad as _v1689 } from "../../calc-construction.js";
+test("bounds: spec-v1689 computeShoringReshoringLoad -- a backshore still carries the dead load", () => {
+  const base = { slab_dead_psf: 100, construction_live_psf: 50, form_dead_psf: 10, connected_levels: 3, backshored: 0, governing_slab_capacity_psf: 200, governing_slab_strength_psi: 2500 };
+  const r = _v1689(base);
+  assert.ok(Math.abs(r.new_pour_load_psf - 160) < 1e-12);
+  assert.ok(Math.abs(r.share_per_level_psf - 160 / 3) < 1e-9);
+  assert.ok(Math.abs(r.governing_level_load_psf - (100 + 160 / 3)) < 1e-9);
+  assert.equal(r.within_capacity, true);
+  assert.ok(r.case_verdict.startsWith("RESHORED"));
+  // The backshore case adds the slab's own dead load to what is redistributed,
+  // and the two readings differ by exactly that over the level count.
+  const back = _v1689({ ...base, backshored: 1 });
+  assert.ok(Math.abs(back.redistributed_load_psf - r.redistributed_load_psf - base.slab_dead_psf) < 1e-12);
+  assert.ok(Math.abs(back.governing_level_load_psf - r.governing_level_load_psf - base.slab_dead_psf / 3) < 1e-9);
+  assert.ok(back.case_verdict.startsWith("BACKSHORED"));
+  // Each reading reports the other, so the difference is a number.
+  assert.ok(Math.abs(r.other_case_load_psf - back.governing_level_load_psf) < 1e-9);
+  assert.ok(Math.abs(back.other_case_load_psf - r.governing_level_load_psf) < 1e-9);
+  // More levels share the same load further, and one level takes all of it.
+  const one = _v1689({ ...base, connected_levels: 1 });
+  assert.ok(Math.abs(one.share_per_level_psf - one.redistributed_load_psf) < 1e-12);
+  assert.equal(one.within_capacity, false);
+  // The levels required, fed back in, brings it inside capacity.
+  const fixed = _v1689({ ...base, connected_levels: one.levels_required });
+  assert.equal(fixed.within_capacity, true);
+  // A slab that cannot carry its own weight is a different problem entirely,
+  // and no number of levels fixes it.
+  const green = _v1689({ ...base, governing_slab_capacity_psf: 80 });
+  assert.equal(green.capacity_below_dead, true);
+  assert.equal(green.levels_required, null);
+  assert.ok(green.verdict.startsWith("THE SLAB CANNOT CARRY ITS OWN WEIGHT"));
+  assert.ok("error" in _v1689({ ...base, connected_levels: 0 }));
+  assert.ok("error" in _v1689({ ...base, slab_dead_psf: 0 }));
+});
+
+import { computePipeMiterCut as _v1680host } from "../../calc-fab.js";
+test("bounds: spec-v1680 cut -- pipe-miter-cut gains the throat and heel, angles untouched", () => {
+  const base = { total_angle_deg: 90, pieces: 3, outside_diameter_in: 12.75 };
+  // The old answer is unchanged with no centreline radius, which is what
+  // makes this additive.
+  const r = _v1680host(base);
+  assert.equal(r.n_welds, 2);
+  assert.ok(Math.abs(r.miter_angle_deg - 22.5) < 1e-12);
+  assert.ok(Math.abs(r.cutback_in - 5.28122292) < 1e-6);
+  assert.equal(r.gore_centerline_in, null);
+  assert.equal(r.heel_length_in, null);
+  assert.equal(r.throat_length_in, null);
+  // spec-v1680's own arithmetic: a five-piece 90 degree elbow has four
+  // joints, each middle gore turns 22.5 degrees and each seam is cut at
+  // 11.25 -- which this already computed before the spec was written.
+  const five = _v1680host({ ...base, pieces: 5 });
+  assert.equal(five.n_welds, 4);
+  assert.ok(Math.abs(five.gore_turn_deg - 22.5) < 1e-12);
+  assert.ok(Math.abs(five.miter_angle_deg - 11.25) < 1e-12);
+  // With a radius, the throat and heel bracket the centreline, and their
+  // difference is exactly the diameter through the turn.
+  const withR = _v1680host({ ...base, centerline_radius_in: 18 });
+  assert.ok(Math.abs(withR.gore_centerline_in - 14.1371669) < 1e-6);
+  assert.ok(Math.abs(withR.heel_length_in - 19.1440802) < 1e-6);
+  assert.ok(Math.abs(withR.throat_length_in - 9.13025365) < 1e-6);
+  assert.ok(withR.throat_length_in < withR.gore_centerline_in);
+  assert.ok(withR.heel_length_in > withR.gore_centerline_in);
+  assert.ok(Math.abs(withR.heel_length_in - withR.throat_length_in - base.outside_diameter_in * withR.gore_turn_deg * Math.PI / 180) < 1e-9);
+  // The centreline is exactly the mean of the two.
+  assert.ok(Math.abs((withR.heel_length_in + withR.throat_length_in) / 2 - withR.gore_centerline_in) < 1e-9);
+  // End gores are half of each, and the whole elbow develops to the full arc.
+  assert.ok(Math.abs(withR.end_gore_centerline_in - withR.gore_centerline_in / 2) < 1e-12);
+  assert.ok(Math.abs(withR.developed_centerline_in - 18 * Math.PI / 2) < 1e-9);
+  assert.ok(Math.abs(withR.developed_centerline_in - withR.gore_centerline_in * withR.n_welds) < 1e-9);
+  // A radius shorter than the pipe's own half-diameter has no throat left.
+  const tightBend = _v1680host({ ...base, centerline_radius_in: 4 });
+  assert.ok(Math.abs(tightBend.throat_length_in) < 1e-12);
+});

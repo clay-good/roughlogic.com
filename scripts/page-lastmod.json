@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "17df00aed69229a4",
+      "sha": "1fa9c380055e7c0f",
       "date": "2026-09-08"
     },
     "/tools/": {
-      "sha": "34c4a48df1dc8bbf",
+      "sha": "48090d9cbbf32e1a",
       "date": "2026-09-08"
     },
     "/groups/accounting/": {
-      "sha": "339724c75e0b0680",
+      "sha": "51cb5b452b894792",
       "date": "2026-09-08"
     },
     "/groups/agriculture/": {
-      "sha": "54047d7effd2552f",
+      "sha": "1bc784818e85e669",
       "date": "2026-09-08"
     },
     "/groups/construction/": {
-      "sha": "0cc3f52ec3738719",
+      "sha": "f994ba11cbf48269",
       "date": "2026-09-08"
     },
     "/groups/cross-trade/": {
-      "sha": "4699de438200e36c",
+      "sha": "f923baf62931197e",
       "date": "2026-09-08"
     },
     "/groups/educators/": {
-      "sha": "ba1f607505e7aa9c",
+      "sha": "7908a4c48cf38ff5",
       "date": "2026-09-08"
     },
     "/groups/electrical/": {
-      "sha": "c337685af9f63933",
+      "sha": "37f4d5296446e3d5",
       "date": "2026-09-08"
     },
     "/groups/field/": {
-      "sha": "be169068d14a3947",
+      "sha": "0698caa1495d748e",
       "date": "2026-09-08"
     },
     "/groups/fire-ground/": {
-      "sha": "d3b7b86aea62c00d",
+      "sha": "4ed17f09530267d5",
       "date": "2026-09-08"
     },
     "/groups/historical/": {
-      "sha": "2539df48ce66598f",
+      "sha": "6b85a51a07071ecf",
       "date": "2026-09-08"
     },
     "/groups/hvac/": {
-      "sha": "1db74e93f5bdcb9f",
+      "sha": "044e6793d0035e50",
       "date": "2026-09-08"
     },
     "/groups/kitchen/": {
-      "sha": "4ab6c270f0717019",
+      "sha": "d02316b3f57ad3d3",
       "date": "2026-09-08"
     },
     "/groups/lab/": {
-      "sha": "f462015c3e743b9e",
+      "sha": "6a866da8621d7d6b",
       "date": "2026-09-08"
     },
     "/groups/mechanic/": {
-      "sha": "cfa60068b0192e10",
+      "sha": "cfd25cd603915cd8",
       "date": "2026-09-08"
     },
     "/groups/plumbing/": {
-      "sha": "6d54255dda7c1918",
+      "sha": "9de6591593c2dee5",
       "date": "2026-09-08"
     },
     "/groups/real-estate/": {
-      "sha": "9b5d3300e7d7aeb5",
+      "sha": "7468fb390ee37975",
       "date": "2026-09-08"
     },
     "/groups/references/": {
-      "sha": "1959a701bd0e41b0",
+      "sha": "7b0dc3113a785a5b",
       "date": "2026-09-08"
     },
     "/groups/restoration/": {
-      "sha": "2357fdd53eec00bf",
+      "sha": "c593cd79a9939225",
       "date": "2026-09-08"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "0056e8ea4caf0745",
+      "sha": "65b3aa86a9976e99",
       "date": "2026-09-08"
     },
     "/groups/stage/": {
-      "sha": "76a0e3b062352e96",
+      "sha": "692d846bc3383814",
       "date": "2026-09-08"
     },
     "/groups/trucking/": {
-      "sha": "9a891ed6089d963b",
+      "sha": "f671cfd699778645",
       "date": "2026-09-08"
     },
     "/groups/water/": {
-      "sha": "2f4842e3c6e344f7",
+      "sha": "6e5bdf723fb337cd",
       "date": "2026-09-08"
     },
     "/tools/aav-install-check/": {
@@ -1134,8 +1134,8 @@
       "date": "2026-09-01"
     },
     "/tools/cmu-grout-volume/": {
-      "sha": "fc51d04e5d5caea1",
-      "date": "2026-09-01"
+      "sha": "ef35fb5023eb614a",
+      "date": "2026-09-08"
     },
     "/tools/cmu-shear-wall/": {
       "sha": "77fb6b17dc19734f",
@@ -3113,6 +3113,10 @@
       "sha": "1a3bad6566869dd9",
       "date": "2026-09-01"
     },
+    "/tools/grout-lift-pour-height/": {
+      "sha": "556e002c6cb8a250",
+      "date": "2026-09-08"
+    },
     "/tools/growing-degree-days/": {
       "sha": "e6638faa51ab6d80",
       "date": "2026-09-01"
@@ -3973,6 +3977,10 @@
       "sha": "0944482900238e54",
       "date": "2026-09-04"
     },
+    "/tools/masonry-cleaning-dilution/": {
+      "sha": "3f5465b395ae082d",
+      "date": "2026-09-08"
+    },
     "/tools/masonry-control-joint-layout/": {
       "sha": "20bc05e53ef2f309",
       "date": "2026-09-01"
@@ -4017,6 +4025,10 @@
       "sha": "9c3eccced13f5c35",
       "date": "2026-09-01"
     },
+    "/tools/mast-climber-platform-load/": {
+      "sha": "feee93e6824d62a0",
+      "date": "2026-09-08"
+    },
     "/tools/master-key-bitting-capacity/": {
       "sha": "7e6b3143f232fe66",
       "date": "2026-09-05"
@@ -4038,8 +4050,8 @@
       "date": "2026-09-04"
     },
     "/tools/material-stacking-limits/": {
-      "sha": "33ae963df6a53cea",
-      "date": "2026-09-01"
+      "sha": "e350b7dc37460870",
+      "date": "2026-09-08"
     },
     "/tools/max-circuit-length-for-vd/": {
       "sha": "42099ae44feeb2e3",
@@ -4088,6 +4100,10 @@
     "/tools/metal-roof-panels/": {
       "sha": "e8b5fbb7183f462e",
       "date": "2026-09-01"
+    },
+    "/tools/metal-roof-thermal-movement/": {
+      "sha": "7cb2a8b511b0fb69",
+      "date": "2026-09-08"
     },
     "/tools/metal-stud-takeoff/": {
       "sha": "352a5602b7509434",
@@ -4176,6 +4192,10 @@
     "/tools/molecular-weight/": {
       "sha": "98f2e1d2d86911ad",
       "date": "2026-09-01"
+    },
+    "/tools/mortar-batch-c270/": {
+      "sha": "56268c950d3fb598",
+      "date": "2026-09-08"
     },
     "/tools/mortar-mix/": {
       "sha": "250b79a7f61019c4",
@@ -5705,6 +5725,10 @@
       "sha": "43a602f8639af2f4",
       "date": "2026-09-01"
     },
+    "/tools/scaffold-tie-spacing/": {
+      "sha": "e9ddf8308cab133f",
+      "date": "2026-09-08"
+    },
     "/tools/scba-cylinder-time/": {
       "sha": "f2dc7586cb0d2dfb",
       "date": "2026-09-01"
@@ -5942,8 +5966,8 @@
       "date": "2026-09-01"
     },
     "/tools/sheathing-takeoff/": {
-      "sha": "6ab7df810f5f055b",
-      "date": "2026-09-01"
+      "sha": "fcba1fb72ea53480",
+      "date": "2026-09-08"
     },
     "/tools/sheet-metal-gauge/": {
       "sha": "40fa200772d6eadb",
@@ -5962,8 +5986,12 @@
       "date": "2026-09-01"
     },
     "/tools/shore-post-load/": {
-      "sha": "aae35809acad7ab7",
-      "date": "2026-09-01"
+      "sha": "17e3f7c2f4c3d664",
+      "date": "2026-09-08"
+    },
+    "/tools/shoring-reshoring-load/": {
+      "sha": "97e4c9dfc7357dff",
+      "date": "2026-09-08"
     },
     "/tools/short-circuit-pp/": {
       "sha": "9650b934d392b050",
@@ -6030,8 +6058,8 @@
       "date": "2026-09-08"
     },
     "/tools/slab-dowel-schedule/": {
-      "sha": "79c242a3c885314d",
-      "date": "2026-09-04"
+      "sha": "2f7192fb77e78218",
+      "date": "2026-09-08"
     },
     "/tools/slider-crank-piston-position/": {
       "sha": "691fbb5cb2c00edd",
@@ -6290,8 +6318,8 @@
       "date": "2026-09-04"
     },
     "/tools/spiral-curve/": {
-      "sha": "e5fde5844756a64a",
-      "date": "2026-09-05"
+      "sha": "c3061d5422b4e2d5",
+      "date": "2026-09-08"
     },
     "/tools/spl-atmospheric/": {
       "sha": "8a84c6d892c1e376",
@@ -6409,6 +6437,10 @@
       "sha": "6f9dc6645182e360",
       "date": "2026-09-01"
     },
+    "/tools/square-to-round-development/": {
+      "sha": "6364999b5e810ed8",
+      "date": "2026-09-08"
+    },
     "/tools/srt-fm-ratio/": {
       "sha": "bf2f4d88bf227ffe",
       "date": "2026-09-01"
@@ -6464,6 +6496,10 @@
     "/tools/standby-battery-sizing/": {
       "sha": "a353bb9b40179bbe",
       "date": "2026-09-01"
+    },
+    "/tools/standing-seam-takeoff/": {
+      "sha": "0933daea6bc654b9",
+      "date": "2026-09-08"
     },
     "/tools/standing-water/": {
       "sha": "5f484f64eafbda55",
@@ -6566,8 +6602,8 @@
       "date": "2026-09-01"
     },
     "/tools/steel-column-stiffness-ratio-g/": {
-      "sha": "440a3b512b94a09a",
-      "date": "2026-09-05"
+      "sha": "5089b4a595dd0304",
+      "date": "2026-09-08"
     },
     "/tools/steel-doubler-plate/": {
       "sha": "262f524d0efce470",
@@ -6666,8 +6702,8 @@
       "date": "2026-09-04"
     },
     "/tools/stucco-coverage/": {
-      "sha": "10d9ab3557cfa87b",
-      "date": "2026-09-01"
+      "sha": "c88aa48770a3ee6c",
+      "date": "2026-09-08"
     },
     "/tools/stud-notch-bore-limit/": {
       "sha": "bc93bac36d3ea716",
@@ -6732,6 +6768,10 @@
     "/tools/suspended-ceiling-grid/": {
       "sha": "f3afe6075a128332",
       "date": "2026-09-01"
+    },
+    "/tools/suspended-scaffold-counterweight/": {
+      "sha": "3d5bcbc7270e2ef7",
+      "date": "2026-09-08"
     },
     "/tools/svi-sludge-index/": {
       "sha": "a4ae1712f0a5d6ce",

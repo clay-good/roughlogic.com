@@ -1119,6 +1119,17 @@ const _TILES = [
   ["nesc-district-loading", "A"],
   ["conductor-creep-elongation", "A"],
   ["sagging-return-wave", "A"],
+  // spec-v1679, v1681..v1689 sheet metal, masonry, and scaffold band
+  ["square-to-round-development", "E"],
+  ["standing-seam-takeoff", "E"],
+  ["metal-roof-thermal-movement", "E"],
+  ["mortar-batch-c270", "E"],
+  ["grout-lift-pour-height", "E"],
+  ["masonry-cleaning-dilution", "E"],
+  ["scaffold-tie-spacing", "E"],
+  ["mast-climber-platform-load", "E"],
+  ["suspended-scaffold-counterweight", "E"],
+  ["shoring-reshoring-load", "E"],
   // spec-v1617..v1621 concrete placement and tilt-up; v1546..v1549 rail logistics
   ["concrete-pump-line-pressure", "E"],
   ["boom-pump-reach", "E"],

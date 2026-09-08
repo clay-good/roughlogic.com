@@ -129,8 +129,30 @@ export function computePipeMiterCut({ total_angle_deg = 90, pieces = 2, outside_
   const R = Number(centerline_radius_in) || 0;
   // Centerline length of a full intermediate gore; end pieces are half this.
   const gore_centerline_in = R > 0 ? R * (A / cuts) * Math.PI / 180 : null;
+  // spec-v1680 gored-elbow-angles was CUT here rather than built: the turn per
+  // joint, the cut angle and the end-half-gore rule are all above. What it had
+  // that this did not is the THROAT and HEEL -- the short and long sides each
+  // gore is actually cut to -- and the developed material for the whole
+  // elbow. Leaving the centerline radius at zero leaves the answer unchanged.
+  const gore_turn_deg = A / cuts;
+  const gore_turn_rad = gore_turn_deg * Math.PI / 180;
+  const heel_length_in = R > 0 ? (R + OD / 2) * gore_turn_rad : null;
+  const throat_length_in = R > 0 ? Math.max(0, (R - OD / 2) * gore_turn_rad) : null;
+  const end_gore_centerline_in = gore_centerline_in === null ? null : gore_centerline_in / 2;
+  const end_gore_heel_in = heel_length_in === null ? null : heel_length_in / 2;
+  const end_gore_throat_in = throat_length_in === null ? null : throat_length_in / 2;
+  // The whole elbow measured along its centerline arc, which is what has to
+  // come off the stock.
+  const developed_centerline_in = R > 0 ? R * A * Math.PI / 180 : null;
+  const developed_heel_in = R > 0 ? (R + OD / 2) * A * Math.PI / 180 : null;
   notes.push(cuts + " cut(s)/weld(s); cut angle " + fmt(miter_angle_deg, 3) + " deg from square; cutback = OD*tan(theta). End pieces are half-gores. The welding procedure, bevel, and engineer of record govern.");
-  return { total_angle_deg: A, pieces: n, n_welds: cuts, miter_angle_deg, cutback_in, gore_centerline_in, degenerate: false, notes };
+  if (R > 0) notes.push("Each middle gore turns " + fmt(gore_turn_deg, 3) + " deg: heel " + fmt(heel_length_in, 3) + " in, throat " + fmt(throat_length_in, 3) + " in, centerline " + fmt(gore_centerline_in, 3) + " in; end gores are half of each. The elbow develops " + fmt(developed_centerline_in, 3) + " in on the centerline and " + fmt(developed_heel_in, 3) + " in on the heel, before seam and bevel allowance.");
+  return {
+    total_angle_deg: A, pieces: n, n_welds: cuts, miter_angle_deg, cutback_in,
+    gore_centerline_in, gore_turn_deg, heel_length_in, throat_length_in,
+    end_gore_centerline_in, end_gore_heel_in, end_gore_throat_in,
+    developed_centerline_in, developed_heel_in, degenerate: false, notes,
+  };
 }
 
 export const pipeMiterCutExample = { inputs: { total_angle_deg: 90, pieces: 3, outside_diameter_in: 12.75, centerline_radius_in: 18 } };

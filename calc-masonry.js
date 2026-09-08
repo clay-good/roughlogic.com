@@ -873,3 +873,214 @@ MASONRY_RENDERERS["masonry-limited-access-zone"] = _simpleRenderer({
   ],
   compute: computeMasonryLimitedAccessZone,
 });
+
+// ===========================================================================
+// spec-v1683..v1685: the 2026-09-08 trade-expansion masonry band. Three tiles,
+// all group E. `mortar-mix` in calc-construction.js counts BAGS from a unit
+// count and a joint size and says nothing about proportions, so v1683 is the
+// batch side of the same trade rather than a duplicate of it.
+
+// Water weighs 62.4 lb per cubic foot; a bag of portland cement is one cubic
+// foot loose and 94 lb; a bag of hydrated lime is 50 lb and about 1.25 cu ft
+// loose. A mason's shovel of damp sand runs about 0.5 cu ft.
+const _CUFT_PER_CEMENT_BAG = 1.0;
+const _LB_PER_CEMENT_BAG = 94;
+const _CUFT_PER_LIME_BAG = 1.25;
+const _LB_PER_LIME_BAG = 50;
+const _CUFT_PER_SHOVEL = 0.5;
+const _GAL_PER_CUFT = 7.48052;
+
+// ============ spec-v1683: ASTM C270 mortar batch proportions ============
+
+// dims: in { cement_volumes: dimensionless, lime_volumes: dimensionless, sand_ratio: dimensionless, cement_bags: dimensionless, unit_strength_psi: M L^-1 T^-2, mortar_strength_psi: M L^-1 T^-2 } out: { cementitious_cuft: L^3, sand_cuft: L^3, sand_min_cuft: L^3, sand_max_cuft: L^3, lime_bags: dimensionless, sand_shovels: dimensionless }
+export function computeMortarBatchC270({ cement_volumes = 1, lime_volumes = 0.5, sand_ratio = 2.5, cement_bags = 1, unit_strength_psi = 0, mortar_strength_psi = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(cement_volumes > 0)) return { error: "The cement proportion must be positive (volumes)." };
+  if (lime_volumes < 0) return { error: "The lime proportion cannot be negative (volumes)." };
+  if (!(sand_ratio > 0)) return { error: "The sand proportion must be positive (times the cementitious total)." };
+  if (!(cement_bags > 0)) return { error: "The batch size must be at least one bag of cement." };
+  if (unit_strength_psi < 0 || mortar_strength_psi < 0) return { error: "A strength cannot be negative (psi)." };
+  const SAND_MIN_RATIO = 2.25;
+  const SAND_MAX_RATIO = 3.0;
+  // C270 proportions are BY VOLUME, and the batch scales with the cement.
+  const scale = cement_bags * _CUFT_PER_CEMENT_BAG / cement_volumes;
+  const cement_cuft = cement_volumes * scale;
+  const lime_cuft = lime_volumes * scale;
+  const cementitious_cuft = cement_cuft + lime_cuft;
+  const sand_cuft = sand_ratio * cementitious_cuft;
+  const sand_min_cuft = SAND_MIN_RATIO * cementitious_cuft;
+  const sand_max_cuft = SAND_MAX_RATIO * cementitious_cuft;
+  const sand_in_range = sand_ratio >= SAND_MIN_RATIO && sand_ratio <= SAND_MAX_RATIO;
+  const lime_bags = lime_cuft / _CUFT_PER_LIME_BAG;
+  const sand_shovels = sand_cuft / _CUFT_PER_SHOVEL;
+  const batch_yield_cuft = cementitious_cuft + sand_cuft;
+  const cement_weight_lb = cement_bags * _LB_PER_CEMENT_BAG;
+  const lime_weight_lb = lime_bags * _LB_PER_LIME_BAG;
+  // The rule that runs against instinct: a mortar harder than the unit cracks
+  // the unit rather than the joint, and the unit is not repointable.
+  const compatible = (unit_strength_psi > 0 && mortar_strength_psi > 0) ? mortar_strength_psi < unit_strength_psi : null;
+  const strength_ratio = (unit_strength_psi > 0 && mortar_strength_psi > 0) ? mortar_strength_psi / unit_strength_psi : null;
+  const outs = [cement_cuft, lime_cuft, cementitious_cuft, sand_cuft, sand_min_cuft, sand_max_cuft, lime_bags, sand_shovels];
+  if (!outs.every(Number.isFinite)) return { error: "Mortar batch math is not a finite value." };
+  const sand_verdict = sand_in_range
+    ? "IN RANGE: " + fmt(sand_ratio, 2) + " is inside the 2.25 to 3.0 the proportion specification allows, which is " + fmt(sand_min_cuft, 2) + " to " + fmt(sand_max_cuft, 2) + " cu ft for this batch"
+    : (sand_ratio > SAND_MAX_RATIO
+      ? "OVER-SANDED at " + fmt(sand_ratio, 2) + ", past the 3.0 limit. Harsh and unworkable, which masons correct with water -- and that changes everything the specification was for"
+      : "UNDER-SANDED at " + fmt(sand_ratio, 2) + ", below the 2.25 minimum. Rich mortar shrinks more and costs more, and it is stronger than the specification intends");
+  const compat_verdict = compatible === null
+    ? "Enter the unit and mortar compressive strengths to check compatibility."
+    : compatible
+      ? "COMPATIBLE: the mortar at " + fmt(mortar_strength_psi, 0) + " psi is weaker than the unit at " + fmt(unit_strength_psi, 0) + " psi, so movement cracks the JOINT, which is repointable"
+      : "MORTAR HARDER THAN THE UNIT: " + fmt(mortar_strength_psi, 0) + " psi against a " + fmt(unit_strength_psi, 0) + " psi unit. Stress transfers into the unit and the unit spalls, which is not repointable -- this is how soft historic brick gets destroyed by a repointing";
+  return {
+    cement_volumes, lime_volumes, sand_ratio, cement_bags, cement_cuft, lime_cuft,
+    cementitious_cuft, sand_cuft, sand_min_cuft, sand_max_cuft, sand_in_range,
+    lime_bags, sand_shovels, batch_yield_cuft, cement_weight_lb, lime_weight_lb,
+    unit_strength_psi, mortar_strength_psi, compatible, strength_ratio,
+    sand_verdict, compat_verdict,
+    note: "ASTM C270 gives mortar as VOLUME PROPORTIONS of cementitious material and sand, and the batch scales from the cement: one bag of portland is one cubic foot, so a Type S at one part cement to half a part lime is a bag and about half a bag-equivalent of lime, with sand between 2.25 and 3 times the sum of the two. THE COUNTERINTUITIVE RULE IS THE IMPORTANT ONE: a stronger mortar is often a worse mortar. Mortar is meant to be the sacrificial element, so that movement and stress crack the joint -- which is repointable -- rather than the masonry unit, which is not. Repointing soft historic brick with a hard Type S or M mortar is a well documented way to destroy the brick, because the hard mortar transfers stress into the unit and the unit spalls. Type O, or a lime mortar, exists for exactly that case, and the strength comparison here is the check that catches it before the wall does. THE PROPORTION VERSUS PROPERTY DISTINCTION MATTERS AT THE MIXER. C270 allows a mortar to be specified either by proportion or by laboratory-tested properties, and the two are not interchangeable: a proportion-specified mortar is batched to the volumes and is not tested for strength at all. Field-tested mortar is tested to a different standard with different acceptance than laboratory mortar, and field results routinely come in below the laboratory values for the same mortar -- treating that as a failure is a common and expensive misunderstanding. SAND VOLUME IS THE TERM MOST OFTEN ABUSED, because it is measured by shovel rather than by box. The allowable range is broad, and running at the high end produces a harsh, unworkable mortar that masons then correct with water, which changes the water-cement ratio, the strength, the shrinkage and the bond all at once. The shovel count here is a working figure at about half a cubic foot per shovel of damp sand and is no substitute for a measured batch box. Proportions the reader supplies for the type in question. NO TYPE TABLE IS SHIPPED: the cement and lime volumes for M, S, N and O come from C270 itself, they differ between the portland-lime and the masonry-cement and mortar-cement systems, and a project specification can require something else entirely. It does not compute water, which is added to workability rather than to a ratio and is the mason's judgment; it does not address air content, retempering, board life, colour or admixtures; and it does not evaluate bond strength, water penetration, or freeze-thaw durability, which are properties of the assembly rather than of the batch. ASTM C270, the project specification, and the mason of record govern.",
+  };
+}
+const mortarBatchC270Example = { inputs: { cement_volumes: 1, lime_volumes: 0.5, sand_ratio: 2.5, cement_bags: 1, unit_strength_psi: 3000, mortar_strength_psi: 1800 } };
+MASONRY_RENDERERS["mortar-batch-c270"] = _simpleRenderer({
+  citation: "Citation: the ASTM C270 proportion specification by name -- mortar is batched by VOLUME, with sand between 2.25 and 3.0 times the sum of the cementitious volumes -- scaled here from bags of portland at one cubic foot and 94 lb per bag, hydrated lime at about 1.25 cu ft and 50 lb per bag, and a working half cubic foot per shovel of damp sand. NO TYPE TABLE IS SHIPPED: the cement and lime volumes for Types M, S, N and O come from C270 and differ between the portland-lime, masonry-cement and mortar-cement systems. Proportion-specified and property-specified mortars are not interchangeable, and field-tested mortar is tested to different acceptance than laboratory mortar. ASTM C270, the project specification, and the mason of record govern.",
+  example: mortarBatchC270Example.inputs,
+  fields: [
+    { key: "cement_volumes", label: "Portland cement (volumes)", kind: "number", default: 1 },
+    { key: "lime_volumes", label: "Hydrated lime (volumes)", kind: "number", default: 0.5 },
+    { key: "sand_ratio", label: "Sand, times the cementitious total", kind: "number", default: 2.5 },
+    { key: "cement_bags", label: "Batch size (bags of cement)", kind: "number", default: 1 },
+    { key: "unit_strength_psi", label: "Masonry unit compressive strength (psi, 0 to skip)", kind: "number", default: 3000 },
+    { key: "mortar_strength_psi", label: "Mortar compressive strength (psi, 0 to skip)", kind: "number", default: 1800 },
+  ],
+  outputs: [
+    { key: "c", id: "mbc-out-c", label: "Cementitious", value: (r) => fmt(r.cement_cuft, 2) + " cu ft of cement (" + fmt(r.cement_bags, 0) + " bag" + (r.cement_bags === 1 ? "" : "s") + ", " + fmt(r.cement_weight_lb, 0) + " lb) and " + fmt(r.lime_cuft, 2) + " cu ft of lime (" + fmt(r.lime_bags, 2) + " bag equivalent, " + fmt(r.lime_weight_lb, 0) + " lb)" },
+    { key: "s", id: "mbc-out-s", label: "Sand", value: (r) => fmt(r.sand_cuft, 2) + " cu ft, about " + fmt(r.sand_shovels, 0) + " shovels of damp sand" },
+    { key: "r", id: "mbc-out-r", label: "Sand against the allowable range", value: (r) => r.sand_verdict },
+    { key: "y", id: "mbc-out-y", label: "Batch yield", value: (r) => fmt(r.batch_yield_cuft, 2) + " cu ft before water" },
+    { key: "k", id: "mbc-out-k", label: "Mortar against the unit", value: (r) => r.compat_verdict },
+    { key: "n", id: "mbc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMortarBatchC270,
+});
+
+// ============ spec-v1684: CMU grout lift and pour height ============
+
+// dims: in { pour_height_ft: L, lift_height_ft: L, max_pour_height_ft: L, max_lift_height_ft: L, grout_unit_weight_pcf: M L^-3, cleanout_threshold_ft: L } out: { lifts_in_pour: dimensionless, base_pressure_psi: M L^-1 T^-2, base_pressure_psf: M L^-1 T^-2, pour_margin_ft: L, lift_margin_ft: L, pressure_at_limit_psi: M L^-1 T^-2 }
+export function computeGroutLiftPourHeight({ pour_height_ft = 0, lift_height_ft = 0, max_pour_height_ft = 0, max_lift_height_ft = 0, grout_unit_weight_pcf = 140, cleanout_threshold_ft = 5.33 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(pour_height_ft > 0)) return { error: "The proposed pour height must be positive (ft)." };
+  if (!(lift_height_ft > 0)) return { error: "The proposed lift height must be positive (ft)." };
+  if (!(lift_height_ft <= pour_height_ft)) return { error: "A lift cannot be taller than the pour it is part of; a pour is made up of one or more lifts." };
+  if (!(max_pour_height_ft > 0)) return { error: "Enter the code's maximum pour height for this grout space, grout type, and unit (ft)." };
+  if (!(max_lift_height_ft > 0)) return { error: "Enter the code's maximum lift height for this configuration (ft)." };
+  if (!(grout_unit_weight_pcf > 0)) return { error: "Grout unit weight must be positive (pcf); fluid grout runs about 140." };
+  if (cleanout_threshold_ft < 0) return { error: "The cleanout threshold height cannot be negative (ft)." };
+  const SQIN_PER_SQFT_MAS = 144;
+  const lifts_in_pour = Math.ceil(pour_height_ft / lift_height_ft);
+  const actual_lift_ft = pour_height_ft / lifts_in_pour;
+  // The wall is holding back a column of liquid while its joints are hours old.
+  const base_pressure_psf = grout_unit_weight_pcf * pour_height_ft;
+  const base_pressure_psi = base_pressure_psf / SQIN_PER_SQFT_MAS;
+  const pressure_at_limit_psi = grout_unit_weight_pcf * max_pour_height_ft / SQIN_PER_SQFT_MAS;
+  const pour_margin_ft = max_pour_height_ft - pour_height_ft;
+  const lift_margin_ft = max_lift_height_ft - lift_height_ft;
+  const pour_ok = pour_height_ft <= max_pour_height_ft;
+  const lift_ok = lift_height_ft <= max_lift_height_ft;
+  const cleanouts_required = pour_height_ft > cleanout_threshold_ft;
+  const outs = [lifts_in_pour, base_pressure_psi, base_pressure_psf, pour_margin_ft, lift_margin_ft];
+  if (!outs.every(Number.isFinite)) return { error: "Grout lift math is not a finite value." };
+  const pour_verdict = pour_ok
+    ? "POUR ALLOWED: " + fmt(pour_height_ft, 2) + " ft against a limit of " + fmt(max_pour_height_ft, 2) + " ft, " + fmt(pour_margin_ft, 2) + " ft to spare"
+    : "POUR OVER THE LIMIT by " + fmt(-pour_margin_ft, 2) + " ft: " + fmt(pour_height_ft, 2) + " ft against " + fmt(max_pour_height_ft, 2) + " ft. This is the blowout case -- fluid grout at " + fmt(base_pressure_psi, 2) + " psi against joints that are hours old";
+  const lift_verdict = lift_ok
+    ? "LIFT ALLOWED: " + fmt(lift_height_ft, 2) + " ft against a limit of " + fmt(max_lift_height_ft, 2) + " ft, so " + fmt(lifts_in_pour, 0) + " lift" + (lifts_in_pour === 1 ? " of " : "s of ") + fmt(actual_lift_ft, 2) + " ft " + (lifts_in_pour === 1 ? "makes" : "make") + " this pour"
+    : "LIFT OVER THE LIMIT by " + fmt(-lift_margin_ft, 2) + " ft: grout deeper than it can be consolidated leaves voids, and a void in a grouted cell means the reinforcement is not embedded and the wall does not have the strength the drawings assume";
+  const cleanout_verdict = cleanouts_required
+    ? "CLEANOUTS REQUIRED at " + fmt(pour_height_ft, 2) + " ft, above the " + fmt(cleanout_threshold_ft, 2) + " ft threshold -- openings at the base of EVERY grouted cell, closed only after inspection. A wall laid without them has to be opened at the base"
+    : "No cleanouts required at " + fmt(pour_height_ft, 2) + " ft, below the " + fmt(cleanout_threshold_ft, 2) + " ft threshold. Check the pour height BEFORE laying, not at inspection";
+  return {
+    pour_height_ft, lift_height_ft, max_pour_height_ft, max_lift_height_ft,
+    lifts_in_pour, actual_lift_ft, grout_unit_weight_pcf, base_pressure_psf,
+    base_pressure_psi, pressure_at_limit_psi, pour_margin_ft, lift_margin_ft,
+    pour_ok, lift_ok, cleanout_threshold_ft, cleanouts_required,
+    pour_verdict, lift_verdict, cleanout_verdict,
+    note: "Two limits control two different failures and they are constantly confused. THE LIFT LIMIT IS ABOUT CONSOLIDATION: grout placed deeper than it can be properly vibrated leaves voids, and a void in a grouted cell means the reinforcement is not embedded and the wall does not have the strength the drawings assume. THE POUR LIMIT IS ABOUT THE WALL'S OWN STRENGTH WHILE THE GROUT IS FLUID: freshly grouted masonry is holding back a column of liquid at roughly 140 pounds per cubic foot, and a pour higher than the wall can resist blows it out. A pour is made up of one or more lifts, so the two limits are checked separately and the lift count falls out of them. The pressure arithmetic is worth carrying because it is the whole reason for the pour limit: a five foot pour puts about five pounds per square inch on the inside of joints that are hours old, and doubling the pour doubles it. Blowouts are exactly what happens when a crew decides to grout a full storey in one go because the pump is already there, and the wall gives no warning before it goes. CLEANOUTS ARE THE PROVISION THAT GETS OMITTED AND THEN REQUIRED. Above a threshold pour height the code requires openings at the base of every grouted cell so mortar droppings can be removed and the space inspected before grouting, and they are closed only after that inspection. A wall built without them and discovered at inspection has to be opened at the base -- cutting units out of completed work -- which is far more expensive than building them in, and entirely avoidable by checking the pour height before laying. CONSOLIDATION IS A TWO-STEP REQUIREMENT rather than one. Grout is vibrated when placed and again after initial water loss, because it settles as the masonry absorbs water, and reconsolidation closes the void that leaves at the top of the lift -- which in many walls sits directly over a reinforcement lap. THE CODE LIMITS ARE ENTERED AND NO TABLE IS SHIPPED. Maximum lift and pour heights depend on the grout space least dimension, the unit type, whether the grout is fine or coarse, and whether cleanouts are provided, and the table that governs is the one in the adopted edition. This does not compute grout volume, design the wall, evaluate whether a specific wall can resist a specific pour pressure -- which depends on the units, the mortar, the joints' age and the bracing -- or address grout demand, aggregate, slump, admixtures, or self-consolidating grout, whose placement rules differ. TMS 602 as adopted, the project specification, and the inspector govern.",
+  };
+}
+const groutLiftPourHeightExample = { inputs: { pour_height_ft: 5, lift_height_ft: 5, max_pour_height_ft: 5.33, max_lift_height_ft: 5.33, grout_unit_weight_pcf: 140, cleanout_threshold_ft: 5.33 } };
+MASONRY_RENDERERS["grout-lift-pour-height"] = _simpleRenderer({
+  citation: "Citation: the TMS 602 grout placement limits by name -- the LIFT limit governs consolidation and the POUR limit governs the wall's resistance to fluid grout pressure, with a pour made up of one or more lifts and cleanouts required at the base of every grouted cell above a threshold pour height. The fluid pressure at the base is unit weight x pour height, about 140 pcf for grout. NO LIMIT TABLE IS SHIPPED: the maximum lift and pour heights depend on the grout space least dimension, the unit type, fine or coarse grout, and whether cleanouts are provided, and come from the adopted edition. TMS 602 as adopted, the project specification, and the inspector govern.",
+  example: groutLiftPourHeightExample.inputs,
+  fields: [
+    { key: "pour_height_ft", label: "Proposed pour height (ft)", kind: "number", default: 5 },
+    { key: "lift_height_ft", label: "Proposed lift height (ft)", kind: "number", default: 5 },
+    { key: "max_pour_height_ft", label: "Code maximum pour height (ft)", kind: "number", default: 5.33 },
+    { key: "max_lift_height_ft", label: "Code maximum lift height (ft)", kind: "number", default: 5.33 },
+    { key: "grout_unit_weight_pcf", label: "Fluid grout unit weight (pcf)", kind: "number", default: 140 },
+    { key: "cleanout_threshold_ft", label: "Cleanout threshold pour height (ft)", kind: "number", default: 5.33 },
+  ],
+  outputs: [
+    { key: "p", id: "glp-out-p", label: "Pour", value: (r) => r.pour_verdict },
+    { key: "l", id: "glp-out-l", label: "Lift", value: (r) => r.lift_verdict },
+    { key: "b", id: "glp-out-b", label: "Pressure at the base", value: (r) => fmt(r.base_pressure_psi, 2) + " psi (" + fmt(r.base_pressure_psf, 0) + " psf) of fluid grout, against " + fmt(r.pressure_at_limit_psi, 2) + " psi at the code's pour limit" },
+    { key: "c", id: "glp-out-c", label: "Cleanouts", value: (r) => r.cleanout_verdict },
+    { key: "n", id: "glp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGroutLiftPourHeight,
+});
+
+// ============ spec-v1685: masonry cleaning dilution and coverage ============
+
+// dims: in { area_ft2: L^2, dilution_parts_water: dimensionless, coverage_ft2_per_gal: L^2, prewet_gal_per_100ft2: L^3, rinse_gal_per_100ft2: L^3, acid_safe_unit: dimensionless } out: { diluted_gal: L^3, concentrate_gal: L^3, water_gal: L^3, prewet_gal: L^3, rinse_gal: L^3, total_water_gal: L^3 }
+export function computeMasonryCleaningDilution({ area_ft2 = 0, dilution_parts_water = 0, coverage_ft2_per_gal = 0, prewet_gal_per_100ft2 = 0, rinse_gal_per_100ft2 = 0, acid_safe_unit = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(area_ft2 > 0)) return { error: "The area to be cleaned must be positive (sq ft)." };
+  if (!(dilution_parts_water > 0)) return { error: "The dilution must be positive (parts water to one part concentrate)." };
+  if (!(coverage_ft2_per_gal > 0)) return { error: "Coverage must be positive (sq ft per gallon of DILUTED solution)." };
+  if (prewet_gal_per_100ft2 < 0 || rinse_gal_per_100ft2 < 0) return { error: "A water rate cannot be negative (gal per 100 sq ft)." };
+  const diluted_gal = area_ft2 / coverage_ft2_per_gal;
+  // One part concentrate to N parts water is one part in N+1 of the mix.
+  const total_parts = dilution_parts_water + 1;
+  const concentrate_gal = diluted_gal / total_parts;
+  const water_gal = diluted_gal - concentrate_gal;
+  const concentrate_pct = 100 / total_parts;
+  const hundreds = area_ft2 / 100;
+  const prewet_gal = prewet_gal_per_100ft2 * hundreds;
+  const rinse_gal = rinse_gal_per_100ft2 * hundreds;
+  const total_water_gal = water_gal + prewet_gal + rinse_gal;
+  const acid_ok = acid_safe_unit >= 0.5;
+  const outs = [diluted_gal, concentrate_gal, water_gal, prewet_gal, rinse_gal, total_water_gal];
+  if (!outs.every(Number.isFinite)) return { error: "Cleaning dilution math is not a finite value." };
+  const compat_verdict = acid_ok
+    ? "The unit is marked acid-tolerant, which still means a TEST PANEL rather than a decision -- the correct dilution is the weakest that removes the soiling, established on the panel"
+    : "DO NOT ACID CLEAN: polished stone, limestone, marble, many coloured and glazed units, and anything with a metallic finish are attacked by acid, and the damage looks like efflorescence or a colour change and is permanent. Aluminium windows below the work are etched by the rinse water alone";
+  return {
+    area_ft2, dilution_parts_water, total_parts, concentrate_pct, coverage_ft2_per_gal,
+    diluted_gal, concentrate_gal, water_gal, prewet_gal_per_100ft2, prewet_gal,
+    rinse_gal_per_100ft2, rinse_gal, total_water_gal, acid_safe_unit, acid_ok, compat_verdict,
+    note: "THE CONCENTRATION IS A PROPERTY OF THE MASONRY RATHER THAN OF THE SOILING, and that inversion is the whole discipline. Acid-based cleaners attack the cement paste in the mortar and the surface of many units, so the correct dilution is the WEAKEST that removes the soiling, established on a test panel -- and strengthening it because the wall is dirty is the standard way to burn a facade. The damage looks like efflorescence or a colour change, it appears after the scaffold is down, and it is permanent. One part concentrate to N parts water is one part in N plus one of the mix, which is the arithmetic people get wrong in the direction of too strong. PREWETTING IS WHAT KEEPS THE CLEANER ON THE SURFACE. Dry masonry draws the solution into itself, where it attacks the mortar from within and leaves salts that migrate back out for years afterward. Saturating the wall first means the cleaner works on the face and rinses away, and skipping it is the difference between a cleaned wall and a damaged one -- so the prewet water is counted here as part of the job rather than as an optional step. RINSING IS A QUANTITY AS WELL AS AN ACTION. Residual cleaner keeps working after the crew moves on, so the rinse volume and pressure are specified, and an inadequate rinse produces damage that appears days later on a wall that looked finished. The total water is what the site has to supply and what the runoff control has to handle. THE UNITS THAT MUST NEVER SEE ACID ARE A SHORT LIST WORTH CARRYING: polished stone, limestone, marble, many coloured and glazed units, and anything with a metallic finish or with metal below that the runoff will reach. Aluminium windows under an acid-cleaned brick facade get etched by the rinse water alone, which is why masking and runoff control are part of the job rather than housekeeping. Dwell time belongs on that list too: a stated dwell is a maximum as much as a minimum, because a cleaner allowed to dry in place has to be removed mechanically. Quantities from a dilution and a coverage rate the reader takes from the manufacturer for the specific unit. It does not select a cleaner or a dilution, evaluate the soiling, or replace a test panel, which is required rather than advisable. It does not address containment, runoff collection and disposal, which are regulated; personal protective equipment and the hazards of the concentrate; pressure and equipment; or the temperature and weather limits on application. Efflorescence, mortar smears, and construction staining have different treatments, and some of them are not acid. The cleaner manufacturer's instructions for the specific unit, the project specification, a test panel, and the applicable environmental rules govern.",
+  };
+}
+const masonryCleaningDilutionExample = { inputs: { area_ft2: 2400, dilution_parts_water: 5, coverage_ft2_per_gal: 150, prewet_gal_per_100ft2: 5, rinse_gal_per_100ft2: 12, acid_safe_unit: 1 } };
+MASONRY_RENDERERS["masonry-cleaning-dilution"] = _simpleRenderer({
+  citation: "Citation: the dilution and coverage identities by name -- diluted solution = area / coverage; one part concentrate to N parts water is one part in N+1, so concentrate = diluted / (N+1) -- with the prewet and rinse water counted at their own rates per 100 sq ft. NO CLEANER, DILUTION OR COVERAGE IS SHIPPED: all three come from the manufacturer for the specific unit, and a test panel is required rather than advisable. Acid attacks polished stone, limestone, marble, many coloured and glazed units, and metal the runoff reaches. The cleaner manufacturer's instructions, the project specification, a test panel, and the applicable environmental rules govern.",
+  example: masonryCleaningDilutionExample.inputs,
+  fields: [
+    { key: "area_ft2", label: "Area to clean (sq ft)", kind: "number", default: 2400 },
+    { key: "dilution_parts_water", label: "Parts water to 1 part concentrate", kind: "number", default: 5 },
+    { key: "coverage_ft2_per_gal", label: "Coverage (sq ft per gal of diluted solution)", kind: "number", default: 150 },
+    { key: "prewet_gal_per_100ft2", label: "Prewet water (gal per 100 sq ft)", kind: "number", default: 5 },
+    { key: "rinse_gal_per_100ft2", label: "Rinse water (gal per 100 sq ft)", kind: "number", default: 12 },
+    { key: "acid_safe_unit", label: "Unit tolerates acid (1 yes, 0 no)", kind: "number", default: 1, attrs: { step: "1", min: "0", max: "1" } },
+  ],
+  outputs: [
+    { key: "d", id: "mcd-out-d", label: "Diluted solution", value: (r) => fmt(r.diluted_gal, 1) + " gal at " + fmt(r.coverage_ft2_per_gal, 0) + " sq ft per gallon" },
+    { key: "c", id: "mcd-out-c", label: "Concentrate and water", value: (r) => fmt(r.concentrate_gal, 2) + " gal of concentrate and " + fmt(r.water_gal, 2) + " gal of water -- 1 part in " + fmt(r.total_parts, 0) + ", " + fmt(r.concentrate_pct, 1) + "% concentrate" },
+    { key: "p", id: "mcd-out-p", label: "Prewet and rinse", value: (r) => fmt(r.prewet_gal, 0) + " gal to saturate the wall first and " + fmt(r.rinse_gal, 0) + " gal to rinse -- residual cleaner keeps working" },
+    { key: "t", id: "mcd-out-t", label: "Total water on site", value: (r) => fmt(r.total_water_gal, 0) + " gal, all of which becomes runoff to be contained" },
+    { key: "k", id: "mcd-out-k", label: "The unit", value: (r) => r.compat_verdict },
+    { key: "n", id: "mcd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMasonryCleaningDilution,
+});

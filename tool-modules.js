@@ -207,6 +207,7 @@ export const TOOL_MODULES = (() => {
   // spec-v28 §7 roadmap; own module since calc-construction and calc-hvac are
   // at their size caps).
   declare("./calc-metalair.js", "METALAIR_RENDERERS", [
+    "square-to-round-development", "standing-seam-takeoff", "metal-roof-thermal-movement",
     "groove-weld-strength", "groove-weld-length-for-load", "duct-static-pressure-total", "compression-ratio-refrig",
     "duct-transition-length",
     "duct-static-regain",
@@ -467,6 +468,7 @@ export const TOOL_MODULES = (() => {
     "abatement-containment",
   ]);
   declare("./calc-construction.js", "CONSTRUCTION_RENDERERS", [
+    "scaffold-tie-spacing", "mast-climber-platform-load", "suspended-scaffold-counterweight", "shoring-reshoring-load",
     // trade expansion v1425-v1434
     "elevator-handling-capacity",
     "glass-thickness-wind",
@@ -864,6 +866,7 @@ export const TOOL_MODULES = (() => {
   // Group E cluster, the masonry counterpart to the steel / RC member benches;
   // masonry's first structural (not takeoff) tiles. All three KEEP group "E".
   declare("./calc-masonry.js", "MASONRY_RENDERERS", [
+    "mortar-batch-c270", "grout-lift-pour-height", "masonry-cleaning-dilution",
     "cmu-wall-flexure", "cmu-shear-wall", "cmu-wall-axial",
     "masonry-wall-weight", "brick-veneer-anchor-spacing", "brick-veneer-weep-count", "masonry-joint-reinforcement", "masonry-lintel-loading", "masonry-lintel-bearing", "fireplace-flue-area", "masonry-limited-access-zone",
     "masonry-anchor-bolt", "masonry-anchor-embedment", "masonry-anchor-shear", "masonry-prism-fm",

@@ -36,6 +36,60 @@ const _finiteGuard = (o) => {
   return null;
 };
 
+// Compact renderer factory, copied verbatim from calc-masonry.js (same
+// ui-fields imports) per the new-module convention; only the inner render
+// function's name differs, so the schema-coverage gates read it unchanged.
+function _simpleRenderer(spec) {
+  const _maRender = function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      let field;
+      if (f.kind === "select") field = makeSelect(f.label, f.id || f.key, f.options);
+      else field = makeNumber(f.label, f.id || f.key, f.attrs || { step: "any", min: "0" });
+      fields[f.key] = field;
+      if (f.default !== undefined) {
+        if (f.kind === "select") field.select.value = f.default;
+        else field.input.value = String(f.default);
+      }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key];
+        else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) {
+        if (f.kind === "select") params[f.key] = fields[f.key].select.value;
+        else params[f.key] = Number(fields[f.key].input.value) || 0;
+      }
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) {
+      const el = f.kind === "select" ? fields[f.key].select : fields[f.key].input;
+      el.addEventListener(f.kind === "select" ? "change" : "input", update);
+    }
+  };
+
+  _maRender.schema = {
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
+    citation: spec.citation ?? null,
+    scope: spec.scope ?? null,
+  };
+  return _maRender;
+}
+
 export const METALAIR_RENDERERS = {};
 
 // Electrode classification minimum tensile strength FEXX (ksi).
@@ -379,3 +433,239 @@ function _v960renderDuctStaticRegain(inputRegion, outputRegion, citationEl) {
   for (const f of [uv, dv, rf]) f.input.addEventListener("input", update);
 }
 METALAIR_RENDERERS["duct-static-regain"] = _v960renderDuctStaticRegain;
+
+// ===========================================================================
+// spec-v1679, v1681, v1682: the 2026-09-08 trade-expansion sheet metal and
+// architectural metal band. Three tiles, all group E.
+//
+// spec-v1680 gored-elbow-angles WAS CUT: `pipe-miter-cut` in calc-fab.js
+// already computes the identical miter geometry -- turn per joint = total /
+// (pieces - 1), cut angle half of that from square, cutback = OD x tan -- and
+// its note already carries the end-half-gore rule that spec-v1680 calls "the
+// whole trick". What that tile lacked is the THROAT and HEEL lengths and the
+// developed material, so those landed there instead.
+
+// ============ spec-v1679: square-to-round transition development ============
+
+// dims: in { square_side_in: L, round_diameter_in: L, height_in: L, offset_in: L, elements_per_quadrant: dimensionless, seam_allowance_in: L } out: { corner_true_length_in: L, midpoint_true_length_in: L, plan_corner_distance_in: L, circumference_in: L, developed_arc_in: L, sheet_width_in: L }
+export function computeSquareToRoundDevelopment({ square_side_in = 0, round_diameter_in = 0, height_in = 0, offset_in = 0, elements_per_quadrant = 8, seam_allowance_in = 0.5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(square_side_in > 0)) return { error: "The square side must be positive (in)." };
+  if (!(round_diameter_in > 0)) return { error: "The round diameter must be positive (in)." };
+  if (!(height_in > 0)) return { error: "The transition height must be positive (in)." };
+  if (offset_in < 0) return { error: "The offset between centres cannot be negative (in)." };
+  if (!(elements_per_quadrant >= 2)) return { error: "Use at least two elements per quadrant; a curve cannot be triangulated with fewer." };
+  if (seam_allowance_in < 0) return { error: "The seam allowance cannot be negative (in)." };
+  const half_side = square_side_in / 2;
+  const radius = round_diameter_in / 2;
+  const n = Math.round(elements_per_quadrant);
+  // Triangulation: every element line is sloped, so its plan view understates
+  // it. The true length is the hypotenuse of the plan distance and the height.
+  const trueLength = (planDistance) => Math.sqrt(planDistance * planDistance + height_in * height_in);
+  // The corner element: from a square corner to the nearest point on the
+  // circle, which sits on the 45 degree diagonal.
+  const corner_x = half_side + offset_in;
+  const corner_y = half_side;
+  const diagonal = Math.sqrt(corner_x * corner_x + corner_y * corner_y);
+  const circle_on_diagonal_x = radius * (corner_x / diagonal);
+  const circle_on_diagonal_y = radius * (corner_y / diagonal);
+  const plan_corner_distance_in = Math.hypot(corner_x - circle_on_diagonal_x, corner_y - circle_on_diagonal_y);
+  const corner_true_length_in = trueLength(plan_corner_distance_in);
+  // The midpoint element: from the middle of a square side straight to the
+  // circle, which is the shortest element on a concentric transition.
+  const plan_midpoint_distance_in = Math.abs(half_side - radius);
+  const midpoint_true_length_in = trueLength(plan_midpoint_distance_in);
+  // The longest element on the piece, which sets the sheet.
+  const longest_true_length_in = Math.max(corner_true_length_in, midpoint_true_length_in);
+  const understatement_pct = plan_corner_distance_in > 0 ? (corner_true_length_in / plan_corner_distance_in - 1) * 100 : null;
+  // The check that costs a sheet rather than a fitting: the developed curved
+  // edge is the sum of the chords across each element, and it must come back
+  // to the circle's circumference. Too few elements and it lands short.
+  const circumference_in = Math.PI * round_diameter_in;
+  const total_elements = 4 * n;
+  const chord_in = 2 * radius * Math.sin(Math.PI / total_elements);
+  const developed_arc_in = chord_in * total_elements;
+  const arc_shortfall_in = circumference_in - developed_arc_in;
+  const arc_shortfall_pct = circumference_in > 0 ? arc_shortfall_in / circumference_in * 100 : 0;
+  const sheet_width_in = square_side_in + 2 * seam_allowance_in;
+  const sheet_length_in = 2 * longest_true_length_in + circumference_in / 2 + 2 * seam_allowance_in;
+  const outs = [corner_true_length_in, midpoint_true_length_in, circumference_in, developed_arc_in, sheet_width_in];
+  if (!outs.every(Number.isFinite)) return { error: "Transition development math is not a finite value." };
+  return {
+    square_side_in, round_diameter_in, height_in, offset_in, elements_per_quadrant: n,
+    total_elements, plan_corner_distance_in, corner_true_length_in,
+    plan_midpoint_distance_in, midpoint_true_length_in, longest_true_length_in,
+    understatement_pct, circumference_in, chord_in, developed_arc_in,
+    arc_shortfall_in, arc_shortfall_pct, seam_allowance_in, sheet_width_in, sheet_length_in,
+    note: "Triangulation is the method and TRUE LENGTH is the only idea in it. Any line on a square-to-round that is neither vertical nor horizontal appears shorter in every orthogonal view than it really is, so laying out from plan dimensions produces a pattern too small and a fitting that will not close. The true length is the hypotenuse of the plan distance and the height, and on an ordinary transition it is far longer than the plan view suggests: a corner element measuring nine inches on the plan can be well over eighteen once the height is in it, which is the error the whole method exists to prevent. The pattern is then built by laying those triangles down in sequence, and the corner elements and the elements to the middle of each side are the two extremes that set everything between them. THE CIRCLE IS DIVIDED INTO ELEMENTS BECAUSE A CURVE CANNOT BE TRIANGULATED DIRECTLY, and the division is where accuracy is won or lost. Each element is developed as a straight chord, so the developed curved edge is a polygon inscribed in the circle and it is always SHORT of the true circumference. More elements close that gap and cost layout time; eight to sixteen per quadrant is common practice, and the shortfall at the entered count is reported here so the choice is made with a number rather than a habit. THE CHECK AT THE END IS WORTH DOING EVERY TIME. The developed pattern's curved edge, measured along its length, should come back to the circumference of the round end. If it does not, an element true length is wrong or the division was uneven -- and finding that on the bench costs a sheet, where finding it at the fitting costs the fitting and the crew. Everything after the development is allowances: seams, laps, and the metal thickness itself on a formed edge, which are added to the developed shape rather than being part of it. This gives the governing true lengths, the element chord, the circumference check, and the sheet the pattern needs. It does not draw the pattern or emit its coordinates, and it does not lay out an eccentric transition's unequal elements individually -- an offset makes every element different and the full development needs all of them. It does not compute bend allowance for the metal thickness and forming method, address stiffening, reinforcing, or the gauge required for the duct pressure class, or select a seam type. SMACNA's duct construction standards, the shop's own layout practice, and a test piece govern.",
+  };
+}
+const squareToRoundDevelopmentExample = { inputs: { square_side_in: 20, round_diameter_in: 14, height_in: 16, offset_in: 0, elements_per_quadrant: 8, seam_allowance_in: 0.5 } };
+METALAIR_RENDERERS["square-to-round-development"] = _simpleRenderer({
+  citation: "Citation: triangulation development of a square-to-round transition by name -- the true length of an element line is sqrt(plan distance squared + height squared), and the developed curved edge is the sum of the chords across the elements, which must come back to pi x diameter. The chord across one of N elements is 2 R sin(pi / N), so a coarse division leaves the developed edge short of the circumference by a computed amount. Seam and lap allowances are added to the developed shape, not part of it. SMACNA's duct construction standards, the shop's layout practice, and a test piece govern.",
+  example: squareToRoundDevelopmentExample.inputs,
+  fields: [
+    { key: "square_side_in", label: "Square side (in)", kind: "number", default: 20 },
+    { key: "round_diameter_in", label: "Round diameter (in)", kind: "number", default: 14 },
+    { key: "height_in", label: "Transition height (in)", kind: "number", default: 16 },
+    { key: "offset_in", label: "Offset between centres (in, 0 for concentric)", kind: "number", default: 0 },
+    { key: "elements_per_quadrant", label: "Elements per quadrant", kind: "number", default: 8 },
+    { key: "seam_allowance_in", label: "Seam and lap allowance (in)", kind: "number", default: 0.5 },
+  ],
+  outputs: [
+    { key: "c", id: "strd-out-c", label: "Corner element", value: (r) => fmt(r.plan_corner_distance_in, 2) + " in on the plan is " + fmt(r.corner_true_length_in, 2) + " in true -- " + fmt(r.understatement_pct, 0) + "% longer than the plan view shows" },
+    { key: "m", id: "strd-out-m", label: "Side midpoint element", value: (r) => fmt(r.plan_midpoint_distance_in, 2) + " in on the plan is " + fmt(r.midpoint_true_length_in, 2) + " in true" },
+    { key: "e", id: "strd-out-e", label: "Element chord", value: (r) => fmt(r.chord_in, 3) + " in across each of " + fmt(r.total_elements, 0) + " elements" },
+    { key: "k", id: "strd-out-k", label: "Circumference check", value: (r) => "the development gives " + fmt(r.developed_arc_in, 2) + " in against a true circumference of " + fmt(r.circumference_in, 2) + " in -- short by " + fmt(r.arc_shortfall_in, 3) + " in, " + fmt(r.arc_shortfall_pct, 2) + "%. More elements close it" },
+    { key: "s", id: "strd-out-s", label: "Sheet the pattern needs", value: (r) => fmt(r.sheet_width_in, 1) + " in by " + fmt(r.sheet_length_in, 1) + " in, seams included" },
+    { key: "n", id: "strd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSquareToRoundDevelopment,
+});
+
+// ============ spec-v1681: standing seam panel and clip takeoff ============
+
+// dims: in { building_width_ft: L, run_length_ft: L, coverage_width_in: L, sheet_width_in: L, field_clip_spacing_in: L, perimeter_clip_spacing_in: L, perimeter_panels: dimensionless, fasteners_per_clip: dimensionless, eave_ridge_allowance_in: L, waste_pct: dimensionless } out: { panel_count: dimensionless, panel_length_ft: L, total_panel_ft: L, field_clip_count: dimensionless, perimeter_clip_count: dimensionless, fastener_count: dimensionless }
+export function computeStandingSeamTakeoff({ building_width_ft = 0, run_length_ft = 0, coverage_width_in = 0, sheet_width_in = 0, field_clip_spacing_in = 0, perimeter_clip_spacing_in = 0, perimeter_panels = 0, fasteners_per_clip = 2, eave_ridge_allowance_in = 0, waste_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(building_width_ft > 0)) return { error: "Building width must be positive (ft)." };
+  if (!(run_length_ft > 0)) return { error: "Run length must be positive (ft)." };
+  if (!(coverage_width_in > 0)) return { error: "Panel coverage width must be positive (in) -- the net width each panel adds, not the flat sheet." };
+  if (sheet_width_in < 0) return { error: "Flat sheet width cannot be negative (in)." };
+  if (sheet_width_in > 0 && !(sheet_width_in >= coverage_width_in)) return { error: "The flat sheet cannot be narrower than the coverage; the difference goes into the seam." };
+  if (!(field_clip_spacing_in > 0)) return { error: "Field clip spacing must be positive (in) -- it comes from the tested assembly's uplift rating, not from convenience." };
+  if (perimeter_clip_spacing_in < 0) return { error: "Perimeter clip spacing cannot be negative (in)." };
+  if (perimeter_panels < 0) return { error: "The perimeter panel count cannot be negative." };
+  if (!(fasteners_per_clip >= 1)) return { error: "There is at least one fastener per clip." };
+  if (eave_ridge_allowance_in < 0) return { error: "The eave and ridge allowance cannot be negative (in)." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (%)." };
+  const IN_PER_FT_MA = 12;
+  const width_in = building_width_ft * IN_PER_FT_MA;
+  const panel_count = Math.ceil(width_in / coverage_width_in);
+  // The mistake the note names: ordering on the flat sheet width instead of
+  // the coverage width, which comes up SHORT on every roof.
+  const panels_if_ordered_on_sheet = sheet_width_in > 0 ? Math.ceil(width_in / sheet_width_in) : null;
+  const panels_short = panels_if_ordered_on_sheet === null ? null : panel_count - panels_if_ordered_on_sheet;
+  const panel_length_ft = run_length_ft + eave_ridge_allowance_in / IN_PER_FT_MA;
+  const total_panel_ft = panel_count * panel_length_ft;
+  const total_panel_with_waste_ft = total_panel_ft * (1 + waste_pct / 100);
+  const clipsPerPanel = (spacing_in) => Math.floor(panel_length_ft * IN_PER_FT_MA / spacing_in) + 1;
+  const field_panels = Math.max(0, panel_count - Math.round(perimeter_panels));
+  const clips_per_field_panel = clipsPerPanel(field_clip_spacing_in);
+  const clips_per_perimeter_panel = perimeter_clip_spacing_in > 0 ? clipsPerPanel(perimeter_clip_spacing_in) : clips_per_field_panel;
+  const field_clip_count = field_panels * clips_per_field_panel;
+  const perimeter_clip_count = Math.round(perimeter_panels) * clips_per_perimeter_panel;
+  const clip_count = field_clip_count + perimeter_clip_count;
+  const fastener_count = clip_count * Math.round(fasteners_per_clip);
+  // Every panel edge is a seam, and the two rakes are not.
+  const seam_count = Math.max(0, panel_count - 1);
+  const seam_length_ft = seam_count * panel_length_ft;
+  const outs = [panel_count, panel_length_ft, total_panel_ft, field_clip_count, clip_count, fastener_count];
+  if (!outs.every(Number.isFinite)) return { error: "Panel takeoff math is not a finite value." };
+  const coverage_verdict = panels_if_ordered_on_sheet === null
+    ? "Enter the flat sheet width to see what ordering on it would cost."
+    : panels_short > 0
+      ? "ORDERING ON THE SHEET WIDTH COMES UP " + fmt(panels_short, 0) + " PANEL" + (panels_short === 1 ? "" : "S") + " SHORT: " + fmt(panel_count, 0) + " panels of " + fmt(coverage_width_in, 2) + " in coverage against " + fmt(panels_if_ordered_on_sheet, 0) + " if the " + fmt(sheet_width_in, 2) + " in sheet is used, and the last panel lands well before the rake"
+      : "Coverage and sheet width give the same count here, which is the case where the seam takes nothing -- check the panel profile";
+  return {
+    building_width_ft, run_length_ft, coverage_width_in, sheet_width_in, panel_count,
+    panels_if_ordered_on_sheet, panels_short, panel_length_ft, eave_ridge_allowance_in,
+    total_panel_ft, waste_pct, total_panel_with_waste_ft, field_panels,
+    perimeter_panels: Math.round(perimeter_panels), field_clip_spacing_in,
+    perimeter_clip_spacing_in, clips_per_field_panel, clips_per_perimeter_panel,
+    field_clip_count, perimeter_clip_count, clip_count, fasteners_per_clip: Math.round(fasteners_per_clip),
+    fastener_count, seam_count, seam_length_ft, coverage_verdict,
+    note: "COVERAGE WIDTH IS THE NUMBER THAT MATTERS AND IT IS NOT THE PANEL WIDTH. A sixteen inch coverage panel is roll-formed from a wider sheet and the difference goes into the seam, so a building takes its width over the COVERAGE regardless of what the flat sheet measures. Ordering on the sheet width is the mistake, and on a wide building it is several panels short with the last one landing well before the rake -- which is discovered on the roof, on the last day, with the crew standing on it. CLIP SPACING IS A STRUCTURAL OUTPUT RATHER THAN AN INSTALLER'S CHOICE. The clips are what hold the roof down against wind uplift, and their spacing comes from the tested assembly's rated resistance against the design pressure for the roof zone -- with corners and edges requiring much closer spacing than the field, because that is where uplift is worst. A roof clipped at a uniform field spacing throughout is under-attached exactly where the wind is strongest, and that is the pattern seen after wind events: the field intact and the perimeter gone. The zone counts are kept separate here for that reason. The panel length allowance is where a takeoff goes wrong in the other direction. Standing seam panels expand and contract along their length, and the eave and ridge details have to accommodate that movement, so panel length carries allowances a bare run measurement does not -- and a panel cut to the run is a panel with nowhere to go. A material takeoff on a simple rectangular roof plane. IT IS NOT A WIND UPLIFT DESIGN and it does not determine the clip spacing: the spacings entered here have to come from the tested assembly's rating against the design pressure for each zone, and the zone boundaries themselves come from the wind standard rather than from the roof's appearance. It does not lay out hips, valleys, or transitions, or take off the flashing, closures, trim, sealant, and clips at those conditions, which on a complicated roof are a large share of the material and nearly all of the labour. It does not address substrate, deck attachment, thermal movement at the details, or the panel gauge and profile the span and load require. The panel manufacturer's tested assembly and installation instructions, the wind design for the building, and the roofing contractor govern.",
+  };
+}
+const standingSeamTakeoffExample = { inputs: { building_width_ft: 42, run_length_ft: 30, coverage_width_in: 16, sheet_width_in: 18, field_clip_spacing_in: 24, perimeter_clip_spacing_in: 12, perimeter_panels: 4, fasteners_per_clip: 2, eave_ridge_allowance_in: 6, waste_pct: 5 } };
+METALAIR_RENDERERS["standing-seam-takeoff"] = _simpleRenderer({
+  citation: "Citation: the standing seam takeoff identities by name -- panel count = building width / COVERAGE width rounded up (not the flat sheet width, whose difference goes into the seam); clips per panel = panel length / clip spacing + 1; fasteners = clips x the tested assembly's fasteners per clip. CLIP SPACING IS NOT DETERMINED HERE: it comes from the tested assembly's rated uplift resistance against the design pressure for each roof zone, with corners and edges much closer than the field. A takeoff on a simple rectangular plane; hips, valleys, flashing and trim are not counted. The panel manufacturer's tested assembly and installation instructions, the wind design for the building, and the roofing contractor govern.",
+  example: standingSeamTakeoffExample.inputs,
+  fields: [
+    { key: "building_width_ft", label: "Building width (ft)", kind: "number", default: 42 },
+    { key: "run_length_ft", label: "Eave-to-ridge run (ft)", kind: "number", default: 30 },
+    { key: "coverage_width_in", label: "Panel COVERAGE width (in)", kind: "number", default: 16 },
+    { key: "sheet_width_in", label: "Flat sheet width (in, 0 to skip the comparison)", kind: "number", default: 18 },
+    { key: "field_clip_spacing_in", label: "Field clip spacing (in)", kind: "number", default: 24 },
+    { key: "perimeter_clip_spacing_in", label: "Edge and corner clip spacing (in, 0 to use the field spacing)", kind: "number", default: 12 },
+    { key: "perimeter_panels", label: "Panels in the edge and corner zones", kind: "number", default: 4 },
+    { key: "fasteners_per_clip", label: "Fasteners per clip", kind: "number", default: 2 },
+    { key: "eave_ridge_allowance_in", label: "Eave and ridge allowance (in)", kind: "number", default: 6 },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 5 },
+  ],
+  outputs: [
+    { key: "p", id: "sst-out-p", label: "Panels", value: (r) => fmt(r.panel_count, 0) + " at " + fmt(r.panel_length_ft, 2) + " ft each -- " + fmt(r.total_panel_ft, 0) + " linear ft, " + fmt(r.total_panel_with_waste_ft, 0) + " with " + fmt(r.waste_pct, 0) + "% waste" },
+    { key: "w", id: "sst-out-w", label: "Coverage against sheet width", value: (r) => r.coverage_verdict },
+    { key: "c", id: "sst-out-c", label: "Clips", value: (r) => fmt(r.clip_count, 0) + " total -- " + fmt(r.field_clip_count, 0) + " on " + fmt(r.field_panels, 0) + " field panels at " + fmt(r.clips_per_field_panel, 0) + " each, " + fmt(r.perimeter_clip_count, 0) + " on " + fmt(r.perimeter_panels, 0) + " edge and corner panels at " + fmt(r.clips_per_perimeter_panel, 0) + " each" },
+    { key: "f", id: "sst-out-f", label: "Fasteners", value: (r) => fmt(r.fastener_count, 0) + " at " + fmt(r.fasteners_per_clip, 0) + " per clip" },
+    { key: "s", id: "sst-out-s", label: "Seam length", value: (r) => fmt(r.seam_length_ft, 0) + " ft across " + fmt(r.seam_count, 0) + " seams" },
+    { key: "n", id: "sst-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeStandingSeamTakeoff,
+});
+
+// ============ spec-v1682: metal roof thermal movement ============
+
+// dims: in { panel_length_ft: L, alpha_per_f: dimensionless, temp_swing_f: T, fixed_point_fraction: dimensionless, clip_travel_in: L } out: { total_movement_in: L, movement_up_slope_in: L, movement_down_slope_in: L, governing_movement_in: L, travel_margin_in: L, max_panel_length_ft: L }
+export function computeMetalRoofThermalMovement({ panel_length_ft = 0, alpha_per_f = 0.0000128, temp_swing_f = 0, fixed_point_fraction = 0, clip_travel_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(panel_length_ft > 0)) return { error: "Panel length must be positive (ft)." };
+  if (!(alpha_per_f > 0)) return { error: "The coefficient of thermal expansion must be positive (per degF)." };
+  if (!(temp_swing_f > 0)) return { error: "The PANEL temperature swing must be positive (degF) -- it is much wider than the air temperature range." };
+  if (!(fixed_point_fraction >= 0 && fixed_point_fraction <= 1)) return { error: "The fixed point must be between 0 (eave) and 1 (ridge) of the panel length." };
+  if (clip_travel_in < 0) return { error: "Clip rated travel cannot be negative (in)." };
+  const IN_PER_FT_TM = 12;
+  const length_in = panel_length_ft * IN_PER_FT_TM;
+  const total_movement_in = alpha_per_f * length_in * temp_swing_f;
+  // Each panel is anchored at one point and moves AWAY from it, so the
+  // movement at each end is that end's share of the length.
+  const movement_up_slope_in = total_movement_in * (1 - fixed_point_fraction);
+  const movement_down_slope_in = total_movement_in * fixed_point_fraction;
+  const governing_movement_in = Math.max(movement_up_slope_in, movement_down_slope_in);
+  const travel_margin_in = clip_travel_in > 0 ? clip_travel_in - governing_movement_in : null;
+  const travel_adequate = clip_travel_in > 0 ? clip_travel_in >= governing_movement_in : null;
+  // The longest panel this clip supports, at this fixed point. A panel fixed
+  // at the middle carries twice the length for the same clip travel.
+  const governing_fraction = Math.max(1 - fixed_point_fraction, fixed_point_fraction);
+  const max_panel_length_ft = (clip_travel_in > 0 && governing_fraction > 0)
+    ? clip_travel_in / (alpha_per_f * temp_swing_f * governing_fraction * IN_PER_FT_TM)
+    : null;
+  const centre_fixed_movement_in = total_movement_in / 2;
+  const centre_fixed_saving_in = governing_movement_in - centre_fixed_movement_in;
+  const outs = [total_movement_in, movement_up_slope_in, movement_down_slope_in, governing_movement_in];
+  if (!outs.every(Number.isFinite)) return { error: "Thermal movement math is not a finite value." };
+  const verdict = travel_adequate === null
+    ? "Enter the clip's rated travel to check it."
+    : travel_adequate
+      ? "WITHIN TRAVEL: " + fmt(governing_movement_in, 3) + " in of movement against " + fmt(clip_travel_in, 3) + " in rated, " + fmt(travel_margin_in, 3) + " in to spare"
+      : "BEYOND TRAVEL by " + fmt(-travel_margin_in, 3) + " in: " + fmt(governing_movement_in, 3) + " in of movement against " + fmt(clip_travel_in, 3) + " in rated. The clips bind, then the movement goes into the clip, then into the fastener holes, and the roof loses its attachment years after installation";
+  return {
+    panel_length_ft, alpha_per_f, temp_swing_f, total_movement_in,
+    fixed_point_fraction, movement_up_slope_in, movement_down_slope_in,
+    governing_movement_in, clip_travel_in, travel_margin_in, travel_adequate,
+    max_panel_length_ft, centre_fixed_movement_in, centre_fixed_saving_in, verdict,
+    note: "Metal expands, and on a standing seam roof the panel is long enough that it matters. THE PANEL TEMPERATURE RANGE IS MUCH WIDER THAN THE AIR TEMPERATURE RANGE, and that is what makes the movement large. A dark panel in summer sun reaches well above ambient, and on a clear winter night it radiates to the sky and goes below it, so a design based on the local air temperature range understates the movement substantially -- a swing of 140 to 180 degrees Fahrenheit on the panel itself is ordinary across most of the country. Aluminium moves about twice as far as steel for the same swing, which is why the material belongs in the calculation rather than in a rule of thumb. THE FIXED POINT DETERMINES WHERE THE MOVEMENT GOES. Each panel is anchored at one location -- eave, ridge, or a point between -- and expands away from it, so the movement at the far end is the full expansion of the whole panel length. A panel fixed at its middle halves the movement at each end, which on very long panels is the only way to keep the clip travel within range, and the saving from moving the fixed point is reported here because it is often the cheapest fix available. THE FAILURE IS PROGRESSIVE RATHER THAN SUDDEN, which is why it gets blamed on workmanship. Clips at the ends of long panels reach the limit of their travel; then the movement goes into the clip itself, then into the fastener holes, which elongate; and the roof gradually loses its attachment and begins to oil-can and leak at the details. It looks like poor installation years after the fact, and it is a movement allowance that was never there. A single straight panel run, uniform temperature, free to move. It does not address the eave and ridge details themselves, the flashing and closures that have to accommodate the same movement, or the sealant joints that carry it at penetrations and transitions -- all of which fail the same way. It does not evaluate the clip's structural capacity, only its travel, and a clip adequate in travel can still be inadequate in uplift. It does not address panels restrained at both ends, which is a common detailing error that turns movement into stress, or the noise a moving roof makes. Panel temperature ranges vary by colour, slope, orientation, insulation, and climate. The panel manufacturer's expansion and clip data, SMACNA and the metal building manufacturers' guidance, and the roofing contractor govern.",
+  };
+}
+const metalRoofThermalMovementExample = { inputs: { panel_length_ft: 120, alpha_per_f: 0.0000128, temp_swing_f: 140, fixed_point_fraction: 0, clip_travel_in: 1.5 } };
+METALAIR_RENDERERS["metal-roof-thermal-movement"] = _simpleRenderer({
+  citation: "Citation: the thermal expansion relation by name -- movement = coefficient of expansion x length x temperature swing, taken on the PANEL temperature range rather than the air range, with steel about 6.5e-06 per degF, aluminium about 1.28e-05 and copper about 9.8e-06. Each panel is fixed at one point and moves away from it, so the movement at an end is that end's share of the length. It checks travel, not clip capacity. The panel manufacturer's expansion and clip data, SMACNA and the metal building manufacturers' guidance, and the roofing contractor govern.",
+  example: metalRoofThermalMovementExample.inputs,
+  fields: [
+    { key: "panel_length_ft", label: "Panel length (ft)", kind: "number", default: 120 },
+    { key: "alpha_per_f", label: "Coefficient of thermal expansion (per degF)", kind: "number", default: 0.0000128 },
+    { key: "temp_swing_f", label: "PANEL temperature swing (F)", kind: "number", default: 140 },
+    { key: "fixed_point_fraction", label: "Fixed point along the panel (0 = eave, 1 = ridge)", kind: "number", default: 0, attrs: { step: "any", min: "0", max: "1" } },
+    { key: "clip_travel_in", label: "Clip rated travel (in, 0 to skip)", kind: "number", default: 1.5 },
+  ],
+  outputs: [
+    { key: "t", id: "mrtm-out-t", label: "Total movement", value: (r) => fmt(r.total_movement_in, 3) + " in over " + fmt(r.panel_length_ft, 0) + " ft at a " + fmt(r.temp_swing_f, 0) + " F panel swing" },
+    { key: "e", id: "mrtm-out-e", label: "Movement at each end", value: (r) => fmt(r.movement_down_slope_in, 3) + " in toward the eave and " + fmt(r.movement_up_slope_in, 3) + " in toward the ridge, from a fixed point at " + fmt(r.fixed_point_fraction * 100, 0) + "% of the length" },
+    { key: "v", id: "mrtm-out-v", label: "Against the clip travel", value: (r) => r.verdict },
+    { key: "c", id: "mrtm-out-c", label: "Fixing it at the middle instead", value: (r) => fmt(r.centre_fixed_movement_in, 3) + " in at each end -- " + fmt(r.centre_fixed_saving_in, 3) + " in less than the governing end has now, which on a long panel is often the cheapest fix there is" },
+    { key: "m", id: "mrtm-out-m", label: "Longest panel this clip supports", value: (r) => r.max_panel_length_ft === null ? "(no clip travel entered)" : fmt(r.max_panel_length_ft, 1) + " ft at this fixed point and temperature swing" },
+    { key: "n", id: "mrtm-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMetalRoofThermalMovement,
+});
