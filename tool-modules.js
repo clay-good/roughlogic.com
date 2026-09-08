@@ -296,6 +296,7 @@ export const TOOL_MODULES = (() => {
   // remaining calc module) into calc-drainage.js. They keep group: "B" (group
   // letter independent of module, the v42/v70/v71/v72 precedent).
   declare("./calc-drainage.js", "DRAINAGE_RENDERERS", [
+    "seepage-travel-time", "well-point-spacing", "water-quality-volume",
     "roof-drain-sizing", "sump-basin-sizing",
     // spec-v426..v427 drainage
     "overflow-scupper-sizing", "scupper-width-for-flow", "sewage-force-main-velocity",
@@ -1380,6 +1381,7 @@ export const TOOL_MODULES = (() => {
   ]);
   // v4 Group O: Kitchen and Food Service.
   declare("./calc-kitchen.js", "KITCHEN_RENDERERS", [
+    "grease-duct-cleaning-interval", "walk-in-door-infiltration", "kitchen-makeup-air-deficit",
     "recipe-scale", "yield-ep", "as-purchased-quantity", "cooling-curve",
     // trade expansion v1350-v1363
     "ice-machine-sizing",
@@ -1437,6 +1439,7 @@ export const TOOL_MODULES = (() => {
   // of the group letter, per the v28/v30/v36/v39/v70 precedent); no tile or
   // output changed.
   declare("./calc-survey.js", "SURVEY_RENDERERS", [
+    "drone-gsd-overlap", "lidar-point-density", "rtk-error-budget", "mass-haul-overhaul",
     "area-by-coordinates", "traverse-closure",
     // trade expansion v1394-v1401
     "three-point-resection",

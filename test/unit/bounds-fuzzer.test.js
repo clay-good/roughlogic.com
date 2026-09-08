@@ -47331,3 +47331,380 @@ test("bounds: spec-v1680 cut -- pipe-miter-cut gains the throat and heel, angles
   const tightBend = _v1680host({ ...base, centerline_radius_in: 4 });
   assert.ok(Math.abs(tightBend.throat_length_in) < 1e-12);
 });
+
+// ===========================================================================
+// spec-v1738..v1744 and spec-v1637..v1639: the 2026-09-08 trade-expansion
+// groundwater and stormwater, survey technology, and commercial kitchen band.
+// Ten tiles across three existing modules.
+//
+// spec-v1737 pump-test-transmissivity WAS CUT: `well-drawdown` in calc-water.js
+// has computed the Cooper-Jacob transmissivity T = 264 Q / delta-s since
+// spec-v23. Storativity from the zero-drawdown intercept and the hydraulic
+// conductivity for an aquifer thickness landed there instead, and are
+// asserted at the bottom of this block with the old answer unchanged.
+//
+// spec-v1742 left TWO unrendered python placeholders in its worked example and
+// spec-v1743 one, which are the fourth and fifth occurrences in this program.
+// ===========================================================================
+
+import { computeSeepageTravelTime as _v1738 } from "../../calc-drainage.js";
+test("bounds: spec-v1738 computeSeepageTravelTime -- the Darcy velocity is a flux, not a speed", () => {
+  const base = { hydraulic_conductivity_ft_day: 25, head_difference_ft: 2, flow_path_ft: 500, effective_porosity: 0.28, travel_distance_ft: 500, retardation_factor: 1 };
+  const r = _v1738(base);
+  assert.ok(Math.abs(r.gradient - 0.004) < 1e-12);
+  assert.ok(Math.abs(r.darcy_velocity_ft_day - 0.1) < 1e-12);
+  assert.ok(Math.abs(r.seepage_velocity_ft_day - 0.35714286) < 1e-7);
+  assert.ok(Math.abs(r.travel_time_days - 1400) < 1e-9);
+  assert.ok(Math.abs(r.travel_time_years - 3.83299110) < 1e-6);
+  assert.ok(Math.abs(r.darcy_travel_time_years - 13.6892539) < 1e-5);
+  // The overstatement from using the Darcy velocity is EXACTLY the reciprocal
+  // of the effective porosity, at every value.
+  assert.ok(Math.abs(r.overstatement_x - 1 / base.effective_porosity) < 1e-9);
+  for (const n of [0.05, 0.15, 0.28, 0.45]) {
+    const x = _v1738({ ...base, effective_porosity: n });
+    assert.ok(Math.abs(x.seepage_velocity_ft_day * n - x.darcy_velocity_ft_day) < 1e-12);
+    assert.ok(x.seepage_velocity_ft_day > x.darcy_velocity_ft_day);
+  }
+  // A retardation factor of one IS the water, and it only ever slows things.
+  assert.ok(Math.abs(r.contaminant_travel_days - r.travel_time_days) < 1e-9);
+  const sorbing = _v1738({ ...base, retardation_factor: 3 });
+  assert.ok(Math.abs(sorbing.contaminant_travel_days - 3 * r.travel_time_days) < 1e-6);
+  assert.ok(sorbing.contaminant_travel_days > sorbing.travel_time_days);
+  // Velocity is exactly linear in conductivity and in gradient.
+  assert.ok(Math.abs(_v1738({ ...base, hydraulic_conductivity_ft_day: 50 }).seepage_velocity_ft_day - 2 * r.seepage_velocity_ft_day) < 1e-9);
+  assert.ok(Math.abs(_v1738({ ...base, head_difference_ft: 4 }).gradient - 2 * r.gradient) < 1e-12);
+  assert.ok("error" in _v1738({ ...base, effective_porosity: 1 }));
+  assert.ok("error" in _v1738({ ...base, retardation_factor: 0.5 }));
+});
+
+import { computeWellPointSpacing as _v1739 } from "../../calc-drainage.js";
+test("bounds: spec-v1739 computeWellPointSpacing -- suction lift is a ceiling, not a preference", () => {
+  const base = { excavation_depth_ft: 22, water_table_depth_ft: 6, subgrade_margin_ft: 3, practical_lift_ft: 15, excavation_length_ft: 100, excavation_width_ft: 60, point_spacing_ft: 5, point_capacity_gpm: 15 };
+  const r = _v1739(base);
+  assert.ok(Math.abs(r.total_drawdown_ft - 19) < 1e-12);
+  assert.equal(r.stages_required, 2);
+  assert.ok(Math.abs(r.drawdown_per_stage_ft - 9.5) < 1e-12);
+  assert.ok(Math.abs(r.perimeter_ft - 320) < 1e-12);
+  assert.equal(r.points_per_stage, 64);
+  assert.equal(r.point_count, 128);
+  assert.equal(r.single_stage_sufficient, false);
+  // The stage count always covers the drawdown and never over-divides it.
+  for (const [d, lift] of [[19, 15], [14, 15], [31, 15], [45, 18]]) {
+    const x = _v1739({ ...base, excavation_depth_ft: d + base.water_table_depth_ft - base.subgrade_margin_ft, practical_lift_ft: lift });
+    assert.ok(x.stages_required * lift >= x.total_drawdown_ft - 1e-9);
+    assert.ok((x.stages_required - 1) * lift < x.total_drawdown_ft);
+  }
+  // Inside one lift is one stage, and the tile says free-standing rather than
+  // staged.
+  const shallow = _v1739({ ...base, excavation_depth_ft: 15 });
+  assert.equal(shallow.stages_required, 1);
+  assert.equal(shallow.single_stage_sufficient, true);
+  assert.ok(shallow.stage_verdict.startsWith("ONE STAGE"));
+  // Closer spacing puts more points around the same perimeter, exactly.
+  const tight = _v1739({ ...base, point_spacing_ft: 2.5 });
+  assert.equal(tight.points_per_stage, 128);
+  // Capacity is the entered per-point figure times the points -- an upper
+  // bound from the equipment, not a flow the soil must deliver.
+  assert.ok(Math.abs(r.system_capacity_gpm - r.points_per_stage * base.point_capacity_gpm) < 1e-9);
+  assert.ok("error" in _v1739({ ...base, excavation_depth_ft: 4 }));
+  assert.ok("error" in _v1739({ ...base, point_spacing_ft: 0 }));
+});
+
+import { computeWaterQualityVolume as _v1740 } from "../../calc-drainage.js";
+test("bounds: spec-v1740 computeWaterQualityVolume -- the site plan is a bigger lever than the pond", () => {
+  const base = { rainfall_depth_in: 1.0, impervious_percent: 65, area_ac: 2.4, alternative_impervious_percent: 40, drawdown_hours: 24 };
+  const r = _v1740(base);
+  assert.ok(Math.abs(r.runoff_coefficient - 0.635) < 1e-12);
+  assert.ok(Math.abs(r.wqv_cf - 5532.12) < 1e-6);
+  assert.ok(Math.abs(r.alternative_runoff_coefficient - 0.41) < 1e-12);
+  assert.ok(Math.abs(r.alternative_wqv_cf - 3571.92) < 1e-6);
+  assert.ok(Math.abs(r.volume_saved_pct - 35.4330709) < 1e-6);
+  // An inch of rain on an acre is 3,630 cubic feet, exactly 43,560 / 12.
+  const unit = _v1740({ ...base, rainfall_depth_in: 1, impervious_percent: 100, area_ac: 1, alternative_impervious_percent: 0 });
+  assert.ok(Math.abs(unit.runoff_coefficient - 0.95) < 1e-12);
+  assert.ok(Math.abs(unit.wqv_cf - 0.95 * 43560 / 12) < 1e-9);
+  // A fully pervious site still runs off five percent of the rain.
+  const pervious = _v1740({ ...base, impervious_percent: 0, alternative_impervious_percent: 0 });
+  assert.ok(Math.abs(pervious.runoff_coefficient - 0.05) < 1e-12);
+  // The volume is exactly linear in depth, in area, and in the coefficient.
+  assert.ok(Math.abs(_v1740({ ...base, rainfall_depth_in: 2 }).wqv_cf - 2 * r.wqv_cf) < 1e-9);
+  assert.ok(Math.abs(_v1740({ ...base, area_ac: 4.8 }).wqv_cf - 2 * r.wqv_cf) < 1e-9);
+  // The release rate, run for the drawdown time, empties exactly the volume.
+  assert.ok(Math.abs(r.release_rate_cfs * base.drawdown_hours * 3600 - r.wqv_cf) < 1e-6);
+  // Halving the drawdown time doubles the release rate.
+  assert.ok(Math.abs(_v1740({ ...base, drawdown_hours: 12 }).release_rate_cfs - 2 * r.release_rate_cfs) < 1e-9);
+  assert.ok("error" in _v1740({ ...base, impervious_percent: 120 }));
+  assert.ok("error" in _v1740({ ...base, rainfall_depth_in: 0 }));
+});
+
+import { computeDroneGsdOverlap as _v1741 } from "../../calc-survey.js";
+test("bounds: spec-v1741 computeDroneGsdOverlap -- four times the images for twice the detail", () => {
+  const base = { flight_height_ft: 400, focal_length_mm: 24, pixel_pitch_um: 1.38, sensor_width_px: 8192, sensor_height_px: 5460, forward_overlap_pct: 75, side_overlap_pct: 65, area_acres: 40 };
+  const r = _v1741(base);
+  assert.ok(Math.abs(r.gsd_cm_px - 0.70104) < 1e-4);
+  assert.ok(r.image_count > 0);
+  // GSD is exactly linear in height and in pitch, and inverse in focal length.
+  assert.ok(Math.abs(_v1741({ ...base, flight_height_ft: 200 }).gsd_cm_px - r.gsd_cm_px / 2) < 1e-9);
+  assert.ok(Math.abs(_v1741({ ...base, pixel_pitch_um: 2.76 }).gsd_cm_px - 2 * r.gsd_cm_px) < 1e-9);
+  assert.ok(Math.abs(_v1741({ ...base, focal_length_mm: 48 }).gsd_cm_px - r.gsd_cm_px / 2) < 1e-9);
+  // The headline: half the height is half the GSD and FOUR times the images,
+  // because both footprint dimensions halve at once.
+  const lower = _v1741({ ...base, flight_height_ft: 200 });
+  assert.ok(Math.abs(lower.gsd_cm_px - r.half_height_gsd_cm_px) < 1e-9);
+  assert.ok(Math.abs(lower.footprint_width_ft - r.footprint_width_ft / 2) < 1e-9);
+  assert.ok(Math.abs(lower.footprint_height_ft - r.footprint_height_ft / 2) < 1e-9);
+  assert.ok(Math.abs(lower.effective_area_ft2 - r.effective_area_ft2 / 4) < 1e-6);
+  assert.equal(r.half_height_image_count, r.image_count * 4);
+  // Zero overlap makes the spacing the whole footprint, exactly.
+  const none = _v1741({ ...base, forward_overlap_pct: 0, side_overlap_pct: 0 });
+  assert.ok(Math.abs(none.line_spacing_ft - none.footprint_width_ft) < 1e-9);
+  assert.ok(Math.abs(none.shot_interval_ft - none.footprint_height_ft) < 1e-9);
+  // More overlap is more images over the same ground.
+  const dense = _v1741({ ...base, forward_overlap_pct: 85, side_overlap_pct: 80 });
+  assert.ok(dense.image_count > r.image_count);
+  assert.ok("error" in _v1741({ ...base, side_overlap_pct: 100 }));
+  assert.ok("error" in _v1741({ ...base, focal_length_mm: 0 }));
+});
+
+import { computeLidarPointDensity as _v1742 } from "../../calc-survey.js";
+test("bounds: spec-v1742 computeLidarPointDensity -- altitude is the expensive lever", () => {
+  const base = { pulse_rate_khz: 400, scan_angle_deg: 60, flight_height_m: 120, ground_speed_ms: 45, side_overlap_pct: 20, area_acres: 500 };
+  const r = _v1742(base);
+  // spec-v1742 left both of these as unrendered python placeholders.
+  assert.ok(Math.abs(r.swath_width_m - 138.564065) < 1e-5);
+  assert.ok(Math.abs(r.point_density_per_m2 - 64.1500299) < 1e-5);
+  assert.ok(Math.abs(r.half_speed_density - 2 * r.point_density_per_m2) < 1e-9);
+  assert.ok(Math.abs(r.half_height_density - 2 * r.point_density_per_m2) < 1e-9);
+  // Both levers double the density, and that is the point: the difference is
+  // what they cost. Halving the height halves the swath, so the lines double.
+  assert.ok(Math.abs(r.half_height_swath_m - r.swath_width_m / 2) < 1e-9);
+  assert.ok(Math.abs(r.half_height_line_multiple - 2) < 1e-9);
+  // Density is exactly linear in pulse rate and inverse in speed and swath.
+  assert.ok(Math.abs(_v1742({ ...base, pulse_rate_khz: 800 }).point_density_per_m2 - 2 * r.point_density_per_m2) < 1e-9);
+  assert.ok(Math.abs(_v1742({ ...base, ground_speed_ms: 90 }).point_density_per_m2 - r.point_density_per_m2 / 2) < 1e-9);
+  // Point spacing is the reciprocal square root of density, always.
+  assert.ok(Math.abs(r.point_spacing_m * r.point_spacing_m * r.point_density_per_m2 - 1) < 1e-9);
+  // A 90 degree scan makes the swath exactly twice the flight height.
+  const wide = _v1742({ ...base, scan_angle_deg: 90 });
+  assert.ok(Math.abs(wide.swath_width_m - 2 * base.flight_height_m) < 1e-9);
+  // Zero side overlap makes the line spacing the whole swath.
+  const nolap = _v1742({ ...base, side_overlap_pct: 0 });
+  assert.ok(Math.abs(nolap.line_spacing_m - nolap.swath_width_m) < 1e-9);
+  assert.ok("error" in _v1742({ ...base, scan_angle_deg: 180 }));
+  assert.ok("error" in _v1742({ ...base, ground_speed_ms: 0 }));
+});
+
+import { computeRtkErrorBudget as _v1743 } from "../../calc-survey.js";
+test("bounds: spec-v1743 computeRtkErrorBudget -- a base error adds, it does not average out", () => {
+  const base = { baseline_km: 10, horizontal_fixed_mm: 8, horizontal_ppm: 1, vertical_fixed_mm: 15, vertical_ppm: 1, base_position_error_mm: 1500, target_vertical_mm: 30 };
+  const r = _v1743(base);
+  assert.ok(Math.abs(r.horizontal_error_mm - 18) < 1e-12);
+  assert.ok(Math.abs(r.vertical_error_mm - 25) < 1e-12);
+  // spec-v1743 left this ratio as an unrendered python placeholder.
+  assert.ok(Math.abs(r.vertical_ratio - 25 / 18) < 1e-12);
+  assert.ok(Math.abs(r.vertical_ratio - 1.38888889) < 1e-8);
+  assert.equal(r.base_error_dominates, true);
+  assert.ok(Math.abs(r.base_error_multiple - 1500 / 18) < 1e-9);
+  // The base error ADDS rather than combining in quadrature, because it is a
+  // systematic shift on every observation of the session.
+  assert.ok(Math.abs(r.total_horizontal_mm - (r.horizontal_error_mm + base.base_position_error_mm)) < 1e-12);
+  assert.ok(r.total_horizontal_mm > Math.hypot(r.horizontal_error_mm, base.base_position_error_mm));
+  // At the base itself only the fixed component remains.
+  const atBase = _v1743({ ...base, baseline_km: 0.000001, base_position_error_mm: 0 });
+  assert.ok(Math.abs(atBase.horizontal_error_mm - base.horizontal_fixed_mm) < 1e-6);
+  assert.ok(Math.abs(atBase.vertical_error_mm - base.vertical_fixed_mm) < 1e-6);
+  // The ppm term is exactly linear in the baseline.
+  assert.ok(Math.abs(_v1743({ ...base, baseline_km: 20 }).horizontal_ppm_mm - 2 * r.horizontal_ppm_mm) < 1e-12);
+  // The baseline that just meets a target, fed back in, meets it exactly.
+  const target = _v1743({ ...base, target_vertical_mm: 20 });
+  assert.ok(target.baseline_for_target_km > 0);
+  const at = _v1743({ ...base, baseline_km: target.baseline_for_target_km, target_vertical_mm: 20 });
+  assert.ok(Math.abs(at.vertical_error_mm - 20) < 1e-9);
+  assert.equal(at.meets_target, true);
+  // A target below the fixed component is unreachable at any baseline.
+  const impossible = _v1743({ ...base, target_vertical_mm: 10 });
+  assert.equal(impossible.baseline_for_target_km, null);
+  assert.equal(impossible.meets_target, false);
+  assert.ok("error" in _v1743({ ...base, baseline_km: 0 }));
+  assert.ok("error" in _v1743({ ...base, base_position_error_mm: -1 }));
+});
+
+import { computeMassHaulOverhaul as _v1744 } from "../../calc-survey.js";
+test("bounds: spec-v1744 computeMassHaulOverhaul -- shrinkage before balance, always", () => {
+  const base = { cut_volume_cy: 12000, shrinkage_factor: 0.9, fill_required_cy: 10800, free_haul_ft: 1000, overhaul_volume_cy: 4200, average_overhaul_distance_ft: 2600, overhaul_rate_per_station_yard: 0.85, borrow_haul_ft: 1800 };
+  const r = _v1744(base);
+  assert.ok(Math.abs(r.compacted_from_cut_cy - 10800) < 1e-9);
+  assert.ok(Math.abs(r.balance_cy) < 1e-9);
+  assert.equal(r.balanced, true);
+  assert.ok(r.balance_verdict.startsWith("BALANCED"));
+  // Overhaul is a volume-distance product in station-yards: 4,200 cy carried
+  // 1,600 ft past free haul is 67,200 station-yards.
+  assert.ok(Math.abs(r.beyond_free_haul_ft - 1600) < 1e-12);
+  assert.ok(Math.abs(r.overhaul_station_yards - 67200) < 1e-9);
+  assert.ok(Math.abs(r.overhaul_cost - 67200 * 0.85) < 1e-6);
+  // Borrow at 1,800 ft is half the station-yards, so it wins on distance.
+  assert.ok(Math.abs(r.borrow_station_yards - 33600) < 1e-9);
+  assert.equal(r.borrow_cheaper, true);
+  // A haul entirely inside free haul costs no overhaul at all.
+  const inside = _v1744({ ...base, average_overhaul_distance_ft: 800 });
+  assert.ok(Math.abs(inside.beyond_free_haul_ft) < 1e-12);
+  assert.ok(Math.abs(inside.overhaul_station_yards) < 1e-12);
+  // Shrinkage runs both ways: rock that swells yields MORE than its in-place
+  // measurement, and the balance follows.
+  const rock = _v1744({ ...base, shrinkage_factor: 1.15 });
+  assert.ok(rock.compacted_from_cut_cy > base.cut_volume_cy);
+  assert.equal(rock.surplus, true);
+  assert.ok(rock.balance_verdict.startsWith("SURPLUS"));
+  const soft = _v1744({ ...base, shrinkage_factor: 0.75 });
+  assert.equal(soft.surplus, false);
+  assert.ok(soft.balance_verdict.startsWith("DEFICIT"));
+  // The cut needed to make the fill, corrected back, gives exactly the fill.
+  const need = _v1744({ ...base, cut_volume_cy: r.cut_needed_for_fill_cy });
+  assert.ok(Math.abs(need.compacted_from_cut_cy - base.fill_required_cy) < 1e-6);
+  assert.equal(need.balanced, true);
+  assert.ok("error" in _v1744({ ...base, shrinkage_factor: 0 }));
+  assert.ok("error" in _v1744({ ...base, fill_required_cy: 0 }));
+});
+
+import { computeGreaseDuctCleaningInterval as _v1637 } from "../../calc-kitchen.js";
+test("bounds: spec-v1637 computeGreaseDuctCleaningInterval -- the measurement governs the schedule", () => {
+  const base = { inspection_interval_months: 3, months_since_inspection: 5, measured_thickness_um: 2400, cleaning_trigger_um: 2000, inspection_point_trigger_um: 50, is_designated_point: 0 };
+  const r = _v1637(base);
+  assert.ok(Math.abs(r.months_overdue - 2) < 1e-12);
+  assert.equal(r.inspection_overdue, true);
+  assert.equal(r.cleaning_triggered, true);
+  assert.ok(Math.abs(r.applicable_trigger_um - 2000) < 1e-12);
+  assert.ok(Math.abs(r.inspections_per_year - 4) < 1e-12);
+  assert.ok(r.measurement_verdict.startsWith("CLEAN NOW"));
+  // A designated inspection point carries a far tighter trigger, so the same
+  // measurement is even further past it.
+  const designated = _v1637({ ...base, is_designated_point: 1 });
+  assert.ok(Math.abs(designated.applicable_trigger_um - 50) < 1e-12);
+  assert.equal(designated.cleaning_triggered, true);
+  assert.ok(designated.thickness_ratio > r.thickness_ratio);
+  // The two tests are independent: on schedule and over the trigger still
+  // means clean now.
+  const onTime = _v1637({ ...base, months_since_inspection: 1 });
+  assert.equal(onTime.inspection_overdue, false);
+  assert.equal(onTime.cleaning_triggered, true);
+  assert.ok(onTime.schedule_verdict.startsWith("ON SCHEDULE"));
+  assert.ok(onTime.measurement_verdict.startsWith("CLEAN NOW"));
+  // And overdue with a clean duct is still overdue.
+  const clean = _v1637({ ...base, measured_thickness_um: 100 });
+  assert.equal(clean.inspection_overdue, true);
+  assert.equal(clean.cleaning_triggered, false);
+  // Interval and frequency are exact reciprocals over twelve months.
+  for (const m of [1, 3, 6, 12]) {
+    const x = _v1637({ ...base, inspection_interval_months: m });
+    assert.ok(Math.abs(x.inspections_per_year * m - 12) < 1e-12);
+  }
+  // 2,000 micrometres is about 0.08 in, which is the field rule of thumb.
+  assert.ok(Math.abs(r.trigger_thickness_in - 2000 / 25400) < 1e-12);
+  assert.ok("error" in _v1637({ ...base, inspection_interval_months: 0 }));
+  assert.ok("error" in _v1637({ ...base, cleaning_trigger_um: 0 }));
+});
+
+import { computeWalkInDoorInfiltration as _v1638 } from "../../calc-kitchen.js";
+test("bounds: spec-v1638 computeWalkInDoorInfiltration -- the open factor is the fraction of the hour", () => {
+  const base = { door_width_ft: 4, door_height_ft: 7, full_open_cfm: 2100, openings_per_hour: 60, seconds_open_each: 20, protection_factor: 1, enthalpy_difference_btu_lb: 24.5, moisture_difference_lb_lb: 0.0092, air_density_lb_ft3: 0.0765 };
+  const r = _v1638(base);
+  assert.ok(Math.abs(r.door_area_ft2 - 28) < 1e-12);
+  assert.ok(Math.abs(r.door_open_factor - 1 / 3) < 1e-9);
+  assert.ok(Math.abs(r.effective_cfm - 700) < 1e-6);
+  assert.ok(Math.abs(r.mass_flow_lb_hr - 700 * 60 * 0.0765) < 1e-6);
+  assert.ok(Math.abs(r.total_load_btuh - r.mass_flow_lb_hr * 24.5) < 1e-6);
+  // Sensible and latent always sum to the total.
+  assert.ok(Math.abs(r.sensible_load_btuh + r.latent_load_btuh - r.total_load_btuh) < 1e-6);
+  // The tile computes the latent share rather than asserting it: at these two
+  // conditions it is about 40%, not "most".
+  assert.ok(r.latent_share_pct > 30 && r.latent_share_pct < 50);
+  // Protection is exactly multiplicative on everything downstream of it.
+  const strips = _v1638({ ...base, protection_factor: 0.4 });
+  assert.ok(Math.abs(strips.effective_cfm - 0.4 * r.effective_cfm) < 1e-9);
+  assert.ok(Math.abs(strips.total_load_btuh - 0.4 * r.total_load_btuh) < 1e-6);
+  assert.ok(Math.abs(strips.frost_lb_day - 0.4 * r.frost_lb_day) < 1e-6);
+  assert.ok(Math.abs(strips.reduction_pct - 60) < 1e-9);
+  assert.ok(Math.abs(strips.unprotected_load_btuh - r.total_load_btuh) < 1e-6);
+  // A door open all the time has an open factor of exactly one.
+  const propped = _v1638({ ...base, openings_per_hour: 1, seconds_open_each: 3600 });
+  assert.ok(Math.abs(propped.door_open_factor - 1) < 1e-12);
+  assert.ok(Math.abs(propped.effective_cfm - base.full_open_cfm) < 1e-9);
+  // With no moisture difference the load is entirely sensible.
+  const dry = _v1638({ ...base, moisture_difference_lb_lb: 0 });
+  assert.ok(Math.abs(dry.latent_load_btuh) < 1e-12);
+  assert.ok(Math.abs(dry.frost_lb_day) < 1e-12);
+  assert.ok(Math.abs(dry.sensible_load_btuh - dry.total_load_btuh) < 1e-6);
+  assert.ok("error" in _v1638({ ...base, protection_factor: 1.5 }));
+  assert.ok("error" in _v1638({ ...base, enthalpy_difference_btu_lb: 0 }));
+});
+
+import { computeKitchenMakeupAirDeficit as _v1639 } from "../../calc-kitchen.js";
+test("bounds: spec-v1639 computeKitchenMakeupAirDeficit -- a starved hood cannot make its rating", () => {
+  const base = { hood_exhaust_cfm: 6000, other_exhaust_cfm: 0, dedicated_makeup_cfm: 4800, intended_transfer_cfm: 400, building_leakage_cfm_per_pa: 120, door_width_ft: 3, door_height_ft: 7 };
+  const r = _v1639(base);
+  assert.ok(Math.abs(r.deficit_cfm - 1200) < 1e-12);
+  assert.ok(Math.abs(r.deficit_percent - 20) < 1e-12);
+  assert.ok(Math.abs(r.uncontrolled_cfm - 800) < 1e-12);
+  assert.ok(Math.abs(r.makeup_shortfall_cfm - 800) < 1e-12);
+  assert.equal(r.balanced, false);
+  assert.ok(Math.abs(r.pressure_pa - 800 / 120) < 1e-9);
+  assert.equal(r.door_force_ok, true);
+  // The deficit is exhaust less makeup, and other exhaust counts in it.
+  const withRestroom = _v1639({ ...base, other_exhaust_cfm: 600 });
+  assert.ok(Math.abs(withRestroom.deficit_cfm - r.deficit_cfm - 600) < 1e-12);
+  // Enough makeup air to cover the deficit less the intended transfer reads
+  // as balanced, and nothing is left uncontrolled.
+  const fixed = _v1639({ ...base, dedicated_makeup_cfm: base.hood_exhaust_cfm - base.intended_transfer_cfm });
+  assert.equal(fixed.balanced, true);
+  assert.ok(Math.abs(fixed.makeup_shortfall_cfm) < 1e-9);
+  // Pressure is inverse in the leakage: a tighter building turns the same
+  // shortfall into a much larger negative pressure and door force.
+  const tight = _v1639({ ...base, building_leakage_cfm_per_pa: 20 });
+  assert.ok(Math.abs(tight.pressure_pa - 6 * r.pressure_pa) < 1e-9);
+  assert.ok(Math.abs(tight.door_force_lbf - 6 * r.door_force_lbf) < 1e-6);
+  // Tighter still and the door passes the egress limit, which is a life
+  // safety finding before it is a comfort one.
+  const verytight = _v1639({ ...base, building_leakage_cfm_per_pa: 10 });
+  assert.ok(verytight.door_force_lbf > 30);
+  assert.equal(verytight.door_force_ok, false);
+  assert.ok(verytight.door_verdict.startsWith("DOOR FORCE OVER THE EGRESS LIMIT"));
+  // Door force is exactly the pressure over the door area.
+  assert.ok(Math.abs(r.door_force_lbf - r.pressure_psf * r.door_area_ft2) < 1e-9);
+  assert.ok(Math.abs(r.door_area_ft2 - 21) < 1e-12);
+  assert.ok("error" in _v1639({ ...base, hood_exhaust_cfm: 0 }));
+  assert.ok("error" in _v1639({ ...base, dedicated_makeup_cfm: -1 }));
+});
+
+import { computeWellDrawdown as _v1737host } from "../../calc-water.js";
+test("bounds: spec-v1737 cut -- well-drawdown gains storativity, Cooper-Jacob untouched", () => {
+  // The old answer is unchanged with none of the new inputs, which is what
+  // makes this additive.
+  const r = _v1737host({ static_level_ft: 50, pumping_level_ft: 80, discharge_gpm: 30 });
+  assert.ok(Math.abs(r.drawdown_ft - 30) < 1e-12);
+  assert.ok(Math.abs(r.specific_capacity_gpm_ft - 1) < 1e-12);
+  assert.ok(Math.abs(r.pump_setting_ft - 100) < 1e-12);
+  assert.equal(r.transmissivity_gpd_ft, null);
+  assert.equal(r.storativity, null);
+  assert.equal(r.hydraulic_conductivity_gpd_ft2, null);
+  assert.equal(r.aquifer_test_valid, false);
+  // spec-v1737's own worked example: 250 gpm at 8.4 ft per log cycle. That
+  // relation was already here, which is why the spec was cut.
+  const t = _v1737host({ static_level_ft: 50, pumping_level_ft: 80, discharge_gpm: 250, delta_s_per_log_ft: 8.4 });
+  assert.ok(Math.abs(t.transmissivity_gpd_ft - 264 * 250 / 8.4) < 1e-6);
+  assert.ok(Math.abs(t.transmissivity_gpd_ft - 7857.14286) < 1e-4);
+  // Storativity needs an OBSERVATION well: from the pumping well it would be
+  // meaningless, and the tile returns null rather than a number.
+  assert.equal(t.storativity, null);
+  assert.equal(t.aquifer_test_valid, false);
+  const obs = _v1737host({ static_level_ft: 50, pumping_level_ft: 80, discharge_gpm: 250, delta_s_per_log_ft: 8.4, observation_distance_ft: 150, intercept_time_min: 2.5, aquifer_thickness_ft: 60 });
+  assert.equal(obs.aquifer_test_valid, true);
+  assert.ok(Math.abs(obs.storativity - 0.3 * obs.transmissivity_gpd_ft * (2.5 / 1440) / (150 * 150)) < 1e-12);
+  assert.ok(obs.storativity > 1e-5 && obs.storativity < 1e-3);
+  // Hydraulic conductivity is transmissivity over the aquifer thickness.
+  assert.ok(Math.abs(obs.hydraulic_conductivity_gpd_ft2 - obs.transmissivity_gpd_ft / 60) < 1e-9);
+  // Storativity is linear in the intercept time and inverse-square in the
+  // observation distance.
+  const farther = _v1737host({ static_level_ft: 50, pumping_level_ft: 80, discharge_gpm: 250, delta_s_per_log_ft: 8.4, observation_distance_ft: 300, intercept_time_min: 2.5, aquifer_thickness_ft: 60 });
+  assert.ok(Math.abs(farther.storativity - obs.storativity / 4) < 1e-12);
+  assert.ok("error" in _v1737host({ static_level_ft: 50, pumping_level_ft: 80, discharge_gpm: 250, observation_distance_ft: -1 }));
+});

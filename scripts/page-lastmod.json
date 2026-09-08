@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "1fa9c380055e7c0f",
+      "sha": "78b4c0848f6c2aed",
       "date": "2026-09-08"
     },
     "/tools/": {
-      "sha": "48090d9cbbf32e1a",
+      "sha": "c0f86b1b9cfc9244",
       "date": "2026-09-08"
     },
     "/groups/accounting/": {
-      "sha": "51cb5b452b894792",
+      "sha": "d8c627c0d656bb93",
       "date": "2026-09-08"
     },
     "/groups/agriculture/": {
-      "sha": "1bc784818e85e669",
+      "sha": "33ed7e40c3cf901f",
       "date": "2026-09-08"
     },
     "/groups/construction/": {
-      "sha": "f994ba11cbf48269",
+      "sha": "b269f476d8604b76",
       "date": "2026-09-08"
     },
     "/groups/cross-trade/": {
-      "sha": "f923baf62931197e",
+      "sha": "12816ba7efcaaa4b",
       "date": "2026-09-08"
     },
     "/groups/educators/": {
-      "sha": "7908a4c48cf38ff5",
+      "sha": "020e58ce5c9266ca",
       "date": "2026-09-08"
     },
     "/groups/electrical/": {
-      "sha": "37f4d5296446e3d5",
+      "sha": "2f0df268cfb997a5",
       "date": "2026-09-08"
     },
     "/groups/field/": {
-      "sha": "0698caa1495d748e",
+      "sha": "0db843e6c42997bf",
       "date": "2026-09-08"
     },
     "/groups/fire-ground/": {
-      "sha": "4ed17f09530267d5",
+      "sha": "ddb470b5b052252d",
       "date": "2026-09-08"
     },
     "/groups/historical/": {
-      "sha": "6b85a51a07071ecf",
+      "sha": "77d8c8cfe69801ea",
       "date": "2026-09-08"
     },
     "/groups/hvac/": {
-      "sha": "044e6793d0035e50",
+      "sha": "aa9ab007963dfa36",
       "date": "2026-09-08"
     },
     "/groups/kitchen/": {
-      "sha": "d02316b3f57ad3d3",
+      "sha": "4bbfa6fccfbc0343",
       "date": "2026-09-08"
     },
     "/groups/lab/": {
-      "sha": "6a866da8621d7d6b",
+      "sha": "aa998b9ee5a83972",
       "date": "2026-09-08"
     },
     "/groups/mechanic/": {
-      "sha": "cfd25cd603915cd8",
+      "sha": "e99829be216ab4da",
       "date": "2026-09-08"
     },
     "/groups/plumbing/": {
-      "sha": "9de6591593c2dee5",
+      "sha": "23ba31b77e4508ad",
       "date": "2026-09-08"
     },
     "/groups/real-estate/": {
-      "sha": "7468fb390ee37975",
+      "sha": "b567befd6b09545a",
       "date": "2026-09-08"
     },
     "/groups/references/": {
-      "sha": "7b0dc3113a785a5b",
+      "sha": "76cad9a61a03ecec",
       "date": "2026-09-08"
     },
     "/groups/restoration/": {
-      "sha": "c593cd79a9939225",
+      "sha": "e02c2c74701aec43",
       "date": "2026-09-08"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "65b3aa86a9976e99",
+      "sha": "3dba03ea03886c33",
       "date": "2026-09-08"
     },
     "/groups/stage/": {
-      "sha": "692d846bc3383814",
+      "sha": "5408c4acebf1939e",
       "date": "2026-09-08"
     },
     "/groups/trucking/": {
-      "sha": "f671cfd699778645",
+      "sha": "135ef375a60d488c",
       "date": "2026-09-08"
     },
     "/groups/water/": {
-      "sha": "6e5bdf723fb337cd",
+      "sha": "98d703fd9dfb64f7",
       "date": "2026-09-08"
     },
     "/tools/aav-install-check/": {
@@ -354,8 +354,8 @@
       "date": "2026-09-01"
     },
     "/tools/attic-ventilation/": {
-      "sha": "913f9f218a42587a",
-      "date": "2026-09-05"
+      "sha": "682b5ea7af24384a",
+      "date": "2026-09-08"
     },
     "/tools/awg-wire-geometry/": {
       "sha": "faba00c655a2045a",
@@ -1442,8 +1442,8 @@
       "date": "2026-09-01"
     },
     "/tools/concrete-washout-volume/": {
-      "sha": "75986973aad31881",
-      "date": "2026-09-01"
+      "sha": "6315aa372159294d",
+      "date": "2026-09-08"
     },
     "/tools/concrete-yield/": {
       "sha": "70435d6f6dacf26a",
@@ -1746,8 +1746,8 @@
       "date": "2026-09-04"
     },
     "/tools/curve-deflection-stakeout/": {
-      "sha": "29c97ff681e3c34d",
-      "date": "2026-09-05"
+      "sha": "0fa0dfb5d4de51a6",
+      "date": "2026-09-08"
     },
     "/tools/curve-grade-scaler/": {
       "sha": "865ec4e879c49413",
@@ -2097,6 +2097,10 @@
       "sha": "2a744b799f7b4b15",
       "date": "2026-09-01"
     },
+    "/tools/drone-gsd-overlap/": {
+      "sha": "81e8a584e9320296",
+      "date": "2026-09-08"
+    },
     "/tools/dry-time-projection/": {
       "sha": "30a8ccbe5e3a0297",
       "date": "2026-09-01"
@@ -2242,8 +2246,8 @@
       "date": "2026-09-01"
     },
     "/tools/earthwork-end-area/": {
-      "sha": "5d3e1e5e1f23c72b",
-      "date": "2026-09-01"
+      "sha": "1b461dc4f783da53",
+      "date": "2026-09-08"
     },
     "/tools/economic-conductor-sizing/": {
       "sha": "7ed8bf9dd4c8a11a",
@@ -3065,6 +3069,10 @@
       "sha": "ba446168ceec79dc",
       "date": "2026-09-01"
     },
+    "/tools/grease-duct-cleaning-interval/": {
+      "sha": "ec19a316454399cb",
+      "date": "2026-09-08"
+    },
     "/tools/grease-interceptor-flow-capacity/": {
       "sha": "89606a5495ee151b",
       "date": "2026-09-01"
@@ -3330,8 +3338,8 @@
       "date": "2026-09-04"
     },
     "/tools/hot-holding-energy/": {
-      "sha": "84f5a967120b1cde",
-      "date": "2026-09-01"
+      "sha": "59ee1e213a486cce",
+      "date": "2026-09-08"
     },
     "/tools/housewrap-rolls/": {
       "sha": "0d3c45da297b24c0",
@@ -3606,8 +3614,8 @@
       "date": "2026-09-01"
     },
     "/tools/keg-yield/": {
-      "sha": "8e270a768ce98eca",
-      "date": "2026-09-01"
+      "sha": "f402c70bf8993a34",
+      "date": "2026-09-08"
     },
     "/tools/key-cut-macs-check/": {
       "sha": "2f745d0380b6762f",
@@ -3628,6 +3636,10 @@
     "/tools/kingpin-to-axle/": {
       "sha": "a681ab06798ea13b",
       "date": "2026-09-01"
+    },
+    "/tools/kitchen-makeup-air-deficit/": {
+      "sha": "bf04844c0e8d5abd",
+      "date": "2026-09-08"
     },
     "/tools/kitchen-sanitizer-ppm/": {
       "sha": "3f08f336f601112d",
@@ -3724,6 +3736,10 @@
     "/tools/lexile-band/": {
       "sha": "4d1a59ee62fc811e",
       "date": "2026-09-01"
+    },
+    "/tools/lidar-point-density/": {
+      "sha": "693dffe10794e157",
+      "date": "2026-09-08"
     },
     "/tools/lifeline-tension/": {
       "sha": "af5f0c34d6e0f89d",
@@ -4020,6 +4036,10 @@
     "/tools/mass-concrete-temp-rise/": {
       "sha": "b7a003e15b48a2f6",
       "date": "2026-09-01"
+    },
+    "/tools/mass-haul-overhaul/": {
+      "sha": "de4b2043b2c85d0a",
+      "date": "2026-09-08"
     },
     "/tools/mass-moles/": {
       "sha": "9c3eccced13f5c35",
@@ -4966,8 +4986,8 @@
       "date": "2026-09-01"
     },
     "/tools/prime-cost/": {
-      "sha": "e5905afd3298157e",
-      "date": "2026-09-01"
+      "sha": "37c7ce44c4549a3e",
+      "date": "2026-09-08"
     },
     "/tools/primer-tm/": {
       "sha": "715d9ddbe562e3d7",
@@ -5174,8 +5194,8 @@
       "date": "2026-09-01"
     },
     "/tools/rail-wear-condemning-limit/": {
-      "sha": "ad3007d34468f167",
-      "date": "2026-09-05"
+      "sha": "f4fd817b719f4dec",
+      "date": "2026-09-08"
     },
     "/tools/railcar-load-limit/": {
       "sha": "f6436f294a214e01",
@@ -5641,6 +5661,10 @@
       "sha": "35cd81ffeb3a82a5",
       "date": "2026-09-01"
     },
+    "/tools/rtk-error-budget/": {
+      "sha": "5d444521f6fe38e2",
+      "date": "2026-09-08"
+    },
     "/tools/ruling-span/": {
       "sha": "fd3b50da4bdb085a",
       "date": "2026-09-07"
@@ -5805,6 +5829,10 @@
       "sha": "372171e72428e825",
       "date": "2026-09-01"
     },
+    "/tools/seepage-travel-time/": {
+      "sha": "358f67866706e1fc",
+      "date": "2026-09-08"
+    },
     "/tools/seer-eer/": {
       "sha": "407b6f3880e93c82",
       "date": "2026-09-01"
@@ -5862,8 +5890,8 @@
       "date": "2026-09-01"
     },
     "/tools/septic-drainfield/": {
-      "sha": "e5cf8e325f6708f7",
-      "date": "2026-09-01"
+      "sha": "7d31ae4cafc30761",
+      "date": "2026-09-08"
     },
     "/tools/septic-drainfield-capacity/": {
       "sha": "faa21831d3534245",
@@ -6186,8 +6214,8 @@
       "date": "2026-09-01"
     },
     "/tools/soil-activity/": {
-      "sha": "8a8b26db57466663",
-      "date": "2026-09-01"
+      "sha": "5eb1dd13039fa7ec",
+      "date": "2026-09-08"
     },
     "/tools/soil-bearing-capacity/": {
       "sha": "29debe5b9f408b81",
@@ -7477,6 +7505,10 @@
       "sha": "17aa27b9ce5b1fd4",
       "date": "2026-09-01"
     },
+    "/tools/walk-in-door-infiltration/": {
+      "sha": "1868c5834f8ebfd0",
+      "date": "2026-09-08"
+    },
     "/tools/wall-bracing-length/": {
       "sha": "5b19c0811e875dda",
       "date": "2026-09-01"
@@ -7541,6 +7573,10 @@
       "sha": "a3429c1faa68c14f",
       "date": "2026-09-01"
     },
+    "/tools/water-quality-volume/": {
+      "sha": "d3d634fdb4e6b5ac",
+      "date": "2026-09-08"
+    },
     "/tools/water-service-pressure-check/": {
       "sha": "1a0cc60c5437d7c2",
       "date": "2026-09-04"
@@ -7574,8 +7610,8 @@
       "date": "2026-09-01"
     },
     "/tools/weld-cost-per-foot/": {
-      "sha": "14a702836588b588",
-      "date": "2026-09-04"
+      "sha": "7817fba404c74eec",
+      "date": "2026-09-08"
     },
     "/tools/weld-deposit-composition/": {
       "sha": "6379e60af5ab5197",
@@ -7640,6 +7676,10 @@
     "/tools/well-max-yield/": {
       "sha": "b2e1fa49f62305cf",
       "date": "2026-09-01"
+    },
+    "/tools/well-point-spacing/": {
+      "sha": "faa34d556166defd",
+      "date": "2026-09-08"
     },
     "/tools/well-shock-chlorination/": {
       "sha": "9f6f54d02fe2a88a",

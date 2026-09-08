@@ -1,5 +1,18 @@
 # roughlogic.com Specification v1737 -- Aquifer Pump Test Transmissivity (Cooper-Jacob) (`calc-drainage.js`, Group M Water and Wastewater Operations, groundwater, 1 New Tile)
 
+> **Status: CUT 2026-09-08 -- DUPLICATE. This tile was not built.** The formula screen for the
+> 2026-09-08 groundwater, survey and kitchen band found this question already answered by
+> `well-drawdown` in `calc-water.js`, which has computed the Cooper-Jacob transmissivity
+> T = 264 Q / delta-s since spec-v23 -- this spec's headline relation, and its worked example
+> (250 gpm at 8.4 ft per log cycle giving 7,857 gpd/ft) to the digit. What the spec had that
+> the tile did not is the STORATIVITY from the zero-drawdown intercept and the hydraulic
+> conductivity for an aquifer thickness, so `well-drawdown` gained both -- and gained the
+> spec's own warning with them: storativity is reported only when an observation-well distance
+> is entered, because the pumping well's drawdown carries well loss and a storativity from it
+> is meaningless. Its answer with those inputs left at zero is unchanged.
+>
+> The specification below is kept as the record of the screen. Do not implement it.
+>
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-drainage.js`**
 > (Group M, Water and Wastewater Operations -- the existing category, hub `/groups/water/`; groundwater and stormwater), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.

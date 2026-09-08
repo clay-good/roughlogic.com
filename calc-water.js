@@ -1027,6 +1027,9 @@ export function computeWellDrawdown({
   pump_offset_ft = 20,
   delta_s_per_log_ft = 0,
   recovery_level_ft = 0,
+  observation_distance_ft = 0,
+  intercept_time_min = 0,
+  aquifer_thickness_ft = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const stat = Number(static_level_ft);
@@ -1053,12 +1056,46 @@ export function computeWellDrawdown({
   let residual_drawdown_ft = null;
   if (rec > 0 && Number.isFinite(rec)) { const v = rec - stat; if (Number.isFinite(v)) residual_drawdown_ft = v; }
 
+  // spec-v1737 pump-test-transmissivity was CUT here rather than built: the
+  // Cooper-Jacob transmissivity above IS its headline relation. What it had
+  // that this did not is the STORATIVITY from the zero-drawdown intercept and
+  // the hydraulic conductivity for an aquifer thickness. Leaving the
+  // observation distance and the intercept time at zero leaves the answer as
+  // it was. Storativity from the PUMPING well is meaningless -- its drawdown
+  // carries well loss, which is not aquifer behaviour -- so this is reported
+  // only when an observation well distance is entered.
+  const r_obs = Number(observation_distance_ft) || 0;
+  const t0 = Number(intercept_time_min) || 0;
+  const b_thick = Number(aquifer_thickness_ft) || 0;
+  if (r_obs < 0) return { error: "The observation well distance cannot be negative (ft)." };
+  if (t0 < 0) return { error: "The zero-drawdown intercept time cannot be negative (min)." };
+  if (b_thick < 0) return { error: "Aquifer thickness cannot be negative (ft)." };
+  let storativity = null;
+  if (transmissivity_gpd_ft !== null && r_obs > 0 && t0 > 0) {
+    // S = 0.3 T t0 / r^2, with T in gpd/ft, t0 in days and r in feet.
+    const t0_days = t0 / 1440;
+    const sv = 0.3 * transmissivity_gpd_ft * t0_days / (r_obs * r_obs);
+    if (Number.isFinite(sv)) storativity = sv;
+  }
+  let hydraulic_conductivity_gpd_ft2 = null;
+  if (transmissivity_gpd_ft !== null && b_thick > 0) {
+    const kv = transmissivity_gpd_ft / b_thick;
+    if (Number.isFinite(kv)) hydraulic_conductivity_gpd_ft2 = kv;
+  }
+  const aquifer_test_valid = r_obs > 0;
+
   return {
     drawdown_ft,
     specific_capacity_gpm_ft,
     pump_setting_ft,
     transmissivity_gpd_ft,
     residual_drawdown_ft,
+    observation_distance_ft: r_obs > 0 ? r_obs : null,
+    intercept_time_min: t0 > 0 ? t0 : null,
+    aquifer_thickness_ft: b_thick > 0 ? b_thick : null,
+    storativity,
+    hydraulic_conductivity_gpd_ft2,
+    aquifer_test_valid,
     warnings,
   };
 }

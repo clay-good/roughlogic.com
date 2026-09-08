@@ -1957,11 +1957,14 @@ cross-check.
 | calc-drainage.js | `computePipePartialFlowDepth` | `{ d_in = 0, slope = 0, flow_gpm = 0, material = "pvc" } = {}` | _ | _ | _ |
 | calc-drainage.js | `computeRoofDrainSizing` | `{ roof_area, rainfall_rate, drain_slope = "1/4", leader_table = null, horiz_t...` | _ | _ | _ |
 | calc-drainage.js | `computeScupperWidthForFlow` | `{ required_gpm = 0, head_in = 0 } = {}` | _ | _ | _ |
+| calc-drainage.js | `computeSeepageTravelTime` | `{ hydraulic_conductivity_ft_day = 0, head_difference_ft = 0, flow_path_ft = 0...` | _ | _ | _ |
 | calc-drainage.js | `computeSewageForceMainVelocity` | `{ gpm = 0, id_in = 0 } = {}` | _ | _ | _ |
 | calc-drainage.js | `computeSumpBasinSizing` | `{ basin_dia, drawdown_in, inflow_gpm, pump_gpm, min_run_s = 60 } = {}` | _ | _ | _ |
 | calc-drainage.js | `computeTr55DetentionStorage` | `{ qi_cfs = 0, qo_cfs = 0, runoff_in = 0, area_mi2 = 0, rainfall_type = "II" }...` | _ | _ | _ |
 | calc-drainage.js | `computeTr55GraphicalPeakDischarge` | `{ tc_hr = 0, curve_number = 0, rainfall_in = 0, area_mi2 = 0, rainfall_type =...` | _ | _ | _ |
 | calc-drainage.js | `computeTr55TimeOfConcentration` | `{ sheet_n = 0, sheet_length_ft = 0, p2_in = 0, sheet_slope = 0, shallow_surfa...` | _ | _ | _ |
+| calc-drainage.js | `computeWaterQualityVolume` | `{ rainfall_depth_in = 0, impervious_percent = 0, area_ac = 0, alternative_imp...` | _ | _ | _ |
+| calc-drainage.js | `computeWellPointSpacing` | `{ excavation_depth_ft = 0, water_table_depth_ft = 0, subgrade_margin_ft = 3, ...` | _ | _ | _ |
 | calc-drainage.js | `renderManningSlope` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-earthwork.js | `computeAtterbergIndices` | `{ ll = 0, pl = 0, w_pct = 0 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeCheckDamSpacing` | `{ dam_height_ft = 0, channel_slope_pct = 0, reach_length_ft = 0 } = {}` | _ | _ | _ |
@@ -2548,9 +2551,11 @@ cross-check.
 | calc-kitchen.js | `computeFoodCostPercentage` | `{ beginning_inventory = 0, purchases = 0, ending_inventory = 0, food_sales = ...` | _ | _ | _ |
 | calc-kitchen.js | `computeFreezingTimePlank` | `{ a_ft = 0, shape = "slab", density_pcf = 0, latent_heat_btu_lb = 0, freezing...` | _ | _ | _ |
 | calc-kitchen.js | `computeFryerOilTurnover` | `{ vat_capacity_lb = 0, daily_product_lb = 0, absorption_fraction = 0.12, oper...` | _ | _ | _ |
+| calc-kitchen.js | `computeGreaseDuctCleaningInterval` | `{ inspection_interval_months = 0, months_since_inspection = 0, measured_thick...` | _ | _ | _ |
 | calc-kitchen.js | `computeHotHoldingEnergy` | `{ equipment = [], diversity_factor = 0.65, voltage = 208, phase = "three" } = {}` | _ | _ | _ |
 | calc-kitchen.js | `computeIceMachineSizing` | `{ covers_per_day = 0, lb_per_cover = 0, derate_factor = 0.8, utilization = 0....` | _ | _ | _ |
 | calc-kitchen.js | `computeKegYield` | `{ keg_size = "half_barrel", custom_gallons = 0, serving_oz = 16, loss_fractio...` | _ | _ | _ |
+| calc-kitchen.js | `computeKitchenMakeupAirDeficit` | `{ hood_exhaust_cfm = 0, other_exhaust_cfm = 0, dedicated_makeup_cfm = 0, inte...` | _ | _ | _ |
 | calc-kitchen.js | `computeKitchenSanitizerPpm` | `{ sanitizer_type = "chlorine", active_pct = 0, target_ppm = 0, batch_gallons ...` | _ | _ | _ |
 | calc-kitchen.js | `computeMenuEngineering` | `{ units_sold = 0, menu_price = 0, food_cost = 0, total_units = 0, item_count ...` | _ | _ | _ |
 | calc-kitchen.js | `computeOverrunPercent` | `{ mix_weight_lb = 0, finished_weight_lb = 0 } = {}` | _ | _ | _ |
@@ -2564,6 +2569,7 @@ cross-check.
 | calc-kitchen.js | `computeSteamKettleHeatup` | `{ gallons = 0, specific_gravity = 1.0, specific_heat = 1.0, start_temp_f = 60...` | _ | _ | _ |
 | calc-kitchen.js | `computeThawTime` | `{ a_ft = 0, shape = "sphere", density_pcf = 0, latent_heat_btu_lb = 0, thaw_p...` | _ | _ | _ |
 | calc-kitchen.js | `computeTphcWindow` | `{ mark_time = "10:30", window_option = "cold_6", start_temp_f = 41, ambient_f...` | _ | _ | _ |
+| calc-kitchen.js | `computeWalkInDoorInfiltration` | `{ door_width_ft = 0, door_height_ft = 0, full_open_cfm = 0, openings_per_hour...` | _ | _ | _ |
 | calc-kitchen.js | `computeWarewasherHotWater` | `{ rinse_gpm = 0, supply_temp_f = 140, rinse_temp_f = 180, racks_per_hour = 0,...` | _ | _ | _ |
 | calc-kitchen.js | `computeYieldEP` | `{ ap_weight = 0, trim_weight = 0, cooking_loss_pct = 0, ap_cost_per_lb = 0 }` | _ | _ | _ |
 | calc-lab.js | `computeArrheniusEquation` | `{ k1 = 0, temp1_c = 0, k2 = 0, temp2_c = 0 } = {}` | _ | _ | _ |
@@ -3420,11 +3426,15 @@ cross-check.
 | calc-survey.js | `computeCogoInverseLocate` | `{ start_n = 0, start_e = 0, end_n = 0, end_e = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeDifferentialLeveling` | `{ bm_elev = 0, bs, fs, known_close = null } = {}` | _ | _ | _ |
 | calc-survey.js | `computeDistanceDistanceIntersect` | `{ n0_ft = 0, e0_ft = 0, dist0_ft = 0, n1_ft = 0, e1_ft = 0, dist1_ft = 0 } = {}` | _ | _ | _ |
+| calc-survey.js | `computeDroneGsdOverlap` | `{ flight_height_ft = 0, focal_length_mm = 0, pixel_pitch_um = 0, sensor_width...` | _ | _ | _ |
 | calc-survey.js | `computeEdmSlopeReduction` | `{ angle_mode, slope_distance_ft = 0, angle_deg = 0, hi_ft = 0, hr_ft = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeGradeRodCutFill` | `{ benchmark_elev_ft = 0, backsight_ft = 0, design_elev_ft = 0, ground_rod_ft ...` | _ | _ | _ |
 | calc-survey.js | `computeGridToGround` | `{ grid_distance_ft = 0, grid_scale_factor = 1, ellipsoid_height_ft = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeLevelLoopAdjustment` | `{ elevs, dists, known_close = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeLevelingCurvatureRefraction` | `{ sight_distance_ft = 0 } = {}` | _ | _ | _ |
+| calc-survey.js | `computeLidarPointDensity` | `{ pulse_rate_khz = 0, scan_angle_deg = 0, flight_height_m = 0, ground_speed_m...` | _ | _ | _ |
+| calc-survey.js | `computeMassHaulOverhaul` | `{ cut_volume_cy = 0, shrinkage_factor = 0.9, fill_required_cy = 0, free_haul_...` | _ | _ | _ |
+| calc-survey.js | `computeRtkErrorBudget` | `{ baseline_km = 0, horizontal_fixed_mm = 8, horizontal_ppm = 1, vertical_fixe...` | _ | _ | _ |
 | calc-survey.js | `computeSlopeStaking` | `{ half_width_ft = 0, depth_ft = 0, side_slope_ratio = 2, ground_cross_slope =...` | _ | _ | _ |
 | calc-survey.js | `computeStadiaDistance` | `{ s_ft = 0, theta_deg = 0, k_f = 100, hi_ft = 0, rod_ft = 0, sta_elev = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeTapingCorrections` | `{ l_ft = 0, t_f = 68, t0_f = 68, h_ft = 0, p_lb = 0, p0_lb = 0, a_in2 = 0, w_...` | _ | _ | _ |
@@ -3605,7 +3615,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2191.
+Row count: 2201.
 
 <!-- END function-corpus-v14 -->
 
@@ -4288,7 +4298,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (550 tiles)
+### Group E Construction (557 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4439,6 +4449,7 @@ per spec-v14 §13.1 second paragraph.
 | `drainage-board-takeoff` | Foundation Drainage Board (Dimple Mat) Takeoff | Foundation drainage board (dimple mat...; area = 150 x 8 = 1,200 sf; rolls = ceil(1200 x 1.1 / 200)... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drinking-fountain-check` | Drinking Fountain Heights and Count (2010 ADA Standards 211, 602) | US Department of Justice / US Access ...; 602.4 puts the wheelchair spout outlet at 36 in MAXIMUM a... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drip-edge-takeoff` | Roof Drip Edge Rake / Eave Split and Piece Count | roof takeoff geometry; 80 ft of eave plus four 14-ft rakes at 6:12 -> slope fact... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `drone-gsd-overlap` | Drone Flight GSD, Overlap, and Image Count | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dryer-duct-length` | Dryer Exhaust Duct Developed Length (IRC M1502.4.5) | International Code Council; 'The maximum length of the exhaust duct shall be 35 feet ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drywall` | Drywall Sheet Count and Mud | Project (first-principles); sheets = ceil(1.10 * 1800 / 32) = 62; mud = 0.053 * 1800 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `drywall-fastener-takeoff` | Drywall Screw Fastener Takeoff | Drywall fastener identity (first-prin...; studs=floor(48/16)+1=4; screws/stud=floor(96/12)+1=9; per... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4538,6 +4549,7 @@ per spec-v14 §13.1 second paragraph.
 | `lateral-earth-pressure` | Lateral Earth Pressure and Thrust (Rankine) | Rankine (1857) as compiled in Das / N...; spec-v261 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lavatory-tub-clearance` | Lavatory Height and Bathtub Clearance (2010 ADA Standards 606, 607) | US Department of Justice / US Access ...; 606.3: 'Lavatories and sinks shall be installed with the ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `layout-squaring` | Layout Squaring (3-4-5) | Pythagorean 3-4-5 method (public); sides 3 and 4 -> diagonal 5 exactly (the 3-4-5 right tria... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `lidar-point-density` | LiDAR Point Density and Flight Line Spacing | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `liquefaction-screening` | Liquefaction Triggering Screening (Seed-Idriss CSR) | Seed-Idriss; spec-v416 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `loader-production` | Wheel-Loader / Excavator Bucket Production Rate | Caterpillar Performance Handbook cycl...; 3.5 lcy bucket, 0.95 fill, 0.50 min cycle, 50-min hour, 8... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `locate-depth-offset` | Utility Locate Depth Cross-Check and Distortion Screen | Project (first-principles); exposing the utility establishes position and depth | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4558,6 +4570,7 @@ per spec-v14 §13.1 second paragraph.
 | `masonry-prism-fm` | Masonry Compressive Strength f'm, Unit-Strength Method (TMS 602 Table 2) | TMS 602-16 (ACI 530.1 / ASCE 6) Table...; spec-v551 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `masonry-wall-weight` | Masonry Wall Dead Load | NCMA TEK; spec-v368 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `mass-concrete-temp-rise` | Mass Concrete Adiabatic Temperature Rise Screen (ACI 207) | ACI 207 adiabatic temperature-rise sc...; rise = 600*12/100 = 72 degF; peak = 70+72 = 142 degF; 72 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `mass-haul-overhaul` | Mass Haul Balance, Free Haul, and Overhaul | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mast-climber-platform-load` | Mast Climbing Work Platform Zone Load | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `master-key-bitting-capacity` | Master Key System Depth and Change Key Capacity | Project (first-principles); the manufacturer's system specification governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `material-quantity` | Material Quantity | Project (industry coverage rules); 1000 ft^2 / drywall 4x8 (32 ft^2 per sheet, 10% waste) ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4653,6 +4666,7 @@ per spec-v14 §13.1 second paragraph.
 | `roofing-squares` | Roofing Squares and Bundles | Project (industry rule of thumb); 2200 ft^2 roof / 6:12 pitch (12% waste) / architectural s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rope-safety-factor` | Elevator Suspension Rope Factor of Safety | Project (first-principles); ASME A17.1 speed-dependent minimums named; the minimum is... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rough-opening-size` | Window / Door Rough Opening Size | US framing convention; slab + 2 in wide / + 2.5 in tall -> 38 x 82.5 RO; header ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `rtk-error-budget` | RTK Baseline Error Budget and Vertical Uncertainty | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rusle-soil-loss` | RUSLE Annual Soil Loss | RUSLE (USDA Agriculture Handbook 703); A = 150*0.32*1.5*1.0*1.0 = 72 tons/acre/yr; site = 72*5 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sag-vertical-curve` | Sag Vertical Curve Length for Headlight SSD (AASHTO) | AASHTO Green Book (sag headlight crit...; spec-v636 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sag-vertical-curve-comfort` | Sag Vertical Curve Comfort and Drainage (AASHTO) | AASHTO Green Book (sag comfort criter...; spec-v638 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4667,6 +4681,7 @@ per spec-v14 §13.1 second paragraph.
 | `secondary-compression-settlement` | Secondary Compression (Creep) Settlement | Das, Principles of Geotechnical Engin...; C-alpha-eps = C-alpha/(1+ep) = 0.02/1.85 = 0.010811. Ss =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `section-properties` | Cross-Section Properties (A, I, S, r) | mechanics of materials; spec-v342 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sediment-basin-volume` | Sediment Basin / Trap Storage Volume | Sediment-basin storage identity (cons...; required = 5*3600 = 18,000 cf (667 cy); surface = 18000/3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `seepage-travel-time` | Groundwater Seepage Velocity and Travel Time | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `seismic-approximate-period` | Approximate Fundamental Period Ta (ASCE 7 §12.8.2.1) | ASCE 7 §12.8.2.1 approximate fundamen...; Ta = Ct hn^x = 0.028 x 120^0.8 = 0.028 x 46.06 = 1.290 s;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `seismic-base-shear` | Seismic Base Shear (ASCE 7 §12.8 Equivalent Lateral Force) | ASCE 7 §12.8 equivalent lateral force; spec-v226 section 2.1 pinned example (short period) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `seismic-design-spectral-acceleration` | Design Spectral Response Accelerations SDS / SD1 (ASCE 7-22 11.4) | ASCE 7-22 11.4; spec-v381 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4807,6 +4822,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-cement-ratio` | Water-Cementitious Ratio and Exposure Cap (ACI 318) | ACI 318 Table 19.3.2.1; ACI 211.1 (wa...; 282 lb water / (470 cement + 94 fly ash = 564) = 0.50, ex... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-closet-location` | Water Closet Location and Seat Height (2010 ADA Standards 604) | US Department of Justice / US Access ...; 604.2: 'The centerline of the water closet shall be 16 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-for-compaction` | Water to Reach Optimum Moisture for Compaction | Gravimetric water-content identity (f...; dry weight = 100*27*105 = 283,500 lb; water = 0.05*283,50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `water-quality-volume` | Stormwater Water Quality Volume and Drawdown | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `weld-cooling-rate-t85` | Weld Cooling Time and the Thickness Transition | Project (first-principles); 2D and 3D heat flow, and the transition | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `weld-cost-per-foot` | All-In Welding Cost per Foot | AWS welding cost and consumable refer...; 0.10 lb/ft, 95% eff, $2.50/lb, 8 lb/hr, 30% factor, $65/h... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `weld-deposit-composition` | Diluted Weld Deposit Composition | welding metallurgy / AWS (dilution mi...; deposit% = D x base% + (1 - D) x filler% = 0.30 x 0 + 0.7... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4821,6 +4837,7 @@ per spec-v14 §13.1 second paragraph.
 | `weld-travel-speed` | Weld Travel Speed for a Target Heat Input | AWS / ASME; spec-v358 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `weld-usage` | Welding Rod and Wire Usage | AWS / Lincoln / Miller welding-engine...; GMAW / 0.05 in^2 cross-section / 120 in weld / 4 lb/min -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `welded-wire-mesh` | Welded-Wire Reinforcement (Mesh) Sheet Takeoff | Lapped-coverage identity (first-princ...; effective = (5-0.5)(10-0.5) = 42.75 sf; gross = 2000*1.05... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `well-point-spacing` | Well Point Dewatering Spacing and Staging | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wind-cc-pressure` | Wind Components and Cladding Pressure (ASCE 7 Ch. 30) | ASCE 7-22 Chapter 30; spec-v296 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wind-gust-effect-factor` | Gust-Effect Factor G (ASCE 7 §26.11) | ASCE 7 §26.11.4 rigid gust-effect factor; zbar = max(0.6*30, 15) = 18 ft; Iz = 0.20*(33/18)^(1/6) =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wind-mwfrs-pressure` | MWFRS Wall Pressure (ASCE 7 Ch. 27) | ASCE 7-22 Chapter 27; spec-v298 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5454,7 +5471,7 @@ per spec-v14 §13.1 second paragraph.
 | `winch-fleet-angle` | Winch Drum Fleet Angle | Winch drum fleet angle (Wire Rope Use...; 6 in offset over a 240 in lead -> atan(0.025) = 1.43 deg,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wireless-intermod` | Two-Transmitter Intermodulation Screen | Project (first-principles); 2f1-f2, 2f2-f1, 3f1-2f2, 3f2-2f1 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group O Kitchen (33 tiles)
+### Group O Kitchen (36 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5473,9 +5490,11 @@ per spec-v14 §13.1 second paragraph.
 | `food-cost-percentage` | Period Food-Cost Percentage | Standard restaurant-accounting identi...; spec-v90 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `freezing-time-plank` | Freezing Time by Plank's Equation | ASHRAE; Plank's equation, slab constants 1/2 and 1/8 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fryer-oil-turnover` | Fryer Oil Turnover, Life, and Annual Cost | Project (first-principles); turnover = vat capacity / daily loss | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `grease-duct-cleaning-interval` | Grease Duct Buildup and Cleaning Interval (NFPA 96) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hot-holding-energy` | Hot-Holding Load, Demand, and Kitchen Heat Gain | Project (first-principles); 3,412 BTU/hr per kW | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ice-machine-sizing` | Ice Machine Capacity and Bin Sizing | AHRI; 70 F air / 50 F water | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `keg-yield` | Keg Yield, Pours, and Cost per Ounce | Project (first-principles); half barrel 15.5 gal x 128 fl oz/gal | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `kitchen-makeup-air-deficit` | Kitchen Exhaust and Makeup Air Balance Deficit | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `kitchen-sanitizer-ppm` | 3-Compartment Sink Sanitizer Dilution | FDA Food Code Sec. 4-501.114 sanitizi...; Bleach 5.25% active, 100 ppm, 3-gal compartment -> 0.24 o... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `menu-engineering` | Menu Engineering Matrix | Kasavana & Smith menu-engineering model; 200 of 1000 units, 10-item menu, price $12, food cost $4,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `overrun-percent` | Ice Cream Overrun | Goff & Hartel, Ice Cream, 7th ed.; FD...; Mix 9.0 lb/gal frozen to 4.5 lb/gal -> 100% overrun, 50% ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5489,6 +5508,7 @@ per spec-v14 §13.1 second paragraph.
 | `steam-kettle-heatup` | Steam Kettle Heat-Up Time and Steam Demand | Project (first-principles); 945.6 BTU/lb at 15 psig | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thaw-time` | Refrigerated Thawing Time | ASHRAE; Plank's equation reversed, sphere constants 1/6 and 1/24 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tphc-window` | Time as a Public Health Control Window | FDA; 3-501.19 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `walk-in-door-infiltration` | Walk-In Door Infiltration Load and Frost | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `warewasher-hot-water` | Warewasher Hot-Water Demand and Booster Sizing | Project (first-principles); 500.4 BTU/hr per gpm-degree F | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `yield-ep` | Yield Percentage and Edible Portion | Project (first-principles) over Culin...; 10 lb AP / 1.5 lb trim / 15% cooking loss / $8/lb -> 72.2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
@@ -5718,6 +5738,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1940. Fixture-covered or reference-cadence: 1940 / 1940.
+Tile count: 1950. Fixture-covered or reference-cadence: 1950 / 1950.
 
 <!-- END tile-index-v14 -->

@@ -101538,6 +101538,662 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "seepage-travel-time",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Groundwater Seepage Velocity and Travel Time -- the spec-v1738 worked example, recomputed",
+   "source_edition_or_year": "spec-v1738 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "hydraulic_conductivity_ft_day": 25,
+    "head_difference_ft": 2,
+    "flow_path_ft": 500,
+    "effective_porosity": 0.28,
+    "travel_distance_ft": 500,
+    "retardation_factor": 1
+   },
+   "outputs": {
+    "gradient": {
+     "value": 0.004,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "darcy_velocity_ft_day": {
+     "value": 0.1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "seepage_velocity_ft_day": {
+     "value": 0.35714,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "travel_time_days": {
+     "value": 1400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "travel_time_years": {
+     "value": 3.83299,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "darcy_travel_time_years": {
+     "value": 13.68925,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "overstatement_x": {
+     "value": 3.57143,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "well-point-spacing",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Well Point Dewatering Spacing and Staging -- the spec-v1739 worked example, recomputed",
+   "source_edition_or_year": "spec-v1739 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "excavation_depth_ft": 22,
+    "water_table_depth_ft": 6,
+    "subgrade_margin_ft": 3,
+    "practical_lift_ft": 15,
+    "excavation_length_ft": 100,
+    "excavation_width_ft": 60,
+    "point_spacing_ft": 5,
+    "point_capacity_gpm": 15
+   },
+   "outputs": {
+    "total_drawdown_ft": {
+     "value": 19,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "stages_required": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "drawdown_per_stage_ft": {
+     "value": 9.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "perimeter_ft": {
+     "value": 320,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "points_per_stage": {
+     "value": 64,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "point_count": {
+     "value": 128,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "system_capacity_gpm": {
+     "value": 960,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "header_length_ft": {
+     "value": 640,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "water-quality-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Stormwater Water Quality Volume and Drawdown -- the spec-v1740 worked example, recomputed",
+   "source_edition_or_year": "spec-v1740 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "rainfall_depth_in": 1,
+    "impervious_percent": 65,
+    "area_ac": 2.4,
+    "alternative_impervious_percent": 40,
+    "drawdown_hours": 24
+   },
+   "outputs": {
+    "runoff_coefficient": {
+     "value": 0.635,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wqv_cf": {
+     "value": 5532.12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wqv_ac_ft": {
+     "value": 0.127,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wqv_gal": {
+     "value": 41383.1343,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alternative_wqv_cf": {
+     "value": 3571.92,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "volume_saved_cf": {
+     "value": 1960.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "volume_saved_pct": {
+     "value": 35.43307,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "release_rate_cfs": {
+     "value": 0.06403,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drone-gsd-overlap",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Drone Flight GSD, Overlap, and Image Count -- the spec-v1741 worked example, recomputed",
+   "source_edition_or_year": "spec-v1741 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "flight_height_ft": 400,
+    "focal_length_mm": 24,
+    "pixel_pitch_um": 1.38,
+    "sensor_width_px": 8192,
+    "sensor_height_px": 5460,
+    "forward_overlap_pct": 75,
+    "side_overlap_pct": 65,
+    "area_acres": 40
+   },
+   "outputs": {
+    "gsd_cm_px": {
+     "value": 0.70104,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "footprint_width_ft": {
+     "value": 188.416,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "footprint_height_ft": {
+     "value": 125.58,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "line_spacing_ft": {
+     "value": 65.9456,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "shot_interval_ft": {
+     "value": 31.395,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "image_count": {
+     "value": 842,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "half_height_gsd_cm_px": {
+     "value": 0.35052,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lidar-point-density",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "LiDAR Point Density and Flight Line Spacing -- the spec-v1742 worked example, recomputed",
+   "source_edition_or_year": "spec-v1742 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "pulse_rate_khz": 400,
+    "scan_angle_deg": 60,
+    "flight_height_m": 120,
+    "ground_speed_ms": 45,
+    "side_overlap_pct": 20,
+    "area_acres": 500
+   },
+   "outputs": {
+    "swath_width_m": {
+     "value": 138.56406,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "point_density_per_m2": {
+     "value": 64.15003,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "point_spacing_m": {
+     "value": 0.12485,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "line_spacing_m": {
+     "value": 110.85125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "half_speed_density": {
+     "value": 128.30006,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "half_height_density": {
+     "value": 128.30006,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "half_height_swath_m": {
+     "value": 69.28203,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rtk-error-budget",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "RTK Baseline Error Budget and Vertical Uncertainty -- the spec-v1743 worked example, recomputed",
+   "source_edition_or_year": "spec-v1743 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "baseline_km": 10,
+    "horizontal_fixed_mm": 8,
+    "horizontal_ppm": 1,
+    "vertical_fixed_mm": 15,
+    "vertical_ppm": 1,
+    "base_position_error_mm": 1500,
+    "target_vertical_mm": 30
+   },
+   "outputs": {
+    "horizontal_ppm_mm": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vertical_ppm_mm": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "horizontal_error_mm": {
+     "value": 18,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vertical_error_mm": {
+     "value": 25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vertical_ratio": {
+     "value": 1.38889,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_horizontal_mm": {
+     "value": 1518,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_vertical_mm": {
+     "value": 1525,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "base_error_multiple": {
+     "value": 83.33333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mass-haul-overhaul",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Mass Haul Balance, Free Haul, and Overhaul -- the spec-v1744 worked example, recomputed",
+   "source_edition_or_year": "spec-v1744 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "cut_volume_cy": 12000,
+    "shrinkage_factor": 0.9,
+    "fill_required_cy": 10800,
+    "free_haul_ft": 1000,
+    "overhaul_volume_cy": 4200,
+    "average_overhaul_distance_ft": 2600,
+    "overhaul_rate_per_station_yard": 0.85,
+    "borrow_haul_ft": 1800
+   },
+   "outputs": {
+    "compacted_from_cut_cy": {
+     "value": 10800,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "balance_cy": {
+     "value": 0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cut_needed_for_fill_cy": {
+     "value": 12000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "beyond_free_haul_ft": {
+     "value": 1600,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "overhaul_station_yards": {
+     "value": 67200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "overhaul_cost": {
+     "value": 57120,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "borrow_station_yards": {
+     "value": 33600,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "free_haul_stations": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "grease-duct-cleaning-interval",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Grease Duct Buildup and Cleaning Interval (NFPA 96) -- the spec-v1637 worked example, recomputed",
+   "source_edition_or_year": "spec-v1637 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "inspection_interval_months": 3,
+    "months_since_inspection": 5,
+    "measured_thickness_um": 2400,
+    "cleaning_trigger_um": 2000,
+    "inspection_point_trigger_um": 50,
+    "is_designated_point": 0
+   },
+   "outputs": {
+    "months_overdue": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "next_inspection_months": {
+     "value": 0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "inspections_per_year": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "applicable_trigger_um": {
+     "value": 2000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "thickness_margin_um": {
+     "value": -400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "thickness_ratio": {
+     "value": 1.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "measured_thickness_in": {
+     "value": 0.09449,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "walk-in-door-infiltration",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Walk-In Door Infiltration Load and Frost -- the spec-v1638 worked example, recomputed",
+   "source_edition_or_year": "spec-v1638 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "door_width_ft": 4,
+    "door_height_ft": 7,
+    "full_open_cfm": 2100,
+    "openings_per_hour": 60,
+    "seconds_open_each": 20,
+    "protection_factor": 1,
+    "enthalpy_difference_btu_lb": 24.5,
+    "moisture_difference_lb_lb": 0.0092,
+    "air_density_lb_ft3": 0.0765
+   },
+   "outputs": {
+    "door_area_ft2": {
+     "value": 28,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "door_open_factor": {
+     "value": 0.33333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "effective_cfm": {
+     "value": 700,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "mass_flow_lb_hr": {
+     "value": 3213,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_load_btuh": {
+     "value": 78718.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "latent_load_btuh": {
+     "value": 31362.7356,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "latent_share_pct": {
+     "value": 39.84163,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "frost_lb_day": {
+     "value": 709.4304,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "kitchen-makeup-air-deficit",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Kitchen Exhaust and Makeup Air Balance Deficit -- the spec-v1639 worked example, recomputed",
+   "source_edition_or_year": "spec-v1639 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "hood_exhaust_cfm": 6000,
+    "other_exhaust_cfm": 0,
+    "dedicated_makeup_cfm": 4800,
+    "intended_transfer_cfm": 400,
+    "building_leakage_cfm_per_pa": 120,
+    "door_width_ft": 3,
+    "door_height_ft": 7
+   },
+   "outputs": {
+    "total_exhaust_cfm": {
+     "value": 6000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "deficit_cfm": {
+     "value": 1200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "deficit_percent": {
+     "value": 20,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "uncontrolled_cfm": {
+     "value": 800,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "makeup_shortfall_cfm": {
+     "value": 800,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pressure_pa": {
+     "value": 6.66667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "door_force_lbf": {
+     "value": 2.92396,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "door_area_ft2": {
+     "value": 21,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

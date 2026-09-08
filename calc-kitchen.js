@@ -30,6 +30,61 @@ const _finiteGuard = (o) => {
 //
 // Scales each ingredient row by target / original yield.
 
+// Compact renderer factory, copied verbatim from calc-masonry.js (same
+// ui-fields imports) per the new-module convention; only the inner render
+// function's name differs, so the schema-coverage gates read it unchanged.
+function _simpleRenderer(spec) {
+  const _kiRender = function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      let field;
+      if (f.kind === "select") field = makeSelect(f.label, f.id || f.key, f.options);
+      else field = makeNumber(f.label, f.id || f.key, f.attrs || { step: "any", min: "0" });
+      fields[f.key] = field;
+      if (f.default !== undefined) {
+        if (f.kind === "select") field.select.value = f.default;
+        else field.input.value = String(f.default);
+      }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key];
+        else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) {
+        if (f.kind === "select") params[f.key] = fields[f.key].select.value;
+        else params[f.key] = Number(fields[f.key].input.value) || 0;
+      }
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) {
+      const el = f.kind === "select" ? fields[f.key].select : fields[f.key].input;
+      el.addEventListener(f.kind === "select" ? "change" : "input", update);
+    }
+  };
+
+  _kiRender.schema = {
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
+    citation: spec.citation ?? null,
+    scope: spec.scope ?? null,
+  };
+  return _kiRender;
+}
+
+
 export const INGREDIENT_DENSITIES_G_PER_CUP = {
   flour_ap: 125,
   sugar_granulated: 200,
@@ -2081,3 +2136,222 @@ function renderHotHoldingEnergy(inputRegion, outputRegion, citationEl) {
   }
 }
 KITCHEN_RENDERERS["hot-holding-energy"] = renderHotHoldingEnergy;
+
+// ===========================================================================
+// spec-v1637..v1639: the 2026-09-08 trade-expansion commercial kitchen band.
+// Three tiles, all group O. `hood-exhaust` in calc-hvac.js sizes the exhaust
+// itself and `mua-tempering-load` conditions the makeup air; neither computes
+// the BALANCE between them, which is v1639.
+
+// ============ spec-v1637: grease duct buildup and cleaning interval ============
+
+// dims: in { inspection_interval_months: T, months_since_inspection: T, measured_thickness_um: L, cleaning_trigger_um: L, inspection_point_trigger_um: L, is_designated_point: dimensionless } out: { months_overdue: T, next_inspection_months: T, thickness_margin_um: L, applicable_trigger_um: L, thickness_ratio: dimensionless, inspections_per_year: dimensionless }
+export function computeGreaseDuctCleaningInterval({ inspection_interval_months = 0, months_since_inspection = 0, measured_thickness_um = 0, cleaning_trigger_um = 2000, inspection_point_trigger_um = 50, is_designated_point = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(inspection_interval_months > 0)) return { error: "The inspection interval must be positive (months) -- monthly for solid fuel, quarterly for high volume, semiannually for moderate, annually for low volume." };
+  if (months_since_inspection < 0) return { error: "Months since the last inspection cannot be negative." };
+  if (measured_thickness_um < 0) return { error: "The measured grease thickness cannot be negative (micrometres)." };
+  if (!(cleaning_trigger_um > 0)) return { error: "The cleaning trigger must be positive (micrometres)." };
+  if (!(inspection_point_trigger_um > 0)) return { error: "The designated inspection point trigger must be positive (micrometres)." };
+  if (is_designated_point < 0) return { error: "The designated-point flag is 1 or 0." };
+  const MONTHS_PER_YEAR = 12;
+  const UM_PER_IN = 25400;
+  const at_designated_point = is_designated_point >= 0.5;
+  const applicable_trigger_um = at_designated_point ? inspection_point_trigger_um : cleaning_trigger_um;
+  const months_overdue = months_since_inspection - inspection_interval_months;
+  const inspection_overdue = months_overdue > 0;
+  const next_inspection_months = Math.max(0, -months_overdue);
+  const inspections_per_year = MONTHS_PER_YEAR / inspection_interval_months;
+  const thickness_margin_um = applicable_trigger_um - measured_thickness_um;
+  const thickness_ratio = applicable_trigger_um > 0 ? measured_thickness_um / applicable_trigger_um : null;
+  const cleaning_triggered = measured_thickness_um >= applicable_trigger_um;
+  const measured_thickness_in = measured_thickness_um / UM_PER_IN;
+  const trigger_thickness_in = applicable_trigger_um / UM_PER_IN;
+  const outs = [months_overdue, next_inspection_months, applicable_trigger_um, thickness_margin_um, inspections_per_year];
+  if (!outs.every(Number.isFinite)) return { error: "Cleaning interval math is not a finite value." };
+  const schedule_verdict = inspection_overdue
+    ? "INSPECTION OVERDUE by " + fmt(months_overdue, 1) + " months: " + fmt(months_since_inspection, 1) + " months since the last one against a " + fmt(inspection_interval_months, 1) + " month interval (" + fmt(inspections_per_year, 1) + " a year)"
+    : "ON SCHEDULE: " + fmt(months_since_inspection, 1) + " months since the last inspection, with " + fmt(next_inspection_months, 1) + " months to the next at a " + fmt(inspection_interval_months, 1) + " month interval";
+  const measurement_verdict = cleaning_triggered
+    ? "CLEAN NOW: " + fmt(measured_thickness_um, 0) + " micrometres (" + fmt(measured_thickness_in, 4) + " in) against a " + fmt(applicable_trigger_um, 0) + " micrometre trigger" + (at_designated_point ? " at a designated inspection point" : "") + ". THE MEASUREMENT GOVERNS, whatever the schedule says"
+    : "Below the trigger at " + fmt(measured_thickness_um, 0) + " micrometres against " + fmt(applicable_trigger_um, 0) + ", with " + fmt(thickness_margin_um, 0) + " to go" + (at_designated_point ? " at a designated inspection point" : "") + " -- but a system found with ANY measurable grease is cleaned, and one found clean is still inspected again at the interval";
+  return {
+    inspection_interval_months, months_since_inspection, months_overdue,
+    inspection_overdue, next_inspection_months, inspections_per_year,
+    measured_thickness_um, measured_thickness_in, cleaning_trigger_um,
+    inspection_point_trigger_um, is_designated_point: at_designated_point ? 1 : 0,
+    applicable_trigger_um, trigger_thickness_in, thickness_margin_um,
+    thickness_ratio, cleaning_triggered, schedule_verdict, measurement_verdict,
+    note: "NFPA 96 sets the inspection interval by COOKING VOLUME rather than by the size of the kitchen: monthly for solid fuel, quarterly for high volume operations -- twenty four hour cooking, charbroiling, wok cooking -- semiannually for moderate volume, and annually for low volume such as churches, seasonal businesses and day camps. Getting the category right is the whole scheduling decision, and a charbroiler in an otherwise moderate kitchen moves the whole system into the quarterly column. THE SCHEDULE AND THE MEASUREMENT ARE TWO SEPARATE TESTS AND THE MEASUREMENT GOVERNS. An inspection at the interval is required whatever the system looks like, and a cleaning is required whenever measurable grease is found, whatever the schedule says. A system inspected on time and found with grease is cleaned on the spot; a system found clean is still inspected again at the interval. Neither test substitutes for the other, and reporting only the schedule is how a system that needed cleaning in month two gets cleaned in month six. The depth criterion is where the two meet: a measurement at a designated inspection point carries a far tighter trigger than the general one, because that point is chosen to represent the system and a small reading there implies a large accumulation elsewhere. THE SCOPE TRAP IS THE ONE THAT LEAVES BUILDINGS ON FIRE. Cleaning means the ENTIRE system -- hood, filters, the full length of duct including horizontal runs and every access panel, the fan, and the roof discharge -- and a cleaning that addresses the hood, the filters and the first accessible section of duct has cleaned the part that is easy to reach and left the part that burns. The fan housing and the roof curb accumulate heavily and are routinely skipped, and a certificate that does not say what was cleaned has not said anything. A schedule check and a depth comparison. It does not determine the cooking volume category, which is a judgment about the operation; it does not address the access panel spacing and placement that make a full cleaning possible in the first place, which is a design and installation matter; and it does not cover the fire suppression system, its inspection interval, its nozzle placement relative to the appliances beneath, or the semiannual servicing that is a separate requirement. Cleaning method, chemicals, containment of the runoff, and the certification of the cleaning contractor are all outside it. NFPA 96 as adopted, the authority having jurisdiction, and the certified cleaning contractor govern.",
+  };
+}
+const greaseDuctCleaningIntervalExample = { inputs: { inspection_interval_months: 3, months_since_inspection: 5, measured_thickness_um: 2400, cleaning_trigger_um: 2000, inspection_point_trigger_um: 50, is_designated_point: 0 } };
+KITCHEN_RENDERERS["grease-duct-cleaning-interval"] = _simpleRenderer({
+  citation: "Citation: the NFPA 96 inspection intervals by cooking volume, by name -- monthly for solid fuel, quarterly for high volume (24 hour, charbroiling, wok), semiannually for moderate, annually for low volume -- with the depth criterion commonly 2,000 micrometres for a general measurement and 50 micrometres at a designated inspection point. The schedule and the measurement are separate tests and the MEASUREMENT GOVERNS. Cleaning scope is the entire system: hood, filters, the full duct, the fan and the roof discharge. NFPA 96 as adopted, the authority having jurisdiction, and the certified cleaning contractor govern.",
+  example: greaseDuctCleaningIntervalExample.inputs,
+  fields: [
+    { key: "inspection_interval_months", label: "Inspection interval for the cooking volume (months)", kind: "number", default: 3 },
+    { key: "months_since_inspection", label: "Months since the last inspection", kind: "number", default: 5 },
+    { key: "measured_thickness_um", label: "Measured grease thickness (micrometres)", kind: "number", default: 2400 },
+    { key: "cleaning_trigger_um", label: "General cleaning trigger (micrometres)", kind: "number", default: 2000 },
+    { key: "inspection_point_trigger_um", label: "Designated inspection point trigger (micrometres)", kind: "number", default: 50 },
+    { key: "is_designated_point", label: "Measured at a designated inspection point (1 yes, 0 no)", kind: "number", default: 0, attrs: { step: "1", min: "0", max: "1" } },
+  ],
+  outputs: [
+    { key: "s", id: "gdci-out-s", label: "Against the schedule", value: (r) => r.schedule_verdict },
+    { key: "m", id: "gdci-out-m", label: "Against the measurement", value: (r) => r.measurement_verdict },
+    { key: "t", id: "gdci-out-t", label: "Trigger in use", value: (r) => fmt(r.applicable_trigger_um, 0) + " micrometres (" + fmt(r.trigger_thickness_in, 4) + " in), the " + (r.is_designated_point ? "designated inspection point" : "general") + " criterion -- the measurement is " + fmt(r.thickness_ratio, 2) + "x it" },
+    { key: "f", id: "gdci-out-f", label: "Inspection frequency", value: (r) => fmt(r.inspections_per_year, 1) + " inspections a year at this interval" },
+    { key: "n", id: "gdci-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGreaseDuctCleaningInterval,
+});
+
+// ============ spec-v1638: walk-in door infiltration load ============
+
+// dims: in { door_width_ft: L, door_height_ft: L, full_open_cfm: L^3 T^-1, openings_per_hour: T^-1, seconds_open_each: T, protection_factor: dimensionless, enthalpy_difference_btu_lb: L^2 T^-2, moisture_difference_lb_lb: dimensionless, air_density_lb_ft3: M L^-3 } out: { door_area_ft2: L^2, door_open_factor: dimensionless, effective_cfm: L^3 T^-1, total_load_btuh: M L^2 T^-3, latent_load_btuh: M L^2 T^-3, latent_share_pct: dimensionless, frost_lb_day: M }
+export function computeWalkInDoorInfiltration({ door_width_ft = 0, door_height_ft = 0, full_open_cfm = 0, openings_per_hour = 0, seconds_open_each = 0, protection_factor = 1, enthalpy_difference_btu_lb = 0, moisture_difference_lb_lb = 0, air_density_lb_ft3 = 0.0765 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(door_width_ft > 0)) return { error: "Door width must be positive (ft)." };
+  if (!(door_height_ft > 0)) return { error: "Door height must be positive (ft)." };
+  if (!(full_open_cfm > 0)) return { error: "The fully-open doorway airflow must be positive (cfm) -- from the doorway flow chart for this door size and temperature difference." };
+  if (!(openings_per_hour > 0)) return { error: "Openings per hour must be positive." };
+  if (!(seconds_open_each > 0)) return { error: "Seconds open per opening must be positive." };
+  if (!(protection_factor > 0 && protection_factor <= 1)) return { error: "The doorway protection factor must be greater than zero and no more than one -- 1.0 is no protection, strip curtains about 0.3 to 0.5, an air curtain about 0.2 to 0.4." };
+  if (!(enthalpy_difference_btu_lb > 0)) return { error: "The enthalpy difference must be positive (Btu/lb) -- from a psychrometric chart at the two conditions." };
+  if (moisture_difference_lb_lb < 0) return { error: "The moisture difference cannot be negative (lb of water per lb of dry air)." };
+  if (!(air_density_lb_ft3 > 0)) return { error: "Air density must be positive (lb per cubic foot)." };
+  const MIN_PER_HOUR = 60;
+  const HOURS_PER_DAY = 24;
+  const LATENT_HEAT_BTU_LB = 1061;
+  const SECONDS_PER_HOUR = 3600;
+  const door_area_ft2 = door_width_ft * door_height_ft;
+  // The door open factor is simply the fraction of the hour it stands open.
+  const door_open_factor = openings_per_hour * seconds_open_each / SECONDS_PER_HOUR;
+  const unprotected_cfm = full_open_cfm * door_open_factor;
+  const effective_cfm = unprotected_cfm * protection_factor;
+  const mass_flow_lb_hr = effective_cfm * MIN_PER_HOUR * air_density_lb_ft3;
+  const total_load_btuh = mass_flow_lb_hr * enthalpy_difference_btu_lb;
+  const latent_load_btuh = mass_flow_lb_hr * moisture_difference_lb_lb * LATENT_HEAT_BTU_LB;
+  const sensible_load_btuh = total_load_btuh - latent_load_btuh;
+  const latent_share_pct = total_load_btuh > 0 ? latent_load_btuh / total_load_btuh * 100 : null;
+  const unprotected_load_btuh = total_load_btuh / protection_factor;
+  const load_avoided_btuh = unprotected_load_btuh - total_load_btuh;
+  const reduction_pct = (1 - protection_factor) * 100;
+  const total_load_tons = total_load_btuh / 12000;
+  // The moisture that comes in has to leave as frost on the coil, which is
+  // what drives the defrost schedule.
+  const frost_lb_day = mass_flow_lb_hr * moisture_difference_lb_lb * HOURS_PER_DAY;
+  const outs = [door_area_ft2, door_open_factor, effective_cfm, mass_flow_lb_hr, total_load_btuh, latent_load_btuh];
+  if (!outs.every(Number.isFinite)) return { error: "Door infiltration math is not a finite value." };
+  const protection_verdict = protection_factor >= 1
+    ? "NO DOORWAY PROTECTION: the full " + fmt(unprotected_load_btuh, 0) + " Btu/h crosses the doorway. Strip curtains in reasonable condition pass about 30 to 50 percent of it, and an air curtain about 20 to 40 percent"
+    : "PROTECTION AT " + fmt(protection_factor, 2) + ": " + fmt(total_load_btuh, 0) + " Btu/h passes against " + fmt(unprotected_load_btuh, 0) + " unprotected -- " + fmt(reduction_pct, 0) + " percent avoided, " + fmt(load_avoided_btuh, 0) + " Btu/h, for the cost of a curtain";
+  return {
+    door_width_ft, door_height_ft, door_area_ft2, full_open_cfm, openings_per_hour,
+    seconds_open_each, door_open_factor, unprotected_cfm, protection_factor,
+    effective_cfm, air_density_lb_ft3, mass_flow_lb_hr, enthalpy_difference_btu_lb,
+    total_load_btuh, total_load_tons, moisture_difference_lb_lb, latent_load_btuh,
+    sensible_load_btuh, latent_share_pct, unprotected_load_btuh, load_avoided_btuh,
+    reduction_pct, frost_lb_day, protection_verdict,
+    note: "The stack effect through an open walk-in door is powerful because the density difference across it is large: cold dense air pours out along the floor while warm humid air flows in above, and the exchange runs continuously for as long as the door stands open. THE DOOR OPEN FACTOR IS JUST THE FRACTION OF THE HOUR THE DOOR IS OPEN, and it is where a busy kitchen diverges from a design assumption -- sixty openings an hour at twenty seconds each is a third of the hour, and a door propped open during a delivery is a hundred percent of it. On a box of ordinary size the door load at that duty commonly rivals or exceeds the product and transmission loads combined, which is why it is worth calculating rather than assuming. A LARGE SHARE OF THE FREEZER DOOR LOAD IS LATENT -- commonly a third to a half of it by enthalpy, and the share is computed here rather than asserted, because it depends entirely on the two conditions -- and that share is the part with consequences beyond the compressor. The moisture carried in with the warm air does not simply add heat: it condenses and freezes on the evaporator coil, which blocks airflow, which raises the defrost frequency, and every defrost cycle puts heat back into the box that the compressor then has to remove again. The frost accumulation is reported here in pounds per day for that reason -- it is the number that explains a coil that ices between defrosts and a box that cannot hold temperature on a hot day. DOORWAY PROTECTION IS THE CHEAPEST INTERVENTION ON THE LIST. Strip curtains in reasonable condition pass roughly thirty to fifty percent of the unprotected load and an air curtain roughly twenty to forty, so the avoided load is most of it -- and cutting infiltration by that much cuts the frost accumulation by roughly the same, which lengthens the interval between defrosts and compounds the saving. The words in reasonable condition are doing work: strips that are torn, missing, curled, or hung too short pass far more than their rating, and a curtain nobody has looked at in two years is not the curtain in the calculation. A steady-state estimate from a doorway airflow the reader takes from the ASHRAE doorway flow relations or the manufacturer's data for the door size and temperature difference, with the enthalpy and moisture differences read off a psychrometric chart at the two conditions. It does not compute that doorway airflow, which depends on the door height, the density ratio, and the flow regime; it does not model the transient at each opening, the time the air curtain takes to re-establish, or the mixing that a heavily trafficked doorway produces. It does not size the refrigeration system, which needs the transmission, product, lighting, motor, personnel and defrost loads alongside this one, and it does not evaluate the defrost strategy, the coil, or the anti-sweat and floor heat that a freezer door needs. ASHRAE's refrigeration handbook, the box and door manufacturer's data, and the refrigeration designer govern.",
+  };
+}
+const walkInDoorInfiltrationExample = { inputs: { door_width_ft: 4, door_height_ft: 7, full_open_cfm: 2100, openings_per_hour: 60, seconds_open_each: 20, protection_factor: 1, enthalpy_difference_btu_lb: 24.5, moisture_difference_lb_lb: 0.0092, air_density_lb_ft3: 0.0765 } };
+KITCHEN_RENDERERS["walk-in-door-infiltration"] = _simpleRenderer({
+  citation: "Citation: the walk-in doorway infiltration relations by name -- the door open factor is the fraction of the hour the door stands open (openings x seconds / 3,600); the effective airflow is the fully-open doorway flow times that factor times the doorway protection factor; the load is that airflow x 60 x air density x the enthalpy difference, with the latent share as the moisture difference x 1,061 Btu per lb. The fully-open doorway flow comes from the ASHRAE doorway flow relations or the manufacturer's data, and the enthalpy and moisture differences from a psychrometric chart. Protection factors run about 0.3 to 0.5 for strip curtains and 0.2 to 0.4 for an air curtain. ASHRAE's refrigeration handbook, the box and door manufacturer's data, and the refrigeration designer govern.",
+  example: walkInDoorInfiltrationExample.inputs,
+  fields: [
+    { key: "door_width_ft", label: "Door width (ft)", kind: "number", default: 4 },
+    { key: "door_height_ft", label: "Door height (ft)", kind: "number", default: 7 },
+    { key: "full_open_cfm", label: "Fully-open doorway airflow (cfm)", kind: "number", default: 2100 },
+    { key: "openings_per_hour", label: "Openings per hour", kind: "number", default: 60 },
+    { key: "seconds_open_each", label: "Seconds open each time", kind: "number", default: 20 },
+    { key: "protection_factor", label: "Doorway protection factor (1.0 none)", kind: "number", default: 1 },
+    { key: "enthalpy_difference_btu_lb", label: "Enthalpy difference (Btu per lb of dry air)", kind: "number", default: 24.5 },
+    { key: "moisture_difference_lb_lb", label: "Moisture difference (lb water per lb dry air)", kind: "number", default: 0.0092 },
+    { key: "air_density_lb_ft3", label: "Air density (lb per cu ft)", kind: "number", default: 0.0765 },
+  ],
+  outputs: [
+    { key: "d", id: "wdi-out-d", label: "Door open factor", value: (r) => fmt(r.door_open_factor, 3) + " -- " + fmt(r.openings_per_hour, 0) + " openings of " + fmt(r.seconds_open_each, 0) + " s is " + fmt(r.door_open_factor * 100, 0) + "% of the hour, through " + fmt(r.door_area_ft2, 0) + " sq ft of door" },
+    { key: "q", id: "wdi-out-q", label: "Effective infiltration", value: (r) => fmt(r.effective_cfm, 0) + " cfm, " + fmt(r.mass_flow_lb_hr, 0) + " lb of air an hour" },
+    { key: "l", id: "wdi-out-l", label: "Infiltration load", value: (r) => fmt(r.total_load_btuh, 0) + " Btu/h (" + fmt(r.total_load_tons, 2) + " tons) -- " + fmt(r.latent_load_btuh, 0) + " of it LATENT, " + fmt(r.latent_share_pct, 0) + "%" },
+    { key: "p", id: "wdi-out-p", label: "Doorway protection", value: (r) => r.protection_verdict },
+    { key: "f", id: "wdi-out-f", label: "Frost on the coil", value: (r) => fmt(r.frost_lb_day, 1) + " lb of water a day arrives as frost -- which blocks the coil, drives the defrost frequency, and puts that heat back in each cycle" },
+    { key: "n", id: "wdi-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWalkInDoorInfiltration,
+});
+
+// ============ spec-v1639: kitchen exhaust and makeup air balance ============
+
+// dims: in { hood_exhaust_cfm: L^3 T^-1, other_exhaust_cfm: L^3 T^-1, dedicated_makeup_cfm: L^3 T^-1, intended_transfer_cfm: L^3 T^-1, building_leakage_cfm_per_pa: L^3 T^-1, door_width_ft: L, door_height_ft: L } out: { total_exhaust_cfm: L^3 T^-1, deficit_cfm: L^3 T^-1, deficit_percent: dimensionless, uncontrolled_cfm: L^3 T^-1, makeup_shortfall_cfm: L^3 T^-1, door_force_lbf: M L T^-2 }
+export function computeKitchenMakeupAirDeficit({ hood_exhaust_cfm = 0, other_exhaust_cfm = 0, dedicated_makeup_cfm = 0, intended_transfer_cfm = 0, building_leakage_cfm_per_pa = 0, door_width_ft = 3, door_height_ft = 7 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(hood_exhaust_cfm > 0)) return { error: "Hood exhaust must be positive (cfm)." };
+  if (other_exhaust_cfm < 0) return { error: "Other exhaust cannot be negative (cfm)." };
+  if (dedicated_makeup_cfm < 0) return { error: "Dedicated makeup air cannot be negative (cfm)." };
+  if (intended_transfer_cfm < 0) return { error: "The intended transfer air cannot be negative (cfm)." };
+  if (building_leakage_cfm_per_pa < 0) return { error: "The building leakage coefficient cannot be negative." };
+  if (!(door_width_ft > 0)) return { error: "Door width must be positive (ft)." };
+  if (!(door_height_ft > 0)) return { error: "Door height must be positive (ft)." };
+  const LBF_PER_PSF_SQFT = 1;
+  const PA_PER_PSF = 47.8803;
+  const EGRESS_DOOR_LIMIT_LBF = 30;
+  const total_exhaust_cfm = hood_exhaust_cfm + other_exhaust_cfm;
+  const deficit_cfm = total_exhaust_cfm - dedicated_makeup_cfm;
+  const deficit_percent = total_exhaust_cfm > 0 ? deficit_cfm / total_exhaust_cfm * 100 : 0;
+  // Some deficit is deliberate, drawing air from the dining room so odours
+  // stay in the kitchen. What is left comes through the envelope and the flues.
+  const uncontrolled_cfm = deficit_cfm - intended_transfer_cfm;
+  const makeup_shortfall_cfm = Math.max(0, uncontrolled_cfm);
+  const balanced = deficit_cfm <= intended_transfer_cfm;
+  // A tight building turns a modest deficit into a large negative pressure,
+  // and the door is where it becomes a code question.
+  const pressure_pa = building_leakage_cfm_per_pa > 0 ? makeup_shortfall_cfm / building_leakage_cfm_per_pa : null;
+  const pressure_psf = pressure_pa === null ? null : pressure_pa / PA_PER_PSF;
+  const door_area_ft2 = door_width_ft * door_height_ft;
+  const door_force_lbf = pressure_psf === null ? null : pressure_psf * door_area_ft2 * LBF_PER_PSF_SQFT;
+  const door_force_ok = door_force_lbf === null ? null : door_force_lbf <= EGRESS_DOOR_LIMIT_LBF;
+  const outs = [total_exhaust_cfm, deficit_cfm, deficit_percent, uncontrolled_cfm, makeup_shortfall_cfm];
+  if (!outs.every(Number.isFinite)) return { error: "Makeup air balance math is not a finite value." };
+  const balance_verdict = balanced
+    ? "BALANCED within the intended transfer: a " + fmt(deficit_cfm, 0) + " cfm deficit against " + fmt(intended_transfer_cfm, 0) + " cfm of transfer air the design intends to draw from the dining room"
+    : "SHORT BY " + fmt(makeup_shortfall_cfm, 0) + " CFM: a " + fmt(deficit_cfm, 0) + " cfm deficit (" + fmt(deficit_percent, 0) + "% of exhaust) less " + fmt(intended_transfer_cfm, 0) + " cfm of intended transfer. That air comes through the envelope, under doors, and down any flue that will pass it";
+  const door_verdict = door_force_lbf === null
+    ? "Enter the building leakage coefficient to turn the shortfall into a pressure and a door force."
+    : door_force_ok
+      ? "DOOR FORCE OK: about " + fmt(door_force_lbf, 1) + " lbf on a " + fmt(door_width_ft, 1) + " by " + fmt(door_height_ft, 1) + " ft door at " + fmt(pressure_pa, 1) + " Pa, inside the " + fmt(EGRESS_DOOR_LIMIT_LBF, 0) + " lbf egress limit"
+      : "DOOR FORCE OVER THE EGRESS LIMIT: about " + fmt(door_force_lbf, 1) + " lbf on a " + fmt(door_width_ft, 1) + " by " + fmt(door_height_ft, 1) + " ft door at " + fmt(pressure_pa, 1) + " Pa, against a " + fmt(EGRESS_DOOR_LIMIT_LBF, 0) + " lbf limit. An exterior door people cannot open is a life safety problem before it is a comfort one";
+  return {
+    hood_exhaust_cfm, other_exhaust_cfm, total_exhaust_cfm, dedicated_makeup_cfm,
+    deficit_cfm, deficit_percent, intended_transfer_cfm, uncontrolled_cfm,
+    makeup_shortfall_cfm, balanced, building_leakage_cfm_per_pa, pressure_pa,
+    pressure_psf, door_width_ft, door_height_ft, door_area_ft2, door_force_lbf,
+    door_force_ok, egress_limit_lbf: EGRESS_DOOR_LIMIT_LBF, balance_verdict, door_verdict,
+    note: "Every cubic foot a kitchen exhausts has to come back in from somewhere, and the deficit between exhaust and dedicated makeup air is the quantity that decides where. SOME DEFICIT IS INTENTIONAL: a kitchen is deliberately kept slightly negative to the dining room so odours and grease-laden air stay where they belong, and a small transfer across that boundary is design rather than fault. What matters is the part NOT accounted for, because that air comes through the building envelope, under exterior doors, and down any flue that will pass it -- and the flue is the one that matters. THE CONSEQUENCES ARRIVE IN AN ORDER. A modest deficit in a tight building produces a large negative pressure, because pressure is the deficit divided by how leaky the building is, and a well-sealed building has very little leakage to work with. That pressure shows up first as door opening force: an exterior door in a tight negative building can exceed the thirty pound egress limit, which is a life safety problem before it is a comfort one and which an inspector can measure. Next it shows up as combustion appliance backdrafting -- a water heater or a boiler in or near the kitchen can spill flue gases into the space, and the test is done at worst case with every exhaust fan running and every makeup path closed. Then other exhaust systems reverse: restroom fans stop exhausting and start blowing restroom air into the restrooms. AND THE HOOD ITSELF STOPS WORKING, which is the consequence people least expect. A hood starved of makeup air cannot move its rated exhaust -- the fan is on a system curve, and raising the resistance by making the room negative moves it back along that curve -- so capture degrades and grease-laden vapour escapes into the space. A kitchen with a capture problem is often a makeup air problem wearing a hood problem's clothes, and adding fan speed to a starved hood makes the negative pressure worse rather than better. The fix is makeup air, and the amount is the deficit less the intended transfer. An air balance, not a design. It does not size the hood or its exhaust, which follows from the appliance line-up and the hood style; it does not size or select the makeup air unit, temper it, or compute the heating and cooling that tempering requires, which on a cold day is a very large load; and it does not distribute the makeup air, which matters as much as its quantity -- makeup air delivered as a draft across the cooking surface disrupts capture as effectively as having none. The leakage coefficient is a crude single-parameter model of a building, and a measured blower-door result is the only sound source for it. It does not perform the combustion safety test, which is a field measurement. The applicable mechanical code, the hood and makeup air manufacturers' data, a measured air balance, and the mechanical designer govern.",
+  };
+}
+const kitchenMakeupAirDeficitExample = { inputs: { hood_exhaust_cfm: 6000, other_exhaust_cfm: 0, dedicated_makeup_cfm: 4800, intended_transfer_cfm: 400, building_leakage_cfm_per_pa: 120, door_width_ft: 3, door_height_ft: 7 } };
+KITCHEN_RENDERERS["kitchen-makeup-air-deficit"] = _simpleRenderer({
+  citation: "Citation: the kitchen air balance identities by name -- deficit = total exhaust - dedicated makeup air; the uncontrolled shortfall is that deficit less the intended transfer from adjacent space; the negative pressure is the shortfall over the building's leakage coefficient; and the door force is that pressure times the door area, against the 30 lbf egress limit. It balances air, it does not size a hood or a makeup air unit or temper it. The leakage coefficient is a crude single-parameter building model and a measured blower-door result is the only sound source for it. The applicable mechanical code, the hood and makeup air manufacturers' data, a measured air balance, and the mechanical designer govern.",
+  example: kitchenMakeupAirDeficitExample.inputs,
+  fields: [
+    { key: "hood_exhaust_cfm", label: "Hood exhaust total (cfm)", kind: "number", default: 6000 },
+    { key: "other_exhaust_cfm", label: "Other exhaust in the space (cfm)", kind: "number", default: 0 },
+    { key: "dedicated_makeup_cfm", label: "Dedicated makeup air (cfm)", kind: "number", default: 4800 },
+    { key: "intended_transfer_cfm", label: "Intended transfer from adjacent space (cfm)", kind: "number", default: 400 },
+    { key: "building_leakage_cfm_per_pa", label: "Building leakage (cfm per Pa, 0 to skip)", kind: "number", default: 120 },
+    { key: "door_width_ft", label: "Exterior door width (ft)", kind: "number", default: 3 },
+    { key: "door_height_ft", label: "Exterior door height (ft)", kind: "number", default: 7 },
+  ],
+  outputs: [
+    { key: "e", id: "kmad-out-e", label: "Exhaust against makeup", value: (r) => fmt(r.total_exhaust_cfm, 0) + " cfm out against " + fmt(r.dedicated_makeup_cfm, 0) + " cfm in -- a " + fmt(r.deficit_cfm, 0) + " cfm deficit, " + fmt(r.deficit_percent, 0) + "% of exhaust" },
+    { key: "b", id: "kmad-out-b", label: "Balance", value: (r) => r.balance_verdict },
+    { key: "p", id: "kmad-out-p", label: "Negative pressure", value: (r) => r.pressure_pa === null ? "(no leakage coefficient entered)" : fmt(r.pressure_pa, 1) + " Pa from " + fmt(r.makeup_shortfall_cfm, 0) + " cfm through a building that leaks " + fmt(r.building_leakage_cfm_per_pa, 0) + " cfm per Pa" },
+    { key: "d", id: "kmad-out-d", label: "Door opening force", value: (r) => r.door_verdict },
+    { key: "f", id: "kmad-out-f", label: "The fix", value: (r) => r.balanced ? "no additional makeup air indicated by the balance" : fmt(r.makeup_shortfall_cfm, 0) + " cfm of makeup air -- and note a starved hood cannot move its rated exhaust, so capture degrades and adding fan speed makes the pressure worse" },
+    { key: "n", id: "kmad-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeKitchenMakeupAirDeficit,
+});

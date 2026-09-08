@@ -1151,3 +1151,306 @@ SURVEY_RENDERERS["grade-rod-cut-fill"] = _simpleRenderer({
   ],
   compute: computeGradeRodCutFill,
 });
+
+// ===========================================================================
+// spec-v1741..v1744: the 2026-09-08 trade-expansion survey technology band.
+// Four tiles, all group E.
+//
+// TWO OF THE FOUR SPECS LEFT UNRENDERED PYTHON PLACEHOLDERS in their worked
+// examples -- spec-v1742 twice and spec-v1743 once -- which are the fourth and
+// fifth occurrences of that defect in this program, after spec-v1652,
+// spec-v1615 and spec-v1687.
+
+// ============ spec-v1741: drone flight GSD, overlap, and image count ============
+
+// dims: in { flight_height_ft: L, focal_length_mm: L, pixel_pitch_um: L, sensor_width_px: dimensionless, sensor_height_px: dimensionless, forward_overlap_pct: dimensionless, side_overlap_pct: dimensionless, area_acres: L^2 } out: { gsd_cm_px: L, footprint_width_ft: L, footprint_height_ft: L, line_spacing_ft: L, shot_interval_ft: L, image_count: dimensionless }
+export function computeDroneGsdOverlap({ flight_height_ft = 0, focal_length_mm = 0, pixel_pitch_um = 0, sensor_width_px = 0, sensor_height_px = 0, forward_overlap_pct = 75, side_overlap_pct = 65, area_acres = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(flight_height_ft > 0)) return { error: "Flight height above ground must be positive (ft)." };
+  if (!(focal_length_mm > 0)) return { error: "Focal length must be positive (mm)." };
+  if (!(pixel_pitch_um > 0)) return { error: "Sensor pixel pitch must be positive (micrometres)." };
+  if (!(sensor_width_px > 0)) return { error: "Sensor width must be positive (pixels)." };
+  if (!(sensor_height_px > 0)) return { error: "Sensor height must be positive (pixels)." };
+  if (!(forward_overlap_pct >= 0 && forward_overlap_pct < 100)) return { error: "Forward overlap must be at least 0 and below 100 percent." };
+  if (!(side_overlap_pct >= 0 && side_overlap_pct < 100)) return { error: "Side overlap must be at least 0 and below 100 percent." };
+  if (area_acres < 0) return { error: "The area cannot be negative (acres)." };
+  const M_PER_FT = 0.3048;
+  const CM_PER_M = 100;
+  const SQFT_PER_ACRE = 43560;
+  const height_m = flight_height_ft * M_PER_FT;
+  const focal_m = focal_length_mm / 1000;
+  const pitch_m = pixel_pitch_um / 1000000;
+  // The ground a single pixel covers: the similar-triangles relation between
+  // the sensor and the ground at the flight height.
+  const gsd_m_px = height_m * pitch_m / focal_m;
+  const gsd_cm_px = gsd_m_px * CM_PER_M;
+  const footprint_width_ft = gsd_m_px * sensor_width_px / M_PER_FT;
+  const footprint_height_ft = gsd_m_px * sensor_height_px / M_PER_FT;
+  const line_spacing_ft = footprint_width_ft * (1 - side_overlap_pct / 100);
+  const shot_interval_ft = footprint_height_ft * (1 - forward_overlap_pct / 100);
+  const effective_area_ft2 = line_spacing_ft * shot_interval_ft;
+  const image_count = area_acres > 0 ? Math.ceil(area_acres * SQFT_PER_ACRE / effective_area_ft2) : null;
+  const line_count = area_acres > 0 ? Math.ceil(Math.sqrt(area_acres * SQFT_PER_ACRE) / line_spacing_ft) : null;
+  // Halving the height halves the GSD and quadruples the images, because both
+  // footprint dimensions halve at once.
+  const half_height_gsd_cm_px = gsd_cm_px / 2;
+  const half_height_image_count = image_count === null ? null : image_count * 4;
+  const outs = [gsd_cm_px, footprint_width_ft, footprint_height_ft, line_spacing_ft, shot_interval_ft];
+  if (!outs.every(Number.isFinite)) return { error: "Flight planning math is not a finite value." };
+  return {
+    flight_height_ft, focal_length_mm, pixel_pitch_um, sensor_width_px, sensor_height_px,
+    gsd_m_px, gsd_cm_px, footprint_width_ft, footprint_height_ft,
+    forward_overlap_pct, side_overlap_pct, line_spacing_ft, shot_interval_ft,
+    effective_area_ft2, area_acres, image_count, line_count,
+    half_height_gsd_cm_px, half_height_image_count,
+    note: "Ground sample distance is the ground a single pixel covers, and it follows from similar triangles: the flight height times the sensor's pixel pitch, over the focal length. It scales LINEARLY with height, which is the whole flight-planning trade -- and the cost of improving it does not. HALVING THE HEIGHT HALVES THE GSD AND QUADRUPLES THE IMAGE COUNT, because both the along-track and the cross-track footprints halve at once. Four times the images means four times the flight time and battery swaps, and processing that scales worse than linearly, so promising a GSD without running that multiplication is how a one-day flight becomes a three-day flight. THE MOST IMPORTANT SENTENCE IN THIS SUBJECT IS THAT GSD IS NOT ACCURACY. Ground sample distance is RESOLUTION -- how finely the ground is sampled -- and accuracy is how close the resulting coordinates are to truth, which comes from ground control, from the camera calibration, and from the geometry of the block. A survey flown at half a centimetre per pixel with no ground control can be metres out in position, and it will look magnificent while it is wrong. Overlap is the other lever and it is cheap by comparison. Mapping practice runs about seventy five to eighty percent forward and sixty five to seventy percent side, and it goes HIGHER over vegetation, water, and uniform surfaces, because the matching algorithms need texture to tie images together and those surfaces have little. A flight planned at the minimum overlap over a forest canopy produces holes in the model that no amount of processing recovers, and reflying is the only fix. Nadir photogrammetry over flat terrain from a rectangular sensor. It assumes the ground is level at the entered height: terrain relief changes the GSD across the frame, and a flight planned at a single height over rolling ground has a varying GSD and a varying overlap, which is what terrain-following flight modes exist to fix. It does not plan the mission, place ground control, evaluate the block geometry, or address oblique imagery, corridor mapping, or the crossing lines that stabilise a self-calibrating bundle adjustment. It does not compute accuracy at all, and no image count buys it. It does not address airspace, authorisation, visual line of sight, or the applicable aviation rules, which govern whether the flight happens. The applicable civil aviation rules, the project's accuracy specification, and the surveyor of record govern.",
+  };
+}
+const droneGsdOverlapExample = { inputs: { flight_height_ft: 400, focal_length_mm: 24, pixel_pitch_um: 1.38, sensor_width_px: 8192, sensor_height_px: 5460, forward_overlap_pct: 75, side_overlap_pct: 65, area_acres: 40 } };
+SURVEY_RENDERERS["drone-gsd-overlap"] = _simpleRenderer({
+  citation: "Citation: the photogrammetric ground sample distance relation by name -- GSD = flight height x sensor pixel pitch / focal length -- with the image footprint as GSD x the sensor pixel dimensions, line spacing = footprint width x (1 - side overlap) and shot interval = footprint height x (1 - forward overlap). GSD IS RESOLUTION, NOT ACCURACY: accuracy comes from ground control, camera calibration, and block geometry, and is not computed here. Nadir imagery over level ground; terrain relief varies both GSD and overlap. The applicable civil aviation rules, the project's accuracy specification, and the surveyor of record govern.",
+  example: droneGsdOverlapExample.inputs,
+  fields: [
+    { key: "flight_height_ft", label: "Flight height above ground (ft)", kind: "number", default: 400 },
+    { key: "focal_length_mm", label: "Focal length (mm)", kind: "number", default: 24 },
+    { key: "pixel_pitch_um", label: "Sensor pixel pitch (micrometres)", kind: "number", default: 1.38 },
+    { key: "sensor_width_px", label: "Sensor width (pixels, across track)", kind: "number", default: 8192 },
+    { key: "sensor_height_px", label: "Sensor height (pixels, along track)", kind: "number", default: 5460 },
+    { key: "forward_overlap_pct", label: "Forward overlap (%)", kind: "number", default: 75 },
+    { key: "side_overlap_pct", label: "Side overlap (%)", kind: "number", default: 65 },
+    { key: "area_acres", label: "Area to cover (acres, 0 to skip the count)", kind: "number", default: 40 },
+  ],
+  outputs: [
+    { key: "g", id: "dgo-out-g", label: "Ground sample distance", value: (r) => fmt(r.gsd_cm_px, 3) + " cm per pixel -- RESOLUTION, not accuracy, which comes from ground control" },
+    { key: "f", id: "dgo-out-f", label: "Image footprint", value: (r) => fmt(r.footprint_width_ft, 1) + " ft across track by " + fmt(r.footprint_height_ft, 1) + " ft along track" },
+    { key: "s", id: "dgo-out-s", label: "Flight geometry", value: (r) => fmt(r.line_spacing_ft, 1) + " ft between lines at " + fmt(r.side_overlap_pct, 0) + "% side overlap, a shot every " + fmt(r.shot_interval_ft, 1) + " ft at " + fmt(r.forward_overlap_pct, 0) + "% forward" },
+    { key: "c", id: "dgo-out-c", label: "Images", value: (r) => r.image_count === null ? "(no area entered)" : fmt(r.image_count, 0) + " over " + fmt(r.area_acres, 1) + " acres, about " + fmt(r.line_count, 0) + " lines" },
+    { key: "h", id: "dgo-out-h", label: "Flying half as high", value: (r) => fmt(r.half_height_gsd_cm_px, 3) + " cm per pixel" + (r.half_height_image_count === null ? "" : " and " + fmt(r.half_height_image_count, 0) + " images -- FOUR times as many for twice the detail, because both footprint dimensions halve at once") },
+    { key: "n", id: "dgo-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDroneGsdOverlap,
+});
+
+// ============ spec-v1742: LiDAR point density and flight line spacing ============
+
+// dims: in { pulse_rate_khz: T^-1, scan_angle_deg: dimensionless, flight_height_m: L, ground_speed_ms: L T^-1, side_overlap_pct: dimensionless, area_acres: L^2 } out: { swath_width_m: L, point_density_per_m2: dimensionless, line_spacing_m: L, half_speed_density: dimensionless, half_height_density: dimensionless, line_count: dimensionless }
+export function computeLidarPointDensity({ pulse_rate_khz = 0, scan_angle_deg = 0, flight_height_m = 0, ground_speed_ms = 0, side_overlap_pct = 20, area_acres = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(pulse_rate_khz > 0)) return { error: "Pulse rate must be positive (kHz)." };
+  if (!(scan_angle_deg > 0 && scan_angle_deg < 180)) return { error: "The TOTAL scan angle must be between 0 and 180 degrees." };
+  if (!(flight_height_m > 0)) return { error: "Flight height above ground must be positive (m)." };
+  if (!(ground_speed_ms > 0)) return { error: "Ground speed must be positive (m/s)." };
+  if (!(side_overlap_pct >= 0 && side_overlap_pct < 100)) return { error: "Side overlap must be at least 0 and below 100 percent." };
+  if (area_acres < 0) return { error: "The area cannot be negative (acres)." };
+  const M2_PER_ACRE = 4046.856;
+  const DEG_TO_RAD_SV = Math.PI / 180;
+  const pulses_per_s = pulse_rate_khz * 1000;
+  const swathFor = (h) => 2 * h * Math.tan(scan_angle_deg / 2 * DEG_TO_RAD_SV);
+  const swath_width_m = swathFor(flight_height_m);
+  // Every pulse lands somewhere in the swath the aircraft sweeps out per
+  // second, so the density is the pulse rate over that area.
+  const densityFor = (h, v) => pulses_per_s / (swathFor(h) * v);
+  const point_density_per_m2 = densityFor(flight_height_m, ground_speed_ms);
+  const point_spacing_m = 1 / Math.sqrt(point_density_per_m2);
+  const line_spacing_m = swath_width_m * (1 - side_overlap_pct / 100);
+  // The two levers, and their costs. Speed is linear in both density and time;
+  // height is linear in density and QUADRATIC in flight lines.
+  const half_speed_density = densityFor(flight_height_m, ground_speed_ms / 2);
+  const half_height_swath_m = swathFor(flight_height_m / 2);
+  const half_height_density = densityFor(flight_height_m / 2, ground_speed_ms);
+  const half_height_line_multiple = swath_width_m / half_height_swath_m;
+  const area_m2 = area_acres > 0 ? area_acres * M2_PER_ACRE : null;
+  const line_count = area_m2 === null ? null : Math.ceil(Math.sqrt(area_m2) / line_spacing_m);
+  const outs = [swath_width_m, point_density_per_m2, point_spacing_m, line_spacing_m, half_speed_density, half_height_density];
+  if (!outs.every(Number.isFinite)) return { error: "LiDAR density math is not a finite value." };
+  return {
+    pulse_rate_khz, pulses_per_s, scan_angle_deg, flight_height_m, ground_speed_ms,
+    swath_width_m, point_density_per_m2, point_spacing_m, side_overlap_pct,
+    line_spacing_m, half_speed_density, half_height_swath_m, half_height_density,
+    half_height_line_multiple, area_acres, area_m2, line_count,
+    note: "Point density is the pulse rate divided by the ground area the sensor sweeps per second, and that area is the swath width times the ground speed. The swath is twice the flight height times the tangent of half the scan angle, so ALL THREE FLIGHT PARAMETERS ENTER, and the two the pilot can change trade very differently. HALVING THE SPEED DOUBLES THE DENSITY AND DOUBLES THE FLIGHT TIME -- a linear trade, and often the cheap one. HALVING THE HEIGHT ALSO DOUBLES THE DENSITY, because the swath halves, but it doubles the number of flight lines needed to cover the same ground at the same time, so the total flight time doubles too AND the line count doubles with it. Altitude is the expensive lever, and knowing which one to pull before quoting a density is most of the planning. DENSITY IS SAMPLING AND IT IS NOT ACCURACY, which is the same distinction that governs photogrammetry. How many points land per square metre says nothing about where those points are: accuracy comes from the sensor's own ranging precision, from the inertial and satellite trajectory that positions every shot, and from the boresight calibration that relates the scanner to the navigation frame. A dense cloud from a poorly calibrated system is densely wrong, and the check is overlapping flight lines that should agree with each other. Multiple returns are the other thing a density figure hides. A pulse over vegetation can produce several returns, so the FIRST return density and the GROUND return density are very different numbers, and a specification written for one and delivered against the other is a common dispute. Ground density under canopy can be a small fraction of the nominal figure, and it is the ground density that a terrain model needs. Side overlap is the last term, and fifteen to thirty percent is normal, because the swath edges are where the scan geometry is worst -- the beam is most oblique, the footprint is most elongated, and the accuracy is lowest. Nominal density for a linear scanner at constant height and speed over level ground. It assumes uniform coverage across the swath, which an oscillating mirror does not give -- density is higher at the swath edges where the mirror slows and reverses -- and it does not model terrain relief, which changes the swath width continuously beneath the aircraft. It does not address atmospheric attenuation, the maximum range at a given reflectance, eye safety, or the pulse repetition limits that come with multiple pulses in air. The sensor manufacturer's specifications, the project's accuracy and density specification, and the surveyor of record govern.",
+  };
+}
+const lidarPointDensityExample = { inputs: { pulse_rate_khz: 400, scan_angle_deg: 60, flight_height_m: 120, ground_speed_ms: 45, side_overlap_pct: 20, area_acres: 500 } };
+SURVEY_RENDERERS["lidar-point-density"] = _simpleRenderer({
+  citation: "Citation: the airborne LiDAR density relations by name -- swath width = 2 x flight height x tan(half the total scan angle); point density = pulse rate / (swath width x ground speed); line spacing = swath width x (1 - side overlap), with 15 to 30 percent overlap normal because the swath edges are where the scan geometry is worst. DENSITY IS SAMPLING, NOT ACCURACY: accuracy comes from the sensor, the trajectory and the boresight calibration. Nominal density for a linear scanner over level ground; an oscillating mirror gives higher density at the swath edges. The sensor manufacturer's specifications, the project's accuracy and density specification, and the surveyor of record govern.",
+  example: lidarPointDensityExample.inputs,
+  fields: [
+    { key: "pulse_rate_khz", label: "Pulse rate (kHz)", kind: "number", default: 400 },
+    { key: "scan_angle_deg", label: "Total scan angle (deg)", kind: "number", default: 60 },
+    { key: "flight_height_m", label: "Flight height above ground (m)", kind: "number", default: 120 },
+    { key: "ground_speed_ms", label: "Ground speed (m/s)", kind: "number", default: 45 },
+    { key: "side_overlap_pct", label: "Side overlap (%)", kind: "number", default: 20 },
+    { key: "area_acres", label: "Area to cover (acres, 0 to skip)", kind: "number", default: 500 },
+  ],
+  outputs: [
+    { key: "s", id: "lpd-out-s", label: "Swath width", value: (r) => fmt(r.swath_width_m, 1) + " m at " + fmt(r.flight_height_m, 0) + " m and a " + fmt(r.scan_angle_deg, 0) + " degree scan" },
+    { key: "d", id: "lpd-out-d", label: "Point density", value: (r) => fmt(r.point_density_per_m2, 1) + " points per sq m -- about " + fmt(r.point_spacing_m, 3) + " m between points" },
+    { key: "l", id: "lpd-out-l", label: "Line spacing", value: (r) => fmt(r.line_spacing_m, 1) + " m at " + fmt(r.side_overlap_pct, 0) + "% side overlap" + (r.line_count === null ? "" : ", about " + fmt(r.line_count, 0) + " lines over " + fmt(r.area_acres, 0) + " acres") },
+    { key: "v", id: "lpd-out-v", label: "Half the speed", value: (r) => fmt(r.half_speed_density, 1) + " points per sq m, and twice the flight time -- a linear trade" },
+    { key: "h", id: "lpd-out-h", label: "Half the height", value: (r) => fmt(r.half_height_density, 1) + " points per sq m, but the swath falls to " + fmt(r.half_height_swath_m, 1) + " m so it takes " + fmt(r.half_height_line_multiple, 1) + "x the flight lines. Altitude is the expensive lever" },
+    { key: "n", id: "lpd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeLidarPointDensity,
+});
+
+// ============ spec-v1743: RTK baseline error budget ============
+
+// dims: in { baseline_km: L, horizontal_fixed_mm: L, horizontal_ppm: dimensionless, vertical_fixed_mm: L, vertical_ppm: dimensionless, base_position_error_mm: L, occupations: dimensionless } out: { horizontal_error_mm: L, vertical_error_mm: L, vertical_ratio: dimensionless, total_horizontal_mm: L, total_vertical_mm: L, baseline_for_target_km: L }
+export function computeRtkErrorBudget({ baseline_km = 0, horizontal_fixed_mm = 8, horizontal_ppm = 1, vertical_fixed_mm = 15, vertical_ppm = 1, base_position_error_mm = 0, target_vertical_mm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(baseline_km > 0)) return { error: "The baseline from the base to the rover must be positive (km)." };
+  if (!(horizontal_fixed_mm > 0)) return { error: "The horizontal fixed component must be positive (mm)." };
+  if (horizontal_ppm < 0) return { error: "The horizontal parts-per-million component cannot be negative." };
+  if (!(vertical_fixed_mm > 0)) return { error: "The vertical fixed component must be positive (mm)." };
+  if (vertical_ppm < 0) return { error: "The vertical parts-per-million component cannot be negative." };
+  if (base_position_error_mm < 0) return { error: "The base position error cannot be negative (mm)." };
+  if (target_vertical_mm < 0) return { error: "The target vertical uncertainty cannot be negative (mm)." };
+  const MM_PER_KM = 1000000;
+  const baseline_mm = baseline_km * MM_PER_KM;
+  // The ppm term is a fraction of the baseline, and the fixed term is the
+  // receiver's own floor. They add.
+  const horizontal_ppm_mm = horizontal_ppm * baseline_km;
+  const vertical_ppm_mm = vertical_ppm * baseline_km;
+  const horizontal_error_mm = horizontal_fixed_mm + horizontal_ppm_mm;
+  const vertical_error_mm = vertical_fixed_mm + vertical_ppm_mm;
+  const vertical_ratio = horizontal_error_mm > 0 ? vertical_error_mm / horizontal_error_mm : null;
+  // A base position error is NOT a precision term: it translates directly and
+  // identically into every rover position of the session, so it ADDS rather
+  // than combining in quadrature.
+  const total_horizontal_mm = horizontal_error_mm + base_position_error_mm;
+  const total_vertical_mm = vertical_error_mm + base_position_error_mm;
+  const base_error_dominates = base_position_error_mm > horizontal_error_mm;
+  const base_error_multiple = horizontal_error_mm > 0 ? base_position_error_mm / horizontal_error_mm : null;
+  // The baseline at which the vertical reaches a target, which is what sets
+  // how far a rover can work from one base.
+  const baseline_for_target_km = (target_vertical_mm > vertical_fixed_mm && vertical_ppm > 0)
+    ? (target_vertical_mm - vertical_fixed_mm) / vertical_ppm
+    : null;
+  const meets_target = target_vertical_mm > 0 ? vertical_error_mm <= target_vertical_mm : null;
+  const outs = [horizontal_error_mm, vertical_error_mm, total_horizontal_mm, total_vertical_mm];
+  if (!outs.every(Number.isFinite)) return { error: "RTK error budget math is not a finite value." };
+  const base_verdict = base_position_error_mm === 0
+    ? "No base position error entered. If the base was set on an autonomous position rather than a known control point, enter its error -- it is usually the largest term by far."
+    : base_error_dominates
+      ? "THE BASE DOMINATES: " + fmt(base_position_error_mm, 0) + " mm of base position error against " + fmt(horizontal_error_mm, 1) + " mm of receiver precision, " + fmt(base_error_multiple, 0) + " times larger. EVERY rover observation of the session inherits it exactly, and no amount of receiver quality or occupation time removes a systematic shift"
+      : "Base position error of " + fmt(base_position_error_mm, 1) + " mm is smaller than the " + fmt(horizontal_error_mm, 1) + " mm receiver precision, but it still adds systematically to every observation rather than averaging out";
+  const target_verdict = meets_target === null
+    ? "Enter a target vertical uncertainty to find the working baseline."
+    : meets_target
+      ? "MEETS the " + fmt(target_vertical_mm, 1) + " mm vertical target at " + fmt(vertical_error_mm, 1) + " mm on this baseline"
+      : "MISSES the " + fmt(target_vertical_mm, 1) + " mm vertical target at " + fmt(vertical_error_mm, 1) + " mm" + (baseline_for_target_km === null ? " -- and the fixed component alone exceeds it, so no baseline reaches it with this receiver" : ", which needs a baseline under " + fmt(baseline_for_target_km, 2) + " km");
+  return {
+    baseline_km, baseline_mm, horizontal_fixed_mm, horizontal_ppm, horizontal_ppm_mm,
+    vertical_fixed_mm, vertical_ppm, vertical_ppm_mm, horizontal_error_mm,
+    vertical_error_mm, vertical_ratio, base_position_error_mm, total_horizontal_mm,
+    total_vertical_mm, base_error_dominates, base_error_multiple,
+    target_vertical_mm, baseline_for_target_km, meets_target, base_verdict, target_verdict,
+    note: "An RTK specification is written as a fixed component plus a parts-per-million term, and both halves matter for different reasons. The fixed part is the receiver's own floor and it does not improve with a shorter baseline; the ppm part grows with distance from the base, because the atmosphere the correction models diverges between the two receivers as they separate. Eight millimetres plus one ppm means eight millimetres at the base and eighteen at ten kilometres. THE VERTICAL IS ROUGHLY TWICE THE HORIZONTAL AND THE REASON IS GEOMETRIC RATHER THAN ELECTRONIC. Satellites are all above the receiver and none below it, so the intersection geometry that fixes a horizontal position from many directions has only one side to work with in the vertical. That ratio holds at every baseline and with every receiver, and it means a job whose result depends on elevation should know before it relies on RTK heights. THE FAILURE THAT DWARFS BOTH IS THE BASE POSITION, and it is not a precision problem at all. If the base was set on an autonomous position rather than on a known control point, its coordinate can be off by a metre or more -- and every rover observation of that session inherits that error EXACTLY. It is systematic, not random: it does not average out over occupations, it does not shrink with a better receiver, and it does not show up in the internal quality figures the data collector displays, which describe the vector from the base and not the base itself. This adds it directly rather than combining it in quadrature for that reason. A float solution is not survey grade. Only a fixed integer solution carries the precision a specification quotes, and a data collector that reports float has not resolved the carrier ambiguities -- the coordinates it stores look identical to fixed ones in the file. And the check that costs two minutes: occupy a known point at the start and at the end of every session. It catches a wrong base coordinate, a wrong antenna height, a wrong datum, and a solution that drifted, and none of those is visible any other way. Antenna height is worth naming on its own, because a mis-measured or mis-typed antenna height is a pure vertical blunder of exactly that size on every point of the session. A precision budget, not an accuracy statement. It does not address multipath, which is site-dependent and can exceed everything here; satellite geometry and its dilution of precision, which varies through the day; ionospheric activity, which degrades long baselines badly during solar maxima; the network RTK case, where the correction is interpolated and the baseline concept differs; or datum and geoid model errors, which are systematic and often larger than any of it. Geoid models convert ellipsoid heights to orthometric ones and carry their own uncertainty, which this does not include. The receiver manufacturer's specification, the project's accuracy requirements, the control network, and the surveyor of record govern.",
+  };
+}
+const rtkErrorBudgetExample = { inputs: { baseline_km: 10, horizontal_fixed_mm: 8, horizontal_ppm: 1, vertical_fixed_mm: 15, vertical_ppm: 1, base_position_error_mm: 1500, target_vertical_mm: 30 } };
+SURVEY_RENDERERS["rtk-error-budget"] = _simpleRenderer({
+  citation: "Citation: the RTK error budget convention by name -- a fixed component plus a parts-per-million term scaled by the baseline, with the vertical roughly twice the horizontal because satellites are all above the receiver and none below. A BASE POSITION ERROR IS SYSTEMATIC and is added directly rather than in quadrature: every rover observation of the session inherits it exactly, and it does not average out or shrink with a better receiver. A precision budget, not an accuracy statement: multipath, dilution of precision, ionospheric activity, and geoid model uncertainty are not included. The receiver manufacturer's specification, the project's accuracy requirements, the control network, and the surveyor of record govern.",
+  example: rtkErrorBudgetExample.inputs,
+  fields: [
+    { key: "baseline_km", label: "Baseline, base to rover (km)", kind: "number", default: 10 },
+    { key: "horizontal_fixed_mm", label: "Horizontal fixed component (mm)", kind: "number", default: 8 },
+    { key: "horizontal_ppm", label: "Horizontal ppm component", kind: "number", default: 1 },
+    { key: "vertical_fixed_mm", label: "Vertical fixed component (mm)", kind: "number", default: 15 },
+    { key: "vertical_ppm", label: "Vertical ppm component", kind: "number", default: 1 },
+    { key: "base_position_error_mm", label: "Base position error (mm, 0 if on known control)", kind: "number", default: 1500 },
+    { key: "target_vertical_mm", label: "Target vertical uncertainty (mm, 0 to skip)", kind: "number", default: 30 },
+  ],
+  outputs: [
+    { key: "h", id: "reb-out-h", label: "Horizontal precision", value: (r) => fmt(r.horizontal_error_mm, 1) + " mm -- " + fmt(r.horizontal_fixed_mm, 1) + " fixed plus " + fmt(r.horizontal_ppm_mm, 1) + " over " + fmt(r.baseline_km, 2) + " km" },
+    { key: "v", id: "reb-out-v", label: "Vertical precision", value: (r) => fmt(r.vertical_error_mm, 1) + " mm -- " + fmt(r.vertical_ratio, 2) + " times the horizontal, and that ratio holds at every baseline because there are no satellites below the receiver" },
+    { key: "b", id: "reb-out-b", label: "The base", value: (r) => r.base_verdict },
+    { key: "t", id: "reb-out-t", label: "With the base error included", value: (r) => fmt(r.total_horizontal_mm, 1) + " mm horizontal and " + fmt(r.total_vertical_mm, 1) + " mm vertical, added directly because a base shift is systematic rather than random" },
+    { key: "g", id: "reb-out-g", label: "Against the target", value: (r) => r.target_verdict },
+    { key: "n", id: "reb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRtkErrorBudget,
+});
+
+// ============ spec-v1744: mass haul balance, free haul, and overhaul ============
+
+// dims: in { cut_volume_cy: L^3, shrinkage_factor: dimensionless, fill_required_cy: L^3, free_haul_ft: L, overhaul_volume_cy: L^3, average_overhaul_distance_ft: L, overhaul_rate_per_station_yard: dimensionless, borrow_haul_ft: L } out: { compacted_from_cut_cy: L^3, balance_cy: L^3, overhaul_station_yards: dimensionless, overhaul_cost: dimensionless, borrow_station_yards: dimensionless, free_haul_stations: dimensionless }
+export function computeMassHaulOverhaul({ cut_volume_cy = 0, shrinkage_factor = 0.9, fill_required_cy = 0, free_haul_ft = 0, overhaul_volume_cy = 0, average_overhaul_distance_ft = 0, overhaul_rate_per_station_yard = 0, borrow_haul_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(cut_volume_cy > 0)) return { error: "Cut volume must be positive (cubic yards)." };
+  if (!(shrinkage_factor > 0 && shrinkage_factor <= 2)) return { error: "The shrinkage factor must be greater than zero and no more than two -- below one for material that compacts, above one for rock that swells." };
+  if (!(fill_required_cy > 0)) return { error: "Fill required must be positive (cubic yards)." };
+  if (free_haul_ft < 0) return { error: "The free haul distance cannot be negative (ft)." };
+  if (overhaul_volume_cy < 0) return { error: "The overhaul volume cannot be negative (cubic yards)." };
+  if (average_overhaul_distance_ft < 0) return { error: "The average overhaul distance cannot be negative (ft)." };
+  if (overhaul_rate_per_station_yard < 0) return { error: "The overhaul rate cannot be negative." };
+  if (borrow_haul_ft < 0) return { error: "The borrow haul distance cannot be negative (ft)." };
+  const FT_PER_STATION = 100;
+  // Cut is measured in place and fill is measured compacted, so the cut has to
+  // be corrected before the two can be compared at all.
+  const compacted_from_cut_cy = cut_volume_cy * shrinkage_factor;
+  const balance_cy = compacted_from_cut_cy - fill_required_cy;
+  const balanced = Math.abs(balance_cy) < 1e-9;
+  const surplus = balance_cy > 0;
+  const borrow_needed_cy = balance_cy < 0 ? -balance_cy : 0;
+  const waste_cy = balance_cy > 0 ? balance_cy : 0;
+  const cut_needed_for_fill_cy = fill_required_cy / shrinkage_factor;
+  // Overhaul is a volume-distance product beyond the free haul, priced in
+  // station-yards: one cubic yard moved one hundred feet past free haul.
+  const beyond_free_haul_ft = Math.max(0, average_overhaul_distance_ft - free_haul_ft);
+  const overhaul_station_yards = overhaul_volume_cy * beyond_free_haul_ft / FT_PER_STATION;
+  const overhaul_cost = overhaul_rate_per_station_yard > 0 ? overhaul_station_yards * overhaul_rate_per_station_yard : null;
+  const free_haul_stations = free_haul_ft / FT_PER_STATION;
+  // The comparison that decides borrow against overhaul: hauling material from
+  // a borrow pit is itself a haul, and the shorter one wins.
+  const borrow_station_yards = (borrow_haul_ft > 0 && overhaul_volume_cy > 0)
+    ? overhaul_volume_cy * Math.max(0, borrow_haul_ft - free_haul_ft) / FT_PER_STATION
+    : null;
+  const borrow_cheaper = borrow_station_yards === null ? null : borrow_station_yards < overhaul_station_yards;
+  const outs = [compacted_from_cut_cy, balance_cy, overhaul_station_yards, free_haul_stations, cut_needed_for_fill_cy];
+  if (!outs.every(Number.isFinite)) return { error: "Mass haul math is not a finite value." };
+  const balance_verdict = balanced
+    ? "BALANCED: " + fmt(cut_volume_cy, 0) + " cy of cut at a " + fmt(shrinkage_factor, 3) + " factor makes exactly the " + fmt(fill_required_cy, 0) + " cy of compacted fill required"
+    : surplus
+      ? "SURPLUS of " + fmt(waste_cy, 0) + " cy: " + fmt(cut_volume_cy, 0) + " cy of cut yields " + fmt(compacted_from_cut_cy, 0) + " cy compacted against " + fmt(fill_required_cy, 0) + " cy needed, so that much is wasted or exported"
+      : "DEFICIT of " + fmt(borrow_needed_cy, 0) + " cy: " + fmt(cut_volume_cy, 0) + " cy of cut yields only " + fmt(compacted_from_cut_cy, 0) + " cy compacted against " + fmt(fill_required_cy, 0) + " cy needed, so that much must be borrowed. It would take " + fmt(cut_needed_for_fill_cy, 0) + " cy of cut in place to make the fill";
+  const haul_verdict = borrow_cheaper === null
+    ? "Enter a borrow haul distance to compare importing against hauling the length of the job."
+    : borrow_cheaper
+      ? "BORROW IS CHEAPER on distance alone: " + fmt(borrow_station_yards, 0) + " station-yards against " + fmt(overhaul_station_yards, 0) + " to haul it along the alignment -- before the cost of the material itself and of wasting what it displaces"
+      : "HAULING ALONG THE JOB IS SHORTER: " + fmt(overhaul_station_yards, 0) + " station-yards against " + fmt(borrow_station_yards, 0) + " from the borrow pit";
+  return {
+    cut_volume_cy, shrinkage_factor, compacted_from_cut_cy, fill_required_cy,
+    balance_cy, balanced, surplus, borrow_needed_cy, waste_cy, cut_needed_for_fill_cy,
+    free_haul_ft, free_haul_stations, overhaul_volume_cy, average_overhaul_distance_ft,
+    beyond_free_haul_ft, overhaul_station_yards, overhaul_rate_per_station_yard,
+    overhaul_cost, borrow_haul_ft, borrow_station_yards, borrow_cheaper,
+    balance_verdict, haul_verdict,
+    note: "A mass haul diagram is the cumulative algebraic sum of cut and fill along an alignment, and everything useful about it comes from two properties of that curve. WHERE IT CROSSES THE BASE LINE, CUT EQUALS FILL between the crossings -- those are the balance points, and the earth between them moves within itself. Where the curve rises, material moves forward along the alignment; where it falls, backward. A persistent surplus or deficit shows as a curve that never returns, and that is where importing or exporting beats hauling. THE SHRINKAGE CORRECTION COMES FIRST AND IT IS NOT OPTIONAL. Cut is measured in place and fill is measured compacted, and the two are different states of the same dirt: most soils lose volume between them, so a cut yields less compacted fill than its in-place measurement, while rock swells and yields more. Accumulating a mass ordinate from uncorrected volumes produces balance points in the wrong places and a haul plan built on them. FREE HAUL AND OVERHAUL ARE A PAYMENT CONVENTION rather than a physical distinction. The free haul distance is the movement included in the excavation price, drawn as a horizontal chord across the curve; the volume above that chord is the material that travels further, and it is paid separately as overhaul in STATION-YARDS -- one cubic yard moved one hundred feet beyond free haul. That unit is why the arithmetic matters: overhaul is a product of volume AND distance, so a modest volume moved a long way can cost more than a large volume moved a short one, and the diagram is what shows which is happening. And the decision the diagram exists to inform is borrow against haul. Bringing material from a pit is itself a haul, so the comparison is between the station-yards of hauling along the job and the station-yards from the pit, plus the cost of the material and of wasting whatever it displaces. On a long alignment with a deficit at one end, borrowing locally routinely beats dragging fill the length of the project. A balance check and an overhaul quantity from figures the reader supplies. IT DOES NOT BUILD THE MASS HAUL DIAGRAM: that takes the cut and fill volume at every station along the alignment, and the balance points, the free haul chord and the overhaul volume are read off the completed curve. The overhaul volume and its average distance are entered here rather than derived for that reason. It does not address haul road condition, grades, or equipment cycle times, which decide the actual cost of moving a yard; the sequencing and phasing of the work; the suitability of cut material for fill, which is a geotechnical question and frequently the real constraint; moisture conditioning; or environmental limits on borrow and waste sites. Shrinkage factors vary by material and by the compaction specified and should come from the geotechnical report rather than from a rule of thumb. The project's earthwork quantities, the geotechnical report, the contract's measurement and payment provisions, and the engineer of record govern.",
+  };
+}
+const massHaulOverhaulExample = { inputs: { cut_volume_cy: 12000, shrinkage_factor: 0.9, fill_required_cy: 10800, free_haul_ft: 1000, overhaul_volume_cy: 4200, average_overhaul_distance_ft: 2600, overhaul_rate_per_station_yard: 0.85, borrow_haul_ft: 1800 } };
+SURVEY_RENDERERS["mass-haul-overhaul"] = _simpleRenderer({
+  citation: "Citation: the mass haul conventions by name -- cut corrected by its shrinkage factor before it is compared with compacted fill; balance points where the mass ordinate crosses the base line; free haul as a horizontal chord of that length; and overhaul as the volume beyond it times its distance past free haul, in STATION-YARDS (one cubic yard moved 100 ft). IT DOES NOT BUILD THE DIAGRAM: the overhaul volume and its average distance are read off a completed curve and entered here. Shrinkage factors vary by material and compaction and come from the geotechnical report. The project's earthwork quantities, the geotechnical report, the contract's measurement and payment provisions, and the engineer of record govern.",
+  example: massHaulOverhaulExample.inputs,
+  fields: [
+    { key: "cut_volume_cy", label: "Cut volume, measured in place (cy)", kind: "number", default: 12000 },
+    { key: "shrinkage_factor", label: "Shrinkage factor (below 1 compacts, above 1 swells)", kind: "number", default: 0.9 },
+    { key: "fill_required_cy", label: "Compacted fill required (cy)", kind: "number", default: 10800 },
+    { key: "free_haul_ft", label: "Free haul distance (ft)", kind: "number", default: 1000 },
+    { key: "overhaul_volume_cy", label: "Volume beyond free haul, off the diagram (cy)", kind: "number", default: 4200 },
+    { key: "average_overhaul_distance_ft", label: "Average haul distance for that volume (ft)", kind: "number", default: 2600 },
+    { key: "overhaul_rate_per_station_yard", label: "Overhaul rate per station-yard (0 to skip)", kind: "number", default: 0.85 },
+    { key: "borrow_haul_ft", label: "Haul distance from a borrow pit (ft, 0 to skip)", kind: "number", default: 1800 },
+  ],
+  outputs: [
+    { key: "c", id: "mho-out-c", label: "Cut corrected to compacted", value: (r) => fmt(r.cut_volume_cy, 0) + " cy in place at " + fmt(r.shrinkage_factor, 3) + " makes " + fmt(r.compacted_from_cut_cy, 0) + " cy of fill" },
+    { key: "b", id: "mho-out-b", label: "Balance", value: (r) => r.balance_verdict },
+    { key: "o", id: "mho-out-o", label: "Overhaul", value: (r) => fmt(r.overhaul_station_yards, 0) + " station-yards -- " + fmt(r.overhaul_volume_cy, 0) + " cy carried " + fmt(r.beyond_free_haul_ft, 0) + " ft past a " + fmt(r.free_haul_ft, 0) + " ft (" + fmt(r.free_haul_stations, 1) + " station) free haul" },
+    { key: "p", id: "mho-out-p", label: "Overhaul cost", value: (r) => r.overhaul_cost === null ? "(no rate entered)" : fmt(r.overhaul_cost, 2) + " at " + fmt(r.overhaul_rate_per_station_yard, 3) + " per station-yard" },
+    { key: "h", id: "mho-out-h", label: "Borrow against haul", value: (r) => r.haul_verdict },
+    { key: "n", id: "mho-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMassHaulOverhaul,
+});

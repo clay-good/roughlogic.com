@@ -1562,6 +1562,17 @@ const RELATED = {
   "nesc-district-loading": ["conductor-sag-at-temperature","transverse-wind-load-conductor","conductor-blowout"],
   "conductor-creep-elongation": ["conductor-sag-at-temperature","line-ground-clearance-nesc","ruling-span"],
   "sagging-return-wave": ["ruling-span","conductor-sag-at-temperature","line-ground-clearance-nesc"],
+  // spec-v1738..v1744, v1637..v1639: groundwater, survey, and kitchen band.
+  "seepage-travel-time": ["well-point-spacing","soil-permeability","well-drawdown"],
+  "well-point-spacing": ["dewatering-rate","seepage-travel-time","trench-slope"],
+  "water-quality-volume": ["stormwater-detention-volume","drywell-infiltration","stormwater-rational"],
+  "drone-gsd-overlap": ["lidar-point-density","rtk-error-budget","grid-to-ground"],
+  "lidar-point-density": ["drone-gsd-overlap","rtk-error-budget","grid-to-ground"],
+  "rtk-error-budget": ["drone-gsd-overlap","lidar-point-density","grid-to-ground"],
+  "mass-haul-overhaul": ["earthwork-end-area","soil-swell-shrink","unit-cost-earthwork"],
+  "grease-duct-cleaning-interval": ["hood-exhaust","kitchen-makeup-air-deficit","grease-trap"],
+  "walk-in-door-infiltration": ["walk-in-cooler-load","kitchen-makeup-air-deficit","infiltration-load"],
+  "kitchen-makeup-air-deficit": ["hood-exhaust","mua-tempering-load","grease-duct-cleaning-interval"],
   // spec-v1679, v1681..v1689: sheet metal, masonry, and scaffold band.
   "square-to-round-development": ["cone-flat-pattern","duct-transition-length","pipe-miter-cut"],
   "standing-seam-takeoff": ["metal-roof-thermal-movement","metal-roof-panels","sheathing-takeoff"],

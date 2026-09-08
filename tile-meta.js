@@ -1119,6 +1119,17 @@ const _TILES = [
   ["nesc-district-loading", "A"],
   ["conductor-creep-elongation", "A"],
   ["sagging-return-wave", "A"],
+  // spec-v1738..v1744, v1637..v1639 groundwater, survey, and kitchen band
+  ["seepage-travel-time", "E"],
+  ["well-point-spacing", "E"],
+  ["water-quality-volume", "E"],
+  ["drone-gsd-overlap", "E"],
+  ["lidar-point-density", "E"],
+  ["rtk-error-budget", "E"],
+  ["mass-haul-overhaul", "E"],
+  ["grease-duct-cleaning-interval", "O"],
+  ["walk-in-door-infiltration", "O"],
+  ["kitchen-makeup-air-deficit", "O"],
   // spec-v1679, v1681..v1689 sheet metal, masonry, and scaffold band
   ["square-to-round-development", "E"],
   ["standing-seam-takeoff", "E"],

@@ -22093,6 +22093,129 @@ export const CITATIONS = {
       { name: "The target sag comes from elsewhere", value: "the stringing chart at the ruling span and the temperature at that moment", source: "the utility's stringing charts" },
     ],
   },
+  // spec-v1738..v1744 and v1637..v1639: the 2026-09-08 trade-expansion
+  // groundwater, survey technology, and commercial kitchen band. spec-v1737 was
+  // cut to well-drawdown.
+  "seepage-travel-time": {
+    formula: "gradient i = head difference / flow path length; Darcy velocity q = K i; seepage (particle) velocity v = q / effective porosity; travel time = distance / v, divided again by a retardation factor for a sorbing contaminant.",
+    edition: "Darcy's law and the seepage velocity relation by name. EFFECTIVE porosity, not total porosity: only interconnected pore space conducts flow, and the gap between the two is largest in clay. One-dimensional steady flow through a homogeneous isotropic aquifer; no dispersion, degradation, density effects, or preferential pathways. The hydrogeologist's conceptual model, the site's own measured conductivity and gradient, and the regulator govern.",
+    freeAccess: "Two divisions on a conductivity and a gradient the reader measures; no aquifer data is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Darcy's law gives a FLUX and not a speed, and the difference is the most consequential mistake in groundwater arithmetic. The Darcy velocity is flow per unit of TOTAL area, solids included, and no particle moves at it; water moves only through the pores, so the particle speed is that divided by the effective porosity and is always several times larger. Using the Darcy velocity to estimate travel time overstates it by exactly the reciprocal of the porosity, and in the dangerous direction -- it says a plume takes thirteen years to reach a receptor it reaches in four. Preferential pathways carry water far faster than any bulk average, so a computed travel time is a central estimate with a very fast tail.",
+    assumptions: [
+      { name: "Effective porosity, not total", value: "dead-end pores and bound water are part of the total and conduct nothing", source: "the hydrogeologist's conceptual model" },
+      { name: "Homogeneous isotropic aquifer", value: "sand lenses, fractures and old trenches carry water far faster", source: "the site investigation" },
+      { name: "No dispersion or degradation", value: "arrival is a range, not a date, and concentration falls along the way", source: "the regulator" },
+    ],
+  },
+  "well-point-spacing": {
+    formula: "total drawdown = excavation depth + the margin below subgrade - the water table depth; stages = that drawdown / the practical suction lift, rounded up; points per stage = the excavation perimeter / the spacing.",
+    edition: "The well point staging and layout relations by name. A vacuum header lifts only about 15 to 18 ft per stage whatever the pump, because atmospheric pressure sets the limit. SPACING IS ENTERED, not derived: it comes from the soil's cone of depression, and a LESS permeable soil needs points CLOSER together. It does not compute the flow to the excavation, which takes the aquifer properties and a flow net and is what sizes the pumps. The dewatering contractor's design, the geotechnical investigation, and the engineer of record govern.",
+    freeAccess: "Two divisions on a geometry the reader measures; no dewatering design is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Suction lift is a physical ceiling and not a preference: about fifteen to eighteen feet per stage whatever the pump, so an excavation needing more drawdown needs STAGES benched into the cut. A dewatering plan showing one ring of points at the top of a deep excavation has not accounted for it and will not reach subgrade. The spacing intuition runs backwards: the points must be close enough that their cones of depression OVERLAP, and in a silty sand the cones are narrow and steep so the points must be CLOSER -- less permeable soil needs more points, not fewer. Inadequate dewatering produces boiling and heave at the subgrade and undercuts slope faces, and both fail suddenly.",
+    assumptions: [
+      { name: "Spacing is entered, not derived", value: "it comes from the soil's cone of depression", source: "the geotechnical investigation" },
+      { name: "No flow calculation", value: "the flow to the excavation takes a flow net and is what sizes the pumps", source: "the dewatering contractor's design" },
+      { name: "No settlement or permitting", value: "drawdown settles adjacent ground and the discharge is regulated", source: "the engineer of record" },
+    ],
+  },
+  "water-quality-volume": {
+    formula: "WQV = rainfall depth x the volumetric runoff coefficient x area, with Rv = 0.05 + 0.009 x percent impervious and 3,630 cubic feet per inch-acre (43,560 / 12); the release rate that empties it is the volume over the required drawdown time.",
+    edition: "The water quality volume relation by name. The Rv is VOLUMETRIC for a small storm and is not the Rational method's peak-flow C. The rainfall depth (commonly 1.0 to 1.5 in), the coefficient form, and the drawdown requirement (often 24 to 48 hours) come from the applicable manual and differ between states. It sizes a volume, not a facility. The state or local stormwater manual, the reviewing authority, and the engineer of record govern.",
+    freeAccess: "One multiplication on a depth and an imperviousness the reader has; no state manual is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Water quality sizing is a DIFFERENT question from detention: it captures the frequent small storms that carry most of the annual pollutant load, while detention sizes on events that happen once in ten or a hundred years, and a facility sized only for the large event passes the small ones straight through. Because the coefficient is linear in impervious cover, taking a site from sixty five percent impervious to forty cuts the volume to treat by about a third -- and that reduction comes from the SITE PLAN rather than from the facility, which is why disconnecting impervious area is so much cheaper than building the pond it would otherwise require. Drawdown decides the outlet: too fast and it does not treat, too slow and it is not ready for the next storm.",
+    assumptions: [
+      { name: "The rainfall depth is entered", value: "commonly 1.0 to 1.5 in, set by the state or local manual", source: "the applicable stormwater manual" },
+      { name: "Rv is volumetric, not the Rational C", value: "different numbers for different purposes", source: "the applicable stormwater manual" },
+      { name: "A volume, not a facility", value: "media, geometry, underdrain and pretreatment each have their own criteria", source: "the reviewing authority" },
+    ],
+  },
+  "drone-gsd-overlap": {
+    formula: "GSD = flight height x sensor pixel pitch / focal length; the image footprint is GSD x the sensor pixel dimensions; line spacing = footprint width x (1 - side overlap); shot interval = footprint height x (1 - forward overlap); image count = area / (line spacing x shot interval).",
+    edition: "The photogrammetric ground sample distance relation by name. GSD IS RESOLUTION, NOT ACCURACY: accuracy comes from ground control, camera calibration and block geometry, and is not computed here. Nadir imagery over level ground; terrain relief varies both the GSD and the overlap across a frame. Airspace, authorisation and visual line of sight are outside it. The applicable civil aviation rules, the project's accuracy specification, and the surveyor of record govern.",
+    freeAccess: "One similar-triangles ratio on numbers off a camera spec sheet; no flight planning software output is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "GSD scales linearly with height and the cost of improving it does not: HALVING THE HEIGHT HALVES THE GSD AND QUADRUPLES THE IMAGE COUNT, because both footprint dimensions halve at once -- four times the flight time, the battery swaps, and processing that scales worse than linearly. The most important sentence in the subject is that GSD is not accuracy: a survey flown at half a centimetre per pixel with no ground control can be metres out and will look magnificent while it is wrong. Overlap goes HIGHER over vegetation, water and uniform surfaces, because matching needs texture, and a flight planned at minimum overlap over canopy leaves holes no processing recovers.",
+    assumptions: [
+      { name: "GSD is resolution, not accuracy", value: "accuracy comes from ground control and block geometry", source: "the project's accuracy specification" },
+      { name: "Nadir over level ground", value: "terrain relief varies the GSD and overlap across the frame", source: "terrain-following flight planning" },
+      { name: "Airspace and authorisation are outside it", value: "and they govern whether the flight happens", source: "the applicable civil aviation rules" },
+    ],
+  },
+  "lidar-point-density": {
+    formula: "swath width = 2 x flight height x tan(half the total scan angle); point density = pulse rate / (swath width x ground speed); point spacing = 1 / sqrt(density); line spacing = swath width x (1 - side overlap).",
+    edition: "The airborne LiDAR density relations by name, with fifteen to thirty percent side overlap normal because the swath edges are where the scan geometry is worst. DENSITY IS SAMPLING, NOT ACCURACY: accuracy comes from the sensor's ranging precision, the inertial and satellite trajectory, and the boresight calibration. Nominal density for a linear scanner over level ground; an oscillating mirror gives higher density at the swath edges. The sensor manufacturer's specifications, the project's accuracy and density specification, and the surveyor of record govern.",
+    freeAccess: "One tangent and one division on numbers off a sensor spec sheet; no manufacturer data is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Density is the pulse rate over the ground area swept per second, so all three flight parameters enter and the two a pilot can change trade very differently. Halving the SPEED doubles the density and doubles the flight time -- a linear trade, and often the cheap one. Halving the HEIGHT also doubles the density, but the swath halves with it, so the line count doubles too: altitude is the expensive lever. A density figure also hides multiple returns -- FIRST return density and GROUND return density are very different numbers under canopy, and a specification written for one and delivered against the other is a common dispute, because it is the ground density a terrain model needs.",
+    assumptions: [
+      { name: "Density is sampling, not accuracy", value: "a dense cloud from a poorly calibrated system is densely wrong", source: "the project's accuracy specification" },
+      { name: "Uniform coverage across the swath", value: "an oscillating mirror is denser at the edges where it slows and reverses", source: "the sensor manufacturer's specifications" },
+      { name: "First returns, not ground returns", value: "ground density under canopy is a fraction of the nominal figure", source: "the project's density specification" },
+    ],
+  },
+  "rtk-error-budget": {
+    formula: "horizontal error = the fixed component + the ppm component x the baseline in km; vertical the same with its own coefficients, and roughly twice the horizontal; a base position error ADDS directly to both rather than combining in quadrature, because it is systematic.",
+    edition: "The RTK error budget convention by name. The vertical is about twice the horizontal because satellites are all above the receiver and none below. A BASE POSITION ERROR IS SYSTEMATIC: every rover observation of the session inherits it exactly, it does not average out, and it does not appear in the data collector's internal quality figures. A float solution is not survey grade. A precision budget, not an accuracy statement: multipath, dilution of precision, ionospheric activity and geoid model uncertainty are not included. The receiver manufacturer's specification, the project's accuracy requirements, the control network, and the surveyor of record govern.",
+    freeAccess: "One multiplication on a manufacturer's published specification; no receiver data is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The fixed component is the receiver's own floor and does not improve with a shorter baseline; the ppm term grows with distance because the atmosphere the correction models diverges between the two receivers. The vertical is roughly twice the horizontal for a geometric reason rather than an electronic one: satellites are all above the receiver, so the intersection that fixes a horizontal position from many directions has only one side to work with vertically. THE FAILURE THAT DWARFS BOTH IS THE BASE POSITION -- a base set on an autonomous position can be off by a metre, and every rover observation of that session inherits it exactly. It is systematic, it does not average out, and it does not appear in the quality figures the data collector displays, which describe the vector from the base and not the base itself.",
+    assumptions: [
+      { name: "A precision budget, not accuracy", value: "multipath, DOP, ionosphere and geoid uncertainty are excluded", source: "the project's accuracy requirements" },
+      { name: "Base error adds, it does not combine", value: "it is a systematic shift on every observation of the session", source: "the control network" },
+      { name: "Only a fixed solution carries the specification", value: "a float solution stores coordinates that look identical in the file", source: "the receiver manufacturer's specification" },
+    ],
+  },
+  "mass-haul-overhaul": {
+    formula: "cut corrected by its shrinkage factor before comparison with compacted fill; balance = corrected cut - fill required; overhaul = the volume beyond free haul x its distance past free haul / 100, in station-yards; the borrow comparison is the same product at the borrow haul distance.",
+    edition: "The mass haul conventions by name -- balance points where the mass ordinate crosses the base line, free haul as a horizontal chord of that length, and overhaul priced in STATION-YARDS (one cubic yard moved 100 ft beyond free haul). IT DOES NOT BUILD THE DIAGRAM: the overhaul volume and its average distance are read off a completed curve and entered here. Shrinkage factors vary by material and by the compaction specified and come from the geotechnical report. The project's earthwork quantities, the geotechnical report, the contract's measurement and payment provisions, and the engineer of record govern.",
+    freeAccess: "One multiplication and one comparison on quantities the reader takes off a diagram; no earthwork quantities are reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE SHRINKAGE CORRECTION COMES FIRST AND IT IS NOT OPTIONAL: cut is measured in place and fill compacted, and most soils lose volume between the two while rock swells, so accumulating a mass ordinate from uncorrected volumes puts the balance points in the wrong places. Free haul and overhaul are a PAYMENT convention rather than a physical distinction -- the free haul is the movement included in the excavation price, and the volume beyond it is paid in station-yards, a product of volume AND distance. That is why a modest volume moved a long way can cost more than a large volume moved a short one. The decision the diagram informs is borrow against haul: bringing material from a pit is itself a haul, and on a long alignment with a deficit at one end, borrowing locally routinely beats dragging fill the length of the job.",
+    assumptions: [
+      { name: "It does not build the diagram", value: "the balance points, free haul chord and overhaul volume are read off a completed curve", source: "the project's earthwork quantities" },
+      { name: "Shrinkage factors come from the geotechnical report", value: "they vary by material and by the compaction specified", source: "the geotechnical report" },
+      { name: "No cycle times or suitability", value: "haul roads, grades and whether cut material can be used as fill decide the real cost", source: "the engineer of record" },
+    ],
+  },
+  "grease-duct-cleaning-interval": {
+    formula: "months overdue = months since the last inspection - the interval for the cooking volume; the cleaning trigger is the general depth criterion, or the tighter designated-inspection-point criterion where the measurement was taken at one.",
+    edition: "The NFPA 96 inspection intervals by cooking volume, by name -- monthly for solid fuel, quarterly for high volume (24 hour, charbroiling, wok), semiannually for moderate, annually for low volume -- with the depth criterion commonly 2,000 micrometres generally and 50 micrometres at a designated inspection point. The schedule and the measurement are separate tests and the MEASUREMENT GOVERNS. Cleaning scope is the entire system: hood, filters, the full duct, the fan and the roof discharge. NFPA 96 as adopted, the authority having jurisdiction, and the certified cleaning contractor govern.",
+    freeAccess: "One subtraction and one comparison on a measurement the reader takes; no NFPA text is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The interval is set by COOKING VOLUME rather than by kitchen size, and a charbroiler in an otherwise moderate kitchen moves the whole system into the quarterly column. The schedule and the measurement are two separate tests and the MEASUREMENT GOVERNS: a system inspected on time and found with grease is cleaned on the spot, and one found clean is still inspected again at the interval. The scope trap is the one that leaves buildings on fire -- cleaning means the entire system including horizontal runs, the fan housing and the roof curb, and a cleaning that addresses the hood, the filters and the first accessible duct section has cleaned the easy part and left the part that burns.",
+    assumptions: [
+      { name: "The cooking volume category is a judgment", value: "and it sets the whole schedule", source: "the authority having jurisdiction" },
+      { name: "The measurement governs over the schedule", value: "any measurable grease means cleaning, whatever the interval says", source: "NFPA 96 as adopted" },
+      { name: "Scope is the entire system", value: "the fan housing and roof curb are routinely skipped", source: "the certified cleaning contractor" },
+    ],
+  },
+  "walk-in-door-infiltration": {
+    formula: "door open factor = openings per hour x seconds open / 3,600; effective airflow = the fully-open doorway flow x that factor x the doorway protection factor; load = airflow x 60 x air density x the enthalpy difference; latent load = the same mass flow x the moisture difference x 1,061 Btu/lb.",
+    edition: "The walk-in doorway infiltration relations by name. The fully-open doorway flow comes from the ASHRAE doorway flow relations or the manufacturer's data for the door size and temperature difference, and the enthalpy and moisture differences from a psychrometric chart at the two conditions. Protection factors run about 0.3 to 0.5 for strip curtains and 0.2 to 0.4 for an air curtain. It does not size the refrigeration system. ASHRAE's refrigeration handbook, the box and door manufacturer's data, and the refrigeration designer govern.",
+    freeAccess: "One fraction and two multiplications on a doorway flow and a psychrometric difference the reader supplies; no ASHRAE table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The door open factor is simply the fraction of the hour the door stands open, and it is where a busy kitchen diverges from a design assumption: sixty openings of twenty seconds is a third of the hour, and a door propped for a delivery is all of it. On an ordinary box the door load at that duty commonly rivals the product and transmission loads combined. A large share of the load on a freezer door is LATENT, and that share has consequences beyond the compressor: the moisture condenses and freezes on the evaporator, which blocks airflow, raises the defrost frequency, and puts the defrost heat back into the box each cycle. Doorway protection is the cheapest intervention on the list, and cutting infiltration cuts the frost accumulation by roughly the same fraction.",
+    assumptions: [
+      { name: "The doorway airflow is entered", value: "it depends on door height, density ratio and flow regime", source: "ASHRAE's refrigeration handbook" },
+      { name: "Steady state, not per-opening transient", value: "the air curtain re-establishment and doorway mixing are not modelled", source: "the door manufacturer's data" },
+      { name: "Not a refrigeration load calculation", value: "transmission, product, lighting, motor, personnel and defrost loads sit alongside this one", source: "the refrigeration designer" },
+    ],
+  },
+  "kitchen-makeup-air-deficit": {
+    formula: "deficit = total exhaust - dedicated makeup air; the uncontrolled shortfall is that deficit less the intended transfer from adjacent space; negative pressure = the shortfall / the building's leakage coefficient; door force = that pressure x the door area, against the 30 lbf egress limit.",
+    edition: "The kitchen air balance identities by name. It balances air: it does not size a hood or its exhaust, size or temper a makeup air unit, or distribute the makeup air, which matters as much as its quantity. The leakage coefficient is a crude single-parameter building model and a measured blower-door result is the only sound source for it. The combustion safety test is a field measurement. The applicable mechanical code, the hood and makeup air manufacturers' data, a measured air balance, and the mechanical designer govern.",
+    freeAccess: "Two subtractions and one division on an air balance the reader measures; no code table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Every cubic foot exhausted comes back from somewhere. Some deficit is intentional -- a kitchen is kept slightly negative so odours stay out of the dining room -- and what matters is the part not accounted for, which comes through the envelope, under doors, and down any flue that will pass it. The consequences arrive in an order: door opening force first, which can exceed the thirty pound egress limit in a tight building and is a life safety problem before a comfort one; then combustion appliance backdrafting; then other exhaust fans reversing. AND THE HOOD ITSELF STOPS WORKING -- a hood starved of makeup air cannot move its rated exhaust, so capture degrades and adding fan speed makes the pressure worse rather than better. A kitchen with a capture problem is often a makeup air problem wearing a hood problem's clothes.",
+    assumptions: [
+      { name: "An air balance, not a design", value: "it does not size the hood, the makeup air unit, or its tempering", source: "the mechanical designer" },
+      { name: "The leakage coefficient is crude", value: "a measured blower-door result is the only sound source", source: "a measured air balance" },
+      { name: "Distribution matters as much as quantity", value: "makeup air delivered across the cooking surface disrupts capture", source: "the hood manufacturer's data" },
+    ],
+  },
   // spec-v1679, v1681..v1689: the 2026-09-08 trade-expansion sheet metal,
   // masonry, and scaffold band. spec-v1680 was cut to pipe-miter-cut.
   "square-to-round-development": {

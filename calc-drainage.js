@@ -27,6 +27,60 @@ const _finiteGuard = (o) => {
   return null;
 };
 
+// Compact renderer factory, copied verbatim from calc-masonry.js (same
+// ui-fields imports) per the new-module convention; only the inner render
+// function's name differs, so the schema-coverage gates read it unchanged.
+function _simpleRenderer(spec) {
+  const _drRender = function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      let field;
+      if (f.kind === "select") field = makeSelect(f.label, f.id || f.key, f.options);
+      else field = makeNumber(f.label, f.id || f.key, f.attrs || { step: "any", min: "0" });
+      fields[f.key] = field;
+      if (f.default !== undefined) {
+        if (f.kind === "select") field.select.value = f.default;
+        else field.input.value = String(f.default);
+      }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key];
+        else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) {
+        if (f.kind === "select") params[f.key] = fields[f.key].select.value;
+        else params[f.key] = Number(fields[f.key].input.value) || 0;
+      }
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) {
+      const el = f.kind === "select" ? fields[f.key].select : fields[f.key].input;
+      el.addEventListener(f.kind === "select" ? "change" : "input", update);
+    }
+  };
+
+  _drRender.schema = {
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
+    citation: spec.citation ?? null,
+    scope: spec.scope ?? null,
+  };
+  return _drRender;
+}
+
 export const DRAINAGE_RENDERERS = {};
 
 // =====================================================================
@@ -1601,3 +1655,200 @@ function renderBoxCulvertHeadwater(inputRegion, outputRegion, citationEl) {
   cfg.select.addEventListener("change", update);
 }
 DRAINAGE_RENDERERS["box-culvert-headwater"] = renderBoxCulvertHeadwater;
+
+// ===========================================================================
+// spec-v1738..v1740: the 2026-09-08 trade-expansion groundwater and stormwater
+// band. Three tiles, all group E.
+//
+// spec-v1737 pump-test-transmissivity WAS CUT: `well-drawdown` in calc-water.js
+// has computed the Cooper-Jacob transmissivity T = 264 Q / delta-s since
+// spec-v23. What it lacked -- storativity from the zero-drawdown intercept and
+// the hydraulic conductivity for an aquifer thickness -- landed there instead.
+
+// ============ spec-v1738: groundwater seepage velocity and travel time ============
+
+// dims: in { hydraulic_conductivity_ft_day: L T^-1, head_difference_ft: L, flow_path_ft: L, effective_porosity: dimensionless, travel_distance_ft: L, retardation_factor: dimensionless } out: { gradient: dimensionless, darcy_velocity_ft_day: L T^-1, seepage_velocity_ft_day: L T^-1, travel_time_days: T, travel_time_years: T, contaminant_travel_years: T }
+export function computeSeepageTravelTime({ hydraulic_conductivity_ft_day = 0, head_difference_ft = 0, flow_path_ft = 0, effective_porosity = 0, travel_distance_ft = 0, retardation_factor = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(hydraulic_conductivity_ft_day > 0)) return { error: "Hydraulic conductivity must be positive (ft/day)." };
+  if (!(head_difference_ft > 0)) return { error: "The head difference must be positive (ft)." };
+  if (!(flow_path_ft > 0)) return { error: "The flow path length must be positive (ft)." };
+  if (!(effective_porosity > 0 && effective_porosity < 1)) return { error: "Effective porosity must be between 0 and 1 -- it is a fraction, and it is smaller than total porosity." };
+  if (!(travel_distance_ft > 0)) return { error: "The travel distance must be positive (ft)." };
+  if (!(retardation_factor >= 1)) return { error: "The retardation factor cannot be below one; a sorbing contaminant travels slower than the water, never faster." };
+  // The JULIAN year, 365.25 days, because a travel time spans leap years.
+  // It is a different constant from the 365 traffic days a year the ESAL
+  // calculation counts, so it carries a different name.
+  const DAYS_PER_JULIAN_YEAR = 365.25;
+  const gradient = head_difference_ft / flow_path_ft;
+  // Darcy velocity is a FLUX per unit total area, not a particle speed.
+  const darcy_velocity_ft_day = hydraulic_conductivity_ft_day * gradient;
+  // Dividing by the EFFECTIVE porosity gives the speed a water particle
+  // actually moves, because only that fraction of the area conducts flow.
+  const seepage_velocity_ft_day = darcy_velocity_ft_day / effective_porosity;
+  const travel_time_days = travel_distance_ft / seepage_velocity_ft_day;
+  const travel_time_years = travel_time_days / DAYS_PER_JULIAN_YEAR;
+  const darcy_travel_time_days = travel_distance_ft / darcy_velocity_ft_day;
+  const darcy_travel_time_years = darcy_travel_time_days / DAYS_PER_JULIAN_YEAR;
+  const overstatement_x = travel_time_days > 0 ? darcy_travel_time_days / travel_time_days : null;
+  const contaminant_velocity_ft_day = seepage_velocity_ft_day / retardation_factor;
+  const contaminant_travel_days = travel_distance_ft / contaminant_velocity_ft_day;
+  const contaminant_travel_years = contaminant_travel_days / DAYS_PER_JULIAN_YEAR;
+  const outs = [gradient, darcy_velocity_ft_day, seepage_velocity_ft_day, travel_time_days, travel_time_years];
+  if (!outs.every(Number.isFinite)) return { error: "Seepage math is not a finite value." };
+  return {
+    hydraulic_conductivity_ft_day, head_difference_ft, flow_path_ft, gradient,
+    effective_porosity, darcy_velocity_ft_day, seepage_velocity_ft_day,
+    travel_distance_ft, travel_time_days, travel_time_years,
+    darcy_travel_time_days, darcy_travel_time_years, overstatement_x,
+    retardation_factor, contaminant_velocity_ft_day, contaminant_travel_days, contaminant_travel_years,
+    note: "Darcy's law gives a FLUX and not a speed, and the difference between the two is the single most consequential mistake in groundwater arithmetic. The Darcy velocity is the flow per unit of TOTAL cross-sectional area -- solids included -- and no water particle moves at it. Water only moves through the pores, so the actual particle speed is the Darcy velocity divided by the EFFECTIVE porosity, and since effective porosity is a fraction well under one, the seepage velocity is always SEVERAL TIMES the Darcy velocity. Using the Darcy velocity to estimate travel time overstates it by exactly the reciprocal of the porosity, and it overstates it in the dangerous direction: it says a plume takes thirteen years to reach a receptor it actually reaches in four, which is the difference between an urgent response and a monitoring plan. Both numbers are reported here for that reason. EFFECTIVE POROSITY IS NOT TOTAL POROSITY and the gap is largest exactly where it matters. Total porosity counts every void; effective porosity counts only the interconnected pore space that actually conducts flow, and in a clay the two differ enormously -- water held in dead-end pores and bound to particle surfaces is part of the total and conducts nothing. A total porosity used in this calculation gives a seepage velocity that is too slow. The gradient is the other input people take from a map without thinking: it is the head difference divided by the distance ALONG THE FLOW PATH, and on a contoured potentiometric surface the flow path is perpendicular to the contours rather than along the shortest line between two wells. RETARDATION IS THE LAST TERM AND IT ONLY EVER SLOWS THINGS DOWN. A sorbing contaminant partitions onto the aquifer solids and travels slower than the water by its retardation factor, so a conservative tracer -- chloride, bromide -- arrives first and defines the fastest possible arrival. Reporting a contaminant arrival without saying which factor was assumed is reporting an assumption as a result. One-dimensional steady flow through a homogeneous isotropic aquifer, which is what the arithmetic can carry and not what the ground is. Real aquifers are heterogeneous, and preferential pathways -- sand lenses, fractures, old utility trenches, abandoned borings -- carry water far faster than any bulk average, so a computed travel time is a central estimate around a distribution with a very fast tail. It does not model dispersion, which spreads arrival over a range rather than a date; degradation or attenuation, which reduce concentration along the way; density-driven flow; the unsaturated zone above the water table; or any transient behaviour from pumping, recharge, or tides. The hydrogeologist's conceptual model, the site's own measured conductivity and gradient, and the regulator govern.",
+  };
+}
+const seepageTravelTimeExample = { inputs: { hydraulic_conductivity_ft_day: 25, head_difference_ft: 2, flow_path_ft: 500, effective_porosity: 0.28, travel_distance_ft: 500, retardation_factor: 1 } };
+DRAINAGE_RENDERERS["seepage-travel-time"] = _simpleRenderer({
+  citation: "Citation: Darcy's law and the seepage velocity relation by name -- Darcy velocity q = K i, seepage (particle) velocity v = K i / effective porosity, gradient i = head difference / flow path, travel time = distance / v -- with a retardation factor dividing the velocity for a sorbing contaminant. EFFECTIVE porosity, not total porosity: only interconnected pore space conducts flow. One-dimensional steady flow through a homogeneous isotropic aquifer; no dispersion, degradation, or preferential pathways. The hydrogeologist's conceptual model, the site's measured conductivity and gradient, and the regulator govern.",
+  example: seepageTravelTimeExample.inputs,
+  fields: [
+    { key: "hydraulic_conductivity_ft_day", label: "Hydraulic conductivity K (ft/day)", kind: "number", default: 25 },
+    { key: "head_difference_ft", label: "Head difference along the flow path (ft)", kind: "number", default: 2 },
+    { key: "flow_path_ft", label: "Flow path length (ft)", kind: "number", default: 500 },
+    { key: "effective_porosity", label: "Effective porosity (0 to 1)", kind: "number", default: 0.28 },
+    { key: "travel_distance_ft", label: "Travel distance to the receptor (ft)", kind: "number", default: 500 },
+    { key: "retardation_factor", label: "Retardation factor (1 for a conservative tracer)", kind: "number", default: 1 },
+  ],
+  outputs: [
+    { key: "i", id: "stt-out-i", label: "Hydraulic gradient", value: (r) => fmt(r.gradient, 5) + " -- " + fmt(r.head_difference_ft, 2) + " ft over " + fmt(r.flow_path_ft, 0) + " ft of flow path" },
+    { key: "d", id: "stt-out-d", label: "Darcy velocity", value: (r) => fmt(r.darcy_velocity_ft_day, 4) + " ft/day -- a FLUX per unit total area, which no particle moves at" },
+    { key: "v", id: "stt-out-v", label: "Seepage velocity", value: (r) => fmt(r.seepage_velocity_ft_day, 4) + " ft/day -- the speed water actually moves, " + fmt(1 / r.effective_porosity, 2) + "x the Darcy velocity" },
+    { key: "t", id: "stt-out-t", label: "Travel time", value: (r) => fmt(r.travel_time_days, 0) + " days, " + fmt(r.travel_time_years, 1) + " years over " + fmt(r.travel_distance_ft, 0) + " ft" },
+    { key: "w", id: "stt-out-w", label: "What the Darcy velocity would have said", value: (r) => fmt(r.darcy_travel_time_years, 1) + " years -- " + fmt(r.overstatement_x, 2) + "x too long, and wrong in the dangerous direction" },
+    { key: "c", id: "stt-out-c", label: "A retarded contaminant", value: (r) => r.retardation_factor === 1 ? "at a retardation factor of 1 this IS the water, which is the fastest anything arrives" : fmt(r.contaminant_travel_years, 1) + " years at a retardation factor of " + fmt(r.retardation_factor, 2) + " -- a conservative tracer still arrives in " + fmt(r.travel_time_years, 1) },
+    { key: "n", id: "stt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSeepageTravelTime,
+});
+
+// ============ spec-v1739: well point dewatering spacing and staging ============
+
+// dims: in { excavation_depth_ft: L, water_table_depth_ft: L, subgrade_margin_ft: L, practical_lift_ft: L, excavation_length_ft: L, excavation_width_ft: L, point_spacing_ft: L, point_capacity_gpm: L^3 T^-1 } out: { total_drawdown_ft: L, stages_required: dimensionless, drawdown_per_stage_ft: L, perimeter_ft: L, point_count: dimensionless, system_capacity_gpm: L^3 T^-1 }
+export function computeWellPointSpacing({ excavation_depth_ft = 0, water_table_depth_ft = 0, subgrade_margin_ft = 3, practical_lift_ft = 15, excavation_length_ft = 0, excavation_width_ft = 0, point_spacing_ft = 0, point_capacity_gpm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(excavation_depth_ft > 0)) return { error: "Excavation depth must be positive (ft)." };
+  if (water_table_depth_ft < 0) return { error: "The water table depth cannot be negative (ft below grade)." };
+  if (!(excavation_depth_ft > water_table_depth_ft)) return { error: "The excavation does not reach the water table; no dewatering is indicated by this calculation." };
+  if (subgrade_margin_ft < 0) return { error: "The margin below subgrade cannot be negative (ft)." };
+  if (!(practical_lift_ft > 0)) return { error: "The practical suction lift per stage must be positive (ft) -- commonly 15 to 18." };
+  if (!(excavation_length_ft > 0)) return { error: "Excavation length must be positive (ft)." };
+  if (!(excavation_width_ft > 0)) return { error: "Excavation width must be positive (ft)." };
+  if (!(point_spacing_ft > 0)) return { error: "Well point spacing must be positive (ft) -- it comes from the soil's cone of depression, not from convenience." };
+  if (point_capacity_gpm < 0) return { error: "Per-point capacity cannot be negative (gpm)." };
+  const target_depth_ft = excavation_depth_ft + subgrade_margin_ft;
+  const total_drawdown_ft = target_depth_ft - water_table_depth_ft;
+  // Suction lift is a hard physical ceiling per stage, so a deep excavation
+  // needs stages benched into the cut rather than one ring at the top.
+  const stages_required = Math.ceil(total_drawdown_ft / practical_lift_ft);
+  const drawdown_per_stage_ft = total_drawdown_ft / stages_required;
+  const single_stage_sufficient = stages_required <= 1;
+  const perimeter_ft = 2 * (excavation_length_ft + excavation_width_ft);
+  const points_per_stage = Math.ceil(perimeter_ft / point_spacing_ft);
+  const point_count = points_per_stage * stages_required;
+  const system_capacity_gpm = point_capacity_gpm > 0 ? points_per_stage * point_capacity_gpm : null;
+  const header_length_ft = perimeter_ft * stages_required;
+  const outs = [total_drawdown_ft, stages_required, drawdown_per_stage_ft, perimeter_ft, points_per_stage, point_count];
+  if (!outs.every(Number.isFinite)) return { error: "Well point math is not a finite value." };
+  const stage_verdict = single_stage_sufficient
+    ? "ONE STAGE: " + fmt(total_drawdown_ft, 1) + " ft of drawdown is inside the " + fmt(practical_lift_ft, 1) + " ft practical suction lift"
+    : fmt(stages_required, 0) + " STAGES REQUIRED: " + fmt(total_drawdown_ft, 1) + " ft of drawdown exceeds the " + fmt(practical_lift_ft, 1) + " ft a single stage can lift, so each stage takes about " + fmt(drawdown_per_stage_ft, 1) + " ft. A plan showing one ring of points at the top has not accounted for the suction limit and will not reach subgrade";
+  return {
+    excavation_depth_ft, water_table_depth_ft, subgrade_margin_ft, target_depth_ft,
+    total_drawdown_ft, practical_lift_ft, stages_required, drawdown_per_stage_ft,
+    single_stage_sufficient, excavation_length_ft, excavation_width_ft, perimeter_ft,
+    point_spacing_ft, points_per_stage, point_count, point_capacity_gpm,
+    system_capacity_gpm, header_length_ft, stage_verdict,
+    note: "A well point system lowers the water table around an excavation so the cut is made in the dry, and two constraints decide the layout. THE FIRST IS SUCTION LIFT AND IT IS A PHYSICAL CEILING, not a preference. A well point header pulls water by vacuum, and the practical lift is around fifteen to eighteen feet per stage whatever the pump -- atmospheric pressure sets the limit and no equipment negotiates it. An excavation needing more drawdown than that needs STAGES: a first ring at the original grade, then a second ring installed on a bench once the cut is deep enough to place it, and so on. A dewatering plan showing one ring of points at the top of a deep excavation has not accounted for the suction limit, and it will not reach subgrade -- which is discovered when the cut is open and the crew is standing in water. THE SECOND CONSTRAINT IS SPACING, AND ITS INTUITION RUNS BACKWARDS. The points must be close enough that their cones of depression OVERLAP, or the water table between them stays high and seeps into the cut. In a clean sand the cones are wide and flat and points can be far apart; in a silty sand the cones are narrow and steep and the points must be much closer together -- so LESS permeable soil needs MORE points, which is the opposite of the guess that less water means less equipment. Spacing therefore comes from the soil, and it is entered here rather than derived, because deriving it takes the aquifer properties and a flow net. The consequences of getting it wrong are not gradual. Water entering an excavation from below produces boiling and heave at the subgrade, which destroys the bearing surface; seepage through a slope face carries fines out and undercuts it; and both fail suddenly rather than progressively. Drawdown also settles adjacent ground, and structures inside that settlement bowl move with it. Geometry, staging, and a point count. IT DOES NOT COMPUTE THE FLOW to the excavation, which takes the aquifer's conductivity, its boundaries and thickness, and a flow net or an equivalent-well analysis, and which is what actually sizes the pumps -- the capacity reported here is only the entered per-point figure times the points, which is an upper bound the soil may not deliver. It does not size headers, pumps, or vacuum capacity, address recharge boundaries, confined aquifers, or artesian pressure below the subgrade, which is a separate and more dangerous case, or evaluate settlement of adjacent structures, discharge permitting, or the treatment of the discharged water. The dewatering contractor's design, the geotechnical investigation, and the engineer of record govern.",
+  };
+}
+const wellPointSpacingExample = { inputs: { excavation_depth_ft: 22, water_table_depth_ft: 6, subgrade_margin_ft: 3, practical_lift_ft: 15, excavation_length_ft: 100, excavation_width_ft: 60, point_spacing_ft: 5, point_capacity_gpm: 15 } };
+DRAINAGE_RENDERERS["well-point-spacing"] = _simpleRenderer({
+  citation: "Citation: the well point staging and layout relations by name -- total drawdown = excavation depth + the margin below subgrade - the water table depth; stages = that drawdown divided by the practical suction lift, rounded up, because a vacuum header lifts only about 15 to 18 ft per stage whatever the pump; points per stage = perimeter / spacing. SPACING IS ENTERED, not derived: it comes from the soil's cone of depression, and a less permeable soil needs points CLOSER together. It does not compute the flow to the excavation, which takes the aquifer properties and a flow net and is what sizes the pumps. The dewatering contractor's design, the geotechnical investigation, and the engineer of record govern.",
+  example: wellPointSpacingExample.inputs,
+  fields: [
+    { key: "excavation_depth_ft", label: "Excavation depth (ft)", kind: "number", default: 22 },
+    { key: "water_table_depth_ft", label: "Water table depth below grade (ft)", kind: "number", default: 6 },
+    { key: "subgrade_margin_ft", label: "Drawdown below subgrade (ft)", kind: "number", default: 3 },
+    { key: "practical_lift_ft", label: "Practical suction lift per stage (ft)", kind: "number", default: 15 },
+    { key: "excavation_length_ft", label: "Excavation length (ft)", kind: "number", default: 100 },
+    { key: "excavation_width_ft", label: "Excavation width (ft)", kind: "number", default: 60 },
+    { key: "point_spacing_ft", label: "Well point spacing (ft)", kind: "number", default: 5 },
+    { key: "point_capacity_gpm", label: "Per-point capacity (gpm, 0 to skip)", kind: "number", default: 15 },
+  ],
+  outputs: [
+    { key: "d", id: "wps-out-d", label: "Total drawdown required", value: (r) => fmt(r.total_drawdown_ft, 1) + " ft -- to " + fmt(r.target_depth_ft, 1) + " ft, which is " + fmt(r.subgrade_margin_ft, 1) + " ft below a " + fmt(r.excavation_depth_ft, 1) + " ft subgrade, from a water table at " + fmt(r.water_table_depth_ft, 1) + " ft" },
+    { key: "s", id: "wps-out-s", label: "Staging", value: (r) => r.stage_verdict },
+    { key: "p", id: "wps-out-p", label: "Points", value: (r) => fmt(r.points_per_stage, 0) + " per stage around a " + fmt(r.perimeter_ft, 0) + " ft perimeter at " + fmt(r.point_spacing_ft, 1) + " ft, " + fmt(r.point_count, 0) + " in all" },
+    { key: "h", id: "wps-out-h", label: "Header", value: (r) => fmt(r.header_length_ft, 0) + " ft across " + fmt(r.stages_required, 0) + " stage" + (r.stages_required === 1 ? "" : "s") },
+    { key: "q", id: "wps-out-q", label: "Nominal system capacity", value: (r) => r.system_capacity_gpm === null ? "(no per-point capacity entered)" : fmt(r.system_capacity_gpm, 0) + " gpm per stage -- an UPPER BOUND from the equipment, not a flow the soil will necessarily deliver" },
+    { key: "n", id: "wps-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWellPointSpacing,
+});
+
+// ============ spec-v1740: stormwater water quality volume ============
+
+// dims: in { rainfall_depth_in: L, impervious_percent: dimensionless, area_ac: L^2, alternative_impervious_percent: dimensionless, drawdown_hours: T } out: { runoff_coefficient: dimensionless, wqv_cf: L^3, wqv_ac_ft: L^3, alternative_wqv_cf: L^3, volume_saved_cf: L^3, release_rate_cfs: L^3 T^-1 }
+export function computeWaterQualityVolume({ rainfall_depth_in = 0, impervious_percent = 0, area_ac = 0, alternative_impervious_percent = 0, drawdown_hours = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(rainfall_depth_in > 0)) return { error: "The water quality rainfall depth must be positive (in) -- commonly 1.0 to 1.5, set by the state or local manual." };
+  if (!(impervious_percent >= 0 && impervious_percent <= 100)) return { error: "Impervious cover must be between 0 and 100 percent." };
+  if (!(area_ac > 0)) return { error: "The contributing drainage area must be positive (acres)." };
+  if (alternative_impervious_percent < 0 || alternative_impervious_percent > 100) return { error: "The comparison impervious cover must be between 0 and 100 percent." };
+  if (drawdown_hours < 0) return { error: "The drawdown time cannot be negative (hours)." };
+  // An inch of rain over an acre is 43,560/12 = 3,630 cubic feet.
+  const CF_PER_IN_ACRE = 3630;
+  const CF_PER_ACRE_FT = 43560;
+  const rv = (imp) => 0.05 + 0.009 * imp;
+  const runoff_coefficient = rv(impervious_percent);
+  const wqv_cf = rainfall_depth_in * runoff_coefficient * area_ac * CF_PER_IN_ACRE;
+  const wqv_ac_ft = wqv_cf / CF_PER_ACRE_FT;
+  const wqv_gal = wqv_cf * 7.48052;
+  const alternative_runoff_coefficient = alternative_impervious_percent > 0 ? rv(alternative_impervious_percent) : null;
+  const alternative_wqv_cf = alternative_runoff_coefficient === null ? null : rainfall_depth_in * alternative_runoff_coefficient * area_ac * CF_PER_IN_ACRE;
+  const volume_saved_cf = alternative_wqv_cf === null ? null : wqv_cf - alternative_wqv_cf;
+  const volume_saved_pct = alternative_wqv_cf === null ? null : volume_saved_cf / wqv_cf * 100;
+  // The facility has to empty before the next storm, which sets the outlet.
+  const release_rate_cfs = drawdown_hours > 0 ? wqv_cf / (drawdown_hours * 3600) : null;
+  const release_rate_gpm = release_rate_cfs === null ? null : release_rate_cfs * 448.831;
+  const outs = [runoff_coefficient, wqv_cf, wqv_ac_ft, wqv_gal];
+  if (!outs.every(Number.isFinite)) return { error: "Water quality volume math is not a finite value." };
+  const lever_verdict = alternative_wqv_cf === null
+    ? "Enter a comparison impervious percentage to see what the site plan is worth against the facility."
+    : "AT " + fmt(alternative_impervious_percent, 0) + "% IMPERVIOUS the volume is " + fmt(alternative_wqv_cf, 0) + " cu ft -- " + fmt(volume_saved_pct, 0) + "% less to treat, from the SITE PLAN rather than from the facility. Disconnecting impervious area and treating it at the source is far cheaper than building the pond it would otherwise need";
+  return {
+    rainfall_depth_in, impervious_percent, area_ac, runoff_coefficient,
+    wqv_cf, wqv_ac_ft, wqv_gal, alternative_impervious_percent,
+    alternative_runoff_coefficient, alternative_wqv_cf, volume_saved_cf,
+    volume_saved_pct, drawdown_hours, release_rate_cfs, release_rate_gpm, lever_verdict,
+    note: "The water quality volume is a DIFFERENT SIZING QUESTION from detention, and confusing the two is how a site ends up with a pond that controls floods and treats nothing. Water quality sizing captures the frequent SMALL storms -- the first inch or so, which carries most of the annual pollutant load and which falls many times a year -- while detention and flood control size on events that happen once in ten or a hundred years. A facility sized only for the large event passes the small storms straight through, and those are the ones doing the pollutant work. The volumetric runoff coefficient is the term that carries the site, and its form is worth reading: a base of 0.05 plus 0.009 for each percent of impervious cover means a completely pervious site still runs off five percent of the rain, and a fully paved one runs off ninety five. It is a VOLUMETRIC coefficient for a small storm and it is not the Rational method's peak-flow C, which is a different number for a different purpose -- using one where the other belongs is a common and quiet error. THE IMPERVIOUSNESS LEVER IS THE POINT OF THE CALCULATION. Because the coefficient is linear in impervious cover, taking a site from sixty five percent impervious to forty cuts the volume to be treated by about a third -- and that reduction comes from the site plan rather than from the facility. Disconnecting roof leaders, breaking up parking, and treating runoff at the source are all far cheaper than building the pond the alternative requires, and the comparison here is meant to be run before the grading plan is fixed rather than after. Drawdown is the requirement people meet last and it decides the outlet. A treatment facility has to empty over a stated time -- often twenty four to forty eight hours -- so the volume is available for the next storm and so the settling that does the treatment actually happens. An outlet sized to drain it in two hours does not treat; one that never drains is a pond. A volume, and the release rate that empties it. It does not design a facility: sizing a bioretention cell, a wet pond, a sand filter or an underground unit takes the media, the geometry, the underdrain, the pretreatment and the planting, and each has its own criteria. It does not compute peak flow, route a hydrograph, or size an outlet structure; it does not address channel protection or the extended detention volume, which are separate requirements in most manuals; and it does not evaluate infiltration feasibility, which needs measured rates and a seasonal high water table. The rainfall depth, the coefficient form, and the drawdown requirement all come from the applicable manual and differ between states. The state or local stormwater manual, the reviewing authority, and the engineer of record govern.",
+  };
+}
+const waterQualityVolumeExample = { inputs: { rainfall_depth_in: 1.0, impervious_percent: 65, area_ac: 2.4, alternative_impervious_percent: 40, drawdown_hours: 24 } };
+DRAINAGE_RENDERERS["water-quality-volume"] = _simpleRenderer({
+  citation: "Citation: the water quality volume relation by name -- WQV = rainfall depth x the volumetric runoff coefficient x area, with Rv = 0.05 + 0.009 x percent impervious, and 3,630 cubic feet per inch-acre (43,560 / 12). The Rv is VOLUMETRIC for a small storm and is not the Rational method's peak-flow C. The rainfall depth (commonly 1.0 to 1.5 in), the coefficient form, and the drawdown requirement (often 24 to 48 hours) come from the applicable manual and differ between states. It sizes a volume, not a facility. The state or local stormwater manual, the reviewing authority, and the engineer of record govern.",
+  example: waterQualityVolumeExample.inputs,
+  fields: [
+    { key: "rainfall_depth_in", label: "Water quality rainfall depth (in)", kind: "number", default: 1.0 },
+    { key: "impervious_percent", label: "Impervious cover (%)", kind: "number", default: 65 },
+    { key: "area_ac", label: "Contributing drainage area (acres)", kind: "number", default: 2.4 },
+    { key: "alternative_impervious_percent", label: "Comparison impervious cover (%, 0 to skip)", kind: "number", default: 40 },
+    { key: "drawdown_hours", label: "Required drawdown time (hours, 0 to skip)", kind: "number", default: 24 },
+  ],
+  outputs: [
+    { key: "r", id: "wqv-out-r", label: "Volumetric runoff coefficient", value: (r) => fmt(r.runoff_coefficient, 3) + " at " + fmt(r.impervious_percent, 0) + "% impervious -- 0.05 plus 0.009 for each percent" },
+    { key: "v", id: "wqv-out-v", label: "Water quality volume", value: (r) => fmt(r.wqv_cf, 0) + " cu ft (" + fmt(r.wqv_ac_ft, 3) + " acre-ft, " + fmt(r.wqv_gal, 0) + " gal)" },
+    { key: "l", id: "wqv-out-l", label: "The imperviousness lever", value: (r) => r.lever_verdict },
+    { key: "d", id: "wqv-out-d", label: "Release rate to drain it", value: (r) => r.release_rate_cfs === null ? "(no drawdown time entered)" : fmt(r.release_rate_cfs, 4) + " cfs (" + fmt(r.release_rate_gpm, 1) + " gpm) over " + fmt(r.drawdown_hours, 0) + " hours -- drain it faster and it does not treat, slower and it is not ready for the next storm" },
+    { key: "n", id: "wqv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWaterQualityVolume,
+});

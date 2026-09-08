@@ -281,6 +281,21 @@
     {"term":"hot holding load","target":"hot-holding-energy","kind":"industry"},
     {"term":"steam table electrical load","target":"hot-holding-energy","kind":"industry"},
     {"term":"kitchen heat gain equipment","target":"hot-holding-energy","kind":"industry"},
-    {"term":"holding cabinet cooling load","target":"hot-holding-energy","kind":"industry"}
+    {"term":"holding cabinet cooling load","target":"hot-holding-energy","kind":"industry"},
+    {"term":"grease duct cleaning interval","target":"grease-duct-cleaning-interval","kind":"industry"},
+    {"term":"nfpa 96 inspection frequency","target":"grease-duct-cleaning-interval","kind":"industry"},
+    {"term":"hood cleaning trigger thickness","target":"grease-duct-cleaning-interval","kind":"industry"},
+    {"term":"grease depth micrometres","target":"grease-duct-cleaning-interval","kind":"industry"},
+    {"term":"kitchen exhaust cleaning schedule","target":"grease-duct-cleaning-interval","kind":"industry"},
+    {"term":"walk in door infiltration","target":"walk-in-door-infiltration","kind":"industry"},
+    {"term":"cooler door load strip curtain","target":"walk-in-door-infiltration","kind":"industry"},
+    {"term":"freezer door air exchange","target":"walk-in-door-infiltration","kind":"industry"},
+    {"term":"walk in frost defrost load","target":"walk-in-door-infiltration","kind":"industry"},
+    {"term":"doorway protection factor","target":"walk-in-door-infiltration","kind":"industry"},
+    {"term":"kitchen makeup air deficit","target":"kitchen-makeup-air-deficit","kind":"industry"},
+    {"term":"hood exhaust air balance","target":"kitchen-makeup-air-deficit","kind":"industry"},
+    {"term":"negative pressure kitchen door force","target":"kitchen-makeup-air-deficit","kind":"industry"},
+    {"term":"makeup air shortfall cfm","target":"kitchen-makeup-air-deficit","kind":"industry"},
+    {"term":"kitchen backdraft combustion","target":"kitchen-makeup-air-deficit","kind":"industry"}
   ]
 }

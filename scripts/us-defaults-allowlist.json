@@ -34,7 +34,7 @@
     },
     {
       "module": "calc-electrical.js",
-      "match": "(\u00b0C)",
+      "match": "(°C)",
       "family": "NEC/IEEE electrical",
       "justification": "ICEA P-32-382 conductor short-circuit limits are published in deg C."
     },
@@ -160,13 +160,13 @@
     },
     {
       "module": "calc-solar.js",
-      "match": "temp (\u00b0C)",
+      "match": "temp (°C)",
       "family": "power and billing (solar datasheet)",
       "justification": "Module datasheets publish record temps and coefficients in deg C."
     },
     {
       "module": "calc-solar.js",
-      "match": "temperature (\u00b0C)",
+      "match": "temperature (°C)",
       "family": "power and billing (solar datasheet)",
       "justification": "Cell/ambient temperature model inputs are datasheet deg C."
     },
@@ -190,13 +190,13 @@
     },
     {
       "module": "calc-solar.js",
-      "match": "W/m\u00b2",
+      "match": "W/m²",
       "family": "power and billing (solar datasheet)",
       "justification": "Plane-of-array irradiance is published in W/m^2."
     },
     {
       "module": "calc-restoration.js",
-      "match": "spores/m\u00b3",
+      "match": "spores/m³",
       "family": "lab and IH practice",
       "justification": "Spore-trap lab reports count spores per cubic meter."
     },
@@ -256,7 +256,7 @@
     },
     {
       "module": "calc-water.js",
-      "match": "Water temperature (\u00b0C; 0.5 - 25)",
+      "match": "Water temperature (°C; 0.5 - 25)",
       "family": "water/wastewater operations",
       "justification": "SWTR CT tables are published against deg C water temperature."
     },
@@ -294,7 +294,7 @@
       "module": "calc-motor.js",
       "match": "Marked temperature rise",
       "family": "electrical / motors",
-      "justification": "The motor nameplate itself marks temperature rise in \u00b0C, and NEC 430.32(A)(1) states its 40 \u00b0C threshold in \u00b0C. The tradesperson reads this number off the nameplate in this unit."
+      "justification": "The motor nameplate itself marks temperature rise in °C, and NEC 430.32(A)(1) states its 40 °C threshold in °C. The tradesperson reads this number off the nameplate in this unit."
     },
     {
       "module": "calc-stage.js",
@@ -394,9 +394,51 @@
     },
     {
       "module": "calc-lowvoltage.js",
-      "match": "Temperature (\u00b0C)",
+      "match": "Temperature (°C)",
       "family": "instrumentation sensor curves",
-      "justification": "RTD (IEC 60751 Callendar-Van Dusen), thermistor Beta, and Steinhart-Hart curves are DEFINED in degrees C -- the coefficients have no Fahrenheit form -- and every one of the three tiles prints \"Temperature (\u00b0F)\" on the next line. Verified 2026-09-04 when output labels were first scanned."
+      "justification": "RTD (IEC 60751 Callendar-Van Dusen), thermistor Beta, and Steinhart-Hart curves are DEFINED in degrees C -- the coefficients have no Fahrenheit form -- and every one of the three tiles prints \"Temperature (°F)\" on the next line. Verified 2026-09-04 when output labels were first scanned."
+    },
+    {
+      "module": "calc-survey.js",
+      "match": "Focal length (mm)",
+      "family": "photogrammetry sensor",
+      "justification": "Camera focal length and sensor pixel pitch are published in millimetres and micrometres by every manufacturer and have no customary form; the tile takes the flight height in FEET, which is how a US operator flies, and returns the GSD in centimetres per pixel because that is how a mapping deliverable is specified. Verified 2026-09-08 with the survey technology band."
+    },
+    {
+      "module": "calc-survey.js",
+      "match": "Flight height above ground (m)",
+      "family": "airborne lidar",
+      "justification": "Airborne LiDAR sensor specifications are published in metric worldwide and have no US customary form: pulse rate in kHz against a swath in metres, flight height in metres, ground speed in m/s, and the deliverable specification itself written in points per SQUARE METRE. A tile that took feet here would make the reader convert a spec sheet before entering it and convert back to compare with the contract. Verified 2026-09-08 with the survey technology band."
+    },
+    {
+      "module": "calc-survey.js",
+      "match": "Baseline, base to rover (km)",
+      "family": "gnss rtk",
+      "justification": "A GNSS receiver specification is written as millimetres plus parts per million over a baseline in kilometres, and that form is universal -- every manufacturer publishes it, and no US customary version exists. Converting it would break the comparison against the receiver's own data sheet, which is the whole purpose of the calculation. Verified 2026-09-08 with the survey technology band."
+    },
+    {
+      "module": "calc-survey.js",
+      "match": "Horizontal fixed component (mm)",
+      "family": "gnss rtk",
+      "justification": "A GNSS receiver specification is written as millimetres plus parts per million over a baseline in kilometres, and that form is universal -- every manufacturer publishes it, and no US customary version exists. Converting it would break the comparison against the receiver's own data sheet, which is the whole purpose of the calculation. Verified 2026-09-08 with the survey technology band."
+    },
+    {
+      "module": "calc-survey.js",
+      "match": "Vertical fixed component (mm)",
+      "family": "gnss rtk",
+      "justification": "A GNSS receiver specification is written as millimetres plus parts per million over a baseline in kilometres, and that form is universal -- every manufacturer publishes it, and no US customary version exists. Converting it would break the comparison against the receiver's own data sheet, which is the whole purpose of the calculation. Verified 2026-09-08 with the survey technology band."
+    },
+    {
+      "module": "calc-survey.js",
+      "match": "Base position error (mm, 0 if on known control)",
+      "family": "gnss rtk",
+      "justification": "A GNSS receiver specification is written as millimetres plus parts per million over a baseline in kilometres, and that form is universal -- every manufacturer publishes it, and no US customary version exists. Converting it would break the comparison against the receiver's own data sheet, which is the whole purpose of the calculation. Verified 2026-09-08 with the survey technology band."
+    },
+    {
+      "module": "calc-survey.js",
+      "match": "Target vertical uncertainty (mm, 0 to skip)",
+      "family": "gnss rtk",
+      "justification": "A GNSS receiver specification is written as millimetres plus parts per million over a baseline in kilometres, and that form is universal -- every manufacturer publishes it, and no US customary version exists. Converting it would break the comparison against the receiver's own data sheet, which is the whole purpose of the calculation. Verified 2026-09-08 with the survey technology band."
     }
   ]
 }
