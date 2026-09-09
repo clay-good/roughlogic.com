@@ -116,8 +116,8 @@
     "field/wmm/coefficients.json": "0e2a631c6b09b945c50421cb16a5a3a9dba4b7ebf5a79528caedbe6e0953bd48",
     "field/manifest.json": "90ccb1beec1cecd36ea7b2e3b639dcec971410e467710dd4426595fc955ab3cf",
     "realestate/loan-limits.json": "75f1d7df553e72f7a6c90e60739e49ba579cc9d682ecc922123dae8c25f74893",
-    "realestate/hud-fmr.json": "4dca4476f52b9574ae4da32a99009e8007dda8aa85e00476bece62ea7f5e9043",
-    "realestate/manifest.json": "3e74cc66f0b201d1b95e495f28f719facf01b789bd8bba2935f5281a915e172c",
+    "realestate/hud-fmr.json": "c44f8a9cd37c2f250c29963b4be38d4bd64a1e0c391601dc513564df6ca5efc6",
+    "realestate/manifest.json": "59b3eadcc6b3a7f03f84f7608838e788e2c3c045c8826f2fc2c5255f76c64f87",
     "fields/manifest.json": "21f8d5e0c3f228e6cb8b3d8828b84bc222e29dfd50cd85199f27fe61fe82c50d",
     "search/manifest.json": "2768fab37ba76b50c1875521702eb9ab31698949cec8808dc3782222847074af"
   }

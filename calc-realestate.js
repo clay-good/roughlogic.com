@@ -1616,7 +1616,7 @@ export function renderLoanLimits(inputRegion, outputRegion, citationEl) {
 // lookup is at huduser.gov.
 
 // dims: in { input: dimensionless }
-//        out: { fmr_studio: dimensionless, fmr_1br: dimensionless, fmr_2br: dimensionless, fmr_3br: dimensionless, fmr_4br: dimensionless, area: dimensionless, source: dimensionless, asOf: dimensionless }
+//        out: { fmr_studio: dimensionless, fmr_1br: dimensionless, fmr_2br: dimensionless, fmr_3br: dimensionless, fmr_4br: dimensionless, area: dimensionless, source: dimensionless, asOf: dimensionless, safmr: dimensionless }
 // (HUD Fair Market Rent shard lookup. FMRs are dimensionless
 //  monthly-rent dollar aggregates per the §7.1 monetary
 //  convention; area / source / asOf tokens are categorical.)
@@ -1652,6 +1652,11 @@ export function computeHudFmr(input) {
     fmr_2br: match.fmr_2br,
     fmr_3br: match.fmr_3br,
     fmr_4br: match.fmr_4br,
+    safmr: match.safmr || "",
+    safmr_note:
+      match.safmr === "all" ? shard.safmr_message
+        : match.safmr === "partial" ? shard.safmr_partial_message
+        : "",
     source: "HUD PD&R Fair Market Rents, FY" + shard.fiscal_year,
   };
 }
@@ -1696,7 +1701,7 @@ export function renderHudFmr(inputRegion, outputRegion, citationEl) {
     o2.textContent = "$" + r.fmr_2br.toLocaleString("en-US");
     o3.textContent = "$" + r.fmr_3br.toLocaleString("en-US");
     o4.textContent = "$" + r.fmr_4br.toLocaleString("en-US");
-    oNote.textContent = r.source;
+    oNote.textContent = r.safmr_note ? r.source + " - " + r.safmr_note : r.source;
   }, DEBOUNCE_MS);
   for (const f of [S, F, N]) f.input.addEventListener("input", update);
 }

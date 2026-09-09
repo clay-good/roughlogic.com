@@ -1,8 +1,8 @@
 {
   "source": "U.S. Department of Housing and Urban Development, Office of Policy Development and Research (PD&R). Fair Market Rents (FMR) are published annually (FY runs Oct 1 to Sep 30) at the 40th-percentile rent of recent-mover units in each HUD Fair Market Rent Area (FMR Area), using American Community Survey 5-year + 1-year data and Random Digit Dialing telephone surveys.",
   "edition": "FY2026 (effective 2025-10-01)",
-  "fetched": "2026-05-16",
-  "verified_on": "2026-05-16",
+  "fetched": "2026-09-09",
+  "verified_on": "2026-09-09",
   "free_access": "huduser.gov/portal/datasets/fmr.html. Per-county FMR lookup at huduser.gov/portal/datasets/fmr/fmrs/FY2026_code/select_Geography.odn.",
   "fiscal_year": 2026,
   "areas": [
@@ -20,182 +20,196 @@
       "name": "Los Angeles-Long Beach-Glendale, CA HUD Metro FMR Area",
       "state": "CA",
       "fips": "06037",
-      "fmr_0br": 1818,
-      "fmr_1br": 2046,
-      "fmr_2br": 2563,
-      "fmr_3br": 3358,
-      "fmr_4br": 3669
+      "fmr_0br": 2079,
+      "fmr_1br": 2328,
+      "fmr_2br": 2903,
+      "fmr_3br": 3681,
+      "fmr_4br": 4098,
+      "safmr": "all"
     },
     {
       "name": "San Diego-Chula Vista-Carlsbad, CA MSA",
       "state": "CA",
       "fips": "06073",
-      "fmr_0br": 2017,
-      "fmr_1br": 2257,
-      "fmr_2br": 2862,
-      "fmr_3br": 3886,
-      "fmr_4br": 4474
+      "fmr_0br": 2288,
+      "fmr_1br": 2459,
+      "fmr_2br": 3001,
+      "fmr_3br": 3998,
+      "fmr_4br": 4845,
+      "safmr": "all"
     },
     {
       "name": "San Jose-Sunnyvale-Santa Clara, CA HUD Metro FMR Area",
       "state": "CA",
       "fips": "06085",
-      "fmr_0br": 2496,
-      "fmr_1br": 2836,
-      "fmr_2br": 3517,
-      "fmr_3br": 4661,
-      "fmr_4br": 5260
+      "fmr_0br": 2621,
+      "fmr_1br": 2982,
+      "fmr_2br": 3483,
+      "fmr_3br": 4602,
+      "fmr_4br": 5010,
+      "safmr": "all"
     },
     {
       "name": "New York, NY HUD Metro FMR Area",
       "state": "NY",
       "fips": "36061",
-      "fmr_0br": 2257,
-      "fmr_1br": 2390,
-      "fmr_2br": 2680,
-      "fmr_3br": 3382,
-      "fmr_4br": 3699
+      "fmr_0br": 2529,
+      "fmr_1br": 2655,
+      "fmr_2br": 2910,
+      "fmr_3br": 3644,
+      "fmr_4br": 3959
     },
     {
       "name": "Boston-Cambridge-Quincy, MA-NH HUD Metro FMR Area",
       "state": "MA",
       "fips": "25025",
-      "fmr_0br": 2169,
-      "fmr_1br": 2422,
-      "fmr_2br": 2934,
-      "fmr_3br": 3654,
-      "fmr_4br": 4006
+      "fmr_0br": 2359,
+      "fmr_1br": 2476,
+      "fmr_2br": 2941,
+      "fmr_3br": 3526,
+      "fmr_4br": 3894
     },
     {
       "name": "Washington-Arlington-Alexandria, DC-VA-MD HUD Metro FMR Area",
       "state": "DC",
       "fips": "11001",
-      "fmr_0br": 1841,
-      "fmr_1br": 1924,
-      "fmr_2br": 2197,
-      "fmr_3br": 2917,
-      "fmr_4br": 3528
+      "fmr_0br": 1953,
+      "fmr_1br": 2015,
+      "fmr_2br": 2246,
+      "fmr_3br": 2835,
+      "fmr_4br": 3332,
+      "safmr": "all"
     },
     {
       "name": "Seattle-Bellevue, WA HUD Metro FMR Area",
       "state": "WA",
       "fips": "53033",
-      "fmr_0br": 1791,
-      "fmr_1br": 1948,
-      "fmr_2br": 2371,
-      "fmr_3br": 3258,
-      "fmr_4br": 3884
+      "fmr_0br": 2074,
+      "fmr_1br": 2146,
+      "fmr_2br": 2501,
+      "fmr_3br": 3272,
+      "fmr_4br": 3847,
+      "safmr": "all"
     },
     {
       "name": "Chicago-Joliet-Naperville, IL HUD Metro FMR Area",
       "state": "IL",
       "fips": "17031",
-      "fmr_0br": 1335,
-      "fmr_1br": 1500,
-      "fmr_2br": 1758,
-      "fmr_3br": 2243,
-      "fmr_4br": 2530
+      "fmr_0br": 1480,
+      "fmr_1br": 1581,
+      "fmr_2br": 1781,
+      "fmr_3br": 2294,
+      "fmr_4br": 2653,
+      "safmr": "all"
     },
     {
-      "name": "Denver-Aurora-Lakewood, CO MSA",
+      "name": "Denver-Aurora-Centennial, CO MSA",
       "state": "CO",
       "fips": "08031",
-      "fmr_0br": 1601,
-      "fmr_1br": 1812,
-      "fmr_2br": 2143,
-      "fmr_3br": 2861,
-      "fmr_4br": 3185
+      "fmr_0br": 1643,
+      "fmr_1br": 1754,
+      "fmr_2br": 2089,
+      "fmr_3br": 2734,
+      "fmr_4br": 3049
     },
     {
-      "name": "Austin-Round Rock, TX MSA",
+      "name": "Austin-Round Rock-San Marcos, TX MSA",
       "state": "TX",
       "fips": "48453",
-      "fmr_0br": 1419,
-      "fmr_1br": 1576,
-      "fmr_2br": 1873,
-      "fmr_3br": 2451,
-      "fmr_4br": 2898
+      "fmr_0br": 1474,
+      "fmr_1br": 1562,
+      "fmr_2br": 1852,
+      "fmr_3br": 2347,
+      "fmr_4br": 2760
     },
     {
       "name": "Dallas, TX HUD Metro FMR Area",
       "state": "TX",
       "fips": "48113",
-      "fmr_0br": 1273,
-      "fmr_1br": 1467,
-      "fmr_2br": 1764,
-      "fmr_3br": 2358,
-      "fmr_4br": 2880
+      "fmr_0br": 1582,
+      "fmr_1br": 1648,
+      "fmr_2br": 1931,
+      "fmr_3br": 2431,
+      "fmr_4br": 3091,
+      "safmr": "all"
     },
     {
-      "name": "Houston-The Woodlands-Sugar Land, TX MSA",
+      "name": "Houston-The Woodlands-Sugar Land, TX HUD Metro FMR Area",
       "state": "TX",
       "fips": "48201",
-      "fmr_0br": 1109,
-      "fmr_1br": 1238,
-      "fmr_2br": 1466,
-      "fmr_3br": 1929,
-      "fmr_4br": 2407
+      "fmr_0br": 1280,
+      "fmr_1br": 1323,
+      "fmr_2br": 1573,
+      "fmr_3br": 2116,
+      "fmr_4br": 2639,
+      "safmr": "partial"
     },
     {
       "name": "Miami-Miami Beach-Kendall, FL HUD Metro FMR Area",
       "state": "FL",
       "fips": "12086",
-      "fmr_0br": 1779,
-      "fmr_1br": 1947,
-      "fmr_2br": 2375,
-      "fmr_3br": 3104,
-      "fmr_4br": 3611
+      "fmr_0br": 1828,
+      "fmr_1br": 1995,
+      "fmr_2br": 2436,
+      "fmr_3br": 3127,
+      "fmr_4br": 3613,
+      "safmr": "all"
     },
     {
       "name": "Atlanta-Sandy Springs-Roswell, GA HUD Metro FMR Area",
       "state": "GA",
       "fips": "13121",
-      "fmr_0br": 1404,
-      "fmr_1br": 1564,
-      "fmr_2br": 1813,
-      "fmr_3br": 2210,
-      "fmr_4br": 2613
+      "fmr_0br": 1585,
+      "fmr_1br": 1660,
+      "fmr_2br": 1820,
+      "fmr_3br": 2182,
+      "fmr_4br": 2605,
+      "safmr": "all"
     },
     {
       "name": "Phoenix-Mesa-Chandler, AZ MSA",
       "state": "AZ",
       "fips": "04013",
-      "fmr_0br": 1308,
-      "fmr_1br": 1486,
-      "fmr_2br": 1799,
-      "fmr_3br": 2474,
-      "fmr_4br": 2935
+      "fmr_0br": 1457,
+      "fmr_1br": 1583,
+      "fmr_2br": 1839,
+      "fmr_3br": 2452,
+      "fmr_4br": 2720,
+      "safmr": "all"
     },
     {
-      "name": "Honolulu, HI MSA",
+      "name": "Urban Honolulu, HI MSA",
       "state": "HI",
       "fips": "15003",
-      "fmr_0br": 1932,
-      "fmr_1br": 2123,
-      "fmr_2br": 2727,
-      "fmr_3br": 3737,
-      "fmr_4br": 4368
+      "fmr_0br": 1877,
+      "fmr_1br": 2016,
+      "fmr_2br": 2642,
+      "fmr_3br": 3674,
+      "fmr_4br": 4432,
+      "safmr": "all"
     },
     {
       "name": "Portland-Vancouver-Hillsboro, OR-WA MSA",
       "state": "OR",
       "fips": "41051",
-      "fmr_0br": 1559,
-      "fmr_1br": 1718,
-      "fmr_2br": 2025,
-      "fmr_3br": 2820,
-      "fmr_4br": 3219
+      "fmr_0br": 1570,
+      "fmr_1br": 1677,
+      "fmr_2br": 1922,
+      "fmr_3br": 2619,
+      "fmr_4br": 3109
     },
     {
       "name": "Minneapolis-St. Paul-Bloomington, MN-WI HUD Metro FMR Area",
       "state": "MN",
       "fips": "27053",
-      "fmr_0br": 1322,
-      "fmr_1br": 1486,
-      "fmr_2br": 1796,
-      "fmr_3br": 2348,
-      "fmr_4br": 2641
+      "fmr_0br": 1242,
+      "fmr_1br": 1405,
+      "fmr_2br": 1709,
+      "fmr_3br": 2262,
+      "fmr_4br": 2531
     }
   ],
-  "unknown_area_message": "Unknown FMR area. HUD publishes FMRs at the HUD-defined Fair Market Rent Area level (typically MSA, HUD Metro FMR Area, or county). Look up the exact county at huduser.gov/portal/datasets/fmr."
+  "unknown_area_message": "Unknown FMR area. HUD publishes FMRs at the HUD-defined Fair Market Rent Area level (typically MSA, HUD Metro FMR Area, or county). Look up the exact county at huduser.gov/portal/datasets/fmr.",
+  "safmr_message": "HUD designates this a Small Area FMR area: Housing Choice Voucher payment standards there are set per ZIP Code, not from this metro-wide figure. The metro-wide FMR still governs other HUD programs. ZIP-level rents are at huduser.gov/portal/datasets/fmr/smallarea.",
+  "safmr_partial_message": "A PHA covering a majority of Housing Choice Vouchers in this area has opted into Small Area FMRs, so voucher payment standards there may be set per ZIP Code rather than from this metro-wide figure."
 }

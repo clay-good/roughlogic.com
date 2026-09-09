@@ -494,35 +494,74 @@ test("the nexus doc's stale-row claim matches the shard", async () => {
   );
 });
 
-// The HUD FMR row for San Francisco carried the OMB CBSA name,
-// "San Francisco-Oakland-Berkeley, CA HUD Metro FMR Area". HUD does not use
-// that as an FMR area: its FY2026 geography list splits the CBSA into
-// "San Francisco, CA HUD Metro FMR Area" (METRO41860MM7360) and
-// "Oakland-Fremont, CA HUD Metro FMR Area" (METRO41860MM5775), with different
-// rents. The row's FIPS is 06075, San Francisco County, so it is the former.
+// Every HUD FMR row, read 2026-09-09 from HUD's own FY2026 Fair Market Rent
+// Documentation System in a browser (huduser.gov serves no automated fetch).
+// The bundled figures had never been checked: 18 of the 19 rows carried numbers
+// matching neither HUD's FY2026 nor its FY2025 table -- Dallas's efficiency FMR
+// read $1,273 against HUD's $1,582 -- and four rows used an area name HUD does
+// not publish. These are dollar amounts a reader acts on.
 //
-// Every one of its five figures was wrong, and matched NEITHER area -- the 4BR
-// was $5,099 against HUD's $4,772. These are dollar amounts a reader acts on.
-// Verified 2026-09-09 against HUD's own FY2026 Documentation System, read in a
-// browser (huduser.gov does not serve an automated fetch).
-test("the San Francisco FMR row is HUD's published FY2026 figure", async () => {
+// Columns: FIPS, HUD's FMR area name, [0BR, 1BR, 2BR, 3BR, 4BR], SAFMR status,
+// and the cbsasub code that addresses the row on huduser.gov:
+//   .../fmr/fmrs/FY2026_code/2026summary.odn?year=2026&fmrtype=Final
+//     &cbsasub=<code>&selection_type=cbsa
+// A Small Area FMR area's page shows only the ZIP table; the metro-wide figure
+// is behind &dallas_sa_override=TRUE&selection_type=hmfa.
+const HUD_FY2026_FMR = [
+  ["06075", "San Francisco, CA HUD Metro FMR Area", [2485, 2977, 3604, 4604, 4772], "", "METRO41860MM7360"],
+  ["06037", "Los Angeles-Long Beach-Glendale, CA HUD Metro FMR Area", [2079, 2328, 2903, 3681, 4098], "all", "METRO31080MM4480"],
+  ["06073", "San Diego-Chula Vista-Carlsbad, CA MSA", [2288, 2459, 3001, 3998, 4845], "all", "METRO41740M41740"],
+  ["06085", "San Jose-Sunnyvale-Santa Clara, CA HUD Metro FMR Area", [2621, 2982, 3483, 4602, 5010], "all", "METRO41940M41940"],
+  ["36061", "New York, NY HUD Metro FMR Area", [2529, 2655, 2910, 3644, 3959], "", "METRO35620MM5600"],
+  ["25025", "Boston-Cambridge-Quincy, MA-NH HUD Metro FMR Area", [2359, 2476, 2941, 3526, 3894], "", "METRO14460MM1120"],
+  ["11001", "Washington-Arlington-Alexandria, DC-VA-MD HUD Metro FMR Area", [1953, 2015, 2246, 2835, 3332], "all", "METRO47900M47900"],
+  ["53033", "Seattle-Bellevue, WA HUD Metro FMR Area", [2074, 2146, 2501, 3272, 3847], "all", "METRO42660MM7600"],
+  ["17031", "Chicago-Joliet-Naperville, IL HUD Metro FMR Area", [1480, 1581, 1781, 2294, 2653], "all", "METRO16980M16980"],
+  ["08031", "Denver-Aurora-Centennial, CO MSA", [1643, 1754, 2089, 2734, 3049], "", "METRO19740M19740"],
+  ["48453", "Austin-Round Rock-San Marcos, TX MSA", [1474, 1562, 1852, 2347, 2760], "", "METRO12420M12420"],
+  ["48113", "Dallas, TX HUD Metro FMR Area", [1582, 1648, 1931, 2431, 3091], "all", "METRO19100M19100"],
+  ["48201", "Houston-The Woodlands-Sugar Land, TX HUD Metro FMR Area", [1280, 1323, 1573, 2116, 2639], "partial", "METRO26420M26420"],
+  ["12086", "Miami-Miami Beach-Kendall, FL HUD Metro FMR Area", [1828, 1995, 2436, 3127, 3613], "all", "METRO33100MM5000"],
+  ["13121", "Atlanta-Sandy Springs-Roswell, GA HUD Metro FMR Area", [1585, 1660, 1820, 2182, 2605], "all", "METRO12060M12060"],
+  ["04013", "Phoenix-Mesa-Chandler, AZ MSA", [1457, 1583, 1839, 2452, 2720], "all", "METRO38060M38060"],
+  ["15003", "Urban Honolulu, HI MSA", [1877, 2016, 2642, 3674, 4432], "all", "METRO46520M46520"],
+  ["41051", "Portland-Vancouver-Hillsboro, OR-WA MSA", [1570, 1677, 1922, 2619, 3109], "", "METRO38900M38900"],
+  ["27053", "Minneapolis-St. Paul-Bloomington, MN-WI HUD Metro FMR Area", [1242, 1405, 1709, 2262, 2531], "", "METRO33460M33460"],
+];
+
+test("every HUD FMR row is HUD's published FY2026 figure", async () => {
   const shard = await readJson("data/realestate/hud-fmr.json");
-  const sf = shard.areas.find((a) => a.fips === "06075");
-  assert.ok(sf, "the 06075 row is gone");
-  assert.equal(sf.name, "San Francisco, CA HUD Metro FMR Area");
-  assert.equal(sf.fmr_0br, 2485);
-  assert.equal(sf.fmr_1br, 2977);
-  assert.equal(sf.fmr_2br, 3604);
-  assert.equal(sf.fmr_3br, 4604);
-  assert.equal(sf.fmr_4br, 4772);
-  // The CBSA name must not come back: it is not an FMR area.
+  assert.equal(shard.areas.length, HUD_FY2026_FMR.length);
+  for (const [fips, name, rents, safmr] of HUD_FY2026_FMR) {
+    const row = shard.areas.find((a) => a.fips === fips);
+    assert.ok(row, `the ${fips} row is gone`);
+    assert.equal(row.name, name, `${fips} name`);
+    assert.deepEqual(
+      [row.fmr_0br, row.fmr_1br, row.fmr_2br, row.fmr_3br, row.fmr_4br],
+      rents,
+      `${fips} rents`,
+    );
+    assert.equal(row.safmr || "", safmr, `${fips} SAFMR status`);
+  }
+  // The OMB CBSA name must not come back: HUD does not use it as an FMR area.
   for (const a of shard.areas) {
     assert.ok(
       !a.name.startsWith("San Francisco-Oakland-Berkeley"),
       "the OMB CBSA name is not a HUD FMR area",
     );
   }
-  // Only this row has been checked against HUD. The shard's own stamp must not
-  // claim otherwise until the other 18 are read.
-  assert.equal(shard.verified_on, "2026-05-16");
+  // All 19 rows were read, so the shard's stamp may say so.
+  assert.equal(shard.verified_on, "2026-09-09");
+});
+
+// A metro-wide FMR is not what a Housing Choice Voucher payment standard uses
+// in a Small Area FMR area, and 12 of these 19 rows are one. The shard must
+// carry the advisory text the renderer prints, or the flag says nothing.
+test("Small Area FMR rows carry the advisory the renderer prints", async () => {
+  const shard = await readJson("data/realestate/hud-fmr.json");
+  const flagged = shard.areas.filter((a) => a.safmr);
+  assert.equal(flagged.length, 12);
+  for (const a of flagged) assert.ok(["all", "partial"].includes(a.safmr), a.fips);
+  assert.match(shard.safmr_message, /per ZIP Code/);
+  assert.match(shard.safmr_partial_message, /opted into Small Area FMRs/);
 });

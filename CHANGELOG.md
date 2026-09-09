@@ -793,6 +793,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Eighteen of the nineteen bundled HUD Fair Market Rent rows carried rents HUD does not publish.** Only San Francisco, corrected the day before, agreed with the publisher. Every other row was read on 2026-09-09 from HUD's own FY2026 Fair Market Rent Documentation System, and every one of them was wrong: Dallas's efficiency FMR read $1,273 against HUD's $1,582, New York's two-bedroom $2,680 against $2,910, Seattle's efficiency $1,791 against $2,074. The figures matched neither HUD's FY2026 table nor its FY2025 one, so they came from nowhere a reader could check. These are the dollar amounts a Housing Choice Voucher payment standard is set from.
+
+  **Four rows also named an area HUD does not define.** `Denver-Aurora-Lakewood` is HUD's `Denver-Aurora-Centennial`; `Austin-Round Rock` is `Austin-Round Rock-San Marcos`; `Honolulu, HI MSA` is `Urban Honolulu, HI MSA`; and Houston is a HUD Metro FMR Area, not an MSA. A name from the wrong taxonomy was the tell on the San Francisco row too.
+
+  **The Small Area FMR question is answered rather than left open.** Eleven of the nineteen are areas where HUD sets *every* voucher payment standard by ZIP Code, and a twelfth (Houston) has a PHA that opted in. Presenting one metro-wide number there, under a citation that names the voucher program, told the reader the opposite of what HUD says. Those rows now carry a `safmr` flag and the tile prints the metro-wide figure with the advisory that it is not the voucher standard there, plus where the ZIP-level rents live.
+
+  A unit test now pins all nineteen names, rent sets and SAFMR flags, along with the `cbsasub` code that addresses each row on huduser.gov, so the next reader can re-read any row without rediscovering the path. The inline shard double in the module's own tests -- a second copy that had agreed with the first and with nothing HUD publishes, which is why nobody ever checked -- is pinned to the shipped shard.
+
 - **A field named by a short word could not be filled by naming it, and 21 labels could not be named at all.** Two halves of the extractor disagreed. `labelTerms` deliberately keeps a short label **whole** -- "AWG", "GPM", "Run", "APR" -- precisely so an acronym field is fillable by name. `windowTerms` then dropped every query word under four characters. The two rules never met: `"loan principal 300000 apr 6.5"` filled the principal and left the rate empty.
 
   Separately, **21 labels produced no matchable terms at all**, which makes a field unfillable by name whatever the reader types: `"Bar size"` is three letters plus a stopword, and a parenthetical unit hides `"APR (%)"` from the whole-label escape hatch, which only fires on a single token.

@@ -42,7 +42,7 @@ const HUD_FMR_SHARD = {
   fiscal_year: 2026,
   areas: [
     { name: "San Francisco, CA HUD Metro FMR Area",                  state: "CA", fips: "06075", fmr_0br: 2485, fmr_1br: 2977, fmr_2br: 3604, fmr_3br: 4604, fmr_4br: 4772 },
-    { name: "New York, NY HUD Metro FMR Area",                       state: "NY", fips: "36061", fmr_0br: 2257, fmr_1br: 2390, fmr_2br: 2680, fmr_3br: 3382, fmr_4br: 3699 },
+    { name: "New York, NY HUD Metro FMR Area",                       state: "NY", fips: "36061", fmr_0br: 2529, fmr_1br: 2655, fmr_2br: 2910, fmr_3br: 3644, fmr_4br: 3959 },
   ],
   unknown_area_message: "Unknown FMR area; look up at huduser.gov.",
 };
@@ -588,10 +588,30 @@ test("computeHudFmr: San Francisco area matches and returns 2BR FMR 3604", () =>
   assert.equal(r.fmr_2br, 3604);
 });
 
+// The inline double above is a copy of two shipped rows. That copy is exactly
+// why nobody ever checked the real numbers: both mirrors agreed with each other
+// and with nothing HUD publishes. Pin the double to the shard so it cannot
+// drift again.
+test("computeHudFmr: the inline shard double matches the shipped shard", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const { resolve, dirname } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const root = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
+  const shipped = JSON.parse(await readFile(resolve(root, "data/realestate/hud-fmr.json"), "utf8"));
+  assert.equal(HUD_FMR_SHARD.fiscal_year, shipped.fiscal_year);
+  for (const row of HUD_FMR_SHARD.areas) {
+    const real = shipped.areas.find((a) => a.fips === row.fips);
+    assert.ok(real, row.fips + " is not in the shipped shard");
+    for (const k of ["name", "state", "fmr_0br", "fmr_1br", "fmr_2br", "fmr_3br", "fmr_4br"]) {
+      assert.equal(row[k], real[k], row.fips + " " + k);
+    }
+  }
+});
+
 test("computeHudFmr: FIPS lookup wins over name", () => {
   const r = computeHudFmr({ fips: "36061", shard: HUD_FMR_SHARD });
   assert.equal(r.state, "NY");
-  assert.equal(r.fmr_1br, 2390);
+  assert.equal(r.fmr_1br, 2655);
 });
 
 test("computeHudFmr: state-only fallback returns the first matched area in that state", () => {
