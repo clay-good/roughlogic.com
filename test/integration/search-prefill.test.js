@@ -708,3 +708,54 @@ test("spec-v592: a failed preview-map fetch is retried on the next keystroke", a
 // table (spec-v591) and covers this query without it. The test proved nothing.
 // The latch release is asserted by shape in alias-autocomplete-wiring instead,
 // which at least catches a revert.
+
+
+// A lazily-loaded alias shard used to refresh the dropdown only while the input
+// was still `document.activeElement`. That is the wrong condition: what matters
+// is whether results are ON SCREEN. A reader who pastes a query and clicks away
+// -- or a CI runner whose focus moves while the shards are in flight -- was left
+// looking at the pre-alias ranking with no keystroke coming to correct it, and
+// the only recovery was to type again. It turned `search-prefill.test.js:132`
+// red on main once (run 34314152740, integration job) and passed on every
+// rerun, which is what a focus race looks like. The condition is now "the
+// dropdown is open", which still never opens a CLOSED dropdown -- the property
+// the focus check was really protecting.
+//
+// The query is one only an ALIAS can resolve: "unibody diagonal measurement" is
+// auto-body vocabulary for `layout-squaring`, whose name and description say
+// neither word. Before the shard lands the ranker leads with unrelated
+// measurement tiles, so a stale dropdown is visibly stale -- which is what makes
+// this test able to fail.
+test("a shard arriving after focus moves still refreshes the open dropdown", async ({ browser }) => {
+  // Service workers blocked for the same reason as the spec-v590 test above:
+  // with the worker installed the shards come from its cache and the delay
+  // this test depends on never happens.
+  const context = await browser.newContext({ serviceWorkers: "block" });
+  const page = await context.newPage();
+  let release;
+  const held = new Promise((r) => { release = r; });
+  await page.route("**/data/search/aliases-*.json", async (route) => {
+    await held;
+    return route.continue();
+  });
+
+  await page.goto("/");
+  const input = page.locator("#search-input");
+  await input.click();
+  await input.fill("unibody diagonal measurement");
+  // The dropdown is open on the pre-alias ranking, which does NOT lead with the
+  // alias target.
+  await expect(page.locator("#search-results")).not.toHaveAttribute("hidden", /.*/);
+  await expect(page.locator("#search-results .search-result").first().locator(".sr-name"))
+    .not.toHaveText("Layout Squaring (3-4-5)");
+
+  // Take focus OFF the input without closing the dropdown, then let the shards
+  // land. Before the fix nothing re-rendered and the ranking stayed stale.
+  await page.evaluate(() => document.getElementById("search-input").blur());
+  release();
+
+  await expect(page.locator("#search-results .search-result").first().locator(".sr-name"))
+    .toHaveText("Layout Squaring (3-4-5)", { timeout: 10000 });
+
+  await context.close();
+});

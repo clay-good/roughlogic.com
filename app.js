@@ -840,7 +840,13 @@ function bindSearch() {
         merged.push(...rows);
         aliasRows = merged.slice();
         // Refresh the open dropdown so just-loaded aliases become searchable.
-        if (document.activeElement === input) render(input.value, true);
+        // The condition is "results are ON SCREEN", not "the input has focus":
+        // a reader who pastes a query and clicks away, or a browser that moves
+        // focus while a shard is in flight, would otherwise be left looking at
+        // the pre-alias results with no keystroke coming to correct them. It
+        // still never opens a CLOSED dropdown, which is what the focus check
+        // was really protecting.
+        if (document.activeElement === input || !list.hidden) render(input.value, true);
       } catch { /* one group failing leaves the rest searchable */ }
     }));
     // A transient failure must not cost the session its aliases. Without them
@@ -862,7 +868,7 @@ function bindSearch() {
     discoveryLoading = true;
     import("./search-discovery.js").then((mod) => {
       discovery = mod;
-      if (document.activeElement === input) render(input.value, true);
+      if (document.activeElement === input || !list.hidden) render(input.value, true);
     }).catch(() => { discoveryLoading = false; });
   }
 
@@ -892,7 +898,7 @@ function bindSearch() {
         // re-runs until the next keystroke, and a reader who has finished
         // typing never sends one. ensureDiscovery() has always re-rendered for
         // exactly this reason; slots and the preview map now do the same.
-        if (document.activeElement === input) render(input.value, true);
+        if (document.activeElement === input || !list.hidden) render(input.value, true);
       })
       // Release the latch so the next keystroke retries, as ensureDiscovery
       // does; a blip on the first search otherwise disables prefill until reload.
@@ -927,7 +933,7 @@ function bindSearch() {
         if (!json || !json.tiles) return;
         previewMap = json.tiles;
         // Same late-arrival re-render as ensureSlots(); see the note there.
-        if (document.activeElement === input) render(input.value, true);
+        if (document.activeElement === input || !list.hidden) render(input.value, true);
       })
       // Same latch release: a blip otherwise costs the session its answer
       // previews entirely, with no retry but a reload.
