@@ -160,3 +160,40 @@ test("the gate names the shards it does not govern", async () => {
   // and reported every stamped shard as ungoverned.
   assert.match(src, /relative\(ROOT, full\)/);
 });
+
+// The seven shards no ledger row covers -- the accounting trio, the cross
+// glossary, and the three under lab/ -- stamped `verified_on: TODAY` on every
+// `data:refresh`. A stamp written from the clock asserts a verification nobody
+// performed, and one that moves on every run can never age into a recheck,
+// which is the entire purpose of the field. build-data.mjs now carries the
+// COMMITTED stamp forward whenever a shard's content is unchanged.
+//
+// This test exercises the carry-forward directly rather than re-running the
+// generator, so it stays fast and does not write to the tree.
+test("an unchanged shard carries its committed verification date forward", async () => {
+  const { carryStamps } = await import("../../scripts/build-data.mjs");
+  const file = resolve(ROOT, "data/lab/iupac-atomic-weights.json");
+  const onDisk = await readJson("data/lab/iupac-atomic-weights.json");
+
+  // Same content, but the generator stamped today's date on every run stamp.
+  const regenerated = { ...onDisk, verified_on: "2099-01-01", fetched: "2099-01-01" };
+  const carried = await carryStamps(file, regenerated);
+  assert.ok(carried, "an unchanged shard must carry its stamp forward");
+  assert.equal(carried.verified_on, onDisk.verified_on);
+  // Only verified_on carries. `fetched` says when the generator ran, and on the
+  // historical series calc-historical.test.js measures data staleness against
+  // it -- freezing that would make a working detector vacuous.
+  assert.equal(carried.fetched, undefined);
+
+  // A shard whose DATA really changed must NOT keep the old date: it earns
+  // today's, because the content was genuinely touched.
+  const changed = {
+    ...onDisk,
+    verified_on: "2099-01-01",
+    weights_g_per_mol: { ...onDisk.weights_g_per_mol, He: 4.0027 },
+  };
+  assert.equal(await carryStamps(file, changed), null);
+
+  // A shard with no file on disk yet has nothing to carry.
+  assert.equal(await carryStamps(resolve(ROOT, "data/lab/does-not-exist.json"), regenerated), null);
+});

@@ -21,10 +21,49 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { createHash } from "node:crypto";
 import { gzipSync } from "node:zlib";
+import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(new URL(".", import.meta.url).pathname, "..");
 const DATA = resolve(ROOT, "data");
 const TODAY = new Date().toISOString().slice(0, 10);
+
+// Read the shard already on disk and, if the new body differs from it ONLY in
+// its verification stamp, hand the committed stamp back so it carries forward.
+// A shard whose data really changed keeps TODAY. Returns null when there is no
+// prior file, when it cannot be parsed, or when the content genuinely differs.
+export async function carryStamps(path, body) {
+  let prior;
+  try {
+    prior = JSON.parse(await readFile(path, "utf8"));
+  } catch {
+    return null;
+  }
+  if (!prior || typeof prior !== "object") return null;
+  // Two different lists, and the difference matters.
+  //
+  // RUN_STAMPS are the dates that simply say when the generator last ran. They
+  // are not content, so a moved one must not count as a change -- otherwise
+  // `fetched` advancing to today would defeat the comparison every time.
+  const RUN_STAMPS = ["verified_on", "fetched", "built", "derived_at"];
+  // CARRIED is only `verified_on`. `fetched`, `built` and `derived_at` stay on
+  // TODAY because on the historical series that is load-bearing:
+  // calc-historical.test.js asserts the last data point is within 60 days of
+  // `fetched`, so freezing it would turn a working staleness detector vacuous.
+  // `verified_on` is the field the freshness gates read and the one that is
+  // supposed to age.
+  const CARRIED = ["verified_on"];
+  const strip = (o) => {
+    const copy = { ...o };
+    for (const k of RUN_STAMPS) delete copy[k];
+    return JSON.stringify(copy);
+  };
+  if (strip(prior) !== strip(body)) return null;
+  const out = {};
+  for (const k of CARRIED) {
+    if (typeof prior[k] === "string") out[k] = prior[k];
+  }
+  return Object.keys(out).length ? out : null;
+}
 
 // spec-v12 §H.2: per-folder refresh cadence sourced from a single file so
 // the schema can evolve without forcing a regeneration of every shard.
@@ -1906,11 +1945,24 @@ async function buildAll() {
       // CF-05: the ledger's human-verification date overrides the TODAY the
       // shard body stamped, for every shard sources-cycle.json tracks.
       const ledgerKey = ds.folder + "/" + shard.file;
+      const path = resolve(dir, shard.file);
+      // A date stamp written from the CLOCK asserts a freshness nobody checked,
+      // and a stamp that moves on every run can never go stale -- which is the
+      // whole point of the field. So carry the COMMITTED stamps forward whenever
+      // the shard's content is byte-identical to what is already on disk; only
+      // content that actually changed earns today's date. This neither invents a
+      // date nor drops the field. Seven shards no ledger row covers (the
+      // accounting trio, the cross glossary and the three under lab/) were
+      // stamped TODAY on every refresh before this, so they could never age
+      // into a recheck.
+      const carried = await carryStamps(path, shard.body);
+      if (carried) Object.assign(shard.body, carried);
+      // CF-05: the ledger's human-verification date still overrides whatever the
+      // body carries, for every shard sources-cycle.json tracks.
       if (LEDGER_VERIFIED_ON[ledgerKey]) {
         shard.body.verified_on = LEDGER_VERIFIED_ON[ledgerKey];
       }
       const out = formatJson(shard.body);
-      const path = resolve(dir, shard.file);
       await ensureDir(dirname(path));
       pendingWrites.push([path, out]);
       // v6 prose-lint: scan the in-memory body before hashing.
@@ -1996,4 +2048,9 @@ async function buildAll() {
   console.log("build-data: wrote " + totalShards + " shards across " + DATASETS.length + " datasets at " + TODAY + "; prose-lint clean; edition-stamp present on all manifests.");
 }
 
-await buildAll();
+// Only regenerate when this file is the process entry point. A test that wants
+// `carryStamps` must be able to import the module without rewriting the whole
+// data tree as a side effect of the import.
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  await buildAll();
+}
