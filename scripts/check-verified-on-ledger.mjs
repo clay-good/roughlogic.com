@@ -129,7 +129,7 @@ function main() {
   // against, so "add a ledger row" is advice nobody can act on, and its
   // `verified_on` legitimately means "the author last reviewed this" -- a date
   // check-manifests still measures against the folder's refresh_cadence.
-  const UNGOVERNED_BUDGET = 4;
+  const UNGOVERNED_BUDGET = 3;
   const ungoverned = [];
   const authorOriginal = [];
   (function walk(dir) {

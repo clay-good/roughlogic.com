@@ -1,8 +1,8 @@
 {
-  "source": "IUPAC Standard Atomic Weights 2021 (Pure and Applied Chemistry).",
-  "edition": "2021",
+  "source": "IUPAC/CIAAW Abridged Standard Atomic Weights 2024 (the Atomic Weights 2021 report with the 2024 revisions to gadolinium, lutetium and zirconium).",
+  "edition": "2024",
   "fetched": "2026-09-09",
-  "verified_on": "2026-09-04",
+  "verified_on": "2026-09-09",
   "free_access": "iupac.org/publications/journals/pac/.",
   "weights_g_per_mol": {
     "H": 1.008,
@@ -44,7 +44,7 @@
     "Rb": 85.468,
     "Sr": 87.62,
     "Y": 88.906,
-    "Zr": 91.224,
+    "Zr": 91.222,
     "Nb": 92.906,
     "Mo": 95.95,
     "Tc": 98,

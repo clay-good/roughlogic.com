@@ -37,7 +37,7 @@ const _finiteGuard = (o) => {
 
 // --- IUPAC standard atomic weights (g/mol) ---
 //
-// Source: IUPAC Standard Atomic Weights 2021 (4-significant-figure rounded
+// Source: IUPAC/CIAAW Abridged Standard Atomic Weights 2024 (4-significant-figure rounded
 // where the published value carries an interval, e.g., H, B, C, N, O, S).
 // Public reference; cite IUPAC by year. data/lab/iupac-atomic-weights.json
 export const IUPAC_ATOMIC_WEIGHTS = {
@@ -48,7 +48,7 @@ export const IUPAC_ATOMIC_WEIGHTS = {
   Sc: 44.956, Ti: 47.867, V: 50.942,   Cr: 51.996, Mn: 54.938,
   Fe: 55.845, Co: 58.933, Ni: 58.693,  Cu: 63.546, Zn: 65.38,
   Ga: 69.723, Ge: 72.630, As: 74.922,  Se: 78.971, Br: 79.904,
-  Kr: 83.798, Rb: 85.468, Sr: 87.62,   Y: 88.906,  Zr: 91.224,
+  Kr: 83.798, Rb: 85.468, Sr: 87.62,   Y: 88.906,  Zr: 91.222,
   Nb: 92.906, Mo: 95.95,  Tc: 98.0,    Ru: 101.07, Rh: 102.91,
   Pd: 106.42, Ag: 107.87, Cd: 112.41,  In: 114.82, Sn: 118.71,
   Sb: 121.76, Te: 127.60, I: 126.90,   Xe: 131.29, Cs: 132.91,
@@ -727,7 +727,7 @@ function renderSerialDilution(inputRegion, outputRegion, citationEl) {
 }
 
 function renderMolecularWeight(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IUPAC Standard Atomic Weights 2021. Bundled.";
+  citationEl.textContent = "Citation: IUPAC/CIAAW Abridged Standard Atomic Weights 2024. Bundled.";
   inputRegion.appendChild(makeNotice(LAB_NOTICE));
   const t = document.createElement("span"); t.textContent = "IUPAC atomic weights"; inputRegion.appendChild(t); attachGlossaryTooltip(t, "IUPAC");
   const f = makeText("Chemical formula", "mw-f");

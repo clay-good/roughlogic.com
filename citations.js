@@ -7632,7 +7632,7 @@ export const CITATIONS = {
   },
   "molecular-weight": {
     formula: "MW = sum over elements (atomic_weight[element] * count). Formula parser supports parentheses and integer subscripts.",
-    edition: "IUPAC Standard Atomic Weights 2021. Bundled in IUPAC_ATOMIC_WEIGHTS (data/lab/iupac-atomic-weights.json).",
+    edition: "IUPAC/CIAAW Abridged Standard Atomic Weights 2024 -- the Atomic Weights 2021 report with the 2024 revisions to gadolinium, lutetium and zirconium. Bundled in IUPAC_ATOMIC_WEIGHTS (data/lab/iupac-atomic-weights.json); of the three revised elements only zirconium is bundled, at its 2024 value of 91.222.",
     freeAccess: "Free at iupac.org/publications/journals/pac/. Element-by-element values published in Pure and Applied Chemistry.",
     governance: GOVERNANCE.lab,
     editionNote: "IUPAC publishes adjustments roughly every 2-4 years; bundled values follow the 2021 edition.",

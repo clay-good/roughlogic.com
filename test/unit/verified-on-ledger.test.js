@@ -149,13 +149,13 @@ test("the estimated-tax due dates are the published 1040-ES schedule", async () 
 
 test("the gate names the shards it does not govern", async () => {
   // A green summary that does not say what it skipped reads as full coverage.
-  // Four shards stamp a verified_on no ledger row backs -- that fact belongs in
+  // Three shards stamp a verified_on no ledger row backs -- that fact belongs in
   // the gate's own output, not only in docs/data-sources.md. The stamps no
   // longer come from the build date (build-data.mjs carries the committed value
   // forward when content is unchanged); what is still missing is a ledger row
   // recording what a human actually checked.
   const src = await readFile(resolve(ROOT, "scripts/check-verified-on-ledger.mjs"), "utf8");
-  assert.match(src, /UNGOVERNED_BUDGET = 4/, "the ungoverned count is ratcheted");
+  assert.match(src, /UNGOVERNED_BUDGET = 3/, "the ungoverned count is ratcheted");
   assert.match(src, /NOT governed here/, "the OK line must name the uncovered set");
   // Author-original content is reported separately: it has no publisher, so a
   // ledger row cannot exist and counting it as unbacked is a category error.
@@ -235,10 +235,36 @@ test("author-original content is not counted as an unbacked publisher claim", as
     "data/accounting/inventory-benchmarks.json",
     "data/lab/buffer-pka.json",
     "data/lab/centrifuge-rotors.json",
-    "data/lab/iupac-atomic-weights.json",
   ]) {
     const shard = await readJson(f);
     assert.ok(shard.verified_on, f + " should still carry a stamp");
     assert.notEqual(shard.provenance, "author-original", f + " has a real publisher");
+  }
+});
+
+// CIAAW publishes "Standard Atomic Weights 2024" -- the Atomic Weights 2021
+// report with 2024 revisions to gadolinium, lutetium and zirconium. The shard
+// declared edition 2021, and of the three revised elements the catalog bundles
+// only zirconium, which was stale: 91.224 against the 2024 abridged value of
+// 91.222(3). Verified 2026-09-09 on both ciaaw.org/atomic-weights.htm and
+// ciaaw.org/abridged-atomic-weights.htm, and corrected in the shard and in the
+// runtime copy in calc-lab.js, which must not drift from each other.
+test("the bundled atomic weights are the 2024 edition, in both copies", async () => {
+  const shard = await readJson("data/lab/iupac-atomic-weights.json");
+  assert.equal(shard.edition, "2024");
+  assert.equal(shard.weights_g_per_mol.Zr, 91.222);
+
+  // The runtime module carries its own copy. Two copies of a constant is two
+  // chances to be stale, so pin them together.
+  const { IUPAC_ATOMIC_WEIGHTS } = await import("../../calc-lab.js");
+  assert.equal(IUPAC_ATOMIC_WEIGHTS.Zr, shard.weights_g_per_mol.Zr);
+  for (const [el, w] of Object.entries(shard.weights_g_per_mol)) {
+    assert.equal(IUPAC_ATOMIC_WEIGHTS[el], w, el + " differs between the shard and calc-lab.js");
+  }
+
+  // Values the 2024 revision did NOT touch must be unchanged, at the
+  // conventional value where the published figure is an interval.
+  for (const [el, w] of Object.entries({ H: 1.008, C: 12.011, N: 14.007, O: 15.999, Cl: 35.45, Ar: 39.948, Pb: 207.2 })) {
+    assert.equal(shard.weights_g_per_mol[el], w);
   }
 });

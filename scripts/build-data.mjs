@@ -1553,8 +1553,8 @@ const PUB_15T_DATA_V5 = {
 // --- v5 lab shards ---
 
 const IUPAC_WEIGHTS_V5 = {
-  source: "IUPAC Standard Atomic Weights 2021 (Pure and Applied Chemistry).",
-  edition: "2021",
+  source: "IUPAC/CIAAW Abridged Standard Atomic Weights 2024 (the Atomic Weights 2021 report with the 2024 revisions to gadolinium, lutetium and zirconium).",
+  edition: "2024",
   fetched: TODAY,
   verified_on: TODAY,
   free_access: "iupac.org/publications/journals/pac/.",
@@ -1566,7 +1566,7 @@ const IUPAC_WEIGHTS_V5 = {
     Sc: 44.956, Ti: 47.867, V: 50.942, Cr: 51.996, Mn: 54.938,
     Fe: 55.845, Co: 58.933, Ni: 58.693, Cu: 63.546, Zn: 65.38,
     Ga: 69.723, Ge: 72.630, As: 74.922, Se: 78.971, Br: 79.904,
-    Kr: 83.798, Rb: 85.468, Sr: 87.62, Y: 88.906, Zr: 91.224,
+    Kr: 83.798, Rb: 85.468, Sr: 87.62, Y: 88.906, Zr: 91.222,
     Nb: 92.906, Mo: 95.95, Tc: 98.0, Ru: 101.07, Rh: 102.91,
     Pd: 106.42, Ag: 107.87, Cd: 112.41, In: 114.82, Sn: 118.71,
     Sb: 121.76, Te: 127.60, I: 126.90, Xe: 131.29, Cs: 132.91,
@@ -1830,8 +1830,8 @@ const DATASETS = [
       { file: "sales-tax-nexus.json", body: buildSalesTaxNexusShard(), name: "Per-state post-Wayfair economic-nexus thresholds" },
     ] },
   // v5 Group T: Bench Science and Laboratory Math (utilities 255-264).
-  { folder: "lab", edition: "IUPAC Standard Atomic Weights 2021. Common laboratory buffer pKa values from Good et al. 1966 and CRC Handbook of Chemistry and Physics 95th ed. Manufacturer rotor specifications (Eppendorf, Beckman Coulter, Thermo Fisher). Verified " + EDITION_VERIFIED.lab + ".", shards: [
-      { file: "iupac-atomic-weights.json", body: IUPAC_WEIGHTS_V5, name: "IUPAC Standard Atomic Weights 2021" },
+  { folder: "lab", edition: "IUPAC/CIAAW Abridged Standard Atomic Weights 2024. Common laboratory buffer pKa values from Good et al. 1966 and CRC Handbook of Chemistry and Physics 95th ed. Manufacturer rotor specifications (Eppendorf, Beckman Coulter, Thermo Fisher). Verified " + EDITION_VERIFIED.lab + ".", shards: [
+      { file: "iupac-atomic-weights.json", body: IUPAC_WEIGHTS_V5, name: "IUPAC Standard Atomic Weights 2024" },
       { file: "buffer-pka.json", body: BUFFER_PKA_V5, name: "Common laboratory buffer pKa values" },
       { file: "centrifuge-rotors.json", body: CENTRIFUGE_ROTORS_V5, name: "Representative centrifuge rotor radii (manufacturer-attributed)" },
     ] },

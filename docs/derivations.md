@@ -1200,7 +1200,7 @@ The chemical formula parser is recursive-descent over three token kinds: element
 
 Parser walks tokens with a position cursor and a stack-free recursion; on "(" it recurses, on ")" it returns and the caller reads any post-paren multiplier and applies it to the inner tally. MW = sum over (atomic_weight[symbol] * count). Unknown element symbol errors.
 
-Citations: IUPAC Standard Atomic Weights 2021 (bundled in IUPAC_ATOMIC_WEIGHTS).
+Citations: IUPAC/CIAAW Abridged Standard Atomic Weights 2024 (bundled in IUPAC_ATOMIC_WEIGHTS).
 
 Verification: NaCl, C6H12O6, K2HPO4, (NH4)2SO4, Ca(OH)2, Fe2(SO4)3, Na2SO4 all match to within 0.01 g/mol of the textbook values computed independently. Unknown element symbol returns an error rather than a silent miss.
 

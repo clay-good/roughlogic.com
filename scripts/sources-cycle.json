@@ -1,6 +1,6 @@
 {
   "_comment": "v10 Phase A.1 source-cycle table. One row per cited standard listing the publishing body, the current edition, the cycle in years, the next-expected release date (best estimate), and a free-access URL. Used by scripts/check-citation-freshness.mjs to flag manifests whose 'edition' string is more than one cycle behind the current publication of that standard. spec-v22 CF-03: when 'next_expected' is in the past, the row must carry a 'last_verified' (ISO date >= next_expected) re-stamp -- the 'verified, not yet released' acknowledgement -- or the freshness gate fails. Update on each rollover (see docs/citation-freshness-ledger.md). Since 2026-09-02 the file also carries `annual_figures`: the bundled federal dollar figures that reprice every year on a known calendar (IRS mileage, Section 179, the SSA wage base, FHFA and HUD loan limits, GSA per-diem, HUD FMRs, Pub 15-T). Five of them were found stale on one day; nothing had ever asked when their publisher last spoke.",
-  "_updated": "2026-09-03",
+  "_updated": "2026-09-09",
   "standards": [
     {
       "id": "nec",
@@ -190,6 +190,22 @@
       ],
       "citation_only": true,
       "citation_only_reason": "No bundled shard holds Green Book data: the horizontal-curve and sight-distance tiles apply the geometric formulas and cite the policy by name rather than reproducing its tables, and the citations carry no edition year to compare. There is no manifest for it to appear in, so CF-06 exempts it. Licensed text is never bundled, which is why this stays a by-name citation."
+    },
+    {
+      "id": "iupac-atomic-weights",
+      "name": "IUPAC/CIAAW Standard Atomic Weights",
+      "current_edition": "2024",
+      "current_release": "2024",
+      "cycle_years": 2,
+      "next_expected": "2028-01",
+      "last_verified": "2026-09-09",
+      "verification_note": "Verified 2026-09-09 against the publisher's own tables at ciaaw.org/atomic-weights.htm and ciaaw.org/abridged-atomic-weights.htm, both of which head the table \"Standard Atomic Weights 2024\" -- the Atomic Weights 2021 report with 2024 revisions to gadolinium, lutetium and zirconium. The shard previously declared edition 2021. Of the three revised elements only ZIRCONIUM is bundled, and it was stale: the shard carried 91.224 where the 2024 abridged table gives 91.222(3), confirmed on both pages. Corrected in the shard and in the runtime copy in calc-lab.js. Every other bundled value was spot-checked against the 2024 abridged table and is unchanged, the interval elements at their conventional values (H 1.008, C 12.011, N 14.007, O 15.999, Mg 24.305, Si 28.085, S 32.06, Cl 35.45, Ar 39.948, Pb 207.2). CIAAW revises on roughly a two-year cycle, so recheck when next_expected passes.",
+      "free_access_url": "https://ciaaw.org/atomic-weights.htm",
+      "where": "data/lab/iupac-atomic-weights.json",
+      "match_terms": [
+        "IUPAC",
+        "Atomic Weights"
+      ]
     }
   ],
   "annual_figures": [
