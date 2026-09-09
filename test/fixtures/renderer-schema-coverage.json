@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 2057,
-  "covered_count": 1979,
+  "total_tiles": 2062,
+  "covered_count": 1984,
   "covered": [
     "aav-install-check",
     "abatement-containment",
@@ -949,6 +949,7 @@
     "loop-signal-scaling",
     "loop-voltage-budget",
     "louver-free-area",
+    "lp-container-separation",
     "ltv",
     "lumber-recovery-overrun",
     "lumber-spans",
@@ -1242,6 +1243,10 @@
     "projector-max-screen-size",
     "prop-pitch-selection",
     "prop-slip",
+    "propane-fill-outage",
+    "propane-regulator-sizing",
+    "propane-run-time",
+    "propane-vaporization-rate",
     "propeller-track-balance",
     "property-tax",
     "proportional-balance-ratio",

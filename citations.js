@@ -24082,6 +24082,70 @@ export const CITATIONS = {
       { name: "The transfer path is elsewhere", value: "door undercut carries the noise ceiling that limits it", source: "the door undercut transfer air calculation" },
     ],
   },
+  // spec-v1591..v1595: the 2026-09-09 trade-expansion propane and LP-gas
+  // band. Five tiles, nothing cut. spec-v1591 says a tank drawn from 60% to
+  // 30% has its wetted area "halve"; the shell arc is a chord function of
+  // depth and the area falls only to 70%, so the tile COMPUTES the area.
+  "propane-vaporization-rate": {
+    formula: "wetted surface of a horizontal cylinder at the entered fill -- the shell arc 2R*acos((R-h)/R)*L plus both head segments -- with the manufacturer's table capacity scaled by the wetted-area ratio and by the temperature-difference ratio.",
+    edition: "Vaporization capacity from the tank manufacturer's published table, scaled by computed geometry. The rate is NOT derived: it also depends on wind, burial, insulation, paint colour and the duration of the draw.",
+    freeAccess: "Circular-segment geometry and two ratios on an entered table reading.",
+    governance: GOVERNANCE.general,
+    editionNote: "A propane tank is a boiler, not a container, and BOTH TERMS MOVE THE WRONG WAY TOGETHER in a cold snap: the ambient falls, so the temperature difference driving heat through the shell shrinks, and a drawn-down tank has less wetted surface. That compound is why the failure is a January morning on a tank at 30% and never the full tank in November. The spec says the wetted area 'halves' between 60% and 30% full; it does not -- the shell arc is a chord function of depth, and on the 3.5 by 16 ft tank here the area goes 108 to 76 sq ft, a fall to 70%. The direction is right and the magnitude is not, which is why the area is computed rather than scaled with the fill. FROST IS THE DIAGNOSIS: liquid boiling fast enough to chill the wall below the dew point means the tank is at or past capacity, and the frost then insulates the shell and makes it worse. THE FIX IS NOT A BIGGER REGULATOR -- it is more wetted area, or a vaporizer.",
+    assumptions: [
+      { name: "The table reading is the input", value: "wind, burial, insulation and paint colour are not modelled", source: "the tank manufacturer's vaporization table" },
+      { name: "Horizontal cylinder with flat heads", value: "a dished or hemispherical head changes the wetted area", source: "the container drawing" },
+      { name: "Continuous draw assumed", value: "intermittent capacity is higher and the table gives both", source: "the tank manufacturer" },
+    ],
+  },
+  "propane-fill-outage": {
+    formula: "maximum fill = water capacity x the filling limit; outage = the remainder; the expansion headroom is the free fraction divided by liquid propane's roughly 0.0015 per degF.",
+    edition: "The filling limit is ENTERED because it is temperature-corrected and differs between aboveground and underground containers and with the filling method.",
+    freeAccess: "Two products and one division.",
+    governance: GOVERNANCE.general,
+    editionNote: "A 500 gallon tank delivers 400 gallons and a full tank reads 80%. NEITHER IS A SHORTFALL, and the arithmetic is here so the conversation can be had with numbers. THE LIMIT IS ABOUT THERMAL EXPANSION rather than a margin in the abstract: liquid propane expands about 1.5% per 10 degF, so the 20% outage at an 80% limit absorbs about 167 degF of rise, while a tank filled to 95% has only 35 degF -- one sunny afternoon. A tank filled solid on a cold morning becomes hydraulically full and lifts its relief valve, which is the valve working correctly and is still a large release of flammable gas. THE FIXED LIQUID LEVEL GAUGE IS THE PHYSICAL ENFORCEMENT: the bleeder sprays white when liquid reaches the dip tube, and that spray is the stop signal regardless of the float gauge or the meter. RUN TIME IS DELIBERATELY LEFT TO THE RUN-TIME TILE, because dividing energy by a load gives a continuous-firing floor rather than an estimate.",
+    assumptions: [
+      { name: "The filling limit is entered", value: "it is temperature-corrected and differs by container type", source: "NFPA 58 as adopted" },
+      { name: "Expansion at 0.0015 per degF", value: "the coefficient varies with the propane-butane mix", source: "published liquid property data" },
+      { name: "The float gauge is an indication", value: "the dip tube is the measurement", source: "LP-gas filling practice" },
+    ],
+  },
+  "propane-regulator-sizing": {
+    formula: "required flow = connected load / the fuel's energy content per cubic foot, compared against regulator capacities entered at each inlet pressure; lock-up is compared against the downstream rating.",
+    edition: "Regulator capacities are ENTERED from the manufacturer's tables: capacity depends on the spring, the orifice and the outlet setting, and no generic relation covers a table the maker publishes.",
+    freeAccess: "One division and four comparisons.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE SIZING TRAP IS INLET PRESSURE. A regulator's capacity is a function of the pressure across it, and tank pressure follows liquid temperature -- so a first stage that passes 300 CFH with a warm tank may pass 165 with a cold one, and a 200 CFH load that looked comfortable in August starves in January. First stages are sized at the MINIMUM expected tank pressure for exactly this reason, and the same regulator is compared at both conditions here so the fall is a number rather than a caution. THE SECOND STAGE IS EASIER because its inlet is regulated year-round; its constraint is LOCK-UP, the outlet pressure at zero flow, which makes a system unsafe AT IDLE rather than at full fire -- the opposite of where anyone looks. AND THIS FAILS ON THE SAME MORNING AS THE TANK: regulator capacity and vaporization capacity both fall with the same cold on the same drawn-down tank, and reading the tank pressure is what separates two causes that look identical at the appliance.",
+    assumptions: [
+      { name: "Capacities are entered", value: "read from the manufacturer's table at each inlet pressure", source: "the regulator manufacturer" },
+      { name: "The minimum tank pressure is entered", value: "it follows liquid temperature and is not predicted here", source: "the design low ambient" },
+      { name: "Piping is sized separately", value: "the two pressures size separately", source: "the gas pipe sizing calculation" },
+    ],
+  },
+  "lp-container-separation": {
+    formula: "each measured distance compared against the requirement entered for it, with the margin and a pass or fail per element, plus the same building check at the next container size.",
+    edition: "The NFPA 58 separation tables are NOT reproduced: they are indexed by container water capacity, they step at capacity breakpoints, and the adopted edition and its amendments govern.",
+    freeAccess: "Comparisons only; no table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE DISTANCES STEP RATHER THAN SCALE, which is the practical point. They change at capacity breakpoints, so choosing between one container size and the next is not only a capacity decision -- it can move the tank across the yard, and a customer told they can double their capacity may be told it in a yard that will not take it. THE CLEARANCE PEOPLE FORGET IS NOT TO THE WALL BUT TO OPENINGS: the relief discharge has to be clear of windows, doors and any opening into a below-grade space, because propane is heavier than air and will find a basement window well and stay in it. That is DIRECTIONAL -- where the relief points, not only how far the container sits -- and no horizontal measurement addresses it, so it is flagged separately. THE OTHER QUIET ONE IS THE POINT OF TRANSFER, whose requirements are frequently more restrictive than the container's: a tank that complies while the truck is absent can be non-compliant while it is being filled.",
+    assumptions: [
+      { name: "Requirements are entered", value: "no separation table is reproduced or looked up", source: "NFPA 58 as adopted" },
+      { name: "Aboveground containers", value: "underground and mounded containers have their own, generally shorter distances", source: "NFPA 58 as adopted" },
+      { name: "Relief direction is a flag, not a distance", value: "no horizontal measurement addresses it", source: "the AHJ" },
+    ],
+  },
+  "propane-run-time": {
+    formula: "energy = gallons x heat content; continuous run time = energy / connected load; the realistic figure divides by the duty cycle; the schedule runs to the delivery trigger; and the degree-day estimate is gallons-per-degree-day times degree days per day.",
+    edition: "Run time from an entered load, duty cycle and delivery history. Consumption is very nearly proportional to heating degree days, and the customer's own record is the honest input.",
+    freeAccess: "Divisions on an entered energy content.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE CONTINUOUS-FIRING NUMBER IS A FLOOR, NOT AN ESTIMATE, and it is the number people compute. Heating equipment cycles: 400 gallons against a 150,000 BTU/h furnace is 10.2 days of continuous firing and about 29 days at a 35% seasonal duty cycle, so a continuous estimate is off by a factor of three in October and roughly right in a January cold snap. DEGREE DAYS ARE THE HONEST METHOD and they come from the customer's own delivery record, which automatically includes the water heater, the range and everything else on the tank that nobody thought to add up. Both estimates are reported side by side, because the RATIO between them is itself the finding: a history running well ahead of the duty-cycle figure means something is on the tank that was not in the load. AND THE SCHEDULE RUNS TO THE TRIGGER, NOT TO EMPTY -- running dry means purging and leak-testing before a refill, and the last of the liquid was struggling to vaporize anyway, which is limited by wetted surface rather than volume.",
+    assumptions: [
+      { name: "The duty cycle is entered", value: "it is not predicted from the weather or the equipment", source: "the service history" },
+      { name: "Degree-day history is the honest input", value: "it beats any appliance rating and includes the whole tank load", source: "the delivery record" },
+      { name: "The trigger, not empty", value: "the last of the tank may not vaporize at the rate the load asks", source: "the supplier's delivery practice" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

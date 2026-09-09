@@ -312,6 +312,8 @@ export const TOOL_MODULES = (() => {
     // spec-v111 high-altitude derate and NG/LP fuel conversion (same module).
     "gas-altitude-derate", "gas-fuel-conversion",
     "wobbe-index", "gas-appliance-connection",
+    "propane-vaporization-rate", "propane-fill-outage", "propane-regulator-sizing",
+    "lp-container-separation", "propane-run-time",
     // spec-v206 medical-gas system demand and diversity (NFPA 99).
     "medgas-demand",
   ]);

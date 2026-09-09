@@ -1636,6 +1636,11 @@ const RELATED = {
   "spa-drain-interval": ["pool-turnover","pool-alkalinity-adjust","pool-volume"],
   // spec-v1745..v1749: containment band.
   "radon-fan-static": ["sub-slab-suction-field","stack-effect-npp","blower-door-ach50"],
+  "propane-vaporization-rate": ["propane-run-time","propane-regulator-sizing","gas-appliance-demand"],
+  "propane-fill-outage": ["propane-run-time","propane-vaporization-rate","lp-container-separation"],
+  "propane-regulator-sizing": ["gas-pipe-sizing","propane-vaporization-rate","gas-appliance-demand"],
+  "lp-container-separation": ["propane-fill-outage","propane-vaporization-rate","gas-appliance-connection"],
+  "propane-run-time": ["propane-fill-outage","propane-vaporization-rate","degree-day-energy"],
   "sub-slab-suction-field": ["radon-fan-static","stack-effect-npp","blower-door-ach50"],
   "acid-waste-neutralization": ["lab-containment-pressure","chemical-feed-pump","fume-hood-face-velocity"],
   "fume-hood-face-velocity": ["lab-containment-pressure","grille-face-velocity","dilution-ventilation-solvent"],

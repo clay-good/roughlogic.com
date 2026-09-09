@@ -51406,3 +51406,206 @@ test("bounds: spec-v1749 computeLabContainmentPressure -- a 10% drift swamps the
   assert.ok(_v1749({ ...base, room_volume_ft3: 0 }).error);
   assert.ok(_v1749({ ...base, hood_exhaust_cfm: 0, general_exhaust_cfm: 0 }).error);
 });
+
+// =====================================================================
+// spec-v1591..v1595: the propane and LP-gas band. Five tiles, nothing cut.
+// spec-v1591 says a tank drawn from 60% to 30% full has its wetted area
+// "halve"; the shell arc is a chord function of depth and the area falls
+// only to 70%, so the tile computes the area rather than scaling it with
+// the fill. spec-v1592 lists a run time among its outputs and spec-v1595
+// is entirely run time; the arithmetic is landed once, in v1595, which
+// carries the duty cycle and the delivery trigger that make it honest.
+// =====================================================================
+import {
+  computePropaneVaporizationRate as _v1591,
+  computePropaneFillOutage as _v1592,
+  computePropaneRegulatorSizing as _v1593,
+  computeLpContainerSeparation as _v1594,
+  computePropaneRunTime as _v1595,
+} from "../../calc-gas.js";
+
+test("bounds: spec-v1591 computePropaneVaporizationRate -- the wetted area does NOT halve", () => {
+  const base = { tank_diameter_ft: 3.5, tank_length_ft: 16, percent_full: 60, ambient_f: 20, liquid_temperature_f: -20, reference_capacity_btuh: 1000000, reference_percent_full: 60, reference_ambient_f: 60, connected_load_btuh: 500000 };
+  const r = _v1591(base);
+  // IDENTITY: at 100% full the wetted area is the whole cylinder --
+  // pi*D*L of shell plus two flat heads. That is closed form.
+  const full = _v1591({ ...base, percent_full: 100 });
+  const wholeTank = Math.PI * 3.5 * 16 + 2 * Math.PI * Math.pow(1.75, 2);
+  assert.ok(Math.abs(full.wetted_area_ft2 - wholeTank) < 1e-6);
+  // IDENTITY: at exactly half full the area is exactly half the whole.
+  const half = _v1591({ ...base, percent_full: 50 });
+  assert.ok(Math.abs(half.wetted_area_ft2 - wholeTank / 2) < 1e-6);
+  // THE FINDING: 60% -> 30% is a fall to 70%, not to 50%.
+  const drawn = _v1591({ ...base, percent_full: 30 });
+  const areaFall = drawn.wetted_area_ft2 / r.wetted_area_ft2;
+  assert.ok(areaFall > 0.68 && areaFall < 0.72);
+  assert.ok(areaFall > 0.6); // it is emphatically NOT a halving
+  // IDENTITY: the reference condition returns the table reading exactly.
+  const atRef = _v1591({ ...base, percent_full: 60, ambient_f: 60 });
+  assert.ok(Math.abs(atRef.capacity_btuh - 1000000) < 1e-6);
+  assert.ok(Math.abs(atRef.area_ratio - 1) < 1e-12);
+  assert.ok(Math.abs(atRef.temperature_ratio - 1) < 1e-12);
+  // IDENTITY: capacity is exactly the product of the two ratios.
+  assert.ok(Math.abs(r.capacity_btuh - 1000000 * r.area_ratio * r.temperature_ratio) < 1e-9);
+  assert.ok(Math.abs(r.temperature_ratio - 40 / 80) < 1e-12);
+  assert.ok(Math.abs(r.capacity_btuh - 500000) < 1e-9);
+  assert.ok(r.meets_load);
+  // BOTH TERMS TOGETHER: 30% full at 0 degF is the compound fall, and it
+  // is strictly worse than either factor alone.
+  const cold = _v1591({ ...base, percent_full: 30, ambient_f: 0 });
+  assert.ok(cold.capacity_btuh < drawn.capacity_btuh);
+  assert.ok(Math.abs(cold.capacity_btuh - drawn.capacity_btuh / 2) < 1e-6);
+  assert.ok(cold.already_short);
+  assert.ok(cold.tanks_required >= 3);
+  // The tank sits exactly at its limit here, which is the spec's story.
+  assert.ok(r.limit_percent_full > 55 && r.limit_percent_full <= 60);
+  assert.ok(_v1591({ ...base, ambient_f: -20 }).error);
+  assert.ok(_v1591({ ...base, tank_diameter_ft: 0 }).error);
+});
+
+test("bounds: spec-v1592 computePropaneFillOutage -- 400 gallons IS a full 500 gallon tank", () => {
+  const base = { water_capacity_gal: 500, fill_limit_pct: 80, current_gauge_pct: 25, btu_per_gal: 91500, liquid_temperature_f: 40 };
+  const r = _v1592(base);
+  assert.ok(Math.abs(r.max_fill_gal - 400) < 1e-12);
+  assert.ok(Math.abs(r.outage_gal - 100) < 1e-12);
+  assert.ok(Math.abs(r.current_gal - 125) < 1e-12);
+  assert.ok(Math.abs(r.deliverable_gal - 275) < 1e-12);
+  assert.ok(Math.abs(r.full_tank_mmbtu - 36.6) < 1e-9);
+  // IDENTITY: fill plus outage is the water capacity, always.
+  assert.ok(Math.abs(r.max_fill_gal + r.outage_gal - 500) < 1e-12);
+  // IDENTITY: a tank AT the limit has nothing deliverable and is not overfilled.
+  const atLimit = _v1592({ ...base, current_gauge_pct: 80 });
+  assert.ok(Math.abs(atLimit.deliverable_gal) < 1e-12);
+  assert.equal(atLimit.overfilled, false);
+  // Above the limit is overfilled, and delivers nothing rather than a negative.
+  const over = _v1592({ ...base, current_gauge_pct: 95 });
+  assert.equal(over.overfilled, true);
+  assert.ok(Math.abs(over.deliverable_gal) < 1e-12);
+  // THE EXPANSION POINT: the outage at an 80% limit buys about 167 degF,
+  // and a 95% fill buys 35 -- one sunny afternoon.
+  assert.ok(Math.abs(r.limit_headroom_f - (20 / 80) / 0.0015) < 1e-9);
+  assert.ok(r.limit_headroom_f > 160 && r.limit_headroom_f < 175);
+  assert.ok(over.expansion_headroom_f > 30 && over.expansion_headroom_f < 40);
+  assert.ok(over.expansion_headroom_f < r.limit_headroom_f / 4);
+  // IDENTITY: the headroom is a RISE, so the liquid-full temperature is it
+  // plus the liquid temperature -- and at a 95% fill on 40 degF liquid that
+  // is 75 degF, a mild afternoon rather than an abstract margin.
+  assert.ok(Math.abs(over.hydraulically_full_at_f - (40 + over.expansion_headroom_f)) < 1e-12);
+  assert.ok(over.hydraulically_full_at_f > 70 && over.hydraulically_full_at_f < 80);
+  // Colder liquid moves that temperature down by exactly the same amount.
+  const cold = _v1592({ ...base, current_gauge_pct: 95, liquid_temperature_f: 10 });
+  assert.ok(Math.abs(cold.hydraulically_full_at_f - (over.hydraulically_full_at_f - 30)) < 1e-9);
+  assert.ok(Math.abs(cold.expansion_headroom_f - over.expansion_headroom_f) < 1e-12);
+  // Exactly linear in capacity and in energy content.
+  assert.ok(Math.abs(_v1592({ ...base, water_capacity_gal: 1000 }).max_fill_gal - 2 * r.max_fill_gal) < 1e-12);
+  assert.ok(Math.abs(_v1592({ ...base, btu_per_gal: 183000 }).full_tank_mmbtu - 2 * r.full_tank_mmbtu) < 1e-9);
+  assert.ok(_v1592({ ...base, water_capacity_gal: 0 }).error);
+  assert.ok(_v1592({ ...base, fill_limit_pct: 0 }).error);
+});
+
+test("bounds: spec-v1593 computePropaneRegulatorSizing -- it passes warm and starves cold", () => {
+  const base = { connected_load_btuh: 500000, btu_per_ft3: 2500, capacity_at_min_inlet_cfh: 165, capacity_at_max_inlet_cfh: 300, second_stage_capacity_cfh: 425, lockup_psig: 0.72, downstream_rating_psig: 0.5 };
+  const r = _v1593(base);
+  assert.ok(Math.abs(r.required_cfh - 200) < 1e-12);
+  // THE TRAP: ample at the warm tank pressure, short at the cold one.
+  assert.equal(r.short_at_max, false);
+  assert.equal(r.short_at_min, true);
+  assert.equal(r.passes_warm_fails_cold, true);
+  assert.ok(Math.abs(r.min_inlet_margin_cfh - (165 - 200)) < 1e-12);
+  assert.ok(Math.abs(r.max_inlet_margin_cfh - (300 - 200)) < 1e-12);
+  assert.ok(Math.abs(r.capacity_fall_pct - 45) < 1e-9);
+  // IDENTITY: demand is exactly linear in load and inverse in heat content.
+  assert.ok(Math.abs(_v1593({ ...base, connected_load_btuh: 1000000 }).required_cfh - 400) < 1e-12);
+  assert.ok(Math.abs(_v1593({ ...base, btu_per_ft3: 1000 }).required_cfh - 500) < 1e-12);
+  // A regulator sized AT the load is not short -- the boundary is inclusive.
+  const exact = _v1593({ ...base, capacity_at_min_inlet_cfh: 200 });
+  assert.equal(exact.short_at_min, false);
+  assert.ok(Math.abs(exact.min_inlet_pct - 100) < 1e-9);
+  // Sizing at the cold inlet is what fixes it, and then both cases pass.
+  const sized = _v1593({ ...base, capacity_at_min_inlet_cfh: 250, capacity_at_max_inlet_cfh: 455 });
+  assert.equal(sized.short_at_min, false);
+  assert.equal(sized.passes_warm_fails_cold, false);
+  // LOCK-UP is a separate failure and it is an IDLE failure.
+  assert.equal(r.lockup_over, true);
+  assert.ok(Math.abs(r.lockup_margin_psig - (0.5 - 0.72)) < 1e-9);
+  assert.equal(_v1593({ ...base, lockup_psig: 0.4 }).lockup_over, false);
+  // Lock-up exactly at the rating is within it, not over.
+  assert.equal(_v1593({ ...base, lockup_psig: 0.5 }).lockup_over, false);
+  // The optional checks stay silent rather than reporting a false pass.
+  const minimal = _v1593({ ...base, capacity_at_max_inlet_cfh: 0, second_stage_capacity_cfh: 0, lockup_psig: 0 });
+  assert.equal(minimal.has_max, false);
+  assert.equal(minimal.has_second, false);
+  assert.equal(minimal.has_lockup, false);
+  assert.ok(_v1593({ ...base, connected_load_btuh: 0 }).error);
+  assert.ok(_v1593({ ...base, capacity_at_min_inlet_cfh: 0 }).error);
+});
+
+test("bounds: spec-v1594 computeLpContainerSeparation -- the distances STEP, they do not scale", () => {
+  const base = { water_capacity_gal: 500, required_building_ft: 10, required_property_line_ft: 10, required_ignition_ft: 10, required_opening_ft: 5, measured_building_ft: 12, measured_property_line_ft: 14, measured_ignition_ft: 18, measured_opening_ft: 6, next_size_required_building_ft: 25, relief_points_at_opening: "no" };
+  const r = _v1594(base);
+  assert.equal(r.checked_count, 4);
+  assert.equal(r.failure_count, 0);
+  assert.equal(r.all_pass, true);
+  // IDENTITY: every margin is measured minus required, exactly.
+  assert.ok(Math.abs(r.building_margin_ft - 2) < 1e-12);
+  assert.ok(Math.abs(r.property_line_margin_ft - 4) < 1e-12);
+  assert.ok(Math.abs(r.ignition_margin_ft - 8) < 1e-12);
+  assert.ok(Math.abs(r.opening_margin_ft - 1) < 1e-12);
+  assert.ok(Math.abs(r.governing_required_ft - 10) < 1e-12);
+  // A distance exactly AT its requirement passes; a hair under fails.
+  assert.equal(_v1594({ ...base, measured_building_ft: 10 }).all_pass, true);
+  const short = _v1594({ ...base, measured_building_ft: 9.5 });
+  assert.equal(short.all_pass, false);
+  assert.equal(short.failure_count, 1);
+  // THE STEP: the same yard does not take the next container size up.
+  assert.equal(r.next_size_fits, false);
+  assert.ok(Math.abs(r.next_size_shortfall_ft - 13) < 1e-12);
+  assert.equal(_v1594({ ...base, next_size_required_building_ft: 11 }).next_size_fits, true);
+  // A skipped element is not counted, and not silently passed.
+  const partial = _v1594({ ...base, required_ignition_ft: 0, measured_ignition_ft: 0, required_opening_ft: 0, measured_opening_ft: 0 });
+  assert.equal(partial.checked_count, 2);
+  assert.ok(Math.abs(partial.ignition_margin_ft) < 1e-12);
+  // The relief direction is a FLAG with no distance behind it.
+  assert.equal(r.relief_flag, false);
+  assert.equal(_v1594({ ...base, relief_points_at_opening: "yes" }).relief_flag, true);
+  assert.ok(_v1594({ ...base, water_capacity_gal: 0 }).error);
+  assert.ok(_v1594({ ...base, measured_building_ft: 0 }).error);
+});
+
+test("bounds: spec-v1595 computePropaneRunTime -- the duty cycle is the whole answer", () => {
+  const base = { water_capacity_gal: 500, fill_limit_pct: 80, current_gauge_pct: 80, trigger_pct: 30, connected_load_btuh: 150000, duty_cycle: 0.35, btu_per_gal: 91500, gallons_per_hdd: 0.45, hdd_per_day: 30 };
+  const r = _v1595(base);
+  assert.ok(Math.abs(r.usable_gal - 400) < 1e-12);
+  assert.ok(Math.abs(r.usable_mmbtu - 36.6) < 1e-9);
+  assert.ok(Math.abs(r.continuous_hours - 244) < 1e-9);
+  assert.ok(Math.abs(r.continuous_days - 244 / 24) < 1e-12);
+  assert.ok(Math.abs(r.realistic_days - (244 / 24) / 0.35) < 1e-9);
+  assert.ok(r.realistic_days > 29 && r.realistic_days < 29.1);
+  // IDENTITY: a duty cycle of 1 is exactly the continuous case.
+  const flatOut = _v1595({ ...base, duty_cycle: 1 });
+  assert.ok(Math.abs(flatOut.realistic_days - r.continuous_days) < 1e-12);
+  // IDENTITY: consumption times realistic days is the tank, exactly.
+  assert.ok(Math.abs(r.gallons_per_day * r.realistic_days - r.usable_gal) < 1e-9);
+  assert.ok(Math.abs(r.gallons_per_day - 150000 * 0.35 * 24 / 91500) < 1e-12);
+  // ROUND TRIP: the days to the trigger, fed back as gallons, lands on the
+  // gallons between the two gauge readings.
+  assert.ok(Math.abs(r.days_to_trigger * r.gallons_per_day - r.gallons_to_trigger) < 1e-9);
+  assert.ok(Math.abs(r.gallons_to_trigger - 250) < 1e-12);
+  assert.ok(r.days_to_trigger > 18 && r.days_to_trigger < 18.2);
+  // Halving the duty cycle exactly doubles the time, both ways.
+  const mild = _v1595({ ...base, duty_cycle: 0.175 });
+  assert.ok(Math.abs(mild.days_to_trigger - 2 * r.days_to_trigger) < 1e-9);
+  // The degree-day estimate is the independent second opinion.
+  assert.equal(r.has_history, true);
+  assert.ok(Math.abs(r.hdd_gallons_per_day - 0.45 * 30) < 1e-12);
+  assert.ok(Math.abs(r.hdd_days_to_trigger * r.hdd_gallons_per_day - r.gallons_to_trigger) < 1e-9);
+  assert.ok(Math.abs(r.history_ratio - r.hdd_gallons_per_day / r.gallons_per_day) < 1e-12);
+  // A history well ahead of the load estimate is the finding, not a fault.
+  const busy = _v1595({ ...base, gallons_per_hdd: 0.9 });
+  assert.ok(busy.history_ratio > 1.9);
+  assert.ok(busy.hdd_days_to_trigger < r.hdd_days_to_trigger / 1.9);
+  assert.equal(_v1595({ ...base, gallons_per_hdd: 0 }).has_history, false);
+  // A trigger at or above the current reading is not a schedule.
+  assert.ok(_v1595({ ...base, trigger_pct: 80 }).error);
+  assert.ok(_v1595({ ...base, duty_cycle: 0 }).error);
+});

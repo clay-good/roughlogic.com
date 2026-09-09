@@ -914,6 +914,8 @@ const _TILES = [
   // spec-v111 fuel-gas altitude derate / NG-LP conversion (Group B)
   ["gas-altitude-derate", "B"],
   ["gas-fuel-conversion", "B"], ["wobbe-index", "B"], ["gas-appliance-connection", "B"],
+  ["propane-vaporization-rate", "B"], ["propane-fill-outage", "B"], ["propane-regulator-sizing", "B"],
+  ["lp-container-separation", "B"], ["propane-run-time", "B"],
   // spec-v112 storage water-heater sizing (Group B)
   ["water-heater-storage-sizing", "B"],
   // spec-v113 guard and handrail code check (Group E)

@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "9b0b9963bc2d9d6c",
+      "sha": "85fff7a7f28838fb",
       "date": "2026-09-09"
     },
     "/tools/": {
-      "sha": "a36b974d45316757",
+      "sha": "7bf784296774ce61",
       "date": "2026-09-09"
     },
     "/groups/accounting/": {
-      "sha": "dab119d12cbea215",
+      "sha": "88030b9e6585189c",
       "date": "2026-09-09"
     },
     "/groups/agriculture/": {
-      "sha": "49c9bb59524666f0",
+      "sha": "5c80f4b9e8de65c4",
       "date": "2026-09-09"
     },
     "/groups/construction/": {
-      "sha": "f2fbc45ec4090bda",
+      "sha": "4bc5dec6716342b2",
       "date": "2026-09-09"
     },
     "/groups/cross-trade/": {
-      "sha": "da57da11adc18db3",
+      "sha": "f9106836768c26ac",
       "date": "2026-09-09"
     },
     "/groups/educators/": {
-      "sha": "1af515ec05217504",
+      "sha": "49f648b6de93df71",
       "date": "2026-09-09"
     },
     "/groups/electrical/": {
-      "sha": "7ff154b3602708b5",
+      "sha": "4c2e26848352717d",
       "date": "2026-09-09"
     },
     "/groups/field/": {
-      "sha": "841c8c241c5dfcd0",
+      "sha": "0219e0017d4c8800",
       "date": "2026-09-09"
     },
     "/groups/fire-ground/": {
-      "sha": "1ea47e413e505673",
+      "sha": "a10d8e9b3eb5c0a8",
       "date": "2026-09-09"
     },
     "/groups/historical/": {
-      "sha": "25a74a85ad596490",
+      "sha": "899a508056103736",
       "date": "2026-09-09"
     },
     "/groups/hvac/": {
-      "sha": "5e9fd55520fba0ca",
+      "sha": "739089a3b8250022",
       "date": "2026-09-09"
     },
     "/groups/kitchen/": {
-      "sha": "8e1ccb1bb22ca4c2",
+      "sha": "a2234eb0006745f7",
       "date": "2026-09-09"
     },
     "/groups/lab/": {
-      "sha": "9382f7c2476cbc24",
+      "sha": "06dd480962e2c8a7",
       "date": "2026-09-09"
     },
     "/groups/mechanic/": {
-      "sha": "f557f857b49238d7",
+      "sha": "ff089b33dd1f19a1",
       "date": "2026-09-09"
     },
     "/groups/plumbing/": {
-      "sha": "d5a58a9e9011ee0f",
+      "sha": "c6633cf67bcc0c21",
       "date": "2026-09-09"
     },
     "/groups/real-estate/": {
-      "sha": "da466b2c71935df6",
+      "sha": "5c3a7f50b6363351",
       "date": "2026-09-09"
     },
     "/groups/references/": {
-      "sha": "5d58cda8d3cb88fe",
+      "sha": "d90e1cdaca215463",
       "date": "2026-09-09"
     },
     "/groups/restoration/": {
-      "sha": "274c2f047e84cf89",
+      "sha": "ee2c3608a582e23f",
       "date": "2026-09-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "5f87b7584b95d9b5",
+      "sha": "f976e64b18a30723",
       "date": "2026-09-09"
     },
     "/groups/stage/": {
-      "sha": "cf2054c6d279eea8",
+      "sha": "188c46f0aadf8b20",
       "date": "2026-09-09"
     },
     "/groups/trucking/": {
-      "sha": "e34f330bc2ccc16c",
+      "sha": "0e815a9a60b50c99",
       "date": "2026-09-09"
     },
     "/groups/water/": {
-      "sha": "4cc33a0b9c9dd9cc",
+      "sha": "7592024556a22cb6",
       "date": "2026-09-09"
     },
     "/tools/aav-install-check/": {
@@ -3006,8 +3006,8 @@
       "date": "2026-09-01"
     },
     "/tools/gas-altitude-derate/": {
-      "sha": "a85b1c46e9a30031",
-      "date": "2026-09-01"
+      "sha": "dd9ae924e32e14ce",
+      "date": "2026-09-09"
     },
     "/tools/gas-appliance-connection/": {
       "sha": "11efa0afe3b863a3",
@@ -4053,6 +4053,10 @@
       "sha": "2695c0c04a7159cb",
       "date": "2026-09-08"
     },
+    "/tools/lp-container-separation/": {
+      "sha": "bf0c5b54eedaaac5",
+      "date": "2026-09-09"
+    },
     "/tools/ltv/": {
       "sha": "deaf41152834caed",
       "date": "2026-09-01"
@@ -4382,7 +4386,7 @@
       "date": "2026-09-01"
     },
     "/tools/mixed-water-temp/": {
-      "sha": "0f7ccb4c0f9b7606",
+      "sha": "a7d83571a879ac3b",
       "date": "2026-09-09"
     },
     "/tools/moist-air-enthalpy/": {
@@ -5230,8 +5234,8 @@
       "date": "2026-09-01"
     },
     "/tools/pressure-tank-drawdown/": {
-      "sha": "1a52f95d2239e6d7",
-      "date": "2026-09-01"
+      "sha": "6f00d5d9b2f734f2",
+      "date": "2026-09-09"
     },
     "/tools/pressure-zone-hgl/": {
       "sha": "d9dcf515b32e68a7",
@@ -5276,6 +5280,22 @@
     "/tools/prop-slip/": {
       "sha": "829b1af50b615358",
       "date": "2026-09-08"
+    },
+    "/tools/propane-fill-outage/": {
+      "sha": "007f4270ea6160a0",
+      "date": "2026-09-09"
+    },
+    "/tools/propane-regulator-sizing/": {
+      "sha": "9d6b7644f65d3396",
+      "date": "2026-09-09"
+    },
+    "/tools/propane-run-time/": {
+      "sha": "57b57d7fc128b4bf",
+      "date": "2026-09-09"
+    },
+    "/tools/propane-vaporization-rate/": {
+      "sha": "b165b55551067c24",
+      "date": "2026-09-09"
     },
     "/tools/propeller-track-balance/": {
       "sha": "8a71296c33436324",

@@ -2381,7 +2381,12 @@ cross-check.
 | calc-gas.js | `computeGasPipeMaxFlow` | `{ drop_inwc = 0, id_in = 0, length_ft = 0, sg = 0.6 } = {}` | _ | _ | _ |
 | calc-gas.js | `computeGasPipePressureDrop` | `{ flow_cfh = 0, id_in = 0, length_ft = 0, sg = 0.6 } = {}` | _ | _ | _ |
 | calc-gas.js | `computeGasPipeSizing` | `{ btu_load, length_ft, gas, dP_in_wc = 0.5, candidate_sizes = ["0.5", "0.75",...` | _ | _ | _ |
+| calc-gas.js | `computeLpContainerSeparation` | `{ water_capacity_gal = 0, required_building_ft = 0, required_property_line_ft...` | _ | _ | _ |
 | calc-gas.js | `computeMedgasDemand` | `{ stations = 0, per_station_scfm = 0, diversity = 1 } = {}` | _ | _ | _ |
+| calc-gas.js | `computePropaneFillOutage` | `{ water_capacity_gal = 0, fill_limit_pct = 80, current_gauge_pct = 0, btu_per...` | _ | _ | _ |
+| calc-gas.js | `computePropaneRegulatorSizing` | `{ connected_load_btuh = 0, btu_per_ft3 = 2500, capacity_at_min_inlet_cfh = 0,...` | _ | _ | _ |
+| calc-gas.js | `computePropaneRunTime` | `{ water_capacity_gal = 0, fill_limit_pct = 80, current_gauge_pct = 0, trigger...` | _ | _ | _ |
+| calc-gas.js | `computePropaneVaporizationRate` | `{ tank_diameter_ft = 0, tank_length_ft = 0, percent_full = 0, ambient_f = 0, ...` | _ | _ | _ |
 | calc-gas.js | `computeWobbeIndex` | `{ hhv_btu_ft3 = 1000, specific_gravity = 0.60 } = {}` | _ | _ | _ |
 | calc-gas.js | `renderGasLeakRate` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-gas.js | `renderGasPipeSizing` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -3722,7 +3727,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2308.
+Row count: 2313.
 
 <!-- END function-corpus-v14 -->
 
@@ -4031,7 +4036,7 @@ per spec-v14 §13.1 second paragraph.
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `yaw-error-loss` | Wind Turbine Yaw Misalignment Power Loss | Project (first-principles); the manufacturer's yaw calibration procedure governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group B Plumbing (145 tiles)
+### Group B Plumbing (150 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4089,6 +4094,7 @@ per spec-v14 §13.1 second paragraph.
 | `hydronic-system-volume` | Hydronic System Water and Glycol Volume | Hydronic system-volume identity (firs...; pipe=500*0.023=11.5; system=11.5+8+5=24.5; glycol=24.5*0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydrostatic-test` | Hydrostatic Test Pressure and Hold | IPC / Plumbing engineering practice; 100 psi working / 200 gal volume / water -> test_pressure... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `leach-field-aggregate` | Leach-Field / Trench Drainrock Volume | Leach-field drainrock identity (first...; stone=3*60*2*1=360; cy=360/27*1.10=14.67; tons=14.67*1.4=... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `lp-container-separation` | LP-Gas Container Separation Check | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `main-disinfection-chlorine` | Water Main Chlorination Dose | AWWA C651 Disinfecting Water Mains (b...; spec-v103 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `manning-pipe-capacity` | Manning Pipe Capacity (Full-Bore Gravity Flow) | Manning full-bore capacity V = (1.486...; spec-v640 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `manning-slope` | Manning's Equation Drainage Slope | Project (first-principles); 4 in PVC sewer at 50 gpm target -> slope ~0.0788 in/ft (s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4112,6 +4118,10 @@ per spec-v14 §13.1 second paragraph.
 | `pipe-volume` | Pipe Volume | Project (first-principles); 1 in Schedule 40 steel pipe ID 1.049 in over 100 ft -> 4.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pressure-conversion` | Pressure Conversion | NIST; 1 atm -> 14.6959 psi exact-to-rounding by 101325 / 6894.757 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pressure-tank-drawdown` | Well Pressure-Tank Drawdown and Sizing | Boyle's law on the diaphragm air char...; 44 gal at 40/60 psi (38 psi precharge) -> 11.35 gal drawd... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `propane-fill-outage` | Propane Tank Filling Limit and Outage | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `propane-regulator-sizing` | Propane Two-Stage Regulator Capacity | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `propane-run-time` | Propane Run Time and Refill Interval | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `propane-vaporization-rate` | Propane Tank Vaporization Capacity | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pump-operating-point` | Pump Operating Point | Project (engineering composite); Static head 30 ft / friction k = 0.003 / small centrifuga... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pump-sizing` | Pump Sizing | Project (first-principles); Standard centrifugal-pump identity (US customary, gpm and... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `radiant-loop-sizing` | Hydronic Radiant Floor Loop Sizing | First-principles; ASHRAE HVAC Systems...; spec-v199 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5952,6 +5962,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2057. Fixture-covered or reference-cadence: 2057 / 2057.
+Tile count: 2062. Fixture-covered or reference-cadence: 2062 / 2062.
 
 <!-- END tile-index-v14 -->

@@ -107985,6 +107985,340 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "propane-vaporization-rate",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Propane Tank Vaporization Capacity -- the spec-v1591 worked example, recomputed",
+   "source_edition_or_year": "spec-v1591 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "tank_diameter_ft": 3.5,
+    "tank_length_ft": 16,
+    "percent_full": 60,
+    "ambient_f": 20,
+    "liquid_temperature_f": -20,
+    "reference_capacity_btuh": 1000000,
+    "reference_percent_full": 60,
+    "reference_ambient_f": 60,
+    "connected_load_btuh": 500000
+   },
+   "outputs": {
+    "wetted_area_ft2": {
+     "value": 108.38022,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "reference_wetted_area_ft2": {
+     "value": 108.38022,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "area_ratio": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "temperature_ratio": {
+     "value": 0.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "capacity_btuh": {
+     "value": 500000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_btuh": {
+     "value": 0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "limit_percent_full": {
+     "value": 59.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tanks_required": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "propane-fill-outage",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Propane Tank Filling Limit and Outage -- the spec-v1592 worked example, recomputed",
+   "source_edition_or_year": "spec-v1592 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "water_capacity_gal": 500,
+    "fill_limit_pct": 80,
+    "current_gauge_pct": 25,
+    "btu_per_gal": 91500,
+    "liquid_temperature_f": 40
+   },
+   "outputs": {
+    "max_fill_gal": {
+     "value": 400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "outage_gal": {
+     "value": 100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "current_gal": {
+     "value": 125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "deliverable_gal": {
+     "value": 275,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "full_tank_mmbtu": {
+     "value": 36.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "current_mmbtu": {
+     "value": 11.4375,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "limit_headroom_f": {
+     "value": 166.66667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hydraulically_full_at_f": {
+     "value": 2040,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "propane-regulator-sizing",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Propane Two-Stage Regulator Capacity -- the spec-v1593 worked example, recomputed",
+   "source_edition_or_year": "spec-v1593 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "connected_load_btuh": 500000,
+    "btu_per_ft3": 2500,
+    "capacity_at_min_inlet_cfh": 165,
+    "capacity_at_max_inlet_cfh": 300,
+    "second_stage_capacity_cfh": 425,
+    "lockup_psig": 0.72,
+    "downstream_rating_psig": 0.5
+   },
+   "outputs": {
+    "required_cfh": {
+     "value": 200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "min_inlet_margin_cfh": {
+     "value": -35,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "min_inlet_pct": {
+     "value": 121.21212,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_inlet_margin_cfh": {
+     "value": 100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "capacity_fall_pct": {
+     "value": 45,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "second_stage_margin_cfh": {
+     "value": 225,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lockup_margin_psig": {
+     "value": -0.22,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lp-container-separation",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "LP-Gas Container Separation Check -- the spec-v1594 worked example, recomputed",
+   "source_edition_or_year": "spec-v1594 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "water_capacity_gal": 500,
+    "required_building_ft": 10,
+    "required_property_line_ft": 10,
+    "required_ignition_ft": 10,
+    "required_opening_ft": 5,
+    "measured_building_ft": 12,
+    "measured_property_line_ft": 14,
+    "measured_ignition_ft": 18,
+    "measured_opening_ft": 6,
+    "next_size_required_building_ft": 25,
+    "relief_points_at_opening": "no"
+   },
+   "outputs": {
+    "building_margin_ft": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "property_line_margin_ft": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ignition_margin_ft": {
+     "value": 8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "opening_margin_ft": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "governing_required_ft": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "next_size_shortfall_ft": {
+     "value": 13,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "propane-run-time",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Propane Run Time and Refill Interval -- the spec-v1595 worked example, recomputed",
+   "source_edition_or_year": "spec-v1595 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "water_capacity_gal": 500,
+    "fill_limit_pct": 80,
+    "current_gauge_pct": 80,
+    "trigger_pct": 30,
+    "connected_load_btuh": 150000,
+    "duty_cycle": 0.35,
+    "btu_per_gal": 91500,
+    "gallons_per_hdd": 0.45,
+    "hdd_per_day": 30
+   },
+   "outputs": {
+    "usable_gal": {
+     "value": 400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "usable_mmbtu": {
+     "value": 36.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "continuous_hours": {
+     "value": 244,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "continuous_days": {
+     "value": 10.166667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "realistic_days": {
+     "value": 29.047619,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gallons_per_day": {
+     "value": 13.770492,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gallons_to_trigger": {
+     "value": 250,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "days_to_trigger": {
+     "value": 18.154762,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hdd_days_to_trigger": {
+     "value": 18.518519,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

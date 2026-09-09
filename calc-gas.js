@@ -37,6 +37,62 @@ const _finiteGuard = (o) => {
   return null;
 };
 
+// Compact renderer factory, copied verbatim from calc-containment.js (same
+// ui-fields imports) per the new-tile convention; only the inner render
+// function's name differs, so the schema-coverage gates read it unchanged.
+// Declared above the module's first export because check-render-output-keys
+// attributes a non-exported helper's returns to the export before it.
+function _simpleRenderer(spec) {
+  const _lpRender = function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      let field;
+      if (f.kind === "select") field = makeSelect(f.label, f.id || f.key, f.options);
+      else field = makeNumber(f.label, f.id || f.key, f.attrs || { step: "any", min: "0" });
+      fields[f.key] = field;
+      if (f.default !== undefined) {
+        if (f.kind === "select") field.select.value = f.default;
+        else field.input.value = String(f.default);
+      }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key];
+        else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) {
+        if (f.kind === "select") params[f.key] = fields[f.key].select.value;
+        else params[f.key] = Number(fields[f.key].input.value) || 0;
+      }
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) {
+      const el = f.kind === "select" ? fields[f.key].select : fields[f.key].input;
+      el.addEventListener(f.kind === "select" ? "change" : "input", update);
+    }
+  };
+
+  _lpRender.schema = {
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
+    citation: spec.citation ?? null,
+    scope: spec.scope ?? null,
+  };
+  return _lpRender;
+}
+
 // Schedule 40 steel pipe inside diameters (in). Duplicated from
 // calc-plumbing.js (a small, stable reference table) so gas-pipe-sizing is
 // self-contained here; the copy in calc-plumbing.js serves the water tiles.
@@ -680,3 +736,568 @@ function _v1145renderGasApplianceConnection(inputRegion, outputRegion, citationE
   for (const x of [ap, sr, su, tp, ti]) x.select.addEventListener("change", update);
 }
 GAS_RENDERERS["gas-appliance-connection"] = _v1145renderGasApplianceConnection;
+
+// =====================================================================
+// spec-v1591..v1595 (scope-trade-expansion-2, the propane and LP-gas band).
+// Five tiles on the tank side of a fuel-gas system, where calc-gas.js
+// already holds the pipe side.
+//
+// The thread running through all five is that a propane tank is a boiler,
+// not a container. What limits it is almost never how much it holds.
+// v1591 is the rate it can turn liquid into vapour, v1592 is the space
+// thermal expansion needs, v1593 is a regulator's capacity falling with the
+// tank pressure that feeds it, v1594 is where the tank may sit, and v1595
+// is how long the gas lasts. Three of them fail on the same January
+// morning and for related reasons, which is why they are one band.
+//
+// spec-v1592 lists a run time among its outputs and spec-v1595 is entirely
+// about run time. Rather than ship the same arithmetic twice with different
+// inputs, the run time is left to propane-run-time (which carries the duty
+// cycle, the delivery trigger and the degree-day history that make it
+// honest) and propane-fill-outage reports the tank's energy content and
+// says where the division belongs.
+// =====================================================================
+
+// Propane energy content, US practice: about 91,500 BTU per liquid gallon
+// and about 2,500 BTU per cubic foot of vapour. Both are entered as
+// defaults rather than hard-coded, because a supplier's figure varies with
+// the propane-butane mix.
+const _LP_BTU_PER_GAL = 91500;
+
+// Liquid propane's volumetric expansion, about 1.5% per 10 degF -- which is
+// 0.0015 per degF, and is the whole reason for the filling limit.
+const _LP_EXPANSION_PER_F = 0.0015;
+
+// Depth at which a horizontal cylinder holds a given fraction of its
+// volume. The area of a circular segment is R^2*acos((R-h)/R) -
+// (R-h)*sqrt(2Rh-h^2); the fraction is that over pi*R^2. Monotonic in h, so
+// bisection converges, and this is a SEARCH rather than an inversion.
+function _lpDepthForFraction(radius_ft, fraction) {
+  if (!(radius_ft > 0) || !(fraction > 0)) return 0;
+  if (fraction >= 1) return 2 * radius_ft;
+  const R = radius_ft;
+  const areaFor = (h) => {
+    const d = R - h;
+    return R * R * Math.acos(Math.max(-1, Math.min(1, d / R))) - d * Math.sqrt(Math.max(0, 2 * R * h - h * h));
+  };
+  const target = fraction * Math.PI * R * R;
+  let lo = 0, hi = 2 * R;
+  for (let i = 0; i < 80; i++) {
+    const mid = (lo + hi) / 2;
+    if (areaFor(mid) < target) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+// Wetted surface of a horizontal cylinder at liquid depth h: the wetted arc
+// of the shell times the length, plus the wetted segment of both heads.
+function _lpWettedArea(radius_ft, length_ft, depth_ft) {
+  if (!(radius_ft > 0) || !(length_ft > 0) || !(depth_ft > 0)) return 0;
+  const R = radius_ft;
+  const h = Math.min(depth_ft, 2 * R);
+  const d = R - h;
+  const halfAngle = Math.acos(Math.max(-1, Math.min(1, d / R)));
+  const shell = 2 * R * halfAngle * length_ft;
+  const heads = 2 * (R * R * halfAngle - d * Math.sqrt(Math.max(0, 2 * R * h - h * h)));
+  return shell + heads;
+}
+
+// =====================================================================
+// spec-v1591: propane vaporization capacity.
+//
+// The spec is explicit that capacity is NOT computed from first principles
+// -- it depends on tank geometry, wind, burial, insulation, paint colour
+// and the duration of the draw, and the manufacturer's table for the
+// specific tank governs. So the table reading is the INPUT and this scales
+// it: capacity goes with wetted area and with the temperature difference
+// driving heat through the shell, and both of those are computable.
+//
+// That scaling is the spec's actual point, which it states and does not
+// demonstrate: BOTH TERMS MOVE THE WRONG WAY TOGETHER in a cold snap on a
+// drawn-down tank, so the compound fall is much larger than either alone.
+// =====================================================================
+// dims: in { tank_diameter_ft: L, tank_length_ft: L, percent_full: dimensionless, ambient_f: T, liquid_temperature_f: T, reference_capacity_btuh: M L^2 T^-3, reference_percent_full: dimensionless, reference_ambient_f: T, connected_load_btuh: M L^2 T^-3 } out: { wetted_area_ft2: L^2, reference_wetted_area_ft2: L^2, capacity_btuh: M L^2 T^-3, margin_btuh: M L^2 T^-3, tanks_required: dimensionless }
+export function computePropaneVaporizationRate({
+  tank_diameter_ft = 0, tank_length_ft = 0, percent_full = 0, ambient_f = 0,
+  liquid_temperature_f = 0, reference_capacity_btuh = 0, reference_percent_full = 0,
+  reference_ambient_f = 0, connected_load_btuh = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(tank_diameter_ft > 0) || !(tank_length_ft > 0)) return { error: "Tank diameter and length must be greater than zero." };
+  if (!(percent_full > 0) || percent_full > 100) return { error: "Percent full must be greater than zero and no more than 100." };
+  if (!(reference_percent_full > 0) || reference_percent_full > 100) return { error: "Reference percent full must be greater than zero and no more than 100." };
+  if (!(reference_capacity_btuh > 0)) return { error: "Reference vaporization capacity must be greater than zero." };
+  if (!(connected_load_btuh > 0)) return { error: "Connected load must be greater than zero." };
+  const deltaT = ambient_f - liquid_temperature_f;
+  const referenceDeltaT = reference_ambient_f - liquid_temperature_f;
+  if (!(deltaT > 0) || !(referenceDeltaT > 0)) return { error: "Ambient temperature must be above the liquid temperature, at the entered and the reference condition." };
+
+  const R = tank_diameter_ft / 2;
+  const depth_ft = _lpDepthForFraction(R, percent_full / 100);
+  const wetted_area_ft2 = _lpWettedArea(R, tank_length_ft, depth_ft);
+  const refDepth = _lpDepthForFraction(R, reference_percent_full / 100);
+  const reference_wetted_area_ft2 = _lpWettedArea(R, tank_length_ft, refDepth);
+  if (!(reference_wetted_area_ft2 > 0)) return { error: "Reference wetted area came out at zero; check the tank dimensions." };
+
+  const area_ratio = wetted_area_ft2 / reference_wetted_area_ft2;
+  const temperature_ratio = deltaT / referenceDeltaT;
+  const capacity_btuh = reference_capacity_btuh * area_ratio * temperature_ratio;
+  const margin_btuh = capacity_btuh - connected_load_btuh;
+  const meets_load = margin_btuh >= -1e-9;
+  const load_pct_of_capacity = 100 * connected_load_btuh / capacity_btuh;
+
+  // The percent full at which capacity falls below the load, at THIS
+  // ambient. Searched downward rather than solved, because wetted area is
+  // not a closed form in the fill fraction.
+  let limit_percent_full = null;
+  for (let pct = 100; pct >= 0.5; pct -= 0.5) {
+    const d = _lpDepthForFraction(R, pct / 100);
+    const a = _lpWettedArea(R, tank_length_ft, d);
+    const cap = reference_capacity_btuh * (a / reference_wetted_area_ft2) * temperature_ratio;
+    if (cap < connected_load_btuh) { limit_percent_full = pct; break; }
+  }
+  const never_short = limit_percent_full === null;
+  const already_short = !meets_load;
+  const tanks_required = Math.max(1, Math.ceil(connected_load_btuh / capacity_btuh));
+
+  const areaVerdict = "at " + fmt(percent_full, 0) + "% full a " + fmt(tank_diameter_ft, 1) + " by " + fmt(tank_length_ft, 1) + " ft tank has " + fmt(wetted_area_ft2, 0) + " sq ft of wetted surface, against " + fmt(reference_wetted_area_ft2, 0) + " sq ft at the " + fmt(reference_percent_full, 0) + "% reference level -- a factor of " + fmt(area_ratio, 2);
+  const capacityVerdict = "scaling the table's " + fmt(reference_capacity_btuh, 0) + " BTU/h by that area factor and by the temperature factor of " + fmt(temperature_ratio, 2) + " (" + fmt(deltaT, 0) + " degF of drive against the reference " + fmt(referenceDeltaT, 0) + ") gives " + fmt(capacity_btuh, 0) + " BTU/h against a " + fmt(connected_load_btuh, 0) + " BTU/h load, which is " + fmt(load_pct_of_capacity, 0) + "% of it";
+  const compoundVerdict = "BOTH TERMS MOVE THE WRONG WAY AT ONCE, which is why the failure is always a cold snap on a drawn-down tank and never a full tank in November. A tank at half the wetted area and half the temperature drive has a QUARTER of the capacity it was commissioned with, and neither factor on its own looks alarming";
+  const limitVerdict = already_short
+    ? "AND IT IS ALREADY SHORT at this level: the tank cannot sustain the load now, which is what frost on the shell means"
+    : never_short
+      ? "at this ambient the tank carries the load down to the bottom of its useful range"
+      : "capacity falls below the load at about " + fmt(limit_percent_full, 0) + "% full at this ambient -- above that the system holds, below it the tank frosts and the vapour pressure falls";
+  const frostVerdict = "FROST ON THE SHELL IS A DIAGNOSIS, NOT A CURIOSITY. It means liquid is boiling fast enough to chill the wall below the dew point, which means the tank is at or past its vaporization capacity -- and the frost layer then insulates the shell and makes it worse. The regulator is the wrong place to look: outlet pressure is falling because the tank cannot make vapour, and a larger regulator does nothing about that";
+  const fixVerdict = "THE FIXES ARE MORE WETTED AREA OR MORE HEAT, in that order: a larger tank, a second tank manifolded in, or a vaporizer. At this condition the load needs about " + fmt(tanks_required, 0) + " tank(s) of this size. Manifolding is why a bank of cylinders on a high-demand appliance is a VAPORIZATION decision rather than a run-time one";
+
+  return {
+    wetted_area_ft2, reference_wetted_area_ft2, area_ratio, temperature_ratio,
+    capacity_btuh, margin_btuh, meets_load, load_pct_of_capacity,
+    limit_percent_full: never_short ? 0 : limit_percent_full, never_short, already_short,
+    tanks_required, depth_ft,
+    areaVerdict, capacityVerdict, compoundVerdict, limitVerdict, frostVerdict, fixVerdict,
+    note: "How fast a propane tank can turn liquid into vapour, which is the number that fails long before the tank runs out of gas. A tank is a boiler: liquid absorbs heat through the wetted wall and boils, so capacity goes with WETTED SURFACE AREA and with the temperature difference driving heat through the shell. The wetted area is computed here from the tank's geometry at the entered level; the capacity itself is SCALED FROM THE MANUFACTURER'S PUBLISHED TABLE rather than derived, because the real rate also depends on wind, on whether the tank is buried, on insulation and paint colour and on how long the draw lasts, and no closed form covers those. BOTH TERMS MOVE THE WRONG WAY AT THE SAME TIME, which is the point. In a cold snap the driving temperature difference shrinks, and a tank that has been drawn down has less wetted surface -- so a tank at half the area and half the drive has a QUARTER of the capacity it was commissioned with. That is why the failure is a January morning on a tank at 30%, and never the full tank in November when the system was signed off. FROST ON THE SHELL IS THE DIAGNOSIS. It means liquid is boiling fast enough to chill the wall below the dew point, so the tank is at or past its capacity, and the frost layer then insulates the shell and makes it worse. The consequences follow in order: the tank frosts, the vapour pressure falls, the regulator can no longer hold outlet pressure, and the appliances lose flame. THE FIX IS NOT A BIGGER REGULATOR. It is more wetted area -- a larger tank or a second one manifolded in -- or a vaporizer that adds heat deliberately. Manifolding two tanks adds wetted area, which is why a bank of cylinders on a high-demand appliance is a vaporization decision rather than a run-time one. This scales an entered table reading by computed geometry. It does not compute vaporization from first principles, model wind, burial, insulation, paint colour or the duration of the draw, distinguish continuous from intermittent draw capacity (they differ, and the table gives both), size regulators or piping, determine tank placement, or select a vaporizer, which carries its own requirements. NFPA 58, the adopted fuel gas code, the tank and appliance manufacturers, and the AHJ govern.",
+  };
+}
+export const propaneVaporizationRateExample = { inputs: { tank_diameter_ft: 3.5, tank_length_ft: 16, percent_full: 60, ambient_f: 20, liquid_temperature_f: -20, reference_capacity_btuh: 1000000, reference_percent_full: 60, reference_ambient_f: 60, connected_load_btuh: 500000 } };
+
+// =====================================================================
+// spec-v1592: the filling limit, the outage, and what "full" means.
+//
+// spec-v1591 says a tank drawn from 60% to 30% has its wetted area "halve".
+// It does not: the wetted surface is dominated by the shell ARC, which is a
+// chord function of depth and falls far more slowly than the volume does.
+// On the 3.5 by 16 ft tank in this band the area goes 108 to 76 sq ft, a
+// fall to 70% rather than to 50%. The direction is right and the magnitude
+// is not, which is why propane-vaporization-rate computes the area instead
+// of scaling it with the fill.
+// =====================================================================
+// dims: in { water_capacity_gal: L^3, fill_limit_pct: dimensionless, current_gauge_pct: dimensionless, btu_per_gal: M L^2 T^-2 L^-3, liquid_temperature_f: T } out: { max_fill_gal: L^3, outage_gal: L^3, current_gal: L^3, deliverable_gal: L^3, full_tank_mmbtu: M L^2 T^-2, current_mmbtu: M L^2 T^-2, expansion_headroom_f: T, hydraulically_full_at_f: T }
+export function computePropaneFillOutage({
+  water_capacity_gal = 0, fill_limit_pct = 80, current_gauge_pct = 0,
+  btu_per_gal = _LP_BTU_PER_GAL, liquid_temperature_f = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(water_capacity_gal > 0)) return { error: "Water capacity must be greater than zero." };
+  if (!(fill_limit_pct > 0) || fill_limit_pct > 100) return { error: "The filling limit must be greater than zero and no more than 100 percent." };
+  if (current_gauge_pct < 0 || current_gauge_pct > 100) return { error: "The gauge reading must be between zero and 100 percent." };
+  if (!(btu_per_gal > 0)) return { error: "Energy content per gallon must be greater than zero." };
+
+  const max_fill_gal = water_capacity_gal * fill_limit_pct / 100;
+  const outage_gal = water_capacity_gal - max_fill_gal;
+  const outage_pct = 100 - fill_limit_pct;
+  const current_gal = water_capacity_gal * current_gauge_pct / 100;
+  const overfilled = current_gauge_pct > fill_limit_pct + 1e-12;
+  const deliverable_gal = Math.max(0, max_fill_gal - current_gal);
+  const full_tank_mmbtu = max_fill_gal * btu_per_gal / 1e6;
+  const current_mmbtu = current_gal * btu_per_gal / 1e6;
+
+  // The temperature rise that would take the CURRENT fill hydraulically
+  // full. This is what the outage buys, and it is the number that shows
+  // why an overfill is not a rounding matter.
+  const room_fraction = current_gauge_pct > 0 ? (100 - current_gauge_pct) / current_gauge_pct : Infinity;
+  const expansion_headroom_f = Number.isFinite(room_fraction) ? room_fraction / _LP_EXPANSION_PER_F : 0;
+  const limit_room_fraction = (100 - fill_limit_pct) / fill_limit_pct;
+  const limit_headroom_f = limit_room_fraction / _LP_EXPANSION_PER_F;
+  // The headroom is a RISE; the liquid temperature turns it into the
+  // temperature the tank actually goes liquid-full at, which is the form
+  // that can be put next to a forecast.
+  const hydraulically_full_at_f = liquid_temperature_f + expansion_headroom_f;
+
+  const fillVerdict = "a " + fmt(water_capacity_gal, 0) + " gallon water capacity tank at a " + fmt(fill_limit_pct, 0) + "% filling limit takes " + fmt(max_fill_gal, 0) + " gallons, leaving " + fmt(outage_gal, 0) + " gallons -- " + fmt(outage_pct, 0) + "% -- of outage. THAT IS A FULL TANK. A customer reading " + fmt(fill_limit_pct, 0) + "% on the float gauge is not short " + fmt(outage_gal, 0) + " gallons; they are looking at the space thermal expansion requires";
+  const deliveryVerdict = overfilled
+    ? "the gauge reads " + fmt(current_gauge_pct, 0) + "%, which is ABOVE the " + fmt(fill_limit_pct, 0) + "% limit -- this tank is overfilled and nothing should be delivered to it"
+    : "at a " + fmt(current_gauge_pct, 0) + "% gauge reading the tank holds " + fmt(current_gal, 0) + " gallons, so a delivery to the limit is " + fmt(deliverable_gal, 0) + " gallons";
+  const expansionVerdict = "THE 80% RULE IS ABOUT THERMAL EXPANSION, not about a safety margin in the abstract. Liquid propane expands about 1.5% per 10 degF, so the outage at the filling limit absorbs a rise of about " + fmt(limit_headroom_f, 0) + " degF before the tank is hydraulically full. At the current " + fmt(current_gauge_pct, 0) + "% reading the headroom is " + (!(current_gauge_pct > 0) ? "the whole tank" : expansion_headroom_f > 200 ? fmt(expansion_headroom_f, 0) + " degF, which is more than any ambient swing can deliver" : fmt(expansion_headroom_f, 0) + " degF") + ". From the entered liquid temperature of " + fmt(liquid_temperature_f, 0) + " degF that is a tank going liquid-full at " + (expansion_headroom_f > 200 ? "a temperature no weather reaches" : fmt(hydraulically_full_at_f, 0) + " degF -- a number to put next to a forecast") + ". A tank filled solid on a cold morning and warmed by the sun lifts its relief valve, which is the relief valve working correctly and is still a large release of flammable gas";
+  const gaugeVerdict = "THE FIXED LIQUID LEVEL GAUGE IS THE PHYSICAL ENFORCEMENT, and it is why filling is a job that needs attention rather than a meter to watch. The bleeder valve is cracked open during the fill and sprays white when liquid reaches the dip tube; that spray is the stop signal REGARDLESS of what the float gauge or the meter says. The float gauge is an indication and the dip tube is the measurement";
+  const energyVerdict = "a full tank holds " + fmt(full_tank_mmbtu, 1) + " MMBTU and the current fill holds " + fmt(current_mmbtu, 1) + " MMBTU at " + fmt(btu_per_gal, 0) + " BTU per gallon. HOW LONG THAT LASTS IS A SEPARATE QUESTION and belongs to the propane run time calculation, which carries the duty cycle, the delivery trigger and the degree-day history that make the answer honest -- a continuous-firing division here would be a floor, not an estimate";
+  const usableVerdict = "AND THE USABLE FIGURE IS LOWER STILL, because the last of the liquid cannot maintain vapour pressure against the appliance load in cold weather. That limit is wetted surface, not volume, and the propane vaporization capacity calculation is where it is read";
+
+  return {
+    max_fill_gal, outage_gal, outage_pct, current_gal, deliverable_gal, overfilled,
+    full_tank_mmbtu, current_mmbtu, expansion_headroom_f: Number.isFinite(expansion_headroom_f) ? expansion_headroom_f : 0,
+    limit_headroom_f, hydraulically_full_at_f: Number.isFinite(hydraulically_full_at_f) ? hydraulically_full_at_f : 0,
+    fillVerdict, deliveryVerdict, expansionVerdict, gaugeVerdict, energyVerdict, usableVerdict,
+    note: "What a full propane tank actually holds, and why the number is smaller than the tank. A 500 gallon tank delivers 400 gallons at most and a 'full' tank reads 80% on the float gauge; neither is a shortfall, and this computes both so the conversation can be had with numbers. THE FILLING LIMIT IS ABOUT THERMAL EXPANSION rather than a safety margin in the abstract. Liquid propane expands roughly 1.5% per 10 degF, so a tank filled solid on a cold morning and warmed by the sun becomes hydraulically full and then lifts its relief valve -- the relief valve working exactly as intended, and still a large release of flammable gas over whatever is beneath it. The outage is the room that expansion needs, and the temperature rise it buys is reported here, because an overfill does not read as dangerous until that figure is put next to a sunny afternoon. THE FIXED LIQUID LEVEL GAUGE IS THE PHYSICAL ENFORCEMENT and it is why filling needs attention rather than a meter to watch: the bleeder valve is cracked open during the fill and sprays white when liquid reaches the dip tube, and that spray is the stop signal regardless of what the float gauge or the meter reads. The float gauge is an indication; the dip tube is the measurement. HOW LONG THE GAS LASTS IS DELIBERATELY NOT COMPUTED HERE. The tank's energy content is reported, but dividing it by a connected load gives a continuous-firing floor rather than an estimate, and the propane run time calculation carries the duty cycle, the delivery trigger and the degree-day history that make the answer usable. The usable figure is lower again, because the last of the liquid cannot maintain vapour pressure against the load in cold weather -- that limit is wetted surface rather than volume, and the propane vaporization capacity calculation is where it is read. This computes fill, outage and energy content from an entered filling limit. It does not determine the applicable filling limit, which is temperature-corrected and differs between aboveground and underground containers and with the filling method, verify or calibrate a float gauge, address the fixed liquid level gauge's setting or the filling procedure, evaluate relief valve sizing or discharge location, or determine what any standard requires. NFPA 58, the adopted fuel gas code, the container manufacturer, and the AHJ govern.",
+  };
+}
+export const propaneFillOutageExample = { inputs: { water_capacity_gal: 500, fill_limit_pct: 80, current_gauge_pct: 25, btu_per_gal: 91500, liquid_temperature_f: 40 } };
+
+// =====================================================================
+// spec-v1593: two-stage regulator capacity against the inlet pressure that
+// feeds it. The capacities are ENTERED from the manufacturer's table --
+// they depend on the spring, the orifice and the outlet setting, and no
+// generic relation covers a table that the maker publishes.
+//
+// What is computed is the comparison the spec says is missed: the SAME
+// regulator against the SAME load at the summer and the winter tank
+// pressure, plus lock-up against the downstream rating.
+// =====================================================================
+// dims: in { connected_load_btuh: M L^2 T^-3, btu_per_ft3: M L^2 T^-2 L^-3, capacity_at_min_inlet_cfh: L^3 T^-1, capacity_at_max_inlet_cfh: L^3 T^-1, second_stage_capacity_cfh: L^3 T^-1, lockup_psig: M L^-1 T^-2, downstream_rating_psig: M L^-1 T^-2 } out: { required_cfh: L^3 T^-1, min_inlet_margin_cfh: L^3 T^-1, max_inlet_margin_cfh: L^3 T^-1, second_stage_margin_cfh: L^3 T^-1, lockup_margin_psig: M L^-1 T^-2 }
+export function computePropaneRegulatorSizing({
+  connected_load_btuh = 0, btu_per_ft3 = 2500, capacity_at_min_inlet_cfh = 0,
+  capacity_at_max_inlet_cfh = 0, second_stage_capacity_cfh = 0,
+  lockup_psig = 0, downstream_rating_psig = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(connected_load_btuh > 0)) return { error: "Connected load must be greater than zero." };
+  if (!(btu_per_ft3 > 0)) return { error: "Energy content per cubic foot must be greater than zero." };
+  if (!(capacity_at_min_inlet_cfh > 0)) return { error: "First-stage capacity at the minimum inlet pressure must be greater than zero." };
+
+  const required_cfh = connected_load_btuh / btu_per_ft3;
+  const min_inlet_margin_cfh = capacity_at_min_inlet_cfh - required_cfh;
+  const short_at_min = min_inlet_margin_cfh < 0;
+  const min_inlet_pct = 100 * required_cfh / capacity_at_min_inlet_cfh;
+
+  const has_max = capacity_at_max_inlet_cfh > 0;
+  const max_inlet_margin_cfh = has_max ? capacity_at_max_inlet_cfh - required_cfh : 0;
+  const short_at_max = has_max && max_inlet_margin_cfh < 0;
+  const capacity_fall_pct = has_max && capacity_at_max_inlet_cfh > 0
+    ? 100 * (1 - capacity_at_min_inlet_cfh / capacity_at_max_inlet_cfh) : 0;
+  const passes_warm_fails_cold = has_max && !short_at_max && short_at_min;
+
+  const has_second = second_stage_capacity_cfh > 0;
+  const second_stage_margin_cfh = has_second ? second_stage_capacity_cfh - required_cfh : 0;
+  const short_second = has_second && second_stage_margin_cfh < 0;
+
+  const has_lockup = lockup_psig > 0 && downstream_rating_psig > 0;
+  const lockup_margin_psig = has_lockup ? downstream_rating_psig - lockup_psig : 0;
+  const lockup_over = has_lockup && lockup_margin_psig < 0;
+
+  const flowVerdict = "a " + fmt(connected_load_btuh, 0) + " BTU/h connected load at " + fmt(btu_per_ft3, 0) + " BTU per cubic foot is " + fmt(required_cfh, 0) + " CFH, and EVERY stage has to pass all of it";
+  const minVerdict = short_at_min
+    ? "AT THE MINIMUM TANK PRESSURE THE FIRST STAGE IS SHORT by " + fmt(-min_inlet_margin_cfh, 0) + " CFH -- it passes " + fmt(capacity_at_min_inlet_cfh, 0) + " against a " + fmt(required_cfh, 0) + " CFH demand, or " + fmt(min_inlet_pct, 0) + "% of what is needed"
+    : "at the minimum tank pressure the first stage passes " + fmt(capacity_at_min_inlet_cfh, 0) + " CFH against the " + fmt(required_cfh, 0) + " required, a margin of " + fmt(min_inlet_margin_cfh, 0) + " CFH (the load is " + fmt(min_inlet_pct, 0) + "% of capacity)";
+  const compareVerdict = !has_max
+    ? "no warm-tank capacity was entered, so only the cold case is checked -- which is the case that matters"
+    : passes_warm_fails_cold
+      ? "AND THAT IS THE TRAP THE SPEC NAMES. At the warm tank pressure the same regulator passes " + fmt(capacity_at_max_inlet_cfh, 0) + " CFH and looks ample; at the cold one it passes " + fmt(capacity_at_min_inlet_cfh, 0) + ", a fall of " + fmt(capacity_fall_pct, 0) + "%. It is sized on a summer afternoon and starves on a January morning"
+      : "the same regulator passes " + fmt(capacity_at_max_inlet_cfh, 0) + " CFH at the warm tank pressure and " + fmt(capacity_at_min_inlet_cfh, 0) + " at the cold one, a fall of " + fmt(capacity_fall_pct, 0) + "% -- and it carries the load at both, which is what sizing at the minimum tank pressure is for";
+  const secondVerdict = !has_second
+    ? "no second-stage capacity was entered"
+    : short_second
+      ? "THE SECOND STAGE IS ALSO SHORT, by " + fmt(-second_stage_margin_cfh, 0) + " CFH"
+      : "the second stage passes " + fmt(second_stage_capacity_cfh, 0) + " CFH, a margin of " + fmt(second_stage_margin_cfh, 0) + ". Its inlet is regulated at about 10 psig year-round, so ITS capacity does not move with the weather -- the first stage is the one the season reaches";
+  const lockupVerdict = !has_lockup
+    ? "no lock-up pressure and downstream rating were entered"
+    : lockup_over
+      ? "LOCK-UP EXCEEDS THE DOWNSTREAM RATING by " + fmt(-lockup_margin_psig, 2) + " psig. The system is unsafe AT IDLE rather than at full fire, which is the opposite of where anyone looks"
+      : "lock-up at " + fmt(lockup_psig, 2) + " psig is within the " + fmt(downstream_rating_psig, 2) + " psig downstream rating, a margin of " + fmt(lockup_margin_psig, 2) + " psig";
+  const stagingVerdict = "WHY TWO STAGES AT ALL: carrying gas at 10 psig lets the interconnecting pipe be far smaller than carrying it at 11 inches of water column, so the first stage sits at the tank, the second at the building, and the long run between them is small pipe. Collapsing that into one regulator at the tank means running the whole distance at 11 in wc and going several pipe sizes up";
+  const coldVerdict = "AND THIS FAILS ON THE SAME MORNING AS THE TANK. Regulator capacity falls with tank pressure, tank pressure follows liquid temperature, and vaporization capacity falls with the same cold and the same drawn-down tank -- so a starving system in a cold snap has two candidate causes that look identical at the appliance. Reading the tank pressure separates them";
+
+  return {
+    required_cfh, min_inlet_margin_cfh, min_inlet_pct, short_at_min,
+    has_max, max_inlet_margin_cfh, short_at_max, capacity_fall_pct, passes_warm_fails_cold,
+    has_second, second_stage_margin_cfh, short_second,
+    has_lockup, lockup_margin_psig, lockup_over,
+    flowVerdict, minVerdict, compareVerdict, secondVerdict, lockupVerdict, stagingVerdict, coldVerdict,
+    note: "Whether each stage of a two-stage propane regulator passes the connected load, checked at the tank pressure that actually matters. The load converts to a volumetric demand at the fuel's energy content, and every stage has to pass all of it. THE SIZING TRAP IS INLET PRESSURE. A regulator's capacity is a function of the pressure across it, so a first stage that comfortably passes the load with a warm tank on a summer afternoon may not pass it with a cold tank on a January morning -- and tank pressure follows liquid temperature. First stages are sized at the MINIMUM expected tank pressure for exactly that reason, and this compares the same regulator at both so the fall is a number rather than a caution. The capacities themselves are entered from the manufacturer's table, because they depend on the spring, the orifice and the outlet setting and no generic relation covers a table the maker publishes. THE SECOND STAGE IS EASIER because its inlet is regulated at about 10 psig year-round, so its capacity does not move with the weather. Its constraint is LOCK-UP: every regulator lets outlet pressure rise slightly at zero flow, and if that pressure exceeds what the appliance or the downstream stage can take, the system is unsafe AT IDLE rather than at full fire -- the opposite of where anyone looks. WHY TWO STAGES EXIST is worth stating, because collapsing them looks like a simplification: carrying gas at 10 psig lets the interconnecting pipe be far smaller than carrying it at 11 inches of water column, so the first stage sits at the tank, the second at the building, and the long run between is small pipe. One regulator at the tank means the whole distance at 11 in wc and several pipe sizes more. AND THIS FAILS ON THE SAME MORNING AS THE TANK. Regulator capacity falls with tank pressure, tank pressure follows liquid temperature, and vaporization capacity falls with the same cold on the same drawn-down tank -- two causes that look identical at the appliance, separated by reading the tank pressure. This compares entered capacities against a computed demand. It does not read a capacity table or predict capacity at an unlisted inlet pressure, size the piping at either pressure (the gas pipe sizing calculation does that, and the two pressures size separately), predict the minimum tank pressure from the weather, select regulators or vent limiters, address regulator venting, which has its own location requirements, or determine what any standard requires. NFPA 58, the adopted fuel gas code, the regulator manufacturer's capacity tables, and the AHJ govern.",
+  };
+}
+export const propaneRegulatorSizingExample = { inputs: { connected_load_btuh: 500000, btu_per_ft3: 2500, capacity_at_min_inlet_cfh: 165, capacity_at_max_inlet_cfh: 300, second_stage_capacity_cfh: 425, lockup_psig: 0.72, downstream_rating_psig: 0.5 } };
+
+// =====================================================================
+// spec-v1594: LP-gas container separation. The NFPA 58 distances are
+// tabulated by water capacity and are NOT reproduced here -- they step at
+// capacity breakpoints and the adopted edition governs. What is computed is
+// the comparison: each measured distance against the requirement entered
+// for it, with the margin, plus the same check at the next container size
+// so the siting conversation happens before the tank is ordered.
+// =====================================================================
+// dims: in { water_capacity_gal: L^3, required_building_ft: L, required_property_line_ft: L, required_ignition_ft: L, measured_building_ft: L, measured_property_line_ft: L, measured_ignition_ft: L, measured_opening_ft: L, required_opening_ft: L, next_size_required_building_ft: L } out: { building_margin_ft: L, property_line_margin_ft: L, ignition_margin_ft: L, opening_margin_ft: L, governing_required_ft: L, next_size_shortfall_ft: L }
+export function computeLpContainerSeparation({
+  water_capacity_gal = 0, required_building_ft = 0, required_property_line_ft = 0,
+  required_ignition_ft = 0, required_opening_ft = 0, measured_building_ft = 0,
+  measured_property_line_ft = 0, measured_ignition_ft = 0, measured_opening_ft = 0,
+  next_size_required_building_ft = 0, relief_points_at_opening = "no",
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(water_capacity_gal > 0)) return { error: "Container water capacity must be greater than zero." };
+  if (!(required_building_ft > 0)) return { error: "The required distance to the building must be greater than zero." };
+  if (!(measured_building_ft > 0)) return { error: "The measured distance to the building must be greater than zero." };
+
+  const items = [
+    { key: "building", label: "building", required: required_building_ft, measured: measured_building_ft },
+    { key: "property_line", label: "property line", required: required_property_line_ft, measured: measured_property_line_ft },
+    { key: "ignition", label: "source of ignition", required: required_ignition_ft, measured: measured_ignition_ft },
+    { key: "opening", label: "opening", required: required_opening_ft, measured: measured_opening_ft },
+  ];
+  const checked = items.filter((it) => it.required > 0 && it.measured > 0);
+  const failures = checked.filter((it) => it.measured < it.required - 1e-12);
+
+  const building_margin_ft = measured_building_ft - required_building_ft;
+  const property_line_margin_ft = required_property_line_ft > 0 && measured_property_line_ft > 0 ? measured_property_line_ft - required_property_line_ft : 0;
+  const ignition_margin_ft = required_ignition_ft > 0 && measured_ignition_ft > 0 ? measured_ignition_ft - required_ignition_ft : 0;
+  const opening_margin_ft = required_opening_ft > 0 && measured_opening_ft > 0 ? measured_opening_ft - required_opening_ft : 0;
+  const governing_required_ft = checked.reduce((m, it) => Math.max(m, it.required), 0);
+  const all_pass = failures.length === 0;
+  const tightest = checked.slice().sort((a, b) => (a.measured - a.required) - (b.measured - b.required))[0] || null;
+
+  const has_next = next_size_required_building_ft > 0;
+  const next_size_shortfall_ft = has_next ? next_size_required_building_ft - measured_building_ft : 0;
+  const next_size_fits = has_next && next_size_shortfall_ft <= 1e-12;
+  const relief_flag = String(relief_points_at_opening) === "yes";
+
+  const siteVerdict = "a " + fmt(water_capacity_gal, 0) + " gallon container with " + checked.length + " distance(s) checked: " + (all_pass
+    ? "every measured distance meets the requirement entered for it, the tightest being the " + (tightest ? tightest.label + " at " + fmt(tightest.measured - tightest.required, 1) + " ft of margin" : "one checked")
+    : "FAILS on " + failures.map((f) => f.label + " (short " + fmt(f.required - f.measured, 1) + " ft)").join(", "));
+  const buildingVerdict = "to the building: " + fmt(measured_building_ft, 1) + " ft measured against " + fmt(required_building_ft, 1) + " ft required, " + (building_margin_ft >= 0 ? fmt(building_margin_ft, 1) + " ft of margin" : "SHORT by " + fmt(-building_margin_ft, 1) + " ft");
+  const stepVerdict = !has_next
+    ? "no next-size requirement was entered. The distances STEP at capacity breakpoints rather than scaling, so the requirement for the next container size up is worth reading before the size is chosen"
+    : next_size_fits
+      ? "the next container size up requires " + fmt(next_size_required_building_ft, 1) + " ft to the building and this location gives " + fmt(measured_building_ft, 1) + " -- the yard takes the larger tank"
+      : "AND THE YARD DOES NOT TAKE THE NEXT SIZE UP. It requires " + fmt(next_size_required_building_ft, 1) + " ft to the building and this location has " + fmt(measured_building_ft, 1) + ", short by " + fmt(next_size_shortfall_ft, 1) + " ft. THE DISTANCES STEP RATHER THAN SCALE, so doubling capacity can move the tank across the yard -- which is worth knowing before the customer is told they can have a bigger tank";
+  const openingVerdict = relief_flag
+    ? "THE RELIEF DISCHARGE POINTS AT AN OPENING, and no horizontal distance addresses that. Propane is heavier than air, so a relief discharge above a basement window well puts flammable vapour into a confined space and leaves it there. This is a DIRECTIONAL requirement: where the relief points matters, not only how far the container sits"
+    : "the relief discharge is not directed at an opening. THAT IS A DIRECTIONAL CHECK WITH NO DISTANCE IN THE TABLE, and it is the clearance people forget -- propane is heavier than air, and a discharge above a window well or a below-grade opening fills a confined space that no horizontal measurement sees";
+  const transferVerdict = "AND THE POINT OF TRANSFER HAS ITS OWN SEPARATION REQUIREMENTS, frequently more restrictive than the container's. A tank that complies while the truck is absent can be non-compliant while it is being filled, which is the quiet one -- the compliant condition is the one nobody is standing next to";
+  const manifoldVerdict = "TWO SMALLER CONTAINERS MANIFOLDED may be treated differently from one large one, and manifolding also adds wetted area and therefore vaporization capacity. It is a genuine option rather than a workaround, and the propane vaporization capacity calculation is where the second half of that case is made";
+
+  return {
+    checked_count: checked.length, failure_count: failures.length, all_pass,
+    building_margin_ft, property_line_margin_ft, ignition_margin_ft, opening_margin_ft,
+    governing_required_ft, has_next, next_size_shortfall_ft, next_size_fits, relief_flag,
+    siteVerdict, buildingVerdict, stepVerdict, openingVerdict, transferVerdict, manifoldVerdict,
+    note: "Whether an LP-gas container sits far enough from the things it has to sit away from. The NFPA 58 distances are tabulated by container water capacity and are not reproduced here -- the adopted edition governs and the required figures are entered -- so what this does is the comparison: each measured distance against its requirement, with the margin and a pass or fail per element. THE DISTANCES STEP RATHER THAN SCALE. They change at capacity breakpoints, so the choice between one container size and the next is not only a capacity decision: it can move the tank across the yard. Checking the separation for both candidate sizes before choosing is the cheap version of that conversation, and it is the one that stops a customer being told they can double their capacity in a yard that will not take it. THE CLEARANCE PEOPLE FORGET IS NOT TO THE WALL BUT TO OPENINGS. The relief valve discharge has to be clear of windows, doors and any opening into a below-grade space, because propane is heavier than air and will find a basement window well and stay in it. That is a DIRECTIONAL requirement -- where the relief points matters, not only how far the container sits -- and no horizontal measurement addresses it, which is why it is flagged separately here. THE OTHER QUIET ONE IS THE POINT OF TRANSFER. The place the delivery hose connects carries its own separation requirements, frequently more restrictive than the container's own, so a tank that complies while the truck is absent can be non-compliant while it is being filled. AND TWO SMALLER CONTAINERS MANIFOLDED may be treated differently from one large one; manifolding also adds wetted area and therefore vaporization capacity, so it is a real option rather than a workaround. This compares entered distances against entered requirements. It does not reproduce or look up any separation table, determine which edition or amendments apply, address underground or mounded containers, which have their own and generally shorter distances, evaluate the point of transfer, the filling connection or the dispensing arrangement, address clearances to driveways, combustible materials or vegetation, or determine what any standard requires. NFPA 58 as adopted, the AHJ, and the container and system installer govern.",
+  };
+}
+export const lpContainerSeparationExample = { inputs: { water_capacity_gal: 500, required_building_ft: 10, required_property_line_ft: 10, required_ignition_ft: 10, required_opening_ft: 5, measured_building_ft: 12, measured_property_line_ft: 14, measured_ignition_ft: 18, measured_opening_ft: 6, next_size_required_building_ft: 25, relief_points_at_opening: "no" } };
+
+// =====================================================================
+// spec-v1595: run time and the refill interval. The spec's own arithmetic
+// checks out to the digit (400 gal, 36.6 MMBTU, 244 h, 10.2 days, 29 days
+// at a 0.35 duty cycle, 18 days to a 30% trigger), so it lands as written.
+//
+// The distinction from generator-fuel-runtime, which computes runtime from
+// a tank and a burn rate, is the three things that make a HEATING answer
+// honest: the duty cycle, the delivery trigger rather than empty, and a
+// degree-day history that beats any appliance rating.
+// =====================================================================
+// dims: in { water_capacity_gal: L^3, fill_limit_pct: dimensionless, current_gauge_pct: dimensionless, trigger_pct: dimensionless, connected_load_btuh: M L^2 T^-3, duty_cycle: dimensionless, btu_per_gal: M L^2 T^-2 L^-3, gallons_per_hdd: L^3, hdd_per_day: T } out: { usable_gal: L^3, usable_mmbtu: M L^2 T^-2, continuous_hours: T, continuous_days: T, realistic_days: T, gallons_to_trigger: L^3, gallons_per_day: L^3 T^-1, days_to_trigger: T, hdd_days_to_trigger: T }
+export function computePropaneRunTime({
+  water_capacity_gal = 0, fill_limit_pct = 80, current_gauge_pct = 0, trigger_pct = 0,
+  connected_load_btuh = 0, duty_cycle = 0, btu_per_gal = _LP_BTU_PER_GAL,
+  gallons_per_hdd = 0, hdd_per_day = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(water_capacity_gal > 0)) return { error: "Water capacity must be greater than zero." };
+  if (!(fill_limit_pct > 0) || fill_limit_pct > 100) return { error: "The filling limit must be greater than zero and no more than 100 percent." };
+  if (!(current_gauge_pct > 0) || current_gauge_pct > 100) return { error: "The gauge reading must be greater than zero and no more than 100 percent." };
+  if (!(connected_load_btuh > 0)) return { error: "Connected load must be greater than zero." };
+  if (!(duty_cycle > 0) || duty_cycle > 1) return { error: "Duty cycle must be greater than zero and no more than 1." };
+  if (!(btu_per_gal > 0)) return { error: "Energy content per gallon must be greater than zero." };
+  if (trigger_pct < 0 || trigger_pct >= current_gauge_pct) return { error: "The delivery trigger must be below the current gauge reading." };
+
+  const usable_gal = water_capacity_gal * current_gauge_pct / 100;
+  const usable_mmbtu = usable_gal * btu_per_gal / 1e6;
+  const continuous_hours = usable_mmbtu * 1e6 / connected_load_btuh;
+  const continuous_days = continuous_hours / 24;
+  const realistic_days = continuous_days / duty_cycle;
+  const gallons_per_day = connected_load_btuh * duty_cycle * 24 / btu_per_gal;
+
+  const gallons_to_trigger = water_capacity_gal * (current_gauge_pct - trigger_pct) / 100;
+  const days_to_trigger = gallons_to_trigger / gallons_per_day;
+
+  const has_history = gallons_per_hdd > 0 && hdd_per_day > 0;
+  const hdd_gallons_per_day = has_history ? gallons_per_hdd * hdd_per_day : 0;
+  const hdd_days_to_trigger = has_history ? gallons_to_trigger / hdd_gallons_per_day : 0;
+  const history_ratio = has_history && gallons_per_day > 0 ? hdd_gallons_per_day / gallons_per_day : 0;
+
+  const full_gal = water_capacity_gal * fill_limit_pct / 100;
+  const interval_gallons = Math.max(0, full_gal - water_capacity_gal * trigger_pct / 100);
+  const refill_interval_days = gallons_per_day > 0 ? interval_gallons / gallons_per_day : 0;
+
+  const energyVerdict = "a " + fmt(current_gauge_pct, 0) + "% gauge reading on a " + fmt(water_capacity_gal, 0) + " gallon tank is " + fmt(usable_gal, 0) + " gallons, or " + fmt(usable_mmbtu, 1) + " MMBTU at " + fmt(btu_per_gal, 0) + " BTU per gallon";
+  const continuousVerdict = "against a " + fmt(connected_load_btuh, 0) + " BTU/h load that is " + fmt(continuous_hours, 0) + " hours -- " + fmt(continuous_days, 1) + " days -- of CONTINUOUS FIRING, which is a floor and not an estimate. It is also the number people compute, and it understates tank life badly in mild weather";
+  const dutyVerdict = "at a " + fmt(100 * duty_cycle, 0) + "% duty cycle the realistic figure is " + fmt(realistic_days, 0) + " days at a consumption of " + fmt(gallons_per_day, 1) + " gallons a day. HEATING EQUIPMENT CYCLES: a furnace sized for design conditions runs a fraction of the time in average weather, so a continuous-firing estimate can be off by a factor of three in October and be roughly right in a January cold snap";
+  const triggerVerdict = "THE DELIVERY SCHEDULE USES THE TRIGGER, NOT EMPTY. From " + fmt(current_gauge_pct, 0) + "% down to a " + fmt(trigger_pct, 0) + "% trigger is " + fmt(gallons_to_trigger, 0) + " gallons, or " + fmt(days_to_trigger, 0) + " days at this duty cycle; a full-to-trigger cycle is " + fmt(refill_interval_days, 0) + " days. Running a tank to empty means purging and leak-testing before it is refilled, and the last of the liquid was struggling to vaporize anyway";
+  const historyVerdict = !has_history
+    ? "no gallons-per-degree-day history was entered. A customer's own delivery record is the honest input here, and it beats every appliance rating"
+    : "from the history, " + fmt(gallons_per_hdd, 2) + " gallons per degree day at " + fmt(hdd_per_day, 0) + " degree days a day is " + fmt(hdd_gallons_per_day, 1) + " gallons a day and " + fmt(hdd_days_to_trigger, 0) + " days to the trigger -- " + (history_ratio > 1.05 ? fmt(history_ratio, 2) + " times FASTER than the duty-cycle estimate" : history_ratio < 0.95 ? fmt(1 / history_ratio, 2) + " times SLOWER than the duty-cycle estimate" : "close to the duty-cycle estimate") + ". DEGREE DAYS ARE THE HONEST METHOD: consumption is very nearly proportional to them, the customer's own gallons-per-degree-day predicts this year from last year's deliveries, and it automatically includes the water heater, the range and everything else on the tank that no appliance rating was asked about";
+  const vaporVerdict = "AND THE LAST OF THE TANK MAY NOT BE AVAILABLE AT ALL IN A COLD SNAP, because vaporization is limited by wetted surface rather than by volume. That is the propane vaporization capacity calculation, and it is a second reason the trigger sits well above empty";
+
+  return {
+    usable_gal, usable_mmbtu, continuous_hours, continuous_days, realistic_days,
+    gallons_per_day, gallons_to_trigger, days_to_trigger, refill_interval_days,
+    has_history, hdd_gallons_per_day, hdd_days_to_trigger, history_ratio,
+    energyVerdict, continuousVerdict, dutyVerdict, triggerVerdict, historyVerdict, vaporVerdict,
+    note: "How long the propane in a tank lasts, and when the next delivery has to be. The energy is the gallons times the fuel's heat content, and dividing by the connected load gives the continuous-firing hours -- which is a floor, not an estimate, and is the number people compute. THE DUTY CYCLE IS WHAT MAKES IT REAL. Heating equipment cycles: a furnace sized for design conditions runs a fraction of the time in average weather, so a continuous-firing figure can understate tank life by a factor of three in October and be roughly right in a January cold snap. DEGREE DAYS ARE THE HONEST METHOD and they are entered here from the customer's own record. Consumption is very nearly proportional to heating degree days, so last year's gallons-per-degree-day from the delivery history predicts this year better than any appliance rating can -- and it automatically includes the water heater, the range and everything else on the tank that nobody thought to add up. Both estimates are reported side by side, because the ratio between them is itself the finding: a history that runs well ahead of the duty-cycle estimate means something is on the tank that was not in the load. THE SCHEDULE RUNS TO THE TRIGGER, NOT TO EMPTY. Deliveries are commonly triggered around a quarter to a third full, and the run time to the trigger is the number a schedule is built on. Running a tank to empty means purging and leak-testing before it can be refilled, and the last of the liquid was struggling to vaporize anyway -- vaporization is limited by wetted surface rather than by volume, which is a second reason the trigger sits high. This computes run time from an entered load, duty cycle and history. It does not predict the duty cycle or the weather, model the building's heat loss (the degree-day energy calculation does that from a building UA), account for domestic hot water, cooking or other non-weather-sensitive load except through an entered history, schedule deliveries or account for route and minimum-delivery practice, or evaluate whether the tank can vaporize at the rate the load asks for. NFPA 58, the adopted fuel gas code, the supplier's delivery practice, and the appliance manufacturers govern.",
+  };
+}
+export const propaneRunTimeExample = { inputs: { water_capacity_gal: 500, fill_limit_pct: 80, current_gauge_pct: 80, trigger_pct: 30, connected_load_btuh: 150000, duty_cycle: 0.35, btu_per_gal: 91500, gallons_per_hdd: 0.45, hdd_per_day: 30 } };
+
+GAS_RENDERERS["propane-vaporization-rate"] = _simpleRenderer({
+  compute: computePropaneVaporizationRate,
+  example: propaneVaporizationRateExample.inputs,
+  citation: "Citation: wetted surface of a horizontal cylinder at the entered fill (shell arc plus both head segments), with vaporization capacity scaled from the manufacturer's published table by the wetted-area ratio and the temperature-difference ratio. The capacity is NOT derived: the real rate also depends on wind, burial, insulation, paint colour and the duration of the draw. NFPA 58, the tank manufacturer's vaporization table, and the AHJ govern.",
+  fields: [
+    { key: "tank_diameter_ft", label: "Tank diameter (ft)" },
+    { key: "tank_length_ft", label: "Tank length (ft)" },
+    { key: "percent_full", label: "Percent full now (%)" },
+    { key: "ambient_f", label: "Ambient temperature (degF)", attrs: { step: "any" } },
+    { key: "liquid_temperature_f", label: "Liquid temperature (degF)", attrs: { step: "any" } },
+    { key: "reference_capacity_btuh", label: "Table capacity at the reference condition (BTU/h)" },
+    { key: "reference_percent_full", label: "Reference percent full (%)" },
+    { key: "reference_ambient_f", label: "Reference ambient (degF)", attrs: { step: "any" } },
+    { key: "connected_load_btuh", label: "Connected load (BTU/h)" },
+  ],
+  outputs: [
+    { key: "wetted_area_ft2", label: "Wetted surface now (sq ft)", unit: "sq ft", value: (r) => fmt(r.wetted_area_ft2, 0) + " sq ft (reference " + fmt(r.reference_wetted_area_ft2, 0) + ")" },
+    { key: "capacity_btuh", label: "Vaporization capacity (BTU/h)", unit: "BTU/h", value: (r) => fmt(r.capacity_btuh, 0) + " BTU/h" },
+    { key: "margin_btuh", label: "Against the load", unit: "BTU/h", value: (r) => (r.meets_load ? "carries it, margin " + fmt(r.margin_btuh, 0) : "SHORT by " + fmt(-r.margin_btuh, 0)) + " BTU/h" },
+    { key: "limit_percent_full", label: "Falls below the load at", value: (r) => r.already_short ? "already short at this level" : r.never_short ? "not at any level at this ambient" : fmt(r.limit_percent_full, 0) + "% full" },
+    { key: "tanks_required", label: "Tanks of this size required", value: (r) => fmt(r.tanks_required, 0) },
+    { key: "areaVerdict", label: "Wetted surface", value: (r) => r.areaVerdict },
+    { key: "capacityVerdict", label: "Capacity", value: (r) => r.capacityVerdict },
+    { key: "compoundVerdict", label: "Why it fails in January", value: (r) => r.compoundVerdict },
+    { key: "limitVerdict", label: "The level it fails at", value: (r) => r.limitVerdict },
+    { key: "frostVerdict", label: "Frost", value: (r) => r.frostVerdict },
+    { key: "fixVerdict", label: "The fix", value: (r) => r.fixVerdict },
+    { key: "note", label: "Note", value: (r) => r.note },
+  ],
+});
+
+GAS_RENDERERS["propane-fill-outage"] = _simpleRenderer({
+  compute: computePropaneFillOutage,
+  example: propaneFillOutageExample.inputs,
+  citation: "Citation: maximum fill = water capacity x the filling limit; outage = the remainder; the expansion headroom uses liquid propane's roughly 1.5% per 10 degF. The applicable filling limit is temperature-corrected and differs between aboveground and underground containers. NFPA 58, the adopted fuel gas code, and the AHJ govern.",
+  fields: [
+    { key: "water_capacity_gal", label: "Water capacity (gal)" },
+    { key: "fill_limit_pct", label: "Filling limit (%)" },
+    { key: "current_gauge_pct", label: "Current gauge reading (%)" },
+    { key: "btu_per_gal", label: "Energy content (BTU/gal)" },
+    { key: "liquid_temperature_f", label: "Liquid temperature (degF)", attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "max_fill_gal", label: "Maximum fill (gal)", unit: "gal", value: (r) => fmt(r.max_fill_gal, 0) + " gal" },
+    { key: "outage_gal", label: "Outage (gal)", unit: "gal", value: (r) => fmt(r.outage_gal, 0) + " gal (" + fmt(r.outage_pct, 0) + "%)" },
+    { key: "deliverable_gal", label: "Deliverable now (gal)", unit: "gal", value: (r) => r.overfilled ? "OVERFILLED - deliver nothing" : fmt(r.deliverable_gal, 0) + " gal" },
+    { key: "full_tank_mmbtu", label: "Energy, full tank (MMBTU)", unit: "MMBTU", value: (r) => fmt(r.full_tank_mmbtu, 1) + " MMBTU (now " + fmt(r.current_mmbtu, 1) + ")" },
+    { key: "expansion_headroom_f", label: "Expansion headroom now (degF)", unit: "degF", value: (r) => fmt(r.expansion_headroom_f, 0) + " degF (at the limit, " + fmt(r.limit_headroom_f, 0) + ")" },
+    { key: "hydraulically_full_at_f", label: "Liquid-full at (degF)", unit: "degF", value: (r) => r.expansion_headroom_f > 200 ? "no weather reaches it at this fill" : fmt(r.hydraulically_full_at_f, 0) + " degF" },
+    { key: "fillVerdict", label: "What full means", value: (r) => r.fillVerdict },
+    { key: "deliveryVerdict", label: "This delivery", value: (r) => r.deliveryVerdict },
+    { key: "expansionVerdict", label: "Why 80%", value: (r) => r.expansionVerdict },
+    { key: "gaugeVerdict", label: "The fixed liquid level gauge", value: (r) => r.gaugeVerdict },
+    { key: "energyVerdict", label: "Energy", value: (r) => r.energyVerdict },
+    { key: "usableVerdict", label: "Usable", value: (r) => r.usableVerdict },
+    { key: "note", label: "Note", value: (r) => r.note },
+  ],
+});
+
+GAS_RENDERERS["propane-regulator-sizing"] = _simpleRenderer({
+  compute: computePropaneRegulatorSizing,
+  example: propaneRegulatorSizingExample.inputs,
+  citation: "Citation: required flow = connected load / the fuel's energy content per cubic foot, compared against regulator capacities ENTERED from the manufacturer's table at each inlet pressure. Capacity is a function of the pressure across the regulator, so the first stage is sized at the minimum expected tank pressure. NFPA 58, the adopted fuel gas code, the regulator manufacturer, and the AHJ govern.",
+  fields: [
+    { key: "connected_load_btuh", label: "Connected load (BTU/h)" },
+    { key: "btu_per_ft3", label: "Energy content (BTU/cu ft)" },
+    { key: "capacity_at_min_inlet_cfh", label: "First stage capacity at the MINIMUM tank pressure (CFH)" },
+    { key: "capacity_at_max_inlet_cfh", label: "First stage capacity at the maximum tank pressure (CFH, 0 to skip)" },
+    { key: "second_stage_capacity_cfh", label: "Second stage capacity (CFH, 0 to skip)" },
+    { key: "lockup_psig", label: "Lock-up pressure (psig, 0 to skip)" },
+    { key: "downstream_rating_psig", label: "Downstream rating (psig, 0 to skip)" },
+  ],
+  outputs: [
+    { key: "required_cfh", label: "Required flow (CFH)", unit: "CFH", value: (r) => fmt(r.required_cfh, 0) + " CFH" },
+    { key: "min_inlet_margin_cfh", label: "First stage, cold tank", unit: "CFH", value: (r) => r.short_at_min ? "SHORT by " + fmt(-r.min_inlet_margin_cfh, 0) + " CFH" : "margin " + fmt(r.min_inlet_margin_cfh, 0) + " CFH" },
+    { key: "max_inlet_margin_cfh", label: "First stage, warm tank", unit: "CFH", value: (r) => !r.has_max ? "not entered" : r.short_at_max ? "SHORT by " + fmt(-r.max_inlet_margin_cfh, 0) + " CFH" : "margin " + fmt(r.max_inlet_margin_cfh, 0) + " CFH" },
+    { key: "second_stage_margin_cfh", label: "Second stage", unit: "CFH", value: (r) => !r.has_second ? "not entered" : r.short_second ? "SHORT by " + fmt(-r.second_stage_margin_cfh, 0) + " CFH" : "margin " + fmt(r.second_stage_margin_cfh, 0) + " CFH" },
+    { key: "lockup_margin_psig", label: "Lock-up", unit: "psig", value: (r) => !r.has_lockup ? "not entered" : r.lockup_over ? "OVER the rating by " + fmt(-r.lockup_margin_psig, 2) + " psig" : "margin " + fmt(r.lockup_margin_psig, 2) + " psig" },
+    { key: "flowVerdict", label: "Demand", value: (r) => r.flowVerdict },
+    { key: "minVerdict", label: "The cold case", value: (r) => r.minVerdict },
+    { key: "compareVerdict", label: "Warm against cold", value: (r) => r.compareVerdict },
+    { key: "secondVerdict", label: "Second stage", value: (r) => r.secondVerdict },
+    { key: "lockupVerdict", label: "Lock-up", value: (r) => r.lockupVerdict },
+    { key: "stagingVerdict", label: "Why two stages", value: (r) => r.stagingVerdict },
+    { key: "coldVerdict", label: "The same morning", value: (r) => r.coldVerdict },
+    { key: "note", label: "Note", value: (r) => r.note },
+  ],
+});
+
+GAS_RENDERERS["lp-container-separation"] = _simpleRenderer({
+  compute: computeLpContainerSeparation,
+  example: lpContainerSeparationExample.inputs,
+  citation: "Citation: each measured distance compared against the requirement ENTERED for it. The NFPA 58 separation tables are not reproduced: they are indexed by container water capacity, they step at capacity breakpoints, and the adopted edition and its amendments govern. NFPA 58 as adopted and the AHJ govern.",
+  fields: [
+    { key: "water_capacity_gal", label: "Container water capacity (gal)" },
+    { key: "required_building_ft", label: "Required to the building (ft)" },
+    { key: "measured_building_ft", label: "Measured to the building (ft)" },
+    { key: "required_property_line_ft", label: "Required to the property line (ft, 0 to skip)" },
+    { key: "measured_property_line_ft", label: "Measured to the property line (ft, 0 to skip)" },
+    { key: "required_ignition_ft", label: "Required to a source of ignition (ft, 0 to skip)" },
+    { key: "measured_ignition_ft", label: "Measured to a source of ignition (ft, 0 to skip)" },
+    { key: "required_opening_ft", label: "Required to an opening (ft, 0 to skip)" },
+    { key: "measured_opening_ft", label: "Measured to an opening (ft, 0 to skip)" },
+    { key: "next_size_required_building_ft", label: "Next container size: required to the building (ft, 0 to skip)" },
+    { key: "relief_points_at_opening", label: "Relief discharge directed at an opening", kind: "select", default: "no", options: [{ value: "no", label: "No" }, { value: "yes", label: "Yes -- relief points at a window, door or below-grade opening" }] },
+  ],
+  outputs: [
+    { key: "all_pass", label: "Verdict", value: (r) => r.all_pass ? "every distance checked meets its requirement" : r.failure_count + " of " + r.checked_count + " FAIL" },
+    { key: "building_margin_ft", label: "Building margin (ft)", unit: "ft", value: (r) => fmt(r.building_margin_ft, 1) + " ft" },
+    { key: "opening_margin_ft", label: "Opening margin (ft)", unit: "ft", value: (r) => fmt(r.opening_margin_ft, 1) + " ft" },
+    { key: "governing_required_ft", label: "Longest requirement (ft)", unit: "ft", value: (r) => fmt(r.governing_required_ft, 1) + " ft" },
+    { key: "next_size_shortfall_ft", label: "Next size up", unit: "ft", value: (r) => !r.has_next ? "not entered" : r.next_size_fits ? "fits" : "short by " + fmt(r.next_size_shortfall_ft, 1) + " ft" },
+    { key: "siteVerdict", label: "Siting", value: (r) => r.siteVerdict },
+    { key: "buildingVerdict", label: "To the building", value: (r) => r.buildingVerdict },
+    { key: "stepVerdict", label: "The next size up", value: (r) => r.stepVerdict },
+    { key: "openingVerdict", label: "Relief discharge", value: (r) => r.openingVerdict },
+    { key: "transferVerdict", label: "Point of transfer", value: (r) => r.transferVerdict },
+    { key: "manifoldVerdict", label: "Manifolding", value: (r) => r.manifoldVerdict },
+    { key: "note", label: "Note", value: (r) => r.note },
+  ],
+});
+
+GAS_RENDERERS["propane-run-time"] = _simpleRenderer({
+  compute: computePropaneRunTime,
+  example: propaneRunTimeExample.inputs,
+  citation: "Citation: energy = gallons x the fuel's heat content; continuous run time = energy / connected load; the realistic figure divides by the duty cycle, and the schedule runs to the delivery trigger rather than to empty. The degree-day estimate uses the customer's own gallons-per-degree-day history. NFPA 58, the supplier's delivery practice, and the appliance manufacturers govern.",
+  fields: [
+    { key: "water_capacity_gal", label: "Water capacity (gal)" },
+    { key: "fill_limit_pct", label: "Filling limit (%)" },
+    { key: "current_gauge_pct", label: "Current gauge reading (%)" },
+    { key: "trigger_pct", label: "Delivery trigger (%)" },
+    { key: "connected_load_btuh", label: "Connected load (BTU/h)" },
+    { key: "duty_cycle", label: "Duty cycle (0 to 1)", attrs: { step: "any", min: "0", max: "1" } },
+    { key: "btu_per_gal", label: "Energy content (BTU/gal)" },
+    { key: "gallons_per_hdd", label: "History: gallons per degree day (0 to skip)" },
+    { key: "hdd_per_day", label: "History: degree days per day (0 to skip)" },
+  ],
+  outputs: [
+    { key: "usable_mmbtu", label: "Energy in the tank (MMBTU)", unit: "MMBTU", value: (r) => fmt(r.usable_mmbtu, 1) + " MMBTU (" + fmt(r.usable_gal, 0) + " gal)" },
+    { key: "continuous_days", label: "Continuous firing (days)", unit: "days", value: (r) => fmt(r.continuous_days, 1) + " days (" + fmt(r.continuous_hours, 0) + " h)" },
+    { key: "realistic_days", label: "At the duty cycle (days)", unit: "days", value: (r) => fmt(r.realistic_days, 0) + " days" },
+    { key: "gallons_per_day", label: "Consumption (gal/day)", unit: "gal/day", value: (r) => fmt(r.gallons_per_day, 1) + " gal/day" },
+    { key: "days_to_trigger", label: "Days to the delivery trigger", unit: "days", value: (r) => fmt(r.days_to_trigger, 0) + " days (" + fmt(r.gallons_to_trigger, 0) + " gal)" },
+    { key: "hdd_days_to_trigger", label: "From the degree-day history", unit: "days", value: (r) => !r.has_history ? "not entered" : fmt(r.hdd_days_to_trigger, 0) + " days (" + fmt(r.hdd_gallons_per_day, 1) + " gal/day)" },
+    { key: "energyVerdict", label: "Energy", value: (r) => r.energyVerdict },
+    { key: "continuousVerdict", label: "Continuous firing", value: (r) => r.continuousVerdict },
+    { key: "dutyVerdict", label: "The duty cycle", value: (r) => r.dutyVerdict },
+    { key: "triggerVerdict", label: "The schedule", value: (r) => r.triggerVerdict },
+    { key: "historyVerdict", label: "Degree days", value: (r) => r.historyVerdict },
+    { key: "vaporVerdict", label: "The last of the tank", value: (r) => r.vaporVerdict },
+    { key: "note", label: "Note", value: (r) => r.note },
+  ],
+});
