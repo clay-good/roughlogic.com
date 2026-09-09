@@ -352,4 +352,11 @@ test("the human ledger table agrees with the cycle file", async () => {
 
   // A substring test would pass this string. startsWith must not.
   assert.ok(!"2024 (2027 voted, not published)".startsWith("2027"));
+
+  // Every tracked standard carries a verification date. `wmm` was the one row
+  // of fourteen without one, which is why the doc could print a date the cycle
+  // file never recorded and no comparison above could run on it.
+  for (const s of cycle.standards) {
+    assert.ok(s.last_verified, s.id + " has no last_verified; nothing can measure that row");
+  }
 });

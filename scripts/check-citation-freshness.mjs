@@ -156,6 +156,16 @@ async function main() {
         return { currentEdition: cells[2] || "", lastVerified: cells[3] || "" };
       };
       for (const s of standards) {
+        // Every tracked standard must carry a verification date. `wmm` was the
+        // one row of fourteen without one, which meant the ledger doc printed a
+        // date for it that the cycle file did not record, and no comparison
+        // below could run. A row with no date is a row nothing can check.
+        if (!s.last_verified) {
+          errors.push(
+            "sources-cycle.json: tracked source '" + s.id + "' (" + s.name + ") has no last_verified. " +
+            "Record the date the source was actually checked; without it nothing measures this row.",
+          );
+        }
         const row = ledgerRow(s.id);
         if (!row) {
           errors.push("citation-freshness-ledger.md: tracked source '" + s.id + "' (" + s.name + ") has no ledger row (spec-v22 §5 ledger-completeness).");

@@ -168,6 +168,8 @@
       "cycle_years": 5,
       "next_expected": "2029-12",
       "expires_on": "2030-01-01",
+      "last_verified": "2026-09-09",
+      "verification_note": "Verified 2026-09-09 against NOAA NCEI's own product page: WMM2025 is the current model, released 2024-12-17 and valid through 2029-12-31, with no out-of-cycle release since. This row previously carried NO last_verified at all -- the only one of the tracked standards without one -- while docs/citation-freshness-ledger.md printed 2026-06-05 for it, a date the machine file did not record. expires_on stays 2030-01-01: NOAA states validity through the END of 2029-12-31, and this field is the exclusive instant the model stops being valid, which is what a date comparison in a gate wants.",
       "free_access_url": "https://www.ncei.noaa.gov/products/world-magnetic-model",
       "match_terms": [
         "WMM",

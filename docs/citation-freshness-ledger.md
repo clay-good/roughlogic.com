@@ -55,7 +55,7 @@ evidence, so the row's `verification_note` should say what was checked.
 | `ashrae-62-2` | ASHRAE 62.2 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
 | `ashrae-90-1` | ASHRAE 90.1 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
 | `fda-food-code` | FDA Food Code | 2022 | 2022 | 2026-09-02 | current |
-| `wmm` | NOAA World Magnetic Model | WMM2025 | WMM2025 (expires 2030-01-01) | 2026-06-05 | current |
+| `wmm` | NOAA World Magnetic Model | WMM2025 | WMM2025 (valid through 2029-12-31) | 2026-09-09 | current |
 | `iupac-atomic-weights` | IUPAC/CIAAW Standard Atomic Weights | 2024 | 2024 | 2026-09-09 | current |
 | `aashto-greenbook` | AASHTO Green Book | 2018 (7th ed.) | 2018 (7th ed.), 8th in development | 2026-09-01 | acknowledged-stale |
 
