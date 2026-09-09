@@ -50577,3 +50577,262 @@ test("bounds: spec-v1716 computeMeltFurnaceEnergy -- efficiency and yield are tw
   assert.ok(base.alt_theoretical_btu_lb > base.theoretical_btu_lb * 2.6);
   assert.ok(_v1716({ ...base, furnace_efficiency_pct: 0 }).error);
 });
+
+// =====================================================================
+// spec-v1664..v1674: the NDT and heat treatment band. Eleven tiles, nothing
+// cut. Two near-neighbours were screened by formula and kept -- this asks how
+// DEEP hardness reaches where `quench-severity` asks whether agitation helps,
+// and `heat-treat-soak-time` says in its own note that it does not address
+// ramp rates. spec-v1665's "382 thousandths on a 0.500 in wall" is asserted
+// against here as 34, since 382 was the absolute error at a 5.6 in reading.
+// =====================================================================
+import {
+  computeWeldVisualAcceptance as _v1664,
+  computeUtThicknessVelocity as _v1665,
+  computeRtExposureTime as _v1666,
+  computeRtRestrictedArea as _v1667,
+  computeMtYokeCoilAmperage as _v1668,
+  computePtDwellDevelopment as _v1669,
+  computeHardnessTensileConversion as _v1670,
+  computeCarburizingCaseDepth as _v1671,
+  computeJominyQuenchSeverity as _v1672,
+  computeTemperingTemperature as _v1673,
+  computePwhtHoldingTime as _v1674,
+} from "../../calc-inspection.js";
+
+test("bounds: spec-v1664 computeWeldVisualAcceptance -- undersize is TWO tests", () => {
+  const base = { nominal_leg_in: 0.375, measured_leg_in: 0.3125, undersize_length_in: 3, weld_length_in: 20, allowed_undersize_in: 0.0625, allowed_undersize_fraction: 0.10, measured_undercut_in: 0.030, allowed_undercut_in: 0.03125, crack_present: "yes" };
+  const r = _v1664(base);
+  // A crack rejects regardless of every dimension.
+  assert.equal(r.accept, false);
+  assert.ok(r.crack_verdict.startsWith("REJECT"));
+  const noCrack = _v1664({ ...base, crack_present: "no" });
+  assert.ok(Math.abs(noCrack.undersize_in - 0.0625) < 1e-12);
+  // The AMOUNT is exactly at the allowance and passes; the LENGTH does not.
+  // 3 of 20 in is 15% against a 10% rule -- the spec called this "a tolerance
+  // question" and never resolved it, and both tests have to be satisfied.
+  assert.equal(noCrack.size_within, true);
+  assert.equal(noCrack.length_within, false);
+  assert.equal(noCrack.accept, false);
+  assert.ok(Math.abs(noCrack.undersize_length_fraction - 0.15) < 1e-12);
+  assert.ok(Math.abs(noCrack.allowed_undersize_length_in - 2) < 1e-12);
+  // Exactly at 10% accepts; the full length rejects.
+  assert.equal(_v1664({ ...base, crack_present: "no", undersize_length_in: 2 }).accept, true);
+  const full = _v1664({ ...base, crack_present: "no", undersize_length_in: 20 });
+  assert.equal(full.accept, false);
+  assert.equal(full.size_within, true);
+  // Undercut is judged against an entered limit that differs by loading.
+  assert.equal(noCrack.undercut_ok, true);
+  assert.equal(_v1664({ ...base, crack_present: "no", undersize_length_in: 2, allowed_undercut_in: 0.01 }).undercut_ok, false);
+  assert.ok(_v1664({ ...base, weld_length_in: 0 }).error);
+  assert.ok(_v1664({ ...base, undersize_length_in: 25 }).error);
+});
+
+test("bounds: spec-v1665 computeUtThicknessVelocity -- the error is a PERCENTAGE, 34 thou not 382", () => {
+  const base = { transit_time_us: 45, gauge_velocity_in_us: 0.232, actual_velocity_in_us: 0.2490, nominal_wall_in: 0.500, retirement_limit_in: 0.190, coating_thickness_in: 0.012 };
+  const r = _v1665(base);
+  assert.ok(Math.abs(r.gauge_reading_in - 5.2200) < 1e-9);
+  assert.ok(Math.abs(r.true_thickness_in - 5.6025) < 1e-9);
+  assert.ok(Math.abs(r.error_pct + 6.8273) < 0.001);
+  // spec-v1665 says this is "382 thousandths" on a 0.500 in wall. 382 is the
+  // absolute error at the 5.6 in reading; on a half-inch wall it is 34.
+  assert.ok(Math.abs(Math.abs(r.error_on_nominal_in) * 1000 - 34.14) < 0.02);
+  assert.ok(Math.abs((5.6025 - 5.2200) * 1000 - 382.5) < 0.1);
+  // IDENTITY: a gauge calibrated for the material has exactly zero error.
+  assert.ok(Math.abs(_v1665({ ...base, actual_velocity_in_us: 0.232 }).error_pct) < 1e-12);
+  // IDENTITY: the thinnest passing wall reads exactly the retirement limit.
+  const t = r.thinnest_passing_in;
+  assert.ok(Math.abs(t * 0.232 / 0.2490 - 0.190) < 1e-12);
+  // This gauge reads LOW, which retires early -- the conservative direction.
+  assert.ok(r.error_pct < 0);
+  assert.ok(t > 0.190);
+  // The reverse calibration is the dangerous one: it reads HIGH.
+  const reverse = _v1665({ ...base, gauge_velocity_in_us: 0.2490, actual_velocity_in_us: 0.232 });
+  assert.ok(reverse.error_pct > 0);
+  assert.ok(reverse.thinnest_passing_in < 0.190);
+  // Coating reads THICK in single-echo mode -- also the unsafe direction.
+  assert.ok(r.coating_overread_in > base.coating_thickness_in);
+  assert.ok(_v1665({ ...base, transit_time_us: 0 }).error);
+});
+
+test("bounds: spec-v1666 computeRtExposureTime -- inverse square against linear unsharpness", () => {
+  const base = { base_exposure_s: 60, base_distance_in: 24, new_distance_in: 36, source_size_in: 0.120, material_thickness_in: 0.75, days_elapsed: 60, half_life_days: 73.83, unsharpness_limit_in: 0.0208 };
+  const r = _v1666(base);
+  assert.ok(Math.abs(r.new_exposure_s - 135) < 1e-9);
+  assert.ok(Math.abs(r.ug_base_in - 0.00375) < 1e-12);
+  assert.ok(Math.abs(r.ug_new_in - 0.0025) < 1e-12);
+  // Unsharpness improves LINEARLY while exposure worsens QUADRATICALLY.
+  assert.ok(Math.abs(r.ug_base_in / r.ug_new_in - 1.5) < 1e-12);
+  assert.ok(Math.abs(r.new_exposure_s / 60 - 2.25) < 1e-12);
+  // IDENTITY: one half-life leaves exactly 50% of the activity.
+  assert.ok(Math.abs(_v1666({ ...base, days_elapsed: 73.83 }).activity_pct - 50) < 1e-9);
+  assert.ok(Math.abs(r.decay_factor - Math.pow(0.5, 60 / 73.83)) < 1e-12);
+  assert.ok(r.decayed_exposure_s > r.new_exposure_s);
+  // IDENTITY: the distance that meets the limit produces exactly the limit.
+  assert.ok(Math.abs(0.120 * 0.75 / r.distance_for_limit_in - 0.0208) < 1e-12);
+  // The short distance already passes, so the longer shot buys nothing.
+  assert.equal(r.base_passes, true);
+  assert.equal(_v1666({ ...base, unsharpness_limit_in: 0.003 }).base_passes, false);
+  assert.ok(_v1666({ ...base, base_distance_in: 0 }).error);
+});
+
+test("bounds: spec-v1667 computeRtRestrictedArea -- the square root is why collimation pays", () => {
+  const base = { source_activity_ci: 60, gamma_constant_r_h_ci_ft: 0.48, boundary_limit_mr_h: 2, collimator_attenuation_factor: 0.05, public_limit_mr_h: 0.5, shielding_factor: 1 };
+  const r = _v1667(base);
+  assert.ok(Math.abs(r.dose_rate_1ft_r_h - 28.8) < 1e-9);
+  assert.ok(Math.abs(r.boundary_distance_ft - 120) < 1e-9);
+  // IDENTITY: at the boundary distance the rate is exactly the limit.
+  assert.ok(Math.abs(r.dose_rate_1ft_r_h / Math.pow(r.boundary_distance_ft, 2) * 1000 - 2) < 1e-9);
+  // IDENTITY: quartering the activity halves the distance -- the square root,
+  // which is why no practical source change does what a collimator does.
+  assert.ok(Math.abs(_v1667({ ...base, source_activity_ci: 15 }).boundary_distance_ft - 60) < 1e-9);
+  assert.ok(r.collimated_distance_ft < r.boundary_distance_ft);
+  // The public limit is stricter, so its boundary is further out.
+  assert.ok(r.public_distance_ft > r.boundary_distance_ft);
+  assert.ok(Math.abs(r.public_distance_ft - 240) < 1e-9);
+  assert.ok(_v1667({ ...base, source_activity_ci: 0 }).error);
+  assert.ok(_v1667({ ...base, shielding_factor: 1.5 }).error);
+});
+
+test("bounds: spec-v1668 computeMtYokeCoilAmperage -- a select is a STRING, and orientation is everything", () => {
+  const base = { part_diameter_in: 6, amps_per_inch: 800, part_length_in: 36, coil_turns: 5, fill_factor: "high", yoke_pole_spacing_in: 6, yoke_current: "ac" };
+  const r = _v1668(base);
+  assert.ok(Math.abs(r.circular_amps - 4800) < 1e-12);
+  assert.ok(Math.abs(r.ld_used - 6) < 1e-12);
+  assert.ok(Math.abs(r.coil_amp_turns - 4375) < 1e-9);
+  assert.ok(Math.abs(r.coil_amps - 875) < 1e-9);
+  // Selects arrive as strings, so "low" must actually select the low constant
+  // and "ac" must not read as DC. A 0/1 encoding would make "0" truthy.
+  assert.equal(r.is_high_fill, true);
+  assert.equal(r.is_dc, false);
+  assert.ok(Math.abs(_v1668({ ...base, fill_factor: "low" }).coil_amp_turns - 45000 / 8) < 1e-9);
+  assert.ok(Math.abs(r.yoke_lift_required_lb - 10) < 1e-12);
+  assert.ok(Math.abs(_v1668({ ...base, yoke_current: "dc" }).yoke_lift_required_lb - 40) < 1e-12);
+  // L/D is bounded 2 to 15 by the standard formulae.
+  assert.equal(_v1668({ ...base, part_length_in: 600 }).ld_clamped, true);
+  assert.ok(Math.abs(_v1668({ ...base, part_length_in: 600 }).ld_used - 15) < 1e-12);
+  assert.equal(_v1668({ ...base, part_length_in: 6 }).ld_used, 2);
+  assert.ok(_v1668({ ...base, part_diameter_in: 0 }).error);
+});
+
+test("bounds: spec-v1669 computePtDwellDevelopment -- every error here is SILENT", () => {
+  const base = { penetration_dwell_min: 25, development_dwell_min: 10, evaluation_window_start_min: 10, evaluation_window_end_min: 60, evaluation_at_min: 20, part_temp_f: 70, min_procedure_temp_f: 40, max_procedure_temp_f: 125 };
+  const r = _v1669(base);
+  assert.ok(Math.abs(r.total_process_min - 35) < 1e-12);
+  assert.equal(r.in_window, true);
+  assert.equal(r.in_temp_range, true);
+  // Both ends of the evaluation window matter.
+  assert.equal(_v1669({ ...base, evaluation_at_min: 3 }).in_window, false);
+  assert.equal(_v1669({ ...base, evaluation_at_min: 75 }).in_window, false);
+  // Exactly on either edge is inside it.
+  assert.equal(_v1669({ ...base, evaluation_at_min: 10 }).in_window, true);
+  assert.equal(_v1669({ ...base, evaluation_at_min: 60 }).in_window, true);
+  // Outside the procedure's temperature range the method must be qualified.
+  assert.equal(_v1669({ ...base, part_temp_f: 35 }).in_temp_range, false);
+  assert.equal(_v1669({ ...base, part_temp_f: 130 }).in_temp_range, false);
+  // A casting-row dwell applied to a tight crack is called out.
+  assert.ok(_v1669({ ...base, penetration_dwell_min: 5 }).dwell_class_verdict.includes("CASTING"));
+  assert.ok(_v1669({ ...base, penetration_dwell_min: 0 }).error);
+});
+
+test("bounds: spec-v1670 computeHardnessTensileConversion -- a SURFACE reading is not a SECTION property", () => {
+  const base = { brinell_hb: 200, tensile_coefficient_ksi_per_hb: 0.50, actual_uts_ksi: 0, case_hardness_hb: 650, core_hardness_hb: 285 };
+  const r = _v1670(base);
+  assert.ok(Math.abs(r.estimated_uts_ksi - 100) < 1e-12);
+  assert.ok(Math.abs(_v1670({ ...base, brinell_hb: 350 }).estimated_uts_ksi - 175) < 1e-12);
+  // The surface trap: the case converts to more than twice the core.
+  assert.ok(Math.abs(r.case_estimated_uts_ksi - 325) < 1e-12);
+  assert.ok(Math.abs(r.core_estimated_uts_ksi - 142.5) < 1e-12);
+  assert.ok(Math.abs(r.overstatement_pct - (650 / 285 - 1) * 100) < 1e-9);
+  assert.ok(r.overstatement_pct > 100);
+  // IDENTITY: the estimate is exactly linear in hardness.
+  assert.ok(Math.abs(_v1670({ ...base, brinell_hb: 400 }).estimated_uts_ksi - 2 * r.estimated_uts_ksi) < 1e-12);
+  // Against a measured value the error is reported both ways.
+  assert.ok(_v1670({ ...base, brinell_hb: 95, actual_uts_ksi: 45 }).estimate_error_pct > 0);
+  assert.ok(_v1670({ ...base, brinell_hb: 0 }).error);
+});
+
+test("bounds: spec-v1671 computeCarburizingCaseDepth -- doubling the case QUADRUPLES the cycle", () => {
+  const base = { reference_case_in: 0.0707, reference_time_hr: 8, time_hr: 8, target_case_in: 0.1414, hotter_reference_case_in: 0.0990 };
+  const r = _v1671(base);
+  // IDENTITY: evaluating at the reference time returns the reference case.
+  assert.ok(Math.abs(r.case_depth_in - 0.0707) < 1e-12);
+  assert.ok(Math.abs(r.time_for_target_hr - 32) < 0.02);
+  // IDENTITY: the time for a target case, run forward, produces that case.
+  assert.ok(Math.abs(_v1671({ ...base, time_hr: r.time_for_target_hr }).case_depth_in - 0.1414) < 1e-12);
+  // IDENTITY: the time ratio is exactly the square of the depth ratio.
+  assert.ok(Math.abs(r.time_ratio - r.depth_ratio * r.depth_ratio) < 1e-9);
+  assert.ok(Math.abs(r.depth_ratio - 2) < 0.001);
+  assert.ok(Math.abs(r.time_ratio - 4) < 0.005);
+  // IDENTITY: quadrupling the time exactly doubles the case.
+  assert.ok(Math.abs(_v1671({ ...base, time_hr: 32 }).case_depth_in - 2 * r.case_depth_in) < 1e-12);
+  // A hotter cycle reaches the same case in less time, by the square of the
+  // ratio between the two reference cases.
+  assert.ok(r.hotter_time_hr < r.time_for_target_hr);
+  assert.ok(Math.abs(r.hotter_time_hr * Math.pow(0.0990 / 0.0707, 2) - r.time_for_target_hr) < 1e-9);
+  assert.ok(_v1671({ ...base, reference_case_in: 0 }).error);
+  assert.ok(_v1671({ ...base, reference_time_hr: 0 }).error);
+});
+
+test("bounds: spec-v1672 computeJominyQuenchSeverity -- hardenability is not hardness", () => {
+  const base = { jominy_distance_sixteenths: 12, hardness_at_distance_hrc: 34, required_core_hardness_hrc: 38, alt_jominy_distance_sixteenths: 5, alt_hardness_hrc: 48, surface_hardness_hrc: 55 };
+  const r = _v1672(base);
+  assert.ok(Math.abs(r.jominy_distance_in - 0.75) < 1e-12);
+  // The mild quench misses the core requirement and the severe one makes it.
+  assert.equal(r.meets, false);
+  assert.equal(r.alt_meets, true);
+  assert.ok(Math.abs(r.hardness_margin_hrc + 4) < 1e-12);
+  assert.ok(Math.abs(r.alt_margin_hrc - 10) < 1e-12);
+  // A severer quench sits CLOSER to the quenched end.
+  assert.ok(r.alt_jominy_distance_in < r.jominy_distance_in);
+  // Surface hardness (carbon) exceeds the core (alloy) -- the distinction.
+  assert.ok(Math.abs(r.core_to_surface_drop_hrc - 21) < 1e-12);
+  assert.ok(r.hardenability_verdict.includes("HARDENABILITY IS NOT HARDNESS"));
+  // Exactly at the requirement passes.
+  assert.equal(_v1672({ ...base, hardness_at_distance_hrc: 38 }).meets, true);
+  assert.ok(_v1672({ ...base, jominy_distance_sixteenths: 0 }).error);
+});
+
+test("bounds: spec-v1673 computeTemperingTemperature -- the failure a hardness test cannot find", () => {
+  const base = { target_hardness_hrc: 32, curve_temp_f: 1025, section_thickness_in: 2, soak_rate_hr_per_in: 1, minimum_soak_hr: 1, embrittlement_low_f: 700, embrittlement_high_f: 1050, secondary_hardening: "no" };
+  const r = _v1673(base);
+  assert.ok(Math.abs(r.soak_time_hr - 2) < 1e-12);
+  assert.equal(r.minimum_governs, false);
+  // 1,025 degF sits inside the susceptible range and must be flagged.
+  assert.equal(r.in_embrittlement, true);
+  assert.ok(r.embrittlement_verdict.includes("TEMPER EMBRITTLEMENT"));
+  assert.equal(_v1673({ ...base, curve_temp_f: 400 }).in_embrittlement, false);
+  // The minimum governs on a thin part.
+  const thin = _v1673({ ...base, section_thickness_in: 0.5 });
+  assert.equal(thin.minimum_governs, true);
+  assert.ok(Math.abs(thin.soak_time_hr - 1) < 1e-12);
+  assert.ok(Math.abs(thin.computed_soak_hr - 0.5) < 1e-12);
+  // Secondary hardening runs the OTHER way and is called out separately.
+  assert.equal(_v1673({ ...base, secondary_hardening: "yes" }).is_secondary, true);
+  assert.ok(_v1673({ ...base, secondary_hardening: "yes" }).secondary_verdict.includes("HARDER"));
+  assert.ok(Math.abs(r.embrittlement_span_f - 350) < 1e-12);
+  assert.ok(_v1673({ ...base, section_thickness_in: 0 }).error);
+});
+
+test("bounds: spec-v1674 computePwhtHoldingTime -- thickness compounds THREE times", () => {
+  const base = { governing_thickness_in: 2.0, hold_rate_hr_per_in: 1, minimum_hold_hr: 0.25, holding_temp_f: 1150, rate_threshold_temp_f: 800, heating_rate_constant_f_hr_in: 400, cooling_rate_constant_f_hr_in: 500, rate_ceiling_f_hr: 400, actual_heating_rate_f_hr: 250, alt_thickness_in: 4.0 };
+  const r = _v1674(base);
+  assert.ok(Math.abs(r.holding_time_hr - 2.0) < 1e-12);
+  assert.ok(Math.abs(r.max_heating_rate_f_hr - 200) < 1e-12);
+  assert.ok(Math.abs(r.max_cooling_rate_f_hr - 250) < 1e-12);
+  assert.ok(Math.abs(r.heating_hours - 1.75) < 1e-12);
+  assert.ok(Math.abs(r.cooling_hours - 1.40) < 1e-12);
+  assert.ok(Math.abs(r.total_cycle_hr - 5.15) < 1e-9);
+  // The hold is well under half the cycle, which is the whole point.
+  assert.ok(r.holding_time_hr / r.total_cycle_hr < 0.4);
+  // IDENTITY: doubling the thickness doubles the hold AND both ramps, so the
+  // whole cycle exactly doubles.
+  assert.ok(Math.abs(r.alt_total_cycle_hr - 10.3) < 1e-9);
+  assert.ok(Math.abs(r.alt_total_cycle_hr - 2 * r.total_cycle_hr) < 1e-9);
+  // The entered rate exceeds the limit and is flagged.
+  assert.equal(r.rate_exceeded, true);
+  assert.equal(_v1674({ ...base, actual_heating_rate_f_hr: 150 }).rate_exceeded, false);
+  // The ceiling binds on a thin section rather than the thickness rule.
+  assert.ok(Math.abs(_v1674({ ...base, governing_thickness_in: 0.5 }).max_heating_rate_f_hr - 400) < 1e-12);
+  assert.ok(_v1674({ ...base, holding_temp_f: 700 }).error);
+});

@@ -1604,6 +1604,18 @@ const RELATED = {
   "riser-modulus-feeding": ["casting-pour-yield","sand-permeability-vent","melt-furnace-energy"],
   "sand-permeability-vent": ["riser-modulus-feeding","casting-pour-yield","melt-furnace-energy"],
   "melt-furnace-energy": ["casting-pour-yield","riser-modulus-feeding","sand-permeability-vent"],
+  // spec-v1664..v1674: NDT and heat treatment band.
+  "weld-visual-acceptance": ["ut-thickness-velocity","rt-exposure-time","pt-dwell-development"],
+  "ut-thickness-velocity": ["weld-visual-acceptance","rt-exposure-time","mt-yoke-coil-amperage"],
+  "rt-exposure-time": ["rt-restricted-area","ut-thickness-velocity","weld-visual-acceptance"],
+  "rt-restricted-area": ["rt-exposure-time","ut-thickness-velocity","weld-visual-acceptance"],
+  "mt-yoke-coil-amperage": ["pt-dwell-development","weld-visual-acceptance","ut-thickness-velocity"],
+  "pt-dwell-development": ["mt-yoke-coil-amperage","weld-visual-acceptance","rt-exposure-time"],
+  "hardness-tensile-conversion": ["jominy-quench-severity","tempering-temperature","carburizing-case-depth"],
+  "carburizing-case-depth": ["jominy-quench-severity","hardness-tensile-conversion","heat-treat-soak-time"],
+  "jominy-quench-severity": ["quench-severity","hardness-tensile-conversion","tempering-temperature"],
+  "tempering-temperature": ["jominy-quench-severity","hardness-tensile-conversion","heat-treat-soak-time"],
+  "pwht-holding-time": ["heat-treat-soak-time","weld-cooling-rate-t85","interpass-temperature-control"],
   // spec-v1622..v1631: HVAC test-and-balance and hydronic systems band.
   "flow-hood-correction": ["pitot-traverse-cfm","proportional-balance-ratio","traverse-closure"],
   "fan-system-effect": ["fan-affinity-laws","duct-leakage","flow-hood-correction"],

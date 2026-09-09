@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "886fa75f4fe3836b",
+      "sha": "ef7ca565f6e6c4fe",
       "date": "2026-09-09"
     },
     "/tools/": {
-      "sha": "b8eaa1bbd2d7f2b6",
+      "sha": "bae12fbef5f68989",
       "date": "2026-09-09"
     },
     "/groups/accounting/": {
-      "sha": "e8e9877ed338ff26",
+      "sha": "fed492167493187a",
       "date": "2026-09-09"
     },
     "/groups/agriculture/": {
-      "sha": "5f23b177616379fc",
+      "sha": "0e59340d0c029c93",
       "date": "2026-09-09"
     },
     "/groups/construction/": {
-      "sha": "59bb0cf9d08e3b18",
+      "sha": "b88dd1e15fd358e9",
       "date": "2026-09-09"
     },
     "/groups/cross-trade/": {
-      "sha": "eda55cb051d9e8e7",
+      "sha": "0a93273c72ba8288",
       "date": "2026-09-09"
     },
     "/groups/educators/": {
-      "sha": "abf30f1172b8b51e",
+      "sha": "239944b87920e782",
       "date": "2026-09-09"
     },
     "/groups/electrical/": {
-      "sha": "f180c2c520277392",
+      "sha": "5b8d003da9de9290",
       "date": "2026-09-09"
     },
     "/groups/field/": {
-      "sha": "b844d80e23ce29b6",
+      "sha": "ca16ad5595c66df5",
       "date": "2026-09-09"
     },
     "/groups/fire-ground/": {
-      "sha": "dd09cc865e4e0b97",
+      "sha": "f7880fac3ae6ad24",
       "date": "2026-09-09"
     },
     "/groups/historical/": {
-      "sha": "6eeff9bf941978f1",
+      "sha": "351e656d1e65d8f5",
       "date": "2026-09-09"
     },
     "/groups/hvac/": {
-      "sha": "63a628d3668c6d2d",
+      "sha": "85c06d5ae8a196fc",
       "date": "2026-09-09"
     },
     "/groups/kitchen/": {
-      "sha": "cfee8be1aa360e30",
+      "sha": "2f81d3a68c7ff30d",
       "date": "2026-09-09"
     },
     "/groups/lab/": {
-      "sha": "9beb6ed09b8eed84",
+      "sha": "3e7614f779963381",
       "date": "2026-09-09"
     },
     "/groups/mechanic/": {
-      "sha": "36e96b2848b12d7d",
+      "sha": "821d12ca4a493843",
       "date": "2026-09-09"
     },
     "/groups/plumbing/": {
-      "sha": "4298d3d588e6bdf6",
+      "sha": "2b6c2f5f28acc978",
       "date": "2026-09-09"
     },
     "/groups/real-estate/": {
-      "sha": "241075eb1e84b854",
+      "sha": "9003f94e1f927bc2",
       "date": "2026-09-09"
     },
     "/groups/references/": {
-      "sha": "a09f774b709cd973",
+      "sha": "72df1ab294453002",
       "date": "2026-09-09"
     },
     "/groups/restoration/": {
-      "sha": "ecfb01c2384ecbef",
+      "sha": "59926be3ac33342b",
       "date": "2026-09-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "1617c91b1e4660cb",
+      "sha": "7e8012d7c8d3333b",
       "date": "2026-09-09"
     },
     "/groups/stage/": {
-      "sha": "4a250608e3195fb5",
+      "sha": "214ed40f1e95cabd",
       "date": "2026-09-09"
     },
     "/groups/trucking/": {
-      "sha": "a53feb353a2f388b",
+      "sha": "ed9388413b3171c4",
       "date": "2026-09-09"
     },
     "/groups/water/": {
-      "sha": "a6b359e80dc17c72",
+      "sha": "584014e79973961d",
       "date": "2026-09-09"
     },
     "/tools/aav-install-check/": {
@@ -904,6 +904,10 @@
     "/tools/carburetor-altitude-jetting/": {
       "sha": "f976eff803487ac0",
       "date": "2026-09-04"
+    },
+    "/tools/carburizing-case-depth/": {
+      "sha": "37f80ab4c3553074",
+      "date": "2026-09-09"
     },
     "/tools/cardioid-sub-array/": {
       "sha": "3f1755158321e872",
@@ -3289,6 +3293,10 @@
       "sha": "a438fe582df2ec0f",
       "date": "2026-09-01"
     },
+    "/tools/hardness-tensile-conversion/": {
+      "sha": "c69de41985f98b78",
+      "date": "2026-09-09"
+    },
     "/tools/hardwood-floor-drying-mat/": {
       "sha": "c0eff501253b35e1",
       "date": "2026-09-01"
@@ -3744,6 +3752,10 @@
     "/tools/joist-notch-bore-limit/": {
       "sha": "275340f42550149b",
       "date": "2026-09-01"
+    },
+    "/tools/jominy-quench-severity/": {
+      "sha": "4cedaea152447f90",
+      "date": "2026-09-09"
     },
     "/tools/keg-yield/": {
       "sha": "f402c70bf8993a34",
@@ -4472,6 +4484,10 @@
     "/tools/motor-vd-starting/": {
       "sha": "b39012c652a9f42e",
       "date": "2026-09-01"
+    },
+    "/tools/mt-yoke-coil-amperage/": {
+      "sha": "0cef2f7ff5a17c8c",
+      "date": "2026-09-09"
     },
     "/tools/mua-tempering-load/": {
       "sha": "88b092bcdae61093",
@@ -5233,6 +5249,10 @@
       "sha": "ed891d2f11901dee",
       "date": "2026-09-01"
     },
+    "/tools/pt-dwell-development/": {
+      "sha": "498b5543082391ba",
+      "date": "2026-09-09"
+    },
     "/tools/pull-box-sizing/": {
       "sha": "39e192d89e7d1dd8",
       "date": "2026-09-01"
@@ -5344,6 +5364,10 @@
     "/tools/pv-string-sizing/": {
       "sha": "9fff5af7d6f016b1",
       "date": "2026-09-01"
+    },
+    "/tools/pwht-holding-time/": {
+      "sha": "de048ad5802528ab",
+      "date": "2026-09-09"
     },
     "/tools/pyramid-frustum-volume/": {
       "sha": "a11a0d34280d5852",
@@ -5880,6 +5904,14 @@
     "/tools/round-to-rect-duct/": {
       "sha": "6c913fe6855dc943",
       "date": "2026-09-01"
+    },
+    "/tools/rt-exposure-time/": {
+      "sha": "ed98d0239c63113b",
+      "date": "2026-09-09"
+    },
+    "/tools/rt-restricted-area/": {
+      "sha": "d09e87be7315210f",
+      "date": "2026-09-09"
     },
     "/tools/rtd-resistance-to-temp/": {
       "sha": "35cd81ffeb3a82a5",
@@ -7177,6 +7209,10 @@
       "sha": "18238b1ddb7537e1",
       "date": "2026-09-01"
     },
+    "/tools/tempering-temperature/": {
+      "sha": "36c4599b293ed86a",
+      "date": "2026-09-09"
+    },
     "/tools/temporary-stairway-check/": {
       "sha": "f2ea5bc49ea67408",
       "date": "2026-09-01"
@@ -7657,6 +7693,10 @@
       "sha": "23b5aa8d94b89ea8",
       "date": "2026-09-01"
     },
+    "/tools/ut-thickness-velocity/": {
+      "sha": "229dc7211e3f234e",
+      "date": "2026-09-09"
+    },
     "/tools/utm-conversion/": {
       "sha": "918fda6d7167df7d",
       "date": "2026-09-01"
@@ -7930,8 +7970,8 @@
       "date": "2026-09-01"
     },
     "/tools/weld-heat-input/": {
-      "sha": "4e2986fdcb6cfe7f",
-      "date": "2026-09-01"
+      "sha": "295be09c3c880ef7",
+      "date": "2026-09-09"
     },
     "/tools/weld-metal-volume/": {
       "sha": "492b6cc31b6d5feb",
@@ -7956,6 +7996,10 @@
     "/tools/weld-usage/": {
       "sha": "f191d1d3bb469740",
       "date": "2026-09-01"
+    },
+    "/tools/weld-visual-acceptance/": {
+      "sha": "9c68f65a0471aeef",
+      "date": "2026-09-09"
     },
     "/tools/welded-wire-mesh/": {
       "sha": "a58db588332ab0dd",

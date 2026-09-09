@@ -106331,6 +106331,533 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "weld-visual-acceptance",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Weld Visual Acceptance Limits (AWS D1.1) -- the spec-v1664 worked example, recomputed",
+   "source_edition_or_year": "spec-v1664 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "nominal_leg_in": 0.375,
+    "measured_leg_in": 0.3125,
+    "undersize_length_in": 3,
+    "weld_length_in": 20,
+    "allowed_undersize_in": 0.0625,
+    "allowed_undersize_fraction": 0.1,
+    "measured_undercut_in": 0.03,
+    "allowed_undercut_in": 0.03125,
+    "crack_present": "yes"
+   },
+   "outputs": {
+    "undersize_in": {
+     "value": 0.0625,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "undersize_length_fraction": {
+     "value": 0.15,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "allowed_undersize_length_in": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "undercut_margin_in": {
+     "value": 0.00125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ut-thickness-velocity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Ultrasonic Thickness Velocity and Calibration -- the spec-v1665 worked example, recomputed",
+   "source_edition_or_year": "spec-v1665 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "transit_time_us": 45,
+    "gauge_velocity_in_us": 0.232,
+    "actual_velocity_in_us": 0.249,
+    "nominal_wall_in": 0.5,
+    "retirement_limit_in": 0.19,
+    "coating_thickness_in": 0.012
+   },
+   "outputs": {
+    "gauge_reading_in": {
+     "value": 5.22,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "true_thickness_in": {
+     "value": 5.6025,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "error_pct": {
+     "value": -6.82731,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "error_on_nominal_in": {
+     "value": -0.03414,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "thinnest_passing_in": {
+     "value": 0.20392,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "coating_overread_in": {
+     "value": 0.03215,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rt-exposure-time",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Radiographic Exposure Time and Source-to-Film Distance -- the spec-v1666 worked example, recomputed",
+   "source_edition_or_year": "spec-v1666 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "base_exposure_s": 60,
+    "base_distance_in": 24,
+    "new_distance_in": 36,
+    "source_size_in": 0.12,
+    "material_thickness_in": 0.75,
+    "days_elapsed": 60,
+    "half_life_days": 73.83,
+    "unsharpness_limit_in": 0.0208
+   },
+   "outputs": {
+    "new_exposure_s": {
+     "value": 135,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ug_base_in": {
+     "value": 0.00375,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ug_new_in": {
+     "value": 0.0025,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "decay_factor": {
+     "value": 0.56932,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "decayed_exposure_s": {
+     "value": 237.12326,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "activity_pct": {
+     "value": 56.93242,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rt-restricted-area",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Radiography Restricted-Area Boundary Distance -- the spec-v1667 worked example, recomputed",
+   "source_edition_or_year": "spec-v1667 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "source_activity_ci": 60,
+    "gamma_constant_r_h_ci_ft": 0.48,
+    "boundary_limit_mr_h": 2,
+    "collimator_attenuation_factor": 0.05,
+    "public_limit_mr_h": 0.5,
+    "shielding_factor": 1
+   },
+   "outputs": {
+    "dose_rate_1ft_r_h": {
+     "value": 28.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "boundary_distance_ft": {
+     "value": 120,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "collimated_distance_ft": {
+     "value": 26.83282,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "public_distance_ft": {
+     "value": 240,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mt-yoke-coil-amperage",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Magnetic Particle Yoke and Coil Amperage -- the spec-v1668 worked example, recomputed",
+   "source_edition_or_year": "spec-v1668 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "part_diameter_in": 6,
+    "amps_per_inch": 800,
+    "part_length_in": 36,
+    "coil_turns": 5,
+    "fill_factor": "high",
+    "yoke_pole_spacing_in": 6,
+    "yoke_current": "ac"
+   },
+   "outputs": {
+    "circular_amps": {
+     "value": 4800,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ld_used": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "coil_amp_turns": {
+     "value": 4375,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "coil_amps": {
+     "value": 875,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "yoke_lift_required_lb": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pt-dwell-development",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Liquid Penetrant Dwell and Development Time -- the spec-v1669 worked example, recomputed",
+   "source_edition_or_year": "spec-v1669 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "penetration_dwell_min": 25,
+    "development_dwell_min": 10,
+    "evaluation_window_start_min": 10,
+    "evaluation_window_end_min": 60,
+    "evaluation_at_min": 20,
+    "part_temp_f": 70,
+    "min_procedure_temp_f": 40,
+    "max_procedure_temp_f": 125
+   },
+   "outputs": {
+    "total_process_min": {
+     "value": 35,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "evaluation_margin_min": {
+     "value": 40,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hardness-tensile-conversion",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Hardness Conversion and Estimated Tensile Strength -- the spec-v1670 worked example, recomputed",
+   "source_edition_or_year": "spec-v1670 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "brinell_hb": 200,
+    "tensile_coefficient_ksi_per_hb": 0.5,
+    "actual_uts_ksi": 0,
+    "case_hardness_hb": 650,
+    "core_hardness_hb": 285
+   },
+   "outputs": {
+    "estimated_uts_ksi": {
+     "value": 100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "case_estimated_uts_ksi": {
+     "value": 325,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "core_estimated_uts_ksi": {
+     "value": 142.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "overstatement_pct": {
+     "value": 128.07018,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "carburizing-case-depth",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Carburizing Case Depth and Time at Temperature -- the spec-v1671 worked example, recomputed",
+   "source_edition_or_year": "spec-v1671 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "reference_case_in": 0.0707,
+    "reference_time_hr": 8,
+    "time_hr": 8,
+    "target_case_in": 0.1414,
+    "hotter_reference_case_in": 0.099
+   },
+   "outputs": {
+    "case_depth_in": {
+     "value": 0.07071,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "time_for_target_hr": {
+     "value": 31.99034,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "time_ratio": {
+     "value": 3.99879,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "depth_ratio": {
+     "value": 1.9997,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hotter_time_hr": {
+     "value": 16.3216,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "jominy-quench-severity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Quench Severity and Jominy Hardenability Depth -- the spec-v1672 worked example, recomputed",
+   "source_edition_or_year": "spec-v1672 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "jominy_distance_sixteenths": 12,
+    "hardness_at_distance_hrc": 34,
+    "required_core_hardness_hrc": 38,
+    "alt_jominy_distance_sixteenths": 5,
+    "alt_hardness_hrc": 48,
+    "surface_hardness_hrc": 55
+   },
+   "outputs": {
+    "jominy_distance_in": {
+     "value": 0.75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hardness_margin_hrc": {
+     "value": -4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_jominy_distance_in": {
+     "value": 0.3125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_margin_hrc": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "core_to_surface_drop_hrc": {
+     "value": 21,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tempering-temperature",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Tempering Temperature for a Target Hardness -- the spec-v1673 worked example, recomputed",
+   "source_edition_or_year": "spec-v1673 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "target_hardness_hrc": 32,
+    "curve_temp_f": 1025,
+    "section_thickness_in": 2,
+    "soak_rate_hr_per_in": 1,
+    "minimum_soak_hr": 1,
+    "embrittlement_low_f": 700,
+    "embrittlement_high_f": 1050,
+    "secondary_hardening": "no"
+   },
+   "outputs": {
+    "soak_time_hr": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "computed_soak_hr": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "embrittlement_span_f": {
+     "value": 350,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pwht-holding-time",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Post-Weld Heat Treatment Holding Time and Rate -- the spec-v1674 worked example, recomputed",
+   "source_edition_or_year": "spec-v1674 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "governing_thickness_in": 2,
+    "hold_rate_hr_per_in": 1,
+    "minimum_hold_hr": 0.25,
+    "holding_temp_f": 1150,
+    "rate_threshold_temp_f": 800,
+    "heating_rate_constant_f_hr_in": 400,
+    "cooling_rate_constant_f_hr_in": 500,
+    "rate_ceiling_f_hr": 400,
+    "actual_heating_rate_f_hr": 250,
+    "alt_thickness_in": 4
+   },
+   "outputs": {
+    "holding_time_hr": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_heating_rate_f_hr": {
+     "value": 200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_cooling_rate_f_hr": {
+     "value": 250,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heating_hours": {
+     "value": 1.75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cooling_hours": {
+     "value": 1.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_cycle_hr": {
+     "value": 5.15,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_total_cycle_hr": {
+     "value": 10.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

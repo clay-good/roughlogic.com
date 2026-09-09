@@ -1310,6 +1310,16 @@ export const TOOL_MODULES = (() => {
     "casting-pour-yield", "riser-modulus-feeding", "sand-permeability-vent",
     "melt-furnace-energy",
   ]);
+  // spec-v1664..v1674: the nondestructive examination and heat treatment
+  // bench. Six NDT methods a weld inspector runs, and the five heat-treatment
+  // calculations that decide whether the steel underneath them is what the
+  // certificate says.
+  declare("./calc-inspection.js", "INSPECTION_RENDERERS", [
+    "weld-visual-acceptance", "ut-thickness-velocity", "rt-exposure-time",
+    "rt-restricted-area", "mt-yoke-coil-amperage", "pt-dwell-development",
+    "hardness-tensile-conversion", "carburizing-case-depth",
+    "jominy-quench-severity", "tempering-temperature", "pwht-holding-time",
+  ]);
   // spec-v1524..v1533: the oil, gas and pipeline bench (Group E). Two benches
   // in one module because they share a vocabulary and a reader: the
   // transmission and integrity side (MAOP, gas flow, station spacing, pigging,

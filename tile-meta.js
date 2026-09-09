@@ -1161,6 +1161,18 @@ const _TILES = [
   ["riser-modulus-feeding", "G"],
   ["sand-permeability-vent", "G"],
   ["melt-furnace-energy", "G"],
+  // spec-v1664..v1674 NDT and heat treatment band
+  ["weld-visual-acceptance", "E"],
+  ["ut-thickness-velocity", "E"],
+  ["rt-exposure-time", "E"],
+  ["rt-restricted-area", "E"],
+  ["mt-yoke-coil-amperage", "E"],
+  ["pt-dwell-development", "E"],
+  ["hardness-tensile-conversion", "E"],
+  ["carburizing-case-depth", "E"],
+  ["jominy-quench-severity", "E"],
+  ["tempering-temperature", "E"],
+  ["pwht-holding-time", "E"],
   // spec-v1622..v1631 HVAC test-and-balance and hydronic systems band
   ["flow-hood-correction", "C"],
   ["fan-system-effect", "C"],

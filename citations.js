@@ -22313,6 +22313,140 @@ export const CITATIONS = {
       { name: "Downwash is not modelled", value: "a short stack near buildings can lose its rise entirely", source: "good engineering practice stack height rules" },
     ],
   },
+  // spec-v1664..v1674: the 2026-09-09 trade-expansion nondestructive
+  // examination and heat treatment band. Eleven tiles, nothing cut.
+  "weld-visual-acceptance": {
+    formula: "a crack is rejectable WITHOUT regard to size; undersize is two independent tests -- the amount against a permitted allowance and the length against a permitted fraction of the weld, both of which must pass; undercut is compared against a limit that differs between statically and cyclically loaded connections.",
+    edition: "Weld visual acceptance as AWS D1.1 and equivalent codes structure it. Every limit is ENTERED from the applicable code and edition, because an acceptance table reproduced here would go stale between editions and be wrong for every code but the one chosen.",
+    freeAccess: "Comparisons against entered limits; no code table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Three things decide a visual examination and they fail differently, which is why they are kept apart. A CRACK is rejectable without dimension, and nothing else is reached once one is found -- the one most often argued about is the crater crack at a stop, which is small, looks cosmetic, and is a crack. UNDERSIZE is two tests: a limited amount over a limited length, both of which must be satisfied, so a weld a sixteenth light over a short run can be acceptable while the same shortfall over the whole weld is not. And the limits themselves depend on the LOADING -- undercut allowances tighten and porosity criteria change between static and cyclic connections, so the same weld can pass as one and fail as the other, and on a structure carrying both the criteria change from member to member.",
+    assumptions: [
+      { name: "Limits are entered per code and edition", value: "no acceptance table is reproduced", source: "AWS D1.1 or the applicable code" },
+      { name: "Loading must be known first", value: "static and cyclic criteria differ", source: "the contract documents" },
+      { name: "A subset of visual items", value: "reinforcement, convexity, overlap, profile and arc strikes are not covered", source: "the full visual examination" },
+    ],
+  },
+  "ut-thickness-velocity": {
+    formula: "thickness = velocity x round-trip transit time / 2. The velocity error is a PERCENTAGE, so its absolute effect scales with the wall being inspected; the thinnest wall that still reads at a retirement limit is limit x gauge velocity / actual velocity.",
+    edition: "The ultrasonic pulse-echo thickness relation. Velocities are ENTERED (steel about 0.232 in/us, aluminium about 0.2490) because they vary with alloy, temperature and grain structure -- a published table is a starting point and not a calibration.",
+    freeAccess: "One relation and two entered velocities.",
+    governance: GOVERNANCE.general,
+    editionNote: "A thickness gauge is a TIMER: it multiplies a measured transit time by whatever velocity it was told, so a gauge calibrated on steel and used on aluminium reports a number that is precise, repeatable, documented and wrong by about 7%. The error scales with the wall, so an absolute figure computed at one thickness does not transfer to another -- 7% of a five-inch section is nearly four hundred thousandths and 7% of a half-inch wall is thirty-four. THE TWO DIRECTIONS ARE NOT EQUALLY DANGEROUS: a gauge reading low retires equipment early, and a gauge reading high leaves a wall in service that is already below its retirement limit with a report saying it passed. Coating in single-echo mode reads thick, again in the unsafe direction, and echo-to-echo removes it.",
+    assumptions: [
+      { name: "Velocities are entered", value: "they vary with alloy, temperature and grain structure", source: "a calibration block of the actual material" },
+      { name: "A gauge finds thickness under the probe", value: "a pit between readings is missed entirely", source: "the inspection plan and grid" },
+      { name: "Not a fitness-for-service assessment", value: "and it does not set a retirement limit", source: "API 570 / API 653" },
+    ],
+  },
+  "rt-exposure-time": {
+    formula: "exposure scales with the INVERSE SQUARE of source-to-film distance, t2 = t1 x (d2/d1)^2; geometric unsharpness Ug = source size x material thickness / distance falls only in direct proportion; and source activity decays as 0.5^(days / half-life), Ir-192 at 73.83 days and Co-60 at 1,925.3 days.",
+    edition: "Radiographic technique arithmetic. The unsharpness LIMIT comes from the applicable code section for the thickness and is entered, as is the half-life so both common industrial sources are covered.",
+    freeAccess: "One inverse-square relation, one geometric ratio, and one exponential decay.",
+    governance: GOVERNANCE.general,
+    editionNote: "The trade is always the same shape: unsharpness improves linearly with distance and exposure worsens quadratically, so whether the longer shot is worth buying depends entirely on the code's unsharpness limit for the thickness. If the short distance already passes, the extra distance buys nothing the code asks for; if it fails, the minimum distance that meets it is the number wanted. SOURCE DECAY IS THE ERROR THAT NEEDS NOTHING TO GO WRONG -- an Ir-192 source loses half its activity in about 74 days, so a technique sheet written two months ago and used unchanged underexposes by nearly half, and the result is a light radiograph that may be interpreted rather than rejected.",
+    assumptions: [
+      { name: "Unsharpness limit is entered", value: "it varies with thickness and code section", source: "the applicable code" },
+      { name: "Half-life is entered", value: "Ir-192 73.83 days, Co-60 1,925.3 days", source: "published nuclide data" },
+      { name: "Not a radiation safety calculation", value: "the restricted-area boundary is a separate question", source: "10 CFR Part 34 or the state equivalent" },
+    ],
+  },
+  "rt-restricted-area": {
+    formula: "dose rate at 1 ft = source activity x gamma constant x any shielding transmission factor; the boundary distance is sqrt(dose rate at 1 ft / permitted rate), a point-source inverse-square estimate.",
+    edition: "A point-source boundary ESTIMATE. The gamma constant, both dose-rate limits and any collimator or shielding factor are entered because they are source-specific and jurisdictional. It is not a substitute for a survey.",
+    freeAccess: "One inverse-square relation on entered constants.",
+    governance: GOVERNANCE.general,
+    editionNote: "The square root governs what is worth doing about a boundary: halving a boundary distance requires cutting the effective activity by a FACTOR OF FOUR. No practical change to the source does that, and a smaller source means a longer exposure, which is not obviously safer -- a COLLIMATOR does it in every direction outside the beam, which is why it is the single largest control available. There are two limits and the stricter governs: at the boundary of an area accessible to the public the permitted rate is substantially lower and the distance correspondingly further, so a job beside an occupied building or a public road is governed by that figure. AND THE CALCULATION IS A STARTING POINT: scatter from surrounding structures makes the real field differ from a point source in free air, and a rope placed on a calculated number and never surveyed is not a controlled area.",
+    assumptions: [
+      { name: "Point source in free air", value: "scatter and real geometry change the actual field", source: "a calibrated survey meter" },
+      { name: "Limits are entered", value: "they are jurisdictional and differ for public areas", source: "10 CFR Part 34 or the state equivalent" },
+      { name: "Not a radiation safety analysis", value: "no shielding design, dosimetry, ALARA planning or total dose", source: "the licensee's radiation safety officer" },
+    ],
+  },
+  "mt-yoke-coil-amperage": {
+    formula: "circular field current = part diameter x amperes per inch; coil shot amp-turns = 35,000 / (L/D + 2) at high fill factor or 45,000 / (L/D + 2) at low, with L/D bounded between 2 and 15; and the yoke lift check of 10 lb on AC or 40 lb on DC at maximum pole spacing.",
+    edition: "Magnetic particle starting currents as ASTM E1444 and E709 practice state them. The amperes per inch is entered (commonly 300 to 800) because it depends on the part and the technique.",
+    freeAccess: "Two published formulae and one lift-test figure.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE ORIENTATION TRAP is what makes this worth a calculation. An indication appears where a discontinuity interrupts the field, so a crack lying PARALLEL to the field lines produces no leakage and does not indicate -- at any amperage, with any particles, under any light. A circular field finds longitudinal cracks; a longitudinal field from a coil or between a yoke's poles finds transverse ones. An examination performed with a single shot has examined for a single crack orientation, and a report describing it as an examination of the part is wrong. Field adequacy is verified with a gauss meter or a quantitative quality indicator rather than by the amperage setting, because the actual field depends on geometry, permeability and the current path in ways no formula captures.",
+    assumptions: [
+      { name: "L/D bounded 2 to 15", value: "outside that range the coil relations do not apply", source: "ASTM E1444" },
+      { name: "Amperes per inch is entered", value: "commonly 300 to 800, depending on part and technique", source: "the written technique" },
+      { name: "Adequacy is verified, not calculated", value: "a gauss meter or quantitative quality indicator", source: "ASTM E709 / the procedure" },
+    ],
+  },
+  "pt-dwell-development": {
+    formula: "penetration dwell, development dwell and the evaluation window, all compared against an entered procedure; the part temperature is screened against the procedure's qualified range.",
+    edition: "Liquid penetrant timing as ASTM E1417 and ASME Section V Article 6 practice state it. Every time and range is ENTERED from the written procedure, because the dwell is selected for the discontinuity type and the window is a procedure parameter.",
+    freeAccess: "Comparisons against entered procedure times.",
+    governance: GOVERNANCE.general,
+    editionNote: "Every error in a penetrant examination is SILENT -- it produces a clean report rather than an obvious failure, which is what makes a checklist worth having. The dwell is chosen for the DISCONTINUITY TYPE and not for the part: a five-minute dwell taken from a casting row and applied to a tight fatigue crack does not let the penetrant enter, and the part shows clean. The evaluation window is when the examination is VALID: indications grow after developer, so reading too early misses ones still forming and too late finds bleed-out whose size no longer relates to the discontinuity. Two failures appear in none of the times -- DRYING, where penetrant dries in place during a long dwell in sun or wind and no developing brings it back, and TEMPERATURE outside the qualified range, where the method must be demonstrated on a comparator block before any result means anything.",
+    assumptions: [
+      { name: "All times are entered", value: "from the written procedure", source: "ASTM E1417 / ASME V Article 6" },
+      { name: "Dwell is chosen for the discontinuity", value: "not for the part or the material", source: "the procedure's dwell table" },
+      { name: "Pre-cleaning is not addressed", value: "and is where most penetrant examinations are actually lost", source: "the written procedure" },
+    ],
+  },
+  "hardness-tensile-conversion": {
+    formula: "estimated tensile strength = Brinell hardness x a coefficient, about 0.50 ksi per HB for steel; the case and core figures are the same relation applied to two readings on one part.",
+    edition: "The ASTM A370 approximate hardness-to-tensile relationship for STEEL, with the coefficient ENTERED because it differs outside steel. ASTM E140 covers scale conversion, which this does not perform.",
+    freeAccess: "One multiplication against an entered coefficient.",
+    governance: GOVERNANCE.general,
+    editionNote: "The correlation is a STEEL relationship. Aluminium alloys need their own coefficient and it differs between them; austenitic stainless work-hardens under the indenter and reads high; grey cast iron's graphite structure makes it unreliable with no consistent direction -- so applying the steel coefficient outside steel gives numbers that are sometimes nearly right and sometimes badly wrong, with nothing in the reading to say which. THE SURFACE TRAP MATTERS MOST: a hardness reading is a SURFACE property and a tensile strength is a SECTION property. A carburised or induction-hardened part has a hard thin case over a much softer core, and converting the surface reading to a strength overstates the load-carrying capacity substantially, because the case is thin and the core carries the load.",
+    assumptions: [
+      { name: "Coefficient is entered", value: "about 0.50 ksi per HB for steel; different or absent elsewhere", source: "ASTM A370" },
+      { name: "Scale conversion is not performed", value: "published tables are empirical and diverge at the extremes", source: "ASTM E140" },
+      { name: "Hardness predicts neither yield, ductility, toughness nor fatigue", value: "and a hard surface can reduce the last", source: "a laboratory tensile test" },
+    ],
+  },
+  "carburizing-case-depth": {
+    formula: "the parabolic diffusion relation case depth = k x sqrt(time), inverted as time = (depth / k)^2, so doubling a case QUADRUPLES the cycle.",
+    edition: "Carburising case depth kinetics. The rate constant k is ENTERED because it depends strongly on carburising temperature, on the atmosphere's carbon potential and on the steel, and a published figure for one combination does not transfer to another.",
+    freeAccess: "One diffusion relation on an entered rate constant.",
+    governance: GOVERNANCE.general,
+    editionNote: "Depth goes with the SQUARE ROOT of time, so a deeper case costs far more than it looks: doubling a case quadruples the cycle, which on a batch furnace is the difference between two loads a day and one every day and a half. The temperature lever is real and not free -- raising the carburising temperature increases k substantially and reaches the same case in far less time, at the cost of grain coarsening, more distortion to correct in grinding, and shorter fixture and furnace life. AND THE SPECIFICATION TRAP IS WHERE SUPPLIER AND CUSTOMER DISAGREE ABOUT A CORRECT PART: 'case depth 0.030 in' does not say whether it is EFFECTIVE case depth measured to a stated hardness or TOTAL case depth, and the total is always larger.",
+    assumptions: [
+      { name: "Rate constant is entered", value: "it depends on temperature, atmosphere and steel", source: "the heat treater's process data" },
+      { name: "Effective and total case differ", value: "and the drawing must say which, and to what hardness", source: "the applicable process standard" },
+      { name: "Hardness profile is not predicted", value: "it depends on the quench as much as on the carburising", source: "a metallurgical section" },
+    ],
+  },
+  "jominy-quench-severity": {
+    formula: "the Jominy end-quench curve read at an equivalent Jominy distance; the equivalence between a bar diameter at a quench severity and a position on the Jominy bar is a CHART lookup rather than a closed form, so the distance and the hardness there are entered.",
+    edition: "Steel hardenability as ASTM A255 expresses it, with the Lamont-type severity charts as the equivalence. Hardness is set by CARBON and hardenability by ALLOYING -- they are different properties. This asks how DEEP hardness reaches; `quench-severity` asks whether agitation helps, through the Biot number.",
+    freeAccess: "An entered chart reading and its comparisons.",
+    governance: GOVERNANCE.general,
+    editionNote: "Hardenability and hardness are different properties and confusing them is the classic error. Maximum hardness is set almost entirely by carbon content, so a steel of a given carbon will not exceed a certain hardness however it is quenched; hardenability is set by the alloying and determines how far below the surface that hardness extends. Two steels of identical carbon reach nearly the same SURFACE hardness and behave completely differently at the core of a thick section -- so a shop substituting one for the other because the carbon matches produces a part that tests correctly at the surface and is soft where the load is. The severity lever has a cost that is easy to ignore: moving from oil to water roughly triples the distortion and quench-cracking risk on a part with section changes or sharp corners, and the answer is often a more hardenable steel rather than a more severe quench.",
+    assumptions: [
+      { name: "The equivalence is a chart lookup", value: "not a closed form, so the distance is entered", source: "the applicable severity charts" },
+      { name: "The Jominy curve is entered", value: "it is a property of the specific steel and heat", source: "the steel supplier's data" },
+      { name: "Tempering follows and reduces hardness", value: "and is not modelled here", source: "the heat treatment specification" },
+    ],
+  },
+  "tempering-temperature": {
+    formula: "soak time = section thickness x an entered rate against a stated minimum, with the tempering TEMPERATURE read from the steel's own curve and entered; the temperature is screened against an entered temper embrittlement range.",
+    edition: "Tempering practice with the temperature taken from the grade's own tempering curve, which is entered because it is a property of the specific steel and no general relationship replaces it.",
+    freeAccess: "One soak rule and one range comparison.",
+    governance: GOVERNANCE.general,
+    editionNote: "Two things go wrong at exactly the right hardness. TEMPER EMBRITTLEMENT is the failure a hardness test cannot find: some alloy steels are susceptible in a range around the middle of the tempering scale, particularly on SLOW cooling through it, and a part tempered there and furnace-cooled comes out at precisely the specified hardness with substantially reduced impact toughness. SECONDARY HARDENING runs the other way and catches anyone reasoning from structural steel: a tool steel such as H13 is HARDER tempered at the high end of its range than the low, because alloy carbides precipitate there, and such grades are commonly double or triple tempered because each temper transforms retained austenite the next one then tempers -- a single temper leaves untempered martensite in the finished part.",
+    assumptions: [
+      { name: "The tempering curve is entered", value: "it is a property of the specific grade", source: "the steel supplier's data" },
+      { name: "Embrittlement susceptibility is grade-specific", value: "and the range is entered", source: "the applicable process standard" },
+      { name: "Hardness is the only thing confirmed", value: "toughness and retained austenite are not", source: "a metallurgical evaluation" },
+    ],
+  },
+  "pwht-holding-time": {
+    formula: "holding time = governing thickness x a code rate against a stated minimum; above a threshold temperature the heating and cooling rates are limited to a constant divided by the thickness, under a ceiling; the total cycle is the hold plus both controlled ramps.",
+    edition: "Post-weld heat treatment cycle arithmetic. Every parameter -- rates, minimum, threshold, constants, ceiling and the code's definition of GOVERNING THICKNESS -- is entered from the applicable code, which for a joint between unequal thicknesses does not simply take the thicker member.",
+    freeAccess: "Arithmetic on entered code parameters; no code table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The controlled ramps either side of the hold frequently exceed the hold itself, so a schedule written on the hold alone is wrong by a factor of two or more. THE RATES ARE THE PART MOST OFTEN VIOLATED, and the reason for the limit is mechanism rather than caution: heating or cooling a heavy section too fast puts a thermal gradient through exactly the material the treatment exists to relieve, which ADDS residual stress rather than removing it. Breaking the rate produces nothing visible at the time and saves real schedule, which is why it goes. Thickness compounds three times over -- doubling it doubles the hold and halves both permitted rates -- so the cycle grows with thickness in every one of its three parts. And the governing thickness is defined by the code rather than by measurement, so getting it wrong moves the hold and both rate limits together.",
+    assumptions: [
+      { name: "All code parameters are entered", value: "rates, minimum, threshold, constants and ceiling", source: "ASME VIII, B31.1/B31.3, AWS D1.1" },
+      { name: "Governing thickness is a code definition", value: "for unequal thicknesses it is not simply the thicker member", source: "the applicable code" },
+      { name: "Whether PWHT is required is not determined", value: "that turns on material, thickness and service", source: "the code and the responsible engineer" },
+    ],
+  },
   // spec-v1705..v1716: the 2026-09-09 trade-expansion plastics processing and
   // foundry band. Twelve tiles, nothing cut.
   "injection-clamp-tonnage": {
