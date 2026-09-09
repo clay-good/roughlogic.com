@@ -134,7 +134,9 @@ prior formula because different AHJs accept different versions:
 - Tiles affected: X.* loan-limit / conforming / jumbo tiles; the
   bundled shard at [../data/realestate/loan-limits.json](../data/realestate/loan-limits.json)
   carries `refresh_cadence: "annual"`.
-- Free-access source: fhfa.gov/DataTools/Downloads.
+- Free-access source: fhfa.gov/data/conforming-loan-limit (the older
+  fhfa.gov/DataTools/Downloads path still redirects, but names FHFA's whole
+  dataset index rather than the conforming-loan-limit page).
 - Handling: the rollover is shape-stable (cap numbers move, file
   schema does not). Treat as a math-change correction step, with
   the prior-year cap row preserved as a per-tile history entry

@@ -321,6 +321,40 @@ test("check-free-access reads the cycle file and catches a soft 404", async () =
   assert.match(src, /free_access_url/, "the probe no longer collects free_access_url");
   assert.match(src, /SOFT_404/, "soft-404 detection is gone");
   assert.match(src, /notfound/i, "the soft-404 pattern no longer matches a not-found path");
+  // Third surface: the shards' own `free_access` prose, which is what the data
+  // files promise a reader can go and read. The loan-limits shard had been
+  // sending people to a hard 404 for as long as nothing looked at it.
+  assert.match(src, /free_access\b/, "the probe no longer reads shard free_access strings");
+  assert.match(src, /DATA_DIR/, "the probe no longer walks data/");
+});
+
+// A shard's `free_access` names where a reader can go and read the source for
+// themselves. FHFA moved its conforming-loan-limit page, and the shard kept
+// pointing at fhfa.gov/data/loan-limit-values, which 404s.
+test("no shard free_access names a URL known to be dead", async () => {
+  const { readdir } = await import("node:fs/promises");
+  const dataDir = resolve(ROOT, "data");
+  // Paths a publisher has retired. Checking the live URL needs the network, so
+  // this pins only what was positively confirmed dead, on the date given.
+  const RETIRED = [
+    // 2026-09-09: hard 404. FHFA moved it to /data/conforming-loan-limit.
+    "fhfa.gov/data/loan-limit-values",
+  ];
+  let checked = 0;
+  for (const folder of await readdir(dataDir, { withFileTypes: true })) {
+    if (!folder.isDirectory()) continue;
+    for (const name of await readdir(resolve(dataDir, folder.name))) {
+      if (!name.endsWith(".json")) continue;
+      const body = await readJson("data/" + folder.name + "/" + name);
+      const fa = body && typeof body.free_access === "string" ? body.free_access : "";
+      if (!fa) continue;
+      checked += 1;
+      for (const dead of RETIRED) {
+        assert.ok(!fa.includes(dead), "data/" + folder.name + "/" + name + " points at " + dead);
+      }
+    }
+  }
+  assert.ok(checked >= 10, "expected many shards to carry free_access, got " + checked);
 });
 
 // CF-05. `last_verified` is the field the machine reads -- CF-03 measures the

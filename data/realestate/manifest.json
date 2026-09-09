@@ -9,7 +9,7 @@
     {
       "file": "loan-limits.json",
       "name": "FHFA conforming + HUD FHA + VA loan limits (2026)",
-      "gzip_size_bytes": 1306
+      "gzip_size_bytes": 1311
     },
     {
       "file": "hud-fmr.json",
@@ -18,7 +18,7 @@
     }
   ],
   "hashes": {
-    "loan-limits.json": "75f1d7df553e72f7a6c90e60739e49ba579cc9d682ecc922123dae8c25f74893",
+    "loan-limits.json": "b9b390e0dc8345486794602c813518b826495d5d0a4747c57965e8caa3efba5d",
     "hud-fmr.json": "c44f8a9cd37c2f250c29963b4be38d4bd64a1e0c391601dc513564df6ca5efc6"
   }
 }

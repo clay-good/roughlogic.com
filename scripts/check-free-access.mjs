@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 // v10 Phase A.2 free-access URL probe (spec-v10.md §3.2).
 //
-// Reads every tile's source-stamp string in ../citations.js AND every
-// `free_access_url` in scripts/sources-cycle.json, and probes each
-// free-access URL referenced (nfpa.org/freeaccess, codes.iccsafe.org,
+// Reads every tile's source-stamp string in ../citations.js, every
+// `free_access_url` in scripts/sources-cycle.json, and every `free_access`
+// string in data/*/*.json, and probes each free-access URL referenced
+// (nfpa.org/freeaccess, codes.iccsafe.org,
 // ecfr.gov, epa.gov, fda.gov, ashrae.org, ncei.noaa.gov, faa.gov,
 // awc.org, etc.). Verifies each URL responds 200.
 //
@@ -26,7 +27,7 @@
 // requests to the same host. We are not running this in CI; the budget
 // is friendliness to publishers.
 
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -39,6 +40,12 @@ const CITATIONS = resolve(ROOT, "citations.js");
 // used nfpa.org/freeaccess, which resolves. The one URL nobody could see was
 // the broken one. Probe both surfaces.
 const CYCLE = resolve(ROOT, "scripts", "sources-cycle.json");
+// The THIRD surface: each shard's own `free_access` prose, which is what the
+// data files promise a reader can go and read. It went unprobed alongside the
+// ledger until 2026-09-09, when the loan-limits shard turned out to be sending
+// people to fhfa.gov/data/loan-limit-values -- a hard 404. FHFA moved that page
+// to /data/conforming-loan-limit.
+const DATA_DIR = resolve(ROOT, "data");
 
 // Hosts the spec-v10 §3.2 example list calls out. We probe any URL
 // that lands under one of these hosts. The match is host-suffix so
@@ -135,12 +142,27 @@ async function probe(url) {
 // error handling at some deeper path is not caught by accident.
 const SOFT_404 = /^\/(?:common\/)?(?:notfound|not-found|404|pagenotfound|page-not-found|error)\/?$/i;
 
-// Hosts that answer 403 to any automated fetch regardless of whether the page
-// is healthy. These are NOT suppressed -- a real regression here still has to
-// be looked at -- but the line says so, because otherwise every run makes
-// somebody re-diagnose a bot wall as a broken link. Verified 2026-09-09:
-// codes.iccsafe.org 403s curl and node fetch, and reads normally in a browser.
-const BOT_WALLED = new Set(["codes.iccsafe.org"]);
+// Hosts that answer 403 (or drop the connection) to any automated fetch
+// regardless of whether the page is healthy. These are NOT suppressed -- a real
+// regression here still has to be looked at -- but the line says so, because
+// otherwise every run makes somebody re-diagnose a bot wall as a broken link.
+// Each was opened in a browser on the date given and served its real page:
+//   codes.iccsafe.org        2026-09-09  the I-Codes index
+//   ssa.gov                  2026-09-09  "Contribution and Benefit Base"
+//   beckman.com              2026-09-09  Beckman Coulter Life Sciences home
+//   iupac.org                2026-09-09  redirects to publications.iupac.org
+//   publications.iupac.org   2026-09-09  Cloudflare "performing security
+//                                        verification" interstitial -- the host
+//                                        is up and gating bots, not down
+// Re-open any of these in a browser rather than trusting the list: a host that
+// has genuinely gone away looks exactly the same from here.
+const BOT_WALLED = new Set([
+  "codes.iccsafe.org",
+  "ssa.gov",
+  "beckman.com",
+  "iupac.org",
+  "publications.iupac.org",
+]);
 
 function hostOf(url) {
   try {
@@ -164,15 +186,43 @@ async function main() {
     if (typeof u === "string" && /^https?:\/\//.test(u)) fromCycle.push(u);
   }
 
-  const urls = [...new Set([...fromCitations, ...fromCycle])];
+  // Third surface: each shard's own `free_access` prose. These are free-form
+  // strings ("FHFA: fhfa.gov/data/conforming-loan-limit. HUD FHA: ..."), so
+  // pull host+path substrings the way the citation strings are parsed, but
+  // without the tracked-host restriction -- a shard may name any publisher.
+  const fromShards = [];
+  for (const folder of await readdir(DATA_DIR, { withFileTypes: true })) {
+    if (!folder.isDirectory()) continue;
+    for (const name of await readdir(resolve(DATA_DIR, folder.name))) {
+      if (!name.endsWith(".json")) continue;
+      let body;
+      try {
+        body = JSON.parse(await readFile(resolve(DATA_DIR, folder.name, name), "utf8"));
+      } catch {
+        continue;
+      }
+      const fa = body && typeof body.free_access === "string" ? body.free_access : "";
+      if (!fa) continue;
+      for (const m of fa.matchAll(/(?:https?:\/\/)?(?:www\.)?([a-z0-9][a-z0-9.-]*\.[a-z]{2,})(\/[^\s;,()"']*)?/gi)) {
+        const host = m[1];
+        // A bare sentence-ending word is not a host; require a known TLD shape
+        // and drop trailing sentence punctuation from the path.
+        const path = (m[2] || "").replace(/[.,;:'")\]]+$/, "");
+        fromShards.push("https://" + host + path);
+      }
+    }
+  }
+
+  const urls = [...new Set([...fromCitations, ...fromCycle, ...fromShards])];
   if (urls.length === 0) {
-    console.log("free-access probe: no tracked URLs found in citations.js or sources-cycle.json.");
+    console.log("free-access probe: no tracked URLs found in citations.js, sources-cycle.json or data/.");
     return;
   }
   console.log(
     "free-access probe: checking " + urls.length + " unique URL(s) -- " + fromCitations.length +
       " from citations.js across " + TRACKED_HOSTS.length + " tracked hosts, " + fromCycle.length +
-      " free_access_url(s) from sources-cycle.json.",
+      " free_access_url(s) from sources-cycle.json, " + new Set(fromShards).size +
+      " from shard free_access strings in data/.",
   );
 
   // Group by host so we can space requests to the same host.
@@ -203,7 +253,7 @@ async function main() {
       let detail = r.error ? " (" + r.error + ")" : "";
       if (r.soft404) {
         detail = " (SOFT 404: answered " + r.status + " but landed on " + r.finalUrl + ")";
-      } else if (r.status === 403 && BOT_WALLED.has(hostOf(r.url))) {
+      } else if ((r.status === 403 || r.status === 0) && BOT_WALLED.has(hostOf(r.url))) {
         detail += " (known bot wall on this host: it 403s any automated fetch. Confirm in a browser" +
           " before treating this as a broken link -- and if the browser also fails, it is real.)";
       }
