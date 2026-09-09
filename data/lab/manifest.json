@@ -19,12 +19,12 @@
     {
       "file": "centrifuge-rotors.json",
       "name": "Representative centrifuge rotor radii (manufacturer-attributed)",
-      "gzip_size_bytes": 442
+      "gzip_size_bytes": 444
     }
   ],
   "hashes": {
     "iupac-atomic-weights.json": "589cb6bc3f05d0609bdc91f0d7b7d0ec61c2c097208a3f60a7b94217f1c98873",
     "buffer-pka.json": "4ad00279335a93b4a364e31e499c141f9d7f1625cc58cc36f7b6c6c45979bdaa",
-    "centrifuge-rotors.json": "4d031a56e9012ed13472a7d33809755c8ad33766a3fdc74eebd7138f6d37a5e6"
+    "centrifuge-rotors.json": "6e0055f3015a61f7867e43cce3ac712fd5aaa43bb85504ba0a1140c098cc31a9"
   }
 }

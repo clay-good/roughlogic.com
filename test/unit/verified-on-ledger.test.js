@@ -268,3 +268,46 @@ test("the bundled atomic weights are the 2024 edition, in both copies", async ()
     assert.equal(shard.weights_g_per_mol[el], w);
   }
 });
+
+// The centrifuge rotor table named the FA-45-30-11 as the 5424's rotor. That is
+// the 5430's rotor; the 5424/5424R takes the FA-45-24-11. The radius was right
+// and only the part number was wrong, so every answer was correct while the
+// label pointed at a part that does not exist for that centrifuge.
+//
+// Each published speed/RCF pair implies its own radius through
+// RCF = 1.118e-6 x r(mm) x rpm^2, which is what identifies whose radius 84 mm
+// is: the FA-45-24-11 at 15,000 rpm and 21,130 x g gives 84.0 mm, while the
+// FA-45-30-11 at 14,000 and 20,817 gives 95.0 mm.
+test("the bundled rotor radii agree with each manufacturer's published RCF", async () => {
+  const shard = await readJson("data/lab/centrifuge-rotors.json");
+  const { CENTRIFUGE_ROTORS } = await import("../../calc-lab.js");
+
+  // The 5424 row names the right part now.
+  assert.equal(shard.rotors.eppendorf_5424_FA452411.part, "FA-45-24-11 (5424/5424R)");
+  assert.equal(shard.rotors.eppendorf_5424_FA452411.radius_mm, 84);
+  assert.equal(shard.rotors.eppendorf_5424_FA453011, undefined, "the 5430 part number is gone");
+
+  // Two copies again: the shard and the runtime table must not drift.
+  for (const [key, row] of Object.entries(shard.rotors)) {
+    assert.ok(CENTRIFUGE_ROTORS[key], key + " missing from calc-lab.js");
+    assert.equal(CENTRIFUGE_ROTORS[key].radius_mm, row.radius_mm, key + " radius differs");
+    assert.equal(CENTRIFUGE_ROTORS[key].part, row.part, key + " part differs");
+  }
+
+  // Radii cross-checked against each manufacturer's published maximum speed and
+  // RCF, verified 2026-09-09. Within 0.5 mm, which is the rounding the published
+  // RCF figures themselves carry.
+  const published = {
+    eppendorf_5424_FA452411: { rpm: 15000, rcf: 21130 },
+    beckman_JA10: { rpm: 10000, rcf: 17700 },
+    beckman_JA20: { rpm: 20000, rcf: 48400 },
+  };
+  for (const [key, { rpm, rcf }] of Object.entries(published)) {
+    const implied = rcf / (1.118e-6 * rpm * rpm);
+    assert.ok(
+      Math.abs(implied - shard.rotors[key].radius_mm) < 0.5,
+      key + ": published " + rpm + " rpm / " + rcf + " x g implies " + implied.toFixed(1)
+        + " mm, shard carries " + shard.rotors[key].radius_mm,
+    );
+  }
+});

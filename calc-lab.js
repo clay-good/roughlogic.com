@@ -73,7 +73,13 @@ export const BUFFER_PKA = {
 // --- Representative centrifuge rotor radii (mm) ---
 // Per-manufacturer attribution. data/lab/centrifuge-rotors.json
 export const CENTRIFUGE_ROTORS = {
-  eppendorf_5424_FA453011:    { radius_mm: 84,  manufacturer: "Eppendorf", part: "FA-45-30-11 (5424)" },
+  // The 5424/5424R rotor is the FA-45-24-11 (24 x 1.5/2.0 mL, 15,000 rpm,
+  // 21,130 x g). This row named the FA-45-30-11, which is the 5430's rotor --
+  // the radius was right for the 5424 and only the part number was wrong.
+  // Confirmed 2026-09-09 against Eppendorf distributor listings, and by the
+  // radius each published speed/RCF pair implies: 21,130 / (1.118e-6 x 15,000^2)
+  // is 84.0 mm, while the FA-45-30-11's 20,817 at 14,000 rpm is 95.0 mm.
+  eppendorf_5424_FA452411:    { radius_mm: 84,  manufacturer: "Eppendorf", part: "FA-45-24-11 (5424/5424R)" },
   eppendorf_5810_FA45630:     { radius_mm: 95,  manufacturer: "Eppendorf", part: "FA-45-6-30 (5810/5810R)" },
   eppendorf_5810_A48140:      { radius_mm: 162, manufacturer: "Eppendorf", part: "A-4-81 swing-bucket (5810/5810R)" },
   beckman_JA10:               { radius_mm: 158, manufacturer: "Beckman Coulter", part: "JA-10 fixed-angle" },

@@ -2,13 +2,13 @@
   "source": "Manufacturer-published rotor specifications. Each entry attributes the publishing manufacturer.",
   "edition": "current",
   "fetched": "2026-09-09",
-  "verified_on": "2026-09-04",
+  "verified_on": "2026-09-09",
   "free_access": "Each manufacturer publishes the rotor catalog free on its website (eppendorf.com, beckman.com, thermofisher.com).",
   "rotors": {
-    "eppendorf_5424_FA453011": {
+    "eppendorf_5424_FA452411": {
       "radius_mm": 84,
       "manufacturer": "Eppendorf",
-      "part": "FA-45-30-11 (5424)"
+      "part": "FA-45-24-11 (5424/5424R)"
     },
     "eppendorf_5810_FA45630": {
       "radius_mm": 95,

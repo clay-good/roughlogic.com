@@ -1601,7 +1601,7 @@ const CENTRIFUGE_ROTORS_V5 = {
   verified_on: TODAY,
   free_access: "Each manufacturer publishes the rotor catalog free on its website (eppendorf.com, beckman.com, thermofisher.com).",
   rotors: {
-    eppendorf_5424_FA453011:    { radius_mm: 84,  manufacturer: "Eppendorf",      part: "FA-45-30-11 (5424)" },
+    eppendorf_5424_FA452411:    { radius_mm: 84,  manufacturer: "Eppendorf",      part: "FA-45-24-11 (5424/5424R)" },
     eppendorf_5810_FA45630:     { radius_mm: 95,  manufacturer: "Eppendorf",      part: "FA-45-6-30 (5810/5810R)" },
     eppendorf_5810_A48140:      { radius_mm: 162, manufacturer: "Eppendorf",      part: "A-4-81 swing-bucket (5810/5810R)" },
     beckman_JA10:               { radius_mm: 158, manufacturer: "Beckman Coulter", part: "JA-10 fixed-angle" },
