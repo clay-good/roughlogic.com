@@ -240,6 +240,22 @@
         "buffer",
         "pKa"
       ]
+    },
+    {
+      "id": "inventory-benchmarks",
+      "name": "Industry inventory-turnover benchmarks",
+      "current_edition": "ARTS 2022 (benchmarked)",
+      "current_release": "2026",
+      "cycle_years": 1,
+      "next_expected": "2027-08",
+      "last_verified": "2026-09-09",
+      "verification_note": "Verified 2026-09-09 against the U.S. Census Annual Retail Trade Survey's own 2022 benchmarked tables (released 2026-08-31), and NOTHING IN THE ROW SURVIVED. (1) THE YEAR CANNOT EXIST: every row was stamped 2023. ARTS's last data year is 2022 -- the survey folded into the Annual Integrated Economic Survey, which began collecting in March 2024 -- and the ASM has no 2022 or 2023 data year at all, because years ending in 2 and 7 are covered by the Economic Census. (2) THE STATISTIC WAS MISNAMED: the key was turnover_median, and Census publishes industry AGGREGATES, not medians across firms. (3) THE VALUES DID NOT REPRODUCE: turnover = COGS / average inventory computes to 7.01 (retail total), 12.94 (NAICS 4451 grocery), 2.98 (448 apparel) and 2.67 (4413 auto parts) against bundled 8, 14, 4 and 5 -- auto parts was 87% high. COGS was derived two independent ways from Census's own tables and they agree to three significant figures: sales minus gross margin, and purchases plus the change in inventory. (4) TWO ROWS HAD NO PUBLISHER AT ALL: ARTS never covered food services (NAICS 722) and the SBA publishes no such median, so restaurant_food (26) cited nothing checkable; manufacturing_general cited an ASM year that does not exist. Both rows removed rather than left unbacked. FETCH NOTES: the ARTS xlsx tables download with a plain curl and a browser user-agent, EXCEPT sales.xlsx, which a WAF rejects -- sales can be recovered as gross margin divided by the gross-margin percentage, and the purchases route confirms the answer independently. The Census data API now requires a key, so use the table downloads.",
+      "free_access_url": "https://www.census.gov/programs-surveys/arts/data/tables.html",
+      "where": "data/accounting/inventory-benchmarks.json",
+      "match_terms": [
+        "ARTS",
+        "Retail Trade"
+      ]
     }
   ],
   "annual_figures": [

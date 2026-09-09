@@ -3142,9 +3142,11 @@ test("bounds: calc-accounting computeInventoryTurnover pins turnover = COGS / av
   assert.strictEqual(r.average_inventory, 260000);
   assert.ok(Math.abs(r.turnover - 2000000 / 260000) < 1e-9, `turnover identity`);
   assert.ok(Math.abs(r.days_sales_of_inventory - 365 / r.turnover) < 1e-9, `DSI identity`);
-  // Industry comparison threads through.
-  assert.ok(r.comparison && r.comparison.median === 8, `retail median 8`);
-  assert.ok(Math.abs(r.comparison.delta - (r.turnover - 8)) < 1e-9, `delta`);
+  // Industry comparison threads through. 7.0 is the Census ARTS 2022
+  // aggregate; it read 8 under a `median` key that named a statistic Census
+  // does not publish.
+  assert.ok(r.comparison && r.comparison.industry_aggregate === 7.0, `retail aggregate 7.0`);
+  assert.ok(Math.abs(r.comparison.delta - (r.turnover - 7.0)) < 1e-9, `delta`);
 });
 
 test("bounds: calc-accounting computeInventoryTurnover rejects negative inputs / zero avg / non-positive period (documented)", () => {

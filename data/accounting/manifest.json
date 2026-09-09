@@ -2,7 +2,7 @@
   "name": "accounting",
   "version": "2026-09-09",
   "fetched": "2026-09-09",
-  "edition": "IRS Pub 946 (MACRS), Pub 15-T (payroll percentage method), annual Rev. Proc. (Section 179 cap), SSA wage-base announcement (SE tax), IRS Form 1040-ES schedule (estimated tax), IRS standard mileage rate notice. U.S. Census ARTS / SBA published medians (inventory). Per-year entries with verified-on date; verified 2026-09-02.",
+  "edition": "IRS Pub 946 (MACRS), Pub 15-T (payroll percentage method), annual Rev. Proc. (Section 179 cap), SSA wage-base announcement (SE tax), IRS Form 1040-ES schedule (estimated tax), IRS standard mileage rate notice. U.S. Census ARTS 2022 (benchmarked) industry aggregates (inventory turnover; ARTS has no later data year, having folded into the Annual Integrated Economic Survey). Per-year entries with verified-on date; verified 2026-09-09.",
   "asOf": "2026-09-09",
   "refresh_cadence": "annual",
   "shards": [
@@ -34,7 +34,7 @@
     {
       "file": "inventory-benchmarks.json",
       "name": "Industry-median inventory turnover (Census ARTS / SBA)",
-      "gzip_size_bytes": 370
+      "gzip_size_bytes": 503
     },
     {
       "file": "pub-15-t-tables.json",
@@ -48,7 +48,7 @@
     "se-tax-parameters.json": "5af85ae9117a5951ac11d7a5632a95699d3381421f3afa87d2d312f0a3d2cb2f",
     "estimated-tax-due-dates.json": "3b0c02a63d8ae712e060fe79e8514c5570e507838456aca83830a1358482a920",
     "standard-mileage-rates.json": "8452adf68136d8c6bd05f5b09b3bb4552d5773bd8f035bf9009ea1cae2ef7f2e",
-    "inventory-benchmarks.json": "f12eada8c4cf2c6436074ee369234d8edbf11ddfa42cfb26b08170d3a8066b85",
+    "inventory-benchmarks.json": "7f0eb25022d30653a119a6a2b8612f8f0eee5b6c9ce72a56cfbb3beb3b9e6531",
     "pub-15-t-tables.json": "e1483a9cfd473567b5d676c5f0f6d7d8cf7b6185ec56c7a84c0e9b8657ff52be"
   }
 }

@@ -793,6 +793,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Every industry inventory-turnover benchmark was wrong, in four different ways at once -- and the last shard with an unbacked verification stamp is now closed.** The tile compared a user's turnover against six "industry medians" attributed to the Census Annual Retail Trade Survey, the Annual Survey of Manufactures, and the SBA. Checked against Census's own 2022 benchmarked tables on 2026-09-09, nothing in the row survived.
+
+  **The year could not exist.** All six were stamped 2023. ARTS's last data year is **2022** -- the survey folded into the Annual Integrated Economic Survey, which began collecting in March 2024 -- and the ASM has no 2022 *or* 2023 data year at all, because years ending in 2 and 7 are covered by the Economic Census instead.
+
+  **The statistic was misnamed.** The key was `turnover_median`. Census publishes industry **aggregates**; there is no median-across-firms turnover in ARTS, so the name was itself a claim about what the number is.
+
+  **The values did not reproduce.** Turnover = COGS ÷ average inventory computes to **7.0** for retail overall, **12.9** for grocery, **3.0** for apparel and **2.7** for auto parts, against bundled 8, 14, 4 and 5. Auto parts was 87% high -- a parts store turning its shelf 2.7 times a year was being told it was well under a benchmark of 5. COGS is derived two independent ways from Census's own tables, sales less gross margin and purchases plus the change in inventory, and they agree to three significant figures on all four.
+
+  **And two rows had no publisher at all.** ARTS never covered food services (NAICS 722) and the SBA publishes no such median, so `restaurant_food` at 26 cited nothing anyone could check; `manufacturing_general` cited an ASM year that does not exist. Both are removed rather than left standing behind a citation that cannot be followed. The picker and the tile's citation now say the figures are aggregates, and a unit test recomputes each one from the published tables by both routes.
+
+  With this shard's ledger row, `check-verified-on-ledger`'s ungoverned-stamp budget reaches **zero**: every shard that stamps a `verified_on` now has a ledger row saying what was actually read, and any new unbacked stamp fails the build.
+
 - **Two bundled buffer pKa values were 20 °C numbers sitting in a table labelled 25 °C.** Good et al. 1966 named the Good's buffers and tabulates them **at 20 °C**. Four rows cited that paper, and two of them carried Good's 20 °C values verbatim -- HEPES 7.55, MOPS 7.20 -- while the other two had already been carried across to 25 °C by somebody who stopped halfway. So the table was a mix of two temperatures under one label, and the two mixed-in values were the ones a user would reach for at the bench: at 25 °C, HEPES is **7.48** and MOPS is **7.14**.
 
   **A buffer's pKa without its temperature is not a constant**, which is the whole reason this went unnoticed: every individual number was a real published figure, just not all of the same thing. The corrected values come from the 25 °C column of PanReac AppliChem's Biological buffers reference, and two independent checks agree: that table's own `d(pKa)/dT` carries Good's 20 °C values exactly onto it (7.55 − 5 × 0.014 = 7.48; 7.20 − 5 × 0.011 = 7.14), and it lands the two rows that were already right on their existing values (6.15 − 5 × 0.011 = 6.10 for MES, 6.80 − 5 × 0.0085 = 6.76 for PIPES). The same source confirms Tris at 8.06 and every useful range the shard carries.

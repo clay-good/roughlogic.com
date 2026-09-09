@@ -1516,18 +1516,16 @@ const STANDARD_MILEAGE_DATA_V5 = {
 };
 
 const INVENTORY_BENCH_DATA_V5 = {
-  source: "U.S. Census Annual Retail Trade Survey (ARTS), Annual Survey of Manufactures (ASM), and SBA / industry-association published medians.",
-  edition: "2023",
+  source: "U.S. Census Annual Retail Trade Survey (ARTS), 2022 benchmarked tables released 2026-08-31. Turnover is an INDUSTRY AGGREGATE, not a median across firms: cost of goods sold over average end-of-year inventory, with COGS taken from the survey's own gross-margin and purchases tables.",
+  edition: "ARTS 2022 (benchmarked)",
   fetched: TODAY,
   verified_on: TODAY,
-  free_access: "census.gov/retail/arts; census.gov/programs-surveys/asm; sba.gov/data.",
+  free_access: "census.gov/programs-surveys/arts/data/tables.html; the 2022 benchmarked sales, inventories, purchases and gross-margin tables are free xlsx downloads.",
   benchmarks: {
-    retail_general:        { turnover_median: 8,  source: "U.S. Census ARTS", year: 2023 },
-    grocery:               { turnover_median: 14, source: "U.S. Census ARTS", year: 2023 },
-    apparel:               { turnover_median: 4,  source: "U.S. Census ARTS", year: 2023 },
-    auto_parts:            { turnover_median: 5,  source: "U.S. Census ARTS", year: 2023 },
-    manufacturing_general: { turnover_median: 6,  source: "U.S. Census ASM",  year: 2023 },
-    restaurant_food:       { turnover_median: 26, source: "SBA / NRA industry median", year: 2023 },
+    retail_general: { turnover_aggregate: 7.0,  source: "U.S. Census ARTS 2022 (benchmarked), retail trade total", year: 2022 },
+    grocery:        { turnover_aggregate: 12.9, source: "U.S. Census ARTS 2022 (benchmarked), NAICS 4451", year: 2022 },
+    apparel:        { turnover_aggregate: 3.0,  source: "U.S. Census ARTS 2022 (benchmarked), NAICS 448", year: 2022 },
+    auto_parts:     { turnover_aggregate: 2.7,  source: "U.S. Census ARTS 2022 (benchmarked), NAICS 4413", year: 2022 },
   },
 };
 
@@ -1700,7 +1698,7 @@ const EDITION_VERIFIED = {
   crosswalks: "2026-09-02",
   summaries: "2026-09-02",
   trucking: "2026-09-02",
-  accounting: "2026-09-02",
+  accounting: "2026-09-09",
   lab: "2026-09-09",
   // The legal folder's date is the OLDEST row stamp under it, not a build date:
   // the manifest must never claim more verification than its least-verified
@@ -1818,7 +1816,7 @@ const DATASETS = [
   // more than HISTORICAL_FRESHNESS_LIMIT_DAYS behind the build date.
   { folder: "historical", edition: "Modeled after BLS PPI / EIA / USDA NASS / FRED federal series (series IDs named verbatim; the monthly values are generated from an in-tree anchor, not downloaded -- the build fetches nothing); built " + TODAY + ". Build fails if any shard's latest point is more than 30 days behind the build date.", shards: buildHistoricalDataset(TODAY) },
   // v5 Group R: Accounting, Tax, and Small-Business (utilities 234-245).
-  { folder: "accounting", edition: "IRS Pub 946 (MACRS), Pub 15-T (payroll percentage method), annual Rev. Proc. (Section 179 cap), SSA wage-base announcement (SE tax), IRS Form 1040-ES schedule (estimated tax), IRS standard mileage rate notice. U.S. Census ARTS / SBA published medians (inventory). Per-year entries with verified-on date; verified " + EDITION_VERIFIED.accounting + ".", shards: [
+  { folder: "accounting", edition: "IRS Pub 946 (MACRS), Pub 15-T (payroll percentage method), annual Rev. Proc. (Section 179 cap), SSA wage-base announcement (SE tax), IRS Form 1040-ES schedule (estimated tax), IRS standard mileage rate notice. U.S. Census ARTS 2022 (benchmarked) industry aggregates (inventory turnover; ARTS has no later data year, having folded into the Annual Integrated Economic Survey). Per-year entries with verified-on date; verified " + EDITION_VERIFIED.accounting + ".", shards: [
       { file: "macrs-tables.json", body: MACRS_TABLES_V5, name: "IRS Pub 946 Tables A-1 (200%/150% DB, half-year)" },
       { file: "section-179-limits.json", body: SECTION_179_DATA_V5, name: "Section 179 cap and phase-out, per-year" },
       { file: "se-tax-parameters.json", body: SE_TAX_DATA_V5, name: "Social Security wage base + Additional Medicare threshold, per-year" },

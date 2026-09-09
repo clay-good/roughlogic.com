@@ -165,7 +165,7 @@ test("the gate names the shards it does not govern", async () => {
   // forward when content is unchanged); what is still missing is a ledger row
   // recording what a human actually checked.
   const src = await readFile(resolve(ROOT, "scripts/check-verified-on-ledger.mjs"), "utf8");
-  assert.match(src, /UNGOVERNED_BUDGET = 1/, "the ungoverned count is ratcheted");
+  assert.match(src, /UNGOVERNED_BUDGET = 0/, "the ungoverned count is ratcheted");
   assert.match(src, /NOT governed here/, "the OK line must name the uncovered set");
   // Author-original content is reported separately: it has no publisher, so a
   // ledger row cannot exist and counting it as unbacked is a category error.
@@ -288,6 +288,59 @@ test("the bundled atomic weights are the 2024 edition, in both copies", async ()
 // RCF = 1.118e-6 x r(mm) x rpm^2, which is what identifies whose radius 84 mm
 // is: the FA-45-24-11 at 15,000 rpm and 21,130 x g gives 84.0 mm, while the
 // FA-45-30-11 at 14,000 and 20,817 gives 95.0 mm.
+// Every inventory-turnover benchmark was wrong at once: the year could not
+// exist (ARTS's last data year is 2022, and the ASM has none for 2022 or 2023),
+// the key called an industry AGGREGATE a median, the values did not reproduce,
+// and two rows cited publishers that publish no such figure. Verified
+// 2026-09-09 by recomputing turnover = COGS / average inventory from Census's
+// own 2022 benchmarked tables, with COGS derived two independent ways.
+test("each inventory-turnover benchmark is what Census's own 2022 tables compute", async () => {
+  const shard = await readJson("data/accounting/inventory-benchmarks.json");
+  const { INVENTORY_BENCHMARKS } = await import("../../calc-accounting.js");
+
+  // [gross margin $M, gross margin % of sales, purchases $M, 2021 EOY inv $M,
+  //  2022 EOY inv $M, bundled turnover]
+  const arts2022 = {
+    retail_general: [2169450, 31.1, 4887440, 644675, 726873, 7.0],
+    grocery: [236421, 28.0, 613014, 44787, 49198, 12.9],
+    apparel: [139400, 49.6, 147093, 44711, 50215, 3.0],
+    auto_parts: [58144, 48.1, 65749, 21983, 24960, 2.7],
+  };
+  assert.deepEqual(Object.keys(arts2022).sort(), Object.keys(shard.benchmarks).sort());
+
+  for (const [key, [gm, gmPct, purchases, inv2021, inv2022, bundled]] of Object.entries(arts2022)) {
+    const row = shard.benchmarks[key];
+    assert.equal(row.turnover_aggregate, bundled, key + " in the shard");
+    assert.equal(row.year, 2022, key + " year");
+    assert.equal(INVENTORY_BENCHMARKS[key].turnover_aggregate, bundled, key + " in calc-accounting.js");
+
+    const avgInventory = (inv2021 + inv2022) / 2;
+    // Route 1: COGS is sales less gross margin, and sales is the gross margin
+    // over its own published percentage of sales.
+    const cogsFromMargin = gm / (gmPct / 100) - gm;
+    // Route 2: COGS is what was bought plus what came off the shelf.
+    const cogsFromPurchases = purchases + inv2021 - inv2022;
+    // The two routes are independent tables; they must agree closely.
+    assert.ok(
+      Math.abs(cogsFromMargin - cogsFromPurchases) / cogsFromMargin < 0.005,
+      key + ": COGS routes disagree, " + cogsFromMargin.toFixed(0) + " vs " + cogsFromPurchases.toFixed(0),
+    );
+    for (const cogs of [cogsFromMargin, cogsFromPurchases]) {
+      assert.ok(
+        Math.abs(cogs / avgInventory - bundled) < 0.06,
+        key + ": Census computes " + (cogs / avgInventory).toFixed(2) + ", bundled " + bundled,
+      );
+    }
+  }
+
+  // The two rows that cited a publisher publishing no such figure must not
+  // come back: ARTS never covered food services, and the ASM has no 2023.
+  for (const gone of ["restaurant_food", "manufacturing_general"]) {
+    assert.equal(shard.benchmarks[gone], undefined, gone + " has no publisher to check");
+    assert.equal(INVENTORY_BENCHMARKS[gone], undefined, gone + " in calc-accounting.js");
+  }
+});
+
 // A buffer's pKa without its temperature is not a constant. The shard is keyed
 // buffers_at_25C, but two of the four Good's buffers carried Good's own 20 C
 // values (HEPES 7.55, MOPS 7.20) while the other two had already been carried

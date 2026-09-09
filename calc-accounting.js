@@ -116,17 +116,41 @@ export const ESTIMATED_TAX_DUE_DATES = {
   2026: ["2026-04-15", "2026-06-15", "2026-09-15", "2027-01-15"],
 };
 
-// Inventory / industry-median benchmarks. Rough Census/SBA-aligned
-// reference points so the user can see whether a turnover ratio is
-// in or out of band. Cite source and year.
+// Industry inventory-turnover benchmarks, derived from the U.S. Census
+// Annual Retail Trade Survey 2022 (benchmarked tables, released 2026-08-31).
 // data/accounting/inventory-benchmarks.json
+//
+// These used to read 8 / 14 / 4 / 5 under a `turnover_median` key attributed
+// to Census, plus a manufacturing row citing the ASM and a restaurant row
+// citing "SBA / NRA". None of it reproduced. Verified 2026-09-09:
+//
+//   - ARTS HAS NO 2023 DATA YEAR. Its last is 2022; the survey folded into
+//     the Annual Integrated Economic Survey, which began collecting in March
+//     2024. The ASM has no 2022 or 2023 data year at all -- years ending in 2
+//     and 7 are covered by the Economic Census instead. Both rows were stamped
+//     `year: 2023`.
+//   - CENSUS PUBLISHES AGGREGATES, NOT MEDIANS. There is no median-across-firms
+//     turnover in ARTS, so the key was a claim about the statistic itself.
+//   - The values did not reproduce: turnover = COGS / average inventory comes
+//     out 7.0 / 12.9 / 3.0 / 2.7, not 8 / 14 / 4 / 5. Auto parts was 87% high.
+//   - ARTS never covered food services (NAICS 722), and the SBA publishes no
+//     such figure, so the restaurant row had no publisher to check at all.
+//     It and the manufacturing row are gone rather than left unbacked.
+//
+// COGS is derived two independent ways from Census's own tables and they agree
+// to three significant figures: sales minus gross margin, and purchases plus
+// the change in inventory. Average inventory is the mean of the 2021 and 2022
+// end-of-year figures.
 export const INVENTORY_BENCHMARKS = {
-  retail_general:        { turnover_median: 8,  source: "U.S. Census Annual Retail Trade Survey", year: 2023 },
-  grocery:               { turnover_median: 14, source: "U.S. Census ARTS", year: 2023 },
-  apparel:               { turnover_median: 4,  source: "U.S. Census ARTS", year: 2023 },
-  auto_parts:            { turnover_median: 5,  source: "U.S. Census ARTS", year: 2023 },
-  manufacturing_general: { turnover_median: 6,  source: "U.S. Census ASM", year: 2023 },
-  restaurant_food:       { turnover_median: 26, source: "SBA / NRA industry median", year: 2023 },
+  // GM $2,169,450M at 31.1% of sales -> COGS $4,806,273M; inventories
+  // $644,675M and $726,873M -> average $685,774M; 4806273 / 685774 = 7.01.
+  retail_general: { turnover_aggregate: 7.0, source: "U.S. Census ARTS 2022 (benchmarked), retail trade total", year: 2022 },
+  // NAICS 4451. COGS $607,940M / average inventory $46,992M = 12.94.
+  grocery: { turnover_aggregate: 12.9, source: "U.S. Census ARTS 2022 (benchmarked), NAICS 4451", year: 2022 },
+  // NAICS 448. COGS $141,648M / average inventory $47,463M = 2.98.
+  apparel: { turnover_aggregate: 3.0, source: "U.S. Census ARTS 2022 (benchmarked), NAICS 448", year: 2022 },
+  // NAICS 4413. COGS $62,737M / average inventory $23,472M = 2.67.
+  auto_parts: { turnover_aggregate: 2.7, source: "U.S. Census ARTS 2022 (benchmarked), NAICS 4413", year: 2022 },
 };
 
 // MACRS percentage tables (IRS Pub 946 Tables A-1 / A-2).
@@ -537,8 +561,8 @@ export function computeInventoryTurnover({
   if (industry_key) {
     const bench = INVENTORY_BENCHMARKS[industry_key];
     if (bench) {
-      const delta = turnover - bench.turnover_median;
-      comparison = { industry: industry_key, median: bench.turnover_median, delta, source: bench.source, year: bench.year };
+      const delta = turnover - bench.turnover_aggregate;
+      comparison = { industry: industry_key, industry_aggregate: bench.turnover_aggregate, delta, source: bench.source, year: bench.year };
     }
   }
   return { turnover, days_sales_of_inventory: dsi, dsi_note, average_inventory: avg, comparison };
@@ -1030,14 +1054,14 @@ function renderSalesTaxCompound(inputRegion, outputRegion, citationEl) {
 }
 
 function renderInventoryTurnover(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: turnover = COGS / avg inventory; DSI = period_days / turnover. Industry medians from U.S. Census ARTS / SBA, year stamped.";
+  citationEl.textContent = "Citation: turnover = COGS / avg inventory; DSI = period_days / turnover. The industry figures are Census ARTS 2022 (benchmarked) AGGREGATES, not medians across firms: COGS from that survey's own gross-margin and purchases tables over its average inventory.";
   const cogs = makeNumber("COGS (USD)", "it-cogs", { step: "any", min: "0" });
   const bi = makeNumber("Beginning inventory (USD)", "it-bi", { step: "any", min: "0" });
   const ei = makeNumber("Ending inventory (USD)", "it-ei", { step: "any", min: "0" });
   const days = makeNumber("Period days", "it-d", { step: "1", min: "1" });
   days.input.value = "365";
   const ind = makeSelect("Industry (for comparison)", "it-ind",
-    [{ value: "", label: "(none)" }].concat(Object.entries(INVENTORY_BENCHMARKS).map(([k, v]) => ({ value: k, label: k.replace(/_/g, " ") + " (median " + v.turnover_median + ")" }))));
+    [{ value: "", label: "(none)" }].concat(Object.entries(INVENTORY_BENCHMARKS).map(([k, v]) => ({ value: k, label: k.replace(/_/g, " ") + " (industry " + v.turnover_aggregate + ")" }))));
   for (const f of [cogs, bi, ei, days, ind]) inputRegion.appendChild(f.wrap);
   const tn = makeOutputLine(outputRegion, "Turnover", "it-out-t");
   const dsi = makeOutputLine(outputRegion, "Days sales of inventory", "it-out-dsi");

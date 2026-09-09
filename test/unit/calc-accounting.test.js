@@ -154,7 +154,7 @@ test("STC: providing both errors", () => { assert.ok(computeSalesTaxCompound({ p
 test("IT: example positive turnover", () => { const r = computeInventoryTurnover(inventoryTurnoverExample.inputs); assert.ok(r.turnover > 0); });
 test("IT: COGS 1M, avg 100k = 10x", () => { const r = computeInventoryTurnover({ cogs: 1000000, beginning_inventory: 100000, ending_inventory: 100000 }); assert.ok(close(r.turnover, 10)); });
 test("IT: DSI = 365/turnover", () => { const r = computeInventoryTurnover({ cogs: 1000000, beginning_inventory: 100000, ending_inventory: 100000 }); assert.ok(close(r.days_sales_of_inventory, 36.5, 0.1)); });
-test("IT: industry comparison populated", () => { const r = computeInventoryTurnover({ cogs: 1000000, beginning_inventory: 100000, ending_inventory: 100000, industry_key: "retail_general" }); assert.ok(r.comparison && r.comparison.median === INVENTORY_BENCHMARKS.retail_general.turnover_median); });
+test("IT: industry comparison populated", () => { const r = computeInventoryTurnover({ cogs: 1000000, beginning_inventory: 100000, ending_inventory: 100000, industry_key: "retail_general" }); assert.ok(r.comparison && r.comparison.industry_aggregate === INVENTORY_BENCHMARKS.retail_general.turnover_aggregate); });
 test("IT: zero average inventory errors", () => { assert.ok(computeInventoryTurnover({ cogs: 1000, beginning_inventory: 0, ending_inventory: 0 }).error); });
 
 // 244 CCC

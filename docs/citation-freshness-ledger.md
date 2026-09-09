@@ -59,6 +59,7 @@ evidence, so the row's `verification_note` should say what was checked.
 | `iupac-atomic-weights` | IUPAC/CIAAW Standard Atomic Weights | 2024 | 2024 | 2026-09-09 | current |
 | `centrifuge-rotors` | Manufacturer centrifuge-rotor radii | current manufacturer catalogs | current manufacturer catalogs | 2026-09-09 | current |
 | `buffer-pka` | Laboratory buffer pKa values | Good 1966 / PanReac AppliChem IP-022EN / CRC 95th | Good 1966 / PanReac AppliChem IP-022EN / CRC 95th | 2026-09-09 | current |
+| `inventory-benchmarks` | Industry inventory-turnover benchmarks | ARTS 2022 (benchmarked) | ARTS 2022 (benchmarked) | 2026-09-09 | current |
 | `aashto-greenbook` | AASHTO Green Book | 2018 (7th ed.) | 2018 (7th ed.), 8th in development | 2026-09-01 | acknowledged-stale |
 
 ## Dispositions (spec-v22 §2)
