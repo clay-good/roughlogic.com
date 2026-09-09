@@ -1575,6 +1575,10 @@ const RELATED = {
   "adhesive-bond-area": ["construction-adhesive-tubes","fillet-weld-strength","bolt-stretch"],
   "refractory-shell-temperature": ["insulation-thickness","pipe-heat-loss-radial","flue-gas-dew-point"],
   "cryogenic-boiloff": ["pipe-insulation-for-condensation","insulation-thickness","evaporation-load"],
+  "gaussian-dispersion-screen": ["plume-rise-briggs","stack-emission-pte","odor-dilution-threshold"],
+  "noise-barrier-insertion-loss": ["community-noise-ldn","noise-dose","room-acoustics"],
+  "community-noise-ldn": ["noise-barrier-insertion-loss","noise-dose","speed-of-sound-air"],
+  "odor-dilution-threshold": ["gaussian-dispersion-screen","plume-rise-briggs","thermal-fog-deodorization"],
   // spec-v1717..v1726: air quality band.
   "stack-emission-pte": ["opacity-six-minute","coating-voc-compliance","plume-rise-briggs"],
   "opacity-six-minute": ["stack-emission-pte","esp-deutsch-efficiency","baghouse-cleaning-interval"],

@@ -52346,3 +52346,156 @@ test("bounds: spec-v1676 (cut into pipe-insulation-takeoff) -- the jacket wraps 
   assert.ok(_v857pit({ pipe_ft: 240, insul_od_in: 8.5, jacket_overlap_pct: -1 }).error);
   assert.ok(_v857pit({ pipe_ft: 240, insul_od_in: 8.5, elbow_count: -1 }).error);
 });
+
+
+import {
+  computeGaussianDispersionScreen as _v1727, computeNoiseBarrierInsertionLoss as _v1728,
+  computeCommunityNoiseLdn as _v1729, computeOdorDilutionThreshold as _v1730,
+} from "../../calc-airquality.js";
+
+test("bounds: spec-v1727 computeGaussianDispersionScreen -- the height term dominates, and the maximum MOVES", () => {
+  const base = { emission_rate_lb_hr: 79.366, effective_height_ft: 219.8, wind_mph: 8.948, distance_mi: 0.6214, stability_class: "D", alt_stability_class: "F" };
+  const r = _v1727(base);
+  // IDENTITY: the concentration is the closed form, term for term.
+  const expected = (r.emission_rate_g_s / (Math.PI * r.wind_speed_m_s * r.sigma_y_m * r.sigma_z_m)) * Math.exp(-(r.effective_height_m ** 2) / (2 * r.sigma_z_m * r.sigma_z_m)) * 1e6;
+  assert.ok(Math.abs(r.concentration_ug_m3 - expected) < 1e-9);
+  // The standard Pasquill-Gifford D coefficients at 1 km, which the spec called
+  // "roughly 70 and 32".
+  assert.ok(Math.abs(r.sigma_y_m - 68.0) < 0.1);
+  assert.ok(Math.abs(r.sigma_z_m - 33.2) < 0.1);
+  // The US inputs convert EXACTLY to the SI the published curves are drawn in.
+  assert.ok(Math.abs(r.emission_rate_g_s - 10) < 1e-3);
+  assert.ok(Math.abs(r.effective_height_m - 67) < 1e-2);
+  assert.ok(Math.abs(r.wind_speed_m_s - 4) < 1e-3);
+  assert.ok(Math.abs(r.distance_km - 1) < 1e-4);
+  // LINEAR in the emission rate, INVERSE in the wind.
+  assert.ok(Math.abs(_v1727({ ...base, emission_rate_lb_hr: 2 * 79.366 }).concentration_ug_m3 - 2 * r.concentration_ug_m3) < 1e-9);
+  assert.ok(Math.abs(_v1727({ ...base, wind_mph: 2 * 8.948 }).concentration_ug_m3 - r.concentration_ug_m3 / 2) < 1e-9);
+  // THE SPEC'S POINT: the height term is an exponential in H squared, so halving
+  // the height multiplies the ground-level concentration several times over.
+  assert.ok(r.height_ratio > 4 && r.height_ratio < 6);
+  // A ground-level release has no height term left to trade.
+  assert.ok(Math.abs(_v1727({ ...base, effective_height_ft: 0 }).exponential_term - 1) < 1e-12);
+  // STABILITY moves WHERE the maximum is: a stable plume stays aloft and reaches
+  // the ground farther out. This is the shape the tile exists to report.
+  assert.ok(r.alt_max_distance_km > r.max_distance_km);
+  assert.ok(r.alt_concentration_ug_m3 < r.concentration_ug_m3);
+  // The reported maximum really is a maximum over the swept range.
+  assert.ok(r.max_concentration_ug_m3 >= r.concentration_ug_m3);
+  assert.ok(r.max_distance_km > 0);
+  // A more unstable class mixes down sooner than a more stable one.
+  const unstable = _v1727({ ...base, stability_class: "B" });
+  const stable = _v1727({ ...base, stability_class: "F" });
+  assert.ok(unstable.max_distance_km < stable.max_distance_km);
+  // ERROR CONTRACT -- calm is undefined for this model, not merely inaccurate.
+  assert.ok(_v1727({ ...base, wind_mph: 0 }).error);
+  assert.ok(_v1727({ ...base, emission_rate_lb_hr: 0 }).error);
+  assert.ok(_v1727({ ...base, distance_mi: 0 }).error);
+  assert.ok(_v1727({ ...base, stability_class: "Z" }).error);
+  assert.ok(_v1727({ ...base, effective_height_ft: -1 }).error);
+  assert.ok(_v1727({ ...base, wind_mph: Infinity }).error);
+});
+
+test("bounds: spec-v1728 computeNoiseBarrierInsertionLoss -- 4.8 dB is the floor, not zero", () => {
+  const base = { path_difference_ft: 0.5, source_to_top_ft: 0, top_to_receiver_ft: 0, source_to_receiver_ft: 0, frequency_hz: 1000, second_frequency_hz: 125, practical_ceiling_db: 20 };
+  const r = _v1728(base);
+  // THE SPEC'S FIGURES: 13.2 dB at 1,000 Hz and 7.2 at 125, from the same barrier.
+  assert.ok(Math.abs(r.wavelength_ft - 1130 / 1000) < 1e-12);
+  assert.ok(Math.abs(r.fresnel_number - 2 * 0.5 / (1130 / 1000)) < 1e-12);
+  assert.ok(Math.abs(r.raw_insertion_loss_db - 10 * Math.log10(3 + 20 * r.fresnel_number)) < 1e-12);
+  assert.ok(Math.abs(r.raw_insertion_loss_db - 13.16) < 0.02);
+  assert.ok(Math.abs(r.second_insertion_loss_db - 7.18) < 0.02);
+  assert.ok(r.second_insertion_loss_db < r.raw_insertion_loss_db);
+  // THE THRESHOLD: grazing the sight line is 10 log10(3) = 4.77 dB, NOT zero.
+  // A barrier calculation that returned 0 here would be reporting no barrier.
+  assert.ok(Math.abs(r.grazing_db - 10 * Math.log10(3)) < 1e-12);
+  assert.ok(Math.abs(r.grazing_db - 4.771) < 0.01);
+  const grazing = _v1728({ ...base, path_difference_ft: 0 });
+  assert.ok(Math.abs(grazing.raw_insertion_loss_db - grazing.grazing_db) < 1e-12);
+  assert.equal(grazing.breaks_line_of_sight, false);
+  assert.ok(grazing.threshold_verdict.includes("threshold, not a slope"));
+  // MONOTONIC in both path difference and frequency.
+  assert.ok(_v1728({ ...base, path_difference_ft: 2 }).raw_insertion_loss_db > r.raw_insertion_loss_db);
+  assert.ok(_v1728({ ...base, frequency_hz: 4000 }).raw_insertion_loss_db > r.raw_insertion_loss_db);
+  // The three-leg geometry must give the same path difference as entering it.
+  const geo = _v1728({ ...base, path_difference_ft: 0, source_to_top_ft: 52, top_to_receiver_ft: 31, source_to_receiver_ft: 82.5 });
+  assert.ok(Math.abs(geo.path_difference_ft - 0.5) < 1e-9);
+  assert.ok(Math.abs(geo.raw_insertion_loss_db - r.raw_insertion_loss_db) < 1e-9);
+  // FLANKING: the geometric result is capped, and the cap is reported as such.
+  const tall = _v1728({ ...base, path_difference_ft: 40, frequency_hz: 4000 });
+  assert.equal(tall.capped, true);
+  assert.ok(tall.raw_insertion_loss_db > 20);
+  assert.ok(Math.abs(tall.insertion_loss_db - 20) < 1e-12);
+  assert.ok(tall.primary_verdict.includes("practical ceiling"));
+  assert.ok(_v1728({ ...base, frequency_hz: 0 }).error);
+  assert.ok(_v1728({ ...base, path_difference_ft: -1 }).error);
+  // An over-the-top path shorter than the direct path is impossible.
+  assert.ok(_v1728({ ...base, path_difference_ft: 0, source_to_top_ft: 10, top_to_receiver_ft: 10, source_to_receiver_ft: 30 }).error);
+});
+
+test("bounds: spec-v1729 computeCommunityNoiseLdn -- the night penalty is worth nearly the full 10 dB", () => {
+  const base = { activity_level_db: 78, activity_hours_day: 2, activity_hours_evening: 0, activity_hours_night: 0, background_level_db: 48, limit_ldn_db: 65 };
+  const day = _v1729(base);
+  // THE SPEC'S CASES, computed: 67.4 by day and 77.2 at night. The spec called
+  // the first "around 68" and the rise "roughly 8 to 9 dB"; it is 9.8.
+  assert.ok(Math.abs(day.ldn_db - 67.43) < 0.02);
+  assert.ok(Math.abs(day.leq24_db - 67.26) < 0.02);
+  const night = _v1729({ ...base, activity_hours_day: 0, activity_hours_night: 2 });
+  assert.ok(Math.abs(night.ldn_db - 77.23) < 0.02);
+  assert.ok(Math.abs(night.ldn_db - day.ldn_db - 9.8) < 0.05);
+  // IDENTITY: the tile's own "moved to night" figure must equal actually moving it.
+  assert.ok(Math.abs(day.night_moved_ldn_db - night.ldn_db) < 1e-9);
+  assert.ok(Math.abs(day.night_penalty_cost_db - (night.ldn_db - day.ldn_db)) < 1e-9);
+  // The limit comparison follows the computed level, in both directions.
+  assert.equal(day.complies, false);
+  assert.equal(night.complies, false);
+  assert.equal(_v1729({ ...base, limit_ldn_db: 70 }).complies, true);
+  // CNEL >= Ldn always, and they are equal when nothing runs in the evening.
+  assert.ok(day.cnel_db >= day.ldn_db - 1e-12);
+  assert.ok(Math.abs(day.cnel_db - day.ldn_db) < 0.02);
+  const evening = _v1729({ ...base, activity_hours_day: 0, activity_hours_evening: 2 });
+  assert.ok(evening.cnel_db > evening.ldn_db);
+  // ENERGY AVERAGING: halving the loud activity takes about 3 dB off, while
+  // taking 10 dB off the BACKGROUND barely moves it. The spec's real lever.
+  assert.ok(day.ldn_db - day.halved_ldn_db > 2.5);
+  assert.ok(day.ldn_db - day.quiet_background_ldn_db < 0.5);
+  assert.ok(day.ldn_db - day.halved_ldn_db > day.ldn_db - day.quiet_background_ldn_db);
+  // Period lengths are real limits, not decoration.
+  assert.ok(_v1729({ ...base, activity_hours_day: 13 }).error);
+  assert.ok(_v1729({ ...base, activity_hours_evening: 4 }).error);
+  assert.ok(_v1729({ ...base, activity_hours_night: 10 }).error);
+  assert.ok(_v1729({ ...base, activity_level_db: 0 }).error);
+  assert.ok(_v1729({ ...base, activity_hours_day: NaN }).error);
+});
+
+test("bounds: spec-v1730 computeOdorDilutionThreshold -- the two placeholders its spec never rendered", () => {
+  const base = { source_dt: 2400, airflow_acfm: 15000, dilution_factor: 400, limit_dt: 10, target_dt: 2 };
+  const r = _v1730(base);
+  // THE UNRENDERED PLACEHOLDERS, computed: 600,000 ou/s and a 67% reduction.
+  assert.ok(Math.abs(r.odour_emission_rate_ou_s - 2400 * 15000 / 60) < 1e-9);
+  assert.ok(Math.abs(r.odour_emission_rate_ou_s - 600000) < 1e-9);
+  assert.ok(Math.abs(r.reduction_pct - 100 * (1 - 800 / 2400)) < 1e-9);
+  assert.ok(Math.abs(r.reduction_pct - 66.667) < 0.01);
+  // The spec's two correct lines.
+  assert.ok(Math.abs(r.dt_at_receptor - 6) < 1e-12);
+  assert.ok(Math.abs(r.required_source_dt - 800) < 1e-12);
+  // ROUND TRIP: the source concentration the target requires, put back through
+  // the same dilution, lands exactly on the target.
+  assert.ok(Math.abs(r.required_source_dt / 400 - 2) < 1e-12);
+  const atTarget = _v1730({ ...base, source_dt: r.required_source_dt });
+  assert.ok(Math.abs(atTarget.dt_at_receptor - 2) < 1e-12);
+  assert.equal(atTarget.already_met, true);
+  // 6 D/T is inside a limit of 10 and outside a limit of 5 -- the spec's point
+  // that which ordinance applies decides the answer.
+  assert.equal(r.complies, true);
+  assert.equal(_v1730({ ...base, limit_dt: 5 }).complies, false);
+  // MONOTONIC: more dilution is a lower receptor D/T, and a stronger source a higher one.
+  assert.ok(_v1730({ ...base, dilution_factor: 800 }).dt_at_receptor < r.dt_at_receptor);
+  assert.ok(_v1730({ ...base, source_dt: 4800 }).dt_at_receptor > r.dt_at_receptor);
+  // The emission rate is linear in both of its factors.
+  assert.ok(Math.abs(_v1730({ ...base, airflow_acfm: 30000 }).odour_emission_rate_ou_s - 2 * r.odour_emission_rate_ou_s) < 1e-9);
+  assert.ok(_v1730({ ...base, source_dt: 0 }).error);
+  assert.ok(_v1730({ ...base, airflow_acfm: 0 }).error);
+  assert.ok(_v1730({ ...base, dilution_factor: 0 }).error);
+  assert.ok(_v1730({ ...base, target_dt: -1 }).error);
+});

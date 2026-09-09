@@ -1134,6 +1134,10 @@ const _TILES = [
   ["adhesive-bond-area", "K"],
   ["refractory-shell-temperature", "C"],
   ["cryogenic-boiloff", "C"],
+  ["gaussian-dispersion-screen", "G"],
+  ["noise-barrier-insertion-loss", "G"],
+  ["community-noise-ldn", "G"],
+  ["odor-dilution-threshold", "G"],
   // spec-v1717..v1726 air quality band (new calc-airquality.js)
   ["stack-emission-pte", "G"],
   ["opacity-six-minute", "G"],

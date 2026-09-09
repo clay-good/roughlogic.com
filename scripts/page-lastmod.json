@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "a943cc3c511e958f",
+      "sha": "c3958143509b74f0",
       "date": "2026-09-09"
     },
     "/tools/": {
-      "sha": "0c23238aaf0ce41b",
+      "sha": "7fcf51faad473efa",
       "date": "2026-09-09"
     },
     "/groups/accounting/": {
-      "sha": "8fb617f425232d4b",
+      "sha": "a0062561654582d6",
       "date": "2026-09-09"
     },
     "/groups/agriculture/": {
-      "sha": "a01f612112d0e3fb",
+      "sha": "f3a603d79438438a",
       "date": "2026-09-09"
     },
     "/groups/construction/": {
-      "sha": "db479b26233fb338",
+      "sha": "520fa8dd505d5033",
       "date": "2026-09-09"
     },
     "/groups/cross-trade/": {
-      "sha": "86b4f3e118410c4c",
+      "sha": "4a45655742caf6b0",
       "date": "2026-09-09"
     },
     "/groups/educators/": {
-      "sha": "c675792d17a2efd7",
+      "sha": "e46232c6f4715ea2",
       "date": "2026-09-09"
     },
     "/groups/electrical/": {
-      "sha": "7b451da00618b08d",
+      "sha": "59c01e4205995f01",
       "date": "2026-09-09"
     },
     "/groups/field/": {
-      "sha": "517a600ea6e73df9",
+      "sha": "cb712c94acc2d309",
       "date": "2026-09-09"
     },
     "/groups/fire-ground/": {
-      "sha": "2085a9a81a2c967b",
+      "sha": "56a4f440e854cb14",
       "date": "2026-09-09"
     },
     "/groups/historical/": {
-      "sha": "9563e7fc51538fbc",
+      "sha": "a1419aac3c877fdc",
       "date": "2026-09-09"
     },
     "/groups/hvac/": {
-      "sha": "0ffb1a7cc5b81f3e",
+      "sha": "a93c680b8a0e5272",
       "date": "2026-09-09"
     },
     "/groups/kitchen/": {
-      "sha": "18d79134e47c132d",
+      "sha": "dcb67799317f220e",
       "date": "2026-09-09"
     },
     "/groups/lab/": {
-      "sha": "ec0d6d44109423be",
+      "sha": "bff3472b2e565bad",
       "date": "2026-09-09"
     },
     "/groups/mechanic/": {
-      "sha": "88b574511f5e5aeb",
+      "sha": "7b9f63c516fe718c",
       "date": "2026-09-09"
     },
     "/groups/plumbing/": {
-      "sha": "2bea17f78fa41efd",
+      "sha": "105decce02a08c8f",
       "date": "2026-09-09"
     },
     "/groups/real-estate/": {
-      "sha": "566030744de904ed",
+      "sha": "994247a0caf90eb3",
       "date": "2026-09-09"
     },
     "/groups/references/": {
-      "sha": "a0514373b9e84c6c",
+      "sha": "101734c725e88124",
       "date": "2026-09-09"
     },
     "/groups/restoration/": {
-      "sha": "73e671f8d4aae920",
+      "sha": "bc5e39cf87828e26",
       "date": "2026-09-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "00162b7dff1efc27",
+      "sha": "2b3aee37116d7e53",
       "date": "2026-09-09"
     },
     "/groups/stage/": {
-      "sha": "d23f72301e024466",
+      "sha": "ba0d7e90aedbf9c2",
       "date": "2026-09-09"
     },
     "/groups/trucking/": {
-      "sha": "6b8c9888fd9dcc16",
+      "sha": "9eff15c6110d0330",
       "date": "2026-09-09"
     },
     "/groups/water/": {
-      "sha": "8b131f6440db0e15",
+      "sha": "03c175b7717df3e8",
       "date": "2026-09-09"
     },
     "/tools/aav-install-check/": {
@@ -1328,6 +1328,10 @@
     "/tools/commission-split/": {
       "sha": "63b39b5a70af55a2",
       "date": "2026-09-01"
+    },
+    "/tools/community-noise-ldn/": {
+      "sha": "7f0485bfd8c82b49",
+      "date": "2026-09-09"
     },
     "/tools/compaction-roller-production/": {
       "sha": "c93e1ad47be69c32",
@@ -3081,6 +3085,10 @@
       "sha": "b9f4adcfd92bf5dd",
       "date": "2026-09-05"
     },
+    "/tools/gaussian-dispersion-screen/": {
+      "sha": "0e9f3c00b6648cd9",
+      "date": "2026-09-09"
+    },
     "/tools/gcwr-check/": {
       "sha": "1fb066a9609f013a",
       "date": "2026-09-01"
@@ -4641,6 +4649,10 @@
       "sha": "6298e3b5cad1ea14",
       "date": "2026-09-06"
     },
+    "/tools/noise-barrier-insertion-loss/": {
+      "sha": "b301f0b4508db0b0",
+      "date": "2026-09-09"
+    },
     "/tools/noise-dose/": {
       "sha": "9882a2f56ad74f49",
       "date": "2026-09-01"
@@ -4672,6 +4684,10 @@
     "/tools/od600-cell-count/": {
       "sha": "cd6a92258411bd1d",
       "date": "2026-09-01"
+    },
+    "/tools/odor-dilution-threshold/": {
+      "sha": "72e1210ee3377fb3",
+      "date": "2026-09-09"
     },
     "/tools/off-grid-battery/": {
       "sha": "da080b6ec1923641",
@@ -7378,8 +7394,8 @@
       "date": "2026-09-01"
     },
     "/tools/thermal-delta-t/": {
-      "sha": "18b894f0833b4458",
-      "date": "2026-09-04"
+      "sha": "0350dd74817345fb",
+      "date": "2026-09-09"
     },
     "/tools/thermal-expansion-volume/": {
       "sha": "d2ca1acb6ea6b671",

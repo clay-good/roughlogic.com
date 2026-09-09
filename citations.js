@@ -22191,6 +22191,56 @@ export const CITATIONS = {
       { name: "Not weight and balance", value: "the centre of gravity envelope is checked elsewhere", source: "the aircraft flight manual" },
     ],
   },
+  // spec-v1727..v1730: the 2026-09-09 trade-expansion dispersion, community
+  // noise and odour band, closing calc-airquality.js. Nothing cut.
+  "gaussian-dispersion-screen": {
+    formula: "the Gaussian plume equation with ground reflection on the plume centreline: C = Q / (pi u sigma_y sigma_z) x exp(-H^2 / (2 sigma_z^2)), with sigma_y and sigma_z from the standard Pasquill-Gifford rural power-law fits sigma = a x^b by stability class.",
+    edition: "A flat-terrain, steady-state, single-source screening estimate with no chemistry. The bundled Pasquill-Gifford coefficients are the standard RURAL fits; urban terrain disperses differently, and they approximate curves drawn from a limited experimental base. It does not address terrain, building downwash, complex or elevated receptors, plume depletion, deposition, reaction, calm or low wind speeds, fumigation, multiple sources, or averaging-time conversion -- the result is a short-term centreline value, not an annual average. It is NOT a regulatory dispersion model and its result is not a compliance demonstration.",
+    freeAccess: "One closed-form equation and a published power-law coefficient set; no proprietary model is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Two terms dominate and neither is the emission rate. EFFECTIVE HEIGHT enters squared inside an exponential, so halving it multiplies the ground-level concentration several times over -- which is why plume rise matters as much as the stack, and why building downwash, which can remove that rise entirely, is such a serious omission from a screen. STABILITY moves the answer by more than an order of magnitude. That is why the maximum's LOCATION is reported rather than only the concentration at one distance: the maximum is neither at the fence line nor at the horizon, and it moves with stability, so a stable plume gives almost nothing close in and then reaches the ground much farther out. A receptor screened at one distance under one condition has not been screened.",
+    assumptions: [
+      { name: "Rural Pasquill-Gifford coefficients", value: "urban terrain disperses differently", source: "the applicable modelling guideline" },
+      { name: "Flat terrain, no downwash", value: "terrain and building effects can dominate a real site", source: "a regulatory dispersion model" },
+      { name: "Not a compliance demonstration", value: "a short-term centreline screen, not an annual average", source: "the air quality authority" },
+    ],
+  },
+  "noise-barrier-insertion-loss": {
+    formula: "Maekawa's barrier attenuation relation: insertion loss = 10 log10(3 + 20 N), where the Fresnel number N is twice the path difference over the wavelength, and the wavelength is the speed of sound (taken as 1,130 ft/s at room temperature) over the frequency.",
+    edition: "A single-barrier, single-frequency, point-source screen. It does not address ground effect, atmospheric absorption, reflections from a parallel barrier or a facade on the far side, multiple diffraction over a thick barrier or a berm, the source's actual spectrum and directivity, the transmission loss of the barrier material itself, or barrier structural design and wind loading. Flanking around the ends caps a real barrier near 20 to 25 dB regardless of what the geometry alone would give.",
+    freeAccess: "One logarithm from a published empirical relation; no proprietary chart is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "FREQUENCY decides the answer: a half-foot path difference is 13 dB at 1,000 Hz and 7 dB at 125 Hz, because a long wavelength diffracts around the top and a short one does not. Tyre noise is substantially reduced and engine and exhaust rumble is barely touched, which is exactly what residents report -- the traffic sounds different and the loud part is still there -- and a single A-weighted number hides it. BREAKING THE LINE OF SIGHT IS A THRESHOLD, NOT A SLOPE: a barrier grazing the sight line has N = 0 and gives 10 log10(3), about 4.8 dB, essentially nothing. There is no partial credit for a barrier you can see over.",
+    assumptions: [
+      { name: "Single frequency, single barrier", value: "a real source has a spectrum and a real site has flanking", source: "the acoustical consultant" },
+      { name: "The material transmits less than it diffracts", value: "otherwise transmission through the barrier governs instead", source: "the barrier manufacturer's data" },
+      { name: "A practical ceiling applies", value: "flanking caps a real barrier near 20 to 25 dB", source: "the applicable highway agency noise procedure" },
+    ],
+  },
+  "community-noise-ldn": {
+    formula: "Ldn is the 24-hour energy (3 dB) average of the hourly levels with 10 dB added to every hour from 10 p.m. to 7 a.m.; CNEL adds a further 4.77 dB to the 7 p.m. to 10 p.m. evening. Each period contributes its activity hours at the activity level and its remaining hours at the background level.",
+    edition: "Levels are ENTERED, and that is the hard part: an ordinance is written at a property line or a receptor, and a level measured or predicted somewhere else is not that level. This does not measure anything, propagate sound from a source to a receptor, apply distance, ground, barrier or shielding attenuation, add the tonal, impulsive or low-frequency character adjustments many ordinances carry, address vibration, or determine which ordinance applies or how it defines its measurement position and averaging period.",
+    freeAccess: "An energy average and two published penalties; no ordinance text is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "This is a 3 dB ENERGY average and must not be confused with OSHA 1910.95 occupational noise dose, which uses a 5 dB exchange rate and answers a hearing-conservation question rather than a land-use one. The night penalty is a factor of ten in energy, so an hour of work at night enters the average as ten hours of the same work by day: moving two hours of a 78 dB activity from the afternoon to 11 p.m. takes the Ldn from about 67 to about 77 with no change in equipment, level, or duration. And because energy averaging lets the loud activity dominate, reducing the BACKGROUND is close to wasted effort while shortening the loud activity is the lever -- halving its duration takes 3 dB off, more than most equipment treatments deliver.",
+    assumptions: [
+      { name: "Levels are at the receptor", value: "a level measured elsewhere is not the ordinance's level", source: "the governing noise ordinance" },
+      { name: "Energy (3 dB) averaging", value: "not the OSHA 5 dB exchange rate", source: "the applicable measurement standard" },
+      { name: "No character adjustments", value: "tonal, impulsive and low-frequency penalties are the ordinance's", source: "the governing noise ordinance" },
+    ],
+  },
+  "odor-dilution-threshold": {
+    formula: "odour emission rate = source dilution-to-threshold x volumetric flow; the receptor D/T is the source D/T divided by the dilution the atmosphere provides; and the source concentration a target receptor D/T requires is that target times the same dilution, from which the reduction follows.",
+    edition: "Source D/T is ENTERED and comes from dynamic olfactometry on a collected sample -- a laboratory panel method with real variability, where one sample represents one operating condition of a source whose odour usually varies with process state, temperature, and season. The dilution between source and receptor is also entered and comes from a dispersion calculation with all the caveats that carries. It does not model dispersion, address odour character or hedonic tone, the intensity-concentration relationship, or the frequency and duration terms most modern odour rules weigh alongside concentration.",
+    freeAccess: "Two multiplications and a ratio; no olfactometry standard text is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The consistent finding is that ODOUR IS REDUCED AT SOURCE OR NOT AT ALL. A source at 2,400 D/T through 15,000 acfm is 600,000 odour units per second; at 400:1 of atmospheric dilution the fence sees 6, and taking that to 2 means the source must fall to 800 -- a 67% reduction in concentration. Achieving the same by dispersion would need three times the dilution, roughly a doubling of effective stack height, because ground-level concentration falls roughly with the square of it. That is why containment, biofilters, scrubbers and oxidizers work where a taller stack does not. Which ordinance applies is genuinely the question: limits, measurement methods, and the exceedances allowed vary widely between jurisdictions.",
+    assumptions: [
+      { name: "D/T from olfactometry", value: "a panel method with real variability, from one operating condition", source: "the olfactometry standard used" },
+      { name: "The dilution is entered", value: "it comes from a dispersion calculation, not from this tile", source: "a dispersion model" },
+      { name: "Concentration is not unpleasantness", value: "hedonic tone, frequency and duration are outside this arithmetic", source: "the applicable odour ordinance or nuisance rule" },
+    ],
+  },
   // spec-v1677, v1678: the 2026-09-09 trade-expansion mechanical insulation
   // band, in the existing calc-hvacsystems.js. Two of the band's four specs
   // were cut as duplicates and landed additively on the tiles that already

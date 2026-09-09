@@ -1501,7 +1501,11 @@ cross-check.
 | calc-airquality.js | `computeBaghouseCleaningInterval` | `{ baseline_inwc = 0, trigger_inwc = 0, cycle_minutes = 0, original_baseline_i...` | _ | _ | _ |
 | calc-airquality.js | `computeCarbonBedLife` | `{ carbon_lb = 0, working_capacity_pct = 0, loading_lb_h = 0, operating_hours_...` | _ | _ | _ |
 | calc-airquality.js | `computeCoatingVocCompliance` | `{ coating_gal = 1, voc_lb = 0, water_gal = 0, exempt_gal = 0, thinner_gal = 0...` | _ | _ | _ |
+| calc-airquality.js | `computeCommunityNoiseLdn` | `{ activity_level_db = 0, activity_hours_day = 0, activity_hours_evening = 0, ...` | _ | _ | _ |
 | calc-airquality.js | `computeEspDeutschEfficiency` | `{ plate_area_ft2 = 0, gas_acfm = 0, migration_velocity_fps = 0, target_effici...` | _ | _ | _ |
+| calc-airquality.js | `computeGaussianDispersionScreen` | `{ emission_rate_lb_hr = 0, effective_height_ft = 0, wind_mph = 0, distance_mi...` | _ | _ | _ |
+| calc-airquality.js | `computeNoiseBarrierInsertionLoss` | `{ source_to_top_ft = 0, top_to_receiver_ft = 0, source_to_receiver_ft = 0, pa...` | _ | _ | _ |
+| calc-airquality.js | `computeOdorDilutionThreshold` | `{ source_dt = 0, airflow_acfm = 0, dilution_factor = 0, limit_dt = 0, target_...` | _ | _ | _ |
 | calc-airquality.js | `computeOpacitySixMinute` | `{ readings_sum_pct = 0, reading_count = 24, peak_reading_pct = 0, limit_pct =...` | _ | _ | _ |
 | calc-airquality.js | `computePlumeRiseBriggs` | `{ stack_height_ft = 0, stack_diameter_ft = 0, exit_velocity_fps = 0, exit_tem...` | _ | _ | _ |
 | calc-airquality.js | `computeScrubberLgRatio` | `{ gas_acfm = 0, lg_ratio_gpm_per_1000 = 0, pump_head_ft = 0, pump_efficiency ...` | _ | _ | _ |
@@ -3741,7 +3745,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2327.
+Row count: 2331.
 
 <!-- END function-corpus-v14 -->
 
@@ -5124,7 +5128,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (143 tiles)
+### Group G Cross-trade (147 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5149,6 +5153,7 @@ per spec-v14 §13.1 second paragraph.
 | `circular-sector` | Circular Sector (Pie Slice) Area and Arc | Project (first-principles); area (1/2)r^2 theta | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `circular-segment-area` | Circular Segment Area (from Chord and Rise) | First-principles circle geometry (Mac...; R = (144 + 16)/8 = 20; theta = 2 acos(16/20) = 1.28700 ra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `coating-voc-compliance` | Coating VOC Content and Compliance Rate | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `community-noise-ldn` | Day-Night Average Sound Level (Ldn and CNEL) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cone-bottom-tank-volume` | Cone-Bottom Tank Volume from Dipstick | Project (first-principles); cone (h^3) + cylinder | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cone-flat-pattern` | Cone Flat-Pattern Development (Radial Line) | sheet-metal radial-line layout; spec-v400 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cyclone-separator-sizing` | Cyclone Separator Cut Size and Pressure Drop | Project (first-principles); d50 = sqrt(9 mu W / (2 pi N V (rho_p - rho_g))) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5168,6 +5173,7 @@ per spec-v14 §13.1 second paragraph.
 | `flange-bolt-torque` | Flange Bolt-Up Torque | ASME PCC-1 / B16.5 (by name); 3/4 in B7 bolt (A_t 0.334 in^2) at 50% of 105 ksi yield, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `frustum-volume` | Frustum (Truncated Cone) Volume and Surface | Project (first-principles); V=(pi h/12)(D^2+Dd+d^2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gas-strut-force` | Gas Spring Force and Mounting Geometry | Project (first-principles); force per strut = lid moment / (struts x moment arm) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `gaussian-dispersion-screen` | Downwind Ground-Level Concentration Screen (Gaussian) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gear-cascade` | Gear Ratio and RPM Cascade | First-principles / AGMA; overall = product of stage ratios; RPM_out = RPM_in/overa... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `geometry` | Geometry Pack | Project (first-principles); r=10 ft / sector 90 deg -> circumference 62.832 / area 31... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `haversine` | GPS Distance (Haversine) | Project (first-principles); Haversine identity over Earth radius 3958.8 mi | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -5195,7 +5201,9 @@ per spec-v14 §13.1 second paragraph.
 | `nitrox-ead` | Nitrox Equivalent Air Depth and the Oxygen Check | Project (first-principles); a gas analysis before every dive and the diving superviso... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `nitrox-mod` | Nitrox Maximum Operating Depth, Best Mix, and Oxygen Limits | Project (first-principles); a gas analysis before every dive and the diving superviso... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `no-decompression-limit` | Dive No-Decompression Limit and Residual Nitrogen | Project (first-principles); the applicable dive tables and the diving supervisor govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `noise-barrier-insertion-loss` | Noise Barrier Insertion Loss (Fresnel Number) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `noise-dose` | OSHA 1910.95 Noise Dose and TWA | OSHA; T = 8 / 2^((L-90)/5); D = sum(C/T)*100; TWA = 16.61 log10... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `odor-dilution-threshold` | Odour Dilution to Threshold and the Reduction a Target Requires | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `opacity-six-minute` | Visible Emission Opacity Six-Minute Average (Method 9) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `oval-tank-volume` | Oval (Obround) Tank Volume from Dipstick | Project (first-principles); stadium cross-section, piecewise segment fill | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `overtime` | Overtime Hours | Project (first-principles); Standard FLSA / state DOL overtime schedule | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5990,6 +5998,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2076. Fixture-covered or reference-cadence: 2076 / 2076.
+Tile count: 2080. Fixture-covered or reference-cadence: 2080 / 2080.
 
 <!-- END tile-index-v14 -->

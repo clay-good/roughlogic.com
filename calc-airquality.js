@@ -933,3 +933,416 @@ AIRQUALITY_RENDERERS["plume-rise-briggs"] = _simpleRenderer({
   ],
   compute: computePlumeRiseBriggs,
 });
+
+// ===================== spec-v1727: Gaussian ground-level concentration screen =====================
+// Pasquill-Gifford sigma coefficients for rural terrain, the standard
+// power-law fits sigma = a x^b with x in km and sigma in m.
+const _PG_SIGMA = {
+  A: { ay: 213, by: 0.894, az: 440.8, bz: 1.941 },
+  B: { ay: 156, by: 0.894, az: 106.6, bz: 1.149 },
+  C: { ay: 104, by: 0.894, az: 61.0, bz: 0.911 },
+  D: { ay: 68, by: 0.894, az: 33.2, bz: 0.725 },
+  E: { ay: 50.5, by: 0.894, az: 22.8, bz: 0.678 },
+  F: { ay: 34, by: 0.894, az: 14.35, bz: 0.740 },
+};
+// dims: in { args: dimensionless } out: { sigma_y_m: L, sigma_z_m: L, concentration_ug_m3: M L^-3, max_concentration_ug_m3: M L^-3, max_distance_km: L, effective_height_m: L }
+export function computeGaussianDispersionScreen({
+  emission_rate_lb_hr = 0, effective_height_ft = 0, wind_mph = 0,
+  distance_mi = 0, stability_class = "D", alt_stability_class = "",
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(emission_rate_lb_hr > 0)) return { error: "Emission rate must be positive." };
+  if (!(effective_height_ft >= 0)) return { error: "Effective release height cannot be negative." };
+  if (!(wind_mph > 0)) return { error: "Wind speed must be positive -- the Gaussian plume model breaks down at calm." };
+  if (!(distance_mi > 0)) return { error: "Downwind distance must be positive." };
+  // The Pasquill-Gifford curves are published with distance in km and the
+  // dispersion coefficients in m, so the entered US units convert once here.
+  // 453.59237 g/lb, 0.3048 m/ft and 1,609.344 m/mi are all exact.
+  const emission_rate_g_s = emission_rate_lb_hr * 453.59237 / 3600;
+  const effective_height_m = effective_height_ft * 0.3048;
+  const wind_speed_m_s = wind_mph * 1609.344 / 3600;
+  const distance_km = distance_mi * 1.609344;
+  const cls = String(stability_class || "D").toUpperCase();
+  if (!_PG_SIGMA[cls]) return { error: "Stability class must be one of A through F." };
+  const sigmasAt = (x_km, c) => {
+    const p = _PG_SIGMA[c];
+    return { y: p.ay * Math.pow(x_km, p.by), z: p.az * Math.pow(x_km, p.bz) };
+  };
+  // The centreline ground-level concentration under a reflecting ground.
+  const concAt = (x_km, c) => {
+    const s = sigmasAt(x_km, c);
+    if (!(s.y > 0) || !(s.z > 0)) return 0;
+    return (emission_rate_g_s / (Math.PI * wind_speed_m_s * s.y * s.z))
+      * Math.exp(-(effective_height_m * effective_height_m) / (2 * s.z * s.z));
+  };
+  const s = sigmasAt(distance_km, cls);
+  const sigma_y_m = s.y;
+  const sigma_z_m = s.z;
+  const exponential_term = Math.exp(-(effective_height_m * effective_height_m) / (2 * sigma_z_m * sigma_z_m));
+  const concentration_g_m3 = concAt(distance_km, cls);
+  const concentration_ug_m3 = concentration_g_m3 * 1e6;
+  const at_verdict = fmt(concentration_ug_m3, 1) + " micrograms per cubic metre at " + fmt(distance_mi, 2)
+    + " miles downwind in stability class " + cls + ", where sigma_y is " + fmt(sigma_y_m, 0) + " m and sigma_z is "
+    + fmt(sigma_z_m, 0) + " m and the height term is " + exponential_term.toExponential(2);
+  // WHERE the maximum sits is the point of the tile: it is not at the fence and
+  // not at the horizon, and it moves with stability.
+  let max_concentration_ug_m3 = 0;
+  let max_distance_km = 0;
+  for (let i = 0; i <= 2000; i++) {
+    const x = 0.05 + i * (50 - 0.05) / 2000;
+    const c = concAt(x, cls) * 1e6;
+    if (c > max_concentration_ug_m3) { max_concentration_ug_m3 = c; max_distance_km = x; }
+  }
+  const at_max = distance_km >= max_distance_km * 0.9 && distance_km <= max_distance_km * 1.1;
+  const max_verdict = "the maximum for class " + cls + " is " + fmt(max_concentration_ug_m3, 1)
+    + " micrograms per cubic metre at about " + fmt(max_distance_km / 1.609344, 2) + " miles"
+    + (at_max
+      ? " -- the entered distance is near it"
+      : ", which is " + (distance_km < max_distance_km ? "FARTHER OUT than" : "CLOSER IN than")
+        + " the " + fmt(distance_mi, 2) + " miles entered, so screening only at that distance misses the peak");
+  // The same source under a second stability class.
+  const alt = String(alt_stability_class || "").toUpperCase();
+  const has_alt = !!alt && !!_PG_SIGMA[alt] && alt !== cls;
+  let alt_concentration_ug_m3 = 0, alt_max_ug_m3 = 0, alt_max_distance_km = 0;
+  if (has_alt) {
+    alt_concentration_ug_m3 = concAt(distance_km, alt) * 1e6;
+    for (let i = 0; i <= 2000; i++) {
+      const x = 0.05 + i * (50 - 0.05) / 2000;
+      const c = concAt(x, alt) * 1e6;
+      if (c > alt_max_ug_m3) { alt_max_ug_m3 = c; alt_max_distance_km = x; }
+    }
+  }
+  const alt_verdict = !has_alt
+    ? "(no second stability class entered)"
+    : "in class " + alt + " the same source gives " + fmt(alt_concentration_ug_m3, 1)
+      + " at " + fmt(distance_mi, 2) + " miles, and its own maximum is " + fmt(alt_max_ug_m3, 1)
+      + " at about " + fmt(alt_max_distance_km / 1.609344, 2) + " miles"
+      + (alt_max_distance_km > max_distance_km
+        ? " -- farther out, because a more stable plume stays coherent and aloft longer before it reaches the ground"
+        : " -- closer in, because a less stable plume mixes down sooner");
+  // The height exponential is the term that dominates.
+  const half_height_conc = effective_height_m > 0
+    ? (emission_rate_g_s / (Math.PI * wind_speed_m_s * sigma_y_m * sigma_z_m))
+      * Math.exp(-Math.pow(effective_height_m / 2, 2) / (2 * sigma_z_m * sigma_z_m)) * 1e6
+    : concentration_ug_m3;
+  const height_ratio = concentration_ug_m3 > 0 ? half_height_conc / concentration_ug_m3 : 0;
+  const height_verdict = effective_height_m <= 0
+    ? "a ground-level release has no height term to trade"
+    : "halving the effective height to " + fmt(effective_height_ft / 2, 0) + " ft would give "
+      + fmt(half_height_conc, 1) + " micrograms per cubic metre at the same distance, "
+      + fmt(height_ratio, 1) + " times as much -- the height enters as a squared term inside an exponential, so effective height moves the answer harder than the emission rate does, and effective height is stack height PLUS plume rise";
+  if (![sigma_y_m, sigma_z_m, concentration_ug_m3, max_concentration_ug_m3].every(Number.isFinite)) return { error: "Dispersion math is not a finite value." };
+  return {
+    emission_rate_g_s, effective_height_m, wind_speed_m_s, distance_km,
+    sigma_y_m, sigma_z_m, exponential_term, concentration_g_m3, concentration_ug_m3, at_verdict,
+    max_concentration_ug_m3, max_distance_km, at_max, max_verdict,
+    has_alt, alt_concentration_ug_m3, alt_max_ug_m3, alt_max_distance_km, alt_verdict,
+    half_height_conc, height_ratio, height_verdict,
+    note: "A screening estimate of the ground-level concentration downwind of an elevated source, from the Gaussian plume equation with ground reflection: the concentration on the centreline is the emission rate over pi times the wind speed and the two dispersion coefficients, times an exponential in the effective release height squared over twice sigma_z squared. Two things dominate and neither is the emission rate. The first is EFFECTIVE HEIGHT, which enters squared inside an exponential -- halving it can multiply the ground-level concentration several times over, which is why plume rise (`plume-rise-briggs`) matters as much as the stack. Effective height is the stack height PLUS the plume rise, and building downwash can eliminate that rise entirely. The second is STABILITY. The dispersion coefficients come from the Pasquill-Gifford curves, and they change the answer by more than an order of magnitude between an unstable afternoon and a stable night. That is why the tile reports WHERE the maximum sits rather than only the concentration at the distance entered: the maximum is not at the fence line and not at the horizon, and its location moves with stability. A stable plume stays coherent and aloft, producing almost nothing close in and then a higher concentration farther out than an unstable one ever reaches. A receptor screened at one distance under one condition has not been screened. The bundled Pasquill-Gifford coefficients are the standard RURAL power-law fits and urban terrain disperses differently; they are an approximation to curves that were themselves drawn from a limited experimental base. This is a flat-terrain, steady-state, single-source screen with no chemistry: it does not address terrain, building downwash, complex or elevated receptors, plume depletion, deposition, reaction, calm or low wind speeds (where the model breaks down rather than merely losing accuracy), fumigation, multiple sources, or averaging-time conversion -- the result is a short-term centreline value, not an annual average. It is not a regulatory dispersion model and its result is not a compliance demonstration. The applicable modelling guideline, a regulatory model such as the ones EPA maintains, and a qualified air quality professional govern.",
+  };
+}
+export const gaussianDispersionScreenExample = { inputs: { emission_rate_lb_hr: 79.366, effective_height_ft: 219.8, wind_mph: 8.948, distance_mi: 0.6214, stability_class: "D", alt_stability_class: "F" } };
+AIRQUALITY_RENDERERS["gaussian-dispersion-screen"] = _simpleRenderer({
+  citation: "Citation: the Gaussian plume equation with ground reflection, C = Q / (pi u sigma_y sigma_z) x exp(-H^2 / (2 sigma_z^2)) on the plume centreline, with the standard Pasquill-Gifford RURAL power-law dispersion coefficients named by stability class A through F. Inputs are entered in US units and converted once at 453.59237 g/lb, 0.3048 m/ft and 1,609.344 m/mi, all exact, because the published curves are in km and metres. A flat-terrain, steady-state, single-source SCREEN with no chemistry: no terrain, building downwash, deposition, depletion, reaction, calm winds, fumigation, multiple sources, or averaging-time conversion. It is not a regulatory dispersion model and its result is not a compliance demonstration. The applicable modelling guideline, a regulatory model, and a qualified air quality professional govern.",
+  example: gaussianDispersionScreenExample.inputs,
+  fields: [
+    { key: "emission_rate_lb_hr", label: "Emission rate (lb/hr)", kind: "number", attrs: { step: "any" } },
+    { key: "effective_height_ft", label: "Effective release height (ft, stack + plume rise)", kind: "number", attrs: { step: "any" } },
+    { key: "wind_mph", label: "Wind speed at release height (mph)", kind: "number", attrs: { step: "any" } },
+    { key: "distance_mi", label: "Downwind distance (miles)", kind: "number", attrs: { step: "any" } },
+    { key: "stability_class", label: "Pasquill stability class", kind: "select", options: [
+      { value: "A", label: "A - very unstable" }, { value: "B", label: "B - unstable" },
+      { value: "C", label: "C - slightly unstable" }, { value: "D", label: "D - neutral" },
+      { value: "E", label: "E - slightly stable" }, { value: "F", label: "F - very stable" },
+    ] },
+    { key: "alt_stability_class", label: "Second stability class to compare", kind: "select", options: [
+      { value: "", label: "(none)" },
+      { value: "A", label: "A - very unstable" }, { value: "B", label: "B - unstable" },
+      { value: "C", label: "C - slightly unstable" }, { value: "D", label: "D - neutral" },
+      { value: "E", label: "E - slightly stable" }, { value: "F", label: "F - very stable" },
+    ] },
+  ],
+  outputs: [
+    { key: "c", id: "gds-out-c", label: "Concentration at the distance entered", value: (r) => r.at_verdict },
+    { key: "m", id: "gds-out-m", label: "Where the maximum is", value: (r) => r.max_verdict },
+    { key: "s", id: "gds-out-s", label: "Under the second stability class", value: (r) => r.alt_verdict },
+    { key: "h", id: "gds-out-h", label: "What effective height is worth", value: (r) => r.height_verdict },
+    { key: "n", id: "gds-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGaussianDispersionScreen,
+});
+
+// ===================== spec-v1728: noise barrier insertion loss (Fresnel number) =====================
+// Speed of sound taken as 1,130 ft/s at room temperature, the standard
+// acoustics reference value.
+const _BARRIER_SPEED_OF_SOUND_FPS = 1130;
+// dims: in { args: dimensionless } out: { path_difference_ft: L, wavelength_ft: L, fresnel_number: dimensionless, insertion_loss_db: dimensionless }
+export function computeNoiseBarrierInsertionLoss({
+  source_to_top_ft = 0, top_to_receiver_ft = 0, source_to_receiver_ft = 0,
+  path_difference_ft = 0, frequency_hz = 0, second_frequency_hz = 0,
+  practical_ceiling_db = 20,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(frequency_hz > 0)) return { error: "Frequency must be positive." };
+  if (!(second_frequency_hz >= 0)) return { error: "The second frequency cannot be negative (0 to skip)." };
+  if (!(practical_ceiling_db > 0)) return { error: "The practical ceiling must be positive." };
+  if (!(path_difference_ft >= 0)) return { error: "Path difference cannot be negative." };
+  // Either enter the path difference, or the three legs it comes from.
+  const has_geometry = source_to_top_ft > 0 && top_to_receiver_ft > 0 && source_to_receiver_ft > 0;
+  const geometric_difference = has_geometry ? (source_to_top_ft + top_to_receiver_ft) - source_to_receiver_ft : 0;
+  if (has_geometry && geometric_difference < 0) return { error: "The over-the-top path cannot be shorter than the direct path -- check the three distances." };
+  const delta = has_geometry ? geometric_difference : path_difference_ft;
+  if (!(delta >= 0)) return { error: "Enter a path difference, or the three distances it comes from." };
+  const lossAt = (f) => {
+    const lambda = _BARRIER_SPEED_OF_SOUND_FPS / f;
+    const N = 2 * delta / lambda;
+    // Maekawa's form. At N = 0 -- the barrier just grazing the line of sight --
+    // this is 10 log10(3) = 4.8 dB, which is the no-credit floor, not zero.
+    const il = 10 * Math.log10(3 + 20 * N);
+    return { lambda, N, il };
+  };
+  const a = lossAt(frequency_hz);
+  const wavelength_ft = a.lambda;
+  const fresnel_number = a.N;
+  const raw_insertion_loss_db = a.il;
+  const capped = raw_insertion_loss_db > practical_ceiling_db;
+  const insertion_loss_db = Math.min(raw_insertion_loss_db, practical_ceiling_db);
+  const primary_verdict = "at " + fmt(frequency_hz, 0) + " Hz the wavelength is " + fmt(wavelength_ft, 2)
+    + " ft, so a " + fmt(delta, 3) + " ft path difference is a Fresnel number of " + fmt(fresnel_number, 2)
+    + " and an insertion loss of " + fmt(raw_insertion_loss_db, 1) + " dB"
+    + (capped ? ", reported as " + fmt(insertion_loss_db, 1) + " dB against the " + fmt(practical_ceiling_db, 0) + " dB practical ceiling -- flanking around the ends caps a real barrier regardless of what the geometry says" : "");
+  // Frequency is the whole story: the same barrier is a different barrier at each band.
+  const has_second = second_frequency_hz > 0;
+  const b = has_second ? lossAt(second_frequency_hz) : null;
+  const second_insertion_loss_db = has_second ? Math.min(b.il, practical_ceiling_db) : 0;
+  const second_verdict = !has_second
+    ? "(no second frequency entered)"
+    : "at " + fmt(second_frequency_hz, 0) + " Hz the wavelength is " + fmt(b.lambda, 2) + " ft, the Fresnel number is "
+      + fmt(b.N, 2) + ", and the same barrier gives " + fmt(b.il, 1) + " dB -- "
+      + (b.il < raw_insertion_loss_db
+        ? "LESS than at " + fmt(frequency_hz, 0) + " Hz, because a long wavelength diffracts around the top. High-frequency tyre noise is substantially reduced and low-frequency engine and exhaust rumble is barely touched, which is why residents report that the traffic sounds different and the loud part is still there"
+        : "MORE than at " + fmt(frequency_hz, 0) + " Hz, because the shorter wavelength diffracts less around the top");
+  // Breaking the line of sight is a THRESHOLD, not a slope.
+  const grazing_db = 10 * Math.log10(3);
+  const breaks_line_of_sight = delta > 0;
+  const threshold_verdict = !breaks_line_of_sight
+    ? "the barrier does not break the line of sight, so the path difference is zero, the Fresnel number is zero, and the insertion loss is "
+      + fmt(grazing_db, 1) + " dB -- essentially nothing. There is no partial credit for a barrier you can see over: this is a threshold, not a slope"
+    : "the barrier breaks the line of sight by " + fmt(delta, 3) + " ft of extra path"
+      + (has_geometry ? ", computed from the three distances entered rather than assumed" : "")
+      + ". A barrier one foot short of blocking the view has a path difference near zero and gives about "
+      + fmt(grazing_db, 1) + " dB, so the last foot is the one that starts the barrier working";
+  if (![wavelength_ft, fresnel_number, raw_insertion_loss_db, insertion_loss_db].every(Number.isFinite)) return { error: "Barrier insertion loss math is not a finite value." };
+  return {
+    path_difference_ft: delta, has_geometry, geometric_difference,
+    wavelength_ft, fresnel_number, raw_insertion_loss_db, insertion_loss_db, capped, primary_verdict,
+    has_second, second_insertion_loss_db, second_verdict,
+    grazing_db, breaks_line_of_sight, threshold_verdict,
+    note: "What a noise barrier actually buys, which is a strong function of frequency and a threshold function of geometry. The insertion loss follows Maekawa's relation from the Fresnel number, twice the path difference over the wavelength, where the path difference is how much farther sound must travel over the top of the barrier than straight through it. Two consequences matter more than barrier height. The first is that FREQUENCY decides the answer. A half-foot path difference is 13 dB at 1,000 Hz and 7 dB at 125 Hz, because the long wavelength diffracts around the top and the short one does not. Tyre noise lives at the high end and is substantially reduced; truck exhaust and engine rumble live at the low end and are barely touched. That is exactly what residents report after a barrier goes in: the traffic sounds different, and the loud part is still there. Reporting a single A-weighted number for a barrier hides this. The second is that BREAKING THE LINE OF SIGHT IS A THRESHOLD, NOT A SLOPE. A barrier that just grazes the line of sight has a path difference of zero, a Fresnel number of zero, and an insertion loss of 10 log10(3), about 4.8 dB, which is essentially nothing -- there is no partial credit for a barrier you can see over. Add the last foot and it begins to work. FLANKING is what caps it in practice: sound goes around the ends, so a barrier has to extend well past the receiver in both directions, and a driveway gap is a hole most of the benefit leaves through. That is why the practical ceiling is 20 to 25 dB regardless of height, and why the geometric result is reported against an entered ceiling rather than on its own. A single-barrier, single-frequency, point-source screen: it does not address ground effect, atmospheric absorption, reflections from a parallel barrier or a building face on the far side (which can remove several decibels of a barrier's benefit), multiple diffraction over a thick barrier or a berm, the source's actual spectrum and directivity, the transmission loss of the barrier material itself (which must be high enough that transmission through it does not govern), or barrier structural design and wind loading. A traffic noise analysis under the applicable highway agency procedure, the acoustical consultant, and the governing noise ordinance govern.",
+  };
+}
+export const noiseBarrierInsertionLossExample = { inputs: { source_to_top_ft: 0, top_to_receiver_ft: 0, source_to_receiver_ft: 0, path_difference_ft: 0.5, frequency_hz: 1000, second_frequency_hz: 125, practical_ceiling_db: 20 } };
+AIRQUALITY_RENDERERS["noise-barrier-insertion-loss"] = _simpleRenderer({
+  citation: "Citation: Maekawa's barrier attenuation relation by name -- insertion loss = 10 log10(3 + 20 N) where the Fresnel number N is twice the path difference over the wavelength -- with the wavelength from a 1,130 ft/s speed of sound at room temperature. A single-barrier, single-frequency, point-source screen: it does not address ground effect, atmospheric absorption, reflections from a parallel barrier or facade, multiple diffraction over a thick barrier or berm, source spectrum and directivity, the barrier material's own transmission loss, or structural design. Flanking around the ends caps a real barrier near 20 to 25 dB regardless of geometry. The applicable highway agency noise procedure, the acoustical consultant, and the governing ordinance govern.",
+  example: noiseBarrierInsertionLossExample.inputs,
+  fields: [
+    { key: "path_difference_ft", label: "Path difference (ft, 0 to use the three distances)", kind: "number", attrs: { step: "any" } },
+    { key: "source_to_top_ft", label: "Source to barrier top (ft, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "top_to_receiver_ft", label: "Barrier top to receiver (ft, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "source_to_receiver_ft", label: "Source to receiver direct (ft, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "frequency_hz", label: "Frequency (Hz)", kind: "number", attrs: { step: "any" } },
+    { key: "second_frequency_hz", label: "Second frequency to compare (Hz, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "practical_ceiling_db", label: "Practical ceiling from flanking (dB)", kind: "number", attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "p", id: "nbil-out-p", label: "Insertion loss", value: (r) => r.primary_verdict },
+    { key: "s", id: "nbil-out-s", label: "At the second frequency", value: (r) => r.second_verdict },
+    { key: "t", id: "nbil-out-t", label: "The line of sight", value: (r) => r.threshold_verdict },
+    { key: "n", id: "nbil-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeNoiseBarrierInsertionLoss,
+});
+
+// ===================== spec-v1729: day-night average sound level (Ldn and CNEL) =====================
+// Ldn: day 7 a.m. to 10 p.m. unpenalized (15 h), night 10 p.m. to 7 a.m. +10 dB (9 h).
+// CNEL splits an evening 7 p.m. to 10 p.m. (3 h) carrying +4.77 dB.
+const _CNEL_EVENING_PENALTY_DB = 4.77;
+// dims: in { args: dimensionless } out: { ldn_db: dimensionless, cnel_db: dimensionless, leq24_db: dimensionless, night_moved_ldn_db: dimensionless }
+export function computeCommunityNoiseLdn({
+  activity_level_db = 0, activity_hours_day = 0, activity_hours_evening = 0, activity_hours_night = 0,
+  background_level_db = 0, limit_ldn_db = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(activity_level_db > 0)) return { error: "The activity sound level must be positive." };
+  if (!(background_level_db >= 0)) return { error: "The background level cannot be negative." };
+  if (!(activity_hours_day >= 0 && activity_hours_evening >= 0 && activity_hours_night >= 0)) return { error: "Activity hours cannot be negative." };
+  if (!(limit_ldn_db >= 0)) return { error: "The limit cannot be negative (0 to skip the comparison)." };
+  if (activity_hours_day > 12) return { error: "The daytime period (7 a.m. to 7 p.m.) is 12 hours." };
+  if (activity_hours_evening > 3) return { error: "The evening period (7 p.m. to 10 p.m.) is 3 hours." };
+  if (activity_hours_night > 9) return { error: "The night period (10 p.m. to 7 a.m.) is 9 hours." };
+  const e = (level) => Math.pow(10, level / 10);
+  // Each period is the activity for its hours plus the background for the rest.
+  const periodEnergy = (hours, activityHours, penalty) => {
+    const bgHours = hours - activityHours;
+    return activityHours * e(activity_level_db + penalty) + bgHours * e(background_level_db + penalty);
+  };
+  // Ldn folds the evening into the unpenalized day.
+  const ldn_energy = periodEnergy(12, activity_hours_day, 0)
+    + periodEnergy(3, activity_hours_evening, 0)
+    + periodEnergy(9, activity_hours_night, 10);
+  const ldn_db = 10 * Math.log10(ldn_energy / 24);
+  // CNEL penalizes the evening.
+  const cnel_energy = periodEnergy(12, activity_hours_day, 0)
+    + periodEnergy(3, activity_hours_evening, _CNEL_EVENING_PENALTY_DB)
+    + periodEnergy(9, activity_hours_night, 10);
+  const cnel_db = 10 * Math.log10(cnel_energy / 24);
+  // The unpenalized 24-hour energy average, for comparison.
+  const leq24_energy = periodEnergy(12, activity_hours_day, 0)
+    + periodEnergy(3, activity_hours_evening, 0)
+    + periodEnergy(9, activity_hours_night, 0);
+  const leq24_db = 10 * Math.log10(leq24_energy / 24);
+  const total_activity_hours = activity_hours_day + activity_hours_evening + activity_hours_night;
+  const level_verdict = "Ldn " + fmt(ldn_db, 1) + " dB and CNEL " + fmt(cnel_db, 1)
+    + " dB, against an unpenalized 24-hour Leq of " + fmt(leq24_db, 1) + " dB";
+  const has_limit = limit_ldn_db > 0;
+  const complies = has_limit && ldn_db <= limit_ldn_db;
+  const limit_verdict = !has_limit
+    ? "(no limit entered)"
+    : complies
+      ? "within the " + fmt(limit_ldn_db, 0) + " dB limit by " + fmt(limit_ldn_db - ldn_db, 1) + " dB"
+      : "OVER the " + fmt(limit_ldn_db, 0) + " dB limit by " + fmt(ldn_db - limit_ldn_db, 1) + " dB";
+  // THE POINT: move the same work to the night period and nothing else changes.
+  const night_energy = periodEnergy(12, 0, 0) + periodEnergy(3, 0, 0)
+    + periodEnergy(9, Math.min(total_activity_hours, 9), 10);
+  const night_moved_ldn_db = 10 * Math.log10(night_energy / 24);
+  const night_penalty_cost_db = night_moved_ldn_db - ldn_db;
+  const all_at_night = activity_hours_night >= total_activity_hours && total_activity_hours > 0;
+  const night_verdict = total_activity_hours === 0
+    ? "(no activity hours entered)"
+    : total_activity_hours > 9
+      ? "the activity is longer than the 9-hour night period, so it cannot all be moved into it"
+      : all_at_night
+        ? "the activity is already entirely at night, and it is carrying the full 10 dB penalty -- moving all " + fmt(total_activity_hours, 1) + " hours into the day would drop the Ldn to " + fmt(10 * Math.log10((periodEnergy(12, Math.min(total_activity_hours, 12), 0) + periodEnergy(3, 0, 0) + periodEnergy(9, 0, 10)) / 24), 1) + " dB"
+        : "moving the same " + fmt(total_activity_hours, 1) + " hours into the night period would raise the Ldn to "
+          + fmt(night_moved_ldn_db, 1) + " dB, up " + fmt(night_penalty_cost_db, 1)
+          + " dB with no change in equipment, level, or duration. The 10 decibels is a factor of ten in energy, so an hour at night is ten hours in the day, and no practical noise control recovers it";
+  // Energy averaging means the loud activity dominates and the background does not.
+  const halved_energy = total_activity_hours > 0
+    ? periodEnergy(12, activity_hours_day / 2, 0) + periodEnergy(3, activity_hours_evening / 2, 0) + periodEnergy(9, activity_hours_night / 2, 10)
+    : ldn_energy;
+  const halved_ldn_db = 10 * Math.log10(halved_energy / 24);
+  const quiet_background_ldn_db = 10 * Math.log10((
+    (12 - activity_hours_day) * e(background_level_db - 10) + activity_hours_day * e(activity_level_db)
+    + (3 - activity_hours_evening) * e(background_level_db - 10) + activity_hours_evening * e(activity_level_db)
+    + (9 - activity_hours_night) * e(background_level_db - 10 + 10) + activity_hours_night * e(activity_level_db + 10)
+  ) / 24);
+  const lever_verdict = total_activity_hours === 0
+    ? "(no activity hours entered)"
+    : "halving the activity to " + fmt(total_activity_hours / 2, 2) + " hours gives " + fmt(halved_ldn_db, 1)
+      + " dB, down " + fmt(ldn_db - halved_ldn_db, 1) + " dB, while taking 10 dB off the BACKGROUND gives "
+      + fmt(quiet_background_ldn_db, 1) + " dB, down only " + fmt(ldn_db - quiet_background_ldn_db, 1)
+      + " dB. Energy averaging means the loud activity dominates the day: shortening it is the lever, and quieting the background is close to wasted effort";
+  if (![ldn_db, cnel_db, leq24_db, night_moved_ldn_db].every(Number.isFinite)) return { error: "Community noise math is not a finite value." };
+  return {
+    ldn_db, cnel_db, leq24_db, total_activity_hours, level_verdict,
+    has_limit, complies, limit_verdict,
+    night_moved_ldn_db, night_penalty_cost_db, all_at_night, night_verdict,
+    halved_ldn_db, quiet_background_ldn_db, lever_verdict,
+    note: "The day-night average sound level a community noise ordinance is written against, and the two things about it that decide outcomes. Ldn is the 24-hour energy average with a 10 dB penalty added to every hour between 10 p.m. and 7 a.m.; CNEL adds a further evening penalty of about 4.8 dB between 7 p.m. and 10 p.m. Both are ENERGY averages on a 3 dB basis, which is a different averaging law from OSHA's occupational noise dose -- that uses a 5 dB exchange rate and answers a hearing-conservation question, not a land-use one, and the two must not be interchanged. The first decisive thing is the night penalty. Ten decibels is a factor of ten in energy, so an hour of work at night enters the average as ten hours of the same work in the day. Moving two hours of an activity from the afternoon to 11 p.m. can raise the Ldn by nearly the full 10 dB with no change in equipment, level, or duration -- taking a marginal operation to a clear violation. No practical noise control recovers that, which is the whole story of night work. The second is that energy averaging lets the loud activity dominate. Twenty-two quiet hours contribute almost nothing to a day containing two loud ones, so reducing the background is close to wasted effort while SHORTENING the loud activity is the lever: halving its duration takes 3 dB off, which is more than most equipment treatments deliver. The tile reports both moves side by side because the intuition usually points at the wrong one. Levels are ENTERED and are the hard part: an ordinance is written at a property line or a receptor, and a level measured or predicted somewhere else is not that level. This does not measure anything, propagate sound from a source to a receptor, apply distance, ground, barrier, or shielding attenuation, address tonal, impulsive, or low-frequency character adjustments that many ordinances add, address vibration, or determine which ordinance applies or how it defines its measurement position and its averaging period. The governing noise ordinance, the applicable measurement standard, and an acoustical consultant govern.",
+  };
+}
+export const communityNoiseLdnExample = { inputs: { activity_level_db: 78, activity_hours_day: 2, activity_hours_evening: 0, activity_hours_night: 0, background_level_db: 48, limit_ldn_db: 65 } };
+AIRQUALITY_RENDERERS["community-noise-ldn"] = _simpleRenderer({
+  citation: "Citation: the day-night average sound level Ldn and the community noise equivalent level CNEL by name -- a 24-hour energy (3 dB) average with a 10 dB penalty on the 10 p.m. to 7 a.m. night period, and for CNEL a further 4.77 dB on the 7 p.m. to 10 p.m. evening. Distinct from OSHA 1910.95 occupational noise dose, which uses a 5 dB exchange rate for a hearing-conservation question. Levels are ENTERED: this does not measure, propagate sound to a receptor, apply distance, ground, barrier or shielding attenuation, add the tonal, impulsive or low-frequency character adjustments many ordinances carry, or determine which ordinance applies. The governing noise ordinance, the applicable measurement standard, and an acoustical consultant govern.",
+  example: communityNoiseLdnExample.inputs,
+  fields: [
+    { key: "activity_level_db", label: "Activity sound level (dBA at the receptor)", kind: "number", attrs: { step: "any" } },
+    { key: "activity_hours_day", label: "Activity hours 7 a.m. to 7 p.m. (max 12)", kind: "number", attrs: { step: "any" } },
+    { key: "activity_hours_evening", label: "Activity hours 7 p.m. to 10 p.m. (max 3)", kind: "number", attrs: { step: "any" } },
+    { key: "activity_hours_night", label: "Activity hours 10 p.m. to 7 a.m. (max 9)", kind: "number", attrs: { step: "any" } },
+    { key: "background_level_db", label: "Background level the rest of the time (dBA)", kind: "number", attrs: { step: "any" } },
+    { key: "limit_ldn_db", label: "Ordinance limit (Ldn dB, 0 to skip)", kind: "number", attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "l", id: "cnl-out-l", label: "Ldn and CNEL", value: (r) => r.level_verdict },
+    { key: "c", id: "cnl-out-c", label: "Against the limit", value: (r) => r.limit_verdict },
+    { key: "g", id: "cnl-out-g", label: "The same work at night", value: (r) => r.night_verdict },
+    { key: "v", id: "cnl-out-v", label: "Which lever actually moves it", value: (r) => r.lever_verdict },
+    { key: "n", id: "cnl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCommunityNoiseLdn,
+});
+
+// ===================== spec-v1730: odour dilution to threshold =====================
+// dims: in { args: dimensionless } out: { odour_emission_rate_ou_s: T^-1, dt_at_receptor: dimensionless, required_source_dt: dimensionless, reduction_pct: dimensionless }
+export function computeOdorDilutionThreshold({
+  source_dt = 0, airflow_acfm = 0, dilution_factor = 0,
+  limit_dt = 0, target_dt = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(source_dt > 0)) return { error: "The source dilution-to-threshold must be positive." };
+  if (!(airflow_acfm > 0)) return { error: "Exhaust airflow must be positive." };
+  if (!(dilution_factor > 0)) return { error: "The dilution between source and receptor must be positive." };
+  if (!(limit_dt >= 0)) return { error: "The ordinance limit cannot be negative (0 to skip)." };
+  if (!(target_dt >= 0)) return { error: "The target cannot be negative (0 to skip)." };
+  // The odour emission rate is what goes into a dispersion calculation, exactly
+  // as a mass rate would.
+  const odour_emission_rate_ou_s = source_dt * airflow_acfm / 60;
+  const rate_verdict = fmt(odour_emission_rate_ou_s, 0) + " odour units per second from "
+    + fmt(airflow_acfm, 0) + " acfm at a source D/T of " + fmt(source_dt, 0)
+    + " -- that rate goes into the same dispersion arithmetic as any pollutant";
+  const dt_at_receptor = source_dt / dilution_factor;
+  const receptor_verdict = fmt(dt_at_receptor, 1) + " dilutions at the receptor, from a "
+    + fmt(dilution_factor, 0) + ":1 dilution between the stack and the property line";
+  const has_limit = limit_dt > 0;
+  const complies = has_limit && dt_at_receptor <= limit_dt;
+  const limit_verdict = !has_limit
+    ? "(no ordinance limit entered -- typical limits run 5 to 15 D/T and which one applies is the question)"
+    : complies
+      ? "within the D/T of " + fmt(limit_dt, 1) + " entered"
+      : "OVER the D/T of " + fmt(limit_dt, 1) + " entered, by a factor of " + fmt(dt_at_receptor / limit_dt, 2);
+  // The reduction the target actually requires, at source.
+  const has_target = target_dt > 0;
+  const required_source_dt = has_target ? target_dt * dilution_factor : 0;
+  const reduction_pct = has_target ? (1 - required_source_dt / source_dt) * 100 : 0;
+  const dilution_multiple_needed = has_target ? source_dt / required_source_dt : 0;
+  const already_met = has_target && dt_at_receptor <= target_dt;
+  const target_verdict = !has_target
+    ? "(no target entered)"
+    : already_met
+      ? "the receptor is already at or below the D/T of " + fmt(target_dt, 1) + " targeted"
+      : "reaching a D/T of " + fmt(target_dt, 1) + " at the receptor takes the source down to "
+        + fmt(required_source_dt, 0) + " D/T, a " + fmt(reduction_pct, 0)
+        + "% reduction in odour concentration -- a TREATMENT problem, not a stack height problem. Getting the same result by dispersion alone would need "
+        + fmt(dilution_multiple_needed, 1) + " times the dilution, which is roughly a "
+        + fmt(Math.sqrt(dilution_multiple_needed), 1)
+        + "-fold increase in effective stack height, since ground-level concentration falls roughly with the square of it. Odour is reduced at source or not at all: the dilution needed to take a strong odour below objection is large enough that dispersion improvements rarely deliver it, which is why containment, biofilters, scrubbers, and oxidizers are the answers that work";
+  if (![odour_emission_rate_ou_s, dt_at_receptor, required_source_dt, reduction_pct].every(Number.isFinite)) return { error: "Odour dilution math is not a finite value." };
+  return {
+    odour_emission_rate_ou_s, rate_verdict,
+    dt_at_receptor, receptor_verdict,
+    has_limit, complies, limit_verdict,
+    has_target, required_source_dt, reduction_pct, dilution_multiple_needed, already_met, target_verdict,
+    note: "Odour measured as a dilution to threshold -- the number of dilutions with clean air needed before a trained panel can no longer detect it -- and what it takes to bring that below an objection level at a property line. The arithmetic is simple and the finding is consistent: ODOUR IS REDUCED AT SOURCE OR NOT AT ALL. A source at 2,400 D/T exhausting 15,000 acfm emits 600,000 odour units per second, and that rate disperses exactly as a mass emission rate does. If the atmosphere delivers 400:1 of dilution between the stack and the fence, the receptor sees 6 dilutions, which against a typical ordinance limit of 5 to 15 may or may not comply -- and which ordinance applies is genuinely the question, because limits, measurement methods, and the number of exceedances allowed vary widely between jurisdictions. Taking that same receptor to a D/T of 2 means the source has to fall to 800, a 67% reduction in odour concentration. Getting there by dispersion instead would need three times the dilution, which is roughly a doubling of effective stack height, because ground-level concentration falls roughly with the square of it. That is why the answers that work are containment, biofilters, scrubbers, and oxidizers rather than a taller stack. The source D/T is ENTERED and comes from dynamic olfactometry on a collected sample, which is a laboratory panel method with real variability, and a single sample represents one operating condition of a source whose odour usually varies with process state, temperature, and season. The dilution between source and receptor is also entered and comes from a dispersion calculation, with all the caveats that carries. This does not model dispersion, address odour character or hedonic tone (unpleasantness is not concentration, and two sources at the same D/T are not equally objectionable), the intensity-concentration relationship, frequency and duration of exposure, which most modern odour rules weigh alongside concentration, community response, or complaint investigation. The applicable odour ordinance or nuisance rule, the olfactometry standard used, and the air quality authority govern.",
+  };
+}
+export const odorDilutionThresholdExample = { inputs: { source_dt: 2400, airflow_acfm: 15000, dilution_factor: 400, limit_dt: 10, target_dt: 2 } };
+AIRQUALITY_RENDERERS["odor-dilution-threshold"] = _simpleRenderer({
+  citation: "Citation: odour concentration as a dilution to threshold (D/T) from dynamic olfactometry, with the odour emission rate = D/T x volumetric flow, and the receptor D/T = source D/T divided by the dilution the atmosphere provides. Source D/T is ENTERED from a laboratory panel method with real variability, and a single sample represents one operating condition. It does not model dispersion, address odour character or hedonic tone, the intensity-concentration relationship, or the frequency and duration terms most modern odour rules weigh alongside concentration. The applicable odour ordinance or nuisance rule, the olfactometry standard used, and the air quality authority govern.",
+  example: odorDilutionThresholdExample.inputs,
+  fields: [
+    { key: "source_dt", label: "Source odour concentration (D/T)", kind: "number", attrs: { step: "any" } },
+    { key: "airflow_acfm", label: "Exhaust airflow (acfm)", kind: "number", attrs: { step: "any" } },
+    { key: "dilution_factor", label: "Dilution from stack to receptor (:1)", kind: "number", attrs: { step: "any" } },
+    { key: "limit_dt", label: "Ordinance limit at the receptor (D/T, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "target_dt", label: "Target at the receptor (D/T, 0 to skip)", kind: "number", attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "r", id: "odt-out-r", label: "Odour emission rate", value: (r) => r.rate_verdict },
+    { key: "d", id: "odt-out-d", label: "At the receptor", value: (r) => r.receptor_verdict },
+    { key: "l", id: "odt-out-l", label: "Against the limit", value: (r) => r.limit_verdict },
+    { key: "t", id: "odt-out-t", label: "What the target requires", value: (r) => r.target_verdict },
+    { key: "n", id: "odt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeOdorDilutionThreshold,
+});

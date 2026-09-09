@@ -1292,6 +1292,9 @@ export const TOOL_MODULES = (() => {
   // the control equipment is governed by exponentials and expansions that make
   // intuition unreliable (Deutsch, the oxidizer gas expansion, breakthrough).
   declare("./calc-airquality.js", "AIRQUALITY_RENDERERS", [
+    // spec-v1727..v1730: dispersion, community noise, and odour.
+    "gaussian-dispersion-screen", "noise-barrier-insertion-loss", "community-noise-ldn", "odor-dilution-threshold",
+
     "stack-emission-pte", "opacity-six-minute", "baghouse-cleaning-interval",
     "scrubber-lg-ratio", "thermal-oxidizer-residence", "coating-voc-compliance",
     "spcc-containment-volume", "esp-deutsch-efficiency", "carbon-bed-life",

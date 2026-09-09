@@ -109483,6 +109483,178 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "gaussian-dispersion-screen",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Gaussian Ground-Level Concentration -- the spec-v1727 source (converted to US units), with the standard Pasquill-Gifford rural coefficients",
+   "source_edition_or_year": "spec-v1727 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "emission_rate_lb_hr": 79.366,
+    "effective_height_ft": 219.8,
+    "wind_mph": 8.948,
+    "distance_mi": 0.6214,
+    "stability_class": "D",
+    "alt_stability_class": "F"
+   },
+   "outputs": {
+    "sigma_y_m": {
+     "value": 68.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sigma_z_m": {
+     "value": 33.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "exponential_term": {
+     "value": 0.13052,
+     "tolerance": {
+      "pct": 1.0
+     }
+    },
+    "concentration_ug_m3": {
+     "value": 45.99,
+     "tolerance": {
+      "pct": 1.0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "noise-barrier-insertion-loss",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Barrier Insertion Loss at Two Frequencies -- the spec-v1728 worked example, recomputed",
+   "source_edition_or_year": "spec-v1728 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "path_difference_ft": 0.5,
+    "source_to_top_ft": 0,
+    "top_to_receiver_ft": 0,
+    "source_to_receiver_ft": 0,
+    "frequency_hz": 1000,
+    "second_frequency_hz": 125,
+    "practical_ceiling_db": 20
+   },
+   "outputs": {
+    "wavelength_ft": {
+     "value": 1.13,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fresnel_number": {
+     "value": 0.885,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "raw_insertion_loss_db": {
+     "value": 13.16,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "second_insertion_loss_db": {
+     "value": 7.18,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "grazing_db": {
+     "value": 4.771,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "community-noise-ldn",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Day-Night Average Sound Level -- the spec-v1729 daytime case, energy-averaged",
+   "source_edition_or_year": "spec-v1729 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "activity_level_db": 78,
+    "activity_hours_day": 2,
+    "activity_hours_evening": 0,
+    "activity_hours_night": 0,
+    "background_level_db": 48,
+    "limit_ldn_db": 65
+   },
+   "outputs": {
+    "ldn_db": {
+     "value": 67.43,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "leq24_db": {
+     "value": 67.26,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "night_moved_ldn_db": {
+     "value": 77.23,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "odor-dilution-threshold",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Odour Emission Rate and the Reduction a Target Requires -- the spec-v1730 worked example, with both unrendered placeholders computed",
+   "source_edition_or_year": "spec-v1730 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "source_dt": 2400,
+    "airflow_acfm": 15000,
+    "dilution_factor": 400,
+    "limit_dt": 10,
+    "target_dt": 2
+   },
+   "outputs": {
+    "odour_emission_rate_ou_s": {
+     "value": 600000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "dt_at_receptor": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_source_dt": {
+     "value": 800,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "reduction_pct": {
+     "value": 66.667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }
