@@ -2861,6 +2861,12 @@
     {"term":"buried horizontal ground wire","target":"counterpoise-resistance","kind":"industry"},
     {"term":"radial ground resistance","target":"counterpoise-resistance","kind":"industry"},
     {"term":"structure grounding counterpoise","target":"counterpoise-resistance","kind":"industry"},
-    {"term":"counterpoise wire length","target":"counterpoise-resistance","kind":"industry"}
+    {"term":"counterpoise wire length","target":"counterpoise-resistance","kind":"industry"},
+    {"term":"duct bank ampacity","target":"duct-bank-ampacity-derate","kind":"industry"},
+    {"term":"neher mcgrath derate","target":"duct-bank-ampacity-derate","kind":"industry"},
+    {"term":"concrete encased duct ampacity","target":"duct-bank-ampacity-derate","kind":"industry"},
+    {"term":"mutual heating cables","target":"duct-bank-ampacity-derate","kind":"industry"},
+    {"term":"underground feeder ampacity","target":"duct-bank-ampacity-derate","kind":"industry"},
+    {"term":"how much do i derate in a duct bank","target":"duct-bank-ampacity-derate","kind":"question"}
   ]
 }

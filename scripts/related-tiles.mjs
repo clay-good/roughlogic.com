@@ -1579,6 +1579,8 @@ const RELATED = {
   "noise-barrier-insertion-loss": ["community-noise-ldn","noise-dose","room-acoustics"],
   "community-noise-ldn": ["noise-barrier-insertion-loss","noise-dose","speed-of-sound-air"],
   "odor-dilution-threshold": ["gaussian-dispersion-screen","plume-rise-briggs","thermal-fog-deodorization"],
+  "duct-bank-ampacity-derate": ["wire-ampacity","ambient-ampacity-adjust","duct-bank-concrete"],
+  "ground-loop-flow-antifreeze": ["geothermal-loop","glycol-mix","pump-tdh"],
   // spec-v1717..v1726: air quality band.
   "stack-emission-pte": ["opacity-six-minute","coating-voc-compliance","plume-rise-briggs"],
   "opacity-six-minute": ["stack-emission-pte","esp-deutsch-efficiency","baghouse-cleaning-interval"],

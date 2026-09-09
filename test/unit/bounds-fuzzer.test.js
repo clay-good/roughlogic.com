@@ -52499,3 +52499,128 @@ test("bounds: spec-v1730 computeOdorDilutionThreshold -- the two placeholders it
   assert.ok(_v1730({ ...base, dilution_factor: 0 }).error);
   assert.ok(_v1730({ ...base, target_dt: -1 }).error);
 });
+
+
+import { computeDuctBankAmpacityDerate as _v1468 } from "../../calc-lineworker.js";
+import { computeGroundLoopFlowAntifreeze as _v1506 } from "../../calc-buildingperf.js";
+
+test("bounds: spec-v1468 computeDuctBankAmpacityDerate -- the CENTER duct governs, from the geometry", () => {
+  const base = { ducts_across: 3, ducts_down: 3, loaded_ducts: 9, spacing_in: 7.5, depth_to_top_in: 36, base_table_ampacity_a: 285, derate_factor: 0.62, alt_derate_factor: 0.56, target_load_a: 200 };
+  const r = _v1468(base);
+  // THE SPEC'S FIGURE: 285 x 0.62 = 177 A.
+  assert.ok(Math.abs(r.derated_ampacity_a - 285 * 0.62) < 1e-9);
+  assert.ok(Math.abs(r.derated_ampacity_a - 176.7) < 0.1);
+  // ROUND TRIP: the table ampacity a target needs, derated, gives back the target.
+  assert.ok(Math.abs(r.required_table_ampacity_a * 0.62 - 200) < 1e-9);
+  // THE GEOMETRY, which is the part actually derived here: on a 3 by 3 bank the
+  // CENTER duct is the hottest, and it is hotter than every corner.
+  assert.equal(r.governing_row, 2);
+  assert.equal(r.governing_col, 2);
+  assert.ok(r.governing_mutual_heat > r.coolest_mutual_heat);
+  assert.ok(r.heat_spread_pct > 20 && r.heat_spread_pct < 30);
+  // A single duct has no neighbours, so there is nothing to rank.
+  const single = _v1468({ ...base, ducts_across: 1, ducts_down: 1, loaded_ducts: 1 });
+  assert.ok(Math.abs(single.governing_mutual_heat) < 1e-12);
+  assert.ok(single.governing_verdict.includes("no neighbours"));
+  // A DEEPER bank has MORE mutual heating: the images recede, so neighbours
+  // shed less of each other's heat to the surface. Getting this backwards would
+  // make a deep bank look better than a shallow one, which it is not.
+  assert.ok(_v1468({ ...base, depth_to_top_in: 72 }).governing_mutual_heat > r.governing_mutual_heat);
+  // WIDER SPACING is less mutual heating -- the one lever a designer has.
+  assert.ok(_v1468({ ...base, spacing_in: 15 }).governing_mutual_heat < r.governing_mutual_heat);
+  // The derate is linear in the factor, and a factor of 1 is no derate at all.
+  assert.ok(Math.abs(_v1468({ ...base, derate_factor: 1 }).derated_ampacity_a - 285) < 1e-9);
+  assert.ok(_v1468({ ...base, alt_derate_factor: 0.56 }).alt_derated_ampacity_a < r.derated_ampacity_a);
+  assert.equal(r.target_met, false);
+  assert.equal(_v1468({ ...base, target_load_a: 150 }).target_met, true);
+  // ERROR CONTRACT.
+  assert.ok(_v1468({ ...base, derate_factor: 0 }).error);
+  assert.ok(_v1468({ ...base, derate_factor: 1.2 }).error);
+  assert.ok(_v1468({ ...base, loaded_ducts: 10 }).error);
+  assert.ok(_v1468({ ...base, loaded_ducts: 0 }).error);
+  assert.ok(_v1468({ ...base, ducts_across: 2.5 }).error);
+  assert.ok(_v1468({ ...base, spacing_in: 0 }).error);
+  assert.ok(_v1468({ ...base, base_table_ampacity_a: Infinity }).error);
+});
+
+test("bounds: spec-v1506 computeGroundLoopFlowAntifreeze -- 74 W/ton is INSIDE the 100 benchmark", () => {
+  const base = { tons: 4, gpm_per_ton: 3.0, pipe_id_in: 1.21, fluid_density_lb_ft3: 63.9, fluid_viscosity_cp: 4.7, specific_gravity: 1.02, head_ft: 45, wire_to_water_efficiency: 0.35, benchmark_w_per_ton: 100 };
+  const r = _v1506(base);
+  // THE SPEC'S PUMP ARITHMETIC, which is correct: 0.40 bhp, 296 W, 74 W/ton.
+  assert.ok(Math.abs(r.design_flow_gpm - 12) < 1e-12);
+  assert.ok(Math.abs(r.pump_bhp - 12 * 45 * 1.02 / (3960 * 0.35)) < 1e-12);
+  assert.ok(Math.abs(r.pump_bhp - 0.3974) < 0.001);
+  assert.ok(Math.abs(r.watts_per_ton - 74.1) < 0.2);
+  // THE SPEC'S CONCLUSION, WHICH ITS OWN NUMBER REFUTES: it calls 74 W/ton
+  // "above the 100 W/ton benchmark" and says the loop spends too much on
+  // pumping. 74 is BELOW 100. This assertion is the correction.
+  assert.ok(r.watts_per_ton < 100);
+  assert.equal(r.within_benchmark, true);
+  assert.ok(r.benchmark_verdict.includes("WITHIN"));
+  assert.equal(_v1506({ ...base, head_ft: 90 }).within_benchmark, false);
+  assert.ok(_v1506({ ...base, head_ft: 90 }).benchmark_verdict.includes("OVER"));
+  // ROUND TRIP: at exactly the head the benchmark allows, W/ton lands on it.
+  const atLimit = _v1506({ ...base, head_ft: r.allowable_head_ft });
+  assert.ok(Math.abs(atLimit.watts_per_ton - 100) < 1e-6);
+  // VELOCITY COMES FROM THE BORE. The spec pairs "1 in HDPE" with 2.6 ft/s;
+  // 12 gpm in a 0.957 in bore is 5.35 ft/s, and 2.6 is a 1.5 in pipe.
+  const oneInch = _v1506({ ...base, pipe_id_in: 0.957 });
+  assert.ok(Math.abs(oneInch.velocity_fps - 5.35) < 0.05);
+  const inchAndHalf = _v1506({ ...base, pipe_id_in: 1.39 });
+  assert.ok(Math.abs(inchAndHalf.velocity_fps - 2.54) < 0.05);
+  // Velocity falls with the SQUARE of the bore, so the identity is exact.
+  assert.ok(Math.abs(oneInch.velocity_fps / r.velocity_fps - (1.21 / 0.957) ** 2) < 1e-9);
+  // REYNOLDS: thicker fluid and slower flow both push toward laminar, and the
+  // tile must say the rated capacity no longer applies rather than just report it.
+  assert.equal(r.turbulent, true);
+  const cold = _v1506({ ...base, fluid_viscosity_cp: 14 });
+  assert.ok(cold.reynolds < r.reynolds);
+  assert.equal(cold.laminar, true);
+  assert.ok(cold.flow_regime_verdict.includes("NO LONGER APPLIES"));
+  assert.ok(Math.abs(cold.reynolds * 14 - r.reynolds * 4.7) < 1e-6);
+  // ERROR CONTRACT.
+  assert.ok(_v1506({ ...base, tons: 0 }).error);
+  assert.ok(_v1506({ ...base, pipe_id_in: 0 }).error);
+  assert.ok(_v1506({ ...base, wire_to_water_efficiency: 0 }).error);
+  assert.ok(_v1506({ ...base, wire_to_water_efficiency: 1.5 }).error);
+  assert.ok(_v1506({ ...base, fluid_viscosity_cp: 0 }).error);
+  assert.ok(_v1506({ ...base, tons: NaN }).error);
+});
+
+test("bounds: spec-v1505 (cut into assembly-r-value) -- the WRONG method, and continuous R beats its nominal", () => {
+  const base = { cavity_r: 21, continuous_r: 0, stud_depth_in: 5.5, framing_factor: 0.23, air_films_r: 0, finish_layers_r: 0, alt_framing_factor: 0.16, alt_continuous_r: 6 };
+  const r = _v99a(base);
+  // The parallel-path answer, and the AREA-WEIGHTED one the spec calls the wrong
+  // method -- which this tile's own note warned about and never computed.
+  assert.ok(Math.abs(r.r_assembly - 14.26) < 0.02);
+  assert.ok(Math.abs(r.r_area_weighted - (0.23 * r.r_framing_path + 0.77 * r.r_cavity_path)) < 1e-12);
+  assert.ok(Math.abs(r.r_area_weighted - 17.75) < 0.02);
+  assert.ok(r.r_area_weighted > r.r_assembly);
+  assert.ok(Math.abs(r.area_weighted_overstatement_pct - 24.5) < 0.5);
+  // THE CORRECTION TO THE SPEC: it says adding R-6 continuous "gives a gain of
+  // 6.0", i.e. straight addition. Continuous insulation sits on BOTH paths and
+  // lifts the weak framing path proportionally the most, so the real gain is
+  // 7.30 -- MORE than its nominal R, not equal to it.
+  assert.ok(Math.abs(r.r_alt_continuous - 21.56) < 0.02);
+  assert.ok(Math.abs(r.continuous_gain - 7.30) < 0.02);
+  assert.ok(r.continuous_gain > 6);
+  assert.ok(r.fixes_verdict.includes("exceeds its nominal"));
+  // IDENTITY: computing the alternative internally must equal passing that
+  // continuous R directly, which is what proves it lands on both paths.
+  const direct = _v99a({ ...base, continuous_r: 6, alt_framing_factor: 0, alt_continuous_r: 0 });
+  assert.ok(Math.abs(r.r_alt_continuous - direct.r_assembly) < 1e-12);
+  // Advanced framing gains far less than the continuous layer here.
+  assert.ok(Math.abs(r.r_alt_framing - 15.80) < 0.02);
+  assert.ok(r.framing_gain < r.continuous_gain);
+  // ADDITIVE: with the new inputs absent the tile's original answer stands.
+  const legacy = _v99a({ cavity_r: 13, continuous_r: 0, stud_depth_in: 3.5, framing_factor: 0.25, air_films_r: 0.85, finish_layers_r: 1.05 });
+  assert.ok(Math.abs(legacy.r_assembly - 11.0894) < 1e-3);
+  assert.equal(legacy.has_alt_framing, false);
+  assert.equal(legacy.has_alt_continuous, false);
+  // A zero framing factor is a wall with no studs, where both methods agree.
+  const noStuds = _v99a({ ...base, framing_factor: 0, alt_framing_factor: 0, alt_continuous_r: 0 });
+  assert.ok(Math.abs(noStuds.r_area_weighted - noStuds.r_assembly) < 1e-9);
+  assert.ok(Math.abs(noStuds.area_weighted_overstatement_pct) < 1e-9);
+  assert.ok(_v99a({ ...base, alt_framing_factor: 1 }).error);
+  assert.ok(_v99a({ ...base, alt_continuous_r: -1 }).error);
+});

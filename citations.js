@@ -22191,6 +22191,32 @@ export const CITATIONS = {
       { name: "Not weight and balance", value: "the centre of gravity envelope is checked elsewhere", source: "the aircraft flight manual" },
     ],
   },
+  // spec-v1468, v1506: the 2026-09-09 trade-expansion final band, CLOSING the
+  // scope-trade-expansion-2 program. spec-v1505 was cut into assembly-r-value.
+  "duct-bank-ampacity-derate": {
+    formula: "derated ampacity = the base table ampacity times a derate factor ENTERED from the Neher-McGrath calculation or the NEC Annex B tables for the arrangement, and the table ampacity a target load requires is that relation inverted. The governing duct position is derived from the standard image-method mutual-heating sum, ln(distance to a neighbour's mirror image above grade / distance to the neighbour) summed over the other ducts.",
+    edition: "The derate factor is ENTERED because it depends on the cable's own thermal resistances as well as the bank geometry, so no geometric shortcut reproduces it. It does not perform the Neher-McGrath calculation, size conductors, or address short-circuit withstand, conductor shielding and grounding, the concrete encasement's design, or duct bank separation requirements.",
+    freeAccess: "One multiplication and a published geometric sum; no NEC table or Annex B figure is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "A duct bank is a mutual-heating problem and the table value is not the answer: a cable rated 285 A can come back near 177 A in a fully loaded 3 by 3 bank, roughly two conductor sizes. The geometry decides WHICH duct governs -- the center duct carries about 24% more mutual heating than a corner -- so a bank sized on an average position runs its middle ducts over temperature. Soil thermal resistivity is the most sensitive input and the one most often assumed rather than measured, and a native-soil backfill is not a thermal backfill. A spare duct is only a spare until a circuit is pulled into it, so derating on today's loading is how a bank becomes overloaded without anyone changing a conductor.",
+    assumptions: [
+      { name: "The derate factor is entered", value: "it belongs to Neher-McGrath or NEC Annex B, not to this arithmetic", source: "the NEC as adopted and IEEE 835" },
+      { name: "Geometry gives only the governing position", value: "the mutual-heating sum ranks ducts; it is not the derate", source: "the engineer of record" },
+      { name: "Soil resistivity is assumed unless measured", value: "90 vs 120 degC-cm/W is roughly another tenth of ampacity", source: "a thermal resistivity survey" },
+    ],
+  },
+  "ground-loop-flow-antifreeze": {
+    formula: "design flow = tons x gpm per ton; velocity = flow / the actual bore area; Reynolds number = density x velocity x diameter / dynamic viscosity, with turbulence taken at 4,000 and the laminar boundary at 2,300; pump brake horsepower = gpm x head x specific gravity / (3,960 x wire-to-water efficiency).",
+    edition: "Fluid properties are ENTERED at the minimum expected loop temperature because they vary strongly with glycol type, concentration and temperature, and propylene and ethylene glycol differ substantially. A flow, regime and pumping screen: it does not size the ground loop or its length, compute the freeze or burst point, model ground thermal properties or the field's annual thermal balance, size the circulator, or address purging, flushing and air removal.",
+    freeAccess: "Standard hydraulic relations and one dimensionless group; no manufacturer glycol table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "VELOCITY COMES FROM THE BORE, NOT THE NOMINAL SIZE -- 12 gpm is 5.3 ft/s in 1 in HDPE and 2.5 ft/s in 1.5 in. Reynolds number then decides whether the loop works at all, because below turbulence heat transfer collapses at the pipe wall and the rated capacity no longer applies. That bites on the coldest day, when the antifreeze is thickest, so a loop comfortably turbulent in October can sit on the laminar boundary in January -- which makes glycol concentration a heat transfer decision and not only a freeze protection one. On the pumping side, wire-to-water efficiency near a third means the electrical draw is roughly three times the hydraulic work; 74 W per ton is INSIDE the 100 W per ton benchmark, and the fixes above it run in order of cheapness: larger header pipe, fewer fittings, the lowest workable glycol concentration, and only then a different pump.",
+    assumptions: [
+      { name: "Fluid properties are entered", value: "at the minimum loop temperature, from the antifreeze manufacturer", source: "the antifreeze manufacturer's data" },
+      { name: "Turbulence at Re 4,000", value: "a conventional boundary; the transition is a band, not a line", source: "IGSHPA design procedure" },
+      { name: "Not a loop design", value: "length, ground properties and annual thermal balance are separate", source: "the designer of record" },
+    ],
+  },
   // spec-v1727..v1730: the 2026-09-09 trade-expansion dispersion, community
   // noise and odour band, closing calc-airquality.js. Nothing cut.
   "gaussian-dispersion-screen": {

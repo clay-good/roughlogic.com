@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 2080,
-  "covered_count": 2002,
+  "total_tiles": 2082,
+  "covered_count": 2004,
   "covered": [
     "aav-install-check",
     "abatement-containment",
@@ -534,6 +534,7 @@
     "drywell-infiltration",
     "dti",
     "dual-fuel-balance-point",
+    "duct-bank-ampacity-derate",
     "duct-bank-concrete",
     "duct-breakout-noise",
     "duct-friction-static",
@@ -768,6 +769,7 @@
     "groove-weld-length-for-load",
     "groove-weld-strength",
     "gross-rent-multiplier",
+    "ground-loop-flow-antifreeze",
     "ground-potential-rise",
     "grounding-electrode",
     "grounding-electrode-conductor",

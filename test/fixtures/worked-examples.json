@@ -109655,6 +109655,155 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "duct-bank-ampacity-derate",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Duct Bank Derated Ampacity -- the spec-v1468 3 by 3 bank, recomputed",
+   "source_edition_or_year": "spec-v1468 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "ducts_across": 3,
+    "ducts_down": 3,
+    "loaded_ducts": 9,
+    "spacing_in": 7.5,
+    "depth_to_top_in": 36,
+    "base_table_ampacity_a": 285,
+    "derate_factor": 0.62,
+    "alt_derate_factor": 0.56,
+    "target_load_a": 200
+   },
+   "outputs": {
+    "derated_ampacity_a": {
+     "value": 176.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_derated_ampacity_a": {
+     "value": 159.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_table_ampacity_a": {
+     "value": 322.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "governing_mutual_heat": {
+     "value": 18.222,
+     "tolerance": {
+      "pct": 1.0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ground-loop-flow-antifreeze",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Ground Loop Flow and Pump Power -- the spec-v1506 loop, with its pipe bore and benchmark corrected",
+   "source_edition_or_year": "spec-v1506 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "tons": 4,
+    "gpm_per_ton": 3.0,
+    "pipe_id_in": 1.21,
+    "fluid_density_lb_ft3": 63.9,
+    "fluid_viscosity_cp": 4.7,
+    "specific_gravity": 1.02,
+    "head_ft": 45,
+    "wire_to_water_efficiency": 0.35,
+    "benchmark_w_per_ton": 100
+   },
+   "outputs": {
+    "design_flow_gpm": {
+     "value": 12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "velocity_fps": {
+     "value": 3.35,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pump_bhp": {
+     "value": 0.3974,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pump_watts": {
+     "value": 296.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "watts_per_ton": {
+     "value": 74.1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "assembly-r-value",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Whole-Wall R with the Area-Weighted Error Beside It -- the spec-v1505 wall (cut into this tile)",
+   "source_edition_or_year": "spec-v1505 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "cavity_r": 21,
+    "continuous_r": 0,
+    "stud_depth_in": 5.5,
+    "framing_factor": 0.23,
+    "air_films_r": 0,
+    "finish_layers_r": 0,
+    "alt_framing_factor": 0.16,
+    "alt_continuous_r": 6
+   },
+   "outputs": {
+    "r_assembly": {
+     "value": 14.26,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "r_area_weighted": {
+     "value": 17.75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "area_weighted_overstatement_pct": {
+     "value": 24.5,
+     "tolerance": {
+      "pct": 2.0
+     }
+    },
+    "r_alt_framing": {
+     "value": 15.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "r_alt_continuous": {
+     "value": 21.56,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

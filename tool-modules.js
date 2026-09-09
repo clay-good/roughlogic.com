@@ -756,6 +756,9 @@ export const TOOL_MODULES = (() => {
   // back at ZERO -- the closest thing was `spanline-sag-tension`, a rigging
   // highline at ONE condition. All eleven keep group "A".
   declare("./calc-lineworker.js", "LINEWORKER_RENDERERS", [
+    // spec-v1468: the last lineworker spec of the program.
+    "duct-bank-ampacity-derate",
+
     "ruling-span", "conductor-sag-at-temperature", "conductor-blowout",
     "conductor-uplift-check", "line-ground-clearance-nesc",
     "pole-class-groundline-moment", "guy-anchor-holding-capacity",
@@ -1306,6 +1309,9 @@ export const TOOL_MODULES = (() => {
   // in it, how the leakage splits between planes, and where an assembly sits
   // against the dew point. spec-v1501 and spec-v1503 were CUT as duplicates.
   declare("./calc-buildingperf.js", "BUILDINGPERF_RENDERERS", [
+    // spec-v1506: ground loop flow, antifreeze and pump power.
+    "ground-loop-flow-antifreeze",
+
     "effective-leakage-area", "building-tightness-limit",
     "ventilation-rate-procedure", "zonal-pressure-diagnostics",
     "caz-depressurization-limit", "stack-effect-npp", "bill-disaggregation",

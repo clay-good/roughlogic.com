@@ -1540,6 +1540,7 @@ cross-check.
 | calc-buildingperf.js | `computeCazDepressurizationLimit` | `{ measured_depressurization_pa = 0, has_natural_draft_water_heater = "no", na...` | _ | _ | _ |
 | calc-buildingperf.js | `computeContinuousInsulationRatio` | `{ r_cavity = 0, r_continuous = 0, required_ratio = 0, indoor_temp_f = 70, ind...` | _ | _ | _ |
 | calc-buildingperf.js | `computeEffectiveLeakageArea` | `{ cfm50 = 0, floor_area_ft2 = 0, ceiling_height_ft = 8, storeys = 1, } = {}` | _ | _ | _ |
+| calc-buildingperf.js | `computeGroundLoopFlowAntifreeze` | `{ tons = 0, gpm_per_ton = 3.0, pipe_id_in = 0, fluid_density_lb_ft3 = 63.9, f...` | _ | _ | _ |
 | calc-buildingperf.js | `computeStackEffectNpp` | `{ height_ft = 0, indoor_temp_f = 70, outdoor_temp_f = 0, neutral_plane_fracti...` | _ | _ | _ |
 | calc-buildingperf.js | `computeVentilationRateProcedure` | `{ rp_cfm_per_person = 0, ra_cfm_per_ft2 = 0, ez = 1, people_1 = 0, area_1_ft2...` | _ | _ | _ |
 | calc-buildingperf.js | `computeZonalPressureDiagnostics` | `{ house_pressure_pa = 50, zone_a_pressure_pa = 0, zone_b_pressure_pa = 0, zon...` | _ | _ | _ |
@@ -2697,6 +2698,7 @@ cross-check.
 | calc-lineworker.js | `computeConductorSagAtTemperature` | `{ span_ft = 0, area_in2 = 0, weight1_lb_per_ft = 0, weight2_lb_per_ft = 0, mo...` | _ | _ | _ |
 | calc-lineworker.js | `computeConductorUpliftCheck` | `{ span_ft = 0, elevation_rise_ft = 0, weight_lb_per_ft = 0, tension_lb = 0, b...` | _ | _ | _ |
 | calc-lineworker.js | `computeCounterpoiseResistance` | `{ soil_resistivity_ohm_cm = 0, length_ft = 0, burial_depth_in = 0, wire_diame...` | _ | _ | _ |
+| calc-lineworker.js | `computeDuctBankAmpacityDerate` | `{ ducts_across = 0, ducts_down = 0, loaded_ducts = 0, spacing_in = 0, depth_t...` | _ | _ | _ |
 | calc-lineworker.js | `computeFeederLossLoadFactor` | `{ peak_current_a = 0, resistance_ohm_per_mile = 0, length_miles = 0, load_fac...` | _ | _ | _ |
 | calc-lineworker.js | `computeGuyAnchorHoldingCapacity` | `{ helix_diameter_in = 0, installed_depth_ft = 0, cohesion_psf = 0, friction_b...` | _ | _ | _ |
 | calc-lineworker.js | `computeLineGroundClearanceNesc` | `{ attachment_height_ft = 0, max_condition_sag_ft = 0, required_clearance_ft =...` | _ | _ | _ |
@@ -3745,7 +3747,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2331.
+Row count: 2333.
 
 <!-- END function-corpus-v14 -->
 
@@ -3813,7 +3815,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (236 tiles)
+### Group A Electrical (237 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3874,6 +3876,7 @@ per spec-v14 §13.1 second paragraph.
 | `dp-flow-signal-scaling` | DP (Square-Root) Flow Transmitter 4-20 mA Scaling | DP flow transmitter square-root extra...; fraction = (12-4)/16 = 0.5; flow% = sqrt(0.5) = 70.71%; v... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dp-level-hydrostatic` | Hydrostatic DP Level Transmitter (Head to Level) | Hydrostatic DP level transmitter (P =...; level = 4.33/(0.433*1.0) = 10 ft; span = 0.433*1.0*20 = 8... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dryer-demand-220-54` | Household Clothes Dryer Demand Load (NEC 220.54) | NEC 2023 (NFPA 70); each at 5000 W floor; 4 x 5000 = 20000 W at 100% = 83.3 A... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `duct-bank-ampacity-derate` | Underground Duct-Bank Ampacity Derate | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `economic-conductor-sizing` | Economic Conductor Sizing (I2R Payback) | economic conductor sizing (I2R); spec-v473 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `egc-parallel-raceways` | EGC for Parallel Raceways (NEC 250.122(F)) | NEC 250.122(F); 400 A OCPD, 2 raceways, copper -> #3 AWG in EACH raceway ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `egc-sizing` | Equipment Grounding Conductor Sizing | NFPA; Table 250.122 (60 A OCPD -> 10 AWG copper EGC) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4213,7 +4216,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (202 tiles)
+### Group C HVAC (203 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4227,7 +4230,7 @@ per spec-v14 §13.1 second paragraph.
 | `ammonia-charge-inventory` | Ammonia Refrigeration Charge Inventory and PSM Threshold | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `approach-delta-t` | Approach and Delta-T Diagnostics | ACCA / manufacturer commissioning bul...; Outdoor 90 F / condenser sat 105 F -> approach 15 F (norm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ashrae-622-ventilation` | ASHRAE 62.2 Whole-House Mechanical Ventilation Rate | ASHRAE 62.2-2019 §4.1; spec-v219 section 2.1 pinned example (no credit) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `assembly-r-value` | Wall Assembly R-Value | ASHRAE Handbook of Fundamentals paral...; spec-v99 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `assembly-r-value` | Wall Assembly R-Value | ASHRAE Handbook of Fundamentals paral...; spec-v99 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `balance-point` | Heat Pump Balance Point | Project (first-principles); slope_capacity = 300 Btu/hr/F (1 percent of design); slop... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `baseboard-length-for-load` | Baseboard Length for a Room Load | Slant/Fin (inverse); 4,800 BTU/hr, 180 F water, 1 gpm, Fine Line 30 (600 BTU/f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `baseboard-output` | Hydronic Baseboard Output | Slant/Fin; 180 F water / 1 gpm / 8 ft of Slant/Fin Fine Line 30 -> 6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4329,6 +4332,7 @@ per spec-v14 §13.1 second paragraph.
 | `geothermal-loop` | Geothermal Loop Length | IGSHPA / ASHRAE Handbook (Applications); 60,000 BTU/hr heating (governs over 48,000 BTU/hr cooling... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `grille-face-velocity` | Grille/Register Face Velocity and Free-Area Sizing | ASHRAE / SMACNA; spec-v348 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `grille-neck-nc` | Grille Neck Velocity and NC Level | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `ground-loop-flow-antifreeze` | Ground Loop Flow, Antifreeze, and Pump Power | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `head-pressure-control` | Low-Ambient Head Pressure Control and Winter Charge | Project (first-principles); minimum head built from the bottom | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `heat-pump-cold-capacity` | Heat-Pump Cold-Temperature Capacity and Auxiliary Heat | AHRI 210/240 low-temperature rating p...; spec-v235 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `heat-pump-seasonal-energy` | Heat-Pump Seasonal Heating Energy and Cost vs Gas and Resistance | AHRI 210/240 HSPF / fuel-cost comparison; spec-v233 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5998,6 +6002,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2080. Fixture-covered or reference-cadence: 2080 / 2080.
+Tile count: 2082. Fixture-covered or reference-cadence: 2082 / 2082.
 
 <!-- END tile-index-v14 -->

@@ -2049,6 +2049,8 @@ export const COMPUTE_MAP = {
   "noise-barrier-insertion-loss": { module: "../../calc-airquality.js", fn: "computeNoiseBarrierInsertionLoss" },
   "community-noise-ldn": { module: "../../calc-airquality.js", fn: "computeCommunityNoiseLdn" },
   "odor-dilution-threshold": { module: "../../calc-airquality.js", fn: "computeOdorDilutionThreshold" },
+  "duct-bank-ampacity-derate": { module: "../../calc-lineworker.js", fn: "computeDuctBankAmpacityDerate" },
+  "ground-loop-flow-antifreeze": { module: "../../calc-buildingperf.js", fn: "computeGroundLoopFlowAntifreeze" },
   "stack-emission-pte": { module: "../../calc-airquality.js", fn: "computeStackEmissionPte" },
   "opacity-six-minute": { module: "../../calc-airquality.js", fn: "computeOpacitySixMinute" },
   "baghouse-cleaning-interval": { module: "../../calc-airquality.js", fn: "computeBaghouseCleaningInterval" },

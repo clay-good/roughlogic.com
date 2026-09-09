@@ -1963,6 +1963,8 @@ export const RENDERER_MAP = {
   "noise-barrier-insertion-loss": { module: "../../calc-airquality.js", exportName: "AIRQUALITY_RENDERERS" },
   "community-noise-ldn": { module: "../../calc-airquality.js", exportName: "AIRQUALITY_RENDERERS" },
   "odor-dilution-threshold": { module: "../../calc-airquality.js", exportName: "AIRQUALITY_RENDERERS" },
+  "duct-bank-ampacity-derate": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },
+  "ground-loop-flow-antifreeze": { module: "../../calc-buildingperf.js", exportName: "BUILDINGPERF_RENDERERS" },
   "stack-emission-pte": { module: "../../calc-airquality.js", exportName: "AIRQUALITY_RENDERERS" },
   "opacity-six-minute": { module: "../../calc-airquality.js", exportName: "AIRQUALITY_RENDERERS" },
   "baghouse-cleaning-interval": { module: "../../calc-airquality.js", exportName: "AIRQUALITY_RENDERERS" },

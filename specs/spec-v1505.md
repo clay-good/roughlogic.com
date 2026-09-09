@@ -1,6 +1,25 @@
 # roughlogic.com Specification v1505 -- Framing Factor and Whole-Wall Effective R-Value (`calc-buildingperf.js`, Group C HVAC, building performance, 1 New Tile)
 
-> **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
+> **Status: CUT 2026-09-09 as a duplicate.** `assembly-r-value` already computes
+> the parallel-path U-average with a `framing_factor` input, already carries a
+> continuous-insulation layer and counts it on BOTH paths, and already reports the
+> bridging percentage -- this spec's entire content, under the same method. The
+> two things it added that that calculator did not have -- the AREA-WEIGHTED
+> R-value average (the wrong method) computed beside the correct one, which that
+> tile's own note warned about without ever computing, and a second framing factor
+> so the two fixes compare in one answer -- landed there as a follow-up instead,
+> additively, so its previous answer is unchanged.
+>
+> **One correction to this spec.** It says adding R-6 continuous to the original
+> wall "gives R-20.4, a gain of 6.0", i.e. straight addition, and calls that the
+> point that "its nominal R and its delivered R are the same number." That is an
+> UNDERSTATEMENT. Continuous insulation sits on both paths and lifts the weak
+> framing path proportionally the most, so the correct parallel-path result is
+> **R-21.56, a gain of 7.30 -- more than its nominal R.** The existing tile's own
+> note had this right ("it buys more than its nominal R") before this spec was
+> written. Everything else in the spec recomputes exactly: R-14.4 whole-wall,
+> R-17.8 area-weighted, 24% overstatement, and 1.5 R from advanced framing.
+> Aliases route this question to `assembly-r-value`. Single-tile spec. Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-buildingperf.js`**
 > (Group C, HVAC -- the existing category, hub `/groups/hvac/`; building performance and envelope diagnostics), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >

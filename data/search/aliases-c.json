@@ -2333,6 +2333,16 @@
     {"term":"insulation surface temperature 140","target":"insulation-thickness","kind":"redirect"},
     {"term":"burn protection pipe insulation","target":"insulation-thickness","kind":"redirect"},
     {"term":"jacket surface temperature touch","target":"insulation-thickness","kind":"redirect"},
-    {"term":"hot pipe insulation thickness","target":"insulation-thickness","kind":"redirect"}
+    {"term":"hot pipe insulation thickness","target":"insulation-thickness","kind":"redirect"},
+    {"term":"ground loop flow","target":"ground-loop-flow-antifreeze","kind":"industry"},
+    {"term":"geothermal antifreeze concentration","target":"ground-loop-flow-antifreeze","kind":"industry"},
+    {"term":"loop pumping watts per ton","target":"ground-loop-flow-antifreeze","kind":"industry"},
+    {"term":"ground loop reynolds number","target":"ground-loop-flow-antifreeze","kind":"industry"},
+    {"term":"geothermal circulator sizing","target":"ground-loop-flow-antifreeze","kind":"industry"},
+    {"term":"how many watts per ton is my loop pumping","target":"ground-loop-flow-antifreeze","kind":"question"},
+    {"term":"whole wall r value","target":"assembly-r-value","kind":"redirect"},
+    {"term":"framing factor thermal bridging","target":"assembly-r-value","kind":"redirect"},
+    {"term":"effective r value wall","target":"assembly-r-value","kind":"redirect"},
+    {"term":"stud thermal bridge","target":"assembly-r-value","kind":"redirect"}
   ]
 }

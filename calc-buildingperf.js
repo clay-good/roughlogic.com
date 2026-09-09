@@ -748,3 +748,98 @@ BUILDINGPERF_RENDERERS["continuous-insulation-ratio"] = _simpleRenderer({
   ],
   compute: computeContinuousInsulationRatio,
 });
+
+// ===================== spec-v1506: ground loop flow, antifreeze and pump power =====================
+// 448.831 gal/min per ft^3/s and 3,960 are the standard hydraulic constants;
+// 6.7197e-4 converts centipoise to lb/(ft s).
+const _GPM_PER_CFS = 448.831;
+const _PUMP_CONSTANT = 3960;
+const _CP_TO_LB_FT_S = 6.7197e-4;
+// dims: in { args: dimensionless } out: { design_flow_gpm: L^3 T^-1, velocity_fps: L T^-1, reynolds: dimensionless, pump_bhp: M L^2 T^-3, pump_watts: M L^2 T^-3, watts_per_ton: dimensionless }
+export function computeGroundLoopFlowAntifreeze({
+  tons = 0, gpm_per_ton = 3.0, pipe_id_in = 0,
+  fluid_density_lb_ft3 = 63.9, fluid_viscosity_cp = 4.7, specific_gravity = 1.02,
+  head_ft = 0, wire_to_water_efficiency = 0.35, benchmark_w_per_ton = 100,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(tons > 0)) return { error: "Capacity in tons must be positive." };
+  if (!(gpm_per_ton > 0)) return { error: "Flow per ton must be positive." };
+  if (!(pipe_id_in > 0)) return { error: "Pipe inside diameter must be positive." };
+  if (!(fluid_density_lb_ft3 > 0)) return { error: "Fluid density must be positive." };
+  if (!(fluid_viscosity_cp > 0)) return { error: "Fluid viscosity must be positive." };
+  if (!(specific_gravity > 0)) return { error: "Specific gravity must be positive." };
+  if (!(head_ft >= 0)) return { error: "Head cannot be negative." };
+  if (!(wire_to_water_efficiency > 0 && wire_to_water_efficiency <= 1)) return { error: "Wire-to-water efficiency must be greater than 0 and no more than 1." };
+  if (!(benchmark_w_per_ton > 0)) return { error: "The pumping benchmark must be positive." };
+  const design_flow_gpm = tons * gpm_per_ton;
+  // Velocity comes from the ACTUAL pipe bore, not from a nominal size.
+  const diameter_ft = pipe_id_in / 12;
+  const area_ft2 = Math.PI / 4 * diameter_ft * diameter_ft;
+  const flow_cfs = design_flow_gpm / _GPM_PER_CFS;
+  const velocity_fps = flow_cfs / area_ft2;
+  const flow_verdict = fmt(design_flow_gpm, 1) + " gpm at " + fmt(gpm_per_ton, 2) + " gpm per ton, which through a "
+    + fmt(pipe_id_in, 3) + " in bore is " + fmt(velocity_fps, 2) + " ft/s";
+  // Reynolds number decides whether the loop's rated capacity applies at all.
+  const viscosity_lb_ft_s = fluid_viscosity_cp * _CP_TO_LB_FT_S;
+  const reynolds = fluid_density_lb_ft3 * velocity_fps * diameter_ft / viscosity_lb_ft_s;
+  const turbulent = reynolds >= 4000;
+  const laminar = reynolds < 2300;
+  const regime = laminar ? "LAMINAR" : (turbulent ? "turbulent" : "TRANSITIONAL");
+  const flow_regime_verdict = fmt(reynolds, 0) + " Reynolds -- " + regime
+    + (turbulent
+      ? (reynolds < 6000 ? ", but not by a wide margin. A colder day, a higher glycol concentration, or a fouled bore moves this the wrong way, and the loop's rated capacity assumes turbulent flow" : ". The loop's rated heat transfer assumes turbulent flow and this has margin")
+      : ", and the loop's rated capacity NO LONGER APPLIES. Heat transfer collapses at the pipe wall below turbulence, so a loop that goes laminar on the coldest day is undersized exactly when it is needed. Raising the flow, using a smaller bore, or lowering the glycol concentration are the fixes, in that order of cheapness");
+  // Pump power, and the benchmark comparison the spec inverted.
+  const pump_bhp = design_flow_gpm * head_ft * specific_gravity / (_PUMP_CONSTANT * wire_to_water_efficiency);
+  const pump_watts = pump_bhp * 745.699872;
+  const watts_per_ton = pump_watts / tons;
+  const within_benchmark = watts_per_ton <= benchmark_w_per_ton;
+  const pump_verdict = fmt(design_flow_gpm, 1) + " gpm at " + fmt(head_ft, 0) + " ft of head and "
+    + fmt(wire_to_water_efficiency * 100, 0) + "% wire-to-water is " + fmt(pump_bhp, 2) + " bhp = "
+    + fmt(pump_watts, 0) + " W, or " + fmt(watts_per_ton, 0) + " W per ton";
+  const benchmark_verdict = within_benchmark
+    ? fmt(watts_per_ton, 0) + " W per ton is WITHIN the " + fmt(benchmark_w_per_ton, 0)
+      + " W per ton benchmark, by " + fmt(benchmark_w_per_ton - watts_per_ton, 0)
+      + " W per ton. The loop is not spending too much on pumping"
+    : fmt(watts_per_ton, 0) + " W per ton is OVER the " + fmt(benchmark_w_per_ton, 0)
+      + " W per ton benchmark by " + fmt(watts_per_ton - benchmark_w_per_ton, 0)
+      + " W per ton -- the loop is spending too much on pumping, and the fixes in order are larger header pipe, fewer fittings, the lowest workable glycol concentration, and only then a different pump";
+  // The head a given W/ton budget allows, which is the design question.
+  const allowable_head_ft = benchmark_w_per_ton * tons / 745.699872 * _PUMP_CONSTANT * wire_to_water_efficiency / (design_flow_gpm * specific_gravity);
+  const head_verdict = "the " + fmt(benchmark_w_per_ton, 0) + " W per ton benchmark allows "
+    + fmt(allowable_head_ft, 0) + " ft of head at this flow and efficiency, against the "
+    + fmt(head_ft, 0) + " ft entered -- head is the variable a designer actually controls, through header size, loop count, and fitting count";
+  if (![design_flow_gpm, velocity_fps, reynolds, pump_bhp, watts_per_ton, allowable_head_ft].every(Number.isFinite)) return { error: "Ground loop math is not a finite value." };
+  return {
+    design_flow_gpm, velocity_fps, area_ft2, flow_verdict,
+    reynolds, turbulent, laminar, regime, flow_regime_verdict,
+    pump_bhp, pump_watts, watts_per_ton, within_benchmark, pump_verdict, benchmark_verdict,
+    allowable_head_ft, head_verdict,
+    note: "A ground loop has to move enough fluid to stay turbulent and few enough watts to be worth having, and those two pull against each other. The flow follows from the capacity at an entered gpm per ton, and the VELOCITY follows from the actual pipe bore rather than a nominal size -- 12 gpm is 5.3 ft/s in 1 in HDPE and 2.5 ft/s in 1.5 in, so a nominal size is not a velocity. Reynolds number is the number that decides whether the loop works at all: below about 4,000 the flow leaves turbulence, heat transfer collapses at the pipe wall, and the loop's rated capacity no longer applies. That matters most on the coldest day, because cold antifreeze is thick -- the same loop that is comfortably turbulent in October can sit on the laminar boundary in January, and a higher glycol concentration moves it the same way. Antifreeze concentration is therefore a heat transfer decision and not only a freeze protection one: use the lowest concentration that protects the loop, and size it against the BURST point rather than the freeze point where the equipment allows it, since a slushy glycol solution expands far less than water does. Pump power is the other half. Wire-to-water efficiency on a small circulator is poor, often near a third, so the electrical draw is roughly three times the hydraulic work, and a loop above about 100 W per ton is spending more on pumping than the efficiency gain over a conventional system is worth. The fixes are in a definite order of cheapness: larger header pipe, fewer fittings, the lowest workable glycol concentration, and only then a different pump. Head is the variable a designer actually controls, so the head a given watts-per-ton budget allows is reported beside the head entered. Fluid properties are ENTERED at the minimum expected loop temperature because they vary strongly with glycol type and concentration and with temperature; propylene and ethylene glycol differ substantially and the manufacturer's data is the source. This is a flow, regime and pumping screen: it does not size the ground loop or its length (`geothermal-loop` estimates that), compute the freeze or burst point (`glycol-mix` does), model ground thermal properties, the annual thermal balance of the field, or the long-term drift a heating-dominated or cooling-dominated load produces, size the circulator, or address purging, flushing, and air removal, which are where loops actually fail in the field. IGSHPA design procedure, the heat pump manufacturer's flow requirements, the antifreeze manufacturer's data, and the designer of record govern.",
+  };
+}
+export const groundLoopFlowAntifreezeExample = { inputs: { tons: 4, gpm_per_ton: 3.0, pipe_id_in: 1.21, fluid_density_lb_ft3: 63.9, fluid_viscosity_cp: 4.7, specific_gravity: 1.02, head_ft: 45, wire_to_water_efficiency: 0.35, benchmark_w_per_ton: 100 } };
+BUILDINGPERF_RENDERERS["ground-loop-flow-antifreeze"] = _simpleRenderer({
+  citation: "Citation: design flow = tons x gpm per ton; velocity from the actual pipe bore; Reynolds number = density x velocity x diameter / dynamic viscosity, with turbulence taken at Re 4,000 and the laminar boundary at 2,300; pump brake horsepower = gpm x head x specific gravity / (3,960 x wire-to-water efficiency). Fluid properties are ENTERED at the minimum expected loop temperature because they vary strongly with glycol type, concentration and temperature. It does not size the loop or its length, compute the freeze or burst point, model ground thermal properties or the field's annual thermal balance, size the circulator, or address purging and air removal. IGSHPA design procedure, the heat pump manufacturer's flow requirements, the antifreeze manufacturer's data, and the designer of record govern.",
+  example: groundLoopFlowAntifreezeExample.inputs,
+  fields: [
+    { key: "tons", label: "Heat pump capacity (tons)", kind: "number", attrs: { step: "any" } },
+    { key: "gpm_per_ton", label: "Design flow (gpm per ton)", kind: "number", attrs: { step: "any" } },
+    { key: "pipe_id_in", label: "Pipe inside diameter (in)", kind: "number", attrs: { step: "any" } },
+    { key: "fluid_density_lb_ft3", label: "Fluid density at the minimum loop temperature (lb/cu ft)", kind: "number", attrs: { step: "any" } },
+    { key: "fluid_viscosity_cp", label: "Fluid dynamic viscosity at that temperature (cP)", kind: "number", attrs: { step: "any" } },
+    { key: "specific_gravity", label: "Fluid specific gravity", kind: "number", attrs: { step: "any" } },
+    { key: "head_ft", label: "Loop head (ft)", kind: "number", attrs: { step: "any" } },
+    { key: "wire_to_water_efficiency", label: "Wire-to-water efficiency (0 to 1)", kind: "number", attrs: { step: "any" } },
+    { key: "benchmark_w_per_ton", label: "Pumping benchmark (W per ton)", kind: "number", attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "f", id: "glfa-out-f", label: "Design flow and velocity", value: (r) => r.flow_verdict },
+    { key: "r", id: "glfa-out-r", label: "Flow regime", value: (r) => r.flow_regime_verdict },
+    { key: "p", id: "glfa-out-p", label: "Pump power", value: (r) => r.pump_verdict },
+    { key: "b", id: "glfa-out-b", label: "Against the benchmark", value: (r) => r.benchmark_verdict },
+    { key: "h", id: "glfa-out-h", label: "The head the benchmark allows", value: (r) => r.head_verdict },
+    { key: "n", id: "glfa-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGroundLoopFlowAntifreeze,
+});

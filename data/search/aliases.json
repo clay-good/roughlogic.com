@@ -112592,6 +112592,86 @@
    "term": "how much odour reduction do i need",
    "target": "odor-dilution-threshold",
    "kind": "question"
+  },
+  {
+   "term": "duct bank ampacity",
+   "target": "duct-bank-ampacity-derate",
+   "kind": "industry"
+  },
+  {
+   "term": "neher mcgrath derate",
+   "target": "duct-bank-ampacity-derate",
+   "kind": "industry"
+  },
+  {
+   "term": "concrete encased duct ampacity",
+   "target": "duct-bank-ampacity-derate",
+   "kind": "industry"
+  },
+  {
+   "term": "mutual heating cables",
+   "target": "duct-bank-ampacity-derate",
+   "kind": "industry"
+  },
+  {
+   "term": "underground feeder ampacity",
+   "target": "duct-bank-ampacity-derate",
+   "kind": "industry"
+  },
+  {
+   "term": "how much do i derate in a duct bank",
+   "target": "duct-bank-ampacity-derate",
+   "kind": "question"
+  },
+  {
+   "term": "ground loop flow",
+   "target": "ground-loop-flow-antifreeze",
+   "kind": "industry"
+  },
+  {
+   "term": "geothermal antifreeze concentration",
+   "target": "ground-loop-flow-antifreeze",
+   "kind": "industry"
+  },
+  {
+   "term": "loop pumping watts per ton",
+   "target": "ground-loop-flow-antifreeze",
+   "kind": "industry"
+  },
+  {
+   "term": "ground loop reynolds number",
+   "target": "ground-loop-flow-antifreeze",
+   "kind": "industry"
+  },
+  {
+   "term": "geothermal circulator sizing",
+   "target": "ground-loop-flow-antifreeze",
+   "kind": "industry"
+  },
+  {
+   "term": "how many watts per ton is my loop pumping",
+   "target": "ground-loop-flow-antifreeze",
+   "kind": "question"
+  },
+  {
+   "term": "whole wall r value",
+   "target": "assembly-r-value",
+   "kind": "redirect"
+  },
+  {
+   "term": "framing factor thermal bridging",
+   "target": "assembly-r-value",
+   "kind": "redirect"
+  },
+  {
+   "term": "effective r value wall",
+   "target": "assembly-r-value",
+   "kind": "redirect"
+  },
+  {
+   "term": "stud thermal bridge",
+   "target": "assembly-r-value",
+   "kind": "redirect"
   }
  ]
 }

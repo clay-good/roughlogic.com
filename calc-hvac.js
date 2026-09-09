@@ -3240,7 +3240,7 @@ function _rEnv(spec) {
 
 // dims: in { cavity_r: dimensionless, continuous_r: dimensionless, stud_depth_in: L, framing_factor: dimensionless, air_films_r: dimensionless, finish_layers_r: dimensionless } out: { r_assembly: dimensionless, r_center: dimensionless }
 // (R-value carries hr-sq-ft-degF/Btu; treated dimensionless per spec-v14 for the U=1/R reciprocal and area-weighting core.)
-export function computeAssemblyRValue({ cavity_r = 0, continuous_r = 0, stud_depth_in = 0, framing_factor = 0.25, air_films_r = 0.85, finish_layers_r = 1.05 } = {}) {
+export function computeAssemblyRValue({ cavity_r = 0, continuous_r = 0, stud_depth_in = 0, framing_factor = 0.25, air_films_r = 0.85, finish_layers_r = 1.05, alt_framing_factor = 0, alt_continuous_r = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
   cavity_r = Number(cavity_r); continuous_r = Number(continuous_r); air_films_r = Number(air_films_r); finish_layers_r = Number(finish_layers_r);
   if (cavity_r < 0 || continuous_r < 0 || air_films_r < 0 || finish_layers_r < 0) return { error: "R-values must be non-negative." };
@@ -3249,15 +3249,62 @@ export function computeAssemblyRValue({ cavity_r = 0, continuous_r = 0, stud_dep
   const common_r = air_films_r + finish_layers_r + continuous_r;
   const r_framing_path = common_r + stud_depth_in * 1.25;
   const r_cavity_path = common_r + cavity_r;
+  // A path with no resistance at all conducts infinitely: guard it rather than
+  // letting 1/0 reach the U-average.
+  if (!(r_cavity_path > 0)) return { error: "The cavity path has no resistance -- enter a cavity R, continuous R, air films, or finish layers." };
+  if (!(r_framing_path > 0)) return { error: "The framing path has no resistance -- check the stud depth." };
   const u_framing = 1 / r_framing_path;
   const u_cavity = 1 / r_cavity_path;
   const u_assembly = framing_factor * u_framing + (1 - framing_factor) * u_cavity;
   const r_assembly = 1 / u_assembly;
   const r_center = r_cavity_path;
+  // spec-v1505 (cut into this tile): the AREA-WEIGHTED R average -- the wrong
+  // method -- computed beside the right one, and a second framing factor so the
+  // two fixes compare in one answer. Both additive; the figures above are unchanged.
+  if (!(alt_framing_factor >= 0 && alt_framing_factor < 1)) return { error: "The alternative framing factor must be at least 0 and less than 1." };
+  if (!(alt_continuous_r >= 0)) return { error: "The alternative continuous R cannot be negative." };
+  // Averaging the R-VALUES instead of the U-values is the error this catches.
+  const r_area_weighted = framing_factor * r_framing_path + (1 - framing_factor) * r_cavity_path;
+  const area_weighted_overstatement_pct = (r_area_weighted / r_assembly - 1) * 100;
+  const wrong_method_verdict = "averaging the R-VALUES gives " + fmt(r_area_weighted, 2)
+    + " against the correct " + fmt(r_assembly, 2) + " -- overstating the wall by "
+    + fmt(area_weighted_overstatement_pct, 0)
+    + "%. Average the U-values weighted by the framing fraction, never the R-values: the studs are a parallel path, not a share of the insulation";
+  // The two fixes, side by side. Advanced framing moves the fraction; continuous
+  // insulation covers BOTH paths, so it delivers its nominal R in full.
+  const solveR = (ff, ci) => {
+    const common = air_films_r + finish_layers_r + ci;
+    const uf = 1 / (common + stud_depth_in * 1.25);
+    const uc = 1 / (common + cavity_r);
+    return 1 / (ff * uf + (1 - ff) * uc);
+  };
+  const has_alt_framing = alt_framing_factor > 0;
+  const r_alt_framing = has_alt_framing ? solveR(alt_framing_factor, continuous_r) : 0;
+  const has_alt_continuous = alt_continuous_r > 0;
+  const r_alt_continuous = has_alt_continuous ? solveR(framing_factor, continuous_r + alt_continuous_r) : 0;
+  const framing_gain = has_alt_framing ? r_alt_framing - r_assembly : 0;
+  const continuous_gain = has_alt_continuous ? r_alt_continuous - r_assembly : 0;
+  const fixes_verdict = !has_alt_framing && !has_alt_continuous
+    ? "(no alternative framing factor or added continuous insulation entered)"
+    : (has_alt_framing ? "advanced framing at a fraction of " + fmt(alt_framing_factor, 2) + " gives "
+        + fmt(r_alt_framing, 2) + ", a gain of " + fmt(framing_gain, 2) : "")
+      + (has_alt_framing && has_alt_continuous ? "; " : "")
+      + (has_alt_continuous ? "adding R-" + fmt(alt_continuous_r, 1) + " of continuous insulation gives "
+        + fmt(r_alt_continuous, 2) + ", a gain of " + fmt(continuous_gain, 2) : "")
+      + (has_alt_framing && has_alt_continuous
+        ? (continuous_gain > framing_gain
+          ? ". The continuous layer wins because it covers the STUDS too, and it lifts that weak path proportionally the most -- which is why its delivered gain here ("
+            + fmt(continuous_gain, 2) + ") exceeds its nominal R-" + fmt(alt_continuous_r, 1)
+            + ", while moving the framing fraction only shrinks a penalty"
+          : ". Moving the framing fraction wins here, which happens when the framing path is already a large share of the wall")
+        : "");
   return {
     r_framing_path, r_cavity_path, u_assembly, r_assembly, r_center,
     bridging_pct: (1 - r_assembly / r_center) * 100,
-    note: "A framed wall has two heat paths - through the studs (about R-1.25 per inch of softwood, so a 2x4 stud is only about R-4.4) and through the insulated cavity - so the wall performs below its center-of-cavity R. Average the U-values weighted by the framing fraction (about a quarter of a 16 in on-center wall is framing), never the R-values, which overstates the wall. Continuous insulation outside the studs counts on both paths, so it buys more than its nominal R. Air films and finishes are editable ASHRAE-table defaults.",
+    r_area_weighted, area_weighted_overstatement_pct, wrong_method_verdict,
+    has_alt_framing, r_alt_framing, framing_gain,
+    has_alt_continuous, r_alt_continuous, continuous_gain, fixes_verdict,
+    note: "A framed wall has two heat paths - through the studs (about R-1.25 per inch of softwood, so a 2x4 stud is only about R-4.4) and through the insulated cavity - so the wall performs below its center-of-cavity R. Average the U-values weighted by the framing fraction (about a quarter of a 16 in on-center wall is framing), never the R-values, which overstates the wall. Continuous insulation outside the studs counts on both paths, so it buys more than its nominal R -- on an R-21 cavity wall with 2x6 studs at a 0.23 framing fraction, moving to advanced framing at 0.16 buys about 1.5 R while adding R-6 continuous buys about 7.3 -- MORE than its nominal R, because it covers the studs too and lifts that weak path proportionally the most. A common shortcut is to add continuous R straight onto the assembly total, which understates it. The area-weighted R average is reported beside the correct one precisely because it is the common error: it overstates that wall by about 24%. Air films and finishes are editable ASHRAE-table defaults.",
   };
 }
 export const assemblyRValueExample = { inputs: { cavity_r: 13, continuous_r: 0, stud_depth_in: 3.5, framing_factor: 0.25, air_films_r: 0.85, finish_layers_r: 1.05 } };

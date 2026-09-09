@@ -47,6 +47,22 @@ const _finiteGuard = (o) => {
   return null;
 };
 
+// The image-method mutual-heating sum for one duct: every other loaded duct
+// contributes ln(distance to its mirror image above grade / distance to it).
+// Module scope, so it adds no v14 derivation-corpus row of its own.
+function _ductBankMutualHeat(positions, i) {
+  const a = positions[i];
+  let sum = 0;
+  for (let j = 0; j < positions.length; j++) {
+    if (j === i) continue;
+    const b = positions[j];
+    const dx = a.x - b.x;
+    const direct = Math.hypot(dx, a.depth - b.depth);
+    if (direct > 0) sum += Math.log(Math.hypot(dx, a.depth + b.depth) / direct);
+  }
+  return sum;
+}
+
 // Compact renderer factory (number inputs only here; same shape as the
 // calc-steamplant.js / calc-diving.js / calc-wind.js _simpleRenderer).
 function _simpleRenderer(spec) {
@@ -1399,4 +1415,121 @@ LINEWORKER_RENDERERS["counterpoise-resistance"] = _simpleRenderer({
     { key: "n", id: "cpr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCounterpoiseResistance,
+});
+
+// ===================== spec-v1468: underground duct-bank ampacity derate =====================
+// The mutual-heating geometry uses the standard image method: each loaded duct
+// raises its neighbours' temperature by ln(distance to the neighbour's mirror
+// image above grade / distance to the neighbour). That sum is what identifies
+// the governing duct. It is NOT the derate factor -- the factor also depends on
+// the cable's own thermal resistances and comes from the standard.
+// dims: in { args: dimensionless } out: { derated_ampacity_a: I, alt_derated_ampacity_a: I, required_table_ampacity_a: I, governing_mutual_heat: dimensionless }
+export function computeDuctBankAmpacityDerate({
+  ducts_across = 0, ducts_down = 0, loaded_ducts = 0,
+  spacing_in = 0, depth_to_top_in = 0,
+  base_table_ampacity_a = 0, derate_factor = 0,
+  alt_derate_factor = 0, target_load_a = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(ducts_across > 0 && ducts_down > 0)) return { error: "The duct bank must be at least one duct across and one down." };
+  if (!Number.isInteger(ducts_across) || !Number.isInteger(ducts_down)) return { error: "Duct counts must be whole numbers." };
+  if (!(spacing_in > 0)) return { error: "Duct center-to-center spacing must be positive." };
+  if (!(depth_to_top_in > 0)) return { error: "Depth to the top duct must be positive." };
+  if (!(base_table_ampacity_a > 0)) return { error: "The base table ampacity must be positive." };
+  if (!(derate_factor > 0 && derate_factor <= 1)) return { error: "The derate factor must be greater than 0 and no more than 1." };
+  if (!(alt_derate_factor >= 0 && alt_derate_factor <= 1)) return { error: "The alternative derate factor must be between 0 and 1 (0 to skip)." };
+  if (!(target_load_a >= 0)) return { error: "The target load cannot be negative (0 to skip)." };
+  const total_ducts = ducts_across * ducts_down;
+  if (!(loaded_ducts > 0 && loaded_ducts <= total_ducts)) return { error: "Loaded ducts must be at least one and no more than the ducts in the bank." };
+  if (!Number.isInteger(loaded_ducts)) return { error: "The loaded duct count must be a whole number." };
+  // The derated ampacity, which is the whole point.
+  const derated_ampacity_a = base_table_ampacity_a * derate_factor;
+  const lost_a = base_table_ampacity_a - derated_ampacity_a;
+  const ampacity_verdict = "the table says " + fmt(base_table_ampacity_a, 0) + " A and the duct bank says "
+    + fmt(derated_ampacity_a, 0) + " A per circuit at a derate factor of " + fmt(derate_factor, 3)
+    + " -- " + fmt(lost_a, 0) + " A given up, which is not a rounding correction but often nearly two conductor sizes";
+  // WHICH duct governs, from the geometry. This part IS derivable: the image
+  // method sums ln(distance to a neighbour's mirror image / distance to it).
+  const positions = [];
+  for (let r = 0; r < ducts_down; r++) {
+    for (let c = 0; c < ducts_across; c++) {
+      positions.push({ x: c * spacing_in, depth: depth_to_top_in + r * spacing_in, row: r + 1, col: c + 1 });
+    }
+  }
+  const mutualHeat = (i) => _ductBankMutualHeat(positions, i);
+  let governing_index = 0;
+  let governing_mutual_heat = -Infinity;
+  let coolest_mutual_heat = Infinity;
+  for (let i = 0; i < positions.length; i++) {
+    const m = mutualHeat(i);
+    if (m > governing_mutual_heat) { governing_mutual_heat = m; governing_index = i; }
+    if (m < coolest_mutual_heat) { coolest_mutual_heat = m; }
+  }
+  const g = positions[governing_index];
+  const heat_spread_pct = coolest_mutual_heat > 0 ? (governing_mutual_heat / coolest_mutual_heat - 1) * 100 : 0;
+  const governing_verdict = total_ducts === 1
+    ? "a single duct has no neighbours to heat it"
+    : "the governing duct is row " + g.row + ", column " + g.col + " of a " + ducts_across + " by "
+      + ducts_down + " bank -- the one with the most neighbours around it and the most earth above and below. It carries "
+      + fmt(heat_spread_pct, 0) + "% more mutual heating than the coolest duct in the same bank, so a bank sized on an average position runs its middle ducts over temperature";
+  const loaded_verdict = loaded_ducts >= total_ducts
+    ? "all " + fmt(total_ducts, 0) + " ducts are loaded, which is the worst case and the one to design to unless spares are genuinely permanent"
+    : fmt(loaded_ducts, 0) + " of " + fmt(total_ducts, 0)
+      + " ducts loaded. Fewer loaded ducts is a higher derate factor, but a spare duct is only a spare until someone pulls a circuit into it -- derating on today's loading is how a bank becomes overloaded without anyone changing a conductor";
+  // The sensitivity that argues for a measured soil resistivity.
+  const has_alt = alt_derate_factor > 0;
+  const alt_derated_ampacity_a = has_alt ? base_table_ampacity_a * alt_derate_factor : 0;
+  const alt_verdict = !has_alt
+    ? "(no alternative derate factor entered)"
+    : "at a derate factor of " + fmt(alt_derate_factor, 3) + " the same cable carries "
+      + fmt(alt_derated_ampacity_a, 0) + " A, "
+      + (alt_derated_ampacity_a > derated_ampacity_a ? "up " : "down ")
+      + fmt(Math.abs(alt_derated_ampacity_a - derated_ampacity_a), 0)
+      + " A. Soil thermal resistivity is the input this is most sensitive to and the one most often assumed: a bank designed at 90 degC-cm/W and installed in 120 loses roughly another tenth of its ampacity, which is the argument for a MEASURED resistivity rather than a table value";
+  // The reverse question a designer actually asks.
+  const has_target = target_load_a > 0;
+  const required_table_ampacity_a = has_target ? target_load_a / derate_factor : 0;
+  const target_met = has_target && derated_ampacity_a >= target_load_a;
+  const target_verdict = !has_target
+    ? "(no target load entered)"
+    : target_met
+      ? "the " + fmt(derated_ampacity_a, 0) + " A derated ampacity carries the " + fmt(target_load_a, 0)
+        + " A target with " + fmt(derated_ampacity_a - target_load_a, 0) + " A to spare"
+      : "carrying " + fmt(target_load_a, 0) + " A after this derate needs a conductor whose TABLE ampacity is "
+        + fmt(required_table_ampacity_a, 0) + " A, against the " + fmt(base_table_ampacity_a, 0)
+        + " A entered -- size the conductor from the derated requirement, never from the table value directly";
+  if (![derated_ampacity_a, governing_mutual_heat, alt_derated_ampacity_a, required_table_ampacity_a].every(Number.isFinite)) return { error: "Duct bank derate math is not a finite value." };
+  return {
+    total_ducts, derated_ampacity_a, lost_a, ampacity_verdict,
+    governing_row: g.row, governing_col: g.col, governing_mutual_heat, coolest_mutual_heat,
+    heat_spread_pct, governing_verdict, loaded_verdict,
+    has_alt, alt_derated_ampacity_a, alt_verdict,
+    has_target, required_table_ampacity_a, target_met, target_verdict,
+    note: "What a conductor in an underground duct bank can actually carry, which is far less than the NEC table says. A duct bank is a mutual-heating problem: every loaded duct warms every other one, the heat has to reach the surface through concrete and soil, and the duct in the middle of the bank sees the worst of it. On a 3 by 3 bank fully loaded, a cable rated 285 A in the table can come back near 177 A -- roughly two conductor sizes, and a design that used the table value would run its center ducts over temperature for the life of the installation. THE DERATE FACTOR IS ENTERED, and that is deliberate. It comes from the Neher-McGrath calculation or from the NEC's Annex B tables and figures for the specific arrangement, and it depends on the cable's own thermal resistances as well as the geometry -- so no geometric shortcut reproduces it, and a tile that appeared to derive one from spacing and depth alone would be inventing a number the standard owns. What IS derived here is the part that geometry decides: WHICH duct governs. The image-method mutual-heating sum identifies the hottest position and reports how much worse it is than the coolest duct in the same bank, which is the answer to 'where do I put the biggest circuit' and the reason a bank sized on an average position fails in the middle. Soil thermal resistivity is the input the answer is most sensitive to and the one most often assumed rather than measured; a bank designed at 90 degC-cm/W and installed in 120 loses roughly another tenth of its ampacity, and a native-soil backfill is not a thermal backfill. Load factor matters for the same reason -- a duct bank at 100% load factor never gets the overnight cooling a 75% one does. A spare duct is only a spare until a circuit is pulled into it, so deriving on today's loading is how a bank becomes overloaded without anyone changing a conductor. This does not perform the Neher-McGrath calculation, size conductors, address short-circuit or fault-current withstand, conductor shielding and grounding, the concrete encasement's own design, or the ductbank structural and separation requirements. The NEC as adopted (including Article 310 and Annex B and their conditions of use), IEEE 835, the utility's own standards, and the engineer of record govern.",
+  };
+}
+export const ductBankAmpacityDerateExample = { inputs: { ducts_across: 3, ducts_down: 3, loaded_ducts: 9, spacing_in: 7.5, depth_to_top_in: 36, base_table_ampacity_a: 285, derate_factor: 0.62, alt_derate_factor: 0.56, target_load_a: 200 } };
+LINEWORKER_RENDERERS["duct-bank-ampacity-derate"] = _simpleRenderer({
+  citation: "Citation: the derate factor is ENTERED from the Neher-McGrath calculation or the NEC Annex B tables and figures for the arrangement, because it depends on the cable's own thermal resistances as well as the geometry and no geometric shortcut reproduces it; the derated ampacity is that factor times the base table ampacity, and the conductor a target load needs is that relation inverted. The governing duct position IS derived, from the standard image-method mutual-heating sum over the loaded ducts. It does not perform the Neher-McGrath calculation, size conductors, or address fault-current withstand, shielding and grounding, the encasement design, or separation requirements. The NEC as adopted (Article 310 and Annex B with their conditions of use), IEEE 835, the utility's standards, and the engineer of record govern.",
+  example: ductBankAmpacityDerateExample.inputs,
+  fields: [
+    { key: "ducts_across", label: "Ducts across", kind: "number" },
+    { key: "ducts_down", label: "Ducts down", kind: "number" },
+    { key: "loaded_ducts", label: "Ducts actually loaded", kind: "number" },
+    { key: "spacing_in", label: "Duct center-to-center spacing (in)", kind: "number", attrs: { step: "any" } },
+    { key: "depth_to_top_in", label: "Depth to the top duct (in)", kind: "number", attrs: { step: "any" } },
+    { key: "base_table_ampacity_a", label: "Base NEC table ampacity (A)", kind: "number", attrs: { step: "any" } },
+    { key: "derate_factor", label: "Derate factor from Annex B / Neher-McGrath (0 to 1)", kind: "number", attrs: { step: "any" } },
+    { key: "alt_derate_factor", label: "Alternative derate factor to compare (0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "target_load_a", label: "Target load per circuit (A, 0 to skip)", kind: "number", attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "a", id: "dbad-out-a", label: "Derated ampacity", value: (r) => r.ampacity_verdict },
+    { key: "g", id: "dbad-out-g", label: "Which duct governs", value: (r) => r.governing_verdict },
+    { key: "l", id: "dbad-out-l", label: "How many are loaded", value: (r) => r.loaded_verdict },
+    { key: "s", id: "dbad-out-s", label: "At another derate factor", value: (r) => r.alt_verdict },
+    { key: "t", id: "dbad-out-t", label: "For a target load", value: (r) => r.target_verdict },
+    { key: "n", id: "dbad-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDuctBankAmpacityDerate,
 });

@@ -1138,6 +1138,8 @@ const _TILES = [
   ["noise-barrier-insertion-loss", "G"],
   ["community-noise-ldn", "G"],
   ["odor-dilution-threshold", "G"],
+  ["duct-bank-ampacity-derate", "A"],
+  ["ground-loop-flow-antifreeze", "C"],
   // spec-v1717..v1726 air quality band (new calc-airquality.js)
   ["stack-emission-pte", "G"],
   ["opacity-six-minute", "G"],
