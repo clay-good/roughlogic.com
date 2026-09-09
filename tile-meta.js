@@ -1132,6 +1132,8 @@ const _TILES = [
   ["aviation-fuel-weight", "K"],
   ["spray-transfer-efficiency", "K"],
   ["adhesive-bond-area", "K"],
+  ["refractory-shell-temperature", "C"],
+  ["cryogenic-boiloff", "C"],
   // spec-v1717..v1726 air quality band (new calc-airquality.js)
   ["stack-emission-pte", "G"],
   ["opacity-six-minute", "G"],

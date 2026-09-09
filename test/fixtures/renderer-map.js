@@ -1957,6 +1957,8 @@ export const RENDERER_MAP = {
   "aviation-fuel-weight": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "spray-transfer-efficiency": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "adhesive-bond-area": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
+  "refractory-shell-temperature": { module: "../../calc-hvacsystems.js", exportName: "HVACSYSTEMS_RENDERERS" },
+  "cryogenic-boiloff": { module: "../../calc-hvacsystems.js", exportName: "HVACSYSTEMS_RENDERERS" },
   "stack-emission-pte": { module: "../../calc-airquality.js", exportName: "AIRQUALITY_RENDERERS" },
   "opacity-six-minute": { module: "../../calc-airquality.js", exportName: "AIRQUALITY_RENDERERS" },
   "baghouse-cleaning-interval": { module: "../../calc-airquality.js", exportName: "AIRQUALITY_RENDERERS" },

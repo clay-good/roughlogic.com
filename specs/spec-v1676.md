@@ -1,6 +1,18 @@
 # roughlogic.com Specification v1676 -- Pipe Insulation Jacketing and Fitting Cover Quantity (`calc-hvacsystems.js`, Group C HVAC, mechanical insulation, 1 New Tile)
 
-> **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
+> **Status: CUT 2026-09-09 as a duplicate.** `pipe-insulation-takeoff` already
+> computes `jacket = pi x insulation OD x cut length`, this spec's headline
+> relation, and its own note already makes the point that the area uses the
+> insulation OD and not the pipe. The three things this spec added that that
+> calculator did not have -- the jacket OD derived from pipe OD plus twice the
+> insulation thickness, with the explicit comparison against the pipe's own
+> circumference (2.23 ft against 1.18, so estimating on the pipe orders 53% of the
+> jacket), the LAP allowance on the jacket area, and the elbow, tee, and valve
+> covers counted as PIECES rather than as the length allowance already in the cut
+> -- landed there as a follow-up instead, additively, so its previous answer is
+> unchanged. The piece count deliberately does not touch the cut length, which
+> would double-count that allowance. Aliases route this question to it.
+> Single-tile spec. Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-hvacsystems.js`**
 > (Group C, HVAC -- the existing category, hub `/groups/hvac/`; mechanical insulation), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >

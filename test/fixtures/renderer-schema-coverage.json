@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 2074,
-  "covered_count": 1996,
+  "total_tiles": 2076,
+  "covered_count": 1998,
   "covered": [
     "aav-install-check",
     "abatement-containment",
@@ -423,6 +423,7 @@
     "crown-pruning-dose",
     "crown-reduction-leaf-area",
     "crusher-reduction-ratio",
+    "cryogenic-boiloff",
     "culvert-headwater",
     "culvert-inlet-control",
     "culvert-outlet-control",
@@ -1347,6 +1348,7 @@
     "reefer-burn",
     "reeving-parts-of-line",
     "reference-et0",
+    "refractory-shell-temperature",
     "refrigerant-charge",
     "refrigerant-charging",
     "refrigerant-leak-rate",

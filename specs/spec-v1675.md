@@ -1,6 +1,25 @@
 # roughlogic.com Specification v1675 -- Insulation Thickness for a Personnel-Protection Surface Temperature (`calc-hvacsystems.js`, Group C HVAC, mechanical insulation, 1 New Tile)
 
-> **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
+> **Status: CUT 2026-09-09 as a duplicate.** `insulation-thickness` already solves
+> exactly this: it bisects for the insulation radius whose conduction flux equals
+> the outer-film flux at the allowable surface temperature rise -- "required
+> thickness from cylindrical conduction at a target surface temp" -- and it already
+> carries the outer film coefficient as an INPUT (default 1.65, still air on a
+> horizontal pipe). The comparison against the energy case is also already in the
+> catalog, in `insulation-thickness-for-heat-loss` and `economic-insulation-thickness`,
+> whose own scope prose makes this spec's headline point that those limits are
+> separate and win where they are larger. The three things this spec added that
+> that calculator did not have -- the FORWARD direction (the surface temperature AT
+> a stated thickness, which it could not report at all), the second FILM CONDITION
+> side by side, which is what makes the counterintuitive point sayable (the same
+> line indoors in still air runs HOTTER at the surface than outdoors in wind), and
+> the JACKET-MATERIAL criterion (a metal jacket at 140 degF burns faster than mastic
+> at the same temperature, so a surface limit without a named jacket is undefined)
+> -- landed there as a follow-up instead, additively, so its previous answer is
+> unchanged. **Note that this spec computed NOTHING:** its worked example states a
+> 4 in line at 400 degF in a 90 degF room and then prints a schematic with no
+> numbers in it. Aliases route this question to `insulation-thickness`.
+> Single-tile spec. Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-hvacsystems.js`**
 > (Group C, HVAC -- the existing category, hub `/groups/hvac/`; mechanical insulation), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >

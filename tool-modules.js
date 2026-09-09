@@ -393,6 +393,9 @@ export const TOOL_MODULES = (() => {
   // calc-hvacsystems.js. They keep group: "C" (group letter independent of
   // module, the v42/v70..v80 precedent).
   declare("./calc-hvacsystems.js", "HVACSYSTEMS_RENDERERS", [
+    // spec-v1677, v1678: the mechanical insulation band.
+    "refractory-shell-temperature", "cryogenic-boiloff",
+
     "grille-neck-nc", "duct-breakout-noise", "silencer-insertion-loss",
     "mechanical-room-nc", "rooftop-curb-uplift",
     // spec-v1622..v1631: the test-and-balance and hydronic systems band.

@@ -573,8 +573,14 @@ export const wetBulbPsychrometerExample = {
 export function computeInsulationThickness({
   pipe_od_in, surface_temp_F, ambient_F, surface_limit_F, k_btu_in_per_hr_ft2_F,
   outside_film_coeff_btu_hr_ft2_F = 1.65,
+  at_thickness_in = 0, alt_film_coeff_btu_hr_ft2_F = 0,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A non-positive pipe diameter has no geometry: the log-ratio the radial forms
+  // use goes non-finite rather than merely wrong.
+  if (!(pipe_od_in > 0)) return { error: "Pipe outside diameter must be positive." };
+  if (!(k_btu_in_per_hr_ft2_F > 0)) return { error: "Insulation conductivity must be positive." };
+  if (!(outside_film_coeff_btu_hr_ft2_F > 0)) return { error: "The outer film coefficient must be positive." };
   const r1 = pipe_od_in / 2;
   const dT = surface_temp_F - ambient_F;
   if (dT <= 0) return { error: "Pipe surface must exceed ambient." };
@@ -602,7 +608,58 @@ export function computeInsulationThickness({
   }
   const r2 = (lo + hi) / 2;
   const thickness_in = r2 - r1;
-  return { thickness_in, r2_in: r2, r1_in: r1 };
+  // spec-v1675 (cut into this tile): the FORWARD direction -- the surface
+  // temperature AT a stated thickness -- and the same question at a second film
+  // condition. Both optional; zero leaves every figure above untouched.
+  if (!(at_thickness_in >= 0)) return { error: "The stated thickness cannot be negative (0 to skip the surface-temperature check)." };
+  if (!(alt_film_coeff_btu_hr_ft2_F >= 0)) return { error: "The alternative film coefficient cannot be negative (0 to skip)." };
+  // Setting conduction through the insulation equal to the outer film flux and
+  // solving for the surface gives a closed form, no iteration needed.
+  const surfaceAt = (thk, h) => {
+    const rOut = r1 + thk;
+    if (!(r1 > 0) || !(rOut > r1) || !(h > 0)) return null;
+    const A = (2 * Math.PI * k) / Math.log(rOut / r1);
+    const B = h * (Math.PI * 2 * rOut / 12);
+    return (A * surface_temp_F + B * ambient_F) / (A + B);
+  };
+  const has_at_thickness = at_thickness_in > 0;
+  const surface_at_thickness_F = has_at_thickness ? surfaceAt(at_thickness_in, outside_film_coeff_btu_hr_ft2_F) : null;
+  const at_thickness_meets = has_at_thickness && surface_at_thickness_F !== null && surface_at_thickness_F <= surface_limit_F;
+  const at_thickness_verdict = !has_at_thickness
+    ? "(no stated thickness entered)"
+    : fmt(at_thickness_in, 2) + " in of insulation leaves the surface at " + fmt(surface_at_thickness_F, 0)
+      + " degF, " + (at_thickness_meets ? "at or below" : "ABOVE") + " the " + fmt(surface_limit_F, 0)
+      + " degF target" + (at_thickness_meets ? "" : " -- " + fmt(thickness_in, 2) + " in is what the target takes");
+  // The counterintuitive installation effect, and the reason the film coefficient
+  // is an input rather than a constant.
+  const has_alt_film = alt_film_coeff_btu_hr_ft2_F > 0;
+  let alt_thickness_in = 0;
+  if (has_alt_film) {
+    let alo = r1 + 1e-3, ahi = r1 + 12;
+    for (let i = 0; i < 80; i++) {
+      const mid = (alo + ahi) / 2;
+      const q_through = (2 * Math.PI * k * Td_minus_Ts) / Math.log(mid / r1);
+      const q_out = alt_film_coeff_btu_hr_ft2_F * (Math.PI * 2 * mid / 12) * allowable_outer_dT;
+      if (q_through > q_out) alo = mid; else ahi = mid;
+    }
+    alt_thickness_in = (alo + ahi) / 2 - r1;
+  }
+  const alt_surface_at_thickness_F = has_alt_film && has_at_thickness ? surfaceAt(at_thickness_in, alt_film_coeff_btu_hr_ft2_F) : null;
+  const alt_film_verdict = !has_alt_film
+    ? "(no alternative film coefficient entered)"
+    : "at a film coefficient of " + fmt(alt_film_coeff_btu_hr_ft2_F, 2) + " the target takes "
+      + fmt(alt_thickness_in, 2) + " in against " + fmt(thickness_in, 2) + " in at "
+      + fmt(outside_film_coeff_btu_hr_ft2_F, 2)
+      + (alt_surface_at_thickness_F !== null
+        ? ", and the stated thickness would run " + fmt(alt_surface_at_thickness_F, 0) + " degF at the surface rather than " + fmt(surface_at_thickness_F, 0)
+        : "")
+      + ". A HIGHER film coefficient carries heat off the jacket faster, so the surface runs COOLER for the same insulation -- which is why the same line outdoors in wind is cooler to touch than indoors in still air, and why a thickness taken from an outdoor calculation can leave an indoor surface above the target. That is the reverse of what most people expect.";
+  return {
+    thickness_in, r2_in: r2, r1_in: r1,
+    has_at_thickness, surface_at_thickness_F, at_thickness_meets, at_thickness_verdict,
+    has_alt_film, alt_thickness_in, alt_surface_at_thickness_F, alt_film_verdict,
+    note: "The insulation thickness that holds a hot pipe's outer surface at or below a target, from cylindrical conduction balanced against the outer film. Two things about this calculation are worth stating plainly. The first is that the PERSONNEL case and the ENERGY case are independent, and the personnel case is usually the lighter one: a line insulated to an economic heat-loss target already satisfies touch protection, but a line insulated only for touch protection is not insulated for energy. That asymmetry is the one that gets used backwards, when someone proposes stripping insulation from a line 'that is only there for touch safety' -- see `insulation-thickness-for-heat-loss` and `economic-insulation-thickness` for the other case. The second is that the surface film coefficient is what makes the answer sensitive to installation, and it runs against intuition: a higher film coefficient carries heat off the jacket faster, so a line OUTDOORS in wind runs COOLER at the surface than the same line indoors in still air. A thickness calculated for outdoor conditions can therefore be inadequate indoors, which is why the coefficient is an entered value rather than a constant. The default 1.65 BTU/hr/sq ft/degF is a still-air horizontal-pipe reference value. The jacket is the part this arithmetic does not capture at all. Skin contact temperature depends on how fast the surface can deliver heat INTO skin, so a metal jacket at 140 degF burns faster than a mastic or PVC finish at the same temperature, and standards set different acceptable surface temperatures for different jacket materials. Specifying a maximum surface temperature without specifying the jacket leaves the criterion unstated, and a metal-jacketed line meeting a number written for mastic is not protected. Conduction and the outer film only: it does not address the insulation's k varying with mean temperature, joints, hangers, supports and the thermal bridges they make, moisture in the insulation, or the alternative of guarding where insulation is impractical. The insulation manufacturer's data and the applicable personnel-protection standard govern.",
+  };
 }
 
 export const insulationThicknessExample = {

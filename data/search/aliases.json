@@ -112362,6 +112362,116 @@
    "term": "mils wet for mils dry",
    "target": "coating-coverage-dft",
    "kind": "redirect"
+  },
+  {
+   "term": "refractory lining heat loss",
+   "target": "refractory-shell-temperature",
+   "kind": "industry"
+  },
+  {
+   "term": "furnace shell temperature",
+   "target": "refractory-shell-temperature",
+   "kind": "industry"
+  },
+  {
+   "term": "layered wall interface temperature",
+   "target": "refractory-shell-temperature",
+   "kind": "industry"
+  },
+  {
+   "term": "refractory backup limit",
+   "target": "refractory-shell-temperature",
+   "kind": "industry"
+  },
+  {
+   "term": "acid dew point shell",
+   "target": "refractory-shell-temperature",
+   "kind": "industry"
+  },
+  {
+   "term": "how hot is the furnace shell",
+   "target": "refractory-shell-temperature",
+   "kind": "question"
+  },
+  {
+   "term": "cryogenic boil off rate",
+   "target": "cryogenic-boiloff",
+   "kind": "industry"
+  },
+  {
+   "term": "ner tank cryogenic",
+   "target": "cryogenic-boiloff",
+   "kind": "industry"
+  },
+  {
+   "term": "liquid nitrogen hold time",
+   "target": "cryogenic-boiloff",
+   "kind": "industry"
+  },
+  {
+   "term": "vacuum jacket lost vacuum",
+   "target": "cryogenic-boiloff",
+   "kind": "industry"
+  },
+  {
+   "term": "cryogenic vent rate",
+   "target": "cryogenic-boiloff",
+   "kind": "industry"
+  },
+  {
+   "term": "how long will a cryogenic tank hold",
+   "target": "cryogenic-boiloff",
+   "kind": "question"
+  },
+  {
+   "term": "personnel protection insulation thickness",
+   "target": "insulation-thickness",
+   "kind": "redirect"
+  },
+  {
+   "term": "insulation surface temperature 140",
+   "target": "insulation-thickness",
+   "kind": "redirect"
+  },
+  {
+   "term": "burn protection pipe insulation",
+   "target": "insulation-thickness",
+   "kind": "redirect"
+  },
+  {
+   "term": "jacket surface temperature touch",
+   "target": "insulation-thickness",
+   "kind": "redirect"
+  },
+  {
+   "term": "hot pipe insulation thickness",
+   "target": "insulation-thickness",
+   "kind": "redirect"
+  },
+  {
+   "term": "pipe jacketing quantity",
+   "target": "pipe-insulation-takeoff",
+   "kind": "redirect"
+  },
+  {
+   "term": "insulation fitting cover count",
+   "target": "pipe-insulation-takeoff",
+   "kind": "redirect"
+  },
+  {
+   "term": "metal jacket square feet",
+   "target": "pipe-insulation-takeoff",
+   "kind": "redirect"
+  },
+  {
+   "term": "removable valve cover insulation",
+   "target": "pipe-insulation-takeoff",
+   "kind": "redirect"
+  },
+  {
+   "term": "insulation takeoff fittings",
+   "target": "pipe-insulation-takeoff",
+   "kind": "redirect"
   }
  ]
 }

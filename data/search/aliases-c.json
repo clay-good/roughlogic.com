@@ -2316,6 +2316,23 @@
     {"term":"curb attachment fasteners","target":"rooftop-curb-uplift","kind":"industry"},
     {"term":"rtu anchorage wind","target":"rooftop-curb-uplift","kind":"industry"},
     {"term":"rooftop equipment overturning","target":"rooftop-curb-uplift","kind":"industry"},
-    {"term":"asce 7 rooftop equipment","target":"rooftop-curb-uplift","kind":"industry"}
+    {"term":"asce 7 rooftop equipment","target":"rooftop-curb-uplift","kind":"industry"},
+    {"term":"refractory lining heat loss","target":"refractory-shell-temperature","kind":"industry"},
+    {"term":"furnace shell temperature","target":"refractory-shell-temperature","kind":"industry"},
+    {"term":"layered wall interface temperature","target":"refractory-shell-temperature","kind":"industry"},
+    {"term":"refractory backup limit","target":"refractory-shell-temperature","kind":"industry"},
+    {"term":"acid dew point shell","target":"refractory-shell-temperature","kind":"industry"},
+    {"term":"how hot is the furnace shell","target":"refractory-shell-temperature","kind":"question"},
+    {"term":"cryogenic boil off rate","target":"cryogenic-boiloff","kind":"industry"},
+    {"term":"ner tank cryogenic","target":"cryogenic-boiloff","kind":"industry"},
+    {"term":"liquid nitrogen hold time","target":"cryogenic-boiloff","kind":"industry"},
+    {"term":"vacuum jacket lost vacuum","target":"cryogenic-boiloff","kind":"industry"},
+    {"term":"cryogenic vent rate","target":"cryogenic-boiloff","kind":"industry"},
+    {"term":"how long will a cryogenic tank hold","target":"cryogenic-boiloff","kind":"question"},
+    {"term":"personnel protection insulation thickness","target":"insulation-thickness","kind":"redirect"},
+    {"term":"insulation surface temperature 140","target":"insulation-thickness","kind":"redirect"},
+    {"term":"burn protection pipe insulation","target":"insulation-thickness","kind":"redirect"},
+    {"term":"jacket surface temperature touch","target":"insulation-thickness","kind":"redirect"},
+    {"term":"hot pipe insulation thickness","target":"insulation-thickness","kind":"redirect"}
   ]
 }

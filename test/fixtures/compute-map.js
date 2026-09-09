@@ -2043,6 +2043,8 @@ export const COMPUTE_MAP = {
   "aviation-fuel-weight": { module: "../../calc-mechanic.js", fn: "computeAviationFuelWeight" },
   "spray-transfer-efficiency": { module: "../../calc-mechanic.js", fn: "computeSprayTransferEfficiency" },
   "adhesive-bond-area": { module: "../../calc-mechanic.js", fn: "computeAdhesiveBondArea" },
+  "refractory-shell-temperature": { module: "../../calc-hvacsystems.js", fn: "computeRefractoryShellTemperature" },
+  "cryogenic-boiloff": { module: "../../calc-hvacsystems.js", fn: "computeCryogenicBoiloff" },
   "stack-emission-pte": { module: "../../calc-airquality.js", fn: "computeStackEmissionPte" },
   "opacity-six-minute": { module: "../../calc-airquality.js", fn: "computeOpacitySixMinute" },
   "baghouse-cleaning-interval": { module: "../../calc-airquality.js", fn: "computeBaghouseCleaningInterval" },

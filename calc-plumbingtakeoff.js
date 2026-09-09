@@ -90,7 +90,7 @@ PLUMBINGTAKEOFF_RENDERERS["solder-joint-quantity"] = _v856renderSolderJointQuant
 
 // ===================== spec-v857: pipe insulation and jacket material takeoff =====================
 // dims: in { pipe_ft: L, waste_pct: dimensionless, num_fittings: dimensionless, fitting_allow_ft: L, section_len_ft: L, insul_od_in: L } out: { cut_ft: L, sections: dimensionless, jacket_sf: L^2 }
-export function computePipeInsulationTakeoff({ pipe_ft = 250, waste_pct = 5, num_fittings = 12, fitting_allow_ft = 1, section_len_ft = 3, insul_od_in = 4.5 } = {}) {
+export function computePipeInsulationTakeoff({ pipe_ft = 250, waste_pct = 5, num_fittings = 12, fitting_allow_ft = 1, section_len_ft = 3, insul_od_in = 4.5, pipe_od_in = 0, insul_thickness_in = 0, jacket_overlap_pct = 0, elbow_count = 0, tee_count = 0, valve_count = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pipe_ft > 0)) return { error: "Pipe length must be positive (ft)." };
   if (!(fitting_allow_ft > 0)) return { error: "Fitting allowance must be positive (ft)." };
@@ -101,12 +101,49 @@ export function computePipeInsulationTakeoff({ pipe_ft = 250, waste_pct = 5, num
   const cut_ft = pipe_ft * (1 + waste_pct / 100) + num_fittings * fitting_allow_ft;
   const sections = Math.ceil(cut_ft / section_len_ft);
   const jacket_sf = Math.PI * (insul_od_in / 12) * cut_ft;
-  if (![cut_ft, sections, jacket_sf].every(Number.isFinite)) return { error: "Insulation-takeoff math is not a finite value." };
+  // spec-v1676 (cut into this tile): the jacket OD check, the lap allowance, and
+  // the fitting and valve covers counted as PIECES. All optional; zero leaves
+  // every figure above untouched.
+  if (!(pipe_od_in >= 0 && insul_thickness_in >= 0)) return { error: "Pipe OD and insulation thickness cannot be negative (0 to skip the jacket OD check)." };
+  if (!(jacket_overlap_pct >= 0)) return { error: "Jacket lap allowance cannot be negative." };
+  if (!(elbow_count >= 0 && tee_count >= 0 && valve_count >= 0)) return { error: "Fitting counts cannot be negative." };
+  const jacket_circumference_ft = Math.PI * (insul_od_in / 12);
+  const jacket_with_lap_sf = jacket_sf * (1 + jacket_overlap_pct / 100);
+  // The trap: estimating the jacket on the PIPE's circumference instead of the
+  // insulation's. On a 4.5 in pipe with 2 in of insulation that is half the material.
+  const has_derived_od = pipe_od_in > 0 && insul_thickness_in > 0;
+  const derived_jacket_od_in = has_derived_od ? pipe_od_in + 2 * insul_thickness_in : 0;
+  const pipe_circumference_ft = pipe_od_in > 0 ? Math.PI * (pipe_od_in / 12) : 0;
+  const od_mismatch = has_derived_od && Math.abs(derived_jacket_od_in - insul_od_in) > 0.01;
+  const jacket_od_verdict = !has_derived_od
+    ? "(no pipe OD and insulation thickness entered)"
+    : fmt(pipe_od_in, 2) + " in pipe with " + fmt(insul_thickness_in, 2) + " in of insulation is a "
+      + fmt(derived_jacket_od_in, 2) + " in jacket OD, a " + fmt(Math.PI * derived_jacket_od_in / 12, 2)
+      + " ft circumference against the pipe's own " + fmt(pipe_circumference_ft, 2)
+      + " ft -- estimating on the pipe would order " + fmt(pipe_circumference_ft / (Math.PI * derived_jacket_od_in / 12) * 100, 0)
+      + "% of the jacket actually needed"
+      + (od_mismatch ? ". NOTE: that disagrees with the " + fmt(insul_od_in, 2) + " in insulation OD entered above, which is what the areas use" : "");
+  // Fitting and valve covers are PIECES, counted and fabricated one at a time.
+  // They are NOT in the square footage above, and the fitting allowance already
+  // in the cut length is a LENGTH allowance, not a cover count.
+  const fitting_covers = elbow_count + tee_count;
+  const valve_covers = valve_count;
+  const total_covers = fitting_covers + valve_covers;
+  const covers_verdict = total_covers === 0
+    ? "(no elbow, tee, or valve counts entered)"
+    : fmt(fitting_covers, 0) + " fitting covers (" + fmt(elbow_count, 0) + " elbows, " + fmt(tee_count, 0)
+      + " tees) and " + fmt(valve_covers, 0) + " valve covers, " + fmt(total_covers, 0)
+      + " pieces in all. These are NOT in the square footage above and the fitting allowance in the cut length is a LENGTH allowance, not a cover count. In labour these pieces can equal or exceed the entire straight run, because each is laid out, cut, formed, and banded individually"
+      + (valve_covers > 0 ? ", and where the specification calls for removable reusable valve covers -- which any line that will be maintained does -- those " + fmt(valve_covers, 0) + " are fabricated items at a cost per piece well above anything in the straight-run estimate" : "");
+  if (![cut_ft, sections, jacket_sf, jacket_with_lap_sf].every(Number.isFinite)) return { error: "Insulation-takeoff math is not a finite value." };
   return {
     cut_ft,
     sections,
     jacket_sf,
-    note: "The fitting allowance covers ells, tees, and valves (a valve is several feet of equivalent length). The jacket area uses the insulation outside diameter (not the pipe). This is a material takeoff distinct from the thermal insulation-thickness; the spec sets the thickness and jacket type.",
+    jacket_circumference_ft, jacket_with_lap_sf,
+    has_derived_od, derived_jacket_od_in, pipe_circumference_ft, od_mismatch, jacket_od_verdict,
+    fitting_covers, valve_covers, total_covers, covers_verdict,
+    note: "The fitting allowance covers ells, tees, and valves as LENGTH (a valve is several feet of equivalent length); the elbow, tee, and valve counts are a separate PIECE count, because a fitting cover is fabricated one at a time and is not square footage. The jacket area uses the insulation outside diameter (not the pipe) -- a 4.5 in pipe with 2 in of insulation has an 8.5 in jacket OD and a 2.23 ft circumference against the pipe's own 1.18 ft, so estimating on the pipe orders half the jacket. Jacket goes on with a lap, so a lap allowance is applied where one is entered. The piece count is the line most often left out entirely, and in labour those pieces can equal or exceed the whole straight run. This is a material takeoff distinct from the thermal insulation-thickness; the spec sets the thickness and jacket type.",
   };
 }
 

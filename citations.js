@@ -22191,6 +22191,34 @@ export const CITATIONS = {
       { name: "Not weight and balance", value: "the centre of gravity envelope is checked elsewhere", source: "the aircraft flight manual" },
     ],
   },
+  // spec-v1677, v1678: the 2026-09-09 trade-expansion mechanical insulation
+  // band, in the existing calc-hvacsystems.js. Two of the band's four specs
+  // were cut as duplicates and landed additively on the tiles that already
+  // held the relation (insulation-thickness, pipe-insulation-takeoff).
+  "refractory-shell-temperature": {
+    formula: "one-dimensional steady-state plane-wall conduction: each layer contributes thickness / conductivity and the outer film one / coefficient, the flux is the total temperature drop over the total resistance, and each interface temperature is the hot face less the flux times the resistance ahead of it; the shell is the ambient plus the flux times the film resistance.",
+    edition: "A steady-state series-resistance solve with every interface reported against its own layer's service limit, and the shell against both a personnel limit and, on flue gas service, an acid dew point. Conductivities are ENTERED because refractory k varies strongly with temperature and with the specific product. It does not address transient heating and dry-out schedules, thermal expansion and joints, corners, arches, penetrations, anchors and the thermal bridge each anchor makes, gas-side convection and radiation, slag or chemical attack, or spalling.",
+    freeAccess: "A sum of resistances and one division; no manufacturer conductivity table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The design lives at the interfaces, not at the shell. INSULATING THE OUTSIDE OF A FURNACE MAKES THE INSIDE HOTTER -- adding an outer layer to cut heat loss raises every interface behind the hot face, because less heat is escaping, and a lining 'improved' that way can put a layer above its service temperature. That failure appears months later as a shell hot spot where the backup has shrunk and opened a path, not at commissioning. A layer's service temperature is a limit on its HOT face, the interface ahead of it, not the cooler one behind. The shell carries two limits pulling opposite ways: a personnel and structural limit that wants it cool, and on flue gas service a floor at the acid dew point, roughly 250 to 300 degF depending on the fuel's sulphur, below which sulphuric acid condenses inside the casing -- so over-insulating a flue gas casing to save energy is a corrosion failure.",
+    assumptions: [
+      { name: "Conductivities are entered", value: "refractory k varies strongly with mean temperature; one value across a 2,000 degF drop is the largest approximation here", source: "the refractory manufacturer's k-versus-temperature curve" },
+      { name: "One-dimensional and steady state", value: "no transient, corner, penetration, or anchor bridging", source: "the furnace or boiler designer" },
+      { name: "Not a lining design", value: "material selection, dry-out, and expansion joints are separate", source: "the refractory manufacturer and the applicable code" },
+    ],
+  },
+  "cryogenic-boiloff": {
+    formula: "boil-off = tank contents x the rated normal evaporation rate, with the implied heat leak that boil-off mass times the latent heat of vaporization; hold time = the vapour mass needed to raise the vapour space from its current pressure to the relief setting, from the ideal gas law at the entered vapour temperature, divided by the boil-off rate.",
+    edition: "A boil-off and hold-time estimate from a rated evaporation rate the user supplies. The normal evaporation rate is a manufacturer figure measured under defined conditions at a stated fill and pressure, and real boil-off varies with fill level, ambient temperature, solar exposure, and the condition of the vacuum jacket. The hold time is a SCREENING estimate: it holds the vapour temperature constant and ignores liquid stratification, the saturated liquid-vapour coupling, and heat going into warming the liquid. It does not size relief devices, which must cover the fire case as well as normal boil-off, and does not address the pressure building coil, the economizer, or withdrawal behaviour.",
+    freeAccess: "One percentage and one ideal-gas mass; no manufacturer performance table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Two results here run against intuition. A LARGER tank has less surface area per unit volume and so a LOWER percentage boil-off, which is why two half-size tanks lose more than one full-size tank of the same total -- and on a site drawing less than the daily boil-off, the tank loses more than the process takes. And because hold time is proportional to vapour space, a tank at 90% full lifts its relief sooner than the same tank at 40%: a full tank is not a tank with more margin, it has less. A tank boiling off at many times its rating has lost the vacuum in its annulus, which frost or sweating on the outer jacket confirms; that is a tank problem rather than a fitting leak. The asphyxiation hazard of cryogenic gases in confined spaces is the leading cause of cryogenic fatalities and is outside this arithmetic entirely.",
+    assumptions: [
+      { name: "The evaporation rate is entered", value: "it is a rated figure at a stated fill and pressure, not a field measurement", source: "the tank manufacturer's data" },
+      { name: "Hold time is a screening estimate", value: "constant vapour temperature, no liquid stratification or saturated coupling", source: "the manufacturer's published hold-time data" },
+      { name: "Not relief sizing", value: "relief devices must also cover the fire case", source: "CGA standards and NFPA 55" },
+    ],
+  },
   // spec-v1659, v1663: the 2026-09-09 trade-expansion auto body band, in the
   // existing calc-mechanic.js. Three of the band's five specs were cut as
   // duplicates and landed additively on the tiles that already held the

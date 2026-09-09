@@ -109273,6 +109273,216 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "refractory-shell-temperature",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Refractory Lining Series Resistance -- the spec-v1677 wall, resistances and interfaces computed by hand",
+   "source_edition_or_year": "spec-v1677 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "hot_face_f": 2100,
+    "ambient_f": 90,
+    "film_coeff_btu_hr_ft2_f": 2.0,
+    "layer1_thickness_in": 4.5,
+    "layer1_k": 8.5,
+    "layer1_limit_f": 3000,
+    "layer2_thickness_in": 2.5,
+    "layer2_k": 1.9,
+    "layer2_limit_f": 2000,
+    "layer3_thickness_in": 2.0,
+    "layer3_k": 0.55,
+    "layer3_limit_f": 1200,
+    "shell_limit_f": 140,
+    "acid_dew_point_f": 0
+   },
+   "outputs": {
+    "total_resistance": {
+     "value": 5.9816,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "flux_btu_hr_ft2": {
+     "value": 336.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "interface1_f": {
+     "value": 1922.1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "interface2_f": {
+     "value": 1480.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "shell_temp_f": {
+     "value": 258.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "layer3_hot_face_f": {
+     "value": 1480.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cryogenic-boiloff",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Cryogenic Tank Boil-Off and Hold Time -- the spec-v1678 tank, hold time computed from the ideal gas law",
+   "source_edition_or_year": "spec-v1678 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "tank_volume_gal": 11000,
+    "ner_pct_per_day": 0.25,
+    "liquid_density_lb_gal": 6.75,
+    "latent_heat_btu_lb": 85.6,
+    "vapour_space_pct": 20,
+    "current_pressure_psig": 30,
+    "relief_pressure_psig": 75,
+    "molecular_weight": 28.01,
+    "vapour_temp_r": 200,
+    "alt_vapour_space_pct": 60,
+    "withdrawal_gal_day": 20
+   },
+   "outputs": {
+    "boil_off_gal_day": {
+     "value": 27.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "boil_off_lb_day": {
+     "value": 185.625,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vapour_space_ft3": {
+     "value": 294.1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hold_time_hr": {
+     "value": 22.34,
+     "tolerance": {
+      "pct": 1.0
+     }
+    },
+    "alt_hold_time_hr": {
+     "value": 67.02,
+     "tolerance": {
+      "pct": 1.0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "insulation-thickness",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Surface Temperature at a Stated Thickness -- the spec-v1675 forward direction (cut into this tile)",
+   "source_edition_or_year": "spec-v1675 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "pipe_od_in": 1,
+    "surface_temp_F": 250,
+    "ambient_F": 75,
+    "surface_limit_F": 120,
+    "k_btu_in_per_hr_ft2_F": 0.27,
+    "at_thickness_in": 1.0,
+    "alt_film_coeff_btu_hr_ft2_F": 4.0
+   },
+   "outputs": {
+    "thickness_in": {
+     "value": 2.6059,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "surface_at_thickness_F": {
+     "value": 170.1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_thickness_in": {
+     "value": 1.315,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pipe-insulation-takeoff",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Jacket Circumference, Lap and Fitting Covers -- the spec-v1676 worked example (cut into this tile)",
+   "source_edition_or_year": "spec-v1676 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "pipe_ft": 240,
+    "waste_pct": 0,
+    "num_fittings": 0,
+    "fitting_allow_ft": 1,
+    "section_len_ft": 3,
+    "insul_od_in": 8.5,
+    "pipe_od_in": 4.5,
+    "insul_thickness_in": 2,
+    "jacket_overlap_pct": 10,
+    "elbow_count": 14,
+    "tee_count": 4,
+    "valve_count": 6
+   },
+   "outputs": {
+    "jacket_circumference_ft": {
+     "value": 2.2253,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "jacket_sf": {
+     "value": 534.1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "jacket_with_lap_sf": {
+     "value": 587.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "derived_jacket_od_in": {
+     "value": 8.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_covers": {
+     "value": 24,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

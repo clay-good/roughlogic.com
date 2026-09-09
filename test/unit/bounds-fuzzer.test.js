@@ -52185,3 +52185,164 @@ test("bounds: spec-v1661 (cut into layout-squaring) -- a tolerance verdict and t
   assert.equal(fd.triple_c, 5);
   assert.ok(_ce3({ ...base, tolerance: -1 }).error);
 });
+
+
+import { computeRefractoryShellTemperature as _v1677, computeCryogenicBoiloff as _v1678 } from "../../calc-hvacsystems.js";
+
+test("bounds: spec-v1677 computeRefractoryShellTemperature -- the limit applies at the HOT face", () => {
+  const base = { hot_face_f: 2100, ambient_f: 90, film_coeff_btu_hr_ft2_f: 2.0, layer1_thickness_in: 4.5, layer1_k: 8.5, layer1_limit_f: 3000, layer2_thickness_in: 2.5, layer2_k: 1.9, layer2_limit_f: 2000, layer3_thickness_in: 2.0, layer3_k: 0.55, layer3_limit_f: 1200, shell_limit_f: 140, acid_dew_point_f: 0 };
+  const r = _v1677(base);
+  // IDENTITY: the resistances add, and the flux is the drop over the total.
+  const R = 4.5 / 8.5 + 2.5 / 1.9 + 2.0 / 0.55 + 1 / 2.0;
+  assert.ok(Math.abs(r.total_resistance - R) < 1e-12);
+  assert.ok(Math.abs(r.flux_btu_hr_ft2 - (2100 - 90) / R) < 1e-9);
+  assert.ok(Math.abs(r.flux_btu_hr_ft2 - 336.0) < 0.5);
+  // IDENTITY: the temperature behind the LAST layer IS the shell surface.
+  assert.ok(Math.abs(r.interface3_f - r.shell_temp_f) < 1e-9);
+  assert.ok(Math.abs(r.shell_temp_f - 258) < 1);
+  // Each layer's hot face is the previous interface -- the chain has to close.
+  assert.ok(Math.abs(r.layer1_hot_face_f - 2100) < 1e-12);
+  assert.ok(Math.abs(r.layer2_hot_face_f - r.interface1_f) < 1e-12);
+  assert.ok(Math.abs(r.layer3_hot_face_f - r.interface2_f) < 1e-12);
+  // THE ASSERTION THAT CAUGHT A REAL BUG: a layer's service limit applies at its
+  // HOT face, not the cooler interface behind it. Layer 3 sees 1,480 degF on its
+  // hot face against a 1,200 limit and is OVER, while the 258 degF behind it
+  // would have passed. Checking the trailing face silently passes a cooking layer.
+  assert.ok(r.layer3_hot_face_f > 1200);
+  assert.ok(r.interface3_f < 1200);
+  assert.equal(r.any_interface_over, true);
+  assert.equal(r.over_layer_count, 1);
+  assert.ok(r.interface_verdict.includes("layer 3"));
+  // THE SPEC'S TRAP: adding insulation OUTSIDE pushes the inner interfaces HOTTER.
+  const thicker = _v1677({ ...base, layer3_thickness_in: 4.0 });
+  assert.ok(thicker.flux_btu_hr_ft2 < r.flux_btu_hr_ft2);
+  assert.ok(thicker.interface1_f > r.interface1_f);
+  assert.ok(thicker.layer3_hot_face_f > r.layer3_hot_face_f);
+  // ...while the SHELL goes the other way, which is why checking only the shell misses it.
+  assert.ok(thicker.shell_temp_f < r.shell_temp_f);
+  // The acid dew point floor: a shell BELOW it is a corrosion finding, not a win.
+  const flue = _v1677({ ...base, acid_dew_point_f: 300 });
+  assert.equal(flue.shell_below_dew, true);
+  assert.ok(flue.shell_verdict.includes("acid dew point"));
+  assert.equal(_v1677({ ...base, acid_dew_point_f: 200 }).shell_below_dew, false);
+  // A single layer is legal; a hot face at or below ambient is not.
+  assert.ok(_v1677({ hot_face_f: 1000, ambient_f: 70, film_coeff_btu_hr_ft2_f: 2, layer1_thickness_in: 3, layer1_k: 5 }).flux_btu_hr_ft2 > 0);
+  assert.ok(_v1677({ ...base, hot_face_f: 90 }).error);
+  assert.ok(_v1677({ ...base, layer1_thickness_in: 0, layer2_thickness_in: 0, layer3_thickness_in: 0 }).error);
+  assert.ok(_v1677({ ...base, layer1_k: 0 }).error);
+  assert.ok(_v1677({ ...base, film_coeff_btu_hr_ft2_f: 0 }).error);
+  assert.ok(_v1677({ ...base, hot_face_f: Infinity }).error);
+});
+
+test("bounds: spec-v1678 computeCryogenicBoiloff -- hold time is PROPORTIONAL to vapour space", () => {
+  const base = { tank_volume_gal: 11000, ner_pct_per_day: 0.25, liquid_density_lb_gal: 6.75, latent_heat_btu_lb: 85.6, vapour_space_pct: 20, current_pressure_psig: 30, relief_pressure_psig: 75, molecular_weight: 28.01, vapour_temp_r: 200, alt_vapour_space_pct: 60, withdrawal_gal_day: 20 };
+  const r = _v1678(base);
+  // THE SPEC'S FIGURES: 27.5 gallons a day, 825 a month.
+  assert.ok(Math.abs(r.boil_off_gal_day - 27.5) < 1e-9);
+  assert.ok(Math.abs(r.boil_off_gal_day * 30 - 825) < 1e-9);
+  assert.ok(Math.abs(r.boil_off_lb_day - 27.5 * 6.75) < 1e-9);
+  assert.ok(Math.abs(r.heat_leak_btu_hr - (27.5 * 6.75 / 24) * 85.6) < 1e-9);
+  // THE SPEC'S POINT, as an exact identity: hold time is proportional to vapour
+  // space, so tripling the space triples the hold. A fuller tank has LESS margin.
+  assert.ok(Math.abs(r.alt_hold_time_hr / r.hold_time_hr - 60 / 20) < 1e-9);
+  assert.ok(r.alt_hold_time_hr > r.hold_time_hr);
+  assert.ok(r.alt_verdict.includes("LONGER"));
+  const fullTank = _v1678({ ...base, vapour_space_pct: 60, alt_vapour_space_pct: 10 });
+  assert.ok(fullTank.alt_hold_time_hr < fullTank.hold_time_hr);
+  assert.equal(fullTank.fuller, true);
+  assert.ok(fullTank.alt_verdict.includes("SHORTER"));
+  assert.ok(fullTank.alt_verdict.includes("less margin"));
+  // Hold time also scales with the pressure span and inversely with boil-off.
+  const widerSpan = _v1678({ ...base, relief_pressure_psig: 120 });
+  assert.ok(Math.abs(widerSpan.hold_time_hr / r.hold_time_hr - 90 / 45) < 1e-9);
+  const lostVacuum = _v1678({ ...base, ner_pct_per_day: 2.0 });
+  assert.ok(Math.abs(lostVacuum.hold_time_hr * 8 - r.hold_time_hr) < 1e-9);
+  assert.ok(lostVacuum.boil_off_gal_day > r.boil_off_gal_day);
+  // BOIL-OFF AGAINST USE: 27.5 lost against 20 drawn is the losing case.
+  assert.equal(r.boil_off_exceeds_use, true);
+  assert.ok(r.use_verdict.includes("BOIL-OFF EXCEEDS USE"));
+  assert.equal(_v1678({ ...base, withdrawal_gal_day: 200 }).boil_off_exceeds_use, false);
+  // With no vapour-space data there is no hold time claimed at all.
+  const noHold = _v1678({ ...base, vapour_space_pct: 0 });
+  assert.equal(noHold.has_hold, false);
+  assert.ok(Math.abs(noHold.boil_off_gal_day - 27.5) < 1e-9);
+  // A relief setting at or below the current pressure is not a hold time.
+  assert.equal(_v1678({ ...base, relief_pressure_psig: 30 }).has_hold, false);
+  assert.ok(_v1678({ ...base, tank_volume_gal: 0 }).error);
+  assert.ok(_v1678({ ...base, ner_pct_per_day: 0 }).error);
+  assert.ok(_v1678({ ...base, vapour_space_pct: 140 }).error);
+  assert.ok(_v1678({ ...base, tank_volume_gal: NaN }).error);
+});
+
+test("bounds: spec-v1675 (cut into insulation-thickness) -- the forward solve round-trips the bisection", () => {
+  const base = { pipe_od_in: 1, surface_temp_F: 250, ambient_F: 75, surface_limit_F: 120, k_btu_in_per_hr_ft2_F: 0.27 };
+  const legacy = computeInsulationThickness(base);
+  // ADDITIVE: the tile's original answer is untouched with the new inputs absent.
+  assert.ok(Math.abs(legacy.thickness_in - 2.605884) < 1e-5);
+  assert.equal(legacy.has_at_thickness, false);
+  assert.equal(legacy.has_alt_film, false);
+  // ROUND TRIP, the strongest check available here: the surface temperature at
+  // the thickness the bisection reported must BE the target it solved for. This
+  // fails if the forward closed form and the iteration disagree at all.
+  const rt = computeInsulationThickness({ ...base, at_thickness_in: legacy.thickness_in });
+  assert.ok(Math.abs(rt.surface_at_thickness_F - 120) < 1e-6);
+  assert.equal(rt.at_thickness_meets, true);
+  // Thinner than required runs hotter than the target, and says so.
+  const thin = computeInsulationThickness({ ...base, at_thickness_in: 1.0 });
+  assert.ok(thin.surface_at_thickness_F > 120);
+  assert.equal(thin.at_thickness_meets, false);
+  assert.ok(thin.at_thickness_verdict.includes("ABOVE"));
+  // MONOTONIC: more insulation is always a cooler surface.
+  assert.ok(computeInsulationThickness({ ...base, at_thickness_in: 3.0 }).surface_at_thickness_F
+    < thin.surface_at_thickness_F);
+  // THE COUNTERINTUITIVE ONE: a HIGHER film coefficient (wind) carries heat off
+  // faster, so it needs LESS insulation and runs COOLER at the same thickness.
+  // Getting this backwards is the error the spec warns about.
+  const windy = computeInsulationThickness({ ...base, at_thickness_in: 1.0, alt_film_coeff_btu_hr_ft2_F: 4.0 });
+  assert.ok(windy.alt_thickness_in < windy.thickness_in);
+  assert.ok(windy.alt_surface_at_thickness_F < windy.surface_at_thickness_F);
+  assert.ok(windy.alt_film_verdict.includes("COOLER"));
+  // And the round trip holds at the alternative film condition too.
+  const altRt = computeInsulationThickness({ ...base, outside_film_coeff_btu_hr_ft2_F: 4.0, at_thickness_in: windy.alt_thickness_in });
+  assert.ok(Math.abs(altRt.surface_at_thickness_F - 120) < 1e-6);
+  assert.ok(computeInsulationThickness({ ...base, at_thickness_in: -1 }).error);
+  assert.ok(computeInsulationThickness({ ...base, alt_film_coeff_btu_hr_ft2_F: -1 }).error);
+});
+
+test("bounds: spec-v1676 (cut into pipe-insulation-takeoff) -- the jacket wraps the INSULATION, and covers are pieces", () => {
+  const legacy = _v857pit({ pipe_ft: 250, waste_pct: 5, num_fittings: 12, fitting_allow_ft: 1, section_len_ft: 3, insul_od_in: 4.5 });
+  // ADDITIVE: the original three answers are untouched.
+  assert.ok(Math.abs(legacy.cut_ft - 274.5) < 1e-9);
+  assert.equal(legacy.sections, 92);
+  assert.ok(Math.abs(legacy.jacket_sf - Math.PI * (4.5 / 12) * 274.5) < 1e-9);
+  assert.equal(legacy.total_covers, 0);
+  const r = _v857pit({ pipe_ft: 240, waste_pct: 0, num_fittings: 0, fitting_allow_ft: 1, section_len_ft: 3, insul_od_in: 8.5, pipe_od_in: 4.5, insul_thickness_in: 2, jacket_overlap_pct: 10, elbow_count: 14, tee_count: 4, valve_count: 6 });
+  // THE SPEC'S FIGURES: 8.5 in jacket OD, 2.2253 ft around, 534 sq ft, 588 with lap.
+  assert.ok(Math.abs(r.derived_jacket_od_in - 8.5) < 1e-12);
+  assert.ok(Math.abs(r.jacket_circumference_ft - Math.PI * 8.5 / 12) < 1e-12);
+  assert.ok(Math.abs(r.jacket_sf - 534.1) < 0.2);
+  assert.ok(Math.abs(r.jacket_with_lap_sf - r.jacket_sf * 1.1) < 1e-9);
+  assert.ok(Math.abs(r.jacket_with_lap_sf - 587.5) < 0.5);
+  assert.equal(r.od_mismatch, false);
+  // THE TRAP: estimating on the PIPE's circumference orders about half the jacket.
+  assert.ok(Math.abs(r.pipe_circumference_ft - Math.PI * 4.5 / 12) < 1e-12);
+  assert.ok(r.pipe_circumference_ft / r.jacket_circumference_ft < 0.55);
+  assert.ok(r.jacket_od_verdict.includes("53%"));
+  // COVERS ARE PIECES, and they are NOT in the square footage.
+  assert.equal(r.fitting_covers, 18);
+  assert.equal(r.valve_covers, 6);
+  assert.equal(r.total_covers, 24);
+  assert.ok(r.covers_verdict.includes("NOT in the square footage"));
+  // The piece count must not move the cut length -- that would double-count the
+  // fitting allowance already in it.
+  const noCovers = _v857pit({ pipe_ft: 240, waste_pct: 0, num_fittings: 0, fitting_allow_ft: 1, section_len_ft: 3, insul_od_in: 8.5 });
+  assert.ok(Math.abs(noCovers.cut_ft - r.cut_ft) < 1e-12);
+  assert.ok(Math.abs(noCovers.jacket_sf - r.jacket_sf) < 1e-12);
+  // A jacket OD that disagrees with the entered insulation OD is flagged, not silently used.
+  const mismatch = _v857pit({ pipe_ft: 240, waste_pct: 0, num_fittings: 0, fitting_allow_ft: 1, section_len_ft: 3, insul_od_in: 6.5, pipe_od_in: 4.5, insul_thickness_in: 2 });
+  assert.equal(mismatch.od_mismatch, true);
+  assert.ok(mismatch.jacket_od_verdict.includes("disagrees"));
+  assert.ok(Math.abs(mismatch.jacket_sf - Math.PI * (6.5 / 12) * 240) < 1e-9);
+  assert.ok(_v857pit({ pipe_ft: 240, insul_od_in: 8.5, jacket_overlap_pct: -1 }).error);
+  assert.ok(_v857pit({ pipe_ft: 240, insul_od_in: 8.5, elbow_count: -1 }).error);
+});

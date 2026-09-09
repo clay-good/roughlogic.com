@@ -3054,3 +3054,223 @@ HVACSYSTEMS_RENDERERS["rooftop-curb-uplift"] = _simpleRenderer({
     { key: "note", label: "Note", value: (r) => r.note },
   ],
 });
+
+// ===================== spec-v1677: refractory lining heat loss, interface temperatures and shell temperature =====================
+// A plane-wall series-resistance solve. Per unit area the layers add as t/k
+// and the outer film adds 1/h, so the flux is the total drop over the total
+// resistance and every interface temperature is the hot face less the flux
+// times the resistance ahead of it.
+// dims: in { hot_face_f: T, ambient_f: T, film_coeff_btu_hr_ft2_f: M T^-3, layer1_thickness_in: L, layer1_k: M L T^-3, layer1_limit_f: T, layer2_thickness_in: L, layer2_k: M L T^-3, layer2_limit_f: T, layer3_thickness_in: L, layer3_k: M L T^-3, layer3_limit_f: T, shell_limit_f: T, acid_dew_point_f: T } out: { total_resistance: dimensionless, flux_btu_hr_ft2: M T^-3, interface1_f: T, interface2_f: T, interface3_f: T, shell_temp_f: T }
+export function computeRefractoryShellTemperature({
+  hot_face_f = 0, ambient_f = 0, film_coeff_btu_hr_ft2_f = 2.0,
+  layer1_thickness_in = 0, layer1_k = 0, layer1_limit_f = 0,
+  layer2_thickness_in = 0, layer2_k = 0, layer2_limit_f = 0,
+  layer3_thickness_in = 0, layer3_k = 0, layer3_limit_f = 0,
+  shell_limit_f = 0, acid_dew_point_f = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(hot_face_f > ambient_f)) return { error: "The hot face must be above ambient." };
+  if (!(film_coeff_btu_hr_ft2_f > 0)) return { error: "The outer film coefficient must be positive." };
+  const layers = [
+    { t: layer1_thickness_in, k: layer1_k, limit: layer1_limit_f, n: 1 },
+    { t: layer2_thickness_in, k: layer2_k, limit: layer2_limit_f, n: 2 },
+    { t: layer3_thickness_in, k: layer3_k, limit: layer3_limit_f, n: 3 },
+  ].filter((L) => L.t > 0);
+  if (!layers.length) return { error: "Enter at least one layer with a positive thickness." };
+  for (const L of layers) {
+    if (!(L.k > 0)) return { error: "Layer " + L.n + " needs a positive thermal conductivity." };
+    if (!(L.limit >= 0)) return { error: "Layer " + L.n + " service limit cannot be negative (0 to skip)." };
+  }
+  // k is BTU-in / (hr ft^2 F), so t/k is already hr ft^2 F / BTU.
+  const film_resistance = 1 / film_coeff_btu_hr_ft2_f;
+  let total_resistance = film_resistance;
+  for (const L of layers) total_resistance += L.t / L.k;
+  const flux_btu_hr_ft2 = (hot_face_f - ambient_f) / total_resistance;
+  // Every interface is the hot face less the flux times the resistance AHEAD of it.
+  // A layer's service limit applies at its HOT face -- the interface AHEAD of it,
+  // not the cooler one behind it. Checking the trailing interface passes a layer
+  // that is actually cooking, which is the failure this tile exists to catch.
+  let running = 0;
+  const interfaces = [];
+  for (const L of layers) {
+    const hot_side = hot_face_f - flux_btu_hr_ft2 * running;
+    running += L.t / L.k;
+    const temp = hot_face_f - flux_btu_hr_ft2 * running;
+    const over = L.limit > 0 && hot_side > L.limit;
+    interfaces.push({ n: L.n, temp, hot_side, limit: L.limit, over });
+  }
+  const shell_temp_f = ambient_f + flux_btu_hr_ft2 * film_resistance;
+  const layer1_hot_face_f = interfaces[0] ? interfaces[0].hot_side : 0;
+  const layer2_hot_face_f = interfaces[1] ? interfaces[1].hot_side : 0;
+  const layer3_hot_face_f = interfaces[2] ? interfaces[2].hot_side : 0;
+  const interface1_f = interfaces[0] ? interfaces[0].temp : 0;
+  const interface2_f = interfaces[1] ? interfaces[1].temp : 0;
+  const interface3_f = interfaces[2] ? interfaces[2].temp : 0;
+  const flux_verdict = fmt(flux_btu_hr_ft2, 0) + " BTU/hr/sq ft through " + fmt(total_resistance, 3)
+    + " hr-sq ft-degF/BTU of total resistance, on a " + fmt(hot_face_f - ambient_f, 0) + " degF drop";
+  // The failure this tile exists to catch: a layer BEHIND the hot face sitting
+  // above its own service temperature.
+  const over_layers = interfaces.filter((i) => i.over);
+  const interface_verdict = interfaces
+    .map((i) => "layer " + i.n + " sees " + fmt(i.hot_side, 0) + " degF on its hot face and "
+      + fmt(i.temp, 0) + " degF behind it"
+      + (i.limit > 0 ? (i.over ? " -- its hot face is OVER the " + fmt(i.limit, 0) + " degF service limit" : " (limit " + fmt(i.limit, 0) + ", met)") : ""))
+    .join("; ");
+  const backup_verdict = !over_layers.length
+    ? "every entered layer's HOT FACE is inside its own service limit -- which is the face the limit applies to, not the cooler one behind it"
+    : "layer " + over_layers.map((i) => i.n).join(" and ") + " has a HOT FACE above its own service temperature. Adding insulation OUTSIDE a lining pushes every interface behind it HOTTER, because less heat is escaping -- a lining 'improved' by adding an outer layer is the usual way this happens, and it shows up months later as a shell hot spot where the backup has shrunk and opened a path";
+  // The shell has TWO limits and they pull in opposite directions.
+  const has_shell_limit = shell_limit_f > 0;
+  const shell_over = has_shell_limit && shell_temp_f > shell_limit_f;
+  const has_dew_point = acid_dew_point_f > 0;
+  const shell_below_dew = has_dew_point && shell_temp_f < acid_dew_point_f;
+  const shell_verdict = fmt(shell_temp_f, 0) + " degF at the shell"
+    + (has_shell_limit ? (shell_over ? " -- ABOVE the " + fmt(shell_limit_f, 0) + " degF limit entered" : " -- within the " + fmt(shell_limit_f, 0) + " degF limit entered") : "")
+    + (has_dew_point
+      ? (shell_below_dew
+        ? "; and BELOW the " + fmt(acid_dew_point_f, 0) + " degF acid dew point, so on flue gas service sulphuric acid condenses on the inside of the casing and corrodes it -- over-insulating that casing to save energy is a corrosion failure, which is the opposite of the usual advice"
+        : "; and above the " + fmt(acid_dew_point_f, 0) + " degF acid dew point, which is where a flue gas casing must stay")
+      : "");
+  if (![total_resistance, flux_btu_hr_ft2, shell_temp_f, interface1_f].every(Number.isFinite)) return { error: "Refractory lining math is not a finite value." };
+  return {
+    total_resistance, film_resistance, flux_btu_hr_ft2, layer_count: layers.length,
+    interface1_f, interface2_f, interface3_f, shell_temp_f,
+    layer1_hot_face_f, layer2_hot_face_f, layer3_hot_face_f,
+    any_interface_over: over_layers.length > 0, over_layer_count: over_layers.length,
+    has_shell_limit, shell_over, has_dew_point, shell_below_dew,
+    flux_verdict, interface_verdict, backup_verdict, shell_verdict,
+    note: "A furnace or boiler lining is a series of resistances and the whole design lives at the interfaces, not at the shell. Per unit area each layer adds its thickness over its conductivity, the outer film adds one over its coefficient, the flux is the total temperature drop over the total resistance, and every interface temperature is the hot face less the flux times the resistance ahead of it. The trap worth carrying is that INSULATING THE OUTSIDE OF A FURNACE MAKES THE INSIDE HOTTER. Adding a layer of block insulation to cut heat loss raises every interface behind the hot face, because less heat is now escaping, and a lining 'improved' that way can put the insulating firebrick above its service temperature. The failure does not appear at commissioning; it appears months later as a shell hot spot where the backup has shrunk and opened a path. So every layer addition has to be checked at every interface, not just at the shell. The shell itself carries two limits that pull in opposite directions. One is the personnel and structural limit, which wants the shell cool. The other applies on flue gas service: the casing must stay ABOVE the acid dew point, roughly 250 to 300 degF depending on the fuel's sulphur, or sulphuric acid condenses on the inside and corrodes it -- so over-insulating a flue gas casing to save energy is a corrosion failure. Conductivities are ENTERED because they vary strongly with temperature and with the specific product, and a refractory k at 2,000 degF is not its k at room temperature; the manufacturer's k-versus-mean-temperature curve is the real source and using a single value across a 2,000 degF drop is the largest approximation here. This is a one-dimensional steady-state plane wall. It does not address transient heating and the dry-out schedule a new lining requires, thermal expansion and the joints that accommodate it, corners, arches, penetrations, anchors and the thermal bridge every anchor makes, gas-side convection and radiation to the hot face, slag or chemical attack, or spalling. The refractory and insulation manufacturers' data, the furnace or boiler designer, and the applicable code govern.",
+  };
+}
+export const refractoryShellTemperatureExample = { inputs: { hot_face_f: 2100, ambient_f: 90, film_coeff_btu_hr_ft2_f: 2.0, layer1_thickness_in: 4.5, layer1_k: 8.5, layer1_limit_f: 3000, layer2_thickness_in: 2.5, layer2_k: 1.9, layer2_limit_f: 2000, layer3_thickness_in: 2.0, layer3_k: 0.55, layer3_limit_f: 1200, shell_limit_f: 140, acid_dew_point_f: 0 } };
+HVACSYSTEMS_RENDERERS["refractory-shell-temperature"] = _simpleRenderer({
+  compute: computeRefractoryShellTemperature,
+  example: refractoryShellTemperatureExample.inputs,
+  citation: "Citation: one-dimensional steady-state plane-wall conduction -- each layer contributes thickness / conductivity and the outer film one / coefficient, the flux is the total drop over the total resistance, and each interface is the hot face less the flux times the resistance ahead of it. Conductivities are ENTERED because refractory k varies strongly with temperature and product; the manufacturer's k-versus-mean-temperature curve governs and a single value across a 2,000 degF drop is the largest approximation here. It does not address dry-out schedules, expansion joints, anchors and their thermal bridges, corners and penetrations, gas-side radiation, slag attack, or spalling. The refractory and insulation manufacturers' data and the furnace or boiler designer govern.",
+  fields: [
+    { key: "hot_face_f", label: "Hot face temperature (°F)" },
+    { key: "ambient_f", label: "Ambient temperature (°F)" },
+    { key: "film_coeff_btu_hr_ft2_f", label: "Outer film coefficient (BTU/hr/sq ft/°F)" },
+    { key: "layer1_thickness_in", label: "Layer 1 (hot face) thickness (in)" },
+    { key: "layer1_k", label: "Layer 1 k (BTU-in/hr/sq ft/°F)" },
+    { key: "layer1_limit_f", label: "Layer 1 service limit (°F, 0 to skip)" },
+    { key: "layer2_thickness_in", label: "Layer 2 (backup) thickness (in, 0 to skip)" },
+    { key: "layer2_k", label: "Layer 2 k (BTU-in/hr/sq ft/°F)" },
+    { key: "layer2_limit_f", label: "Layer 2 service limit (°F, 0 to skip)" },
+    { key: "layer3_thickness_in", label: "Layer 3 thickness (in, 0 to skip)" },
+    { key: "layer3_k", label: "Layer 3 k (BTU-in/hr/sq ft/°F)" },
+    { key: "layer3_limit_f", label: "Layer 3 service limit (°F, 0 to skip)" },
+    { key: "shell_limit_f", label: "Shell temperature limit (°F, 0 to skip)" },
+    { key: "acid_dew_point_f", label: "Acid dew point for flue gas service (°F, 0 to skip)" },
+  ],
+  outputs: [
+    { key: "flux_btu_hr_ft2", label: "Heat flux", unit: "BTU/hr/sq ft", value: (r) => r.flux_verdict },
+    { key: "interface1_f", label: "Interface temperatures", unit: "°F", value: (r) => r.interface_verdict },
+    { key: "backup", label: "The layer behind", value: (r) => r.backup_verdict },
+    { key: "shell_temp_f", label: "Shell", unit: "°F", value: (r) => r.shell_verdict },
+    { key: "note", label: "Note", value: (r) => r.note },
+  ],
+});
+
+// ===================== spec-v1678: cryogenic tank boil-off rate and hold time =====================
+// The boil-off is the rated normal evaporation rate applied to the contents.
+// The hold time is how long the generated vapour takes to raise the vapour
+// space from its current pressure to the relief setting with the vent closed,
+// from the ideal gas law at the entered vapour temperature.
+const _CRYO_R_PSIA_FT3_PER_LBMOL_R = 10.7316;
+const _CRYO_GAL_PER_FT3 = 7.480519;
+// dims: in { tank_volume_gal: L^3, ner_pct_per_day: dimensionless, liquid_density_lb_gal: M L^-3, latent_heat_btu_lb: L^2 T^-2, vapour_space_pct: dimensionless, current_pressure_psig: M L^-1 T^-2, relief_pressure_psig: M L^-1 T^-2, molecular_weight: dimensionless, vapour_temp_r: T, alt_vapour_space_pct: dimensionless, withdrawal_gal_day: L^3 } out: { boil_off_gal_day: L^3, boil_off_lb_day: M, heat_leak_btu_hr: M L^2 T^-3, vapour_space_ft3: L^3, hold_time_hr: T, alt_hold_time_hr: T }
+export function computeCryogenicBoiloff({
+  tank_volume_gal = 0, ner_pct_per_day = 0, liquid_density_lb_gal = 0, latent_heat_btu_lb = 0,
+  vapour_space_pct = 0, current_pressure_psig = 0, relief_pressure_psig = 0,
+  molecular_weight = 0, vapour_temp_r = 0, alt_vapour_space_pct = 0, withdrawal_gal_day = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(tank_volume_gal > 0)) return { error: "Tank volume must be positive." };
+  if (!(ner_pct_per_day > 0)) return { error: "The normal evaporation rate must be positive." };
+  if (!(liquid_density_lb_gal > 0)) return { error: "Liquid density must be positive." };
+  if (!(latent_heat_btu_lb >= 0)) return { error: "Latent heat cannot be negative (0 to skip the heat leak)." };
+  if (!(vapour_space_pct >= 0 && vapour_space_pct <= 100)) return { error: "The vapour space must be between 0 and 100 percent of the tank." };
+  if (!(alt_vapour_space_pct >= 0 && alt_vapour_space_pct <= 100)) return { error: "The alternative vapour space must be between 0 and 100 percent." };
+  if (!(withdrawal_gal_day >= 0)) return { error: "Withdrawal cannot be negative." };
+  if (!(relief_pressure_psig >= 0 && current_pressure_psig >= 0)) return { error: "Pressures cannot be negative." };
+  // The boil-off itself: the rated percentage of the contents, every day, used or not.
+  const boil_off_gal_day = tank_volume_gal * (ner_pct_per_day / 100);
+  const boil_off_lb_day = boil_off_gal_day * liquid_density_lb_gal;
+  const boil_off_lb_hr = boil_off_lb_day / 24;
+  const heat_leak_btu_hr = boil_off_lb_hr * latent_heat_btu_lb;
+  const boil_off_verdict = fmt(boil_off_gal_day, 1) + " gallons a day (" + fmt(boil_off_lb_day, 0)
+    + " lb) whether the tank is used or not, or " + fmt(boil_off_gal_day * 30, 0) + " gallons a month"
+    + (latent_heat_btu_lb > 0 ? ", which is " + fmt(heat_leak_btu_hr, 0) + " BTU/hr of heat leaking into the tank" : "");
+  // Boil-off against actual use, which is the argument for tank sizing.
+  const has_withdrawal = withdrawal_gal_day > 0;
+  const boil_off_exceeds_use = has_withdrawal && boil_off_gal_day > withdrawal_gal_day;
+  const use_verdict = !has_withdrawal
+    ? "(no withdrawal rate entered)"
+    : boil_off_exceeds_use
+      ? "BOIL-OFF EXCEEDS USE: " + fmt(boil_off_gal_day, 1) + " a day lost against " + fmt(withdrawal_gal_day, 1)
+        + " a day drawn, so the tank loses more than the process takes -- a smaller tank, or a larger one on a shared site, is the answer, since a larger tank has less surface area per unit volume and a LOWER percentage boil-off"
+      : fmt(boil_off_gal_day, 1) + " a day lost against " + fmt(withdrawal_gal_day, 1) + " a day drawn, so boil-off is "
+        + fmt(boil_off_gal_day / withdrawal_gal_day * 100, 0) + "% of consumption";
+  // Hold time: the vapour the boil-off adds to a CLOSED tank, raising the pressure
+  // to the relief setting. Ideal gas at the entered vapour temperature.
+  const has_hold = vapour_space_pct > 0 && molecular_weight > 0 && vapour_temp_r > 0 && relief_pressure_psig > current_pressure_psig;
+  const vapour_space_ft3 = tank_volume_gal * (vapour_space_pct / 100) / _CRYO_GAL_PER_FT3;
+  const holdTime = (spacePct) => {
+    const v = tank_volume_gal * (spacePct / 100) / _CRYO_GAL_PER_FT3;
+    const dP = relief_pressure_psig - current_pressure_psig;
+    const dm = dP * v * molecular_weight / (_CRYO_R_PSIA_FT3_PER_LBMOL_R * vapour_temp_r);
+    return dm / boil_off_lb_hr;
+  };
+  const hold_time_hr = has_hold ? holdTime(vapour_space_pct) : 0;
+  const hold_verdict = !has_hold
+    ? "(enter a vapour space, molecular weight, vapour temperature, and a relief pressure above the current one)"
+    : fmt(hold_time_hr, 1) + " hours to reach " + fmt(relief_pressure_psig, 0) + " psig from " + fmt(current_pressure_psig, 0)
+      + " psig with the vent closed, on " + fmt(vapour_space_ft3, 0) + " cu ft of vapour space";
+  // The counterintuitive one: a FULLER tank has LESS margin, not more.
+  const has_alt = has_hold && alt_vapour_space_pct > 0;
+  const alt_hold_time_hr = has_alt ? holdTime(alt_vapour_space_pct) : 0;
+  const fuller = has_alt && alt_vapour_space_pct < vapour_space_pct;
+  const alt_verdict = !has_alt
+    ? "(no alternative fill level entered)"
+    : "at a " + fmt(alt_vapour_space_pct, 0) + "% vapour space it holds " + fmt(alt_hold_time_hr, 1) + " hours, "
+      + (alt_hold_time_hr > hold_time_hr ? "LONGER" : "SHORTER") + " than the " + fmt(hold_time_hr, 1)
+      + " above -- the hold time is proportional to the vapour space, so "
+      + (fuller
+        ? "the FULLER tank is the one with less margin, which is the opposite of the intuition that a full tank is a safe tank"
+        : "the emptier tank holds longer; a full tank is not a tank with more margin, it has less");
+  if (![boil_off_gal_day, boil_off_lb_day, heat_leak_btu_hr, hold_time_hr, alt_hold_time_hr].every(Number.isFinite)) return { error: "Cryogenic boil-off math is not a finite value." };
+  return {
+    boil_off_gal_day, boil_off_lb_day, boil_off_lb_hr, heat_leak_btu_hr, boil_off_verdict,
+    has_withdrawal, boil_off_exceeds_use, use_verdict,
+    has_hold, vapour_space_ft3, hold_time_hr, hold_verdict,
+    has_alt, alt_hold_time_hr, fuller, alt_verdict,
+    note: "What a cryogenic tank loses standing still, and how long it holds with the vent closed. The boil-off is the rated normal evaporation rate applied to the contents: an 11,000 gallon liquid nitrogen tank at 0.25% a day loses 27.5 gallons every day, used or not, which is 825 gallons a month. On a site whose consumption is lower than that, boil-off exceeds use and the tank is losing more than the process takes. That is the argument for tank sizing running counter to intuition -- a LARGER tank has less surface area per unit volume, so its percentage boil-off is lower, and two half-size tanks lose more than one full-size tank holding the same total. The hold time is the second half and it is where the intuition is backwards. With the vent closed the boil-off has nowhere to go, so it pressurizes the vapour space, and the time to reach the relief setting is proportional to how much vapour space there is. A tank at 90% full has a small vapour space and lifts its relief quickly; the same tank at 40% full holds for considerably longer. A full tank is not a tank with more margin -- it has less. The hold time here is a SCREENING estimate from the ideal gas law at the entered vapour temperature: it holds that temperature constant and ignores liquid stratification, the saturated coupling between liquid and vapour, and heat going into warming the liquid, all of which matter in a real tank, so the manufacturer's published hold-time data governs. The rated evaporation rate is itself a manufacturer figure measured under defined conditions at a stated fill and pressure, and real boil-off varies with fill level, ambient temperature, and solar exposure. A tank boiling off at many times its rating -- 2% a day where 0.25 is rated -- has lost the vacuum in its annulus, which frost or sweating on the outer jacket confirms; that is a tank problem rather than a fitting leak, and an insulated vessel that is no longer insulated vents continuously. It does not size relief devices, which are a mandatory safety system that must cover the fire case as well as normal boil-off, and it does not address the pressure building coil, the economizer, or the withdrawal behaviour that changes tank pressure during use. It does not address the asphyxiation hazard of cryogenic gases in confined or poorly ventilated spaces, which is the leading cause of cryogenic fatalities, or the cold burn and material embrittlement hazards. The tank manufacturer's data and operating instructions, CGA standards, NFPA 55, and the gas supplier govern.",
+  };
+}
+export const cryogenicBoiloffExample = { inputs: { tank_volume_gal: 11000, ner_pct_per_day: 0.25, liquid_density_lb_gal: 6.75, latent_heat_btu_lb: 85.6, vapour_space_pct: 20, current_pressure_psig: 30, relief_pressure_psig: 75, molecular_weight: 28.01, vapour_temp_r: 200, alt_vapour_space_pct: 60, withdrawal_gal_day: 20 } };
+HVACSYSTEMS_RENDERERS["cryogenic-boiloff"] = _simpleRenderer({
+  compute: computeCryogenicBoiloff,
+  example: cryogenicBoiloffExample.inputs,
+  citation: "Citation: boil-off = tank contents x the manufacturer's rated normal evaporation rate, with the heat leak that rate implies through the latent heat of vaporization; hold time from the ideal gas law, as the vapour mass needed to raise the vapour space from its current pressure to the relief setting divided by the boil-off rate. The hold time is a SCREENING estimate -- it holds the vapour temperature constant and ignores liquid stratification and the saturated liquid-vapour coupling, so the manufacturer's published hold-time data governs. It does not size relief devices, which must also cover the fire case, and does not address the asphyxiation, cold burn, or embrittlement hazards. CGA standards, NFPA 55, and the tank manufacturer govern.",
+  fields: [
+    { key: "tank_volume_gal", label: "Tank volume (gal)" },
+    { key: "ner_pct_per_day", label: "Normal evaporation rate (% per day)" },
+    { key: "liquid_density_lb_gal", label: "Liquid density (lb/gal)" },
+    { key: "latent_heat_btu_lb", label: "Latent heat of vaporization (BTU/lb, 0 to skip)" },
+    { key: "vapour_space_pct", label: "Vapour space (% of tank, 0 to skip hold time)" },
+    { key: "current_pressure_psig", label: "Current pressure (psig)" },
+    { key: "relief_pressure_psig", label: "Relief setting (psig)" },
+    { key: "molecular_weight", label: "Gas molecular weight (N₂ 28.01, O₂ 32.00, Ar 39.95)" },
+    { key: "vapour_temp_r", label: "Vapour temperature (°R)" },
+    { key: "alt_vapour_space_pct", label: "Alternative vapour space (%, 0 to skip)" },
+    { key: "withdrawal_gal_day", label: "Withdrawal (gal/day, 0 to skip)" },
+  ],
+  outputs: [
+    { key: "boil_off_gal_day", label: "Boil-off", unit: "gal/day", value: (r) => r.boil_off_verdict },
+    { key: "use", label: "Against actual use", value: (r) => r.use_verdict },
+    { key: "hold_time_hr", label: "Hold time to relief", unit: "hr", value: (r) => r.hold_verdict },
+    { key: "alt_hold_time_hr", label: "At another fill level", unit: "hr", value: (r) => r.alt_verdict },
+    { key: "note", label: "Note", value: (r) => r.note },
+  ],
+});

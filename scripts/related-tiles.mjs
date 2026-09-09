@@ -1573,6 +1573,8 @@ const RELATED = {
   "aviation-fuel-weight": ["aircraft-weight-balance","control-cable-tension","density-altitude"],
   "spray-transfer-efficiency": ["coating-coverage-dft","powder-coating-coverage","spray-booth-airflow","paint-mix-ratio"],
   "adhesive-bond-area": ["construction-adhesive-tubes","fillet-weld-strength","bolt-stretch"],
+  "refractory-shell-temperature": ["insulation-thickness","pipe-heat-loss-radial","flue-gas-dew-point"],
+  "cryogenic-boiloff": ["pipe-insulation-for-condensation","insulation-thickness","evaporation-load"],
   // spec-v1717..v1726: air quality band.
   "stack-emission-pte": ["opacity-six-minute","coating-voc-compliance","plume-rise-briggs"],
   "opacity-six-minute": ["stack-emission-pte","esp-deutsch-efficiency","baghouse-cleaning-interval"],

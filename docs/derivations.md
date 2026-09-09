@@ -2562,6 +2562,7 @@ cross-check.
 | calc-hvacsystems.js | `computeCoilFaceArea` | `{ cfm = 0, target_fpm = 500 } = {}` | _ | _ | _ |
 | calc-hvacsystems.js | `computeCoilFaceVelocity` | `{ cfm = 0, face_width_in = 0, face_height_in = 0, threshold_fpm = 500 } = {}` | _ | _ | _ |
 | calc-hvacsystems.js | `computeCompressorShortCycle` | `{ system_type = "single", load_fraction_pct = 50, observed_cph = null, } = {}` | _ | _ | _ |
+| calc-hvacsystems.js | `computeCryogenicBoiloff` | `{ tank_volume_gal = 0, ner_pct_per_day = 0, liquid_density_lb_gal = 0, latent...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeDuctBreakoutNoise` | `{ duct_width_in = 0, duct_height_in = 0, exposed_length_ft = 0, sound_power_d...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeEnvelopeConductionLoad` | `{ area_ft2 = 0, u_factor = 0, cltd_f = 0 } = {}` | _ | _ | _ |
 | calc-hvacsystems.js | `computeFanSystemEffect` | `{ flow_cfm = 0, outlet_width_in = 0, outlet_height_in = 0, straight_duct_ft =...` | _ | _ | _ |
@@ -2579,6 +2580,7 @@ cross-check.
 | calc-hvacsystems.js | `computePlenumReturnDrop` | `{ return_cfm = 0, pinch_width_ft = 0, pinch_clear_in = 0, target_velocity_fpm...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeProportionalBalanceRatio` | `{ design_1_cfm = 0, measured_1_cfm = 0, design_2_cfm = 0, measured_2_cfm = 0,...` | _ | _ | _ |
 | calc-hvacsystems.js | `computePumpImpellerTrim` | `{ current_diameter_in = 0, current_flow_gpm = 0, required_flow_gpm = 0, curre...` | _ | _ | _ |
+| calc-hvacsystems.js | `computeRefractoryShellTemperature` | `{ hot_face_f = 0, ambient_f = 0, film_coeff_btu_hr_ft2_f = 2.0, layer1_thickn...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeRooftopCurbUplift` | `{ unit_length_ft = 0, unit_width_ft = 0, unit_height_ft = 0, unit_weight_lb =...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeSilencerInsertionLoss` | `{ airflow_cfm = 0, face_width_in = 0, face_height_in = 0, reference_drop_in_w...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeValveActuatorCloseOff` | `{ seat_area_in2 = 0, design_differential_psi = 0, minimum_flow_differential_p...` | _ | _ | _ |
@@ -3739,7 +3741,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2325.
+Row count: 2327.
 
 <!-- END function-corpus-v14 -->
 
@@ -4121,7 +4123,7 @@ per spec-v14 §13.1 second paragraph.
 | `pipe-expansion` | Pipe Thermal Expansion | ASHRAE / ASTM; Copper alpha = 9.4e-6 in/in/F; 100 ft of copper x 100 F d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-expansion-loop` | Pipe Thermal Expansion and Loop Sizing | Project (first-principles); Carbon steel A53 4.5 in OD / 200 ft run / 100 F dT -> 1.5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-filled-support-load` | Filled Pipe Support Load per Hanger | First-principles cross-section x dens...; spec-v161 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `pipe-insulation-takeoff` | Pipe Insulation and Jacket Material Takeoff | Mechanical-insulation takeoff identit...; cut = 250*1.05 + 12 = 274.5 ft; sections = ceil(274.5/3) ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `pipe-insulation-takeoff` | Pipe Insulation and Jacket Material Takeoff | Mechanical-insulation takeoff identit...; cut = 250*1.05 + 12 = 274.5 ft; sections = ceil(274.5/3) ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `pipe-partial-flow-depth` | Circular Pipe Partial-Flow Depth and Velocity (Manning) | Manning applied to circular-segment g...; spec-v1011 section 2.1; re-checked by substituting the so... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pipe-pressure-rating` | Pipe Pressure Rating and Required Wall (ASME B31.1) | ASME B31.1 Power Piping (by name); spec-v160 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pipe-purge-volume` | Pipe Inert Purge Volume and Time | Inert-purge identity (first-principles); pipe = (PI/4)*(2.067/12)^2*100 = 2.33; purge = 2.33*5 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4207,7 +4209,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (200 tiles)
+### Group C HVAC (202 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4268,6 +4270,7 @@ per spec-v14 §13.1 second paragraph.
 | `continuous-insulation-ratio` | Continuous vs Cavity Insulation Ratio for Condensation Control | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cooling-coil-total-load` | Cooling Coil Total Load from Enthalpy Difference | ASHRAE Fundamentals; spec-v376 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cooling-tower` | Cooling Tower Approach and Range | CTI ATC-105 cooling-tower test code; 95 F in / 85 F out / 75 F wet-bulb / 300 gpm / 15 kW fan ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `cryogenic-boiloff` | Cryogenic Tank Boil-Off Rate and Hold Time | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `damper-authority` | Control Damper Authority and Leakage | Project (first-principles); damper dP / branch dP; leakage as sqrt(dP) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dcv-co2-ventilation` | Demand-Controlled Ventilation Rate from a CO2 Setpoint | Steady-state single-zone CO2 mass bal...; spec-v277 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `deaerator-steam-demand` | Deaerator Steam Demand and Vent Rate | Project (first-principles); ASME, the deaerator manufacturer, the water treatment pro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4335,7 +4338,7 @@ per spec-v14 §13.1 second paragraph.
 | `indirect-evaporative-cooling` | Indirect Evaporative Cooler Leaving Temperature | ASHRAE Handbook HVAC Systems & Equipm...; depression = 95 - 65 = 30; drop = 0.65 x 30 = 19.5; leavi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `infiltration-load` | Infiltration Heating / Cooling Load (Sensible + Latent) | ASHRAE Handbook of Fundamentals (air-...; spec-v220 section 2.1 pinned example (winter heating) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `insulation-heat-loss` | Pipe Insulation Heat Loss (bare vs insulated) | ASHRAE Handbook (Fundamentals) / manu...; 2.375 in OD pipe at 200 F into 70 F still air with 1.5 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `insulation-thickness` | Pipe Insulation Thickness | ASHRAE Handbook (Fundamentals); 1 in OD pipe at 250 F into 75 F ambient, 120 F surface li... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `insulation-thickness` | Pipe Insulation Thickness | ASHRAE Handbook (Fundamentals); 1 in OD pipe at 250 F into 75 F ambient, 120 F surface li... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `insulation-thickness-for-heat-loss` | Pipe Insulation Thickness for a Target Heat Loss | Fourier cylindrical-shell conduction ...; od 2 in, k 0.25, 200 vs 70 F, target 40 BTU/hr-ft -> 0.53... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `internal-heat-gains` | Internal Heat Gains: People, Lighting, Equipment | ASHRAE / ACCA Manual J internal gains; spec-v228 section 2.1 pinned example (small office) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `isolator-deflection` | Isolator Static Deflection for a Target Isolation | ASHRAE Fundamentals, Sound and Vibrat...; spec-v633 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4370,6 +4373,7 @@ per spec-v14 §13.1 second paragraph.
 | `radiant-floor-output` | Radiant Floor Heat Output | radiant-panel practice; spec-v442 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `receiver-pumpdown-capacity` | Refrigerant Receiver Pump-Down Capacity | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `recovery-cylinder` | Recovery-Cylinder 80% Fill | DOT / AHRI 700 / EPA Section 608 reco...; spec-v102 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `refractory-shell-temperature` | Refractory Lining Heat Loss, Interface Temperatures, and Shell Temperature | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `refrigerant-charge` | Refrigerant Charge Weighing | Chemours / Honeywell published refrig...; R-410A / 25 ft of 3/8 in + 5 ft of 1/2 in -> 15 + 4.75 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `refrigerant-charging` | Refrigerant Superheat / Subcooling (psig-psia toggle) | ACCA / NATE refrigerant-charging meth...; R_410A / 130 psig suction / 50 F suction-line / 350 psig ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `refrigerant-leak-rate` | Refrigerant Leak Rate and the EPA Repair Threshold | EPA; annualized leak rate | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5986,6 +5990,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2074. Fixture-covered or reference-cadence: 2074 / 2074.
+Tile count: 2076. Fixture-covered or reference-cadence: 2076 / 2076.
 
 <!-- END tile-index-v14 -->

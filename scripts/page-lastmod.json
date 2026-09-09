@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "112a800cfdbf5be2",
+      "sha": "a943cc3c511e958f",
       "date": "2026-09-09"
     },
     "/tools/": {
-      "sha": "65a577302fd38f5b",
+      "sha": "0c23238aaf0ce41b",
       "date": "2026-09-09"
     },
     "/groups/accounting/": {
-      "sha": "6810a42d05612efc",
+      "sha": "8fb617f425232d4b",
       "date": "2026-09-09"
     },
     "/groups/agriculture/": {
-      "sha": "83f136bc0db1585c",
+      "sha": "a01f612112d0e3fb",
       "date": "2026-09-09"
     },
     "/groups/construction/": {
-      "sha": "9b7e3625a47b8402",
+      "sha": "db479b26233fb338",
       "date": "2026-09-09"
     },
     "/groups/cross-trade/": {
-      "sha": "b22fd44b5edd0790",
+      "sha": "86b4f3e118410c4c",
       "date": "2026-09-09"
     },
     "/groups/educators/": {
-      "sha": "5d0cf5ac91726254",
+      "sha": "c675792d17a2efd7",
       "date": "2026-09-09"
     },
     "/groups/electrical/": {
-      "sha": "21ac71199b3a9896",
+      "sha": "7b451da00618b08d",
       "date": "2026-09-09"
     },
     "/groups/field/": {
-      "sha": "63dcb69652ca40e0",
+      "sha": "517a600ea6e73df9",
       "date": "2026-09-09"
     },
     "/groups/fire-ground/": {
-      "sha": "a407bbea94333205",
+      "sha": "2085a9a81a2c967b",
       "date": "2026-09-09"
     },
     "/groups/historical/": {
-      "sha": "a96d131052ebdbd0",
+      "sha": "9563e7fc51538fbc",
       "date": "2026-09-09"
     },
     "/groups/hvac/": {
-      "sha": "d75fc2329eb7b4a5",
+      "sha": "0ffb1a7cc5b81f3e",
       "date": "2026-09-09"
     },
     "/groups/kitchen/": {
-      "sha": "caaf5d0efd470b8f",
+      "sha": "18d79134e47c132d",
       "date": "2026-09-09"
     },
     "/groups/lab/": {
-      "sha": "6a7a6f1ed06b1c45",
+      "sha": "ec0d6d44109423be",
       "date": "2026-09-09"
     },
     "/groups/mechanic/": {
-      "sha": "93162eaf03259350",
+      "sha": "88b574511f5e5aeb",
       "date": "2026-09-09"
     },
     "/groups/plumbing/": {
-      "sha": "fdb40c787eb49905",
+      "sha": "2bea17f78fa41efd",
       "date": "2026-09-09"
     },
     "/groups/real-estate/": {
-      "sha": "cac6192493279c68",
+      "sha": "566030744de904ed",
       "date": "2026-09-09"
     },
     "/groups/references/": {
-      "sha": "21e5f3ad3325ff81",
+      "sha": "a0514373b9e84c6c",
       "date": "2026-09-09"
     },
     "/groups/restoration/": {
-      "sha": "42b183a030a5ca29",
+      "sha": "73e671f8d4aae920",
       "date": "2026-09-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "4e792ed1d6a4718a",
+      "sha": "00162b7dff1efc27",
       "date": "2026-09-09"
     },
     "/groups/stage/": {
-      "sha": "e80af36ea1036839",
+      "sha": "d23f72301e024466",
       "date": "2026-09-09"
     },
     "/groups/trucking/": {
-      "sha": "3e3cc6806046c29b",
+      "sha": "6b8c9888fd9dcc16",
       "date": "2026-09-09"
     },
     "/groups/water/": {
-      "sha": "f63712550d3c75ac",
+      "sha": "8b131f6440db0e15",
       "date": "2026-09-09"
     },
     "/tools/aav-install-check/": {
@@ -1825,6 +1825,10 @@
       "sha": "113578524386f1d2",
       "date": "2026-09-05"
     },
+    "/tools/cryogenic-boiloff/": {
+      "sha": "6a28356a1eb4f62c",
+      "date": "2026-09-09"
+    },
     "/tools/culvert-headwater/": {
       "sha": "3c27e64632cf9a8f",
       "date": "2026-09-01"
@@ -1906,8 +1910,8 @@
       "date": "2026-09-01"
     },
     "/tools/deaerator-steam-demand/": {
-      "sha": "5d53a8c35ad6f3f3",
-      "date": "2026-09-07"
+      "sha": "d26939bcd8d4285a",
+      "date": "2026-09-09"
     },
     "/tools/debt-yield/": {
       "sha": "6c194b35cd929eba",
@@ -3666,8 +3670,8 @@
       "date": "2026-09-01"
     },
     "/tools/indirect-evaporative-cooling/": {
-      "sha": "0c2164d672e49aae",
-      "date": "2026-09-08"
+      "sha": "d2f164773824af54",
+      "date": "2026-09-09"
     },
     "/tools/infiltration-load/": {
       "sha": "66b7961213084e72",
@@ -5712,6 +5716,10 @@
     "/tools/reference-et0/": {
       "sha": "3b20d81dae0555cd",
       "date": "2026-09-01"
+    },
+    "/tools/refractory-shell-temperature/": {
+      "sha": "e92d457a266c7453",
+      "date": "2026-09-09"
     },
     "/tools/refrigerant-charge/": {
       "sha": "2f023b15975625a3",

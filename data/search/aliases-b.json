@@ -1754,6 +1754,11 @@
     {"term":"api 521 flare setback","target":"flare-radiation-distance","kind":"industry"},
     {"term":"thermal radiation exclusion zone","target":"flare-radiation-distance","kind":"industry"},
     {"term":"flare exclusion radius","target":"flare-radiation-distance","kind":"industry"},
-    {"term":"radiant heat flare sizing","target":"flare-radiation-distance","kind":"industry"}
+    {"term":"radiant heat flare sizing","target":"flare-radiation-distance","kind":"industry"},
+    {"term":"pipe jacketing quantity","target":"pipe-insulation-takeoff","kind":"redirect"},
+    {"term":"insulation fitting cover count","target":"pipe-insulation-takeoff","kind":"redirect"},
+    {"term":"metal jacket square feet","target":"pipe-insulation-takeoff","kind":"redirect"},
+    {"term":"removable valve cover insulation","target":"pipe-insulation-takeoff","kind":"redirect"},
+    {"term":"insulation takeoff fittings","target":"pipe-insulation-takeoff","kind":"redirect"}
   ]
 }
