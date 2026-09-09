@@ -153,8 +153,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": 200,
       "combine": "or",
-      "citation": "Mich. Comp. Laws 205.52b (RAB 2018-16)",
-      "verified_on": "2025-01-15"
+      "citation": "Mich. Comp. Laws 205.52b (RAB 2021-21, approved 2021-11-03)",
+      "verified_on": "2026-09-09"
     },
     "MN": {
       "sales_threshold_usd": 100000,

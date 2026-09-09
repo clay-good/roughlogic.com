@@ -46,10 +46,10 @@ test("the three states that repealed their transaction prong carry no count", ()
 });
 
 test("a row re-verified today is not left claiming the old stamp", () => {
-  // Four rows deliberately keep 2025-01-15 -- AR, CO, GA and MI. Every
-  // automated fetch of their code sites returns 403, and none of the four is
-  // stamped from a summary chart: a wrong stamp is worse than a stale one, and
-  // the folder's staleness warning should keep firing until a human reads them.
+  // Three rows deliberately keep 2025-01-15 -- AR, CO and GA. Every automated
+  // fetch of their code sites returns 403, and none of the three is stamped
+  // from a summary chart: a wrong stamp is worse than a stale one, and the
+  // folder's staleness warning should keep firing until a human reads them.
   // Ten of the sixteen were read and found CORRECT -- OH, VA, MN, NE, WV, VT,
   // HI, DC, RI and NV -- which is still a verification, and the only kind that
   // lets a stamp move.
@@ -75,6 +75,10 @@ test("a row re-verified today is not left claiming the old stamp", () => {
     ID: "2026-09-04", ND: "2026-09-04",
     ME: "2026-09-04", OK: "2026-09-04",
     SC: "2026-09-04", WY: "2026-09-04", AK: "2026-09-04",
+    // Read 2026-09-09 against Michigan Treasury's own RAB 2021-21, which states
+    // on its face that it replaces RAB 2018-16. The thresholds were already
+    // right; only the citation named the superseded bulletin.
+    MI: "2026-09-09",
   };
   const rechecked = Object.entries(SALES_TAX_NEXUS).filter(([, v]) => v.verified_on !== "2025-01-15");
   assert.deepEqual(rechecked.map(([st]) => st).sort(), Object.keys(LEDGER).sort());
@@ -177,12 +181,12 @@ test("Wyoming and Alaska cite the repeal that removed their transaction prong", 
   }
 });
 
-test("the four states left stale are exactly the ones no source would serve", () => {
+test("the three states left stale are exactly the ones no source would serve", () => {
   // Named so this cannot quietly grow. If a row joins this set, someone has
   // let a stamp rot without recording why.
   const stale = Object.entries(SALES_TAX_NEXUS)
     .filter(([, v]) => v.verified_on === "2025-01-15")
     .map(([st]) => st)
     .sort();
-  assert.deepEqual(stale, ["AR", "CO", "GA", "MI"]);
+  assert.deepEqual(stale, ["AR", "CO", "GA"]);
 });

@@ -475,7 +475,7 @@ export const SALES_TAX_NEXUS = {
   ME: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Me. Rev. Stat. tit. 36 sec. 1754-B(1-B)(B): >$100,000 gross sales into Maine, previous or current calendar year", verified_on: "2026-09-04" },
   MD: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "COMAR 03.06.01.33 B(5)(a)-(b) (out-of-State vendor)", verified_on: "2026-09-04" },
   MA: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Mass. Gen. Laws ch. 64H sec. 34 (prior or current TAXABLE year; no transaction test)", verified_on: "2026-09-04" },
-  MI: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "Mich. Comp. Laws 205.52b (RAB 2018-16)", verified_on: "2025-01-15" },
+  MI: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "Mich. Comp. Laws 205.52b (RAB 2021-21, approved 2021-11-03)", verified_on: "2026-09-09" },
   MN: { sales_threshold_usd: 100000, transactions_threshold: 200,  combine: "or", citation: "Minn. Stat. 297A.66 subd. 1(c)", verified_on: "2026-09-03" },
   MS: { sales_threshold_usd: 250000, transactions_threshold: null, combine: null, citation: "Miss. Code Ann. 27-65-9 (substantial economic presence); MS DOR business-tax FAQ: over $250,000 in ANY twelve-month period, eff. 2018-07-01", verified_on: "2026-09-04" },
   MO: { sales_threshold_usd: 100000, transactions_threshold: null, combine: null, citation: "Mo. Rev. Stat. 144.605(2)(e) (SB 153): >$100,000 taxable sales into MO, previous or current calendar year", verified_on: "2026-09-04" },

@@ -455,12 +455,12 @@ test("the nexus doc's stale-row claim matches the shard", async () => {
 
   // 47 state rows (46 sales-tax states plus DC), which is what the docs claim.
   assert.equal(rows.length, 47);
-  assert.deepEqual(stale, ["AR", "CO", "GA", "MI"]);
+  assert.deepEqual(stale, ["AR", "CO", "GA"]);
 
   const doc = await readFile(resolve(ROOT, "docs/data-sources.md"), "utf8");
   // The live count and the live list, both stated.
-  assert.match(doc, /4 of the 47 rows still carry `verified_on` 2025-01-15/);
-  assert.match(doc, /leaving four: AR, CO, GA, MI/);
+  assert.match(doc, /3 of the 47 rows still carry `verified_on` 2025-01-15/);
+  assert.match(doc, /leaving three: AR, CO, GA/);
   // The superseded count must not be stated in the present tense again.
   assert.ok(
     !/The remaining 33 rows keep `verified_on: 2025-01-15`/.test(doc),
