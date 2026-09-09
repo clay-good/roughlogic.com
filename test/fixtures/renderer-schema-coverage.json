@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 2072,
-  "covered_count": 1994,
+  "total_tiles": 2074,
+  "covered_count": 1996,
   "covered": [
     "aav-install-check",
     "abatement-containment",
@@ -20,6 +20,7 @@
     "acoustic-gain-pag-nag",
     "ada-ramp-slope",
     "ada-stair-check",
+    "adhesive-bond-area",
     "advance-warning-sign-spacing",
     "aeration-oxygen-demand",
     "aerial-ladder",
@@ -1610,6 +1611,7 @@
     "spray-drift-buffer",
     "spray-foam-board-feet",
     "spray-tip-selection",
+    "spray-transfer-efficiency",
     "sprayer-calibration",
     "sprayer-field-capacity",
     "spreader-beam",

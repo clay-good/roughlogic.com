@@ -1,6 +1,17 @@
 # roughlogic.com Specification v1661 -- Unibody Frame Diagonal Measurement and Tolerance (`calc-mechanic.js`, Group K Mechanic - Auto, Marine, Aviation, auto body, 1 New Tile)
 
-> **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
+> **Status: CUT 2026-09-09 as a duplicate.** `layout-squaring` in its check-square
+> mode already takes two measured diagonals and reports `|d1 - d2|` together with
+> which corner to draw in -- the same physical quantity this spec is built on, under
+> different trade vocabulary. The two things this spec added that that calculator did
+> not have -- a stated TOLERANCE, which turns the difference into a verdict rather
+> than a number, and the paired left/right SYMMETRY measurement from a centreline --
+> landed there as a follow-up instead, additively, so its previous answer is
+> unchanged. Note that the tile reports which side is SHORT rather than which way the
+> structure moved: this spec's worked example asserted "the left front has been driven
+> back", but which side that means depends on where the datum point sits, so the
+> reading is left to the dimension chart. Aliases route this question to it.
+> Single-tile spec. Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-mechanic.js`**
 > (Group K, Mechanic - Auto, Marine, Aviation -- the existing category, hub `/groups/mechanic/`; auto body and refinishing), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >

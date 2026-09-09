@@ -1,6 +1,15 @@
 # roughlogic.com Specification v1662 -- Wet Film Thickness for a Target Dry Film Build (`calc-mechanic.js`, Group K Mechanic - Auto, Marine, Aviation, auto body, 1 New Tile)
 
-> **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
+> **Status: CUT 2026-09-09 as a duplicate.** `coating-coverage-dft` already computes
+> the identical `WFT = DFT / volume solids` and the identical
+> `1,604 x volume solids / DFT` theoretical coverage, on the same SSPC/AMPP PA 2
+> basis. The one term this spec added that that calculator did not have -- REDUCTION,
+> which dilutes the solids as `solids / (1 + ratio)` and so moves the wet-film target
+> without moving the specification, plus the reverse question of what dry build a
+> stated wet gauge reading leaves -- landed there as a follow-up instead, additively,
+> so its previous answer is unchanged. That tile's own note already said "thinning
+> lowers it" without computing it, which is the sibling naming the gap. Aliases route
+> this question to it. Single-tile spec. Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-mechanic.js`**
 > (Group K, Mechanic - Auto, Marine, Aviation -- the existing category, hub `/groups/mechanic/`; auto body and refinishing), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >

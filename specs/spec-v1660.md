@@ -1,6 +1,15 @@
 # roughlogic.com Specification v1660 -- Paint Booth Airflow, Air Changes, and Cure Time (`calc-mechanic.js`, Group K Mechanic - Auto, Marine, Aviation, auto body, 1 New Tile)
 
-> **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
+> **Status: CUT 2026-09-09 as a duplicate.** `spray-booth-airflow` already computes
+> the identical `cfm = cross-sectional area x face velocity` and the identical
+> `1.08 x cfm x delta-T` sensible load, against the same NFPA 33 / OSHA 1910.107
+> face-velocity requirement. The three things this spec added that that calculator
+> did not have -- the booth's AIR CHANGES (cfm x 60 / booth volume, 600 an hour on
+> the worked example), the BAKE CYCLE energy and cost per cycle and per year, and
+> the FILTER-LOADING check of a measured face velocity against the design one, which
+> that tile's own scope note named as a gap -- landed there as a follow-up instead,
+> additively, so its previous answer is unchanged. Aliases route this question to it.
+> Single-tile spec. Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-mechanic.js`**
 > (Group K, Mechanic - Auto, Marine, Aviation -- the existing category, hub `/groups/mechanic/`; auto body and refinishing), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
 >

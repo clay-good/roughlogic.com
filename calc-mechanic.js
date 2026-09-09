@@ -4951,3 +4951,157 @@ MECHANIC_RENDERERS["aviation-fuel-weight"] = _simpleRenderer({
   ],
   compute: computeAviationFuelWeight,
 });
+
+// ===================== spec-v1659: spray gun transfer efficiency and material usage =====================
+// dims: in { applied_material_qt: L^3, transfer_efficiency: dimensionless, alt_transfer_efficiency: dimensionless, price_per_qt: dimensionless, jobs_per_year: dimensionless } out: { material_sprayed_qt: L^3, overspray_qt: L^3, overspray_fraction: dimensionless, alt_material_sprayed_qt: L^3, saving_per_job_qt: L^3, annual_saving_usd: dimensionless }
+export function computeSprayTransferEfficiency({ applied_material_qt = 0, transfer_efficiency = 0, alt_transfer_efficiency = 0, price_per_qt = 0, jobs_per_year = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(applied_material_qt > 0)) return { error: "The applied material a job needs must be positive." };
+  if (!(transfer_efficiency > 0 && transfer_efficiency <= 1)) return { error: "Transfer efficiency must be greater than 0 and no more than 1." };
+  if (!(alt_transfer_efficiency >= 0 && alt_transfer_efficiency <= 1)) return { error: "The alternative transfer efficiency must be between 0 and 1 (0 to skip the comparison)." };
+  if (!(price_per_qt >= 0)) return { error: "Material price cannot be negative." };
+  if (!(jobs_per_year >= 0)) return { error: "Jobs per year cannot be negative." };
+  // The whole tile: what leaves the gun is what lands, divided by the share that lands.
+  const material_sprayed_qt = applied_material_qt / transfer_efficiency;
+  const overspray_qt = material_sprayed_qt - applied_material_qt;
+  const overspray_fraction = 1 - transfer_efficiency;
+  const material_cost_usd = material_sprayed_qt * price_per_qt;
+  const usage_verdict = fmt(material_sprayed_qt, 2) + " quarts have to leave the gun for the " + fmt(applied_material_qt, 2)
+    + " quarts the job needs, so " + fmt(overspray_qt, 2) + " quarts -- " + fmt(overspray_fraction * 100, 0)
+    + "% of what was sprayed -- becomes overspray in the filters and the booth";
+  // The comparison, which is the reason to run this at all.
+  const has_alt = alt_transfer_efficiency > 0;
+  const alt_material_sprayed_qt = has_alt ? applied_material_qt / alt_transfer_efficiency : 0;
+  const saving_per_job_qt = has_alt ? material_sprayed_qt - alt_material_sprayed_qt : 0;
+  const saving_per_job_usd = saving_per_job_qt * price_per_qt;
+  const annual_saving_usd = saving_per_job_usd * jobs_per_year;
+  // Report the direction in words: an alternative can be WORSE than the gun in hand.
+  const better = saving_per_job_qt > 0;
+  const alt_verdict = !has_alt
+    ? "(no alternative transfer efficiency entered)"
+    : Math.abs(saving_per_job_qt) < 1e-9
+      ? "the alternative transfers at the same efficiency, so it changes nothing"
+      : better
+        ? "at " + fmt(alt_transfer_efficiency * 100, 0) + "% the same job takes " + fmt(alt_material_sprayed_qt, 2)
+          + " quarts, SAVING " + fmt(saving_per_job_qt, 2) + " quarts per job"
+        : "at " + fmt(alt_transfer_efficiency * 100, 0) + "% the same job takes " + fmt(alt_material_sprayed_qt, 2)
+          + " quarts, COSTING " + fmt(-saving_per_job_qt, 2) + " quarts more per job -- the alternative is the worse gun";
+  const money_verdict = !has_alt || price_per_qt <= 0
+    ? "(no alternative efficiency and material price entered)"
+    : better
+      ? "$" + fmt(saving_per_job_usd, 2) + " a job at $" + fmt(price_per_qt, 2) + " a quart, and $" + fmt(annual_saving_usd, 0)
+        + " across " + fmt(jobs_per_year, 0) + " jobs a year -- before the filter loading, booth cleaning, and emissions that scale with the overspray too"
+      : "$" + fmt(-saving_per_job_usd, 2) + " a job MORE, and $" + fmt(-annual_saving_usd, 0)
+        + " more across " + fmt(jobs_per_year, 0) + " jobs a year";
+  if (![material_sprayed_qt, overspray_qt, overspray_fraction, alt_material_sprayed_qt, saving_per_job_qt, annual_saving_usd].every(Number.isFinite)) return { error: "Transfer efficiency math is not a finite value." };
+  return {
+    material_sprayed_qt, overspray_qt, overspray_fraction, material_cost_usd, usage_verdict,
+    has_alt, alt_material_sprayed_qt, saving_per_job_qt, saving_per_job_usd, annual_saving_usd,
+    better, alt_verdict, money_verdict,
+    note: "Transfer efficiency is the share of what leaves the gun that lands on the panel, and it multiplies material consumption directly -- so the difference between a 35% conventional gun and a 65% HVLP gun is not a refinement, it is nearly half the paint. A job needing 1.2 quarts applied takes 3.43 quarts through a 35% gun and 1.85 through a 65% one, and the 1.58 quart difference at $90 a quart across 700 jobs is $99,692 a year. The overspray is not merely wasted material either: it is emitted VOC, it is what loads the booth filters, and it is what contaminates the booth, so a low-efficiency gun carries three costs beyond the paint. That arithmetic is why HVLP became both the economic default and the regulatory requirement, and air quality rules in most areas now require HVLP or an equivalent demonstrated transfer efficiency for refinishing. Technique matters as much as equipment and this is the caveat to take seriously: rated efficiencies are laboratory or standardized-test values, and gun distance, overlap, travel speed, air pressure, and fluid delivery move the achieved figure well away from them. A well-set HVLP gun in poor hands can transfer no better than a conventional gun in good ones, so the honest way to know a shop's real number is to divide theoretical coverage by measured consumption over a month rather than to enter a rating. It does not compute the theoretical coverage the job needs, which comes from the coating manufacturer's technical data sheet at the specified film build -- the coating coverage calculator converts volume solids and a dry-film target into that coverage, and the powder coating coverage calculator is the powder analogue of this comparison, where reclaim rather than transfer efficiency decides the answer. It does not select spray equipment or address the regulatory requirement, which specifies HVLP or an equivalent demonstrated efficiency and carries recordkeeping obligations. It does not address mixing ratios and reduction, booth airflow and filtration, or the respiratory protection and isocyanate exposure controls refinishing requires. The coating manufacturer's technical data, the applicable air district rule, and OSHA govern.",
+  };
+}
+export const sprayTransferEfficiencyExample = { inputs: { applied_material_qt: 1.2, transfer_efficiency: 0.35, alt_transfer_efficiency: 0.65, price_per_qt: 90, jobs_per_year: 700 } };
+MECHANIC_RENDERERS["spray-transfer-efficiency"] = _simpleRenderer({
+  citation: "Citation: transfer efficiency = material deposited / material sprayed, so material required = applied material / transfer efficiency, with the balance (1 - TE) becoming overspray. Rated efficiencies are laboratory or standardized-test values (conventional siphon guns commonly 25 to 35%, HVLP 55 to 70%) and achieved efficiency depends heavily on operator technique, part geometry, and gun setup -- a shop's measured consumption is the better basis. It does not compute theoretical coverage (the coating coverage calculator computes it), select equipment, or address the air district rule requiring HVLP or an equivalent demonstrated transfer efficiency and its recordkeeping. The coating manufacturer's technical data sheet, the applicable air quality regulation, and OSHA govern.",
+  example: sprayTransferEfficiencyExample.inputs,
+  fields: [
+    { key: "applied_material_qt", label: "Applied material the job needs (qt)", kind: "number", attrs: { step: "any" } },
+    { key: "transfer_efficiency", label: "Transfer efficiency of the gun in hand (0 to 1)", kind: "number", attrs: { step: "any" } },
+    { key: "alt_transfer_efficiency", label: "Alternative equipment efficiency (0 to 1, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "price_per_qt", label: "Material price ($/qt)", kind: "number", attrs: { step: "any" } },
+    { key: "jobs_per_year", label: "Jobs per year", kind: "number", attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "u", id: "ste-out-u", label: "Material sprayed and overspray", value: (r) => r.usage_verdict },
+    { key: "a", id: "ste-out-a", label: "Against the alternative equipment", value: (r) => r.alt_verdict },
+    { key: "m", id: "ste-out-m", label: "What the difference is worth", value: (r) => r.money_verdict },
+    { key: "n", id: "ste-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSprayTransferEfficiency,
+});
+
+// ===================== spec-v1663: structural adhesive bond area and shear capacity =====================
+// dims: in { bond_length_in: L, bond_width_in: L, shear_strength_psi: M L^-1 T^-2, required_load_lb: M L T^-2, elevated_shear_strength_psi: M L^-1 T^-2, bond_line_in: L, bond_line_min_in: L, bond_line_max_in: L } out: { bond_area_in2: L^2, capacity_lb: M L T^-2, margin_lb: M L T^-2, length_for_required_in: L, elevated_capacity_lb: M L T^-2, elevated_drop_pct: dimensionless }
+export function computeAdhesiveBondArea({ bond_length_in = 0, bond_width_in = 0, shear_strength_psi = 0, required_load_lb = 0, elevated_shear_strength_psi = 0, bond_line_in = 0, bond_line_min_in = 0, bond_line_max_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(bond_length_in > 0)) return { error: "Bond length must be positive." };
+  if (!(bond_width_in > 0)) return { error: "Bond width must be positive." };
+  if (!(shear_strength_psi > 0)) return { error: "Adhesive shear strength must be positive." };
+  if (!(required_load_lb >= 0)) return { error: "Required joint capacity cannot be negative (0 to skip the check)." };
+  if (!(elevated_shear_strength_psi >= 0)) return { error: "The elevated-temperature shear strength cannot be negative (0 to skip)." };
+  if (!(bond_line_in >= 0)) return { error: "Bond line thickness cannot be negative (0 to skip the range check)." };
+  if (!(bond_line_min_in >= 0 && bond_line_max_in >= 0)) return { error: "The bond line range cannot be negative." };
+  if (bond_line_min_in > 0 && bond_line_max_in > 0 && bond_line_min_in > bond_line_max_in) return { error: "The bond line minimum cannot exceed the maximum." };
+  // The arithmetic is trivial; everything that matters is in the conditions on the strength.
+  const bond_area_in2 = bond_length_in * bond_width_in;
+  const capacity_lb = bond_area_in2 * shear_strength_psi;
+  const capacity_verdict = fmt(bond_length_in, 2) + " in of a " + fmt(bond_width_in, 3) + " in bead is "
+    + fmt(bond_area_in2, 2) + " sq in of bond, carrying " + fmt(capacity_lb, 0) + " lb at "
+    + fmt(shear_strength_psi, 0) + " psi in shear";
+  // The check against a required load, and the length that would satisfy it.
+  const has_required = required_load_lb > 0;
+  const margin_lb = capacity_lb - required_load_lb;
+  const length_for_required_in = has_required ? required_load_lb / (bond_width_in * shear_strength_psi) : 0;
+  const adequate = margin_lb >= 0;
+  const required_verdict = !has_required
+    ? "(no required capacity entered)"
+    : adequate
+      ? "ADEQUATE for " + fmt(required_load_lb, 0) + " lb with " + fmt(margin_lb, 0) + " lb to spare -- "
+        + fmt(length_for_required_in, 2) + " in of this bead width would just carry the required load"
+      : "SHORT of " + fmt(required_load_lb, 0) + " lb by " + fmt(-margin_lb, 0) + " lb -- "
+        + fmt(length_for_required_in, 2) + " in of this bead width is needed, against the "
+        + fmt(bond_length_in, 2) + " in entered";
+  // Temperature: the data sheet's strength at the SERVICE temperature is what the joint has.
+  const has_elevated = elevated_shear_strength_psi > 0;
+  const elevated_capacity_lb = has_elevated ? bond_area_in2 * elevated_shear_strength_psi : 0;
+  const elevated_drop_pct = has_elevated ? (1 - elevated_shear_strength_psi / shear_strength_psi) * 100 : 0;
+  const elevated_verdict = !has_elevated
+    ? "(no elevated-temperature strength entered)"
+    : elevated_drop_pct > 0
+      ? "at " + fmt(elevated_shear_strength_psi, 0) + " psi the same joint carries " + fmt(elevated_capacity_lb, 0)
+        + " lb, " + fmt(elevated_drop_pct, 0) + "% BELOW the entered figure"
+        + (has_required && elevated_capacity_lb < required_load_lb ? " -- and that is short of the required load, so the joint is adequate cold and not hot" : "")
+      : "the entered elevated-temperature strength is not below the reference strength, so there is no reduction to apply";
+  // Bond line thickness has an optimum, not a minimum.
+  const has_line = bond_line_in > 0 && bond_line_min_in > 0 && bond_line_max_in > 0;
+  const line_in_range = has_line && bond_line_in >= bond_line_min_in && bond_line_in <= bond_line_max_in;
+  const line_verdict = !has_line
+    ? "(no bond line thickness and range entered)"
+    : line_in_range
+      ? fmt(bond_line_in, 3) + " in is inside the " + fmt(bond_line_min_in, 3) + " to " + fmt(bond_line_max_in, 3) + " in range specified"
+      : bond_line_in < bond_line_min_in
+        ? fmt(bond_line_in, 3) + " in is BELOW the " + fmt(bond_line_min_in, 3) + " in minimum -- a starved joint, and clamping until the adhesive squeezes out is how it happens"
+        : fmt(bond_line_in, 3) + " in is ABOVE the " + fmt(bond_line_max_in, 3) + " in maximum -- the adhesive's own strength governs over a longer path";
+  if (![bond_area_in2, capacity_lb, margin_lb, length_for_required_in, elevated_capacity_lb, elevated_drop_pct].every(Number.isFinite)) return { error: "Adhesive bond math is not a finite value." };
+  return {
+    bond_area_in2, capacity_lb, capacity_verdict,
+    has_required, margin_lb, length_for_required_in, adequate, required_verdict,
+    has_elevated, elevated_capacity_lb, elevated_drop_pct, elevated_verdict,
+    has_line, line_in_range, line_verdict,
+    note: "Structural adhesive replaces welds on many modern panels, and its capacity is a bond area times a shear strength -- so bond width and length are structural dimensions rather than assembly conveniences. An 18 in flange with a 0.75 in bead is 13.5 sq in, and at 2,500 psi that is 33,750 lb, which is why adhesive bonding is structurally credible. Run a 0.5 in bead instead and the same flange carries 22,500 lb: a third of the joint gone from a bead width nobody measured. The arithmetic is trivial and everything important is in the conditions attached to the shear strength. A published value assumes a specific substrate, a specific surface preparation, a specific bond line thickness, and full cure at a stated temperature, and missing any one of them can leave a fraction of the number. Surface preparation is where field joints actually fail -- adhesive on a contaminated, unabraded, or incorrectly primed surface releases cleanly, and the failure looks like defective adhesive when it was the preparation. That variable is not represented in this arithmetic at all. Bond line thickness has an OPTIMUM rather than a minimum: too thin starves the joint and concentrates stress, too thick lets the adhesive's own strength govern over a longer path, and manufacturers hold the thickness with glass beads mixed into the adhesive for exactly this reason -- clamping a joint until the adhesive squeezes out is a way of making it weaker. Temperature is the other condition worth flagging, because structural adhesives lose strength as they warm and a joint adequate at room temperature can be marginal on a hot roof or near an exhaust; the data sheet's strength at the SERVICE temperature is the number the joint actually has. It does not address joint design -- peel and cleavage loading, which adhesives resist far less well than shear, stress concentration at the bond ends, or the combination of adhesive with welds or rivets that most modern repairs specify. Vehicle manufacturers specify which joints may be bonded, which adhesive, which preparation, and which combination of bonding and mechanical fastening, and a bonded joint outside that procedure is an unapproved repair with crash-performance consequences. The vehicle manufacturer's body repair manual, the adhesive manufacturer's technical data sheet, and the manufacturer's position statements govern.",
+  };
+}
+export const adhesiveBondAreaExample = { inputs: { bond_length_in: 18, bond_width_in: 0.75, shear_strength_psi: 2500, required_load_lb: 20000, elevated_shear_strength_psi: 1400, bond_line_in: 0.02, bond_line_min_in: 0.01, bond_line_max_in: 0.04 } };
+MECHANIC_RENDERERS["adhesive-bond-area"] = _simpleRenderer({
+  citation: "Citation: bond area = bond length x bond width and capacity = area x shear strength, with the shear strength taken from the adhesive manufacturer's data sheet AT THE SERVICE TEMPERATURE and for the substrate, surface preparation, bond line thickness, and cure schedule the joint actually has. Surface preparation usually governs the achieved strength and is not represented in this arithmetic. It does not address peel or cleavage loading, stress concentration at the bond ends, or the combination of bonding with welds and rivets. The vehicle manufacturer's body repair manual and position statements, and the adhesive manufacturer's technical data sheet, govern.",
+  example: adhesiveBondAreaExample.inputs,
+  fields: [
+    { key: "bond_length_in", label: "Bond length (in)", kind: "number", attrs: { step: "any" } },
+    { key: "bond_width_in", label: "Bond (bead) width (in)", kind: "number", attrs: { step: "any" } },
+    { key: "shear_strength_psi", label: "Adhesive shear strength (psi)", kind: "number", attrs: { step: "any" } },
+    { key: "required_load_lb", label: "Required joint capacity (lb, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "elevated_shear_strength_psi", label: "Shear strength at service temperature (psi, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "bond_line_in", label: "Bond line thickness (in, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "bond_line_min_in", label: "Bond line minimum specified (in)", kind: "number", attrs: { step: "any" } },
+    { key: "bond_line_max_in", label: "Bond line maximum specified (in)", kind: "number", attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "c", id: "aba-out-c", label: "Bond area and capacity", value: (r) => r.capacity_verdict },
+    { key: "r", id: "aba-out-r", label: "Against the required load", value: (r) => r.required_verdict },
+    { key: "t", id: "aba-out-t", label: "At the service temperature", value: (r) => r.elevated_verdict },
+    { key: "b", id: "aba-out-b", label: "Bond line thickness", value: (r) => r.line_verdict },
+    { key: "n", id: "aba-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAdhesiveBondArea,
+});

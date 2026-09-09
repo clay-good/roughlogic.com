@@ -22191,6 +22191,34 @@ export const CITATIONS = {
       { name: "Not weight and balance", value: "the centre of gravity envelope is checked elsewhere", source: "the aircraft flight manual" },
     ],
   },
+  // spec-v1659, v1663: the 2026-09-09 trade-expansion auto body band, in the
+  // existing calc-mechanic.js. Three of the band's five specs were cut as
+  // duplicates and landed additively on the tiles that already held the
+  // relation (spray-booth-airflow, coating-coverage-dft, layout-squaring).
+  "spray-transfer-efficiency": {
+    formula: "transfer efficiency = material deposited / material sprayed, so the material that must leave the gun is the applied material divided by that efficiency, and the balance (1 - TE) is overspray. The comparison against alternative equipment is the same relation at a second efficiency, and the annual figure is the per-job difference times the jobs entered.",
+    edition: "A material consumption and equipment comparison from a transfer efficiency the user supplies. Rated efficiencies are laboratory or standardized-test values (conventional siphon guns commonly 25 to 35%, HVLP 55 to 70%) and the achieved figure depends heavily on operator technique, part geometry, and gun setup. It does not compute theoretical coverage, select spray equipment, or address the air district rule requiring HVLP or an equivalent demonstrated transfer efficiency and its recordkeeping obligations.",
+    freeAccess: "One division and a comparison; no manufacturer coverage table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Transfer efficiency multiplies material consumption directly, which is why the gap between a 35% conventional gun and a 65% HVLP one is nearly half the paint rather than a refinement. The overspray is not only wasted material: it is emitted VOC, it loads the booth filters, and it contaminates the booth, so three costs follow the same fraction. The caveat that matters is technique -- a well-set HVLP gun in poor hands can transfer no better than a conventional gun in good ones, so a shop's measured consumption over a month divided into theoretical coverage is a better input than any rating.",
+    assumptions: [
+      { name: "The efficiency is entered", value: "rated figures are test values, not achieved ones", source: "the equipment manufacturer and the shop's own measurement" },
+      { name: "Theoretical coverage is entered", value: "it comes from the coating data sheet at the specified film build", source: "the coating manufacturer's technical data sheet" },
+      { name: "Not a compliance determination", value: "the HVLP or equivalent-efficiency requirement and its recordkeeping are the rule's", source: "the applicable air district rule" },
+    ],
+  },
+  "adhesive-bond-area": {
+    formula: "bond area = bond length x bond width and capacity = area x shear strength; the bond length that just carries a required load is that relation inverted, and the capacity at a service temperature is the same area times the strength at that temperature.",
+    edition: "A capacity calculation using a shear strength the user supplies. Published adhesive strengths are for a specific substrate, surface preparation, bond line thickness, cure schedule, and test temperature, and the achieved strength in a field joint depends on all of them; surface preparation usually governs and is not represented in this arithmetic at all. It does not address peel or cleavage loading, stress concentration at the bond ends, or the combination of bonding with welds and rivets that most modern repairs specify.",
+    freeAccess: "One multiplication; no adhesive strength table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The arithmetic is trivial and everything important is in the conditions attached to the strength. Bead width is a structural dimension: an 18 in flange at 0.75 in carries 33,750 lb at 2,500 psi, and the same flange at a 0.5 in bead carries 22,500 lb -- a third of the joint gone from a dimension nobody measured. Bond line thickness has an OPTIMUM rather than a minimum, which is why manufacturers hold it with glass beads and why clamping until the adhesive squeezes out makes the joint weaker. Structural adhesives also lose strength as they warm, so the data sheet's value at the SERVICE temperature is the number the joint has. A bonded joint outside the vehicle manufacturer's procedure is an unapproved repair with crash-performance consequences.",
+    assumptions: [
+      { name: "The shear strength is entered", value: "it is conditional on substrate, preparation, bond line, cure, and temperature", source: "the adhesive manufacturer's technical data sheet" },
+      { name: "Surface preparation is not modelled", value: "it is usually the governing variable and is absent from the arithmetic", source: "the adhesive manufacturer's preparation procedure" },
+      { name: "Shear only", value: "peel and cleavage are resisted far less well and are not computed", source: "the vehicle manufacturer's body repair manual" },
+    ],
+  },
   // spec-v1717..v1726: the 2026-09-08 trade-expansion air quality band, in
   // the new calc-airquality.js. Ten tiles, nothing cut.
   "stack-emission-pte": {

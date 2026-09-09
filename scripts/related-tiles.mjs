@@ -1571,6 +1571,8 @@ const RELATED = {
   "control-cable-tension": ["propeller-track-balance","aircraft-weight-balance","aviation-fuel-weight"],
   "propeller-track-balance": ["single-plane-field-balance","vibration-severity-zone","control-cable-tension"],
   "aviation-fuel-weight": ["aircraft-weight-balance","control-cable-tension","density-altitude"],
+  "spray-transfer-efficiency": ["coating-coverage-dft","powder-coating-coverage","spray-booth-airflow","paint-mix-ratio"],
+  "adhesive-bond-area": ["construction-adhesive-tubes","fillet-weld-strength","bolt-stretch"],
   // spec-v1717..v1726: air quality band.
   "stack-emission-pte": ["opacity-six-minute","coating-voc-compliance","plume-rise-briggs"],
   "opacity-six-minute": ["stack-emission-pte","esp-deutsch-efficiency","baghouse-cleaning-interval"],

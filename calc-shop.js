@@ -3065,8 +3065,8 @@ SHOP_RENDERERS["gas-strut-force"] = _simpleRenderer({
 });
 
 // ===================== spec-v1439: spray booth airflow and makeup air load =====================
-// dims: in { args: dimensionless } out: { exhaust_cfm: L^3 T^-1, heating_btu_hr: M L^2 T^-3, gas_input_btu_hr: M L^2 T^-3 }
-export function computeSprayBoothAirflow({ opening_width_ft = 0, opening_height_ft = 0, face_velocity_fpm = 100, indoor_temp_f = 70, outdoor_temp_f = 0, burner_efficiency = 0.8, hours_per_year = 0, price_per_therm = 0 } = {}) {
+// dims: in { args: dimensionless } out: { exhaust_cfm: L^3 T^-1, heating_btu_hr: M L^2 T^-3, gas_input_btu_hr: M L^2 T^-3, booth_volume_cuft: L^3, air_changes_per_hour: T^-1, measured_cfm: L^3 T^-1, bake_btu_hr: M L^2 T^-3, bake_btu_per_cycle: M L^2 T^-2 }
+export function computeSprayBoothAirflow({ opening_width_ft = 0, opening_height_ft = 0, face_velocity_fpm = 100, indoor_temp_f = 70, outdoor_temp_f = 0, burner_efficiency = 0.8, hours_per_year = 0, price_per_therm = 0, booth_depth_ft = 0, measured_face_velocity_fpm = 0, bake_temp_f = 0, bake_minutes = 0, bakes_per_year = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(opening_width_ft > 0 && opening_height_ft > 0)) return { error: "Booth opening width and height must be positive." };
   if (!(face_velocity_fpm > 0)) return { error: "Design face velocity must be positive." };
@@ -3074,6 +3074,14 @@ export function computeSprayBoothAirflow({ opening_width_ft = 0, opening_height_
   if (!(burner_efficiency > 0 && burner_efficiency <= 1)) return { error: "Burner efficiency must be between 0 and 1." };
   if (!(hours_per_year >= 0)) return { error: "Hours of operation cannot be negative." };
   if (!(price_per_therm >= 0)) return { error: "Fuel price cannot be negative." };
+  // spec-v1660 (cut into this tile): the booth's air changes, the bake cycle, and
+  // the filter-loading check this tile's own scope note named as a gap. Every one
+  // is optional and zero leaves the figures above untouched.
+  if (!(booth_depth_ft >= 0)) return { error: "Booth depth cannot be negative (0 to skip the air-change check)." };
+  if (!(measured_face_velocity_fpm >= 0)) return { error: "The measured face velocity cannot be negative (0 to skip)." };
+  if (!(bake_minutes >= 0)) return { error: "Bake cycle length cannot be negative (0 to skip)." };
+  if (!(bakes_per_year >= 0)) return { error: "Bakes per year cannot be negative." };
+  if (bake_minutes > 0 && !(bake_temp_f > indoor_temp_f)) return { error: "Bake temperature must be above the booth ambient to compute a bake load." };
   const opening_sqft = opening_width_ft * opening_height_ft;
   // Face velocity is a life-safety requirement, not a design choice, and the
   // airflow follows from the opening whether the booth is spraying or not.
@@ -3084,19 +3092,61 @@ export function computeSprayBoothAirflow({ opening_width_ft = 0, opening_height_
   const therms_per_hour = gas_input_btu_hr / 100000;
   const cost_per_hour = therms_per_hour * price_per_therm;
   const annual_cost = cost_per_hour * hours_per_year;
-  if (![exhaust_cfm, heating_btu_hr, gas_input_btu_hr, cost_per_hour].every(Number.isFinite)) return { error: "Spray-booth math is not a finite value." };
+  // Air changes: a booth is one of the largest air handlers in a shop, and the
+  // number is startling enough to be worth printing.
+  const has_depth = booth_depth_ft > 0;
+  const booth_volume_cuft = has_depth ? opening_sqft * booth_depth_ft : 0;
+  const air_changes_per_hour = has_depth ? exhaust_cfm * 60 / booth_volume_cuft : 0;
+  const air_change_verdict = !has_depth
+    ? "(no booth depth entered)"
+    : fmt(booth_volume_cuft, 0) + " cu ft of booth swept at " + fmt(exhaust_cfm, 0) + " cfm is "
+      + fmt(air_changes_per_hour, 0) + " air changes an hour -- which is what a booth is";
+  // Filter loading: velocity falls as filters load, and the booth goes out of
+  // compliance before the finish gets visibly dirty.
+  const has_measured = measured_face_velocity_fpm > 0;
+  const measured_cfm = has_measured ? opening_sqft * measured_face_velocity_fpm : 0;
+  const velocity_shortfall_pct = has_measured ? (1 - measured_face_velocity_fpm / face_velocity_fpm) * 100 : 0;
+  const velocity_compliant = has_measured ? measured_face_velocity_fpm >= face_velocity_fpm : true;
+  const velocity_verdict = !has_measured
+    ? "(no measured face velocity entered)"
+    : velocity_compliant
+      ? "the measured " + fmt(measured_face_velocity_fpm, 0) + " fpm meets the " + fmt(face_velocity_fpm, 0)
+        + " fpm design, moving " + fmt(measured_cfm, 0) + " cfm"
+      : "the measured " + fmt(measured_face_velocity_fpm, 0) + " fpm is " + fmt(velocity_shortfall_pct, 0)
+        + "% BELOW the " + fmt(face_velocity_fpm, 0) + " fpm design, moving " + fmt(measured_cfm, 0)
+        + " cfm -- the booth is out of compliance on the requirement that protects the painter, not merely producing a dirtier finish";
+  // The bake cycle: the booth heats its ENTIRE airflow to bake temperature and
+  // exhausts it, continuously. Not the energy to heat a car.
+  const has_bake = bake_minutes > 0 && bake_temp_f > indoor_temp_f;
+  const bake_delta_t = has_bake ? bake_temp_f - indoor_temp_f : 0;
+  const bake_btu_hr = has_bake ? 1.08 * exhaust_cfm * bake_delta_t : 0;
+  const bake_btu_per_cycle = has_bake ? bake_btu_hr * (bake_minutes / 60) : 0;
+  const bake_gas_btu_per_cycle = has_bake ? bake_btu_per_cycle / burner_efficiency : 0;
+  const bake_cost_per_cycle = has_bake ? (bake_gas_btu_per_cycle / 100000) * price_per_therm : 0;
+  const bake_annual_cost = bake_cost_per_cycle * bakes_per_year;
+  const bake_verdict = !has_bake
+    ? "(no bake cycle entered)"
+    : "heating " + fmt(exhaust_cfm, 0) + " cfm over a " + fmt(bake_delta_t, 0) + " degF rise is "
+      + fmt(bake_btu_hr / 1000000, 2) + " MMBTU/hr, so a " + fmt(bake_minutes, 0) + " minute bake takes "
+      + fmt(bake_btu_per_cycle / 1000000, 2) + " MMBTU -- $" + fmt(bake_cost_per_cycle, 2) + " a cycle and $"
+      + fmt(bake_annual_cost, 0) + " across " + fmt(bakes_per_year, 0) + " bakes a year";
+  if (![exhaust_cfm, heating_btu_hr, gas_input_btu_hr, cost_per_hour, air_changes_per_hour, measured_cfm, bake_btu_per_cycle, bake_annual_cost].every(Number.isFinite)) return { error: "Spray-booth math is not a finite value." };
   return {
     opening_sqft, exhaust_cfm, makeup_cfm: exhaust_cfm, delta_t,
     heating_btu_hr, heating_mbh: heating_btu_hr / 1000, gas_input_btu_hr,
     therms_per_hour, cost_per_hour, annual_cost,
-    note: "The airflow a spray booth takes and what it costs to replace it. Booth ventilation is not sized for comfort or even for the paint -- it is sized to keep the vapor concentration far below the lower flammable limit and to keep overspray moving away from the operator. NFPA 33 and OSHA 1910.107 set that as a FACE VELOCITY across the booth opening, commonly 100 fpm for an open-face booth, and the airflow follows from the opening area whether the booth is spraying or not. That air leaves the building and it has to be replaced, and replacing it in January is the expensive part. The sensible load is 1.08 x cfm x delta-T, and at booth airflows the delta-T does not have to be large before the number is enormous: a 14 by 9 ft opening at 100 fpm is 12,600 cfm, and tempering it from 20 F to 70 F is 680,400 BTU/hr -- more than most residential furnaces put out in a day, running whenever the booth runs, and at $1.20 a therm and 80% burner efficiency about $10 an hour in gas alone. That is why booth discipline, spraying in batches and not leaving the fan running, is worth real money. Note what the face velocity does and does not allow: nothing about it is negotiable downward, because it is a life-safety requirement, but a smaller opening is a smaller airflow, and a 10 ft wide booth at the same 100 fpm needs 9,000 cfm and costs 29% less to temper. Airflow and the sensible makeup-air load only. It does not size the fan, the ductwork, or the makeup air unit, does not compute the negative pressure the booth must hold relative to the shop, and does not address filter selection, filter loading and its effect on airflow, the interlocks between the spray equipment and the fan, the electrical classification of the booth and the area around it, or the exhaust stack height and discharge location. Air-solvent concentration, recirculation, and heat recovery are all separate questions with their own code limits. NFPA 33, OSHA 1910.107, the adopted mechanical code, the equipment manufacturer, and the AHJ govern.",
+    has_depth, booth_volume_cuft, air_changes_per_hour, air_change_verdict,
+    has_measured, measured_cfm, velocity_shortfall_pct, velocity_compliant, velocity_verdict,
+    has_bake, bake_delta_t, bake_btu_hr, bake_btu_per_cycle, bake_gas_btu_per_cycle,
+    bake_cost_per_cycle, bake_annual_cost, bake_verdict,
+    note: "The airflow a spray booth takes and what it costs to replace it. Booth ventilation is not sized for comfort or even for the paint -- it is sized to keep the vapor concentration far below the lower flammable limit and to keep overspray moving away from the operator. NFPA 33 and OSHA 1910.107 set that as a FACE VELOCITY across the booth opening, commonly 100 fpm for an open-face booth, and the airflow follows from the opening area whether the booth is spraying or not. That air leaves the building and it has to be replaced, and replacing it in January is the expensive part. The sensible load is 1.08 x cfm x delta-T, and at booth airflows the delta-T does not have to be large before the number is enormous: a 14 by 9 ft opening at 100 fpm is 12,600 cfm, and tempering it from 20 F to 70 F is 680,400 BTU/hr -- more than most residential furnaces put out in a day, running whenever the booth runs, and at $1.20 a therm and 80% burner efficiency about $10 an hour in gas alone. That is why booth discipline, spraying in batches and not leaving the fan running, is worth real money. Three things follow from the same airflow. The booth's AIR CHANGES are startling once the depth is entered -- a 24 by 14 ft downdraft plan at 100 fpm over a 10 ft height is 33,600 cfm through 3,360 cu ft, which is 600 air changes an hour, and it is why a booth is the largest air handler in most shops. The BAKE CYCLE is the second, and it surprises people: a booth heats its ENTIRE airflow from ambient to bake temperature and exhausts it continuously, so the energy is the full airflow times the rise for the whole cycle rather than the energy to heat a car. That same 33,600 cfm over a 70 degF rise is 2.54 MMBTU/hr, so a 30 minute bake is 1.27 MMBTU -- which is why bake cycles are short and why recirculating and heat-recovery booths are sold against exactly this number. The third is FILTER LOADING, and it is the one that matters for safety: face velocity falls as filters load, and a booth measured at 65 fpm against a 100 fpm design is moving 35% less air and is out of compliance on the requirement that protects the painter -- the dirty finish a shop notices first is the least of what is wrong. Cure schedules are coating-specific and are stated as METAL temperature and time; a cycle timed from when the booth air reaches setpoint under-cures the coating, which is why booth cure cycles specify a ramp plus a hold rather than a single duration, and the bake load here is an energy figure rather than a cure schedule. Note what the face velocity does and does not allow: nothing about it is negotiable downward, because it is a life-safety requirement, but a smaller opening is a smaller airflow, and a 10 ft wide booth at the same 100 fpm needs 9,000 cfm and costs 29% less to temper. Airflow and the sensible makeup-air load only. It does not size the fan, the ductwork, or the makeup air unit, does not compute the negative pressure the booth must hold relative to the shop, and does not address filter selection or the differential pressure monitoring a booth needs, the interlocks between the spray equipment and the fan, the electrical classification of the booth and the area around it, or the exhaust stack height and discharge location. Air-solvent concentration, recirculation, and heat recovery are all separate questions with their own code limits. NFPA 33, OSHA 1910.107, the adopted mechanical code, the equipment manufacturer, and the AHJ govern.",
   };
 }
 
 export const sprayBoothAirflowExample = { inputs: { opening_width_ft: 14, opening_height_ft: 9, face_velocity_fpm: 100, indoor_temp_f: 70, outdoor_temp_f: 20, burner_efficiency: 0.8, hours_per_year: 1000, price_per_therm: 1.2 } };
 
 SHOP_RENDERERS["spray-booth-airflow"] = _simpleRenderer({
-  citation: "Citation: spray booth exhaust airflow from the design FACE VELOCITY across the booth opening, the requirement NFPA 33 and OSHA 1910.107 set (commonly 100 fpm open-face), cited by name and not reproduced; makeup-air sensible load from the standard-air relation 1.08 x cfm x delta-T. Airflow and the sensible load only -- it sizes no fan, duct, or makeup air unit and addresses no filter, interlock, electrical classification, or stack requirement. NFPA 33, OSHA 1910.107, the adopted mechanical code, and the AHJ govern.",
+  citation: "Citation: spray booth exhaust airflow from the design FACE VELOCITY across the booth opening, the requirement NFPA 33 and OSHA 1910.107 set (commonly 100 fpm open-face), cited by name and not reproduced; makeup-air sensible load from the standard-air relation 1.08 x cfm x delta-T, with the booth air changes as cfm x 60 / booth volume and the bake load the same 1.08 x cfm x delta-T over the cycle. Cure schedules are coating-specific and stated as METAL temperature and time, so the bake figure is an energy and cost number, not a cure schedule. Airflow, air changes, and the sensible load only -- it sizes no fan, duct, or makeup air unit and addresses no filter, interlock, electrical classification, or stack requirement. NFPA 33, OSHA 1910.107, the adopted mechanical code, and the AHJ govern.",
   example: sprayBoothAirflowExample.inputs,
   fields: [
     { key: "opening_width_ft", label: "Booth opening width (ft)", kind: "number" },
@@ -3107,12 +3157,20 @@ SHOP_RENDERERS["spray-booth-airflow"] = _simpleRenderer({
     { key: "burner_efficiency", label: "Makeup air unit efficiency (0 to 1)", kind: "number" },
     { key: "hours_per_year", label: "Booth hours per year", kind: "number" },
     { key: "price_per_therm", label: "Gas price ($/therm)", kind: "number" },
+    { key: "booth_depth_ft", label: "Booth depth for the air-change check (ft, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "measured_face_velocity_fpm", label: "Measured face velocity (fpm, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "bake_temp_f", label: "Bake temperature (°F, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "bake_minutes", label: "Bake cycle length (min, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "bakes_per_year", label: "Bakes per year", kind: "number", attrs: { step: "any" } },
   ],
   outputs: [
     { key: "a", id: "sba-out-a", label: "Exhaust and makeup airflow", value: (r) => fmt(r.exhaust_cfm, 0) + " cfm across " + fmt(r.opening_sqft, 0) + " sq ft of opening" },
     { key: "l", id: "sba-out-l", label: "Makeup air heating load", value: (r) => fmt(r.heating_btu_hr, 0) + " BTU/hr (" + fmt(r.heating_mbh, 0) + " MBH) over a " + fmt(r.delta_t, 0) + " F rise" },
     { key: "g", id: "sba-out-g", label: "Gas input required", value: (r) => fmt(r.gas_input_btu_hr, 0) + " BTU/hr = " + fmt(r.therms_per_hour, 2) + " therms per hour" },
     { key: "c", id: "sba-out-c", label: "Operating cost", value: (r) => "$" + fmt(r.cost_per_hour, 2) + " per hour, $" + fmt(r.annual_cost, 0) + " over the hours entered" },
+    { key: "h", id: "sba-out-h", label: "Air changes", value: (r) => r.air_change_verdict },
+    { key: "v", id: "sba-out-v", label: "Measured against design velocity", value: (r) => r.velocity_verdict },
+    { key: "b", id: "sba-out-b", label: "Bake cycle", value: (r) => r.bake_verdict },
     { key: "n", id: "sba-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeSprayBoothAirflow,

@@ -1,6 +1,6 @@
 {
- "_comment": "v10 Phase D.1 search aliases (spec-v10 §6.1). One row per alias mapping a free-text term to a tile id. AUTHORING MASTER ONLY since the spec-v590 split remediation (2026-07-17): the runtime never fetches this file. scripts/build-alias-shards.mjs derives the per-group runtime shards data/search/aliases-<letter>.json from it (lazy parallel fetch on first search interaction via bindSearch / ensureAliases in app.js; --check in npm run lint gates drift), so edit THIS file and rerun the script. On exact-term match the user is routed to the target tile via the same path as a tool-name suggestion. Industry vocabulary, misspellings, abbreviations, question phrasings (spec-v590), and adjacent-question redirects only. The resolveQuery / matchAliasPrefix helpers in search-discovery.js are the canonical pure-functional resolvers (exercised by test/unit/search-discovery.test.js).",
- "_updated": "2026-09-08",
+ "_comment": "v10 Phase D.1 search aliases (spec-v10 \u00a76.1). One row per alias mapping a free-text term to a tile id. AUTHORING MASTER ONLY since the spec-v590 split remediation (2026-07-17): the runtime never fetches this file. scripts/build-alias-shards.mjs derives the per-group runtime shards data/search/aliases-<letter>.json from it (lazy parallel fetch on first search interaction via bindSearch / ensureAliases in app.js; --check in npm run lint gates drift), so edit THIS file and rerun the script. On exact-term match the user is routed to the target tile via the same path as a tool-name suggestion. Industry vocabulary, misspellings, abbreviations, question phrasings (spec-v590), and adjacent-question redirects only. The resolveQuery / matchAliasPrefix helpers in search-discovery.js are the canonical pure-functional resolvers (exercised by test/unit/search-discovery.test.js).",
+ "_updated": "2026-09-09",
  "_schema": "Each alias row: { term: string, target: tile-id, kind: 'question' | 'industry' | 'adjacent' | 'redirect' }. Multiple aliases may map to the same target.",
  "aliases": [
   {
@@ -112222,6 +112222,146 @@
    "term": "asce 7 rooftop equipment",
    "target": "rooftop-curb-uplift",
    "kind": "industry"
+  },
+  {
+   "term": "spray transfer efficiency",
+   "target": "spray-transfer-efficiency",
+   "kind": "industry"
+  },
+  {
+   "term": "hvlp material savings",
+   "target": "spray-transfer-efficiency",
+   "kind": "industry"
+  },
+  {
+   "term": "overspray percentage",
+   "target": "spray-transfer-efficiency",
+   "kind": "industry"
+  },
+  {
+   "term": "paint usage per job",
+   "target": "spray-transfer-efficiency",
+   "kind": "industry"
+  },
+  {
+   "term": "transfer efficiency voc",
+   "target": "spray-transfer-efficiency",
+   "kind": "industry"
+  },
+  {
+   "term": "how much paint does overspray waste",
+   "target": "spray-transfer-efficiency",
+   "kind": "question"
+  },
+  {
+   "term": "structural adhesive bond area",
+   "target": "adhesive-bond-area",
+   "kind": "industry"
+  },
+  {
+   "term": "panel bonding strength",
+   "target": "adhesive-bond-area",
+   "kind": "industry"
+  },
+  {
+   "term": "adhesive shear capacity",
+   "target": "adhesive-bond-area",
+   "kind": "industry"
+  },
+  {
+   "term": "bond line thickness",
+   "target": "adhesive-bond-area",
+   "kind": "industry"
+  },
+  {
+   "term": "weld bonding panel",
+   "target": "adhesive-bond-area",
+   "kind": "industry"
+  },
+  {
+   "term": "how strong is a bonded panel flange",
+   "target": "adhesive-bond-area",
+   "kind": "question"
+  },
+  {
+   "term": "paint booth airflow",
+   "target": "spray-booth-airflow",
+   "kind": "redirect"
+  },
+  {
+   "term": "booth face velocity",
+   "target": "spray-booth-airflow",
+   "kind": "redirect"
+  },
+  {
+   "term": "spray booth air changes",
+   "target": "spray-booth-airflow",
+   "kind": "redirect"
+  },
+  {
+   "term": "bake cycle energy",
+   "target": "spray-booth-airflow",
+   "kind": "redirect"
+  },
+  {
+   "term": "booth filter loading velocity",
+   "target": "spray-booth-airflow",
+   "kind": "redirect"
+  },
+  {
+   "term": "paint booth air changes per hour",
+   "target": "spray-booth-airflow",
+   "kind": "redirect"
+  },
+  {
+   "term": "unibody diagonal measurement",
+   "target": "layout-squaring",
+   "kind": "redirect"
+  },
+  {
+   "term": "frame diamond damage check",
+   "target": "layout-squaring",
+   "kind": "redirect"
+  },
+  {
+   "term": "body dimension tolerance",
+   "target": "layout-squaring",
+   "kind": "redirect"
+  },
+  {
+   "term": "symmetry measurement collision",
+   "target": "layout-squaring",
+   "kind": "redirect"
+  },
+  {
+   "term": "x check frame",
+   "target": "layout-squaring",
+   "kind": "redirect"
+  },
+  {
+   "term": "wet film thickness calculation",
+   "target": "coating-coverage-dft",
+   "kind": "redirect"
+  },
+  {
+   "term": "dry film build volume solids",
+   "target": "coating-coverage-dft",
+   "kind": "redirect"
+  },
+  {
+   "term": "wft dft gauge",
+   "target": "coating-coverage-dft",
+   "kind": "redirect"
+  },
+  {
+   "term": "coating reduction solids",
+   "target": "coating-coverage-dft",
+   "kind": "redirect"
+  },
+  {
+   "term": "mils wet for mils dry",
+   "target": "coating-coverage-dft",
+   "kind": "redirect"
   }
  ]
 }

@@ -49758,6 +49758,8 @@ import {
   computeControlCableTension as _v1645,
   computePropellerTrackBalance as _v1646,
   computeAviationFuelWeight as _v1647,
+  computeSprayTransferEfficiency as _v1659,
+  computeAdhesiveBondArea as _v1663,
 } from "../../calc-mechanic.js";
 
 test("bounds: spec-v1640 computeMetacentricHeight -- a difference of similar numbers", () => {
@@ -51993,4 +51995,193 @@ test("bounds: spec-v1636 computeRooftopCurbUplift -- a negative net uplift is th
   assert.equal(_v1636({ ...base, fastener_capacity_lb: 20 }).capacity_ok, false);
   assert.ok(_v1636({ ...base, fastener_count: 0 }).error);
   assert.ok(_v1636({ ...base, windward_fastener_count: 20 }).error);
+});
+
+
+test("bounds: spec-v1659 computeSprayTransferEfficiency -- the round trip, and an alternative that is WORSE", () => {
+  const base = { applied_material_qt: 1.2, transfer_efficiency: 0.35, alt_transfer_efficiency: 0.65, price_per_qt: 90, jobs_per_year: 700 };
+  const r = _v1659(base);
+  // ROUND TRIP: what leaves the gun times the efficiency is what lands. If the
+  // division were ever written as a multiplication this is what catches it.
+  assert.ok(Math.abs(r.material_sprayed_qt * 0.35 - 1.2) < 1e-12);
+  assert.ok(Math.abs(r.material_sprayed_qt - r.overspray_qt - 1.2) < 1e-12);
+  assert.ok(Math.abs(r.overspray_fraction - (1 - 0.35)) < 1e-12);
+  // THE SPEC'S FIGURES: 3.43 sprayed for 1.2 applied, 1.85 through the HVLP gun,
+  // and the annual difference computed from the UNROUNDED 1.5824, not from 1.58.
+  assert.ok(Math.abs(r.material_sprayed_qt - 3.4286) < 1e-3);
+  assert.ok(Math.abs(r.alt_material_sprayed_qt - 1.8462) < 1e-3);
+  assert.ok(Math.abs(r.saving_per_job_qt - 1.5824) < 1e-3);
+  assert.ok(Math.abs(r.annual_saving_usd - 99692.31) < 1);
+  assert.equal(r.better, true);
+  // MONOTONIC: a better gun can never need more material.
+  const worseGun = _v1659({ ...base, transfer_efficiency: 0.25 });
+  assert.ok(worseGun.material_sprayed_qt > r.material_sprayed_qt);
+  // THE DIRECTION, which is the assertion that can actually fail: an alternative
+  // WORSE than the gun in hand must report a cost, not a saving.
+  const worseAlt = _v1659({ ...base, alt_transfer_efficiency: 0.20 });
+  assert.equal(worseAlt.better, false);
+  assert.ok(worseAlt.saving_per_job_qt < 0);
+  assert.ok(worseAlt.annual_saving_usd < 0);
+  assert.ok(worseAlt.money_verdict.includes("MORE"));
+  // A perfect gun leaves no overspray at all.
+  const perfect = _v1659({ ...base, transfer_efficiency: 1 });
+  assert.ok(Math.abs(perfect.overspray_qt) < 1e-12);
+  assert.ok(Math.abs(perfect.material_sprayed_qt - 1.2) < 1e-12);
+  // An equal alternative changes nothing, and says so rather than reporting a saving.
+  const same = _v1659({ ...base, alt_transfer_efficiency: 0.35 });
+  assert.ok(Math.abs(same.saving_per_job_qt) < 1e-12);
+  assert.ok(same.alt_verdict.includes("changes nothing"));
+  // ERROR CONTRACT: an efficiency of zero or above one is not a transfer efficiency.
+  assert.ok(_v1659({ ...base, transfer_efficiency: 0 }).error);
+  assert.ok(_v1659({ ...base, transfer_efficiency: 1.2 }).error);
+  assert.ok(_v1659({ ...base, applied_material_qt: 0 }).error);
+  assert.ok(_v1659({ ...base, price_per_qt: -1 }).error);
+  assert.ok(_v1659({ ...base, applied_material_qt: Infinity }).error);
+});
+
+test("bounds: spec-v1663 computeAdhesiveBondArea -- bead width is linear, and the joint can be adequate cold and not hot", () => {
+  const base = { bond_length_in: 18, bond_width_in: 0.75, shear_strength_psi: 2500, required_load_lb: 20000, elevated_shear_strength_psi: 1400, bond_line_in: 0.02, bond_line_min_in: 0.01, bond_line_max_in: 0.04 };
+  const r = _v1663(base);
+  // IDENTITY: the area and the capacity are the two multiplications, and nothing else.
+  assert.ok(Math.abs(r.bond_area_in2 - 18 * 0.75) < 1e-12);
+  assert.ok(Math.abs(r.capacity_lb - r.bond_area_in2 * 2500) < 1e-12);
+  assert.ok(Math.abs(r.capacity_lb - 33750) < 1e-9);
+  // ROUND TRIP: the length reported as just carrying the required load must do so.
+  assert.ok(Math.abs(r.length_for_required_in * 0.75 * 2500 - 20000) < 1e-9);
+  // THE SPEC'S POINT: bead width is a structural dimension and the relation is
+  // LINEAR -- two thirds of the bead is two thirds of the joint.
+  const narrow = _v1663({ ...base, bond_width_in: 0.5 });
+  assert.ok(Math.abs(narrow.capacity_lb - 22500) < 1e-9);
+  assert.ok(Math.abs(narrow.capacity_lb / r.capacity_lb - 0.5 / 0.75) < 1e-12);
+  // TEMPERATURE: 1,400 psi on the same area is 18,900 lb, 44% below -- and that
+  // is BELOW the required load, so the joint is adequate cold and not hot. The
+  // verdict has to say so; a capacity check that only ran at room temperature
+  // would pass this joint.
+  assert.ok(Math.abs(r.elevated_capacity_lb - 18900) < 1e-9);
+  assert.ok(Math.abs(r.elevated_drop_pct - 44) < 0.01);
+  assert.equal(r.adequate, true);
+  assert.ok(r.elevated_capacity_lb < base.required_load_lb);
+  assert.ok(r.elevated_verdict.includes("adequate cold and not hot"));
+  // A joint SHORT of its required load says so, and names the length that is not short.
+  const short = _v1663({ ...base, bond_length_in: 6 });
+  assert.equal(short.adequate, false);
+  assert.ok(short.margin_lb < 0);
+  assert.ok(short.length_for_required_in > 6);
+  // BOND LINE: the range is inclusive at both ends, and outside it the verdict
+  // distinguishes starved from too thick rather than just failing.
+  assert.equal(_v1663({ ...base, bond_line_in: 0.01 }).line_in_range, true);
+  assert.equal(_v1663({ ...base, bond_line_in: 0.04 }).line_in_range, true);
+  const thin = _v1663({ ...base, bond_line_in: 0.005 });
+  assert.equal(thin.line_in_range, false);
+  assert.ok(thin.line_verdict.includes("BELOW"));
+  const thick = _v1663({ ...base, bond_line_in: 0.06 });
+  assert.equal(thick.line_in_range, false);
+  assert.ok(thick.line_verdict.includes("ABOVE"));
+  // ERROR CONTRACT.
+  assert.ok(_v1663({ ...base, bond_length_in: 0 }).error);
+  assert.ok(_v1663({ ...base, bond_width_in: 0 }).error);
+  assert.ok(_v1663({ ...base, shear_strength_psi: 0 }).error);
+  assert.ok(_v1663({ ...base, bond_line_min_in: 0.05, bond_line_max_in: 0.01 }).error);
+  assert.ok(_v1663({ ...base, bond_length_in: NaN }).error);
+});
+
+
+test("bounds: spec-v1660 (cut into spray-booth-airflow) -- air changes, the bake cycle, and the filter-loading check", () => {
+  const base = { opening_width_ft: 24, opening_height_ft: 14, face_velocity_fpm: 100, indoor_temp_f: 70, outdoor_temp_f: 20, burner_efficiency: 1, hours_per_year: 0, price_per_therm: 0.90, booth_depth_ft: 10, measured_face_velocity_fpm: 65, bake_temp_f: 140, bake_minutes: 30, bakes_per_year: 2000 };
+  const r = _v1439(base);
+  // THE CUT SPEC'S FIGURES: 33,600 cfm through 3,360 cu ft is 600 air changes.
+  assert.ok(Math.abs(r.exhaust_cfm - 33600) < 1e-9);
+  assert.ok(Math.abs(r.booth_volume_cuft - 3360) < 1e-9);
+  assert.ok(Math.abs(r.air_changes_per_hour - 600) < 1e-9);
+  assert.ok(Math.abs(r.air_changes_per_hour - r.exhaust_cfm * 60 / r.booth_volume_cuft) < 1e-9);
+  // BAKE: 2.54 MMBTU/hr, 1.27 MMBTU over a 30 minute cycle, $11.43 a bake.
+  assert.ok(Math.abs(r.bake_btu_hr - 1.08 * 33600 * 70) < 1e-9);
+  assert.ok(Math.abs(r.bake_btu_per_cycle - r.bake_btu_hr / 2) < 1e-9);
+  assert.ok(Math.abs(r.bake_cost_per_cycle - 11.43) < 0.01);
+  assert.ok(Math.abs(r.bake_annual_cost - 22861) < 1);
+  // FILTER LOADING: 65 fpm against a 100 fpm design is 35% down and NOT compliant.
+  assert.ok(Math.abs(r.measured_cfm - 21840) < 1e-9);
+  assert.ok(Math.abs(r.velocity_shortfall_pct - 35) < 1e-9);
+  assert.equal(r.velocity_compliant, false);
+  // A booth measured AT its design velocity is compliant -- the boundary, and the
+  // assertion that fails if the comparison is ever written the wrong way round.
+  assert.equal(_v1439({ ...base, measured_face_velocity_fpm: 100 }).velocity_compliant, true);
+  assert.equal(_v1439({ ...base, measured_face_velocity_fpm: 110 }).velocity_compliant, true);
+  // ADDITIVE: with the new inputs at zero the tile's original answer is untouched.
+  const legacy = { opening_width_ft: 14, opening_height_ft: 9, face_velocity_fpm: 100, indoor_temp_f: 70, outdoor_temp_f: 20, burner_efficiency: 0.8, hours_per_year: 1000, price_per_therm: 1.2 };
+  const l = _v1439(legacy);
+  assert.ok(Math.abs(l.exhaust_cfm - 12600) < 1e-9);
+  assert.ok(Math.abs(l.heating_btu_hr - 680400) < 1e-9);
+  assert.equal(l.has_bake, false);
+  assert.equal(l.has_depth, false);
+  assert.ok(l.air_change_verdict.includes("no booth depth"));
+  // A bake temperature at or below the ambient is not a bake.
+  assert.ok(_v1439({ ...base, bake_temp_f: 70 }).error);
+});
+
+test("bounds: spec-v1662 (cut into coating-coverage-dft) -- reduction moves the wet-film target", () => {
+  const base = { vol_solids_pct: 45, dft_mils: 2.0, area_ft2: 100, loss_pct: 35, reduction_pct: 25, wet_reading_mils: 4.4444444 };
+  const r = _v69a(base);
+  // THE CUT SPEC'S FIGURES: 4.44 wet for 2.0 dry, and 25% reduction takes 45%
+  // solids to 36% and the wet target to 5.56.
+  assert.ok(Math.abs(r.wft_mils - 2.0 / 0.45) < 1e-9);
+  assert.ok(Math.abs(r.reduced_solids_pct - 36) < 1e-9);
+  assert.ok(Math.abs(r.reduced_wft_mils - 2.0 / 0.36) < 1e-9);
+  assert.ok(Math.abs(r.theoretical_cov_ft2_gal - 361) < 0.5);
+  // THE REVERSE, and the spec's real point: keep gauging to the OLD 4.44 reading
+  // after reducing and the film dries 20% under the specification.
+  assert.ok(Math.abs(r.wet_reading_dft_mils - 1.6) < 1e-6);
+  assert.ok(Math.abs(r.wet_reading_shortfall_pct - 20) < 0.01);
+  // ROUND TRIP: gauging to the REDUCED target lands exactly on the dry build.
+  const onTarget = _v69a({ ...base, wet_reading_mils: 2.0 / 0.36 });
+  assert.ok(Math.abs(onTarget.wet_reading_dft_mils - 2.0) < 1e-9);
+  assert.ok(Math.abs(onTarget.wet_reading_shortfall_pct) < 1e-9);
+  // OVER-build is reported as over, not as a negative shortfall in words.
+  const over = _v69a({ ...base, wet_reading_mils: 7.0 });
+  assert.ok(over.wet_reading_shortfall_pct < 0);
+  assert.ok(over.wet_reading_verdict.includes("OVER"));
+  // MONOTONIC: more reducer always means a thicker wet film for the same dry build.
+  assert.ok(_v69a({ ...base, reduction_pct: 50 }).reduced_wft_mils > r.reduced_wft_mils);
+  // ADDITIVE: no reduction leaves the reduced figures equal to the originals, and
+  // the tile's original four outputs are untouched.
+  const legacy = _v69a({ vol_solids_pct: 60, dft_mils: 5.0, area_ft2: 2000, loss_pct: 35 });
+  assert.ok(Math.abs(legacy.theoretical_cov_ft2_gal - 1604 * 0.6 / 5) < 1e-9);
+  assert.ok(Math.abs(legacy.wft_mils - 5 / 0.6) < 1e-9);
+  assert.ok(Math.abs(legacy.reduced_wft_mils - legacy.wft_mils) < 1e-12);
+  assert.ok(Math.abs(legacy.reduced_solids_pct - 60) < 1e-12);
+  assert.equal(legacy.has_reduction, false);
+  assert.ok(_v69a({ ...base, reduction_pct: -5 }).error);
+  assert.ok(_v69a({ ...base, wet_reading_mils: -1 }).error);
+});
+
+test("bounds: spec-v1661 (cut into layout-squaring) -- a tolerance verdict and the symmetry check", () => {
+  const base = { mode: "check-square", side_a: 1000, side_b: 1000, diag1: 1412, diag2: 1405, tolerance: 3, sym_left: 684, sym_right: 691 };
+  const r = _ce3(base);
+  // THE CUT SPEC'S FIGURES: 7 out against a 3 tolerance, and the same 7 on the
+  // paired symmetry measurement.
+  assert.ok(Math.abs(r.out_of_square - 7) < 1e-12);
+  assert.ok(Math.abs(r.symmetry_difference - 7) < 1e-12);
+  assert.equal(r.within_tolerance, false);
+  assert.equal(r.symmetry_within, false);
+  // THE BOUNDARY: a difference exactly AT the tolerance is within it.
+  assert.equal(_ce3({ ...base, diag1: 1408, tolerance: 3 }).within_tolerance, true);
+  assert.equal(_ce3({ ...base, diag1: 1409, tolerance: 3 }).within_tolerance, false);
+  // The verdict names the SHORT side rather than asserting which way the
+  // structure moved -- that depends on where the datum point sits.
+  assert.ok(r.symmetry_verdict.includes("left"));
+  assert.ok(r.symmetry_verdict.includes("depends on where the datum point sits"));
+  const mirrored = _ce3({ ...base, sym_left: 691, sym_right: 684 });
+  assert.ok(Math.abs(mirrored.symmetry_difference - 7) < 1e-12);
+  assert.ok(mirrored.symmetry_verdict.includes("right"));
+  // ADDITIVE: with no tolerance and no symmetry pair the original answer stands.
+  const legacy = _ce3({ mode: "check-square", side_a: 10, side_b: 12, diag1: 15.62, diag2: 15.60 });
+  assert.ok(Math.abs(legacy.out_of_square - 0.02) < 1e-9);
+  assert.equal(legacy.has_tolerance, false);
+  assert.equal(legacy.within_tolerance, null);
+  assert.ok(legacy.corner_to_draw_in.includes("diagonal-1"));
+  // find-diagonal mode is untouched by any of it.
+  const fd = _ce3({ mode: "find-diagonal", side_a: 3, side_b: 4 });
+  assert.ok(Math.abs(fd.ideal_diagonal - 5) < 1e-12);
+  assert.equal(fd.triple_c, 5);
+  assert.ok(_ce3({ ...base, tolerance: -1 }).error);
 });

@@ -1955,6 +1955,8 @@ export const RENDERER_MAP = {
   "control-cable-tension": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "propeller-track-balance": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "aviation-fuel-weight": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
+  "spray-transfer-efficiency": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
+  "adhesive-bond-area": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "stack-emission-pte": { module: "../../calc-airquality.js", exportName: "AIRQUALITY_RENDERERS" },
   "opacity-six-minute": { module: "../../calc-airquality.js", exportName: "AIRQUALITY_RENDERERS" },
   "baghouse-cleaning-interval": { module: "../../calc-airquality.js", exportName: "AIRQUALITY_RENDERERS" },

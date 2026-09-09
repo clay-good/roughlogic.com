@@ -1145,6 +1145,9 @@ export const TOOL_MODULES = (() => {
   ]);
   // v4 Group K: Mechanic - Auto, Marine, Aviation.
   declare("./calc-mechanic.js", "MECHANIC_RENDERERS", [
+    // spec-v1659, v1663: the auto body paint and panel-bonding band.
+    "spray-transfer-efficiency", "adhesive-bond-area",
+
     // spec-v1640..v1647: the marine and aviation band.
     "metacentric-height", "marine-shaft-diameter", "house-battery-alternator",
     "travel-lift-sling-placement", "dock-piling-lateral", "control-cable-tension",

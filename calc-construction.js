@@ -3954,8 +3954,8 @@ CONSTRUCTION_RENDERERS["metal-weight"] = renderMetalWeight;
 // largest whole 3-4-5 multiple that fits the sides. check-square: compare the
 // two measured diagonals; out_of_square = |d1 - d2|; the longer diagonal marks
 // the corner to draw in. Triangle inequality flags an impossible measurement.
-// dims: in { side_a: L, side_b: L, diag1: L, diag2: L } out: { ideal_diagonal: L, out_of_square: L, triple_a: L, triple_b: L, triple_c: L }
-export function computeLayoutSquaring({ mode, side_a, side_b, diag1, diag2 } = {}) {
+// dims: in { side_a: L, side_b: L, diag1: L, diag2: L, tolerance: L, sym_left: L, sym_right: L } out: { ideal_diagonal: L, out_of_square: L, triple_a: L, triple_b: L, triple_c: L, symmetry_difference: L }
+export function computeLayoutSquaring({ mode, side_a, side_b, diag1, diag2, tolerance = 0, sym_left = 0, sym_right = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const a = Number(side_a) || 0;
   const b = Number(side_b) || 0;
@@ -3971,6 +3971,33 @@ export function computeLayoutSquaring({ mode, side_a, side_b, diag1, diag2 } = {
     if (d1 > a + b || d2 > a + b) return { error: "A measured diagonal exceeds side a + side b (impossible for a quadrilateral with these sides)." };
     const out_of_square = Math.abs(d1 - d2);
     const corner = d1 === d2 ? "square (diagonals equal)" : (d1 > d2 ? "shorten toward the diagonal-1 corner" : "shorten toward the diagonal-2 corner");
+    // spec-v1661 (cut into this tile): a stated tolerance turns the difference into
+    // a verdict, and a paired left/right measurement from a centreline is the second
+    // check that finds the same lateral movement from the other direction. Both are
+    // optional; zero leaves every figure above untouched.
+    const tol = Number(tolerance) || 0;
+    if (tol < 0) return { error: "Tolerance cannot be negative (0 to skip the verdict)." };
+    const has_tolerance = tol > 0;
+    const within_tolerance = has_tolerance ? out_of_square <= tol : null;
+    const tolerance_verdict = !has_tolerance
+      ? "(no tolerance entered)"
+      : within_tolerance
+        ? fmt(out_of_square, 3) + " out against a " + fmt(tol, 3) + " tolerance -- WITHIN tolerance"
+        : fmt(out_of_square, 3) + " out against a " + fmt(tol, 3) + " tolerance -- OUT OF TOLERANCE. Unequal diagonals mean the shape is a parallelogram rather than a rectangle, and on a vehicle structure that is diamond damage: the short diagonal names the corner that has moved";
+    const l = Number(sym_left) || 0;
+    const r = Number(sym_right) || 0;
+    if (l < 0 || r < 0) return { error: "Symmetry measurements cannot be negative (0 to skip)." };
+    const has_symmetry = l > 0 && r > 0;
+    const symmetry_difference = has_symmetry ? Math.abs(l - r) : 0;
+    const symmetry_within = has_symmetry && has_tolerance ? symmetry_difference <= tol : null;
+    const symmetry_verdict = !has_symmetry
+      ? "(no paired left and right measurements entered)"
+      : symmetry_difference === 0
+        ? "the paired measurements match at " + fmt(l, 3) + ", so the two sides are equidistant from the centreline"
+        : "left " + fmt(l, 3) + " against right " + fmt(r, 3) + " is " + fmt(symmetry_difference, 3)
+          + " apart, and the SHORT side is the " + (l < r ? "left" : "right")
+          + " -- which side that means has moved depends on where the datum point sits, so read it against the dimension chart"
+          + (has_tolerance ? (symmetry_within ? "; within the " + fmt(tol, 3) + " tolerance" : "; OUT of the " + fmt(tol, 3) + " tolerance") : "");
     return {
       mode: "check-square",
       ideal_diagonal: Number.isFinite(ideal) ? ideal : null,
@@ -3978,7 +4005,9 @@ export function computeLayoutSquaring({ mode, side_a, side_b, diag1, diag2 } = {
       diag1_diff_from_ideal: Number.isFinite(d1 - ideal) ? d1 - ideal : null,
       diag2_diff_from_ideal: Number.isFinite(d2 - ideal) ? d2 - ideal : null,
       corner_to_draw_in: corner,
-      note: "A layout aid, not a substitute for a transit or string-line. Equal diagonals indicate a square (rectangular) layout.",
+      has_tolerance, within_tolerance, tolerance_verdict,
+      has_symmetry, symmetry_difference, symmetry_within, symmetry_verdict,
+      note: "A layout aid, not a substitute for a transit or string-line. Equal diagonals indicate a square (rectangular) layout. Enter a tolerance and the difference becomes a verdict rather than a number, which is how the same check is used on a collision-damaged vehicle structure: a unibody bay whose diagonals differ by more than the maker's few-millimetre tolerance has diamond damage, and the driver experiences it as a pull, uneven tyre wear, or an inability to align the wheels within specification. The paired left/right measurement from a centreline finds the same lateral movement from the other direction and localizes it. What NEITHER check finds is sag, mash, or twist -- vertical and longitudinal collapse, and damage that is symmetric about the centreline, all of which need three-dimensional measurement against the datum plane rather than a tape. On a vehicle the dimensions, datum planes, measuring points, and tolerances come from the manufacturer's body dimension chart or the measuring system's database; generic tolerances are not usable, and whether the damage is repairable at all depends on the maker's procedures and the materials involved, since many high-strength steels, aluminium, and composites may not be straightened.",
     };
   }
   // find-diagonal (default)
@@ -3998,7 +4027,7 @@ export function computeLayoutSquaring({ mode, side_a, side_b, diag1, diag2 } = {
 export const layoutSquaringExample = { inputs: { mode: "find-diagonal", side_a: 3, side_b: 4 } };
 
 function renderLayoutSquaring(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: The Pythagorean 3-4-5 right-angle layout method (public) and the standard foundation and deck squaring technique. A layout aid, not a substitute for a transit or string-line.";
+  citationEl.textContent = "Citation: The Pythagorean 3-4-5 right-angle layout method (public) and the standard foundation and deck squaring technique; equal diagonals mean a rectangle, and a paired left/right measurement from a centreline is the same lateral check from the other direction. A layout aid, not a substitute for a transit or string-line. On a collision-damaged vehicle structure the dimensions, datum planes, measuring points, and tolerances come from the manufacturer\u0027s body dimension chart, generic tolerances are not usable, and neither check finds sag, mash, or twist. The manufacturer\u0027s body repair manual governs.";
   const mode = makeSelect("Mode", "lsq-mode", [
     { value: "find-diagonal", label: "Find diagonal" }, { value: "check-square", label: "Check square" },
   ]);
@@ -4012,15 +4041,20 @@ function renderLayoutSquaring(inputRegion, outputRegion, citationEl) {
   const oTriple = makeOutputLine(outputRegion, "3-4-5 marks", "lsq-out-triple");
   const oOut = makeOutputLine(outputRegion, "Out of square", "lsq-out-oos");
   const oCorner = makeOutputLine(outputRegion, "Adjustment", "lsq-out-corner");
-  let d1, d2;
+  const oTol = makeOutputLine(outputRegion, "Against the tolerance", "lsq-out-tol");
+  const oSym = makeOutputLine(outputRegion, "Left/right symmetry", "lsq-out-sym");
+  let d1, d2, tol, symL, symR;
   function readNum(i) { if (!i || i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   function refreshDiag() {
     while (diagHost.firstChild) diagHost.removeChild(diagHost.firstChild);
-    d1 = null; d2 = null;
+    d1 = null; d2 = null; tol = null; symL = null; symR = null;
     if (mode.select.value === "check-square") {
       d1 = makeNumber("Measured diagonal 1", "lsq-d1", { step: "any", min: "0" });
       d2 = makeNumber("Measured diagonal 2", "lsq-d2", { step: "any", min: "0" });
-      for (const f of [d1, d2]) { diagHost.appendChild(f.wrap); f.input.addEventListener("input", update); }
+      tol = makeNumber("Tolerance (0 to skip the verdict)", "lsq-tol", { step: "any", min: "0" });
+      symL = makeNumber("Left symmetry measurement (0 to skip)", "lsq-syml", { step: "any", min: "0" });
+      symR = makeNumber("Right symmetry measurement (0 to skip)", "lsq-symr", { step: "any", min: "0" });
+      for (const f of [d1, d2, tol, symL, symR]) { diagHost.appendChild(f.wrap); f.input.addEventListener("input", update); }
     }
   }
   function update() {
@@ -4030,17 +4064,24 @@ function renderLayoutSquaring(inputRegion, outputRegion, citationEl) {
       side_b: readNum(b.input),
       diag1: d1 ? readNum(d1.input) : 0,
       diag2: d2 ? readNum(d2.input) : 0,
+      tolerance: tol ? readNum(tol.input) : 0,
+      sym_left: symL ? readNum(symL.input) : 0,
+      sym_right: symR ? readNum(symR.input) : 0,
     });
-    if (r.error) { oIdeal.textContent = r.error; oTriple.textContent = ""; oOut.textContent = ""; oCorner.textContent = ""; return; }
+    if (r.error) { oIdeal.textContent = r.error; oTriple.textContent = ""; oOut.textContent = ""; oCorner.textContent = ""; oTol.textContent = ""; oSym.textContent = ""; return; }
     oIdeal.textContent = fmt(r.ideal_diagonal, 4);
     if (r.mode === "find-diagonal") {
       oTriple.textContent = fmt(r.triple_a, 2) + " by " + fmt(r.triple_b, 2) + " -> diagonal " + fmt(r.triple_c, 2) + " (n = " + String(r.triple_multiple) + ")";
       oOut.textContent = "(check-square mode reports out-of-square)";
       oCorner.textContent = "";
+      oTol.textContent = "(check-square mode reports the tolerance verdict)";
+      oSym.textContent = "(check-square mode reports the symmetry check)";
     } else {
       oTriple.textContent = "(find-diagonal mode reports 3-4-5 marks)";
       oOut.textContent = fmt(r.out_of_square, 4);
       oCorner.textContent = r.corner_to_draw_in;
+      oTol.textContent = r.tolerance_verdict;
+      oSym.textContent = r.symmetry_verdict;
     }
   }
   mode.select.addEventListener("input", () => { refreshDiag(); update(); });
@@ -4178,10 +4219,10 @@ CONSTRUCTION_RENDERERS["fillet-weld-strength"] = _v27renderFilletWeldStrength;
 // theoretical = 1604 x (vol_solids/100) / dft; practical = theoretical x
 // (1 - loss/100); gallons = area / practical; wft = dft / (vol_solids/100).
 // 1604 ft^2-mil per gallon at 100% solids is the exact conversion.
-// dims: in { vol_solids_pct: dimensionless, dft_mils: L, area_ft2: L^2, loss_pct: dimensionless } out: { theoretical_cov_ft2_gal: L^-1, practical_cov_ft2_gal: L^-1, gallons: L^3, wft_mils: L }
+// dims: in { vol_solids_pct: dimensionless, dft_mils: L, area_ft2: L^2, loss_pct: dimensionless, reduction_pct: dimensionless, wet_reading_mils: L } out: { theoretical_cov_ft2_gal: L^-1, practical_cov_ft2_gal: L^-1, gallons: L^3, wft_mils: L, reduced_solids_pct: dimensionless, reduced_wft_mils: L, reduced_theoretical_cov_ft2_gal: L^-1, wet_reading_dft_mils: L, wet_reading_shortfall_pct: dimensionless }
 // (Volume-solids and loss are dimensionless percents; the DFT and WFT are
 //  lengths L (mils); the coverage is area-per-volume L^-1 and the gallons L^3.)
-export function computeCoatingCoverageDft({ vol_solids_pct, dft_mils, area_ft2, loss_pct = 35 } = {}) {
+export function computeCoatingCoverageDft({ vol_solids_pct, dft_mils, area_ft2, loss_pct = 35, reduction_pct = 0, wet_reading_mils = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const solids = Number(vol_solids_pct);
   const dft = Number(dft_mils);
@@ -4195,38 +4236,82 @@ export function computeCoatingCoverageDft({ vol_solids_pct, dft_mils, area_ft2, 
   const practicalCov = theoreticalCov * (1 - loss / 100);
   const gallons = area / practicalCov;
   const wftMils = dft / (solids / 100);
-  if (![theoreticalCov, practicalCov, gallons, wftMils].every(Number.isFinite)) return { error: "Coverage math is not a finite value." };
+  // spec-v1662 (cut into this tile): thinning dilutes the solids, so it moves the
+  // wet-film target the painter is gauging to. Additive -- 0 reduction and no wet
+  // reading leave every figure above untouched.
+  const reduction = Number(reduction_pct);
+  const wetReading = Number(wet_reading_mils);
+  if (!Number.isFinite(reduction) || reduction < 0) return { error: "Reduction must be zero or a positive percent." };
+  if (!Number.isFinite(wetReading) || wetReading < 0) return { error: "The wet-film reading cannot be negative (0 to skip)." };
+  const reducedSolids = solids / (1 + reduction / 100);
+  const reducedWft = dft / (reducedSolids / 100);
+  const reducedTheoreticalCov = 1604 * (reducedSolids / 100) / dft;
+  const hasReduction = reduction > 0;
+  const reductionVerdict = !hasReduction
+    ? "no reduction entered, so the wet-film target is the " + fmt(wftMils, 2) + " mils above"
+    : "reducing " + fmt(reduction, 0) + "% takes " + fmt(solids, 1) + "% solids to " + fmt(reducedSolids, 1)
+      + "%, so the wet film for the same " + fmt(dft, 2) + " mil dry build rises from " + fmt(wftMils, 2)
+      + " to " + fmt(reducedWft, 2) + " mils -- a shop that adds reducer and keeps gauging to the old reading is under-building";
+  // The reverse question a wet-film gauge actually asks.
+  const hasWetReading = wetReading > 0;
+  const wetReadingDft = hasWetReading ? wetReading * (reducedSolids / 100) : 0;
+  const wetReadingShortfallPct = hasWetReading ? (1 - wetReadingDft / dft) * 100 : 0;
+  const wetReadingVerdict = !hasWetReading
+    ? "(no wet-film reading entered)"
+    : Math.abs(wetReadingShortfallPct) < 0.05
+      ? fmt(wetReading, 2) + " mils wet lands on the " + fmt(dft, 2) + " mil target"
+      : wetReadingShortfallPct > 0
+        ? fmt(wetReading, 2) + " mils wet at " + fmt(reducedSolids, 1) + "% solids dries to " + fmt(wetReadingDft, 2)
+          + " mils -- " + fmt(wetReadingShortfallPct, 0) + "% UNDER the " + fmt(dft, 2) + " mil target"
+        : fmt(wetReading, 2) + " mils wet at " + fmt(reducedSolids, 1) + "% solids dries to " + fmt(wetReadingDft, 2)
+          + " mils -- " + fmt(-wetReadingShortfallPct, 0) + "% OVER the " + fmt(dft, 2) + " mil target";
+  if (![theoreticalCov, practicalCov, gallons, wftMils, reducedSolids, reducedWft, wetReadingDft].every(Number.isFinite)) return { error: "Coverage math is not a finite value." };
   return {
     theoretical_cov_ft2_gal: theoreticalCov,
     practical_cov_ft2_gal: practicalCov,
     gallons,
     wft_mils: wftMils,
-    note: "1604 is the exact conversion (a gallon spread one mil thick covers 1604 ft^2 at 100% solids). The product data sheet's volume-solids is the governing number and thinning lowers it. The loss factor is the honest difference between theory and the job; 35% spray loss is a default, not a promise. DFT is verified with a gauge per SSPC / AMPP PA 2, not assumed from the WFT. Multiple coats and touch-up are not in this single-coat number.",
+    reduced_solids_pct: reducedSolids,
+    reduced_wft_mils: reducedWft,
+    reduced_theoretical_cov_ft2_gal: reducedTheoreticalCov,
+    has_reduction: hasReduction,
+    reduction_verdict: reductionVerdict,
+    has_wet_reading: hasWetReading,
+    wet_reading_dft_mils: wetReadingDft,
+    wet_reading_shortfall_pct: wetReadingShortfallPct,
+    wet_reading_verdict: wetReadingVerdict,
+    note: "1604 is the exact conversion (a gallon spread one mil thick covers 1604 ft^2 at 100% solids). The product data sheet's volume-solids is the governing number and thinning lowers it -- REDUCTION is the term that is easiest to lose track of, because it moves the wet-film target without moving the specification. Thinning 25% takes 45% solids to 36%, and the wet film for a 2.0 mil dry build rises from 4.44 to 5.56 mils; a shop that adds reducer for a hot day and keeps spraying to the old gauge reading is 20% under build, which on a clearcoat is UV protection the customer paid for and is not getting. The reverse is reported too: a wet reading times the reduced solids is the dry build it will leave. Under-build gives poor hiding, reduced durability, and insufficient UV protection; over-build gives solvent entrapment, sags, extended cure, and on some coatings cracking -- which is why manufacturers specify a range rather than a number, and why the wet gauge is used while the coating is still wet enough to fix. The loss factor is the honest difference between theory and the job; 35% spray loss is a default, not a promise. DFT is verified with a gauge per SSPC / AMPP PA 2, not assumed from the WFT. Multiple coats and touch-up are not in this single-coat number.",
   };
 }
 
 function _v69renderCoatingCoverageDft(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: SSPC / AMPP PA 2 (dry-film thickness) and the 1604 ft^2-mil/gal coverage constant by name. theoretical = 1604 x volume-solids / DFT; practical applies the loss factor; WFT = DFT / volume-solids. The product data sheet governs.";
+  citationEl.textContent = "Citation: SSPC / AMPP PA 2 (dry-film thickness) and the 1604 ft^2-mil/gal coverage constant by name. theoretical = 1604 x volume-solids / DFT; practical applies the loss factor; WFT = DFT / volume-solids, and reduction dilutes the solids as solids / (1 + reduction), which raises the wet-film target for the same dry build. The product data sheet governs.";
   const solids = makeNumber("Volume solids (%, from the data sheet)", "cc-solids", { step: "any", min: "0" });
   const dft = makeNumber("Target dry-film thickness (mils)", "cc-dft", { step: "any", min: "0" });
   const area = makeNumber("Area to coat (ft²)", "cc-area", { step: "any", min: "0" });
   const loss = makeNumber("Application loss (%, spray ~35)", "cc-loss", { step: "any", min: "0", value: "35" });
   loss.input.value = "35";
-  for (const f of [solids, dft, area, loss]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { solids.input.value = "60"; dft.input.value = "5.0"; area.input.value = "2000"; loss.input.value = "35"; update(); });
+  const reduction = makeNumber("Reduction (%, 0 for unreduced)", "cc-red", { step: "any", min: "0", value: "0" });
+  const wetReading = makeNumber("Wet-film gauge reading (mils, 0 to skip)", "cc-wet", { step: "any", min: "0", value: "0" });
+  for (const f of [solids, dft, area, loss, reduction, wetReading]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { solids.input.value = "60"; dft.input.value = "5.0"; area.input.value = "2000"; loss.input.value = "35"; reduction.input.value = "0"; wetReading.input.value = "0"; update(); });
   const oTheo = makeOutputLine(outputRegion, "Theoretical coverage", "cc-out-theo");
   const oPrac = makeOutputLine(outputRegion, "Practical coverage (after loss)", "cc-out-prac");
   const oGal = makeOutputLine(outputRegion, "Gallons required", "cc-out-gal");
   const oWft = makeOutputLine(outputRegion, "Wet-film thickness to read", "cc-out-wft");
+  const oRed = makeOutputLine(outputRegion, "After reduction", "cc-out-red");
+  const oWet = makeOutputLine(outputRegion, "Dry build from the gauge reading", "cc-out-wet");
   const update = debounce(() => {
-    const r = computeCoatingCoverageDft({ vol_solids_pct: Number(solids.input.value) || 0, dft_mils: Number(dft.input.value) || 0, area_ft2: Number(area.input.value) || 0, loss_pct: loss.input.value === "" ? 35 : Number(loss.input.value) });
-    if (r.error) { oTheo.textContent = r.error; for (const o of [oPrac, oGal, oWft]) o.textContent = "-"; return; }
+    const r = computeCoatingCoverageDft({ vol_solids_pct: Number(solids.input.value) || 0, dft_mils: Number(dft.input.value) || 0, area_ft2: Number(area.input.value) || 0, loss_pct: loss.input.value === "" ? 35 : Number(loss.input.value), reduction_pct: Number(reduction.input.value) || 0, wet_reading_mils: Number(wetReading.input.value) || 0 });
+    if (r.error) { oTheo.textContent = r.error; for (const o of [oPrac, oGal, oWft, oRed, oWet]) o.textContent = "-"; return; }
     oTheo.textContent = fmt(r.theoretical_cov_ft2_gal, 1) + " ft^2/gal";
     oPrac.textContent = fmt(r.practical_cov_ft2_gal, 1) + " ft^2/gal";
     oGal.textContent = fmt(r.gallons, 1) + " gal";
     oWft.textContent = fmt(r.wft_mils, 2) + " mils";
+    oRed.textContent = r.reduction_verdict;
+    oWet.textContent = r.wet_reading_verdict;
   }, DEBOUNCE_MS);
-  for (const f of [solids, dft, area, loss]) f.input.addEventListener("input", update);
+  for (const f of [solids, dft, area, loss, reduction, wetReading]) f.input.addEventListener("input", update);
 }
 CONSTRUCTION_RENDERERS["coating-coverage-dft"] = _v69renderCoatingCoverageDft;
 

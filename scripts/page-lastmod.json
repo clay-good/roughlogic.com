@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "f628c6aea666cc08",
+      "sha": "112a800cfdbf5be2",
       "date": "2026-09-09"
     },
     "/tools/": {
-      "sha": "5a504655478b7598",
+      "sha": "65a577302fd38f5b",
       "date": "2026-09-09"
     },
     "/groups/accounting/": {
-      "sha": "55bf765c66ff317b",
+      "sha": "6810a42d05612efc",
       "date": "2026-09-09"
     },
     "/groups/agriculture/": {
-      "sha": "d659f8e4a4ff8977",
+      "sha": "83f136bc0db1585c",
       "date": "2026-09-09"
     },
     "/groups/construction/": {
-      "sha": "92835bebb2941095",
+      "sha": "9b7e3625a47b8402",
       "date": "2026-09-09"
     },
     "/groups/cross-trade/": {
-      "sha": "4787e4c31810eeaf",
+      "sha": "b22fd44b5edd0790",
       "date": "2026-09-09"
     },
     "/groups/educators/": {
-      "sha": "f4b77a78dc5350c5",
+      "sha": "5d0cf5ac91726254",
       "date": "2026-09-09"
     },
     "/groups/electrical/": {
-      "sha": "479180cada724a3c",
+      "sha": "21ac71199b3a9896",
       "date": "2026-09-09"
     },
     "/groups/field/": {
-      "sha": "501be9be7167b8ef",
+      "sha": "63dcb69652ca40e0",
       "date": "2026-09-09"
     },
     "/groups/fire-ground/": {
-      "sha": "839cd3b2d9ee8d52",
+      "sha": "a407bbea94333205",
       "date": "2026-09-09"
     },
     "/groups/historical/": {
-      "sha": "f36a3a3c6140522a",
+      "sha": "a96d131052ebdbd0",
       "date": "2026-09-09"
     },
     "/groups/hvac/": {
-      "sha": "6b2365451cd5e727",
+      "sha": "d75fc2329eb7b4a5",
       "date": "2026-09-09"
     },
     "/groups/kitchen/": {
-      "sha": "24d214e17ab318ce",
+      "sha": "caaf5d0efd470b8f",
       "date": "2026-09-09"
     },
     "/groups/lab/": {
-      "sha": "48ab073e808b3921",
+      "sha": "6a7a6f1ed06b1c45",
       "date": "2026-09-09"
     },
     "/groups/mechanic/": {
-      "sha": "ada8c24969b86b79",
+      "sha": "93162eaf03259350",
       "date": "2026-09-09"
     },
     "/groups/plumbing/": {
-      "sha": "e2f6eb90e1b0d1c7",
+      "sha": "fdb40c787eb49905",
       "date": "2026-09-09"
     },
     "/groups/real-estate/": {
-      "sha": "2462458fe4ce81bc",
+      "sha": "cac6192493279c68",
       "date": "2026-09-09"
     },
     "/groups/references/": {
-      "sha": "c717947d65e7fadc",
+      "sha": "21e5f3ad3325ff81",
       "date": "2026-09-09"
     },
     "/groups/restoration/": {
-      "sha": "b66160164c6ed48a",
+      "sha": "42b183a030a5ca29",
       "date": "2026-09-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "9599d7a1a0283efe",
+      "sha": "4e792ed1d6a4718a",
       "date": "2026-09-09"
     },
     "/groups/stage/": {
-      "sha": "efbc44568793dae0",
+      "sha": "e80af36ea1036839",
       "date": "2026-09-09"
     },
     "/groups/trucking/": {
-      "sha": "247a0c89ad9cb2fa",
+      "sha": "3e3cc6806046c29b",
       "date": "2026-09-09"
     },
     "/groups/water/": {
-      "sha": "9ab0875ceedd2959",
+      "sha": "f63712550d3c75ac",
       "date": "2026-09-09"
     },
     "/tools/aav-install-check/": {
@@ -160,6 +160,10 @@
     "/tools/ada-stair-check/": {
       "sha": "ea38de6a18a66dbb",
       "date": "2026-09-01"
+    },
+    "/tools/adhesive-bond-area/": {
+      "sha": "c722a0c02493e32f",
+      "date": "2026-09-09"
     },
     "/tools/adpi-diffuser-selection/": {
       "sha": "be64e5f8b10f24a8",
@@ -2794,8 +2798,8 @@
       "date": "2026-09-04"
     },
     "/tools/flange-coupling-torque/": {
-      "sha": "36fec6cd0b4e130d",
-      "date": "2026-09-08"
+      "sha": "1b93fe3cb80d4626",
+      "date": "2026-09-09"
     },
     "/tools/flange-rating/": {
       "sha": "88acc37148671383",
@@ -6734,8 +6738,8 @@
       "date": "2026-09-08"
     },
     "/tools/spindle-max-mrr/": {
-      "sha": "4dca36ce908556b9",
-      "date": "2026-09-01"
+      "sha": "62192b9e2630676a",
+      "date": "2026-09-09"
     },
     "/tools/spindle-power-torque/": {
       "sha": "ef40d52c16f11075",
@@ -6780,6 +6784,10 @@
     "/tools/spray-tip-selection/": {
       "sha": "7e6976308cf831f7",
       "date": "2026-09-01"
+    },
+    "/tools/spray-transfer-efficiency/": {
+      "sha": "39803da5c9c4666b",
+      "date": "2026-09-09"
     },
     "/tools/sprayer-calibration/": {
       "sha": "227a1e4b59e9bbd1",

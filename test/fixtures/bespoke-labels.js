@@ -166,7 +166,7 @@ export const BESPOKE_LABELS = {
   "closing-costs": {"purchase_price":"Purchase price ($)","loan_amount":"Loan amount ($)","transfer_tax_rate_pct":"State/local transfer tax rate (percent of price)","note_rate_pct":"Note rate (percent; for prepaid interest)"},
   "co-air-free": {"measured_co_ppm":"Measured CO (ppm)","measured_o2_pct":"Flue-gas O2 at the same point (%)"},
   "coagulant-dose": {"flow_mgd":"Flow (MGD)","jar_test_dose_mg_l":"Jar-test optimal dose (mg/L)","product":"Product"},
-  "coating-coverage-dft": {"vol_solids_pct":"Volume solids (%, from the data sheet)","dft_mils":"Target dry-film thickness (mils)","area_ft2":"Area to coat (ft²)","loss_pct":"Application loss (%, spray ~35)"},
+  "coating-coverage-dft": {"vol_solids_pct":"Volume solids (%, from the data sheet)","dft_mils":"Target dry-film thickness (mils)","area_ft2":"Area to coat (ft²)","loss_pct":"Application loss (%, spray ~35)","reduction_pct":"Reduction (%, 0 for unreduced)","wet_reading_mils":"Wet-film gauge reading (mils, 0 to skip)"},
   "coax-rg-loss": {"mode":"Mode","loss_per_100ft_db":"Loss per 100 ft (dB)","length_ft":"Run length (ft)","source_level":"Source level (dBmV/dBm, optional)","target_level":"Target level (max-run mode)"},
   "codon-table": {"sequence":"Sequence (in-frame)","sequence_type":"Sequence type"},
   "cogo-forward-point": {"start_n":"Start northing N (ft)","start_e":"Start easting E (ft)","azimuth_deg":"Azimuth (deg, clockwise from north)","distance_ft":"Distance (ft)"},

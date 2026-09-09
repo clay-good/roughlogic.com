@@ -1646,7 +1646,7 @@ cross-check.
 | calc-construction.js | `computeChipSealMcleod` | `{ median_size_in = 0, flakiness_index_pct = 0, loose_unit_weight_pcf = 0, bul...` | _ | _ | _ |
 | calc-construction.js | `computeCmuGroutVolume` | `{ wall_len_ft = 0, wall_ht_ft = 0, core_spacing_in = 0, core_area_in2 = 24, b...` | _ | _ | _ |
 | calc-construction.js | `computeCoAlarmPlacement` | `{ sleeping_areas = 1, bedrooms_with_appliance = 0, has_fuel_appliance = "yes"...` | _ | _ | _ |
-| calc-construction.js | `computeCoatingCoverageDft` | `{ vol_solids_pct, dft_mils, area_ft2, loss_pct = 35 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeCoatingCoverageDft` | `{ vol_solids_pct, dft_mils, area_ft2, loss_pct = 35, reduction_pct = 0, wet_r...` | _ | _ | _ |
 | calc-construction.js | `computeColumnBucklingWood` | `{ b_in = 0, d_in = 0, le_in = 0, fc_star_psi = 0, emin_psi = 0, ke = 1 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeCombinedStressAxialBending` | `{ P_lb = 0, M_lbin = 0, A_in2 = 0, c_in = 0, I_in4 = 0, e_in = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeConcreteEvaporationRate` | `{ air_temp_f = 70, concrete_temp_f = null, rh_pct = 50, wind_mph = 0 } = {}` | _ | _ | _ |
@@ -1726,7 +1726,7 @@ cross-check.
 | calc-construction.js | `computeKneeToeClearance` | `{ apron_height_in = 0, knee_depth_at_9_in = 0, knee_depth_at_27_in = 0, toe_d...` | _ | _ | _ |
 | calc-construction.js | `computeLandingCheck` | `{ landing_depth_in = 0, landing_width_in = 0, flight_width_in = 36, threshold...` | _ | _ | _ |
 | calc-construction.js | `computeLavatoryTubClearance` | `{ rim_height_in = 0, counter_height_in = 0, metering_seconds = 0, tub_length_...` | _ | _ | _ |
-| calc-construction.js | `computeLayoutSquaring` | `{ mode, side_a, side_b, diag1, diag2 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeLayoutSquaring` | `{ mode, side_a, side_b, diag1, diag2, tolerance = 0, sym_left = 0, sym_right ...` | _ | _ | _ |
 | calc-construction.js | `computeLumberSpan` | `{ species_grade, nominal_size, total_load_psf, tributary_width_in = 16, defle...` | _ | _ | _ |
 | calc-construction.js | `computeMasonryControlJointLayout` | `{ wall_length_ft = 80, wall_height_ft = 16, max_spacing_cap_ft = 25 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeMasonryCount` | `{ wall_area_ft2, unit_type, mortar_joint_in = 0.375, waste_factor = 0.05 }` | _ | _ | _ |
@@ -2794,6 +2794,7 @@ cross-check.
 | calc-masonry.js | `computeMasonryWallWeight` | `{ hollow_psf = 0, grout_adder = 0, cell_spacing = 8, grout_spacing = 0, heigh...` | _ | _ | _ |
 | calc-masonry.js | `computeMortarBatchC270` | `{ cement_volumes = 1, lime_volumes = 0.5, sand_ratio = 2.5, cement_bags = 1, ...` | _ | _ | _ |
 | calc-mechanic.js | `computeAbycDcWire` | `{ current_a = 0, run_length_ft = 0, system_voltage_v = 0, drop_pct = 3 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeAdhesiveBondArea` | `{ bond_length_in = 0, bond_width_in = 0, shear_strength_psi = 0, required_loa...` | _ | _ | _ |
 | calc-mechanic.js | `computeAerodynamicDragForce` | `{ speed_mph = 0, frontal_area_ft2 = 0, drag_coefficient = 0, air_density_lb_f...` | _ | _ | _ |
 | calc-mechanic.js | `computeAircraftWeightBalance` | `{ empty_weight_lb = 0, empty_arm_in = 0, front_weight_lb = 0, front_arm_in = ...` | _ | _ | _ |
 | calc-mechanic.js | `computeAlternatorChargingLoad` | `{ total_load_a = 0, alternator_a = 0, idle_frac = 0.5, cruise_frac = 0.9 } = {}` | _ | _ | _ |
@@ -2864,6 +2865,7 @@ cross-check.
 | calc-mechanic.js | `computeScrewConveyor` | `{ screw_diameter_in = 0, shaft_diameter_in = 0, pitch_in = 0, rpm = 0, loadin...` | _ | _ | _ |
 | calc-mechanic.js | `computeScrewConveyorRpm` | `{ target_ft3_hr = 0, screw_diameter_in = 0, shaft_diameter_in = 0, pitch_in =...` | _ | _ | _ |
 | calc-mechanic.js | `computeSliderCrankPistonPosition` | `{ stroke_in = 0, rod_length_in = 0, crank_angle_deg = 0 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeSprayTransferEfficiency` | `{ applied_material_qt = 0, transfer_efficiency = 0, alt_transfer_efficiency =...` | _ | _ | _ |
 | calc-mechanic.js | `computeSpringNaturalFrequency` | `{ wire_diameter_in = 0, mean_coil_diameter_in = 0, active_coils = 0, material...` | _ | _ | _ |
 | calc-mechanic.js | `computeSpringWireStress` | `{ wire_diameter_in = 0, mean_coil_diameter_in = 0, force_lb = 0, total_coils ...` | _ | _ | _ |
 | calc-mechanic.js | `computeTerminalVelocity` | `{ weight_lb = 0, frontal_area_ft2 = 0, drag_coefficient = 0, air_density_lb_f...` | _ | _ | _ |
@@ -3737,7 +3739,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2323.
+Row count: 2325.
 
 <!-- END function-corpus-v14 -->
 
@@ -4543,7 +4545,7 @@ per spec-v14 §13.1 second paragraph.
 | `cmu-wall-axial` | Reinforced CMU Wall Axial Compression (TMS 402 ASD) | TMS 402-16 (ACI 530 / ASCE 5) via Mas...; spec-v271 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cmu-wall-flexure` | Reinforced CMU Wall Out-of-Plane Flexure (TMS 402 ASD) | TMS 402-16 (ACI 530 / ASCE 5) via Mas...; spec-v269 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `co-alarm-placement` | Carbon Monoxide Alarm Requirement and Count (IRC R315) | International Code Council; 'An approved carbon monoxide alarm shall be installed out... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `coating-coverage-dft` | Coating Coverage from Volume-Solids and DFT | SSPC / AMPP PA 2; 60% volume-solids, 5.0 mil DFT, 2,000 ft^2, 35% loss -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `coating-coverage-dft` | Coating Coverage from Volume-Solids and DFT | SSPC / AMPP PA 2; 60% volume-solids, 5.0 mil DFT, 2,000 ft^2, 35% loss -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `coefficient-of-consolidation` | Coefficient of Consolidation cv from Oedometer Curve | Das, Principles of Geotechnical Engin...; cv = T50 Hdr^2/t50 = 0.197 x (0.5)^2 / 5 = 0.197 x 0.25 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cohesive-earth-pressure` | Rankine Active Earth Pressure on a Cohesive (Clay) Backfill | Rankine c-phi active earth pressure /...; Ka = (1 - sin 20)/(1 + sin 20) = 0.490291, sqrt(Ka) = 0.7... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `coil-length` | Coil / Roll Stock Length | coil / roll stock annulus identity; spec-v802 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4730,7 +4732,7 @@ per spec-v14 §13.1 second paragraph.
 | `landing-check` | Stairway and Exterior-Door Landing Check | International Code Council; 'Landings shall have a dimension of not less than 36 inch... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lateral-earth-pressure` | Lateral Earth Pressure and Thrust (Rankine) | Rankine (1857) as compiled in Das / N...; spec-v261 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lavatory-tub-clearance` | Lavatory Height and Bathtub Clearance (2010 ADA Standards 606, 607) | US Department of Justice / US Access ...; 606.3: 'Lavatories and sinks shall be installed with the ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `layout-squaring` | Layout Squaring (3-4-5) | Pythagorean 3-4-5 method (public); sides 3 and 4 -> diagonal 5 exactly (the 3-4-5 right tria... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `layout-squaring` | Layout Squaring (3-4-5) | Pythagorean 3-4-5 method (public); sides 3 and 4 -> diagonal 5 exactly (the 3-4-5 right tria... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lidar-point-density` | LiDAR Point Density and Flight Line Spacing | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `liquefaction-screening` | Liquefaction Triggering Screening (Seed-Idriss CSR) | Seed-Idriss; spec-v416 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `liquid-pipeline-station-spacing` | Liquid Pipeline Friction Loss and Pump Station Spacing | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5237,7 +5239,7 @@ per spec-v14 §13.1 second paragraph.
 | `spcc-containment-volume` | SPCC Secondary Containment Volume and Freeboard | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spherical-cap-volume` | Spherical Cap / Dome / Partial-Fill Volume | Project (first-principles); V=(pi h^2/3)(3R-h) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spherical-zone-volume` | Spherical Zone (Segment of Two Bases) Volume | Project (first-principles); prismatoid rule V=(pi h/6)(3r1^2+3r2^2+h^2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `spray-booth-airflow` | Spray Booth Airflow and Makeup Air Load | NFPA; exhaust = opening x face velocity; load = 1.08 x cfm x dT | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `spray-booth-airflow` | Spray Booth Airflow and Makeup Air Load | NFPA; exhaust = opening x face velocity; load = 1.08 x cfm x dT | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stack-emission-pte` | Stack Emission Rate and Potential to Emit | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `surface-air-consumption` | Dive Surface Air Consumption, Rock Bottom, and Gas Planning | Project (first-principles); the operation's diving safety manual and the supervisor g... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `swing-fall-geometry` | Swing Fall Geometry (Pendulum Drop and Arc) | pendulum geometry; asin(10/20) = exactly 30 deg; drop 20 - sqrt(400-100) = 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5334,12 +5336,13 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (162 tiles)
+### Group K Mechanic (164 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `abyc-dc-wire` | ABYC E-11 Marine DC Wire Sizing | ABYC E-11 DC wire sizing by voltage drop; spec-v517 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `acme-thread-depth` | Acme (29-degree) Thread Depth and Dimensions | General-purpose Acme thread (Machiner...; pitch = 1/5 = 0.200; depth = 0.200/2 + 0.010 = 0.110; pit... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `adhesive-bond-area` | Structural Adhesive Bond Area and Shear Capacity | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `aerodynamic-drag-force` | Aerodynamic Drag Force and Power | Project (first-principles); F = 1/2 rho V^2 Cd A | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `air-compressor-cfm-sizing` | Air Compressor CFM and Duty Sizing From Tool Demand | Project (first-principles); the compressor and tool manufacturers data govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `air-dryer-sizing` | Refrigerated and Desiccant Air Dryer Sizing | Project (first-principles); the dryer manufacturer correction tables and dew point ra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5463,6 +5466,7 @@ per spec-v14 §13.1 second paragraph.
 | `soft-foot-correction` | Soft-Foot Measurement and Correction Shim | Project (first-principles); the machine manufacturer mounting requirements govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spindle-max-mrr` | Max Material Removal Rate from Spindle Power | first-principles specific-cutting-ene...; 5 hp motor, 80% eff, unit power 1.0 (carbon steel) -> 4.0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spindle-power-torque` | Cutting Power and Spindle Torque | first-principles specific-cutting-ene...; 3.0 in3/min steel, 80% eff, 800 rpm -> 3.0 cutting hp, 3.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `spray-transfer-efficiency` | Spray Gun Transfer Efficiency and Material Usage | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spring-natural-frequency` | Helical Spring Natural (Surge) Frequency | Project (first-principles); fn = (1/2) sqrt(k g / W) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spring-wire-stress` | Spring Wire Stress (Wahl), Solid Height, and Buckling | Machinery's Handbook / Shigley (Wahl ...; C = 0.75/0.080 = 9.375; Kw = 36.5/33.5 + 0.0656 = 1.15515... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sprocket-pitch-diameter` | Sprocket Pitch Diameter (ANSI B29.1) | ANSI B29.1 sprocket geometry; spec-v801 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5982,6 +5986,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2072. Fixture-covered or reference-cadence: 2072 / 2072.
+Tile count: 2074. Fixture-covered or reference-cadence: 2074 / 2074.
 
 <!-- END tile-index-v14 -->

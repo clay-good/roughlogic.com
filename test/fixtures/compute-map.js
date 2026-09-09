@@ -2041,6 +2041,8 @@ export const COMPUTE_MAP = {
   "control-cable-tension": { module: "../../calc-mechanic.js", fn: "computeControlCableTension" },
   "propeller-track-balance": { module: "../../calc-mechanic.js", fn: "computePropellerTrackBalance" },
   "aviation-fuel-weight": { module: "../../calc-mechanic.js", fn: "computeAviationFuelWeight" },
+  "spray-transfer-efficiency": { module: "../../calc-mechanic.js", fn: "computeSprayTransferEfficiency" },
+  "adhesive-bond-area": { module: "../../calc-mechanic.js", fn: "computeAdhesiveBondArea" },
   "stack-emission-pte": { module: "../../calc-airquality.js", fn: "computeStackEmissionPte" },
   "opacity-six-minute": { module: "../../calc-airquality.js", fn: "computeOpacitySixMinute" },
   "baghouse-cleaning-interval": { module: "../../calc-airquality.js", fn: "computeBaghouseCleaningInterval" },
