@@ -24212,6 +24212,71 @@ export const CITATIONS = {
       { name: "Not a reserves estimate", value: "no classification standard is applied", source: "SPE and PRMS definitions" },
     ],
   },
+  // spec-v1632..v1636: the 2026-09-09 trade-expansion HVAC acoustics and
+  // rooftop anchorage band. Five tiles, nothing cut. spec-v1636 reads its
+  // own sign backwards (a -280 lb net uplift is the WEIGHT winning by 280,
+  // not the wind); spec-v1634 ships two unrendered python placeholders and
+  // a face velocity its own dimensions make 2,160 rather than 2,158.
+  "grille-neck-nc": {
+    formula: "neck velocity = airflow / neck free area; the NC change for a size change is 10 log10(velocity ratio ^ 5), because outlet sound power rises roughly with the fifth power of velocity.",
+    edition: "The NC rating at a given size and flow is ENTERED from the manufacturer's table; no generic relation reproduces a table the maker publishes.",
+    freeAccess: "One division and one logarithm.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE FIFTH-POWER RELATION IS WHAT MAKES THIS FIXABLE. Going one nominal size up drops neck velocity around 30% and the rating by seven or eight points -- the difference between a complaint and silence, for the price difference between two diffusers. Very few HVAC problems respond that strongly to so small a change. THE DAMPER LOCATION IS THE OTHER HALF and it is where most retrofit noise actually comes from: a balancing damper immediately behind a diffuser generates turbulence at the outlet with nothing between it and the room, and throttling it hard to balance a branch turns the diffuser into a whistle. Moving the balancing to the branch takeoff removes the noise without changing the airflow, and it is the first thing to try before anything is replaced. AND THE PUBLISHED RATING ASSUMES A FAIRLY ABSORPTIVE ROOM, so the same outlet reads several points higher under a gypsum ceiling than under a lay-in one -- which is why one selection is quiet in one space and audible in another.",
+    assumptions: [
+      { name: "The NC rating is entered", value: "read from the manufacturer's table at this size and flow", source: "the outlet manufacturer's sound data" },
+      { name: "Fifth-power velocity relation", value: "a rule of thumb; the manufacturer's own table at the new size is better", source: "ASHRAE Applications" },
+      { name: "Single number, not a spectrum", value: "NC is a spectrum criterion and one number hides where the problem is", source: "the acoustical consultant" },
+    ],
+  },
+  "duct-breakout-noise": {
+    formula: "radiating area = duct perimeter x exposed length; the room level is Lp = Lw - TL + 10 log10(S / A); the equal-area round diameter is sqrt(4 x duct area / pi).",
+    edition: "The breakout transmission loss and the duct sound power are ENTERED. Breakout TL depends on the duct construction and gauge and is a low-frequency problem a single number hides.",
+    freeAccess: "Perimeter geometry and the standard room equation.",
+    governance: GOVERNANCE.general,
+    editionNote: "A SILENCER DOES NOTHING ABOUT THIS, and that is geometric rather than a matter of degree. A silencer attenuates sound travelling ALONG the duct to a downstream outlet; breakout leaves SIDEWAYS through the wall wherever the duct runs, and arrives in the room without ever passing through a diffuser. Rumble that does not change when the outlets are blanked off is breakout. RECTANGULAR DUCT IS THE PROBLEM: a large flat panel is an efficient radiator at low frequency and the wider and flatter the worse, so a 48 by 12 in duct -- 4 to 1, and the shape a tight ceiling forces -- is close to the worst case. An equal-area round duct is 27.1 in and commonly 15 to 25 dB better in the low bands, because a cylinder is stiff and has no panels to flex. LAGGING WORKS ONLY DECOUPLED: a limp mass layer over a soft layer adds transmission loss, mass strapped straight to the metal does much less, and thin materials do almost nothing against rumble. The cheapest fix is routing and the second is round duct, and both are DESIGN decisions -- by the time a balancer measures the complaint the ceiling is closed.",
+    assumptions: [
+      { name: "Transmission loss is entered", value: "not predicted from the duct construction", source: "ASHRAE Applications and tested data" },
+      { name: "Single band", value: "breakout is a low-frequency problem and one number hides it", source: "the acoustical consultant" },
+      { name: "Equal AREA round substitution", value: "an equal-friction substitution is a different diameter", source: "duct design practice" },
+    ],
+  },
+  "silencer-insertion-loss": {
+    formula: "face velocity = airflow / face area; pressure drop scales with the SQUARE of face velocity from an entered reference; the downstream sound power is the energy sum of (Lw - insertion loss) and the regenerated level.",
+    edition: "Insertion loss, catalogue pressure drop and regenerated sound power are ENTERED from the manufacturer's tested data; a silencer's rating also differs with flow direction relative to the sound.",
+    freeAccess: "A square-law scaling and one energy sum.",
+    governance: GOVERNANCE.general,
+    editionNote: "REGENERATED NOISE IS THE LIMIT PEOPLE DISCOVER LAST, and energy-summing is what makes it visible. The silencer generates turbulent noise downstream of its own baffles -- created AFTER the attenuation, so nothing removes it -- and above some face velocity it becomes the dominant source. On the case here, squeezing a 9,000 cfm silencer from a 36 by 24 face into a 30 by 20 takes the velocity from 1,500 to 2,160 fpm, DOUBLES the pressure drop from 0.35 to 0.73 in wc, and puts the regenerated level above the attenuated one -- at which point another 10 dB of insertion loss buys 1.9 dB in the room. spec-v1634 describes that floor and never computes it, and ships two unrendered python placeholders for the pressure drop besides. INSERTION LOSS AND PRESSURE DROP ARE NOT INDEPENDENT: the geometry that absorbs sound is the geometry that restricts flow. Attenuation and pressure drop both rise with LENGTH, linearly; regenerated noise rises much faster with VELOCITY -- and that asymmetry is the whole design rule.",
+    assumptions: [
+      { name: "Catalogue data is entered", value: "insertion loss, drop and regenerated noise are tested values", source: "the silencer manufacturer" },
+      { name: "Square-law pressure drop", value: "scaled from one reference point", source: "standard duct fitting practice" },
+      { name: "Direction not distinguished", value: "forward and reverse flow ratings differ", source: "the manufacturer's tested data" },
+    ],
+  },
+  "mechanical-room-nc": {
+    formula: "L_p2 = L_p1 - TL + 10 log10(S / A); the flanking test compares that calculated level against a measured one, and the gap in decibels is a factor of 10^(gap/10) in energy.",
+    edition: "Octave-band transmission loss is the right input. STC is weighted for SPEECH frequencies and mechanical noise is concentrated far lower, so an STC number is the wrong number here.",
+    freeAccess: "One subtraction and one logarithm.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE FLANKING TEST IS THE POINT OF DOING THIS AT ALL. Neither the source level nor the transmission loss is known precisely in the field, so the absolute prediction carries real uncertainty -- but the DIFFERENCE between prediction and measurement is robust. If the wall should deliver 45 dB and the room reads 55, that is a factor of ten in energy and no wall built as specified underperforms by that much: there is a flanking path, and finding it is cheaper than any acoustic upgrade. If they agree, the wall is performing as built and the choice is a better wall, a quieter machine, or vibration isolation. FLANKING IS WHY UPGRADES DISAPPOINT -- a partition that stops at the ceiling grid over a shared plenum makes the wall's rating nearly irrelevant, and a few square inches of unsealed penetration can undo an entire assembly, which is why sealing is not a detail. AND STC DOES NOT DESCRIBE MECHANICAL NOISE: a high-STC wall can perform poorly against a chiller or a fan.",
+    assumptions: [
+      { name: "Single band", value: "an NC rating needs the whole spectrum", source: "the acoustical consultant" },
+      { name: "Airborne path only", value: "structure-borne transmission is separate and often dominant", source: "ASHRAE Applications" },
+      { name: "Transmission loss entered by band", value: "an STC number is the wrong input for a low-frequency source", source: "tested partition data" },
+    ],
+  },
+  "rooftop-curb-uplift": {
+    formula: "uplift = plan area x the zone's net uplift pressure, resisted by the unit weight; lateral wind on the side profile acts at mid-height, and the moment resolves across the unit width as a couple adding tension to the windward fasteners.",
+    edition: "The design pressures are ENTERED for the roof zone and height. Rooftop equipment carries its own provisions, distinct from the roof covering's, and edge and corner zones are much worse than the field.",
+    freeAccess: "Areas, one moment, and one division.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE DIRECTION IS REPORTED IN WORDS, NOT AS A SIGNED NUMBER, because spec-v1636 read its own sign backwards. Its unit sees 1,120 lb of uplift and weighs 1,400, so the net is -280 -- the WEIGHT winning by 280 lb -- and the spec bolds '-280 lb still trying to lift it after its own weight is counted'. Direct uplift is fully resisted there; every pound of windward tension comes from the overturning couple instead. Its downstream arithmetic is right, which is how the class survives review. THE COUPLE IS THE PART THAT GETS OMITTED ENTIRELY and it is frequently the larger demand: lateral wind acts well above the curb and resolves across the width, so a TALL NARROW UNIT IS HARDER TO ANCHOR THAN A LOW WIDE ONE OF THE SAME WEIGHT -- the lever arm grows and the resolving width shrinks together. AND THE LOAD PATH HAS TWO PARTS, THE SECOND INVISIBLE: a unit adequately screwed to a curb that is only nailed to a wood deck fails at the deck, and post-event roof inspections find exactly that.",
+    assumptions: [
+      { name: "Design pressures entered", value: "for the zone and height the unit actually sits at", source: "ASCE 7 as adopted" },
+      { name: "Lateral force at mid-height", value: "the unit's centroid is assumed at mid-height of the side profile", source: "the engineer of record" },
+      { name: "Unit-to-curb only", value: "the curb-to-deck connection is a separate and invisible check", source: "the curb manufacturer and the roofer" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

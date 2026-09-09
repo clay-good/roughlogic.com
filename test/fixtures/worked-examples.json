@@ -108643,6 +108643,348 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "grille-neck-nc",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Grille Neck Velocity and NC Level -- the spec-v1632 worked example, recomputed",
+   "source_edition_or_year": "spec-v1632 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "airflow_cfm": 600,
+    "neck_free_area_ft2": 1,
+    "rated_nc": 34,
+    "next_size_free_area_ft2": 1.4,
+    "room_nc_target": 30,
+    "room_correction_db": 0,
+    "damper_at_neck": "yes"
+   },
+   "outputs": {
+    "neck_velocity_fpm": {
+     "value": 600,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "effective_nc": {
+     "value": 34,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "over_target_db": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "next_velocity_fpm": {
+     "value": 428.57143,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "velocity_drop_pct": {
+     "value": 28.571429,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "nc_change_db": {
+     "value": -7.3064018,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "next_nc": {
+     "value": 26.693598,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cfm_at_target": {
+     "value": 499.05826,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "duct-breakout-noise",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Duct Breakout Noise and Lagging -- the spec-v1633 worked example, recomputed",
+   "source_edition_or_year": "spec-v1633 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "duct_width_in": 48,
+    "duct_height_in": 12,
+    "exposed_length_ft": 20,
+    "sound_power_db": 85,
+    "breakout_tl_db": 22,
+    "room_absorption_sabins": 250,
+    "room_criterion_db": 40,
+    "lagging_improvement_db": 0
+   },
+   "outputs": {
+    "exposed_area_ft2": {
+     "value": 200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "aspect_ratio": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "round_diameter_in": {
+     "value": 27.0811,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "round_area_ft2": {
+     "value": 141.79631,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "room_spl_db": {
+     "value": 62.0309,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "over_criterion_db": {
+     "value": 22.0309,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tl_required_db": {
+     "value": 44.0309,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "silencer-insertion-loss",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Duct Silencer Insertion Loss and Pressure Drop -- the spec-v1634 worked example, recomputed",
+   "source_edition_or_year": "spec-v1634 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "airflow_cfm": 9000,
+    "face_width_in": 36,
+    "face_height_in": 24,
+    "reference_drop_in_wc": 0.35,
+    "reference_velocity_fpm": 1500,
+    "alt_face_width_in": 30,
+    "alt_face_height_in": 20,
+    "target_velocity_fpm": 1500,
+    "upstream_lw_db": 95,
+    "insertion_loss_db": 25,
+    "regenerated_lw_db": 72,
+    "fan_available_static_in_wc": 2.5
+   },
+   "outputs": {
+    "face_area_ft2": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "face_velocity_fpm": {
+     "value": 1500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pressure_drop_in_wc": {
+     "value": 0.35,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_face_velocity_fpm": {
+     "value": 2160,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_pressure_drop_in_wc": {
+     "value": 0.72576,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "drop_increase_in_wc": {
+     "value": 0.37576,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "attenuated_lw_db": {
+     "value": 70,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "downstream_lw_db": {
+     "value": 74.124426,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "more_il_gain_db": {
+     "value": 1.8587023,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mechanical-room-nc",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Mechanical Room Sound Transmission and Flanking -- the spec-v1635 worked example, recomputed",
+   "source_edition_or_year": "spec-v1635 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "source_spl_db": 85,
+    "partition_tl_db": 38,
+    "partition_area_ft2": 200,
+    "receiving_absorption_sabins": 300,
+    "criterion_db": 40,
+    "measured_spl_db": 55,
+    "flanking_threshold_db": 5
+   },
+   "outputs": {
+    "area_term_db": {
+     "value": -1.7609126,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "received_spl_db": {
+     "value": 45.239087,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "over_criterion_db": {
+     "value": 5.2390874,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tl_required_db": {
+     "value": 43.239087,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "measured_excess_db": {
+     "value": 9.7609126,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "energy_factor": {
+     "value": 9.4643602,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rooftop-curb-uplift",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Rooftop Equipment Wind Uplift and Anchorage -- the spec-v1636 worked example, recomputed",
+   "source_edition_or_year": "spec-v1636 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "unit_length_ft": 8,
+    "unit_width_ft": 5,
+    "unit_height_ft": 4,
+    "unit_weight_lb": 1400,
+    "uplift_psf": 28,
+    "lateral_psf": 22,
+    "fastener_count": 8,
+    "windward_fastener_count": 4,
+    "fastener_capacity_lb": 400
+   },
+   "outputs": {
+    "plan_area_ft2": {
+     "value": 40,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "uplift_lb": {
+     "value": 1120,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "net_uplift_lb": {
+     "value": -280,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "weight_reserve_lb": {
+     "value": 280,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lateral_lb": {
+     "value": 704,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "overturning_ftlb": {
+     "value": 1408,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "couple_tension_lb": {
+     "value": 281.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "per_windward_lb": {
+     "value": 35.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "demand_ratio": {
+     "value": 0.0885,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

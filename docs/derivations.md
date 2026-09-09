@@ -2562,20 +2562,25 @@ cross-check.
 | calc-hvacsystems.js | `computeCoilFaceArea` | `{ cfm = 0, target_fpm = 500 } = {}` | _ | _ | _ |
 | calc-hvacsystems.js | `computeCoilFaceVelocity` | `{ cfm = 0, face_width_in = 0, face_height_in = 0, threshold_fpm = 500 } = {}` | _ | _ | _ |
 | calc-hvacsystems.js | `computeCompressorShortCycle` | `{ system_type = "single", load_fraction_pct = 50, observed_cph = null, } = {}` | _ | _ | _ |
+| calc-hvacsystems.js | `computeDuctBreakoutNoise` | `{ duct_width_in = 0, duct_height_in = 0, exposed_length_ft = 0, sound_power_d...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeEnvelopeConductionLoad` | `{ area_ft2 = 0, u_factor = 0, cltd_f = 0 } = {}` | _ | _ | _ |
 | calc-hvacsystems.js | `computeFanSystemEffect` | `{ flow_cfm = 0, outlet_width_in = 0, outlet_height_in = 0, straight_duct_ft =...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeFilterPressureDrop` | `{ filter_type = "merv13", face_area_ft2 = 0, face_velocity_fpm = 300, clean_d...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeFlowHoodCorrection` | `{ hood_reading_cfm = 0, correction_factor = 1, reference_traverse_cfm = 0, de...` | _ | _ | _ |
+| calc-hvacsystems.js | `computeGrilleNeckNc` | `{ airflow_cfm = 0, neck_free_area_ft2 = 0, rated_nc = 0, next_size_free_area_...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeHumidifierCapacity` | `{ cfm = 0, supply_db_F = 70, entering_rh_pct = 20, target_rh_pct = 40, altitu...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeHxLmtdNtu` | `{ config = "counterflow", th_in_F = 0, th_out_F = 0, tc_in_F = 0, tc_out_F = ...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeHydronicBufferTank` | `{ min_on_time_min = 0, source_min_btu = 0, zone_min_load_btu = 0, delta_t_f =...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeHydronicInjectionMixing` | `{ secondary_gpm = 10, secondary_supply_f = 110, secondary_return_f = 90, prim...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeInternalHeatGains` | `{ occupants = 0, sens_per_person = 245, lat_per_person = 200, lighting_w = 0,...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeLouverFreeArea` | `{ width_ft = 0, height_ft = 0, free_area_ratio = 0.45, airflow_cfm = 0, water...` | _ | _ | _ |
+| calc-hvacsystems.js | `computeMechanicalRoomNc` | `{ source_spl_db = 0, partition_tl_db = 0, partition_area_ft2 = 0, receiving_a...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeOutdoorResetRatio` | `{ supply_design_f = 180, supply_min_f = 80, oa_design_f = 0, oa_noheat_f = 65...` | _ | _ | _ |
 | calc-hvacsystems.js | `computePlenumReturnDrop` | `{ return_cfm = 0, pinch_width_ft = 0, pinch_clear_in = 0, target_velocity_fpm...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeProportionalBalanceRatio` | `{ design_1_cfm = 0, measured_1_cfm = 0, design_2_cfm = 0, measured_2_cfm = 0,...` | _ | _ | _ |
 | calc-hvacsystems.js | `computePumpImpellerTrim` | `{ current_diameter_in = 0, current_flow_gpm = 0, required_flow_gpm = 0, curre...` | _ | _ | _ |
+| calc-hvacsystems.js | `computeRooftopCurbUplift` | `{ unit_length_ft = 0, unit_width_ft = 0, unit_height_ft = 0, unit_weight_lb =...` | _ | _ | _ |
+| calc-hvacsystems.js | `computeSilencerInsertionLoss` | `{ airflow_cfm = 0, face_width_in = 0, face_height_in = 0, reference_drop_in_w...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeValveActuatorCloseOff` | `{ seat_area_in2 = 0, design_differential_psi = 0, minimum_flow_differential_p...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeValveAuthority` | `{ valve_pressure_drop_psi = 5, controlled_circuit_drop_psi = 3 } = {}` | _ | _ | _ |
 | calc-hvacsystems.js | `computeVariablePrimaryBypass` | `{ machine_design_gpm = 0, minimum_flow_fraction = 0.45, machines_running = 1,...` | _ | _ | _ |
@@ -3732,7 +3737,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2318.
+Row count: 2323.
 
 <!-- END function-corpus-v14 -->
 
@@ -4200,7 +4205,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (195 tiles)
+### Group C HVAC (200 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4270,6 +4275,7 @@ per spec-v14 §13.1 second paragraph.
 | `draft-hood-dilution` | Draft-Hood Dilution Ratio | Combustion-analysis practice; appliance O2 5%, diluted O2 12% -> ratio 1.79, 44.0% dilu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drybulb-from-enthalpy` | Dry-Bulb from Enthalpy and Humidity Ratio | ASHRAE Fundamentals (moist-air enthal...; spec-v663 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dual-fuel-balance-point` | Dual-Fuel Economic Switchover (Heat Pump vs Gas Balance Point) | Delivered-Btu fuel-cost comparison; spec-v234 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `duct-breakout-noise` | Duct Breakout Noise and Lagging | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-friction-static` | Duct Friction Loss and Static Pressure | ASHRAE Fundamentals Darcy-Weisbach + ...; 1200 cfm in 12 in round galvanised duct, 60 ft, with 4 sm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-heat-gain` | Duct Heat Gain/Loss Through Unconditioned Space | ASHRAE Fundamentals; spec-v347 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `duct-leakage` | Duct Leakage Test-and-Balance | ACCA Manual D + SMACNA HVAC Duct Cons...; 1000 design cfm / 60 measured / 300 ft^2 / 1.0 in WC -> n... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4313,6 +4319,7 @@ per spec-v14 §13.1 second paragraph.
 | `gas-meter-clock-target` | Gas-Meter Clock Target Time | First-principles meter-clocking arith...; spec-v652 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `geothermal-loop` | Geothermal Loop Length | IGSHPA / ASHRAE Handbook (Applications); 60,000 BTU/hr heating (governs over 48,000 BTU/hr cooling... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `grille-face-velocity` | Grille/Register Face Velocity and Free-Area Sizing | ASHRAE / SMACNA; spec-v348 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `grille-neck-nc` | Grille Neck Velocity and NC Level | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `head-pressure-control` | Low-Ambient Head Pressure Control and Winter Charge | Project (first-principles); minimum head built from the bottom | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `heat-pump-cold-capacity` | Heat-Pump Cold-Temperature Capacity and Auxiliary Heat | AHRI 210/240 low-temperature rating p...; spec-v235 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `heat-pump-seasonal-energy` | Heat-Pump Seasonal Heating Energy and Cost vs Gas and Resistance | AHRI 210/240 HSPF / fuel-cost comparison; spec-v233 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4336,6 +4343,7 @@ per spec-v14 §13.1 second paragraph.
 | `manual-d-friction-rate` | Manual D Friction Rate (Available Static Pressure) | ACCA Manual D; spec-v408 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `manual-j-cooling` | Manual J Cooling Load (Simplified) | ACCA Manual J residential cooling-loa...; 1500 ft^2 / 1200 wall / 200 window / 4 occupants / 95 out... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `manual-j-heating` | Manual J Heating Load (Simplified) | ACCA Manual J residential heating-loa...; 1500 ft^2 / 1200 wall / 200 window / 1500 ceiling / 10 ou... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `mechanical-room-nc` | Mechanical Room Sound Transmission and Flanking | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `moist-air-enthalpy` | Moist Air Enthalpy (ASHRAE Psychrometrics) | ASHRAE Fundamentals; spec-v375 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `mua-tempering-load` | Makeup-Air Unit Tempering Load (Sensible, Latent, Total) | ASHRAE Fundamentals psychrometric loa...; spec-v276 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `nitrogen-pressure-test` | Nitrogen Pressure Test (Temperature-Corrected) | First-principles Gay-Lussac's law (co...; spec-v105 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4373,6 +4381,7 @@ per spec-v14 §13.1 second paragraph.
 | `refrigeration-cop` | Refrigeration COP and Carnot Limit | Refrigeration COP and Carnot limit; spec-v321 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `refrigeration-relief-capacity` | Refrigeration Pressure-Relief Discharge Capacity (ASHRAE 15) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `reynolds-number-pipe` | Pipe Flow Reynolds Number and Regime | Reynolds number Re = V D / nu; spec-v305 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `rooftop-curb-uplift` | Rooftop Equipment Wind Uplift and Anchorage | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `round-to-rect-duct` | Round-to-Rectangular Duct Equivalent | ASHRAE Fundamentals (duct design) / S...; 14 in x 8 in rectangular -> equivalent diameter 11.46 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `run-capacitor-microfarad` | Run Capacitor Microfarad Check | First-principles capacitive reactance...; spec-v104 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `safety-valve-capacity` | Boiler Safety Valve Relieving Capacity | Project (first-principles); ASME BPVC Sections I and IV, the National Board, and the ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4380,6 +4389,7 @@ per spec-v14 §13.1 second paragraph.
 | `seer-eer` | SEER and EER Conversion | Project (engineering approximation); EER 12 -> SEER 13.44 / SEER2 estimate 12.768 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shr` | Sensible Heat Ratio | ASHRAE Handbook (Fundamentals); 24,000 BTU/hr sensible / 30,000 BTU/hr total -> SHR 0.80 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shr-latent` | Sensible Heat Ratio / Latent Split (ASHRAE) | ASHRAE; Q_s = 1.08 * 1200 * 20 = 25,920; Q_l = 36,000 - 25,920 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `silencer-insertion-loss` | Duct Silencer Insertion Loss and Pressure Drop | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `snowmelt-load` | Hydronic Snowmelt Load and Boiler Sizing (ASHRAE) | ASHRAE snow-melting flux / Chapman IP...; spec-v478 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stack-effect-npp` | Stack Effect Pressure and the Neutral Pressure Plane | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `static-pressure-hvac` | Static Pressure | ACCA Manual D / ASHRAE Fundamentals; filter 0.10 + coil 0.30 + supply duct 0.20 + return duct ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5972,6 +5982,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2067. Fixture-covered or reference-cadence: 2067 / 2067.
+Tile count: 2072. Fixture-covered or reference-cadence: 2072 / 2072.
 
 <!-- END tile-index-v14 -->

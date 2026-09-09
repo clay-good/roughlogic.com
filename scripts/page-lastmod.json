@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "25ffa90f65f4db5d",
+      "sha": "f628c6aea666cc08",
       "date": "2026-09-09"
     },
     "/tools/": {
-      "sha": "5072f9817339dc5d",
+      "sha": "5a504655478b7598",
       "date": "2026-09-09"
     },
     "/groups/accounting/": {
-      "sha": "c72ce887aaf7fd8f",
+      "sha": "55bf765c66ff317b",
       "date": "2026-09-09"
     },
     "/groups/agriculture/": {
-      "sha": "3c2bb0395b5b12c9",
+      "sha": "d659f8e4a4ff8977",
       "date": "2026-09-09"
     },
     "/groups/construction/": {
-      "sha": "46eeaa07b3fd8086",
+      "sha": "92835bebb2941095",
       "date": "2026-09-09"
     },
     "/groups/cross-trade/": {
-      "sha": "464e1984ef6987b9",
+      "sha": "4787e4c31810eeaf",
       "date": "2026-09-09"
     },
     "/groups/educators/": {
-      "sha": "de34e42de75f1041",
+      "sha": "f4b77a78dc5350c5",
       "date": "2026-09-09"
     },
     "/groups/electrical/": {
-      "sha": "34a61ebca3a2a567",
+      "sha": "479180cada724a3c",
       "date": "2026-09-09"
     },
     "/groups/field/": {
-      "sha": "8ec1e44c18dd778f",
+      "sha": "501be9be7167b8ef",
       "date": "2026-09-09"
     },
     "/groups/fire-ground/": {
-      "sha": "2fb82e10dca69197",
+      "sha": "839cd3b2d9ee8d52",
       "date": "2026-09-09"
     },
     "/groups/historical/": {
-      "sha": "faa0f526e2bf9b83",
+      "sha": "f36a3a3c6140522a",
       "date": "2026-09-09"
     },
     "/groups/hvac/": {
-      "sha": "d641aa754dbee227",
+      "sha": "6b2365451cd5e727",
       "date": "2026-09-09"
     },
     "/groups/kitchen/": {
-      "sha": "5e38ac3d310f4291",
+      "sha": "24d214e17ab318ce",
       "date": "2026-09-09"
     },
     "/groups/lab/": {
-      "sha": "421261ff244ce506",
+      "sha": "48ab073e808b3921",
       "date": "2026-09-09"
     },
     "/groups/mechanic/": {
-      "sha": "a40367c2ae13873f",
+      "sha": "ada8c24969b86b79",
       "date": "2026-09-09"
     },
     "/groups/plumbing/": {
-      "sha": "b0a82e630014cf30",
+      "sha": "e2f6eb90e1b0d1c7",
       "date": "2026-09-09"
     },
     "/groups/real-estate/": {
-      "sha": "3daba135887cbf53",
+      "sha": "2462458fe4ce81bc",
       "date": "2026-09-09"
     },
     "/groups/references/": {
-      "sha": "1b615b32b5e45690",
+      "sha": "c717947d65e7fadc",
       "date": "2026-09-09"
     },
     "/groups/restoration/": {
-      "sha": "f70006d7058ae677",
+      "sha": "b66160164c6ed48a",
       "date": "2026-09-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "e837c481abfc71cb",
+      "sha": "9599d7a1a0283efe",
       "date": "2026-09-09"
     },
     "/groups/stage/": {
-      "sha": "8e45334ddf978ae1",
+      "sha": "efbc44568793dae0",
       "date": "2026-09-09"
     },
     "/groups/trucking/": {
-      "sha": "08a19e9d681718cb",
+      "sha": "247a0c89ad9cb2fa",
       "date": "2026-09-09"
     },
     "/groups/water/": {
-      "sha": "bf7d4efef3f64140",
+      "sha": "9ab0875ceedd2959",
       "date": "2026-09-09"
     },
     "/tools/aav-install-check/": {
@@ -2273,6 +2273,10 @@
       "sha": "217c50fdfc77371e",
       "date": "2026-09-01"
     },
+    "/tools/duct-breakout-noise/": {
+      "sha": "9525ec391c8d5883",
+      "date": "2026-09-09"
+    },
     "/tools/duct-friction-static/": {
       "sha": "545fae5ebfcb56cd",
       "date": "2026-09-04"
@@ -2810,8 +2814,8 @@
       "date": "2026-09-07"
     },
     "/tools/flat-oval-duct/": {
-      "sha": "880df543e9cde89c",
-      "date": "2026-09-01"
+      "sha": "7780f1ed5f58c7f8",
+      "date": "2026-09-09"
     },
     "/tools/flat-top-stockpile-volume/": {
       "sha": "85b978b3e63d87e4",
@@ -3237,6 +3241,10 @@
       "sha": "008fc6e91d9bd556",
       "date": "2026-09-01"
     },
+    "/tools/grille-neck-nc/": {
+      "sha": "da1240d42b99b9cd",
+      "date": "2026-09-09"
+    },
     "/tools/grinding-wheel-rpm/": {
       "sha": "ef346a6adcab57b0",
       "date": "2026-09-01"
@@ -3526,8 +3534,8 @@
       "date": "2026-09-01"
     },
     "/tools/hvac-equipment-circuit/": {
-      "sha": "ff5c9400cfdfe3f4",
-      "date": "2026-09-01"
+      "sha": "32acd21ddefbebdc",
+      "date": "2026-09-09"
     },
     "/tools/hx-lmtd-ntu/": {
       "sha": "a0685fd417f9b859",
@@ -3710,8 +3718,8 @@
       "date": "2026-09-01"
     },
     "/tools/internal-heat-gains/": {
-      "sha": "741c1ff139d2c679",
-      "date": "2026-09-01"
+      "sha": "2f6ed74bb0496300",
+      "date": "2026-09-09"
     },
     "/tools/interpass-temperature-control/": {
       "sha": "ff53da25319f65a4",
@@ -4305,6 +4313,10 @@
       "sha": "3fff70293abea7fb",
       "date": "2026-09-01"
     },
+    "/tools/mechanical-room-nc/": {
+      "sha": "219d733b5d6f2119",
+      "date": "2026-09-09"
+    },
     "/tools/medgas-demand/": {
       "sha": "b9aae12145eeff5a",
       "date": "2026-09-01"
@@ -4694,8 +4706,8 @@
       "date": "2026-09-01"
     },
     "/tools/orifice-pressure-loss/": {
-      "sha": "12eeee833acf65b5",
-      "date": "2026-09-04"
+      "sha": "b76481d9735e1aea",
+      "date": "2026-09-09"
     },
     "/tools/osha-recordkeeping/": {
       "sha": "3777822a22fe6edf",
@@ -5426,8 +5438,8 @@
       "date": "2026-09-01"
     },
     "/tools/pv-row-spacing/": {
-      "sha": "177a447967dfd7b7",
-      "date": "2026-09-01"
+      "sha": "1de8f57636b99baa",
+      "date": "2026-09-09"
     },
     "/tools/pv-string-fusing/": {
       "sha": "ab50d863e46fc89a",
@@ -5945,6 +5957,10 @@
       "sha": "756af01abc23e6b7",
       "date": "2026-09-01"
     },
+    "/tools/rooftop-curb-uplift/": {
+      "sha": "50f780cde50f2b8a",
+      "date": "2026-09-09"
+    },
     "/tools/rooftop-temp-adder/": {
       "sha": "8db9b52fb9b99e90",
       "date": "2026-09-01"
@@ -5986,8 +6002,8 @@
       "date": "2026-09-05"
     },
     "/tools/round-to-rect-duct/": {
-      "sha": "6c913fe6855dc943",
-      "date": "2026-09-01"
+      "sha": "27cf18f76ed2dca1",
+      "date": "2026-09-09"
     },
     "/tools/rt-exposure-time/": {
       "sha": "ed98d0239c63113b",
@@ -6420,6 +6436,10 @@
     "/tools/significant-figures/": {
       "sha": "328af8cbc60d4260",
       "date": "2026-09-01"
+    },
+    "/tools/silencer-insertion-loss/": {
+      "sha": "c4de92beecbe7d59",
+      "date": "2026-09-09"
     },
     "/tools/silica-table-1/": {
       "sha": "abbb09dd9325729d",

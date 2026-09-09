@@ -1201,6 +1201,8 @@ const _TILES = [
   ["lab-containment-pressure", "C"],
   // spec-v1622..v1631 HVAC test-and-balance and hydronic systems band
   ["flow-hood-correction", "C"],
+  ["grille-neck-nc", "C"], ["duct-breakout-noise", "C"], ["silencer-insertion-loss", "C"],
+  ["mechanical-room-nc", "C"], ["rooftop-curb-uplift", "C"],
   ["fan-system-effect", "C"],
   ["proportional-balance-ratio", "C"],
   ["pump-impeller-trim", "C"],

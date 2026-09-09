@@ -51799,3 +51799,198 @@ test("bounds: spec-v1538 computeWellDeclineReserves -- nominal is not effective"
   assert.ok(_v1538({ ...base, economic_limit_bpd: 420 }).error);
   assert.ok(_v1538({ ...base, decline_rate: 1.5, rate_is_effective: "yes" }).error);
 });
+
+// =====================================================================
+// spec-v1632..v1636: the HVAC acoustics and rooftop anchorage band. Five
+// tiles, nothing cut. spec-v1636 reads its own sign backwards -- a -280 lb
+// net uplift is the WEIGHT winning by 280, not the wind -- while its
+// downstream arithmetic is right, so only the sentence is wrong. That tile
+// reports the direction in WORDS. spec-v1634 ships two unrendered python
+// placeholders (0.72 and 0.37 in wc) and a 2,158 fpm that its own
+// dimensions make 2,160.
+// =====================================================================
+import {
+  computeGrilleNeckNc as _v1632,
+  computeDuctBreakoutNoise as _v1633,
+  computeSilencerInsertionLoss as _v1634,
+  computeMechanicalRoomNc as _v1635,
+  computeRooftopCurbUplift as _v1636,
+} from "../../calc-hvacsystems.js";
+
+test("bounds: spec-v1632 computeGrilleNeckNc -- the fifth power is what makes it fixable", () => {
+  const base = { airflow_cfm: 600, neck_free_area_ft2: 1.0, rated_nc: 34, next_size_free_area_ft2: 1.4, room_nc_target: 30, room_correction_db: 0, damper_at_neck: "yes" };
+  const r = _v1632(base);
+  assert.ok(Math.abs(r.neck_velocity_fpm - 600) < 1e-12);
+  assert.ok(Math.abs(r.next_velocity_fpm - 600 / 1.4) < 1e-9);
+  assert.ok(Math.abs(r.velocity_drop_pct - 28.6) < 0.1);
+  // The spec's own -7.3 dB, from 10 log10(ratio^5).
+  assert.ok(Math.abs(r.nc_change_db + 7.31) < 0.02);
+  assert.ok(Math.abs(r.nc_change_db - 50 * Math.log10(r.velocity_ratio)) < 1e-9);
+  // One size up clears an NC 30 target the current size misses.
+  assert.equal(r.meets_target, false);
+  assert.equal(r.next_meets, true);
+  // IDENTITY: the same area on both sides is no change at all.
+  const same = _v1632({ ...base, next_size_free_area_ft2: 1.0 });
+  assert.ok(Math.abs(same.nc_change_db) < 1e-12);
+  assert.ok(Math.abs(same.next_nc - same.effective_nc) < 1e-12);
+  // ROUND TRIP: the airflow that meets the target, fed back, lands ON it.
+  const backVelocity = r.cfm_at_target / 1.0;
+  const predictedNc = r.effective_nc + 50 * Math.log10(backVelocity / r.neck_velocity_fpm);
+  assert.ok(Math.abs(predictedNc - 30) < 1e-9);
+  // The room correction shifts the rating one for one.
+  const hardRoom = _v1632({ ...base, room_correction_db: 4 });
+  assert.ok(Math.abs(hardRoom.effective_nc - (r.effective_nc + 4)) < 1e-12);
+  // The damper flag is a select, and "no" must not read as truthy.
+  assert.equal(r.damper_flag, true);
+  assert.equal(_v1632({ ...base, damper_at_neck: "no" }).damper_flag, false);
+  assert.ok(_v1632({ ...base, neck_free_area_ft2: 0 }).error);
+  assert.ok(_v1632({ ...base, rated_nc: 0 }).error);
+});
+
+test("bounds: spec-v1633 computeDuctBreakoutNoise -- a silencer does nothing about it", () => {
+  const base = { duct_width_in: 48, duct_height_in: 12, exposed_length_ft: 20, sound_power_db: 85, breakout_tl_db: 22, room_absorption_sabins: 250, room_criterion_db: 40, lagging_improvement_db: 0 };
+  const r = _v1633(base);
+  // The spec's 200 sq ft, exactly.
+  assert.ok(Math.abs(r.exposed_area_ft2 - 200) < 1e-12);
+  assert.ok(Math.abs(r.exposed_area_ft2 - 2 * (48 + 12) / 12 * 20) < 1e-12);
+  // A 4-to-1 duct is the wide flat worst case.
+  assert.ok(Math.abs(r.aspect_ratio - 4) < 1e-12);
+  assert.equal(r.wide_flat, true);
+  // A square duct of the same area is not, and has LESS perimeter.
+  const square = _v1633({ ...base, duct_width_in: 24, duct_height_in: 24 });
+  assert.ok(Math.abs(square.aspect_ratio - 1) < 1e-12);
+  assert.equal(square.wide_flat, false);
+  assert.ok(square.exposed_area_ft2 < r.exposed_area_ft2);
+  // IDENTITY: equal-area round is sqrt(4A/pi), and it beats both on area.
+  assert.ok(Math.abs(r.round_diameter_in - Math.sqrt(4 * 48 * 12 / Math.PI)) < 1e-9);
+  assert.ok(r.round_diameter_in > 27 && r.round_diameter_in < 27.2);
+  assert.ok(r.round_area_ft2 < r.exposed_area_ft2);
+  // IDENTITY: the room equation, term by term.
+  assert.ok(Math.abs(r.room_spl_db - (85 - 22 + 10 * Math.log10(200 / 250))) < 1e-9);
+  // IDENTITY: doubling the transmission loss deficit is one-for-one in dB.
+  const better = _v1633({ ...base, breakout_tl_db: 32 });
+  assert.ok(Math.abs(better.room_spl_db - (r.room_spl_db - 10)) < 1e-9);
+  // ROUND TRIP: the TL the criterion needs, fed back, lands ON the criterion.
+  const fixed = _v1633({ ...base, breakout_tl_db: r.tl_required_db });
+  assert.ok(Math.abs(fixed.room_spl_db - 40) < 1e-9);
+  assert.equal(fixed.meets_criterion, true);
+  // Lagging subtracts one for one and does not touch the unlagged level.
+  const lagged = _v1633({ ...base, lagging_improvement_db: 10 });
+  assert.ok(Math.abs(lagged.lagged_spl_db - (r.room_spl_db - 10)) < 1e-9);
+  assert.ok(Math.abs(lagged.room_spl_db - r.room_spl_db) < 1e-12);
+  assert.ok(_v1633({ ...base, room_absorption_sabins: 0 }).error);
+  assert.ok(_v1633({ ...base, exposed_length_ft: 0 }).error);
+});
+
+test("bounds: spec-v1634 computeSilencerInsertionLoss -- the regenerated noise is the floor", () => {
+  const base = { airflow_cfm: 9000, face_width_in: 36, face_height_in: 24, reference_drop_in_wc: 0.35, reference_velocity_fpm: 1500, alt_face_width_in: 30, alt_face_height_in: 20, target_velocity_fpm: 1500, upstream_lw_db: 95, insertion_loss_db: 25, regenerated_lw_db: 72, fan_available_static_in_wc: 2.5 };
+  const r = _v1634(base);
+  // The spec's face figures, exactly.
+  assert.ok(Math.abs(r.face_area_ft2 - 6) < 1e-12);
+  assert.ok(Math.abs(r.face_velocity_fpm - 1500) < 1e-12);
+  // IDENTITY: at the reference velocity the drop IS the reference drop.
+  assert.ok(Math.abs(r.pressure_drop_in_wc - 0.35) < 1e-12);
+  // THE FINDING: the spec's unrendered placeholders are 0.72 and 0.37, and
+  // its 2,158 fpm is 2,160 on its own dimensions.
+  assert.ok(Math.abs(r.alt_face_velocity_fpm - 2160) < 1e-9);
+  assert.ok(Math.abs(r.alt_pressure_drop_in_wc - 0.73) < 0.01);
+  assert.ok(Math.abs(r.drop_increase_in_wc - 0.38) < 0.01);
+  // IDENTITY: the drop goes with the SQUARE of velocity, exactly.
+  assert.ok(Math.abs(r.drop_ratio - Math.pow(2160 / 1500, 2)) < 1e-9);
+  assert.ok(r.drop_ratio > 2); // "pressure drop doubles"
+  // ROUND TRIP: the face area for the target velocity gives that velocity.
+  assert.ok(Math.abs(r.target_face_area_ft2 * 1500 - 9000) < 1e-9);
+  assert.ok(Math.abs(r.target_face_area_ft2 - r.face_area_ft2) < 1e-12);
+  // THE NOISE FLOOR: attenuation alone would give 70, the regenerated 72
+  // dominates, and the sum exceeds both.
+  assert.ok(Math.abs(r.attenuated_lw_db - 70) < 1e-12);
+  assert.equal(r.regen_dominates, true);
+  assert.ok(r.downstream_lw_db > 72);
+  assert.ok(r.downstream_lw_db < 75);
+  // AND MORE INSERTION LOSS BUYS ALMOST NOTHING against that floor.
+  assert.ok(r.more_il_gain_db < 3);
+  // With the regenerated noise well below, 10 dB of IL buys nearly 10.
+  const quiet = _v1634({ ...base, regenerated_lw_db: 40 });
+  assert.equal(quiet.regen_dominates, false);
+  assert.ok(quiet.more_il_gain_db > 9.5);
+  // IDENTITY: with no regenerated figure the downstream IS the attenuated.
+  const noRegen = _v1634({ ...base, regenerated_lw_db: 0 });
+  assert.ok(Math.abs(noRegen.downstream_lw_db - noRegen.attenuated_lw_db) < 1e-12);
+  assert.ok(_v1634({ ...base, reference_velocity_fpm: 0 }).error);
+  assert.ok(_v1634({ ...base, face_width_in: 0 }).error);
+});
+
+test("bounds: spec-v1635 computeMechanicalRoomNc -- the gap is the finding, not the level", () => {
+  const base = { source_spl_db: 85, partition_tl_db: 38, partition_area_ft2: 200, receiving_absorption_sabins: 300, criterion_db: 40, measured_spl_db: 55, flanking_threshold_db: 5 };
+  const r = _v1635(base);
+  // The spec's figures, to the digit.
+  assert.ok(Math.abs(r.area_term_db + 1.76) < 0.01);
+  assert.ok(Math.abs(r.received_spl_db - 45.24) < 0.01);
+  assert.ok(Math.abs(r.over_criterion_db - 5.24) < 0.01);
+  // IDENTITY: equal area and absorption makes the area term exactly zero.
+  const balanced = _v1635({ ...base, receiving_absorption_sabins: 200 });
+  assert.ok(Math.abs(balanced.area_term_db) < 1e-12);
+  assert.ok(Math.abs(balanced.received_spl_db - (85 - 38)) < 1e-12);
+  // ROUND TRIP: the TL the criterion needs, fed back, lands ON it.
+  const fixed = _v1635({ ...base, partition_tl_db: r.tl_required_db });
+  assert.ok(Math.abs(fixed.received_spl_db - 40) < 1e-9);
+  assert.equal(fixed.meets_criterion, true);
+  // THE FLANKING TEST: 10 dB above the calculation is ~10x in energy.
+  assert.ok(Math.abs(r.measured_excess_db - 9.76) < 0.01);
+  assert.equal(r.flanking_likely, true);
+  assert.ok(r.energy_factor > 9 && r.energy_factor < 10);
+  assert.ok(Math.abs(r.energy_factor - Math.pow(10, r.measured_excess_db / 10)) < 1e-9);
+  // A measurement that AGREES is not flanking, and must not be flagged.
+  const agrees = _v1635({ ...base, measured_spl_db: 46 });
+  assert.equal(agrees.flanking_likely, false);
+  // A measurement exactly AT the threshold is not yet flanking.
+  const atThreshold = _v1635({ ...base, measured_spl_db: r.received_spl_db + 5 });
+  assert.equal(atThreshold.flanking_likely, false);
+  assert.equal(_v1635({ ...base, measured_spl_db: 0 }).has_measured, false);
+  assert.ok(_v1635({ ...base, partition_tl_db: 0 }).error);
+  assert.ok(_v1635({ ...base, receiving_absorption_sabins: 0 }).error);
+});
+
+test("bounds: spec-v1636 computeRooftopCurbUplift -- a negative net uplift is the WEIGHT winning", () => {
+  const base = { unit_length_ft: 8, unit_width_ft: 5, unit_height_ft: 4, unit_weight_lb: 1400, uplift_psf: 28, lateral_psf: 22, fastener_count: 8, windward_fastener_count: 4, fastener_capacity_lb: 400 };
+  const r = _v1636(base);
+  // Every figure in the spec reproduces.
+  assert.ok(Math.abs(r.plan_area_ft2 - 40) < 1e-12);
+  assert.ok(Math.abs(r.uplift_lb - 1120) < 1e-12);
+  assert.ok(Math.abs(r.net_uplift_lb + 280) < 1e-12);
+  assert.ok(Math.abs(r.lateral_lb - 704) < 1e-12);
+  assert.ok(Math.abs(r.overturning_ftlb - 1408) < 1e-12);
+  assert.ok(Math.abs(r.couple_tension_lb - 281.6) < 1e-9);
+  assert.ok(Math.abs(r.per_windward_lb - 35.4) < 0.1);
+  // THE FINDING: the spec calls -280 lb "still trying to lift it". It is
+  // the WEIGHT winning by 280, and the flag says so in the right direction.
+  assert.equal(r.weight_governs, true);
+  assert.ok(Math.abs(r.weight_reserve_lb - 280) < 1e-12);
+  // ALL the windward tension comes from the couple here, not the uplift.
+  assert.ok(r.direct_share_lb < 0);
+  assert.ok(r.couple_share_lb > r.per_windward_lb);
+  assert.equal(r.couple_dominates, true);
+  // A lighter unit flips the direction, and the flag flips with it.
+  const light = _v1636({ ...base, unit_weight_lb: 600 });
+  assert.equal(light.weight_governs, false);
+  assert.ok(Math.abs(light.net_uplift_lb - (1120 - 600)) < 1e-12);
+  assert.ok(light.per_windward_lb > r.per_windward_lb);
+  // A unit exactly balanced is the weight governing, not the wind.
+  const balanced = _v1636({ ...base, unit_weight_lb: 1120 });
+  assert.equal(balanced.weight_governs, true);
+  assert.ok(Math.abs(balanced.weight_reserve_lb) < 1e-12);
+  // A TALL NARROW unit is harder to anchor than a low wide one of the same
+  // weight and plan area -- the lever arm grows and the width shrinks.
+  const tall = _v1636({ ...base, unit_height_ft: 8 });
+  assert.ok(tall.couple_tension_lb > 3.9 * r.couple_tension_lb);
+  const narrow = _v1636({ ...base, unit_length_ft: 10, unit_width_ft: 4 });
+  assert.ok(narrow.couple_tension_lb > r.couple_tension_lb);
+  // IDENTITY: the moment is lateral force times half the height, exactly.
+  assert.ok(Math.abs(r.overturning_ftlb - r.lateral_lb * r.lever_arm_ft) < 1e-9);
+  assert.ok(Math.abs(r.couple_tension_lb * 5 - r.overturning_ftlb) < 1e-9);
+  // Capacity: this passes comfortably; a weak fastener does not.
+  assert.equal(r.capacity_ok, true);
+  assert.equal(_v1636({ ...base, fastener_capacity_lb: 20 }).capacity_ok, false);
+  assert.ok(_v1636({ ...base, fastener_count: 0 }).error);
+  assert.ok(_v1636({ ...base, windward_fastener_count: 20 }).error);
+});
