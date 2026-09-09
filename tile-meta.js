@@ -1139,6 +1139,15 @@ const _TILES = [
   ["esp-deutsch-efficiency", "G"],
   ["carbon-bed-life", "G"],
   ["plume-rise-briggs", "G"],
+  // spec-v1495..v1504 building performance and envelope diagnostics band
+  ["effective-leakage-area", "C"],
+  ["building-tightness-limit", "C"],
+  ["ventilation-rate-procedure", "C"],
+  ["zonal-pressure-diagnostics", "C"],
+  ["caz-depressurization-limit", "C"],
+  ["stack-effect-npp", "C"],
+  ["bill-disaggregation", "C"],
+  ["continuous-insulation-ratio", "C"],
   // spec-v1622..v1631 HVAC test-and-balance and hydronic systems band
   ["flow-hood-correction", "C"],
   ["fan-system-effect", "C"],

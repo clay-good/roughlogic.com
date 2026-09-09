@@ -1,5 +1,11 @@
 # roughlogic.com Specification v1503 -- Wall Assembly Dew Point and Vapor Retarder Class (`calc-buildingperf.js`, Group C HVAC, building performance, 1 New Tile)
 
+> **Status: CUT 2026-09-08 -- DUPLICATE. This tile was not built.** The formula screen for the
+> 2026-09-08 building performance band found the headline of this question already answered by
+> `wall-condensation-gradient`, which already computes the sheathing plane temperature through the assembly and compares it against the indoor dew point. A second tile drawing the same gradient would be a duplicate of the visible answer, so the material this spec had that the shipped tile lacked -- the required RATIO of continuous to total insulation, which is the form the energy code table takes and the form a builder works to -- landed on the new `continuous-insulation-ratio` tile in `calc-buildingperf.js` instead, together with both inversions (the minimum continuous R a given cavity demands, and the maximum cavity a given thickness of exterior insulation will support) and the counterintuitive direction that adding cavity insulation lowers the ratio and makes the assembly worse for moisture.
+>
+> The specification below is kept as the record of the screen. Do not implement it.
+>
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-buildingperf.js`**
 > (Group C, HVAC -- the existing category, hub `/groups/hvac/`; building performance and envelope diagnostics), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.

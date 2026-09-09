@@ -50051,3 +50051,229 @@ test("bounds: spec-v1647 computeAviationFuelWeight -- 95 minus 59 is 36, not 44"
   assert.ok(Math.abs(r.moment_difference_inlb - r.weight_difference_lb * 120) < 1e-9);
   assert.ok(_v1647({ ...base, gallons: 0 }).error);
 });
+
+// =====================================================================
+// spec-v1495..v1504: the building performance and envelope diagnostics
+// band. Eight tiles; spec-v1501 and spec-v1503 were cut as duplicates and
+// their new material landed on blower-door-ach50 and
+// wall-condensation-gradient. Every inverse below is asserted by its ROUND
+// TRIP: the answer fed back into the forward direction must land on the
+// input. That habit has caught three defects in this file's own computes
+// across two earlier bands, so it is written first here.
+// =====================================================================
+import {
+  computeEffectiveLeakageArea as _v1495,
+  computeBuildingTightnessLimit as _v1496,
+  computeVentilationRateProcedure as _v1497,
+  computeZonalPressureDiagnostics as _v1498,
+  computeCazDepressurizationLimit as _v1499,
+  computeStackEffectNpp as _v1500,
+  computeBillDisaggregation as _v1502,
+  computeContinuousInsulationRatio as _v1504,
+} from "../../calc-buildingperf.js";
+
+test("bounds: spec-v1495 computeEffectiveLeakageArea -- two conventions, one building", () => {
+  const base = { cfm50: 1850, floor_area_ft2: 2400, ceiling_height_ft: 8, storeys: 1 };
+  const r = _v1495(base);
+  // IDENTITY: ACH50 and CFM50 are the same measurement through the volume.
+  assert.ok(Math.abs(r.ach50 * r.volume_ft3 / 60 - 1850) < 1e-9);
+  // IDENTITY: the hole is square, so its side squared is the leakage area.
+  assert.ok(Math.abs(r.hole_side_in * r.hole_side_in - r.ela_in2) < 1e-9);
+  // The 4 Pa and 10 Pa conventions describe the SAME building and differ only
+  // by reference pressure -- 1.89x, which is why a figure quoted without its
+  // convention cannot be compared with one quoted under the other.
+  assert.ok(Math.abs(r.eqla_in2 / r.ela_in2 - 1.89) < 1e-9);
+  assert.ok(r.eqla_in2 > r.ela_in2);
+  assert.ok(Math.abs(r.ela_in2 - 97.88) < 0.01);
+  assert.ok(Math.abs(r.eqla_in2 - 185) < 0.01);
+  // A 10 in hole in the envelope, permanently.
+  assert.ok(r.hole_side_in > 9.8 && r.hole_side_in < 10.0);
+  // The height correction is what ACH50 lacks: a three-storey house with the
+  // SAME CFM50 and volume reports a HIGHER normalized leakage.
+  const tall = _v1495({ ...base, ceiling_height_ft: 8, storeys: 3, floor_area_ft2: 800 });
+  assert.ok(tall.building_height_ft > r.building_height_ft);
+  assert.ok(tall.height_factor > r.height_factor);
+  assert.ok(_v1495({ ...base, cfm50: 0 }).error);
+  assert.ok(_v1495({ ...base, floor_area_ft2: 0 }).error);
+});
+
+test("bounds: spec-v1496 computeBuildingTightnessLimit -- the limit, fed back, has zero margin", () => {
+  const base = { floor_area_ft2: 2400, bedrooms: 3, cfm50: 1850, n_factor: 17, ceiling_height_ft: 8, planned_cfm50_reduction: 200 };
+  const r = _v1496(base);
+  // ASHRAE 62.2: 0.03 x 2400 + 7.5 x 4 = 72 + 30 = 102 cfm.
+  assert.ok(Math.abs(r.required_cfm - 102) < 1e-9);
+  assert.ok(Math.abs(r.tightness_limit_cfm50 - 1734) < 1e-9);
+  // IDENTITY: the limit itself, taken as the measurement, leaves zero margin.
+  const atLimit = _v1496({ ...base, cfm50: r.tightness_limit_cfm50, planned_cfm50_reduction: 0 });
+  assert.ok(Math.abs(atLimit.margin_cfm50) < 1e-9);
+  // The point of the tile: this house PASSES today and FAILS after the
+  // planned sealing, which is why the scope has to carry a fan.
+  assert.equal(r.above_limit, true);
+  assert.equal(r.after_above, false);
+  assert.equal(r.crosses_limit, true);
+  // and the margin is thin -- under 7%.
+  assert.ok(r.margin_pct < 7);
+  // IDENTITY: the after figure is the same compute re-run at the lower CFM50.
+  const after = _v1496({ ...base, cfm50: base.cfm50 - base.planned_cfm50_reduction, planned_cfm50_reduction: 0 });
+  assert.equal(r.after_above, after.above_limit);
+  assert.ok(_v1496({ ...base, floor_area_ft2: 0 }).error);
+  assert.ok(_v1496({ ...base, n_factor: 0 }).error);
+});
+
+test("bounds: spec-v1497 computeVentilationRateProcedure -- one zone sets the whole intake", () => {
+  const base = { rp_cfm_per_person: 5, ra_cfm_per_ft2: 0.06, ez: 0.8, people_1: 25, area_1_ft2: 2500, primary_1_cfm: 1200, people_2: 12, area_2_ft2: 1800, primary_2_cfm: 900, people_3: 40, area_3_ft2: 3000, primary_3_cfm: 1500, diversity: 1 };
+  const r = _v1497(base);
+  // IDENTITIES: the procedure's own algebra, each step against the next.
+  assert.ok(Math.abs(r.xs - r.vou_cfm / r.vps_cfm) < 1e-12);
+  assert.ok(Math.abs(r.ev - (1 + r.xs - r.zp_max)) < 1e-12);
+  assert.ok(Math.abs(r.vot_cfm - r.vou_cfm / r.ev) < 1e-9);
+  assert.ok(Math.abs(r.penalty_cfm - (r.vot_cfm - r.vou_cfm)) < 1e-9);
+  assert.ok(Math.abs(r.vou_cfm - 823) < 0.5);
+  assert.equal(String(r.critical_label), "3");
+  // Ev below 1 means the intake EXCEEDS the sum of the zone requirements --
+  // the penalty for one zone being short of primary air.
+  assert.ok(r.ev < 1);
+  assert.ok(r.vot_cfm > r.vou_cfm);
+  // THE FIX IS REDISTRIBUTION, NOT MORE AIR. Holding the system total at
+  // 3,600 cfm and equalising Zp across the three zones raises Ev and drops the
+  // intake. This assertion is what caught the note claiming that simply adding
+  // primary air to the critical zone does it.
+  const redistributed = _v1497({ ...base, primary_1_cfm: 1204, primary_2_cfm: 735, primary_3_cfm: 1661 });
+  assert.ok(Math.abs(redistributed.vps_cfm - r.vps_cfm) < 1);
+  assert.ok(redistributed.zp_max < r.zp_max);
+  assert.ok(redistributed.ev > r.ev);
+  assert.ok(redistributed.vot_cfm < r.vot_cfm);
+  // And the counterexample the note now names: ADDING air to the critical zone
+  // raises Vps, which drops Xs faster than it drops Zp, so Ev FALLS.
+  const justMore = _v1497({ ...base, primary_3_cfm: 2400 });
+  assert.ok(justMore.zp_max < r.zp_max);
+  assert.ok(justMore.ev < r.ev);
+  assert.ok(justMore.vot_cfm > r.vot_cfm);
+  assert.ok(_v1497({ ...base, ez: 0 }).error);
+});
+
+test("bounds: spec-v1498 computeZonalPressureDiagnostics -- a 50% zone is a balanced plane", () => {
+  const base = { house_pressure_pa: 50, zone_a_pressure_pa: 42, zone_b_pressure_pa: 6, zone_a_label: "attic", zone_b_label: "crawl" };
+  const r = _v1498(base);
+  assert.ok(Math.abs(r.zone_a_ratio - 0.84) < 1e-12);
+  assert.ok(Math.abs(r.zone_b_ratio - 0.12) < 1e-12);
+  // IDENTITY: a zone sitting at exactly half the house pressure has two
+  // equally leaky planes, so the path ratio is exactly 1.
+  const balanced = _v1498({ ...base, zone_a_pressure_pa: 25 });
+  assert.ok(Math.abs(balanced.zone_a_path_ratio - 1) < 1e-12);
+  // The attic is nearly at HOUSE pressure -- its house-side plane is the leaky
+  // one -- and the crawl is nearly at OUTDOOR pressure.
+  assert.ok(r.zone_a_path_ratio > 1);
+  assert.ok(r.zone_b_path_ratio < 1);
+  assert.ok(r.priority.includes("attic"));
+  assert.ok(_v1498({ ...base, house_pressure_pa: 0 }).error);
+  assert.ok(_v1498({ ...base, zone_a_pressure_pa: 60 }).error);
+});
+
+test("bounds: spec-v1499 computeCazDepressurizationLimit -- the zone is judged by the WEAKEST appliance", () => {
+  const base = { measured_depressurization_pa: 4.5, has_natural_draft_water_heater: "yes", natural_draft_wh_limit_pa: 2, has_natural_draft_furnace: "no", natural_draft_furnace_limit_pa: 3, has_induced_draft: "yes", induced_draft_limit_pa: 5, has_direct_vent: "no", direct_vent_limit_pa: 15, largest_exhaust_cfm: 200 };
+  const r = _v1499(base);
+  // The induced-draft appliance PASSES at 5 Pa and the zone still FAILS,
+  // because the natural-draft water heater at 2 Pa governs.
+  assert.equal(r.passes, false);
+  assert.equal(r.mixed, true);
+  assert.ok(Math.abs(r.governing_limit_pa - 2) < 1e-12);
+  assert.ok(r.governing_name.includes("water heater"));
+  // IDENTITY: margin is limit minus measured, and at the limit it is zero and
+  // the zone passes (the limit is inclusive).
+  assert.ok(Math.abs(r.margin_pa - (r.governing_limit_pa - r.measured)) < 1e-12);
+  const atLimit = _v1499({ ...base, measured_depressurization_pa: 2 });
+  assert.ok(Math.abs(atLimit.margin_pa) < 1e-12);
+  assert.equal(atLimit.passes, true);
+  // Removing the weakest appliance moves the governing limit UP to the next.
+  const noWh = _v1499({ ...base, has_natural_draft_water_heater: "no" });
+  assert.ok(noWh.governing_limit_pa > r.governing_limit_pa);
+  assert.equal(noWh.passes, true);
+  assert.ok(_v1499({ ...base, has_natural_draft_water_heater: "no", has_induced_draft: "no" }).error);
+});
+
+test("bounds: spec-v1500 computeStackEffectNpp -- LINEAR in height, and the spec's own constant gives zero", () => {
+  const base = { height_ft: 24, indoor_temp_f: 70, outdoor_temp_f: 10, neutral_plane_fraction: 0.5, tall_building_height_ft: 240 };
+  const r = _v1500(base);
+  // The ASHRAE 3460 form in US units. spec-v1500 printed 0.000109 in wc
+  // (0.027 Pa) for this house and "0 Pa" for the 240 ft tower, because its
+  // constant and its bracket did not belong to the same form -- roughly 400x.
+  assert.ok(Math.abs(r.total_pressure_pa - 10.99) < 0.01);
+  assert.ok(Math.abs(r.total_pressure_inwc - 0.0442) < 0.0001);
+  assert.ok(r.total_pressure_pa > 100 * 0.0271);
+  // IDENTITY: exactly linear in height -- the tower is 10x the house.
+  assert.ok(Math.abs(r.tall_pressure_pa - r.total_pressure_pa * 10) < 1e-9);
+  const asHouse = _v1500({ ...base, height_ft: 240, tall_building_height_ft: 0 });
+  assert.ok(Math.abs(asHouse.total_pressure_pa - r.tall_pressure_pa) < 1e-9);
+  assert.ok(Math.abs(r.tall_pressure_pa - 109.88) < 0.01);
+  // IDENTITY: the two halves sum to the total wherever the plane sits.
+  assert.ok(Math.abs(r.bottom_pressure_pa + r.top_pressure_pa - r.total_pressure_pa) < 1e-9);
+  const low = _v1500({ ...base, neutral_plane_fraction: 0.25 });
+  assert.ok(Math.abs(low.bottom_pressure_pa + low.top_pressure_pa - low.total_pressure_pa) < 1e-9);
+  assert.ok(low.top_pressure_pa > low.bottom_pressure_pa);
+  // Summer reverses the sign of the driving temperature difference.
+  const summer = _v1500({ ...base, indoor_temp_f: 72, outdoor_temp_f: 95 });
+  assert.equal(summer.is_winter, false);
+  assert.ok(_v1500({ ...base, height_ft: 0 }).error);
+});
+
+test("bounds: spec-v1502 computeBillDisaggregation -- the split decides where the money goes", () => {
+  const base = { baseload_per_year: 310, slope_per_degree_day: 1.85, degree_days: 1240, equipment_efficiency: 0.80, btu_per_unit: 100000, balance_point_f: 60 };
+  const r = _v1502(base);
+  // IDENTITY: the two-parameter signature reconstructs the bill exactly.
+  assert.ok(Math.abs(r.total_units - (310 + 1.85 * 1240)) < 1e-9);
+  assert.ok(Math.abs(r.weather_share_pct + r.baseload_share_pct - 100) < 1e-9);
+  // IDENTITY: the UA, run back through the same conversion, is the slope.
+  assert.ok(Math.abs(r.implied_ua * 24 / (100000 * 0.80) - 1.85) < 1e-9);
+  assert.ok(Math.abs(r.total_units - 2604) < 1e-9);
+  assert.ok(r.weather_share_pct > 88 && r.weather_share_pct < 88.2);
+  assert.equal(r.weather_dominates, true);
+  // A mostly-baseload bill will not respond to envelope work, and the flag
+  // has to say so -- same slope, ten times the baseload.
+  const baseHeavy = _v1502({ ...base, baseload_per_year: 6000 });
+  assert.equal(baseHeavy.weather_dominates, false);
+  assert.ok(_v1502({ ...base, equipment_efficiency: 0 }).error);
+  assert.ok(_v1502({ ...base, btu_per_unit: 0 }).error);
+});
+
+test("bounds: spec-v1504 computeContinuousInsulationRatio -- more cavity is a moisture DOWNGRADE", () => {
+  const base = { r_cavity: 20, r_continuous: 6, required_ratio: 0.36, indoor_temp_f: 70, indoor_rh_pct: 35, outdoor_design_temp_f: 10 };
+  const r = _v1504(base);
+  assert.ok(Math.abs(r.achieved_ratio - 6 / 26) < 1e-12);
+  assert.equal(r.meets, false);
+  assert.ok(Math.abs(r.r_continuous_min - 11.25) < 1e-9);
+  assert.ok(Math.abs(r.r_cavity_max - 10.6666667) < 1e-6);
+  // IDENTITY: both inversions, fed back, land EXACTLY on the requirement.
+  const byCi = _v1504({ ...base, r_continuous: r.r_continuous_min });
+  assert.ok(Math.abs(byCi.achieved_ratio - 0.36) < 1e-12);
+  assert.equal(byCi.meets, true);
+  const byCavity = _v1504({ ...base, r_cavity: r.r_cavity_max });
+  assert.ok(Math.abs(byCavity.achieved_ratio - 0.36) < 1e-12);
+  assert.equal(byCavity.meets, true);
+  // THE DIRECTION PEOPLE GET WRONG: adding cavity raises the R-value and
+  // LOWERS the ratio, so the assembly gets worse for moisture.
+  const deeper = _v1504({ ...base, r_cavity: 25 });
+  assert.ok(deeper.r_total > r.r_total);
+  assert.ok(deeper.achieved_ratio < r.achieved_ratio);
+  assert.ok(Math.abs(r.more_cavity_ratio - deeper.achieved_ratio) < 1e-12);
+  // The physics behind the table. IDENTITY: an assembly built to the ratio the
+  // dew point requires puts the sheathing EXACTLY on the dew point. This is
+  // what caught the ratio being written as its own complement -- the two are
+  // close together near 0.5 and the error reverses the humidity direction.
+  assert.ok(Math.abs(r.dew_point_f - 41.07) < 0.05);
+  const onDewPoint = _v1504({ ...base, r_continuous: r.ratio_from_dew_point * base.r_cavity / (1 - r.ratio_from_dew_point) });
+  assert.ok(Math.abs(onDewPoint.sheathing_temp_f - onDewPoint.dew_point_f) < 1e-9);
+  assert.ok(Math.abs(onDewPoint.achieved_ratio - r.ratio_from_dew_point) < 1e-12);
+  // This assembly is well short of it, so its sheathing condenses at design.
+  assert.ok(r.sheathing_temp_f < r.dew_point_f);
+  assert.ok(r.achieved_ratio < r.ratio_from_dew_point);
+  // A wetter house needs MORE continuous insulation, not less.
+  const wetter = _v1504({ ...base, indoor_rh_pct: 50 });
+  assert.ok(wetter.dew_point_f > r.dew_point_f);
+  assert.ok(wetter.ratio_from_dew_point > r.ratio_from_dew_point);
+  // and a milder climate needs less, which is why the table rises with zone.
+  const mild = _v1504({ ...base, outdoor_design_temp_f: 35 });
+  assert.ok(mild.ratio_from_dew_point < r.ratio_from_dew_point);
+  assert.ok(_v1504({ ...base, r_cavity: 0 }).error);
+  assert.ok(_v1504({ ...base, required_ratio: 1 }).error);
+});

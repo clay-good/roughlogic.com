@@ -1,5 +1,13 @@
 # roughlogic.com Specification v1501 -- Natural Infiltration From ACH50 (LBL n-Factor Model) (`calc-buildingperf.js`, Group C HVAC, building performance, 1 New Tile)
 
+> **Status: CUT 2026-09-08 -- DUPLICATE. This tile was not built.** The formula screen for the
+> 2026-09-08 building performance band found the headline of this question already answered by
+> `blower-door-ach50` in `calc-hvacservice.js`, which has divided ACH50 by the LBL N-factor and reported both the natural air change and the natural cfm since spec-v218. A second tile performing the same division would be a duplicate of the visible answer, so the material this spec had that the shipped tile lacked -- the N-factor SPREAD (the same test at a low and a high N, and the ratio between them, which is the spec's own point that quoting natural infiltration without stating N is close to meaningless) and the seasonal heating energy the leakage costs at an entered degree-day figure -- landed on `blower-door-ach50` instead. Those three inputs default to zero, and with them empty the old answer is unchanged, bit for bit.
+>
+> This spec's own arithmetic was checked and is sound: 1,850 CFM50 at N 17 is 109 cfm and 0.340 natural air changes in a 19,200 cu ft house, and the same house reads 168 cfm at N 11 and 74 cfm at N 25 -- the 2.3x spread it describes. All of it is reproduced by the host tile.
+>
+> The specification below is kept as the record of the screen. Do not implement it.
+>
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-buildingperf.js`**
 > (Group C, HVAC -- the existing category, hub `/groups/hvac/`; building performance and envelope diagnostics), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.

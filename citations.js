@@ -22313,6 +22313,104 @@ export const CITATIONS = {
       { name: "Downwash is not modelled", value: "a short stack near buildings can lose its rise entirely", source: "good engineering practice stack height rules" },
     ],
   },
+  // spec-v1495..v1504: the 2026-09-08 trade-expansion building performance and
+  // envelope diagnostics band. Eight tiles; spec-v1501 and spec-v1503 cut.
+  "effective-leakage-area": {
+    formula: "ELA (US, 4 Pa reference) = CFM50 / 18.9 in square inches, and EqLA (Canadian, 10 Pa reference) = CFM50 / 10.0; specific leakage area = ELA / floor area; normalized leakage = 1000 x SLA x (building height / 8.2 ft)^0.3. The hole side is the square root of the ELA.",
+    edition: "The LBL effective leakage area conversion at the 4 Pa reference and the CGSB equivalent leakage area at 10 Pa, both by name, with the ASHRAE Fundamentals normalized-leakage definition and its height correction. The two conventions describe the SAME building and differ only by reference pressure, so a figure quoted without its convention cannot be compared with one quoted under the other.",
+    freeAccess: "Two published divisors and one power-law height correction.",
+    governance: GOVERNANCE.general,
+    editionNote: "The point of the conversion is communication rather than physics: 98 square inches is a hole about 10 inches on a side, permanently open in the envelope, and that sentence changes a homeowner's mind where an ACH50 figure does not. The trap is the CONVENTION -- the US and Canadian figures for one building differ by about 1.9x, and comparing an ELA against an EqLA reports a difference that does not exist. Normalized leakage carries the height correction that ACH50 lacks, which is why two houses with the same ACH50 can have quite different real air change rates and why normalized leakage rather than ACH50 is the right basis for estimating natural infiltration.",
+    assumptions: [
+      { name: "Reference pressure", value: "4 Pa for ELA, 10 Pa for EqLA", source: "LBL and CGSB conventions" },
+      { name: "Height correction exponent", value: "0.3 about an 8.2 ft reference", source: "the normalized leakage definition" },
+      { name: "Single-zone envelope", value: "the model does not say where the leakage is", source: "a zonal pressure diagnostic" },
+    ],
+  },
+  "building-tightness-limit": {
+    formula: "the ASHRAE 62.2 whole-house requirement 0.03 x floor area + 7.5 x (bedrooms + 1) in cfm, converted to a CFM50 tightness limit by multiplying by the LBL N-factor; the house is below the limit when its measured CFM50 falls under it, and the margin is the sealing that can be done before mechanical ventilation is required.",
+    edition: "ASHRAE 62.2 whole-house ventilation by name, with the LBL N-factor conversion between natural and 50 Pa flows. The limit is a SCREEN on whether air sealing will drive a house below its ventilation requirement, not a substitute for the 62.2 calculation or for a measured ventilation rate.",
+    freeAccess: "One published rate expression and one divisor.",
+    governance: GOVERNANCE.general,
+    editionNote: "This is the number that decides whether an air-sealing scope needs a ventilation fan in it, and the reason to run it BEFORE the work rather than after: a house 7% above the limit is one afternoon of sealing away from needing a fan, and finding that out afterwards is an expensive way to learn it. Natural infiltration credited against the requirement is a seasonal average and is wrong on any given day by a wide margin, which is why current practice is increasingly to ventilate mechanically and treat infiltration as an energy term only.",
+    assumptions: [
+      { name: "Infiltration credit is a seasonal average", value: "wrong on any given day by a wide margin", source: "ASHRAE 62.2 and the LBL model" },
+      { name: "N-factor", value: "climate zone, height and shielding; a threefold range", source: "the LBL table" },
+      { name: "Not a signed test report", value: "a screen, not a rater's certification", source: "RESNET or BPI protocol" },
+    ],
+  },
+  "ventilation-rate-procedure": {
+    formula: "per breathing zone Vbz = Rp x people + Ra x area and Voz = Vbz / Ez; Zp = Voz / primary air; Xs = Vou / Vps; Ev = 1 + Xs - max(Zp); Vot = Vou / Ev.",
+    edition: "The ASHRAE 62.1 Ventilation Rate Procedure for a multiple-zone recirculating system by name, in its simplified single-supply form. Rp, Ra and Ez are ENTERED from the standard's own occupancy-category and air-distribution tables rather than reproduced here, because those tables are the part that changes between editions.",
+    freeAccess: "The procedure's algebra; no table from the standard is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The counterintuitive result the procedure exists to produce is that ONE zone sets the intake for the whole system. The zone with the highest ratio of required outdoor air to the primary air it receives is critical, every other zone is over-ventilated as a consequence, and the fix is to REDISTRIBUTE primary air toward the critical zone at a constant system total rather than to raise the intake -- which is cheaper than conditioning the extra outdoor air for the life of the building. Simply adding primary air to the critical zone is a different move and can lower the efficiency, because it raises the system's total primary flow and so lowers the system fraction alongside the zone fraction. Ez below 1 for overhead heating is where a design quietly loses ventilation air, because warm supply air short-circuits to the return.",
+    assumptions: [
+      { name: "Single-supply simplified form", value: "multiple air handlers or systems are computed separately", source: "ASHRAE 62.1" },
+      { name: "Rp, Ra and Ez are entered", value: "from the standard's occupancy-category and distribution tables", source: "the applicable edition" },
+      { name: "Design, not measurement", value: "a measured intake is a different question", source: "a balancing report" },
+    ],
+  },
+  "zonal-pressure-diagnostics": {
+    formula: "pressure ratio = zone pressure with reference to outdoors / house pressure with reference to outdoors, both taken during a blower door depressurization; the ratio of the two series leakage paths follows as sqrt(ratio / (1 - ratio)) on the standard n = 0.5 flow exponent.",
+    edition: "The zonal pressure diagnostic as building-performance field practice states it, with the series-leakage interpretation on an assumed flow exponent of 0.5. It is a RATIO diagnostic: it says which of two planes is leakier, not how many cfm either passes.",
+    freeAccess: "One measured ratio and one square-root relation.",
+    governance: GOVERNANCE.general,
+    editionNote: "A ratio near the house pressure means the plane between the house and the zone is the leaky one and the zone is effectively inside; a ratio near zero means that plane is tight and the zone is effectively outdoors. That single reading decides where the money goes, and it is the answer to the question a blower door number cannot address at all -- an attic at house pressure is being ventilated by the house, and insulating over it without air sealing first is close to wasted work.",
+    assumptions: [
+      { name: "Flow exponent 0.5", value: "real envelopes run roughly 0.5 to 0.75", source: "the power-law leakage model" },
+      { name: "Series leakage, two planes", value: "a zone with a third path is not this model", source: "a multi-point diagnostic" },
+      { name: "A ratio, not a flow", value: "it does not report cfm through either plane", source: "an add-a-hole measurement" },
+    ],
+  },
+  "caz-depressurization-limit": {
+    formula: "the zone passes when the measured worst-case depressurization is at or below the limit for the WEAKEST vent type present; limits are entered by appliance class, and the margin is limit minus measured.",
+    edition: "The combustion appliance zone depressurization test as BPI and CAZ field protocol states it, with the limits ENTERED by appliance class because they differ between protocols and jurisdictions. It is a pressure screen: it does not measure spillage, draft, or carbon monoxide, all of which the full protocol requires.",
+    freeAccess: "One comparison against an entered limit.",
+    governance: GOVERNANCE.general,
+    editionNote: "The rule the arithmetic encodes is that the zone is judged by the WEAKEST appliance in it, so a zone can contain appliances that individually pass and still fail. A natural-draft water heater with a limit of a few pascals sitting alongside an induced-draft furnace governs the whole zone, and this is the test that must be resolved before any further air sealing -- tightening a house that already fails is how backdrafting becomes carbon monoxide exposure. Reducing the exhaust that causes the depressurization comes before makeup air, and replacing the weakest appliance with a sealed-combustion unit removes the problem rather than managing it.",
+    assumptions: [
+      { name: "Limits are entered by appliance class", value: "they differ between protocols and jurisdictions", source: "BPI / the adopted protocol" },
+      { name: "Worst case is a test condition", value: "every exhaust on, interior doors positioned to worsen it", source: "the CAZ procedure" },
+      { name: "Not a spillage or CO test", value: "pressure only", source: "the full combustion safety protocol" },
+    ],
+  },
+  "stack-effect-npp": {
+    formula: "total stack pressure difference = 0.0188 x 1898.3-equivalent constant form: dP (Pa) = 3460 x height (m) x (1/T_outdoor - 1/T_indoor) in kelvin, which in US units is 1898.3 x height (ft) x (1/T_outdoor - 1/T_indoor) in degrees Rankine; the neutral plane splits that total between the bottom and the top in proportion to its position.",
+    edition: "The ASHRAE Fundamentals stack-effect relation by name, in its US-unit form. The constant 1898.3 Pa per foot per reciprocal Rankine is the SI 3460 converted at 0.3048 m per foot and 1.8 Rankine per kelvin, both exact.",
+    freeAccess: "One published relation and two exact conversions.",
+    governance: GOVERNANCE.general,
+    editionNote: "The relation is exactly LINEAR in height and depends on the reciprocal temperatures, which is why stack effect is a curiosity in a house and a design problem in a tower: the same temperatures that give about 11 Pa across a two-storey house give about 110 Pa across a 240 ft building, with no wind and no fans involved at all. The neutral pressure plane is where the answer becomes actionable -- below it cold air comes in and above it warm moist air goes out, which is why the top of a building gets the moisture problems and the bottom gets the cold draughts, and why sealing the top and bottom of an envelope does far more than sealing its middle.",
+    assumptions: [
+      { name: "No wind, no mechanical systems", value: "real buildings combine all three", source: "ASHRAE Fundamentals" },
+      { name: "Neutral plane position is entered", value: "it depends on where the leakage sits, which this does not model", source: "a zonal diagnostic" },
+      { name: "Air density from temperature only", value: "humidity and altitude are not carried", source: "the full relation" },
+    ],
+  },
+  "bill-disaggregation": {
+    formula: "a two-parameter energy signature: annual consumption = baseload + slope x heating degree days at the fitted balance point; the weather-sensitive share is slope x degree days over the total, and the implied building UA is slope x equipment efficiency x BTU per unit / 24.",
+    edition: "Degree-day regression of utility bills (the energy signature method) as ASHRAE Fundamentals and PRISM-style bill analysis describe it, with the baseload, slope and balance point ENTERED as fitted parameters rather than derived here. The regression itself is not performed by this calculation.",
+    freeAccess: "One linear relation and one unit conversion.",
+    governance: GOVERNANCE.general,
+    editionNote: "The split decides where the money goes: a bill that is mostly baseload will not respond to insulation however good the insulation is, and one that is mostly weather-sensitive will. The balance point is the parameter people get wrong -- it is FITTED, not the conventional 65 degF, and a well-insulated house with large internal gains balances materially lower; using the wrong base temperature makes both the intercept and the slope meaningless. The UA implied by the slope is worth comparing against a modelled one, because a large disagreement means one of the two is wrong.",
+    assumptions: [
+      { name: "Baseload, slope and balance point are fitted parameters", value: "entered here, not regressed", source: "a bill regression" },
+      { name: "Degree days at the fitted base", value: "not the conventional 65 degF base", source: "the fitted signature" },
+      { name: "Whole-building UA", value: "includes infiltration and duct losses, not a takeoff U-value", source: "a modelled load calculation" },
+    ],
+  },
+  "continuous-insulation-ratio": {
+    formula: "achieved ratio = R continuous exterior / (R continuous + R cavity) against a required ratio from the code table; R_ci,min = required x R_cavity / (1 - required) and R_cavity,max = R_ci x (1 - required) / required. The sheathing sits at T_out + ratio x (T_in - T_out) because only the continuous R lies between it and outdoors, so the ratio the physics requires is (dew point - T_out) / (T_in - T_out).",
+    edition: "The continuous-insulation ratio for condensation control as the energy code expresses it, with the REQUIRED ratio entered from the applicable code table rather than reproduced, because the table is jurisdictional and changes between editions. The dew point uses the Magnus approximation.",
+    freeAccess: "One ratio, two rearrangements, and one published dew-point approximation.",
+    governance: GOVERNANCE.general,
+    editionNote: "The direction people get wrong is that adding CAVITY insulation to a wall with fixed exterior insulation makes the assembly WORSE from a moisture standpoint even as it improves the R-value: the ratio falls and the sheathing gets colder. A deeper wall packed with more cavity insulation is a common energy upgrade and a moisture downgrade, and it is exactly the change made without thinking of it as an assembly change. The required ratio is nothing but a dew point calculation solved once per climate zone at assumed indoor conditions, so a house run wetter than the table assumed needs more continuous insulation than the table gives.",
+    assumptions: [
+      { name: "The required ratio is entered", value: "from the applicable energy code table", source: "the adopted code" },
+      { name: "Design conditions, not hygrothermal analysis", value: "no transient or seasonal moisture accounting", source: "a hygrothermal model" },
+      { name: "Air leakage is not modelled", value: "it dwarfs vapor diffusion and wets most walls", source: "the air barrier design" },
+    ],
+  },
   // spec-v1622..v1631: the 2026-09-08 trade-expansion HVAC test-and-balance
   // and hydronic systems band. Ten tiles, nothing cut.
   "flow-hood-correction": {

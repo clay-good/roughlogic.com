@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 2006,
-  "covered_count": 1928,
+  "total_tiles": 2014,
+  "covered_count": 1936,
   "covered": [
     "aav-install-check",
     "abatement-containment",
@@ -124,6 +124,7 @@
     "bernoulli-head",
     "beverage-co2-duration",
     "bifacial-pv-gain",
+    "bill-disaggregation",
     "blast-airblast-overpressure",
     "blast-burden-spacing",
     "blast-fume-clearance-time",
@@ -177,6 +178,7 @@
     "bucket-elevator-capacity",
     "buffer-stroke-speed",
     "buffer-tank-loop-credit",
+    "building-tightness-limit",
     "building-ua",
     "bulk-density",
     "bunker-silo-capacity",
@@ -208,6 +210,7 @@
     "cattle-heart-girth-weight",
     "cattle-stocking-rate",
     "cavity-drying-system",
+    "caz-depressurization-limit",
     "cctv-retention-days",
     "cctv-storage",
     "ceiling-speaker-coverage",
@@ -374,6 +377,7 @@
     "construction-adhesive-tubes",
     "containment-air-balance",
     "contents-packout-inventory",
+    "continuous-insulation-ratio",
     "contour-slope",
     "control-cable-tension",
     "control-joint-spacing",
@@ -549,6 +553,7 @@
     "economizer-savings-hours",
     "edm-slope-reduction",
     "effective-annual-rate",
+    "effective-leakage-area",
     "egc-parallel-raceways",
     "egc-sizing",
     "egc-upsize-proportional",
@@ -1583,6 +1588,7 @@
     "srt-fm-ratio",
     "srw-geogrid-spacing",
     "ssd-design-speed",
+    "stack-effect-npp",
     "stack-emission-pte",
     "stadia-distance",
     "stage-deck-live-load",
@@ -1821,6 +1827,7 @@
     "velocity-head",
     "vent-sizing-stack",
     "vent-terminal-check",
+    "ventilation-rate-procedure",
     "vertical-curve",
     "vertical-curve-sight-distance",
     "vessel-head-volume",
@@ -1930,6 +1937,7 @@
     "worm-gear-geometry",
     "wsfu-demand",
     "yaw-error-loss",
-    "yield-ep"
+    "yield-ep",
+    "zonal-pressure-diagnostics"
   ]
 }

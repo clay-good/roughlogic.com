@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "0c5e89813fb0294d",
+      "sha": "ea211f25a27b11fd",
       "date": "2026-09-08"
     },
     "/tools/": {
-      "sha": "042f4bd0f58806df",
+      "sha": "8ad2c756ca5fb1f1",
       "date": "2026-09-08"
     },
     "/groups/accounting/": {
-      "sha": "f1664c8a15a60682",
+      "sha": "be1d5b4905499abe",
       "date": "2026-09-08"
     },
     "/groups/agriculture/": {
-      "sha": "ba05b7d7b80749db",
+      "sha": "dca85c89fdcadf5d",
       "date": "2026-09-08"
     },
     "/groups/construction/": {
-      "sha": "c9f82915f7be7095",
+      "sha": "5a53151f8c0f9ec9",
       "date": "2026-09-08"
     },
     "/groups/cross-trade/": {
-      "sha": "100e3cf996e191f7",
+      "sha": "2806806cfbd8238f",
       "date": "2026-09-08"
     },
     "/groups/educators/": {
-      "sha": "588010225ced44db",
+      "sha": "b79acc9ec59b6732",
       "date": "2026-09-08"
     },
     "/groups/electrical/": {
-      "sha": "91a91b799f4d5f05",
+      "sha": "fa388056267e27f4",
       "date": "2026-09-08"
     },
     "/groups/field/": {
-      "sha": "69218c8b35aef522",
+      "sha": "c3b5aea3d45f75bd",
       "date": "2026-09-08"
     },
     "/groups/fire-ground/": {
-      "sha": "943c95e3b4ebf41f",
+      "sha": "31c193ffab7ee61f",
       "date": "2026-09-08"
     },
     "/groups/historical/": {
-      "sha": "db60a972fc55ca9a",
+      "sha": "89e1c849c340da26",
       "date": "2026-09-08"
     },
     "/groups/hvac/": {
-      "sha": "f6ae4bfd2bbe7977",
+      "sha": "40ee94f90750132b",
       "date": "2026-09-08"
     },
     "/groups/kitchen/": {
-      "sha": "dee74b04c2bfdf6d",
+      "sha": "d73b1d3b683e2758",
       "date": "2026-09-08"
     },
     "/groups/lab/": {
-      "sha": "e59eaba841f85ad4",
+      "sha": "93e2eb53723c3bd7",
       "date": "2026-09-08"
     },
     "/groups/mechanic/": {
-      "sha": "1de36fdd951a8bc0",
+      "sha": "025b813bf97bfed1",
       "date": "2026-09-08"
     },
     "/groups/plumbing/": {
-      "sha": "c2e39d0f723ec675",
+      "sha": "b43737103652bca7",
       "date": "2026-09-08"
     },
     "/groups/real-estate/": {
-      "sha": "8a1950f76423747f",
+      "sha": "13e737fdb159746b",
       "date": "2026-09-08"
     },
     "/groups/references/": {
-      "sha": "10a5bc71a2166d88",
+      "sha": "383317bc95f2ee3d",
       "date": "2026-09-08"
     },
     "/groups/restoration/": {
-      "sha": "73925efa79c25f21",
+      "sha": "e8dba73a595386c1",
       "date": "2026-09-08"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "cb1c2d7aa1d6c47b",
+      "sha": "6a78aae80c250571",
       "date": "2026-09-08"
     },
     "/groups/stage/": {
-      "sha": "dab70fa8ec993ce5",
+      "sha": "079543521f0004b1",
       "date": "2026-09-08"
     },
     "/groups/trucking/": {
-      "sha": "910c95d171c10a3a",
+      "sha": "430965c213535d4b",
       "date": "2026-09-08"
     },
     "/groups/water/": {
-      "sha": "715b92ab4b44d154",
+      "sha": "80cfa0bf48aa3871",
       "date": "2026-09-08"
     },
     "/tools/aav-install-check/": {
@@ -322,8 +322,8 @@
       "date": "2026-09-04"
     },
     "/tools/ashrae-622-ventilation/": {
-      "sha": "45f9cde2ea8b06c2",
-      "date": "2026-09-01"
+      "sha": "047540068dc1bed8",
+      "date": "2026-09-08"
     },
     "/tools/asme-head-thickness/": {
       "sha": "8c36038a2fb596dd",
@@ -605,6 +605,10 @@
       "sha": "4704175330e9f604",
       "date": "2026-09-01"
     },
+    "/tools/bill-disaggregation/": {
+      "sha": "57f00f6313779aab",
+      "date": "2026-09-08"
+    },
     "/tools/blast-airblast-overpressure/": {
       "sha": "9f12b0f847562510",
       "date": "2026-09-05"
@@ -821,6 +825,10 @@
       "sha": "3f759999ba9b97bc",
       "date": "2026-09-01"
     },
+    "/tools/building-tightness-limit/": {
+      "sha": "c48feb574d32d34c",
+      "date": "2026-09-08"
+    },
     "/tools/building-ua/": {
       "sha": "16c849f3706bf3fb",
       "date": "2026-09-01"
@@ -952,6 +960,10 @@
     "/tools/cavity-drying-system/": {
       "sha": "6793fb166747ae4c",
       "date": "2026-09-01"
+    },
+    "/tools/caz-depressurization-limit/": {
+      "sha": "9506a9c2beb98535",
+      "date": "2026-09-08"
     },
     "/tools/cctv-retention-days/": {
       "sha": "219aebe1df80d30d",
@@ -1526,8 +1538,8 @@
       "date": "2026-09-08"
     },
     "/tools/condensing-flue-condensate/": {
-      "sha": "48a1f66ef68562eb",
-      "date": "2026-09-04"
+      "sha": "176e799a3e047a36",
+      "date": "2026-09-08"
     },
     "/tools/conductivity-from-tds/": {
       "sha": "48a397f8e73b2de5",
@@ -1624,6 +1636,10 @@
     "/tools/contents-packout-inventory/": {
       "sha": "c61409e09c565e86",
       "date": "2026-09-04"
+    },
+    "/tools/continuous-insulation-ratio/": {
+      "sha": "755e3c65dfdb28f4",
+      "date": "2026-09-08"
     },
     "/tools/continuous-load-ocpd/": {
       "sha": "aaedc7d2fc4a7ef9",
@@ -1850,8 +1866,8 @@
       "date": "2026-09-04"
     },
     "/tools/damper-authority/": {
-      "sha": "3c9397700ba6419e",
-      "date": "2026-09-04"
+      "sha": "6fe62b123b3e16fd",
+      "date": "2026-09-08"
     },
     "/tools/dc-shunt-sizing/": {
       "sha": "a57411c4f65bea41",
@@ -2340,6 +2356,10 @@
     "/tools/effective-annual-rate/": {
       "sha": "85eba6ec249c8dfc",
       "date": "2026-09-04"
+    },
+    "/tools/effective-leakage-area/": {
+      "sha": "0659e4dc8fd64ad1",
+      "date": "2026-09-08"
     },
     "/tools/egc-parallel-raceways/": {
       "sha": "0b1721a6eb9489c1",
@@ -6673,6 +6693,10 @@
       "sha": "f38894ed2921006f",
       "date": "2026-09-01"
     },
+    "/tools/stack-effect-npp/": {
+      "sha": "44b0e4d97d9e0e6b",
+      "date": "2026-09-08"
+    },
     "/tools/stack-emission-pte/": {
       "sha": "4f537ca85637a4cc",
       "date": "2026-09-08"
@@ -7673,6 +7697,10 @@
       "sha": "1bf0e609f9a0f587",
       "date": "2026-09-04"
     },
+    "/tools/ventilation-rate-procedure/": {
+      "sha": "4dff7fa056c4e7f1",
+      "date": "2026-09-08"
+    },
     "/tools/vertical-curve/": {
       "sha": "01e898eebceed7c0",
       "date": "2026-09-05"
@@ -8116,6 +8144,10 @@
     "/tools/yield-ep/": {
       "sha": "e60214c409d045fb",
       "date": "2026-09-01"
+    },
+    "/tools/zonal-pressure-diagnostics/": {
+      "sha": "93da47ee9a5e07a8",
+      "date": "2026-09-08"
     }
   }
 }

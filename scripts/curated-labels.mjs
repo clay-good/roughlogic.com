@@ -167,6 +167,10 @@ export const CURATED_OUTPUT_LABELS = {
   "sloped-backfill-earth-pressure": { ka: "Active earth-pressure coefficient Ka" },
   "soil-bearing-capacity": { nq: "Bearing capacity factor Nq", nc: "Bearing capacity factor Nc" },
   "soil-gradation-coefficients": { cu: "Uniformity coefficient Cu" },
+  "effective-leakage-area": {
+    ach50: "Air changes per hour at 50 Pa (ACH50)",
+    sla: "Specific leakage area (ELA per ft² of floor)",
+  },
   "spearman-rank-correlation": { rho: "Spearman rho" },
   "steel-b2-amplifier": { rm: "Story stiffness factor RM" },
   "steel-block-shear": {
@@ -174,6 +178,10 @@ export const CURATED_OUTPUT_LABELS = {
     ant: "Net tension area Ant (in²)",
   },
   "steel-tension-member": { u: "Shear lag factor U" },
+  "ventilation-rate-procedure": {
+    xs: "System outdoor air fraction Xs",
+    ev: "System ventilation efficiency Ev",
+  },
   "tankless-gpm": { gpm: "Hot-water flow (gpm)" },
   "tire-load-check": { ok: "Within the tire rating" },
   "tr55-graphical-peak-discharge": { fp: "Pond and swamp factor Fp" },

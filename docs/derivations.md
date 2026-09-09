@@ -1531,6 +1531,14 @@ cross-check.
 | calc-arborist.js | `computeTreeRiggingShock` | `{ static_weight_lb, drop_ft, rope_length_ft, elong_pct = 5 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeTrunkDecayStrength` | `{ diameter_in = 0, shell_thick_in = 0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeTrunkMinShellThickness` | `{ diameter_in = 0, allow_loss_pct = 0 } = {}` | _ | _ | _ |
+| calc-buildingperf.js | `computeBillDisaggregation` | `{ baseload_per_year = 0, slope_per_degree_day = 0, degree_days = 0, equipment...` | _ | _ | _ |
+| calc-buildingperf.js | `computeBuildingTightnessLimit` | `{ floor_area_ft2 = 0, bedrooms = 0, cfm50 = 0, n_factor = 17, ceiling_height_...` | _ | _ | _ |
+| calc-buildingperf.js | `computeCazDepressurizationLimit` | `{ measured_depressurization_pa = 0, has_natural_draft_water_heater = "no", na...` | _ | _ | _ |
+| calc-buildingperf.js | `computeContinuousInsulationRatio` | `{ r_cavity = 0, r_continuous = 0, required_ratio = 0, indoor_temp_f = 70, ind...` | _ | _ | _ |
+| calc-buildingperf.js | `computeEffectiveLeakageArea` | `{ cfm50 = 0, floor_area_ft2 = 0, ceiling_height_ft = 8, storeys = 1, } = {}` | _ | _ | _ |
+| calc-buildingperf.js | `computeStackEffectNpp` | `{ height_ft = 0, indoor_temp_f = 70, outdoor_temp_f = 0, neutral_plane_fracti...` | _ | _ | _ |
+| calc-buildingperf.js | `computeVentilationRateProcedure` | `{ rp_cfm_per_person = 0, ra_cfm_per_ft2 = 0, ez = 1, people_1 = 0, area_1_ft2...` | _ | _ | _ |
+| calc-buildingperf.js | `computeZonalPressureDiagnostics` | `{ house_pressure_pa = 50, zone_a_pressure_pa = 0, zone_b_pressure_pa = 0, zon...` | _ | _ | _ |
 | calc-civil.js | `computeCompoundCurve` | `{ r1_ft = 0, r2_ft = 0, delta1_deg = 0, delta2_deg = 0 } = {}` | _ | _ | _ |
 | calc-civil.js | `computeCurveDeflectionStakeout` | `{ mode, radius_ft, degree_of_curve, arc_length_ft } = {}` | _ | _ | _ |
 | calc-civil.js | `computeEarthworkEndArea` | `{ areas, interval_ft, mid_area_ft2, swell_shrink_factor } = {}` | _ | _ | _ |
@@ -2507,7 +2515,7 @@ cross-check.
 | calc-hvac.js | `renderStaticPressureHvac` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderWetBulbPsychrometer` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvacservice.js | `computeAshrae622Ventilation` | `{ floor_area_ft2 = 0, bedrooms = 0, infil_credit_cfm = 0 } = {}` | _ | _ | _ |
-| calc-hvacservice.js | `computeBlowerDoorAch50` | `{ cfm50 = 0, volume_ft3 = 0, n_factor = 17, target_ach50 = 3 } = {}` | _ | _ | _ |
+| calc-hvacservice.js | `computeBlowerDoorAch50` | `{ cfm50 = 0, volume_ft3 = 0, n_factor = 17, target_ach50 = 3, n_factor_low = ...` | _ | _ | _ |
 | calc-hvacservice.js | `computeChilledWaterDeltaT` | `{ load_btuh = 0, actual_gpm = 0, design_delta_t_f = 0 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeChimneyDraft` | `{ stack_height_ft = 0, ambient_temp_f = 0, mean_flue_temp_f = 0, baro_psia = ...` | _ | _ | _ |
 | calc-hvacservice.js | `computeChimneyHeightForDraft` | `{ target_draft_net_inwc = 0, ambient_temp_f = 0, mean_flue_temp_f = 0, baro_p...` | _ | _ | _ |
@@ -3671,7 +3679,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2257.
+Row count: 2265.
 
 <!-- END function-corpus-v14 -->
 
@@ -4126,7 +4134,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (185 tiles)
+### Group C HVAC (193 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4145,12 +4153,15 @@ per spec-v14 §13.1 second paragraph.
 | `baseboard-length-for-load` | Baseboard Length for a Room Load | Slant/Fin (inverse); 4,800 BTU/hr, 180 F water, 1 gpm, Fine Line 30 (600 BTU/f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `baseboard-output` | Hydronic Baseboard Output | Slant/Fin; 180 F water / 1 gpm / 8 ft of Slant/Fin Fine Line 30 -> 6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `belt-pulley` | Belt Length and Pulley Speed | Project (first-principles); 4 in drive / 8 in driven / 18 in centers / 1750 RPM motor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `bill-disaggregation` | Utility Bill Baseload and Weather-Sensitive Split (Energy Signature) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `blowdown-heat-recovery` | Boiler Blowdown Heat Recovery and Efficiency Gain | Project (first-principles); ASME, the boiler manufacturer, the water treatment progra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `blower-door-ach50` | Blower-Door Air-Tightness (ACH50, Natural Infiltration, Code Check) | IECC R402.4.1.2 + LBL infiltration model; spec-v218 section 2.1 pinned example (first test, FAIL) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `blown-insulation-coverage` | Blown Insulation Coverage | Manufacturer blown-insulation coverag...; spec-v99 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `boiler-pipe-sizing` | Boiler Distribution Pipe Sizing | ASHRAE / Bell & Gossett; GPM = 200000/(500*20) = 20; v(1.265 in) = 5.11 > 4 -> ste... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `buffer-tank-loop-credit` | Buffer Tank with Distribution-Loop Credit | ASHRAE / Idronics (Caleffi); 60 gal gross, 1.5 in x 200 ft loop holds 18.36 gal -> 41.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `building-tightness-limit` | Building Tightness Limit vs Minimum Ventilation (When Air Sealing Needs a Fan) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `building-ua` | Whole-Building Heat-Loss Coefficient UA | Whole-building UA (ASHRAE / RESNET); spec-v329 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `caz-depressurization-limit` | Combustion Appliance Zone Depressurization Limit (Worst-Case Backdraft Test) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cfm-per-ton` | CFM per Ton | Project (first-principles); ACCA Manual D / industry rule of thumb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `chilled-water-delta-t` | Chilled-Water Low Delta-T Screen and Pump Penalty | Project (first-principles); Q = 500 x gpm x delta-T; cube law on flow | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `chiller-staging-point` | Chiller Staging Point and Part-Load Efficiency | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4181,6 +4192,7 @@ per spec-v14 §13.1 second paragraph.
 | `condenser-heat-rejection` | Condenser Total Heat of Rejection | Total heat of rejection THR = Q_evap ...; spec-v322 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `condenser-td-head-pressure` | Condenser TD and Condensing Temperature (Dry or Wet Bulb) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `condensing-flue-condensate` | Condensing Appliance Flue Condensate Rate | Condensing appliance flue condensate ...; water = 1 therm/hr x 9.4 = 9.4 lb/hr; condensate = 9.4 x ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `continuous-insulation-ratio` | Continuous vs Cavity Insulation Ratio for Condensation Control | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cooling-coil-total-load` | Cooling Coil Total Load from Enthalpy Difference | ASHRAE Fundamentals; spec-v376 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cooling-tower` | Cooling Tower Approach and Range | CTI ATC-105 cooling-tower test code; 95 F in / 85 F out / 75 F wet-bulb / 300 gpm / 15 kW fan ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `damper-authority` | Control Damper Authority and Leakage | Project (first-principles); damper dP / branch dP; leakage as sqrt(dP) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4204,6 +4216,7 @@ per spec-v14 §13.1 second paragraph.
 | `economic-insulation-thickness` | Economic (Least-Cost) Insulation Thickness | economic-thickness analysis; dT 250, R0 0.5, k 0.27, 8,000 h, $12/MMBtu at 80% efficie... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `economizer-enthalpy-changeover` | Economizer Enthalpy Changeover | ASHRAE 90.1; spec-v443 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `economizer-savings-hours` | Air-Side Economizer Free-Cooling Hours | ASHRAE sensible-heat relation + Stand...; 4000 CFM, dT 20 F -> 86,400 BTU/hr | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `effective-leakage-area` | Effective Leakage Area and Normalized Leakage (Blower Door to Square Inches of Hole) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `envelope-conduction-load` | Opaque-Envelope Conduction Cooling Load (Sol-Air CLTD) | ASHRAE / ACCA Manual J opaque envelope; spec-v229 section 2.1 pinned example (dark roof) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `equivalent-length` | Equivalent Length of Fittings | ASHRAE / SMACNA fitting tables; Four long-radius 90-degree elbows at 1 in (1.7 ft each) +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `erv-sensible-recovery` | ERV/HRV Sensible Effectiveness and Recovered Load | ASHRAE Standard 84 / AHRI Standard 10...; spec-v275 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4300,6 +4313,7 @@ per spec-v14 §13.1 second paragraph.
 | `shr` | Sensible Heat Ratio | ASHRAE Handbook (Fundamentals); 24,000 BTU/hr sensible / 30,000 BTU/hr total -> SHR 0.80 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shr-latent` | Sensible Heat Ratio / Latent Split (ASHRAE) | ASHRAE; Q_s = 1.08 * 1200 * 20 = 25,920; Q_l = 36,000 - 25,920 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `snowmelt-load` | Hydronic Snowmelt Load and Boiler Sizing (ASHRAE) | ASHRAE snow-melting flux / Chapman IP...; spec-v478 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `stack-effect-npp` | Stack Effect Pressure and the Neutral Pressure Plane | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `static-pressure-hvac` | Static Pressure | ACCA Manual D / ASHRAE Fundamentals; filter 0.10 + coil 0.30 + supply duct 0.20 + return duct ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `superheat-subcool` | Superheat and Subcool | AHRI / manufacturer P-T charts; R-410A at 118 psig saturates at ~40 F; suction line at 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-stage-interstage-pressure` | Two-Stage Refrigeration Interstage Pressure | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4309,12 +4323,14 @@ per spec-v14 §13.1 second paragraph.
 | `valve-authority` | Control Valve Authority (Beta) | Control valve authority (beta); beta = 5/(5+3) = 5/8 = 0.625 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `variable-primary-bypass` | Variable Primary Chilled Water Minimum Flow Bypass | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vav-box-airflow` | VAV Box Minimum and Maximum Airflow | VAV design / ASHRAE 62.1; spec-v410 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `ventilation-rate-procedure` | ASHRAE 62.1 Ventilation Rate Procedure (Multiple-Zone, Critical Zone, System Efficiency) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vibration-isolation` | Vibration Isolation Efficiency (ASHRAE) | ASHRAE Handbook -- Fundamentals, Soun...; spec-v483 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `walk-in-cooler-load` | Walk-In Cooler Heat Load | ASHRAE Refrigeration; spec-v432 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wall-condensation-gradient` | Wall Condensation Plane Temperature vs Dew Point | R-proportional gradient + Magnus dew ...; spec-v331 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wet-bulb-psychrometer` | Wet-Bulb Sling Psychrometer | ASHRAE Handbook (Fundamentals); 80 F dry-bulb / 67 F wet-bulb at 1013.25 hPa -> ~50.7% RH... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `window-overhang-shade` | Window Overhang Shading (Profile Angle and Shade Line) | ASHRAE Handbook-Fundamentals (Fenestr...; spec-v1012 section 2.1 pinned example; tan(profile) = tan... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `window-solar-heat-gain` | Window Solar Heat Gain and Conduction Cooling Load | ASHRAE / ACCA Manual J fenestration; spec-v227 section 2.1 pinned example (west window) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `zonal-pressure-diagnostics` | Zonal Pressure Diagnostics (Series Leakage Split for Attics and Crawlspaces) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group D Restoration (56 tiles)
 
@@ -5850,6 +5866,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2006. Fixture-covered or reference-cadence: 2006 / 2006.
+Tile count: 2014. Fixture-covered or reference-cadence: 2014 / 2014.
 
 <!-- END tile-index-v14 -->

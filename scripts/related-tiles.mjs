@@ -1582,6 +1582,15 @@ const RELATED = {
   "esp-deutsch-efficiency": ["baghouse-cleaning-interval","cyclone-separator-sizing","opacity-six-minute"],
   "carbon-bed-life": ["thermal-oxidizer-residence","hepa-filter-life","coating-voc-compliance"],
   "plume-rise-briggs": ["chimney-height-for-draft","stack-emission-pte","opacity-six-minute"],
+  // spec-v1495..v1504: building performance and envelope diagnostics band.
+  "effective-leakage-area": ["blower-door-ach50","building-tightness-limit","zonal-pressure-diagnostics"],
+  "building-tightness-limit": ["blower-door-ach50","ashrae-622-ventilation","caz-depressurization-limit"],
+  "ventilation-rate-procedure": ["ashrae-622-ventilation","vav-box-airflow","building-tightness-limit"],
+  "zonal-pressure-diagnostics": ["effective-leakage-area","blower-door-ach50","duct-leakage"],
+  "caz-depressurization-limit": ["combustion-air","building-tightness-limit","stack-effect-npp"],
+  "stack-effect-npp": ["chimney-height-for-draft","caz-depressurization-limit","blower-door-ach50"],
+  "bill-disaggregation": ["degree-day-energy","balance-point","manual-j-heating"],
+  "continuous-insulation-ratio": ["wall-condensation-gradient","insulation-thickness","insulation-heat-loss"],
   // spec-v1622..v1631: HVAC test-and-balance and hydronic systems band.
   "flow-hood-correction": ["pitot-traverse-cfm","proportional-balance-ratio","traverse-closure"],
   "fan-system-effect": ["fan-affinity-laws","duct-leakage","flow-hood-correction"],

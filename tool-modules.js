@@ -1287,6 +1287,17 @@ export const TOOL_MODULES = (() => {
     "spcc-containment-volume", "esp-deutsch-efficiency", "carbon-bed-life",
     "plume-rise-briggs",
   ]);
+  // spec-v1495..v1504: the building performance and envelope diagnostics bench
+  // (Group C). The diagnostic side of the envelope -- what a blower door
+  // reading means as a hole, whether a house is too tight for the appliances
+  // in it, how the leakage splits between planes, and where an assembly sits
+  // against the dew point. spec-v1501 and spec-v1503 were CUT as duplicates.
+  declare("./calc-buildingperf.js", "BUILDINGPERF_RENDERERS", [
+    "effective-leakage-area", "building-tightness-limit",
+    "ventilation-rate-procedure", "zonal-pressure-diagnostics",
+    "caz-depressurization-limit", "stack-effect-npp", "bill-disaggregation",
+    "continuous-insulation-ratio",
+  ]);
   // spec-v1524..v1533: the oil, gas and pipeline bench (Group E). Two benches
   // in one module because they share a vocabulary and a reader: the
   // transmission and integrity side (MAOP, gas flow, station spacing, pigging,

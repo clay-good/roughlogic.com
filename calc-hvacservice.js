@@ -545,8 +545,8 @@ HVACSERVICE_RENDERERS["furnace-airflow-to-rise"] = _simpleRenderer({
 
 // ===================== spec-v218: blower-door air-tightness (ACH50) =====================
 
-// dims: in { cfm50: L^3 T^-1, volume_ft3: L^3, n_factor: dimensionless, target_ach50: dimensionless } out: { ach50: T^-1, ach_nat: T^-1, cfm_nat: L^3 T^-1 }
-export function computeBlowerDoorAch50({ cfm50 = 0, volume_ft3 = 0, n_factor = 17, target_ach50 = 3 } = {}) {
+// dims: in { cfm50: L^3 T^-1, volume_ft3: L^3, n_factor: dimensionless, target_ach50: dimensionless, n_factor_low: dimensionless, n_factor_high: dimensionless, heating_degree_days: dimensionless } out: { ach50: T^-1, ach_nat: T^-1, cfm_nat: L^3 T^-1, cfm_nat_low_n: L^3 T^-1, cfm_nat_high_n: L^3 T^-1, spread_ratio: dimensionless, infiltration_btu_per_year: L^2 M T^-2 }
+export function computeBlowerDoorAch50({ cfm50 = 0, volume_ft3 = 0, n_factor = 17, target_ach50 = 3, n_factor_low = 0, n_factor_high = 0, heating_degree_days = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(cfm50 > 0)) return { error: "Measured CFM50 must be positive (cfm)." };
   if (!(volume_ft3 > 0)) return { error: "Conditioned volume must be positive (ft^3)." };
@@ -559,26 +559,57 @@ export function computeBlowerDoorAch50({ cfm50 = 0, volume_ft3 = 0, n_factor = 1
     : "FAIL - exceeds the " + fmt(target_ach50, 1) + " ACH50 target; air-seal and retest";
   const ach_nat = ach50 / n_factor;
   const cfm_nat = ach_nat * volume_ft3 / 60;
+  // spec-v1501 (CUT to here): the N-factor SPREAD, which is what makes a single
+  // natural-infiltration figure close to meaningless when N is not stated.
+  if (n_factor_low < 0 || n_factor_high < 0) return { error: "The N-factor range must not be negative." };
+  const has_range = n_factor_low > 0 && n_factor_high > 0;
+  if (has_range && n_factor_low > n_factor_high) return { error: "The low N-factor must not exceed the high one." };
+  const cfm_nat_low_n = has_range ? cfm50 / n_factor_low : 0;
+  const cfm_nat_high_n = has_range ? cfm50 / n_factor_high : 0;
+  const spread_ratio = has_range ? n_factor_high / n_factor_low : 0;
+  const range_verdict = !has_range
+    ? "(no N-factor range entered)"
+    : "the same house, the same test: at N " + fmt(n_factor_low, 0) + " (cold, windy, exposed, taller) it leaks " + fmt(cfm_nat_low_n, 0) + " cfm, and at N " + fmt(n_factor_high, 0) + " (mild, sheltered, single-storey) it leaks " + fmt(cfm_nat_high_n, 0) + " cfm -- a " + fmt(spread_ratio, 1) + "x spread purely from where the building stands, which is why quoting natural infiltration without stating N is close to meaningless";
+  if (heating_degree_days < 0) return { error: "Heating degree days must not be negative." };
+  const has_hdd = heating_degree_days > 0;
+  const infiltration_btu_per_year = has_hdd ? 1.08 * cfm_nat * 24 * heating_degree_days : 0;
+  const infiltration_btu_low_n = has_hdd && has_range ? 1.08 * cfm_nat_low_n * 24 * heating_degree_days : 0;
+  const infiltration_btu_high_n = has_hdd && has_range ? 1.08 * cfm_nat_high_n * 24 * heating_degree_days : 0;
+  const energy_verdict = !has_hdd
+    ? "(no heating degree days entered)"
+    : "the seasonal heating energy attributable to infiltration is about " + fmt(infiltration_btu_per_year / 1e6, 1) + " million BTU at " + fmt(heating_degree_days, 0) + " degree days"
+      + (has_range ? ", or " + fmt(infiltration_btu_high_n / 1e6, 1) + " to " + fmt(infiltration_btu_low_n / 1e6, 1) + " million across the N range -- the uncertainty in the N-factor carries straight into the energy claim" : " -- an energy term, and the only use of this figure that current practice endorses");
+  const seasonal_verdict = "this is a SEASONAL AVERAGE and is wrong on any given day by a wide margin: a still mild day gives almost nothing and a windy cold night gives multiples of it. Using it to claim a house is adequately ventilated is the error building-tightness-limit exists to police, and current practice is to ventilate mechanically and treat infiltration purely as an energy term";
+  if (![cfm_nat_low_n, cfm_nat_high_n, spread_ratio, infiltration_btu_per_year].every(Number.isFinite)) return { error: "Infiltration range math is not a finite value." };
   return {
     ach50, pass, verdict, ach_nat, cfm_nat,
-    note: "ACH50 = CFM50 x 60 / conditioned volume normalizes the blower-door reading to air changes per hour at 50 Pa; the IECC R402.4.1.2 limit is <= 3 ACH50 in climate zones 3-8 and <= 5 in zones 1-2 (the editable target). The natural air change divides ACH50 by the LBL N-factor (default 17), which depends on climate zone, building height, and wind shielding - a sheltered one-story and an exposed three-story differ by roughly a factor of two. Volume is the conditioned volume, not the floor area. A field normalization, not a rater's signed test report. ASTM E779 / E1827 are the test methods.",
+    has_range, cfm_nat_low_n, cfm_nat_high_n, spread_ratio, range_verdict,
+    has_hdd, infiltration_btu_per_year, infiltration_btu_low_n, infiltration_btu_high_n,
+    energy_verdict, seasonal_verdict,
+    note: "ACH50 = CFM50 x 60 / conditioned volume normalizes the blower-door reading to air changes per hour at 50 Pa; the IECC R402.4.1.2 limit is <= 3 ACH50 in climate zones 3-8 and <= 5 in zones 1-2 (the editable target). The natural air change divides ACH50 by the LBL N-factor (default 17), which depends on climate zone, building height, and wind shielding. Entering a plausible LOW and HIGH N shows the spread that single figure hides: N runs from roughly 10 in a cold, windy, exposed, taller situation to over 30 in a mild, sheltered, single-storey one, so the SAME measured CFM50 can mean a threefold range of real infiltration depending purely on where the building stands, and a natural-infiltration figure quoted without its N is close to meaningless. That range is the reason for the caution attached to the figure. Natural infiltration estimated this way is a seasonal average, wrong on any given day by a wide margin -- a still mild day gives almost nothing, a windy cold night gives multiples of the average -- so it must not be read as an hourly or design-condition rate. Entering heating degree days converts it to the seasonal energy the leakage costs, which is the use of the figure current practice endorses; using it instead to claim a house is adequately ventilated is the error the tightness limit exists to police. The model does not distinguish WHERE the leakage sits in the envelope, which matters because leakage concentrated at the top and bottom drives far more stack flow than the same leakage spread evenly, and it does not account for mechanical system operation, duct leakage to outdoors, or exhaust fan use. Volume is the conditioned volume, not the floor area. A field normalization, not a rater's signed test report. ASTM E779 / E1827 are the test methods; ASHRAE Fundamentals, RESNET or BPI protocols, and the adopted energy code govern.",
   };
 }
-export const blowerDoorAch50Example = { inputs: { cfm50: 960, volume_ft3: 12800, n_factor: 17, target_ach50: 3 } };
+export const blowerDoorAch50Example = { inputs: { cfm50: 960, volume_ft3: 12800, n_factor: 17, target_ach50: 3, n_factor_low: 11, n_factor_high: 25, heating_degree_days: 5400 } };
 HVACSERVICE_RENDERERS["blower-door-ach50"] = _simpleRenderer({
-  citation: "Citation: ACH50 = CFM50 x 60 / conditioned volume (the blower-door normalization) and the LBL natural-infiltration divide-by-N rule (by name); IECC R402.4.1.2 sets the air-leakage limit in ACH50 (<= 3 in CZ 3-8, <= 5 in CZ 1-2); ASTM E779 / E1827 are the test methods. The N-factor varies with climate zone, building height, and wind shielding. A field normalization, not a rater's signed report.",
+  citation: "Citation: ACH50 = CFM50 x 60 / conditioned volume (the blower-door normalization) and the LBL natural-infiltration divide-by-N rule (by name); IECC R402.4.1.2 sets the air-leakage limit in ACH50 (<= 3 in CZ 3-8, <= 5 in CZ 1-2); ASTM E779 / E1827 are the test methods. The N-factor varies with climate zone, building height, and wind shielding -- roughly 10 in a cold, windy, exposed, taller situation to over 30 in a mild, sheltered, single-storey one -- so entering a low and high N shows the threefold spread a single figure hides. Natural infiltration on this model is a SEASONAL AVERAGE, not an hourly or design-condition rate; the seasonal energy uses the standard 1.08 x cfm x 24 x heating degree days. A field normalization, not a rater's signed report.",
   example: blowerDoorAch50Example.inputs,
   fields: [
     { key: "cfm50", label: "Blower-door reading CFM50 (cfm)", kind: "number" },
     { key: "volume_ft3", label: "Conditioned volume (ft³)", kind: "number" },
     { key: "n_factor", label: "LBL N-factor (ACH50 -> natural)", kind: "number" },
     { key: "target_ach50", label: "Target ACH50 (IECC limit)", kind: "number" },
+    { key: "n_factor_low", label: "Low N-factor for the range (0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "n_factor_high", label: "High N-factor for the range (0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "heating_degree_days", label: "Heating degree days (0 to skip the energy)", kind: "number", attrs: { step: "any" } },
   ],
   outputs: [
     { key: "a", id: "bda-out-a", label: "ACH50", value: (r) => fmt(r.ach50, 2) + " ACH50" },
     { key: "v", id: "bda-out-v", label: "Code check", value: (r) => r.verdict },
     { key: "n", id: "bda-out-n", label: "Natural air change", value: (r) => fmt(r.ach_nat, 3) + " ACH" },
     { key: "c", id: "bda-out-c", label: "Natural infiltration", value: (r) => fmt(r.cfm_nat, 1) + " cfm" },
+    { key: "r", id: "bda-out-r", label: "What the N-factor hides", value: (r) => r.range_verdict },
+    { key: "e", id: "bda-out-e", label: "What the leakage costs", value: (r) => r.energy_verdict },
+    { key: "s", id: "bda-out-s", label: "Read it as an average", value: (r) => r.seasonal_verdict },
     { key: "z", id: "bda-out-z", label: "Note", value: (r) => r.note },
   ],
   compute: computeBlowerDoorAch50,

@@ -105274,6 +105274,411 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "effective-leakage-area",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Effective Leakage Area and Normalized Leakage -- the spec-v1495 worked example, recomputed",
+   "source_edition_or_year": "spec-v1495 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "cfm50": 1850,
+    "floor_area_ft2": 2400,
+    "ceiling_height_ft": 8,
+    "storeys": 1
+   },
+   "outputs": {
+    "ela_in2": {
+     "value": 97.8836,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "eqla_in2": {
+     "value": 185,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hole_side_in": {
+     "value": 9.89361,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ach50": {
+     "value": 5.78125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "normalized_leakage": {
+     "value": 40.48382,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sla": {
+     "value": 0.04078,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "building-tightness-limit",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Minimum Ventilation vs Building Tightness Limit -- the spec-v1496 worked example, recomputed",
+   "source_edition_or_year": "spec-v1496 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "floor_area_ft2": 2400,
+    "bedrooms": 3,
+    "cfm50": 1850,
+    "n_factor": 17,
+    "ceiling_height_ft": 8,
+    "planned_cfm50_reduction": 200
+   },
+   "outputs": {
+    "required_cfm": {
+     "value": 102,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tightness_limit_cfm50": {
+     "value": 1734,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_cfm50": {
+     "value": 116,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "natural_cfm": {
+     "value": 108.82353,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "after_cfm50": {
+     "value": 1650,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ventilation-rate-procedure",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "ASHRAE 62.1 Ventilation Rate Procedure (Multiple-Zone) -- the spec-v1497 worked example, recomputed",
+   "source_edition_or_year": "spec-v1497 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "rp_cfm_per_person": 5,
+    "ra_cfm_per_ft2": 0.06,
+    "ez": 0.8,
+    "people_1": 25,
+    "area_1_ft2": 2500,
+    "primary_1_cfm": 1200,
+    "people_2": 12,
+    "area_2_ft2": 1800,
+    "primary_2_cfm": 900,
+    "people_3": 40,
+    "area_3_ft2": 3000,
+    "primary_3_cfm": 1500,
+    "diversity": 1
+   },
+   "outputs": {
+    "vou_cfm": {
+     "value": 823,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "xs": {
+     "value": 0.22861,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "zp_max": {
+     "value": 0.31667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ev": {
+     "value": 0.91194,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vot_cfm": {
+     "value": 902.46726,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "penalty_cfm": {
+     "value": 79.46726,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "zonal-pressure-diagnostics",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Zonal Pressure Diagnostic Leakage Split -- the spec-v1498 worked example, recomputed",
+   "source_edition_or_year": "spec-v1498 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "house_pressure_pa": 50,
+    "zone_a_pressure_pa": 42,
+    "zone_b_pressure_pa": 6,
+    "zone_a_label": "attic",
+    "zone_b_label": "crawl"
+   },
+   "outputs": {
+    "zone_a_ratio": {
+     "value": 0.84,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "zone_a_path_ratio": {
+     "value": 2.29129,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "zone_b_ratio": {
+     "value": 0.12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "zone_b_path_ratio": {
+     "value": 0.36927,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "caz-depressurization-limit",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Combustion Appliance Zone Depressurization Limit -- the spec-v1499 worked example, recomputed",
+   "source_edition_or_year": "spec-v1499 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "measured_depressurization_pa": 4.5,
+    "has_natural_draft_water_heater": "yes",
+    "natural_draft_wh_limit_pa": 2,
+    "has_natural_draft_furnace": "no",
+    "natural_draft_furnace_limit_pa": 3,
+    "has_induced_draft": "yes",
+    "induced_draft_limit_pa": 5,
+    "has_direct_vent": "no",
+    "direct_vent_limit_pa": 15,
+    "largest_exhaust_cfm": 200
+   },
+   "outputs": {
+    "governing_limit_pa": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_pa": {
+     "value": -2.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "appliance_count": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "stack-effect-npp",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Stack Effect Pressure and Neutral Pressure Plane -- the spec-v1500 worked example, recomputed",
+   "source_edition_or_year": "spec-v1500 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "height_ft": 24,
+    "indoor_temp_f": 70,
+    "outdoor_temp_f": 10,
+    "neutral_plane_fraction": 0.5,
+    "tall_building_height_ft": 240
+   },
+   "outputs": {
+    "total_pressure_pa": {
+     "value": 10.98827,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_pressure_inwc": {
+     "value": 0.04416,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "neutral_plane_ft": {
+     "value": 12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bottom_pressure_pa": {
+     "value": 5.49413,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "top_pressure_pa": {
+     "value": 5.49413,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tall_pressure_pa": {
+     "value": 109.88265,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bill-disaggregation",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Utility Bill Baseload and Weather-Sensitive Split -- the spec-v1502 worked example, recomputed",
+   "source_edition_or_year": "spec-v1502 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "baseload_per_year": 310,
+    "slope_per_degree_day": 1.85,
+    "degree_days": 1240,
+    "equipment_efficiency": 0.8,
+    "btu_per_unit": 100000,
+    "balance_point_f": 60
+   },
+   "outputs": {
+    "weather_units": {
+     "value": 2294,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_units": {
+     "value": 2604,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "weather_share_pct": {
+     "value": 88.09524,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "baseload_share_pct": {
+     "value": 11.90476,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "implied_ua": {
+     "value": 6166.66667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "continuous-insulation-ratio",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Continuous vs Cavity Insulation Ratio for Condensation Control -- the spec-v1504 worked example, recomputed",
+   "source_edition_or_year": "spec-v1504 of scope-trade-expansion-2, 2026-09-08",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-08",
+   "inputs": {
+    "r_cavity": 20,
+    "r_continuous": 6,
+    "required_ratio": 0.36,
+    "indoor_temp_f": 70,
+    "indoor_rh_pct": 35,
+    "outdoor_design_temp_f": 10
+   },
+   "outputs": {
+    "achieved_ratio": {
+     "value": 0.23077,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "r_continuous_min": {
+     "value": 11.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "r_cavity_max": {
+     "value": 10.66667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "dew_point_f": {
+     "value": 41.07457,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ratio_from_dew_point": {
+     "value": 0.51791,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sheathing_temp_f": {
+     "value": 23.84615,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }
