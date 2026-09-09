@@ -311,3 +311,45 @@ test("the bundled rotor radii agree with each manufacturer's published RCF", asy
     );
   }
 });
+
+// docs/citation-freshness-ledger.md is the table a reader trusts, and nothing
+// compared it to scripts/sources-cycle.json. The gate only asserted a row
+// EXISTS. So the doc sat at "2024 (2027 voted, not published)" for the IMC and
+// IFGC while the cycle file recorded both 2027 editions as published, and at a
+// stale last-verified date for all four ICC rows.
+//
+// The edition comparison must LEAD, not merely contain: the offending row
+// literally contains "2027" while asserting the opposite, so a substring test
+// passes it. That hole was in the first version of this gate.
+test("the human ledger table agrees with the cycle file", async () => {
+  const cycle = await readJson("scripts/sources-cycle.json");
+  const ledger = await readFile(resolve(ROOT, "docs/citation-freshness-ledger.md"), "utf8");
+  const row = (id) => {
+    const m = ledger.match(new RegExp("^\\|\\s*`" + id + "`\\s*\\|(.*)$", "m"));
+    if (!m) return null;
+    const cells = m[1].split("|").map((c) => c.trim());
+    return { currentEdition: cells[2].replace(/\*/g, "").trim(), lastVerified: cells[3] };
+  };
+  for (const s of cycle.standards) {
+    const r = row(s.id);
+    assert.ok(r, s.id + " has no ledger row");
+    if (s.current_edition) {
+      assert.ok(
+        r.currentEdition.startsWith(String(s.current_edition)),
+        s.id + ": ledger says \"" + r.currentEdition + "\", cycle file says \"" + s.current_edition + "\"",
+      );
+    }
+    if (s.last_verified) assert.equal(r.lastVerified, String(s.last_verified), s.id + " last-verified");
+  }
+
+  // The two editions that had actually published, pinned so the doc cannot
+  // silently revert to claiming they had not.
+  assert.ok(row("imc").currentEdition.startsWith("2027"));
+  assert.ok(row("ifgc").currentEdition.startsWith("2027"));
+  // ...and the two that genuinely had not, as of 2026-09-09.
+  assert.ok(row("ibc").currentEdition.startsWith("2024"));
+  assert.ok(row("ifc").currentEdition.startsWith("2024"));
+
+  // A substring test would pass this string. startsWith must not.
+  assert.ok(!"2024 (2027 voted, not published)".startsWith("2027"));
+});

@@ -142,9 +142,44 @@ async function main() {
       errors.push("docs/citation-freshness-ledger.md not found; spec-v22 §5 requires a ledger row per tracked source.");
     } else {
       const ledger = await readFile(LEDGER_PATH, "utf8");
+      // Presence alone was not enough. The doc table sat at "2024 (2027 voted,
+      // not published)" for the IMC and IFGC for six days after
+      // sources-cycle.json recorded both 2027 editions as PUBLISHED, and at a
+      // stale last-verified date for all four ICC rows. A reader trusts the
+      // human-readable table; nothing compared it to the machine-readable one.
+      // So the row must AGREE, not merely exist.
+      const ledgerRow = (id) => {
+        const m = ledger.match(new RegExp("^\\|\\s*`" + id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "`\\s*\\|(.*)$", "m"));
+        if (!m) return null;
+        const cells = m[1].split("|").map((c) => c.trim());
+        // source | edition cited | current edition | last verified | status
+        return { currentEdition: cells[2] || "", lastVerified: cells[3] || "" };
+      };
       for (const s of standards) {
-        if (!ledger.includes("`" + s.id + "`")) {
+        const row = ledgerRow(s.id);
+        if (!row) {
           errors.push("citation-freshness-ledger.md: tracked source '" + s.id + "' (" + s.name + ") has no ledger row (spec-v22 §5 ledger-completeness).");
+          continue;
+        }
+        // The edition the ledger prints must LEAD with the edition the cycle
+        // file records. Trailing free text is fine ("2027 (published)",
+        // "2018 (7th ed.), 8th in development"); leading with a different
+        // edition is not. A mere substring test is too weak -- the row this
+        // check was written for, "2024 (2027 voted, not published)", CONTAINS
+        // "2027" while asserting the exact opposite.
+        const printed = row.currentEdition.replace(/\*/g, "").trim();
+        if (s.current_edition && !printed.startsWith(String(s.current_edition))) {
+          errors.push(
+            "citation-freshness-ledger.md: '" + s.id + "' current edition reads \"" + printed +
+            "\" but sources-cycle.json records \"" + s.current_edition + "\". The table a reader trusts must " +
+            "agree with the cycle file; update the row.",
+          );
+        }
+        if (s.last_verified && row.lastVerified !== String(s.last_verified)) {
+          errors.push(
+            "citation-freshness-ledger.md: '" + s.id + "' last-verified reads \"" + row.lastVerified +
+            "\" but sources-cycle.json records \"" + s.last_verified + "\".",
+          );
         }
       }
     }
