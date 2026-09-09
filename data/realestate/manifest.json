@@ -14,11 +14,11 @@
     {
       "file": "hud-fmr.json",
       "name": "HUD Fair Market Rents (FY2026 representative MSAs)",
-      "gzip_size_bytes": 1542
+      "gzip_size_bytes": 1544
     }
   ],
   "hashes": {
     "loan-limits.json": "75f1d7df553e72f7a6c90e60739e49ba579cc9d682ecc922123dae8c25f74893",
-    "hud-fmr.json": "f35cf6bf5495b09b833a45685bbcd7d838dced58d5ee35c880e8a690a990c221"
+    "hud-fmr.json": "4dca4476f52b9574ae4da32a99009e8007dda8aa85e00476bece62ea7f5e9043"
   }
 }

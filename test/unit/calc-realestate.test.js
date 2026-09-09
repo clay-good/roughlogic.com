@@ -41,7 +41,7 @@ const LOAN_LIMITS_SHARD = {
 const HUD_FMR_SHARD = {
   fiscal_year: 2026,
   areas: [
-    { name: "San Francisco-Oakland-Berkeley, CA HUD Metro FMR Area", state: "CA", fips: "06075", fmr_0br: 2517, fmr_1br: 2864, fmr_2br: 3553, fmr_3br: 4593, fmr_4br: 5099 },
+    { name: "San Francisco, CA HUD Metro FMR Area",                  state: "CA", fips: "06075", fmr_0br: 2485, fmr_1br: 2977, fmr_2br: 3604, fmr_3br: 4604, fmr_4br: 4772 },
     { name: "New York, NY HUD Metro FMR Area",                       state: "NY", fips: "36061", fmr_0br: 2257, fmr_1br: 2390, fmr_2br: 2680, fmr_3br: 3382, fmr_4br: 3699 },
   ],
   unknown_area_message: "Unknown FMR area; look up at huduser.gov.",
@@ -578,10 +578,14 @@ test("computeLoanLimits: missing shard rejected", () => {
 
 // --- X.10 HUD FMR ---
 
-test("computeHudFmr: San Francisco area matches and returns 2BR FMR 3553", () => {
+test("computeHudFmr: San Francisco area matches and returns 2BR FMR 3604", () => {
+  // 3604 is HUD's published FY2026 two-bedroom FMR for the San Francisco, CA
+  // HUD Metro FMR Area. It read 3553 under the OMB CBSA name
+  // "San Francisco-Oakland-Berkeley", which HUD does not use as an FMR area --
+  // see the pin in verified-on-ledger.test.js.
   const r = computeHudFmr({ ...hudFmrExample.inputs, shard: HUD_FMR_SHARD });
   assert.equal(r.kind, "matched");
-  assert.equal(r.fmr_2br, 3553);
+  assert.equal(r.fmr_2br, 3604);
 });
 
 test("computeHudFmr: FIPS lookup wins over name", () => {

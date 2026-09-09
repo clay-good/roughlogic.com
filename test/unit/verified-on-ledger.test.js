@@ -493,3 +493,36 @@ test("the nexus doc's stale-row claim matches the shard", async () => {
     "the generated note must name the same oldest cohort the doc does",
   );
 });
+
+// The HUD FMR row for San Francisco carried the OMB CBSA name,
+// "San Francisco-Oakland-Berkeley, CA HUD Metro FMR Area". HUD does not use
+// that as an FMR area: its FY2026 geography list splits the CBSA into
+// "San Francisco, CA HUD Metro FMR Area" (METRO41860MM7360) and
+// "Oakland-Fremont, CA HUD Metro FMR Area" (METRO41860MM5775), with different
+// rents. The row's FIPS is 06075, San Francisco County, so it is the former.
+//
+// Every one of its five figures was wrong, and matched NEITHER area -- the 4BR
+// was $5,099 against HUD's $4,772. These are dollar amounts a reader acts on.
+// Verified 2026-09-09 against HUD's own FY2026 Documentation System, read in a
+// browser (huduser.gov does not serve an automated fetch).
+test("the San Francisco FMR row is HUD's published FY2026 figure", async () => {
+  const shard = await readJson("data/realestate/hud-fmr.json");
+  const sf = shard.areas.find((a) => a.fips === "06075");
+  assert.ok(sf, "the 06075 row is gone");
+  assert.equal(sf.name, "San Francisco, CA HUD Metro FMR Area");
+  assert.equal(sf.fmr_0br, 2485);
+  assert.equal(sf.fmr_1br, 2977);
+  assert.equal(sf.fmr_2br, 3604);
+  assert.equal(sf.fmr_3br, 4604);
+  assert.equal(sf.fmr_4br, 4772);
+  // The CBSA name must not come back: it is not an FMR area.
+  for (const a of shard.areas) {
+    assert.ok(
+      !a.name.startsWith("San Francisco-Oakland-Berkeley"),
+      "the OMB CBSA name is not a HUD FMR area",
+    );
+  }
+  // Only this row has been checked against HUD. The shard's own stamp must not
+  // claim otherwise until the other 18 are read.
+  assert.equal(shard.verified_on, "2026-05-16");
+});
