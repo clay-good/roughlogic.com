@@ -1,18 +1,18 @@
 {
   "name": "cross",
-  "version": "2026-09-04",
-  "fetched": "2026-09-04",
+  "version": "2026-09-09",
+  "fetched": "2026-09-09",
   "edition": "Original plain-English glossary entries authored by the project (v5 Step 62, utility 271). MIT licensed.",
-  "asOf": "2026-09-04",
+  "asOf": "2026-09-09",
   "refresh_cadence": "annual",
   "shards": [
     {
       "file": "glossary.json",
       "name": "Inline glossary tooltip definitions",
-      "gzip_size_bytes": 1808
+      "gzip_size_bytes": 1822
     }
   ],
   "hashes": {
-    "glossary.json": "ae05a9e2886435540d24bd77eb6e5ce6894167f77813692aed0f9b511e8e6148"
+    "glossary.json": "d3050b989c576b0e2399433431085989d81e0d4bd94c965f73e6d0aa1425daa1"
   }
 }

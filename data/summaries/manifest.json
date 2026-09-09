@@ -1,9 +1,9 @@
 {
   "name": "summaries",
-  "version": "2026-09-04",
-  "fetched": "2026-09-04",
+  "version": "2026-09-09",
+  "fetched": "2026-09-09",
   "edition": "Original plain-English summaries by the project author; MIT-licensed creative work. Last revision 2026-09-02.",
-  "asOf": "2026-09-04",
+  "asOf": "2026-09-09",
   "refresh_cadence": "annual",
   "shards": [
     {

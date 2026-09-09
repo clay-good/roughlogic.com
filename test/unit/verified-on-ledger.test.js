@@ -149,12 +149,17 @@ test("the estimated-tax due dates are the published 1040-ES schedule", async () 
 
 test("the gate names the shards it does not govern", async () => {
   // A green summary that does not say what it skipped reads as full coverage.
-  // Five shards stamp a verified_on no ledger row backs, so the generator
-  // still writes it from the build date -- that fact belongs in the gate's
-  // own output, not only in docs/data-sources.md.
+  // Four shards stamp a verified_on no ledger row backs -- that fact belongs in
+  // the gate's own output, not only in docs/data-sources.md. The stamps no
+  // longer come from the build date (build-data.mjs carries the committed value
+  // forward when content is unchanged); what is still missing is a ledger row
+  // recording what a human actually checked.
   const src = await readFile(resolve(ROOT, "scripts/check-verified-on-ledger.mjs"), "utf8");
-  assert.match(src, /UNGOVERNED_BUDGET = 5/, "the ungoverned count is ratcheted");
+  assert.match(src, /UNGOVERNED_BUDGET = 4/, "the ungoverned count is ratcheted");
   assert.match(src, /NOT governed here/, "the OK line must name the uncovered set");
+  // Author-original content is reported separately: it has no publisher, so a
+  // ledger row cannot exist and counting it as unbacked is a category error.
+  assert.match(src, /author-original/, "the OK line must separate author-original shards");
   // The paths compared must be repo-relative on both sides; comparing an
   // absolute walk against sources-cycle.json's relative keys matched nothing
   // and reported every stamped shard as ungoverned.
@@ -196,4 +201,44 @@ test("an unchanged shard carries its committed verification date forward", async
 
   // A shard with no file on disk yet has nothing to carry.
   assert.equal(await carryStamps(resolve(ROOT, "data/lab/does-not-exist.json"), regenerated), null);
+});
+
+// data/cross/glossary.json has no publisher: its source is the project author's
+// own plain-English definitions. "Add a ledger row recording what was actually
+// checked" is therefore advice nobody can act on, yet it sat in the unbacked
+// budget as though it were open maintainer work. Its six author-original
+// siblings carry no date stamp at all; the glossary is the outlier.
+//
+// Deleting the stamp was the wrong fix -- data/cross holds only this shard, and
+// check-manifests measures a folder's cadence from the verified_on stamps its
+// shards carry, so removing it would have traded a false stamp for no annual
+// review check at all. Instead the shard declares its provenance, the gate
+// counts it separately, and the date is an explicit constant so the build clock
+// cannot certify a review nobody performed.
+test("author-original content is not counted as an unbacked publisher claim", async () => {
+  const glossary = await readJson("data/cross/glossary.json");
+  assert.equal(glossary.provenance, "author-original");
+  // The date is the author's stated review date, NOT the build date. Adding the
+  // provenance marker changed the shard's content, so the carry-forward could
+  // not preserve it -- an explicit constant is what keeps it honest.
+  assert.equal(glossary.verified_on, "2026-09-04");
+  assert.match(glossary.source, /project author/i);
+
+  // The stamp is still there, so data/cross still gets its cadence check.
+  const manifest = await readJson("data/cross/manifest.json");
+  assert.equal(manifest.refresh_cadence, "annual");
+  assert.match(glossary.verified_on, /^\d{4}-\d{2}-\d{2}$/);
+
+  // Every shard still in the unbacked budget has a real external publisher, so
+  // the gate's advice is actionable for all of them.
+  for (const f of [
+    "data/accounting/inventory-benchmarks.json",
+    "data/lab/buffer-pka.json",
+    "data/lab/centrifuge-rotors.json",
+    "data/lab/iupac-atomic-weights.json",
+  ]) {
+    const shard = await readJson(f);
+    assert.ok(shard.verified_on, f + " should still carry a stamp");
+    assert.notEqual(shard.provenance, "author-original", f + " has a real publisher");
+  }
 });

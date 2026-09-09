@@ -27,6 +27,14 @@ const ROOT = resolve(new URL(".", import.meta.url).pathname, "..");
 const DATA = resolve(ROOT, "data");
 const TODAY = new Date().toISOString().slice(0, 10);
 
+// Author-original shards have no publisher, so their `verified_on` records when
+// the AUTHOR last reviewed the prose. Held here as an explicit constant so the
+// build clock can never advance it -- the same discipline sources-cycle.json
+// applies to shards that do have a publisher.
+const AUTHOR_REVIEWED = {
+  "cross/glossary.json": "2026-09-04",
+};
+
 // Read the shard already on disk and, if the new body differs from it ONLY in
 // its verification stamp, hand the committed stamp back so it carries forward.
 // A shard whose data really changed keeps TODAY. Returns null when there is no
@@ -1604,10 +1612,19 @@ const CENTRIFUGE_ROTORS_V5 = {
 
 const GLOSSARY_DATA_V5 = {
   source: "Original plain-English definitions written by the project author.",
+  // No publisher exists to check these against, so `verified_on` here means
+  // "the author last reviewed these definitions", not "checked against a
+  // source". check-verified-on-ledger reads this marker so it stops asking for
+  // a ledger row that cannot exist, and data/cross keeps its annual cadence
+  // check, which removing the stamp would have silently ended.
+  provenance: "author-original",
+  // Stated explicitly rather than left on TODAY, for the same reason the ledger
+  // overrides tracked shards: the clock must not certify a review nobody did.
+  // Editing prose here means advancing this date deliberately.
+  verified_on: AUTHOR_REVIEWED["cross/glossary.json"],
   edition: "v5",
   fetched: TODAY,
-  verified_on: TODAY,
-  license: "MIT (original creative work)",
+    license: "MIT (original creative work)",
   terms: {
     MACRS: "Modified Accelerated Cost Recovery System. The depreciation method most U.S. business assets use for tax. Bundled percentage tables (Pub 946) prescribe the deduction by class life and convention.",
     FICA: "Federal Insurance Contributions Act. The combined Social Security (6.2%) and Medicare (1.45%) tax. Self-employed pay both halves via Schedule SE; employees split it with the employer.",

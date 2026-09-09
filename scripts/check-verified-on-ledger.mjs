@@ -124,8 +124,14 @@ function main() {
   // fact lived in docs/data-sources.md, which is where an open item goes to be
   // forgotten. The count is ratcheted: closing one is welcome, adding a sixth
   // is a new unbacked claim and fails.
-  const UNGOVERNED_BUDGET = 5;
+  // Shards with an EXTERNAL publisher that no ledger row backs. Author-original
+  // content is counted separately below: there is no publisher to check it
+  // against, so "add a ledger row" is advice nobody can act on, and its
+  // `verified_on` legitimately means "the author last reviewed this" -- a date
+  // check-manifests still measures against the folder's refresh_cadence.
+  const UNGOVERNED_BUDGET = 4;
   const ungoverned = [];
+  const authorOriginal = [];
   (function walk(dir) {
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
       const full = join(dir, entry.name);
@@ -142,7 +148,10 @@ function main() {
         // writes; the walk yields absolute. Comparing the two matched nothing
         // and reported all 15 stamped shards as ungoverned.
         const rel = relative(ROOT, full).split("\\").join("/");
-        if ((shard.verified_on || shard.verifiedOn) && !tracked.has(rel)) ungoverned.push(rel);
+        if ((shard.verified_on || shard.verifiedOn) && !tracked.has(rel)) {
+          if (shard.provenance === "author-original") authorOriginal.push(rel);
+          else ungoverned.push(rel);
+        }
       }
     }
   })(resolve(ROOT, "data"));
@@ -151,8 +160,9 @@ function main() {
       ungoverned.length +
         " shard(s) carry a verified_on that no sources-cycle.json row backs, over a " +
         "budget of " + UNGOVERNED_BUDGET + ": " + ungoverned.join(", ") +
-        ". An unbacked stamp is written from the build date and means nothing. " +
-        "Add a ledger row recording what was actually checked.",
+        ". An unbacked stamp names no verification anyone performed. Add a ledger " +
+        "row recording what was actually checked -- or, if the content has no " +
+        "publisher at all, mark the shard provenance: \"author-original\".",
     );
   }
 
@@ -175,7 +185,10 @@ function main() {
       " ledger-tracked shard(s) carry a verified_on equal to their oldest recorded " +
       "verification. NOT governed here: " + ungoverned.length +
       " shard(s) stamp a verified_on with no ledger row (budget " + UNGOVERNED_BUDGET + ")" +
-      (ungoverned.length ? " -- " + ungoverned.join(", ") : "") + ".",
+      (ungoverned.length ? " -- " + ungoverned.join(", ") : "") + ". " +
+      authorOriginal.length + " author-original shard(s) carry a verified_on that means " +
+      "\"last reviewed by the author\" and can have no ledger row" +
+      (authorOriginal.length ? " -- " + authorOriginal.join(", ") : "") + ".",
   );
 }
 
