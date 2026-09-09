@@ -1298,6 +1298,18 @@ export const TOOL_MODULES = (() => {
     "caz-depressurization-limit", "stack-effect-npp", "bill-disaggregation",
     "continuous-insulation-ratio",
   ]);
+  // spec-v1705..v1716: the plastics processing and foundry bench. Two forming
+  // trades the catalog had never touched -- injection moulding, extrusion and
+  // thermoforming, and sand casting -- plus the two field calculations a
+  // plumber inherits from them, HDPE butt fusion and thermoplastic derating.
+  declare("./calc-process.js", "PROCESS_RENDERERS", [
+    "injection-clamp-tonnage", "shot-size-residence-time",
+    "injection-cooling-time", "mold-shrinkage-dimension",
+    "extrusion-output-rate", "thermoforming-draw-ratio",
+    "hdpe-fusion-pressure-time", "thermoplastic-temperature-derate",
+    "casting-pour-yield", "riser-modulus-feeding", "sand-permeability-vent",
+    "melt-furnace-energy",
+  ]);
   // spec-v1524..v1533: the oil, gas and pipeline bench (Group E). Two benches
   // in one module because they share a vocabulary and a reader: the
   // transmission and integrity side (MAOP, gas flow, station spacing, pigging,

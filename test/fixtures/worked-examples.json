@@ -105679,6 +105679,658 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "injection-clamp-tonnage",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Injection Mold Clamp Tonnage and Projected Area -- the spec-v1705 worked example, recomputed",
+   "source_edition_or_year": "spec-v1705 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "cavities": 4,
+    "part_projected_area_in2": 12,
+    "runner_projected_area_in2": 6,
+    "cavity_pressure_tsi": 2.5,
+    "safety_factor_pct": 15,
+    "machine_rating_tons": 150
+   },
+   "outputs": {
+    "total_area_in2": {
+     "value": 54,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "clamp_required_tons": {
+     "value": 135,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "clamp_with_safety_tons": {
+     "value": 155.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "runner_penalty_tons": {
+     "value": 17.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_tons": {
+     "value": -5.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_cavity_pressure_tsi": {
+     "value": 2.41546,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "shot-size-residence-time",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Injection Shot Size, Barrel Capacity, and Residence Time -- the spec-v1706 worked example, recomputed",
+   "source_edition_or_year": "spec-v1706 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "barrel_capacity_oz": 12,
+    "shot_weight_oz": 4.2,
+    "cycle_time_s": 32,
+    "min_pct": 20,
+    "max_pct": 80,
+    "max_residence_min": 4,
+    "alt_cycle_time_s": 45
+   },
+   "outputs": {
+    "shot_pct": {
+     "value": 35,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "shots_in_barrel": {
+     "value": 2.85714,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "residence_min": {
+     "value": 1.52381,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "min_barrel_oz": {
+     "value": 5.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_barrel_oz": {
+     "value": 21,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_residence_min": {
+     "value": 2.14286,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "injection-cooling-time",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Injection Molding Cooling Time From Wall Thickness -- the spec-v1707 worked example, recomputed",
+   "source_edition_or_year": "spec-v1707 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "wall_thickness_in": 0.1,
+    "alpha_in2_s": 0.00015,
+    "melt_temp_f": 450,
+    "mould_temp_f": 100,
+    "eject_temp_f": 180,
+    "alt_wall_thickness_in": 0.125,
+    "non_cooling_cycle_s": 8,
+    "annual_parts": 1000000
+   },
+   "outputs": {
+    "cooling_time_s": {
+     "value": 11.60108,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_cooling_time_s": {
+     "value": 18.12669,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "time_ratio": {
+     "value": 1.5625,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cored_time_s": {
+     "value": 4.53167,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cycle_time_s": {
+     "value": 19.60108,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annual_machine_hours": {
+     "value": 1812.66869,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mold-shrinkage-dimension",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Molded Part Shrinkage and Mold Dimension -- the spec-v1708 worked example, recomputed",
+   "source_edition_or_year": "spec-v1708 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "part_dimension_in": 4,
+    "shrinkage_flow_in_in": 0.018,
+    "shrinkage_cross_in_in": 0.012,
+    "shrinkage_low_in_in": 0.015,
+    "shrinkage_high_in_in": 0.022,
+    "existing_cavity_in": 4.0201
+   },
+   "outputs": {
+    "cavity_flow_in": {
+     "value": 4.07332,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cavity_cross_in": {
+     "value": 4.04858,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "anisotropy_in": {
+     "value": 0.02474,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cavity_low_in": {
+     "value": 4.06091,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cavity_high_in": {
+     "value": 4.08998,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "part_from_cavity_in": {
+     "value": 3.94774,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "extrusion-output-rate",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Extrusion Output Rate and Line Speed -- the spec-v1709 worked example, recomputed",
+   "source_edition_or_year": "spec-v1709 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "product_od_in": 2.5,
+    "wall_thickness_in": 0.1,
+    "line_speed_ft_min": 45,
+    "melt_density_lb_in3": 0.0347,
+    "extruder_output_lb_h": 400,
+    "die_opening_in": 3,
+    "cooling_capacity_lb_h": 500,
+    "shift_hours": 8
+   },
+   "outputs": {
+    "area_in2": {
+     "value": 0.75398,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lb_per_ft": {
+     "value": 0.31396,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "output_at_speed_lb_h": {
+     "value": 847.68715,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "speed_at_output_ft_min": {
+     "value": 21.23425,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "draw_down_ratio": {
+     "value": 1.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "shift_pounds": {
+     "value": 6781.49719,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thermoforming-draw-ratio",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Thermoforming Draw Ratio and Wall Thinning -- the spec-v1710 worked example, recomputed",
+   "source_edition_or_year": "spec-v1710 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "opening_diameter_in": 10,
+    "draw_depth_in": 6,
+    "sheet_thickness_in": 0.06,
+    "corner_fraction": 0.4,
+    "min_wall_in": 0.015,
+    "hd_limit": 0.5
+   },
+   "outputs": {
+    "hd_ratio": {
+     "value": 0.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "formed_area_in2": {
+     "value": 267.03538,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "areal_draw_ratio": {
+     "value": 3.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "average_wall_in": {
+     "value": 0.01765,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "corner_wall_in": {
+     "value": 0.00706,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sheet_for_corner_in": {
+     "value": 0.1275,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hdpe-fusion-pressure-time",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "HDPE Butt Fusion Interface Pressure and Cycle Time -- the spec-v1711 worked example, recomputed",
+   "source_edition_or_year": "spec-v1711 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "pipe_od_in": 6.625,
+    "dimension_ratio": 11,
+    "wall_thickness_in": 0,
+    "cylinder_area_in2": 3.15,
+    "interfacial_pressure_psi": 75,
+    "drag_pressure_psi": 60,
+    "alt_pipe_od_in": 12.75
+   },
+   "outputs": {
+    "wall_in": {
+     "value": 0.60227,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "face_area_in2": {
+     "value": 11.39558,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "theoretical_gauge_psi": {
+     "value": 271.32323,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_gauge_psi": {
+     "value": 331.32323,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_gauge_psi": {
+     "value": 1064.92947,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thermoplastic-temperature-derate",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Thermoplastic Pipe Pressure Derating vs Temperature -- the spec-v1712 worked example, recomputed",
+   "source_edition_or_year": "spec-v1712 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "rated_pressure_psi": 200,
+    "operating_temp_f": 120,
+    "derating_factor": 0.4,
+    "operating_pressure_psi": 100,
+    "max_rated_temp_f": 140,
+    "alt_derating_factor": 0.82
+   },
+   "outputs": {
+    "derated_pressure_psi": {
+     "value": 80,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_psi": {
+     "value": -20,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "utilization_pct": {
+     "value": 125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_derated_psi": {
+     "value": 164,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "casting-pour-yield",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Casting Pour Weight, Gating Yield, and Charge -- the spec-v1713 worked example, recomputed",
+   "source_edition_or_year": "spec-v1713 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "casting_weight_lb": 280,
+    "gating_weight_lb": 170,
+    "castings_per_mould": 1,
+    "melt_energy_btu_lb": 500,
+    "target_yield_pct": 70,
+    "annual_castings": 5000
+   },
+   "outputs": {
+    "poured_weight_lb": {
+     "value": 450,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "yield_pct": {
+     "value": 62.22222,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "btu_per_saleable_lb": {
+     "value": 803.57143,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "target_poured_lb": {
+     "value": 400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "target_btu_per_lb": {
+     "value": 714.28571,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "riser-modulus-feeding",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Riser Modulus and Feeding Distance -- the spec-v1714 worked example, recomputed",
+   "source_edition_or_year": "spec-v1714 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "section_length_in": 8,
+    "section_width_in": 6,
+    "section_thickness_in": 1.5,
+    "modulus_ratio": 1.2,
+    "shrinkage_pct": 4,
+    "riser_efficiency_pct": 15,
+    "sleeve_factor": 1
+   },
+   "outputs": {
+    "section_volume_in3": {
+     "value": 72,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "section_surface_in2": {
+     "value": 138,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "casting_modulus_in": {
+     "value": 0.52174,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "riser_modulus_in": {
+     "value": 0.62609,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "riser_diameter_in": {
+     "value": 3.75652,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "riser_volume_in3": {
+     "value": 41.63395,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "volume_needed_in3": {
+     "value": 19.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sand-permeability-vent",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Molding Sand Permeability and Vent Area -- the spec-v1715 worked example, recomputed",
+   "source_edition_or_year": "spec-v1715 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "mould_sand_lb": 800,
+    "moisture_pct": 3.5,
+    "binder_lb": 4,
+    "binder_gas_cm3_g": 15,
+    "pour_temp_f": 2600,
+    "vent_area_in2": 6,
+    "permeability_number": 120,
+    "fineness_change_pct": 20
+   },
+   "outputs": {
+    "water_lb": {
+     "value": 28,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "steam_volume_in3": {
+     "value": 6000676.20051,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "binder_gas_in3": {
+     "value": 1660.79428,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_gas_in3": {
+     "value": 6002336.99479,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "expansion_ratio": {
+     "value": 7736.5861,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "new_permeability_number": {
+     "value": 83.33333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "melt-furnace-energy",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Melt Furnace Energy and Charge Time -- the spec-v1716 worked example, recomputed",
+   "source_edition_or_year": "spec-v1716 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "charge_weight_lb": 2000,
+    "theoretical_btu_lb": 190,
+    "furnace_efficiency_pct": 70,
+    "energy_cost_per_kwh": 0.1,
+    "alt_efficiency_pct": 30,
+    "alt_theoretical_btu_lb": 500,
+    "casting_yield_pct": 62
+   },
+   "outputs": {
+    "theoretical_mmbtu": {
+     "value": 0.38,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "input_mmbtu": {
+     "value": 0.54286,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "input_kwh": {
+     "value": 159.0958,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cost_per_heat": {
+     "value": 15.90958,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_input_mmbtu": {
+     "value": 1.26667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "btu_per_saleable_lb": {
+     "value": 437.78802,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

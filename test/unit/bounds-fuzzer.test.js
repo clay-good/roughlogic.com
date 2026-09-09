@@ -50277,3 +50277,303 @@ test("bounds: spec-v1504 computeContinuousInsulationRatio -- more cavity is a mo
   assert.ok(_v1504({ ...base, r_cavity: 0 }).error);
   assert.ok(_v1504({ ...base, required_ratio: 1 }).error);
 });
+
+// =====================================================================
+// spec-v1705..v1716: the plastics processing and foundry band. Twelve tiles,
+// nothing cut. Every inverse is asserted by its ROUND TRIP, and the two
+// places this band departs from its specs are asserted directly: the exact
+// annular area rather than the thin-wall approximation (v1709), and a
+// thermal diffusivity three to seven times lower than spec-v1707 states,
+// which is what k/(rho x cp) gives and what the spec's own "12 seconds"
+// hypothetical implies.
+// =====================================================================
+import {
+  computeInjectionClampTonnage as _v1705,
+  computeShotSizeResidenceTime as _v1706,
+  computeInjectionCoolingTime as _v1707,
+  computeMoldShrinkageDimension as _v1708,
+  computeExtrusionOutputRate as _v1709,
+  computeThermoformingDrawRatio as _v1710,
+  computeHdpeFusionPressureTime as _v1711,
+  computeThermoplasticTemperatureDerate as _v1712,
+  computeCastingPourYield as _v1713,
+  computeRiserModulusFeeding as _v1714,
+  computeSandPermeabilityVent as _v1715,
+  computeMeltFurnaceEnergy as _v1716,
+} from "../../calc-process.js";
+
+test("bounds: spec-v1705 computeInjectionClampTonnage -- the runner is not a rounding error", () => {
+  const base = { cavities: 4, part_projected_area_in2: 12, runner_projected_area_in2: 6, cavity_pressure_tsi: 2.5, safety_factor_pct: 15, machine_rating_tons: 150 };
+  const r = _v1705(base);
+  assert.ok(Math.abs(r.total_area_in2 - 54) < 1e-12);
+  assert.ok(Math.abs(r.clamp_required_tons - 135) < 1e-12);
+  assert.ok(Math.abs(r.clamp_with_safety_tons - 155.25) < 1e-9);
+  // The runner's 6 in2 adds 17.25 tons, which is what puts this over a 150.
+  assert.ok(Math.abs(r.runner_penalty_tons - 6 * 2.5 * 1.15) < 1e-9);
+  assert.equal(r.fits, false);
+  assert.equal(_v1705({ ...base, runner_projected_area_in2: 0 }).fits, true);
+  // IDENTITY: the maximum cavity pressure, fed back, exactly exhausts the machine.
+  const atMax = _v1705({ ...base, cavity_pressure_tsi: r.max_cavity_pressure_tsi });
+  assert.ok(Math.abs(atMax.clamp_with_safety_tons - 150) < 1e-9);
+  assert.equal(atMax.fits, true);
+  // Cavity pressure is the variable that moves most: 4 tsi on the same area.
+  assert.ok(Math.abs(_v1705({ ...base, cavity_pressure_tsi: 4 }).clamp_with_safety_tons - 248.4) < 1e-9);
+  assert.ok(_v1705({ ...base, cavities: 0 }).error);
+  assert.ok(_v1705({ ...base, cavity_pressure_tsi: 0 }).error);
+});
+
+test("bounds: spec-v1706 computeShotSizeResidenceTime -- the window has a reason at BOTH ends", () => {
+  const base = { barrel_capacity_oz: 12, shot_weight_oz: 4.2, cycle_time_s: 32, min_pct: 20, max_pct: 80, max_residence_min: 4, alt_cycle_time_s: 45 };
+  const r = _v1706(base);
+  assert.ok(Math.abs(r.shot_pct - 35) < 1e-9);
+  assert.ok(Math.abs(r.residence_min - (12 / 4.2) * 32 / 60) < 1e-12);
+  assert.equal(r.in_window, true);
+  assert.equal(r.over_limit, false);
+  // IDENTITIES: both window edges round-trip to exactly their percentages.
+  assert.ok(Math.abs(_v1706({ ...base, barrel_capacity_oz: r.min_barrel_oz }).shot_pct - 80) < 1e-9);
+  assert.ok(Math.abs(_v1706({ ...base, barrel_capacity_oz: r.max_barrel_oz }).shot_pct - 20) < 1e-9);
+  // The same part on the 40 oz machine that happens to be free.
+  const big = _v1706({ ...base, barrel_capacity_oz: 40 });
+  assert.equal(big.too_small, true);
+  assert.equal(big.over_limit, true);
+  assert.ok(big.residence_min > 5 && big.residence_min < 5.1);
+  // And the other end: 4.2 oz in a 5 oz barrel is 84% and too large.
+  assert.equal(_v1706({ ...base, barrel_capacity_oz: 5 }).too_large, true);
+  // Residence scales DIRECTLY with cycle time.
+  assert.ok(Math.abs(_v1706({ ...base, cycle_time_s: 64 }).residence_min - 2 * r.residence_min) < 1e-12);
+  assert.ok(_v1706({ ...base, cycle_time_s: 0 }).error);
+});
+
+test("bounds: spec-v1707 computeInjectionCoolingTime -- the SQUARE law, and a diffusivity the spec got wrong", () => {
+  const base = { wall_thickness_in: 0.1, alpha_in2_s: 0.00015, melt_temp_f: 450, mould_temp_f: 100, eject_temp_f: 180, alt_wall_thickness_in: 0.125, non_cooling_cycle_s: 8, annual_parts: 1000000 };
+  const r = _v1707(base);
+  // spec-v1707 states alpha = 0.0005 to 0.001 in2/s. k/(rho x cp) gives 0.00013
+  // for ABS through 0.00023 for HDPE -- 3 to 7 times lower. The spec never
+  // multiplied its own constant through the formula it printed; it stopped at
+  // h^2/alpha = 16.7 and then wrote "if the cooling was 12 seconds", which
+  // implies 0.000145 and contradicts its own range. This example reproduces
+  // that hypothetical, which is the figure that was physically right.
+  assert.ok(r.cooling_time_s > 11 && r.cooling_time_s < 12.5);
+  assert.ok(_v1707({ ...base, alpha_in2_s: 0.0006 }).cooling_time_s < 3.5);
+  // IDENTITY: the time ratio is EXACTLY the square of the thickness ratio.
+  assert.ok(Math.abs(r.time_ratio - 1.5625) < 1e-12);
+  assert.ok(Math.abs(r.alt_cooling_time_s / r.cooling_time_s - 1.5625) < 1e-12);
+  // IDENTITY: coring halves the wall, so it quarters the cooling.
+  assert.ok(Math.abs(r.cored_time_s * 4 - r.alt_cooling_time_s) < 1e-9);
+  // IDENTITY: cooling is inversely proportional to diffusivity.
+  assert.ok(Math.abs(_v1707({ ...base, alpha_in2_s: 0.0003 }).cooling_time_s * 2 - r.cooling_time_s) < 1e-9);
+  // Mould temperature is the WEAK lever -- it enters through a logarithm.
+  const colder = _v1707({ ...base, mould_temp_f: 60 });
+  assert.ok(colder.cooling_time_s < r.cooling_time_s);
+  assert.ok(colder.cooling_time_s > r.cooling_time_s * 0.75);
+  assert.ok(Math.abs(r.annual_machine_hours - (r.alt_cooling_time_s - r.cooling_time_s) * 1e6 / 3600) < 1e-6);
+  assert.ok(_v1707({ ...base, eject_temp_f: 460 }).error);
+  assert.ok(_v1707({ ...base, alpha_in2_s: 0 }).error);
+});
+
+test("bounds: spec-v1708 computeMoldShrinkageDimension -- steel safe is an ASYMMETRY, not caution", () => {
+  const base = { part_dimension_in: 4.000, shrinkage_flow_in_in: 0.018, shrinkage_cross_in_in: 0.012, shrinkage_low_in_in: 0.015, shrinkage_high_in_in: 0.022, existing_cavity_in: 4.0201 };
+  const r = _v1708(base);
+  assert.ok(Math.abs(r.cavity_flow_in - 4.0733) < 0.0002);
+  assert.ok(Math.abs(r.cavity_cross_in - 4.0486) < 0.0002);
+  // A square feature cut uniformly comes out rectangular.
+  assert.ok(r.anisotropy_in > 0);
+  assert.ok(Math.abs(r.anisotropy_in * 1000 - 24.74) < 0.02);
+  // IDENTITY: the cavity, run back through the shrinkage, returns the part.
+  assert.ok(Math.abs(_v1708({ ...base, existing_cavity_in: r.cavity_flow_in }).part_from_cavity_in - 4.000) < 1e-12);
+  // The ABS-cut cavity run in this material makes an UNDERSIZE part -- 52 thou.
+  assert.ok(r.part_from_cavity_in < 4.000);
+  assert.ok(Math.abs((4.000 - r.part_from_cavity_in) * 1000 - 52.3) < 0.2);
+  // Steel safe: the LOW end of the range gives the SMALLER cavity.
+  assert.ok(r.cavity_low_in < r.cavity_high_in);
+  assert.ok(r.steel_safe_verdict.includes("LOW end"));
+  // A vanishing shrinkage is a 1:1 cavity.
+  assert.ok(Math.abs(_v1708({ ...base, shrinkage_flow_in_in: 1e-12 }).cavity_flow_in - 4.000) < 1e-9);
+  assert.ok(_v1708({ ...base, shrinkage_flow_in_in: 1 }).error);
+  assert.ok(_v1708({ ...base, shrinkage_low_in_in: 0.03 }).error);
+});
+
+test("bounds: spec-v1709 computeExtrusionOutputRate -- the EXACT annulus, and cooling governs", () => {
+  const base = { product_od_in: 2.5, wall_thickness_in: 0.1, line_speed_ft_min: 45, melt_density_lb_in3: 0.0347, extruder_output_lb_h: 400, die_opening_in: 3.0, cooling_capacity_lb_h: 500, shift_hours: 8 };
+  const r = _v1709(base);
+  // spec-v1709 used the thin-wall approximation pi x OD x wall = 0.785 in2.
+  // The exact annulus is 0.754, so the approximation runs 4.2% high and that
+  // error lands directly on the output figure.
+  assert.ok(Math.abs(r.area_in2 - Math.PI / 4 * (2.5 * 2.5 - 2.3 * 2.3)) < 1e-12);
+  assert.ok(Math.abs(r.thin_wall_area_in2 - Math.PI * 2.5 * 0.1) < 1e-12);
+  assert.ok(r.thin_wall_area_in2 > r.area_in2);
+  assert.ok(Math.abs(r.thin_wall_area_in2 / r.area_in2 - 1.0417) < 0.001);
+  // IDENTITY: the speed for an output reproduces exactly that output.
+  assert.ok(Math.abs(_v1709({ ...base, line_speed_ft_min: r.speed_at_output_ft_min }).output_at_speed_lb_h - 400) < 1e-9);
+  assert.ok(Math.abs(r.draw_down_ratio - 1.2) < 1e-12);
+  // Cooling governs only when the bath is below the screw.
+  assert.equal(r.cooling_governs, false);
+  assert.equal(_v1709({ ...base, cooling_capacity_lb_h: 300 }).cooling_governs, true);
+  assert.ok(Math.abs(r.shift_pounds - r.output_at_speed_lb_h * 8) < 1e-9);
+  assert.ok(_v1709({ ...base, wall_thickness_in: 1.5 }).error);
+  assert.ok(_v1709({ ...base, melt_density_lb_in3: 0 }).error);
+});
+
+test("bounds: spec-v1710 computeThermoformingDrawRatio -- the average is not the specification", () => {
+  const base = { opening_diameter_in: 10, draw_depth_in: 6, sheet_thickness_in: 0.060, corner_fraction: 0.4, min_wall_in: 0.015, hd_limit: 0.5 };
+  const r = _v1710(base);
+  assert.ok(Math.abs(r.hd_ratio - 0.6) < 1e-12);
+  assert.equal(r.within_limit, false);
+  assert.ok(Math.abs(r.areal_draw_ratio - 3.4) < 0.001);
+  // IDENTITY: conservation -- ADR times the average wall is the sheet gauge.
+  assert.ok(Math.abs(r.areal_draw_ratio * r.average_wall_in - 0.060) < 1e-12);
+  // The corner is what the part fails at, and it fails here.
+  assert.ok(Math.abs(r.corner_wall_in - r.average_wall_in * 0.4) < 1e-12);
+  assert.equal(r.corner_passes, false);
+  // IDENTITY: the sheet gauge for the corner minimum gives EXACTLY that corner.
+  const heavier = _v1710({ ...base, sheet_thickness_in: r.sheet_for_corner_in });
+  assert.ok(Math.abs(heavier.corner_wall_in - 0.015) < 1e-12);
+  assert.equal(heavier.corner_passes, true);
+  assert.ok(r.sheet_for_corner_in > base.sheet_thickness_in * 2);
+  // Plug assist does not change the average -- only the distribution does.
+  const assisted = _v1710({ ...base, corner_fraction: 0.6 });
+  assert.ok(Math.abs(assisted.average_wall_in - r.average_wall_in) < 1e-12);
+  assert.ok(assisted.corner_wall_in > r.corner_wall_in);
+  assert.ok(_v1710({ ...base, corner_fraction: 0 }).error);
+});
+
+test("bounds: spec-v1711 computeHdpeFusionPressureTime -- drag is ADDED, and area goes as OD squared", () => {
+  const base = { pipe_od_in: 6.625, dimension_ratio: 11, wall_thickness_in: 0, cylinder_area_in2: 3.15, interfacial_pressure_psi: 75, drag_pressure_psi: 60, alt_pipe_od_in: 12.75 };
+  const r = _v1711(base);
+  assert.ok(Math.abs(r.wall_in - 6.625 / 11) < 1e-12);
+  assert.ok(Math.abs(r.face_area_in2 - 11.396) < 0.001);
+  assert.ok(Math.abs(r.theoretical_gauge_psi - 271.32) < 0.01);
+  assert.ok(Math.abs(r.total_gauge_psi - 331.32) < 0.01);
+  // IDENTITY: the gauge, run back through the area ratio, is the interfacial.
+  assert.ok(Math.abs(r.theoretical_gauge_psi * 3.15 / r.face_area_in2 - 75) < 1e-9);
+  // Drag is ADDED, not scaled -- omitting it under-presses by exactly the drag.
+  assert.ok(Math.abs(r.total_gauge_psi - r.theoretical_gauge_psi - 60) < 1e-12);
+  assert.equal(_v1711({ ...base, drag_pressure_psi: 0 }).has_drag, false);
+  // Face area scales with the SQUARE of diameter at a fixed dimension ratio,
+  // which is why a fixed gauge number across sizes is the other error.
+  assert.ok(Math.abs(r.alt_face_area_in2 / r.face_area_in2 - Math.pow(12.75 / 6.625, 2)) < 1e-9);
+  assert.ok(r.alt_gauge_psi > r.total_gauge_psi * 3);
+  assert.ok(_v1711({ ...base, dimension_ratio: 0, wall_thickness_in: 0 }).error);
+  assert.ok(_v1711({ ...base, cylinder_area_in2: 0 }).error);
+});
+
+test("bounds: spec-v1712 computeThermoplasticTemperatureDerate -- 200 psi is an 80 psi line at 120 degF", () => {
+  const base = { rated_pressure_psi: 200, operating_temp_f: 120, derating_factor: 0.40, operating_pressure_psi: 100, max_rated_temp_f: 140, alt_derating_factor: 0.82 };
+  const r = _v1712(base);
+  assert.ok(Math.abs(r.derated_pressure_psi - 80) < 1e-12);
+  // The system runs 100 psi against an 80 psi allowable and it is NOT ok.
+  assert.equal(r.passes, false);
+  assert.ok(Math.abs(r.margin_psi + 20) < 1e-12);
+  assert.ok(r.utilization_pct > 100);
+  // IDENTITY: operating exactly at the allowable leaves zero margin.
+  assert.ok(Math.abs(_v1712({ ...base, operating_pressure_psi: r.derated_pressure_psi }).margin_psi) < 1e-12);
+  // A factor of 1 is the printed rating.
+  assert.ok(Math.abs(_v1712({ ...base, derating_factor: 1 }).derated_pressure_psi - 200) < 1e-12);
+  // The temperature LIMIT is a hard stop, not a steep derating.
+  assert.equal(r.over_temp, false);
+  const tooHot = _v1712({ ...base, operating_temp_f: 160 });
+  assert.equal(tooHot.over_temp, true);
+  assert.equal(tooHot.passes, false);
+  // CPVC holds far more of its rating -- the reason it exists.
+  assert.ok(r.alt_derated_psi > r.derated_pressure_psi * 2);
+  assert.ok(_v1712({ ...base, derating_factor: 0 }).error);
+  assert.ok(_v1712({ ...base, derating_factor: 1.5 }).error);
+});
+
+test("bounds: spec-v1713 computeCastingPourYield -- the energy, not the metal, is what is lost", () => {
+  const base = { casting_weight_lb: 280, gating_weight_lb: 170, castings_per_mould: 1, melt_energy_btu_lb: 500, target_yield_pct: 70, annual_castings: 5000 };
+  const r = _v1713(base);
+  assert.ok(Math.abs(r.poured_weight_lb - 450) < 1e-12);
+  assert.ok(Math.abs(r.yield_pct - 62.222) < 0.01);
+  assert.ok(Math.abs(r.btu_per_saleable_lb - 450 * 500 / 280) < 1e-9);
+  // IDENTITY: energy per saleable pound times saleable pounds is the poured energy.
+  assert.ok(Math.abs(r.btu_per_saleable_lb * r.saleable_lb - r.poured_weight_lb * 500) < 1e-6);
+  // IDENTITY: the poured weight for the target yield reproduces that yield.
+  const atTarget = _v1713({ ...base, gating_weight_lb: r.target_poured_lb - 280 });
+  assert.ok(Math.abs(atTarget.yield_pct - 70) < 1e-9);
+  assert.ok(Math.abs(r.target_poured_lb - 400) < 1e-9);
+  // Zero gating is a perfect yield and no energy penalty at all.
+  const perfect = _v1713({ ...base, gating_weight_lb: 0 });
+  assert.ok(Math.abs(perfect.yield_pct - 100) < 1e-12);
+  assert.ok(Math.abs(perfect.btu_per_saleable_lb - 500) < 1e-9);
+  assert.ok(Math.abs(perfect.energy_penalty_pct) < 1e-9);
+  assert.ok(_v1713({ ...base, casting_weight_lb: 0 }).error);
+  assert.ok(_v1713({ ...base, target_yield_pct: 100 }).error);
+});
+
+test("bounds: spec-v1714 computeRiserModulusFeeding -- TWO conditions, not one", () => {
+  const base = { section_length_in: 8, section_width_in: 6, section_thickness_in: 1.5, modulus_ratio: 1.2, shrinkage_pct: 4, riser_efficiency_pct: 15, sleeve_factor: 1 };
+  const r = _v1714(base);
+  assert.ok(Math.abs(r.section_volume_in3 - 72) < 1e-12);
+  assert.ok(Math.abs(r.section_surface_in2 - 138) < 1e-12);
+  assert.ok(Math.abs(r.casting_modulus_in - 72 / 138) < 1e-12);
+  // IDENTITY: the riser modulus is the casting modulus times the ratio, and a
+  // cylinder of height equal to its diameter has a modulus of d/6.
+  assert.ok(Math.abs(r.riser_modulus_in - r.casting_modulus_in * 1.2) < 1e-12);
+  assert.ok(Math.abs(r.riser_diameter_in / 6 - r.riser_modulus_in) < 1e-12);
+  assert.ok(Math.abs(r.riser_diameter_in - 3.756) < 0.001);
+  // The volume condition is a SECOND check, and this riser passes both.
+  assert.ok(Math.abs(r.shrinkage_volume_in3 - 2.88) < 1e-12);
+  assert.ok(Math.abs(r.volume_needed_in3 - 19.2) < 1e-9);
+  assert.equal(r.volume_ok, true);
+  assert.ok(r.riser_volume_in3 > r.volume_needed_in3 * 2);
+  // IDENTITY: the volume-governed diameter holds exactly the volume needed.
+  assert.ok(Math.abs(Math.PI / 4 * Math.pow(r.diameter_for_volume_in, 3) - r.volume_needed_in3) < 1e-9);
+  // A riser can satisfy modulus and FAIL volume -- the failure that leaves
+  // porosity directly under a riser that stayed liquid.
+  const thirsty = _v1714({ ...base, shrinkage_pct: 20, riser_efficiency_pct: 5 });
+  assert.equal(thirsty.volume_ok, false);
+  assert.ok(Math.abs(thirsty.riser_diameter_in - r.riser_diameter_in) < 1e-12);
+  // A 2x sleeve reaches the same modulus at half the diameter.
+  assert.ok(Math.abs(_v1714({ ...base, sleeve_factor: 2 }).riser_diameter_in * 2 - r.riser_diameter_in) < 1e-12);
+  assert.ok(_v1714({ ...base, section_thickness_in: 0 }).error);
+});
+
+test("bounds: spec-v1715 computeSandPermeabilityVent -- water expands seven thousand times at pouring heat", () => {
+  const base = { mould_sand_lb: 800, moisture_pct: 3.5, binder_lb: 4, binder_gas_cm3_g: 15, pour_temp_f: 2600, vent_area_in2: 6, permeability_number: 120, fineness_change_pct: 20 };
+  const r = _v1715(base);
+  assert.ok(Math.abs(r.water_lb - 28) < 1e-12);
+  // The steam term is the one that surprises: ~7,700x the liquid volume.
+  assert.ok(r.expansion_ratio > 7000 && r.expansion_ratio < 8500);
+  // IDENTITY: steam scales linearly with water and with ABSOLUTE temperature.
+  assert.ok(Math.abs(_v1715({ ...base, moisture_pct: 7 }).steam_volume_in3 - 2 * r.steam_volume_in3) < 1e-6);
+  const twiceAbsolute = 2 * (2600 + 459.67) - 459.67;
+  assert.ok(Math.abs(_v1715({ ...base, pour_temp_f: twiceAbsolute }).steam_volume_in3 - 2 * r.steam_volume_in3) < 1e-6);
+  assert.ok(Math.abs(r.total_gas_in3 - (r.steam_volume_in3 + r.binder_gas_in3)) < 1e-9);
+  // A chemically bonded sand has no moisture, so its gas is all binder.
+  const dry = _v1715({ ...base, moisture_pct: 0 });
+  assert.ok(Math.abs(dry.steam_volume_in3) < 1e-12);
+  assert.ok(Math.abs(dry.total_gas_in3 - dry.binder_gas_in3) < 1e-12);
+  // IDENTITY: permeability goes with the SQUARE of grain size, so 20% finer
+  // divides it by 1.2 squared.
+  assert.ok(Math.abs(r.new_permeability_number * 1.44 - 120) < 1e-9);
+  assert.ok(r.new_permeability_number < 120);
+  assert.ok(_v1715({ ...base, fineness_change_pct: -20 }).new_permeability_number > 120);
+  assert.ok(_v1715({ ...base, mould_sand_lb: 0 }).error);
+});
+
+test("bounds: spec-v1716 computeMeltFurnaceEnergy -- efficiency and yield are two separate divisions", () => {
+  const base = { charge_weight_lb: 2000, theoretical_btu_lb: 190, furnace_efficiency_pct: 70, energy_cost_per_kwh: 0.10, alt_efficiency_pct: 30, alt_theoretical_btu_lb: 500, casting_yield_pct: 62 };
+  const r = _v1716(base);
+  assert.ok(Math.abs(r.theoretical_mmbtu - 0.38) < 1e-9);
+  // IDENTITY: input times efficiency is the theoretical.
+  assert.ok(Math.abs(r.input_mmbtu * 0.70 - r.theoretical_mmbtu) < 1e-9);
+  assert.ok(Math.abs(r.input_kwh * 3412.14 - r.input_btu) < 1e-6);
+  // 159.10 kWh, not the 158.26 the spec's rounded 0.54 MMBTU implies -- the
+  // exact input is 0.542857 MMBTU, and the spec's own 159 kWh agrees.
+  assert.ok(Math.abs(r.input_kwh - 159.10) < 0.05);
+  // 100% efficiency is the theoretical figure exactly.
+  assert.ok(Math.abs(_v1716({ ...base, furnace_efficiency_pct: 100 }).input_mmbtu - r.theoretical_mmbtu) < 1e-12);
+  // IDENTITY: energy per saleable pound times saleable pounds is the input.
+  assert.ok(Math.abs(r.btu_per_saleable_lb * 2000 * 0.62 - r.input_btu) < 1e-6);
+  assert.ok(Math.abs(r.btu_per_saleable_lb - 437.8) < 0.5);
+  // and it is roughly 2.3x the theoretical once BOTH divisions are counted.
+  assert.ok(Math.abs(r.btu_per_saleable_lb / 190 - 2.304) < 0.02);
+  // A 100% yield leaves only the furnace efficiency.
+  assert.ok(Math.abs(_v1716({ ...base, casting_yield_pct: 100 }).btu_per_saleable_lb * 2000 - r.input_btu) < 1e-6);
+  // The gas furnace takes 2.3x the input for exactly the same metal.
+  assert.ok(Math.abs(r.alt_input_mmbtu / r.input_mmbtu - 70 / 30) < 1e-9);
+  // Aluminium takes MORE energy per pound than iron at half the melting point.
+  assert.ok(base.alt_theoretical_btu_lb > base.theoretical_btu_lb * 2.6);
+  assert.ok(_v1716({ ...base, furnace_efficiency_pct: 0 }).error);
+});

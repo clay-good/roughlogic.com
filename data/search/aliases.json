@@ -110772,6 +110772,306 @@
    "term": "ratio of ci to cavity",
    "target": "continuous-insulation-ratio",
    "kind": "industry"
+  },
+  {
+   "term": "injection clamp tonnage",
+   "target": "injection-clamp-tonnage",
+   "kind": "industry"
+  },
+  {
+   "term": "projected area mould clamp",
+   "target": "injection-clamp-tonnage",
+   "kind": "industry"
+  },
+  {
+   "term": "tons per square inch injection",
+   "target": "injection-clamp-tonnage",
+   "kind": "industry"
+  },
+  {
+   "term": "clamp force calculation",
+   "target": "injection-clamp-tonnage",
+   "kind": "industry"
+  },
+  {
+   "term": "mould flashing clamp",
+   "target": "injection-clamp-tonnage",
+   "kind": "industry"
+  },
+  {
+   "term": "injection residence time",
+   "target": "shot-size-residence-time",
+   "kind": "industry"
+  },
+  {
+   "term": "barrel capacity shot size ratio",
+   "target": "shot-size-residence-time",
+   "kind": "industry"
+  },
+  {
+   "term": "material degradation residence",
+   "target": "shot-size-residence-time",
+   "kind": "industry"
+  },
+  {
+   "term": "20 to 80 percent shot",
+   "target": "shot-size-residence-time",
+   "kind": "industry"
+  },
+  {
+   "term": "oversized machine small part",
+   "target": "shot-size-residence-time",
+   "kind": "industry"
+  },
+  {
+   "term": "injection cooling time wall thickness",
+   "target": "injection-cooling-time",
+   "kind": "industry"
+  },
+  {
+   "term": "cooling time square law plastic",
+   "target": "injection-cooling-time",
+   "kind": "industry"
+  },
+  {
+   "term": "cycle time thick section",
+   "target": "injection-cooling-time",
+   "kind": "industry"
+  },
+  {
+   "term": "thermal diffusivity cooling plastic",
+   "target": "injection-cooling-time",
+   "kind": "industry"
+  },
+  {
+   "term": "coring out thick sections",
+   "target": "injection-cooling-time",
+   "kind": "industry"
+  },
+  {
+   "term": "mould shrinkage allowance",
+   "target": "mold-shrinkage-dimension",
+   "kind": "industry"
+  },
+  {
+   "term": "plastic shrink rate cavity",
+   "target": "mold-shrinkage-dimension",
+   "kind": "industry"
+  },
+  {
+   "term": "steel safe mould dimension",
+   "target": "mold-shrinkage-dimension",
+   "kind": "industry"
+  },
+  {
+   "term": "flow versus cross flow shrinkage",
+   "target": "mold-shrinkage-dimension",
+   "kind": "industry"
+  },
+  {
+   "term": "semi crystalline shrinkage",
+   "target": "mold-shrinkage-dimension",
+   "kind": "industry"
+  },
+  {
+   "term": "extrusion output rate",
+   "target": "extrusion-output-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "pounds per hour to feet per minute",
+   "target": "extrusion-output-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "extruder line speed calculation",
+   "target": "extrusion-output-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "draw down ratio extrusion",
+   "target": "extrusion-output-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "extrusion cooling limited",
+   "target": "extrusion-output-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "thermoforming draw ratio",
+   "target": "thermoforming-draw-ratio",
+   "kind": "industry"
+  },
+  {
+   "term": "wall thinning thermoform",
+   "target": "thermoforming-draw-ratio",
+   "kind": "industry"
+  },
+  {
+   "term": "h to d ratio forming",
+   "target": "thermoforming-draw-ratio",
+   "kind": "industry"
+  },
+  {
+   "term": "plug assist thermoforming",
+   "target": "thermoforming-draw-ratio",
+   "kind": "industry"
+  },
+  {
+   "term": "corner thinning vacuum form",
+   "target": "thermoforming-draw-ratio",
+   "kind": "industry"
+  },
+  {
+   "term": "hdpe butt fusion pressure",
+   "target": "hdpe-fusion-pressure-time",
+   "kind": "industry"
+  },
+  {
+   "term": "fusion gauge pressure calculation",
+   "target": "hdpe-fusion-pressure-time",
+   "kind": "industry"
+  },
+  {
+   "term": "interfacial pressure polyethylene",
+   "target": "hdpe-fusion-pressure-time",
+   "kind": "industry"
+  },
+  {
+   "term": "drag pressure fusion",
+   "target": "hdpe-fusion-pressure-time",
+   "kind": "industry"
+  },
+  {
+   "term": "astm f2620 fusion",
+   "target": "hdpe-fusion-pressure-time",
+   "kind": "industry"
+  },
+  {
+   "term": "plastic pipe temperature derating",
+   "target": "thermoplastic-temperature-derate",
+   "kind": "industry"
+  },
+  {
+   "term": "pvc pressure at 120 degrees",
+   "target": "thermoplastic-temperature-derate",
+   "kind": "industry"
+  },
+  {
+   "term": "cpvc versus pvc temperature",
+   "target": "thermoplastic-temperature-derate",
+   "kind": "industry"
+  },
+  {
+   "term": "thermoplastic pressure rating derate",
+   "target": "thermoplastic-temperature-derate",
+   "kind": "industry"
+  },
+  {
+   "term": "plastic pipe hot water rating",
+   "target": "thermoplastic-temperature-derate",
+   "kind": "industry"
+  },
+  {
+   "term": "casting yield foundry",
+   "target": "casting-pour-yield",
+   "kind": "industry"
+  },
+  {
+   "term": "pour weight versus casting weight",
+   "target": "casting-pour-yield",
+   "kind": "industry"
+  },
+  {
+   "term": "gating and riser weight",
+   "target": "casting-pour-yield",
+   "kind": "industry"
+  },
+  {
+   "term": "melt charge calculation",
+   "target": "casting-pour-yield",
+   "kind": "industry"
+  },
+  {
+   "term": "foundry returns ratio",
+   "target": "casting-pour-yield",
+   "kind": "industry"
+  },
+  {
+   "term": "riser modulus feeding",
+   "target": "riser-modulus-feeding",
+   "kind": "industry"
+  },
+  {
+   "term": "chvorinov rule casting",
+   "target": "riser-modulus-feeding",
+   "kind": "industry"
+  },
+  {
+   "term": "volume to surface ratio riser",
+   "target": "riser-modulus-feeding",
+   "kind": "industry"
+  },
+  {
+   "term": "feeding distance riser",
+   "target": "riser-modulus-feeding",
+   "kind": "industry"
+  },
+  {
+   "term": "insulating sleeve modulus",
+   "target": "riser-modulus-feeding",
+   "kind": "industry"
+  },
+  {
+   "term": "sand permeability foundry",
+   "target": "sand-permeability-vent",
+   "kind": "industry"
+  },
+  {
+   "term": "mould venting gas defects",
+   "target": "sand-permeability-vent",
+   "kind": "industry"
+  },
+  {
+   "term": "core venting blowholes",
+   "target": "sand-permeability-vent",
+   "kind": "industry"
+  },
+  {
+   "term": "afs permeability number",
+   "target": "sand-permeability-vent",
+   "kind": "industry"
+  },
+  {
+   "term": "green sand moisture blows",
+   "target": "sand-permeability-vent",
+   "kind": "industry"
+  },
+  {
+   "term": "melt furnace energy",
+   "target": "melt-furnace-energy",
+   "kind": "industry"
+  },
+  {
+   "term": "btu per pound to melt",
+   "target": "melt-furnace-energy",
+   "kind": "industry"
+  },
+  {
+   "term": "induction furnace efficiency",
+   "target": "melt-furnace-energy",
+   "kind": "industry"
+  },
+  {
+   "term": "aluminium versus iron melt energy",
+   "target": "melt-furnace-energy",
+   "kind": "industry"
+  },
+  {
+   "term": "holding furnace loss",
+   "target": "melt-furnace-energy",
+   "kind": "industry"
   }
  ]
 }

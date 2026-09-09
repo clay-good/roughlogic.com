@@ -1689,6 +1689,11 @@
     {"term":"napier orifice area for capacity","target":"steam-prv-area-for-capacity","kind":"question"},
     {"term":"sewer scour slope","target":"manning-slope","kind":"redirect"},
     {"term":"minimum slope self cleansing sewer","target":"manning-slope","kind":"redirect"},
-    {"term":"gravity sewer 2 fps velocity","target":"manning-slope","kind":"redirect"}
+    {"term":"gravity sewer 2 fps velocity","target":"manning-slope","kind":"redirect"},
+    {"term":"plastic pipe temperature derating","target":"thermoplastic-temperature-derate","kind":"industry"},
+    {"term":"pvc pressure at 120 degrees","target":"thermoplastic-temperature-derate","kind":"industry"},
+    {"term":"cpvc versus pvc temperature","target":"thermoplastic-temperature-derate","kind":"industry"},
+    {"term":"thermoplastic pressure rating derate","target":"thermoplastic-temperature-derate","kind":"industry"},
+    {"term":"plastic pipe hot water rating","target":"thermoplastic-temperature-derate","kind":"industry"}
   ]
 }

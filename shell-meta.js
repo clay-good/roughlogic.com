@@ -129,6 +129,12 @@ export const PROFESSION_NOUN = {
   coatings: "Coatings",
   "door-hardware": "Door Hardware",
   painting: "Painters",
+  // Added 2026-09-09 with the plastics processing and foundry band. Both lead
+  // on tiles of their own, and an unmapped lead silently retitles them
+  // "... - Trades ..." rather than failing. Short on purpose: a long noun is
+  // the first thing buildTitle drops at the 70-char cap.
+  plastics: "Plastics",
+  foundry: "Foundry",
 };
 
 // Escape a string for embedding inside HTML text content or an attribute.

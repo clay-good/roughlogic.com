@@ -3050,6 +3050,18 @@ cross-check.
 | calc-powerquality.js | `computeRlcReactanceResonance` | `{ frequency_hz = 60, resistance_ohm = 10, inductance_h = 0.05, capacitance_uf...` | _ | _ | _ |
 | calc-powerquality.js | `computeTddIeee519` | `{ isc_a = 0, il_a = 0, measured_tdd_pct = 0 } = {}` | _ | _ | _ |
 | calc-powerquality.js | `computeTransformerKFactor` | `{ i1 = 1, i3 = 0, i5 = 0, i7 = 0, i9 = 0, i11 = 0, i13 = 0 } = {}` | _ | _ | _ |
+| calc-process.js | `computeCastingPourYield` | `{ casting_weight_lb = 0, gating_weight_lb = 0, castings_per_mould = 1, melt_e...` | _ | _ | _ |
+| calc-process.js | `computeExtrusionOutputRate` | `{ product_od_in = 0, wall_thickness_in = 0, line_speed_ft_min = 0, melt_densi...` | _ | _ | _ |
+| calc-process.js | `computeHdpeFusionPressureTime` | `{ pipe_od_in = 0, dimension_ratio = 0, wall_thickness_in = 0, cylinder_area_i...` | _ | _ | _ |
+| calc-process.js | `computeInjectionClampTonnage` | `{ cavities = 0, part_projected_area_in2 = 0, runner_projected_area_in2 = 0, c...` | _ | _ | _ |
+| calc-process.js | `computeInjectionCoolingTime` | `{ wall_thickness_in = 0, alpha_in2_s = 0, melt_temp_f = 0, mould_temp_f = 0, ...` | _ | _ | _ |
+| calc-process.js | `computeMeltFurnaceEnergy` | `{ charge_weight_lb = 0, theoretical_btu_lb = 0, furnace_efficiency_pct = 0, e...` | _ | _ | _ |
+| calc-process.js | `computeMoldShrinkageDimension` | `{ part_dimension_in = 0, shrinkage_flow_in_in = 0, shrinkage_cross_in_in = 0,...` | _ | _ | _ |
+| calc-process.js | `computeRiserModulusFeeding` | `{ section_length_in = 0, section_width_in = 0, section_thickness_in = 0, modu...` | _ | _ | _ |
+| calc-process.js | `computeSandPermeabilityVent` | `{ mould_sand_lb = 0, moisture_pct = 0, binder_lb = 0, binder_gas_cm3_g = 0, p...` | _ | _ | _ |
+| calc-process.js | `computeShotSizeResidenceTime` | `{ barrel_capacity_oz = 0, shot_weight_oz = 0, cycle_time_s = 0, min_pct = 20,...` | _ | _ | _ |
+| calc-process.js | `computeThermoformingDrawRatio` | `{ opening_diameter_in = 0, draw_depth_in = 0, sheet_thickness_in = 0, corner_...` | _ | _ | _ |
+| calc-process.js | `computeThermoplasticTemperatureDerate` | `{ rated_pressure_psi = 0, operating_temp_f = 73, derating_factor = 0, operati...` | _ | _ | _ |
 | calc-rail.js | `computeBallastSection` | `{ top_width_ft = 0, depth_in = 0, side_slope_ratio = 1.5, length_ft = 0, dens...` | _ | _ | _ |
 | calc-rail.js | `computeClearancePlateEnvelope` | `{ truck_centres_ft = 0, car_length_ft = 0, car_width_in = 0, degree_of_curve ...` | _ | _ | _ |
 | calc-rail.js | `computeCwrThermalForce` | `{ rail_area_in2 = 0, modulus_psi = 30000000, alpha_per_degf = 0.0000065, neut...` | _ | _ | _ |
@@ -3679,7 +3691,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2265.
+Row count: 2277.
 
 <!-- END function-corpus-v14 -->
 
@@ -3988,7 +4000,7 @@ per spec-v14 §13.1 second paragraph.
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `yaw-error-loss` | Wind Turbine Yaw Misalignment Power Loss | Project (first-principles); the manufacturer's yaw calibration procedure governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group B Plumbing (141 tiles)
+### Group B Plumbing (142 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4108,6 +4120,7 @@ per spec-v14 §13.1 second paragraph.
 | `tank-drain-time` | Tank Drain Time (Falling-Head Orifice) | Falling-head (Torricelli) orifice dra...; spec-v630 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tankless-gpm` | Tankless Water Heater GPM | Project (first-principles); 199 kBTU input, climate 5A (Chicago) inlet 50 F, target 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thermal-expansion-volume` | Water Thermal-Expansion Volume | NIST / standard steam tables (water d...; 50 gal, 50->140 F -> ~0.839 gal expansion | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `thermoplastic-temperature-derate` | Thermoplastic Pipe Pressure Derating vs Temperature | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thrust-block-max-pressure` | Max Line Pressure for a Thrust Block (AWWA M41) | AWWA M41 (solved for the pressure); spec-v745 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thrust-block-sizing` | Thrust Block Bearing Area at a Pipe Bend (AWWA M41) | AWWA M41; spec-v388 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `time-of-concentration` | Time of Concentration (Kirpich) | Kirpich (1940) / USDA TR-55; spec-v302 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5028,7 +5041,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (127 tiles)
+### Group G Cross-trade (138 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5043,6 +5056,7 @@ per spec-v14 §13.1 second paragraph.
 | `bolt-proof-load` | Bolt Proof, Yield, and Tensile Load (SAE J429) | SAE J429 (ASME B1.1 tensile stress area); spec-v503 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bucket-elevator-capacity` | Bucket Elevator Capacity, Speed, and Power | Project (first-principles); capacity = bucket volume x buckets/ft x speed x 60 x fill | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `carbon-bed-life` | Activated Carbon Adsorber Bed Life and Breakthrough | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `casting-pour-yield` | Casting Pour Weight, Gating Yield, and Melt Energy | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `center-of-gravity-2point` | Center of Gravity from Two Scales | ASME B30.9 / ITI rigging references (...; readings 3000 and 1000 lb over 10 ft -> 4000 lb total, CG... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `chamber-gas-volume` | Recompression Chamber Gas Volume, Ventilation, and Duration | Project (first-principles); the applicable treatment tables and a diving medical offi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `circle-from-3-points` | Circle Through Three Points | First-principles coordinate geometry ...; (0,0),(4,0),(0,3) -> center (2, 1.5), radius 2.5 (right-t... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5063,6 +5077,7 @@ per spec-v14 §13.1 second paragraph.
 | `equal-spacing` | Equal Spacing Layout | First-principles equal-spacing layout...; 60 in run, 1.5 in balusters, 4 in max gap -> 11 balusters... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `esp-deutsch-efficiency` | Electrostatic Precipitator Collection Efficiency (Deutsch) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `extension-ladder-overlap` | Extension Ladder Overlap and True Working Height | OCWR extension-ladder fast facts (OSH...; 24 ft, 2 sections -> 3 ft overlap, 21.0 ft working length... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `extrusion-output-rate` | Extrusion Output Rate, Line Speed, and Draw-Down | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fall-protection-clearance` | Fall Protection Clearance | 29 CFR 1926.502 (fall-protection syst...; 6 ft shock-absorbing lanyard / 5 ft worker height / 1 ft ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `flange-bolt-torque` | Flange Bolt-Up Torque | ASME PCC-1 / B16.5 (by name); 3/4 in B7 bolt (A_t 0.334 in^2) at 50% of 105 ksi yield, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `frustum-volume` | Frustum (Truncated Cone) Volume and Surface | Project (first-principles); V=(pi h/12)(D^2+Dd+d^2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5070,11 +5085,14 @@ per spec-v14 §13.1 second paragraph.
 | `gear-cascade` | Gear Ratio and RPM Cascade | First-principles / AGMA; overall = product of stage ratios; RPM_out = RPM_in/overa... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `geometry` | Geometry Pack | Project (first-principles); r=10 ft / sector 90 deg -> circumference 62.832 / area 31... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `haversine` | GPS Distance (Haversine) | Project (first-principles); Haversine identity over Earth radius 3958.8 mi | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `hdpe-fusion-pressure-time` | HDPE Butt Fusion Gauge Pressure and Drag | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hearing-protector-nrr` | Hearing Protector Attenuation (OSHA 1910.95 App. B) | Occupational Safety and Health Admini...; NIOSH derates the labelled NRR by protector type: 'all ot... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `heat-stress` | Heat Stress (WBGT and Heat Index) | NWS; NWS Technical Attachment SR 90-23 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `heat-treat-soak-time` | Heat-Treat Soak Time and Furnace Load | Project (first-principles); soak by section thickness; charge heat = w x c x dT | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hydraulic-cylinder` | Hydraulic Cylinder Force and Speed | NFPA (fluid power); F = P*A; v = GPM*231/(60*A); A_extend = pi*(bore/2)^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hydraulic-reservoir-cooler` | Hydraulic Reservoir Size and Cooler Heat Rejection | Project (first-principles); gpm x psi / 1,714; 2,545 BTU/hr per hp | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `injection-clamp-tonnage` | Injection Mould Clamp Tonnage From Projected Area | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `injection-cooling-time` | Injection Moulding Cooling Time From Wall Thickness | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ladder-angle` | Ladder Placement Angle | OSHA; OSHA 1926.1053(b)(5) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `laundry-cost-per-pound` | Laundry Water, Sewer, and Energy Cost per Pound | Project (first-principles); the utility tariffs, the chemical supplier, and the equip... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `laundry-dryer-evaporation` | Tumble Dryer Evaporation Load and Makeup Air | Project (first-principles); the dryer manufacturer, the adopted mechanical code, and ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5084,7 +5102,9 @@ per spec-v14 §13.1 second paragraph.
 | `loan-payment` | Loan Payment | Project (first-principles); Closed-form annuity-immediate at monthly rate r = APR/12/100 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `markup` | Markup and Margin | Project (first-principles); selling_price = cost * (1 + markup); margin = profit / price | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `material-cost` | Material Cost Estimator | Project (first-principles); Standard sales-line arithmetic | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `melt-furnace-energy` | Melt Furnace Energy per Heat and per Saleable Pound | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mileage-cost` | Mileage and Fuel Cost | Project (first-principles); Standard fleet-cost arithmetic | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `mold-shrinkage-dimension` | Moulded Part Shrinkage and the Cavity Dimension to Cut | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `niosh-lifting` | NIOSH Lifting Equation | NIOSH; 30 lb load / H=12 in / V=30 in / D=20 in / 0 deg asym / 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `nitrox-ead` | Nitrox Equivalent Air Depth and the Oxygen Check | Project (first-principles); a gas analysis before every dive and the diving superviso... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `nitrox-mod` | Nitrox Maximum Operating Depth, Best Mix, and Oxygen Limits | Project (first-principles); a gas analysis before every dive and the diving superviso... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5120,11 +5140,14 @@ per spec-v14 §13.1 second paragraph.
 | `rainwater-yield` | Rainwater Harvesting Yield | Project (first-principles); Standard 0.6233 gal-per-in-per-ft^2 conversion factor | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ramp-slope` | Ramp Slope (ADA) | Project (first-principles); ADA 4.8.2 1:12 maximum running slope (cited by name) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `regular-polygon` | Regular Polygon (Apothem, Across Flats/Corners, Area) | Project (first-principles); apothem/across-flats/area | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `riser-modulus-feeding` | Riser Modulus and the Feeding Volume Check | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rolled-blank` | Rolled Plate Blank Length | First-principles arc-length geometry ...; OD 12 in, T 0.25 in, k 0.5 -> neutral 11.75 in, L 36.9137... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rolling-offset` | Rolling Offset | NCCER pipefitting / standard fitter's...; rise 12, roll 9 -> true offset 15; at 45 deg travel 21.21 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rotor-balance-grade` | Permissible Residual Unbalance and Balance Grade | ISO; permissible residual unbalance | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sales-tax` | Sales Tax | Texas Comptroller of Public Accounts; $1,000 subtotal in TX (6.25%) -> $62.50 tax / $1062.50 total | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `sand-permeability-vent` | Moulding Sand Gas Evolution, Permeability, and Venting | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `scrubber-lg-ratio` | Wet Scrubber Liquid-to-Gas Ratio and Removal | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `shot-size-residence-time` | Injection Shot Size, Barrel Capacity, and Residence Time | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shrink-fit` | Interference Shrink-Fit Temperature | first-principles thermal-expansion re...; 4 in fit, 0.004 in interference, 0.002 in clearance, stee... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `silica-table-1` | Silica Table 1 Respirator Lookup (OSHA 1926.1153) | Occupational Safety and Health Admini...; Row (xi), handheld grinders for mortar removal (tuckpoint... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sine-bar` | Sine Bar Angle Setup | First-principles sine-bar trigonometr...; 5-in sine bar on a 2.5-in stack -> arcsin(0.5) = 30.000 deg | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5140,6 +5163,7 @@ per spec-v14 §13.1 second paragraph.
 | `tank-volume-dished-heads` | Horizontal Tank Volume with Dished Heads (Dipstick) | Project (first-principles); shell segment + head cap (b/R = 1/2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tapered-tank-volume` | Tapered (Frustum) Tank Volume from Level | Project (first-principles); frustum up to the level | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `thermal-oxidizer-residence` | Thermal Oxidizer Residence Time and Chamber Volume | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `thermoforming-draw-ratio` | Thermoforming Draw Ratio and Wall Thinning | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thread-measure-wire` | Three-Wire Thread Measurement | First-principles three-wire geometry ...; 1/2-13 UNC, E 0.45 in -> best wire 0.044412 in, M 0.51661... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thread-pitch` | Thread Pitch and Lead | First-principles 60-degree thread geo...; 1/4-20 UNC: 20 TPI -> 0.050 in pitch, 0.043301 in sharp-V... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thread-pitch-dia-from-wires` | Pitch Diameter from Three-Wire Measurement | First-principles three-wire geometry ...; 1/2-13 UNC, M 0.49 in over best wires -> E 0.423383 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5866,6 +5890,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2014. Fixture-covered or reference-cadence: 2014 / 2014.
+Tile count: 2026. Fixture-covered or reference-cadence: 2026 / 2026.
 
 <!-- END tile-index-v14 -->

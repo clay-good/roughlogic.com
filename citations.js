@@ -22313,6 +22313,152 @@ export const CITATIONS = {
       { name: "Downwash is not modelled", value: "a short stack near buildings can lose its rise entirely", source: "good engineering practice stack height rules" },
     ],
   },
+  // spec-v1705..v1716: the 2026-09-09 trade-expansion plastics processing and
+  // foundry band. Twelve tiles, nothing cut.
+  "injection-clamp-tonnage": {
+    formula: "clamp force = total projected area (parts plus runner, taken ALONG the mould opening direction) x cavity pressure, with a safety factor commonly 10 to 20%; the maximum cavity pressure a machine supports inverts it.",
+    edition: "Injection moulding clamp sizing as the trade states it, with cavity pressure ENTERED (typically 2 to 5 tons per in2) because it depends on wall thickness, flow length and material viscosity rather than on part size, and a mould flow analysis rather than a table is what a serious tool is sized on.",
+    freeAccess: "One multiplication and one rearrangement.",
+    governance: GOVERNANCE.general,
+    editionNote: "Projected area is got wrong in two ways and both show as flash. It is the area seen ALONG the mould opening direction rather than the part's surface area or its footprint, and it INCLUDES the runner, because a cold runner is pressurised plastic pushing the mould open exactly as the parts do. Cavity pressure is the term that moves most and the one this cannot supply: two parts of identical projected area can want machines a factor of two apart from geometry alone. Over-clamping is not free either -- it damages the parting line over time and ties up capacity -- so the answer is the right machine rather than the largest available.",
+    assumptions: [
+      { name: "Cavity pressure is entered", value: "2 to 5 tons per in2 typical, from geometry and material", source: "a mould flow analysis" },
+      { name: "Projected area includes the runner", value: "a cold runner pressurises the mould", source: "standard moulding practice" },
+      { name: "Clamp only", value: "platen size, tie-bar spacing and stack height also decide fit", source: "the machine manufacturer's specifications" },
+    ],
+  },
+  "shot-size-residence-time": {
+    formula: "residence time = (barrel capacity / shot size) x cycle time; the usable shot window is commonly 20 to 80% of barrel capacity, and the barrel range for a given shot inverts it.",
+    edition: "Shot size and residence time as injection moulding practice states them, with the material's maximum residence ENTERED from the resin supplier's processing data because it is a material property rather than a machine one.",
+    freeAccess: "One ratio and one multiplication.",
+    governance: GOVERNANCE.general,
+    editionNote: "The window has a reason at BOTH ends: below the floor the melt makes too many cycles in a hot barrel, above the ceiling the screw has too little stroke and time to homogenise the charge. The consequence at the low end is what matters -- a long residence is survivable on a polyolefin and a degradation risk on PVC, acetal, polycarbonate and many flame-retardant grades, and degraded parts frequently pass dimensional inspection and fail on properties, so the defect SHIPS. Running a small part on whatever large machine is free is therefore a material decision rather than a scheduling one.",
+    assumptions: [
+      { name: "Maximum residence is entered", value: "a material property from the resin supplier", source: "the resin processing data sheet" },
+      { name: "Machine rating basis", value: "machines are commonly rated in ounces of general-purpose polystyrene", source: "the machine manufacturer's rating" },
+      { name: "Average residence", value: "some material in a screw sits far longer than the average", source: "a residence distribution study" },
+    ],
+  },
+  "injection-cooling-time": {
+    formula: "the one-dimensional plate solution t = h^2 / (pi^2 alpha) x ln[(4/pi) x (T_melt - T_mould) / (T_eject - T_mould)]; cooling goes with the SQUARE of the wall and only the LOGARITHM of the temperatures.",
+    edition: "The classical plate cooling solution for injection moulding, with thermal diffusivity ENTERED. Note that alpha = k/(rho x cp) gives roughly 0.00013 in2/s for ABS, 0.00020 for polypropylene, 0.00021 for polycarbonate and 0.00023 for HDPE -- several times lower than figures sometimes quoted, and a diffusivity too high shortens every answer in proportion.",
+    freeAccess: "One published closed-form solution.",
+    governance: GOVERNANCE.general,
+    editionNote: "The square law is why plastic parts look the way they do, and the reason is economic rather than aesthetic: a 25% thicker wall costs 56% more cooling, on every part the tool ever makes. Coring is the counter-move -- splitting a thick section into two thinner walls returns the cooling to the thin-wall figure, because it is the distance heat must travel that matters and not the amount of material -- and it is free per part and available only before the tool is cut. Mould temperature enters through a logarithm rather than a square, so it is the weak lever, and running colder to save cycle time costs crystallinity, adds moulded-in stress and degrades finish.",
+    assumptions: [
+      { name: "One-dimensional plate, constant properties", value: "corners and ribs cool from more than one direction", source: "a mould cooling analysis" },
+      { name: "Thermal diffusivity is entered", value: "roughly 0.00013 to 0.00023 in2/s for common thermoplastics", source: "k/(rho x cp) from the resin data sheet" },
+      { name: "No crystallisation heat", value: "semi-crystalline materials release heat on solidifying", source: "a thermal simulation" },
+    ],
+  },
+  "mold-shrinkage-dimension": {
+    formula: "cavity = part dimension / (1 - shrinkage), and part = cavity x (1 - shrinkage) inverts it; the flow and cross-flow directions are computed separately.",
+    edition: "Moulding shrinkage allowance as tool design states it, with the shrinkage rate ENTERED in in/in from the resin supplier's data for the specific grade -- amorphous materials run roughly 0.004 to 0.008 and semi-crystalline roughly 0.010 to 0.025.",
+    freeAccess: "One division and one multiplication.",
+    governance: GOVERNANCE.general,
+    editionNote: "The published shrinkage is a RANGE rather than a value, and mould temperature, hold pressure and hold time all move the actual figure within it, so the range is the real uncertainty. Anisotropy is the second reason one number is insufficient: flow and cross-flow shrinkage differ sharply in filled and semi-crystalline materials, so a square feature cut uniformly comes out rectangular. The steel-safe rule follows from an ASYMMETRY rather than from caution -- a cavity cut to the low end of the range makes a large part, corrected by removing metal, while the high end makes a small part, corrected only by welding the cavity and re-cutting it.",
+    assumptions: [
+      { name: "Shrinkage is entered per grade", value: "published as a range, not a value", source: "the resin supplier's data sheet" },
+      { name: "Process moves it within the range", value: "mould temperature, hold pressure and hold time", source: "the moulder's process record" },
+      { name: "Post-mould shrinkage", value: "some materials keep shrinking for hours or days", source: "the material data sheet" },
+    ],
+  },
+  "extrusion-output-rate": {
+    formula: "output = cross-sectional area x line speed x melt density, with the EXACT annular area pi/4 x (OD^2 - ID^2); line speed inverts it, and draw-down is die opening over product size.",
+    edition: "The extrusion mass balance. The exact annulus is used rather than the thin-wall approximation pi x OD x wall, which runs several percent high on a heavy wall and puts that error directly onto the output figure. Melt density is ENTERED because it differs from solid density and varies with temperature.",
+    freeAccess: "One mass balance on entered geometry.",
+    governance: GOVERNANCE.general,
+    editionNote: "COOLING USUALLY GOVERNS, NOT THE SCREW, and that is the diagnosis this supports. An extruder rated above what the bath can solidify does not make more good product: it makes product that leaves the bath soft, ovalises under the puller and drifts dimensionally. Adding extruder output to a cooling-limited line buys nothing, and the money goes to bath length or a vacuum tank rather than a bigger machine. The operator's instinct to slow the line and leave the screw alone makes it worse, because it puts more material in every foot. Draw-down is why speed and output are not independently adjustable -- changing one without the other changes the orientation the product was qualified at.",
+    assumptions: [
+      { name: "Exact annulus, round product only", value: "profiles and non-uniform walls are a different area", source: "the product drawing" },
+      { name: "Melt density is entered", value: "differs from solid density and varies with temperature", source: "the material supplier's melt data" },
+      { name: "No die swell", value: "which is why the die is not cut to the product size", source: "the die manufacturer's data" },
+    ],
+  },
+  "thermoforming-draw-ratio": {
+    formula: "areal draw ratio ADR = formed surface area / original sheet area, average wall = sheet gauge / ADR, and the sheet gauge for a corner minimum inverts it; the formed shape is approximated as a cylinder plus a flat bottom.",
+    edition: "Thermoforming draw ratio and wall thinning as the trade states them. The corner fraction is ENTERED, commonly a third to a half of the average, because it depends on sheet temperature uniformity, the plug and the forming sequence and is not predicted here.",
+    freeAccess: "One area ratio and one division.",
+    governance: GOVERNANCE.general,
+    editionNote: "The draw ratio is a CONSERVATION statement, so no process change moves the average wall -- only the distribution is available. The average is also not the specification: the bottom corners are the last material to arrive, formed from sheet already chilled against the sidewall, and they run a third to a half of the average. A part quoted on its average wall is quoted on a number that appears nowhere on it, and the starting gauge that meets a corner minimum is materially heavier than the one that meets an average, which is where the part's cost comes from. Plug assist attacks the right variable because it redistributes material while leaving the average where conservation puts it; opening the corner radii does the same from the design side at no cost.",
+    assumptions: [
+      { name: "Cylinder plus flat bottom", value: "a real three-dimensional part has a different formed area", source: "the part model" },
+      { name: "Corner fraction is entered", value: "it varies widely and is not predicted here", source: "the thermoformer's own trials" },
+      { name: "Female forming", value: "male or drape forming distributes material differently in kind", source: "the forming method" },
+    ],
+  },
+  "hdpe-fusion-pressure-time": {
+    formula: "gauge pressure = interfacial pressure x pipe face area / machine total effective cylinder area, with MEASURED drag pressure ADDED; pipe face area is the annulus pi/4 x (OD^2 - ID^2) and scales with the square of diameter at a fixed dimension ratio.",
+    edition: "Butt fusion pressure as ASTM F2620 practice and machine manufacturers state it, with the interfacial pressure (commonly 75 psi), the heat soak time, the cool time and the heater temperature all coming from the pipe manufacturer's qualified procedure rather than from here.",
+    freeAccess: "One area ratio and one addition.",
+    governance: GOVERNANCE.general,
+    editionNote: "Two errors follow from the geometry and both leave joints that look right. OMITTING DRAG under-presses the joint by exactly the drag, and drag is not a constant -- it changes with the setup, with how much pipe hangs off the machine and with what the pipe is dragged over, so it must be measured before every joint rather than carried over. RUNNING A FIXED GAUGE NUMBER ACROSS SIZES is the other: face area grows with the square of diameter, so the small-pipe figure badly under-presses large pipe and the large-pipe figure squeezes the melt out of a small joint. Cool time is where a correct joint is lost at the last step, because releasing pressure early relaxes a joint that will look right and test badly.",
+    assumptions: [
+      { name: "Interfacial pressure is entered", value: "commonly 75 psi, from the manufacturer's procedure", source: "ASTM F2620 or the qualified procedure" },
+      { name: "Heat soak and cool are by wall thickness", value: "from the procedure, not computed here", source: "the pipe manufacturer's procedure" },
+      { name: "Not a qualification", value: "this sizes pressure; it does not qualify machine, operator or bead", source: "the operator's qualification" },
+    ],
+  },
+  "thermoplastic-temperature-derate": {
+    formula: "allowable = pressure rating at 73 degF x the temperature derating factor; the factor and the material's maximum rated temperature both come from the material's own published table.",
+    edition: "Thermoplastic pipe pressure derating as pipe manufacturers publish it. The factor is ENTERED because it is NOT one curve for all plastics: PVC falls sharply and is not rated above 140 degF, CPVC holds far more and is rated to 200 degF, and PE and PEX have their own derating and long-term behaviour.",
+    freeAccess: "One multiplication against an entered factor.",
+    governance: GOVERNANCE.general,
+    editionNote: "Plastic pipe ratings are long-term hydrostatic strength figures, so a line run above its derated allowable does not fail on commissioning -- it fails in a year or two, and the failure is blamed on the pipe or a fitting rather than on the design. That delay is the whole reason the discipline exists. The temperature LIMIT is a different kind of number from the factor: above it a material is not rated at any pressure, which is a hard stop rather than a steep derating. And two things are not derating questions at all: compressed air in PVC is prohibited, because a brittle failure with stored gas energy is an explosion rather than a leak, and outdoor ultraviolet exposure degrades PVC in a way the pressure tables do not cover.",
+    assumptions: [
+      { name: "The factor is entered per material", value: "not one curve for all plastics", source: "the pipe manufacturer's derating table" },
+      { name: "Long-term hydrostatic basis", value: "exceeding the allowable fails late, not immediately", source: "the pipe standard" },
+      { name: "Joints and supports also derate", value: "and are not evaluated here", source: "the plumbing or mechanical code" },
+    ],
+  },
+  "casting-pour-yield": {
+    formula: "yield = casting weight / poured weight; melt energy per saleable pound = poured weight x melt energy per pound / casting weight, and the poured weight for a target yield inverts it.",
+    edition: "Foundry casting yield and its melt energy consequence. The theoretical melt energy is ENTERED because it varies by alloy. The metal in gating and risers is remelted and is not a materials loss; the loss is the ENERGY, spent again on every heat.",
+    freeAccess: "One ratio and one multiplication.",
+    governance: GOVERNANCE.general,
+    editionNote: "The tension here does not resolve by pushing the yield up. The risers that lower the yield are the risers that feed solidification shrinkage, and cutting them to hit a yield target puts porosity in the casting -- one scrap casting costs more than the energy saved on many sound ones, and porosity is often found late, after machining or assembly. So riser sizing is a FEEDING calculation done on the casting's own geometry, and yield is the outcome of that calculation rather than an input to it. The lever that moves both at once is an insulating or exothermic sleeve, which achieves the same feeding from a smaller riser.",
+    assumptions: [
+      { name: "Melt energy is entered", value: "varies by alloy", source: "the foundry's own melt records" },
+      { name: "Yield is an outcome", value: "riser sizing is a feeding calculation, not a yield target", source: "a solidification analysis" },
+      { name: "No melting loss", value: "slag, dross and oxidation are real losses on top of the yield", source: "the foundry's melt records" },
+    ],
+  },
+  "riser-modulus-feeding": {
+    formula: "casting modulus = volume / cooling surface area; the riser modulus must exceed it by an entered ratio (commonly about 1.2), and a cylindrical riser of height equal to its diameter has a modulus of about d/6. The VOLUME condition runs alongside: riser volume >= casting volume x solidification shrinkage / feeding efficiency.",
+    edition: "Riser sizing on Chvorinov's modulus rule with the volume check that accompanies it. The modulus ratio, the alloy shrinkage, the feeding efficiency and any sleeve factor are all ENTERED.",
+    freeAccess: "Two published rules and one geometric relation.",
+    governance: GOVERNANCE.general,
+    editionNote: "This is TWO conditions and not one, and a riser sized on either alone is sized on whichever happened to be easier. A riser that satisfies the modulus condition and fails the volume one stays liquid and still runs out of metal, leaving porosity directly under it -- a defect that looks like a feeding failure and is a volume failure, and the two are corrected differently. Modulus is a shape argument rather than a size one, so the section needing feeding is not always the heaviest, and a riser placed on the heaviest section can leave a thinner one unfed. An insulating or exothermic sleeve raises the effective modulus without raising the size, which lifts the yield without giving up soundness.",
+    assumptions: [
+      { name: "Rectangular section, cylindrical riser", value: "real geometry needs a solidification simulation", source: "a casting simulation" },
+      { name: "Feeding DISTANCE is not computed", value: "how far a riser reaches along a section is a separate limit", source: "the methods engineer" },
+      { name: "The riser neck is not sized", value: "and is where feeding is most often lost", source: "the methoding drawing" },
+    ],
+  },
+  "sand-permeability-vent": {
+    formula: "green sand steam volume from the ideal gas law PV = nRT (R = 10.7316 ft^3 psi per lbmol degR, water 18.0153 lb per lbmol) at the entered pouring temperature and one atmosphere, plus binder gas = binder mass x an entered evolution rate in cm3 per gram; permeability is scaled with the SQUARE of grain size.",
+    edition: "Foundry mould gas estimation. spec-v1715 supplied no arithmetic of its own, so only relations that can be defended from first principles are computed and everything else is stated as guidance. The binder gas evolution rate is ENTERED because binder suppliers publish it in cm3/g and it differs by binder system and by the metal poured against it.",
+    freeAccess: "The ideal gas law and one published binder rate.",
+    governance: GOVERNANCE.general,
+    editionNote: "Water expands roughly seventeen hundred times on flashing at the boil and some seven thousand times at pouring temperature, so a sand a percent or two over its target moisture generates gas faster than any permeability can pass it -- a problem no venting and no sand change fixes, because the control is at the MULLER. CORES ARE THE WORST CASE and are not in this arithmetic: a core is surrounded by metal on nearly every side, its binder decomposes as soon as metal arrives, and its only escape is through its own body to its prints, so an unvented core or one whose prints seal sends that gas into the casting, and the blowholes appear on the cored surface where inspection is hardest. The permeability trade does not resolve in general, which is why a foundry runs more than one sand system.",
+    assumptions: [
+      { name: "Volumes, not rates", value: "whether a casting gases depends on the RATE against the mould's passing rate", source: "AFS test procedures" },
+      { name: "Binder gas rate is entered", value: "differs by binder system and by the metal poured", source: "the binder supplier's data" },
+      { name: "Gas per vent area is comparative", value: "a ranking figure against a mould that ran sound, not an acceptance criterion", source: "the foundry's methods engineer" },
+    ],
+  },
+  "melt-furnace-energy": {
+    formula: "input energy = charge weight x theoretical melt energy / furnace efficiency, converted at 3,412.14 BTU per kWh; energy per saleable pound divides again by the casting yield.",
+    edition: "Melt furnace energy accounting. The theoretical melt energy, the furnace efficiency and the casting yield are all ENTERED because they vary by alloy, by furnace and by how the furnace is operated.",
+    freeAccess: "Two divisions and one exact unit conversion.",
+    governance: GOVERNANCE.general,
+    editionNote: "Melting point is not what melting costs. Aluminium melts at less than half the temperature of cast iron and takes substantially MORE energy per pound, because its specific heat and its latent heat of fusion are both much higher -- which is why an aluminium foundry's energy per pound bears no resemblance to an iron foundry's. Furnace type is the first multiplier and a large one: induction and gas-fired furnaces melting the same iron differ by a factor of two or more. THE CASTING YIELD IS THE SECOND MULTIPLIER AND THE ONE LEFT OUT -- only the portion of a heat that becomes saleable casting earns anything, so an energy programme that ignores the methoding is working on the smaller of the two terms.",
+    assumptions: [
+      { name: "Efficiency is entered", value: "depends on holding time, lid discipline and heat size as much as on the equipment", source: "the foundry's own metering" },
+      { name: "No holding energy", value: "a furnace left up between pours can rival the melting energy", source: "the furnace manufacturer's data" },
+      { name: "No demand charges", value: "time-of-use tariffs are often the larger part of an induction shop's bill", source: "the utility tariff" },
+    ],
+  },
   // spec-v1495..v1504: the 2026-09-08 trade-expansion building performance and
   // envelope diagnostics band. Eight tiles; spec-v1501 and spec-v1503 cut.
   "effective-leakage-area": {

@@ -2,100 +2,100 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "ea211f25a27b11fd",
-      "date": "2026-09-08"
+      "sha": "886fa75f4fe3836b",
+      "date": "2026-09-09"
     },
     "/tools/": {
-      "sha": "8ad2c756ca5fb1f1",
-      "date": "2026-09-08"
+      "sha": "b8eaa1bbd2d7f2b6",
+      "date": "2026-09-09"
     },
     "/groups/accounting/": {
-      "sha": "be1d5b4905499abe",
-      "date": "2026-09-08"
+      "sha": "e8e9877ed338ff26",
+      "date": "2026-09-09"
     },
     "/groups/agriculture/": {
-      "sha": "dca85c89fdcadf5d",
-      "date": "2026-09-08"
+      "sha": "5f23b177616379fc",
+      "date": "2026-09-09"
     },
     "/groups/construction/": {
-      "sha": "5a53151f8c0f9ec9",
-      "date": "2026-09-08"
+      "sha": "59bb0cf9d08e3b18",
+      "date": "2026-09-09"
     },
     "/groups/cross-trade/": {
-      "sha": "2806806cfbd8238f",
-      "date": "2026-09-08"
+      "sha": "eda55cb051d9e8e7",
+      "date": "2026-09-09"
     },
     "/groups/educators/": {
-      "sha": "b79acc9ec59b6732",
-      "date": "2026-09-08"
+      "sha": "abf30f1172b8b51e",
+      "date": "2026-09-09"
     },
     "/groups/electrical/": {
-      "sha": "fa388056267e27f4",
-      "date": "2026-09-08"
+      "sha": "f180c2c520277392",
+      "date": "2026-09-09"
     },
     "/groups/field/": {
-      "sha": "c3b5aea3d45f75bd",
-      "date": "2026-09-08"
+      "sha": "b844d80e23ce29b6",
+      "date": "2026-09-09"
     },
     "/groups/fire-ground/": {
-      "sha": "31c193ffab7ee61f",
-      "date": "2026-09-08"
+      "sha": "dd09cc865e4e0b97",
+      "date": "2026-09-09"
     },
     "/groups/historical/": {
-      "sha": "89e1c849c340da26",
-      "date": "2026-09-08"
+      "sha": "6eeff9bf941978f1",
+      "date": "2026-09-09"
     },
     "/groups/hvac/": {
-      "sha": "40ee94f90750132b",
-      "date": "2026-09-08"
+      "sha": "63a628d3668c6d2d",
+      "date": "2026-09-09"
     },
     "/groups/kitchen/": {
-      "sha": "d73b1d3b683e2758",
-      "date": "2026-09-08"
+      "sha": "cfee8be1aa360e30",
+      "date": "2026-09-09"
     },
     "/groups/lab/": {
-      "sha": "93e2eb53723c3bd7",
-      "date": "2026-09-08"
+      "sha": "9beb6ed09b8eed84",
+      "date": "2026-09-09"
     },
     "/groups/mechanic/": {
-      "sha": "025b813bf97bfed1",
-      "date": "2026-09-08"
+      "sha": "36e96b2848b12d7d",
+      "date": "2026-09-09"
     },
     "/groups/plumbing/": {
-      "sha": "b43737103652bca7",
-      "date": "2026-09-08"
+      "sha": "4298d3d588e6bdf6",
+      "date": "2026-09-09"
     },
     "/groups/real-estate/": {
-      "sha": "13e737fdb159746b",
-      "date": "2026-09-08"
+      "sha": "241075eb1e84b854",
+      "date": "2026-09-09"
     },
     "/groups/references/": {
-      "sha": "383317bc95f2ee3d",
-      "date": "2026-09-08"
+      "sha": "a09f774b709cd973",
+      "date": "2026-09-09"
     },
     "/groups/restoration/": {
-      "sha": "e8dba73a595386c1",
-      "date": "2026-09-08"
+      "sha": "ecfb01c2384ecbef",
+      "date": "2026-09-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "6a78aae80c250571",
-      "date": "2026-09-08"
+      "sha": "1617c91b1e4660cb",
+      "date": "2026-09-09"
     },
     "/groups/stage/": {
-      "sha": "079543521f0004b1",
-      "date": "2026-09-08"
+      "sha": "4a250608e3195fb5",
+      "date": "2026-09-09"
     },
     "/groups/trucking/": {
-      "sha": "430965c213535d4b",
-      "date": "2026-09-08"
+      "sha": "a53feb353a2f388b",
+      "date": "2026-09-09"
     },
     "/groups/water/": {
-      "sha": "80cfa0bf48aa3871",
-      "date": "2026-09-08"
+      "sha": "a6b359e80dc17c72",
+      "date": "2026-09-09"
     },
     "/tools/aav-install-check/": {
-      "sha": "ffd2b0e38a75491f",
-      "date": "2026-09-04"
+      "sha": "4e1b1d5b33ca35e4",
+      "date": "2026-09-09"
     },
     "/tools/abatement-containment/": {
       "sha": "80d7fbe074593ffb",
@@ -454,8 +454,8 @@
       "date": "2026-09-01"
     },
     "/tools/barrel-volume/": {
-      "sha": "66b87cf5a5bca684",
-      "date": "2026-09-06"
+      "sha": "d49093be74652639",
+      "date": "2026-09-09"
     },
     "/tools/barstock-cutlist/": {
       "sha": "a4198647bf9e0c3f",
@@ -936,6 +936,10 @@
     "/tools/casing-cement-volume/": {
       "sha": "dc1e22ca7f50e611",
       "date": "2026-09-08"
+    },
+    "/tools/casting-pour-yield/": {
+      "sha": "89add6765aa15a88",
+      "date": "2026-09-09"
     },
     "/tools/category-deterioration/": {
       "sha": "eef7af5b0e1adbcd",
@@ -1862,8 +1866,8 @@
       "date": "2026-09-01"
     },
     "/tools/cylindrical-wedge-volume/": {
-      "sha": "0c02bf54376d51fb",
-      "date": "2026-09-04"
+      "sha": "13e19e8f2bde2de2",
+      "date": "2026-09-09"
     },
     "/tools/damper-authority/": {
       "sha": "6fe62b123b3e16fd",
@@ -2414,8 +2418,8 @@
       "date": "2026-09-04"
     },
     "/tools/ellipsoid-volume/": {
-      "sha": "92fd6eb65b9cbed7",
-      "date": "2026-09-01"
+      "sha": "ec11ee55c0aec1b8",
+      "date": "2026-09-09"
     },
     "/tools/emergency-contacts/": {
       "sha": "4cbda0a70359a7a3",
@@ -2588,6 +2592,10 @@
     "/tools/extinguisher-coverage/": {
       "sha": "895affa058086980",
       "date": "2026-09-01"
+    },
+    "/tools/extrusion-output-rate/": {
+      "sha": "1c5b0fe5fb69f928",
+      "date": "2026-09-09"
     },
     "/tools/eyring-reverberation/": {
       "sha": "d3a073ceb844a3e0",
@@ -3329,6 +3337,10 @@
       "sha": "f2634b1af5c4cbca",
       "date": "2026-09-05"
     },
+    "/tools/hdpe-fusion-pressure-time/": {
+      "sha": "6aa79e4605851304",
+      "date": "2026-09-09"
+    },
     "/tools/head-pressure-control/": {
       "sha": "794ae73daaf97383",
       "date": "2026-09-01"
@@ -3566,8 +3578,8 @@
       "date": "2026-09-01"
     },
     "/tools/hydrostatic-test/": {
-      "sha": "72b7a81d702a35e8",
-      "date": "2026-09-01"
+      "sha": "5894690247a775bc",
+      "date": "2026-09-09"
     },
     "/tools/hydroxyl-sizing/": {
       "sha": "aa891bb5fbcf3f81",
@@ -3612,6 +3624,14 @@
     "/tools/infiltration-load/": {
       "sha": "66b7961213084e72",
       "date": "2026-09-01"
+    },
+    "/tools/injection-clamp-tonnage/": {
+      "sha": "cd2e47761a2cfb1e",
+      "date": "2026-09-09"
+    },
+    "/tools/injection-cooling-time/": {
+      "sha": "8406866e5a90489b",
+      "date": "2026-09-09"
     },
     "/tools/injector-flow-at-pressure/": {
       "sha": "e8a4f7599a53bb0f",
@@ -4237,6 +4257,10 @@
       "sha": "b9aae12145eeff5a",
       "date": "2026-09-01"
     },
+    "/tools/melt-furnace-energy/": {
+      "sha": "b4f7386f84db2a61",
+      "date": "2026-09-09"
+    },
     "/tools/membrane-fastener-takeoff/": {
       "sha": "9e536d62edc9a4dd",
       "date": "2026-09-01"
@@ -4314,8 +4338,8 @@
       "date": "2026-09-01"
     },
     "/tools/mixed-water-temp/": {
-      "sha": "ca34654d935ae1f3",
-      "date": "2026-09-01"
+      "sha": "0f7ccb4c0f9b7606",
+      "date": "2026-09-09"
     },
     "/tools/moist-air-enthalpy/": {
       "sha": "70ddaaf29f1524df",
@@ -4348,6 +4372,10 @@
     "/tools/mold-remediation-level/": {
       "sha": "3ab2bc2dd258627a",
       "date": "2026-09-04"
+    },
+    "/tools/mold-shrinkage-dimension/": {
+      "sha": "b06ff4367f41b05b",
+      "date": "2026-09-09"
     },
     "/tools/molecular-weight/": {
       "sha": "98f2e1d2d86911ad",
@@ -4722,8 +4750,8 @@
       "date": "2026-09-04"
     },
     "/tools/paraboloid-volume/": {
-      "sha": "dc2dfe288c0678ec",
-      "date": "2026-09-01"
+      "sha": "e77d5b14158a1e5e",
+      "date": "2026-09-09"
     },
     "/tools/parallel-conductor-derate/": {
       "sha": "0ac185fd5ff48ef6",
@@ -4846,8 +4874,8 @@
       "date": "2026-09-01"
     },
     "/tools/pipe-fitting-takeout/": {
-      "sha": "a4e256e0ca9b8a84",
-      "date": "2026-09-04"
+      "sha": "4dd2626ae9af252a",
+      "date": "2026-09-09"
     },
     "/tools/pipe-flotation/": {
       "sha": "a7c08d118afa94a6",
@@ -5318,8 +5346,8 @@
       "date": "2026-09-01"
     },
     "/tools/pyramid-frustum-volume/": {
-      "sha": "723bedcbdc51d533",
-      "date": "2026-09-08"
+      "sha": "a11a0d34280d5852",
+      "date": "2026-09-09"
     },
     "/tools/quadratic-formula/": {
       "sha": "b22371afc811f577",
@@ -5354,8 +5382,8 @@
       "date": "2026-09-01"
     },
     "/tools/radiant-heat-exchange/": {
-      "sha": "c8688f509f740184",
-      "date": "2026-09-01"
+      "sha": "093da6e5ab17121e",
+      "date": "2026-09-09"
     },
     "/tools/radiant-loop-sizing/": {
       "sha": "a48f874c0093c9e0",
@@ -5741,6 +5769,10 @@
       "sha": "55d497ea9b4b5e28",
       "date": "2026-09-01"
     },
+    "/tools/riser-modulus-feeding/": {
+      "sha": "b9406f51b648f936",
+      "date": "2026-09-09"
+    },
     "/tools/rlc-reactance-resonance/": {
       "sha": "9dfbe96438352228",
       "date": "2026-09-01"
@@ -5912,6 +5944,10 @@
     "/tools/sample-size-for-margin/": {
       "sha": "de2e564eb96e810b",
       "date": "2026-09-01"
+    },
+    "/tools/sand-permeability-vent/": {
+      "sha": "56df34e6f59555c4",
+      "date": "2026-09-09"
     },
     "/tools/sanitary-dfu/": {
       "sha": "66632defc96e42ba",
@@ -6224,6 +6260,10 @@
     "/tools/short-circuit-pp/": {
       "sha": "9650b934d392b050",
       "date": "2026-09-01"
+    },
+    "/tools/shot-size-residence-time/": {
+      "sha": "3b6b7c792942d2d3",
+      "date": "2026-09-09"
     },
     "/tools/shotcrete-rebound-quantity/": {
       "sha": "da0959706fce3540",
@@ -7189,6 +7229,14 @@
       "sha": "42f6eb2975dcccdf",
       "date": "2026-09-07"
     },
+    "/tools/thermoforming-draw-ratio/": {
+      "sha": "e7d15aa2637a6375",
+      "date": "2026-09-09"
+    },
+    "/tools/thermoplastic-temperature-derate/": {
+      "sha": "12bb5fb01eeb91f6",
+      "date": "2026-09-09"
+    },
     "/tools/thi-livestock/": {
       "sha": "5ce351a047ea0eee",
       "date": "2026-09-04"
@@ -7238,8 +7286,8 @@
       "date": "2026-09-01"
     },
     "/tools/thrust-block-sizing/": {
-      "sha": "5c7812c30332b6fa",
-      "date": "2026-09-01"
+      "sha": "24ca2aeb0b1571de",
+      "date": "2026-09-09"
     },
     "/tools/tiedown-count/": {
       "sha": "28e2c87db3f9d9a2",
@@ -7322,8 +7370,8 @@
       "date": "2026-09-04"
     },
     "/tools/torus-volume/": {
-      "sha": "01bd692057288dab",
-      "date": "2026-09-01"
+      "sha": "bdb65cff7c3f4624",
+      "date": "2026-09-09"
     },
     "/tools/tphc-window/": {
       "sha": "0d8226d5c82d93d3",

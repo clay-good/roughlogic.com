@@ -1,444 +1,450 @@
 {
-  "_comment": "spec-v593 section 2 exception class: metric that IS US trade practice. Each entry waives check-us-defaults findings whose label contains `match` in `module` (module \"*\" = any). Additions are reviewed like citations, against the section-2 acid test: would a US tradesperson read this number in this unit off their own instrument, code table, or product label? Every entry must waive at least one finding no other entry already waives: on 2026-09-04 seven did not (four matched a token combination the scanner can never produce, three were subsumed by a broader entry in the same module) and were removed.",
-  "entries": [
-    {
-      "module": "*",
-      "match": "mg/L",
-      "family": "water/wastewater operations",
-      "justification": "mg/L is the universal US water-ops unit (SDWA/SWTR reporting, jar tests, MLSS)."
-    },
-    {
-      "module": "*",
-      "match": "mL/L",
-      "family": "water/wastewater operations",
-      "justification": "SV30 settleometer reads mL/L on the cone itself."
-    },
-    {
-      "module": "*",
-      "match": "mL/g",
-      "family": "water/wastewater operations",
-      "justification": "Sludge Volume Index (SVI) is universally reported in mL/g in US wastewater ops (Standard Methods, WEF, operator-certification exams); there is no US-customary equivalent."
-    },
-    {
-      "module": "*",
-      "match": "mg-min/L",
-      "family": "water/wastewater operations",
-      "justification": "CT tables (SWTR) are published in mg-min/L."
-    },
-    {
-      "module": "*",
-      "match": "(g)",
-      "family": "not metric (acceleration)",
-      "justification": "Peak ground / seismic acceleration in g (gravity), not grams: ASCE 7 and USGS publish in g.",
-      "note": "grams collisions are covered by module-scoped lab/kitchen entries"
-    },
-    {
-      "module": "calc-electrical.js",
-      "match": "(°C)",
-      "family": "NEC/IEEE electrical",
-      "justification": "ICEA P-32-382 conductor short-circuit limits are published in deg C."
-    },
-    {
-      "module": "calc-lab.js",
-      "match": "*",
-      "family": "lab and IH practice",
-      "justification": "Module-wide: US lab practice is SI throughout (mL, uL, mg, g/mol, M, g/mL, cm cuvette paths, mm rotors). Spelled \"*\" since 2026-08-30; it was an empty string, which exempted the module by accident rather than by decision."
-    },
-    {
-      "module": "calc-kitchen.js",
-      "match": "(g",
-      "family": "lab and IH practice",
-      "justification": "Baker's percentage and equilibrium-cure recipes are written in grams in US kitchens."
-    },
-    {
-      "module": "calc-field.js",
-      "match": "Easting (m)",
-      "family": "standards defined in SI",
-      "justification": "UTM easting/northing are defined in meters (USGS quads print meters)."
-    },
-    {
-      "module": "calc-field.js",
-      "match": "Northing (m)",
-      "family": "standards defined in SI",
-      "justification": "UTM easting/northing are defined in meters."
-    },
-    {
-      "module": "calc-lowvoltage.js",
-      "match": "Link length (m)",
-      "family": "standards defined in SI",
-      "justification": "TIA-568 defines the 90 m permanent link / 100 m channel in meters."
-    },
-    {
-      "module": "calc-lowvoltage.js",
-      "match": "cords (m)",
-      "family": "standards defined in SI",
-      "justification": "TIA-568 cord budgets are specified in meters."
-    },
-    {
-      "module": "calc-lowvoltage.js",
-      "match": "dB/km",
-      "family": "standards defined in SI",
-      "justification": "Fiber attenuation is specified in dB/km on every datasheet."
-    },
-    {
-      "module": "calc-earthwork.js",
-      "match": "D10, effective size (mm)",
-      "family": "product/spec conventions",
-      "justification": "Grain-size and sieve-opening diameters are stated in mm by ASTM D2487 / D6913 and printed in mm on every US geotechnical gradation report; there is no US-customary equivalent in use."
-    },
-    {
-      "module": "calc-earthwork.js",
-      "match": "D30 (mm)",
-      "family": "product/spec conventions",
-      "justification": "Grain-size and sieve-opening diameters are stated in mm by ASTM D2487 / D6913 and printed in mm on every US geotechnical gradation report; there is no US-customary equivalent in use."
-    },
-    {
-      "module": "calc-earthwork.js",
-      "match": "D60 (mm)",
-      "family": "product/spec conventions",
-      "justification": "Grain-size and sieve-opening diameters are stated in mm by ASTM D2487 / D6913 and printed in mm on every US geotechnical gradation report; there is no US-customary equivalent in use."
-    },
-    {
-      "module": "calc-earthwork.js",
-      "match": "(cm)",
-      "family": "geotechnical lab testing",
-      "justification": "Permeameter tests (ASTM D2434 constant head, D5084 falling head) are run in metric in US geotechnical labs: sample length, standpipe/burette heads, and mold dimensions are read in cm off the apparatus, and hydraulic conductivity k is reported in cm/s universally. There is no US-customary equivalent in lab practice."
-    },
-    {
-      "module": "calc-lowvoltage.js",
-      "match": "Sensor width (mm",
-      "family": "product/spec conventions",
-      "justification": "Camera sensor formats and lens focal lengths are sold in mm."
-    },
-    {
-      "module": "calc-lowvoltage.js",
-      "match": "Focal length (mm)",
-      "family": "product/spec conventions",
-      "justification": "Lens focal lengths are sold in mm."
-    },
-    {
-      "module": "calc-layout.js",
-      "match": "Metric pitch (mm)",
-      "family": "product/spec conventions",
-      "justification": "Metric thread pitch is the product spec on the box."
-    },
-    {
-      "module": "calc-shop.js",
-      "match": "Metric pitch (mm)",
-      "family": "product/spec conventions",
-      "justification": "Metric thread pitch is the product spec on the box."
-    },
-    {
-      "module": "calc-shop.js",
-      "match": "Thread pitch (mm, metric)",
-      "family": "product/spec conventions",
-      "justification": "The tile's metric-thread entry path; US pitch field sits beside it."
-    },
-    {
-      "module": "calc-mechanic.js",
-      "match": "Pad thickness (mm)",
-      "family": "product/spec conventions",
-      "justification": "Brake pad thickness is published and measured in mm in US shops."
-    },
-    {
-      "module": "calc-mechanic.js",
-      "match": "Wear rate (mm/kJ",
-      "family": "product/spec conventions",
-      "justification": "Pad wear-rate shop data rides the mm pad-thickness convention."
-    },
-    {
-      "module": "calc-mechanic.js",
-      "match": "Offset ET (mm",
-      "family": "product/spec conventions",
-      "justification": "Wheel offset is stamped ET in mm on the wheel itself."
-    },
-    {
-      "module": "calc-stage.js",
-      "match": "Pixel pitch (mm)",
-      "family": "product/spec conventions",
-      "justification": "LED panel pixel pitch is sold in mm."
-    },
-    {
-      "module": "calc-solar.js",
-      "match": "temp (°C)",
-      "family": "power and billing (solar datasheet)",
-      "justification": "Module datasheets publish record temps and coefficients in deg C."
-    },
-    {
-      "module": "calc-solar.js",
-      "match": "temperature (°C)",
-      "family": "power and billing (solar datasheet)",
-      "justification": "Cell/ambient temperature model inputs are datasheet deg C."
-    },
-    {
-      "module": "calc-solar.js",
-      "match": "NOCT (C",
-      "family": "power and billing (solar datasheet)",
-      "justification": "NOCT is a datasheet deg C value."
-    },
-    {
-      "module": "calc-solar.js",
-      "match": "%/C",
-      "family": "power and billing (solar datasheet)",
-      "justification": "Power temperature coefficients are datasheet %/deg C."
-    },
-    {
-      "module": "calc-solar.js",
-      "match": "kWh/m2/day",
-      "family": "power and billing (solar datasheet)",
-      "justification": "Peak-sun-hours insolation data is published in kWh/m2/day (NREL)."
-    },
-    {
-      "module": "calc-solar.js",
-      "match": "W/m²",
-      "family": "power and billing (solar datasheet)",
-      "justification": "Plane-of-array irradiance is published in W/m^2."
-    },
-    {
-      "module": "calc-restoration.js",
-      "match": "spores/m³",
-      "family": "lab and IH practice",
-      "justification": "Spore-trap lab reports count spores per cubic meter."
-    },
-    {
-      "module": "calc-restoration.js",
-      "match": "Pump flow (L/min",
-      "family": "lab and IH practice",
-      "justification": "Air-sampling pumps are calibrated in L/min."
-    },
-    {
-      "module": "calc-fire.js",
-      "match": "Consumption rate (L/min",
-      "family": "fire service SCBA air management",
-      "justification": "SCBA breathing/consumption rate is expressed in L/min: NIOSH rates open-circuit SCBA duration at 40 L/min and NFPA 1981 heavy-work testing at ~103 L/min, and US fireground air-management training teaches ~40 L/min light / ~100 L/min heavy. There is no US-customary breathing-rate unit a firefighter reads off the rating."
-    },
-    {
-      "module": "calc-restoration.js",
-      "match": "per cassette (L)",
-      "family": "lab and IH practice",
-      "justification": "Sampling cassette volumes are specified in liters."
-    },
-    {
-      "module": "calc-agriculture.js",
-      "match": "Particle density (g/cc)",
-      "family": "lab and IH practice",
-      "justification": "Soil particle density is quoted in g/cc (2.65) in US soils practice and every geotech lab report."
-    },
-    {
-      "module": "calc-concrete.js",
-      "match": "(l/",
-      "family": "not metric",
-      "justification": "ACI 318 minimum-thickness span ratios l/20..l/28 (l = span), not liters."
-    },
-    {
-      "module": "calc-concrete.js",
-      "match": "(l / denominator)",
-      "family": "not metric",
-      "justification": "Span ratio result line (l = span), not liters."
-    },
-    {
-      "module": "calc-elecdesign.js",
-      "match": "Surface layer thickness hs (m)",
-      "family": "NEC/IEEE electrical",
-      "justification": "IEEE Std 80 step/touch equations take the crushed-rock layer hs in meters as published."
-    },
-    {
-      "module": "calc-kitchen.js",
-      "match": "Bottle size (mL)",
-      "family": "product/spec conventions",
-      "justification": "US beverage bottles are labeled in mL (750 mL)."
-    },
-    {
-      "module": "calc-realestate.js",
-      "match": "policy (C)",
-      "family": "not metric",
-      "justification": "Loan Estimate section C (services you can shop for), not Celsius."
-    },
-    {
-      "module": "calc-water.js",
-      "match": "Water temperature (°C; 0.5 - 25)",
-      "family": "water/wastewater operations",
-      "justification": "SWTR CT tables are published against deg C water temperature."
-    },
-    {
-      "module": "calc-field.js",
-      "match": "Distance (km)",
-      "family": "secondary output (spec-v593 section 1)",
-      "justification": "lightning-countdown secondary metric output line; the primary Distance (mi) output line precedes it -- the sanctioned US-primary + metric-secondary pattern."
-    },
-    {
-      "module": "calc-lowvoltage.js",
-      "match": "Link distance (km)",
-      "family": "RF / wireless link budget (spec-v1249)",
-      "justification": "free-space path loss is metric-native: the Friis constant 32.44 is defined for km and MHz, and RF engineering (including US practice) states link distance in km and frequency in MHz; there is no US-customary form of the FSPL equation in common use."
-    },
-    {
-      "module": "calc-lowvoltage.js",
-      "match": "Distance end 1 to obstruction (km)",
-      "family": "RF / Fresnel-zone geometry (spec-v1250)",
-      "justification": "Fresnel-zone radius is metric-native: the 17.32 constant (sqrt(300)) is defined for km and GHz, and RF path surveys state distances in km; no US-customary form of the Fresnel-zone equation is in common use."
-    },
-    {
-      "module": "calc-lowvoltage.js",
-      "match": "Distance end 2 to obstruction (km)",
-      "family": "RF / Fresnel-zone geometry (spec-v1250)",
-      "justification": "Fresnel-zone radius is metric-native: the 17.32 constant (sqrt(300)) is defined for km and GHz, and RF path surveys state distances in km; no US-customary form of the Fresnel-zone equation is in common use."
-    },
-    {
-      "module": "calc-treatment.js",
-      "match": "Particle diameter (mm)",
-      "family": "water/wastewater sedimentation practice (spec-v1271)",
-      "justification": "Settling-particle and grit sizes are stated in mm and micron in US water/wastewater and environmental-engineering practice (grit-chamber and sedimentation design, the same ASTM grain-size convention already allowlisted for calc-earthwork D10/D30/D60); there is no US-customary equivalent for a particle diameter."
-    },
-    {
-      "module": "calc-motor.js",
-      "match": "Marked temperature rise",
-      "family": "electrical / motors",
-      "justification": "The motor nameplate itself marks temperature rise in °C, and NEC 430.32(A)(1) states its 40 °C threshold in °C. The tradesperson reads this number off the nameplate in this unit."
-    },
-    {
-      "module": "calc-stage.js",
-      "match": "diameter (mm",
-      "family": "entertainment lighting gobos",
-      "justification": "Gobo and gate sizes are specified in millimeters everywhere in the US entertainment-lighting trade: an M-size gobo is 66 mm outside diameter with a 48 mm image, and every US manufacturer's catalog and every fixture's spec sheet prints those figures in mm. A US lighting technician reads this number in mm off the gobo holder itself."
-    },
-    {
-      "module": "*",
-      "match": "kW/m2",
-      "family": "fire-protection engineering",
-      "justification": "Radiant heat flux is expressed in kW/m2 everywhere in US fire-protection engineering: the SFPE Handbook, NFPA standards, and every published ignition and tenability threshold state it that way, and a US fire protection engineer reads the number in that unit off their own reference."
-    },
-    {
-      "module": "calc-fab.js",
-      "match": "Heat input Q (kJ/mm",
-      "family": "weld cooling-time model",
-      "justification": "The t8/5 weld cooling-time model has no US customary formulation: EN 1011-2 and every welding-metallurgy reference write it in kJ/mm, degrees Celsius, and millimetres, and a US welding engineer computing it reads those units off the procedure and the literature. Converting the inputs would make the tile disagree with every published worked example of the model."
-    },
-    {
-      "module": "calc-fab.js",
-      "match": "Preheat / interpass temperature (deg C)",
-      "family": "weld cooling-time model",
-      "justification": "The t8/5 weld cooling-time model has no US customary formulation: EN 1011-2 and every welding-metallurgy reference write it in kJ/mm, degrees Celsius, and millimetres, and a US welding engineer computing it reads those units off the procedure and the literature. Converting the inputs would make the tile disagree with every published worked example of the model."
-    },
-    {
-      "module": "calc-fab.js",
-      "match": "Plate thickness (mm, the t8/5 model is metric)",
-      "family": "weld cooling-time model",
-      "justification": "The t8/5 weld cooling-time model has no US customary formulation: EN 1011-2 and every welding-metallurgy reference write it in kJ/mm, degrees Celsius, and millimetres, and a US welding engineer computing it reads those units off the procedure and the literature. Converting the inputs would make the tile disagree with every published worked example of the model."
-    },
-    {
-      "module": "calc-shop.js",
-      "match": "Rotor mass (kg)",
-      "family": "ISO 1940 rotor balancing",
-      "justification": "ISO 1940-1 defines the balance grade itself in millimetres per second and the permissible unbalance in gram-millimetres per kilogram, and a US balancing machine's readout is in those units. A US shop balancing a rotor enters mass in kg and the correction radius in mm because the standard and the machine both do; converting would make the tile disagree with the readout."
-    },
-    {
-      "module": "calc-shop.js",
-      "match": "Correction radius (mm)",
-      "family": "ISO 1940 rotor balancing",
-      "justification": "ISO 1940-1 defines the balance grade itself in millimetres per second and the permissible unbalance in gram-millimetres per kilogram, and a US balancing machine's readout is in those units. A US shop balancing a rotor enters mass in kg and the correction radius in mm because the standard and the machine both do; converting would make the tile disagree with the readout."
-    },
-    {
-      "module": "calc-shop.js",
-      "match": "Bearing outside diameter (mm)",
-      "family": "metric bearing designations",
-      "justification": "Rolling-element bearings are metric worldwide including in the US: a 6310 IS 50 x 110 x 27 mm, and the bore, outside diameter, and width are the designation itself and are stamped on the bearing. A US millwright reads these numbers in millimetres off the part in their hand."
-    },
-    {
-      "module": "calc-shop.js",
-      "match": "Bearing width (mm)",
-      "family": "metric bearing designations",
-      "justification": "Rolling-element bearings are metric worldwide including in the US: a 6310 IS 50 x 110 x 27 mm, and the bore, outside diameter, and width are the designation itself and are stamped on the bearing. A US millwright reads these numbers in millimetres off the part in their hand."
-    },
-    {
-      "module": "calc-shop.js",
-      "match": "Bearing bore (mm)",
-      "family": "metric bearing designations",
-      "justification": "Rolling-element bearings are metric worldwide including in the US: a 6310 IS 50 x 110 x 27 mm, and the bore, outside diameter, and width are the designation itself and are stamped on the bearing. A US millwright reads these numbers in millimetres off the part in their hand."
-    },
-    {
-      "module": "calc-elecdesign.js",
-      "match": "Initial conductor temperature (deg C)",
-      "family": "ICEA conductor short-circuit limits",
-      "justification": "The ICEA P-32-382 conductor short-circuit temperature limits, and the insulation damage temperatures they are compared against, are published in degrees Celsius -- the same basis the catalog's existing conductor short-circuit withstand tile is allowlisted on. A US electrical engineer reads the 75 C and 250 C limits in Celsius off the standard itself."
-    },
-    {
-      "module": "calc-elecdesign.js",
-      "match": "Insulation damage temperature (deg C)",
-      "family": "ICEA conductor short-circuit limits",
-      "justification": "The ICEA P-32-382 conductor short-circuit temperature limits, and the insulation damage temperatures they are compared against, are published in degrees Celsius -- the same basis the catalog's existing conductor short-circuit withstand tile is allowlisted on. A US electrical engineer reads the 75 C and 250 C limits in Celsius off the standard itself."
-    },
-    {
-      "module": "calc-shop.js",
-      "match": "Metal atomic weight (g/mol)",
-      "family": "Faraday's law of electrolysis",
-      "justification": "Atomic weight has no customary-unit form at all -- it is grams per mole by definition, and it is the value a plater reads straight off the periodic table or the bath supplier's data sheet to enter Faraday's law. Converting it would produce a number that appears in no reference a US plating shop owns."
-    },
-    {
-      "module": "calc-shop.js",
-      "match": "Metal density (g/cm3)",
-      "family": "Faraday's law of electrolysis",
-      "justification": "Plating and metallurgical references list metal density in g/cm3 universally, including the ones on a US plating shop's shelf, and it pairs directly with the g/s mass rate Faraday's law produces. A US plater reads 8.9 for nickel off that table; lb/cubic ft would have to be converted back before it could be used."
-    },
-    {
-      "module": "calc-agriculture.js",
-      "match": "Recommendation (kg/ha)",
-      "family": "agronomy",
-      "justification": "A metric COMPANION to the primary US output: the same tile prints \"Blend (lb/acre)\" directly above it, and kg/ha is how agronomic rate recommendations and fertilizer research are published. US-first with a metric sibling, not metric-defaulted."
-    },
-    {
-      "module": "calc-cross.js",
-      "match": "Distance (km)",
-      "family": "navigation",
-      "justification": "A metric COMPANION: the haversine tile prints \"Distance (miles)\" directly above it. Aviation and marine plots read both, and the cited Earth radius is given in mi and km."
-    },
-    {
-      "module": "calc-lowvoltage.js",
-      "match": "Temperature (°C)",
-      "family": "instrumentation sensor curves",
-      "justification": "RTD (IEC 60751 Callendar-Van Dusen), thermistor Beta, and Steinhart-Hart curves are DEFINED in degrees C -- the coefficients have no Fahrenheit form -- and every one of the three tiles prints \"Temperature (°F)\" on the next line. Verified 2026-09-04 when output labels were first scanned."
-    },
-    {
-      "module": "calc-survey.js",
-      "match": "Focal length (mm)",
-      "family": "photogrammetry sensor",
-      "justification": "Camera focal length and sensor pixel pitch are published in millimetres and micrometres by every manufacturer and have no customary form; the tile takes the flight height in FEET, which is how a US operator flies, and returns the GSD in centimetres per pixel because that is how a mapping deliverable is specified. Verified 2026-09-08 with the survey technology band."
-    },
-    {
-      "module": "calc-survey.js",
-      "match": "Flight height above ground (m)",
-      "family": "airborne lidar",
-      "justification": "Airborne LiDAR sensor specifications are published in metric worldwide and have no US customary form: pulse rate in kHz against a swath in metres, flight height in metres, ground speed in m/s, and the deliverable specification itself written in points per SQUARE METRE. A tile that took feet here would make the reader convert a spec sheet before entering it and convert back to compare with the contract. Verified 2026-09-08 with the survey technology band."
-    },
-    {
-      "module": "calc-survey.js",
-      "match": "Baseline, base to rover (km)",
-      "family": "gnss rtk",
-      "justification": "A GNSS receiver specification is written as millimetres plus parts per million over a baseline in kilometres, and that form is universal -- every manufacturer publishes it, and no US customary version exists. Converting it would break the comparison against the receiver's own data sheet, which is the whole purpose of the calculation. Verified 2026-09-08 with the survey technology band."
-    },
-    {
-      "module": "calc-survey.js",
-      "match": "Horizontal fixed component (mm)",
-      "family": "gnss rtk",
-      "justification": "A GNSS receiver specification is written as millimetres plus parts per million over a baseline in kilometres, and that form is universal -- every manufacturer publishes it, and no US customary version exists. Converting it would break the comparison against the receiver's own data sheet, which is the whole purpose of the calculation. Verified 2026-09-08 with the survey technology band."
-    },
-    {
-      "module": "calc-survey.js",
-      "match": "Vertical fixed component (mm)",
-      "family": "gnss rtk",
-      "justification": "A GNSS receiver specification is written as millimetres plus parts per million over a baseline in kilometres, and that form is universal -- every manufacturer publishes it, and no US customary version exists. Converting it would break the comparison against the receiver's own data sheet, which is the whole purpose of the calculation. Verified 2026-09-08 with the survey technology band."
-    },
-    {
-      "module": "calc-survey.js",
-      "match": "Base position error (mm, 0 if on known control)",
-      "family": "gnss rtk",
-      "justification": "A GNSS receiver specification is written as millimetres plus parts per million over a baseline in kilometres, and that form is universal -- every manufacturer publishes it, and no US customary version exists. Converting it would break the comparison against the receiver's own data sheet, which is the whole purpose of the calculation. Verified 2026-09-08 with the survey technology band."
-    },
-    {
-      "module": "calc-survey.js",
-      "match": "Target vertical uncertainty (mm, 0 to skip)",
-      "family": "gnss rtk",
-      "justification": "A GNSS receiver specification is written as millimetres plus parts per million over a baseline in kilometres, and that form is universal -- every manufacturer publishes it, and no US customary version exists. Converting it would break the comparison against the receiver's own data sheet, which is the whole purpose of the calculation. Verified 2026-09-08 with the survey technology band."
-    }
-  ]
+ "_comment": "spec-v593 section 2 exception class: metric that IS US trade practice. Each entry waives check-us-defaults findings whose label contains `match` in `module` (module \"*\" = any). Additions are reviewed like citations, against the section-2 acid test: would a US tradesperson read this number in this unit off their own instrument, code table, or product label? Every entry must waive at least one finding no other entry already waives: on 2026-09-04 seven did not (four matched a token combination the scanner can never produce, three were subsumed by a broader entry in the same module) and were removed.",
+ "entries": [
+  {
+   "module": "*",
+   "match": "mg/L",
+   "family": "water/wastewater operations",
+   "justification": "mg/L is the universal US water-ops unit (SDWA/SWTR reporting, jar tests, MLSS)."
+  },
+  {
+   "module": "*",
+   "match": "mL/L",
+   "family": "water/wastewater operations",
+   "justification": "SV30 settleometer reads mL/L on the cone itself."
+  },
+  {
+   "module": "*",
+   "match": "mL/g",
+   "family": "water/wastewater operations",
+   "justification": "Sludge Volume Index (SVI) is universally reported in mL/g in US wastewater ops (Standard Methods, WEF, operator-certification exams); there is no US-customary equivalent."
+  },
+  {
+   "module": "*",
+   "match": "mg-min/L",
+   "family": "water/wastewater operations",
+   "justification": "CT tables (SWTR) are published in mg-min/L."
+  },
+  {
+   "module": "*",
+   "match": "(g)",
+   "family": "not metric (acceleration)",
+   "justification": "Peak ground / seismic acceleration in g (gravity), not grams: ASCE 7 and USGS publish in g.",
+   "note": "grams collisions are covered by module-scoped lab/kitchen entries"
+  },
+  {
+   "module": "calc-electrical.js",
+   "match": "(°C)",
+   "family": "NEC/IEEE electrical",
+   "justification": "ICEA P-32-382 conductor short-circuit limits are published in deg C."
+  },
+  {
+   "module": "calc-lab.js",
+   "match": "*",
+   "family": "lab and IH practice",
+   "justification": "Module-wide: US lab practice is SI throughout (mL, uL, mg, g/mol, M, g/mL, cm cuvette paths, mm rotors). Spelled \"*\" since 2026-08-30; it was an empty string, which exempted the module by accident rather than by decision."
+  },
+  {
+   "module": "calc-kitchen.js",
+   "match": "(g",
+   "family": "lab and IH practice",
+   "justification": "Baker's percentage and equilibrium-cure recipes are written in grams in US kitchens."
+  },
+  {
+   "module": "calc-field.js",
+   "match": "Easting (m)",
+   "family": "standards defined in SI",
+   "justification": "UTM easting/northing are defined in meters (USGS quads print meters)."
+  },
+  {
+   "module": "calc-field.js",
+   "match": "Northing (m)",
+   "family": "standards defined in SI",
+   "justification": "UTM easting/northing are defined in meters."
+  },
+  {
+   "module": "calc-lowvoltage.js",
+   "match": "Link length (m)",
+   "family": "standards defined in SI",
+   "justification": "TIA-568 defines the 90 m permanent link / 100 m channel in meters."
+  },
+  {
+   "module": "calc-lowvoltage.js",
+   "match": "cords (m)",
+   "family": "standards defined in SI",
+   "justification": "TIA-568 cord budgets are specified in meters."
+  },
+  {
+   "module": "calc-lowvoltage.js",
+   "match": "dB/km",
+   "family": "standards defined in SI",
+   "justification": "Fiber attenuation is specified in dB/km on every datasheet."
+  },
+  {
+   "module": "calc-earthwork.js",
+   "match": "D10, effective size (mm)",
+   "family": "product/spec conventions",
+   "justification": "Grain-size and sieve-opening diameters are stated in mm by ASTM D2487 / D6913 and printed in mm on every US geotechnical gradation report; there is no US-customary equivalent in use."
+  },
+  {
+   "module": "calc-earthwork.js",
+   "match": "D30 (mm)",
+   "family": "product/spec conventions",
+   "justification": "Grain-size and sieve-opening diameters are stated in mm by ASTM D2487 / D6913 and printed in mm on every US geotechnical gradation report; there is no US-customary equivalent in use."
+  },
+  {
+   "module": "calc-earthwork.js",
+   "match": "D60 (mm)",
+   "family": "product/spec conventions",
+   "justification": "Grain-size and sieve-opening diameters are stated in mm by ASTM D2487 / D6913 and printed in mm on every US geotechnical gradation report; there is no US-customary equivalent in use."
+  },
+  {
+   "module": "calc-earthwork.js",
+   "match": "(cm)",
+   "family": "geotechnical lab testing",
+   "justification": "Permeameter tests (ASTM D2434 constant head, D5084 falling head) are run in metric in US geotechnical labs: sample length, standpipe/burette heads, and mold dimensions are read in cm off the apparatus, and hydraulic conductivity k is reported in cm/s universally. There is no US-customary equivalent in lab practice."
+  },
+  {
+   "module": "calc-lowvoltage.js",
+   "match": "Sensor width (mm",
+   "family": "product/spec conventions",
+   "justification": "Camera sensor formats and lens focal lengths are sold in mm."
+  },
+  {
+   "module": "calc-lowvoltage.js",
+   "match": "Focal length (mm)",
+   "family": "product/spec conventions",
+   "justification": "Lens focal lengths are sold in mm."
+  },
+  {
+   "module": "calc-layout.js",
+   "match": "Metric pitch (mm)",
+   "family": "product/spec conventions",
+   "justification": "Metric thread pitch is the product spec on the box."
+  },
+  {
+   "module": "calc-shop.js",
+   "match": "Metric pitch (mm)",
+   "family": "product/spec conventions",
+   "justification": "Metric thread pitch is the product spec on the box."
+  },
+  {
+   "module": "calc-shop.js",
+   "match": "Thread pitch (mm, metric)",
+   "family": "product/spec conventions",
+   "justification": "The tile's metric-thread entry path; US pitch field sits beside it."
+  },
+  {
+   "module": "calc-mechanic.js",
+   "match": "Pad thickness (mm)",
+   "family": "product/spec conventions",
+   "justification": "Brake pad thickness is published and measured in mm in US shops."
+  },
+  {
+   "module": "calc-mechanic.js",
+   "match": "Wear rate (mm/kJ",
+   "family": "product/spec conventions",
+   "justification": "Pad wear-rate shop data rides the mm pad-thickness convention."
+  },
+  {
+   "module": "calc-mechanic.js",
+   "match": "Offset ET (mm",
+   "family": "product/spec conventions",
+   "justification": "Wheel offset is stamped ET in mm on the wheel itself."
+  },
+  {
+   "module": "calc-stage.js",
+   "match": "Pixel pitch (mm)",
+   "family": "product/spec conventions",
+   "justification": "LED panel pixel pitch is sold in mm."
+  },
+  {
+   "module": "calc-solar.js",
+   "match": "temp (°C)",
+   "family": "power and billing (solar datasheet)",
+   "justification": "Module datasheets publish record temps and coefficients in deg C."
+  },
+  {
+   "module": "calc-solar.js",
+   "match": "temperature (°C)",
+   "family": "power and billing (solar datasheet)",
+   "justification": "Cell/ambient temperature model inputs are datasheet deg C."
+  },
+  {
+   "module": "calc-solar.js",
+   "match": "NOCT (C",
+   "family": "power and billing (solar datasheet)",
+   "justification": "NOCT is a datasheet deg C value."
+  },
+  {
+   "module": "calc-solar.js",
+   "match": "%/C",
+   "family": "power and billing (solar datasheet)",
+   "justification": "Power temperature coefficients are datasheet %/deg C."
+  },
+  {
+   "module": "calc-solar.js",
+   "match": "kWh/m2/day",
+   "family": "power and billing (solar datasheet)",
+   "justification": "Peak-sun-hours insolation data is published in kWh/m2/day (NREL)."
+  },
+  {
+   "module": "calc-solar.js",
+   "match": "W/m²",
+   "family": "power and billing (solar datasheet)",
+   "justification": "Plane-of-array irradiance is published in W/m^2."
+  },
+  {
+   "module": "calc-restoration.js",
+   "match": "spores/m³",
+   "family": "lab and IH practice",
+   "justification": "Spore-trap lab reports count spores per cubic meter."
+  },
+  {
+   "module": "calc-restoration.js",
+   "match": "Pump flow (L/min",
+   "family": "lab and IH practice",
+   "justification": "Air-sampling pumps are calibrated in L/min."
+  },
+  {
+   "module": "calc-fire.js",
+   "match": "Consumption rate (L/min",
+   "family": "fire service SCBA air management",
+   "justification": "SCBA breathing/consumption rate is expressed in L/min: NIOSH rates open-circuit SCBA duration at 40 L/min and NFPA 1981 heavy-work testing at ~103 L/min, and US fireground air-management training teaches ~40 L/min light / ~100 L/min heavy. There is no US-customary breathing-rate unit a firefighter reads off the rating."
+  },
+  {
+   "module": "calc-restoration.js",
+   "match": "per cassette (L)",
+   "family": "lab and IH practice",
+   "justification": "Sampling cassette volumes are specified in liters."
+  },
+  {
+   "module": "calc-agriculture.js",
+   "match": "Particle density (g/cc)",
+   "family": "lab and IH practice",
+   "justification": "Soil particle density is quoted in g/cc (2.65) in US soils practice and every geotech lab report."
+  },
+  {
+   "module": "calc-concrete.js",
+   "match": "(l/",
+   "family": "not metric",
+   "justification": "ACI 318 minimum-thickness span ratios l/20..l/28 (l = span), not liters."
+  },
+  {
+   "module": "calc-concrete.js",
+   "match": "(l / denominator)",
+   "family": "not metric",
+   "justification": "Span ratio result line (l = span), not liters."
+  },
+  {
+   "module": "calc-elecdesign.js",
+   "match": "Surface layer thickness hs (m)",
+   "family": "NEC/IEEE electrical",
+   "justification": "IEEE Std 80 step/touch equations take the crushed-rock layer hs in meters as published."
+  },
+  {
+   "module": "calc-kitchen.js",
+   "match": "Bottle size (mL)",
+   "family": "product/spec conventions",
+   "justification": "US beverage bottles are labeled in mL (750 mL)."
+  },
+  {
+   "module": "calc-realestate.js",
+   "match": "policy (C)",
+   "family": "not metric",
+   "justification": "Loan Estimate section C (services you can shop for), not Celsius."
+  },
+  {
+   "module": "calc-water.js",
+   "match": "Water temperature (°C; 0.5 - 25)",
+   "family": "water/wastewater operations",
+   "justification": "SWTR CT tables are published against deg C water temperature."
+  },
+  {
+   "module": "calc-field.js",
+   "match": "Distance (km)",
+   "family": "secondary output (spec-v593 section 1)",
+   "justification": "lightning-countdown secondary metric output line; the primary Distance (mi) output line precedes it -- the sanctioned US-primary + metric-secondary pattern."
+  },
+  {
+   "module": "calc-lowvoltage.js",
+   "match": "Link distance (km)",
+   "family": "RF / wireless link budget (spec-v1249)",
+   "justification": "free-space path loss is metric-native: the Friis constant 32.44 is defined for km and MHz, and RF engineering (including US practice) states link distance in km and frequency in MHz; there is no US-customary form of the FSPL equation in common use."
+  },
+  {
+   "module": "calc-lowvoltage.js",
+   "match": "Distance end 1 to obstruction (km)",
+   "family": "RF / Fresnel-zone geometry (spec-v1250)",
+   "justification": "Fresnel-zone radius is metric-native: the 17.32 constant (sqrt(300)) is defined for km and GHz, and RF path surveys state distances in km; no US-customary form of the Fresnel-zone equation is in common use."
+  },
+  {
+   "module": "calc-lowvoltage.js",
+   "match": "Distance end 2 to obstruction (km)",
+   "family": "RF / Fresnel-zone geometry (spec-v1250)",
+   "justification": "Fresnel-zone radius is metric-native: the 17.32 constant (sqrt(300)) is defined for km and GHz, and RF path surveys state distances in km; no US-customary form of the Fresnel-zone equation is in common use."
+  },
+  {
+   "module": "calc-treatment.js",
+   "match": "Particle diameter (mm)",
+   "family": "water/wastewater sedimentation practice (spec-v1271)",
+   "justification": "Settling-particle and grit sizes are stated in mm and micron in US water/wastewater and environmental-engineering practice (grit-chamber and sedimentation design, the same ASTM grain-size convention already allowlisted for calc-earthwork D10/D30/D60); there is no US-customary equivalent for a particle diameter."
+  },
+  {
+   "module": "calc-motor.js",
+   "match": "Marked temperature rise",
+   "family": "electrical / motors",
+   "justification": "The motor nameplate itself marks temperature rise in °C, and NEC 430.32(A)(1) states its 40 °C threshold in °C. The tradesperson reads this number off the nameplate in this unit."
+  },
+  {
+   "module": "calc-stage.js",
+   "match": "diameter (mm",
+   "family": "entertainment lighting gobos",
+   "justification": "Gobo and gate sizes are specified in millimeters everywhere in the US entertainment-lighting trade: an M-size gobo is 66 mm outside diameter with a 48 mm image, and every US manufacturer's catalog and every fixture's spec sheet prints those figures in mm. A US lighting technician reads this number in mm off the gobo holder itself."
+  },
+  {
+   "module": "*",
+   "match": "kW/m2",
+   "family": "fire-protection engineering",
+   "justification": "Radiant heat flux is expressed in kW/m2 everywhere in US fire-protection engineering: the SFPE Handbook, NFPA standards, and every published ignition and tenability threshold state it that way, and a US fire protection engineer reads the number in that unit off their own reference."
+  },
+  {
+   "module": "calc-fab.js",
+   "match": "Heat input Q (kJ/mm",
+   "family": "weld cooling-time model",
+   "justification": "The t8/5 weld cooling-time model has no US customary formulation: EN 1011-2 and every welding-metallurgy reference write it in kJ/mm, degrees Celsius, and millimetres, and a US welding engineer computing it reads those units off the procedure and the literature. Converting the inputs would make the tile disagree with every published worked example of the model."
+  },
+  {
+   "module": "calc-fab.js",
+   "match": "Preheat / interpass temperature (deg C)",
+   "family": "weld cooling-time model",
+   "justification": "The t8/5 weld cooling-time model has no US customary formulation: EN 1011-2 and every welding-metallurgy reference write it in kJ/mm, degrees Celsius, and millimetres, and a US welding engineer computing it reads those units off the procedure and the literature. Converting the inputs would make the tile disagree with every published worked example of the model."
+  },
+  {
+   "module": "calc-fab.js",
+   "match": "Plate thickness (mm, the t8/5 model is metric)",
+   "family": "weld cooling-time model",
+   "justification": "The t8/5 weld cooling-time model has no US customary formulation: EN 1011-2 and every welding-metallurgy reference write it in kJ/mm, degrees Celsius, and millimetres, and a US welding engineer computing it reads those units off the procedure and the literature. Converting the inputs would make the tile disagree with every published worked example of the model."
+  },
+  {
+   "module": "calc-shop.js",
+   "match": "Rotor mass (kg)",
+   "family": "ISO 1940 rotor balancing",
+   "justification": "ISO 1940-1 defines the balance grade itself in millimetres per second and the permissible unbalance in gram-millimetres per kilogram, and a US balancing machine's readout is in those units. A US shop balancing a rotor enters mass in kg and the correction radius in mm because the standard and the machine both do; converting would make the tile disagree with the readout."
+  },
+  {
+   "module": "calc-shop.js",
+   "match": "Correction radius (mm)",
+   "family": "ISO 1940 rotor balancing",
+   "justification": "ISO 1940-1 defines the balance grade itself in millimetres per second and the permissible unbalance in gram-millimetres per kilogram, and a US balancing machine's readout is in those units. A US shop balancing a rotor enters mass in kg and the correction radius in mm because the standard and the machine both do; converting would make the tile disagree with the readout."
+  },
+  {
+   "module": "calc-shop.js",
+   "match": "Bearing outside diameter (mm)",
+   "family": "metric bearing designations",
+   "justification": "Rolling-element bearings are metric worldwide including in the US: a 6310 IS 50 x 110 x 27 mm, and the bore, outside diameter, and width are the designation itself and are stamped on the bearing. A US millwright reads these numbers in millimetres off the part in their hand."
+  },
+  {
+   "module": "calc-shop.js",
+   "match": "Bearing width (mm)",
+   "family": "metric bearing designations",
+   "justification": "Rolling-element bearings are metric worldwide including in the US: a 6310 IS 50 x 110 x 27 mm, and the bore, outside diameter, and width are the designation itself and are stamped on the bearing. A US millwright reads these numbers in millimetres off the part in their hand."
+  },
+  {
+   "module": "calc-shop.js",
+   "match": "Bearing bore (mm)",
+   "family": "metric bearing designations",
+   "justification": "Rolling-element bearings are metric worldwide including in the US: a 6310 IS 50 x 110 x 27 mm, and the bore, outside diameter, and width are the designation itself and are stamped on the bearing. A US millwright reads these numbers in millimetres off the part in their hand."
+  },
+  {
+   "module": "calc-elecdesign.js",
+   "match": "Initial conductor temperature (deg C)",
+   "family": "ICEA conductor short-circuit limits",
+   "justification": "The ICEA P-32-382 conductor short-circuit temperature limits, and the insulation damage temperatures they are compared against, are published in degrees Celsius -- the same basis the catalog's existing conductor short-circuit withstand tile is allowlisted on. A US electrical engineer reads the 75 C and 250 C limits in Celsius off the standard itself."
+  },
+  {
+   "module": "calc-elecdesign.js",
+   "match": "Insulation damage temperature (deg C)",
+   "family": "ICEA conductor short-circuit limits",
+   "justification": "The ICEA P-32-382 conductor short-circuit temperature limits, and the insulation damage temperatures they are compared against, are published in degrees Celsius -- the same basis the catalog's existing conductor short-circuit withstand tile is allowlisted on. A US electrical engineer reads the 75 C and 250 C limits in Celsius off the standard itself."
+  },
+  {
+   "module": "calc-shop.js",
+   "match": "Metal atomic weight (g/mol)",
+   "family": "Faraday's law of electrolysis",
+   "justification": "Atomic weight has no customary-unit form at all -- it is grams per mole by definition, and it is the value a plater reads straight off the periodic table or the bath supplier's data sheet to enter Faraday's law. Converting it would produce a number that appears in no reference a US plating shop owns."
+  },
+  {
+   "module": "calc-shop.js",
+   "match": "Metal density (g/cm3)",
+   "family": "Faraday's law of electrolysis",
+   "justification": "Plating and metallurgical references list metal density in g/cm3 universally, including the ones on a US plating shop's shelf, and it pairs directly with the g/s mass rate Faraday's law produces. A US plater reads 8.9 for nickel off that table; lb/cubic ft would have to be converted back before it could be used."
+  },
+  {
+   "module": "calc-agriculture.js",
+   "match": "Recommendation (kg/ha)",
+   "family": "agronomy",
+   "justification": "A metric COMPANION to the primary US output: the same tile prints \"Blend (lb/acre)\" directly above it, and kg/ha is how agronomic rate recommendations and fertilizer research are published. US-first with a metric sibling, not metric-defaulted."
+  },
+  {
+   "module": "calc-cross.js",
+   "match": "Distance (km)",
+   "family": "navigation",
+   "justification": "A metric COMPANION: the haversine tile prints \"Distance (miles)\" directly above it. Aviation and marine plots read both, and the cited Earth radius is given in mi and km."
+  },
+  {
+   "module": "calc-lowvoltage.js",
+   "match": "Temperature (°C)",
+   "family": "instrumentation sensor curves",
+   "justification": "RTD (IEC 60751 Callendar-Van Dusen), thermistor Beta, and Steinhart-Hart curves are DEFINED in degrees C -- the coefficients have no Fahrenheit form -- and every one of the three tiles prints \"Temperature (°F)\" on the next line. Verified 2026-09-04 when output labels were first scanned."
+  },
+  {
+   "module": "calc-survey.js",
+   "match": "Focal length (mm)",
+   "family": "photogrammetry sensor",
+   "justification": "Camera focal length and sensor pixel pitch are published in millimetres and micrometres by every manufacturer and have no customary form; the tile takes the flight height in FEET, which is how a US operator flies, and returns the GSD in centimetres per pixel because that is how a mapping deliverable is specified. Verified 2026-09-08 with the survey technology band."
+  },
+  {
+   "module": "calc-survey.js",
+   "match": "Flight height above ground (m)",
+   "family": "airborne lidar",
+   "justification": "Airborne LiDAR sensor specifications are published in metric worldwide and have no US customary form: pulse rate in kHz against a swath in metres, flight height in metres, ground speed in m/s, and the deliverable specification itself written in points per SQUARE METRE. A tile that took feet here would make the reader convert a spec sheet before entering it and convert back to compare with the contract. Verified 2026-09-08 with the survey technology band."
+  },
+  {
+   "module": "calc-survey.js",
+   "match": "Baseline, base to rover (km)",
+   "family": "gnss rtk",
+   "justification": "A GNSS receiver specification is written as millimetres plus parts per million over a baseline in kilometres, and that form is universal -- every manufacturer publishes it, and no US customary version exists. Converting it would break the comparison against the receiver's own data sheet, which is the whole purpose of the calculation. Verified 2026-09-08 with the survey technology band."
+  },
+  {
+   "module": "calc-survey.js",
+   "match": "Horizontal fixed component (mm)",
+   "family": "gnss rtk",
+   "justification": "A GNSS receiver specification is written as millimetres plus parts per million over a baseline in kilometres, and that form is universal -- every manufacturer publishes it, and no US customary version exists. Converting it would break the comparison against the receiver's own data sheet, which is the whole purpose of the calculation. Verified 2026-09-08 with the survey technology band."
+  },
+  {
+   "module": "calc-survey.js",
+   "match": "Vertical fixed component (mm)",
+   "family": "gnss rtk",
+   "justification": "A GNSS receiver specification is written as millimetres plus parts per million over a baseline in kilometres, and that form is universal -- every manufacturer publishes it, and no US customary version exists. Converting it would break the comparison against the receiver's own data sheet, which is the whole purpose of the calculation. Verified 2026-09-08 with the survey technology band."
+  },
+  {
+   "module": "calc-survey.js",
+   "match": "Base position error (mm, 0 if on known control)",
+   "family": "gnss rtk",
+   "justification": "A GNSS receiver specification is written as millimetres plus parts per million over a baseline in kilometres, and that form is universal -- every manufacturer publishes it, and no US customary version exists. Converting it would break the comparison against the receiver's own data sheet, which is the whole purpose of the calculation. Verified 2026-09-08 with the survey technology band."
+  },
+  {
+   "module": "calc-survey.js",
+   "match": "Target vertical uncertainty (mm, 0 to skip)",
+   "family": "gnss rtk",
+   "justification": "A GNSS receiver specification is written as millimetres plus parts per million over a baseline in kilometres, and that form is universal -- every manufacturer publishes it, and no US customary version exists. Converting it would break the comparison against the receiver's own data sheet, which is the whole purpose of the calculation. Verified 2026-09-08 with the survey technology band."
+  },
+  {
+   "module": "calc-process.js",
+   "match": "Binder gas evolution (cm³/g, 0 to skip)",
+   "family": "foundry binder gas",
+   "justification": "Foundry binder gas evolution is published in cubic centimetres per gram by every binder supplier, and no US customary form of the figure exists or is used in the trade. The input is entered straight off the supplier's data sheet, so converting it would force the user to convert back and would break the comparison this calculation is for. The output is reported in cubic feet. Verified 2026-09-09 with the plastics processing and foundry band."
+  }
+ ]
 }
