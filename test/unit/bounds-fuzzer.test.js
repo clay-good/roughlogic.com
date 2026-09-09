@@ -50963,3 +50963,164 @@ test("bounds: spec-v1736 computeRetrievalWinchForce -- the weakest element rates
   assert.equal(_v1736({ ...base, system_rating_lb: 200 }).system_ok, false);
   assert.ok(_v1736({ ...base, entrant_weight_lb: 0 }).error);
 });
+
+// =====================================================================
+// spec-v1588..v1590, v1605..v1607: the water systems band. Six tiles across
+// wells and distribution; spec-v1737 was cut by an earlier band. Two spec
+// defects are asserted against here: v1589 printed two figures ten times
+// apart for one hypochlorite volume, and v1607 called a house at 600 ft
+// "below the band" and "over the 80 psi limit" when its own band starts at
+// 595 ft and the pressure is 77.94 psi.
+// =====================================================================
+import {
+  computeStepDrawdownEfficiency as _v1588,
+  computeWellCasingPurgeVolume as _v1589,
+  computeConstantPressureWellVfd as _v1590,
+  computeWetWellCycleTime as _v1605,
+  computeMainFlushingVolume as _v1606,
+  computePressureZoneHgl as _v1607,
+} from "../../calc-water.js";
+
+test("bounds: spec-v1588 computeStepDrawdownEfficiency -- efficiency depends on the RATE tested", () => {
+  const base = { q1_gpm: 300, s1_ft: 12, q2_gpm: 600, s2_ft: 28, q3_gpm: 900, s3_ft: 48, operating_gpm: 900, efficiency_threshold_pct: 65, previous_efficiency_pct: 84 };
+  const r = _v1588(base);
+  assert.ok(Math.abs(r.b_ft_per_gpm - 0.0333333) < 1e-6);
+  assert.ok(Math.abs(r.c_ft_per_gpm2 - 2.2222e-5) < 1e-8);
+  // IDENTITY: the fitted curve reproduces the measured drawdown at step 3.
+  assert.ok(Math.abs(r.total_drawdown_ft - 48) < 1e-9);
+  assert.ok(Math.abs(r.aquifer_loss_ft - 30) < 1e-9);
+  assert.ok(Math.abs(r.well_loss_ft - 18) < 1e-9);
+  // IDENTITY: the split sums to the total, and specific capacity inverts it.
+  assert.ok(Math.abs(r.aquifer_loss_ft + r.well_loss_ft - r.total_drawdown_ft) < 1e-12);
+  assert.ok(Math.abs(r.specific_capacity_gpm_ft * r.total_drawdown_ft - 900) < 1e-9);
+  assert.ok(Math.abs(r.efficiency_pct - 62.5) < 1e-9);
+  // IDENTITY: perfectly linear drawdown means no well loss -- exactly 100%.
+  const linear = _v1588({ ...base, s1_ft: 10, s2_ft: 20, s3_ft: 30 });
+  assert.ok(Math.abs(linear.efficiency_pct - 100) < 1e-9);
+  assert.ok(Math.abs(linear.well_loss_ft) < 1e-9);
+  // The rate trap: the same well is 83% efficient at a third of the rate.
+  assert.ok(Math.abs(r.light_rate_efficiency_pct - 83.3333) < 0.001);
+  assert.ok(r.light_rate_efficiency_pct > r.efficiency_pct);
+  assert.equal(r.below_threshold, true);
+  assert.ok(Math.abs(r.efficiency_change_pts + 21.5) < 0.01);
+  // Two steps at the same rate plus a third still determine the line, so that
+  // is not degenerate. ALL steps at one rate is.
+  assert.ok(!_v1588({ ...base, q2_gpm: 300 }).error);
+  assert.ok(_v1588({ ...base, q1_gpm: 900, s1_ft: 48, q2_gpm: 900, s2_ft: 48, q3_gpm: 900, s3_ft: 48 }).error);
+  assert.ok(_v1588({ ...base, q2_gpm: 0, q3_gpm: 0 }).error);
+});
+
+test("bounds: spec-v1589 computeWellCasingPurgeVolume -- the spec printed 0.02 and 0.22 for one volume", () => {
+  const base = { casing_diameter_in: 6, well_depth_ft: 280, static_water_level_ft: 90, purge_volumes: 3, purge_rate_gpm: 15, target_dose_mg_l: 100, solution_strength_pct: 12.5, solution_lb_per_gal: 10.0 };
+  const r = _v1589(base);
+  assert.ok(Math.abs(r.gal_per_ft - 1.4688) < 1e-9);
+  // The standing column is depth less the STATIC LEVEL, not the drilled depth.
+  assert.ok(Math.abs(r.standing_column_ft - 190) < 1e-12);
+  assert.ok(Math.abs(r.casing_volume_gal - 279.072) < 1e-6);
+  assert.ok(Math.abs(r.purge_volume_gal - 837.216) < 1e-6);
+  assert.ok(Math.abs(r.purge_minutes - 55.8144) < 1e-6);
+  // spec-v1589 says "~ 0.02 gal -- roughly 0.22 gal" for the same quantity.
+  // 0.233 lb of chlorine is 1.86 lb of 12.5% solution: 0.19 gal at 10 lb/gal
+  // (a real hypochlorite density) or 0.22 at water density. 0.02 is a slip.
+  assert.ok(Math.abs(r.chlorine_lb - 0.2327) < 1e-4);
+  assert.ok(Math.abs(r.solution_gal - 0.18620) < 1e-4);
+  assert.ok(Math.abs(_v1589({ ...base, solution_lb_per_gal: 8.34 }).solution_gal - 0.2233) < 1e-4);
+  assert.ok(r.solution_gal > 0.1);
+  // IDENTITY: the dose is exactly linear in concentration and in volume.
+  assert.ok(Math.abs(_v1589({ ...base, target_dose_mg_l: 200 }).solution_gal - 2 * r.solution_gal) < 1e-9);
+  assert.ok(_v1589({ ...base, static_water_level_ft: 300 }).error);
+  assert.ok(_v1589({ ...base, solution_strength_pct: 0 }).error);
+});
+
+test("bounds: spec-v1590 computeConstantPressureWellVfd -- the cube law does NOT apply", () => {
+  const base = { static_lift_ft: 180, friction_at_design_ft: 25, design_flow_gpm: 20, setpoint_psi: 50, reduced_flow_gpm: 5, full_speed_rpm: 3450, drawdown_at_design_ft: 40, pump_max_head_ft: 340 };
+  const r = _v1590(base);
+  assert.ok(Math.abs(r.setpoint_head_ft - 115.5) < 1e-9);
+  assert.ok(Math.abs(r.head_at_design_ft - 320.5) < 1e-9);
+  // Only friction is speed-sensitive, and it falls with the square of flow.
+  assert.ok(Math.abs(r.friction_at_reduced_ft - 25 * 0.0625) < 1e-12);
+  assert.ok(Math.abs(r.head_at_reduced_ft - (180 + 25 * 0.0625 + 115.5)) < 1e-12);
+  // A 75% flow cut buys under 4% speed -- the point of the tile.
+  assert.ok(r.speed_reduction_pct < 5);
+  assert.ok(r.speed_at_reduced_rpm > 3300);
+  // IDENTITY: at design flow the speed is exactly full speed.
+  assert.ok(Math.abs(_v1590({ ...base, reduced_flow_gpm: 20 }).speed_at_reduced_rpm - 3450) < 1e-9);
+  // Drawdown adds to the static lift and can put the setpoint out of reach.
+  assert.ok(Math.abs(r.head_with_drawdown_ft - 360.5) < 1e-9);
+  assert.equal(r.cannot_hold, true);
+  assert.equal(_v1590({ ...base, pump_max_head_ft: 400 }).cannot_hold, false);
+  assert.ok(_v1590({ ...base, reduced_flow_gpm: 25 }).error);
+  assert.ok(_v1590({ ...base, setpoint_psi: 0 }).error);
+});
+
+test("bounds: spec-v1605 computeWetWellCycleTime -- half the pump rate is the worst case", () => {
+  const base = { pump_gpm: 250, well_diameter_ft: 6, min_cycle_minutes: 10, max_starts_per_hour: 0, inflow_gpm: 125 };
+  const r = _v1605(base);
+  assert.ok(Math.abs(r.active_volume_gal - 625) < 1e-12);
+  assert.ok(Math.abs(r.worst_case_inflow_gpm - 125) < 1e-12);
+  assert.ok(Math.abs(r.level_differential_ft - 2.9548) < 1e-3);
+  // IDENTITY: at exactly half the pump rate the cycle equals the design
+  // minimum -- which is WHY the four is in V = t Q / 4.
+  assert.ok(Math.abs(r.cycle_at_inflow_min - 10) < 1e-9);
+  assert.equal(r.short_cycling, false);
+  // Any other inflow gives a LONGER cycle. That is the worst-case claim.
+  for (const q of [25, 50, 100, 150, 200, 240]) {
+    assert.ok(_v1605({ ...base, inflow_gpm: q }).cycle_at_inflow_min >= 10 - 1e-9);
+  }
+  // The starts-per-hour route agrees with the cycle-time route.
+  assert.ok(Math.abs(_v1605({ ...base, min_cycle_minutes: 0, max_starts_per_hour: 6 }).active_volume_gal - 625) < 1e-9);
+  // Inflow at or above the pump rate means the pump never stops.
+  assert.ok(_v1605({ ...base, inflow_gpm: 250 }).error);
+  assert.ok(_v1605({ ...base, min_cycle_minutes: 0, max_starts_per_hour: 0 }).error);
+});
+
+test("bounds: spec-v1606 computeMainFlushingVolume -- required flow goes with diameter SQUARED", () => {
+  const base = { main_diameter_in: 8, run_length_ft: 1200, target_velocity_fps: 3, pipe_volumes: 3, available_flow_gpm: 0, hydrant_outlets: 1, outlet_capacity_gpm: 500 };
+  const r = _v1606(base);
+  assert.ok(Math.abs(r.gal_per_ft - 2.6112) < 1e-9);
+  assert.ok(Math.abs(r.pipe_volume_gal - 3133.44) < 1e-6);
+  assert.ok(Math.abs(r.required_gpm - 470.016) < 1e-6);
+  assert.ok(Math.abs(r.duration_min - 20) < 0.01);
+  assert.ok(Math.abs(r.total_discharged_gal - 9400.32) < 1e-6);
+  // 500 gpm reaches 3.19 ft/s on an 8 in main, so it DOES scour.
+  assert.equal(r.scours, true);
+  // The same outlet on a 12 in main does not -- required flow is 1,058 gpm.
+  const big = _v1606({ ...base, main_diameter_in: 12 });
+  assert.ok(Math.abs(big.required_gpm - 1057.536) < 1e-6);
+  assert.equal(big.scours, false);
+  assert.ok(big.achieved_velocity_fps < 1.5);
+  // IDENTITY: supplying exactly the required flow gives exactly the target.
+  const exact = _v1606({ ...base, outlet_capacity_gpm: r.required_gpm });
+  assert.ok(Math.abs(exact.achieved_velocity_fps - 3) < 1e-9);
+  assert.equal(exact.scours, true);
+  assert.ok(_v1606({ ...base, target_velocity_fps: 0 }).error);
+});
+
+test("bounds: spec-v1607 computePressureZoneHgl -- the spec contradicted its own band", () => {
+  const base = { hgl_ft: 780, service_elevation_ft: 620, min_pressure_psi: 40, max_pressure_psi: 80, service_relief_ft: 250, fire_flow_friction_ft: 35 };
+  const r = _v1607(base);
+  assert.ok(Math.abs(r.static_psi - 69.28) < 1e-6);
+  assert.ok(Math.abs(r.lowest_servable_ft - (780 - 80 / 0.433)) < 1e-9);
+  assert.ok(Math.abs(r.highest_servable_ft - (780 - 40 / 0.433)) < 1e-9);
+  assert.ok(Math.abs(r.elevation_band_ft - 40 / 0.433) < 1e-9);
+  assert.equal(r.zones_required, 3);
+  // IDENTITIES: at the band edges the pressure is exactly the stated limit.
+  assert.ok(Math.abs(_v1607({ ...base, service_elevation_ft: r.lowest_servable_ft }).static_psi - 80) < 1e-9);
+  assert.ok(Math.abs(_v1607({ ...base, service_elevation_ft: r.highest_servable_ft }).static_psi - 40) < 1e-9);
+  // spec-v1607 says a house at 600 ft is "below the band" and "over the 80
+  // psi limit". Its own band starts at 595 ft and 600 ft sees 77.94 psi, so
+  // it is INSIDE the band and UNDER the limit -- no PRV is required there.
+  const at600 = _v1607({ ...base, service_elevation_ft: 600 });
+  assert.ok(Math.abs(at600.static_psi - 77.94) < 0.01);
+  assert.ok(at600.static_psi < 80);
+  assert.equal(at600.in_band, true);
+  // 590 ft is the case the spec meant: genuinely below the band, over 80 psi.
+  const at590 = _v1607({ ...base, service_elevation_ft: 590 });
+  assert.equal(at590.in_band, false);
+  assert.ok(at590.static_psi > 80);
+  // Fire flow drops the HGL by the friction to the point.
+  assert.ok(Math.abs(r.fire_flow_psi - (745 - 620) * 0.433) < 1e-9);
+  assert.equal(r.fire_ok, true);
+  assert.equal(_v1607({ ...base, fire_flow_friction_ft: 300 }).fire_ok, false);
+  assert.ok(_v1607({ ...base, max_pressure_psi: 30 }).error);
+});

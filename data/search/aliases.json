@@ -111472,6 +111472,156 @@
    "term": "confined space rescue plan",
    "target": "retrieval-winch-force",
    "kind": "industry"
+  },
+  {
+   "term": "step drawdown test",
+   "target": "step-drawdown-efficiency",
+   "kind": "industry"
+  },
+  {
+   "term": "well efficiency calculation",
+   "target": "step-drawdown-efficiency",
+   "kind": "industry"
+  },
+  {
+   "term": "well loss coefficient",
+   "target": "step-drawdown-efficiency",
+   "kind": "industry"
+  },
+  {
+   "term": "aquifer loss versus well loss",
+   "target": "step-drawdown-efficiency",
+   "kind": "industry"
+  },
+  {
+   "term": "specific capacity degradation",
+   "target": "step-drawdown-efficiency",
+   "kind": "industry"
+  },
+  {
+   "term": "well casing volume",
+   "target": "well-casing-purge-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "purge volume before sampling",
+   "target": "well-casing-purge-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "gallons per foot casing",
+   "target": "well-casing-purge-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "well disinfection volume",
+   "target": "well-casing-purge-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "standing water column well",
+   "target": "well-casing-purge-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "constant pressure well vfd",
+   "target": "constant-pressure-well-vfd",
+   "kind": "industry"
+  },
+  {
+   "term": "variable speed well pump setpoint",
+   "target": "constant-pressure-well-vfd",
+   "kind": "industry"
+  },
+  {
+   "term": "affinity laws static head",
+   "target": "constant-pressure-well-vfd",
+   "kind": "industry"
+  },
+  {
+   "term": "minimum speed pump vfd",
+   "target": "constant-pressure-well-vfd",
+   "kind": "industry"
+  },
+  {
+   "term": "well pump drive sizing",
+   "target": "constant-pressure-well-vfd",
+   "kind": "industry"
+  },
+  {
+   "term": "lift station cycle time",
+   "target": "wet-well-cycle-time",
+   "kind": "industry"
+  },
+  {
+   "term": "wet well volume sizing",
+   "target": "wet-well-cycle-time",
+   "kind": "industry"
+  },
+  {
+   "term": "pump starts per hour",
+   "target": "wet-well-cycle-time",
+   "kind": "industry"
+  },
+  {
+   "term": "short cycling lift station",
+   "target": "wet-well-cycle-time",
+   "kind": "industry"
+  },
+  {
+   "term": "worst case cycle inflow",
+   "target": "wet-well-cycle-time",
+   "kind": "industry"
+  },
+  {
+   "term": "water main flushing",
+   "target": "main-flushing-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "unidirectional flushing velocity",
+   "target": "main-flushing-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "flush duration pipe volumes",
+   "target": "main-flushing-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "hydrant flushing flow",
+   "target": "main-flushing-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "main scour velocity",
+   "target": "main-flushing-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "water pressure from elevation",
+   "target": "pressure-zone-hgl",
+   "kind": "industry"
+  },
+  {
+   "term": "hydraulic grade line psi",
+   "target": "pressure-zone-hgl",
+   "kind": "industry"
+  },
+  {
+   "term": "pressure zone elevation band",
+   "target": "pressure-zone-hgl",
+   "kind": "industry"
+  },
+  {
+   "term": "why is my water pressure low",
+   "target": "pressure-zone-hgl",
+   "kind": "industry"
+  },
+  {
+   "term": "0.433 psi per foot",
+   "target": "pressure-zone-hgl",
+   "kind": "industry"
   }
  ]
 }

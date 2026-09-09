@@ -107096,6 +107096,361 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "step-drawdown-efficiency",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Step-Drawdown Test Well Efficiency -- the spec-v1588 worked example, recomputed",
+   "source_edition_or_year": "spec-v1588 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "q1_gpm": 300,
+    "s1_ft": 12,
+    "q2_gpm": 600,
+    "s2_ft": 28,
+    "q3_gpm": 900,
+    "s3_ft": 48,
+    "operating_gpm": 900,
+    "efficiency_threshold_pct": 65,
+    "previous_efficiency_pct": 84
+   },
+   "outputs": {
+    "b_ft_per_gpm": {
+     "value": 0.03333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "c_ft_per_gpm2": {
+     "value": 0.0000222222,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "aquifer_loss_ft": {
+     "value": 30,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "well_loss_ft": {
+     "value": 18,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_drawdown_ft": {
+     "value": 48,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "efficiency_pct": {
+     "value": 62.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "specific_capacity_gpm_ft": {
+     "value": 18.75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "light_rate_efficiency_pct": {
+     "value": 83.33333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "well-casing-purge-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Well Casing Storage and Purge Volume -- the spec-v1589 worked example, recomputed",
+   "source_edition_or_year": "spec-v1589 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "casing_diameter_in": 6,
+    "well_depth_ft": 280,
+    "static_water_level_ft": 90,
+    "purge_volumes": 3,
+    "purge_rate_gpm": 15,
+    "target_dose_mg_l": 100,
+    "solution_strength_pct": 12.5,
+    "solution_lb_per_gal": 10
+   },
+   "outputs": {
+    "gal_per_ft": {
+     "value": 1.4688,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "standing_column_ft": {
+     "value": 190,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "casing_volume_gal": {
+     "value": 279.072,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "purge_volume_gal": {
+     "value": 837.216,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "purge_minutes": {
+     "value": 55.8144,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "chlorine_lb": {
+     "value": 0.23275,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "solution_gal": {
+     "value": 0.1862,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "constant-pressure-well-vfd",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Constant-Pressure Well VFD Setpoint and Flow -- the spec-v1590 worked example, recomputed",
+   "source_edition_or_year": "spec-v1590 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "static_lift_ft": 180,
+    "friction_at_design_ft": 25,
+    "design_flow_gpm": 20,
+    "setpoint_psi": 50,
+    "reduced_flow_gpm": 5,
+    "full_speed_rpm": 3450,
+    "drawdown_at_design_ft": 40,
+    "pump_max_head_ft": 340
+   },
+   "outputs": {
+    "setpoint_head_ft": {
+     "value": 115.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "head_at_design_ft": {
+     "value": 320.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "head_at_reduced_ft": {
+     "value": 297.0625,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "speed_at_reduced_rpm": {
+     "value": 3321.45975,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "speed_reduction_pct": {
+     "value": 3.7258,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "head_with_drawdown_ft": {
+     "value": 360.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wet-well-cycle-time",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Lift Station Wet-Well Volume and Cycle Time -- the spec-v1605 worked example, recomputed",
+   "source_edition_or_year": "spec-v1605 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "pump_gpm": 250,
+    "well_diameter_ft": 6,
+    "min_cycle_minutes": 10,
+    "max_starts_per_hour": 0,
+    "inflow_gpm": 125
+   },
+   "outputs": {
+    "active_volume_gal": {
+     "value": 625,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "area_ft2": {
+     "value": 28.27433,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gal_per_ft": {
+     "value": 211.52029,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "level_differential_ft": {
+     "value": 2.9548,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "worst_case_inflow_gpm": {
+     "value": 125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cycle_at_inflow_min": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "main-flushing-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Water Main Flushing Volume and Duration -- the spec-v1606 worked example, recomputed",
+   "source_edition_or_year": "spec-v1606 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "main_diameter_in": 8,
+    "run_length_ft": 1200,
+    "target_velocity_fps": 3,
+    "pipe_volumes": 3,
+    "available_flow_gpm": 0,
+    "hydrant_outlets": 1,
+    "outlet_capacity_gpm": 500
+   },
+   "outputs": {
+    "gal_per_ft": {
+     "value": 2.6112,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pipe_volume_gal": {
+     "value": 3133.44,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_gpm": {
+     "value": 470.016,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "duration_min": {
+     "value": 20,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_discharged_gal": {
+     "value": 9400.32,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "achieved_velocity_fps": {
+     "value": 3.19138,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pressure-zone-hgl",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Water Pressure Zone HGL and Service Pressure -- the spec-v1607 worked example, recomputed",
+   "source_edition_or_year": "spec-v1607 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "hgl_ft": 780,
+    "service_elevation_ft": 620,
+    "min_pressure_psi": 40,
+    "max_pressure_psi": 80,
+    "service_relief_ft": 250,
+    "fire_flow_friction_ft": 35
+   },
+   "outputs": {
+    "static_psi": {
+     "value": 69.28,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lowest_servable_ft": {
+     "value": 595.24249,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "highest_servable_ft": {
+     "value": 687.62125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "elevation_band_ft": {
+     "value": 92.37875,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "zones_required": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fire_flow_psi": {
+     "value": 54.125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

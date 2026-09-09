@@ -1622,6 +1622,13 @@ const RELATED = {
   "arc-rated-clothing-selection": ["arc-flash-screen","ppe","capacitor-discharge-time"],
   "fixed-ladder-fall-protection": ["portable-ladder-setup","ladder-angle","extension-ladder-overlap"],
   "retrieval-winch-force": ["confined-space-vent","winch-drum-line-pull","confined-space-purge"],
+  // spec-v1588..v1590, v1605..v1607: water systems band.
+  "step-drawdown-efficiency": ["well-drawdown","well-casing-purge-volume","constant-pressure-well-vfd"],
+  "well-casing-purge-volume": ["step-drawdown-efficiency","well-drawdown","main-disinfection-chlorine"],
+  "constant-pressure-well-vfd": ["pressure-tank-drawdown","vfd-energy-savings","pump-tdh"],
+  "wet-well-cycle-time": ["confined-space-vent","pump-tdh","water-hammer-surge"],
+  "main-flushing-volume": ["pipe-volume","pressure-zone-hgl","main-disinfection-chlorine"],
+  "pressure-zone-hgl": ["main-flushing-volume","pump-tdh","water-hammer-surge"],
   // spec-v1622..v1631: HVAC test-and-balance and hydronic systems band.
   "flow-hood-correction": ["pitot-traverse-cfm","proportional-balance-ratio","traverse-closure"],
   "fan-system-effect": ["fan-affinity-laws","duct-leakage","flow-hood-correction"],

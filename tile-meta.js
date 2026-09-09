@@ -1179,6 +1179,13 @@ const _TILES = [
   ["arc-rated-clothing-selection", "G"],
   ["fixed-ladder-fall-protection", "G"],
   ["retrieval-winch-force", "G"],
+  // spec-v1588..v1590, v1605..v1607 water systems band
+  ["step-drawdown-efficiency", "M"],
+  ["well-casing-purge-volume", "M"],
+  ["constant-pressure-well-vfd", "M"],
+  ["wet-well-cycle-time", "M"],
+  ["main-flushing-volume", "M"],
+  ["pressure-zone-hgl", "M"],
   // spec-v1622..v1631 HVAC test-and-balance and hydronic systems band
   ["flow-hood-correction", "C"],
   ["fan-system-effect", "C"],

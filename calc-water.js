@@ -31,6 +31,62 @@ const _finiteGuard = (o) => {
 // Pounds/day = flow (MGD) * dose (mg/L) * 8.34
 // Adjusted dose = pounds_target / (flow * purity_pct/100 * 8.34)
 
+// Compact renderer factory, copied verbatim from calc-hygiene.js (same
+// ui-fields imports); only the inner render function's name differs, so the
+// schema-coverage gates read it unchanged. Placed ABOVE the module's first
+// export, because check-render-output-keys attributes a non-exported
+// helper's returns to the export before it.
+function _simpleRenderer(spec) {
+  const _wtRender = function (inputRegion, outputRegion, citationEl) {
+    citationEl.textContent = spec.citation;
+    attachExampleButton(inputRegion, () => fillExample(spec.example));
+    const fields = {};
+    for (const f of spec.fields) {
+      let field;
+      if (f.kind === "select") field = makeSelect(f.label, f.id || f.key, f.options);
+      else field = makeNumber(f.label, f.id || f.key, f.attrs || { step: "any", min: "0" });
+      fields[f.key] = field;
+      if (f.default !== undefined) {
+        if (f.kind === "select") field.select.value = f.default;
+        else field.input.value = String(f.default);
+      }
+      inputRegion.appendChild(field.wrap);
+    }
+    const outs = {};
+    for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    function fillExample(v) {
+      for (const f of spec.fields) {
+        if (v[f.key] === undefined) continue;
+        if (f.kind === "select") fields[f.key].select.value = v[f.key];
+        else fields[f.key].input.value = v[f.key];
+      }
+      update();
+    }
+    const update = debounce(() => {
+      const params = {};
+      for (const f of spec.fields) {
+        if (f.kind === "select") params[f.key] = fields[f.key].select.value;
+        else params[f.key] = Number(fields[f.key].input.value) || 0;
+      }
+      const r = spec.compute(params);
+      if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
+      for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
+    }, DEBOUNCE_MS);
+    for (const f of spec.fields) {
+      const el = f.kind === "select" ? fields[f.key].select : fields[f.key].input;
+      el.addEventListener(f.kind === "select" ? "change" : "input", update);
+    }
+  };
+
+  _wtRender.schema = {
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
+    citation: spec.citation ?? null,
+    scope: spec.scope ?? null,
+  };
+  return _wtRender;
+}
+
 export const CHEMICAL_PURITY = {
   chlorine_gas:           { pct: 100,  label: "Chlorine gas (Cl2)" },
   sodium_hypochlorite:    { pct: 12.5, label: "Sodium hypochlorite (12.5%)" },
@@ -2164,3 +2220,492 @@ function _v992renderTwoSourceBlend(inputRegion, outputRegion, citationEl) {
   for (const f of [f1, c1, f2, c2, tc]) f.input.addEventListener("input", update);
 }
 WATER_RENDERERS["two-source-blend"] = _v992renderTwoSourceBlend;
+
+// =====================================================================
+// spec-v1588: step-drawdown test and well efficiency.
+// =====================================================================
+//
+// Total drawdown splits into a term LINEAR in flow (the aquifer's own loss,
+// which is a property of the formation and cannot be improved) and a term
+// QUADRATIC in flow (turbulent loss at the screen and pack, which is the
+// well fighting itself and IS recoverable). A step test at three or more
+// rates separates them: plotting s/Q against Q gives the intercept B and the
+// slope C, fitted here by least squares.
+// dims: in { q1_gpm: L^3 T^-1, s1_ft: L, q2_gpm: L^3 T^-1, s2_ft: L, q3_gpm: L^3 T^-1, s3_ft: L, operating_gpm: L^3 T^-1, efficiency_threshold_pct: dimensionless, previous_efficiency_pct: dimensionless } out: { b_ft_per_gpm: T L^-2, c_ft_per_gpm2: T^2 L^-5, aquifer_loss_ft: L, well_loss_ft: L, total_drawdown_ft: L, efficiency_pct: dimensionless, specific_capacity_gpm_ft: L^2 T^-1 }
+export function computeStepDrawdownEfficiency({
+  q1_gpm = 0, s1_ft = 0, q2_gpm = 0, s2_ft = 0, q3_gpm = 0, s3_ft = 0,
+  operating_gpm = 0, efficiency_threshold_pct = 65, previous_efficiency_pct = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const steps = [[q1_gpm, s1_ft], [q2_gpm, s2_ft], [q3_gpm, s3_ft]].filter(([q, s]) => q > 0 && s > 0);
+  if (steps.length < 2) return { error: "At least two steps with a positive rate and drawdown are needed to separate aquifer loss from well loss." };
+  if (!(operating_gpm > 0)) return { error: "The operating rate must be positive (gpm)." };
+  if (efficiency_threshold_pct < 0 || efficiency_threshold_pct > 100) return { error: "The efficiency threshold must be between 0 and 100 percent." };
+  if (previous_efficiency_pct < 0 || previous_efficiency_pct > 100) return { error: "A previous efficiency must be between 0 and 100 percent." };
+  // Least squares on (Q, s/Q): intercept B, slope C.
+  const n = steps.length;
+  const xs = steps.map(([q]) => q);
+  const ys = steps.map(([q, s]) => s / q);
+  const sx = xs.reduce((a, b) => a + b, 0), sy = ys.reduce((a, b) => a + b, 0);
+  const sxy = xs.reduce((a, x, i) => a + x * ys[i], 0), sxx = xs.reduce((a, x) => a + x * x, 0);
+  const denom = n * sxx - sx * sx;
+  if (!(Math.abs(denom) > 1e-12)) return { error: "The steps must be at different pumping rates to fit the loss coefficients." };
+  const c_ft_per_gpm2 = (n * sxy - sx * sy) / denom;
+  const b_ft_per_gpm = (sy - c_ft_per_gpm2 * sx) / n;
+  if (!(b_ft_per_gpm > 0)) return { error: "The fitted aquifer loss coefficient is not positive -- check the step drawdowns, which must rise with rate." };
+  const aquifer_loss_ft = b_ft_per_gpm * operating_gpm;
+  const well_loss_ft = c_ft_per_gpm2 * operating_gpm * operating_gpm;
+  const total_drawdown_ft = aquifer_loss_ft + well_loss_ft;
+  if (!(total_drawdown_ft > 0)) return { error: "Total drawdown at the operating rate is not positive." };
+  const efficiency_pct = aquifer_loss_ft / total_drawdown_ft * 100;
+  const specific_capacity_gpm_ft = operating_gpm / total_drawdown_ft;
+  const fit_verdict = "fitting s/Q against Q across " + fmt(n, 0) + " steps gives B = " + fmt(b_ft_per_gpm, 5) + " ft per gpm of aquifer loss and C = " + fmt(c_ft_per_gpm2, 8) + " ft per gpm squared of well loss";
+  const split_verdict = "at " + fmt(operating_gpm, 0) + " gpm the drawdown is " + fmt(total_drawdown_ft, 1) + " ft: " + fmt(aquifer_loss_ft, 1) + " ft of aquifer loss and " + fmt(well_loss_ft, 1) + " ft of WELL loss. Specific capacity is " + fmt(specific_capacity_gpm_ft, 2) + " gpm per ft";
+  const below_threshold = efficiency_pct < efficiency_threshold_pct;
+  const efficiency_verdict = "well efficiency is " + fmt(efficiency_pct, 1) + "% -- " + fmt(well_loss_ft, 1) + " ft of the " + fmt(total_drawdown_ft, 1) + " is the well fighting itself, and THAT part is recoverable by rehabilitation. The aquifer loss is a property of the formation and is not"
+    + (below_threshold
+      ? ". That is BELOW the " + fmt(efficiency_threshold_pct, 0) + "% threshold entered, so the screen and pack warrant investigation"
+      : ". That is at or above the " + fmt(efficiency_threshold_pct, 0) + "% threshold entered");
+  // The quadratic term is why a light-duty test finds nothing.
+  const lightRate = operating_gpm / 3;
+  const lightEfficiency = (b_ft_per_gpm * lightRate) / (b_ft_per_gpm * lightRate + c_ft_per_gpm2 * lightRate * lightRate) * 100;
+  const rate_verdict = "AND EFFICIENCY DEPENDS ON THE RATE YOU TEST AT. The well loss is QUADRATIC in flow, so at " + fmt(lightRate, 0) + " gpm this same well runs " + fmt(lightEfficiency, 0) + "% efficient -- a light-duty test would have found nothing wrong. Test at the rate the well actually runs, or the number describes a well nobody operates";
+  const has_previous = previous_efficiency_pct > 0;
+  const efficiency_change_pts = has_previous ? efficiency_pct - previous_efficiency_pct : 0;
+  const trend_verdict = !has_previous
+    ? "(no previous test entered -- and the TREND is worth more than the number, because a well's efficiency when new is the baseline its later tests are read against)"
+    : efficiency_change_pts < 0
+      ? "against a previous " + fmt(previous_efficiency_pct, 0) + "% at the same rate the well has LOST " + fmt(-efficiency_change_pts, 1) + " points, which is incrustation or plugging at the screen. That trend is the case for rehabilitation, and it is more informative than any single reading"
+      : "against a previous " + fmt(previous_efficiency_pct, 0) + "% the well has gained " + fmt(efficiency_change_pts, 1) + " points, which is what a successful rehabilitation looks like";
+  if (![b_ft_per_gpm, c_ft_per_gpm2, aquifer_loss_ft, well_loss_ft, total_drawdown_ft, efficiency_pct, specific_capacity_gpm_ft].every(Number.isFinite)) return { error: "Step drawdown math is not a finite value." };
+  return {
+    steps_used: n, b_ft_per_gpm, c_ft_per_gpm2, fit_verdict,
+    aquifer_loss_ft, well_loss_ft, total_drawdown_ft, specific_capacity_gpm_ft, split_verdict,
+    efficiency_pct, below_threshold, efficiency_verdict,
+    light_rate_efficiency_pct: lightEfficiency, rate_verdict,
+    has_previous, efficiency_change_pts, trend_verdict,
+    note: "What a single-rate test cannot tell you: how much of a well's drawdown is the aquifer, and how much is the well itself. Total drawdown is B times the flow plus C times the flow squared. The linear term is formation loss -- a property of the aquifer, and not something any amount of work on the well will improve. The quadratic term is turbulent loss at the screen and the gravel pack, and it is the part that degrades over a well's life and the part rehabilitation recovers. Pumping at three or more increasing rates and plotting drawdown over flow against flow separates them: the intercept is B and the slope is C, fitted here by least squares. WELL EFFICIENCY IS THE AQUIFER LOSS OVER THE TOTAL, and the useful reading of a low number is not that the well is bad but that a specific, recoverable quantity of head is being spent on turbulence at the screen. Feet of well loss convert directly into pumping energy, every hour the well runs. THE RATE YOU TEST AT DETERMINES THE ANSWER, which is the trap. Well loss goes with the SQUARE of flow, so a well that is 62 percent efficient at its operating rate can be 83 percent efficient at a third of it. A light-duty test finds nothing wrong with a well that is in trouble at the rate it actually runs, and a test rate chosen for convenience describes a well nobody operates. THE TREND IS WORTH MORE THAN THE NUMBER. A well's efficiency when new is the baseline every later test is read against; the same well losing twenty points over five years at the same rate is incrusting, and that trajectory is the case for rehabilitation in a way an absolute figure never is. Which is why the test is worth running when the well is new, when nobody thinks they need it. This fits and evaluates entered step data. It does not conduct or design a step test (the steps must be long enough for drawdown to stabilise at each rate, which is the part most often done badly), determine aquifer properties -- transmissivity and storativity come from a constant-rate test, not this one -- diagnose WHY efficiency is low (incrustation, biofouling, sand pumping, plugging and a poorly developed pack all read the same here), select or design a rehabilitation, size a pump, or address well construction, screen selection or development. AWWA A100, the driller's log and the hydrogeologist govern.",
+  };
+}
+export const stepDrawdownEfficiencyExample = { inputs: { q1_gpm: 300, s1_ft: 12, q2_gpm: 600, s2_ft: 28, q3_gpm: 900, s3_ft: 48, operating_gpm: 900, efficiency_threshold_pct: 65, previous_efficiency_pct: 84 } };
+WATER_RENDERERS["step-drawdown-efficiency"] = _simpleRenderer({
+  citation: "Citation: the step-drawdown relation s = BQ + CQ², where BQ is aquifer (formation) loss and CQ² is turbulent well loss at the screen and pack; well efficiency = BQ / (BQ + CQ²). B and C are fitted by least squares from the entered steps by plotting s/Q against Q. Efficiency depends on the RATE tested, because well loss is quadratic -- a light-duty test finds nothing wrong with a well that is in trouble at its operating rate. It does not design or conduct a step test, determine aquifer transmissivity or storativity (those come from a constant-rate test), diagnose why efficiency is low, design a rehabilitation, or size a pump. AWWA A100, the driller's log and the hydrogeologist govern.",
+  example: stepDrawdownEfficiencyExample.inputs,
+  fields: [
+    { key: "q1_gpm", label: "Step 1 rate (gpm)", kind: "number", attrs: { step: "any" } },
+    { key: "s1_ft", label: "Step 1 stabilized drawdown (ft)", kind: "number", attrs: { step: "any" } },
+    { key: "q2_gpm", label: "Step 2 rate (gpm)", kind: "number", attrs: { step: "any" } },
+    { key: "s2_ft", label: "Step 2 stabilized drawdown (ft)", kind: "number", attrs: { step: "any" } },
+    { key: "q3_gpm", label: "Step 3 rate (gpm, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "s3_ft", label: "Step 3 stabilized drawdown (ft, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "operating_gpm", label: "Operating rate to evaluate (gpm)", kind: "number", attrs: { step: "any" } },
+    { key: "efficiency_threshold_pct", label: "Rehabilitation threshold (%)", kind: "number", default: 65, attrs: { step: "any" } },
+    { key: "previous_efficiency_pct", label: "Previous test efficiency (%, 0 to skip)", kind: "number", attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "f", id: "sde-out-f", label: "Fitted coefficients", value: (r) => r.fit_verdict },
+    { key: "s", id: "sde-out-s", label: "Drawdown split", value: (r) => r.split_verdict },
+    { key: "e", id: "sde-out-e", label: "Well efficiency", value: (r) => r.efficiency_verdict },
+    { key: "r", id: "sde-out-r", label: "Why the test rate matters", value: (r) => r.rate_verdict },
+    { key: "t", id: "sde-out-t", label: "Against the previous test", value: (r) => r.trend_verdict },
+    { key: "n", id: "sde-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeStepDrawdownEfficiency,
+});
+
+// =====================================================================
+// spec-v1589: well casing storage, purge volume, and disinfection dose.
+// =====================================================================
+//
+// The spec prints TWO figures for the same disinfection volume, ten times
+// apart: "volume of 12.5% solution ~ 0.02 gal -- roughly 0.22 gal". Working
+// it: 279 gal at 100 mg/L is 0.233 lb of available chlorine, so 1.86 lb of
+// 12.5% solution -- 0.22 gal at water density, or 0.19 gal at the roughly
+// 10 lb/gal a hypochlorite solution actually weighs. The 0.02 is a decimal
+// slip. Solution strength and density are entered here so the figure comes
+// out of the arithmetic rather than a slipped constant.
+// =====================================================================
+const _WELL_GAL_PER_FT_COEFF = 0.0408; // gal per ft of a round casing, diameter in inches
+const _WELL_LB_PER_MG_MGL = 8.34;
+// dims: in { casing_diameter_in: L, well_depth_ft: L, static_water_level_ft: L, purge_volumes: dimensionless, purge_rate_gpm: L^3 T^-1, target_dose_mg_l: dimensionless, solution_strength_pct: dimensionless, solution_lb_per_gal: M L^-3 } out: { gal_per_ft: L^2, standing_column_ft: L, casing_volume_gal: L^3, purge_volume_gal: L^3, purge_minutes: T, chlorine_lb: M, solution_gal: L^3 }
+export function computeWellCasingPurgeVolume({
+  casing_diameter_in = 0, well_depth_ft = 0, static_water_level_ft = 0,
+  purge_volumes = 3, purge_rate_gpm = 0,
+  target_dose_mg_l = 0, solution_strength_pct = 12.5, solution_lb_per_gal = 10.0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(casing_diameter_in > 0)) return { error: "Casing diameter must be positive (in)." };
+  if (!(well_depth_ft > 0)) return { error: "Well depth must be positive (ft)." };
+  if (static_water_level_ft < 0) return { error: "Static water level cannot be negative." };
+  if (!(well_depth_ft > static_water_level_ft)) return { error: "The well depth must exceed the static water level -- there would be no standing column." };
+  if (!(purge_volumes > 0)) return { error: "The number of purge volumes must be positive." };
+  if (purge_rate_gpm < 0 || target_dose_mg_l < 0) return { error: "Purge rate and dose cannot be negative." };
+  if (!(solution_strength_pct > 0) || solution_strength_pct > 100) return { error: "Solution strength must be above 0 and no more than 100 percent." };
+  if (!(solution_lb_per_gal > 0)) return { error: "Solution density must be positive (lb/gal)." };
+  const gal_per_ft = _WELL_GAL_PER_FT_COEFF * casing_diameter_in * casing_diameter_in;
+  const standing_column_ft = well_depth_ft - static_water_level_ft;
+  const casing_volume_gal = gal_per_ft * standing_column_ft;
+  const volume_verdict = "a " + fmt(casing_diameter_in, 1) + " in casing holds " + fmt(gal_per_ft, 2) + " gal per foot, and " + fmt(standing_column_ft, 0) + " ft of standing column (" + fmt(well_depth_ft, 0) + " ft deep less a " + fmt(static_water_level_ft, 0) + " ft static level) is " + fmt(casing_volume_gal, 0) + " gallons";
+  const purge_volume_gal = casing_volume_gal * purge_volumes;
+  const has_rate = purge_rate_gpm > 0;
+  const purge_minutes = has_rate ? purge_volume_gal / purge_rate_gpm : 0;
+  const purge_verdict = "purging " + fmt(purge_volumes, 1) + " casing volumes before sampling is " + fmt(purge_volume_gal, 0) + " gallons"
+    + (has_rate
+      ? ", which at " + fmt(purge_rate_gpm, 1) + " gpm is " + fmt(purge_minutes, 0) + " minutes -- the number that decides whether a sampling visit is a twenty-minute job or a two-hour one"
+      : ". (No purge rate entered, and the TIME is what decides how a sampling visit is scheduled)");
+  const has_dose = target_dose_mg_l > 0;
+  const chlorine_lb = has_dose ? casing_volume_gal / 1e6 * _WELL_LB_PER_MG_MGL * target_dose_mg_l : 0;
+  const solution_lb = has_dose ? chlorine_lb / (solution_strength_pct / 100) : 0;
+  const solution_gal = has_dose ? solution_lb / solution_lb_per_gal : 0;
+  const dose_verdict = !has_dose
+    ? "(no disinfection dose entered)"
+    : "dosing the standing column to " + fmt(target_dose_mg_l, 0) + " mg/L needs " + fmt(chlorine_lb, 3) + " lb of available chlorine, which is " + fmt(solution_lb, 2) + " lb of " + fmt(solution_strength_pct, 1) + "% solution -- " + fmt(solution_gal, 3) + " gallons at " + fmt(solution_lb_per_gal, 1) + " lb/gal. Note that a hypochlorite solution is DENSER than water, so using 8.34 lb/gal overstates the volume by about 20%";
+  const formation_verdict = !has_dose
+    ? "(no disinfection dose entered)"
+    : "AND THAT DOSE TREATS THE CASING ONLY. The gravel pack and the near-well formation hold water too -- often a comparable volume -- so the practical dose is increased and the chlorine is agitated and given time to reach the formation. Dosing the casing volume alone disinfects the part of the well that was already cleanest, and the sample comes back clean while the source of the contamination is untouched";
+  const purge_purpose_verdict = "The purge exists because water standing in a casing is not the water the aquifer is producing: it has exchanged gases with the air in the well, may have picked up metals from the casing, and has had time to change temperature and chemistry. Purging until the field parameters stabilise is the better criterion than a fixed number of volumes, and a low-flow sample taken at the screen avoids most of the argument";
+  if (![gal_per_ft, standing_column_ft, casing_volume_gal, purge_volume_gal, purge_minutes, chlorine_lb, solution_gal].every(Number.isFinite)) return { error: "Casing volume math is not a finite value." };
+  return {
+    gal_per_ft, standing_column_ft, casing_volume_gal, volume_verdict,
+    purge_volume_gal, has_rate, purge_minutes, purge_verdict,
+    has_dose, chlorine_lb, solution_lb, solution_gal, dose_verdict,
+    formation_verdict, purge_purpose_verdict,
+    note: "How much water stands in a well casing, how long purging it takes, and what disinfecting it costs in chlorine. The volume is the standard 0.0408 times the diameter in inches squared, giving gallons per foot, times the standing column -- the depth below the static water level rather than the drilled depth, which is the term most often got wrong. THE TIME IS THE USEFUL OUTPUT. Three casing volumes at a modest purge rate turns a sampling visit from a twenty-minute job into a two-hour one, and knowing that before driving out is the difference between a planned day and a rescheduled one. The purge exists because water standing in a casing is not what the aquifer is producing: it has exchanged gases with the air in the well, may have picked up metals from the casing, and has had time to change temperature and chemistry. Purging until field parameters stabilise is a better criterion than a fixed count of volumes, and a low-flow sample drawn at the screen avoids most of the argument. THE DISINFECTION DOSE HAS A UNIT TRAP AND A SCOPE TRAP. The unit trap is the solution: available chlorine is a percentage BY WEIGHT of a solution that is denser than water, so converting pounds of solution to gallons at 8.34 lb/gal overstates the volume by roughly a fifth. Strength and density are both entered here rather than assumed. The scope trap is larger. A dose computed on the casing volume treats the CASING. The gravel pack and the near-well formation hold a comparable volume of water, and chlorine that never reaches them disinfects the part of the well that was already cleanest -- so the practical dose is increased, agitated, and given contact time, and a well disinfected on the casing figure alone can return a clean sample while the source of the contamination sits untouched a few inches outside the screen. This computes volumes and doses from entered dimensions. It does not determine a purge protocol or a sampling method, size the formation and pack volume (which depends on the borehole diameter, the pack gradation and its porosity), specify a disinfection procedure, contact time or the neutralisation and discharge of the purge water, evaluate a bacteriological result, or address well construction or the annular seal that most often explains a contaminated well. AWWA A100 and C654, the applicable state well code, and the licensed driller or water system operator govern.",
+  };
+}
+export const wellCasingPurgeVolumeExample = { inputs: { casing_diameter_in: 6, well_depth_ft: 280, static_water_level_ft: 90, purge_volumes: 3, purge_rate_gpm: 15, target_dose_mg_l: 100, solution_strength_pct: 12.5, solution_lb_per_gal: 10.0 } };
+WATER_RENDERERS["well-casing-purge-volume"] = _simpleRenderer({
+  citation: "Citation: casing volume = 0.0408 × diameter(in)² gal/ft × the STANDING COLUMN (depth less the static water level), with the purge at an entered number of casing volumes. Chlorine demand = MG × 8.34 × mg/L, converted to solution volume at an ENTERED strength and density -- a hypochlorite solution is denser than water, so using 8.34 lb/gal for the solution overstates the volume by about 20%. The dose treats the CASING; the gravel pack and near-well formation hold a comparable volume. It does not set a purge protocol or sampling method, size the pack volume, specify contact time or purge-water neutralisation, or address the annular seal. AWWA A100 / C654 and the state well code govern.",
+  example: wellCasingPurgeVolumeExample.inputs,
+  fields: [
+    { key: "casing_diameter_in", label: "Casing inside diameter (in)", kind: "number", attrs: { step: "any" } },
+    { key: "well_depth_ft", label: "Well depth (ft)", kind: "number", attrs: { step: "any" } },
+    { key: "static_water_level_ft", label: "Static water level (ft below grade)", kind: "number", attrs: { step: "any" } },
+    { key: "purge_volumes", label: "Casing volumes to purge", kind: "number", default: 3, attrs: { step: "any" } },
+    { key: "purge_rate_gpm", label: "Purge pump rate (gpm, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "target_dose_mg_l", label: "Disinfection dose (mg/L, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "solution_strength_pct", label: "Hypochlorite strength (% available chlorine)", kind: "number", default: 12.5, attrs: { step: "any" } },
+    { key: "solution_lb_per_gal", label: "Solution density (lb/gal)", kind: "number", default: 10.0, attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "v", id: "wcp-out-v", label: "Standing volume", value: (r) => r.volume_verdict },
+    { key: "p", id: "wcp-out-p", label: "Purge", value: (r) => r.purge_verdict },
+    { key: "d", id: "wcp-out-d", label: "Disinfection dose", value: (r) => r.dose_verdict },
+    { key: "f", id: "wcp-out-f", label: "What the dose does not reach", value: (r) => r.formation_verdict },
+    { key: "w", id: "wcp-out-w", label: "Why purge at all", value: (r) => r.purge_purpose_verdict },
+    { key: "n", id: "wcp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWellCasingPurgeVolume,
+});
+
+// =====================================================================
+// spec-v1590: constant-pressure well VFD setpoint and flow.
+// =====================================================================
+// dims: in { static_lift_ft: L, friction_at_design_ft: L, design_flow_gpm: L^3 T^-1, setpoint_psi: M L^-1 T^-2, reduced_flow_gpm: L^3 T^-1, full_speed_rpm: T^-1, drawdown_at_design_ft: L, pump_max_head_ft: L } out: { setpoint_head_ft: L, head_at_design_ft: L, head_at_reduced_ft: L, speed_at_reduced_rpm: T^-1, speed_reduction_pct: dimensionless, head_with_drawdown_ft: L }
+export function computeConstantPressureWellVfd({
+  static_lift_ft = 0, friction_at_design_ft = 0, design_flow_gpm = 0, setpoint_psi = 0,
+  reduced_flow_gpm = 0, full_speed_rpm = 3450, drawdown_at_design_ft = 0, pump_max_head_ft = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(static_lift_ft > 0)) return { error: "Static lift must be positive (ft)." };
+  if (friction_at_design_ft < 0) return { error: "Friction head cannot be negative." };
+  if (!(design_flow_gpm > 0)) return { error: "Design flow must be positive (gpm)." };
+  if (!(setpoint_psi > 0)) return { error: "The pressure setpoint must be positive (psi)." };
+  if (reduced_flow_gpm < 0 || reduced_flow_gpm > design_flow_gpm) return { error: "The reduced flow must be between 0 and the design flow." };
+  if (!(full_speed_rpm > 0)) return { error: "Full speed must be positive (rpm)." };
+  if (drawdown_at_design_ft < 0 || pump_max_head_ft < 0) return { error: "Drawdown and pump maximum head cannot be negative." };
+  const setpoint_head_ft = setpoint_psi * 2.31;
+  const head_at_design_ft = static_lift_ft + friction_at_design_ft + setpoint_head_ft;
+  const design_verdict = "holding " + fmt(setpoint_psi, 0) + " psi (" + fmt(setpoint_head_ft, 0) + " ft) at " + fmt(design_flow_gpm, 0) + " gpm takes " + fmt(head_at_design_ft, 0) + " ft of head: " + fmt(static_lift_ft, 0) + " ft of static lift, " + fmt(friction_at_design_ft, 0) + " ft of friction, and the setpoint";
+  const has_reduced = reduced_flow_gpm > 0;
+  // Friction is the ONLY speed-sensitive term, and it goes with flow squared.
+  const flow_ratio = has_reduced ? reduced_flow_gpm / design_flow_gpm : 1;
+  const friction_at_reduced_ft = friction_at_design_ft * flow_ratio * flow_ratio;
+  const head_at_reduced_ft = has_reduced ? static_lift_ft + friction_at_reduced_ft + setpoint_head_ft : 0;
+  const speed_at_reduced_rpm = has_reduced ? full_speed_rpm * Math.sqrt(head_at_reduced_ft / head_at_design_ft) : 0;
+  const speed_reduction_pct = has_reduced ? (1 - speed_at_reduced_rpm / full_speed_rpm) * 100 : 0;
+  const reduced_verdict = !has_reduced
+    ? "(no reduced flow entered -- and the point of this is what happens to the SPEED when demand falls)"
+    : "at " + fmt(reduced_flow_gpm, 0) + " gpm the friction falls to " + fmt(friction_at_reduced_ft, 1) + " ft and the head required is " + fmt(head_at_reduced_ft, 0) + " ft, so the speed is about " + fmt(speed_at_reduced_rpm, 0) + " rpm -- only " + fmt(speed_reduction_pct, 1) + "% slower for a " + fmt((1 - flow_ratio) * 100, 0) + "% reduction in flow";
+  const savings_verdict = !has_reduced
+    ? "(no reduced flow entered)"
+    : "THE CUBE LAW DOES NOT APPLY HERE, and expecting it is the mistake. A VFD saves on the cube of speed only when the head is FRICTION head, which falls with flow. On a well holding a pressure setpoint, static lift and the setpoint are constant and only friction is speed-sensitive -- here " + fmt(friction_at_design_ft, 0) + " ft out of " + fmt(head_at_design_ft, 0) + ", or " + fmt(friction_at_design_ft / head_at_design_ft * 100, 0) + "% of the head. The pump is doing LIFTING work, not friction work, so the speed barely falls and neither does the power. A constant-pressure system is bought for the pressure it holds, not for the energy it saves";
+  const has_drawdown = drawdown_at_design_ft > 0;
+  const head_with_drawdown_ft = has_drawdown ? head_at_design_ft + drawdown_at_design_ft : 0;
+  const has_curve = pump_max_head_ft > 0;
+  const cannot_hold = has_drawdown && has_curve && head_with_drawdown_ft > pump_max_head_ft;
+  const drawdown_verdict = !has_drawdown
+    ? "(no drawdown entered -- and drawdown is what makes the demand-day complaint)"
+    : "AND THE DRAWDOWN MOVES THE TARGET. Pumping " + fmt(design_flow_gpm, 0) + " gpm draws the level down another " + fmt(drawdown_at_design_ft, 0) + " ft, so the head required becomes " + fmt(head_with_drawdown_ft, 0) + " ft"
+      + (!has_curve
+        ? ". (No pump maximum head entered.) The static lift is not a constant -- it grows with the flow being drawn"
+        : cannot_hold
+          ? ". A pump topping out at " + fmt(pump_max_head_ft, 0) + " ft CANNOT hold the setpoint at that flow AT ANY SPEED -- the system loses pressure exactly when demand is highest, which is the complaint that actually gets reported"
+          : ". A pump topping out at " + fmt(pump_max_head_ft, 0) + " ft still covers it, with " + fmt(pump_max_head_ft - head_with_drawdown_ft, 0) + " ft in hand");
+  if (![setpoint_head_ft, head_at_design_ft, head_at_reduced_ft, speed_at_reduced_rpm, speed_reduction_pct, head_with_drawdown_ft].every(Number.isFinite)) return { error: "Constant-pressure VFD math is not a finite value." };
+  return {
+    setpoint_head_ft, head_at_design_ft, design_verdict,
+    has_reduced, flow_ratio, friction_at_reduced_ft, head_at_reduced_ft,
+    speed_at_reduced_rpm, speed_reduction_pct, reduced_verdict, savings_verdict,
+    has_drawdown, head_with_drawdown_ft, has_curve, cannot_hold, drawdown_verdict,
+    note: "What speed a constant-pressure well pump really runs at when demand falls, and why the energy saving is small. The head a well pump must produce is three terms: the static lift to the water, the friction through the pipe, and the pressure setpoint it is holding. Only the FRICTION term is speed-sensitive, and it falls with the square of flow. THE CUBE LAW DOES NOT APPLY, and expecting it is the error this exists to correct. A variable frequency drive saves on the cube of speed when the head is friction head -- a circulating loop, a duct system, a pool. On a well holding a pressure setpoint, static lift and the setpoint are constants that do not care how fast the pump turns, so cutting the flow by three quarters may cut the speed by only a few percent. The pump is doing lifting work rather than friction work, and lifting work does not go away when you slow down. A constant-pressure system is worth buying for the pressure it holds -- steady pressure at every fixture, no pressure tank cycling, no water hammer at the shower when the washer fills -- and it should be sold on that rather than on an energy saving that a friction-dominated system would deliver and this one will not. AND THE DRAWDOWN IS WHAT PRODUCES THE COMPLAINT. Static lift is not a constant: pumping draws the water level down, so the lift at design flow is greater than the lift at rest, and it grows with the flow being drawn. A pump curve that comfortably covers the standing condition can fail to reach the setpoint at high flow with the level drawn down -- and the system then loses pressure at exactly the moment demand is highest, which is the fault that gets reported and the one a static calculation never predicts. Where the required head exceeds what the pump can make, no control strategy recovers it: the answer is a different pump, a lower setpoint, or storage. This computes head and speed from entered figures. It does not select a pump or read a pump curve (the affinity relation here assumes the pump follows its curve, and a real curve is not a perfect square law), size a drive or a motor, compute power or energy (which needs the curve and the motor and drive efficiencies at each speed), model the well's drawdown against rate -- that is a step test -- address minimum flow, thermal protection at low speed, or the cooling flow a submersible motor needs, or evaluate pressure tank sizing and control settings. The pump manufacturer's curve, the well's own test data, and the pump installer govern.",
+  };
+}
+export const constantPressureWellVfdExample = { inputs: { static_lift_ft: 180, friction_at_design_ft: 25, design_flow_gpm: 20, setpoint_psi: 50, reduced_flow_gpm: 5, full_speed_rpm: 3450, drawdown_at_design_ft: 40, pump_max_head_ft: 340 } };
+WATER_RENDERERS["constant-pressure-well-vfd"] = _simpleRenderer({
+  citation: "Citation: total head = static lift + friction + setpoint (psi × 2.31 ft/psi), with friction the ONLY speed-sensitive term, falling with the square of flow; the speed follows the affinity relation N₂ = N₁ × √(H₂/H₁). The cube law for power applies to friction-dominated systems, NOT to a well holding a pressure setpoint, where static lift and setpoint are constant. Drawdown adds to the static lift and grows with flow. It does not select a pump or read a real curve, size a drive or motor, compute power or energy, model drawdown against rate (that is a step test), or address minimum flow and submersible motor cooling. The pump manufacturer's curve and the well's test data govern.",
+  example: constantPressureWellVfdExample.inputs,
+  fields: [
+    { key: "static_lift_ft", label: "Static lift to water (ft)", kind: "number", attrs: { step: "any" } },
+    { key: "friction_at_design_ft", label: "Friction head at design flow (ft)", kind: "number", attrs: { step: "any" } },
+    { key: "design_flow_gpm", label: "Design flow (gpm)", kind: "number", attrs: { step: "any" } },
+    { key: "setpoint_psi", label: "Pressure setpoint (psi)", kind: "number", attrs: { step: "any" } },
+    { key: "reduced_flow_gpm", label: "Reduced flow to evaluate (gpm, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "full_speed_rpm", label: "Full speed (rpm)", kind: "number", default: 3450, attrs: { step: "any" } },
+    { key: "drawdown_at_design_ft", label: "Drawdown at design flow (ft, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "pump_max_head_ft", label: "Pump maximum head (ft, 0 to skip)", kind: "number", attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "d", id: "cpv-out-d", label: "At design flow", value: (r) => r.design_verdict },
+    { key: "r", id: "cpv-out-r", label: "At reduced flow", value: (r) => r.reduced_verdict },
+    { key: "s", id: "cpv-out-s", label: "Why the cube law does not apply", value: (r) => r.savings_verdict },
+    { key: "w", id: "cpv-out-w", label: "With drawdown", value: (r) => r.drawdown_verdict },
+    { key: "n", id: "cpv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConstantPressureWellVfd,
+});
+
+// =====================================================================
+// spec-v1605: lift station wet-well volume and cycle time.
+// =====================================================================
+//
+// The governing case is inflow at HALF the pump rate, which is where a
+// fixed-speed station cycles fastest: V = t x Q / 4 falls straight out of
+// maximising fill time plus draw time.
+// =====================================================================
+const _WW_GAL_PER_CU_FT = 7.481;
+// dims: in { pump_gpm: L^3 T^-1, well_diameter_ft: L, min_cycle_minutes: T, max_starts_per_hour: dimensionless, inflow_gpm: L^3 T^-1 } out: { active_volume_gal: L^3, area_ft2: L^2, gal_per_ft: L^2, level_differential_ft: L, worst_case_inflow_gpm: L^3 T^-1, cycle_at_inflow_min: T }
+export function computeWetWellCycleTime({
+  pump_gpm = 0, well_diameter_ft = 0, min_cycle_minutes = 0, max_starts_per_hour = 0, inflow_gpm = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(pump_gpm > 0)) return { error: "Pump rate must be positive (gpm)." };
+  if (!(well_diameter_ft > 0)) return { error: "Wet well diameter must be positive (ft)." };
+  if (min_cycle_minutes < 0 || max_starts_per_hour < 0) return { error: "Cycle time and starts per hour cannot be negative." };
+  if (!(min_cycle_minutes > 0) && !(max_starts_per_hour > 0)) return { error: "Enter either a minimum cycle time or a maximum starts per hour." };
+  if (inflow_gpm < 0 || inflow_gpm >= pump_gpm) return { error: "Inflow must be at least 0 and below the pump rate -- at or above it the pump never shuts off." };
+  const cycle_min = min_cycle_minutes > 0 ? min_cycle_minutes : 60 / max_starts_per_hour;
+  const starts_per_hour = 60 / cycle_min;
+  // The worst case is inflow at half the pump rate.
+  const worst_case_inflow_gpm = pump_gpm / 2;
+  const active_volume_gal = cycle_min * pump_gpm / 4;
+  const area_ft2 = Math.PI / 4 * well_diameter_ft * well_diameter_ft;
+  const gal_per_ft = area_ft2 * _WW_GAL_PER_CU_FT;
+  const level_differential_ft = active_volume_gal / gal_per_ft;
+  const volume_verdict = "a " + fmt(cycle_min, 1) + " minute minimum cycle (" + fmt(starts_per_hour, 1) + " starts an hour) on a " + fmt(pump_gpm, 0) + " gpm pump needs " + fmt(active_volume_gal, 0) + " gallons of ACTIVE volume -- the volume between the start and stop levels, not the whole well";
+  const geometry_verdict = "a " + fmt(well_diameter_ft, 1) + " ft well is " + fmt(area_ft2, 1) + " sq ft, or " + fmt(gal_per_ft, 0) + " gal per foot of depth, so the level differential is " + fmt(level_differential_ft, 2) + " ft between the start and stop floats";
+  const worst_verdict = "THE GOVERNING CASE IS INFLOW AT HALF THE PUMP RATE, which is " + fmt(worst_case_inflow_gpm, 0) + " gpm here. That is where a fixed-speed station cycles fastest: at a low inflow the well takes a long time to fill, and at an inflow near the pump rate it takes a long time to draw down -- halfway between, both halves are short at once. Sizing on average inflow instead of that worst case is how a station ends up short-cycling at a flow it will certainly see";
+  const has_inflow = inflow_gpm > 0;
+  const fill_min = has_inflow ? active_volume_gal / inflow_gpm : 0;
+  const draw_min = has_inflow ? active_volume_gal / (pump_gpm - inflow_gpm) : 0;
+  const cycle_at_inflow_min = has_inflow ? fill_min + draw_min : 0;
+  const short_cycling = has_inflow && cycle_at_inflow_min < cycle_min;
+  const inflow_verdict = !has_inflow
+    ? "(no actual inflow entered)"
+    : "at " + fmt(inflow_gpm, 0) + " gpm of inflow the well fills in " + fmt(fill_min, 1) + " min and draws down in " + fmt(draw_min, 1) + " min, a " + fmt(cycle_at_inflow_min, 1) + " minute cycle"
+      + (short_cycling
+        ? " -- SHORTER than the " + fmt(cycle_min, 1) + " minute minimum, so the motor is starting more often than its rating allows"
+        : ", which meets the " + fmt(cycle_min, 1) + " minute minimum with " + fmt(cycle_at_inflow_min - cycle_min, 1) + " minutes to spare");
+  const motor_verdict = "The cycle limit is a MOTOR rating rather than a hydraulic one. Starting current is several times running current and the heat it produces has to be shed before the next start, so the manufacturer's permitted starts per hour is the constraint -- and it falls as motors get larger. Short-cycling does not announce itself: it shortens motor life and burns contactors quietly, and the station is diagnosed when something fails rather than when the cycling begins";
+  const septicity_verdict = "AND A BIGGER WELL IS NOT A FREE FIX. Active volume buys cycle time, and it also buys DETENTION TIME -- wastewater sitting in a wet well goes septic, producing hydrogen sulphide that corrodes the structure above the waterline and creates an atmosphere that has killed entrants. The design sits between short-cycling on one side and septicity on the other, which is why variable speed or a second pump at a lower rate is often the real answer rather than a larger well";
+  if (![active_volume_gal, area_ft2, gal_per_ft, level_differential_ft, worst_case_inflow_gpm, cycle_at_inflow_min].every(Number.isFinite)) return { error: "Wet well math is not a finite value." };
+  return {
+    cycle_min, starts_per_hour, worst_case_inflow_gpm, active_volume_gal,
+    area_ft2, gal_per_ft, level_differential_ft,
+    volume_verdict, geometry_verdict, worst_verdict,
+    has_inflow, fill_min, draw_min, cycle_at_inflow_min, short_cycling, inflow_verdict,
+    motor_verdict, septicity_verdict,
+    note: "The active volume a lift station wet well needs so its pump does not start more often than the motor allows. The relation is short -- active volume is the minimum cycle time times the pump rate divided by four -- and the four is the interesting part. THE GOVERNING CASE IS INFLOW AT EXACTLY HALF THE PUMP RATE. At a low inflow the well takes a long time to fill and the cycle is long; at an inflow approaching the pump rate the drawdown takes a long time and the cycle is long again. Halfway between, both halves are short at once, and that is where a fixed-speed station cycles fastest. Sizing on average inflow rather than that worst case produces a station that short-cycles at a flow it will certainly see, usually within its first year. THE CYCLE LIMIT IS A MOTOR RATING, NOT A HYDRAULIC ONE. Starting current is several times running current, and the heat it produces has to be shed before the next start -- so the constraint is the manufacturer's permitted starts per hour, and it falls as motors get larger. Short-cycling gives no immediate symptom. It shortens motor life and burns contactors quietly, and the station gets diagnosed when something fails rather than when the cycling starts, which is why the calculation belongs at design rather than at the first callout. AND A BIGGER WELL IS NOT A FREE FIX, which is the tension the design actually sits in. Active volume buys cycle time, and the same volume buys detention time: wastewater held in a wet well goes septic, generating hydrogen sulphide that corrodes the structure above the waterline and produces an atmosphere that has killed people who entered without testing. So the well is bounded below by short-cycling and above by septicity, and the resolution on a station with a wide flow range is usually variable speed or a second smaller pump rather than more volume. This sizes active volume from an entered cycle limit. It does not size the pump or select it against a system curve, determine the inflow or its diurnal pattern, set float or transducer elevations, address the minimum submergence a pump needs or the clearance below the stop level, evaluate the force main, its velocity, or the surge and air release it needs, model a duplex or alternating arrangement or a variable speed control, or address the ventilation, confined space entry, and corrosion protection a wet well requires. Ten States Standards or the applicable design standard, the pump manufacturer's permitted starts, and the design engineer govern.",
+  };
+}
+export const wetWellCycleTimeExample = { inputs: { pump_gpm: 250, well_diameter_ft: 6, min_cycle_minutes: 10, max_starts_per_hour: 0, inflow_gpm: 125 } };
+WATER_RENDERERS["wet-well-cycle-time"] = _simpleRenderer({
+  citation: "Citation: active wet-well volume V = t × Q / 4, where t is the minimum cycle time and Q the pump rate -- the four falls out of the governing case, inflow at exactly HALF the pump rate, where fill time and draw-down time are both short at once. Level differential = V / (π/4 × D² × 7.481 gal/ft³). The cycle limit is a MOTOR rating (permitted starts per hour), not a hydraulic one. It does not size or select the pump, determine inflow or its diurnal pattern, set float elevations or minimum submergence, evaluate the force main, model duplex or variable-speed arrangements, or address wet-well ventilation, entry and corrosion. Ten States Standards, the pump manufacturer's permitted starts and the design engineer govern.",
+  example: wetWellCycleTimeExample.inputs,
+  fields: [
+    { key: "pump_gpm", label: "Pump rate (gpm)", kind: "number", attrs: { step: "any" } },
+    { key: "well_diameter_ft", label: "Wet well diameter (ft)", kind: "number", attrs: { step: "any" } },
+    { key: "min_cycle_minutes", label: "Minimum cycle time (min, 0 to use starts/hour)", kind: "number", attrs: { step: "any" } },
+    { key: "max_starts_per_hour", label: "Maximum starts per hour (0 if cycle time given)", kind: "number", attrs: { step: "any" } },
+    { key: "inflow_gpm", label: "Actual inflow to check (gpm, 0 to skip)", kind: "number", attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "v", id: "wwc-out-v", label: "Active volume", value: (r) => r.volume_verdict },
+    { key: "g", id: "wwc-out-g", label: "Level differential", value: (r) => r.geometry_verdict },
+    { key: "w", id: "wwc-out-w", label: "The governing case", value: (r) => r.worst_verdict },
+    { key: "i", id: "wwc-out-i", label: "At the entered inflow", value: (r) => r.inflow_verdict },
+    { key: "m", id: "wwc-out-m", label: "Why the limit exists", value: (r) => r.motor_verdict },
+    { key: "s", id: "wwc-out-s", label: "Why not just build it bigger", value: (r) => r.septicity_verdict },
+    { key: "n", id: "wwc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWetWellCycleTime,
+});
+
+// =====================================================================
+// spec-v1606: water main flushing volume, duration, and the velocity trap.
+// =====================================================================
+const _MAIN_GAL_PER_FT_COEFF = 0.0408;
+const _MAIN_GPM_COEFF = 2.448; // gpm = 2.448 x d(in)^2 x v(ft/s)
+// dims: in { main_diameter_in: L, run_length_ft: L, target_velocity_fps: L T^-1, pipe_volumes: dimensionless, available_flow_gpm: L^3 T^-1, hydrant_outlets: dimensionless, outlet_capacity_gpm: L^3 T^-1 } out: { gal_per_ft: L^2, pipe_volume_gal: L^3, required_gpm: L^3 T^-1, duration_min: T, total_discharged_gal: L^3, achieved_velocity_fps: L T^-1 }
+export function computeMainFlushingVolume({
+  main_diameter_in = 0, run_length_ft = 0, target_velocity_fps = 3, pipe_volumes = 3,
+  available_flow_gpm = 0, hydrant_outlets = 0, outlet_capacity_gpm = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(main_diameter_in > 0)) return { error: "Main diameter must be positive (in)." };
+  if (!(run_length_ft > 0)) return { error: "Run length must be positive (ft)." };
+  if (!(target_velocity_fps > 0)) return { error: "Target scouring velocity must be positive (ft/s)." };
+  if (!(pipe_volumes > 0)) return { error: "The number of pipe volumes must be positive." };
+  if (available_flow_gpm < 0 || hydrant_outlets < 0 || outlet_capacity_gpm < 0) return { error: "Available flow, outlet count and outlet capacity cannot be negative." };
+  const gal_per_ft = _MAIN_GAL_PER_FT_COEFF * main_diameter_in * main_diameter_in;
+  const pipe_volume_gal = gal_per_ft * run_length_ft;
+  const required_gpm = _MAIN_GPM_COEFF * main_diameter_in * main_diameter_in * target_velocity_fps;
+  const total_discharged_gal = pipe_volume_gal * pipe_volumes;
+  const duration_min = total_discharged_gal / required_gpm;
+  const volume_verdict = "a " + fmt(main_diameter_in, 0) + " in main holds " + fmt(gal_per_ft, 2) + " gal per foot, so " + fmt(run_length_ft, 0) + " ft is " + fmt(pipe_volume_gal, 0) + " gallons";
+  const flow_verdict = "reaching " + fmt(target_velocity_fps, 1) + " ft/s takes " + fmt(required_gpm, 0) + " gpm, and " + fmt(pipe_volumes, 1) + " pipe volumes at that flow is " + fmt(duration_min, 0) + " minutes and " + fmt(total_discharged_gal, 0) + " gallons discharged -- both worth knowing before opening the hydrant, because that water has to go somewhere and be dechlorinated";
+  // Whether the outlets can actually pass the required flow is the real question.
+  const has_outlets = hydrant_outlets > 0 && outlet_capacity_gpm > 0;
+  const outlet_total_gpm = has_outlets ? hydrant_outlets * outlet_capacity_gpm : 0;
+  const governing_gpm = has_outlets ? Math.min(outlet_total_gpm, available_flow_gpm > 0 ? available_flow_gpm : outlet_total_gpm) : available_flow_gpm;
+  const has_limit = governing_gpm > 0;
+  const achieved_velocity_fps = has_limit ? governing_gpm / (_MAIN_GPM_COEFF * main_diameter_in * main_diameter_in) : 0;
+  const scours = has_limit && achieved_velocity_fps >= target_velocity_fps;
+  const actual_duration_min = has_limit ? total_discharged_gal / governing_gpm : 0;
+  const outlet_verdict = !has_limit
+    ? "(no available flow or hydrant outlet capacity entered -- and whether the outlets can PASS the required flow is the whole question)"
+    : scours
+      ? "the available " + fmt(governing_gpm, 0) + " gpm reaches " + fmt(achieved_velocity_fps, 2) + " ft/s, at or above the target, so the run scours. It takes " + fmt(actual_duration_min, 0) + " minutes at that flow"
+      : "THE AVAILABLE " + fmt(governing_gpm, 0) + " GPM REACHES ONLY " + fmt(achieved_velocity_fps, 2) + " FT/S, below the " + fmt(target_velocity_fps, 1) + " ft/s target -- so this run does NOT scour. The crew flushes for " + fmt(actual_duration_min, 0) + " minutes, discharges " + fmt(total_discharged_gal, 0) + " gallons, and the main is no cleaner. That is the failure this calculation exists to catch";
+  // The diameter at which a single outlet stops being enough.
+  const single_outlet_gpm = outlet_capacity_gpm > 0 ? outlet_capacity_gpm : 1000;
+  const max_diameter_one_outlet = Math.sqrt(single_outlet_gpm / (_MAIN_GPM_COEFF * target_velocity_fps));
+  const unidirectional_verdict = "REQUIRED FLOW GOES WITH THE SQUARE OF DIAMETER, which is why conventional flushing quietly stops working on larger mains. At " + fmt(target_velocity_fps, 1) + " ft/s a single outlet passing " + fmt(single_outlet_gpm, 0) + " gpm can scour a main up to about " + fmt(max_diameter_one_outlet, 1) + " in, and above that it cannot -- opening one hydrant on a larger main produces a velocity that scours almost nothing. UNIDIRECTIONAL FLUSHING, with valves closed to force the water down a defined path and more outlets open, is what makes the velocity, and it is the difference between a programme that cleans the system and one that only uses water";
+  if (![gal_per_ft, pipe_volume_gal, required_gpm, duration_min, total_discharged_gal, achieved_velocity_fps].every(Number.isFinite)) return { error: "Flushing math is not a finite value." };
+  return {
+    gal_per_ft, pipe_volume_gal, required_gpm, duration_min, total_discharged_gal,
+    volume_verdict, flow_verdict,
+    has_outlets, outlet_total_gpm, has_limit, governing_gpm, achieved_velocity_fps,
+    scours, actual_duration_min, outlet_verdict,
+    max_diameter_one_outlet, unidirectional_verdict,
+    note: "How much water a main flush takes, how long it runs, and whether it reaches a scouring velocity at all. Volume is the standard 0.0408 times diameter squared per foot; the flow for a target velocity is 2.448 times diameter squared times the velocity. THE VELOCITY IS THE POINT AND THE VOLUME IS NOT. Flushing works by scouring: moving fast enough to lift the sediment and biofilm off the pipe wall and carry them out. Around 3 ft/s is the usual target, and below it water simply passes through the main and out the hydrant, having disturbed very little. A crew can flush for an hour, discharge thousands of gallons, dechlorinate all of it, log the work, and leave the main exactly as dirty as they found it -- and nothing in that operation looks like a failure. REQUIRED FLOW GOES WITH THE SQUARE OF DIAMETER, which is why conventional flushing stops working as mains get larger. A single hydrant outlet can pass enough to scour a small main and nowhere near enough for a large one, and the transition is not gradual in practice because the outlet's capacity is fixed by its own size and the system pressure. UNIDIRECTIONAL FLUSHING is the answer: closing valves to force the water down a defined path, opening more outlets, and sequencing the runs so each one is fed by already-clean water. It is more planning and more valve work, and it is the difference between a programme that cleans a distribution system and one that consumes water on a schedule. AND THE DISCHARGE IS A REAL CONSTRAINT rather than an afterthought. The water has to go somewhere it will not erode or flood, and chlorinated water reaching a storm drain or a watercourse needs dechlorinating -- which is why the total gallons matters before the hydrant is opened rather than after. This computes volumes, flows and velocities from entered dimensions. It does not model the distribution system's hydraulics or predict the flow a hydrant will actually deliver at system pressure, plan a unidirectional sequence or the valve operations it needs, evaluate water quality or determine when flushing is warranted, size dechlorination, address the pressure drop and the discoloration a flush can cause elsewhere in the system, or account for the customer complaints that follow a badly sequenced one. AWWA M17 and the utility's own flushing programme govern.",
+  };
+}
+export const mainFlushingVolumeExample = { inputs: { main_diameter_in: 8, run_length_ft: 1200, target_velocity_fps: 3, pipe_volumes: 3, available_flow_gpm: 0, hydrant_outlets: 1, outlet_capacity_gpm: 500 } };
+WATER_RENDERERS["main-flushing-volume"] = _simpleRenderer({
+  citation: "Citation: pipe volume = 0.0408 × diameter(in)² gal/ft × length; the flow for a scouring velocity is gpm = 2.448 × diameter(in)² × velocity(ft/s), with about 3 ft/s the usual target. Required flow goes with the SQUARE of diameter, so a single hydrant outlet that scours a small main cannot scour a large one -- unidirectional flushing with valves closed to force the path is what makes the velocity. It does not model distribution hydraulics or predict the flow a hydrant delivers at system pressure, plan a unidirectional sequence, evaluate water quality or decide when flushing is warranted, size dechlorination, or address discoloration elsewhere in the system. AWWA M17 and the utility's flushing programme govern.",
+  example: mainFlushingVolumeExample.inputs,
+  fields: [
+    { key: "main_diameter_in", label: "Main diameter (in)", kind: "number", attrs: { step: "any" } },
+    { key: "run_length_ft", label: "Run length (ft)", kind: "number", attrs: { step: "any" } },
+    { key: "target_velocity_fps", label: "Target scouring velocity (ft/s)", kind: "number", default: 3, attrs: { step: "any" } },
+    { key: "pipe_volumes", label: "Pipe volumes to discharge", kind: "number", default: 3, attrs: { step: "any" } },
+    { key: "hydrant_outlets", label: "Hydrant outlets open (0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "outlet_capacity_gpm", label: "Flow per outlet at system pressure (gpm, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "available_flow_gpm", label: "Or total available flow (gpm, 0 to skip)", kind: "number", attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "v", id: "mfv-out-v", label: "Pipe volume", value: (r) => r.volume_verdict },
+    { key: "f", id: "mfv-out-f", label: "Flow and duration", value: (r) => r.flow_verdict },
+    { key: "o", id: "mfv-out-o", label: "Does it actually scour", value: (r) => r.outlet_verdict },
+    { key: "u", id: "mfv-out-u", label: "Why big mains need unidirectional", value: (r) => r.unidirectional_verdict },
+    { key: "n", id: "mfv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMainFlushingVolume,
+});
+
+// =====================================================================
+// spec-v1607: pressure zone HGL, service pressure, and the elevation band.
+// =====================================================================
+//
+// The spec contradicts its OWN criterion twice in one sentence: "A house at
+// 600 ft is below the band and will see 78 psi -- over the 80 psi limit, and
+// the plumbing code requires a PRV at that service." It computed the band
+// itself as 595 to 688 ft, so 600 ft is INSIDE it, and 77.94 psi is UNDER the
+// 80 psi limit it states. No PRV is required at that service. A house at
+// 590 ft (82.3 psi) is the case it meant to describe. Both the band test and
+// the pressure test are computed here rather than asserted, so the verdict
+// cannot drift from the criterion the same tile prints.
+// =====================================================================
+const _HGL_PSI_PER_FT = 0.433;
+// dims: in { hgl_ft: L, service_elevation_ft: L, min_pressure_psi: M L^-1 T^-2, max_pressure_psi: M L^-1 T^-2, service_relief_ft: L, fire_flow_friction_ft: L } out: { static_psi: M L^-1 T^-2, lowest_servable_ft: L, highest_servable_ft: L, elevation_band_ft: L, zones_required: dimensionless, fire_flow_psi: M L^-1 T^-2 }
+export function computePressureZoneHgl({
+  hgl_ft = 0, service_elevation_ft = 0, min_pressure_psi = 40, max_pressure_psi = 80,
+  service_relief_ft = 0, fire_flow_friction_ft = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(hgl_ft > 0)) return { error: "The hydraulic grade line must be positive (ft)." };
+  if (service_elevation_ft < 0) return { error: "Service elevation cannot be negative." };
+  if (!(min_pressure_psi > 0)) return { error: "The minimum service pressure must be positive (psi)." };
+  if (!(max_pressure_psi > min_pressure_psi)) return { error: "The maximum service pressure must exceed the minimum." };
+  if (service_relief_ft < 0 || fire_flow_friction_ft < 0) return { error: "Service relief and fire flow friction cannot be negative." };
+  const static_psi = (hgl_ft - service_elevation_ft) * _HGL_PSI_PER_FT;
+  const static_verdict = "an HGL of " + fmt(hgl_ft, 0) + " ft over a service at " + fmt(service_elevation_ft, 0) + " ft is " + fmt(hgl_ft - service_elevation_ft, 0) + " ft of head, or " + fmt(static_psi, 1) + " psi static";
+  const lowest_servable_ft = hgl_ft - max_pressure_psi / _HGL_PSI_PER_FT;
+  const highest_servable_ft = hgl_ft - min_pressure_psi / _HGL_PSI_PER_FT;
+  const elevation_band_ft = highest_servable_ft - lowest_servable_ft;
+  const in_band = service_elevation_ft >= lowest_servable_ft && service_elevation_ft <= highest_servable_ft;
+  const band_verdict = "between " + fmt(min_pressure_psi, 0) + " and " + fmt(max_pressure_psi, 0) + " psi this zone serves elevations " + fmt(lowest_servable_ft, 0) + " to " + fmt(highest_servable_ft, 0) + " ft -- a band of " + fmt(elevation_band_ft, 0) + " ft. ONE ZONE IS ONE ELEVATION BAND, and its width is fixed by the pressure range the code allows, not by anything the utility chooses";
+  const service_verdict = in_band
+    ? "the service at " + fmt(service_elevation_ft, 0) + " ft sits inside the band at " + fmt(static_psi, 1) + " psi"
+    : service_elevation_ft < lowest_servable_ft
+      ? "the service at " + fmt(service_elevation_ft, 0) + " ft is BELOW the band and sees " + fmt(static_psi, 1) + " psi -- over the " + fmt(max_pressure_psi, 0) + " psi limit, so the plumbing code requires a pressure reducing valve at that service"
+      : "the service at " + fmt(service_elevation_ft, 0) + " ft is ABOVE the band and sees only " + fmt(static_psi, 1) + " psi -- under the " + fmt(min_pressure_psi, 0) + " psi minimum, so it needs a booster or a higher zone";
+  const has_relief = service_relief_ft > 0;
+  const zones_required = has_relief && elevation_band_ft > 0 ? Math.ceil(service_relief_ft / elevation_band_ft) : 0;
+  const zones_verdict = !has_relief
+    ? "(no service area relief entered)"
+    : "a service area spanning " + fmt(service_relief_ft, 0) + " ft of relief needs " + fmt(zones_required, 0) + " zone" + (zones_required > 1 ? "s" : "") + " at this band width. That is the arithmetic behind why hilly systems have many zones and flat ones have few, and it is a topography question rather than a design preference";
+  const has_fire = fire_flow_friction_ft > 0;
+  const fire_hgl_ft = has_fire ? hgl_ft - fire_flow_friction_ft : 0;
+  const fire_flow_psi = has_fire ? (fire_hgl_ft - service_elevation_ft) * _HGL_PSI_PER_FT : 0;
+  const fire_ok = has_fire && fire_flow_psi >= 20;
+  const fire_verdict = !has_fire
+    ? "(no fire flow friction entered -- and the STATIC case is not the one that governs)"
+    : "under fire flow, " + fmt(fire_flow_friction_ft, 0) + " ft of friction drops the HGL to " + fmt(fire_hgl_ft, 0) + " ft and this service to " + fmt(fire_flow_psi, 1) + " psi"
+      + (fire_ok
+        ? ", still above the 20 psi residual that codes generally require during fire flow"
+        : " -- BELOW the 20 psi residual codes generally require during fire flow, which is the condition that actually sizes mains and storage");
+  const hgl_verdict = "THE HGL IS THE THING TO THINK IN, not the tank level or the pump pressure. It is the elevation to which water would rise in an open tube, so pressure anywhere is simply the HGL less the ground elevation, times 0.433. Under static conditions it is the tank overflow; under flow it falls by the friction between the tank and the point, which is why every pressure in a system is a different number at 2 am and at peak hour";
+  if (![static_psi, lowest_servable_ft, highest_servable_ft, elevation_band_ft, zones_required, fire_flow_psi].every(Number.isFinite)) return { error: "Pressure zone math is not a finite value." };
+  return {
+    static_psi, static_verdict,
+    lowest_servable_ft, highest_servable_ft, elevation_band_ft, in_band, band_verdict, service_verdict,
+    has_relief, zones_required, zones_verdict,
+    has_fire, fire_hgl_ft, fire_flow_psi, fire_ok, fire_verdict, hgl_verdict,
+    note: "What pressure a service sees, and which elevations one pressure zone can serve. All of it comes from the hydraulic grade line: pressure is the HGL less the ground elevation, times 0.433 psi per foot. THE HGL IS THE THING TO THINK IN. It is the elevation water would rise to in an open tube, so it makes every pressure in a system a subtraction rather than a calculation. Under static conditions it is the tank overflow elevation; under flow it falls by the friction between the tank and the point in question, which is why the same service reads one pressure at two in the morning and another at peak hour, and why a complaint about low pressure is a question about when. ONE ZONE IS ONE ELEVATION BAND, and the band's width is not a design choice. It is fixed by the pressure range the code allows -- typically 40 psi at the top of the band and 80 at the bottom -- which at 0.433 psi per foot is a little over 90 feet of relief per zone. A service area spanning more relief than that needs more zones, and the count is arithmetic rather than preference. That is the whole reason a hilly system has many zones, many tanks, many pressure reducing stations and many boundary valves, and a flat one has few. Services outside the band are not failures of the zone; they are services that need a pressure reducing valve below it or a booster above it, and identifying them from the elevation is cheaper than identifying them from complaints. AND THE STATIC CASE IS NOT THE ONE THAT GOVERNS. Codes generally require a residual pressure -- commonly 20 psi -- to be maintained at every service during fire flow, and that condition is what actually sizes mains, storage and pump stations. A zone comfortable at rest can fall below the residual at the far corner during a fire, and the static number gives no warning of it. This computes pressures and bands from an entered HGL. It does not model the distribution network or compute the friction that sets the HGL under any flow (which needs a hydraulic model), determine fire flow requirements or available fire flow, size storage, mains or pumping, locate zone boundaries or pressure reducing stations, address surge, thermal expansion, or the backflow protection a PRV arrangement needs, or evaluate what any jurisdiction requires. AWWA M32, the applicable plumbing and fire codes, and the utility's hydraulic model govern.",
+  };
+}
+export const pressureZoneHglExample = { inputs: { hgl_ft: 780, service_elevation_ft: 620, min_pressure_psi: 40, max_pressure_psi: 80, service_relief_ft: 250, fire_flow_friction_ft: 35 } };
+WATER_RENDERERS["pressure-zone-hgl"] = _simpleRenderer({
+  citation: "Citation: service pressure = (HGL − ground elevation) × 0.433 psi/ft, so a zone's servable elevation band runs from HGL − max/0.433 up to HGL − min/0.433, and the number of zones is the service area's relief divided by that band. Codes generally require a 20 psi residual at every service during fire flow, which is the condition that sizes mains and storage rather than the static case. It does not model the network or compute the friction that sets the HGL under flow, determine required or available fire flow, size storage, mains or pumping, locate zone boundaries or PRV stations, or address surge and backflow protection. AWWA M32, the plumbing and fire codes, and the utility's hydraulic model govern.",
+  example: pressureZoneHglExample.inputs,
+  fields: [
+    { key: "hgl_ft", label: "Hydraulic grade line / tank overflow (ft)", kind: "number", attrs: { step: "any" } },
+    { key: "service_elevation_ft", label: "Service ground elevation (ft)", kind: "number", attrs: { step: "any" } },
+    { key: "min_pressure_psi", label: "Minimum service pressure (psi)", kind: "number", default: 40, attrs: { step: "any" } },
+    { key: "max_pressure_psi", label: "Maximum service pressure (psi)", kind: "number", default: 80, attrs: { step: "any" } },
+    { key: "service_relief_ft", label: "Service area relief (ft, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "fire_flow_friction_ft", label: "Friction to this point at fire flow (ft, 0 to skip)", kind: "number", attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "s", id: "pzh-out-s", label: "Static pressure", value: (r) => r.static_verdict },
+    { key: "b", id: "pzh-out-b", label: "Zone elevation band", value: (r) => r.band_verdict },
+    { key: "v", id: "pzh-out-v", label: "This service", value: (r) => r.service_verdict },
+    { key: "z", id: "pzh-out-z", label: "Zones for the terrain", value: (r) => r.zones_verdict },
+    { key: "f", id: "pzh-out-f", label: "Under fire flow", value: (r) => r.fire_verdict },
+    { key: "h", id: "pzh-out-h", label: "Think in HGL", value: (r) => r.hgl_verdict },
+    { key: "n", id: "pzh-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePressureZoneHgl,
+});

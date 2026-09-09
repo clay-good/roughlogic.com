@@ -22313,6 +22313,80 @@ export const CITATIONS = {
       { name: "Downwash is not modelled", value: "a short stack near buildings can lose its rise entirely", source: "good engineering practice stack height rules" },
     ],
   },
+  // spec-v1588..v1590, v1605..v1607: the 2026-09-09 trade-expansion water
+  // systems band. Six tiles across wells and distribution.
+  "step-drawdown-efficiency": {
+    formula: "the step-drawdown relation s = BQ + CQ^2, with B (aquifer loss) and C (well loss) fitted by least squares from the entered steps by plotting s/Q against Q; well efficiency = BQ / (BQ + CQ^2), and specific capacity = Q / s.",
+    edition: "Step-drawdown testing as AWWA A100 and standard hydrogeologic practice state it. The steps are ENTERED from a field test in which drawdown was allowed to stabilise at each rate.",
+    freeAccess: "One published relation and a two-parameter least-squares fit.",
+    governance: GOVERNANCE.general,
+    editionNote: "The linear term is formation loss, a property of the aquifer that no work on the well improves; the quadratic term is turbulent loss at the screen and pack, and it is what degrades over a well's life and what rehabilitation recovers. EFFICIENCY DEPENDS ON THE RATE YOU TEST AT, which is the trap -- well loss goes with the SQUARE of flow, so a well that is 62% efficient at its operating rate can be 83% efficient at a third of it, and a light-duty test finds nothing wrong with a well that is in trouble where it actually runs. THE TREND IS WORTH MORE THAN THE NUMBER: a well's efficiency when new is the baseline later tests are read against, and the same well losing twenty points over five years at the same rate is incrusting.",
+    assumptions: [
+      { name: "Steps must be stabilised", value: "drawdown still moving at a step biases the fit", source: "the field test procedure" },
+      { name: "Test at the operating rate", value: "efficiency is rate-dependent because well loss is quadratic", source: "AWWA A100" },
+      { name: "Not an aquifer test", value: "transmissivity and storativity come from a constant-rate test", source: "the hydrogeologist" },
+    ],
+  },
+  "well-casing-purge-volume": {
+    formula: "casing volume = 0.0408 x diameter(in)^2 gal/ft x the standing column (depth less static water level); chlorine demand = MG x 8.34 x mg/L, converted to solution volume at an entered strength and density.",
+    edition: "Well casing volumes and disinfection as AWWA A100 and C654 state them. Hypochlorite strength and density are ENTERED because available chlorine is a percentage by weight of a solution denser than water.",
+    freeAccess: "Two standard volume relations and one dose conversion.",
+    governance: GOVERNANCE.general,
+    editionNote: "The standing column -- depth below the STATIC WATER LEVEL, not the drilled depth -- is the term most often got wrong. The purge time is the useful output: three casing volumes at a modest rate turns a sampling visit from a twenty-minute job into a two-hour one. THE DISINFECTION DOSE HAS TWO TRAPS. The unit trap: converting pounds of solution to gallons at 8.34 lb/gal overstates the volume by roughly a fifth, because a hypochlorite solution is denser than water. The scope trap is larger -- a dose computed on the casing volume treats the CASING, while the gravel pack and near-well formation hold a comparable volume, so a well disinfected on the casing figure alone can return a clean sample while the source of contamination sits untouched outside the screen.",
+    assumptions: [
+      { name: "Standing column, not drilled depth", value: "the volume above the static level holds no water", source: "the well log" },
+      { name: "Solution density is entered", value: "hypochlorite is denser than water; 8.34 lb/gal overstates by ~20%", source: "the product data sheet" },
+      { name: "Treats the casing only", value: "the pack and formation hold a comparable volume", source: "AWWA C654" },
+    ],
+  },
+  "constant-pressure-well-vfd": {
+    formula: "total head = static lift + friction + setpoint (psi x 2.31 ft/psi); friction is the only speed-sensitive term and falls with the square of flow, and the speed follows N2 = N1 x sqrt(H2/H1).",
+    edition: "Constant-pressure well pump operation on the pump affinity relations. The pump is assumed to follow its curve; a real curve is not a perfect square law.",
+    freeAccess: "The affinity relations and one exact pressure conversion.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE CUBE LAW DOES NOT APPLY HERE, and expecting it is the error. A VFD saves on the cube of speed when the head is FRICTION head, which falls with flow. On a well holding a pressure setpoint, static lift and the setpoint are constants that do not care how fast the pump turns -- so cutting the flow by three quarters may cut the speed by only a few percent, because the pump is doing lifting work rather than friction work. A constant-pressure system is worth buying for the pressure it holds, not for an energy saving a friction-dominated system would deliver and this one will not. AND THE DRAWDOWN MOVES THE TARGET: static lift grows with the flow being drawn, so a pump curve that covers the standing condition can fail to reach the setpoint at high flow with the level drawn down, and the system loses pressure exactly when demand is highest.",
+    assumptions: [
+      { name: "Pump follows its curve", value: "a real curve is not a perfect square law", source: "the manufacturer's curve" },
+      { name: "No power or energy computed", value: "that needs the curve plus motor and drive efficiencies at each speed", source: "a pump selection program" },
+      { name: "Drawdown is entered", value: "modelling it against rate is a step test", source: "the well's own test data" },
+    ],
+  },
+  "wet-well-cycle-time": {
+    formula: "active volume V = t x Q / 4 for a minimum cycle time t and pump rate Q; the level differential is V over the well's gallons per foot (pi/4 x D^2 x 7.481).",
+    edition: "Lift station wet-well sizing as Ten States Standards and standard practice state it. The permitted starts per hour is a MOTOR rating from the manufacturer.",
+    freeAccess: "One published sizing relation and one geometric conversion.",
+    governance: GOVERNANCE.general,
+    editionNote: "The four falls out of the governing case: INFLOW AT EXACTLY HALF THE PUMP RATE. At low inflow the well takes a long time to fill; at an inflow near the pump rate the drawdown takes a long time; halfway between, both halves are short at once and the station cycles fastest. Sizing on average inflow rather than that worst case produces a station that short-cycles at a flow it will certainly see. THE CYCLE LIMIT IS A MOTOR RATING rather than a hydraulic one -- starting current is several times running current and the heat must be shed before the next start -- and short-cycling gives no immediate symptom, shortening motor life and burning contactors quietly. AND A BIGGER WELL IS NOT A FREE FIX: the same volume that buys cycle time buys DETENTION time, and wastewater held in a wet well goes septic, generating hydrogen sulphide that corrodes the structure and produces an atmosphere that has killed entrants.",
+    assumptions: [
+      { name: "Worst case is half the pump rate", value: "not the average inflow", source: "standard lift station practice" },
+      { name: "Starts per hour is a motor rating", value: "and falls as motors get larger", source: "the pump manufacturer" },
+      { name: "Bounded above by septicity", value: "detention time is the competing constraint", source: "Ten States Standards" },
+    ],
+  },
+  "main-flushing-volume": {
+    formula: "pipe volume = 0.0408 x diameter(in)^2 gal/ft x length; the flow for a target velocity is gpm = 2.448 x diameter(in)^2 x velocity(ft/s), and the achieved velocity inverts it from the flow actually available.",
+    edition: "Water main flushing as AWWA M17 describes it, with about 3 ft/s the usual scouring target. The flow a hydrant outlet actually passes at system pressure is ENTERED, because it depends on the outlet, the pressure and the system.",
+    freeAccess: "Two standard volume and flow relations.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE VELOCITY IS THE POINT AND THE VOLUME IS NOT. Flushing works by scouring -- moving fast enough to lift sediment and biofilm off the pipe wall -- and below the target the water simply passes through, having disturbed very little. A crew can flush for an hour, discharge thousands of gallons, dechlorinate all of it, log the work, and leave the main exactly as dirty as they found it, and nothing in that operation looks like a failure. REQUIRED FLOW GOES WITH THE SQUARE OF DIAMETER, which is why conventional flushing stops working as mains get larger: an outlet that scours a small main passes nowhere near enough for a large one. Unidirectional flushing -- valves closed to force a defined path, more outlets open, runs sequenced so each is fed by already-clean water -- is what makes the velocity.",
+    assumptions: [
+      { name: "Outlet flow is entered", value: "it depends on the outlet, system pressure and the network", source: "a hydrant flow test" },
+      { name: "Velocity is the criterion", value: "volume and duration are consequences of it", source: "AWWA M17" },
+      { name: "Discharge must be handled", value: "chlorinated water needs dechlorination before a storm drain or watercourse", source: "the utility's programme" },
+    ],
+  },
+  "pressure-zone-hgl": {
+    formula: "service pressure = (HGL - ground elevation) x 0.433 psi/ft; the servable elevation band runs from HGL - max/0.433 to HGL - min/0.433, and the zones a service area needs is its relief divided by that band.",
+    edition: "Distribution pressure zones as AWWA M32 and the plumbing codes frame them. The minimum and maximum service pressures are ENTERED because they are jurisdictional; 40 and 80 psi are common.",
+    freeAccess: "One exact hydrostatic conversion and its rearrangements.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE HGL IS THE THING TO THINK IN -- the elevation water would rise to in an open tube -- because it makes every pressure in a system a subtraction. Under static conditions it is the tank overflow; under flow it falls by the friction between the tank and the point, which is why the same service reads one pressure at 2 am and another at peak hour. ONE ZONE IS ONE ELEVATION BAND and its width is not a design choice: it is fixed by the pressure range the code allows, which at 0.433 psi per foot is a little over 90 feet of relief for a 40 to 80 psi range. That is the whole reason a hilly system has many zones and tanks and PRV stations and a flat one has few. AND THE STATIC CASE IS NOT THE ONE THAT GOVERNS: codes generally require a residual pressure during fire flow, and that condition is what actually sizes mains, storage and pumping.",
+    assumptions: [
+      { name: "Pressure limits are entered", value: "they are jurisdictional; 40 and 80 psi are common", source: "the plumbing code in force" },
+      { name: "Static HGL", value: "under flow it falls by friction, which needs a hydraulic model", source: "AWWA M32" },
+      { name: "Fire flow governs", value: "the residual requirement sizes mains and storage, not the static case", source: "the fire code and the utility's model" },
+    ],
+  },
   // spec-v1731..v1736: the 2026-09-09 trade-expansion industrial hygiene
   // band. Five tiles; spec-v1734 cut to capacitor-discharge-time.
   "dilution-ventilation-solvent": {

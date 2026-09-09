@@ -3636,6 +3636,7 @@ cross-check.
 | calc-water.js | `computeChlorineDemand` | `{ applied_mg_l = 0, measured_residual_mg_l = 0, target_residual_mg_l = 0 } = {}` | _ | _ | _ |
 | calc-water.js | `computeCisternStorageDays` | `{ usable_storage_gal = 2500, daily_demand_gpd = 150, target_days = 30 } = {}` | _ | _ | _ |
 | calc-water.js | `computeCoagulantDose` | `{ flow_mgd = 0, jar_test_dose_mg_l = 0, product = "alum_liquid", } = {}` | _ | _ | _ |
+| calc-water.js | `computeConstantPressureWellVfd` | `{ static_lift_ft = 0, friction_at_design_ft = 0, design_flow_gpm = 0, setpoin...` | _ | _ | _ |
 | calc-water.js | `computeCoolingWaterMakeup` | `{ recirculation_gpm = 0, delta_T_F = 0, coc = 4, drift_fraction = 0.002, } = {}` | _ | _ | _ |
 | calc-water.js | `computeDechlorinationDose` | `{ chlorine_residual_mg_l = 2, flow_mgd = 5, stoich_ratio = 1.46, purity_pct =...` | _ | _ | _ |
 | calc-water.js | `computeDetentionBasinVolume` | `{ target_minutes = 0, flow_gpm = 0 } = {}` | _ | _ | _ |
@@ -3647,21 +3648,26 @@ cross-check.
 | calc-water.js | `computeFloatMethodFlow` | `{ float_distance_ft = 20, travel_time_s = 10, channel_width_ft = 4, mean_dept...` | _ | _ | _ |
 | calc-water.js | `computeFluorideFeedDose` | `{ target_dose_mg_l = 0.7, raw_fluoride_mg_l = 0.1, flow_mgd = 2, afi_fraction...` | _ | _ | _ |
 | calc-water.js | `computeIronManganeseChlorineDose` | `{ fe_mgl = 3.0, mn_mgl = 0.5, extra_demand_mgl = 0.5, target_residual_mgl = 0...` | _ | _ | _ |
+| calc-water.js | `computeMainFlushingVolume` | `{ main_diameter_in = 0, run_length_ft = 0, target_velocity_fps = 3, pipe_volu...` | _ | _ | _ |
 | calc-water.js | `computePoolTurnover` | `{ pool_volume_gal = 0, turnover_hr = 6, chlorine_ppm = 2, chlorine_type = "ca...` | _ | _ | _ |
 | calc-water.js | `computePopulationEquivalent` | `{ flow_mgd = 0, bod_mg_l = 0, ss_mg_l = 0 } = {}` | _ | _ | _ |
 | calc-water.js | `computePoundsFormula` | `{ flow_mgd = 0, dose_mg_l = 0, chemical = "chlorine_gas" }` | _ | _ | _ |
+| calc-water.js | `computePressureZoneHgl` | `{ hgl_ft = 0, service_elevation_ft = 0, min_pressure_psi = 40, max_pressure_p...` | _ | _ | _ |
 | calc-water.js | `computePumpEfficiency` | `{ flow_gpm = 0, tdh_ft = 0, motor_kW = 0, motor_eff = 0.92, drive_eff = 1.0 }` | _ | _ | _ |
 | calc-water.js | `computeRasFlowRate` | `{ plant_flow_mgd = 0, mlss_mg_l = 0, ras_ss_mg_l = 0 } = {}` | _ | _ | _ |
 | calc-water.js | `computeRasSviSettleability` | `{ plant_flow_mgd = 0, mlss_mg_l = 0, svi_ml_g = 0 } = {}` | _ | _ | _ |
 | calc-water.js | `computeRoRecoveryConcentration` | `{ feed_gpm = 10, permeate_gpm = 7.5, feed_tds_mgl = 500 } = {}` | _ | _ | _ |
 | calc-water.js | `computeSRTandFM` | `{ aeration_volume_gal = 0, mlss_mg_l = 0, mlvss_mg_l = 0, was_flow_mgd = 0, w...` | _ | _ | _ |
 | calc-water.js | `computeSVI` | `{ sv30_ml_per_l = 0, mlss_mg_per_l = 0, } = {}` | _ | _ | _ |
+| calc-water.js | `computeStepDrawdownEfficiency` | `{ q1_gpm = 0, s1_ft = 0, q2_gpm = 0, s2_ft = 0, q3_gpm = 0, s3_ft = 0, operat...` | _ | _ | _ |
 | calc-water.js | `computeTwoSourceBlend` | `{ flow1_gpm = 500, conc1 = 4, flow2_gpm = 300, conc2 = 12, target_conc = 8 } ...` | _ | _ | _ |
 | calc-water.js | `computeUvDose` | `{ intensity_mw_cm2 = 0, exposure_time_s = 0, target_dose_mj_cm2 = 40 } = {}` | _ | _ | _ |
 | calc-water.js | `computeUvRequiredExposure` | `{ target_dose_mj_cm2 = 40, intensity_mw_cm2 = 0, exposure_time_s = 0 } = {}` | _ | _ | _ |
 | calc-water.js | `computeWasSrtControl` | `{ aeration_volume_mg = 0, mlss_mg_l = 0, target_srt_days = 0, was_conc_mg_l =...` | _ | _ | _ |
+| calc-water.js | `computeWellCasingPurgeVolume` | `{ casing_diameter_in = 0, well_depth_ft = 0, static_water_level_ft = 0, purge...` | _ | _ | _ |
 | calc-water.js | `computeWellDrawdown` | `{ static_level_ft = 0, pumping_level_ft = 0, discharge_gpm = 0, pump_offset_f...` | _ | _ | _ |
 | calc-water.js | `computeWellMaxYield` | `{ specific_capacity_gpm_ft = 0, allowable_drawdown_ft = 0 } = {}` | _ | _ | _ |
+| calc-water.js | `computeWetWellCycleTime` | `{ pump_gpm = 0, well_diameter_ft = 0, min_cycle_minutes = 0, max_starts_per_h...` | _ | _ | _ |
 | calc-wind.js | `computeGinPoleUptowerLift` | `{ component_weight_lb = 0, haul_angle_deg = 0, pole_length_ft = 0, mount_rate...` | _ | _ | _ |
 | calc-wind.js | `computeTipSpeedRatio` | `{ rotor_diameter_ft = 0, rotor_rpm = 0, wind_speed_mph = 0, design_tsr = 7, t...` | _ | _ | _ |
 | calc-wind.js | `computeTurbineDensityCorrection` | `{ elevation_ft = 0, air_temp_f = 59, reference_density_pcf = _RHO_REF_PCF, me...` | _ | _ | _ |
@@ -3707,7 +3713,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2293.
+Row count: 2299.
 
 <!-- END function-corpus-v14 -->
 
@@ -5539,7 +5545,7 @@ per spec-v14 §13.1 second paragraph.
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-stroke-mix-ratio-check` | Two-Stroke Mix Ratio Check | First-principles volume arithmetic (i...; spec-v653 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group M Water and wastewater (66 tiles)
+### Group M Water and wastewater (72 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5559,6 +5565,7 @@ per spec-v14 §13.1 second paragraph.
 | `clarifier-surface-loading` | Clarifier Surface, Weir, and Solids Loading | Ten States Standards / Metcalf & Eddy; spec-v405 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `coagulant-dose` | Coagulant Dose from Jar Test | USEPA / WEF; pure_lb_day = 5 * 20 * 8.34 = 834; product_lb_day = 834 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conductivity-from-tds` | Conductivity from Total Dissolved Solids | Standard Methods 2510 (inverse of tds...; spec-v657 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `constant-pressure-well-vfd` | Constant-Pressure Well VFD Setpoint and Speed | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cooling-water-makeup` | Cooling Water Makeup (Cycles of Concentration) | CTI / ASHRAE; evap = 1000*10/1000 = 10; blowdown = 10/(4-1) = 3.333; dr... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dechlorination-dose` | Dechlorination Chemical Dose | Dechlorination stoichiometry + pounds...; dose = 1.46*2.0 = 2.92; feed = 2.92*5*8.34/1.0 = 121.76 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `design-flow-peaking` | Design Flow from Population (Average, Peak, Minimum) | Metcalf & Eddy, Wastewater Engineerin...; avg = 50000 x 100 / 1e6 = 5.0 MGD; PF = 1 + 14/(4 + sqrt(... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5576,6 +5583,7 @@ per spec-v14 §13.1 second paragraph.
 | `iron-manganese-chlorine-dose` | Chlorine Dose to Oxidize Iron and Manganese | iron/manganese chlorine oxidation (AW...; dose = 0.62*3.0 + 1.30*0.5 + 0.5 + 0.3 = 3.31; lb/day = 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lab-dilution` | Lab Dilution and Serial Dilution | Project (first-principles) over stand...; C1=1000 / C2=50 / V2=100 -> V1=5, diluent=95 (computed by... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `langelier-index` | Langelier Saturation Index | Langelier (1936) / Standard Methods (...; pH 7.5, 25 C, Ca 200, alk 150, TDS 320 -> LSI ~+0.04 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `main-flushing-volume` | Water Main Flushing Volume, Duration, and Velocity | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `oil-water-separator-sizing` | Gravity Oil/Water Separator Surface Area (API 421) | API Publication 421 (gravity oil/wate...; Vt=9.81*(rho_w-rho_o)*d^2/(18*mu) SI -> 0.3285 ft/min; ar... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `particle-settling-velocity` | Discrete-Particle Settling Velocity (Stokes' Law) | Stokes' law (Davis & Cornwell, Introd...; mu=2.414e-5*10^(247.8/(293.15-140))=1.0019e-3; rho_w=998.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pool-alkalinity-adjust` | Pool Total Alkalinity Adjustment | NSPF CPO Handbook / ANSI-APSP-ICC dos...; spec-v93 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5591,12 +5599,14 @@ per spec-v14 §13.1 second paragraph.
 | `pool-volume` | Pool Water Volume by Shape | NSPF CPO pool-volume method / plane g...; avg = (3+8)/2 = 5.5; area = 512; vol = 2816 ft^3; gal = 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `population-equivalent` | Population Equivalent (Organic Load) | Population equivalent (organic load),...; 0.5 MGD, 600 mg/L BOD, 400 mg/L SS -> PE_bod 14718, PE_fl... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pounds-formula` | Pounds Formula | USEPA; Standard water-treatment chemical dose identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pressure-zone-hgl` | Water Pressure Zone HGL and Service Pressure | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pump-eff-w2w` | Pump Wire-to-Water Efficiency | Hydraulic Institute pump-efficiency i...; 500 gpm / 120 ft TDH / 25 kW / 0.92 motor eff -> WHP 15.1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ras-flow-rate` | Return Activated Sludge (RAS) Flow Rate | WEF / Sacramento activated-sludge man...; 5 MGD, 2500 MLSS, 8000 RAS_SS -> 2.27 MGD, 45% return | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ras-svi-settleability` | Settleability-Based RAS Rate (from SVI) | WEF / Sacramento activated-sludge ope...; 4 MGD, 2,500 mg/L MLSS, SVI 100 -> Xr 10,000 mg/L, 33% re... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ro-recovery-concentration` | RO Recovery, Concentrate Flow, and Concentration Factor | RO mass balance (AMTA / AWWA); R = 7.5/10 = 0.75; reject = 2.5; CF = 1/(1-0.75) = 4; rej... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sluice-gate-flow` | Sluice-Gate (Underflow) Free-Flow Discharge | Open-channel hydraulics (Henderson) /...; Cd = 0.61/sqrt(1 + 0.61 x 1/6) = 0.5812; Q = 0.5812 x 5 x... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `srt-fm-ratio` | SRT and F/M Ratio | WEF MOP 11 + Metcalf & Eddy activated...; 1 MG aeration / 2500 mg/L MLSS / 2000 mg/L MLVSS / 0.05 M... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `step-drawdown-efficiency` | Step-Drawdown Test and Well Efficiency | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `svi-sludge-index` | Sludge Volume Index (SVI) | USEPA / WEF; SVI = SV30 * 1000 / MLSS | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tapered-flocculation-g` | Tapered Flocculation G Schedule | Camp & Stein 1943 / Ten States Standards; G 50/30/20 per s, three 100 m3 stages, 15 C (mu 1.138e-3)... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tds-from-conductivity` | Total Dissolved Solids from Conductivity | Standard Methods 2510; spec-v407 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5607,8 +5617,10 @@ per spec-v14 §13.1 second paragraph.
 | `was-srt-control` | WAS Rate to Hold Target SRT (Sludge Age) | MCRT/SRT control; WEF operator training; 2 MG, 3000 MLSS, SRT 10 d, WAS 8000, eff 5 MGD/15 mg/L ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `weir-flow` | Weir / Flume Open-Channel Flow | USBR Water Measurement Manual (V-notc...; 90-degree V-notch, H 0.5 ft -> ~0.446 cfs ~200 GPM | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `weir-head-from-flow` | Weir Head from a Target Flow | USBR Water Measurement Manual (invers...; spec-v658 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `well-casing-purge-volume` | Well Casing Storage, Purge Volume, and Disinfection | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `well-drawdown` | Well Drawdown and Specific Capacity | AWWA / USGS; drawdown = 80 - 50 = 30 ft; specific capacity = 30/30 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `well-max-yield` | Well Sustainable Yield from Specific Capacity | AWWA / USGS (inverse); 1.0 GPM/ft, 30 ft allowable drawdown -> 30 GPM (round-tri... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `wet-well-cycle-time` | Lift Station Wet-Well Volume and Cycle Time | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group N Stage (40 tiles)
 
@@ -5922,6 +5934,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2042. Fixture-covered or reference-cadence: 2042 / 2042.
+Tile count: 2048. Fixture-covered or reference-cadence: 2048 / 2048.
 
 <!-- END tile-index-v14 -->
