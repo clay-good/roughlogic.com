@@ -1173,6 +1173,12 @@ const _TILES = [
   ["jominy-quench-severity", "E"],
   ["tempering-temperature", "E"],
   ["pwht-holding-time", "E"],
+  // spec-v1731..v1736 industrial hygiene band
+  ["dilution-ventilation-solvent", "G"],
+  ["respirator-cartridge-life", "G"],
+  ["arc-rated-clothing-selection", "G"],
+  ["fixed-ladder-fall-protection", "G"],
+  ["retrieval-winch-force", "G"],
   // spec-v1622..v1631 HVAC test-and-balance and hydronic systems band
   ["flow-hood-correction", "C"],
   ["fan-system-effect", "C"],

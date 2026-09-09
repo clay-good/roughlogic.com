@@ -2572,6 +2572,11 @@ cross-check.
 | calc-hvacsystems.js | `computeVavBoxAirflow` | `{ zone_sensible_btuh = 0, supply_dt_f = 0, ventilation_cfm = 0, turndown = 0....` | _ | _ | _ |
 | calc-hvacsystems.js | `computeWindowOverhangShade` | `{ projection_in = 0, gap_in = 0, glass_height_in = 0, solar_altitude_deg = 0,...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeWindowSolarHeatGain` | `{ area_ft2 = 0, shgc = 0, psf = 0, u_factor = 0, cltd_f = 0 } = {}` | _ | _ | _ |
+| calc-hygiene.js | `computeArcRatedClothingSelection` | `{ incident_energy_cal_cm2 = 0, system_arc_rating_cal_cm2 = 0, garment_ratings...` | _ | _ | _ |
+| calc-hygiene.js | `computeDilutionVentilationSolvent` | `{ evaporation_lb_hr = 0, molecular_weight = 0, tlv_ppm = 0, mixing_factor = 5...` | _ | _ | _ |
+| calc-hygiene.js | `computeFixedLadderFallProtection` | `{ ladder_height_ft = 0, fall_protection_threshold_ft = 24, rest_platform_inte...` | _ | _ | _ |
+| calc-hygiene.js | `computeRespiratorCartridgeLife` | `{ estimated_life_hr = 0, safety_fraction = 0.5, shift_hours = 8, concentratio...` | _ | _ | _ |
+| calc-hygiene.js | `computeRetrievalWinchForce` | `{ entrant_weight_lb = 0, equipment_weight_lb = 0, friction_pct = 15, entangle...` | _ | _ | _ |
 | calc-inspection.js | `computeCarburizingCaseDepth` | `{ reference_case_in = 0, reference_time_hr = 0, time_hr = 0, target_case_in =...` | _ | _ | _ |
 | calc-inspection.js | `computeHardnessTensileConversion` | `{ brinell_hb = 0, tensile_coefficient_ksi_per_hb = 0.50, actual_uts_ksi = 0, ...` | _ | _ | _ |
 | calc-inspection.js | `computeJominyQuenchSeverity` | `{ jominy_distance_sixteenths = 0, hardness_at_distance_hrc = 0, required_core...` | _ | _ | _ |
@@ -3702,7 +3707,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2288.
+Row count: 2293.
 
 <!-- END function-corpus-v14 -->
 
@@ -5063,11 +5068,12 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (138 tiles)
+### Group G Cross-trade (143 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `annulus-area` | Annulus (Ring) Area | Project (first-principles); (pi/4)(D^2-d^2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `arc-rated-clothing-selection` | Arc-Rated Clothing Selection From Incident Energy | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `baghouse-cleaning-interval` | Baghouse Pressure Drop and Pulse Cleaning Interval | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `barrel-volume` | Barrel / Cask Volume (Bulged Sides) | Project (first-principles); V=(pi L/15)(2D^2+Dd+3/4 d^2); matches numeric integral | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bearing-regrease` | Bearing Regrease Quantity and Interval | Project (first-principles); 0.005 OD x width; 14e6 / (rpm sqrt(bore)) - 4 bore | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5093,6 +5099,7 @@ per spec-v14 §13.1 second paragraph.
 | `cylindrical-wedge-volume` | Cylindrical Wedge (Ungula) Volume | Project (first-principles); V=(2/3)R^2 H=D^2 H/6=8 ft^3; no pi | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `decimal-to-fraction` | Decimal to Fraction | First-principles tape-measure arithmetic; 2.375 in to nearest 1/16 -> 2-3/8 in (whole 2, 3/8), error 0 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dilution` | Dilution / Mixing Ratio | Project (first-principles); C1*V1 = C2*V2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `dilution-ventilation-solvent` | Dilution Ventilation for a Solvent Vapour | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dust-collection-duct` | Dust Collection Duct Velocity, Diameter, and Branch Balance | Project (first-principles); area = airflow / velocity, rounded DOWN to a standard size | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ellipse-area-perimeter` | Ellipse Area and Perimeter | Project (first-principles); area pi a b; Ramanujan perimeter | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ellipsoid-volume` | Ellipsoid Volume (Oblong / Oval Solid) | Project (first-principles); V=(4/3)pi abc | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5101,6 +5108,7 @@ per spec-v14 §13.1 second paragraph.
 | `extension-ladder-overlap` | Extension Ladder Overlap and True Working Height | OCWR extension-ladder fast facts (OSH...; 24 ft, 2 sections -> 3 ft overlap, 21.0 ft working length... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `extrusion-output-rate` | Extrusion Output Rate, Line Speed, and Draw-Down | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fall-protection-clearance` | Fall Protection Clearance | 29 CFR 1926.502 (fall-protection syst...; 6 ft shock-absorbing lanyard / 5 ft worker height / 1 ft ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `fixed-ladder-fall-protection` | Fixed Ladder Fall Protection and Rest Platforms | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `flange-bolt-torque` | Flange Bolt-Up Torque | ASME PCC-1 / B16.5 (by name); 3/4 in B7 bolt (A_t 0.334 in^2) at 50% of 105 ksi yield, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `frustum-volume` | Frustum (Truncated Cone) Volume and Surface | Project (first-principles); V=(pi h/12)(D^2+Dd+d^2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gas-strut-force` | Gas Spring Force and Mounting Geometry | Project (first-principles); force per strut = lid moment / (struts x moment arm) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5162,6 +5170,8 @@ per spec-v14 §13.1 second paragraph.
 | `rainwater-yield` | Rainwater Harvesting Yield | Project (first-principles); Standard 0.6233 gal-per-in-per-ft^2 conversion factor | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ramp-slope` | Ramp Slope (ADA) | Project (first-principles); ADA 4.8.2 1:12 maximum running slope (cited by name) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `regular-polygon` | Regular Polygon (Apothem, Across Flats/Corners, Area) | Project (first-principles); apothem/across-flats/area | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `respirator-cartridge-life` | Respirator Cartridge Change Schedule | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `retrieval-winch-force` | Confined Space Retrieval Winch Force | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `riser-modulus-feeding` | Riser Modulus and the Feeding Volume Check | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rolled-blank` | Rolled Plate Blank Length | First-principles arc-length geometry ...; OD 12 in, T 0.25 in, k 0.5 -> neutral 11.75 in, L 36.9137... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rolling-offset` | Rolling Offset | NCCER pipefitting / standard fitter's...; rise 12, roll 9 -> true offset 15; at 45 deg travel 21.21 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5912,6 +5922,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2037. Fixture-covered or reference-cadence: 2037 / 2037.
+Tile count: 2042. Fixture-covered or reference-cadence: 2042 / 2042.
 
 <!-- END tile-index-v14 -->

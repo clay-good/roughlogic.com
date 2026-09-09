@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "ef7ca565f6e6c4fe",
+      "sha": "31357eb700dbc8e1",
       "date": "2026-09-09"
     },
     "/tools/": {
-      "sha": "bae12fbef5f68989",
+      "sha": "a3f33fc9381127c8",
       "date": "2026-09-09"
     },
     "/groups/accounting/": {
-      "sha": "fed492167493187a",
+      "sha": "7981031f5c8b8c42",
       "date": "2026-09-09"
     },
     "/groups/agriculture/": {
-      "sha": "0e59340d0c029c93",
+      "sha": "a099002e945f3e70",
       "date": "2026-09-09"
     },
     "/groups/construction/": {
-      "sha": "b88dd1e15fd358e9",
+      "sha": "d3c5b59e25f9229a",
       "date": "2026-09-09"
     },
     "/groups/cross-trade/": {
-      "sha": "0a93273c72ba8288",
+      "sha": "847cf4cde9acd9f2",
       "date": "2026-09-09"
     },
     "/groups/educators/": {
-      "sha": "239944b87920e782",
+      "sha": "0e6201d858eb417c",
       "date": "2026-09-09"
     },
     "/groups/electrical/": {
-      "sha": "5b8d003da9de9290",
+      "sha": "27bf1687e26c02c7",
       "date": "2026-09-09"
     },
     "/groups/field/": {
-      "sha": "ca16ad5595c66df5",
+      "sha": "55183934951d8e99",
       "date": "2026-09-09"
     },
     "/groups/fire-ground/": {
-      "sha": "f7880fac3ae6ad24",
+      "sha": "04c4088b15712225",
       "date": "2026-09-09"
     },
     "/groups/historical/": {
-      "sha": "351e656d1e65d8f5",
+      "sha": "e9e4ead57d998e7d",
       "date": "2026-09-09"
     },
     "/groups/hvac/": {
-      "sha": "85c06d5ae8a196fc",
+      "sha": "f9fd694b6f973efa",
       "date": "2026-09-09"
     },
     "/groups/kitchen/": {
-      "sha": "2f81d3a68c7ff30d",
+      "sha": "70767ab92fa0a8b8",
       "date": "2026-09-09"
     },
     "/groups/lab/": {
-      "sha": "3e7614f779963381",
+      "sha": "562ca0be7165e733",
       "date": "2026-09-09"
     },
     "/groups/mechanic/": {
-      "sha": "821d12ca4a493843",
+      "sha": "eb0f966b4ac31927",
       "date": "2026-09-09"
     },
     "/groups/plumbing/": {
-      "sha": "2b6c2f5f28acc978",
+      "sha": "84cfb53a28ecf2ee",
       "date": "2026-09-09"
     },
     "/groups/real-estate/": {
-      "sha": "9003f94e1f927bc2",
+      "sha": "e4b8a0e951578fa8",
       "date": "2026-09-09"
     },
     "/groups/references/": {
-      "sha": "72df1ab294453002",
+      "sha": "33283f57eb8b5fbe",
       "date": "2026-09-09"
     },
     "/groups/restoration/": {
-      "sha": "59926be3ac33342b",
+      "sha": "4fc4dae5dbe9188b",
       "date": "2026-09-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "7e8012d7c8d3333b",
+      "sha": "91c2a43c1a2d2ffa",
       "date": "2026-09-09"
     },
     "/groups/stage/": {
-      "sha": "214ed40f1e95cabd",
+      "sha": "fd779716f868d49d",
       "date": "2026-09-09"
     },
     "/groups/trucking/": {
-      "sha": "ed9388413b3171c4",
+      "sha": "4cb28c191edff15f",
       "date": "2026-09-09"
     },
     "/groups/water/": {
-      "sha": "584014e79973961d",
+      "sha": "39f733c4157ed415",
       "date": "2026-09-09"
     },
     "/tools/aav-install-check/": {
@@ -300,6 +300,10 @@
     "/tools/arc-flash-screen/": {
       "sha": "cbd590d42f82a10d",
       "date": "2026-09-01"
+    },
+    "/tools/arc-rated-clothing-selection/": {
+      "sha": "a2f09e5277637ce1",
+      "date": "2026-09-09"
     },
     "/tools/area-by-coordinates/": {
       "sha": "a136fc32a615e05e",
@@ -1134,8 +1138,8 @@
       "date": "2026-09-01"
     },
     "/tools/circular-arc/": {
-      "sha": "b91ad4046463460c",
-      "date": "2026-09-01"
+      "sha": "05b91da1b474767b",
+      "date": "2026-09-09"
     },
     "/tools/circular-arc-rise-from-radius/": {
       "sha": "bf97979cf01dcc5b",
@@ -2022,8 +2026,12 @@
       "date": "2026-09-01"
     },
     "/tools/dilution/": {
-      "sha": "2cbb917fb508419d",
-      "date": "2026-09-01"
+      "sha": "1920d3b77024f9e1",
+      "date": "2026-09-09"
+    },
+    "/tools/dilution-ventilation-solvent/": {
+      "sha": "8a91694d10462331",
+      "date": "2026-09-09"
     },
     "/tools/dim-weight/": {
       "sha": "b341bd9e20104aaa",
@@ -2614,8 +2622,8 @@
       "date": "2026-09-01"
     },
     "/tools/fall-protection-clearance/": {
-      "sha": "f8a269a2d81c0b27",
-      "date": "2026-09-01"
+      "sha": "af1c8b33a048e309",
+      "date": "2026-09-09"
     },
     "/tools/fan-affinity-laws/": {
       "sha": "774c6c7d4a44563a",
@@ -2752,6 +2760,10 @@
     "/tools/fix-flip-profit/": {
       "sha": "f6637c0cfe5bc2ce",
       "date": "2026-09-01"
+    },
+    "/tools/fixed-ladder-fall-protection/": {
+      "sha": "d0bafc38a11c5d1b",
+      "date": "2026-09-09"
     },
     "/tools/fixed-orifice-target-superheat/": {
       "sha": "5043345a310705dd",
@@ -4418,8 +4430,8 @@
       "date": "2026-09-01"
     },
     "/tools/motor-branch-protection/": {
-      "sha": "550797037ea7da0d",
-      "date": "2026-09-04"
+      "sha": "326deb89ba66ad96",
+      "date": "2026-09-09"
     },
     "/tools/motor-capacitor-max/": {
       "sha": "9273ba1f5c878054",
@@ -5302,8 +5314,8 @@
       "date": "2026-09-01"
     },
     "/tools/punch-force/": {
-      "sha": "70a32c31169dbb60",
-      "date": "2026-09-01"
+      "sha": "3e22317adbd8672b",
+      "date": "2026-09-09"
     },
     "/tools/pv-ac-output-circuit/": {
       "sha": "851386853c8ed0fb",
@@ -5729,6 +5741,10 @@
       "sha": "c41642911246c26d",
       "date": "2026-09-01"
     },
+    "/tools/respirator-cartridge-life/": {
+      "sha": "8640e6ce0f26bddf",
+      "date": "2026-09-09"
+    },
     "/tools/restrained-pipe-length/": {
       "sha": "7ebfd8b0b79fdcaf",
       "date": "2026-09-01"
@@ -5748,6 +5764,10 @@
     "/tools/retaining-wall-stability/": {
       "sha": "d8e998de4a9f7b54",
       "date": "2026-09-01"
+    },
+    "/tools/retrieval-winch-force/": {
+      "sha": "c36f39e1ade03e6e",
+      "date": "2026-09-09"
     },
     "/tools/reverse-curve/": {
       "sha": "b893de06afa3396c",

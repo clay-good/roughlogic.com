@@ -1320,6 +1320,14 @@ export const TOOL_MODULES = (() => {
     "hardness-tensile-conversion", "carburizing-case-depth",
     "jominy-quench-severity", "tempering-temperature", "pwht-holding-time",
   ]);
+  // spec-v1731..v1736: the industrial hygiene bench. Split into its own
+  // module rather than added to calc-cross.js, which sits at 94.6% of its
+  // size cap and whose own gate says to split rather than raise the budget.
+  declare("./calc-hygiene.js", "HYGIENE_RENDERERS", [
+    "dilution-ventilation-solvent", "respirator-cartridge-life",
+    "arc-rated-clothing-selection", "fixed-ladder-fall-protection",
+    "retrieval-winch-force",
+  ]);
   // spec-v1524..v1533: the oil, gas and pipeline bench (Group E). Two benches
   // in one module because they share a vocabulary and a reader: the
   // transmission and integrity side (MAOP, gas flow, station spacing, pigging,

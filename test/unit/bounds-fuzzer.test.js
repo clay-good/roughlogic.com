@@ -50836,3 +50836,130 @@ test("bounds: spec-v1674 computePwhtHoldingTime -- thickness compounds THREE tim
   assert.ok(Math.abs(_v1674({ ...base, governing_thickness_in: 0.5 }).max_heating_rate_f_hr - 400) < 1e-12);
   assert.ok(_v1674({ ...base, holding_temp_f: 700 }).error);
 });
+
+// =====================================================================
+// spec-v1731..v1736: the industrial hygiene band. Five tiles; spec-v1734 was
+// CUT to calc-electrical.js::capacitor-discharge-time, which already computes
+// the whole of it and draws the NEC comparison the spec declined to draw.
+// spec-v1731's constant is asserted against here: it used 403, the
+// PINTS-PER-MINUTE constant, on an input in lb/h, understating the airflow
+// sixteenfold.
+// =====================================================================
+import {
+  computeDilutionVentilationSolvent as _v1731,
+  computeRespiratorCartridgeLife as _v1732,
+  computeArcRatedClothingSelection as _v1733,
+  computeFixedLadderFallProtection as _v1735,
+  computeRetrievalWinchForce as _v1736,
+} from "../../calc-hygiene.js";
+
+test("bounds: spec-v1731 computeDilutionVentilationSolvent -- the spec's constant was 16x low", () => {
+  const base = { evaporation_lb_hr: 2, molecular_weight: 92, tlv_ppm: 20, mixing_factor: 5, lel_pct: 1.1, lel_safety_fraction: 0.25, room_volume_ft3: 20000, alt_mixing_factor: 10 };
+  const r = _v1731(base);
+  // First principles: 2 lb/h / 92 lb/lbmol x 386.9 ft3/lbmol / 60 = 0.1402 cfm
+  // of vapour, diluted to 20 ppm and multiplied by K.
+  const derived = 2 / 92 * 386.9 / 60 / (20 / 1e6) * 5;
+  assert.ok(Math.abs(r.health_cfm - derived) < 1e-6);
+  assert.ok(r.health_cfm > 34000 && r.health_cfm < 36000);
+  // spec-v1731 printed 2,190 cfm, from 403 x lb/h x K x 1000 / (MW x ppm).
+  // 403 is 387 x 1.043 lb/pint, the PINTS PER MINUTE constant.
+  assert.ok(Math.abs(r.health_cfm / (403 * 2 * 5 * 1000 / (92 * 20)) - 16) < 0.05);
+  // IDENTITIES: linear in K and in the rate, inverse in the limit.
+  assert.ok(Math.abs(r.alt_health_cfm - 2 * r.health_cfm) < 1e-6);
+  assert.ok(Math.abs(_v1731({ ...base, evaporation_lb_hr: 4 }).health_cfm - 2 * r.health_cfm) < 1e-6);
+  assert.ok(Math.abs(_v1731({ ...base, tlv_ppm: 10 }).health_cfm - 2 * r.health_cfm) < 1e-6);
+  // The health requirement governs for a low-TLV solvent, by a wide margin.
+  assert.equal(r.health_governs, true);
+  assert.ok(Math.abs(r.lel_target_ppm - 2750) < 1e-9);
+  assert.ok(r.lel_cfm < r.health_cfm / 100);
+  // 105 ACH is itself the argument for local exhaust.
+  assert.ok(r.room_ach > 100);
+  assert.ok(_v1731({ ...base, mixing_factor: 0.5 }).error);
+  assert.ok(_v1731({ ...base, tlv_ppm: 0 }).error);
+});
+
+test("bounds: spec-v1732 computeRespiratorCartridgeLife -- the worst task, not the typical one", () => {
+  const base = { estimated_life_hr: 8, safety_fraction: 0.5, shift_hours: 8, concentration_ppm: 50, worst_case_ppm: 100, humidity_pct: 85, humidity_derate_above_65: 0.5 };
+  const r = _v1732(base);
+  assert.ok(Math.abs(r.schedule_hr - 4) < 1e-12);
+  // Service life is roughly inverse in concentration: double it, halve the life.
+  assert.ok(Math.abs(r.worst_case_life_hr - 4) < 1e-12);
+  assert.ok(Math.abs(r.worst_case_schedule_hr - 2) < 1e-12);
+  // Humidity above 65% derates it again -- the two compound.
+  assert.equal(r.humid, true);
+  assert.ok(Math.abs(r.humidity_adjusted_hr - 1) < 1e-12);
+  assert.equal(_v1732({ ...base, humidity_pct: 50 }).humid, false);
+  // A cartridge lasting the shift needs no mid-shift change.
+  assert.ok(_v1732({ ...base, estimated_life_hr: 20 }).changes_per_shift <= 0);
+  assert.ok(_v1732({ ...base, estimated_life_hr: 8 }).changes_per_shift >= 1);
+  assert.ok(_v1732({ ...base, safety_fraction: 0 }).error);
+  assert.ok(_v1732({ ...base, humidity_pct: 120 }).error);
+});
+
+test("bounds: spec-v1733 computeArcRatedClothingSelection -- ATPV is a 50% burn probability", () => {
+  const base = { incident_energy_cal_cm2: 8, system_arc_rating_cal_cm2: 12, garment_ratings_sum_cal_cm2: 16, meltable_underlayer: "no" };
+  const r = _v1733(base);
+  assert.ok(Math.abs(r.margin_cal_cm2 - 4) < 1e-12);
+  assert.ok(Math.abs(r.minimum_rating_cal_cm2 - 8) < 1e-12);
+  assert.equal(r.adequate, true);
+  assert.equal(r.acceptable, true);
+  // IDENTITY: rated exactly at the exposure gives exactly zero margin -- and
+  // that is the fifty percent burn probability point, not a safe threshold.
+  const exact = _v1733({ ...base, system_arc_rating_cal_cm2: 8 });
+  assert.ok(Math.abs(exact.margin_cal_cm2) < 1e-12);
+  assert.equal(exact.adequate, true);
+  assert.ok(exact.atpv_verdict.includes("FIFTY PERCENT"));
+  // A meltable underlayer rejects at ANY rating.
+  const melt = _v1733({ ...base, system_arc_rating_cal_cm2: 100, meltable_underlayer: "yes" });
+  assert.equal(melt.adequate, true);
+  assert.equal(melt.acceptable, false);
+  // Under-rated clothing fails.
+  assert.equal(_v1733({ ...base, system_arc_rating_cal_cm2: 4 }).adequate, false);
+  // The garment sum is reported but is NOT the system rating.
+  assert.ok(r.layering_verdict.includes("not addition") || r.layering_verdict.includes("NOT THE SYSTEM RATING"));
+  assert.ok(_v1733({ ...base, incident_energy_cal_cm2: 0 }).error);
+});
+
+test("bounds: spec-v1735 computeFixedLadderFallProtection -- a cage is not fall protection", () => {
+  const base = { ladder_height_ft: 48, fall_protection_threshold_ft: 24, rest_platform_interval_ft: 50, existing_protection: "cage" };
+  const r = _v1735(base);
+  assert.equal(r.requires_protection, true);
+  assert.ok(Math.abs(r.height_over_threshold_ft - 24) < 1e-12);
+  // THE FINDING: a cage does not comply, a ladder safety system does.
+  assert.equal(r.compliant, false);
+  assert.ok(r.protection_verdict.includes("A CAGE IS NOT FALL PROTECTION"));
+  assert.equal(_v1735({ ...base, existing_protection: "system" }).compliant, true);
+  assert.equal(_v1735({ ...base, existing_protection: "pfas" }).compliant, true);
+  assert.equal(_v1735({ ...base, existing_protection: "none" }).compliant, false);
+  // Below the threshold, protection is not required on height alone.
+  assert.equal(_v1735({ ...base, ladder_height_ft: 20 }).requires_protection, false);
+  assert.equal(_v1735({ ...base, ladder_height_ft: 24 }).requires_protection, false);
+  // Rest platforms divide the climb at the entered interval.
+  assert.equal(r.rest_platforms_required, 0);
+  assert.equal(_v1735({ ...base, ladder_height_ft: 120 }).rest_platforms_required, 2);
+  assert.ok(Math.abs(_v1735({ ...base, ladder_height_ft: 120 }).longest_unbroken_climb_ft - 40) < 1e-12);
+  assert.ok(_v1735({ ...base, ladder_height_ft: 0 }).error);
+});
+
+test("bounds: spec-v1736 computeRetrievalWinchForce -- the weakest element rates the system", () => {
+  const base = { entrant_weight_lb: 200, equipment_weight_lb: 0, friction_pct: 15, entanglement_factor: 3, system_rating_lb: 350, anchorage_rating_lb: 310 };
+  const r = _v1736(base);
+  assert.ok(Math.abs(r.suspended_lb - 200) < 1e-12);
+  assert.ok(Math.abs(r.friction_lb - 30) < 1e-12);
+  assert.ok(Math.abs(r.retrieval_lb - 230) < 1e-12);
+  // An entangled entrant is a different number entirely.
+  assert.ok(Math.abs(r.entangled_lb - 690) < 1e-12);
+  // The system rating is an INPUT, not a returned key -- compare to base.
+  assert.ok(r.entangled_lb > base.system_rating_lb);
+  // The free-hanging case passes; the anchorage is the weakest element.
+  assert.equal(r.system_ok, true);
+  assert.ok(Math.abs(r.weakest_rating_lb - 310) < 1e-12);
+  assert.ok(r.anchorage_verdict.includes("WEAKEST"));
+  // IDENTITY: no friction makes the retrieval force the suspended load.
+  assert.ok(Math.abs(_v1736({ ...base, friction_pct: 0 }).retrieval_lb - 200) < 1e-12);
+  // Equipment adds directly to the suspended load.
+  assert.ok(Math.abs(_v1736({ ...base, equipment_weight_lb: 50 }).suspended_lb - 250) < 1e-12);
+  // An under-rated system is flagged.
+  assert.equal(_v1736({ ...base, system_rating_lb: 200 }).system_ok, false);
+  assert.ok(_v1736({ ...base, entrant_weight_lb: 0 }).error);
+});

@@ -1616,6 +1616,12 @@ const RELATED = {
   "jominy-quench-severity": ["quench-severity","hardness-tensile-conversion","tempering-temperature"],
   "tempering-temperature": ["jominy-quench-severity","hardness-tensile-conversion","heat-treat-soak-time"],
   "pwht-holding-time": ["heat-treat-soak-time","weld-cooling-rate-t85","interpass-temperature-control"],
+  // spec-v1731..v1736: industrial hygiene band.
+  "dilution-ventilation-solvent": ["confined-space-vent","respirator-cartridge-life","air-changes-hour"],
+  "respirator-cartridge-life": ["dilution-ventilation-solvent","ppe","confined-space-vent"],
+  "arc-rated-clothing-selection": ["arc-flash-screen","ppe","capacitor-discharge-time"],
+  "fixed-ladder-fall-protection": ["portable-ladder-setup","ladder-angle","extension-ladder-overlap"],
+  "retrieval-winch-force": ["confined-space-vent","winch-drum-line-pull","confined-space-purge"],
   // spec-v1622..v1631: HVAC test-and-balance and hydronic systems band.
   "flow-hood-correction": ["pitot-traverse-cfm","proportional-balance-ratio","traverse-closure"],
   "fan-system-effect": ["fan-affinity-laws","duct-leakage","flow-hood-correction"],

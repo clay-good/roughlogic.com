@@ -106858,6 +106858,244 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "dilution-ventilation-solvent",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Dilution Ventilation Rate for a Solvent Vapor -- the spec-v1731 worked example, recomputed",
+   "source_edition_or_year": "spec-v1731 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "evaporation_lb_hr": 2,
+    "molecular_weight": 92,
+    "tlv_ppm": 20,
+    "mixing_factor": 5,
+    "lel_pct": 1.1,
+    "lel_safety_fraction": 0.25,
+    "room_volume_ft3": 20000,
+    "alt_mixing_factor": 10
+   },
+   "outputs": {
+    "health_cfm": {
+     "value": 35045.28986,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lel_target_ppm": {
+     "value": 2750,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lel_cfm": {
+     "value": 50.97497,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "governing_cfm": {
+     "value": 35045.28986,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "room_ach": {
+     "value": 105.13587,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_health_cfm": {
+     "value": 70090.57971,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "respirator-cartridge-life",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Respirator Cartridge Service Life Estimate -- the spec-v1732 worked example, recomputed",
+   "source_edition_or_year": "spec-v1732 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "estimated_life_hr": 8,
+    "safety_fraction": 0.5,
+    "shift_hours": 8,
+    "concentration_ppm": 50,
+    "worst_case_ppm": 100,
+    "humidity_pct": 85,
+    "humidity_derate_above_65": 0.5
+   },
+   "outputs": {
+    "schedule_hr": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "changes_per_shift": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "worst_case_life_hr": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "worst_case_schedule_hr": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "humidity_adjusted_hr": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "arc-rated-clothing-selection",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Arc-Rated Clothing ATPV Selection From Incident Energy -- the spec-v1733 worked example, recomputed",
+   "source_edition_or_year": "spec-v1733 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "incident_energy_cal_cm2": 8,
+    "system_arc_rating_cal_cm2": 12,
+    "garment_ratings_sum_cal_cm2": 16,
+    "meltable_underlayer": "no"
+   },
+   "outputs": {
+    "minimum_rating_cal_cm2": {
+     "value": 8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_cal_cm2": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "margin_pct": {
+     "value": 50,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fixed-ladder-fall-protection",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Fixed Ladder Rest Platform and Climb System Spacing -- the spec-v1735 worked example, recomputed",
+   "source_edition_or_year": "spec-v1735 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "ladder_height_ft": 48,
+    "fall_protection_threshold_ft": 24,
+    "rest_platform_interval_ft": 50,
+    "existing_protection": "cage"
+   },
+   "outputs": {
+    "height_over_threshold_ft": {
+     "value": 24,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rest_platforms_required": {
+     "value": 0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "longest_unbroken_climb_ft": {
+     "value": 48,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "retrieval-winch-force",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Confined Space Retrieval Winch Force and Line Pull -- the spec-v1736 worked example, recomputed",
+   "source_edition_or_year": "spec-v1736 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "entrant_weight_lb": 200,
+    "equipment_weight_lb": 0,
+    "friction_pct": 15,
+    "entanglement_factor": 3,
+    "system_rating_lb": 350,
+    "anchorage_rating_lb": 310
+   },
+   "outputs": {
+    "suspended_lb": {
+     "value": 200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "friction_lb": {
+     "value": 30,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "retrieval_lb": {
+     "value": 230,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "entangled_lb": {
+     "value": 690,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "system_margin_lb": {
+     "value": 120,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "anchorage_margin_lb": {
+     "value": 80,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "weakest_rating_lb": {
+     "value": 310,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

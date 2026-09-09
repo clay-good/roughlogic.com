@@ -22313,6 +22313,68 @@ export const CITATIONS = {
       { name: "Downwash is not modelled", value: "a short stack near buildings can lose its rise entirely", source: "good engineering practice stack height rules" },
     ],
   },
+  // spec-v1731..v1736: the 2026-09-09 trade-expansion industrial hygiene
+  // band. Five tiles; spec-v1734 cut to capacitor-discharge-time.
+  "dilution-ventilation-solvent": {
+    formula: "dilution airflow = molar volume 387 ft^3/lbmol (at 70 degF, 1 atm) x 1e6 / 60 x (lb/h) x K / (molecular weight x ppm), with the flammability requirement computed the same way against a fraction of the LEL and the larger governing.",
+    edition: "Dilution ventilation as the ACGIH Industrial Ventilation manual states it. NOTE THE INPUT UNIT ON THE PUBLISHED CONSTANT: the familiar 403 is 387 ft^3/lbmol x 1.043 lb/pint and belongs to a form taking PINTS PER MINUTE of liquid; applying it to a mass rate in lb/h understates the airflow by a factor of sixteen. The mass-rate form is used here so the unit and the constant cannot drift apart.",
+    freeAccess: "The ideal gas law and one entered judgement factor.",
+    governance: GOVERNANCE.general,
+    editionNote: "Two requirements come out of one emission and they are not the same number: the health figure holds the room at a limit in parts per million, and the flammability figure holds it at a fraction of the lower explosive limit, measured in percent -- four orders of magnitude apart. Both are computed and the larger governs, because a rate set on one without checking the other is set on half the question. THE MIXING FACTOR SWINGS THE ANSWER BY A FACTOR OF TEN and is the least defensible input: roughly 1 for a well-mixed room with the emission remote from anyone, up toward 10 for poor mixing, a worker at the source, or a consequence severe enough that being wrong is unacceptable. AND DILUTION DOES NOT PROTECT THE PERSON AT THE SOURCE. This is a room AVERAGE, and the breathing zone of someone standing over the tank is higher than the average before any mixing has occurred. Local exhaust that captures at the source is the control for anything more than a low-toxicity vapour released steadily away from people, and it does the job on a fraction of the air -- a dilution rate that comes out implausibly large is itself the argument for it.",
+    assumptions: [
+      { name: "Mixing factor is entered", value: "1 to 10; nothing in the arithmetic supplies it", source: "a certified industrial hygienist" },
+      { name: "Uniform mixing assumed", value: "the person at the source breathes more than the average", source: "local exhaust ventilation design" },
+      { name: "Single contaminant, steady state", value: "mixtures and peak releases are not modelled", source: "the ACGIH Industrial Ventilation manual" },
+    ],
+  },
+  "respirator-cartridge-life": {
+    formula: "change schedule = estimated service life x a safety fraction (commonly one half); service life scales roughly INVERSELY with concentration and is derated above about 65% relative humidity.",
+    edition: "Respirator cartridge change schedules as 29 CFR 1910.134 requires them where no end-of-service-life indicator is fitted. The estimated life is ENTERED from the manufacturer's model or test data for the specific cartridge and contaminant.",
+    freeAccess: "One multiplication and one inverse scaling.",
+    governance: GOVERNANCE.general,
+    editionNote: "A schedule set for the typical task is wrong for the worst one, and the worst task is what it has to cover -- doubling the concentration roughly halves the life. Humidity is the other large term: above roughly 65% the sorbent takes up water in competition with the contaminant, so a humid day and a heavy task together turn a cartridge that covered a shift into one that covers a fraction of it. THE SCHEDULE EXISTS BECAUSE THE WEARER CANNOT DETECT BREAKTHROUGH. Changing when it smells is not a method: odour thresholds vary widely between people, olfactory fatigue sets in during the exposure, several important contaminants have poor warning properties or none, and a wearer with a head cold has none at all. A MIXTURE IS HARDER STILL -- one contaminant can displace another already adsorbed and release it downstream, so a mixture's life is not the shortest of its components'.",
+    assumptions: [
+      { name: "Estimated life is entered", value: "it depends on contaminant, concentration, work rate, temperature and humidity together", source: "the manufacturer's service life data" },
+      { name: "Inverse concentration scaling", value: "an approximation adequate for scheduling, not for breakthrough prediction", source: "the manufacturer's model" },
+      { name: "Not a respirator selection", value: "and air-purifying respirators are not permitted in oxygen-deficient or IDLH atmospheres", source: "29 CFR 1910.134" },
+    ],
+  },
+  "arc-rated-clothing-selection": {
+    formula: "the system arc rating must be at or above the incident energy at the working distance; margin = system rating - incident energy, and the minimum required rating IS the incident energy.",
+    edition: "Arc-rated clothing selection under NFPA 70E. Incident energy is ENTERED because computing it is a separate study. ATPV is the incident energy at a 50% probability of a second-degree burn; where a fabric reports both ATPV and EBT, the LOWER is its arc rating.",
+    freeAccess: "One comparison against entered ratings.",
+    governance: GOVERNANCE.general,
+    editionNote: "What the rating means is the part that changes decisions: ATPV is not a threshold below which nothing happens, it is a fifty percent burn probability, so clothing rated exactly at the exposure places the wearer on that point. Margin is not conservatism, it is the difference between a coin toss and a protected worker. LAYERING IS NOT ADDITION -- two 8 cal garments do not make a 16 cal system, because the rating of a combination comes from testing it and the air gaps between layers contribute in a way no arithmetic predicts. Substituting an underlayer changes the system that was tested. THE UNDERLAYER PROHIBITION IS ABSOLUTE and routinely missed: polyester, nylon and acetate next to skin melt and adhere in an arc event, and the items forgotten are the undershirt and the socks. And arc rating addresses the THERMAL hazard only -- the pressure wave, noise, molten metal spray and shock hazard are separate.",
+    assumptions: [
+      { name: "Incident energy is entered", value: "computing it is a separate study", source: "an IEEE 1584 study or the table method" },
+      { name: "System ratings are tested, not summed", value: "air gaps between layers contribute unpredictably", source: "the garment manufacturer's tested system rating" },
+      { name: "Thermal hazard only", value: "pressure, noise, spray and shock are separate", source: "NFPA 70E and the electrical safety programme" },
+    ],
+  },
+  "fixed-ladder-fall-protection": {
+    formula: "a height threshold above which fall protection is required (commonly 24 ft), and rest platforms at an entered interval; a CAGE does not satisfy the fall protection requirement.",
+    edition: "Fixed ladder requirements as 29 CFR 1910.28 structures them. The threshold, the rest platform interval and the phase-out dates are ENTERED because they differ between jurisdictions and have changed over time.",
+    freeAccess: "Two threshold comparisons.",
+    governance: GOVERNANCE.general,
+    editionNote: "A CAGE IS NOT FALL PROTECTION UNDER THE CURRENT RULE, and that is the finding this exists to surface. Cages were accepted historically and are not accepted on new ladders, because a cage does not ARREST a fall -- it may keep a falling climber roughly within the ladder's plane while they fall the full height inside it. Existing caged ladders are subject to a phase-out, after which a ladder safety system or a personal fall arrest arrangement is required; the cage may remain, it simply does not satisfy the requirement. REST PLATFORMS ARE A DIFFERENT QUESTION and belong to the older provisions -- a ladder with rest platforms and no fall protection is a ladder with no fall protection. The facility-level finding is the useful one: a plant with older fixed ladders almost certainly has several in this condition and they are non-compliant NOW rather than after a phase-out passes, because a caged ladder reads as a protected ladder to almost everyone who walks past it.",
+    assumptions: [
+      { name: "Thresholds are entered", value: "they differ between jurisdictions and have changed", source: "29 CFR 1910.28 or the state plan" },
+      { name: "Height only", value: "rung spacing, clearances, climbing space and landing extensions are separate requirements", source: "29 CFR 1910.23" },
+      { name: "Anchorage not evaluated", value: "a personal fall arrest arrangement needs an adequate one", source: "a qualified person" },
+    ],
+  },
+  "retrieval-winch-force": {
+    formula: "retrieval force = (entrant + equipment weight) x (1 + friction allowance), with an entanglement factor applied separately; the system rating is the MINIMUM of the winch and the anchorage.",
+    edition: "Confined space non-entry retrieval as 29 CFR 1910.146 and ANSI Z117.1 require it. The friction allowance (commonly about 15%) and any entanglement factor are ENTERED, because both depend on the space and the configuration.",
+    freeAccess: "One sum and one comparison against entered ratings.",
+    governance: GOVERNANCE.general,
+    editionNote: "The free-hanging case is the easy half. AN ENTANGLED OR WEDGED ENTRANT IS A DIFFERENT NUMBER ENTIRELY -- several times body weight -- and a system sized for the free-hanging load stalls at exactly the moment it was meant to work. THE SYSTEM IS RATED BY ITS WEAKEST ELEMENT: winch, line, davit or tripod, and anchorage, so a winch rated well above the load mounted on a tripod with an inadequate footing is a system rated by the footing. AND THE UPPER LIMIT IS MEDICAL RATHER THAN MECHANICAL: pulling hard enough to free a wedged entrant can injure them badly, so a retrieval that does not come freely is a signal to STOP and go to the entry rescue plan -- which has to exist, with a trained team able to respond in time, even where retrieval equipment is provided. The reason the whole arrangement exists is that most confined space fatalities include would-be rescuers who entered without protection and were overcome by the same atmosphere.",
+    assumptions: [
+      { name: "Friction and entanglement are entered", value: "both depend on the space and configuration", source: "the entry supervisor" },
+      { name: "Rated as a system", value: "the weakest element governs, and the anchorage is least often calculated", source: "the equipment manufacturer's ratings" },
+      { name: "Feasibility is not determined", value: "some configurations do not permit non-entry retrieval at all", source: "29 CFR 1910.146 and the rescue plan" },
+    ],
+  },
   // spec-v1664..v1674: the 2026-09-09 trade-expansion nondestructive
   // examination and heat treatment band. Eleven tiles, nothing cut.
   "weld-visual-acceptance": {

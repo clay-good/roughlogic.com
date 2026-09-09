@@ -1,5 +1,15 @@
 # roughlogic.com Specification v1734 -- Stored Energy Bleed-Down Time and Verification (`calc-cross.js`, Group G Cross-Trade Utilities, industrial hygiene, 1 New Tile)
 
+> **Status: CUT 2026-09-09 -- DUPLICATE. This tile was not built.** The formula screen for the
+> 2026-09-09 industrial hygiene band found this question already answered, and answered BETTER, by
+> `capacitor-discharge-time` in `calc-electrical.js`. That tile has computed V(t) = V0 e^(-t/RC), the discharge time for a supplied resistor, and the largest compliant resistor R_max = t_limit / (C ln(V0/V_safe)) since spec-v9 -- and it selects the NEC 460.6 limit automatically by voltage (1 minute at or below 600 V, 5 minutes above) where this spec would have had the user supply it.
+>
+> **The shipped tile also draws the conclusion this spec declined to draw.** Run on this spec's own example -- 1,200 uF, 50 kohm, 600 V -- it returns 149.1 s against a 60 s limit and reports `meets_code: false`, with a maximum compliant resistance of 20,121 ohm. This spec computes the same 149 seconds, says it is "against the NEC's stated requirement", and never states the requirement or makes the comparison. Its own example bank FAILS by 89 seconds and its 50 kohm bleed resistor is 2.5 times too large. A threshold gestured at and never applied reads as a pass.
+>
+> The material this spec had that the shipped tile lacked -- that a bleed resistor fails OPEN silently, so the calculation predicts and only a live-dead-live verification establishes, and that stored energy is not only capacitive (a VFD DC bus, springs, suspended loads, accumulators, thermal energy, material that can flow) -- landed on `capacitor-discharge-time` instead.
+>
+> The specification below is kept as the record of the screen. Do not implement it.
+>
 > **Status: PROPOSED (2026-09-05). Single-tile spec.** Part of [scope-trade-expansion-2](scope-trade-expansion-2.md).
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-cross.js`**
 > (Group G, Cross-Trade Utilities -- the existing category, hub `/groups/cross-trade/`; industrial hygiene and safety), no new dependency and no new network call. Inherits spec.md through spec-v1449.md.
