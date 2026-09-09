@@ -360,3 +360,45 @@ test("the human ledger table agrees with the cycle file", async () => {
     assert.ok(s.last_verified, s.id + " has no last_verified; nothing can measure that row");
   }
 });
+
+// The ledger's "not in the cycle table" section is where a reader looks to find
+// what NOTHING watches. It listed seven sources; four of them had since become
+// tracked rows -- FDA Food Code and the WMM in `standards`, the FHFA/HUD limits
+// and the IRS current-year publications in `annual_figures` -- so the genuinely
+// unwatched three were buried among four that were fine. Rows were added to
+// sources-cycle.json without anyone editing the prose that claimed they were
+// absent: the same update-one-surface-not-its-twin failure as the table above.
+test("the untracked section does not name a source the cycle file tracks", async () => {
+  const cycle = await readJson("scripts/sources-cycle.json");
+  const ledger = await readFile(resolve(ROOT, "docs/citation-freshness-ledger.md"), "utf8");
+  const heading = "## Verified current / well-disclosed, not in the cycle table";
+  const start = ledger.indexOf(heading);
+  assert.ok(start !== -1, "the untracked section is gone; update this test with it");
+  // The claim itself is the first paragraph after the heading; the explanation
+  // that follows deliberately names the four that graduated out of it.
+  const body = ledger.slice(start + heading.length);
+  const claim = body.split("\n\n").slice(0, 2).join("\n\n");
+
+  // A distinctive token per tracked source. If the claim paragraph names one,
+  // it is asserting that nothing watches something that is watched.
+  const tracked = [
+    ["fda-food-code", "FDA Food Code"],
+    ["wmm", "WMM"],
+    ["fhfa-conforming-loan-limit", "FHFA"],
+    ["irs-standard-mileage", "IRS current-year"],
+  ];
+  const ids = new Set([...cycle.standards, ...(cycle.annual_figures || [])].map((r) => r.id));
+  for (const [id, token] of tracked) {
+    assert.ok(ids.has(id), id + " should still be a tracked row");
+    assert.ok(
+      !claim.includes(token),
+      "the untracked section names \"" + token + "\", but " + id + " IS tracked in sources-cycle.json",
+    );
+  }
+
+  // The three that genuinely are not tracked must still be listed, or the
+  // section has quietly stopped telling anyone what is unwatched.
+  for (const token of ["NFPA 14", "NFPA 70E", "IICRC S520"]) {
+    assert.ok(claim.includes(token), "the untracked section no longer lists " + token);
+  }
+});

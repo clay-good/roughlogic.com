@@ -135,8 +135,15 @@ evidence, so the row's `verification_note` should say what was checked.
 
 ## Verified current / well-disclosed, not in the cycle table (spec-v22 §2)
 
-These sources were audited and found current or correctly disclosed but are not
-tracked rows in `sources-cycle.json` (they are cited by edition inline):
-FDA Food Code 2022 (disclosed), WMM2025 (expiry-dated), NFPA 14-2024 (disclosed),
-NFPA 70E-2024, IICRC S520-2024, FHFA / HUD FY2026 limits, and the IRS
-current-year publications.
+These sources were audited and found current or correctly disclosed, are cited
+by edition inline, and are **not** tracked rows in `sources-cycle.json`:
+NFPA 14-2024 (disclosed), NFPA 70E-2024, and IICRC S520-2024.
+
+Four entries that used to sit in this list have since become tracked rows and
+were moved out of it, because a reader scanning this section for *what nothing
+watches* was getting the wrong answer: **FDA Food Code** and the **NOAA World
+Magnetic Model** are now rows in `standards`, and the **FHFA / HUD loan limits**
+and the **IRS current-year publications** are rows in `annual_figures`. They are
+governed by the tracked-source ledger above, not by this section. The unit test
+in `test/unit/verified-on-ledger.test.js` fails if a tracked source is named
+here again.
