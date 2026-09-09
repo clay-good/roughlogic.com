@@ -402,3 +402,39 @@ test("the untracked section does not name a source the cycle file tracks", async
     assert.ok(claim.includes(token), "the untracked section no longer lists " + token);
   }
 });
+
+// The "disclosed-lag" mechanism only works if the disclosure actually DISCLOSES
+// the lag. IRC and IPC named the newer edition; IBC and IFGC named only OLDER
+// ones ("Older IBC editions reference ASCE 7-16 / 7-10", "Jurisdictions on
+// earlier editions"), which tells a reader the bundled 2021 is the newest there
+// is. The ledger's Dispositions section meanwhile claimed all four "already
+// name 2024 as the newer adopted edition" -- true for two of them.
+//
+// A disclosure is a third surface on the same fact, so pin it to the edition
+// sources-cycle.json records.
+test("each I-code disclosure names the current published edition", async () => {
+  const cycle = await readJson("scripts/sources-cycle.json");
+  const citations = await readFile(resolve(ROOT, "citations.js"), "utf8");
+  const disclosure = (name) => {
+    const m = citations.match(new RegExp("^const " + name + "_DISCLOSURE = \"([^\"]+)\"", "m"));
+    return m ? m[1] : null;
+  };
+  const byId = Object.fromEntries(cycle.standards.map((r) => [r.id, r]));
+
+  for (const [id, constName] of [["irc", "IRC"], ["ibc", "IBC"], ["ipc", "IPC"], ["ifgc", "IFGC"], ["nec", "NEC"]]) {
+    const text = disclosure(constName);
+    assert.ok(text, constName + "_DISCLOSURE not found");
+    const current = String(byId[id].current_edition);
+    assert.ok(
+      text.includes(current),
+      constName + "_DISCLOSURE never names the current edition " + current +
+        ", so a reader cannot tell how far behind the bundled values are: \"" + text + "\"",
+    );
+    // ...and it must still say what IS bundled, or the disclosure is only half of one.
+    assert.match(text, /bundled values follow/, constName + "_DISCLOSURE must say what is bundled");
+  }
+
+  // The two that were wrong, pinned by name so they cannot regress quietly.
+  assert.match(disclosure("IBC"), /IBC 2024 is the current published edition/);
+  assert.match(disclosure("IFGC"), /IFGC 2027 is the current published edition/);
+});

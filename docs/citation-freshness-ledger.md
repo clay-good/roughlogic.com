@@ -66,11 +66,17 @@ evidence, so the row's `verification_note` should say what was checked.
   follow NEC 2023; `NEC_DISCLOSURE` now names 2026 as the current edition, so
   this is **disclosed-lag**, not a silent stale. The 2026 value refresh is a
   data change tracked separately (out of v22's citation-text scope).
-- **ICC I-codes (CF-04):** `IRC` / `IBC` / `IMC` / `IFGC` / `IPC` bundle 2021
-  while 2024 is current. The disclosures (`IRC_DISCLOSURE`, `IBC_DISCLOSURE`,
-  `IPC_DISCLOSURE`, `IFGC_DISCLOSURE`) already name 2024 as the newer adopted
-  edition, so this is correctly **disclosed-lag**. The 2024 value refresh is its
-  own future data pass.
+- **ICC I-codes (CF-04):** `IRC` / `IBC` / `IMC` / `IFGC` / `IPC` bundle 2021.
+  This entry used to say all four disclosures "already name 2024 as the newer
+  adopted edition". That was true of `IRC_DISCLOSURE` and `IPC_DISCLOSURE` only.
+  `IBC_DISCLOSURE` named just *older* editions ("Older IBC editions reference
+  ASCE 7-16 / 7-10") and `IFGC_DISCLOSURE` just "earlier editions" -- so a
+  reader was told the bundled 2021 was the newest there is, which is the
+  disclosed-lag mechanism failing to disclose the lag. Both now name the current
+  published edition: **IBC 2024**, and **IFGC 2027**, which shipped in the 2027
+  I-Code staged release. Corrected 2026-09-09 and gated -- a unit test pins each
+  disclosure against the `current_edition` in `sources-cycle.json`. The value
+  refresh remains its own future data pass.
 
 - **ICC I-codes, 2026-09-01 re-stamp (CF-03):** all six rows carried
   `next_expected: 2026-09`, which passed at UTC midnight on 2026-09-01 and
