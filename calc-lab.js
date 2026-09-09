@@ -57,14 +57,25 @@ export const IUPAC_ATOMIC_WEIGHTS = {
   // Common biology / pharmacology subset; expand as needed.
 };
 
-// --- Common laboratory buffer pKa values (25 C unless noted) ---
+// --- Common laboratory buffer pKa values, all at 25 C ---
 // data/lab/buffer-pka.json
+//
+// The four Good's buffers used to be cited to Good et al. 1966 for numbers
+// that were a MIX of two temperatures: Good tabulates at 20 C, and HEPES
+// (7.55) and MOPS (7.20) were his 20 C values sitting in a table this comment
+// called 25 C, while MES (6.10) and PIPES (6.76) had already been carried to
+// 25 C by somebody who stopped halfway. Corrected 2026-09-09 to the 25 C
+// column of PanReac AppliChem's Biological buffers IP-022EN, which agrees with
+// Good's own 20 C values carried across by the d(pKa)/dT it publishes:
+// HEPES 7.55 - 5(0.014) = 7.48, MOPS 7.20 - 5(0.011) = 7.14, and the two that
+// were already right, MES 6.15 - 5(0.011) = 6.10 and PIPES 6.80 - 5(0.0085)
+// = 6.76. A buffer's pKa without its temperature is not a constant.
 export const BUFFER_PKA = {
   Tris:        { pKa: 8.06, useful_range: "7.0-9.0", citation: "CRC Handbook of Chemistry and Physics, 95th ed." },
-  HEPES:       { pKa: 7.55, useful_range: "6.8-8.2", citation: "Good et al., Biochemistry 5(2): 467 (1966)" },
-  MES:         { pKa: 6.10, useful_range: "5.5-6.7", citation: "Good et al., Biochemistry 5(2): 467 (1966)" },
-  MOPS:        { pKa: 7.20, useful_range: "6.5-7.9", citation: "Good et al., Biochemistry 5(2): 467 (1966)" },
-  PIPES:       { pKa: 6.76, useful_range: "6.1-7.5", citation: "Good et al., Biochemistry 5(2): 467 (1966)" },
+  HEPES:       { pKa: 7.48, useful_range: "6.8-8.2", citation: "Good et al., Biochemistry 5(2): 467 (1966); Good tabulates 20 C, 25 C value per PanReac AppliChem IP-022EN" },
+  MES:         { pKa: 6.10, useful_range: "5.5-6.7", citation: "Good et al., Biochemistry 5(2): 467 (1966); Good tabulates 20 C, 25 C value per PanReac AppliChem IP-022EN" },
+  MOPS:        { pKa: 7.14, useful_range: "6.5-7.9", citation: "Good et al., Biochemistry 5(2): 467 (1966); Good tabulates 20 C, 25 C value per PanReac AppliChem IP-022EN" },
+  PIPES:       { pKa: 6.76, useful_range: "6.1-7.5", citation: "Good et al., Biochemistry 5(2): 467 (1966); Good tabulates 20 C, 25 C value per PanReac AppliChem IP-022EN" },
   phosphate:   { pKa: 7.20, useful_range: "5.8-8.0", citation: "CRC Handbook (H2PO4- / HPO4^2-)" },
   acetate:     { pKa: 4.76, useful_range: "3.6-5.6", citation: "CRC Handbook (acetic acid / acetate)" },
   bicarbonate: { pKa: 6.35, useful_range: "5.5-7.5", citation: "CRC Handbook (H2CO3 / HCO3-)" },
@@ -1048,7 +1059,7 @@ function renderHendersonHasselbalch(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Henderson-Hasselbalch pH = pKa + log10([A-]/[HA]). First principles.";
   inputRegion.appendChild(makeNotice(LAB_NOTICE));
   const t = document.createElement("span"); t.textContent = "pKa"; inputRegion.appendChild(t); attachGlossaryTooltip(t, "pKa");
-  const buf = makeSelect("Bundled buffer pKa", "hh-buf", [{ value: "", label: "(custom)" }].concat(Object.entries(BUFFER_PKA).map(([k, v]) => ({ value: k, label: k + " (pKa " + v.pKa + ")" }))));
+  const buf = makeSelect("Bundled buffer pKa (25 C)", "hh-buf", [{ value: "", label: "(custom)" }].concat(Object.entries(BUFFER_PKA).map(([k, v]) => ({ value: k, label: k + " (pKa " + v.pKa + ")" }))));
   const pKa = makeNumber("pKa", "hh-pka", { step: "any", min: "0" });
   const pH = makeNumber("Target pH", "hh-ph", { step: "any", min: "0" });
   const cT = makeNumber("Total buffer concentration (M)", "hh-c", { step: "any", min: "0" });

@@ -165,7 +165,7 @@ test("the gate names the shards it does not govern", async () => {
   // forward when content is unchanged); what is still missing is a ledger row
   // recording what a human actually checked.
   const src = await readFile(resolve(ROOT, "scripts/check-verified-on-ledger.mjs"), "utf8");
-  assert.match(src, /UNGOVERNED_BUDGET = 2/, "the ungoverned count is ratcheted");
+  assert.match(src, /UNGOVERNED_BUDGET = 1/, "the ungoverned count is ratcheted");
   assert.match(src, /NOT governed here/, "the OK line must name the uncovered set");
   // Author-original content is reported separately: it has no publisher, so a
   // ledger row cannot exist and counting it as unbacked is a category error.
@@ -288,6 +288,45 @@ test("the bundled atomic weights are the 2024 edition, in both copies", async ()
 // RCF = 1.118e-6 x r(mm) x rpm^2, which is what identifies whose radius 84 mm
 // is: the FA-45-24-11 at 15,000 rpm and 21,130 x g gives 84.0 mm, while the
 // FA-45-30-11 at 14,000 and 20,817 gives 95.0 mm.
+// A buffer's pKa without its temperature is not a constant. The shard is keyed
+// buffers_at_25C, but two of the four Good's buffers carried Good's own 20 C
+// values (HEPES 7.55, MOPS 7.20) while the other two had already been carried
+// across to 25 C. Verified 2026-09-09 against the 25 C column of PanReac
+// AppliChem's Biological buffers IP-022EN, cross-checked by carrying Good's
+// 20 C values over with the d(pKa)/dT that same table publishes.
+test("the bundled buffer pKa values are 25 C values, in both copies", async () => {
+  const shard = await readJson("data/lab/buffer-pka.json");
+  const { BUFFER_PKA } = await import("../../calc-lab.js");
+
+  // [pKa at 25 C, Good's 20 C pKa or null, d(pKa)/dT or null]
+  const at25 = {
+    Tris: [8.06, null, null],
+    HEPES: [7.48, 7.55, -0.014],
+    MES: [6.10, 6.15, -0.011],
+    MOPS: [7.14, 7.20, -0.011],
+    PIPES: [6.76, 6.80, -0.0085],
+    phosphate: [7.20, null, null],
+    acetate: [4.76, null, null],
+    bicarbonate: [6.35, null, null],
+  };
+  assert.deepEqual(Object.keys(at25).sort(), Object.keys(shard.buffers_at_25C).sort());
+
+  for (const [name, [pKa, good20, dpKadT]] of Object.entries(at25)) {
+    assert.equal(shard.buffers_at_25C[name].pKa, pKa, name + " in the shard");
+    assert.ok(BUFFER_PKA[name], name + " missing from calc-lab.js");
+    assert.equal(BUFFER_PKA[name].pKa, pKa, name + " in calc-lab.js");
+    assert.equal(BUFFER_PKA[name].useful_range, shard.buffers_at_25C[name].useful_range, name + " range");
+    if (good20 === null) continue;
+    // Good's own 20 C value, carried five degrees, must land on the bundled one.
+    const carried = good20 + 5 * dpKadT;
+    assert.ok(
+      Math.abs(carried - pKa) < 0.01,
+      name + ": Good's 20 C " + good20 + " carried by " + dpKadT + "/C gives "
+        + carried.toFixed(3) + ", bundled " + pKa,
+    );
+  }
+});
+
 test("the bundled rotor radii agree with each manufacturer's published RCF", async () => {
   const shard = await readJson("data/lab/centrifuge-rotors.json");
   const { CENTRIFUGE_ROTORS } = await import("../../calc-lab.js");

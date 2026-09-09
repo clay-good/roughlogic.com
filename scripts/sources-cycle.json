@@ -224,6 +224,22 @@
         "centrifuge",
         "rotor"
       ]
+    },
+    {
+      "id": "buffer-pka",
+      "name": "Laboratory buffer pKa values",
+      "current_edition": "Good 1966 / PanReac AppliChem IP-022EN / CRC 95th",
+      "current_release": "2024",
+      "cycle_years": 5,
+      "next_expected": "2031-09",
+      "last_verified": "2026-09-09",
+      "verification_note": "All eight rows verified 2026-09-09. THE DEFECT WAS A TEMPERATURE, NOT A NUMBER: the table is keyed buffers_at_25C and the runtime comment said 25 C, but the four Good's buffers were cited to Good et al. 1966, WHICH TABULATES AT 20 C -- and two of the four carried his 20 C values (HEPES 7.55, MOPS 7.20) while the other two had already been carried to 25 C by somebody who stopped halfway (MES 6.10, PIPES 6.76). Corrected against the 25 C column of PanReac AppliChem's Biological buffers IP-022EN: HEPES 7.48, MOPS 7.14. Two independent confirmations: that table's own d(pKa)/dT carries Good's 20 C values exactly onto it (7.55 - 5 x 0.014 = 7.48; 7.20 - 5 x 0.011 = 7.14; 6.15 - 5 x 0.011 = 6.10; 6.80 - 5 x 0.0085 = 6.76), and Promega's technical reference publishes the same 20 C column with the same coefficients. IP-022EN also confirms Tris 8.06 at 25 C and every useful range the shard carries. The CRC rows (phosphate pK2 7.20, acetate 4.76, carbonic pK1 6.35) are unchanged and are 25 C values. A unit test pins all eight in both copies. RECHECK TRIGGER: not an edition cycle -- these are physical constants -- so the row exists to ask whether the temperature label still matches the values.",
+      "free_access_url": "https://www.itwreagents.com/download_file/info_point/IP-022/en/IP-022_en.pdf",
+      "where": "data/lab/buffer-pka.json",
+      "match_terms": [
+        "buffer",
+        "pKa"
+      ]
     }
   ],
   "annual_figures": [

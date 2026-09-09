@@ -1577,17 +1577,17 @@ const IUPAC_WEIGHTS_V5 = {
 };
 
 const BUFFER_PKA_V5 = {
-  source: "Good et al., Biochemistry 5(2): 467 (1966), for the Good's buffers (HEPES, MES, MOPS, PIPES); CRC Handbook of Chemistry and Physics 95th ed. for Tris, phosphate, acetate, bicarbonate.",
-  edition: "Good 1966 / CRC 95th",
+  source: "Good et al., Biochemistry 5(2): 467 (1966), named the Good's buffers (HEPES, MES, MOPS, PIPES) and tabulates them at 20 C; the 25 C pKa values here are PanReac AppliChem Biological buffers IP-022EN. CRC Handbook of Chemistry and Physics 95th ed. for Tris, phosphate, acetate, bicarbonate.",
+  edition: "Good 1966 / PanReac AppliChem IP-022EN / CRC 95th",
   fetched: TODAY,
   verified_on: TODAY,
   free_access: "Good 1966 historical paper free at the journal archive; CRC Handbook is a commercial reference book. Bundled values are public physical constants.",
   buffers_at_25C: {
     Tris:        { pKa: 8.06, useful_range: "7.0-9.0", citation: "CRC Handbook 95th ed." },
-    HEPES:       { pKa: 7.55, useful_range: "6.8-8.2", citation: "Good et al. 1966" },
-    MES:         { pKa: 6.10, useful_range: "5.5-6.7", citation: "Good et al. 1966" },
-    MOPS:        { pKa: 7.20, useful_range: "6.5-7.9", citation: "Good et al. 1966" },
-    PIPES:       { pKa: 6.76, useful_range: "6.1-7.5", citation: "Good et al. 1966" },
+    HEPES:       { pKa: 7.48, useful_range: "6.8-8.2", citation: "Good et al. 1966 (Good tabulates 20 C); 25 C value per PanReac AppliChem IP-022EN" },
+    MES:         { pKa: 6.10, useful_range: "5.5-6.7", citation: "Good et al. 1966 (Good tabulates 20 C); 25 C value per PanReac AppliChem IP-022EN" },
+    MOPS:        { pKa: 7.14, useful_range: "6.5-7.9", citation: "Good et al. 1966 (Good tabulates 20 C); 25 C value per PanReac AppliChem IP-022EN" },
+    PIPES:       { pKa: 6.76, useful_range: "6.1-7.5", citation: "Good et al. 1966 (Good tabulates 20 C); 25 C value per PanReac AppliChem IP-022EN" },
     phosphate:   { pKa: 7.20, useful_range: "5.8-8.0", citation: "CRC Handbook (H2PO4- / HPO4^2-)" },
     acetate:     { pKa: 4.76, useful_range: "3.6-5.6", citation: "CRC Handbook (acetic acid / acetate)" },
     bicarbonate: { pKa: 6.35, useful_range: "5.5-7.5", citation: "CRC Handbook (H2CO3 / HCO3-)" },
@@ -1834,7 +1834,7 @@ const DATASETS = [
       { file: "sales-tax-nexus.json", body: buildSalesTaxNexusShard(), name: "Per-state post-Wayfair economic-nexus thresholds" },
     ] },
   // v5 Group T: Bench Science and Laboratory Math (utilities 255-264).
-  { folder: "lab", edition: "IUPAC/CIAAW Abridged Standard Atomic Weights 2024. Common laboratory buffer pKa values from Good et al. 1966 and CRC Handbook of Chemistry and Physics 95th ed. Manufacturer rotor specifications, current manufacturer catalogs (Eppendorf, Beckman Coulter, Thermo Fisher). Verified " + EDITION_VERIFIED.lab + ".", shards: [
+  { folder: "lab", edition: "IUPAC/CIAAW Abridged Standard Atomic Weights 2024. Common laboratory buffer pKa values, Good 1966 / PanReac AppliChem IP-022EN / CRC 95th (Good named the buffers and tabulates at 20 C; the bundled 25 C values are IP-022EN, and Tris, phosphate, acetate and bicarbonate are CRC). Manufacturer rotor specifications, current manufacturer catalogs (Eppendorf, Beckman Coulter, Thermo Fisher). Verified " + EDITION_VERIFIED.lab + ".", shards: [
       { file: "iupac-atomic-weights.json", body: IUPAC_WEIGHTS_V5, name: "IUPAC Standard Atomic Weights 2024" },
       { file: "buffer-pka.json", body: BUFFER_PKA_V5, name: "Common laboratory buffer pKa values" },
       { file: "centrifuge-rotors.json", body: CENTRIFUGE_ROTORS_V5, name: "Representative centrifuge rotor radii (manufacturer-attributed)" },
