@@ -22313,6 +22313,56 @@ export const CITATIONS = {
       { name: "Downwash is not modelled", value: "a short stack near buildings can lose its rise entirely", source: "good engineering practice stack height rules" },
     ],
   },
+  // spec-v1701..v1704: the 2026-09-09 trade-expansion pool and spa service
+  // band. Four tiles, nothing cut.
+  "pool-cover-evaporation": {
+    formula: "evaporative loss = surface area x evaporation depth x 7.481 gal/ft^3 x 8.34 lb/gal x 1,046 BTU/lb of latent heat; a cover's saving is that loss times its effectiveness times the fraction of the day it is on, and the FUEL saving divides by the heater efficiency.",
+    edition: "Pool evaporative heat loss on the latent heat of vaporisation. The evaporation RATE is ENTERED because it depends on wind speed, humidity and the water-to-air temperature difference together, and is by far the largest uncertainty in the result.",
+    freeAccess: "One latent heat constant and two unit conversions.",
+    governance: GOVERNANCE.general,
+    editionNote: "Evaporation is the largest heat loss on most outdoor pools and it is the one nobody sees -- radiation, convection and conduction to the ground are all real and all smaller, while an owner reasoning about pool heat loss reasons about the air temperature. That is why the most effective single measure is a cover and the second is a windbreak. A COVER ONLY WORKS WHILE IT IS ON: effectiveness and hours MULTIPLY, so a 90% cover on for two thirds of the day saves 60% of the loss, not 90%. The hours that matter most are overnight, when the air is coldest and driest. And the FUEL saving is larger than the heat saving by the heater's efficiency -- heat not lost is fuel not bought. The gallons are a second saving the heat figure hides: they are treated, balanced water, replaced with cold make-up that must then be heated and re-balanced.",
+    assumptions: [
+      { name: "Evaporation rate is entered", value: "it depends on wind, humidity and the temperature difference", source: "a site measurement or ASHRAE Applications" },
+      { name: "Cover effectiveness times hours", value: "a cover off the pool saves nothing", source: "the cover manufacturer's data" },
+      { name: "Make-up water is not all evaporation", value: "splash-out, backwash and leaks read the same", source: "the pool professional" },
+    ],
+  },
+  "pool-pump-speed-savings": {
+    formula: "the affinity laws -- flow proportional to speed, power to the CUBE of speed -- with the TURNOVER held constant, so run time extends inversely with flow and the energy per turnover is speed^3 / speed, which is speed SQUARED.",
+    edition: "Centrifugal pump affinity relations applied at constant turnover volume. The equipment minimum flow is ENTERED because heaters, salt cells, cleaners and solar all have one.",
+    freeAccess: "The published affinity relations and one exact horsepower conversion.",
+    governance: GOVERNANCE.general,
+    editionNote: "The cube law is the figure a variable speed pump is sold on and it is NOT the saving, because a pool still has to be turned over. Half speed is an eighth of the power for twice as long: a QUARTER of the energy, not an eighth. That is still an excellent result and it is half again less than the power ratio suggests, so quoting the cube law to a pool owner overstates it. THE EQUIPMENT MINIMUM IS THE REAL CONSTRAINT -- a gas heater will not fire, a salt cell will not generate, a cleaner will not drive and a solar collector will not lift -- so the usual answer is a schedule rather than a single speed. AND FILTRATION IMPROVES AT LOW FLOW: slower water gives fine particles time to be intercepted rather than driven through, so a long slow cycle filters better as well as costing less. The instinct that a pump on low speed is not doing real work is exactly backwards.",
+    assumptions: [
+      { name: "Turnover held constant", value: "which is what makes the exponent 2 rather than 3", source: "standard pool practice" },
+      { name: "Equipment minimum flow is entered", value: "heater, salt cell, cleaner and solar each have one", source: "the equipment manufacturers" },
+      { name: "Fixed system curve assumed", value: "static head from solar or a spillway flattens the affinity relation", source: "the pump manufacturer's curve" },
+    ],
+  },
+  "pool-heat-pump-capacity": {
+    formula: "delivered capacity = rated capacity x the air, humidity and water derate factors multiplied together, all three read from the manufacturer's own capacity table; heat required = gallons x 8.34 x the temperature rise, and the heat-up time divides it by the DERATED capacity.",
+    edition: "Pool heat pump performance from the manufacturer's published capacity tables. The factors are ENTERED because the shape of the capacity surface differs between units and refrigerants enough that a generic correlation would be wrong for most of them.",
+    freeAccess: "Three entered factors and one thermal mass relation.",
+    governance: GOVERNANCE.general,
+    editionNote: "A rating is stated at one air temperature, one humidity and one water temperature -- usually a summer combination -- and the shoulder season the owner bought the unit for is a different set of numbers. THE THREE FACTORS DO NOT MOVE TOGETHER. Cooler air cuts capacity; WARMER WATER also cuts it, because the condensing temperature rises with the water, so pushing the setpoint up reduces the output that has to reach it; and HIGHER HUMIDITY RAISES capacity, because latent heat is available at the evaporator. That third term is the one nobody expects, and it is why pool heat pumps like humid climates. The COP falls on the same conditions, so the cost per BTU roughly doubles exactly when the pool needs the most of them. AND A COVER DOES NOT ADD CAPACITY -- it removes the loss the heater is fighting, which on a slow heat-up is the whole result: an uncovered pool in cool weather can run a heat pump continuously and gain almost nothing.",
+    assumptions: [
+      { name: "Factors are entered from the manufacturer's table", value: "the capacity surface differs by unit and refrigerant", source: "the manufacturer's capacity tables" },
+      { name: "Heat-up uses the DERATED capacity", value: "not the nameplate, which is a summer figure", source: "this tile versus a rating-based heat-up" },
+      { name: "Frost-limited cutoff not modelled", value: "commonly around 50 degF, and a manufacturer figure", source: "the manufacturer's data" },
+    ],
+  },
+  "spa-drain-interval": {
+    formula: "the one-third rule: drain interval in days = spa gallons / (3 x average daily bathers), which is exactly inverse in bather load and linear in volume.",
+    edition: "The residential spa drain convention as the NSPF CPO handbook and manufacturers state it. A TDS measurement, where available, supersedes the convention because it measures what the rule estimates.",
+    freeAccess: "One published rule of thumb.",
+    governance: GOVERNANCE.general,
+    editionNote: "Dissolved solids, body oils, cosmetics and disinfection byproducts accumulate in proportion to bather load and are removed only by REPLACING WATER -- filtration and sanitiser do not remove them. So the interval is volume over load, and a spa is a small volume carrying a heavy load. The same handful of bathers on a full-size pool gives an interval measured in YEARS, which is exactly why pools are not drained on a schedule and spas are, despite being the same chemistry. The interval is inverse in load, so a spa used twice as hard needs draining twice as often, and a schedule set for a quiet household is wrong for the week the family visits. The failure mode is not dramatic: the water goes dull, foams, resists sanitiser and starts to scale, and the owner adds more chemicals to a problem that only fresh water solves. A commercial spa is a separate and stricter question governed by the health code.",
+    assumptions: [
+      { name: "A convention, not a measurement", value: "a TDS reading beats it where one is available", source: "the NSPF CPO handbook" },
+      { name: "Residential only", value: "health codes require far more frequent draining for public spas", source: "the applicable health code" },
+      { name: "Refill chemistry not addressed", value: "a refill starts a new balance and needs its own testing", source: "the spa manufacturer's instructions" },
+    ],
+  },
   // spec-v1588..v1590, v1605..v1607: the 2026-09-09 trade-expansion water
   // systems band. Six tiles across wells and distribution.
   "step-drawdown-efficiency": {

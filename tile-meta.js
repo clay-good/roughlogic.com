@@ -1186,6 +1186,11 @@ const _TILES = [
   ["wet-well-cycle-time", "M"],
   ["main-flushing-volume", "M"],
   ["pressure-zone-hgl", "M"],
+  // spec-v1701..v1704 pool and spa service band
+  ["pool-cover-evaporation", "M"],
+  ["pool-pump-speed-savings", "M"],
+  ["pool-heat-pump-capacity", "M"],
+  ["spa-drain-interval", "M"],
   // spec-v1622..v1631 HVAC test-and-balance and hydronic systems band
   ["flow-hood-correction", "C"],
   ["fan-system-effect", "C"],

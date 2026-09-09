@@ -1323,6 +1323,13 @@ export const TOOL_MODULES = (() => {
   // spec-v1731..v1736: the industrial hygiene bench. Split into its own
   // module rather than added to calc-cross.js, which sits at 94.6% of its
   // size cap and whose own gate says to split rather than raise the budget.
+  // spec-v1701..v1704: the pool and spa service bench. Split into its own
+  // module rather than added to calc-treatment.js, which sits at 99.6% of its
+  // size cap.
+  declare("./calc-pool.js", "POOL_RENDERERS", [
+    "pool-cover-evaporation", "pool-pump-speed-savings",
+    "pool-heat-pump-capacity", "spa-drain-interval",
+  ]);
   declare("./calc-hygiene.js", "HYGIENE_RENDERERS", [
     "dilution-ventilation-solvent", "respirator-cartridge-life",
     "arc-rated-clothing-selection", "fixed-ladder-fall-protection",

@@ -107451,6 +107451,255 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "pool-cover-evaporation",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Pool Cover Evaporation and Heat Loss Savings -- the spec-v1701 worked example, recomputed",
+   "source_edition_or_year": "spec-v1701 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "surface_area_ft2": 800,
+    "evaporation_in_day": 0.25,
+    "cover_effectiveness_pct": 90,
+    "cover_hours_per_day": 16,
+    "heater_efficiency_pct": 82,
+    "fuel_cost_per_mmbtu": 12,
+    "season_days": 180
+   },
+   "outputs": {
+    "gallons_per_day": {
+     "value": 124.68333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pounds_per_day": {
+     "value": 1039.859,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "mmbtu_per_day": {
+     "value": 1.0876925,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cover_saving_mmbtu_day": {
+     "value": 0.65261551,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "season_saving_mmbtu": {
+     "value": 117.47079,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fuel_mmbtu": {
+     "value": 143.25706,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "season_saving_cost": {
+     "value": 1719.0848,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pool-pump-speed-savings",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Pool Pump Speed Reduction Energy Savings -- the spec-v1702 worked example, recomputed",
+   "source_edition_or_year": "spec-v1702 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "pump_hp": 2,
+    "full_speed_hours": 8,
+    "speed_fraction": 0.5,
+    "electricity_rate_per_kwh": 0.16,
+    "days_per_year": 365,
+    "minimum_flow_fraction": 0.4
+   },
+   "outputs": {
+    "full_kw": {
+     "value": 1.4914,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "reduced_kw": {
+     "value": 0.186425,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "reduced_hours": {
+     "value": 16,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "energy_fraction": {
+     "value": 0.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "full_kwh_day": {
+     "value": 11.9312,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "reduced_kwh_day": {
+     "value": 2.9828,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "saving_kwh_day": {
+     "value": 8.9484,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annual_saving_cost": {
+     "value": 522.58656,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pool-heat-pump-capacity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Pool Heat Pump Capacity vs Air and Water Temperature -- the spec-v1703 worked example, recomputed",
+   "source_edition_or_year": "spec-v1703 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "rated_capacity_btuh": 110000,
+    "air_derate_factor": 0.62,
+    "humidity_derate_factor": 0.88,
+    "water_derate_factor": 0.92,
+    "rated_cop": 5.5,
+    "cop_derate_factor": 0.55,
+    "pool_gallons": 20000,
+    "temperature_rise_f": 10,
+    "cover_loss_reduction_pct": 70
+   },
+   "outputs": {
+    "combined_factor": {
+     "value": 0.501952,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "derated_capacity_btuh": {
+     "value": 55214.72,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "capacity_pct_of_rating": {
+     "value": 50.1952,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "derated_cop": {
+     "value": 3.025,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heat_required_btu": {
+     "value": 1668000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heat_up_hours": {
+     "value": 30.209335,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heat_up_hours_with_cover": {
+     "value": 17.770197,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spa-drain-interval",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Spa Drain Interval and Refill Volume -- the spec-v1704 worked example, recomputed",
+   "source_edition_or_year": "spec-v1704 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "spa_gallons": 400,
+    "daily_bathers": 6,
+    "days_since_drain": 14,
+    "alternative_bathers": 12,
+    "fill_tds_ppm": 250,
+    "current_tds_ppm": 1100,
+    "tds_limit_ppm": 1500
+   },
+   "outputs": {
+    "interval_days": {
+     "value": 22.222222,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "interval_weeks": {
+     "value": 3.1746032,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "days_remaining": {
+     "value": 8.2222222,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alternative_interval_days": {
+     "value": 11.111111,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tds_rise_ppm": {
+     "value": 850,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "refill_gallons": {
+     "value": 400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

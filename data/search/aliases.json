@@ -111622,6 +111622,106 @@
    "term": "0.433 psi per foot",
    "target": "pressure-zone-hgl",
    "kind": "industry"
+  },
+  {
+   "term": "pool cover energy savings",
+   "target": "pool-cover-evaporation",
+   "kind": "industry"
+  },
+  {
+   "term": "pool evaporation heat loss",
+   "target": "pool-cover-evaporation",
+   "kind": "industry"
+  },
+  {
+   "term": "pool blanket payback",
+   "target": "pool-cover-evaporation",
+   "kind": "industry"
+  },
+  {
+   "term": "evaporation rate pool",
+   "target": "pool-cover-evaporation",
+   "kind": "industry"
+  },
+  {
+   "term": "pool water loss cover",
+   "target": "pool-cover-evaporation",
+   "kind": "industry"
+  },
+  {
+   "term": "pool pump variable speed savings",
+   "target": "pool-pump-speed-savings",
+   "kind": "industry"
+  },
+  {
+   "term": "affinity law pool pump",
+   "target": "pool-pump-speed-savings",
+   "kind": "industry"
+  },
+  {
+   "term": "pool pump energy cube law",
+   "target": "pool-pump-speed-savings",
+   "kind": "industry"
+  },
+  {
+   "term": "turnover at low speed",
+   "target": "pool-pump-speed-savings",
+   "kind": "industry"
+  },
+  {
+   "term": "pool pump cost savings",
+   "target": "pool-pump-speed-savings",
+   "kind": "industry"
+  },
+  {
+   "term": "pool heat pump capacity air temperature",
+   "target": "pool-heat-pump-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "heat pump derate cool weather",
+   "target": "pool-heat-pump-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "pool heat pump derated output",
+   "target": "pool-heat-pump-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "heat pump cop pool",
+   "target": "pool-heat-pump-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "shoulder season pool heating",
+   "target": "pool-heat-pump-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "spa drain interval",
+   "target": "spa-drain-interval",
+   "kind": "industry"
+  },
+  {
+   "term": "hot tub water change frequency",
+   "target": "spa-drain-interval",
+   "kind": "industry"
+  },
+  {
+   "term": "gallons divided by three times bathers",
+   "target": "spa-drain-interval",
+   "kind": "industry"
+  },
+  {
+   "term": "spa tds drain",
+   "target": "spa-drain-interval",
+   "kind": "industry"
+  },
+  {
+   "term": "when to drain a hot tub",
+   "target": "spa-drain-interval",
+   "kind": "industry"
   }
  ]
 }

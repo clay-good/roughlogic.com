@@ -1629,6 +1629,11 @@ const RELATED = {
   "wet-well-cycle-time": ["confined-space-vent","pump-tdh","water-hammer-surge"],
   "main-flushing-volume": ["pipe-volume","pressure-zone-hgl","main-disinfection-chlorine"],
   "pressure-zone-hgl": ["main-flushing-volume","pump-tdh","water-hammer-surge"],
+  // spec-v1701..v1704: pool and spa service band.
+  "pool-cover-evaporation": ["pool-heat-pump-capacity","pool-pump-speed-savings","pool-volume"],
+  "pool-pump-speed-savings": ["pool-turnover","vfd-energy-savings","pool-cover-evaporation"],
+  "pool-heat-pump-capacity": ["pool-heater-btu","pool-cover-evaporation","heat-pump-cold-capacity"],
+  "spa-drain-interval": ["pool-turnover","pool-alkalinity-adjust","pool-volume"],
   // spec-v1622..v1631: HVAC test-and-balance and hydronic systems band.
   "flow-hood-correction": ["pitot-traverse-cfm","proportional-balance-ratio","traverse-closure"],
   "fan-system-effect": ["fan-affinity-laws","duct-leakage","flow-hood-correction"],

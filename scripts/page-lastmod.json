@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "03477d6277d927e6",
+      "sha": "975cc23bd3d5e3d7",
       "date": "2026-09-09"
     },
     "/tools/": {
-      "sha": "63db599376ee5bd2",
+      "sha": "44d8e38b99ae86ae",
       "date": "2026-09-09"
     },
     "/groups/accounting/": {
-      "sha": "d1828f9386f262be",
+      "sha": "3913a9b9bec258fa",
       "date": "2026-09-09"
     },
     "/groups/agriculture/": {
-      "sha": "cd30977fdf373aa1",
+      "sha": "b3e83b55de0e67ea",
       "date": "2026-09-09"
     },
     "/groups/construction/": {
-      "sha": "9f105776e53115ee",
+      "sha": "b2649e2d12407ba6",
       "date": "2026-09-09"
     },
     "/groups/cross-trade/": {
-      "sha": "e2ed7fd859f63a40",
+      "sha": "62403742995ec813",
       "date": "2026-09-09"
     },
     "/groups/educators/": {
-      "sha": "ee607fc34d665d3c",
+      "sha": "fc461bb01cffe218",
       "date": "2026-09-09"
     },
     "/groups/electrical/": {
-      "sha": "2f4853d8f6edc007",
+      "sha": "7ac633c6f60408e5",
       "date": "2026-09-09"
     },
     "/groups/field/": {
-      "sha": "5c78b36e4deaf7ea",
+      "sha": "6afa5b1c36a2949d",
       "date": "2026-09-09"
     },
     "/groups/fire-ground/": {
-      "sha": "47d2b467f5389cd2",
+      "sha": "939b1f3898c5a118",
       "date": "2026-09-09"
     },
     "/groups/historical/": {
-      "sha": "27a0d4d22bf2799b",
+      "sha": "35daf7d75b9c1ac0",
       "date": "2026-09-09"
     },
     "/groups/hvac/": {
-      "sha": "58afd53393899a5f",
+      "sha": "50307b5a6d8df010",
       "date": "2026-09-09"
     },
     "/groups/kitchen/": {
-      "sha": "635319c87a3cef94",
+      "sha": "ec40799d957e5659",
       "date": "2026-09-09"
     },
     "/groups/lab/": {
-      "sha": "d6568a906224652b",
+      "sha": "28b7d0b9ad6077ee",
       "date": "2026-09-09"
     },
     "/groups/mechanic/": {
-      "sha": "d92adcd0ea19c6c8",
+      "sha": "47124c15b96b3fcd",
       "date": "2026-09-09"
     },
     "/groups/plumbing/": {
-      "sha": "9b22c8022c3df950",
+      "sha": "96ce42371ecb2d8a",
       "date": "2026-09-09"
     },
     "/groups/real-estate/": {
-      "sha": "9b588b9ee8738875",
+      "sha": "eb5165f6459b2fca",
       "date": "2026-09-09"
     },
     "/groups/references/": {
-      "sha": "d5b43b30f2415ac7",
+      "sha": "956af34974f3fdc1",
       "date": "2026-09-09"
     },
     "/groups/restoration/": {
-      "sha": "40a724146a22fcb6",
+      "sha": "3cb6ee61f93df2a0",
       "date": "2026-09-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "50f93043102853ac",
+      "sha": "3db200c950fbc39c",
       "date": "2026-09-09"
     },
     "/groups/stage/": {
-      "sha": "80b91f820eddbb6b",
+      "sha": "a66bb3bae047d948",
       "date": "2026-09-09"
     },
     "/groups/trucking/": {
-      "sha": "cb8a527d6757d2dd",
+      "sha": "b80f6a3ba01bd04e",
       "date": "2026-09-09"
     },
     "/groups/water/": {
-      "sha": "ba96a83ae0e74fe9",
+      "sha": "3ebb5d10f811d531",
       "date": "2026-09-09"
     },
     "/tools/aav-install-check/": {
@@ -1154,8 +1154,8 @@
       "date": "2026-09-04"
     },
     "/tools/cistern-storage-days/": {
-      "sha": "015e79b6f25180cd",
-      "date": "2026-09-01"
+      "sha": "f6f8b126b3eae16b",
+      "date": "2026-09-09"
     },
     "/tools/clarifier-area-for-loading/": {
       "sha": "6801abcc5918e5b6",
@@ -4794,7 +4794,7 @@
       "date": "2026-09-01"
     },
     "/tools/particle-settling-velocity/": {
-      "sha": "f602e2b67244028f",
+      "sha": "34892a6cbc09e69c",
       "date": "2026-09-09"
     },
     "/tools/partition-mass-law-tl/": {
@@ -5093,9 +5093,17 @@
       "sha": "fcf29c9205b9c194",
       "date": "2026-09-01"
     },
+    "/tools/pool-cover-evaporation/": {
+      "sha": "d83af95a55336bda",
+      "date": "2026-09-09"
+    },
     "/tools/pool-cya-dose/": {
       "sha": "0db21412e3b303ad",
       "date": "2026-09-01"
+    },
+    "/tools/pool-heat-pump-capacity/": {
+      "sha": "8c67734b8a16321a",
+      "date": "2026-09-09"
     },
     "/tools/pool-heater-btu/": {
       "sha": "1e35aea2fe5e59b4",
@@ -5108,6 +5116,10 @@
     "/tools/pool-interior-finish-volume/": {
       "sha": "7dbdb1c8cba080d4",
       "date": "2026-09-01"
+    },
+    "/tools/pool-pump-speed-savings/": {
+      "sha": "12d1c661a01b62d3",
+      "date": "2026-09-09"
     },
     "/tools/pool-salt-dose/": {
       "sha": "c710e42617d35c22",
@@ -6604,6 +6616,10 @@
     "/tools/sous-vide-pasteurization/": {
       "sha": "b5ffc75616b917ab",
       "date": "2026-09-04"
+    },
+    "/tools/spa-drain-interval/": {
+      "sha": "619abe65f5f98fb3",
+      "date": "2026-09-09"
     },
     "/tools/spanline-sag-for-tension/": {
       "sha": "545000793b0ad277",

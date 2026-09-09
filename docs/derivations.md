@@ -3056,6 +3056,10 @@ cross-check.
 | calc-plumbingtakeoff.js | `computePipePurgeVolume` | `{ pipe_id_in = 2.067, length_ft = 100, air_changes = 5, flow_scfh = 60 } = {}` | _ | _ | _ |
 | calc-plumbingtakeoff.js | `computeSolarThermalCollector` | `{ optical_efficiency = 0.70, loss_coeff = 0.85, inlet_temp_f = 120, ambient_t...` | _ | _ | _ |
 | calc-plumbingtakeoff.js | `computeSolderJointQuantity` | `{ joints = 200, wire_in_per_joint = 0.75, wire_dia_in = 0.125, solder_density...` | _ | _ | _ |
+| calc-pool.js | `computePoolCoverEvaporation` | `{ surface_area_ft2 = 0, evaporation_in_day = 0, cover_effectiveness_pct = 90,...` | _ | _ | _ |
+| calc-pool.js | `computePoolHeatPumpCapacity` | `{ rated_capacity_btuh = 0, air_derate_factor = 1, humidity_derate_factor = 1,...` | _ | _ | _ |
+| calc-pool.js | `computePoolPumpSpeedSavings` | `{ pump_hp = 0, full_speed_hours = 0, speed_fraction = 0.5, electricity_rate_p...` | _ | _ | _ |
+| calc-pool.js | `computeSpaDrainInterval` | `{ spa_gallons = 0, daily_bathers = 0, days_since_drain = 0, alternative_bathe...` | _ | _ | _ |
 | calc-powerquality.js | `computeCapacitorBankForResonanceOrder` | `{ short_circuit_mva = 0, target_resonant_order = 4.7 } = {}` | _ | _ | _ |
 | calc-powerquality.js | `computeHarmonicResonance` | `{ short_circuit_mva = 0, cap_bank_mvar = 0 } = {}` | _ | _ | _ |
 | calc-powerquality.js | `computeMotorCapacitorMax` | `{ v_ll = 0, i_noload_a = 0, safety_factor = 0.90 } = {}` | _ | _ | _ |
@@ -3713,7 +3717,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2299.
+Row count: 2303.
 
 <!-- END function-corpus-v14 -->
 
@@ -5545,7 +5549,7 @@ per spec-v14 §13.1 second paragraph.
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-stroke-mix-ratio-check` | Two-Stroke Mix Ratio Check | First-principles volume arithmetic (i...; spec-v653 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group M Water and wastewater (72 tiles)
+### Group M Water and wastewater (76 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5589,10 +5593,13 @@ per spec-v14 §13.1 second paragraph.
 | `pool-alkalinity-adjust` | Pool Total Alkalinity Adjustment | NSPF CPO Handbook / ANSI-APSP-ICC dos...; spec-v93 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pool-calcium-hardness-dose` | Pool Calcium Hardness Increase (Calcium Chloride) | Pool calcium hardness increase (calci...; lb = 20*20000*8.34e-6*(110.98/100.09)/0.77 = 3.336*1.1088... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pool-chlorine-dose` | Pool Free-Chlorine Dose by Product | pool-care practice; spec-v353 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `pool-cover-evaporation` | Pool Cover Evaporation and Heat Loss Savings | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pool-cya-dose` | Pool Cyanuric Acid Dose | NSPF CPO Handbook / ANSI-APSP-ICC; spec-v93 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pool-heat-pump-capacity` | Pool Heat Pump Capacity vs Air, Water, and Humidity | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pool-heater-btu` | Pool Heater Sizing and Heat-Up Time | thermodynamics; spec-v354 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pool-heater-size` | Pool Heater Output for a Target Heat-Up Time | thermodynamics (inverse); spec-v677 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pool-interior-finish-volume` | Pool Gunite Shell and Plaster Volume | Pool interior-finish identity (first-...; interior=15*30+2*45*5.5=945; gunite=945*(8/12)/27*1.15=26... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `pool-pump-speed-savings` | Pool Pump Speed Reduction at Constant Turnover | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pool-salt-dose` | Pool Salt Dose | Mass-balance identity (NSPF CPO / ANS...; spec-v93 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pool-tile-coping-perimeter` | Pool Waterline Tile and Coping Perimeter Takeoff | Pool perimeter-takeoff identity (firs...; perimeter=2*(16+32)=96; tiles=ceil(96/0.5*1*1.10)=ceil(21... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pool-turnover` | Pool Turnover Rate and Chlorine Demand | NSPF; GPM = 20000/(6*60) = 55.56; pure Cl = 20000*2*8.34/1e6 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5605,6 +5612,7 @@ per spec-v14 §13.1 second paragraph.
 | `ras-svi-settleability` | Settleability-Based RAS Rate (from SVI) | WEF / Sacramento activated-sludge ope...; 4 MGD, 2,500 mg/L MLSS, SVI 100 -> Xr 10,000 mg/L, 33% re... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ro-recovery-concentration` | RO Recovery, Concentrate Flow, and Concentration Factor | RO mass balance (AMTA / AWWA); R = 7.5/10 = 0.75; reject = 2.5; CF = 1/(1-0.75) = 4; rej... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sluice-gate-flow` | Sluice-Gate (Underflow) Free-Flow Discharge | Open-channel hydraulics (Henderson) /...; Cd = 0.61/sqrt(1 + 0.61 x 1/6) = 0.5812; Q = 0.5812 x 5 x... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `spa-drain-interval` | Spa Drain Interval and Refill Volume | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `srt-fm-ratio` | SRT and F/M Ratio | WEF MOP 11 + Metcalf & Eddy activated...; 1 MG aeration / 2500 mg/L MLSS / 2000 mg/L MLVSS / 0.05 M... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `step-drawdown-efficiency` | Step-Drawdown Test and Well Efficiency | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `svi-sludge-index` | Sludge Volume Index (SVI) | USEPA / WEF; SVI = SV30 * 1000 / MLSS | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5934,6 +5942,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2048. Fixture-covered or reference-cadence: 2048 / 2048.
+Tile count: 2052. Fixture-covered or reference-cadence: 2052 / 2052.
 
 <!-- END tile-index-v14 -->

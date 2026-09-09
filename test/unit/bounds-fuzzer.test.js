@@ -51124,3 +51124,113 @@ test("bounds: spec-v1607 computePressureZoneHgl -- the spec contradicted its own
   assert.equal(_v1607({ ...base, fire_flow_friction_ft: 300 }).fire_ok, false);
   assert.ok(_v1607({ ...base, max_pressure_psi: 30 }).error);
 });
+
+// =====================================================================
+// spec-v1701..v1704: the pool and spa service band. Four tiles, nothing cut.
+// spec-v1702 shipped an unrendered python placeholder for its annual saving,
+// and spec-v1703 ASSERTED its derate ("perhaps 55,000", "COP toward 3")
+// without computing it -- the factors are entered here and reproduce those
+// asserted figures, which is the check the spec declined to run.
+// =====================================================================
+import {
+  computePoolCoverEvaporation as _v1701,
+  computePoolPumpSpeedSavings as _v1702,
+  computePoolHeatPumpCapacity as _v1703,
+  computeSpaDrainInterval as _v1704,
+} from "../../calc-pool.js";
+
+test("bounds: spec-v1701 computePoolCoverEvaporation -- a cover only works while it is ON", () => {
+  const base = { surface_area_ft2: 800, evaporation_in_day: 0.25, cover_effectiveness_pct: 90, cover_hours_per_day: 16, heater_efficiency_pct: 82, fuel_cost_per_mmbtu: 12, season_days: 180 };
+  const r = _v1701(base);
+  assert.ok(Math.abs(r.gallons_per_day - 800 * 0.25 / 12 * 7.481) < 1e-9);
+  assert.ok(Math.abs(r.mmbtu_per_day - 1.0877) < 0.001);
+  // IDENTITY: the cover saving is effectiveness x hours-fraction, exactly.
+  assert.ok(Math.abs(r.cover_saving_mmbtu_day - r.mmbtu_per_day * 0.90 * (16 / 24)) < 1e-12);
+  // A 100% cover on 24 h saves exactly the whole evaporative loss.
+  const full = _v1701({ ...base, cover_effectiveness_pct: 100, cover_hours_per_day: 24 });
+  assert.ok(Math.abs(full.cover_saving_mmbtu_day - r.mmbtu_per_day) < 1e-12);
+  // No hours means no saving, whatever the effectiveness.
+  assert.ok(Math.abs(_v1701({ ...base, cover_hours_per_day: 0 }).cover_saving_mmbtu_day) < 1e-12);
+  // IDENTITY: fuel is heat over efficiency, so it EXCEEDS the heat saved.
+  assert.ok(Math.abs(r.fuel_mmbtu * 0.82 - r.season_saving_mmbtu) < 1e-9);
+  assert.ok(r.fuel_mmbtu > r.season_saving_mmbtu);
+  // Exactly linear in area and in evaporation depth.
+  assert.ok(Math.abs(_v1701({ ...base, surface_area_ft2: 1600 }).mmbtu_per_day - 2 * r.mmbtu_per_day) < 1e-12);
+  assert.ok(Math.abs(_v1701({ ...base, evaporation_in_day: 0.5 }).mmbtu_per_day - 2 * r.mmbtu_per_day) < 1e-12);
+  assert.ok(_v1701({ ...base, evaporation_in_day: 0 }).error);
+  assert.ok(_v1701({ ...base, heater_efficiency_pct: 0 }).error);
+});
+
+test("bounds: spec-v1702 computePoolPumpSpeedSavings -- energy goes with the SQUARE, not the cube", () => {
+  const base = { pump_hp: 2, full_speed_hours: 8, speed_fraction: 0.5, electricity_rate_per_kwh: 0.16, days_per_year: 365, minimum_flow_fraction: 0.4 };
+  const r = _v1702(base);
+  assert.ok(Math.abs(r.power_fraction - 0.125) < 1e-12);
+  assert.ok(Math.abs(r.reduced_hours - 16) < 1e-12);
+  // THE POINT: energy per turnover is speed^3 / speed = speed^2.
+  assert.ok(Math.abs(r.energy_fraction - 0.25) < 1e-12);
+  assert.ok(Math.abs(r.energy_fraction - Math.pow(0.5, 2)) < 1e-12);
+  assert.ok(r.energy_fraction > r.power_fraction);
+  // Derived from the exact 0.7457 kW/hp, not the spec's rounded 1.49 kW.
+  const exactFullKw = 2 * 0.7457;
+  assert.ok(Math.abs(r.full_kw - exactFullKw) < 1e-12);
+  const exactSaving = exactFullKw * 8 - exactFullKw * 0.125 * 16;
+  assert.ok(Math.abs(r.saving_kwh_day - exactSaving) < 1e-12);
+  assert.ok(Math.abs(r.annual_saving_cost - exactSaving * 365 * 0.16) < 1e-9);
+  // spec-v1702's unrendered placeholder ${8.9*365*0.16:,.0f} is about $520.
+  assert.ok(r.annual_saving_cost > 500 && r.annual_saving_cost < 540);
+  // The equipment minimum is what stops "as slow as possible".
+  assert.equal(r.below_minimum, false);
+  const slow = _v1702({ ...base, speed_fraction: 0.3 });
+  assert.equal(slow.below_minimum, true);
+  assert.ok(Math.abs(slow.energy_fraction - 0.09) < 1e-12);
+  assert.ok(_v1702({ ...base, speed_fraction: 1 }).error);
+  assert.ok(_v1702({ ...base, pump_hp: 0 }).error);
+});
+
+test("bounds: spec-v1703 computePoolHeatPumpCapacity -- the three factors multiply", () => {
+  const base = { rated_capacity_btuh: 110000, air_derate_factor: 0.62, humidity_derate_factor: 0.88, water_derate_factor: 0.92, rated_cop: 5.5, cop_derate_factor: 0.55, pool_gallons: 20000, temperature_rise_f: 10, cover_loss_reduction_pct: 70 };
+  const r = _v1703(base);
+  assert.ok(Math.abs(r.combined_factor - 0.62 * 0.88 * 0.92) < 1e-12);
+  // The spec ASSERTED "perhaps 55,000" and "half its rated output" without
+  // computing either. These factors reproduce both.
+  assert.ok(Math.abs(r.derated_capacity_btuh - 55214.72) < 0.01);
+  assert.ok(Math.abs(r.capacity_pct_of_rating - 50) < 0.3);
+  assert.ok(Math.abs(r.derated_cop - 3.025) < 1e-12);
+  // IDENTITY: unity factors give exactly the rating back.
+  const unity = _v1703({ ...base, air_derate_factor: 1, humidity_derate_factor: 1, water_derate_factor: 1 });
+  assert.ok(Math.abs(unity.derated_capacity_btuh - 110000) < 1e-9);
+  // IDENTITY: heat required is gallons x 8.34 x rise, and hours divide it.
+  assert.ok(Math.abs(r.heat_required_btu - 20000 * 8.34 * 10) < 1e-9);
+  assert.ok(Math.abs(r.heat_up_hours * r.derated_capacity_btuh - r.heat_required_btu) < 1e-6);
+  // The derated heat-up is LONGER than a nameplate heat-up would be, which
+  // is the whole distinction from pool-heater-btu.
+  assert.ok(r.heat_up_hours > r.heat_required_btu / 110000);
+  // A cover shortens the effective heat-up without adding capacity.
+  assert.ok(r.heat_up_hours_with_cover < r.heat_up_hours);
+  assert.ok(Math.abs(r.derated_capacity_btuh - unity.derated_capacity_btuh * r.combined_factor) < 1e-6);
+  assert.ok(_v1703({ ...base, air_derate_factor: 0 }).error);
+  assert.ok(_v1703({ ...base, rated_capacity_btuh: 0 }).error);
+});
+
+test("bounds: spec-v1704 computeSpaDrainInterval -- why a spa and not a pool", () => {
+  const base = { spa_gallons: 400, daily_bathers: 6, days_since_drain: 14, alternative_bathers: 12, fill_tds_ppm: 250, current_tds_ppm: 1100, tds_limit_ppm: 1500 };
+  const r = _v1704(base);
+  assert.ok(Math.abs(r.interval_days - 400 / 18) < 1e-12);
+  assert.ok(Math.abs(r.interval_days - 22.222) < 0.001);
+  // IDENTITY: exactly inverse in bather load.
+  assert.ok(Math.abs(r.alternative_interval_days - r.interval_days / 2) < 1e-12);
+  // IDENTITY: exactly linear in volume -- a 50x pool gives a 50x interval,
+  // which is the whole reason pools are not drained on a schedule.
+  const pool = _v1704({ ...base, spa_gallons: 20000 });
+  assert.ok(Math.abs(pool.interval_days - 50 * r.interval_days) < 1e-9);
+  assert.ok(pool.interval_days / 365 > 3);
+  assert.equal(r.overdue, false);
+  assert.equal(_v1704({ ...base, days_since_drain: 30 }).overdue, true);
+  // A TDS reading beats the convention.
+  assert.ok(Math.abs(r.tds_rise_ppm - 850) < 1e-12);
+  assert.equal(r.over_tds, false);
+  assert.equal(_v1704({ ...base, current_tds_ppm: 1600 }).over_tds, true);
+  assert.ok(Math.abs(r.refill_gallons - 400) < 1e-12);
+  assert.ok(_v1704({ ...base, daily_bathers: 0 }).error);
+  assert.ok(_v1704({ ...base, spa_gallons: 0 }).error);
+});
