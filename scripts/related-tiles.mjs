@@ -1637,6 +1637,11 @@ const RELATED = {
   // spec-v1745..v1749: containment band.
   "radon-fan-static": ["sub-slab-suction-field","stack-effect-npp","blower-door-ach50"],
   "propane-vaporization-rate": ["propane-run-time","propane-regulator-sizing","gas-appliance-demand"],
+  "tank-strapping-volume": ["tank-volume","tank-vent-api-2000","separator-retention-sizing"],
+  "tank-vent-api-2000": ["tank-strapping-volume","separator-retention-sizing","flare-radiation-distance"],
+  "separator-retention-sizing": ["tank-vent-api-2000","gas-pipeline-flow","tank-strapping-volume"],
+  "flare-radiation-distance": ["tank-vent-api-2000","separator-retention-sizing","gas-pipeline-flow"],
+  "well-decline-reserves": ["separator-retention-sizing","tank-strapping-volume","gas-pipeline-flow"],
   "propane-fill-outage": ["propane-run-time","propane-vaporization-rate","lp-container-separation"],
   "propane-regulator-sizing": ["gas-pipe-sizing","propane-vaporization-rate","gas-appliance-demand"],
   "lp-container-separation": ["propane-fill-outage","propane-vaporization-rate","gas-appliance-connection"],

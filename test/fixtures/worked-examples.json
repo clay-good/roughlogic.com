@@ -108319,6 +108319,330 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "tank-strapping-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Vertical Tank Strapping and Gauge Conversion -- the spec-v1534 worked example, recomputed",
+   "source_edition_or_year": "spec-v1534 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "tank_diameter_ft": 30,
+    "gauge_ft": 14,
+    "gauge_in": 6,
+    "closing_gauge_ft": 9,
+    "closing_gauge_in": 6,
+    "volume_correction_factor": 0.985,
+    "sediment_water_pct": 0.5
+   },
+   "outputs": {
+    "bbl_per_ft": {
+     "value": 125.88751,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bbl_per_in": {
+     "value": 10.490626,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gross_bbl": {
+     "value": 1825.3688,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "moved_bbl": {
+     "value": 629.43753,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "net_bbl": {
+     "value": 616.89599,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "correction_bbl": {
+     "value": 12.541543,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "correction_pct": {
+     "value": 1.9925,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tank-vent-api-2000",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Atmospheric Tank Vent Sizing (API 2000) -- the spec-v1535 worked example, recomputed",
+   "source_edition_or_year": "spec-v1535 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "pump_in_bph": 3000,
+    "pump_out_bph": 2000,
+    "volatile_factor": 1,
+    "thermal_out_ft3h": 1200,
+    "thermal_in_ft3h": 3600,
+    "fire_case_ft3h": 742000,
+    "installed_pressure_ft3h": 20000,
+    "installed_vacuum_ft3h": 12000
+   },
+   "outputs": {
+    "liquid_out_ft3h": {
+     "value": 16845,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "liquid_in_ft3h": {
+     "value": 11230,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_out_ft3h": {
+     "value": 18045,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_in_ft3h": {
+     "value": 14830,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pressure_margin_ft3h": {
+     "value": 1955,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "vacuum_margin_ft3h": {
+     "value": -2830,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fire_ratio": {
+     "value": 41.119424,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "separator-retention-sizing",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Two-Phase Separator Retention and Gas Capacity -- the spec-v1536 worked example, recomputed",
+   "source_edition_or_year": "spec-v1536 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "vessel_diameter_ft": 4,
+    "seam_to_seam_ft": 12,
+    "liquid_fraction": 0.5,
+    "liquid_rate_bpd": 1200,
+    "required_retention_min": 3,
+    "gas_rate_mmscfd": 3.5,
+    "pressure_psig": 400,
+    "temperature_f": 100,
+    "z_factor": 0.92,
+    "gas_gravity": 0.7,
+    "liquid_density_lb_ft3": 52,
+    "k_factor": 0.35
+   },
+   "outputs": {
+    "liquid_volume_bbl": {
+     "value": 13.428001,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "actual_retention_min": {
+     "value": 16.113601,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_liquid_bbl": {
+     "value": 2.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "liquid_pct_of_required": {
+     "value": 18.617813,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gas_density_lb_ft3": {
+     "value": 1.5216056,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_velocity_fps": {
+     "value": 2.0159036,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "actual_velocity_fps": {
+     "value": 0.2263789,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gas_pct_of_max": {
+     "value": 11.229649,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flare-radiation-distance",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Flare Thermal Radiation Safe Distance (API 521) -- the spec-v1537 worked example, recomputed",
+   "source_edition_or_year": "spec-v1537 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "heat_release_btuh": 250000000,
+    "radiant_fraction": 0.15,
+    "allowable_btuh_ft2": 500,
+    "solar_btuh_ft2": 300,
+    "available_distance_ft": 100
+   },
+   "outputs": {
+    "radiated_btuh": {
+     "value": 37500000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "budget_btuh_ft2": {
+     "value": 200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_distance_ft": {
+     "value": 122.15063,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "no_solar_distance_ft": {
+     "value": 77.25484,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "solar_penalty_ft": {
+     "value": 44.895788,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "radiation_at_distance_btuh_ft2": {
+     "value": 598.41552,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "supportable_release_btuh": {
+     "value": 167551610,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "well-decline-reserves",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Well Decline Curve and Remaining Reserves -- the spec-v1538 worked example, recomputed",
+   "source_edition_or_year": "spec-v1538 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "initial_rate_bpd": 420,
+    "decline_rate": 0.28,
+    "rate_is_effective": "no",
+    "economic_limit_bpd": 15,
+    "years_ahead": 5
+   },
+   "outputs": {
+    "nominal_decline": {
+     "value": 0.28,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "effective_decline": {
+     "value": 0.24421626,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "economic_life_years": {
+     "value": 11.90073,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "remaining_reserves_bbl": {
+     "value": 527946.43,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rate_at_years_bpd": {
+     "value": 103.57072,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cumulative_to_years_bbl": {
+     "value": 412488.16,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "misread_reserves_bbl": {
+     "value": 449994.43,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "misread_life_years": {
+     "value": 10.143572,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

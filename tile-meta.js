@@ -1217,6 +1217,8 @@ const _TILES = [
   ["pig-batch-volume", "E"],
   ["cathodic-anode-count-life", "E"],
   ["corroded-pipe-b31g", "E"],
+  ["tank-strapping-volume", "B"], ["tank-vent-api-2000", "B"], ["separator-retention-sizing", "B"],
+  ["flare-radiation-distance", "B"], ["well-decline-reserves", "E"],
   ["casing-cement-volume", "E"],
   ["mud-hydrostatic-pressure", "E"],
   ["kill-mud-weight", "E"],

@@ -2941,12 +2941,17 @@ cross-check.
 | calc-oilgas.js | `computeCasingCementVolume` | `{ hole_dia_in = 0, casing_od_in = 0, casing_id_in = 0, cement_column_ft = 0, ...` | _ | _ | _ |
 | calc-oilgas.js | `computeCathodicAnodeCountLife` | `{ od_in = 0, length_mi = 0, coating_efficiency_pct = 0, current_density_ma_pe...` | _ | _ | _ |
 | calc-oilgas.js | `computeCorrodedPipeB31g` | `{ od_in = 0, wall_in = 0, smys_psi = 0, defect_depth_in = 0, defect_length_in...` | _ | _ | _ |
+| calc-oilgas.js | `computeFlareRadiationDistance` | `{ heat_release_btuh = 0, radiant_fraction = 0, allowable_btuh_ft2 = 0, solar_...` | _ | _ | _ |
 | calc-oilgas.js | `computeGasPipelineFlow` | `{ equation = "panhandle_a", id_in = 0, length_mi = 0, inlet_psig = 0, outlet_...` | _ | _ | _ |
 | calc-oilgas.js | `computeKillMudWeight` | `{ original_mw_ppg = 0, tvd_ft = 0, sidpp_psi = 0, scr_pressure_psi = 0, safet...` | _ | _ | _ |
 | calc-oilgas.js | `computeLiquidPipelineStationSpacing` | `{ total_length_mi = 0, friction_gradient_ft_per_mi = 0, elevation_change_ft =...` | _ | _ | _ |
 | calc-oilgas.js | `computeMudHydrostaticPressure` | `{ mud_weight_ppg = 0, tvd_ft = 0, measured_depth_ft = 0, formation_pressure_p...` | _ | _ | _ |
 | calc-oilgas.js | `computePigBatchVolume` | `{ id_in = 0, length_mi = 0, flow_bpd = 0, tool_min_fps = 0, tool_max_fps = 0,...` | _ | _ | _ |
 | calc-oilgas.js | `computePipelineMaoBarlow` | `{ od_in = 0, wall_in = 0, smys_psi = 0, class_location = "class_1", joint_fac...` | _ | _ | _ |
+| calc-oilgas.js | `computeSeparatorRetentionSizing` | `{ vessel_diameter_ft = 0, seam_to_seam_ft = 0, liquid_fraction = 0.5, liquid_...` | _ | _ | _ |
+| calc-oilgas.js | `computeTankStrappingVolume` | `{ tank_diameter_ft = 0, gauge_ft = 0, gauge_in = 0, closing_gauge_ft = 0, clo...` | _ | _ | _ |
+| calc-oilgas.js | `computeTankVentApi2000` | `{ pump_in_bph = 0, pump_out_bph = 0, volatile_factor = 1, thermal_out_ft3h = ...` | _ | _ | _ |
+| calc-oilgas.js | `computeWellDeclineReserves` | `{ initial_rate_bpd = 0, decline_rate = 0, rate_is_effective = "no", economic_...` | _ | _ | _ |
 | calc-pipefit.js | `computeAsmeHeadThickness` | `{ design_pressure_psi = 0, inside_diameter_in = 0, allowable_stress_psi = 0, ...` | _ | _ | _ |
 | calc-pipefit.js | `computeAsmeShellThickness` | `{ design_pressure_psi = 0, inside_radius_in = 0, allowable_stress_psi = 0, jo...` | _ | _ | _ |
 | calc-pipefit.js | `computeBoilerHorsepower` | `{ output_btuhr = 0 } = {}` | _ | _ | _ |
@@ -3727,7 +3732,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2313.
+Row count: 2318.
 
 <!-- END function-corpus-v14 -->
 
@@ -4036,7 +4041,7 @@ per spec-v14 §13.1 second paragraph.
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `yaw-error-loss` | Wind Turbine Yaw Misalignment Power Loss | Project (first-principles); the manufacturer's yaw calibration procedure governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group B Plumbing (150 tiles)
+### Group B Plumbing (154 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4071,6 +4076,7 @@ per spec-v14 §13.1 second paragraph.
 | `expansion-tank` | Hydronic Expansion Tank | ASHRAE Handbook (HVAC Systems and Equ...; 100 gal system, 60 F -> 200 F, 12 psig fill, 30 psig reli... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fixture-clearance-check` | Plumbing Fixture Clearances (IPC 405.3.1) | International Code Council; 'A water closet, urinal, lavatory or bidet shall not be s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flange-rating` | Flange Pressure-Temperature Rating (ASME B16.5) | ASME B16.5 pressure-temperature ratin...; spec-v203 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `flare-radiation-distance` | Flare Thermal Radiation Safe Distance (API 521) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `flash-steam-pct` | Flash Steam Percentage Across a Pressure Drop | Steam thermodynamics; ASME steam tabl...; spec-v157 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flow-continuity` | Flow Continuity Velocity at a Size Change | fluid mechanics; spec-v372 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `friction-loss` | Friction Loss | Project (first-principles); 10 gpm through 100 ft of 1 in SCH40 PVC -> ~5.49 ft head ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4133,6 +4139,7 @@ per spec-v14 §13.1 second paragraph.
 | `roof-drain-sizing` | Roof Drain and Leader Sizing | IPC 2021 Section 1106 (Tables 1106.2 ...; 5000 ft^2 roof, 4 in/hr design rainfall -> 208 GPM, 6 in ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sanitary-dfu` | Sanitary Drain DFU Sizing | ICC; DFU = 3 + 1 + 2 = 6; 2 in horizontal branch (max 6 DFU) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `scupper-width-for-flow` | Scupper Width for a Required Overflow Flow | Francis weir / IPC 1108 (solved for t...; spec-v731 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `separator-retention-sizing` | Two-Phase Separator Retention and Gas Capacity | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `septic-dose-tank` | Septic Pump / Dose Tank Volume | USEPA Onsite Wastewater Treatment Sys...; 600 gpd, 4 doses, 5 gal drainback -> 150 net, 155 per cyc... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `septic-drainfield` | Septic Drainfield Trench Length | Project (first-principles); 600 gpd design flow / 0.6 gpd/ft^2 application rate -> 10... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `septic-drainfield-capacity` | Septic Drainfield Capacity (Flow / Bedrooms) | Project (first-principles) / USEPA OWTS; 300 ft of 3 ft trench at 0.6 gpd/ft^2 -> 900 ft^2 -> 540 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4162,6 +4169,8 @@ per spec-v14 §13.1 second paragraph.
 | `sump-basin-sizing` | Sump / Ejector Basin Drawdown and Cycle Check | IPC 2021 Section 712 / Hydraulic Inst...; 24 in basin, 12 in float spread, 10 GPM inflow, 30 GPM pu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `supply-pressure-budget` | Water-Supply Pressure Budget | IPC 2021 Section 604 / ASPE PEDH Vol. 2; street 60, 30 ft up, meter 8, friction 12, min 8 -> 12.99... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tank-drain-time` | Tank Drain Time (Falling-Head Orifice) | Falling-head (Torricelli) orifice dra...; spec-v630 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `tank-strapping-volume` | Vertical Tank Strapping and Gauge Conversion | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `tank-vent-api-2000` | Atmospheric Tank Vent Sizing (API 2000) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tankless-gpm` | Tankless Water Heater GPM | Project (first-principles); 199 kBTU input, climate 5A (Chicago) inlet 50 F, target 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thermal-expansion-volume` | Water Thermal-Expansion Volume | NIST / standard steam tables (water d...; 50 gal, 50->140 F -> ~0.839 gal expansion | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thermoplastic-temperature-derate` | Thermoplastic Pipe Pressure Derating vs Temperature | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4452,7 +4461,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (578 tiles)
+### Group E Construction (579 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5012,6 +5021,7 @@ per spec-v14 §13.1 second paragraph.
 | `weld-usage` | Welding Rod and Wire Usage | AWS / Lincoln / Miller welding-engine...; GMAW / 0.05 in^2 cross-section / 120 in weld / 4 lb/min -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `weld-visual-acceptance` | Weld Visual Acceptance: Cracks, Undersize, and Undercut | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `welded-wire-mesh` | Welded-Wire Reinforcement (Mesh) Sheet Takeoff | Lapped-coverage identity (first-princ...; effective = (5-0.5)(10-0.5) = 42.75 sf; gross = 2000*1.05... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `well-decline-reserves` | Well Decline Curve and Remaining Reserves | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `well-point-spacing` | Well Point Dewatering Spacing and Staging | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wind-cc-pressure` | Wind Components and Cladding Pressure (ASCE 7 Ch. 30) | ASCE 7-22 Chapter 30; spec-v296 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wind-gust-effect-factor` | Gust-Effect Factor G (ASCE 7 §26.11) | ASCE 7 §26.11.4 rigid gust-effect factor; zbar = max(0.6*30, 15) = 18 ft; Iz = 0.20*(33/18)^(1/6) =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5962,6 +5972,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2062. Fixture-covered or reference-cadence: 2062 / 2062.
+Tile count: 2067. Fixture-covered or reference-cadence: 2067 / 2067.
 
 <!-- END tile-index-v14 -->

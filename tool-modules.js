@@ -1350,6 +1350,8 @@ export const TOOL_MODULES = (() => {
   // cathodic protection, B31G) and the wellsite side (cement volume, mud
   // hydrostatic, kill sheet, annular velocity).
   declare("./calc-oilgas.js", "OILGAS_RENDERERS", [
+    "tank-strapping-volume", "tank-vent-api-2000", "separator-retention-sizing",
+    "flare-radiation-distance", "well-decline-reserves",
     "pipeline-mao-barlow", "gas-pipeline-flow", "liquid-pipeline-station-spacing",
     "pig-batch-volume", "cathodic-anode-count-life", "corroded-pipe-b31g",
     "casing-cement-volume", "mud-hydrostatic-pressure", "kill-mud-weight",

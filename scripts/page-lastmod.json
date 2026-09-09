@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "85fff7a7f28838fb",
+      "sha": "25ffa90f65f4db5d",
       "date": "2026-09-09"
     },
     "/tools/": {
-      "sha": "7bf784296774ce61",
+      "sha": "5072f9817339dc5d",
       "date": "2026-09-09"
     },
     "/groups/accounting/": {
-      "sha": "88030b9e6585189c",
+      "sha": "c72ce887aaf7fd8f",
       "date": "2026-09-09"
     },
     "/groups/agriculture/": {
-      "sha": "5c80f4b9e8de65c4",
+      "sha": "3c2bb0395b5b12c9",
       "date": "2026-09-09"
     },
     "/groups/construction/": {
-      "sha": "4bc5dec6716342b2",
+      "sha": "46eeaa07b3fd8086",
       "date": "2026-09-09"
     },
     "/groups/cross-trade/": {
-      "sha": "f9106836768c26ac",
+      "sha": "464e1984ef6987b9",
       "date": "2026-09-09"
     },
     "/groups/educators/": {
-      "sha": "49f648b6de93df71",
+      "sha": "de34e42de75f1041",
       "date": "2026-09-09"
     },
     "/groups/electrical/": {
-      "sha": "4c2e26848352717d",
+      "sha": "34a61ebca3a2a567",
       "date": "2026-09-09"
     },
     "/groups/field/": {
-      "sha": "0219e0017d4c8800",
+      "sha": "8ec1e44c18dd778f",
       "date": "2026-09-09"
     },
     "/groups/fire-ground/": {
-      "sha": "a10d8e9b3eb5c0a8",
+      "sha": "2fb82e10dca69197",
       "date": "2026-09-09"
     },
     "/groups/historical/": {
-      "sha": "899a508056103736",
+      "sha": "faa0f526e2bf9b83",
       "date": "2026-09-09"
     },
     "/groups/hvac/": {
-      "sha": "739089a3b8250022",
+      "sha": "d641aa754dbee227",
       "date": "2026-09-09"
     },
     "/groups/kitchen/": {
-      "sha": "a2234eb0006745f7",
+      "sha": "5e38ac3d310f4291",
       "date": "2026-09-09"
     },
     "/groups/lab/": {
-      "sha": "06dd480962e2c8a7",
+      "sha": "421261ff244ce506",
       "date": "2026-09-09"
     },
     "/groups/mechanic/": {
-      "sha": "ff089b33dd1f19a1",
+      "sha": "a40367c2ae13873f",
       "date": "2026-09-09"
     },
     "/groups/plumbing/": {
-      "sha": "c6633cf67bcc0c21",
+      "sha": "b0a82e630014cf30",
       "date": "2026-09-09"
     },
     "/groups/real-estate/": {
-      "sha": "5c3a7f50b6363351",
+      "sha": "3daba135887cbf53",
       "date": "2026-09-09"
     },
     "/groups/references/": {
-      "sha": "d90e1cdaca215463",
+      "sha": "1b615b32b5e45690",
       "date": "2026-09-09"
     },
     "/groups/restoration/": {
-      "sha": "ee2c3608a582e23f",
+      "sha": "f70006d7058ae677",
       "date": "2026-09-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "f976e64b18a30723",
+      "sha": "e837c481abfc71cb",
       "date": "2026-09-09"
     },
     "/groups/stage/": {
-      "sha": "188c46f0aadf8b20",
+      "sha": "8e45334ddf978ae1",
       "date": "2026-09-09"
     },
     "/groups/trucking/": {
-      "sha": "0e815a9a60b50c99",
+      "sha": "08a19e9d681718cb",
       "date": "2026-09-09"
     },
     "/groups/water/": {
-      "sha": "7592024556a22cb6",
+      "sha": "bf7d4efef3f64140",
       "date": "2026-09-09"
     },
     "/tools/aav-install-check/": {
@@ -2797,6 +2797,10 @@
       "sha": "88acc37148671383",
       "date": "2026-09-01"
     },
+    "/tools/flare-radiation-distance/": {
+      "sha": "8acb7bcf8f08b4f8",
+      "date": "2026-09-09"
+    },
     "/tools/flash-gas-subcool/": {
       "sha": "a36fa5c76d7968b9",
       "date": "2026-09-01"
@@ -3474,8 +3478,8 @@
       "date": "2026-09-01"
     },
     "/tools/horizontal-curve/": {
-      "sha": "7252953841f54f32",
-      "date": "2026-09-05"
+      "sha": "f6869f4cd3d83b1f",
+      "date": "2026-09-09"
     },
     "/tools/horizontal-sightline-offset/": {
       "sha": "aef6c843c6c7620b",
@@ -4914,8 +4918,8 @@
       "date": "2026-09-01"
     },
     "/tools/pipe-expansion/": {
-      "sha": "b39587be85c39e27",
-      "date": "2026-09-04"
+      "sha": "9f3a89f2d8a918fd",
+      "date": "2026-09-09"
     },
     "/tools/pipe-expansion-loop/": {
       "sha": "be54be95bc7163e3",
@@ -5234,7 +5238,7 @@
       "date": "2026-09-01"
     },
     "/tools/pressure-tank-drawdown/": {
-      "sha": "6f00d5d9b2f734f2",
+      "sha": "8f6c106289071b87",
       "date": "2026-09-09"
     },
     "/tools/pressure-zone-hgl/": {
@@ -6232,6 +6236,10 @@
     "/tools/seller-net-sheet/": {
       "sha": "2c8b90aa73967b95",
       "date": "2026-09-01"
+    },
+    "/tools/separator-retention-sizing/": {
+      "sha": "4543806134975be4",
+      "date": "2026-09-09"
     },
     "/tools/septic-dose-tank/": {
       "sha": "8b9dd5ed2799c018",
@@ -7233,6 +7241,14 @@
       "sha": "58dc95791bf696f7",
       "date": "2026-09-04"
     },
+    "/tools/tank-strapping-volume/": {
+      "sha": "6592c1d554a90c10",
+      "date": "2026-09-09"
+    },
+    "/tools/tank-vent-api-2000/": {
+      "sha": "d610541b990ce3d3",
+      "date": "2026-09-09"
+    },
     "/tools/tank-volume/": {
       "sha": "2504ef89da7246ff",
       "date": "2026-09-01"
@@ -8107,6 +8123,10 @@
     },
     "/tools/well-casing-purge-volume/": {
       "sha": "0381b488857353b0",
+      "date": "2026-09-09"
+    },
+    "/tools/well-decline-reserves/": {
+      "sha": "aa026475aaeb806a",
       "date": "2026-09-09"
     },
     "/tools/well-drawdown/": {

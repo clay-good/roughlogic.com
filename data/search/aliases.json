@@ -111972,6 +111972,131 @@
    "term": "propane delivery interval",
    "target": "propane-run-time",
    "kind": "industry"
+  },
+  {
+   "term": "tank strapping table",
+   "target": "tank-strapping-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "barrels per inch tank",
+   "target": "tank-strapping-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "gauge to barrels",
+   "target": "tank-strapping-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "tank volume oil field",
+   "target": "tank-strapping-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "custody transfer tank gauge",
+   "target": "tank-strapping-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "tank vent sizing",
+   "target": "tank-vent-api-2000",
+   "kind": "industry"
+  },
+  {
+   "term": "api 2000 breathing",
+   "target": "tank-vent-api-2000",
+   "kind": "industry"
+  },
+  {
+   "term": "tank vacuum breather",
+   "target": "tank-vent-api-2000",
+   "kind": "industry"
+  },
+  {
+   "term": "normal venting tank",
+   "target": "tank-vent-api-2000",
+   "kind": "industry"
+  },
+  {
+   "term": "emergency vent fire case",
+   "target": "tank-vent-api-2000",
+   "kind": "industry"
+  },
+  {
+   "term": "separator sizing retention time",
+   "target": "separator-retention-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "two phase separator",
+   "target": "separator-retention-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "souders brown separator",
+   "target": "separator-retention-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "oil gas separator capacity",
+   "target": "separator-retention-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "separator carryover sizing",
+   "target": "separator-retention-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "flare radiation distance",
+   "target": "flare-radiation-distance",
+   "kind": "industry"
+  },
+  {
+   "term": "api 521 flare setback",
+   "target": "flare-radiation-distance",
+   "kind": "industry"
+  },
+  {
+   "term": "thermal radiation exclusion zone",
+   "target": "flare-radiation-distance",
+   "kind": "industry"
+  },
+  {
+   "term": "flare exclusion radius",
+   "target": "flare-radiation-distance",
+   "kind": "industry"
+  },
+  {
+   "term": "radiant heat flare sizing",
+   "target": "flare-radiation-distance",
+   "kind": "industry"
+  },
+  {
+   "term": "decline curve analysis",
+   "target": "well-decline-reserves",
+   "kind": "industry"
+  },
+  {
+   "term": "exponential decline reserves",
+   "target": "well-decline-reserves",
+   "kind": "industry"
+  },
+  {
+   "term": "well economic life",
+   "target": "well-decline-reserves",
+   "kind": "industry"
+  },
+  {
+   "term": "eur estimate decline",
+   "target": "well-decline-reserves",
+   "kind": "industry"
+  },
+  {
+   "term": "effective annual decline rate",
+   "target": "well-decline-reserves",
+   "kind": "industry"
   }
  ]
 }

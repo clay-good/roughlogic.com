@@ -51609,3 +51609,193 @@ test("bounds: spec-v1595 computePropaneRunTime -- the duty cycle is the whole an
   assert.ok(_v1595({ ...base, trigger_pct: 80 }).error);
   assert.ok(_v1595({ ...base, duty_cycle: 0 }).error);
 });
+
+// =====================================================================
+// spec-v1534..v1538: the tank battery, separation and flare band. Five
+// tiles, nothing cut. TWO of the five state a conclusion their own numbers
+// refute. spec-v1536 bolds "Gas governs this vessel" and never computes
+// the gas velocity: it is 11% of the Souders-Brown limit, and 30% even at
+// the most conservative K and gas gravity. spec-v1537 says ignoring solar
+// "would have given 97 ft"; the same formula gives 77.3, and the
+// understatement is 44.9 ft rather than the 25 the spec claims.
+// =====================================================================
+import {
+  computeTankStrappingVolume as _v1534,
+  computeTankVentApi2000 as _v1535,
+  computeSeparatorRetentionSizing as _v1536,
+  computeFlareRadiationDistance as _v1537,
+  computeWellDeclineReserves as _v1538,
+} from "../../calc-oilgas.js";
+
+test("bounds: spec-v1534 computeTankStrappingVolume -- gross to net is 2% and it is money", () => {
+  const base = { tank_diameter_ft: 30, gauge_ft: 14, gauge_in: 6, closing_gauge_ft: 9, closing_gauge_in: 6, volume_correction_factor: 0.985, sediment_water_pct: 0.5 };
+  const r = _v1534(base);
+  // The spec's figures, to the digit.
+  assert.ok(Math.abs(r.bbl_per_ft - 125.89) < 0.01);
+  assert.ok(Math.abs(r.bbl_per_in - 10.491) < 0.001);
+  assert.ok(Math.abs(r.gross_bbl - 1825.4) < 0.1);
+  assert.ok(Math.abs(r.moved_bbl - 629.4) < 0.1);
+  assert.ok(Math.abs(r.net_bbl - 616.9) < 0.1);
+  assert.ok(Math.abs(r.correction_bbl - 12.5) < 0.1);
+  // IDENTITY: per inch is exactly per foot over twelve.
+  assert.ok(Math.abs(r.bbl_per_in * 12 - r.bbl_per_ft) < 1e-12);
+  // IDENTITY: the volume goes with the SQUARE of the diameter.
+  assert.ok(Math.abs(_v1534({ ...base, tank_diameter_ft: 60 }).bbl_per_ft - 4 * r.bbl_per_ft) < 1e-9);
+  // IDENTITY: gross is exactly per-foot times the gauge height in feet.
+  assert.ok(Math.abs(r.gross_bbl - r.bbl_per_ft * (14 + 6 / 12)) < 1e-9);
+  // ROUND TRIP: net back through both corrections lands on gross.
+  assert.ok(Math.abs(r.net_bbl / (0.985 * 0.995) - r.moved_bbl) < 1e-9);
+  // IDENTITY: unity factor and zero S&W leave the volume untouched.
+  const uncorrected = _v1534({ ...base, volume_correction_factor: 1, sediment_water_pct: 0 });
+  assert.ok(Math.abs(uncorrected.net_bbl - uncorrected.moved_bbl) < 1e-9);
+  assert.ok(Math.abs(uncorrected.correction_bbl) < 1e-9);
+  // A RISING gauge is a receipt, not a negative delivery.
+  const receipt = _v1534({ ...base, closing_gauge_ft: 18, closing_gauge_in: 0 });
+  assert.equal(receipt.is_delivery, false);
+  assert.ok(receipt.moved_bbl < 0);
+  assert.ok(receipt.net_bbl > 0);
+  // With no closing gauge the corrections apply to the standing volume.
+  const standing = _v1534({ ...base, closing_gauge_ft: 0, closing_gauge_in: 0 });
+  assert.equal(standing.has_closing, false);
+  assert.ok(Math.abs(standing.subject_bbl - standing.gross_bbl) < 1e-12);
+  assert.ok(_v1534({ ...base, tank_diameter_ft: 0 }).error);
+  assert.ok(_v1534({ ...base, sediment_water_pct: 100 }).error);
+});
+
+test("bounds: spec-v1535 computeTankVentApi2000 -- the vacuum side is the one that destroys tanks", () => {
+  const base = { pump_in_bph: 3000, pump_out_bph: 2000, volatile_factor: 1, thermal_out_ft3h: 1200, thermal_in_ft3h: 3600, fire_case_ft3h: 742000, installed_pressure_ft3h: 20000, installed_vacuum_ft3h: 12000 };
+  const r = _v1535(base);
+  // The spec's displacement figures, exactly.
+  assert.ok(Math.abs(r.liquid_out_ft3h - 16845) < 1e-9);
+  assert.ok(Math.abs(r.liquid_in_ft3h - 11230) < 1e-9);
+  // IDENTITY: each requirement is displacement plus its thermal term.
+  assert.ok(Math.abs(r.required_out_ft3h - (16845 + 1200)) < 1e-9);
+  assert.ok(Math.abs(r.required_in_ft3h - (11230 + 3600)) < 1e-9);
+  // The volatile allowance multiplies out-breathing ONLY.
+  const volatile = _v1535({ ...base, volatile_factor: 1.07 });
+  assert.ok(Math.abs(volatile.liquid_out_ft3h - 16845 * 1.07) < 1e-9);
+  assert.ok(Math.abs(volatile.liquid_in_ft3h - r.liquid_in_ft3h) < 1e-12);
+  // THE POINT: this tank passes on pressure and is SHORT on vacuum, which
+  // is the direction that dishes a tank in.
+  assert.equal(r.pressure_short, false);
+  assert.equal(r.vacuum_short, true);
+  assert.ok(Math.abs(r.vacuum_margin_ft3h - (12000 - 14830)) < 1e-9);
+  // THERMAL ALONE: an idle tank with no pumping still breathes in.
+  const idle = _v1535({ ...base, pump_in_bph: 0, pump_out_bph: 0.0001 });
+  assert.ok(idle.required_in_ft3h > 3599);
+  const truly_idle = _v1535({ ...base, pump_out_bph: 0 });
+  assert.ok(Math.abs(truly_idle.required_in_ft3h - 3600) < 1e-9);
+  assert.equal(truly_idle.thermal_alone_in, true);
+  assert.equal(truly_idle.vacuum_short, false);
+  // THE FIRE CASE IS ANOTHER ORDER OF MAGNITUDE.
+  assert.ok(r.fire_ratio > 40 && r.fire_ratio < 42);
+  assert.equal(_v1535({ ...base, fire_case_ft3h: 0 }).has_fire, false);
+  assert.ok(_v1535({ ...base, pump_in_bph: 0, pump_out_bph: 0 }).error);
+  assert.ok(_v1535({ ...base, volatile_factor: 0 }).error);
+});
+
+test("bounds: spec-v1536 computeSeparatorRetentionSizing -- gas does NOT govern this vessel", () => {
+  const base = { vessel_diameter_ft: 4, seam_to_seam_ft: 12, liquid_fraction: 0.5, liquid_rate_bpd: 1200, required_retention_min: 3, gas_rate_mmscfd: 3.5, pressure_psig: 400, temperature_f: 100, z_factor: 0.92, gas_gravity: 0.7, liquid_density_lb_ft3: 52, k_factor: 0.35 };
+  const r = _v1536(base);
+  // The spec's liquid figures reproduce exactly.
+  assert.ok(Math.abs(r.liquid_volume_bbl - 13.43) < 0.01);
+  assert.ok(Math.abs(r.actual_retention_min - 16.1) < 0.05);
+  // IDENTITY: retention x rate is the volume, exactly.
+  assert.ok(Math.abs(r.actual_retention_min * r.liquid_rate_bpm - r.liquid_volume_bbl) < 1e-9);
+  // THE FINDING: the spec bolds "Gas governs this vessel". It does not.
+  assert.ok(r.gas_pct_of_max > 10 && r.gas_pct_of_max < 12);
+  assert.ok(Math.abs(r.max_velocity_fps - 2.02) < 0.02);
+  assert.ok(Math.abs(r.actual_velocity_fps - 0.226) < 0.002);
+  assert.equal(r.gas_governs, false);
+  assert.equal(r.both_ample, true);
+  assert.equal(r.gas_ok, true);
+  assert.equal(r.liquid_ok, true);
+  // ROBUST: even with no mist extractor and the heaviest plausible gas it
+  // is under a third of the limit, so the finding is not an assumption.
+  const conservative = _v1536({ ...base, k_factor: 0.15, gas_gravity: 0.9 });
+  assert.ok(conservative.gas_pct_of_max < 35);
+  assert.equal(conservative.gas_ok, true);
+  // A vessel that IS gas-limited reports so, and the flag is not stuck.
+  const gassy = _v1536({ ...base, gas_rate_mmscfd: 40 });
+  assert.equal(gassy.gas_ok, false);
+  assert.equal(gassy.gas_governs, true);
+  assert.ok(gassy.gas_pct_of_max > 100);
+  // IDENTITY: gas velocity is exactly linear in the gas rate.
+  assert.ok(Math.abs(gassy.actual_velocity_fps - r.actual_velocity_fps * (40 / 3.5)) < 1e-9);
+  // A vessel that IS liquid-limited reports the other way.
+  const wet = _v1536({ ...base, liquid_rate_bpd: 12000, required_retention_min: 3 });
+  assert.equal(wet.liquid_ok, false);
+  assert.equal(wet.gas_governs, false);
+  // IDENTITY: retention is exactly inverse in the liquid rate.
+  assert.ok(Math.abs(wet.actual_retention_min - r.actual_retention_min / 10) < 1e-9);
+  assert.ok(_v1536({ ...base, liquid_fraction: 1 }).error);
+  assert.ok(_v1536({ ...base, liquid_density_lb_ft3: 0.5 }).error);
+});
+
+test("bounds: spec-v1537 computeFlareRadiationDistance -- ignoring solar costs 45 ft, not 25", () => {
+  const base = { heat_release_btuh: 250000000, radiant_fraction: 0.15, allowable_btuh_ft2: 500, solar_btuh_ft2: 300, available_distance_ft: 100 };
+  const r = _v1537(base);
+  assert.ok(Math.abs(r.radiated_btuh - 37500000) < 1e-6);
+  assert.ok(Math.abs(r.budget_btuh_ft2 - 200) < 1e-12);
+  // The spec's two criteria reproduce to the digit.
+  assert.ok(Math.abs(r.required_distance_ft - 122.2) < 0.1);
+  const brief = _v1537({ ...base, allowable_btuh_ft2: 1500 });
+  assert.ok(Math.abs(brief.required_distance_ft - 49.9) < 0.1);
+  // THE FINDING: the spec says 97 ft and 25 ft. It is 77.3 and 44.9.
+  assert.ok(Math.abs(r.no_solar_distance_ft - 77.3) < 0.1);
+  assert.ok(Math.abs(r.solar_penalty_ft - 44.9) < 0.1);
+  assert.ok(r.solar_penalty_ft > 40); // emphatically not 25
+  assert.ok(Math.abs(r.solar_penalty_pct - 58.1) < 0.2);
+  // IDENTITY: with no solar the two distances coincide, and the penalty is zero.
+  const noSun = _v1537({ ...base, solar_btuh_ft2: 0 });
+  assert.ok(Math.abs(noSun.required_distance_ft - noSun.no_solar_distance_ft) < 1e-12);
+  assert.ok(Math.abs(noSun.solar_penalty_ft) < 1e-12);
+  // INVERSE SQUARE: a quarter of the budget is exactly twice the distance.
+  const tight = _v1537({ ...base, allowable_btuh_ft2: 350, solar_btuh_ft2: 300 });
+  assert.ok(Math.abs(tight.required_distance_ft - 2 * r.required_distance_ft) < 1e-9);
+  // ROUND TRIP: the level at the required distance is exactly the criterion.
+  const atRequired = _v1537({ ...base, available_distance_ft: r.required_distance_ft });
+  assert.ok(Math.abs(atRequired.radiation_at_distance_btuh_ft2 - 500) < 1e-6);
+  assert.equal(atRequired.distance_ok, true);
+  // ROUND TRIP: the supportable release at that distance is the entered one.
+  assert.ok(Math.abs(atRequired.supportable_release_btuh - 250000000) < 1);
+  // The site check fails at 100 ft, which is inside the 122 ft required.
+  assert.equal(r.distance_ok, false);
+  assert.ok(r.radiation_at_distance_btuh_ft2 > 500);
+  // Solar at or above the criterion has no solution, and says so.
+  assert.ok(_v1537({ ...base, solar_btuh_ft2: 500 }).error);
+  assert.ok(_v1537({ ...base, radiant_fraction: 1 }).error);
+});
+
+test("bounds: spec-v1538 computeWellDeclineReserves -- nominal is not effective", () => {
+  const base = { initial_rate_bpd: 420, decline_rate: 0.28, rate_is_effective: "no", economic_limit_bpd: 15, years_ahead: 5 };
+  const r = _v1538(base);
+  // Every figure in the spec, to the digit.
+  assert.ok(Math.abs(r.effective_decline - 0.2442) < 0.0001);
+  assert.ok(Math.abs(r.economic_life_years - 11.9) < 0.05);
+  assert.ok(Math.abs(r.remaining_reserves_bbl - 527946) < 1);
+  assert.ok(Math.abs(r.misread_reserves_bbl - 450000) < 100);
+  assert.ok(Math.abs(r.misread_life_years - 10.1) < 0.05);
+  assert.ok(Math.abs(r.misread_error_pct + 14.8) < 0.2);
+  // ROUND TRIP: entering the effective rate gives back the same nominal.
+  const asEffective = _v1538({ ...base, decline_rate: r.effective_decline, rate_is_effective: "yes" });
+  assert.ok(Math.abs(asEffective.nominal_decline - 0.28) < 1e-9);
+  assert.ok(Math.abs(asEffective.remaining_reserves_bbl - r.remaining_reserves_bbl) < 1e-6);
+  assert.ok(Math.abs(asEffective.economic_life_years - r.economic_life_years) < 1e-9);
+  // IDENTITY: the two forms bracket each other -- effective is always less.
+  assert.ok(r.effective_decline < r.nominal_decline);
+  // ROUND TRIP: the rate at the economic life IS the economic limit.
+  const atLimit = _v1538({ ...base, years_ahead: r.economic_life_years });
+  assert.ok(Math.abs(atLimit.rate_at_years_bpd - 15) < 1e-6);
+  assert.ok(Math.abs(atLimit.cumulative_to_years_bbl - r.remaining_reserves_bbl) < 1e-3);
+  // IDENTITY: the forward rate is exactly the exponential.
+  assert.ok(Math.abs(r.rate_at_years_bpd - 420 * Math.exp(-0.28 * 5)) < 1e-9);
+  // For a SHALLOW decline the two forms nearly coincide; for a steep one
+  // they diverge badly, which is the whole warning.
+  const shallow = _v1538({ ...base, decline_rate: 0.05 });
+  assert.ok(Math.abs(shallow.misread_error_pct) < 3);
+  const steep = _v1538({ ...base, decline_rate: 0.7 });
+  assert.ok(Math.abs(steep.misread_error_pct) > 25);
+  assert.ok(_v1538({ ...base, economic_limit_bpd: 420 }).error);
+  assert.ok(_v1538({ ...base, decline_rate: 1.5, rate_is_effective: "yes" }).error);
+});

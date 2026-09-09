@@ -24146,6 +24146,72 @@ export const CITATIONS = {
       { name: "The trigger, not empty", value: "the last of the tank may not vaporize at the rate the load asks", source: "the supplier's delivery practice" },
     ],
   },
+  // spec-v1534..v1538: the 2026-09-09 trade-expansion tank battery,
+  // separation and flare band. Five tiles, nothing cut. TWO of the five
+  // state a conclusion their own numbers refute: spec-v1536 bolds "Gas
+  // governs this vessel" (the gas is at 11% of its velocity limit) and
+  // spec-v1537 quotes a no-solar distance of 97 ft (the same formula gives
+  // 77, and the understatement is 45 ft rather than 25).
+  "tank-strapping-volume": {
+    formula: "barrels per foot = (pi/4) D^2 / 5.615 for an ideal vertical cylinder; gross = that times the gauge height; net = gross x the volume correction factor x (1 - the sediment and water fraction).",
+    edition: "Ideal-cylinder geometry with an ENTERED volume correction factor and sediment-and-water deduction. The certified strapping table is the legal document for custody transfer and this is not a substitute for it.",
+    freeAccess: "One geometric constant and two multiplications.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE VALUE OF THIS NUMBER IS CHECKING. A vertical cylinder holds the same volume per inch all the way up, so a pumper who knows the tank's barrels per inch knows instantly what a two inch change is worth, and a ticket that disagrees is worth a second look. THE CERTIFIED STRAPPING TABLE IS THE LEGAL DOCUMENT and this formula is not a substitute: real tanks have shell courses of different thickness, bottom deadwood, out-of-round shells and tilt, and the table captures all of it, which is exactly why it is measured rather than computed. TWO CORRECTIONS SIT BETWEEN GROSS AND NET AND BOTH ARE MONEY. On the 30 ft tank here a 629 barrel run corrects to 617 -- 12.5 barrels, about 2% -- from a 0.985 temperature factor and a 0.5% sediment-and-water deduction together. Crude expands appreciably, so a warm afternoon gauge holds fewer standard barrels than the same height at dawn; that is why the correction is on the ticket and not left to the gauge.",
+    assumptions: [
+      { name: "Ideal cylinder", value: "deadwood, tilt, out-of-roundness and roof displacement are not modelled", source: "the certified strapping table" },
+      { name: "The correction factor is entered", value: "from the applicable petroleum measurement tables for the observed temperature and gravity", source: "API MPMS" },
+      { name: "Not a custody transfer document", value: "a planning and checking number", source: "the purchaser's measurement procedures" },
+    ],
+  },
+  "tank-vent-api-2000": {
+    formula: "liquid-movement venting = pump rate x 5.615 cu ft/bbl, times an allowance above unity for a volatile product; the requirement in each direction adds the thermal rate; the fire case is separate.",
+    edition: "The thermal rates and the fire case are ENTERED from the API 2000 tables, which are indexed by tank capacity and by wetted surface area and whose adopted edition governs.",
+    freeAccess: "One displacement conversion and two sums.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE VACUUM SIDE IS THE ONE THAT DESTROYS TANKS. Tanks are far weaker in vacuum than in pressure, so an under-vented tank dishes in long before it would rupture outward -- and every cubic foot of the in-breathing requirement has to pass INWARD through a vent screen that ice, insects or a coat of paint can restrict. That puts vent screen maintenance directly on the path of the failure mode rather than on a housekeeping list. AND THERMAL IN-BREATHING NEEDS NO PUMPING AT ALL, which is what makes it quiet: a warm tank hit by a cold rain contracts its vapour space in minutes, and a tank that has sat idle for weeks with nobody near it can be found dished in the next morning. THE FIRE CASE IS A DIFFERENT ORDER OF MAGNITUDE -- on the case here it is 41 times the normal out-breathing requirement -- which is why emergency relief is a weak-seam roof or a dedicated emergency vent rather than the normal conservation breather.",
+    assumptions: [
+      { name: "Thermal rates are entered", value: "the API 2000 tables are indexed by capacity and are not reproduced", source: "API 2000 as adopted" },
+      { name: "The volatile allowance is entered", value: "some liquid flashes, so out-breathing exceeds displacement", source: "the product's volatility class" },
+      { name: "Vent piping is not modelled", value: "pressure drop through the vent line reduces installed capacity", source: "the vent manufacturer" },
+    ],
+  },
+  "separator-retention-sizing": {
+    formula: "liquid retention = liquid volume / flow rate; the gas limit is Souders-Brown v = K sqrt((rho_L - rho_G)/rho_G) with gas density from PM/(ZRT), against the actual velocity across the vapour space.",
+    edition: "The K factor, the required retention time and the compressibility factor are ENTERED: all three depend on the service and the internals.",
+    freeAccess: "Cylinder geometry, the real-gas density relation, and one velocity comparison.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE SPEC BOLDS A CONCLUSION ITS OWN NUMBERS REFUTE. spec-v1536 says of its 4 by 12 ft vessel at 3.5 MMSCFD and 400 psig that 'Gas governs this vessel', and never computes the gas velocity. It is 0.23 ft/s against a Souders-Brown limit of 2.02 -- 11% of the limit, and still only 30% at the most conservative K and the heaviest plausible gas gravity. The liquid side is at 19% of its retention requirement. NEITHER SIDE GOVERNS THAT VESSEL TIGHTLY, so this computes both and names the governing case from the numbers. THE TWO FAILURES LOOK NOTHING ALIKE, which is why both are always reported: a vessel sized only on liquid retention can be far too small in diameter, and the symptom is carryover into the gas line and eventually a damaged compressor; a vessel sized only on gas can be too short to degas, and the symptom is gas breaking out downstream and upsetting the tank battery. RETENTION DOES NOT FIX RE-ENTRAINMENT -- over the settling limit the vessel carries liquid regardless of its minutes, and the fix is diameter or a mist extractor, not length. AND FOAM IS THE WILD CARD NO DIAMETER FIXES.",
+    assumptions: [
+      { name: "K factor entered", value: "it depends on the internals and whether a mist extractor is fitted", source: "API 12J and the vessel manufacturer" },
+      { name: "Retention time entered", value: "a foaming crude can need several times the nominal", source: "the design engineer" },
+      { name: "Two-phase only", value: "the oil-water interface of a three-phase vessel is a separate problem", source: "the operator's facility standards" },
+    ],
+  },
+  "flare-radiation-distance": {
+    formula: "the API 521 point-source relation D = sqrt(F x Q / (4 pi K)), with the solar contribution SUBTRACTED from the allowable level before the distance is taken, because solar adds to the flare's radiation at the target.",
+    edition: "A still-air point-source screen. The radiant fraction and the criterion are ENTERED; flame length and wind tilt are not modelled.",
+    freeAccess: "One square root and one subtraction.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE SPEC'S OWN COMPARISON IS WRONG BY 80%. spec-v1537 computes 49.9 ft and 122 ft correctly, then says that ignoring solar 'would have given 97 ft, understating the required setback by 25 ft'. The same formula at 500 BTU/h-sq ft with no solar deduction gives 77.3 ft, and the understatement is 44.9 ft -- 58% of the no-solar distance. The spec's point is right and its number makes its own case look half as strong, so the no-solar distance is COMPUTED here rather than quoted. SOLAR IS ADDED, NOT IGNORED: on a clear day 250 to 300 BTU/h per square foot is more than half of a 500 BTU/h-sq ft personnel criterion, spent before the flare is lit. AND IT IS INVERSE SQUARE, so halving the allowable multiplies the distance by 1.41, not 2 -- distances move much more slowly than heat releases. THE CRITERION HAS TO MATCH THE TARGET, and using the equipment figure where people stand is the error that matters.",
+    assumptions: [
+      { name: "Point source, still air", value: "wind tilts the flame and increases downwind radiation; that is the design case", source: "API 521 as adopted" },
+      { name: "The radiant fraction is entered", value: "0.1 to 0.15 for light hydrocarbons, up to 0.3 for sootier gases", source: "the gas composition" },
+      { name: "The criterion is entered", value: "fence line, control room, escape route and equipment are four different numbers", source: "the operator's facility siting standards" },
+    ],
+  },
+  "well-decline-reserves": {
+    formula: "exponential decline q(t) = q_i exp(-Dt); cumulative N = (q_i - q)/D; economic life t = ln(q_i/q_econ)/D; effective annual decline = 1 - exp(-D).",
+    edition: "Exponential decline only. Unconventional wells decline hyperbolically and this says so rather than fitting them.",
+    freeAccess: "Two exponentials and a logarithm.",
+    governance: GOVERNANCE.general,
+    editionNote: "TWO FORMS OF THE SAME NUMBER CIRCULATE AND GET CONFUSED: the nominal decline that goes in the exponent, and the effective annual decline that people quote as 'a 28% decline'. The well here declines 0.28 nominal, which is 24.4% effective -- and someone who reads the same 28% as effective computes a nominal of 0.329, an economic life of 10.1 years instead of 11.9, and 450,000 barrels instead of 528,000. That is 15% low on one well and material on a package. Both readings are reported here from the one number entered, because which of the two a quoted decline is meant to be is exactly what nobody writes down. THE PRACTICAL OUTPUT IS THE DATE RATHER THAN THE BARRELS: a well is abandoned when its rate stops covering lease operating expense, and plugging liability, equipment redeployment and workover decisions are all scheduled from that year. AND EXPONENTIAL IS THE WRONG MODEL FOR A SHALE WELL, where an exponential fit on early data dramatically understates reserves and a high-b hyperbolic fit far into the future overstates them.",
+    assumptions: [
+      { name: "Exponential decline only", value: "unconventional wells are hyperbolic and need a b factor and a terminal decline", source: "the reservoir engineer" },
+      { name: "Constant economic limit", value: "the limit moves with price and with operating cost", source: "the operator's economics" },
+      { name: "Not a reserves estimate", value: "no classification standard is applied", source: "SPE and PRMS definitions" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

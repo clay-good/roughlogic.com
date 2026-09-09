@@ -938,3 +938,501 @@ OILGAS_RENDERERS["annular-velocity-cleaning"] = _simpleRenderer({
   ],
   compute: computeAnnularVelocityCleaning,
 });
+
+// =====================================================================
+// spec-v1534..v1538 (scope-trade-expansion-2, the tank battery, separation
+// and flare band). Five tiles on the surface facilities between the
+// wellhead this module already covers and the pipeline it already sizes.
+//
+// TWO OF THE FIVE STATE A CONCLUSION THEIR OWN NUMBERS DO NOT SUPPORT.
+// spec-v1536 bolds "Gas governs this vessel" and never computes the gas
+// velocity; on its own inputs the velocity is 0.23 ft/s against a
+// Souders-Brown limit of 2.0, which is 11% of the limit -- and 30% even at
+// the most conservative K and gas gravity. Nothing governs that vessel
+// tightly. spec-v1537 says ignoring the solar contribution "would have
+// given 97 ft"; the same formula gives 77, and the understatement is 45 ft
+// rather than the 25 the spec claims. Both tiles compute the comparison
+// rather than asserting it.
+// =====================================================================
+
+const _OG_FT3_PER_BBL = 5.615;
+const _OG_R_GAS = 10.7316;          // psia ft^3 / (lbmol degR)
+const _OG_AIR_MW = 28.964;
+const _OG_STD_T_R = 519.67;         // 60 degF in degrees Rankine
+const _OG_STD_P_PSIA = 14.696;
+
+// =====================================================================
+// spec-v1534: vertical tank strapping, and the two corrections between
+// gross and net that are both money.
+// =====================================================================
+// dims: in { tank_diameter_ft: L, gauge_ft: L, gauge_in: L, closing_gauge_ft: L, closing_gauge_in: L, volume_correction_factor: dimensionless, sediment_water_pct: dimensionless } out: { bbl_per_ft: L^3, bbl_per_in: L^3, gross_bbl: L^3, moved_bbl: L^3, net_bbl: L^3, correction_bbl: L^3 }
+export function computeTankStrappingVolume({
+  tank_diameter_ft = 0, gauge_ft = 0, gauge_in = 0,
+  closing_gauge_ft = 0, closing_gauge_in = 0,
+  volume_correction_factor = 1, sediment_water_pct = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(tank_diameter_ft > 0)) return { error: "Tank diameter must be greater than zero." };
+  const opening_height_ft = gauge_ft + gauge_in / 12;
+  if (!(opening_height_ft > 0)) return { error: "The gauge height must be greater than zero." };
+  if (!(volume_correction_factor > 0)) return { error: "The volume correction factor must be greater than zero." };
+  if (sediment_water_pct < 0 || sediment_water_pct >= 100) return { error: "Sediment and water must be between zero and 100 percent." };
+
+  const bbl_per_ft = (Math.PI / 4) * tank_diameter_ft * tank_diameter_ft / _OG_FT3_PER_BBL;
+  const bbl_per_in = bbl_per_ft / 12;
+  const gross_bbl = bbl_per_ft * opening_height_ft;
+
+  const closing_height_ft = closing_gauge_ft + closing_gauge_in / 12;
+  const has_closing = closing_height_ft > 0;
+  const moved_bbl = has_closing ? bbl_per_ft * (opening_height_ft - closing_height_ft) : 0;
+  const is_delivery = moved_bbl > 0;
+  const subject_bbl = has_closing ? Math.abs(moved_bbl) : gross_bbl;
+
+  const sw_factor = 1 - sediment_water_pct / 100;
+  const net_bbl = subject_bbl * volume_correction_factor * sw_factor;
+  const correction_bbl = subject_bbl - net_bbl;
+  const correction_pct = subject_bbl > 0 ? 100 * correction_bbl / subject_bbl : 0;
+
+  const perInchVerdict = "a " + fmt(tank_diameter_ft, 1) + " ft diameter vertical tank holds " + fmt(bbl_per_ft, 2) + " barrels per foot and " + fmt(bbl_per_in, 3) + " per inch, the same all the way up -- so a one inch change is " + fmt(bbl_per_in, 2) + " barrels and a ticket that says otherwise is worth a second look";
+  const grossVerdict = "at a gauge of " + fmt(gauge_ft, 0) + " ft " + fmt(gauge_in, 1) + " in the tank holds " + fmt(gross_bbl, 1) + " barrels gross";
+  const movedVerdict = !has_closing
+    ? "no closing gauge was entered, so the corrections below apply to the standing volume rather than to a run"
+    : is_delivery
+      ? "the gauge fell to " + fmt(closing_gauge_ft, 0) + " ft " + fmt(closing_gauge_in, 1) + " in, so the run moved " + fmt(moved_bbl, 1) + " barrels gross"
+      : "the gauge ROSE to " + fmt(closing_gauge_ft, 0) + " ft " + fmt(closing_gauge_in, 1) + " in, so the tank RECEIVED " + fmt(-moved_bbl, 1) + " barrels gross";
+  const netVerdict = "applying a volume correction factor of " + fmt(volume_correction_factor, 4) + " and a " + fmt(sediment_water_pct, 2) + "% sediment and water deduction gives " + fmt(net_bbl, 1) + " barrels net -- a difference of " + fmt(correction_bbl, 1) + " barrels, or " + fmt(correction_pct, 2) + "%. THAT IS WHY THE CORRECTION IS ON THE TICKET AND NOT LEFT TO THE GAUGE";
+  const strappingVerdict = "AND THE CERTIFIED STRAPPING TABLE IS THE LEGAL DOCUMENT, not this formula. Real tanks deviate from the ideal cylinder -- shell courses of different thickness, bottom deadwood, an out-of-round shell, tilt -- and the strapping table captures all of it, which is why it is MEASURED rather than computed. This is a sanity check and a planning number, and for custody transfer it is neither sufficient nor authoritative";
+  const temperatureVerdict = "THE TEMPERATURE CORRECTION IS NOT A ROUNDING MATTER. Crude expands appreciably, so a warm tank gauged in the afternoon holds fewer standard barrels than the same height gauged at dawn, and the correction to 60 degF is what makes two measurements comparable. The factor is ENTERED from the applicable petroleum measurement tables for the observed temperature and gravity rather than modelled here";
+
+  return {
+    bbl_per_ft, bbl_per_in, gross_bbl, has_closing, moved_bbl, is_delivery,
+    net_bbl, correction_bbl, correction_pct, subject_bbl,
+    perInchVerdict, grossVerdict, movedVerdict, netVerdict, strappingVerdict, temperatureVerdict,
+    note: "Barrels per inch on a vertical tank, and the two corrections that sit between a gauge reading and a ticket. A vertical cylinder holds the same volume per inch all the way up, so the arithmetic is one constant and a multiplication -- and the value of having it in hand is CHECKING. A pumper who knows the tank's barrels per inch knows immediately what a two inch change is worth, and a ticket that disagrees is worth a second look. THE CERTIFIED STRAPPING TABLE IS THE LEGAL DOCUMENT AND THIS FORMULA IS NOT A SUBSTITUTE. Real tanks deviate from the ideal cylinder: shell courses of different thickness, bottom deadwood, an out-of-round shell, tilt. The strapping table captures all of that, which is exactly why it is measured rather than computed, and why custody transfer runs on it. TWO CORRECTIONS SIT BETWEEN GROSS AND NET AND BOTH ARE MONEY. Temperature correction to 60 degF, because crude expands appreciably and a warm afternoon gauge holds fewer standard barrels than the same height at dawn; and the deduction for sediment and water, which is volume that is not oil. On a run of a few hundred barrels the two together commonly move the ticket by more than ten barrels, which is why they are on it. The correction factor is ENTERED from the applicable petroleum measurement tables for the observed temperature and gravity rather than modelled here, because those tables are the authority and they differ by product. This computes an ideal-cylinder volume and applies entered corrections. It does not replace a certified strapping table, generate a correction factor from temperature and gravity, account for deadwood, tilt, out-of-roundness or floating-roof displacement, address bottom sediment, free water or a water cut measurement, handle horizontal or spherical vessels, or produce a custody transfer document. API MPMS, the certified strapping table, the purchaser's measurement procedures, and the operator govern.",
+  };
+}
+export const tankStrappingVolumeExample = { inputs: { tank_diameter_ft: 30, gauge_ft: 14, gauge_in: 6, closing_gauge_ft: 9, closing_gauge_in: 6, volume_correction_factor: 0.985, sediment_water_pct: 0.5 } };
+
+// =====================================================================
+// spec-v1535: API 2000 atmospheric tank venting. Four demands, two
+// directions, and a fire case that is a different order of magnitude.
+// The thermal and fire rates are ENTERED from the API 2000 tables -- they
+// are tabulated by capacity and by wetted area and the adopted edition
+// governs -- and what is computed is the combination and the margin.
+// =====================================================================
+// dims: in { pump_in_bph: L^3 T^-1, pump_out_bph: L^3 T^-1, volatile_factor: dimensionless, thermal_out_ft3h: L^3 T^-1, thermal_in_ft3h: L^3 T^-1, fire_case_ft3h: L^3 T^-1, installed_pressure_ft3h: L^3 T^-1, installed_vacuum_ft3h: L^3 T^-1 } out: { liquid_out_ft3h: L^3 T^-1, liquid_in_ft3h: L^3 T^-1, required_out_ft3h: L^3 T^-1, required_in_ft3h: L^3 T^-1, pressure_margin_ft3h: L^3 T^-1, vacuum_margin_ft3h: L^3 T^-1 }
+export function computeTankVentApi2000({
+  pump_in_bph = 0, pump_out_bph = 0, volatile_factor = 1,
+  thermal_out_ft3h = 0, thermal_in_ft3h = 0, fire_case_ft3h = 0,
+  installed_pressure_ft3h = 0, installed_vacuum_ft3h = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(pump_in_bph > 0) && !(pump_out_bph > 0)) return { error: "Enter at least one of the pump-in and pump-out rates." };
+  if (!(volatile_factor > 0)) return { error: "The volatile allowance factor must be greater than zero." };
+
+  // Whatever volume goes in displaces an equal volume of vapour out, with
+  // an allowance above unity for a volatile product because some flashes.
+  const liquid_out_ft3h = pump_in_bph * _OG_FT3_PER_BBL * volatile_factor;
+  const liquid_in_ft3h = pump_out_bph * _OG_FT3_PER_BBL;
+
+  const required_out_ft3h = liquid_out_ft3h + thermal_out_ft3h;
+  const required_in_ft3h = liquid_in_ft3h + thermal_in_ft3h;
+
+  const has_pressure_vent = installed_pressure_ft3h > 0;
+  const has_vacuum_vent = installed_vacuum_ft3h > 0;
+  const pressure_margin_ft3h = has_pressure_vent ? installed_pressure_ft3h - required_out_ft3h : 0;
+  const vacuum_margin_ft3h = has_vacuum_vent ? installed_vacuum_ft3h - required_in_ft3h : 0;
+  const pressure_short = has_pressure_vent && pressure_margin_ft3h < 0;
+  const vacuum_short = has_vacuum_vent && vacuum_margin_ft3h < 0;
+
+  const thermal_share_out_pct = required_out_ft3h > 0 ? 100 * thermal_out_ft3h / required_out_ft3h : 0;
+  const thermal_share_in_pct = required_in_ft3h > 0 ? 100 * thermal_in_ft3h / required_in_ft3h : 0;
+  const thermal_alone_in = thermal_in_ft3h > 0 && liquid_in_ft3h === 0;
+
+  const has_fire = fire_case_ft3h > 0;
+  const fire_ratio = has_fire && required_out_ft3h > 0 ? fire_case_ft3h / required_out_ft3h : 0;
+
+  const outVerdict = "OUT-BREATHING: " + fmt(pump_in_bph, 0) + " bbl/h in is " + fmt(liquid_out_ft3h, 0) + " cu ft/h of displaced vapour" + (volatile_factor > 1 ? " (including the " + fmt(volatile_factor, 2) + "x volatile allowance)" : "") + ", plus " + fmt(thermal_out_ft3h, 0) + " thermal, for " + fmt(required_out_ft3h, 0) + " cu ft/h required on the pressure side";
+  const inVerdict = "IN-BREATHING: " + fmt(pump_out_bph, 0) + " bbl/h out is " + fmt(liquid_in_ft3h, 0) + " cu ft/h of air that has to get IN, plus " + fmt(thermal_in_ft3h, 0) + " thermal, for " + fmt(required_in_ft3h, 0) + " cu ft/h required on the vacuum side";
+  const vacuumVerdict = "THE VACUUM SIDE IS THE ONE THAT DESTROYS TANKS. Tanks are far weaker in vacuum than in pressure, and every cubic foot of the " + fmt(required_in_ft3h, 0) + " cu ft/h has to pass INWARD through a vent screen that ice, insects or a coat of paint can restrict. That is a maintenance item on the path of the failure mode, not a housekeeping one";
+  const thermalVerdict = thermal_alone_in
+    ? "AND THERMAL IN-BREATHING NEEDS NO PUMPING AT ALL. A warm tank hit by a cold rain contracts its vapour space fast, and a tank that has sat idle for weeks can be found dished in -- which is exactly the case entered here, with no pump-out and " + fmt(thermal_in_ft3h, 0) + " cu ft/h of thermal demand"
+    : "AND THERMAL IN-BREATHING NEEDS NO PUMPING AT ALL: a warm tank hit by a cold rain contracts its vapour space fast, and a tank that has sat idle can be found dished in. Here thermal is " + fmt(thermal_share_in_pct, 0) + "% of the vacuum requirement and " + fmt(thermal_share_out_pct, 0) + "% of the pressure requirement, but on an idle tank it is 100% of both";
+  const marginVerdict = (!has_pressure_vent && !has_vacuum_vent)
+    ? "no installed vent capacity was entered, so no margin is reported"
+    : (pressure_short || vacuum_short)
+      ? "THE INSTALLED VENT IS SHORT" + (pressure_short ? " on pressure by " + fmt(-pressure_margin_ft3h, 0) + " cu ft/h" : "") + (pressure_short && vacuum_short ? " and" : "") + (vacuum_short ? " on vacuum by " + fmt(-vacuum_margin_ft3h, 0) + " cu ft/h" : "")
+      : "the installed vent covers both directions, with " + (has_pressure_vent ? fmt(pressure_margin_ft3h, 0) + " cu ft/h of pressure margin" : "no pressure figure entered") + " and " + (has_vacuum_vent ? fmt(vacuum_margin_ft3h, 0) + " cu ft/h of vacuum margin" : "no vacuum figure entered");
+  const fireVerdict = !has_fire
+    ? "no fire case was entered. It is sized on WETTED SURFACE AREA from the API 2000 tables and it is a different order of magnitude from normal venting"
+    : "THE FIRE CASE IS A DIFFERENT ORDER OF MAGNITUDE: " + fmt(fire_case_ft3h, 0) + " cu ft/h, which is " + fmt(fire_ratio, 0) + " times the normal out-breathing requirement. That is why emergency venting is a weak-seam roof or a dedicated emergency vent rather than the normal breather -- no conservation vent sized for pumping and weather passes it";
+
+  return {
+    liquid_out_ft3h, liquid_in_ft3h, required_out_ft3h, required_in_ft3h,
+    has_pressure_vent, has_vacuum_vent, pressure_margin_ft3h, vacuum_margin_ft3h,
+    pressure_short, vacuum_short, thermal_share_out_pct, thermal_share_in_pct, thermal_alone_in,
+    has_fire, fire_ratio,
+    outVerdict, inVerdict, vacuumVerdict, thermalVerdict, marginVerdict, fireVerdict,
+    note: "What an atmospheric tank's vent has to pass, in both directions. Four demands combine into two: liquid movement plus thermal effect on the pressure side, and liquid movement plus thermal effect on the vacuum side. The liquid terms are straightforward displacement -- whatever volume goes in pushes an equal volume of vapour out -- with an allowance above unity for a volatile product because some of it flashes. The thermal terms and the fire case are ENTERED from the API 2000 tables, which are indexed by tank capacity and by wetted surface area and whose adopted edition governs. THE VACUUM SIDE IS THE ONE THAT DESTROYS TANKS. Tanks are far weaker in vacuum than in pressure, so an under-vented tank dishes in long before it would rupture outward, and every cubic foot of the in-breathing requirement has to pass INWARD through a vent screen that ice, insects or a coat of paint can restrict. That puts vent screen maintenance directly on the path of the failure mode. AND THERMAL IN-BREATHING NEEDS NO PUMPING AT ALL, which is what makes it quiet. A warm tank hit by a cold rain contracts its vapour space in minutes, and a tank that has sat idle for weeks with nobody near it can be found dished in the next morning. THE FIRE CASE IS A DIFFERENT ORDER OF MAGNITUDE, sized on wetted surface area, and where it applies it governs the emergency venting entirely -- which is why emergency relief is a weak-seam roof or a dedicated emergency vent rather than the normal conservation breather. This combines entered rates. It does not read the API 2000 thermal or fire tables, determine the volatility class or the applicable allowance, size a vent or select a device, account for vent piping pressure drop, inert gas blanketing, or a vapour recovery connection, evaluate a weak-seam roof, or address the settings and set-point spread a conservation vent needs. API 2000 as adopted, the tank and vent manufacturers, and the engineer of record govern.",
+  };
+}
+export const tankVentApi2000Example = { inputs: { pump_in_bph: 3000, pump_out_bph: 2000, volatile_factor: 1, thermal_out_ft3h: 1200, thermal_in_ft3h: 3600, fire_case_ft3h: 742000, installed_pressure_ft3h: 20000, installed_vacuum_ft3h: 12000 } };
+
+// =====================================================================
+// spec-v1536: two-phase separator sizing. Two independent requirements in
+// one vessel, and the spec BOLDS a conclusion it never computes: "Gas
+// governs this vessel". On its own inputs -- 4 ft by 12 ft, half full,
+// 3.5 MMSCFD at 400 psig -- the gas velocity is 0.23 ft/s against a
+// Souders-Brown limit of about 2.0, which is 11% of it. Even at the most
+// conservative K (0.15, no mist extractor) and a heavy 0.9 gravity gas it
+// is 30%. NEITHER side governs that vessel tightly, and the liquid side
+// has 16 minutes of retention against the 2 to 3 a light oil needs. So
+// this computes both and names the governing one from the numbers.
+// =====================================================================
+// dims: in { vessel_diameter_ft: L, seam_to_seam_ft: L, liquid_fraction: dimensionless, liquid_rate_bpd: L^3 T^-1, required_retention_min: T, gas_rate_mmscfd: L^3 T^-1, pressure_psig: M L^-1 T^-2, temperature_f: T, z_factor: dimensionless, gas_gravity: dimensionless, liquid_density_lb_ft3: M L^-3, k_factor: L T^-1 } out: { liquid_volume_bbl: L^3, actual_retention_min: T, required_liquid_bbl: L^3, gas_density_lb_ft3: M L^-3, max_velocity_fps: L T^-1, actual_velocity_fps: L T^-1, gas_pct_of_max: dimensionless, liquid_pct_of_required: dimensionless }
+export function computeSeparatorRetentionSizing({
+  vessel_diameter_ft = 0, seam_to_seam_ft = 0, liquid_fraction = 0.5,
+  liquid_rate_bpd = 0, required_retention_min = 0, gas_rate_mmscfd = 0,
+  pressure_psig = 0, temperature_f = 0, z_factor = 0.9, gas_gravity = 0.7,
+  liquid_density_lb_ft3 = 0, k_factor = 0.35,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(vessel_diameter_ft > 0) || !(seam_to_seam_ft > 0)) return { error: "Vessel diameter and seam-to-seam length must be greater than zero." };
+  if (!(liquid_fraction > 0) || liquid_fraction >= 1) return { error: "The liquid fraction must be greater than zero and less than 1." };
+  if (!(liquid_rate_bpd > 0)) return { error: "Liquid rate must be greater than zero." };
+  if (!(required_retention_min > 0)) return { error: "Required retention time must be greater than zero." };
+  if (!(gas_rate_mmscfd > 0)) return { error: "Gas rate must be greater than zero." };
+  if (!(z_factor > 0)) return { error: "The compressibility factor must be greater than zero." };
+  if (!(gas_gravity > 0)) return { error: "Gas gravity must be greater than zero." };
+  if (!(liquid_density_lb_ft3 > 0)) return { error: "Liquid density must be greater than zero." };
+  if (!(k_factor > 0)) return { error: "The K factor must be greater than zero." };
+  const pressure_psia = pressure_psig + _OG_STD_P_PSIA;
+  const temperature_r = temperature_f + 459.67;
+  if (!(temperature_r > 0)) return { error: "Temperature must be above absolute zero." };
+
+  // The liquid side: pure residence time.
+  const shell_area_ft2 = (Math.PI / 4) * vessel_diameter_ft * vessel_diameter_ft;
+  const liquid_volume_ft3 = shell_area_ft2 * seam_to_seam_ft * liquid_fraction;
+  const liquid_volume_bbl = liquid_volume_ft3 / _OG_FT3_PER_BBL;
+  const liquid_rate_bpm = liquid_rate_bpd / 1440;
+  const actual_retention_min = liquid_volume_bbl / liquid_rate_bpm;
+  const required_liquid_bbl = liquid_rate_bpm * required_retention_min;
+  const liquid_ok = actual_retention_min >= required_retention_min - 1e-12;
+  const liquid_pct_of_required = 100 * required_liquid_bbl / liquid_volume_bbl;
+
+  // The gas side: a velocity limit, not a volume.
+  const gas_mw = gas_gravity * _OG_AIR_MW;
+  const gas_density_lb_ft3 = pressure_psia * gas_mw / (z_factor * _OG_R_GAS * temperature_r);
+  if (!(gas_density_lb_ft3 > 0) || gas_density_lb_ft3 >= liquid_density_lb_ft3) return { error: "Gas density came out at or above the liquid density; check the pressure, temperature and gravity entered." };
+  const max_velocity_fps = k_factor * Math.sqrt((liquid_density_lb_ft3 - gas_density_lb_ft3) / gas_density_lb_ft3);
+  const vapour_area_ft2 = shell_area_ft2 * (1 - liquid_fraction);
+  const actual_ft3s = gas_rate_mmscfd * 1e6 / 86400 * (_OG_STD_P_PSIA / pressure_psia) * (temperature_r / _OG_STD_T_R) * z_factor;
+  const actual_velocity_fps = actual_ft3s / vapour_area_ft2;
+  const gas_ok = actual_velocity_fps <= max_velocity_fps + 1e-12;
+  const gas_pct_of_max = 100 * actual_velocity_fps / max_velocity_fps;
+
+  const gas_governs = gas_pct_of_max >= liquid_pct_of_required;
+  const both_ample = gas_pct_of_max < 50 && liquid_pct_of_required < 50;
+
+  const liquidVerdict = "LIQUID SIDE: at " + fmt(100 * liquid_fraction, 0) + "% full a " + fmt(vessel_diameter_ft, 1) + " by " + fmt(seam_to_seam_ft, 1) + " ft vessel holds " + fmt(liquid_volume_bbl, 2) + " barrels, and " + fmt(liquid_rate_bpd, 0) + " bbl/day is " + fmt(liquid_rate_bpm, 3) + " bbl/min -- " + fmt(actual_retention_min, 1) + " minutes of retention against the " + fmt(required_retention_min, 1) + " required, so the liquid side is at " + fmt(liquid_pct_of_required, 0) + "% of its limit";
+  const gasVerdict = "GAS SIDE: gas density at " + fmt(pressure_psig, 0) + " psig and " + fmt(temperature_f, 0) + " degF is " + fmt(gas_density_lb_ft3, 3) + " lb/cu ft, so the Souders-Brown limit at K = " + fmt(k_factor, 2) + " is " + fmt(max_velocity_fps, 2) + " ft/s. " + fmt(gas_rate_mmscfd, 2) + " MMSCFD across " + fmt(vapour_area_ft2, 2) + " sq ft of vapour space is " + fmt(actual_velocity_fps, 3) + " ft/s -- " + fmt(gas_pct_of_max, 0) + "% of the limit";
+  const governsVerdict = both_ample
+    ? "NEITHER SIDE GOVERNS THIS VESSEL TIGHTLY. The liquid is at " + fmt(liquid_pct_of_required, 0) + "% of its requirement and the gas at " + fmt(gas_pct_of_max, 0) + "% of its velocity limit, so the vessel is comfortable on both and the next constraint on this location is something else"
+    : gas_governs
+      ? "GAS GOVERNS, at " + fmt(gas_pct_of_max, 0) + "% of the velocity limit against the liquid side's " + fmt(liquid_pct_of_required, 0) + "% of its retention requirement. The fix is a larger DIAMETER or a mist extractor, not a longer vessel"
+      : "LIQUID GOVERNS, at " + fmt(liquid_pct_of_required, 0) + "% of the retention requirement against the gas side's " + fmt(gas_pct_of_max, 0) + "% of its velocity limit. The fix is more liquid volume -- a longer vessel or a higher interface -- not a larger diameter";
+  const carryoverVerdict = gas_ok
+    ? "the gas velocity is inside the settling limit, so droplets have time to fall out rather than being carried into the gas line"
+    : "THE GAS VELOCITY EXCEEDS THE SETTLING LIMIT and the separator will carry liquid into the gas line and eventually into a compressor, REGARDLESS of how many minutes of retention the liquid side shows. Retention does not fix re-entrainment";
+  const asymmetryVerdict = "THE TWO FAILURES LOOK NOTHING ALIKE, which is why both are reported. A vessel sized only on liquid retention can be far too small in diameter for its gas rate, and the symptom is liquid carryover into the gas line and eventually a damaged compressor. A vessel sized only on gas can be too short for the liquid to degas, and the symptom is gas breaking out downstream in the oil line and upsetting the tank battery";
+  const foamVerdict = "FOAM IS THE WILD CARD AND NO DIAMETER FIXES IT. A foaming crude can need several times the nominal retention, so a separator that worked on one well can fail on another from the same field. The answer is a defoamer, an internal, or a much larger vessel -- and none of that is in this arithmetic, which assumes the retention time entered is the right one";
+
+  return {
+    liquid_volume_bbl, liquid_rate_bpm, actual_retention_min, required_liquid_bbl,
+    liquid_ok, liquid_pct_of_required,
+    gas_density_lb_ft3, max_velocity_fps, vapour_area_ft2, actual_velocity_fps,
+    gas_ok, gas_pct_of_max, gas_governs, both_ample,
+    liquidVerdict, gasVerdict, governsVerdict, carryoverVerdict, asymmetryVerdict, foamVerdict,
+    note: "Whether a two-phase separator is big enough, which is two independent questions in one vessel. The liquid side is pure residence time: flow rate times the minutes needed, which sets the liquid volume below the interface. The gas side is a velocity limit: gas moving faster than the settling velocity of a droplet re-entrains liquid and carries it out of the gas line, which sets the vessel's cross-sectional area. EITHER CAN GOVERN AND THE TWO FAILURES LOOK NOTHING ALIKE. A vessel sized only on liquid retention can be far too small in diameter for its gas rate, and the symptom is liquid carryover into the gas line and eventually a damaged compressor. A vessel sized only on gas can be too short for the liquid to degas, and the symptom is gas breaking out downstream in the oil line and upsetting the tank battery. Both are computed here and the governing one is named from the numbers, because a vessel can look generous on the side that was checked and be marginal on the side that was not. RETENTION DOES NOT FIX RE-ENTRAINMENT. If the gas velocity is over the settling limit the separator carries liquid regardless of how many minutes the liquid side shows, and the fix is a larger diameter or a mist extractor rather than a longer vessel. FOAM IS THE WILD CARD AND NO DIAMETER FIXES IT: a foaming crude can need several times the nominal retention, which is why a separator that worked on one well can fail on another from the same field, and why the answer there is a defoamer, an internal or a much larger vessel. This screens an entered geometry against entered rates and properties. It does not select the K factor, the retention time, or the compressibility factor -- all three depend on the service and the internals and are entered -- predict foaming or a foam-corrected retention, design internals, inlet devices or mist extractors, address three-phase separation and the oil-water interface, size relief or level control, or determine the vessel's pressure rating. API 12J, the operator's facility standards, and the design engineer govern.",
+  };
+}
+export const separatorRetentionSizingExample = { inputs: { vessel_diameter_ft: 4, seam_to_seam_ft: 12, liquid_fraction: 0.5, liquid_rate_bpd: 1200, required_retention_min: 3, gas_rate_mmscfd: 3.5, pressure_psig: 400, temperature_f: 100, z_factor: 0.92, gas_gravity: 0.7, liquid_density_lb_ft3: 52, k_factor: 0.35 } };
+
+// =====================================================================
+// spec-v1537: flare thermal radiation distance (API 521).
+//
+// The spec's own arithmetic is right for the two criteria it computes
+// (49.9 ft and 122 ft) and WRONG for the comparison it draws from them.
+// It says ignoring the solar contribution "would have given 97 ft ...
+// understating the required setback by 25 ft". The same formula at 500
+// BTU/h-sq ft with no solar deduction gives sqrt(37.5e6 / (4 pi x 500)) =
+// 77.3 ft, and the understatement is 44.9 ft. The spec's point -- that
+// leaving solar out puts a walkway inside an exclusion zone -- is right,
+// and its number understates its own case by about 80%. So the no-solar
+// distance is computed here rather than quoted.
+// =====================================================================
+// dims: in { heat_release_btuh: M L^2 T^-3, radiant_fraction: dimensionless, allowable_btuh_ft2: M T^-3, solar_btuh_ft2: M T^-3, available_distance_ft: L } out: { radiated_btuh: M L^2 T^-3, budget_btuh_ft2: M T^-3, required_distance_ft: L, no_solar_distance_ft: L, solar_penalty_ft: L, radiation_at_distance_btuh_ft2: M T^-3, supportable_release_btuh: M L^2 T^-3 }
+export function computeFlareRadiationDistance({
+  heat_release_btuh = 0, radiant_fraction = 0, allowable_btuh_ft2 = 0,
+  solar_btuh_ft2 = 0, available_distance_ft = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(heat_release_btuh > 0)) return { error: "Heat release must be greater than zero." };
+  if (!(radiant_fraction > 0) || radiant_fraction >= 1) return { error: "The radiant fraction must be greater than zero and less than 1." };
+  if (!(allowable_btuh_ft2 > 0)) return { error: "The allowable radiation level must be greater than zero." };
+  if (solar_btuh_ft2 < 0) return { error: "The solar contribution cannot be negative." };
+  if (solar_btuh_ft2 >= allowable_btuh_ft2) return { error: "The solar contribution alone meets or exceeds the allowable level, so no distance satisfies this criterion. Solar is ADDED to the flare's contribution, not compared against it." };
+
+  const radiated_btuh = radiant_fraction * heat_release_btuh;
+  const budget_btuh_ft2 = allowable_btuh_ft2 - solar_btuh_ft2;
+  const required_distance_ft = Math.sqrt(radiated_btuh / (4 * Math.PI * budget_btuh_ft2));
+
+  // The same criterion with the solar term left out -- computed, not quoted.
+  const no_solar_distance_ft = Math.sqrt(radiated_btuh / (4 * Math.PI * allowable_btuh_ft2));
+  const solar_penalty_ft = required_distance_ft - no_solar_distance_ft;
+  const solar_penalty_pct = no_solar_distance_ft > 0 ? 100 * solar_penalty_ft / no_solar_distance_ft : 0;
+  const solar_share_pct = 100 * solar_btuh_ft2 / allowable_btuh_ft2;
+
+  const has_distance = available_distance_ft > 0;
+  const radiation_at_distance_btuh_ft2 = has_distance
+    ? radiated_btuh / (4 * Math.PI * available_distance_ft * available_distance_ft) + solar_btuh_ft2 : 0;
+  const distance_ok = has_distance && radiation_at_distance_btuh_ft2 <= allowable_btuh_ft2 + 1e-9;
+  const supportable_release_btuh = has_distance
+    ? 4 * Math.PI * available_distance_ft * available_distance_ft * budget_btuh_ft2 / radiant_fraction : 0;
+
+  const radiatedVerdict = "a " + fmt(heat_release_btuh / 1e6, 0) + " MMBTU/h release with a radiant fraction of " + fmt(radiant_fraction, 2) + " puts " + fmt(radiated_btuh / 1e6, 1) + " MMBTU/h out as radiation -- the rest goes up with the plume";
+  const budgetVerdict = "SOLAR IS ADDED, NOT IGNORED. Against a " + fmt(allowable_btuh_ft2, 0) + " BTU/h-sq ft criterion, " + fmt(solar_btuh_ft2, 0) + " of solar is " + fmt(solar_share_pct, 0) + "% of the budget spent before the flare is lit, leaving " + fmt(budget_btuh_ft2, 0) + " for the flare itself";
+  const distanceVerdict = "the required distance is " + fmt(required_distance_ft, 1) + " ft. Leaving the solar term out of the SAME criterion gives " + fmt(no_solar_distance_ft, 1) + " ft -- an understatement of " + fmt(solar_penalty_ft, 1) + " ft, or " + fmt(solar_penalty_pct, 0) + "%, which is exactly the kind of omission that puts a walkway inside an exclusion zone";
+  const inverseSquareVerdict = "AND IT IS INVERSE SQUARE, so halving the allowable radiation multiplies the distance by 1.41 rather than by 2. That cuts both ways: a criterion four times tighter is only twice as far, and a flare twice as large is only 1.41 times as far -- distances move much more slowly than heat releases do";
+  const criterionVerdict = "THE CRITERION HAS TO MATCH THE TARGET, and this is the error that matters. A fence line where the public may stand, a control room, a walkway an operator uses DURING the emergency, and a vessel that only has to survive the event are four different numbers. Using the equipment figure where people stand is not a conservative simplification -- it is the wrong criterion, and it is the one that reads as an engineering judgement in a report";
+  const checkVerdict = !has_distance
+    ? "no available distance was entered, so no site check is made"
+    : distance_ok
+      ? "at the " + fmt(available_distance_ft, 1) + " ft available the level is " + fmt(radiation_at_distance_btuh_ft2, 0) + " BTU/h-sq ft including solar, inside the " + fmt(allowable_btuh_ft2, 0) + " criterion. That distance supports a release up to " + fmt(supportable_release_btuh / 1e6, 0) + " MMBTU/h at this radiant fraction"
+      : "AT THE " + fmt(available_distance_ft, 1) + " FT AVAILABLE THE LEVEL IS " + fmt(radiation_at_distance_btuh_ft2, 0) + " BTU/h-sq ft including solar, OVER the " + fmt(allowable_btuh_ft2, 0) + " criterion. That distance supports only " + fmt(supportable_release_btuh / 1e6, 0) + " MMBTU/h at this radiant fraction";
+  const windVerdict = "AND THE STILL-AIR CALCULATION IS NOT THE GOVERNING CASE. Wind tilts the flame, moving the effective radiating centre downwind and lower, which increases radiation on the downwind side substantially. A point-source result like this one is a screen; the tilted-flame geometry is the design case and it is not computed here";
+
+  return {
+    radiated_btuh, budget_btuh_ft2, required_distance_ft, no_solar_distance_ft,
+    solar_penalty_ft, solar_penalty_pct, solar_share_pct,
+    has_distance, radiation_at_distance_btuh_ft2, distance_ok, supportable_release_btuh,
+    radiatedVerdict, budgetVerdict, distanceVerdict, inverseSquareVerdict, criterionVerdict, checkVerdict, windVerdict,
+    note: "How far a flare's thermal radiation reaches, on the API 521 point-source relation. Only a fraction of the heat release leaves as radiation -- the rest goes up with the plume -- and that fraction depends on the gas, from around 0.1 for light hydrocarbons to 0.3 for heavier and sootier ones. Beyond that it is inverse square, which means distances move much more slowly than heat releases: halving the allowable radiation multiplies the required distance by 1.41, not by 2. SOLAR IS ADDED, NOT IGNORED, and it is a large part of the budget. On a clear day the sun contributes on the order of 250 to 300 BTU/h per square foot, which against a 500 BTU/h-sq ft continuous-personnel criterion is more than half the allowance spent before the flare is lit. The distance with the solar term left out is computed here alongside the correct one, because the gap between them is the whole argument and quoting it from memory understates it. THE CRITERION HAS TO MATCH THE TARGET, and this is the error that matters. A fence line where the public may stand, a control room, a walkway an operator uses during the emergency, and a vessel that only has to survive the event are four different numbers, and using the equipment figure where people stand is not a conservative simplification. AND THE STILL-AIR RESULT IS NOT THE GOVERNING CASE: wind tilts the flame, moving the effective radiating centre downwind and lower, and increasing radiation on the downwind side substantially. This is a point-source screen on an entered heat release and radiant fraction. It does not model flame length, flame tilt or the wind case, locate the radiating centre, select the radiant fraction or the criterion for a target, address flare tip design, exit velocity, or smokeless operation, evaluate dispersion of an unignited release, or address the noise and the ground-level concentration a flare also produces. API 521 as adopted, the operator's facility siting standards, and the design engineer govern.",
+  };
+}
+export const flareRadiationDistanceExample = { inputs: { heat_release_btuh: 250000000, radiant_fraction: 0.15, allowable_btuh_ft2: 500, solar_btuh_ft2: 300, available_distance_ft: 100 } };
+
+// =====================================================================
+// spec-v1538: exponential decline and remaining reserves. Every figure in
+// the spec checks out to the digit -- 24.4% effective, 11.9 years, 527,946
+// bbl, and the nominal-vs-effective trap costing 15% -- so it lands as
+// written. The one thing added is that the trap is computed BOTH ways from
+// the same entered number, because which of the two a quoted decline is
+// meant to be is exactly what nobody writes down.
+// =====================================================================
+// dims: in { initial_rate_bpd: L^3 T^-1, decline_rate: T^-1, rate_is_effective: dimensionless, economic_limit_bpd: L^3 T^-1, years_ahead: T } out: { nominal_decline: T^-1, effective_decline: T^-1, economic_life_years: T, remaining_reserves_bbl: L^3, rate_at_years_bpd: L^3 T^-1, cumulative_to_years_bbl: L^3, misread_reserves_bbl: L^3, misread_error_pct: dimensionless }
+export function computeWellDeclineReserves({
+  initial_rate_bpd = 0, decline_rate = 0, rate_is_effective = "no",
+  economic_limit_bpd = 0, years_ahead = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(initial_rate_bpd > 0)) return { error: "Initial rate must be greater than zero." };
+  if (!(decline_rate > 0)) return { error: "The decline rate must be greater than zero." };
+  if (!(economic_limit_bpd > 0)) return { error: "The economic limit rate must be greater than zero." };
+  if (economic_limit_bpd >= initial_rate_bpd) return { error: "The economic limit must be below the initial rate." };
+  const effective_entered = String(rate_is_effective) === "yes";
+  if (effective_entered && decline_rate >= 1) return { error: "An effective annual decline must be less than 1 (100 percent)." };
+
+  const nominal_decline = effective_entered ? -Math.log(1 - decline_rate) : decline_rate;
+  const effective_decline = 1 - Math.exp(-nominal_decline);
+
+  const economic_life_years = Math.log(initial_rate_bpd / economic_limit_bpd) / nominal_decline;
+  const remaining_reserves_bbl = (initial_rate_bpd - economic_limit_bpd) / nominal_decline * 365;
+
+  const has_years = years_ahead > 0;
+  const rate_at_years_bpd = has_years ? initial_rate_bpd * Math.exp(-nominal_decline * years_ahead) : 0;
+  const cumulative_to_years_bbl = has_years ? (initial_rate_bpd - rate_at_years_bpd) / nominal_decline * 365 : 0;
+
+  // THE TRAP, both ways from the one number entered: what the reserves
+  // would be if the same figure were read as the other kind of decline.
+  const misread_nominal = effective_entered ? decline_rate : -Math.log(1 - Math.min(decline_rate, 0.999999));
+  const misread_valid = Number.isFinite(misread_nominal) && misread_nominal > 0;
+  const misread_reserves_bbl = misread_valid ? (initial_rate_bpd - economic_limit_bpd) / misread_nominal * 365 : 0;
+  const misread_life_years = misread_valid ? Math.log(initial_rate_bpd / economic_limit_bpd) / misread_nominal : 0;
+  const misread_error_pct = misread_valid && remaining_reserves_bbl > 0
+    ? 100 * (misread_reserves_bbl - remaining_reserves_bbl) / remaining_reserves_bbl : 0;
+
+  const declineVerdict = effective_entered
+    ? "the " + fmt(100 * decline_rate, 1) + "% entered was read as an EFFECTIVE annual decline, so the nominal constant is -ln(1 - " + fmt(decline_rate, 3) + ") = " + fmt(nominal_decline, 4) + " per year"
+    : "the " + fmt(decline_rate, 3) + " entered was read as a NOMINAL decline constant, so the effective annual decline people would quote is 1 - exp(-" + fmt(decline_rate, 3) + ") = " + fmt(100 * effective_decline, 1) + "% per year";
+  const lifeVerdict = "from " + fmt(initial_rate_bpd, 0) + " bbl/day to a " + fmt(economic_limit_bpd, 0) + " bbl/day economic limit is " + fmt(economic_life_years, 1) + " years, and the remaining reserves to that limit are " + fmt(remaining_reserves_bbl, 0) + " barrels -- about " + fmt(remaining_reserves_bbl / 1000, 0) + " thousand";
+  const trapVerdict = misread_valid
+    ? "THE TRAP IN NUMBERS: this well declines " + fmt(100 * effective_decline, 1) + "% effective and " + fmt(nominal_decline, 3) + " nominal, and the two are not interchangeable. Reading the same figure as the other kind gives " + fmt(misread_reserves_bbl, 0) + " barrels and " + fmt(misread_life_years, 1) + " years -- " + fmt(Math.abs(misread_error_pct), 0) + "% " + (misread_error_pct < 0 ? "LOW" : "HIGH") + ". For small declines the two are close; for steep ones they diverge badly, and on a package of wells that error is material"
+    : "the entered figure cannot be read the other way, so no comparison is made";
+  const forwardVerdict = !has_years
+    ? "no forecast horizon was entered"
+    : "at " + fmt(years_ahead, 1) + " years the rate is " + fmt(rate_at_years_bpd, 1) + " bbl/day and the cumulative to that point is " + fmt(cumulative_to_years_bbl, 0) + " barrels";
+  const shaleVerdict = "AND EXPONENTIAL IS THE WRONG MODEL FOR AN UNCONVENTIONAL WELL. Shale wells decline hyperbolically -- very steeply at first and then flattening -- so forcing an exponential fit on early data dramatically UNDERSTATES reserves, while forcing a hyperbolic fit with a high b far into the future OVERSTATES them. This fits exponential and says so; a shale forecast needs a b factor and a terminal decline, and neither is here";
+  const decisionVerdict = "THE PRACTICAL OUTPUT IS THE DATE, NOT THE BARRELS. A well is abandoned when its rate no longer covers lease operating expense, and solving the curve for that rate is what plugging liability, equipment redeployment and the decision to work a well over all hang on -- and all three are scheduled from it";
+
+  return {
+    nominal_decline, effective_decline, economic_life_years, remaining_reserves_bbl,
+    has_years, rate_at_years_bpd, cumulative_to_years_bbl,
+    misread_valid, misread_reserves_bbl, misread_life_years, misread_error_pct,
+    declineVerdict, lifeVerdict, trapVerdict, forwardVerdict, shaleVerdict, decisionVerdict,
+    note: "How long a well lasts and how much is left in it, on an exponential decline. Exponential says the rate falls by the same PERCENTAGE each year, which makes the cumulative a simple difference of rates over the decline constant, and the economic life a logarithm. TWO FORMS OF THE SAME NUMBER CIRCULATE AND GET CONFUSED: the nominal decline that goes in the exponent, and the effective annual decline -- one minus exp of minus the nominal -- that people actually quote as 'a 25% decline'. For shallow declines the two are close; for steep ones they diverge badly, and mixing them up moves reserves directly. Both are reported here, and so is what the reserves would be if the entered figure were read the other way, because which of the two a quoted decline is meant to be is exactly what nobody writes down. THE PRACTICAL OUTPUT IS THE DATE RATHER THAN THE BARRELS. A well is abandoned when its rate no longer covers lease operating expense, and solving the curve for that rate gives a year -- which is what plugging liability, equipment redeployment and the decision to work a well over are scheduled from. AND EXPONENTIAL IS THE WRONG MODEL FOR AN UNCONVENTIONAL WELL. Shale wells decline hyperbolically, very steeply at first and then flattening, so forcing an exponential fit on early data dramatically understates reserves while forcing a hyperbolic fit with a high b factor far into the future overstates them. This fits exponential and says so. It does not fit hyperbolic or harmonic decline, choose a b factor or a terminal decline, fit a curve to production data or judge whether a fit is valid, account for interference, artificial lift changes, workovers, shut-ins or curtailment, evaluate reserves under any classification standard, or produce an economic evaluation. SPE and PRMS reserve definitions, the operator's engineering standards, and a qualified reservoir engineer govern.",
+  };
+}
+export const wellDeclineReservesExample = { inputs: { initial_rate_bpd: 420, decline_rate: 0.28, rate_is_effective: "no", economic_limit_bpd: 15, years_ahead: 5 } };
+
+OILGAS_RENDERERS["tank-strapping-volume"] = _simpleRenderer({
+  compute: computeTankStrappingVolume,
+  example: tankStrappingVolumeExample.inputs,
+  citation: "Citation: barrels per foot = (pi/4) D^2 / 5.615 for an ideal vertical cylinder, times the gauge height, with an ENTERED volume correction factor and sediment-and-water deduction. The certified strapping table is the legal document for custody transfer and this formula is not a substitute for it. API MPMS and the purchaser's measurement procedures govern.",
+  fields: [
+    { key: "tank_diameter_ft", label: "Tank diameter (ft)" },
+    { key: "gauge_ft", label: "Opening gauge (ft)" },
+    { key: "gauge_in", label: "Opening gauge (in)" },
+    { key: "closing_gauge_ft", label: "Closing gauge (ft, 0 to skip)" },
+    { key: "closing_gauge_in", label: "Closing gauge (in)" },
+    { key: "volume_correction_factor", label: "Volume correction factor to 60 degF" },
+    { key: "sediment_water_pct", label: "Sediment and water (%)" },
+  ],
+  outputs: [
+    { key: "bbl_per_ft", label: "Barrels per foot", unit: "bbl/ft", value: (r) => fmt(r.bbl_per_ft, 2) + " bbl/ft" },
+    { key: "bbl_per_in", label: "Barrels per inch", unit: "bbl/in", value: (r) => fmt(r.bbl_per_in, 3) + " bbl/in" },
+    { key: "gross_bbl", label: "Gross at the opening gauge", unit: "bbl", value: (r) => fmt(r.gross_bbl, 1) + " bbl" },
+    { key: "moved_bbl", label: "Moved on the run", unit: "bbl", value: (r) => !r.has_closing ? "no closing gauge" : (r.is_delivery ? fmt(r.moved_bbl, 1) + " bbl out" : fmt(-r.moved_bbl, 1) + " bbl in") },
+    { key: "net_bbl", label: "Net after corrections", unit: "bbl", value: (r) => fmt(r.net_bbl, 1) + " bbl" },
+    { key: "correction_bbl", label: "Gross minus net", unit: "bbl", value: (r) => fmt(r.correction_bbl, 1) + " bbl (" + fmt(r.correction_pct, 2) + "%)" },
+    { key: "perInchVerdict", label: "Per inch", value: (r) => r.perInchVerdict },
+    { key: "grossVerdict", label: "Gross", value: (r) => r.grossVerdict },
+    { key: "movedVerdict", label: "The run", value: (r) => r.movedVerdict },
+    { key: "netVerdict", label: "Gross to net", value: (r) => r.netVerdict },
+    { key: "temperatureVerdict", label: "Temperature", value: (r) => r.temperatureVerdict },
+    { key: "strappingVerdict", label: "The strapping table", value: (r) => r.strappingVerdict },
+    { key: "note", label: "Note", value: (r) => r.note },
+  ],
+});
+
+OILGAS_RENDERERS["tank-vent-api-2000"] = _simpleRenderer({
+  compute: computeTankVentApi2000,
+  example: tankVentApi2000Example.inputs,
+  citation: "Citation: liquid-movement venting is displacement -- pump rate x 5.615 cu ft/bbl, times an allowance above unity for a volatile product -- added to the thermal rate ENTERED from the API 2000 tables, which are indexed by tank capacity. The fire case is entered separately and is sized on wetted surface area. API 2000 as adopted and the engineer of record govern.",
+  fields: [
+    { key: "pump_in_bph", label: "Maximum pump-in rate (bbl/h)" },
+    { key: "pump_out_bph", label: "Maximum pump-out rate (bbl/h)" },
+    { key: "volatile_factor", label: "Volatile allowance on out-breathing (1.0 non-volatile)" },
+    { key: "thermal_out_ft3h", label: "Thermal out-breathing from the table (cu ft/h)" },
+    { key: "thermal_in_ft3h", label: "Thermal in-breathing from the table (cu ft/h)" },
+    { key: "fire_case_ft3h", label: "Fire case from the table (cu ft/h, 0 to skip)" },
+    { key: "installed_pressure_ft3h", label: "Installed vent, pressure (cu ft/h, 0 to skip)" },
+    { key: "installed_vacuum_ft3h", label: "Installed vent, vacuum (cu ft/h, 0 to skip)" },
+  ],
+  outputs: [
+    { key: "required_out_ft3h", label: "Required out-breathing", unit: "cu ft/h", value: (r) => fmt(r.required_out_ft3h, 0) + " cu ft/h" },
+    { key: "required_in_ft3h", label: "Required in-breathing", unit: "cu ft/h", value: (r) => fmt(r.required_in_ft3h, 0) + " cu ft/h" },
+    { key: "pressure_margin_ft3h", label: "Pressure margin", unit: "cu ft/h", value: (r) => !r.has_pressure_vent ? "not entered" : r.pressure_short ? "SHORT by " + fmt(-r.pressure_margin_ft3h, 0) : fmt(r.pressure_margin_ft3h, 0) + " cu ft/h" },
+    { key: "vacuum_margin_ft3h", label: "Vacuum margin", unit: "cu ft/h", value: (r) => !r.has_vacuum_vent ? "not entered" : r.vacuum_short ? "SHORT by " + fmt(-r.vacuum_margin_ft3h, 0) : fmt(r.vacuum_margin_ft3h, 0) + " cu ft/h" },
+    { key: "fire_ratio", label: "Fire case vs normal", value: (r) => !r.has_fire ? "not entered" : fmt(r.fire_ratio, 0) + "x the normal out-breathing" },
+    { key: "outVerdict", label: "Out-breathing", value: (r) => r.outVerdict },
+    { key: "inVerdict", label: "In-breathing", value: (r) => r.inVerdict },
+    { key: "vacuumVerdict", label: "Why vacuum matters", value: (r) => r.vacuumVerdict },
+    { key: "thermalVerdict", label: "Thermal", value: (r) => r.thermalVerdict },
+    { key: "marginVerdict", label: "Against the installed vent", value: (r) => r.marginVerdict },
+    { key: "fireVerdict", label: "The fire case", value: (r) => r.fireVerdict },
+    { key: "note", label: "Note", value: (r) => r.note },
+  ],
+});
+
+OILGAS_RENDERERS["separator-retention-sizing"] = _simpleRenderer({
+  compute: computeSeparatorRetentionSizing,
+  example: separatorRetentionSizingExample.inputs,
+  citation: "Citation: liquid retention = liquid volume / flow rate; the gas limit is the Souders-Brown settling velocity v = K sqrt((rho_L - rho_G)/rho_G) with the gas density from PM/(ZRT), compared against the actual velocity across the vapour space. The K factor, the retention time and the compressibility factor are ENTERED. API 12J and the design engineer govern.",
+  fields: [
+    { key: "vessel_diameter_ft", label: "Vessel diameter (ft)" },
+    { key: "seam_to_seam_ft", label: "Seam-to-seam length (ft)" },
+    { key: "liquid_fraction", label: "Liquid fraction of the vessel (0 to 1)", attrs: { step: "any", min: "0", max: "1" } },
+    { key: "liquid_rate_bpd", label: "Liquid rate (bbl/day)" },
+    { key: "required_retention_min", label: "Required retention (min)" },
+    { key: "gas_rate_mmscfd", label: "Gas rate (MMSCFD)" },
+    { key: "pressure_psig", label: "Operating pressure (psig)" },
+    { key: "temperature_f", label: "Operating temperature (degF)", attrs: { step: "any" } },
+    { key: "z_factor", label: "Compressibility factor Z" },
+    { key: "gas_gravity", label: "Gas specific gravity (air = 1)" },
+    { key: "liquid_density_lb_ft3", label: "Liquid density (lb/cu ft)" },
+    { key: "k_factor", label: "Souders-Brown K factor" },
+  ],
+  outputs: [
+    { key: "actual_retention_min", label: "Retention achieved", unit: "min", value: (r) => fmt(r.actual_retention_min, 1) + " min against " + fmt(r.liquid_pct_of_required, 0) + "% of the requirement" },
+    { key: "liquid_volume_bbl", label: "Liquid volume", unit: "bbl", value: (r) => fmt(r.liquid_volume_bbl, 2) + " bbl (needs " + fmt(r.required_liquid_bbl, 2) + ")" },
+    { key: "max_velocity_fps", label: "Souders-Brown limit", unit: "ft/s", value: (r) => fmt(r.max_velocity_fps, 2) + " ft/s" },
+    { key: "actual_velocity_fps", label: "Actual gas velocity", unit: "ft/s", value: (r) => fmt(r.actual_velocity_fps, 3) + " ft/s (" + fmt(r.gas_pct_of_max, 0) + "% of the limit)" },
+    { key: "gas_density_lb_ft3", label: "Gas density", unit: "lb/cu ft", value: (r) => fmt(r.gas_density_lb_ft3, 3) + " lb/cu ft" },
+    { key: "gas_governs", label: "Which governs", value: (r) => r.both_ample ? "neither, tightly" : r.gas_governs ? "gas" : "liquid" },
+    { key: "liquidVerdict", label: "Liquid side", value: (r) => r.liquidVerdict },
+    { key: "gasVerdict", label: "Gas side", value: (r) => r.gasVerdict },
+    { key: "governsVerdict", label: "Governing case", value: (r) => r.governsVerdict },
+    { key: "carryoverVerdict", label: "Carryover", value: (r) => r.carryoverVerdict },
+    { key: "asymmetryVerdict", label: "The two failures", value: (r) => r.asymmetryVerdict },
+    { key: "foamVerdict", label: "Foam", value: (r) => r.foamVerdict },
+    { key: "note", label: "Note", value: (r) => r.note },
+  ],
+});
+
+OILGAS_RENDERERS["flare-radiation-distance"] = _simpleRenderer({
+  compute: computeFlareRadiationDistance,
+  example: flareRadiationDistanceExample.inputs,
+  citation: "Citation: the API 521 point-source relation D = sqrt(F x Q / (4 pi K)), with the solar contribution SUBTRACTED from the allowable level before the distance is taken, because solar adds to the flare's radiation at the target. The radiant fraction and the criterion are ENTERED. API 521 as adopted and the design engineer govern.",
+  fields: [
+    { key: "heat_release_btuh", label: "Total heat release (BTU/h)" },
+    { key: "radiant_fraction", label: "Radiant fraction (0.1 to 0.3 by gas)" },
+    { key: "allowable_btuh_ft2", label: "Allowable radiation at the target (BTU/h-sq ft)" },
+    { key: "solar_btuh_ft2", label: "Solar contribution (BTU/h-sq ft)" },
+    { key: "available_distance_ft", label: "Distance available on site (ft, 0 to skip)" },
+  ],
+  outputs: [
+    { key: "required_distance_ft", label: "Required distance", unit: "ft", value: (r) => fmt(r.required_distance_ft, 1) + " ft" },
+    { key: "no_solar_distance_ft", label: "If solar were left out", unit: "ft", value: (r) => fmt(r.no_solar_distance_ft, 1) + " ft -- understating by " + fmt(r.solar_penalty_ft, 1) + " ft (" + fmt(r.solar_penalty_pct, 0) + "%)" },
+    { key: "radiated_btuh", label: "Radiated heat", unit: "BTU/h", value: (r) => fmt(r.radiated_btuh / 1e6, 1) + " MMBTU/h" },
+    { key: "budget_btuh_ft2", label: "Budget left for the flare", unit: "BTU/h-sq ft", value: (r) => fmt(r.budget_btuh_ft2, 0) + " BTU/h-sq ft left for the flare (solar took " + fmt(r.solar_share_pct, 0) + "% of the criterion)" },
+    { key: "radiation_at_distance_btuh_ft2", label: "Level at the distance available", unit: "BTU/h-sq ft", value: (r) => !r.has_distance ? "not entered" : fmt(r.radiation_at_distance_btuh_ft2, 0) + " BTU/h-sq ft -- " + (r.distance_ok ? "inside the criterion" : "OVER the criterion") },
+    { key: "supportable_release_btuh", label: "Release that distance supports", unit: "BTU/h", value: (r) => !r.has_distance ? "not entered" : fmt(r.supportable_release_btuh / 1e6, 0) + " MMBTU/h" },
+    { key: "radiatedVerdict", label: "Radiated heat", value: (r) => r.radiatedVerdict },
+    { key: "budgetVerdict", label: "Solar", value: (r) => r.budgetVerdict },
+    { key: "distanceVerdict", label: "Distance", value: (r) => r.distanceVerdict },
+    { key: "inverseSquareVerdict", label: "Inverse square", value: (r) => r.inverseSquareVerdict },
+    { key: "criterionVerdict", label: "Matching the criterion", value: (r) => r.criterionVerdict },
+    { key: "checkVerdict", label: "The site check", value: (r) => r.checkVerdict },
+    { key: "windVerdict", label: "Wind", value: (r) => r.windVerdict },
+    { key: "note", label: "Note", value: (r) => r.note },
+  ],
+});
+
+OILGAS_RENDERERS["well-decline-reserves"] = _simpleRenderer({
+  compute: computeWellDeclineReserves,
+  example: wellDeclineReservesExample.inputs,
+  citation: "Citation: exponential decline q(t) = q_i exp(-Dt), cumulative N = (q_i - q)/D, economic life t = ln(q_i/q_econ)/D, and the effective annual decline 1 - exp(-D). Exponential is the wrong model for an unconventional well, which declines hyperbolically. SPE and PRMS reserve definitions and a qualified reservoir engineer govern.",
+  fields: [
+    { key: "initial_rate_bpd", label: "Initial rate (bbl/day)" },
+    { key: "decline_rate", label: "Decline rate (per year)" },
+    { key: "rate_is_effective", label: "That rate is", kind: "select", default: "no", options: [{ value: "no", label: "Nominal (the constant in the exponent)" }, { value: "yes", label: "Effective (the annual percentage people quote)" }] },
+    { key: "economic_limit_bpd", label: "Economic limit rate (bbl/day)" },
+    { key: "years_ahead", label: "Forecast horizon (years, 0 to skip)" },
+  ],
+  outputs: [
+    { key: "nominal_decline", label: "Nominal decline", unit: "per year", value: (r) => fmt(r.nominal_decline, 4) + " per year" },
+    { key: "effective_decline", label: "Effective annual decline", value: (r) => fmt(100 * r.effective_decline, 1) + "% per year" },
+    { key: "economic_life_years", label: "Economic life", unit: "years", value: (r) => fmt(r.economic_life_years, 1) + " years" },
+    { key: "remaining_reserves_bbl", label: "Remaining reserves", unit: "bbl", value: (r) => fmt(r.remaining_reserves_bbl, 0) + " bbl" },
+    { key: "rate_at_years_bpd", label: "Rate at the horizon", unit: "bbl/day", value: (r) => !r.has_years ? "not entered" : fmt(r.rate_at_years_bpd, 1) + " bbl/day (cumulative " + fmt(r.cumulative_to_years_bbl, 0) + " bbl)" },
+    { key: "misread_reserves_bbl", label: "If the rate were read the other way", unit: "bbl", value: (r) => !r.misread_valid ? "not comparable" : fmt(r.misread_reserves_bbl, 0) + " bbl (" + fmt(Math.abs(r.misread_error_pct), 0) + "% " + (r.misread_error_pct < 0 ? "low" : "high") + ")" },
+    { key: "declineVerdict", label: "Which decline", value: (r) => r.declineVerdict },
+    { key: "lifeVerdict", label: "Life and reserves", value: (r) => r.lifeVerdict },
+    { key: "trapVerdict", label: "Nominal vs effective", value: (r) => r.trapVerdict },
+    { key: "forwardVerdict", label: "Forecast", value: (r) => r.forwardVerdict },
+    { key: "shaleVerdict", label: "Unconventional wells", value: (r) => r.shaleVerdict },
+    { key: "decisionVerdict", label: "What it is for", value: (r) => r.decisionVerdict },
+    { key: "note", label: "Note", value: (r) => r.note },
+  ],
+});

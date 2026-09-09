@@ -6164,6 +6164,11 @@
     {"term":"post weld heat treatment rate","target":"pwht-holding-time","kind":"industry"},
     {"term":"stress relief hour per inch","target":"pwht-holding-time","kind":"industry"},
     {"term":"pwht heating cooling rate","target":"pwht-holding-time","kind":"industry"},
-    {"term":"soak band thermocouple","target":"pwht-holding-time","kind":"industry"}
+    {"term":"soak band thermocouple","target":"pwht-holding-time","kind":"industry"},
+    {"term":"decline curve analysis","target":"well-decline-reserves","kind":"industry"},
+    {"term":"exponential decline reserves","target":"well-decline-reserves","kind":"industry"},
+    {"term":"well economic life","target":"well-decline-reserves","kind":"industry"},
+    {"term":"eur estimate decline","target":"well-decline-reserves","kind":"industry"},
+    {"term":"effective annual decline rate","target":"well-decline-reserves","kind":"industry"}
   ]
 }
