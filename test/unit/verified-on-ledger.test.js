@@ -438,3 +438,37 @@ test("each I-code disclosure names the current published edition", async () => {
   assert.match(disclosure("IBC"), /IBC 2024 is the current published edition/);
   assert.match(disclosure("IFGC"), /IFGC 2027 is the current published edition/);
 });
+
+// docs/data-sources.md described the sales-tax nexus re-verification in two
+// adjacent bullets. The 2026-09-03 bullet said "the remaining 33 rows keep
+// verified_on: 2025-01-15" and pointed the next maintainer at seven rows. A
+// second pass on 2026-09-04 read 29 more, leaving four -- the cadence bullet
+// below and the manifest's GENERATED staleness_note were both updated, the
+// hand-written sentence above them was not. Four of the seven it sent you to
+// had already been read, and CO, which had not, was missing from the list.
+//
+// The prose that tells a maintainer where to look must match the stamps.
+test("the nexus doc's stale-row claim matches the shard", async () => {
+  const shard = await readJson("data/legal/sales-tax-nexus.json");
+  const rows = Object.entries(shard.by_state).filter(([, v]) => v && typeof v === "object");
+  const stale = rows.filter(([, v]) => v.verified_on === "2025-01-15").map(([k]) => k).sort();
+
+  // 47 state rows (46 sales-tax states plus DC), which is what the docs claim.
+  assert.equal(rows.length, 47);
+  assert.deepEqual(stale, ["AR", "CO", "GA", "MI"]);
+
+  const doc = await readFile(resolve(ROOT, "docs/data-sources.md"), "utf8");
+  // The live count and the live list, both stated.
+  assert.match(doc, /4 of the 47 rows still carry `verified_on` 2025-01-15/);
+  assert.match(doc, /leaving four: AR, CO, GA, MI/);
+  // The superseded count must not be stated in the present tense again.
+  assert.ok(
+    !/The remaining 33 rows keep `verified_on: 2025-01-15`/.test(doc),
+    "the doc states the superseded 33-row count as current",
+  );
+
+  // The manifest's generated note is the surface that cannot drift; it must
+  // agree with the same stamps.
+  const manifest = await readJson("data/legal/manifest.json");
+  assert.match(manifest.staleness_note, new RegExp("^" + stale.length + " of " + rows.length + " rows"));
+});
