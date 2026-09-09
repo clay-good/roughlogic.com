@@ -165,7 +165,7 @@ test("the gate names the shards it does not govern", async () => {
   // forward when content is unchanged); what is still missing is a ledger row
   // recording what a human actually checked.
   const src = await readFile(resolve(ROOT, "scripts/check-verified-on-ledger.mjs"), "utf8");
-  assert.match(src, /UNGOVERNED_BUDGET = 3/, "the ungoverned count is ratcheted");
+  assert.match(src, /UNGOVERNED_BUDGET = 2/, "the ungoverned count is ratcheted");
   assert.match(src, /NOT governed here/, "the OK line must name the uncovered set");
   // Author-original content is reported separately: it has no publisher, so a
   // ledger row cannot exist and counting it as unbacked is a category error.
@@ -307,11 +307,21 @@ test("the bundled rotor radii agree with each manufacturer's published RCF", asy
   // Radii cross-checked against each manufacturer's published maximum speed and
   // RCF, verified 2026-09-09. Within 0.5 mm, which is the rounding the published
   // RCF figures themselves carry.
+  // All six rows now, read 2026-09-09: three of them carried a radius that
+  // belonged to a different rotor or a different bucket. The FA-45-6-30 read
+  // 95 mm (the FA-45-30-11's), the A-4-81 read 162 mm (its MTP/Flex plate
+  // bucket, not the buckets it ships with), and the Fiberlite read 137 mm
+  // against a published 10.4 cm.
   const published = {
     eppendorf_5424_FA452411: { rpm: 15000, rcf: 21130 },
+    eppendorf_5810_FA45630: { rpm: 12100, rcf: 20133 },
+    eppendorf_5810_A48140: { rpm: 4000, rcf: 3220 },
     beckman_JA10: { rpm: 10000, rcf: 17700 },
     beckman_JA20: { rpm: 20000, rcf: 48400 },
+    thermo_F15_8x50c: { rpm: 14500, rcf: 24446 },
   };
+  // Every row is covered: an unchecked row must not be able to slip in.
+  assert.deepEqual(Object.keys(published).sort(), Object.keys(shard.rotors).sort());
   for (const [key, { rpm, rcf }] of Object.entries(published)) {
     const implied = rcf / (1.118e-6 * rpm * rpm);
     assert.ok(

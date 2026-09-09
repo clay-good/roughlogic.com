@@ -11,14 +11,14 @@
       "part": "FA-45-24-11 (5424/5424R)"
     },
     "eppendorf_5810_FA45630": {
-      "radius_mm": 95,
+      "radius_mm": 123,
       "manufacturer": "Eppendorf",
       "part": "FA-45-6-30 (5810/5810R)"
     },
     "eppendorf_5810_A48140": {
-      "radius_mm": 162,
+      "radius_mm": 180,
       "manufacturer": "Eppendorf",
-      "part": "A-4-81 swing-bucket (5810/5810R)"
+      "part": "A-4-81 swing-bucket, 500 mL rectangular or 7 x 50 mL conical buckets (5810/5810R)"
     },
     "beckman_JA10": {
       "radius_mm": 158,
@@ -31,7 +31,7 @@
       "part": "JA-20 fixed-angle"
     },
     "thermo_F15_8x50c": {
-      "radius_mm": 137,
+      "radius_mm": 104,
       "manufacturer": "Thermo Fisher",
       "part": "Fiberlite F15-8x50c"
     }

@@ -1602,11 +1602,11 @@ const CENTRIFUGE_ROTORS_V5 = {
   free_access: "Each manufacturer publishes the rotor catalog free on its website (eppendorf.com, beckman.com, thermofisher.com).",
   rotors: {
     eppendorf_5424_FA452411:    { radius_mm: 84,  manufacturer: "Eppendorf",      part: "FA-45-24-11 (5424/5424R)" },
-    eppendorf_5810_FA45630:     { radius_mm: 95,  manufacturer: "Eppendorf",      part: "FA-45-6-30 (5810/5810R)" },
-    eppendorf_5810_A48140:      { radius_mm: 162, manufacturer: "Eppendorf",      part: "A-4-81 swing-bucket (5810/5810R)" },
+    eppendorf_5810_FA45630:     { radius_mm: 123, manufacturer: "Eppendorf",      part: "FA-45-6-30 (5810/5810R)" },
+    eppendorf_5810_A48140:      { radius_mm: 180, manufacturer: "Eppendorf",      part: "A-4-81 swing-bucket, 500 mL rectangular or 7 x 50 mL conical buckets (5810/5810R)" },
     beckman_JA10:               { radius_mm: 158, manufacturer: "Beckman Coulter", part: "JA-10 fixed-angle" },
     beckman_JA20:               { radius_mm: 108, manufacturer: "Beckman Coulter", part: "JA-20 fixed-angle" },
-    thermo_F15_8x50c:           { radius_mm: 137, manufacturer: "Thermo Fisher",  part: "Fiberlite F15-8x50c" },
+    thermo_F15_8x50c:           { radius_mm: 104, manufacturer: "Thermo Fisher",  part: "Fiberlite F15-8x50c" },
   },
 };
 
@@ -1701,7 +1701,7 @@ const EDITION_VERIFIED = {
   summaries: "2026-09-02",
   trucking: "2026-09-02",
   accounting: "2026-09-02",
-  lab: "2026-09-02",
+  lab: "2026-09-09",
   // The legal folder's date is the OLDEST row stamp under it, not a build date:
   // the manifest must never claim more verification than its least-verified
   // row. It sat at 2025-01-15 through two re-verification passes; the last four
@@ -1834,7 +1834,7 @@ const DATASETS = [
       { file: "sales-tax-nexus.json", body: buildSalesTaxNexusShard(), name: "Per-state post-Wayfair economic-nexus thresholds" },
     ] },
   // v5 Group T: Bench Science and Laboratory Math (utilities 255-264).
-  { folder: "lab", edition: "IUPAC/CIAAW Abridged Standard Atomic Weights 2024. Common laboratory buffer pKa values from Good et al. 1966 and CRC Handbook of Chemistry and Physics 95th ed. Manufacturer rotor specifications (Eppendorf, Beckman Coulter, Thermo Fisher). Verified " + EDITION_VERIFIED.lab + ".", shards: [
+  { folder: "lab", edition: "IUPAC/CIAAW Abridged Standard Atomic Weights 2024. Common laboratory buffer pKa values from Good et al. 1966 and CRC Handbook of Chemistry and Physics 95th ed. Manufacturer rotor specifications, current manufacturer catalogs (Eppendorf, Beckman Coulter, Thermo Fisher). Verified " + EDITION_VERIFIED.lab + ".", shards: [
       { file: "iupac-atomic-weights.json", body: IUPAC_WEIGHTS_V5, name: "IUPAC Standard Atomic Weights 2024" },
       { file: "buffer-pka.json", body: BUFFER_PKA_V5, name: "Common laboratory buffer pKa values" },
       { file: "centrifuge-rotors.json", body: CENTRIFUGE_ROTORS_V5, name: "Representative centrifuge rotor radii (manufacturer-attributed)" },

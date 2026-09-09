@@ -80,11 +80,24 @@ export const CENTRIFUGE_ROTORS = {
   // radius each published speed/RCF pair implies: 21,130 / (1.118e-6 x 15,000^2)
   // is 84.0 mm, while the FA-45-30-11's 20,817 at 14,000 rpm is 95.0 mm.
   eppendorf_5424_FA452411:    { radius_mm: 84,  manufacturer: "Eppendorf", part: "FA-45-24-11 (5424/5424R)" },
-  eppendorf_5810_FA45630:     { radius_mm: 95,  manufacturer: "Eppendorf", part: "FA-45-6-30 (5810/5810R)" },
-  eppendorf_5810_A48140:      { radius_mm: 162, manufacturer: "Eppendorf", part: "A-4-81 swing-bucket (5810/5810R)" },
+  // The other three rows were read the same way on 2026-09-09, and all three
+  // were wrong. The FA-45-6-30 carried 95 mm -- the FA-45-30-11's radius, the
+  // same wrong-rotor copy the 5424 row made. Eppendorf's instructions give
+  // 12.3 cm, and both published pairs agree: 16,639 x g at 11,000 rpm and
+  // 20,133 at 12,100 each imply 123.0 mm.
+  eppendorf_5810_FA45630:     { radius_mm: 123, manufacturer: "Eppendorf", part: "FA-45-6-30 (5810/5810R)" },
+  // The A-4-81 carried 162 mm, which is the MTP/Flex plate bucket (2,900 x g
+  // at 4,000 rpm implies 162.1; Eppendorf states 16.3 cm) under a label naming
+  // the rotor generally. With the buckets it ships with -- 500 mL rectangular
+  // or 7 x 50 mL conical -- Eppendorf states 18 cm, and its published
+  // 3,220 x g at 4,000 rpm implies 180.0 mm. The label now names the bucket.
+  eppendorf_5810_A48140:      { radius_mm: 180, manufacturer: "Eppendorf", part: "A-4-81 swing-bucket, 500 mL rectangular or 7 x 50 mL conical buckets (5810/5810R)" },
   beckman_JA10:               { radius_mm: 158, manufacturer: "Beckman Coulter", part: "JA-10 fixed-angle" },
   beckman_JA20:               { radius_mm: 108, manufacturer: "Beckman Coulter", part: "JA-20 fixed-angle" },
-  thermo_F15_8x50c:           { radius_mm: 137, manufacturer: "Thermo Fisher", part: "Fiberlite F15-8x50c" },
+  // The Fiberlite carried 137 mm against a published 10.4 cm -- every RCF it
+  // gave was 32% high. Thermo publishes 14,500 rpm / 24,446 x g, which implies
+  // 104.0 mm.
+  thermo_F15_8x50c:           { radius_mm: 104, manufacturer: "Thermo Fisher", part: "Fiberlite F15-8x50c" },
 };
 
 // --- 255: Molarity and Dilution (C1V1 = C2V2) ---

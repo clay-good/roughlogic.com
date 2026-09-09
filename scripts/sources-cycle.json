@@ -208,6 +208,22 @@
         "IUPAC",
         "Atomic Weights"
       ]
+    },
+    {
+      "id": "centrifuge-rotors",
+      "name": "Manufacturer centrifuge-rotor radii",
+      "current_edition": "current manufacturer catalogs",
+      "current_release": "2026",
+      "cycle_years": 3,
+      "next_expected": "2029-09",
+      "last_verified": "2026-09-09",
+      "verification_note": "All six rotor rows verified 2026-09-09 against each manufacturer's own published figures, and against the radius those figures imply through RCF = 1.118e-6 x r(mm) x rpm^2 -- the inversion is what settles a radius the vendor does not print, since max speed and max RCF are always published. THREE OF THE SIX WERE WRONG. (1) FA-45-6-30 carried 95 mm, which is the FA-45-30-11's radius -- the same wrong-rotor copy the 5424 row made. Eppendorf's instructions for use give 12.3 cm without adapter, and both published pairs agree (16,639 x g / 11,000 rpm and 20,133 / 12,100 each imply 123.0 mm). Corrected to 123. (2) A-4-81 carried 162 mm, which is its MTP/Flex plate bucket (Eppendorf states 16.3 cm; 2,900 x g at 4,000 rpm implies 162.1) under a label naming the rotor generally. With the buckets it ships with -- 500 mL rectangular or 7 x 50 mL conical -- Eppendorf states 18 cm and its published 3,220 x g at 4,000 rpm implies 180.0 mm. Corrected to 180 and the label now names the bucket. (3) Fiberlite F15-8x50c carried 137 mm against a published 10.4 cm, so every RCF it gave was 32% high; Thermo publishes 14,500 rpm / 24,446 x g, implying 104.0 mm. Corrected to 104. The 5424 FA-45-24-11 (84 mm) and the two Beckman rows (JA-10 158 mm, JA-20 108 mm) were verified on 2026-09-09 and are unchanged. A unit test now cross-checks EVERY row against its published speed/RCF pair and asserts the covered set equals the shard, so an unchecked row cannot be added silently. FETCH NOTES: eppendorf.com 403s WebFetch but serves a plain curl with a browser user-agent; thermofisher.com needs the browser (cookie wall) and publishes speed and RCF but no radius.",
+      "free_access_url": "https://www.thermofisher.com/order/catalog/product/75003663",
+      "where": "data/lab/centrifuge-rotors.json",
+      "match_terms": [
+        "centrifuge",
+        "rotor"
+      ]
     }
   ],
   "annual_figures": [
