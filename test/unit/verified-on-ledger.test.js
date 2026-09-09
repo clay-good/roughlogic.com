@@ -288,6 +288,81 @@ test("the bundled atomic weights are the 2024 edition, in both copies", async ()
 // RCF = 1.118e-6 x r(mm) x rpm^2, which is what identifies whose radius 84 mm
 // is: the FA-45-24-11 at 15,000 rpm and 21,130 x g gives 84.0 mm, while the
 // FA-45-30-11 at 14,000 and 20,817 gives 95.0 mm.
+// The free-access probe used to read only citations.js -- the surface a READER
+// follows. The cycle file's `free_access_url` is the surface a MAINTAINER
+// follows to re-verify, and nothing looked at it: the NEC row pointed at
+// nfpa.org/free-access, which 404s, while all 44 reader-facing NEC citations
+// used nfpa.org/freeaccess, which resolves. The one URL nobody could see was
+// the broken one.
+test("every ledger free_access_url is an absolute http(s) URL the probe can reach", async () => {
+  const cycle = await readJson("scripts/sources-cycle.json");
+  const rows = [...(cycle.standards || []), ...(cycle.annual_figures || [])];
+  let probed = 0;
+  for (const row of rows) {
+    const u = row.free_access_url;
+    if (u === undefined) continue;
+    assert.equal(typeof u, "string", (row.id || row.name) + ": free_access_url is not a string");
+    // The probe only takes absolute http(s) values; a bare host or a relative
+    // path would be skipped in silence, which is worse than not being there.
+    assert.match(u, /^https?:\/\/[^\s"]+$/, (row.id || row.name) + ": free_access_url is not absolute");
+    // The NFPA row's dead hyphenated variant must not come back.
+    assert.ok(!u.includes("nfpa.org/free-access"), (row.id || row.name) + ": nfpa.org/free-access 404s; use /freeaccess");
+    probed += 1;
+  }
+  assert.ok(probed >= 15, "expected most rows to carry a free_access_url, got " + probed);
+});
+
+// The probe is opt-in and hits the network, so this pins its shape rather than
+// running it: it must still read both surfaces, and it must still judge a
+// redirect's destination rather than only its status code.
+test("check-free-access reads the cycle file and catches a soft 404", async () => {
+  const src = await readFile(resolve(ROOT, "scripts/check-free-access.mjs"), "utf8");
+  assert.match(src, /sources-cycle\.json/, "the probe no longer reads the ledger's URLs");
+  assert.match(src, /free_access_url/, "the probe no longer collects free_access_url");
+  assert.match(src, /SOFT_404/, "soft-404 detection is gone");
+  assert.match(src, /notfound/i, "the soft-404 pattern no longer matches a not-found path");
+});
+
+// CF-05. `last_verified` is the field the machine reads -- CF-03 measures the
+// recheck cadence from it and every shard's `verified_on` must equal it --
+// while `verification_note` is the field a person reads. When somebody
+// rechecks a source, writes the date in the note, and does not move the stamp,
+// the machine keeps reading the older date and the note becomes the only
+// record of the work. Five rows had drifted that way by 2026-09-09, the IBC
+// and IFC each claiming a 2026-09-09 re-confirmation over a 2026-09-03 stamp.
+//
+// This asserts the invariant independently of the gate, so the two have to
+// drift together to go unnoticed.
+test("no ledger row claims a verification later than its own last_verified", async () => {
+  const cycle = await readJson("scripts/sources-cycle.json");
+  const rows = [...(cycle.standards || []), ...(cycle.annual_figures || [])];
+  assert.ok(rows.length > 0);
+  const verifyDate = /\b(?:re-?verified|re-?confirmed|verified|confirmed|re-?checked|checked|reviewed)\b[^.]{0,40}?\b(20\d{2}-\d{2}-\d{2})\b/gi;
+  for (const row of rows) {
+    const note = row.verification_note || "";
+    const stamp = row.last_verified || "";
+    if (!note || !stamp) continue;
+    // A pass that reached something short of a verification says so in these
+    // words; the phrase has to name the stamp it is defending, so a stale
+    // opt-out left behind by a later re-stamp cannot silence anything.
+    if (note.includes("last_verified stays " + stamp)) continue;
+    const later = [...note.matchAll(verifyDate)].map((m) => m[1]).filter((d) => d > stamp);
+    assert.deepEqual(
+      later, [],
+      (row.id || row.name) + ": note claims a check on " + later.join(", ") +
+        " over last_verified " + stamp,
+    );
+  }
+});
+
+// The gate that enforces it must still be wired in, and its opt-out must still
+// be the phrase the notes use.
+test("check-citation-freshness carries the CF-05 note-versus-stamp check", async () => {
+  const src = await readFile(resolve(ROOT, "scripts/check-citation-freshness.mjs"), "utf8");
+  assert.match(src, /CF-05/, "the check is gone");
+  assert.match(src, /last_verified stays/, "the opt-out phrase is gone");
+});
+
 // Every inventory-turnover benchmark was wrong at once: the year could not
 // exist (ARTS's last data year is 2022, and the ASM has none for 2022 or 2023),
 // the key called an industry AGGREGATE a median, the values did not reproduce,

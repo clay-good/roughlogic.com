@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // v10 Phase A.2 free-access URL probe (spec-v10.md §3.2).
 //
-// Reads every tile's source-stamp string in ../citations.js and probes
-// any free-access URL referenced (nfpa.org/freeaccess, codes.iccsafe.org,
+// Reads every tile's source-stamp string in ../citations.js AND every
+// `free_access_url` in scripts/sources-cycle.json, and probes each
+// free-access URL referenced (nfpa.org/freeaccess, codes.iccsafe.org,
 // ecfr.gov, epa.gov, fda.gov, ashrae.org, ncei.noaa.gov, faa.gov,
 // awc.org, etc.). Verifies each URL responds 200.
 //
@@ -31,6 +32,13 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const CITATIONS = resolve(ROOT, "citations.js");
+// The citation strings are the surface a READER follows. The cycle file's
+// `free_access_url` is the surface a MAINTAINER follows to re-verify, and
+// until 2026-09-09 nothing probed it: the NEC row pointed at
+// nfpa.org/free-access, which 404s, while all 44 reader-facing NEC citations
+// used nfpa.org/freeaccess, which resolves. The one URL nobody could see was
+// the broken one. Probe both surfaces.
+const CYCLE = resolve(ROOT, "scripts", "sources-cycle.json");
 
 // Hosts the spec-v10 §3.2 example list calls out. We probe any URL
 // that lands under one of these hosts. The match is host-suffix so
@@ -110,8 +118,29 @@ async function probe(url) {
     ({ r, error } = await request(url, "GET"));
   }
   if (!r) return { ok: false, status: 0, error: String(error && error.message ? error.message : error) };
+  // A SOFT 404 answers 200 and redirects to a not-found page, so a status-code
+  // probe calls it healthy. The AASHTO row's product-ID URL did exactly that
+  // -- 200, final URL store.transportation.org/Common/NotFound -- and read as
+  // OK for as long as anyone had been running this. Judge the destination, not
+  // just the code.
+  const softNotFound = SOFT_404.test(new URL(r.url, url).pathname);
+  if (softNotFound) {
+    return { ok: false, status: r.status, finalUrl: r.url, soft404: true };
+  }
   return { ok: r.ok, status: r.status, finalUrl: r.url };
 }
+
+// Path segments a publisher uses for "this page is gone" while still answering
+// 200. Matched against the FINAL url's path only, so a legitimate page about
+// error handling at some deeper path is not caught by accident.
+const SOFT_404 = /^\/(?:common\/)?(?:notfound|not-found|404|pagenotfound|page-not-found|error)\/?$/i;
+
+// Hosts that answer 403 to any automated fetch regardless of whether the page
+// is healthy. These are NOT suppressed -- a real regression here still has to
+// be looked at -- but the line says so, because otherwise every run makes
+// somebody re-diagnose a bot wall as a broken link. Verified 2026-09-09:
+// codes.iccsafe.org 403s curl and node fetch, and reads normally in a browser.
+const BOT_WALLED = new Set(["codes.iccsafe.org"]);
 
 function hostOf(url) {
   try {
@@ -123,13 +152,27 @@ function hostOf(url) {
 
 async function main() {
   const text = await readFile(CITATIONS, "utf8");
-  const urls = extractFreeAccessRefs(text);
+  const fromCitations = extractFreeAccessRefs(text);
+
+  // The cycle file's URLs are already absolute and are not limited to the
+  // tracked hosts -- a ledger row may cite any publisher -- so take them
+  // whole rather than re-extracting them by host.
+  const cycle = JSON.parse(await readFile(CYCLE, "utf8"));
+  const fromCycle = [];
+  for (const row of [...(cycle.standards || []), ...(cycle.annual_figures || [])]) {
+    const u = row.free_access_url;
+    if (typeof u === "string" && /^https?:\/\//.test(u)) fromCycle.push(u);
+  }
+
+  const urls = [...new Set([...fromCitations, ...fromCycle])];
   if (urls.length === 0) {
-    console.log("free-access probe: no tracked URLs found in citations.js.");
+    console.log("free-access probe: no tracked URLs found in citations.js or sources-cycle.json.");
     return;
   }
   console.log(
-    "free-access probe: checking " + urls.length + " unique URL(s) across " + TRACKED_HOSTS.length + " tracked hosts.",
+    "free-access probe: checking " + urls.length + " unique URL(s) -- " + fromCitations.length +
+      " from citations.js across " + TRACKED_HOSTS.length + " tracked hosts, " + fromCycle.length +
+      " free_access_url(s) from sources-cycle.json.",
   );
 
   // Group by host so we can space requests to the same host.
@@ -157,7 +200,13 @@ async function main() {
       console.log("OK   " + r.status + " " + r.url + note);
     } else {
       warnCount += 1;
-      const detail = r.error ? " (" + r.error + ")" : "";
+      let detail = r.error ? " (" + r.error + ")" : "";
+      if (r.soft404) {
+        detail = " (SOFT 404: answered " + r.status + " but landed on " + r.finalUrl + ")";
+      } else if (r.status === 403 && BOT_WALLED.has(hostOf(r.url))) {
+        detail += " (known bot wall on this host: it 403s any automated fetch. Confirm in a browser" +
+          " before treating this as a broken link -- and if the browser also fails, it is real.)";
+      }
       console.warn("WARN " + (r.status || "ERR") + " " + r.url + detail);
     }
   }

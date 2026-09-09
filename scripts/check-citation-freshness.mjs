@@ -517,6 +517,46 @@ async function main() {
     }
   }
 
+  // CF-05: a row's note may not claim a verification later than its own stamp.
+  //
+  // `last_verified` is the machine-read field: CF-03 measures the recheck
+  // cadence from it, and check-verified-on-ledger makes every shard's
+  // `verified_on` match it. The `verification_note` is the human-read field.
+  // When somebody rechecks a source and writes the date in the note but does
+  // not move the stamp, the two disagree and the MACHINE reads the older one --
+  // so a source that was checked last week is treated as unchecked since the
+  // stamp, and the note quietly becomes the only record of the work. That had
+  // happened to five rows at once by 2026-09-09: the IBC and IFC notes each
+  // said "Re-confirmed 2026-09-09" over a stamp reading 2026-09-03.
+  //
+  // Not every later date is a missing re-stamp, though. A note may legitimately
+  // record that a later pass reached something SHORT of a verification -- the
+  // IPC and IRC rows say a 2026-09-02 pass reached only ICC's anticipated
+  // schedule, "and an anticipated date is not a verification". Those rows
+  // already spell out the deliberate choice in the words `last_verified stays
+  // <date>`, so that phrase is the opt-out: say it and the row passes, leave it
+  // out and the mismatch has to be resolved one way or the other.
+  const VERIFY_DATE = new RegExp(
+    "\\b(?:re-?verified|re-?confirmed|verified|confirmed|re-?checked|checked|reviewed)\\b" +
+      "[^.]{0,40}?\\b(20\\d{2}-\\d{2}-\\d{2})\\b",
+    "gi",
+  );
+  for (const row of [...standards, ...annual]) {
+    const note = row.verification_note || "";
+    const stamp = row.last_verified || "";
+    if (!note || !stamp) continue;
+    if (note.includes("last_verified stays " + stamp)) continue;
+    const claimed = [...note.matchAll(VERIFY_DATE)].map((m) => m[1]).filter((d) => d > stamp);
+    if (claimed.length === 0) continue;
+    errors.push(
+      "sources-cycle.json: '" + (row.name || row.id) + "' has a verification_note claiming a check on " +
+        [...new Set(claimed)].sort().join(", ") + " but carries last_verified " + stamp +
+        ". The machine reads the stamp, so the later check does not count. Move last_verified to the " +
+        "date actually checked, or -- if that pass reached something short of a verification -- say so " +
+        "in the note with the words \"last_verified stays " + stamp + "\"."
+    );
+  }
+
   for (const w of warnings) console.warn("WARN: " + w);
   if (errors.length > 0) {
     for (const e of errors) console.error("ERROR: " + e);

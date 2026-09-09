@@ -11,7 +11,7 @@
       "next_expected": "2028-08",
       "last_verified": "2026-06-05",
       "verification_note": "NEC 2026 (NFPA 70-2026) published on the standard NFPA three-year cycle. Bundled ampacity/correction values still follow NEC 2023 (disclosed-lag per NEC_DISCLOSURE); the 2026 value refresh is a data change tracked separately.",
-      "free_access_url": "https://www.nfpa.org/free-access",
+      "free_access_url": "https://www.nfpa.org/for-professionals/codes-and-standards/list-of-codes-and-standards/free-access",
       "match_terms": [
         "NEC ",
         "NFPA 70"
@@ -52,8 +52,8 @@
       "current_release": "2023-09",
       "cycle_years": 3,
       "next_expected": "2026-10",
-      "last_verified": "2026-09-03",
-      "verification_note": "Verified 2026-09-03 against the publisher's own Digital Codes site (codes.iccsafe.org/codes/i-codes/2027-icodes), which states \"Select 2027 I-Codes are available now, with additional titles added to Digital Codes as they are released throughout the year\" and lists seven 2027 titles: IPMC, IPSDC, ISPSC, IZC, IFGC, IMC. The International Building Code is NOT among them, so the 2027 IBC has not published as of this date. This is an actual confirmation of non-publication against the publisher, which the 2026-09-02 pass could not obtain (shop.iccsafe.org 404s and codes.iccsafe.org was 403ing an automated fetch; the page is JS-rendered and was read in a browser). It was anticipated September 2026, so recheck when next_expected 2026-10 passes. Re-confirmed 2026-09-09 on the same Digital Codes page, read in a browser because codes.iccsafe.org 403s an automated fetch: it still lists exactly seven 2027 titles (IPMC, IPSDC, ISPSC, IZC, IFGC, IMC, plus a 2023 ANSI/PHTA standard) and the International Building Code and International Fire Code are still NOT among them, so neither 2027 edition has published as of that date. next_expected 2026-10 has not yet passed, so last_verified is left at the 2026-09-03 confirmation rather than advanced; re-check once the month turns.",
+      "last_verified": "2026-09-09",
+      "verification_note": "Verified 2026-09-09 against the publisher's own Digital Codes site (codes.iccsafe.org/codes/i-codes/2027-icodes), read in a BROWSER because codes.iccsafe.org 403s an automated fetch and the page is JS-rendered. It states \"Select 2027 I-Codes are available now, with additional titles added to Digital Codes as they are released throughout the year\" and lists SIX 2027 titles -- IPMC, IPSDC, ISPSC, IZC, IFGC, IMC -- plus one non-2027 row (the 2023 ANSI/PHTA/ICC-2 pool and spa standard), which is why an earlier note here miscounted them as seven. The International Building Code is NOT among them, so the 2027 IBC has not published. That is a confirmation of non-publication against the publisher, which the 2026-09-02 pass could not obtain: shop.iccsafe.org 404s, and reaching only ICC's ANTICIPATED schedule is not a verification. It was anticipated September 2026 and did not arrive, and ICC is shipping the 2027 family title by title, so recheck the same page when next_expected passes and either advance the row to 2027 or re-stamp last_verified on or after that date.",
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
       "match_terms": [
         "IBC "
@@ -80,8 +80,8 @@
       "current_release": "2023-09",
       "cycle_years": 3,
       "next_expected": "2026-10",
-      "last_verified": "2026-09-03",
-      "verification_note": "Verified 2026-09-03 against the publisher's own Digital Codes site (codes.iccsafe.org/codes/i-codes/2027-icodes), which states \"Select 2027 I-Codes are available now, with additional titles added to Digital Codes as they are released throughout the year\" and lists seven 2027 titles: IPMC, IPSDC, ISPSC, IZC, IFGC, IMC. The International Fire Code is NOT among them, so the 2027 IFC has not published as of this date. This is an actual confirmation of non-publication against the publisher, which the 2026-09-02 pass could not obtain (shop.iccsafe.org 404s and codes.iccsafe.org was 403ing an automated fetch; the page is JS-rendered and was read in a browser). It was anticipated September 2026, so recheck when next_expected 2026-10 passes. Re-confirmed 2026-09-09 on the same Digital Codes page, read in a browser because codes.iccsafe.org 403s an automated fetch: it still lists exactly seven 2027 titles (IPMC, IPSDC, ISPSC, IZC, IFGC, IMC, plus a 2023 ANSI/PHTA standard) and the International Building Code and International Fire Code are still NOT among them, so neither 2027 edition has published as of that date. next_expected 2026-10 has not yet passed, so last_verified is left at the 2026-09-03 confirmation rather than advanced; re-check once the month turns.",
+      "last_verified": "2026-09-09",
+      "verification_note": "Verified 2026-09-09 against the publisher's own Digital Codes site (codes.iccsafe.org/codes/i-codes/2027-icodes), read in a BROWSER because codes.iccsafe.org 403s an automated fetch and the page is JS-rendered. It states \"Select 2027 I-Codes are available now, with additional titles added to Digital Codes as they are released throughout the year\" and lists SIX 2027 titles -- IPMC, IPSDC, ISPSC, IZC, IFGC, IMC -- plus one non-2027 row (the 2023 ANSI/PHTA/ICC-2 pool and spa standard), which is why an earlier note here miscounted them as seven. The International Fire Code is NOT among them, so the 2027 IFC has not published. That is a confirmation of non-publication against the publisher, which the 2026-09-02 pass could not obtain: shop.iccsafe.org 404s, and reaching only ICC's ANTICIPATED schedule is not a verification. It was anticipated September 2026 and did not arrive, and ICC is shipping the 2027 family title by title, so recheck the same page when next_expected passes and either advance the row to 2027 or re-stamp last_verified on or after that date.",
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
       "match_terms": [
         "IFC "
@@ -155,8 +155,8 @@
         "FDA Food Code",
         "Food Code"
       ],
-      "last_verified": "2026-09-02",
-      "verification_note": "Verified 2026-09-02 against fda.gov: the 2022 Food Code (10th edition) is still the most recent published edition, and FDA has said a 2026 edition is coming later this year on the four-year interval it moved to after 2017. This row had carried no last_verified at all, so the gate could only ever have failed on it, never been satisfied. Recheck at fda.gov/food/retail-food-protection/fda-food-code when next_expected passes.",
+      "last_verified": "2026-09-09",
+      "verification_note": "Re-verified 2026-09-09 at fda.gov/food/retail-food-protection/fda-food-code, which states verbatim that \"The 2022 Food Code is the most recent full edition published by FDA\" and whose Food Code by Year list ends at 2022. CORRECTION TO THE EARLIER NOTE: it said FDA \"has said a 2026 edition is coming later this year\". The page says no such thing. What it states is the POLICY -- that FDA moved to a four-year interval between complete editions with the support of the Conference for Food Protection -- from which a 2026 edition is an INFERENCE, not an announcement. The page also notes FDA may publish a Food Code Supplement between full editions; none is listed for the 2022 edition. This row had carried no last_verified at all before 2026-09-02, so the gate could only ever have failed on it. Recheck the same page when next_expected 2026-12 passes: either a 2026 edition has published, in which case advance the row, or it has not, in which case re-stamp on or after that date.",
       "citation_only": true,
       "citation_only_reason": "No bundled shard holds Food Code data: the retail-food tiles cite it by section for holding temperatures and cooling times and compute from the cited figures inline. There is no manifest for it to appear in, so CF-06 exempts it. The citation text names Food Code 2022, which is the current edition, so nothing is behind today; the ask when a 2026 edition publishes is a citation-text edit, not a data refresh."
     },
@@ -184,8 +184,8 @@
       "cycle_years": 7,
       "next_expected": "2027-01",
       "last_verified": "2026-09-01",
-      "verification_note": "Verified 2026-09-01: the 8th edition is NOT yet published. NCHRP 07-29, the research project developing it, was scheduled to complete 2026-03-31, so publication follows that rather than precedes it. The 2018 7th edition remains current; bundled geometric-design defaults follow it and the citation discloses it.",
-      "free_access_url": "https://store.transportation.org/Item/PublicationDetail?ID=4642",
+      "verification_note": "Verified 2026-09-01: the 8th edition is NOT yet published. NCHRP 07-29, the research project developing it, was scheduled to complete 2026-03-31, so publication follows that rather than precedes it. The 2018 7th edition remains current; bundled geometric-design defaults follow it and the citation discloses it. 2026-09-09, free_access_url only: the row pointed at store.transportation.org/Item/PublicationDetail?ID=4642, which now SOFT-404s -- it answers HTTP 200 while redirecting to /Common/NotFound, so a status-code probe called it healthy. Repointed at the store root, which resolves to itself. NOTE FOR WHOEVER RECHECKS THE EDITION: AASHTO's store states that it prohibits the use of AASHTO content with any artificial-intelligence tool, so the Green Book edition has to be confirmed by a person, not by an agent reading that site. last_verified stays 2026-09-01: repointing a link is not a verification of the edition.",
+      "free_access_url": "https://store.transportation.org/",
       "match_terms": [
         "AASHTO Green Book",
         "Green Book"
@@ -337,7 +337,7 @@
       "covers": "calendar tax year",
       "where": "data/accounting/pub-15-t-tables.json",
       "last_verified": "2025-12-01",
-      "verification_note": "The shard declares edition 2025 and the tile discloses the year and that the brackets are single-filer and illustrative. Left as-is on 2026-09-02: it is disclosed rather than stale-and-silent, and this row exists so the next reader is asked."
+      "verification_note": "The shard declares edition 2025 and the tile discloses the year and that the brackets are single-filer and illustrative. Reviewed on 2026-09-02 and left as-is: it is disclosed rather than stale-and-silent, and this row exists so the next reader is asked. That review read the DISCLOSURE, not the publisher, so last_verified stays 2025-12-01 -- reading our own tile is not a verification of the IRS's tables. Closing this row means fetching Pub 15-T for the current tax year and comparing the bundled single-filer brackets against it."
     },
     {
       "id": "irs-macrs-table-a1",

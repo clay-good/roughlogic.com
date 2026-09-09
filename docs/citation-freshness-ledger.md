@@ -8,8 +8,9 @@ This ledger lists every tracked source in
 [../scripts/sources-cycle.json](../scripts/sources-cycle.json) with the edition
 the site bundles, the current published edition, the date the row was last
 verified, and a status. `scripts/check-citation-freshness.mjs` fails if any
-tracked source `id` is missing a row here (ledger-completeness, CF-02) or if a
-row's `next_expected` has passed without a `last_verified` re-stamp (CF-03).
+tracked source `id` is missing a row here (ledger-completeness, CF-02), if a
+row's `next_expected` has passed without a `last_verified` re-stamp (CF-03), or
+if a row's `verification_note` claims a check later than its own stamp (CF-05).
 
 Since 2026-09-02 the same file also carries **`annual_figures`**: the bundled
 federal dollar amounts that reprice every year on a known calendar -- the IRS
@@ -29,6 +30,25 @@ figure is a full cycle behind before it can turn the build red. Re-verify
 against the publisher, then move `last_verified`; a stamped date is not
 evidence, so the row's `verification_note` should say what was checked.
 
+**CF-05** keeps the two halves of a row honest with each other. `last_verified`
+is the field the machine reads -- CF-03 measures the recheck cadence from it,
+and `check-verified-on-ledger` makes every shard's `verified_on` equal it --
+while `verification_note` is the field a person reads. Recheck a source, write
+the date in the note, and forget the stamp, and the machine goes on reading the
+older date: the source is treated as unchecked and the note becomes the only
+record of the work. Five rows had drifted that way by 2026-09-09, the IBC and
+IFC each claiming a 2026-09-09 re-confirmation over a 2026-09-03 stamp. The
+gate now fails on a note that claims a verification date later than its own
+stamp.
+
+A later date is not always a missing re-stamp: a pass can reach something short
+of a verification, as the IPC and IRC rows record, where a 2026-09-02 pass
+reached only ICC's *anticipated* schedule and "an anticipated date is not a
+verification". Say so in the note with the words **`last_verified stays
+<date>`** and the row passes. The phrase has to name the stamp it is
+defending, so an opt-out left behind by a later re-stamp cannot silence
+anything.
+
 **Status vocabulary**
 
 - **current** — the bundled edition is the current published edition (or the
@@ -47,14 +67,14 @@ evidence, so the row's `verification_note` should say what was checked.
 | `nec` | NEC (NFPA 70) | 2023 | 2026 | 2026-06-05 | disclosed-lag |
 | `ipc` | International Plumbing Code | 2021 | 2024 (2027 voted, not published) | 2026-09-01 | disclosed-lag |
 | `irc` | International Residential Code | 2021 | 2024 (2027 voted, not published) | 2026-09-01 | disclosed-lag |
-| `ibc` | International Building Code | 2021 | 2024 (2027 not yet published) | 2026-09-03 | disclosed-lag |
+| `ibc` | International Building Code | 2021 | 2024 (2027 not yet published) | 2026-09-09 | disclosed-lag |
 | `imc` | International Mechanical Code | 2021 | **2027 (published)** | 2026-09-03 | disclosed-lag |
-| `ifc` | International Fire Code | 2021 | 2024 (2027 not yet published) | 2026-09-03 | disclosed-lag |
+| `ifc` | International Fire Code | 2021 | 2024 (2027 not yet published) | 2026-09-09 | disclosed-lag |
 | `ifgc` | International Fuel Gas Code | 2021 | **2027 (published)** | 2026-09-03 | disclosed-lag |
 | `ashrae-62-1` | ASHRAE 62.1 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
 | `ashrae-62-2` | ASHRAE 62.2 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
 | `ashrae-90-1` | ASHRAE 90.1 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
-| `fda-food-code` | FDA Food Code | 2022 | 2022 | 2026-09-02 | current |
+| `fda-food-code` | FDA Food Code | 2022 | 2022 | 2026-09-09 | current |
 | `wmm` | NOAA World Magnetic Model | WMM2025 | WMM2025 (valid through 2029-12-31) | 2026-09-09 | current |
 | `iupac-atomic-weights` | IUPAC/CIAAW Standard Atomic Weights | 2024 | 2024 | 2026-09-09 | current |
 | `centrifuge-rotors` | Manufacturer centrifuge-rotor radii | current manufacturer catalogs | current manufacturer catalogs | 2026-09-09 | current |
