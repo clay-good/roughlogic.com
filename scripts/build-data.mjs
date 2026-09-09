@@ -1702,7 +1702,11 @@ const EDITION_VERIFIED = {
   trucking: "2026-09-02",
   accounting: "2026-09-02",
   lab: "2026-09-02",
-  legal: "2025-01-15",
+  // The legal folder's date is the OLDEST row stamp under it, not a build date:
+  // the manifest must never claim more verification than its least-verified
+  // row. It sat at 2025-01-15 through two re-verification passes; the last four
+  // rows were read 2026-09-09, and the oldest cohort is now 2026-09-03.
+  legal: "2026-09-03",
 };
 
 // --- Manifests for each per-folder dataset ---

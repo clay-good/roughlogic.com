@@ -96,12 +96,22 @@ test("no manifest edition claims it was verified on the build date", async () =>
 });
 
 test("data/legal's manifest agrees with the stamps under it", async () => {
-  // It read "Verified <build date>" while every shard beneath carried
-  // 2025-01-15 -- contradicting a staleness warning the project already prints.
+  // It read "Verified <build date>" while every shard beneath carried an older
+  // date -- contradicting a staleness warning the project already prints.
+  //
+  // The assertion is the INVARIANT, not a literal date: it used to pin
+  // "2025-01-15", which made a genuine re-verification pass look like a
+  // regression. The rollup must equal the oldest row beneath it, and the
+  // manifest edition must name that, whatever it currently is.
   const manifest = await readJson("data/legal/manifest.json");
   const shard = await readJson("data/legal/sales-tax-nexus.json");
   const oldest = shard.by_state.verifiedOn;
-  assert.equal(oldest, "2025-01-15");
+  const rowStamps = Object.values(shard.by_state)
+    .filter((v) => v && typeof v === "object")
+    .map((v) => v.verified_on)
+    .sort();
+  assert.match(oldest, /^\d{4}-\d{2}-\d{2}$/);
+  assert.equal(oldest, rowStamps[0], "the rollup must be the oldest row stamp");
   assert.ok(
     manifest.edition.includes(oldest),
     "the legal manifest must name the date its shards actually carry, got: " + manifest.edition,
@@ -455,12 +465,19 @@ test("the nexus doc's stale-row claim matches the shard", async () => {
 
   // 47 state rows (46 sales-tax states plus DC), which is what the docs claim.
   assert.equal(rows.length, 47);
-  assert.deepEqual(stale, ["AR", "CO", "GA"]);
+  assert.deepEqual(stale, []);
 
   const doc = await readFile(resolve(ROOT, "docs/data-sources.md"), "utf8");
   // The live count and the live list, both stated.
-  assert.match(doc, /3 of the 47 rows still carry `verified_on` 2025-01-15/);
-  assert.match(doc, /leaving three: AR, CO, GA/);
+  // The doc must keep stating the staleness in the shape check-manifests parses,
+  // pointed at whatever the OLDEST cohort now is -- the gate fails rather than
+  // going blind if that sentence disappears.
+  const m = doc.match(/(\d+) of the (\d+) rows still carry `verified_on` (\d{4}-\d{2}-\d{2})/);
+  assert.ok(m, "the doc no longer states staleness in the parseable form");
+  const oldest = rows.map(([, v]) => v.verified_on).sort()[0];
+  assert.equal(m[3], oldest, "the doc names a cohort that is not the oldest");
+  assert.equal(Number(m[2]), rows.length);
+  assert.equal(Number(m[1]), rows.filter(([, v]) => v.verified_on === oldest).length);
   // The superseded count must not be stated in the present tense again.
   assert.ok(
     !/The remaining 33 rows keep `verified_on: 2025-01-15`/.test(doc),
@@ -470,5 +487,9 @@ test("the nexus doc's stale-row claim matches the shard", async () => {
   // The manifest's generated note is the surface that cannot drift; it must
   // agree with the same stamps.
   const manifest = await readJson("data/legal/manifest.json");
-  assert.match(manifest.staleness_note, new RegExp("^" + stale.length + " of " + rows.length + " rows"));
+  assert.match(
+    manifest.staleness_note,
+    new RegExp("^" + Number(m[1]) + " of " + rows.length + " rows still carry verified_on " + oldest),
+    "the generated note must name the same oldest cohort the doc does",
+  );
 });

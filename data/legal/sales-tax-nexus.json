@@ -4,7 +4,7 @@
   "fetched": "2026-09-09",
   "free_access": "Each state's DOR site publishes its current threshold.",
   "by_state": {
-    "verifiedOn": "2025-01-15",
+    "verifiedOn": "2026-09-03",
     "AL": {
       "sales_threshold_usd": 250000,
       "transactions_threshold": null,
@@ -30,8 +30,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": 200,
       "combine": "or",
-      "citation": "Ark. Code Ann. 26-52-111",
-      "verified_on": "2025-01-15"
+      "citation": "Ark. Code Ann. 26-52-111(a)(1)-(2)",
+      "verified_on": "2026-09-09"
     },
     "CA": {
       "sales_threshold_usd": 500000,
@@ -44,8 +44,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": null,
       "combine": null,
-      "citation": "Colo. Rev. Stat. 39-26-102(3)(b) (HB19-1240)",
-      "verified_on": "2025-01-15"
+      "citation": "Colo. Rev. Stat. 39-26-102(3)(c)(I) (HB19-1240)",
+      "verified_on": "2026-09-09"
     },
     "CT": {
       "sales_threshold_usd": 100000,
@@ -66,8 +66,8 @@
       "sales_threshold_usd": 100000,
       "transactions_threshold": 200,
       "combine": "or",
-      "citation": "O.C.G.A. 48-8-2(8)(M.1)",
-      "verified_on": "2025-01-15"
+      "citation": "O.C.G.A. 48-8-2(8)(M.1)-(M.2)",
+      "verified_on": "2026-09-09"
     },
     "HI": {
       "sales_threshold_usd": 100000,
