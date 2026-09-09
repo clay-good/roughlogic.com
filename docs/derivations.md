@@ -1880,6 +1880,11 @@ cross-check.
 | calc-construction.js | `renderStairs` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-construction.js | `renderTileCount` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-construction.js | `renderWindPressure` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-containment.js | `computeAcidWasteNeutralization` | `{ peak_flow_gpm = 0, retention_minutes = 30, slug_volume_gal = 0, tank_volume...` | _ | _ | _ |
+| calc-containment.js | `computeFumeHoodFaceVelocity` | `{ sash_width_ft = 0, sash_height_in = 0, face_velocity_fpm = 100, alt_sash_he...` | _ | _ | _ |
+| calc-containment.js | `computeLabContainmentPressure` | `{ room_volume_ft3 = 0, required_ach = 0, hood_exhaust_cfm = 0, general_exhaus...` | _ | _ | _ |
+| calc-containment.js | `computeRadonFanStatic` | `{ flow_cfm = 0, pipe_diameter_in = 4, pipe_length_ft = 0, fan_static_in_wc = ...` | _ | _ | _ |
+| calc-containment.js | `computeSubSlabSuctionField` | `{ slab_area_ft2 = 0, reaches_ft = 0, fails_ft = 0, slab_length_ft = 0, slab_w...` | _ | _ | _ |
 | calc-cross.js | `computeBeltCenterDistance` | `{ large_pitch_diameter_in = 0, small_pitch_diameter_in = 0, belt_pitch_length...` | _ | _ | _ |
 | calc-cross.js | `computeBeltHpTransmitted` | `{ tight_side_tension_lb = 0, slack_side_tension_lb = 0, sheave_diameter_in = ...` | _ | _ | _ |
 | calc-cross.js | `computeBoltProofLoad` | `{ nominal_diameter_in = 0, threads_per_inch = 0, grade = "5" } = {}` | _ | _ | _ |
@@ -3717,7 +3722,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2303.
+Row count: 2308.
 
 <!-- END function-corpus-v14 -->
 
@@ -4026,12 +4031,13 @@ per spec-v14 §13.1 second paragraph.
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `yaw-error-loss` | Wind Turbine Yaw Misalignment Power Loss | Project (first-principles); the manufacturer's yaw calibration procedure governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group B Plumbing (142 tiles)
+### Group B Plumbing (145 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `aav-install-check` | Air Admittance Valve Installation Check (IPC 918) | International Code Council; 'Individual and branch-type air admittance valves shall b... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `accessible-toilet-compartment` | Accessible Toilet Compartment Sizing (2010 ADA Standards 604.8) | US Department of Justice / US Access ...; 213.3.1 triggers the ambulatory compartment where six or ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `acid-waste-neutralization` | Acid Waste Neutralization Tank Sizing | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `asme-head-thickness` | ASME UG-32 Formed-Head Thickness (Ellipsoidal, Hemispherical, Torispherical) | ASME BPVC VIII-1 UG-32; P 150 psig, D 48 in, S 17,500 psi, E 0.85, CA 0.0625 -> S... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `asme-shell-thickness` | ASME UG-27 Shell Thickness (Joint Efficiency and Corrosion) | ASME BPVC VIII-1 UG-27; P 150 psig, R 24 in, S 17,500 psi, E 0.85, CA 0.0625 -> S... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `backflow` | Backflow Reference | IPC 2024 + project bundled backflow-p...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4110,6 +4116,7 @@ per spec-v14 §13.1 second paragraph.
 | `pump-sizing` | Pump Sizing | Project (first-principles); Standard centrifugal-pump identity (US customary, gpm and... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `radiant-loop-sizing` | Hydronic Radiant Floor Loop Sizing | First-principles; ASHRAE HVAC Systems...; spec-v199 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `radiator-edr-output` | Radiator EDR to Heat Output | Radiator EDR to heat output (Hydronic...; Q = 320 x 240 = 76,800; gross = 76,800 x 1.33 = 102,144 B... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `radon-fan-static` | Radon Fan Static Pressure and Pipe Velocity | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `recirc-loop-sizing` | Hot Water Recirc Loop Sizing (ASPE) | ASPE; U=0.17 Btu/hr/ft/F at 3/4-in / 1-in insulation; dT_pipe =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `recirc-pump-head` | Hot Water Recirc Pump Head | Project (first-principles); 100 ft of 0.75 in copper / 8 fittings (eq. ~16 ft) / 4 gp... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `reducer-offset` | Reducer Centerline Offset and Invert Continuity | Geometry; ASME B16.9 lay lengths (by ...; spec-v202 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4141,6 +4148,7 @@ per spec-v14 §13.1 second paragraph.
 | `stormwater-detention-volume` | Stormwater Detention Volume (Modified Rational) | Modified Rational method; spec-v428 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stormwater-max-drainage-area` | Max Tributary Drainage Area for an Allowable Flow | USEPA / NRCS; 2 cfs allowable, asphalt (C=0.95), 2 in/hr -> 1.053 acres... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `stormwater-rational` | Stormwater Rational Method | USEPA / NRCS; 5000 ft^2 asphalt (C=0.95), 2 in/hr -> 0.218 cfs / 97.9 g... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `sub-slab-suction-field` | Radon Sub-Slab Suction Points From a Communication Test | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sump-basin-sizing` | Sump / Ejector Basin Drawdown and Cycle Check | IPC 2021 Section 712 / Hydraulic Inst...; 24 in basin, 12 in float spread, 10 GPM inflow, 30 GPM pu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `supply-pressure-budget` | Water-Supply Pressure Budget | IPC 2021 Section 604 / ASPE PEDH Vol. 2; street 60, 30 ft up, meter 8, friction 12, min 8 -> 12.99... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tank-drain-time` | Tank Drain Time (Falling-Head Orifice) | Falling-head (Torricelli) orifice dra...; spec-v630 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4173,7 +4181,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (193 tiles)
+### Group C HVAC (195 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4278,6 +4286,7 @@ per spec-v14 §13.1 second paragraph.
 | `flue-gas-dew-point` | Natural-Gas Flue-Gas Water Dew Point | Natural-gas flue-gas water dew point ...; frac = 2/(1 + 9.52 x 1.15) = 0.1674; p = 127.2 mmHg; Anto... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `freezer-underfloor-heat` | Freezer Slab Underfloor Heat and Frost Heave | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fuel-oil-atomizing-viscosity` | Fuel Oil Heating for Atomizing Viscosity | Project (first-principles); the burner manufacturer, the oil supplier data sheet, and... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `fume-hood-face-velocity` | Fume Hood Face Velocity and Exhaust CFM | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `furnace-airflow-to-rise` | Furnace Airflow to Temperature Rise | First-principles sensible-heat relati...; spec-v655 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `furnace-temp-rise` | Furnace Temperature Rise and Derived Airflow | First-principles sensible-heat relati...; spec-v110 section 2.2 pinned example (70->120 F, 100k inp... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gas-dp-flow-meter` | Gas (Compressible) Differential-Pressure Flow Meter | ISO 5167-2 (compressible orifice flow...; eps=1-(0.351+0.256*0.0625+0.93*0.00390625)(1-0.99^(1/1.4)... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4302,6 +4311,7 @@ per spec-v14 §13.1 second paragraph.
 | `insulation-thickness-for-heat-loss` | Pipe Insulation Thickness for a Target Heat Loss | Fourier cylindrical-shell conduction ...; od 2 in, k 0.25, 200 vs 70 F, target 40 BTU/hr-ft -> 0.53... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `internal-heat-gains` | Internal Heat Gains: People, Lighting, Equipment | ASHRAE / ACCA Manual J internal gains; spec-v228 section 2.1 pinned example (small office) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `isolator-deflection` | Isolator Static Deflection for a Target Isolation | ASHRAE Fundamentals, Sound and Vibrat...; spec-v633 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `lab-containment-pressure` | Laboratory Containment Offset and Pressure Direction | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `louver-free-area` | Louver Free Area, Velocity, and Water Penetration | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `machinery-room-ventilation` | Refrigeration Machinery Room Ventilation (ASHRAE 15) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `manual-d-friction-rate` | Manual D Friction Rate (Available Static Pressure) | ACCA Manual D; spec-v408 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5942,6 +5952,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2052. Fixture-covered or reference-cadence: 2052 / 2052.
+Tile count: 2057. Fixture-covered or reference-cadence: 2057 / 2057.
 
 <!-- END tile-index-v14 -->

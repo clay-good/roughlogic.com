@@ -2281,6 +2281,16 @@
     {"term":"ci ratio climate zone","target":"continuous-insulation-ratio","kind":"industry"},
     {"term":"exterior foam minimum r","target":"continuous-insulation-ratio","kind":"industry"},
     {"term":"condensation control ratio","target":"continuous-insulation-ratio","kind":"industry"},
-    {"term":"ratio of ci to cavity","target":"continuous-insulation-ratio","kind":"industry"}
+    {"term":"ratio of ci to cavity","target":"continuous-insulation-ratio","kind":"industry"},
+    {"term":"fume hood face velocity cfm","target":"fume-hood-face-velocity","kind":"industry"},
+    {"term":"sash position hood exhaust","target":"fume-hood-face-velocity","kind":"industry"},
+    {"term":"ashrae 110 containment","target":"fume-hood-face-velocity","kind":"industry"},
+    {"term":"hood energy laboratory","target":"fume-hood-face-velocity","kind":"industry"},
+    {"term":"too fast face velocity turbulence","target":"fume-hood-face-velocity","kind":"industry"},
+    {"term":"lab air change rate","target":"lab-containment-pressure","kind":"industry"},
+    {"term":"laboratory negative pressure offset","target":"lab-containment-pressure","kind":"industry"},
+    {"term":"room pressure relationship lab","target":"lab-containment-pressure","kind":"industry"},
+    {"term":"vav hood supply tracking","target":"lab-containment-pressure","kind":"industry"},
+    {"term":"lab pressure monitoring","target":"lab-containment-pressure","kind":"industry"}
   ]
 }

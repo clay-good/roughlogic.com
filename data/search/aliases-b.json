@@ -1694,6 +1694,21 @@
     {"term":"pvc pressure at 120 degrees","target":"thermoplastic-temperature-derate","kind":"industry"},
     {"term":"cpvc versus pvc temperature","target":"thermoplastic-temperature-derate","kind":"industry"},
     {"term":"thermoplastic pressure rating derate","target":"thermoplastic-temperature-derate","kind":"industry"},
-    {"term":"plastic pipe hot water rating","target":"thermoplastic-temperature-derate","kind":"industry"}
+    {"term":"plastic pipe hot water rating","target":"thermoplastic-temperature-derate","kind":"industry"},
+    {"term":"radon fan static pressure","target":"radon-fan-static","kind":"industry"},
+    {"term":"sub slab depressurization fan","target":"radon-fan-static","kind":"industry"},
+    {"term":"radon pipe sizing","target":"radon-fan-static","kind":"industry"},
+    {"term":"radon fan diagnostic vacuum flow","target":"radon-fan-static","kind":"industry"},
+    {"term":"radon mitigation fan curve","target":"radon-fan-static","kind":"industry"},
+    {"term":"radon suction pit size","target":"sub-slab-suction-field","kind":"industry"},
+    {"term":"sub slab communication test","target":"sub-slab-suction-field","kind":"industry"},
+    {"term":"suction field extension radon","target":"sub-slab-suction-field","kind":"industry"},
+    {"term":"multiple suction points","target":"sub-slab-suction-field","kind":"industry"},
+    {"term":"sub slab compartment footing","target":"sub-slab-suction-field","kind":"industry"},
+    {"term":"acid waste neutralization tank","target":"acid-waste-neutralization","kind":"industry"},
+    {"term":"limestone chip tank sizing","target":"acid-waste-neutralization","kind":"industry"},
+    {"term":"lab waste ph sewer","target":"acid-waste-neutralization","kind":"industry"},
+    {"term":"neutralization retention time","target":"acid-waste-neutralization","kind":"industry"},
+    {"term":"acid waste piping material","target":"acid-waste-neutralization","kind":"industry"}
   ]
 }

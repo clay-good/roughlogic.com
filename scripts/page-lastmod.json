@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "975cc23bd3d5e3d7",
+      "sha": "9b0b9963bc2d9d6c",
       "date": "2026-09-09"
     },
     "/tools/": {
-      "sha": "44d8e38b99ae86ae",
+      "sha": "a36b974d45316757",
       "date": "2026-09-09"
     },
     "/groups/accounting/": {
-      "sha": "3913a9b9bec258fa",
+      "sha": "dab119d12cbea215",
       "date": "2026-09-09"
     },
     "/groups/agriculture/": {
-      "sha": "b3e83b55de0e67ea",
+      "sha": "49c9bb59524666f0",
       "date": "2026-09-09"
     },
     "/groups/construction/": {
-      "sha": "b2649e2d12407ba6",
+      "sha": "f2fbc45ec4090bda",
       "date": "2026-09-09"
     },
     "/groups/cross-trade/": {
-      "sha": "62403742995ec813",
+      "sha": "da57da11adc18db3",
       "date": "2026-09-09"
     },
     "/groups/educators/": {
-      "sha": "fc461bb01cffe218",
+      "sha": "1af515ec05217504",
       "date": "2026-09-09"
     },
     "/groups/electrical/": {
-      "sha": "7ac633c6f60408e5",
+      "sha": "7ff154b3602708b5",
       "date": "2026-09-09"
     },
     "/groups/field/": {
-      "sha": "6afa5b1c36a2949d",
+      "sha": "841c8c241c5dfcd0",
       "date": "2026-09-09"
     },
     "/groups/fire-ground/": {
-      "sha": "939b1f3898c5a118",
+      "sha": "1ea47e413e505673",
       "date": "2026-09-09"
     },
     "/groups/historical/": {
-      "sha": "35daf7d75b9c1ac0",
+      "sha": "25a74a85ad596490",
       "date": "2026-09-09"
     },
     "/groups/hvac/": {
-      "sha": "50307b5a6d8df010",
+      "sha": "5e9fd55520fba0ca",
       "date": "2026-09-09"
     },
     "/groups/kitchen/": {
-      "sha": "ec40799d957e5659",
+      "sha": "8e1ccb1bb22ca4c2",
       "date": "2026-09-09"
     },
     "/groups/lab/": {
-      "sha": "28b7d0b9ad6077ee",
+      "sha": "9382f7c2476cbc24",
       "date": "2026-09-09"
     },
     "/groups/mechanic/": {
-      "sha": "47124c15b96b3fcd",
+      "sha": "f557f857b49238d7",
       "date": "2026-09-09"
     },
     "/groups/plumbing/": {
-      "sha": "96ce42371ecb2d8a",
+      "sha": "d5a58a9e9011ee0f",
       "date": "2026-09-09"
     },
     "/groups/real-estate/": {
-      "sha": "eb5165f6459b2fca",
+      "sha": "da466b2c71935df6",
       "date": "2026-09-09"
     },
     "/groups/references/": {
-      "sha": "956af34974f3fdc1",
+      "sha": "5d58cda8d3cb88fe",
       "date": "2026-09-09"
     },
     "/groups/restoration/": {
-      "sha": "3cb6ee61f93df2a0",
+      "sha": "274c2f047e84cf89",
       "date": "2026-09-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "3db200c950fbc39c",
+      "sha": "5f87b7584b95d9b5",
       "date": "2026-09-09"
     },
     "/groups/stage/": {
-      "sha": "a66bb3bae047d948",
+      "sha": "cf2054c6d279eea8",
       "date": "2026-09-09"
     },
     "/groups/trucking/": {
-      "sha": "b80f6a3ba01bd04e",
+      "sha": "e34f330bc2ccc16c",
       "date": "2026-09-09"
     },
     "/groups/water/": {
-      "sha": "3ebb5d10f811d531",
+      "sha": "4cc33a0b9c9dd9cc",
       "date": "2026-09-09"
     },
     "/tools/aav-install-check/": {
@@ -140,6 +140,10 @@
     "/tools/accessible-toilet-compartment/": {
       "sha": "427729842997f3d3",
       "date": "2026-09-01"
+    },
+    "/tools/acid-waste-neutralization/": {
+      "sha": "b9f7d081768df71f",
+      "date": "2026-09-09"
     },
     "/tools/acme-thread-depth/": {
       "sha": "b694ce7cda1154a8",
@@ -370,8 +374,8 @@
       "date": "2026-09-01"
     },
     "/tools/attic-ventilation/": {
-      "sha": "682b5ea7af24384a",
-      "date": "2026-09-08"
+      "sha": "b09a9507ed6d1318",
+      "date": "2026-09-09"
     },
     "/tools/aviation-fuel-weight/": {
       "sha": "3d3ba80fd01d75d2",
@@ -2114,8 +2118,8 @@
       "date": "2026-09-01"
     },
     "/tools/dp-flow-meter/": {
-      "sha": "e251d41f5e17a2cb",
-      "date": "2026-09-08"
+      "sha": "61b1fe74dd9c8fbb",
+      "date": "2026-09-09"
     },
     "/tools/dp-flow-signal-scaling/": {
       "sha": "e637dadaa272312a",
@@ -2977,6 +2981,10 @@
       "sha": "30b96db4f8e114b2",
       "date": "2026-09-01"
     },
+    "/tools/fume-hood-face-velocity/": {
+      "sha": "c04b4cc97cb60f9b",
+      "date": "2026-09-09"
+    },
     "/tools/furnace-airflow-to-rise/": {
       "sha": "41222a50a5cf2fdf",
       "date": "2026-09-08"
@@ -3454,8 +3462,8 @@
       "date": "2026-09-01"
     },
     "/tools/hood-exhaust/": {
-      "sha": "157d5be2861ba5cb",
-      "date": "2026-09-04"
+      "sha": "3bc0a71fd687d90a",
+      "date": "2026-09-09"
     },
     "/tools/hoop-stress-mawp/": {
       "sha": "66f6603b9794ece3",
@@ -3820,6 +3828,10 @@
     "/tools/knurl-blank-diameter/": {
       "sha": "1ed3a9b9412a9a7a",
       "date": "2026-09-01"
+    },
+    "/tools/lab-containment-pressure/": {
+      "sha": "aa143e86198bd5be",
+      "date": "2026-09-09"
     },
     "/tools/lab-dilution/": {
       "sha": "8377dc2a55964b76",
@@ -4962,8 +4974,8 @@
       "date": "2026-09-01"
     },
     "/tools/pipe-velocity/": {
-      "sha": "b559ca632f6fc252",
-      "date": "2026-09-04"
+      "sha": "7d2659595812d0bd",
+      "date": "2026-09-09"
     },
     "/tools/pipe-volume/": {
       "sha": "d826106bd7f5b276",
@@ -5274,8 +5286,8 @@
       "date": "2026-09-01"
     },
     "/tools/proportional-balance-ratio/": {
-      "sha": "99dcfa8719da1bb1",
-      "date": "2026-09-08"
+      "sha": "4f183f1b030ce413",
+      "date": "2026-09-09"
     },
     "/tools/protruding-object-check/": {
       "sha": "aa1c7e8c2322d345",
@@ -5452,6 +5464,10 @@
     "/tools/radiator-edr-output/": {
       "sha": "88517141d27849cc",
       "date": "2026-09-01"
+    },
+    "/tools/radon-fan-static/": {
+      "sha": "6ac78e033df7569b",
+      "date": "2026-09-09"
     },
     "/tools/rafter/": {
       "sha": "e1e5f385b91379e1",
@@ -5662,8 +5678,8 @@
       "date": "2026-09-01"
     },
     "/tools/refrigerant-charging/": {
-      "sha": "11e02c36ff3aca89",
-      "date": "2026-09-04"
+      "sha": "2999d12b7e339ca8",
+      "date": "2026-09-09"
     },
     "/tools/refrigerant-leak-rate/": {
       "sha": "a91c20674475be43",
@@ -6198,8 +6214,8 @@
       "date": "2026-09-01"
     },
     "/tools/septic-dose-tank/": {
-      "sha": "193934582173a0af",
-      "date": "2026-09-01"
+      "sha": "8b9dd5ed2799c018",
+      "date": "2026-09-09"
     },
     "/tools/septic-drainfield/": {
       "sha": "7d31ae4cafc30761",
@@ -7084,6 +7100,10 @@
     "/tools/stump-grinding-volume/": {
       "sha": "22bc572af21c625f",
       "date": "2026-09-08"
+    },
+    "/tools/sub-slab-suction-field/": {
+      "sha": "c1729bf573474020",
+      "date": "2026-09-09"
     },
     "/tools/subgrade-cbr-thickness/": {
       "sha": "1cda71ff28e54c49",

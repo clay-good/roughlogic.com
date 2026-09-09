@@ -1191,6 +1191,12 @@ const _TILES = [
   ["pool-pump-speed-savings", "M"],
   ["pool-heat-pump-capacity", "M"],
   ["spa-drain-interval", "M"],
+  // spec-v1745..v1749 containment band
+  ["radon-fan-static", "B"],
+  ["sub-slab-suction-field", "B"],
+  ["acid-waste-neutralization", "B"],
+  ["fume-hood-face-velocity", "C"],
+  ["lab-containment-pressure", "C"],
   // spec-v1622..v1631 HVAC test-and-balance and hydronic systems band
   ["flow-hood-correction", "C"],
   ["fan-system-effect", "C"],

@@ -1326,6 +1326,13 @@ export const TOOL_MODULES = (() => {
   // spec-v1701..v1704: the pool and spa service bench. Split into its own
   // module rather than added to calc-treatment.js, which sits at 99.6% of its
   // size cap.
+  // spec-v1745..v1749: the containment bench -- keeping soil gas out, keeping
+  // aggressive effluent out of the sewer, and keeping contaminants inside a
+  // hood and a room. Split out because calc-cross.js sits at 94.6% of its cap.
+  declare("./calc-containment.js", "CONTAINMENT_RENDERERS", [
+    "radon-fan-static", "sub-slab-suction-field", "acid-waste-neutralization",
+    "fume-hood-face-velocity", "lab-containment-pressure",
+  ]);
   declare("./calc-pool.js", "POOL_RENDERERS", [
     "pool-cover-evaporation", "pool-pump-speed-savings",
     "pool-heat-pump-capacity", "spa-drain-interval",

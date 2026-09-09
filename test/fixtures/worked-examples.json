@@ -107700,6 +107700,291 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "radon-fan-static",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Radon Fan Static Pressure and Pipe Sizing -- the spec-v1745 worked example, recomputed",
+   "source_edition_or_year": "spec-v1745 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "flow_cfm": 80,
+    "pipe_diameter_in": 4,
+    "pipe_length_ft": 30,
+    "fan_static_in_wc": 1.2,
+    "measured_vacuum_in_wc": 1,
+    "alt_pipe_diameter_in": 6
+   },
+   "outputs": {
+    "area_ft2": {
+     "value": 0.087266463,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "velocity_fpm": {
+     "value": 916.73247,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pipe_loss_in_wc": {
+     "value": 0.11096485,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pipe_share_pct": {
+     "value": 9.2470706,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_velocity_fpm": {
+     "value": 407.43665,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_pipe_loss_in_wc": {
+     "value": 0.016171561,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sub-slab-suction-field",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Radon Sub-Slab Suction Pit and Field Extension -- the spec-v1746 worked example, recomputed",
+   "source_edition_or_year": "spec-v1746 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "slab_area_ft2": 1600,
+    "reaches_ft": 25,
+    "fails_ft": 40,
+    "slab_length_ft": 80,
+    "slab_width_ft": 20,
+    "existing_points": 1
+   },
+   "outputs": {
+    "effective_radius_ft": {
+     "value": 25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "area_per_point_ft2": {
+     "value": 1963.4954,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "points_required": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "coverage_ratio": {
+     "value": 0.81487331,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "longest_dimension_ft": {
+     "value": 80,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "points_by_length": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "governing_points": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "acid-waste-neutralization",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Acid Waste Neutralization Tank Sizing -- the spec-v1747 worked example, recomputed",
+   "source_edition_or_year": "spec-v1747 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "peak_flow_gpm": 25,
+    "retention_minutes": 30,
+    "slug_volume_gal": 5,
+    "tank_volume_gal": 750,
+    "discharge_ph_min": 5.5,
+    "discharge_ph_max": 10,
+    "measured_ph": 7.2
+   },
+   "outputs": {
+    "required_volume_gal": {
+     "value": 750,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "turnover_minutes": {
+     "value": 30,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "slug_contact_minutes": {
+     "value": 30,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "slug_fraction_pct": {
+     "value": 0.66666667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fume-hood-face-velocity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Fume Hood Face Velocity and Exhaust CFM -- the spec-v1748 worked example, recomputed",
+   "source_edition_or_year": "spec-v1748 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "sash_width_ft": 6,
+    "sash_height_in": 18,
+    "face_velocity_fpm": 100,
+    "alt_sash_height_in": 30,
+    "heating_rise_f": 60,
+    "hours_per_year": 8760,
+    "energy_cost_per_mmbtu": 12,
+    "too_fast_fpm": 125
+   },
+   "outputs": {
+    "open_area_ft2": {
+     "value": 9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "exhaust_cfm": {
+     "value": 900,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_open_area_ft2": {
+     "value": 15,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_exhaust_cfm": {
+     "value": 1500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "extra_cfm": {
+     "value": 600,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heating_btuh": {
+     "value": 38880,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annual_cost": {
+     "value": 4087.0656,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lab-containment-pressure",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Laboratory Air Change Rate and Containment Pressure -- the spec-v1749 worked example, recomputed",
+   "source_edition_or_year": "spec-v1749 of scope-trade-expansion-2, 2026-09-09",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-09",
+   "inputs": {
+    "room_volume_ft3": 9600,
+    "required_ach": 8,
+    "hood_exhaust_cfm": 1200,
+    "general_exhaust_cfm": 80,
+    "supply_cfm": 1180,
+    "hood_sash_closed_cfm": 400,
+    "supply_drift_pct": 10
+   },
+   "outputs": {
+    "ach_airflow_cfm": {
+     "value": 1280,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_exhaust_cfm": {
+     "value": 1280,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "governing_cfm": {
+     "value": 1280,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "offset_cfm": {
+     "value": 100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "offset_pct": {
+     "value": 7.8125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sash_swing_cfm": {
+     "value": 800,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "drift_cfm": {
+     "value": 118,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

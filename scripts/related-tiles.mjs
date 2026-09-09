@@ -1634,6 +1634,12 @@ const RELATED = {
   "pool-pump-speed-savings": ["pool-turnover","vfd-energy-savings","pool-cover-evaporation"],
   "pool-heat-pump-capacity": ["pool-heater-btu","pool-cover-evaporation","heat-pump-cold-capacity"],
   "spa-drain-interval": ["pool-turnover","pool-alkalinity-adjust","pool-volume"],
+  // spec-v1745..v1749: containment band.
+  "radon-fan-static": ["sub-slab-suction-field","stack-effect-npp","blower-door-ach50"],
+  "sub-slab-suction-field": ["radon-fan-static","stack-effect-npp","blower-door-ach50"],
+  "acid-waste-neutralization": ["lab-containment-pressure","chemical-feed-pump","fume-hood-face-velocity"],
+  "fume-hood-face-velocity": ["lab-containment-pressure","grille-face-velocity","dilution-ventilation-solvent"],
+  "lab-containment-pressure": ["fume-hood-face-velocity","air-changes-hour","door-undercut-transfer-air"],
   // spec-v1622..v1631: HVAC test-and-balance and hydronic systems band.
   "flow-hood-correction": ["pitot-traverse-cfm","proportional-balance-ratio","traverse-closure"],
   "fan-system-effect": ["fan-affinity-laws","duct-leakage","flow-hood-correction"],

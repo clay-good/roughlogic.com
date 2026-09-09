@@ -51234,3 +51234,175 @@ test("bounds: spec-v1704 computeSpaDrainInterval -- why a spa and not a pool", (
   assert.ok(_v1704({ ...base, daily_bathers: 0 }).error);
   assert.ok(_v1704({ ...base, spa_gallons: 0 }).error);
 });
+
+// =====================================================================
+// spec-v1745..v1749: the radon, acid waste and laboratory containment band.
+// Five tiles, nothing cut. spec-v1745 ASSERTED pipe friction was "a few
+// hundredths of an inch" and "a percent or two" of the system; Darcy-Weisbach
+// gives 0.111 in wc and the equal-friction duct form gives 0.128, both around
+// 9-11% of a 1.2 in wc fan, so the share is computed here rather than asserted.
+// spec-v1746's shape point is sharper than it states: its own 1,600 sq ft slab
+// needs 1 point on area and 2 along its 80 ft run.
+// =====================================================================
+import {
+  computeRadonFanStatic as _v1745,
+  computeSubSlabSuctionField as _v1746,
+  computeAcidWasteNeutralization as _v1747,
+  computeFumeHoodFaceVelocity as _v1748,
+  computeLabContainmentPressure as _v1749,
+} from "../../calc-containment.js";
+
+test("bounds: spec-v1745 computeRadonFanStatic -- the pipe is 9%, not the asserted 'percent or two'", () => {
+  const base = { flow_cfm: 80, pipe_diameter_in: 4, pipe_length_ft: 30, fan_static_in_wc: 1.2, measured_vacuum_in_wc: 1.0, alt_pipe_diameter_in: 6 };
+  const r = _v1745(base);
+  // Area and velocity are exact geometry: 4 in pipe is pi/4 x (4/12)^2 sq ft.
+  assert.ok(Math.abs(r.area_ft2 - Math.PI / 4 * Math.pow(4 / 12, 2)) < 1e-12);
+  assert.ok(Math.abs(r.velocity_fpm - 80 / r.area_ft2) < 1e-9);
+  assert.ok(Math.abs(r.velocity_fpm - 917) < 1);
+  // THE FINDING: the spec says "a few hundredths" and "a percent or two".
+  assert.ok(r.pipe_loss_in_wc > 0.10 && r.pipe_loss_in_wc < 0.12);
+  assert.ok(r.pipe_share_pct > 9 && r.pipe_share_pct < 10);
+  // IDENTITY: the share is the loss over the entered static, exactly.
+  assert.ok(Math.abs(r.pipe_share_pct - 100 * r.pipe_loss_in_wc / 1.2) < 1e-9);
+  // IDENTITY: zero length is zero friction, so the pipe is 0% of the system.
+  const none = _v1745({ ...base, pipe_length_ft: 0 });
+  assert.ok(Math.abs(none.pipe_loss_in_wc) < 1e-12);
+  assert.ok(Math.abs(none.pipe_share_pct) < 1e-12);
+  // IDENTITY: friction is exactly linear in length at fixed diameter and flow.
+  const long = _v1745({ ...base, pipe_length_ft: 60 });
+  assert.ok(Math.abs(long.pipe_loss_in_wc - 2 * r.pipe_loss_in_wc) < 1e-9);
+  // IDENTITY: velocity goes with the INVERSE SQUARE of diameter.
+  assert.ok(Math.abs(r.alt_velocity_fpm - r.velocity_fpm * Math.pow(4 / 6, 2)) < 1e-9);
+  // The upsize is a real saving and still leaves the soil the large majority.
+  assert.ok(r.alt_pipe_loss_in_wc < r.pipe_loss_in_wc / 5);
+  assert.ok(100 - r.pipe_share_pct > 85);
+  // The diagnostic: high vacuum at low flow is a TIGHT sub-slab.
+  assert.ok(Math.abs(r.vacuum_ratio - 1.0 / 1.2) < 1e-12);
+  assert.ok(/tight sub-slab/i.test(r.diagnostic_verdict));
+  assert.ok(/MORE SUCTION POINTS/.test(r.diagnostic_verdict));
+  // Low vacuum at high flow is the OPPOSITE failure and must not read the same.
+  const leak = _v1745({ ...base, flow_cfm: 200, measured_vacuum_in_wc: 0.2 });
+  assert.ok(!/tight sub-slab/i.test(leak.diagnostic_verdict));
+  assert.ok(_v1745({ ...base, flow_cfm: 0 }).error);
+  assert.ok(_v1745({ ...base, pipe_diameter_in: 0 }).error);
+});
+
+test("bounds: spec-v1746 computeSubSlabSuctionField -- SHAPE governs, not area", () => {
+  const base = { slab_area_ft2: 1600, reaches_ft: 25, fails_ft: 40, slab_length_ft: 80, slab_width_ft: 20, existing_points: 1 };
+  const r = _v1746(base);
+  // The confirmed radius, not the distance where vacuum was absent.
+  assert.equal(r.effective_radius_ft, 25);
+  assert.ok(Math.abs(r.area_per_point_ft2 - Math.PI * 25 * 25) < 1e-9);
+  // Area alone says ONE point -- 1,963 sq ft covers the 1,600 sq ft slab.
+  assert.equal(r.points_required, 1);
+  assert.ok(r.coverage_ratio < 1);
+  // THE FINDING: the same slab needs TWO along its 80 ft run.
+  assert.equal(r.points_by_length, 2);
+  assert.equal(r.governing_points, 2);
+  assert.equal(r.shape_governs, true);
+  // IDENTITY: the same AREA laid out compactly needs only the area answer.
+  const square = _v1746({ ...base, slab_length_ft: 40, slab_width_ft: 40 });
+  assert.equal(square.governing_points, 1);
+  assert.equal(square.shape_governs, false);
+  assert.equal(square.area_per_point_ft2, r.area_per_point_ft2);
+  // A TIGHT sub-slab needs many points regardless of fan size.
+  const tight = _v1746({ ...base, reaches_ft: 6, fails_ft: 10 });
+  assert.ok(tight.governing_points >= 15);
+  // IDENTITY: coverage goes with the SQUARE of the radius.
+  const half = _v1746({ ...base, reaches_ft: 12.5, fails_ft: 20 });
+  assert.ok(Math.abs(half.area_per_point_ft2 - r.area_per_point_ft2 / 4) < 1e-9);
+  // The governing count never falls below either individual check.
+  assert.ok(r.governing_points >= r.points_required);
+  assert.ok(r.governing_points >= r.points_by_length);
+  assert.ok(_v1746({ ...base, slab_area_ft2: 0 }).error);
+  assert.ok(_v1746({ ...base, reaches_ft: 0 }).error);
+});
+
+test("bounds: spec-v1747 computeAcidWasteNeutralization -- halve the tank, halve the contact", () => {
+  const base = { peak_flow_gpm: 25, retention_minutes: 30, slug_volume_gal: 5, tank_volume_gal: 750, discharge_ph_min: 5.5, discharge_ph_max: 10, measured_ph: 7.2 };
+  const r = _v1747(base);
+  assert.ok(Math.abs(r.required_volume_gal - 750) < 1e-12);
+  // IDENTITY: a tank sized exactly to the requirement turns over at it.
+  assert.ok(Math.abs(r.turnover_minutes - 30) < 1e-12);
+  assert.equal(r.undersized, false);
+  // THE POINT: halving the tank halves the contact time.
+  const small = _v1747({ ...base, tank_volume_gal: 375 });
+  assert.ok(Math.abs(small.turnover_minutes - 15) < 1e-12);
+  assert.equal(small.undersized, true);
+  // The slug is a trivial FRACTION -- capacity was never the question.
+  assert.ok(Math.abs(r.slug_fraction_pct - 100 * 5 / 750) < 1e-12);
+  assert.ok(r.slug_fraction_pct < 1);
+  // IDENTITY: contact time is the turnover, and it is exactly inverse in flow.
+  assert.ok(Math.abs(r.slug_contact_minutes - r.turnover_minutes) < 1e-12);
+  const busy = _v1747({ ...base, peak_flow_gpm: 50 });
+  assert.ok(Math.abs(busy.turnover_minutes - r.turnover_minutes / 2) < 1e-12);
+  // The pH window is entered, and both ends of it are checked.
+  assert.equal(r.in_window, true);
+  assert.equal(_v1747({ ...base, measured_ph: 4 }).in_window, false);
+  assert.equal(_v1747({ ...base, measured_ph: 11 }).in_window, false);
+  // A discharge exactly ON the limit is inside it, not a failure.
+  assert.equal(_v1747({ ...base, measured_ph: 5.5 }).in_window, true);
+  assert.equal(_v1747({ ...base, measured_ph: 10 }).in_window, true);
+  assert.ok(_v1747({ ...base, peak_flow_gpm: 0 }).error);
+  assert.ok(_v1747({ ...base, retention_minutes: 0 }).error);
+});
+
+test("bounds: spec-v1748 computeFumeHoodFaceVelocity -- the sash is the whole variable", () => {
+  const base = { sash_width_ft: 6, sash_height_in: 18, face_velocity_fpm: 100, alt_sash_height_in: 30, heating_rise_f: 60, hours_per_year: 8760, energy_cost_per_mmbtu: 12, too_fast_fpm: 125 };
+  const r = _v1748(base);
+  assert.ok(Math.abs(r.open_area_ft2 - 6 * 18 / 12) < 1e-12);
+  assert.ok(Math.abs(r.exhaust_cfm - 900) < 1e-12);
+  assert.ok(Math.abs(r.alt_exhaust_cfm - 1500) < 1e-12);
+  // IDENTITY: exhaust is exactly linear in sash height and in velocity.
+  assert.ok(Math.abs(r.extra_cfm - (r.alt_exhaust_cfm - r.exhaust_cfm)) < 1e-12);
+  assert.ok(Math.abs(_v1748({ ...base, sash_height_in: 36 }).exhaust_cfm - 2 * r.exhaust_cfm) < 1e-12);
+  assert.ok(Math.abs(_v1748({ ...base, face_velocity_fpm: 200 }).exhaust_cfm - 2 * r.exhaust_cfm) < 1e-12);
+  // IDENTITY: the same sash on both sides means no extra air at all.
+  const same = _v1748({ ...base, alt_sash_height_in: 18 });
+  assert.ok(Math.abs(same.extra_cfm) < 1e-12);
+  assert.ok(Math.abs(same.heating_btuh) < 1e-12);
+  // The standard sensible heat relation, 1.08 x cfm x rise.
+  assert.ok(Math.abs(r.heating_btuh - 1.08 * 600 * 60) < 1e-9);
+  assert.ok(Math.abs(r.annual_cost - r.heating_btuh * 8760 / 1e6 * 12) < 1e-6);
+  // TOO FAST IS NOT SAFER -- the threshold is a ceiling, not a floor.
+  assert.equal(r.too_fast, false);
+  assert.equal(_v1748({ ...base, face_velocity_fpm: 150 }).too_fast, true);
+  // A velocity exactly AT the threshold is not yet over it.
+  assert.equal(_v1748({ ...base, face_velocity_fpm: 125 }).too_fast, false);
+  assert.ok(/turbulence/i.test(r.velocity_verdict));
+  assert.ok(_v1748({ ...base, sash_width_ft: 0 }).error);
+  assert.ok(_v1748({ ...base, face_velocity_fpm: 0 }).error);
+});
+
+test("bounds: spec-v1749 computeLabContainmentPressure -- a 10% drift swamps the whole offset", () => {
+  const base = { room_volume_ft3: 9600, required_ach: 8, hood_exhaust_cfm: 1200, general_exhaust_cfm: 80, supply_cfm: 1180, hood_sash_closed_cfm: 400, supply_drift_pct: 10 };
+  const r = _v1749(base);
+  assert.ok(Math.abs(r.ach_airflow_cfm - 9600 * 8 / 60) < 1e-12);
+  assert.ok(Math.abs(r.total_exhaust_cfm - 1280) < 1e-12);
+  // IDENTITY: the governing rate is the LARGER of the two, always.
+  assert.ok(Math.abs(r.governing_cfm - Math.max(r.ach_airflow_cfm, r.total_exhaust_cfm)) < 1e-12);
+  // Raise the air change requirement and the OTHER side governs.
+  const airy = _v1749({ ...base, required_ach: 12 });
+  assert.equal(airy.hoods_govern, false);
+  assert.ok(Math.abs(airy.governing_cfm - 9600 * 12 / 60) < 1e-12);
+  // The offset, and the direction it puts the room.
+  assert.ok(Math.abs(r.offset_cfm - 100) < 1e-12);
+  assert.equal(r.negative, true);
+  assert.ok(Math.abs(r.offset_pct - 100 * 100 / 1280) < 1e-12);
+  // THE FINDING: a 10% supply drift is 118 cfm and EXCEEDS the 100 cfm offset.
+  assert.ok(Math.abs(r.drift_cfm - 118) < 1e-12);
+  assert.ok(r.drift_cfm > r.offset_cfm);
+  assert.equal(r.drift_swamps, true);
+  // A big enough offset survives the same drift, which is the design lesson.
+  const robust = _v1749({ ...base, supply_cfm: 1000 });
+  assert.equal(robust.drift_swamps, false);
+  assert.ok(robust.drift_cfm < robust.offset_cfm);
+  // THE VAV SWING IS LARGER STILL: a closing sash drives the room POSITIVE.
+  assert.ok(Math.abs(r.sash_swing_cfm - 800) < 1e-12);
+  assert.equal(r.positive_on_close, true);
+  assert.ok(r.sash_swing_cfm > r.drift_cfm);
+  // Supply exceeding exhaust is a POSITIVE room -- the opposite hazard call.
+  assert.equal(_v1749({ ...base, supply_cfm: 1400 }).negative, false);
+  assert.ok(_v1749({ ...base, room_volume_ft3: 0 }).error);
+  assert.ok(_v1749({ ...base, hood_exhaust_cfm: 0, general_exhaust_cfm: 0 }).error);
+});

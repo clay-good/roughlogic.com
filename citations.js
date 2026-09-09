@@ -24017,6 +24017,71 @@ export const CITATIONS = {
       { name: "Oxygen is its own inventory", value: "running out of it ends the treatment", source: "chamber operations" },
     ],
   },
+  // spec-v1745..v1749: the 2026-09-09 trade-expansion radon, acid waste and
+  // laboratory containment band. Five tiles, nothing cut. spec-v1745 asserted
+  // pipe friction was "a few hundredths" and "a percent or two" of the system;
+  // two independent methods put it at 0.111 and 0.128 in wc, 9-11% of a 1.2 in
+  // wc fan, so the share is COMPUTED here rather than asserted.
+  "radon-fan-static": {
+    formula: "pipe velocity = flow / area; friction by Darcy-Weisbach with the Blasius smooth-pipe factor f = 0.316 / Re^0.25, converted from feet of air to inches of water column; the share divides that loss by the fan's entered static.",
+    edition: "Duct friction by Darcy-Weisbach on a smooth pipe, with the sub-slab resistance ENTERED as a measured fan static rather than predicted, because it depends on the aggregate, the fines and the soil and is not calculable in advance.",
+    freeAccess: "Standard duct friction relations and two unit conversions.",
+    governance: GOVERNANCE.general,
+    editionNote: "The share is computed rather than asserted, and the arithmetic does not support the usual description of it. On the standard residential case -- 80 cfm through 30 ft of 4 in PVC against a fan developing 1.2 in wc -- the pipe costs about 0.111 in wc, which is 9% of the system, not the 'percent or two' the rule of thumb claims. The CONCLUSION still holds, because the soil is still around 90% of the resistance and upsizing to 6 in buys back only 0.095 in wc. But 'upsizing the pipe changes almost nothing' is a 3 to 4 times understatement of what it does change, and on a long run with a fan already at its limit that margin is the job. THE DIAGNOSTIC IS VACUUM AGAINST FLOW: high vacuum at low flow is a tight sub-slab and needs MORE SUCTION POINTS; low vacuum at high flow is a short circuit to outdoor air and needs sealing. A bigger fan makes the second worse. And a radon fan is selected from its CURVE, not its rating, because the operating point sits on a system curve nobody knows until the system runs.",
+    assumptions: [
+      { name: "Smooth-pipe friction factor", value: "Blasius, appropriate to PVC; a corrugated or flexible run is far worse", source: "standard duct friction practice" },
+      { name: "Fan static is entered", value: "the sub-slab resistance is not predictable", source: "a post-installation measurement" },
+      { name: "Fittings are not counted", value: "elbows and the roof termination add to the entered length", source: "the equivalent-length tables" },
+    ],
+  },
+  "sub-slab-suction-field": {
+    formula: "area per point = pi x the confirmed radius squared; points on area = slab area / that; points along the longest run = ceil(run / two radii); the LARGER of the two governs.",
+    edition: "A diagnostic communication test -- vacuum applied at a candidate point, a micromanometer read at test holes at increasing distances -- converted into a point count. The reach is MEASURED because nothing about it is calculable.",
+    freeAccess: "Circle area and a spacing count on entered test readings.",
+    governance: GOVERNANCE.general,
+    editionNote: "SHAPE GOVERNS MORE OFTEN THAN AREA, and a coverage figure alone hides it. The 1,600 sq ft slab in the source case needs 1 point on area -- a 25 ft radius covers 1,963 sq ft -- but 2 along an 80 ft run, and a compact 40 by 40 ft slab of identical area needs 1. On a tight sub-slab with a 6 ft field the same slab needs 15. Both checks are made here and the larger is reported, because designing on coverage alone under-counts every corridor-shaped building. THE SUB-SLAB MATERIAL DECIDES EVERYTHING and varies between ends of one house: clean gravel carries a field twenty-five or thirty feet, a slab on compacted fines gives a few. A BIGGER FAN DOES NOT FIX POOR COMMUNICATION -- it pulls harder on the same small area. And the test costs an hour BEFORE installation; the same finding after a failed post-mitigation measurement costs a second mobilisation and a second penetration.",
+    assumptions: [
+      { name: "The confirmed radius is the design input", value: "not the distance at which vacuum was absent", source: "the communication test" },
+      { name: "Circular field assumed", value: "footings and slab joints compartmentalise it in reality", source: "the mitigation professional" },
+      { name: "Points spaced two radii apart", value: "the standard non-overlapping spacing", source: "sub-slab depressurisation practice" },
+    ],
+  },
+  "acid-waste-neutralization": {
+    formula: "required volume = peak flow x retention time; turnover = tank volume / peak flow, which is the contact time a slug entering at the start of the window actually gets; the slug fraction is its volume over the tank's.",
+    edition: "Tank retention sizing on entered peak drainage flow. The required retention and the permitted discharge pH window are BOTH local limits set by the sewer authority and are entered rather than assumed.",
+    freeAccess: "Volume over flow, and one fraction.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE SLUG CASE SIZES THE TANK, not the average load, and the reason is not capacity. A few gallons of concentrated acid is well under one percent of a tank's contents, so whether the tank HOLDS it was never the question -- whether it stays long enough to react is. Halving the tank halves the contact time, and the unreacted part leaves. THE FAILURE IS DISCOVERED AT THE SEWER AUTHORITY'S MONITORING POINT: a tank set on average flow passes almost every day and fails on the one event that mattered, and the record arrives as a notice of violation rather than an alarm. pH IS LOGARITHMIC, which makes this deceptive -- getting from pH 2 to 5.5 removes more than 99.9% of the hydrogen ion and the last stretch is the slow one. AND PASSIVE LIMESTONE TANKS DISAPPOINT: the chips are consumed and need a replenishment nobody owns after the first year, strong acid overwhelms the surface faster than it dissolves, and a tank that has stopped bubbling has stopped working.",
+    assumptions: [
+      { name: "Retention time is entered", value: "the sewer authority sets it and it differs by jurisdiction", source: "the local pretreatment limits" },
+      { name: "Neutralisation capacity is not computed", value: "retention only says how long there is to react", source: "the design engineer" },
+      { name: "Complete mixing assumed", value: "short-circuiting in a poorly baffled tank cuts contact time further", source: "tank design practice" },
+    ],
+  },
+  "fume-hood-face-velocity": {
+    formula: "exhaust = sash width x sash height x face velocity; the sash difference is the two exhaust figures subtracted, and heating it is 1.08 x cfm x temperature rise.",
+    edition: "The face-velocity airflow relation, with the 1.08 sensible heat constant at standard air. The too-fast threshold is ENTERED because the institution and the standard set it.",
+    freeAccess: "One product, one difference, and the standard sensible heat relation.",
+    governance: GOVERNANCE.general,
+    editionNote: "TOO FAST IS NOT SAFER, which is the part people get backwards. Face velocity has an optimum rather than a floor: above roughly 125 fpm, turbulence at the face and in the wake of a person standing at the hood can pull contaminants OUT of it, so raising a setpoint is not a safety improvement and a hood failing containment does not usually need more air. AND FACE VELOCITY IS A SURROGATE. It became the field check because an anemometer is cheap; what matters is whether the hood keeps material inside, which is what ASHRAE 110 tracer gas testing determines. A hood can pass a velocity survey and fail containment outright from a cross-draft, a person walking past, clutter on the rear baffle, or equipment set too near the face. THE TWO GOALS AGREE, which is unusual enough to tell users directly: a lower sash contains better AND exhausts less. The 6 ft hood here goes from 900 to 1,500 cfm between an 18 and a 30 in sash -- 600 cfm of conditioned air, continuously, from a sash nobody closed.",
+    assumptions: [
+      { name: "Face velocity is a surrogate", value: "containment is what matters and tracer gas testing is what measures it", source: "ASHRAE 110" },
+      { name: "Standard air for the heat figure", value: "the 1.08 constant shifts with altitude and temperature", source: "standard psychrometric practice" },
+      { name: "The required velocity is entered", value: "the standard and the institution set it, and it varies with the material", source: "ANSI/AIHA Z9.5" },
+    ],
+  },
+  "lab-containment-pressure": {
+    formula: "air change airflow = volume x ACH / 60; the governing rate is the LARGER of that and total exhaust; the offset is exhaust minus supply, and a supply drift percentage is compared against it directly.",
+    edition: "Room air balance on entered airflows. The pressure DIFFERENTIAL is not modelled, because it depends on the leakage paths and is measured rather than calculated.",
+    freeAccess: "Air change arithmetic and one difference.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE OFFSET IS SMALL AND THE FLOWS AROUND IT ARE LARGE, which is the whole fragility. On the case here a 100 cfm offset -- 7.8% -- sits inside 1,280 cfm of exhaust, so a 10% supply drift is 118 cfm and SWAMPS the entire offset. The room reverses with no alarm, no noise, and nothing a person in the space would notice, which is why a pressure relationship is monitored rather than balanced once. THE VAV HOOD SWING IS LARGER STILL: a sash closing takes the hood from 1,200 to 400 cfm and, if the supply does not track it, drives the room 700 cfm POSITIVE and pushes laboratory air into the corridor. The control system, not the balance, holds the relationship. AND THE DIRECTION IS A HAZARD DECISION -- chemical laboratories negative so nothing gets out, cleanrooms and compounding positive so nothing gets in, and a space that needs both needs an anteroom. Getting it backwards is not an error of degree.",
+    assumptions: [
+      { name: "The differential is not modelled", value: "inches of water column depend on the leakage paths; measure it", source: "the commissioning agent" },
+      { name: "Airflows are entered", value: "measured at the terminal, not scheduled", source: "the test and balance report" },
+      { name: "The transfer path is elsewhere", value: "door undercut carries the noise ceiling that limits it", source: "the door undercut transfer air calculation" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---
