@@ -271,7 +271,7 @@ SHOP_RENDERERS["feed-for-surface-finish"] = renderFeedForSurfaceFinish;
 // TPI = (D - d) / L; TPF = TPI x 12; angle per side = atan((D-d)/(2L)).
 // =====================================================================
 
-// dims: in { large_dia_in: L, small_dia_in: L, length_in: L } out: { tpf_in: L, tpi_in: dimensionless, angle_per_side_deg: dimensionless, included_angle_deg: dimensionless }
+// dims: in { large_dia_in: L, small_dia_in: L, length_in: L } out: { tpf_in: dimensionless, tpi_in: dimensionless, angle_per_side_deg: dimensionless, included_angle_deg: dimensionless }
 export function computeTaperCalc({ large_dia_in = 0, small_dia_in = 0, length_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const D = Number(large_dia_in) || 0, d = Number(small_dia_in) || 0, L = Number(length_in) || 0;

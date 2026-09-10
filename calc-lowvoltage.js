@@ -1536,7 +1536,7 @@ function renderThermistorSteinhartHart(inputRegion, outputRegion, citationEl) {
 LOWVOLTAGE_RENDERERS["thermistor-steinhart-hart"] = renderThermistorSteinhartHart;
 
 // ===================== spec-v958: hydrostatic DP level transmitter (head to level) =====================
-// dims: in { measured_pressure_psi: M L^-1 T^-2, specific_gravity: dimensionless, max_level_ft: L } out: { level_ft: dimensionless, level_pct: dimensionless, span_psi: M L^-1 T^-2 }
+// dims: in { measured_pressure_psi: M L^-1 T^-2, specific_gravity: dimensionless, max_level_ft: L } out: { level_ft: L, level_pct: dimensionless, span_psi: M L^-1 T^-2 }
 export function computeDpLevelHydrostatic({ measured_pressure_psi = 4.33, specific_gravity = 1.0, max_level_ft = 20 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(measured_pressure_psi >= 0)) return { error: "Measured pressure cannot be negative (psi)." };

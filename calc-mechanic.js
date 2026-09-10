@@ -2756,7 +2756,7 @@ MECHANIC_RENDERERS["density-altitude"] = _simpleRenderer({
 // The companion the density-altitude tile feeds and turn-radius-bank consumes: no tile converted CAS
 // to TAS. TAS = CAS / sqrt(sigma), sigma the ISA density ratio at the density altitude,
 // sigma = (1 - 6.87535e-6 h)^4.2559 (h = density altitude in ft, troposphere). FAA PHAK / ICAO ISA.
-// dims: in { cas_kt: dimensionless, density_altitude_ft: dimensionless } out: { tas_kt: dimensionless, density_ratio: dimensionless, rule_of_thumb_kt: dimensionless }
+// dims: in { cas_kt: dimensionless, density_altitude_ft: L } out: { tas_kt: dimensionless, density_ratio: dimensionless, rule_of_thumb_kt: dimensionless }
 export function computeTrueAirspeed({ cas_kt = 0, density_altitude_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const cas = Number(cas_kt);

@@ -1387,7 +1387,7 @@ GEOTECH_RENDERERS["slope-failure-depth-for-fs"] = _simpleRenderer({
 });
 
 // ===================== spec-v965: frost penetration depth (Stefan / modified Berggren) =====================
-// dims: in { args: dimensionless } out: { volumetric_latent_heat_btu_ft3: dimensionless, stefan_depth_ft: dimensionless, berggren_depth_ft: dimensionless }
+// dims: in { args: dimensionless } out: { volumetric_latent_heat_btu_ft3: dimensionless, stefan_depth_ft: L, berggren_depth_ft: L }
 export function computeFrostDepthBerggren({ freezing_index_f_days = 2000, frozen_conductivity_btu = 1.0, dry_density_pcf = 100, water_content_pct = 15, berggren_lambda = 0.8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(freezing_index_f_days > 0)) return { error: "Air-freezing index must be positive (F-days)." };

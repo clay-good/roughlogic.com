@@ -151,8 +151,9 @@ function parseDimsAnnotation(text) {
 //
 //   - pressure (psi, psig, psia)      - volumetric flow (gpm, mgd, cfh, cfm, gph, cfs, gpd)
 //   - velocity (mph, fps, fpm)        - rotational speed (rpm)
-//   - volume (gal, gallons, ft3)      - area (ft2, sf, in2)
-//   - power (hp, kw, kva, btuh, btuhr)  - energy (btu)
+//   - power (hp, kw, kva, btuh, btuhr)  - energy (btu, kwh)
+//   - length (ft, in, mi)             - force (lbf)
+//   - area (ft2, sf, in2, sqft, sqin) - volume (gal, gallons, ft3, cy, yd3)
 //
 // NOT covered, and why -- each of these would produce a wrong verdict, so the
 // gate stays silent rather than flattering itself with coverage it lacks:
@@ -181,6 +182,10 @@ const UNIT_TAIL_DIMS = new Map(Object.entries({
   ft2: "L^2", sf: "L^2", in2: "L^2",
   hp: "M L^2 T^-3", kw: "M L^2 T^-3", kva: "M L^2 T^-3",
   btu: "M L^2 T^-2", btuh: "M L^2 T^-3", btuhr: "M L^2 T^-3",
+  lbf: "M L T^-2", kwh: "M L^2 T^-2",
+  ft: "L", in: "L", mi: "L",
+  sqft: "L^2", sqin: "L^2",
+  cy: "L^3", yd3: "L^3",
 }));
 
 // A segment that, sitting directly in front of the tail, means the tail is the
@@ -189,7 +194,16 @@ const COMPOUND_PREV = new Set([
   ...UNIT_TAIL_DIMS.keys(),
   "per", "lb", "lbs", "oz", "ton", "tons", "btu", "btuh", "kwh", "lbf",
   "in", "ft", "mi", "ac", "amp", "amps", "v", "w", "va", "ug", "mg", "g", "kg",
-  "usd", "torr", "degree", "hg", "pcf", "wage", "fringe", "rev",
+  "usd", "torr", "degree", "hg", "pcf", "psf", "wage", "fringe", "rev",
+  // added with the length tails 2026-09-10: each one sits in front of a length
+  // tail and turns it into a denominator or a compound unit of its own.
+  // `j`/`kj` (weld heat input per inch), `kip` (a line load per foot), `bbl`
+  // (a hole capacity per foot), `sq`/`cubic`/`acre` (the tail is the unit being
+  // squared, cubed, or multiplied into an acre-foot), `inch` and `1` (an
+  // explicit "per inch"), and `ci` (a curie in a gamma-constant compound).
+  "j", "kj", "kip", "kips", "bbl", "sq", "cubic", "acre", "inch", "1", "ci",
+  // `cut`: "cut-in" is a wind speed, and its `in` is not an inch.
+  "cut",
   // time segments: a tail behind one of these is a per-time rate (`flux_btu_hr_ft2`).
   "hr", "hour", "hours", "min", "sec", "day", "days", "year", "years", "month", "months",
 ]);
@@ -226,6 +240,19 @@ const UNIT_TAIL_EXEMPT = new Set([
   "calc-hvac.js:computeDrybulbFromEnthalpy:enthalpy_btu",
   "calc-hvac.js:computeCoolingCoilTotalLoad:h_ent_btu",
   "calc-hvac.js:computeCoolingCoilTotalLoad:h_lvg_btu",
+  // The length tails added 2026-09-10 have five, and none is a length.
+  // A PREDICATE that names a distance: `false` unless an exposure is inside 50 ft.
+  "calc-fire.js:computeNFPA1142WaterSupply:exposure_within_50_ft",
+  // An AREA in square inches whose name stops at the unit's first half; the
+  // guard beside it compares it against `area_have_in2`.
+  "calc-plumbing.js:computeShowerCompartmentCheck:area_needed_in",
+  // AISC's shear-lag coefficient U, entered directly to override the computed
+  // one. The `_in` marks it as an input, not an inch.
+  "calc-steel.js:computeSteelTensionMember:u_in",
+  // Taper per inch and taper per foot: a diameter change over a length, so both
+  // are ratios. The `_in` says what the numerator is measured in.
+  "calc-shop.js:computeTaperCalc:tpi_in",
+  "calc-shop.js:computeTaperCalc:tpf_in",
 ]);
 
 function canonicalDimension(expr) {
@@ -258,6 +285,11 @@ function unitTailExpectation(key) {
   const prev = segs[segs.length - 2];
   if (!UNIT_TAIL_DIMS.has(tail)) return null;
   if (COMPOUND_PREV.has(prev)) return null;
+  // A `per` anywhere in the name -- not only directly in front of the tail --
+  // makes the tail a denominator: `ball_per_caliper_in` is inches of root ball
+  // per inch of trunk caliper, and `per_inch_setover_in` is a setover per inch.
+  // Both are ratios, and both read as a bare length if only `prev` is checked.
+  if (segs.includes("per")) return null;
   if (MONEY_OR_RATE.test(key.toLowerCase())) return null;
   return canonicalDimension(UNIT_TAIL_DIMS.get(tail));
 }

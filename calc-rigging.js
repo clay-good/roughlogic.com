@@ -1638,7 +1638,7 @@ function _v938renderWireRopeClips(inputRegion, outputRegion, citationEl) {
 RIGGING_RENDERERS["wire-rope-clips"] = _v938renderWireRopeClips;
 
 // ===================== spec-v953: crane load radius and boom-tip height from boom geometry =====================
-// dims: in { boom_length_ft: L, boom_angle_deg: dimensionless, boom_foot_offset_ft: L, boom_foot_height_ft: L, target_radius_ft: L } out: { load_radius_ft: L, boom_tip_height_ft: dimensionless, angle_for_target_radius_deg: dimensionless }
+// dims: in { boom_length_ft: L, boom_angle_deg: dimensionless, boom_foot_offset_ft: L, boom_foot_height_ft: L, target_radius_ft: L } out: { load_radius_ft: L, boom_tip_height_ft: L, angle_for_target_radius_deg: dimensionless }
 export function computeCraneLoadRadiusBoom({ boom_length_ft = 30, boom_angle_deg = 60, boom_foot_offset_ft = 4, boom_foot_height_ft = 6, target_radius_ft = 25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(boom_length_ft > 0)) return { error: "Boom length must be positive (ft)." };

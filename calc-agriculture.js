@@ -3183,7 +3183,7 @@ function _v940renderAnhydrousAmmoniaRate(inputRegion, outputRegion, citationEl) 
 AGRICULTURE_RENDERERS["anhydrous-ammonia-rate"] = _v940renderAnhydrousAmmoniaRate;
 
 // ===================== spec-v964: available-water / MAD irrigation trigger =====================
-// dims: in { args: dimensionless } out: { taw_in: dimensionless, raw_in: dimensionless, irrigation_interval_days: dimensionless }
+// dims: in { args: dimensionless } out: { taw_in: L, raw_in: L, irrigation_interval_days: dimensionless }
 export function computeMadIrrigationTrigger({ field_capacity = 0.30, wilting_point = 0.12, root_depth_in = 24, mad_fraction = 0.5, etc_in_day = 0.25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(field_capacity > 0 && field_capacity < 1)) return { error: "Field capacity must be a fraction between 0 and 1 (in/in)." };

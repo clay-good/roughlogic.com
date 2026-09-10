@@ -2202,7 +2202,7 @@ CONCRETE_RENDERERS["concrete-stair-volume"] = _simpleRenderer({
 });
 
 // ===================== spec-v975: slab load-transfer dowel schedule (ACI 302) =====================
-// dims: in { args: dimensionless } out: { dowels_per_joint: dimensionless, total_dowels: dimensionless, dowel_diameter_in: dimensionless }
+// dims: in { args: dimensionless } out: { dowels_per_joint: dimensionless, total_dowels: dimensionless, dowel_diameter_in: L }
 export function computeSlabDowelSchedule({ joint_length_ft = 40, slab_thickness_in = 6, dowel_spacing_in = 12, edge_clearance_in = 6, num_joints = 5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(joint_length_ft > 0)) return { error: "Joint length must be positive (ft)." };

@@ -1589,7 +1589,7 @@ function _v912renderVesselHeadVolume(inputRegion, outputRegion, citationEl) {
 FAB_RENDERERS["vessel-head-volume"] = _v912renderVesselHeadVolume;
 
 // ===================== spec-v962: sheet-metal bend springback =====================
-// dims: in { tool_radius_in: L, thickness_in: L, yield_strength_psi: M L^-1 T^-2, modulus_psi: M L^-1 T^-2 } out: { springback_factor_ks: dimensionless, final_radius_in: dimensionless }
+// dims: in { tool_radius_in: L, thickness_in: L, yield_strength_psi: M L^-1 T^-2, modulus_psi: M L^-1 T^-2 } out: { springback_factor_ks: dimensionless, final_radius_in: L }
 export function computeBendSpringback({ tool_radius_in = 1.0, thickness_in = 0.1, yield_strength_psi = 50000, modulus_psi = 29000000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(tool_radius_in > 0)) return { error: "Tool (inside) bend radius must be positive (in)." };

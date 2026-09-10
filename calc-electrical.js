@@ -6066,7 +6066,7 @@ function _v985renderOpenDeltaTransformer(inputRegion, outputRegion, citationEl) 
 ELECTRICAL_RENDERERS["open-delta-transformer"] = _v985renderOpenDeltaTransformer;
 
 // ===================== spec-v989: conduit nipple 60% fill (NEC Chapter 9 Note 4) =====================
-// dims: in { args: dimensionless } out: { fill_area_sqin: dimensionless, fill_pct: dimensionless, nipple_max_conductors: dimensionless, normal_max_conductors: dimensionless }
+// dims: in { args: dimensionless } out: { fill_area_sqin: L^2, fill_pct: dimensionless, nipple_max_conductors: dimensionless, normal_max_conductors: dimensionless }
 export function computeConduitNipple60Fill({ conduit_area_sqin = 0.864, conductor_area_sqin = 0.0211, conductor_count = 20 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(conduit_area_sqin > 0)) return { error: "Conduit total area must be positive (sq in, NEC Ch. 9 Table 4)." };
