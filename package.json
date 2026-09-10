@@ -7,7 +7,7 @@
   "license": "MIT",
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
-    "@playwright/test": "1.62.1",
+    "@playwright/test": "1.63.0",
     "wrangler": "4.129.0"
   },
   "overrides": {
