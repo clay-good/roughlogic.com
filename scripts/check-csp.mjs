@@ -95,6 +95,70 @@ function isAllowedReportingOrigin(dir, tok) {
   return tok === TURNSTILE_ORIGIN && (dir === "script-src" || dir === "frame-src");
 }
 
+
+// Parse _headers into [{ pattern, headerNames }]. A rule is a line starting at
+// column 0 (the path pattern) followed by indented `Name: value` lines.
+function parseHeaderRules(text) {
+  const rules = [];
+  let current = null;
+  for (const raw of text.split(/\r?\n/)) {
+    if (!raw.trim() || raw.trimStart().startsWith("#")) continue;
+    if (/^\S/.test(raw)) {
+      current = { pattern: raw.trim(), headers: new Set() };
+      rules.push(current);
+      continue;
+    }
+    const m = raw.match(/^\s+([A-Za-z0-9-]+):/);
+    if (m && current) current.headers.add(m[1].toLowerCase());
+  }
+  return rules;
+}
+
+// Can any one path match both patterns? Each Cloudflare pattern here is a
+// literal with at most one `*`, so split it into prefix and suffix: an overlap
+// exists exactly when one prefix extends the other, one suffix extends the
+// other, and the combined length fits. A pattern with more than one wildcard is
+// treated as overlapping, which errs toward flagging rather than missing.
+function patternsOverlap(a, b) {
+  const starsA = (a.match(/\*/g) || []).length;
+  const starsB = (b.match(/\*/g) || []).length;
+  if (starsA > 1 || starsB > 1) return true;
+  const split = (p) => {
+    const i = p.indexOf("*");
+    return i === -1 ? { pre: p, suf: "", exact: true } : { pre: p.slice(0, i), suf: p.slice(i + 1), exact: false };
+  };
+  const A = split(a);
+  const B = split(b);
+  if (A.exact && B.exact) return a === b;
+  if (A.exact) return a.startsWith(B.pre) && a.endsWith(B.suf) && a.length >= B.pre.length + B.suf.length;
+  if (B.exact) return b.startsWith(A.pre) && b.endsWith(A.suf) && b.length >= A.pre.length + A.suf.length;
+  const pre = A.pre.length >= B.pre.length ? A.pre : B.pre;
+  const shortPre = A.pre.length >= B.pre.length ? B.pre : A.pre;
+  if (!pre.startsWith(shortPre)) return false;
+  const suf = A.suf.length >= B.suf.length ? A.suf : B.suf;
+  const shortSuf = A.suf.length >= B.suf.length ? B.suf : A.suf;
+  if (!suf.endsWith(shortSuf)) return false;
+  // A path can always be padded between prefix and suffix, so any prefix/suffix
+  // pair that is mutually compatible has a witness.
+  return true;
+}
+
+// Every (ruleA, ruleB, header) where both rules set `header` and their paths
+// can both match one request.
+export function overlappingHeaderRules(text) {
+  const rules = parseHeaderRules(text);
+  const clashes = [];
+  for (let i = 0; i < rules.length; i++) {
+    for (let j = i + 1; j < rules.length; j++) {
+      if (!patternsOverlap(rules[i].pattern, rules[j].pattern)) continue;
+      for (const h of rules[i].headers) {
+        if (rules[j].headers.has(h)) clashes.push([rules[i].pattern, rules[j].pattern, h]);
+      }
+    }
+  }
+  return clashes;
+}
+
 async function main() {
   const errors = [];
   const html = await readFile(resolve(ROOT, "index.html"), "utf8");
@@ -129,6 +193,29 @@ async function main() {
     } else if (line[1].trim() !== value) {
       errors.push(`_headers: ${name} is "${line[1].trim()}", expected "${value}" (docs/threat-model.md).`);
     }
+  }
+
+  // TWO RULES SETTING THE SAME HEADER FOR THE SAME PATH DO NOT OVERRIDE -- THEY
+  // CONCATENATE. _headers used to carry exact-path Cache-Control overrides
+  // under a comment claiming "Cloudflare applies every matching rule and the
+  // LAST one wins". Production said otherwise on 2026-09-09:
+  //
+  //   /manual-j-worker.js -> public, max-age=0, must-revalidate, public, max-age=3600
+  //   /sw.js              -> public, max-age=0, must-revalidate, public, max-age=0, must-revalidate
+  //   /data/*.json        -> public, max-age=86400, stale-while-revalidate=604800, public, max-age=86400
+  //
+  // The first of those is two conflicting max-age values in one header, so the
+  // override it was written to apply was never reliably in effect. Nothing here
+  // could see that, because this gate only ever read individual header VALUES,
+  // never which paths a rule applies to. So: one rule sets a given header for
+  // any given path.
+  for (const [ruleA, ruleB, header] of overlappingHeaderRules(headers)) {
+    errors.push(
+      `_headers: "${ruleA}" and "${ruleB}" both set ${header}, and their paths overlap. ` +
+        "Cloudflare concatenates the values of every matching rule into one header rather than " +
+        "letting the last win, so this does not override -- it emits both. Narrow the patterns so " +
+        "only one rule sets that header for any path.",
+    );
   }
 
   const cspMeta = metaCsp(html);
@@ -223,7 +310,13 @@ async function main() {
   );
 }
 
-main().catch((e) => {
-  console.error("check-csp: unexpected error", e);
-  process.exit(1);
-});
+// Run only when invoked as a script. `overlappingHeaderRules` is imported by
+// the unit tests, and a bare `main()` here would make importing this file run
+// the whole gate -- and, on a real failure, call process.exit(1) out from under
+// the test runner.
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((e) => {
+    console.error("check-csp: unexpected error", e);
+    process.exit(1);
+  });
+}

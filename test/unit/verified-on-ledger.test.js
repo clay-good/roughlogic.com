@@ -288,6 +288,39 @@ test("the bundled atomic weights are the 2024 edition, in both copies", async ()
 // RCF = 1.118e-6 x r(mm) x rpm^2, which is what identifies whose radius 84 mm
 // is: the FA-45-24-11 at 15,000 rpm and 21,130 x g gives 84.0 mm, while the
 // FA-45-30-11 at 14,000 and 20,817 gives 95.0 mm.
+// Cloudflare applies EVERY matching _headers rule and concatenates their
+// values into one header; it does not let the last one win. Production on
+// 2026-09-09 was serving /manual-j-worker.js
+//   Cache-Control: public, max-age=0, must-revalidate, public, max-age=3600
+// -- two conflicting max-age values, so the override that line was written to
+// apply was never reliably in effect.
+test("no two _headers rules set the same header for overlapping paths", async () => {
+  const { overlappingHeaderRules } = await import("../../scripts/check-csp.mjs");
+  const headers = await readFile(resolve(ROOT, "_headers"), "utf8");
+  assert.deepEqual(overlappingHeaderRules(headers), []);
+});
+
+test("the overlapping-rule detector catches the two shapes production had", async () => {
+  const { overlappingHeaderRules } = await import("../../scripts/check-csp.mjs");
+  // An exact path under a glob that already sets the same header.
+  const exactUnderGlob = "/*.js\n  Cache-Control: a\n\n/manual-j-worker.js\n  Cache-Control: b\n";
+  assert.deepEqual(
+    overlappingHeaderRules(exactUnderGlob),
+    [["/*.js", "/manual-j-worker.js", "cache-control"]],
+  );
+  // Two globs that both match the same files.
+  const twoGlobs = "/data/*\n  Cache-Control: a\n\n/*.json\n  Cache-Control: b\n";
+  assert.deepEqual(overlappingHeaderRules(twoGlobs), [["/data/*", "/*.json", "cache-control"]]);
+  // Rules that genuinely cannot both match one path must NOT be flagged, or the
+  // gate is just noise: nothing is both a .js and a .css.
+  const disjoint = "/*.js\n  Cache-Control: a\n\n/*.css\n  Cache-Control: b\n";
+  assert.deepEqual(overlappingHeaderRules(disjoint), []);
+  // Different headers on overlapping paths are fine -- that is how /sw.js adds
+  // Service-Worker-Allowed on top of the /*.js cache rule.
+  const differentHeaders = "/*.js\n  Cache-Control: a\n\n/sw.js\n  Service-Worker-Allowed: /\n";
+  assert.deepEqual(overlappingHeaderRules(differentHeaders), []);
+});
+
 // The free-access probe used to read only citations.js -- the surface a READER
 // follows. The cycle file's `free_access_url` is the surface a MAINTAINER
 // follows to re-verify, and nothing looked at it: the NEC row pointed at

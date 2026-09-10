@@ -10,7 +10,7 @@ roughlogic.com is a static site deployed via Cloudflare Pages. There is no serve
 - Build output directory: `dist`
 - Node version: 20
 
-The `_headers` file is copied into `dist/` and consumed by Cloudflare Pages to serve the section 7 security headers and the `Cache-Control` rules.
+The `_headers` file is copied into `dist/` and consumed by Cloudflare Pages to serve the section 7 security headers and the `Cache-Control` rules. **One rule sets a given header for any given path.** Cloudflare applies every matching rule and *concatenates* their values into a single header rather than letting the last one win, so a narrower rule listed later does not override a broader one -- it appends to it. Verified against production on 2026-09-09, where an exact-path override was producing `Cache-Control: public, max-age=0, must-revalidate, public, max-age=3600`, two conflicting `max-age` values in one header. `check-csp.mjs` now fails the build when two rules set the same header for paths that can overlap.
 
 ## Build
 

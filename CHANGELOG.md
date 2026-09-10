@@ -793,6 +793,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`_headers` said the last matching rule wins. Production says they concatenate, and one cache override had never been in effect.** The file carried exact-path `Cache-Control` overrides under a comment explaining that "Cloudflare applies every matching rule and the LAST one wins, so these would otherwise be clobbered by `/*.js` above". Reading the live headers off roughlogic.com on 2026-09-09 showed otherwise -- Cloudflare emits the values of *every* matching rule joined into one header:
+
+  - `/manual-j-worker.js` → `Cache-Control: public, max-age=0, must-revalidate, public, max-age=3600`
+  - `/sw.js` → its identical value twice
+  - every data shard → `public, max-age=86400, stale-while-revalidate=604800, public, max-age=86400`
+
+  The first is **two conflicting `max-age` values in one header**, where what a cache does with a repeated directive is implementation-defined, so the one-hour cache that line was written to apply was never reliably in effect. The other two were harmless only by accident, because the duplicated values happened to agree.
+
+  All three overlaps are gone. The worker and the service worker take the `/*.js` rule, which is what they need anyway -- revalidate always, cheap ETag 304s, and `sw.js` must never be long-cached or the update mechanism breaks. Every file under `data/` is `.json` (167 of 167), so one `/*.json` rule now covers the shards and the root JSON alike.
+
+  **Nothing could have caught this, because the gate only ever read header *values*, never which paths a rule applies to.** `check-csp.mjs` now fails the build when two rules set the same header for paths that can both match one request -- and passes rules that only look like they overlap, so it is not just noise: `/*.js` and `/*.css` are fine, and so is `/sw.js` adding `Service-Worker-Allowed` on top of the `/*.js` cache rule. Both production shapes are pinned as tests.
+
 - **A third free-access surface was going unprobed too, and the loan-limits shard had been pointing readers at a 404.** Each data shard carries a `free_access` string naming where a reader can go and read the source themselves. Nothing checked those. `data/realestate/loan-limits.json` said `fhfa.gov/data/loan-limit-values`; FHFA has moved that page to `/data/conforming-loan-limit`, and the old path is a hard 404. The dead URL was repeated in two docs and in `scripts/sources.md`, so anyone following the citation from any surface landed on nothing. The probe now walks all three surfaces -- reader-facing citations, the maintainer-facing ledger, and the shards' own prose -- and seeding the retired FHFA path back in makes it warn.
 
   Three more hosts warn on every run because they refuse automated fetches, not because they are broken: `ssa.gov`, `beckman.com` and `iupac.org` (whose publications host answers with a bot-check interstitial). Each was opened in a browser and served its real page, and the probe now says so on the line rather than leaving the next person to re-diagnose it.

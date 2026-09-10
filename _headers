@@ -10,11 +10,15 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), accelerometer=(), gyroscope=(), magnetometer=()
   X-DNS-Prefetch-Control: off
 
-/data/*
-  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
-
+# One rule, not two. /data/* and /*.json both matched every shard, and
+# Cloudflare concatenated them into
+#   Cache-Control: public, max-age=86400, stale-while-revalidate=604800, public, max-age=86400
+# -- the same max-age twice, which happened to be harmless only because the two
+# rules agreed. Every file under data/ is .json (167 of 167 as of 2026-09-09),
+# so this single rule covers the shards and the root JSON (build-info.json,
+# .well-known/mcp.json) alike.
 /*.json
-  Cache-Control: public, max-age=86400
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 
 # Shell JS/CSS use STABLE filenames (no content hash in the name), so a long
 # edge cache keeps serving an old deploy's bytes for up to max-age while a
@@ -29,13 +33,23 @@
 /styles.css
   Cache-Control: public, max-age=0, must-revalidate
 
-# Exact-path overrides must come AFTER the /*.js glob: Cloudflare applies every
-# matching rule and the LAST one wins, so these would otherwise be clobbered by
-# /*.js above. sw.js must never be long-cached or the update mechanism breaks:
-# the browser must re-fetch it on every navigation to detect a new BUILD_HASH.
-/manual-j-worker.js
-  Cache-Control: public, max-age=3600
-
+# THERE ARE NO EXACT-PATH OVERRIDES OF Cache-Control HERE, and there must not
+# be. This block used to carry two, under a comment claiming that "Cloudflare
+# applies every matching rule and the LAST one wins". It does not. Checked
+# against production on 2026-09-09, Cloudflare CONCATENATES the values of every
+# matching rule into one header, so /manual-j-worker.js was being served
+#
+#   Cache-Control: public, max-age=0, must-revalidate, public, max-age=3600
+#
+# -- two conflicting max-age values in one header, where what a cache does with
+# a repeated directive is implementation-defined. The 3600 override was never
+# reliably in effect, and /sw.js was being served its identical value twice.
+#
+# So the rule is: ONE rule sets a given header for any given path. The /*.js
+# glob above already gives both files exactly what they need -- revalidate
+# always, with cheap ETag 304s -- which is what sw.js requires anyway, since the
+# browser must re-fetch it on every navigation to detect a new BUILD_HASH.
+# check-csp.mjs fails the build if two rules here set the same header for paths
+# that can overlap.
 /sw.js
   Service-Worker-Allowed: /
-  Cache-Control: public, max-age=0, must-revalidate
