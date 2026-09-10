@@ -1194,7 +1194,7 @@ const renderDraftBeerLineBalance = _r({
 KITCHEN_RENDERERS["draft-beer-line-balance"] = renderDraftBeerLineBalance;
 
 // ===================== spec-v1000: desired dough temperature (mixing water temp) =====================
-// dims: in { args: dimensionless } out: { water_temp_f: T, factor_count: dimensionless }
+// dims: in { desired_dough_temp_f: T, flour_temp_f: T, room_temp_f: T, friction_factor_f: T, preferment_temp_f: T } out: { water_temp_f: T, factor_count: dimensionless }
 export function computeDoughWaterTemperature({ desired_dough_temp_f = 75, flour_temp_f = 68, room_temp_f = 72, friction_factor_f = 24, preferment_temp_f = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(desired_dough_temp_f > 0)) return { error: "Desired dough temperature must be positive (F)." };
@@ -1270,7 +1270,7 @@ KITCHEN_RENDERERS["as-purchased-quantity"] = _r({
 });
 
 // ===================== spec-v1002: alcohol by volume from gravity =====================
-// dims: in { args: dimensionless } out: { abv_pct: dimensionless, apparent_attenuation_pct: dimensionless }
+// dims: in { original_gravity: dimensionless, final_gravity: dimensionless } out: { abv_pct: dimensionless, apparent_attenuation_pct: dimensionless }
 export function computeAbvFromGravity({ original_gravity = 1.055, final_gravity = 1.012 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(original_gravity > 1)) return { error: "Original gravity must be greater than 1.000." };
@@ -1310,7 +1310,7 @@ KITCHEN_RENDERERS["abv-from-gravity"] = _r({
 // ===========================================================================
 
 // ===================== spec-v1350: ice machine capacity and bin sizing =====================
-// dims: in { args: dimensionless } out: { daily_demand_lb: M, required_nameplate_lb: M, bin_capacity_lb: M }
+// dims: in { covers_per_day: dimensionless, lb_per_cover: M, derate_factor: dimensionless, utilization: dimensionless, peak_fraction: dimensionless } out: { daily_demand_lb: M, required_nameplate_lb: M, bin_capacity_lb: M }
 export function computeIceMachineSizing({ covers_per_day = 0, lb_per_cover = 0, derate_factor = 0.8, utilization = 0.9, peak_fraction = 0.4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(covers_per_day > 0)) return { error: "Covers per day must be positive." };
@@ -1353,7 +1353,7 @@ KITCHEN_RENDERERS["ice-machine-sizing"] = _r({
 });
 
 // ===================== spec-v1351: warewasher hot-water demand and booster sizing =====================
-// dims: in { args: dimensionless } out: { delta_t_f: T, booster_btuh: dimensionless, booster_kw: M L^2 T^-3, gas_input_btuh: dimensionless, hourly_hot_water_gal: L^3 }
+// dims: in { rinse_gpm: L^3 T^-1, supply_temp_f: T, rinse_temp_f: T, racks_per_hour: dimensionless, gal_per_rack: L^3, booster_efficiency: dimensionless } out: { delta_t_f: T, booster_btuh: dimensionless, booster_kw: M L^2 T^-3, gas_input_btuh: dimensionless, hourly_hot_water_gal: L^3 }
 export function computeWarewasherHotWater({ rinse_gpm = 0, supply_temp_f = 140, rinse_temp_f = 180, racks_per_hour = 0, gal_per_rack = 0, booster_efficiency = 0.8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rinse_gpm > 0)) return { error: "Final-rinse flow must be positive." };
@@ -1409,7 +1409,7 @@ export const PLANK_SHAPE_CONSTANTS = {
   sphere:   { P: 1 / 6, R: 1 / 24, label: "Sphere (diameter a)" },
 };
 
-// dims: in { args: dimensionless } out: { freezing_time_hr: T, surface_term: dimensionless, internal_term: dimensionless, driving_term: dimensionless }
+// dims: in { a_ft: L, shape: dimensionless, density_pcf: M L^-3, latent_heat_btu_lb: L^2 T^-2, freezing_point_f: T, medium_temp_f: T, h_coeff: M T^-3, k_frozen: M L T^-3 } out: { freezing_time_hr: T, surface_term: dimensionless, internal_term: dimensionless, driving_term: dimensionless }
 export function computeFreezingTimePlank({ a_ft = 0, shape = "slab", density_pcf = 0, latent_heat_btu_lb = 0, freezing_point_f = 28, medium_temp_f = -10, h_coeff = 0, k_frozen = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const s = PLANK_SHAPE_CONSTANTS[shape];
@@ -1463,7 +1463,7 @@ KITCHEN_RENDERERS["freezing-time-plank"] = _r({
 });
 
 // ===================== spec-v1353: refrigerated thawing time =====================
-// dims: in { args: dimensionless } out: { thaw_time_hr: T, thaw_time_days: T, surface_term: dimensionless, internal_term: dimensionless }
+// dims: in { a_ft: L, shape: dimensionless, density_pcf: M L^-3, latent_heat_btu_lb: L^2 T^-2, thaw_point_f: T, cooler_temp_f: T, h_coeff: M T^-3, k_unfrozen: M L T^-3 } out: { thaw_time_hr: T, thaw_time_days: T, surface_term: dimensionless, internal_term: dimensionless }
 export function computeThawTime({ a_ft = 0, shape = "sphere", density_pcf = 0, latent_heat_btu_lb = 0, thaw_point_f = 28, cooler_temp_f = 38, h_coeff = 0, k_unfrozen = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const s = PLANK_SHAPE_CONSTANTS[shape];
@@ -1522,7 +1522,7 @@ KITCHEN_RENDERERS["thaw-time"] = _r({
 });
 
 // ===================== spec-v1354: fryer oil turnover, life, and annual cost =====================
-// dims: in { args: dimensionless } out: { daily_oil_loss_lb: M, turnover_days: T, annual_oil_lb: M, annual_cost: dimensionless }
+// dims: in { vat_capacity_lb: M, daily_product_lb: M, absorption_fraction: dimensionless, operating_days: T, oil_price_per_lb: dimensionless } out: { daily_oil_loss_lb: M, turnover_days: T, annual_oil_lb: M, annual_cost: dimensionless }
 export function computeFryerOilTurnover({ vat_capacity_lb = 0, daily_product_lb = 0, absorption_fraction = 0.12, operating_days = 360, oil_price_per_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(vat_capacity_lb > 0)) return { error: "Vat oil capacity must be positive." };
@@ -1578,7 +1578,7 @@ export const KEG_SIZES_GAL = {
   custom:         { gal: 0,     label: "Custom (enter gallons)" },
 };
 
-// dims: in { args: dimensionless } out: { gross_oz: L^3, net_oz: L^3, servings: dimensionless, cost_per_serving: dimensionless, pour_cost_pct: dimensionless }
+// dims: in { keg_size: dimensionless, custom_gallons: L^3, serving_oz: L^3, loss_fraction: dimensionless, keg_cost: dimensionless, menu_price: dimensionless } out: { gross_oz: L^3, net_oz: L^3, servings: dimensionless, cost_per_serving: dimensionless, pour_cost_pct: dimensionless }
 export function computeKegYield({ keg_size = "half_barrel", custom_gallons = 0, serving_oz = 16, loss_fraction = 0.15, keg_cost = 0, menu_price = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const preset = KEG_SIZES_GAL[keg_size];
@@ -1634,7 +1634,7 @@ KITCHEN_RENDERERS["keg-yield"] = _r({
 });
 
 // ===================== spec-v1356: beverage CO2 cylinder duration =====================
-// dims: in { args: dimensionless } out: { kegs_per_cylinder: dimensionless, days_of_supply: T, changeout_kegs: dimensionless, changeout_days: T }
+// dims: in { cylinder_lb: M, lb_co2_per_keg: M, kegs_per_day: T^-1, reserve_fraction: dimensionless } out: { kegs_per_cylinder: dimensionless, days_of_supply: T, changeout_kegs: dimensionless, changeout_days: T }
 export function computeBeverageCo2Duration({ cylinder_lb = 0, lb_co2_per_keg = 1.2, kegs_per_day = 0, reserve_fraction = 0.2 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(cylinder_lb > 0)) return { error: "Cylinder weight must be positive." };
@@ -1677,7 +1677,7 @@ KITCHEN_RENDERERS["beverage-co2-duration"] = _r({
 });
 
 // ===================== spec-v1357: dough ball weight from thickness factor =====================
-// dims: in { args: dimensionless } out: { pan_area_sqin: L^2, dough_weight_oz: M, scaled_weight_oz: M }
+// dims: in { pan_shape: dimensionless, diameter_in: L, length_in: L, width_in: L, thickness_factor: M L^-2, reference_weight_oz: M, reference_diameter_in: L } out: { pan_area_sqin: L^2, dough_weight_oz: M, scaled_weight_oz: M }
 export function computeDoughBallScaling({ pan_shape = "round", diameter_in = 0, length_in = 0, width_in = 0, thickness_factor = 0.1, reference_weight_oz = 0, reference_diameter_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (pan_shape !== "round" && pan_shape !== "rectangular") return { error: "Pan shape must be round or rectangular." };
@@ -1780,7 +1780,7 @@ KITCHEN_RENDERERS["fermentation-time-q10"] = _r({
 });
 
 // ===================== spec-v1359: covers and sales per labor hour =====================
-// dims: in { args: dimensionless } out: { cplh: dimensionless, splh: dimensionless, labor_cost_pct: dimensionless, average_check: dimensionless, labor_per_cover: dimensionless }
+// dims: in { covers: dimensionless, labor_hours: T, net_sales: dimensionless, labor_cost: dimensionless } out: { cplh: dimensionless, splh: dimensionless, labor_cost_pct: dimensionless, average_check: dimensionless, labor_per_cover: dimensionless }
 export function computeCoversPerLaborHour({ covers = 0, labor_hours = 0, net_sales = 0, labor_cost = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(covers > 0)) return { error: "Covers served must be positive." };
@@ -1827,7 +1827,7 @@ KITCHEN_RENDERERS["covers-per-labor-hour"] = _r({
 });
 
 // ===================== spec-v1360: par level and order quantity =====================
-// dims: in { args: dimensionless } out: { coverage_days: T, par_level: dimensionless, order_needed: dimensionless, cases: dimensionless, overshoot: dimensionless }
+// dims: in { daily_usage: T^-1, lead_time_days: T, order_cycle_days: T, safety_factor: dimensionless, on_hand: dimensionless, on_order: dimensionless, units_per_case: dimensionless } out: { coverage_days: T, par_level: dimensionless, order_needed: dimensionless, cases: dimensionless, overshoot: dimensionless }
 export function computeParLevelOrder({ daily_usage = 0, lead_time_days = 0, order_cycle_days = 0, safety_factor = 0.25, on_hand = 0, on_order = 0, units_per_case = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(daily_usage > 0)) return { error: "Average daily usage must be positive." };
@@ -1915,7 +1915,7 @@ function _formatClock(minutes) {
   return h12 + ":" + String(min).padStart(2, "0") + " " + ampm + (minutes >= 1440 ? " (next day)" : "");
 }
 
-// dims: in { args: dimensionless } out: { window_hr: T, projected_temp_f: T, time_to_70_hr: T }
+// dims: in { mark_time: dimensionless, window_option: dimensionless, start_temp_f: T, ambient_f: T, tau_hr: T } out: { window_hr: T, projected_temp_f: T, time_to_70_hr: T }
 export function computeTphcWindow({ mark_time = "10:30", window_option = "cold_6", start_temp_f = 41, ambient_f = 75, tau_hr = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const w = TPHC_WINDOWS[window_option];
@@ -1974,7 +1974,7 @@ KITCHEN_RENDERERS["tphc-window"] = _r({
 });
 
 // ===================== spec-v1362: steam kettle heat-up time and steam demand =====================
-// dims: in { args: dimensionless } out: { mass_lb: M, heat_btu: dimensionless, heatup_min: T, steam_per_batch_lb: M, steam_rate_lb_hr: M T^-1 }
+// dims: in { gallons: L^3, specific_gravity: dimensionless, specific_heat: L^2 T^-2, start_temp_f: T, final_temp_f: T, rated_input_btuh: M L^2 T^-3, jacket_efficiency: dimensionless, latent_heat_btu_lb: L^2 T^-2 } out: { mass_lb: M, heat_btu: dimensionless, heatup_min: T, steam_per_batch_lb: M, steam_rate_lb_hr: M T^-1 }
 export function computeSteamKettleHeatup({ gallons = 0, specific_gravity = 1.0, specific_heat = 1.0, start_temp_f = 60, final_temp_f = 200, rated_input_btuh = 0, jacket_efficiency = 0.85, latent_heat_btu_lb = 945.6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(gallons > 0)) return { error: "Kettle working volume must be positive." };
@@ -2033,7 +2033,7 @@ KITCHEN_RENDERERS["steam-kettle-heatup"] = _r({
 });
 
 // ===================== spec-v1363: hot-holding connected load, demand, and kitchen heat gain =====================
-// dims: in { args: dimensionless } out: { connected_kw: M L^2 T^-3, demand_kw: M L^2 T^-3, demand_amps: I, sensible_btuh: dimensionless, tons: M }
+// dims: in { equipment: dimensionless, diversity_factor: dimensionless, voltage: M L^2 T^-3 I^-1, phase: dimensionless } out: { connected_kw: M L^2 T^-3, demand_kw: M L^2 T^-3, demand_amps: I, sensible_btuh: dimensionless, tons: M }
 export function computeHotHoldingEnergy({ equipment = [], diversity_factor = 0.65, voltage = 208, phase = "three" } = {}) {
   if (!Array.isArray(equipment) || equipment.length === 0) return { error: "List at least one piece of hot-holding equipment." };
   if (!(Number(diversity_factor) > 0 && Number(diversity_factor) <= 1)) return { error: "Diversity factor must be between 0 and 1." };
