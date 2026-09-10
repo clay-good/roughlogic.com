@@ -195,6 +195,21 @@ Reading the minus sign moved that corpus 5,211 -> 5,223 fields and 703 -> 707
 tiles fully recovered, still at 0 wrong values, and left `measure-ranking.mjs`
 byte-identical.
 
+An **id is an address, not a phrasing**: it is the one string the catalog
+guarantees is unique, and the one an agent holds after `search_calculators`.
+`describe_calculator` and `run_calculator` honour it exactly; `answer_query`
+used to resolve it by ranking, like any other prose. Measured 2026-09-09, 21
+tiles named a *different* tile when handed their own id -- and `backflow-sizing`,
+a sizing screen, came back `status: OK` carrying the `backflow` **reference
+table**, because "sizing" is a noise word and what remained matched the
+reference tile's name exactly. A literal id now resolves to its tile ahead of
+every other kind of evidence, and counts as its own corroboration. All 2,082
+answer to their own id, and none to another's.
+
+Literal only: `backflow sizing` with a space is a human phrasing and genuinely
+ambiguous, and one tile's published name is another tile's id (`affinity-laws`
+is named "Fan Affinity Laws"). Spaced queries are still decided by ranking.
+
 What the corpus cannot see, a standing test now does: **no tile answers a
 question that is only its own name.** A tile's name is what an agent sends when
 it has just read the catalog, and it carries no values, so `OK` is the wrong

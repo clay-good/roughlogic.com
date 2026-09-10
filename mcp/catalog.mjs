@@ -1302,15 +1302,39 @@ export async function answerQuery({ query } = {}) {
   //    because "water loss class" is that tile's curated phrase.
   // 3. A contained curated alias, then rank order -- the behaviour before all
   //    of this.
+  // 0. The query IS a tile's id, literally. An id is not a phrasing, it is an
+  //    ADDRESS -- the one string the catalog guarantees is unique, and the one
+  //    an agent holds after `search_calculators`. `describe_calculator` and
+  //    `run_calculator` both honour it exactly; this door did not, and resolved
+  //    it by ranking like any other prose. Measured 2026-09-09: 21 tiles named
+  //    a DIFFERENT tile when handed their own id, and `backflow-sizing` --
+  //    which is a sizing screen -- came back `status: OK` carrying the
+  //    `backflow` REFERENCE table, because "sizing" is a noise word and what
+  //    remained matched the reference tile's name exactly.
+  //
+  //    Literal only. `backflow sizing` with a space is a human phrasing and
+  //    genuinely ambiguous, and one tile's published NAME is another tile's id:
+  //    `affinity-laws` is named "Fan Affinity Laws", which is exactly
+  //    `fan-affinity-laws`. Treating a spaced query as an id would decide that
+  //    against the name a reader can see. A hyphenated id cannot be mistaken
+  //    for anything, and no curated alias term is one (checked: zero).
+  //
+  //    Resolved from the catalog, not from `results` -- the whole failure is
+  //    that the tile need not be in the ranked top 3 at all.
+  const literalId = byId.has(q.toLowerCase()) ? { id: q.toLowerCase() } : null;
   const exactAlias = results.find((r) => queryIsExactCuratedAliasFor(q, r.id, aliasRows));
   const exactName = results.find((r) => sameTokens(q, byId.get(r.id)));
-  const top = exactAlias
+  const top = literalId
+    || exactAlias
     || exactName
     || results.find((r) => queryIsCuratedAliasFor(q, r.id, aliasRows))
     || results[0];
   if (!top) return { status: "NO_MATCH", query: q, message: "No calculator matched." };
 
   const tool = byId.get(top.id);
+  // `literalId` carries an id and nothing else; every other branch comes from a
+  // ranked result that already has a name on it.
+  if (tool && !top.name) top.name = tool.name;
   const rows = await fieldRowsFor(top.id, tool ? tool.group : "");
   const { queryFill } = await import(new URL("../query-fill.js", import.meta.url).href);
   // The tile's own name goes in so the words the agent used to NAME the
@@ -1321,11 +1345,18 @@ export async function answerQuery({ query } = {}) {
   // Corroboration, in any of three forms: the question carried values, it names
   // the calculator, or the catalog's own alias corpus maps it to this one.
   const { aliases } = await load();
-  if (!recovered.length && !queryNamesTile(q, top.name) && !queryIsCuratedAliasFor(q, top.id, aliases)) {
+  // A literal id needs no corroborating word: addressing a tile by the unique
+  // string the catalog publishes for it IS the corroboration, and it is
+  // stronger than any of the three below. Without this the guard rejected the
+  // very query it had just resolved -- "backflow-sizing" carries no value, does
+  // not tokenise into "Backflow Assembly Sizing Screen", and is nobody's
+  // curated phrase, so a correctly identified tile came back NO_MATCH.
+  if (!literalId
+      && !recovered.length && !queryNamesTile(q, top.name) && !queryIsCuratedAliasFor(q, top.id, aliases)) {
     return { status: "NO_MATCH", query: q, message: "No calculator matched." };
   }
-  // 21 tiles have no inputs at all: OSHA Top-10, the knot and hand-signal
-  // references, the WMM model stamp. Their content IS the answer. Sending an
+  // 20 tiles have no inputs at all: OSHA Top-10, the knot and hand-signal
+  // references, the GFCI/AFCI table. Their content IS the answer. Sending an
   // agent NO_VALUES with "call describe_calculator for its inputs" points it at
   // an empty list, so a question the catalog can answer completely came back as
   // a dead end. Corroboration has already been established above -- the query

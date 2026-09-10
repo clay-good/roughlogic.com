@@ -285,6 +285,29 @@ test("the MCP door and the tile page agree on the declination", async () => {
 //
 // The invariant: a tile that takes inputs must not answer OK when the question
 // is nothing but its own name. 2,062 tiles, roughly a minute.
+// An id is not a phrasing, it is an ADDRESS: the one string the catalog
+// guarantees is unique, and the one an agent holds after `search_calculators`.
+// `describe_calculator` and `run_calculator` honour it exactly; `answer_query`
+// resolved it by ranking like any other prose, and measured 2026-09-09, 21
+// tiles named a DIFFERENT tile when handed their own id. `backflow-sizing` --
+// a sizing screen -- came back `status: OK` carrying the `backflow` REFERENCE
+// table, because "sizing" is a noise word and what was left matched the
+// reference tile's name exactly.
+//
+// Two halves, and the first fix broke the second: after the tile resolved, the
+// corroboration guard rejected it, because a hyphenated id carries no value,
+// does not tokenise into the tile's name, and is nobody's curated phrase.
+test("every tile answers to its own id, and none answers to another's", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  const { TOOLS } = await import("../../tools-data.js");
+  const wrong = [];
+  for (const t of TOOLS) {
+    const out = await answerQuery({ query: t.id });
+    if (out.id !== t.id) wrong.push(`${t.id} -> ${out.id ?? out.status}`);
+  }
+  assert.deepEqual(wrong, []);
+});
+
 test("no tile answers a question that is only its own name", async () => {
   const { answerQuery, describe } = await import("../../mcp/catalog.mjs");
   const { TOOLS } = await import("../../tools-data.js");
