@@ -67,9 +67,9 @@ anything.
 | `nec` | NEC (NFPA 70) | 2023 | 2026 | 2026-06-05 | disclosed-lag |
 | `ipc` | International Plumbing Code | 2021 | 2024 (2027 voted, not published) | 2026-09-01 | disclosed-lag |
 | `irc` | International Residential Code | 2021 | 2024 (2027 voted, not published) | 2026-09-01 | disclosed-lag |
-| `ibc` | International Building Code | 2021 | 2024 (2027 not yet published) | 2026-09-09 | disclosed-lag |
+| `ibc` | International Building Code | 2021 | 2024 (2027 not yet published) | 2026-09-10 | disclosed-lag |
 | `imc` | International Mechanical Code | 2021 | **2027 (published)** | 2026-09-03 | disclosed-lag |
-| `ifc` | International Fire Code | 2021 | 2024 (2027 not yet published) | 2026-09-09 | disclosed-lag |
+| `ifc` | International Fire Code | 2021 | 2024 (2027 not yet published) | 2026-09-10 | disclosed-lag |
 | `ifgc` | International Fuel Gas Code | 2021 | **2027 (published)** | 2026-09-03 | disclosed-lag |
 | `ashrae-62-1` | ASHRAE 62.1 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
 | `ashrae-62-2` | ASHRAE 62.2 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
@@ -112,6 +112,24 @@ anything.
   `next_expected` is advanced to that source's own anticipated month
   (IBC / IFC 2026-10, IPC / IMC / IFGC 2027-01, IRC 2027-02) rather than to one
   date for all six. Advance `current_edition` on confirmed publication.
+- **IBC and IFC, 2026-09-10 (CF-03):** both were due **2026-10** with a
+  re-stamp of 2026-09-09, which by CF-03's own rule could never cover it -- so
+  `main` would have gone red at UTC midnight on **2026-10-01** with no commit
+  behind it, taking `accessibility` and `integration` with it (both
+  `needs: test`). Verified against a publisher surface the earlier passes had
+  not used: ICC's newsroom announcement of **2026-08-24** states that the 2027
+  International Codes will be published later this year and names **no month**.
+  That corroborates the 2026-09-09 Digital Codes reading -- neither the IBC nor
+  the IFC is among the released 2027 titles -- and settles what the earlier
+  note could only infer: there is no anticipated month for these two any more,
+  only a year-end window. The September date came and went, so **2026-10 was a
+  guess**, not the publisher's claim. `next_expected` advances to **2027-01**:
+  the first month after ICC's own window closes, and deliberately not 2026-12,
+  which the FDA Food Code row already holds -- rows stacked on one date arrive
+  as several errors at once after months of quiet, which is how the 2026-09-01
+  six-row red happened. `last_verified` 2026-09-10. This defers **tracking** of
+  the next edition, not a citation change: the site cites 2021 here against a
+  current 2024, a lag already disclosed in the table above.
 - **FDA Food Code, 2026-09-02 (CF-03):** the row had **no `last_verified` at
   all**, which meant the gate could only ever fail on it and never be satisfied,
   and it is due 2026-12. Verified against fda.gov: the **2022 Food Code (10th
@@ -155,12 +173,13 @@ anything.
   inherits it as a surprise. That has happened. `check-citation-freshness` now
   emits a **non-fatal warning for the 92 days before** a row is due, whenever
   the row's existing re-stamp will not cover that date -- and a re-stamp dated
-  *before* the due date never does, by CF-03's own rule. Three rows are warning
-  today: IBC and IFC (due 2026-10, re-stamped 2026-09-01 and so **not**
-  covered -- the October re-verify is real work, now visible a month out) and
-  the FDA Food Code (due 2026-12; it carried no `last_verified` at all until
-  2026-09-02, and its re-stamp still predates the due date). A date this file
-  already knows about should not be able to ambush anyone.
+  *before* the due date never does, by CF-03's own rule. One row is warning
+  today: the FDA Food Code (due 2026-12; it carried no `last_verified` at all
+  until 2026-09-02, and its re-stamp still predates the due date). IBC and IFC
+  warned here until 2026-09-10, when their due date moved to 2027-01 on the
+  evidence recorded above; they warn again from 2026-10-01, ninety-two days
+  out. A date this file already knows about should not be able to ambush
+  anyone.
 
 ## Verified current / well-disclosed, not in the cycle table (spec-v22 §2)
 
