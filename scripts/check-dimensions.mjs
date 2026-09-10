@@ -158,9 +158,20 @@ function parseDimsAnnotation(text) {
 //   - voltage (v)                     - power (w)
 //   - current (a, amp, amps)          - force (kip, kips)
 //   - stress (ksi)                    - capacitance (uf)
-//   - ratio-by-name (pct, deg, db, ppm): a percentage, an angle, a decibel and a
-//     part-per-million are dimensionless BY DEFINITION, and pinning them stops
-//     the next `dimensionless` filler from hiding among 868 correct ones.
+//   - length (lf, mm), volume (in3)
+//   - ratio-by-name (pct, deg, db, ppm, percent, fraction, count): a percentage,
+//     an angle, a decibel, a part-per-million, a fraction and a count are
+//     dimensionless BY DEFINITION, and pinning them stops the next
+//     `dimensionless` filler from hiding among 1,132 correct ones.
+//
+// TRIED AND LEFT OUT, with the reason, so the next pass does not re-measure:
+//   - `s`, `m`, `l`, `cm`. Each is a real unit and each is also a SYMBOL in this
+//     corpus: `lambda_s` and `eps_s` are concrete and radiation factors, `q_m` is
+//     a heat flux, `I_L` is a line current, `cols_m` is a column count, and
+//     `target_m` is a molarity. They are also the tails most often preceded by
+//     another unit -- `viscosity_Pa_s`, `cv_cm2_s`, `concentration_mol_l`,
+//     `conductivity_us_cm` -- so covering them means a compound list as long as
+//     the finds. Agreement runs 64-90%, against 98-100% for every tail above.
 //
 // NOT covered, and why -- each of these would produce a wrong verdict, so the
 // gate stays silent rather than flattering itself with coverage it lacks:
@@ -198,7 +209,9 @@ const UNIT_TAIL_DIMS = new Map(Object.entries({
   a: "I", amp: "I", amps: "I",
   kip: "M L T^-2", kips: "M L T^-2", ksi: "M L^-1 T^-2",
   uf: "M^-1 L^-2 T^4 I^2",
+  in3: "L^3", lf: "L", mm: "L",
   pct: "dimensionless", deg: "dimensionless", db: "dimensionless", ppm: "dimensionless",
+  percent: "dimensionless", fraction: "dimensionless", count: "dimensionless",
 }));
 
 // A segment that, sitting directly in front of the tail, means the tail is the

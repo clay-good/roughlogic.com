@@ -793,6 +793,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The unit-tail rule closes at 7,543 keys, from 1,942 when it landed.** The last clean tails -- `_in3`, `_lf`, `_mm`, `_percent`, `_fraction`, `_count` -- add 370 keys and one defect: `termination_lf` is assigned `perimeter_ft`, an input declared `L`, and was itself declared `dimensionless`. Its own assignment disproves it.
+
+  **Four tails were measured and deliberately left out, with the reason recorded in the gate so the next pass does not re-measure them.** `_s`, `_m`, `_l` and `_cm` are each a real unit and each also a *symbol* here: `lambda_s` and `eps_s` are factors, `q_m` is a heat flux, `I_L` is a line current, `target_m` is a molarity. They are also the tails most often sitting behind another unit -- `viscosity_Pa_s`, `cv_cm2_s`, `concentration_mol_l`, `conductivity_us_cm` -- so covering them costs a compound list as long as the finds. Agreement runs 64-90% against 98-100% for every tail that was added.
+
 - **A pile capacity was declared one power of length short, and the error ran through all eight of its keys.** Adding `_a`, `_amp`, `_amps`, `_kip`, `_kips`, `_ksi`, `_uf` and the four ratio-by-name tails (`_pct`, `_deg`, `_db`, `_ppm`) takes unit-tail coverage **5,969 -> 7,173 keys** and caught nineteen more.
 
   **`computePileAxialCapacity` declares `cu_ksf: M L^-1 T^-2` and `as_ft2: L^2` correctly and then declares their product `M T^-2`** -- a force per unit length where `alpha x cu x area` is a force. Every one of its four capacities carries the same missing `L`, and `computePileLengthForCapacity` carries it into four more, including the target capacity a user types in. Alongside them: five bolt and press-brake stresses in ksi read `dimensionless`, and six currents did the same -- four alternator output and balance amps, a heat-trace breaker size, and a shunt's measured current.

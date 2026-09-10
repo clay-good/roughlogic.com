@@ -10591,7 +10591,7 @@ CONSTRUCTION_RENDERERS["roof-ballast-weight"] = _simpleRenderer({
 });
 
 // ===================== spec-v988: foundation drainage board (dimple mat) takeoff =====================
-// dims: in { perimeter_ft: L, below_grade_height_ft: L, roll_width_ft: L, roll_length_ft: L, waste_pct: dimensionless } out: { wall_area_sf: L^2, rolls: dimensionless, termination_lf: dimensionless }
+// dims: in { perimeter_ft: L, below_grade_height_ft: L, roll_width_ft: L, roll_length_ft: L, waste_pct: dimensionless } out: { wall_area_sf: L^2, rolls: dimensionless, termination_lf: L }
 export function computeDrainageBoardTakeoff({ perimeter_ft = 150, below_grade_height_ft = 8, roll_width_ft = 4, roll_length_ft = 50, waste_pct = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(perimeter_ft > 0)) return { error: "Foundation perimeter must be positive (ft)." };
