@@ -30,6 +30,15 @@
 // prompt, one moves toward caution ("DO NOT ACID CLEAN"), and the rest are
 // value or prose differences rather than a permissiveness verdict.
 //
+// The ABOVE-MAX half is clean, and was swept 2026-09-10 for the same reason
+// this file exists: an instrument that tests one edge and reports as though it
+// tested the bound is worse than no instrument. 92 tiles carry a `max`, 15
+// answered instead of refusing, and 6 conclusions changed -- none of them
+// toward permissiveness. Four are boolean flags modelled as a number with
+// max="1", where a 3 is simply truthy and the verdict it produces is the
+// correct one (a scaffold read as SHEETED needs TIGHTER ties, not looser); the
+// other two shift a month figure inside a verdict that does not change.
+//
 // WHY IT COMPARES RATHER THAN PATTERN-MATCHES. A first attempt matched result
 // strings against a "passing" vocabulary and was useless: nearly every hit was
 // a static `note:` field whose prose happens to contain "passes" or "within",
@@ -56,11 +65,23 @@ for (const tool of TOOLS) {
   const example = card.example && card.example.inputs;
   if (!example || !Object.keys(example).length) continue;
 
-  const bounded = (card.inputs || []).filter((f) => {
+  // Both halves of the bound. Sweeping only `min` would test half the space and
+  // report as though it had tested all of it.
+  const bounded = [];
+  for (const f of card.inputs || []) {
     const attrs = f && f.attrs;
-    if (!attrs || attrs.min === undefined || attrs.min === null) return false;
-    return f.key in example && Number.isFinite(Number(example[f.key]));
-  });
+    if (!attrs) continue;
+    if (!(f.key in example) || !Number.isFinite(Number(example[f.key]))) continue;
+    const value = Number(example[f.key]);
+    if (attrs.min !== undefined && attrs.min !== null && Number.isFinite(Number(attrs.min))) {
+      const min = Number(attrs.min);
+      bounded.push({ key: f.key, edge: "min", limit: min, probe: min - (Math.abs(value) + 1) });
+    }
+    if (attrs.max !== undefined && attrs.max !== null && Number.isFinite(Number(attrs.max))) {
+      const max = Number(attrs.max);
+      bounded.push({ key: f.key, edge: "max", limit: max, probe: max + Math.abs(max || 1) + 1 });
+    }
+  }
   if (!bounded.length) continue;
 
   let base;
@@ -71,16 +92,14 @@ for (const tool of TOOLS) {
   scanned += 1;
 
   for (const field of bounded) {
-    const min = Number(field.attrs.min);
-    const value = min - (Math.abs(Number(example[field.key])) + 1);
     let out;
-    try { out = (await run({ id: tool.id, inputs: { ...example, [field.key]: value } })).result; } catch { continue; }
+    try { out = (await run({ id: tool.id, inputs: { ...example, [field.key]: field.probe } })).result; } catch { continue; }
     // A compute that refuses is the outcome this harness wants.
     if (!out || out.error) continue;
     probes += 1;
     for (const [key, was] of strings) {
       if (typeof out[key] === "string" && out[key] !== was) {
-        flips.push({ id: tool.id, field: field.key, value, min, key, was, now: out[key] });
+        flips.push({ id: tool.id, field: field.key, value: field.probe, edge: field.edge, limit: field.limit, key, was, now: out[key] });
       }
     }
   }
@@ -88,7 +107,7 @@ for (const tool of TOOLS) {
 
 const cut = (s) => (s.length > 46 ? s.slice(0, 46) + "..." : s);
 for (const f of flips) {
-  console.log(`  ${f.id}  ${f.field}=${f.value} (min ${f.min})  ${f.key}: ${JSON.stringify(cut(f.was))} -> ${JSON.stringify(cut(f.now))}`);
+  console.log(`  ${f.id}  ${f.field}=${f.value} (${f.edge} ${f.limit})  ${f.key}: ${JSON.stringify(cut(f.was))} -> ${JSON.stringify(cut(f.now))}`);
 }
 console.log(
   `measure-verdict-bounds: ${scanned} tile(s) with a bounded numeric input and a string output; ` +
