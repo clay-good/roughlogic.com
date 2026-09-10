@@ -368,7 +368,7 @@ test("a deterministic slice of the alias corpus reaches its tiles", async () => 
 // carrying a digit -- 100 answered OK -- it was the only one, so this refuses
 // almost nothing.
 test("the door does not answer on a value the tile's own bounds reject", async () => {
-  const { answerQuery, run } = await import("../../mcp/catalog.mjs");
+  const { answerQuery, run, describe } = await import("../../mcp/catalog.mjs");
 
   const dip = await answerQuery({ query: "generator voltage dip 30 percent limit" });
   assert.equal(dip.status, "MISSING_INPUTS");
@@ -386,14 +386,28 @@ test("the door does not answer on a value the tile's own bounds reject", async (
   assert.equal(good.status, "OK");
   assert.equal(good.result.flag, "exceeds limit (>5%)");
 
-  // And a caller who means it is still served: run_calculator answers, with the
-  // warning advisory, exactly as its contract says.
+  // And a caller who means it is still served: `run_calculator` answers and
+  // keeps the warning ADVISORY, exactly as its contract says. Demonstrated on
+  // a tile whose compute does not itself refuse -- a negative insurance
+  // premium is out of range but arithmetically meaningful, and the door hands
+  // back the number with the bound reported beside it.
   const forced = await run({
+    id: "rent-vs-buy",
+    inputs: { ...(await describe({ id: "rent-vs-buy" })).example.inputs, insurance_annual: -1800 },
+  });
+  assert.ok(forced.result && !forced.result.error, JSON.stringify(forced.result).slice(0, 120));
+  assert.equal(forced.warnings.filter((w) => w.rule === "min").length, 1);
+
+  // voltage-drop is NOT such a tile any more. A negative length is not a value
+  // a caller can mean: the flag ladder compares a signed percent, so -9.88%
+  // read as "within advisory (<=3%)". The compute refuses it outright now, and
+  // that refusal is stronger than this door's advisory warning by design --
+  // advisory is for a reading that is unusual, not for one that is impossible.
+  const refused = await run({
     id: "voltage-drop",
     inputs: { phase: "single", material: "copper", awg: "10", length_ft: -150, current_A: 20, source_voltage_V: 240 },
   });
-  assert.ok(Number.isFinite(forced.result.drop_V));
-  assert.equal(forced.warnings.length, 1);
+  assert.match(refused.result.error, /cannot be negative/);
 });
 
 // An id is not a phrasing, it is an ADDRESS: the one string the catalog

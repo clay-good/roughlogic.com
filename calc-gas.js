@@ -131,6 +131,14 @@ export function computeGasPipeSizing({ btu_load, length_ft, gas, dP_in_wc = 0.5,
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const props = GAS_PROPERTIES[gas];
   if (!props) return { error: "Unknown gas." };
+  // A negative load makes `required_cfh` negative, which the first candidate
+  // size then "satisfies": measured 2026-09-10, `btu_load = -100000` took this
+  // tile's own example from 3/4 in to 1/2 in. An undersized gas pipe returned
+  // as a recommendation. A negative run length is equally meaningless to
+  // Spitzglass.
+  if (Number(btu_load) < 0 || Number(length_ft) < 0) {
+    return { error: "Load and run length cannot be negative." };
+  }
   const required_cfh = btu_load / props.heating_value_btu_ft3;
   for (const size of candidate_sizes) {
     const d = SCH40_ID_IN[size];

@@ -793,6 +793,26 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Seven calculators answered an impossible reading with a safer answer than the truth.** A tile whose renderer declares `min="0"` on a field is stating that a value below it is not a reading. The computes did not enforce it -- and every threshold ladder and table walk in them is written with `>=` or `<=`, so a negative value clears the first branch and returns the smallest, lowest-risk, most permissive answer the tile has. Each case below is that tile's **own published worked example** with one input negated:
+
+  | Tile | Input | Was | Became |
+  | --- | --- | --- | --- |
+  | `crane-net-capacity` | below-the-hook gear | "critical / engineered lift - plan and document" | **"ok"** |
+  | `mold` | relative humidity | risk "high" | **risk "low"** |
+  | `voltage-drop` | length, current | "exceeds advisory (>3%)" | **"within advisory (≤3%)"** |
+  | `egc-sizing` | OCPD rating | 10 AWG | **14 AWG** |
+  | `gas-pipe-sizing` | BTU load | 3/4 in | **1/2 in** |
+  | `dehumidifier` | room volume | "stage two-or-more large LGRs" | **"one small portable LGR"** |
+  | `air-movers` | affected area | "corners + perimeter" | **"corners"** |
+
+  A negative deduction *adds* capacity the crane does not have; a negative OCPD clears the first row of NEC 250.122 and returns an undersized equipment grounding conductor; the voltage-drop flag ladder compares a **signed** percent, so -9.88% reads as within advisory. Each compute now refuses. The guards are written `< 0` rather than `>= 0` so a blank field -- which arrives as NaN, and `NaN < 0` is false -- behaves exactly as it did.
+
+  This is narrower than it sounds and deliberately so. `run_calculator` still keeps a range warning **advisory** for a caller who supplies an out-of-range value that is nonetheless arithmetically meaningful -- a negative insurance premium in `rent-vs-buy` still answers, with the bound reported beside it -- and the browser still marks the field invalid. What changed is that on these seven, the tile no longer states a *conclusion* on a reading its own schema rejects. Advisory is for a reading that is unusual; a refusal is for one that is impossible, and a compute-level refusal outranks the door's warning.
+
+  [scripts/measure-verdict-bounds.mjs](scripts/measure-verdict-bounds.mjs) is the standing sweep: it re-runs every tile's own example with one bounded input pushed below its minimum and reports the conclusions that **change**. 674 tiles, 21 changed, 7 fixed. The nine that remain are deliberate -- three degrade to a "you must enter X" prompt, one moves toward caution ("DO NOT ACID CLEAN"), and the rest are value or prose differences rather than a permissiveness verdict.
+
+  **Why it compares rather than pattern-matches.** A first attempt scored result strings against a "passing" vocabulary and was useless: nearly every hit was a static `note:` field whose prose happens to contain "passes" or "within", and it missed `voltage-drop` entirely. Requiring the string to *differ* between the in-range and out-of-range run excludes static prose by construction.
+
 - **The phrase the catalog curated for a tile could not find it.** `resolveQuery` in [search-discovery.js](search-discovery.js) reads an exact **address** -- a tile's own id, or a phrase a maintainer wrote against it -- and it was only ever reached from `fallbackSearch`, which the ranker declines into rarely. So on the ranked path the curation was never read at all. Swept over all 22,534 curated terms: three targets never appeared in the browser's twelve-row dropdown -- *"how much can i build on my lot"* (`floor-area-ratio`), *"what size wire"* (`min-conductor-for-vd`), *"what size weld"* (`steel-fillet-weld-size`) -- and 58 more appeared but not first, with **"wire size" returning `thread-measure-wire`, a machinist's thread-measuring wire, ahead of wire ampacity**. `promoteExactMatch` now moves the named tile to the front and leaves every other result in its order behind it: addition, not replacement. All 22,534 reach their tile, and all of them first. `mcp/catalog.mjs` resolves the same two addresses ahead of its own ranker, so both doors agree on what an address is; where a curated term is also some other tile's exact name, curation wins, which is the call the agent door already made after measuring.
 
   61 queries change their top result. Four of those had an exact **name** match on top -- and three are clear corrections (*"pump out"* is a septic pump-out, *"tip size"* is a nozzle tip). The fourth is genuinely debatable and pre-existing: `affinity-laws` is *named* "Fan Affinity Laws", which is exactly the id of the different tile `fan-affinity-laws`. Both doors now resolve it the same way.

@@ -107,6 +107,16 @@ export function computeCraneNetCapacity({ gross_chart_lb, hook_block_lb = 0, jib
   const load = Number(load_weight_lb);
   if (!Number.isFinite(gross) || gross <= 0) return { error: "Gross chart capacity must be a positive finite number (lb)." };
   if (!Number.isFinite(load) || load <= 0) return { error: "Load weight must be a positive finite number (lb)." };
+  // Gross and load are already checked; the DEDUCTIONS were not, and every one
+  // of them is subtracted. A negative deduction therefore ADDS capacity the
+  // crane does not have, and a negative below-the-hook weight lightens the
+  // load: measured 2026-09-10, `below_hook_lb = -600` turned this tile's own
+  // example from "critical / engineered lift - plan and document" into "ok".
+  // The renderer declares min="0" on all four; this enforces it. `< 0` rather
+  // than `>= 0` so a blank field still reads as the 0 it defaults to.
+  if (hookBlock < 0 || jib < 0 || wireRope < 0 || belowHook < 0) {
+    return { error: "Deductions and below-the-hook weight cannot be negative (lb) - a negative deduction would add capacity the crane does not have." };
+  }
   const netCapacity = gross - hookBlock - jib - wireRope;
   if (!(netCapacity > 0)) return { error: "Net capacity is zero or negative after deductions - the rigging exceeds the chart." };
   const totalHook = load + belowHook;

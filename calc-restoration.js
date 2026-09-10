@@ -108,6 +108,12 @@ const AHAM_PINTS_PER_FT3_BY_CLASS = {
 //  multipliers; the operational-guidance string is categorical.)
 export function computeDehumidifierSize({ room_cubic_feet, water_class = "2", expected_pints_per_day = null }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Every threshold below is `>=`, so a negative volume clears none of them and
+  // the tile recommends the SMALLEST equipment: measured 2026-09-10,
+  // `room_cubic_feet = -6000` moved this tile's own example from "stage
+  // two-or-more large LGRs" to "one small portable LGR". Under-drying a
+  // structure is the failure this tile exists to prevent.
+  if (Number(room_cubic_feet) < 0) return { error: "Room volume cannot be negative (cubic feet)." };
   const factor = AHAM_PINTS_PER_FT3_BY_CLASS[String(water_class)];
   const aham = factor ? room_cubic_feet * factor : null;
   // Field method: scale by 1.55x to account for actual job conditions.
@@ -161,6 +167,10 @@ export function computeAirMovers({ affected_area_ft2, water_class = "2" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const ft2_per = AIR_MOVER_FT2_PER_UNIT_BY_CLASS[String(water_class)];
   if (!ft2_per) return { error: "Unknown water class." };
+  // A negative area yields a negative count, which then reads as the smallest
+  // placement pattern: measured 2026-09-10, `affected_area_ft2 = -600` moved
+  // this tile's own example from "corners + perimeter" to "corners".
+  if (Number(affected_area_ft2) < 0) return { error: "Affected area cannot be negative (ft2)." };
   const count = Math.ceil(affected_area_ft2 / ft2_per);
   // Typical air mover ~ 2500 CFM at low setting. Coverage in CFM/ft^2.
   const cfm_per_unit = 2500;
@@ -240,6 +250,15 @@ export function computeDryingTime({ material }) {
 // (RH percent and risk-band token are dimensionless; temperatures
 //  and the germination-hours interval carry the §7.1 base-token `T`.)
 export function computeMoldRisk({ rh_percent, temperature_F, hours_elevated }) {
+  // Both thresholds below are `>=`, so a NEGATIVE humidity or duration clears
+  // neither and the tile reports "low" -- a reassurance derived from an
+  // impossible reading. Measured 2026-09-10: `rh_percent = -81` took this
+  // tile's own example from "high" to "low". Temperature is deliberately not
+  // guarded: it is the one input here that is legitimately negative. `< 0`
+  // rather than `>= 0` so a blank field behaves exactly as it did.
+  if (Number(rh_percent) < 0 || Number(hours_elevated) < 0) {
+    return { error: "Relative humidity and hours at elevated RH cannot be negative." };
+  }
   let risk = "low";
   if (rh_percent >= 70 && hours_elevated >= 24) risk = "high";
   else if (rh_percent >= 60 && hours_elevated >= 48) risk = "moderate";

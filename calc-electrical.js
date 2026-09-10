@@ -126,6 +126,14 @@ export const wireAmpacityExample = {
 // dims: in { phase: dimensionless, material: dimensionless, awg: dimensionless, length_ft: L, current_A: I, source_voltage_V: M L^2 T^-3 I^-1 } out: { drop_V: M L^2 T^-3 I^-1, drop_percent: dimensionless, voltage_at_load_V: M L^2 T^-3 I^-1 }
 export function computeVoltageDrop({ phase, material, awg, length_ft, current_A, source_voltage_V }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative length or current makes the drop negative, and the flag ladder
+  // below compares a SIGNED percent, so -9.88% reads as "within advisory
+  // (<=3%)" -- a pass stated on a run that is nothing of the kind. Measured
+  // 2026-09-10 on this tile's own example. The renderer declares min="0" on
+  // both; `< 0` rather than `>= 0` so a blank field behaves as it did.
+  if (Number(length_ft) < 0 || Number(current_A) < 0) {
+    return { error: "Length and current cannot be negative." };
+  }
   const drop_V = voltageDrop({ phase, material, awg, length_ft, current_A });
   const percent = source_voltage_V > 0 ? (drop_V / source_voltage_V) * 100 : null;
   // v8 §C.1: companion output (voltage at load) and advisory / limit flags.
@@ -417,6 +425,12 @@ export const EGC_TABLE_AWG = [
 
 // dims: in { ocpd_A: I, material: dimensionless } out: { egc_awg: dimensionless }
 export function computeEGCSize({ ocpd_A, material }) {
+  // The table is walked with `ocpd_A <= r.ocpd_max_A`, so a NEGATIVE rating
+  // clears the very first row and returns the SMALLEST conductor in NEC
+  // 250.122. Measured 2026-09-10: `ocpd_A = -60` took this tile's own example
+  // from 10 AWG to 14 AWG -- an undersized equipment grounding conductor,
+  // returned as though it were the answer.
+  if (Number(ocpd_A) < 0) return { error: "OCPD rating cannot be negative (A)." };
   const row = EGC_TABLE_AWG.find((r) => ocpd_A <= r.ocpd_max_A);
   if (!row) return { error: "OCPD rating exceeds bundled table; consult engineering analysis." };
   return { egc_awg: material === "aluminum" ? row.aluminum : row.copper };
