@@ -209,8 +209,8 @@ names and curated alias phrases: three answers changed, all three from
 
 ### What the extractor is not measured on
 
-`scripts/measure-query-fill.mjs` reports **0 wrong values** across 2,043 tiles
-(5,223 of 9,203 fields recovered), and that is true of the corpus it measures:
+`scripts/measure-query-fill.mjs` reports **0 wrong values** across 2,046 tiles
+(5,223 of 9,208 fields recovered), and that is true of the corpus it measures:
 every number labelled, in field order, taken from each tile's own worked
 example. It carries no distractors, so it cannot see the case where a question
 holds more numbers than the tile has fields.
@@ -218,6 +218,12 @@ holds more numbers than the tile has fields.
 Reading the minus sign moved that corpus 5,211 -> 5,223 fields and 703 -> 707
 tiles fully recovered, still at 0 wrong values, and left `measure-ranking.mjs`
 byte-identical.
+
+Destructuring the four opaque-object computes put three more tiles into the
+field index (2,043 -> 2,046) and five more fields into this corpus
+(9,203 -> 9,208). It recovered none of the five, which is the right outcome
+rather than a regression: a state, a county and a commodity are **text**, and
+this extractor reads numbers.
 
 `answer_query` also refuses a value it read out of the question that the tile's
 own field bounds reject. `run_calculator` keeps such a warning **advisory** and
