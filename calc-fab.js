@@ -631,7 +631,7 @@ export function computeShieldingGasRuntime({ flow_cfh, arc_on_min, cylinder_ft3,
   };
 }
 
-// dims: in { oxygen_cfh: L^3 T^-1, fuel_cfh: L^3 T^-1, cut_length_in: L, cut_speed_ipm: dimensionless, oxygen_cyl_ft3: L^3, fuel_cyl_ft3: L^3 } out: { cut_time_min: T, oxygen_used_ft3: L^3, fuel_used_ft3: L^3, oxygen_runtime_hr: T, fuel_runtime_hr: T }
+// dims: in { oxygen_cfh: L^3 T^-1, fuel_cfh: L^3 T^-1, cut_length_in: L, cut_speed_ipm: L T^-1, oxygen_cyl_ft3: L^3, fuel_cyl_ft3: L^3 } out: { cut_time_min: T, oxygen_used_ft3: L^3, fuel_used_ft3: L^3, oxygen_runtime_hr: T, fuel_runtime_hr: T }
 export function computeOxyfuelCuttingGas({ oxygen_cfh, fuel_cfh, cut_length_in, cut_speed_ipm, oxygen_cyl_ft3 = 244, fuel_cyl_ft3 = 330 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const oxygen = Number(oxygen_cfh);

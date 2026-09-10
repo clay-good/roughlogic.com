@@ -2537,7 +2537,7 @@ function _simpleRenderer(spec) {
 }
 
 // ===================== spec-v1406: permissible residual unbalance =====================
-// dims: in { args: dimensionless } out: { omega_rad_s: T^-1, e_permissible: dimensionless, u_permissible: dimensionless, correction_mass_g: M }
+// dims: in { balance_grade: L T^-1, rpm: T^-1, rotor_mass_kg: M, planes: dimensionless, correction_radius_mm: L } out: { omega_rad_s: T^-1, e_permissible: L, u_permissible: M L, correction_mass_g: M }
 export function computeRotorBalanceGrade({ balance_grade = 6.3, rpm = 0, rotor_mass_kg = 0, planes = 2, correction_radius_mm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(balance_grade > 0)) return { error: "Balance grade must be positive." };
@@ -2586,7 +2586,7 @@ SHOP_RENDERERS["rotor-balance-grade"] = _simpleRenderer({
 });
 
 // ===================== spec-v1407: bearing regrease quantity and interval =====================
-// dims: in { args: dimensionless } out: { grease_grams: M, base_interval_hr: T, corrected_interval_hr: T }
+// dims: in { od_mm: L, width_mm: L, bore_mm: L, rpm: T^-1, correction_factor: dimensionless, duty_hours_per_day: T } out: { grease_grams: M, base_interval_hr: T, corrected_interval_hr: T }
 export function computeBearingRegrease({ od_mm = 0, width_mm = 0, bore_mm = 0, rpm = 0, correction_factor = 1.0, duty_hours_per_day = 24 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(od_mm > 0)) return { error: "Bearing outside diameter must be positive." };
@@ -2639,7 +2639,7 @@ SHOP_RENDERERS["bearing-regrease"] = _simpleRenderer({
 });
 
 // ===================== spec-v1408: plasma cut time, consumable life, cost per part =====================
-// dims: in { args: dimensionless } out: { cut_time_min: T, arc_hours_per_part: T, parts_per_set: dimensionless, cost_per_part: dimensionless }
+// dims: in { cut_length_in: L, cut_speed_ipm: L T^-1, pierces_per_part: dimensionless, set_cost: dimensionless, rated_pierces: dimensionless, rated_arc_hours: T } out: { cut_time_min: T, arc_hours_per_part: T, parts_per_set: dimensionless, cost_per_part: dimensionless }
 export function computePlasmaCutSpeed({ cut_length_in = 0, cut_speed_ipm = 0, pierces_per_part = 0, set_cost = 0, rated_pierces = 0, rated_arc_hours = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(cut_length_in > 0)) return { error: "Cut length per part must be positive." };
@@ -2702,7 +2702,7 @@ SHOP_RENDERERS["plasma-cut-speed"] = _simpleRenderer({
 });
 
 // ===================== spec-v1409: hydraulic reservoir size and cooler duty =====================
-// dims: in { args: dimensionless } out: { hydraulic_hp: M L^2 T^-3, heat_btu_hr: dimensionless, reservoir_gal: L^3, cooler_duty_btu_hr: dimensionless }
+// dims: in { pump_gpm: L^3 T^-1, pressure_psi: M L^-1 T^-2, pump_efficiency: dimensionless, heat_fraction: dimensionless, reservoir_multiplier: dimensionless, reservoir_dissipation_btu_hr: M L^2 T^-3 } out: { hydraulic_hp: M L^2 T^-3, heat_btu_hr: M L^2 T^-3, reservoir_gal: L^3, cooler_duty_btu_hr: M L^2 T^-3 }
 export function computeHydraulicReservoirCooler({ pump_gpm = 0, pressure_psi = 0, pump_efficiency = 0.85, heat_fraction = 0.25, reservoir_multiplier = 3, reservoir_dissipation_btu_hr = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pump_gpm > 0)) return { error: "Pump flow must be positive." };
@@ -2777,7 +2777,7 @@ const _dustPick = (required_in) => {
 };
 const _dustArea = (dia_in) => Math.PI * (dia_in / 12) * (dia_in / 12) / 4;
 
-// dims: in { args: dimensionless } out: { branch_area_sqft: L^2, branch_diameter_in: L, branch_velocity_actual_fpm: L T^-1 }
+// dims: in { cfm_per_machine: L^3 T^-1, branch_velocity_fpm: L T^-1, main_velocity_fpm: L T^-1, machines: dimensionless, simultaneous: dimensionless } out: { branch_area_sqft: L^2, branch_diameter_in: L, branch_velocity_actual_fpm: L T^-1 }
 export function computeDustCollectionDuct({ cfm_per_machine = 0, branch_velocity_fpm = 4000, main_velocity_fpm = 3500, machines = 1, simultaneous = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(cfm_per_machine > 0)) return { error: "Airflow per machine must be positive." };
@@ -2843,7 +2843,7 @@ SHOP_RENDERERS["dust-collection-duct"] = _simpleRenderer({
 // ===========================================================================
 
 // ===================== spec-v1435: pneumatic cylinder air consumption =====================
-// dims: in { args: dimensionless } out: { volume_per_cycle_ft3: L^3, scfm_total: L^3 T^-1, compressor_hp: M L^2 T^-3 }
+// dims: in { bore_in: L, rod_in: L, stroke_in: L, cycles_per_min: T^-1, pressure_psig: M L^-1 T^-2, cylinders: dimensionless, cfm_per_hp: M^-1 L T^2 } out: { volume_per_cycle_ft3: L^3, scfm_total: L^3 T^-1, compressor_hp: M L^2 T^-3 }
 export function computePneumaticCylinderScfm({ bore_in = 0, rod_in = 0, stroke_in = 0, cycles_per_min = 0, pressure_psig = 0, cylinders = 1, cfm_per_hp = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(bore_in > 0)) return { error: "Bore diameter must be positive." };
@@ -2900,7 +2900,7 @@ SHOP_RENDERERS["pneumatic-cylinder-scfm"] = _simpleRenderer({
 });
 
 // ===================== spec-v1436: bucket elevator capacity and power =====================
-// dims: in { args: dimensionless } out: { capacity_ft3_hr: L^3 T^-1, lifting_hp: M L^2 T^-3, motor_hp: M L^2 T^-3 }
+// dims: in { bucket_volume_ft3: L^3, spacing_in: L, speed_fpm: L T^-1, fill_factor: dimensionless, bulk_density_pcf: M L^-3, lift_ft: L, drive_efficiency: dimensionless, friction_allowance: dimensionless } out: { capacity_ft3_hr: L^3 T^-1, lifting_hp: M L^2 T^-3, motor_hp: M L^2 T^-3 }
 export function computeBucketElevatorCapacity({ bucket_volume_ft3 = 0, spacing_in = 0, speed_fpm = 0, fill_factor = 0.75, bulk_density_pcf = 0, lift_ft = 0, drive_efficiency = 0.75, friction_allowance = 1.2 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(bucket_volume_ft3 > 0)) return { error: "Bucket volume must be positive." };
@@ -2953,7 +2953,7 @@ SHOP_RENDERERS["bucket-elevator-capacity"] = _simpleRenderer({
 });
 
 // ===================== spec-v1437: cyclone separator cut size and pressure drop =====================
-// dims: in { args: dimensionless } out: { d50_ft: L, d50_micron: L, pressure_drop_psf: M L^-1 T^-2 }
+// dims: in { inlet_width_ft: L, inlet_velocity_fps: L T^-1, turns: dimensionless, gas_viscosity_lb_ft_s: M L^-1 T^-1, gas_density_pcf: M L^-3, particle_density_pcf: M L^-3, k_velocity_heads: dimensionless, airflow_cfm: L^3 T^-1, second_velocity_fps: L T^-1 } out: { d50_ft: L, d50_micron: L, pressure_drop_psf: M L^-1 T^-2 }
 export function computeCycloneSeparatorSizing({ inlet_width_ft = 0, inlet_velocity_fps = 0, turns = 5, gas_viscosity_lb_ft_s = 1.24e-5, gas_density_pcf = 0.075, particle_density_pcf = 0, k_velocity_heads = 8, airflow_cfm = 0, second_velocity_fps = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(inlet_width_ft > 0)) return { error: "Inlet width must be positive." };
@@ -3013,7 +3013,7 @@ SHOP_RENDERERS["cyclone-separator-sizing"] = _simpleRenderer({
 });
 
 // ===================== spec-v1438: gas spring force and mounting geometry =====================
-// dims: in { args: dimensionless } out: { lid_moment_in_lb: M L^2 T^-2, force_per_strut_lb: M L T^-2 }
+// dims: in { lid_weight_lb: M L T^-2, cg_distance_in: L, opening_angle_deg: dimensionless, moment_arm_in: L, struts: dimensionless, second_angle_deg: dimensionless, second_moment_arm_in: L } out: { lid_moment_in_lb: M L^2 T^-2, force_per_strut_lb: M L T^-2 }
 export function computeGasStrutForce({ lid_weight_lb = 0, cg_distance_in = 0, opening_angle_deg = 0, moment_arm_in = 0, struts = 2, second_angle_deg = 0, second_moment_arm_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(lid_weight_lb > 0)) return { error: "Lid weight must be positive." };
@@ -3065,7 +3065,7 @@ SHOP_RENDERERS["gas-strut-force"] = _simpleRenderer({
 });
 
 // ===================== spec-v1439: spray booth airflow and makeup air load =====================
-// dims: in { args: dimensionless } out: { exhaust_cfm: L^3 T^-1, heating_btu_hr: M L^2 T^-3, gas_input_btu_hr: M L^2 T^-3, booth_volume_cuft: L^3, air_changes_per_hour: T^-1, measured_cfm: L^3 T^-1, bake_btu_hr: M L^2 T^-3, bake_btu_per_cycle: M L^2 T^-2 }
+// dims: in { opening_width_ft: L, opening_height_ft: L, face_velocity_fpm: L T^-1, indoor_temp_f: T, outdoor_temp_f: T, burner_efficiency: dimensionless, hours_per_year: T, price_per_therm: dimensionless, booth_depth_ft: L, measured_face_velocity_fpm: L T^-1, bake_temp_f: T, bake_minutes: T, bakes_per_year: dimensionless } out: { exhaust_cfm: L^3 T^-1, heating_btu_hr: M L^2 T^-3, gas_input_btu_hr: M L^2 T^-3, booth_volume_cuft: L^3, air_changes_per_hour: T^-1, measured_cfm: L^3 T^-1, bake_btu_hr: M L^2 T^-3, bake_btu_per_cycle: M L^2 T^-2 }
 export function computeSprayBoothAirflow({ opening_width_ft = 0, opening_height_ft = 0, face_velocity_fpm = 100, indoor_temp_f = 70, outdoor_temp_f = 0, burner_efficiency = 0.8, hours_per_year = 0, price_per_therm = 0, booth_depth_ft = 0, measured_face_velocity_fpm = 0, bake_temp_f = 0, bake_minutes = 0, bakes_per_year = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(opening_width_ft > 0 && opening_height_ft > 0)) return { error: "Booth opening width and height must be positive." };
@@ -3177,7 +3177,7 @@ SHOP_RENDERERS["spray-booth-airflow"] = _simpleRenderer({
 });
 
 // ===================== spec-v1440: powder coating coverage and reclaim =====================
-// dims: in { args: dimensionless } out: { theoretical_coverage_sqft_lb: L^2 M^-1, powder_required_lb: M }
+// dims: in { specific_gravity: dimensionless, film_thickness_mils: L, part_area_sqft: L^2, transfer_efficiency: dimensionless, reclaim_efficiency: dimensionless, price_per_lb: dimensionless } out: { theoretical_coverage_sqft_lb: L^2 M^-1, powder_required_lb: M }
 export function computePowderCoatingCoverage({ specific_gravity = 0, film_thickness_mils = 0, part_area_sqft = 0, transfer_efficiency = 0.6, reclaim_efficiency = 0, price_per_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(specific_gravity > 0)) return { error: "Powder specific gravity must be positive." };
@@ -3231,7 +3231,7 @@ SHOP_RENDERERS["powder-coating-coverage"] = _simpleRenderer({
 });
 
 // ===================== spec-v1441: plating tank current and time (Faraday) =====================
-// dims: in { args: dimensionless } out: { total_current_a: I, plating_time_s: T, thickness_rate_in_hr: L T^-1 }
+// dims: in { current_density_asf: I L^-2, part_area_sqft: L^2, atomic_weight: dimensionless, valence: dimensionless, metal_density_gcc: M L^-3, current_efficiency: dimensionless, target_thickness_in: L } out: { total_current_a: I, plating_time_s: T, thickness_rate_in_hr: L T^-1 }
 export function computePlatingTankCurrent({ current_density_asf = 0, part_area_sqft = 0, atomic_weight = 0, valence = 0, metal_density_gcc = 0, current_efficiency = 0.95, target_thickness_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(current_density_asf > 0)) return { error: "Current density must be positive." };
@@ -3287,7 +3287,7 @@ SHOP_RENDERERS["plating-tank-current"] = _simpleRenderer({
 });
 
 // ===================== spec-v1442: heat-treat soak time and furnace load =====================
-// dims: in { args: dimensionless } out: { total_at_temp_hr: T, charge_heat_btu: M L^2 T^-2, furnace_input_btu_hr: M L^2 T^-3 }
+// dims: in { charge_weight_lb: M, section_thickness_in: L, soak_temp_f: T, start_temp_f: T, through_heat_rate_hr_per_in: T L^-1, soak_rate_hr_per_in: T L^-1, specific_heat: L^2 T^-2, furnace_efficiency: dimensionless } out: { total_at_temp_hr: T, charge_heat_btu: M L^2 T^-2, furnace_input_btu_hr: M L^2 T^-3 }
 export function computeHeatTreatSoakTime({ charge_weight_lb = 0, section_thickness_in = 0, soak_temp_f = 0, start_temp_f = 70, through_heat_rate_hr_per_in = 1, soak_rate_hr_per_in = 1, specific_heat = 0.12, furnace_efficiency = 0.6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(charge_weight_lb > 0)) return { error: "Charge weight must be positive." };
@@ -3338,7 +3338,7 @@ SHOP_RENDERERS["heat-treat-soak-time"] = _simpleRenderer({
 });
 
 // ===================== spec-v1443: quench severity and the Biot screen =====================
-// dims: in { args: dimensionless } out: { biot: dimensionless, second_biot: dimensionless }
+// dims: in { grossmann_h: L^-1, section_diameter_in: L, second_grossmann_h: L^-1 } out: { biot: dimensionless, second_biot: dimensionless }
 export function computeQuenchSeverity({ grossmann_h = 0, section_diameter_in = 0, second_grossmann_h = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(grossmann_h > 0)) return { error: "Grossmann H-value must be positive." };
@@ -3385,7 +3385,7 @@ SHOP_RENDERERS["quench-severity"] = _simpleRenderer({
 });
 
 // ===================== spec-v1444: belt conveyor tension and drive power =====================
-// dims: in { args: dimensionless } out: { effective_tension_lb: M L T^-2, belt_hp: M L^2 T^-3, motor_hp: M L^2 T^-3 }
+// dims: in { tons_per_hour: M T^-1, belt_speed_fpm: L T^-1, length_ft: L, lift_ft: L, belt_weight_plf: M T^-2, idler_weight_plf: M T^-2, friction_factor: dimensionless, drive_efficiency: dimensionless } out: { effective_tension_lb: M L T^-2, belt_hp: M L^2 T^-3, motor_hp: M L^2 T^-3 }
 export function computeBeltConveyorTensionPower({ tons_per_hour = 0, belt_speed_fpm = 0, length_ft = 0, lift_ft = 0, belt_weight_plf = 0, idler_weight_plf = 0, friction_factor = 0.022, drive_efficiency = 0.85 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(tons_per_hour > 0)) return { error: "Capacity in tons per hour must be positive." };
