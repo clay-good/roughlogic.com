@@ -22,6 +22,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { COMPUTE_MAP } from "../fixtures/compute-map.js";
@@ -47,6 +48,32 @@ test("the list here matches the budget check-render-output-keys ratchets", async
   assert.equal(
     SPREAD_RETURNS.length, Number(m[1]),
     "a compute joined or left the gate's skipped set; add or remove it here so the runtime check keeps covering exactly what the static one cannot",
+  );
+});
+
+// A COUNT IS NOT THE SET. The assertion above compares lengths, so one compute
+// leaving the gate's skipped set and another joining it on the same commit
+// keeps the total at seven while this file goes on covering the wrong seven --
+// the new one unverified, the test still green. Ask the gate which computes it
+// actually skipped and compare the MEMBERS.
+test("the list here names exactly the computes check-render-output-keys skips", async () => {
+  const { stdout } = await new Promise((res, rej) => {
+    execFile(process.execPath, [resolve(ROOT, "scripts", "check-render-output-keys.mjs"), "--verbose"],
+      { cwd: ROOT, maxBuffer: 8 << 20 },
+      (err, out, errOut) => (err ? rej(err) : res({ stdout: out + errOut })));
+  });
+  const line = stdout.split("\n").find((l) => l.trim().startsWith("unchecked:"));
+  assert.ok(line, "check-render-output-keys --verbose no longer lists its skipped computes");
+  const live = new Set(
+    line.slice(line.indexOf(":") + 1).split(",").map((s) => s.trim().split("::").pop()).filter(Boolean),
+  );
+  const mine = new Set(SPREAD_RETURNS);
+  const missing = [...live].filter((f) => !mine.has(f));
+  const extra = [...mine].filter((f) => !live.has(f));
+  assert.deepEqual(
+    { missing, extra }, { missing: [], extra: [] },
+    "SPREAD_RETURNS is not the set the gate skips. `missing` are computes the static gate cannot read and " +
+    "nothing here runs; `extra` are computes it can read again, so their entry here is dead weight.",
   );
 });
 
