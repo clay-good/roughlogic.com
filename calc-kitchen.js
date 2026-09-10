@@ -2033,7 +2033,7 @@ KITCHEN_RENDERERS["steam-kettle-heatup"] = _r({
 });
 
 // ===================== spec-v1363: hot-holding connected load, demand, and kitchen heat gain =====================
-// dims: in { equipment: dimensionless, diversity_factor: dimensionless, voltage: M L^2 T^-3 I^-1, phase: dimensionless } out: { connected_kw: M L^2 T^-3, demand_kw: M L^2 T^-3, demand_amps: I, sensible_btuh: M L^2 T^-3, tons: M }
+// dims: in { equipment: dimensionless, diversity_factor: dimensionless, voltage: M L^2 T^-3 I^-1, phase: dimensionless } out: { connected_kw: M L^2 T^-3, demand_kw: M L^2 T^-3, demand_amps: I, sensible_btuh: M L^2 T^-3, tons: M L^2 T^-3 }
 export function computeHotHoldingEnergy({ equipment = [], diversity_factor = 0.65, voltage = 208, phase = "three" } = {}) {
   if (!Array.isArray(equipment) || equipment.length === 0) return { error: "List at least one piece of hot-holding equipment." };
   if (!(Number(diversity_factor) > 0 && Number(diversity_factor) <= 1)) return { error: "Diversity factor must be between 0 and 1." };

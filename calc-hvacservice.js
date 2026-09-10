@@ -87,7 +87,7 @@ function _condensateDrainSize(tons) {
   if (tons <= 125) return 1.5;
   return 2.0;
 }
-// dims: in { tons: M, pints_per_ton_hr: dimensionless, run_ft: L, slope_in_per_ft: dimensionless } out: { rate_pints_hr: dimensionless, rate_gph: dimensionless, min_size_in: L, fall_in: L }
+// dims: in { tons: M L^2 T^-3, pints_per_ton_hr: dimensionless, run_ft: L, slope_in_per_ft: dimensionless } out: { rate_pints_hr: dimensionless, rate_gph: dimensionless, min_size_in: L, fall_in: L }
 export function computeCondensateDrain({ tons = 0, pints_per_ton_hr = 3, run_ft = 0, slope_in_per_ft = 0.125 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (run_ft < 0 || slope_in_per_ft < 0) return { error: "Run and slope must be non-negative." };

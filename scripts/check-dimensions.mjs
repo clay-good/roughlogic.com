@@ -302,6 +302,7 @@ const POLYMORPHIC_KEYS = new Map(Object.entries({
   slope: "a hydraulic gradient (dimensionless) in 12 uses, a capacity slope in computeHeatPumpColdCapacity",
   t_min: "a minimum wall thickness in pipefit, a minimum time in plumbing",
   target_fc: "a footcandle target; the luminous base J is dropped by every use",
+  tons: "a REFRIGERATION ton in the four HVAC uses -- 12,000 BTU/hr, a power -- and a\n    short ton of silage or compost in calc-agriculture, a mass",
   total_oz: "fluid ounces (volume) and weight ounces (mass)",
 }));
 

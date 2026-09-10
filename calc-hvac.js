@@ -357,7 +357,7 @@ export const shrExample = {
 
 // --- Utility 30: CFM per Ton ---
 
-// dims: in { tons: M, climate: dimensionless } out: { cfm: L^3 T^-1, cfm_per_ton: dimensionless }
+// dims: in { tons: M L^2 T^-3, climate: dimensionless } out: { cfm: L^3 T^-1, cfm_per_ton: dimensionless }
 export function computeCfmPerTon({ tons, climate = "standard" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const map = {
@@ -4422,7 +4422,7 @@ HVAC_RENDERERS["drybulb-from-enthalpy"] = _rEnv({
   compute: computeDrybulbFromEnthalpy,
 });
 
-// dims: in { cfm: L^3 T^-1, h_ent_btu: L^2 T^-2, h_lvg_btu: L^2 T^-2 } out: { q_btuh: M L^2 T^-3, tons: M, dh: L^2 T^-2 }
+// dims: in { cfm: L^3 T^-1, h_ent_btu: L^2 T^-2, h_lvg_btu: L^2 T^-2 } out: { q_btuh: M L^2 T^-3, tons: M L^2 T^-3, dh: L^2 T^-2 }
 export function computeCoolingCoilTotalLoad({ cfm = 0, h_ent_btu = 0, h_lvg_btu = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
   const q = Number(cfm) || 0;
