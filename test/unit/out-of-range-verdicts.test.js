@@ -54,6 +54,26 @@ test("an impossible reading does not buy a safer answer", async () => {
   assert.deepEqual(answered, []);
 });
 
+test("a negative meter reading is not a dry material", async () => {
+  // Found by the same sweep run WITHOUT relying on a declared bound: no
+  // moisture meter reads below zero, whether or not the renderer said so.
+  // `affected_reading = -35` against a reference of 12 makes the delta -47,
+  // which clears `delta <= allow`, and the tile declared soaked material "at
+  // dry standard". The field now declares min="0" as well, so the browser
+  // marks it, `run_calculator` warns, and `answer_query` refuses.
+  const { run, describe } = await import("../../mcp/catalog.mjs");
+  const example = (await describe({ id: "moisture-dry-goal" })).example.inputs;
+
+  const negative = await run({ id: "moisture-dry-goal", inputs: { ...example, affected_reading: -35 } });
+  assert.match(negative.result.error, /cannot be negative/);
+
+  // The DELTA, by contrast, is legitimately negative: affected drier than the
+  // reference is the outcome the job is chasing, and it must still read as dry.
+  const drier = await run({ id: "moisture-dry-goal", inputs: { ...example, affected_reading: 8 } });
+  assert.equal(drier.result.verdict, "at dry standard");
+  assert.equal(drier.result.delta, 8 - Number(example.reference_reading));
+});
+
 test("the published examples themselves still answer", async () => {
   // The guards use `< 0` rather than `>= 0` precisely so that a blank field --
   // which arrives as NaN, and `NaN < 0` is false -- behaves exactly as before.

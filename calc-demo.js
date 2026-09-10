@@ -109,6 +109,13 @@ export function computeMoistureDryGoal({ reference_reading, affected_reading, ac
   const allow = Number(acceptable_delta);
   if (!Number.isFinite(ref) || !Number.isFinite(aff)) return { error: "Readings must be finite numbers." };
   if (!(allow > 0)) return { error: "Acceptable delta must be positive." };
+  // The DELTA is legitimately negative -- affected drier than the reference is
+  // the outcome the job is chasing, and "at dry standard" is right for it. A
+  // negative READING is not: no moisture meter reads below zero, on %MC or on
+  // a relative scale. Without this, `affected_reading = -35` against a
+  // reference of 12 makes the delta -47, which clears `delta <= allow`, and the
+  // tile declares soaked material "at dry standard". Measured 2026-09-10.
+  if (ref < 0 || aff < 0) return { error: "Meter readings cannot be negative." };
   const delta = aff - ref;
   const atDry = delta <= allow;
   const pointsToGo = Math.max(0, delta - allow);
@@ -128,8 +135,8 @@ export const moistureDryGoalExample = {
 
 function renderMoistureDryGoal(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: IICRC S500-2021 dry-standard concept by name (not reproduced): a material is dry when its moisture content matches similar unaffected material in the same structure. The protocol and a calibrated meter govern.";
-  const ref = makeNumber("Unaffected reference reading (dry standard)", "mdg-ref", { step: "any" });
-  const aff = makeNumber("Affected material reading", "mdg-aff", { step: "any" });
+  const ref = makeNumber("Unaffected reference reading (dry standard)", "mdg-ref", { step: "any", min: "0" });
+  const aff = makeNumber("Affected material reading", "mdg-aff", { step: "any", min: "0" });
   const allow = makeNumber("Acceptable delta above standard", "mdg-allow", { step: "any", min: "0", value: "4" });
   allow.input.value = "4";
   for (const f of [ref, aff, allow]) inputRegion.appendChild(f.wrap);

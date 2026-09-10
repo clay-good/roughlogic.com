@@ -46,6 +46,23 @@
 // the in-range and the out-of-range run excludes static prose by construction,
 // because static prose does not change.
 //
+// `--undeclared` sweeps the OTHER 56.8%: tiles whose numeric inputs declare no
+// bound at all, by negating any positive example value whose label does not
+// name a quantity that legitimately goes negative (temperature, elevation,
+// declination, a delta, a margin). Measured 2026-09-10: 1,120 tiles, 301
+// negative runs answered, 124 conclusions changed -- a far weaker signal than
+// the declared sweep, and it must be read that way. Most of those move toward
+// MORE caution ("in range (4-20 mA)" -> "fault-low", which for a 4-20 mA loop
+// is simply correct), and several tiles take a negative legitimately anyway (a
+// z-score, a scientific-notation value, a cut/fill elevation). Each candidate
+// is a per-field domain call, which is why this mode reports rather than gates.
+//
+// One has been acted on so far: `moisture-dry-goal` declared soaked material
+// "at dry standard" on a negative meter reading, and now declares min="0" and
+// refuses. Declaring the bound is the better half of the fix -- it moves the
+// field into the declared sweep above, where the browser, `run_calculator` and
+// `answer_query` all see it too.
+//
 // Zero dependencies, no network. `node scripts/measure-verdict-bounds.mjs`.
 
 import { resolve, dirname } from "node:path";
