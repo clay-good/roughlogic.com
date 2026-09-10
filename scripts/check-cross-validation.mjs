@@ -195,13 +195,32 @@ async function main() {
       );
     }
   }
+  // The count in docs/correctness.md row B. This was `if (statedChecks && ...)`
+  // against the WHOLE FILE until 2026-09-10, which is presence-not-truth twice
+  // over: DELETING the number turned the gate green (seeded and confirmed), and
+  // a `(N checks:` appearing anywhere else in the document would have been read
+  // as row B's. The claim is now REQUIRED, and required in the row that makes it.
   const correctness = await readFile(resolve(ROOT, "docs", "correctness.md"), "utf8");
-  const statedChecks = /\(([\d,]+) checks:/.exec(correctness);
-  if (statedChecks && Number(statedChecks[1].replace(/,/g, "")) !== toleranceCheckedCount) {
+  const rowB = correctness.split("\n").find((l) => l.startsWith("| B |"));
+  if (!rowB) {
     errors.push(
-      "docs/correctness.md says " + statedChecks[1] + " tolerance checks; this run made " +
-      toleranceCheckedCount + ".",
+      "docs/correctness.md has no row B. It is the row that states how many tolerance " +
+      "checks this gate makes, and without it that number is unguarded.",
     );
+  } else {
+    const statedChecks = /\(([\d,]+) checks:/.exec(rowB);
+    if (!statedChecks) {
+      errors.push(
+        "docs/correctness.md row B no longer states the tolerance-check count in its " +
+        "`(N checks:` phrase. This run made " + toleranceCheckedCount + ". Removing the " +
+        "claim is not a way to satisfy the gate that guards it.",
+      );
+    } else if (Number(statedChecks[1].replace(/,/g, "")) !== toleranceCheckedCount) {
+      errors.push(
+        "docs/correctness.md row B says " + statedChecks[1] + " tolerance checks; this run made " +
+        toleranceCheckedCount + ".",
+      );
+    }
   }
 
   if (errors.length > 0) {
