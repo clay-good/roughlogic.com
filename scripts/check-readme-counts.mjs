@@ -21,6 +21,7 @@
 // chain. Standalone Node 20, built-ins only.
 
 import { readFile, readdir } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { assertFullCatalogParse } from "./catalog-size.mjs";
@@ -129,6 +130,44 @@ function checkPattern(readme, re, expected, label, errors) {
     }
   }
   return found;
+}
+
+// Same as `checkPattern`, but the phrase must actually BE there. `checkPattern`
+// walks the matches it finds and says nothing when it finds none, so deleting
+// the sentence is a way to satisfy the gate that guards it -- the number stops
+// being wrong by ceasing to be stated. Every anchor below describes a figure
+// the README uses to say how far a guarantee reaches, which is precisely the
+// kind of claim that should not be allowed to quietly disappear.
+function checkPatternRequired(readme, re, expected, label, errors) {
+  const found = checkPattern(readme, re, expected, label, errors);
+  if (found === 0) {
+    const where = /\(([^)]+\.md)\)/.exec(label);
+    errors.push(
+      `${where ? where[1] : "README.md"}: the phrase stating the ${label.replace(/\s*\([^)]+\.md\)$/, "")} ` +
+      `is gone. It is anchored here so the figure cannot rot; if the sentence moved, move this anchor with it ` +
+      `rather than dropping the claim.`);
+  }
+  return found;
+}
+
+// Read a figure out of a gate's OWN summary line rather than recomputing it
+// here. A second implementation of the same count is the drift this gate
+// exists to catch: the README's trade-off table quoted six figures that were
+// hand-typed and had all rotted (1,731 tolerance checks against a live 3,431,
+// 1,875 registry ids against 2,082, 1,673/131 example-parity against
+// 1,797/285). Parsing the gate's output makes disagreement impossible by
+// construction. Each of these runs in well under a second and is already in
+// the lint chain, so the cost is a second process, not a second sweep.
+function gateFigure(script, re, label, args = []) {
+  let out;
+  try {
+    out = execFileSync("node", [resolve(ROOT, "scripts", script), ...args], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+  } catch (e) {
+    throw new Error(`check-readme-counts: could not run ${script} to derive ${label}: ${e && e.message}`);
+  }
+  const m = re.exec(out);
+  if (!m) throw new Error(`check-readme-counts: ${script} no longer prints the ${label} its summary line is parsed for. Update the pattern here and in the README together.`);
+  return Number(String(m[1]).replace(/,/g, ""));
 }
 
 // index.html states the exact tile count in two spots: the JSON-LD
@@ -401,6 +440,65 @@ async function main() {
   // Sitemap URL count: the build diagram node and the prose "carries N URLs".
   checked += checkPattern(readme, /sitemap\.xml\\n(\d+) URLs/g, live.sitemap, "sitemap URL count", errors);
   checked += checkPattern(readme, /carries (\d+) URLs/g, live.sitemap, "sitemap URL count", errors);
+
+  // ---- "Why you can trust the answers": the reach of each guarantee ----
+  //
+  // Every figure in that table says how FAR a gate's promise extends, which is
+  // the half a reader weighs. All six below were hand-typed and all six had
+  // rotted -- most of them frozen at a catalog size two campaigns old, and one
+  // ("Five take a named object parameter") describing a budget that had since
+  // been drained to zero. They are anchored to the gate that produces them.
+
+  // check-cross-validation: how many tolerance checks the ceiling polices.
+  const xvalChecks = gateFigure("check-cross-validation.mjs", /([\d,]+) tolerance check/, "tolerance-check count");
+  checked += checkPatternRequired(readme, /or carries a written justification \(([\d,]+) checks\)/g, xvalChecks, "cross-validation tolerance-check count", errors);
+
+  // check-example-parity: the static half and the browser-driven half, which
+  // must also add up to the catalog -- the README's old trio (1,673 + 131)
+  // summed to 1,804 while claiming to cover 1,875, so the arithmetic was the
+  // tell before any gate was consulted.
+  const parityRuntime = execFileSync("node", [resolve(ROOT, "scripts", "check-example-parity.mjs"), "--list-unresolved"], { encoding: "utf8" })
+    .split("\n").map((x) => x.trim()).filter(Boolean).length;
+  const parityStatic = live.tiles - parityRuntime;
+  checked += checkPatternRequired(readme, /\(([\d,]+) tiles statically;/g, parityStatic, "example-parity static tile count", errors);
+  checked += checkPatternRequired(readme, /the ([\d,]+) that declare theirs inline/g, parityRuntime, "example-parity runtime tile count", errors);
+  checked += checkPatternRequired(readme, /so the claim covers all ([\d,]+)\)/g, live.tiles, "example-parity total tile count", errors);
+
+  // check-dead-inputs: the computes the destructuring sweep actually reaches.
+  const deadInputComputes = gateFigure("check-dead-inputs.mjs", /([\d,]+) computes that destructure their inputs/, "destructuring-compute count");
+  checked += checkPatternRequired(readme, /across the ([\d,]+) computes that destructure their inputs/g, deadInputComputes, "destructuring-compute count", errors);
+
+  // check-tile-registries: the id count every full registry must hold.
+  checked += checkPatternRequired(readme, /names every registry that holds all ([\d,]+) ids/g, live.tiles, "registry id count", errors);
+
+  // NOT anchored here: the "N of them are first-principles" figure in the same
+  // table. `check-worked-examples` already holds that sentence to the registry,
+  // and it counts tiles whose worked examples are self-sourced in EVERY row --
+  // not, as a second implementation here first assumed, tiles with any such
+  // row. Two gates policing one sentence under two definitions is the drift
+  // this file exists to prevent, so that claim stays with its own gate.
+
+  // The lede splits the gate count into "the ones anyone can run" and
+  // `check-ngrams`, the only gate that needs a file this repository does not
+  // ship. Spelled out, so it escaped the numeric anchors above and drifted:
+  // it still read fifty-six/fifty-seventh at 59 gates.
+  // Two forms: the first number is cardinal ("Fifty-eight of them run"), the
+  // second ordinal ("the fifty-ninth, check-ngrams").
+  const CARDINALS = ["fifty-five", "fifty-six", "fifty-seven", "fifty-eight", "fifty-nine", "sixty", "sixty-one", "sixty-two"];
+  const ORDINALS = ["fifty-fifth", "fifty-sixth", "fifty-seventh", "fifty-eighth", "fifty-ninth", "sixtieth", "sixty-first", "sixty-second"];
+  const runnable = CARDINALS[live.gates - 1 - 55] || null;
+  const privateGate = ORDINALS[live.gates - 55] || null;
+  if (runnable && privateGate) {
+    const cap = (w) => w.charAt(0).toUpperCase() + w.slice(1);
+    const wanted = `${cap(runnable)} of them run for anyone who clones this repository; the ${privateGate}, \`check-ngrams\`,`;
+    if (!readme.includes(wanted)) {
+      errors.push(
+        `README.md: with ${live.gates} lint gates the trust-section lede should read ` +
+        `"${cap(runnable)} of them run for anyone who clones this repository; the ${privateGate}, \`check-ngrams\`," ` +
+        `-- check-ngrams is the only gate that skips without a file this repository does not ship.`);
+    }
+    checked += 1;
+  }
 
   if (errors.length) {
     console.error("check-readme-counts FAILED (live: " + JSON.stringify(live) + "):");

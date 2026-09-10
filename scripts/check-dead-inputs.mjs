@@ -95,6 +95,20 @@ function findings(source) {
   return out;
 }
 
+// How many computes the sweep above actually reached. README.md quotes this
+// number ("across the N computes that destructure their inputs") to say how
+// far the guarantee reaches, and a hand-typed count rots every time the
+// catalog grows -- it read 1,776 against a live 2,082. Same regex and same
+// zero-param skip as `findings`, so the two can never disagree.
+function sweptComputes(source) {
+  const re = /export\s+function\s+([A-Za-z0-9_$]+)\s*\(\s*\{([\s\S]*?)\}\s*(?:=\s*\{\}\s*)?\)\s*\{/g;
+  let m, n = 0;
+  while ((m = re.exec(source))) {
+    if (destructuredNames(m[2]).length > 0) n++;
+  }
+  return n;
+}
+
 async function main() {
   const files = (await readdir(ROOT)).filter((f) => /^calc-.*\.js$/.test(f) || f === "pure-math.js");
   files.sort();
@@ -118,10 +132,21 @@ async function main() {
   // `computeHudFmr(input)` -- is never matched, produces no error, and the old
   // summary said "58 modules swept", which reads as full coverage. Twenty-one
   // param-less reference computes are genuinely out of scope (no inputs, so
-  // none can be dead). Five take a real object of inputs this gate cannot see
-  // into, and that set is ratcheted: convert one to a destructured signature
-  // and lower the budget; adding a sixth is new unchecked surface.
-  const UNCHECKED_WITH_INPUTS = 4;
+  // none can be dead). The rest take a real object of inputs this gate cannot
+  // see into, and that set is ratcheted: convert one to a destructured
+  // signature and lower the budget; adding one back is new unchecked surface.
+  //
+  // Drained to 0 on 2026-09-10. The four that held this budget open --
+  // computeHudFmr, computeLoanLimits, computeRentalWorksheet and
+  // computePvPerformanceRatio -- were destructured, and the sibling gate
+  // `check-guard-only-inputs` lowered its own budget to 0 for exactly that
+  // reason. This one was left at 4 against a live count of 0, which is a
+  // budget that no longer guards anything: four computes could have gone back
+  // to an opaque parameter without failing a gate whose whole purpose is to
+  // notice that. It may not rise -- a compute that hides its inputs behind one
+  // opaque parameter is unreviewable here, in check-guard-only-inputs and in
+  // check-fixture-keys alike.
+  const UNCHECKED_WITH_INPUTS = 0;
   const namedParamComputes = [];
   for (const file of files) {
     const src = sources.get(file);
@@ -146,9 +171,12 @@ async function main() {
       `signature so a dead input is visible, or raise the budget deliberately.`);
     process.exit(1);
   }
+  let swept = 0;
+  for (const file of files) swept += sweptComputes(sources.get(file));
   console.log(
     `check-dead-inputs OK: no compute function destructures an input it never uses ` +
-    `(${files.length} modules swept). NOT checked here: ${namedParamComputes.length} ` +
+    `(${swept} computes that destructure their inputs, across ${files.length} modules swept). ` +
+    `NOT checked here: ${namedParamComputes.length} ` +
     `compute(s) take a named object parameter the destructuring scan cannot see into ` +
     `(budget ${UNCHECKED_WITH_INPUTS}) -- ${namedParamComputes.join(", ")}.`);
 }
