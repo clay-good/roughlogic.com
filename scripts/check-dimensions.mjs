@@ -773,6 +773,34 @@ async function main() {
     }
     checkPhrase(/([\d,]+) names are still declared two ways/, stillSplit.length,
       "count of names still declared two ways", "N names are still declared two ways");
+    // SECOND SURFACE. docs/correctness.md row C states the same three live
+    // numbers the README row does, and until 2026-09-10 nothing checked it at
+    // all -- the README row was guarded four ways and the document making the
+    // same claim was guarded none. Two surfaces saying one thing must agree, so
+    // they are held to the same anchors here.
+    const correctness = await readFile(resolve(ROOT, "docs", "correctness.md"), "utf8");
+    const cRow = correctness.split("\n").find((l) => l.startsWith("| C |"));
+    if (!cRow) {
+      errors.push("docs/correctness.md has no row C; the dimension-annotation claim it holds is unchecked.");
+    } else {
+      const cPhrase = (re, live, what, phrase) => {
+        const m = cRow.match(re);
+        const got = m ? Number(m[1].replace(/,/g, "")) : null;
+        if (got === live) return;
+        errors.push(
+          "docs/correctness.md row C does not state the live " + what + " (" +
+          live.toLocaleString("en-US") + ") in its `" + phrase + "` phrase; it says " +
+          (got === null ? "nothing there" : got.toLocaleString("en-US")) +
+          ". It and the README's check-dimensions row make the same claim and must agree.",
+        );
+      };
+      cPhrase(/\*\*([\d,]+) of them are stubs\*\*/, stubs.length,
+        "stub count", "**N of them are stubs**");
+      cPhrase(/holds for ([\d,]+),/, totalFunctions - stubs.length,
+        "count of functions that actually declare their inputs", "holds for N,");
+      cPhrase(/left ([\d,]+) names declared two ways/, stillSplit.length,
+        "count of names still declared two ways", "left N names declared two ways");
+    }
     if (!/annotat|declar/i.test(row)) {
       errors.push(
         "README.md's check-dimensions row does not say it checks a declaration. " +
