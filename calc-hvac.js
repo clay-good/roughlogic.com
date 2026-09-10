@@ -436,7 +436,7 @@ export function bandLabel(value, low, high) {
   return "normal";
 }
 
-// dims: in { args: dimensionless } out: { approach_F: T, delta_t_F: T, band: dimensionless }
+// dims: in { outdoor_F: T, condenser_saturation_F: T, supply_F: T, return_F: T, approach_normal_low: T, approach_normal_high: T, delta_T_normal_low: T, delta_T_normal_high: T } out: { approach_F: T, delta_t_F: T, band: dimensionless }
 export function computeApproachDeltaT({
   outdoor_F, condenser_saturation_F, supply_F, return_F,
   approach_normal_low = 5, approach_normal_high = 20,
@@ -569,7 +569,7 @@ export const wetBulbPsychrometerExample = {
 // 1.65 BTU/hr/ft^2/F (still air on a horizontal pipe, public engineering
 // reference value).
 
-// dims: in { args: dimensionless } out: { thickness_in: L, r_value: dimensionless }
+// dims: in { pipe_od_in: L, surface_temp_F: T, ambient_F: T, surface_limit_F: T, k_btu_in_per_hr_ft2_F: M L^2 T^-3, outside_film_coeff_btu_hr_ft2_F: M T^-3, at_thickness_in: L, alt_film_coeff_btu_hr_ft2_F: M T^-3 } out: { thickness_in: L, r_value: dimensionless }
 export function computeInsulationThickness({
   pipe_od_in, surface_temp_F, ambient_F, surface_limit_F, k_btu_in_per_hr_ft2_F,
   outside_film_coeff_btu_hr_ft2_F = 1.65,
@@ -1405,7 +1405,7 @@ export const beltAndPulleyExample = {
 // V_gal = (t_min * (C_demand_scfm - C_pump_scfm) * P_atm_psi) / (P1 - P2)
 // converted to gallons via 7.4805 gal per ft^3.
 
-// dims: in { args: dimensionless } out: { receiver_gal: L^3 }
+// dims: in { tools: dimensionless, pump_scfm: L^3 T^-1, p_high_psi: M L^-1 T^-2, p_low_psi: M L^-1 T^-2, drawdown_minutes: T, p_atm_psi: M L^-1 T^-2 } out: { receiver_gal: L^3 }
 export function computeAirReceiver({
   tools = [], pump_scfm = 0, p_high_psi = 0, p_low_psi = 0,
   drawdown_minutes = 1, p_atm_psi = 14.7,
@@ -1914,7 +1914,7 @@ function _frictionFactor(eps_ft, D_h_ft, Re) {
   return 0.25 / (denom * denom);
 }
 
-// dims: in { args: dimensionless } out: { total_static_in_wc: M L^-1 T^-2, friction_loss_in_wc: M L^-1 T^-2 }
+// dims: in { shape: dimensionless, D_in: L, W_in: L, H_in: L, material: dimensionless, cfm: L^3 T^-1, length_ft: L, fittings: dimensionless } out: { total_static_in_wc: M L^-1 T^-2, friction_loss_in_wc: M L^-1 T^-2 }
 export function computeDuctFrictionStatic({
   shape = "round", D_in = 0, W_in = 0, H_in = 0,
   material = "galv_smooth", cfm = 0, length_ft = 0, fittings = [],
@@ -2031,7 +2031,7 @@ function _filmCoeff(V_fpm, eps_jacket, T_surface_F, T_ambient_F) {
   return h_conv + h_rad;
 }
 
-// dims: in { args: dimensionless } out: { heat_loss_btuhr: M L^2 T^-3, surface_T_F: T }
+// dims: in { pipe_OD_in: L, surface_T_F: T, ambient_T_F: T, air_velocity_fpm: L T^-1, insulation: dimensionless, thickness_in: L, jacket_emissivity: dimensionless } out: { heat_loss_btuhr: M L^2 T^-3, surface_T_F: T }
 export function computeInsulationHeatLoss({
   pipe_OD_in = 0, surface_T_F = 0, ambient_T_F = 0,
   air_velocity_fpm = 0, insulation = "fiberglass",
@@ -2631,7 +2631,7 @@ function _v9_pressureAtAltitude_kPa(z_ft) {
   return 101.325 * Math.pow(1 - 2.25577e-5 * z_m, 5.2559);
 }
 
-// dims: in { args: dimensionless } out: { shr: dimensionless, latent_btuhr: M L^2 T^-3, sensible_btuhr: M L^2 T^-3 }
+// dims: in { total_capacity_btu_hr: M L^2 T^-3, return_db_F: T, return_wb_F: T, supply_db_F: T, cfm: L^3 T^-1, altitude_ft: L } out: { shr: dimensionless, latent_btuhr: M L^2 T^-3, sensible_btuhr: M L^2 T^-3 }
 export function computeSHRLatent({
   total_capacity_btu_hr = 0,
   return_db_F = 75,
@@ -4795,7 +4795,7 @@ HVAC_RENDERERS["economizer-enthalpy-changeover"] = _v443renderEconomizerEnthalpy
 // film, h (2 pi r2/12)(Tamb - Td), equals heat through the insulation, 2 pi k (Td - Tpipe)/ln(r2/r1).
 // LHS grows and RHS shrinks with r2, so the root is unique (critical-radius k/h ~ 0.16 in is far
 // below any real pipe). Dew point from the repo's pinned psychrometric functions.
-// dims: in { pipe_od_in: L, pipe_temp_F: T, ambient_F: T, ambient_rh_pct: dimensionless, k_btu_in_per_hr_ft2_F: dimensionless, outside_film_coeff_btu_hr_ft2_F: dimensionless } out: { dew_point_F: T, thickness_in: L, r2_in: L }
+// dims: in { pipe_od_in: L, pipe_temp_F: T, ambient_F: T, ambient_rh_pct: dimensionless, k_btu_in_per_hr_ft2_F: M L^2 T^-3, outside_film_coeff_btu_hr_ft2_F: M T^-3 } out: { dew_point_F: T, thickness_in: L, r2_in: L }
 export function computePipeInsulationForCondensation({ pipe_od_in = 0, pipe_temp_F = 40, ambient_F = 75, ambient_rh_pct = 50, k_btu_in_per_hr_ft2_F = 0.27, outside_film_coeff_btu_hr_ft2_F = 1.65 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const od = Number(pipe_od_in) || 0;

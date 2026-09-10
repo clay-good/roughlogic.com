@@ -46,7 +46,7 @@ const _finiteGuard = (o) => {
 
 // --- Utility 67: Solar PV String Sizing ---
 
-// dims: in { args: dimensionless } out: { max_series: dimensionless, min_series: dimensionless, cold_voc_V: M L^2 T^-3 I^-1, warm_vmp_V: M L^2 T^-3 I^-1 }
+// dims: in { module_voc_V: M L^2 T^-3 I^-1, module_vmp_V: M L^2 T^-3 I^-1, voc_temp_coeff_pct_per_C: T^-1, record_low_C: T, record_high_C: T, inverter_mppt_min_V: M L^2 T^-3 I^-1, inverter_mppt_max_V: M L^2 T^-3 I^-1, inverter_vdc_max_V: M L^2 T^-3 I^-1 } out: { max_series: dimensionless, min_series: dimensionless, cold_voc_V: M L^2 T^-3 I^-1, warm_vmp_V: M L^2 T^-3 I^-1 }
 export function computePVStringSizing({
   module_voc_V, module_vmp_V, voc_temp_coeff_pct_per_C,
   record_low_C, record_high_C,
@@ -344,7 +344,7 @@ export function renderPvInterconnectionBusbar(inputRegion, outputRegion, citatio
 // efficiency. LFP industry practice uses ~80% DoD; flooded lead-acid ~50%.
 // The manufacturer datasheet governs chemistry-specific derates.
 
-// dims: in { args: dimensionless } out: { usable_wh: M L^2 T^-3 T, nameplate_wh: M L^2 T^-3 T, nameplate_ah: I T }
+// dims: in { daily_load_wh: M L^2 T^-2, days_autonomy: T, dod_limit: dimensionless, system_voltage_v: M L^2 T^-3 I^-1, round_trip_efficiency: dimensionless, temperature_derate: dimensionless } out: { usable_wh: M L^2 T^-3 T, nameplate_wh: M L^2 T^-3 T, nameplate_ah: I T }
 export function computeOffGridBattery({
   daily_load_wh = 0,
   days_autonomy = 3,
@@ -1708,7 +1708,7 @@ function _v897renderPvBallastWeight(inputRegion, outputRegion, citationEl) {
 SOLAR_RENDERERS["pv-ballast-weight"] = _v897renderPvBallastWeight;
 
 // ===================== spec-v963: DC ammeter shunt sizing =====================
-// dims: in { args: dimensionless } out: { shunt_resistance_ohm: M L^2 T^-3 I^-2, measured_current_a: I, power_dissipation_w: M L^2 T^-3 }
+// dims: in { rated_current_a: I, rated_millivolt: M L^2 T^-3 I^-1, measured_millivolt: M L^2 T^-3 I^-1 } out: { shunt_resistance_ohm: M L^2 T^-3 I^-2, measured_current_a: I, power_dissipation_w: M L^2 T^-3 }
 export function computeDcShuntSizing({ rated_current_a = 100, rated_millivolt = 50, measured_millivolt = 25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rated_current_a > 0)) return { error: "Rated current must be positive (A)." };
@@ -1754,7 +1754,7 @@ function _v963renderDcShuntSizing(inputRegion, outputRegion, citationEl) {
 SOLAR_RENDERERS["dc-shunt-sizing"] = _v963renderDcShuntSizing;
 
 // ===================== spec-v968: EV range added per hour of charging =====================
-// dims: in { args: dimensionless } out: { range_added_mi_per_hr: dimensionless, hours_to_add_target: dimensionless }
+// dims: in { evse_power_kw: M L^2 T^-3, charge_efficiency: dimensionless, vehicle_efficiency_mi_per_kwh: M^-1 L^-1 T^2, target_range_mi: L } out: { range_added_mi_per_hr: L T^-1, hours_to_add_target: T }
 export function computeEvRangePerHour({ evse_power_kw = 7.7, charge_efficiency = 0.88, vehicle_efficiency_mi_per_kwh = 3.5, target_range_mi = 100 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(evse_power_kw > 0)) return { error: "EVSE power must be positive (kW)." };
@@ -1798,7 +1798,7 @@ function _v968renderEvRangePerHour(inputRegion, outputRegion, citationEl) {
 SOLAR_RENDERERS["ev-range-per-hour"] = _v968renderEvRangePerHour;
 
 // ===================== spec-v972: battery bank series/parallel configuration =====================
-// dims: in { args: dimensionless } out: { series_count: dimensionless, actual_bus_v: M L^2 T^-3 I^-1, total_ah: dimensionless, usable_kwh: M L^2 T^-2 }
+// dims: in { target_bus_v: M L^2 T^-3 I^-1, module_v: M L^2 T^-3 I^-1, module_ah: I T, parallel_strings: dimensionless, depth_of_discharge: dimensionless } out: { series_count: dimensionless, actual_bus_v: M L^2 T^-3 I^-1, total_ah: I T, usable_kwh: M L^2 T^-2 }
 export function computeBatterySeriesParallel({ target_bus_v = 48, module_v = 12.8, module_ah = 100, parallel_strings = 2, depth_of_discharge = 0.8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(target_bus_v > 0)) return { error: "Target bus voltage must be positive (V)." };
@@ -1853,7 +1853,7 @@ function _v972renderBatterySeriesParallel(inputRegion, outputRegion, citationEl)
 SOLAR_RENDERERS["battery-series-parallel"] = _v972renderBatterySeriesParallel;
 
 // ===================== spec-v983: bifacial PV rear-side gain =====================
-// dims: in { args: dimensionless } out: { bifacial_gain_pct: dimensionless, effective_power_w: M L^2 T^-3 }
+// dims: in { front_poa_wm2: M T^-3, rear_poa_wm2: M T^-3, bifaciality: dimensionless, front_power_w: M L^2 T^-3 } out: { bifacial_gain_pct: dimensionless, effective_power_w: M L^2 T^-3 }
 export function computeBifacialPvGain({ front_poa_wm2 = 1000, rear_poa_wm2 = 150, bifaciality = 0.75, front_power_w = 400 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(front_poa_wm2 > 0)) return { error: "Front plane-of-array irradiance must be positive (W/m^2)." };

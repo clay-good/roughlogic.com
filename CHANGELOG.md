@@ -797,6 +797,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
   The classification, the counts and the named four are now in the gate, in both of its messages and in the README's trust table. The budget still ratchets; what changed is that it no longer implies work that cannot be done.
 
+- **Stub annotations 82 -> 70: an amp-hour declared a pure number beside an amp-hour declared correctly.** The twelfth tranche is `calc-hvac.js` and `calc-solar.js`. `computeBatterySeriesParallel` calls its total amp-hours `dimensionless` while `computeOffGridBattery`, two functions away in the same file, has `nameplate_ah: I T`. `computeEvRangePerHour` declared the range it adds per hour, and the hours it takes to reach a target, as pure numbers -- one is a speed and the other is a time, and both were hidden from the tail rule by the `per` in the key.
+
+  Declaring a thermal conductivity and a film coefficient honestly failed the build in a third function: `computePipeInsulationForCondensation` had `k_btu_in_per_hr_ft2_F` and `outside_film_coeff_btu_hr_ft2_F` as `dimensionless`, where the corpus's own `film_coeff_btu_hr_ft2_f` is `M T^-3`. That is the fourth tranche running where naming a key was enough to break something else.
+
+  **`computeAffinityLaws` is left a stub, and it is the clearest case yet.** It takes a `target_value` beside a `target_kind` selector, and the fan laws mean that value is an rpm, a CFM, or a static pressure depending on the kind -- three different dimensions behind one parameter. The third function in the campaign whose fix is the input, not the comment.
+
 - **Stub annotations 97 -> 82, and an oil burner's whole output side was filler.** The eleventh tranche is `calc-refrigerant.js` and `calc-plumbing.js`. Declaring `input_btu_hr` in the water-heater pair put it against `calc-hvacservice`, where `computeOilBurnerFiringRate` declared **both** of its outputs `dimensionless` -- a fuel input in BTU/hr and a firing rate in gallons per hour. That function was itself an `args` stub, so it declared nothing at either end; it is drained here too. A third `_rate_` key hidden from the tail rule by the same `rate`-word exemption.
 
   `computeWaterHeaterRecovery` had the familiar shape: `input_kw: M L^2 T^-3` declared correctly beside `input_btu_hr` and `q_useful_btu_hr` as `dimensionless` -- the same quantity, three keys, two of them blank. And `computeTxvCapacityCheck` declared its installed capacity in refrigeration tons as a pure number while taking a nominal tonnage that is a power.
