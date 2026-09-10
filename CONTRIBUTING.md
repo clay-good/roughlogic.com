@@ -55,7 +55,7 @@ These are not preferences. A change that breaks one of them will fail a gate.
   from that source.
 - **A new calculator.** Read the "New tile" section of
   [docs/contributor-checklist.md](docs/contributor-checklist.md) first; a tile
-  touches about twenty files, and every one of those registries holds all 1,804
+  touches about twenty files, and every one of those registries holds all 2,082
   ids. Open an issue before building so the id and scope can be agreed.
 - **A bug in the site or the MCP server.** Issue with steps to reproduce, or a
   PR with a failing test that your change turns green.

@@ -74,7 +74,7 @@ in `styles.css` carries the dark palette; the light one is declared twice, at
 `:root[data-theme="light"]` for the in-page toggle and again under
 `@media (prefers-color-scheme: light)` for everyone else. On the SPA `theme.js`
 sets `data-theme` before first paint, from the stored preference or the system
-one. The 1,826 prerendered pages load no script at all, so the media query is
+one. The 2,104 prerendered pages load no script at all, so the media query is
 the only thing that reaches them -- and until 2026-09-02 there was none, which
 meant every static page rendered dark whatever the reader's system asked for,
 while its own `<meta name="color-scheme" content="dark light">` told the
@@ -261,7 +261,7 @@ is unchanged.
   printing its answer white on white paper.
 - Manual keyboard-only audit is part of the launch checklist.
 - Manual voice-input audit is part of the launch checklist.
-- The structural half of W3C validation is checked offline on all 1,826
+- The structural half of W3C validation is checked offline on all 2,104
   prerendered pages by `check-shells`: exactly one `<main>`, `<header>`,
   `<footer>`, `<h1>` and `<title>` each, and a `lang` on `<html>` -- the
   properties [launch-checklist.md](launch-checklist.md) names in that row.

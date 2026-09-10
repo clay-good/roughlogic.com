@@ -793,6 +793,20 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Five more live claims across four files, all frozen at a catalog two campaigns old.** Sweeping every catalog-scale number in the living docs against its live value, rather than waiting for each to be noticed:
+
+  | File | Claim | Said | Live |
+  |---|---|---|---|
+  | `CONTRIBUTING.md` | every registry "holds all N ids" | 1,804 | **2,082** |
+  | `docs/correctness.md` | dimension annotations present and parseable | 2,059 of 2,059 across 58 modules | **2,337 across 78** |
+  | `docs/accessibility.md` | prerendered pages that load no script | 1,826 | **2,104** |
+  | `docs/accessibility.md` | pages W3C-checked offline by `check-shells` | 1,826 | **2,104** |
+  | `docs/contributor-checklist.md` | shells `check:shell-mobile` drives at 320 px | 1,826 | **2,104** |
+
+  The `CONTRIBUTING.md` row is the same claim the README's `check-tile-registries` line makes, on the surface GitHub links from the Contribute panel; the README's copy was corrected earlier in this run and this one was not, because nothing was watching it. The three 1,826s are one arithmetic -- 1,804 tiles + 21 groups + the hub -- so they rotted together and were corrected together.
+
+  All five anchored, and each seeded. `check-readme-counts` now holds **73** label-anchored counts, up from 55 at the start of this run.
+
 - **Two more docs still described a 1,804-tile catalog.** `docs/performance.md` said the build emits "one static HTML shell per tile (`/tools/<id>/index.html`, **1,804 shells**)" -- a present-tense claim about what the build does, against a live **2,082**. `docs/correctness.md` stated the catalog size twice in the sentence explaining why a partial parse reads like a full one ("a sweep that covered 1,700 of 1,804 prints exactly what a sweep that covered all 1,804 prints"), which is the right argument over a stale number. Both corrected and anchored, along with the per-group shell count beside the first.
 
   The first anchor written for that line matched the *group* clause too -- "(`/groups/<slug>/index.html`, 21 shells)" is the very next phrase -- and compared 21 against the tile count. The gate caught it immediately, which is the argument for anchoring on a path rather than a shape.

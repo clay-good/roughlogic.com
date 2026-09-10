@@ -439,6 +439,32 @@ async function main() {
   // Module count: the file-tree line.
   checked += checkPattern(readme, /(\d+) per-group calculator modules/g, live.modules, "calc-* module count", errors);
 
+  const correctness = await readFile(resolve(ROOT, "docs", "correctness.md"), "utf8");
+  const a11yDoc = await readFile(resolve(ROOT, "docs", "accessibility.md"), "utf8");
+  const contributing = await readFile(resolve(ROOT, "CONTRIBUTING.md"), "utf8");
+
+  // CONTRIBUTING.md repeats the README's `check-tile-registries` claim -- "every
+  // one of those registries holds all N ids" -- on the surface GitHub links from
+  // the Contribute panel. The README's copy was corrected on 2026-09-10 and this
+  // one was not, because nothing was watching it: it still said 1,804.
+  checked += checkPattern(contributing, /registries holds all ([\d,]+)/g, live.tiles, "registry id count (CONTRIBUTING.md)", errors);
+
+  // The shell total again, on the two surfaces that describe what sweeps it.
+  // Both said 1,826 -- 1,804 tiles + 21 groups + the hub, the arithmetic of a
+  // catalog two campaigns old.
+  checked += checkPattern(a11yDoc, /The ([\d,]+) prerendered pages load no script/g, live.shells, "prerendered page count (docs/accessibility.md)", errors);
+  checked += checkPattern(a11yDoc, /checked offline on all ([\d,]+)/g, live.shells, "prerendered page count (docs/accessibility.md)", errors);
+  const checklist = await readFile(resolve(ROOT, "docs", "contributor-checklist.md"), "utf8");
+  checked += checkPattern(checklist, /([\d,]+) shells through a headless browser/g, live.shells, "shell count (docs/contributor-checklist.md)", errors);
+
+  // docs/correctness.md states the dimension-annotation coverage as a live
+  // fact. It read "2,059 of 2,059 across 58 modules" against 2,337 across 78.
+  // The function count comes from the gate that produces it; the module count
+  // is the calc-* modules plus pure-math.js, which that sweep also covers.
+  const dimsFns = gateFigure("check-dimensions.mjs", /([\d,]+) \/ [\d,]+ functions annotated/, "annotated-function count");
+  checked += checkPattern(correctness, /([\d,]+) of [\d,]+ across \d+ modules/g, dimsFns, "annotated-function count (docs/correctness.md)", errors);
+  checked += checkPattern(correctness, /[\d,]+ of [\d,]+ across (\d+) modules/g, live.modules + 1, "annotated-module count (docs/correctness.md)", errors);
+
   // docs/performance.md states the per-tile shell count as a live fact about
   // what the build emits, and docs/correctness.md states the catalog size twice
   // in the sentence explaining why a partial parse reads like a full one. Both
@@ -448,7 +474,6 @@ async function main() {
   // group count against the tile count.
   checked += checkPattern(perf, /\/tools\/<id>\/index\.html`, ([\d,]+) shells\)/g, live.tiles, "per-tile shell count (docs/performance.md)", errors);
   checked += checkPattern(perf, /\/groups\/<slug>\/index\.html`, ([\d,]+) shells\)/g, live.groups, "per-group shell count (docs/performance.md)", errors);
-  const correctness = await readFile(resolve(ROOT, "docs", "correctness.md"), "utf8");
   checked += checkPattern(correctness, /covered 1,700 of ([\d,]+) prints/g, live.tiles, "catalog size (docs/correctness.md)", errors);
   checked += checkPattern(correctness, /a sweep that covered all\n([\d,]+) prints/g, live.tiles, "catalog size (docs/correctness.md)", errors);
 
@@ -456,7 +481,6 @@ async function main() {
   // itself reads TOOLS at run time and auto-scales, so only the PROSE rots --
   // and it had, to 1,804, the catalog size two campaigns back. One route per
   // tile plus the home view.
-  const a11yDoc = await readFile(resolve(ROOT, "docs", "accessibility.md"), "utf8");
   checked += checkPattern(a11yDoc, /runs ([\d,]+) routes that are all SPA hash routes/g, live.tiles + 1, "axe route count (docs/accessibility.md)", errors);
 
   // The static-shell total, which THREE surfaces state and only two were
@@ -476,7 +500,6 @@ async function main() {
   // CONTRIBUTING.md tells a first-time contributor how much has to pass. It is
   // the same claim the README makes, on the surface GitHub links from the
   // "Contribute" panel, so it drifts the same way and is pinned the same way.
-  const contributing = await readFile(resolve(ROOT, "CONTRIBUTING.md"), "utf8");
   checked += checkPattern(contributing, /alone is (\d+) static gates/g, live.gates, "lint gate count (CONTRIBUTING.md)", errors);
 
   // Sitemap URL count: the prose "carries N URLs" (the build-diagram node is

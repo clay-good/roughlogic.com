@@ -109,7 +109,7 @@ dimension as a product / ratio expression.
 
 What the lint asserts is that the annotation is **present and
 parseable**, in the grammar above, for every exported function:
-2,059 of 2,059 across 58 modules, and a malformed annotation
+2,337 of 2,337 across 78 modules, and a malformed annotation
 fails the build. It does **not** evaluate whether the annotation
 is physically right, and it does not balance the inputs against
 the output -- doing that from source would need a CAS, which is
