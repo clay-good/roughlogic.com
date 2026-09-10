@@ -119,20 +119,46 @@ if (problems.length) {
 // count was printed and never pinned, so it could climb one tile at a time.
 // Ratchet it: fix a signature and lower the budget, add unchecked surface and
 // raise it deliberately.
+//
+// WHAT THE 30 ACTUALLY ARE (classified 2026-09-10; 28 functions, two of them
+// carrying two fixtures each). The budget is mostly a STRUCTURAL FLOOR, not a
+// backlog, and the earlier message -- "destructure the compute signature" --
+// was impossible advice for 21 of the 28:
+//
+//   21  take NO PARAMETER AT ALL: `computeColorCodes()`, `computeSmokeReading()`,
+//       `computeWaterReference()` and the rest of the reference tiles, which
+//       return a static table. There is nothing to destructure and nothing to
+//       compare a fixture key against; the `inputs` on those fixtures belong to
+//       the renderer's own controls. NOT drainable.
+//    3  dispatch on a SHAPE and take the dimensions as a rest param --
+//       `computeArea({ shape, ...dims })`, `computeGeometry`,
+//       `computeConcreteVolume`. Which keys are valid depends on the shape, so
+//       no single destructuring lists them. NOT drainable without an API change.
+//    4  take a SINGLE OPAQUE OBJECT and could be destructured today:
+//       `computeHudFmr(input)`, `computeLoanLimits(input)`,
+//       `computeRentalWorksheet(inputs)`, `computePvPerformanceRatio(inputs = {})`.
+//       These are the only drainable ones, and draining them is a signature
+//       change on live tiles, not a comment edit.
+//
+// So the floor is 26 fixtures. Lower the budget past that only by converting
+// one of those four.
 const SKIPPED_BUDGET = 30;
 if (skipped > SKIPPED_BUDGET) {
   console.error(
-    `check-fixture-keys FAILED: ${skipped} fixture(s) are unchecked (rest-param or ` +
-    `non-destructured signature), over a budget of ${SKIPPED_BUDGET}: ${skippedTiles.sort().join(", ")}. ` +
-    `Destructure the compute signature so its input keys are visible, or raise the budget deliberately.`);
+    `check-fixture-keys FAILED: ${skipped} fixture(s) are unchecked (the compute takes no parameter, ` +
+    `dispatches on a shape with a rest param, or takes a single opaque object), over a budget of ` +
+    `${SKIPPED_BUDGET}: ${skippedTiles.sort().join(", ")}. If the new one takes a single opaque object, ` +
+    `destructure it so its input keys are visible; a no-parameter reference tile cannot be checked here ` +
+    `at all, so raise the budget deliberately and say which kind it is.`);
   process.exit(1);
 }
 // The names go in the FAILURE message and behind --verbose, not into every
 // green run: thirty tile ids on a passing line is a wall in the CI log, and the
 // disclosure the summary owes a reader is the count and the budget.
 console.log(`check-fixture-keys OK: ${checked} fixture(s) checked; every input key matches a compute parameter. ` +
-  `NOT checked here: ${skipped} fixture(s) whose compute takes a rest param or a non-destructured signature ` +
-  `(budget ${SKIPPED_BUDGET}; --verbose lists them).`);
+  `NOT checked here: ${skipped} fixture(s) -- 21 reference tiles whose compute takes NO parameter, 3 that ` +
+  `dispatch on a shape through a rest param, and 4 that take a single opaque object and could be ` +
+  `destructured (budget ${SKIPPED_BUDGET}, structural floor 26; --verbose lists them).`);
 if (process.argv.includes("--verbose")) {
   console.log("  unchecked: " + skippedTiles.sort().join(", "));
 }
