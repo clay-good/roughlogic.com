@@ -534,7 +534,7 @@ export const salesTaxExample = { inputs: { pre_tax: 100, rate1_pct: 6, rate2_pct
 
 // --- 243: Inventory Turnover and Days Sales of Inventory ---
 
-// dims: in { cogs: dimensionless, beginning_inventory: dimensionless, ending_inventory: dimensionless, period_days: dimensionless, industry_key: dimensionless }
+// dims: in { cogs: dimensionless, beginning_inventory: dimensionless, ending_inventory: dimensionless, period_days: T, industry_key: dimensionless }
 //        out: { turnover: dimensionless, days_sales_of_inventory: dimensionless, average_inventory: dimensionless, comparison: dimensionless }
 // (Inventory turnover = COGS / avg inventory; DSI = period days /
 //  turnover. COGS and inventory balances are dimensionless dollar

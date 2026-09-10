@@ -480,7 +480,7 @@ function checkKeyAgreement(keyDims, errors) {
 const STUB_INPUT_NAMES = new Set(["args", "input", "opts", "options", "params", "o", "obj"]);
 
 // Lower this as stubs are drained. It may never rise.
-const STUB_BUDGET = 112;
+const STUB_BUDGET = 97;
 
 function isStubAnnotation(fn) {
   if (!fn.parse || !fn.parse.ok) return false;

@@ -852,7 +852,7 @@ export const IRRIGATION_EFFICIENCY_PCT = {
 
 const GAL_PER_ACRE_FT = 325851;
 
-// dims: in { args: dimensionless } out: { et_crop_in: L, gross_in: L, acre_ft: L^3, gallons: L^3 }
+// dims: in { crop: dimensionless, et_ref_in_per_day: L T^-1, period_days: T, area_acres: L^2, efficiency_pct: dimensionless, rainfall_in: L } out: { et_crop_in: L, gross_in: L, acre_ft: L^3, gallons: L^3 }
 export function computeIrrigationRequirement({
   crop = "corn",
   et_ref_in_per_day = 0,
@@ -966,7 +966,7 @@ export const ANIMAL_UNIT_EQUIV = {
 const AUM_LB_DM = 780;
 const AU_LB_DM_PER_DAY = 26;
 
-// dims: in { args: dimensionless } out: { available_forage_lb: M, aums_available: dimensionless, grazing_days: T }
+// dims: in { area_acres: L^2, forage_lb_per_acre: M L^-2, utilization_pct: dimensionless, animal_class: dimensionless, herd_size: dimensionless } out: { available_forage_lb: M, aums_available: dimensionless, grazing_days: T }
 export function computeStockingRate({
   area_acres = 0,
   forage_lb_per_acre = 0,
@@ -1344,7 +1344,7 @@ const NPK_DEFAULT_SOURCES = {
   mop_k_pct: 60,    // muriate of potash 0-0-60 (K source)
 };
 
-// dims: in { args: dimensionless } out: { rec_n_lb_per_acre: M L^-2, rec_p_lb_per_acre: M L^-2, rec_k_lb_per_acre: M L^-2, urea_lb_per_acre: M L^-2, dap_lb_per_acre: M L^-2, mop_lb_per_acre: M L^-2, urea_total_lb: M, dap_total_lb: M, mop_total_lb: M }
+// dims: in { crop: dimensionless, soil_n_lb_per_acre: M L^-2, soil_p_lb_per_acre: M L^-2, soil_k_lb_per_acre: M L^-2, area_acres: L^2, urea_n_pct: dimensionless, dap_n_pct: dimensionless, dap_p_pct: dimensionless, mop_k_pct: dimensionless, bag_weight_lb: M } out: { rec_n_lb_per_acre: M L^-2, rec_p_lb_per_acre: M L^-2, rec_k_lb_per_acre: M L^-2, urea_lb_per_acre: M L^-2, dap_lb_per_acre: M L^-2, mop_lb_per_acre: M L^-2, urea_total_lb: M, dap_total_lb: M, mop_total_lb: M }
 export function computeNpkBlend({
   crop = "corn",
   soil_n_lb_per_acre = 0,
@@ -3183,7 +3183,7 @@ function _v940renderAnhydrousAmmoniaRate(inputRegion, outputRegion, citationEl) 
 AGRICULTURE_RENDERERS["anhydrous-ammonia-rate"] = _v940renderAnhydrousAmmoniaRate;
 
 // ===================== spec-v964: available-water / MAD irrigation trigger =====================
-// dims: in { args: dimensionless } out: { taw_in: L, raw_in: L, irrigation_interval_days: dimensionless }
+// dims: in { field_capacity: dimensionless, wilting_point: dimensionless, root_depth_in: L, mad_fraction: dimensionless, etc_in_day: L T^-1 } out: { taw_in: L, raw_in: L, irrigation_interval_days: T }
 export function computeMadIrrigationTrigger({ field_capacity = 0.30, wilting_point = 0.12, root_depth_in = 24, mad_fraction = 0.5, etc_in_day = 0.25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(field_capacity > 0 && field_capacity < 1)) return { error: "Field capacity must be a fraction between 0 and 1 (in/in)." };
@@ -3234,7 +3234,7 @@ function _v964renderMadIrrigationTrigger(inputRegion, outputRegion, citationEl) 
 AGRICULTURE_RENDERERS["mad-irrigation-trigger"] = _v964renderMadIrrigationTrigger;
 
 // ===================== spec-v974: fertigation / chemigation injection rate =====================
-// dims: in { args: dimensionless } out: { total_product_gal: L^3, injection_rate_gph: dimensionless, injection_rate_gpm: dimensionless }
+// dims: in { product_rate_gal_per_acre: L, area_acres: L^2, set_time_hours: T } out: { total_product_gal: L^3, injection_rate_gph: L^3 T^-1, injection_rate_gpm: L^3 T^-1 }
 export function computeFertigationInjectionRate({ product_rate_gal_per_acre = 5, area_acres = 40, set_time_hours = 6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(product_rate_gal_per_acre > 0)) return { error: "Product rate must be positive (gal/acre)." };
@@ -3278,7 +3278,7 @@ function _v974renderFertigationInjectionRate(inputRegion, outputRegion, citation
 AGRICULTURE_RENDERERS["fertigation-injection-rate"] = _v974renderFertigationInjectionRate;
 
 // ===================== spec-v993: cattle live weight from heart girth =====================
-// dims: in { heart_girth_in: L, body_length_in: L } out: { live_weight_lb: dimensionless }
+// dims: in { heart_girth_in: L, body_length_in: L } out: { live_weight_lb: M }
 export function computeCattleHeartGirthWeight({ heart_girth_in = 70, body_length_in = 55 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(heart_girth_in > 0)) return { error: "Heart girth must be positive (in)." };
@@ -3309,7 +3309,7 @@ AGRICULTURE_RENDERERS["cattle-heart-girth-weight"] = _r({
 });
 
 // ===================== spec-v994: pre-harvest corn yield (yield component method) =====================
-// dims: in { args: dimensionless } out: { kernels_per_ear: dimensionless, bushels_per_acre: dimensionless }
+// dims: in { ears_per_thousandth_acre: dimensionless, kernel_rows_around: dimensionless, kernels_per_row: dimensionless, kernel_factor: dimensionless } out: { kernels_per_ear: dimensionless, bushels_per_acre: dimensionless }
 export function computeCornYieldEstimate({ ears_per_thousandth_acre = 32, kernel_rows_around = 16, kernels_per_row = 35, kernel_factor = 90 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(ears_per_thousandth_acre > 0)) return { error: "Ear count must be positive (ears in 1/1000 acre)." };
@@ -3347,7 +3347,7 @@ AGRICULTURE_RENDERERS["corn-yield-estimate"] = _r({
 });
 
 // ===================== spec-v995: carcass dressing percentage =====================
-// dims: in { args: dimensionless } out: { dressing_pct: dimensionless, boneless_yield_lb: dimensionless }
+// dims: in { live_weight_lb: M, hot_carcass_weight_lb: M, cutting_yield_pct: dimensionless } out: { dressing_pct: dimensionless, boneless_yield_lb: M }
 export function computeDressingPercentage({ live_weight_lb = 1200, hot_carcass_weight_lb = 744, cutting_yield_pct = 67 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(live_weight_lb > 0)) return { error: "Live weight must be positive (lb)." };

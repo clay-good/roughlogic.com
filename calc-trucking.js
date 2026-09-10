@@ -1955,7 +1955,7 @@ TRUCKING_RENDERERS["hydroplaning-speed"] = _simpleRenderer({
 // ===========================================================================
 
 // ===================== spec-v1377: minimum tiedown count =====================
-// dims: in { args: dimensionless } out: { min_tiedowns: dimensionless, required_wll_lb: M, provided_wll_lb: M }
+// dims: in { length_ft: L, weight_lb: M, tiedowns: dimensionless, wll_per_tiedown_lb: M, secured_both_ends: dimensionless } out: { min_tiedowns: dimensionless, required_wll_lb: M, provided_wll_lb: M }
 export function computeTiedownCount({ length_ft = 0, weight_lb = 0, tiedowns = 0, wll_per_tiedown_lb = 0, secured_both_ends = true } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(length_ft > 0)) return { error: "Article length must be positive." };
@@ -2080,7 +2080,7 @@ TRUCKING_RENDERERS["kingpin-to-axle"] = _simpleRenderer({
 });
 
 // ===================== spec-v1379: safe downgrade descent speed =====================
-// dims: in { args: dimensionless } out: { descent_power_hp: M L^2 T^-3, balance_speed_mph: L T^-1, service_brake_hp: M L^2 T^-3 }
+// dims: in { gcw_lb: M L T^-2, grade_pct: dimensionless, descent_speed_mph: L T^-1, engine_brake_hp: M L^2 T^-3 } out: { descent_power_hp: M L^2 T^-3, balance_speed_mph: L T^-1, service_brake_hp: M L^2 T^-3 }
 export function computeSafeDescentSpeed({ gcw_lb = 0, grade_pct = 0, descent_speed_mph = 0, engine_brake_hp = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(gcw_lb > 0)) return { error: "Gross combination weight must be positive." };
@@ -2132,7 +2132,7 @@ TRUCKING_RENDERERS["safe-descent-speed"] = _simpleRenderer({
 });
 
 // ===================== spec-v1380: air brake pushrod stroke screen =====================
-// dims: in { args: dimensionless } out: { margin_in: L, defective_fraction_pct: dimensionless }
+// dims: in { readjustment_limit_in: L, measured_stroke_in: L, defective_brakes: dimensionless, total_brakes: dimensionless } out: { margin_in: L, defective_fraction_pct: dimensionless }
 export function computeAirBrakePushrodStroke({ readjustment_limit_in = 2.0, measured_stroke_in = 0, defective_brakes = 0, total_brakes = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(readjustment_limit_in > 0)) return { error: "Readjustment limit must be positive." };
@@ -2182,7 +2182,7 @@ TRUCKING_RENDERERS["air-brake-pushrod-stroke"] = _simpleRenderer({
 });
 
 // ===================== spec-v1381: oversize / overweight permit threshold screen =====================
-// dims: in { args: dimensionless } out: { width_excess_ft: L, height_excess_ft: L, length_excess_ft: L, weight_excess_lb: M }
+// dims: in { width_ft: L, height_ft: L, length_ft: L, weight_lb: M L T^-2, width_limit_ft: L, height_limit_ft: L, length_limit_ft: L, weight_limit_lb: M L T^-2 } out: { width_excess_ft: L, height_excess_ft: L, length_excess_ft: L, weight_excess_lb: M L T^-2 }
 export function computeOversizePermitScreen({
   width_ft = 0, height_ft = 0, length_ft = 0, weight_lb = 0,
   width_limit_ft = 8.5, height_limit_ft = 13.5, length_limit_ft = 75, weight_limit_lb = 80000,
@@ -2245,7 +2245,7 @@ TRUCKING_RENDERERS["oversize-permit-screen"] = _simpleRenderer({
 });
 
 // ===================== spec-v1382: hazmat placarding threshold screen =====================
-// dims: in { args: dimensionless } out: { table2_aggregate_lb: M, threshold_met: dimensionless }
+// dims: in { materials: dimensionless, table1_present: dimensionless } out: { table2_aggregate_lb: M, threshold_met: dimensionless }
 export function computeHazmatPlacardThreshold({ materials = [], table1_present = false } = {}) {
   if (!Array.isArray(materials) || materials.length === 0) return { error: "List at least one hazardous material with its gross weight." };
   let table2_aggregate_lb = 0;
@@ -2343,7 +2343,7 @@ function renderHazmatPlacardThreshold(inputRegion, outputRegion, citationEl) {
 TRUCKING_RENDERERS["hazmat-placard-threshold"] = renderHazmatPlacardThreshold;
 
 // ===================== spec-v1383: idle fuel burn, cost, and engine-hour equivalent =====================
-// dims: in { args: dimensionless } out: { annual_idle_hours: T, annual_gallons: L^3, annual_cost: dimensionless, equivalent_miles: L }
+// dims: in { idle_hours_per_day: T, operating_days: T, idle_gph: L^3 T^-1, fuel_price: dimensionless, trucks: dimensionless, miles_per_engine_hour: L T^-1, fleet_annual_miles: L } out: { annual_idle_hours: T, annual_gallons: L^3, annual_cost: dimensionless, equivalent_miles: L }
 export function computeIdleFuelCost({ idle_hours_per_day = 0, operating_days = 0, idle_gph = 0.8, fuel_price = 0, trucks = 1, miles_per_engine_hour = 7, fleet_annual_miles = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(idle_hours_per_day > 0)) return { error: "Idle hours per day must be positive." };
@@ -2400,7 +2400,7 @@ TRUCKING_RENDERERS["idle-fuel-cost"] = _simpleRenderer({
 });
 
 // ===================== spec-v1384: flatbed tarp coverage, count, and weight =====================
-// dims: in { args: dimensionless } out: { width_needed_ft: L, tarps_needed: dimensionless, covered_length_ft: L, total_weight_lb: M }
+// dims: in { load_length_ft: L, load_width_ft: L, load_height_ft: L, tarp_length_ft: L, tarp_width_ft: L, overlap_ft: L, tuck_ft: L, tarp_weight_lb: M } out: { width_needed_ft: L, tarps_needed: dimensionless, covered_length_ft: L, total_weight_lb: M }
 export function computeFlatbedTarpSize({ load_length_ft = 0, load_width_ft = 0, load_height_ft = 0, tarp_length_ft = 0, tarp_width_ft = 0, overlap_ft = 0, tuck_ft = 1, tarp_weight_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(load_length_ft > 0 && load_width_ft > 0)) return { error: "Load length and width must be positive." };
@@ -2462,7 +2462,7 @@ TRUCKING_RENDERERS["flatbed-tarp-size"] = _simpleRenderer({
 });
 
 // ===================== spec-v1385: trailer deck point load and dunnage spread =====================
-// dims: in { args: dimensionless } out: { bearing_pressure_psf: M L^-1 T^-2, linear_load_plf: M L^-1, utilization_pct: dimensionless, required_length_ft: L }
+// dims: in { load_lb: M L T^-2, feet_count: dimensionless, foot_area_sqin: L^2, dunnage_bearing_ft: L, deck_rating_plf: M T^-2 } out: { bearing_pressure_psf: M L^-1 T^-2, linear_load_plf: M T^-2, utilization_pct: dimensionless, required_length_ft: L }
 export function computeDeckPointLoadDunnage({ load_lb = 0, feet_count = 4, foot_area_sqin = 0, dunnage_bearing_ft = 0, deck_rating_plf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(load_lb > 0)) return { error: "Concentrated load must be positive." };
