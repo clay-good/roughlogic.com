@@ -1874,7 +1874,7 @@ export function renderPearson(inputRegion, outputRegion, citationEl) {
 
 // --- spec-v17 Y.3 Chi-square goodness-of-fit -------------------------
 
-// dims: in { args: dimensionless } out: { chi_square: dimensionless, df: dimensionless, p_value: dimensionless }
+// dims: in { observed: dimensionless, expected_type: dimensionless, alpha: dimensionless } out: { chi_square: dimensionless, df: dimensionless, p_value: dimensionless }
 export function computeChiSquareGof({ observed, expected, expected_type = "counts", alpha = 0.05 }) {
   const obs = Array.isArray(observed) ? observed.filter(Number.isFinite) : parseNumberList(observed);
   const exp = Array.isArray(expected) ? expected.filter(Number.isFinite) : parseNumberList(expected);

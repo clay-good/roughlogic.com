@@ -346,6 +346,40 @@ function checkKeyAgreement(keyDims, errors) {
   return stillSplit;
 }
 
+// ---------------------------------------------------------------------------
+// Stub annotations (added 2026-09-10).
+//
+// `// dims: in { args: dimensionless }` parses. It satisfies every rule above.
+// It is also not an annotation: the function it sits on destructures a dozen
+// named inputs, and the line declares none of them. 241 functions carry one,
+// hiding roughly 1,960 named inputs, while this gate reported 100% coverage and
+// the README's trust table said every function "declares each input's ... SI
+// dimensions". For 241 of them that was false.
+//
+// These are NOT fixed here. Writing 1,960 dimensions in one pass is how the
+// filler got in: the two rules above exist because 273 hand-written entries were
+// wrong, and mass-producing another 1,960 unread would be the same mistake at
+// six times the scale. The count is pinned instead and RATCHETS DOWN -- a new
+// stub fails the build, and draining the list lowers the pin.
+//
+// 20 more functions take a single opaque argument and are not counted: there,
+// `args` is the honest name of what the function receives.
+// ---------------------------------------------------------------------------
+
+const STUB_INPUT_NAMES = new Set(["args", "input", "opts", "options", "params", "o", "obj"]);
+
+// Lower this as stubs are drained. It may never rise.
+const STUB_BUDGET = 232;
+
+function isStubAnnotation(fn) {
+  if (!fn.parse || !fn.parse.ok) return false;
+  if (fn.parse.inputs.length !== 1) return false;
+  if (!STUB_INPUT_NAMES.has(fn.parse.inputs[0].name)) return false;
+  // Only a stub if the function actually destructures named parameters. A
+  // function whose parameter really is one opaque object is described correctly.
+  return /^export\s+function\s+[A-Za-z_][A-Za-z0-9_]*\s*\(\s*\{/.test(fn.signature || "");
+}
+
 function checkUnitTails(module, fnName, parse, errors, counters) {
   for (const [side, list] of [["input", parse.inputs], ["output", parse.outputs]]) {
     for (const entry of list) {
@@ -425,7 +459,7 @@ function extractFunctionsAndAnnotations(source, modulePath) {
     }
     const annotation = annotationLines.join("\n");
     const parsed = parseDimsAnnotation(annotation);
-    out.push({ name, hasAnnotation: true, annotationText: annotation, parse: parsed, module: modulePath });
+    out.push({ name, hasAnnotation: true, annotationText: annotation, parse: parsed, module: modulePath, signature: line });
   }
   return out;
 }
@@ -441,6 +475,7 @@ async function main() {
   let annotated = 0;
   const tailCounters = { covered: 0, uncovered: 0, exempt: 0 };
   const keyDims = new Map();
+  const stubs = [];
   const errors = [];
   const missing = [];
   for (const rel of SOURCES) {
@@ -454,6 +489,7 @@ async function main() {
         if (!fn.parse.ok) {
           errors.push(rel + ": " + fn.name + ": " + fn.parse.message);
         } else {
+          if (isStubAnnotation(fn)) stubs.push(rel + ": " + fn.name);
           checkUnitTails(rel, fn.name, fn.parse, errors, tailCounters);
           for (const [side, list] of [["in", fn.parse.inputs], ["out", fn.parse.outputs]]) {
             for (const entry of list) {
@@ -503,6 +539,24 @@ async function main() {
   // annotation and fails a malformed one; a function may declare `out: L/T`,
   // compute something with dimensions of L/T^2, and pass. The docstring above has
   // always said so ("it does not verify floating-point math"); the README did not.
+  console.log(
+    "stub annotations: " + stubs.length + " function(s) declare a single opaque input " +
+    "(`args`) while destructuring named parameters -- an annotation that parses and says " +
+    "nothing. Budget " + STUB_BUDGET + "; this number may only go DOWN.",
+  );
+  if (stubs.length > STUB_BUDGET) {
+    for (const st of stubs.slice(0, 10)) errors.push("stub `// dims: in { args: ... }` on " + st + ", which destructures named parameters.");
+    errors.push(
+      "stub-annotation count rose to " + stubs.length + " against a budget of " + STUB_BUDGET +
+      ". Declare the function's real inputs; do not add another `args` stub.",
+    );
+  } else if (stubs.length < STUB_BUDGET) {
+    errors.push(
+      "stub-annotation count fell to " + stubs.length + " (budget " + STUB_BUDGET +
+      "). Lower STUB_BUDGET in this file to " + stubs.length + " so the ratchet holds.",
+    );
+  }
+
   const stillSplit = checkKeyAgreement(keyDims, errors);
   console.log(
     "key agreement: " + keyDims.size + " distinct key names, " + stillSplit.length +
@@ -540,6 +594,13 @@ async function main() {
         "README.md's check-dimensions row does not state the live unit-tail count (" +
         tailCounters.covered.toLocaleString("en-US") + "). Found: " +
         (stated.length ? stated.join(", ") : "no number at all") + ".",
+      );
+    }
+    if (!stated.includes(stubs.length)) {
+      errors.push(
+        "README.md's check-dimensions row does not state the live stub count (" +
+        stubs.length + "). The row claims every function declares its inputs; " +
+        stubs.length + " of them declare a single opaque `args` instead.",
       );
     }
     if (!stated.includes(stillSplit.length)) {

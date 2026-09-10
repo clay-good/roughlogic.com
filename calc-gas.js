@@ -615,7 +615,7 @@ function renderMedgasDemand(inputRegion, outputRegion, citationEl) {
 GAS_RENDERERS["medgas-demand"] = renderMedgasDemand;
 
 // ===================== spec-v977: Wobbe index (fuel-gas interchangeability) =====================
-// dims: in { args: dimensionless } out: { wobbe_index_btu_ft3: dimensionless }
+// dims: in { hhv_btu_ft3: M L^-1 T^-2, specific_gravity: dimensionless } out: { wobbe_index_btu_ft3: dimensionless }
 export function computeWobbeIndex({ hhv_btu_ft3 = 1000, specific_gravity = 0.60 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(hhv_btu_ft3 > 0)) return { error: "Higher heating value must be positive (BTU/ft^3)." };

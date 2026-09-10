@@ -3278,7 +3278,7 @@ function _v974renderFertigationInjectionRate(inputRegion, outputRegion, citation
 AGRICULTURE_RENDERERS["fertigation-injection-rate"] = _v974renderFertigationInjectionRate;
 
 // ===================== spec-v993: cattle live weight from heart girth =====================
-// dims: in { args: dimensionless } out: { live_weight_lb: dimensionless }
+// dims: in { heart_girth_in: L, body_length_in: L } out: { live_weight_lb: dimensionless }
 export function computeCattleHeartGirthWeight({ heart_girth_in = 70, body_length_in = 55 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(heart_girth_in > 0)) return { error: "Heart girth must be positive (in)." };

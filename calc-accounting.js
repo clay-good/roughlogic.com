@@ -659,7 +659,7 @@ const HOME_OFFICE_SIMPLIFIED_RATE = 5;   // $/ft^2
 const HOME_OFFICE_SIMPLIFIED_MAX_FT2 = 300;
 const HOME_OFFICE_SIMPLIFIED_CAP = 1500; // $5 x 300
 
-// dims: in { args: dimensionless } out: { simplified_deduction: dimensionless, actual_deduction: dimensionless, recommended_deduction: dimensionless, office_use_pct: dimensionless }
+// dims: in { office_ft2: L^2, home_ft2: L^2, total_home_expenses: dimensionless } out: { simplified_deduction: dimensionless, actual_deduction: dimensionless, recommended_deduction: dimensionless, office_use_pct: dimensionless }
 export function computeHomeOffice({
   office_ft2 = 0,
   home_ft2 = 0,

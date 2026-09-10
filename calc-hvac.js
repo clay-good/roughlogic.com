@@ -2324,7 +2324,7 @@ export const OA_OCCUPANCY_PRESETS = {
   retail:    { Rp: 7.5, Ra: 0.12, label: "Retail sales floor (ASHRAE 62.1-2022 placeholder)" },
 };
 
-// dims: in { args: dimensionless } out: { required_cfm: L^3 T^-1 }
+// dims: in { people: dimensionless, floor_area_ft2: L^2 } out: { required_cfm: L^3 T^-1 }
 export function computeOutdoorAirVentilation({
   Rp_cfm_per_person = 0,
   Ra_cfm_per_ft2 = 0,

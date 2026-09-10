@@ -1296,7 +1296,7 @@ function renderDpFlowSignalScaling(inputRegion, outputRegion, citationEl) {
 LOWVOLTAGE_RENDERERS["dp-flow-signal-scaling"] = renderDpFlowSignalScaling;
 
 // ===================== spec-v947: RTD (Pt100 / Pt1000) resistance to temperature =====================
-// dims: in { args: dimensionless } out: { temperature_c: T, temperature_f: T }
+// dims: in { resistance_ohms: M L^2 T^-3 I^-2, r0_ohms: M L^2 T^-3 I^-2, temperature_f: T } out: { temperature_c: T, temperature_f: T }
 export function computeRtdResistanceToTemp({ resistance_ohms = 119.397, r0_ohms = 100 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(resistance_ohms > 0)) return { error: "Measured resistance must be positive (ohms)." };

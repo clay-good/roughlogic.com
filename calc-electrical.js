@@ -2522,7 +2522,7 @@ import {
 // circuits whose breaker positions are listed in `swappable_pairs`, or
 // (if not supplied) between any two single-leg breakers across phases.
 
-// dims: in { args: dimensionless } out: { recommendations: dimensionless, imbalance_percent: dimensionless }
+// dims: in { circuits: dimensionless, swappable_pairs: dimensionless, lightPhase: dimensionless } out: { recommendations: dimensionless, imbalance_percent: dimensionless }
 export function computePanelRebalance({
   circuits = [],
   swappable_pairs = null,

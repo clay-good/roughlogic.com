@@ -1122,7 +1122,7 @@ HVACSERVICE_RENDERERS["oil-burner-firing-rate"] = _simpleRenderer({
 });
 
 // ===================== spec-v1004: natural-gas flue-gas water dew point =====================
-// dims: in { args: dimensionless } out: { water_vapor_pct: dimensionless, dew_point_f: T }
+// dims: in { excess_air_pct: dimensionless, dew_point_f: T, chimney: dimensionless } out: { water_vapor_pct: dimensionless, dew_point_f: T }
 export function computeFlueGasDewPoint({ excess_air_pct = 15 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(excess_air_pct >= 0)) return { error: "Excess air cannot be negative (percent)." };

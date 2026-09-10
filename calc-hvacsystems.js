@@ -1562,7 +1562,7 @@ function _v956renderHydronicInjectionMixing(inputRegion, outputRegion, citationE
 HVACSYSTEMS_RENDERERS["hydronic-injection-mixing"] = _v956renderHydronicInjectionMixing;
 
 // ===================== spec-v980: control valve authority =====================
-// dims: in { args: dimensionless } out: { valve_authority: dimensionless }
+// dims: in { valve_pressure_drop_psi: M L^-1 T^-2, controlled_circuit_drop_psi: M L^-1 T^-2, verdict: dimensionless } out: { valve_authority: dimensionless }
 export function computeValveAuthority({ valve_pressure_drop_psi = 5, controlled_circuit_drop_psi = 3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(valve_pressure_drop_psi > 0)) return { error: "Valve pressure drop (fully open) must be positive (psi)." };
