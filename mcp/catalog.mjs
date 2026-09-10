@@ -379,13 +379,81 @@ function wmmCoefficients() {
   return _wmmCoefficients;
 }
 
+const _wrapped = new WeakMap();
+
 // Keyed by compute export name, matching how compute-map wires a tile. The
 // wrapper's own destructure is what `describe` introspects, so the advertised
 // input names are exactly the names `run` honors -- `coefficients` is closed
 // over rather than declared, because it is the door's job to supply it and not
 // the caller's.
-const SHARD_COMPUTES = { computeMagneticDeclination: wrapMagneticDeclination };
-const _wrapped = new WeakMap();
+// The same argument for the two realestate lookups. `computeHudFmr` and
+// `computeLoanLimits` take a `shard` -- the FMR table and the FHFA/FHA/VA
+// county limits -- which the tile page fetches over HTTP and which no caller
+// of this door can hand over. Until 2026-09-10 they were computes taking one
+// opaque object, so `describe` advertised no inputs at all and the question
+// never came up; destructuring them made the door advertise `shard` as though
+// an agent could supply one, and `run` answered every request with
+// "HUD FMR shard not loaded."
+//
+// The door runs in Node, where the shard is a file. Same fix as the WMM
+// bundle: read it here and close over it, so the advertised inputs are the
+// four a caller can actually spell and the door fills the fifth itself.
+const SHARD_COMPUTES = {
+  computeMagneticDeclination: wrapMagneticDeclination,
+  computeHudFmr: wrapHudFmr,
+  computeLoanLimits: wrapLoanLimits,
+};
+
+const _realestateShards = new Map();
+function realestateShard(file) {
+  if (!_realestateShards.has(file)) {
+    try {
+      _realestateShards.set(file, JSON.parse(
+        readFileSync(new URL("../data/realestate/" + file, import.meta.url), "utf8"),
+      ));
+    } catch {
+      _realestateShards.set(file, null);
+    }
+  }
+  return _realestateShards.get(file);
+}
+
+// The wrapper's OWN DESTRUCTURE is what `describe` introspects, so each one
+// spells out its inputs rather than taking an opaque object -- a generic
+// `(args = {})` wrapper would work at run time and advertise nothing, which is
+// the half-fix: the door would answer correctly and still be unable to say what
+// to ask it.
+//
+// `shard` is DECLARED and DEFAULTED, not closed over the way the WMM bundle is.
+// Hiding it was tried first and broke two standing contracts worth keeping --
+// that `describe` names every key the tile's own worked example sets, and that
+// `run` warns on a key the compute cannot receive -- because the fixture
+// carries the whole table as an input, since the worked-example runner calls
+// the raw compute. Declaring it optional satisfies both: the door fills it, a
+// caller may still override it, and the tile answers either way.
+function wrapHudFmr(compute) {
+  let fn = _wrapped.get(compute);
+  if (fn) return fn;
+  fn = function computeHudFmr({ shard = null, state = "", fips = "", area_name = "" } = {}) {
+    const table = shard || realestateShard("hud-fmr.json");
+    if (!table) return { error: "HUD FMR shard not readable on this host." };
+    return compute({ shard: table, state, fips, area_name });
+  };
+  _wrapped.set(compute, fn);
+  return fn;
+}
+
+function wrapLoanLimits(compute) {
+  let fn = _wrapped.get(compute);
+  if (fn) return fn;
+  fn = function computeLoanLimits({ shard = null, state = "", county_fips = "", county_name = "" } = {}) {
+    const table = shard || realestateShard("loan-limits.json");
+    if (!table) return { error: "Loan-limits shard not readable on this host." };
+    return compute({ shard: table, state, county_fips, county_name });
+  };
+  _wrapped.set(compute, fn);
+  return fn;
+}
 
 function wrapMagneticDeclination(stub) {
   let fn = _wrapped.get(stub);
