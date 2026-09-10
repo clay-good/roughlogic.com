@@ -1379,7 +1379,7 @@ function _v948renderPulseFlowmeterRate(inputRegion, outputRegion, citationEl) {
 LOWVOLTAGE_RENDERERS["pulse-flowmeter-k-factor"] = _v948renderPulseFlowmeterRate;
 
 // ===================== spec-v949: loop-powered 2-wire 4-20 mA transmitter voltage budget =====================
-// dims: in { args: dimensionless } out: { max_loop_resistance_ohms: M L^2 T^-3 I^-2, voltage_at_transmitter_v: dimensionless, margin_v: M L^2 T^-3 I^-1, within_spec: dimensionless }
+// dims: in { args: dimensionless } out: { max_loop_resistance_ohms: M L^2 T^-3 I^-2, voltage_at_transmitter_v: M L^2 T^-3 I^-1, margin_v: M L^2 T^-3 I^-1, within_spec: dimensionless }
 export function computeLoopVoltageBudget({ supply_v = 24, transmitter_min_v = 10.5, load_resistance_ohms = 250, wire_resistance_ohms = 50 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(supply_v > 0)) return { error: "Loop supply voltage must be positive (Vdc)." };

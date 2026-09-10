@@ -462,7 +462,7 @@ ELECDESIGN_RENDERERS["neutral-grounding-resistor"] = _simpleRenderer({
 
 // ===================== spec-v558: tolerable step and touch voltage (IEEE Std 80) =====================
 
-// dims: in { clearing_time_s: T, surface_resistivity: dimensionless, native_resistivity: dimensionless, layer_thickness_m: L, body_weight: dimensionless } out: { cs: dimensionless, e_step_v: dimensionless, e_touch_v: dimensionless }
+// dims: in { clearing_time_s: T, surface_resistivity: dimensionless, native_resistivity: dimensionless, layer_thickness_m: L, body_weight: dimensionless } out: { cs: dimensionless, e_step_v: M L^2 T^-3 I^-1, e_touch_v: M L^2 T^-3 I^-1 }
 export function computeStepTouchVoltage({ clearing_time_s = 0, surface_resistivity = 0, native_resistivity = 0, layer_thickness_m = 0, body_weight = "50" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const ts = Number(clearing_time_s) || 0;
@@ -508,7 +508,7 @@ ELECDESIGN_RENDERERS["step-touch-voltage"] = _simpleRenderer({
 
 // ===================== spec-v610: ground potential rise screen (IEEE Std 80) =====================
 // GPR = grid_current * grid_resistance. safe_by_gpr = tolerable_touch > 0 && GPR <= tolerable_touch.
-// dims: in { grid_current_a: I, grid_resistance_ohm: M L^2 T^-3 I^-2, tolerable_touch_v: dimensionless } out: { gpr_v: dimensionless, safe_by_gpr: dimensionless, margin_v: M L^2 T^-3 I^-1 }
+// dims: in { grid_current_a: I, grid_resistance_ohm: M L^2 T^-3 I^-2, tolerable_touch_v: M L^2 T^-3 I^-1 } out: { gpr_v: M L^2 T^-3 I^-1, safe_by_gpr: dimensionless, margin_v: M L^2 T^-3 I^-1 }
 export function computeGroundPotentialRise({ grid_current_a = 0, grid_resistance_ohm = 0, tolerable_touch_v = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const ig = Number(grid_current_a) || 0;
@@ -548,7 +548,7 @@ ELECDESIGN_RENDERERS["ground-potential-rise"] = _simpleRenderer({
 // tile checks whether GPR = I_G x R_g clears the tolerable touch voltage; sizing
 // the grid resistance target to pass that screen is the inverse:
 // max_R_g = tolerable_touch_v / grid_current_a.
-// dims: in { tolerable_touch_v: dimensionless, grid_current_a: I } out: { max_grid_resistance_ohm: M L^2 T^-3 I^-2 }
+// dims: in { tolerable_touch_v: M L^2 T^-3 I^-1, grid_current_a: I } out: { max_grid_resistance_ohm: M L^2 T^-3 I^-2 }
 export function computeMaxGridResistanceForTouch({ tolerable_touch_v = 0, grid_current_a = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const et = Number(tolerable_touch_v) || 0;

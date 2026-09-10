@@ -479,7 +479,7 @@ export const osmolarityExample = { inputs: { concentration_mol_l: 0.154, vant_ho
 // The lab chemistry set has no electrochemistry member. This adds the Nernst equation
 // E = E0 - (RT/nF) ln Q, R = 8.314 J/(mol*K), F = 96485 C/mol; at 25 C the slope RT ln(10)/(nF) is
 // 0.05916/n V per decade of Q. Practical for battery, corrosion, and ion/pH-electrode work.
-// dims: in { standard_potential_v: dimensionless, electrons_n: dimensionless, reaction_quotient: dimensionless, temperature_c: T } out: { cell_potential_v: dimensionless, nernst_slope_v: dimensionless }
+// dims: in { standard_potential_v: M L^2 T^-3 I^-1, electrons_n: dimensionless, reaction_quotient: dimensionless, temperature_c: T } out: { cell_potential_v: M L^2 T^-3 I^-1, nernst_slope_v: M L^2 T^-3 I^-1 }
 export function computeNernstEquation({ standard_potential_v = 0, electrons_n = 1, reaction_quotient = 1, temperature_c = 25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const R = 8.314; // J/(mol*K)

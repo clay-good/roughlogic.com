@@ -793,6 +793,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Seventeen voltages and watts read `dimensionless`, including every output of the Nernst equation.** `_v` and `_w` are the two tails that buy the most and cost the most, because outside the electrical modules **`V` is a shear or a vertical component and `W` is a width, a web, a withdrawal or water** -- never a volt or a watt. Nine keys are exempted by name for exactly that: Cramer's V, the vertical components of the Coulomb and Mononobe-Okabe earth-pressure resultants, AISC's `omega_v` safety factor, a torsional shear force, `rho_w` (which is `As/(bw d)`, a web steel ratio), three wood withdrawal design forces, and the 16 of a 16:9 aspect ratio.
+
+  What that bought: `computeNernstEquation` declared its standard potential, its cell potential **and** its Nernst slope all `dimensionless` -- every electrical quantity in an electrochemistry tile. `computeStepTouchVoltage` declared both the step and touch voltages that way, and `computeGroundPotentialRise` did the same for the GPR and the tolerable touch voltage it is compared against, while declaring `margin_v` -- their difference -- correctly. Also a VFD reflected-wave peak and its insulation limit, a transformer's no-load and load losses, a DC bus voltage, a shunt's power dissipation, and a bifacial array's effective power.
+
+  Unit-tail coverage 5,838 -> 5,969 keys, up from 1,942 when the rule first landed.
+
 - **Twenty-two frequencies and resistances read `dimensionless`, and two whole functions declared nothing at all.** Adding `_hz`, `_ohm` and `_ohms` to the unit-tail rule caught every one, with **no false positive to exempt** -- a hertz is a hertz and an ohm is an ohm in every trade this catalog covers.
 
   **`computeBearingDefectFrequencies` declares its input `rpm: T^-1` correctly and then calls all five of its outputs `dimensionless`** -- the fundamental train frequency, ball pass outer and inner, the ball spin, and the shaft rate. They are computed *from* that rpm. **`computeRlcReactanceResonance` declared all four**: both reactances, the impedance, and the resonant frequency. Its input side was one of the `args` stubs, so it declared nothing at either end; it is drained here too (stub count 161 -> 160), which is what surfaced that its inductance is a henry, `M L^2 T^-2 I^-2`, and its capacitance a farad.

@@ -4977,7 +4977,7 @@ function _v471renderMotorEfficiencyUpgradeSavings(inputRegion, outputRegion, cit
 ELECTRICAL_RENDERERS["motor-efficiency-upgrade-savings"] = _v471renderMotorEfficiencyUpgradeSavings;
 
 // ===================== spec-v472: transformer loading efficiency and losses =====================
-// dims: in { kva_rating: dimensionless, noload_w: dimensionless, loadloss_w: dimensionless, load: dimensionless, pf: dimensionless } out: { output_kw: M L^2 T^-3, losses_kw: M L^2 T^-3, efficiency: dimensionless, max_eff_load: dimensionless }
+// dims: in { kva_rating: dimensionless, noload_w: M L^2 T^-3, loadloss_w: M L^2 T^-3, load: dimensionless, pf: dimensionless } out: { output_kw: M L^2 T^-3, losses_kw: M L^2 T^-3, efficiency: dimensionless, max_eff_load: dimensionless }
 export function computeTransformerLoadingEfficiency({ kva_rating = 0, noload_w = 0, loadloss_w = 0, load = 0, pf = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const kva = Number(kva_rating) || 0;

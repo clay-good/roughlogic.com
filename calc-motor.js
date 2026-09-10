@@ -570,7 +570,7 @@ MOTOR_RENDERERS["reduced-voltage-starter"] = renderReducedVoltageStarter;
 
 // --- spec-v557 A: VFD reflected-wave cable-length limit (NEMA MG-1 Part 31) ---
 // cable_velocity = 0.01 x velocity_pct x 984. L_crit = rise_time x cable_velocity / 2. V_peak doubles past L_crit.
-// dims: in { rise_time_us: T, velocity_pct: dimensionless, system_voltage_v: M L^2 T^-3 I^-1, run_length_ft: L } out: { l_crit_ft: L, v_peak_v: dimensionless, limit_invduty_v: dimensionless }
+// dims: in { rise_time_us: T, velocity_pct: dimensionless, system_voltage_v: M L^2 T^-3 I^-1, run_length_ft: L } out: { l_crit_ft: L, v_peak_v: M L^2 T^-3 I^-1, limit_invduty_v: M L^2 T^-3 I^-1 }
 export function computeVfdReflectedWave({ rise_time_us = 0, velocity_pct = 50, system_voltage_v = 0, run_length_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const rt = Number(rise_time_us) || 0;

@@ -155,6 +155,7 @@ function parseDimsAnnotation(text) {
 //   - length (ft, in, mi)             - force (lbf)
 //   - area (ft2, sf, in2, sqft, sqin) - volume (gal, gallons, ft3, cy, yd3)
 //   - frequency (hz)                  - resistance (ohm, ohms)
+//   - voltage (v)                     - power (w)
 //
 // NOT covered, and why -- each of these would produce a wrong verdict, so the
 // gate stays silent rather than flattering itself with coverage it lacks:
@@ -188,6 +189,7 @@ const UNIT_TAIL_DIMS = new Map(Object.entries({
   sqft: "L^2", sqin: "L^2",
   cy: "L^3", yd3: "L^3",
   hz: "T^-1", ohm: "M L^2 T^-3 I^-2", ohms: "M L^2 T^-3 I^-2",
+  v: "M L^2 T^-3 I^-1", w: "M L^2 T^-3",
 }));
 
 // A segment that, sitting directly in front of the tail, means the tail is the
@@ -255,6 +257,21 @@ const UNIT_TAIL_EXEMPT = new Set([
   // are ratios. The `_in` says what the numerator is measured in.
   "calc-shop.js:computeTaperCalc:tpi_in",
   "calc-shop.js:computeTaperCalc:tpf_in",
+  // `_v` and `_w` added 2026-09-10 buy the most and cost the most. Outside the
+  // electrical modules `V` is a SHEAR or a VERTICAL component and `W` is a
+  // width, a web, a withdrawal or water -- never a volt or a watt.
+  "calc-edu.js:computeChiSquareIndependence:cramers_v",      // Cramer's V, a statistic
+  "calc-geotech.js:computeSlopedBackfillEarthPressure:pa_v", // vertical component of Pa
+  "calc-geotech.js:computeCoulombEarthPressure:pa_v",        // vertical component of Pa
+  "calc-geotech.js:computeSeismicEarthPressure:pae_v",       // vertical component of Pae
+  "calc-geotech.js:computeRetainingWallStability:sum_v",     // the vertical force sum
+  "calc-steel.js:computeSteelBeamShear:omega_v",             // AISC Omega_v, a safety factor
+  "calc-steel.js:computeBoltGroupEccentric:tors_v",          // a torsional SHEAR force
+  "calc-concrete.js:computeRcOneWayShear:rho_w",             // As/(bw d), a WEB steel ratio
+  "calc-construction.js:computeWoodNailWithdrawal:z_w",      // a WITHDRAWAL design force
+  "calc-construction.js:computeWoodLagWithdrawal:z_w",       // a WITHDRAWAL design force
+  "calc-construction.js:computeWoodScrewWithdrawal:z_w",     // a WITHDRAWAL design force
+  "calc-stage.js:computeProjectorMaxScreenSize:aspect_w",    // the 16 of 16:9, a WIDTH
 ]);
 
 function canonicalDimension(expr) {
