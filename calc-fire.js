@@ -2500,7 +2500,7 @@ function _simpleRenderer(spec) {
 }
 
 // ===================== spec-v1388: PPV fan sizing and clearing time =====================
-// dims: in { args: dimensionless } out: { effective_cfm: L^3 T^-1, air_change_min: T, clearing_min: T, required_cfm: L^3 T^-1 }
+// dims: in { volume_cf: L^3, fan_cfm: L^3 T^-1, entrainment_efficiency: dimensionless, remaining_fraction: dimensionless, target_time_min: T } out: { effective_cfm: L^3 T^-1, air_change_min: T, clearing_min: T, required_cfm: L^3 T^-1 }
 export function computePpvFanSizing({ volume_cf = 0, fan_cfm = 0, entrainment_efficiency = 0.6, remaining_fraction = 0.10, target_time_min = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(volume_cf > 0)) return { error: "Structure volume must be positive." };
@@ -2550,7 +2550,7 @@ FIRE_RENDERERS["ppv-fan-sizing"] = _simpleRenderer({
 });
 
 // ===================== spec-v1389: hose lay section count, reach, and charged weight =====================
-// dims: in { args: dimensionless } out: { lay_length_ft: L, sections: dimensionless, actual_reach_ft: L, charged_weight_lb: M }
+// dims: in { map_distance_ft: L, slack_fraction: dimensionless, section_length_ft: L, hose_id_in: L, dry_weight_per_section_lb: M } out: { lay_length_ft: L, sections: dimensionless, actual_reach_ft: L, charged_weight_lb: M }
 export function computeHoseLaySectionCount({ map_distance_ft = 0, slack_fraction = 0.20, section_length_ft = 50, hose_id_in = 0, dry_weight_per_section_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(map_distance_ft > 0)) return { error: "Map distance must be positive." };
@@ -2606,7 +2606,7 @@ FIRE_RENDERERS["hose-lay-section-count"] = _simpleRenderer({
 });
 
 // ===================== spec-v1391: fire department connection supply check =====================
-// dims: in { args: dimensionless } out: { flow_per_line_gpm: L^3 T^-1, friction_loss_psi: M L^-1 T^-2, engine_pressure_psi: M L^-1 T^-2 }
+// dims: in { fdc_pressure_psi: M L^-1 T^-2, total_flow_gpm: L^3 T^-1, lines: dimensionless, line_length_ft: L, friction_coefficient: dimensionless, elevation_ft: L } out: { flow_per_line_gpm: L^3 T^-1, friction_loss_psi: M L^-1 T^-2, engine_pressure_psi: M L^-1 T^-2 }
 export function computeFdcSupplyCheck({ fdc_pressure_psi = 0, total_flow_gpm = 0, lines = 2, line_length_ft = 0, friction_coefficient = 0.677, elevation_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fdc_pressure_psi > 0)) return { error: "Pressure required at the connection must be positive." };
@@ -2664,7 +2664,7 @@ FIRE_RENDERERS["fdc-supply-check"] = _simpleRenderer({
 });
 
 // ===================== spec-v1392: radiant exposure separation distance =====================
-// dims: in { args: dimensionless } out: { radiated_power_kw: M L^2 T^-3, separation_m: L, separation_ft: L, flux_at_distance: dimensionless }
+// dims: in { heat_release_kw: M L^2 T^-3, radiative_fraction: dimensionless, target_flux_kwm2: M T^-3, evaluate_distance_ft: L } out: { radiated_power_kw: M L^2 T^-3, separation_m: L, separation_ft: L, flux_at_distance: M T^-3 }
 export function computeRadiantExposureSeparation({ heat_release_kw = 0, radiative_fraction = 0.3, target_flux_kwm2 = 12.6, evaluate_distance_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(heat_release_kw > 0)) return { error: "Fire heat release rate must be positive." };

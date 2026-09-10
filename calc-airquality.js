@@ -945,7 +945,7 @@ const _PG_SIGMA = {
   E: { ay: 50.5, by: 0.894, az: 22.8, bz: 0.678 },
   F: { ay: 34, by: 0.894, az: 14.35, bz: 0.740 },
 };
-// dims: in { args: dimensionless } out: { sigma_y_m: L, sigma_z_m: L, concentration_ug_m3: M L^-3, max_concentration_ug_m3: M L^-3, max_distance_km: L, effective_height_m: L }
+// dims: in { emission_rate_lb_hr: M T^-1, effective_height_ft: L, wind_mph: L T^-1, distance_mi: L, stability_class: dimensionless, alt_stability_class: dimensionless } out: { sigma_y_m: L, sigma_z_m: L, concentration_ug_m3: M L^-3, max_concentration_ug_m3: M L^-3, max_distance_km: L, effective_height_m: L }
 export function computeGaussianDispersionScreen({
   emission_rate_lb_hr = 0, effective_height_ft = 0, wind_mph = 0,
   distance_mi = 0, stability_class = "D", alt_stability_class = "",
@@ -1076,7 +1076,7 @@ AIRQUALITY_RENDERERS["gaussian-dispersion-screen"] = _simpleRenderer({
 // Speed of sound taken as 1,130 ft/s at room temperature, the standard
 // acoustics reference value.
 const _BARRIER_SPEED_OF_SOUND_FPS = 1130;
-// dims: in { args: dimensionless } out: { path_difference_ft: L, wavelength_ft: L, fresnel_number: dimensionless, insertion_loss_db: dimensionless }
+// dims: in { source_to_top_ft: L, top_to_receiver_ft: L, source_to_receiver_ft: L, path_difference_ft: L, frequency_hz: T^-1, second_frequency_hz: T^-1, practical_ceiling_db: dimensionless } out: { path_difference_ft: L, wavelength_ft: L, fresnel_number: dimensionless, insertion_loss_db: dimensionless }
 export function computeNoiseBarrierInsertionLoss({
   source_to_top_ft = 0, top_to_receiver_ft = 0, source_to_receiver_ft = 0,
   path_difference_ft = 0, frequency_hz = 0, second_frequency_hz = 0,
@@ -1167,7 +1167,7 @@ AIRQUALITY_RENDERERS["noise-barrier-insertion-loss"] = _simpleRenderer({
 // Ldn: day 7 a.m. to 10 p.m. unpenalized (15 h), night 10 p.m. to 7 a.m. +10 dB (9 h).
 // CNEL splits an evening 7 p.m. to 10 p.m. (3 h) carrying +4.77 dB.
 const _CNEL_EVENING_PENALTY_DB = 4.77;
-// dims: in { args: dimensionless } out: { ldn_db: dimensionless, cnel_db: dimensionless, leq24_db: dimensionless, night_moved_ldn_db: dimensionless }
+// dims: in { activity_level_db: dimensionless, activity_hours_day: T, activity_hours_evening: T, activity_hours_night: T, background_level_db: dimensionless, limit_ldn_db: dimensionless } out: { ldn_db: dimensionless, cnel_db: dimensionless, leq24_db: dimensionless, night_moved_ldn_db: dimensionless }
 export function computeCommunityNoiseLdn({
   activity_level_db = 0, activity_hours_day = 0, activity_hours_evening = 0, activity_hours_night = 0,
   background_level_db = 0, limit_ldn_db = 0,
@@ -1274,7 +1274,7 @@ AIRQUALITY_RENDERERS["community-noise-ldn"] = _simpleRenderer({
 });
 
 // ===================== spec-v1730: odour dilution to threshold =====================
-// dims: in { args: dimensionless } out: { odour_emission_rate_ou_s: T^-1, dt_at_receptor: dimensionless, required_source_dt: dimensionless, reduction_pct: dimensionless }
+// dims: in { source_dt: dimensionless, airflow_acfm: L^3 T^-1, dilution_factor: dimensionless, limit_dt: dimensionless, target_dt: dimensionless } out: { odour_emission_rate_ou_s: L^3 T^-1, dt_at_receptor: dimensionless, required_source_dt: dimensionless, reduction_pct: dimensionless }
 export function computeOdorDilutionThreshold({
   source_dt = 0, airflow_acfm = 0, dilution_factor = 0,
   limit_dt = 0, target_dt = 0,

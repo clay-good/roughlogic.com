@@ -1340,7 +1340,7 @@ function _v947renderRtdResistanceToTemp(inputRegion, outputRegion, citationEl) {
 LOWVOLTAGE_RENDERERS["rtd-resistance-to-temp"] = _v947renderRtdResistanceToTemp;
 
 // ===================== spec-v948: pulse (turbine/paddlewheel) flowmeter K-factor scaling =====================
-// dims: in { args: dimensionless } out: { flow_gpm: L^3 T^-1, flow_gph: L^3 T^-1 }
+// dims: in { frequency_hz: T^-1, k_factor_pulses_per_gal: L^-3 } out: { flow_gpm: L^3 T^-1, flow_gph: L^3 T^-1 }
 export function computePulseFlowmeterRate({ frequency_hz = 100, k_factor_pulses_per_gal = 200 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(frequency_hz >= 0)) return { error: "Pulse frequency cannot be negative (Hz)." };
@@ -1379,7 +1379,7 @@ function _v948renderPulseFlowmeterRate(inputRegion, outputRegion, citationEl) {
 LOWVOLTAGE_RENDERERS["pulse-flowmeter-k-factor"] = _v948renderPulseFlowmeterRate;
 
 // ===================== spec-v949: loop-powered 2-wire 4-20 mA transmitter voltage budget =====================
-// dims: in { args: dimensionless } out: { max_loop_resistance_ohms: M L^2 T^-3 I^-2, voltage_at_transmitter_v: M L^2 T^-3 I^-1, margin_v: M L^2 T^-3 I^-1, within_spec: dimensionless }
+// dims: in { supply_v: M L^2 T^-3 I^-1, transmitter_min_v: M L^2 T^-3 I^-1, load_resistance_ohms: M L^2 T^-3 I^-2, wire_resistance_ohms: M L^2 T^-3 I^-2 } out: { max_loop_resistance_ohms: M L^2 T^-3 I^-2, voltage_at_transmitter_v: M L^2 T^-3 I^-1, margin_v: M L^2 T^-3 I^-1, within_spec: dimensionless }
 export function computeLoopVoltageBudget({ supply_v = 24, transmitter_min_v = 10.5, load_resistance_ohms = 250, wire_resistance_ohms = 50 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(supply_v > 0)) return { error: "Loop supply voltage must be positive (Vdc)." };
@@ -1435,7 +1435,7 @@ function _v949renderLoopVoltageBudget(inputRegion, outputRegion, citationEl) {
 LOWVOLTAGE_RENDERERS["loop-voltage-budget"] = _v949renderLoopVoltageBudget;
 
 // ===================== spec-v950: NTC thermistor resistance to temperature (beta equation) =====================
-// dims: in { args: dimensionless } out: { temperature_c: T, temperature_f: T }
+// dims: in { resistance_ohms: M L^2 T^-3 I^-2, r0_ohms: M L^2 T^-3 I^-2, beta_k: T, ref_temp_c: T } out: { temperature_c: T, temperature_f: T }
 export function computeThermistorBetaTemp({ resistance_ohms = 10000, r0_ohms = 10000, beta_k = 3950, ref_temp_c = 25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(resistance_ohms > 0)) return { error: "Measured resistance must be positive (ohms)." };
@@ -1584,7 +1584,7 @@ function _v958renderDpLevelHydrostatic(inputRegion, outputRegion, citationEl) {
 LOWVOLTAGE_RENDERERS["dp-level-hydrostatic"] = _v958renderDpLevelHydrostatic;
 
 // ===================== spec-v961: Ziegler-Nichols closed-loop PID tuning =====================
-// dims: in { args: dimensionless } out: { pid_kp: dimensionless, pid_ti_sec: dimensionless, pid_td_sec: dimensionless, proportional_band_pct: dimensionless }
+// dims: in { ultimate_gain_ku: dimensionless, ultimate_period_tu_sec: T } out: { pid_kp: dimensionless, pid_ti_sec: T, pid_td_sec: T, proportional_band_pct: dimensionless }
 export function computePidTuningZieglerNichols({ ultimate_gain_ku = 4, ultimate_period_tu_sec = 2 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(ultimate_gain_ku > 0)) return { error: "Ultimate gain Ku must be positive." };
