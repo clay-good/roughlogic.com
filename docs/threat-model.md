@@ -58,6 +58,27 @@ Controls:
 - Until 2026-08-29 the second bullet was not true, though this document asserted it: nothing hashed a shard, so altering a data file while leaving its manifest alone produced no banner at all. Two shard folders (`search`, `fields`) were not anchored in data/integrity.json either, and all 46 of their recorded shard hashes were the placeholder string `"pending"` -- which satisfied check-manifests' "every listed shard has a recorded hash" while recording nothing. [scripts/check-integrity-coverage.mjs](../scripts/check-integrity-coverage.mjs) now fails the lint if any folder goes unanchored, any shard loses its hash, or any recorded hash stops matching the file, because verifyShard deliberately skips a shard with no recorded hash rather than accusing it.
 - There are **two** hash registries and they have to move together: the runtime `data/integrity.json` above, and the build's `scripts/expected-hashes.json`, which `npm run data:verify` checks. `data:verify` is a CI step and is not in the lint chain, so from 2026-09-05 check-integrity-coverage checks that registry too -- a stale entry in either now fails locally rather than forty minutes into a push. Both are re-stamped automatically by `scripts/stamp-integrity-anchor.mjs`, which `build-field-index.mjs` and `build-alias-shards.mjs` call after rewriting their manifests.
 
+- Runtime dependencies are zero, but the **dev** tree is not, and this section
+  had no position on it until 2026-09-09, when Dependabot opened a high-severity
+  advisory against `sharp` (libheif, GHSA-g89c-p67h-r497 / GHSA-2jg2-4ch7-h545).
+  The position: a dev-only advisory is fixed, not argued away, even when the
+  package is unreachable from anything this repository runs -- `sharp` arrives
+  as an *optional* dependency of `miniflare`, which arrives with `wrangler`,
+  which is used only to deploy the report Worker. No build, lint, test or CI
+  step loads it, and nothing here decodes a HEIF image. Upgrading `wrangler`
+  does not move it: `miniflare` pins `sharp` to an exact `0.35.2`, and still
+  does on its newest release, so the fix is an `overrides` pin to the patched
+  `0.35.4` in package.json. `npm audit` reports 0 vulnerabilities and `npm ci`
+  resolves the lockfile clean.
+- An override is a claim that something upstream is still wrong, and it outlives
+  its reason silently. [scripts/check-dependency-overrides.mjs](../scripts/check-dependency-overrides.mjs)
+  fails the lint when an entry in `overrides` no longer changes anything -- when
+  every dependent that asks for the package already asks for a version the
+  override would not alter -- so the pin is deleted when upstream catches up
+  rather than left behind as a second source of truth. It also fails when the
+  lockfile has drifted off the pinned version, which is what a stray
+  `npm install` would do.
+
 ### T3. Network exfiltration
 
 Threat: A bug or injected script attempts to exfiltrate user input or referrer information.
