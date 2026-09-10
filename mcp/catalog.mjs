@@ -1440,6 +1440,37 @@ export async function answerQuery({ query } = {}) {
 
   try {
     const out = await run({ id: top.id, inputs: coerceForCompute(filled, rows) });
+    // A hard bound the tile itself declares is the extractor's own error
+    // report. `run_calculator` keeps such a warning ADVISORY and still answers,
+    // and that is right there: the caller chose the value deliberately. Here
+    // nobody chose it -- this door pulled the number out of a sentence, and a
+    // value outside the field's declared min/max is the field saying the guess
+    // was wrong. Answering anyway produces a confident number nobody can tell
+    // is built on it.
+    //
+    // The curated phrase "generator voltage dip 30 percent limit" is the case:
+    // `dip_factor` runs 0 to 1, the extractor handed it the 30 out of "30
+    // percent", and the tile answered OK on a 3000% dip. Swept over every
+    // curated alias term carrying a digit -- 2,040 of them, 100 answered OK --
+    // that was the only one, so this refuses almost nothing and never a value a
+    // caller supplied.
+    const rejected = (out.warnings || []).filter(
+      (w) => w && (w.rule === "min" || w.rule === "max") && w.key in filled,
+    );
+    if (rejected.length) {
+      return {
+        status: "MISSING_INPUTS", query: q, id: top.id, name: top.name,
+        inputs: filled,
+        missing: rejected.map((w) => ({
+          key: w.key,
+          label: (rows.find((r) => r.d === w.key) || {}).l || w.key,
+          unit: (rows.find((r) => r.d === w.key) || {}).u || null,
+        })),
+        message: `"${top.name}" did not accept a value read from the question: ` +
+          rejected.map((w) => w.message).join(" ") +
+          " Send it to run_calculator directly if that value is intended.",
+      };
+    }
     return { ...out, status: "OK", query: q, name: top.name, via: "registry" };
   } catch (e) {
     return {

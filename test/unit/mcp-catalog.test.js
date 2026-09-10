@@ -355,6 +355,47 @@ test("a deterministic slice of the alias corpus reaches its tiles", async () => 
   assert.deepEqual(wrong, []);
 });
 
+// `run_calculator` keeps a range warning ADVISORY and answers anyway, which is
+// right there: the caller chose the value. This door did the same, and nobody
+// chose anything -- it pulled the number out of a sentence. A value outside a
+// bound the tile itself declares is the field reporting that the guess was
+// wrong, and answering on it produces a confident number nobody can tell is
+// built on it.
+//
+// The curated phrase "generator voltage dip 30 percent limit" is the case:
+// `dip_factor` runs 0 to 1, the extractor handed it the 30 out of "30 percent",
+// and the tile answered OK on a 3000% dip. Swept over all 2,040 curated terms
+// carrying a digit -- 100 answered OK -- it was the only one, so this refuses
+// almost nothing.
+test("the door does not answer on a value the tile's own bounds reject", async () => {
+  const { answerQuery, run } = await import("../../mcp/catalog.mjs");
+
+  const dip = await answerQuery({ query: "generator voltage dip 30 percent limit" });
+  assert.equal(dip.status, "MISSING_INPUTS");
+  assert.equal(dip.id, "generator-motor-starting");
+  assert.ok(dip.missing.some((m) => m.key === "dip_factor"), JSON.stringify(dip.missing));
+
+  // A negative length is only reachable from prose since the extractor learned
+  // to read a minus sign; it must not answer either.
+  const vd = await answerQuery({ query: "voltage drop 120v -150 ft 12 awg copper 20a" });
+  assert.equal(vd.status, "MISSING_INPUTS");
+  assert.ok(/below the field minimum/.test(vd.message), vd.message);
+
+  // The same question in bounds still answers, and states the right verdict.
+  const good = await answerQuery({ query: "voltage drop 120v 150 ft 12 awg copper 20a" });
+  assert.equal(good.status, "OK");
+  assert.equal(good.result.flag, "exceeds limit (>5%)");
+
+  // And a caller who means it is still served: run_calculator answers, with the
+  // warning advisory, exactly as its contract says.
+  const forced = await run({
+    id: "voltage-drop",
+    inputs: { phase: "single", material: "copper", awg: "10", length_ft: -150, current_A: 20, source_voltage_V: 240 },
+  });
+  assert.ok(Number.isFinite(forced.result.drop_V));
+  assert.equal(forced.warnings.length, 1);
+});
+
 // An id is not a phrasing, it is an ADDRESS: the one string the catalog
 // guarantees is unique, and the one an agent holds after `search_calculators`.
 // `describe_calculator` and `run_calculator` honour it exactly; `answer_query`

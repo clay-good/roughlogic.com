@@ -195,6 +195,18 @@ Reading the minus sign moved that corpus 5,211 -> 5,223 fields and 703 -> 707
 tiles fully recovered, still at 0 wrong values, and left `measure-ranking.mjs`
 byte-identical.
 
+`answer_query` also refuses a value it read out of the question that the tile's
+own field bounds reject. `run_calculator` keeps such a warning **advisory** and
+answers anyway, which is right there -- the caller chose the value. Here nobody
+chose it, so a number outside a declared min/max is the field reporting that the
+extraction was wrong, and answering on it yields a confident result no caller
+can tell is built on it. The curated phrase *"generator voltage dip 30 percent
+limit"* is the case: `dip_factor` runs 0 to 1, the extractor handed it the 30
+out of "30 percent", and the tile answered `OK` on a 3000% dip. It now returns
+`MISSING_INPUTS` naming `dip_factor`, and says to send the value to
+`run_calculator` directly if it was intended. Swept over all 2,040 curated terms
+carrying a digit (100 of which answer `OK`), that is the only one it refuses.
+
 A curated alias is the other kind of address, and it was reachable only if the
 ranker already agreed. `answer_query`'s rule for the alias corpus has always
 been *"a human wrote that phrase against that tile; nothing here outranks it"* --
