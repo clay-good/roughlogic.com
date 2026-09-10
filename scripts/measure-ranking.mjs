@@ -232,5 +232,19 @@ if (SHOW_MISSES) {
 } else {
   const total = Object.values(all).reduce((a, m) => a + m.length, 0);
   console.log(`\n${total} miss(es) across the three sets; re-run with --misses to list them.`);
+  // What this harness measures is `rankTools` ALONE, and no door calls it
+  // alone. Both compose it: the browser and mcp/catalog.mjs each resolve an
+  // exact ADDRESS -- a tile's own id, or a phrase a maintainer curated against
+  // it -- ahead of the ranker, via `promoteExactMatch` / the door's own
+  // evidence order. Every alias miss below is an exact curated term, so every
+  // one of them already reaches its tile in the dropdown and on the agent door.
+  // Read them as ranker headroom, not as broken lookups, and do not "fix" them
+  // by editing the alias corpus.
+  if (total) {
+    console.log(
+      "  Note: this is the ranker alone. Both doors resolve an exact id or curated term ahead of it,\n" +
+      "  so an exact-term miss here is still first in the dropdown. See promoteExactMatch in search-discovery.js.",
+    );
+  }
 }
 }

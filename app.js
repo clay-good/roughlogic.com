@@ -985,6 +985,21 @@ function bindSearch() {
   // through rankTools; null when the substring fallback answered. Feeds
   // the spec-v592 did-you-mean row and the answer preview.
   let lastRanked = null;
+
+  // An exact address -- a tile's own id, or a phrase curated against it --
+  // moves to the front; everything else keeps its order. See promoteExactMatch
+  // in search-discovery.js, which both doors call. `lastRanked.rows` is
+  // reordered with the list because the did-you-mean row and the answer
+  // preview read row 0.
+  let toolIdSet = null;
+  function promoteExact(q, ranked) {
+    if (!discovery.promoteExactMatch) return ranked;
+    return discovery.promoteExactMatch(q, ranked, TOOLS, aliasRows, {
+      limit: 12,
+      ids: (toolIdSet ||= new Set(TOOLS.map((t) => t.id))),
+    });
+  }
+
   function searchTools(query) {
     if (!searchReady) return [];
     lastRanked = null;
@@ -995,8 +1010,8 @@ function bindSearch() {
       if (tokens.length) {
         const ranked = discovery.rankTools(tokens, TOOLS, aliasRows, { limit: 12 });
         if (ranked.length) {
-          lastRanked = { rows: ranked, tokens };
-          return ranked.map((r) => r.tool);
+          lastRanked = { rows: promoteExact(q, ranked), tokens };
+          return lastRanked.rows.map((r) => r.tool);
         }
       }
       // The ranker declined -- a digit-led query carries no coverage. The

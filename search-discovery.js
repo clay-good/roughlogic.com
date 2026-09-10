@@ -63,6 +63,10 @@ export function resolveQuery(query, aliases, toolIds) {
   for (const row of aliases) {
     if (!row || typeof row !== "object") continue;
     if (typeof row.term !== "string" || typeof row.target !== "string") continue;
+    // Length first: the browser's ranked path calls this on every keystroke,
+    // and toLowerCase() allocates. This drops all but a handful of the 22,500
+    // rows before allocating anything.
+    if (row.term.length !== q.length) continue;
     if (row.term.toLowerCase() !== q) continue;
     if (ids.size > 0 && !ids.has(row.target)) continue;
     return { match: row.target, alias: row.term, kind: row.kind || "redirect" };
@@ -91,6 +95,30 @@ function toIdSet(toolIds) {
   if (toolIds instanceof Set) return toolIds;
   if (Array.isArray(toolIds)) return new Set(toolIds);
   return new Set();
+}
+
+// Promote an exact ADDRESS -- a tile's own id, or a phrase a maintainer curated
+// against it -- to the front of a ranked list, leaving the rest in order behind
+// it. `resolveQuery` always read one, but was reached only from
+// `fallbackSearch`, so the ranked path never consulted the curation: 3 of
+// 22,534 curated terms put their target nowhere in the browser's dropdown and
+// 58 more not first ("wire size" returned a machinist's thread-measuring wire).
+// Addition, not replacement. A curated term that is also another tile's exact
+// name goes to the curation, the call the agent door already made. Detail in
+// docs/architecture.md; mcp/catalog.mjs resolves the same two addresses.
+export function promoteExactMatch(query, ranked, tools, aliases, opts) {
+  const rows = Array.isArray(ranked) ? ranked : [];
+  const list = Array.isArray(tools) ? tools : [];
+  const cap = Number.isFinite(opts && opts.limit) ? Math.floor(opts.limit) : rows.length || 12;
+  const exact = resolveQuery(query, aliases, (opts && opts.ids) || list.map((t) => t.id));
+  if (!exact) return rows;
+  if (rows.length && rows[0].tool && rows[0].tool.id === exact.match) return rows;
+  const at = rows.findIndex((r) => r && r.tool && r.tool.id === exact.match);
+  if (at >= 0) return [rows[at], ...rows.slice(0, at), ...rows.slice(at + 1)];
+  const tool = list.find((t) => t && t.id === exact.match);
+  // No typo metadata: an exact address is not a correction, and the
+  // did-you-mean row reads row 0.
+  return tool ? [{ tool, score: Infinity }, ...rows].slice(0, cap) : rows;
 }
 
 // The one fallback both doors use when the ranker declines to answer.

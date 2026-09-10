@@ -20,6 +20,7 @@ import {
   TOKEN_SYNONYMS,
   extractQuantities,
   mapSlots,
+  promoteExactMatch,
 } from "../../search-discovery.js";
 import { search as mcpSearch } from "../../mcp/catalog.mjs";
 import { parseHashRoute } from "../../routing.js";
@@ -459,6 +460,57 @@ test("extractQuantities reads a minus sign, and still refuses a hyphen", () => {
   // change and still is: "type-4" names an enclosure, not a quantity of 4.
   assert.deepEqual(extractQuantities("type-4 enclosure"), []);
   assert.deepEqual(extractQuantities("2026-01-01"), [{ value: "2026", unit: null }]);
+});
+
+// `resolveQuery` reads an exact address -- a tile's own id, or a phrase a
+// maintainer curated against it -- and until 2026-09-10 it was reached only
+// from `fallbackSearch`, which the ranker declines into rarely. So on the
+// ranked path the curation was not read at all. Swept over all 22,534 curated
+// terms, three targets never appeared in the browser's twelve-row dropdown:
+// "how much can i build on my lot", "what size wire", "what size weld". A
+// further 58 appeared but not first -- "wire size" returned a machinist's
+// thread-measuring wire ahead of wire ampacity.
+test("promoteExactMatch moves an exact address to the front, keeping the rest", () => {
+  const TOOLS = [{ id: "a" }, { id: "b" }, { id: "c" }];
+  const ALIASES = [{ term: "curated phrase", target: "c", kind: "question" }];
+  const ranked = [{ tool: TOOLS[0], score: 9 }, { tool: TOOLS[1], score: 8 }, { tool: TOOLS[2], score: 1 }];
+
+  const moved = promoteExactMatch("curated phrase", ranked, TOOLS, ALIASES);
+  assert.deepEqual(moved.map((r) => r.tool.id), ["c", "a", "b"], "addition, not replacement");
+
+  // A tile the ranker never returned is inserted, and the list stays capped.
+  const short = [{ tool: TOOLS[0], score: 9 }, { tool: TOOLS[1], score: 8 }];
+  const added = promoteExactMatch("curated phrase", short, TOOLS, ALIASES, { limit: 2 });
+  assert.deepEqual(added.map((r) => r.tool.id), ["c", "a"]);
+  assert.equal(added[0].score, Infinity);
+
+  // A tile's own id is an address too.
+  assert.deepEqual(promoteExactMatch("b", ranked, TOOLS, ALIASES).map((r) => r.tool.id), ["b", "a", "c"]);
+
+  // Already first, or no address at all: the list is returned untouched.
+  assert.equal(promoteExactMatch("b", [{ tool: TOOLS[1] }], TOOLS, ALIASES).length, 1);
+  assert.deepEqual(promoteExactMatch("nothing curated", ranked, TOOLS, ALIASES), ranked);
+});
+
+test("the catalog's own curated phrases reach their tile on the browser path", async () => {
+  const { TOOLS } = await import("../../tools-data.js");
+  const raw = JSON.parse(await readFile(resolve(ROOT, "data/search/aliases.json"), "utf8"));
+  const aliases = raw.aliases;
+  const ids = new Set(TOOLS.map((t) => t.id));
+  // Exactly what app.js does on the ranked path.
+  const browser = (q) => {
+    const { tokens } = normalizeQuery(q);
+    const ranked = rankTools(tokens, TOOLS, aliases, { limit: 12 });
+    return promoteExactMatch(q, ranked, TOOLS, aliases, { limit: 12, ids }).map((r) => r.tool.id);
+  };
+  for (const [term, want] of [
+    ["how much can i build on my lot", "floor-area-ratio"],
+    ["what size wire", "min-conductor-for-vd"],
+    ["what size weld", "steel-fillet-weld-size"],
+    ["wire size", "wire-ampacity"],
+  ]) {
+    assert.equal(browser(term)[0], want, `${term} should reach ${want}`);
+  }
 });
 
 test("extractQuantities: an exponent is part of a unit, not a value", () => {
