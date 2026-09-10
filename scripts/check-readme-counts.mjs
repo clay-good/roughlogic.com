@@ -471,6 +471,12 @@ async function main() {
   checked += checkPattern(correctness, /([\d,]+) of [\d,]+ across \d+ modules/g, dimsFns, "annotated-function count (docs/correctness.md)", errors);
   checked += checkPattern(correctness, /[\d,]+ of [\d,]+ across (\d+) modules/g, live.modules + 1, "annotated-module count (docs/correctness.md)", errors);
 
+  // mcp/README.md quotes the query-fill corpus size in a fourth place. d073f51a
+  // refreshed the figures that had gone stale when the corpus moved and missed
+  // this one, which still read 1,763 -- the corpus size from 2026-09-01. It is
+  // the same population the field index covers, so it pins to the same value.
+  checked += checkPattern(mcpReadme, /Recovery across all ([\d,]+) tiles is/g, live.indexedTiles, "query-fill corpus size (mcp/README.md)", errors);
+
   // docs/seo.md quotes the home lede, describes the related-tiles registry's
   // coverage, and counts the catalog twice more in prose. It said 1,804 in all
   // four places -- including in a sentence whose whole point is that the string

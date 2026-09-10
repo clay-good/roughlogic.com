@@ -176,3 +176,12 @@ console.log(
   `  Reach: ${bounded_tiles} of ${numeric_tiles} calculator(s) with numeric inputs declare any bound ` +
   `(${(100 * (numeric_tiles - bounded_tiles) / numeric_tiles).toFixed(1)}% declare none, and cannot be probed here).`,
 );
+// The COMPLEMENT, spelled out, because that is the direction mcp/README.md
+// states it in ("N of the M calculators with numeric inputs declare none at
+// all") and a reader refreshing that sentence should not have to subtract.
+// It drifted by exactly one tile when `moisture-dry-goal` gained a min="0",
+// which is small enough that only printing the figure the doc quotes catches it.
+console.log(
+  `  mcp/README.md phrasing: ${numeric_tiles - bounded_tiles} of the ${numeric_tiles} calculators with ` +
+  `numeric inputs (${(100 * (numeric_tiles - bounded_tiles) / numeric_tiles).toFixed(1)}%) declare none at all.`,
+);

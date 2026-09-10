@@ -237,8 +237,8 @@ out of "30 percent", and the tile answered `OK` on a 3000% dip. It now returns
 `run_calculator` directly if it was intended. Swept over all 2,040 curated terms
 carrying a digit (100 of which answer `OK`), that is the only one it refuses.
 
-**How far that reaches.** It fires only where a bound is *declared*, and **1,166
-of the 2,053 calculators with numeric inputs (56.8%) declare none at all** --
+**How far that reaches.** It fires only where a bound is *declared*, and **1,165
+of the 2,053 calculators with numeric inputs (56.7%) declare none at all** --
 `ohms-law` has four unbounded numeric fields. On those tiles this guard,
 `run_calculator`'s range warnings, and `scripts/measure-verdict-bounds.mjs` are
 all silent, because there is no stated limit for a value to violate. That is a
@@ -335,7 +335,7 @@ a pipe size in inches is still a length among lengths and the case the phase
 was written for keeps filling, while `wire-ampacity` measures amps, degrees
 and counts and has no home for a distance. Same dimension, not same unit --
 narrowing it to the unit would have broken `pipe-volume`, whose size dropdown
-declares no unit in its label at all. Recovery across all 1,763 tiles is
+declares no unit in its label at all. Recovery across all 2,046 tiles is
 unchanged by that one.
 
 The two that remain are not fixed, and both are traced rather than mysterious.
