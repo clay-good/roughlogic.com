@@ -1289,7 +1289,7 @@ REFRIGERANT_RENDERERS["txv-capacity-check"] = _simpleRenderer({
 });
 
 // ===================== spec-v1414: evaporator defrost heat and cycle time =====================
-// dims: in { args: dimensionless } out: { sensible_btu: dimensionless, latent_btu: dimensionless, total_btu: M L^2 T^-2, defrost_min: T }
+// dims: in { args: dimensionless } out: { sensible_btu: M L^2 T^-2, latent_btu: M L^2 T^-2, total_btu: M L^2 T^-2, defrost_min: T }
 export function computeDefrostCycleSizing({ frost_lb = 0, coil_temp_f = -10, coil_mass_lb = 0, coil_specific_heat = 0.10, coil_temp_rise_f = 0, heater_btuh = 0, defrost_efficiency = 0.8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(frost_lb > 0)) return { error: "Frost mass per cycle must be positive." };

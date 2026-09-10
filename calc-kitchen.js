@@ -1353,7 +1353,7 @@ KITCHEN_RENDERERS["ice-machine-sizing"] = _r({
 });
 
 // ===================== spec-v1351: warewasher hot-water demand and booster sizing =====================
-// dims: in { rinse_gpm: L^3 T^-1, supply_temp_f: T, rinse_temp_f: T, racks_per_hour: dimensionless, gal_per_rack: L^3, booster_efficiency: dimensionless } out: { delta_t_f: T, booster_btuh: dimensionless, booster_kw: M L^2 T^-3, gas_input_btuh: dimensionless, hourly_hot_water_gal: L^3 }
+// dims: in { rinse_gpm: L^3 T^-1, supply_temp_f: T, rinse_temp_f: T, racks_per_hour: dimensionless, gal_per_rack: L^3, booster_efficiency: dimensionless } out: { delta_t_f: T, booster_btuh: M L^2 T^-3, booster_kw: M L^2 T^-3, gas_input_btuh: M L^2 T^-3, hourly_hot_water_gal: L^3 }
 export function computeWarewasherHotWater({ rinse_gpm = 0, supply_temp_f = 140, rinse_temp_f = 180, racks_per_hour = 0, gal_per_rack = 0, booster_efficiency = 0.8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rinse_gpm > 0)) return { error: "Final-rinse flow must be positive." };
@@ -1974,7 +1974,7 @@ KITCHEN_RENDERERS["tphc-window"] = _r({
 });
 
 // ===================== spec-v1362: steam kettle heat-up time and steam demand =====================
-// dims: in { gallons: L^3, specific_gravity: dimensionless, specific_heat: L^2 T^-2, start_temp_f: T, final_temp_f: T, rated_input_btuh: M L^2 T^-3, jacket_efficiency: dimensionless, latent_heat_btu_lb: L^2 T^-2 } out: { mass_lb: M, heat_btu: dimensionless, heatup_min: T, steam_per_batch_lb: M, steam_rate_lb_hr: M T^-1 }
+// dims: in { gallons: L^3, specific_gravity: dimensionless, specific_heat: L^2 T^-2, start_temp_f: T, final_temp_f: T, rated_input_btuh: M L^2 T^-3, jacket_efficiency: dimensionless, latent_heat_btu_lb: L^2 T^-2 } out: { mass_lb: M, heat_btu: M L^2 T^-2, heatup_min: T, steam_per_batch_lb: M, steam_rate_lb_hr: M T^-1 }
 export function computeSteamKettleHeatup({ gallons = 0, specific_gravity = 1.0, specific_heat = 1.0, start_temp_f = 60, final_temp_f = 200, rated_input_btuh = 0, jacket_efficiency = 0.85, latent_heat_btu_lb = 945.6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(gallons > 0)) return { error: "Kettle working volume must be positive." };
@@ -2033,7 +2033,7 @@ KITCHEN_RENDERERS["steam-kettle-heatup"] = _r({
 });
 
 // ===================== spec-v1363: hot-holding connected load, demand, and kitchen heat gain =====================
-// dims: in { equipment: dimensionless, diversity_factor: dimensionless, voltage: M L^2 T^-3 I^-1, phase: dimensionless } out: { connected_kw: M L^2 T^-3, demand_kw: M L^2 T^-3, demand_amps: I, sensible_btuh: dimensionless, tons: M }
+// dims: in { equipment: dimensionless, diversity_factor: dimensionless, voltage: M L^2 T^-3 I^-1, phase: dimensionless } out: { connected_kw: M L^2 T^-3, demand_kw: M L^2 T^-3, demand_amps: I, sensible_btuh: M L^2 T^-3, tons: M }
 export function computeHotHoldingEnergy({ equipment = [], diversity_factor = 0.65, voltage = 208, phase = "three" } = {}) {
   if (!Array.isArray(equipment) || equipment.length === 0) return { error: "List at least one piece of hot-holding equipment." };
   if (!(Number(diversity_factor) > 0 && Number(diversity_factor) <= 1)) return { error: "Diversity factor must be between 0 and 1." };

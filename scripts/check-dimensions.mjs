@@ -152,7 +152,7 @@ function parseDimsAnnotation(text) {
 //   - pressure (psi, psig, psia)      - volumetric flow (gpm, mgd, cfh, cfm, gph, cfs, gpd)
 //   - velocity (mph, fps, fpm)        - rotational speed (rpm)
 //   - volume (gal, gallons, ft3)      - area (ft2, sf, in2)
-//   - power (hp, kw, kva)
+//   - power (hp, kw, kva, btuh, btuhr)  - energy (btu)
 //
 // NOT covered, and why -- each of these would produce a wrong verdict, so the
 // gate stays silent rather than flattering itself with coverage it lacks:
@@ -180,6 +180,7 @@ const UNIT_TAIL_DIMS = new Map(Object.entries({
   gal: "L^3", gallons: "L^3", ft3: "L^3",
   ft2: "L^2", sf: "L^2", in2: "L^2",
   hp: "M L^2 T^-3", kw: "M L^2 T^-3", kva: "M L^2 T^-3",
+  btu: "M L^2 T^-2", btuh: "M L^2 T^-3", btuhr: "M L^2 T^-3",
 }));
 
 // A segment that, sitting directly in front of the tail, means the tail is the
@@ -199,11 +200,32 @@ const MONEY_OR_RATE = /(^|_)(usd|cost|price|rate|wage|fringe|rev|fee|daily|annua
 // proves it. `computeManureStorageVolume` and `computeManureCoverSavings` take
 // three per-day volumes alongside `daily_manure_ft3` and a `storage_days`
 // multiplier; the three that omit `daily_` are the same daily rate.
+//
+// The `btu` tail added 2026-09-10 has its own seven, and they are all one class:
+// the key drops a unit the sibling key still carries. A `_btu` that is divided
+// by an hour count, or multiplied by a BTU/hr-per-foot figure, is a BTU per
+// HOUR whatever the name says; a `_btu` that goes into `(h - 1061 w) / 0.240`
+// is a BTU per POUND. In each case the declaration is right and the NAME is
+// short, so renaming the key is the fix -- and each of these is a live field
+// key or output key, which puts it past a comment-line change.
 const UNIT_TAIL_EXEMPT = new Set([
   "calc-agriculture.js:computeManureStorageVolume:wastewater_ft3",
   "calc-agriculture.js:computeManureStorageVolume:bedding_ft3",
   "calc-agriculture.js:computeManureCoverSavings:wastewater_ft3",
   "calc-agriculture.js:computeManureCoverSavings:bedding_ft3",
+  // BTU/hr wearing a `_btu` name: divided by a BTU/hr-per-foot soil figure.
+  "calc-hvac.js:computeGeothermalLoop:heating_btu",
+  "calc-hvac.js:computeGeothermalLoop:cooling_btu",
+  // BTU/hr: sized against a minimum ON TIME, so it is a rate, not a quantity.
+  "calc-hvacsystems.js:computeHydronicBufferTank:zone_min_load_btu",
+  "calc-hvacsystems.js:computeBufferTankLoopCredit:zone_min_load_btu",
+  // BTU/hr: an energy divided by the target heat-up hours.
+  "calc-treatment.js:computePoolHeaterSize:required_output_btu",
+  // BTU per POUND of dry air: the specific enthalpy of the psychrometric chart,
+  // which the sibling `h1_btulb` spells out in full.
+  "calc-hvac.js:computeDrybulbFromEnthalpy:enthalpy_btu",
+  "calc-hvac.js:computeCoolingCoilTotalLoad:h_ent_btu",
+  "calc-hvac.js:computeCoolingCoilTotalLoad:h_lvg_btu",
 ]);
 
 function canonicalDimension(expr) {
