@@ -62,9 +62,10 @@ test("content is HTML-escaped, and an unrecognised shape renders nothing", () =>
 
 test("every page the builder treats as a reference renders rows", async () => {
   // The builder's own condition: no worked-example INPUTS, which is what makes
-  // a shell print no Example section. magnetic-declination advertises no
-  // fields but does carry an example, so it keeps its example and is not one
-  // of these.
+  // a shell print no Example section. magnetic-declination carries a
+  // build-time computed example, so it keeps its Example section and is not
+  // one of these -- and since 2026-09-09 it advertises its inputs on the MCP
+  // door too, so this set and the door's input-free set are the same 20.
   const catalog = await import("../../mcp/catalog.mjs");
   const { TOOLS } = await import("../../tools-data.js");
   const { loadWorkedExamples } = await import("../../scripts/build-shells.mjs");

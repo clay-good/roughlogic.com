@@ -18,7 +18,7 @@ would overwhelm a client's tool list):
 | `search_calculators` | Find calculators by keyword and/or trade. Call with no arguments for a trade overview with counts. |
 | `describe_calculator` | Input fields with labels, select options, units, and min/max; the outputs; a publisher-verified worked example; the cited source; and any limitation banner. |
 | `run_calculator` | Evaluate a calculator with your own inputs. Returns the raw result plus rendered outputs (units + display strings), range warnings, and the limitation banner. With no inputs, the worked example is run. |
-| `answer_query` | **Answer a plain-language question in one call.** Picks the calculator, extracts the values out of the question, and computes: `voltage drop 120v 150 ft 12 awg copper 20a` returns 11.85 V without a `describe` round trip. Returns `MISSING_INPUTS` naming what it still needs rather than a bare refusal, `NO_VALUES` when the question named a calculator that takes inputs but carried no numbers, and `NO_MATCH` otherwise. The 21 tiles that take no inputs at all -- OSHA Top-10, the knot and hand-signal references, the WMM model stamp -- answer from their own content with `via: "reference"`, since asking such a tile for values would point at an empty list. Reads the same `data/fields/` descriptors the website reads, so an agent and a person cannot disagree about what a tile needs. |
+| `answer_query` | **Answer a plain-language question in one call.** Picks the calculator, extracts the values out of the question, and computes: `voltage drop 120v 150 ft 12 awg copper 20a` returns 11.85 V without a `describe` round trip. Returns `MISSING_INPUTS` naming what it still needs rather than a bare refusal, `NO_VALUES` when the question named a calculator that takes inputs but carried no numbers, and `NO_MATCH` otherwise. The 20 tiles that take no inputs at all -- OSHA Top-10, the knot and hand-signal references, the GFCI/AFCI table -- answer from their own content with `via: "reference"`, since asking such a tile for values would point at an empty list. That set is exactly the 20 pages the site prerenders as reference cards, and it is arrived at independently on each side. Reads the same `data/fields/` descriptors the website reads, so an agent and a person cannot disagree about what a tile needs. |
 | `run_calculators` | Evaluate up to 50 `{ id, inputs }` calls in one request — for sweeps and comparisons. A bad item returns `{ id, error }` without failing the batch. |
 
 Typical flow: `search_calculators({query:"voltage drop", trade:"electrical"})`
@@ -44,6 +44,28 @@ The compute functions, their input shapes, and the example values are read
 straight from the repo (`tools-data.js`, `test/fixtures/compute-map.js`,
 `test/fixtures/worked-examples.json`), so the MCP surface can never drift from
 the site.
+
+One tile needs more than that wiring to keep the promise. `magnetic-declination`
+computes from the World Magnetic Model, whose coefficients are a data shard the
+browser fetches asynchronously; because the worked-example runner is
+synchronous, the tile's compute-map entry is a zero-argument **wiring stub**
+that returns the model's version stamp. That is the right contract for the
+runner and was the wrong one for this door, in three places at once: a compute
+with no parameters advertises no inputs, so `describe_calculator` named none of
+the four values the tile's own page asks for; `answer_query` reads that empty
+input list to decide a tile is a reference card, so *"magnetic declination at
+latitude 25.76 longitude -80.19"* came back `status: OK` carrying the string
+`"WMM-2025"`; and `run_calculator` spreads the caller's object into the compute,
+so a latitude and a longitude handed to a function that takes nothing were
+dropped in silence and that same stamp came back. The tile's own page had been
+printing 7.56 deg for Denver the whole time.
+
+This door runs in Node, where that shard is a file. It reads the same bundle the
+page reads and calls the same engine the page calls, so the two now agree by
+construction -- `run_calculator` on the page's own example returns 7.56 deg
+declination, 65.88 deg inclination, 51,095 nT and -0.080 deg/yr, which is what
+the page prints. With no coordinates the model stamp is still what comes back:
+that is the tile's reference content, and it is what a bare `run` should print.
 
 Input names come from the calculator's renderer schema where it has one, and
 otherwise from its compute signature. Where the signature cannot be read — a

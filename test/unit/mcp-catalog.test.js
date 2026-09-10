@@ -170,10 +170,18 @@ test("trade shorthand reaches the same tile on both doors", async () => {
   }
 });
 
-// 21 tiles take no inputs at all -- OSHA Top-10, the knot and hand-signal
-// references, the WMM model stamp. Their content is the answer, so a question
+// 20 tiles take no inputs at all -- OSHA Top-10, the knot and hand-signal
+// references, the GFCI/AFCI table. Their content is the answer, so a question
 // that names one carried nothing to extract and used to come back NO_VALUES
 // with "call describe_calculator for its inputs", pointing at an empty list.
+//
+// It was 21 until 2026-09-09, and the 21st was not a reference tile at all:
+// `magnetic-declination` looked input-free only because its compute-map entry
+// is a zero-argument wiring stub, so the door advertised none of the four
+// values its own page asks for and answered "declination at 25.76, -80.19"
+// with the string "WMM-2025". The door now reads the bundled coefficients and
+// runs the real model, so the tile advertises its inputs and leaves this set --
+// which is now exactly the 20 pages build-shells treats as reference pages.
 test("a tile with no inputs answers from its content, not NO_VALUES", async () => {
   const { answerQuery, describe } = await import("../../mcp/catalog.mjs");
   const out = await answerQuery({ query: "OSHA Top-10 Citations" });
@@ -192,7 +200,7 @@ test("every input-free tile answers when its own name is the question", async ()
   for (const t of TOOLS) {
     if (!(await describe({ id: t.id })).inputs.length) free.push(t);
   }
-  assert.equal(free.length, 21, `input-free population moved: ${free.map((t) => t.id)}`);
+  assert.equal(free.length, 20, `input-free population moved: ${free.map((t) => t.id)}`);
   const unanswered = [];
   for (const t of free) {
     // water-classes loses its own name to class-of-loss-screen, a tile that
@@ -205,12 +213,61 @@ test("every input-free tile answers when its own name is the question", async ()
   assert.deepEqual(unanswered, []);
 });
 
+// mcp/README.md states that the door's input-free set is "exactly the 20 pages
+// the site prerenders as reference cards, and it is arrived at independently on
+// each side". Two counts that agree are not two sets that agree, and the pair
+// was 21 against 20 until 2026-09-09 -- so compare the members, not the totals.
+// The door reads the compute's parameters; the builder reads the worked
+// example's inputs. Neither knows about the other.
+test("the door's input-free tiles are exactly the site's reference pages", async () => {
+  const { describe } = await import("../../mcp/catalog.mjs");
+  const { TOOLS } = await import("../../tools-data.js");
+  const { loadWorkedExamples } = await import("../../scripts/build-shells.mjs");
+  const examples = await loadWorkedExamples();
+  const doorFree = [];
+  for (const t of TOOLS) {
+    if (!(await describe({ id: t.id })).inputs.length) doorFree.push(t.id);
+  }
+  const shellRefs = TOOLS
+    .filter((t) => !examples.get(t.id) || !Object.keys(examples.get(t.id).inputs || {}).length)
+    .map((t) => t.id);
+  assert.deepEqual([...doorFree].sort(), [...shellRefs].sort());
+});
+
+// The substance of that fix: the two doors must not merely both answer, they
+// must answer the SAME. The page's example is computed at build time from the
+// bundled WMM coefficients (scripts/build-shells.mjs); the door computes from
+// the same shard through mcp/catalog.mjs. Nothing here is hard-coded -- when
+// the model is refreshed on the 2030 rollover, both sides move together, and a
+// change that moves only one of them fails.
+test("the MCP door and the tile page agree on the declination", async () => {
+  const { run } = await import("../../mcp/catalog.mjs");
+  const { loadWorkedExamples } = await import("../../scripts/build-shells.mjs");
+  const page = (await loadWorkedExamples()).get("magnetic-declination");
+  assert.ok(page && Object.keys(page.inputs || {}).length, "the page's example lost its inputs");
+
+  const door = await run({
+    id: "magnetic-declination",
+    inputs: {
+      lat_deg: page.inputs.lat_deg, lon_deg: page.inputs.lon_deg,
+      alt_km: page.inputs.alt_km, date_iso: page.inputs.date,
+    },
+  });
+  assert.deepEqual(door.warnings, [], "the page's own inputs must run warning-free");
+  // The page rounds for display; compare at the page's own precision.
+  const at = (key, digits) => Number(door.result[key].toFixed(digits));
+  assert.equal(at("declination_deg", 2), page.outputs.declination_deg.value);
+  assert.equal(at("inclination_deg", 2), page.outputs.inclination_deg.value);
+  assert.equal(Math.round(door.result.total_intensity_nT), page.outputs.total_intensity_nT.value);
+  assert.equal(at("annual_change_deg_yr", 3), page.outputs.annual_change_deg_yr.value);
+});
+
 // The other direction, which nothing checked: a tile that DOES take inputs must
 // never fall into the reference path. The branch used to test `!rows.length` --
 // the tile's field-INDEX rows -- and that is a different set from "has no
 // inputs": a tile with no renderer shard, or one whose inputs are list-valued,
 // projects no rows while having plenty of inputs. Measured 2026-09-02 the proxy
-// fired for 42 tiles when 21 qualify, and the 22 extra had their OWN DEFAULTS
+// fired for 42 tiles when 20 qualify, and the 22 extra had their OWN DEFAULTS
 // run and returned as status "OK". "Rent vs Buy NPV Comparison" answered a
 // question carrying no numbers with a $400,000 purchase price, $80,000 down and
 // 6.5% -- none of it supplied, none of it distinguishable by the agent from an

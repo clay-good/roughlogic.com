@@ -14,6 +14,10 @@
 // run() of a tile in that module, exactly as the worked-example runner does.
 
 import { readFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
+// The World Magnetic Model engine and its two helpers, imported by the
+// shard-backed compute below. Same functions the tile's renderer calls.
+import { computeWMM, computeBearingConversion, decimalYearFromIso } from "../calc-field.js";
 import { normalizeQuery, rankTools, fallbackSearch } from "../search-discovery.js";
 import { getLimitationCopy } from "../limitation-banner.js";
 // The shared result-key humanizer: the same fallback the static pages use, so
@@ -288,6 +292,104 @@ function validateSelects(schema, inputs) {
   return normalized;
 }
 
+// ---------------------------------------------------------------------------
+// Shard-backed computes: the one place a wiring stub reaches this door.
+//
+// `magnetic-declination` computes from the World Magnetic Model, whose
+// coefficients are a data shard the browser fetches asynchronously. The
+// worked-example runner is synchronous, so the tile's compute-map entry is a
+// zero-argument WIRING STUB (`computeMagneticDeclination`) that returns the
+// model's version stamp; numerical correctness is proven separately against
+// all 100 NCEI WMM2025 test vectors. That is the right contract for the
+// runner and the wrong one for this door, and the door paid for it three
+// times over:
+//
+//   * a stub with no parameters advertises no inputs, so
+//     `describe_calculator` named none of the four values the tile's own page
+//     asks for and reported the tile as having nothing to fill;
+//   * `answer_query` reads that empty input list to decide a tile is a
+//     reference card, so "magnetic declination at latitude 25.76 longitude
+//     -80.19" came back `status: OK, via: "reference"` carrying the string
+//     "WMM-2025" -- a confident non-answer to a question the curated alias
+//     "magnetic declination for my location" routes straight here;
+//   * `run_calculator` spreads the caller's object into the compute, so a
+//     latitude and a longitude handed to a function that takes nothing were
+//     dropped in silence and the same stamp came back.
+//
+// Meanwhile the tile's own page has been printing 7.56 deg for Denver the
+// whole time -- the exact drift between the two doors that this module's
+// header promises cannot happen.
+//
+// The door runs in Node, where the shard is a file. It reads the same bundle
+// the page reads and calls the same engine the page calls (`computeWMM`), so
+// the two agree by construction. With no coordinates the stub's model stamp
+// is still what comes back: that is the tile's reference content, and it is
+// what a bare `run` -- which falls back to a worked example whose inputs are
+// empty -- should print.
+const WMM_SHARD_URL = new URL("../data/field/wmm/coefficients.json", import.meta.url);
+let _wmmCoefficients;
+function wmmCoefficients() {
+  if (_wmmCoefficients === undefined) {
+    try {
+      _wmmCoefficients = JSON.parse(readFileSync(WMM_SHARD_URL, "utf8"));
+    } catch {
+      _wmmCoefficients = null;
+    }
+  }
+  return _wmmCoefficients;
+}
+
+// Keyed by compute export name, matching how compute-map wires a tile. The
+// wrapper's own destructure is what `describe` introspects, so the advertised
+// input names are exactly the names `run` honors -- `coefficients` is closed
+// over rather than declared, because it is the door's job to supply it and not
+// the caller's.
+const SHARD_COMPUTES = { computeMagneticDeclination: wrapMagneticDeclination };
+const _wrapped = new WeakMap();
+
+function wrapMagneticDeclination(stub) {
+  let fn = _wrapped.get(stub);
+  if (fn) return fn;
+  fn = function computeMagneticDeclination({
+    lat_deg, lon_deg, alt_km = 0, date_iso, bearing_deg, direction = "magnetic_to_true",
+  } = {}) {
+    const stamp = stub();
+    const coefficients = wmmCoefficients();
+    // No location is not an error: it is the reference question ("which model
+    // is bundled?"), and the stamp answers it. A location the model cannot be
+    // read for is an error, named rather than papered over with the stamp.
+    if (!Number.isFinite(lat_deg) || !Number.isFinite(lon_deg)) return stamp;
+    if (!coefficients) return { ...stamp, error: "WMM coefficient bundle not readable." };
+    const iso = date_iso || new Date().toISOString().slice(0, 10);
+    const decimal_year = decimalYearFromIso(iso);
+    if (!Number.isFinite(decimal_year)) return { ...stamp, error: "Date must be YYYY-MM-DD." };
+    const r = computeWMM({ lat_deg, lon_deg, alt_km: alt_km || 0, decimal_year, coefficients });
+    if (!r || r.error) return { ...stamp, error: r ? r.error : "WMM evaluation failed." };
+    const out = {
+      ...stamp,
+      declination_deg: r.D,
+      inclination_deg: r.I,
+      horizontal_intensity_nT: r.H,
+      total_intensity_nT: r.F,
+      annual_change_deg_yr: r.dD,
+      // The epoch the model was evaluated at. Echoed because it is the one
+      // answer the caller may not have supplied: with no date the door uses
+      // today, and a WMM result means nothing without the date it is for.
+      evaluated_date: iso,
+      // The page prints this line as "Model status"; WMM2025 is valid
+      // 2025-2030 and a date outside that window is extrapolated, not refused.
+      in_validity_window: decimal_year >= 2025 && decimal_year < 2030,
+    };
+    if (Number.isFinite(bearing_deg)) {
+      const conv = computeBearingConversion({ declination_deg: r.D, bearing_deg, direction });
+      if (!conv.error) out.converted_bearing_deg = conv.result_deg;
+    }
+    return out;
+  };
+  _wrapped.set(stub, fn);
+  return fn;
+}
+
 // Resolve and import the calc module for a wired tile, caching by URL.
 async function importCompute(reg, modCache) {
   const url = new URL(reg.module, COMPUTE_MAP_URL).href;
@@ -300,7 +402,8 @@ async function importCompute(reg, modCache) {
   if (typeof fn !== "function") {
     throw new Error(`compute export not found: ${reg.fn} in ${reg.module}`);
   }
-  return fn;
+  const wrap = SHARD_COMPUTES[reg.fn];
+  return wrap ? wrap(fn) : fn;
 }
 
 // Strip `//` and `/* */` comments, leaving string literals alone. A compute's
