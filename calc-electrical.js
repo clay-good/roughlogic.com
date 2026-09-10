@@ -2147,7 +2147,7 @@ export const NEMA_MG1_CODE_LETTERS = {
 
 const GENERATOR_KW_STEPS = [15, 22, 35, 50, 60, 80, 100, 125, 150, 175, 200, 230, 275, 300, 400, 500, 600, 750, 1000];
 
-// dims: in { args: dimensionless } out: { starting_kva: M L^2 T^-3, recommended_kW: M L^2 T^-3 }
+// dims: in { motors: dimensionless, non_motor_kW: M L^2 T^-3, dip_factor: dimensionless, starts_per_hour: dimensionless } out: { starting_kva: M L^2 T^-3, recommended_kW: M L^2 T^-3 }
 export function computeGeneratorMotorStarting({
   motors = [],
   non_motor_kW = 0,
@@ -2700,7 +2700,7 @@ const _PPE_BANDS = [
   { min: 40,  max: Infinity, label: "No standard PPE rated above 40 cal/cm²; remote operation or de-energize" },
 ];
 
-// dims: in { args: dimensionless } out: { incident_energy_cal_cm2: M T^-2, ppe_category: dimensionless }
+// dims: in { voltage_V: M L^2 T^-3 I^-1, bolted_fault_A: I, clearing_time_s: T, working_distance_in: L, equipment_config: dimensionless } out: { incident_energy_cal_cm2: M T^-2, ppe_category: dimensionless }
 export function computeArcFlashScreen({
   voltage_V = 0,
   bolted_fault_A = 0,
@@ -3296,7 +3296,7 @@ ELECTRICAL_RENDERERS["voltage-drop-reactance"] = renderVoltageDropReactance;
 // magnitude (kW / kVA / kVAR) -- PF and angle alone give only the shape, not
 // the size. Leading vs lagging is a sign label on the reactive leg.
 
-// dims: in { args: dimensionless } out: { kw: M L^2 T^-3, kva: M L^2 T^-3, kvar: M L^2 T^-3, pf: dimensionless, angle_deg: dimensionless }
+// dims: in { kw: M L^2 T^-3, kva: M L^2 T^-3, kvar: M L^2 T^-3, pf: dimensionless, angle_deg: dimensionless, sign: dimensionless } out: { kw: M L^2 T^-3, kva: M L^2 T^-3, kvar: M L^2 T^-3, pf: dimensionless, angle_deg: dimensionless }
 export function computePowerTriangle({
   kw = null,
   kva = null,

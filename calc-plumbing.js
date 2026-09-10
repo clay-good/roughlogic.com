@@ -2759,7 +2759,7 @@ export const BACKFLOW_ASSEMBLY_TO_CLASS = {
 // hazard or any backpressure condition.
 const _V16P_BACKPRESSURE_OK = new Set(["DC", "RP"]);
 
-// dims: in { args: dimensionless } out: { head_loss_psi: M L^-1 T^-2, downstream_psi: M L^-1 T^-2 }
+// dims: in { service_flow_gpm: L^3 T^-1, hazard: dimensionless, assembly_type: dimensionless, pipe_size_in: L, upstream_pressure_psi: M L^-1 T^-2, min_residual_psi: M L^-1 T^-2 } out: { head_loss_psi: M L^-1 T^-2, downstream_psi: M L^-1 T^-2 }
 export function computeBackflowSizing({
   service_flow_gpm = 0,
   hazard = "high",

@@ -2349,7 +2349,7 @@ export const APA_SPAN_RATINGS = {
   "48/24": { roof: { spacing_in: 48, live_psf: 25, total_psf: 35 }, floor: { spacing_in: 24, total_psf: 100 } },
 };
 
-// dims: in { args: dimensionless } out: { max_span_in: L, deflection_in: L }
+// dims: in { span_rating: dimensionless, panel_thickness_in: L, application: dimensionless, support_spacing_in: L, live_load_psf: M L^-1 T^-2, dead_load_psf: M L^-1 T^-2 } out: { max_span_in: L, deflection_in: L }
 export function computePlywoodSpan({
   span_rating = "24/16", panel_thickness_in = 0,
   application = "roof", support_spacing_in = 0,

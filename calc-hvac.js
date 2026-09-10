@@ -54,7 +54,7 @@ export const U_FACTORS = {
   window: { single: 1.10, double: 0.50, triple: 0.30 },
 };
 
-// dims: in { args: dimensionless } out: { cooling_load_btuhr: M L^2 T^-3, sensible_btuhr: M L^2 T^-3, latent_btuhr: M L^2 T^-3 }
+// dims: in { floor_area_ft2: L^2, wall_area_ft2: L^2, window_area_ft2: L^2, ceiling_area_ft2: L^2, insulation_level: dimensionless, window_type: dimensionless, occupants: dimensionless, outdoor_design_F: T, indoor_design_F: T, solar_factor: dimensionless, ach: T^-1, ceiling_height_ft: L, outdoor_RH_percent: dimensionless } out: { cooling_load_btuhr: M L^2 T^-3, sensible_btuhr: M L^2 T^-3, latent_btuhr: M L^2 T^-3 }
 export function manualJCooling({
   floor_area_ft2,
   wall_area_ft2,
@@ -124,7 +124,7 @@ export const manualJCoolingExample = {
   expectedRange: { tons: { min: 1.5, max: 6 } },
 };
 
-// dims: in { args: dimensionless } out: { heating_load_btuhr: M L^2 T^-3 }
+// dims: in { floor_area_ft2: L^2, wall_area_ft2: L^2, window_area_ft2: L^2, ceiling_area_ft2: L^2, insulation_level: dimensionless, window_type: dimensionless, outdoor_design_F: T, indoor_design_F: T, ach: T^-1, ceiling_height_ft: L } out: { heating_load_btuhr: M L^2 T^-3 }
 export function manualJHeating({
   floor_area_ft2,
   wall_area_ft2,

@@ -464,7 +464,7 @@ export function renderOffGridBattery(inputRegion, outputRegion, citationEl) {
 const _EV_BREAKER_SIZES = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200];
 const _EV_CU_AWG = ["14", "12", "10", "8", "6", "4", "3", "2", "1", "1/0", "2/0", "3/0", "4/0"];
 
-// dims: in { args: dimensionless } out: { continuous_circuit_a: I, recommended_breaker_a: I, new_panel_load_a: I, headroom_a: I }
+// dims: in { charger_amps: I, main_breaker_a: I, existing_load_a: I, busbar_rating_a: I, load_managed: dimensionless } out: { continuous_circuit_a: I, recommended_breaker_a: I, new_panel_load_a: I, headroom_a: I }
 export function computeEvChargerLoad({
   charger_amps = 0,
   main_breaker_a = 0,

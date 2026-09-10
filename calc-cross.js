@@ -2328,7 +2328,7 @@ CROSS_RENDERERS["hydraulic-cylinder"] = renderHydraulicCylinder;
 // (Gates / Goodyear) governs the final belt count.
 const _VBELT_HP_PER_BELT = { A: 3, B: 7, C: 15, D: 30, "3V": 5, "5V": 12, "8V": 30 };
 
-// dims: in { args: dimensionless } out: { ratio: dimensionless, driven_pitch_diameter_in: L, belt_length_in: L, design_hp: M L^2 T^-3 }
+// dims: in { driver_rpm: T^-1, driven_rpm: T^-1, driver_hp: M L^2 T^-3, driver_pitch_diameter_in: L, center_distance_in: L, belt_section: dimensionless, service_factor: dimensionless } out: { ratio: dimensionless, driven_pitch_diameter_in: L, belt_length_in: L, design_hp: M L^2 T^-3 }
 export function computeVbeltDrive({
   driver_rpm = 0,
   driven_rpm = 0,
