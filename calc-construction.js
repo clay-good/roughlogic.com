@@ -1794,7 +1794,7 @@ export const demoDebrisExample = { inputs: { structure_type: "wood_frame", volum
 
 export const ACI_C_W = { normal: 1.0, lightweight_115: 0.85, lightweight_135: 0.93, plasticized: 1.20 };
 
-// dims: in { args: dimensionless } out: { pressure_psf: M L^-1 T^-2 }
+// dims: in { pour_rate_ft_per_hr: L T^-1, concrete_temp_F: T, weight_factor: dimensionless, unit_weight_pcf: M L^-3, wall_height_ft: L } out: { pressure_psf: M L^-1 T^-2 }
 export function computeFormworkPressure({
   pour_rate_ft_per_hr = 0, concrete_temp_F = 70, weight_factor = "normal", unit_weight_pcf = 150, wall_height_ft = 100,
 }) {
@@ -2240,7 +2240,7 @@ export const stairStringerExampleV7 = {
 
 // --- 247: Hip, Valley, and Jack Rafter Schedule ---
 
-// dims: in { args: dimensionless } out: { hip_length_ft: L, valley_length_ft: L }
+// dims: in { run_ft: L, pitch: dimensionless, pitch_irregular: dimensionless, overhang_in: L, jack_oc_in: L } out: { hip_length_ft: L, valley_length_ft: L }
 export function computeHipValleyRafter({
   run_ft = 0, pitch = 6, pitch_irregular = 0,
   overhang_in = 12, jack_oc_in = 16,
@@ -2431,7 +2431,7 @@ export const helicalPileTorqueExample = { inputs: { shaft: "1.5_inch_solid", tar
 
 // --- 251: Crane Lift Plan Quick-Math ---
 
-// dims: in { args: dimensionless } out: { radius_ft: L, capacity_lb: M L T^-2, utilization: dimensionless }
+// dims: in { load_lb: M L T^-2, rigging_lb: M L T^-2, block_lb: M L T^-2, jib_deduct_lb: M L T^-2, sling_legs: dimensionless, sling_angle_deg: dimensionless, chart_capacity_lb: M L T^-2 } out: { radius_ft: L, capacity_lb: M L T^-2, utilization: dimensionless }
 export function computeCraneLiftCheck({
   load_lb = 0, rigging_lb = 0, block_lb = 0, jib_deduct_lb = 0,
   sling_legs = 1, sling_angle_deg = 90, chart_capacity_lb = 0,
@@ -2710,7 +2710,7 @@ CONSTRUCTION_RENDERERS["crane-lift-quick"] = _v7c_renderCraneLiftCheck;
 // + sole). 2x lumber section is 1.5 in × 3.5 in (S4S 2x4) or 1.5 × 5.5
 // (2x6); board feet uses nominal × actual length.
 
-// dims: in { args: dimensionless } out: { studs: dimensionless, plates_lf: L, sheathing_sheets: dimensionless }
+// dims: in { footprint_ft2: L^2, perimeter_ft: L, wall_height_ft: L, stud_oc_in: L, joist_span_ft: L, joist_oc_in: L, rafter_oc_in: L, building_run_ft: L, pitch: dimensionless, stud_size: dimensionless, joist_size: dimensionless, rafter_size: dimensionless } out: { studs: dimensionless, plates_lf: L, sheathing_sheets: dimensionless }
 export function computeResidentialFraming({
   footprint_ft2 = 0, perimeter_ft = 0, wall_height_ft = 8,
   stud_oc_in = 16,
@@ -10551,7 +10551,7 @@ CONSTRUCTION_RENDERERS["foundation-waterproofing-takeoff"] = _simpleRenderer({
 });
 
 // ===================== spec-v986: ballasted single-ply roof ballast weight and order =====================
-// dims: in { args: dimensionless } out: { total_ballast_lb: dimensionless, total_tons: dimensionless, stone_depth_in: L, volume_cy: L^3 }
+// dims: in { roof_area_sqft: L^2, ballast_psf: M L^-2, stone_density_pcf: M L^-3 } out: { total_ballast_lb: dimensionless, total_tons: dimensionless, stone_depth_in: L, volume_cy: L^3 }
 export function computeRoofBallastWeight({ roof_area_sqft = 5000, ballast_psf = 12, stone_density_pcf = 100 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(roof_area_sqft > 0)) return { error: "Roof area must be positive (sq ft)." };
@@ -14539,7 +14539,7 @@ CONSTRUCTION_RENDERERS["curtain-wall-mullion-deflection"] = _simpleRenderer({
 // ===========================================================================
 
 // ===================== spec-v1425: elevator round-trip time =====================
-// dims: in { args: dimensionless } out: { rtt_s: T, interval_s: T, hc_total: T^-1 }
+// dims: in { rise_ft: L, car_speed_fpm: L T^-1, passengers_per_trip: dimensionless, probable_stops: dimensionless, stop_time_s: T, transfer_time_s: T, cars: dimensionless, population: dimensionless, target_interval_s: T } out: { rtt_s: T, interval_s: T, hc_total: T^-1 }
 export function computeElevatorHandlingCapacity({ rise_ft = 0, car_speed_fpm = 0, passengers_per_trip = 0, probable_stops = 0, stop_time_s = 0, transfer_time_s = 0, cars = 1, population = 0, target_interval_s = 30 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rise_ft > 0)) return { error: "Rise must be positive." };
@@ -14609,7 +14609,7 @@ export const GLASS_TYPE_FACTOR = {
   tempered: { factor: 4, label: "Fully tempered" },
 };
 
-// dims: in { args: dimensionless } out: { area_sqft: L^2, total_load_lb: M L T^-2, allowable_deflection_in: L }
+// dims: in { width_ft: L, height_ft: L, design_pressure_psf: M L^-1 T^-2, glass_type: dimensionless, deflection_divisor: dimensionless, thickness_in: L, lites: dimensionless, spacer_allowance_psf: M L^-1 T^-2 } out: { area_sqft: L^2, total_load_lb: M L T^-2, allowable_deflection_in: L }
 export function computeGlassThicknessWind({ width_ft = 0, height_ft = 0, design_pressure_psf = 0, glass_type = "annealed", deflection_divisor = 175, thickness_in = 0, lites = 1, spacer_allowance_psf = 0.33 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const t = GLASS_TYPE_FACTOR[glass_type];
@@ -14667,7 +14667,7 @@ CONSTRUCTION_RENDERERS["glass-thickness-wind"] = _simpleRenderer({
 });
 
 // ===================== spec-v1428: attached canopy wind uplift and snow =====================
-// dims: in { args: dimensionless } out: { area_sqft: L^2, q_psf: M L^-1 T^-2, uplift_force_lb: M L T^-2 }
+// dims: in { projection_ft: L, width_ft: L, wind_speed_mph: L T^-1, kz: dimensionless, kzt: dimensionless, kd: dimensionless, cn_uplift: dimensionless, cn_downward: dimensionless, ground_snow_psf: M L^-1 T^-2, ce: dimensionless, ct: dimensionless, is: dimensionless, dead_load_psf: M L^-1 T^-2 } out: { area_sqft: L^2, q_psf: M L^-1 T^-2, uplift_force_lb: M L T^-2 }
 export function computeAwningCanopyLoad({ projection_ft = 0, width_ft = 0, wind_speed_mph = 0, kz = 0.98, kzt = 1, kd = 0.85, cn_uplift = 1.2, cn_downward = 0.7, ground_snow_psf = 0, ce = 1, ct = 1, is = 1, dead_load_psf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(projection_ft > 0 && width_ft > 0)) return { error: "Canopy projection and width must be positive." };
@@ -14735,7 +14735,7 @@ CONSTRUCTION_RENDERERS["awning-canopy-load"] = _simpleRenderer({
 });
 
 // ===================== spec-v1429: garage door torsion spring =====================
-// dims: in { args: dimensionless } out: { required_torque_inlb: M L^2 T^-2, turns: dimensionless, required_ippt: M L^2 T^-2 }
+// dims: in { door_weight_lb: M L T^-2, door_height_in: L, drum_radius_in: L, springs: dimensionless } out: { required_torque_inlb: M L^2 T^-2, turns: dimensionless, required_ippt: M L^2 T^-2 }
 export function computeGarageDoorTorsionSpring({ door_weight_lb = 0, door_height_in = 0, drum_radius_in = 0, springs = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(door_weight_lb > 0)) return { error: "Door weight must be positive." };
@@ -14778,7 +14778,7 @@ CONSTRUCTION_RENDERERS["garage-door-torsion-spring"] = _simpleRenderer({
 });
 
 // ===================== spec-v1430: window film solar heat gain reduction =====================
-// dims: in { args: dimensionless } out: { peak_reduction_btuh: M L^2 T^-3, kwh_saved: M L^2 T^-2, payback_years: T }
+// dims: in { area_sqft: L^2, shgc_before: dimensionless, shgc_after: dimensionless, peak_irradiance_btuh_sqft: M T^-3, full_sun_hours: T, eer: dimensionless, price_per_kwh: dimensionless, cost_per_sqft: dimensionless } out: { peak_reduction_btuh: M L^2 T^-3, kwh_saved: M L^2 T^-2, payback_years: T }
 export function computeWindowFilmShgc({ area_sqft = 0, shgc_before = 0, shgc_after = 0, peak_irradiance_btuh_sqft = 0, full_sun_hours = 0, eer = 0, price_per_kwh = 0, cost_per_sqft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_sqft > 0)) return { error: "Glass area must be positive." };
@@ -14834,7 +14834,7 @@ CONSTRUCTION_RENDERERS["window-film-shgc"] = _simpleRenderer({
 });
 
 // ===================== spec-v1431: insulating glass U-factor and condensation =====================
-// dims: in { args: dimensionless } out: { r_total: dimensionless, u_factor: M T^-4, surface_temp_f: T, dew_point_f: T }
+// dims: in { lites: dimensionless, r_per_lite: dimensionless, r_gap: dimensionless, r_indoor_film: dimensionless, r_outdoor_film: dimensionless, indoor_temp_f: T, outdoor_temp_f: T, indoor_rh_pct: dimensionless } out: { r_total: dimensionless, u_factor: M T^-4, surface_temp_f: T, dew_point_f: T }
 export function computeIguUFactor({ lites = 2, r_per_lite = 0.03, r_gap = 1.02, r_indoor_film = 0.68, r_outdoor_film = 0.17, indoor_temp_f = 70, outdoor_temp_f = 0, indoor_rh_pct = 40 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(lites >= 1)) return { error: "There must be at least one lite." };
@@ -14893,7 +14893,7 @@ CONSTRUCTION_RENDERERS["igu-u-factor"] = _simpleRenderer({
 });
 
 // ===================== spec-v1434: escalator handling capacity =====================
-// dims: in { args: dimensionless } out: { steps_per_hour: T^-1, practical_pph: T^-1, step_load_lb: M L T^-2 }
+// dims: in { speed_fpm: L T^-1, step_depth_in: L, persons_per_step: dimensionless, loading_factor: dimensionless, weight_per_person_lb: M L T^-2, design_flow_pph: T^-1 } out: { steps_per_hour: T^-1, practical_pph: T^-1, step_load_lb: M L T^-2 }
 export function computeEscalatorCapacity({ speed_fpm = 0, step_depth_in = 0, persons_per_step = 1, loading_factor = 0.6, weight_per_person_lb = 150, design_flow_pph = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(speed_fpm > 0)) return { error: "Rated speed must be positive." };
