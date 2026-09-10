@@ -25,6 +25,7 @@ import { getLimitationCopy } from "../limitation-banner.js";
 // The shared result-key humanizer: the same fallback the static pages use, so
 // a tile that captions nothing still names its answers on both doors.
 import { humanizeKey } from "../key-labels.js";
+import { COMMODITIES } from "../calc-historical.js";
 // spec-v1185: the curated per-tile cross-links the browser shows as "related
 // tiles". Build-time data; a missing/unreadable module degrades to no related.
 let RELATED = {};
@@ -402,6 +403,7 @@ const SHARD_COMPUTES = {
   computeMagneticDeclination: wrapMagneticDeclination,
   computeHudFmr: wrapHudFmr,
   computeLoanLimits: wrapLoanLimits,
+  computeHistorical: wrapHistorical,
 };
 
 const _realestateShards = new Map();
@@ -438,6 +440,43 @@ function wrapHudFmr(compute) {
     const table = shard || realestateShard("hud-fmr.json");
     if (!table) return { error: "HUD FMR shard not readable on this host." };
     return compute({ shard: table, state, fips, area_name });
+  };
+  _wrapped.set(compute, fn);
+  return fn;
+}
+
+// `historical-pricing` is the third of the same kind, and its shard is chosen by
+// an input: one file per commodity under data/historical/commodities/. The
+// browser fetches it, so the door answered "Shard not loaded." for every one of
+// the fourteen series. `COMMODITIES` is the page's own catalog of which file
+// belongs to which id, so the door resolves it the same way the page does
+// rather than guessing at a filename.
+const _historicalShards = new Map();
+function historicalShard(file) {
+  if (!_historicalShards.has(file)) {
+    try {
+      _historicalShards.set(file, JSON.parse(
+        readFileSync(new URL("../data/historical/commodities/" + file, import.meta.url), "utf8"),
+      ));
+    } catch {
+      _historicalShards.set(file, null);
+    }
+  }
+  return _historicalShards.get(file);
+}
+
+function wrapHistorical(compute) {
+  let fn = _wrapped.get(compute);
+  if (fn) return fn;
+  fn = function computeHistorical({ commodity, lookback_months = 12, shard = null } = {}) {
+    let table = shard;
+    if (!table) {
+      const entry = COMMODITIES.find((c) => c.id === commodity);
+      // An unknown commodity is the compute's error to report, not this
+      // wrapper's -- it names the ones it has.
+      if (entry) table = historicalShard(entry.file);
+    }
+    return compute({ commodity, lookback_months, shard: table });
   };
   _wrapped.set(compute, fn);
   return fn;
