@@ -64,8 +64,23 @@ This door runs in Node, where that shard is a file. It reads the same bundle the
 page reads and calls the same engine the page calls, so the two now agree by
 construction -- `run_calculator` on the page's own example returns 7.56 deg
 declination, 65.88 deg inclination, 51,095 nT and -0.080 deg/yr, which is what
-the page prints. With no coordinates the model stamp is still what comes back:
-that is the tile's reference content, and it is what a bare `run` should print.
+the page prints. Handed no coordinates at all, the model stamp alone comes back;
+that is the tile's reference content, and the right answer to "which model is
+bundled?".
+
+The tile's worked example is filled from the same published example object its
+page's own "example" button uses, so `describe_calculator` demonstrates the case
+the page demonstrates and a bare `run_calculator` computes a real declination
+rather than restating the stub. That matters beyond the demo: an example that
+names no inputs marks no field **required**, and `answer_query` reads
+requiredness to decide whether it may run. Before this, *"declination at latitude
+25.76 longitude -80.19"* filled the latitude, silently missed the longitude, and
+answered `OK` anyway. It now returns `MISSING_INPUTS` naming the longitude.
+
+(A question written with a negative longitude still cannot be filled from the
+text: `extractQuantities` reads no number carrying a minus sign. That is a
+catalog-wide limit of the extractor, not of this tile, and it is tracked
+separately.)
 
 Input names come from the calculator's renderer schema where it has one, and
 otherwise from its compute signature. Where the signature cannot be read — a
@@ -135,7 +150,7 @@ also `"eta^2 = "` -- and calling that a unit would be a guess. `outputUnits(id)`
 in `catalog.mjs` exposes them as what they are.
 
 `answer_query` reads the `data/fields/` descriptors the website reads, which
-exist for 2,042 calculators. For the other 40 it projects the descriptors from
+exist for 2,043 calculators. For the other 39 it projects the descriptors from
 `describe_calculator` instead, naming each input with the caption the
 calculator itself prints. A field whose verified
 example holds something a numeric extractor must not guess at -- a list, a

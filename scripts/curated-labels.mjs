@@ -26,6 +26,17 @@
 // leaving two sources of truth.
 
 export const CURATED_INPUT_LABELS = {
+  // A fourth honest reason, and the only tile with it: `magnetic-declination`'s
+  // renderer builds its fields normally, but it hands them to `computeWMM` as
+  // LOCAL VARIABLES rather than as `lat.input.value` in the call, so the
+  // extractor cannot tie a field to a parameter and emits nothing. These are
+  // that renderer's own label strings, copied verbatim from calc-field.js.
+  "magnetic-declination": {
+    lat_deg: "Latitude (deg, -90 to 90)",
+    lon_deg: "Longitude (deg, -180 to 180)",
+    alt_km: "Altitude (km above WGS84 ellipsoid, optional)",
+    date: "Date (YYYY-MM-DD)",
+  },
   // Reading list: a run of backsights and foresights, not two scalars.
   "differential-leveling": { bs: "Backsight readings (ft)", fs: "Foresight readings (ft)" },
   // ASTM C33 fine-aggregate sieve ladder: percent PASSING each sieve.

@@ -17,7 +17,9 @@ import { readFile } from "node:fs/promises";
 import { readFileSync } from "node:fs";
 // The World Magnetic Model engine and its two helpers, imported by the
 // shard-backed compute below. Same functions the tile's renderer calls.
-import { computeWMM, computeBearingConversion, decimalYearFromIso } from "../calc-field.js";
+import {
+  computeWMM, computeBearingConversion, decimalYearFromIso, magneticDeclinationExample,
+} from "../calc-field.js";
 import { normalizeQuery, rankTools, fallbackSearch } from "../search-discovery.js";
 import { getLimitationCopy } from "../limitation-banner.js";
 // The shared result-key humanizer: the same fallback the static pages use, so
@@ -88,6 +90,28 @@ async function load() {
     const rows = examples.get(row.tile_id);
     if (rows) rows.push(row);
     else examples.set(row.tile_id, [row]);
+  }
+
+  // `magnetic-declination`'s fixture row is a wiring stub (see SHARD_COMPUTES
+  // below), so it names no inputs -- and an example that names no inputs marks
+  // no field REQUIRED, which is how `answer_query` decides it may run on
+  // whatever a question happened to mention. Asked for "declination at latitude
+  // 25.76 longitude -80.19" it filled the latitude, missed the longitude, and
+  // still answered OK.
+  //
+  // The tile's real example is published in calc-field.js as
+  // `magneticDeclinationExample` -- the same object its page's "example" button
+  // fills from and the same one scripts/build-shells.mjs computes the printed
+  // example from, so the door and the page demonstrate one case, not two. The
+  // row's provenance fields are kept; only the inputs it never carried are
+  // filled in.
+  const wmmRows = examples.get("magnetic-declination");
+  if (wmmRows && wmmRows[0] && !Object.keys(wmmRows[0].inputs || {}).length) {
+    const ex = magneticDeclinationExample.inputs;
+    wmmRows[0] = {
+      ...wmmRows[0],
+      inputs: { lat_deg: ex.lat_deg, lon_deg: ex.lon_deg, alt_km: ex.alt_km || 0, date: ex.date_iso },
+    };
   }
 
   const byId = new Map(TOOLS.map((t) => [t.id, t]));
@@ -322,10 +346,11 @@ function validateSelects(schema, inputs) {
 //
 // The door runs in Node, where the shard is a file. It reads the same bundle
 // the page reads and calls the same engine the page calls (`computeWMM`), so
-// the two agree by construction. With no coordinates the stub's model stamp
-// is still what comes back: that is the tile's reference content, and it is
-// what a bare `run` -- which falls back to a worked example whose inputs are
-// empty -- should print.
+// the two agree by construction. With no coordinates the model stamp alone is
+// what comes back -- that is the tile's reference content, and it is the right
+// answer to "which model is bundled?". A bare `run` does not land there: it
+// falls back to the tile's worked example, which `load()` fills with the
+// published example inputs above, so it demonstrates a real declination.
 const WMM_SHARD_URL = new URL("../data/field/wmm/coefficients.json", import.meta.url);
 let _wmmCoefficients;
 function wmmCoefficients() {
@@ -350,8 +375,11 @@ const _wrapped = new WeakMap();
 function wrapMagneticDeclination(stub) {
   let fn = _wrapped.get(stub);
   if (fn) return fn;
+  // `date` rather than `date_iso`: this destructure is what `describe`
+  // advertises AND what the tile page's own example row is keyed by, so the
+  // two names have to be one name for a caption to reach both.
   fn = function computeMagneticDeclination({
-    lat_deg, lon_deg, alt_km = 0, date_iso, bearing_deg, direction = "magnetic_to_true",
+    lat_deg, lon_deg, alt_km = 0, date, bearing_deg, direction = "magnetic_to_true",
   } = {}) {
     const stamp = stub();
     const coefficients = wmmCoefficients();
@@ -360,7 +388,7 @@ function wrapMagneticDeclination(stub) {
     // read for is an error, named rather than papered over with the stamp.
     if (!Number.isFinite(lat_deg) || !Number.isFinite(lon_deg)) return stamp;
     if (!coefficients) return { ...stamp, error: "WMM coefficient bundle not readable." };
-    const iso = date_iso || new Date().toISOString().slice(0, 10);
+    const iso = date || new Date().toISOString().slice(0, 10);
     const decimal_year = decimalYearFromIso(iso);
     if (!Number.isFinite(decimal_year)) return { ...stamp, error: "Date must be YYYY-MM-DD." };
     const r = computeWMM({ lat_deg, lon_deg, alt_km: alt_km || 0, decimal_year, coefficients });

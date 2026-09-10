@@ -246,13 +246,13 @@ test("the MCP door and the tile page agree on the declination", async () => {
   const page = (await loadWorkedExamples()).get("magnetic-declination");
   assert.ok(page && Object.keys(page.inputs || {}).length, "the page's example lost its inputs");
 
-  const door = await run({
-    id: "magnetic-declination",
-    inputs: {
-      lat_deg: page.inputs.lat_deg, lon_deg: page.inputs.lon_deg,
-      alt_km: page.inputs.alt_km, date_iso: page.inputs.date,
-    },
-  });
+  // The door fills the same example from the same published object, so it can
+  // be handed straight over: if the two ever diverge this line is what says so.
+  const { describe } = await import("../../mcp/catalog.mjs");
+  const doorExample = (await describe({ id: "magnetic-declination" })).example.inputs;
+  assert.deepEqual(doorExample, page.inputs);
+
+  const door = await run({ id: "magnetic-declination", inputs: { ...doorExample } });
   assert.deepEqual(door.warnings, [], "the page's own inputs must run warning-free");
   // The page rounds for display; compare at the page's own precision.
   const at = (key, digits) => Number(door.result[key].toFixed(digits));

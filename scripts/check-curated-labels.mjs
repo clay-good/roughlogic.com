@@ -34,15 +34,22 @@ const { CURATED_INPUT_LABELS, CURATED_OUTPUT_LABELS } = await import(resolve(ROO
 const { inputLabels, outputLabels } = await import(resolve(ROOT, "mcp/catalog.mjs"));
 const { BESPOKE_LABELS } = await import(resolve(ROOT, "test/fixtures/bespoke-labels.js"));
 const { BESPOKE_OUTPUT_LABELS } = await import(resolve(ROOT, "test/fixtures/bespoke-output-labels.js"));
-const { humanizeKey } = await import(resolve(ROOT, "scripts/build-shells.mjs"));
+const { humanizeKey, loadWorkedExamples } = await import(resolve(ROOT, "scripts/build-shells.mjs"));
 
-// The same one-row-per-tile selection build-shells makes: the first fixture row
-// for a tile is the one its page prints.
-const raw = JSON.parse(await readFile(resolve(ROOT, "test/fixtures/worked-examples.json"), "utf8"));
-const example = new Map();
-for (const row of raw.rows || []) {
-  if (row && row.tile_id && !example.has(row.tile_id)) example.set(row.tile_id, row);
-}
+// The examples the pages actually print -- build-shells' own loader, not a
+// second reading of the fixture beside it.
+//
+// This gate used to re-do the one-row-per-tile selection itself, over
+// test/fixtures/worked-examples.json, under the comment "the first fixture row
+// for a tile is the one its page prints". That is true of 2,081 tiles and was
+// false of `magnetic-declination`, whose example is computed at BUILD time from
+// the bundled WMM coefficients because its fixture row is a wiring stub. So the
+// gate read an empty input list and a five-row model stamp while the page
+// printed four coordinates and four field values -- and assertion C, "zero rows
+// across the whole catalog print an uncaptioned key", never looked at a single
+// row that page actually shows. Reading the builder's loader means the rows
+// checked here are the rows rendered, by construction.
+const example = await loadWorkedExamples();
 
 // build-shells drops a row whose value renders empty, so only the rows that
 // actually reach the page are counted.
