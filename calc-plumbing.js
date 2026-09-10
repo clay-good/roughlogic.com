@@ -1503,7 +1503,7 @@ export const FLUID_PROPERTIES = {
   glycol_50:    { K_psi: 322000, rho_slug_ft3: 2.045, label: "50% propylene glycol" },
 };
 
-// dims: in { args: dimensionless } out: { surge_pressure_psi: M L^-1 T^-2, wave_velocity_fps: L T^-1 }
+// dims: in { material: dimensionless, pipe_size: dimensionless, velocity_fps: L T^-1, closure_time_s: T, run_length_ft: L, fluid: dimensionless } out: { surge_pressure_psi: M L^-1 T^-2, wave_velocity_fps: L T^-1 }
 export function computeWaterHammerSurge({
   material = "copper",
   pipe_size = "1",
@@ -1596,7 +1596,7 @@ function _interpPumpCurve(curve, gpm) {
   return { head_ft: pts[pts.length - 1].head_ft, eff: pts[pts.length - 1].eff };
 }
 
-// dims: in { args: dimensionless } out: { flow_gpm: L^3 T^-1, head_ft: L, efficiency: dimensionless }
+// dims: in { pump: dimensionless, static_head_ft: L, k_friction: L^-5 T^2 } out: { flow_gpm: L^3 T^-1, head_ft: L, efficiency: dimensionless }
 export function computePumpOperatingPoint({
   pump = "small_centrifugal_60Hz",
   static_head_ft = 0,
@@ -1918,7 +1918,7 @@ function _interpInsulationU(row, t) {
   return row[String(keys[0])];
 }
 
-// dims: in { args: dimensionless } out: { pipe_size_in: L, flow_gpm: L^3 T^-1, head_ft: L }
+// dims: in { loop_length_ft: L, nominal_size_in: L, insulation_in: L, hot_supply_F: T, ambient_F: T, set_point_delta_F: T, fuel: dimensionless, heater_efficiency: dimensionless, runtime_hr_per_year: T, fuel_price: dimensionless } out: { pipe_size_in: L, flow_gpm: L^3 T^-1, head_ft: L }
 export function computeRecircLoopSizing({
   loop_length_ft = 0,
   nominal_size_in = "0.75",
@@ -2120,7 +2120,7 @@ export const WATER_HEATER_EFFICIENCY = {
   gas_condensing: 0.94,
 };
 
-// dims: in { args: dimensionless } out: { recovery_gph: L^3 T^-1, first_hour_gph: L^3 T^-1, q_useful_btu_hr: dimensionless }
+// dims: in { heater_type: dimensionless, input_btu_hr: M L^2 T^-3, input_kw: M L^2 T^-3, efficiency: dimensionless, incoming_F: T, setpoint_F: T, tank_gal: L^3, peak_demand_gph: L^3 T^-1 } out: { recovery_gph: L^3 T^-1, first_hour_gph: L^3 T^-1, q_useful_btu_hr: M L^2 T^-3 }
 export function computeWaterHeaterRecovery({
   heater_type = "gas_atmospheric",
   input_btu_hr = 0,
@@ -2252,7 +2252,7 @@ function _v16p_renderWaterHeaterRecovery(inputRegion, outputRegion, citationEl) 
 }
 PLUMBING_RENDERERS["water-heater-recovery"] = _v16p_renderWaterHeaterRecovery;
 
-// dims: in { args: dimensionless } out: { input_btu_hr: dimensionless, input_kw: M L^2 T^-3, delta_T_F: T }
+// dims: in { heater_type: dimensionless, target_recovery_gph: L^3 T^-1, efficiency: dimensionless, incoming_F: T, setpoint_F: T } out: { input_btu_hr: M L^2 T^-3, input_kw: M L^2 T^-3, delta_T_F: T }
 export function computeWaterHeaterInput({
   heater_type = "gas_atmospheric",
   target_recovery_gph = 0,
@@ -2344,7 +2344,7 @@ function _v16p_waterDensity(F) {
   return t[t.length - 1].rho;
 }
 
-// dims: in { args: dimensionless } out: { v_expansion_gal: L^3, v_tank_gal: L^3, recommended_gal: L^3 }
+// dims: in { water_heater_vol_gal: L^3, incoming_psi: M L^-1 T^-2, relief_psi: M L^-1 T^-2, incoming_F: T, setpoint_F: T, acceptance_factor: dimensionless } out: { v_expansion_gal: L^3, v_tank_gal: L^3, recommended_gal: L^3 }
 export function computeWhExpansionTank({
   water_heater_vol_gal = 0,
   incoming_psi = 60,
@@ -2638,7 +2638,7 @@ export const TRAP_PRIMER_DRAINS_PER_UNIT = {
   pump_discharge: 4,
 };
 
-// dims: in { args: dimensionless } out: { primers_needed: dimensionless, water_gal_per_year: L^3 }
+// dims: in { floor_drain_count: dimensionless, zone: dimensionless, prime_method: dimensionless, prime_volume_oz: L^3, cycles_per_day: dimensionless } out: { primers_needed: dimensionless, water_gal_per_year: L^3 }
 export function computeTrapPrimer({
   floor_drain_count = 0,
   zone = "occupied",

@@ -348,7 +348,7 @@ function _interpRefSatT(refrigerant, psia) {
   return tbl[tbl.length - 1].T_F;
 }
 
-// dims: in { args: dimensionless } out: { target_subcool_F: T, target_superheat_F: T }
+// dims: in { refrigerant: dimensionless, suction_pressure: M L^-1 T^-2, suction_unit: dimensionless, suction_line_temp_F: T, liquid_pressure: M L^-1 T^-2, liquid_unit: dimensionless, liquid_line_temp_F: T } out: { target_subcool_F: T, target_superheat_F: T }
 export function computeRefrigerantCharging({
   refrigerant = "R_410A",
   suction_pressure = 0, suction_unit = "psig", suction_line_temp_F = 0,
@@ -1134,7 +1134,7 @@ function _v861renderRefrigerantLinesetChargeAdjust(inputRegion, outputRegion, ci
 REFRIGERANT_RENDERERS["refrigerant-lineset-charge-adjust"] = _v861renderRefrigerantLinesetChargeAdjust;
 
 // ===================== spec-v978: reciprocating compressor volumetric efficiency (clearance re-expansion) =====================
-// dims: in { args: dimensionless } out: { compression_ratio: dimensionless, volumetric_efficiency_pct: dimensionless }
+// dims: in { clearance_ratio: dimensionless, suction_pressure_psia: M L^-1 T^-2, discharge_pressure_psia: M L^-1 T^-2, polytropic_exponent: dimensionless } out: { compression_ratio: dimensionless, volumetric_efficiency_pct: dimensionless }
 export function computeCompressorVolumetricEfficiency({ clearance_ratio = 0.045, suction_pressure_psia = 70, discharge_pressure_psia = 300, polytropic_exponent = 1.11 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(clearance_ratio >= 0)) return { error: "Clearance ratio cannot be negative." };
@@ -1238,7 +1238,7 @@ function _simpleRenderer(spec) {
 }
 
 // ===================== spec-v1413: TXV capacity correction and sizing =====================
-// dims: in { args: dimensionless } out: { pressure_factor: dimensionless, installed_capacity_tons: dimensionless, sizing_ratio_pct: dimensionless }
+// dims: in { nominal_tons: M L^2 T^-3, rated_dp_psi: M L^-1 T^-2, actual_dp_psi: M L^-1 T^-2, liquid_temp_factor: dimensionless, evaporator_load_tons: M L^2 T^-3 } out: { pressure_factor: dimensionless, installed_capacity_tons: M L^2 T^-3, sizing_ratio_pct: dimensionless }
 export function computeTxvCapacityCheck({ nominal_tons = 0, rated_dp_psi = 100, actual_dp_psi = 0, liquid_temp_factor = 1.0, evaporator_load_tons = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(nominal_tons > 0)) return { error: "Nominal valve tonnage must be positive." };
@@ -1289,7 +1289,7 @@ REFRIGERANT_RENDERERS["txv-capacity-check"] = _simpleRenderer({
 });
 
 // ===================== spec-v1414: evaporator defrost heat and cycle time =====================
-// dims: in { args: dimensionless } out: { sensible_btu: M L^2 T^-2, latent_btu: M L^2 T^-2, total_btu: M L^2 T^-2, defrost_min: T }
+// dims: in { frost_lb: M, coil_temp_f: T, coil_mass_lb: M, coil_specific_heat: L^2 T^-2, coil_temp_rise_f: T, heater_btuh: M L^2 T^-3, defrost_efficiency: dimensionless } out: { sensible_btu: M L^2 T^-2, latent_btu: M L^2 T^-2, total_btu: M L^2 T^-2, defrost_min: T }
 export function computeDefrostCycleSizing({ frost_lb = 0, coil_temp_f = -10, coil_mass_lb = 0, coil_specific_heat = 0.10, coil_temp_rise_f = 0, heater_btuh = 0, defrost_efficiency = 0.8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(frost_lb > 0)) return { error: "Frost mass per cycle must be positive." };
@@ -1352,7 +1352,7 @@ REFRIGERANT_RENDERERS["defrost-cycle-sizing"] = _simpleRenderer({
 });
 
 // ===================== spec-v1417: refrigerant leak rate and the repair threshold =====================
-// dims: in { args: dimensionless } out: { leak_rate_pct: dimensionless, allowed_lb: M, pounds_over_lb: M }
+// dims: in { full_charge_lb: M, pounds_added_lb: M, period_months: T, threshold_pct: dimensionless } out: { leak_rate_pct: dimensionless, allowed_lb: M, pounds_over_lb: M }
 export function computeRefrigerantLeakRate({ full_charge_lb = 0, pounds_added_lb = 0, period_months = 12, threshold_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(full_charge_lb > 0)) return { error: "Full charge must be positive -- a system whose full charge has never been recorded cannot compute a compliant leak rate at all." };
@@ -1400,7 +1400,7 @@ REFRIGERANT_RENDERERS["refrigerant-leak-rate"] = _simpleRenderer({
 });
 
 // ===================== spec-v1418: refrigerant recovery time and phase split =====================
-// dims: in { args: dimensionless } out: { liquid_min: T, vapor_min: T, total_min: T, speedup_factor: dimensionless }
+// dims: in { total_charge_lb: M, liquid_charge_lb: M, liquid_rate_lb_min: M T^-1, vapor_rate_lb_min: M T^-1, evacuation_min: T, cylinder_net_lb: M } out: { liquid_min: T, vapor_min: T, total_min: T, speedup_factor: dimensionless }
 export function computeRefrigerantRecoveryTime({ total_charge_lb = 0, liquid_charge_lb = 0, liquid_rate_lb_min = 0, vapor_rate_lb_min = 0, evacuation_min = 0, cylinder_net_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(total_charge_lb > 0)) return { error: "Total charge must be positive." };
@@ -1460,7 +1460,7 @@ REFRIGERANT_RENDERERS["refrigerant-recovery-time"] = _simpleRenderer({
 });
 
 // ===================== spec-v1419: low-ambient head pressure control =====================
-// dims: in { args: dimensionless } out: { min_head_psig: M L^-1 T^-2, flooding_charge_lb: M, winter_charge_lb: M }
+// dims: in { refrigerant: dimensionless, evaporator_psig: M L^-1 T^-2, valve_dp_psi: M L^-1 T^-2, line_losses_psi: M L^-1 T^-2, condenser_volume_cf: L^3, flooded_fraction: dimensionless, liquid_density_pcf: M L^-3, receiver_capacity_lb: M, summer_charge_lb: M } out: { min_head_psig: M L^-1 T^-2, flooding_charge_lb: M, winter_charge_lb: M }
 export function computeHeadPressureControl({ refrigerant = "R_410A", evaporator_psig = 0, valve_dp_psi = 0, line_losses_psi = 0, condenser_volume_cf = 0, flooded_fraction = 0.8, liquid_density_pcf = 70, receiver_capacity_lb = 0, summer_charge_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(evaporator_psig >= 0)) return { error: "Evaporator pressure cannot be negative." };

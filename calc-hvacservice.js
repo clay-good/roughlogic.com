@@ -1087,7 +1087,7 @@ function _v609renderCombustionLambda(inputRegion, outputRegion, citationEl) {
 HVACSERVICE_RENDERERS["combustion-lambda"] = _v609renderCombustionLambda;
 
 // ===================== spec-v997: oil burner nozzle firing rate (GPH) =====================
-// dims: in { args: dimensionless } out: { input_btu_hr: dimensionless, firing_rate_gph: dimensionless }
+// dims: in { output_btu_hr: M L^2 T^-3, steady_state_efficiency_pct: dimensionless, heating_value_btu_gal: M L^-1 T^-2 } out: { input_btu_hr: M L^2 T^-3, firing_rate_gph: L^3 T^-1 }
 export function computeOilBurnerFiringRate({ output_btu_hr = 88000, steady_state_efficiency_pct = 85, heating_value_btu_gal = 138500 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(output_btu_hr > 0)) return { error: "Design output must be positive (BTU/hr)." };

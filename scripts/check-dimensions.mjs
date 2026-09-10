@@ -419,7 +419,8 @@ const UNQUALIFIED_KEYS = new Set([
   "v", "w", "x", "y", "z", "C", "n1", "n2", "v1", "v2", "x1", "x2", "y1", "y2", "c1", "c2",
   "d1", "d2", "t1", "t2", "p1", "p2", "r1", "r2", "w1", "w2", "e0", "mu", "nu", "gamma",
   "beta", "theta", "phi", "value", "load", "density", "temperature", "voltage", "size",
-  "count", "total", "result", "nominal_size", "molecular_weight", "k_factor", "u_factor",
+  "count", "total", "result", "nominal_size", "pipe_size", "molecular_weight", "k_factor",
+  "u_factor",
   "diametral_pitch", "pitch_rise",
 ]);
 
@@ -480,7 +481,7 @@ function checkKeyAgreement(keyDims, errors) {
 const STUB_INPUT_NAMES = new Set(["args", "input", "opts", "options", "params", "o", "obj"]);
 
 // Lower this as stubs are drained. It may never rise.
-const STUB_BUDGET = 97;
+const STUB_BUDGET = 82;
 
 function isStubAnnotation(fn) {
   if (!fn.parse || !fn.parse.ok) return false;
