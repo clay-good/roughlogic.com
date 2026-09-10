@@ -14,8 +14,18 @@
 //
 // This gate pins the catalog invariants in the README by anchoring on the
 // stable LABEL next to each number (not the number's position), so it
-// catches drift whether the number lives in prose or a Mermaid node. It
-// derives the live values from the same sources the build uses.
+// catches drift wherever the number lives in the prose. It derives the live
+// values from the same sources the build uses.
+//
+// The README's Mermaid diagrams have since been removed, and with them the
+// four diagram-node anchors above -- which is how the second half of this
+// gate's job came to light. An anchor whose phrase disappears used to match
+// nothing and say nothing, so those four sat dead while the prose beside one
+// of them drifted (2026-09-10: "the N static shells are not precached" read
+// 1,878 against a live 2,104, while the same sentence in docs/architecture.md
+// and docs/deployment.md was anchored and read correctly). A zero-match anchor
+// is therefore a FAILURE now, exactly like a wrong number: a claim may not
+// stop being checked by quietly ceasing to be stated.
 //
 // Deterministic, offline, no build needed -> runs in the `npm run lint`
 // chain. Standalone Node 20, built-ins only.
@@ -115,6 +125,16 @@ async function liveCounts() {
 
 // For a label-anchored pattern, collect every number that precedes/follows
 // the stable label and assert each equals `expected`.
+// An anchor that matches NOTHING is an anchor guarding nothing. This walked the
+// matches it found and said nothing when it found none, so a claim could be
+// deleted -- or drift into a shape the pattern no longer recognises -- and the
+// gate stayed green. Both happened at once: the four Mermaid-node anchors this
+// file was written for went dead when the README's diagrams were removed, and
+// the prose beside one of them ("the N static shells are not precached") then
+// rotted to 1,878 against a live 2,104 with nothing watching. So a zero-match
+// anchor is now a failure, the same way a wrong number is. If a sentence moves,
+// move its anchor; if a claim is genuinely retired, delete the anchor
+// deliberately in the same commit.
 function checkPattern(readme, re, expected, label, errors) {
   // The label already names the file when it is not the README, and a message
   // that opens "README:" while pointing at docs/performance.md is the same
@@ -129,23 +149,11 @@ function checkPattern(readme, re, expected, label, errors) {
       errors.push(`${source}: "${m[0].replace(/\\n/g, "\\n").trim()}" states ${n}, but the live ${label.replace(/\s*\([^)]+\.md\)$/, "")} is ${expected}.`);
     }
   }
-  return found;
-}
-
-// Same as `checkPattern`, but the phrase must actually BE there. `checkPattern`
-// walks the matches it finds and says nothing when it finds none, so deleting
-// the sentence is a way to satisfy the gate that guards it -- the number stops
-// being wrong by ceasing to be stated. Every anchor below describes a figure
-// the README uses to say how far a guarantee reaches, which is precisely the
-// kind of claim that should not be allowed to quietly disappear.
-function checkPatternRequired(readme, re, expected, label, errors) {
-  const found = checkPattern(readme, re, expected, label, errors);
   if (found === 0) {
-    const where = /\(([^)]+\.md)\)/.exec(label);
     errors.push(
-      `${where ? where[1] : "README.md"}: the phrase stating the ${label.replace(/\s*\([^)]+\.md\)$/, "")} ` +
-      `is gone. It is anchored here so the figure cannot rot; if the sentence moved, move this anchor with it ` +
-      `rather than dropping the claim.`);
+      `${source}: the phrase stating the ${label.replace(/\s*\([^)]+\.md\)$/, "")} is gone -- ` +
+      `nothing there matches /${re.source}/. It is anchored here so the figure cannot rot; if the ` +
+      `sentence moved, move this anchor with it rather than leaving an anchor that guards nothing.`);
   }
   return found;
 }
@@ -415,16 +423,30 @@ async function main() {
   checked += checkPattern(perf, /\*\*([\d,]+) integrity-checked entries/g, live.dataEntries, "integrity-checked entry count (docs/performance.md)", errors);
   checked += checkPattern(perf, /entries across ([\d,]+) dataset folders/g, live.dataFolders, "dataset folder count (docs/performance.md)", errors);
 
-  // Tile count: the /tools/ shell-diagram node and the prose "(N)".
-  // ("static shells" also labels the /groups/ node, so anchor on the path.)
-  checked += checkPattern(readme, /\/tools\/&lt;id&gt;\/index\.html\\n(\d+) static shells/g, live.tiles, "tile count", errors);
+  // Tile count: the prose "(N)".
+  //
+  // RETIRED HERE: the three Mermaid-node anchors this file was originally
+  // written for -- the /tools/ and /groups/ shell-diagram nodes and the
+  // architecture diagram's "N group modules" -- plus the sitemap.xml node
+  // below. The README no longer contains a Mermaid block at all, so all four
+  // matched nothing while the gate reported OK. They are deleted rather than
+  // left in place: an anchor for content that does not exist is a dead
+  // exemption, and now that a zero-match anchor fails, leaving them would fail
+  // the build for a diagram nobody intends to bring back. If the diagrams
+  // return, so should the anchors.
   checked += checkPattern(readme, /shell per tile \((\d+)\)/g, live.tiles, "tile count", errors);
-  // Group count: the /groups/ shell-diagram node.
-  checked += checkPattern(readme, /\/groups\/&lt;slug&gt;\/index\.html\\n(\d+) static shells/g, live.groups, "group count", errors);
 
-  // Module count: the architecture diagram node and the file-tree line.
-  checked += checkPattern(readme, /(\d+) group modules/g, live.modules, "calc-* module count", errors);
+  // Module count: the file-tree line.
   checked += checkPattern(readme, /(\d+) per-group calculator modules/g, live.modules, "calc-* module count", errors);
+
+  // The static-shell total, which THREE surfaces state and only two were
+  // anchored. docs/architecture.md and docs/deployment.md both say "N static
+  // shells is not a precache" and both were pinned above, so both read the
+  // live 2,104. The README makes the identical claim in its "How it's built"
+  // paragraph, was pinned only through a Mermaid node that no longer exists,
+  // and had rotted to 1,878 -- a catalog-and-a-bit out of date, on the copy a
+  // reader meets first.
+  checked += checkPattern(readme, /The ([\d,]+) static shells are not precached/g, live.shells, "static shell count", errors);
 
   // Gate count: the trust section's headline number and the develop-section
   // comment. A reader is being told how much has to pass; say the real number.
@@ -437,8 +459,8 @@ async function main() {
   const contributing = await readFile(resolve(ROOT, "CONTRIBUTING.md"), "utf8");
   checked += checkPattern(contributing, /alone is (\d+) static gates/g, live.gates, "lint gate count (CONTRIBUTING.md)", errors);
 
-  // Sitemap URL count: the build diagram node and the prose "carries N URLs".
-  checked += checkPattern(readme, /sitemap\.xml\\n(\d+) URLs/g, live.sitemap, "sitemap URL count", errors);
+  // Sitemap URL count: the prose "carries N URLs" (the build-diagram node is
+  // retired with the other three -- see the note above).
   checked += checkPattern(readme, /carries (\d+) URLs/g, live.sitemap, "sitemap URL count", errors);
 
   // ---- "Why you can trust the answers": the reach of each guarantee ----
@@ -451,7 +473,7 @@ async function main() {
 
   // check-cross-validation: how many tolerance checks the ceiling polices.
   const xvalChecks = gateFigure("check-cross-validation.mjs", /([\d,]+) tolerance check/, "tolerance-check count");
-  checked += checkPatternRequired(readme, /or carries a written justification \(([\d,]+) checks\)/g, xvalChecks, "cross-validation tolerance-check count", errors);
+  checked += checkPattern(readme, /or carries a written justification \(([\d,]+) checks\)/g, xvalChecks, "cross-validation tolerance-check count", errors);
 
   // check-example-parity: the static half and the browser-driven half, which
   // must also add up to the catalog -- the README's old trio (1,673 + 131)
@@ -460,16 +482,16 @@ async function main() {
   const parityRuntime = execFileSync("node", [resolve(ROOT, "scripts", "check-example-parity.mjs"), "--list-unresolved"], { encoding: "utf8" })
     .split("\n").map((x) => x.trim()).filter(Boolean).length;
   const parityStatic = live.tiles - parityRuntime;
-  checked += checkPatternRequired(readme, /\(([\d,]+) tiles statically;/g, parityStatic, "example-parity static tile count", errors);
-  checked += checkPatternRequired(readme, /the ([\d,]+) that declare theirs inline/g, parityRuntime, "example-parity runtime tile count", errors);
-  checked += checkPatternRequired(readme, /so the claim covers all ([\d,]+)\)/g, live.tiles, "example-parity total tile count", errors);
+  checked += checkPattern(readme, /\(([\d,]+) tiles statically;/g, parityStatic, "example-parity static tile count", errors);
+  checked += checkPattern(readme, /the ([\d,]+) that declare theirs inline/g, parityRuntime, "example-parity runtime tile count", errors);
+  checked += checkPattern(readme, /so the claim covers all ([\d,]+)\)/g, live.tiles, "example-parity total tile count", errors);
 
   // check-dead-inputs: the computes the destructuring sweep actually reaches.
   const deadInputComputes = gateFigure("check-dead-inputs.mjs", /([\d,]+) computes that destructure their inputs/, "destructuring-compute count");
-  checked += checkPatternRequired(readme, /across the ([\d,]+) computes that destructure their inputs/g, deadInputComputes, "destructuring-compute count", errors);
+  checked += checkPattern(readme, /across the ([\d,]+) computes that destructure their inputs/g, deadInputComputes, "destructuring-compute count", errors);
 
   // check-tile-registries: the id count every full registry must hold.
-  checked += checkPatternRequired(readme, /names every registry that holds all ([\d,]+) ids/g, live.tiles, "registry id count", errors);
+  checked += checkPattern(readme, /names every registry that holds all ([\d,]+) ids/g, live.tiles, "registry id count", errors);
 
   // NOT anchored here: the "N of them are first-principles" figure in the same
   // table. `check-worked-examples` already holds that sentence to the registry,
