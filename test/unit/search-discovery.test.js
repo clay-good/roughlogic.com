@@ -429,6 +429,46 @@ test("extractQuantities leaves ordinary hyphenated phrases alone", () => {
   assert.deepEqual(extractQuantities("3-ply wall"), [{ value: "3", unit: null }]);
 });
 
+// Until 2026-09-09 every NEGATIVE number in a question was invisible. The
+// anchor above rejects a digit run glued to `-` so that the "2" in "12-2 romex"
+// is not a quantity -- and it made no distinction between that hyphen and a
+// minus sign, so a sub-freezing design temperature was simply dropped. The
+// two temperature normalizers in query-fill.js preserve the sign explicitly
+// (`(-?\d+...)\s*deg c`) and were handing it to a scanner that threw the
+// whole number away.
+//
+// The rule is what sits in FRONT of the minus: nothing, whitespace or an
+// opening bracket makes it arithmetic; a letter or a digit makes it a hyphen
+// inside an identifier.
+test("extractQuantities reads a minus sign, and still refuses a hyphen", () => {
+  assert.deepEqual(extractQuantities("-10 degf"), [{ value: "-10", unit: "degf" }]);
+  // A spaced single-letter unit is not a unit here by long-standing design, so
+  // this is the sign alone, which is the part under test.
+  assert.deepEqual(extractQuantities("design temp -5 c"), [{ value: "-5", unit: null }]);
+  assert.deepEqual(extractQuantities("(-5) offset"), [{ value: "-5", unit: null }]);
+  assert.deepEqual(extractQuantities("longitude -80.19"), [{ value: "-80.19", unit: null }]);
+  // A heating question states both ends; the sub-zero one used to vanish,
+  // leaving the indoor number as the only candidate for either field.
+  assert.deepEqual(
+    extractQuantities("outdoor -10degf indoor 70degf"),
+    [{ value: "-10", unit: "degf" }, { value: "70", unit: "degf" }],
+  );
+  // Unchanged, and the reason the guard exists: these are identifiers.
+  assert.deepEqual(extractQuantities("12-2 romex"), [{ value: "12", unit: null }]);
+  // A digit glued behind a LETTER-hyphen was dropped entirely before this
+  // change and still is: "type-4" names an enclosure, not a quantity of 4.
+  assert.deepEqual(extractQuantities("type-4 enclosure"), []);
+  assert.deepEqual(extractQuantities("2026-01-01"), [{ value: "2026", unit: null }]);
+});
+
+test("extractQuantities: a signed number reports the sign's own offset", () => {
+  // query-fill reads `index` to tell `length 40 width 20` from `40 length 20
+  // width`, so the offset must be where the number starts -- the minus.
+  const [q] = extractQuantities("temp -12 degf", { withIndex: true });
+  assert.equal(q.value, "-12");
+  assert.equal("temp -12 degf".slice(q.index, q.end), "-12 degf");
+});
+
 // A query that OPENS with a calculator's whole name is asking for that
 // calculator and then handing it numbers. Coverage sorts ahead of score, so a
 // sibling matching one more of the leftover words used to win: "asphalt

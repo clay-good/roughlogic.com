@@ -723,10 +723,29 @@ export function extractQuantities(query, opts) {
   while ((m = QUANTITY_RE.exec(q)) !== null) {
     const before = m.index === 0 ? "" : q[m.index - 1];
     const afterIdx = m.index + m[0].length;
-    // Anchored: a digit run glued to a preceding letter / number
-    // punctuation is part of an identifier ("m3", "62.2" tail), not a
-    // quantity.
-    if (before && /[a-z0-9.,/-]/.test(before)) continue;
+    // A leading minus is a SIGN only where nothing sits in front of it that it
+    // could be joining. `12-2 romex`, `type-4`, `2026-01-01` are identifiers,
+    // and the anchor below has always dropped their trailing halves; that must
+    // not change. But a minus after a space or an opening bracket, or at the
+    // very start, is arithmetic -- and reading it as an identifier hyphen made
+    // every negative number in a question INVISIBLE. "outdoor temperature -10
+    // degrees f and indoor 70 f" returned the 70 alone, so a heating question
+    // at ten below filled its design-temperature field with the indoor number
+    // or nothing at all; "a temperature of -5 c" returned no quantity at all.
+    // The two temperature normalizers in query-fill.js go to the trouble of
+    // preserving the sign (`(-?\d+...)\s*deg c`) and handed it to a scanner
+    // that then threw the whole number away.
+    let sign = "";
+    if (before === "-") {
+      const prior = m.index >= 2 ? q[m.index - 2] : "";
+      if (prior === "" || /[\s([]/.test(prior)) sign = "-";
+      else continue;
+    } else if (before && /[a-z0-9.,/]/.test(before)) {
+      // Anchored: a digit run glued to a preceding letter / number
+      // punctuation is part of an identifier ("m3", "62.2" tail), not a
+      // quantity.
+      continue;
+    }
     let value;
     const frac = m[0].match(/^(\d+)\s*\/\s*(\d+)$/);
     if (frac) {
@@ -736,6 +755,9 @@ export function extractQuantities(query, opts) {
     } else {
       value = m[0].replace(/,/g, "");
     }
+    // A signed fraction ("-1/2 in") keeps its sign; the fraction branch above
+    // has already divided, so prefixing is safe for both shapes.
+    if (sign) value = sign + value;
     // Unit token: glued ("120v") or exactly one space away ("150 ft").
     // Single-letter units are accepted glued only, so an article ("a")
     // or a dimension separator ("x") never reads as a unit.
@@ -761,7 +783,10 @@ export function extractQuantities(query, opts) {
     }
     if (withIndex) {
       const consumed = (glued ? glued[1].length : spaced ? spaced[0].length : 0) + (tail ? tail[0].length : 0);
-      out.push({ value, unit, index: m.index, end: afterIdx + consumed });
+      // The index points at the sign, not the first digit: query-fill reads
+      // these offsets to tell `length 40 width 20` from `40 length 20 width`,
+      // and the character the number starts at is the minus.
+      out.push({ value, unit, index: m.index - sign.length, end: afterIdx + consumed });
     } else {
       out.push({ value, unit });
     }

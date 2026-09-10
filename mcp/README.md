@@ -77,10 +77,13 @@ requiredness to decide whether it may run. Before this, *"declination at latitud
 25.76 longitude -80.19"* filled the latitude, silently missed the longitude, and
 answered `OK` anyway. It now returns `MISSING_INPUTS` naming the longitude.
 
-(A question written with a negative longitude still cannot be filled from the
-text: `extractQuantities` reads no number carrying a minus sign. That is a
-catalog-wide limit of the extractor, not of this tile, and it is tracked
-separately.)
+Filling that longitude from the text needed one more fix, catalog-wide rather
+than specific to this tile: `extractQuantities` read no number carrying a minus
+sign, because the guard that stops the "2" in `12-2 romex` from being a quantity
+made no distinction between a hyphen and a sign. A minus is now read as a sign
+where nothing it could be joining sits in front of it -- start of string,
+whitespace, or an opening bracket -- and as a hyphen otherwise. *"magnetic
+declination at latitude 25.76 longitude -80.19"* answers -7.38 deg.
 
 Input names come from the calculator's renderer schema where it has one, and
 otherwise from its compute signature. Where the signature cannot be read — a
@@ -182,11 +185,15 @@ names and curated alias phrases: three answers changed, all three from
 
 ### What the extractor is not measured on
 
-`scripts/measure-query-fill.mjs` reports **0 wrong values** across 1,763 tiles,
-and that is true of the corpus it measures: every number labelled, in field
-order, taken from each tile's own worked example. It carries no distractors, so
-it cannot see the case where a question holds more numbers than the tile has
-fields.
+`scripts/measure-query-fill.mjs` reports **0 wrong values** across 2,043 tiles
+(5,223 of 9,203 fields recovered), and that is true of the corpus it measures:
+every number labelled, in field order, taken from each tile's own worked
+example. It carries no distractors, so it cannot see the case where a question
+holds more numbers than the tile has fields.
+
+Reading the minus sign moved that corpus 5,211 -> 5,223 fields and 703 -> 707
+tiles fully recovered, still at 0 wrong values, and left `measure-ranking.mjs`
+byte-identical.
 
 Five of five hand-written trade questions do bind a value the query text rules
 out. `wire size for a 50 amp circuit 90 feet away` puts **90 into the
