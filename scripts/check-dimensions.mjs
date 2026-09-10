@@ -154,6 +154,7 @@ function parseDimsAnnotation(text) {
 //   - power (hp, kw, kva, btuh, btuhr)  - energy (btu, kwh)
 //   - length (ft, in, mi)             - force (lbf)
 //   - area (ft2, sf, in2, sqft, sqin) - volume (gal, gallons, ft3, cy, yd3)
+//   - frequency (hz)                  - resistance (ohm, ohms)
 //
 // NOT covered, and why -- each of these would produce a wrong verdict, so the
 // gate stays silent rather than flattering itself with coverage it lacks:
@@ -186,6 +187,7 @@ const UNIT_TAIL_DIMS = new Map(Object.entries({
   ft: "L", in: "L", mi: "L",
   sqft: "L^2", sqin: "L^2",
   cy: "L^3", yd3: "L^3",
+  hz: "T^-1", ohm: "M L^2 T^-3 I^-2", ohms: "M L^2 T^-3 I^-2",
 }));
 
 // A segment that, sitting directly in front of the tail, means the tail is the
@@ -424,7 +426,7 @@ function checkKeyAgreement(keyDims, errors) {
 const STUB_INPUT_NAMES = new Set(["args", "input", "opts", "options", "params", "o", "obj"]);
 
 // Lower this as stubs are drained. It may never rise.
-const STUB_BUDGET = 161;
+const STUB_BUDGET = 160;
 
 function isStubAnnotation(fn) {
   if (!fn.parse || !fn.parse.ok) return false;

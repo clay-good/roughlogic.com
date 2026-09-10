@@ -478,7 +478,7 @@ MILLWRIGHT_RENDERERS["vibration-severity-zone"] = _simpleRenderer({
 
 // ============ spec-v1475: vibration forcing frequencies ============
 
-// dims: in { rpm: T^-1, blade_count: dimensionless, gear_tooth_count: dimensionless, belt_length_in: L, sheave_diameter_in: L, line_frequency_hz: dimensionless, rotor_bar_count: dimensionless } out: { one_x_hz: dimensionless, blade_pass_hz: dimensionless, gear_mesh_hz: dimensionless, belt_frequency_hz: dimensionless, twice_line_hz: dimensionless, rotor_bar_pass_hz: dimensionless }
+// dims: in { rpm: T^-1, blade_count: dimensionless, gear_tooth_count: dimensionless, belt_length_in: L, sheave_diameter_in: L, line_frequency_hz: T^-1, rotor_bar_count: dimensionless } out: { one_x_hz: T^-1, blade_pass_hz: T^-1, gear_mesh_hz: T^-1, belt_frequency_hz: T^-1, twice_line_hz: T^-1, rotor_bar_pass_hz: T^-1 }
 export function computeVibrationForcingFrequencies({ rpm = 0, blade_count = 0, gear_tooth_count = 0, belt_length_in = 0, sheave_diameter_in = 0, line_frequency_hz = 60, rotor_bar_count = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rpm > 0)) return { error: "Shaft speed must be positive (rpm)." };
@@ -543,7 +543,7 @@ MILLWRIGHT_RENDERERS["vibration-forcing-frequencies"] = _simpleRenderer({
 
 // ============ spec-v1476: rolling-element bearing defect frequencies ============
 
-// dims: in { rpm: T^-1, ball_count: dimensionless, ball_diameter_in: L, pitch_diameter_in: L, contact_angle_deg: dimensionless } out: { shaft_hz: dimensionless, ftf_hz: dimensionless, bpfo_hz: dimensionless, bpfi_hz: dimensionless, bsf_hz: dimensionless }
+// dims: in { rpm: T^-1, ball_count: dimensionless, ball_diameter_in: L, pitch_diameter_in: L, contact_angle_deg: dimensionless } out: { shaft_hz: T^-1, ftf_hz: T^-1, bpfo_hz: T^-1, bpfi_hz: T^-1, bsf_hz: T^-1 }
 export function computeBearingDefectFrequencies({ rpm = 0, ball_count = 0, ball_diameter_in = 0, pitch_diameter_in = 0, contact_angle_deg = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rpm > 0)) return { error: "Shaft speed must be positive (rpm)." };

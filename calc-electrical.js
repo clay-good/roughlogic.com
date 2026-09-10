@@ -5027,7 +5027,7 @@ function _v472renderTransformerLoadingEfficiency(inputRegion, outputRegion, cita
 ELECTRICAL_RENDERERS["transformer-loading-efficiency"] = _v472renderTransformerLoadingEfficiency;
 
 // ===================== spec-v473: economic conductor sizing (I2R payback) =====================
-// dims: in { current_a: I, r_small_ohm: dimensionless, r_big_ohm: dimensionless, hours: T, rate_kwh: dimensionless, upsize_cost: dimensionless } out: { loss_small_kw: M L^2 T^-3, loss_big_kw: M L^2 T^-3, annual_saving: dimensionless, payback_yr: dimensionless }
+// dims: in { current_a: I, r_small_ohm: M L^2 T^-3 I^-2, r_big_ohm: M L^2 T^-3 I^-2, hours: T, rate_kwh: dimensionless, upsize_cost: dimensionless } out: { loss_small_kw: M L^2 T^-3, loss_big_kw: M L^2 T^-3, annual_saving: dimensionless, payback_yr: dimensionless }
 export function computeEconomicConductorSizing({ current_a = 0, r_small_ohm = 0, r_big_ohm = 0, hours = 0, rate_kwh = 0, upsize_cost = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const I = Number(current_a) || 0;

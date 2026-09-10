@@ -539,7 +539,7 @@ function _v524renderTddIeee519(inputRegion, outputRegion, citationEl) {
 POWERQUALITY_RENDERERS["tdd-ieee-519"] = _v524renderTddIeee519;
 
 // --- spec-v955: Series RLC reactance, impedance, and resonant frequency (`rlc-reactance-resonance`) ---
-// dims: in { args: dimensionless } out: { inductive_reactance_ohm: dimensionless, capacitive_reactance_ohm: dimensionless, impedance_ohm: dimensionless, resonant_frequency_hz: dimensionless, power_factor: dimensionless }
+// dims: in { frequency_hz: T^-1, resistance_ohm: M L^2 T^-3 I^-2, inductance_h: M L^2 T^-2 I^-2, capacitance_uf: M^-1 L^-2 T^4 I^2 } out: { inductive_reactance_ohm: M L^2 T^-3 I^-2, capacitive_reactance_ohm: M L^2 T^-3 I^-2, impedance_ohm: M L^2 T^-3 I^-2, resonant_frequency_hz: T^-1, power_factor: dimensionless }
 export function computeRlcReactanceResonance({ frequency_hz = 60, resistance_ohm = 10, inductance_h = 0.05, capacitance_uf = 50 } = {}) {
   for (const v of [frequency_hz, resistance_ohm, inductance_h, capacitance_uf]) {
     if (typeof v === "number" && !Number.isFinite(v)) return { error: "All numeric inputs must be finite numbers." };
