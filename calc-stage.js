@@ -1755,7 +1755,7 @@ function renderWinchFleetAngle(inputRegion, outputRegion, citationEl) {
 STAGE_RENDERERS["winch-fleet-angle"] = renderWinchFleetAngle;
 
 // ===================== spec-v1003: potential / needed acoustic gain (feedback stability) =====================
-// dims: in { args: dimensionless } out: { pag_db: dimensionless, nag_db: dimensionless, margin_db: dimensionless }
+// dims: in { ds_ft: L, d0_ft: L, d1_ft: L, d2_ft: L, open_mics: dimensionless, ead_ft: L } out: { pag_db: dimensionless, nag_db: dimensionless, margin_db: dimensionless }
 export function computeAcousticGainPagNag({ ds_ft = 2, d0_ft = 30, d1_ft = 8, d2_ft = 12, open_mics = 1, ead_ft = 6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(ds_ft > 0)) return { error: "Talker-to-mic distance Ds must be positive (ft)." };
@@ -1823,7 +1823,7 @@ STAGE_RENDERERS["acoustic-gain-pag-nag"] = _v1003renderAcousticGainPagNag;
 const _speedOfSound = (temp_f) => 1125 * Math.sqrt((temp_f + 459.67) / 529.67);
 
 // ===================== spec-v1364: line array vertical coverage and splay =====================
-// dims: in { args: dimensionless } out: { coverage_deg: dimensionless, avg_splay_deg: dimensionless, level_taper_db: dimensionless }
+// dims: in { trim_height_ft: L, ear_height_ft: L, near_throw_ft: L, far_throw_ft: L, cabinets: dimensionless } out: { coverage_deg: dimensionless, avg_splay_deg: dimensionless, level_taper_db: dimensionless }
 export function computeLineArraySplay({ trim_height_ft = 0, ear_height_ft = 4, near_throw_ft = 0, far_throw_ft = 0, cabinets = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(trim_height_ft > 0)) return { error: "Trim height must be positive." };
@@ -2030,7 +2030,7 @@ STAGE_RENDERERS["driver-spacing-lobing"] = _r({
 });
 
 // ===================== spec-v1368: two-transmitter intermodulation screen =====================
-// dims: in { args: dimensionless } out: { spacing_mhz: T^-1, third_low_mhz: T^-1, third_high_mhz: T^-1 }
+// dims: in { f1_mhz: T^-1, f2_mhz: T^-1, test_freq_mhz: T^-1 } out: { spacing_mhz: T^-1, third_low_mhz: T^-1, third_high_mhz: T^-1 }
 export function computeWirelessIntermod({ f1_mhz = 0, f2_mhz = 0, test_freq_mhz = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(f1_mhz > 0) || !(f2_mhz > 0)) return { error: "Both carrier frequencies must be positive." };
@@ -2086,7 +2086,7 @@ STAGE_RENDERERS["wireless-intermod"] = _r({
 });
 
 // ===================== spec-v1369: RF antenna cable loss and amplifier budget =====================
-// dims: in { args: dimensionless } out: { cable_loss_db: dimensionless, total_loss_db: dimensionless, net_gain_db: dimensionless }
+// dims: in { length_ft: L, loss_per_100ft_db: dimensionless, connectors: dimensionless, loss_per_connector_db: dimensionless, splitter_loss_db: dimensionless, amplifier_gain_db: dimensionless } out: { cable_loss_db: dimensionless, total_loss_db: dimensionless, net_gain_db: dimensionless }
 export function computeRfAntennaCableLoss({ length_ft = 0, loss_per_100ft_db = 0, connectors = 0, loss_per_connector_db = 0.25, splitter_loss_db = 0, amplifier_gain_db = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(length_ft > 0)) return { error: "Cable length must be positive." };
@@ -2140,7 +2140,7 @@ STAGE_RENDERERS["rf-antenna-cable-loss"] = _r({
 });
 
 // ===================== spec-v1370: chain hoist lift time, power, and duty cycle =====================
-// dims: in { args: dimensionless } out: { lift_time_min: T, hoisting_hp: M L^2 T^-3, allowed_on_time_min: T, lifts_per_period: dimensionless }
+// dims: in { lift_height_ft: L, hoist_speed_fpm: L T^-1, load_lb: M L T^-2, duty_cycle: dimensionless, rating_period_min: T, hoists: dimensionless } out: { lift_time_min: T, hoisting_hp: M L^2 T^-3, allowed_on_time_min: T, lifts_per_period: dimensionless }
 export function computeChainHoistLiftTime({ lift_height_ft = 0, hoist_speed_fpm = 16, load_lb = 0, duty_cycle = 0.4, rating_period_min = 10, hoists = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(lift_height_ft > 0)) return { error: "Lift height must be positive." };
@@ -2198,7 +2198,7 @@ STAGE_RENDERERS["chain-hoist-lift-time"] = _r({
 });
 
 // ===================== spec-v1371: gobo projected image size and keystone =====================
-// dims: in { args: dimensionless } out: { image_diameter_ft: L, keystone_stretch: dimensionless, stretched_axis_ft: L, relative_illuminance: dimensionless }
+// dims: in { throw_ft: L, field_angle_deg: dimensionless, incidence_deg: dimensionless, gobo_image_mm: L, gate_diameter_mm: L } out: { image_diameter_ft: L, keystone_stretch: dimensionless, stretched_axis_ft: L, relative_illuminance: dimensionless }
 export function computeGoboImageSize({ throw_ft = 0, field_angle_deg = 0, incidence_deg = 0, gobo_image_mm = 0, gate_diameter_mm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(throw_ft > 0)) return { error: "Throw distance must be positive." };
@@ -2264,7 +2264,7 @@ export const MIRED_CORRECTIONS = [
   { name: "Full CTO", shift: 131 },
 ];
 
-// dims: in { args: dimensionless } out: { source_mired: dimensionless, target_mired: dimensionless, shift_needed: dimensionless, resulting_k: dimensionless }
+// dims: in { source_k: T, target_k: T, applied_shift: T^-1 } out: { source_mired: T^-1, target_mired: T^-1, shift_needed: T^-1, resulting_k: T }
 export function computeMiredGelShift({ source_k = 3200, target_k = 5600, applied_shift = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(source_k > 0)) return { error: "Source color temperature must be positive." };
@@ -2317,7 +2317,7 @@ STAGE_RENDERERS["mired-gel-shift"] = _r({
 });
 
 // ===================== spec-v1373: haze and fog machine output for a venue =====================
-// dims: in { args: dimensionless } out: { ventilation_cfm: L^3 T^-1, required_output: dimensionless, time_constant_hr: T, time_to_90_hr: T }
+// dims: in { volume_cf: L^3, ach: T^-1, ref_volume_cf: L^3, ref_ach: T^-1, ref_output: dimensionless } out: { ventilation_cfm: L^3 T^-1, required_output: dimensionless, time_constant_hr: T, time_to_90_hr: T }
 export function computeHazeMachineSizing({ volume_cf = 0, ach = 0, ref_volume_cf = 100000, ref_ach = 2, ref_output = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(volume_cf > 0)) return { error: "Venue volume must be positive." };
@@ -2367,7 +2367,7 @@ STAGE_RENDERERS["haze-machine-sizing"] = _r({
 });
 
 // ===================== spec-v1374: stage deck and platform live-load check =====================
-// dims: in { args: dimensionless } out: { deck_area_sqft: L^2, live_load_lb: M, load_per_leg_lb: M, leg_utilization_pct: dimensionless }
+// dims: in { length_ft: L, width_ft: L, legs: dimensionless, design_psf: M L^-1 T^-2, deck_dead_lb: M L T^-2, leg_rating_lb: M L T^-2, point_load_lb: M L T^-2, bearing_sqin: L^2, deck_point_rating_lb: M L T^-2 } out: { deck_area_sqft: L^2, live_load_lb: M L T^-2, load_per_leg_lb: M L T^-2, leg_utilization_pct: dimensionless }
 export function computeStageDeckLiveLoad({ length_ft = 0, width_ft = 0, legs = 4, design_psf = 125, deck_dead_lb = 0, leg_rating_lb = 0, point_load_lb = 0, bearing_sqin = 0, deck_point_rating_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(length_ft > 0 && width_ft > 0)) return { error: "Deck length and width must be positive." };
@@ -2438,7 +2438,7 @@ STAGE_RENDERERS["stage-deck-live-load"] = _r({
 });
 
 // ===================== spec-v1375: LED wall data rate and processor port count =====================
-// dims: in { args: dimensionless } out: { total_pixels: dimensionless, data_rate_gbps: dimensionless, ports_needed: dimensionless, spare_pixels: dimensionless }
+// dims: in { width_px: dimensionless, height_px: dimensionless, bit_depth: dimensionless, refresh_hz: T^-1, pixels_per_port: dimensionless } out: { total_pixels: dimensionless, data_rate_gbps: dimensionless, ports_needed: dimensionless, spare_pixels: dimensionless }
 export function computeVideoWallDataRate({ width_px = 0, height_px = 0, bit_depth = 8, refresh_hz = 60, pixels_per_port = 650000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(width_px > 0 && height_px > 0)) return { error: "Wall width and height in pixels must be positive." };
@@ -2486,7 +2486,7 @@ STAGE_RENDERERS["video-wall-data-rate"] = _r({
 });
 
 // ===================== spec-v1376: outdoor stage and banner wind load with ballast =====================
-// dims: in { args: dimensionless } out: { velocity_pressure_psf: M L^-1 T^-2, wind_force_lb: M L T^-2, overturning_moment_ftlb: M L^2 T^-2, required_ballast_lb: M }
+// dims: in { banner_height_ft: L, banner_width_ft: L, centroid_height_ft: L, wind_speed_mph: L T^-1, drag_coefficient: dimensionless, base_width_ft: L, safety_factor: dimensionless, available_ballast_lb: M L T^-2 } out: { velocity_pressure_psf: M L^-1 T^-2, wind_force_lb: M L T^-2, overturning_moment_ftlb: M L^2 T^-2, required_ballast_lb: M L T^-2 }
 export function computeOutdoorStageWind({ banner_height_ft = 0, banner_width_ft = 0, centroid_height_ft = 0, wind_speed_mph = 0, drag_coefficient = 1.3, base_width_ft = 0, safety_factor = 1.5, available_ballast_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(banner_height_ft > 0 && banner_width_ft > 0)) return { error: "Banner height and width must be positive." };

@@ -797,6 +797,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
   The classification, the counts and the named four are now in the gate, in both of its messages and in the README's trust table. The budget still ratchets; what changed is that it no longer implies work that cannot be done.
 
+- **Stub annotations 133 -> 122, and a stage deck was carrying pounds as mass in a function that reported them as force.** The eighth tranche is `calc-stage.js`. Declaring `design_psf` put it against `calc-construction`'s `M L^-1 T^-2` for the same key, and the collision was real: `computeStageDeckLiveLoad` declared its live load and per-leg load as masses, which the corpus's own `ground_snow_psf` and `dead_load_psf` -- both forces per area -- contradict. Nine keys in that module now read as forces, and the function is self-consistent for the first time: `area x design_psf` gives the load, and the load over the legs gives the reaction.
+
+  `computeOutdoorStageWind` had the same split **inside one function**: `wind_force_lb: M L T^-2` beside `required_ballast_lb: M`, where the ballast is derived by dividing an overturning moment by a base width and is therefore a force too.
+
+  **A mired is not a pure number.** `computeMiredGelShift` converts a colour temperature to `1e6 / K` and declared all three mired values, and the Kelvin it converts back to, as `dimensionless`. A mired is a reciprocal temperature; the Kelvin is a temperature.
+
 - **Stub annotations 145 -> 133, and this tranche found nothing -- which is worth saying.** The seventh is `calc-construction.js`: formwork pressure, hip and valley rafters, a crane lift check, a residential framing takeoff, roof ballast, elevator and escalator handling, glass thickness, awning load, a torsion spring, window film and an IGU U-factor. Every declaration came out of the function's own arithmetic, and nothing contradicted anything -- **a tranche that surfaces no defect is still the tranche that put twelve functions' worth of keys under the corpus-wide rules for the first time.**
 
   Two conventions had to be followed rather than fixed. `unit_weight_pcf` is `M L^-3` corpus-wide, so `computeFormworkPressure` gets that even though the pressure it multiplies out to is declared as a force per area; and `ballast_psf` is `M L^-2` because `stone_depth_in = ballast_psf / stone_density_pcf` can only give a length that way. Both are the pound's force-versus-mass split, and each function's own arithmetic decides which side it sits on.
