@@ -1157,7 +1157,7 @@ HVACSERVICE_RENDERERS["flue-gas-dew-point"] = _simpleRenderer({
 });
 
 // ===================== spec-v1005: condensing appliance flue condensate rate =====================
-// dims: in { args: dimensionless } out: { water_produced_lb_hr: dimensionless, condensate_gph: L^3 T^-1 }
+// dims: in { input_btu_hr: M L^2 T^-3, water_lb_per_therm: L^-2 T^2, condensing_fraction: dimensionless } out: { water_produced_lb_hr: M T^-1, condensate_gph: L^3 T^-1 }
 export function computeCondensingFlueCondensate({ input_btu_hr = 100000, water_lb_per_therm = 9.4, condensing_fraction = 0.85 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(input_btu_hr > 0)) return { error: "Fuel input must be positive (BTU/hr)." };
@@ -1337,7 +1337,7 @@ HVACSERVICE_RENDERERS["condensate-overflow-pan"] = _simpleRenderer({
 // ===========================================================================
 
 // ===================== spec-v1415: control damper authority and leakage =====================
-// dims: in { args: dimensionless } out: { authority: dimensionless, leakage_1in_cfm: L^3 T^-1, leakage_actual_cfm: L^3 T^-1, leakage_pct: dimensionless }
+// dims: in { damper_dp_inwg: M L^-1 T^-2, branch_dp_inwg: M L^-1 T^-2, face_area_sqft: L^2, leakage_class_cfm_sqft: L T^-1, closed_dp_inwg: M L^-1 T^-2, design_cfm: L^3 T^-1 } out: { authority: dimensionless, leakage_1in_cfm: L^3 T^-1, leakage_actual_cfm: L^3 T^-1, leakage_pct: dimensionless }
 export function computeDamperAuthority({ damper_dp_inwg = 0, branch_dp_inwg = 0, face_area_sqft = 0, leakage_class_cfm_sqft = 0, closed_dp_inwg = 0, design_cfm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(damper_dp_inwg > 0)) return { error: "Damper pressure drop wide open must be positive." };
@@ -1399,7 +1399,7 @@ HVACSERVICE_RENDERERS["damper-authority"] = _simpleRenderer({
 });
 
 // ===================== spec-v1416: chilled-water low delta-T screen =====================
-// dims: in { args: dimensionless } out: { actual_delta_t_f: T, design_flow_gpm: L^3 T^-1, excess_flow_gpm: L^3 T^-1, pump_penalty: dimensionless }
+// dims: in { load_btuh: M L^2 T^-3, actual_gpm: L^3 T^-1, design_delta_t_f: T } out: { actual_delta_t_f: T, design_flow_gpm: L^3 T^-1, excess_flow_gpm: L^3 T^-1, pump_penalty: dimensionless }
 export function computeChilledWaterDeltaT({ load_btuh = 0, actual_gpm = 0, design_delta_t_f = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(load_btuh > 0)) return { error: "Measured load must be positive." };

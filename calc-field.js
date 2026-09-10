@@ -1271,7 +1271,7 @@ FIELD_RENDERERS["hiking-time"] = renderHikingTime;
 // ===========================================================================
 
 // ===================== spec-v1397: map scale distance and area =====================
-// dims: in { args: dimensionless } out: { ft_per_inch: L, ground_distance_ft: L, ground_area_acres: L^2, acres_per_sq_inch: L^2 }
+// dims: in { representative_fraction: dimensionless, map_distance_in: L, map_area_sqin: L^2 } out: { ft_per_inch: L, ground_distance_ft: L, ground_area_acres: L^2, acres_per_sq_inch: L^2 }
 export function computeMapScaleConversion({ representative_fraction = 24000, map_distance_in = 0, map_area_sqin = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(representative_fraction > 0)) return { error: "Representative fraction must be positive (24000 for a 1:24,000 map)." };
@@ -1320,7 +1320,7 @@ FIELD_RENDERERS["map-scale-conversion"] = _r({
 });
 
 // ===================== spec-v1398: slope and grade from contour lines =====================
-// dims: in { args: dimensionless } out: { rise_ft: L, run_ft: L, grade_pct: dimensionless, slope_angle_deg: dimensionless, slope_distance_ft: L }
+// dims: in { contour_interval_ft: L, intervals_crossed: dimensionless, map_distance_in: L, representative_fraction: dimensionless } out: { rise_ft: L, run_ft: L, grade_pct: dimensionless, slope_angle_deg: dimensionless, slope_distance_ft: L }
 export function computeContourSlope({ contour_interval_ft = 0, intervals_crossed = 0, map_distance_in = 0, representative_fraction = 24000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(contour_interval_ft > 0)) return { error: "Contour interval must be positive." };
@@ -1436,7 +1436,7 @@ FIELD_RENDERERS["helicopter-lz-sizing"] = _r({
 });
 
 // ===================== spec-v1401: litter carry team size and rotation =====================
-// dims: in { args: dimensionless } out: { carry_time_hr: T, teams_needed: dimensionless, total_personnel: dimensionless, person_hours: T }
+// dims: in { distance_mi: L, pace_mph: L T^-1, carriers_per_litter: dimensionless, duty_fraction: dimensionless, rotation_interval_min: T, support_personnel: dimensionless } out: { carry_time_hr: T, teams_needed: dimensionless, total_personnel: dimensionless, person_hours: T }
 export function computeLitterCarryTeam({ distance_mi = 0, pace_mph = 1.0, carriers_per_litter = 6, duty_fraction = 0.5, rotation_interval_min = 10, support_personnel = 2 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(distance_mi > 0)) return { error: "Carry distance must be positive." };

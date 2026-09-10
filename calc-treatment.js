@@ -1507,7 +1507,7 @@ function _v899renderPoolInteriorFinishVolume(inputRegion, outputRegion, citation
 TREATMENT_RENDERERS["pool-interior-finish-volume"] = _v899renderPoolInteriorFinishVolume;
 
 // ===================== spec-v943: gravity oil/water separator surface area (API 421) =====================
-// dims: in { args: dimensionless } out: { rise_velocity_ftmin: dimensionless, horizontal_area_ft2: L^2 }
+// dims: in { flow_gpm: L^3 T^-1, oil_sg: dimensionless, droplet_micron: L, water_viscosity_cp: M L^-1 T^-1 } out: { rise_velocity_ftmin: L T^-1, horizontal_area_ft2: L^2 }
 export function computeOilWaterSeparatorSizing({ flow_gpm = 50, oil_sg = 0.85, droplet_micron = 150, water_viscosity_cp = 1.1 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   if (!(flow_gpm > 0)) return { error: "Flow must be positive (gpm)." };
@@ -1559,7 +1559,7 @@ function _v943renderOilWaterSeparatorSizing(inputRegion, outputRegion, citationE
 TREATMENT_RENDERERS["oil-water-separator-sizing"] = _v943renderOilWaterSeparatorSizing;
 
 // ===================== spec-v1271: discrete-particle settling velocity (Stokes' law) =====================
-// dims: in { args: dimensionless } out: { settling_velocity_mm_s: dimensionless, settling_velocity_ft_min: dimensionless, reynolds: dimensionless }
+// dims: in { particle_diameter_mm: L, particle_sg: dimensionless, water_temp_f: T } out: { settling_velocity_mm_s: L T^-1, settling_velocity_ft_min: L T^-1, reynolds: dimensionless }
 export function computeParticleSettlingVelocity({ particle_diameter_mm = 0.05, particle_sg = 2.65, water_temp_f = 68 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   if (!(particle_diameter_mm > 0)) return { error: "Particle diameter must be positive (mm)." };

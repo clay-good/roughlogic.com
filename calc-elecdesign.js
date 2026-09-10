@@ -756,7 +756,7 @@ export const IEEE80_KF = {
   steel: { kf: 15.9, label: "Steel" },
 };
 
-// dims: in { args: dimensionless } out: { area_kcmil: L^2, area_cmil: L^2 }
+// dims: in { fault_current_ka: I, clearing_time_s: T, material: dimensionless, installed_kcmil: L^2 } out: { area_kcmil: L^2, area_cmil: L^2 }
 export function computeGroundingGridConductor({ fault_current_ka = 0, clearing_time_s = 0, material = "copper_brazed", installed_kcmil = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const m = IEEE80_KF[material];
@@ -806,7 +806,7 @@ ELECDESIGN_RENDERERS["grounding-grid-conductor"] = _simpleRenderer({
 });
 
 // ===================== spec-v1421: overcurrent selective coordination screen =====================
-// dims: in { args: dimensionless } out: { ratio: dimensionless, pickup_a: I, coordinated_to_a: I }
+// dims: in { device_type: dimensionless, upstream_rating_a: I, downstream_rating_a: I, published_ratio: dimensionless, instantaneous_multiplier: dimensionless, available_fault_a: I } out: { ratio: dimensionless, pickup_a: I, coordinated_to_a: I }
 export function computeSelectiveCoordinationScreen({ device_type = "fuse", upstream_rating_a = 0, downstream_rating_a = 0, published_ratio = 2, instantaneous_multiplier = 10, available_fault_a = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (device_type !== "fuse" && device_type !== "breaker") return { error: "Device type must be fuse or breaker." };
@@ -874,7 +874,7 @@ ELECDESIGN_RENDERERS["selective-coordination-screen"] = _simpleRenderer({
 });
 
 // ===================== spec-v1422: current-limiting let-through and downstream withstand =====================
-// dims: in { args: dimensionless } out: { withstand_a: I, withstand_i2t: dimensionless, margin: dimensionless }
+// dims: in { conductor_cmil: L^2, initial_temp_c: T, damage_temp_c: T, duration_s: T, let_through_i2t: I^2 T, let_through_peak_a: I, equipment_peak_withstand_a: I } out: { withstand_a: I, withstand_i2t: I^2 T, margin: dimensionless }
 export function computeFuseLetThrough({ conductor_cmil = 0, initial_temp_c = 75, damage_temp_c = 250, duration_s = 0.01, let_through_i2t = 0, let_through_peak_a = 0, equipment_peak_withstand_a = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(conductor_cmil > 0)) return { error: "Conductor area must be positive (circular mils)." };

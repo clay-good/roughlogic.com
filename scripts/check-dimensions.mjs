@@ -489,7 +489,7 @@ function checkKeyAgreement(keyDims, errors) {
 const STUB_INPUT_NAMES = new Set(["args", "input", "opts", "options", "params", "o", "obj"]);
 
 // Lower this as stubs are drained. It may never rise.
-const STUB_BUDGET = 38;
+const STUB_BUDGET = 24;
 
 function isStubAnnotation(fn) {
   if (!fn.parse || !fn.parse.ok) return false;
@@ -716,11 +716,18 @@ async function main() {
         (stated.length ? stated.join(", ") : "no number at all") + ".",
       );
     }
-    if (!stated.includes(stubs.length)) {
+    // The stub count is the ratchet, so it is matched IN PLACE rather than by
+    // "appears anywhere in the row". Set membership passed by coincidence on
+    // 2026-09-10: the count fell to 24 and the row already said 24 about the
+    // pound convention, so a stale stub count would have shipped green.
+    const statedStubs = row.match(/\*\*([\d,]+) of those annotations are stubs\*\*/);
+    if (!statedStubs || Number(statedStubs[1].replace(/,/g, "")) !== stubs.length) {
       errors.push(
         "README.md's check-dimensions row does not state the live stub count (" +
-        stubs.length + "). The row claims every function declares its inputs; " +
-        stubs.length + " of them declare a single opaque `args` instead.",
+        stubs.length + ") in its `**N of those annotations are stubs**` phrase; it " +
+        "says " + (statedStubs ? statedStubs[1] : "nothing there") + ". The row claims " +
+        "every function declares its inputs; " + stubs.length + " of them declare a " +
+        "single opaque `args` instead.",
       );
     }
     if (!stated.includes(stillSplit.length)) {

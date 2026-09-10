@@ -1816,7 +1816,7 @@ export const FALL_PROTECTION_DECEL = {
   "self-retracting-overhead":     { decel_ft: 1.0, free_fall_ft: 2, description: "Overhead SRL" },
 };
 
-// dims: in { args: dimensionless } out: { clearance_ft: L, pass: dimensionless }
+// dims: in { connector: dimensionless, free_fall_ft_override: L, decel_ft_override: L, worker_height_ft: L, harness_stretch_ft: L, safety_factor_ft: L, actual_clearance_ft: L } out: { clearance_ft: L, pass: dimensionless }
 export function computeFallProtectionClearance({
   connector = "shock-absorbing-lanyard-6ft",
   free_fall_ft_override = null,
@@ -2066,7 +2066,7 @@ CROSS_RENDERERS["noise-dose"] = renderNoiseDose;
 // bundled. A positive suction lift raises TDH; a flooded (negative) suction
 // lowers it.
 
-// dims: in { args: dimensionless } out: { tdh_ft: L, static_head_ft: L, velocity_fps: L T^-1 }
+// dims: in { flow_gpm: L^3 T^-1, internal_diameter_in: L, hw_c: dimensionless, static_suction_lift_ft: L, static_discharge_head_ft: L, suction_length_ft: L, discharge_length_ft: L, fittings_equiv_length_ft: L } out: { tdh_ft: L, static_head_ft: L, velocity_fps: L T^-1 }
 export function computePumpTdh({
   flow_gpm = 0,
   internal_diameter_in = 0,
@@ -2575,7 +2575,7 @@ CROSS_RENDERERS["belt-hp-transmitted"] = renderBeltHpTransmitted;
 // the overall ratio and a per-stage efficiency (0.97 default for spur gears).
 // Up to four stages; blank or incomplete stages are ignored.
 
-// dims: in { args: dimensionless } out: { overall_ratio: dimensionless, output_rpm: T^-1, output_torque: M L^2 T^-2 }
+// dims: in { stages: dimensionless, input_rpm: T^-1, input_torque: M L^2 T^-2, efficiency: dimensionless } out: { overall_ratio: dimensionless, output_rpm: T^-1, output_torque: M L^2 T^-2 }
 export function computeGearCascade({
   stages = [],
   input_rpm = 0,
