@@ -2630,7 +2630,7 @@ MECHANIC_RENDERERS["engine-fuel-burn-gph"] = _simpleRenderer({
 });
 
 // ===================== spec-v464: alternator charging load balance =====================
-// dims: in { total_load_a: I, alternator_a: I, idle_frac: dimensionless, cruise_frac: dimensionless } out: { idle_out_a: dimensionless, cruise_out_a: dimensionless, idle_balance_a: dimensionless, cruise_balance_a: dimensionless }
+// dims: in { total_load_a: I, alternator_a: I, idle_frac: dimensionless, cruise_frac: dimensionless } out: { idle_out_a: I, cruise_out_a: I, idle_balance_a: I, cruise_balance_a: I }
 export function computeAlternatorChargingLoad({ total_load_a = 0, alternator_a = 0, idle_frac = 0.5, cruise_frac = 0.9 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const load = Number(total_load_a) || 0;

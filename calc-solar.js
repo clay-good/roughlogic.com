@@ -1708,7 +1708,7 @@ function _v897renderPvBallastWeight(inputRegion, outputRegion, citationEl) {
 SOLAR_RENDERERS["pv-ballast-weight"] = _v897renderPvBallastWeight;
 
 // ===================== spec-v963: DC ammeter shunt sizing =====================
-// dims: in { args: dimensionless } out: { shunt_resistance_ohm: M L^2 T^-3 I^-2, measured_current_a: dimensionless, power_dissipation_w: M L^2 T^-3 }
+// dims: in { args: dimensionless } out: { shunt_resistance_ohm: M L^2 T^-3 I^-2, measured_current_a: I, power_dissipation_w: M L^2 T^-3 }
 export function computeDcShuntSizing({ rated_current_a = 100, rated_millivolt = 50, measured_millivolt = 25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rated_current_a > 0)) return { error: "Rated current must be positive (A)." };

@@ -695,7 +695,7 @@ SHOP_RENDERERS["thread-pitch-dia-from-wires"] = _v721renderThreadPitchDiaFromWir
 // constant is the published mild-steel value); total = tons/ft x L.
 // =====================================================================
 
-// dims: in { thickness_in: L, bend_length_ft: L, die_opening_in: L, uts_ksi: dimensionless } out: { tons_per_ft: dimensionless, total_tons: dimensionless }
+// dims: in { thickness_in: L, bend_length_ft: L, die_opening_in: L, uts_ksi: M L^-1 T^-2 } out: { tons_per_ft: dimensionless, total_tons: dimensionless }
 export function computePressBrakeTonnage({ thickness_in = 0, bend_length_ft = 0, die_opening_in = 0, uts_ksi = 60 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const T = Number(thickness_in) || 0, L = Number(bend_length_ft) || 0;
@@ -744,7 +744,7 @@ SHOP_RENDERERS["press-brake-tonnage"] = _v40renderPressBrakeTonnage;
 // the thickest material a given press can air-bend. From
 // total_tons = 575 x (UTS/60) x T^2 / V x L, solving for T:
 // T = sqrt( total_tons x V / (575 x (UTS/60) x L) ).
-// dims: in { available_tonnage_tons: dimensionless, die_opening_in: L, bend_length_ft: L, uts_ksi: dimensionless } out: { max_thickness_in: L, recommended_die_in: L }
+// dims: in { available_tonnage_tons: dimensionless, die_opening_in: L, bend_length_ft: L, uts_ksi: M L^-1 T^-2 } out: { max_thickness_in: L, recommended_die_in: L }
 export function computePressBrakeMaxThickness({ available_tonnage_tons = 0, die_opening_in = 0, bend_length_ft = 0, uts_ksi = 60 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const tons = Number(available_tonnage_tons) || 0;

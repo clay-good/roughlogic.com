@@ -506,7 +506,7 @@ GEOTECH_RENDERERS["elastic-settlement-allowable-pressure"] = _simpleRenderer({
   compute: computeElasticSettlementAllowablePressure,
 });
 
-// dims: in { d_ft: L, l_ft: L, cu_ksf: M L^-1 T^-2, alpha: dimensionless, fs: dimensionless } out: { as_ft2: L^2, ap_ft2: L^2, qs_kip: M T^-2, qp_kip: M T^-2, qult_kip: M T^-2, qall_kip: M T^-2 }
+// dims: in { d_ft: L, l_ft: L, cu_ksf: M L^-1 T^-2, alpha: dimensionless, fs: dimensionless } out: { as_ft2: L^2, ap_ft2: L^2, qs_kip: M L T^-2, qp_kip: M L T^-2, qult_kip: M L T^-2, qall_kip: M L T^-2 }
 export function computePileAxialCapacity({ d_ft = 0, l_ft = 0, cu_ksf = 0, alpha = 0.55, fs = 3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(d_ft > 0)) return { error: "Pile diameter must be positive (ft)." };
@@ -553,7 +553,7 @@ GEOTECH_RENDERERS["pile-axial-capacity"] = _simpleRenderer({
 // inverse. Qult = Qall x FS; the tip Qp = 9 cu (pi D^2/4) is independent of L,
 // so the skin friction must supply Qult - Qp, giving
 // L = (Qall x FS - Qp) / (alpha cu pi D).
-// dims: in { qall_target_kip: M T^-2, d_ft: L, cu_ksf: M L^-1 T^-2, alpha: dimensionless, fs: dimensionless } out: { l_ft: L, qp_kip: M T^-2, qs_required_kip: M T^-2, qult_kip: M T^-2 }
+// dims: in { qall_target_kip: M L T^-2, d_ft: L, cu_ksf: M L^-1 T^-2, alpha: dimensionless, fs: dimensionless } out: { l_ft: L, qp_kip: M L T^-2, qs_required_kip: M L T^-2, qult_kip: M L T^-2 }
 export function computePileLengthForCapacity({ qall_target_kip = 0, d_ft = 0, cu_ksf = 0, alpha = 0.55, fs = 3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const qall = Number(qall_target_kip) || 0;

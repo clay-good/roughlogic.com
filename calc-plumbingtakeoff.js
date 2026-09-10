@@ -176,7 +176,7 @@ function _v857renderPipeInsulationTakeoff(inputRegion, outputRegion, citationEl)
 PLUMBINGTAKEOFF_RENDERERS["pipe-insulation-takeoff"] = _v857renderPipeInsulationTakeoff;
 
 // ===================== spec-v858: freeze-protection heat-trace cable and circuit =====================
-// dims: in { pipe_ft: L, allowance_pct: dimensionless, num_valves: dimensionless, valve_allow_ft: L, rated_w_per_ft: dimensionless, voltage: dimensionless, breaker_a: dimensionless } out: { cable_ft: L, watts: M L^2 T^-3, amps: dimensionless }
+// dims: in { pipe_ft: L, allowance_pct: dimensionless, num_valves: dimensionless, valve_allow_ft: L, rated_w_per_ft: dimensionless, voltage: dimensionless, breaker_a: I } out: { cable_ft: L, watts: M L^2 T^-3, amps: dimensionless }
 export function computeHeatTraceSizing({ pipe_ft = 150, allowance_pct = 10, num_valves = 1, valve_allow_ft = 3, rated_w_per_ft = 5, voltage = 120, breaker_a = 20 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pipe_ft > 0)) return { error: "Pipe length must be positive (ft)." };

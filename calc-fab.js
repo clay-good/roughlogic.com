@@ -264,7 +264,7 @@ function _v26crossSequence(n) {
   return { seq, standard: false };
 }
 
-// dims: in { bolt_diameter_in: L, bolt_count: dimensionless, tensile_area_in2: L^2, target_percent_yield: dimensionless, target_stress_ksi: dimensionless, yield_ksi: dimensionless, nut_factor_k: dimensionless } out: { preload_lb: dimensionless, torque_ftlb: dimensionless, torque_nm: dimensionless, stress_pct_yield: dimensionless }
+// dims: in { bolt_diameter_in: L, bolt_count: dimensionless, tensile_area_in2: L^2, target_percent_yield: dimensionless, target_stress_ksi: M L^-1 T^-2, yield_ksi: M L^-1 T^-2, nut_factor_k: dimensionless } out: { preload_lb: dimensionless, torque_ftlb: dimensionless, torque_nm: dimensionless, stress_pct_yield: dimensionless }
 export function computeFlangeBoltTorque({ bolt_diameter_in = 0, thread_series = "UNC", bolt_count = 8, tensile_area_in2 = null, target_percent_yield = 50, target_stress_ksi = null, yield_ksi = 105, nut_factor_k = 0.18 } = {}) {
   const _g = _finiteGuard({ bolt_diameter_in, bolt_count, target_percent_yield, yield_ksi, nut_factor_k }); if (_g) return _g;
   const D = Number(bolt_diameter_in);

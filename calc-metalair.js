@@ -172,7 +172,7 @@ METALAIR_RENDERERS["groove-weld-strength"] = _renderGrooveWeldStrength;
 // length; the inverse recovers the weld length an applied load needs at a given effective throat, so a detailer sizes the
 // weld run. From capacity = stress_ksi x 1000 x throat x L (stress_ksi = 0.30 FEXX ASD or 0.75 x 0.60 FEXX LRFD),
 // L = load / (stress_ksi x 1000 x throat). CJP uses the thinner-part thickness as the throat; PJP uses the WPS effective throat.
-// dims: in { applied_load_lb: dimensionless, weld_type: dimensionless, effective_throat_in: L, base_thickness_in: L, electrode: dimensionless, method: dimensionless } out: { required_length_in: L, stress_ksi: dimensionless, throat_in: L }
+// dims: in { applied_load_lb: dimensionless, weld_type: dimensionless, effective_throat_in: L, base_thickness_in: L, electrode: dimensionless, method: dimensionless } out: { required_length_in: L, stress_ksi: M L^-1 T^-2, throat_in: L }
 export function computeGrooveWeldLengthForLoad({ applied_load_lb = 0, weld_type = "PJP", effective_throat_in = 0, base_thickness_in = 0, electrode = "E70", method = "ASD" } = {}) {
   const _g = _finiteGuard({ applied_load_lb, effective_throat_in, base_thickness_in }); if (_g) return _g;
   const Fexx = _FEXX[electrode] || 70;

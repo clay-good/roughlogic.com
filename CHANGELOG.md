@@ -793,6 +793,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A pile capacity was declared one power of length short, and the error ran through all eight of its keys.** Adding `_a`, `_amp`, `_amps`, `_kip`, `_kips`, `_ksi`, `_uf` and the four ratio-by-name tails (`_pct`, `_deg`, `_db`, `_ppm`) takes unit-tail coverage **5,969 -> 7,173 keys** and caught nineteen more.
+
+  **`computePileAxialCapacity` declares `cu_ksf: M L^-1 T^-2` and `as_ft2: L^2` correctly and then declares their product `M T^-2`** -- a force per unit length where `alpha x cu x area` is a force. Every one of its four capacities carries the same missing `L`, and `computePileLengthForCapacity` carries it into four more, including the target capacity a user types in. Alongside them: five bolt and press-brake stresses in ksi read `dimensionless`, and six currents did the same -- four alternator output and balance amps, a heat-trace breaker size, and a shunt's measured current.
+
+  **The four ratio-by-name tails found nothing, which is the point of adding them.** A percentage, an angle, a decibel and a part-per-million are dimensionless by definition, and all 868 were already right; pinning them stops the next piece of `dimensionless` filler from hiding among correct ones.
+
+  **`_a` is the weakest tail in the table and it is labelled as such.** The letter A is a triangle side, a series coefficient, and an A-or-B label as often as it is an ampere, and nothing in the name tells them apart -- ten exemptions against six finds, each naming which of the three its `a` is.
+
 - **Seventeen voltages and watts read `dimensionless`, including every output of the Nernst equation.** `_v` and `_w` are the two tails that buy the most and cost the most, because outside the electrical modules **`V` is a shear or a vertical component and `W` is a width, a web, a withdrawal or water** -- never a volt or a watt. Nine keys are exempted by name for exactly that: Cramer's V, the vertical components of the Coulomb and Mononobe-Okabe earth-pressure resultants, AISC's `omega_v` safety factor, a torsional shear force, `rho_w` (which is `As/(bw d)`, a web steel ratio), three wood withdrawal design forces, and the 16 of a 16:9 aspect ratio.
 
   What that bought: `computeNernstEquation` declared its standard potential, its cell potential **and** its Nernst slope all `dimensionless` -- every electrical quantity in an electrochemistry tile. `computeStepTouchVoltage` declared both the step and touch voltages that way, and `computeGroundPotentialRise` did the same for the GPR and the tolerable touch voltage it is compared against, while declaring `margin_v` -- their difference -- correctly. Also a VFD reflected-wave peak and its insulation limit, a transformer's no-load and load losses, a DC bus voltage, a shunt's power dissipation, and a bifacial array's effective power.

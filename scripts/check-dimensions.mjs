@@ -156,6 +156,11 @@ function parseDimsAnnotation(text) {
 //   - area (ft2, sf, in2, sqft, sqin) - volume (gal, gallons, ft3, cy, yd3)
 //   - frequency (hz)                  - resistance (ohm, ohms)
 //   - voltage (v)                     - power (w)
+//   - current (a, amp, amps)          - force (kip, kips)
+//   - stress (ksi)                    - capacitance (uf)
+//   - ratio-by-name (pct, deg, db, ppm): a percentage, an angle, a decibel and a
+//     part-per-million are dimensionless BY DEFINITION, and pinning them stops
+//     the next `dimensionless` filler from hiding among 868 correct ones.
 //
 // NOT covered, and why -- each of these would produce a wrong verdict, so the
 // gate stays silent rather than flattering itself with coverage it lacks:
@@ -190,6 +195,10 @@ const UNIT_TAIL_DIMS = new Map(Object.entries({
   cy: "L^3", yd3: "L^3",
   hz: "T^-1", ohm: "M L^2 T^-3 I^-2", ohms: "M L^2 T^-3 I^-2",
   v: "M L^2 T^-3 I^-1", w: "M L^2 T^-3",
+  a: "I", amp: "I", amps: "I",
+  kip: "M L T^-2", kips: "M L T^-2", ksi: "M L^-1 T^-2",
+  uf: "M^-1 L^-2 T^4 I^2",
+  pct: "dimensionless", deg: "dimensionless", db: "dimensionless", ppm: "dimensionless",
 }));
 
 // A segment that, sitting directly in front of the tail, means the tail is the
@@ -272,6 +281,21 @@ const UNIT_TAIL_EXEMPT = new Set([
   "calc-construction.js:computeWoodLagWithdrawal:z_w",       // a WITHDRAWAL design force
   "calc-construction.js:computeWoodScrewWithdrawal:z_w",     // a WITHDRAWAL design force
   "calc-stage.js:computeProjectorMaxScreenSize:aspect_w",    // the 16 of 16:9, a WIDTH
+  // `_a` is the WEAKEST tail in this table and these eleven say why: the letter
+  // A is a triangle side, a series coefficient, and an A-or-B label as often as
+  // it is an ampere, and nothing in the name tells the two apart. Kept anyway --
+  // it pins 206 correct ampere declarations and found six that were filler --
+  // but every addition here must name which of those three the `a` is.
+  "calc-construction.js:computeLayoutSquaring:side_a",       // a triangle SIDE
+  "calc-construction.js:computeLayoutSquaring:triple_a",     // a 3-4-5 triple's short SIDE
+  "calc-construction.js:computeSeismicStoryDrift:delta_a",   // allowable drift, a LENGTH
+  "calc-layout.js:computeTriangleSas:side_a",                // a triangle SIDE
+  "calc-layout.js:computeTriangleSss:side_a",                // a triangle SIDE
+  "calc-layout.js:computeTriangleAsa:side_a",                // a triangle SIDE
+  "calc-lab.js:computeArrheniusEquation:pre_exponential_a",  // Arrhenius A, a rate prefactor
+  "calc-lowvoltage.js:computeThermistorSteinhartHart:coeff_a", // Steinhart-Hart's A
+  "calc-refrigerant.js:computeCompareRefrigerants:refrigerant_a", // an A-or-B LABEL
+  "calc-service.js:computeVfdEnergySavings:frac_a",          // an A-or-B time FRACTION
 ]);
 
 function canonicalDimension(expr) {
