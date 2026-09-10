@@ -878,7 +878,7 @@ function renderServiceConductorSizing(inputRegion, outputRegion, citationEl) {
 SERVICE_RENDERERS["service-conductor-sizing"] = renderServiceConductorSizing;
 
 // ===================== spec-v957: insulation-resistance PI / DAR (megger test) =====================
-// dims: in { args: dimensionless } out: { polarization_index: dimensionless, dar: dimensionless }
+// dims: in { ir_30s_mohm: M L^2 T^-3 I^-2, ir_1min_mohm: M L^2 T^-3 I^-2, ir_10min_mohm: M L^2 T^-3 I^-2 } out: { polarization_index: dimensionless, dar: dimensionless }
 export function computeInsulationResistancePi({ ir_30s_mohm = 800, ir_1min_mohm = 1040, ir_10min_mohm = 4160 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(ir_30s_mohm > 0)) return { error: "30-second insulation resistance must be positive (Mohm)." };

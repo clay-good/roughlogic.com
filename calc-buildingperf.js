@@ -755,7 +755,7 @@ BUILDINGPERF_RENDERERS["continuous-insulation-ratio"] = _simpleRenderer({
 const _GPM_PER_CFS = 448.831;
 const _PUMP_CONSTANT = 3960;
 const _CP_TO_LB_FT_S = 6.7197e-4;
-// dims: in { args: dimensionless } out: { design_flow_gpm: L^3 T^-1, velocity_fps: L T^-1, reynolds: dimensionless, pump_bhp: M L^2 T^-3, pump_watts: M L^2 T^-3, watts_per_ton: dimensionless }
+// dims: in { tons: M L^2 T^-3, gpm_per_ton: M^-1 L T^2, pipe_id_in: L, fluid_density_lb_ft3: M L^-3, fluid_viscosity_cp: M L^-1 T^-1, specific_gravity: dimensionless, head_ft: L, wire_to_water_efficiency: dimensionless, benchmark_w_per_ton: dimensionless } out: { design_flow_gpm: L^3 T^-1, velocity_fps: L T^-1, reynolds: dimensionless, pump_bhp: M L^2 T^-3, pump_watts: M L^2 T^-3, watts_per_ton: dimensionless }
 export function computeGroundLoopFlowAntifreeze({
   tons = 0, gpm_per_ton = 3.0, pipe_id_in = 0,
   fluid_density_lb_ft3 = 63.9, fluid_viscosity_cp = 4.7, specific_gravity = 1.02,

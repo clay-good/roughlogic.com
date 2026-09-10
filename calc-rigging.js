@@ -1696,7 +1696,7 @@ function _v953renderCraneLoadRadiusBoom(inputRegion, outputRegion, citationEl) {
 RIGGING_RENDERERS["crane-load-radius-boom"] = _v953renderCraneLoadRadiusBoom;
 
 // ===================== spec-v991: block-and-tackle reeving line pull =====================
-// dims: in { args: dimensionless } out: { hauling_line_pull_lb: dimensionless, frictionless_pull_lb: dimensionless, reeving_efficiency: dimensionless }
+// dims: in { load_lb: M L T^-2, parts_of_line: dimensionless, sheave_efficiency: dimensionless } out: { hauling_line_pull_lb: M L T^-2, frictionless_pull_lb: M L T^-2, reeving_efficiency: dimensionless }
 export function computeReevingPartsOfLine({ load_lb = 20000, parts_of_line = 4, sheave_efficiency = 0.98 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(load_lb > 0)) return { error: "Load must be positive (lb)." };

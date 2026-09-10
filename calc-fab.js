@@ -1932,7 +1932,7 @@ FAB_RENDERERS["tube-bend-wall-thinning"] = _simpleRenderer({
 });
 
 // ===================== spec-v1410: weld cooling time t8/5 =====================
-// dims: in { args: dimensionless } out: { t85_3d_s: T, t85_2d_s: T, transition_mm: L, governing_s: T }
+// dims: in { heat_input_kj_mm: M L T^-2, preheat_c: T, thickness_mm: L, f2: dimensionless, f3: dimensionless } out: { t85_3d_s: T, t85_2d_s: T, transition_mm: L, governing_s: T }
 export function computeWeldCoolingRateT85({ heat_input_kj_mm = 0, preheat_c = 20, thickness_mm = 0, f2 = 1.0, f3 = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(heat_input_kj_mm > 0)) return { error: "Heat input must be positive." };
@@ -1989,7 +1989,7 @@ FAB_RENDERERS["weld-cooling-rate-t85"] = _simpleRenderer({
 });
 
 // ===================== spec-v1412: interpass temperature window =====================
-// dims: in { args: dimensionless } out: { idle_allowance_min: T, required_wait_min: T, temp_at_elapsed_f: T }
+// dims: in { tau_min: T, ambient_f: T, preheat_min_f: T, interpass_max_f: T, current_temp_f: T, restart_temp_f: T, elapsed_min: T } out: { idle_allowance_min: T, required_wait_min: T, temp_at_elapsed_f: T }
 export function computeInterpassTemperatureControl({ tau_min = 0, ambient_f = 70, preheat_min_f = 0, interpass_max_f = 0, current_temp_f = 0, restart_temp_f = 0, elapsed_min = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(tau_min > 0)) return { error: "Joint time constant must be positive." };

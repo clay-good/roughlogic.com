@@ -1171,7 +1171,7 @@ FINISH_RENDERERS["crawl-space-ventilation"] = _simpleRenderer({
 // ===========================================================================
 
 // ===================== spec-v1447: airless spray tip selection =====================
-// dims: in { args: dimensionless } out: { flow_gpm: L^3 T^-1, coverage_rate_sqft_min: L^2 T^-1, travel_speed_fpm: L T^-1 }
+// dims: in { tip_number: dimensionless, pressure_psi: M L^-1 T^-2, wet_film_mils: L, ref_orifice_in: L, ref_flow_gpm: L^3 T^-1, ref_pressure_psi: M L^-1 T^-2 } out: { flow_gpm: L^3 T^-1, coverage_rate_sqft_min: L^2 T^-1, travel_speed_fpm: L T^-1 }
 export function computeSprayTipSelection({ tip_number = 0, pressure_psi = 0, wet_film_mils = 0, ref_orifice_in = 0.015, ref_flow_gpm = 0.31, ref_pressure_psi = 2000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(tip_number >= 100 && tip_number <= 999)) return { error: "Tip number must be a three-digit airless tip designation (100 to 999)." };
@@ -1231,7 +1231,7 @@ FINISH_RENDERERS["spray-tip-selection"] = _simpleRenderer({
 });
 
 // ===================== spec-v1448: wall and ceiling texture takeoff =====================
-// dims: in { args: dimensionless } out: { net_area_sqft: L^2, dry_weight_lb: M, mix_water_gal: L^3 }
+// dims: in { gross_area_sqft: L^2, openings_sqft: L^2, coverage_per_bag_sqft: L^2, waste_pct: dimensionless, bag_weight_lb: M, water_gal_per_bag: L^3 } out: { net_area_sqft: L^2, dry_weight_lb: M, mix_water_gal: L^3 }
 export function computeTextureMaterialTakeoff({ gross_area_sqft = 0, openings_sqft = 0, coverage_per_bag_sqft = 0, waste_pct = 10, bag_weight_lb = 40, water_gal_per_bag = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(gross_area_sqft > 0)) return { error: "Gross area must be positive." };

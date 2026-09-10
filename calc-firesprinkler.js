@@ -412,7 +412,7 @@ FIRESPRINKLER_RENDERERS["jockey-pump-sizing"] = _simpleRenderer({
 // ===========================================================================
 
 // ===================== spec-v1386: stairwell pressurization =====================
-// dims: in { args: dimensionless } out: { airflow_cfm: L^3 T^-1, door_force_lbf: M L T^-2, max_pressure_inwg: M L^-1 T^-2 }
+// dims: in { leakage_area_sqft: L^2, pressure_inwg: M L^-1 T^-2, door_width_ft: L, door_height_ft: L, knob_setback_in: L, closer_force_lbf: M L T^-2, force_limit_lbf: M L T^-2 } out: { airflow_cfm: L^3 T^-1, door_force_lbf: M L T^-2, max_pressure_inwg: M L^-1 T^-2 }
 export function computeStairwellPressurization({ leakage_area_sqft = 0, pressure_inwg = 0.15, door_width_ft = 3, door_height_ft = 7, knob_setback_in = 3, closer_force_lbf = 10, force_limit_lbf = 30 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(leakage_area_sqft > 0)) return { error: "Total effective leakage area must be positive." };

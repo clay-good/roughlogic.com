@@ -1423,7 +1423,7 @@ LINEWORKER_RENDERERS["counterpoise-resistance"] = _simpleRenderer({
 // image above grade / distance to the neighbour). That sum is what identifies
 // the governing duct. It is NOT the derate factor -- the factor also depends on
 // the cable's own thermal resistances and comes from the standard.
-// dims: in { args: dimensionless } out: { derated_ampacity_a: I, alt_derated_ampacity_a: I, required_table_ampacity_a: I, governing_mutual_heat: dimensionless }
+// dims: in { ducts_across: dimensionless, ducts_down: dimensionless, loaded_ducts: dimensionless, spacing_in: L, depth_to_top_in: L, base_table_ampacity_a: I, derate_factor: dimensionless, alt_derate_factor: dimensionless, target_load_a: I } out: { derated_ampacity_a: I, alt_derated_ampacity_a: I, required_table_ampacity_a: I, governing_mutual_heat: dimensionless }
 export function computeDuctBankAmpacityDerate({
   ducts_across = 0, ducts_down = 0, loaded_ducts = 0,
   spacing_in = 0, depth_to_top_in = 0,

@@ -1642,7 +1642,7 @@ export function renderPeriodicElement(inputRegion, outputRegion, citationEl) {
 
 // --- spec-v17 Y.2 Linear regression (least squares) ------------------
 
-// dims: in { args: dimensionless } out: { slope: dimensionless, intercept: dimensionless, r2: dimensionless, rse: dimensionless }
+// dims: in { x_values: dimensionless, y_values: dimensionless, predict_x: dimensionless, alpha: dimensionless } out: { slope: dimensionless, intercept: dimensionless, r2: dimensionless, rse: dimensionless }
 export function computeLinearRegression({ x_values, y_values, predict_x = null, alpha = 0.05 }) {
   const xs = Array.isArray(x_values) ? x_values.filter(Number.isFinite) : parseNumberList(x_values);
   const ys = Array.isArray(y_values) ? y_values.filter(Number.isFinite) : parseNumberList(y_values);

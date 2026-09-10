@@ -979,7 +979,7 @@ function _simpleRenderer(spec) {
 }
 
 // ===================== spec-v1394: two-bearing resection =====================
-// dims: in { args: dimensionless } out: { east: L, north: L, distance_a_ft: L, distance_b_ft: L, intersection_angle_deg: dimensionless }
+// dims: in { ax: L, ay: L, azimuth_to_a_deg: dimensionless, bx: L, by: L, azimuth_to_b_deg: dimensionless, declination_deg: dimensionless } out: { east: L, north: L, distance_a_ft: L, distance_b_ft: L, intersection_angle_deg: dimensionless }
 export function computeThreePointResection({ ax = 0, ay = 0, azimuth_to_a_deg = 0, bx = 0, by = 0, azimuth_to_b_deg = 0, declination_deg = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Number.isFinite(ax) || !Number.isFinite(ay) || !Number.isFinite(bx) || !Number.isFinite(by)) return { error: "Known-point coordinates must be finite numbers." };
@@ -1050,7 +1050,7 @@ SURVEY_RENDERERS["three-point-resection"] = _simpleRenderer({
 });
 
 // ===================== spec-v1395: slope stake catch point on a cross slope =====================
-// dims: in { args: dimensionless } out: { catch_distance_ft: L, vertical_at_catch_ft: L, flat_ground_distance_ft: L }
+// dims: in { half_width_ft: L, depth_ft: L, side_slope_ratio: dimensionless, ground_cross_slope: dimensionless, section: dimensionless } out: { catch_distance_ft: L, vertical_at_catch_ft: L, flat_ground_distance_ft: L }
 export function computeSlopeStaking({ half_width_ft = 0, depth_ft = 0, side_slope_ratio = 2, ground_cross_slope = 0, section = "cut" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (section !== "cut" && section !== "fill") return { error: "Section must be cut or fill." };

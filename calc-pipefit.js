@@ -1060,7 +1060,7 @@ function _renderSteamPrvAreaForCapacity(inputRegion, outputRegion, citationEl) {
 PIPEFIT_RENDERERS["steam-prv-area-for-capacity"] = _renderSteamPrvAreaForCapacity;
 
 // ===================== spec-v954: steam boiler surface blowdown (cycles of concentration) =====================
-// dims: in { args: dimensionless } out: { cycles_of_concentration: dimensionless, blowdown_rate_lb_hr: dimensionless, blowdown_pct_of_feedwater: dimensionless }
+// dims: in { steam_rate_lb_hr: M T^-1, feedwater_tds_ppm: dimensionless, max_boiler_tds_ppm: dimensionless } out: { cycles_of_concentration: dimensionless, blowdown_rate_lb_hr: M T^-1, blowdown_pct_of_feedwater: dimensionless }
 export function computeSteamBoilerBlowdown({ steam_rate_lb_hr = 10000, feedwater_tds_ppm = 100, max_boiler_tds_ppm = 3500 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(steam_rate_lb_hr > 0)) return { error: "Steam rate must be positive (lb/hr)." };
@@ -1107,7 +1107,7 @@ function _v954renderSteamBoilerBlowdown(inputRegion, outputRegion, citationEl) {
 PIPEFIT_RENDERERS["steam-boiler-blowdown"] = _v954renderSteamBoilerBlowdown;
 
 // ===================== spec-v990: radiator EDR to heat output =====================
-// dims: in { args: dimensionless } out: { heat_output_btu_hr: dimensionless, gross_boiler_btu_hr: dimensionless }
+// dims: in { edr_sqft: L^2, system_k: M T^-3, pickup_factor: dimensionless } out: { heat_output_btu_hr: M L^2 T^-3, gross_boiler_btu_hr: M L^2 T^-3 }
 export function computeRadiatorEdrOutput({ edr_sqft = 320, system_k = 240, pickup_factor = 0.33 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(edr_sqft > 0)) return { error: "EDR must be positive (sq ft)." };

@@ -380,7 +380,7 @@ function _v906renderPexHomerunTakeoff(inputRegion, outputRegion, citationEl) {
 PLUMBINGTAKEOFF_RENDERERS["pex-homerun-takeoff"] = _v906renderPexHomerunTakeoff;
 
 // ===================== spec-v987: solar thermal flat-plate collector output =====================
-// dims: in { args: dimensionless } out: { efficiency: dimensionless, useful_btu_per_sqft: dimensionless, useful_btu_hr: dimensionless }
+// dims: in { optical_efficiency: dimensionless, loss_coeff: M T^-3, inlet_temp_f: T, ambient_temp_f: T, irradiance_btu: M T^-3, area_sqft: L^2 } out: { efficiency: dimensionless, useful_btu_per_sqft: M T^-3, useful_btu_hr: M L^2 T^-3 }
 export function computeSolarThermalCollector({ optical_efficiency = 0.70, loss_coeff = 0.85, inlet_temp_f = 120, ambient_temp_f = 70, irradiance_btu = 300, area_sqft = 40 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(optical_efficiency > 0 && optical_efficiency <= 1)) return { error: "Optical efficiency (y-intercept) must be between 0 and 1." };

@@ -68,7 +68,7 @@ export const septicTankExample = {
 // Required absorption area = daily_flow_gpd / application_rate_gpd_per_ft2.
 // Trench linear feet = required_area / trench_width_ft.
 
-// dims: in { args: dimensionless } out: { area_ft2: L^2, length_ft: L }
+// dims: in { design_flow_gpd: L^3 T^-1, application_rate_gpd_per_ft2: L T^-1, trench_width_ft: L } out: { area_ft2: L^2, length_ft: L }
 export function computeSepticDrainfield({
   design_flow_gpd = 0,
   application_rate_gpd_per_ft2 = 0,
@@ -92,7 +92,7 @@ export const septicDrainfieldExample = {
 // this returns the design flow the field supports and the bedroom count it
 // permits. design_flow = trench_length x trench_width x application_rate;
 // bedrooms = floor(design_flow / gpd_per_bedroom), EPA 150 gpd/bedroom default.
-// dims: in { args: dimensionless } out: { design_flow_gpd: L^3 T^-1, absorption_area_ft2: L^2, bedrooms: dimensionless }
+// dims: in { available_trench_ft: L, application_rate_gpd_per_ft2: L T^-1, trench_width_ft: L, gpd_per_bedroom: L^3 T^-1 } out: { design_flow_gpd: L^3 T^-1, absorption_area_ft2: L^2, bedrooms: dimensionless }
 export function computeSepticDrainfieldCapacity({
   available_trench_ft = 0,
   application_rate_gpd_per_ft2 = 0,

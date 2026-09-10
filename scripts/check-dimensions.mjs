@@ -266,6 +266,12 @@ const UNIT_TAIL_EXEMPT = new Set([
   "calc-hvac.js:computeDrybulbFromEnthalpy:enthalpy_btu",
   "calc-hvac.js:computeCoolingCoilTotalLoad:h_ent_btu",
   "calc-hvac.js:computeCoolingCoilTotalLoad:h_lvg_btu",
+  // BTU per hour per foot per degree -- a thermal CONDUCTIVITY whose name stops
+  // at the BTU. It multiplies a depth and divides a degree-day product.
+  "calc-geotech.js:computeFrostDepthBerggren:frozen_conductivity_btu",
+  // BTU per hour per square foot -- an IRRADIANCE whose name stops at the BTU.
+  // Its own `optical_efficiency x irradiance x area` is a heat rate.
+  "calc-plumbingtakeoff.js:computeSolarThermalCollector:irradiance_btu",
   // The length tails added 2026-09-10 have five, and none is a length.
   // A PREDICATE that names a distance: `false` unless an exposure is inside 50 ft.
   "calc-fire.js:computeNFPA1142WaterSupply:exposure_within_50_ft",
@@ -484,12 +490,33 @@ function checkKeyAgreement(keyDims, errors) {
 //
 // 20 more functions take a single opaque argument and are not counted: there,
 // `args` is the honest name of what the function receives.
+//
+// DRAINED 241 -> 3 over fifteen tranches, 2026-09-10. The three that remain are
+// NOT a backlog -- each takes a parameter whose dimension is chosen at runtime
+// by a sibling selector, so no single declaration is right and the fix is the
+// INPUT, not the comment:
+//
+//   calc-hvac.js       computeAffinityLaws        `target_value` is an rpm, a
+//                                                 CFM or a static pressure,
+//                                                 per `target_kind`.
+//   calc-agriculture.js computeTankMix            `product_rate_per_acre` is a
+//                                                 length (gal/acre) or an
+//                                                 `M L^-2` (lb/acre), per
+//                                                 `product_unit`.
+//   calc-kitchen.js    computeAsPurchasedQuantity `unit_weight` is `M` here and
+//                                                 `M L^-3` everywhere else --
+//                                                 declaring it adds a name
+//                                                 collision. Rename the field
+//                                                 key to fix it.
+//
+// Splitting those three inputs, or renaming that key, is a live-tile change and
+// takes the budget to 0. Nothing else here is drainable by editing a comment.
 // ---------------------------------------------------------------------------
 
 const STUB_INPUT_NAMES = new Set(["args", "input", "opts", "options", "params", "o", "obj"]);
 
 // Lower this as stubs are drained. It may never rise.
-const STUB_BUDGET = 24;
+const STUB_BUDGET = 3;
 
 function isStubAnnotation(fn) {
   if (!fn.parse || !fn.parse.ok) return false;

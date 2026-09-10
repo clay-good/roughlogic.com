@@ -705,7 +705,7 @@ function _v944renderMotorAccelerationTime(inputRegion, outputRegion, citationEl)
 MOTOR_RENDERERS["motor-acceleration-time"] = _v944renderMotorAccelerationTime;
 
 // ===================== spec-v945: motor RMS horsepower for a duty-cycle load =====================
-// dims: in { args: dimensionless } out: { rms_hp: M L^2 T^-3, effective_time_s: T }
+// dims: in { hp_run: M L^2 T^-3, run_time_s: T, hp_idle: M L^2 T^-3, idle_time_s: T, cooling_factor: dimensionless } out: { rms_hp: M L^2 T^-3, effective_time_s: T }
 export function computeMotorRmsHp({ hp_run = 20, run_time_s = 10, hp_idle = 0, idle_time_s = 20, cooling_factor = 3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(hp_run > 0)) return { error: "Working (run) horsepower must be positive." };
