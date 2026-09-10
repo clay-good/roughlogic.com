@@ -80,6 +80,43 @@ async function main() {
     }
   }
 
+  // docs/seo.md describes the BUILT graph -- the one `relatedGraph` produces
+  // after adopting every tile that received no inbound link -- and states its
+  // edge count and how many orphans found a host. Those are facts about this
+  // registry, so they are checked here rather than in check-readme-counts, and
+  // measured by running the builder's own function rather than a second
+  // implementation of it. Both had rotted with the catalog: 6,387 edges and
+  // "268 of the 269" against a live 7,247 and 293 of 294.
+  //
+  // The mean inbound degree and the heaviest receiver are stated in the same
+  // sentence and were still correct (3.48 rounds to the 3.5 it claims, and 30
+  // is unchanged), so they are left as prose rather than pinned to a number
+  // that would churn on every landing.
+  const { relatedGraph, relatedTiles } = await import("./build-shells.mjs");
+  // The checks above work from parsed ids; the graph needs the real tile
+  // objects (the ranker reads name and group), so load the module here.
+  const { TOOLS } = await import(resolve(ROOT, "tools-data.js"));
+  const preLists = new Map(TOOLS.map((t) => [t.id, relatedTiles(t, TOOLS, RELATED)]));
+  const preInbound = new Map(TOOLS.map((t) => [t.id, 0]));
+  for (const l of preLists.values()) for (const r of l) preInbound.set(r.id, (preInbound.get(r.id) || 0) + 1);
+  const orphans = [...preInbound.values()].filter((v) => v === 0).length;
+  const lists = relatedGraph(TOOLS, RELATED);
+  let edges = 0;
+  for (const l of lists.values()) edges += l.length;
+  const adopted = orphans - [...TOOLS].filter((t) => {
+    for (const l of lists.values()) if (l.some((x) => x.id === t.id)) return false;
+    return true;
+  }).length;
+  const seo = await readFile(resolve(ROOT, "docs", "seo.md"), "utf8");
+  const seoEdges = /The graph now carries ([\d,]+) edges/.exec(seo);
+  const seoHosts = /([\d,]+) of the ([\d,]+) find a host/.exec(seo);
+  if (!seoEdges) errors.push("docs/seo.md no longer states the built graph's edge count; it is anchored here so it cannot rot.");
+  else if (Number(seoEdges[1].replace(/,/g, "")) !== edges) errors.push(`docs/seo.md says the graph carries ${seoEdges[1]} edges; it carries ${edges}.`);
+  if (!seoHosts) errors.push("docs/seo.md no longer states how many orphaned tiles find a host; it is anchored here so it cannot rot.");
+  else if (Number(seoHosts[1].replace(/,/g, "")) !== adopted || Number(seoHosts[2].replace(/,/g, "")) !== orphans) {
+    errors.push(`docs/seo.md says ${seoHosts[1]} of the ${seoHosts[2]} orphans find a host; it is ${adopted} of ${orphans}.`);
+  }
+
   if (errors.length > 0) {
     console.error("check-related-tiles: " + errors.length + " issue(s):");
     for (const e of errors) console.error("  - " + e);
@@ -88,7 +125,7 @@ async function main() {
 
   console.log(
     "check-related-tiles OK: " + Object.keys(RELATED).length +
-    " curated entries; every id resolves to a TOOLS tile, no self-refs, no duplicates, all <= 6 entries."
+    " curated entries; every id resolves to a TOOLS tile, no self-refs, no duplicates, all <= 6 entries; the built graph carries " + edges + " edges and docs/seo.md agrees on that and on the " + adopted + " of " + orphans + " orphans that find a host."
   );
 }
 

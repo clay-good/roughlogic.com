@@ -201,7 +201,7 @@ The home page (2026-09-01). Its `<meta name="description">`,
 and in every link preview anyone ever shared of it. The JSON-LD on the
 same page carried a real sentence the whole time. All three now carry
 the home lede, which is the sentence the page itself opens with and
-already pinned by `check-readme-counts`: "1,804 free calculators for
+already pinned by `check-readme-counts`: "2,082 free calculators for
 the trades. Type the job the way you'd say it, and you get the number,
 the inputs, and the source."
 
@@ -251,9 +251,9 @@ Every tile shell links:
   in [../scripts/related-tiles.mjs](../scripts/related-tiles.mjs)
   (a build-time-only module the SPA never sees; lifted out of
   tile-meta.js on 2026-05-18 so the runtime tile-meta.js stops
-  growing with the editorial map). The registry covers 1,638 of the
-  1,804 tiles; the catalog outgrew the Phase E expansion that once
-  covered it entirely. The remaining 167, and the 185 curated
+  growing with the editorial map). The registry covers 1,916 of the
+  2,082 tiles; the catalog outgrew the Phase E expansion that once
+  covered it entirely. The remaining 166, and the 186 curated
   entries that hold fewer than three links, are filled out at build
   time by ranking the tile's own name against its group siblings
   through the same `rankTools` the search box uses. Until
@@ -267,9 +267,9 @@ Every tile shell links:
   the whole catalog after the per-tile lists are built: each tile
   that received no link is appended to the list of the one group
   sibling that ranks it highest and still has room under the cap of
-  six. 268 of the 269 find a host; `historical-pricing` cannot,
-  being the only tile in group Q. The graph now carries 6,387 edges
-  across 1,804 tiles, a mean of 3.5 inbound links per tile, and the
+  six. 293 of the 294 find a host; `historical-pricing` cannot,
+  being the only tile in group Q. The graph now carries 7,247 edges
+  across 2,082 tiles, a mean of 3.5 inbound links per tile, and the
   heaviest receiver is unchanged at 30.
 - Sideways from the SPA's hash-route view by way of the canonical
   link.
@@ -303,7 +303,7 @@ must not all end up with the same list, and that every tile but
 path that matches no file -- a retired tile id, a mistyped URL, a stale
 external link into a catalog that has renumbered twice. The site
 shipped none until 2026-08-31, so those readers got the platform's
-default: no wordmark, no search, no way back into 1,804 calculators.
+default: no wordmark, no search, no way back into 2,082 calculators.
 
 Every path on the page is **root-absolute**. It is served AT THE MISSED
 URL, so a relative `styles.css` would resolve to `/tools/typo/styles.css`

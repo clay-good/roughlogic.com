@@ -60,7 +60,7 @@ Descriptions are four fifths of it. Without them the registry gzips to **47,224 
 
 Two paths pay that today, and neither needs all of it:
 
-- **A deep link** (`/index.html#<id>`, what search results and shared links point at) loads the whole catalog before it can validate the id and read one row's name and description. It needs 1 of 1,804.
+- **A deep link** (`/index.html#<id>`, what search results and shared links point at) loads the whole catalog before it can validate the id and read one row's name and description. It needs 1 of 2,082.
 - **The first search keystroke** loads it too, because `toolMatches` searches `name + " " + desc`. This one genuinely wants every description.
 
 So the deep-link case is a clean win, and the search case turns out not to be the tradeoff it first looked like. Search only degrades if it ranks *before* the descriptions arrive; if it awaits every description shard exactly as it awaits `tools-data.js` today, results are identical and the bytes are the same, fetched in parallel instead of serially.

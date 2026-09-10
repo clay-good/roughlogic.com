@@ -41,6 +41,11 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 async function liveCounts() {
   const toolsData = await readFile(resolve(ROOT, "tools-data.js"), "utf8");
   const tiles = (toolsData.match(/^\s*\{ id: "/gm) || []).length;
+  // How many tiles the related-tiles registry curates by hand. docs/seo.md
+  // states this and the complement ("the remaining N") in one sentence, so
+  // both move together and both are pinned to the same source of truth.
+  const relatedSrc = await readFile(resolve(ROOT, "scripts", "related-tiles.mjs"), "utf8");
+  const relatedCurated = (relatedSrc.match(/^\s{2}"[a-z0-9-]+":\s*\[/gm) || []).length;
   // Every count this gate pins into the README and the docs is derived from
   // that line-start match, so a tile the match misses would quietly lower the
   // number the docs are held to. Check it against the module itself.
@@ -111,6 +116,7 @@ async function liveCounts() {
   };
   return {
     shells,
+    relatedCurated,
     tileGzipCap: capOf("TILE_GZIP_CAP"),
     groupGzipCap: capOf("GROUP_GZIP_CAP"),
     citationStrings, unitSuites, integrationSpecs,
@@ -464,6 +470,20 @@ async function main() {
   const dimsFns = gateFigure("check-dimensions.mjs", /([\d,]+) \/ [\d,]+ functions annotated/, "annotated-function count");
   checked += checkPattern(correctness, /([\d,]+) of [\d,]+ across \d+ modules/g, dimsFns, "annotated-function count (docs/correctness.md)", errors);
   checked += checkPattern(correctness, /[\d,]+ of [\d,]+ across (\d+) modules/g, live.modules + 1, "annotated-module count (docs/correctness.md)", errors);
+
+  // docs/seo.md quotes the home lede, describes the related-tiles registry's
+  // coverage, and counts the catalog twice more in prose. It said 1,804 in all
+  // four places -- including in a sentence whose whole point is that the string
+  // is "already pinned by check-readme-counts", which it was: the pinned copy in
+  // index.html read 2,082 while the doc quoting it read 1,804.
+  const seo = await readFile(resolve(ROOT, "docs", "seo.md"), "utf8");
+  checked += checkPattern(seo, /pinned by `check-readme-counts`: "([\d,]+) free calculators/g, live.tiles, "tile count (docs/seo.md)", errors);
+  checked += checkPattern(seo, /covered it entirely\. The remaining ([\d,]+),/g, live.tiles - live.relatedCurated, "uncurated tile count (docs/seo.md)", errors);
+  checked += checkPattern(seo, /The registry covers ([\d,]+) of the/g, live.relatedCurated, "curated related-tiles entry count (docs/seo.md)", errors);
+  checked += checkPattern(seo, /of the\n  ([\d,]+) tiles; the catalog outgrew/g, live.tiles, "tile count (docs/seo.md)", errors);
+  checked += checkPattern(seo, /across ([\d,]+) tiles, a mean of/g, live.tiles, "tile count (docs/seo.md)", errors);
+  checked += checkPattern(seo, /no way back into ([\d,]+) calculators/g, live.tiles, "tile count (docs/seo.md)", errors);
+  checked += checkPattern(perf, /It needs 1 of ([\d,]+)\./g, live.tiles, "tile count (docs/performance.md)", errors);
 
   // docs/performance.md states the per-tile shell count as a live fact about
   // what the build emits, and docs/correctness.md states the catalog size twice

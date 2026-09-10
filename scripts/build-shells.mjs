@@ -650,7 +650,7 @@ export function relatedTiles(tool, tools, related) {
 // everything already in the list. Orphans are processed in TOOLS order and the
 // ranker settles ties alphabetically, so the graph is deterministic.
 //
-// 268 of the 269 find a host. `historical-pricing` cannot: it is the only tile
+// 293 of the 294 find a host. `historical-pricing` cannot: it is the only tile
 // in group Q, and a related link crossing groups would point a reader out of
 // the trade they are working in.
 export function relatedGraph(tools, related) {

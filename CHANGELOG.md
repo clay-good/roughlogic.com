@@ -793,6 +793,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`docs/seo.md` described a 1,804-tile catalog in four places, including a sentence about the number being pinned.** The clearest of them quotes the home lede and says it is "already pinned by `check-readme-counts`" -- which it is: the copy in `index.html` read **2,082** while the doc quoting it read 1,804. The others: the related-tiles registry "covers 1,638 of the 1,804 tiles" (live **1,916 of 2,082**, with "the remaining 167" and "185 curated entries that hold fewer than three links" now **166** and **186**), and "no way back into 1,804 calculators" on the 404 page's rationale. `docs/performance.md`'s deep-link paragraph ("It needs 1 of 1,804") was the same figure again.
+
+  **The built related-tiles graph had grown by 860 edges with nothing watching.** `docs/seo.md` said it "carries 6,387 edges across 1,804 tiles" and that "268 of the 269" orphaned tiles find a host. Live, measured by running the builder's own `relatedGraph`: **7,247 edges across 2,082 tiles, and 293 of 294**. The same orphan figure sat in a `build-shells.mjs` comment, a second surface, and is corrected with it. Two numbers in that sentence were **still right** and are left as prose rather than pinned: the mean inbound degree (3.48, which rounds to the 3.5 it claims) and the heaviest receiver (30, unchanged).
+
+  The graph figures are anchored in `check-related-tiles` rather than `check-readme-counts`, because they are facts about that registry and are measured by calling the builder's own function -- a second implementation of a graph is worse than a stale number. The tile counts are anchored in `check-readme-counts`, which now holds **80** label-anchored counts, up from 55 at the start of this run.
+
 - **Five more live claims across four files, all frozen at a catalog two campaigns old.** Sweeping every catalog-scale number in the living docs against its live value, rather than waiting for each to be noticed:
 
   | File | Claim | Said | Live |
