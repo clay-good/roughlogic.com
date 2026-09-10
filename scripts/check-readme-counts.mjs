@@ -439,6 +439,13 @@ async function main() {
   // Module count: the file-tree line.
   checked += checkPattern(readme, /(\d+) per-group calculator modules/g, live.modules, "calc-* module count", errors);
 
+  // docs/accessibility.md says how many routes the axe sweep visits. The sweep
+  // itself reads TOOLS at run time and auto-scales, so only the PROSE rots --
+  // and it had, to 1,804, the catalog size two campaigns back. One route per
+  // tile plus the home view.
+  const a11yDoc = await readFile(resolve(ROOT, "docs", "accessibility.md"), "utf8");
+  checked += checkPattern(a11yDoc, /runs ([\d,]+) routes that are all SPA hash routes/g, live.tiles + 1, "axe route count (docs/accessibility.md)", errors);
+
   // The static-shell total, which THREE surfaces state and only two were
   // anchored. docs/architecture.md and docs/deployment.md both say "N static
   // shells is not a precache" and both were pinned above, so both read the

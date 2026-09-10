@@ -793,6 +793,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A 5% tolerance let the axe-pass figure drift by 68 tests, and the route count beside it by 279.** `check-ci-claims` pinned the README's "N-test axe pass" to within 5% of the live count. Five percent of a per-route sweep is about a hundred tests, so the README could read **2,107** against a live **2,175** and pass -- approximately right, and therefore never corrected as the catalog grew. It is now pinned **exactly**. The count is deterministic (the Playwright config's project list is fixed, and the sweep is one test per `TOOLS` id), so exactness costs what the tile, sitemap and shell counts in the same README already cost: one bump per landing, in the commit that moves the number. The gate's own summary line said "within 5% of its live size" and now says what it does.
+
+  `docs/accessibility.md` had the same drift with nothing watching at all: it said the axe sweep "runs **1,804** routes", the catalog size two campaigns back, against a live **2,083** (one route per tile plus the home view). The sweep reads `TOOLS` at run time and auto-scaled the whole way; only the prose rotted. Corrected and anchored in `check-readme-counts`.
+
+  Seeded three ways: off by one fails, the old 2,107 fails where it passed an hour earlier, and the stale route count fails.
+
 - **Four anchors in `check-readme-counts` matched nothing, and the claim beside one of them had rotted.** The gate was written to stop the README's Mermaid diagram nodes from drifting -- the number is glued to a literal `\n` there, so a word-boundary substitution misses it. **The README no longer contains a Mermaid block at all.** All four diagram anchors had gone dead, matching nothing while the gate reported OK, because `checkPattern` walked the matches it found and said nothing when it found none. The summary line could not reveal it either: it counts *matches*, so a dead anchor contributed 0 and simply made the total smaller.
 
   What the dead anchor was covering drifted, exactly as one would predict. **Three surfaces state the static-shell total; only two were anchored.** `docs/architecture.md` and `docs/deployment.md` both say "N static shells is not a precache", both were pinned, and both read the live **2,104**. The README makes the identical claim in "How it's built", was pinned only through the Mermaid node that no longer exists, and read **1,878** -- more than a catalog out of date, on the copy a reader meets first. Corrected and anchored to its own prose.

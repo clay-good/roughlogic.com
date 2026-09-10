@@ -228,7 +228,7 @@ is unchanged.
   axe-core ruleset the SPA passes" from spec-v13 until 2026-08-31, and
   nothing checked it. The axe sweep in
   [../test/integration/a11y.test.js](../test/integration/a11y.test.js)
-  runs 1,804 routes that are all SPA hash routes; the shells are a
+  runs 2,083 routes that are all SPA hash routes; the shells are a
   different document, and the Lighthouse run this used to cite was
   removed from CI on 2026-08-23. When the claim was finally measured,
   **all 21 group hubs failed WCAG 1.4.1** -- each tile link sits in a

@@ -165,10 +165,17 @@ async function main() {
     if (live === null) {
       errors.push("could not count the axe pass with `playwright --list`; the README figure is unverified, which is not the same as correct.");
     } else {
+      // Pinned EXACTLY, not within a band. This tolerated 5% drift until
+      // 2026-09-10, and 5% of a per-route sweep is ~100 tests: the README read
+      // 2,107 against a live 2,175 and passed, because the catalog had grown
+      // under a figure that was allowed to be approximately right. The count is
+      // deterministic -- the config's project list is fixed and the sweep is
+      // one test per TOOLS id -- so exactness costs exactly what the tile,
+      // sitemap and shell counts in this same README already cost: one bump per
+      // landing, in the commit that changes the number.
       const stated = Number(claimed[1].replace(/,/g, ""));
-      const drift = Math.abs(live - stated) / live;
-      if (drift > 0.05) {
-        errors.push(`README says the axe pass is ${claimed[1]} tests; it is ${live} (${(drift * 100).toFixed(1)}% off).`);
+      if (stated !== live) {
+        errors.push(`README says the axe pass is ${claimed[1]} tests; it is ${live}.`);
       }
     }
   }
@@ -454,7 +461,7 @@ async function main() {
     process.exit(1);
   }
   console.log(
-    `check-ci-claims OK: README names all ${jobs.length} CI jobs (${jobs.join(", ")}), states the axe pass within 5% of its live size, no doc claims a gate the workflow does not run, both data-refresh lanes run the static gates plus the base-TIP stamp check themselves (the PRs they open never run CI), docs/performance.md's gate table and scripts/audit.mjs's header both name where each gate actually runs.`,
+    `check-ci-claims OK: README names all ${jobs.length} CI jobs (${jobs.join(", ")}), states the axe pass at exactly its live size, no doc claims a gate the workflow does not run, both data-refresh lanes run the static gates plus the base-TIP stamp check themselves (the PRs they open never run CI), docs/performance.md's gate table and scripts/audit.mjs's header both name where each gate actually runs.`,
   );
 }
 
