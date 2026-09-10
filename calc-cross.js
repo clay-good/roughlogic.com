@@ -2197,7 +2197,7 @@ CROSS_RENDERERS["pump-tdh"] = renderPumpTdh;
 // retraction (the annulus), so a cylinder extends slower with more force than
 // it retracts. 231 in^3 = 1 US gallon.
 
-// dims: in { args: dimensionless } out: { force_lb: M L T^-2, speed_in_per_s: L T^-1, oil_per_stroke_gal: L^3 }
+// dims: in { bore_in: L, rod_in: L, pressure_psi: M L^-1 T^-2, flow_gpm: L^3 T^-1, direction: dimensionless, stroke_in: L } out: { force_lb: M L T^-2, speed_in_per_s: L T^-1, oil_per_stroke_gal: L^3 }
 export function computeHydraulicCylinder({
   bore_in = 0,
   rod_in = 0,

@@ -2030,7 +2030,7 @@ TRUCKING_RENDERERS["tiedown-count"] = _simpleRenderer({
 });
 
 // ===================== spec-v1378: kingpin-to-rear-axle compliance =====================
-// dims: in { args: dimensionless } out: { excess_ft: L, holes_needed: dimensionless, resulting_kpra_ft: L }
+// dims: in { kpra_ft: L, state_limit_ft: L, hole_spacing_in: L } out: { excess_ft: L, holes_needed: dimensionless, resulting_kpra_ft: L }
 export function computeKingpinToAxle({ kpra_ft = 0, state_limit_ft = 40, hole_spacing_in = 6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(kpra_ft > 0)) return { error: "Measured kingpin-to-rear-axle distance must be positive." };

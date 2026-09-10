@@ -1106,7 +1106,7 @@ SURVEY_RENDERERS["slope-staking"] = _simpleRenderer({
 });
 
 // ===================== spec-v1396: grade rod, cut, and fill =====================
-// dims: in { args: dimensionless } out: { hi_ft: L, grade_rod_ft: L, ground_elevation_ft: L, cut_fill_ft: L }
+// dims: in { benchmark_elev_ft: L, backsight_ft: L, design_elev_ft: L, ground_rod_ft: L } out: { hi_ft: L, grade_rod_ft: L, ground_elevation_ft: L, cut_fill_ft: L }
 export function computeGradeRodCutFill({ benchmark_elev_ft = 0, backsight_ft = 0, design_elev_ft = 0, ground_rod_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Number.isFinite(benchmark_elev_ft) || !Number.isFinite(design_elev_ft)) return { error: "Benchmark and design elevations must be finite numbers." };

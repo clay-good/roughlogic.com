@@ -1589,7 +1589,7 @@ function _v912renderVesselHeadVolume(inputRegion, outputRegion, citationEl) {
 FAB_RENDERERS["vessel-head-volume"] = _v912renderVesselHeadVolume;
 
 // ===================== spec-v962: sheet-metal bend springback =====================
-// dims: in { args: dimensionless } out: { springback_factor_ks: dimensionless, final_radius_in: dimensionless }
+// dims: in { tool_radius_in: L, thickness_in: L, yield_strength_psi: M L^-1 T^-2, modulus_psi: M L^-1 T^-2 } out: { springback_factor_ks: dimensionless, final_radius_in: dimensionless }
 export function computeBendSpringback({ tool_radius_in = 1.0, thickness_in = 0.1, yield_strength_psi = 50000, modulus_psi = 29000000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(tool_radius_in > 0)) return { error: "Tool (inside) bend radius must be positive (in)." };
@@ -1875,7 +1875,7 @@ function _simpleRenderer(spec) {
 }
 
 // ===================== spec-v1404: tube bend wall thinning =====================
-// dims: in { args: dimensionless } out: { bend_ratio: dimensionless, d_over_t: dimensionless, wall_after_in: L, thinning_pct: dimensionless, arc_length_in: L }
+// dims: in { od_in: L, wall_in: L, clr_in: L, bend_angle_deg: dimensionless } out: { bend_ratio: dimensionless, d_over_t: dimensionless, wall_after_in: L, thinning_pct: dimensionless, arc_length_in: L }
 export function computeTubeBendWallThinning({ od_in = 0, wall_in = 0, clr_in = 0, bend_angle_deg = 90 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(od_in > 0)) return { error: "Tube outside diameter must be positive." };

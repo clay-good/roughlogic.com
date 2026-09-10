@@ -663,7 +663,7 @@ ELECDESIGN_RENDERERS["rolling-sphere-protection"] = _simpleRenderer({
 });
 
 // ===================== spec-v979: room cavity ratio (RCR) for CU lookup =====================
-// dims: in { args: dimensionless } out: { room_cavity_ratio: dimensionless }
+// dims: in { room_length_ft: L, room_width_ft: L, cavity_height_ft: L } out: { room_cavity_ratio: dimensionless }
 export function computeRoomCavityRatio({ room_length_ft = 40, room_width_ft = 30, cavity_height_ft = 8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(room_length_ft > 0)) return { error: "Room length must be positive (ft)." };
@@ -696,7 +696,7 @@ ELECDESIGN_RENDERERS["room-cavity-ratio"] = _simpleRenderer({
 });
 
 // ===================== spec-v982: luminaire spacing-to-mounting-height ratio =====================
-// dims: in { args: dimensionless } out: { max_spacing_ft: L }
+// dims: in { smh_ratio: dimensionless, mounting_height_ft: L, actual_spacing_ft: L } out: { max_spacing_ft: L }
 export function computeLuminaireSpacingMh({ smh_ratio = 1.3, mounting_height_ft = 8, actual_spacing_ft = 9 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(smh_ratio > 0)) return { error: "Spacing-to-mounting-height ratio must be positive." };

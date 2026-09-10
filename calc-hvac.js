@@ -1582,7 +1582,7 @@ function vaporPressureFt(F) {
   return psi * 2.31;
 }
 
-// dims: in { args: dimensionless } out: { npsh_a_ft: L }
+// dims: in { elevation_ft: L, water_temp_F: T, source_elevation_relative_ft: L, npsh_required_ft: L, target_margin_ft: L } out: { npsh_a_ft: L }
 export function computeNPSHa({
   elevation_ft = 0, water_temp_F = 60,
   source_elevation_relative_ft = 0, // positive if source above pump
@@ -2217,7 +2217,7 @@ export const SMACNA_LEAKAGE_CLASSES = {
   48: { cfm_per_100ft2_at_1inwc: 48, description: "Class 48 - severely-leaking duct (failure)" },
 };
 
-// dims: in { args: dimensionless } out: { leakage_cfm: L^3 T^-1, leakage_percent: dimensionless }
+// dims: in { design_cfm: L^3 T^-1, measured_cfm: L^3 T^-1, duct_surface_ft2: L^2, test_pressure_inwc: M L^-1 T^-2, design_class: dimensionless } out: { leakage_cfm: L^3 T^-1, leakage_percent: dimensionless }
 export function computeDuctLeakage({
   design_cfm = 0, measured_cfm = 0,
   duct_surface_ft2 = 0, test_pressure_inwc = 1.0,

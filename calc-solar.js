@@ -208,7 +208,7 @@ export function renderBatteryRuntime(inputRegion, outputRegion, citationEl, para
 // tap (705.11) is ahead of the service disconnect and is not subject to the
 // busbar rule at all. The AHJ inspector reads the panel to verify position.
 
-// dims: in { args: dimensionless } out: { sum_of_breakers_a: I, limit_a: I, passes: dimensionless }
+// dims: in { main_breaker_a: I, busbar_rating_a: I, pv_existing_a: I, pv_proposed_a: I, method: dimensionless } out: { sum_of_breakers_a: I, limit_a: I, passes: dimensionless }
 export function computePvInterconnectionBusbar({
   main_breaker_a = 0,
   busbar_rating_a = 0,

@@ -623,7 +623,7 @@ export const waterHammerArrestorExample = {
 
 // --- Utility 73: Hot Water Recirculation Pump Head ---
 
-// dims: in { args: dimensionless } out: { head_ft: L, flow_gpm: L^3 T^-1, pump_hp: M L^2 T^-3 }
+// dims: in { pipe_length_ft: L, fittings_count: dimensionless, target_flow_gpm: L^3 T^-1, internal_diameter_in: L, material: dimensionless, equivalent_length_per_fitting_ft: L } out: { head_ft: L, flow_gpm: L^3 T^-1, pump_hp: M L^2 T^-3 }
 export function computeRecircPumpHead({
   pipe_length_ft, fittings_count = 0, target_flow_gpm,
   internal_diameter_in, material = "copper",
@@ -1655,7 +1655,7 @@ export const THERMAL_EXPANSION_COEFFICIENTS = {
   pvc:           { alpha_per_F: 3.0e-5,  E_psi: 420000,  S_a_psi: 2000,  description: "PVC Schedule 80" },
 };
 
-// dims: in { args: dimensionless } out: { leg_length_in: L, loop_length_in: L }
+// dims: in { material: dimensionless, length_ft: L, delta_T_F: T, pipe_OD_in: L } out: { leg_length_in: L, loop_length_in: L }
 export function computePipeExpansionLoop({
   material = "copper",
   length_ft = 0,
@@ -2486,7 +2486,7 @@ export const SANITARY_BUILDING_DRAIN_MAX_DFU = {
   "0.5": { 2: 26, 2.5: 31, 3: 50, 4: 250, 5: 575, 6: 1000, 8: 2300 },
 };
 
-// dims: in { args: dimensionless } out: { total_dfu: dimensionless, min_size_in: L }
+// dims: in { fixtures: dimensionless, config: dimensionless, slope_in_per_ft: dimensionless, proposed_size_in: L } out: { total_dfu: dimensionless, min_size_in: L }
 export function computeSanitaryDfu({
   fixtures = {},
   config = "horizontal_branch",

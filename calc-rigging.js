@@ -1638,7 +1638,7 @@ function _v938renderWireRopeClips(inputRegion, outputRegion, citationEl) {
 RIGGING_RENDERERS["wire-rope-clips"] = _v938renderWireRopeClips;
 
 // ===================== spec-v953: crane load radius and boom-tip height from boom geometry =====================
-// dims: in { args: dimensionless } out: { load_radius_ft: L, boom_tip_height_ft: dimensionless, angle_for_target_radius_deg: dimensionless }
+// dims: in { boom_length_ft: L, boom_angle_deg: dimensionless, boom_foot_offset_ft: L, boom_foot_height_ft: L, target_radius_ft: L } out: { load_radius_ft: L, boom_tip_height_ft: dimensionless, angle_for_target_radius_deg: dimensionless }
 export function computeCraneLoadRadiusBoom({ boom_length_ft = 30, boom_angle_deg = 60, boom_foot_offset_ft = 4, boom_foot_height_ft = 6, target_radius_ft = 25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(boom_length_ft > 0)) return { error: "Boom length must be positive (ft)." };
@@ -1742,7 +1742,7 @@ function _v991renderReevingPartsOfLine(inputRegion, outputRegion, citationEl) {
 RIGGING_RENDERERS["reeving-parts-of-line"] = _v991renderReevingPartsOfLine;
 
 // ===================== spec-v996: guy-wire / down-guy tension and mast download =====================
-// dims: in { args: dimensionless } out: { guy_angle_deg: dimensionless, guy_tension_lb: dimensionless, mast_download_lb: dimensionless, anchor_uplift_lb: dimensionless }
+// dims: in { horizontal_load_lb: M L T^-2, attachment_height_ft: L, anchor_lead_ft: L } out: { guy_angle_deg: dimensionless, guy_tension_lb: dimensionless, mast_download_lb: dimensionless, anchor_uplift_lb: dimensionless }
 export function computeGuyWireTension({ horizontal_load_lb = 500, attachment_height_ft = 20, anchor_lead_ft = 20 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(horizontal_load_lb > 0)) return { error: "Horizontal load must be positive (lb)." };

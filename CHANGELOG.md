@@ -793,6 +793,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Stub annotations 241 -> 186 across three tranches.** The drainer's resolver learned the units the unit-tail rule deliberately leaves out of the *gate* -- `_in`, `_ft`, `_psf`, `_ksi`, `_inwc`, `_v`, `_a`, `_ohms`, `_hz`, `_btu`, `_cy`, `_deg`, and `_f`/`_c` only behind a temperature word, since a bare `_f` is as often a factor. Those units propose an annotation; the gate's own rules A and C then check every proposal, so a wrong guess here cannot land quietly. 32 more functions drained.
+
+  What the wider resolver bought is compounds it can now derive rather than guess: `soil_resistivity_ohm_cm` is `M L^3 T^-3 I^-2` (an ohm times a length), and `slope_in_per_ft` is dimensionless because inches over feet is a length over a length.
+
 - **A second stub tranche: 218 left, down from 241.** Fourteen more `args` stubs are drained, chosen by a rule that refuses to guess: a function is only touched when **every** parameter's dimension is decidable from its unit tail or from a corpus consensus where the key is already declared exactly one way. A partly-declared annotation would be a new kind of lie, so a single undecidable parameter leaves the whole function stubbed.
 
   The first draft of that drainer produced duplicate keys -- `net_volume_gal` twice, `material` twice -- because it read past the parameter list into the function body. It was a dry run, and the duplicates were the tell. Reading exactly from the signature's `(` to its matching `)` took the tranche from 5 wrong to 14 right. **A detector is worth as little as its worst case: verify it against a known signature before believing a count.**

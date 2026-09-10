@@ -794,7 +794,7 @@ function _v16h_humidityRatioFromRH({ T_db_F, rh_pct, P_kPa }) {
 // Latent heat of vaporization of water near room temperature (BTU/lb).
 const _V16H_HFG_BTU_LB = 1061;
 
-// dims: in { args: dimensionless } out: { addition_lb_hr: M T^-1, gpd: L^3 T^-1, latent_btu_hr: M L^2 T^-3 }
+// dims: in { cfm: L^3 T^-1, supply_db_F: T, entering_rh_pct: dimensionless, target_rh_pct: dimensionless, altitude_ft: L } out: { addition_lb_hr: M T^-1, gpd: L^3 T^-1, latent_btu_hr: M L^2 T^-3 }
 export function computeHumidifierCapacity({
   cfm = 0,
   supply_db_F = 70,
@@ -1517,7 +1517,7 @@ function _v915renderOutdoorResetRatio(inputRegion, outputRegion, citationEl) {
 HVACSYSTEMS_RENDERERS["outdoor-reset-ratio"] = _v915renderOutdoorResetRatio;
 
 // ===================== spec-v956: hydronic injection-mixing loop flow =====================
-// dims: in { args: dimensionless } out: { injection_gpm: L^3 T^-1, injection_pct_of_secondary: dimensionless }
+// dims: in { secondary_gpm: L^3 T^-1, secondary_supply_f: T, secondary_return_f: T, primary_supply_f: T } out: { injection_gpm: L^3 T^-1, injection_pct_of_secondary: dimensionless }
 export function computeHydronicInjectionMixing({ secondary_gpm = 10, secondary_supply_f = 110, secondary_return_f = 90, primary_supply_f = 180 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(secondary_gpm > 0)) return { error: "Secondary loop flow must be positive (gpm)." };

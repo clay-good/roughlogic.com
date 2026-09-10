@@ -577,7 +577,7 @@ FINISH_RENDERERS["cement-board-takeoff"] = _simpleRenderer({
 });
 
 // ===================== spec-v966: roof step-flashing piece count =====================
-// dims: in { args: dimensionless } out: { step_flashing_pieces: dimensionless, order_pieces: dimensionless }
+// dims: in { wall_run_ft: L, shingle_exposure_in: L, waste_pct: dimensionless } out: { step_flashing_pieces: dimensionless, order_pieces: dimensionless }
 export function computeStepFlashingCount({ wall_run_ft = 20, shingle_exposure_in = 5, waste_pct = 5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(wall_run_ft > 0)) return { error: "Sloped wall/chimney run must be positive (ft)." };

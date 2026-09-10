@@ -2205,7 +2205,7 @@ import {
 
 // --- 246: Stair Stringer Layout (code-check pass/fail) ---
 
-// dims: in { args: dimensionless } out: { stringer_in: L, board_feet: L^3 }
+// dims: in { total_rise_in: L, target_rise_in: L, target_tread_in: L, nosing_in: L, stringer_thickness_in: L, code_max_rise_in: L, code_min_tread_in: L } out: { stringer_in: L, board_feet: L^3 }
 export function computeStairStringerV7({
   total_rise_in = 0, target_rise_in = 7.0, target_tread_in = 11.0,
   nosing_in = 1, stringer_thickness_in = 11.25,
@@ -10512,7 +10512,7 @@ CONSTRUCTION_RENDERERS["joist-cantilever-check"] = _simpleRenderer({
 });
 
 // ===================== spec-v970: foundation waterproofing / dampproofing takeoff =====================
-// dims: in { args: dimensionless } out: { wall_area_sf: L^2, gallons: L^3 }
+// dims: in { perimeter_ft: L, below_grade_height_ft: L, coverage_sf_per_gal: L^-1, waste_pct: dimensionless } out: { wall_area_sf: L^2, gallons: L^3 }
 export function computeFoundationWaterproofingTakeoff({ perimeter_ft = 150, below_grade_height_ft = 8, coverage_sf_per_gal = 50, waste_pct = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(perimeter_ft > 0)) return { error: "Foundation perimeter must be positive (ft)." };
@@ -10591,7 +10591,7 @@ CONSTRUCTION_RENDERERS["roof-ballast-weight"] = _simpleRenderer({
 });
 
 // ===================== spec-v988: foundation drainage board (dimple mat) takeoff =====================
-// dims: in { args: dimensionless } out: { wall_area_sf: L^2, rolls: dimensionless, termination_lf: dimensionless }
+// dims: in { perimeter_ft: L, below_grade_height_ft: L, roll_width_ft: L, roll_length_ft: L, waste_pct: dimensionless } out: { wall_area_sf: L^2, rolls: dimensionless, termination_lf: dimensionless }
 export function computeDrainageBoardTakeoff({ perimeter_ft = 150, below_grade_height_ft = 8, roll_width_ft = 4, roll_length_ft = 50, waste_pct = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(perimeter_ft > 0)) return { error: "Foundation perimeter must be positive (ft)." };

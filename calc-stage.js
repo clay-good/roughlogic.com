@@ -1875,7 +1875,7 @@ STAGE_RENDERERS["line-array-splay"] = _r({
 });
 
 // ===================== spec-v1365: delay loudspeaker time and Haas offset =====================
-// dims: in { args: dimensionless } out: { speed_ft_s: L T^-1, geometric_ms: T, set_delay_ms: T }
+// dims: in { distance_ft: L, temp_f: T, haas_offset_ms: T, compare_temp_f: T } out: { speed_ft_s: L T^-1, geometric_ms: T, set_delay_ms: T }
 export function computeDelayTowerAlignment({ distance_ft = 0, temp_f = 70, haas_offset_ms = 15, compare_temp_f = 90 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(distance_ft > 0)) return { error: "Distance from the main array must be positive." };
@@ -1927,7 +1927,7 @@ STAGE_RENDERERS["delay-tower-alignment"] = _r({
 });
 
 // ===================== spec-v1366: end-fire and cardioid subwoofer array spacing =====================
-// dims: in { args: dimensionless } out: { delay_per_element_ms: T, optimum_freq_hz: T^-1, wavelength_ft: L }
+// dims: in { spacing_ft: L, elements: dimensionless, temp_f: T, target_freq_hz: T^-1 } out: { delay_per_element_ms: T, optimum_freq_hz: T^-1, wavelength_ft: L }
 export function computeCardioidSubArray({ spacing_ft = 0, elements = 4, temp_f = 70, target_freq_hz = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(spacing_ft > 0)) return { error: "Element spacing must be positive." };
@@ -1980,7 +1980,7 @@ STAGE_RENDERERS["cardioid-sub-array"] = _r({
 });
 
 // ===================== spec-v1367: driver spacing, lobing, and crossover ceiling =====================
-// dims: in { args: dimensionless } out: { crossover_ceiling_hz: T^-1, wavelength_ft: L, max_spacing_ft: L }
+// dims: in { spacing_ft: L, test_freq_hz: T^-1, temp_f: T } out: { crossover_ceiling_hz: T^-1, wavelength_ft: L, max_spacing_ft: L }
 export function computeDriverSpacingLobing({ spacing_ft = 0, test_freq_hz = 0, temp_f = 70 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(spacing_ft > 0)) return { error: "Center-to-center spacing must be positive." };

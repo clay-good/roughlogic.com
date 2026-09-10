@@ -2838,7 +2838,7 @@ ELECTRICAL_RENDERERS["arc-flash-screen"] = renderArcFlashScreen;
 // when nameplate FLA is provided, both are surfaced and the larger
 // (design) value is flagged.
 
-// dims: in { args: dimensionless } out: { fla_A: I, branch_A: I, overload_A: I }
+// dims: in { hp: M L^2 T^-3, voltage_V: M L^2 T^-3 I^-1, phase: dimensionless, eta: dimensionless, power_factor: dimensionless, nameplate_fla_A: I, service_factor: dimensionless } out: { fla_A: I, branch_A: I, overload_A: I }
 export function computeMotorBranchFromNameplate({
   hp = 0,
   voltage_V = 0,
@@ -2993,7 +2993,7 @@ ELECTRICAL_RENDERERS["motor-branch-from-nameplate"] = renderMotorBranchFromNamep
 // between rods means n rods at ~6 ft spacing land closer to ~1.1n /
 // R_single in practice; the count is a starting point, not a design.
 
-// dims: in { args: dimensionless } out: { resistance_ohms: M L^2 T^-3 I^-2, supplemental_rods: dimensionless }
+// dims: in { electrode_type: dimensionless, soil_resistivity_ohm_cm: M L^3 T^-3 I^-2, rod_diameter_in: L, rod_length_ft: L, ring_diameter_ft: L, ring_conductor_diameter_in: L, ring_burial_depth_ft: L, plate_area_ft2: L^2, plate_burial_depth_ft: L, ufer_concrete_diameter_in: L } out: { resistance_ohms: M L^2 T^-3 I^-2, supplemental_rods: dimensionless }
 export function computeGroundingElectrodeResistance({
   electrode_type = "driven_rod",
   soil_resistivity_ohm_cm = 0,
@@ -5926,7 +5926,7 @@ function _v942renderPvAcOutputCircuit(inputRegion, outputRegion, citationEl) {
 ELECTRICAL_RENDERERS["pv-ac-output-circuit"] = _v942renderPvAcOutputCircuit;
 
 // ===================== spec-v951: Wenner 4-pin soil resistivity =====================
-// dims: in { args: dimensionless } out: { resistivity_ohm_m: dimensionless, resistivity_ohm_cm: dimensionless }
+// dims: in { probe_spacing_ft: L, meter_resistance_ohm: M L^2 T^-3 I^-2 } out: { resistivity_ohm_m: dimensionless, resistivity_ohm_cm: dimensionless }
 export function computeSoilResistivityWenner({ probe_spacing_ft = 10, meter_resistance_ohm = 5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(probe_spacing_ft > 0)) return { error: "Probe spacing must be positive (ft)." };

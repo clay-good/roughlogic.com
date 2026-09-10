@@ -1371,7 +1371,7 @@ FIELD_RENDERERS["contour-slope"] = _r({
 });
 
 // ===================== spec-v1400: helicopter landing zone sizing =====================
-// dims: in { args: dimensionless } out: { required_side_ft: L, slope_limit_pct: dimensionless, approach_length_ft: L, total_clear_ft: L }
+// dims: in { rotor_diameter_ft: L, size_factor: dimensionless, measured_clear_ft: L, ground_slope_deg: dimensionless, slope_limit_deg: dimensionless, obstacle_height_ft: L, approach_ratio: dimensionless } out: { required_side_ft: L, slope_limit_pct: dimensionless, approach_length_ft: L, total_clear_ft: L }
 export function computeHelicopterLzSizing({ rotor_diameter_ft = 0, size_factor = 2, measured_clear_ft = 0, ground_slope_deg = 0, slope_limit_deg = 8, obstacle_height_ft = 0, approach_ratio = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rotor_diameter_ft > 0)) return { error: "Rotor diameter must be positive." };

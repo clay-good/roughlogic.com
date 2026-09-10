@@ -523,7 +523,7 @@ FIRESPRINKLER_RENDERERS["fire-tank-sizing"] = _simpleRenderer({
 });
 
 // ===================== spec-v1390: sprinkler obstruction clearance =====================
-// dims: in { args: dimensionless } out: { required_separation_in: L, deficiency_in: L }
+// dims: in { obstruction_width_in: L, horizontal_separation_in: L, obstruction_depth_in: L } out: { required_separation_in: L, deficiency_in: L }
 export function computeSprinklerObstruction({ obstruction_width_in = 0, horizontal_separation_in = 0, obstruction_depth_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(obstruction_width_in > 0)) return { error: "Obstruction width must be positive." };
@@ -579,7 +579,7 @@ FIRESPRINKLER_RENDERERS["sprinkler-obstruction"] = _simpleRenderer({
 });
 
 // ===================== spec-v1393: hydrant count and spacing =====================
-// dims: in { args: dimensionless } out: { hydrants_by_flow: dimensionless, hydrants_by_frontage: dimensionless, actual_spacing_ft: L, max_distance_ft: L }
+// dims: in { required_flow_gpm: L^3 T^-1, credited_flow_per_hydrant_gpm: L^3 T^-1, frontage_ft: L, average_spacing_ft: L, max_distance_ft: L } out: { hydrants_by_flow: dimensionless, hydrants_by_frontage: dimensionless, actual_spacing_ft: L, max_distance_ft: L }
 export function computeHydrantSpacingCount({ required_flow_gpm = 0, credited_flow_per_hydrant_gpm = 0, frontage_ft = 0, average_spacing_ft = 0, max_distance_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(required_flow_gpm > 0)) return { error: "Required fire flow must be positive." };

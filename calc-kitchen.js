@@ -1734,7 +1734,7 @@ KITCHEN_RENDERERS["dough-ball-scaling"] = _r({
 });
 
 // ===================== spec-v1358: fermentation and proof time vs temperature (Q10) =====================
-// dims: in { args: dimensionless } out: { predicted_time_hr: T, predicted_time_min: T, ratio: dimensionless, delta_f: T, delta_c: T }
+// dims: in { reference_time_hr: T, reference_temp_f: T, actual_temp_f: T, q10: dimensionless } out: { predicted_time_hr: T, predicted_time_min: T, ratio: dimensionless, delta_f: T, delta_c: T }
 export function computeFermentationTimeQ10({ reference_time_hr = 0, reference_temp_f = 78, actual_temp_f = 78, q10 = 2.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(reference_time_hr > 0)) return { error: "Reference proof or bulk time must be positive." };
