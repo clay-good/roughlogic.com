@@ -1802,7 +1802,7 @@ function _v917renderReamingDrillAllowance(inputRegion, outputRegion, citationEl)
 MACHINING_RENDERERS["reaming-drill-allowance"] = _v917renderReamingDrillAllowance;
 
 // ===================== spec-v952: Taylor tool-life / cutting-speed trade-off =====================
-// dims: in { args: dimensionless } out: { tool_life_min: dimensionless, speed_for_target_life_sfm: dimensionless }
+// dims: in { taylor_c: L T^-1, taylor_n: dimensionless, cutting_speed_sfm: L T^-1, target_life_min: T } out: { tool_life_min: T, speed_for_target_life_sfm: L T^-1 }
 export function computeTaylorToolLife({ taylor_c = 300, taylor_n = 0.2, cutting_speed_sfm = 200, target_life_min = 15 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(taylor_c > 0)) return { error: "Taylor constant C must be positive (sfm at 1-minute life)." };
@@ -2199,7 +2199,7 @@ function _simpleRenderer(spec) {
 }
 
 // ===================== spec-v1402: drill speed, feed, power, and torque =====================
-// dims: in { args: dimensionless } out: { rpm: T^-1, feed_ipm: L T^-1, removal_rate_cipm: L^3 T^-1, torque_in_lb: M L^2 T^-2 }
+// dims: in { diameter_in: L, sfm: L T^-1, feed_ipr: L, unit_power: M L^-1 T^-2, spindle_efficiency: dimensionless } out: { rpm: T^-1, feed_ipm: L T^-1, removal_rate_cipm: L^3 T^-1, torque_in_lb: M L^2 T^-2 }
 export function computeDrillFeedThrust({ diameter_in = 0, sfm = 0, feed_ipr = 0, unit_power = 1.0, spindle_efficiency = 0.8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(diameter_in > 0)) return { error: "Drill diameter must be positive." };
@@ -2251,7 +2251,7 @@ MACHINING_RENDERERS["drill-feed-thrust"] = _simpleRenderer({
 });
 
 // ===================== spec-v1403: band saw blade pitch, speed, and cut time =====================
-// dims: in { args: dimensionless } out: { min_tpi: dimensionless, max_tpi: dimensionless, wheel_rpm: T^-1, cut_time_min: T }
+// dims: in { thickness_in_cut_in: L, blade_speed_sfm: L T^-1, wheel_diameter_in: L, cut_area_sqin: L^2, feed_sqin_per_min: L^2 T^-1 } out: { min_tpi: dimensionless, max_tpi: dimensionless, wheel_rpm: T^-1, cut_time_min: T }
 export function computeBandSawBladePitch({ thickness_in_cut_in = 0, blade_speed_sfm = 0, wheel_diameter_in = 0, cut_area_sqin = 0, feed_sqin_per_min = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(thickness_in_cut_in > 0)) return { error: "Section thickness in the cut must be positive." };
@@ -2306,7 +2306,7 @@ MACHINING_RENDERERS["band-saw-blade-pitch"] = _simpleRenderer({
 });
 
 // ===================== spec-v1405: counterbore depth and remaining material =====================
-// dims: in { args: dimensionless } out: { counterbore_depth_in: L, remaining_thickness_in: L, required_engagement_in: L, shortfall_in: L }
+// dims: in { screw_diameter_in: L, head_height_in: L, below_flush_in: L, plate_thickness_in: L, engagement_multiplier: dimensionless, tapped_part: dimensionless } out: { counterbore_depth_in: L, remaining_thickness_in: L, required_engagement_in: L, shortfall_in: L }
 export function computeCounterboreDepth({ screw_diameter_in = 0, head_height_in = 0, below_flush_in = 0.015, plate_thickness_in = 0, engagement_multiplier = 1.0, tapped_part = "yes" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Accepts the renderer's "yes"/"no" and a programmatic caller's boolean alike.

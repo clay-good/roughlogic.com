@@ -51,7 +51,7 @@ export const SHOP_RENDERERS = {};
 // entered directly; cut time t = L / feed_IPM; total = t x passes.
 // =====================================================================
 
-// dims: in { cut_length_in: L, rpm: T^-1, feed_ipr_in: L, feed_ipm_in: L, passes: dimensionless } out: { feed_ipm: L T^-1, time_min: T, time_s: T, total_min: T }
+// dims: in { cut_length_in: L, rpm: T^-1, feed_ipr_in: L, feed_ipm_in: L T^-1, passes: dimensionless } out: { feed_ipm: L T^-1, time_min: T, time_s: T, total_min: T }
 export function computeMachiningTime({ feed_mode = "rpm-ipr", cut_length_in = 0, rpm = 0, feed_ipr_in = 0, feed_ipm_in = 0, passes = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(cut_length_in) || 0;
@@ -114,7 +114,7 @@ SHOP_RENDERERS["machining-time"] = _v40renderMachiningTime;
 // drilling MRR = (pi*D^2/4) x feed_IPM. First-principles geometry.
 // =====================================================================
 
-// dims: in { mode: dimensionless, woc_in: L, doc_in: L, feed_ipm_in: L, sfm: L, feed_ipr_in: L, drill_dia_in: L } out: { mrr_in3: L^3, mrr_cm3: L^3 }
+// dims: in { mode: dimensionless, woc_in: L, doc_in: L, feed_ipm_in: L T^-1, sfm: L T^-1, feed_ipr_in: L, drill_dia_in: L } out: { mrr_in3: L^3 T^-1, mrr_cm3: L^3 T^-1 }
 export function computeMaterialRemovalRate({ mode = "milling", woc_in = 0, doc_in = 0, feed_ipm_in = 0, sfm = 0, feed_ipr_in = 0, drill_dia_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const m = String(mode);

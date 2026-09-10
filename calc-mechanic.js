@@ -3751,7 +3751,7 @@ function _v959renderUjointOperatingAngle(inputRegion, outputRegion, citationEl) 
 MECHANIC_RENDERERS["ujoint-operating-angle"] = _v959renderUjointOperatingAngle;
 
 // ===================== spec-v967: hull displacement and block coefficient =====================
-// dims: in { args: dimensionless } out: { displacement_ft3: L^3, displacement_lb: dimensionless, displacement_long_tons: dimensionless }
+// dims: in { lwl_ft: L, bwl_ft: L, draft_ft: L, block_coefficient: dimensionless, water_density_pcf: M L^-3 } out: { displacement_ft3: L^3, displacement_lb: M, displacement_long_tons: M }
 export function computeHullDisplacement({ lwl_ft = 30, bwl_ft = 10, draft_ft = 4, block_coefficient = 0.5, water_density_pcf = 64 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(lwl_ft > 0)) return { error: "Waterline length must be positive (ft)." };
@@ -3794,7 +3794,7 @@ MECHANIC_RENDERERS["hull-displacement"] = _simpleRenderer({
 });
 
 // ===================== spec-v998: sailboat performance ratios (SA/D and DLR) =====================
-// dims: in { args: dimensionless } out: { sa_d_ratio: dimensionless, dl_ratio: dimensionless }
+// dims: in { sail_area_sqft: L^2, displacement_lb: M, lwl_ft: L } out: { sa_d_ratio: dimensionless, dl_ratio: dimensionless }
 export function computeSailboatPerformanceRatios({ sail_area_sqft = 500, displacement_lb = 10000, lwl_ft = 30 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(sail_area_sqft > 0)) return { error: "Sail area must be positive (sq ft)." };
@@ -3835,7 +3835,7 @@ MECHANIC_RENDERERS["sailboat-performance-ratios"] = _simpleRenderer({
 });
 
 // ===================== spec-v1007: flywheel stored kinetic energy and speed fluctuation =====================
-// dims: in { args: dimensionless } out: { kinetic_energy_ftlb: M L^2 T^-2, speed_fluctuation_pct: dimensionless }
+// dims: in { weight_lb: M, radius_of_gyration_ft: L, rpm: T^-1, energy_fluctuation_ftlb: M L^2 T^-2 } out: { kinetic_energy_ftlb: M L^2 T^-2, speed_fluctuation_pct: dimensionless }
 export function computeFlywheelEnergy({ weight_lb = 100, radius_of_gyration_ft = 1, rpm = 1000, energy_fluctuation_ftlb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(weight_lb > 0)) return { error: "Flywheel weight must be positive (lb)." };
@@ -4208,7 +4208,7 @@ MECHANIC_RENDERERS["gear-dynamic-tooth-stress"] = _simpleRenderer({
 // root is 0.87 -- and it is what this tile computes.
 // ===========================================================================
 
-// dims: in { args: dimensionless } out: { density_ratio: dimensionless, corrected_jet_number: dimensionless, corrected_jet_diameter_in: L }
+// dims: in { baseline_pressure_inhg: M L^-1 T^-2, baseline_temp_f: T, actual_pressure_inhg: M L^-1 T^-2, actual_temp_f: T, jet_flow_number: dimensionless, jet_diameter_in: L } out: { density_ratio: dimensionless, corrected_jet_number: dimensionless, corrected_jet_diameter_in: L }
 export function computeCarburetorAltitudeJetting({ baseline_pressure_inhg = 29.92, baseline_temp_f = 59, actual_pressure_inhg = 0, actual_temp_f = 0, jet_flow_number = 0, jet_diameter_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(baseline_pressure_inhg > 0)) return { error: "Baseline absolute pressure must be positive." };

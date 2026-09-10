@@ -279,6 +279,14 @@ const UNIT_TAIL_EXEMPT = new Set([
   // are ratios. The `_in` says what the numerator is measured in.
   "calc-shop.js:computeTaperCalc:tpi_in",
   "calc-shop.js:computeTaperCalc:tpf_in",
+  // A material REMOVAL RATE: cubic inches per minute, whose name stops at the
+  // cubic inch. Its own `woc x doc x ipm` carries the per-minute.
+  "calc-shop.js:computeMaterialRemovalRate:mrr_in3",
+  // The IPM feed as an INPUT -- the trailing `_in` marks the parameter, not an
+  // inch, exactly as `u_in` does in calc-steel. computeMachiningTime assigns it
+  // straight to `feed_ipm`, which it declares `L T^-1`.
+  "calc-shop.js:computeMachiningTime:feed_ipm_in",
+  "calc-shop.js:computeMaterialRemovalRate:feed_ipm_in",
   // `_v` and `_w` added 2026-09-10 buy the most and cost the most. Outside the
   // electrical modules `V` is a SHEAR or a VERTICAL component and `W` is a
   // width, a web, a withdrawal or water -- never a volt or a watt.
@@ -481,7 +489,7 @@ function checkKeyAgreement(keyDims, errors) {
 const STUB_INPUT_NAMES = new Set(["args", "input", "opts", "options", "params", "o", "obj"]);
 
 // Lower this as stubs are drained. It may never rise.
-const STUB_BUDGET = 70;
+const STUB_BUDGET = 53;
 
 function isStubAnnotation(fn) {
   if (!fn.parse || !fn.parse.ok) return false;

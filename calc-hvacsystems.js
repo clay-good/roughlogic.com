@@ -148,7 +148,7 @@ export const CHILLER_FLUID_FACTORS = {
   glycol_50: 449, // 50% propylene glycol: ~8.8 lb/gal * 0.85 cp * 60
 };
 
-// dims: in { args: dimensionless } out: { delta_T_F: T, q_btu_hr: dimensionless, tons: M, required_gpm: L^3 T^-1 }
+// dims: in { gpm: L^3 T^-1, ewt_F: T, lwt_F: T, fluid: dimensionless, nameplate_tons: M L^2 T^-3 } out: { delta_T_F: T, q_btu_hr: M L^2 T^-3, tons: M L^2 T^-3, required_gpm: L^3 T^-1 }
 export function computeChillerTons({
   gpm = 0,
   ewt_F = 54,
@@ -245,7 +245,7 @@ HVACSYSTEMS_RENDERERS["chiller-tons"] = _v16h_renderChillerTons;
 // balance as the chiller tile. C = GPM * factor.
 export const HX_FLUID_FACTORS = CHILLER_FLUID_FACTORS;
 
-// dims: in { args: dimensionless } out: { lmtd_F: T, q_btu_hr: dimensionless, ua_btu_hr_F: dimensionless, effectiveness: dimensionless, ntu: dimensionless }
+// dims: in { config: dimensionless, th_in_F: T, th_out_F: T, tc_in_F: T, tc_out_F: T, hot_gpm: L^3 T^-1, cold_gpm: L^3 T^-1, hot_fluid: dimensionless, cold_fluid: dimensionless } out: { lmtd_F: T, q_btu_hr: M L^2 T^-3, ua_btu_hr_F: M L^2 T^-3, effectiveness: dimensionless, ntu: dimensionless }
 export function computeHxLmtdNtu({
   config = "counterflow",
   th_in_F = 0,
@@ -674,7 +674,7 @@ export const COMPRESSOR_CYCLE_LIMITS = {
   inverter: { label: "VRF / inverter", min_on_min: 4, min_off_min: 3, max_cph: null },
 };
 
-// dims: in { args: dimensionless } out: { cph_estimated: T^-1, on_time_min: T, off_time_min: T }
+// dims: in { system_type: dimensionless, load_fraction_pct: dimensionless, observed_cph: T^-1 } out: { cph_estimated: T^-1, on_time_min: T, off_time_min: T }
 export function computeCompressorShortCycle({
   system_type = "single",
   load_fraction_pct = 50,
@@ -917,7 +917,7 @@ const _V16H_FILTER_REF_FPM = 300;
 // Air horsepower constant: AHP = CFM * dp(in. WC) / 6356.
 const _V16H_AHP_CONST = 6356;
 
-// dims: in { args: dimensionless } out: { airflow_cfm: L^3 T^-1, clean_dp_in_wc: dimensionless, final_dp_in_wc: dimensionless, clean_fan_kw: M L^2 T^-3 }
+// dims: in { filter_type: dimensionless, face_area_ft2: L^2, face_velocity_fpm: L T^-1, clean_dp_override: M L^-1 T^-2, final_dp_override: M L^-1 T^-2, fan_total_efficiency: dimensionless, runtime_hr_per_year: T, energy_cost_per_kwh: dimensionless } out: { airflow_cfm: L^3 T^-1, clean_dp_in_wc: M L^-1 T^-2, final_dp_in_wc: M L^-1 T^-2, clean_fan_kw: M L^2 T^-3 }
 export function computeFilterPressureDrop({
   filter_type = "merv13",
   face_area_ft2 = 0,
@@ -1469,7 +1469,7 @@ function _v623renderBufferTankLoopCredit(inputRegion, outputRegion, citationEl) 
 HVACSYSTEMS_RENDERERS["buffer-tank-loop-credit"] = _v623renderBufferTankLoopCredit;
 
 // ===================== spec-v915: hydronic outdoor reset ratio and supply target =====================
-// dims: in { args: dimensionless } out: { reset_ratio: dimensionless, supply_target_f: T, clamped: dimensionless }
+// dims: in { supply_design_f: T, supply_min_f: T, oa_design_f: T, oa_noheat_f: T, oa_current_f: T } out: { reset_ratio: dimensionless, supply_target_f: T, clamped: dimensionless }
 export function computeOutdoorResetRatio({ supply_design_f = 180, supply_min_f = 80, oa_design_f = 0, oa_noheat_f = 65, oa_current_f = 30 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(supply_design_f > supply_min_f)) return { error: "Design supply temperature must be above the minimum supply." };

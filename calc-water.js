@@ -2019,7 +2019,7 @@ function _v935renderCisternStorageDays(inputRegion, outputRegion, citationEl) {
 WATER_RENDERERS["cistern-storage-days"] = _v935renderCisternStorageDays;
 
 // ===================== spec-v971: dechlorination chemical dose =====================
-// dims: in { args: dimensionless } out: { reagent_dose_mg_l: dimensionless, feed_lb_day: dimensionless }
+// dims: in { chlorine_residual_mg_l: M L^-3, flow_mgd: L^3 T^-1, stoich_ratio: dimensionless, purity_pct: dimensionless } out: { reagent_dose_mg_l: M L^-3, feed_lb_day: M T^-1 }
 export function computeDechlorinationDose({ chlorine_residual_mg_l = 2, flow_mgd = 5, stoich_ratio = 1.46, purity_pct = 100 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(chlorine_residual_mg_l > 0)) return { error: "Chlorine residual must be positive (mg/L)." };
@@ -2063,7 +2063,7 @@ function _v971renderDechlorinationDose(inputRegion, outputRegion, citationEl) {
 WATER_RENDERERS["dechlorination-dose"] = _v971renderDechlorinationDose;
 
 // ===================== spec-v973: float-method (velocity-area) open-channel flow =====================
-// dims: in { args: dimensionless } out: { surface_velocity_fps: L T^-1, cross_area_ft2: L^2, flow_cfs: L^3 T^-1, flow_gpm: L^3 T^-1 }
+// dims: in { float_distance_ft: L, travel_time_s: T, channel_width_ft: L, mean_depth_ft: L, float_coefficient: dimensionless } out: { surface_velocity_fps: L T^-1, cross_area_ft2: L^2, flow_cfs: L^3 T^-1, flow_gpm: L^3 T^-1 }
 export function computeFloatMethodFlow({ float_distance_ft = 20, travel_time_s = 10, channel_width_ft = 4, mean_depth_ft = 1.5, float_coefficient = 0.85 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(float_distance_ft > 0)) return { error: "Float travel distance must be positive (ft)." };
@@ -2116,7 +2116,7 @@ WATER_RENDERERS["float-method-flow"] = _v973renderFloatMethodFlow;
 // ===================== spec-v984: fluoride feed dose (available-fluoride-ion) =====================
 // Unlike the generic pounds formula, fluoride dosing must divide by the AVAILABLE FLUORIDE ION (AFI)
 // fraction of the compound and subtract the raw background fluoride already in the source water.
-// dims: in { args: dimensionless } out: { feed_lb_day: dimensionless, pure_fluoride_lb_day: dimensionless }
+// dims: in { target_dose_mg_l: M L^-3, raw_fluoride_mg_l: M L^-3, flow_mgd: L^3 T^-1, afi_fraction: dimensionless, purity_fraction: dimensionless } out: { feed_lb_day: M T^-1, pure_fluoride_lb_day: M T^-1 }
 export function computeFluorideFeedDose({ target_dose_mg_l = 0.7, raw_fluoride_mg_l = 0.1, flow_mgd = 2, afi_fraction = 0.792, purity_fraction = 0.25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(flow_mgd > 0)) return { error: "Flow must be positive (MGD)." };
@@ -2164,7 +2164,7 @@ function _v984renderFluorideFeedDose(inputRegion, outputRegion, citationEl) {
 WATER_RENDERERS["fluoride-feed-dose"] = _v984renderFluorideFeedDose;
 
 // ===================== spec-v992: flow-weighted two-source water blend =====================
-// dims: in { args: dimensionless } out: { blended_conc: dimensionless, required_low_source_pct: dimensionless }
+// dims: in { flow1_gpm: L^3 T^-1, conc1: M L^-3, flow2_gpm: L^3 T^-1, conc2: M L^-3, target_conc: M L^-3 } out: { blended_conc: M L^-3, required_low_source_pct: dimensionless }
 export function computeTwoSourceBlend({ flow1_gpm = 500, conc1 = 4, flow2_gpm = 300, conc2 = 12, target_conc = 8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(flow1_gpm > 0)) return { error: "Source 1 flow must be positive (gpm)." };
@@ -2327,7 +2327,7 @@ WATER_RENDERERS["step-drawdown-efficiency"] = _simpleRenderer({
 // =====================================================================
 const _WELL_GAL_PER_FT_COEFF = 0.0408; // gal per ft of a round casing, diameter in inches
 const _WELL_LB_PER_MG_MGL = 8.34;
-// dims: in { casing_diameter_in: L, well_depth_ft: L, static_water_level_ft: L, purge_volumes: dimensionless, purge_rate_gpm: L^3 T^-1, target_dose_mg_l: dimensionless, solution_strength_pct: dimensionless, solution_lb_per_gal: M L^-3 } out: { gal_per_ft: L^2, standing_column_ft: L, casing_volume_gal: L^3, purge_volume_gal: L^3, purge_minutes: T, chlorine_lb: M, solution_gal: L^3 }
+// dims: in { casing_diameter_in: L, well_depth_ft: L, static_water_level_ft: L, purge_volumes: dimensionless, purge_rate_gpm: L^3 T^-1, target_dose_mg_l: M L^-3, solution_strength_pct: dimensionless, solution_lb_per_gal: M L^-3 } out: { gal_per_ft: L^2, standing_column_ft: L, casing_volume_gal: L^3, purge_volume_gal: L^3, purge_minutes: T, chlorine_lb: M, solution_gal: L^3 }
 export function computeWellCasingPurgeVolume({
   casing_diameter_in = 0, well_depth_ft = 0, static_water_level_ft = 0,
   purge_volumes = 3, purge_rate_gpm = 0,
