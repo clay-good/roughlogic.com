@@ -390,7 +390,7 @@ function _renderDuctTransitionLength(inputRegion, outputRegion, citationEl) {
 METALAIR_RENDERERS["duct-transition-length"] = _renderDuctTransitionLength;
 
 // ===================== spec-v960: duct static regain at a velocity decrease =====================
-// dims: in { args: dimensionless } out: { vp_upstream_inwc: dimensionless, vp_downstream_inwc: dimensionless, static_regain_inwc: dimensionless }
+// dims: in { upstream_velocity_fpm: L T^-1, downstream_velocity_fpm: L T^-1, recovery_factor: dimensionless } out: { vp_upstream_inwc: dimensionless, vp_downstream_inwc: dimensionless, static_regain_inwc: dimensionless }
 export function computeDuctStaticRegain({ upstream_velocity_fpm = 2000, downstream_velocity_fpm = 1500, recovery_factor = 0.75 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(upstream_velocity_fpm > 0)) return { error: "Upstream velocity must be positive (fpm)." };

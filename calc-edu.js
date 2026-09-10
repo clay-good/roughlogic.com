@@ -1773,7 +1773,7 @@ function _pearsonStrength(absr) {
   return "near-perfect";
 }
 
-// dims: in { args: dimensionless } out: { r: dimensionless, r2: dimensionless, t: dimensionless, p_value: dimensionless }
+// dims: in { x_values: dimensionless, y_values: dimensionless, alpha: dimensionless } out: { r: dimensionless, r2: dimensionless, t: dimensionless, p_value: dimensionless }
 export function computePearson({ x_values, y_values, alpha = 0.05 }) {
   const xs = Array.isArray(x_values) ? x_values.filter(Number.isFinite) : parseNumberList(x_values);
   const ys = Array.isArray(y_values) ? y_values.filter(Number.isFinite) : parseNumberList(y_values);

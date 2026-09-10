@@ -1846,7 +1846,7 @@ function _v952renderTaylorToolLife(inputRegion, outputRegion, citationEl) {
 MACHINING_RENDERERS["taylor-tool-life"] = _v952renderTaylorToolLife;
 
 // ===================== spec-v1006: single-point thread cutting depth (60-degree UN external) =====================
-// dims: in { args: dimensionless } out: { pitch_in: L, single_depth_in: dimensionless, compound_infeed_in: dimensionless }
+// dims: in { tpi: L^-1 } out: { pitch_in: L, single_depth_in: dimensionless, compound_infeed_in: dimensionless }
 export function computeThreadSingleDepth({ tpi = 13 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(tpi > 0)) return { error: "Threads per inch must be positive." };

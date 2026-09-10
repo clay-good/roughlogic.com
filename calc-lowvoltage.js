@@ -1179,7 +1179,7 @@ function _v937renderFireAlarmNacVoltageDrop(inputRegion, outputRegion, citationE
 LOWVOLTAGE_RENDERERS["fire-alarm-nac-voltage-drop"] = _v937renderFireAlarmNacVoltageDrop;
 
 // ===================== spec-v946: 4-20 mA current-loop signal scaling =====================
-// dims: in { args: dimensionless } out: { percent_of_span: dimensionless, engineering_value: dimensionless, status: dimensionless }
+// dims: in { signal_ma: I, range_low: L T^-1, range_high: L T^-1 } out: { percent_of_span: dimensionless, engineering_value: dimensionless, status: dimensionless }
 export function computeLoopSignalScaling({ signal_ma = 12, range_low = 0, range_high = 100 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (range_high === range_low) return { error: "Range high and low must differ (the span cannot be zero)." };

@@ -2246,7 +2246,7 @@ CONCRETE_RENDERERS["slab-dowel-schedule"] = _simpleRenderer({
 });
 
 // ===================== spec-v999: bagged (premix) concrete count for a small pour =====================
-// dims: in { args: dimensionless } out: { volume_ft3: L^3, bags: dimensionless }
+// dims: in { length_ft: L, width_ft: L, thickness_in: L, bag_yield_ft3: L^3, waste_pct: dimensionless } out: { volume_ft3: L^3, bags: dimensionless }
 export function computeConcretePremixBags({ length_ft = 4, width_ft = 4, thickness_in = 4, bag_yield_ft3 = 0.60, waste_pct = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(length_ft > 0)) return { error: "Length must be positive (ft)." };

@@ -3705,7 +3705,7 @@ MECHANIC_RENDERERS["dynamic-compression-ratio"] = _simpleRenderer({
 });
 
 // ===================== spec-v959: driveline U-joint operating angle and cancellation =====================
-// dims: in { args: dimensionless } out: { first_joint_variation_pct: dimensionless, second_joint_variation_pct: dimensionless, angle_difference_deg: dimensionless }
+// dims: in { input_angle_deg: dimensionless, output_angle_deg: dimensionless } out: { first_joint_variation_pct: dimensionless, second_joint_variation_pct: dimensionless, angle_difference_deg: dimensionless }
 export function computeUjointOperatingAngle({ input_angle_deg = 10, output_angle_deg = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(input_angle_deg >= 0 && input_angle_deg < 90)) return { error: "Input (first) U-joint operating angle must be between 0 and 90 degrees." };

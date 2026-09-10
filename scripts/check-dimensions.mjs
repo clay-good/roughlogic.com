@@ -351,7 +351,7 @@ function checkKeyAgreement(keyDims, errors) {
 //
 // `// dims: in { args: dimensionless }` parses. It satisfies every rule above.
 // It is also not an annotation: the function it sits on destructures a dozen
-// named inputs, and the line declares none of them. 241 functions carry one,
+// named inputs, and the line declares none of them. 241 functions carried one,
 // hiding roughly 1,960 named inputs, while this gate reported 100% coverage and
 // the README's trust table said every function "declares each input's ... SI
 // dimensions". For 241 of them that was false.
@@ -369,7 +369,7 @@ function checkKeyAgreement(keyDims, errors) {
 const STUB_INPUT_NAMES = new Set(["args", "input", "opts", "options", "params", "o", "obj"]);
 
 // Lower this as stubs are drained. It may never rise.
-const STUB_BUDGET = 232;
+const STUB_BUDGET = 218;
 
 function isStubAnnotation(fn) {
   if (!fn.parse || !fn.parse.ok) return false;

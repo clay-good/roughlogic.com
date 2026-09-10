@@ -403,7 +403,7 @@ export const ACH_TARGET_BANDS = {
   operating_room: { lo: 20, hi: 25, label: "Operating room (ASHRAE 170)" },
 };
 
-// dims: in { args: dimensionless } out: { ach: T^-1, net_ach: T^-1, pressurization_cfm: L^3 T^-1 }
+// dims: in { volume_ft3: L^3, supply_cfm: L^3 T^-1, return_cfm: L^3 T^-1, occupancy: dimensionless } out: { ach: T^-1, net_ach: T^-1, pressurization_cfm: L^3 T^-1 }
 export function computeAirChangesPerHour({
   volume_ft3 = 0,
   supply_cfm = 0,
@@ -550,7 +550,7 @@ function _v16h_pipeVelocityFps(gpm, id_in) {
   return id_in > 0 ? gpm / (2.44778 * id_in * id_in) : Infinity;
 }
 
-// dims: in { args: dimensionless } out: { gpm: L^3 T^-1, velocity_fps: L T^-1, friction_ft_per_100ft: dimensionless, head_ft: L }
+// dims: in { boiler_btu_hr: M L^2 T^-3, delta_T_F: T, material: dimensionless, max_velocity_fps: L T^-1, length_ft: L } out: { gpm: L^3 T^-1, velocity_fps: L T^-1, friction_ft_per_100ft: dimensionless, head_ft: L }
 export function computeBoilerPipeSizing({
   boiler_btu_hr = 0,
   delta_T_F = 20,

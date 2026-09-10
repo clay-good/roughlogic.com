@@ -1558,7 +1558,7 @@ export const phaseBalanceExample = {
 
 // --- Utility 129: Branch Circuit Voltage Drop With Multiple Loads ---
 
-// dims: in { args: dimensionless } out: { drop_V: M L^2 T^-3 I^-1, drop_percent: dimensionless }
+// dims: in { material: dimensionless, awg: dimensionless, source_voltage_V: M L^2 T^-3 I^-1, loads: dimensionless } out: { drop_V: M L^2 T^-3 I^-1, drop_percent: dimensionless }
 export function computeMultiLoadVoltageDrop({
   material = "copper",
   awg = "12",
@@ -2040,7 +2040,7 @@ function renderPoEBudget(inputRegion, outputRegion, citationEl, params) {
 
 export const TRANSFORMER_KVA_STEPS = [15, 30, 45, 75, 112.5, 150, 225, 300, 500, 750, 1000];
 
-// dims: in { args: dimensionless } out: { kva: M L^2 T^-3, recommended_kva: M L^2 T^-3 }
+// dims: in { loads: dimensionless, primary_V: M L^2 T^-3 I^-1, secondary_V: M L^2 T^-3 I^-1, phase: dimensionless, growth_reserve_pct: dimensionless } out: { kva: M L^2 T^-3, recommended_kva: M L^2 T^-3 }
 export function computeTransformerKvaSizing({
   loads = [],
   primary_V = 480,

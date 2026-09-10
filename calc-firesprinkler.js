@@ -472,7 +472,7 @@ FIRESPRINKLER_RENDERERS["stairwell-pressurization"] = _simpleRenderer({
 });
 
 // ===================== spec-v1387: fire-protection water tank sizing =====================
-// dims: in { args: dimensionless } out: { total_demand_gpm: L^3 T^-1, net_volume_gal: L^3, gross_volume_gal: L^3, refill_hours: T }
+// dims: in { sprinkler_demand_gpm: L^3 T^-1, hose_allowance_gpm: L^3 T^-1, duration_min: T, unusable_fraction: dimensionless, refill_gpm: L^3 T^-1 } out: { total_demand_gpm: L^3 T^-1, net_volume_gal: L^3, gross_volume_gal: L^3, refill_hours: T }
 export function computeFireTankSizing({ sprinkler_demand_gpm = 0, hose_allowance_gpm = 0, duration_min = 60, unusable_fraction = 0.08, refill_gpm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(sprinkler_demand_gpm > 0)) return { error: "Sprinkler system demand must be positive." };

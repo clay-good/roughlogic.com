@@ -793,6 +793,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A second stub tranche: 218 left, down from 241.** Fourteen more `args` stubs are drained, chosen by a rule that refuses to guess: a function is only touched when **every** parameter's dimension is decidable from its unit tail or from a corpus consensus where the key is already declared exactly one way. A partly-declared annotation would be a new kind of lie, so a single undecidable parameter leaves the whole function stubbed.
+
+  The first draft of that drainer produced duplicate keys -- `net_volume_gal` twice, `material` twice -- because it read past the parameter list into the function body. It was a dry run, and the duplicates were the tell. Reading exactly from the signature's `(` to its matching `)` took the tranche from 5 wrong to 14 right. **A detector is worth as little as its worst case: verify it against a known signature before believing a count.**
+
+  Draining moved the unit-tail count 1,947 -> 1,960, and the build stayed red until the README said so.
+
 - **`// dims: in { args: dimensionless }` parses, satisfies every rule, and is not an annotation.** 241 functions carried one while destructuring named inputs -- roughly 1,960 real inputs declared by a single fake key -- and the gate reported **100% coverage** the whole time. The README's trust table said every function "declares each input's and each output's SI dimensions". For 241 of them that was false, and it was false in the flattering direction.
 
   **The 1,960 are not fixed here, deliberately.** The two rules landed above exist because 273 hand-written dimension entries were wrong; mass-producing another 1,960 unread would be the same mistake at six times the scale. The count is **pinned and ratchets DOWN**: a new stub fails the build, and draining stubs fails the build too until the budget in the gate is lowered to match. Both directions are seed-verified. Nine stubs are drained here as the first tranche -- `computeHomeOffice`, `computeCattleHeartGirthWeight`, `computeWobbeIndex`, `computeOutdoorAirVentilation`, `computeValveAuthority`, `computeRtdResistanceToTemp`, `computeChiSquareGof`, `computePanelRebalance`, `computeFlueGasDewPoint` -- taking the budget to **232**, and the two rules above checked that tranche's work for free: `_psi` keys had to come out as pressure, `resistance_ohms` had to match the ohm reading the rest of the corpus uses.

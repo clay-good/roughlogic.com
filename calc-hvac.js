@@ -2461,7 +2461,7 @@ export const HOOD_DUTY_MULTIPLIERS_CFM_PER_FT = {
 // Type II vapor-only hoods (IMC 507.20) - flat rate per linear foot.
 export const TYPE_II_HOOD_CFM_PER_FT = 100;
 
-// dims: in { args: dimensionless } out: { required_cfm: L^3 T^-1 }
+// dims: in { hood_type: dimensionless, hood_class: dimensionless, duty: dimensionless, length_ft: L, width_ft: L, duct_velocity_fpm: L T^-1 } out: { required_cfm: L^3 T^-1 }
 export function computeHoodExhaust({
   hood_type = "wall-canopy",
   hood_class = "I",

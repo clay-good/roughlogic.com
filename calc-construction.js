@@ -2859,7 +2859,7 @@ const BENCH_HEIGHT_FT = 4;       // typical max bench height per OSHA Subpart P
 const BOTTOM_WIDTH_FT_DEFAULT = 2;
 const SURCHARGE_BUMP = 0.25;     // additive H:V increase under surcharge (engineering practice)
 
-// dims: in { args: dimensionless } out: { benches: dimensionless, total_volume_yd3: L^3 }
+// dims: in { depth_ft: L, soil_class: dimensionless, surcharge: dimensionless, length_ft: L, bottom_width_ft: L } out: { benches: dimensionless, total_volume_yd3: L^3 }
 export function computeExcavationBenchPlan({
   depth_ft = 0,
   soil_class = "B",
@@ -14465,7 +14465,7 @@ CONSTRUCTION_RENDERERS["ramp-detail-check"] = _simpleRenderer({
 
 // ===================== spec-v1411: curtain wall mullion deflection limit =====================
 // Part of the 2026-08-26 trade expansion. See specs/scope-trade-expansion.md.
-// dims: in { args: dimensionless } out: { line_load_pli: M T^-2, allowable_deflection_in: L, required_i_in4: L^4, moment_in_lb: M L^2 T^-2 }
+// dims: in { span_in: L, tributary_width_ft: L, wind_pressure_psf: M L^-1 T^-2, modulus_psi: M L^-1 T^-2, allowable_stress_psi: M L^-1 T^-2 } out: { line_load_pli: M T^-2, allowable_deflection_in: L, required_i_in4: L^4, moment_in_lb: M L^2 T^-2 }
 export function computeCurtainWallMullionDeflection({ span_in = 0, tributary_width_ft = 0, wind_pressure_psf = 0, modulus_psi = 10000000, allowable_stress_psi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(span_in > 0)) return { error: "Mullion span must be positive." };
