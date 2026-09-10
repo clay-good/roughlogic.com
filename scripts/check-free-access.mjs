@@ -243,7 +243,14 @@ async function main() {
     }
   }
 
+  // --strict exits non-zero when something is ACTUALLY broken, so a scheduled
+  // run can go red on a dead link without a publisher's bot wall making it red
+  // every month forever. Without the flag this stays advisory, which is why it
+  // is outside `npm run lint`: a publisher's outage should not block a release.
+  const strict = process.argv.includes("--strict");
+
   let warnCount = 0;
+  let brokenCount = 0;
   for (const r of results) {
     if (r.ok) {
       const note = r.finalUrl && r.finalUrl !== r.url ? " -> " + r.finalUrl : "";
@@ -251,22 +258,35 @@ async function main() {
     } else {
       warnCount += 1;
       let detail = r.error ? " (" + r.error + ")" : "";
+      let walled = false;
       if (r.soft404) {
         detail = " (SOFT 404: answered " + r.status + " but landed on " + r.finalUrl + ")";
       } else if ((r.status === 403 || r.status === 0) && BOT_WALLED.has(hostOf(r.url))) {
+        walled = true;
         detail += " (known bot wall on this host: it 403s any automated fetch. Confirm in a browser" +
           " before treating this as a broken link -- and if the browser also fails, it is real.)";
       }
+      if (!walled) brokenCount += 1;
       console.warn("WARN " + (r.status || "ERR") + " " + r.url + detail);
     }
   }
   console.log(
-    "free-access probe: " + (results.length - warnCount) + " OK / " + warnCount + " WARN.",
+    "free-access probe: " + (results.length - warnCount) + " OK / " + warnCount + " WARN (" +
+      brokenCount + " not explained by a known bot wall).",
   );
   if (warnCount > 0) {
     console.log(
       "Append a manual review entry to scripts/sources.md per spec-v10 §3.2.",
     );
+  }
+  if (strict && brokenCount > 0) {
+    console.error(
+      "free-access probe --strict: " + brokenCount + " URL(s) look genuinely broken. " +
+        "A bot-walled host is annotated above and does not count; anything else is a link a reader " +
+        "or a maintainer would follow to nothing. Fix the URL at its source -- citations.js, the " +
+        "sources-cycle.json row, or the shard's free_access -- and re-run.",
+    );
+    process.exitCode = 1;
   }
 }
 

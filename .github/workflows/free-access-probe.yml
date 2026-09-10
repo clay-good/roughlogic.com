@@ -1,0 +1,50 @@
+name: Free-access probe (monthly)
+
+# Every citation in this project promises a reader they can go and read the
+# source for free. That promise is stated on three surfaces -- the citation
+# strings in citations.js, the free_access_url of each sources-cycle.json row,
+# and each shard's own free_access prose -- and publishers reorganize their
+# sites without telling anyone.
+#
+# scripts/check-free-access.mjs probes all three. Nothing ran it. It is
+# deliberately outside `npm run lint` and the build, because a publisher's
+# outage must never block a release, so being opt-in meant being run by nobody:
+# on 2026-09-09 the NEC ledger row had been pointing at a 404 (nfpa.org's
+# free-access page, hyphenated), and the loan-limits shard had been sending
+# readers to a retired FHFA path. Both had been dead for an unknown length of
+# time because the only thing that would have noticed was a command no CI job
+# invoked.
+#
+# So it runs here on a schedule instead, where a red run is a notification and
+# not a blocked merge. --strict exits non-zero only for URLs that are NOT
+# explained by a known bot wall (codes.iccsafe.org, ssa.gov, beckman.com,
+# iupac.org and its publications host all 403 automated fetches while serving
+# their real pages in a browser). Those still print, so a host that genuinely
+# dies is visible in the log -- they just do not turn the schedule red every
+# month, which is the thing that makes people stop reading it.
+#
+# This job makes network requests to publishers, one at a time per host with a
+# 250 ms gap. Monthly is the budget: friendliness to publishers, and dead links
+# do not appear faster than that.
+
+on:
+  schedule:
+    - cron: "0 13 1 * *"   # 13:00 UTC on the 1st of each month
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 20
+      # The probe is dependency-free: it reads files and calls fetch.
+      - name: Probe every free-access URL on all three surfaces
+        run: node scripts/check-free-access.mjs --strict
