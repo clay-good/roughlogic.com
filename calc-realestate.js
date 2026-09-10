@@ -198,8 +198,8 @@ export function renderDTI(inputRegion, outputRegion, citationEl) {
 // the monthly PMI amount; the LTV-derived PMI rate lookup is out of
 // scope for the starter).
 
-// dims: in { principal: dimensionless, apr_percent: dimensionless, term_years: dimensionless, annual_property_tax: dimensionless, annual_insurance: dimensionless, monthly_hoa: dimensionless, monthly_pmi: dimensionless }
-//        out: { monthly_principal_and_interest: dimensionless, monthly_tax: dimensionless, monthly_insurance: dimensionless, monthly_hoa: dimensionless, monthly_pmi: dimensionless, piti: dimensionless, piti_plus_hoa: dimensionless, annual_total: dimensionless, term_months: dimensionless }
+// dims: in { principal: dimensionless, apr_percent: dimensionless, term_years: T, annual_property_tax: dimensionless, annual_insurance: dimensionless, monthly_hoa: dimensionless, monthly_pmi: dimensionless }
+//        out: { monthly_principal_and_interest: dimensionless, monthly_tax: dimensionless, monthly_insurance: dimensionless, monthly_hoa: dimensionless, monthly_pmi: dimensionless, piti: dimensionless, piti_plus_hoa: dimensionless, annual_total: dimensionless, term_months: T }
 // (Standard mortgage P&I formula. All monetary aggregates are
 //  dimensionless dollars per the §7.1 monetary convention; APR
 //  percent, term in years, and term in months are dimensionless.)
@@ -978,7 +978,7 @@ export function renderCommissionSplit(inputRegion, outputRegion, citationEl) {
 // sampled-row table; the render shows total interest, last balance,
 // and first / mid / last sampled rows so the home view stays compact.
 
-// dims: in { principal: dimensionless, apr_percent: dimensionless, term_years: dimensionless, extra_monthly_principal: dimensionless }
+// dims: in { principal: dimensionless, apr_percent: dimensionless, term_years: T, extra_monthly_principal: dimensionless }
 //        out: { monthly_principal_and_interest: dimensionless, extra_monthly_principal: dimensionless, scheduled_term_months: dimensionless, actual_term_months: dimensionless, total_paid: dimensionless, total_interest: dimensionless, final_balance: dimensionless, months_saved: dimensionless, sample_rows: dimensionless, rows: dimensionless }
 // (Closed-form mortgage amortization. Monetary aggregates and
 //  per-period rows are dimensionless dollars; APR percent, term in
@@ -1086,7 +1086,7 @@ export function renderAmortizationSchedule(inputRegion, outputRegion, citationEl
 // what does that cost me?" conversations. Pure arithmetic; no
 // forecast.
 
-// dims: in { principal: dimensionless, current_rate_percent: dimensionless, future_rate_percent: dimensionless, term_years: dimensionless }
+// dims: in { principal: dimensionless, current_rate_percent: dimensionless, future_rate_percent: dimensionless, term_years: T }
 //        out: { monthly_pi_now: dimensionless, monthly_pi_future: dimensionless, monthly_delta: dimensionless, total_paid_now: dimensionless, total_paid_future: dimensionless, total_interest_now: dimensionless, total_interest_future: dimensionless, total_interest_delta: dimensionless, rate_delta_pct: dimensionless }
 // (Pair of amortizations at two rates. All monetary aggregates are
 //  dimensionless dollars; rates and percentage-point delta are
@@ -2397,7 +2397,7 @@ REALESTATE_RENDERERS["gross-rent-multiplier"] = renderGrossRentMultiplier;
 
 // --- v20 X.2: PMI cancellation / termination (`pmi-cancellation-date`) ---
 // Amortized balance B(m) = P*((1+r)^n - (1+r)^m)/((1+r)^n - 1); solve for 80% / 78% LTV.
-// dims: in { value: dimensionless, loan: dimensionless, rate_pct: dimensionless, term_months: dimensionless } out: { month_80: dimensionless, month_78: dimensionless }
+// dims: in { value: dimensionless, loan: dimensionless, rate_pct: dimensionless, term_months: T } out: { month_80: dimensionless, month_78: dimensionless }
 export function computePmiCancellationDate({ value = 0, loan = 0, rate_pct = 0, term_months = 0 } = {}) {
   const V = Number(value) || 0;
   const P = Number(loan) || 0;

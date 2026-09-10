@@ -1204,7 +1204,7 @@ TRUCKING_RENDERERS["fuel-tax-ifta"] = renderFuelTaxIFTA;
 
 // --- v20 J.1: Operating cost per mile (`cost-per-mile`) ---
 // fixed_cpm = fixed_monthly/miles; fuel_cpm = price/mpg; total = sum; break-even = total.
-// dims: in { fixed_monthly: dimensionless, miles_month: L, fuel_price: dimensionless, mpg: dimensionless, maint_cpm: dimensionless, driver_cpm: dimensionless } out: { total_cpm: dimensionless, fuel_cpm: dimensionless }
+// dims: in { fixed_monthly: dimensionless, miles_month: L, fuel_price: dimensionless, mpg: L^-2, maint_cpm: dimensionless, driver_cpm: dimensionless } out: { total_cpm: dimensionless, fuel_cpm: dimensionless }
 export function computeCostPerMile({ fixed_monthly = 0, miles_month = 0, fuel_price = 0, mpg = 0, maint_cpm = 0, driver_cpm = 0 } = {}) {
   const fixed = Number(fixed_monthly) || 0;
   const miles = Number(miles_month) || 0;
@@ -1385,7 +1385,7 @@ TRUCKING_RENDERERS["axle-load-distribution"] = renderAxleLoadDistribution;
 // cost structure cost-per-mile builds; DOE/EIA diesel index for the FSC.
 // =====================================================================
 
-// dims: in { linehaul_revenue: dimensionless, loaded_miles: L, deadhead_miles: L, fuel_price: dimensionless, mpg: dimensionless, variable_cpm: dimensionless, fixed_per_day: dimensionless, days: dimensionless, tolls: dimensionless, other_costs: dimensionless } out: { net_profit: dimensionless, profit_per_loaded_mile: dimensionless }
+// dims: in { linehaul_revenue: dimensionless, loaded_miles: L, deadhead_miles: L, fuel_price: dimensionless, mpg: L^-2, variable_cpm: dimensionless, fixed_per_day: dimensionless, days: dimensionless, tolls: dimensionless, other_costs: dimensionless } out: { net_profit: dimensionless, profit_per_loaded_mile: dimensionless }
 export function computeLoadProfitability({ linehaul_revenue = 0, loaded_miles = 0, deadhead_miles = 0, fuel_price = 0, mpg = 0, variable_cpm = 0, fixed_per_day = 0, days = 0, tolls = 0, other_costs = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   deadhead_miles = Number(deadhead_miles); tolls = Number(tolls); other_costs = Number(other_costs);
@@ -1641,7 +1641,7 @@ const renderDetentionDemurrageBilling = _simpleRenderer({
 });
 TRUCKING_RENDERERS["detention-demurrage-billing"] = renderDetentionDemurrageBilling;
 
-// dims: in { cpm_usd: dimensionless, pct: dimensionless, miles: dimensionless, linehaul_usd: dimensionless } out: { cpm_pay_usd: dimensionless, pct_pay_usd: dimensionless, breakeven_rate_usd_mi: dimensionless }
+// dims: in { cpm_usd: dimensionless, pct: dimensionless, miles: L, linehaul_usd: dimensionless } out: { cpm_pay_usd: dimensionless, pct_pay_usd: dimensionless, breakeven_rate_usd_mi: dimensionless }
 export function computeDriverPayCpmVsPercentage({ cpm_usd = 0, pct = 0, miles = 0, linehaul_usd = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const cpm = Number(cpm_usd) || 0;

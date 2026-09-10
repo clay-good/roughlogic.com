@@ -211,7 +211,7 @@ MOTOR_RENDERERS["motor-operating-cost"] = renderMotorOperatingCost;
 // the inverse recovers the run-hours a cost budget buys, hours = budget / (input_kW x rate), with
 // input_kW = HP x 0.746 x load / efficiency. It answers "how many hours can I run before I hit the energy budget" and
 // reports the input power and the annual kWh at that budget.
-// dims: in { hp: dimensionless, efficiency_pct: dimensionless, load_factor_pct: dimensionless, rate_usd_per_kwh: dimensionless, cost_budget_usd: dimensionless } out: { max_hours_per_year: T, input_kw: M L^2 T^-3, annual_kwh: dimensionless }
+// dims: in { hp: M L^2 T^-3, efficiency_pct: dimensionless, load_factor_pct: dimensionless, rate_usd_per_kwh: dimensionless, cost_budget_usd: dimensionless } out: { max_hours_per_year: T, input_kw: M L^2 T^-3, annual_kwh: M L^2 T^-2 }
 export function computeMotorRunHoursForBudget({ hp = 0, efficiency_pct = 93, load_factor_pct = 100, rate_usd_per_kwh = 0.12, cost_budget_usd = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(hp > 0)) return { error: "Horsepower must be positive." };
@@ -570,7 +570,7 @@ MOTOR_RENDERERS["reduced-voltage-starter"] = renderReducedVoltageStarter;
 
 // --- spec-v557 A: VFD reflected-wave cable-length limit (NEMA MG-1 Part 31) ---
 // cable_velocity = 0.01 x velocity_pct x 984. L_crit = rise_time x cable_velocity / 2. V_peak doubles past L_crit.
-// dims: in { rise_time_us: T, velocity_pct: dimensionless, system_voltage_v: dimensionless, run_length_ft: L } out: { l_crit_ft: L, v_peak_v: dimensionless, limit_invduty_v: dimensionless }
+// dims: in { rise_time_us: T, velocity_pct: dimensionless, system_voltage_v: M L^2 T^-3 I^-1, run_length_ft: L } out: { l_crit_ft: L, v_peak_v: dimensionless, limit_invduty_v: dimensionless }
 export function computeVfdReflectedWave({ rise_time_us = 0, velocity_pct = 50, system_voltage_v = 0, run_length_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const rt = Number(rise_time_us) || 0;

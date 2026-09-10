@@ -4321,7 +4321,7 @@ PLUMBING_RENDERERS["thrust-block-max-pressure"] = _v745renderThrustBlockMaxPress
 
 // ===================== spec-v428: stormwater detention volume (drainage trio) =====================
 
-// dims: in { runoff_c: dimensionless, intensity_in_hr: dimensionless, area_ac: dimensionless, q_allow_cfs: L^3 T^-1, duration_min: dimensionless } out: { q_in_cfs: L^3 T^-1, storage_cf: L^3, storage_ac_ft: L^3 }
+// dims: in { runoff_c: dimensionless, intensity_in_hr: dimensionless, area_ac: L^2, q_allow_cfs: L^3 T^-1, duration_min: T } out: { q_in_cfs: L^3 T^-1, storage_cf: L^3, storage_ac_ft: L^3 }
 export function computeStormwaterDetentionVolume({ runoff_c = 0, intensity_in_hr = 0, area_ac = 0, q_allow_cfs = 0, duration_min = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const c = Number(runoff_c) || 0;

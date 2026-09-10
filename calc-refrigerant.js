@@ -770,7 +770,7 @@ REFRIGERANT_RENDERERS["condenser-cop-for-heat-rejection"] = _renderCondenserCopF
 
 // ===================== spec-v432..v434: walk-in refrigeration trio (Group C) =====================
 
-// dims: in { u_factor: dimensionless, area_ft2: L^2, delta_t_f: T, infiltration_btuh: M L^2 T^-3, product_btuh: M L^2 T^-3, internal_btuh: M L^2 T^-3, safety: dimensionless } out: { transmission_btuh: M L^2 T^-3, total_btuh: M L^2 T^-3, tons: dimensionless }
+// dims: in { u_factor: dimensionless, area_ft2: L^2, delta_t_f: T, infiltration_btuh: M L^2 T^-3, product_btuh: M L^2 T^-3, internal_btuh: M L^2 T^-3, safety: dimensionless } out: { transmission_btuh: M L^2 T^-3, total_btuh: M L^2 T^-3, tons: M }
 export function computeWalkInCoolerLoad({ u_factor = 0, area_ft2 = 0, delta_t_f = 0, infiltration_btuh = 0, product_btuh = 0, internal_btuh = 0, safety = 1.10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const u = Number(u_factor) || 0;
@@ -819,7 +819,7 @@ function _v432renderWalkInCoolerLoad(inputRegion, outputRegion, citationEl) {
 }
 REFRIGERANT_RENDERERS["walk-in-cooler-load"] = _v432renderWalkInCoolerLoad;
 
-// dims: in { mass_lb: M, cp_above: dimensionless, t_enter_f: T, t_storage_f: T, t_freeze_f: T, hif_btu_lb: dimensionless, cp_below: dimensionless, hours: dimensionless } out: { q_btu: M L^2 T^-2, rate_btuh: M L^2 T^-3 }
+// dims: in { mass_lb: M, cp_above: dimensionless, t_enter_f: T, t_storage_f: T, t_freeze_f: T, hif_btu_lb: dimensionless, cp_below: dimensionless, hours: T } out: { q_btu: M L^2 T^-2, rate_btuh: M L^2 T^-3 }
 export function computeProductPullDownLoad({ mass_lb = 0, cp_above = 0, t_enter_f = 0, t_storage_f = 0, t_freeze_f = 0, hif_btu_lb = 0, cp_below = 0, hours = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const mass = Number(mass_lb) || 0;
@@ -879,7 +879,7 @@ REFRIGERANT_RENDERERS["product-pull-down-load"] = _v433renderProductPullDownLoad
 // gives rate = Q / hours; given the refrigeration capacity dedicated to the
 // product load, the pull-down time is hours = Q / capacity. Q (with the freezer
 // latent branch) is reused from computeProductPullDownLoad at hours = 1.
-// dims: in { mass_lb: M, cp_above: dimensionless, t_enter_f: T, t_storage_f: T, t_freeze_f: T, hif_btu_lb: dimensionless, cp_below: dimensionless, capacity_btuh: M L^2 T^-3 } out: { hours: dimensionless, q_btu: M L^2 T^-2 }
+// dims: in { mass_lb: M, cp_above: dimensionless, t_enter_f: T, t_storage_f: T, t_freeze_f: T, hif_btu_lb: dimensionless, cp_below: dimensionless, capacity_btuh: M L^2 T^-3 } out: { hours: T, q_btu: M L^2 T^-2 }
 export function computeProductPullDownTime({ mass_lb = 0, cp_above = 0, t_enter_f = 0, t_storage_f = 0, t_freeze_f = 0, hif_btu_lb = 0, cp_below = 0, capacity_btuh = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const cap = Number(capacity_btuh) || 0;
@@ -1289,7 +1289,7 @@ REFRIGERANT_RENDERERS["txv-capacity-check"] = _simpleRenderer({
 });
 
 // ===================== spec-v1414: evaporator defrost heat and cycle time =====================
-// dims: in { args: dimensionless } out: { sensible_btu: dimensionless, latent_btu: dimensionless, total_btu: dimensionless, defrost_min: T }
+// dims: in { args: dimensionless } out: { sensible_btu: dimensionless, latent_btu: dimensionless, total_btu: M L^2 T^-2, defrost_min: T }
 export function computeDefrostCycleSizing({ frost_lb = 0, coil_temp_f = -10, coil_mass_lb = 0, coil_specific_heat = 0.10, coil_temp_rise_f = 0, heater_btuh = 0, defrost_efficiency = 0.8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(frost_lb > 0)) return { error: "Frost mass per cycle must be positive." };

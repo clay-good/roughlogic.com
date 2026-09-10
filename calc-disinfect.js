@@ -80,7 +80,7 @@ const _GAL_PER_MG = 1000000;
 
 // ===================== spec-v103: new water main chlorination =====================
 
-// dims: in { diameter_in: L, length_ft: L, dose_mg_l: dimensionless, product_pct: dimensionless } out: { volume_gal: L^3, available_cl_lb: M, product_lb: M }
+// dims: in { diameter_in: L, length_ft: L, dose_mg_l: M L^-3, product_pct: dimensionless } out: { volume_gal: L^3, available_cl_lb: M, product_lb: M }
 export function computeMainDisinfectionChlorine({ diameter_in = 0, length_ft = 0, dose_mg_l = 25, product_pct = 65 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(diameter_in > 0)) return { error: "Pipe inside diameter must be positive." };

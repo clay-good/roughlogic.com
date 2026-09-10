@@ -344,7 +344,7 @@ VELOCITY_RENDERERS["dp-flow-meter"] = renderDpFlowMeter;
 //   qm = (Cd / sqrt(1 - beta^4)) eps (pi/4) d^2 sqrt(2 gc dP rho1)
 // with rho1 the upstream density from the ideal-gas law rho = p1 MW / (R Tabs). Reported as mass, actual (acfm),
 // and standard (scfm) flow. Valid for p2/p1 >= 0.75 (the tile flags below that).
-// dims: in { pipe_id_in: L, bore_in: L, p1_psia: M L^-1 T^-2, dp_psi: M L^-1 T^-2, temp_f: dimensionless, gas_sg: dimensionless, kappa: dimensionless, cd: dimensionless } out: { expansion_factor: dimensionless, mass_flow_lb_min: M T^-1, scfm: L^3 T^-1, acfm: L^3 T^-1, beta_ratio: dimensionless }
+// dims: in { pipe_id_in: L, bore_in: L, p1_psia: M L^-1 T^-2, dp_psi: M L^-1 T^-2, temp_f: T, gas_sg: dimensionless, kappa: dimensionless, cd: dimensionless } out: { expansion_factor: dimensionless, mass_flow_lb_min: M T^-1, scfm: L^3 T^-1, acfm: L^3 T^-1, beta_ratio: dimensionless }
 export function computeGasDpFlowMeter({ pipe_id_in = 0, bore_in = 0, p1_psia = 0, dp_psi = 0, temp_f = 60, gas_sg = 1.0, kappa = 1.4, cd = 0.61 } = {}) {
   const D = Number(pipe_id_in), d = Number(bore_in), p1 = Number(p1_psia), dp = Number(dp_psi), tF = Number(temp_f), sg = Number(gas_sg), k = Number(kappa), Cd = Number(cd);
   if (![D, d, p1, dp, tF, sg, k, Cd].every(Number.isFinite)) return { error: "All inputs must be finite numbers." };

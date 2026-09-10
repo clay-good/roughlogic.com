@@ -215,7 +215,7 @@ LINEWORKER_RENDERERS["ruling-span"] = _simpleRenderer({
 
 // ============ spec-v1451: conductor sag change with temperature ============
 
-// dims: in { span_ft: L, area_in2: L^2, weight1_lb_per_ft: M / L, weight2_lb_per_ft: M / L, modulus_psi: M L^-1 T^-2, alpha_per_f: dimensionless, tension1_lb: M L T^-2, temp1_f: T, temp2_f: T, rated_strength_lb: M L T^-2 } out: { sag1_ft: L, tension2_lb: M L T^-2, sag2_ft: L, sag_increase_ft: L, tension_change_lb: M L T^-2 }
+// dims: in { span_ft: L, area_in2: L^2, weight1_lb_per_ft: M / L, weight2_lb_per_ft: M / L, modulus_psi: M L^-1 T^-2, alpha_per_f: T^-1, tension1_lb: M L T^-2, temp1_f: T, temp2_f: T, rated_strength_lb: M L T^-2 } out: { sag1_ft: L, tension2_lb: M L T^-2, sag2_ft: L, sag_increase_ft: L, tension_change_lb: M L T^-2 }
 export function computeConductorSagAtTemperature({ span_ft = 0, area_in2 = 0, weight1_lb_per_ft = 0, weight2_lb_per_ft = 0, modulus_psi = 0, alpha_per_f = 0, tension1_lb = 0, temp1_f = 60, temp2_f = 120, rated_strength_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(span_ft > 0)) return { error: "Span must be positive (ft)." };
@@ -773,7 +773,7 @@ LINEWORKER_RENDERERS["nesc-district-loading"] = _simpleRenderer({
 
 // ============ spec-v1459: conductor long-term creep ============
 
-// dims: in { creep_strain: dimensionless, alpha_per_f: dimensionless, span_ft: L, area_in2: L^2, weight_lb_per_ft: M / L, modulus_psi: M L^-1 T^-2, tension1_lb: M L T^-2, design_temp_f: T } out: { equivalent_temp_rise_f: T, sag_design_ft: L, sag_after_creep_ft: L, creep_sag_increase_ft: L, initial_stringing_sag_ft: L }
+// dims: in { creep_strain: dimensionless, alpha_per_f: T^-1, span_ft: L, area_in2: L^2, weight_lb_per_ft: M / L, modulus_psi: M L^-1 T^-2, tension1_lb: M L T^-2, design_temp_f: T } out: { equivalent_temp_rise_f: T, sag_design_ft: L, sag_after_creep_ft: L, creep_sag_increase_ft: L, initial_stringing_sag_ft: L }
 export function computeConductorCreepElongation({ creep_strain = 0, alpha_per_f = 0, span_ft = 0, area_in2 = 0, weight_lb_per_ft = 0, modulus_psi = 0, tension1_lb = 0, design_temp_f = 60 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(creep_strain > 0)) return { error: "Creep strain must be positive (a few times 1e-4 over the life of an aluminium conductor)." };

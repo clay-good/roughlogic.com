@@ -447,7 +447,7 @@ LAYOUT_RENDERERS["sine-bar"] = _v37renderSineBar;
 // P x number of starts. The fundamental sharp-V triangle height is
 // H = P x cos(30) = P x sqrt(3) / 2, exact 60-degree geometry.
 const _V38_COS30 = Math.sqrt(3) / 2; // = 0.8660254037844386
-// dims: in { thread_standard: dimensionless, tpi: T^-1, pitch_mm: L, starts: dimensionless } out: { pitch_in: L, pitch_mm: L, tpi: dimensionless, lead_in: L, lead_mm: L, sharp_v_height_in: L, sharp_v_height_mm: L }
+// dims: in { thread_standard: dimensionless, tpi: L^-1, pitch_mm: L, starts: dimensionless } out: { pitch_in: L, pitch_mm: L, tpi: L^-1, lead_in: L, lead_mm: L, sharp_v_height_in: L, sharp_v_height_mm: L }
 export function computeThreadPitch({ thread_standard = "inch", tpi = 0, pitch_mm = 0, starts = 1 } = {}) {
   const _g = _finiteGuard({ tpi, pitch_mm, starts }); if (_g) return _g;
   const isMetric = String(thread_standard) === "metric";

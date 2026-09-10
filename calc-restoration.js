@@ -1294,7 +1294,7 @@ function _v23SimpleRenderer(spec) {
 // =====================================================================
 // v23 D.1: Drying-chamber fresh-air / CO2 buildup (ASHRAE 62.1 mass balance)
 // =====================================================================
-// dims: in { containment_volume_ft3: L^3, co2_generation_cfm: L^3 T^-1, target_indoor_ppm: dimensionless, outdoor_ppm: dimensionless } out: { fresh_air_cfm: L^3 T^-1, ach: dimensionless, above_target: dimensionless }
+// dims: in { containment_volume_ft3: L^3, co2_generation_cfm: L^3 T^-1, target_indoor_ppm: dimensionless, outdoor_ppm: dimensionless } out: { fresh_air_cfm: L^3 T^-1, ach: T^-1, above_target: dimensionless }
 export function computeDryingChamberCO2({ containment_volume_ft3 = 0, co2_generation_cfm = 0, target_indoor_ppm = 1000, outdoor_ppm = 420 } = {}) {
   const V = Number(containment_volume_ft3) || 0;
   const gen = Number(co2_generation_cfm) || 0;
@@ -1333,7 +1333,7 @@ RESTORATION_RENDERERS["drying-chamber-co2"] = renderDryingChamberCO2;
 // --- v20 D.1: Moisture removed by grain depression (`grains-removed`) ---
 // dG = inlet - outlet; mass air = CFM*60/13.33 lb-dry-air/hr; water lb/hr =
 // mass-air * dG / 7000; gal = lb/hr * hours / 8.345.
-// dims: in { cfm: L^3*T^-1, inlet_gpp: dimensionless, outlet_gpp: dimensionless, hours: dimensionless } out: { water_lb_hr: M*T^-1, water_gal: L^3 }
+// dims: in { cfm: L^3*T^-1, inlet_gpp: dimensionless, outlet_gpp: dimensionless, hours: T } out: { water_lb_hr: M*T^-1, water_gal: L^3 }
 export function computeGrainsRemoved({ cfm = 0, inlet_gpp = 0, outlet_gpp = 0, hours = 0 } = {}) {
   const CFM = Number(cfm) || 0;
   const inG = Number(inlet_gpp) || 0;
@@ -1873,7 +1873,7 @@ RESTORATION_RENDERERS["ceiling-water-load"] = renderCeilingWaterLoad;
 // grain depression, and the honest unit count that follows - which goes
 // UP, not down, as the chamber dries (the classic drying plateau). The
 // operator reads the derate off the unit's own performance curve.
-// dims: in { aham_pints_per_day: M T^-1, derate_factor: dimensionless, required_pints_per_day: M T^-1 }
+// dims: in { aham_pints_per_day: L^3 T^-1, derate_factor: dimensionless, required_pints_per_day: L^3 T^-1 }
 //        out: { effective_pints: M T^-1, units_by_nameplate: dimensionless, units_by_field: dimensionless, shortfall_units: dimensionless }
 export function computeDehumidifierDerate({ aham_pints_per_day = 0, derate_factor = 0.5, required_pints_per_day = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -1989,7 +1989,7 @@ RESTORATION_RENDERERS["class-of-loss-screen"] = renderWaterClassScreen;
 // psychrometric mass balance grains-removed uses in reverse. The
 // performance map governs the achievable depression; reactivation air
 // ducts outside.
-// dims: in { required_pints_per_day: M T^-1, design_grain_depression: dimensionless, nameplate_process_cfm: L^3 T^-1 }
+// dims: in { required_pints_per_day: L^3 T^-1, design_grain_depression: dimensionless, nameplate_process_cfm: L^3 T^-1 }
 //        out: { lb_per_hr: M T^-1, process_cfm: L^3 T^-1, units_needed: dimensionless }
 export function computeDesiccantAirflow({ required_pints_per_day = 0, design_grain_depression = 60, nameplate_process_cfm = 2000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

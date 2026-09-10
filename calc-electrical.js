@@ -2700,7 +2700,7 @@ const _PPE_BANDS = [
   { min: 40,  max: Infinity, label: "No standard PPE rated above 40 cal/cm²; remote operation or de-energize" },
 ];
 
-// dims: in { args: dimensionless } out: { incident_energy_cal_cm2: dimensionless, ppe_category: dimensionless }
+// dims: in { args: dimensionless } out: { incident_energy_cal_cm2: M T^-2, ppe_category: dimensionless }
 export function computeArcFlashScreen({
   voltage_V = 0,
   bolted_fault_A = 0,
@@ -4925,7 +4925,7 @@ function _v374renderConduitJamRatio(inputRegion, outputRegion, citationEl) {
 ELECTRICAL_RENDERERS["conduit-jam-ratio"] = _v374renderConduitJamRatio;
 
 // ===================== spec-v471: premium motor upgrade energy savings =====================
-// dims: in { hp: dimensionless, load: dimensionless, eff_standard: dimensionless, eff_premium: dimensionless, hours: dimensionless, rate_kwh: dimensionless } out: { kw_standard: dimensionless, kw_premium: dimensionless, annual_saving: dimensionless }
+// dims: in { hp: M L^2 T^-3, load: dimensionless, eff_standard: dimensionless, eff_premium: dimensionless, hours: T, rate_kwh: dimensionless } out: { kw_standard: dimensionless, kw_premium: dimensionless, annual_saving: dimensionless }
 export function computeMotorEfficiencyUpgradeSavings({ hp = 0, load = 0, eff_standard = 0, eff_premium = 0, hours = 0, rate_kwh = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const h = Number(hp) || 0;
@@ -5027,7 +5027,7 @@ function _v472renderTransformerLoadingEfficiency(inputRegion, outputRegion, cita
 ELECTRICAL_RENDERERS["transformer-loading-efficiency"] = _v472renderTransformerLoadingEfficiency;
 
 // ===================== spec-v473: economic conductor sizing (I2R payback) =====================
-// dims: in { current_a: dimensionless, r_small_ohm: dimensionless, r_big_ohm: dimensionless, hours: dimensionless, rate_kwh: dimensionless, upsize_cost: dimensionless } out: { loss_small_kw: M L^2 T^-3, loss_big_kw: M L^2 T^-3, annual_saving: dimensionless, payback_yr: dimensionless }
+// dims: in { current_a: I, r_small_ohm: dimensionless, r_big_ohm: dimensionless, hours: T, rate_kwh: dimensionless, upsize_cost: dimensionless } out: { loss_small_kw: M L^2 T^-3, loss_big_kw: M L^2 T^-3, annual_saving: dimensionless, payback_yr: dimensionless }
 export function computeEconomicConductorSizing({ current_a = 0, r_small_ohm = 0, r_big_ohm = 0, hours = 0, rate_kwh = 0, upsize_cost = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const I = Number(current_a) || 0;
@@ -5966,7 +5966,7 @@ function _v951renderSoilResistivityWenner(inputRegion, outputRegion, citationEl)
 ELECTRICAL_RENDERERS["soil-resistivity-wenner"] = _v951renderSoilResistivityWenner;
 
 // ===================== spec-v981: maximum one-way circuit length for a voltage-drop target =====================
-// dims: in { args: dimensionless } out: { vd_target_volts: dimensionless, max_length_ft: dimensionless }
+// dims: in { args: dimensionless } out: { vd_target_volts: dimensionless, max_length_ft: L }
 export function computeMaxCircuitLengthForVd({ source_voltage_v = 120, target_vd_pct = 3, current_a = 20, conductor_cmil = 6530, k_constant = 12.9, phases = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(source_voltage_v > 0)) return { error: "Source voltage must be positive (V)." };

@@ -1482,7 +1482,7 @@ FIRE_RENDERERS["standpipe-pdp"] = _v15f_renderStandpipePDP;
 // Time to one air change = volume / actual CFM. The exhaust-to-entry opening
 // ratio drives PPV efficiency (1:1 to 1.5:1 is the fireground best practice).
 
-// dims: in { length_ft: L, width_ft: L, height_ft: L, target_ach: dimensionless, fan_cfm: L^3 T^-1, exhaust_opening_ft2: L^2, entry_opening_ft2: L^2 } out: { cfm_required: L^3 T^-1, fans: dimensionless, time_to_one_change_min: T }
+// dims: in { length_ft: L, width_ft: L, height_ft: L, target_ach: T^-1, fan_cfm: L^3 T^-1, exhaust_opening_ft2: L^2, entry_opening_ft2: L^2 } out: { cfm_required: L^3 T^-1, fans: dimensionless, time_to_one_change_min: T }
 export function computeSmokeEjector({
   length_ft = 0,
   width_ft = 0,

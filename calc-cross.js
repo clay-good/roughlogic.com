@@ -633,7 +633,7 @@ export const upgradeROIExample = {
 
 export const IRS_STANDARD_MILEAGE_RATE = 0.76;
 
-// dims: in { round_trip_miles: L, mpg: dimensionless, fuel_price_per_gallon: dimensionless, irs_rate_per_mile: dimensionless } out: { fuel_cost: dimensionless, irs_deduction: dimensionless }
+// dims: in { round_trip_miles: L, mpg: L^-2, fuel_price_per_gallon: dimensionless, irs_rate_per_mile: dimensionless } out: { fuel_cost: dimensionless, irs_deduction: dimensionless }
 export function computeMileageCost({ round_trip_miles, mpg, fuel_price_per_gallon, irs_rate_per_mile = IRS_STANDARD_MILEAGE_RATE }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const miles = Number(round_trip_miles) || 0;

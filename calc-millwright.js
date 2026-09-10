@@ -345,7 +345,7 @@ MILLWRIGHT_RENDERERS["soft-foot-correction"] = _simpleRenderer({
 
 // ============ spec-v1473: coupling alignment tolerance by speed ============
 
-// dims: in { rpm: dimensionless, measured_offset_in: L, measured_angularity_mils_per_in: dimensionless, offset_excellent_in: L, offset_acceptable_in: L, angularity_excellent_mils_per_in: dimensionless, angularity_acceptable_mils_per_in: dimensionless, spacer_length_in: L, spacer_end_offset_in: L } out: { offset_pct_of_acceptable: dimensionless, angularity_pct_of_acceptable: dimensionless, offset_over_by_in: L, spacer_slope_mils_per_in: dimensionless }
+// dims: in { rpm: T^-1, measured_offset_in: L, measured_angularity_mils_per_in: dimensionless, offset_excellent_in: L, offset_acceptable_in: L, angularity_excellent_mils_per_in: dimensionless, angularity_acceptable_mils_per_in: dimensionless, spacer_length_in: L, spacer_end_offset_in: L } out: { offset_pct_of_acceptable: dimensionless, angularity_pct_of_acceptable: dimensionless, offset_over_by_in: L, spacer_slope_mils_per_in: dimensionless }
 export function computeCouplingAlignmentTolerance({ rpm = 0, measured_offset_in = 0, measured_angularity_mils_per_in = 0, offset_excellent_in = 0, offset_acceptable_in = 0, angularity_excellent_mils_per_in = 0, angularity_acceptable_mils_per_in = 0, spacer_length_in = 0, spacer_end_offset_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rpm > 0)) return { error: "Operating speed must be positive (rpm)." };
@@ -478,7 +478,7 @@ MILLWRIGHT_RENDERERS["vibration-severity-zone"] = _simpleRenderer({
 
 // ============ spec-v1475: vibration forcing frequencies ============
 
-// dims: in { rpm: dimensionless, blade_count: dimensionless, gear_tooth_count: dimensionless, belt_length_in: L, sheave_diameter_in: L, line_frequency_hz: dimensionless, rotor_bar_count: dimensionless } out: { one_x_hz: dimensionless, blade_pass_hz: dimensionless, gear_mesh_hz: dimensionless, belt_frequency_hz: dimensionless, twice_line_hz: dimensionless, rotor_bar_pass_hz: dimensionless }
+// dims: in { rpm: T^-1, blade_count: dimensionless, gear_tooth_count: dimensionless, belt_length_in: L, sheave_diameter_in: L, line_frequency_hz: dimensionless, rotor_bar_count: dimensionless } out: { one_x_hz: dimensionless, blade_pass_hz: dimensionless, gear_mesh_hz: dimensionless, belt_frequency_hz: dimensionless, twice_line_hz: dimensionless, rotor_bar_pass_hz: dimensionless }
 export function computeVibrationForcingFrequencies({ rpm = 0, blade_count = 0, gear_tooth_count = 0, belt_length_in = 0, sheave_diameter_in = 0, line_frequency_hz = 60, rotor_bar_count = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rpm > 0)) return { error: "Shaft speed must be positive (rpm)." };
@@ -543,7 +543,7 @@ MILLWRIGHT_RENDERERS["vibration-forcing-frequencies"] = _simpleRenderer({
 
 // ============ spec-v1476: rolling-element bearing defect frequencies ============
 
-// dims: in { rpm: dimensionless, ball_count: dimensionless, ball_diameter_in: L, pitch_diameter_in: L, contact_angle_deg: dimensionless } out: { shaft_hz: dimensionless, ftf_hz: dimensionless, bpfo_hz: dimensionless, bpfi_hz: dimensionless, bsf_hz: dimensionless }
+// dims: in { rpm: T^-1, ball_count: dimensionless, ball_diameter_in: L, pitch_diameter_in: L, contact_angle_deg: dimensionless } out: { shaft_hz: dimensionless, ftf_hz: dimensionless, bpfo_hz: dimensionless, bpfi_hz: dimensionless, bsf_hz: dimensionless }
 export function computeBearingDefectFrequencies({ rpm = 0, ball_count = 0, ball_diameter_in = 0, pitch_diameter_in = 0, contact_angle_deg = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rpm > 0)) return { error: "Shaft speed must be positive (rpm)." };

@@ -802,7 +802,7 @@ DRAINAGE_RENDERERS["tr55-time-of-concentration"] = renderTr55TimeOfConcentration
 // NRCS Curve Number method (TR-55 Chapter 2) is the standard for that: from a rainfall depth and
 // a curve number it returns the runoff depth, and with a drainage area the runoff volume.
 // Verified against the TR-55 runoff figure (P=5 in, CN=80 -> Q=2.89 in).
-// dims: in { rainfall_in: L, curve_number: dimensionless, area_acres: dimensionless } out: { retention_s_in: L, initial_abstraction_in: L, runoff_in: L, runoff_coefficient: dimensionless, runoff_volume_acreft: L^3, runoff_volume_ft3: L^3, runoff_gal: L^3 }
+// dims: in { rainfall_in: L, curve_number: dimensionless, area_acres: L^2 } out: { retention_s_in: L, initial_abstraction_in: L, runoff_in: L, runoff_coefficient: dimensionless, runoff_volume_acreft: L^3, runoff_volume_ft3: L^3, runoff_gal: L^3 }
 export function computeCurveNumberRunoff({ rainfall_in = 0, curve_number = 0, area_acres = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const P = Number(rainfall_in) || 0;

@@ -135,7 +135,7 @@ function _v26renderMotorFeederMultiple(inputRegion, outputRegion, citationEl) {
 }
 FEEDER_RENDERERS["motor-feeder-multiple"] = _v26renderMotorFeederMultiple;
 
-// dims: in { kva: dimensionless, primary_v: dimensionless, secondary_v: dimensionless, phase: dimensionless } out: { primary_fla_A: I, secondary_fla_A: I, primary_ocpd_max_A: I, secondary_ocpd_max_A: I, secondary_conductor_min_A: I }
+// dims: in { kva: M L^2 T^-3, primary_v: dimensionless, secondary_v: dimensionless, phase: dimensionless } out: { primary_fla_A: I, secondary_fla_A: I, primary_ocpd_max_A: I, secondary_ocpd_max_A: I, secondary_conductor_min_A: I }
 export function computeTransformerConductorProtection({ kva = 0, primary_v = 0, secondary_v = 0, phase = 3, secondary_protection = false } = {}) {
   const _g = _finiteGuard({ kva, primary_v, secondary_v }); if (_g) return _g;
   const KVA = Number(kva) || 0;

@@ -607,7 +607,7 @@ METALAIR_RENDERERS["standing-seam-takeoff"] = _simpleRenderer({
 
 // ============ spec-v1682: metal roof thermal movement ============
 
-// dims: in { panel_length_ft: L, alpha_per_f: dimensionless, temp_swing_f: T, fixed_point_fraction: dimensionless, clip_travel_in: L } out: { total_movement_in: L, movement_up_slope_in: L, movement_down_slope_in: L, governing_movement_in: L, travel_margin_in: L, max_panel_length_ft: L }
+// dims: in { panel_length_ft: L, alpha_per_f: T^-1, temp_swing_f: T, fixed_point_fraction: dimensionless, clip_travel_in: L } out: { total_movement_in: L, movement_up_slope_in: L, movement_down_slope_in: L, governing_movement_in: L, travel_margin_in: L, max_panel_length_ft: L }
 export function computeMetalRoofThermalMovement({ panel_length_ft = 0, alpha_per_f = 0.0000128, temp_swing_f = 0, fixed_point_fraction = 0, clip_travel_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(panel_length_ft > 0)) return { error: "Panel length must be positive (ft)." };

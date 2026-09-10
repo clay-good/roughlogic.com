@@ -1032,7 +1032,7 @@ MASONRY_RENDERERS["grout-lift-pour-height"] = _simpleRenderer({
 
 // ============ spec-v1685: masonry cleaning dilution and coverage ============
 
-// dims: in { area_ft2: L^2, dilution_parts_water: dimensionless, coverage_ft2_per_gal: L^2, prewet_gal_per_100ft2: L^3, rinse_gal_per_100ft2: L^3, acid_safe_unit: dimensionless } out: { diluted_gal: L^3, concentrate_gal: L^3, water_gal: L^3, prewet_gal: L^3, rinse_gal: L^3, total_water_gal: L^3 }
+// dims: in { area_ft2: L^2, dilution_parts_water: dimensionless, coverage_ft2_per_gal: L^-1, prewet_gal_per_100ft2: L^3, rinse_gal_per_100ft2: L^3, acid_safe_unit: dimensionless } out: { diluted_gal: L^3, concentrate_gal: L^3, water_gal: L^3, prewet_gal: L^3, rinse_gal: L^3, total_water_gal: L^3 }
 export function computeMasonryCleaningDilution({ area_ft2 = 0, dilution_parts_water = 0, coverage_ft2_per_gal = 0, prewet_gal_per_100ft2 = 0, rinse_gal_per_100ft2 = 0, acid_safe_unit = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_ft2 > 0)) return { error: "The area to be cleaned must be positive (sq ft)." };

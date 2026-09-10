@@ -259,7 +259,7 @@ export const FUEL_PROPERTIES = {
   jet_a:        { lhv_btu_gal: 124000, density_lb_gal: 6.7 },
 };
 
-// dims: in { fuel: dimensionless, tank_gal: L^3, mpg: dimensionless, mpg_basis: dimensionless, load_factor: dimensionless, price_per_gal: dimensionless, solve_for: dimensionless, target_range_mi: L }
+// dims: in { fuel: dimensionless, tank_gal: L^3, mpg: L^-2, mpg_basis: dimensionless, load_factor: dimensionless, price_per_gal: dimensionless, solve_for: dimensionless, target_range_mi: L }
 //        out: { total_btu: M L^2 T^-2, total_kwh: M L^2 T^-2, range_mi: L, derate_flag: dimensionless, fuel_cost_usd: dimensionless, cost_per_mile_usd: dimensionless, solved_mpg: dimensionless, solved_tank_gal: L^3 }
 // (Tank capacity in gallons is volume `L^3`; energy in BTU / kWh is
 // `M L^2 T^-2`; range in miles is length; miles-per-gallon is
@@ -762,7 +762,7 @@ MECHANIC_RENDERERS["valve-flow-coefficient"] = renderValveFlowCoefficient;
 // follows. Loading fractions come from the CEMA material class
 // (user-supplied); exceeding the class maximum is flagged.
 //
-// dims: in { screw_diameter_in: L, shaft_diameter_in: L, pitch_in: L, rpm: dimensionless, loading_fraction: dimensionless, bulk_density_lb_ft3: dimensionless } out: { capacity_ft3_hr: dimensionless, mass_rate_lb_hr: dimensionless, mass_rate_ton_hr: dimensionless }
+// dims: in { screw_diameter_in: L, shaft_diameter_in: L, pitch_in: L, rpm: T^-1, loading_fraction: dimensionless, bulk_density_lb_ft3: dimensionless } out: { capacity_ft3_hr: L^3 T^-1, mass_rate_lb_hr: dimensionless, mass_rate_ton_hr: dimensionless }
 export function computeScrewConveyor({ screw_diameter_in = 0, shaft_diameter_in = 0, pitch_in = 0, rpm = 0, loading_fraction = 0, bulk_density_lb_ft3 = 0 } = {}) {
   const D = Number(screw_diameter_in) || 0;
   const d = Number(shaft_diameter_in) || 0;
@@ -808,7 +808,7 @@ const renderScrewConveyor = _simpleRenderer({
 });
 MECHANIC_RENDERERS["screw-conveyor"] = renderScrewConveyor;
 
-// dims: in { target_ft3_hr: dimensionless, screw_diameter_in: L, shaft_diameter_in: L, pitch_in: L, loading_fraction: dimensionless } out: { rpm: dimensionless }
+// dims: in { target_ft3_hr: dimensionless, screw_diameter_in: L, shaft_diameter_in: L, pitch_in: L, loading_fraction: dimensionless } out: { rpm: T^-1 }
 export function computeScrewConveyorRpm({ target_ft3_hr = 0, screw_diameter_in = 0, shaft_diameter_in = 0, pitch_in = 0, loading_fraction = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const target = Number(target_ft3_hr) || 0;
@@ -1962,7 +1962,7 @@ MECHANIC_RENDERERS["terminal-velocity"] = _simpleRenderer({
 
 // --- v20 K.1: Horsepower from torque and RPM (`hp-from-torque`) ---
 // HP = Torque * RPM / 5252; kW = HP * 0.7457. Solve for any of {HP, T, RPM}.
-// dims: in { solve_for: dimensionless, torque_lbft: M*L^2*T^-2, rpm: T^-1, hp: dimensionless } out: { hp: dimensionless, kw: dimensionless }
+// dims: in { solve_for: dimensionless, torque_lbft: M*L^2*T^-2, rpm: T^-1, hp: M L^2 T^-3 } out: { hp: M L^2 T^-3, kw: M L^2 T^-3 }
 export function computeHpFromTorque({ solve_for = "hp", torque_lbft = 0, rpm = 0, hp = 0 } = {}) {
   const T = Number(torque_lbft) || 0;
   const N = Number(rpm) || 0;
@@ -2593,7 +2593,7 @@ MECHANIC_RENDERERS["prop-pitch-selection"] = _simpleRenderer({
 });
 
 // ===================== spec-v463: engine fuel burn from horsepower (BSFC) =====================
-// dims: in { horsepower: dimensionless, bsfc_lb_hp_hr: dimensionless, density_lb_gal: dimensionless, tank_gal: L^3 } out: { gph: L^3 T^-1, run_hours: dimensionless }
+// dims: in { horsepower: M L^2 T^-3, bsfc_lb_hp_hr: dimensionless, density_lb_gal: M L^-3, tank_gal: L^3 } out: { gph: L^3 T^-1, run_hours: T }
 export function computeEngineFuelBurnGph({ horsepower = 0, bsfc_lb_hp_hr = 0, density_lb_gal = 0, tank_gal = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const hp = Number(horsepower) || 0;
@@ -2630,7 +2630,7 @@ MECHANIC_RENDERERS["engine-fuel-burn-gph"] = _simpleRenderer({
 });
 
 // ===================== spec-v464: alternator charging load balance =====================
-// dims: in { total_load_a: dimensionless, alternator_a: dimensionless, idle_frac: dimensionless, cruise_frac: dimensionless } out: { idle_out_a: dimensionless, cruise_out_a: dimensionless, idle_balance_a: dimensionless, cruise_balance_a: dimensionless }
+// dims: in { total_load_a: I, alternator_a: I, idle_frac: dimensionless, cruise_frac: dimensionless } out: { idle_out_a: dimensionless, cruise_out_a: dimensionless, idle_balance_a: dimensionless, cruise_balance_a: dimensionless }
 export function computeAlternatorChargingLoad({ total_load_a = 0, alternator_a = 0, idle_frac = 0.5, cruise_frac = 0.9 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const load = Number(total_load_a) || 0;
@@ -3835,7 +3835,7 @@ MECHANIC_RENDERERS["sailboat-performance-ratios"] = _simpleRenderer({
 });
 
 // ===================== spec-v1007: flywheel stored kinetic energy and speed fluctuation =====================
-// dims: in { args: dimensionless } out: { kinetic_energy_ftlb: dimensionless, speed_fluctuation_pct: dimensionless }
+// dims: in { args: dimensionless } out: { kinetic_energy_ftlb: M L^2 T^-2, speed_fluctuation_pct: dimensionless }
 export function computeFlywheelEnergy({ weight_lb = 100, radius_of_gyration_ft = 1, rpm = 1000, energy_fluctuation_ftlb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(weight_lb > 0)) return { error: "Flywheel weight must be positive (lb)." };

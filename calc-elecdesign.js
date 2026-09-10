@@ -508,7 +508,7 @@ ELECDESIGN_RENDERERS["step-touch-voltage"] = _simpleRenderer({
 
 // ===================== spec-v610: ground potential rise screen (IEEE Std 80) =====================
 // GPR = grid_current * grid_resistance. safe_by_gpr = tolerable_touch > 0 && GPR <= tolerable_touch.
-// dims: in { grid_current_a: I, grid_resistance_ohm: dimensionless, tolerable_touch_v: dimensionless } out: { gpr_v: dimensionless, safe_by_gpr: dimensionless, margin_v: dimensionless }
+// dims: in { grid_current_a: I, grid_resistance_ohm: dimensionless, tolerable_touch_v: dimensionless } out: { gpr_v: dimensionless, safe_by_gpr: dimensionless, margin_v: M L^2 T^-3 I^-1 }
 export function computeGroundPotentialRise({ grid_current_a = 0, grid_resistance_ohm = 0, tolerable_touch_v = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const ig = Number(grid_current_a) || 0;
@@ -696,7 +696,7 @@ ELECDESIGN_RENDERERS["room-cavity-ratio"] = _simpleRenderer({
 });
 
 // ===================== spec-v982: luminaire spacing-to-mounting-height ratio =====================
-// dims: in { args: dimensionless } out: { max_spacing_ft: dimensionless }
+// dims: in { args: dimensionless } out: { max_spacing_ft: L }
 export function computeLuminaireSpacingMh({ smh_ratio = 1.3, mounting_height_ft = 8, actual_spacing_ft = 9 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(smh_ratio > 0)) return { error: "Spacing-to-mounting-height ratio must be positive." };

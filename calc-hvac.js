@@ -282,7 +282,7 @@ export const staticPressureHvacExample = {
 
 // --- Utility 27: SEER and EER Conversion ---
 
-// dims: in { value: dimensionless, from: dimensionless, cooling_load_btu_hr: M L^2 T^-3, annual_hours: dimensionless, electricity_rate: dimensionless } out: { seer: dimensionless, eer: dimensionless, annual_kwh: dimensionless, annual_cost_usd: dimensionless }
+// dims: in { value: dimensionless, from: dimensionless, cooling_load_btu_hr: M L^2 T^-3, annual_hours: T, electricity_rate: dimensionless } out: { seer: dimensionless, eer: dimensionless, annual_kwh: M L^2 T^-2, annual_cost_usd: dimensionless }
 export function computeSeerEer({ value, from, cooling_load_btu_hr = 0, annual_hours = 0, electricity_rate = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Common engineering approximation: SEER ~ EER * 1.12 (averaged across rating conditions).
@@ -357,7 +357,7 @@ export const shrExample = {
 
 // --- Utility 30: CFM per Ton ---
 
-// dims: in { tons: dimensionless, climate: dimensionless } out: { cfm: L^3 T^-1, cfm_per_ton: dimensionless }
+// dims: in { tons: M, climate: dimensionless } out: { cfm: L^3 T^-1, cfm_per_ton: dimensionless }
 export function computeCfmPerTon({ tons, climate = "standard" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const map = {
@@ -2768,7 +2768,7 @@ HVAC_RENDERERS["shr-latent"] = renderSHRLatent;
 
 // --- v20 C.1: Air-side economizer free-cooling hours (`economizer-savings-hours`) ---
 // Q_sens = 1.08 * CFM * dT; ton-hours = Q_sens * hours / 12,000.
-// dims: in { cfm: L^3*T^-1, delta_t_f: T, hours: dimensionless } out: { q_sens_btuh: M*L^2*T^-3, ton_hours: dimensionless }
+// dims: in { cfm: L^3*T^-1, delta_t_f: T, hours: T } out: { q_sens_btuh: M*L^2*T^-3, ton_hours: dimensionless }
 export function computeEconomizerSavingsHours({ cfm = 0, delta_t_f = 0, hours = 0 } = {}) {
   const CFM = Number(cfm) || 0;
   const dT = Number(delta_t_f) || 0;
@@ -2924,7 +2924,7 @@ HVAC_RENDERERS["insulation-thickness-for-heat-loss"] = renderInsulationThickness
 // AHP = CFM * TSP / 6356; BHP = AHP / eta_fan; motor HP = BHP / eta_drive,
 // rounded up to the next standard NEMA size.
 const NEMA_HP_SIZES = [0.25, 0.33, 0.5, 0.75, 1, 1.5, 2, 3, 5, 7.5, 10, 15, 20, 25, 30, 40, 50, 60, 75, 100, 125, 150, 200, 250, 300];
-// dims: in { cfm: L^3*T^-1, tsp_inwc: M*L^-1*T^-2, eta_fan: dimensionless, eta_drive: dimensionless } out: { ahp: dimensionless, bhp: dimensionless }
+// dims: in { cfm: L^3*T^-1, tsp_inwc: M*L^-1*T^-2, eta_fan: dimensionless, eta_drive: dimensionless } out: { ahp: dimensionless, bhp: M L^2 T^-3 }
 export function computeFanMotorBhp({ cfm = 0, tsp_inwc = 0, eta_fan = 0.65, eta_drive = 1 } = {}) {
   const CFM = Number(cfm) || 0;
   const TSP = Number(tsp_inwc) || 0;
@@ -2972,7 +2972,7 @@ function renderFanMotorBhp(inputRegion, outputRegion, citationEl) {
 }
 HVAC_RENDERERS["fan-motor-bhp"] = renderFanMotorBhp;
 
-// dims: in { power_hp: M L^2 T^-3, power_basis: dimensionless, tsp_inwc: M*L^-1*T^-2, eta_fan: dimensionless, eta_drive: dimensionless } out: { max_cfm: L^3*T^-1, bhp: dimensionless }
+// dims: in { power_hp: M L^2 T^-3, power_basis: dimensionless, tsp_inwc: M*L^-1*T^-2, eta_fan: dimensionless, eta_drive: dimensionless } out: { max_cfm: L^3*T^-1, bhp: M L^2 T^-3 }
 export function computeFanMotorMaxAirflow({ power_hp = 0, power_basis = "motor", tsp_inwc = 0, eta_fan = 0.65, eta_drive = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const power = Number(power_hp) || 0;
@@ -4422,7 +4422,7 @@ HVAC_RENDERERS["drybulb-from-enthalpy"] = _rEnv({
   compute: computeDrybulbFromEnthalpy,
 });
 
-// dims: in { cfm: L^3 T^-1, h_ent_btu: L^2 T^-2, h_lvg_btu: L^2 T^-2 } out: { q_btuh: M L^2 T^-3, tons: dimensionless, dh: L^2 T^-2 }
+// dims: in { cfm: L^3 T^-1, h_ent_btu: L^2 T^-2, h_lvg_btu: L^2 T^-2 } out: { q_btuh: M L^2 T^-3, tons: M, dh: L^2 T^-2 }
 export function computeCoolingCoilTotalLoad({ cfm = 0, h_ent_btu = 0, h_lvg_btu = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
   const q = Number(cfm) || 0;

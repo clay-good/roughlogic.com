@@ -1222,7 +1222,7 @@ function renderGrainBin(inputRegion, outputRegion, citationEl) {
 // Trapezoidal cross-section A = (bottom + top)/2 x depth; volume = A x length;
 // tons = volume x density / 2000. Silage as-fed density is user-entered because
 // it varies with dry matter and packing (~40-50 lb/ft^3 for corn silage).
-// dims: in { bottom_width_ft: L, top_width_ft: L, average_depth_ft: L, length_ft: L, density_lb_ft3: M L^-3 } out: { cross_section_ft2: L^2, volume_ft3: L^3, volume_yd3: L^3, tons: dimensionless }
+// dims: in { bottom_width_ft: L, top_width_ft: L, average_depth_ft: L, length_ft: L, density_lb_ft3: M L^-3 } out: { cross_section_ft2: L^2, volume_ft3: L^3, volume_yd3: L^3, tons: M }
 export function computeBunkerSiloCapacity({ bottom_width_ft = 0, top_width_ft = 0, average_depth_ft = 0, length_ft = 0, density_lb_ft3 = 44 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const b = Number(bottom_width_ft) || 0;
@@ -2093,7 +2093,7 @@ export function computeSprayDriftBuffer({ base_buffer_ft = 0, droplet_class = "m
   };
 }
 
-// dims: in { boom_width_ft: L, speed_mph: L T^-1, field_efficiency_pct: dimensionless, field_acres: dimensionless, tank_gal: L^3, gpa: dimensionless } out: { theoretical_ac_hr: dimensionless, effective_ac_hr: dimensionless, spray_time_hr: dimensionless, acres_per_tank: dimensionless, tanks_needed: dimensionless }
+// dims: in { boom_width_ft: L, speed_mph: L T^-1, field_efficiency_pct: dimensionless, field_acres: dimensionless, tank_gal: L^3, gpa: dimensionless } out: { theoretical_ac_hr: dimensionless, effective_ac_hr: dimensionless, spray_time_hr: dimensionless, acres_per_tank: L^2, tanks_needed: dimensionless }
 export function computeSprayerFieldCapacity({ boom_width_ft, speed_mph, field_efficiency_pct = 70, field_acres, tank_gal, gpa } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const boom = Number(boom_width_ft);
@@ -2644,7 +2644,7 @@ AGRICULTURE_RENDERERS["manure-application-rate"] = renderManureApplicationRate;
 
 // ===================== spec-v417..v419: landscape/agriculture trio (Group L) =====================
 
-// dims: in { area_ft2: L^2, depth_in: L, bulk_density: dimensionless, bag_ft3: L^3, load_yd3: L^3, waste_pct: dimensionless } out: { yd3: L^3, bags: dimensionless, tons: dimensionless, loads: dimensionless }
+// dims: in { area_ft2: L^2, depth_in: L, bulk_density: M L^-3, bag_ft3: L^3, load_yd3: L^3, waste_pct: dimensionless } out: { yd3: L^3, bags: dimensionless, tons: M, loads: dimensionless }
 export function computeMulchTopsoilVolume({ area_ft2 = 0, depth_in = 0, bulk_density = 0, bag_ft3 = 2, load_yd3 = 10, waste_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const area = Number(area_ft2) || 0;
@@ -3142,7 +3142,7 @@ function _v914renderTractorBallast(inputRegion, outputRegion, citationEl) {
 AGRICULTURE_RENDERERS["tractor-ballast"] = _v914renderTractorBallast;
 
 // ===================== spec-v940: anhydrous ammonia product rate from target nitrogen =====================
-// dims: in { n_target_lb_per_ac: dimensionless, tank_gal: L^3 } out: { product_lb_per_ac: dimensionless, product_gal_per_ac: dimensionless, acres_per_tank: dimensionless }
+// dims: in { n_target_lb_per_ac: dimensionless, tank_gal: L^3 } out: { product_lb_per_ac: dimensionless, product_gal_per_ac: dimensionless, acres_per_tank: L^2 }
 export function computeAnhydrousAmmoniaRate({ n_target_lb_per_ac = 180, tank_gal = 1000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(n_target_lb_per_ac > 0)) return { error: "Target nitrogen must be positive (lb N/acre)." };

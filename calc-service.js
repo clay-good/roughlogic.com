@@ -530,7 +530,7 @@ SERVICE_RENDERERS["neutral-demand-220-61"] = _v169renderNeutralDemand;
 // / 220.44).
 // =====================================================================
 
-// dims: in { floor_area_ft2: L^2, unit_load_va_ft2: dimensionless, receptacle_count: dimensionless, supply_v: dimensionless } out: { lighting_va: dimensionless, recep_va: dimensionless, recep_demand_va: dimensionless, total_va: dimensionless, total_a: I }
+// dims: in { floor_area_ft2: L^2, unit_load_va_ft2: dimensionless, receptacle_count: dimensionless, supply_v: M L^2 T^-3 I^-1 } out: { lighting_va: dimensionless, recep_va: dimensionless, recep_demand_va: dimensionless, total_va: M L^2 T^-3, total_a: I }
 export function computeCommercialLightingLoad({ floor_area_ft2 = 0, unit_load_va_ft2 = 0, receptacle_count = 0, supply_v = 208 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const area = Number(floor_area_ft2) || 0;

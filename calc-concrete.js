@@ -2077,7 +2077,7 @@ CONCRETE_RENDERERS["fresh-concrete-temp"] = _simpleRenderer({
 });
 
 // ===================== spec-v918: curing compound coverage =====================
-// dims: in { slab_area_sf: L^2, coats: dimensionless, coverage_sf_per_gal: L^2, waste_pct: dimensionless } out: { gallons_needed: dimensionless, gallons_exact: dimensionless, pails_5gal: dimensionless }
+// dims: in { slab_area_sf: L^2, coats: dimensionless, coverage_sf_per_gal: L^-1, waste_pct: dimensionless } out: { gallons_needed: dimensionless, gallons_exact: dimensionless, pails_5gal: dimensionless }
 export function computeCuringCompoundCoverage({ slab_area_sf = 2500, coats = 1, coverage_sf_per_gal = 200, waste_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(slab_area_sf > 0)) return { error: "Slab area must be positive (sf)." };

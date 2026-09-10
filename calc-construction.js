@@ -7541,7 +7541,7 @@ CONSTRUCTION_RENDERERS["seismic-pdelta-stability"] = _renderSeismicPdelta;
 
 const _V430_REBAR_UNIT_WT = { "3": 0.376, "4": 0.668, "5": 1.043, "6": 1.502, "7": 2.044, "8": 2.670, "9": 3.400, "10": 4.303, "11": 5.313, "14": 7.65, "18": 13.60 };
 
-// dims: in { bar_size: dimensionless, total_len_ft: L, price_per_lb: dimensionless } out: { unit_wt: dimensionless, weight_lb: M, tons: dimensionless }
+// dims: in { bar_size: dimensionless, total_len_ft: L, price_per_lb: dimensionless } out: { unit_wt: dimensionless, weight_lb: M, tons: M }
 export function computeRebarWeightTakeoff({ bar_size = "5", total_len_ft = 0, price_per_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const size = String(bar_size);
@@ -7776,7 +7776,7 @@ CONSTRUCTION_RENDERERS["stockpile-volume"] = _v818renderStockpileVolume;
 // compost windrow, a DOT salt/sand pile, an aggregate windrow - is a triangular prism with a cone split across its
 // two ends. height = (W/2) tan(repose); cross-section = (1/2) W h; volume = prism (area x ridge length) + one full
 // cone at the ends. Ridge length 0 collapses to the conical pile.
-// dims: in { base_width_ft: L, ridge_length_ft: L, repose_angle_deg: dimensionless, density_pcf: dimensionless } out: { height_ft: L, volume_ft3: L^3, volume_cy: L^3, tons: dimensionless }
+// dims: in { base_width_ft: L, ridge_length_ft: L, repose_angle_deg: dimensionless, density_pcf: M L^-3 } out: { height_ft: L, volume_ft3: L^3, volume_cy: L^3, tons: M }
 export function computeWindrowStockpileVolume({ base_width_ft = 0, ridge_length_ft = 0, repose_angle_deg = 37, density_pcf = 100 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(base_width_ft > 0)) return { error: "Base width must be positive (ft)." };
@@ -7821,7 +7821,7 @@ CONSTRUCTION_RENDERERS["windrow-stockpile-volume"] = _v1327renderWindrowStockpil
 // stockpile-volume is a SHARP cone; a radial stacker or a bulldozer leaves a FLAT top, making a truncated cone
 // (frustum). height comes from the repose slope across the ring width: h = (Rb - Rt) tan(repose). volume is the
 // frustum (pi h/3)(Rb^2 + Rb Rt + Rt^2). Top diameter 0 collapses to the conical stockpile-volume pile.
-// dims: in { base_diameter_ft: L, top_diameter_ft: L, repose_angle_deg: dimensionless, density_pcf: dimensionless } out: { height_ft: L, volume_ft3: L^3, volume_cy: L^3, tons: dimensionless }
+// dims: in { base_diameter_ft: L, top_diameter_ft: L, repose_angle_deg: dimensionless, density_pcf: M L^-3 } out: { height_ft: L, volume_ft3: L^3, volume_cy: L^3, tons: M }
 export function computeFlatTopStockpileVolume({ base_diameter_ft = 0, top_diameter_ft = 0, repose_angle_deg = 37, density_pcf = 100 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(base_diameter_ft > 0)) return { error: "Base diameter must be positive (ft)." };
@@ -8153,7 +8153,7 @@ const _v454renderMultiBendFlatPattern = _simpleRenderer({
 CONSTRUCTION_RENDERERS["multi-bend-flat-pattern"] = _v454renderMultiBendFlatPattern;
 
 // ===================== spec-v467: powered attic ventilator sizing =====================
-// dims: in { attic_area_ft2: L^2, cfm_per_ft2: dimensionless, dark_roof: dimensionless } out: { fan_cfm: L^3 T^-1, intake_ft2: L^2, intake_in2: L^2 }
+// dims: in { attic_area_ft2: L^2, cfm_per_ft2: L T^-1, dark_roof: dimensionless } out: { fan_cfm: L^3 T^-1, intake_ft2: L^2, intake_in2: L^2 }
 export function computePoweredAtticVentilator({ attic_area_ft2 = 0, cfm_per_ft2 = 0.7, dark_roof = "no" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const area = Number(attic_area_ft2) || 0;
@@ -10512,7 +10512,7 @@ CONSTRUCTION_RENDERERS["joist-cantilever-check"] = _simpleRenderer({
 });
 
 // ===================== spec-v970: foundation waterproofing / dampproofing takeoff =====================
-// dims: in { args: dimensionless } out: { wall_area_sf: L^2, gallons: dimensionless }
+// dims: in { args: dimensionless } out: { wall_area_sf: L^2, gallons: L^3 }
 export function computeFoundationWaterproofingTakeoff({ perimeter_ft = 150, below_grade_height_ft = 8, coverage_sf_per_gal = 50, waste_pct = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(perimeter_ft > 0)) return { error: "Foundation perimeter must be positive (ft)." };
@@ -10551,7 +10551,7 @@ CONSTRUCTION_RENDERERS["foundation-waterproofing-takeoff"] = _simpleRenderer({
 });
 
 // ===================== spec-v986: ballasted single-ply roof ballast weight and order =====================
-// dims: in { args: dimensionless } out: { total_ballast_lb: dimensionless, total_tons: dimensionless, stone_depth_in: dimensionless, volume_cy: dimensionless }
+// dims: in { args: dimensionless } out: { total_ballast_lb: dimensionless, total_tons: dimensionless, stone_depth_in: L, volume_cy: L^3 }
 export function computeRoofBallastWeight({ roof_area_sqft = 5000, ballast_psf = 12, stone_density_pcf = 100 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(roof_area_sqft > 0)) return { error: "Roof area must be positive (sq ft)." };

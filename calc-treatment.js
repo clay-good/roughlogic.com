@@ -364,7 +364,7 @@ TREATMENT_RENDERERS["langelier-index"] = renderLangelierIndex;
 // --- v20 M.3: Chemical metering-pump setting (`chemical-feed-pump`) ---
 // pure lb/day = MGD*dose*8.34; solution lb/day = pure/(strength/100);
 // GPD = solution_lb/day/(8.34*SG); mL/min = GPD*3785.41/1440; setting% = GPD/pump_max*100.
-// dims: in { flow_mgd: L^3*T^-1, dose_mgl: dimensionless, strength_pct: dimensionless, sg: dimensionless, pump_max_gpd: L^3*T^-1 } out: { solution_gpd: L^3*T^-1, setting_pct: dimensionless }
+// dims: in { flow_mgd: L^3*T^-1, dose_mgl: M L^-3, strength_pct: dimensionless, sg: dimensionless, pump_max_gpd: L^3*T^-1 } out: { solution_gpd: L^3*T^-1, setting_pct: dimensionless }
 export function computeChemicalFeedPump({ flow_mgd = 0, dose_mgl = 0, strength_pct = 100, sg = 1, pump_max_gpd = 0 } = {}) {
   const mgd = Number(flow_mgd) || 0;
   const dose = Number(dose_mgl) || 0;
@@ -474,7 +474,7 @@ function _rPool(spec) {
   return _rlRender;
 }
 
-// dims: in { gallons: dimensionless, current_ta_ppm: dimensionless, target_ta_ppm: dimensionless } out: { delta_ppm: dimensionless, bicarb_lb: dimensionless, acid_floz: dimensionless }
+// dims: in { gallons: L^3, current_ta_ppm: dimensionless, target_ta_ppm: dimensionless } out: { delta_ppm: dimensionless, bicarb_lb: dimensionless, acid_floz: dimensionless }
 export function computePoolAlkalinityAdjust({ gallons = 0, current_ta_ppm = 0, target_ta_ppm = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   if (current_ta_ppm < 0 || target_ta_ppm < 0) return { error: "Alkalinity readings must be non-negative." };
@@ -508,7 +508,7 @@ const renderPoolAlkalinityAdjust = _rPool({
 });
 TREATMENT_RENDERERS["pool-alkalinity-adjust"] = renderPoolAlkalinityAdjust;
 
-// dims: in { gallons: dimensionless, current_cya_ppm: dimensionless, target_cya_ppm: dimensionless } out: { delta_ppm: dimensionless, cya_lb: dimensionless, drain_gallons: L^3 }
+// dims: in { gallons: L^3, current_cya_ppm: dimensionless, target_cya_ppm: dimensionless } out: { delta_ppm: dimensionless, cya_lb: dimensionless, drain_gallons: L^3 }
 export function computePoolCyaDose({ gallons = 0, current_cya_ppm = 0, target_cya_ppm = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   if (current_cya_ppm < 0 || target_cya_ppm < 0) return { error: "Cyanuric acid readings must be non-negative." };
@@ -545,7 +545,7 @@ const renderPoolCyaDose = _rPool({
 });
 TREATMENT_RENDERERS["pool-cya-dose"] = renderPoolCyaDose;
 
-// dims: in { gallons: dimensionless, current_salt_ppm: dimensionless, target_salt_ppm: dimensionless } out: { delta_ppm: dimensionless, salt_lb: dimensionless, salt_bags: dimensionless, drain_gallons: L^3 }
+// dims: in { gallons: L^3, current_salt_ppm: dimensionless, target_salt_ppm: dimensionless } out: { delta_ppm: dimensionless, salt_lb: dimensionless, salt_bags: dimensionless, drain_gallons: L^3 }
 export function computePoolSaltDose({ gallons = 0, current_salt_ppm = 0, target_salt_ppm = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   if (current_salt_ppm < 0) return { error: "Salt reading must be non-negative." };
@@ -586,7 +586,7 @@ TREATMENT_RENDERERS["pool-salt-dose"] = renderPoolSaltDose;
 // that clears chloramines (v355).
 
 const _POOL_CL_PRODUCTS = { "liquid-12.5": 12.5, "cal-hypo-65": 65, "dichlor-56": 56, "trichlor-90": 90 };
-// dims: in { ppm: dimensionless, gallons: dimensionless, product: dimensionless, avail: dimensionless } out: { lb_cl: dimensionless, lb_prod: dimensionless, dry_oz: dimensionless, liq_floz: dimensionless }
+// dims: in { ppm: dimensionless, gallons: L^3, product: dimensionless, avail: dimensionless } out: { lb_cl: dimensionless, lb_prod: dimensionless, dry_oz: dimensionless, liq_floz: dimensionless }
 export function computePoolChlorineDose({ ppm = 0, gallons = 0, product = "cal-hypo-65", avail = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   const rise = Number(ppm) || 0;
@@ -639,7 +639,7 @@ function renderPoolChlorineDose(inputRegion, outputRegion, citationEl) {
 }
 TREATMENT_RENDERERS["pool-chlorine-dose"] = renderPoolChlorineDose;
 
-// dims: in { gallons: dimensionless, dT_F: T, output: M L^2 T^-3, eff: dimensionless } out: { Q_btu: M L^2 T^-2, delivered: M L^2 T^-3, hours: T }
+// dims: in { gallons: L^3, dT_F: T, output: M L^2 T^-3, eff: dimensionless } out: { Q_btu: M L^2 T^-2, delivered: M L^2 T^-3, hours: T }
 export function computePoolHeaterBtu({ gallons = 0, dT_F = 0, output = 0, eff = 0.80 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   const gal = Number(gallons) || 0;
@@ -676,7 +676,7 @@ TREATMENT_RENDERERS["pool-heater-btu"] = _rPool({
   compute: computePoolHeaterBtu,
 });
 
-// dims: in { gallons: dimensionless, dT_F: T, target_hours: T, eff: dimensionless } out: { required_output_btu: M L^2 T^-3, Q_btu: M L^2 T^-2 }
+// dims: in { gallons: L^3, dT_F: T, target_hours: T, eff: dimensionless } out: { required_output_btu: M L^2 T^-3, Q_btu: M L^2 T^-2 }
 export function computePoolHeaterSize({ gallons = 0, dT_F = 0, target_hours = 0, eff = 0.80 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   const gal = Number(gallons) || 0;
@@ -714,7 +714,7 @@ TREATMENT_RENDERERS["pool-heater-size"] = _rPool({
   compute: computePoolHeaterSize,
 });
 
-// dims: in { shape: dimensionless, length_ft: L, width_ft: L, diameter_ft: L, shallow_ft: L, deep_ft: L } out: { area_ft2: L^2, avg_depth_ft: L, volume_ft3: L^3, gallons: dimensionless }
+// dims: in { shape: dimensionless, length_ft: L, width_ft: L, diameter_ft: L, shallow_ft: L, deep_ft: L } out: { area_ft2: L^2, avg_depth_ft: L, volume_ft3: L^3, gallons: L^3 }
 // Pool water volume from the surface shape and the average depth: gallons =
 // surface area x average depth x 7.48052 gal/ft^3, average depth =
 // (shallow + deep)/2. Rectangle area = L x W, round = pi (D/2)^2, oval =
@@ -794,7 +794,7 @@ function renderPoolVolume(inputRegion, outputRegion, citationEl) {
 }
 TREATMENT_RENDERERS["pool-volume"] = renderPoolVolume;
 
-// dims: in { total_ppm: dimensionless, free_ppm: dimensionless, ratio: dimensionless, gallons: dimensionless, avail: dimensionless } out: { combined_ppm: dimensionless, dose_ppm: dimensionless, lb_product: dimensionless }
+// dims: in { total_ppm: dimensionless, free_ppm: dimensionless, ratio: dimensionless, gallons: L^3, avail: dimensionless } out: { combined_ppm: dimensionless, dose_ppm: dimensionless, lb_product: dimensionless }
 export function computeBreakpointChlorination({ total_ppm = 0, free_ppm = 0, ratio = 10, gallons = 0, avail = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   const total = Number(total_ppm) || 0;
@@ -1185,7 +1185,7 @@ const _FGV_M3_PER_GAL = 0.003785411784;
 // empty page field must fail its own guard, not fall through to the metric
 // default. (Number(null) is 0, so a finiteness test cannot decide this.)
 const _fgvGiven = (v) => v !== null && v !== undefined;
-// dims: in { power_input_w: M L^2 T^-3, power_input_hp: M L^2 T^-3, basin_volume_m3: L^3, basin_volume_gal: L^3, water_temp_c: dimensionless, water_temp_f: dimensionless, detention_time_s: T } out: { g_value: dimensionless, gt_value: dimensionless, power_input_w: M L^2 T^-3, basin_volume_m3: L^3, water_temp_c: dimensionless }
+// dims: in { power_input_w: M L^2 T^-3, power_input_hp: M L^2 T^-3, basin_volume_m3: L^3, basin_volume_gal: L^3, water_temp_c: dimensionless, water_temp_f: T, detention_time_s: T } out: { g_value: dimensionless, gt_value: dimensionless, power_input_w: M L^2 T^-3, basin_volume_m3: L^3, water_temp_c: dimensionless }
 export function computeFlocculationGValue({ power_input_w = 0, power_input_hp = null, basin_volume_m3 = 0, basin_volume_gal = null, water_temp_c = 15, water_temp_f = null, detention_time_s = 0 } = {}) {
   const useHp = _fgvGiven(power_input_hp), useGal = _fgvGiven(basin_volume_gal), useF = _fgvGiven(water_temp_f);
   const hp = Number(power_input_hp), gal = Number(basin_volume_gal), tF = Number(water_temp_f);
@@ -1241,7 +1241,7 @@ TREATMENT_RENDERERS["flocculation-g-value"] = renderFlocculationGValue;
 
 // --- spec-v621 M: Tapered flocculation multi-stage G schedule (`tapered-flocculation-g`) ---
 // P_stage = G_stage^2 x mu(T) x V_stage (Camp-Stein inverted). Stage 3 G = 0 models a 2-stage train. Gt = mean(G) x total_time.
-// dims: in { stage1_g_per_s: dimensionless, stage2_g_per_s: dimensionless, stage3_g_per_s: dimensionless, stage_volume_m3: L^3, stage_volume_gal: L^3, water_temp_c: dimensionless, water_temp_f: dimensionless, total_detention_min: T } out: { stage1_power_w: M L^2 T^-3, stage2_power_w: M L^2 T^-3, stage3_power_w: M L^2 T^-3, total_power_w: M L^2 T^-3, mean_g: dimensionless, gt_value: dimensionless }
+// dims: in { stage1_g_per_s: dimensionless, stage2_g_per_s: dimensionless, stage3_g_per_s: dimensionless, stage_volume_m3: L^3, stage_volume_gal: L^3, water_temp_c: dimensionless, water_temp_f: T, total_detention_min: T } out: { stage1_power_w: M L^2 T^-3, stage2_power_w: M L^2 T^-3, stage3_power_w: M L^2 T^-3, total_power_w: M L^2 T^-3, mean_g: dimensionless, gt_value: dimensionless }
 export function computeTaperedFlocculationG({ stage1_g_per_s = 0, stage2_g_per_s = 0, stage3_g_per_s = 0, stage_volume_m3 = 0, stage_volume_gal = null, water_temp_c = 15, water_temp_f = null, total_detention_min = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   const g1 = Number(stage1_g_per_s) || 0;
@@ -1303,7 +1303,7 @@ TREATMENT_RENDERERS["tapered-flocculation-g"] = renderTaperedFlocculationG;
 
 // --- spec-v613 M: Paddle flocculator power from geometry (Camp drag) ---
 // v_tip = 2*pi*r*rpm/60. v_rel = v_tip*(1-k). P = 0.5*Cd*1.937*A*v_rel^3 (ft-lb/s), *1.35582 W, /550 hp.
-// dims: in { paddle_radius_ft: L, wheel_rpm: T^-1, paddle_area_ft2: L^2, drag_coeff: dimensionless, slip_factor: dimensionless } out: { v_tip_fps: L T^-1, v_rel_fps: L T^-1, power_ftlbs: dimensionless, power_w: dimensionless, power_hp: M L^2 T^-3 }
+// dims: in { paddle_radius_ft: L, wheel_rpm: T^-1, paddle_area_ft2: L^2, drag_coeff: dimensionless, slip_factor: dimensionless } out: { v_tip_fps: L T^-1, v_rel_fps: L T^-1, power_ftlbs: dimensionless, power_w: M L^2 T^-3, power_hp: M L^2 T^-3 }
 export function computeFlocculatorPaddlePower({ paddle_radius_ft = 0, wheel_rpm = 0, paddle_area_ft2 = 0, drag_coeff = 1.8, slip_factor = 0.25 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   const r = Number(paddle_radius_ft) || 0;
@@ -1354,7 +1354,7 @@ TREATMENT_RENDERERS["flocculator-paddle-power"] = renderFlocculatorPaddlePower;
 // --- spec-v576 M: Gas chlorine cylinder withdrawal rate ---
 // per_container = base(type) x temp-derate. containers = ceil(feed / per). Frost warn if cold or near ceiling.
 const _CL_WITHDRAWAL_BASE = { cylinder: 40, ton: 400 }; // lb/day at ~70 F
-// dims: in { feed_rate_lb_day: M T^-1, container_type: dimensionless, room_temp_f: dimensionless } out: { per_container_lb_day: M T^-1, containers: dimensionless }
+// dims: in { feed_rate_lb_day: M T^-1, container_type: dimensionless, room_temp_f: T } out: { per_container_lb_day: M T^-1, containers: dimensionless }
 export function computeChlorineCylinderWithdrawal({ feed_rate_lb_day = 0, container_type = "cylinder", room_temp_f = 70 } = {}) {
   const feed = Number(feed_rate_lb_day) || 0;
   const temp = Number(room_temp_f);
@@ -1623,7 +1623,7 @@ function _v1271renderParticleSettlingVelocity(inputRegion, outputRegion, citatio
 TREATMENT_RENDERERS["particle-settling-velocity"] = _v1271renderParticleSettlingVelocity;
 
 // ===================== spec-v969: pool calcium hardness increase (calcium chloride dose) =====================
-// dims: in { gallons: dimensionless, ppm_increase: dimensionless, product_purity_pct: dimensionless } out: { calcium_chloride_lb: dimensionless, calcium_chloride_oz: dimensionless }
+// dims: in { gallons: L^3, ppm_increase: dimensionless, product_purity_pct: dimensionless } out: { calcium_chloride_lb: dimensionless, calcium_chloride_oz: dimensionless }
 export function computePoolCalciumHardnessDose({ gallons = 20000, ppm_increase = 20, product_purity_pct = 77 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   if (!(gallons > 0)) return { error: "Pool volume must be positive (gal)." };

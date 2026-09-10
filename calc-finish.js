@@ -316,7 +316,7 @@ FINISH_RENDERERS["attic-ventilation"] = _simpleRenderer({
 });
 
 const _GUTTER_PITCH = { "1.00": 1.0, "1.05": 1.05, "1.10": 1.1, "1.20": 1.2, "1.30": 1.3 };
-// dims: in { roof_area_sqft: L^2, pitch_factor: dimensionless, rainfall_in_hr: L, downspout_sqin: L^2 } out: { adjusted_area: L^2, downspout_total_sqin: L^2, downspouts: dimensionless }
+// dims: in { roof_area_sqft: L^2, pitch_factor: dimensionless, rainfall_in_hr: L T^-1, downspout_sqin: L^2 } out: { adjusted_area: L^2, downspout_total_sqin: L^2, downspouts: dimensionless }
 export function computeGutterDownspout({ roof_area_sqft = 0, pitch_factor = "1.00", rainfall_in_hr = 5, downspout_sqin = 12 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(roof_area_sqft > 0)) return { error: "Roof area must be positive." };

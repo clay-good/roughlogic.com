@@ -676,7 +676,7 @@ CIVIL_RENDERERS["slope-stake-cut-fill"] = renderSlopeStakeCutFill;
 // AASHTO point-mass model: e + f = V^2/(15 R). Mode "e" solves the required
 // superelevation e = V^2/(15 R) - f for a curve radius; mode "rmin" solves the
 // minimum radius R_min = V^2/(15(e_max + f)) at a maximum bank. V in mph, R in ft.
-// dims: in { V_mph: dimensionless, R_ft: L, e_max: dimensionless, f: dimensionless } out: { e_req: dimensionless, R_min_ft: L }
+// dims: in { V_mph: L T^-1, R_ft: L, e_max: dimensionless, f: dimensionless } out: { e_req: dimensionless, R_min_ft: L }
 export function computeSuperelevation({ mode, V_mph, R_ft, e_max, f } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const V = Number(V_mph) || 0;
@@ -742,7 +742,7 @@ CIVIL_RENDERERS["superelevation"] = renderSuperelevation;
 // minimum radius from the design speed; the inverse recovers the maximum safe speed a curve supports from its radius,
 // superelevation (bank), and side-friction factor. From the AASHTO point-mass relation e + f = V^2 / (15 R),
 // V = sqrt( 15 R (e + f) ). V in mph, R in ft.
-// dims: in { R_ft: L, e: dimensionless, f: dimensionless } out: { v_mph: dimensionless }
+// dims: in { R_ft: L, e: dimensionless, f: dimensionless } out: { v_mph: L T^-1 }
 export function computeSuperelevationSafeCurveSpeed({ R_ft, e, f } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const R = Number(R_ft) || 0;

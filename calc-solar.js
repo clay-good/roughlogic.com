@@ -1798,7 +1798,7 @@ function _v968renderEvRangePerHour(inputRegion, outputRegion, citationEl) {
 SOLAR_RENDERERS["ev-range-per-hour"] = _v968renderEvRangePerHour;
 
 // ===================== spec-v972: battery bank series/parallel configuration =====================
-// dims: in { args: dimensionless } out: { series_count: dimensionless, actual_bus_v: dimensionless, total_ah: dimensionless, usable_kwh: dimensionless }
+// dims: in { args: dimensionless } out: { series_count: dimensionless, actual_bus_v: dimensionless, total_ah: dimensionless, usable_kwh: M L^2 T^-2 }
 export function computeBatterySeriesParallel({ target_bus_v = 48, module_v = 12.8, module_ah = 100, parallel_strings = 2, depth_of_discharge = 0.8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(target_bus_v > 0)) return { error: "Target bus voltage must be positive (V)." };

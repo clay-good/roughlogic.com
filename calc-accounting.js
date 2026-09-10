@@ -177,8 +177,8 @@ export const MACRS_TABLES = {
 // Annual depreciation = (cost - salvage) / life. Even split, no convention.
 // Cite IRS Publication 946 Chapter 1 (Straight-Line method) by name.
 
-// dims: in { cost: dimensionless, salvage: dimensionless, life_years: dimensionless, year_of_interest: dimensionless }
-//        out: { annual_depreciation: dimensionless, accumulated_depreciation: dimensionless, book_value: dimensionless, life_years: dimensionless, year_of_interest: dimensionless }
+// dims: in { cost: dimensionless, salvage: dimensionless, life_years: T, year_of_interest: dimensionless }
+//        out: { annual_depreciation: dimensionless, accumulated_depreciation: dimensionless, book_value: dimensionless, life_years: T, year_of_interest: dimensionless }
 // (Monetary cost / salvage / book value are dimensionless dollar
 //  aggregates per the §7.1 monetary convention. Useful life in
 //  years is a calendar count (dimensionless integer per the §7.1
@@ -416,7 +416,7 @@ export const payrollExample = { inputs: { gross_per_period: 1500, pay_frequency:
 //
 // Standard formula: P = (r * PV) / (1 - (1+r)^-n).
 
-// dims: in { principal: dimensionless, annual_rate_pct: dimensionless, term_months: dimensionless, extra_principal: dimensionless, first_payment_date: dimensionless }
+// dims: in { principal: dimensionless, annual_rate_pct: dimensionless, term_months: T, extra_principal: dimensionless, first_payment_date: dimensionless }
 //        out: { payment: dimensionless, schedule: dimensionless, total_interest: dimensionless, payoff_month: dimensionless }
 // (Standard loan amortization P = (r*PV)/(1-(1+r)^-n). Principal,
 //  payment, interest, and per-month rows are dimensionless dollar

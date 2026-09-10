@@ -70,7 +70,7 @@ const _PIPE_ALPHA = {
 // ---------------------------------------------------------------------
 // 29.1 Pipe cold spring / cut-short (pipe-cold-spring) - ASME B31.1 §119
 // ---------------------------------------------------------------------
-// dims: in { run_length_ft: L, install_temp_f: T, operating_temp_f: T, cold_spring_percent: dimensionless, alpha_per_f: dimensionless } out: { thermal_growth_in: L, cold_spring_gap_in: L, residual_movement_in: L, growth_per_100ft_in: L }
+// dims: in { run_length_ft: L, install_temp_f: T, operating_temp_f: T, cold_spring_percent: dimensionless, alpha_per_f: T^-1 } out: { thermal_growth_in: L, cold_spring_gap_in: L, residual_movement_in: L, growth_per_100ft_in: L }
 export function computeColdSpring({ material = "steel", run_length_ft = 0, install_temp_f = 0, operating_temp_f = 0, cold_spring_percent = 50, alpha_per_f = null } = {}) {
   const _g = _finiteGuard({ run_length_ft, install_temp_f, operating_temp_f, cold_spring_percent }); if (_g) return _g;
   const L = Number(run_length_ft);
@@ -129,7 +129,7 @@ PIPEFIT_RENDERERS["pipe-cold-spring"] = _renderColdSpring;
 // ---------------------------------------------------------------------
 // 29.2 PVC raceway expansion fitting (raceway-expansion-fitting) - NEC 352.44
 // ---------------------------------------------------------------------
-// dims: in { run_length_ft: L, temp_range_f: T, alpha_per_f: dimensionless, fitting_travel_in: L, threshold_in: L } out: { length_change_in: L, per_100ft_in: L, fittings_needed: dimensionless }
+// dims: in { run_length_ft: L, temp_range_f: T, alpha_per_f: T^-1, fitting_travel_in: L, threshold_in: L } out: { length_change_in: L, per_100ft_in: L, fittings_needed: dimensionless }
 export function computeRacewayExpansion({ run_length_ft = 0, temp_range_f = 0, alpha_per_f = 0.0000338, fitting_travel_in = 6, threshold_in = 0.25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(run_length_ft);

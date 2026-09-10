@@ -106,7 +106,7 @@ LOWVOLTAGE_RENDERERS["fiber-loss-budget"] = _renderFiberLossBudget;
 // RF link math was entirely absent; this is the wireless sibling of the fiber/coax loss budgets.
 // FSPL(dB) = 32.44 + 20 log10(d_km) + 20 log10(f_MHz); received power Pr = Pt + Gt + Gr - FSPL.
 // Friis transmission equation / ITU-R P.525 (free). The 32.44 constant is for km and MHz.
-// dims: in { distance_km: dimensionless, frequency_mhz: dimensionless, tx_power_dbm: dimensionless, tx_gain_dbi: dimensionless, rx_gain_dbi: dimensionless } out: { fspl_db: dimensionless, rx_power_dbm: dimensionless }
+// dims: in { distance_km: L, frequency_mhz: dimensionless, tx_power_dbm: dimensionless, tx_gain_dbi: dimensionless, rx_gain_dbi: dimensionless } out: { fspl_db: dimensionless, rx_power_dbm: dimensionless }
 export function computeWirelessFspl({ distance_km = 0, frequency_mhz = 0, tx_power_dbm = 20, tx_gain_dbi = 0, rx_gain_dbi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const d = Number(distance_km);
@@ -205,7 +205,7 @@ LOWVOLTAGE_RENDERERS["fresnel-zone-clearance"] = _renderFresnelZoneClearance;
 // consumes free-space path loss, mirroring the fiber-loss-budget margin/pass logic for the radio path.
 // EIRP = Pt + Gt - Lcable_tx; Prx = EIRP - FSPL + Gr - Lcable_rx; fade margin = Prx - Rx_sensitivity.
 // FSPL = 32.44 + 20 log10(d_km) + 20 log10(f_MHz). All dB; a >= 10 dB fade margin is the usual target.
-// dims: in { tx_power_dbm: dimensionless, tx_gain_dbi: dimensionless, tx_cable_loss_db: dimensionless, distance_km: dimensionless, frequency_mhz: dimensionless, rx_gain_dbi: dimensionless, rx_cable_loss_db: dimensionless, rx_sensitivity_dbm: dimensionless } out: { eirp_dbm: dimensionless, fspl_db: dimensionless, rx_power_dbm: dimensionless, fade_margin_db: dimensionless }
+// dims: in { tx_power_dbm: dimensionless, tx_gain_dbi: dimensionless, tx_cable_loss_db: dimensionless, distance_km: L, frequency_mhz: dimensionless, rx_gain_dbi: dimensionless, rx_cable_loss_db: dimensionless, rx_sensitivity_dbm: dimensionless } out: { eirp_dbm: dimensionless, fspl_db: dimensionless, rx_power_dbm: dimensionless, fade_margin_db: dimensionless }
 export function computeWirelessLinkBudget({ tx_power_dbm = 20, tx_gain_dbi = 0, tx_cable_loss_db = 0, distance_km = 0, frequency_mhz = 0, rx_gain_dbi = 0, rx_cable_loss_db = 0, rx_sensitivity_dbm = -80 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const pt = Number(tx_power_dbm), gt = Number(tx_gain_dbi), ltx = Number(tx_cable_loss_db);
@@ -526,7 +526,7 @@ LOWVOLTAGE_RENDERERS["cctv-retention-days"] = _renderCctvRetentionDays;
 // ---------------------------------------------------------------------
 // Z.4 70-volt distributed speaker line (speaker-70v-line)
 // ---------------------------------------------------------------------
-// dims: in { amp_rated_w: M L^2 T^-3, headroom_percent: dimensionless, tap_watts: M L^2 T^-3, tap_count: dimensionless, line_voltage_v: dimensionless } out: { total_tap_w: M L^2 T^-3, reflected_impedance_ohm: dimensionless }
+// dims: in { amp_rated_w: M L^2 T^-3, headroom_percent: dimensionless, tap_watts: M L^2 T^-3, tap_count: dimensionless, line_voltage_v: M L^2 T^-3 I^-1 } out: { total_tap_w: M L^2 T^-3, reflected_impedance_ohm: M L^2 T^-3 I^-2 }
 export function computeSpeaker70vLine({ amp_rated_w = 0, headroom_percent = 20, tap_watts = 0, tap_count = 0, line_voltage_v = 70.7, run_length_ft = 0, wire_ohms_per_1000ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const rating = Number(amp_rated_w);
@@ -644,7 +644,7 @@ function _renderStandbyBatterySizing(inputRegion, outputRegion, citationEl) {
 }
 LOWVOLTAGE_RENDERERS["standby-battery-sizing"] = _renderStandbyBatterySizing;
 
-// dims: in { battery_ah: dimensionless, standby_current_a: I, alarm_current_a: I, alarm_minutes: T, derate: dimensionless } out: { standby_hours: T }
+// dims: in { battery_ah: I T, standby_current_a: I, alarm_current_a: I, alarm_minutes: T, derate: dimensionless } out: { standby_hours: T }
 export function computeStandbyBatteryRuntime({ battery_ah = 0, standby_current_a = 0, alarm_current_a = 0, alarm_minutes = 0, derate = 1.2 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Ah = Number(battery_ah), Is = Number(standby_current_a);
@@ -1296,7 +1296,7 @@ function renderDpFlowSignalScaling(inputRegion, outputRegion, citationEl) {
 LOWVOLTAGE_RENDERERS["dp-flow-signal-scaling"] = renderDpFlowSignalScaling;
 
 // ===================== spec-v947: RTD (Pt100 / Pt1000) resistance to temperature =====================
-// dims: in { args: dimensionless } out: { temperature_c: dimensionless, temperature_f: dimensionless }
+// dims: in { args: dimensionless } out: { temperature_c: T, temperature_f: T }
 export function computeRtdResistanceToTemp({ resistance_ohms = 119.397, r0_ohms = 100 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(resistance_ohms > 0)) return { error: "Measured resistance must be positive (ohms)." };
@@ -1379,7 +1379,7 @@ function _v948renderPulseFlowmeterRate(inputRegion, outputRegion, citationEl) {
 LOWVOLTAGE_RENDERERS["pulse-flowmeter-k-factor"] = _v948renderPulseFlowmeterRate;
 
 // ===================== spec-v949: loop-powered 2-wire 4-20 mA transmitter voltage budget =====================
-// dims: in { args: dimensionless } out: { max_loop_resistance_ohms: dimensionless, voltage_at_transmitter_v: dimensionless, margin_v: dimensionless, within_spec: dimensionless }
+// dims: in { args: dimensionless } out: { max_loop_resistance_ohms: dimensionless, voltage_at_transmitter_v: dimensionless, margin_v: M L^2 T^-3 I^-1, within_spec: dimensionless }
 export function computeLoopVoltageBudget({ supply_v = 24, transmitter_min_v = 10.5, load_resistance_ohms = 250, wire_resistance_ohms = 50 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(supply_v > 0)) return { error: "Loop supply voltage must be positive (Vdc)." };
@@ -1435,7 +1435,7 @@ function _v949renderLoopVoltageBudget(inputRegion, outputRegion, citationEl) {
 LOWVOLTAGE_RENDERERS["loop-voltage-budget"] = _v949renderLoopVoltageBudget;
 
 // ===================== spec-v950: NTC thermistor resistance to temperature (beta equation) =====================
-// dims: in { args: dimensionless } out: { temperature_c: dimensionless, temperature_f: dimensionless }
+// dims: in { args: dimensionless } out: { temperature_c: T, temperature_f: T }
 export function computeThermistorBetaTemp({ resistance_ohms = 10000, r0_ohms = 10000, beta_k = 3950, ref_temp_c = 25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(resistance_ohms > 0)) return { error: "Measured resistance must be positive (ohms)." };
@@ -1486,7 +1486,7 @@ LOWVOLTAGE_RENDERERS["thermistor-beta-temp"] = _v950renderThermistorBetaTemp;
 // The thermistor-beta-temp tile's own note says a wider/tighter job "uses the 3-constant Steinhart-Hart
 // equation instead" -- the accurate temperature-sensor form the beta 2-point equation approximates. This
 // adds it: 1/T = A + B ln(R) + C (ln R)^3, T in kelvin, A/B/C from the datasheet or a 3-point calibration.
-// dims: in { resistance_ohms: dimensionless, coeff_a: dimensionless, coeff_b: dimensionless, coeff_c: dimensionless } out: { temperature_c: T, temperature_f: T, temperature_k: T }
+// dims: in { resistance_ohms: M L^2 T^-3 I^-2, coeff_a: dimensionless, coeff_b: dimensionless, coeff_c: dimensionless } out: { temperature_c: T, temperature_f: T, temperature_k: T }
 export function computeThermistorSteinhartHart({ resistance_ohms = 10000, coeff_a = 0.001125308852122, coeff_b = 0.000234711863267, coeff_c = 0.000000085663516, } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const R = Number(resistance_ohms) || 0;

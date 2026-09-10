@@ -150,7 +150,7 @@ export function computeSepticDoseTank({ daily_flow_gpd, doses_per_day = 4, drain
   };
 }
 
-// dims: in { tank_gal: L^3, people: dimensionless, accum_gal_pp_yr: dimensionless, fill_fraction: dimensionless } out: { years: dimensionless, allowed_gal: L^3, annual_accum_gal: dimensionless }
+// dims: in { tank_gal: L^3, people: dimensionless, accum_gal_pp_yr: dimensionless, fill_fraction: dimensionless } out: { years: T, allowed_gal: L^3, annual_accum_gal: dimensionless }
 export function computeSepticPumpoutInterval({ tank_gal, people, accum_gal_pp_yr = 30, fill_fraction = 0.33 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const tank = Number(tank_gal);

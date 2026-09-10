@@ -561,7 +561,7 @@ SHOP_RENDERERS["dividing-head"] = _v40renderDividingHead;
 const _V40_BESTWIRE = 1 / (2 * Math.cos(Math.PI / 6)); // 0.5773502691896258
 const _V40_MOW_K = Math.cos(Math.PI / 6); // 0.8660254 = (1/2)cot(30deg) = sqrt(3)/2, the 60-degree measurement-over-wires constant (M = E + 3W - K*P)
 
-// dims: in { thread_standard: dimensionless, tpi: T^-1, pitch_mm: L, pitch_diameter_in: L, wire_dia_in: L } out: { best_wire_in: L, measurement_over_wires_in: L }
+// dims: in { thread_standard: dimensionless, tpi: L^-1, pitch_mm: L, pitch_diameter_in: L, wire_dia_in: L } out: { best_wire_in: L, measurement_over_wires_in: L }
 export function computeThreadMeasureWire({ thread_standard = "inch", tpi = 0, pitch_mm = 0, pitch_diameter_in = 0, wire_dia_in = 0 } = {}) {
   const _g = _finiteGuard({ tpi, pitch_mm, pitch_diameter_in, wire_dia_in }); if (_g) return _g;
   const isMetric = String(thread_standard) === "metric";
@@ -627,7 +627,7 @@ SHOP_RENDERERS["thread-measure-wire"] = _v40renderThreadMeasureWire;
 // gives the measurement over wires M from a pitch diameter E; the machinist
 // actually measures M on the mic and wants E, so E = M - 3W + 0.86603 P is the
 // working direction. Same 60-degree geometry, best-wire default, and range check.
-// dims: in { thread_standard: dimensionless, tpi: T^-1, pitch_mm: L, measurement_over_wires_in: L, wire_dia_in: L } out: { pitch_diameter_in: L, best_wire_in: L, pitch_in: L }
+// dims: in { thread_standard: dimensionless, tpi: L^-1, pitch_mm: L, measurement_over_wires_in: L, wire_dia_in: L } out: { pitch_diameter_in: L, best_wire_in: L, pitch_in: L }
 export function computeThreadPitchDiaFromWires({ thread_standard = "inch", tpi = 0, pitch_mm = 0, measurement_over_wires_in = 0, wire_dia_in = 0 } = {}) {
   const _g = _finiteGuard({ tpi, pitch_mm, measurement_over_wires_in, wire_dia_in }); if (_g) return _g;
   const isMetric = String(thread_standard) === "metric";
@@ -1016,7 +1016,7 @@ SHOP_RENDERERS["carbon-equivalent"] = _v40renderCarbonEquivalent;
 
 const _V41_TAP_K = 76.98; // 60-degree percent-of-thread constant (1 / 0.012990)
 
-// dims: in { thread_standard: dimensionless, major_dia_in: L, tpi: T^-1, pitch_mm: L, thread_percent: dimensionless } out: { drill_dia_in: L, drill_dia_mm: L, nearest_64th_in: L, nearest_64th_percent: dimensionless }
+// dims: in { thread_standard: dimensionless, major_dia_in: L, tpi: L^-1, pitch_mm: L, thread_percent: dimensionless } out: { drill_dia_in: L, drill_dia_mm: L, nearest_64th_in: L, nearest_64th_percent: dimensionless }
 export function computeTapDrillSize({ thread_standard = "inch", major_dia_in = 0, tpi = 0, pitch_mm = 0, thread_percent = 75 } = {}) {
   const _g = _finiteGuard({ major_dia_in, tpi, pitch_mm, thread_percent }); if (_g) return _g;
   const pct = Number(thread_percent) || 0;

@@ -240,6 +240,112 @@ function unitTailExpectation(key) {
   return canonicalDimension(UNIT_TAIL_DIMS.get(tail));
 }
 
+// ---------------------------------------------------------------------------
+// One key name, one dimension (added 2026-09-10).
+//
+// The unit-tail rule above only sees keys whose name spells a unit. This one
+// needs no unit table: it asks whether the corpus contradicts ITSELF. If
+// `rpm` is `T^-1` in fourteen functions and `dimensionless` in four, the four
+// are wrong, and no physics knowledge is required to know it -- only that a
+// name means one thing.
+//
+// It is the rule that catches what a unit table cannot. `alpha_per_f` is
+// `T^-1` in one function and `dimensionless` in five: the MAJORITY was the
+// wrong side, so a vote would have propagated the error. `tpi` (threads per
+// inch, `L^-1`) was declared `T^-1` in four places and `dimensionless` in
+// three -- wrong in all seven, and only visible because they disagreed.
+//
+// Two allowlists, both of which must stay honest.
+// ---------------------------------------------------------------------------
+
+// Names that genuinely denote different quantities in different trades. Each
+// is a real collision, not a defect -- renaming them is the fix, and that is a
+// bigger change than this gate.
+const POLYMORPHIC_KEYS = new Map(Object.entries({
+  a1: "a linear-system coefficient in calc-edu, a base-plate area in calc-steel",
+  allowable: "an allowable area in calc-construction, an allowable depth in calc-lowvoltage",
+  area: "a geometric area everywhere except computeHudFmr, where it is a metro area NAME",
+  days: "a duration, except computeGrowingDegreeDays where it is a degree-day product",
+  db: "a rebar diameter in concrete, a decibel in calc-stage (and dry-bulb elsewhere)",
+  F: "degrees Fahrenheit in pure-math, magnetic field intensity in computeWMM",
+  fv: "a future value (money) in accounting, an allowable shear stress in structural",
+  governing: "which check governs (a label), except computePullBoxSizing where it is a length",
+  gpa: "gallons per acre in agriculture, a grade point average in calc-edu",
+  headroom: "a pressure headroom and a dimensionless margin",
+  I: "electric current, and second moment of area in the beam tiles",
+  j: "a polar moment of area, and a loop index",
+  mo: "an overturning moment, and a month count",
+  pa: "an active-earth-pressure resultant per unit width in geotech, an axial force in steel",
+  rho: "a density in plumbing, Spearman's rho in calc-edu, a reinforcement ratio in masonry",
+  slope: "a hydraulic gradient (dimensionless) in 12 uses, a capacity slope in computeHeatPumpColdCapacity",
+  t_min: "a minimum wall thickness in pipefit, a minimum time in plumbing",
+  target_fc: "a footcandle target; the luminous base J is dropped by every use",
+  total_oz: "fluid ounces (volume) and weight ounces (mass)",
+}));
+
+// The pound is declared as a FORCE (`M L T^-2`) in some annotations and a MASS
+// (`M`) in others, and `weight_lb` is split exactly 8 / 8. That is a repo-wide
+// convention that has never been decided, not a typo: US customary `lb` is
+// pounds-force for a load on a hook and pounds-mass in `lb_per_ft3`, and the
+// corpus reflects both readings. `pcf` inherits the same split -- `density_pcf`
+// is `M L^-3` while the geotech unit weight `gamma_pcf` is `M L^-2 T^-2`, and
+// both are defensible.
+//
+// Deciding it means rewriting well over a hundred annotations one way, which is
+// a maintainer's call, not this gate's. Until then these are named, counted and
+// printed on every run rather than quietly waived.
+const POUND_CONVENTION_UNSETTLED = new Set([
+  "actual_weight_lb", "capacity_lb", "charge_weight_lb", "displacement_lb", "force_lb",
+  "green_weight_lb", "guy_tension_lb", "gvw_lb", "load_lb", "margin_lb", "max_charge_lb",
+  "payload_lb", "preload_lb", "reaction_lb", "required_wll_lb", "total_lb",
+  "total_weight_lb", "tractive_effort_lb", "vehicle_weight_lb", "vs_fed_lb_day",
+  "W_lb", "water_weight_lb", "wc_pcf", "weight_lb",
+]);
+
+// Single-letter and index-like names carry no quantity by themselves.
+const UNQUALIFIED_KEYS = new Set([
+  "a", "b", "c", "d", "e", "f", "g", "h", "k", "l", "m", "n", "p", "q", "r", "s", "t", "u",
+  "v", "w", "x", "y", "z", "C", "n1", "n2", "v1", "v2", "x1", "x2", "y1", "y2", "c1", "c2",
+  "d1", "d2", "t1", "t2", "p1", "p2", "r1", "r2", "w1", "w2", "e0", "mu", "nu", "gamma",
+  "beta", "theta", "phi", "value", "load", "density", "temperature", "voltage", "size",
+  "count", "total", "result", "nominal_size", "molecular_weight", "k_factor", "u_factor",
+  "diametral_pitch", "pitch_rise",
+]);
+
+function checkKeyAgreement(keyDims, errors) {
+  // keyDims: Map(key -> Map(canonical dimension -> [where, ...])).
+  const stillSplit = [];
+  for (const [key, byDim] of keyDims) {
+    if (byDim.size < 2) continue;
+    if (UNQUALIFIED_KEYS.has(key)) continue;
+    if (POLYMORPHIC_KEYS.has(key)) { stillSplit.push(key + " (polymorphic)"); continue; }
+    if (POUND_CONVENTION_UNSETTLED.has(key)) { stillSplit.push(key + " (pound convention)"); continue; }
+    const variants = [...byDim.entries()]
+      .sort((a, b) => b[1].length - a[1].length)
+      .map(([dim, where]) => where.length + "x `" + dim + "` (" + where.slice(0, 3).join(", ") + (where.length > 3 ? ", ..." : "") + ")");
+    errors.push(
+      "`" + key + "` is declared with " + byDim.size + " different dimensions: " + variants.join(" vs ") +
+      ". One name means one quantity -- fix the wrong side, or rename the key. Do NOT take a vote: " +
+      "`alpha_per_f` and `tpi` were both wrong on the majority side.",
+    );
+  }
+  // An allowlist entry that no longer waives anything is a hole waiting for the
+  // next collision, and this repo has shipped those before. Both lists ratchet:
+  // once a key agrees with itself, its entry must go.
+  const split = new Set([...keyDims.entries()].filter(([, d]) => d.size > 1).map(([k]) => k));
+  for (const [key] of POLYMORPHIC_KEYS) {
+    if (!split.has(key)) {
+      errors.push("POLYMORPHIC_KEYS still lists `" + key + "`, but it now declares one dimension everywhere. Remove the entry.");
+    }
+  }
+  for (const key of POUND_CONVENTION_UNSETTLED) {
+    if (!split.has(key)) {
+      errors.push("POUND_CONVENTION_UNSETTLED still lists `" + key + "`, but it now declares one dimension everywhere. Remove the entry.");
+    }
+  }
+  return stillSplit;
+}
+
 function checkUnitTails(module, fnName, parse, errors, counters) {
   for (const [side, list] of [["input", parse.inputs], ["output", parse.outputs]]) {
     for (const entry of list) {
@@ -334,6 +440,7 @@ async function main() {
   let totalFunctions = 0;
   let annotated = 0;
   const tailCounters = { covered: 0, uncovered: 0, exempt: 0 };
+  const keyDims = new Map();
   const errors = [];
   const missing = [];
   for (const rel of SOURCES) {
@@ -348,6 +455,16 @@ async function main() {
           errors.push(rel + ": " + fn.name + ": " + fn.parse.message);
         } else {
           checkUnitTails(rel, fn.name, fn.parse, errors, tailCounters);
+          for (const [side, list] of [["in", fn.parse.inputs], ["out", fn.parse.outputs]]) {
+            for (const entry of list) {
+              const canon = canonicalDimension(entry.expr);
+              if (canon === null) continue;
+              if (!keyDims.has(entry.name)) keyDims.set(entry.name, new Map());
+              const byDim = keyDims.get(entry.name);
+              if (!byDim.has(canon)) byDim.set(canon, []);
+              byDim.get(canon).push(rel + ":" + fn.name + "[" + side + "]");
+            }
+          }
         }
       } else {
         missing.push(rel + ": " + fn.name);
@@ -386,6 +503,16 @@ async function main() {
   // annotation and fails a malformed one; a function may declare `out: L/T`,
   // compute something with dimensions of L/T^2, and pass. The docstring above has
   // always said so ("it does not verify floating-point math"); the README did not.
+  const stillSplit = checkKeyAgreement(keyDims, errors);
+  console.log(
+    "key agreement: " + keyDims.size + " distinct key names, " + stillSplit.length +
+    " still declared two ways and named as such (" +
+    stillSplit.filter((k) => k.endsWith("(pound convention)")).length +
+    " of them the undecided pound convention, " +
+    stillSplit.filter((k) => k.endsWith("(polymorphic)")).length +
+    " genuine name collisions). Any name not on those lists must mean one quantity.",
+  );
+
   const readmeText = await readFile(resolve(ROOT, "README.md"), "utf8");
   const row = readmeText.split("\n").find((l) => l.includes("`check-dimensions`"));
   if (row) {
@@ -400,7 +527,7 @@ async function main() {
     // module lands. Hold them here rather than trusting a future editor: this
     // repo has shipped a stale README count in this exact row before (it said
     // 2,059 functions against a live 2,337 for long enough that nobody knew).
-    const stated = [...row.matchAll(/([\d,]{3,})/g)].map((m) => Number(m[1].replace(/,/g, "")));
+    const stated = [...row.matchAll(/(\d[\d,]*)/g)].map((m) => Number(m[1].replace(/,/g, "")));
     if (!stated.includes(totalFunctions)) {
       errors.push(
         "README.md's check-dimensions row does not state the live function count (" +
@@ -412,6 +539,13 @@ async function main() {
       errors.push(
         "README.md's check-dimensions row does not state the live unit-tail count (" +
         tailCounters.covered.toLocaleString("en-US") + "). Found: " +
+        (stated.length ? stated.join(", ") : "no number at all") + ".",
+      );
+    }
+    if (!stated.includes(stillSplit.length)) {
+      errors.push(
+        "README.md's check-dimensions row does not state the live count of names still " +
+        "declared two ways (" + stillSplit.length + "). Found: " +
         (stated.length ? stated.join(", ") : "no number at all") + ".",
       );
     }

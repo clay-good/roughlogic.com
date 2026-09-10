@@ -43,7 +43,7 @@ export const SURVEY_RENDERERS = {};
 // --- Area by coordinates (`area-by-coordinates`) ---
 // Shoelace on a closed ring of {n, e} boundary corners. area_ft2 =
 // 0.5*|sum(E_i*N_{i+1} - E_{i+1}*N_i)|; signed>0 is counter-clockwise.
-// dims: in { points: dimensionless } out: { area_ft2: L^2, area_acres: dimensionless, area_m2: L^2, perimeter_ft: L, distinct_points: dimensionless }
+// dims: in { points: dimensionless } out: { area_ft2: L^2, area_acres: L^2, area_m2: L^2, perimeter_ft: L, distinct_points: dimensionless }
 export function computeAreaByCoordinates({ points } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Array.isArray(points) || points.length < 3) return { error: "Need at least three boundary points." };

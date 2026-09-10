@@ -148,7 +148,7 @@ export const CHILLER_FLUID_FACTORS = {
   glycol_50: 449, // 50% propylene glycol: ~8.8 lb/gal * 0.85 cp * 60
 };
 
-// dims: in { args: dimensionless } out: { delta_T_F: T, q_btu_hr: dimensionless, tons: dimensionless, required_gpm: L^3 T^-1 }
+// dims: in { args: dimensionless } out: { delta_T_F: T, q_btu_hr: dimensionless, tons: M, required_gpm: L^3 T^-1 }
 export function computeChillerTons({
   gpm = 0,
   ewt_F = 54,

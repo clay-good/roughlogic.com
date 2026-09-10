@@ -1194,7 +1194,7 @@ const renderDraftBeerLineBalance = _r({
 KITCHEN_RENDERERS["draft-beer-line-balance"] = renderDraftBeerLineBalance;
 
 // ===================== spec-v1000: desired dough temperature (mixing water temp) =====================
-// dims: in { args: dimensionless } out: { water_temp_f: dimensionless, factor_count: dimensionless }
+// dims: in { args: dimensionless } out: { water_temp_f: T, factor_count: dimensionless }
 export function computeDoughWaterTemperature({ desired_dough_temp_f = 75, flour_temp_f = 68, room_temp_f = 72, friction_factor_f = 24, preferment_temp_f = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(desired_dough_temp_f > 0)) return { error: "Desired dough temperature must be positive (F)." };
@@ -2033,7 +2033,7 @@ KITCHEN_RENDERERS["steam-kettle-heatup"] = _r({
 });
 
 // ===================== spec-v1363: hot-holding connected load, demand, and kitchen heat gain =====================
-// dims: in { args: dimensionless } out: { connected_kw: M L^2 T^-3, demand_kw: M L^2 T^-3, demand_amps: I, sensible_btuh: dimensionless, tons: dimensionless }
+// dims: in { args: dimensionless } out: { connected_kw: M L^2 T^-3, demand_kw: M L^2 T^-3, demand_amps: I, sensible_btuh: dimensionless, tons: M }
 export function computeHotHoldingEnergy({ equipment = [], diversity_factor = 0.65, voltage = 208, phase = "three" } = {}) {
   if (!Array.isArray(equipment) || equipment.length === 0) return { error: "List at least one piece of hot-holding equipment." };
   if (!(Number(diversity_factor) > 0 && Number(diversity_factor) <= 1)) return { error: "Diversity factor must be between 0 and 1." };

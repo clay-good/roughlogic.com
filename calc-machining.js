@@ -1846,7 +1846,7 @@ function _v952renderTaylorToolLife(inputRegion, outputRegion, citationEl) {
 MACHINING_RENDERERS["taylor-tool-life"] = _v952renderTaylorToolLife;
 
 // ===================== spec-v1006: single-point thread cutting depth (60-degree UN external) =====================
-// dims: in { args: dimensionless } out: { pitch_in: dimensionless, single_depth_in: dimensionless, compound_infeed_in: dimensionless }
+// dims: in { args: dimensionless } out: { pitch_in: L, single_depth_in: dimensionless, compound_infeed_in: dimensionless }
 export function computeThreadSingleDepth({ tpi = 13 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(tpi > 0)) return { error: "Threads per inch must be positive." };
@@ -1887,7 +1887,7 @@ MACHINING_RENDERERS["thread-single-depth"] = _v1006renderThreadSingleDepth;
 // General-purpose Acme (Machinery's Handbook / ASME B1.5): pitch P = 1/TPI; external thread depth
 // h = P/2 + 0.010 in; basic pitch dia = D - P/2; external minor (root) = D - 2h = D - P - 0.020;
 // width of flat at the crest = 0.3707 P; included thread angle 29 degrees.
-// dims: in { major_dia_in: L, tpi: dimensionless } out: { pitch_in: L, thread_depth_in: L, pitch_dia_in: L, minor_dia_in: L, crest_flat_in: L }
+// dims: in { major_dia_in: L, tpi: L^-1 } out: { pitch_in: L, thread_depth_in: L, pitch_dia_in: L, minor_dia_in: L, crest_flat_in: L }
 export function computeAcmeThreadDepth({ major_dia_in = 0, tpi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const D = Number(major_dia_in) || 0;
@@ -1934,7 +1934,7 @@ MACHINING_RENDERERS["acme-thread-depth"] = renderAcmeThreadDepth;
 // height h = 0.3 P (vs P/2 for general Acme); basic pitch dia = D - 0.3 P; minor = D - 0.6 P;
 // crest flat = P/2 - h tan(14.5 deg) = 0.4224 P (same 29-degree geometry, wider flat than the
 // deeper general form's 0.3707 P).
-// dims: in { major_dia_in: L, tpi: dimensionless } out: { pitch_in: L, thread_depth_in: L, pitch_dia_in: L, minor_dia_in: L, crest_flat_in: L }
+// dims: in { major_dia_in: L, tpi: L^-1 } out: { pitch_in: L, thread_depth_in: L, pitch_dia_in: L, minor_dia_in: L, crest_flat_in: L }
 export function computeStubAcmeThreadDepth({ major_dia_in = 0, tpi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const D = Number(major_dia_in) || 0;

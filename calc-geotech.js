@@ -944,7 +944,7 @@ GEOTECH_RENDERERS["boussinesq-surcharge-wall"] = _simpleRenderer({
 
 // ===================== spec-v414..v416: geotechnical settlement/foundation trio (Group E) =====================
 
-// dims: in { u_percent: dimensionless, cv_ft2_day: dimensionless, hdr_ft: L } out: { tv: dimensionless, t_days: dimensionless }
+// dims: in { u_percent: dimensionless, cv_ft2_day: L^2 T^-1, hdr_ft: L } out: { tv: dimensionless, t_days: dimensionless }
 export function computeConsolidationTimeRate({ u_percent = 0, cv_ft2_day = 0, hdr_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const u = Number(u_percent) || 0;
@@ -977,7 +977,7 @@ GEOTECH_RENDERERS["consolidation-time-rate"] = _simpleRenderer({
   compute: computeConsolidationTimeRate,
 });
 
-// dims: in { cv_ft2_day: dimensionless, hdr_ft: L, t_days: dimensionless } out: { tv: dimensionless, u_percent: dimensionless }
+// dims: in { cv_ft2_day: L^2 T^-1, hdr_ft: L, t_days: dimensionless } out: { tv: dimensionless, u_percent: dimensionless }
 export function computeConsolidationDegree({ cv_ft2_day = 0, hdr_ft = 0, t_days = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const cv = Number(cv_ft2_day) || 0;
