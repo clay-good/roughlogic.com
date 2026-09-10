@@ -1,6 +1,31 @@
 # v6 Citation-Discipline Audit Tracker
 
-This document tracks the v6 audit pass mandated by spec-v6.md §6. Every existing tile (utilities 1 through 233 across groups A–Q) is checked against the section-2 / section-3 reference rule and marked off here as it passes. v6 is "done" only when every tile is green.
+> **Historical record, not a live worklist.** The per-group tables below are the
+> audit as it was worked, tile by tile, from v6 through the v12 close on
+> 2026-05-16 -- 385 spec-numbered utilities. The catalog is now **2,082 tiles**,
+> and they were not added to these tables, because by then the audit's invariant
+> had stopped being a checklist and become a gate.
+>
+> **What holds it today is `check-citation-coverage`**, in the `npm run lint`
+> chain: it fails the build unless every tile in `TOOLS` has a `CITATIONS` entry
+> carrying all four required fields, with no orphan entries and no raw URL
+> schemes -- currently **2,082 of 2,082**. `test/unit/citations.test.js` holds
+> the shape beside it: every entry carries the six §3 fields, and every entry's
+> governance string matches a `GOVERNANCE` variant verbatim. That test also
+> carries per-group coverage assertions (Groups A, B, F, G and others), which is
+> what the v12 close below was pointing at -- it does not itself contain a
+> catalog-wide "v6 audit complete" check, and the sentence at the foot of this
+> document that credited it with one named the wrong guardian.
+>
+> So a tile added tomorrow cannot ship without a structured citation, and it
+> will not appear in these tables either. Read them as the record of how the
+> catalog got here.
+>
+> This header was added on 2026-09-10. Until then the document opened by saying
+> it covered "utilities 1 through 233" and that v6 is done "only when every tile
+> is green", against a catalog nearly nine times that size.
+
+This document tracks the v6 audit pass mandated by spec-v6.md §6. Every tile in the original scope (utilities 1 through 233 across groups A–Q) was checked against the section-2 / section-3 reference rule and marked off here as it passed.
 
 The audit is organized as one PR per group, in the priority order from spec §6:
 
@@ -44,7 +69,7 @@ For each tile, the audit PR confirms:
 
 ## Per-group audit status
 
-Tile counts include every entry registered in `TOOLS` in `app.js`. The status column is one of: `not started`, `in progress`, `complete`. A tile is `complete` when every checklist item above is checked.
+Tile counts include every entry registered in `TOOLS`, which lived in `app.js` when these tables were written and now lives in `tools-data.js`. The status column is one of: `not started`, `in progress`, `complete`. A tile is `complete` when every checklist item above is checked.
 
 ### Group A — Electrical (calc-electrical.js) — priority 1
 
@@ -379,4 +404,4 @@ Status: **complete** - citations.js populated for all fifteen Group Y tiles (Y.1
 
 ### v12 expansion close (2026-05-16)
 
-Tile counts at v12 audit close: 385 spec-numbered utilities + visible tiles (was 271 after v5). 86 new visible tiles across Groups U / V / W / X / Y (18 + 20 + 18 + 15 + 15). Every new tile has a `CITATIONS` entry; every entry covers the six §3 fields; every entry uses one of the twenty-five GOVERNANCE variants (the twenty-one pre-v12 variants plus four new v12 variants: `veterinary`, `ems_prehospital`, `real_estate`, and `education`; the `aviation` variant was added earlier in v9). The `test/unit/citations.test.js` "v6 audit complete" coverage check fails the build if any future tile is added without a structured citation, so v12 expansion held the v6 audit invariant throughout. The spec-v12 §13.1 profession-overrides extension is documented in [profession-overrides.md](profession-overrides.md); every Group U / V tile carries the v10 §B.1 limitation banner with the canonical professional-governs replacement copy per the override.
+Tile counts at v12 audit close: 385 spec-numbered utilities + visible tiles (was 271 after v5). 86 new visible tiles across Groups U / V / W / X / Y (18 + 20 + 18 + 15 + 15). Every new tile has a `CITATIONS` entry; every entry covers the six §3 fields; every entry uses one of the twenty-five GOVERNANCE variants (the twenty-one pre-v12 variants plus four new v12 variants: `veterinary`, `ems_prehospital`, `real_estate`, and `education`; the `aviation` variant was added earlier in v9). The per-group coverage assertions in `test/unit/citations.test.js`, together with `check-citation-coverage` in the lint chain, fail the build if a tile is added without a structured citation, so v12 expansion held the v6 audit invariant throughout. (`check-citation-coverage` is the catalog-wide one; this sentence used to credit the unit test alone with a "v6 audit complete" check it does not contain.) The spec-v12 §13.1 profession-overrides extension is documented in [profession-overrides.md](profession-overrides.md); every Group U / V tile carries the v10 §B.1 limitation banner with the canonical professional-governs replacement copy per the override.

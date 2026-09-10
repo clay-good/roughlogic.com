@@ -477,6 +477,15 @@ async function main() {
   // the same population the field index covers, so it pins to the same value.
   checked += checkPattern(mcpReadme, /Recovery across all ([\d,]+) tiles is/g, live.indexedTiles, "query-fill corpus size (mcp/README.md)", errors);
 
+  // docs/v6-audit.md's 2026-09-10 header states the live catalog size twice --
+  // once as the size its per-tile tables do NOT cover, and once as what
+  // check-citation-coverage holds. A header written to stop a document reading
+  // as live is worth rather more if its own numbers stay live.
+  const v6 = await readFile(resolve(ROOT, "docs", "v6-audit.md"), "utf8");
+  checked += checkPattern(v6, /catalog is now \*\*([\d,]+) tiles\*\*/g, live.tiles, "tile count (docs/v6-audit.md)", errors);
+  checked += checkPattern(v6, /currently \*\*([\d,]+) of [\d,]+\*\*/g, live.tiles, "citation-coverage tile count (docs/v6-audit.md)", errors);
+  checked += checkPattern(v6, /currently \*\*[\d,]+ of ([\d,]+)\*\*/g, live.tiles, "citation-coverage tile count (docs/v6-audit.md)", errors);
+
   // docs/seo.md quotes the home lede, describes the related-tiles registry's
   // coverage, and counts the catalog twice more in prose. It said 1,804 in all
   // four places -- including in a sentence whose whole point is that the string

@@ -793,6 +793,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The v6 audit tracker read as a live worklist over a catalog nine times its scope, and named the wrong gate as its guardian.** `docs/v6-audit.md` opened by saying every tile "(utilities 1 through 233 across groups A-Q)" is checked and marked off there, and that v6 is done "only when every tile is green". Its per-group tables stop at the v12 close of 385 utilities; the catalog is **2,082**. A reader had no way to tell whether the other 1,697 tiles were unaudited or simply untabulated.
+
+  They are audited, by a gate rather than a table: `check-citation-coverage` fails the build unless every tile in `TOOLS` carries a `CITATIONS` entry with all four required fields, no orphans and no raw URL schemes -- **2,082 of 2,082** -- and `test/unit/citations.test.js` holds the shape beside it (six §3 fields, governance strings matching a `GOVERNANCE` variant verbatim).
+
+  **The document credited the wrong check.** Its v12 close said `test/unit/citations.test.js` carries a "v6 audit complete" coverage check that "fails the build if any future tile is added without a structured citation". That file carries *per-group* coverage assertions (A, B, F, G and others) and no catalog-wide one; the catalog-wide guarantee is `check-citation-coverage`'s. Both sentences now name what actually holds the invariant. Also corrected: "every entry registered in `TOOLS` in `app.js`" -- `TOOLS` moved to `tools-data.js` and `app.js` no longer defines it.
+
+  A dated header marks the tables as the record of how the catalog got here, in the form `docs/profession-overrides.md` used for the same problem on 2026-09-02. Its own two counts are anchored, because a header written to stop a document reading as live is worth more if its numbers stay live.
+
 - **`main` was scheduled to go red at UTC midnight on 2026-10-01, with no commit behind it.** The `ibc` and `ifc` rows in `scripts/sources-cycle.json` were due **2026-10** carrying a re-stamp of 2026-09-09, and by CF-03's own rule a re-stamp dated *before* the due date never covers it. Because `accessibility` and `integration` both declare `needs: test`, that one date would have taken the whole pipeline down -- the same shape as the 2026-09-01 six-row red.
 
   Verified against a publisher surface the earlier passes had not used: ICC's newsroom announcement of **2026-08-24** states that the 2027 International Codes will be published later this year and names **no month**. That corroborates the 2026-09-09 Digital Codes reading -- neither the IBC nor the IFC is among the released 2027 titles -- and settles what the earlier note could only infer: ICC no longer publishes an anticipated month for these two, only a year-end window. The September date came and went, so **2026-10 was a guess rather than the publisher's claim**.
