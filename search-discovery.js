@@ -740,10 +740,20 @@ export function extractQuantities(query, opts) {
       const prior = m.index >= 2 ? q[m.index - 2] : "";
       if (prior === "" || /[\s([]/.test(prior)) sign = "-";
       else continue;
-    } else if (before && /[a-z0-9.,/]/.test(before)) {
+    } else if (before && /[a-z0-9.,/^]/.test(before)) {
       // Anchored: a digit run glued to a preceding letter / number
       // punctuation is part of an identifier ("m3", "62.2" tail), not a
       // quantity.
+      //
+      // `^` is in that set because an exponent is part of a UNIT, not a value.
+      // The catalog states areas as `mm^2` and a coefficient of determination
+      // as `R^2`, and three tiles carry one in their own NAME -- so asking
+      // `answer_query` for "AWG Conductor Geometry (Diameter, Circular Mils,
+      // mm^2)", which is what an agent that read the catalog sends, scraped
+      // the 2 out of `mm^2` and returned the geometry of **AWG 2**: a
+      // confident answer to a question that named no gauge. The curated alias
+      // `5wL^4/384EI concrete` was worse -- the `4/384` after the caret parsed
+      // as a FRACTION and offered 0.010417 as a value.
       continue;
     }
     let value;

@@ -272,6 +272,33 @@ test("the MCP door and the tile page agree on the declination", async () => {
 // question carrying no numbers with a $400,000 purchase price, $80,000 down and
 // 6.5% -- none of it supplied, none of it distinguishable by the agent from an
 // answer. NO_VALUES is the true reply, and a wrong answer is worse than none.
+// The catalog-wide form of the test below, which pins a hand-listed 21 tiles
+// and only flags the REFERENCE path. That list cannot grow on its own, and the
+// reference path is not the only way to answer a question that carried nothing:
+// a tile can answer `status: OK, via: "registry"` on a value the extractor
+// scraped out of the query text when the query text was only the tile's name.
+//
+// `awg-wire-geometry` did exactly that. Its name ends "(Diameter, Circular
+// Mils, mm^2)", the extractor read the exponent as a quantity, and the tile
+// answered with the geometry of AWG 2 -- to a question that named no gauge, and
+// the question an agent sends when it has just read the catalog.
+//
+// The invariant: a tile that takes inputs must not answer OK when the question
+// is nothing but its own name. 2,062 tiles, roughly a minute.
+test("no tile answers a question that is only its own name", async () => {
+  const { answerQuery, describe } = await import("../../mcp/catalog.mjs");
+  const { TOOLS } = await import("../../tools-data.js");
+  const answered = [];
+  for (const t of TOOLS) {
+    if (!(await describe({ id: t.id })).inputs.length) continue; // reference tiles may
+    const out = await answerQuery({ query: t.name });
+    if (out.status === "OK" && out.via !== "reference") {
+      answered.push(`${t.id}: OK via ${out.via} with ${JSON.stringify(out.inputs)}`);
+    }
+  }
+  assert.deepEqual(answered, []);
+});
+
 test("a tile that takes inputs never answers from its own defaults", async () => {
   const { answerQuery, describe } = await import("../../mcp/catalog.mjs");
   const { TOOLS } = await import("../../tools-data.js");

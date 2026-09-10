@@ -195,6 +195,16 @@ Reading the minus sign moved that corpus 5,211 -> 5,223 fields and 703 -> 707
 tiles fully recovered, still at 0 wrong values, and left `measure-ranking.mjs`
 byte-identical.
 
+What the corpus cannot see, a standing test now does: **no tile answers a
+question that is only its own name.** A tile's name is what an agent sends when
+it has just read the catalog, and it carries no values, so `OK` is the wrong
+status for all 2,062 tiles that take inputs. One did. `awg-wire-geometry` is
+named "AWG Conductor Geometry (Diameter, Circular Mils, mm^2)", and the
+extractor read the exponent in `mm^2` as a quantity and returned the geometry of
+**AWG 2**. An exponent is part of a unit; it is no longer read as a value, and
+the curated alias `5wL^4/384EI concrete` no longer offers `4/384` as the
+fraction 0.010417 either.
+
 Five of five hand-written trade questions do bind a value the query text rules
 out. `wire size for a 50 amp circuit 90 feet away` puts **90 into the
 conductor's insulation temperature rating**, where 90 C is a real value and an

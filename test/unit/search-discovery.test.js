@@ -461,6 +461,26 @@ test("extractQuantities reads a minus sign, and still refuses a hyphen", () => {
   assert.deepEqual(extractQuantities("2026-01-01"), [{ value: "2026", unit: null }]);
 });
 
+test("extractQuantities: an exponent is part of a unit, not a value", () => {
+  // The catalog writes areas as `mm^2` and a coefficient of determination as
+  // `R^2`, and three tiles carry one in their own NAME. `^` was not in the
+  // anchor's reject set, so the 2 read as a quantity -- and asking
+  // `answer_query` for "AWG Conductor Geometry (Diameter, Circular Mils,
+  // mm^2)", which is exactly what an agent that read the catalog sends,
+  // returned the geometry of AWG 2. A confident answer to a question that
+  // named no gauge.
+  assert.deepEqual(extractQuantities("AWG Conductor Geometry (Diameter, Circular Mils, mm^2)"), []);
+  assert.deepEqual(extractQuantities("Pearson Correlation (r, R^2, significance)"), []);
+  // The value in front of the unit survives; only the exponent is dropped.
+  assert.deepEqual(
+    extractQuantities("area 500 mm^2 and 12 awg"),
+    [{ value: "500", unit: "mm" }, { value: "12", unit: "awg" }],
+  );
+  // A formula written into a curated alias offered its own denominator as a
+  // value: `4/384` after the caret parsed as the fraction 0.010417.
+  assert.deepEqual(extractQuantities("5wL^4/384EI concrete"), [{ value: "5", unit: "wl" }]);
+});
+
 test("extractQuantities: a signed number reports the sign's own offset", () => {
   // query-fill reads `index` to tell `length 40 width 20` from `40 length 20
   // width`, so the offset must be where the number starts -- the minus.
