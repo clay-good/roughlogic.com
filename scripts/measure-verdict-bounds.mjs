@@ -58,6 +58,8 @@ const { TOOLS } = await import(resolve(ROOT, "tools-data.js"));
 const flips = [];
 let scanned = 0;
 let probes = 0;
+let numeric_tiles = 0;
+let bounded_tiles = 0;
 
 for (const tool of TOOLS) {
   let card;
@@ -67,6 +69,12 @@ for (const tool of TOOLS) {
 
   // Both halves of the bound. Sweeping only `min` would test half the space and
   // report as though it had tested all of it.
+  const numeric = (card.inputs || []).filter((f) => f && (f.kind === "number" || (!f.kind && !f.options)));
+  if (numeric.length) {
+    numeric_tiles += 1;
+    if (numeric.some((f) => f.attrs && (f.attrs.min !== undefined || f.attrs.max !== undefined))) bounded_tiles += 1;
+  }
+
   const bounded = [];
   for (const f of card.inputs || []) {
     const attrs = f && f.attrs;
@@ -112,4 +120,10 @@ for (const f of flips) {
 console.log(
   `measure-verdict-bounds: ${scanned} tile(s) with a bounded numeric input and a string output; ` +
   `${probes} out-of-range run(s) answered instead of refusing; ${flips.length} conclusion(s) changed.`,
+);
+// A clean sweep here is only as wide as the catalog's own declarations. Say how
+// wide, so nobody reads silence as coverage.
+console.log(
+  `  Reach: ${bounded_tiles} of ${numeric_tiles} calculator(s) with numeric inputs declare any bound ` +
+  `(${(100 * (numeric_tiles - bounded_tiles) / numeric_tiles).toFixed(1)}% declare none, and cannot be probed here).`,
 );

@@ -207,6 +207,15 @@ out of "30 percent", and the tile answered `OK` on a 3000% dip. It now returns
 `run_calculator` directly if it was intended. Swept over all 2,040 curated terms
 carrying a digit (100 of which answer `OK`), that is the only one it refuses.
 
+**How far that reaches.** It fires only where a bound is *declared*, and **1,166
+of the 2,053 calculators with numeric inputs (56.8%) declare none at all** --
+`ohms-law` has four unbounded numeric fields. On those tiles this guard,
+`run_calculator`'s range warnings, and `scripts/measure-verdict-bounds.mjs` are
+all silent, because there is no stated limit for a value to violate. That is a
+gap in the *catalog's* declarations rather than in the door, and it is worth
+knowing the size of before trusting a clean sweep: a tile that reports no
+violation may simply have nothing to violate.
+
 A curated alias is the other kind of address, and it was reachable only if the
 ranker already agreed. `answer_query`'s rule for the alias corpus has always
 been *"a human wrote that phrase against that tile; nothing here outranks it"* --
