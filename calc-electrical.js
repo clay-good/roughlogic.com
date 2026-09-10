@@ -954,7 +954,7 @@ export function renderEGC(inputRegion, outputRegion, citationEl, params) {
 
 export const STANDARD_SERVICE_AMPACITIES = [60, 100, 125, 150, 175, 200, 225, 250, 300, 400];
 
-// dims: in { args: dimensionless } out: { total_VA: M L^2 T^-3, recommended_service_A: I }
+// dims: in { area_ft2: L^2, small_appliance_circuits: dimensionless, laundry_circuits: dimensionless, fixed_appliances_W: M L^2 T^-3, range_W: M L^2 T^-3, dryer_W: M L^2 T^-3, hvac_cooling_W: M L^2 T^-3, hvac_heating_W: M L^2 T^-3 } out: { total_VA: M L^2 T^-3, recommended_service_A: I }
 export function computeServiceLoad({
   area_ft2 = 0,
   small_appliance_circuits = 2,
@@ -1362,7 +1362,7 @@ export function renderLightingDensity(inputRegion, outputRegion, citationEl, par
 // over a sequence of bends. Sidewall pressure at each bend = T / R where
 // R is the bend radius in feet.
 
-// dims: in { args: dimensionless } out: { tension_lb: M L T^-2, sidewall_pressure_lb_ft: M T^-2 }
+// dims: in { cable_weight_lb_per_ft: M T^-2, run_length_ft: L, lubricant: dimensionless, straight_run_ft: L, bends: dimensionless } out: { tension_lb: M L T^-2, sidewall_pressure_lb_ft: M T^-2 }
 export function computePullingTension({
   cable_weight_lb_per_ft = 0,
   run_length_ft = 0,
@@ -2095,7 +2095,7 @@ export const transformerKvaSizingExample = {
 
 const POINT_TO_POINT_SQRT3 = 1.732;
 
-// dims: in { args: dimensionless } out: { isca_A: I, M: dimensionless }
+// dims: in { utility_kVA: M L^2 T^-3, utility_Z_pct: dimensionless, secondary_V: M L^2 T^-3 I^-1, phase: dimensionless, C_value: dimensionless, length_ft: L, parallel_sets: dimensionless } out: { isca_A: I, M: dimensionless }
 export function computeShortCircuitPP({
   utility_kVA = 0,
   utility_Z_pct = 0,
@@ -2213,7 +2213,7 @@ export const generatorMotorStartingExample = {
 
 const STD_SERVICE_AMPACITIES = [100, 125, 150, 175, 200, 225, 300, 400];
 
-// dims: in { args: dimensionless } out: { total_va: M L^2 T^-3, recommended_service_A: I }
+// dims: in { area_ft2: L^2, small_appliance_circuits: dimensionless, laundry_circuit: dimensionless, fixed_appliances_W: M L^2 T^-3, fixed_appliance_count: dimensionless, range_W: M L^2 T^-3, dryer_W: M L^2 T^-3, largest_motor_W: M L^2 T^-3, hvac_cooling_W: M L^2 T^-3, hvac_heating_W: M L^2 T^-3, service_voltage: M L^2 T^-3 I^-1 } out: { total_va: M L^2 T^-3, recommended_service_A: I }
 export function computeServiceLoadStandard({
   area_ft2 = 0,
   small_appliance_circuits = 2,
@@ -3161,7 +3161,7 @@ ELECTRICAL_RENDERERS["grounding-electrode"] = renderGroundingElectrode;
 // since a steel raceway raises X). Table 9 is paywalled, so the user enters the
 // R and X for their conductor / conduit pair; the tile does not bundle it.
 
-// dims: in { args: dimensionless } out: { drop_v: M L^2 T^-3 I^-1, drop_percent: dimensionless, voltage_at_load_v: M L^2 T^-3 I^-1 }
+// dims: in { system_voltage_v: M L^2 T^-3 I^-1, current_a: I, length_ft: L, r_ohm_per_kft: M L T^-3 I^-2, x_ohm_per_kft: M L T^-3 I^-2, power_factor: dimensionless, phase: dimensionless } out: { drop_v: M L^2 T^-3 I^-1, drop_percent: dimensionless, voltage_at_load_v: M L^2 T^-3 I^-1 }
 export function computeVoltageDropReactance({
   system_voltage_v = 0,
   current_a = 0,
@@ -3501,7 +3501,7 @@ function _fillFactor(n) {
   return 0.35;
 }
 
-// dims: in { args: dimensionless } out: { ambient_factor: dimensionless, fill_factor: dimensionless, combined_factor: dimensionless, adjusted_ampacity_a: I }
+// dims: in { base_ampacity_a: I, temp_column: T, ambient_c: T, conductor_count: dimensionless } out: { ambient_factor: dimensionless, fill_factor: dimensionless, combined_factor: dimensionless, adjusted_ampacity_a: I }
 export function computeAmbientAmpacityAdjust({
   base_ampacity_a = 0,
   temp_column = 75,
@@ -3616,7 +3616,7 @@ ELECTRICAL_RENDERERS["ambient-ampacity-adjust"] = renderAmbientAmpacityAdjust;
 // comparison line runs the standard 220.42 method and the service is sized to
 // the larger of the two.
 
-// dims: in { args: dimensionless } out: { optional_total_va: M L^2 T^-3, optional_demand_a: I, recommended_a: I }
+// dims: in { area_ft2: L^2, small_appliance_circuits: dimensionless, laundry_circuits: dimensionless, fixed_appliances_kw: M L^2 T^-3, range_kw: M L^2 T^-3, dryer_kw: M L^2 T^-3, water_heater_kw: M L^2 T^-3, hvac_heating_kw: M L^2 T^-3, hvac_cooling_kw: M L^2 T^-3, ev_charger_a: I, service_voltage: M L^2 T^-3 I^-1 } out: { optional_total_va: M L^2 T^-3, optional_demand_a: I, recommended_a: I }
 export function computeServiceLoadOptional({
   area_ft2 = 0,
   small_appliance_circuits = 2,
@@ -5966,7 +5966,7 @@ function _v951renderSoilResistivityWenner(inputRegion, outputRegion, citationEl)
 ELECTRICAL_RENDERERS["soil-resistivity-wenner"] = _v951renderSoilResistivityWenner;
 
 // ===================== spec-v981: maximum one-way circuit length for a voltage-drop target =====================
-// dims: in { args: dimensionless } out: { vd_target_volts: dimensionless, max_length_ft: L }
+// dims: in { source_voltage_v: M L^2 T^-3 I^-1, target_vd_pct: dimensionless, current_a: I, conductor_cmil: L^2, k_constant: M L^3 T^-3 I^-2, phases: dimensionless } out: { vd_target_volts: M L^2 T^-3 I^-1, max_length_ft: L }
 export function computeMaxCircuitLengthForVd({ source_voltage_v = 120, target_vd_pct = 3, current_a = 20, conductor_cmil = 6530, k_constant = 12.9, phases = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(source_voltage_v > 0)) return { error: "Source voltage must be positive (V)." };
@@ -6016,7 +6016,7 @@ function _v981renderMaxCircuitLengthForVd(inputRegion, outputRegion, citationEl)
 ELECTRICAL_RENDERERS["max-circuit-length-for-vd"] = _v981renderMaxCircuitLengthForVd;
 
 // ===================== spec-v985: open-delta (V-V) transformer bank capacity =====================
-// dims: in { args: dimensionless } out: { available_3ph_kva: M L^2 T^-3, per_transformer_kva: M L^2 T^-3, utilization_pct: dimensionless }
+// dims: in { transformer_kva_each: M L^2 T^-3, required_load_kva: M L^2 T^-3 } out: { available_3ph_kva: M L^2 T^-3, per_transformer_kva: M L^2 T^-3, utilization_pct: dimensionless }
 export function computeOpenDeltaTransformer({ transformer_kva_each = 25, required_load_kva = 40 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(transformer_kva_each > 0)) return { error: "Transformer rating must be positive (kVA)." };
@@ -6066,7 +6066,7 @@ function _v985renderOpenDeltaTransformer(inputRegion, outputRegion, citationEl) 
 ELECTRICAL_RENDERERS["open-delta-transformer"] = _v985renderOpenDeltaTransformer;
 
 // ===================== spec-v989: conduit nipple 60% fill (NEC Chapter 9 Note 4) =====================
-// dims: in { args: dimensionless } out: { fill_area_sqin: L^2, fill_pct: dimensionless, nipple_max_conductors: dimensionless, normal_max_conductors: dimensionless }
+// dims: in { conduit_area_sqin: L^2, conductor_area_sqin: L^2, conductor_count: dimensionless } out: { fill_area_sqin: L^2, fill_pct: dimensionless, nipple_max_conductors: dimensionless, normal_max_conductors: dimensionless }
 export function computeConduitNipple60Fill({ conduit_area_sqin = 0.864, conductor_area_sqin = 0.0211, conductor_count = 20 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(conduit_area_sqin > 0)) return { error: "Conduit total area must be positive (sq in, NEC Ch. 9 Table 4)." };

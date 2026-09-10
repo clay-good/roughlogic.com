@@ -797,6 +797,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
   The classification, the counts and the named four are now in the gate, in both of its messages and in the README's trust table. The budget still ratchets; what changed is that it no longer implies work that cannot be done.
 
+- **Stub annotations 122 -> 112: the NEC service-load family, and a voltage target declared a pure number.** The ninth tranche is `calc-electrical.js` -- the standard, optional and general service-load calculations, short-circuit point-to-point, voltage drop with reactance, ambient ampacity adjustment, cable pulling tension, open-delta banking, and the 60% nipple fill. `computeMaxCircuitLengthForVd` declared `vd_target_volts` as `dimensionless`; it is the volts the run is allowed to drop, and dividing by it is what turns circular mils into feet.
+
+  Two compounds the tail rule cannot see, written out here for the first time: `r_ohm_per_kft` and `x_ohm_per_kft` are `M L T^-3 I^-2` (an ohm over a length), and `k_constant` -- the NEC's ohm-circular-mil-per-foot resistivity -- is `M L^3 T^-3 I^-2`, which is what makes `vd x cmil / (2 k I)` come out a length.
+
 - **Stub annotations 133 -> 122, and a stage deck was carrying pounds as mass in a function that reported them as force.** The eighth tranche is `calc-stage.js`. Declaring `design_psf` put it against `calc-construction`'s `M L^-1 T^-2` for the same key, and the collision was real: `computeStageDeckLiveLoad` declared its live load and per-leg load as masses, which the corpus's own `ground_snow_psf` and `dead_load_psf` -- both forces per area -- contradict. Nine keys in that module now read as forces, and the function is self-consistent for the first time: `area x design_psf` gives the load, and the load over the legs gives the reaction.
 
   `computeOutdoorStageWind` had the same split **inside one function**: `wind_force_lb: M L T^-2` beside `required_ballast_lb: M`, where the ballast is derived by dividing an overturning moment by a base width and is therefore a force too.
