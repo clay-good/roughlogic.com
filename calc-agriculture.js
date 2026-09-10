@@ -1867,7 +1867,7 @@ AGRICULTURE_RENDERERS["pearson-square-ration"] = renderPearsonSquareRation;
 // --- v20 L.3: Livestock water requirement (`livestock-water-requirement`) ---
 // Table method: interpolate per-head gallons between two user-supplied
 // temperature breakpoints. Intake-ratio method: gal = DMI * ratio / 8.345.
-// dims: in { method: dimensionless, head: dimensionless, temp_f: T, t_low_f: T, gal_low: L^3, t_high_f: T, gal_high: L^3, dmi_lb: M, water_per_dmi: dimensionless, lactating: dimensionless } out: { per_head_gpd: L^3, herd_gpd: L^3 }
+// dims: in { method: dimensionless, head: dimensionless, temp_f: T, t_low_f: T, gal_low: L^3, t_high_f: T, gal_high: L^3, dmi_lb: M, water_per_dmi: dimensionless, lactating: dimensionless } out: { per_head_gpd: L^3 T^-1, herd_gpd: L^3 T^-1 }
 export function computeLivestockWaterRequirement({ method = "table", head = 1, temp_f = 0, t_low_f = 0, gal_low = 0, t_high_f = 0, gal_high = 0, dmi_lb = 0, water_per_dmi = 3.5, lactating = false } = {}) {
   const n = Math.round(Number(head) || 0);
   if (!(n >= 1)) return { error: "Head count must be at least 1." };
@@ -2053,7 +2053,7 @@ AGRICULTURE_RENDERERS["two-stroke-mix-ratio-check"] = renderTwoStrokeMixRatioChe
 // reference; editable planning values, NOT the label's mandatory buffer.
 const _v84_DROPLET_BASE = { very_coarse: 5, coarse: 10, medium: 20, fine: 40 };
 
-// dims: in { rated_gpm: L^3 T^-1, rated_psi: dimensionless, new_psi: dimensionless, target_gpm: dimensionless } out: { new_gpm: L^3 T^-1, req_psi: dimensionless }
+// dims: in { rated_gpm: L^3 T^-1, rated_psi: M L^-1 T^-2, new_psi: M L^-1 T^-2, target_gpm: L^3 T^-1 } out: { new_gpm: L^3 T^-1, req_psi: M L^-1 T^-2 }
 export function computeNozzleFlowPressure({ rated_gpm, rated_psi, new_psi, target_gpm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const ratedGpm = Number(rated_gpm);
@@ -2073,7 +2073,7 @@ export function computeNozzleFlowPressure({ rated_gpm, rated_psi, new_psi, targe
   };
 }
 
-// dims: in { base_buffer_ft: L, wind_mph: dimensionless, boom_height_in: L, ref_height_in: L } out: { buffer_ft: L }
+// dims: in { base_buffer_ft: L, wind_mph: L T^-1, boom_height_in: L, ref_height_in: L } out: { buffer_ft: L }
 export function computeSprayDriftBuffer({ base_buffer_ft = 0, droplet_class = "medium", wind_mph, boom_height_in = 20, ref_height_in = 20 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const classBase = _v84_DROPLET_BASE[String(droplet_class)] || _v84_DROPLET_BASE.medium;
@@ -2093,7 +2093,7 @@ export function computeSprayDriftBuffer({ base_buffer_ft = 0, droplet_class = "m
   };
 }
 
-// dims: in { boom_width_ft: L, speed_mph: dimensionless, field_efficiency_pct: dimensionless, field_acres: dimensionless, tank_gal: L^3, gpa: dimensionless } out: { theoretical_ac_hr: dimensionless, effective_ac_hr: dimensionless, spray_time_hr: dimensionless, acres_per_tank: dimensionless, tanks_needed: dimensionless }
+// dims: in { boom_width_ft: L, speed_mph: L T^-1, field_efficiency_pct: dimensionless, field_acres: dimensionless, tank_gal: L^3, gpa: dimensionless } out: { theoretical_ac_hr: dimensionless, effective_ac_hr: dimensionless, spray_time_hr: dimensionless, acres_per_tank: dimensionless, tanks_needed: dimensionless }
 export function computeSprayerFieldCapacity({ boom_width_ft, speed_mph, field_efficiency_pct = 70, field_acres, tank_gal, gpa } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const boom = Number(boom_width_ft);
@@ -2692,7 +2692,7 @@ function renderMulchTopsoilVolume(inputRegion, outputRegion, citationEl) {
 }
 AGRICULTURE_RENDERERS["mulch-topsoil-volume"] = renderMulchTopsoilVolume;
 
-// dims: in { bushels: dimensionless, lb_per_bushel: dimensionless, mi_percent: dimensionless, mf_percent: dimensionless, btu_per_lb: dimensionless, price_per_gal: dimensionless } out: { weight_lb: M, water_lb: M, energy_btu: M L^2 T^-2, propane_gal: dimensionless }
+// dims: in { bushels: dimensionless, lb_per_bushel: dimensionless, mi_percent: dimensionless, mf_percent: dimensionless, btu_per_lb: dimensionless, price_per_gal: dimensionless } out: { weight_lb: M, water_lb: M, energy_btu: M L^2 T^-2, propane_gal: L^3 }
 export function computeGrainDryingEnergy({ bushels = 0, lb_per_bushel = 56, mi_percent = 0, mf_percent = 0, btu_per_lb = 1500, price_per_gal = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const bu = Number(bushels) || 0;
@@ -3142,7 +3142,7 @@ function _v914renderTractorBallast(inputRegion, outputRegion, citationEl) {
 AGRICULTURE_RENDERERS["tractor-ballast"] = _v914renderTractorBallast;
 
 // ===================== spec-v940: anhydrous ammonia product rate from target nitrogen =====================
-// dims: in { n_target_lb_per_ac: dimensionless, tank_gal: dimensionless } out: { product_lb_per_ac: dimensionless, product_gal_per_ac: dimensionless, acres_per_tank: dimensionless }
+// dims: in { n_target_lb_per_ac: dimensionless, tank_gal: L^3 } out: { product_lb_per_ac: dimensionless, product_gal_per_ac: dimensionless, acres_per_tank: dimensionless }
 export function computeAnhydrousAmmoniaRate({ n_target_lb_per_ac = 180, tank_gal = 1000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(n_target_lb_per_ac > 0)) return { error: "Target nitrogen must be positive (lb N/acre)." };
@@ -3234,7 +3234,7 @@ function _v964renderMadIrrigationTrigger(inputRegion, outputRegion, citationEl) 
 AGRICULTURE_RENDERERS["mad-irrigation-trigger"] = _v964renderMadIrrigationTrigger;
 
 // ===================== spec-v974: fertigation / chemigation injection rate =====================
-// dims: in { args: dimensionless } out: { total_product_gal: dimensionless, injection_rate_gph: dimensionless, injection_rate_gpm: dimensionless }
+// dims: in { args: dimensionless } out: { total_product_gal: L^3, injection_rate_gph: dimensionless, injection_rate_gpm: dimensionless }
 export function computeFertigationInjectionRate({ product_rate_gal_per_acre = 5, area_acres = 40, set_time_hours = 6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(product_rate_gal_per_acre > 0)) return { error: "Product rate must be positive (gal/acre)." };

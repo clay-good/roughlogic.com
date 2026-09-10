@@ -1517,7 +1517,7 @@ function _v915renderOutdoorResetRatio(inputRegion, outputRegion, citationEl) {
 HVACSYSTEMS_RENDERERS["outdoor-reset-ratio"] = _v915renderOutdoorResetRatio;
 
 // ===================== spec-v956: hydronic injection-mixing loop flow =====================
-// dims: in { args: dimensionless } out: { injection_gpm: dimensionless, injection_pct_of_secondary: dimensionless }
+// dims: in { args: dimensionless } out: { injection_gpm: L^3 T^-1, injection_pct_of_secondary: dimensionless }
 export function computeHydronicInjectionMixing({ secondary_gpm = 10, secondary_supply_f = 110, secondary_return_f = 90, primary_supply_f = 180 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(secondary_gpm > 0)) return { error: "Secondary loop flow must be positive (gpm)." };

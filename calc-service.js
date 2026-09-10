@@ -358,7 +358,7 @@ const _RANGE_COL_C_KW = {
   11: 26, 12: 27, 13: 28, 14: 29, 15: 30, 16: 31,
 };
 
-// dims: in { num_ranges: dimensionless, nameplate_kw: dimensionless, supply_v: M L^2 T^-3 I^-1 } out: { col_c_kw: dimensionless, demand_kw: dimensionless, demand_a: I }
+// dims: in { num_ranges: dimensionless, nameplate_kw: M L^2 T^-3, supply_v: M L^2 T^-3 I^-1 } out: { col_c_kw: M L^2 T^-3, demand_kw: M L^2 T^-3, demand_a: I }
 export function computeRangeDemand22055({ num_ranges = 1, nameplate_kw = 0, supply_v = 240 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const n = Math.round(Number(num_ranges) || 0);

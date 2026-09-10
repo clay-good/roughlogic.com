@@ -1294,7 +1294,7 @@ function _v23SimpleRenderer(spec) {
 // =====================================================================
 // v23 D.1: Drying-chamber fresh-air / CO2 buildup (ASHRAE 62.1 mass balance)
 // =====================================================================
-// dims: in { containment_volume_ft3: dimensionless, co2_generation_cfm: dimensionless, target_indoor_ppm: dimensionless, outdoor_ppm: dimensionless } out: { fresh_air_cfm: dimensionless, ach: dimensionless, above_target: dimensionless }
+// dims: in { containment_volume_ft3: L^3, co2_generation_cfm: L^3 T^-1, target_indoor_ppm: dimensionless, outdoor_ppm: dimensionless } out: { fresh_air_cfm: L^3 T^-1, ach: dimensionless, above_target: dimensionless }
 export function computeDryingChamberCO2({ containment_volume_ft3 = 0, co2_generation_cfm = 0, target_indoor_ppm = 1000, outdoor_ppm = 420 } = {}) {
   const V = Number(containment_volume_ft3) || 0;
   const gen = Number(co2_generation_cfm) || 0;

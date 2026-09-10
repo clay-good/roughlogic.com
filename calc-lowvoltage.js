@@ -1340,7 +1340,7 @@ function _v947renderRtdResistanceToTemp(inputRegion, outputRegion, citationEl) {
 LOWVOLTAGE_RENDERERS["rtd-resistance-to-temp"] = _v947renderRtdResistanceToTemp;
 
 // ===================== spec-v948: pulse (turbine/paddlewheel) flowmeter K-factor scaling =====================
-// dims: in { args: dimensionless } out: { flow_gpm: dimensionless, flow_gph: dimensionless }
+// dims: in { args: dimensionless } out: { flow_gpm: L^3 T^-1, flow_gph: L^3 T^-1 }
 export function computePulseFlowmeterRate({ frequency_hz = 100, k_factor_pulses_per_gal = 200 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(frequency_hz >= 0)) return { error: "Pulse frequency cannot be negative (Hz)." };
@@ -1536,7 +1536,7 @@ function renderThermistorSteinhartHart(inputRegion, outputRegion, citationEl) {
 LOWVOLTAGE_RENDERERS["thermistor-steinhart-hart"] = renderThermistorSteinhartHart;
 
 // ===================== spec-v958: hydrostatic DP level transmitter (head to level) =====================
-// dims: in { args: dimensionless } out: { level_ft: dimensionless, level_pct: dimensionless, span_psi: dimensionless }
+// dims: in { args: dimensionless } out: { level_ft: dimensionless, level_pct: dimensionless, span_psi: M L^-1 T^-2 }
 export function computeDpLevelHydrostatic({ measured_pressure_psi = 4.33, specific_gravity = 1.0, max_level_ft = 20 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(measured_pressure_psi >= 0)) return { error: "Measured pressure cannot be negative (psi)." };

@@ -327,7 +327,7 @@ FIRESPRINKLER_RENDERERS["smoke-detector-spacing-count"] = _simpleRenderer({
 });
 
 // ===================== spec-v934: dry-pipe / preaction air compressor CFM =====================
-// dims: in { dry_volume_gal: L^3, normal_pressure_psig: dimensionless, restore_minutes: T } out: { system_ft3: L^3, free_air_cfm: L^3 T^-1 }
+// dims: in { dry_volume_gal: L^3, normal_pressure_psig: M L^-1 T^-2, restore_minutes: T } out: { system_ft3: L^3, free_air_cfm: L^3 T^-1 }
 export function computeDrypipeAirCompressor({ dry_volume_gal = 400, normal_pressure_psig = 40, restore_minutes = 30 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(dry_volume_gal > 0)) return { error: "Dry system volume must be positive (gal)." };
@@ -364,7 +364,7 @@ FIRESPRINKLER_RENDERERS["drypipe-air-compressor"] = _simpleRenderer({
 });
 
 // ===================== spec-v939: jockey (pressure-maintenance) pump sizing =====================
-// dims: in { fire_pump_gpm: L^3 T^-1, churn_psi: dimensionless, min_static_psi: dimensionless } out: { jockey_gpm: L^3 T^-1, jockey_stop_psi: dimensionless, jockey_start_psi: dimensionless, fire_pump_start_psi: dimensionless }
+// dims: in { fire_pump_gpm: L^3 T^-1, churn_psi: M L^-1 T^-2, min_static_psi: M L^-1 T^-2 } out: { jockey_gpm: L^3 T^-1, jockey_stop_psi: M L^-1 T^-2, jockey_start_psi: M L^-1 T^-2, fire_pump_start_psi: M L^-1 T^-2 }
 export function computeJockeyPumpSizing({ fire_pump_gpm = 750, churn_psi = 120, min_static_psi = 50 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fire_pump_gpm > 0)) return { error: "Fire pump rated flow must be positive (gpm)." };

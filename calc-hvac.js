@@ -316,7 +316,7 @@ export const seerEerExample = {
 
 // --- Utility 28: Heat Pump Balance Point ---
 
-// dims: in { heating_capacity_btu_hr_at_design: M L^2 T^-3, design_outdoor_F: T, building_heat_loss_btu_hr: M L^2 T^-3, indoor_F: T } out: { balance_point_F: T, aux_heat_btu_hr: M L^2 T^-3, aux_strip_kw: dimensionless }
+// dims: in { heating_capacity_btu_hr_at_design: M L^2 T^-3, design_outdoor_F: T, building_heat_loss_btu_hr: M L^2 T^-3, indoor_F: T } out: { balance_point_F: T, aux_heat_btu_hr: M L^2 T^-3, aux_strip_kw: M L^2 T^-3 }
 export function computeBalancePoint({ heating_capacity_btu_hr_at_design, design_outdoor_F, building_heat_loss_btu_hr, indoor_F = 65 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Capacity falls roughly linearly with outdoor temperature; building load
@@ -406,7 +406,7 @@ export const combustionAirExample = {
 // (volume) method treats a space as adequate at 50 ft^3 per 1000 BTU/hr, so
 // the largest appliance input a confined space supports WITHOUT added
 // combustion-air openings is (room_volume_ft3 / 50) * 1000.
-// dims: in { room_volume_ft3: dimensionless } out: { max_btu_input: dimensionless, max_kbtu_input: dimensionless }
+// dims: in { room_volume_ft3: L^3 } out: { max_btu_input: dimensionless, max_kbtu_input: dimensionless }
 export function computeCombustionAirMaxInput({ room_volume_ft3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const V = Number(room_volume_ft3);
@@ -2972,7 +2972,7 @@ function renderFanMotorBhp(inputRegion, outputRegion, citationEl) {
 }
 HVAC_RENDERERS["fan-motor-bhp"] = renderFanMotorBhp;
 
-// dims: in { power_hp: dimensionless, power_basis: dimensionless, tsp_inwc: M*L^-1*T^-2, eta_fan: dimensionless, eta_drive: dimensionless } out: { max_cfm: L^3*T^-1, bhp: dimensionless }
+// dims: in { power_hp: M L^2 T^-3, power_basis: dimensionless, tsp_inwc: M*L^-1*T^-2, eta_fan: dimensionless, eta_drive: dimensionless } out: { max_cfm: L^3*T^-1, bhp: dimensionless }
 export function computeFanMotorMaxAirflow({ power_hp = 0, power_basis = "motor", tsp_inwc = 0, eta_fan = 0.65, eta_drive = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const power = Number(power_hp) || 0;
@@ -4234,7 +4234,7 @@ HVAC_RENDERERS["adpi-diffuser-selection"] = _renderAdpiSelection;
 
 // ===================== spec-v483: vibration isolation efficiency (ASHRAE) =====================
 
-// dims: in { equipment_rpm: dimensionless, static_deflection_in: L } out: { fn_hz: T^-1, fn_cpm: T^-1, disturbing_hz: T^-1, ratio: dimensionless, transmissibility: dimensionless, efficiency_pct: dimensionless }
+// dims: in { equipment_rpm: T^-1, static_deflection_in: L } out: { fn_hz: T^-1, fn_cpm: T^-1, disturbing_hz: T^-1, ratio: dimensionless, transmissibility: dimensionless, efficiency_pct: dimensionless }
 export function computeVibrationIsolation({ equipment_rpm = 0, static_deflection_in = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
   const rpm = Number(equipment_rpm) || 0;
@@ -4487,7 +4487,7 @@ HVAC_RENDERERS["coil-bypass-factor"] = _rEnv({
 
 // ===================== spec-v384: fan affinity laws (HVAC airflow field-methods trio) =====================
 
-// dims: in { q1_cfm: L^3 T^-1, sp1_inwg: dimensionless, bhp1_hp: dimensionless, n1: T^-1, n2: T^-1 } out: { r: dimensionless, q2_cfm: L^3 T^-1, sp2_inwg: dimensionless, bhp2_hp: dimensionless }
+// dims: in { q1_cfm: L^3 T^-1, sp1_inwg: dimensionless, bhp1_hp: M L^2 T^-3, n1: T^-1, n2: T^-1 } out: { r: dimensionless, q2_cfm: L^3 T^-1, sp2_inwg: dimensionless, bhp2_hp: M L^2 T^-3 }
 export function computeFanAffinityLaws({ q1_cfm = 0, sp1_inwg = 0, bhp1_hp = 0, n1 = 0, n2 = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
   const N1 = Number(n1) || 0, N2 = Number(n2) || 0;

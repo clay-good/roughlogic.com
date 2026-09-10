@@ -2140,7 +2140,7 @@ STAGE_RENDERERS["rf-antenna-cable-loss"] = _r({
 });
 
 // ===================== spec-v1370: chain hoist lift time, power, and duty cycle =====================
-// dims: in { args: dimensionless } out: { lift_time_min: T, hoisting_hp: dimensionless, allowed_on_time_min: T, lifts_per_period: dimensionless }
+// dims: in { args: dimensionless } out: { lift_time_min: T, hoisting_hp: M L^2 T^-3, allowed_on_time_min: T, lifts_per_period: dimensionless }
 export function computeChainHoistLiftTime({ lift_height_ft = 0, hoist_speed_fpm = 16, load_lb = 0, duty_cycle = 0.4, rating_period_min = 10, hoists = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(lift_height_ft > 0)) return { error: "Lift height must be positive." };

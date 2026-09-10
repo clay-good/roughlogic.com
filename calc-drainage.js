@@ -380,7 +380,7 @@ function renderSewageForceMainVelocity(inputRegion, outputRegion, citationEl) {
 DRAINAGE_RENDERERS["sewage-force-main-velocity"] = renderSewageForceMainVelocity;
 
 // ===================== spec-v976: dry well / infiltration trench sizing =====================
-// dims: in { args: dimensionless } out: { excavation_volume_ft3: dimensionless, footprint_sf: dimensionless, draindown_time_hr: dimensionless }
+// dims: in { args: dimensionless } out: { excavation_volume_ft3: L^3, footprint_sf: L^2, draindown_time_hr: dimensionless }
 export function computeDrywellInfiltration({ runoff_volume_ft3 = 200, void_ratio = 0.35, trench_depth_ft = 4, infiltration_rate_in_hr = 0.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(runoff_volume_ft3 > 0)) return { error: "Runoff (storage) volume must be positive (ft^3)." };

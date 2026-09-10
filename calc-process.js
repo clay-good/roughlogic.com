@@ -859,7 +859,7 @@ const _SAND_GAS_R_IN3_PSI_LBMOL_R = 10.7316 * 1728; // 10.7316 ft^3 psi / (lbmol
 const _SAND_WATER_LB_PER_LBMOL = 18.0153;
 const _SAND_CM3_PER_IN3 = 16.387064;
 const _SAND_RANKINE_OFFSET = 459.67;
-// dims: in { mould_sand_lb: M, moisture_pct: dimensionless, binder_lb: M, binder_gas_cm3_g: L^3 M^-1, pour_temp_f: T, vent_area_in2: L^2, permeability_number: dimensionless, fineness_change_pct: dimensionless } out: { water_lb: M, steam_volume_in3: L^3, binder_gas_in3: L^3, total_gas_in3: L^3, gas_per_vent_in2: L, new_permeability_number: dimensionless }
+// dims: in { mould_sand_lb: M, moisture_pct: dimensionless, binder_lb: M, binder_gas_cm3_g: L^3 M^-1, pour_temp_f: T, vent_area_in2: L^2, permeability_number: dimensionless, fineness_change_pct: dimensionless } out: { water_lb: M, steam_volume_in3: L^3, binder_gas_in3: L^3, total_gas_in3: L^3, gas_per_vent_in2: L^2, new_permeability_number: dimensionless }
 export function computeSandPermeabilityVent({
   mould_sand_lb = 0, moisture_pct = 0, binder_lb = 0, binder_gas_cm3_g = 0,
   pour_temp_f = 2600, vent_area_in2 = 0, permeability_number = 0, fineness_change_pct = 0,

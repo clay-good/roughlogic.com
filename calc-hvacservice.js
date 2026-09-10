@@ -1157,7 +1157,7 @@ HVACSERVICE_RENDERERS["flue-gas-dew-point"] = _simpleRenderer({
 });
 
 // ===================== spec-v1005: condensing appliance flue condensate rate =====================
-// dims: in { args: dimensionless } out: { water_produced_lb_hr: dimensionless, condensate_gph: dimensionless }
+// dims: in { args: dimensionless } out: { water_produced_lb_hr: dimensionless, condensate_gph: L^3 T^-1 }
 export function computeCondensingFlueCondensate({ input_btu_hr = 100000, water_lb_per_therm = 9.4, condensing_fraction = 0.85 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(input_btu_hr > 0)) return { error: "Fuel input must be positive (BTU/hr)." };

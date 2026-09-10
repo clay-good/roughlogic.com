@@ -1010,7 +1010,7 @@ const SANITIZER_BANDS = {
   quat: { lo: 150, hi: 400, label: "quaternary ammonium", contact: "per label, typically at least 30 seconds" },
   iodine: { lo: 12.5, hi: 25, label: "iodine", contact: "at least 30 seconds" },
 };
-// dims: in { sanitizer_type: dimensionless, active_pct: dimensionless, target_ppm: dimensionless, batch_gallons: dimensionless } out: { oz_per_gal: dimensionless, total_oz: dimensionless }
+// dims: in { sanitizer_type: dimensionless, active_pct: dimensionless, target_ppm: dimensionless, batch_gallons: L^3 } out: { oz_per_gal: dimensionless, total_oz: dimensionless }
 export function computeKitchenSanitizerPpm({ sanitizer_type = "chlorine", active_pct = 0, target_ppm = 0, batch_gallons = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const active = Number(active_pct) || 0;
@@ -1353,7 +1353,7 @@ KITCHEN_RENDERERS["ice-machine-sizing"] = _r({
 });
 
 // ===================== spec-v1351: warewasher hot-water demand and booster sizing =====================
-// dims: in { args: dimensionless } out: { delta_t_f: T, booster_btuh: dimensionless, booster_kw: dimensionless, gas_input_btuh: dimensionless, hourly_hot_water_gal: L^3 }
+// dims: in { args: dimensionless } out: { delta_t_f: T, booster_btuh: dimensionless, booster_kw: M L^2 T^-3, gas_input_btuh: dimensionless, hourly_hot_water_gal: L^3 }
 export function computeWarewasherHotWater({ rinse_gpm = 0, supply_temp_f = 140, rinse_temp_f = 180, racks_per_hour = 0, gal_per_rack = 0, booster_efficiency = 0.8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rinse_gpm > 0)) return { error: "Final-rinse flow must be positive." };
@@ -2033,7 +2033,7 @@ KITCHEN_RENDERERS["steam-kettle-heatup"] = _r({
 });
 
 // ===================== spec-v1363: hot-holding connected load, demand, and kitchen heat gain =====================
-// dims: in { args: dimensionless } out: { connected_kw: dimensionless, demand_kw: dimensionless, demand_amps: I, sensible_btuh: dimensionless, tons: dimensionless }
+// dims: in { args: dimensionless } out: { connected_kw: M L^2 T^-3, demand_kw: M L^2 T^-3, demand_amps: I, sensible_btuh: dimensionless, tons: dimensionless }
 export function computeHotHoldingEnergy({ equipment = [], diversity_factor = 0.65, voltage = 208, phase = "three" } = {}) {
   if (!Array.isArray(equipment) || equipment.length === 0) return { error: "List at least one piece of hot-holding equipment." };
   if (!(Number(diversity_factor) > 0 && Number(diversity_factor) <= 1)) return { error: "Diversity factor must be between 0 and 1." };

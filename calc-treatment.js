@@ -25,7 +25,7 @@ export const TREATMENT_RENDERERS = {};
 // --- v20 M.1: Weir / flume open-channel flow (`weir-flow`) ---
 // 90deg V-notch Q = 2.49*H^2.48; rectangular Francis Q = 3.33*(L-0.2H)*H^1.5
 // (contracted) or 3.33*L*H^1.5 (suppressed). 1 cfs = 448.831 GPM.
-// dims: in { weir_type: dimensionless, head_ft: L, crest_length_ft: L, coeff: dimensionless } out: { flow_cfs: L^3*T^-1, flow_gpm: L^3 T^-1*T^-1 }
+// dims: in { weir_type: dimensionless, head_ft: L, crest_length_ft: L, coeff: dimensionless } out: { flow_cfs: L^3*T^-1, flow_gpm: L^3 T^-1 }
 export function computeWeirFlow({ weir_type = "vnotch90", head_ft = 0, crest_length_ft = 0, coeff = 0 } = {}) {
   const H = Number(head_ft) || 0;
   const L = Number(crest_length_ft) || 0;
@@ -236,7 +236,7 @@ TREATMENT_RENDERERS["broad-crested-weir"] = renderBroadCrestedWeir;
 // --- spec-v658 M: weir head from a target flow (inverse of weir-flow) ---
 // V-notch H = (Q/C)^(1/2.48); rect suppressed H = (Q/(C L))^(2/3); rect
 // contracted solves L-0.2H by a few fixed-point passes seeded from suppressed.
-// dims: in { weir_type: dimensionless, target_flow_cfs: L^3*T^-1, crest_length_ft: L, coeff: dimensionless } out: { head_ft: L, flow_gpm: L^3 T^-1*T^-1, flow_mgd: L^3*T^-1 }
+// dims: in { weir_type: dimensionless, target_flow_cfs: L^3*T^-1, crest_length_ft: L, coeff: dimensionless } out: { head_ft: L, flow_gpm: L^3 T^-1, flow_mgd: L^3*T^-1 }
 export function computeWeirHeadFromFlow({ weir_type = "vnotch90", target_flow_cfs = 0, crest_length_ft = 0, coeff = 0 } = {}) {
   const Q = Number(target_flow_cfs) || 0;
   const L = Number(crest_length_ft) || 0;
@@ -508,7 +508,7 @@ const renderPoolAlkalinityAdjust = _rPool({
 });
 TREATMENT_RENDERERS["pool-alkalinity-adjust"] = renderPoolAlkalinityAdjust;
 
-// dims: in { gallons: dimensionless, current_cya_ppm: dimensionless, target_cya_ppm: dimensionless } out: { delta_ppm: dimensionless, cya_lb: dimensionless, drain_gallons: dimensionless }
+// dims: in { gallons: dimensionless, current_cya_ppm: dimensionless, target_cya_ppm: dimensionless } out: { delta_ppm: dimensionless, cya_lb: dimensionless, drain_gallons: L^3 }
 export function computePoolCyaDose({ gallons = 0, current_cya_ppm = 0, target_cya_ppm = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   if (current_cya_ppm < 0 || target_cya_ppm < 0) return { error: "Cyanuric acid readings must be non-negative." };
@@ -545,7 +545,7 @@ const renderPoolCyaDose = _rPool({
 });
 TREATMENT_RENDERERS["pool-cya-dose"] = renderPoolCyaDose;
 
-// dims: in { gallons: dimensionless, current_salt_ppm: dimensionless, target_salt_ppm: dimensionless } out: { delta_ppm: dimensionless, salt_lb: dimensionless, salt_bags: dimensionless, drain_gallons: dimensionless }
+// dims: in { gallons: dimensionless, current_salt_ppm: dimensionless, target_salt_ppm: dimensionless } out: { delta_ppm: dimensionless, salt_lb: dimensionless, salt_bags: dimensionless, drain_gallons: L^3 }
 export function computePoolSaltDose({ gallons = 0, current_salt_ppm = 0, target_salt_ppm = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   if (current_salt_ppm < 0) return { error: "Salt reading must be non-negative." };
@@ -837,7 +837,7 @@ TREATMENT_RENDERERS["breakpoint-chlorination"] = _rPool({
 
 // ===================== spec-v405..v407: water/wastewater-operations trio (Group M) =====================
 
-// dims: in { flow_mgd: dimensionless, surface_ft2: L^2, weir_len_ft: L, mlss_mgl: dimensionless } out: { sor_gpd_ft2: dimensionless, weir_gpd_ft: dimensionless, solids_lb_ft2_day: dimensionless }
+// dims: in { flow_mgd: L^3 T^-1, surface_ft2: L^2, weir_len_ft: L, mlss_mgl: dimensionless } out: { sor_gpd_ft2: dimensionless, weir_gpd_ft: dimensionless, solids_lb_ft2_day: dimensionless }
 export function computeClarifierSurfaceLoading({ flow_mgd = 0, surface_ft2 = 0, weir_len_ft = 0, mlss_mgl = 0 } = {}) {
   const flow = Number(flow_mgd) || 0;
   const area = Number(surface_ft2) || 0;
@@ -885,7 +885,7 @@ TREATMENT_RENDERERS["clarifier-surface-loading"] = renderClarifierSurfaceLoading
 // clarifier-area-for-loading: inverse of clarifier-surface-loading. The forward tile gives the surface overflow rate from
 // the area; the inverse sizes the clarifier surface area for a target SOR at the design flow, area = flow x 1e6 / SOR,
 // and the equivalent circular clarifier diameter, so a designer picks a tank that lands within the design SOR limit.
-// dims: in { flow_mgd: dimensionless, target_sor_gpd_ft2: dimensionless } out: { required_area_ft2: L^2, equiv_diameter_ft: L }
+// dims: in { flow_mgd: L^3 T^-1, target_sor_gpd_ft2: dimensionless } out: { required_area_ft2: L^2, equiv_diameter_ft: L }
 export function computeClarifierAreaForLoading({ flow_mgd = 0, target_sor_gpd_ft2 = 0 } = {}) {
   const flow = Number(flow_mgd) || 0;
   const sor = Number(target_sor_gpd_ft2) || 0;
@@ -921,7 +921,7 @@ function renderClarifierAreaForLoading(inputRegion, outputRegion, citationEl) {
 }
 TREATMENT_RENDERERS["clarifier-area-for-loading"] = renderClarifierAreaForLoading;
 
-// dims: in { flow_mgd: dimensionless, influent_mgl: dimensionless, effluent_mgl: dimensionless } out: { influent_lb_day: dimensionless, effluent_lb_day: dimensionless, removed_lb_day: dimensionless, removal_pct: dimensionless }
+// dims: in { flow_mgd: L^3 T^-1, influent_mgl: dimensionless, effluent_mgl: dimensionless } out: { influent_lb_day: dimensionless, effluent_lb_day: dimensionless, removed_lb_day: dimensionless, removal_pct: dimensionless }
 export function computeBodTssLoadingRemoval({ flow_mgd = 0, influent_mgl = 0, effluent_mgl = 0 } = {}) {
   const flow = Number(flow_mgd) || 0;
   const inf = Number(influent_mgl) || 0;
@@ -1303,7 +1303,7 @@ TREATMENT_RENDERERS["tapered-flocculation-g"] = renderTaperedFlocculationG;
 
 // --- spec-v613 M: Paddle flocculator power from geometry (Camp drag) ---
 // v_tip = 2*pi*r*rpm/60. v_rel = v_tip*(1-k). P = 0.5*Cd*1.937*A*v_rel^3 (ft-lb/s), *1.35582 W, /550 hp.
-// dims: in { paddle_radius_ft: L, wheel_rpm: dimensionless, paddle_area_ft2: L^2, drag_coeff: dimensionless, slip_factor: dimensionless } out: { v_tip_fps: dimensionless, v_rel_fps: dimensionless, power_ftlbs: dimensionless, power_w: dimensionless, power_hp: dimensionless }
+// dims: in { paddle_radius_ft: L, wheel_rpm: T^-1, paddle_area_ft2: L^2, drag_coeff: dimensionless, slip_factor: dimensionless } out: { v_tip_fps: L T^-1, v_rel_fps: L T^-1, power_ftlbs: dimensionless, power_w: dimensionless, power_hp: M L^2 T^-3 }
 export function computeFlocculatorPaddlePower({ paddle_radius_ft = 0, wheel_rpm = 0, paddle_area_ft2 = 0, drag_coeff = 1.8, slip_factor = 0.25 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   const r = Number(paddle_radius_ft) || 0;
@@ -1507,7 +1507,7 @@ function _v899renderPoolInteriorFinishVolume(inputRegion, outputRegion, citation
 TREATMENT_RENDERERS["pool-interior-finish-volume"] = _v899renderPoolInteriorFinishVolume;
 
 // ===================== spec-v943: gravity oil/water separator surface area (API 421) =====================
-// dims: in { args: dimensionless } out: { rise_velocity_ftmin: dimensionless, horizontal_area_ft2: dimensionless }
+// dims: in { args: dimensionless } out: { rise_velocity_ftmin: dimensionless, horizontal_area_ft2: L^2 }
 export function computeOilWaterSeparatorSizing({ flow_gpm = 50, oil_sg = 0.85, droplet_micron = 150, water_viscosity_cp = 1.1 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   if (!(flow_gpm > 0)) return { error: "Flow must be positive (gpm)." };
@@ -1667,7 +1667,7 @@ TREATMENT_RENDERERS["pool-calcium-hardness-dose"] = _rPool({
 // the average daily flow from population and per-capita flow, then the peak and minimum via the
 // classic empirical factors. Harmon peaking PF = 1 + 14/(4 + sqrt(P_thousands)); Gifft minimum ratio
 // = 0.2 * (P_thousands)^(1/6). Textbook sanitary engineering (Metcalf & Eddy, Ten States Standards).
-// dims: in { population: dimensionless, per_capita_gpcd: dimensionless } out: { avg_flow_mgd: dimensionless, avg_flow_gpm: dimensionless, peak_flow_mgd: dimensionless, peak_flow_gpm: dimensionless, min_flow_mgd: dimensionless, min_flow_gpm: dimensionless, harmon_pf: dimensionless, gifft_min_ratio: dimensionless }
+// dims: in { population: dimensionless, per_capita_gpcd: dimensionless } out: { avg_flow_mgd: L^3 T^-1, avg_flow_gpm: L^3 T^-1, peak_flow_mgd: L^3 T^-1, peak_flow_gpm: L^3 T^-1, min_flow_mgd: L^3 T^-1, min_flow_gpm: L^3 T^-1, harmon_pf: dimensionless, gifft_min_ratio: dimensionless }
 export function computeDesignFlowPeaking({ population = 0, per_capita_gpcd = 100 } = {}) {
   const P = Number(population) || 0;
   const q = Number(per_capita_gpcd) || 0;

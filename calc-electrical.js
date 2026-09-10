@@ -4977,7 +4977,7 @@ function _v471renderMotorEfficiencyUpgradeSavings(inputRegion, outputRegion, cit
 ELECTRICAL_RENDERERS["motor-efficiency-upgrade-savings"] = _v471renderMotorEfficiencyUpgradeSavings;
 
 // ===================== spec-v472: transformer loading efficiency and losses =====================
-// dims: in { kva_rating: dimensionless, noload_w: dimensionless, loadloss_w: dimensionless, load: dimensionless, pf: dimensionless } out: { output_kw: dimensionless, losses_kw: dimensionless, efficiency: dimensionless, max_eff_load: dimensionless }
+// dims: in { kva_rating: dimensionless, noload_w: dimensionless, loadloss_w: dimensionless, load: dimensionless, pf: dimensionless } out: { output_kw: M L^2 T^-3, losses_kw: M L^2 T^-3, efficiency: dimensionless, max_eff_load: dimensionless }
 export function computeTransformerLoadingEfficiency({ kva_rating = 0, noload_w = 0, loadloss_w = 0, load = 0, pf = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const kva = Number(kva_rating) || 0;
@@ -5027,7 +5027,7 @@ function _v472renderTransformerLoadingEfficiency(inputRegion, outputRegion, cita
 ELECTRICAL_RENDERERS["transformer-loading-efficiency"] = _v472renderTransformerLoadingEfficiency;
 
 // ===================== spec-v473: economic conductor sizing (I2R payback) =====================
-// dims: in { current_a: dimensionless, r_small_ohm: dimensionless, r_big_ohm: dimensionless, hours: dimensionless, rate_kwh: dimensionless, upsize_cost: dimensionless } out: { loss_small_kw: dimensionless, loss_big_kw: dimensionless, annual_saving: dimensionless, payback_yr: dimensionless }
+// dims: in { current_a: dimensionless, r_small_ohm: dimensionless, r_big_ohm: dimensionless, hours: dimensionless, rate_kwh: dimensionless, upsize_cost: dimensionless } out: { loss_small_kw: M L^2 T^-3, loss_big_kw: M L^2 T^-3, annual_saving: dimensionless, payback_yr: dimensionless }
 export function computeEconomicConductorSizing({ current_a = 0, r_small_ohm = 0, r_big_ohm = 0, hours = 0, rate_kwh = 0, upsize_cost = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const I = Number(current_a) || 0;
@@ -6016,7 +6016,7 @@ function _v981renderMaxCircuitLengthForVd(inputRegion, outputRegion, citationEl)
 ELECTRICAL_RENDERERS["max-circuit-length-for-vd"] = _v981renderMaxCircuitLengthForVd;
 
 // ===================== spec-v985: open-delta (V-V) transformer bank capacity =====================
-// dims: in { args: dimensionless } out: { available_3ph_kva: dimensionless, per_transformer_kva: dimensionless, utilization_pct: dimensionless }
+// dims: in { args: dimensionless } out: { available_3ph_kva: M L^2 T^-3, per_transformer_kva: M L^2 T^-3, utilization_pct: dimensionless }
 export function computeOpenDeltaTransformer({ transformer_kva_each = 25, required_load_kva = 40 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(transformer_kva_each > 0)) return { error: "Transformer rating must be positive (kVA)." };

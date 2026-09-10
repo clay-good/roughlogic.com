@@ -300,7 +300,7 @@ METALAIR_RENDERERS["duct-static-pressure-total"] = _renderDuctStaticTotal;
 // ---------------------------------------------------------------------
 // 30.3 Compression ratio (compression-ratio-refrig) - ASHRAE Refrigeration
 // ---------------------------------------------------------------------
-// dims: in { suction_psig: dimensionless, discharge_psig: dimensionless, atmospheric_psia: dimensionless } out: { suction_psia: dimensionless, discharge_psia: dimensionless, compression_ratio: dimensionless }
+// dims: in { suction_psig: M L^-1 T^-2, discharge_psig: M L^-1 T^-2, atmospheric_psia: M L^-1 T^-2 } out: { suction_psia: M L^-1 T^-2, discharge_psia: M L^-1 T^-2, compression_ratio: dimensionless }
 export function computeCompressionRatio({ suction_psig = 0, discharge_psig = 0, atmospheric_psia = 14.696 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const atm = Number(atmospheric_psia);

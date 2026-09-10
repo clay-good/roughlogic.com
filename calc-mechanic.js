@@ -702,7 +702,7 @@ export const MECHANIC_RENDERERS = {
 // {Cv, Q, dP}. The gas/compressible regime uses a different equation and is
 // flagged, not computed. Choked / cavitating flow is out of scope.
 //
-// dims: in { solve_for: dimensionless, fluid: dimensionless, specific_gravity: dimensionless, cv: dimensionless, flow_gpm: dimensionless, dp_psi: dimensionless } out: { cv: dimensionless, flow_gpm: dimensionless, dp_psi: dimensionless }
+// dims: in { solve_for: dimensionless, fluid: dimensionless, specific_gravity: dimensionless, cv: dimensionless, flow_gpm: L^3 T^-1, dp_psi: M L^-1 T^-2 } out: { cv: dimensionless, flow_gpm: L^3 T^-1, dp_psi: M L^-1 T^-2 }
 export function computeValveFlowCoefficient({ solve_for = "flow", fluid = "liquid", specific_gravity = 1, cv = 0, flow_gpm = 0, dp_psi = 0 } = {}) {
   const SG = Number(specific_gravity) || 0;
   const Cv = Number(cv) || 0;
@@ -2555,7 +2555,7 @@ MECHANIC_RENDERERS["cooling-system-flow"] = _simpleRenderer({
 });
 
 // ===================== spec-v462: marine propeller pitch selection =====================
-// dims: in { current_pitch_in: L, current_wot_rpm: dimensionless, target_wot_rpm: dimensionless, rpm_per_inch: dimensionless } out: { pitch_change_in: L, new_pitch_in: L }
+// dims: in { current_pitch_in: L, current_wot_rpm: T^-1, target_wot_rpm: T^-1, rpm_per_inch: dimensionless } out: { pitch_change_in: L, new_pitch_in: L }
 export function computePropPitchSelection({ current_pitch_in = 0, current_wot_rpm = 0, target_wot_rpm = 0, rpm_per_inch = 200 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const pitch = Number(current_pitch_in) || 0;
@@ -3751,7 +3751,7 @@ function _v959renderUjointOperatingAngle(inputRegion, outputRegion, citationEl) 
 MECHANIC_RENDERERS["ujoint-operating-angle"] = _v959renderUjointOperatingAngle;
 
 // ===================== spec-v967: hull displacement and block coefficient =====================
-// dims: in { args: dimensionless } out: { displacement_ft3: dimensionless, displacement_lb: dimensionless, displacement_long_tons: dimensionless }
+// dims: in { args: dimensionless } out: { displacement_ft3: L^3, displacement_lb: dimensionless, displacement_long_tons: dimensionless }
 export function computeHullDisplacement({ lwl_ft = 30, bwl_ft = 10, draft_ft = 4, block_coefficient = 0.5, water_density_pcf = 64 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(lwl_ft > 0)) return { error: "Waterline length must be positive (ft)." };

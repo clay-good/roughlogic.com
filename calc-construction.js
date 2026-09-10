@@ -4332,7 +4332,7 @@ const _blastNozzle = (bore) => {
   }
   return best;
 };
-// dims: in { nozzle_bore_in: L, pressure_psi: M L^-1 T^-2, area_ft2: L^2, lb_per_ft2: dimensionless } out: { cfm: L^3 T^-1, compressor_hp: dimensionless, abrasive_lb_hr: M T^-1, abrasive_lb: M, abrasive_tons: M }
+// dims: in { nozzle_bore_in: L, pressure_psi: M L^-1 T^-2, area_ft2: L^2, lb_per_ft2: dimensionless } out: { cfm: L^3 T^-1, compressor_hp: M L^2 T^-3, abrasive_lb_hr: M T^-1, abrasive_lb: M, abrasive_tons: M }
 // (The nozzle bore is a length L; pressure is M L^-1 T^-2; the air-flow is a
 //  volume-rate L^3 T^-1; abrasive consumption is a mass-rate M T^-1 and the
 //  totals are masses M.)
@@ -10512,7 +10512,7 @@ CONSTRUCTION_RENDERERS["joist-cantilever-check"] = _simpleRenderer({
 });
 
 // ===================== spec-v970: foundation waterproofing / dampproofing takeoff =====================
-// dims: in { args: dimensionless } out: { wall_area_sf: dimensionless, gallons: dimensionless }
+// dims: in { args: dimensionless } out: { wall_area_sf: L^2, gallons: dimensionless }
 export function computeFoundationWaterproofingTakeoff({ perimeter_ft = 150, below_grade_height_ft = 8, coverage_sf_per_gal = 50, waste_pct = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(perimeter_ft > 0)) return { error: "Foundation perimeter must be positive (ft)." };
@@ -10591,7 +10591,7 @@ CONSTRUCTION_RENDERERS["roof-ballast-weight"] = _simpleRenderer({
 });
 
 // ===================== spec-v988: foundation drainage board (dimple mat) takeoff =====================
-// dims: in { args: dimensionless } out: { wall_area_sf: dimensionless, rolls: dimensionless, termination_lf: dimensionless }
+// dims: in { args: dimensionless } out: { wall_area_sf: L^2, rolls: dimensionless, termination_lf: dimensionless }
 export function computeDrainageBoardTakeoff({ perimeter_ft = 150, below_grade_height_ft = 8, roll_width_ft = 4, roll_length_ft = 50, waste_pct = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(perimeter_ft > 0)) return { error: "Foundation perimeter must be positive (ft)." };

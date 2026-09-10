@@ -2063,7 +2063,7 @@ function _v971renderDechlorinationDose(inputRegion, outputRegion, citationEl) {
 WATER_RENDERERS["dechlorination-dose"] = _v971renderDechlorinationDose;
 
 // ===================== spec-v973: float-method (velocity-area) open-channel flow =====================
-// dims: in { args: dimensionless } out: { surface_velocity_fps: dimensionless, cross_area_ft2: dimensionless, flow_cfs: dimensionless, flow_gpm: dimensionless }
+// dims: in { args: dimensionless } out: { surface_velocity_fps: L T^-1, cross_area_ft2: L^2, flow_cfs: L^3 T^-1, flow_gpm: L^3 T^-1 }
 export function computeFloatMethodFlow({ float_distance_ft = 20, travel_time_s = 10, channel_width_ft = 4, mean_depth_ft = 1.5, float_coefficient = 0.85 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(float_distance_ft > 0)) return { error: "Float travel distance must be positive (ft)." };

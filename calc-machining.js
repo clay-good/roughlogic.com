@@ -263,7 +263,7 @@ MACHINING_RENDERERS["cutting-fluid-concentration"] = renderCuttingFluidConcentra
 // --- spec-v135 K: Cutting Power and Spindle Torque from Material Removal Rate ---
 // cutting_hp = MRR x unit_power; motor_hp = cutting_hp / efficiency;
 // torque_lbft = 5252 x cutting_hp / rpm (the 5252 constant reused from v122).
-// dims: in { mrr_in3_min: L^3 T^-1, unit_power_hp: dimensionless, efficiency_pct: dimensionless, rpm: T^-1 } out: { cutting_hp: M L^2 T^-3, motor_hp: M L^2 T^-3, spindle_torque_lbft: M L^2 T^-2 }
+// dims: in { mrr_in3_min: L^3 T^-1, unit_power_hp: M L^2 T^-3, efficiency_pct: dimensionless, rpm: T^-1 } out: { cutting_hp: M L^2 T^-3, motor_hp: M L^2 T^-3, spindle_torque_lbft: M L^2 T^-2 }
 export function computeSpindlePowerTorque({ mrr_in3_min = 0, unit_power_hp = 1.0, efficiency_pct = 80, rpm = 0 } = {}) {
   const _g = _finiteGuard({ mrr_in3_min, unit_power_hp, efficiency_pct, rpm }); if (_g) return _g;
   const mrr = Number(mrr_in3_min);
@@ -319,7 +319,7 @@ MACHINING_RENDERERS["spindle-power-torque"] = renderSpindlePowerTorque;
 // The inverse of spindle-power-torque: the forward tile gives the motor hp a cut
 // needs; given the motor you have, the power-limited max removal rate is
 // max_MRR = motor_hp x (efficiency/100) / unit_power.
-// dims: in { available_motor_hp: M L^2 T^-3, unit_power_hp: dimensionless, efficiency_pct: dimensionless } out: { max_mrr_in3_min: L^3 T^-1, cutting_hp: M L^2 T^-3 }
+// dims: in { available_motor_hp: M L^2 T^-3, unit_power_hp: M L^2 T^-3, efficiency_pct: dimensionless } out: { max_mrr_in3_min: L^3 T^-1, cutting_hp: M L^2 T^-3 }
 export function computeSpindleMaxMrr({ available_motor_hp = 0, unit_power_hp = 1.0, efficiency_pct = 80 } = {}) {
   const _g = _finiteGuard({ available_motor_hp, unit_power_hp, efficiency_pct }); if (_g) return _g;
   const motor = Number(available_motor_hp);

@@ -791,7 +791,7 @@ SHOP_RENDERERS["press-brake-max-thickness"] = _v724renderPressBrakeMaxThickness;
 // First-principles shear: F = perimeter x T x shear strength.
 // =====================================================================
 
-// dims: in { shape: dimensionless, diameter_in: L, side_a_in: L, side_b_in: L, perimeter_in: L, thickness_in: L, shear_strength_psi: dimensionless } out: { perimeter_in: L, force_lb: dimensionless, force_tons: dimensionless }
+// dims: in { shape: dimensionless, diameter_in: L, side_a_in: L, side_b_in: L, perimeter_in: L, thickness_in: L, shear_strength_psi: M L^-1 T^-2 } out: { perimeter_in: L, force_lb: dimensionless, force_tons: dimensionless }
 export function computePunchForce({ shape = "round", diameter_in = 0, side_a_in = 0, side_b_in = 0, perimeter_in = 0, thickness_in = 0, shear_strength_psi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const sh = String(shape);
@@ -855,7 +855,7 @@ SHOP_RENDERERS["punch-force"] = _v40renderPunchForce;
 
 // spec-v683 - punch-capacity (inverse of punch-force) - Group G
 // F = perimeter x T x tau; solved for the max round-hole diameter or the max thickness a press can punch.
-// dims: in { capacity_tons: dimensionless, shear_strength_psi: dimensionless, solve_for: dimensionless, diameter_in: L, thickness_in: L } out: { max_thickness_in: L, max_diameter_in: L, force_lb: dimensionless }
+// dims: in { capacity_tons: dimensionless, shear_strength_psi: M L^-1 T^-2, solve_for: dimensionless, diameter_in: L, thickness_in: L } out: { max_thickness_in: L, max_diameter_in: L, force_lb: dimensionless }
 export function computePunchCapacity({ capacity_tons = 0, shear_strength_psi = 0, solve_for = "thickness", diameter_in = 0, thickness_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const cap = Number(capacity_tons) || 0;
@@ -2702,7 +2702,7 @@ SHOP_RENDERERS["plasma-cut-speed"] = _simpleRenderer({
 });
 
 // ===================== spec-v1409: hydraulic reservoir size and cooler duty =====================
-// dims: in { args: dimensionless } out: { hydraulic_hp: dimensionless, heat_btu_hr: dimensionless, reservoir_gal: L^3, cooler_duty_btu_hr: dimensionless }
+// dims: in { args: dimensionless } out: { hydraulic_hp: M L^2 T^-3, heat_btu_hr: dimensionless, reservoir_gal: L^3, cooler_duty_btu_hr: dimensionless }
 export function computeHydraulicReservoirCooler({ pump_gpm = 0, pressure_psi = 0, pump_efficiency = 0.85, heat_fraction = 0.25, reservoir_multiplier = 3, reservoir_dissipation_btu_hr = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pump_gpm > 0)) return { error: "Pump flow must be positive." };

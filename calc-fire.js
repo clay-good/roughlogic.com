@@ -1599,7 +1599,7 @@ import {
 // Smooth bore: NR = 1.57 * d^2 * NP. Fog: NR = 0.0505 * Q * sqrt(NP).
 // Staffing thresholds (~60 lb one person, ~75 lb hose team) are advisory.
 //
-// dims: in { nozzle_type: dimensionless, bore_in: L, flow_gpm: dimensionless, nozzle_pressure_psi: dimensionless } out: { reaction_lb: dimensionless }
+// dims: in { nozzle_type: dimensionless, bore_in: L, flow_gpm: L^3 T^-1, nozzle_pressure_psi: M L^-1 T^-2 } out: { reaction_lb: dimensionless }
 export function computeFireStreamReaction({ nozzle_type = "smooth", bore_in = 0, flow_gpm = 0, nozzle_pressure_psi = 0 } = {}) {
   const np = Number(nozzle_pressure_psi) || 0;
   if (!(np > 0 && Number.isFinite(np))) return { error: "Nozzle pressure must be positive (psi)." };
@@ -1648,7 +1648,7 @@ export function renderFireStreamReaction(inputRegion, outputRegion, citationEl) 
 FIRE_RENDERERS["fire-stream-reaction"] = renderFireStreamReaction;
 
 // --- F.2: Sprinkler K-factor solver (Q = K * sqrt(P)) ---
-// dims: in { solve_for: dimensionless, flow_gpm: dimensionless, pressure_psi: dimensionless, k_factor: dimensionless } out: { flow_gpm: dimensionless, pressure_psi: dimensionless, k_factor: dimensionless }
+// dims: in { solve_for: dimensionless, flow_gpm: L^3 T^-1, pressure_psi: M L^-1 T^-2, k_factor: dimensionless } out: { flow_gpm: L^3 T^-1, pressure_psi: M L^-1 T^-2, k_factor: dimensionless }
 export function computeSprinklerKFactor({ solve_for = "flow", flow_gpm = 0, pressure_psi = 0, k_factor = 0 } = {}) {
   const Q = Number(flow_gpm) || 0;
   const P = Number(pressure_psi) || 0;
@@ -1750,7 +1750,7 @@ FIRE_RENDERERS["elevation-pressure-loss"] = renderElevationPressureLoss;
 
 // --- v20 F.2: Water-supply duration (`water-supply-duration`) ---
 // t = V / GPM; with resupply R: if R >= GPM, sustained; else t = V/(GPM-R).
-// dims: in { volume_gal: L^3, flow_gpm: L^3 T^-1*T^-1, resupply_gpm: L^3 T^-1*T^-1 } out: { duration_min: T, net_drain_gpm: L^3 T^-1*T^-1 }
+// dims: in { volume_gal: L^3, flow_gpm: L^3 T^-1, resupply_gpm: L^3 T^-1 } out: { duration_min: T, net_drain_gpm: L^3 T^-1 }
 export function computeWaterSupplyDuration({ volume_gal = 0, flow_gpm = 0, resupply_gpm = 0 } = {}) {
   const V = Number(volume_gal) || 0;
   const Q = Number(flow_gpm) || 0;
@@ -2664,7 +2664,7 @@ FIRE_RENDERERS["fdc-supply-check"] = _simpleRenderer({
 });
 
 // ===================== spec-v1392: radiant exposure separation distance =====================
-// dims: in { args: dimensionless } out: { radiated_power_kw: dimensionless, separation_m: L, separation_ft: L, flux_at_distance: dimensionless }
+// dims: in { args: dimensionless } out: { radiated_power_kw: M L^2 T^-3, separation_m: L, separation_ft: L, flux_at_distance: dimensionless }
 export function computeRadiantExposureSeparation({ heat_release_kw = 0, radiative_fraction = 0.3, target_flux_kwm2 = 12.6, evaluate_distance_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(heat_release_kw > 0)) return { error: "Fire heat release rate must be positive." };

@@ -508,7 +508,7 @@ ARBORIST_RENDERERS["thinning-target-tpa"] = _v619renderThinningTargetTpa;
 
 // --- spec-v598 L: Quadratic mean diameter from a DBH tally ---
 // QMD = sqrt(sum(count*d^2)/sum(count)); amean = sum(count*d)/sum(count); BA = 0.005454*sum(count*d^2).
-// dims: in { tally: dimensionless } out: { qmd_in: L, arithmetic_mean_in: L, tree_count: dimensionless, basal_area_ft2: dimensionless }
+// dims: in { tally: dimensionless } out: { qmd_in: L, arithmetic_mean_in: L, tree_count: dimensionless, basal_area_ft2: L^2 }
 export function computeQuadraticMeanDiameter({ tally = "" } = {}) {
   const tokens = String(tally).split(/[\n,]+/).map((t) => t.trim()).filter(Boolean);
   if (tokens.length === 0) return { error: "Enter a diameter tally: one token per tree (\"12\") or per class (\"12:40\")." };

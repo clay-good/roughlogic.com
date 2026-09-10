@@ -264,7 +264,7 @@ function _v26crossSequence(n) {
   return { seq, standard: false };
 }
 
-// dims: in { bolt_diameter_in: L, bolt_count: dimensionless, tensile_area_in2: L, target_percent_yield: dimensionless, target_stress_ksi: dimensionless, yield_ksi: dimensionless, nut_factor_k: dimensionless } out: { preload_lb: dimensionless, torque_ftlb: dimensionless, torque_nm: dimensionless, stress_pct_yield: dimensionless }
+// dims: in { bolt_diameter_in: L, bolt_count: dimensionless, tensile_area_in2: L^2, target_percent_yield: dimensionless, target_stress_ksi: dimensionless, yield_ksi: dimensionless, nut_factor_k: dimensionless } out: { preload_lb: dimensionless, torque_ftlb: dimensionless, torque_nm: dimensionless, stress_pct_yield: dimensionless }
 export function computeFlangeBoltTorque({ bolt_diameter_in = 0, thread_series = "UNC", bolt_count = 8, tensile_area_in2 = null, target_percent_yield = 50, target_stress_ksi = null, yield_ksi = 105, nut_factor_k = 0.18 } = {}) {
   const _g = _finiteGuard({ bolt_diameter_in, bolt_count, target_percent_yield, yield_ksi, nut_factor_k }); if (_g) return _g;
   const D = Number(bolt_diameter_in);
@@ -608,7 +608,7 @@ FAB_RENDERERS["conduit-90-stub"] = renderConduit90Stub;
 // of carbon steel (about 0.11 Btu/lb-degF), and the heating value of propane
 // (about 21,600 Btu/lb, 91,500 Btu/gal).
 
-// dims: in { flow_cfh: dimensionless, arc_on_min: T, cylinder_ft3: L^3, gas_cost: dimensionless } out: { gas_used_ft3: L^3, runtime_hr_per_cyl: T, cylinders_needed: dimensionless, job_gas_cost: dimensionless }
+// dims: in { flow_cfh: L^3 T^-1, arc_on_min: T, cylinder_ft3: L^3, gas_cost: dimensionless } out: { gas_used_ft3: L^3, runtime_hr_per_cyl: T, cylinders_needed: dimensionless, job_gas_cost: dimensionless }
 export function computeShieldingGasRuntime({ flow_cfh, arc_on_min, cylinder_ft3, gas_cost = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const flow = Number(flow_cfh);
@@ -631,7 +631,7 @@ export function computeShieldingGasRuntime({ flow_cfh, arc_on_min, cylinder_ft3,
   };
 }
 
-// dims: in { oxygen_cfh: dimensionless, fuel_cfh: dimensionless, cut_length_in: L, cut_speed_ipm: dimensionless, oxygen_cyl_ft3: L^3, fuel_cyl_ft3: L^3 } out: { cut_time_min: T, oxygen_used_ft3: L^3, fuel_used_ft3: L^3, oxygen_runtime_hr: T, fuel_runtime_hr: T }
+// dims: in { oxygen_cfh: L^3 T^-1, fuel_cfh: L^3 T^-1, cut_length_in: L, cut_speed_ipm: dimensionless, oxygen_cyl_ft3: L^3, fuel_cyl_ft3: L^3 } out: { cut_time_min: T, oxygen_used_ft3: L^3, fuel_used_ft3: L^3, oxygen_runtime_hr: T, fuel_runtime_hr: T }
 export function computeOxyfuelCuttingGas({ oxygen_cfh, fuel_cfh, cut_length_in, cut_speed_ipm, oxygen_cyl_ft3 = 244, fuel_cyl_ft3 = 330 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const oxygen = Number(oxygen_cfh);

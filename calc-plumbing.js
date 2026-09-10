@@ -2252,7 +2252,7 @@ function _v16p_renderWaterHeaterRecovery(inputRegion, outputRegion, citationEl) 
 }
 PLUMBING_RENDERERS["water-heater-recovery"] = _v16p_renderWaterHeaterRecovery;
 
-// dims: in { args: dimensionless } out: { input_btu_hr: dimensionless, input_kw: dimensionless, delta_T_F: T }
+// dims: in { args: dimensionless } out: { input_btu_hr: dimensionless, input_kw: M L^2 T^-3, delta_T_F: T }
 export function computeWaterHeaterInput({
   heater_type = "gas_atmospheric",
   target_recovery_gph = 0,
@@ -2967,7 +2967,7 @@ PLUMBING_RENDERERS["trap-seal-loss"] = renderTrapSealLoss;
 // =====================================================================
 // v23 B.2: Water meter sizing from peak demand (AWWA M22)
 // =====================================================================
-// dims: in { peak_demand_gpm: dimensionless, normal_rating_gpm: dimensionless, peak_rating_gpm: dimensionless } out: { percent_used: dimensionless, headroom_gpm: dimensionless, adequate: dimensionless, above_peak_rating: dimensionless }
+// dims: in { peak_demand_gpm: L^3 T^-1, normal_rating_gpm: L^3 T^-1, peak_rating_gpm: L^3 T^-1 } out: { percent_used: dimensionless, headroom_gpm: L^3 T^-1, adequate: dimensionless, above_peak_rating: dimensionless }
 export function computeWaterMeterSizing({ peak_demand_gpm = 0, normal_rating_gpm = 0, peak_rating_gpm = 0 } = {}) {
   const peak = Number(peak_demand_gpm) || 0;
   const normal = Number(normal_rating_gpm) || 0;
@@ -3139,7 +3139,7 @@ PLUMBING_RENDERERS["vent-sizing-stack"] = renderVentSizingStack;
 // fmt, debounce, DEBOUNCE_MS) are already imported at module top.
 // =====================================================================
 
-// dims: in { hot_temp_F: T, cold_temp_F: T, hot_gpm: dimensionless, cold_gpm: dimensionless, target_temp_F: T } out: { blend_temp_F: T, percent_hot: dimensionless, hot_fraction: dimensionless, hot_cold_ratio: dimensionless, hot_gpm: dimensionless }
+// dims: in { hot_temp_F: T, cold_temp_F: T, hot_gpm: L^3 T^-1, cold_gpm: L^3 T^-1, target_temp_F: T } out: { blend_temp_F: T, percent_hot: dimensionless, hot_fraction: dimensionless, hot_cold_ratio: dimensionless, hot_gpm: L^3 T^-1 }
 export function computeMixedWaterTemp({ mode = "find-blend", hot_temp_F = 0, cold_temp_F = 0, hot_gpm = 0, cold_gpm = 0, target_temp_F = 0 } = {}) {
   const _g = _finiteGuard({ hot_temp_F, cold_temp_F, hot_gpm, cold_gpm, target_temp_F }); if (_g) return _g;
   const Th = Number(hot_temp_F), Tc = Number(cold_temp_F);
@@ -3237,7 +3237,7 @@ function _v26renderMixedWaterTemp(inputRegion, outputRegion, citationEl) {
 }
 PLUMBING_RENDERERS["mixed-water-temp"] = _v26renderMixedWaterTemp;
 
-// dims: in { tank_volume_gal: dimensionless, cut_in_psi: dimensionless, cut_out_psi: dimensionless, precharge_psi: dimensionless, pump_gpm: dimensionless, target_drawdown_gal: dimensionless } out: { drawdown_gal: dimensionless, runtime_min: T, cycles_per_hour: dimensionless, tank_volume_gal: dimensionless }
+// dims: in { tank_volume_gal: L^3, cut_in_psi: dimensionless, cut_out_psi: M L^-1 T^-2, precharge_psi: M L^-1 T^-2, pump_gpm: L^3 T^-1, target_drawdown_gal: L^3 } out: { drawdown_gal: L^3, runtime_min: T, cycles_per_hour: dimensionless, tank_volume_gal: L^3 }
 export function computePressureTankDrawdown({ mode = "find-drawdown", tank_volume_gal = 0, cut_in_psi = 0, cut_out_psi = 0, precharge_psi = null, pump_gpm = 0, target_drawdown_gal = 0 } = {}) {
   const _g = _finiteGuard({ tank_volume_gal, cut_in_psi, cut_out_psi, pump_gpm, target_drawdown_gal }); if (_g) return _g;
   const Pin = Number(cut_in_psi), Pout = Number(cut_out_psi);
@@ -3338,7 +3338,7 @@ const _V26_PIPE_ID_IN = {
   steel:  { "0.5": 0.622, "0.75": 0.824, "1": 1.049, "1.25": 1.380, "1.5": 1.610, "2": 2.067 },
 };
 
-// dims: in { flow_gpm: dimensionless, diameter_in: L, target_velocity_fps: dimensionless } out: { velocity_fps: dimensionless, max_flow_gpm: dimensionless }
+// dims: in { flow_gpm: L^3 T^-1, diameter_in: L, target_velocity_fps: L T^-1 } out: { velocity_fps: L T^-1, max_flow_gpm: L^3 T^-1 }
 export function computePipeVelocity({ mode = "velocity-from-flow", flow_gpm = 0, diameter_in = 0, material = "copper", service = "hot", target_velocity_fps = 0 } = {}) {
   const _g = _finiteGuard({ flow_gpm, diameter_in, target_velocity_fps }); if (_g) return _g;
   const d = Number(diameter_in);
@@ -5041,7 +5041,7 @@ PLUMBING_RENDERERS["cleanout-layout"] = _v1140renderCleanoutLayout;
 // system is now CLOSED and heated water has nowhere to expand back to. The homeowner who
 // fixes banging pipes with a PRV and then wonders why the T&P valve started weeping has
 // completed the chain without being told it existed. This tile walks it in one place.
-// dims: in { static_pressure_psi: L^-1, min_fixture_pressure_psi: L^-1, has_check_or_backflow: dimensionless, has_storage_water_heater: dimensionless, expansion_control_present: dimensionless, prv_setpoint_psi: L^-1 } out: { over_by_psi: L^-1, headroom_psi: L^-1 }
+// dims: in { static_pressure_psi: M L^-1 T^-2, min_fixture_pressure_psi: M L^-1 T^-2, has_check_or_backflow: dimensionless, has_storage_water_heater: dimensionless, expansion_control_present: dimensionless, prv_setpoint_psi: M L^-1 T^-2 } out: { over_by_psi: M L^-1 T^-2, headroom_psi: M L^-1 T^-2 }
 export function computeWaterServicePressureCheck({ static_pressure_psi = 0, min_fixture_pressure_psi = 20, has_check_or_backflow = "no", has_storage_water_heater = "yes", expansion_control_present = "no", prv_setpoint_psi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const p = Number(static_pressure_psi) || 0;

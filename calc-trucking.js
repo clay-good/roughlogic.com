@@ -1161,7 +1161,7 @@ TRUCKING_RENDERERS["cargo-securement-wll"] = renderCargoSecurementWLL;
 // paid at the pump on gallons purchased there. Run once per jurisdiction
 // and sum the net column for the return; a negative net is a credit.
 //
-// dims: in { miles: L, fleet_mpg: dimensionless, tax_rate_per_gal: dimensionless, gallons_purchased: dimensionless } out: { taxable_gallons: dimensionless, tax_on_consumption: dimensionless, tax_paid_at_pump: dimensionless, net_tax: dimensionless }
+// dims: in { miles: L, fleet_mpg: dimensionless, tax_rate_per_gal: dimensionless, gallons_purchased: dimensionless } out: { taxable_gallons: L^3, tax_on_consumption: dimensionless, tax_paid_at_pump: dimensionless, net_tax: dimensionless }
 export function computeFuelTaxIFTA({ miles = 0, fleet_mpg = 0, tax_rate_per_gal = 0, gallons_purchased = 0 } = {}) {
   const mi = Number(miles) || 0;
   const mpg = Number(fleet_mpg) || 0;
@@ -2080,7 +2080,7 @@ TRUCKING_RENDERERS["kingpin-to-axle"] = _simpleRenderer({
 });
 
 // ===================== spec-v1379: safe downgrade descent speed =====================
-// dims: in { args: dimensionless } out: { descent_power_hp: dimensionless, balance_speed_mph: L T^-1, service_brake_hp: dimensionless }
+// dims: in { args: dimensionless } out: { descent_power_hp: M L^2 T^-3, balance_speed_mph: L T^-1, service_brake_hp: M L^2 T^-3 }
 export function computeSafeDescentSpeed({ gcw_lb = 0, grade_pct = 0, descent_speed_mph = 0, engine_brake_hp = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(gcw_lb > 0)) return { error: "Gross combination weight must be positive." };
