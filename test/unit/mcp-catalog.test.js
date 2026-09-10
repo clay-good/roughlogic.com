@@ -201,6 +201,21 @@ test("every input-free tile answers when its own name is the question", async ()
     if (!(await describe({ id: t.id })).inputs.length) free.push(t);
   }
   assert.equal(free.length, 20, `input-free population moved: ${free.map((t) => t.id)}`);
+
+  // Three living docs state this number in prose, and it is the kind of number
+  // that moves under a change nobody connects to a doc. It did: AGENTS.md --
+  // the file agents are pointed at -- still said 21 after fe03d908 moved it to
+  // 20, and nothing looked. Anchored here, where the live count is already in
+  // hand, rather than in a gate that would have to recompute it.
+  const { readFile: readDoc } = await import("node:fs/promises");
+  const stale = [];
+  for (const rel of ["../../AGENTS.md", "../../mcp/README.md", "../../docs/architecture.md"]) {
+    const text = await readDoc(new URL(rel, import.meta.url), "utf8");
+    for (const m of text.matchAll(/(\d+) tiles that take no inputs/g)) {
+      if (Number(m[1]) !== free.length) stale.push(`${rel}: "${m[0]}" but the live count is ${free.length}`);
+    }
+  }
+  assert.deepEqual(stale, []);
   const unanswered = [];
   for (const t of free) {
     // water-classes loses its own name to class-of-loss-screen, a tile that
