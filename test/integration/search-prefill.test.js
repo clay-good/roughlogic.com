@@ -514,6 +514,38 @@ test("spec-v1343: a specific query routes straight through, no card", async ({ p
   await expect(page.locator(".pick-card")).toHaveCount(0);
 });
 
+test("an exact address routes straight through, and a vague query still asks", async ({ page }) => {
+  // Promoting an exact address to rank 0 can leave a HIGHER-scoring row behind
+  // it, and the ambiguity check reads nothing but the top two scores -- so
+  // typing a tile's own id and pressing Enter asked "Which one did you mean?"
+  // about the tile the reader had just named exactly. The guard asked only
+  // about curated terms; it asks `resolveQuery` now, which reads ids too.
+  await page.goto("/");
+  const input = page.locator("#search-input");
+
+  for (const [typed, hash] of [
+    ["backflow-sizing", "#backflow-sizing"],
+    ["how much can i build on my lot", "#floor-area-ratio"],
+  ]) {
+    await page.goto("/");
+    await input.click();
+    await input.fill(typed);
+    await expect(page.locator(".search-result").first()).toBeVisible({ timeout: 30_000 });
+    await input.press("Enter");
+    await expect(page).toHaveURL(new RegExp(hash.replace("#", "#")));
+    await expect(page.locator(".pick-card")).toHaveCount(0);
+  }
+
+  // The control: the feature still fires where it is meant to. A vague query
+  // naming no tile and carrying no values is exactly what it exists for.
+  await page.goto("/");
+  await input.click();
+  await input.fill("pressure drop");
+  await expect(page.locator(".search-result").first()).toBeVisible({ timeout: 30_000 });
+  await input.press("Enter");
+  await expect(page.locator(".pick-card")).toBeVisible();
+});
+
 test("spec-v1343: arrowing to a row is a deliberate pick and routes", async ({ page }) => {
   // render() calls setActive(0), so activeIndex is 0 the moment anything is
   // typed. Without the userPicked flag every Enter looks deliberate and the

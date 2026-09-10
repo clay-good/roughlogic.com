@@ -797,6 +797,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
   61 queries change their top result. Four of those had an exact **name** match on top -- and three are clear corrections (*"pump out"* is a septic pump-out, *"tip size"* is a nozzle tip). The fourth is genuinely debatable and pre-existing: `affinity-laws` is *named* "Fan Affinity Laws", which is exactly the id of the different tile `fan-affinity-laws`. Both doors now resolve it the same way.
 
+  Promotion has one consequence worth stating: moving a tile to rank 0 can leave a **higher-scoring** row behind it, and the spec-v1343 ambiguity check reads nothing but the top two scores. So typing a tile's own id and pressing Enter asked *"Which one did you mean?"* about the tile the reader had just named exactly. That guard asked only about curated terms -- and compared a raw alias term against a lowercased query; it asks `resolveQuery` now, the same reader the promotion uses, which covers ids too. The card still fires where it is meant to: "pressure drop" names no tile and carries no values, and still asks.
+
   `scripts/measure-ranking.mjs` measures `rankTools` **alone**, which no door calls alone, so an exact-term miss in its output is still first in the dropdown. Its summary now says so, because a future reader would otherwise "fix" those by editing the alias corpus.
 
   The per-module gzip cap on `search-discovery.js` moved 14000 -> 15500. The module was already at **99.3%** of the previous cap before this change.

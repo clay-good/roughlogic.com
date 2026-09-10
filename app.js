@@ -1087,10 +1087,16 @@ function bindSearch() {
     const rows = lastRanked.rows;
     const leader = rows[0].score;
     if (!leader) return null;
-    // A curated alias is a deliberate routing decision, not a coincidence of
-    // token scores. If one fired, respect it.
+    // An exact ADDRESS is a deliberate routing decision, not a coincidence of
+    // token scores. This asked only about curated terms, and compared a raw
+    // term to a lowercased query; `resolveQuery` is the same reader the
+    // promotion above uses, and it covers a tile's own id too. Without that,
+    // promoting a tile from rank 1 to rank 0 left a HIGHER-scoring row behind
+    // it, which reads as a tie: typing "backflow-sizing" and pressing Enter
+    // asked "Which one did you mean?" about the tile the reader had just named
+    // exactly.
     const typed = (input.value || "").trim().toLowerCase();
-    if (aliasRows.some((a) => a.term === typed)) return null;
+    if (discovery.resolveQuery && discovery.resolveQuery(typed, aliasRows, toolIdSet || TOOLS.map((t) => t.id))) return null;
     // A slots.json template fired means the query was specific enough to
     // prefill; that is not ambiguity either.
     if (slotsByTile && slotsByTile.has(rows[0].tool.id) && discovery
