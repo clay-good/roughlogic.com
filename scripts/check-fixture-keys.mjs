@@ -134,15 +134,17 @@ if (problems.length) {
 //       `computeArea({ shape, ...dims })`, `computeGeometry`,
 //       `computeConcreteVolume`. Which keys are valid depends on the shape, so
 //       no single destructuring lists them. NOT drainable without an API change.
-//    4  take a SINGLE OPAQUE OBJECT and could be destructured today:
-//       `computeHudFmr(input)`, `computeLoanLimits(input)`,
-//       `computeRentalWorksheet(inputs)`, `computePvPerformanceRatio(inputs = {})`.
-//       These are the only drainable ones, and draining them is a signature
-//       change on live tiles, not a comment edit.
+//    4  took a SINGLE OPAQUE OBJECT and were the only drainable ones --
+//       `computeHudFmr`, `computeLoanLimits`, `computeRentalWorksheet` and
+//       `computePvPerformanceRatio`. DESTRUCTURED 2026-09-10 (5 fixtures, since
+//       pv-performance-ratio carries two), which also took
+//       check-guard-only-inputs' own named-object budget from 4 to 0.
 //
-// So the floor is 26 fixtures. Lower the budget past that only by converting
-// one of those four.
-const SKIPPED_BUDGET = 30;
+// So 25 is the FLOOR, and nothing above it is drainable by editing anything: a
+// compute with no parameter has no input keys to compare, and a shape-dispatch
+// rest param has no fixed set of them. Raise this only for a genuinely new tile
+// of one of those two kinds, and say which.
+const SKIPPED_BUDGET = 25;
 if (skipped > SKIPPED_BUDGET) {
   console.error(
     `check-fixture-keys FAILED: ${skipped} fixture(s) are unchecked (the compute takes no parameter, ` +
@@ -156,9 +158,9 @@ if (skipped > SKIPPED_BUDGET) {
 // green run: thirty tile ids on a passing line is a wall in the CI log, and the
 // disclosure the summary owes a reader is the count and the budget.
 console.log(`check-fixture-keys OK: ${checked} fixture(s) checked; every input key matches a compute parameter. ` +
-  `NOT checked here: ${skipped} fixture(s) -- 21 reference tiles whose compute takes NO parameter, 3 that ` +
-  `dispatch on a shape through a rest param, and 4 that take a single opaque object and could be ` +
-  `destructured (budget ${SKIPPED_BUDGET}, structural floor 26; --verbose lists them).`);
+  `NOT checked here: ${skipped} fixture(s) -- 21 reference tiles whose compute takes NO parameter and 4 ` +
+  `that dispatch on a shape through a rest param. Both kinds are unfixable: there are no input keys to ` +
+  `compare against (budget ${SKIPPED_BUDGET}, which IS the floor; --verbose lists them).`);
 if (process.argv.includes("--verbose")) {
   console.log("  unchecked: " + skippedTiles.sort().join(", "));
 }

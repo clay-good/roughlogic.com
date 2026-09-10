@@ -192,7 +192,12 @@ if (errors.length > 0) {
 // need the object: rental-worksheet and pv-performance-ratio index it by a
 // variable key, loan-limits and hud-fmr take a data shard rather than a field
 // list.
-const SKIPPED_WITH_INPUTS_BUDGET = 4;
+// Drained to 0 on 2026-09-10 by destructuring the four computes that took a
+// single named object -- computeHudFmr, computeLoanLimits,
+// computeRentalWorksheet and computePvPerformanceRatio. It may not rise: a
+// compute that hides its inputs behind one opaque parameter is unreviewable
+// here and in check-fixture-keys both.
+const SKIPPED_WITH_INPUTS_BUDGET = 0;
 if (skippedWithInputs.length > SKIPPED_WITH_INPUTS_BUDGET) {
   console.error(
     "check-guard-only-inputs FAILED: " + skippedWithInputs.length + " compute function(s) take a " +

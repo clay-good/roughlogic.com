@@ -1345,15 +1345,26 @@ const RENTAL_EXPENSE_FIELDS = [
 //  are dimensionless dollars per the §7.1 monetary convention;
 //  cap rate, cash-on-cash, DSCR, and the gross-rent multiplier are
 //  dimensionless ratios (price and rent share the dollar dimension).)
-export function computeRentalWorksheet(inputs) {
+export function computeRentalWorksheet({
+  monthly_rent: monthly_rent_in, vacancy_pct: vacancy_pct_in, other_income_annual, depreciation_annual,
+  property_value: property_value_in, cash_invested: cash_invested_in, market_grm: market_grm_in,
+  advertising, auto_travel, cleaning_maintenance, commissions, insurance, legal_professional,
+  management_fees, mortgage_interest, other_interest, repairs, supplies, property_taxes,
+  utilities, hoa_fees,
+} = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  const monthly_rent = Number(inputs.monthly_rent);
-  const vacancy_pct = Number(inputs.vacancy_pct) || 0;
-  const other_income = Number(inputs.other_income_annual) || 0;
-  const depreciation = Number(inputs.depreciation_annual) || 0;
-  const property_value = Number(inputs.property_value) || 0;
-  const cash_invested = Number(inputs.cash_invested) || 0;
-  const market_grm = Number(inputs.market_grm) || 0;
+  const inputs = {
+    advertising, auto_travel, cleaning_maintenance, commissions, insurance, legal_professional,
+    management_fees, mortgage_interest, other_interest, repairs, supplies, property_taxes,
+    utilities, hoa_fees,
+  };
+  const monthly_rent = Number(monthly_rent_in);
+  const vacancy_pct = Number(vacancy_pct_in) || 0;
+  const other_income = Number(other_income_annual) || 0;
+  const depreciation = Number(depreciation_annual) || 0;
+  const property_value = Number(property_value_in) || 0;
+  const cash_invested = Number(cash_invested_in) || 0;
+  const market_grm = Number(market_grm_in) || 0;
   if (!Number.isFinite(monthly_rent) || monthly_rent < 0) return { error: "Monthly rent must be non-negative." };
   if (vacancy_pct < 0 || vacancy_pct > 100) return { error: "Vacancy rate must be 0 to 100 percent." };
   const gross_rent = monthly_rent * 12;
@@ -1522,17 +1533,16 @@ async function loadShard(file) {
   return promise;
 }
 
-// dims: in { input: dimensionless }
+// dims: in { shard: dimensionless, state: dimensionless, county_fips: dimensionless, county_name: dimensionless }
 //        out: { conforming_limit: dimensionless, conforming_high_cost_limit: dimensionless, fha_limit: dimensionless, va_no_down_limit: dimensionless, county: dimensionless, source: dimensionless, asOf: dimensionless }
 // (FHFA / FHA / VA county-level loan-limit shard lookup. Monetary
 //  caps are dimensionless dollars per the §7.1 monetary
 //  convention; county / source / asOf tokens are categorical.)
-export function computeLoanLimits(input) {
-  const shard = input && input.shard ? input.shard : null;
+export function computeLoanLimits({ shard = null, state = "", county_fips = "", county_name = "" } = {}) {
   if (!shard) return { error: "Loan-limits shard not loaded." };
-  const wantState = String(input.state || "").toUpperCase();
-  const wantFips = String(input.county_fips || "").trim();
-  const wantName = String(input.county_name || "").trim().toLowerCase();
+  const wantState = String(state || "").toUpperCase();
+  const wantFips = String(county_fips || "").trim();
+  const wantName = String(county_name || "").trim().toLowerCase();
   let match = null;
   if (wantFips) match = shard.high_cost_counties_one_unit.find((c) => c.county_fips === wantFips) || null;
   if (!match && wantState && wantName) {
@@ -1615,17 +1625,16 @@ export function renderLoanLimits(inputRegion, outputRegion, citationEl) {
 // representative high-cost / mid-cost MSAs; the canonical per-county
 // lookup is at huduser.gov.
 
-// dims: in { input: dimensionless }
+// dims: in { shard: dimensionless, state: dimensionless, fips: dimensionless, area_name: dimensionless }
 //        out: { fmr_studio: dimensionless, fmr_1br: dimensionless, fmr_2br: dimensionless, fmr_3br: dimensionless, fmr_4br: dimensionless, area: dimensionless, source: dimensionless, asOf: dimensionless, safmr: dimensionless }
 // (HUD Fair Market Rent shard lookup. FMRs are dimensionless
 //  monthly-rent dollar aggregates per the §7.1 monetary
 //  convention; area / source / asOf tokens are categorical.)
-export function computeHudFmr(input) {
-  const shard = input && input.shard ? input.shard : null;
+export function computeHudFmr({ shard = null, state = "", fips = "", area_name = "" } = {}) {
   if (!shard) return { error: "HUD FMR shard not loaded." };
-  const wantState = String(input.state || "").toUpperCase();
-  const wantFips = String(input.fips || "").trim();
-  const wantName = String(input.area_name || "").trim().toLowerCase();
+  const wantState = String(state || "").toUpperCase();
+  const wantFips = String(fips || "").trim();
+  const wantName = String(area_name || "").trim().toLowerCase();
   let match = null;
   if (wantFips) match = shard.areas.find((a) => a.fips === wantFips) || null;
   if (!match && wantState && wantName) {

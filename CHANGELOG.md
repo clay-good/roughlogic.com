@@ -797,6 +797,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
   The classification, the counts and the named four are now in the gate, in both of its messages and in the README's trust table. The budget still ratchets; what changed is that it no longer implies work that cannot be done.
 
+- **Four computes hid their inputs behind one opaque parameter; destructuring them drained two budgets and put three tiles into the field index for the first time.** `computeHudFmr`, `computeLoanLimits`, `computeRentalWorksheet` and `computePvPerformanceRatio` each took a single named object, which three source-parsing gates cannot see into. They now destructure their real parameters: **`check-guard-only-inputs`' named-object budget goes 4 -> 0**, and `check-fixture-keys` falls 30 -> **25, which is now its floor** -- everything left there is a reference tile with no parameter at all or a shape-dispatch rest param, neither of which has input keys to compare.
+
+  The downstream effects are the point. The schema and label extractors can now read those signatures, so **`/tools/hud-fmr/`, `/tools/loan-limits/` and `/tools/rental-worksheet/` entered the field index** -- 2,043 indexed tiles becomes 2,046, un-indexed 39 becomes 36 -- and the agent door can describe inputs it previously could only guess at. The `rental-worksheet` citation moved out of `renderer-citations.js` and into its input schema, which is the extractor's own de-duplication rule, not a loss.
+
+  Two of the four then had to declare their dimensions: destructuring turns a function the annotation gate was ignoring into one it counts, and the stub ratchet failed the build until `computeHudFmr` and `computeLoanLimits` named their real inputs.
+
 - **Deleting a number was a way to satisfy the gate that guarded it.** `check-cross-validation` held `docs/correctness.md` row B's tolerance-check count with `if (statedChecks && ...)`. That is presence-not-truth twice over: **remove the number from the document and the gate goes green** -- seeded and confirmed -- and because it searched the whole file rather than row B, a `(N checks:` appearing anywhere else would have been read as row B's. The claim is now required, required *in the row that makes it*, and both failure modes are seeded: a deleted count and a wrong one each fail.
 
   A sweep of the other fifty-nine gates for the same optional-claim shape came back clean; `check-audit-trail`, which holds the Phase H signoff numbers in the same document, already errors when its claim goes missing.

@@ -3140,9 +3140,9 @@ cross-check.
 | calc-realestate.js | `computeFixFlipProfit` | `{ arv_usd = 0, purchase_usd = 0, rehab_usd = 0, holding_usd = 0, financing_us...` | _ | _ | _ |
 | calc-realestate.js | `computeFloorAreaRatio` | `{ building_floor_area_sf = 0, lot_area_sf = 0, far_limit = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeGrossRentMultiplier` | `{ price = 0, gross_rent = 0, rent_basis = "annual", market_grm = 0 } = {}` | _ | _ | _ |
-| calc-realestate.js | `computeHudFmr` | `input` | _ | _ | _ |
+| calc-realestate.js | `computeHudFmr` | `{ shard = null, state = "", fips = "", area_name = "" } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeLTV` | `{ loan_amount, value }` | _ | _ | _ |
-| calc-realestate.js | `computeLoanLimits` | `input` | _ | _ | _ |
+| calc-realestate.js | `computeLoanLimits` | `{ shard = null, state = "", county_fips = "", county_name = "" } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeMaxOffer70Rule` | `{ arv = 0, repairs = 0, rule_pct = 70, fee = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeMortgagePointBreakeven` | `{ loan_amount, base_rate_pct, points_rate_pct, point_cost_pct, term_years, ho...` | _ | _ | _ |
 | calc-realestate.js | `computeMortgageReserves` | `{ piti_monthly, reserves_months, liquid_assets, retirement_balance, retiremen...` | _ | _ | _ |
@@ -3154,7 +3154,7 @@ cross-check.
 | calc-realestate.js | `computeRentRollVacancy` | `{ potential_gross_rent = 0, vacancy_rate_pct = 0, credit_loss_pct = 0, other_...` | _ | _ | _ |
 | calc-realestate.js | `computeRentVsBuy` | `{ purchase_price, down_payment, mortgage_rate_pct, term_years, property_tax_p...` | _ | _ | _ |
 | calc-realestate.js | `computeRentalTotalReturn` | `{ cash_invested_usd = 0, annual_cash_flow_usd = 0, principal_paydown_usd = 0,...` | _ | _ | _ |
-| calc-realestate.js | `computeRentalWorksheet` | `inputs` | _ | _ | _ |
+| calc-realestate.js | `computeRentalWorksheet` | `{ monthly_rent: monthly_rent_in, vacancy_pct: vacancy_pct_in, other_income_an...` | _ | _ | _ |
 | calc-realestate.js | `computeRequiredFaceRent` | `{ target_ner = 0, term_periods = 0, free_periods = 0, one_time_credit = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeSection121` | `{ filing_status, sale_price, selling_costs, purchase_price, improvements, mee...` | _ | _ | _ |
 | calc-realestate.js | `computeSellerNetSheet` | `{ price = 0, payoff = 0, commission_pct = 0, transfer_tax_pct = 0, fees = 0, ...` | _ | _ | _ |
@@ -3452,7 +3452,7 @@ cross-check.
 | calc-solar.js | `computePvInterconnectionBusbar` | `{ main_breaker_a = 0, busbar_rating_a = 0, pv_existing_a = 0, pv_proposed_a =...` | _ | _ | _ |
 | calc-solar.js | `computePvInverterRatio` | `{ dc_kw = 0, ac_kw = 0, inv_eff = 0.96 } = {}` | _ | _ | _ |
 | calc-solar.js | `computePvMaxAmbientForPower` | `{ target_power_W = 0, P_stc_W = 0, G_wm2 = 0, NOCT_C = 45, gamma = -0.35 } = {}` | _ | _ | _ |
-| calc-solar.js | `computePvPerformanceRatio` | `inputs = {}` | _ | _ | _ |
+| calc-solar.js | `computePvPerformanceRatio` | `{ soiling = 0, temperature = 0, wiring_dc = 0, wiring_ac = 0, inverter = 0, m...` | _ | _ | _ |
 | calc-solar.js | `computePvRailClampTakeoff` | `{ rows = 2, modules_per_row = 12, module_width_ft = 3.42, gap_ft = 0, rails_p...` | _ | _ | _ |
 | calc-solar.js | `computePvRowShadeAngle` | `{ module_length_ft = 0, tilt_deg = 0, row_pitch_ft = 0 } = {}` | _ | _ | _ |
 | calc-solar.js | `computePvRowSpacing` | `{ module_length_ft = 0, tilt_deg = 0, profile_angle_deg = 0 } = {}` | _ | _ | _ |

@@ -1170,8 +1170,15 @@ function renderPvMaxAmbientForPower(inputRegion, outputRegion, citationEl) {
 SOLAR_RENDERERS["pv-max-ambient-for-power"] = renderPvMaxAmbientForPower;
 
 // dims: in { soiling: dimensionless, temperature: dimensionless, wiring_dc: dimensionless, wiring_ac: dimensionless, inverter: dimensionless, mismatch: dimensionless, shading: dimensionless, availability: dimensionless, nameplate: dimensionless, lid: dimensionless, connections: dimensionless } out: { pr: dimensionless, total_loss_pct: dimensionless }
-export function computePvPerformanceRatio(inputs = {}) {
-  const _g = _finiteGuard(inputs); if (_g) return _g;
+export function computePvPerformanceRatio({
+  soiling = 0, temperature = 0, wiring_dc = 0, wiring_ac = 0, inverter = 0, mismatch = 0,
+  shading = 0, availability = 0, nameplate = 0, lid = 0, connections = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const inputs = {
+    soiling, temperature, wiring_dc, wiring_ac, inverter, mismatch,
+    shading, availability, nameplate, lid, connections,
+  };
   const keys = ["soiling", "temperature", "wiring_dc", "wiring_ac", "inverter", "mismatch", "shading", "availability", "nameplate", "lid", "connections"];
   let pr = 1;
   let anyEntered = false;
