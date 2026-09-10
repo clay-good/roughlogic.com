@@ -728,21 +728,35 @@ async function main() {
     // module lands. Hold them here rather than trusting a future editor: this
     // repo has shipped a stale README count in this exact row before (it said
     // 2,059 functions against a live 2,337 for long enough that nobody knew).
+    // EVERY count here is matched IN ITS OWN PHRASE, not by "appears anywhere in
+    // the row". Set membership passed by coincidence on 2026-09-10: the stub
+    // count fell to 24 and the row already said 24 about the pound convention,
+    // so a stale count would have shipped green. A row this long carries a
+    // dozen numbers, and any one of them can stand in for any other.
     const stated = [...row.matchAll(/(\d[\d,]*)/g)].map((m) => Number(m[1].replace(/,/g, "")));
-    if (!stated.includes(totalFunctions)) {
+    const inPhrase = (re) => {
+      const m = row.match(re);
+      return m ? Number(m[1].replace(/,/g, "")) : null;
+    };
+    const checkPhrase = (re, live, what, phrase) => {
+      const got = inPhrase(re);
+      if (got === live) return;
       errors.push(
-        "README.md's check-dimensions row does not state the live function count (" +
-        totalFunctions.toLocaleString("en-US") + "). Found: " +
-        (stated.length ? stated.join(", ") : "no number at all") + ".",
+        "README.md's check-dimensions row does not state the live " + what + " (" +
+        live.toLocaleString("en-US") + ") in its `" + phrase + "` phrase; it says " +
+        (got === null ? "nothing there" : got.toLocaleString("en-US")) +
+        ". Numbers found in the row: " + (stated.length ? stated.join(", ") : "none") + ".",
       );
-    }
-    if (!stated.includes(tailCounters.covered)) {
-      errors.push(
-        "README.md's check-dimensions row does not state the live unit-tail count (" +
-        tailCounters.covered.toLocaleString("en-US") + "). Found: " +
-        (stated.length ? stated.join(", ") : "no number at all") + ".",
-      );
-    }
+    };
+    checkPhrase(/all ([\d,]+) exported calculator functions/, totalFunctions,
+      "function count", "all N exported calculator functions");
+    checkPhrase(/([\d,]+) keys \*named\* for a unit/, tailCounters.covered,
+      "unit-tail count", "N keys *named* for a unit");
+    // The row also states the DERIVED claim -- how many functions really do
+    // declare their inputs -- and that one rots on its own if either input to
+    // the subtraction moves without it.
+    checkPhrase(/true of ([\d,]+) functions/, totalFunctions - stubs.length,
+      "count of functions that actually declare their inputs", "true of N functions");
     // The stub count is the ratchet, so it is matched IN PLACE rather than by
     // "appears anywhere in the row". Set membership passed by coincidence on
     // 2026-09-10: the count fell to 24 and the row already said 24 about the
@@ -757,13 +771,8 @@ async function main() {
         "single opaque `args` instead.",
       );
     }
-    if (!stated.includes(stillSplit.length)) {
-      errors.push(
-        "README.md's check-dimensions row does not state the live count of names still " +
-        "declared two ways (" + stillSplit.length + "). Found: " +
-        (stated.length ? stated.join(", ") : "no number at all") + ".",
-      );
-    }
+    checkPhrase(/([\d,]+) names are still declared two ways/, stillSplit.length,
+      "count of names still declared two ways", "N names are still declared two ways");
     if (!/annotat|declar/i.test(row)) {
       errors.push(
         "README.md's check-dimensions row does not say it checks a declaration. " +
