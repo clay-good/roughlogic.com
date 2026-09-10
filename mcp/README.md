@@ -195,6 +195,22 @@ Reading the minus sign moved that corpus 5,211 -> 5,223 fields and 703 -> 707
 tiles fully recovered, still at 0 wrong values, and left `measure-ranking.mjs`
 byte-identical.
 
+A curated alias is the other kind of address, and it was reachable only if the
+ranker already agreed. `answer_query`'s rule for the alias corpus has always
+been *"a human wrote that phrase against that tile; nothing here outranks it"* --
+but it was implemented as a search over the ranked **top 3**, so it could only
+rescue a target the ranker had already put there. Six of the ~22,500 curated
+terms had their target ranked lower or absent, and the door answered `NO_MATCH`:
+*no calculator matched*, about a phrase the catalog itself maps to one.
+"how much can i build on my lot" does not put `floor-area-ratio` in the top ten.
+An exact term is now resolved from the corpus itself, and all 22,534 reach their
+tile. A term two tiles share states no preference, so the ranker still
+arbitrates those.
+
+`scripts/measure-alias-door.mjs` sweeps the whole corpus through the door, about
+six minutes; it sits with the other `measure-*` harnesses rather than in the
+lint chain. The six regressions and a deterministic slice are standing tests.
+
 An **id is an address, not a phrasing**: it is the one string the catalog
 guarantees is unique, and the one an agent holds after `search_calculators`.
 `describe_calculator` and `run_calculator` honour it exactly; `answer_query`

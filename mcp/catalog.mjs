@@ -131,7 +131,22 @@ async function load() {
     }
   } catch { /* degrade to no aliases */ }
 
-  _state = { TOOLS, COMPUTE_MAP, RENDERER_MAP, examples, byId, modCache, aliases };
+  // Exact curated term -> the target(s) a human wrote it against. Built once:
+  // the corpus is ~22,500 rows and `answer_query` consults it per call.
+  // A term is only an ANSWER when it names exactly one tile; 48 terms are
+  // genuinely shared ("weld" is both the fillet-weld size and the cost per
+  // foot, "pump" is both pump sizing and the septic pump-out interval), and
+  // for those the ranker is the right arbiter, not the corpus.
+  const aliasExact = new Map();
+  for (const row of aliases) {
+    const term = row.term.toLowerCase().trim();
+    if (!term) continue;
+    const set = aliasExact.get(term);
+    if (set) set.add(row.target);
+    else aliasExact.set(term, new Set([row.target]));
+  }
+
+  _state = { TOOLS, COMPUTE_MAP, RENDERER_MAP, examples, byId, modCache, aliases, aliasExact };
   return _state;
 }
 
@@ -1253,7 +1268,7 @@ export async function answerQuery({ query } = {}) {
   const q = String(query || "").trim();
   if (!q) return { status: "NO_MATCH", query: q, message: "Pass a plain-language question." };
 
-  const { byId, aliases: aliasRows } = await load();
+  const { byId, aliases: aliasRows, aliasExact } = await load();
   const ranked = await search({ query: q, limit: 3 });
   const results = (ranked && ranked.results) || [];
   // Corroboration is only ever asked of ONE tile, so which one it asks about
@@ -1322,7 +1337,27 @@ export async function answerQuery({ query } = {}) {
   //    Resolved from the catalog, not from `results` -- the whole failure is
   //    that the tile need not be in the ranked top 3 at all.
   const literalId = byId.has(q.toLowerCase()) ? { id: q.toLowerCase() } : null;
-  const exactAlias = results.find((r) => queryIsExactCuratedAliasFor(q, r.id, aliasRows));
+  // 1. An exact curated term, resolved from the CORPUS rather than from the
+  //    ranked top 3. The rule was always "a human wrote that phrase against
+  //    that tile; nothing here outranks it" -- but it was implemented as a
+  //    search over `results`, so it could only rescue a target the ranker had
+  //    already placed in the top 3. Sampled 867 of 22,534 curated terms on
+  //    2026-09-09, two came back NO_MATCH: "shaft size for torque" ranks its
+  //    target FIFTH, and "how much can i build on my lot" does not put
+  //    floor-area-ratio in the top ten at all. The door was answering "no
+  //    calculator matched" to phrases the catalog itself maps.
+  //
+  //    Only when the term names ONE tile. 48 terms are shared between two or
+  //    three tiles, and there the corpus states no preference, so the ranker
+  //    decides as before.
+  const soleAliasTarget = (() => {
+    const set = aliasExact && aliasExact.get(q.toLowerCase());
+    if (!set || set.size !== 1) return null;
+    const id = [...set][0];
+    return byId.has(id) ? { id } : null;
+  })();
+  const exactAlias = results.find((r) => queryIsExactCuratedAliasFor(q, r.id, aliasRows))
+    || soleAliasTarget;
   const exactName = results.find((r) => sameTokens(q, byId.get(r.id)));
   const top = literalId
     || exactAlias
@@ -1351,7 +1386,7 @@ export async function answerQuery({ query } = {}) {
   // very query it had just resolved -- "backflow-sizing" carries no value, does
   // not tokenise into "Backflow Assembly Sizing Screen", and is nobody's
   // curated phrase, so a correctly identified tile came back NO_MATCH.
-  if (!literalId
+  if (!literalId && !soleAliasTarget
       && !recovered.length && !queryNamesTile(q, top.name) && !queryIsCuratedAliasFor(q, top.id, aliases)) {
     return { status: "NO_MATCH", query: q, message: "No calculator matched." };
   }

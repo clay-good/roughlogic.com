@@ -285,6 +285,61 @@ test("the MCP door and the tile page agree on the declination", async () => {
 //
 // The invariant: a tile that takes inputs must not answer OK when the question
 // is nothing but its own name. 2,062 tiles, roughly a minute.
+// The alias corpus is the catalog's own statement of how people ask for these
+// calculators, and `answer_query`'s rule for it has always been "a human wrote
+// that phrase against that tile; nothing here outranks it". The rule was
+// implemented as a search over the ranked TOP 3, so it could only rescue a
+// target the ranker had already put there. Six of the ~22,500 terms had their
+// target ranked lower or absent -- "how much can i build on my lot" does not
+// put floor-area-ratio in the top TEN -- and the door answered NO_MATCH: no
+// calculator matched, about a phrase the catalog itself maps to one.
+//
+// An exact term is now resolved from the corpus. The full sweep is
+// scripts/measure-alias-door.mjs, about six minutes; these are the six, plus a
+// deterministic slice so the property is not only pinned where it broke.
+test("a curated alias reaches its own tile, even when the ranker buries it", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  const REGRESSIONS = [
+    ["sheave", "block-redirect-load"],
+    ["what size wire", "min-conductor-for-vd"],
+    ["what size weld", "steel-fillet-weld-size"],
+    ["shaft size for torque", "shaft-diameter-for-torsion"],
+    ["size a weir for flow", "weir-head-from-flow"],
+    ["how much can i build on my lot", "floor-area-ratio"],
+  ];
+  const wrong = [];
+  for (const [term, want] of REGRESSIONS) {
+    const out = await answerQuery({ query: term });
+    if (out.id !== want) wrong.push(`${term} -> ${out.id ?? out.status} (want ${want})`);
+  }
+  assert.deepEqual(wrong, []);
+});
+
+test("a deterministic slice of the alias corpus reaches its tiles", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  const { readFile } = await import("node:fs/promises");
+  const raw = JSON.parse(await readFile(new URL("../../data/search/aliases.json", import.meta.url), "utf8"));
+  // Keyed as the door keys them. A term two tiles share states no preference,
+  // so the ranker arbitrates it and it is not asserted here.
+  const byTerm = new Map();
+  for (const row of raw.aliases || []) {
+    if (!row || typeof row.term !== "string" || typeof row.target !== "string") continue;
+    const term = row.term.toLowerCase().trim();
+    if (!term) continue;
+    const set = byTerm.get(term);
+    if (set) set.add(row.target); else byTerm.set(term, new Set([row.target]));
+  }
+  const unique = [...byTerm.entries()].filter(([, v]) => v.size === 1);
+  const wrong = [];
+  for (let i = 0; i < unique.length; i += 250) {
+    const [term, set] = unique[i];
+    const want = [...set][0];
+    const out = await answerQuery({ query: term });
+    if (out.id !== want) wrong.push(`${term} -> ${out.id ?? out.status} (want ${want})`);
+  }
+  assert.deepEqual(wrong, []);
+});
+
 // An id is not a phrasing, it is an ADDRESS: the one string the catalog
 // guarantees is unique, and the one an agent holds after `search_calculators`.
 // `describe_calculator` and `run_calculator` honour it exactly; `answer_query`
