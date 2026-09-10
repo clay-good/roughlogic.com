@@ -45,7 +45,11 @@ straight from the repo (`tools-data.js`, `test/fixtures/compute-map.js`,
 `test/fixtures/worked-examples.json`), so the MCP surface can never drift from
 the site.
 
-One tile needs more than that wiring to keep the promise. `magnetic-declination`
+Four tiles need more than that wiring to keep the promise, all for one reason:
+they compute from a **data shard the browser fetches over HTTP**, and this door
+runs in Node, where that fetch never resolves.
+
+The first was `magnetic-declination`
 computes from the World Magnetic Model, whose coefficients are a data shard the
 browser fetches asynchronously; because the worked-example runner is
 synchronous, the tile's compute-map entry is a zero-argument **wiring stub**
@@ -67,6 +71,26 @@ declination, 65.88 deg inclination, 51,095 nT and -0.080 deg/yr, which is what
 the page prints. Handed no coordinates at all, the model stamp alone comes back;
 that is the tile's reference content, and the right answer to "which model is
 bundled?".
+
+The other three were quieter about it and worse off. `hud-fmr`, `loan-limits`
+and `historical-pricing` each take their table as an input the page supplies
+after a fetch, so **every `run_calculator` against them came back
+`"shard not loaded."`** -- not a wrong answer, but no answer at all, for three
+tiles the catalog advertises. Nothing caught it, because a bare `run` falls back
+to the tile's own worked example and the fixture *carries the shard*: the door's
+test suite exercised the one path where the input was already there. They read
+the same files the page reads now, so asking for the San Francisco FMR area
+returns the FY2026 two-bedroom rent of $3,604, the San Francisco County loan
+limit returns $1,249,125, and each of the fourteen commodity series resolves
+through `COMMODITIES` -- the page's own catalog of which file belongs to which
+id, rather than a filename this door guesses at.
+
+`shard` stays **declared and optional** on all three rather than hidden. Hiding
+it was tried and reverted: it broke the two contracts that keep this door
+honest -- that `describe_calculator` names every key the tile's own worked
+example sets, and that `run_calculator` warns on a key the calculator cannot
+receive. Declaring it optional satisfies both. The door fills it, a caller may
+still override it, and the tile answers either way.
 
 The tile's worked example is filled from the same published example object its
 page's own "example" button uses, so `describe_calculator` demonstrates the case
