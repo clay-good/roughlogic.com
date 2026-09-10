@@ -793,6 +793,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Two more docs still described a 1,804-tile catalog.** `docs/performance.md` said the build emits "one static HTML shell per tile (`/tools/<id>/index.html`, **1,804 shells**)" -- a present-tense claim about what the build does, against a live **2,082**. `docs/correctness.md` stated the catalog size twice in the sentence explaining why a partial parse reads like a full one ("a sweep that covered 1,700 of 1,804 prints exactly what a sweep that covered all 1,804 prints"), which is the right argument over a stale number. Both corrected and anchored, along with the per-group shell count beside the first.
+
+  The first anchor written for that line matched the *group* clause too -- "(`/groups/<slug>/index.html`, 21 shells)" is the very next phrase -- and compared 21 against the tile count. The gate caught it immediately, which is the argument for anchoring on a path rather than a shape.
+
 - **A 5% tolerance let the axe-pass figure drift by 68 tests, and the route count beside it by 279.** `check-ci-claims` pinned the README's "N-test axe pass" to within 5% of the live count. Five percent of a per-route sweep is about a hundred tests, so the README could read **2,107** against a live **2,175** and pass -- approximately right, and therefore never corrected as the catalog grew. It is now pinned **exactly**. The count is deterministic (the Playwright config's project list is fixed, and the sweep is one test per `TOOLS` id), so exactness costs what the tile, sitemap and shell counts in the same README already cost: one bump per landing, in the commit that moves the number. The gate's own summary line said "within 5% of its live size" and now says what it does.
 
   `docs/accessibility.md` had the same drift with nothing watching at all: it said the axe sweep "runs **1,804** routes", the catalog size two campaigns back, against a live **2,083** (one route per tile plus the home view). The sweep reads `TOOLS` at run time and auto-scaled the whole way; only the prose rotted. Corrected and anchored in `check-readme-counts`.

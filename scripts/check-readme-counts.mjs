@@ -439,6 +439,19 @@ async function main() {
   // Module count: the file-tree line.
   checked += checkPattern(readme, /(\d+) per-group calculator modules/g, live.modules, "calc-* module count", errors);
 
+  // docs/performance.md states the per-tile shell count as a live fact about
+  // what the build emits, and docs/correctness.md states the catalog size twice
+  // in the sentence explaining why a partial parse reads like a full one. Both
+  // still said 1,804 on 2026-09-10. Neither was anchored; both are now.
+  // Anchored on the /tools/ path: the very next clause says "(`/groups/<slug>/
+  // index.html`, 21 shells)", and a pattern that matched both compared the
+  // group count against the tile count.
+  checked += checkPattern(perf, /\/tools\/<id>\/index\.html`, ([\d,]+) shells\)/g, live.tiles, "per-tile shell count (docs/performance.md)", errors);
+  checked += checkPattern(perf, /\/groups\/<slug>\/index\.html`, ([\d,]+) shells\)/g, live.groups, "per-group shell count (docs/performance.md)", errors);
+  const correctness = await readFile(resolve(ROOT, "docs", "correctness.md"), "utf8");
+  checked += checkPattern(correctness, /covered 1,700 of ([\d,]+) prints/g, live.tiles, "catalog size (docs/correctness.md)", errors);
+  checked += checkPattern(correctness, /a sweep that covered all\n([\d,]+) prints/g, live.tiles, "catalog size (docs/correctness.md)", errors);
+
   // docs/accessibility.md says how many routes the axe sweep visits. The sweep
   // itself reads TOOLS at run time and auto-scales, so only the PROSE rots --
   // and it had, to 1,804, the catalog size two campaigns back. One route per

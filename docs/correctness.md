@@ -248,8 +248,8 @@ regular expression matching a fixed field order -- `{ id: "...", name:
 "...", group: "..." }`. A tile written with its fields in another order,
 or carrying an escape the pattern does not allow, is skipped without a
 word. A tile a gate skips is a tile that gate never checked, and a sweep
-that covered 1,700 of 1,804 prints exactly what a sweep that covered all
-1,804 prints: an OK line.
+that covered 1,700 of 2,082 prints exactly what a sweep that covered all
+2,082 prints: an OK line.
 
 Each of those parsers now calls `assertFullCatalogParse` from
 [../scripts/catalog-size.mjs](../scripts/catalog-size.mjs), which compares
