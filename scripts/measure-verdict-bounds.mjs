@@ -57,11 +57,22 @@
 // z-score, a scientific-notation value, a cut/fill elevation). Each candidate
 // is a per-field domain call, which is why this mode reports rather than gates.
 //
-// One has been acted on so far: `moisture-dry-goal` declared soaked material
-// "at dry standard" on a negative meter reading, and now declares min="0" and
-// refuses. Declaring the bound is the better half of the fix -- it moves the
-// field into the declared sweep above, where the browser, `run_calculator` and
+// One was acted on: `moisture-dry-goal` declared soaked material "at dry
+// standard" on a negative meter reading, and now declares min="0" and refuses.
+// Declaring the bound is the better half of the fix -- it moves the field into
+// the declared sweep above, where the browser, `run_calculator` and
 // `answer_query` all see it too.
+//
+// AND IT WAS THE ONLY ONE. Of the 118 conclusions that change in this mode,
+// **zero** go from a baseline that reads as a problem to a negated verdict that
+// reads as permissive. They move the other way ("in range (4-20 mA)" ->
+// "fault-low"), or they are value and prose differences, or the tile takes a
+// negative legitimately. That is worth stating plainly, because it answers the
+// question this mode exists to ask: declaring the missing bounds on 1,166
+// calculators would be a campaign, and it is NOT one this particular harm
+// requires -- there is none of it left in that population to remove. Bounds are
+// still worth declaring for the other reasons (the browser marks the field,
+// `run_calculator` warns, `answer_query` refuses), just not urgently.
 //
 // Zero dependencies, no network. `node scripts/measure-verdict-bounds.mjs`.
 
@@ -69,8 +80,14 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const UNDECLARED = process.argv.includes("--undeclared");
 const { describe, run } = await import(resolve(ROOT, "mcp/catalog.mjs"));
 const { TOOLS } = await import(resolve(ROOT, "tools-data.js"));
+
+// Quantities that legitimately go negative, named rather than guessed at. Only
+// consulted in `--undeclared` mode, where the tile has stated no limit and the
+// label is the only evidence there is.
+const SIGNED = /(temp|deg\s?[fc]\b|°|declination|elevation|elev\b|offset|delta|change|difference|grade|slope|balance|profit|margin|\bnet\b|latitude|longitude|altitude|bearing|azimuth|correction|drift|error|score|mean|z-?score|value\b|tolerance)/i;
 
 const flips = [];
 let scanned = 0;
@@ -94,17 +111,31 @@ for (const tool of TOOLS) {
 
   const bounded = [];
   for (const f of card.inputs || []) {
-    const attrs = f && f.attrs;
-    if (!attrs) continue;
-    if (!(f.key in example) || !Number.isFinite(Number(example[f.key]))) continue;
-    const value = Number(example[f.key]);
-    if (attrs.min !== undefined && attrs.min !== null && Number.isFinite(Number(attrs.min))) {
-      const min = Number(attrs.min);
-      bounded.push({ key: f.key, edge: "min", limit: min, probe: min - (Math.abs(value) + 1) });
+    if (!f) continue;
+    const key = f.key ?? f.name;
+    if (!key || !(key in example) || !Number.isFinite(Number(example[key]))) continue;
+    const value = Number(example[key]);
+    const attrs = f.attrs;
+    const hasMin = attrs && attrs.min !== undefined && attrs.min !== null && Number.isFinite(Number(attrs.min));
+    const hasMax = attrs && attrs.max !== undefined && attrs.max !== null && Number.isFinite(Number(attrs.max));
+
+    if (UNDECLARED) {
+      // No stated limit to violate, so the probe is a NEGATION and the label
+      // is the only evidence about whether that is even meaningless.
+      if (hasMin) continue;
+      if (value <= 0) continue;
+      if (SIGNED.test(String(f.label || key))) continue;
+      bounded.push({ key, edge: "negated", limit: 0, probe: -value });
+      continue;
     }
-    if (attrs.max !== undefined && attrs.max !== null && Number.isFinite(Number(attrs.max))) {
+
+    if (hasMin) {
+      const min = Number(attrs.min);
+      bounded.push({ key, edge: "min", limit: min, probe: min - (Math.abs(value) + 1) });
+    }
+    if (hasMax) {
       const max = Number(attrs.max);
-      bounded.push({ key: f.key, edge: "max", limit: max, probe: max + Math.abs(max || 1) + 1 });
+      bounded.push({ key, edge: "max", limit: max, probe: max + Math.abs(max || 1) + 1 });
     }
   }
   if (!bounded.length) continue;
@@ -135,8 +166,9 @@ for (const f of flips) {
   console.log(`  ${f.id}  ${f.field}=${f.value} (${f.edge} ${f.limit})  ${f.key}: ${JSON.stringify(cut(f.was))} -> ${JSON.stringify(cut(f.now))}`);
 }
 console.log(
-  `measure-verdict-bounds: ${scanned} tile(s) with a bounded numeric input and a string output; ` +
-  `${probes} out-of-range run(s) answered instead of refusing; ${flips.length} conclusion(s) changed.`,
+  `measure-verdict-bounds${UNDECLARED ? " --undeclared" : ""}: ${scanned} tile(s) probed; ` +
+  `${probes} out-of-range run(s) answered instead of refusing; ${flips.length} conclusion(s) changed.` +
+  (UNDECLARED ? " Reporting only: each one is a per-field domain call." : ""),
 );
 // A clean sweep here is only as wide as the catalog's own declarations. Say how
 // wide, so nobody reads silence as coverage.
