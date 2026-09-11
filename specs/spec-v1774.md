@@ -68,12 +68,13 @@ A well-coated line in resistive soil, reading -1.050 V on and -0.780 V instant o
 -0.650 V. After 24 hours with every source off it depolarises to -0.670 V:
 
 ```
-IR drop     = -1.050 - (-0.780) = -0.270 V
-formation   = -0.780 - (-0.650) = -130 mV
-decay       = -0.780 - (-0.670) = -110 mV
+IR drop     = -0.780 - (-1.050) = 0.270 V, the ON reading is that much
+              more negative than the instant off
+formation   = -0.650 - (-0.780) = 130 mV more negative than native
+decay       = -0.670 - (-0.780) = 110 mV less negative after depolarising
 ```
 
-**Both demonstrations clear 100 mV** -- -130 mV by formation and -110 mV by decay -- **and the line is protected
+**Both demonstrations clear 100 mV** -- 130 mV by formation and 110 mV by decay -- **and the line is protected
 under the criterion the standard allows here.**
 
 **It does not meet -0.850 V, and it was never going to:**
@@ -91,12 +92,12 @@ finding.
 **Now make the error the criterion is most often got wrong by.** Measure the decay from the ON potential:
 
 ```
--1.050 - (-0.670) = -380 mV
+-0.670 - (-1.050) = 380 mV
 ```
 
-**-380 mV against a true -110 mV -- 3.5 times over.** The difference is the -270 mV of IR drop, which is
-voltage across soil and not polarisation of steel. A structure whose real decay was -110 mV would pass on this
-reading while sitting 210 mV from the criterion, and **a structure genuinely below 100 mV would pass
+**380 mV against a true 110 mV -- 3.5 times over.** The difference is the 270 mV of IR drop, which is
+voltage across soil and not polarisation of steel. A structure whose real decay was 110 mV would pass on this
+reading while sitting 10 mV from the criterion, and **a structure genuinely below 100 mV would pass
 comfortably** -- which is the failure mode that matters, because it certifies an unprotected line.
 
 ## 4. Scope and non-goals

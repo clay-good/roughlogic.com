@@ -4,7 +4,7 @@
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-brewing.js`**
 > (Group O Kitchen and Food Service, hub `/groups/kitchen/`), no new dependency and no new network call. Inherits spec.md through spec-v1749.md.
 >
-> **The gap.** Between the brite tank and the loading dock a brewery loses a few percent to transfers and fills, and then abandons a partial keg because kegs come in one size. That remainder is the cheapest loss to recover and the one no log sheet records.
+> **The gap.** Between the brite tank and the loading dock a brewery loses a few percent to transfers and fills, and then abandons a partial keg because kegs come in one size. That remainder is a third of the loss and the one no log sheet records.
 
 Repository: github.com/clay-good/roughlogic.com -- US standards only.
 
@@ -81,14 +81,21 @@ remainder       = 4.74 gal
 losses are process; the remainder is arithmetic, and **it is 0.31 of a keg of finished, taxed, saleable beer
 poured down a drain because kegs come in one size.**
 
-**A mixed keg fleet recovers most of it.** The 4.74 gal remainder holds 0 sixth barrels at 5.16 gal,
-recovering 0.00 gal and leaving only 4.74 gal behind -- **0 percent of the remainder saved, with no
-change to the process at all.**
+**A mixed keg fleet usually recovers most of a remainder, and this batch is the unlucky case.** A sixth barrel
+holds 5.16 gal and the remainder is 4.74 -- **0.42 gal short of the smallest package the brewery owns**, so
+none of it can be sold. Had the batch left 5.60 gal instead, one sixth barrel would have taken
+5.16 of it and cut the unsaleable remainder to 0.44 gal.
+
+**Which is the real lesson about remainders: they do not scale and they do not average.** The loss depends
+entirely on where the volume happens to fall against the package sizes available, so **a brewery that tracks
+remainder as a percentage across batches learns nothing** -- the figure is a different number every time for
+reasons that have nothing to do with how the beer was made.
 
 **At $175 a keg the batch is worth $3,325.** The percentage losses cost $121 and the remainder
-$54 -- so the process losses are the larger number, **but they are the ones that need a capital
-project, and the remainder needs a sixth-barrel keg.** That is why yield is tracked in whole packages: the
-percentage tells a brewery how it is doing, and the remainder tells it what to do this afternoon.
+$54. **Both are small and only one of them is a project** -- the process losses need shorter lines or a
+better filler, and the remainder needs nothing but a batch size that divides better into the packages the
+brewery actually owns. **That is why yield is tracked in whole packages rather than in percentages**: the
+percentage measures the process, and the package count measures what was sold.
 
 ## 4. Scope and non-goals
 
