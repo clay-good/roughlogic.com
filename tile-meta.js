@@ -1331,6 +1331,13 @@ const _TILES = [
   ["snow-stacking-area", "G"],
   ["ice-melt-working-temperature", "G"],
   ["walkway-clearing-productivity", "G"],
+  // spec-v1818..v1823 building automation and controls band
+  ["transmitter-span-scaling", "A"],
+  ["deadband-cycling-rate", "C"],
+  ["trend-log-storage", "C"],
+  ["mstp-segment-loading", "C"],
+  ["damper-actuator-torque", "C"],
+  ["loop-error-stackup", "A"],
 ];
 
 

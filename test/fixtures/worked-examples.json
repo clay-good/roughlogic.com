@@ -110546,6 +110546,482 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "transmitter-span-scaling",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Transmitter Span, Accuracy, and 4-20 mA Scaling -- the spec-v1818 worked example, recomputed",
+   "source_edition_or_year": "spec-v1818 of scope-trade-expansion-3, 2026-09-11",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-11",
+   "inputs": {
+    "lower_range_value": 0,
+    "upper_range_value": 100,
+    "upper_range_limit": 250,
+    "loop_ma": 12,
+    "accuracy_pct": 0.1,
+    "low_reading_value": 20,
+    "alt_upper_range_value": 25
+   },
+   "outputs": {
+    "value_eng": {
+     "value": 50,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "span_eng": {
+     "value": 100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "turndown": {
+     "value": 2.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "err_span_eng": {
+     "value": 0.1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "err_url_eng": {
+     "value": 0.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "err_url_as_pct_of_span": {
+     "value": 0.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "basis_ratio": {
+     "value": 2.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "err_url_at_low_reading_pct": {
+     "value": 1.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_span_eng": {
+     "value": 25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_turndown": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_err_url_as_pct_of_span": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "deadband-cycling-rate",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Deadband, Differential, and Equipment Cycling Rate -- the spec-v1819 worked example, recomputed",
+   "source_edition_or_year": "spec-v1819 of scope-trade-expansion-3, 2026-09-11",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-11",
+   "inputs": {
+    "capacitance_btu_f": 1000,
+    "ua_btu_hr_f": 500,
+    "setpoint_f": 70,
+    "outdoor_f": 30,
+    "capacity_btu_hr": 25000,
+    "deadband_f": 2,
+    "alt_deadband_f": 1,
+    "alt_capacity_btu_hr": 50000
+   },
+   "outputs": {
+    "load_btu_hr": {
+     "value": 20000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "on_min": {
+     "value": 24,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "off_min": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cycles_per_hour": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "duty_pct": {
+     "value": 80,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_cycles_per_hour": {
+     "value": 3.125,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "outdoor_at_max_f": {
+     "value": 45,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_deadband_cycles_per_hour": {
+     "value": 4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_capacity_cycles_per_hour": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_capacity_max_cycles_per_hour": {
+     "value": 6.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_capacity_outdoor_at_max_f": {
+     "value": 20,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "trend-log-storage",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Trend Log Sample Interval and Point Storage -- the spec-v1820 worked example, recomputed",
+   "source_edition_or_year": "spec-v1820 of scope-trade-expansion-3, 2026-09-11",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-11",
+   "inputs": {
+    "point_count": 5000,
+    "interval_min": 5,
+    "retention_years": 2,
+    "bytes_per_sample": 16,
+    "controller_points": 200,
+    "controller_buffer_samples": 1000,
+    "poll_interval_min": 60,
+    "cov_changes_per_point_day": 100,
+    "alt_interval_min": 1
+   },
+   "outputs": {
+    "samples_per_point_year": {
+     "value": 105120,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_samples": {
+     "value": 1051200000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "storage_gb": {
+     "value": 16.8192,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_storage_gb": {
+     "value": 84.096,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "controller_samples_per_hour": {
+     "value": 2400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "buffer_fill_min": {
+     "value": 25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "poll_loss_pct": {
+     "value": 58.333333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cov_total_samples": {
+     "value": 365000000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cov_storage_gb": {
+     "value": 5.84,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cov_reduction_pct": {
+     "value": 65.277778,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mstp-segment-loading",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "BACnet MS/TP Segment Loading and Token Loop Time -- the spec-v1821 worked example, recomputed",
+   "source_edition_or_year": "spec-v1821 of scope-trade-expansion-3, 2026-09-11",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-11",
+   "inputs": {
+    "baud": 76800,
+    "device_count": 32,
+    "token_octets": 8,
+    "turnaround_bits": 40,
+    "frame_octets": 50,
+    "transmitting_share": 0.5,
+    "alt_device_count": 64,
+    "alt_baud": 38400
+   },
+   "outputs": {
+    "token_frame_ms": {
+     "value": 1.0416667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "turnaround_ms": {
+     "value": 0.52083333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "per_device_ms": {
+     "value": 1.5625,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "idle_rotation_ms": {
+     "value": 50,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "frame_time_ms": {
+     "value": 6.5104167,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "data_ms": {
+     "value": 104.16667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "loop_time_ms": {
+     "value": 154.16667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_devices_loop_ms": {
+     "value": 308.33333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_devices_ratio": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_baud_loop_ms": {
+     "value": 308.33333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "damper-actuator-torque",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Damper Actuator Torque and Sizing -- the spec-v1822 worked example, recomputed",
+   "source_edition_or_year": "spec-v1822 of scope-trade-expansion-3, 2026-09-11",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-11",
+   "inputs": {
+    "damper_width_in": 48,
+    "damper_height_in": 36,
+    "torque_factor_in_lb_ft2": 5,
+    "sealed_torque_factor_in_lb_ft2": 9,
+    "safety_factor": 1.5
+   },
+   "outputs": {
+    "damper_area_ft2": {
+     "value": 12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_torque_in_lb": {
+     "value": 60,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "design_torque_in_lb": {
+     "value": 90,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "selected_actuator_in_lb": {
+     "value": 140,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sealed_required_torque_in_lb": {
+     "value": 108,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sealed_design_torque_in_lb": {
+     "value": 162,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sealed_selected_actuator_in_lb": {
+     "value": 180,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "loop-error-stackup",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Instrument Loop Total Error Stackup -- the spec-v1823 worked example, recomputed",
+   "source_edition_or_year": "spec-v1823 of scope-trade-expansion-3, 2026-09-11",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-11",
+   "inputs": {
+    "span_eng": 100,
+    "element_err_eng": 0.5,
+    "transmitter_err_pct_span": 0.2,
+    "input_err_pct_span": 0.1,
+    "installation_err_eng": 4,
+    "averaging_err_eng": 0.5,
+    "deadband_eng": 1
+   },
+   "outputs": {
+    "element_eng": {
+     "value": 0.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "transmitter_eng": {
+     "value": 0.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "input_eng": {
+     "value": 0.1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "worst_case_eng": {
+     "value": 0.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rss_eng": {
+     "value": 0.54772256,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ratio": {
+     "value": 1.4605935,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "element_share_of_worst_pct": {
+     "value": 62.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_with_installation_eng": {
+     "value": 4.0373258,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "installation_multiple": {
+     "value": 7.3711148,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_with_averaging_eng": {
+     "value": 0.74161985,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

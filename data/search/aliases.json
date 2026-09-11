@@ -112922,6 +112922,156 @@
    "term": "ice melt application walkways",
    "target": "walkway-clearing-productivity",
    "kind": "industry"
+  },
+  {
+   "term": "4-20 ma scaling",
+   "target": "transmitter-span-scaling",
+   "kind": "industry"
+  },
+  {
+   "term": "transmitter span and zero",
+   "target": "transmitter-span-scaling",
+   "kind": "industry"
+  },
+  {
+   "term": "turndown ratio accuracy",
+   "target": "transmitter-span-scaling",
+   "kind": "industry"
+  },
+  {
+   "term": "percent of span versus percent of url",
+   "target": "transmitter-span-scaling",
+   "kind": "industry"
+  },
+  {
+   "term": "instrument accuracy calibrated range",
+   "target": "transmitter-span-scaling",
+   "kind": "industry"
+  },
+  {
+   "term": "deadband cycling rate",
+   "target": "deadband-cycling-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "control differential short cycling",
+   "target": "deadband-cycling-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "equipment cycles per hour hvac",
+   "target": "deadband-cycling-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "oversizing short cycle",
+   "target": "deadband-cycling-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "two position control deadband",
+   "target": "deadband-cycling-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "trend log storage sizing",
+   "target": "trend-log-storage",
+   "kind": "industry"
+  },
+  {
+   "term": "bacnet trend buffer overrun",
+   "target": "trend-log-storage",
+   "kind": "industry"
+  },
+  {
+   "term": "point count sample interval retention",
+   "target": "trend-log-storage",
+   "kind": "industry"
+  },
+  {
+   "term": "cov reporting data volume",
+   "target": "trend-log-storage",
+   "kind": "industry"
+  },
+  {
+   "term": "building automation historian size",
+   "target": "trend-log-storage",
+   "kind": "industry"
+  },
+  {
+   "term": "bacnet mstp segment loading",
+   "target": "mstp-segment-loading",
+   "kind": "industry"
+  },
+  {
+   "term": "token loop time mstp",
+   "target": "mstp-segment-loading",
+   "kind": "industry"
+  },
+  {
+   "term": "devices per mstp segment",
+   "target": "mstp-segment-loading",
+   "kind": "industry"
+  },
+  {
+   "term": "mstp baud rate response time",
+   "target": "mstp-segment-loading",
+   "kind": "industry"
+  },
+  {
+   "term": "field bus device count",
+   "target": "mstp-segment-loading",
+   "kind": "industry"
+  },
+  {
+   "term": "damper actuator torque",
+   "target": "damper-actuator-torque",
+   "kind": "industry"
+  },
+  {
+   "term": "inch pounds per square foot damper",
+   "target": "damper-actuator-torque",
+   "kind": "industry"
+  },
+  {
+   "term": "low leakage damper actuator sizing",
+   "target": "damper-actuator-torque",
+   "kind": "industry"
+  },
+  {
+   "term": "jackshaft multi section damper",
+   "target": "damper-actuator-torque",
+   "kind": "industry"
+  },
+  {
+   "term": "damper close off torque",
+   "target": "damper-actuator-torque",
+   "kind": "industry"
+  },
+  {
+   "term": "instrument loop error stackup",
+   "target": "loop-error-stackup",
+   "kind": "industry"
+  },
+  {
+   "term": "total probable error control loop",
+   "target": "loop-error-stackup",
+   "kind": "industry"
+  },
+  {
+   "term": "rss versus worst case accuracy",
+   "target": "loop-error-stackup",
+   "kind": "industry"
+  },
+  {
+   "term": "sensor installation error stratification",
+   "target": "loop-error-stackup",
+   "kind": "industry"
+  },
+  {
+   "term": "averaging sensor duct",
+   "target": "loop-error-stackup",
+   "kind": "industry"
   }
  ]
 }

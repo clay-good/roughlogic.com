@@ -56,6 +56,11 @@ export const PROFESSION_NOUN = {
   // dead keys are gone, along with `vet`, `ems` and `aviation`, which appear
   // in no tile's trades array at all. shell-meta.test.js now sweeps the map in
   // both directions, so neither a new trade nor a dead key stays quiet.
+  // spec-v1818..v1823 added the first tiles whose PRIMARY trade is one of
+  // these two, which is what surfaced the gap: both slugs were already
+  // carried as secondary trades and the fallback hid it.
+  instrumentation: "Instrumentation",
+  controls: "Building Controls",
   construction: "Construction",
   welding: "Welders",
   fabrication: "Fabrication",

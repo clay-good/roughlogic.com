@@ -3237,7 +3237,7 @@ function _v26renderMixedWaterTemp(inputRegion, outputRegion, citationEl) {
 }
 PLUMBING_RENDERERS["mixed-water-temp"] = _v26renderMixedWaterTemp;
 
-// dims: in { tank_volume_gal: L^3, cut_in_psi: dimensionless, cut_out_psi: M L^-1 T^-2, precharge_psi: M L^-1 T^-2, pump_gpm: L^3 T^-1, target_drawdown_gal: L^3 } out: { drawdown_gal: L^3, runtime_min: T, cycles_per_hour: dimensionless, tank_volume_gal: L^3 }
+// dims: in { tank_volume_gal: L^3, cut_in_psi: dimensionless, cut_out_psi: M L^-1 T^-2, precharge_psi: M L^-1 T^-2, pump_gpm: L^3 T^-1, target_drawdown_gal: L^3 } out: { drawdown_gal: L^3, runtime_min: T, cycles_per_hour: T^-1, tank_volume_gal: L^3 }
 export function computePressureTankDrawdown({ mode = "find-drawdown", tank_volume_gal = 0, cut_in_psi = 0, cut_out_psi = 0, precharge_psi = null, pump_gpm = 0, target_drawdown_gal = 0 } = {}) {
   const _g = _finiteGuard({ tank_volume_gal, cut_in_psi, cut_out_psi, pump_gpm, target_drawdown_gal }); if (_g) return _g;
   const Pin = Number(cut_in_psi), Pout = Number(cut_out_psi);

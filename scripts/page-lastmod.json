@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "0921704052b3c809",
+      "sha": "0402c45747e915b8",
       "date": "2026-09-11"
     },
     "/tools/": {
-      "sha": "b68665764004c72c",
+      "sha": "4004eee19e9fb8bc",
       "date": "2026-09-11"
     },
     "/groups/accounting/": {
-      "sha": "48fefa8e02f1df57",
+      "sha": "5ee1b19c1dd467a9",
       "date": "2026-09-11"
     },
     "/groups/agriculture/": {
-      "sha": "221b8fa1d51b2249",
+      "sha": "5e7e297a41174e58",
       "date": "2026-09-11"
     },
     "/groups/construction/": {
-      "sha": "4717f1a2850870f0",
+      "sha": "cf9462f5019c4616",
       "date": "2026-09-11"
     },
     "/groups/cross-trade/": {
-      "sha": "a132e9cc9b132281",
+      "sha": "66d101439ccc567c",
       "date": "2026-09-11"
     },
     "/groups/educators/": {
-      "sha": "c57846f47085570d",
+      "sha": "87f87a234fa71bfd",
       "date": "2026-09-11"
     },
     "/groups/electrical/": {
-      "sha": "ce54e435fea1d882",
+      "sha": "fe9a8d0c8af67451",
       "date": "2026-09-11"
     },
     "/groups/field/": {
-      "sha": "4680c508705f2418",
+      "sha": "45ffcef309a408a5",
       "date": "2026-09-11"
     },
     "/groups/fire-ground/": {
-      "sha": "868e4dae8d3e86f6",
+      "sha": "940d41565037af7d",
       "date": "2026-09-11"
     },
     "/groups/historical/": {
-      "sha": "39b4a4574e73f90d",
+      "sha": "e6f4117a5c82e293",
       "date": "2026-09-11"
     },
     "/groups/hvac/": {
-      "sha": "b5afecf5c26e331e",
+      "sha": "91c8ce8ee274f55e",
       "date": "2026-09-11"
     },
     "/groups/kitchen/": {
-      "sha": "a0e63b25b491b578",
+      "sha": "4e192ee09470591e",
       "date": "2026-09-11"
     },
     "/groups/lab/": {
-      "sha": "85032f2d9280e3d4",
+      "sha": "fcf01997d4609f45",
       "date": "2026-09-11"
     },
     "/groups/mechanic/": {
-      "sha": "60c3cf07aa118219",
+      "sha": "8fba47be37fbc138",
       "date": "2026-09-11"
     },
     "/groups/plumbing/": {
-      "sha": "a018330a818e71ae",
+      "sha": "73bd5e84112f0563",
       "date": "2026-09-11"
     },
     "/groups/real-estate/": {
-      "sha": "6bf1bea871f7af84",
+      "sha": "5f5b6400d199563f",
       "date": "2026-09-11"
     },
     "/groups/references/": {
-      "sha": "525dd9d9163609b5",
+      "sha": "00f927927a947920",
       "date": "2026-09-11"
     },
     "/groups/restoration/": {
-      "sha": "7f886aeb630ced5a",
+      "sha": "4cb63b263c2d1698",
       "date": "2026-09-11"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "fe0d898954fae47f",
+      "sha": "80796cc8f3f8b2c6",
       "date": "2026-09-11"
     },
     "/groups/stage/": {
-      "sha": "18949511b98a7821",
+      "sha": "87ce0d3b8dd0d29f",
       "date": "2026-09-11"
     },
     "/groups/trucking/": {
-      "sha": "42c63b6a2a89da9f",
+      "sha": "d14149905eca3d08",
       "date": "2026-09-11"
     },
     "/groups/water/": {
-      "sha": "366f406cf0861e5d",
+      "sha": "94501f4783f28200",
       "date": "2026-09-11"
     },
     "/tools/aav-install-check/": {
@@ -1901,9 +1901,13 @@
       "sha": "13e19e8f2bde2de2",
       "date": "2026-09-09"
     },
+    "/tools/damper-actuator-torque/": {
+      "sha": "31e4bbf582cf7fd4",
+      "date": "2026-09-11"
+    },
     "/tools/damper-authority/": {
-      "sha": "6fe62b123b3e16fd",
-      "date": "2026-09-08"
+      "sha": "f177c93342dd395e",
+      "date": "2026-09-11"
     },
     "/tools/dc-shunt-sizing/": {
       "sha": "a57411c4f65bea41",
@@ -1912,6 +1916,10 @@
     "/tools/dcv-co2-ventilation/": {
       "sha": "a938c8df60ab2f6a",
       "date": "2026-09-01"
+    },
+    "/tools/deadband-cycling-rate/": {
+      "sha": "1821101d05ae796c",
+      "date": "2026-09-11"
     },
     "/tools/deadhead-percent/": {
       "sha": "e3a335ce2dd2540f",
@@ -2138,8 +2146,8 @@
       "date": "2026-09-09"
     },
     "/tools/dp-flow-signal-scaling/": {
-      "sha": "e637dadaa272312a",
-      "date": "2026-09-04"
+      "sha": "a49d04c8c4233bc0",
+      "date": "2026-09-11"
     },
     "/tools/dp-level-hydrostatic/": {
       "sha": "ba4fc6b60221ba7d",
@@ -3570,8 +3578,8 @@
       "date": "2026-09-01"
     },
     "/tools/hvac-equipment-circuit/": {
-      "sha": "32acd21ddefbebdc",
-      "date": "2026-09-09"
+      "sha": "ff5c9400cfdfe3f4",
+      "date": "2026-09-11"
     },
     "/tools/hx-lmtd-ntu/": {
       "sha": "a0685fd417f9b859",
@@ -4089,9 +4097,13 @@
       "sha": "fd7bae174a52713f",
       "date": "2026-09-06"
     },
+    "/tools/loop-error-stackup/": {
+      "sha": "66fc5666e10acd1f",
+      "date": "2026-09-11"
+    },
     "/tools/loop-signal-scaling/": {
-      "sha": "b3a5a2f2f3d14347",
-      "date": "2026-09-01"
+      "sha": "b58853ae5f23b9b5",
+      "date": "2026-09-11"
     },
     "/tools/loop-voltage-budget/": {
       "sha": "f6bb7161dffb77f1",
@@ -4522,8 +4534,8 @@
       "date": "2026-09-04"
     },
     "/tools/motor-fault-contribution/": {
-      "sha": "d6e89d9c02895dad",
-      "date": "2026-09-01"
+      "sha": "561dc287471f337d",
+      "date": "2026-09-11"
     },
     "/tools/motor-feeder-multiple/": {
       "sha": "63fdbf8b8c6c1b36",
@@ -4576,6 +4588,10 @@
     "/tools/motor-vd-starting/": {
       "sha": "b39012c652a9f42e",
       "date": "2026-09-01"
+    },
+    "/tools/mstp-segment-loading/": {
+      "sha": "84d973a70eaee50b",
+      "date": "2026-09-11"
     },
     "/tools/mt-yoke-coil-amperage/": {
       "sha": "0cef2f7ff5a17c8c",
@@ -5006,8 +5022,8 @@
       "date": "2026-09-01"
     },
     "/tools/pipe-insulation-for-condensation/": {
-      "sha": "c4c08cf36a4caa26",
-      "date": "2026-09-01"
+      "sha": "5eb4737cd6c8f1b7",
+      "date": "2026-09-11"
     },
     "/tools/pipe-insulation-takeoff/": {
       "sha": "23a58f1144313617",
@@ -6022,8 +6038,8 @@
       "date": "2026-09-01"
     },
     "/tools/rooftop-curb-uplift/": {
-      "sha": "50f780cde50f2b8a",
-      "date": "2026-09-09"
+      "sha": "91c4e486afb0ca88",
+      "date": "2026-09-11"
     },
     "/tools/rooftop-temp-adder/": {
       "sha": "8db9b52fb9b99e90",
@@ -7466,8 +7482,8 @@
       "date": "2026-09-01"
     },
     "/tools/thermistor-steinhart-hart/": {
-      "sha": "42f6eb2975dcccdf",
-      "date": "2026-09-07"
+      "sha": "2f423a515b031d63",
+      "date": "2026-09-11"
     },
     "/tools/thermoforming-draw-ratio/": {
       "sha": "e7d15aa2637a6375",
@@ -7697,6 +7713,10 @@
       "sha": "b77ef5b6f3bc2916",
       "date": "2026-09-01"
     },
+    "/tools/transmitter-span-scaling/": {
+      "sha": "e2fb0489e5c1de2b",
+      "date": "2026-09-11"
+    },
     "/tools/transverse-wind-load-conductor/": {
       "sha": "87f35cc90ed3681d",
       "date": "2026-09-07"
@@ -7760,6 +7780,10 @@
     "/tools/trench-slope/": {
       "sha": "cc379eb1fa8372b9",
       "date": "2026-09-01"
+    },
+    "/tools/trend-log-storage/": {
+      "sha": "e3376597f741643b",
+      "date": "2026-09-11"
     },
     "/tools/triage-quickread/": {
       "sha": "b904a0868a532892",
@@ -7942,8 +7966,8 @@
       "date": "2026-09-08"
     },
     "/tools/valve-authority/": {
-      "sha": "61f9ab8cc67b1d08",
-      "date": "2026-09-04"
+      "sha": "ddc99fa56d4403e8",
+      "date": "2026-09-11"
     },
     "/tools/valve-flow-coefficient/": {
       "sha": "34b723c32057dfe6",

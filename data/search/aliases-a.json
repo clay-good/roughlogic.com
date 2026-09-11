@@ -2867,6 +2867,16 @@
     {"term":"concrete encased duct ampacity","target":"duct-bank-ampacity-derate","kind":"industry"},
     {"term":"mutual heating cables","target":"duct-bank-ampacity-derate","kind":"industry"},
     {"term":"underground feeder ampacity","target":"duct-bank-ampacity-derate","kind":"industry"},
-    {"term":"how much do i derate in a duct bank","target":"duct-bank-ampacity-derate","kind":"question"}
+    {"term":"how much do i derate in a duct bank","target":"duct-bank-ampacity-derate","kind":"question"},
+    {"term":"4-20 ma scaling","target":"transmitter-span-scaling","kind":"industry"},
+    {"term":"transmitter span and zero","target":"transmitter-span-scaling","kind":"industry"},
+    {"term":"turndown ratio accuracy","target":"transmitter-span-scaling","kind":"industry"},
+    {"term":"percent of span versus percent of url","target":"transmitter-span-scaling","kind":"industry"},
+    {"term":"instrument accuracy calibrated range","target":"transmitter-span-scaling","kind":"industry"},
+    {"term":"instrument loop error stackup","target":"loop-error-stackup","kind":"industry"},
+    {"term":"total probable error control loop","target":"loop-error-stackup","kind":"industry"},
+    {"term":"rss versus worst case accuracy","target":"loop-error-stackup","kind":"industry"},
+    {"term":"sensor installation error stratification","target":"loop-error-stackup","kind":"industry"},
+    {"term":"averaging sensor duct","target":"loop-error-stackup","kind":"industry"}
   ]
 }

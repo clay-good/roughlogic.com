@@ -193,7 +193,7 @@ EARTHWORK_RENDERERS["haul-cycle-production"] = _v67renderHaulCycleProduction;
 //
 // payload = bucket_cap x fill_factor; cycles/hr = eff_min / cycle;
 // production = payload x cycles/hr; daily = production x hours.
-// dims: in { bucket_cap_lcy: L^3, fill_factor: dimensionless, cycle_min: T, eff_min_per_hr: T, hours_per_day: T } out: { bucket_payload_lcy: L^3, cycles_per_hour: dimensionless, production_lcy_hr: L^3 T^-1, daily_lcy: L^3 }
+// dims: in { bucket_cap_lcy: L^3, fill_factor: dimensionless, cycle_min: T, eff_min_per_hr: T, hours_per_day: T } out: { bucket_payload_lcy: L^3, cycles_per_hour: T^-1, production_lcy_hr: L^3 T^-1, daily_lcy: L^3 }
 // (Bucket capacity is L^3; the fill factor and cycles-per-hour are dimensionless;
 //  every time is T; production is a volume-rate L^3 T^-1 and the daily volume L^3.)
 export function computeLoaderProduction({ bucket_cap_lcy, fill_factor = 0.95, cycle_min, eff_min_per_hr = 50, hours_per_day = 8 } = {}) {
@@ -256,7 +256,7 @@ EARTHWORK_RENDERERS["loader-production"] = _v809renderLoaderProduction;
 //
 // cycle = push_dist/push_speed + push_dist/return_speed + fixed;
 // cycles/hr = eff_min / cycle; production = blade x cycles/hr.
-// dims: in { blade_cap_lcy: L^3, push_dist_ft: L, push_speed_fpm: L T^-1, return_speed_fpm: L T^-1, fixed_min: T, eff_min_per_hr: T } out: { cycle_min: T, cycles_per_hour: dimensionless, production_lcy_hr: L^3 T^-1 }
+// dims: in { blade_cap_lcy: L^3, push_dist_ft: L, push_speed_fpm: L T^-1, return_speed_fpm: L T^-1, fixed_min: T, eff_min_per_hr: T } out: { cycle_min: T, cycles_per_hour: T^-1, production_lcy_hr: L^3 T^-1 }
 // (Blade capacity is L^3; push distance L; both speeds L T^-1; every time is T;
 //  cycles-per-hour is dimensionless and production a volume-rate L^3 T^-1.)
 export function computeDozerProduction({ blade_cap_lcy, push_dist_ft, push_speed_fpm, return_speed_fpm, fixed_min = 0.05, eff_min_per_hr = 50 } = {}) {

@@ -24163,6 +24163,81 @@ export const CITATIONS = {
   // on the hand work, which is what degrades fastest"; its OWN depth factors
   // at 12 in give 3.33 h of machine work against 2.50 h of hand work, so the
   // MACHINE governs. Which operation governs is computed here, not asserted.
+  // spec-v1818..v1823: the 2026-09-11 trade-expansion building automation and
+  // controls band. Six tiles, nothing cut, and all six specs arithmetically
+  // sound as written -- every figure recomputed before wiring.
+  "transmitter-span-scaling": {
+    formula: "value = LRV + (mA - 4) / 16 x span, where span = URV - LRV; turndown = URL / span; the same quoted accuracy is applied on three bases -- percent of calibrated span, percent of upper range limit, and percent of reading.",
+    edition: "The linear 4-20 mA scaling relation and the three accuracy bases a datasheet may use. The accuracy figure and its basis are ENTERED from the transmitter's specification.",
+    freeAccess: "A linear map and three percentage bases.",
+    governance: GOVERNANCE.general,
+    editionNote: "'0.1% OF SPAN' AND '0.1% OF URL' ARE THE SAME STATEMENT ONLY AT TURNDOWN 1:1, and a specification that does not state a basis has not stated an accuracy. The URL-basis error is FIXED by the sensor limit, so as a share of the calibrated span it grows in direct proportion to turndown: a 250 in w.c. device ranged 0 to 100 gives 0.25% of span from a 0.1% figure, and ranged 0 to 25 gives 1.0% -- ten times the headline, from a device performing exactly to specification. The absolute error never moved; the span shrank underneath it. AND THE BOTTOM OF THE RANGE IS WORSE AGAIN: at 20% of span the same error is 1.25% of reading, at a condition a modern control sequence spends most of its time in. This is the LINEAR case; a differential-pressure flow transmitter maps to the square root of the signal and is steeper still at the bottom. Published accuracy is a REFERENCE figure excluding ambient temperature, static pressure, drift, mounting position and vibration, all specified separately and frequently larger.",
+    assumptions: [
+      { name: "Linear transfer function", value: "no square-root extraction or internal characterisation", source: "the transmitter's configuration" },
+      { name: "Accuracy is a reference figure", value: "operating-condition effects are specified separately", source: "the manufacturer's full specification" },
+      { name: "Installation error is not included", value: "it commonly dominates everything the instrument contributes", source: "a field verification" },
+    ],
+  },
+  "deadband-cycling-rate": {
+    formula: "load = UA x (setpoint - outdoor); on = C x deadband / (Q - load); off = C x deadband / load; cycles per hour = load (Q - load) / (C x deadband x Q); duty = load / Q; the maximum is Q / (4 C x deadband), at 50% duty.",
+    edition: "A first-order two-position cycling model: one thermal capacitance, one loss coefficient, and a fixed-output device. Not a simulation.",
+    freeAccess: "A first-order thermal relation.",
+    governance: GOVERNANCE.general,
+    editionNote: "DEADBAND AND CYCLING ARE INVERSELY PROPORTIONAL -- halving the band exactly doubles the starts -- while THE DUTY CYCLE DOES NOT DEPEND ON THE DEADBAND AT ALL. A narrow band does not make equipment run more, it makes it START more, which is the damaging thing. OVERSIZING WORKS THROUGH THE MAXIMUM: the peak rate scales directly with capacity, so doubling the equipment doubles the worst case (3.12 to 6.25 per hour on the worked case). AND THE PEAK MOVES TO A COLDER DAY, NOT A MILDER ONE -- the oversized unit reaches 50% duty at 20 degF against the right-sized unit's 45 -- which inverts the usual folklore. The stronger statement the arithmetic supports is that an oversized unit cycles more at EVERY load: cycles = (load / C x deadband) x (1 - load / Q) is strictly increasing in Q. Anti-short-cycle timers decouple the real machine from this relation entirely, and modulating or staged equipment does not cycle this way at all.",
+    assumptions: [
+      { name: "First-order space", value: "one capacitance, one UA; internal mass, gains and infiltration are not modelled", source: "a teaching model, not a simulation" },
+      { name: "Instantaneous equipment", value: "no start-up transient, purge, pull-down or minimum off timer", source: "the equipment manufacturer's data" },
+      { name: "Two-position control only", value: "modulating, staged and variable-speed equipment do not cycle this way", source: "the sequence of operation" },
+    ],
+  },
+  "trend-log-storage": {
+    formula: "samples per point per year = 60 / interval x 24 x 365; storage = points x samples x years x bytes per sample; the controller's own rate is its points x 60 / interval, and its buffer fills in depth / that rate -- which is the maximum archive poll interval.",
+    edition: "Trend volume and buffer fill relations. Bytes per sample, buffer depth and the poll interval are ENTERED from the controller and historian documentation.",
+    freeAccess: "Two rate calculations.",
+    governance: GOVERNANCE.general,
+    editionNote: "STORAGE IS RARELY WHAT STOPS A TREND SYSTEM -- 5,000 points at 5 minutes for two years is under 20 GB. THE CONTROLLER BUFFER IS, AND IT LEAVES NO TRACE: 200 points at 5 minutes fills a 1,000-sample buffer in 25 minutes, so an hourly poll -- a completely ordinary setting -- loses 58% of every hour and reports nothing. The archive receives a continuous-looking series with unmarked gaps and the trend plots as a line because the graph joins the points it has. The maximum poll interval is set by the buffer depth and point count on EACH controller, not site-wide. CHANGE-OF-VALUE IS NOT A GENERAL ANSWER: it reduces volume only while the change rate is below the periodic rate (100 changes/day against 288 periodic samples is a 65% cut), and a noisy analogue point crossing a small deadband can exceed it and INCREASE the volume it was adopted to reduce. Bytes per sample varies by an order of magnitude with the historian, so this is a planning number rather than a disk requirement.",
+    assumptions: [
+      { name: "Bytes per sample is entered", value: "a compressed columnar store is a fraction of the naive figure; an indexed relational table several times it", source: "the historian's documentation" },
+      { name: "The buffer wraps", value: "some controllers stop or signal instead; it is product-specific", source: "the controller's documentation" },
+      { name: "Uniform interval across points", value: "a real site mixes intervals by point purpose", source: "the trend design" },
+    ],
+  },
+  "mstp-segment-loading": {
+    formula: "token frame = octets x 10 / baud; turnaround = bit times / baud; idle rotation = devices x (token frame + turnaround); data = transmitting devices x (frame octets x 10 / baud); loop time = idle rotation + data, and the worst-case response is one full rotation.",
+    edition: "A simplified model of the BACnet MS/TP master node state machine. ASHRAE Standard 135 and the controller manufacturers' documentation govern the real behaviour.",
+    freeAccess: "Frame timing arithmetic.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE 127 MASTER ADDRESSES THE PROTOCOL PERMITS ARE A NAMING LIMIT, NOT A CAPACITY. 32 devices at 76,800 baud gives a 50 ms idle rotation and 154 ms with half the devices sending a 50 octet frame; 64 devices doubles it to 308 ms, and that is still only half the address space. A segment built to the address limit responds in the high hundreds of milliseconds before anyone adds a trend poll -- adequate for scheduled and reset sequences, not for a safety interlock, and that judgement is what the number is for. DROPPING THE BAUD RATE IS THE SAME PROBLEM FROM THE OTHER SIDE: 32 devices at 38,400 also gives 308 ms, exactly double, because every frame takes twice as long. Raising the rate is the first remedy and it is BOUNDED -- maximum cable length falls as baud rises and the bus becomes far less tolerant of stubs, missing termination and grounding faults, so on a long existing run the answer is another segment rather than another setting. TOKEN LOSS AND RECOVERY, not steady-state rotation, is what makes a marginal segment behave badly, and most MS/TP problems live in the physical layer this does not model.",
+    assumptions: [
+      { name: "Steady-state rotation", value: "no token loss, recovery timeout, or poll-for-master cycle", source: "ASHRAE Standard 135's state machine" },
+      { name: "One frame per device per token", value: "Nmax_info_frames may permit more", source: "the controller's configuration" },
+      { name: "Uniform frame length", value: "a trend upload or firmware download behaves nothing like a present-value poll", source: "the services in use" },
+    ],
+  },
+  "damper-actuator-torque": {
+    formula: "area = width x height / 144; required torque = area x the torque factor in in-lb per sq ft; design torque = required x the safety factor; the selection is the smallest standard actuator at or above it, from the 35 / 70 / 140 / 180 in-lb ladder, and beyond the largest it is multiple actuators or a jackshaft.",
+    edition: "The damper torque factor convention. Factors are ENTERED: roughly 3 to 5 in-lb per sq ft for an ordinary low-pressure damper, 5 to 7 at higher velocity and pressure, and 7 to 10 or more with blade and jamb seals.",
+    freeAccess: "An area calculation and a ladder lookup.",
+    governance: GOVERNANCE.general,
+    editionNote: "SEALS ARE THE WHOLE STORY AND THEY ARE SPECIFIED BY SOMEONE ELSE. A 48 x 36 in damper needs a 140 in-lb actuator unsealed and 180 with blade and jamb seals -- the seals move the selection up a size, and the leakage specification that required them lives on the DAMPER schedule rather than the actuator schedule. That is the disconnect: the damper is correctly specified, the actuator is sized from the ordinary factor, and the two documents never meet. THE FAILURE LOOKS LIKE A CONTROL PROBLEM: the damper strokes to within a few degrees of closed, the actuator sits at stall compressing the last of the seal, and the control system reports the COMMANDED position rather than the achieved one -- so what gets investigated is the freeze stat that tripped. AND NONE OF THIS ADDRESSES CLOSE-OFF, which is separately rated and frequently governs for isolation service: an actuator adequate to stroke a damper can be inadequate to keep it closed once the fan starts. A spring-return actuator delivers LESS torque than the same frame size without one. The actuator ladder is bundled as the four standard sizes rather than taken as a list input; a different ladder is the manufacturer's to supply.",
+    assumptions: [
+      { name: "Torque factors are entered", value: "blade style, bearings, linkage, frame, velocity and seals all move them", source: "the damper manufacturer's published torque" },
+      { name: "Close-off is NOT computed", value: "holding shut against fan pressure is a separate published rating", source: "the actuator datasheet" },
+      { name: "Single-section damper", value: "a multi-section damper is normally sized and driven section by section", source: "the manufacturer's arrangement" },
+    ],
+  },
+  "loop-error-stackup": {
+    formula: "each element converted to the same engineering units; worst case = the arithmetic sum; total probable error = sqrt(sum of squares); installation and averaging errors combine in quadrature with the instrument total, and the result is compared with the control deadband.",
+    edition: "The worst-case and root-sum-square uncertainty combination conventions. RSS is valid for INDEPENDENT errors only; systematic ones must be summed. Installation error is ENTERED and estimated.",
+    freeAccess: "A sum and a root sum square.",
+    governance: GOVERNANCE.general,
+    editionNote: "WORST CASE AND RSS ANSWER DIFFERENT QUESTIONS AND BOTH ARE LEGITIMATE -- 0.80 degF against 0.55 on the worked chain, a factor of 1.46, with the sensing element supplying 62% of the worst case on its own. Quoting one and meaning the other over- or understates by a consistent and invisible factor. RSS IS VALID ONLY FOR INDEPENDENT RANDOM ERRORS: a calibration offset, a common temperature effect, or a shared reference affects several elements in the same direction and must be SUMMED. THE UNIT CONVERSION IS WHERE STACKUPS GO WRONG BEFORE ANY COMBINATION IS ATTEMPTED, because percentages of different spans do not add. AND THEN PLACEMENT MAKES THE EXERCISE ACADEMIC: a 4 degF stratification takes the same loop to 4.04 degF, SEVEN TIMES the carefully computed instrument error and essentially equal to the installation error alone -- against a 1.0 degF deadband that loop cannot control at all, and it will look like an unstable loop rather than a misplaced sensor. THE REMEDY IS A SENSOR, NOT A TUNING SESSION: a multi-point averaging element brings the same loop back to 0.74 degF. The first question about any loop is where its sensor sits, and the stackup is worth computing mainly so that answer can be put beside it.",
+    assumptions: [
+      { name: "Errors are independent", value: "RSS is wrong for systematic or shared-cause errors, which must be summed", source: "standard uncertainty practice" },
+      { name: "Reference accuracies only", value: "ambient temperature, drift, supply voltage, mounting and vibration belong in a complete stackup", source: "the manufacturers' full specifications" },
+      { name: "Static error only", value: "dynamic error from a sensor's time constant is not included", source: "a field verification of the loop" },
+    ],
+  },
   "salt-application-rate": {
     formula: "material per pass = rate per lane-mile x route lane-miles; coverage = hopper capacity in lb / material per pass; a lot converts at 63,360 sq ft per lane-mile (one 12 ft lane one mile long).",
     edition: "Published application rate bands by PAVEMENT temperature (Salt Institute, Clear Roads, and state maintenance manuals): roughly 100 to 200 lb per lane-mile at 30 degF and above, 200 to 300 at 25 to 30, 300 to 400 at 20 to 25, and 400 to 600 below 20. The band and the rate are ENTERED, not selected.",

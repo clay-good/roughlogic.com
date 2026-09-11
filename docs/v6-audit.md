@@ -2,14 +2,14 @@
 
 > **Historical record, not a live worklist.** The per-group tables below are the
 > audit as it was worked, tile by tile, from v6 through the v12 close on
-> 2026-05-16 -- 385 spec-numbered utilities. The catalog is now **2,092 tiles**,
+> 2026-05-16 -- 385 spec-numbered utilities. The catalog is now **2,098 tiles**,
 > and they were not added to these tables, because by then the audit's invariant
 > had stopped being a checklist and become a gate.
 >
 > **What holds it today is `check-citation-coverage`**, in the `npm run lint`
 > chain: it fails the build unless every tile in `TOOLS` has a `CITATIONS` entry
 > carrying all four required fields, with no orphan entries and no raw URL
-> schemes -- currently **2,092 of 2,092**. `test/unit/citations.test.js` holds
+> schemes -- currently **2,098 of 2,098**. `test/unit/citations.test.js` holds
 > the shape beside it: every entry carries the six §3 fields, and every entry's
 > governance string matches a `GOVERNANCE` variant verbatim. That test also
 > carries per-group coverage assertions (Groups A, B, F, G and others), which is

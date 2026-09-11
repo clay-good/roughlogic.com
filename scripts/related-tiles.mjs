@@ -1644,6 +1644,13 @@ const RELATED = {
   "pool-pump-speed-savings": ["pool-turnover","vfd-energy-savings","pool-cover-evaporation"],
   "pool-heat-pump-capacity": ["pool-heater-btu","pool-cover-evaporation","heat-pump-cold-capacity"],
   "spa-drain-interval": ["pool-turnover","pool-alkalinity-adjust","pool-volume"],
+  // spec-v1818..v1823: building automation and controls band.
+  "transmitter-span-scaling": ["loop-error-stackup","dp-flow-signal-scaling","loop-signal-scaling"],
+  "loop-error-stackup": ["transmitter-span-scaling","loop-signal-scaling","rtd-resistance-to-temp"],
+  "deadband-cycling-rate": ["trend-log-storage","pid-tuning-ziegler-nichols","building-ua"],
+  "trend-log-storage": ["mstp-segment-loading","deadband-cycling-rate","loop-error-stackup"],
+  "mstp-segment-loading": ["trend-log-storage","transmitter-span-scaling","voltage-drop"],
+  "damper-actuator-torque": ["damper-authority","valve-authority","duct-leakage"],
   // spec-v1845..v1850: snow and ice management band.
   "salt-application-rate": ["ice-melt-working-temperature","brine-batch-salinity","plow-route-cycle-time"],
   "brine-batch-salinity": ["salt-application-rate","ice-melt-working-temperature","tds-from-conductivity"],

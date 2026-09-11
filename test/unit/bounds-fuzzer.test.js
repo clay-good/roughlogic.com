@@ -53199,3 +53199,343 @@ test("bounds: spec-v1850 computeWalkwayClearingProductivity -- the MACHINE gover
   assert.ok(_v1850({ ...base, blower_depth_factor: 1.5 }).error);
   assert.ok(_v1850({ ...base, hand_depth_factor: 0 }).error);
 });
+
+// =====================================================================
+// spec-v1818..v1823: the building automation and controls band. Six tiles,
+// nothing cut, and all six specs arithmetically sound as written. The
+// identities below pin the claims the specs make about their own numbers:
+// that the URL accuracy basis degrades in EXACT proportion to turndown, that
+// duty cycle is independent of deadband while cycling is inverse in it, that
+// an oversized unit cycles more at EVERY load and peaks on a COLDER day, that
+// halving the baud rate and doubling the device count cost the same, and that
+// worst case and root sum square are a bounded pair.
+// =====================================================================
+import {
+  computeTransmitterSpanScaling as _v1818,
+  computeDeadbandCyclingRate as _v1819,
+  computeTrendLogStorage as _v1820,
+  computeMstpSegmentLoading as _v1821,
+  computeDamperActuatorTorque as _v1822,
+  computeLoopErrorStackup as _v1823,
+} from "../../calc-controls.js";
+
+test("bounds: spec-v1818 computeTransmitterSpanScaling -- the URL basis degrades exactly with turndown", () => {
+  const base = { lower_range_value: 0, upper_range_value: 100, upper_range_limit: 250, loop_ma: 12, accuracy_pct: 0.1, low_reading_value: 20, alt_upper_range_value: 25 };
+  const r = _v1818(base);
+  assert.ok(Math.abs(r.value_eng - 50) < 1e-12);
+  assert.ok(Math.abs(r.turndown - 2.5) < 1e-12);
+  assert.ok(Math.abs(r.err_span_eng - 0.1) < 1e-12);
+  assert.ok(Math.abs(r.err_url_eng - 0.25) < 1e-12);
+  assert.ok(Math.abs(r.err_url_as_pct_of_span - 0.25) < 1e-12);
+  assert.ok(Math.abs(r.basis_ratio - 2.5) < 1e-12);
+  assert.ok(Math.abs(r.err_url_at_low_reading_pct - 1.25) < 1e-12);
+  assert.ok(Math.abs(r.alt_turndown - 10) < 1e-12);
+  assert.ok(Math.abs(r.alt_err_url_as_pct_of_span - 1.0) < 1e-12);
+  // IDENTITY: the endpoints of the loop map to the endpoints of the range.
+  assert.ok(Math.abs(_v1818({ ...base, loop_ma: 4 }).value_eng - 0) < 1e-12);
+  assert.ok(Math.abs(_v1818({ ...base, loop_ma: 20 }).value_eng - 100) < 1e-12);
+  // IDENTITY: the map is linear, so the midpoint current is the midpoint value.
+  assert.ok(Math.abs(r.value_eng - (0 + 100) / 2) < 1e-12);
+  // THE FINDING: the ratio between the two bases IS the turndown, exactly --
+  // which is why "0.1% of span" and "0.1% of URL" coincide only at 1:1.
+  assert.ok(Math.abs(r.basis_ratio - r.turndown) < 1e-12);
+  assert.ok(Math.abs(r.err_url_as_pct_of_span - 0.1 * r.turndown) < 1e-12);
+  // At turndown 1:1 the two bases are the same statement.
+  const full = _v1818({ ...base, upper_range_value: 250 });
+  assert.ok(Math.abs(full.turndown - 1) < 1e-12);
+  assert.ok(Math.abs(full.basis_ratio - 1) < 1e-12);
+  assert.ok(Math.abs(full.err_span_eng - full.err_url_eng) < 1e-12);
+  // IDENTITY: the URL-basis ABSOLUTE error never moves with the calibrated
+  // span. The span shrank underneath a constant error -- that is the whole
+  // mechanism, and it is why the narrower range reads 1.0%.
+  const narrow = _v1818({ ...base, upper_range_value: 25, low_reading_value: 0, alt_upper_range_value: 0 });
+  assert.ok(Math.abs(narrow.err_url_eng - r.err_url_eng) < 1e-12);
+  assert.ok(Math.abs(narrow.err_url_as_pct_of_span - 1.0) < 1e-12);
+  assert.ok(Math.abs(narrow.err_url_as_pct_of_span - r.alt_err_url_as_pct_of_span) < 1e-12);
+  // Optional comparisons stay null rather than NaN.
+  const bare = _v1818({ ...base, low_reading_value: 0, alt_upper_range_value: 0 });
+  assert.strictEqual(bare.err_url_at_low_reading_pct, null);
+  assert.strictEqual(bare.alt_span_eng, null);
+  assert.ok(Number.isFinite(bare.value_eng));
+  // Degenerate seams, including a span wider than the sensor can be ranged to.
+  assert.ok(_v1818({ ...base, upper_range_value: 0 }).error);
+  assert.ok(_v1818({ ...base, upper_range_limit: 0 }).error);
+  assert.ok(_v1818({ ...base, upper_range_value: 300 }).error);
+  assert.ok(_v1818({ ...base, loop_ma: 3 }).error);
+  assert.ok(_v1818({ ...base, loop_ma: 21 }).error);
+  assert.ok(_v1818({ ...base, accuracy_pct: 0 }).error);
+});
+
+test("bounds: spec-v1819 computeDeadbandCyclingRate -- duty is deadband-free and oversizing cycles worse at EVERY load", () => {
+  const base = { capacitance_btu_f: 1000, ua_btu_hr_f: 500, setpoint_f: 70, outdoor_f: 30, capacity_btu_hr: 25000, deadband_f: 2, alt_deadband_f: 1, alt_capacity_btu_hr: 50000 };
+  const r = _v1819(base);
+  assert.ok(Math.abs(r.load_btu_hr - 20000) < 1e-9);
+  assert.ok(Math.abs(r.on_min - 24) < 1e-9);
+  assert.ok(Math.abs(r.off_min - 6) < 1e-9);
+  assert.ok(Math.abs(r.cycles_per_hour - 2) < 1e-12);
+  assert.ok(Math.abs(r.duty_pct - 80) < 1e-12);
+  assert.ok(Math.abs(r.max_cycles_per_hour - 3.125) < 1e-12);
+  assert.ok(Math.abs(r.outdoor_at_max_f - 45) < 1e-12);
+  assert.ok(Math.abs(r.alt_deadband_cycles_per_hour - 4) < 1e-12);
+  assert.ok(Math.abs(r.alt_capacity_cycles_per_hour - 6) < 1e-9);
+  assert.ok(Math.abs(r.alt_capacity_max_cycles_per_hour - 6.25) < 1e-12);
+  assert.ok(Math.abs(r.alt_capacity_outdoor_at_max_f - 20) < 1e-12);
+  // IDENTITY: cycles per hour is 60 / (on + off) in minutes.
+  assert.ok(Math.abs(r.cycles_per_hour - 60 / (r.on_min + r.off_min)) < 1e-12);
+  // IDENTITY: duty is the on fraction of the cycle AND the load over capacity.
+  assert.ok(Math.abs(r.duty_pct - 100 * r.on_min / (r.on_min + r.off_min)) < 1e-9);
+  assert.ok(Math.abs(r.duty_pct - 100 * 20000 / 25000) < 1e-12);
+  // THE FINDING: halving the deadband exactly doubles the cycling AND leaves
+  // the duty cycle untouched. Both halves of that matter.
+  assert.ok(Math.abs(r.alt_deadband_cycles_per_hour - 2 * r.cycles_per_hour) < 1e-9);
+  assert.ok(Math.abs(r.alt_deadband_duty_pct - r.duty_pct) < 1e-12);
+  // IDENTITY: the maximum is Q / (4 C deadband), and it occurs at 50% duty --
+  // check by driving the outdoor temperature to the reported crossing.
+  assert.ok(Math.abs(r.max_cycles_per_hour - 25000 / (4 * 1000 * 2)) < 1e-12);
+  const atPeak = _v1819({ ...base, outdoor_f: r.outdoor_at_max_f });
+  assert.ok(Math.abs(atPeak.duty_pct - 50) < 1e-9);
+  assert.ok(Math.abs(atPeak.cycles_per_hour - r.max_cycles_per_hour) < 1e-9);
+  // THE STRONGER CLAIM: an oversized unit cycles more at EVERY load the
+  // right-sized unit can actually serve, not only in mild weather.
+  // cycles = (L / C db)(1 - L/Q) is strictly increasing in Q.
+  // Below 20 degF the 25,000 Btu/hr unit cannot meet a 500 Btu/hr-degF load
+  // at all, so there is no cycling rate to compare -- it runs continuously.
+  for (const outdoor of [21, 25, 30, 45, 55, 65]) {
+    const small = _v1819({ ...base, outdoor_f: outdoor, alt_capacity_btu_hr: 0 });
+    const big = _v1819({ ...base, outdoor_f: outdoor, capacity_btu_hr: 50000, alt_capacity_btu_hr: 0 });
+    assert.ok(!small.error && !big.error, "both must compute at " + outdoor);
+    assert.ok(big.cycles_per_hour > small.cycles_per_hour, "oversized must cycle more at " + outdoor);
+  }
+  // And the boundary itself: at the load that equals its capacity and below,
+  // the right-sized unit never cycles off and the tile refuses rather than
+  // reporting a rate. 70 - 25,000/500 = 20 degF is exactly that point.
+  assert.ok(_v1819({ ...base, outdoor_f: 20 }).error);
+  assert.ok(_v1819({ ...base, outdoor_f: 19 }).error);
+  assert.ok(!_v1819({ ...base, outdoor_f: 20.1 }).error);
+  // The oversized unit still cycles there, which is part of the same point.
+  assert.ok(!_v1819({ ...base, outdoor_f: 20, capacity_btu_hr: 50000, alt_capacity_btu_hr: 0 }).error);
+  // AND THE PEAK MOVES TO A COLDER DAY: 20 degF against 45, not the reverse.
+  assert.ok(r.alt_capacity_outdoor_at_max_f < r.outdoor_at_max_f);
+  // The spec's mild-day comparison: 4.69 against 3.12, 50% more starts.
+  const mildSmall = _v1819({ ...base, outdoor_f: 45, alt_capacity_btu_hr: 0 });
+  const mildBig = _v1819({ ...base, outdoor_f: 45, capacity_btu_hr: 50000, alt_capacity_btu_hr: 0 });
+  assert.ok(Math.abs(mildSmall.cycles_per_hour - 3.125) < 1e-9);
+  assert.ok(Math.abs(mildBig.cycles_per_hour - 4.6875) < 1e-9);
+  assert.ok(Math.abs(mildBig.cycles_per_hour / mildSmall.cycles_per_hour - 1.5) < 1e-9);
+  // Degenerate seams, including equipment that cannot meet the load.
+  assert.ok(_v1819({ ...base, capacitance_btu_f: 0 }).error);
+  assert.ok(_v1819({ ...base, ua_btu_hr_f: 0 }).error);
+  assert.ok(_v1819({ ...base, capacity_btu_hr: 20000 }).error);
+  assert.ok(_v1819({ ...base, deadband_f: 0 }).error);
+  assert.ok(_v1819({ ...base, outdoor_f: 70 }).error);
+  assert.ok(_v1819({ ...base, outdoor_f: 80 }).error);
+});
+
+test("bounds: spec-v1820 computeTrendLogStorage -- the buffer overruns long before the disk does", () => {
+  const base = { point_count: 5000, interval_min: 5, retention_years: 2, bytes_per_sample: 16, controller_points: 200, controller_buffer_samples: 1000, poll_interval_min: 60, cov_changes_per_point_day: 100, alt_interval_min: 1 };
+  const r = _v1820(base);
+  assert.ok(Math.abs(r.samples_per_point_year - 105120) < 1e-6);
+  assert.ok(Math.abs(r.total_samples - 1051200000) < 1);
+  assert.ok(Math.abs(r.storage_gb - 16.8) < 0.05);
+  assert.ok(Math.abs(r.alt_storage_gb - 84.1) < 0.05);
+  assert.ok(Math.abs(r.controller_samples_per_hour - 2400) < 1e-9);
+  assert.ok(Math.abs(r.buffer_fill_min - 25) < 1e-9);
+  assert.ok(Math.abs(r.poll_loss_pct - 58.3) < 0.05);
+  assert.ok(Math.abs(r.cov_storage_gb - 5.84) < 0.01);
+  assert.ok(Math.abs(r.cov_reduction_pct - 65.3) < 0.05);
+  assert.ok(Math.abs(r.periodic_samples_per_day - 288) < 1e-12);
+  // IDENTITY: a 5x faster interval is exactly 5x the samples and storage.
+  assert.ok(Math.abs(r.alt_storage_gb - 5 * r.storage_gb) < 1e-6);
+  // IDENTITY: the fill time is the buffer depth at the controller's own rate,
+  // and it IS the maximum poll interval -- the same number, not a derived one.
+  assert.ok(Math.abs(r.buffer_fill_min * r.controller_samples_per_hour / 60 - 1000) < 1e-9);
+  assert.ok(Math.abs(r.max_poll_interval_min - r.buffer_fill_min) < 1e-12);
+  // THE FINDING: an ordinary hourly poll against a 25 minute buffer loses 58%,
+  // and the tile says so rather than reporting only a storage figure.
+  assert.strictEqual(r.poll_overruns, true);
+  assert.ok(/BUFFER OVERRUNS/.test(r.buffer_verdict));
+  assert.ok(/nothing reports an error/.test(r.buffer_verdict));
+  // Poll exactly at the fill time loses nothing, and faster loses nothing.
+  const atFill = _v1820({ ...base, poll_interval_min: 25 });
+  assert.strictEqual(atFill.poll_overruns, false);
+  assert.ok(Math.abs(atFill.poll_loss_pct) < 1e-9);
+  assert.ok(!/OVERRUNS/.test(atFill.buffer_verdict));
+  const fast = _v1820({ ...base, poll_interval_min: 5 });
+  assert.ok(Math.abs(fast.poll_loss_pct) < 1e-9);
+  // THE COV CAVEAT: it reduces volume only while the change rate is BELOW the
+  // periodic rate. At 400 changes/day against 288 periodic samples it grows.
+  const noisy = _v1820({ ...base, cov_changes_per_point_day: 400 });
+  assert.ok(noisy.cov_total_samples > noisy.total_samples);
+  assert.ok(noisy.cov_reduction_pct < 0);
+  // At exactly the periodic rate the two are the same volume.
+  const even = _v1820({ ...base, cov_changes_per_point_day: 288 });
+  assert.ok(Math.abs(even.cov_reduction_pct) < 1e-9);
+  // Degenerate seams.
+  assert.ok(_v1820({ ...base, point_count: 0 }).error);
+  assert.ok(_v1820({ ...base, interval_min: 0 }).error);
+  assert.ok(_v1820({ ...base, retention_years: 0 }).error);
+  assert.ok(_v1820({ ...base, bytes_per_sample: 0 }).error);
+  assert.ok(_v1820({ ...base, controller_buffer_samples: 0 }).error);
+});
+
+test("bounds: spec-v1821 computeMstpSegmentLoading -- doubling devices and halving baud cost the same", () => {
+  const base = { baud: 76800, device_count: 32, token_octets: 8, turnaround_bits: 40, frame_octets: 50, transmitting_share: 0.5, alt_device_count: 64, alt_baud: 38400 };
+  const r = _v1821(base);
+  assert.ok(Math.abs(r.token_frame_ms - 1.042) < 0.001);
+  assert.ok(Math.abs(r.turnaround_ms - 0.521) < 0.001);
+  assert.ok(Math.abs(r.per_device_ms - 1.5625) < 1e-9);
+  assert.ok(Math.abs(r.idle_rotation_ms - 50) < 1e-9);
+  assert.ok(Math.abs(r.frame_time_ms - 6.51) < 0.005);
+  assert.ok(Math.abs(r.data_ms - 104.2) < 0.05);
+  assert.ok(Math.abs(r.loop_time_ms - 154.2) < 0.05);
+  assert.ok(Math.abs(r.alt_devices_loop_ms - 308.3) < 0.05);
+  assert.ok(Math.abs(r.alt_baud_loop_ms - 308.3) < 0.05);
+  // IDENTITY: a frame's time is its bits over the baud rate, in ms.
+  assert.ok(Math.abs(r.token_frame_ms - 8 * 10 / 76800 * 1000) < 1e-12);
+  assert.ok(Math.abs(r.frame_time_ms - 50 * 10 / 76800 * 1000) < 1e-12);
+  // IDENTITY: the loop is the idle rotation plus the data actually sent, and
+  // the worst-case response IS one full loop.
+  assert.ok(Math.abs(r.loop_time_ms - (r.idle_rotation_ms + r.data_ms)) < 1e-9);
+  assert.ok(Math.abs(r.worst_case_response_ms - r.loop_time_ms) < 1e-12);
+  assert.ok(Math.abs(r.transmitting_devices - 16) < 1e-12);
+  // THE FINDING: doubling the device count and halving the baud rate produce
+  // the SAME loop time, because both double every term proportionally.
+  assert.ok(Math.abs(r.alt_devices_loop_ms - r.alt_baud_loop_ms) < 1e-9);
+  assert.ok(Math.abs(r.alt_devices_ratio - 2) < 1e-9);
+  assert.ok(Math.abs(r.alt_baud_ratio - 2) < 1e-9);
+  // IDENTITY: loop time is exactly linear in device count at a fixed share.
+  const n8 = _v1821({ ...base, device_count: 8, alt_device_count: 0, alt_baud: 0 });
+  assert.ok(Math.abs(r.loop_time_ms - 4 * n8.loop_time_ms) < 1e-9);
+  // IDENTITY: loop time is exactly inverse in baud.
+  const fast = _v1821({ ...base, baud: 153600, alt_device_count: 0, alt_baud: 0 });
+  assert.ok(Math.abs(fast.loop_time_ms - r.loop_time_ms / 2) < 1e-9);
+  // A quiet segment is the idle rotation alone -- the floor, not zero.
+  const quiet = _v1821({ ...base, transmitting_share: 0 });
+  assert.ok(Math.abs(quiet.data_ms) < 1e-12);
+  assert.ok(Math.abs(quiet.loop_time_ms - quiet.idle_rotation_ms) < 1e-12);
+  assert.ok(quiet.loop_time_ms > 0);
+  // A segment at the protocol's address limit is in the high hundreds of ms.
+  const maxed = _v1821({ ...base, device_count: 127, alt_device_count: 0, alt_baud: 0 });
+  assert.ok(maxed.loop_time_ms > 500);
+  // Degenerate seams.
+  assert.ok(_v1821({ ...base, baud: 0 }).error);
+  assert.ok(_v1821({ ...base, device_count: 0 }).error);
+  assert.ok(_v1821({ ...base, token_octets: 0 }).error);
+  assert.ok(_v1821({ ...base, frame_octets: 0 }).error);
+  assert.ok(_v1821({ ...base, turnaround_bits: -1 }).error);
+  assert.ok(_v1821({ ...base, transmitting_share: 1.5 }).error);
+});
+
+test("bounds: spec-v1822 computeDamperActuatorTorque -- the seals move the selection up a size", () => {
+  const base = { damper_width_in: 48, damper_height_in: 36, torque_factor_in_lb_ft2: 5, sealed_torque_factor_in_lb_ft2: 9, safety_factor: 1.5 };
+  const r = _v1822(base);
+  assert.ok(Math.abs(r.damper_area_ft2 - 12) < 1e-12);
+  assert.ok(Math.abs(r.required_torque_in_lb - 60) < 1e-12);
+  assert.ok(Math.abs(r.design_torque_in_lb - 90) < 1e-12);
+  assert.strictEqual(r.selected_actuator_in_lb, 140);
+  assert.strictEqual(r.actuator_count, 1);
+  assert.ok(Math.abs(r.sealed_required_torque_in_lb - 108) < 1e-12);
+  assert.ok(Math.abs(r.sealed_design_torque_in_lb - 162) < 1e-12);
+  assert.strictEqual(r.sealed_selected_actuator_in_lb, 180);
+  // THE FINDING: the same damper takes a bigger actuator once it has seals,
+  // and the tile flags that the selection moved rather than leaving it to be
+  // noticed across two schedules.
+  assert.strictEqual(r.seals_move_the_selection, true);
+  assert.ok(r.sealed_selected_actuator_in_lb > r.selected_actuator_in_lb);
+  // IDENTITY: area is width x height over 144, and design is required x SF.
+  assert.ok(Math.abs(r.damper_area_ft2 - 48 * 36 / 144) < 1e-12);
+  assert.ok(Math.abs(r.design_torque_in_lb - r.required_torque_in_lb * 1.5) < 1e-12);
+  // IDENTITY: the selection is the SMALLEST ladder size at or above the design
+  // torque -- never below it, and never skipping a size that would have fit.
+  for (const design of [10, 35, 36, 70, 90, 139, 140, 141, 180]) {
+    const f = 1, sf = 1;
+    const area = design; // 1 in-lb per sq ft, SF 1 -> design torque == area
+    const x = _v1822({ damper_width_in: 12 * area, damper_height_in: 12, torque_factor_in_lb_ft2: f, sealed_torque_factor_in_lb_ft2: 0, safety_factor: sf });
+    assert.ok(Math.abs(x.design_torque_in_lb - design) < 1e-9);
+    if (x.selected_actuator_in_lb !== null) {
+      assert.ok(x.selected_actuator_in_lb >= x.design_torque_in_lb - 1e-9);
+      for (const s of [35, 70, 140, 180]) {
+        if (s >= x.design_torque_in_lb - 1e-9) { assert.ok(x.selected_actuator_in_lb <= s); }
+      }
+    }
+  }
+  // A large damper exceeds every standard size and falls to multiple
+  // actuators or a jackshaft rather than silently selecting the largest.
+  const big = _v1822({ ...base, damper_width_in: 96, damper_height_in: 72, sealed_torque_factor_in_lb_ft2: 0 });
+  assert.ok(Math.abs(big.damper_area_ft2 - 48) < 1e-12);
+  assert.ok(Math.abs(big.design_torque_in_lb - 360) < 1e-12);
+  assert.strictEqual(big.selected_actuator_in_lb, null);
+  assert.strictEqual(big.actuator_count, 2);
+  assert.ok(/NO SINGLE ACTUATOR/.test(big.selection_verdict));
+  assert.ok(/jackshaft/.test(big.selection_verdict));
+  // An unsealed damper whose seals do not change the size says so plainly.
+  const same = _v1822({ ...base, sealed_torque_factor_in_lb_ft2: 5.2 });
+  assert.strictEqual(same.seals_move_the_selection, false);
+  // The sealed comparison is optional.
+  const bare = _v1822({ ...base, sealed_torque_factor_in_lb_ft2: 0 });
+  assert.strictEqual(bare.sealed_design_torque_in_lb, null);
+  // Degenerate seams.
+  assert.ok(_v1822({ ...base, damper_width_in: 0 }).error);
+  assert.ok(_v1822({ ...base, damper_height_in: 0 }).error);
+  assert.ok(_v1822({ ...base, torque_factor_in_lb_ft2: 0 }).error);
+  assert.ok(_v1822({ ...base, safety_factor: 0 }).error);
+});
+
+test("bounds: spec-v1823 computeLoopErrorStackup -- RSS is bounded by worst case, and placement swamps both", () => {
+  const base = { span_eng: 100, element_err_eng: 0.5, transmitter_err_pct_span: 0.2, input_err_pct_span: 0.1, installation_err_eng: 4.0, averaging_err_eng: 0.5, deadband_eng: 1.0 };
+  const r = _v1823(base);
+  assert.ok(Math.abs(r.element_eng - 0.5) < 1e-12);
+  assert.ok(Math.abs(r.transmitter_eng - 0.2) < 1e-12);
+  assert.ok(Math.abs(r.input_eng - 0.1) < 1e-12);
+  assert.ok(Math.abs(r.worst_case_eng - 0.8) < 1e-9);
+  assert.ok(Math.abs(r.rss_eng - 0.548) < 0.001);
+  assert.ok(Math.abs(r.ratio - 1.46) < 0.005);
+  assert.ok(Math.abs(r.element_share_of_worst_pct - 62.5) < 0.01);
+  assert.ok(Math.abs(r.total_with_installation_eng - 4.04) < 0.005);
+  assert.ok(Math.abs(r.installation_multiple - 7.37) < 0.01);
+  assert.ok(Math.abs(r.total_with_averaging_eng - 0.74) < 0.005);
+  // IDENTITY: each percentage is converted against the SAME span before any
+  // combination -- the step the spec says stackups get wrong first.
+  assert.ok(Math.abs(r.transmitter_eng - 0.2 / 100 * 100) < 1e-12);
+  assert.ok(Math.abs(r.rss_eng - Math.sqrt(0.5 * 0.5 + 0.2 * 0.2 + 0.1 * 0.1)) < 1e-12);
+  // IDENTITY: RSS is never above the worst case and never below the largest
+  // single term. That bound holds for ANY set of element errors.
+  for (const p of [base, { ...base, element_err_eng: 0 }, { ...base, element_err_eng: 5, transmitter_err_pct_span: 0.01 }, { ...base, transmitter_err_pct_span: 3, input_err_pct_span: 3 }]) {
+    const x = _v1823(p);
+    assert.ok(x.rss_eng <= x.worst_case_eng + 1e-12);
+    assert.ok(x.rss_eng >= Math.max(x.element_eng, x.transmitter_eng, x.input_eng) - 1e-12);
+    if (x.ratio !== null) assert.ok(x.ratio >= 1 - 1e-12);
+  }
+  // A single non-zero term makes the two identical -- the degenerate case of
+  // the same bound.
+  const one = _v1823({ ...base, transmitter_err_pct_span: 0, input_err_pct_span: 0 });
+  assert.ok(Math.abs(one.rss_eng - one.worst_case_eng) < 1e-12);
+  assert.ok(Math.abs(one.ratio - 1) < 1e-12);
+  // THE FINDING: the instrument chain is INSIDE a 1.0 degF deadband and the
+  // installed loop is not, by a factor of seven, and the total is essentially
+  // the installation error alone.
+  assert.strictEqual(r.instrument_within_deadband, true);
+  assert.strictEqual(r.installed_within_deadband, false);
+  assert.ok(Math.abs(r.total_with_installation_eng - 4.0) < 0.05);
+  assert.ok(/OUTSIDE THE DEADBAND/.test(r.deadband_verdict));
+  assert.ok(/hunt/.test(r.deadband_verdict));
+  // AND THE REMEDY IS THE SENSOR: an averaging element brings it back inside.
+  assert.strictEqual(r.averaging_within_deadband, true);
+  assert.ok(r.total_with_averaging_eng < base.deadband_eng);
+  assert.ok(/REMEDY IS A SENSOR/.test(r.deadband_verdict));
+  // Without an installation error the verdict speaks about the chain alone.
+  const clean = _v1823({ ...base, installation_err_eng: 0, averaging_err_eng: 0 });
+  assert.strictEqual(clean.total_with_installation_eng, null);
+  assert.ok(/instrument chain alone is INSIDE/.test(clean.deadband_verdict));
+  // Zero errors are legal (a perfect chain), not an error.
+  const perfect = _v1823({ ...base, element_err_eng: 0, transmitter_err_pct_span: 0, input_err_pct_span: 0, installation_err_eng: 0, averaging_err_eng: 0 });
+  assert.ok(!perfect.error);
+  assert.ok(Math.abs(perfect.rss_eng) < 1e-12);
+  assert.strictEqual(perfect.ratio, null);
+  // Degenerate seams.
+  assert.ok(_v1823({ ...base, span_eng: 0 }).error);
+  assert.ok(_v1823({ ...base, deadband_eng: 0 }).error);
+  assert.ok(_v1823({ ...base, element_err_eng: -1 }).error);
+  assert.ok(_v1823({ ...base, transmitter_err_pct_span: -1 }).error);
+  assert.ok(_v1823({ ...base, installation_err_eng: -1 }).error);
+});

@@ -1352,6 +1352,15 @@ export const TOOL_MODULES = (() => {
     "radon-fan-static", "sub-slab-suction-field", "acid-waste-neutralization",
     "fume-hood-face-velocity", "lab-containment-pressure",
   ]);
+  // spec-v1818..v1823: the building automation and controls bench -- what a
+  // 4-20 mA loop resolves, how often two-position equipment starts, how much
+  // trend data a site makes and where it is silently lost, how long a field
+  // bus takes to pass its token, what a damper needs, and what a measurement
+  // chain is worth. Two Group A and four Group C.
+  declare("./calc-controls.js", "CONTROLS_RENDERERS", [
+    "transmitter-span-scaling", "deadband-cycling-rate", "trend-log-storage",
+    "mstp-segment-loading", "damper-actuator-torque", "loop-error-stackup",
+  ]);
   // spec-v1845..v1850: the snow and ice management bench -- what a pavement
   // temperature costs in salt, what a brine batch has to be, how long a plow
   // route takes, where the snow goes, when a deicer stops working, and whether

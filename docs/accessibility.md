@@ -74,7 +74,7 @@ in `styles.css` carries the dark palette; the light one is declared twice, at
 `:root[data-theme="light"]` for the in-page toggle and again under
 `@media (prefers-color-scheme: light)` for everyone else. On the SPA `theme.js`
 sets `data-theme` before first paint, from the stored preference or the system
-one. The 2,114 prerendered pages load no script at all, so the media query is
+one. The 2,120 prerendered pages load no script at all, so the media query is
 the only thing that reaches them -- and until 2026-09-02 there was none, which
 meant every static page rendered dark whatever the reader's system asked for,
 while its own `<meta name="color-scheme" content="dark light">` told the
@@ -228,7 +228,7 @@ is unchanged.
   axe-core ruleset the SPA passes" from spec-v13 until 2026-08-31, and
   nothing checked it. The axe sweep in
   [../test/integration/a11y.test.js](../test/integration/a11y.test.js)
-  runs 2,093 routes that are all SPA hash routes; the shells are a
+  runs 2,099 routes that are all SPA hash routes; the shells are a
   different document, and the Lighthouse run this used to cite was
   removed from CI on 2026-08-23. When the claim was finally measured,
   **all 21 group hubs failed WCAG 1.4.1** -- each tile link sits in a
@@ -239,7 +239,7 @@ is unchanged.
   catalog hub, all 21 group hubs, one tile shell per group, every
   reference page, and three structural outliers (longest name, a name
   needing HTML escaping, the widest worked example). It does **not**
-  sweep the remaining tile shells -- **2,092 tile shells** exist and the
+  sweep the remaining tile shells -- **2,098 tile shells** exist and the
   sweep visits one per group -- since they come from one generator and
   differ only in text; volume lives in the SPA sweep.
   [../scripts/check-shells.mjs](../scripts/check-shells.mjs) continues
@@ -261,7 +261,7 @@ is unchanged.
   printing its answer white on white paper.
 - Manual keyboard-only audit is part of the launch checklist.
 - Manual voice-input audit is part of the launch checklist.
-- The structural half of W3C validation is checked offline on all 2,114
+- The structural half of W3C validation is checked offline on all 2,120
   prerendered pages by `check-shells`: exactly one `<main>`, `<header>`,
   `<footer>`, `<h1>` and `<title>` each, and a `lang` on `<html>` -- the
   properties [launch-checklist.md](launch-checklist.md) names in that row.

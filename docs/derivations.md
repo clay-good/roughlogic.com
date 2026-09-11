@@ -1890,6 +1890,12 @@ cross-check.
 | calc-containment.js | `computeLabContainmentPressure` | `{ room_volume_ft3 = 0, required_ach = 0, hood_exhaust_cfm = 0, general_exhaus...` | _ | _ | _ |
 | calc-containment.js | `computeRadonFanStatic` | `{ flow_cfm = 0, pipe_diameter_in = 4, pipe_length_ft = 0, fan_static_in_wc = ...` | _ | _ | _ |
 | calc-containment.js | `computeSubSlabSuctionField` | `{ slab_area_ft2 = 0, reaches_ft = 0, fails_ft = 0, slab_length_ft = 0, slab_w...` | _ | _ | _ |
+| calc-controls.js | `computeDamperActuatorTorque` | `{ damper_width_in = 0, damper_height_in = 0, torque_factor_in_lb_ft2 = 5, sea...` | _ | _ | _ |
+| calc-controls.js | `computeDeadbandCyclingRate` | `{ capacitance_btu_f = 0, ua_btu_hr_f = 0, setpoint_f = 70, outdoor_f = 30, ca...` | _ | _ | _ |
+| calc-controls.js | `computeLoopErrorStackup` | `{ span_eng = 0, element_err_eng = 0, transmitter_err_pct_span = 0, input_err_...` | _ | _ | _ |
+| calc-controls.js | `computeMstpSegmentLoading` | `{ baud = 76800, device_count = 0, token_octets = 8, turnaround_bits = 40, fra...` | _ | _ | _ |
+| calc-controls.js | `computeTransmitterSpanScaling` | `{ lower_range_value = 0, upper_range_value = 0, upper_range_limit = 0, loop_m...` | _ | _ | _ |
+| calc-controls.js | `computeTrendLogStorage` | `{ point_count = 0, interval_min = 0, retention_years = 0, bytes_per_sample = ...` | _ | _ | _ |
 | calc-cross.js | `computeBeltCenterDistance` | `{ large_pitch_diameter_in = 0, small_pitch_diameter_in = 0, belt_pitch_length...` | _ | _ | _ |
 | calc-cross.js | `computeBeltHpTransmitted` | `{ tight_side_tension_lb = 0, slack_side_tension_lb = 0, sheave_diameter_in = ...` | _ | _ | _ |
 | calc-cross.js | `computeBoltProofLoad` | `{ nominal_diameter_in = 0, threads_per_inch = 0, grade = "5" } = {}` | _ | _ | _ |
@@ -3757,7 +3763,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2343.
+Row count: 2349.
 
 <!-- END function-corpus-v14 -->
 
@@ -3825,7 +3831,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (237 tiles)
+### Group A Electrical (239 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3926,6 +3932,7 @@ per spec-v14 §13.1 second paragraph.
 | `lighting-retrofit-savings` | LED Lighting Retrofit Savings and Payback | Energy-and-demand lighting-savings me...; spec-v231 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lighting-uniformity-ratio` | Lighting Illuminance Uniformity Ratio | IES recommended practice; spec-v366 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `line-ground-clearance-nesc` | Overhead Line Ground Clearance | Project (first-principles); the adopted NESC edition and the authority having jurisdi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `loop-error-stackup` | Instrument Loop Total Error Stackup | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `loop-signal-scaling` | 4-20 mA Current-Loop Signal Scaling | 4-20 mA current-loop live-zero scalin...; percent = (12-4)/16*100 = 50; value = 0 + 0.5*(100-0) = 50 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `loop-voltage-budget` | Loop-Powered (2-Wire) 4-20 mA Transmitter Voltage Budget | Loop-powered 2-wire 4-20 mA transmitt...; maxR = (24-10.5)/0.020 = 675; V_at = 24 - 0.020*300 = 18;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lumen-method` | Lumen-Method Luminaire Count | IES lumen method (by name).; spec-v101 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4047,6 +4054,7 @@ per spec-v14 §13.1 second paragraph.
 | `transformer-sizing` | Transformer Sizing | Project (first-principles); 90 kW @ 0.9 pf -> 100 kVA required; next ANSI standard st... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transformer-turns-ratio` | Transformer Turns / Voltage / Current / Impedance Ratio | ideal transformer circuit relations; spec-v806 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `transformer-voltage-regulation` | Transformer Voltage Regulation from %R and %X | transformer voltage-regulation approx...; spec-v494 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `transmitter-span-scaling` | Transmitter Span, Turndown, and 4-20 mA Accuracy | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transverse-wind-load-conductor` | Transverse Wind Load on Conductor and Pole | Project (first-principles); the applicable NESC edition and a qualified line designer... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `turbine-density-correction` | Wind Turbine Output Air-Density Correction | Project (first-principles); the manufacturer's power curve and IEC 61400-12 govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vfd-energy-savings` | VFD Retrofit Energy and Cost Savings (Affinity Cube Law) | US DOE motor/pump-system energy method; spec-v230 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4226,7 +4234,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (203 tiles)
+### Group C HVAC (207 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4288,8 +4296,10 @@ per spec-v14 §13.1 second paragraph.
 | `cooling-coil-total-load` | Cooling Coil Total Load from Enthalpy Difference | ASHRAE Fundamentals; spec-v376 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cooling-tower` | Cooling Tower Approach and Range | CTI ATC-105 cooling-tower test code; 95 F in / 85 F out / 75 F wet-bulb / 300 gpm / 15 kW fan ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cryogenic-boiloff` | Cryogenic Tank Boil-Off Rate and Hold Time | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `damper-actuator-torque` | Damper Actuator Torque and Sizing | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `damper-authority` | Control Damper Authority and Leakage | Project (first-principles); damper dP / branch dP; leakage as sqrt(dP) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dcv-co2-ventilation` | Demand-Controlled Ventilation Rate from a CO2 Setpoint | Steady-state single-zone CO2 mass bal...; spec-v277 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `deadband-cycling-rate` | Deadband, Differential, and Equipment Cycling Rate | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `deaerator-steam-demand` | Deaerator Steam Demand and Vent Rate | Project (first-principles); ASME, the deaerator manufacturer, the water treatment pro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `defrost-cycle-sizing` | Evaporator Defrost Heat and Cycle Time | Project (first-principles); 144 BTU/lb latent, 0.5 BTU/lb-F sensible | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `degree-day-energy` | Annual Heating Energy and Fuel Cost from Degree-Days | Degree-day method (ASHRAE / RESNET); spec-v330 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4368,6 +4378,7 @@ per spec-v14 §13.1 second paragraph.
 | `manual-j-heating` | Manual J Heating Load (Simplified) | ACCA Manual J residential heating-loa...; 1500 ft^2 / 1200 wall / 200 window / 1500 ceiling / 10 ou... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mechanical-room-nc` | Mechanical Room Sound Transmission and Flanking | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `moist-air-enthalpy` | Moist Air Enthalpy (ASHRAE Psychrometrics) | ASHRAE Fundamentals; spec-v375 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `mstp-segment-loading` | BACnet MS/TP Segment Loading and Token Loop Time | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mua-tempering-load` | Makeup-Air Unit Tempering Load (Sensible, Latent, Total) | ASHRAE Fundamentals psychrometric loa...; spec-v276 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `nitrogen-pressure-test` | Nitrogen Pressure Test (Temperature-Corrected) | First-principles Gay-Lussac's law (co...; spec-v105 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `npsh-a` | Pump NPSH Available | Hydraulic Institute / centrifugal-pum...; 0 ft elevation / 60 F water / +5 ft flooded source / 2 ft... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4418,6 +4429,7 @@ per spec-v14 §13.1 second paragraph.
 | `stack-effect-npp` | Stack Effect Pressure and the Neutral Pressure Plane | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `static-pressure-hvac` | Static Pressure | ACCA Manual D / ASHRAE Fundamentals; filter 0.10 + coil 0.30 + supply duct 0.20 + return duct ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `superheat-subcool` | Superheat and Subcool | AHRI / manufacturer P-T charts; R-410A at 118 psig saturates at ~40 F; suction line at 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `trend-log-storage` | Trend Log Interval, Storage, and Controller Buffer Overrun | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-stage-interstage-pressure` | Two-Stage Refrigeration Interstage Pressure | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `txv-capacity-check` | TXV Capacity Correction and Valve Sizing | Project (first-principles); sqrt(actual dP / rated dP) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vacuum-decay-test` | Vacuum Decay (Blank-Off) Test | First-principles standing-decay (blan...; spec-v105 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6022,6 +6034,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2092. Fixture-covered or reference-cadence: 2092 / 2092.
+Tile count: 2098. Fixture-covered or reference-cadence: 2098 / 2098.
 
 <!-- END tile-index-v14 -->

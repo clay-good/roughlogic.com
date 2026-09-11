@@ -2343,6 +2343,26 @@
     {"term":"whole wall r value","target":"assembly-r-value","kind":"redirect"},
     {"term":"framing factor thermal bridging","target":"assembly-r-value","kind":"redirect"},
     {"term":"effective r value wall","target":"assembly-r-value","kind":"redirect"},
-    {"term":"stud thermal bridge","target":"assembly-r-value","kind":"redirect"}
+    {"term":"stud thermal bridge","target":"assembly-r-value","kind":"redirect"},
+    {"term":"deadband cycling rate","target":"deadband-cycling-rate","kind":"industry"},
+    {"term":"control differential short cycling","target":"deadband-cycling-rate","kind":"industry"},
+    {"term":"equipment cycles per hour hvac","target":"deadband-cycling-rate","kind":"industry"},
+    {"term":"oversizing short cycle","target":"deadband-cycling-rate","kind":"industry"},
+    {"term":"two position control deadband","target":"deadband-cycling-rate","kind":"industry"},
+    {"term":"trend log storage sizing","target":"trend-log-storage","kind":"industry"},
+    {"term":"bacnet trend buffer overrun","target":"trend-log-storage","kind":"industry"},
+    {"term":"point count sample interval retention","target":"trend-log-storage","kind":"industry"},
+    {"term":"cov reporting data volume","target":"trend-log-storage","kind":"industry"},
+    {"term":"building automation historian size","target":"trend-log-storage","kind":"industry"},
+    {"term":"bacnet mstp segment loading","target":"mstp-segment-loading","kind":"industry"},
+    {"term":"token loop time mstp","target":"mstp-segment-loading","kind":"industry"},
+    {"term":"devices per mstp segment","target":"mstp-segment-loading","kind":"industry"},
+    {"term":"mstp baud rate response time","target":"mstp-segment-loading","kind":"industry"},
+    {"term":"field bus device count","target":"mstp-segment-loading","kind":"industry"},
+    {"term":"damper actuator torque","target":"damper-actuator-torque","kind":"industry"},
+    {"term":"inch pounds per square foot damper","target":"damper-actuator-torque","kind":"industry"},
+    {"term":"low leakage damper actuator sizing","target":"damper-actuator-torque","kind":"industry"},
+    {"term":"jackshaft multi section damper","target":"damper-actuator-torque","kind":"industry"},
+    {"term":"damper close off torque","target":"damper-actuator-torque","kind":"industry"}
   ]
 }
