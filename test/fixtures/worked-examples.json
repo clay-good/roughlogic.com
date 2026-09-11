@@ -1,6 +1,6 @@
 {
  "_comment": "v10 Phase C.1 worked-example registry (spec-v10 \u00a75.1). One or more rows per tile recording a worked example from a primary public source: tile id, source citation, inputs, expected outputs with tolerance. The unit-test runner (when wired in Phase C migration) reads the registry and asserts each tile's output matches within tolerance. This file is the migration target for the existing per-test fixture obligation; tiles are added incrementally.",
- "_updated": "2026-09-09",
+ "_updated": "2026-09-11",
  "_schema": "Each row: { tile_id, source_publisher, source_title, source_edition_or_year, source_section_or_page, verified_by, verified_on (ISO date), inputs (object), outputs (object: { name: { value, tolerance: { abs?, pct? } } }) }. Tolerance defaults per spec-v10 \u00a75.3: code-table 1 percent or 1 unit-of-least-precision; first-principles 0.5 percent; standard-rounded sizes exact match.",
  "_coverage_target": "Spec-v10 \u00a75.2 declares this file the migration target. Every tile must eventually have at least one row. Current coverage is a starter set; new tiles ship a row with their PR per the contributor checklist. The check-worked-examples.mjs linter reports coverage but does not (yet) fail CI on missing rows. Fail-on-missing is enabled when coverage exceeds 80 percent.",
  "rows": [
@@ -109799,6 +109799,289 @@
     },
     "r_alt_continuous": {
      "value": 21.56,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "galvanize-coating-weight",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Hot-Dip Galvanized Coating Weight and Thickness -- the spec-v1824 worked example, recomputed",
+   "source_edition_or_year": "spec-v1824 of scope-trade-expansion-3, 2026-09-11",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-11",
+   "inputs": {
+    "coating_grade_um": 85,
+    "steel_tons": 5,
+    "area_per_ton_ft2": 400,
+    "alt_area_per_ton_ft2": 120
+   },
+   "outputs": {
+    "thickness_mils": {
+     "value": 3.3464567,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "coating_oz_ft2": {
+     "value": 1.9877953,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_area_ft2": {
+     "value": 2000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "zinc_lb": {
+     "value": 248.47441,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pickup_pct": {
+     "value": 2.4847441,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "zinc_lb_per_ton": {
+     "value": 49.694882,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_zinc_lb_per_ton": {
+     "value": 14.908465,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_pickup_pct": {
+     "value": 0.74542323,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "zinc_ratio": {
+     "value": 3.3333333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pretreatment-bath-dragout",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Pretreatment Bath Dragout and Rinse Water -- the spec-v1825 worked example, recomputed",
+   "source_edition_or_year": "spec-v1825 of scope-trade-expansion-3, 2026-09-11",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-11",
+   "inputs": {
+    "dragout_gal_per_1000ft2": 1.5,
+    "area_ft2_per_day": 20000,
+    "bath_volume_gal": 2000,
+    "bath_concentrate_pct": 5,
+    "dilution_ratio": 1000,
+    "rinse_stages": 2
+   },
+   "outputs": {
+    "dragout_gal_day": {
+     "value": 30,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "concentrate_gal_day": {
+     "value": 1.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "makeup_water_gal_day": {
+     "value": 28.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bath_turnover_days": {
+     "value": 66.666667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "single_rinse_gal_day": {
+     "value": 30000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "two_stage_gal_day": {
+     "value": 948.6833,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "three_stage_gal_day": {
+     "value": 300,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "two_stage_saving_pct": {
+     "value": 96.837722,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "three_stage_saving_pct": {
+     "value": 99,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "next_stage_saving_gal_day": {
+     "value": 648.6833,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "galvanize-kettle-throughput",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Galvanizing Kettle Immersion Cycle and Throughput -- the spec-v1826 worked example, recomputed",
+   "source_edition_or_year": "spec-v1826 of scope-trade-expansion-3, 2026-09-11",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-11",
+   "inputs": {
+    "lower_min": 1,
+    "immerse_min": 5,
+    "withdraw_min": 2,
+    "travel_min": 2,
+    "load_lb_per_lift": 2000,
+    "area_per_ton_ft2": 400,
+    "steel_specific_heat_btu_lb_f": 0.12,
+    "bath_temp_f": 830,
+    "ambient_temp_f": 70,
+    "burner_btu_hr": 1500000
+   },
+   "outputs": {
+    "cycle_min": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lifts_per_hour": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "throughput_lb_hr": {
+     "value": 12000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "throughput_tons_hr": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "area_per_min_ft2": {
+     "value": 40,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heat_demand_btu_hr": {
+     "value": 1094400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heat_limited_lb_hr": {
+     "value": 16447.368,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heat_limited_tons_hr": {
+     "value": 8.2236842,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "governing_tons_hr": {
+     "value": 6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "phosphate-coating-weight",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Phosphate Conversion Coating Weight -- the spec-v1827 worked example, recomputed",
+   "source_edition_or_year": "spec-v1827 of scope-trade-expansion-3, 2026-09-11",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-11",
+   "inputs": {
+    "panel_length_in": 4,
+    "panel_width_in": 6,
+    "faces_coated": 2,
+    "mass_before_g": 45.682,
+    "mass_after_g": 45.647,
+    "spec_min_mg_ft2": 150,
+    "spec_max_mg_ft2": 300
+   },
+   "outputs": {
+    "area_one_face_ft2": {
+     "value": 0.16666667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "area_coated_ft2": {
+     "value": 0.33333333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "mass_lost_mg": {
+     "value": 35,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "coating_mg_ft2": {
+     "value": 105,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "coating_g_m2": {
+     "value": 1.1302095,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "one_sided_mg_ft2": {
+     "value": 210,
      "tolerance": {
       "pct": 0.5
      }

@@ -52626,3 +52626,247 @@ test("bounds: spec-v1505 (cut into assembly-r-value) -- the WRONG method, and co
   assert.ok(_v99a({ ...base, alt_framing_factor: 1 }).error);
   assert.ok(_v99a({ ...base, alt_continuous_r: -1 }).error);
 });
+
+// =====================================================================
+// spec-v1824..v1827: the metal finishing and galvanizing band. Four tiles,
+// nothing cut, and the first band of scope-trade-expansion-3 whose specs
+// needed no arithmetic correction -- every figure in all four worked
+// examples was recomputed before wiring and all four reproduce exactly.
+// The identities below pin the claims the specs make ABOUT those figures,
+// which is the part a worked-example fixture cannot check: that zinc pickup
+// is a surface-area quantity and so does not move with tonnage, that the
+// counterflow saving is an Nth root and so collapses after two stages, that
+// heavy work gives MORE tons per hour and FEWER square feet per minute at
+// the same time, and that a one-face area on a two-face panel reports
+// exactly double and flips a failing coating into a passing one.
+// =====================================================================
+import {
+  computeGalvanizeCoatingWeight as _v1824,
+  computePretreatmentBathDragout as _v1825,
+  computeGalvanizeKettleThroughput as _v1826,
+  computePhosphateCoatingWeight as _v1827,
+} from "../../calc-finishing.js";
+
+test("bounds: spec-v1824 computeGalvanizeCoatingWeight -- pickup is an AREA quantity on a WEIGHT basis", () => {
+  const base = { coating_grade_um: 85, steel_tons: 5, area_per_ton_ft2: 400, alt_area_per_ton_ft2: 120 };
+  const r = _v1824(base);
+  // The spec's worked example, to its own printed precision.
+  assert.ok(Math.abs(r.thickness_mils - 85 / 25.4) < 1e-12);
+  assert.ok(Math.abs(r.thickness_mils - 3.35) < 0.005);
+  assert.ok(Math.abs(r.coating_oz_ft2 - 1.99) < 0.005);
+  assert.ok(Math.abs(r.total_area_ft2 - 2000) < 1e-9);
+  assert.ok(Math.abs(r.zinc_lb - 248) < 1);
+  assert.ok(Math.abs(r.pickup_pct - 2.48) < 0.01);
+  assert.ok(Math.abs(r.alt_zinc_lb_per_ton - 14.9) < 0.05);
+  assert.ok(Math.abs(r.alt_pickup_pct - 0.75) < 0.005);
+  // IDENTITY: the coating weight is exactly the zinc density conversion.
+  assert.ok(Math.abs(r.coating_oz_ft2 - r.thickness_mils * 0.5940) < 1e-12);
+  // IDENTITY: zinc is area x coating weight, in pounds.
+  assert.ok(Math.abs(r.zinc_lb - r.total_area_ft2 * r.coating_oz_ft2 / 16) < 1e-9);
+  // IDENTITY: pickup is zinc over steel weight, and steel weight is tons x 2,000.
+  assert.ok(Math.abs(r.pickup_pct - 100 * r.zinc_lb / (5 * 2000)) < 1e-9);
+  // THE FINDING: pickup does NOT move with tonnage. It is a surface-area
+  // quantity reported against a weight basis, so ten times the steel at the
+  // same area-per-ton gives ten times the zinc and the SAME percentage.
+  const tenx = _v1824({ ...base, steel_tons: 50 });
+  assert.ok(Math.abs(tenx.pickup_pct - r.pickup_pct) < 1e-9);
+  assert.ok(Math.abs(tenx.zinc_lb - 10 * r.zinc_lb) < 1e-9);
+  assert.ok(Math.abs(tenx.zinc_lb_per_ton - r.zinc_lb_per_ton) < 1e-9);
+  // IDENTITY: the per-ton zinc ratio is exactly the area-per-ton ratio --
+  // 400 over 120 is 3.33, which is the spec's "3.3 times the zinc per ton".
+  assert.ok(Math.abs(r.zinc_ratio - 400 / 120) < 1e-12);
+  assert.ok(Math.abs(r.zinc_lb_per_ton / r.alt_zinc_lb_per_ton - r.zinc_ratio) < 1e-9);
+  assert.ok(Math.abs(r.zinc_delta_lb_per_ton - 34.8) < 0.1);
+  // IDENTITY: thickness and coating weight are both exactly linear in grade.
+  const dbl = _v1824({ ...base, coating_grade_um: 170 });
+  assert.ok(Math.abs(dbl.thickness_mils - 2 * r.thickness_mils) < 1e-12);
+  assert.ok(Math.abs(dbl.zinc_lb - 2 * r.zinc_lb) < 1e-9);
+  // The comparison is OPTIONAL: zero means not compared, and no field is NaN.
+  const solo = _v1824({ ...base, alt_area_per_ton_ft2: 0 });
+  assert.strictEqual(solo.alt_zinc_lb_per_ton, null);
+  assert.strictEqual(solo.zinc_ratio, null);
+  assert.ok(Number.isFinite(solo.zinc_lb) && Number.isFinite(solo.pickup_pct));
+  // Degenerate seams.
+  assert.ok(_v1824({ ...base, coating_grade_um: 0 }).error);
+  assert.ok(_v1824({ ...base, steel_tons: 0 }).error);
+  assert.ok(_v1824({ ...base, area_per_ton_ft2: -1 }).error);
+  assert.ok(_v1824({ ...base, steel_tons: Infinity }).error);
+});
+
+test("bounds: spec-v1825 computePretreatmentBathDragout -- the Nth root collapses after two stages", () => {
+  const base = { dragout_gal_per_1000ft2: 1.5, area_ft2_per_day: 20000, bath_volume_gal: 2000, bath_concentrate_pct: 5, dilution_ratio: 1000, rinse_stages: 2 };
+  const r = _v1825(base);
+  // The spec's worked example.
+  assert.ok(Math.abs(r.dragout_gal_day - 30) < 1e-9);
+  assert.ok(Math.abs(r.concentrate_gal_day - 1.5) < 1e-9);
+  assert.ok(Math.abs(r.makeup_water_gal_day - 28.5) < 1e-9);
+  assert.ok(Math.abs(r.bath_turnover_days - 66.667) < 0.001);
+  assert.ok(Math.abs(r.single_rinse_gal_day - 30000) < 1e-6);
+  assert.ok(Math.abs(r.two_stage_gal_day - 949) < 0.5);
+  assert.ok(Math.abs(r.three_stage_gal_day - 300) < 1e-6);
+  assert.ok(Math.abs(r.two_stage_saving_pct - 96.84) < 0.01);
+  assert.ok(Math.abs(r.three_stage_saving_pct - 99.00) < 0.01);
+  // IDENTITY: concentrate plus makeup water is the whole dragout.
+  assert.ok(Math.abs(r.concentrate_gal_day + r.makeup_water_gal_day - r.dragout_gal_day) < 1e-9);
+  // IDENTITY: turnover is bath volume over dragout, exactly.
+  assert.ok(Math.abs(r.bath_turnover_days * r.dragout_gal_day - 2000) < 1e-9);
+  // IDENTITY: the N-stage flow raised to the Nth power over dragout^N is the
+  // dilution ratio. This is the power law itself, not a value read off it.
+  assert.ok(Math.abs(Math.pow(r.two_stage_gal_day / r.dragout_gal_day, 2) - 1000) < 1e-6);
+  assert.ok(Math.abs(Math.pow(r.three_stage_gal_day / r.dragout_gal_day, 3) - 1000) < 1e-6);
+  // IDENTITY: one stage IS the single rinse. The general relation must
+  // reduce to the special case rather than sit beside it.
+  const one = _v1825({ ...base, rinse_stages: 1 });
+  assert.ok(Math.abs(one.rinse_flow_gal_day - one.single_rinse_gal_day) < 1e-6);
+  assert.ok(Math.abs(one.saving_vs_single_pct) < 1e-9);
+  // THE FINDING: the saving per added stage collapses. The first step saves
+  // 29,051 gal/day, the second 649, the third 131 -- each an order of
+  // magnitude less, which is why lines stop at two or three tanks.
+  const two = _v1825({ ...base, rinse_stages: 2 });
+  const three = _v1825({ ...base, rinse_stages: 3 });
+  assert.ok(Math.abs(one.next_stage_saving_gal_day - 29051) < 1);
+  assert.ok(Math.abs(two.next_stage_saving_gal_day - 649) < 1);
+  assert.ok(Math.abs(three.next_stage_saving_gal_day - 131) < 1);
+  assert.ok(one.next_stage_saving_gal_day > 40 * two.next_stage_saving_gal_day);
+  assert.ok(two.next_stage_saving_gal_day > 4 * three.next_stage_saving_gal_day);
+  // Flow is strictly decreasing in stages and never below the dragout itself.
+  let prev = Infinity;
+  for (let n = 1; n <= 8; n++) {
+    const f = _v1825({ ...base, rinse_stages: n }).rinse_flow_gal_day;
+    assert.ok(f < prev && f > r.dragout_gal_day);
+    prev = f;
+  }
+  // IDENTITY: every flow is exactly linear in dragout, which is why cutting
+  // dragout cuts chemistry, water and effluent at once.
+  const half = _v1825({ ...base, dragout_gal_per_1000ft2: 0.75 });
+  assert.ok(Math.abs(half.dragout_gal_day - r.dragout_gal_day / 2) < 1e-9);
+  assert.ok(Math.abs(half.two_stage_gal_day - r.two_stage_gal_day / 2) < 1e-9);
+  assert.ok(Math.abs(half.concentrate_gal_day - r.concentrate_gal_day / 2) < 1e-9);
+  // Degenerate seams.
+  assert.ok(_v1825({ ...base, dragout_gal_per_1000ft2: 0 }).error);
+  assert.ok(_v1825({ ...base, area_ft2_per_day: 0 }).error);
+  assert.ok(_v1825({ ...base, bath_volume_gal: -1 }).error);
+  assert.ok(_v1825({ ...base, bath_concentrate_pct: 0 }).error);
+  assert.ok(_v1825({ ...base, bath_concentrate_pct: 101 }).error);
+  assert.ok(_v1825({ ...base, dilution_ratio: 1 }).error);
+  assert.ok(_v1825({ ...base, rinse_stages: 0 }).error);
+});
+
+test("bounds: spec-v1826 computeGalvanizeKettleThroughput -- tons and square feet point opposite ways", () => {
+  const light = { lower_min: 1, immerse_min: 5, withdraw_min: 2, travel_min: 2, load_lb_per_lift: 2000, area_per_ton_ft2: 400, steel_specific_heat_btu_lb_f: 0.12, bath_temp_f: 830, ambient_temp_f: 70, burner_btu_hr: 1500000 };
+  const heavy = { ...light, immerse_min: 12, load_lb_per_lift: 6000, area_per_ton_ft2: 120 };
+  const L = _v1826(light), H = _v1826(heavy);
+  // The spec's two worked cases.
+  assert.ok(Math.abs(L.cycle_min - 10) < 1e-12);
+  assert.ok(Math.abs(L.lifts_per_hour - 6) < 1e-12);
+  assert.ok(Math.abs(L.throughput_lb_hr - 12000) < 1e-9);
+  assert.ok(Math.abs(L.heat_demand_btu_hr / 1e6 - 1.09) < 0.005);
+  assert.ok(Math.abs(L.area_per_min_ft2 - 40) < 1e-9);
+  assert.ok(Math.abs(H.cycle_min - 17) < 1e-12);
+  assert.ok(Math.abs(H.lifts_per_hour - 3.53) < 0.005);
+  assert.ok(Math.abs(H.throughput_lb_hr - 21176) < 1);
+  assert.ok(Math.abs(H.throughput_tons_hr - 10.6) < 0.02);
+  assert.ok(Math.abs(H.heat_demand_btu_hr / 1e6 - 1.93) < 0.005);
+  assert.ok(Math.abs(H.area_per_min_ft2 - 21) < 0.2);
+  // IDENTITY: lifts per hour is 60 over the cycle, and the cycle is the sum.
+  assert.ok(Math.abs(L.cycle_min - (1 + 5 + 2 + 2)) < 1e-12);
+  assert.ok(Math.abs(L.lifts_per_hour * L.cycle_min - 60) < 1e-9);
+  assert.ok(Math.abs(L.throughput_lb_hr - L.lifts_per_hour * 2000) < 1e-9);
+  // THE FINDING: the heavy work gives MORE tons per hour despite sitting in
+  // the bath 2.4 times as long, because the load grew faster than the cycle.
+  assert.ok(H.throughput_tons_hr > L.throughput_tons_hr);
+  assert.ok(Math.abs(H.throughput_tons_hr / L.throughput_tons_hr - 1.76) < 0.01);
+  assert.ok(Math.abs(12 / 5 - 2.4) < 1e-12);
+  // AND THE AREA GOES THE OTHER WAY, at the same time, on the same two runs.
+  assert.ok(H.area_per_min_ft2 < L.area_per_min_ft2);
+  assert.ok(Math.abs(L.area_per_min_ft2 / H.area_per_min_ft2 - 1.89) < 0.01);
+  // IDENTITY: heat demand is the sensible heat of the throughput.
+  assert.ok(Math.abs(L.heat_demand_btu_hr - L.throughput_lb_hr * 0.12 * (830 - 70)) < 1e-6);
+  assert.ok(Math.abs(L.delta_t_f - 760) < 1e-12);
+  // IDENTITY: the heat-limited rate depends on the BURNER and the temperature
+  // rise only -- not on the cycle -- so it is the same for both jobs.
+  assert.ok(Math.abs(L.heat_limited_lb_hr - H.heat_limited_lb_hr) < 1e-9);
+  assert.ok(Math.abs(L.heat_limited_lb_hr - 16447) < 1);
+  assert.ok(Math.abs(L.heat_limited_tons_hr - 8.22) < 0.01);
+  // THE GOVERNING CONSTRAINT: the light job is inside the burners and the
+  // crane governs; the heavy job is not, and its real output is 8.2 not 10.6.
+  assert.strictEqual(L.heat_limited, false);
+  assert.ok(/CRANE GOVERNS/.test(L.governing_verdict));
+  assert.ok(Math.abs(L.governing_tons_hr - L.throughput_tons_hr) < 1e-12);
+  assert.ok(Math.abs(L.shortfall_pct) < 1e-12);
+  assert.strictEqual(H.heat_limited, true);
+  assert.ok(/BURNERS GOVERN/.test(H.governing_verdict));
+  assert.ok(Math.abs(H.governing_tons_hr - 8.22) < 0.01);
+  assert.ok(Math.abs(H.shortfall_pct - 22.3) < 0.1);
+  // IDENTITY: the governing output is exactly the lower of the two, always.
+  for (const p of [light, heavy, { ...heavy, burner_btu_hr: 5e6 }, { ...light, burner_btu_hr: 2e5 }]) {
+    const x = _v1826(p);
+    assert.ok(Math.abs(x.governing_tons_hr - Math.min(x.throughput_tons_hr, x.heat_limited_tons_hr)) < 1e-12);
+    // heat_limited is true exactly when the steel wants more than the burners
+    // deliver, and the burner output is recoverable from the heat-limited rate.
+    assert.strictEqual(x.heat_limited, x.heat_demand_btu_hr > p.burner_btu_hr);
+    assert.ok(Math.abs(x.heat_limited_lb_hr * 0.12 * x.delta_t_f - p.burner_btu_hr) < 1e-6);
+  }
+  // A big enough burner always hands the job back to the crane.
+  const plenty = _v1826({ ...heavy, burner_btu_hr: 5e6 });
+  assert.strictEqual(plenty.heat_limited, false);
+  assert.ok(Math.abs(plenty.governing_tons_hr - H.throughput_tons_hr) < 1e-9);
+  // Degenerate seams, including the bath that is not above ambient.
+  assert.ok(_v1826({ ...light, immerse_min: 0 }).error);
+  assert.ok(_v1826({ ...light, lower_min: 0 }).error);
+  assert.ok(_v1826({ ...light, load_lb_per_lift: 0 }).error);
+  assert.ok(_v1826({ ...light, area_per_ton_ft2: -1 }).error);
+  assert.ok(_v1826({ ...light, burner_btu_hr: 0 }).error);
+  assert.ok(_v1826({ ...light, bath_temp_f: 70 }).error);
+  assert.ok(_v1826({ ...light, steel_specific_heat_btu_lb_f: 0 }).error);
+});
+
+test("bounds: spec-v1827 computePhosphateCoatingWeight -- one face reports exactly double and flips the verdict", () => {
+  const base = { panel_length_in: 4, panel_width_in: 6, faces_coated: 2, mass_before_g: 45.682, mass_after_g: 45.647, spec_min_mg_ft2: 150, spec_max_mg_ft2: 300 };
+  const r = _v1827(base);
+  // The spec's worked example.
+  assert.ok(Math.abs(r.area_one_face_ft2 - 24 / 144) < 1e-12);
+  assert.ok(Math.abs(r.area_coated_ft2 - 1 / 3) < 1e-12);
+  assert.ok(Math.abs(r.mass_lost_mg - 35) < 1e-6);
+  assert.ok(Math.abs(r.coating_mg_ft2 - 105) < 0.01);
+  assert.ok(Math.abs(r.coating_g_m2 - 1.13) < 0.005);
+  // IDENTITY: coated area is the faces times one face, and the coating weight
+  // is the mass lost over THAT area.
+  assert.ok(Math.abs(r.area_coated_ft2 - 2 * r.area_one_face_ft2) < 1e-12);
+  assert.ok(Math.abs(r.coating_mg_ft2 * r.area_coated_ft2 - r.mass_lost_mg) < 1e-9);
+  // THE FINDING: the one-face figure is EXACTLY double, and it is the one
+  // error that turns a failing coating into a passing one.
+  assert.ok(Math.abs(r.one_sided_mg_ft2 - 2 * r.coating_mg_ft2) < 1e-9);
+  assert.ok(Math.abs(r.one_sided_mg_ft2 - 210) < 0.02);
+  assert.strictEqual(r.within_spec, false);
+  assert.ok(/FAILS THE MINIMUM/.test(r.spec_verdict));
+  assert.ok(Math.abs(r.margin_mg_ft2 - 45) < 0.01);
+  assert.ok(r.coating_mg_ft2 < 150 && r.one_sided_mg_ft2 > 150 && r.one_sided_mg_ft2 < 300);
+  // Declaring one face on the same panel reproduces the error exactly, and
+  // the tile then reports it as a PASS -- which is the whole warning.
+  const wrong = _v1827({ ...base, faces_coated: 1 });
+  assert.ok(Math.abs(wrong.coating_mg_ft2 - r.one_sided_mg_ft2) < 1e-9);
+  assert.strictEqual(wrong.within_spec, true);
+  assert.ok(/WITHIN/.test(wrong.spec_verdict));
+  // 105 also sits ABOVE the iron phosphate band, so it is not simply a light
+  // coating of the other type -- it is a zinc phosphate bath running short.
+  assert.ok(r.coating_mg_ft2 > 80);
+  const iron = _v1827({ ...base, spec_min_mg_ft2: 30, spec_max_mg_ft2: 80 });
+  assert.strictEqual(iron.within_spec, false);
+  assert.ok(/EXCEEDS THE MAXIMUM/.test(iron.spec_verdict));
+  assert.ok(Math.abs(iron.margin_mg_ft2 - 25) < 0.01);
+  // IDENTITY: the metric conversion, and linearity in the mass lost.
+  assert.ok(Math.abs(r.coating_g_m2 - r.coating_mg_ft2 * 10.7639 / 1000) < 1e-12);
+  const heavier = _v1827({ ...base, mass_after_g: 45.612 });
+  assert.ok(Math.abs(heavier.mass_lost_mg - 70) < 1e-6);
+  assert.ok(Math.abs(heavier.coating_mg_ft2 - 2 * r.coating_mg_ft2) < 1e-6);
+  assert.strictEqual(heavier.within_spec, true);
+  // Degenerate seams, including the stripping that gained weight.
+  assert.ok(_v1827({ ...base, panel_length_in: 0 }).error);
+  assert.ok(_v1827({ ...base, panel_width_in: -1 }).error);
+  assert.ok(_v1827({ ...base, faces_coated: 3 }).error);
+  assert.ok(_v1827({ ...base, mass_after_g: 45.682 }).error);
+  assert.ok(_v1827({ ...base, mass_after_g: 45.7 }).error);
+  assert.ok(_v1827({ ...base, spec_min_mg_ft2: 0 }).error);
+  assert.ok(_v1827({ ...base, spec_max_mg_ft2: 150 }).error);
+});

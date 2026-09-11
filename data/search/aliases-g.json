@@ -1221,6 +1221,26 @@
     {"term":"odour emission rate","target":"odor-dilution-threshold","kind":"industry"},
     {"term":"odour complaint dispersion","target":"odor-dilution-threshold","kind":"industry"},
     {"term":"detection versus objectionable odour","target":"odor-dilution-threshold","kind":"industry"},
-    {"term":"how much odour reduction do i need","target":"odor-dilution-threshold","kind":"question"}
+    {"term":"how much odour reduction do i need","target":"odor-dilution-threshold","kind":"question"},
+    {"term":"galvanized coating weight","target":"galvanize-coating-weight","kind":"industry"},
+    {"term":"astm a123 coating grade microns","target":"galvanize-coating-weight","kind":"industry"},
+    {"term":"zinc pickup per ton steel","target":"galvanize-coating-weight","kind":"industry"},
+    {"term":"oz per square foot galvanizing","target":"galvanize-coating-weight","kind":"industry"},
+    {"term":"surface area per ton structural steel","target":"galvanize-coating-weight","kind":"industry"},
+    {"term":"pretreatment dragout rate","target":"pretreatment-bath-dragout","kind":"industry"},
+    {"term":"counterflow rinse water calculation","target":"pretreatment-bath-dragout","kind":"industry"},
+    {"term":"plating rinse stages dilution","target":"pretreatment-bath-dragout","kind":"industry"},
+    {"term":"bath makeup concentrate","target":"pretreatment-bath-dragout","kind":"industry"},
+    {"term":"metal finishing water use","target":"pretreatment-bath-dragout","kind":"industry"},
+    {"term":"galvanizing kettle throughput","target":"galvanize-kettle-throughput","kind":"industry"},
+    {"term":"immersion time hot dip","target":"galvanize-kettle-throughput","kind":"industry"},
+    {"term":"kettle cycle time crane","target":"galvanize-kettle-throughput","kind":"industry"},
+    {"term":"galvanizing heat load steel","target":"galvanize-kettle-throughput","kind":"industry"},
+    {"term":"tons per hour galvanizing","target":"galvanize-kettle-throughput","kind":"industry"},
+    {"term":"phosphate coating weight","target":"phosphate-coating-weight","kind":"industry"},
+    {"term":"conversion coating mg per square foot","target":"phosphate-coating-weight","kind":"industry"},
+    {"term":"strip and weigh coating test","target":"phosphate-coating-weight","kind":"industry"},
+    {"term":"zinc phosphate iron phosphate weight","target":"phosphate-coating-weight","kind":"industry"},
+    {"term":"paint pretreatment coating weight","target":"phosphate-coating-weight","kind":"industry"}
   ]
 }

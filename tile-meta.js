@@ -1319,6 +1319,11 @@ const _TILES = [
   ["air-dryer-sizing", "K"],
   ["receiver-pump-up-time", "K"],
   ["vacuum-evacuation-time", "K"],
+  // spec-v1824..v1827 metal finishing and galvanizing band
+  ["galvanize-coating-weight", "G"],
+  ["pretreatment-bath-dragout", "G"],
+  ["galvanize-kettle-throughput", "G"],
+  ["phosphate-coating-weight", "G"],
 ];
 
 

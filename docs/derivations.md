@@ -2309,6 +2309,10 @@ cross-check.
 | calc-finish.js | `computeTextureMaterialTakeoff` | `{ gross_area_sqft = 0, openings_sqft = 0, coverage_per_bag_sqft = 0, waste_pc...` | _ | _ | _ |
 | calc-finish.js | `computeThinsetCoverage` | `{ area_sqft = 0, trowel = "quarter_three_eighths", coverage_per_bag = 0, bag_...` | _ | _ | _ |
 | calc-finish.js | `computeValleyFlashingTakeoff` | `{ valley_run_ft = 0, valley_count = 1, pitch_rise_per_12 = 6, metal_width_in ...` | _ | _ | _ |
+| calc-finishing.js | `computeGalvanizeCoatingWeight` | `{ coating_grade_um = 0, steel_tons = 0, area_per_ton_ft2 = 0, alt_area_per_to...` | _ | _ | _ |
+| calc-finishing.js | `computeGalvanizeKettleThroughput` | `{ lower_min = 0, immerse_min = 0, withdraw_min = 0, travel_min = 0, load_lb_p...` | _ | _ | _ |
+| calc-finishing.js | `computePhosphateCoatingWeight` | `{ panel_length_in = 0, panel_width_in = 0, faces_coated = 2, mass_before_g = ...` | _ | _ | _ |
+| calc-finishing.js | `computePretreatmentBathDragout` | `{ dragout_gal_per_1000ft2 = 0, area_ft2_per_day = 0, bath_volume_gal = 0, bat...` | _ | _ | _ |
 | calc-fire.js | `computeAerialLadderReach` | `{ angle_deg, extension_ft }` | _ | _ | _ |
 | calc-fire.js | `computeBrakingDistance` | `{ speed_mph, friction_coefficient, grade_percent = 0, reaction_time_s = 1.5 }` | _ | _ | _ |
 | calc-fire.js | `computeConfinedSpaceVent` | `{ length_ft = 0, width_ft = 0, height_ft = 0, volume_ft3 = null, blower_cfm =...` | _ | _ | _ |
@@ -3747,7 +3751,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2333.
+Row count: 2337.
 
 <!-- END function-corpus-v14 -->
 
@@ -5132,7 +5136,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (147 tiles)
+### Group G Cross-trade (151 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5176,6 +5180,8 @@ per spec-v14 §13.1 second paragraph.
 | `fixed-ladder-fall-protection` | Fixed Ladder Fall Protection and Rest Platforms | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `flange-bolt-torque` | Flange Bolt-Up Torque | ASME PCC-1 / B16.5 (by name); 3/4 in B7 bolt (A_t 0.334 in^2) at 50% of 105 ksi yield, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `frustum-volume` | Frustum (Truncated Cone) Volume and Surface | Project (first-principles); V=(pi h/12)(D^2+Dd+d^2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `galvanize-coating-weight` | Hot-Dip Galvanized Coating Weight and Thickness | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `galvanize-kettle-throughput` | Galvanizing Kettle Cycle Throughput and Heat Limit | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gas-strut-force` | Gas Spring Force and Mounting Geometry | Project (first-principles); force per strut = lid moment / (struts x moment arm) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gaussian-dispersion-screen` | Downwind Ground-Level Concentration Screen (Gaussian) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gear-cascade` | Gear Ratio and RPM Cascade | First-principles / AGMA; overall = product of stage ratios; RPM_out = RPM_in/overa... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5214,6 +5220,7 @@ per spec-v14 §13.1 second paragraph.
 | `parabolic-segment` | Parabolic Segment Area and Arc Length | Project (first-principles); area (2/3)bh; parabolic arc | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `paraboloid-volume` | Paraboloid of Revolution Volume | Project (first-principles); V(y)=pi R^2 y^2/(2H); half-height reads a quarter full | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `per-diem` | Per-Diem (GSA) | U.S. General Services Administration ...; TX state-default M&IE -> $74/day (FY2026 second tier); ta... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `phosphate-coating-weight` | Phosphate Conversion Coating Weight by Strip and Weigh | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-fitting-takeout` | Fitting Take-Out Cut Length | NCCER Pipefitting / standard fitter's...; 24 in C-to-C, two 1 in threaded 90 ells (take-out 1.5 in,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-miter-cut` | Multi-Piece Miter Elbow Layout | NCCER Pipefitting / standard fabricat...; 3-piece 90 deg miter -> 22.5 deg at each of two cuts; 12.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-spacing-rack` | Insulated Pipe Rack Spacing | ASTM C585 + first-principles geometry...; 2.375 in OD + 1 in insulation -> 4.375 in insulated OD; +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5227,6 +5234,7 @@ per spec-v14 §13.1 second paragraph.
 | `powder-coating-coverage` | Powder Coating Coverage, Transfer Efficiency, and Reclaim | Project (first-principles); coverage = 192.7 / (SG x mils) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `press-fit-interference-for-force` | Interference for a Target Press-Fit Holding Force | Lame interference-fit model (Machiner...; spec-v728 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `press-fit-pressure` | Interference Press-Fit Pressure and Holding Force (Lame) | Lame interference-fit model (Machiner...; spec-v511 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `pretreatment-bath-dragout` | Pretreatment Bath Dragout and Counterflow Rinse Water | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pulley-ma-gen` | Pulley System Mechanical Advantage | Project (first-principles); Triple block (block_3, 3 pulleys), efficiency 0.95 -> the... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pump-tdh` | Pump Total Dynamic Head (TDH) | Crane / Hazen-Williams; TDH = static + suction + discharge + fittings friction; h... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `punch-capacity` | Punch Capacity: Max Hole or Thickness | First-principles shear (inverse); 9.8175 ton press, 0.5 in hole, 50,000 psi shear -> 0.25 i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6002,6 +6010,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2082. Fixture-covered or reference-cadence: 2082 / 2082.
+Tile count: 2086. Fixture-covered or reference-cadence: 2086 / 2086.
 
 <!-- END tile-index-v14 -->

@@ -1352,6 +1352,15 @@ export const TOOL_MODULES = (() => {
     "radon-fan-static", "sub-slab-suction-field", "acid-waste-neutralization",
     "fume-hood-face-velocity", "lab-containment-pressure",
   ]);
+  // spec-v1824..v1827: the metal finishing and galvanizing bench -- what a
+  // galvanized coating weighs, what a pretreatment bath drags out, what a
+  // kettle can put through, and what a stripped panel says about a
+  // conversion coating. Its own module rather than calc-finish.js, which is
+  // architectural finishes and a different trade.
+  declare("./calc-finishing.js", "FINISHING_RENDERERS", [
+    "galvanize-coating-weight", "pretreatment-bath-dragout",
+    "galvanize-kettle-throughput", "phosphate-coating-weight",
+  ]);
   declare("./calc-pool.js", "POOL_RENDERERS", [
     "pool-cover-evaporation", "pool-pump-speed-savings",
     "pool-heat-pump-capacity", "spa-drain-interval",

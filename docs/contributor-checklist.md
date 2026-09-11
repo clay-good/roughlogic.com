@@ -198,7 +198,7 @@ phase docs ([edition-rollover.md](edition-rollover.md),
   the URLs when it is stale.
 - [ ] `npm run check:shell-mobile` before any layout or type change. It
   is the one CI post-build gate `npm run audit` does not run: it drives
-  2,104 shells through a headless browser at 320 px and takes about five
+  2,108 shells through a headless browser at 320 px and takes about five
   minutes.
 - [ ] `npm run lint` clean.
 - [ ] `npm test` passing (full unit suite).

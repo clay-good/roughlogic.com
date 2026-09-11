@@ -2,96 +2,96 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "b09364e095d5a9ef",
-      "date": "2026-09-09"
+      "sha": "a249af4228ad25c9",
+      "date": "2026-09-11"
     },
     "/tools/": {
-      "sha": "a6c1f4c042279aaf",
-      "date": "2026-09-09"
+      "sha": "2dcc1230b62bb914",
+      "date": "2026-09-11"
     },
     "/groups/accounting/": {
-      "sha": "3cbe875c2cb5ae89",
-      "date": "2026-09-09"
+      "sha": "ce8ec044ac5bb793",
+      "date": "2026-09-11"
     },
     "/groups/agriculture/": {
-      "sha": "0a416c1c7adb6180",
-      "date": "2026-09-09"
+      "sha": "e1562e45b287bf33",
+      "date": "2026-09-11"
     },
     "/groups/construction/": {
-      "sha": "fec8af67990192e3",
-      "date": "2026-09-09"
+      "sha": "4154ba5c6f113093",
+      "date": "2026-09-11"
     },
     "/groups/cross-trade/": {
-      "sha": "bdffd921da9d5167",
-      "date": "2026-09-09"
+      "sha": "578e6bfe204afc02",
+      "date": "2026-09-11"
     },
     "/groups/educators/": {
-      "sha": "ea0a55aeeeafe2fa",
-      "date": "2026-09-09"
+      "sha": "29164ee5f89a6f05",
+      "date": "2026-09-11"
     },
     "/groups/electrical/": {
-      "sha": "f9231add32e97cda",
-      "date": "2026-09-09"
+      "sha": "9e4379d3af096f81",
+      "date": "2026-09-11"
     },
     "/groups/field/": {
-      "sha": "0c3aafdda3970cf5",
-      "date": "2026-09-09"
+      "sha": "e7e7ddc241b47eac",
+      "date": "2026-09-11"
     },
     "/groups/fire-ground/": {
-      "sha": "34990eadc9921a5b",
-      "date": "2026-09-09"
+      "sha": "6a7d12d715909036",
+      "date": "2026-09-11"
     },
     "/groups/historical/": {
-      "sha": "886aa549722bef92",
-      "date": "2026-09-09"
+      "sha": "8e5848dcd6fa47f9",
+      "date": "2026-09-11"
     },
     "/groups/hvac/": {
-      "sha": "8c3c36a3a9b9be35",
-      "date": "2026-09-09"
+      "sha": "2a3201a07742a954",
+      "date": "2026-09-11"
     },
     "/groups/kitchen/": {
-      "sha": "3693e11e78985d85",
-      "date": "2026-09-09"
+      "sha": "35e48a88e6d1851c",
+      "date": "2026-09-11"
     },
     "/groups/lab/": {
-      "sha": "396c2b6fabd05deb",
-      "date": "2026-09-09"
+      "sha": "41938a3b83aa3fe6",
+      "date": "2026-09-11"
     },
     "/groups/mechanic/": {
-      "sha": "b29a9cbd97d8ff13",
-      "date": "2026-09-09"
+      "sha": "c05dd6c674429eb0",
+      "date": "2026-09-11"
     },
     "/groups/plumbing/": {
-      "sha": "a3a40b48a41140e0",
-      "date": "2026-09-09"
+      "sha": "21151e6e84b85044",
+      "date": "2026-09-11"
     },
     "/groups/real-estate/": {
-      "sha": "b689657036d022c3",
-      "date": "2026-09-09"
+      "sha": "871df48eb5b52313",
+      "date": "2026-09-11"
     },
     "/groups/references/": {
-      "sha": "7ddf043fba8d9ebf",
-      "date": "2026-09-09"
+      "sha": "f685511f4a21ad71",
+      "date": "2026-09-11"
     },
     "/groups/restoration/": {
-      "sha": "11ecf71592c9bc26",
-      "date": "2026-09-09"
+      "sha": "ee34375df30ce69b",
+      "date": "2026-09-11"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "ccadfcd190453084",
-      "date": "2026-09-09"
+      "sha": "04f96b2205ce26cc",
+      "date": "2026-09-11"
     },
     "/groups/stage/": {
-      "sha": "75207105804106d4",
-      "date": "2026-09-09"
+      "sha": "d8fe1a45d29d05cc",
+      "date": "2026-09-11"
     },
     "/groups/trucking/": {
-      "sha": "8544c89b6ee7c4e5",
-      "date": "2026-09-09"
+      "sha": "bca1ecff4ee31683",
+      "date": "2026-09-11"
     },
     "/groups/water/": {
-      "sha": "27fb9574f6e3407a",
-      "date": "2026-09-09"
+      "sha": "4fbd2f34e49b6591",
+      "date": "2026-09-11"
     },
     "/tools/aav-install-check/": {
       "sha": "4e1b1d5b33ca35e4",
@@ -3025,6 +3025,14 @@
       "sha": "8e7290990eddc02f",
       "date": "2026-09-01"
     },
+    "/tools/galvanize-coating-weight/": {
+      "sha": "5f0947b8848274d1",
+      "date": "2026-09-11"
+    },
+    "/tools/galvanize-kettle-throughput/": {
+      "sha": "bb99e5ff9ad6301c",
+      "date": "2026-09-11"
+    },
     "/tools/garage-door-torsion-spring/": {
       "sha": "d27e879b26748a6d",
       "date": "2026-09-01"
@@ -4925,6 +4933,10 @@
       "sha": "4ae6375724b04ca5",
       "date": "2026-09-01"
     },
+    "/tools/phosphate-coating-weight/": {
+      "sha": "e880623291db7790",
+      "date": "2026-09-11"
+    },
     "/tools/pid-tuning-ziegler-nichols/": {
       "sha": "019feb1fab1e45e7",
       "date": "2026-09-01"
@@ -5289,6 +5301,10 @@
       "sha": "d9dcf515b32e68a7",
       "date": "2026-09-09"
     },
+    "/tools/pretreatment-bath-dragout/": {
+      "sha": "115f65c19720b0bf",
+      "date": "2026-09-11"
+    },
     "/tools/prevailing-wage-fringe/": {
       "sha": "8a2594aa0f72a117",
       "date": "2026-09-01"
@@ -5522,8 +5538,8 @@
       "date": "2026-09-01"
     },
     "/tools/radiant-heat-exchange/": {
-      "sha": "093da6e5ab17121e",
-      "date": "2026-09-09"
+      "sha": "a1a6b609076fe895",
+      "date": "2026-09-11"
     },
     "/tools/radiant-loop-sizing/": {
       "sha": "a48f874c0093c9e0",

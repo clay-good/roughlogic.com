@@ -24154,6 +24154,58 @@ export const CITATIONS = {
   // pipe friction was "a few hundredths" and "a percent or two" of the system;
   // two independent methods put it at 0.111 and 0.128 in wc, 9-11% of a 1.2 in
   // wc fan, so the share is COMPUTED here rather than asserted.
+  // spec-v1824..v1827: the 2026-09-11 trade-expansion metal finishing and
+  // galvanizing band. Four tiles, nothing cut. All four specs were recomputed
+  // before wiring and all four are arithmetically sound as written -- the
+  // first band of this program to need no correction.
+  "galvanize-coating-weight": {
+    formula: "thickness in mils = microns / 25.4; coating weight in oz per sq ft = mils x 0.5940 (the fixed zinc density); total area = tonnage x surface area per ton; zinc = area x coating weight / 16; pickup = zinc / (tons x 2,000), reported as a percent of steel weight.",
+    edition: "ASTM A123 assigns the coating grade in microns from the material category and the steel thickness; the grade is ENTERED here rather than selected. Fasteners fall under A153 and sheet under other standards.",
+    freeAccess: "A material density conversion and two unit conversions.",
+    governance: GOVERNANCE.general,
+    editionNote: "SURFACE AREA PER TON IS THE DOMINANT INPUT and it is not a table lookup: real work spans roughly 100 to 150 sq ft per ton for heavy structural shapes and 300 to 500 for light angle, grating and fabricated assemblies, a factor of four, and it must come from the fabricator's own takeoff. That range is the whole reason galvanizing prices look strange to a fabricator -- zinc, kettle time, racking and handling all follow AREA while the purchase order is written in TONS, so two loads of identical weight can differ threefold or fourfold in what they cost to coat. The ZINC PICKUP figure is a surface-area quantity reported against a weight basis, which is exactly why it moves so much at a fixed coating grade. AND A123 THICKNESS IS AN AVERAGE WITH MINIMUMS, not a uniform value: the coating grows by reaction with the steel, so a silicon-reactive steel produces a thick dull grey coating that meets the specification and looks nothing like the bright pieces beside it. That is metallurgy, not a defect, and it is the most common galvanizing complaint.",
+    assumptions: [
+      { name: "Zinc density conversion", value: "1 mil over 1 sq ft = 0.5940 oz", source: "the density of zinc" },
+      { name: "Surface area per ton is entered", value: "from the fabricator's takeoff, not a table", source: "the drawings for the actual pieces" },
+      { name: "Kettle losses are not counted", value: "dross, ash and skimmings are beyond what leaves on the steel", source: "the galvanizer's own consumption records" },
+    ],
+  },
+  "pretreatment-bath-dragout": {
+    formula: "dragout = rate per 1,000 sq ft x area processed; concentrate lost = dragout x bath concentration; bath turnover = bath volume / dragout; single-rinse flow = dragout x dilution ratio; N counterflow stages need flow = dragout x (dilution ratio)^(1/N).",
+    edition: "Standard metal finishing mass balance and the counterflow rinse dilution relation. The dragout rate is ENTERED and must be measured for the actual parts, racks and drain practice.",
+    freeAccess: "A mass balance and an Nth root.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE POWER LAW IS THE RESULT: the required flow falls as the Nth ROOT of the dilution ratio, so on a 1,000:1 target the step from one rinse tank to two cuts the water by 96.8%, the step from two to three adds only 2.2 points more, and a fourth stage saves an order of magnitude less again while costing a tank, floor space and another transfer. That is why lines are built with two or three rinses and almost never with five. The relation assumes IDEAL MIXING in each stage, complete carry-over between stages and steady state, and a real rinse falls short of all three, so these flows are a LOWER BOUND. And the cheapest gallon is the one never dragged out -- longer drain time, a rack that lets solution run off instead of cupping, drain boards and air knives cut the chemical loss, the rinse water and the effluent load at once, because all three are proportional to the same number.",
+    assumptions: [
+      { name: "Dragout is measured, not predicted", value: "roughly 0.4 to 2 gal per 1,000 sq ft for well-drained flat work, up to 10 for cupped or threaded parts", source: "weighing racked parts wet and dry over the tank" },
+      { name: "Ideal counterflow", value: "perfect mixing, complete carry-over, steady state", source: "the standard dilution relation" },
+      { name: "Discharge limits are not evaluated", value: "the permit governs what may leave the site", source: "the local sewer authority and the effluent guidelines" },
+    ],
+  },
+  "galvanize-kettle-throughput": {
+    formula: "cycle = lower + immerse + withdraw and drain + travel; lifts per hour = 60 / cycle in minutes; crane throughput = lifts per hour x load per lift; heat demand = lb/h x specific heat x (bath temperature - ambient); heat-limited throughput = burner output to the steel / (specific heat x temperature rise); the LOWER of the two governs.",
+    edition: "The kettle cycle throughput relation and the sensible heat demand of the steel, with ASTM A123 named for the coating the immersion time is chosen to produce. Immersion time and burner output are ENTERED.",
+    freeAccess: "A cycle-time relation and a sensible-heat relation.",
+    governance: GOVERNANCE.general,
+    editionNote: "A KETTLE IS TWO MACHINES IN SERIES WITH DIFFERENT LIMITS -- a crane whose rate is the cycle and a thermal machine whose rate is the burners -- and quoting one tons-per-hour figure for the plant hides which is binding, so both are computed and the lower is reported. Heavy work gives MORE tons per hour despite a far longer immersion, because the load per lift grows faster than the cycle does, while the same comparison in square feet per minute goes the OTHER way. Both are real: zinc, dross and coating quality follow AREA and the invoice follows WEIGHT. On heavy work the burners usually govern, and the shortfall against the crane-cycle promise is reported rather than left implicit. THE REMEDY IS BURNER CAPACITY OR SCHEDULING, NOT A HOTTER BATH: raising bath temperature accelerates kettle wall attack, and a kettle failure is the most expensive event a galvanizing plant has. This heat figure covers only heating the steel -- wall losses, ash and dross, reheating the zinc the work removes and flux evaporation are all beyond it, so the burner capacity actually needed exceeds it.",
+    assumptions: [
+      { name: "Immersion time is entered", value: "a metallurgical requirement set by section, chemistry, bath temperature and specification", source: "the galvanizer's own cycle and coating records" },
+      { name: "Steel specific heat", value: "about 0.12 Btu/lb-degF, entered and adjustable", source: "standard steel property tables" },
+      { name: "Only the steel is heated", value: "wall losses, dross, flux and zinc reheat are not counted", source: "the kettle and burner manufacturers' data" },
+    ],
+  },
+  "phosphate-coating-weight": {
+    formula: "coated area = panel length x width / 144, times the number of coated faces; coating weight in mg per sq ft = mass lost on stripping in mg / coated area; g per m^2 = mg per sq ft x 10.7639 / 1,000.",
+    edition: "The strip-and-weigh conversion coating weight method. The stripping solution, time and temperature are prescribed by the applicable ASTM test method for the specific coating and substrate; specification ranges are ENTERED from the coating supplier.",
+    freeAccess: "A division by area and one unit conversion.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE AREA IS BOTH FACES OF A FLAT PANEL: a 4 x 6 in panel is 48 sq in, not 24, and dividing by one face reports EXACTLY DOUBLE. On the standard case that turns a 105 mg/sq ft result which FAILS a 150 to 300 zinc phosphate range into a 210 which passes comfortably -- with a correct measurement, a correct balance and a wrong area. The one-face figure is computed and shown alongside the correct one so the error is visible rather than silent. Coating weight is a PROXY for coverage and crystal structure and measures neither; a specification states a RANGE rather than a minimum because both failure directions are real, a light coating leaving bare areas and a heavy one being coarse and friable and failing within itself under a well-adhered paint film. AND THE STRIP SOLUTION IS WHERE A RESULT QUIETLY GOES WRONG -- it must dissolve the coating and leave the substrate alone, and one that takes metal with the coating reports a coating weight that is partly base metal.",
+    assumptions: [
+      { name: "Both faces are coated unless told otherwise", value: "the default is 2; the one-face figure is reported either way", source: "the geometry of a flat test panel" },
+      { name: "Typical ranges are entered, not assumed", value: "zinc phosphate roughly 150 to 300 mg/sq ft, iron phosphate roughly 30 to 80", source: "the coating supplier's specification" },
+      { name: "The strip removes coating only", value: "a solution that takes substrate reports a coating weight that is partly base metal", source: "the applicable ASTM test method" },
+    ],
+  },
   "radon-fan-static": {
     formula: "pipe velocity = flow / area; friction by Darcy-Weisbach with the Blasius smooth-pipe factor f = 0.316 / Re^0.25, converted from feet of air to inches of water column; the share divides that loss by the fan's entered static.",
     edition: "Duct friction by Darcy-Weisbach on a smooth pipe, with the sub-slab resistance ENTERED as a measured fan static rather than predicted, because it depends on the aggregate, the fines and the soil and is not calculable in advance.",

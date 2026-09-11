@@ -1644,6 +1644,11 @@ const RELATED = {
   "pool-pump-speed-savings": ["pool-turnover","vfd-energy-savings","pool-cover-evaporation"],
   "pool-heat-pump-capacity": ["pool-heater-btu","pool-cover-evaporation","heat-pump-cold-capacity"],
   "spa-drain-interval": ["pool-turnover","pool-alkalinity-adjust","pool-volume"],
+  // spec-v1824..v1827: metal finishing and galvanizing band.
+  "galvanize-coating-weight": ["galvanize-kettle-throughput","phosphate-coating-weight","coating-coverage-dft"],
+  "galvanize-kettle-throughput": ["galvanize-coating-weight","phosphate-coating-weight","haul-cycle-production"],
+  "pretreatment-bath-dragout": ["phosphate-coating-weight","galvanize-coating-weight","plating-tank-current"],
+  "phosphate-coating-weight": ["pretreatment-bath-dragout","galvanize-coating-weight","coating-coverage-dft"],
   // spec-v1745..v1749: containment band.
   "radon-fan-static": ["sub-slab-suction-field","stack-effect-npp","blower-door-ach50"],
   "propane-vaporization-rate": ["propane-run-time","propane-regulator-sizing","gas-appliance-demand"],

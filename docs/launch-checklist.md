@@ -418,10 +418,10 @@ than sitting here misinforming a reader for three months.
 
 | Figure | Live |
 | --- | --- |
-| Calculators (tiles) in `TOOLS` | **2082 live tiles** |
+| Calculators (tiles) in `TOOLS` | **2086 live tiles** |
 | Active catalog groups | **21 live groups** |
-| `calc-*.js` modules | **77 live calc modules** |
-| Sitemap URLs (one per tile, one per group hub, home, catalog hub) | **2105 live sitemap URLs** |
+| `calc-*.js` modules | **78 live calc modules** |
+| Sitemap URLs (one per tile, one per group hub, home, catalog hub) | **2109 live sitemap URLs** |
 
 ### Gates
 
