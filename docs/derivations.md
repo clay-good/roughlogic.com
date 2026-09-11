@@ -3713,6 +3713,12 @@ cross-check.
 | calc-wind.js | `computeWindPowerDensityBetz` | `{ wind_speed_mph = 0, air_density_pcf = _RHO_REF_PCF, rotor_diameter_ft = 0, ...` | _ | _ | _ |
 | calc-wind.js | `computeWindShearHubHeight` | `{ measured_speed_mph = 0, measured_height_ft = 0, hub_height_ft = 0, shear_ex...` | _ | _ | _ |
 | calc-wind.js | `computeYawErrorLoss` | `{ yaw_error_deg = 0, rated_power_kw = 0, capacity_factor_pct = 40, energy_pri...` | _ | _ | _ |
+| calc-winterops.js | `computeBrineBatchSalinity` | `{ batch_gal = 0, target_pct = 23.3, brine_density_lb_gal = 9.8, saturation_pc...` | _ | _ | _ |
+| calc-winterops.js | `computeIceMeltWorkingTemperature` | `{ area_ft2 = 0, ice_thickness_in = 0, ice_density_lb_ft3 = 57.2, pavement_tem...` | _ | _ | _ |
+| calc-winterops.js | `computePlowRouteCycleTime` | `{ route_lane_miles = 0, plow_speed_mph = 0, overhead_factor = 1.2, system_lan...` | _ | _ | _ |
+| calc-winterops.js | `computeSaltApplicationRate` | `{ rate_lb_per_lane_mile = 0, route_lane_miles = 0, lot_area_ft2 = 0, hopper_c...` | _ | _ | _ |
+| calc-winterops.js | `computeSnowStackingArea` | `{ lot_area_ft2 = 0, accumulation_in = 0, events = 1, fresh_density_lb_ft3 = 7...` | _ | _ | _ |
+| calc-winterops.js | `computeWalkwayClearingProductivity` | `{ total_area_ft2 = 0, hand_area_ft2 = 0, blower_rate_ft2_hr = 0, hand_rate_ft...` | _ | _ | _ |
 | pure-math.js | `C_to_F` | `C` | _ | _ | _ |
 | pure-math.js | `C_to_K` | `C` | _ | _ | _ |
 | pure-math.js | `F_to_C` | `F` | _ | _ | _ |
@@ -3751,7 +3757,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2337.
+Row count: 2343.
 
 <!-- END function-corpus-v14 -->
 
@@ -5136,7 +5142,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (151 tiles)
+### Group G Cross-trade (156 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5150,6 +5156,7 @@ per spec-v14 §13.1 second paragraph.
 | `belt-hp-transmitted` | Belt Power from Tension and Speed | belt-drive power relation (Machinery'...; spec-v807 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bolt-circle` | Bolt Circle Layout | First-principles circle-of-holes trig...; 8-in bolt circle, 6 holes, start 0 deg -> R 4, spacing 60... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bolt-proof-load` | Bolt Proof, Yield, and Tensile Load (SAE J429) | SAE J429 (ASME B1.1 tensile stress area); spec-v503 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `brine-batch-salinity` | Salt Brine Batch Salinity, Salometer, and Freeze Point | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bucket-elevator-capacity` | Bucket Elevator Capacity, Speed, and Power | Project (first-principles); capacity = bucket volume x buckets/ft x speed x 60 x fill | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `carbon-bed-life` | Activated Carbon Adsorber Bed Life and Breakthrough | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `casting-pour-yield` | Casting Pour Weight, Gating Yield, and Melt Energy | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5193,6 +5200,7 @@ per spec-v14 §13.1 second paragraph.
 | `heat-treat-soak-time` | Heat-Treat Soak Time and Furnace Load | Project (first-principles); soak by section thickness; charge heat = w x c x dT | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hydraulic-cylinder` | Hydraulic Cylinder Force and Speed | NFPA (fluid power); F = P*A; v = GPM*231/(60*A); A_extend = pi*(bore/2)^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hydraulic-reservoir-cooler` | Hydraulic Reservoir Size and Cooler Heat Rejection | Project (first-principles); gpm x psi / 1,714; 2,545 BTU/hr per hp | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `ice-melt-working-temperature` | Ice Melt Working Temperature and Melting Capacity | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `injection-clamp-tonnage` | Injection Mould Clamp Tonnage From Projected Area | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `injection-cooling-time` | Injection Moulding Cooling Time From Wall Thickness | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ladder-angle` | Ladder Placement Angle | OSHA; OSHA 1926.1053(b)(5) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5253,6 +5261,7 @@ per spec-v14 §13.1 second paragraph.
 | `rolling-offset` | Rolling Offset | NCCER pipefitting / standard fitter's...; rise 12, roll 9 -> true offset 15; at 45 deg travel 21.21 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rotor-balance-grade` | Permissible Residual Unbalance and Balance Grade | ISO; permissible residual unbalance | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sales-tax` | Sales Tax | Texas Comptroller of Public Accounts; $1,000 subtotal in TX (6.25%) -> $62.50 tax / $1062.50 total | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `salt-application-rate` | Deicing Salt Application Rate and Coverage per Load | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sand-permeability-vent` | Moulding Sand Gas Evolution, Permeability, and Venting | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `scrubber-lg-ratio` | Wet Scrubber Liquid-to-Gas Ratio and Removal | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shot-size-residence-time` | Injection Shot Size, Barrel Capacity, and Residence Time | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5260,6 +5269,7 @@ per spec-v14 §13.1 second paragraph.
 | `silica-table-1` | Silica Table 1 Respirator Lookup (OSHA 1926.1153) | Occupational Safety and Health Admini...; Row (xi), handheld grinders for mortar removal (tuckpoint... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sine-bar` | Sine Bar Angle Setup | First-principles sine-bar trigonometr...; 5-in sine bar on a 2.5-in stack -> arcsin(0.5) = 30.000 deg | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `slope-from-level` | Slope from Digital Level | Project (first-principles); Trig conversion arctan / tan | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `snow-stacking-area` | Snow Storage Stacking Area and Haul-Off Trigger | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spcc-containment-volume` | SPCC Secondary Containment Volume and Freeboard | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spherical-cap-volume` | Spherical Cap / Dome / Partial-Fill Volume | Project (first-principles); V=(pi h^2/3)(3R-h) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spherical-zone-volume` | Spherical Zone (Segment of Two Bases) Volume | Project (first-principles); prismatoid rule V=(pi h/6)(3r1^2+3r2^2+h^2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5289,6 +5299,7 @@ per spec-v14 §13.1 second paragraph.
 | `upgrade-roi` | Upgrade ROI / Payback | Project (first-principles); NPV = -C + sum(S / (1+d)^i) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vbelt-drive` | V-Belt Sheave and Drive Sizing | ANSI/RMA / Gates; L = 2C + (pi/2)(D1+D2) + (D2-D1)^2/(4C); design_HP = HP*SF | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vehicle-load` | Vehicle Load Distribution | Project (first-principles) over FMVSS...; 140 in wheelbase / 1000 lb payload at 60 in from cab / 88... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `walkway-clearing-productivity` | Walkway Clearing Crew Time and Service Window | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wind-chill` | Wind Chill Exposure | NWS; T_wc = 35.74 + 0.6215 T - 35.75 V^0.16 + 0.4275 T V^0.16 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wind-chill-wind-speed` | Wind Speed from Wind Chill and Temperature | NWS (2001 formula, solved for wind sp...; spec-v758 pinned example: 5 F air, -19 F wind chill -> ~2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
@@ -5312,7 +5323,7 @@ per spec-v14 §13.1 second paragraph.
 | `tool-maintenance` | Tool Maintenance Intervals | Project bundled tool maintenance sche...; Reference compute returns the per-attribute table; runner... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 | `triage-quickread` | Field First Aid Triage Quick-Read | START / SALT triage protocols (projec...; Returns 4 categories + notice + citation; tested on the n... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 
-### Group J Trucking (43 tiles)
+### Group J Trucking (44 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5345,6 +5356,7 @@ per spec-v14 §13.1 second paragraph.
 | `maintenance-reserve` | Maintenance Reserve per Mile | First-principles owner-operator reser...; spec-v91 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `oversize-permit-screen` | Oversize and Overweight Permit Threshold Screen | Project (first-principles); excess on each of four dimensions | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pallet-loadout` | Pallet Cube and Trailer Loadout | GMA pallet (48 x 40 in) + 53 ft dry-v...; 12 x 10 x 8 in case @ 25 lb / 48 cases per pallet -> 26 p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `plow-route-cycle-time` | Plow Route Cycle Time, Accumulation, and Truck Count | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `railcar-load-limit` | Railcar Load Limit, Route Limit, and Cube | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `reefer-burn` | Reefer Fuel Burn and Run Time | Thermo King published technical bulle...; Continuous SB / 50 gal tank / 24 hr / moderate / 1200 mi ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `safe-descent-speed` | Safe Downgrade Descent Speed and Brake Load | Project (first-principles); P = W x v x grade / 550 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -6010,6 +6022,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2086. Fixture-covered or reference-cadence: 2086 / 2086.
+Tile count: 2092. Fixture-covered or reference-cadence: 2092 / 2092.
 
 <!-- END tile-index-v14 -->

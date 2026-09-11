@@ -110087,6 +110087,465 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "salt-application-rate",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Deicing Salt Application Rate by Pavement Temperature -- the spec-v1845 worked example, recomputed",
+   "source_edition_or_year": "spec-v1845 of scope-trade-expansion-3, 2026-09-11",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-11",
+   "inputs": {
+    "rate_lb_per_lane_mile": 250,
+    "route_lane_miles": 30,
+    "lot_area_ft2": 100000,
+    "hopper_capacity_tons": 8,
+    "alt_rate_lb_per_lane_mile": 500
+   },
+   "outputs": {
+    "material_lb_per_pass": {
+     "value": 7500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "material_tons_per_pass": {
+     "value": 3.75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "passes_per_load": {
+     "value": 2.1333333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_material_lb_per_pass": {
+     "value": 15000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_passes_per_load": {
+     "value": 1.0666667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lot_lane_miles": {
+     "value": 1.5782828,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lot_material_lb": {
+     "value": 394.57071,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "brine-batch-salinity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Salt Brine Batch Salinity and Blend -- the spec-v1846 worked example, recomputed",
+   "source_edition_or_year": "spec-v1846 of scope-trade-expansion-3, 2026-09-11",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-11",
+   "inputs": {
+    "batch_gal": 3000,
+    "target_pct": 23.3,
+    "brine_density_lb_gal": 9.8,
+    "saturation_pct": 26.4,
+    "alt_pct": 20
+   },
+   "outputs": {
+    "batch_weight_lb": {
+     "value": 29400,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "salt_lb": {
+     "value": 6850.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "salt_tons": {
+     "value": 3.4251,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "water_lb": {
+     "value": 22549.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "water_gal": {
+     "value": 2702.1929,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "salt_per_1000gal_lb": {
+     "value": 2283.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "salometer": {
+     "value": 88.257576,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "freeze_point_f": {
+     "value": -6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_salt_lb": {
+     "value": 5880,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_freeze_point_f": {
+     "value": 1.9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "salt_difference_lb": {
+     "value": 970.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "plow-route-cycle-time",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Plow Route Cycle Time and Truck Count -- the spec-v1847 worked example, recomputed",
+   "source_edition_or_year": "spec-v1847 of scope-trade-expansion-3, 2026-09-11",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-11",
+   "inputs": {
+    "route_lane_miles": 30,
+    "plow_speed_mph": 25,
+    "overhead_factor": 1.2,
+    "system_lane_miles": 300,
+    "cycle_target_hr": 2,
+    "snowfall_in_hr": 1.5,
+    "alt_cycle_target_hr": 1.3333333333333333
+   },
+   "outputs": {
+    "effective_speed_lane_miles_hr": {
+     "value": 20.833333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cycle_time_hr": {
+     "value": 1.44,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cycle_time_min": {
+     "value": 86.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "accumulation_in": {
+     "value": 2.16,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lane_miles_per_truck": {
+     "value": 41.666667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "trucks_required": {
+     "value": 8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_lane_miles_per_truck": {
+     "value": 27.777778,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_trucks_required": {
+     "value": 11,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "extra_trucks": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "accumulation_bought_in": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "snow-stacking-area",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Snow Storage Stacking Area and Haul-Off Trigger -- the spec-v1848 worked example, recomputed",
+   "source_edition_or_year": "spec-v1848 of scope-trade-expansion-3, 2026-09-11",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-11",
+   "inputs": {
+    "lot_area_ft2": 100000,
+    "accumulation_in": 12,
+    "events": 3,
+    "fresh_density_lb_ft3": 7,
+    "pile_density_lb_ft3": 25,
+    "pile_height_ft": 12,
+    "side_slope_run_per_rise": 1,
+    "area_per_space_ft2": 300,
+    "allocated_pct": 5
+   },
+   "outputs": {
+    "fallen_volume_ft3": {
+     "value": 100000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pile_volume_ft3": {
+     "value": 28000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "base_width_ft": {
+     "value": 24,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cross_section_ft2": {
+     "value": 144,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "windrow_length_ft": {
+     "value": 194.44444,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "footprint_ft2": {
+     "value": 4666.6667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "footprint_pct_of_lot": {
+     "value": 4.6666667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "spaces_lost": {
+     "value": 16,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "season_footprint_ft2": {
+     "value": 14000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "season_spaces_lost": {
+     "value": 47,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "allocated_volume_ft3": {
+     "value": 30000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "haul_volume_ft3": {
+     "value": 54000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "haul_cy": {
+     "value": 2000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cone_height_ft": {
+     "value": 29.902659,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cone_footprint_ft2": {
+     "value": 2809.1148,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ice-melt-working-temperature",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Ice Melt Product Working Temperature and Capacity -- the spec-v1849 worked example, recomputed",
+   "source_edition_or_year": "spec-v1849 of scope-trade-expansion-3, 2026-09-11",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-11",
+   "inputs": {
+    "area_ft2": 1000,
+    "ice_thickness_in": 1,
+    "ice_density_lb_ft3": 57.2,
+    "pavement_temp_f": 30,
+    "capacity_lb_ice_per_lb": 46.3,
+    "alt_capacity_lb_ice_per_lb": 4.9,
+    "alt_temp_f": 10,
+    "practical_limit_f": 15,
+    "eutectic_f": -6
+   },
+   "outputs": {
+    "ice_volume_ft3": {
+     "value": 83.333333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ice_mass_lb": {
+     "value": 4766.6667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "product_lb": {
+     "value": 102.95176,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "alt_product_lb": {
+     "value": 972.78912,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "product_ratio": {
+     "value": 9.4489796,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "walkway-clearing-productivity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Walkway Clearing Crew Productivity -- the spec-v1850 worked example, recomputed",
+   "source_edition_or_year": "spec-v1850 of scope-trade-expansion-3, 2026-09-11",
+   "source_section_or_page": "the standards named in the tile citation govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-11",
+   "inputs": {
+    "total_area_ft2": 12000,
+    "hand_area_ft2": 2000,
+    "blower_rate_ft2_hr": 12000,
+    "hand_rate_ft2_hr_person": 1200,
+    "crew_size": 2,
+    "service_window_hr": 2,
+    "blower_depth_factor": 0.25,
+    "hand_depth_factor": 0.3333333333333333,
+    "icemelt_lb_per_1000ft2": 4,
+    "applications": 3
+   },
+   "outputs": {
+    "open_area_ft2": {
+     "value": 10000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "blower_hr": {
+     "value": 3.3333333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hand_hr": {
+     "value": 2.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "crew_hr": {
+     "value": 3.3333333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "crew_min": {
+     "value": 200,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "crews_required": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "icemelt_per_application_lb": {
+     "value": 48,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "icemelt_event_lb": {
+     "value": 144,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

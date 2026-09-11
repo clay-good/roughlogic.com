@@ -52870,3 +52870,332 @@ test("bounds: spec-v1827 computePhosphateCoatingWeight -- one face reports exact
   assert.ok(_v1827({ ...base, spec_min_mg_ft2: 0 }).error);
   assert.ok(_v1827({ ...base, spec_max_mg_ft2: 150 }).error);
 });
+
+// =====================================================================
+// spec-v1845..v1850: the snow and ice management band. Six tiles, nothing
+// cut. Five of the six specs are arithmetically sound as written. THE
+// EXCEPTION IS spec-v1850, which states that a walk route "fails on the hand
+// work, which is what degrades fastest" -- its own depth factors at 12 in
+// (blower at a quarter of its rate, hand at a third) give 3.33 h of machine
+// work against 2.50 h of hand work, so the MACHINE governs and it is the
+// machine whose rate fell faster. The tile computes which operation governs
+// instead of asserting it, and the test below pins BOTH directions.
+// =====================================================================
+import {
+  computeSaltApplicationRate as _v1845,
+  computeBrineBatchSalinity as _v1846,
+  computePlowRouteCycleTime as _v1847,
+  computeSnowStackingArea as _v1848,
+  computeIceMeltWorkingTemperature as _v1849,
+  computeWalkwayClearingProductivity as _v1850,
+} from "../../calc-winterops.js";
+
+test("bounds: spec-v1845 computeSaltApplicationRate -- doubling the rate halves the coverage", () => {
+  const base = { rate_lb_per_lane_mile: 250, route_lane_miles: 30, lot_area_ft2: 100000, hopper_capacity_tons: 8, alt_rate_lb_per_lane_mile: 500 };
+  const r = _v1845(base);
+  assert.ok(Math.abs(r.material_lb_per_pass - 7500) < 1e-9);
+  assert.ok(Math.abs(r.material_tons_per_pass - 3.75) < 1e-12);
+  assert.ok(Math.abs(r.passes_per_load - 2.13) < 0.005);
+  assert.ok(Math.abs(r.alt_material_lb_per_pass - 15000) < 1e-9);
+  assert.ok(Math.abs(r.alt_passes_per_load - 1.07) < 0.005);
+  assert.ok(Math.abs(r.lot_lane_miles - 1.58) < 0.005);
+  assert.ok(Math.abs(r.lot_material_lb - 395) < 0.5);
+  // IDENTITY: the lane-mile is 12 ft x 5,280 ft = 63,360 sq ft, exactly.
+  assert.ok(Math.abs(r.lot_lane_miles - 100000 / 63360) < 1e-12);
+  // IDENTITY: coverage is hopper pounds over material per pass, and reloads
+  // per pass is its reciprocal.
+  assert.ok(Math.abs(r.passes_per_load * r.material_lb_per_pass - 16000) < 1e-9);
+  assert.ok(Math.abs(r.passes_per_load * r.reloads_per_pass - 1) < 1e-12);
+  // THE FINDING: coverage is INVERSELY proportional to rate. Doubling the
+  // rate halves the passes per load, so the reload trips double too.
+  assert.ok(Math.abs(r.rate_ratio - 2) < 1e-12);
+  assert.ok(Math.abs(r.alt_passes_per_load - r.passes_per_load / 2) < 1e-9);
+  assert.ok(Math.abs(r.alt_reloads_per_pass - 2 * r.reloads_per_pass) < 1e-9);
+  // The lot conversion is OPTIONAL and no field goes NaN without it.
+  const noLot = _v1845({ ...base, lot_area_ft2: 0 });
+  assert.strictEqual(noLot.lot_lane_miles, null);
+  assert.strictEqual(noLot.lot_material_lb, null);
+  assert.ok(Number.isFinite(noLot.passes_per_load));
+  const noAlt = _v1845({ ...base, alt_rate_lb_per_lane_mile: 0 });
+  assert.strictEqual(noAlt.alt_passes_per_load, null);
+  // Degenerate seams.
+  assert.ok(_v1845({ ...base, rate_lb_per_lane_mile: 0 }).error);
+  assert.ok(_v1845({ ...base, route_lane_miles: 0 }).error);
+  assert.ok(_v1845({ ...base, hopper_capacity_tons: 0 }).error);
+  assert.ok(_v1845({ ...base, lot_area_ft2: -1 }).error);
+});
+
+test("bounds: spec-v1846 computeBrineBatchSalinity -- the eutectic is a minimum in BOTH directions", () => {
+  const base = { batch_gal: 3000, target_pct: 23.3, brine_density_lb_gal: 9.8, saturation_pct: 26.4, alt_pct: 20 };
+  const r = _v1846(base);
+  assert.ok(Math.abs(r.batch_weight_lb - 29400) < 1e-6);
+  assert.ok(Math.abs(r.salt_lb - 6850) < 1);
+  assert.ok(Math.abs(r.salt_tons - 3.43) < 0.005);
+  assert.ok(Math.abs(r.water_lb - 22550) < 1);
+  assert.ok(Math.abs(r.water_gal - 2702) < 1);
+  assert.ok(Math.abs(r.salt_per_1000gal_lb - 2283) < 1);
+  assert.ok(Math.abs(r.salometer - 88) < 0.5);
+  assert.ok(Math.abs(r.freeze_point_f - (-6)) < 0.05);
+  assert.ok(Math.abs(r.alt_salt_lb - 5880) < 1);
+  assert.ok(Math.abs(r.salt_difference_lb - 970) < 1);
+  // IDENTITY: salt plus water is the whole batch, and salt is the stated
+  // fraction of it by WEIGHT.
+  assert.ok(Math.abs(r.salt_lb + r.water_lb - r.batch_weight_lb) < 1e-6);
+  assert.ok(Math.abs(r.salt_lb / r.batch_weight_lb - 0.233) < 1e-12);
+  // IDENTITY: the salometer is the concentration as a percent of saturation.
+  assert.ok(Math.abs(r.salometer - 23.3 / 26.4 * 100) < 1e-12);
+  // THE FINDING: 23.3% is a MINIMUM of the freezing point, so moving away in
+  // EITHER direction raises it. Walk the curve and check monotonicity on the
+  // ice branch, then confirm the eutectic is the lowest point sampled.
+  assert.strictEqual(r.at_eutectic, true);
+  let prev = Infinity;
+  for (const pct of [2, 5, 8, 10, 12, 15, 18, 20, 22, 23.3]) {
+    const f = _v1846({ ...base, target_pct: pct }).freeze_point_f;
+    assert.ok(f < prev, "freeze point must fall toward the eutectic at " + pct);
+    prev = f;
+  }
+  assert.ok(r.freeze_point_f <= prev + 1e-12);
+  // Under-mixing gives away freezing point, and the tile names it the more
+  // dangerous failure rather than the cheaper one.
+  const under = _v1846({ ...base, target_pct: 20, alt_pct: 23.3 });
+  assert.ok(Math.abs(under.freeze_point_f - 1.9) < 0.05);
+  assert.ok(under.freeze_point_f - r.freeze_point_f > 7);
+  assert.ok(/BELOW THE EUTECTIC/.test(under.target_verdict));
+  assert.ok(/more dangerous/.test(under.target_verdict));
+  // Over the eutectic the failure is the OPPOSITE one and must not read alike.
+  const over = _v1846({ ...base, target_pct: 25 });
+  assert.ok(/ABOVE THE EUTECTIC/.test(over.target_verdict));
+  assert.ok(/crystallises/.test(over.target_verdict));
+  assert.ok(!/more dangerous/.test(over.target_verdict));
+  // IDENTITY: salt is exactly linear in batch volume at a fixed density.
+  const big = _v1846({ ...base, batch_gal: 6000 });
+  assert.ok(Math.abs(big.salt_lb - 2 * r.salt_lb) < 1e-9);
+  assert.ok(Math.abs(big.salt_per_1000gal_lb - r.salt_per_1000gal_lb) < 1e-9);
+  // Degenerate seams.
+  assert.ok(_v1846({ ...base, batch_gal: 0 }).error);
+  assert.ok(_v1846({ ...base, brine_density_lb_gal: 0 }).error);
+  assert.ok(_v1846({ ...base, target_pct: 0 }).error);
+  assert.ok(_v1846({ ...base, target_pct: 30 }).error);
+  assert.ok(_v1846({ ...base, saturation_pct: 0 }).error);
+});
+
+test("bounds: spec-v1847 computePlowRouteCycleTime -- the fleet is inverse in the cycle target", () => {
+  const base = { route_lane_miles: 30, plow_speed_mph: 25, overhead_factor: 1.2, system_lane_miles: 300, cycle_target_hr: 2, snowfall_in_hr: 1.5, alt_cycle_target_hr: 4 / 3 };
+  const r = _v1847(base);
+  assert.ok(Math.abs(r.effective_speed_lane_miles_hr - 20.83) < 0.005);
+  assert.ok(Math.abs(r.cycle_time_min - 86) < 0.5);
+  assert.ok(Math.abs(r.accumulation_in - 2.2) < 0.05);
+  assert.ok(Math.abs(r.lane_miles_per_truck - 41.7) < 0.05);
+  assert.strictEqual(r.trucks_required, 8);
+  assert.ok(Math.abs(r.alt_lane_miles_per_truck - 27.8) < 0.05);
+  assert.strictEqual(r.alt_trucks_required, 11);
+  assert.strictEqual(r.extra_trucks, 3);
+  assert.ok(Math.abs(r.extra_trucks_pct - 37.5) < 0.1);
+  assert.ok(Math.abs(r.accumulation_bought_in - 1.0) < 1e-9);
+  // IDENTITY: effective speed is the plowing speed over the overhead factor,
+  // and the cycle is the route over that.
+  assert.ok(Math.abs(r.effective_speed_lane_miles_hr * 1.2 - 25) < 1e-12);
+  assert.ok(Math.abs(r.cycle_time_hr * r.effective_speed_lane_miles_hr - 30) < 1e-9);
+  assert.ok(Math.abs(r.accumulation_in - 1.5 * r.cycle_time_hr) < 1e-12);
+  // IDENTITY: lane-miles per truck is exactly linear in the cycle target, so
+  // the coverage halves when the promise halves.
+  const half = _v1847({ ...base, cycle_target_hr: 1 });
+  assert.ok(Math.abs(half.lane_miles_per_truck - r.lane_miles_per_truck / 2) < 1e-9);
+  // THE FINDING: the truck count is inverse in the target. Halving the cycle
+  // at least doubles the fleet (rounding up can only push it further).
+  assert.ok(half.trucks_required >= 2 * r.trucks_required - 1);
+  assert.ok(half.trucks_required > r.trucks_required);
+  // THE OVERHEAD FACTOR: the same route at 1.5 cycles in 108 min, 22 longer,
+  // and the fleet sized from the map is short by one truck at the standard.
+  const dense = _v1847({ ...base, overhead_factor: 1.5 });
+  assert.ok(Math.abs(dense.cycle_time_min - 108) < 0.5);
+  assert.ok(Math.abs(dense.cycle_time_min - r.cycle_time_min - 21.6) < 0.5);
+  assert.strictEqual(dense.trucks_required, 9);
+  assert.strictEqual(dense.trucks_required - r.trucks_required, 1);
+  // An overhead factor of exactly 1 is the no-overhead ideal, not an error.
+  assert.ok(!_v1847({ ...base, overhead_factor: 1 }).error);
+  // Zero snowfall is legal and gives zero accumulation, not an error.
+  const dry = _v1847({ ...base, snowfall_in_hr: 0 });
+  assert.ok(!dry.error && Math.abs(dry.accumulation_in) < 1e-12);
+  // Degenerate seams.
+  assert.ok(_v1847({ ...base, route_lane_miles: 0 }).error);
+  assert.ok(_v1847({ ...base, plow_speed_mph: 0 }).error);
+  assert.ok(_v1847({ ...base, overhead_factor: 0.9 }).error);
+  assert.ok(_v1847({ ...base, system_lane_miles: 0 }).error);
+  assert.ok(_v1847({ ...base, cycle_target_hr: 0 }).error);
+  assert.ok(_v1847({ ...base, snowfall_in_hr: -1 }).error);
+});
+
+test("bounds: spec-v1848 computeSnowStackingArea -- the height limit is what costs the ground", () => {
+  const base = { lot_area_ft2: 100000, accumulation_in: 12, events: 3, fresh_density_lb_ft3: 7, pile_density_lb_ft3: 25, pile_height_ft: 12, side_slope_run_per_rise: 1, area_per_space_ft2: 300, allocated_pct: 5 };
+  const r = _v1848(base);
+  assert.ok(Math.abs(r.fallen_volume_ft3 - 100000) < 1e-6);
+  assert.ok(Math.abs(r.pile_volume_ft3 - 28000) < 1e-6);
+  assert.ok(Math.abs(r.densification_saving_pct - 72) < 1e-9);
+  assert.ok(Math.abs(r.base_width_ft - 24) < 1e-12);
+  assert.ok(Math.abs(r.cross_section_ft2 - 144) < 1e-12);
+  assert.ok(Math.abs(r.windrow_length_ft - 194) < 1);
+  assert.ok(Math.abs(r.footprint_ft2 - 4667) < 1);
+  assert.ok(Math.abs(r.footprint_pct_of_lot - 4.7) < 0.05);
+  assert.strictEqual(r.spaces_lost, 16);
+  assert.ok(Math.abs(r.season_footprint_ft2 - 14000) < 1);
+  assert.ok(Math.abs(r.season_footprint_pct_of_lot - 14) < 0.01);
+  assert.strictEqual(r.season_spaces_lost, 47);
+  assert.ok(Math.abs(r.allocated_volume_ft3 - 30000) < 1e-6);
+  assert.ok(Math.abs(r.haul_volume_ft3 - 54000) < 1);
+  assert.ok(Math.abs(r.haul_cy - 2000) < 1);
+  // IDENTITY: the pile is the fallen volume scaled by the density ratio.
+  assert.ok(Math.abs(r.pile_volume_ft3 - 100000 * 7 / 25) < 1e-6);
+  // IDENTITY: windrow geometry closes -- length x cross-section is the volume,
+  // and footprint is length x base.
+  assert.ok(Math.abs(r.windrow_length_ft * r.cross_section_ft2 - r.pile_volume_ft3) < 1e-6);
+  assert.ok(Math.abs(r.footprint_ft2 - r.windrow_length_ft * r.base_width_ft) < 1e-9);
+  // IDENTITY: footprint is exactly linear in the number of events, which is
+  // why a winter without a thaw consumes storage linearly rather than slowly.
+  assert.ok(Math.abs(r.season_footprint_ft2 - 3 * r.footprint_ft2) < 1e-6);
+  // THE CORRECTED FINDING: a free cone at the same slope stands about 30 ft
+  // on 2,809 sq ft -- 40 PERCENT less ground than the windrow, not a third of
+  // it. spec-v1848 was corrected to this before the band was written.
+  assert.ok(Math.abs(r.cone_height_ft - 29.9) < 0.1);
+  assert.ok(Math.abs(r.cone_footprint_ft2 - 2809) < 2);
+  assert.ok(Math.abs(r.cone_saving_pct - 39.8) < 0.2);
+  assert.ok(r.cone_saving_pct > 35 && r.cone_saving_pct < 45);
+  assert.ok(Math.abs(r.cone_saving_ft2 - (r.footprint_ft2 - r.cone_footprint_ft2)) < 1e-9);
+  // IDENTITY: the cone holds the same volume, pi r^2 h / 3, at the same slope.
+  assert.ok(Math.abs(Math.PI * Math.pow(r.cone_height_ft, 2) * r.cone_height_ft / 3 - r.pile_volume_ft3) < 1e-3);
+  // A TALLER limit costs less ground; that is the trade the limit is making.
+  const tall = _v1848({ ...base, pile_height_ft: 18 });
+  assert.ok(tall.footprint_ft2 < r.footprint_ft2);
+  // A generous allocation removes the haul entirely, and it never goes negative.
+  const roomy = _v1848({ ...base, allocated_pct: 50 });
+  assert.ok(Math.abs(roomy.haul_volume_ft3) < 1e-9);
+  // Degenerate seams, including a pile no denser than the snow that fell.
+  assert.ok(_v1848({ ...base, lot_area_ft2: 0 }).error);
+  assert.ok(_v1848({ ...base, accumulation_in: 0 }).error);
+  assert.ok(_v1848({ ...base, fresh_density_lb_ft3: 0 }).error);
+  assert.ok(_v1848({ ...base, pile_density_lb_ft3: 7 }).error);
+  assert.ok(_v1848({ ...base, pile_height_ft: 0 }).error);
+  assert.ok(_v1848({ ...base, area_per_space_ft2: 0 }).error);
+  assert.ok(_v1848({ ...base, allocated_pct: 101 }).error);
+});
+
+test("bounds: spec-v1849 computeIceMeltWorkingTemperature -- nine times the salt, and then no amount works", () => {
+  const base = { area_ft2: 1000, ice_thickness_in: 1, ice_density_lb_ft3: 57.2, pavement_temp_f: 30, capacity_lb_ice_per_lb: 46.3, alt_capacity_lb_ice_per_lb: 4.9, alt_temp_f: 10, practical_limit_f: 15, eutectic_f: -6 };
+  const r = _v1849(base);
+  assert.ok(Math.abs(r.ice_volume_ft3 - 83.3) < 0.05);
+  assert.ok(Math.abs(r.ice_mass_lb - 4767) < 1);
+  assert.ok(Math.abs(r.product_lb - 103) < 0.5);
+  assert.ok(Math.abs(r.alt_product_lb - 973) < 1);
+  assert.ok(Math.abs(r.product_ratio - 9.4) < 0.05);
+  // IDENTITY: product required is the ice mass over the capacity, and the
+  // product ratio is EXACTLY the inverse capacity ratio -- the material
+  // multiplier is the capacity collapse and nothing else.
+  assert.ok(Math.abs(r.product_lb * 46.3 - r.ice_mass_lb) < 1e-9);
+  assert.ok(Math.abs(r.product_ratio - r.capacity_ratio) < 1e-12);
+  assert.ok(Math.abs(r.capacity_ratio - 46.3 / 4.9) < 1e-12);
+  // The 20 degF rung of the published curve gives the spec's 5.4x.
+  const mid = _v1849({ ...base, alt_capacity_lb_ice_per_lb: 8.6, alt_temp_f: 20 });
+  assert.ok(Math.abs(mid.alt_product_lb - 554) < 1);
+  assert.ok(Math.abs(mid.product_ratio - 5.4) < 0.05);
+  // THE FINDING: at 30 degF rock salt is INSIDE its practical limit, and at
+  // 10 it is not -- which is why the 973 lb figure is arithmetic, not practice.
+  assert.strictEqual(r.within_practical_limit, true);
+  assert.ok(/INSIDE/.test(r.limit_verdict));
+  assert.strictEqual(r.alt_within_practical_limit, false);
+  const cold = _v1849({ ...base, pavement_temp_f: 10 });
+  assert.strictEqual(cold.within_practical_limit, false);
+  assert.ok(/BELOW/.test(cold.limit_verdict));
+  assert.ok(/DIFFERENT CHEMISTRY/.test(cold.limit_verdict));
+  assert.ok(/NO QUANTITY/.test(cold.limit_verdict));
+  // The working limit sits far ABOVE the eutectic -- 21 degF apart for rock
+  // salt -- which is the confusion the tile exists to settle.
+  assert.ok(Math.abs(r.eutectic_gap_f - 21) < 1e-12);
+  assert.ok(r.eutectic_gap_f > 15);
+  // A product with a low working limit (calcium chloride) passes where salt
+  // does not, at the same pavement temperature.
+  const cacl = _v1849({ ...base, pavement_temp_f: 10, practical_limit_f: -20, eutectic_f: -60 });
+  assert.strictEqual(cacl.within_practical_limit, true);
+  // IDENTITY: ice mass is linear in area and in thickness.
+  const twice = _v1849({ ...base, ice_thickness_in: 2 });
+  assert.ok(Math.abs(twice.product_lb - 2 * r.product_lb) < 1e-9);
+  // Degenerate seams.
+  assert.ok(_v1849({ ...base, area_ft2: 0 }).error);
+  assert.ok(_v1849({ ...base, ice_thickness_in: 0 }).error);
+  assert.ok(_v1849({ ...base, ice_density_lb_ft3: 0 }).error);
+  assert.ok(_v1849({ ...base, capacity_lb_ice_per_lb: 0 }).error);
+});
+
+test("bounds: spec-v1850 computeWalkwayClearingProductivity -- the MACHINE governs at 12 in, not the hand work", () => {
+  const base = { total_area_ft2: 12000, hand_area_ft2: 2000, blower_rate_ft2_hr: 12000, hand_rate_ft2_hr_person: 1200, crew_size: 2, service_window_hr: 2, blower_depth_factor: 1, hand_depth_factor: 1, icemelt_lb_per_1000ft2: 4, applications: 3 };
+  // 4 in: both operations take 50 min and the crew is BALANCED.
+  const light = _v1850(base);
+  assert.ok(Math.abs(light.blower_hr * 60 - 50) < 0.5);
+  assert.ok(Math.abs(light.hand_hr * 60 - 50) < 0.5);
+  assert.ok(Math.abs(light.crew_min - 50) < 0.5);
+  assert.strictEqual(light.balanced, true);
+  assert.strictEqual(light.governing_operation, "balanced");
+  assert.ok(/BALANCED/.test(light.balance_verdict));
+  assert.ok(/save nothing/.test(light.balance_verdict));
+  assert.strictEqual(light.meets_window, true);
+  assert.strictEqual(light.crews_required, 1);
+  // 8 in, both rates halved: 100 min, still balanced, still inside 2 hours.
+  const midIn = { ...base, blower_depth_factor: 0.5, hand_depth_factor: 0.5 };
+  const mid = _v1850(midIn);
+  assert.ok(Math.abs(mid.crew_min - 100) < 0.5);
+  assert.strictEqual(mid.balanced, true);
+  assert.strictEqual(mid.meets_window, true);
+  // THE FINDING: at 12 in of wet snow the spec's own factors put the BLOWER
+  // at 200 min and hand work at 150, so the MACHINE governs -- the spec says
+  // the route "fails on the hand work, which is what degrades fastest", and
+  // its own arithmetic says the opposite.
+  const deepIn = { ...base, blower_depth_factor: 0.25, hand_depth_factor: 1 / 3 };
+  const deep = _v1850(deepIn);
+  assert.ok(Math.abs(deep.blower_hr * 60 - 200) < 0.5);
+  assert.ok(Math.abs(deep.hand_hr * 60 - 150) < 0.5);
+  assert.ok(deep.blower_hr > deep.hand_hr);
+  assert.strictEqual(deep.governing_operation, "machine work");
+  assert.ok(/MACHINE WORK GOVERNS/.test(deep.balance_verdict));
+  assert.ok(!/BALANCED/.test(deep.balance_verdict));
+  assert.ok(Math.abs(deep.crew_min - 200) < 0.5);
+  assert.strictEqual(deep.meets_window, false);
+  assert.strictEqual(deep.crews_required, 2);
+  // IDENTITY: the crew time is the MAXIMUM of the two, never the sum, and the
+  // slack is the difference the waiting operation spends idle.
+  for (const p of [base, midIn, deepIn]) {
+    const x = _v1850(p);
+    assert.ok(Math.abs(x.crew_hr - Math.max(x.blower_hr, x.hand_hr)) < 1e-12);
+    assert.ok(x.crew_hr < x.blower_hr + x.hand_hr + 1e-12);
+    assert.ok(Math.abs(x.slack_hr - Math.abs(x.blower_hr - x.hand_hr)) < 1e-12);
+  }
+  // AND THE OTHER DIRECTION IS REAL TOO: starve the hand rate and hand work
+  // governs, so the field is not simply always naming the machine.
+  const handBound = _v1850({ ...base, hand_depth_factor: 0.2 });
+  assert.strictEqual(handBound.governing_operation, "hand work");
+  assert.ok(/HAND WORK GOVERNS/.test(handBound.balance_verdict));
+  assert.ok(Math.abs(handBound.crew_hr - handBound.hand_hr) < 1e-12);
+  // Adding a shoveller helps ONLY when hand work governs -- the whole point
+  // of the parallel model.
+  const moreShovels = _v1850({ ...base, hand_depth_factor: 0.2, crew_size: 4 });
+  assert.ok(moreShovels.crew_hr < handBound.crew_hr);
+  const moreShovelsDeep = _v1850({ ...base, blower_depth_factor: 0.25, hand_depth_factor: 1 / 3, crew_size: 4 });
+  assert.ok(Math.abs(moreShovelsDeep.crew_hr - deep.crew_hr) < 1e-12);
+  // Material is PER APPLICATION and scales with the count, not the storm.
+  assert.ok(Math.abs(light.icemelt_per_application_lb - 48) < 1e-9);
+  assert.ok(Math.abs(light.icemelt_event_lb - 144) < 1e-9);
+  assert.ok(Math.abs(light.icemelt_event_lb - 3 * light.icemelt_per_application_lb) < 1e-12);
+  // A route with no hand work at all is legal and the machine simply governs.
+  const allMachine = _v1850({ ...base, hand_area_ft2: 0 });
+  assert.ok(Math.abs(allMachine.hand_hr) < 1e-12);
+  assert.strictEqual(allMachine.governing_operation, "machine work");
+  // Degenerate seams, including hand work exceeding the whole route.
+  assert.ok(_v1850({ ...base, total_area_ft2: 0 }).error);
+  assert.ok(_v1850({ ...base, hand_area_ft2: 13000 }).error);
+  assert.ok(_v1850({ ...base, hand_area_ft2: -1 }).error);
+  assert.ok(_v1850({ ...base, blower_rate_ft2_hr: 0 }).error);
+  assert.ok(_v1850({ ...base, hand_rate_ft2_hr_person: 0 }).error);
+  assert.ok(_v1850({ ...base, crew_size: 0 }).error);
+  assert.ok(_v1850({ ...base, service_window_hr: 0 }).error);
+  assert.ok(_v1850({ ...base, icemelt_lb_per_1000ft2: 0 }).error);
+  assert.ok(_v1850({ ...base, blower_depth_factor: 1.5 }).error);
+  assert.ok(_v1850({ ...base, hand_depth_factor: 0 }).error);
+});

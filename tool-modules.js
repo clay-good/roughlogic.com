@@ -1352,6 +1352,15 @@ export const TOOL_MODULES = (() => {
     "radon-fan-static", "sub-slab-suction-field", "acid-waste-neutralization",
     "fume-hood-face-velocity", "lab-containment-pressure",
   ]);
+  // spec-v1845..v1850: the snow and ice management bench -- what a pavement
+  // temperature costs in salt, what a brine batch has to be, how long a plow
+  // route takes, where the snow goes, when a deicer stops working, and whether
+  // a walk crew makes its window. Five Group G and one Group J.
+  declare("./calc-winterops.js", "WINTEROPS_RENDERERS", [
+    "salt-application-rate", "brine-batch-salinity", "plow-route-cycle-time",
+    "snow-stacking-area", "ice-melt-working-temperature",
+    "walkway-clearing-productivity",
+  ]);
   // spec-v1824..v1827: the metal finishing and galvanizing bench -- what a
   // galvanized coating weighs, what a pretreatment bath drags out, what a
   // kettle can put through, and what a stripped panel says about a

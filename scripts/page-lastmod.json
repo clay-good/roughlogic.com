@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "a249af4228ad25c9",
+      "sha": "0921704052b3c809",
       "date": "2026-09-11"
     },
     "/tools/": {
-      "sha": "2dcc1230b62bb914",
+      "sha": "b68665764004c72c",
       "date": "2026-09-11"
     },
     "/groups/accounting/": {
-      "sha": "ce8ec044ac5bb793",
+      "sha": "48fefa8e02f1df57",
       "date": "2026-09-11"
     },
     "/groups/agriculture/": {
-      "sha": "e1562e45b287bf33",
+      "sha": "221b8fa1d51b2249",
       "date": "2026-09-11"
     },
     "/groups/construction/": {
-      "sha": "4154ba5c6f113093",
+      "sha": "4717f1a2850870f0",
       "date": "2026-09-11"
     },
     "/groups/cross-trade/": {
-      "sha": "578e6bfe204afc02",
+      "sha": "a132e9cc9b132281",
       "date": "2026-09-11"
     },
     "/groups/educators/": {
-      "sha": "29164ee5f89a6f05",
+      "sha": "c57846f47085570d",
       "date": "2026-09-11"
     },
     "/groups/electrical/": {
-      "sha": "9e4379d3af096f81",
+      "sha": "ce54e435fea1d882",
       "date": "2026-09-11"
     },
     "/groups/field/": {
-      "sha": "e7e7ddc241b47eac",
+      "sha": "4680c508705f2418",
       "date": "2026-09-11"
     },
     "/groups/fire-ground/": {
-      "sha": "6a7d12d715909036",
+      "sha": "868e4dae8d3e86f6",
       "date": "2026-09-11"
     },
     "/groups/historical/": {
-      "sha": "8e5848dcd6fa47f9",
+      "sha": "39b4a4574e73f90d",
       "date": "2026-09-11"
     },
     "/groups/hvac/": {
-      "sha": "2a3201a07742a954",
+      "sha": "b5afecf5c26e331e",
       "date": "2026-09-11"
     },
     "/groups/kitchen/": {
-      "sha": "35e48a88e6d1851c",
+      "sha": "a0e63b25b491b578",
       "date": "2026-09-11"
     },
     "/groups/lab/": {
-      "sha": "41938a3b83aa3fe6",
+      "sha": "85032f2d9280e3d4",
       "date": "2026-09-11"
     },
     "/groups/mechanic/": {
-      "sha": "c05dd6c674429eb0",
+      "sha": "60c3cf07aa118219",
       "date": "2026-09-11"
     },
     "/groups/plumbing/": {
-      "sha": "21151e6e84b85044",
+      "sha": "a018330a818e71ae",
       "date": "2026-09-11"
     },
     "/groups/real-estate/": {
-      "sha": "871df48eb5b52313",
+      "sha": "6bf1bea871f7af84",
       "date": "2026-09-11"
     },
     "/groups/references/": {
-      "sha": "f685511f4a21ad71",
+      "sha": "525dd9d9163609b5",
       "date": "2026-09-11"
     },
     "/groups/restoration/": {
-      "sha": "ee34375df30ce69b",
+      "sha": "7f886aeb630ced5a",
       "date": "2026-09-11"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "04f96b2205ce26cc",
+      "sha": "fe0d898954fae47f",
       "date": "2026-09-11"
     },
     "/groups/stage/": {
-      "sha": "d8fe1a45d29d05cc",
+      "sha": "18949511b98a7821",
       "date": "2026-09-11"
     },
     "/groups/trucking/": {
-      "sha": "bca1ecff4ee31683",
+      "sha": "42c63b6a2a89da9f",
       "date": "2026-09-11"
     },
     "/groups/water/": {
-      "sha": "4fbd2f34e49b6591",
+      "sha": "366f406cf0861e5d",
       "date": "2026-09-11"
     },
     "/tools/aav-install-check/": {
@@ -808,6 +808,10 @@
     "/tools/bridle-leg-tension/": {
       "sha": "df64258394cad7a3",
       "date": "2026-09-01"
+    },
+    "/tools/brine-batch-salinity/": {
+      "sha": "c973cb58263f7e3c",
+      "date": "2026-09-11"
     },
     "/tools/brine-cure/": {
       "sha": "fb7792e8ab21b454",
@@ -3669,6 +3673,10 @@
       "sha": "b06055c3d3cd80e4",
       "date": "2026-09-01"
     },
+    "/tools/ice-melt-working-temperature/": {
+      "sha": "7a6ff39177017203",
+      "date": "2026-09-11"
+    },
     "/tools/ideal-gas-law/": {
       "sha": "58d674039e47ff11",
       "date": "2026-09-01"
@@ -5101,6 +5109,10 @@
       "sha": "dfa6de70ad7a28b7",
       "date": "2026-09-08"
     },
+    "/tools/plow-route-cycle-time/": {
+      "sha": "04d6b05e631db713",
+      "date": "2026-09-11"
+    },
     "/tools/plumbing-fixture-count/": {
       "sha": "4217ba0b09c38d25",
       "date": "2026-09-01"
@@ -6125,6 +6137,10 @@
       "sha": "2889fd1f509e9484",
       "date": "2026-09-04"
     },
+    "/tools/salt-application-rate/": {
+      "sha": "29d91ee4b0a7f08a",
+      "date": "2026-09-11"
+    },
     "/tools/sample-size-for-margin/": {
       "sha": "de2e564eb96e810b",
       "date": "2026-09-01"
@@ -6624,6 +6640,10 @@
     "/tools/snow-load/": {
       "sha": "ffc3f95c3b97196b",
       "date": "2026-09-01"
+    },
+    "/tools/snow-stacking-area/": {
+      "sha": "fb9c6859004a33b4",
+      "date": "2026-09-11"
     },
     "/tools/snow-unbalanced-gable/": {
       "sha": "a236f73ea5a4d24d",
@@ -7766,12 +7786,12 @@
       "date": "2026-09-01"
     },
     "/tools/truck-startability/": {
-      "sha": "c91760126579883d",
-      "date": "2026-09-08"
+      "sha": "a050d2b0899bcdd1",
+      "date": "2026-09-11"
     },
     "/tools/truck-swept-path-width/": {
-      "sha": "b8a9d001d4a54109",
-      "date": "2026-09-08"
+      "sha": "ed9424cacd366378",
+      "date": "2026-09-11"
     },
     "/tools/true-airspeed/": {
       "sha": "f08bd713a3b241c7",
@@ -8032,6 +8052,10 @@
     "/tools/walk-in-door-infiltration/": {
       "sha": "1868c5834f8ebfd0",
       "date": "2026-09-08"
+    },
+    "/tools/walkway-clearing-productivity/": {
+      "sha": "fbee5f275cc7272e",
+      "date": "2026-09-11"
     },
     "/tools/wall-bracing-length/": {
       "sha": "5b19c0811e875dda",

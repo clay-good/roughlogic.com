@@ -24158,6 +24158,83 @@ export const CITATIONS = {
   // galvanizing band. Four tiles, nothing cut. All four specs were recomputed
   // before wiring and all four are arithmetically sound as written -- the
   // first band of this program to need no correction.
+  // spec-v1845..v1850: the 2026-09-11 trade-expansion snow and ice management
+  // band. Six tiles, nothing cut. spec-v1850 states that a walk route "fails
+  // on the hand work, which is what degrades fastest"; its OWN depth factors
+  // at 12 in give 3.33 h of machine work against 2.50 h of hand work, so the
+  // MACHINE governs. Which operation governs is computed here, not asserted.
+  "salt-application-rate": {
+    formula: "material per pass = rate per lane-mile x route lane-miles; coverage = hopper capacity in lb / material per pass; a lot converts at 63,360 sq ft per lane-mile (one 12 ft lane one mile long).",
+    edition: "Published application rate bands by PAVEMENT temperature (Salt Institute, Clear Roads, and state maintenance manuals): roughly 100 to 200 lb per lane-mile at 30 degF and above, 200 to 300 at 25 to 30, 300 to 400 at 20 to 25, and 400 to 600 below 20. The band and the rate are ENTERED, not selected.",
+    freeAccess: "A unit conversion and a coverage division.",
+    governance: GOVERNANCE.general,
+    editionNote: "PAVEMENT TEMPERATURE IS THE CONTROLLING VARIABLE AND IT IS NOT THE AIR TEMPERATURE. A bridge deck, a shaded north-facing lot, and a pavement that has radiated to a clear sky all night each sit several degrees below the air -- one published band, and sometimes two. The bands climb steeply because salt's melting capacity COLLAPSES as it cools, not because colder ice is harder to break. And the coverage arithmetic is where that becomes an operations problem: a truck carries a fixed tonnage, so doubling the rate HALVES the coverage per load and doubles the reload trips, which come straight out of the cycle time the route was designed around. A cold event degrades service twice over. Below about 15 degF salt alone is not effective at any rate. Spreader calibration is NOT checked here and decides whether the rate on the controller is the rate on the road; it is verified by a catch test.",
+    assumptions: [
+      { name: "Lane-mile basis", value: "one 12 ft lane one mile long = 63,360 sq ft", source: "the standard basis of every published rate" },
+      { name: "Rate is entered, not selected", value: "from the agency's own policy against a measured pavement temperature", source: "published rate guidance" },
+      { name: "Calibration is assumed", value: "the rate on the controller is taken to be the rate on the road", source: "a catch test the operation performs itself" },
+    ],
+  },
+  "brine-batch-salinity": {
+    formula: "batch weight = gallons x brine density; salt = batch weight x concentration; water is the balance by weight, converted at 8.345 lb per gallon; salometer = concentration / saturation concentration x 100; the freezing point is read off the published NaCl curve.",
+    edition: "The sodium chloride eutectic at 23.3% by weight and about -6 degF, and the NaCl freezing-point curve linearly interpolated between 0, 5, 10, 15, 20 and 23.3%. Brine density is ENTERED and nominal.",
+    freeAccess: "A weight balance and a published phase-diagram interpolation.",
+    governance: GOVERNANCE.general,
+    editionNote: "23.3% IS THE EUTECTIC, NOT A PREFERENCE -- moving away from it in EITHER direction raises the freezing point, which is why every brine operation mixes to the same number. THE TWO FAILURE DIRECTIONS LOOK NOTHING ALIKE: over-concentrated brine crystallises in tanks, lines, screens and nozzles and takes the truck out of service; under-concentrated brine sprays perfectly and FREEZES ON THE ROAD, which is worse because nothing about the application looked wrong. A 3,000 gal batch mixed at 20% instead saves 970 lb of salt and gives away about 8 degF of freezing point, landing near +2 -- a temperature the road reaches on any clear night. VERIFY WITH A SALOMETER, NOT BY COUNTING BAGS, and remember the scale is referenced to a stated temperature: a hydrometer dropped into cold brine READS HIGH, which is exactly when a crew is most likely to check it. The comparison case is computed at the same entered density, because density actually varies with concentration and temperature. And brine is ANTI-ICING: applied to snow already on the ground it is adding water to the problem.",
+    assumptions: [
+      { name: "Eutectic concentration", value: "23.3% NaCl by weight, freezing about -6 degF", source: "the sodium chloride phase diagram" },
+      { name: "Freezing points are for the pure system", value: "a working brine picks up dissolved and suspended material", source: "the published NaCl curve" },
+      { name: "Density is nominal and entered", value: "about 9.8 lb per gal at 23.3%; verify the batch", source: "the material supplier's data" },
+    ],
+  },
+  "plow-route-cycle-time": {
+    formula: "effective speed = plowing speed / overhead factor; cycle time = route lane-miles / effective speed; accumulation between passes = snowfall rate x cycle time; lane-miles per truck = effective speed x cycle target; trucks = system lane-miles / lane-miles per truck, rounded up.",
+    edition: "Standard winter maintenance route and fleet sizing relations. The overhead factor is ENTERED from the operation's own route timing records; 1.2 to 1.5 is ordinary.",
+    freeAccess: "A rate relation and a division rounded up.",
+    governance: GOVERNANCE.general,
+    editionNote: "CYCLE TIME IS THE SERVICE LEVEL AND EVERYTHING ELSE IS BOOKKEEPING -- what a customer experiences is how deep the snow is when the plow returns, which is the snowfall rate times the cycle. THE FLEET SCALES INVERSELY WITH THE TARGET, so on a 300 lane-mile system going from a two-hour to an eighty-minute standard costs 3 more trucks out of 8 (38% more fleet) to buy 1.0 in of accumulation at 1.5 in/h. Stating the trade in inches is what makes it a decision rather than a budget argument. THE OVERHEAD FACTOR CARRIES THE WHOLE ANSWER: the same 30 lane-mile route cycles in 86 minutes at 1.2 and 108 at 1.5, and a fleet sized from the map rather than the route is short. Plowing speed is treated as CONSTANT and is not -- deep or wet snow slows a truck at exactly the moment the cycle matters most -- and route sequencing by priority means the lowest-priority streets cycle far slower than any published standard.",
+    assumptions: [
+      { name: "Overhead factor is entered", value: "turns, intersections, traffic, blade lifts and reload trips; 1.2 open, 1.5 dense grid", source: "the operation's own route timing records" },
+      { name: "Constant plowing speed", value: "depth and snow type are not modelled", source: "a planning-level estimate" },
+      { name: "No priority sequencing", value: "every route is treated as cycling on the same standard", source: "the public works or contract standard" },
+    ],
+  },
+  "snow-stacking-area": {
+    formula: "fallen volume = lot area x depth; pile volume = fallen volume x fresh density / piled density; a windrow at a given side slope has base = 2 x height x run-per-rise and cross-section = 0.5 x base x height, so length = pile volume / cross-section and footprint = length x base; the free-cone comparison solves V = pi r^2 h / 3 at the same slope.",
+    edition: "Snow densification and prism geometry. Densities and the height limit are ENTERED; fresh snow runs roughly 5 to 10 lb per cu ft and a worked pile 20 to 30.",
+    freeAccess: "A density ratio and two solid geometries.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE HEIGHT LIMIT IS WHAT CONVERTS A COMPACT PILE INTO A LONG ONE, and the price of it is computed here rather than described. One 12 in event on a 100,000 sq ft lot piles to 28,000 cu ft, which as a free cone would stand about 30 ft tall on 2,809 sq ft but as a 12 ft windrow occupies 4,667 sq ft -- the cone uses 40% less ground, and the 1,858 sq ft of difference is the price of being able to see past the pile and to build it at all. Three events with no thaw reach 14% of the lot and 47 parking spaces, which is when hauling starts. STORAGE IS CONSUMED LINEARLY, NOT GRADUALLY. The multi-event case assumes NO MELTING between events, which is the design case rather than the typical one. A late-season pile is denser and dirtier than this arithmetic suggests. Where storage may be PLACED -- drainage, sight lines, fire lanes, accessible routes -- is a site constraint and several parts of it are regulatory.",
+    assumptions: [
+      { name: "No melting between events", value: "the design case, not the typical one", source: "a season's own records are better" },
+      { name: "Densities are entered", value: "fresh 5 to 10, worked pile 20 to 30 lb per cu ft", source: "the site's snow plan" },
+      { name: "Idealised windrow", value: "a uniform prism at a constant side slope, no end cones", source: "prism geometry" },
+    ],
+  },
+  "ice-melt-working-temperature": {
+    formula: "ice mass = area x thickness x ice density; product = ice mass / the melting capacity at that temperature; the comparison divides by the capacity at a second temperature.",
+    edition: "Published deicer melting capacity and eutectic data. Capacities and the practical working limit are ENTERED laboratory figures: rock salt roughly 46 lb of ice per lb at 30 degF, 8.6 at 20 and under 5 at 10.",
+    freeAccess: "A mass calculation and a division by a published capacity.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE EUTECTIC IS A THERMODYNAMIC BOUNDARY AND THE WORKING LIMIT IS AN OPERATIONAL ONE, and confusing them is the most common error in deicer selection -- for sodium chloride they are more than twenty degrees apart (-6 degF against a practical 15 to 20), and a bag advertising a very low temperature is usually quoting the eutectic. THE CAPACITY COLLAPSE IS THE RESULT: the same 1 in of ice off 1,000 sq ft takes 103 lb of rock salt at 30 degF and 973 at 10, NINE TIMES the material for a twenty degree drop -- and the 10 degF figure is arithmetic rather than practice, because below the working limit the brine refreezes about as fast as it is made and no quantity produces the result. A cold event calls for a DIFFERENT CHEMISTRY, not a heavier application, and spreading heavier is the most common winter operations mistake there is. Calcium chloride's low limit is thermodynamic: it releases heat as it dissolves, and the cost, hygroscopicity and aggressiveness come with it. CAPACITIES ARE LABORATORY FIGURES AND NOT FIELD YIELDS.",
+    assumptions: [
+      { name: "Capacities are laboratory figures", value: "stated time, temperature and ice thickness; a field application is substantially less effective", source: "published deicer capacity data" },
+      { name: "Ice density", value: "57.2 lb per cu ft, entered and adjustable", source: "the density of ice" },
+      { name: "Working limits are practice ranges", value: "suppliers differ; they are entered rather than defined", source: "the product supplier's data" },
+    ],
+  },
+  "walkway-clearing-productivity": {
+    formula: "machine time = open walk area / (blower rate x depth factor); hand time = hand area / (shovellers x hand rate x depth factor); the crew time is the LARGER of the two, not the sum; crews = crew time / service window, rounded up; ice melt = area / 1,000 x the rate, PER APPLICATION.",
+    edition: "The parallel-operation crew time convention. Production rates and depth factors are ENTERED from the contractor's own timed records.",
+    freeAccess: "Two rate divisions and a maximum.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE SPEC THIS IMPLEMENTS STATES A CONCLUSION ITS OWN NUMBERS REFUTE. spec-v1850 says the 12 in case 'fails on the hand work, which is what degrades fastest', but its own depth factors -- the blower at a quarter of its rate, hand work at a third -- give 3.33 h of machine work against 2.50 h of hand work. THE MACHINE GOVERNS, and it degraded faster, not slower. Which operation governs is therefore COMPUTED from the entered rates and factors and named in the output, and a crew whose two operations finish together is reported as balanced rather than having one arbitrarily declared the leader. That matters operationally, because the whole point of the parallel model is that adding capacity to the operation which is NOT governing changes nothing at all. The material is counted PER APPLICATION, not per storm: a walk cleared once and then left to refreeze is worse than one never cleared, and the re-application is the part most often left out of both the material order and the labour estimate. The two operations are treated as perfectly parallel and independent, which they are not.",
+    assumptions: [
+      { name: "Perfectly parallel operations", value: "crews interfere, share transport, and lose time between properties", source: "the contractor's own records" },
+      { name: "Rates and depth factors are entered", value: "illustrative rather than measured; they do not transfer between properties", source: "the contractor's timed records" },
+      { name: "Travel between sites is not counted", value: "on a route of small sites it commonly exceeds the clearing time", source: "the route plan" },
+    ],
+  },
   "galvanize-coating-weight": {
     formula: "thickness in mils = microns / 25.4; coating weight in oz per sq ft = mils x 0.5940 (the fixed zinc density); total area = tonnage x surface area per ton; zinc = area x coating weight / 16; pickup = zinc / (tons x 2,000), reported as a percent of steel weight.",
     edition: "ASTM A123 assigns the coating grade in microns from the material category and the steel thickness; the grade is ENTERED here rather than selected. Fasteners fall under A153 and sheet under other standards.",

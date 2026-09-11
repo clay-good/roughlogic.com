@@ -545,7 +545,7 @@ const renderPoolCyaDose = _rPool({
 });
 TREATMENT_RENDERERS["pool-cya-dose"] = renderPoolCyaDose;
 
-// dims: in { gallons: L^3, current_salt_ppm: dimensionless, target_salt_ppm: dimensionless } out: { delta_ppm: dimensionless, salt_lb: dimensionless, salt_bags: dimensionless, drain_gallons: L^3 }
+// dims: in { gallons: L^3, current_salt_ppm: dimensionless, target_salt_ppm: dimensionless } out: { delta_ppm: dimensionless, salt_lb: M, salt_bags: dimensionless, drain_gallons: L^3 }
 export function computePoolSaltDose({ gallons = 0, current_salt_ppm = 0, target_salt_ppm = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   if (current_salt_ppm < 0) return { error: "Salt reading must be non-negative." };

@@ -29,8 +29,8 @@ spec. This document is the operational summary.
 | Phase | What it verifies | Artifact | Lint / test |
 | --- | --- | --- | --- |
 | A | Every exported calculator function has a corpus row. | `## Function corpus (v14)` table in [derivations.md](derivations.md). | `npm run audit:corpus` (wired into `npm run lint`). |
-| B | Each calculator's output for a fixture input is within tolerance of an independent published value. | Per-row fixture in [../test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json). | [../test/unit/worked-examples-runner.test.js](../test/unit/worked-examples-runner.test.js) runs every fixture through its compute and compares to tolerance; [../scripts/check-cross-validation.mjs](../scripts/check-cross-validation.mjs) polices the tolerances themselves (3,465 checks: none wider than the ceiling without a written justification). Both in `npm run lint` / `npm test`. |
-| C | Every exported function carries a parseable dimension annotation -- though **3 of them are stubs** declaring a single opaque `args`, so the stronger "declares its inputs" holds for 2,338, a count pinned by the gate and allowed only to fall -- and now at its floor, the three being functions whose input dimension a sibling selector picks at runtime. (Whether the declaration matches the *arithmetic* is Phase G; the lint checks shape. It does check two slices of correctness: a key named for a unit -- `_psi`, `_gpm`, `_rpm`, `_hp`, `_btu`, `_btuh`, `_ft`, `_in`, `_sqin`, `_hz`, `_ohm`, `_v`, `_w`, `_a`, `_ksi`, `_kip`, `_deg`, `_ft3`, `_fps` -- must declare that unit's dimension, and a key name must mean one quantity corpus-wide. Together they found 434 wrong declarations on 2026-09-10, and left 44 names declared two ways, each listed by name in the gate.) | `// dims:` annotation in the source. | [../scripts/check-dimensions.mjs](../scripts/check-dimensions.mjs), wired into `npm run lint` (also `npm run audit:dimensions`). Fail-on-missing across **all 78 modules** since 2026-08-30: the per-module graduation the spec-v14 §16.2 ratchet describes is complete, and the allowlist it ran on is gone. |
+| B | Each calculator's output for a fixture input is within tolerance of an independent published value. | Per-row fixture in [../test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json). | [../test/unit/worked-examples-runner.test.js](../test/unit/worked-examples-runner.test.js) runs every fixture through its compute and compares to tolerance; [../scripts/check-cross-validation.mjs](../scripts/check-cross-validation.mjs) polices the tolerances themselves (3,521 checks: none wider than the ceiling without a written justification). Both in `npm run lint` / `npm test`. |
+| C | Every exported function carries a parseable dimension annotation -- though **3 of them are stubs** declaring a single opaque `args`, so the stronger "declares its inputs" holds for 2,344, a count pinned by the gate and allowed only to fall -- and now at its floor, the three being functions whose input dimension a sibling selector picks at runtime. (Whether the declaration matches the *arithmetic* is Phase G; the lint checks shape. It does check two slices of correctness: a key named for a unit -- `_psi`, `_gpm`, `_rpm`, `_hp`, `_btu`, `_btuh`, `_ft`, `_in`, `_sqin`, `_hz`, `_ohm`, `_v`, `_w`, `_a`, `_ksi`, `_kip`, `_deg`, `_ft3`, `_fps` -- must declare that unit's dimension, and a key name must mean one quantity corpus-wide. Together they found 434 wrong declarations on 2026-09-10, and left 44 names declared two ways, each listed by name in the gate.) | `// dims:` annotation in the source. | [../scripts/check-dimensions.mjs](../scripts/check-dimensions.mjs), wired into `npm run lint` (also `npm run audit:dimensions`). Fail-on-missing across **all 78 modules** since 2026-08-30: the per-module graduation the spec-v14 §16.2 ratchet describes is complete, and the allowlist it ran on is gone. |
 | D | Each calculator returns a finite sensible value at every documented domain edge. | Per-row domain band in the corpus. | [../scripts/check-bounds.mjs](../scripts/check-bounds.mjs), wired into `npm run lint` (also `npm run audit:bounds`). |
 | E | Iterative / transcendental methods converge to a stable bit pattern. | [../test/unit/numerical-stability.test.js](../test/unit/numerical-stability.test.js) (pure-math scaffolding landed; calc-module iteratives append). | `npm test`. |
 | F | Tiles that share a computation agree to the floating-point floor; round-trip conversions are identity-preserving. | [../test/unit/cross-tile-invariants.test.js](../test/unit/cross-tile-invariants.test.js) (pure-math primitives + monotonicity scaffolding landed; cross-group invariants append). | `npm test`. |
@@ -109,7 +109,7 @@ dimension as a product / ratio expression.
 
 What the lint asserts is that the annotation is **present and
 parseable**, in the grammar above, for every exported function:
-2,341 of 2,341 across 79 modules, and a malformed annotation
+2,347 of 2,347 across 80 modules, and a malformed annotation
 fails the build. It does **not** evaluate whether the annotation
 is physically right, and it does not balance the inputs against
 the output -- doing that from source would need a CAS, which is
@@ -248,8 +248,8 @@ regular expression matching a fixed field order -- `{ id: "...", name:
 "...", group: "..." }`. A tile written with its fields in another order,
 or carrying an escape the pattern does not allow, is skipped without a
 word. A tile a gate skips is a tile that gate never checked, and a sweep
-that covered 1,700 of 2,086 prints exactly what a sweep that covered all
-2,086 prints: an OK line.
+that covered 1,700 of 2,092 prints exactly what a sweep that covered all
+2,092 prints: an OK line.
 
 Each of those parsers now calls `assertFullCatalogParse` from
 [../scripts/catalog-size.mjs](../scripts/catalog-size.mjs), which compares

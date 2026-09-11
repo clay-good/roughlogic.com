@@ -1324,6 +1324,13 @@ const _TILES = [
   ["pretreatment-bath-dragout", "G"],
   ["galvanize-kettle-throughput", "G"],
   ["phosphate-coating-weight", "G"],
+  // spec-v1845..v1850 snow and ice management band
+  ["salt-application-rate", "G"],
+  ["brine-batch-salinity", "G"],
+  ["plow-route-cycle-time", "J"],
+  ["snow-stacking-area", "G"],
+  ["ice-melt-working-temperature", "G"],
+  ["walkway-clearing-productivity", "G"],
 ];
 
 

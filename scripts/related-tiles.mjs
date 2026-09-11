@@ -1644,6 +1644,13 @@ const RELATED = {
   "pool-pump-speed-savings": ["pool-turnover","vfd-energy-savings","pool-cover-evaporation"],
   "pool-heat-pump-capacity": ["pool-heater-btu","pool-cover-evaporation","heat-pump-cold-capacity"],
   "spa-drain-interval": ["pool-turnover","pool-alkalinity-adjust","pool-volume"],
+  // spec-v1845..v1850: snow and ice management band.
+  "salt-application-rate": ["ice-melt-working-temperature","brine-batch-salinity","plow-route-cycle-time"],
+  "brine-batch-salinity": ["salt-application-rate","ice-melt-working-temperature","tds-from-conductivity"],
+  "plow-route-cycle-time": ["salt-application-rate","snow-stacking-area","haul-cycle-production"],
+  "snow-stacking-area": ["plow-route-cycle-time","salt-application-rate","haul-cycle-production"],
+  "ice-melt-working-temperature": ["salt-application-rate","brine-batch-salinity","walkway-clearing-productivity"],
+  "walkway-clearing-productivity": ["ice-melt-working-temperature","salt-application-rate","snow-stacking-area"],
   // spec-v1824..v1827: metal finishing and galvanizing band.
   "galvanize-coating-weight": ["galvanize-kettle-throughput","phosphate-coating-weight","coating-coverage-dft"],
   "galvanize-kettle-throughput": ["galvanize-coating-weight","phosphate-coating-weight","haul-cycle-production"],

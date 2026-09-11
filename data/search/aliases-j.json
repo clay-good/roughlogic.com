@@ -430,6 +430,11 @@
     {"term":"car body curve swing","target":"clearance-plate-envelope","kind":"industry"},
     {"term":"mid ordinate railcar overhang","target":"clearance-plate-envelope","kind":"industry"},
     {"term":"dimensional load clearance rail","target":"clearance-plate-envelope","kind":"industry"},
-    {"term":"railcar end overhang curve","target":"clearance-plate-envelope","kind":"industry"}
+    {"term":"railcar end overhang curve","target":"clearance-plate-envelope","kind":"industry"},
+    {"term":"plow route cycle time","target":"plow-route-cycle-time","kind":"industry"},
+    {"term":"snow plow truck count","target":"plow-route-cycle-time","kind":"industry"},
+    {"term":"service level cycle time snow","target":"plow-route-cycle-time","kind":"industry"},
+    {"term":"lane miles per truck","target":"plow-route-cycle-time","kind":"industry"},
+    {"term":"accumulation between plow passes","target":"plow-route-cycle-time","kind":"industry"}
   ]
 }

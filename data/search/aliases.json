@@ -112772,6 +112772,156 @@
    "term": "paint pretreatment coating weight",
    "target": "phosphate-coating-weight",
    "kind": "industry"
+  },
+  {
+   "term": "deicing salt application rate",
+   "target": "salt-application-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "pounds per lane mile salt",
+   "target": "salt-application-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "pavement temperature salt rate",
+   "target": "salt-application-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "salt truck coverage per load",
+   "target": "salt-application-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "anti icing versus deicing rate",
+   "target": "salt-application-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "salt brine concentration",
+   "target": "brine-batch-salinity",
+   "kind": "industry"
+  },
+  {
+   "term": "23.3 percent sodium chloride brine",
+   "target": "brine-batch-salinity",
+   "kind": "industry"
+  },
+  {
+   "term": "brine salometer reading",
+   "target": "brine-batch-salinity",
+   "kind": "industry"
+  },
+  {
+   "term": "anti icing brine batch",
+   "target": "brine-batch-salinity",
+   "kind": "industry"
+  },
+  {
+   "term": "brine freeze point concentration",
+   "target": "brine-batch-salinity",
+   "kind": "industry"
+  },
+  {
+   "term": "plow route cycle time",
+   "target": "plow-route-cycle-time",
+   "kind": "industry"
+  },
+  {
+   "term": "snow plow truck count",
+   "target": "plow-route-cycle-time",
+   "kind": "industry"
+  },
+  {
+   "term": "service level cycle time snow",
+   "target": "plow-route-cycle-time",
+   "kind": "industry"
+  },
+  {
+   "term": "lane miles per truck",
+   "target": "plow-route-cycle-time",
+   "kind": "industry"
+  },
+  {
+   "term": "accumulation between plow passes",
+   "target": "plow-route-cycle-time",
+   "kind": "industry"
+  },
+  {
+   "term": "snow storage stacking area",
+   "target": "snow-stacking-area",
+   "kind": "industry"
+  },
+  {
+   "term": "snow pile footprint parking lot",
+   "target": "snow-stacking-area",
+   "kind": "industry"
+  },
+  {
+   "term": "snow haul off trigger",
+   "target": "snow-stacking-area",
+   "kind": "industry"
+  },
+  {
+   "term": "plowed snow density",
+   "target": "snow-stacking-area",
+   "kind": "industry"
+  },
+  {
+   "term": "parking spaces lost to snow",
+   "target": "snow-stacking-area",
+   "kind": "industry"
+  },
+  {
+   "term": "ice melt working temperature",
+   "target": "ice-melt-working-temperature",
+   "kind": "industry"
+  },
+  {
+   "term": "rock salt melting capacity",
+   "target": "ice-melt-working-temperature",
+   "kind": "industry"
+  },
+  {
+   "term": "eutectic versus practical temperature",
+   "target": "ice-melt-working-temperature",
+   "kind": "industry"
+  },
+  {
+   "term": "calcium chloride magnesium chloride deicer",
+   "target": "ice-melt-working-temperature",
+   "kind": "industry"
+  },
+  {
+   "term": "pounds of ice melted per pound of salt",
+   "target": "ice-melt-working-temperature",
+   "kind": "industry"
+  },
+  {
+   "term": "walkway clearing productivity",
+   "target": "walkway-clearing-productivity",
+   "kind": "industry"
+  },
+  {
+   "term": "sidewalk snow removal crew size",
+   "target": "walkway-clearing-productivity",
+   "kind": "industry"
+  },
+  {
+   "term": "snow blower square feet per hour",
+   "target": "walkway-clearing-productivity",
+   "kind": "industry"
+  },
+  {
+   "term": "shovel productivity snow",
+   "target": "walkway-clearing-productivity",
+   "kind": "industry"
+  },
+  {
+   "term": "ice melt application walkways",
+   "target": "walkway-clearing-productivity",
+   "kind": "industry"
   }
  ]
 }
