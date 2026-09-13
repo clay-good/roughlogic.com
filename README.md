@@ -121,7 +121,7 @@ npm ci             # exact locked dev tooling; the site has zero runtime deps
 npm run dev        # build, then serve only dist/ on loopback
 npm run build      # emit dist/ (SPA + static shells + sitemap)
 npm run lint       # the full static-gate chain (59 checks) -- 56 run without the private n-gram list
-npm test           # unit tests (node --test)
+npm test           # recursively discover unit tests with Node's test runner
 npm run test:e2e   # Playwright integration suite (needs a browser)
 ```
 

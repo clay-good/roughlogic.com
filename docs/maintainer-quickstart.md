@@ -214,7 +214,7 @@ outcome. The audit trail is append-only and public.
 | ------- | ------------ |
 | `npm run dev` | Builds `dist/`, then serves only that public tree on loopback. |
 | `npm run build` | Produces `dist/` for deployment. |
-| `npm test` | Full unit-test suite under Node's test runner. |
+| `npm test` | Recursively discovers the full `test/unit/` suite with Node's test runner; no shell-specific globbing. |
 | `npm run test:unit` | Same as `npm test`. |
 | `npm run test:e2e` | Playwright integration tests. |
 | `npm run test:a11y` | axe-core accessibility tests. |

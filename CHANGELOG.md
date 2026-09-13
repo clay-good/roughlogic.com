@@ -831,6 +831,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The unit-test command depended on a Bash feature macOS does not ship.** Both test scripts enabled `globstar`, but the system Bash 3 on macOS rejects that option before invoking Node. The current flat suite happened to run through the unexpanded pattern anyway, while a future nested suite could be skipped. The scripts now give `test/unit` directly to the Node 20+ test runner for recursive, shell-independent discovery, and a unit test pins that contract.
+
 - **`calc-earthwork.js` and `calc-plumbing.js` declared `cycles_per_hour` dimensionless.** Three exported functions -- `computeLoaderProduction`, `computeDozerProduction` and `computePressureTankDrawdown` -- annotated a value they all print as "cycles/hr" as having no dimension. The `check-dimensions` key-agreement gate caught it when the new `deadband-cycling-rate` declared the same key as a rate. The key name states the unit, so the existing annotations were the wrong side. Annotation only -- no computed value changes.
 
 - **`calc-treatment.js` declared `salt_lb` dimensionless.** The `check-dimensions` key-agreement gate caught it when the new `brine-batch-salinity` declared the same key as mass. Pounds of salt are a mass, and the key name states the unit, so the existing annotation was the wrong side. Annotation only -- no computed value changes.
