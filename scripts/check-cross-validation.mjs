@@ -38,7 +38,7 @@
 
 import { readFile } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { existsSync } from "node:fs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -82,12 +82,10 @@ const GROUP_CEILING_PCT = {
 const TOLERANCE_EXEMPT_GROUPS = new Set(["H", "Q", "S"]);
 
 async function loadTileGroups() {
-  const text = await readFile(TOOLS_DATA, "utf8");
-  const map = new Map();
-  // Match `{ id: "...", name: "...", group: "...", ... }` rows.
-  const re = /\{\s*id:\s*"([a-z0-9-]+)"[^}]*?group:\s*"([A-Z])"/g;
-  for (const m of text.matchAll(re)) map.set(m[1], m[2]);
-  return map;
+  // tools-data.js is pure data. Importing it avoids a partial-catalog pass if
+  // a row's field order or formatting changes underneath a source-text regex.
+  const { TOOLS } = await import(pathToFileURL(TOOLS_DATA).href);
+  return new Map(TOOLS.map((tool) => [tool.id, tool.group]));
 }
 
 async function loadCorpusModuleCounts() {

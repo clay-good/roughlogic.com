@@ -262,8 +262,15 @@ every agent the catalog holds. All five were reading the full catalog at
 the time the guard was added; the point is that nothing would have said
 so if they had not been.
 
-There is no exemption list, deliberately. A parser added later either
-imports the guard or fails
+Three more catalog-wide tools once had the same exposure:
+`check-cross-validation`, `check-derivation-coverage`, and
+`build-tile-index`. The last two used compatible regexes, so they could omit
+the same row and still report 100% derivation coverage. They now import the
+pure-data `TOOLS` module directly. The catalog-parser regression test pins
+that choice alongside the five guarded parsers.
+
+There is no exemption list for source-text parsers, deliberately. A parser
+added later either imports the guard or fails
 [../test/unit/catalog-parse-coverage.test.js](../test/unit/catalog-parse-coverage.test.js),
 which walks `scripts/` and looks for one.
 

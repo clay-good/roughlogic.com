@@ -1,9 +1,10 @@
-// Four gates read tools-data.js with a regular expression that matches a fixed
+// Five gates read tools-data.js with a regular expression that matches a fixed
 // field order -- `{ id: "...", name: "...", group: "..."`. A tile written with
 // its fields in another order is silently skipped, and a tile a gate skips is a
-// tile that gate never checked: a sweep covering 1,700 of 1,804 reports exactly
-// what a sweep covering all of them reports, which is nothing. Each parser now
-// asserts it saw the whole registry.
+// tile that gate never checked: a partial sweep reports exactly what a sweep
+// covering all of them reports, which is nothing. Each parser now
+// asserts it saw the whole registry. Three other catalog-wide tools avoid this
+// class of bug by importing the data module directly.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
@@ -19,6 +20,12 @@ const GUARDED = [
   "build.mjs",
 ];
 
+const DIRECT_IMPORT = [
+  "check-cross-validation.mjs",
+  "check-derivation-coverage.mjs",
+  "build-tile-index.mjs",
+];
+
 test("catalogSize reports the module's own tile count", async () => {
   const { TOOLS } = await import("../../tools-data.js");
   assert.equal(await catalogSize(), TOOLS.length);
@@ -30,6 +37,14 @@ for (const file of GUARDED) {
     const src = await readFile(new URL(`../../scripts/${file}`, import.meta.url), "utf8");
     assert.match(src, /assertFullCatalogParse\(/, `${file} parses tools-data.js without checking its own coverage`);
     assert.match(src, /["']\.\/catalog-size\.mjs["']/, `${file} does not pull in the shared guard`);
+  });
+}
+
+for (const file of DIRECT_IMPORT) {
+  test(`${file} reads the complete catalog from the data module`, async () => {
+    const src = await readFile(new URL(`../../scripts/${file}`, import.meta.url), "utf8");
+    assert.match(src, /import\(pathToFileURL\(TOOLS_DATA\)\.href\)/, `${file} does not import the live TOOLS array`);
+    assert.doesNotMatch(src, /readFile\(TOOLS_DATA/, `${file} still parses tools-data.js as source text`);
   });
 }
 

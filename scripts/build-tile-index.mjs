@@ -22,7 +22,7 @@
 
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DERIVATIONS = resolve(ROOT, "docs", "derivations.md");
@@ -67,18 +67,10 @@ const GROUP_NAMES = {
 };
 
 async function loadTools() {
-  const text = await readFile(TOOLS_DATA, "utf8");
-  const out = [];
-  // Match `{ id: "tile-id", name: "Display", group: "X", ... }` in TOOLS.
-  // The pattern uses lazy capture between id and group to tolerate any
-  // intermediate fields (name / trades / desc / etc.) in any order; in
-  // practice id is always followed shortly by name then group.
-  const re = /\{\s*id:\s*"([a-z0-9-]+)"\s*,\s*name:\s*"([^"]+)"\s*,\s*group:\s*"([A-Z])"/g;
-  let m;
-  while ((m = re.exec(text)) !== null) {
-    out.push({ id: m[1], name: m[2], group: m[3] });
-  }
-  return out;
+  // tools-data.js is pure data. Read the registry itself so a harmless field
+  // reorder cannot make the generated index silently omit a calculator.
+  const { TOOLS } = await import(pathToFileURL(TOOLS_DATA).href);
+  return TOOLS.map(({ id, name, group }) => ({ id, name, group }));
 }
 
 async function loadFixtures() {

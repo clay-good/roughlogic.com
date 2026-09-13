@@ -30,7 +30,7 @@
 
 import { readFile } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { existsSync } from "node:fs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -39,13 +39,11 @@ const TOOLS_DATA = resolve(ROOT, "tools-data.js");
 const DERIV = resolve(ROOT, "docs", "derivations.md");
 
 async function loadTools() {
-  // Returns array of { id, group } for every TOOLS entry in app.js.
-  const text = await readFile(TOOLS_DATA, "utf8");
-  const out = [];
-  for (const m of text.matchAll(/\{\s*id:\s*"([a-z0-9-]+)"[^}]*?group:\s*"([A-Z])"/g)) {
-    out.push({ id: m[1], group: m[2] });
-  }
-  return out;
+  // tools-data.js is pure data. Import the complete registry rather than
+  // trusting the same source-text shape used by the index generator this gate
+  // checks; otherwise both tools can skip the same row and report 100%.
+  const { TOOLS } = await import(pathToFileURL(TOOLS_DATA).href);
+  return TOOLS.map(({ id, group }) => ({ id, group }));
 }
 
 async function main() {
