@@ -1,6 +1,6 @@
 {
  "_comment": "v10 Phase C.1 worked-example registry (spec-v10 \u00a75.1). One or more rows per tile recording a worked example from a primary public source: tile id, source citation, inputs, expected outputs with tolerance. The unit-test runner (when wired in Phase C migration) reads the registry and asserts each tile's output matches within tolerance. This file is the migration target for the existing per-test fixture obligation; tiles are added incrementally.",
- "_updated": "2026-09-11",
+ "_updated": "2026-09-13",
  "_schema": "Each row: { tile_id, source_publisher, source_title, source_edition_or_year, source_section_or_page, verified_by, verified_on (ISO date), inputs (object), outputs (object: { name: { value, tolerance: { abs?, pct? } } }) }. Tolerance defaults per spec-v10 \u00a75.3: code-table 1 percent or 1 unit-of-least-precision; first-principles 0.5 percent; standard-rounded sizes exact match.",
  "_coverage_target": "Spec-v10 \u00a75.2 declares this file the migration target. Every tile must eventually have at least one row. Current coverage is a starter set; new tiles ship a row with their PR per the contributor checklist. The check-worked-examples.mjs linter reports coverage but does not (yet) fail CI on missing rows. Fail-on-missing is enabled when coverage exceeds 80 percent.",
  "rows": [
@@ -111021,6 +111021,140 @@
       "pct": 0.5
      }
     }
+   }
+  },
+  {
+   "tile_id": "otdr-event-distance",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "OTDR Event Distance -- the spec-v1837 worked example, recomputed with the corrected-index distance carried through both route corrections",
+   "source_edition_or_year": "spec-v1837 of scope-trade-expansion-3, 2026-09-13",
+   "source_section_or_page": "the cable datasheet, route as-built, and applicable test standard govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-13",
+   "inputs": { "round_trip_time_us": 50, "entered_group_index": 1.4682, "true_group_index": 1.47, "excess_fiber_pct": 1, "slack_per_splice_ft": 49.87, "splice_points": 5, "comparison_span_km": 40 },
+   "outputs": {
+    "entered_distance_m": { "value": 5104.761919357035, "tolerance": { "pct": 0.5 } },
+    "corrected_distance_m": { "value": 5098.51119047619, "tolerance": { "pct": 0.5 } },
+    "index_error_m": { "value": 6.2507288808456, "tolerance": { "pct": 0.5 } },
+    "comparison_error_m": { "value": 48.97959183673528, "tolerance": { "pct": 0.5 } },
+    "route_distance_m": { "value": 4972.029001659594, "tolerance": { "pct": 0.5 } }
+   }
+  },
+  {
+   "tile_id": "chromatic-dispersion-reach",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Chromatic Dispersion Reach -- the spec-v1838 worked example, recomputed",
+   "source_edition_or_year": "spec-v1838 of scope-trade-expansion-3, 2026-09-13",
+   "source_section_or_page": "the equipment dispersion tolerance and cable data govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-13",
+   "inputs": { "dispersion_ps_nm_km": 17, "span_km": 80, "bit_rate_gbps": 10, "spectral_width_nm": 0.1, "lower_bit_rate_gbps": 2.5, "higher_bit_rate_gbps": 40 },
+   "outputs": {
+    "accumulated_dispersion_ps_nm": { "value": 1360, "tolerance": { "pct": 0.5 } },
+    "reach_km": { "value": 58.8235294117647, "tolerance": { "pct": 0.5 } },
+    "lower_rate_reach_km": { "value": 941.1764705882352, "tolerance": { "pct": 0.5 } },
+    "higher_rate_reach_km": { "value": 3.676470588235294, "tolerance": { "pct": 0.5 } },
+    "over_limit_pct": { "value": 36, "tolerance": { "pct": 0.5 } }
+   }
+  },
+  {
+   "tile_id": "fiber-slack-storage",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Fiber Slack Storage -- the spec-v1839 worked example, recomputed",
+   "source_edition_or_year": "spec-v1839 of scope-trade-expansion-3, 2026-09-13",
+   "source_section_or_page": "the owner's construction standard and cable handling limits govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-13",
+   "inputs": { "route_length_ft": 52800, "usable_reel_length_ft": 12000, "slack_per_splice_ft": 100, "terminal_slack_ft": 100, "waste_pct": 5, "restoration_slack_each_side_ft": 60 },
+   "outputs": {
+    "splice_points": { "value": 4, "tolerance": { "abs": 0 } },
+    "total_slack_ft": { "value": 600, "tolerance": { "pct": 0.5 } },
+    "cable_to_order_ft": { "value": 56070, "tolerance": { "pct": 0.5 } },
+    "shortfall_per_splice_ft": { "value": 20, "tolerance": { "pct": 0.5 } },
+    "additional_restoration_slack_ft": { "value": 80, "tolerance": { "pct": 0.5 } }
+   }
+  },
+  {
+   "tile_id": "pon-split-loss-budget",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "PON Split Loss Budget -- the spec-v1840 worked example, recomputed",
+   "source_edition_or_year": "spec-v1840 of scope-trade-expansion-3, 2026-09-13",
+   "source_section_or_page": "the applicable PON standard and component data govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-13",
+   "inputs": { "class_budget_db": 28, "split_ratio": 32, "splitter_excess_db": 2.5, "connector_count": 4, "connector_loss_db": 0.5, "splice_count": 6, "splice_loss_db": 0.1, "attenuation_db_km": 0.35, "design_margin_db": 0, "alternative_split_ratio": 64 },
+   "outputs": {
+    "splitter_loss_db": { "value": 17.551499783199063, "tolerance": { "pct": 0.5 } },
+    "remaining_fiber_budget_db": { "value": 7.848500216800937, "tolerance": { "pct": 0.5 } },
+    "reach_km": { "value": 22.42428633371696, "tolerance": { "pct": 0.5 } },
+    "alternative_reach_km": { "value": 13.82342931474608, "tolerance": { "pct": 0.5 } },
+    "split_loss_delta_db": { "value": 3.010299956639809, "tolerance": { "pct": 0.5 } }
+   }
+  },
+  {
+   "tile_id": "fiber-strand-count-planning",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Fiber Strand Count Planning -- the spec-v1841 worked example, recomputed",
+   "source_edition_or_year": "spec-v1841 of scope-trade-expansion-3, 2026-09-13",
+   "source_section_or_page": "the route survey and operator construction standard govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-13",
+   "inputs": { "living_units": 2000, "split_ratio": 32, "terminal_ports": 8, "spare_pct": 25, "standard_counts": "12,24,48,72,96,144,216,288,432", "route_length_ft": 52800, "lower_material_cost_per_ft": 1.5, "selected_material_cost_per_ft": 1.8, "placement_cost_per_ft": 8 },
+   "outputs": {
+    "feeder_fibers_required": { "value": 63, "tolerance": { "abs": 0 } },
+    "feeder_with_spare": { "value": 79, "tolerance": { "abs": 0 } },
+    "selected_standard_count": { "value": 96, "tolerance": { "abs": 0 } },
+    "distribution_with_spare": { "value": 313, "tolerance": { "abs": 0 } },
+    "installed_cost_delta": { "value": 15840, "tolerance": { "pct": 0.5 } }
+   }
+  },
+  {
+   "tile_id": "optical-return-loss",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Optical Return Loss -- the spec-v1842 worked example, recomputed",
+   "source_edition_or_year": "spec-v1842 of scope-trade-expansion-3, 2026-09-13",
+   "source_section_or_page": "transceiver, connector, and applicable test requirements govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-13",
+   "inputs": { "connector_count": 4, "connector_reflectance_db": -50, "unmated_end_count": 1, "fiber_index": 1.468, "required_orl_db": 32, "apc_reflectance_db": -60 },
+   "outputs": {
+    "fresnel_reflectance_pct": { "value": 3.5958485798118667, "tolerance": { "pct": 0.5 } },
+    "connector_only_orl_db": { "value": 43.979400086720375, "tolerance": { "pct": 0.5 } },
+    "with_unmated_orl_db": { "value": 14.43715766548042, "tolerance": { "pct": 0.5 } },
+    "apc_orl_db": { "value": 53.979400086720375, "tolerance": { "pct": 0.5 } }
+   }
+  },
+  {
+   "tile_id": "cable-jetting-distance",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Cable Jetting Distance -- the spec-v1843 worked example, recomputed at the exact target-fill diameter",
+   "source_edition_or_year": "spec-v1843 of scope-trade-expansion-3, 2026-09-13",
+   "source_section_or_page": "manufacturer jetting data and a trial shot govern distance",
+   "verified_by": "rl",
+   "verified_on": "2026-09-13",
+   "inputs": { "duct_id_mm": 10, "cable_od_mm": 8.5, "fill_min_pct": 40, "fill_max_pct": 60, "optimal_fill_pct": 50, "air_velocity_m_s": 25, "pressure_bar_absolute": 10 },
+   "outputs": {
+    "fill_ratio_pct": { "value": 72.25, "tolerance": { "pct": 0.5 } },
+    "free_air_l_min": { "value": 326.92198551418784, "tolerance": { "pct": 0.5 } },
+    "optimal_cable_od_mm": { "value": 7.0710678118654755, "tolerance": { "pct": 0.5 } },
+    "optimal_free_air_l_min": { "value": 589.0486225480861, "tolerance": { "pct": 0.5 } }
+   }
+  },
+  {
+   "tile_id": "splice-loss-mismatch",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Splice Loss Mismatch -- the spec-v1844 worked example, recomputed",
+   "source_edition_or_year": "spec-v1844 of scope-trade-expansion-3, 2026-09-13",
+   "source_section_or_page": "splicer and fiber data and acceptance standards govern",
+   "verified_by": "rl",
+   "verified_on": "2026-09-13",
+   "inputs": { "mfd_1_um": 9.2, "mfd_2_um": 8.6, "lateral_offset_um": 1, "cleave_angle_deg": 1, "wavelength_nm": 1550, "fiber_index": 1.468 },
+   "outputs": {
+    "mfd_mismatch_loss_db": { "value": 0.01973817456961525, "tolerance": { "pct": 0.5 } },
+    "lateral_offset_loss_db": { "value": 0.20524574669187148, "tolerance": { "pct": 0.5 } },
+    "angular_loss_db": { "value": 0.24782703904941103, "tolerance": { "pct": 0.5 } },
+    "angular_2deg_loss_db": { "value": 0.9913081561976441, "tolerance": { "pct": 0.5 } },
+    "total_loss_db": { "value": 0.47281096031089775, "tolerance": { "pct": 0.5 } }
    }
   }
  ]

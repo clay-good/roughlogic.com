@@ -1361,6 +1361,14 @@ export const TOOL_MODULES = (() => {
     "transmitter-span-scaling", "deadband-cycling-rate", "trend-log-storage",
     "mstp-segment-loading", "damper-actuator-torque", "loop-error-stackup",
   ]);
+  // spec-v1837..v1844: fiber-optic outside plant -- trace distance,
+  // dispersion, restoration slack, PON loss, strand-count planning, return
+  // loss, microduct jetting, and fusion-splice geometry. All Group A.
+  declare("./calc-telecom.js", "TELECOM_RENDERERS", [
+    "otdr-event-distance", "chromatic-dispersion-reach", "fiber-slack-storage",
+    "pon-split-loss-budget", "fiber-strand-count-planning", "optical-return-loss",
+    "cable-jetting-distance", "splice-loss-mismatch",
+  ]);
   // spec-v1845..v1850: the snow and ice management bench -- what a pavement
   // temperature costs in salt, what a brine batch has to be, how long a plow
   // route takes, where the snow goes, when a deicer stops working, and whether

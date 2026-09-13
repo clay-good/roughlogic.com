@@ -2,96 +2,96 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "0402c45747e915b8",
-      "date": "2026-09-11"
+      "sha": "d60331af87d393f5",
+      "date": "2026-09-13"
     },
     "/tools/": {
-      "sha": "4004eee19e9fb8bc",
-      "date": "2026-09-11"
+      "sha": "4809e2e2df9f2934",
+      "date": "2026-09-13"
     },
     "/groups/accounting/": {
-      "sha": "5ee1b19c1dd467a9",
-      "date": "2026-09-11"
+      "sha": "95b921c2f06d6202",
+      "date": "2026-09-13"
     },
     "/groups/agriculture/": {
-      "sha": "5e7e297a41174e58",
-      "date": "2026-09-11"
+      "sha": "65c2e89907b9f0fc",
+      "date": "2026-09-13"
     },
     "/groups/construction/": {
-      "sha": "cf9462f5019c4616",
-      "date": "2026-09-11"
+      "sha": "dff16fcf50e2662a",
+      "date": "2026-09-13"
     },
     "/groups/cross-trade/": {
-      "sha": "66d101439ccc567c",
-      "date": "2026-09-11"
+      "sha": "7c7d5db7a85a0399",
+      "date": "2026-09-13"
     },
     "/groups/educators/": {
-      "sha": "87f87a234fa71bfd",
-      "date": "2026-09-11"
+      "sha": "011dcf8dd35b71e7",
+      "date": "2026-09-13"
     },
     "/groups/electrical/": {
-      "sha": "fe9a8d0c8af67451",
-      "date": "2026-09-11"
+      "sha": "6d2b173d7e99f24e",
+      "date": "2026-09-13"
     },
     "/groups/field/": {
-      "sha": "45ffcef309a408a5",
-      "date": "2026-09-11"
+      "sha": "f7d37a77132fa99d",
+      "date": "2026-09-13"
     },
     "/groups/fire-ground/": {
-      "sha": "940d41565037af7d",
-      "date": "2026-09-11"
+      "sha": "6b9f26373214f614",
+      "date": "2026-09-13"
     },
     "/groups/historical/": {
-      "sha": "e6f4117a5c82e293",
-      "date": "2026-09-11"
+      "sha": "90be7d784643b6f1",
+      "date": "2026-09-13"
     },
     "/groups/hvac/": {
-      "sha": "91c8ce8ee274f55e",
-      "date": "2026-09-11"
+      "sha": "ba0a4271bc9ee9e8",
+      "date": "2026-09-13"
     },
     "/groups/kitchen/": {
-      "sha": "4e192ee09470591e",
-      "date": "2026-09-11"
+      "sha": "c9d1a71c0e364061",
+      "date": "2026-09-13"
     },
     "/groups/lab/": {
-      "sha": "fcf01997d4609f45",
-      "date": "2026-09-11"
+      "sha": "cfdf47792b9d397a",
+      "date": "2026-09-13"
     },
     "/groups/mechanic/": {
-      "sha": "8fba47be37fbc138",
-      "date": "2026-09-11"
+      "sha": "187a7ae246b86284",
+      "date": "2026-09-13"
     },
     "/groups/plumbing/": {
-      "sha": "73bd5e84112f0563",
-      "date": "2026-09-11"
+      "sha": "4a6738ec5f4fe7e0",
+      "date": "2026-09-13"
     },
     "/groups/real-estate/": {
-      "sha": "5f5b6400d199563f",
-      "date": "2026-09-11"
+      "sha": "f46b9c28967376ba",
+      "date": "2026-09-13"
     },
     "/groups/references/": {
-      "sha": "00f927927a947920",
-      "date": "2026-09-11"
+      "sha": "e394d16db962c726",
+      "date": "2026-09-13"
     },
     "/groups/restoration/": {
-      "sha": "4cb63b263c2d1698",
-      "date": "2026-09-11"
+      "sha": "e6dbc067db27b23e",
+      "date": "2026-09-13"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "80796cc8f3f8b2c6",
-      "date": "2026-09-11"
+      "sha": "9036856d7166155f",
+      "date": "2026-09-13"
     },
     "/groups/stage/": {
-      "sha": "87ce0d3b8dd0d29f",
-      "date": "2026-09-11"
+      "sha": "4f17cf31b4355b4b",
+      "date": "2026-09-13"
     },
     "/groups/trucking/": {
-      "sha": "d14149905eca3d08",
-      "date": "2026-09-11"
+      "sha": "a03679ff15890335",
+      "date": "2026-09-13"
     },
     "/groups/water/": {
-      "sha": "94501f4783f28200",
-      "date": "2026-09-11"
+      "sha": "dcfbcf2015f86260",
+      "date": "2026-09-13"
     },
     "/tools/aav-install-check/": {
       "sha": "4e1b1d5b33ca35e4",
@@ -869,6 +869,10 @@
       "sha": "277d945b84cb6d22",
       "date": "2026-09-01"
     },
+    "/tools/cable-jetting-distance/": {
+      "sha": "c4b40adb02a8125c",
+      "date": "2026-09-13"
+    },
     "/tools/cable-reel-capacity/": {
       "sha": "7936d19867228a0c",
       "date": "2026-09-04"
@@ -878,8 +882,8 @@
       "date": "2026-09-01"
     },
     "/tools/cable-tray-fill/": {
-      "sha": "de73f747e4dfa15b",
-      "date": "2026-09-01"
+      "sha": "2f6b3a36f6ecf646",
+      "date": "2026-09-13"
     },
     "/tools/camera-lens-fov/": {
       "sha": "61432710b0a91664",
@@ -994,8 +998,8 @@
       "date": "2026-09-01"
     },
     "/tools/cctv-storage/": {
-      "sha": "7b926f4c57248ab2",
-      "date": "2026-09-08"
+      "sha": "16ff436b7f672977",
+      "date": "2026-09-13"
     },
     "/tools/ceiling-speaker-coverage/": {
       "sha": "3657efe2bfb2e355",
@@ -1136,6 +1140,10 @@
     "/tools/chlorine-demand/": {
       "sha": "292bd5f7ca6b387c",
       "date": "2026-09-01"
+    },
+    "/tools/chromatic-dispersion-reach/": {
+      "sha": "fb0ee3b165fdc05c",
+      "date": "2026-09-13"
     },
     "/tools/cipolletti-weir/": {
       "sha": "b2416958eacb1421",
@@ -2734,8 +2742,16 @@
       "date": "2026-09-01"
     },
     "/tools/fiber-max-length/": {
-      "sha": "df17dfbf151a12ab",
-      "date": "2026-09-01"
+      "sha": "30b33b1e9ec81494",
+      "date": "2026-09-13"
+    },
+    "/tools/fiber-slack-storage/": {
+      "sha": "fb980e419181087e",
+      "date": "2026-09-13"
+    },
+    "/tools/fiber-strand-count-planning/": {
+      "sha": "3ac338246d58d938",
+      "date": "2026-09-13"
     },
     "/tools/fillet-weld-strength/": {
       "sha": "9e947f5803e40917",
@@ -4761,6 +4777,10 @@
       "sha": "4b22a0cc102c551b",
       "date": "2026-09-01"
     },
+    "/tools/optical-return-loss/": {
+      "sha": "2f37e1d3a18383bf",
+      "date": "2026-09-13"
+    },
     "/tools/orifice-diameter-for-flow/": {
       "sha": "7f5c40176d60c545",
       "date": "2026-09-01"
@@ -4784,6 +4804,10 @@
     "/tools/osmolarity/": {
       "sha": "2e64e93b7fcb8b3f",
       "date": "2026-09-04"
+    },
+    "/tools/otdr-event-distance/": {
+      "sha": "bbccf74170a9a030",
+      "date": "2026-09-13"
     },
     "/tools/outdoor-air-mix/": {
       "sha": "40bd0ac349f85ee8",
@@ -5180,6 +5204,10 @@
     "/tools/polymeric-sand-bags/": {
       "sha": "a7daad7d2850fbe6",
       "date": "2026-09-01"
+    },
+    "/tools/pon-split-loss-budget/": {
+      "sha": "dcf93629d4e6e0aa",
+      "date": "2026-09-13"
     },
     "/tools/pool-alkalinity-adjust/": {
       "sha": "57eae3e3f10ac0f1",
@@ -6845,6 +6873,10 @@
       "sha": "bf1bd30549c1790e",
       "date": "2026-09-01"
     },
+    "/tools/splice-loss-mismatch/": {
+      "sha": "9ce8667e61395496",
+      "date": "2026-09-13"
+    },
     "/tools/spoil-setback/": {
       "sha": "26abe626021e842e",
       "date": "2026-09-01"
@@ -8394,16 +8426,16 @@
       "date": "2026-09-04"
     },
     "/tools/wireless-fspl/": {
-      "sha": "588fa7367f67e81d",
-      "date": "2026-09-08"
+      "sha": "b54dae831f9df2c8",
+      "date": "2026-09-13"
     },
     "/tools/wireless-intermod/": {
       "sha": "447ed8577a73a503",
       "date": "2026-09-01"
     },
     "/tools/wireless-link-budget/": {
-      "sha": "d31583b1e2783590",
-      "date": "2026-09-04"
+      "sha": "b61da7178e4bef83",
+      "date": "2026-09-13"
     },
     "/tools/wireway-fill/": {
       "sha": "48fe8359ba3cd252",

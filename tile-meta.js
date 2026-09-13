@@ -1338,6 +1338,15 @@ const _TILES = [
   ["mstp-segment-loading", "C"],
   ["damper-actuator-torque", "C"],
   ["loop-error-stackup", "A"],
+  // spec-v1837..v1844 fiber-optic outside plant
+  ["otdr-event-distance", "A"],
+  ["chromatic-dispersion-reach", "A"],
+  ["fiber-slack-storage", "A"],
+  ["pon-split-loss-budget", "A"],
+  ["fiber-strand-count-planning", "A"],
+  ["optical-return-loss", "A"],
+  ["cable-jetting-distance", "A"],
+  ["splice-loss-mismatch", "A"],
 ];
 
 

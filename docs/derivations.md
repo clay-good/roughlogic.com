@@ -3577,6 +3577,14 @@ cross-check.
 | calc-survey.js | `computeTapingNormalTension` | `{ span_ft = 100, tape_weight_plf = 0.02, tape_area_in2 = 0.006, standard_pull...` | _ | _ | _ |
 | calc-survey.js | `computeThreePointResection` | `{ ax = 0, ay = 0, azimuth_to_a_deg = 0, bx = 0, by = 0, azimuth_to_b_deg = 0,...` | _ | _ | _ |
 | calc-survey.js | `computeTraverseClosure` | `{ courses, n0 = 0, e0 = 0 } = {}` | _ | _ | _ |
+| calc-telecom.js | `computeCableJettingDistance` | `{ duct_id_mm = 0, cable_od_mm = 0, fill_min_pct = 40, fill_max_pct = 60, opti...` | _ | _ | _ |
+| calc-telecom.js | `computeChromaticDispersionReach` | `{ dispersion_ps_nm_km = 0, span_km = 0, bit_rate_gbps = 0, spectral_width_nm ...` | _ | _ | _ |
+| calc-telecom.js | `computeFiberSlackStorage` | `{ route_length_ft = 0, usable_reel_length_ft = 0, slack_per_splice_ft = 0, te...` | _ | _ | _ |
+| calc-telecom.js | `computeFiberStrandCountPlanning` | `{ living_units = 0, split_ratio = 0, terminal_ports = 0, spare_pct = 0, stand...` | _ | _ | _ |
+| calc-telecom.js | `computeOpticalReturnLoss` | `{ connector_count = 0, connector_reflectance_db = 0, unmated_end_count = 1, f...` | _ | _ | _ |
+| calc-telecom.js | `computeOtdrEventDistance` | `{ round_trip_time_us = 0, entered_group_index = 0, true_group_index = 0, exce...` | _ | _ | _ |
+| calc-telecom.js | `computePonSplitLossBudget` | `{ class_budget_db = 0, split_ratio = 0, splitter_excess_db = 0, connector_cou...` | _ | _ | _ |
+| calc-telecom.js | `computeSpliceLossMismatch` | `{ mfd_1_um = 0, mfd_2_um = 0, lateral_offset_um = 0, cleave_angle_deg = 0, wa...` | _ | _ | _ |
 | calc-treatment.js | `computeBodTssLoadingRemoval` | `{ flow_mgd = 0, influent_mgl = 0, effluent_mgl = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeBreakpointChlorination` | `{ total_ppm = 0, free_ppm = 0, ratio = 10, gallons = 0, avail = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeBroadCrestedWeir` | `{ crest_length_ft = 0, head_ft = 0, discharge_coeff = 0 } = {}` | _ | _ | _ |
@@ -3763,7 +3771,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2349.
+Row count: 2357.
 
 <!-- END function-corpus-v14 -->
 
@@ -3831,7 +3839,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (239 tiles)
+### Group A Electrical (247 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3857,6 +3865,7 @@ per spec-v14 §13.1 second paragraph.
 | `buck-boost-sizing` | Buck-Boost Transformer Sizing (Single-Phase) | NEC 2023 (NFPA 70) Article 450; manuf...; 208 V to 230 V at 50 A -> boost 22 V; xfmr = 22 x 50 / 10... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `burial-depth-300-5` | Underground Burial Cover-Depth Lookup (NEC Table 300.5) | NEC 2023 (NFPA 70); nonmetallic raceway (PVC), general earth -> 18 in cover | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cable-bend-radius` | Cable Bend Radius Minimum | Southwire; Single-conductor THHN: 8x multiple; 0.5 in OD -> 4 in min... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `cable-jetting-distance` | Microduct Fill Ratio and Cable Jetting Air | Project (first-principles); manufacturer jetting data and a trial shot govern distance | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cable-reel-capacity` | Cable Reel Capacity / Length on Reel | Reel-capacity identity (first-princip...; length = 0.9*PI*(900-144)*18/(48*1) = 801 ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cable-support-jhook` | J-Hook / Bridle-Ring Count and Bundle Weight | J-hook support identity (first-princi...; hooks = ceil(400/4) = 100; load = 50*0.035*4 = 7 lb/hook | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cable-tray-fill` | Cable Tray Fill | NEC Article 392.22(A) (by name); six 1.5 in 4/0 cables in a 12 in ladder tray -> 9 in of 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3869,6 +3878,7 @@ per spec-v14 §13.1 second paragraph.
 | `cctv-storage` | IP Camera / NVR Storage and Bandwidth | first-principles NVR/VMS bitrate acco...; 1 camera at 4 Mbps, 24 h, 30 days -> 4 * 10.8 * 30 = 1296 GB | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ceiling-speaker-coverage` | Ceiling Speaker Coverage and Spacing | commercial-audio design practice; spec-v457 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ceiling-speaker-coverage-angle` | Ceiling Speaker Coverage Angle for a Target Spacing | commercial-audio design practice (sol...; spec-v740 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `chromatic-dispersion-reach` | Fiber Chromatic Dispersion Penalty and Reach | Project (first-principles); the equipment dispersion tolerance and cable data govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `coax-rg-loss` | Coaxial Cable Attenuation | Belden / CommScope loss curves (by name); 100 ft RG6 @ 1000 MHz (6 dB/100 ft) -> 6 dB; source 0 dBm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `commercial-lighting-load` | Commercial General-Lighting and Receptacle Load (NEC 220.12 / 220.44) | NEC 2023 (NFPA 70); 5,000 ft2 x 3 VA = 15,000 VA lighting; 60 x 180 = 10,800 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `conductor-blowout` | Conductor Blowout and Horizontal Clearance | Project (first-principles); the applicable NESC edition and the right-of-way requirem... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3911,6 +3921,8 @@ per spec-v14 §13.1 second paragraph.
 | `feeder-tap-rule` | Feeder Tap Conductor 10-ft / 25-ft Rule (NEC 240.21(B)) | NEC 2023 (NFPA 70); 400 A feeder, 22 ft tap -> 25-ft rule, min = 400/3 = 133.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fiber-loss-budget` | Fiber Optic Loss Budget | TIA-568 / TIA-526 / IEEE 802.3 (by name); 300 m OM4 @ 850 nm (3.0 dB/km, 2 connectors @ 0.75 dB) ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fiber-max-length` | Fiber Max Length for a Loss Budget | TIA-568 / IEEE 802.3 (by name), inverse; 2.6 dB budget, OM4 3.0 dB/km, 2 connectors @ 0.75 dB -> 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `fiber-slack-storage` | Fiber Slack Loop and Splice Enclosure Reserve | Project (first-principles); the owner's construction standard and cable handling limi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `fiber-strand-count-planning` | Fiber Strand Count from Homes Passed and Split Architecture | Project (first-principles); the route survey and operator construction standard govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fire-alarm-nac-voltage-drop` | Fire-Alarm NAC Circuit Voltage Drop (End-of-Line) | fire-alarm NAC voltage drop (NFPA 72); CUSTV = 0.85*24 = 20.4; loop R = 2*250*(2.525/1000) = 1.2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fresnel-zone-clearance` | Fresnel Zone Radius and 60% Clearance | ITU-R P.526 / first-principles Fresne...; d1 = d2 = 2.5 km, D = 5 km; r1 = 17.32 sqrt(2.5 x 2.5 / (... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fuse-let-through` | Current-Limiting Let-Through and Downstream Withstand | Project (first-principles); 0.0297 x cmil x sqrt(log10((T2+234)/(T1+234))/t) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3977,6 +3989,8 @@ per spec-v14 §13.1 second paragraph.
 | `off-grid-battery` | Off-Grid Battery Bank Sizing | IEEE; nameplate_Wh = daily_Wh * days / (DoD * efficiency); Ah =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ohms-law` | Ohm's Law | Project (first-principles); Ohm's law definition | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `open-delta-transformer` | Open-Delta (V-V) Transformer Bank Capacity | Open-delta (V-V) transformer bank cap...; available = sqrt(3) x 25 = 43.30; per unit = 40/sqrt(3) =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `optical-return-loss` | Optical Return Loss and Connector Reflectance | Project (first-principles); transceiver, connector, and applicable test requirements ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `otdr-event-distance` | OTDR Event Distance and Index of Refraction | Project (first-principles); the cable datasheet, route as-built, and applicable test ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `panel-rebalance` | Panel Loading and Phase Rebalance | Project (first-principles); Six-circuit panel skewed onto A (65 A) vs B (22 A) vs C (... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `parallel-conductor-derate` | Parallel Conductor Ampacity | NEC (NFPA 70) Article 310 parallel-co...; 3/0 Cu at 200 A, N=3, no derate -> 600 A total | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pf-correction` | Power Factor Correction Capacitor | Project (first-principles); 100 kW / pf 0.75 -> 0.95 / 480 V three-phase -> 55.32 kVA... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3986,6 +4000,7 @@ per spec-v14 §13.1 second paragraph.
 | `point-illuminance` | Point-Method Illuminance (Inverse-Square + Cosine) | IES Lighting Handbook (point method); angle 0: E = 1000 x cos(0) / 10^2 = 10.0 fc (107.6 lux) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `point-method-required-candela` | Point-Method Required Candela for a Target | IES Lighting Handbook (point method),...; 10 fc target, 10 ft up, nadir -> 1,000 cd (round-trips po... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pole-class-groundline-moment` | Wood Pole Class and Groundline Moment | Project (first-principles); ANSI O5.1, the applicable NESC edition, and a qualified l... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pon-split-loss-budget` | PON Split Ratio and Optical Loss Budget | Project (first-principles); the applicable PON standard and component data govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pool-bonding-680-26` | Swimming-Pool Equipotential Bonding Checklist (NEC 680.26) | NEC 2023 (NFPA 70); permanent pool/spa -> full 8-component 680.26(B)/(C) bond... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `power-factor-billing-savings` | Power-Factor Correction Demand-Billing Savings | Power-triangle demand-billing method; spec-v232 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `power-triangle` | Power Triangle Solver (kW / kVA / kVAR / PF) | IEEE; kVA^2 = kW^2 + kVAR^2; PF = kW/kVA; theta = arccos(PF) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4034,6 +4049,7 @@ per spec-v14 §13.1 second paragraph.
 | `solar-azimuth-angle` | Solar Azimuth (Sun Compass Bearing) | NOAA / Duffie & Beckman solar geometr...; dec = 23.45; H = -45 deg; from-south gamma = atan2(cos23.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `solar-egc-690-45` | PV Equipment Grounding Conductor (NEC 690.45) | NFPA; 20 A OCPD -> 12 AWG copper EGC (above the 14 AWG floor) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `speaker-70v-line` | 70-Volt Distributed Speaker Line | constant-voltage distributed audio pr...; sixteen 8 W taps (128 W) on a 200 W amp at 20% headroom -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `splice-loss-mismatch` | Fusion Splice Loss from Fiber and Geometry Mismatch | Project (first-principles); splicer and fiber data and acceptance standards govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `standby-battery-runtime` | Standby Battery Runtime from Capacity | NFPA 72 §10.6 (by name), inverse; 14.6 Ah, 0.5 A standby, 2 A / 5 min alarm, derate 1.2 -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `standby-battery-sizing` | Fire-Alarm / Security Standby Battery | NFPA 72 §10.6 (by name); 0.5 A x 24 h + 2.0 A x 5 min, derate 1.2 -> (12 + 0.1667)... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `step-touch-voltage` | Tolerable Step and Touch Voltage (IEEE 80) | IEEE Std 80 (tolerable step and touch...; 0.5 s, 3000 ohm-m rock over 100, 0.1 m, 50 kg -> Cs 0.70,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6034,6 +6050,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2098. Fixture-covered or reference-cadence: 2098 / 2098.
+Tile count: 2106. Fixture-covered or reference-cadence: 2106 / 2106.
 
 <!-- END tile-index-v14 -->

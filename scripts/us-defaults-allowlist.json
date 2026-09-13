@@ -445,6 +445,12 @@
    "match": "Binder gas evolution (cm³/g, 0 to skip)",
    "family": "foundry binder gas",
    "justification": "Foundry binder gas evolution is published in cubic centimetres per gram by every binder supplier, and no US customary form of the figure exists or is used in the trade. The input is entered straight off the supplier's data sheet, so converting it would force the user to convert back and would break the comparison this calculation is for. The output is reported in cubic feet. Verified 2026-09-09 with the plastics processing and foundry band."
+  },
+  {
+   "module": "calc-telecom.js",
+   "match": "*",
+   "family": "fiber-optic outside plant",
+   "justification": "Fiber-optic instruments, cable and component data sheets, and international transmission standards use metres or kilometres for optical distance, ps/nm/km for chromatic dispersion, dB/km for attenuation, and millimetres for microduct and cable diameters in US practice. These are the values a US technician reads directly from an OTDR, cable data sheet, or product label; converting the input surface to customary units would break the comparison it exists to make. Route and stored-slack quantities that are conventionally laid out in feet remain in feet. Verified 2026-09-13 with the outside-plant fiber band."
   }
  ]
 }

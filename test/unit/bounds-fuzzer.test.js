@@ -53539,3 +53539,107 @@ test("bounds: spec-v1823 computeLoopErrorStackup -- RSS is bounded by worst case
   assert.ok(_v1823({ ...base, transmitter_err_pct_span: -1 }).error);
   assert.ok(_v1823({ ...base, installation_err_eng: -1 }).error);
 });
+
+// =====================================================================
+// spec-v1837..v1844: fiber-optic outside-plant calculations.
+// =====================================================================
+import {
+  computeOtdrEventDistance as _v1837,
+  computeChromaticDispersionReach as _v1838,
+  computeFiberSlackStorage as _v1839,
+  computePonSplitLossBudget as _v1840,
+  computeFiberStrandCountPlanning as _v1841,
+  computeOpticalReturnLoss as _v1842,
+  computeCableJettingDistance as _v1843,
+  computeSpliceLossMismatch as _v1844,
+} from "../../calc-telecom.js";
+
+function assertFiniteNumericOutputs(result, label) {
+  assert.ok(!result.error, `${label}: ${result.error}`);
+  for (const [key, value] of Object.entries(result)) {
+    if (typeof value === "number") assertFinite(value, `${label}.${key}`);
+  }
+}
+
+test("bounds: spec-v1837 computeOtdrEventDistance -- correction order preserves the route identity", () => {
+  const base = { round_trip_time_us: 50, entered_group_index: 1.4682, true_group_index: 1.47, excess_fiber_pct: 1, slack_per_splice_ft: 49.87, splice_points: 5, comparison_span_km: 40 };
+  const r = _v1837(base);
+  assertFiniteNumericOutputs(r, "v1837");
+  assert.ok(Math.abs(r.corrected_distance_m - 5098.51119047619) < 1e-9);
+  assert.ok(Math.abs(r.route_distance_m - (r.corrected_distance_m / 1.01 - 5 * 49.87 / 3.280839895013123)) < 1e-9);
+  assert.ok(Math.abs(r.fiber_to_route_delta_m - (r.corrected_distance_m - r.route_distance_m)) < 1e-9);
+  for (const bad of [{ round_trip_time_us: 0 }, { entered_group_index: 1 }, { true_group_index: 1 }, { excess_fiber_pct: 100 }, { splice_points: -1 }]) assert.ok(_v1837({ ...base, ...bad }).error);
+});
+
+test("bounds: spec-v1838 computeChromaticDispersionReach -- reach follows the inverse-square rate law", () => {
+  const base = { dispersion_ps_nm_km: 17, span_km: 80, bit_rate_gbps: 10, spectral_width_nm: 0.1, lower_bit_rate_gbps: 2.5, higher_bit_rate_gbps: 40 };
+  const r = _v1838(base);
+  assertFiniteNumericOutputs(r, "v1838");
+  assert.ok(Math.abs(r.lower_rate_reach_km / r.reach_km - 16) < 1e-9);
+  assert.ok(Math.abs(r.reach_km / r.higher_rate_reach_km - 16) < 1e-9);
+  assert.strictEqual(r.within_limit, false);
+  for (const bad of [{ dispersion_ps_nm_km: 0 }, { span_km: 0 }, { bit_rate_gbps: 0 }, { spectral_width_nm: -1 }]) assert.ok(_v1838({ ...base, ...bad }).error);
+});
+
+test("bounds: spec-v1839 computeFiberSlackStorage -- reel seams and restoration slack reconcile", () => {
+  const base = { route_length_ft: 52800, usable_reel_length_ft: 12000, slack_per_splice_ft: 100, terminal_slack_ft: 100, waste_pct: 5, restoration_slack_each_side_ft: 60 };
+  const r = _v1839(base);
+  assertFiniteNumericOutputs(r, "v1839");
+  assert.strictEqual(r.splice_points, 4);
+  assert.ok(Math.abs(r.total_slack_ft - 600) < 1e-9);
+  assert.ok(Math.abs(r.cable_to_order_ft - 56070) < 1e-9);
+  assert.ok(Math.abs(r.additional_restoration_slack_ft - r.splice_points * r.shortfall_per_splice_ft) < 1e-9);
+  for (const bad of [{ route_length_ft: 0 }, { usable_reel_length_ft: 60000 }, { slack_per_splice_ft: 0 }, { terminal_slack_ft: 0 }, { waste_pct: 100 }]) assert.ok(_v1839({ ...base, ...bad }).error);
+});
+
+test("bounds: spec-v1840 computePonSplitLossBudget -- doubling the split consumes 3.0103 dB", () => {
+  const base = { class_budget_db: 28, split_ratio: 32, splitter_excess_db: 2.5, connector_count: 4, connector_loss_db: 0.5, splice_count: 6, splice_loss_db: 0.1, attenuation_db_km: 0.35, design_margin_db: 0, alternative_split_ratio: 64 };
+  const r = _v1840(base);
+  assertFiniteNumericOutputs(r, "v1840");
+  assert.ok(Math.abs(r.split_loss_delta_db - 10 * Math.log10(2)) < 1e-12);
+  assert.ok(Math.abs(r.reach_km - r.remaining_fiber_budget_db / 0.35) < 1e-12);
+  assert.ok(r.alternative_reach_km < r.reach_km);
+  for (const bad of [{ class_budget_db: 0 }, { split_ratio: 0 }, { attenuation_db_km: 0 }, { connector_count: -1 }]) assert.ok(_v1840({ ...base, ...bad }).error);
+});
+
+test("bounds: spec-v1841 computeFiberStrandCountPlanning -- standard-count rounding and installed cost reconcile", () => {
+  const base = { living_units: 2000, split_ratio: 32, terminal_ports: 8, spare_pct: 25, standard_counts: "12,24,48,72,96,144,216,288,432", route_length_ft: 52800, lower_material_cost_per_ft: 1.5, selected_material_cost_per_ft: 1.8, placement_cost_per_ft: 8 };
+  const r = _v1841(base);
+  assertFiniteNumericOutputs(r, "v1841");
+  assert.deepStrictEqual([r.feeder_fibers_required, r.feeder_with_spare, r.standard_without_spare, r.selected_standard_count], [63, 79, 72, 96]);
+  assert.ok(Math.abs(r.installed_cost_delta - 52800 * 0.3) < 1e-8);
+  assert.ok(r.selected_standard_count >= r.feeder_with_spare);
+  for (const bad of [{ living_units: 0 }, { split_ratio: 0 }, { terminal_ports: 0 }, { spare_pct: -1 }, { standard_counts: "none" }]) assert.ok(_v1841({ ...base, ...bad }).error);
+});
+
+test("bounds: spec-v1842 computeOpticalReturnLoss -- reflected powers add before conversion to dB", () => {
+  const base = { connector_count: 4, connector_reflectance_db: -50, unmated_end_count: 1, fiber_index: 1.468, required_orl_db: 32, apc_reflectance_db: -60 };
+  const r = _v1842(base);
+  assertFiniteNumericOutputs(r, "v1842");
+  assert.strictEqual(r.connector_pass, true);
+  assert.strictEqual(r.unmated_pass, false);
+  assert.ok(r.with_unmated_orl_db < r.connector_only_orl_db);
+  assert.ok(Math.abs(r.apc_orl_db - r.connector_only_orl_db - 10) < 1e-9);
+  for (const bad of [{ connector_count: 0 }, { connector_reflectance_db: 0 }, { unmated_end_count: -1 }, { fiber_index: 1 }, { required_orl_db: 0 }]) assert.ok(_v1842({ ...base, ...bad }).error);
+});
+
+test("bounds: spec-v1843 computeCableJettingDistance -- exact target fill determines annulus and air", () => {
+  const base = { duct_id_mm: 10, cable_od_mm: 8.5, fill_min_pct: 40, fill_max_pct: 60, optimal_fill_pct: 50, air_velocity_m_s: 25, pressure_bar_absolute: 10 };
+  const r = _v1843(base);
+  assertFiniteNumericOutputs(r, "v1843");
+  assert.ok(Math.abs(r.fill_ratio_pct - 72.25) < 1e-9);
+  assert.ok(Math.abs(r.optimal_cable_od_mm - 10 * Math.sqrt(0.5)) < 1e-12);
+  assert.ok(Math.abs(r.optimal_free_air_l_min - 589.0486225480861) < 1e-9);
+  assert.strictEqual(r.fill_status, "ABOVE WINDOW");
+  for (const bad of [{ duct_id_mm: 0 }, { cable_od_mm: 10 }, { fill_min_pct: 70 }, { optimal_fill_pct: 70 }, { air_velocity_m_s: 0 }, { pressure_bar_absolute: 0 }]) assert.ok(_v1843({ ...base, ...bad }).error);
+});
+
+test("bounds: spec-v1844 computeSpliceLossMismatch -- independent loss mechanisms add", () => {
+  const base = { mfd_1_um: 9.2, mfd_2_um: 8.6, lateral_offset_um: 1, cleave_angle_deg: 1, wavelength_nm: 1550, fiber_index: 1.468 };
+  const r = _v1844(base);
+  assertFiniteNumericOutputs(r, "v1844");
+  assert.ok(Math.abs(r.total_loss_db - (r.mfd_mismatch_loss_db + r.lateral_offset_loss_db + r.angular_loss_db)) < 1e-12);
+  assert.ok(Math.abs(r.lateral_2um_loss_db / r.lateral_1um_loss_db - 4) < 1e-12);
+  assert.ok(Math.abs(r.angular_2deg_loss_db / r.angular_1deg_loss_db - 4) < 1e-12);
+  for (const bad of [{ mfd_1_um: 0 }, { mfd_2_um: 0 }, { lateral_offset_um: -1 }, { cleave_angle_deg: 90 }, { wavelength_nm: 0 }, { fiber_index: 1 }]) assert.ok(_v1844({ ...base, ...bad }).error);
+});

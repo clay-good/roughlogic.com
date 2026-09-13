@@ -1651,6 +1651,15 @@ const RELATED = {
   "trend-log-storage": ["mstp-segment-loading","deadband-cycling-rate","loop-error-stackup"],
   "mstp-segment-loading": ["trend-log-storage","transmitter-span-scaling","voltage-drop"],
   "damper-actuator-torque": ["damper-authority","valve-authority","duct-leakage"],
+  // spec-v1837..v1844: fiber-optic outside plant.
+  "otdr-event-distance": ["fiber-slack-storage","fiber-loss-budget","splice-loss-mismatch"],
+  "chromatic-dispersion-reach": ["fiber-loss-budget","fiber-max-length","pon-split-loss-budget"],
+  "fiber-slack-storage": ["otdr-event-distance","splice-loss-mismatch","pulling-tension"],
+  "pon-split-loss-budget": ["fiber-loss-budget","fiber-max-length","optical-return-loss"],
+  "fiber-strand-count-planning": ["pon-split-loss-budget","fiber-slack-storage","fiber-loss-budget"],
+  "optical-return-loss": ["pon-split-loss-budget","fiber-loss-budget","splice-loss-mismatch"],
+  "cable-jetting-distance": ["pulling-tension","cable-bend-radius","fiber-slack-storage"],
+  "splice-loss-mismatch": ["fiber-loss-budget","optical-return-loss","otdr-event-distance"],
   // spec-v1845..v1850: snow and ice management band.
   "salt-application-rate": ["ice-melt-working-temperature","brine-batch-salinity","plow-route-cycle-time"],
   "brine-batch-salinity": ["salt-application-rate","ice-melt-working-temperature","tds-from-conductivity"],
