@@ -2,96 +2,96 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "d60331af87d393f5",
-      "date": "2026-09-13"
+      "sha": "0e3508f288e48ece",
+      "date": "2026-09-14"
     },
     "/tools/": {
-      "sha": "4809e2e2df9f2934",
-      "date": "2026-09-13"
+      "sha": "6fc39d75fd25944f",
+      "date": "2026-09-14"
     },
     "/groups/accounting/": {
-      "sha": "95b921c2f06d6202",
-      "date": "2026-09-13"
+      "sha": "5bc436b6df9893cb",
+      "date": "2026-09-14"
     },
     "/groups/agriculture/": {
-      "sha": "65c2e89907b9f0fc",
-      "date": "2026-09-13"
+      "sha": "8cffa8e73dbea23e",
+      "date": "2026-09-14"
     },
     "/groups/construction/": {
-      "sha": "dff16fcf50e2662a",
-      "date": "2026-09-13"
+      "sha": "9742ca4e9361081f",
+      "date": "2026-09-14"
     },
     "/groups/cross-trade/": {
-      "sha": "7c7d5db7a85a0399",
-      "date": "2026-09-13"
+      "sha": "643c966c36420595",
+      "date": "2026-09-14"
     },
     "/groups/educators/": {
-      "sha": "011dcf8dd35b71e7",
-      "date": "2026-09-13"
+      "sha": "7254070554affd7c",
+      "date": "2026-09-14"
     },
     "/groups/electrical/": {
-      "sha": "6d2b173d7e99f24e",
-      "date": "2026-09-13"
+      "sha": "e50d0dea86a19040",
+      "date": "2026-09-14"
     },
     "/groups/field/": {
-      "sha": "f7d37a77132fa99d",
-      "date": "2026-09-13"
+      "sha": "34fd22f1cc4bae3b",
+      "date": "2026-09-14"
     },
     "/groups/fire-ground/": {
-      "sha": "6b9f26373214f614",
-      "date": "2026-09-13"
+      "sha": "f326febc06f48a03",
+      "date": "2026-09-14"
     },
     "/groups/historical/": {
-      "sha": "90be7d784643b6f1",
-      "date": "2026-09-13"
+      "sha": "122a51571ce5bee2",
+      "date": "2026-09-14"
     },
     "/groups/hvac/": {
-      "sha": "ba0a4271bc9ee9e8",
-      "date": "2026-09-13"
+      "sha": "fe3e9875d0c98a45",
+      "date": "2026-09-14"
     },
     "/groups/kitchen/": {
-      "sha": "c9d1a71c0e364061",
-      "date": "2026-09-13"
+      "sha": "6060a595764c013d",
+      "date": "2026-09-14"
     },
     "/groups/lab/": {
-      "sha": "cfdf47792b9d397a",
-      "date": "2026-09-13"
+      "sha": "6d9beb32cb99b0ff",
+      "date": "2026-09-14"
     },
     "/groups/mechanic/": {
-      "sha": "187a7ae246b86284",
-      "date": "2026-09-13"
+      "sha": "c4de327fc0fadda9",
+      "date": "2026-09-14"
     },
     "/groups/plumbing/": {
-      "sha": "4a6738ec5f4fe7e0",
-      "date": "2026-09-13"
+      "sha": "de70c33a142e88f3",
+      "date": "2026-09-14"
     },
     "/groups/real-estate/": {
-      "sha": "f46b9c28967376ba",
-      "date": "2026-09-13"
+      "sha": "856825b77a117eb7",
+      "date": "2026-09-14"
     },
     "/groups/references/": {
-      "sha": "e394d16db962c726",
-      "date": "2026-09-13"
+      "sha": "2d2141c73ce39bde",
+      "date": "2026-09-14"
     },
     "/groups/restoration/": {
-      "sha": "e6dbc067db27b23e",
-      "date": "2026-09-13"
+      "sha": "36a415940bd377de",
+      "date": "2026-09-14"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "9036856d7166155f",
-      "date": "2026-09-13"
+      "sha": "6d1553b1da0b998f",
+      "date": "2026-09-14"
     },
     "/groups/stage/": {
-      "sha": "4f17cf31b4355b4b",
-      "date": "2026-09-13"
+      "sha": "162ae6b75e000e55",
+      "date": "2026-09-14"
     },
     "/groups/trucking/": {
-      "sha": "a03679ff15890335",
-      "date": "2026-09-13"
+      "sha": "aabe52450c552624",
+      "date": "2026-09-14"
     },
     "/groups/water/": {
-      "sha": "dcfbcf2015f86260",
-      "date": "2026-09-13"
+      "sha": "0f7a5d2ce6c873e1",
+      "date": "2026-09-14"
     },
     "/tools/aav-install-check/": {
       "sha": "4e1b1d5b33ca35e4",
@@ -1101,6 +1101,10 @@
       "sha": "a5c99d925ad5b17c",
       "date": "2026-09-01"
     },
+    "/tools/chilled-water-ride-through/": {
+      "sha": "ad3e6bf954cc4db8",
+      "date": "2026-09-14"
+    },
     "/tools/chiller-staging-point/": {
       "sha": "9c14cbb5b1c10017",
       "date": "2026-09-08"
@@ -1673,6 +1677,10 @@
       "sha": "d764360670c11487",
       "date": "2026-09-08"
     },
+    "/tools/containment-bypass-airflow/": {
+      "sha": "db0d912ee4aed9fb",
+      "date": "2026-09-14"
+    },
     "/tools/contents-packout-inventory/": {
       "sha": "c61409e09c565e86",
       "date": "2026-09-04"
@@ -1780,6 +1788,10 @@
     "/tools/covers-per-labor-hour/": {
       "sha": "302b263b3c55a4c0",
       "date": "2026-09-01"
+    },
+    "/tools/crac-sensible-derate/": {
+      "sha": "2488621a2375140e",
+      "date": "2026-09-14"
     },
     "/tools/crane-ground-bearing/": {
       "sha": "3372d70ee35934d0",
@@ -1916,6 +1928,10 @@
     "/tools/damper-authority/": {
       "sha": "f177c93342dd395e",
       "date": "2026-09-11"
+    },
+    "/tools/datacenter-pue/": {
+      "sha": "6fdc56eee1297b24",
+      "date": "2026-09-14"
     },
     "/tools/dc-shunt-sizing/": {
       "sha": "a57411c4f65bea41",
@@ -2150,8 +2166,8 @@
       "date": "2026-09-01"
     },
     "/tools/dp-flow-meter/": {
-      "sha": "61b1fe74dd9c8fbb",
-      "date": "2026-09-09"
+      "sha": "c333aaec542196e5",
+      "date": "2026-09-14"
     },
     "/tools/dp-flow-signal-scaling/": {
       "sha": "a49d04c8c4233bc0",
@@ -4945,6 +4961,10 @@
       "sha": "86f4d44c5b228bcf",
       "date": "2026-09-01"
     },
+    "/tools/pdu-branch-loading/": {
+      "sha": "f5adcfe1b165138a",
+      "date": "2026-09-14"
+    },
     "/tools/pearson-correlation/": {
       "sha": "9c270e18b6d0dc76",
       "date": "2026-09-01"
@@ -5581,6 +5601,10 @@
       "sha": "6ac10016790e9bc2",
       "date": "2026-09-01"
     },
+    "/tools/rack-power-density-airflow/": {
+      "sha": "5dd16d0aa5d5ea1b",
+      "date": "2026-09-14"
+    },
     "/tools/radial-chip-thinning/": {
       "sha": "5cef5c38e9a3c09d",
       "date": "2026-09-01"
@@ -5636,6 +5660,10 @@
     "/tools/rainwater-yield/": {
       "sha": "67d16289ee1c4a20",
       "date": "2026-09-01"
+    },
+    "/tools/raised-floor-tile-airflow/": {
+      "sha": "0fa4363e614a1f58",
+      "date": "2026-09-14"
     },
     "/tools/ramp-detail-check/": {
       "sha": "b2359d8a3a61f2d9",
@@ -6404,6 +6432,10 @@
     "/tools/serial-dilution/": {
       "sha": "cda631c88213d45f",
       "date": "2026-09-01"
+    },
+    "/tools/server-inlet-envelope/": {
+      "sha": "ab9c905fb8e16c44",
+      "date": "2026-09-14"
     },
     "/tools/service-conductor-sizing/": {
       "sha": "3afae4fbc2222f58",
@@ -7952,6 +7984,10 @@
     "/tools/upgrade-roi/": {
       "sha": "23b5aa8d94b89ea8",
       "date": "2026-09-01"
+    },
+    "/tools/ups-module-redundancy/": {
+      "sha": "6bffc96905a2be9b",
+      "date": "2026-09-14"
     },
     "/tools/ut-thickness-velocity/": {
       "sha": "229dc7211e3f234e",

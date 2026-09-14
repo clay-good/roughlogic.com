@@ -53643,3 +53643,89 @@ test("bounds: spec-v1844 computeSpliceLossMismatch -- independent loss mechanism
   assert.ok(Math.abs(r.angular_2deg_loss_db / r.angular_1deg_loss_db - 4) < 1e-12);
   for (const bad of [{ mfd_1_um: 0 }, { mfd_2_um: 0 }, { lateral_offset_um: -1 }, { cleave_angle_deg: 90 }, { wavelength_nm: 0 }, { fiber_index: 1 }]) assert.ok(_v1844({ ...base, ...bad }).error);
 });
+
+// =====================================================================
+// spec-v1800..v1808: data-center and mission-critical calculations.
+// =====================================================================
+import {
+  computeDatacenterPue as _v1800,
+  computeRackPowerDensityAirflow as _v1801,
+  computeUpsModuleRedundancy as _v1802,
+  computeCracSensibleDerate as _v1803,
+  computeContainmentBypassAirflow as _v1804,
+  computePduBranchLoading as _v1805,
+  computeChilledWaterRideThrough as _v1806,
+  computeServerInletEnvelope as _v1807,
+  computeRaisedFloorTileAirflow as _v1808,
+} from "../../calc-datacenter.js";
+
+test("bounds: spec-v1800 computeDatacenterPue -- energy falls even when the ratio worsens", () => {
+  const base = { it_load_kw: 500, cooling_kw: 210, ups_loss_kw: 35, miscellaneous_kw: 15, tariff_per_kwh: 0.1, target_pue: 1.3, reduced_it_kw: 400, reduced_cooling_kw: 175, reduced_ups_loss_kw: 30 };
+  const r = _v1800(base); assertFiniteNumericOutputs(r, "v1800");
+  assert.ok(r.reduced_pue > r.pue && r.reduced_annual_cost < r.annual_cost);
+  assert.ok(Math.abs(r.total_facility_kw - 760) < 1e-12);
+  for (const bad of [{ it_load_kw: 0 }, { tariff_per_kwh: 0 }, { cooling_kw: -1 }, { target_pue: 0.99 }, { reduced_it_kw: 0 }]) assert.ok(_v1800({ ...base, ...bad }).error);
+});
+
+test("bounds: spec-v1801 computeRackPowerDensityAirflow -- airflow is inverse to delta-T", () => {
+  const base = { rack_load_kw: 8, equipment_delta_t_f: 20, standard_tile_cfm: 500, comparison_rack_kw: 15, high_flow_tile_cfm: 900, alternative_delta_t_f: 30 };
+  const r = _v1801(base); assertFiniteNumericOutputs(r, "v1801");
+  assert.ok(Math.abs(r.comparison_required_cfm / r.alternative_delta_t_cfm - 1.5) < 1e-12);
+  assert.ok(Math.abs(r.comparison_required_cfm / r.comparison_high_flow_tiles_required - 900) < 1e-9);
+  for (const key of ["rack_load_kw", "equipment_delta_t_f", "standard_tile_cfm", "comparison_rack_kw", "high_flow_tile_cfm", "alternative_delta_t_f"]) assert.ok(_v1801({ ...base, [key]: 0 }).error);
+});
+
+test("bounds: spec-v1802 computeUpsModuleRedundancy -- redundancy lowers utilization and raises loss", () => {
+  const base = { it_load_kw: 500, power_factor: 0.9, module_rating_kva: 250, n_plus_one_efficiency_pct: 95.5, two_n_efficiency_pct: 94, tariff_per_kwh: 0.1, cooling_cop: 3 };
+  const r = _v1802(base); assertFiniteNumericOutputs(r, "v1802");
+  assert.deepStrictEqual([r.required_modules, r.n_plus_one_modules, r.two_n_modules], [3, 4, 6]);
+  assert.ok(r.required_load_pct > r.n_plus_one_load_pct && r.n_plus_one_load_pct > r.two_n_load_pct && r.loss_delta_kw > 0);
+  for (const bad of [{ it_load_kw: 0 }, { power_factor: 0 }, { module_rating_kva: 0 }, { n_plus_one_efficiency_pct: 101 }, { cooling_cop: 0 }]) assert.ok(_v1802({ ...base, ...bad }).error);
+});
+
+test("bounds: spec-v1803 computeCracSensibleDerate -- capacity follows return-air delta-T", () => {
+  const base = { airflow_cfm: 12000, supply_temp_f: 55, return_temp_f: 75, contained_return_temp_f: 85, bypass_return_temp_f: 68 };
+  const r = _v1803(base); assertFiniteNumericOutputs(r, "v1803");
+  assert.ok(Math.abs(r.contained_change_pct - 50) < 1e-12 && Math.abs(r.bypass_change_pct + 35) < 1e-12);
+  for (const bad of [{ airflow_cfm: 0 }, { return_temp_f: 55 }, { contained_return_temp_f: 55 }, { bypass_return_temp_f: 55 }]) assert.ok(_v1803({ ...base, ...bad }).error);
+});
+
+test("bounds: spec-v1804 computeContainmentBypassAirflow -- supply balance closes in normal and failure cases", () => {
+  const base = { it_load_kw: 500, equipment_delta_t_f: 20, unit_count: 8, airflow_per_unit_cfm: 12000, supply_temp_f: 65, exhaust_temp_f: 85, fan_power_per_unit_kw: 7.5, tariff_per_kwh: 0.1 };
+  const r = _v1804(base); assertFiniteNumericOutputs(r, "v1804");
+  assert.ok(Math.abs(r.supply_airflow_cfm - r.it_airflow_cfm - r.bypass_cfm) < 1e-9);
+  assert.ok(r.one_failed_margin_cfm > 0 && r.two_failed_margin_cfm < 0 && r.matched_fan_power_kw < r.current_fan_power_kw);
+  for (const bad of [{ it_load_kw: 0 }, { equipment_delta_t_f: 0 }, { unit_count: 0 }, { exhaust_temp_f: 65 }, { fan_power_per_unit_kw: -1 }]) assert.ok(_v1804({ ...base, ...bad }).error);
+});
+
+test("bounds: spec-v1805 computePduBranchLoading -- a filled A/B pair overloads either survivor", () => {
+  const base = { line_voltage_v: 208, phase_configuration: "three_phase", breaker_rating_a: 30, continuous_load_pct: 80, power_factor: 0.99, device_draw_w: 450 };
+  const r = _v1805(base); assertFiniteNumericOutputs(r, "v1805");
+  assert.strictEqual(r.supported_device_count, 19); assert.ok(r.failover_current_a <= r.usable_current_a && r.pair_filled_survivor_breaker_pct > 100);
+  for (const bad of [{ line_voltage_v: 0 }, { phase_configuration: "dc" }, { breaker_rating_a: 0 }, { continuous_load_pct: 101 }, { power_factor: 0 }, { device_draw_w: 0 }]) assert.ok(_v1805({ ...base, ...bad }).error);
+});
+
+test("bounds: spec-v1806 computeChilledWaterRideThrough -- stored energy and required volume are inverses", () => {
+  const base = { loop_volume_gal: 5000, it_load_kw: 500, supply_temp_f: 45, max_temp_f: 60, generator_transfer_min: 0.5, chiller_restart_min: 7, smaller_loop_volume_gal: 1200 };
+  const r = _v1806(base); assertFiniteNumericOutputs(r, "v1806");
+  assert.ok(r.ride_through_min > r.required_restart_min && r.smaller_loop_shortfall_min > 0);
+  assert.ok(Math.abs(r.required_volume_gal / base.smaller_loop_volume_gal - r.required_restart_min / r.smaller_loop_ride_min) < 1e-12);
+  for (const bad of [{ loop_volume_gal: 0 }, { it_load_kw: 0 }, { max_temp_f: 45 }, { generator_transfer_min: -1 }, { smaller_loop_volume_gal: 0 }]) assert.ok(_v1806({ ...base, ...bad }).error);
+});
+
+test("bounds: spec-v1807 computeServerInletEnvelope -- dew point catches the hot humid corner", () => {
+  const base = { dry_bulb_f: 78, relative_humidity_pct: 45, recommended_min_f: 64.4, recommended_max_f: 80.6, allowable_min_f: 59, allowable_max_f: 89.6, upper_dew_point_f: 59, upper_rh_pct: 60, alternative_temp_f: 82, alternative_rh_pct: 50 };
+  const r = _v1807(base); assertFiniteNumericOutputs(r, "v1807");
+  assert.ok(r.recommended_pass && r.dew_point_pass && r.alternative_allowable_pass && !r.alternative_dew_point_pass);
+  assert.ok(r.alternative_dew_point_f > r.warm_same_rh_dew_point_f && r.warm_same_rh_dew_point_f > r.dew_point_f);
+  for (const bad of [{ dry_bulb_f: 141 }, { relative_humidity_pct: 0 }, { recommended_min_f: 90 }, { allowable_max_f: 50 }, { alternative_rh_pct: 101 }]) assert.ok(_v1807({ ...base, ...bad }).error);
+});
+
+test("bounds: spec-v1808 computeRaisedFloorTileAirflow -- flow and pressure obey square laws", () => {
+  const base = { tile_area_ft2: 4, open_area_pct: 25, discharge_coefficient: 0.7, plenum_pressure_in_wc: 0.05, total_supply_cfm: 96000, open_tile_count: 150, high_flow_open_pct: 56, reduced_pressure_in_wc: 0.02, increased_tile_count: 200 };
+  const r = _v1808(base); assertFiniteNumericOutputs(r, "v1808");
+  assert.ok(Math.abs(r.high_flow_ratio - 2.24) < 1e-12);
+  assert.ok(Math.abs(r.reduced_pressure_airflow_cfm / r.tile_airflow_cfm - Math.sqrt(0.02 / 0.05)) < 1e-12);
+  assert.ok(Math.abs(r.increased_count_pressure_in_wc / r.required_plenum_pressure_in_wc - Math.pow(150 / 200, 2)) < 1e-12);
+  for (const bad of [{ tile_area_ft2: 0 }, { open_area_pct: 0 }, { discharge_coefficient: 2 }, { plenum_pressure_in_wc: 0 }, { open_tile_count: 0 }, { reduced_pressure_in_wc: 0 }]) assert.ok(_v1808({ ...base, ...bad }).error);
+});

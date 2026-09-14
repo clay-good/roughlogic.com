@@ -1,10 +1,10 @@
 # Scope: The 2026-09-11 Trade Expansion (specs v1750-v1850, 101 New Tiles)
 
-> **Status: ACTIVE (updated 2026-09-13). 24 of 101 tiles are wired; catalog 2,082 -> 2,106.**
+> **Status: ACTIVE (updated 2026-09-13). 33 of 101 tiles are wired; catalog 2,082 -> 2,115.**
 > All 101 spec files exist (`spec-v1750.md` through `spec-v1850.md`) and are pushed.
-> Wired bands: metal finishing v1824-v1827, building automation v1818-v1823,
+> Wired bands: data center v1800-v1808, metal finishing v1824-v1827, building automation v1818-v1823,
 > snow and ice management v1845-v1850, and fiber-optic outside plant v1837-v1844.
-> The remaining 77 specs stay proposed.
+> The remaining 68 specs stay proposed.
 > Inherits the spec-v106 trades-only charter and every convention through spec-v1749.
 
 Repository: github.com/clay-good/roughlogic.com -- US standards only.

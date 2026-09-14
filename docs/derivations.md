@@ -1959,6 +1959,15 @@ cross-check.
 | calc-cross.js | `renderTipOut` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-cross.js | `renderUnitConverter` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-cross.js | `renderUpgradeROI` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-datacenter.js | `computeChilledWaterRideThrough` | `{ loop_volume_gal = 0, it_load_kw = 0, supply_temp_f = 0, max_temp_f = 0, gen...` | _ | _ | _ |
+| calc-datacenter.js | `computeContainmentBypassAirflow` | `{ it_load_kw = 0, equipment_delta_t_f = 0, unit_count = 0, airflow_per_unit_c...` | _ | _ | _ |
+| calc-datacenter.js | `computeCracSensibleDerate` | `{ airflow_cfm = 0, supply_temp_f = 0, return_temp_f = 0, contained_return_tem...` | _ | _ | _ |
+| calc-datacenter.js | `computeDatacenterPue` | `{ it_load_kw = 0, cooling_kw = 0, ups_loss_kw = 0, miscellaneous_kw = 0, tari...` | _ | _ | _ |
+| calc-datacenter.js | `computePduBranchLoading` | `{ line_voltage_v = 0, phase_configuration = "three_phase", breaker_rating_a =...` | _ | _ | _ |
+| calc-datacenter.js | `computeRackPowerDensityAirflow` | `{ rack_load_kw = 0, equipment_delta_t_f = 0, standard_tile_cfm = 0, compariso...` | _ | _ | _ |
+| calc-datacenter.js | `computeRaisedFloorTileAirflow` | `{ tile_area_ft2 = 0, open_area_pct = 0, discharge_coefficient = 0, plenum_pre...` | _ | _ | _ |
+| calc-datacenter.js | `computeServerInletEnvelope` | `{ dry_bulb_f = 0, relative_humidity_pct = 0, recommended_min_f = 0, recommend...` | _ | _ | _ |
+| calc-datacenter.js | `computeUpsModuleRedundancy` | `{ it_load_kw = 0, power_factor = 0, module_rating_kva = 0, n_plus_one_efficie...` | _ | _ | _ |
 | calc-demo.js | `computeAbatementContainment` | `{ room_len_ft, room_wid_ft, room_ht_ft, ach_target = 4, nam_cfm = 1500, debri...` | _ | _ | _ |
 | calc-demo.js | `computeAbatementWasteContainers` | `{ area_ft2 = 0, thickness_in = 0, bulking_factor = 2, bag_volume_ft3 = 3, bag...` | _ | _ | _ |
 | calc-demo.js | `computeFloodCutQuantity` | `{ wall_run_lf, cut_height_in = 24, two_sided = false, insulated = false } = {}` | _ | _ | _ |
@@ -3771,7 +3780,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2357.
+Row count: 2366.
 
 <!-- END function-corpus-v14 -->
 
@@ -3839,7 +3848,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (247 tiles)
+### Group A Electrical (250 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3897,6 +3906,7 @@ per spec-v14 §13.1 second paragraph.
 | `continuous-load-ocpd` | Continuous-Load OCPD and Conductor at 125% (NEC 210.20 / 215.3) | NEC 2023 210.20(A) / 215.3 / 240.6(A); spec-v280 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `copper-resistance` | Conductor Resistance at Temperature | NFPA; NEC Table 8 gives 1.93 ohm/1000 ft at 75 C uncoated coppe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `counterpoise-resistance` | Counterpoise and Radial Ground Array Resistance | Project (first-principles); IEEE 80, IEEE 81 for measurement and the utility groundin... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `datacenter-pue` | Data Center PUE and Cooling Overhead | Project (first-principles); The Green Grid measurement boundary and site meters govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dc-shunt-sizing` | DC Ammeter Shunt Sizing | DC current-shunt sizing (Ohm's law); R = 0.05/100 = 0.0005 ohm; I = 100*25/50 = 50 A; P = 100*... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `delta-wye-line-phase` | Wye / Delta Line-to-Phase Voltage and Current | First-principles three-phase theory; spec-v128 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dp-flow-signal-scaling` | DP (Square-Root) Flow Transmitter 4-20 mA Scaling | DP flow transmitter square-root extra...; fraction = (12-4)/16 = 0.5; flow% = sqrt(0.5) = 70.71%; v... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3993,6 +4003,7 @@ per spec-v14 §13.1 second paragraph.
 | `otdr-event-distance` | OTDR Event Distance and Index of Refraction | Project (first-principles); the cable datasheet, route as-built, and applicable test ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `panel-rebalance` | Panel Loading and Phase Rebalance | Project (first-principles); Six-circuit panel skewed onto A (65 A) vs B (22 A) vs C (... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `parallel-conductor-derate` | Parallel Conductor Ampacity | NEC (NFPA 70) Article 310 parallel-co...; 3/0 Cu at 200 A, N=3, no derate -> 600 A total | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pdu-branch-loading` | PDU Branch Loading and Failover Capacity | Project (first-principles); the NEC and authority having jurisdiction govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pf-correction` | Power Factor Correction Capacitor | Project (first-principles); 100 kW / pf 0.75 -> 0.95 / 480 V three-phase -> 55.32 kVA... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `phase-balance` | Phase Balance Across Panels | Project (first-principles); Four circuits {A:1500, A:800, B:600, C:700} -> 141.67% in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pid-tuning-ziegler-nichols` | PID Loop Tuning (Ziegler-Nichols Closed-Loop) | Ziegler-Nichols closed-loop PID tunin...; Kp = 0.6*4 = 2.4; Ti = 0.5*2 = 1.0; Td = 0.125*2 = 0.25; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4073,6 +4084,7 @@ per spec-v14 §13.1 second paragraph.
 | `transmitter-span-scaling` | Transmitter Span, Turndown, and 4-20 mA Accuracy | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transverse-wind-load-conductor` | Transverse Wind Load on Conductor and Pole | Project (first-principles); the applicable NESC edition and a qualified line designer... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `turbine-density-correction` | Wind Turbine Output Air-Density Correction | Project (first-principles); the manufacturer's power curve and IEC 61400-12 govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `ups-module-redundancy` | UPS Module Count, Redundancy, and Efficiency | Project (first-principles); manufacturer efficiency curves and facility class govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vfd-energy-savings` | VFD Retrofit Energy and Cost Savings (Affinity Cube Law) | US DOE motor/pump-system energy method; spec-v230 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `vfd-reflected-wave` | VFD Reflected-Wave Cable Length Limit | VFD reflected-wave cable-length limit...; 480 V, 0.1 us rise, 50% velocity, 100 ft -> L_crit 24.6 f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `voltage-drop` | Voltage Drop | Project (first-principles); Standard single-phase voltage-drop derivation; K=12.9 ohm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4250,7 +4262,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (207 tiles)
+### Group C HVAC (213 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4280,6 +4292,7 @@ per spec-v14 §13.1 second paragraph.
 | `caz-depressurization-limit` | Combustion Appliance Zone Depressurization Limit (Worst-Case Backdraft Test) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cfm-per-ton` | CFM per Ton | Project (first-principles); ACCA Manual D / industry rule of thumb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `chilled-water-delta-t` | Chilled-Water Low Delta-T Screen and Pump Penalty | Project (first-principles); Q = 500 x gpm x delta-T; cube law on flow | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `chilled-water-ride-through` | Chilled-Water Thermal Ride-Through | Project (first-principles); usable volume and chiller restart sequence govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `chiller-staging-point` | Chiller Staging Point and Part-Load Efficiency | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `chiller-tons` | Chiller Tonnage (Delta-T and GPM) | ASHRAE; Q = 240*500*10 = 1,200,000 BTU/hr; tons = 1,200,000/12000... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `chimney-draft` | Theoretical Chimney Draft | ASHRAE Handbook HVAC Systems / NFPA 211; 30 ft stack, 60 F ambient, 400 F mean flue, 14.7 psia -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4308,9 +4321,11 @@ per spec-v14 §13.1 second paragraph.
 | `condenser-heat-rejection` | Condenser Total Heat of Rejection | Total heat of rejection THR = Q_evap ...; spec-v322 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `condenser-td-head-pressure` | Condenser TD and Condensing Temperature (Dry or Wet Bulb) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `condensing-flue-condensate` | Condensing Appliance Flue Condensate Rate | Condensing appliance flue condensate ...; water = 1 therm/hr x 9.4 = 9.4 lb/hr; condensate = 9.4 x ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `containment-bypass-airflow` | Hot-Aisle Containment Bypass Airflow | Project (first-principles); rack inlet surveys and commissioning govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `continuous-insulation-ratio` | Continuous vs Cavity Insulation Ratio for Condensation Control | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cooling-coil-total-load` | Cooling Coil Total Load from Enthalpy Difference | ASHRAE Fundamentals; spec-v376 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cooling-tower` | Cooling Tower Approach and Range | CTI ATC-105 cooling-tower test code; 95 F in / 85 F out / 75 F wet-bulb / 300 gpm / 15 kW fan ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `crac-sensible-derate` | CRAC Sensible Capacity and Return-Air Derate | Project (first-principles); manufacturer performance and ASHRAE TC 9.9 govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cryogenic-boiloff` | Cryogenic Tank Boil-Off Rate and Hold Time | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `damper-actuator-torque` | Damper Actuator Torque and Sizing | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `damper-authority` | Control Damper Authority and Leakage | Project (first-principles); damper dP / branch dP; leakage as sqrt(dP) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4415,7 +4430,9 @@ per spec-v14 §13.1 second paragraph.
 | `pump-impeller-trim` | Pump Impeller Trim for a Balanced Flow | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pump-specific-speed` | Pump Specific Speed and Impeller Type | Hydraulic Institute specific speed; spec-v307 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pump-suction-specific-speed` | Pump Suction Specific Speed (Nss) | Hydraulic Institute suction specific ...; spec-v629 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `rack-power-density-airflow` | Rack Power Density and Cooling Airflow | Project (first-principles); equipment airflow and ASHRAE TC 9.9 limits govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `radiant-floor-output` | Radiant Floor Heat Output | radiant-panel practice; spec-v442 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `raised-floor-tile-airflow` | Raised-Floor Tile Airflow and Plenum Pressure | Project (first-principles); manufacturer curves and under-floor survey govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `receiver-pumpdown-capacity` | Refrigerant Receiver Pump-Down Capacity | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `recovery-cylinder` | Recovery-Cylinder 80% Fill | DOT / AHRI 700 / EPA Section 608 reco...; spec-v102 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `refractory-shell-temperature` | Refractory Lining Heat Loss, Interface Temperatures, and Shell Temperature | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4438,6 +4455,7 @@ per spec-v14 §13.1 second paragraph.
 | `safety-valve-capacity` | Boiler Safety Valve Relieving Capacity | Project (first-principles); ASME BPVC Sections I and IV, the National Board, and the ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `secondary-glycol-loop` | Secondary Coolant (Glycol) Loop Flow and Pump Penalty | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `seer-eer` | SEER and EER Conversion | Project (engineering approximation); EER 12 -> SEER 13.44 / SEER2 estimate 12.768 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `server-inlet-envelope` | Server Inlet Temperature and Humidity Envelope | Project (first-principles); current ASHRAE TC 9.9 and equipment limits govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shr` | Sensible Heat Ratio | ASHRAE Handbook (Fundamentals); 24,000 BTU/hr sensible / 30,000 BTU/hr total -> SHR 0.80 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shr-latent` | Sensible Heat Ratio / Latent Split (ASHRAE) | ASHRAE; Q_s = 1.08 * 1200 * 20 = 25,920; Q_l = 36,000 - 25,920 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `silencer-insertion-loss` | Duct Silencer Insertion Loss and Pressure Drop | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -6050,6 +6068,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2106. Fixture-covered or reference-cadence: 2106 / 2106.
+Tile count: 2115. Fixture-covered or reference-cadence: 2115 / 2115.
 
 <!-- END tile-index-v14 -->

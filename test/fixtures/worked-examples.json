@@ -111156,6 +111156,51 @@
     "angular_2deg_loss_db": { "value": 0.9913081561976441, "tolerance": { "pct": 0.5 } },
     "total_loss_db": { "value": 0.47281096031089775, "tolerance": { "pct": 0.5 } }
    }
+  },
+  {
+   "tile_id": "datacenter-pue", "source_publisher": "Project (first-principles)", "source_title": "Data Center PUE -- the spec-v1800 worked example, recomputed", "source_edition_or_year": "spec-v1800 of scope-trade-expansion-3, 2026-09-13", "source_section_or_page": "The Green Grid measurement boundary and site meters govern", "verified_by": "rl", "verified_on": "2026-09-13",
+   "inputs": { "it_load_kw": 500, "cooling_kw": 210, "ups_loss_kw": 35, "miscellaneous_kw": 15, "tariff_per_kwh": 0.1, "target_pue": 1.3, "reduced_it_kw": 400, "reduced_cooling_kw": 175, "reduced_ups_loss_kw": 30 },
+   "outputs": { "pue": { "value": 1.52, "tolerance": { "pct": 0.5 } }, "dcie_pct": { "value": 65.78947368421052, "tolerance": { "pct": 0.5 } }, "annual_cost": { "value": 665760, "tolerance": { "pct": 0.5 } }, "target_annual_savings": { "value": 96360, "tolerance": { "pct": 0.5 } }, "reduced_pue": { "value": 1.55, "tolerance": { "pct": 0.5 } }, "reduced_annual_savings": { "value": 122640, "tolerance": { "pct": 0.5 } } }
+  },
+  {
+   "tile_id": "rack-power-density-airflow", "source_publisher": "Project (first-principles)", "source_title": "Rack Power Density Airflow -- the spec-v1801 worked example, recomputed", "source_edition_or_year": "spec-v1801 of scope-trade-expansion-3, 2026-09-13", "source_section_or_page": "equipment airflow and ASHRAE TC 9.9 limits govern", "verified_by": "rl", "verified_on": "2026-09-13",
+   "inputs": { "rack_load_kw": 8, "equipment_delta_t_f": 20, "standard_tile_cfm": 500, "comparison_rack_kw": 15, "high_flow_tile_cfm": 900, "alternative_delta_t_f": 30 },
+   "outputs": { "required_cfm": { "value": 1263.7037037037037, "tolerance": { "pct": 0.5 } }, "standard_tiles_required": { "value": 2.5274074074074075, "tolerance": { "pct": 0.5 } }, "comparison_required_cfm": { "value": 2369.4444444444443, "tolerance": { "pct": 0.5 } }, "comparison_high_flow_tiles_required": { "value": 2.632716049382716, "tolerance": { "pct": 0.5 } }, "alternative_airflow_reduction_pct": { "value": 33.33333333333334, "tolerance": { "pct": 0.5 } } }
+  },
+  {
+   "tile_id": "ups-module-redundancy", "source_publisher": "Project (first-principles)", "source_title": "UPS Redundancy -- the spec-v1802 worked example, recomputed", "source_edition_or_year": "spec-v1802 of scope-trade-expansion-3, 2026-09-13", "source_section_or_page": "manufacturer efficiency curves and facility class govern", "verified_by": "rl", "verified_on": "2026-09-13",
+   "inputs": { "it_load_kw": 500, "power_factor": 0.9, "module_rating_kva": 250, "n_plus_one_efficiency_pct": 95.5, "two_n_efficiency_pct": 94, "tariff_per_kwh": 0.1, "cooling_cop": 3 },
+   "outputs": { "apparent_power_kva": { "value": 555.5555555555555, "tolerance": { "pct": 0.5 } }, "required_modules": { "value": 3, "tolerance": { "abs": 0 } }, "n_plus_one_modules": { "value": 4, "tolerance": { "abs": 0 } }, "two_n_modules": { "value": 6, "tolerance": { "abs": 0 } }, "loss_delta_kw": { "value": 8.354684192937501, "tolerance": { "pct": 0.5 } }, "annual_total_penalty_delta": { "value": 9758.271137351001, "tolerance": { "pct": 0.5 } } }
+  },
+  {
+   "tile_id": "crac-sensible-derate", "source_publisher": "Project (first-principles)", "source_title": "CRAC Sensible Derate -- the spec-v1803 worked example, recomputed", "source_edition_or_year": "spec-v1803 of scope-trade-expansion-3, 2026-09-13", "source_section_or_page": "manufacturer performance and ASHRAE TC 9.9 govern", "verified_by": "rl", "verified_on": "2026-09-13",
+   "inputs": { "airflow_cfm": 12000, "supply_temp_f": 55, "return_temp_f": 75, "contained_return_temp_f": 85, "bypass_return_temp_f": 68 },
+   "outputs": { "capacity_btu_h": { "value": 259200, "tolerance": { "pct": 0.5 } }, "capacity_tons": { "value": 21.6, "tolerance": { "pct": 0.5 } }, "contained_capacity_btu_h": { "value": 388800, "tolerance": { "pct": 0.5 } }, "contained_change_pct": { "value": 50, "tolerance": { "pct": 0.5 } }, "bypass_change_pct": { "value": -35, "tolerance": { "pct": 0.5 } } }
+  },
+  {
+   "tile_id": "containment-bypass-airflow", "source_publisher": "Project (first-principles)", "source_title": "Containment Bypass Airflow -- the spec-v1804 worked example, recomputed", "source_edition_or_year": "spec-v1804 of scope-trade-expansion-3, 2026-09-13", "source_section_or_page": "rack inlet surveys and commissioning govern", "verified_by": "rl", "verified_on": "2026-09-13",
+   "inputs": { "it_load_kw": 500, "equipment_delta_t_f": 20, "unit_count": 8, "airflow_per_unit_cfm": 12000, "supply_temp_f": 65, "exhaust_temp_f": 85, "fan_power_per_unit_kw": 7.5, "tariff_per_kwh": 0.1 },
+   "outputs": { "it_airflow_cfm": { "value": 78981.48148148147, "tolerance": { "pct": 0.5 } }, "bypass_fraction_pct": { "value": 17.72762345679013, "tolerance": { "pct": 0.5 } }, "return_temp_f": { "value": 81.45447530864197, "tolerance": { "pct": 0.5 } }, "annual_fan_savings": { "value": 23290.353018846235, "tolerance": { "pct": 0.5 } }, "two_failed_margin_cfm": { "value": -6981.4814814814745, "tolerance": { "pct": 0.5 } } }
+  },
+  {
+   "tile_id": "pdu-branch-loading", "source_publisher": "Project (first-principles)", "source_title": "PDU Branch Loading -- the spec-v1805 worked example, recomputed", "source_edition_or_year": "spec-v1805 of scope-trade-expansion-3, 2026-09-13", "source_section_or_page": "the NEC and authority having jurisdiction govern", "verified_by": "rl", "verified_on": "2026-09-13",
+   "inputs": { "line_voltage_v": 208, "phase_configuration": "three_phase", "breaker_rating_a": 30, "continuous_load_pct": 80, "power_factor": 0.99, "device_draw_w": 450 },
+   "outputs": { "usable_current_a": { "value": 24, "tolerance": { "pct": 0.5 } }, "branch_capacity_kw": { "value": 8.559933655069997, "tolerance": { "pct": 0.5 } }, "supported_device_count": { "value": 19, "tolerance": { "abs": 0 } }, "failover_current_a": { "value": 23.972148414779046, "tolerance": { "pct": 0.5 } }, "pair_filled_survivor_breaker_pct": { "value": 159.81432276519362, "tolerance": { "pct": 0.5 } } }
+  },
+  {
+   "tile_id": "chilled-water-ride-through", "source_publisher": "Project (first-principles)", "source_title": "Chilled-Water Ride-Through -- the spec-v1806 worked example, recomputed", "source_edition_or_year": "spec-v1806 of scope-trade-expansion-3, 2026-09-13", "source_section_or_page": "usable volume and chiller restart sequence govern", "verified_by": "rl", "verified_on": "2026-09-13",
+   "inputs": { "loop_volume_gal": 5000, "it_load_kw": 500, "supply_temp_f": 45, "max_temp_f": 60, "generator_transfer_min": 0.5, "chiller_restart_min": 7, "smaller_loop_volume_gal": 1200 },
+   "outputs": { "stored_cooling_btu": { "value": 625500, "tolerance": { "pct": 0.5 } }, "ride_through_min": { "value": 21.998827667057444, "tolerance": { "pct": 0.5 } }, "ride_margin_min": { "value": 14.498827667057444, "tolerance": { "pct": 0.5 } }, "smaller_loop_shortfall_min": { "value": 2.2202813599062132, "tolerance": { "pct": 0.5 } }, "required_volume_gal": { "value": 1704.6362909672264, "tolerance": { "pct": 0.5 } } }
+  },
+  {
+   "tile_id": "server-inlet-envelope", "source_publisher": "Project (first-principles)", "source_title": "Server Inlet Envelope -- the spec-v1807 worked example, recomputed", "source_edition_or_year": "spec-v1807 of scope-trade-expansion-3, 2026-09-13", "source_section_or_page": "current ASHRAE TC 9.9 and equipment limits govern", "verified_by": "rl", "verified_on": "2026-09-13",
+   "inputs": { "dry_bulb_f": 78, "relative_humidity_pct": 45, "recommended_min_f": 64.4, "recommended_max_f": 80.6, "allowable_min_f": 59, "allowable_max_f": 89.6, "upper_dew_point_f": 59, "upper_rh_pct": 60, "alternative_temp_f": 82, "alternative_rh_pct": 50 },
+   "outputs": { "dew_point_f": { "value": 54.91676593032166, "tolerance": { "pct": 0.5 } }, "dew_point_margin_f": { "value": 4.0832340696783405, "tolerance": { "pct": 0.5 } }, "warm_same_rh_dew_point_f": { "value": 58.53506442390163, "tolerance": { "pct": 0.5 } }, "alternative_dew_point_f": { "value": 61.498353941455896, "tolerance": { "pct": 0.5 } }, "alternative_dew_point_margin_f": { "value": -2.498353941455896, "tolerance": { "pct": 0.5 } } }
+  },
+  {
+   "tile_id": "raised-floor-tile-airflow", "source_publisher": "Project (first-principles)", "source_title": "Raised-Floor Tile Airflow -- the spec-v1808 worked example, recomputed", "source_edition_or_year": "spec-v1808 of scope-trade-expansion-3, 2026-09-13", "source_section_or_page": "manufacturer curves and under-floor survey govern", "verified_by": "rl", "verified_on": "2026-09-13",
+   "inputs": { "tile_area_ft2": 4, "open_area_pct": 25, "discharge_coefficient": 0.7, "plenum_pressure_in_wc": 0.05, "total_supply_cfm": 96000, "open_tile_count": 150, "high_flow_open_pct": 56, "reduced_pressure_in_wc": 0.02, "increased_tile_count": 200 },
+   "outputs": { "tile_airflow_cfm": { "value": 626.881657492066, "tolerance": { "pct": 0.5 } }, "high_flow_airflow_cfm": { "value": 1404.2149127822279, "tolerance": { "pct": 0.5 } }, "reduced_pressure_airflow_cfm": { "value": 396.4747722112972, "tolerance": { "pct": 0.5 } }, "required_plenum_pressure_in_wc": { "value": 0.052114530204718436, "tolerance": { "pct": 0.5 } }, "increased_count_pressure_change_pct": { "value": -43.75000000000001, "tolerance": { "pct": 0.5 } } }
   }
  ]
 }

@@ -2247,6 +2247,16 @@ const RELATED = {
   "spore-io-ratio": ["air-sample-volume","mold-conditions","mold-remediation-level"],
   "hardwood-floor-drying-mat": ["class-of-loss-screen","desiccant-airflow-sizing","wood-emc"],
   "mold-cleaning-labor": ["mold-remediation-level","ppe","antimicrobial-dilution"],
+  // spec-v1800..v1808 data-center and mission-critical facilities band.
+  "datacenter-pue": ["ups-module-redundancy","containment-bypass-airflow","rack-power-density-airflow"],
+  "rack-power-density-airflow": ["crac-sensible-derate","raised-floor-tile-airflow","containment-bypass-airflow"],
+  "ups-module-redundancy": ["datacenter-pue","pdu-branch-loading","chilled-water-ride-through"],
+  "crac-sensible-derate": ["rack-power-density-airflow","containment-bypass-airflow","server-inlet-envelope"],
+  "containment-bypass-airflow": ["rack-power-density-airflow","crac-sensible-derate","datacenter-pue"],
+  "pdu-branch-loading": ["ups-module-redundancy","datacenter-pue","rack-power-density-airflow"],
+  "chilled-water-ride-through": ["ups-module-redundancy","crac-sensible-derate","datacenter-pue"],
+  "server-inlet-envelope": ["crac-sensible-derate","containment-bypass-airflow","rack-power-density-airflow"],
+  "raised-floor-tile-airflow": ["rack-power-density-airflow","containment-bypass-airflow","crac-sensible-derate"],
 };
 
 export { RELATED };

@@ -1347,6 +1347,16 @@ const _TILES = [
   ["optical-return-loss", "A"],
   ["cable-jetting-distance", "A"],
   ["splice-loss-mismatch", "A"],
+  // spec-v1800..v1808 data-center and mission-critical facilities
+  ["datacenter-pue", "A"],
+  ["rack-power-density-airflow", "C"],
+  ["ups-module-redundancy", "A"],
+  ["crac-sensible-derate", "C"],
+  ["containment-bypass-airflow", "C"],
+  ["pdu-branch-loading", "A"],
+  ["chilled-water-ride-through", "C"],
+  ["server-inlet-envelope", "C"],
+  ["raised-floor-tile-airflow", "C"],
 ];
 
 

@@ -24334,6 +24334,106 @@ export const CITATIONS = {
       { name: "One-direction intrinsic estimate", value: "dissimilar fibers require bidirectional OTDR averaging", source: "the acceptance test standard" },
     ],
   },
+  // spec-v1800..v1808: data-center and mission-critical facilities.
+  "datacenter-pue": {
+    formula: "total facility kW = IT + cooling + UPS loss + miscellaneous; PUE = total/IT; DCiE = IT/total; annual energy = total x 8,760.",
+    edition: "The Green Grid PUE/DCiE definitions and ASHRAE data-center energy guidance. The site's declared metering boundary and measurement category govern.",
+    freeAccess: "An energy ratio and component sum; The Green Grid publishes the PUE definition publicly.",
+    governance: GOVERNANCE.general,
+    editionNote: "PUE is properly an ANNUAL ENERGY ratio across a declared boundary, not an instantaneous power reading. Reducing useful IT load can worsen the ratio while reducing total energy, so total kWh and useful work must accompany it.",
+    assumptions: [
+      { name: "Measurement boundary", value: "all entered components use the same facility boundary and averaging period", source: "The Green Grid / site metering plan" },
+      { name: "Annualization", value: "8,760 hours at the entered average loads", source: "planning estimate" },
+    ],
+  },
+  "rack-power-density-airflow": {
+    formula: "heat = rack kW x 3,412 Btu/hr per kW; airflow = heat/(1.08 x delta-T); tile count = airflow/tile delivery.",
+    edition: "The standard air-side sensible-heat relation and ASHRAE TC 9.9 thermal guidance. Equipment airflow and cooling-unit data govern.",
+    freeAccess: "A public sensible-heat balance using the conventional 1.08 air constant.",
+    governance: GOVERNANCE.general,
+    editionNote: "The 1.08 constant assumes ordinary sea-level air. Rack fans, blanking, recirculation, tile placement, altitude, and containment decide actual delivery; a fractional tile count is an airflow demand, not a layout.",
+    assumptions: [
+      { name: "Air constant", value: "1.08 Btu/hr per cfm-degF at ordinary standard-air conditions", source: "ASHRAE Fundamentals" },
+      { name: "Tile delivery", value: "entered from measured or manufacturer performance at the actual plenum pressure", source: "tile manufacturer / commissioning" },
+    ],
+  },
+  "ups-module-redundancy": {
+    formula: "IT kVA = IT kW/power factor; N = ceil(kVA/module rating); N+1 = N+1 modules; 2N = 2N modules; loss = IT(1/efficiency - 1).",
+    edition: "Standard N, N+1, and 2N availability conventions with first-principles UPS conversion-loss arithmetic. Manufacturer efficiency curves and facility availability requirements govern.",
+    freeAccess: "Ceilings, utilization ratios, and an input/output efficiency balance.",
+    governance: GOVERNANCE.general,
+    editionNote: "Nameplate redundancy does not establish concurrent maintainability or fault isolation. UPS efficiency varies strongly with module loading; entered efficiencies must come from the selected topology's part-load curve.",
+    assumptions: [
+      { name: "Balanced modules", value: "load shares equally among all online modules", source: "planning model" },
+      { name: "Cooling penalty", value: "UPS loss divided by the entered cooling COP", source: "first-principles energy balance" },
+    ],
+  },
+  "crac-sensible-derate": {
+    formula: "sensible capacity = 1.08 x airflow x (return temperature - supply temperature); tons = Btu/hr/12,000.",
+    edition: "The ASHRAE air-side sensible-heat relation and computer-room cooling rating practice. Manufacturer performance data and ASHRAE TC 9.9 govern.",
+    freeAccess: "A public sensible-heat balance and unit conversions.",
+    governance: GOVERNANCE.general,
+    editionNote: "Airflow alone is not capacity. Bypass air lowers return temperature and coil delta-T, while containment raises it; fan heat, latent load, altitude, coil approach, and compressor limits remain outside this screen.",
+    assumptions: [
+      { name: "Air constant", value: "1.08 at ordinary standard-air conditions", source: "ASHRAE Fundamentals" },
+      { name: "Sensible-only model", value: "latent load and manufacturer operating-envelope limits excluded", source: "cooling-unit performance data" },
+    ],
+  },
+  "containment-bypass-airflow": {
+    formula: "IT airflow = IT kW x 3,412/(1.08 x equipment delta-T); bypass = supply - IT airflow; mixed return follows the sensible heat balance; fan power varies with airflow cubed.",
+    edition: "First-principles airflow mixing and the fan affinity laws, with ASHRAE TC 9.9 thermal guidance. Rack-level inlet surveys and commissioning measurements govern.",
+    freeAccess: "Mass/heat balance plus the public cube-law fan relation.",
+    governance: GOVERNANCE.general,
+    editionNote: "A positive arithmetic bypass is not proof that every rack is supplied: local recirculation and bypass can coexist. The failure cases are aggregate screens; room geometry, control response, and rack inlet measurements decide resilience.",
+    assumptions: [
+      { name: "Uniform equipment rise", value: "all IT airflow is represented by one entered delta-T", source: "planning model" },
+      { name: "Fan affinity", value: "variable-speed fan power scales with the cube of airflow", source: "fan laws" },
+    ],
+  },
+  "pdu-branch-loading": {
+    formula: "usable current = breaker amperes x continuous-load fraction; kVA = V I for single phase or sqrt(3) V I for three phase; device count = floor(usable kW/device W).",
+    edition: "NEC continuous-load sizing and the standard AC power relations. The adopted NEC edition, equipment ratings, and authority having jurisdiction govern.",
+    freeAccess: "Basic single- and three-phase power arithmetic; NEC continuous-load requirements are publicly summarized by authorities and manufacturers.",
+    governance: GOVERNANCE.general,
+    editionNote: "The device-count result is a steady nameplate screen. Phase balance, receptacle and cord ratings, startup peaks, harmonics, topology, and upstream coordination can govern before aggregate kW does; A/B failover must fit on either surviving feed.",
+    assumptions: [
+      { name: "Continuous fraction", value: "entered from the adopted electrical requirements, commonly 80% where 125% sizing applies", source: "NEC / AHJ" },
+      { name: "Balanced three phase", value: "equal phase loading and entered power factor", source: "planning model" },
+    ],
+  },
+  "chilled-water-ride-through": {
+    formula: "stored Btu = gallons x 8.34 lb/gal x allowable delta-T; ride-through minutes = stored Btu/(IT kW x 3,412 Btu/hr) x 60.",
+    edition: "The water sensible-heat storage relation with ASHRAE TC 9.9 guidance. Chiller restart sequence and usable system volume are manufacturer- and site-specific.",
+    freeAccess: "Mass x specific heat x temperature-rise energy storage.",
+    governance: GOVERNANCE.general,
+    editionNote: "Installed volume is not necessarily usable ride-through volume: mixing, minimum pump flow, coil approach, controls, and the actual chiller restart sequence reduce it. This is a thermal inventory, not a transient hydraulic simulation.",
+    assumptions: [
+      { name: "Water properties", value: "8.34 lb/gal and 1 Btu/lb-degF", source: "standard water properties" },
+      { name: "Load transfer", value: "the full entered IT load reaches the chilled-water loop throughout the gap", source: "conservative planning case" },
+    ],
+  },
+  "server-inlet-envelope": {
+    formula: "dew point is calculated from dry bulb and RH with the Tetens correlation, then dry bulb, RH, and dew point are checked independently against entered recommended and allowable limits.",
+    edition: "ASHRAE TC 9.9 thermal guidelines for data-processing environments and the Tetens saturation-vapor-pressure approximation. The current equipment-class limits govern.",
+    freeAccess: "The dew-point correlation is public; envelope limits are entered rather than reproducing a proprietary table.",
+    governance: GOVERNANCE.general,
+    editionNote: "Passing dry bulb does not guarantee compliance: the hot-and-humid corner can fail the upper dew-point limit. The entered envelope must match the installed equipment class and current manufacturer requirements.",
+    assumptions: [
+      { name: "Correlation range", value: "ordinary data-center air temperatures within the validated input bounds", source: "Tetens correlation" },
+      { name: "Steady inlet condition", value: "rack-level spatial and temporal excursions are not averaged into compliance", source: "ASHRAE TC 9.9 / site survey" },
+    ],
+  },
+  "raised-floor-tile-airflow": {
+    formula: "Q = 4,005 x discharge coefficient x free area in sq ft x sqrt(plenum pressure in w.c.); pressure at fixed geometry varies with flow squared.",
+    edition: "The standard orifice airflow relation. Tile manufacturer measured flow curves and an under-floor pressure survey govern.",
+    freeAccess: "A public orifice relation and square-law inversion.",
+    governance: GOVERNANCE.general,
+    editionNote: "A raised floor distributes fan airflow; it does not create it. Opening more tiles at fixed system airflow lowers each tile's share and required pressure, while local pressure and leakage make actual distribution nonuniform.",
+    assumptions: [
+      { name: "Free area", value: "gross tile area times entered open-area fraction", source: "tile manufacturer" },
+      { name: "Discharge coefficient", value: "entered coefficient represents the selected tile geometry", source: "manufacturer curve / field measurement" },
+    ],
+  },
   "salt-application-rate": {
     formula: "material per pass = rate per lane-mile x route lane-miles; coverage = hopper capacity in lb / material per pass; a lot converts at 63,360 sq ft per lane-mile (one 12 ft lane one mile long).",
     edition: "Published application rate bands by PAVEMENT temperature (Salt Institute, Clear Roads, and state maintenance manuals): roughly 100 to 200 lb per lane-mile at 30 degF and above, 200 to 300 at 25 to 30, 300 to 400 at 20 to 25, and 400 to 600 below 20. The band and the rate are ENTERED, not selected.",

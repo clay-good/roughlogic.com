@@ -1369,6 +1369,16 @@ export const TOOL_MODULES = (() => {
     "pon-split-loss-budget", "fiber-strand-count-planning", "optical-return-loss",
     "cable-jetting-distance", "splice-loss-mismatch",
   ]);
+  // spec-v1800..v1808: data-center and mission-critical facility power,
+  // redundancy, branch loading, rack airflow, CRAC capacity, containment,
+  // chilled-water ride-through, inlet envelope, and raised-floor delivery.
+  // Three Group A and six Group C.
+  declare("./calc-datacenter.js", "DATACENTER_RENDERERS", [
+    "datacenter-pue", "rack-power-density-airflow", "ups-module-redundancy",
+    "crac-sensible-derate", "containment-bypass-airflow", "pdu-branch-loading",
+    "chilled-water-ride-through", "server-inlet-envelope",
+    "raised-floor-tile-airflow",
+  ]);
   // spec-v1845..v1850: the snow and ice management bench -- what a pavement
   // temperature costs in salt, what a brine batch has to be, how long a plow
   // route takes, where the snow goes, when a deicer stops working, and whether

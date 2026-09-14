@@ -2917,6 +2917,21 @@
     {"term":"mode field diameter mismatch splice","target":"splice-loss-mismatch","kind":"industry"},
     {"term":"lateral offset splice loss","target":"splice-loss-mismatch","kind":"industry"},
     {"term":"cleave angle splice loss","target":"splice-loss-mismatch","kind":"industry"},
-    {"term":"core alignment splicer","target":"splice-loss-mismatch","kind":"industry"}
+    {"term":"core alignment splicer","target":"splice-loss-mismatch","kind":"industry"},
+    {"term":"power usage effectiveness pue","target":"datacenter-pue","kind":"industry"},
+    {"term":"data center energy overhead","target":"datacenter-pue","kind":"industry"},
+    {"term":"dcie data center infrastructure efficiency","target":"datacenter-pue","kind":"industry"},
+    {"term":"cooling overhead kw per it kw","target":"datacenter-pue","kind":"question"},
+    {"term":"data center annual energy cost","target":"datacenter-pue","kind":"question"},
+    {"term":"ups module sizing","target":"ups-module-redundancy","kind":"industry"},
+    {"term":"n+1 redundancy ups capacity","target":"ups-module-redundancy","kind":"industry"},
+    {"term":"ups load fraction efficiency","target":"ups-module-redundancy","kind":"question"},
+    {"term":"2n ups configuration","target":"ups-module-redundancy","kind":"industry"},
+    {"term":"ups losses cooling penalty","target":"ups-module-redundancy","kind":"question"},
+    {"term":"pdu branch circuit loading","target":"pdu-branch-loading","kind":"industry"},
+    {"term":"rack power strip capacity","target":"pdu-branch-loading","kind":"redirect"},
+    {"term":"dual corded a b feed loading","target":"pdu-branch-loading","kind":"industry"},
+    {"term":"208v three phase rack circuit","target":"pdu-branch-loading","kind":"question"},
+    {"term":"80 percent continuous load rack","target":"pdu-branch-loading","kind":"question"}
   ]
 }

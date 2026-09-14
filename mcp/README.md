@@ -1,7 +1,7 @@
 # roughlogic MCP server
 
 A local, zero-dependency [Model Context Protocol](https://modelcontextprotocol.io)
-server that exposes the roughlogic catalog of **2,106 trades calculators**
+server that exposes the roughlogic catalog of **2,115 trades calculators**
 (electrical, plumbing, HVAC, construction, restoration, and more) to any MCP
 client — Claude Code, Claude Desktop, Cursor, and the like.
 
@@ -117,7 +117,7 @@ element — the keys of the publisher-verified worked example fill the gap, so
 returning an empty list. `scripts/check-both-doors.mjs` holds the door to that
 contract: every advertised name must be a key a caller can actually send, every
 key the tile's own example sets must be advertised, and that example must run
-clean through `run_calculator`. All three are checked for all 2,106 tiles on
+clean through `run_calculator`. All three are checked for all 2,115 tiles on
 every build.
 
 `run_calculator` also warns when it is handed a key the calculator cannot
@@ -149,7 +149,7 @@ each number**, keyed by the compute's own result key: `outputs_source` is
 way, a key is named only where the calculator is observed to produce it -- the
 worked example's result for `describe_calculator`, the caller's own result for
 `run_calculator` -- so the door never names an answer that is not there.
-`check-both-doors.mjs` holds that. **2,106 of 2,106 calculators name their
+`check-both-doors.mjs` holds that. **2,115 of 2,115 calculators name their
 answers.** The remaining 0 return them unlabelled.
 
 That was 1,768 until 2026-09-02, and the 36 were a gap between the two doors
@@ -177,7 +177,7 @@ also `"eta^2 = "` -- and calling that a unit would be a guess. `outputUnits(id)`
 in `catalog.mjs` exposes them as what they are.
 
 `answer_query` reads the `data/fields/` descriptors the website reads, which
-exist for 2,070 calculators. For the other 36 it projects the descriptors from
+exist for 2,079 calculators. For the other 36 it projects the descriptors from
 `describe_calculator` instead, naming each input with the caption the
 calculator itself prints. A field whose verified
 example holds something a numeric extractor must not guess at -- a list, a
@@ -270,7 +270,7 @@ tiles named a *different* tile when handed their own id -- and `backflow-sizing`
 a sizing screen, came back `status: OK` carrying the `backflow` **reference
 table**, because "sizing" is a noise word and what remained matched the
 reference tile's name exactly. A literal id now resolves to its tile ahead of
-every other kind of evidence, and counts as its own corroboration. All 2,106
+every other kind of evidence, and counts as its own corroboration. All 2,115
 answer to their own id, and none to another's.
 
 Literal only: `backflow sizing` with a space is a human phrasing and genuinely
@@ -280,7 +280,7 @@ is named "Fan Affinity Laws"). Spaced queries are still decided by ranking.
 What the corpus cannot see, a standing test now does: **no tile answers a
 question that is only its own name.** A tile's name is what an agent sends when
 it has just read the catalog, and it carries no values, so `OK` is the wrong
-status for all 2,070 tiles that take inputs. One did. `awg-wire-geometry` is
+status for all 2,079 tiles that take inputs. One did. `awg-wire-geometry` is
 named "AWG Conductor Geometry (Diameter, Circular Mils, mm^2)", and the
 extractor read the exponent in `mm^2` as a quantity and returned the geometry of
 **AWG 2**. An exponent is part of a unit; it is no longer read as a value, and
@@ -335,7 +335,7 @@ a pipe size in inches is still a length among lengths and the case the phase
 was written for keeps filling, while `wire-ampacity` measures amps, degrees
 and counts and has no home for a distance. Same dimension, not same unit --
 narrowing it to the unit would have broken `pipe-volume`, whose size dropdown
-declares no unit in its label at all. Recovery across all 2,070 tiles is
+declares no unit in its label at all. Recovery across all 2,079 tiles is
 unchanged by that one.
 
 The two that remain are not fixed, and both are traced rather than mysterious.
