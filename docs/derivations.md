@@ -3691,6 +3691,15 @@ cross-check.
 | calc-velocity.js | `renderPitotTraverseCfm` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-velocity.js | `renderRefrigerantLineSize` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-velocity.js | `renderRefrigerantVelocity` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-warehouse.js | `computeDockDoorCountThroughput` | `{ trucks_per_day = 0, operating_hours = 0, turn_time_min = 0, utilization_pct...` | _ | _ | _ |
+| calc-warehouse.js | `computeDockLevelerSlope` | `{ dock_height_in = 0, low_bed_height_in = 0, high_bed_height_in = 0, leveler_...` | _ | _ | _ |
+| calc-warehouse.js | `computeOrderPickLaborStandard` | `{ lines_per_order = 0, units_per_line = 0, travel_time_s = 0, pick_time_s = 0...` | _ | _ | _ |
+| calc-warehouse.js | `computePalletRackBeamCapacity` | `{ span_in = 0, pallet_weight_lb = 0, pallets_per_level = 0, moment_of_inertia...` | _ | _ | _ |
+| calc-warehouse.js | `computeRackBasePlateAnchorage` | `{ frame_weight_lb = 0, frame_depth_in = 0, top_beam_height_ft = 0, lateral_fo...` | _ | _ | _ |
+| calc-warehouse.js | `computeRackFlueSpace` | `{ pallet_width_in = 0, pallet_depth_in = 0, pallets_per_bay = 0, transverse_g...` | _ | _ | _ |
+| calc-warehouse.js | `computeRackUprightCapacityDerate` | `{ beam_spacing_in = 0, column_moment_of_inertia_in4 = 0, effective_length_fac...` | _ | _ | _ |
+| calc-warehouse.js | `computeStackingAisleWidth` | `{ load_length_in = 0, operating_clearance_in = 0, counterbalanced_turning_rad...` | _ | _ | _ |
+| calc-warehouse.js | `computeWarehouseCubeUtilization` | `{ building_width_ft = 0, building_depth_ft = 0, clear_height_ft = 0, module_p...` | _ | _ | _ |
 | calc-water.js | `computeAerationOxygenDemand` | `{ bod_removed_lb_day = 0, oxygen_factor = 0, nh3_nitrified_lb_day = 0, sote_p...` | _ | _ | _ |
 | calc-water.js | `computeBackflowTestPSI` | `{ assembly_type = "rp", check1_psid = 0, relief_open_psid = 0, check2_psi = 0...` | _ | _ | _ |
 | calc-water.js | `computeChlorineDecay` | `{ initial_mg_l = 0, decay_k_per_hr = 0.1, time_hr = 0, target_mg_l = 0.2, vel...` | _ | _ | _ |
@@ -3780,7 +3789,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2366.
+Row count: 2375.
 
 <!-- END function-corpus-v14 -->
 
@@ -4541,7 +4550,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (579 tiles)
+### Group E Construction (583 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4847,6 +4856,7 @@ per spec-v14 §13.1 second paragraph.
 | `overconsolidated-settlement` | Primary Consolidation Settlement (Over-Consolidated Clay) | Terzaghi primary consolidation, OC cl...; Cc 0.25, Cr 0.05, H 10 ft, e0 0.90, sigma'0 2,000 psf, si... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `oxyfuel-cutting-gas` | Oxy-Fuel Cutting Gas Consumption | Torch maker's tip charts; 1/2 in tip: 55 cfh oxygen, 12 cfh acetylene, 240 in at 16... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `paint-coverage` | Paint Coverage | Project (first-principles); 700 ft^2 smooth wall, 2 coats, primer needed -> 2.0 gal/c... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pallet-rack-beam-capacity` | Pallet Rack Beam Load and Deflection | Project (first-principles); ANSI MH16.1 and the manufacturer's span capacity govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `panic-hardware-force` | Panic Hardware Operating Force and What a Failure Points At | Project (first-principles); limits entered from the adopted building and fire code | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pavement-milling-production` | Cold-Planing (Milling) Production and RAP Tonnage | Cold-planing production identity (fir...; sy/hr = 7*30*60*0.7/9 = 980; spread = 4*148*0.75 = 444; R... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pavement-structural-number` | Flexible Pavement Structural Number (AASHTO 93) | Project (first-principles); the agency pavement design manual and the pavement engine... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4874,6 +4884,9 @@ per spec-v14 §13.1 second paragraph.
 | `protruding-object-check` | Protruding Objects and Headroom (2010 ADA Standards 307) | US Department of Justice / US Access ...; 307.2: 'Objects with leading edges more than 27 inches an... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pt-dwell-development` | Liquid Penetrant Dwell, Development, and Evaluation Window | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pwht-holding-time` | Post-Weld Heat Treatment Holding Time and Ramp Rates | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `rack-base-plate-anchorage` | Pallet Rack Base Plate Anchorage and Overturning | Project (first-principles); ANSI MH16.1, the building code, and the anchor evaluation... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `rack-flue-space` | Rack Storage Flue Space and Beam Length | Project (first-principles); NFPA 13 as adopted and the AHJ govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `rack-upright-capacity-derate` | Rack Upright Frame Capacity and Unbraced Length | Project (first-principles); ANSI MH16.1 requires tested capacities | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rafter` | Rafter Length | Project (first-principles); Pythagoras on rise / 12 run with overhang | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rail-wear-condemning-limit` | Rail Head Wear, Combined Limit, and Tonnage to Replacement | Project (first-principles); limits entered from the track owner's engineering instruc... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rain-load-ponding` | Roof Rain Load and Secondary-Drainage Flow (ASCE 7 Ch. 8) | ASCE 7 Ch. 8 + IPC drainage; spec-v224 section 2.1 pinned example (typical scupper) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5369,7 +5382,7 @@ per spec-v14 §13.1 second paragraph.
 | `tool-maintenance` | Tool Maintenance Intervals | Project bundled tool maintenance sche...; Reference compute returns the per-attribute table; runner... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 | `triage-quickread` | Field First Aid Triage Quick-Read | START / SALT triage protocols (projec...; Returns 4 categories + notice + citation; tested on the n... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 
-### Group J Trucking (44 tiles)
+### Group J Trucking (49 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5385,6 +5398,8 @@ per spec-v14 §13.1 second paragraph.
 | `def-consumption` | Diesel Exhaust Fluid (DEF) Consumption and Range | DEF consumption and range model (SCR ...; spec-v508 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `detention-demurrage-billing` | Detention Billing and Opportunity Cost | carrier tariff practice; spec-v423 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dim-weight` | Dimensional Weight (DIM) | UPS / FedEx (carrier-published); UPS Service Guide divisor; FedEx Ground / Express also 13... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `dock-door-count-throughput` | Dock Door Count from Arrivals and Turn Time | Project (first-principles); the facility's own arrival data governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `dock-leveler-slope` | Dock Leveler Ramp Slope and Truck Bed Range | Project (first-principles); the manufacturer's rated service range governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `driver-pay-cpm-vs-percentage` | Driver Pay: Cents-per-Mile vs Percentage | carrier settlement practice; spec-v424 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flatbed-tarp-size` | Flatbed Tarp Coverage, Count, and Weight | Project (first-principles); width = W + 2H + 2 tuck; shingled overlap | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `freight-density` | Freight Density and NMFC Class | NMFTA; NMFTA NMFC density-class bracket (cited by name) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5400,6 +5415,7 @@ per spec-v14 §13.1 second paragraph.
 | `kingpin-to-axle` | Kingpin-to-Rear-Axle Compliance and Tandem Slide | Project (first-principles); kingpin to rear-axle center | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `load-profitability` | Per-Load Net Profit | First-principles owner-operator load ...; spec-v91 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `maintenance-reserve` | Maintenance Reserve per Mile | First-principles owner-operator reser...; spec-v91 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `order-pick-labor-standard` | Order Pick Rate and Labour Standard | Project (first-principles); the facility's own time study governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `oversize-permit-screen` | Oversize and Overweight Permit Threshold Screen | Project (first-principles); excess on each of four dimensions | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pallet-loadout` | Pallet Cube and Trailer Loadout | GMA pallet (48 x 40 in) + 53 ft dry-v...; 12 x 10 x 8 in case @ 25 lb / 48 cases per pallet -> 26 p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `plow-route-cycle-time` | Plow Route Cycle Time, Accumulation, and Truck Count | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5407,6 +5423,7 @@ per spec-v14 §13.1 second paragraph.
 | `reefer-burn` | Reefer Fuel Burn and Run Time | Thermo King published technical bulle...; Continuous SB / 50 gal tank / 24 hr / moderate / 1200 mi ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `safe-descent-speed` | Safe Downgrade Descent Speed and Brake Load | Project (first-principles); P = W x v x grade / 550 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ssd-design-speed` | Max Design Speed from Sight Distance | AASHTO (inverse); 490.225 ft sight distance, dry level (f 0.35, t 2.5 s) ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `stacking-aisle-width` | Right-Angle Stacking Aisle Width | Project (first-principles); truck manufacturer stack data and the fire code govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `static-rollover-threshold` | Static Rollover Threshold | static stability factor (NHTSA); srt = (72/2)/80 = 0.45; speed = sqrt(0.45*32.174*200)*0.6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stopping-sight-distance` | Stopping Sight Distance (AASHTO) | AASHTO; d_pr = 1.47*v*t_pr; d_br = v^2 / (30*(f+g)) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tiedown-count` | Minimum Tiedown Count and Aggregate WLL | FMCSA; 393.110 count rule and 393.106 aggregate WLL | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5417,6 +5434,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-off-tracking` | Low-Speed Off-Tracking (Swept Path) | AASHTO Green Book (low-speed off-trac...; OT = 50 - sqrt(2500 - 400) = 50 - 45.826 = 4.174 ft; effe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `warehouse-cube-utilization` | Storage Position Count and Cube Utilisation | Project (first-principles); layout drawings and the slotting policy govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group K Mechanic (164 tiles)
 
@@ -6068,6 +6086,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2115. Fixture-covered or reference-cadence: 2115 / 2115.
+Tile count: 2124. Fixture-covered or reference-cadence: 2124 / 2124.
 
 <!-- END tile-index-v14 -->

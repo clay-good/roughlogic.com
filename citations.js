@@ -24434,6 +24434,106 @@ export const CITATIONS = {
       { name: "Discharge coefficient", value: "entered coefficient represents the selected tile geometry", source: "manufacturer curve / field measurement" },
     ],
   },
+  // spec-v1809..v1817: warehouse racking and material handling.
+  "pallet-rack-beam-capacity": {
+    formula: "Two equal point loads at the quarter points: M = P L / 4; d = P a (3 L^2 - 4 a^2) / (24 E I) with a = L/4 and E = 29,000,000 psi; allowable bending stress = Fy / 1.67; acceptance limit L/180.",
+    edition: "ANSI MH16.1 Design, Testing and Utilization of Industrial Steel Storage Racks, the applicable building code, and the rack manufacturer's published beam capacity AT the installed span.",
+    freeAccess: "The beam relations and the L/180 criterion are public; ANSI MH16.1 itself is a purchased standard.",
+    governance: GOVERNANCE.general,
+    editionNote: "Deflection governs an ordinary rack beam because it grows as the cube of span while moment grows linearly, so a bay respaced in the field has a capacity nobody recalculated and a span-specific load plaque that is now wrong.",
+    assumptions: [
+      { name: "Load pattern", value: "two equal pallets delivering point loads at the quarter points", source: "spec-v1809 idealisation" },
+      { name: "Beam end connector", value: "not evaluated; its capacity comes from testing and frequently limits the beam first", source: "ANSI MH16.1" },
+    ],
+  },
+  "rack-upright-capacity-derate": {
+    formula: "P_cr = pi^2 E I / (K L)^2 with E = 29,000,000 psi over the unbraced length set by the beam spacing; load per column = loaded levels x load per level / 2.",
+    edition: "ANSI MH16.1 Design, Testing and Utilization of Industrial Steel Storage Racks, which requires TESTED capacities for perforated cold-formed columns and requires damaged members be unloaded and repaired or replaced.",
+    freeAccess: "The Euler relation is public; ANSI MH16.1 itself is a purchased standard.",
+    governance: GOVERNANCE.general,
+    editionNote: "The Euler load overstates a perforated cold-formed rack column considerably, which fails by local and distortional buckling well below it; the figure is shown for the square-law trend on unbraced length, not as a capacity.",
+    assumptions: [
+      { name: "Frame rating", value: "stated AT a beam spacing; it is not a property of the frame alone", source: "rack manufacturer" },
+      { name: "Damage", value: "not a derate -- the standard requires unloading and repair or replacement, not a reduction factor", source: "ANSI MH16.1" },
+    ],
+  },
+  "rack-base-plate-anchorage": {
+    formula: "Overturning M_o = lateral force x effective height; resisting M_r = frame weight x half the frame depth; net uplift = (M_o - M_r) / frame depth; anchors = net uplift / allowable tension per anchor, rounded up.",
+    edition: "ANSI MH16.1, the applicable building code and its seismic provisions, and the post-installed anchor's evaluation report at the slab thickness, concrete strength, and edge distance actually present.",
+    freeAccess: "The statics are public; ANSI MH16.1 and anchor evaluation reports are published by their own bodies.",
+    governance: GOVERNANCE.general,
+    editionNote: "The anchorage calculation is really a question about the floor. A warehouse slab is routinely thinner, weaker, more cracked, and closer to a joint than the rack drawings assumed, and anchor capacity tables assume otherwise.",
+    assumptions: [
+      { name: "Lateral force", value: "entered as a coefficient on the frame weight acting at a fraction of the frame height", source: "spec-v1811 screening idealisation" },
+      { name: "Remedies", value: "a larger plate, a thicker or reinforced slab, a shallower frame, or bracing to the structure -- none is a field decision", source: "rack design engineer" },
+    ],
+  },
+  "rack-flue-space": {
+    formula: "Required beam length = pallets x pallet width + transverse gaps x nominal flue; longitudinal flue = back-to-back spacing - 2 x overhang, with overhang = (load depth - frame depth) / 2.",
+    edition: "NFPA 13 Standard for the Installation of Sprinkler Systems as adopted, with the commodity classification, storage height, and arrangement.",
+    freeAccess: "NFPA publishes its standards for free read-only online access; the nominal 6 in transverse and longitudinal flue is stated there.",
+    governance: GOVERNANCE.general,
+    editionNote: "Flues are fire protection hardware that happens to look like empty space: they are the path by which ceiling sprinkler water reaches the lower levels of a rack. Solid decking blocks the flue entirely and changes the protection requirement; open wire or bar decking does not.",
+    assumptions: [
+      { name: "Nominal flue", value: "6 in transverse and longitudinal unless the adopted edition and arrangement say otherwise", source: "NFPA 13 as adopted" },
+      { name: "In-rack sprinklers", value: "required when ceiling protection cannot be shown adequate; that determination is the fire protection engineer's and the AHJ's", source: "NFPA 13 as adopted" },
+    ],
+  },
+  "stacking-aisle-width": {
+    formula: "Right-angle stacking aisle = outside turning radius + load length along the forks + load face to turning centre + operating clearance; the turret / VNA case reduces to load length + clearance; module pitch = 2 x rack row depth + aisle.",
+    edition: "Truck manufacturer right-angle stack data at the actual load and mast, and the fire code's aisle requirements as adopted.",
+    freeAccess: "The geometry is public; right-angle stack figures come from each truck manufacturer's published specification sheet.",
+    governance: GOVERNANCE.general,
+    editionNote: "The three truck types differ only in where the load sits relative to the turning centre. A narrow aisle is bought with guidance, a superflat floor tolerance, tighter rack alignment, slower aisle entry, and one truck per aisle.",
+    assumptions: [
+      { name: "Truck dimensions", value: "entered per type; a manufacturer's right-angle stack figure at the actual load and mast supersedes the build-up", source: "truck manufacturer" },
+      { name: "Module fit", value: "whole modules across the entered width; cross-aisles, columns, and egress are not deducted", source: "spec-v1812 screening idealisation" },
+    ],
+  },
+  "warehouse-cube-utilization": {
+    formula: "Building cube = footprint x clear height; positions = rack rows x bays x levels x pallets per bay level; occupied cube = positions x pallet cube; cube utilisation = occupied / building cube.",
+    edition: "The facility's own layout drawings, the fire code's aisle and storage requirements as adopted, and its slotting policy.",
+    freeAccess: "Geometry only; no purchased standard is required to reproduce it.",
+    governance: GOVERNANCE.general,
+    editionNote: "Fifteen to thirty per cent is the ordinary range and it is a normal figure rather than a failing one. Aisle floor is the largest single consumer; honeycombing is the part the racking cannot fix.",
+    assumptions: [
+      { name: "Rack run length", value: "entered separately from building depth so cross-aisles and dock apron are not counted as storage", source: "facility layout" },
+      { name: "Honeycombing", value: "not modelled; it varies with slotting policy rather than with geometry", source: "spec-v1813 scope" },
+    ],
+  },
+  "dock-leveler-slope": {
+    formula: "Differential = dock height - trailer bed height; ramp grade = differential / leveler length.",
+    edition: "The leveler manufacturer's rated service range above and below dock level, and the employer's powered-industrial-truck program.",
+    freeAccess: "The geometry is public; service range and rated capacity come from each manufacturer's published data.",
+    governance: GOVERNANCE.general,
+    editionNote: "Service range answers whether the leveler can REACH a bed height; grade answers whether equipment can work across it once it does. A leveler comfortably within its service range can still present a ramp too steep to run pallets over.",
+    assumptions: [
+      { name: "Grade guideline", value: "roughly 10% a common practical maximum for powered equipment, 7% or less preferred; a manual pallet truck struggles well before a forklift does", source: "industry practice, entered as an input" },
+      { name: "Static geometry", value: "a trailer settles as it loads, rises as it empties, and can creep away from the dock; restraints and chocks address the creep", source: "spec-v1814 scope" },
+    ],
+  },
+  "dock-door-count-throughput": {
+    formula: "Door-hours = trucks x turn time; doors at full utilisation = door-hours / operating hours; doors required = that count / practical utilisation, rounded up; the peak is computed the same way over the peak window.",
+    edition: "The facility's own arrival data, turn-time measurement, and yard and detention practice.",
+    freeAccess: "Queueing arithmetic only; no purchased standard is required to reproduce it.",
+    governance: GOVERNANCE.general,
+    editionNote: "Turn time is the whole time a trailer occupies the door -- spotting, securing, handling, counting and paperwork, and release. A dock measuring handling time and calling it turn time will be short of doors by the difference.",
+    assumptions: [
+      { name: "Practical utilisation", value: "60 to 70% is the ordinary planning range; utilisation below 100% is not slack but what makes the dock work", source: "industry practice, entered as an input" },
+      { name: "Peak", value: "a share of arrivals in a stated window; sizing on the daily average understates the requirement by the peaking factor", source: "facility arrival data" },
+    ],
+  },
+  "order-pick-labor-standard": {
+    formula: "Time per line = travel + pick + (units per line - 1) x per-additional-unit time; allowed order time = (line time + setup and close) x (1 + PF and D allowance); rate = lines / allowed time.",
+    edition: "The facility's own time study or predetermined motion time system, and any applicable collective bargaining agreement where a standard is used to staff or to pay.",
+    freeAccess: "Element build-up is public method; the element times themselves are facility-specific measurements.",
+    governance: GOVERNANCE.general,
+    editionNote: "A labour standard is an engineered time, not an observed average. Travel is the element with no output and routinely exceeds the picking time; every serious productivity intervention is aimed at it.",
+    assumptions: [
+      { name: "PF and D allowance", value: "10 to 20% is usual; entered rather than assumed", source: "facility time study" },
+      { name: "Batched travel", value: "entered rather than divided by the batch size -- the picker still walks between every location the combined order needs", source: "spec-v1817 method" },
+    ],
+  },
   "salt-application-rate": {
     formula: "material per pass = rate per lane-mile x route lane-miles; coverage = hopper capacity in lb / material per pass; a lot converts at 63,360 sq ft per lane-mile (one 12 ft lane one mile long).",
     edition: "Published application rate bands by PAVEMENT temperature (Salt Institute, Clear Roads, and state maintenance manuals): roughly 100 to 200 lb per lane-mile at 30 degF and above, 200 to 300 at 25 to 30, 300 to 400 at 20 to 25, and 400 to 600 below 20. The band and the rate are ENTERED, not selected.",

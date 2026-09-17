@@ -2,96 +2,96 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "0e3508f288e48ece",
-      "date": "2026-09-14"
+      "sha": "7cb3e1385c4b1079",
+      "date": "2026-09-17"
     },
     "/tools/": {
-      "sha": "6fc39d75fd25944f",
-      "date": "2026-09-14"
+      "sha": "d8bbd96b0fced83c",
+      "date": "2026-09-17"
     },
     "/groups/accounting/": {
-      "sha": "5bc436b6df9893cb",
-      "date": "2026-09-14"
+      "sha": "74c62211e128b788",
+      "date": "2026-09-17"
     },
     "/groups/agriculture/": {
-      "sha": "8cffa8e73dbea23e",
-      "date": "2026-09-14"
+      "sha": "5c9667196da0b07c",
+      "date": "2026-09-17"
     },
     "/groups/construction/": {
-      "sha": "9742ca4e9361081f",
-      "date": "2026-09-14"
+      "sha": "2e5167ae1cbea5cb",
+      "date": "2026-09-17"
     },
     "/groups/cross-trade/": {
-      "sha": "643c966c36420595",
-      "date": "2026-09-14"
+      "sha": "0b1bfa478e3e5228",
+      "date": "2026-09-17"
     },
     "/groups/educators/": {
-      "sha": "7254070554affd7c",
-      "date": "2026-09-14"
+      "sha": "6fe240be7065102e",
+      "date": "2026-09-17"
     },
     "/groups/electrical/": {
-      "sha": "e50d0dea86a19040",
-      "date": "2026-09-14"
+      "sha": "bed32c23e7a728e3",
+      "date": "2026-09-17"
     },
     "/groups/field/": {
-      "sha": "34fd22f1cc4bae3b",
-      "date": "2026-09-14"
+      "sha": "868eb12de3daa851",
+      "date": "2026-09-17"
     },
     "/groups/fire-ground/": {
-      "sha": "f326febc06f48a03",
-      "date": "2026-09-14"
+      "sha": "3e028c4cfa61cf24",
+      "date": "2026-09-17"
     },
     "/groups/historical/": {
-      "sha": "122a51571ce5bee2",
-      "date": "2026-09-14"
+      "sha": "6d5a344add67c9d9",
+      "date": "2026-09-17"
     },
     "/groups/hvac/": {
-      "sha": "fe3e9875d0c98a45",
-      "date": "2026-09-14"
+      "sha": "c37f42a138f3b849",
+      "date": "2026-09-17"
     },
     "/groups/kitchen/": {
-      "sha": "6060a595764c013d",
-      "date": "2026-09-14"
+      "sha": "e29629b3f4bc5477",
+      "date": "2026-09-17"
     },
     "/groups/lab/": {
-      "sha": "6d9beb32cb99b0ff",
-      "date": "2026-09-14"
+      "sha": "4c56bd75e059814d",
+      "date": "2026-09-17"
     },
     "/groups/mechanic/": {
-      "sha": "c4de327fc0fadda9",
-      "date": "2026-09-14"
+      "sha": "1bd439a9f52e23f1",
+      "date": "2026-09-17"
     },
     "/groups/plumbing/": {
-      "sha": "de70c33a142e88f3",
-      "date": "2026-09-14"
+      "sha": "793168aa2d7ae73e",
+      "date": "2026-09-17"
     },
     "/groups/real-estate/": {
-      "sha": "856825b77a117eb7",
-      "date": "2026-09-14"
+      "sha": "b5a29e742468f6dc",
+      "date": "2026-09-17"
     },
     "/groups/references/": {
-      "sha": "2d2141c73ce39bde",
-      "date": "2026-09-14"
+      "sha": "3ce8cd2c6c2ca78b",
+      "date": "2026-09-17"
     },
     "/groups/restoration/": {
-      "sha": "36a415940bd377de",
-      "date": "2026-09-14"
+      "sha": "f462255a51877ffe",
+      "date": "2026-09-17"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "6d1553b1da0b998f",
-      "date": "2026-09-14"
+      "sha": "e111c62368d53ce2",
+      "date": "2026-09-17"
     },
     "/groups/stage/": {
-      "sha": "162ae6b75e000e55",
-      "date": "2026-09-14"
+      "sha": "014047720c06b977",
+      "date": "2026-09-17"
     },
     "/groups/trucking/": {
-      "sha": "aabe52450c552624",
-      "date": "2026-09-14"
+      "sha": "b819a9c2af706e7c",
+      "date": "2026-09-17"
     },
     "/groups/water/": {
-      "sha": "0f7a5d2ce6c873e1",
-      "date": "2026-09-14"
+      "sha": "fc6068726e5730f5",
+      "date": "2026-09-17"
     },
     "/tools/aav-install-check/": {
       "sha": "4e1b1d5b33ca35e4",
@@ -1038,8 +1038,8 @@
       "date": "2026-09-01"
     },
     "/tools/cg-load-share/": {
-      "sha": "fad3190f68aa7294",
-      "date": "2026-09-04"
+      "sha": "706bf965ab2bc1a0",
+      "date": "2026-09-17"
     },
     "/tools/chain-hoist-lift-time/": {
       "sha": "9c92088d312b4852",
@@ -2090,8 +2090,8 @@
       "date": "2026-09-09"
     },
     "/tools/dim-weight/": {
-      "sha": "b341bd9e20104aaa",
-      "date": "2026-09-04"
+      "sha": "b1464aaeef96fd9c",
+      "date": "2026-09-17"
     },
     "/tools/disinfectant-dwell/": {
       "sha": "9d4738ede9d3aefe",
@@ -2120,6 +2120,14 @@
     "/tools/dmx-planner/": {
       "sha": "16932c725606b778",
       "date": "2026-09-01"
+    },
+    "/tools/dock-door-count-throughput/": {
+      "sha": "9da86b40cee4cf5a",
+      "date": "2026-09-17"
+    },
+    "/tools/dock-leveler-slope/": {
+      "sha": "d51ba03b7d9e3bdc",
+      "date": "2026-09-17"
     },
     "/tools/dock-piling-lateral/": {
       "sha": "cdf750d3d4771c53",
@@ -3146,8 +3154,8 @@
       "date": "2026-09-09"
     },
     "/tools/gcwr-check/": {
-      "sha": "1fb066a9609f013a",
-      "date": "2026-09-01"
+      "sha": "ec57d428470232b9",
+      "date": "2026-09-17"
     },
     "/tools/gear-cascade/": {
       "sha": "a1a3e16dc5c6169c",
@@ -3738,8 +3746,8 @@
       "date": "2026-09-01"
     },
     "/tools/incoterm-decoder/": {
-      "sha": "a09bdab12f713eaf",
-      "date": "2026-09-01"
+      "sha": "b037377bb6568bc8",
+      "date": "2026-09-17"
     },
     "/tools/indirect-evaporative-cooling/": {
       "sha": "d2f164773824af54",
@@ -4797,6 +4805,10 @@
       "sha": "2f37e1d3a18383bf",
       "date": "2026-09-13"
     },
+    "/tools/order-pick-labor-standard/": {
+      "sha": "baef316d838939c6",
+      "date": "2026-09-17"
+    },
     "/tools/orifice-diameter-for-flow/": {
       "sha": "7f5c40176d60c545",
       "date": "2026-09-01"
@@ -4898,8 +4910,12 @@
       "date": "2026-09-04"
     },
     "/tools/pallet-loadout/": {
-      "sha": "9bc35fd305183d0f",
-      "date": "2026-09-01"
+      "sha": "5a838c321b2870ca",
+      "date": "2026-09-17"
+    },
+    "/tools/pallet-rack-beam-capacity/": {
+      "sha": "c29c37714a3591cb",
+      "date": "2026-09-17"
     },
     "/tools/pan-conversion/": {
       "sha": "30ac242dc776bb5a",
@@ -5601,9 +5617,21 @@
       "sha": "6ac10016790e9bc2",
       "date": "2026-09-01"
     },
+    "/tools/rack-base-plate-anchorage/": {
+      "sha": "d5b86f8fb57204a2",
+      "date": "2026-09-17"
+    },
+    "/tools/rack-flue-space/": {
+      "sha": "5cd5ca2818a64cfc",
+      "date": "2026-09-17"
+    },
     "/tools/rack-power-density-airflow/": {
       "sha": "5dd16d0aa5d5ea1b",
       "date": "2026-09-14"
+    },
+    "/tools/rack-upright-capacity-derate/": {
+      "sha": "3a415e8dd02dc1ac",
+      "date": "2026-09-17"
     },
     "/tools/radial-chip-thinning/": {
       "sha": "5cef5c38e9a3c09d",
@@ -7041,6 +7069,10 @@
       "sha": "4f537ca85637a4cc",
       "date": "2026-09-08"
     },
+    "/tools/stacking-aisle-width/": {
+      "sha": "3063e2413ede77f9",
+      "date": "2026-09-17"
+    },
     "/tools/stadia-distance/": {
       "sha": "6a3286252fdf99c4",
       "date": "2026-09-04"
@@ -7874,12 +7906,12 @@
       "date": "2026-09-01"
     },
     "/tools/truck-startability/": {
-      "sha": "a050d2b0899bcdd1",
-      "date": "2026-09-11"
+      "sha": "f9e9b91f2919aa82",
+      "date": "2026-09-17"
     },
     "/tools/truck-swept-path-width/": {
-      "sha": "ed9424cacd366378",
-      "date": "2026-09-11"
+      "sha": "304682c40c1b1da2",
+      "date": "2026-09-17"
     },
     "/tools/true-airspeed/": {
       "sha": "f08bd713a3b241c7",
@@ -8160,6 +8192,10 @@
     "/tools/wallpaper-rolls/": {
       "sha": "5582f13155941f72",
       "date": "2026-09-01"
+    },
+    "/tools/warehouse-cube-utilization/": {
+      "sha": "f566247cd7da4b10",
+      "date": "2026-09-17"
     },
     "/tools/warewasher-hot-water/": {
       "sha": "adaf9dfb6394f7a3",

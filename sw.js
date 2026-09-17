@@ -107,6 +107,7 @@ const SHELL_ASSETS = [
   "./calc-controls.js",
   "./calc-telecom.js",
   "./calc-datacenter.js",
+  "./calc-warehouse.js",
   "./calc-oilgas.js",
   "./calc-refrigeration.js",
   "./calc-arborist.js",

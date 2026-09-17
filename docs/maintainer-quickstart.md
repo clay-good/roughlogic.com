@@ -67,10 +67,19 @@ Tests live in `test/unit/` and `test/integration/`.
      [../test/unit/first-principles.test.js](../test/unit/first-principles.test.js)
      still runs but recent tiles pin in bounds-fuzzer.
    - Edge cases: zero, negative, max, missing input.
-5. Add the source-stamp string to [citation-discipline.md](citation-discipline.md)
-   and the inline entry (formula / edition / freeAccess / governance)
-   in [../citations.js](../citations.js); both agree
-   (`check-citation-coverage`).
+5. Add the inline entry (formula / edition / freeAccess / governance) in
+   [../citations.js](../citations.js) -- `check-citation-coverage` fails on a
+   `TOOLS` id with no `CITATIONS` row.
+
+   **Add a source-stamp row to [citation-discipline.md](citation-discipline.md)
+   only for a bespoke, hand-written renderer.** `build-citation-strings --check`
+   reads each row back out of the renderer it names, and it finds the literal by
+   locating `function render<Name>` and matching the `citationEl.textContent`
+   assignment inside it. A declarative `_simpleRenderer` tile has no such
+   function -- its citation lives in the spec object -- so a row added for one
+   fails the gate with "no citation literal found in its renderer". Every band
+   since the declarative factory arrived has (correctly) left those tiles out of
+   that table; `citations.js` is where their wording is reviewed.
 6. Regenerate the derived artifacts, **in this order** -- several read
    each other's output, and `extract-citations` reads a file the build
    emits, so running it early leaves `renderer-citations.js` stale and

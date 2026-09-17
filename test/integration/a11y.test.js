@@ -255,7 +255,19 @@ test("every tile's inputs have an accessible name and numeric keypad hint", asyn
   // hash nav (one page load) and assert each visible input has an accessible
   // name and each number input has inputmode -- so a new grid tile that skips
   // either fails here instead of shipping.
-  test.slow();
+  //
+  // Runtime scales with the catalog: one hash nav plus a 25 ms settle and a
+  // DOM probe per tile, so the floor is ~25 ms x TOOL_IDS before any work.
+  // `test.slow()` only triples the 30 s base to 90 s, and at 2,124 tiles the
+  // sweep crossed that ceiling -- it timed out on both attempts at exactly
+  // 1.5 min, on the pass that added nine tiles. The same thing happened to
+  // responsive-stress (see its header): a whole-catalog sweep that runs out
+  // of clock reports a failure it never found, which is worse than no gate,
+  // because the fix tried next is a content fix for a phantom. A timeout is
+  // not a budget -- it is the line past which the run is certainly wedged --
+  // so the headroom costs a passing run nothing. 300 s is ~3x the measured
+  // pass and leaves room for the catalog to keep growing.
+  test.setTimeout(300_000);
   await page.goto("/index.html");
   const offenders = [];
   for (const id of TOOL_IDS) {

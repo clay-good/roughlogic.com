@@ -140,6 +140,16 @@ export const PROFESSION_NOUN = {
   // the first thing buildTitle drops at the 70-char cap.
   plastics: "Plastics",
   foundry: "Foundry",
+  // Added 2026-09-17 with the warehouse racking and material handling band.
+  // `warehouse` leads on five of those tiles. `logistics` is the one this band
+  // surfaced rather than introduced: it has been a live SECONDARY trade in
+  // tools-data.js and never had an entry, so it was one tile away from the
+  // silent "Trades" fallback -- the forward sweep only reads a tile's FIRST
+  // trade, which is exactly how `instrumentation` and `controls` sat unseen
+  // until spec-v1818 led with them. Both are short on purpose: a long noun is
+  // the first thing buildTitle drops at the 70-char cap.
+  warehouse: "Warehouse",
+  logistics: "Logistics",
 };
 
 // Escape a string for embedding inside HTML text content or an attribute.

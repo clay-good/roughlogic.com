@@ -2257,6 +2257,16 @@ const RELATED = {
   "chilled-water-ride-through": ["ups-module-redundancy","crac-sensible-derate","datacenter-pue"],
   "server-inlet-envelope": ["crac-sensible-derate","containment-bypass-airflow","rack-power-density-airflow"],
   "raised-floor-tile-airflow": ["rack-power-density-airflow","containment-bypass-airflow","crac-sensible-derate"],
+  // spec-v1809..v1817 warehouse racking and material handling band.
+  "pallet-rack-beam-capacity": ["rack-upright-capacity-derate","rack-flue-space","rack-base-plate-anchorage"],
+  "rack-upright-capacity-derate": ["pallet-rack-beam-capacity","rack-base-plate-anchorage","rack-flue-space"],
+  "rack-base-plate-anchorage": ["rack-upright-capacity-derate","pallet-rack-beam-capacity","seismic-base-shear"],
+  "rack-flue-space": ["pallet-rack-beam-capacity","warehouse-cube-utilization","rack-upright-capacity-derate"],
+  "stacking-aisle-width": ["warehouse-cube-utilization","forklift-capacity-derate","pallet-loadout"],
+  "warehouse-cube-utilization": ["stacking-aisle-width","order-pick-labor-standard","rack-flue-space"],
+  "dock-leveler-slope": ["dock-door-count-throughput","forklift-capacity-derate","ramp-slope"],
+  "dock-door-count-throughput": ["dock-leveler-slope","order-pick-labor-standard","pallet-loadout"],
+  "order-pick-labor-standard": ["warehouse-cube-utilization","dock-door-count-throughput","stacking-aisle-width"],
 };
 
 export { RELATED };

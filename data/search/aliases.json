@@ -1,8 +1,233 @@
 {
  "_comment": "v10 Phase D.1 search aliases (spec-v10 \u00a76.1). One row per alias mapping a free-text term to a tile id. AUTHORING MASTER ONLY since the spec-v590 split remediation (2026-07-17): the runtime never fetches this file. scripts/build-alias-shards.mjs derives the per-group runtime shards data/search/aliases-<letter>.json from it (lazy parallel fetch on first search interaction via bindSearch / ensureAliases in app.js; --check in npm run lint gates drift), so edit THIS file and rerun the script. On exact-term match the user is routed to the target tile via the same path as a tool-name suggestion. Industry vocabulary, misspellings, abbreviations, question phrasings (spec-v590), and adjacent-question redirects only. The resolveQuery / matchAliasPrefix helpers in search-discovery.js are the canonical pure-functional resolvers (exercised by test/unit/search-discovery.test.js).",
- "_updated": "2026-09-13",
+ "_updated": "2026-09-17",
  "_schema": "Each alias row: { term: string, target: tile-id, kind: 'question' | 'industry' | 'adjacent' | 'redirect' }. Multiple aliases may map to the same target.",
  "aliases": [
+  {
+   "term": "pallet rack beam capacity",
+   "target": "pallet-rack-beam-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "rack beam deflection limit",
+   "target": "pallet-rack-beam-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "storage rack beam span load",
+   "target": "pallet-rack-beam-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "rmi mh16.1 beam design",
+   "target": "pallet-rack-beam-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "rack level capacity two pallets",
+   "target": "pallet-rack-beam-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "rack upright frame capacity",
+   "target": "rack-upright-capacity-derate",
+   "kind": "industry"
+  },
+  {
+   "term": "beam spacing unbraced length rack",
+   "target": "rack-upright-capacity-derate",
+   "kind": "industry"
+  },
+  {
+   "term": "damaged upright derate",
+   "target": "rack-upright-capacity-derate",
+   "kind": "industry"
+  },
+  {
+   "term": "rack column buckling capacity",
+   "target": "rack-upright-capacity-derate",
+   "kind": "industry"
+  },
+  {
+   "term": "rack load plaque beam elevation",
+   "target": "rack-upright-capacity-derate",
+   "kind": "industry"
+  },
+  {
+   "term": "rack base plate anchorage",
+   "target": "rack-base-plate-anchorage",
+   "kind": "industry"
+  },
+  {
+   "term": "rack overturning uplift anchor",
+   "target": "rack-base-plate-anchorage",
+   "kind": "industry"
+  },
+  {
+   "term": "seismic rack anchor tension",
+   "target": "rack-base-plate-anchorage",
+   "kind": "industry"
+  },
+  {
+   "term": "storage rack floor anchor",
+   "target": "rack-base-plate-anchorage",
+   "kind": "industry"
+  },
+  {
+   "term": "rack base plate hole count",
+   "target": "rack-base-plate-anchorage",
+   "kind": "industry"
+  },
+  {
+   "term": "right angle stacking aisle",
+   "target": "stacking-aisle-width",
+   "kind": "industry"
+  },
+  {
+   "term": "lift truck aisle width",
+   "target": "stacking-aisle-width",
+   "kind": "industry"
+  },
+  {
+   "term": "vna very narrow aisle",
+   "target": "stacking-aisle-width",
+   "kind": "industry"
+  },
+  {
+   "term": "reach truck aisle requirement",
+   "target": "stacking-aisle-width",
+   "kind": "industry"
+  },
+  {
+   "term": "warehouse aisle rack ratio",
+   "target": "stacking-aisle-width",
+   "kind": "industry"
+  },
+  {
+   "term": "warehouse cube utilization",
+   "target": "warehouse-cube-utilization",
+   "kind": "industry"
+  },
+  {
+   "term": "pallet positions per square foot",
+   "target": "warehouse-cube-utilization",
+   "kind": "industry"
+  },
+  {
+   "term": "storage density warehouse",
+   "target": "warehouse-cube-utilization",
+   "kind": "industry"
+  },
+  {
+   "term": "aisle share of floor area",
+   "target": "warehouse-cube-utilization",
+   "kind": "industry"
+  },
+  {
+   "term": "clear height utilization",
+   "target": "warehouse-cube-utilization",
+   "kind": "industry"
+  },
+  {
+   "term": "dock leveler slope",
+   "target": "dock-leveler-slope",
+   "kind": "industry"
+  },
+  {
+   "term": "truck bed height range dock",
+   "target": "dock-leveler-slope",
+   "kind": "industry"
+  },
+  {
+   "term": "dock leveler length selection",
+   "target": "dock-leveler-slope",
+   "kind": "industry"
+  },
+  {
+   "term": "loading dock grade forklift",
+   "target": "dock-leveler-slope",
+   "kind": "industry"
+  },
+  {
+   "term": "dock height service range",
+   "target": "dock-leveler-slope",
+   "kind": "industry"
+  },
+  {
+   "term": "rack flue space nfpa 13",
+   "target": "rack-flue-space",
+   "kind": "industry"
+  },
+  {
+   "term": "transverse longitudinal flue",
+   "target": "rack-flue-space",
+   "kind": "industry"
+  },
+  {
+   "term": "in rack sprinkler requirement",
+   "target": "rack-flue-space",
+   "kind": "industry"
+  },
+  {
+   "term": "rack storage beam length flue",
+   "target": "rack-flue-space",
+   "kind": "industry"
+  },
+  {
+   "term": "pallet overhang flue closure",
+   "target": "rack-flue-space",
+   "kind": "industry"
+  },
+  {
+   "term": "dock door count sizing",
+   "target": "dock-door-count-throughput",
+   "kind": "industry"
+  },
+  {
+   "term": "truck turn time dock",
+   "target": "dock-door-count-throughput",
+   "kind": "industry"
+  },
+  {
+   "term": "loading dock capacity trucks per day",
+   "target": "dock-door-count-throughput",
+   "kind": "industry"
+  },
+  {
+   "term": "dock utilization peak arrivals",
+   "target": "dock-door-count-throughput",
+   "kind": "industry"
+  },
+  {
+   "term": "trailer yard queueing",
+   "target": "dock-door-count-throughput",
+   "kind": "industry"
+  },
+  {
+   "term": "order pick labor standard",
+   "target": "order-pick-labor-standard",
+   "kind": "industry"
+  },
+  {
+   "term": "lines per hour picking",
+   "target": "order-pick-labor-standard",
+   "kind": "industry"
+  },
+  {
+   "term": "travel time share picking",
+   "target": "order-pick-labor-standard",
+   "kind": "industry"
+  },
+  {
+   "term": "batch picking productivity",
+   "target": "order-pick-labor-standard",
+   "kind": "industry"
+  },
+  {
+   "term": "warehouse pick rate pfd allowance",
+   "target": "order-pick-labor-standard",
+   "kind": "industry"
+  },
   {
    "term": "loop voltage budget",
    "target": "loop-voltage-budget",

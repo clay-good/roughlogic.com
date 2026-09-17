@@ -1357,6 +1357,16 @@ const _TILES = [
   ["chilled-water-ride-through", "C"],
   ["server-inlet-envelope", "C"],
   ["raised-floor-tile-airflow", "C"],
+  // spec-v1809..v1817 warehouse racking and material handling
+  ["pallet-rack-beam-capacity", "E"],
+  ["rack-upright-capacity-derate", "E"],
+  ["rack-base-plate-anchorage", "E"],
+  ["rack-flue-space", "E"],
+  ["stacking-aisle-width", "J"],
+  ["warehouse-cube-utilization", "J"],
+  ["dock-leveler-slope", "J"],
+  ["dock-door-count-throughput", "J"],
+  ["order-pick-labor-standard", "J"],
 ];
 
 

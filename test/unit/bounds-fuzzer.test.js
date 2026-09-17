@@ -53729,3 +53729,204 @@ test("bounds: spec-v1808 computeRaisedFloorTileAirflow -- flow and pressure obey
   assert.ok(Math.abs(r.increased_count_pressure_in_wc / r.required_plenum_pressure_in_wc - Math.pow(150 / 200, 2)) < 1e-12);
   for (const bad of [{ tile_area_ft2: 0 }, { open_area_pct: 0 }, { discharge_coefficient: 2 }, { plenum_pressure_in_wc: 0 }, { open_tile_count: 0 }, { reduced_pressure_in_wc: 0 }]) assert.ok(_v1808({ ...base, ...bad }).error);
 });
+
+// ---------------------------------------------------------------------------
+// spec-v1809..v1817: warehouse racking and material handling.
+// ---------------------------------------------------------------------------
+
+import {
+  computePalletRackBeamCapacity as _v1809,
+  computeRackUprightCapacityDerate as _v1810,
+  computeRackBasePlateAnchorage as _v1811,
+  computeStackingAisleWidth as _v1812,
+  computeWarehouseCubeUtilization as _v1813,
+  computeDockLevelerSlope as _v1814,
+  computeRackFlueSpace as _v1815,
+  computeDockDoorCountThroughput as _v1816,
+  computeOrderPickLaborStandard as _v1817,
+} from "../../calc-warehouse.js";
+
+test("bounds: spec-v1809 computePalletRackBeamCapacity -- deflection governs a beam that passes stress", () => {
+  const base = { span_in: 108, pallet_weight_lb: 2500, pallets_per_level: 2, moment_of_inertia_in4: 2.5, section_modulus_in3: 1.111, yield_strength_psi: 55000, deflection_limit_ratio: 180 };
+  const r = _v1809(base); assertFiniteNumericOutputs(r, "v1809");
+  assert.ok(Math.abs(r.moment_in_lb - 33750) < 1e-9);
+  assert.ok(Math.abs(r.deflection_in - 0.6221637931034483) < 1e-9);
+  assert.ok(Math.abs(r.deflection_limit_in - 0.6) < 1e-12);
+  // The whole point of the tile: stress passes, deflection fails, and
+  // deflection is what the rack industry accepts the beam on.
+  assert.ok(r.stress_pass && !r.deflection_pass && r.governs === "deflection");
+  // Moment is linear in span and deflection is cubic. The 12 in wider bay
+  // raises one by ~11% and the other by ~37%, which is the spec's claim and
+  // the reason a rack respaced in the field has an uncomputed capacity.
+  const wider = _v1809({ ...base, span_in: 120 });
+  assert.ok(Math.abs(wider.moment_in_lb / r.moment_in_lb - 120 / 108) < 1e-12);
+  assert.ok(Math.abs(wider.deflection_in / r.deflection_in - Math.pow(120 / 108, 3)) < 1e-12);
+  // Closing the gap takes stiffness, and the required I scales with the miss.
+  assert.ok(Math.abs(r.required_moment_of_inertia_in4 - 2.5 * r.deflection_ratio) < 1e-12);
+  const stiffer = _v1809({ ...base, moment_of_inertia_in4: r.required_moment_of_inertia_in4 });
+  assert.ok(Math.abs(stiffer.deflection_in - r.deflection_limit_in) < 1e-9);
+  for (const bad of [{ span_in: 0 }, { pallet_weight_lb: 0 }, { moment_of_inertia_in4: 0 }, { section_modulus_in3: 0 }, { yield_strength_psi: 0 }, { deflection_limit_ratio: 0 }, { pallets_per_level: 3 }, { span_in: Infinity }]) {
+    assert.ok(_v1809({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1810 computeRackUprightCapacityDerate -- doubling the unbraced length quarters the capacity", () => {
+  const base = { beam_spacing_in: 48, column_moment_of_inertia_in4: 0.6, effective_length_factor: 1, loaded_levels: 3, load_per_level_lb: 5000, rated_frame_capacity_lb: 24000 };
+  const r = _v1810(base); assertFiniteNumericOutputs(r, "v1810");
+  assert.ok(Math.abs(r.load_per_column_lb - 7500) < 1e-12 && Math.abs(r.utilization_pct - 62.5) < 1e-12);
+  assert.ok(Math.abs(r.euler_capacity_lb - 74536.07487) < 1e-4);
+  // The square law is the transferable fact, not the Euler magnitude.
+  assert.ok(Math.abs(r.removed_capacity_ratio - 0.25) < 1e-12);
+  assert.ok(Math.abs(r.removed_capacity_loss_pct - 75) < 1e-12);
+  // K enters squared as well: K = 2 costs the same factor of four.
+  const pinned = _v1810({ ...base, effective_length_factor: 2 });
+  assert.ok(Math.abs(pinned.euler_capacity_lb / r.euler_capacity_lb - 0.25) < 1e-12);
+  for (const key of ["beam_spacing_in", "column_moment_of_inertia_in4", "effective_length_factor", "loaded_levels", "load_per_level_lb", "rated_frame_capacity_lb"]) {
+    assert.ok(_v1810({ ...base, [key]: 0 }).error);
+  }
+  assert.ok(_v1810({ ...base, beam_spacing_in: Infinity }).error);
+});
+
+test("bounds: spec-v1811 computeRackBasePlateAnchorage -- the anchors take what the weight does not", () => {
+  const base = { frame_weight_lb: 15000, frame_depth_in: 42, top_beam_height_ft: 20, lateral_force_coefficient: 0.2, effective_height_fraction: 0.666667, allowable_anchor_tension_lb: 1800, base_plate_holes: 2, improved_anchor_tension_lb: 2800 };
+  const r = _v1811(base); assertFiniteNumericOutputs(r, "v1811");
+  assert.ok(Math.abs(r.lateral_force_lb - 3000) < 1e-12);
+  assert.ok(Math.abs(r.resisting_moment_ftlb - 26250) < 1e-12);
+  assert.ok(Math.abs(r.net_uplift_lb - 3928.577) < 0.01);
+  // 3 anchors into 2 holes is the finding; a better slab closes it with 2.
+  assert.deepStrictEqual([r.anchors_required, r.anchors_required_improved], [3, 2]);
+  assert.ok(!r.base_plate_sufficient && r.improved_plate_sufficient);
+  // A heavy enough frame resists its own overturning and the uplift floors at
+  // zero rather than going negative.
+  const heavy = _v1811({ ...base, lateral_force_coefficient: 0.01 });
+  assert.ok(heavy.weight_alone_resists && heavy.net_uplift_lb === 0 && heavy.anchors_required === 0);
+  for (const bad of [{ frame_weight_lb: 0 }, { frame_depth_in: 0 }, { top_beam_height_ft: 0 }, { lateral_force_coefficient: 0 }, { effective_height_fraction: 0 }, { effective_height_fraction: 1.5 }, { allowable_anchor_tension_lb: 0 }, { base_plate_holes: 0 }, { improved_anchor_tension_lb: 0 }, { frame_weight_lb: Infinity }]) {
+    assert.ok(_v1811({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1812 computeStackingAisleWidth -- the reach truck's own gain is not its share of the turret's", () => {
+  const base = { load_length_in: 48, operating_clearance_in: 6, counterbalanced_turning_radius_in: 78, counterbalanced_load_center_in: 14, reach_turning_radius_in: 55, reach_load_center_in: 8, turret_clearance_in: 12, rack_row_depth_in: 42, building_width_ft: 300 };
+  const r = _v1812(base); assertFiniteNumericOutputs(r, "v1812");
+  assert.deepStrictEqual([r.counterbalanced_aisle_in, r.reach_aisle_in, r.turret_aisle_in], [146, 117, 60]);
+  assert.deepStrictEqual([r.counterbalanced_modules, r.reach_modules, r.turret_modules], [15, 17, 25]);
+  assert.ok(Math.abs(r.turret_gain_pct - 200 / 3) < 1e-9 && r.turret_additional_rows === 20);
+  // spec-v1812 §3 calls the reach truck's figure "13 percent of that
+  // improvement". 13% is its own gain over the counterbalanced layout; its
+  // share of the turret's gain is 20%. They are different quantities and the
+  // tile reports both rather than letting one stand for the other.
+  assert.ok(Math.abs(r.reach_gain_pct - 40 / 3) < 1e-9);
+  assert.ok(Math.abs(r.reach_share_of_turret_gain_pct - 20) < 1e-9);
+  for (const key of ["load_length_in", "operating_clearance_in", "counterbalanced_turning_radius_in", "counterbalanced_load_center_in", "reach_turning_radius_in", "reach_load_center_in", "turret_clearance_in", "rack_row_depth_in", "building_width_ft"]) {
+    assert.ok(_v1812({ ...base, [key]: 0 }).error);
+  }
+  assert.ok(_v1812({ ...base, load_length_in: Infinity }).error);
+});
+
+test("bounds: spec-v1813 computeWarehouseCubeUtilization -- more of the floor is aisle than rack", () => {
+  const base = { building_width_ft: 300, building_depth_ft: 400, clear_height_ft: 32, module_pitch_in: 201, rack_row_depth_in: 42, rack_run_length_ft: 360, bays_per_row: 40, levels_per_bay: 6, pallets_per_bay_level: 2, pallet_width_in: 48, pallet_depth_in: 40, pallet_loaded_height_in: 50, beam_pitch_in: 58 };
+  const r = _v1813(base); assertFiniteNumericOutputs(r, "v1813");
+  assert.ok(Math.abs(r.building_cube_ft3 - 3840000) < 1e-9);
+  assert.deepStrictEqual([r.modules, r.rack_rows, r.pallet_positions], [17, 34, 16320]);
+  assert.ok(Math.abs(r.aisle_floor_ft2 - 59670) < 1e-9 && Math.abs(r.rack_floor_ft2 - 42840) < 1e-9);
+  assert.ok(r.aisle_floor_share_pct > r.rack_floor_share_pct);
+  assert.ok(Math.abs(r.cube_utilization_pct - 23.611111111111114) < 1e-9);
+  assert.ok(Math.abs(r.positions_per_ft2 - 0.136) < 1e-12);
+  assert.ok(Math.abs(r.level_clearance_in - 8) < 1e-12);
+  // The module pitch has to leave room for an aisle, and the rack run cannot
+  // be longer than the building is deep -- both are silent nonsense otherwise.
+  assert.ok(_v1813({ ...base, module_pitch_in: 84 }).error);
+  assert.ok(_v1813({ ...base, rack_run_length_ft: 401 }).error);
+  for (const key of ["building_width_ft", "building_depth_ft", "clear_height_ft", "module_pitch_in", "rack_row_depth_in", "rack_run_length_ft", "bays_per_row", "levels_per_bay", "pallets_per_bay_level", "pallet_width_in", "pallet_depth_in", "pallet_loaded_height_in", "beam_pitch_in"]) {
+    assert.ok(_v1813({ ...base, [key]: 0 }).error);
+  }
+  assert.ok(_v1813({ ...base, clear_height_ft: Infinity }).error);
+});
+
+test("bounds: spec-v1814 computeDockLevelerSlope -- reaching the trailer and working the ramp are different questions", () => {
+  const base = { dock_height_in: 48, low_bed_height_in: 40, high_bed_height_in: 56, leveler_length_ft: 6, service_range_in: 12, grade_guideline_pct: 10, longer_leveler_length_ft: 10, outlier_bed_height_in: 36 };
+  const r = _v1814(base); assertFiniteNumericOutputs(r, "v1814");
+  // Both ends are 8 in from the dock, well inside the service range, and both
+  // exceed the grade guideline. That is the spec's point.
+  assert.ok(r.low_within_service_range && r.high_within_service_range);
+  assert.ok(!r.low_grade_pass && !r.high_grade_pass);
+  assert.ok(Math.abs(r.low_grade_pct - 100 * 8 / 72) < 1e-12);
+  assert.ok(Math.abs(r.longer_leveler_grade_pct - 100 * 8 / 120) < 1e-12);
+  assert.ok(r.longer_leveler_grade_pass);
+  // Grade is a magnitude: a trailer above the dock gives a signed differential
+  // and an unsigned grade, so the high end is not reported as a negative ramp.
+  assert.ok(r.high_differential_in < 0 && r.high_grade_pct > 0);
+  // The outlier at the edge of the fleet sets the requirement.
+  assert.ok(Math.abs(r.outlier_grade_pct - 100 * 12 / 72) < 1e-12);
+  assert.ok(Math.abs(r.governing_grade_pct - r.outlier_grade_pct) < 1e-12);
+  assert.ok(_v1814({ ...base, low_bed_height_in: 60 }).error);
+  for (const key of ["dock_height_in", "low_bed_height_in", "high_bed_height_in", "leveler_length_ft", "service_range_in", "grade_guideline_pct", "longer_leveler_length_ft", "outlier_bed_height_in"]) {
+    assert.ok(_v1814({ ...base, [key]: 0 }).error);
+  }
+  assert.ok(_v1814({ ...base, dock_height_in: Infinity }).error);
+});
+
+test("bounds: spec-v1815 computeRackFlueSpace -- the flue sets the beam, and a deeper load closes it", () => {
+  const base = { pallet_width_in: 48, pallet_depth_in: 48, pallets_per_bay: 2, transverse_gaps: 3, nominal_flue_in: 6, beam_length_in: 108, frame_depth_in: 42, back_to_back_spacing_in: 12, deeper_load_depth_in: 52 };
+  const r = _v1815(base); assertFiniteNumericOutputs(r, "v1815");
+  assert.ok(Math.abs(r.transverse_gap_each_in - 4) < 1e-12 && !r.transverse_flue_pass);
+  assert.ok(Math.abs(r.required_beam_length_in - 114) < 1e-12 && Math.abs(r.beam_shortfall_in - 6) < 1e-12);
+  // The longitudinal flue is exactly nominal with no margin, and a 4 in
+  // deeper load takes it to a third of nominal with nothing else changing.
+  assert.ok(Math.abs(r.longitudinal_flue_in - 6) < 1e-12 && r.longitudinal_flue_pass);
+  assert.ok(Math.abs(r.deeper_load_longitudinal_flue_in - 2) < 1e-12 && !r.deeper_load_flue_pass);
+  assert.ok(Math.abs(r.deeper_load_flue_share_pct - 100 / 3) < 1e-9);
+  // Building the bay to the required length is what makes the flue.
+  const built = _v1815({ ...base, beam_length_in: r.required_beam_length_in });
+  assert.ok(built.transverse_flue_pass && Math.abs(built.transverse_gap_each_in - 6) < 1e-12);
+  for (const key of ["pallet_width_in", "pallet_depth_in", "pallets_per_bay", "transverse_gaps", "nominal_flue_in", "beam_length_in", "frame_depth_in", "back_to_back_spacing_in", "deeper_load_depth_in"]) {
+    assert.ok(_v1815({ ...base, [key]: 0 }).error);
+  }
+  assert.ok(_v1815({ ...base, beam_length_in: Infinity }).error);
+});
+
+test("bounds: spec-v1816 computeDockDoorCountThroughput -- the peak asks for more doors than the average", () => {
+  const base = { trucks_per_day: 60, operating_hours: 10, turn_time_min: 55, utilization_pct: 65, peak_arrival_share_pct: 40, peak_window_hours: 3, improved_turn_time_min: 40 };
+  const r = _v1816(base); assertFiniteNumericOutputs(r, "v1816");
+  assert.ok(Math.abs(r.door_hours - 55) < 1e-12 && Math.abs(r.doors_at_full_utilization - 5.5) < 1e-12);
+  assert.deepStrictEqual([r.doors_required, r.peak_doors_required, r.peak_shortfall_doors], [9, 12, 3]);
+  // 15 minutes of turn time buys back the whole peak shortfall, which is
+  // process rather than construction.
+  assert.deepStrictEqual([r.improved_peak_doors_required, r.doors_saved_by_turn_time], [9, 3]);
+  // Door count rounds UP: a dock cannot build 8.46 doors.
+  assert.ok(Number.isInteger(r.doors_required) && r.doors_required >= r.doors_at_full_utilization);
+  assert.ok(_v1816({ ...base, peak_window_hours: 11 }).error);
+  assert.ok(_v1816({ ...base, utilization_pct: 101 }).error);
+  assert.ok(_v1816({ ...base, peak_arrival_share_pct: 0 }).error);
+  for (const key of ["trucks_per_day", "operating_hours", "turn_time_min", "utilization_pct", "peak_window_hours", "improved_turn_time_min"]) {
+    assert.ok(_v1816({ ...base, [key]: 0 }).error);
+  }
+  assert.ok(_v1816({ ...base, trucks_per_day: Infinity }).error);
+});
+
+test("bounds: spec-v1817 computeOrderPickLaborStandard -- the gain comes out of the element with no output", () => {
+  const base = { lines_per_order: 120, units_per_line: 2.5, travel_time_s: 18, pick_time_s: 12, additional_unit_time_s: 3, setup_time_min: 8, pfd_allowance_pct: 15, batch_size: 4, batch_travel_time_s: 7 };
+  const r = _v1817(base); assertFiniteNumericOutputs(r, "v1817");
+  assert.ok(Math.abs(r.time_per_line_s - 34.5) < 1e-12);
+  assert.ok(Math.abs(r.allowed_order_time_min - 88.55) < 1e-12);
+  assert.ok(Math.abs(r.lines_per_hour - 81.30999435346697) < 1e-9);
+  assert.ok(Math.abs(r.units_per_hour - r.lines_per_hour * 2.5) < 1e-9);
+  // Travel is over half the picking time and none of it touches a carton.
+  assert.ok(Math.abs(r.travel_share_pct - 100 * 18 / 34.5) < 1e-9);
+  assert.ok(Math.abs(r.batch_lines_per_hour - 113.83399209486166) < 1e-9);
+  assert.ok(Math.abs(r.batch_improvement_pct - 40) < 1e-9);
+  // Only the travel element changes under batching; the handling does not.
+  assert.ok(Math.abs(r.time_per_line_s - r.batch_time_per_line_s - (18 - 7)) < 1e-12);
+  // Batching cannot make travel worse than the discrete order it replaces.
+  assert.ok(_v1817({ ...base, batch_travel_time_s: 19 }).error);
+  // A single-unit line carries no additional-unit increment at all.
+  const single = _v1817({ ...base, units_per_line: 1 });
+  assert.ok(Math.abs(single.time_per_line_s - 30) < 1e-12);
+  assert.ok(_v1817({ ...base, units_per_line: 0.5 }).error);
+  for (const key of ["lines_per_order", "travel_time_s", "pick_time_s", "batch_travel_time_s"]) {
+    assert.ok(_v1817({ ...base, [key]: 0 }).error);
+  }
+  assert.ok(_v1817({ ...base, additional_unit_time_s: -1 }).error);
+  assert.ok(_v1817({ ...base, pfd_allowance_pct: -1 }).error);
+  assert.ok(_v1817({ ...base, lines_per_order: Infinity }).error);
+});

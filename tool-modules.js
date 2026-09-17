@@ -1379,6 +1379,18 @@ export const TOOL_MODULES = (() => {
     "chilled-water-ride-through", "server-inlet-envelope",
     "raised-floor-tile-airflow",
   ]);
+  // spec-v1809..v1817: warehouse racking and material handling. Four Group E
+  // tiles are the rack as a structure -- beam load and deflection, upright
+  // unbraced length, base plate anchorage, flue space -- and five Group J
+  // tiles are the building and the operation it serves: stacking aisle width,
+  // cube utilisation, dock leveler grade, dock door count, and the order pick
+  // labour standard.
+  declare("./calc-warehouse.js", "WAREHOUSE_RENDERERS", [
+    "pallet-rack-beam-capacity", "rack-upright-capacity-derate",
+    "rack-base-plate-anchorage", "rack-flue-space", "stacking-aisle-width",
+    "warehouse-cube-utilization", "dock-leveler-slope",
+    "dock-door-count-throughput", "order-pick-labor-standard",
+  ]);
   // spec-v1845..v1850: the snow and ice management bench -- what a pavement
   // temperature costs in salt, what a brine batch has to be, how long a plow
   // route takes, where the snow goes, when a deicer stops working, and whether
