@@ -3193,7 +3193,7 @@ HVACSYSTEMS_RENDERERS["refractory-shell-temperature"] = _simpleRenderer({
 // space from its current pressure to the relief setting with the vent closed,
 // from the ideal gas law at the entered vapour temperature.
 const _CRYO_R_PSIA_FT3_PER_LBMOL_R = 10.7316;
-const _CRYO_GAL_PER_FT3 = 7.480519;
+const _CRYO_GAL_PER_FT3 = 1728 / 231;
 // dims: in { tank_volume_gal: L^3, ner_pct_per_day: dimensionless, liquid_density_lb_gal: M L^-3, latent_heat_btu_lb: L^2 T^-2, vapour_space_pct: dimensionless, current_pressure_psig: M L^-1 T^-2, relief_pressure_psig: M L^-1 T^-2, molecular_weight: dimensionless, vapour_temp_r: T, alt_vapour_space_pct: dimensionless, withdrawal_gal_day: L^3 } out: { boil_off_gal_day: L^3, boil_off_lb_day: M, heat_leak_btu_hr: M L^2 T^-3, vapour_space_ft3: L^3, hold_time_hr: T, alt_hold_time_hr: T }
 export function computeCryogenicBoiloff({
   tank_volume_gal = 0, ner_pct_per_day = 0, liquid_density_lb_gal = 0, latent_heat_btu_lb = 0,

@@ -888,7 +888,7 @@ const _LB_PER_CEMENT_BAG = 94;
 const _CUFT_PER_LIME_BAG = 1.25;
 const _LB_PER_LIME_BAG = 50;
 const _CUFT_PER_SHOVEL = 0.5;
-const _GAL_PER_CUFT = 7.48052;
+const _GAL_PER_CUFT = 1728 / 231;
 
 // ============ spec-v1683: ASTM C270 mortar batch proportions ============
 

@@ -81,7 +81,7 @@ export const WIND_RENDERERS = {};
 // 0.745699872 kW per horsepower, 8,760 hours in a year, the Betz coefficient
 // 16/27, and the IEC/ISO reference air density 0.0765 lb/cu ft at 59 degF
 // (518.67 degR) and sea level.
-const _FPS_PER_MPH = 1.4666667;
+const _FPS_PER_MPH = 22 / 15;
 const _G_FPS2 = 32.174;
 const _FTLB_S_PER_HP = 550;
 const _KW_PER_HP = 0.745699872;

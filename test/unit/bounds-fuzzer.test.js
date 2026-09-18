@@ -43876,7 +43876,7 @@ test("bounds: spec-v1601 computeVacuumExcavationSpoil pins swell against the tan
   // Water added for wet cutting goes into the tank too.
   const wet = _v1601({ ...base, water_added_gal: 1000 });
   assert.ok(wet.loose_cy_total > r.loose_cy_total);
-  assert.ok(Math.abs(wet.water_cy - 1000 / 7.48052 / 27) < 1e-9);
+  assert.ok(Math.abs(wet.water_cy - 1000 / (1728 / 231) / 27) < 1e-9);
   // Haul time follows the fills, which is why disposal changes the day.
   assert.ok(Math.abs(r.haul_time_min - r.tank_fills * 75) < 1e-9);
   assert.ok(Math.abs(day.haul_time_min - 150) < 1e-9);
@@ -51147,7 +51147,7 @@ import {
 test("bounds: spec-v1701 computePoolCoverEvaporation -- a cover only works while it is ON", () => {
   const base = { surface_area_ft2: 800, evaporation_in_day: 0.25, cover_effectiveness_pct: 90, cover_hours_per_day: 16, heater_efficiency_pct: 82, fuel_cost_per_mmbtu: 12, season_days: 180 };
   const r = _v1701(base);
-  assert.ok(Math.abs(r.gallons_per_day - 800 * 0.25 / 12 * 7.481) < 1e-9);
+  assert.ok(Math.abs(r.gallons_per_day - 800 * 0.25 / 12 * (1728 / 231)) < 1e-9);
   assert.ok(Math.abs(r.mmbtu_per_day - 1.0877) < 0.001);
   // IDENTITY: the cover saving is effectiveness x hours-fraction, exactly.
   assert.ok(Math.abs(r.cover_saving_mmbtu_day - r.mmbtu_per_day * 0.90 * (16 / 24)) < 1e-12);
@@ -51175,8 +51175,8 @@ test("bounds: spec-v1702 computePoolPumpSpeedSavings -- energy goes with the SQU
   assert.ok(Math.abs(r.energy_fraction - 0.25) < 1e-12);
   assert.ok(Math.abs(r.energy_fraction - Math.pow(0.5, 2)) < 1e-12);
   assert.ok(r.energy_fraction > r.power_fraction);
-  // Derived from the exact 0.7457 kW/hp, not the spec's rounded 1.49 kW.
-  const exactFullKw = 2 * 0.7457;
+  // Derived from the exact kW/hp (550 ft-lbf/s), not the spec's rounded 1.49 kW.
+  const exactFullKw = 2 * (550 * 0.3048 * 4.4482216152605 / 1000);
   assert.ok(Math.abs(r.full_kw - exactFullKw) < 1e-12);
   const exactSaving = exactFullKw * 8 - exactFullKw * 0.125 * 16;
   assert.ok(Math.abs(r.saving_kwh_day - exactSaving) < 1e-12);

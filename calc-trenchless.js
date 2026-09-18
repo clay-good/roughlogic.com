@@ -87,8 +87,8 @@ export const TRENCHLESS_RENDERERS = {};
 // 27 cubic ft per cubic yard, 144 square inches per square foot, water at
 // 62.4 lb per cubic foot, and the 0.052 psi per foot per pound-per-gallon
 // mud-column constant.
-const _GAL_PER_CUFT = 7.48052;
-const _CUFT_PER_BBL = 5.615;
+const _GAL_PER_CUFT = 1728 / 231;
+const _CUFT_PER_BBL = 42 * 231 / 1728;
 const _CUFT_PER_CY = 27;
 const _SQIN_PER_SQFT = 144;
 const _WATER_PCF = 62.4;

@@ -74,6 +74,22 @@ const EXACT = {
   M2_PER_ACRE: [43560 * 0.3048 * 0.3048, "43,560 international sq ft to the acre"],
   PA_PER_PSF: [4.4482216152605 / (0.3048 * 0.3048), "1 lbf = 4.4482216152605 N exactly, over a square foot"],
   LB_PER_MEGAGRAM: [1e6 / 453.59237, "1 lb = 453.59237 g exactly"],
+  // Module-private factors, underscore-prefixed, which the pattern below could
+  // not see until 2026-09-18 -- when calc-oilgas held both an exact barrel and
+  // a 5.615 one a hundred lines apart.
+  _OG_CUFT_PER_BBL: [42 * 231 / 1728, "a barrel is 42 US gallons of 231 cu in"],
+  _CUFT_PER_BBL: [42 * 231 / 1728, "the same barrel"],
+  _GAL_PER_CUFT: [1728 / 231, "231 cu in to the gallon, 1,728 to the cubic foot"],
+  _AQ_GAL_PER_CUFT: [1728 / 231, "the same factor"],
+  _REF_GAL_PER_CUFT: [1728 / 231, "the same factor"],
+  _CRYO_GAL_PER_FT3: [1728 / 231, "the same factor"],
+  _POOL_GAL_PER_CU_FT: [1728 / 231, "the same factor"],
+  _WW_GAL_PER_CU_FT: [1728 / 231, "the same factor"],
+  _GPM_PER_CFS: [60 * 1728 / 231, "60 s a minute of 1,728 / 231 gal"],
+  _FPS_PER_MPH: [22 / 15, "5,280 ft per mile over 3,600 s per hour"],
+  _POOL_KW_PER_HP: [550 * 0.3048 * 4.4482216152605 / 1000, "550 ft-lbf/s, exactly 745.699872 W"],
+  _M2_PER_FT2: [0.3048 * 0.3048, "the square of the international foot"],
+  _M3_PER_FT3: [0.3048 * 0.3048 * 0.3048, "the cube of the international foot"],
 };
 
 // Every `NAME = value` in a `const` statement, including the second and later
@@ -87,7 +103,7 @@ function* numericConstants(src) {
   for (const stmt of src.matchAll(/^\s*const\s+([^;]+);/gm)) {
     const parts = stmt[1].split(/,(?![^(]*\))/);
     for (const part of parts) {
-      const m = /^\s*([A-Z][A-Z0-9_]*)\s*=\s*(.+?)\s*$/.exec(part);
+      const m = /^\s*(_?[A-Z][A-Z0-9_]*)\s*=\s*(.+?)\s*$/.exec(part);
       if (!m || !ARITHMETIC.test(m[2]) || !/\d/.test(m[2])) continue;
       const value = Function(`"use strict"; return (${m[2]});`)();
       const plain = parts.length === 1 && /^-?\d+(?:\.\d+)?(?:e-?\d+)?$/.test(m[2]);
@@ -125,6 +141,10 @@ test("no two modules define the same named numeric constant differently", () => 
     const src = readFileSync(resolve(ROOT, file), "utf8");
     for (const [name, number, , plain] of numericConstants(src)) {
       if (name.length < 4) continue;
+      // Underscore-prefixed names are module-private by convention and may
+      // legitimately differ (calc-hvac's _KW_PER_HP is the DOE compressed-air
+      // 0.746 it cites); only the table above judges them.
+      if (name.startsWith("_")) continue;
       // Function-local limits declared several to a line (MIN_W, H_MAX) name
       // different quantities in different places; a unit factor never does.
       if (!plain && !name.includes("_PER_")) continue;

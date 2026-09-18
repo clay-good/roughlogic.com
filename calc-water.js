@@ -2483,7 +2483,7 @@ WATER_RENDERERS["constant-pressure-well-vfd"] = _simpleRenderer({
 // fixed-speed station cycles fastest: V = t x Q / 4 falls straight out of
 // maximising fill time plus draw time.
 // =====================================================================
-const _WW_GAL_PER_CU_FT = 7.481;
+const _WW_GAL_PER_CU_FT = 1728 / 231;
 // dims: in { pump_gpm: L^3 T^-1, well_diameter_ft: L, min_cycle_minutes: T, max_starts_per_hour: dimensionless, inflow_gpm: L^3 T^-1 } out: { active_volume_gal: L^3, area_ft2: L^2, gal_per_ft: L^2, level_differential_ft: L, worst_case_inflow_gpm: L^3 T^-1, cycle_at_inflow_min: T }
 export function computeWetWellCycleTime({
   pump_gpm = 0, well_diameter_ft = 0, min_cycle_minutes = 0, max_starts_per_hour = 0, inflow_gpm = 0,

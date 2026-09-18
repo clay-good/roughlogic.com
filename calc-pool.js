@@ -90,7 +90,7 @@ export const POOL_RENDERERS = {};
 // =====================================================================
 // spec-v1701: pool cover evaporation and heat loss savings.
 // =====================================================================
-const _POOL_GAL_PER_CU_FT = 7.481;
+const _POOL_GAL_PER_CU_FT = 1728 / 231;
 const _POOL_LB_PER_GAL = 8.34;
 const _POOL_LATENT_BTU_PER_LB = 1046;
 // dims: in { surface_area_ft2: L^2, evaporation_in_day: L T^-1, cover_effectiveness_pct: dimensionless, cover_hours_per_day: T, heater_efficiency_pct: dimensionless, fuel_cost_per_mmbtu: dimensionless, season_days: T } out: { gallons_per_day: L^3 T^-1, pounds_per_day: M T^-1, mmbtu_per_day: L^2 M T^-2, cover_saving_mmbtu_day: L^2 M T^-2, season_saving_mmbtu: L^2 M T^-2, season_saving_cost: dimensionless }
@@ -173,7 +173,7 @@ POOL_RENDERERS["pool-cover-evaporation"] = _simpleRenderer({
 // an eighth. Same affinity relation, different binding constraint, and the
 // difference is the number an owner is quoted.
 // =====================================================================
-const _POOL_KW_PER_HP = 0.7457;
+const _POOL_KW_PER_HP = 550 * 0.3048 * 4.4482216152605 / 1000;
 // dims: in { pump_hp: L^2 M T^-3, full_speed_hours: T, speed_fraction: dimensionless, electricity_rate_per_kwh: dimensionless, days_per_year: dimensionless, minimum_flow_fraction: dimensionless } out: { full_kw: L^2 M T^-3, reduced_kw: L^2 M T^-3, reduced_hours: T, full_kwh_day: L^2 M T^-2, reduced_kwh_day: L^2 M T^-2, saving_kwh_day: L^2 M T^-2, annual_saving_cost: dimensionless, energy_fraction: dimensionless }
 export function computePoolPumpSpeedSavings({
   pump_hp = 0, full_speed_hours = 0, speed_fraction = 0.5,
