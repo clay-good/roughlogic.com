@@ -4630,21 +4630,33 @@ export function computeDockPilingLateral({
   if (existing_embedment_ft < 0) return { error: "Existing embedment cannot be negative (ft)." };
   const b_ft = pile_diameter_in / 12;
   const moment_ftlb = lateral_load_lb * height_above_mudline_ft;
-  // IBC 1807.3 nonconstrained embedment, the same relation the catalog uses
-  // for posts. S1 is the lateral bearing at one third the embedment, and the
-  // code permits it to be taken at the value entered.
-  const a_term = _MEC_EMBED_A_CONST * lateral_load_lb / (soil_lateral_bearing_psf_per_ft * b_ft);
-  const embedment_ft = 0.5 * a_term * (1 + Math.sqrt(1 + _MEC_EMBED_H_CONST * height_above_mudline_ft / a_term));
+  // IBC 1807.3.2.1 nonconstrained embedment, the same relation the catalog's
+  // pole-embedment-depth uses. S1 is the lateral bearing at ONE THIRD of the
+  // embedment -- the entered rate (psf per ft of depth, IBC 1806.2) times d/3 --
+  // so d appears on both sides and is found by bisection. This tile had used
+  // the per-foot rate itself as S1, which on the worked pile asked 23.9 ft of
+  // embedment where the code gives about 9.7.
+  const embedFor = (h_ft) => {
+    const req = (d) => {
+      const A = _MEC_EMBED_A_CONST * lateral_load_lb / (soil_lateral_bearing_psf_per_ft * d / 3 * b_ft);
+      return 0.5 * A * (1 + Math.sqrt(1 + _MEC_EMBED_H_CONST * h_ft / A));
+    };
+    let lo = 1e-6, hi = 1000;
+    for (let i = 0; i < 200; i++) {
+      const mid = (lo + hi) / 2;
+      if (req(mid) > mid) lo = mid; else hi = mid;
+    }
+    return (lo + hi) / 2;
+  };
+  const embedment_ft = embedFor(height_above_mudline_ft);
+  const a_term = _MEC_EMBED_A_CONST * lateral_load_lb / (soil_lateral_bearing_psf_per_ft * embedment_ft / 3 * b_ft);
   // Scour is what makes this a marine problem rather than a fence problem: the
   // effective mudline drops, so the cantilever LENGTHENS and the embedment
   // SHORTENS at the same time.
   const has_scour = scour_ft > 0;
   const scoured_height_ft = height_above_mudline_ft + scour_ft;
   const scoured_moment_ftlb = lateral_load_lb * scoured_height_ft;
-  const scoured_a_term = a_term;
-  const scoured_embedment_ft = has_scour
-    ? 0.5 * scoured_a_term * (1 + Math.sqrt(1 + _MEC_EMBED_H_CONST * scoured_height_ft / scoured_a_term))
-    : embedment_ft;
+  const scoured_embedment_ft = has_scour ? embedFor(scoured_height_ft) : embedment_ft;
   const total_depth_needed_ft = scoured_embedment_ft + scour_ft;
   const extra_depth_ft = total_depth_needed_ft - embedment_ft;
   const scour_verdict = !has_scour

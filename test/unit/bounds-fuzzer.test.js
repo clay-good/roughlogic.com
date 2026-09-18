@@ -49916,7 +49916,9 @@ test("bounds: spec-v1644 computeDockPilingLateral -- scour attacks from both dir
   const r = _v1644(base);
   // IDENTITY: the moment, and the code's own embedment relation.
   assert.ok(Math.abs(r.moment_ftlb - 1200 * 6) < 1e-9);
-  assert.ok(Math.abs(r.a_term - 2.34 * 1200 / (150 * 1)) < 1e-9);
+  // S1 is the rate at one third of the embedment (IBC 1807.3.2.1), so the
+  // relation holds at its own fixed point.
+  assert.ok(Math.abs(r.a_term - 2.34 * 1200 / (150 * r.embedment_ft / 3 * 1)) < 1e-9);
   assert.ok(Math.abs(r.embedment_ft - 0.5 * r.a_term * (1 + Math.sqrt(1 + 4.36 * 6 / r.a_term))) < 1e-9);
   // SCOUR LENGTHENS THE CANTILEVER AND DEEPENS THE DRIVE, both at once.
   assert.ok(Math.abs(r.scoured_height_ft - 8) < 1e-12);

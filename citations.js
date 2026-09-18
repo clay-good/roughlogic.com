@@ -22144,7 +22144,7 @@ export const CITATIONS = {
     ],
   },
   "dock-piling-lateral": {
-    formula: "the nonconstrained embedment d = 0.5 A (1 + sqrt(1 + 4.36 h / A)) with A = 2.34 P / (S1 b); scour lengthens the cantilever by the scour depth and the pile must be driven that much deeper below the ORIGINAL mudline on top of the deeper embedment the longer cantilever demands.",
+    formula: "the nonconstrained embedment d = 0.5 A (1 + sqrt(1 + 4.36 h / A)) with A = 2.34 P / (S1 b), S1 being the lateral bearing rate at one third of the embedment (rate x d / 3, IBC 1807.3.2.1), so d is solved iteratively; scour lengthens the cantilever by the scour depth and the pile must be driven that much deeper below the ORIGINAL mudline on top of the deeper embedment the longer cantilever demands.",
     edition: "The nonconstrained lateral embedment relation the building code gives for posts and poles, applied to a marine pile, with the soil's lateral bearing ENTERED from the geotechnical information for the site rather than inferred from the driving record. It does not compute berthing energy, wind or current loading, or ice; it does not check the pile's own bending capacity or its section loss to marine borers, address pile group effects, evaluate uplift or axial capacity, or account for a sloping mudline.",
     freeAccess: "One code relation evaluated twice; no code text is reproduced.",
     governance: GOVERNANCE.general,
