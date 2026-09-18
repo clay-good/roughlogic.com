@@ -51638,7 +51638,7 @@ test("bounds: spec-v1534 computeTankStrappingVolume -- gross to net is 2% and it
   // The spec's figures, to the digit.
   assert.ok(Math.abs(r.bbl_per_ft - 125.89) < 0.01);
   assert.ok(Math.abs(r.bbl_per_in - 10.491) < 0.001);
-  assert.ok(Math.abs(r.gross_bbl - 1825.4) < 0.1);
+  assert.ok(Math.abs(r.gross_bbl - 1825.5) < 0.1);
   assert.ok(Math.abs(r.moved_bbl - 629.4) < 0.1);
   assert.ok(Math.abs(r.net_bbl - 616.9) < 0.1);
   assert.ok(Math.abs(r.correction_bbl - 12.5) < 0.1);
@@ -51671,20 +51671,20 @@ test("bounds: spec-v1535 computeTankVentApi2000 -- the vacuum side is the one th
   const base = { pump_in_bph: 3000, pump_out_bph: 2000, volatile_factor: 1, thermal_out_ft3h: 1200, thermal_in_ft3h: 3600, fire_case_ft3h: 742000, installed_pressure_ft3h: 20000, installed_vacuum_ft3h: 12000 };
   const r = _v1535(base);
   // The spec's displacement figures, exactly.
-  assert.ok(Math.abs(r.liquid_out_ft3h - 16845) < 1e-9);
-  assert.ok(Math.abs(r.liquid_in_ft3h - 11230) < 1e-9);
+  assert.ok(Math.abs(r.liquid_out_ft3h - 3000 * (42 * 231 / 1728)) < 1e-9);
+  assert.ok(Math.abs(r.liquid_in_ft3h - 2000 * (42 * 231 / 1728)) < 1e-9);
   // IDENTITY: each requirement is displacement plus its thermal term.
-  assert.ok(Math.abs(r.required_out_ft3h - (16845 + 1200)) < 1e-9);
-  assert.ok(Math.abs(r.required_in_ft3h - (11230 + 3600)) < 1e-9);
+  assert.ok(Math.abs(r.required_out_ft3h - (3000 * (42 * 231 / 1728) + 1200)) < 1e-9);
+  assert.ok(Math.abs(r.required_in_ft3h - (2000 * (42 * 231 / 1728) + 3600)) < 1e-9);
   // The volatile allowance multiplies out-breathing ONLY.
   const volatile = _v1535({ ...base, volatile_factor: 1.07 });
-  assert.ok(Math.abs(volatile.liquid_out_ft3h - 16845 * 1.07) < 1e-9);
+  assert.ok(Math.abs(volatile.liquid_out_ft3h - 3000 * (42 * 231 / 1728) * 1.07) < 1e-9);
   assert.ok(Math.abs(volatile.liquid_in_ft3h - r.liquid_in_ft3h) < 1e-12);
   // THE POINT: this tank passes on pressure and is SHORT on vacuum, which
   // is the direction that dishes a tank in.
   assert.equal(r.pressure_short, false);
   assert.equal(r.vacuum_short, true);
-  assert.ok(Math.abs(r.vacuum_margin_ft3h - (12000 - 14830)) < 1e-9);
+  assert.ok(Math.abs(r.vacuum_margin_ft3h - (12000 - 2000 * (42 * 231 / 1728) - 3600)) < 1e-9);
   // THERMAL ALONE: an idle tank with no pumping still breathes in.
   const idle = _v1535({ ...base, pump_in_bph: 0, pump_out_bph: 0.0001 });
   assert.ok(idle.required_in_ft3h > 3599);

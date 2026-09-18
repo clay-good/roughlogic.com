@@ -1790,8 +1790,8 @@
       "date": "2026-09-01"
     },
     "/tools/corroded-pipe-b31g/": {
-      "sha": "a2b3045087a265d8",
-      "date": "2026-09-08"
+      "sha": "23f0b90515a3b388",
+      "date": "2026-09-18"
     },
     "/tools/corrosion-rate-weight-loss/": {
       "sha": "08ac638d12d5417a",
@@ -7662,12 +7662,12 @@
       "date": "2026-09-04"
     },
     "/tools/tank-strapping-volume/": {
-      "sha": "6592c1d554a90c10",
-      "date": "2026-09-09"
+      "sha": "3b2d9b4f7383d72c",
+      "date": "2026-09-18"
     },
     "/tools/tank-vent-api-2000/": {
-      "sha": "d610541b990ce3d3",
-      "date": "2026-09-09"
+      "sha": "bf003e27f06152ac",
+      "date": "2026-09-18"
     },
     "/tools/tank-volume/": {
       "sha": "2504ef89da7246ff",

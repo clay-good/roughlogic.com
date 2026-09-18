@@ -23203,6 +23203,7 @@ export const CITATIONS = {
       { name: "Nominal wall and a single defect", value: "interacting defects and clusters need a different treatment", source: "ASME B31G" },
       { name: "General metal loss only", value: "cracks, gouges, dents and weld anomalies are outside the criterion", source: "a fitness-for-service assessment" },
       { name: "Conservative by design", value: "RSTRENG with a river-bottom profile usually permits more", source: "the operator's integrity management program" },
+      { name: "Safe pressure ceiling", value: "the safe pressure may not exceed the design pressure of the same pipe uncorroded; the 1.1 flow stress would otherwise let a short, shallow defect read stronger than sound pipe", source: "ASME B31G" },
     ],
   },
   "casing-cement-volume": {

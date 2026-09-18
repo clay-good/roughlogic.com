@@ -577,7 +577,14 @@ export function computeCorrodedPipeB31g({
   const failure_pressure_psi = is_parabolic
     ? flow_stress_psi * hoop_term * (1 - two_thirds_depth) / (1 - two_thirds_depth / folias_m)
     : flow_stress_psi * hoop_term * (1 - depth_ratio);
-  const safe_pressure_psi = failure_pressure_psi / safety_factor;
+  // B31G's own ceiling: the safe pressure P' may not exceed P, the design
+  // pressure of the same pipe with no corrosion (here SMYS x 2t/D over the same
+  // factor). The 1.1 flow stress otherwise lets a short, shallow defect read as
+  // STRONGER than sound pipe -- a 20% deep, 1 in pit on this line by 8%.
+  const design_pressure_psi = smys_psi * hoop_term / safety_factor;
+  const unbounded_safe_psi = failure_pressure_psi / safety_factor;
+  const capped_at_design = unbounded_safe_psi > design_pressure_psi;
+  const safe_pressure_psi = Math.min(unbounded_safe_psi, design_pressure_psi);
   const branch_label = is_parabolic
     ? "PARABOLIC (Folias) form, A = " + fmt(a_parameter, 2) + " at or below the 4.0 limit, bulging factor M = " + fmt(folias_m, 3)
     : "RECTANGULAR form, A = " + fmt(a_parameter, 2) + " ABOVE the 4.0 limit -- the parabolic profile and its bulging factor do not apply to a defect this long, and using them here overstates the remaining strength";
@@ -599,13 +606,14 @@ export function computeCorrodedPipeB31g({
     depth_ratio, depth_pct, over_depth_limit, flow_stress_psi,
     a_parameter, is_parabolic, folias_m, branch_label,
     failure_pressure_psi, safe_pressure_psi, safety_factor,
+    design_pressure_psi, capped_at_design,
     has_maop, margin_psi, acceptable, verdict,
     note: "The remaining strength of a corroded pipeline by the original ASME B31G criterion, and whether it still supports the line's operating pressure. The criterion says a corroded area behaves like a blunt flaw whose severity depends on how deep it is relative to the wall AND how long it is relative to the pipe's ability to bulge around it. Depth alone is not the answer: a deep short pit can be tolerable while a shallower but much longer groove is not, because the bulging factor grows with length and drives the failure pressure down. That is the single most useful thing to know when reading an inline inspection report, and it is why anomalies are ranked by predicted failure pressure rather than by depth. Two things here are easy to get wrong and are therefore computed rather than left to the reader. The first is the BRANCH: B31G is a two-part criterion, and the parabolic form with its Folias bulging factor applies only while A = 0.893 L / sqrt(D t) is at or below 4.0. Past that the defect is treated as a full rectangular loss with no bulging factor at all, and carrying the parabolic form beyond its range overstates the remaining strength on exactly the long defects that matter most. The second is WHICH PRESSURE the acceptance is read against: the predicted failure pressure is not the criterion, the safe pressure after the safety factor is, and a defect whose failure pressure sits above MAOP can still fail the screen once the factor is applied. The original B31G is deliberately conservative -- it assumes a parabolic profile and a 1.1 flow stress -- and Modified B31G and RSTRENG use a more realistic effective area and typically permit higher pressures on the same defect. That conservatism is a feature when screening hundreds of anomalies and a cost when it condemns a joint unnecessarily, which is why a defect failing this is normally re-evaluated by RSTRENG with the detailed river-bottom profile before anyone digs. This screens a single area of general metal loss on nominal wall: it does not evaluate cracks, gouges, dents, seam or girth weld anomalies, interacting defects, or corrosion under external loading, and it is not a fitness-for-service assessment. ASME B31G, the operator's integrity management program, and a qualified engineer govern.",
   };
 }
 export const corrodedPipeB31gExample = { inputs: { od_in: 12.75, wall_in: 0.25, smys_psi: 52000, defect_depth_in: 0.105, defect_length_in: 4.0, safety_factor: 1.39, maop_psig: 1468 } };
 OILGAS_RENDERERS["corroded-pipe-b31g"] = _simpleRenderer({
-  citation: "Citation: the original ASME B31G criterion by name -- flow stress 1.1 x SMYS, A = 0.893 L / sqrt(D t) selecting the branch, the parabolic form P = S_flow (2t/D) [1 - (2/3)(d/t)] / [1 - (2/3)(d/t)/M] with M = sqrt(1 + 0.8 L^2/(D t)) at A at or below 4.0, the rectangular form P = S_flow (2t/D)(1 - d/t) above it, and the 80% of wall screening limit. The safe pressure is the predicted failure pressure divided by the ENTERED safety factor, and acceptance is read against the SAFE pressure. It screens a single area of general metal loss on nominal wall; it does not evaluate cracks, gouges, dents, seam or girth weld anomalies, interacting defects, or external loading, and it is not a fitness-for-service assessment. Modified B31G and RSTRENG typically permit more on the same defect. ASME B31G and a qualified engineer govern.",
+  citation: "Citation: the original ASME B31G criterion by name -- flow stress 1.1 x SMYS, A = 0.893 L / sqrt(D t) selecting the branch, the parabolic form P = S_flow (2t/D) [1 - (2/3)(d/t)] / [1 - (2/3)(d/t)/M] with M = sqrt(1 + 0.8 L^2/(D t)) at A at or below 4.0, the rectangular form P = S_flow (2t/D)(1 - d/t) above it, the 80% of wall screening limit, and B31G's rule that the safe pressure may not exceed the design pressure of the uncorroded pipe. The safe pressure is the predicted failure pressure divided by the ENTERED safety factor, and acceptance is read against the SAFE pressure. It screens a single area of general metal loss on nominal wall; it does not evaluate cracks, gouges, dents, seam or girth weld anomalies, interacting defects, or external loading, and it is not a fitness-for-service assessment. Modified B31G and RSTRENG typically permit more on the same defect. ASME B31G and a qualified engineer govern.",
   example: corrodedPipeB31gExample.inputs,
   fields: [
     { key: "od_in", label: "Pipe outside diameter (in)", kind: "number" },
@@ -620,7 +628,7 @@ OILGAS_RENDERERS["corroded-pipe-b31g"] = _simpleRenderer({
     { key: "d", id: "cpb-out-d", label: "Depth", value: (r) => fmt(r.depth_pct, 1) + "% of wall" + (r.over_depth_limit ? " -- past the 80% screening limit" : "") },
     { key: "b", id: "cpb-out-b", label: "Which B31G branch", value: (r) => r.branch_label },
     { key: "f", id: "cpb-out-f", label: "Predicted failure pressure", value: (r) => fmt(r.failure_pressure_psi, 0) + " psi at a flow stress of " + fmt(r.flow_stress_psi, 0) + " psi" },
-    { key: "s", id: "cpb-out-s", label: "Safe operating pressure", value: (r) => fmt(r.safe_pressure_psi, 0) + " psi at a safety factor of " + fmt(r.safety_factor, 2) },
+    { key: "s", id: "cpb-out-s", label: "Safe operating pressure", value: (r) => fmt(r.safe_pressure_psi, 0) + " psi at a safety factor of " + fmt(r.safety_factor, 2) + (r.capped_at_design ? " -- held at the design pressure of sound pipe, which B31G's safe pressure may not exceed" : "") },
     { key: "v", id: "cpb-out-v", label: "Verdict", value: (r) => r.verdict },
     { key: "n", id: "cpb-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -955,7 +963,8 @@ OILGAS_RENDERERS["annular-velocity-cleaning"] = _simpleRenderer({
 // rather than asserting it.
 // =====================================================================
 
-const _OG_FT3_PER_BBL = 5.615;
+// The same barrel as _OG_CUFT_PER_BBL above: 42 US gallons of 231 cu in.
+const _OG_FT3_PER_BBL = _OG_CUFT_PER_BBL;
 const _OG_R_GAS = 10.7316;          // psia ft^3 / (lbmol degR)
 const _OG_AIR_MW = 28.964;
 const _OG_STD_T_R = 519.67;         // 60 degF in degrees Rankine
