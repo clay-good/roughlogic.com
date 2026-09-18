@@ -1,8 +1,333 @@
 {
  "_comment": "v10 Phase D.1 search aliases (spec-v10 \u00a76.1). One row per alias mapping a free-text term to a tile id. AUTHORING MASTER ONLY since the spec-v590 split remediation (2026-07-17): the runtime never fetches this file. scripts/build-alias-shards.mjs derives the per-group runtime shards data/search/aliases-<letter>.json from it (lazy parallel fetch on first search interaction via bindSearch / ensureAliases in app.js; --check in npm run lint gates drift), so edit THIS file and rerun the script. On exact-term match the user is routed to the target tile via the same path as a tool-name suggestion. Industry vocabulary, misspellings, abbreviations, question phrasings (spec-v590), and adjacent-question redirects only. The resolveQuery / matchAliasPrefix helpers in search-discovery.js are the canonical pure-functional resolvers (exercised by test/unit/search-discovery.test.js).",
- "_updated": "2026-09-20",
+ "_updated": "2026-09-21",
  "_schema": "Each alias row: { term: string, target: tile-id, kind: 'question' | 'industry' | 'adjacent' | 'redirect' }. Multiple aliases may map to the same target.",
  "aliases": [
+  {
+   "term": "anode bed resistance",
+   "target": "anode-bed-resistance",
+   "kind": "industry"
+  },
+  {
+   "term": "dwight equation anode",
+   "target": "anode-bed-resistance",
+   "kind": "industry"
+  },
+  {
+   "term": "groundbed resistance to earth",
+   "target": "anode-bed-resistance",
+   "kind": "industry"
+  },
+  {
+   "term": "sunde multiple anode",
+   "target": "anode-bed-resistance",
+   "kind": "industry"
+  },
+  {
+   "term": "impressed current groundbed sizing",
+   "target": "anode-bed-resistance",
+   "kind": "industry"
+  },
+  {
+   "term": "cp rectifier sizing",
+   "target": "cp-rectifier-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "cathodic protection rectifier voltage",
+   "target": "cp-rectifier-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "impressed current power supply",
+   "target": "cp-rectifier-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "rectifier dc output selection",
+   "target": "cp-rectifier-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "cp system energy cost",
+   "target": "cp-rectifier-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "pipeline cp attenuation",
+   "target": "pipeline-potential-attenuation",
+   "kind": "industry"
+  },
+  {
+   "term": "drain point potential decay",
+   "target": "pipeline-potential-attenuation",
+   "kind": "industry"
+  },
+  {
+   "term": "coating resistance attenuation constant",
+   "target": "pipeline-potential-attenuation",
+   "kind": "industry"
+  },
+  {
+   "term": "cp reach between rectifiers",
+   "target": "pipeline-potential-attenuation",
+   "kind": "industry"
+  },
+  {
+   "term": "characteristic resistance pipeline",
+   "target": "pipeline-potential-attenuation",
+   "kind": "industry"
+  },
+  {
+   "term": "instant off potential",
+   "target": "instant-off-ir-drop",
+   "kind": "industry"
+  },
+  {
+   "term": "ir drop cathodic protection",
+   "target": "instant-off-ir-drop",
+   "kind": "industry"
+  },
+  {
+   "term": "pipe to soil potential correction",
+   "target": "instant-off-ir-drop",
+   "kind": "industry"
+  },
+  {
+   "term": "850 mv criterion",
+   "target": "instant-off-ir-drop",
+   "kind": "industry"
+  },
+  {
+   "term": "on off survey interrupter",
+   "target": "instant-off-ir-drop",
+   "kind": "industry"
+  },
+  {
+   "term": "coating breakdown factor",
+   "target": "coating-breakdown-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "cp current end of life",
+   "target": "coating-breakdown-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "coating degradation cp design",
+   "target": "coating-breakdown-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "mean current demand cathodic",
+   "target": "coating-breakdown-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "cp design life current growth",
+   "target": "coating-breakdown-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "stray current interference",
+   "target": "stray-current-bond",
+   "kind": "industry"
+  },
+  {
+   "term": "mitigation bond resistor",
+   "target": "stray-current-bond",
+   "kind": "industry"
+  },
+  {
+   "term": "foreign structure interference cp",
+   "target": "stray-current-bond",
+   "kind": "industry"
+  },
+  {
+   "term": "interference testing pipeline",
+   "target": "stray-current-bond",
+   "kind": "industry"
+  },
+  {
+   "term": "resistance bond sizing cathodic",
+   "target": "stray-current-bond",
+   "kind": "industry"
+  },
+  {
+   "term": "corrosion rate mpy",
+   "target": "corrosion-rate-weight-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "coupon weight loss corrosion",
+   "target": "corrosion-rate-weight-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "astm g1 corrosion rate",
+   "target": "corrosion-rate-weight-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "remaining wall life corrosion",
+   "target": "corrosion-rate-weight-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "pitting factor corrosion rate",
+   "target": "corrosion-rate-weight-loss",
+   "kind": "industry"
+  },
+  {
+   "term": "galvanic corrosion area ratio",
+   "target": "galvanic-area-ratio",
+   "kind": "industry"
+  },
+  {
+   "term": "dissimilar metal corrosion",
+   "target": "galvanic-area-ratio",
+   "kind": "industry"
+  },
+  {
+   "term": "galvanic series driving voltage",
+   "target": "galvanic-area-ratio",
+   "kind": "industry"
+  },
+  {
+   "term": "small anode large cathode",
+   "target": "galvanic-area-ratio",
+   "kind": "industry"
+  },
+  {
+   "term": "bimetallic corrosion fastener",
+   "target": "galvanic-area-ratio",
+   "kind": "industry"
+  },
+  {
+   "term": "tank bottom cathodic protection",
+   "target": "tank-bottom-anode-layout",
+   "kind": "industry"
+  },
+  {
+   "term": "ast anode grid layout",
+   "target": "tank-bottom-anode-layout",
+   "kind": "industry"
+  },
+  {
+   "term": "under tank anode ribbon",
+   "target": "tank-bottom-anode-layout",
+   "kind": "industry"
+  },
+  {
+   "term": "tank bottom current density",
+   "target": "tank-bottom-anode-layout",
+   "kind": "industry"
+  },
+  {
+   "term": "mmo ribbon grid tank",
+   "target": "tank-bottom-anode-layout",
+   "kind": "industry"
+  },
+  {
+   "term": "close interval survey",
+   "target": "close-interval-survey-readings",
+   "kind": "industry"
+  },
+  {
+   "term": "cis reading count pipeline",
+   "target": "close-interval-survey-readings",
+   "kind": "industry"
+  },
+  {
+   "term": "on off potential survey",
+   "target": "close-interval-survey-readings",
+   "kind": "industry"
+  },
+  {
+   "term": "pipeline survey production rate",
+   "target": "close-interval-survey-readings",
+   "kind": "industry"
+  },
+  {
+   "term": "cis wire spool setups",
+   "target": "close-interval-survey-readings",
+   "kind": "industry"
+  },
+  {
+   "term": "ac induced voltage pipeline",
+   "target": "ac-induced-voltage-pipeline",
+   "kind": "industry"
+  },
+  {
+   "term": "ac corrosion current density",
+   "target": "ac-induced-voltage-pipeline",
+   "kind": "industry"
+  },
+  {
+   "term": "pipeline powerline corridor",
+   "target": "ac-induced-voltage-pipeline",
+   "kind": "industry"
+  },
+  {
+   "term": "touch voltage pipeline",
+   "target": "ac-induced-voltage-pipeline",
+   "kind": "industry"
+  },
+  {
+   "term": "ac mitigation grounding pipeline",
+   "target": "ac-induced-voltage-pipeline",
+   "kind": "industry"
+  },
+  {
+   "term": "100 mv polarization criterion",
+   "target": "polarization-decay-criterion",
+   "kind": "industry"
+  },
+  {
+   "term": "cp depolarization test",
+   "target": "polarization-decay-criterion",
+   "kind": "industry"
+  },
+  {
+   "term": "polarization decay cathodic protection",
+   "target": "polarization-decay-criterion",
+   "kind": "industry"
+  },
+  {
+   "term": "alternative cp criterion",
+   "target": "polarization-decay-criterion",
+   "kind": "industry"
+  },
+  {
+   "term": "depolarization survey pipeline",
+   "target": "polarization-decay-criterion",
+   "kind": "industry"
+  },
+  {
+   "term": "coke breeze backfill quantity",
+   "target": "coke-breeze-backfill",
+   "kind": "industry"
+  },
+  {
+   "term": "carbonaceous backfill anode",
+   "target": "coke-breeze-backfill",
+   "kind": "industry"
+  },
+  {
+   "term": "anode column volume",
+   "target": "coke-breeze-backfill",
+   "kind": "industry"
+  },
+  {
+   "term": "calcined petroleum coke cp",
+   "target": "coke-breeze-backfill",
+   "kind": "industry"
+  },
+  {
+   "term": "groundbed backfill bags",
+   "target": "coke-breeze-backfill",
+   "kind": "industry"
+  },
   {
    "term": "greenhouse roof vent area",
    "target": "greenhouse-vent-area",

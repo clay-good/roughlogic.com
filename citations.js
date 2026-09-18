@@ -24434,6 +24434,150 @@ export const CITATIONS = {
       { name: "Discharge coefficient", value: "entered coefficient represents the selected tile geometry", source: "manufacturer curve / field measurement" },
     ],
   },
+  // spec-v1763..v1775: cathodic protection and corrosion control.
+  "anode-bed-resistance": {
+    formula: "Dwight single anode R = 0.00521 rho / L x [ln(8L/d) - 1]; Sunde bed R_N = 0.00521 rho / (N L) x [ln(8L/d) - 1 + (2L/S) ln(0.656 N)], rho in ohm-cm and lengths in feet.",
+    edition: "Dwight's and Sunde's groundbed relations for uniform soil. A Wenner resistivity survey at the bed's own depth and the CP designer govern.",
+    freeAccess: "Public relations published in the CP literature.",
+    governance: GOVERNANCE.general,
+    editionNote: "A bed is not its anodes in parallel: they compete for the same soil. Length sits outside the logarithm and diameter inside it, so drill deeper rather than auger wider.",
+    assumptions: [
+      { name: "Soil", value: "uniform resistivity assumed; a layered profile changes the answer", source: "Wenner survey" },
+      { name: "Mutual interference", value: "the Sunde term, which the naive parallel figure omits", source: "spec-v1763 method" },
+    ],
+  },
+  "cp-rectifier-sizing": {
+    formula: "required voltage = design current x (bed + cable resistance) + back EMF; design voltage adds the margin; AC input = DC output / rectifier efficiency.",
+    edition: "NACE SP0169 (now AMPP) and the CP designer govern. The rectifier manufacturer's rating governs the selection.",
+    freeAccess: "Ohm's law; rectifier ratings are published by manufacturers.",
+    governance: GOVERNANCE.general,
+    editionNote: "The cable is not a rounding error, and the AC bill is paid continuously forever. Current demand rises as the coating degrades, so a rectifier with no headroom has nowhere to go.",
+    assumptions: [
+      { name: "Back EMF", value: "entered as an allowance, commonly about 2 V", source: "CP practice" },
+      { name: "Selection", value: "the next standard rectifier above the design voltage, tapped down on commissioning", source: "manufacturer" },
+    ],
+  },
+  "pipeline-potential-attenuation": {
+    formula: "R_L = steel resistivity / steel area; R_G = coating resistance / surface per foot; alpha = sqrt(R_L / R_G); R_k = sqrt(R_L x R_G); shift at x = drain shift x e^(-alpha x).",
+    edition: "The infinite-line attenuation relations. The pipeline's own close interval survey governs.",
+    freeAccess: "Public transmission-line analogue relations.",
+    governance: GOVERNANCE.general,
+    editionNote: "A tenfold coating degradation raises the attenuation constant only by its square root, but the reach still falls by that factor. The far-end test stations show the coating's condition; the rectifier does not.",
+    assumptions: [
+      { name: "Line", value: "infinite and uniformly coated; a finite line or a holiday changes it", source: "spec-v1765 scope" },
+      { name: "Steel resistivity", value: "entered; about 7.1 x 10^-6 ohm-in for line pipe", source: "materials data" },
+    ],
+  },
+  "instant-off-ir-drop": {
+    formula: "IR drop = instant-off minus ON potential; -0.850 V criterion applied to the instant-off potential against Cu/CuSO4; polarisation = native minus instant-off.",
+    edition: "NACE SP0169 (now AMPP) and the CP designer govern.",
+    freeAccess: "The criteria are in NACE SP0169; public reference cells and interrupters make the measurement.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ON potential includes soil IR drop, which is not polarisation of the steel -- read against it, a thin real margin looks comfortable. One rectifier left running voids the instant-off reading.",
+    assumptions: [
+      { name: "Reference electrode", value: "copper-copper sulfate; other references shift every figure", source: "NACE SP0169" },
+      { name: "Interruption", value: "every influencing source must be interrupted synchronously", source: "survey procedure" },
+    ],
+  },
+  "coating-breakdown-factor": {
+    formula: "f(t) = f(0) + annual rate x t, capped at 1.0; current = area x bare-steel current density x f(t); mean at f(0) + rate x life / 2.",
+    edition: "Linear coating breakdown per DNV-RP-B401 and NACE practice. The CP designer governs the factors.",
+    freeAccess: "DNV-RP-B401 is freely downloadable from DNV.",
+    governance: GOVERNANCE.general,
+    editionNote: "The mean current buys anode metal; the final current buys anode count and rectifier capacity. Sizing everything on commissioning current leaves a system at a small fraction of its end-of-life requirement.",
+    assumptions: [
+      { name: "Degradation", value: "linear, the customary design model", source: "DNV-RP-B401" },
+      { name: "Ceiling", value: "the breakdown factor caps at fully bare steel", source: "spec-v1767 method" },
+    ],
+  },
+  "stray-current-bond": {
+    formula: "circuit resistance = open-circuit potential / solid-bond current; resistor = (potential / target current) - circuit resistance; dissipation = current^2 x resistance.",
+    edition: "NACE SP0169 (now AMPP) and the CP designer govern. The foreign structure's operator and the interference retest govern.",
+    freeAccess: "Ohm's law.",
+    governance: GOVERNANCE.general,
+    editionNote: "The number that matters is not the resistor but the retest: both structures must meet criterion with the bond in place, and the foreign line's positive shift must be gone at the discharge point.",
+    assumptions: [
+      { name: "Rating", value: "several times the dissipation, because the resistor runs continuously", source: "CP practice" },
+      { name: "Retest", value: "mandatory on both structures; the arithmetic does not certify the bond", source: "NACE SP0169" },
+    ],
+  },
+  "corrosion-rate-weight-loss": {
+    formula: "CR (mpy) = 534 x mass loss (mg) / (density (g/cm^3) x area (sq in) x time (h)); life = (wall - retirement) / rate; pit rate = CR x pitting factor.",
+    edition: "ASTM G1 coupon preparation, cleaning, and weight-loss evaluation. The coupon's own pit-depth measurement governs the pitting factor.",
+    freeAccess: "ASTM G1 is a purchased standard; the 534 constant is widely published.",
+    governance: GOVERNANCE.general,
+    editionNote: "The average rate and the deepest pit come from the same weighing, and the second decides when the equipment leaks. A programme recording mass loss and not pit depth has measured the wrong extreme.",
+    assumptions: [
+      { name: "Rate", value: "assumed constant; a very long projected life is correct arithmetic and a meaningless forecast", source: "spec-v1769 caveat" },
+      { name: "Pitting factor", value: "deepest pit over average penetration, measured on the coupon", source: "coupon inspection" },
+    ],
+  },
+  "galvanic-area-ratio": {
+    formula: "galvanic current = cathodic current density x cathode area; anode current density = that current / anode area; penetration = anode density x electrochemical equivalent / metal density.",
+    edition: "Potentials measured in the actual service electrolyte; published galvanic series and the materials engineer govern.",
+    freeAccess: "Public electrochemistry; galvanic series are widely published.",
+    governance: GOVERNANCE.general,
+    editionNote: "The galvanic series tells you which metal corrodes; only the geometry tells you whether anyone will notice. Reversing the area ratio changes the attack by that ratio squared. Coating the anode makes it worse.",
+    assumptions: [
+      { name: "Cathodic limit", value: "current is set by what the cathode supports", source: "spec-v1770 method" },
+      { name: "Electrolyte", value: "potentials are specific to the service electrolyte and temperature", source: "field measurement" },
+    ],
+  },
+  "tank-bottom-anode-layout": {
+    formula: "current = bottom area x design current density; ribbon loading = current / ribbon length, for a grid of chords at the entered spacing and for a perimeter ring.",
+    edition: "API RP 651, NACE SP0193 (now AMPP), and the ribbon manufacturer's rating govern.",
+    freeAccess: "API RP 651 is a purchased standard; ribbon ratings are published by manufacturers.",
+    governance: GOVERNANCE.general,
+    editionNote: "A perimeter ring passes its loading check and leaves the tank centre farthest from any anode -- where bottoms perforate. Over a containment liner the ring does nothing, so the grid must go in when the tank is built.",
+    assumptions: [
+      { name: "Distribution", value: "ribbon loading is checked; current spread through the pad is not modelled", source: "spec-v1771 scope" },
+      { name: "Liner", value: "a closed containment blocks any anode outside it", source: "API RP 651" },
+    ],
+  },
+  "close-interval-survey-readings": {
+    formula: "stations = length / interval, doubled for on/off; spool setups = length / spool, rounded up; field days = length / production rate.",
+    edition: "NACE SP0207 (now AMPP) governs close interval survey practice.",
+    freeAccess: "Public planning arithmetic.",
+    governance: GOVERNANCE.general,
+    editionNote: "The survey's value is the readings between test stations, where holidays live. Production rate, not reading rate, is the number to quote from, and doubling the interval steps over half the holidays.",
+    assumptions: [
+      { name: "Field time", value: "scales linearly with interval here, which overstates the saving since walking does not shrink", source: "spec-v1772 caveat" },
+      { name: "Crew day", value: "entered; the meter-busy share depends on it", source: "field practice" },
+    ],
+  },
+  "ac-induced-voltage-pipeline": {
+    formula: "J_AC = 8 V_AC / (rho pi d) at a circular holiday of equivalent diameter d, against the AC corrosion threshold and the personnel touch limit.",
+    edition: "ISO 18086, NACE SP21424 (now AMPP), and a corridor AC interference study govern.",
+    freeAccess: "ISO 18086 is a purchased standard; the spreading-resistance relation is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "Mitigating to the personnel touch limit protects the crew and does nothing for the pipe. And high-resistivity ground, hard for DC protection, is where AC corrosion is least likely.",
+    assumptions: [
+      { name: "Holiday size", value: "an assumption rather than a measurement", source: "corridor study" },
+      { name: "Thresholds", value: "commonly 30 A/m^2 for AC corrosion and 15 V for touch", source: "ISO 18086 / safety practice" },
+    ],
+  },
+  "polarization-decay-criterion": {
+    formula: "formation = native minus instant-off; decay = depolarised minus instant-off; both against 100 mV, always from the instant-off; plus -0.850 V on the instant-off.",
+    edition: "NACE SP0169 (now AMPP) and the CP designer govern.",
+    freeAccess: "The criteria are in NACE SP0169.",
+    governance: GOVERNANCE.general,
+    editionNote: "A line can fail -0.850 V and be properly protected under 100 mV, which is why the criterion exists. Measuring decay from the ON potential adds the IR drop and certifies an unprotected line.",
+    assumptions: [
+      { name: "Reference", value: "decay and formation are always measured from the instant-off potential", source: "NACE SP0169" },
+      { name: "Criterion choice", value: "which criterion applies depends on the structure and the standard", source: "CP designer" },
+    ],
+  },
+  "coke-breeze-backfill": {
+    formula: "backfill = column volume - anode volume per anode; weight = volume x density as placed; column resistance by Dwight R = 0.00521 rho / L x [ln(8L/d) - 1].",
+    edition: "The backfill supplier's data and the CP designer govern.",
+    freeAccess: "Public geometry and Dwight's relation.",
+    governance: GOVERNANCE.general,
+    editionNote: "Widening the hole buys little because diameter sits inside the logarithm; doubling the depth buys a great deal. Voids are where the anode is consumed, so the waste allowance keeps the column full.",
+    assumptions: [
+      { name: "Density", value: "as placed, which varies with product and tamping", source: "supplier data" },
+      { name: "Column", value: "the backfill column is treated as the effective anode for resistance", source: "CP practice" },
+    ],
+  },
   // spec-v1750..v1762: greenhouse and controlled-environment agriculture.
   "greenhouse-vent-area": {
     formula: "Q = Cd x A_eff x sqrt(2 g dH dT / T_absolute), with A_eff = 1/sqrt(1/A_roof^2 + 1/A_side^2) for two openings in series.",

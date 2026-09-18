@@ -158,6 +158,10 @@ export const PROFESSION_NOUN = {
   // it leads on all thirteen tiles. Short on purpose: a long noun is the first
   // thing buildTitle drops at the 70-char cap.
   greenhouse: "Greenhouse",
+  // Added 2026-09-18 with the cathodic protection and corrosion band, where it
+  // leads on all thirteen tiles. Short on purpose: a long noun is the first
+  // thing buildTitle drops at the 70-char cap.
+  corrosion: "Corrosion",
 };
 
 // Escape a string for embedding inside HTML text content or an attribute.

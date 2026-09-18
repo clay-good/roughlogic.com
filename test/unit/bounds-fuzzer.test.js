@@ -54783,3 +54783,265 @@ test("bounds: spec-v1762 computeLeachingFractionRunoffEc -- the bound is never a
     assert.ok(_v1762({ ...base, ...bad }).error);
   }
 });
+
+// ---------------------------------------------------------------------------
+// spec-v1763..v1775: cathodic protection and corrosion control.
+// ---------------------------------------------------------------------------
+
+import {
+  computeAnodeBedResistance as _v1763,
+  computeCpRectifierSizing as _v1764,
+  computePipelinePotentialAttenuation as _v1765,
+  computeInstantOffIrDrop as _v1766,
+  computeCoatingBreakdownFactor as _v1767,
+  computeStrayCurrentBond as _v1768,
+  computeCorrosionRateWeightLoss as _v1769,
+  computeGalvanicAreaRatio as _v1770,
+  computeTankBottomAnodeLayout as _v1771,
+  computeCloseIntervalSurveyReadings as _v1772,
+  computeAcInducedVoltagePipeline as _v1773,
+  computePolarizationDecayCriterion as _v1774,
+  computeCokeBreezeBackfill as _v1775,
+} from "../../calc-corrosion.js";
+
+test("bounds: spec-v1763 computeAnodeBedResistance -- a bed is not its anodes in parallel", () => {
+  const base = { soil_resistivity_ohm_cm: 5000, column_length_ft: 10, column_diameter_in: 8, anode_count: 10, spacing_ft: 15, alternative_spacing_ft: 30, alternative_length_ft: 20, alternative_diameter_in: 6 };
+  const r = _v1763(base); assertFiniteNumericOutputs(r, "v1763");
+  assert.ok(Math.abs(r.single_anode_resistance_ohm - 9.86641598994723) < 1e-9);
+  assert.ok(Math.abs(r.bed_resistance_ohm - 1.6399723350881061) < 1e-9);
+  // The whole interference penalty: the bed is worse than parallel resistors.
+  assert.ok(r.bed_resistance_ohm > r.parallel_resistance_ohm);
+  assert.ok(Math.abs(r.parallel_resistance_ohm - r.single_anode_resistance_ohm / 10) < 1e-12);
+  // Resistance is linear in soil resistivity -- every term carries rho.
+  const doubled = _v1763({ ...base, soil_resistivity_ohm_cm: 10000 });
+  assert.ok(Math.abs(doubled.bed_resistance_ohm / r.bed_resistance_ohm - 2) < 1e-12);
+  // Wider spacing always helps; infinite spacing would approach parallel.
+  assert.ok(r.alternative_spacing_bed_ohm < r.bed_resistance_ohm);
+  assert.ok(r.alternative_spacing_bed_ohm > r.parallel_resistance_ohm);
+  // Length beats diameter, and it is not close.
+  assert.ok(Math.abs(r.alternative_length_change_pct) > 5 * Math.abs(r.alternative_diameter_change_pct));
+  assert.ok(_v1763({ ...base, anode_count: 1 }).error);
+  for (const bad of [{ soil_resistivity_ohm_cm: 0 }, { column_length_ft: 0 }, { column_diameter_in: 0 }, { spacing_ft: 0 }, { alternative_spacing_ft: 0 }, { alternative_length_ft: 0 }, { alternative_diameter_in: 0 }, { soil_resistivity_ohm_cm: Infinity }]) {
+    assert.ok(_v1763({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1764 computeCpRectifierSizing -- the cable is not a rounding error", () => {
+  const base = { design_current_a: 10, bed_resistance_ohm: 1.640, header_length_ft: 500, negative_length_ft: 300, cable_ohm_per_kft: 0.2485, back_emf_v: 2, design_margin_pct: 50, rectifier_efficiency_pct: 60, energy_rate_per_kwh: 0.12 };
+  const r = _v1764(base); assertFiniteNumericOutputs(r, "v1764");
+  assert.ok(Math.abs(r.cable_resistance_ohm - 0.1988) < 1e-12);
+  assert.ok(Math.abs(r.required_voltage_v - 20.388) < 1e-9);
+  assert.ok(Math.abs(r.design_voltage_v - r.required_voltage_v * 1.5) < 1e-9);
+  // Ohm's law around the circuit, closed exactly.
+  assert.ok(Math.abs(r.required_voltage_v - (10 * r.total_resistance_ohm + 2)) < 1e-12);
+  assert.ok(Math.abs(r.voltage_without_cable_v - (r.required_voltage_v - r.cable_drop_v)) < 1e-9);
+  assert.ok(Math.abs(r.ac_input_w - r.dc_output_w / 0.6) < 1e-9);
+  assert.ok(Math.abs(r.annual_kwh - 2976.648) < 1e-6);
+  // No cable at all removes exactly the cable drop.
+  const noCable = _v1764({ ...base, header_length_ft: 0, negative_length_ft: 0 });
+  assert.ok(noCable.cable_resistance_ohm === 0 && Math.abs(noCable.required_voltage_v - 18.4) < 1e-9);
+  for (const bad of [{ design_current_a: 0 }, { bed_resistance_ohm: 0 }, { cable_ohm_per_kft: 0 }, { back_emf_v: -1 }, { design_margin_pct: -1 }, { rectifier_efficiency_pct: 0 }, { rectifier_efficiency_pct: 101 }, { energy_rate_per_kwh: -1 }, { header_length_ft: -1 }, { design_current_a: Infinity }]) {
+    assert.ok(_v1764({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1765 computePipelinePotentialAttenuation -- tenfold worse coating, square-root reach", () => {
+  const base = { pipe_od_in: 12.75, wall_thickness_in: 0.25, steel_resistivity_ohm_in: 7.087e-6, coating_resistance_ohm_sqft: 100000, drain_shift_v: 1.0, distance_mi: 10, degraded_coating_resistance_ohm_sqft: 10000 };
+  const r = _v1765(base); assertFiniteNumericOutputs(r, "v1765");
+  assert.ok(Math.abs(r.steel_area_sqin - Math.PI / 4 * 12.5) < 1e-12);
+  assert.ok(Math.abs(r.characteristic_resistance_ohm - 0.5094276185808144) < 1e-12);
+  assert.ok(Math.abs(r.shift_at_distance_v - 0.4074519408002349) < 1e-12);
+  assert.ok(Math.abs(r.degraded_shift_at_distance_v - 0.058472717966892636) < 1e-12);
+  // The one forgiving feature: attenuation goes as the square root of the
+  // coating degradation, and the reach falls by the same factor.
+  assert.ok(Math.abs(r.attenuation_rise_factor - Math.sqrt(10)) < 1e-9);
+  assert.ok(Math.abs(r.reach_fall_factor - Math.sqrt(10)) < 1e-9);
+  // At the half-shift distance exactly half the drain shift survives.
+  const atHalf = _v1765({ ...base, distance_mi: r.half_shift_mi });
+  assert.ok(Math.abs(atHalf.shift_at_distance_v - 0.5) < 1e-9);
+  assert.ok(_v1765({ ...base, wall_thickness_in: 7 }).error);
+  for (const bad of [{ pipe_od_in: 0 }, { wall_thickness_in: 0 }, { steel_resistivity_ohm_in: 0 }, { coating_resistance_ohm_sqft: 0 }, { drain_shift_v: 0 }, { distance_mi: 0 }, { degraded_coating_resistance_ohm_sqft: 0 }, { pipe_od_in: Infinity }]) {
+    assert.ok(_v1765({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1766 computeInstantOffIrDrop -- the ON reading is ten times too optimistic", () => {
+  const base = { on_potential_v: -1.150, instant_off_potential_v: -0.880, native_potential_v: -0.620, criterion_v: -0.850, polarization_criterion_mv: 100 };
+  const r = _v1766(base); assertFiniteNumericOutputs(r, "v1766");
+  assert.ok(Math.abs(r.ir_drop_mv - 270) < 1e-9);
+  assert.ok(Math.abs(r.off_margin_mv - 30) < 1e-9);
+  assert.ok(Math.abs(r.on_margin_mv - 300) < 1e-9);
+  assert.ok(Math.abs(r.polarization_mv - 260) < 1e-9);
+  // The apparent margin is the real one plus the IR drop, exactly.
+  assert.ok(Math.abs(r.on_margin_mv - (r.off_margin_mv + r.ir_drop_mv)) < 1e-9);
+  assert.ok(Math.abs(r.optimism_ratio - 10) < 1e-9);
+  assert.ok(r.meets_absolute_criterion && r.meets_polarization_criterion);
+  // An instant-off just less negative than the criterion fails it.
+  const failing = _v1766({ ...base, instant_off_potential_v: -0.840 });
+  assert.ok(!failing.meets_absolute_criterion);
+  // A reading where ON is less negative than OFF means a source failed to
+  // interrupt, and the tile refuses it rather than reporting a negative IR drop.
+  assert.ok(_v1766({ ...base, on_potential_v: -0.800 }).error);
+  assert.ok(_v1766({ ...base, criterion_v: 0.85 }).error);
+  assert.ok(_v1766({ ...base, polarization_criterion_mv: 0 }).error);
+  assert.ok(_v1766({ ...base, on_potential_v: -Infinity }).error);
+});
+
+test("bounds: spec-v1767 computeCoatingBreakdownFactor -- the mean buys metal, the final buys capacity", () => {
+  const base = { surface_sqft: 50000, bare_current_density_ma_per_sqft: 2, initial_breakdown_pct: 2, annual_degradation_pct: 2, design_life_years: 30, fast_degradation_pct: 4 };
+  const r = _v1767(base); assertFiniteNumericOutputs(r, "v1767");
+  assert.deepStrictEqual([r.initial_current_a, r.final_current_a, r.mean_current_a], [2, 62, 32]);
+  assert.ok(Math.abs(r.growth_ratio - 31) < 1e-12);
+  assert.ok(Math.abs(r.bare_steel_current_a - 100) < 1e-12);
+  // The breakdown factor caps at fully bare: the faster rate hits the ceiling.
+  assert.ok(Math.abs(r.fast_final_current_a - r.bare_steel_current_a) < 1e-12);
+  assert.ok(Math.abs(r.years_to_bare - 49) < 1e-12 && Math.abs(r.fast_years_to_bare - 24.5) < 1e-12);
+  // Current can never exceed the bare-steel demand, however long the life.
+  const ancient = _v1767({ ...base, design_life_years: 500 });
+  assert.ok(ancient.final_current_a <= ancient.bare_steel_current_a + 1e-12);
+  assert.ok(Math.abs(r.mean_shortfall_pct - 100 * 30 / 62) < 1e-9);
+  for (const bad of [{ surface_sqft: 0 }, { bare_current_density_ma_per_sqft: 0 }, { initial_breakdown_pct: 100 }, { annual_degradation_pct: 0 }, { fast_degradation_pct: 0 }, { design_life_years: 0 }, { surface_sqft: Infinity }]) {
+    assert.ok(_v1767({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1768 computeStrayCurrentBond -- the resistor limits the bond to its target", () => {
+  const base = { open_circuit_v: 0.45, solid_bond_current_a: 8.5, target_bond_current_a: 3.0, interference_shift_mv: 250, rating_margin_factor: 5 };
+  const r = _v1768(base); assertFiniteNumericOutputs(r, "v1768");
+  assert.ok(Math.abs(r.circuit_resistance_ohm - 0.45 / 8.5) < 1e-12);
+  assert.ok(Math.abs(r.required_resistance_ohm - 0.15) < 1e-12);
+  // The added resistor plus the circuit gives exactly the target current.
+  assert.ok(Math.abs(base.open_circuit_v / (r.resistor_ohm + r.circuit_resistance_ohm) - 3.0) < 1e-9);
+  assert.ok(Math.abs(r.dissipation_w - 9 * r.resistor_ohm) < 1e-12);
+  assert.ok(Math.abs(r.recommended_rating_w - r.dissipation_w * 5) < 1e-12);
+  // A resistor can only reduce a current: a target above the solid bond is refused.
+  assert.ok(_v1768({ ...base, target_bond_current_a: 9 }).error);
+  for (const bad of [{ open_circuit_v: 0 }, { solid_bond_current_a: 0 }, { target_bond_current_a: 0 }, { interference_shift_mv: -1 }, { rating_margin_factor: 0.5 }, { open_circuit_v: Infinity }]) {
+    assert.ok(_v1768({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1769 computeCorrosionRateWeightLoss -- the pit decides when it leaks", () => {
+  const base = { mass_loss_mg: 125, density_g_cm3: 7.85, exposed_area_sqin: 6.0, exposure_hours: 2160, wall_thickness_in: 0.25, retirement_thickness_in: 0.125, pitting_factor: 10, alternative_mass_loss_mg: 2500 };
+  const r = _v1769(base); assertFiniteNumericOutputs(r, "v1769");
+  assert.ok(Math.abs(r.corrosion_rate_mpy - 0.6561099315876386) < 1e-12);
+  assert.ok(Math.abs(r.corrosion_rate_mm_per_year - r.corrosion_rate_mpy * 0.0254) < 1e-15);
+  // The relation is linear: a factor in mass loss is the same factor in rate.
+  assert.ok(Math.abs(r.rate_ratio - 20) < 1e-12);
+  assert.ok(Math.abs(r.remaining_life_years / r.alternative_life_years - 20) < 1e-9);
+  // The pit life is the average life divided by the pitting factor, exactly.
+  assert.ok(Math.abs(r.remaining_life_years / r.pit_life_years - 10) < 1e-9);
+  assert.ok(_v1769({ ...base, retirement_thickness_in: 0.3 }).error);
+  assert.ok(_v1769({ ...base, pitting_factor: 0.5 }).error);
+  for (const bad of [{ mass_loss_mg: 0 }, { density_g_cm3: 0 }, { exposed_area_sqin: 0 }, { exposure_hours: 0 }, { wall_thickness_in: 0 }, { alternative_mass_loss_mg: 0 }, { mass_loss_mg: Infinity }]) {
+    assert.ok(_v1769({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1770 computeGalvanicAreaRatio -- reversing the areas changes the attack by the ratio squared", () => {
+  const base = { anode_potential_v: -0.61, cathode_potential_v: -0.36, cathodic_current_density_ma_per_sqft: 5, cathode_area_sqin: 1000, anode_area_sqin: 1, electrochemical_equivalent_lb_per_a_yr: 20.1, anode_density_pcf: 490 };
+  const r = _v1770(base); assertFiniteNumericOutputs(r, "v1770");
+  assert.ok(Math.abs(r.driving_voltage_v - 0.25) < 1e-12);
+  assert.ok(Math.abs(r.penetration_in_per_year - 2.461224489795919) < 1e-9);
+  // The whole lesson: area ratio squared.
+  assert.ok(Math.abs(r.attack_ratio - r.area_ratio * r.area_ratio) / (r.area_ratio * r.area_ratio) < 1e-9);
+  // Equal areas make the reversal a no-op.
+  const equal = _v1770({ ...base, cathode_area_sqin: 50, anode_area_sqin: 50 });
+  assert.ok(Math.abs(equal.attack_ratio - 1) < 1e-12);
+  // The more active metal must be entered as the anode.
+  assert.ok(_v1770({ ...base, anode_potential_v: -0.30 }).error);
+  for (const bad of [{ cathodic_current_density_ma_per_sqft: 0 }, { cathode_area_sqin: 0 }, { anode_area_sqin: 0 }, { electrochemical_equivalent_lb_per_a_yr: 0 }, { anode_density_pcf: 0 }, { cathode_area_sqin: Infinity }]) {
+    assert.ok(_v1770({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1771 computeTankBottomAnodeLayout -- the ring passes and leaves the centre bare", () => {
+  const base = { tank_diameter_ft: 100, current_density_ma_per_sqft: 1.0, grid_spacing_ft: 10, ribbon_rating_ma_per_ft: 30 };
+  const r = _v1771(base); assertFiniteNumericOutputs(r, "v1771");
+  assert.ok(Math.abs(r.bottom_area_sqft - Math.PI * 2500) < 1e-9);
+  assert.ok(Math.abs(r.grid_ribbon_ft - 792.9969559032713) < 1e-9);
+  assert.strictEqual(r.line_count, 10);
+  assert.ok(Math.abs(r.ring_ribbon_ft - Math.PI * 100) < 1e-9);
+  assert.ok(Math.abs(r.ring_loading_ma_per_ft - 25) < 1e-9);
+  // Both layouts pass the loading check -- the point is that the check is
+  // not the whole question.
+  assert.ok(r.grid_passes_rating && r.ring_passes_rating);
+  assert.ok(r.ring_to_centre_ft > r.grid_to_farthest_ft);
+  // A finer grid needs more ribbon and loads each foot less.
+  const fine = _v1771({ ...base, grid_spacing_ft: 5 });
+  assert.ok(fine.grid_ribbon_ft > r.grid_ribbon_ft && fine.grid_loading_ma_per_ft < r.grid_loading_ma_per_ft);
+  assert.ok(_v1771({ ...base, grid_spacing_ft: 150 }).error);
+  for (const bad of [{ tank_diameter_ft: 0 }, { current_density_ma_per_sqft: 0 }, { grid_spacing_ft: 0 }, { ribbon_rating_ma_per_ft: 0 }, { tank_diameter_ft: Infinity }]) {
+    assert.ok(_v1771({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1772 computeCloseIntervalSurveyReadings -- the value is between the test stations", () => {
+  const base = { survey_length_mi: 10, reading_interval_ft: 2.5, readings_per_station: 2, spool_length_ft: 5000, production_mi_per_day: 2.5, seconds_per_reading: 1.5, crew_day_hours: 8, test_station_spacing_mi: 1, alternative_interval_ft: 5 };
+  const r = _v1772(base); assertFiniteNumericOutputs(r, "v1772");
+  assert.deepStrictEqual([r.reading_count, r.data_points, r.test_station_readings, r.readings_between_stations, r.spool_setups], [21120, 42240, 11, 21109, 11]);
+  assert.ok(Math.abs(r.field_days - 4) < 1e-12);
+  assert.ok(Math.abs(r.reading_hours - 8.8) < 1e-12);
+  assert.ok(Math.abs(r.meter_busy_pct - 27.5) < 1e-9);
+  // Doubling the interval halves the station count.
+  assert.strictEqual(r.alternative_reading_count, r.reading_count / 2);
+  // A single-reading survey records half the data points.
+  const onOnly = _v1772({ ...base, readings_per_station: 1 });
+  assert.strictEqual(onOnly.data_points, r.data_points / 2);
+  for (const bad of [{ survey_length_mi: 0 }, { reading_interval_ft: 0 }, { readings_per_station: 0 }, { spool_length_ft: 0 }, { production_mi_per_day: 0 }, { seconds_per_reading: 0 }, { crew_day_hours: 25 }, { test_station_spacing_mi: 0 }, { alternative_interval_ft: 0 }, { survey_length_mi: Infinity }]) {
+    assert.ok(_v1772({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1773 computeAcInducedVoltagePipeline -- the touch limit protects the crew, not the pipe", () => {
+  const base = { induced_ac_v: 15, soil_resistivity_ohm_m: 25, holiday_area_cm2: 1, touch_limit_v: 15, risk_threshold_a_per_m2: 30, alternative_resistivity_ohm_m: 100 };
+  const r = _v1773(base); assertFiniteNumericOutputs(r, "v1773");
+  assert.ok(Math.abs(r.ac_current_density_a_per_m2 - 135.4055000514615) < 1e-9);
+  assert.ok(Math.abs(r.voltage_for_threshold_v - 3.3233509704478426) < 1e-12);
+  // Both statements at once: meets the touch limit AND above the AC threshold.
+  assert.ok(r.meets_touch_limit && r.above_threshold);
+  // At the threshold voltage the density is exactly the threshold.
+  const atThreshold = _v1773({ ...base, induced_ac_v: r.voltage_for_threshold_v });
+  assert.ok(Math.abs(atThreshold.ac_current_density_a_per_m2 - 30) < 1e-9);
+  // Density is inverse to resistivity: four times the resistivity, a quarter.
+  assert.ok(Math.abs(r.alternative_current_density_a_per_m2 / r.ac_current_density_a_per_m2 - 0.25) < 1e-12);
+  for (const bad of [{ induced_ac_v: 0 }, { soil_resistivity_ohm_m: 0 }, { holiday_area_cm2: 0 }, { touch_limit_v: 0 }, { risk_threshold_a_per_m2: 0 }, { alternative_resistivity_ohm_m: 0 }, { induced_ac_v: Infinity }]) {
+    assert.ok(_v1773({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1774 computePolarizationDecayCriterion -- failing -0.850 is not a finding", () => {
+  const base = { on_potential_v: -1.050, instant_off_potential_v: -0.780, native_potential_v: -0.650, depolarized_potential_v: -0.670, criterion_v: -0.850, polarization_criterion_mv: 100 };
+  const r = _v1774(base); assertFiniteNumericOutputs(r, "v1774");
+  assert.deepStrictEqual([Math.round(r.ir_drop_mv), Math.round(r.formation_mv), Math.round(r.decay_mv), Math.round(r.decay_from_on_mv)], [270, 130, 110, 380]);
+  // The whole point: fails the absolute criterion, protected under 100 mV.
+  assert.ok(!r.absolute_passes && r.formation_passes && r.decay_passes && r.protected_under_either);
+  // Decay from ON is the true decay plus the IR drop, which is the error.
+  assert.ok(Math.abs(r.decay_from_on_mv - (r.decay_mv + r.ir_drop_mv)) < 1e-9);
+  // A line that fails every criterion is reported as unprotected.
+  const unprotected = _v1774({ ...base, instant_off_potential_v: -0.700, depolarized_potential_v: -0.680 });
+  assert.ok(!unprotected.protected_under_either);
+  assert.ok(_v1774({ ...base, depolarized_potential_v: -0.900 }).error);
+  assert.ok(_v1774({ ...base, on_potential_v: -0.700 }).error);
+  assert.ok(_v1774({ ...base, polarization_criterion_mv: 0 }).error);
+  assert.ok(_v1774({ ...base, native_potential_v: 0.1 }).error);
+});
+
+test("bounds: spec-v1775 computeCokeBreezeBackfill -- drill deeper, do not auger wider", () => {
+  const base = { hole_diameter_in: 8, hole_depth_ft: 10, anode_diameter_in: 2, anode_length_ft: 5, anode_count: 10, backfill_density_pcf: 70, bag_weight_lb: 50, waste_pct: 10, soil_resistivity_ohm_cm: 5000 };
+  const r = _v1775(base); assertFiniteNumericOutputs(r, "v1775");
+  assert.ok(Math.abs(r.backfill_ft3_per_anode - 3.381575425739013) < 1e-12);
+  assert.ok(Math.abs(r.backfill_ft3_per_anode - (r.column_ft3 - r.anode_ft3)) < 1e-12);
+  assert.ok(Math.abs(r.bed_backfill_lb - 2367.1027980173094) < 1e-9);
+  assert.deepStrictEqual([r.bag_count, r.bag_count_with_waste], [48, 53]);
+  // The same Dwight relation as anode-bed-resistance, so they must agree.
+  const bed = _v1763({ soil_resistivity_ohm_cm: 5000, column_length_ft: 10, column_diameter_in: 8, anode_count: 2, spacing_ft: 15, alternative_spacing_ft: 30, alternative_length_ft: 20, alternative_diameter_in: 6 });
+  assert.ok(Math.abs(r.base_resistance_ohm - bed.single_anode_resistance_ohm) < 1e-12);
+  // Depth beats diameter by a wide margin.
+  assert.ok(Math.abs(r.deeper_change_pct) > 5 * Math.abs(r.wider_change_pct));
+  assert.ok(_v1775({ ...base, anode_diameter_in: 9 }).error);
+  assert.ok(_v1775({ ...base, anode_length_ft: 12 }).error);
+  for (const bad of [{ hole_diameter_in: 0 }, { hole_depth_ft: 0 }, { anode_diameter_in: 0 }, { anode_length_ft: 0 }, { anode_count: 0 }, { backfill_density_pcf: 0 }, { bag_weight_lb: 0 }, { waste_pct: -1 }, { soil_resistivity_ohm_cm: 0 }, { hole_depth_ft: Infinity }]) {
+    assert.ok(_v1775({ ...base, ...bad }).error);
+  }
+});

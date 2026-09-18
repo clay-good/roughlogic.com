@@ -32,7 +32,7 @@ What does gate performance today, on every push:
 | `check-shells` | integration job | any prerendered shell over its 6 KB / 68 KB gzip cap |
 | `perf.test.js` | integration job | home-view FCP / LCP / TBT / CLS past the hard-fail tier |
 
-`perf.test.js` measures under a harsher profile than the table above (Chrome's Slow-3G preset plus a 4x CPU throttle, not Slow 4G), so its numbers are deliberately looser, and it runs a documented three-tier policy: the spec-v10 §10.3 targets (FCP 1.5 s / LCP 2.5 s / TBT 200 ms / CLS 0.05) warn, a 10% drift against `test/perf-baseline.json` warns, and only egregious values (FCP 5 s / LCP 10 s / TBT 1,000 ms / CLS 0.25) fail. Since 2026-08-29 it also covers the prerendered shells, restoring the surface Lighthouse used to check: the two tile shells `lighthouserc.json` still names, plus the two heaviest static documents the site serves, which are also the two that matter most to a stranger arriving from a search engine. `/groups/construction/` is the top landing page and the largest group index (55,270 B gzipped, 79% of the check-shells cap, 2.3x the `/groups/electrical/` this list originally named), and `/tools/` is the catalog hub the one-box program is gated on (56,946 B), which nothing measured at all. Size costs little on these: construction paints 3% slower than electrical for 2.2x the bytes, because the 400 ms RTT dominates a single static document. Their thresholds are measured rather than inherited, because that config ran a desktop preset on a 1.6 Mbit link while this file runs Slow-3G with a 4x CPU throttle.
+`perf.test.js` measures under a harsher profile than the table above (Chrome's Slow-3G preset plus a 4x CPU throttle, not Slow 4G), so its numbers are deliberately looser, and it runs a documented three-tier policy: the spec-v10 §10.3 targets (FCP 1.5 s / LCP 2.5 s / TBT 200 ms / CLS 0.05) warn, a 10% drift against `test/perf-baseline.json` warns, and only egregious values (FCP 5 s / LCP 10 s / TBT 1,000 ms / CLS 0.25) fail. Since 2026-08-29 it also covers the prerendered shells, restoring the surface Lighthouse used to check: the two tile shells `lighthouserc.json` still names, plus the two heaviest static documents the site serves, which are also the two that matter most to a stranger arriving from a search engine. `/groups/construction/` is the top landing page and the largest group index (58,804 B gzipped, 84% of the check-shells cap, 2.3x the `/groups/electrical/` this list originally named), and `/tools/` is the catalog hub the one-box program is gated on (58,432 B), which nothing measured at all. Size costs little on these: construction paints 3% slower than electrical for 2.2x the bytes, because the 400 ms RTT dominates a single static document. Their thresholds are measured rather than inherited, because that config ran a desktop preset on a 1.6 Mbit link while this file runs Slow-3G with a 4x CPU throttle.
 
 Two limits worth knowing. The shell tests assert paint and layout shift but **not** total blocking time: seeding a 600 ms blocking script into a built shell left TBT at 0, because a parser-blocking script that runs before the observer registers is never attributed as a long task, so that assertion would have passed on a broken page. Script on a shell is `check-shells`' rule instead, and it does fail on that seed. The SPA's own tile views -- the hash routes a reader reaches from search and from a shared link -- are covered too, and adding that coverage found a defect: a tile view builds in two passes, so the footer sat high and got shoved down when the calculator arrived, for a CLS of 0.173 to 0.247 against a 0.05 budget (0.25 is Core Web Vitals' "poor" line). Reserving the page height for the duration of a tool route took those to 0.056 / 0.060 / 0.101. The CLS thresholds sit between the two ranges on purpose: a hard tier at 0.25 would have sat above the defect it exists to catch.
 
@@ -60,7 +60,7 @@ Descriptions are four fifths of it. Without them the registry gzips to **47,224 
 
 Two paths pay that today, and neither needs all of it:
 
-- **A deep link** (`/index.html#<id>`, what search results and shared links point at) loads the whole catalog before it can validate the id and read one row's name and description. It needs 1 of 2,157.
+- **A deep link** (`/index.html#<id>`, what search results and shared links point at) loads the whole catalog before it can validate the id and read one row's name and description. It needs 1 of 2,170.
 - **The first search keystroke** loads it too, because `toolMatches` searches `name + " " + desc`. This one genuinely wants every description.
 
 So the deep-link case is a clean win, and the search case turns out not to be the tradeoff it first looked like. Search only degrades if it ranks *before* the descriptions arrive; if it awaits every description shard exactly as it awaits `tools-data.js` today, results are identical and the bytes are the same, fetched in parallel instead of serially.
@@ -109,7 +109,7 @@ The blocker is blast radius, not the search tradeoff: this rewrites how the brow
 ## Page weight strategy
 
 - Single index.html, single styles.css, single app.js. No bundler in the runtime path.
-- Calculator modules (86 `calc-*.js` files; the list is `ls calc-*.js`, and check-readme-counts pins the count wherever a doc quotes it -- this line said 24 until 2026-08-29, and enumerated three modules that spec-v107 had already retired) and their support libs (pure-math.js, hash-state.js, data-stamp.js, clipboard.js, ui-fields.js, ui-validity.js, tile-meta.js, limitation-banner.js, search-discovery.js, context-band.js, cost-output.js, v5-platform.js, standard-sizes.js, citations.js) are loaded via dynamic ES module imports inside renderToolView, never eagerly from the home view. Each module loads at most once (cached by promise + by the service worker) on first navigation to a tool that uses it. The home-view payload is index.html + styles.css + app.js + theme.js + integrity.js + routing.js. Two registries that used to sit inside `app.js` are now lazy-loaded and are therefore outside it: the `TOOLS` catalog registry in `tools-data.js`, dynamic-imported on the first search keystroke or tile route, and the `TOOL_MODULES` tile-id-to-renderer table in `tool-modules.js`, dynamic-imported on the first tile open by `loadRenderer()`. As of 2026-09-10 the payload gzips to **52,130 B** (50.9% of the 100 KB budget). `shell-meta.js`, which builds the tile `<title>` and `<meta name="description">` for both the prerendered shell and the SPA route, is a third such lazy module: `updateHeadForTool()` imports it on a tile route, so the home view does not carry it.
+- Calculator modules (87 `calc-*.js` files; the list is `ls calc-*.js`, and check-readme-counts pins the count wherever a doc quotes it -- this line said 24 until 2026-08-29, and enumerated three modules that spec-v107 had already retired) and their support libs (pure-math.js, hash-state.js, data-stamp.js, clipboard.js, ui-fields.js, ui-validity.js, tile-meta.js, limitation-banner.js, search-discovery.js, context-band.js, cost-output.js, v5-platform.js, standard-sizes.js, citations.js) are loaded via dynamic ES module imports inside renderToolView, never eagerly from the home view. Each module loads at most once (cached by promise + by the service worker) on first navigation to a tool that uses it. The home-view payload is index.html + styles.css + app.js + theme.js + integrity.js + routing.js. Two registries that used to sit inside `app.js` are now lazy-loaded and are therefore outside it: the `TOOLS` catalog registry in `tools-data.js`, dynamic-imported on the first search keystroke or tile route, and the `TOOL_MODULES` tile-id-to-renderer table in `tool-modules.js`, dynamic-imported on the first tile open by `loadRenderer()`. As of 2026-09-10 the payload gzips to **52,130 B** (50.9% of the 100 KB budget). `shell-meta.js`, which builds the tile `<title>` and `<meta name="description">` for both the prerendered shell and the SPA route, is a third such lazy module: `updateHeadForTool()` imports it on a tile route, so the home view does not carry it.
 - Data shards under data/ load on demand only, never eagerly. The data pipeline currently produces **119 integrity-checked entries across 19 dataset folders** (as of 2026-08-29; `npm run data:verify` prints the live count) (accounting, construction, cross, crosswalks, electrical, field, fields, fire, historical, hvac, lab, legal, physical-constants, plumbing, realestate, restoration, search, summaries, trucking); the manifest hashes (one per folder) are fetched at boot, and each shard is checked against its manifest's recorded hash when it is actually fetched.
 - The Manual J cooling and heating estimators and the duct sizing calculator run inside a Web Worker so they do not contribute to main-thread blocking time.
 
@@ -128,7 +128,7 @@ The §14.3 starter estimates (vet 22 KB / ems 25 KB / aviation 18 KB / realestat
 ## v13 per-shell budgets (spec-v13 §12.1)
 
 Spec-v13 added a build-time prerender step that emits one static HTML
-shell per tile (`/tools/<id>/index.html`, 2,157 shells) and one per
+shell per tile (`/tools/<id>/index.html`, 2,170 shells) and one per
 group (`/groups/<slug>/index.html`, 21 shells), plus the catalog hub at
 `/tools/` and the not-found page at `/404.html`. The shells are separate
 documents from the SPA home view, served as static files by Cloudflare
@@ -153,11 +153,11 @@ Payload caps enforced by [../scripts/check-shells.mjs](../scripts/check-shells.m
   that state it moved. The catalog hub and the not-found page are linted
   under the group cap.
 
-Live measurements 2026-09-05, from the built `dist/`: **tile shells
-2,506 B gzipped at the median and 3,811 B at the largest**
-(`machine-room-heat`); **group shells 5,250 B at the median
-and 55,270 B at the largest** (`/groups/construction/`, which carries
-567 tile rows). Both under cap, and both larger than the v13-close
+Live measurements 2026-09-05 for tile shells and 2026-09-18 for group
+shells, from the built `dist/`: **tile shells 2,506 B gzipped at the
+median and 3,811 B at the largest** (`machine-room-heat`); **group
+shells 6,238 B at the median and 58,804 B at the largest**
+(`/groups/construction/`, which carries 600 tile rows). Both under cap, and both larger than the v13-close
 figures this section used to quote -- tile shells carry the worked
 example, the citation, and since 2026-08-31 a print-only copy of the
 proof, and group hubs carry every sibling hub.

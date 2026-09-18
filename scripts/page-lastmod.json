@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "a8be39a7fb3b25dd",
+      "sha": "0ef47563d94f7f86",
       "date": "2026-09-18"
     },
     "/tools/": {
-      "sha": "5f2e3b732e3f550c",
+      "sha": "2366aeef18808f45",
       "date": "2026-09-18"
     },
     "/groups/accounting/": {
-      "sha": "8a353c2ea70ab81d",
+      "sha": "64d86708ff0d1be8",
       "date": "2026-09-18"
     },
     "/groups/agriculture/": {
-      "sha": "2f47af3891914610",
+      "sha": "d9d1b09ab29acc8b",
       "date": "2026-09-18"
     },
     "/groups/construction/": {
-      "sha": "5d865e373a7ce77e",
+      "sha": "a68ee01959775346",
       "date": "2026-09-18"
     },
     "/groups/cross-trade/": {
-      "sha": "846cb18c0615166f",
+      "sha": "cd685d7ca11212b8",
       "date": "2026-09-18"
     },
     "/groups/educators/": {
-      "sha": "3a5f68932f1a9966",
+      "sha": "edfd134d064caae7",
       "date": "2026-09-18"
     },
     "/groups/electrical/": {
-      "sha": "ec0e9b2564f12df1",
+      "sha": "75219609aab2fde1",
       "date": "2026-09-18"
     },
     "/groups/field/": {
-      "sha": "593c88008aa8f84b",
+      "sha": "b4b7c9bcae2fd88e",
       "date": "2026-09-18"
     },
     "/groups/fire-ground/": {
-      "sha": "3a5ad867d5a93a8d",
+      "sha": "5ef6cd29fe0c5094",
       "date": "2026-09-18"
     },
     "/groups/historical/": {
-      "sha": "f9aa585d5d003619",
+      "sha": "018ab39a5520e50c",
       "date": "2026-09-18"
     },
     "/groups/hvac/": {
-      "sha": "e692a007d0d9a984",
+      "sha": "0b2495dfc2f79b83",
       "date": "2026-09-18"
     },
     "/groups/kitchen/": {
-      "sha": "110ce8fdcefcdb6c",
+      "sha": "89f6fb783cf2793d",
       "date": "2026-09-18"
     },
     "/groups/lab/": {
-      "sha": "7d9b049552c73877",
+      "sha": "1305441f5b66e7a6",
       "date": "2026-09-18"
     },
     "/groups/mechanic/": {
-      "sha": "a9016111feef8683",
+      "sha": "63c2ee6321a1e15b",
       "date": "2026-09-18"
     },
     "/groups/plumbing/": {
-      "sha": "368d4041d800a53d",
+      "sha": "f3150ca121790f80",
       "date": "2026-09-18"
     },
     "/groups/real-estate/": {
-      "sha": "e487dfdd8dc4e96e",
+      "sha": "dc728e1206bbb629",
       "date": "2026-09-18"
     },
     "/groups/references/": {
-      "sha": "3299a2b07c11e7dc",
+      "sha": "0171778eec9357b9",
       "date": "2026-09-18"
     },
     "/groups/restoration/": {
-      "sha": "c334122967dd52c2",
+      "sha": "ed851fd0821eafef",
       "date": "2026-09-18"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "1df73cb68c9f377b",
+      "sha": "da5b270461977123",
       "date": "2026-09-18"
     },
     "/groups/stage/": {
-      "sha": "8c2592c6f9c21081",
+      "sha": "8f1ad8b2d726150a",
       "date": "2026-09-18"
     },
     "/groups/trucking/": {
-      "sha": "dae9eb2f78e26608",
+      "sha": "dbad68e76791d7a1",
       "date": "2026-09-18"
     },
     "/groups/water/": {
-      "sha": "cc7793d49858dae7",
+      "sha": "06ecccaf414b2349",
       "date": "2026-09-18"
     },
     "/tools/aav-install-check/": {
@@ -116,6 +116,10 @@
     "/tools/abyc-dc-wire/": {
       "sha": "e7fb36d904d802d5",
       "date": "2026-09-01"
+    },
+    "/tools/ac-induced-voltage-pipeline/": {
+      "sha": "c7a2d15fb02b939b",
+      "date": "2026-09-18"
     },
     "/tools/access-control-power-supply/": {
       "sha": "6e73ba0b9624d381",
@@ -294,8 +298,12 @@
       "date": "2026-09-08"
     },
     "/tools/annulus-area/": {
-      "sha": "212223f331114d6d",
-      "date": "2026-09-04"
+      "sha": "1e6d85f88a47d813",
+      "date": "2026-09-18"
+    },
+    "/tools/anode-bed-resistance/": {
+      "sha": "98938a7a733c1780",
+      "date": "2026-09-18"
     },
     "/tools/antimicrobial-dilution/": {
       "sha": "7aa1a1f50bf1bfb1",
@@ -982,8 +990,8 @@
       "date": "2026-09-01"
     },
     "/tools/cathodic-anode-count-life/": {
-      "sha": "159c83e2ca4630ad",
-      "date": "2026-09-08"
+      "sha": "a3f4cdc238c4c8ee",
+      "date": "2026-09-18"
     },
     "/tools/cattle-heart-girth-weight/": {
       "sha": "e35995d58cedd522",
@@ -1217,6 +1225,10 @@
       "sha": "4db83be93cfc88f0",
       "date": "2026-09-01"
     },
+    "/tools/close-interval-survey-readings/": {
+      "sha": "fb8b19799bb6a295",
+      "date": "2026-09-18"
+    },
     "/tools/closet-shelf-takeoff/": {
       "sha": "5ea59d11a605ffda",
       "date": "2026-09-01"
@@ -1260,6 +1272,10 @@
     "/tools/coagulant-dose/": {
       "sha": "dd68c4fd8e791ab6",
       "date": "2026-09-01"
+    },
+    "/tools/coating-breakdown-factor/": {
+      "sha": "beb54d4ba3d2a966",
+      "date": "2026-09-18"
     },
     "/tools/coating-coverage-dft/": {
       "sha": "5e25f7bb07f7995d",
@@ -1312,6 +1328,10 @@
     "/tools/coil-length/": {
       "sha": "22c48a3f49208d89",
       "date": "2026-09-01"
+    },
+    "/tools/coke-breeze-backfill/": {
+      "sha": "ba8a8dfe32fe510e",
+      "date": "2026-09-18"
     },
     "/tools/colebrook-friction-factor/": {
       "sha": "7148da0f365771c4",
@@ -1761,6 +1781,10 @@
       "sha": "a2b3045087a265d8",
       "date": "2026-09-08"
     },
+    "/tools/corrosion-rate-weight-loss/": {
+      "sha": "08ac638d12d5417a",
+      "date": "2026-09-18"
+    },
     "/tools/cost-of-waiting/": {
       "sha": "b86f30077d71d685",
       "date": "2026-09-01"
@@ -1808,6 +1832,10 @@
     "/tools/covers-per-labor-hour/": {
       "sha": "302b263b3c55a4c0",
       "date": "2026-09-01"
+    },
+    "/tools/cp-rectifier-sizing/": {
+      "sha": "570f5a4db9b52be3",
+      "date": "2026-09-18"
     },
     "/tools/crac-sensible-derate/": {
       "sha": "2488621a2375140e",
@@ -2530,8 +2558,8 @@
       "date": "2026-09-01"
     },
     "/tools/ellipse-area-perimeter/": {
-      "sha": "a54ee9deda90305b",
-      "date": "2026-09-04"
+      "sha": "9a4d2d05eca43385",
+      "date": "2026-09-18"
     },
     "/tools/ellipsoid-volume/": {
       "sha": "ec11ee55c0aec1b8",
@@ -3112,6 +3140,10 @@
     "/tools/future-value-of-annuity/": {
       "sha": "8e7290990eddc02f",
       "date": "2026-09-01"
+    },
+    "/tools/galvanic-area-ratio/": {
+      "sha": "f06d7b1620eda5e0",
+      "date": "2026-09-18"
     },
     "/tools/galvanize-coating-weight/": {
       "sha": "5f0947b8848274d1",
@@ -3828,6 +3860,10 @@
     "/tools/inspection-checklist/": {
       "sha": "e2089920c25377ed",
       "date": "2026-09-01"
+    },
+    "/tools/instant-off-ir-drop/": {
+      "sha": "028350d4a0bbc51e",
+      "date": "2026-09-18"
     },
     "/tools/insulation-batt-coverage/": {
       "sha": "61a208a838721821",
@@ -5206,8 +5242,8 @@
       "date": "2026-09-01"
     },
     "/tools/pipe-template-wrap/": {
-      "sha": "1538b00004be355f",
-      "date": "2026-09-01"
+      "sha": "103bd1dd4b04fbea",
+      "date": "2026-09-18"
     },
     "/tools/pipe-velocity/": {
       "sha": "7d2659595812d0bd",
@@ -5220,6 +5256,10 @@
     "/tools/pipeline-mao-barlow/": {
       "sha": "3eea631541c6edee",
       "date": "2026-09-08"
+    },
+    "/tools/pipeline-potential-attenuation/": {
+      "sha": "8b07b364be662d6c",
+      "date": "2026-09-18"
     },
     "/tools/pit-dewatering-staging/": {
       "sha": "182038fc29420507",
@@ -5316,6 +5356,10 @@
     "/tools/point-method-required-candela/": {
       "sha": "10988e0eca49fe5d",
       "date": "2026-09-01"
+    },
+    "/tools/polarization-decay-criterion/": {
+      "sha": "8694203a72234e08",
+      "date": "2026-09-18"
     },
     "/tools/pole-class-groundline-moment/": {
       "sha": "d38493f1d2b2af94",
@@ -6186,7 +6230,7 @@
       "date": "2026-09-01"
     },
     "/tools/rolling-offset/": {
-      "sha": "3b3e14eeed6ef76e",
+      "sha": "5ef08fb6b9e3e856",
       "date": "2026-09-18"
     },
     "/tools/rolling-sphere-protection/": {
@@ -7421,6 +7465,10 @@
       "sha": "2d6c85b6700fa8bf",
       "date": "2026-09-01"
     },
+    "/tools/stray-current-bond/": {
+      "sha": "afc0a9e2fe0be61a",
+      "date": "2026-09-18"
+    },
     "/tools/striping-paint-quantity/": {
       "sha": "c000258dcaeffbd2",
       "date": "2026-09-01"
@@ -7552,6 +7600,10 @@
     "/tools/tandem-lift-share/": {
       "sha": "871eb6f68c8fd335",
       "date": "2026-09-01"
+    },
+    "/tools/tank-bottom-anode-layout/": {
+      "sha": "f8075c2c24aba25f",
+      "date": "2026-09-18"
     },
     "/tools/tank-drain-time/": {
       "sha": "3ea9a8cbc1ea3a13",

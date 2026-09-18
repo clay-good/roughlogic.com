@@ -1426,6 +1426,19 @@ export const TOOL_MODULES = (() => {
     "substrate-container-volume", "photoperiod-blackout-schedule",
     "leaching-fraction-runoff-ec",
   ]);
+  // spec-v1763..v1775: cathodic protection and corrosion control. Ten Group
+  // E tiles cover the impressed-current system, the pipeline, and the surveys;
+  // the rectifier is Group A; coupon weight loss and the galvanic area ratio
+  // are Group G because they concern corrosion itself, with or without CP.
+  declare("./calc-corrosion.js", "CORROSION_RENDERERS", [
+    "anode-bed-resistance", "cp-rectifier-sizing",
+    "pipeline-potential-attenuation", "instant-off-ir-drop",
+    "coating-breakdown-factor", "stray-current-bond",
+    "corrosion-rate-weight-loss", "galvanic-area-ratio",
+    "tank-bottom-anode-layout", "close-interval-survey-readings",
+    "ac-induced-voltage-pipeline", "polarization-decay-criterion",
+    "coke-breeze-backfill",
+  ]);
   // spec-v1845..v1850: the snow and ice management bench -- what a pavement
   // temperature costs in salt, what a brine batch has to be, how long a plow
   // route takes, where the snow goes, when a deicer stops working, and whether

@@ -627,6 +627,26 @@ async function main() {
     );
   }
 
+  // The same README sentence states the TRACKED count beside the untracked one,
+  // and until 2026-09-18 nothing read it: it sat at 1,477 through four tile bands
+  // while the live figure rose to 1,483, so the sentence's two halves no longer
+  // summed to the catalog. A ratchet on one half of a sentence lets the other
+  // half rot. Check that the tracked figure is the live one, which also pins the
+  // two halves to the catalog total between them.
+  const trackedTiles = citationsMap.size - untrackedTiles.length;
+  const statedTracked = /\b([\d,]+) tiles cite a source on a recheck calendar\b/.exec(readmeText);
+  if (!statedTracked) {
+    errors.push(
+      "README.md does not state how many tiles cite a source on a recheck calendar; " +
+      trackedTiles + " of " + citationsMap.size + " do.",
+    );
+  } else if (Number(statedTracked[1].replace(/,/g, "")) !== trackedTiles) {
+    errors.push(
+      "README.md says " + statedTracked[1] + " tiles cite a source on a recheck calendar; " +
+      "this run counted " + trackedTiles + ".",
+    );
+  }
+
   const verboseAll = process.argv.includes("--verbose-all");
   if (process.argv.includes("--verbose") || verboseAll) {
     const rows = [...sourceToTiles.entries()].sort((a, b) => b[1].length - a[1].length);

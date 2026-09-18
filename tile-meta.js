@@ -1403,6 +1403,20 @@ const _TILES = [
   ["substrate-container-volume", "L"],
   ["photoperiod-blackout-schedule", "L"],
   ["leaching-fraction-runoff-ec", "L"],
+  // spec-v1763..v1775 cathodic protection and corrosion control
+  ["anode-bed-resistance", "E"],
+  ["cp-rectifier-sizing", "A"],
+  ["pipeline-potential-attenuation", "E"],
+  ["instant-off-ir-drop", "E"],
+  ["coating-breakdown-factor", "E"],
+  ["stray-current-bond", "E"],
+  ["corrosion-rate-weight-loss", "G"],
+  ["galvanic-area-ratio", "G"],
+  ["tank-bottom-anode-layout", "E"],
+  ["close-interval-survey-readings", "E"],
+  ["ac-induced-voltage-pipeline", "E"],
+  ["polarization-decay-criterion", "E"],
+  ["coke-breeze-backfill", "E"],
 ];
 
 

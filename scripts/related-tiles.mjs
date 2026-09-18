@@ -2303,6 +2303,20 @@ const RELATED = {
   "substrate-container-volume": ["plug-tray-cell-count","greenhouse-transpiration-water","mulch-topsoil-volume"],
   "photoperiod-blackout-schedule": ["ppfd-daily-light-integral","grow-light-fixture-count","shade-cloth-transmission"],
   "leaching-fraction-runoff-ec": ["greenhouse-transpiration-water","tds-from-conductivity","vapor-pressure-deficit"],
+  // spec-v1763..v1775 cathodic protection and corrosion control band.
+  "anode-bed-resistance": ["cp-rectifier-sizing","coke-breeze-backfill","soil-resistivity-wenner"],
+  "cp-rectifier-sizing": ["anode-bed-resistance","coating-breakdown-factor","pipeline-potential-attenuation"],
+  "pipeline-potential-attenuation": ["cp-rectifier-sizing","coating-breakdown-factor","close-interval-survey-readings"],
+  "instant-off-ir-drop": ["polarization-decay-criterion","close-interval-survey-readings","pipeline-potential-attenuation"],
+  "coating-breakdown-factor": ["cp-rectifier-sizing","anode-bed-resistance","pipeline-potential-attenuation"],
+  "stray-current-bond": ["instant-off-ir-drop","ac-induced-voltage-pipeline","pipeline-potential-attenuation"],
+  "corrosion-rate-weight-loss": ["galvanic-area-ratio","coating-breakdown-factor","instant-off-ir-drop"],
+  "galvanic-area-ratio": ["corrosion-rate-weight-loss","coating-breakdown-factor","stray-current-bond"],
+  "tank-bottom-anode-layout": ["anode-bed-resistance","cp-rectifier-sizing","coating-breakdown-factor"],
+  "close-interval-survey-readings": ["instant-off-ir-drop","polarization-decay-criterion","pipeline-potential-attenuation"],
+  "ac-induced-voltage-pipeline": ["stray-current-bond","instant-off-ir-drop","pipeline-potential-attenuation"],
+  "polarization-decay-criterion": ["instant-off-ir-drop","close-interval-survey-readings","cp-rectifier-sizing"],
+  "coke-breeze-backfill": ["anode-bed-resistance","cp-rectifier-sizing","soil-resistivity-wenner"],
 };
 
 export { RELATED };

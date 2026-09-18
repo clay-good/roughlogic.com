@@ -469,6 +469,18 @@
    "match": "mS/cm",
    "family": "greenhouse and controlled-environment agriculture",
    "justification": "Root-zone and feed electrical conductivity are read in mS/cm on every US horticultural EC meter and in extension pour-through guidance; there is no US-customary equivalent."
+  },
+  {
+   "module": "calc-corrosion.js",
+   "match": "g/cm^3",
+   "family": "cathodic protection and corrosion control",
+   "justification": "The ASTM G1 weight-loss corrosion rate, mpy = 534 W / (D A T), defines its 534 constant for alloy density in g/cm^3; a US corrosion engineer reads density in g/cm^3 off the ASTM G1 table itself, and entering lb/cu ft would silently break the constant."
+  },
+  {
+   "module": "calc-corrosion.js",
+   "match": "A/m^2",
+   "family": "cathodic protection and corrosion control",
+   "justification": "ISO 18086 and NACE SP21424 state the AC corrosion current-density thresholds in A/m^2, and US pipeline AC mitigation studies report them in those units; there is no US-customary form of the threshold."
   }
  ]
 }

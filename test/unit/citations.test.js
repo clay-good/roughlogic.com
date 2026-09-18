@@ -112,8 +112,9 @@ test("Group F all 18 tiles use the fire governance variant", () => {
 
 test("Group G audit coverage: every cross-trade tile has a CITATIONS entry", async () => {
   const ids = await _groupIds("// Group G: Cross-Trade", "// Group H:");
-  // 41 + the Group G flare of the spec-v1789..v1799 solid waste band.
-  assert.ok(ids.length === 42, "expected 42 Group G tile ids, got " + ids.length);
+  // 41 + the Group G flare of the spec-v1789..v1799 solid waste band + the
+  // 2 Group G tiles of the spec-v1763..v1775 corrosion band.
+  assert.ok(ids.length === 44, "expected 44 Group G tile ids, got " + ids.length);
   for (const id of ids) assert.ok(CITATIONS[id], "Group G tile '" + id + "' missing CITATIONS entry");
 });
 
