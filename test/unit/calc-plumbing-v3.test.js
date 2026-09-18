@@ -64,7 +64,7 @@ test("Stormwater: unknown surface returns error", () => {
 
 test("Stormwater: gpm = cfs * 448.831", () => {
   const r = computeStormwaterRational({ area_ft2: 5000, surface: "gravel", rainfall_in_per_hr: 1.5 });
-  assert.ok(close(r.peak_flow_gpm / r.peak_flow_cfs, 448.831, 0.5));
+  assert.ok(close(r.peak_flow_gpm / r.peak_flow_cfs, (60 * 1728 / 231), 0.5));
 });
 
 test("Stormwater: every coefficient is between 0 and 1", () => {

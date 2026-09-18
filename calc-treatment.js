@@ -41,7 +41,7 @@ export function computeWeirFlow({ weir_type = "vnotch90", head_ft = 0, crest_len
     if (effL <= 0) return { error: "Effective crest length is non-positive - head too large for this crest." };
     cfs = C * effL * Math.pow(H, 1.5);
   }
-  const gpm = cfs * 448.831;
+  const gpm = cfs * (60 * 1728 / 231);
   const mgd = gpm * 1440 / 1e6;
   return {
     flow_cfs: Number.isFinite(cfs) ? cfs : null,
@@ -95,7 +95,7 @@ export function computeCipollettiWeir({ crest_length_ft = 0, head_ft = 0, coeff 
   if (!(H > 0)) return { error: "Head over crest must be positive (ft)." };
   const C = coeff > 0 ? coeff : 3.367;
   const cfs = C * L * Math.pow(H, 1.5);
-  const gpm = cfs * 448.831;
+  const gpm = cfs * (60 * 1728 / 231);
   const mgd = gpm * 1440 / 1e6;
   if (![cfs, gpm, mgd].every(Number.isFinite)) return { error: "Cipolletti-weir math is not a finite value." };
   return {
@@ -147,7 +147,7 @@ export function computeSluiceGateFlow({ gate_opening_ft = 0, gate_width_ft = 0, 
   const g = 32.2; // ft/s^2
   const Cd = Cc / Math.sqrt(1 + Cc * a / y1);
   const cfs = Cd * b * a * Math.sqrt(2 * g * y1);
-  const gpm = cfs * 448.831;
+  const gpm = cfs * (60 * 1728 / 231);
   const mgd = gpm * 1440 / 1e6;
   if (![Cd, cfs, gpm, mgd].every(Number.isFinite)) return { error: "Sluice-gate math is not a finite value." };
   return {
@@ -200,7 +200,7 @@ export function computeBroadCrestedWeir({ crest_length_ft = 0, head_ft = 0, disc
   const K = Math.pow(2 / 3, 1.5) * Math.sqrt(g); // theoretical critical-flow coefficient = 3.0888
   const effective_coeff = Cd * K;
   const cfs = effective_coeff * L * Math.pow(H, 1.5);
-  const gpm = cfs * 448.831;
+  const gpm = cfs * (60 * 1728 / 231);
   const mgd = gpm * 1440 / 1e6;
   if (![effective_coeff, cfs, gpm, mgd].every(Number.isFinite)) return { error: "Broad-crested-weir math is not a finite value." };
   return {
@@ -262,7 +262,7 @@ export function computeWeirHeadFromFlow({ weir_type = "vnotch90", target_flow_cf
       head_ft = H;
     }
   }
-  const gpm = Q * 448.831;
+  const gpm = Q * (60 * 1728 / 231);
   return {
     head_ft: Number.isFinite(head_ft) ? head_ft : null,
     flow_gpm: gpm, flow_mgd: gpm * 1440 / 1e6, low_accuracy: head_ft < 0.2,

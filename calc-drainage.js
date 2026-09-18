@@ -549,7 +549,7 @@ export function computeManningPipeCapacity({ d_in = 0, slope = 0, material = "pv
   const a_ft2 = Math.PI * D_ft * D_ft / 4;
   const v_fps = (1.486 / n) * Math.pow(r_ft, 2 / 3) * Math.sqrt(slope);
   const q_cfs = v_fps * a_ft2;
-  const q_gpm = q_cfs * 448.831;
+  const q_gpm = q_cfs * (60 * 1728 / 231);
   return {
     n, a_ft2, r_ft, v_fps, q_cfs, q_gpm,
     note: "Manning full-bore gravity-flow capacity: V = (1.486/n) R^(2/3) sqrt(S) with the hydraulic radius R = D/4 for a circular pipe flowing full and Q = V (pi/4) D^2 - the discharge side of the same Manning equation the manning-slope tile inverts. The roughness n is taken from the standard tables (PVC 0.009, cast iron / concrete 0.013, corrugated metal 0.024). Because Q scales with sqrt(S), doubling the slope raises the capacity only about 1.41x. A steady, uniform (normal-depth) full flow in a circular pipe; it does not compute the partial-flow depth, and a circular pipe actually carries a few percent more than full-bore at about 0.94 depth (the partial-flow curves are separate). A design aid; the engineer of record and the local plumbing/sewer code govern.",
@@ -605,7 +605,7 @@ export function computePipePartialFlowDepth({ d_in = 0, slope = 0, flow_gpm = 0,
   const n = MANNING_ROUGHNESS[material];
   if (!Number.isFinite(n)) return { error: "Unknown pipe material." };
   const d_ft = d_in / 12;
-  const q_cfs = flow_gpm / 448.831;
+  const q_cfs = flow_gpm / (60 * 1728 / 231);
   const areaOf = (th) => (d_ft * d_ft / 8) * (th - Math.sin(th));
   const perimOf = (th) => (d_ft * th) / 2;
   const qOf = (th) => {
@@ -615,7 +615,7 @@ export function computePipePartialFlowDepth({ d_in = 0, slope = 0, flow_gpm = 0,
   const q_full_cfs = qOf(2 * Math.PI);
   const q_max_cfs = qOf(THETA_MAX_Q);
   if (q_cfs > q_max_cfs) {
-    return { error: "Flow exceeds the pipe's maximum gravity capacity of " + (q_max_cfs * 448.831).toFixed(0) + " gpm (reached at d/D = 0.94). Use a larger pipe or a steeper slope." };
+    return { error: "Flow exceeds the pipe's maximum gravity capacity of " + (q_max_cfs * (60 * 1728 / 231)).toFixed(0) + " gpm (reached at d/D = 0.94). Use a larger pipe or a steeper slope." };
   }
   // Bisect on the rising branch only: qOf is monotonic on (0, THETA_MAX_Q].
   let lo = 1e-9, hi = THETA_MAX_Q;
@@ -632,8 +632,8 @@ export function computePipePartialFlowDepth({ d_in = 0, slope = 0, flow_gpm = 0,
   const shear_psf = 62.4 * r_ft * slope;
   return {
     n, d_ft, theta, depth_in, d_over_d, a_ft2, r_ft, v_fps, self_cleansing, shear_psf,
-    q_full_gpm: q_full_cfs * 448.831,
-    q_max_gpm: q_max_cfs * 448.831,
+    q_full_gpm: q_full_cfs * (60 * 1728 / 231),
+    q_max_gpm: q_max_cfs * (60 * 1728 / 231),
     d_over_d_at_max_q: (1 - Math.cos(THETA_MAX_Q / 2)) / 2,
     d_over_d_at_max_v: (1 - Math.cos(THETA_MAX_V / 2)) / 2,
     pct_full: (q_cfs / q_full_cfs) * 100,
@@ -1818,7 +1818,7 @@ export function computeWaterQualityVolume({ rainfall_depth_in = 0, impervious_pe
   const volume_saved_pct = alternative_wqv_cf === null ? null : volume_saved_cf / wqv_cf * 100;
   // The facility has to empty before the next storm, which sets the outlet.
   const release_rate_cfs = drawdown_hours > 0 ? wqv_cf / (drawdown_hours * 3600) : null;
-  const release_rate_gpm = release_rate_cfs === null ? null : release_rate_cfs * 448.831;
+  const release_rate_gpm = release_rate_cfs === null ? null : release_rate_cfs * (60 * 1728 / 231);
   const outs = [runoff_coefficient, wqv_cf, wqv_ac_ft, wqv_gal];
   if (!outs.every(Number.isFinite)) return { error: "Water quality volume math is not a finite value." };
   const lever_verdict = alternative_wqv_cf === null

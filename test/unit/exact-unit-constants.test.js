@@ -186,3 +186,28 @@ test("no code line converts cubic feet to gallons with a truncated inline 7.48",
   }
   assert.deepEqual(found, []);
 });
+
+// The same scan for the other two conversions seen inline: gpm per cfs
+// (exactly 60 x 1,728 / 231 = 448.8312) and kW per horsepower (exactly
+// 0.74569987). 0.746 is allowed where a tile's own formula and citation print
+// it as the motor convention -- calc-electrical's premium-motor saving and
+// calc-motor's energy tiles -- and nowhere else.
+const INLINE_POWER_FLOW_ALLOWED = new Map([
+  ["calc-electrical.js", "the premium-motor relation, input kW = HP x 0.746 x load / efficiency, as its citation prints it"],
+  ["calc-motor.js", "the motor energy tiles, whose formula and citation state 0.746 kW/HP"],
+]);
+
+test("no code line converts cfs or horsepower with a truncated inline factor", () => {
+  const found = [];
+  for (const file of readdirSync(ROOT).filter((f) => /^calc-.*\.js$/.test(f))) {
+    const lines = readFileSync(resolve(ROOT, file), "utf8").split("\n");
+    lines.forEach((line, i) => {
+      if (/^\s*\/\//.test(line)) return;
+      const code = line.replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`/g, '""').replace(/\/\/.*$/, "");
+      if (/[*/]\s*448\.83\d*\b|\b448\.83\d*\s*[*/]/.test(code)) found.push(`${file}:${i + 1}: ${line.trim()}`);
+      if (/[*/]\s*0\.745\d*\b|\b0\.745\d*\s*[*/]/.test(code) && !/0\.745699872/.test(code)) found.push(`${file}:${i + 1}: ${line.trim()}`);
+      if (/[*/]\s*0\.746\b|\b0\.746\s*[*/]/.test(code) && !INLINE_POWER_FLOW_ALLOWED.has(file)) found.push(`${file}:${i + 1}: ${line.trim()}`);
+    });
+  }
+  assert.deepEqual(found, []);
+});

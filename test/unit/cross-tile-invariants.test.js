@@ -7525,7 +7525,7 @@ test("monotonicity: computeStormwaterRational peak_flow_cfs is strictly increasi
   assert.ok(asphalt.peak_flow_cfs > lawn.peak_flow_cfs && lawn.peak_flow_cfs > forest.peak_flow_cfs,
     `coef ordering: ${asphalt.peak_flow_cfs} ${lawn.peak_flow_cfs} ${forest.peak_flow_cfs}`);
   // peak_flow_gpm = cfs * 448.831 exact unit pin.
-  assert.ok(Math.abs(asphalt.peak_flow_gpm - asphalt.peak_flow_cfs * 448.831) < 1e-9,
+  assert.ok(Math.abs(asphalt.peak_flow_gpm - asphalt.peak_flow_cfs * (60 * 1728 / 231)) < 1e-9,
     `gpm = ${asphalt.peak_flow_gpm}, expected ${asphalt.peak_flow_cfs * 448.831}`);
   // area_acres = area_ft2 / 43560 exact unit pin.
   assert.ok(Math.abs(asphalt.area_acres - 5000 / 43560) < 1e-12,

@@ -989,7 +989,7 @@ export function computeStormwaterRational({ area_ft2 = 0, surface = "asphalt", r
   const A_acres = area_ft2 / 43560;
   const Q_cfs = C * rainfall_in_per_hr * A_acres;
   // 1 cfs = 448.831 gpm.
-  const Q_gpm = Q_cfs * 448.831;
+  const Q_gpm = Q_cfs * (60 * 1728 / 231);
   return { runoff_coefficient: C, peak_flow_cfs: Q_cfs, peak_flow_gpm: Q_gpm, area_acres: A_acres };
 }
 
@@ -3810,7 +3810,7 @@ export function computeOrificeFlow({ d_in = 0, h_ft = 0, cd = 0.60 } = {}) {
   if (!(cd > 0)) return { error: "The discharge coefficient must be positive (~0.6 sharp-edged)." };
   const a_ft2 = (Math.PI / 4) * Math.pow(d_in / 12, 2);
   const q_cfs = cd * a_ft2 * Math.sqrt(2 * 32.2 * h_ft);
-  const q_gpm = q_cfs * 448.831;
+  const q_gpm = q_cfs * (60 * 1728 / 231);
   return {
     a_ft2, q_cfs, q_gpm,
     note: "Orifice discharge Q = Cd A sqrt(2 g h) with g = 32.2 ft/s^2, Cd about 0.6 for a sharp-edged orifice (~0.8 short tube, ~0.98 rounded), and the head measured to the orifice centroid. The flow scales with the square root of the head, which makes an orifice a gentle stage-discharge control for a detention outlet. Free/submerged discharge under a steady head for a small orifice (uniform velocity across it) - it does not integrate the falling head of a draining tank (the time-to-drain is a follow-on) or a partially submerged/gated outlet. A design aid; the engineer of record governs.",
@@ -4442,7 +4442,7 @@ export function computeTrapezoidalChannelFlow({ bottom_width_ft = 0, side_slope_
   const hyd_depth_ft = area_sf / top_width_ft;
   const froude = velocity_fps / Math.sqrt(32.174 * hyd_depth_ft);
   const regime = froude > 1.01 ? "supercritical (shooting)" : froude < 0.99 ? "subcritical (tranquil)" : "near critical";
-  const flow_gpm = flow_cfs * 448.831;
+  const flow_gpm = flow_cfs * (60 * 1728 / 231);
   if (![area_sf, hyd_radius_ft, velocity_fps, flow_cfs, froude].every(Number.isFinite)) return { error: "Channel math did not produce a finite value." };
   return {
     area_sf, wetted_perim_ft, hyd_radius_ft, velocity_fps, flow_cfs, flow_gpm,

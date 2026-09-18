@@ -1971,13 +1971,13 @@ export function computeHpFromTorque({ solve_for = "hp", torque_lbft = 0, rpm = 0
     if (!(HP > 0 && Number.isFinite(HP))) return { error: "Horsepower must be positive to solve for torque." };
     if (!(N > 0 && Number.isFinite(N))) return { error: "RPM must be positive to solve for torque." };
     const torque = HP * 5252 / N;
-    return { torque_lbft: torque, hp: HP, kw: HP * 0.7457, rpm: N, note: "Torque = HP * 5252 / RPM. Torque and HP are equal at 5252 RPM by definition." };
+    return { torque_lbft: torque, hp: HP, kw: HP * (550 * 0.3048 * 4.4482216152605 / 1000), rpm: N, note: "Torque = HP * 5252 / RPM. Torque and HP are equal at 5252 RPM by definition." };
   }
   if (solve_for === "rpm") {
     if (!(HP > 0 && Number.isFinite(HP))) return { error: "Horsepower must be positive to solve for RPM." };
     if (!(T > 0 && Number.isFinite(T))) return { error: "Torque must be positive to solve for RPM." };
     const rpmOut = HP * 5252 / T;
-    return { rpm: rpmOut, hp: HP, kw: HP * 0.7457, torque_lbft: T, note: "RPM = HP * 5252 / Torque." };
+    return { rpm: rpmOut, hp: HP, kw: HP * (550 * 0.3048 * 4.4482216152605 / 1000), torque_lbft: T, note: "RPM = HP * 5252 / Torque." };
   }
   // solve for HP
   if (!Number.isFinite(T) || T < 0) return { error: "Torque must be a non-negative number (lb-ft)." };
@@ -1985,7 +1985,7 @@ export function computeHpFromTorque({ solve_for = "hp", torque_lbft = 0, rpm = 0
   const hpOut = T * N / 5252;
   return {
     hp: Number.isFinite(hpOut) ? hpOut : null,
-    kw: Number.isFinite(hpOut) ? hpOut * 0.7457 : null,
+    kw: Number.isFinite(hpOut) ? hpOut * (550 * 0.3048 * 4.4482216152605 / 1000) : null,
     torque_lbft: T, rpm: N,
     note: "HP = Torque * RPM / 5252 (5252 = 33,000 / 2*pi). Brake/observed power per the inputs, not SAE-corrected unless the dyno applied the correction.",
   };

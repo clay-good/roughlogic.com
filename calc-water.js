@@ -2075,7 +2075,7 @@ export function computeFloatMethodFlow({ float_distance_ft = 20, travel_time_s =
   const surface_velocity_fps = float_distance_ft / travel_time_s;
   const cross_area_ft2 = channel_width_ft * mean_depth_ft;
   const flow_cfs = float_coefficient * surface_velocity_fps * cross_area_ft2;
-  const flow_gpm = flow_cfs * 448.831;
+  const flow_gpm = flow_cfs * (60 * 1728 / 231);
   if (![surface_velocity_fps, cross_area_ft2, flow_cfs, flow_gpm].every(Number.isFinite)) return { error: "Float-method math is not a finite value." };
   return {
     surface_velocity_fps,

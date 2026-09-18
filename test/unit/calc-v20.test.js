@@ -594,7 +594,7 @@ test("hp-from-torque: 400 lb-ft at 5000 RPM -> 380.8 HP", () => {
 });
 test("hp-from-torque: example + kW", () => {
   const r = computeHpFromTorque(hpFromTorqueExample.inputs);
-  assert.ok(Math.abs(r.kw - r.hp * 0.7457) < 1e-6);
+  assert.ok(Math.abs(r.kw - r.hp * (550 * 0.3048 * 4.4482216152605 / 1000)) < 1e-6);
 });
 test("hp-from-torque: torque = HP at 5252 RPM", () => {
   const r = computeHpFromTorque({ solve_for: "torque", hp: 100, rpm: 5252 });

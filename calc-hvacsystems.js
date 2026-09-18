@@ -953,7 +953,7 @@ export function computeFilterPressureDrop({
 
   // Fan power (kW) attributable to the filter at a given pressure drop:
   // brake HP = (CFM * dp / 6356) / efficiency; kW = HP * 0.7457.
-  const fanKw = (dp) => ((airflow_cfm * dp) / _V16H_AHP_CONST / eta) * 0.7457;
+  const fanKw = (dp) => ((airflow_cfm * dp) / _V16H_AHP_CONST / eta) * (550 * 0.3048 * 4.4482216152605 / 1000);
   const clean_fan_kw = fanKw(clean_dp_in_wc);
   const final_fan_kw = fanKw(final_dp_in_wc);
   const avg_fan_kw = fanKw(avg_dp_in_wc);

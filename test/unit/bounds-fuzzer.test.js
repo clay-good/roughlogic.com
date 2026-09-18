@@ -7670,7 +7670,7 @@ test("bounds: calc-hvac computeFilterPressureDrop pins airflow, velocity-scaled 
   assert.ok(Math.abs(r.airflow_cfm - 1200) < 1e-9);
   assert.ok(Math.abs(r.clean_dp_in_wc - 0.35) < 1e-9);
   assert.ok(Math.abs(r.final_dp_in_wc - 0.70) < 1e-9);
-  assert.ok(Math.abs(r.clean_fan_kw - (1200 * 0.35 / 6356 / 0.6) * 0.7457) < 1e-9);
+  assert.ok(Math.abs(r.clean_fan_kw - (1200 * 0.35 / 6356 / 0.6) * (550 * 0.3048 * 4.4482216152605 / 1000)) < 1e-9);
   // Average drop drives the annual energy; the penalty is over clean.
   assert.ok(Math.abs(r.annual_fan_kwh - r.avg_fan_kw * 4000) < 1e-6);
   assert.ok(Math.abs(r.annual_penalty_kwh - (r.avg_fan_kw - r.clean_fan_kw) * 4000) < 1e-6);
@@ -8086,7 +8086,7 @@ test("bounds: calc-plumbing computeStormwaterRational pins Q = C*i*A (acres) and
   assert.ok(Math.abs(r.runoff_coefficient - 0.95) < 1e-12);
   assert.ok(Math.abs(r.area_acres - A_ac) < 1e-12);
   assert.ok(Math.abs(r.peak_flow_cfs - expected_cfs) < 1e-12);
-  assert.ok(Math.abs(r.peak_flow_gpm - expected_cfs * 448.831) < 1e-9);
+  assert.ok(Math.abs(r.peak_flow_gpm - expected_cfs * (60 * 1728 / 231)) < 1e-9);
   // Rejections.
   assert.ok("error" in computeStormwaterRational({ area_ft2: 0, surface: "asphalt", rainfall_in_per_hr: 2 }));
   assert.ok("error" in computeStormwaterRational({ area_ft2: 100, surface: "asphalt", rainfall_in_per_hr: -1 }));
@@ -10538,7 +10538,7 @@ test("bounds: spec-v1241 computeBroadCrestedWeir pins Q = Cd (2/3)^1.5 sqrt(g) L
   assert.ok(Math.abs(r.effective_coeff - 2.78) < 5e-3);
   assert.ok(Math.abs(r.flow_cfs - 0.9 * K * 10 * Math.pow(1, 1.5)) < 1e-9);
   assert.ok(Math.abs(r.flow_cfs - 27.8) < 0.05);
-  assert.ok(Math.abs(r.flow_gpm - r.flow_cfs * 448.831) < 1e-6);
+  assert.ok(Math.abs(r.flow_gpm - r.flow_cfs * (60 * 1728 / 231)) < 1e-6);
   // The broad-crested effective coefficient is below the 3.33 sharp-crested (Francis) value.
   assert.ok(r.effective_coeff < 3.33);
   // Flow scales linearly with crest length and as H^1.5.
@@ -10564,7 +10564,7 @@ test("bounds: spec-v1240 computeSluiceGateFlow pins Cd = Cc/sqrt(1+Cc a/y1), Q =
   assert.ok(Math.abs(r.discharge_coeff - 0.5812) < 5e-4);
   assert.ok(Math.abs(r.flow_cfs - r.discharge_coeff * 5 * 1 * Math.sqrt(2 * g * 6)) < 1e-9);
   assert.ok(Math.abs(r.flow_cfs - 57.12) < 0.05);
-  assert.ok(Math.abs(r.flow_gpm - r.flow_cfs * 448.831) < 1e-6);
+  assert.ok(Math.abs(r.flow_gpm - r.flow_cfs * (60 * 1728 / 231)) < 1e-6);
   // Flow scales linearly with gate width.
   const wide = _v1240({ gate_opening_ft: 1, gate_width_ft: 10, upstream_depth_ft: 6, contraction_coeff: 0 });
   assert.ok(Math.abs(wide.flow_cfs - 2 * r.flow_cfs) < 1e-9);
@@ -10588,7 +10588,7 @@ test("bounds: spec-v1227 computeCipollettiWeir pins Q = 3.367 L H^1.5, the unit 
   const r = _v1227({ crest_length_ft: 3, head_ft: 0.5, coeff: 0 });
   assert.ok(Math.abs(r.flow_cfs - 3.367 * 3 * Math.pow(0.5, 1.5)) < 1e-9);
   assert.ok(Math.abs(r.flow_cfs - 3.571) < 0.005);
-  assert.ok(Math.abs(r.flow_gpm - r.flow_cfs * 448.831) < 1e-6 && Math.abs(r.flow_gpm - 1602.9) < 1);
+  assert.ok(Math.abs(r.flow_gpm - r.flow_cfs * (60 * 1728 / 231)) < 1e-6 && Math.abs(r.flow_gpm - 1602.9) < 1);
   assert.ok(Math.abs(r.flow_mgd - r.flow_gpm * 1440 / 1e6) < 1e-9);
   // Linear in crest length: doubling L doubles the flow (no contraction deduction).
   assert.ok(Math.abs(_v1227({ crest_length_ft: 6, head_ft: 0.5 }).flow_cfs - 2 * r.flow_cfs) < 1e-9);
@@ -17750,7 +17750,7 @@ test("bounds: spec-v303 computeOrificeFlow pins the discharge, the sqrt-of-head 
   const r = _v303({ d_in: 6, h_ft: 4, cd: 0.60 });
   assert.ok(Math.abs(r.a_ft2 - Math.PI / 4 * 0.25) < 1e-9);
   assert.ok(Math.abs(r.q_cfs - 0.6 * r.a_ft2 * Math.sqrt(2 * 32.2 * 4)) < 1e-9);
-  assert.ok(Math.abs(r.q_gpm - r.q_cfs * 448.831) < 1e-6);
+  assert.ok(Math.abs(r.q_gpm - r.q_cfs * (60 * 1728 / 231)) < 1e-6);
   assert.ok(Math.abs(r.q_cfs - 1.89) < 0.01);
   // Square-root-of-head: a 2.25x head is a 1.5x flow.
   const r2 = _v303({ d_in: 6, h_ft: 9, cd: 0.60 });
@@ -27875,7 +27875,7 @@ test("bounds: spec-v640 computeManningPipeCapacity pins the full-bore Manning ca
   const r = _v640({ d_in: 8, slope: 0.01, material: "concrete" });
   assert.ok(Math.abs(r.v_fps - 3.4618476935237945) < 1e-9);
   assert.ok(Math.abs(r.q_cfs - 1.2084128090912356) < 1e-9);
-  assert.ok(Math.abs(r.q_gpm - r.q_cfs * 448.831) < 1e-9);
+  assert.ok(Math.abs(r.q_gpm - r.q_cfs * (60 * 1728 / 231)) < 1e-9);
   // Full-bore geometry: R = D/4, A = (pi/4) D^2, Q = V A.
   assert.ok(Math.abs(r.a_ft2 - Math.PI * (8 / 12) ** 2 / 4) < 1e-12);
   assert.ok(Math.abs(r.r_ft - (8 / 12) / 4) < 1e-12);
@@ -30099,7 +30099,7 @@ test("bounds: spec-v973 computeFloatMethodFlow pins the velocity-area flow and e
   assert.ok(Math.abs(r.surface_velocity_fps - 2) < 1e-9); // 20/10
   assert.ok(Math.abs(r.cross_area_ft2 - 6) < 1e-9); // 4*1.5
   assert.ok(Math.abs(r.flow_cfs - 10.2) < 1e-9); // 0.85*2*6
-  assert.ok(Math.abs(r.flow_gpm - 4578.0762) < 0.5); // *448.831
+  assert.ok(Math.abs(r.flow_gpm - 4578.0762) < 0.5); // *(60 * 1728 / 231)
   // A rougher channel (lower C) cuts the flow.
   assert.ok(Math.abs(_v973({ float_distance_ft: 20, travel_time_s: 10, channel_width_ft: 4, mean_depth_ft: 1.5, float_coefficient: 0.80 }).flow_cfs - 9.6) < 1e-9);
   // A slower float (longer time) means less flow; a bigger area means more.
@@ -31080,7 +31080,7 @@ test("bounds: spec-v1011 computePipePartialFlowDepth pins the circular partial-f
   // return the input flow. This is the solver's own proof.
   const D = 8 / 12, n = 0.013, S = 0.01, th = r.theta;
   const A = (D * D / 8) * (th - Math.sin(th)), P = D * th / 2;
-  const qBack = (1.486 / n) * A * Math.pow(A / P, 2 / 3) * Math.sqrt(S) * 448.831;
+  const qBack = (1.486 / n) * A * Math.pow(A / P, 2 / 3) * Math.sqrt(S) * (60 * 1728 / 231);
   assert.ok(Math.abs(qBack - 200) < 1e-6);
   // The turning points are DERIVED, not tabulated: max Q at d/D 0.9382, max V at 0.8128.
   assert.ok(Math.abs(r.d_over_d_at_max_q - 0.93818) < 1e-4);
