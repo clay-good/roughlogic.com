@@ -325,7 +325,14 @@ export function computeRcPunchingShear({ c1_in = 0, c2_in = 0, d_in = 0, fc_psi 
   if (!(fc_psi > 0)) return { error: "Concrete strength must be positive (psi)." };
   if (!(lambda > 0 && lambda <= 1)) return { error: "The lightweight factor lambda is over 0 and up to 1.0." };
   const alpha_s = position === "edge" ? 30 : (position === "corner" ? 20 : 40);
-  const bo_in = 2 * (c1_in + d_in) + 2 * (c2_in + d_in);
+  // The critical section sits d/2 from the column faces, and a slab edge cuts
+  // it off (ACI 318-19 22.6.4): interior four sides, edge three sides (c1
+  // perpendicular to the edge, slab flush with the column's outer face),
+  // corner two sides. Until 2026-09-18 every position took the four-sided
+  // perimeter, 35% (edge) to 78% (corner) unconservative.
+  const bo_in = position === "edge" ? 2 * (c1_in + d_in / 2) + (c2_in + d_in)
+    : position === "corner" ? (c1_in + d_in / 2) + (c2_in + d_in / 2)
+      : 2 * (c1_in + d_in) + 2 * (c2_in + d_in);
   const beta = Math.max(c1_in, c2_in) / Math.min(c1_in, c2_in);
   const t1 = 4;
   const t2 = 2 + 4 / beta;
@@ -342,7 +349,7 @@ export function computeRcPunchingShear({ c1_in = 0, c2_in = 0, d_in = 0, fc_psi 
   const phi_vc_kip = (0.75 * vc_psi * bo_in * d_in) / 1000;
   return {
     bo_in, beta, alpha_s, t2, t3, least, governs, lambda_s, vc_psi, phi_vc_kip,
-    note: "ACI 318-19 Table 22.6.5.2 two-way (punching) shear on the d/2 critical perimeter: vc is the least of 4 lambda sqrt(f'c), (2 + 4/beta) lambda sqrt(f'c), and (2 + alpha_s d/bo) lambda sqrt(f'c), with alpha_s = 40/30/20 for an interior/edge/corner column and phi = 0.75; phi Vc = phi vc bo d. All three terms also carry the 22.5.5.1.3 size-effect factor lambda_s = sqrt(2 / (1 + d/10)) capped at 1.0 (new in the 2019 edition), so lambda_s is 1.0 up to d = 10 in and drops below it for deeper slabs and footings, cutting the punching capacity of thick members. sqrt(f'c) is capped at 100 psi per 22.5.3.1 (the 22.5.3.2 exception needs minimum shear reinforcement, which this case lacks), so it only affects f'c above 10,000 psi. Shear without unbalanced-moment transfer (no gamma_v amplification), no shear reinforcement or drop panel, rectangular column with the full d/2 perimeter available. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    note: "ACI 318-19 Table 22.6.5.2 two-way (punching) shear on the d/2 critical perimeter: vc is the least of 4 lambda sqrt(f'c), (2 + 4/beta) lambda sqrt(f'c), and (2 + alpha_s d/bo) lambda sqrt(f'c), with alpha_s = 40/30/20 for an interior/edge/corner column and phi = 0.75; phi Vc = phi vc bo d. All three terms also carry the 22.5.5.1.3 size-effect factor lambda_s = sqrt(2 / (1 + d/10)) capped at 1.0 (new in the 2019 edition), so lambda_s is 1.0 up to d = 10 in and drops below it for deeper slabs and footings, cutting the punching capacity of thick members. sqrt(f'c) is capped at 100 psi per 22.5.3.1 (the 22.5.3.2 exception needs minimum shear reinforcement, which this case lacks), so it only affects f'c above 10,000 psi. Shear without unbalanced-moment transfer (no gamma_v amplification), no shear reinforcement or drop panel, rectangular column; the edge (three-sided) and corner (two-sided) perimeters assume the slab edge flush with the column face, c1 measured perpendicular to the edge. A design aid, not a substitute for the structural engineer of record's stamped design.",
   };
 }
 export const rcPunchingShearExample = { inputs: { c1_in: 20, c2_in: 20, d_in: 6, fc_psi: 4000, position: "interior", lambda: 1.0 } };
@@ -1252,7 +1259,7 @@ CONCRETE_RENDERERS["rc-compression-dev-length"] = _simpleRenderer({
 // ===================== spec-v1237: effective moment of inertia Ie (ACI 318-19 §24.2.3.5, Bischoff) =====================
 // The Ie the cracking-moment tile names ("the value behind the Ie deflection analysis") and the value the
 // long-term-deflection tile takes as a hand-entered input but nobody derives. ACI 318-19 replaced Branson's cubic
-// with Bischoff's form: Ie = Ig when Ma <= (2/3)Mcr (Eq 24.2.3.5b), else Ie = Icr/[1 - (Mcr/Ma)^2 (1 - Icr/Ig)]
+// with Bischoff's form: Ie = Ig when Ma <= (2/3)Mcr (Eq 24.2.3.5b), else Ie = Icr/[1 - ((2/3)Mcr/Ma)^2 (1 - Icr/Ig)]
 // (Eq 24.2.3.5a). Mcr = fr Ig/yt, fr = 7.5 lambda sqrt(f'c). Icr is the cracked transformed section (singly
 // reinforced rectangular): n = Es/Ec, kd = d(sqrt((rho n)^2 + 2 rho n) - rho n), Icr = b kd^3/3 + n As (d-kd)^2.
 // dims: in { b_in: L, h_in: L, d_in: L, as_in2: L^2, fc_psi: M L^-1 T^-2, ma_kipft: M L^2 T^-2, lambda: dimensionless } out: { ig_in4: L^4, icr_in4: L^4, ie_in4: L^4, mcr_kipft: M L^2 T^-2 }
@@ -1286,18 +1293,22 @@ export function computeConcreteEffectiveInertia({ b_in = 0, h_in = 0, d_in = 0, 
   if (!cracked) {
     ie_in4 = ig_in4; // Eq 24.2.3.5b
   } else {
-    ie_in4 = icr_in4 / (1 - Math.pow(mcr_lbin / ma_lbin, 2) * (1 - icr_in4 / ig_in4)); // Eq 24.2.3.5a
+    // Eq 24.2.3.5a carries the 2/3 INSIDE: Ie = Icr / [1 - ((2/3)Mcr/Ma)^2 (1 - Icr/Ig)],
+    // which meets Ig exactly at Ma = (2/3)Mcr where 24.2.3.5b hands over. Until
+    // 2026-09-18 the 2/3 was only in the switch, so Ie jumped there and went
+    // NEGATIVE just above it (the Ie > Ig clamp hid part of that band).
+    ie_in4 = icr_in4 / (1 - Math.pow((2 / 3) * mcr_lbin / ma_lbin, 2) * (1 - icr_in4 / ig_in4)); // Eq 24.2.3.5a
     if (ie_in4 > ig_in4) ie_in4 = ig_in4; // Ie can never exceed Ig
   }
   if (![ig_in4, icr_in4, ie_in4, mcr_kipft, kd].every(Number.isFinite)) return { error: "Effective-inertia math is not a finite value." };
   return {
     ig_in4, icr_in4, ie_in4, mcr_kipft, kd_in: kd, ec_psi: Ec, n, ie_ratio: ie_in4 / ig_in4, cracked,
-    note: "ACI 318-19 §24.2.3.5 effective moment of inertia for deflection, the value the cracking-moment tile points to and the immediate deflection the long-term-deflection tile needs. The 2019 code replaced Branson's cubic with Bischoff's form: if the service moment Ma <= (2/3) Mcr the section is essentially uncracked and Ie = Ig; once Ma exceeds (2/3) Mcr, Ie = Icr / [1 - (Mcr/Ma)^2 (1 - Icr/Ig)], which drops rapidly toward the cracked value Icr as the load grows. Mcr = fr Ig/yt with fr = 7.5 lambda sqrt(f'c); Icr is the cracked transformed section n = Es/Ec, kd = d(sqrt((rho n)^2 + 2 rho n) - rho n), Icr = b kd^3/3 + n As (d-kd)^2 for a singly-reinforced rectangular beam (Es = 29,000,000 psi, Ec = 57000 sqrt(f'c) normalweight). The immediate deflection is then (a load-case coefficient) w L^4 / (Ec Ie); feed that into concrete-longterm-defl for creep and shrinkage. Bischoff's form predicts larger deflections than the old Branson equation, especially for lightly reinforced slabs. Singly-reinforced rectangular section; a T-beam or doubly-reinforced section uses the appropriate transformed Icr. A design aid; the engineer of record's stamped design governs.",
+    note: "ACI 318-19 §24.2.3.5 effective moment of inertia for deflection, the value the cracking-moment tile points to and the immediate deflection the long-term-deflection tile needs. The 2019 code replaced Branson's cubic with Bischoff's form: if the service moment Ma <= (2/3) Mcr the section is essentially uncracked and Ie = Ig; once Ma exceeds (2/3) Mcr, Ie = Icr / [1 - ((2/3)Mcr/Ma)^2 (1 - Icr/Ig)], which drops rapidly toward the cracked value Icr as the load grows. Mcr = fr Ig/yt with fr = 7.5 lambda sqrt(f'c); Icr is the cracked transformed section n = Es/Ec, kd = d(sqrt((rho n)^2 + 2 rho n) - rho n), Icr = b kd^3/3 + n As (d-kd)^2 for a singly-reinforced rectangular beam (Es = 29,000,000 psi, Ec = 57000 sqrt(f'c) normalweight). The immediate deflection is then (a load-case coefficient) w L^4 / (Ec Ie); feed that into concrete-longterm-defl for creep and shrinkage. Bischoff's form predicts larger deflections than the old Branson equation, especially for lightly reinforced slabs. Singly-reinforced rectangular section; a T-beam or doubly-reinforced section uses the appropriate transformed Icr. A design aid; the engineer of record's stamped design governs.",
   };
 }
 export const concreteEffectiveInertiaExample = { inputs: { b_in: 12, h_in: 20, d_in: 17.5, as_in2: 3.0, fc_psi: 4000, ma_kipft: 60, lambda: 1.0 } };
 CONCRETE_RENDERERS["concrete-effective-inertia"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 §24.2.3.5 effective moment of inertia (Bischoff): Ie = Ig for Ma <= (2/3)Mcr (Eq 24.2.3.5b), else Ie = Icr/[1 - (Mcr/Ma)^2 (1 - Icr/Ig)] (Eq 24.2.3.5a). Mcr = fr Ig/yt, fr = 7.5 lambda sqrt(f'c) (§19.2.3.1); Icr is the cracked transformed section (singly-reinforced rectangular) with n = Es/Ec and Ec = 57000 sqrt(f'c) (§19.2.2.1). The 2019 code removed Branson's cubic. Confirmed against the ACI 318-19 code change (StructurePoint / PCA). A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  citation: "Citation: ACI 318-19 §24.2.3.5 effective moment of inertia (Bischoff): Ie = Ig for Ma <= (2/3)Mcr (Eq 24.2.3.5b), else Ie = Icr/[1 - ((2/3)Mcr/Ma)^2 (1 - Icr/Ig)] (Eq 24.2.3.5a). Mcr = fr Ig/yt, fr = 7.5 lambda sqrt(f'c) (§19.2.3.1); Icr is the cracked transformed section (singly-reinforced rectangular) with n = Es/Ec and Ec = 57000 sqrt(f'c) (§19.2.2.1). The 2019 code removed Branson's cubic. Confirmed against the ACI 318-19 code change (StructurePoint / PCA). A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: concreteEffectiveInertiaExample.inputs,
   fields: [
     { key: "b_in", label: "Section width b (in)", kind: "number" },
@@ -1814,14 +1825,20 @@ export function computeConcreteAnchorShearBreakout({ anchor_dia_in = 0, embedmen
   const da = Number(anchor_dia_in) || 0;
   const hef = Number(embedment_in) || 0;
   const fc = Number(fc_psi) || 0;
-  const ca1 = Number(edge_distance_in) || 0;
+  const ca1_entered = Number(edge_distance_in) || 0;
   const ca2 = Number(perp_edge_in) || 0;
   const ha = Number(member_thickness_in) || 0;
   const lam = Number(lambda) || 0;
   if (!(da > 0)) return { error: "Anchor diameter must be positive (in)." };
   if (!(hef > 0)) return { error: "Effective embedment must be positive (in)." };
   if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
-  if (!(ca1 > 0)) return { error: "Edge distance c_a1 (toward the shear) must be positive (in) - far from an edge, shear breakout does not apply; steel or pryout governs." };
+  if (!(ca1_entered > 0)) return { error: "Edge distance c_a1 (toward the shear) must be positive (in) - far from an edge, shear breakout does not apply; steel or pryout governs." };
+  // ACI 318-19 17.7.2.1.2: in a narrow, thin member where BOTH ca2 and ha are
+  // under 1.5 ca1, the ca1 used in every breakout equation may not exceed the
+  // greater of ca2/1.5 and ha/1.5 (s/3 applies to groups). Until 2026-09-18
+  // this was not applied, 20% unconservative on the worked corner case.
+  const narrow = ca2 > 0 && ha > 0 && ca2 < 1.5 * ca1_entered && ha < 1.5 * ca1_entered;
+  const ca1 = narrow ? Math.min(ca1_entered, Math.max(ca2 / 1.5, ha / 1.5)) : ca1_entered;
   if (ca2 < 0) return { error: "Perpendicular edge distance must be zero (none) or positive (in)." };
   if (ha < 0) return { error: "Member thickness must be zero (thick) or positive (in)." };
   if (!(lam > 0 && lam <= 1)) return { error: "Lambda must be in (0, 1] (1.0 normal weight)." };
@@ -1844,6 +1861,7 @@ export function computeConcreteAnchorShearBreakout({ anchor_dia_in = 0, embedmen
   if (![vb_lb, vcb_lb, phi_vcb_lb].every(Number.isFinite)) return { error: "Shear-breakout math did not produce a finite value." };
   return {
     vb_lb, governing_form, le_in, AVco, AVc, area_ratio, psi_edV, psi_cV, psi_hV, vcb_lb, phi_vcb_lb,
+    ca1_used_in: ca1, narrow_member_limit: narrow,
     note: "The strength scales with the EDGE DISTANCE to the 1.5 power (not the embedment - that is the tension mode): moving the anchor away from the edge is the strongest knob. A second edge closer than 1.5 c_a1 (corner) and a member thinner than 1.5 c_a1 both truncate the breakout half-pyramid; psi_hV partially compensates for the thin-member area loss. Shear toward the edge only - shear parallel to an edge is checked with twice this strength per 17.7.2.1(c) (not modeled). Single anchor; groups, eccentricity, and the seismic 0.75 factor are separate. Steel shear and pryout are separate checks. phi = 0.70 is Condition B (no supplementary reinforcement). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
   };
 }

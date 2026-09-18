@@ -54687,11 +54687,11 @@
   {
    "tile_id": "concrete-effective-inertia",
    "source_publisher": "ACI 318-19 24.2.3.5 (Bischoff effective inertia)",
-   "source_title": "12 x 20 in, d 17.5, As 3.0, 4000 psi, Ma 60 kip-ft -> Ig 8000, Icr 4017, Ie 4662 in^4",
+   "source_title": "12 x 20 in, d 17.5, As 3.0, 4000 psi, Ma 60 kip-ft -> Ig 8000, Icr 4017, Ie 4280 in^4",
    "source_edition_or_year": "spec-v1237 worked example (machine-verified; Bischoff form)",
-   "source_section_or_page": "Mcr = 31.62 kip-ft; Ma 60 > (2/3)Mcr so cracked; Ie = 4017/[1 - (31.62/60)^2 (1 - 4017/8000)] = 4662 in^4",
+   "source_section_or_page": "Mcr = 31.62 kip-ft; Ma 60 > (2/3)Mcr so cracked; Ie = 4017/[1 - ((2/3)(31.62)/60)^2 (1 - 4017/8000)] = 4280 in^4 (Eq 24.2.3.5a, the 2/3 inside)",
    "verified_by": "rl",
-   "verified_on": "2026-08-08",
+   "verified_on": "2026-09-18",
    "inputs": {
     "b_in": 12,
     "h_in": 20,
@@ -54715,7 +54715,7 @@
      }
     },
     "ie_in4": {
-     "value": 4662,
+     "value": 4280.3,
      "tolerance": {
       "abs": 5
      }
@@ -75329,11 +75329,11 @@
   {
    "tile_id": "concrete-anchor-shear-breakout",
    "source_publisher": "ACI 318-19",
-   "source_title": "cross-check: corner (ca2 4 in) + thin member (ha 6 in) truncation with psi_hV compensation",
+   "source_title": "cross-check: corner (ca2 4 in) + thin member (ha 6 in) -> the 17.7.2.1.2 narrow-member limit caps ca1 at max(4/1.5, 6/1.5) = 4 in",
    "source_edition_or_year": "ACI 318-19",
-   "source_section_or_page": "same anchor: psi_edV 0.7 + 0.3(4)/(9) = 0.8333, psi_hV sqrt(9/6) = 1.2247, AVc 6 x 13 = 78 vs AVco 162 -> Vcb 4,111 lb, phiVcb 2,878 lb (the corner halves the design capacity)",
+   "source_section_or_page": "same anchor, ca1 taken as 4: Vb = 9 sqrt(4000) 4^1.5 = 4,554 lb; psi_edV 0.7 + 0.3(4)/(6) = 0.90, psi_hV 1.0 (ha 6 = 1.5 x 4), AVc 6 x 10 = 60 vs AVco 72 -> Vcb 3,415 lb, phiVcb 2,391 lb",
    "verified_by": "rl",
-   "verified_on": "2026-07-27",
+   "verified_on": "2026-09-18",
    "inputs": {
     "anchor_dia_in": 0.75,
     "embedment_in": 6,
@@ -75346,37 +75346,37 @@
    },
    "outputs": {
     "psi_edV": {
-     "value": 0.83333,
+     "value": 0.9,
      "tolerance": {
       "abs": 1e-05
      }
     },
     "psi_hV": {
-     "value": 1.22474,
+     "value": 1.0,
      "tolerance": {
       "abs": 1e-05
      }
     },
     "AVc": {
-     "value": 78,
+     "value": 60,
      "tolerance": {
       "abs": 0.001
      }
     },
     "area_ratio": {
-     "value": 0.48148,
+     "value": 0.83333,
      "tolerance": {
       "abs": 1e-05
      }
     },
     "vcb_lb": {
-     "value": 4110.96,
+     "value": 3415.26,
      "tolerance": {
       "abs": 0.5
      }
     },
     "phi_vcb_lb": {
-     "value": 2877.67,
+     "value": 2390.68,
      "tolerance": {
       "abs": 0.5
      }
@@ -78912,7 +78912,7 @@
   {
    "tile_id": "concrete-immediate-deflection",
    "source_publisher": "ACI 318-19 \u00a724.2.3",
-   "source_title": "Ie 4662 in^4 (12x20 beam @ 4000 psi), 0.8 kip/ft on a 24 ft simply supported span -> immediate deflection 0.355 in, L/810 (spec-v1279)",
+   "source_title": "Ie 4662 in^4, 0.8 kip/ft on a 24 ft simply supported span -> immediate deflection 0.355 in, L/810 (spec-v1279)",
    "source_edition_or_year": "delta = K w L^4 / (Ec Ie), K = 5/384 simple UDL, Ec = 57000 sqrt(f'c)",
    "source_section_or_page": "Ec = 57000 sqrt(4000) = 3,604,997 psi = 3605 ksi. w = 0.8/12 = 0.06667 kip/in, L = 24 x 12 = 288 in. delta = (5/384)(0.06667)(288^4)/(3605 x 4662) = 0.3553 in. Span/deflection = 288/0.3553 = L/810, comfortably inside the L/240 and L/360 limits. This immediate deflection is the input to concrete-longterm-defl.",
    "verified_by": "rl",

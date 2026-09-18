@@ -23474,16 +23474,16 @@ test("bounds: spec-v496 computeAsymmetricalFaultXr pins both factors, their mono
 import { computeConcreteLongtermDefl as _v497 } from "../../calc-concrete.js";
 import { computeConcreteEffectiveInertia as _v1237 } from "../../calc-concrete.js";
 test("bounds: spec-v1237 computeConcreteEffectiveInertia pins Ig/Icr/Mcr, the Bischoff Ie, the (2/3)Mcr threshold, and error seams", () => {
-  // 12x20, d 17.5, As 3.0, 4000 psi, Ma 60 kip-ft: Ig 8000, Icr ~4017, Mcr ~31.6, Ie ~4662.
+  // 12x20, d 17.5, As 3.0, 4000 psi, Ma 60 kip-ft: Ig 8000, Icr ~4017, Mcr ~31.6, Ie ~4280.
   const r = _v1237({ b_in: 12, h_in: 20, d_in: 17.5, as_in2: 3.0, fc_psi: 4000, ma_kipft: 60, lambda: 1.0 });
   assert.ok(Math.abs(r.ig_in4 - 12 * 20 * 20 * 20 / 12) < 1e-9); // Ig = b h^3/12 = 8000
   assert.ok(Math.abs(r.mcr_kipft - 31.62) < 0.1);
   assert.ok(Math.abs(r.icr_in4 - 4017) < 3);
-  assert.ok(Math.abs(r.ie_in4 - 4662) < 3 && r.cracked === true);
+  assert.ok(Math.abs(r.ie_in4 - 4280.3) < 1 && r.cracked === true);
   // Ie sits between Icr and Ig, and equals the Bischoff closed form.
   assert.ok(r.icr_in4 < r.ie_in4 && r.ie_in4 < r.ig_in4);
   const mcr = r.mcr_kipft, ig = r.ig_in4, icr = r.icr_in4;
-  assert.ok(Math.abs(r.ie_in4 - icr / (1 - Math.pow(mcr / 60, 2) * (1 - icr / ig))) < 1e-6);
+  assert.ok(Math.abs(r.ie_in4 - icr / (1 - Math.pow((2 / 3) * mcr / 60, 2) * (1 - icr / ig))) < 1e-6); // Eq 24.2.3.5a, 2/3 inside
   // Threshold: Ma <= (2/3)Mcr returns Ie = Ig (uncracked).
   const lo = _v1237({ b_in: 12, h_in: 20, d_in: 17.5, as_in2: 3.0, fc_psi: 4000, ma_kipft: 15, lambda: 1.0 });
   assert.ok(lo.cracked === false && Math.abs(lo.ie_in4 - lo.ig_in4) < 1e-9);
@@ -31786,13 +31786,15 @@ test("bounds: spec-v1019 computeConcreteAnchorShearBreakout pins the Vb pair and
   assert.ok(r.area_ratio === 1 && r.psi_edV === 1 && r.psi_hV === 1);
   assert.ok(Math.abs(r.vcb_lb - r.vb_lb) < 1e-9);
   assert.ok(Math.abs(r.phi_vcb_lb - 0.70 * r.vcb_lb) < 1e-9);
-  // Cross-check: corner (ca2 4) + thin member (ha 6).
+  // Cross-check: corner (ca2 4) + thin member (ha 6). Both are under 1.5 ca1 = 9, so
+  // 17.7.2.1.2 caps ca1 at max(4/1.5, 6/1.5) = 4 in every breakout equation.
   const c = _v1019({ ...base, perp_edge_in: 4, member_thickness_in: 6 });
-  assert.ok(Math.abs(c.psi_edV - (0.7 + 0.3 * 4 / 9)) < 1e-12);
-  assert.ok(Math.abs(c.psi_hV - Math.sqrt(9 / 6)) < 1e-12);
-  assert.ok(Math.abs(c.AVc - 78) < 1e-9 && Math.abs(c.AVco - 162) < 1e-9);
-  assert.ok(Math.abs(c.vcb_lb - 4110.96) < 0.5);
-  assert.ok(Math.abs(c.phi_vcb_lb - 2877.67) < 0.5);
+  assert.strictEqual(c.ca1_used_in, 4);
+  assert.ok(Math.abs(c.psi_edV - (0.7 + 0.3 * 4 / 6)) < 1e-12);
+  assert.ok(Math.abs(c.psi_hV - 1) < 1e-12);
+  assert.ok(Math.abs(c.AVc - 60) < 1e-9 && Math.abs(c.AVco - 72) < 1e-9);
+  assert.ok(Math.abs(c.vcb_lb - 3415.26) < 0.5);
+  assert.ok(Math.abs(c.phi_vcb_lb - 2390.68) < 0.5);
   // 7-form governs for a slender anchor: da 0.5, hef 4 -> coefficient 7.502 < 9.
   const s = _v1019({ ...base, anchor_dia_in: 0.5, embedment_in: 4, edge_distance_in: 4 });
   assert.ok(s.governing_form.startsWith("7-form"));
