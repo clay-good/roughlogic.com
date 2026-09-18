@@ -1287,9 +1287,16 @@ export function computeOdorDilutionThreshold({
   if (!(target_dt >= 0)) return { error: "The target cannot be negative (0 to skip)." };
   // The odour emission rate is what goes into a dispersion calculation, exactly
   // as a mass rate would.
+  // D/T times flow is an emission rate in odour units, and there are two
+  // odour units. With the flow in cfm (spec-v1730) each unit is a cubic FOOT of
+  // air at threshold, the older American convention. EN 13725's European odour
+  // unit is a cubic METRE, so the same stack is 35.3 times fewer OU_E per
+  // second -- the number a European limit or model expects.
   const odour_emission_rate_ou_s = source_dt * airflow_acfm / 60;
-  const rate_verdict = fmt(odour_emission_rate_ou_s, 0) + " odour units per second from "
+  const odour_emission_rate_oue_s = source_dt * airflow_acfm * 0.3048 * 0.3048 * 0.3048 / 60;
+  const rate_verdict = fmt(odour_emission_rate_ou_s, 0) + " odour units per second (each a cubic foot of air at threshold) from "
     + fmt(airflow_acfm, 0) + " acfm at a source D/T of " + fmt(source_dt, 0)
+    + "; in EN 13725 European units, a cubic metre each, that is " + fmt(odour_emission_rate_oue_s, 0) + " OU_E/s"
     + " -- that rate goes into the same dispersion arithmetic as any pollutant";
   const dt_at_receptor = source_dt / dilution_factor;
   const receptor_verdict = fmt(dt_at_receptor, 1) + " dilutions at the receptor, from a "
@@ -1319,7 +1326,7 @@ export function computeOdorDilutionThreshold({
         + "-fold increase in effective stack height, since ground-level concentration falls roughly with the square of it. Odour is reduced at source or not at all: the dilution needed to take a strong odour below objection is large enough that dispersion improvements rarely deliver it, which is why containment, biofilters, scrubbers, and oxidizers are the answers that work";
   if (![odour_emission_rate_ou_s, dt_at_receptor, required_source_dt, reduction_pct].every(Number.isFinite)) return { error: "Odour dilution math is not a finite value." };
   return {
-    odour_emission_rate_ou_s, rate_verdict,
+    odour_emission_rate_ou_s, odour_emission_rate_oue_s, rate_verdict,
     dt_at_receptor, receptor_verdict,
     has_limit, complies, limit_verdict,
     has_target, required_source_dt, reduction_pct, dilution_multiple_needed, already_met, target_verdict,

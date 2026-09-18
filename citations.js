@@ -22263,6 +22263,7 @@ export const CITATIONS = {
     editionNote: "The consistent finding is that ODOUR IS REDUCED AT SOURCE OR NOT AT ALL. A source at 2,400 D/T through 15,000 acfm is 600,000 odour units per second; at 400:1 of atmospheric dilution the fence sees 6, and taking that to 2 means the source must fall to 800 -- a 67% reduction in concentration. Achieving the same by dispersion would need three times the dilution, roughly a doubling of effective stack height, because ground-level concentration falls roughly with the square of it. That is why containment, biofilters, scrubbers and oxidizers work where a taller stack does not. Which ordinance applies is genuinely the question: limits, measurement methods, and the exceedances allowed vary widely between jurisdictions.",
     assumptions: [
       { name: "D/T from olfactometry", value: "a panel method with real variability, from one operating condition", source: "the olfactometry standard used" },
+      { name: "Which odour unit", value: "with the flow in cfm the rate counts cubic FEET of air at threshold; EN 13725's OU_E is a cubic metre, 35.3 times fewer per second, and both are reported", source: "EN 13725" },
       { name: "The dilution is entered", value: "it comes from a dispersion calculation, not from this tile", source: "a dispersion model" },
       { name: "Concentration is not unpleasantness", value: "hedonic tone, frequency and duration are outside this arithmetic", source: "the applicable odour ordinance or nuisance rule" },
     ],
