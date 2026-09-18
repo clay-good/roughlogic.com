@@ -106493,14 +106493,14 @@
   {
    "tile_id": "rt-restricted-area",
    "source_publisher": "Project (first-principles)",
-   "source_title": "Radiography Restricted-Area Boundary Distance -- the spec-v1667 worked example, recomputed",
+   "source_title": "Radiography Restricted-Area Boundary Distance -- the spec-v1667 worked example, recomputed with Ir-192's gamma constant at one foot (0.48 R/h per Ci at 1 m = 5.1667 at 1 ft)",
    "source_edition_or_year": "spec-v1667 of scope-trade-expansion-2, 2026-09-09",
    "source_section_or_page": "the standards named in the tile citation govern",
    "verified_by": "rl",
    "verified_on": "2026-09-09",
    "inputs": {
     "source_activity_ci": 60,
-    "gamma_constant_r_h_ci_ft": 0.48,
+    "gamma_constant_r_h_ci_ft": 5.1667,
     "boundary_limit_mr_h": 2,
     "collimator_attenuation_factor": 0.05,
     "public_limit_mr_h": 0.5,
@@ -106508,25 +106508,25 @@
    },
    "outputs": {
     "dose_rate_1ft_r_h": {
-     "value": 28.8,
+     "value": 310.002,
      "tolerance": {
       "pct": 0.5
      }
     },
     "boundary_distance_ft": {
-     "value": 120,
+     "value": 393.70166,
      "tolerance": {
       "pct": 0.5
      }
     },
     "collimated_distance_ft": {
-     "value": 26.83282,
+     "value": 88.034368,
      "tolerance": {
       "pct": 0.5
      }
     },
     "public_distance_ft": {
-     "value": 240,
+     "value": 787.40333,
      "tolerance": {
       "pct": 0.5
      }

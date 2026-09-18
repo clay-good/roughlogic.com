@@ -370,6 +370,10 @@ export function computeRtRestrictedArea({
   if (collimator_attenuation_factor < 0) return { error: "The collimator attenuation factor cannot be negative." };
   if (public_limit_mr_h < 0) return { error: "The public-area limit cannot be negative." };
   if (!(shielding_factor > 0) || shielding_factor > 1) return { error: "The shielding transmission factor must be above 0 and no more than 1." };
+  // The constant is per curie at one FOOT. Published constants are usually per
+  // METRE -- Ir-192 about 0.48 R/h per Ci at 1 m, Co-60 1.32 -- and are 10.76
+  // times larger at a foot. spec-v1667 quoted the per-metre figures as per-foot,
+  // which put its 60 Ci Ir-192 boundary at 120 ft instead of about 394.
   const dose_rate_1ft_r_h = source_activity_ci * gamma_constant_r_h_ci_ft * shielding_factor;
   const _distanceFor = (limit_mr_h, factor) => Math.sqrt(dose_rate_1ft_r_h * factor / (limit_mr_h / 1000));
   const boundary_distance_ft = _distanceFor(boundary_limit_mr_h, 1);
@@ -397,13 +401,13 @@ export function computeRtRestrictedArea({
     note: "How far the restricted-area boundary sits from a radiography source, by the inverse square law. Activity times the gamma constant gives the dose rate at one foot, and the distance at which that falls to a permitted rate is the square root of the ratio -- which is a large number on a job site and the reason radiography shuts work down around it. THE SQUARE ROOT IS THE FACT WORTH CARRYING, because it governs what is worth doing about the boundary. Distance buys protection slowly: halving a boundary requires cutting the effective activity by a factor of four. No practical change to the source does that, and a smaller source means a longer exposure, which is not obviously safer. A COLLIMATOR does it, in every direction outside the beam, which is why collimated shots have a long boundary in one direction and a short one everywhere else and why collimation is the single largest control available. There are two limits and the stricter one governs the site. The restricted-area boundary applies where access is controlled; at the boundary of an area accessible to the PUBLIC the permitted rate is substantially lower and the distance correspondingly further. A job next to an occupied building, a public road, or an adjacent tenant is governed by the public figure, and running the restricted-area number on such a site understates the boundary considerably. Both limits are entered here because they are jurisdictional. AND THE CALCULATION IS A STARTING POINT RATHER THAN THE BOUNDARY ITSELF. The real field is not a point source in free air: scatter from surrounding steel, concrete and the ground makes it larger in some directions, and structures make it smaller in others. The boundary is established and maintained with a calibrated survey meter before and during every exposure, and a rope placed on a calculated number and never surveyed is not a controlled area. This is a point-source inverse-square estimate on entered figures. It does not perform a radiation safety analysis, determine any regulatory limit, size shielding or compute its attenuation, account for scatter, skyshine, or ground reflection, address personnel dosimetry, ALARA planning, exposure duration and total dose, source handling, or the emergency procedures a radiographer works under, or substitute for a survey. 10 CFR Part 34 or the agreement-state equivalent, the licensee's radiation safety officer, and the certified radiographer govern.",
   };
 }
-export const rtRestrictedAreaExample = { inputs: { source_activity_ci: 60, gamma_constant_r_h_ci_ft: 0.48, boundary_limit_mr_h: 2, collimator_attenuation_factor: 0.05, public_limit_mr_h: 0.5, shielding_factor: 1 } };
+export const rtRestrictedAreaExample = { inputs: { source_activity_ci: 60, gamma_constant_r_h_ci_ft: 5.1667, boundary_limit_mr_h: 2, collimator_attenuation_factor: 0.05, public_limit_mr_h: 0.5, shielding_factor: 1 } };
 INSPECTION_RENDERERS["rt-restricted-area"] = _simpleRenderer({
   citation: "Citation: point-source inverse square -- dose rate at 1 ft = activity × gamma constant, and the boundary distance is √(dose rate at 1 ft / permitted rate). The gamma constant, both dose-rate limits and any collimator or shielding transmission factor are ENTERED because they are source-specific and jurisdictional. This is an ESTIMATE, not the boundary: scatter and real shielding geometry make the actual field differ from a point source in free air, and the boundary is established with a calibrated survey meter before and during every exposure. It does not perform a radiation safety analysis, set any regulatory limit, size shielding, or address dosimetry or emergency procedures. 10 CFR Part 34 or the agreement-state equivalent and the licensee's radiation safety officer govern.",
   example: rtRestrictedAreaExample.inputs,
   fields: [
     { key: "source_activity_ci", label: "Source activity (Ci)", kind: "number", attrs: { step: "any" } },
-    { key: "gamma_constant_r_h_ci_ft", label: "Gamma constant (R/h per Ci at 1 ft)", kind: "number", attrs: { step: "any" } },
+    { key: "gamma_constant_r_h_ci_ft", label: "Gamma constant (R/h per Ci at 1 FOOT; Ir-192 about 5.2, Co-60 about 14.2)", kind: "number", attrs: { step: "any" } },
     { key: "boundary_limit_mr_h", label: "Restricted-area boundary limit (mR/h)", kind: "number", default: 2, attrs: { step: "any" } },
     { key: "public_limit_mr_h", label: "Public-area limit (mR/h, 0 to skip)", kind: "number", attrs: { step: "any" } },
     { key: "collimator_attenuation_factor", label: "Collimator transmission outside the beam (0 to skip)", kind: "number", attrs: { step: "any" } },
@@ -444,7 +448,11 @@ export function computeMtYokeCoilAmperage({
   const ld_clamped = has_coil && Math.abs(ld_used - ld_raw) > 1e-12;
   const is_high_fill = fill_factor === "high";
   const fill_constant = is_high_fill ? _MT_COIL_HIGH_FILL_CONSTANT : _MT_COIL_LOW_FILL_CONSTANT;
-  const coil_amp_turns = has_coil ? fill_constant / (ld_used + 2) : 0;
+  // ASTM E709 / E1444, and spec-v1668 as written: a high-fill coil takes
+  // NI = 35,000 / (L/D + 2), a low-fill coil with the part against its wall
+  // NI = 45,000 / (L/D). The tile had used the high-fill denominator for both,
+  // which at L/D = 4 asks 7,500 ampere-turns of a coil that needs 11,250.
+  const coil_amp_turns = has_coil ? (is_high_fill ? fill_constant / (ld_used + 2) : fill_constant / ld_used) : 0;
   const coil_amps = has_coil ? coil_amp_turns / coil_turns : 0;
   const coil_verdict = !has_coil
     ? "(no part length and coil turns entered)"

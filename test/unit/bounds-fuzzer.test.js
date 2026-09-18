@@ -50710,7 +50710,8 @@ test("bounds: spec-v1668 computeMtYokeCoilAmperage -- a select is a STRING, and 
   // and "ac" must not read as DC. A 0/1 encoding would make "0" truthy.
   assert.equal(r.is_high_fill, true);
   assert.equal(r.is_dc, false);
-  assert.ok(Math.abs(_v1668({ ...base, fill_factor: "low" }).coil_amp_turns - 45000 / 8) < 1e-9);
+  // Low fill is NI = 45,000 / (L/D), with no + 2 (spec-v1668, ASTM E709).
+  assert.ok(Math.abs(_v1668({ ...base, fill_factor: "low" }).coil_amp_turns - 45000 / 6) < 1e-9);
   assert.ok(Math.abs(r.yoke_lift_required_lb - 10) < 1e-12);
   assert.ok(Math.abs(_v1668({ ...base, yoke_current: "dc" }).yoke_lift_required_lb - 40) < 1e-12);
   // L/D is bounded 2 to 15 by the standard formulae.
