@@ -153,10 +153,13 @@ test("236 LRA override works when V and phase given", () => {
   assert.ok(close(r.worst_starting_kVA, 200 * 480 * Math.sqrt(3) / 1000, 0.5));
 });
 
-test("236 30% dip ⇒ required_starting_kVA = worst / 0.30", () => {
+test("236 30% dip ⇒ required_starting_kVA = worst x X'd x (1 - dip) / dip", () => {
   const r = computeGeneratorMotorStarting({ motors: [{ hp: 10, code_letter: "G" }], non_motor_kW: 0, dip_factor: 0.30, starts_per_hour: "occasional" });
-  // 10 × 5.6 = 56; / 0.30 = 186.67
-  assert.ok(close(r.required_starting_kVA, 56 / 0.30, 0.5));
+  // 10 × 5.6 = 56 kVA; reactance divider at X'd 0.25: 56 × 0.25 × 0.7 / 0.3 = 32.67
+  assert.ok(close(r.required_starting_kVA, 56 * 0.25 * 0.7 / 0.3, 0.01));
+  // Back-substitute: that generator dips exactly 30% on this start.
+  const S = r.required_starting_kVA;
+  assert.ok(close(0.25 * 56 / (S + 0.25 * 56), 0.30, 1e-9));
 });
 
 test("236 frequent-start derate factor is 1.15", () => {

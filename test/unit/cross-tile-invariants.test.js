@@ -11017,7 +11017,7 @@ import { computeHelicalPile } from "../../calc-construction.js";
 import { computeLadderPipeReach } from "../../calc-fire.js";
 import { computeVehicleLoad } from "../../calc-cross.js";
 
-test("monotonicity: computeGeneratorMotorStarting required_starting_kVA = worst_starting_kVA / dip_factor * starts_factor — strictly decreasing in dip_factor (1/x), strictly increasing across starts cadence occasional 1.0 < frequent 1.15 < continuous 1.30, and worst_starting_kVA strictly increasing in motor hp (NEMA code-letter kVA/hp); running_kW additive in non_motor_kW (+1 kW -> +1 kW); recommended_kW monotone non-decreasing in required_kW; bad motors / dip / code -> error", () => {
+test("monotonicity: computeGeneratorMotorStarting required_starting_kVA = worst_starting_kVA * Xd * (1 - dip) / dip * starts_factor — strictly decreasing in dip_factor, strictly increasing across starts cadence occasional 1.0 < frequent 1.15 < continuous 1.30, and worst_starting_kVA strictly increasing in motor hp (NEMA code-letter kVA/hp); running_kW additive in non_motor_kW (+1 kW -> +1 kW); recommended_kW monotone non-decreasing in required_kW; bad motors / dip / code -> error", () => {
   // Group A. required_starting_kVA = worst / dip * sf.
   const oneMotor = (over) => ({ motors: [{ hp: 25, code_letter: "G" }], non_motor_kW: 15, dip_factor: 0.30, starts_per_hour: "occasional", ...over });
   // Strictly decreasing in dip_factor.
@@ -11042,8 +11042,8 @@ test("monotonicity: computeGeneratorMotorStarting required_starting_kVA = worst_
   // Closed-form pin: req = worst / dip * sf (worst identical across cadence, only sf differs).
   assert.ok(Math.abs(freq.required_starting_kVA - occ.required_starting_kVA * 1.15) < 1e-9,
     `frequent should be 1.15x occasional: ${freq.required_starting_kVA} vs ${occ.required_starting_kVA * 1.15}`);
-  assert.ok(Math.abs(occ.required_starting_kVA - (occ.worst_starting_kVA / 0.30) * 1.0) < 1e-9,
-    `req = worst/dip*sf: ${occ.required_starting_kVA} vs ${(occ.worst_starting_kVA / 0.30)}`);
+  assert.ok(Math.abs(occ.required_starting_kVA - occ.worst_starting_kVA * 0.25 * 0.7 / 0.30) < 1e-9,
+    `req = worst*Xd*(1-dip)/dip*sf: ${occ.required_starting_kVA} vs ${occ.worst_starting_kVA * 0.25 * 0.7 / 0.30}`);
   // worst_starting_kVA strictly increasing in motor hp (single motor, fixed code letter).
   let prevW = -Infinity;
   for (const hp of [5, 10, 25, 50, 100]) {

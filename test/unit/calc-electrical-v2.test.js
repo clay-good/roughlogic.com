@@ -41,10 +41,12 @@ test("Service load: small home picks 100 A or less", () => {
   assert.ok(r.next_standard_A <= 100);
 });
 
-test("Service load: zero-area / zero-load returns dryer minimum 5 kW", () => {
+test("Service load: no dryer is charged nothing; a small dryer gets the 5 kW floor", () => {
+  // NEC 220.54's 5 kW minimum applies to a dryer that is there, not to every house.
   const r = computeServiceLoad({ small_appliance_circuits: 0, laundry_circuits: 0 });
-  // dryer_demand floor is 5000 W -> 5000 / 240 ~ 20.83 A.
-  assert.ok(close(r.required_A, 5000 / 240, 0.5));
+  assert.equal(r.required_A, 0);
+  const d = computeServiceLoad({ small_appliance_circuits: 0, laundry_circuits: 0, dryer_W: 3000 });
+  assert.equal(d.breakdown.dryer_demand_W, 5000);
 });
 
 test("Service load: HVAC takes the larger of cooling vs heating", () => {
@@ -54,9 +56,11 @@ test("Service load: HVAC takes the larger of cooling vs heating", () => {
   assert.equal(r2.breakdown.hvac_demand_W, 9000);
 });
 
-test("Service load: range first 8 kW at 100% then 40%", () => {
-  const r = computeServiceLoad({ range_W: 12000 });
-  assert.ok(close(r.breakdown.range_demand_W, 8000 + (12000 - 8000) * 0.4));
+test("Service load: one range per NEC Table 220.55 Column C", () => {
+  // Not over 12 kW: 8 kW. Over 12 kW: +5% of 8 kW per kW over 12 (Note 1).
+  assert.equal(computeServiceLoad({ range_W: 12000 }).breakdown.range_demand_W, 8000);
+  assert.equal(computeServiceLoad({ range_W: 10000 }).breakdown.range_demand_W, 8000);
+  assert.ok(close(computeServiceLoad({ range_W: 16000 }).breakdown.range_demand_W, 8000 * 1.2));
 });
 
 test("Service load: range under 8 kW counted at 100%", () => {
@@ -76,7 +80,7 @@ test("Service load: general demand above 3000 W applies 35% factor", () => {
 });
 
 test("Service load: rounds up to next standard ampacity", () => {
-  const r = computeServiceLoad({ small_appliance_circuits: 0, laundry_circuits: 0, fixed_appliances_W: 24000 });
+  const r = computeServiceLoad({ small_appliance_circuits: 0, laundry_circuits: 0, fixed_appliances_W: 24000, dryer_W: 5000 });
   // 24000 + 5000 dryer = 29000 W -> ~120.8 A. Next standard is 125 A.
   assert.equal(r.next_standard_A, 125);
 });

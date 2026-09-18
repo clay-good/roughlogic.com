@@ -400,7 +400,7 @@ export const BESPOKE_LABELS = {
   "gear-undercut-backlash": {"pressure_angle_deg":"Pressure angle (deg)","teeth":"Number of teeth N","addendum_coefficient":"Addendum coefficient (1.0 full, 0.8 stub)","center_distance_change_in":"Center-distance increase (in, 0 = skip)","diametral_pitch":"Diametral pitch (teeth/in, 0 = skip)"},
   "generator-conductor-445": {"nameplate_current_a":"Nameplate current (A, 0 = derive from kW)","gen_kw":"Generator real power (kW, used if nameplate is 0)","voltage_v":"Voltage (V, line-to-line 3ph or line-to-neutral 1ph)","phase":"Phase","power_factor":"Power factor","overload_limited":"Generator design"},
   "generator-fuel-runtime": {"tank_capacity_gal":"Fuel tank capacity (gal)","consumption_gph":"Fuel consumption at load (gph)","usable_pct":"Usable tank fraction (%)","target_runtime_hr":"Target backup duration (hr, 0 to skip)"},
-  "generator-motor-starting": {"non_motor_kW":"Non-motor steady kW","dip_factor":"Allowable voltage dip (0-1, default 0.30)","starts_per_hour":"Starts per hour"},
+  "generator-motor-starting": {"non_motor_kW":"Non-motor steady kW","dip_factor":"Allowable voltage dip (0-1, default 0.30)","starts_per_hour":"Starts per hour","generator_xd":"Generator transient reactance X'd (per unit, default 0.25)"},
   "geothermal-loop": {"heating_btu":"Heating design (BTU/hr)","cooling_btu":"Cooling design (BTU/hr)","soil":"Soil class","loop_type":"Loop type"},
   "glycol-mix": {"system_volume_gal":"System volume (gal)","target_burst_F":"Target protection (°F)","glycol_type":"Glycol type","protection_mode":"Protection mode"},
   "gpa-calculator": {"courses":"Courses (one per line: letter credits [regular|honors|ap])"},

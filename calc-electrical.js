@@ -972,14 +972,22 @@ export function computeServiceLoad({
   // Demand factor on lighting + small appliance + laundry: first 3000 W
   // at 100%, remainder at 35% (standard residential demand factor).
   const general = lighting + small_appliance + laundry;
-  const general_demand = general <= 3000 ? general : 3000 + (general - 3000) * 0.35;
-  // Range: first 8 kW at 100%, remainder at 40% (conservative).
+  // NEC Table 220.45: 3000 at 100%, 3001-120000 at 35%, remainder at 25%.
+  const general_demand = general <= 3000 ? general
+    : general <= 120000 ? 3000 + (general - 3000) * 0.35
+      : 3000 + 117000 * 0.35 + (general - 120000) * 0.25;
+  // Range per NEC Table 220.55 Column C, as service-load-standard applies it:
+  // one range not over 12 kW is 8 kW; over 12 kW adds 5% per kW. Until
+  // 2026-09-18 this took 8 kW plus 40% of the rest -- no NEC rule; a 12 kW
+  // range read 9.6 kW.
   const r = Number(range_W) || 0;
-  const range_demand = r <= 8000 ? r : 8000 + (r - 8000) * 0.4;
-  // Dryer: 5 kW or input, whichever is greater.
+  const range_demand = r === 0 ? 0 : r <= 8000 ? r : r <= 12000 ? 8000 : 8000 * (1 + 0.05 * Math.round((r - 12000) / 1000));
+  // Dryer per NEC 220.54: 5 kW or nameplate, whichever is greater -- when there
+  // is one. Until 2026-09-18 a house with no electric dryer was charged 5 kW.
   const d = Number(dryer_W) || 0;
-  const dryer_demand = Math.max(5000, d);
-  // Fixed appliances: sum input W (no further demand factor at this level).
+  const dryer_demand = d === 0 ? 0 : Math.max(5000, d);
+  // Fixed appliances: sum input W at 100%. NEC 220.53's 75% needs the count of
+  // appliances, which service-load-standard takes; at 100% this errs high.
   const fixed_demand = Number(fixed_appliances_W) || 0;
   // HVAC: larger of cooling vs heating.
   const hvac_demand = Math.max(Number(hvac_cooling_W) || 0, Number(hvac_heating_W) || 0);
@@ -2156,11 +2164,14 @@ export function computeGeneratorMotorStarting({
   non_motor_kW = 0,
   dip_factor = 0.30,
   starts_per_hour = "occasional",
+  generator_xd = 0.25,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Array.isArray(motors) || motors.length === 0) return { error: "Provide at least one motor." };
   if (!(non_motor_kW >= 0)) return { error: "Non-motor steady load must be non-negative." };
   if (!(dip_factor > 0 && dip_factor < 1)) return { error: "Dip factor must be between 0 and 1." };
+  const xd = Number(generator_xd);
+  if (!(xd > 0 && xd <= 1)) return { error: "Generator transient reactance X'd must be over 0 and at most 1 per unit (typically 0.15-0.30)." };
   let running_kW = Number(non_motor_kW) || 0;
   let worst_starting_kVA = 0;
   for (const m of motors) {
@@ -2183,7 +2194,13 @@ export function computeGeneratorMotorStarting({
   // Frequent-start derate (occasional 1.0 / frequent 1.15 / continuous 1.30)
   const startsFactor = { occasional: 1.0, frequent: 1.15, continuous: 1.30 };
   const sf = startsFactor[starts_per_hour] || 1.0;
-  const required_starting_kVA = (worst_starting_kVA / dip_factor) * sf;
+  // Voltage dip on a motor start is the reactance divider
+  //   dip = X'd S_m / (S_gen + X'd S_m)  =>  S_gen = S_m X'd (1 - dip) / dip.
+  // Until 2026-09-18 this was S_m / dip, which is the same relation with X'd
+  // taken as 1.0 per unit and the (1 - dip) dropped: 5x oversized for a real
+  // set (X'd about 0.15-0.30). The worked example asked 500 kW for a 25 hp
+  // motor plus 45 kW of load; the divider gives 80 kW.
+  const required_starting_kVA = worst_starting_kVA * xd * (1 - dip_factor) / dip_factor * sf;
   // Generator must be larger of running-kW basis and starting-kVA basis
   // (assume pf ~ 1 for the running-kW comparison; engineering-practice).
   const required_kW = Math.max(running_kW, required_starting_kVA * 0.8);
@@ -2197,7 +2214,7 @@ export function computeGeneratorMotorStarting({
   const recommended_kW = GENERATOR_KW_STEPS.find((s) => s >= required_kW) ?? _gk_max;
   return {
     running_kW, worst_starting_kVA, required_starting_kVA,
-    required_kW, recommended_kW, starts_factor: sf, exceeds_standard,
+    required_kW, recommended_kW, starts_factor: sf, exceeds_standard, generator_xd: xd,
   };
 }
 
@@ -2375,7 +2392,7 @@ function _v7renderShortCircuitPP(inputRegion, outputRegion, citationEl) {
 }
 
 function _v7renderGeneratorMotorStarting(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Generator sizing for motor starting per the published 30% voltage-dip criterion. NEMA MG-1 code-letter table.";
+  citationEl.textContent = "Citation: Generator sizing for motor starting: the reactance divider dip = X'd S_m / (S_gen + X'd S_m), solved for S_gen at the 30% dip criterion; NEMA MG-1 code-letter table. The generator manufacturer's motor-starting curve governs.";
   _v7attachEx(inputRegion, () => fillExample(generatorMotorStartingExample.inputs));
   const hp = _v7makeNumber("Largest motor HP", "gm-hp", { step: "any", min: "0" });
   const codeOpts = Object.keys(NEMA_MG1_CODE_LETTERS).map((k) => ({ value: k, label: "Code " + k + " (" + NEMA_MG1_CODE_LETTERS[k] + " kVA/HP)" }));
@@ -2384,12 +2401,14 @@ function _v7renderGeneratorMotorStarting(inputRegion, outputRegion, citationEl) 
   const nonMotor = _v7makeNumber("Non-motor steady kW", "gm-nm", { step: "any", min: "0" });
   const dip = _v7makeNumber("Allowable voltage dip (0-1, default 0.30)", "gm-dip", { step: "any", min: "0", max: "1" });
   dip.input.value = "0.30";
+  const xdIn = _v7makeNumber("Generator transient reactance X'd (per unit, default 0.25)", "gm-xd", { step: "any", min: "0", max: "1" });
+  xdIn.input.value = "0.25";
   const starts = _v7makeSelect("Starts per hour", "gm-st", [
     { value: "occasional", label: "Occasional (≤ 3 / hr)" },
     { value: "frequent", label: "Frequent (4-10 / hr)" },
     { value: "continuous", label: "Continuous (> 10 / hr)" },
   ]);
-  for (const f of [hp, code, nonMotor, dip, starts]) inputRegion.appendChild(f.wrap);
+  for (const f of [hp, code, nonMotor, dip, xdIn, starts]) inputRegion.appendChild(f.wrap);
   const oR = _v7makeOut(outputRegion, "Steady running kW", "gm-out-r");
   const oS = _v7makeOut(outputRegion, "Worst starting kVA", "gm-out-s");
   const oReq = _v7makeOut(outputRegion, "Required gen kW", "gm-out-req");
@@ -2404,6 +2423,7 @@ function _v7renderGeneratorMotorStarting(inputRegion, outputRegion, citationEl) 
       motors: [{ hp: Number(hp.input.value) || 0, code_letter: code.select.value }],
       non_motor_kW: Number(nonMotor.input.value) || 0,
       dip_factor: Number(dip.input.value) || 0.30,
+      generator_xd: Number(xdIn.input.value) || 0.25,
       starts_per_hour: starts.select.value,
     });
     if (r.error) { oR.textContent = r.error; oS.textContent = "-"; oReq.textContent = "-"; oRec.textContent = "-"; return; }
@@ -2412,7 +2432,7 @@ function _v7renderGeneratorMotorStarting(inputRegion, outputRegion, citationEl) 
     oReq.textContent = _v7fmt(r.required_kW, 1) + " kW";
     oRec.textContent = r.recommended_kW + " kW (typical step series)" + (r.exceeds_standard ? " -- EXCEEDS the largest standard size; this is the ceiling, NOT a sufficient size. Engineered design required." : "");
   }, _V7_DEB);
-  for (const f of [hp.input, code.select, nonMotor.input, dip.input, starts.select]) f.addEventListener("input", update);
+  for (const f of [hp.input, code.select, nonMotor.input, dip.input, xdIn.input, starts.select]) f.addEventListener("input", update);
 }
 
 function _v7renderServiceLoadStandard(inputRegion, outputRegion, citationEl) {

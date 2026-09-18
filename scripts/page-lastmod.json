@@ -3294,8 +3294,8 @@
       "date": "2026-09-01"
     },
     "/tools/generator-motor-starting/": {
-      "sha": "e695f2a6d26be294",
-      "date": "2026-09-01"
+      "sha": "ee5e9ff053a295e7",
+      "date": "2026-09-18"
     },
     "/tools/generator-sizing/": {
       "sha": "a265bbe80844d4de",
@@ -6654,8 +6654,8 @@
       "date": "2026-09-01"
     },
     "/tools/service-load/": {
-      "sha": "558a826695a24b55",
-      "date": "2026-09-01"
+      "sha": "a031bb92eee5c59b",
+      "date": "2026-09-18"
     },
     "/tools/service-load-optional/": {
       "sha": "397c866e7177cc85",

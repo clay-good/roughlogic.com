@@ -1668,7 +1668,7 @@ export const CITATIONS = {
     ],
   },
   "service-load": {
-    formula: "Standard method per NEC 220.42 (general lighting demand factors) and 220.82 (optional dwelling-service); appliance loads per NEC 220.53.",
+    formula: "Standard method: general lighting and receptacle demand per NEC Table 220.45 (3 kVA at 100%, to 120 kVA at 35%, rest at 25%); range per Table 220.55 Column C; dryer per 220.54 (5 kW minimum when present); fixed appliances at 100% (the 75% of 220.53 needs an appliance count -- service-load-standard applies it); larger of heating or cooling per 220.60.",
     edition: NEC_2023 + " Article 220.",
     freeAccess: NEC_FREE,
     governance: GOVERNANCE.electrical,
@@ -1963,7 +1963,7 @@ export const CITATIONS = {
     ],
   },
   "generator-motor-starting": {
-    formula: "Steady kW = Σ running_kW + non_motor_kW. Worst starting kVA = max over motors of starting_kVA(motor); starting_kVA = HP × code_kVA_per_HP from the NEMA MG-1 code letter, OR LRA × V × √phases / 1000 if the user supplies LRA. Required gen kVA = worst_starting_kVA / dip_factor (0.30 default per the 30% voltage-dip criterion). Required kW = max(steady, required_starting_kVA × 0.8).",
+    formula: "Steady kW = Σ running_kW + non_motor_kW. Worst starting kVA = max over motors of starting_kVA(motor); starting_kVA = HP × code_kVA_per_HP from the NEMA MG-1 code letter, OR LRA × V × √phases / 1000 if the user supplies LRA. Required gen kVA = worst_starting_kVA x X'd x (1 - dip) / dip, the reactance divider dip = X'd S_m / (S_gen + X'd S_m) solved for S_gen, with X'd the generator transient reactance (default 0.25 per unit) and dip_factor (0.30 default per the 30% voltage-dip criterion). Required kW = max(steady, required_starting_kVA × 0.8).",
     edition: "NEMA MG-1 (Motors and Generators) by name; engineering-practice 30% voltage-dip criterion for transient motor starts.",
     freeAccess: "NEMA MG-1 licensed; code-letter principles free in published power-engineering texts.",
     governance: GOVERNANCE.electrical,
@@ -1971,6 +1971,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "Code-letter table", value: "data/electrical/nema-mg1-code-letters.json keyed to A through V (lower bound of each range)", source: "NEMA MG-1" },
       { name: "Default dip factor", value: "0.30 (30% voltage-dip criterion)", source: "engineering practice" },
+      { name: "Generator transient reactance X'd", value: "0.25 per unit default (typical sets 0.15-0.30; the manufacturer's data sheet governs)", source: "engineering practice" },
       { name: "Frequent-start derate", value: "occasional 1.0 / frequent 1.15 / continuous 1.30", source: "manufacturer typical" },
     ],
   },

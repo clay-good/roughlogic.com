@@ -8271,9 +8271,9 @@
    "source_publisher": "NFPA",
    "source_title": "NEC 2023 Article 220 demand-load calculation (simplified residential variant)",
    "source_edition_or_year": "NEC 2023 Art. 220",
-   "source_section_or_page": "2000 ft^2 dwelling with 2 small-appliance + 1 laundry + 6 kW fixed + 12 kW range + 5 kW dryer; cooling 5 kW vs heating 8 kW (heating governs); @ 240 V -> 34,225 VA / 142.6 A required / 150 A next standard breaker",
+   "source_section_or_page": "2000 ft^2 dwelling with 2 small-appliance + 1 laundry + 6 kW fixed + 12 kW range + 5 kW dryer; cooling 5 kW vs heating 8 kW (heating governs); @ 240 V -> 32,625 VA / 135.9 A required (range 8,000 W per Table 220.55 Col. C) / 150 A next standard breaker",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-18",
    "inputs": {
     "area_ft2": 2000,
     "small_appliance_circuits": 2,
@@ -8286,13 +8286,13 @@
    },
    "outputs": {
     "total_demand_W": {
-     "value": 34225,
+     "value": 32625,
      "tolerance": {
       "abs": 5
      }
     },
     "required_A": {
-     "value": 142.6,
+     "value": 135.94,
      "tolerance": {
       "abs": 0.1
      }
@@ -12111,9 +12111,9 @@
    "source_publisher": "NEC 430.110 + manufacturer locked-rotor schedule (project bundled)",
    "source_title": "Generator sizing for motor starting: required_kVA = LRA at code letter; recommended kW = next ANSI step above required",
    "source_edition_or_year": "NEC 430.110 + NEMA MG 1 code-letter table (Code F = 5.0-5.59 kVA/hp locked-rotor)",
-   "source_section_or_page": "25 hp Code G + 10 hp Code F + 5 hp Code B motors, 15 kW non-motor, 0.3 dip, frequent starts -> running 44.84 kW, worst LRA 140 kVA, required 536.67 kVA / 429.33 kW, recommended 500 kW",
+   "source_section_or_page": "25 hp Code G + 10 hp Code F + 5 hp Code B motors, 15 kW non-motor, 0.3 dip, frequent starts -> running 44.84 kW, worst LRA 140 kVA, required 93.92 kVA / 75.13 kW by the reactance divider S_gen = S_m X'd (1 - dip)/dip x 1.15 with X'd 0.25, recommended 80 kW",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-18",
    "inputs": {
     "motors": [
      {
@@ -12147,19 +12147,19 @@
      }
     },
     "required_starting_kVA": {
-     "value": 536.67,
+     "value": 93.92,
      "tolerance": {
       "abs": 0.5
      }
     },
     "required_kW": {
-     "value": 429.33,
+     "value": 75.13,
      "tolerance": {
       "abs": 0.5
      }
     },
     "recommended_kW": {
-     "value": 500,
+     "value": 80,
      "tolerance": {
       "abs": 0
      }

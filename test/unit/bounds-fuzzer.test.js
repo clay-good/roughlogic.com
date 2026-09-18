@@ -9567,8 +9567,9 @@ test("bounds: calc-electrical computeServiceLoad pins 2000 ft^2 dwelling next-st
     fixed_appliances_W: 6000, range_W: 12000, dryer_W: 5000,
     hvac_cooling_W: 5000, hvac_heating_W: 8000,
   });
-  // general = 2000*3 + 3000 = 9000; general_demand = 3000 + 6000*0.35 = 5100... actually 9000>3000 so 3000 + 6000*0.35 = 5100; range 12000 -> 8000 + 1600 = 9600; dryer max(5000,5000) = 5000; hvac max(5000,8000) = 8000; fixed 6000. Total = 5100+6000+9600+5000+8000 = 33700? Probe said 34225.
-  assert.ok(r.total_demand_W > 33000 && r.total_demand_W < 36000);
+  // general = 6000 + 3000 + 1500 = 10500 -> 3000 + 7500*0.35 = 5625; range 12 kW -> 8000
+  // (Table 220.55 Col C); dryer 5000; hvac max(5000, 8000) = 8000; fixed 6000. Total 32625.
+  assert.strictEqual(r.total_demand_W, 32625);
   assert.strictEqual(r.next_standard_A, 150);
   // HVAC takes larger of cooling/heating.
   assert.strictEqual(r.breakdown.hvac_demand_W, 8000);
@@ -9764,10 +9765,11 @@ test("bounds: calc-electrical computeGeneratorMotorStarting pins NEMA code-lette
   });
   // Worst motor: 25 HP * 5.6 (G) = 140 kVA.
   assert.strictEqual(r.worst_starting_kVA, 140);
-  // required_starting_kVA = (140 / 0.30) * 1.15
-  assert.ok(Math.abs(r.required_starting_kVA - (140 / 0.30) * 1.15) < 1e-9);
+  // Reactance divider at X'd 0.25: 140 * 0.25 * 0.7 / 0.3 * 1.15 = 93.92 kVA -> 75.1 kW -> 80 kW.
+  assert.ok(Math.abs(r.required_starting_kVA - 140 * 0.25 * 0.7 / 0.3 * 1.15) < 1e-9);
   assert.strictEqual(r.starts_factor, 1.15);
-  assert.strictEqual(r.recommended_kW, 500);
+  assert.strictEqual(r.recommended_kW, 80);
+  assert.ok("error" in computeGeneratorMotorStarting({ motors: [{ hp: 5 }], generator_xd: 0 }));
   assert.ok("error" in computeGeneratorMotorStarting({ motors: [] }));
   assert.ok("error" in computeGeneratorMotorStarting({ motors: [{ hp: 5, code_letter: "ZZ" }] }));
 });
