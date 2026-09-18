@@ -2617,21 +2617,35 @@ export function computeDuctBreakoutNoise({
   const round_area_ft2 = round_perimeter_ft * exposed_length_ft;
 
   // The standard room equation: Lp = Lw - TL + 10 log10(S / A).
-  const room_spl_db = sound_power_db - breakout_tl_db + 10 * Math.log10(exposed_area_ft2 / room_absorption_sabins);
+  // ASHRAE HVAC Applications (noise and vibration control): the breakout sound
+  // power is Lw_out = Lw_in + 10 log(S / A) - TL_out, with A the duct's OWN
+  // cross-section -- the in-duct intensity is the sound power over that area --
+  // and it cannot exceed the power in the duct. The room then receives it
+  // through the room equation, Lp = Lw + 10 log(4 / R) + 10.5 (R in sabins,
+  // reverberant field). spec-v1633 names no equation; this tile had used the
+  // partition relation Lp = Lw - TL + 10 log(S / A_room), which takes a
+  // source-room PRESSURE level, not a duct's sound power, and read about 10 dB
+  // quiet on the worked duct.
+  const duct_cross_section_ft2 = duct_area_in2 / 144;
+  const area_gain_db = 10 * Math.log10(exposed_area_ft2 / duct_cross_section_ft2);
+  const breakout_lw_db = Math.min(sound_power_db, sound_power_db + area_gain_db - breakout_tl_db);
+  const room_term_db = 10 * Math.log10(4 / room_absorption_sabins) + 10.5;
+  const room_spl_db = breakout_lw_db + room_term_db;
   const lagged_spl_db = room_spl_db - lagging_improvement_db;
   const has_lagging = lagging_improvement_db > 0;
 
   const has_criterion = room_criterion_db > 0;
   const over_criterion_db = has_criterion ? lagged_spl_db - room_criterion_db : 0;
   const meets_criterion = has_criterion && over_criterion_db <= 1e-12;
-  const tl_required_db = has_criterion ? breakout_tl_db + over_criterion_db : 0;
+  // Solved from the uncapped relation, which is where a TL requirement bites.
+  const tl_required_db = has_criterion ? Math.max(0, sound_power_db + area_gain_db + room_term_db - lagging_improvement_db - room_criterion_db) : 0;
 
   const areaVerdict = "a " + fmt(duct_width_in, 0) + " by " + fmt(duct_height_in, 0) + " in duct running " + fmt(exposed_length_ft, 0) + " ft through the space presents " + fmt(exposed_area_ft2, 0) + " sq ft of radiating surface";
   const shapeVerdict = wide_flat
     ? "AND ITS ASPECT RATIO IS " + fmt(aspect_ratio, 1) + " TO 1, which is close to the worst case. A large flat sheet-metal panel is an efficient radiator at low frequency, and the wider and flatter the panel the worse it is -- which is exactly the shape a tight ceiling forces"
     : "its aspect ratio is " + fmt(aspect_ratio, 1) + " to 1. Flat panels radiate efficiently at low frequency and the wider and flatter they are the worse, so a squarer duct is already better than a wide shallow one of the same area";
   const roundVerdict = "AN EQUAL-AREA ROUND DUCT WOULD BE " + fmt(round_diameter_in, 1) + " in, presenting " + fmt(round_area_ft2, 0) + " sq ft -- and the area is not the point. A cylinder is stiff and has no flat panels to flex, so its breakout transmission loss is dramatically higher, commonly 15 to 25 dB better at low frequency. THAT IS THE SECOND CHEAPEST FIX AND IT IS A DESIGN DECISION, not a field one";
-  const levelVerdict = "the room equation gives " + fmt(sound_power_db, 0) + " dB of duct sound power, less " + fmt(breakout_tl_db, 0) + " dB of breakout transmission loss, plus " + fmt(10 * Math.log10(exposed_area_ft2 / room_absorption_sabins), 1) + " dB for " + fmt(exposed_area_ft2, 0) + " sq ft radiating into " + fmt(room_absorption_sabins, 0) + " sabins -- " + fmt(room_spl_db, 1) + " dB in the room";
+  const levelVerdict = fmt(sound_power_db, 0) + " dB of sound power in the duct, plus " + fmt(area_gain_db, 1) + " dB for " + fmt(exposed_area_ft2, 0) + " sq ft of wall against a " + fmt(duct_cross_section_ft2, 1) + " sq ft duct section, less " + fmt(breakout_tl_db, 0) + " dB of breakout transmission loss, is " + fmt(breakout_lw_db, 1) + " dB of breakout sound power; into " + fmt(room_absorption_sabins, 0) + " sabins that is " + fmt(room_spl_db, 1) + " dB in the room";
   const laggingVerdict = !has_lagging
     ? "no lagging was entered. IT WORKS ONLY IF IT IS DONE CORRECTLY: a limp mass layer DECOUPLED from the duct by a soft layer adds transmission loss, while mass strapped directly to the metal couples to it and does much less. And because the complaint is low-frequency rumble, thin materials do almost nothing -- the required surface mass is substantial"
     : "with " + fmt(lagging_improvement_db, 0) + " dB of lagging the room level is " + fmt(lagged_spl_db, 1) + " dB. Lagging works only when the mass layer is DECOUPLED from the duct by a soft layer; mass strapped straight to the metal couples to it and does much less, and thin materials do almost nothing against low-frequency rumble";
@@ -2645,6 +2659,7 @@ export function computeDuctBreakoutNoise({
 
   return {
     exposed_area_ft2, aspect_ratio, wide_flat, round_diameter_in, round_area_ft2,
+    duct_cross_section_ft2, area_gain_db, breakout_lw_db, room_term_db,
     room_spl_db, has_lagging, lagged_spl_db, has_criterion, over_criterion_db,
     meets_criterion, tl_required_db,
     areaVerdict, shapeVerdict, roundVerdict, levelVerdict, laggingVerdict, criterionVerdict, silencerVerdict, orderVerdict,
@@ -2925,7 +2940,7 @@ HVACSYSTEMS_RENDERERS["grille-neck-nc"] = _simpleRenderer({
 HVACSYSTEMS_RENDERERS["duct-breakout-noise"] = _simpleRenderer({
   compute: computeDuctBreakoutNoise,
   example: ductBreakoutNoiseExample.inputs,
-  citation: "Citation: radiating area from the duct perimeter and exposed length; the room level from Lp = Lw - TL + 10 log10(S/A). The breakout transmission loss is ENTERED, because it depends on the duct construction and gauge. ASHRAE Applications and the acoustical consultant govern.",
+  citation: "Citation: radiating area from the duct perimeter and exposed length; breakout sound power Lw_out = Lw_in + 10 log10(S / A_duct) - TL (ASHRAE Applications, A_duct the duct cross-section), then the room level Lp = Lw_out + 10 log10(4 / R) + 10.5. The breakout transmission loss is ENTERED, because it depends on the duct construction and gauge. ASHRAE Applications and the acoustical consultant govern.",
   fields: [
     { key: "duct_width_in", label: "Duct width (in)" },
     { key: "duct_height_in", label: "Duct height (in)" },

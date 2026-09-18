@@ -25510,7 +25510,7 @@ export const CITATIONS = {
     ],
   },
   "duct-breakout-noise": {
-    formula: "radiating area = duct perimeter x exposed length; the room level is Lp = Lw - TL + 10 log10(S / A); the equal-area round diameter is sqrt(4 x duct area / pi).",
+    formula: "radiating area = duct perimeter x exposed length; breakout sound power Lw_out = Lw_in + 10 log10(S / A_duct) - TL, capped at Lw_in, with A_duct the duct cross-section; the room level is Lp = Lw_out + 10 log10(4 / R) + 10.5; the equal-area round diameter is sqrt(4 x duct area / pi).",
     edition: "The breakout transmission loss and the duct sound power are ENTERED. Breakout TL depends on the duct construction and gauge and is a low-frequency problem a single number hides.",
     freeAccess: "Perimeter geometry and the standard room equation.",
     governance: GOVERNANCE.general,
@@ -25519,6 +25519,7 @@ export const CITATIONS = {
       { name: "Transmission loss is entered", value: "not predicted from the duct construction", source: "ASHRAE Applications and tested data" },
       { name: "Single band", value: "breakout is a low-frequency problem and one number hides it", source: "the acoustical consultant" },
       { name: "Equal AREA round substitution", value: "an equal-friction substitution is a different diameter", source: "duct design practice" },
+      { name: "Room equation", value: "reverberant field, Lp = Lw + 10 log10(4 / R) + 10.5 with R the room absorption in sabins; a listener close to the duct hears more", source: "ASHRAE Applications" },
     ],
   },
   "silencer-insertion-loss": {

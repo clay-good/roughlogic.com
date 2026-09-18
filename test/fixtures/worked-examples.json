@@ -108715,7 +108715,7 @@
   {
    "tile_id": "duct-breakout-noise",
    "source_publisher": "Project (first-principles)",
-   "source_title": "Duct Breakout Noise and Lagging -- the spec-v1633 worked example, recomputed",
+   "source_title": "Duct Breakout Noise and Lagging -- the spec-v1633 worked example, recomputed with ASHRAE's breakout and room equations",
    "source_edition_or_year": "spec-v1633 of scope-trade-expansion-2, 2026-09-09",
    "source_section_or_page": "the standards named in the tile citation govern",
    "verified_by": "rl",
@@ -108756,19 +108756,19 @@
      }
     },
     "room_spl_db": {
-     "value": 62.0309,
+     "value": 72.5309,
      "tolerance": {
       "pct": 0.5
      }
     },
     "over_criterion_db": {
-     "value": 22.0309,
+     "value": 32.5309,
      "tolerance": {
       "pct": 0.5
      }
     },
     "tl_required_db": {
-     "value": 44.0309,
+     "value": 54.5309,
      "tolerance": {
       "pct": 0.5
      }

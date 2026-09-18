@@ -51870,8 +51870,8 @@ test("bounds: spec-v1633 computeDuctBreakoutNoise -- a silencer does nothing abo
   assert.ok(Math.abs(r.round_diameter_in - Math.sqrt(4 * 48 * 12 / Math.PI)) < 1e-9);
   assert.ok(r.round_diameter_in > 27 && r.round_diameter_in < 27.2);
   assert.ok(r.round_area_ft2 < r.exposed_area_ft2);
-  // IDENTITY: the room equation, term by term.
-  assert.ok(Math.abs(r.room_spl_db - (85 - 22 + 10 * Math.log10(200 / 250))) < 1e-9);
+  // IDENTITY: ASHRAE's breakout power, then the room equation, term by term.
+  assert.ok(Math.abs(r.room_spl_db - (85 + 10 * Math.log10(200 / 4) - 22 + 10 * Math.log10(4 / 250) + 10.5)) < 1e-9);
   // IDENTITY: doubling the transmission loss deficit is one-for-one in dB.
   const better = _v1633({ ...base, breakout_tl_db: 32 });
   assert.ok(Math.abs(better.room_spl_db - (r.room_spl_db - 10)) < 1e-9);
