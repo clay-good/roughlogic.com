@@ -2448,6 +2448,19 @@ cross-check.
 | calc-geotech.js | `computeSptBearingCapacity` | `{ n60 = 0, b_ft = 0, d_ft = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeSptRequiredN60` | `{ qa_target_ksf = 0, b_ft = 0, d_ft = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeSubmergedEarthPressure` | `{ phi = 0, gamma_sat = 125, h_ft = 0, q = 0 } = {}` | _ | _ | _ |
+| calc-greenhouse.js | `computeCo2EnrichmentRate` | `{ house_volume_ft3 = 0, ambient_ppm = 0, target_ppm = 0, air_changes_per_hour...` | _ | _ | _ |
+| calc-greenhouse.js | `computeFanPadEvaporativeCooling` | `{ floor_area_sqft = 0, airflow_per_sqft_cfm = 0, pad_face_velocity_fpm = 0, p...` | _ | _ | _ |
+| calc-greenhouse.js | `computeGreenhouseTranspirationWater` | `{ floor_area_sqft = 0, daily_solar_btu_per_sqft = 0, latent_fraction = 0, lea...` | _ | _ | _ |
+| calc-greenhouse.js | `computeGreenhouseVentArea` | `{ house_width_ft = 0, house_length_ft = 0, gutter_height_ft = 0, ridge_height...` | _ | _ | _ |
+| calc-greenhouse.js | `computeGrowLightFixtureCount` | `{ growing_area_sqft = 0, target_ppfd_umol_m2_s = 0, fixture_ppf_umol_s = 0, f...` | _ | _ | _ |
+| calc-greenhouse.js | `computeLeachingFractionRunoffEc` | `{ volume_applied = 0, volume_drained = 0, feed_ec = 0, measured_leachate_ec =...` | _ | _ | _ |
+| calc-greenhouse.js | `computePhotoperiodBlackoutSchedule` | `{ blackout_pull_hour = 0, blackout_open_hour = 0, critical_dark_hours = 0, lo...` | _ | _ | _ |
+| calc-greenhouse.js | `computePlugTrayCellCount` | `{ plants_required = 0, cells_per_tray = 0, germination_pct = 0, cull_pct = 0,...` | _ | _ | _ |
+| calc-greenhouse.js | `computePpfdDailyLightIntegral` | `{ ppfd_umol_m2_s = 0, photoperiod_hours = 0, outdoor_dli = 0, transmission_pc...` | _ | _ | _ |
+| calc-greenhouse.js | `computeShadeClothTransmission` | `{ outdoor_dli = 0, glazing_transmission_pct = 0, shade_pct = 0, target_dli = ...` | _ | _ | _ |
+| calc-greenhouse.js | `computeSubstrateContainerVolume` | `{ container_count = 0, filled_volume_in3 = 0, allowance_pct = 0, bale_label_f...` | _ | _ | _ |
+| calc-greenhouse.js | `computeThermalScreenEnergySaving` | `{ house_width_ft = 0, house_length_ft = 0, gutter_height_ft = 0, ridge_height...` | _ | _ | _ |
+| calc-greenhouse.js | `computeVaporPressureDeficit` | `{ air_temp_f = 0, relative_humidity_pct = 0, leaf_offset_f = 0, alternative_l...` | _ | _ | _ |
 | calc-historical.js | `computeHistorical` | `{ commodity, lookback_months = 12, shard }` | _ | _ | _ |
 | calc-historical.js | `computePercentileBands` | `{ points = [], lookback_months = 12 } = {}` | _ | _ | _ |
 | calc-historical.js | `quantile` | `values, p` | _ | _ | _ |
@@ -3809,7 +3822,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2395.
+Row count: 2408.
 
 <!-- END function-corpus-v14 -->
 
@@ -4291,7 +4304,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (213 tiles)
+### Group C HVAC (214 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4492,6 +4505,7 @@ per spec-v14 §13.1 second paragraph.
 | `stack-effect-npp` | Stack Effect Pressure and the Neutral Pressure Plane | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `static-pressure-hvac` | Static Pressure | ACCA Manual D / ASHRAE Fundamentals; filter 0.10 + coil 0.30 + supply duct 0.20 + return duct ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `superheat-subcool` | Superheat and Subcool | AHRI / manufacturer P-T charts; R-410A at 118 psig saturates at ~40 F; suction line at 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `thermal-screen-energy-saving` | Greenhouse Thermal Screen Energy Saving | Project (first-principles); the screen manufacturer's UA reduction governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `trend-log-storage` | Trend Log Interval, Storage, and Controller Buffer Overrun | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-stage-interstage-pressure` | Two-Stage Refrigeration Interstage Pressure | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `txv-capacity-check` | TXV Capacity Correction and Valve Sizing | Project (first-principles); sqrt(actual dP / rated dP) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5638,7 +5652,7 @@ per spec-v14 §13.1 second paragraph.
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `worm-gear-geometry` | Worm and Worm-Wheel Geometry | Machinery's Handbook (worm gearing); lead = 0.5 x 1 = 0.5 in; lead angle = atan(0.5/(pi x 2)) ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group L Agriculture (83 tiles)
+### Group L Agriculture (95 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5651,6 +5665,7 @@ per spec-v14 §13.1 second paragraph.
 | `cattle-stocking-rate` | Cattle Stocking Rate (AUM) | USDA NRCS; available = 1500*160*0.40 = 96,000 lb; AUMs = 96,000/780 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `center-pivot-runtime` | Center-Pivot Application Depth and Runtime | USDA-NRCS center-pivot design / unive...; 800 gpm, 125 ac, 1 in gross, 85% -> 70.7 hr, 6.4 gpm/ac, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `chipper-debris` | Brush Chip Volume and Haul Loads | First-principles green-weight to chip...; 4,400 lb of green wood, 550 lb/lcy, 15 cy box -> 8.0 loos... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `co2-enrichment-rate` | Greenhouse CO2 Enrichment Rate and Cost | Project (first-principles); the supplier's data and combustion safety govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `corn-yield-estimate` | Pre-Harvest Corn Yield (Yield Component Method) | Pre-harvest corn yield (yield compone...; kernels/ear = 16 x 35 = 560; bu/ac = 32 x 560 / 90 = 17,9... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `crop-yield` | Crop Yield and Harvest Loss | USDA NASS yield-strip identity (proje...; Corn / 2 rows @ 30 in / 50 ft strip / 8 lb / 18% moisture... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `crown-pruning-dose` | Live Crown Removal Limit (Pruning Dose) | ANSI A300 Part 1 / ISA BMP - Pruning; 15 of 100 live foliage, mature -> 15% removal, cap 25% (w... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5659,6 +5674,7 @@ per spec-v14 §13.1 second paragraph.
 | `drawbar-pull` | Tractor Drawbar Pull from Power | ASABE (inverse); 75 PTO hp at 4.5 mph on firm soil (0.72) -> 54 drawbar hp... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dressing-percentage` | Carcass Dressing Percentage and Freezer Yield | Carcass dressing percentage and freez...; dressing = 744/1200 x 100 = 62.0%; boneless = 744 x 0.67 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drip-zone-flow` | Drip Zone Flow and Valve Capacity | Irrigation Association low-volume / m...; spec-v209 section 2.1 pinned example (inline dripline) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `fan-pad-evaporative-cooling` | Greenhouse Fan and Pad Evaporative Cooling | Project (first-principles); pad manufacturer data and the design wet bulb govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `feed-conversion-ratio` | Feed Conversion Ratio and Average Daily Gain | USDA / land-grant extension (animal s...; gain = 1250-650 = 600 lb; ADG = 600/200 = 3.0 lb/day; FCR... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `felling-notch-hinge` | Felling Notch and Hinge Geometry | ANSI Z133-2017 open-face felling; 20 in cut, 22% notch, 70 deg -> 4.4 in notch, 2.0 in hing... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fertigation-injection-rate` | Fertigation / Chemigation Injection Rate | Fertigation / chemigation injection rate; total = 5*40 = 200; injection = 200/6 = 33.333 gph = 0.55... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5669,6 +5685,9 @@ per spec-v14 §13.1 second paragraph.
 | `grain-bin-height-for-capacity` | Grain Bin Wall Height for a Target Capacity | Bin geometry first-principles (inverse); 12,875 bu, 30 ft dia, 8 ft cone, free-flow -> 20 ft wall ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `grain-drying-energy` | Grain Drying Energy and Fuel | grain-handling practice; spec-v418 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `grain-shrink-moisture` | Grain Drying Shrink and Net Bushels | USDA / land-grant extension; spec-v338 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `greenhouse-transpiration-water` | Greenhouse Crop Transpiration and Water Use | Project (first-principles); the crop stage and irrigation designer govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `greenhouse-vent-area` | Greenhouse Natural Ventilation Vent Area | Project (first-principles); the manufacturer's vent schedule governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `grow-light-fixture-count` | Horticultural Fixture Count and Energy | Project (first-principles); the manufacturer's PPF and a photometric layout govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `growing-degree-days` | Growing Degree Days | USDA / NWS GDD method + McMaster & Wi...; corn, Tmax 92 / Tmin 64 (modified) -> 25 GDD | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hay-dry-matter` | Hay Dry-Matter and Safe-Storage Weight | First-principles dry-matter balance +...; spec-v118 section 2.1 pinned example (over the 18% ceiling) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `irrigation-requirement` | Irrigation Requirement (ET-based, acre-feet) | FAO / USDA NRCS; ET_crop = 1.20*0.25*30 = 9.0 in; net = 9.0-1.0 = 8.0; gro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5676,6 +5695,7 @@ per spec-v14 §13.1 second paragraph.
 | `irrigation-zone-runtime` | Irrigation Zone Runtime and Cycle-and-Soak | Irrigation Association scheduling ref...; spec-v208 section 2.1 pinned example (clay lawn zone) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `kiln-charge-water` | Kiln Charge Water Weight, Energy, and Vent Load | Project (first-principles); the FPL dry-kiln schedules and the mill's own kiln sample... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `kiln-drying-time` | Lumber Kiln Drying Time and Schedule Duration | Project (first-principles); the FPL dry-kiln schedules and the kiln manufacturer govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `leaching-fraction-runoff-ec` | Leaching Fraction and Runoff Conductivity | Project (first-principles); a consistent pour-through and the crop range govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `livestock-dry-matter-intake` | Livestock Dry-Matter Intake and As-Fed Ration | NRC Nutrient Requirements; spec-v339 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `livestock-water-requirement` | Livestock Water Requirement | NRC / USDA NRCS water-intake guidance...; 50 head, 80 F between (40 F,8 gal) and (90 F,20 gal) -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `log-limb-weight` | Green Log and Limb Weight | USDA FPL Wood Handbook green density; 16 in butt / 16 in top, 8 ft red oak (density 64) -> 11.1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5691,16 +5711,20 @@ per spec-v14 §13.1 second paragraph.
 | `npk-blend` | NPK Fertilizer Blend from Soil Test | USDA NRCS; rec = 130 N / 50 P2O5 / 25 K2O; DAP = 50/0.46 = 108.70 (N... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pearson-square-ration` | Pearson-Square Feed Ration | Pearson square (land-grant animal sci...; corn 9% / SBM 44% to 16% CP -> 80% corn, 20% SBM | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pesticide-rei-phi` | Pesticide REI / PHI Clock | EPA WPS 40 CFR 170 + product label; REI 12 hr, 4 hr elapsed -> 8 hr remaining; PHI 7 d, 2 d e... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `photoperiod-blackout-schedule` | Photoperiod Blackout and Night Interruption | Project (first-principles); the crop's critical photoperiod governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pivot-application-rate` | Center-Pivot Outer-Span Application Rate vs Soil Intake | USDA-NRCS center-pivot design / unive...; 1-in pass, 1,320 ft pivot, 24-hr revolution, 100-ft band ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pivot-timer-depth` | Center-Pivot Percent-Timer to Depth | USDA-NRCS center-pivot design / unive...; 800 gpm, 125 ac, 20-hr full-speed pass, timer 50% -> 40-h... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `plant-spacing-count` | Plant Spacing Count (Square and Triangular) | Nursery / landscape estimating refere...; spec-v210 section 2.1 pinned example (1 ft on center) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `plug-tray-cell-count` | Plug Tray Count and Seeding Quantity | Project (first-principles); the seed lot's tested germination governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `porta-wrap-friction` | Friction-Device Hold Force by Wraps | Capstan (Euler-Eytelwein) / ANSI Z133...; 800 lb load side, friction 0.20 -> 1 wrap 227.7 lb, 2 wra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `ppfd-daily-light-integral` | PPFD to Daily Light Integral | Project (first-principles); the crop's published DLI requirement governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `quadratic-mean-diameter` | Quadratic Mean Diameter (from a Tally) | USDA Forest Service forest-mensuratio...; Five-tree tally 8, 10, 10, 12, 14 in -> sum_sq 604, QMD s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `reference-et0` | Reference Evapotranspiration ET0 (Hargreaves / FAO-56) | Hargreaves & Samani 1985 / FAO-56 (Ra...; J=197 (mid-July); Tmax=30C, Tmin=15C, Tmean=22.5C, dT=15;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `reineke-sdi` | Reineke Stand Density Index | Reineke Stand Density Index (Reineke ...; 300 TPA, QMD 10 in, SDI_max 400 -> SDI 300, 75% of max (u... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `root-ball-size-weight` | Tree Root Ball Diameter and Weight (ANSI Z60.1) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sawmill-residue-yield` | Sawmill Residue, Sawdust, and Chip Yield | Project (first-principles); the residue buyers' specifications and NFPA 664 govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `seed-rate` | Planting Density and Seed Rate | Project (first-principles); 30 in rows / 32,000 plants/ac target / 1,500 seeds/lb / 9... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `shade-cloth-transmission` | Shade Cloth Transmission and Solar Heat | Project (first-principles); cloth manufacturer data and the crop DLI govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sod-takeoff` | Sod Takeoff (Slabs and Pallets) | Turfgrass producer / landscape estima...; spec-v211 section 2.1 pinned example (residential lawn) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `soil-volume-for-canopy` | Soil Volume Required for a Target Canopy | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spray-drift-buffer` | Downwind Spray Drift Buffer | USDA land-grant extension drift-manag...; Medium droplets (base 20 ft), 15 mph, 30 in boom, 20 in r... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -5709,6 +5733,7 @@ per spec-v14 §13.1 second paragraph.
 | `sprinkler-gpm-for-precip` | Sprinkler Zone Flow for a Target Precip Rate | Irrigation Association / Rain Bird / ...; spec-v736 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sprinkler-precip-rate` | Sprinkler Precipitation Rate | Irrigation Association / Rain Bird / ...; spec-v207 section 2.1 pinned example (rotor lawn zone) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stump-grinding-volume` | Stump Grinding Volume, Chip Yield, and Backfill | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `substrate-container-volume` | Substrate and Container Volume Takeoff | Project (first-principles); the supplier's loose yield and a measured fill govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tank-mix` | Pesticide Tank-Mix and Acres per Tank | EPA / USDA NRCS; acres/tank = 300/15 = 20; product/tank = 20*1.5 = 30 pt; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thi-livestock` | Temperature-Humidity Index (Livestock) | USDA-ARS / K-State Extension; THI = T_F - (0.55 - 0.0055*RH) * (T_F - 58) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thinning-target-tpa` | Thinning Target TPA From a Target SDI | Reineke 1933 / USDA FS stocking-guide...; SDI_max 450 at 35%, QMD 10 in, current 300 TPA -> target ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5725,6 +5750,7 @@ per spec-v14 §13.1 second paragraph.
 | `trunk-min-shell-thickness` | Minimum Sound Shell for an Allowable Trunk Strength Loss | Wagener 1963 / Mattheck t/R / ISA TRA...; 24 in trunk held to 29.6% loss -> 4.0 in min shell, t/R 0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-stroke-mix-ratio-check` | Two-Stroke Mix Ratio Check | First-principles volume arithmetic (i...; spec-v653 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `vapor-pressure-deficit` | Vapor Pressure Deficit at the Leaf | Project (first-principles); the crop's published VPD band governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group M Water and wastewater (83 tiles)
 
@@ -6126,6 +6152,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2144. Fixture-covered or reference-cadence: 2144 / 2144.
+Tile count: 2157. Fixture-covered or reference-cadence: 2157 / 2157.
 
 <!-- END tile-index-v14 -->

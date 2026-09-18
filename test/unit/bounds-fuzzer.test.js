@@ -54475,3 +54475,311 @@ test("bounds: spec-v1799 computeWorkingFaceCellLift -- halving the width leaves 
     assert.ok(_v1799({ ...base, ...bad }).error);
   }
 });
+
+// ---------------------------------------------------------------------------
+// spec-v1750..v1762: greenhouse and controlled-environment agriculture.
+// ---------------------------------------------------------------------------
+
+import {
+  computeGreenhouseVentArea as _v1750,
+  computeFanPadEvaporativeCooling as _v1751,
+  computePpfdDailyLightIntegral as _v1752,
+  computeGrowLightFixtureCount as _v1753,
+  computeVaporPressureDeficit as _v1754,
+  computeCo2EnrichmentRate as _v1755,
+  computeShadeClothTransmission as _v1756,
+  computeGreenhouseTranspirationWater as _v1757,
+  computeThermalScreenEnergySaving as _v1758,
+  computePlugTrayCellCount as _v1759,
+  computeSubstrateContainerVolume as _v1760,
+  computePhotoperiodBlackoutSchedule as _v1761,
+  computeLeachingFractionRunoffEc as _v1762,
+} from "../../calc-greenhouse.js";
+
+test("bounds: spec-v1750 computeGreenhouseVentArea -- two openings in series do not add", () => {
+  const base = { house_width_ft: 30, house_length_ft: 96, gutter_height_ft: 12, ridge_height_ft: 18, roof_vent_pct: 18, side_vent_pct: 18, design_temp_difference_f: 5, discharge_coefficient: 0.6, mild_temp_difference_f: 1 };
+  const r = _v1750(base); assertFiniteNumericOutputs(r, "v1750");
+  assert.ok(Math.abs(r.effective_area_sqft - 366.56415536710625) < 1e-9);
+  // Equal openings in series give 1/sqrt(2) of one of them, not their sum.
+  assert.ok(Math.abs(r.series_share_pct - 100 / Math.SQRT2) < 1e-9);
+  assert.ok(r.effective_area_sqft < r.roof_vent_area_sqft);
+  assert.ok(Math.abs(r.airflow_cfm - 24968.46929865556) < 1e-6);
+  // Airflow goes as the square root of the temperature difference: a fifth of
+  // the difference leaves 45% of the flow, not a fifth of it.
+  assert.ok(Math.abs(r.mild_airflow_cfm / r.airflow_cfm - Math.sqrt(1 / 5)) < 1e-9);
+  assert.ok(r.mild_share_pct > r.mild_temp_share_pct);
+  // Enlarging one opening alone barely moves the answer -- the spec's point.
+  const biggerRoof = _v1750({ ...base, roof_vent_pct: 36 });
+  assert.ok(biggerRoof.effective_area_sqft / r.effective_area_sqft < 1.3);
+  assert.ok(_v1750({ ...base, ridge_height_ft: 12 }).error);
+  for (const bad of [{ house_width_ft: 0 }, { house_length_ft: 0 }, { gutter_height_ft: 0 }, { roof_vent_pct: 0 }, { side_vent_pct: 0 }, { design_temp_difference_f: 0 }, { discharge_coefficient: 0 }, { discharge_coefficient: 1.5 }, { mild_temp_difference_f: 0 }, { house_width_ft: Infinity }]) {
+    assert.ok(_v1750({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1751 computeFanPadEvaporativeCooling -- the crop is part of the cooling system", () => {
+  const base = { floor_area_sqft: 2880, airflow_per_sqft_cfm: 8, pad_face_velocity_fpm: 250, pad_height_ft: 5, outdoor_dry_bulb_f: 95, outdoor_wet_bulb_f: 75, pad_efficiency_pct: 85, solar_gain_btuh_per_sqft: 188, latent_fraction: 0.5 };
+  const r = _v1751(base); assertFiniteNumericOutputs(r, "v1751");
+  assert.ok(Math.abs(r.total_airflow_cfm - 23040) < 1e-9);
+  assert.ok(Math.abs(r.pad_area_sqft - 92.16) < 1e-9);
+  assert.ok(Math.abs(r.pad_outlet_temp_f - 78) < 1e-9);
+  // The pad can never go below the wet bulb, whatever its efficiency.
+  const perfect = _v1751({ ...base, pad_efficiency_pct: 100 });
+  assert.ok(Math.abs(perfect.pad_outlet_temp_f - base.outdoor_wet_bulb_f) < 1e-9);
+  assert.ok(Math.abs(r.temp_rise_f - 10.87962962962963) < 1e-9);
+  assert.ok(Math.abs(r.fan_end_temp_f - 88.87962962962963) < 1e-9);
+  // Emptying the house exactly doubles the rise at a 0.5 latent fraction --
+  // the crop is not a load on the cooling system, it is part of it.
+  assert.ok(Math.abs(r.empty_house_rise_ratio - 2) < 1e-9);
+  assert.ok(r.empty_house_fan_end_f > base.outdoor_dry_bulb_f);
+  assert.ok(_v1751({ ...base, outdoor_wet_bulb_f: 100 }).error);
+  for (const bad of [{ floor_area_sqft: 0 }, { airflow_per_sqft_cfm: 0 }, { pad_face_velocity_fpm: 0 }, { pad_height_ft: 0 }, { pad_efficiency_pct: 0 }, { pad_efficiency_pct: 101 }, { solar_gain_btuh_per_sqft: 0 }, { latent_fraction: 1 }, { floor_area_sqft: Infinity }]) {
+    assert.ok(_v1751({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1752 computePpfdDailyLightIntegral -- the glazing makes December worse", () => {
+  const base = { ppfd_umol_m2_s: 400, photoperiod_hours: 16, outdoor_dli: 6, transmission_pct: 65, target_dli: 20 };
+  const r = _v1752(base); assertFiniteNumericOutputs(r, "v1752");
+  assert.ok(Math.abs(r.dli - 23.04) < 1e-12);
+  assert.ok(Math.abs(r.inside_dli - 3.9) < 1e-12);
+  assert.ok(Math.abs(r.shortfall_dli - 16.1) < 1e-12);
+  assert.ok(!r.meets_target);
+  assert.ok(Math.abs(r.supplemental_ppfd_umol_m2_s - 279.5138888888889) < 1e-9);
+  // The supplemental figure must itself produce the shortfall it was sized for.
+  const check = _v1752({ ...base, ppfd_umol_m2_s: r.supplemental_ppfd_umol_m2_s });
+  assert.ok(Math.abs(check.dli - r.shortfall_dli) < 1e-9);
+  // A summer house is over target, and then shade rather than light is the
+  // intervention -- the supplemental figure floors at zero, never negative.
+  const summer = _v1752({ ...base, outdoor_dli: 45 });
+  assert.ok(summer.meets_target && summer.supplemental_ppfd_umol_m2_s === 0);
+  assert.ok(summer.inside_share_of_target > 1);
+  for (const bad of [{ ppfd_umol_m2_s: 0 }, { photoperiod_hours: 0 }, { photoperiod_hours: 25 }, { outdoor_dli: 0 }, { transmission_pct: 0 }, { transmission_pct: 101 }, { target_dli: 0 }, { outdoor_dli: Infinity }]) {
+    assert.ok(_v1752({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1753 computeGrowLightFixtureCount -- the on-target fraction costs TWO fixtures here, not one", () => {
+  const base = { growing_area_sqft: 1000, target_ppfd_umol_m2_s: 200, fixture_ppf_umol_s: 1700, fixture_watts: 645, on_target_fraction: 0.9, photoperiod_hours: 16, season_days: 180, energy_rate_per_kwh: 0.12 };
+  const r = _v1753(base); assertFiniteNumericOutputs(r, "v1753");
+  assert.ok(Math.abs(r.growing_area_m2 - 92.9030401442212) < 1e-9);
+  assert.ok(Math.abs(r.exact_count - 12.144188254146561) < 1e-9);
+  // spec-v1753 §3 says the 90% on-target fraction "costs a fixture by itself",
+  // then prints 11 at a perfect 1.00 against 13 at 0.90. That is TWO fixtures,
+  // not one. The tile reports the difference its own inputs produce.
+  assert.deepStrictEqual([r.fixture_count, r.perfect_count, r.on_target_cost_fixtures], [13, 11, 2]);
+  assert.ok(Math.abs(r.connected_load_w - 8385) < 1e-9);
+  assert.ok(Math.abs(r.efficacy_umol_per_joule - 1700 / 645) < 1e-12);
+  assert.ok(Math.abs(r.season_kwh - 24148.8) < 1e-6);
+  assert.ok(Math.abs(r.season_cost - 24148.8 * 0.12) < 1e-6);
+  // Every connected watt arrives as heat.
+  assert.ok(Math.abs(r.heat_btuh - r.connected_load_w * 3.412) < 1e-9);
+  // A perfect on-target fraction is the floor on the count.
+  const perfect = _v1753({ ...base, on_target_fraction: 1 });
+  assert.strictEqual(perfect.fixture_count, r.perfect_count);
+  for (const bad of [{ growing_area_sqft: 0 }, { target_ppfd_umol_m2_s: 0 }, { fixture_ppf_umol_s: 0 }, { fixture_watts: 0 }, { on_target_fraction: 0 }, { on_target_fraction: 1.5 }, { photoperiod_hours: 25 }, { season_days: 0 }, { energy_rate_per_kwh: -1 }, { fixture_watts: Infinity }]) {
+    assert.ok(_v1753({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1754 computeVaporPressureDeficit -- the room sensor reads a different quantity", () => {
+  const base = { air_temp_f: 75, relative_humidity_pct: 65, leaf_offset_f: -2, alternative_leaf_offset_f: 3, alternative_humidity_pct: 80 };
+  const r = _v1754(base); assertFiniteNumericOutputs(r, "v1754");
+  assert.ok(Math.abs(r.leaf_vpd_kpa - 0.8452481258736531) < 1e-9);
+  assert.ok(Math.abs(r.air_vpd_kpa - 1.03742630780056) < 1e-9);
+  // A cooler leaf makes the room reading HIGH, by a lot for 2 degF.
+  assert.ok(r.air_vpd_kpa > r.leaf_vpd_kpa);
+  assert.ok(Math.abs(r.air_over_leaf_ratio - r.air_vpd_kpa / r.leaf_vpd_kpa) < 1e-12);
+  // A leaf above air runs the deficit up with air and humidity unchanged.
+  assert.ok(Math.abs(r.alternative_leaf_vpd_kpa - 1.3474812288201634) < 1e-9);
+  assert.ok(r.alternative_change_pct > 50);
+  // The humidity lever moves it less than a few degrees of leaf temperature.
+  assert.ok(Math.abs(r.humid_leaf_vpd_kpa - 0.40063685110198444) < 1e-9);
+  assert.ok(Math.abs(r.humidity_change_pct) < r.alternative_change_pct);
+  // At zero offset the leaf and air figures are the same quantity.
+  const same = _v1754({ ...base, leaf_offset_f: 0 });
+  assert.ok(Math.abs(same.leaf_vpd_kpa - same.air_vpd_kpa) < 1e-12);
+  // Saturated air has no deficit at all at zero offset.
+  const saturated = _v1754({ ...base, relative_humidity_pct: 100, leaf_offset_f: 0 });
+  assert.ok(Math.abs(saturated.leaf_vpd_kpa) < 1e-12);
+  for (const bad of [{ relative_humidity_pct: 0 }, { relative_humidity_pct: 101 }, { alternative_humidity_pct: 0 }, { air_temp_f: Infinity }]) {
+    assert.ok(_v1754({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1755 computeCo2EnrichmentRate -- the injector must interlock to vent position", () => {
+  const base = { house_volume_ft3: 43200, ambient_ppm: 400, target_ppm: 1000, air_changes_per_hour: 1, gas_price_per_lb: 0.10, vented_air_changes_per_hour: 30, floor_area_sqft: 2880, enrichment_hours_per_day: 10 };
+  const r = _v1755(base); assertFiniteNumericOutputs(r, "v1755");
+  assert.ok(Math.abs(r.initial_charge_ft3 - 25.92) < 1e-9);
+  assert.ok(Math.abs(r.makeup_ft3_per_hour - 25.92) < 1e-9);
+  assert.ok(Math.abs(r.makeup_lb_per_hour - 25.92 * 0.1138) < 1e-9);
+  // Cost is exactly proportional to the air change rate -- 30x the rate is 30x
+  // the bill for the same setpoint, straight out of the vents.
+  assert.ok(Math.abs(r.vented_cost_ratio - 30) < 1e-12);
+  assert.ok(Math.abs(r.vented_hourly_cost / r.hourly_cost - 30) < 1e-9);
+  assert.ok(Math.abs(r.lb_per_1000_sqft_per_hour - r.makeup_lb_per_hour / 2.88) < 1e-9);
+  assert.ok(Math.abs(r.daily_cost - r.hourly_cost * 10) < 1e-9);
+  // At one air change per hour the charge and the hourly makeup coincide.
+  assert.ok(Math.abs(r.initial_charge_ft3 - r.makeup_ft3_per_hour) < 1e-12);
+  assert.ok(_v1755({ ...base, target_ppm: 400 }).error);
+  for (const bad of [{ house_volume_ft3: 0 }, { ambient_ppm: 0 }, { air_changes_per_hour: 0 }, { vented_air_changes_per_hour: 0 }, { gas_price_per_lb: -1 }, { floor_area_sqft: 0 }, { enrichment_hours_per_day: 25 }, { house_volume_ft3: Infinity }]) {
+    assert.ok(_v1755({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1756 computeShadeClothTransmission -- the fractions multiply, they do not add", () => {
+  const base = { outdoor_dli: 45, glazing_transmission_pct: 65, shade_pct: 50, target_dli: 20, outdoor_peak_btuh_per_sqft: 290, floor_area_sqft: 2880 };
+  const r = _v1756(base); assertFiniteNumericOutputs(r, "v1756");
+  // The label says 50% shade and the crop gets 32.5% of outdoor light.
+  assert.ok(Math.abs(r.system_transmission_pct - 32.5) < 1e-12);
+  assert.ok(Math.abs(r.inside_dli - 14.625) < 1e-12);
+  assert.ok(!r.meets_target);
+  // Two layers transmit a quarter of what reaches them, not nothing.
+  assert.ok(Math.abs(r.two_layer_transmission - 0.1625) < 1e-12);
+  assert.ok(Math.abs(r.two_layer_dli - r.inside_dli * 0.5) < 1e-12);
+  // The shade that lands exactly on target, checked by feeding it back in.
+  assert.ok(Math.abs(r.required_shade_pct - 31.623931623931625) < 1e-9);
+  const onTarget = _v1756({ ...base, shade_pct: r.required_shade_pct });
+  assert.ok(Math.abs(onTarget.inside_dli - base.target_dli) < 1e-9);
+  // The heat side is real and is bought with the light.
+  assert.ok(Math.abs(r.solar_removed_btuh - 271440) < 1e-6);
+  assert.ok(Math.abs(r.solar_removed_tons - 271440 / 12000) < 1e-9);
+  // No cloth at all means no heat removed and full glazed transmission.
+  const bare = _v1756({ ...base, shade_pct: 0 });
+  assert.ok(bare.solar_removed_btuh === 0 && Math.abs(bare.system_transmission - 0.65) < 1e-12);
+  for (const bad of [{ outdoor_dli: 0 }, { glazing_transmission_pct: 0 }, { glazing_transmission_pct: 101 }, { shade_pct: 100 }, { target_dli: 0 }, { outdoor_peak_btuh_per_sqft: 0 }, { floor_area_sqft: 0 }, { outdoor_dli: Infinity }]) {
+    assert.ok(_v1756({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1757 computeGreenhouseTranspirationWater -- a sealed house has to remove every pint", () => {
+  const base = { floor_area_sqft: 2880, daily_solar_btu_per_sqft: 1500, latent_fraction: 0.5, leaching_fraction: 0.2, peak_solar_btuh_per_sqft: 188, irrigation_hours_per_day: 12 };
+  const r = _v1757(base); assertFiniteNumericOutputs(r, "v1757");
+  assert.ok(Math.abs(r.transpiration_lb_per_day - 2057.142857142857) < 1e-6);
+  assert.ok(Math.abs(r.transpiration_gal_per_day - 246.51202602071388) < 1e-9);
+  // The sanity band growers quote is 0.05 to 0.15 gal/sq ft/day.
+  assert.ok(r.gal_per_sqft_per_day > 0.05 && r.gal_per_sqft_per_day < 0.15);
+  assert.ok(Math.abs(r.applied_gal_per_day - r.transpiration_gal_per_day / 0.8) < 1e-9);
+  // The peak hour is what the irrigation system must deliver.
+  assert.ok(Math.abs(r.peak_to_average_ratio - 1.504) < 1e-9);
+  assert.ok(r.peak_gal_per_hour > r.average_gal_per_hour);
+  assert.ok(Math.abs(r.moisture_pints_per_day - r.transpiration_gal_per_day * 8) < 1e-9);
+  // With no leaching the applied volume is the transpiration itself.
+  const noLeach = _v1757({ ...base, leaching_fraction: 0 });
+  assert.ok(Math.abs(noLeach.applied_gal_per_day - noLeach.transpiration_gal_per_day) < 1e-12);
+  assert.ok(noLeach.leached_gal_per_day === 0);
+  for (const bad of [{ floor_area_sqft: 0 }, { daily_solar_btu_per_sqft: 0 }, { latent_fraction: 0 }, { latent_fraction: 1 }, { leaching_fraction: 1 }, { peak_solar_btuh_per_sqft: 0 }, { irrigation_hours_per_day: 25 }, { floor_area_sqft: Infinity }]) {
+    assert.ok(_v1757({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1758 computeThermalScreenEnergySaving -- the envelope is twice the floor", () => {
+  const base = { house_width_ft: 30, house_length_ft: 96, gutter_height_ft: 12, ridge_height_ft: 18, glazing_u_factor: 1.2, screen_ua_reduction_pct: 35, season_nights: 180, night_hours: 12, night_temp_difference_f: 40, plant_efficiency_pct: 80, fuel_price_per_therm: 1.20, screen_cost_per_sqft: 4.00 };
+  const r = _v1758(base); assertFiniteNumericOutputs(r, "v1758");
+  assert.ok(Math.abs(r.gable_area_sqft - 900) < 1e-9);
+  assert.ok(Math.abs(r.sidewall_area_sqft - 2304) < 1e-9);
+  assert.ok(Math.abs(r.envelope_sqft - 6305.8549289094735) < 1e-6);
+  // The reason a greenhouse heating bill looks nothing like a building's.
+  assert.ok(r.envelope_to_floor_ratio > 2);
+  assert.ok(r.roof_share_pct > 45 && r.roof_share_pct < 55);
+  assert.ok(Math.abs(r.base_ua - r.envelope_sqft * 1.2) < 1e-9);
+  assert.ok(Math.abs(r.screened_ua - r.base_ua * 0.65) < 1e-9);
+  assert.ok(Math.abs(r.heat_saved_btu - 228826863.66026694) < 1);
+  assert.ok(Math.abs(r.therms_saved - 2860.3357957533367) < 1e-6);
+  assert.ok(Math.abs(r.payback_years - 3.3562492957130634) < 1e-9);
+  // Payback is the cost over the saving, both of which scale with the house.
+  assert.ok(Math.abs(r.payback_years - r.screen_cost / r.annual_saving) < 1e-12);
+  assert.ok(_v1758({ ...base, ridge_height_ft: 10 }).error);
+  for (const bad of [{ house_width_ft: 0 }, { glazing_u_factor: 0 }, { screen_ua_reduction_pct: 0 }, { screen_ua_reduction_pct: 100 }, { season_nights: 0 }, { night_hours: 25 }, { night_temp_difference_f: 0 }, { plant_efficiency_pct: 0 }, { fuel_price_per_therm: 0 }, { house_length_ft: Infinity }]) {
+    assert.ok(_v1758({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1759 computePlugTrayCellCount -- the naive count is found short at transplant", () => {
+  const base = { plants_required: 12000, cells_per_tray: 288, germination_pct: 92, cull_pct: 5, seeds_per_cell: 1, tray_footprint_sqft: 1.6 };
+  const r = _v1759(base); assertFiniteNumericOutputs(r, "v1759");
+  assert.ok(Math.abs(r.survival - 0.874) < 1e-12);
+  assert.ok(Math.abs(r.usable_per_tray - 251.712) < 1e-9);
+  assert.deepStrictEqual([r.trays_to_sow, r.naive_trays, r.trays_the_naive_count_misses], [48, 42, 6]);
+  // The sowing must actually cover the order; the naive count must not.
+  assert.ok(r.finished_yield >= base.plants_required);
+  assert.ok(r.naive_yield < base.plants_required);
+  assert.ok(Math.abs(r.naive_shortfall - (base.plants_required - r.naive_yield)) < 1e-9);
+  // The cushion rounding buys should be small -- under one tray's worth.
+  assert.ok(r.surplus > 0 && r.surplus < r.usable_per_tray);
+  assert.ok(Math.abs(r.bench_area_sqft - 48 * 1.6) < 1e-9);
+  // Perfect germination and no culls collapse the two counts onto each other.
+  const ideal = _v1759({ ...base, germination_pct: 100, cull_pct: 0 });
+  assert.strictEqual(ideal.trays_to_sow, ideal.naive_trays);
+  for (const bad of [{ plants_required: 0 }, { cells_per_tray: 0 }, { germination_pct: 0 }, { germination_pct: 101 }, { cull_pct: 100 }, { seeds_per_cell: 0 }, { tray_footprint_sqft: 0 }, { plants_required: Infinity }]) {
+    assert.ok(_v1759({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1760 computeSubstrateContainerVolume -- two errors that push opposite ways", () => {
+  const base = { container_count: 5000, filled_volume_in3: 160, allowance_pct: 10, bale_label_ft3: 3.8, bale_loose_yield_ft3: 2.8, true_gallon_in3: 231 };
+  const r = _v1760(base); assertFiniteNumericOutputs(r, "v1760");
+  assert.ok(Math.abs(r.loose_volume_ft3 - 462.962962962963) < 1e-9);
+  assert.ok(Math.abs(r.ordered_volume_ft3 - r.loose_volume_ft3 * 1.1) < 1e-9);
+  assert.strictEqual(r.order_yd3, 19);
+  // The label under-orders because it describes the bale in the truck.
+  assert.deepStrictEqual([r.bale_count, r.label_bale_count, r.bales_the_label_misses], [182, 135, 47]);
+  // The trade-gallon error over-orders, in the other direction.
+  assert.ok(r.true_gallon_volume_yd3 > r.ordered_volume_yd3);
+  assert.ok(Math.abs(r.true_gallon_over_pct - 44.375) < 1e-9);
+  assert.ok(Math.abs(r.true_gallon_excess_yd3 - (r.true_gallon_volume_ft3 - r.ordered_volume_ft3) / 27) < 1e-9);
+  // A bale whose loose yield equals its label needs no correction at all.
+  const honest = _v1760({ ...base, bale_loose_yield_ft3: 3.8 });
+  assert.strictEqual(honest.bale_count, honest.label_bale_count);
+  assert.ok(_v1760({ ...base, bale_loose_yield_ft3: 5 }).error);
+  for (const bad of [{ container_count: 0 }, { filled_volume_in3: 0 }, { allowance_pct: -1 }, { bale_label_ft3: 0 }, { true_gallon_in3: 0 }, { container_count: Infinity }]) {
+    assert.ok(_v1760({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1761 computePhotoperiodBlackoutSchedule -- the signal is free and the darkness is expensive", () => {
+  const base = { blackout_pull_hour: 17, blackout_open_hour: 8, critical_dark_hours: 13, long_photoperiod_hours: 16, short_photoperiod_hours: 11, ppfd_umol_m2_s: 400, interruption_hours: 4, interruption_ppfd_umol_m2_s: 2 };
+  const r = _v1761(base); assertFiniteNumericOutputs(r, "v1761");
+  // The blackout wraps midnight: 17:00 to 08:00 is 15 hours, not -9.
+  assert.ok(Math.abs(r.dark_hours - 15) < 1e-12);
+  assert.ok(Math.abs(r.light_hours - 9) < 1e-12);
+  assert.ok(r.satisfies_critical && Math.abs(r.dark_margin_hours - 2) < 1e-12);
+  assert.ok(Math.abs(r.dli_given_up - 7.2) < 1e-9);
+  assert.ok(Math.abs(r.dli_given_up_pct - 31.25) < 1e-9);
+  // The whole economics: a complete reversal of flowering for a fraction of a
+  // per cent of the light budget.
+  assert.ok(Math.abs(r.interruption_dli - 0.0288) < 1e-12);
+  assert.ok(r.interruption_share_of_long_pct < 1);
+  // A daytime blackout window does not wrap and is measured forward.
+  const daytime = _v1761({ ...base, blackout_pull_hour: 8, blackout_open_hour: 17 });
+  assert.ok(Math.abs(daytime.dark_hours - 9) < 1e-12);
+  assert.ok(!daytime.satisfies_critical);
+  assert.ok(_v1761({ ...base, blackout_open_hour: 17 }).error);
+  for (const bad of [{ blackout_pull_hour: 24 }, { critical_dark_hours: 0 }, { critical_dark_hours: 24 }, { long_photoperiod_hours: 25 }, { ppfd_umol_m2_s: 0 }, { interruption_hours: 0 }, { interruption_ppfd_umol_m2_s: 0 }, { ppfd_umol_m2_s: Infinity }]) {
+    assert.ok(_v1761({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1762 computeLeachingFractionRunoffEc -- the bound is never a target", () => {
+  const base = { volume_applied: 1.0, volume_drained: 0.20, feed_ec: 2.0, measured_leachate_ec: 3.0, alternative_leaching_fraction: 0.40, target_leachate_ec: 3.0 };
+  const r = _v1762(base); assertFiniteNumericOutputs(r, "v1762");
+  assert.ok(Math.abs(r.leaching_fraction - 0.2) < 1e-12);
+  assert.ok(Math.abs(r.bound_ec - 10) < 1e-12);
+  // The gap between the bound and the measurement IS the crop's uptake.
+  assert.ok(r.measurement_below_bound);
+  assert.ok(Math.abs(r.implied_uptake_pct - 70) < 1e-9);
+  // Doubling the leaching fraction halves the bound, for twice the water.
+  assert.ok(Math.abs(r.alternative_bound_ec - 5) < 1e-12);
+  assert.ok(Math.abs(r.bound_change_pct + 50) < 1e-9);
+  // Holding the target on the bound alone takes a leaching fraction nobody
+  // irrigates at, which is the point: manage to the measurement.
+  assert.ok(Math.abs(r.required_leaching_fraction_pct - 200 / 3) < 1e-9);
+  assert.ok(r.target_reachable_on_bound);
+  // A leachate reading at the feed EC means the crop took up nothing at all.
+  const noUptake = _v1762({ ...base, measured_leachate_ec: 10 });
+  assert.ok(Math.abs(noUptake.implied_uptake_pct) < 1e-9 && !noUptake.measurement_below_bound);
+  assert.ok(_v1762({ ...base, volume_drained: 1.5 }).error);
+  for (const bad of [{ volume_applied: 0 }, { volume_drained: 0 }, { feed_ec: 0 }, { measured_leachate_ec: 0 }, { alternative_leaching_fraction: 0 }, { alternative_leaching_fraction: 1 }, { target_leachate_ec: 0 }, { feed_ec: Infinity }]) {
+    assert.ok(_v1762({ ...base, ...bad }).error);
+  }
+});

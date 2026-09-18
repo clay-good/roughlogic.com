@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "31827f9e9e7ae8e2",
+      "sha": "a8be39a7fb3b25dd",
       "date": "2026-09-18"
     },
     "/tools/": {
-      "sha": "44728e19d7760e13",
+      "sha": "5f2e3b732e3f550c",
       "date": "2026-09-18"
     },
     "/groups/accounting/": {
-      "sha": "4ae14cc376c6c752",
+      "sha": "8a353c2ea70ab81d",
       "date": "2026-09-18"
     },
     "/groups/agriculture/": {
-      "sha": "a31d198056c97c60",
+      "sha": "2f47af3891914610",
       "date": "2026-09-18"
     },
     "/groups/construction/": {
-      "sha": "bca8738d47222cbe",
+      "sha": "5d865e373a7ce77e",
       "date": "2026-09-18"
     },
     "/groups/cross-trade/": {
-      "sha": "c9552697390e127b",
+      "sha": "846cb18c0615166f",
       "date": "2026-09-18"
     },
     "/groups/educators/": {
-      "sha": "bced4175b907551d",
+      "sha": "3a5f68932f1a9966",
       "date": "2026-09-18"
     },
     "/groups/electrical/": {
-      "sha": "2c2a8786ef99c797",
+      "sha": "ec0e9b2564f12df1",
       "date": "2026-09-18"
     },
     "/groups/field/": {
-      "sha": "1fceaba4c9ddc6c7",
+      "sha": "593c88008aa8f84b",
       "date": "2026-09-18"
     },
     "/groups/fire-ground/": {
-      "sha": "44690cfe517dd928",
+      "sha": "3a5ad867d5a93a8d",
       "date": "2026-09-18"
     },
     "/groups/historical/": {
-      "sha": "fb891c2aac4c12ff",
+      "sha": "f9aa585d5d003619",
       "date": "2026-09-18"
     },
     "/groups/hvac/": {
-      "sha": "248a6ca1766743de",
+      "sha": "e692a007d0d9a984",
       "date": "2026-09-18"
     },
     "/groups/kitchen/": {
-      "sha": "ca29d78362c1e951",
+      "sha": "110ce8fdcefcdb6c",
       "date": "2026-09-18"
     },
     "/groups/lab/": {
-      "sha": "0d0ace38da9be422",
+      "sha": "7d9b049552c73877",
       "date": "2026-09-18"
     },
     "/groups/mechanic/": {
-      "sha": "fd49c0e8af635f36",
+      "sha": "a9016111feef8683",
       "date": "2026-09-18"
     },
     "/groups/plumbing/": {
-      "sha": "6b231da291c56c54",
+      "sha": "368d4041d800a53d",
       "date": "2026-09-18"
     },
     "/groups/real-estate/": {
-      "sha": "0c31532a5eab2f31",
+      "sha": "e487dfdd8dc4e96e",
       "date": "2026-09-18"
     },
     "/groups/references/": {
-      "sha": "c83051f64c3882f0",
+      "sha": "3299a2b07c11e7dc",
       "date": "2026-09-18"
     },
     "/groups/restoration/": {
-      "sha": "d4cbe23fc2bbe906",
+      "sha": "c334122967dd52c2",
       "date": "2026-09-18"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "1128dfc3434dcba0",
+      "sha": "1df73cb68c9f377b",
       "date": "2026-09-18"
     },
     "/groups/stage/": {
-      "sha": "8e3928f6ea9c20ff",
+      "sha": "8c2592c6f9c21081",
       "date": "2026-09-18"
     },
     "/groups/trucking/": {
-      "sha": "e118e51787c651b2",
+      "sha": "dae9eb2f78e26608",
       "date": "2026-09-18"
     },
     "/groups/water/": {
-      "sha": "949d11e611cfe183",
+      "sha": "cc7793d49858dae7",
       "date": "2026-09-18"
     },
     "/tools/aav-install-check/": {
@@ -282,8 +282,8 @@
       "date": "2026-09-01"
     },
     "/tools/anhydrous-ammonia-rate/": {
-      "sha": "ca20f5a06ebd96f8",
-      "date": "2026-09-01"
+      "sha": "3c76f7ea84a18b8a",
+      "date": "2026-09-18"
     },
     "/tools/annular-grout-volume/": {
       "sha": "dfb4537667a1d016",
@@ -1248,6 +1248,10 @@
     "/tools/co-alarm-placement/": {
       "sha": "b453d52324568a2d",
       "date": "2026-09-01"
+    },
+    "/tools/co2-enrichment-rate/": {
+      "sha": "796e6e79e5ecc5a0",
+      "date": "2026-09-18"
     },
     "/tools/co2-transcritical-pressure/": {
       "sha": "c97386d32751eee7",
@@ -2737,6 +2741,10 @@
       "sha": "8268045943b782ee",
       "date": "2026-09-01"
     },
+    "/tools/fan-pad-evaporative-cooling/": {
+      "sha": "9c60ccb74f74082b",
+      "date": "2026-09-18"
+    },
     "/tools/fan-sheave-for-target-cfm/": {
       "sha": "9606d748f30943af",
       "date": "2026-09-01"
@@ -3341,6 +3349,14 @@
       "sha": "314aaddb2f54e19f",
       "date": "2026-09-01"
     },
+    "/tools/greenhouse-transpiration-water/": {
+      "sha": "d9824adc15349a71",
+      "date": "2026-09-18"
+    },
+    "/tools/greenhouse-vent-area/": {
+      "sha": "00611fcb2a192c3c",
+      "date": "2026-09-18"
+    },
     "/tools/grid-to-ground/": {
       "sha": "f955e9d87f18ec35",
       "date": "2026-09-01"
@@ -3392,6 +3408,10 @@
     "/tools/grout-lift-pour-height/": {
       "sha": "556e002c6cb8a250",
       "date": "2026-09-08"
+    },
+    "/tools/grow-light-fixture-count/": {
+      "sha": "aabeea7027a3f89b",
+      "date": "2026-09-18"
     },
     "/tools/growing-degree-days/": {
       "sha": "e6638faa51ab6d80",
@@ -4031,6 +4051,10 @@
     },
     "/tools/leachate-water-balance/": {
       "sha": "ae0754709bf0e123",
+      "date": "2026-09-18"
+    },
+    "/tools/leaching-fraction-runoff-ec/": {
+      "sha": "9236ce5decc88f26",
       "date": "2026-09-18"
     },
     "/tools/lead-dust-clearance/": {
@@ -5073,6 +5097,10 @@
       "sha": "e880623291db7790",
       "date": "2026-09-11"
     },
+    "/tools/photoperiod-blackout-schedule/": {
+      "sha": "53b7134ceee8c3a3",
+      "date": "2026-09-18"
+    },
     "/tools/pid-tuning-ziegler-nichols/": {
       "sha": "019feb1fab1e45e7",
       "date": "2026-09-01"
@@ -5249,6 +5277,10 @@
       "sha": "04d6b05e631db713",
       "date": "2026-09-11"
     },
+    "/tools/plug-tray-cell-count/": {
+      "sha": "2842908c53b9c2f9",
+      "date": "2026-09-18"
+    },
     "/tools/plumbing-fixture-count/": {
       "sha": "4217ba0b09c38d25",
       "date": "2026-09-01"
@@ -5420,6 +5452,10 @@
     "/tools/ppe/": {
       "sha": "a95fa69a6f794134",
       "date": "2026-09-01"
+    },
+    "/tools/ppfd-daily-light-integral/": {
+      "sha": "75b1c2339f9d8281",
+      "date": "2026-09-18"
     },
     "/tools/ppv-fan-sizing/": {
       "sha": "d043bba78223212d",
@@ -5926,8 +5962,8 @@
       "date": "2026-09-01"
     },
     "/tools/reference-et0/": {
-      "sha": "3b20d81dae0555cd",
-      "date": "2026-09-01"
+      "sha": "c74ff75867656fc8",
+      "date": "2026-09-18"
     },
     "/tools/refractory-shell-temperature/": {
       "sha": "e92d457a266c7453",
@@ -6560,6 +6596,10 @@
     "/tools/shackle-eyebolt-wll/": {
       "sha": "0157f45258e0b735",
       "date": "2026-09-01"
+    },
+    "/tools/shade-cloth-transmission/": {
+      "sha": "c85e0f6a947d9b54",
+      "date": "2026-09-18"
     },
     "/tools/shadow-length/": {
       "sha": "bbd90d375a5fbae1",
@@ -7421,6 +7461,10 @@
       "sha": "065829810f09fe79",
       "date": "2026-09-01"
     },
+    "/tools/substrate-container-volume/": {
+      "sha": "f257d9aec3f90fae",
+      "date": "2026-09-18"
+    },
     "/tools/substrate-for-velocity/": {
       "sha": "fba7f00fcf07746d",
       "date": "2026-09-01"
@@ -7632,6 +7676,10 @@
     "/tools/thermal-oxidizer-residence/": {
       "sha": "97d01f833d034b64",
       "date": "2026-09-08"
+    },
+    "/tools/thermal-screen-energy-saving/": {
+      "sha": "065de2d14932cc97",
+      "date": "2026-09-18"
     },
     "/tools/thermal-stress-max-deltat/": {
       "sha": "cb35d37f05cdeb0a",
@@ -8152,6 +8200,10 @@
     "/tools/vapor-barrier-rolls/": {
       "sha": "29a9c0d5e2940a6f",
       "date": "2026-09-01"
+    },
+    "/tools/vapor-pressure-deficit/": {
+      "sha": "35f67c2d42864466",
+      "date": "2026-09-18"
     },
     "/tools/variable-primary-bypass/": {
       "sha": "f5b8bc7eb49f3e47",

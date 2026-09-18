@@ -24434,6 +24434,150 @@ export const CITATIONS = {
       { name: "Discharge coefficient", value: "entered coefficient represents the selected tile geometry", source: "manufacturer curve / field measurement" },
     ],
   },
+  // spec-v1750..v1762: greenhouse and controlled-environment agriculture.
+  "greenhouse-vent-area": {
+    formula: "Q = Cd x A_eff x sqrt(2 g dH dT / T_absolute), with A_eff = 1/sqrt(1/A_roof^2 + 1/A_side^2) for two openings in series.",
+    edition: "Buoyancy ventilation, with roof and side vents at 15 to 20% of floor area each the customary schedule and one air change per minute the summer target. The greenhouse manufacturer's vent schedule governs.",
+    freeAccess: "Public relations; the vent schedule comes from the house manufacturer.",
+    governance: GOVERNANCE.general,
+    editionNote: "Two openings in SERIES do not add, and airflow goes as the square root of the temperature difference -- so natural ventilation is weakest exactly when the margin is thinnest. Above about 2 mph the wind term takes over and this becomes a floor rather than a prediction.",
+    assumptions: [
+      { name: "Wind", value: "not modelled; the stack result is what the house is guaranteed on a still day", source: "spec-v1750 scope" },
+      { name: "Discharge coefficient", value: "entered; it depends on the vent geometry and insect screen", source: "manufacturer data" },
+    ],
+  },
+  "fan-pad-evaporative-cooling": {
+    formula: "pad outlet = dry bulb - saturation efficiency x (dry bulb - wet bulb); pad area = airflow / face velocity; pad-to-fan rise = sensible gain / (1.08 x airflow).",
+    edition: "Customary greenhouse figures: 8 cfm per square foot of floor in summer and 250 fpm pad face velocity for cellulose. Pad manufacturer saturation data and the design wet bulb for the site govern.",
+    freeAccess: "Public psychrometric relations; saturation efficiency comes from the pad manufacturer.",
+    governance: GOVERNANCE.general,
+    editionNote: "The pad cannot cool below the outdoor WET BULB, so that is the climate's own limit. The crop is not a load on the cooling system but part of it: a well-watered crop returns about half the solar gain as latent heat, and an empty house roughly doubles the pad-to-fan rise.",
+    assumptions: [
+      { name: "Gradient", value: "the crop gets a gradient, not pad-end air -- a uniform crop grown in two climates", source: "spec-v1751 method" },
+      { name: "Latent fraction", value: "entered; it varies with crop, stage, and how well watered the crop is", source: "grower observation" },
+    ],
+  },
+  "ppfd-daily-light-integral": {
+    formula: "DLI = PPFD x photoperiod x 3,600 / 1,000,000, in mol per square metre per day; inside light = outdoor DLI x glazing and screen transmission.",
+    edition: "The crop's own published daily light integral requirement governs; a quantum (PAR) sensor is the correct instrument.",
+    freeAccess: "Public arithmetic; crop DLI requirements are published by extension services.",
+    governance: GOVERNANCE.general,
+    editionNote: "A lux or footcandle meter is spectrum-weighted and CANNOT be converted for a horticultural fixture: the sunlight factor near 0.20 micromol per footcandle is specific to sunlight's spectrum and is simply wrong applied to HPS or a red-blue LED array.",
+    assumptions: [
+      { name: "Transmission", value: "entered; glazing, structure, and any deployed screen all take a share", source: "house survey" },
+      { name: "Instrument", value: "a quantum sensor; a lux meter weights green light the crop barely uses", source: "spec-v1752 caveat" },
+    ],
+  },
+  "grow-light-fixture-count": {
+    formula: "photons required = target PPFD x area in square metres; fixtures = required / (fixture PPF x on-target fraction), rounded up; efficacy = PPF / input watts; heat = connected watts x 3.412 Btu/h.",
+    edition: "The fixture manufacturer's PPF rating and a photometric layout govern the actual distribution.",
+    freeAccess: "Public arithmetic; PPF ratings are published by fixture manufacturers.",
+    governance: GOVERNANCE.general,
+    editionNote: "The on-target fraction is a number most lighting plans never state and it decides the order quantity by itself. Every connected watt arrives as heat -- a credit in December and a cooling load in March -- which makes lighting and ventilation one control decision rather than two.",
+    assumptions: [
+      { name: "On-target fraction", value: "entered; the share of emitted photons landing on the crop rather than the aisle or wall", source: "photometric layout" },
+      { name: "Distribution", value: "uniform average assumed; a real layout has a distribution the count does not capture", source: "manufacturer photometrics" },
+    ],
+  },
+  "vapor-pressure-deficit": {
+    formula: "VPD = es(leaf temperature) - RH x es(air temperature), with es = 0.6108 exp(17.27 T / (T + 237.3)) in kPa for T in degrees Celsius.",
+    edition: "The Tetens saturation relation over water. The crop's own published VPD band governs.",
+    freeAccess: "Public relation; crop VPD bands are published by extension services.",
+    governance: GOVERNANCE.general,
+    editionNote: "The deficit the crop sees is set at the LEAF and a room sensor cannot see leaf temperature. A leaf running above air under strong light raises the deficit sharply with the air and humidity unchanged -- the runaway that closes stomata in a house whose humidity reading looks fine.",
+    assumptions: [
+      { name: "Leaf temperature", value: "entered as an offset from air; an infrared reading is the cheap instrument for it", source: "IR thermometer" },
+      { name: "Humidity lever", value: "weaker than it feels -- a large RH change moves the leaf deficit less than a few degrees of leaf temperature", source: "spec-v1754 finding" },
+    ],
+  },
+  "co2-enrichment-rate": {
+    formula: "initial charge = house volume x concentration lift; makeup = volume x air changes per hour x the lift; mass at 0.1138 lb per cubic foot of carbon dioxide.",
+    edition: "Ambient is about 400 ppm and 1,000 to 1,500 ppm the customary target. The crop's uptake, the supplier's data, and any combustion safety requirements govern.",
+    freeAccess: "Public mass balance; supplier sizing tables are quoted per 1,000 square feet.",
+    governance: GOVERNANCE.general,
+    editionNote: "The makeup rate is proportional to the air change rate, so a controller that keeps the injector open when the vents crack pays that multiple to enrich the outdoors. Interlocking the injector to vent position is the whole control strategy.",
+    assumptions: [
+      { name: "Mixing", value: "a well-mixed house at steady state is assumed; crop uptake is not deducted", source: "spec-v1755 scope" },
+      { name: "Combustion", value: "an unvented burner adds water and combustion products; its own safety requirements apply", source: "equipment listing" },
+    ],
+  },
+  "shade-cloth-transmission": {
+    formula: "system transmission = glazing transmission x (1 - shade fraction), multiplied again per layer; inside DLI = outdoor DLI x system transmission; solar removed = (glazed - shaded) intensity x floor area.",
+    edition: "Cloth manufacturer transmission data measured on the installed fabric, and the crop's own DLI requirement, govern.",
+    freeAccess: "Public arithmetic; transmission percentages are published by cloth manufacturers.",
+    governance: GOVERNANCE.general,
+    editionNote: "The label percentage is not what the crop receives: the glazing takes its share first and the fractions MULTIPLY. Two layers transmit a quarter rather than nothing, which is a propagation light level under what was meant to be a production crop.",
+    assumptions: [
+      { name: "Layers", value: "compound multiplicatively; adding shade percentages is wrong", source: "spec-v1756 method" },
+      { name: "Heat", value: "real and the reason the cloth exists, but bought with exactly the light the crop lost", source: "grower trade-off" },
+    ],
+  },
+  "greenhouse-transpiration-water": {
+    formula: "transpiration = solar energy through the glazing x the crop's latent fraction / 1,050 Btu per pound of water; applied = transpiration / (1 - leaching fraction).",
+    edition: "An energy balance. The crop's own stage and the irrigation designer govern; 0.05 to 0.15 gal per square foot per day is the band growers quote.",
+    freeAccess: "Public energy balance; the grower band is widely published.",
+    governance: GOVERNANCE.general,
+    editionNote: "Irrigation must deliver the PEAK hour, not the daily total divided by the day length. Every pound transpired enters the house air: a ventilated house blows it outside, while a sealed house must remove it, which is why closed rooms fail on humidity first.",
+    assumptions: [
+      { name: "Latent fraction", value: "entered; roughly half for a well-watered crop and much lower for a sparse or stressed one", source: "grower observation" },
+      { name: "Check", value: "the 0.05 to 0.15 gal/sq ft/day band is the sanity check on the energy route", source: "industry practice" },
+    ],
+  },
+  "thermal-screen-energy-saving": {
+    formula: "UA = envelope area x glazing U-factor; seasonal saving = UA difference x average night temperature difference x deployed hours, divided by the heating plant efficiency.",
+    edition: "The screen manufacturer's published UA reduction on the installed configuration, and the site's own fuel and weather records, govern.",
+    freeAccess: "Public envelope arithmetic; UA reductions are published by screen manufacturers.",
+    governance: GOVERNANCE.general,
+    editionNote: "A greenhouse envelope is roughly twice its floor area, which is why the heating bill looks nothing like a building's. The number that does NOT appear in the payback is the light: open on a light level, not on a clock.",
+    assumptions: [
+      { name: "Degree-days", value: "a single average night difference is used rather than binned weather data", source: "site weather records" },
+      { name: "Light cost", value: "not in the payback; holding the screen closed removes hours from a DLI already below target", source: "spec-v1758 caveat" },
+    ],
+  },
+  "plug-tray-cell-count": {
+    formula: "usable per tray = cells x germination rate x (1 - cull rate); trays = plants required / usable per tray, rounded up.",
+    edition: "The seed lot's own tested germination rate and the grower's observed cull at transplant govern; a published germination figure is a laboratory result under ideal conditions.",
+    freeAccess: "Public arithmetic; germination is on the seed lot's own tag.",
+    governance: GOVERNANCE.general,
+    editionNote: "The naive count -- the order divided by the cell count -- is short by the germination and cull losses together, and the shortage is found at TRANSPLANT, when a re-sow is weeks too late to ship with the crop.",
+    assumptions: [
+      { name: "Germination", value: "the lot's tested rate, not the species average; field conditions are worse than the laboratory", source: "seed lot tag" },
+      { name: "Bench area", value: "before aisles; the transplanted crop needs several times that on a different bench", source: "production schedule" },
+    ],
+  },
+  "substrate-container-volume": {
+    formula: "loose volume = containers x filled volume per container, at 1,728 cubic inches per cubic foot and 27 cubic feet per cubic yard, plus a compaction and spill allowance.",
+    edition: "The supplier's own loose-yield figure and a measured container fill govern.",
+    freeAccess: "Public arithmetic; loose yields are published by substrate suppliers.",
+    governance: GOVERNANCE.general,
+    editionNote: "A nursery trade gallon is not a US gallon, and a compressed bale's label describes the bale in the truck rather than the media on the bench. The two errors push in OPPOSITE directions, so making both may give roughly the right number for entirely the wrong reasons.",
+    assumptions: [
+      { name: "Filled volume", value: "varies with the container and how it is filled; a measured fill beats a nominal size", source: "yard measurement" },
+      { name: "Bale yield", value: "the loose yield, not the compressed label volume, is what fills containers", source: "supplier data" },
+    ],
+  },
+  "photoperiod-blackout-schedule": {
+    formula: "the uninterrupted dark period from the pull and open times, against the crop's critical dark period; DLI at each photoperiod = PPFD x hours x 3,600 / 1,000,000.",
+    edition: "Short-day crops generally need 12 to 13 hours of uninterrupted darkness. The crop's own published critical photoperiod and the cultivar's response group govern.",
+    freeAccess: "Public arithmetic; critical photoperiods are published per crop and cultivar.",
+    governance: GOVERNANCE.general,
+    editionNote: "The signal is free and the darkness is expensive. That asymmetry is also the WARNING: if a couple of micromol across a few hours breaks a night on purpose, a security light or an exit sign breaks one by accident, and nothing in the crop's appearance says so until it fails to flower.",
+    assumptions: [
+      { name: "Light leaks", value: "not modelled; any stray light during the dark period can break it", source: "site survey" },
+      { name: "Response group", value: "cultivar-specific; the critical period is not a species constant", source: "breeder data" },
+    ],
+  },
+  "leaching-fraction-runoff-ec": {
+    formula: "leaching fraction = volume drained / volume applied; the no-uptake upper bound on leachate conductivity = feed EC / leaching fraction; implied uptake is the gap between that bound and a measurement.",
+    edition: "A pour-through or saturated-media extract done consistently, and the crop's own published root-zone EC range, govern.",
+    freeAccess: "Public arithmetic; root-zone EC ranges are published by extension services.",
+    governance: GOVERNANCE.general,
+    editionNote: "The bound is NOT a prediction and must never be used as a target -- nothing grows at it, which is the clue it is far from the truth. The gap between the bound and a measurement IS the crop's uptake, so this calculation's error term is its product.",
+    assumptions: [
+      { name: "Steady state", value: "a single event is modelled; accumulated salt from prior events is not carried", source: "spec-v1762 scope" },
+      { name: "Procedure", value: "pour-through and saturated-media extract give different numbers; consistency matters more than which", source: "extension guidance" },
+    ],
+  },
   // spec-v1789..v1799: solid waste, landfill, and transfer operations.
   "landfill-airspace-density": {
     formula: "waste airspace = tons / in-place density in tons per cubic yard; cover airspace = waste airspace x the cover ratio; airspace utilisation factor = tons placed / total airspace consumed.",

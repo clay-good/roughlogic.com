@@ -1413,6 +1413,19 @@ export const TOOL_MODULES = (() => {
     "landfill-settlement-airspace", "collection-vehicle-payload",
     "working-face-cell-lift",
   ]);
+  // spec-v1750..v1762: greenhouse and controlled-environment agriculture.
+  // Twelve Group L tiles cover the environment, the light, and the crop's
+  // consumables; the thermal screen is Group C because it is an envelope and
+  // heating-plant calculation rather than a growing one.
+  declare("./calc-greenhouse.js", "GREENHOUSE_RENDERERS", [
+    "greenhouse-vent-area", "fan-pad-evaporative-cooling",
+    "ppfd-daily-light-integral", "grow-light-fixture-count",
+    "vapor-pressure-deficit", "co2-enrichment-rate",
+    "shade-cloth-transmission", "greenhouse-transpiration-water",
+    "thermal-screen-energy-saving", "plug-tray-cell-count",
+    "substrate-container-volume", "photoperiod-blackout-schedule",
+    "leaching-fraction-runoff-ec",
+  ]);
   // spec-v1845..v1850: the snow and ice management bench -- what a pavement
   // temperature costs in salt, what a brine batch has to be, how long a plow
   // route takes, where the snow goes, when a deicer stops working, and whether

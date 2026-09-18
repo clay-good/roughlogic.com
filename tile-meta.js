@@ -1389,6 +1389,20 @@ const _TILES = [
   ["landfill-settlement-airspace", "M"],
   ["collection-vehicle-payload", "J"],
   ["working-face-cell-lift", "M"],
+  // spec-v1750..v1762 greenhouse and controlled-environment agriculture
+  ["greenhouse-vent-area", "L"],
+  ["fan-pad-evaporative-cooling", "L"],
+  ["ppfd-daily-light-integral", "L"],
+  ["grow-light-fixture-count", "L"],
+  ["vapor-pressure-deficit", "L"],
+  ["co2-enrichment-rate", "L"],
+  ["shade-cloth-transmission", "L"],
+  ["greenhouse-transpiration-water", "L"],
+  ["thermal-screen-energy-saving", "C"],
+  ["plug-tray-cell-count", "L"],
+  ["substrate-container-volume", "L"],
+  ["photoperiod-blackout-schedule", "L"],
+  ["leaching-fraction-runoff-ec", "L"],
 ];
 
 

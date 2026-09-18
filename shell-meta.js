@@ -154,6 +154,10 @@ export const PROFESSION_NOUN = {
   // it leads on all eleven tiles. Short on purpose: a long noun is the first
   // thing buildTitle drops at the 70-char cap.
   waste: "Solid Waste",
+  // Added 2026-09-18 with the greenhouse and controlled-environment band, where
+  // it leads on all thirteen tiles. Short on purpose: a long noun is the first
+  // thing buildTitle drops at the 70-char cap.
+  greenhouse: "Greenhouse",
 };
 
 // Escape a string for embedding inside HTML text content or an attribute.

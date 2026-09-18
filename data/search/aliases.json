@@ -1,8 +1,333 @@
 {
  "_comment": "v10 Phase D.1 search aliases (spec-v10 \u00a76.1). One row per alias mapping a free-text term to a tile id. AUTHORING MASTER ONLY since the spec-v590 split remediation (2026-07-17): the runtime never fetches this file. scripts/build-alias-shards.mjs derives the per-group runtime shards data/search/aliases-<letter>.json from it (lazy parallel fetch on first search interaction via bindSearch / ensureAliases in app.js; --check in npm run lint gates drift), so edit THIS file and rerun the script. On exact-term match the user is routed to the target tile via the same path as a tool-name suggestion. Industry vocabulary, misspellings, abbreviations, question phrasings (spec-v590), and adjacent-question redirects only. The resolveQuery / matchAliasPrefix helpers in search-discovery.js are the canonical pure-functional resolvers (exercised by test/unit/search-discovery.test.js).",
- "_updated": "2026-09-19",
+ "_updated": "2026-09-20",
  "_schema": "Each alias row: { term: string, target: tile-id, kind: 'question' | 'industry' | 'adjacent' | 'redirect' }. Multiple aliases may map to the same target.",
  "aliases": [
+  {
+   "term": "greenhouse roof vent area",
+   "target": "greenhouse-vent-area",
+   "kind": "industry"
+  },
+  {
+   "term": "natural ventilation greenhouse",
+   "target": "greenhouse-vent-area",
+   "kind": "industry"
+  },
+  {
+   "term": "gutter to ridge vent sizing",
+   "target": "greenhouse-vent-area",
+   "kind": "industry"
+  },
+  {
+   "term": "passive greenhouse cooling",
+   "target": "greenhouse-vent-area",
+   "kind": "industry"
+  },
+  {
+   "term": "vent area percent of floor",
+   "target": "greenhouse-vent-area",
+   "kind": "industry"
+  },
+  {
+   "term": "fan and pad greenhouse cooling",
+   "target": "fan-pad-evaporative-cooling",
+   "kind": "industry"
+  },
+  {
+   "term": "evaporative pad sizing",
+   "target": "fan-pad-evaporative-cooling",
+   "kind": "industry"
+  },
+  {
+   "term": "greenhouse pad and fan airflow",
+   "target": "fan-pad-evaporative-cooling",
+   "kind": "industry"
+  },
+  {
+   "term": "cellulose pad face velocity",
+   "target": "fan-pad-evaporative-cooling",
+   "kind": "industry"
+  },
+  {
+   "term": "greenhouse temperature rise pad to fan",
+   "target": "fan-pad-evaporative-cooling",
+   "kind": "industry"
+  },
+  {
+   "term": "ppfd to dli",
+   "target": "ppfd-daily-light-integral",
+   "kind": "industry"
+  },
+  {
+   "term": "daily light integral greenhouse",
+   "target": "ppfd-daily-light-integral",
+   "kind": "industry"
+  },
+  {
+   "term": "mol per square meter per day",
+   "target": "ppfd-daily-light-integral",
+   "kind": "industry"
+  },
+  {
+   "term": "photosynthetic photon flux density",
+   "target": "ppfd-daily-light-integral",
+   "kind": "industry"
+  },
+  {
+   "term": "supplemental light dli target",
+   "target": "ppfd-daily-light-integral",
+   "kind": "industry"
+  },
+  {
+   "term": "grow light fixture count",
+   "target": "grow-light-fixture-count",
+   "kind": "industry"
+  },
+  {
+   "term": "supplemental lighting layout",
+   "target": "grow-light-fixture-count",
+   "kind": "industry"
+  },
+  {
+   "term": "ppf to ppfd fixture",
+   "target": "grow-light-fixture-count",
+   "kind": "industry"
+  },
+  {
+   "term": "horticultural lighting design",
+   "target": "grow-light-fixture-count",
+   "kind": "industry"
+  },
+  {
+   "term": "led fixture efficacy umol per joule",
+   "target": "grow-light-fixture-count",
+   "kind": "industry"
+  },
+  {
+   "term": "vapor pressure deficit",
+   "target": "vapor-pressure-deficit",
+   "kind": "industry"
+  },
+  {
+   "term": "vpd greenhouse",
+   "target": "vapor-pressure-deficit",
+   "kind": "industry"
+  },
+  {
+   "term": "leaf vpd calculation",
+   "target": "vapor-pressure-deficit",
+   "kind": "industry"
+  },
+  {
+   "term": "transpiration driving force",
+   "target": "vapor-pressure-deficit",
+   "kind": "industry"
+  },
+  {
+   "term": "humidity deficit kpa",
+   "target": "vapor-pressure-deficit",
+   "kind": "industry"
+  },
+  {
+   "term": "greenhouse co2 enrichment",
+   "target": "co2-enrichment-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "carbon dioxide injection rate",
+   "target": "co2-enrichment-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "co2 ppm greenhouse",
+   "target": "co2-enrichment-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "enrichment loss air change",
+   "target": "co2-enrichment-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "co2 burner greenhouse rate",
+   "target": "co2-enrichment-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "shade cloth percent transmission",
+   "target": "shade-cloth-transmission",
+   "kind": "industry"
+  },
+  {
+   "term": "greenhouse shading light loss",
+   "target": "shade-cloth-transmission",
+   "kind": "industry"
+  },
+  {
+   "term": "shade fabric dli",
+   "target": "shade-cloth-transmission",
+   "kind": "industry"
+  },
+  {
+   "term": "summer shade greenhouse",
+   "target": "shade-cloth-transmission",
+   "kind": "industry"
+  },
+  {
+   "term": "glazing plus shade transmission",
+   "target": "shade-cloth-transmission",
+   "kind": "industry"
+  },
+  {
+   "term": "greenhouse water use",
+   "target": "greenhouse-transpiration-water",
+   "kind": "industry"
+  },
+  {
+   "term": "crop transpiration rate",
+   "target": "greenhouse-transpiration-water",
+   "kind": "industry"
+  },
+  {
+   "term": "greenhouse irrigation demand",
+   "target": "greenhouse-transpiration-water",
+   "kind": "industry"
+  },
+  {
+   "term": "latent heat transpiration",
+   "target": "greenhouse-transpiration-water",
+   "kind": "industry"
+  },
+  {
+   "term": "greenhouse humidity load",
+   "target": "greenhouse-transpiration-water",
+   "kind": "industry"
+  },
+  {
+   "term": "greenhouse energy screen",
+   "target": "thermal-screen-energy-saving",
+   "kind": "industry"
+  },
+  {
+   "term": "thermal curtain heat saving",
+   "target": "thermal-screen-energy-saving",
+   "kind": "industry"
+  },
+  {
+   "term": "night curtain greenhouse",
+   "target": "thermal-screen-energy-saving",
+   "kind": "industry"
+  },
+  {
+   "term": "retractable screen payback",
+   "target": "thermal-screen-energy-saving",
+   "kind": "industry"
+  },
+  {
+   "term": "greenhouse heat retention screen",
+   "target": "thermal-screen-energy-saving",
+   "kind": "industry"
+  },
+  {
+   "term": "plug tray count",
+   "target": "plug-tray-cell-count",
+   "kind": "industry"
+  },
+  {
+   "term": "propagation seeding quantity",
+   "target": "plug-tray-cell-count",
+   "kind": "industry"
+  },
+  {
+   "term": "germination rate tray sowing",
+   "target": "plug-tray-cell-count",
+   "kind": "industry"
+  },
+  {
+   "term": "transplant plug order",
+   "target": "plug-tray-cell-count",
+   "kind": "industry"
+  },
+  {
+   "term": "bedding plant tray math",
+   "target": "plug-tray-cell-count",
+   "kind": "industry"
+  },
+  {
+   "term": "potting mix cubic yards",
+   "target": "substrate-container-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "nursery container media volume",
+   "target": "substrate-container-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "trade gallon container volume",
+   "target": "substrate-container-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "substrate bale count",
+   "target": "substrate-container-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "growing media takeoff",
+   "target": "substrate-container-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "photoperiod control greenhouse",
+   "target": "photoperiod-blackout-schedule",
+   "kind": "industry"
+  },
+  {
+   "term": "blackout cloth schedule",
+   "target": "photoperiod-blackout-schedule",
+   "kind": "industry"
+  },
+  {
+   "term": "night interruption lighting",
+   "target": "photoperiod-blackout-schedule",
+   "kind": "industry"
+  },
+  {
+   "term": "short day long day crop",
+   "target": "photoperiod-blackout-schedule",
+   "kind": "industry"
+  },
+  {
+   "term": "critical dark period",
+   "target": "photoperiod-blackout-schedule",
+   "kind": "industry"
+  },
+  {
+   "term": "leaching fraction greenhouse",
+   "target": "leaching-fraction-runoff-ec",
+   "kind": "industry"
+  },
+  {
+   "term": "runoff ec root zone",
+   "target": "leaching-fraction-runoff-ec",
+   "kind": "industry"
+  },
+  {
+   "term": "salt accumulation container",
+   "target": "leaching-fraction-runoff-ec",
+   "kind": "industry"
+  },
+  {
+   "term": "leachate ec monitoring",
+   "target": "leaching-fraction-runoff-ec",
+   "kind": "industry"
+  },
+  {
+   "term": "pour through ec",
+   "target": "leaching-fraction-runoff-ec",
+   "kind": "industry"
+  },
   {
    "term": "landfill airspace consumption",
    "target": "landfill-airspace-density",

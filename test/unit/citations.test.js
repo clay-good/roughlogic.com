@@ -139,7 +139,8 @@ test("Group G ramp-slope and trench-slope use structural governance; rainwater-y
 
 test("Group L audit coverage: every agriculture tile has a CITATIONS entry", async () => {
   const ids = await _groupIds("// Group L: Agriculture", "// Group M");
-  assert.ok(ids.length === 36, "expected 36 Group L tile ids, got " + ids.length);
+  // 36 + the 12 Group L tiles of the spec-v1750..v1762 greenhouse band.
+  assert.ok(ids.length === 48, "expected 48 Group L tile ids, got " + ids.length);
   for (const id of ids) assert.ok(CITATIONS[id], "Group L tile '" + id + "' missing CITATIONS entry");
 });
 

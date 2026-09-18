@@ -451,6 +451,24 @@
    "match": "*",
    "family": "fiber-optic outside plant",
    "justification": "Fiber-optic instruments, cable and component data sheets, and international transmission standards use metres or kilometres for optical distance, ps/nm/km for chromatic dispersion, dB/km for attenuation, and millimetres for microduct and cable diameters in US practice. These are the values a US technician reads directly from an OTDR, cable data sheet, or product label; converting the input surface to customary units would break the comparison it exists to make. Route and stored-slack quantities that are conventionally laid out in feet remain in feet. Verified 2026-09-13 with the outside-plant fiber band."
+  },
+  {
+   "module": "calc-greenhouse.js",
+   "match": "micromol/m^2/s",
+   "family": "greenhouse and controlled-environment agriculture",
+   "justification": "PPFD is reported in micromol per square metre per second worldwide, including by every US fixture manufacturer and extension service; there is no US-customary equivalent, and a footcandle reading is spectrum-weighted and cannot be converted for a horticultural fixture."
+  },
+  {
+   "module": "calc-greenhouse.js",
+   "match": "mol/m^2/day",
+   "family": "greenhouse and controlled-environment agriculture",
+   "justification": "Daily light integral is published in mol per square metre per day in US crop guidance; there is no US-customary form of the quantity."
+  },
+  {
+   "module": "calc-greenhouse.js",
+   "match": "mS/cm",
+   "family": "greenhouse and controlled-environment agriculture",
+   "justification": "Root-zone and feed electrical conductivity are read in mS/cm on every US horticultural EC meter and in extension pour-through guidance; there is no US-customary equivalent."
   }
  ]
 }

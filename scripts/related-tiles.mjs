@@ -2289,6 +2289,20 @@ const RELATED = {
   "landfill-settlement-airspace": ["landfill-airspace-density","daily-cover-volume","leachate-water-balance"],
   "collection-vehicle-payload": ["collection-route-productivity","transfer-station-throughput","dim-weight"],
   "working-face-cell-lift": ["landfill-airspace-density","daily-cover-volume","leachate-water-balance"],
+  // spec-v1750..v1762 greenhouse and controlled-environment agriculture band.
+  "greenhouse-vent-area": ["fan-pad-evaporative-cooling","thermal-screen-energy-saving","shade-cloth-transmission"],
+  "fan-pad-evaporative-cooling": ["greenhouse-vent-area","greenhouse-transpiration-water","shade-cloth-transmission"],
+  "ppfd-daily-light-integral": ["grow-light-fixture-count","shade-cloth-transmission","photoperiod-blackout-schedule"],
+  "grow-light-fixture-count": ["ppfd-daily-light-integral","photoperiod-blackout-schedule","shade-cloth-transmission"],
+  "vapor-pressure-deficit": ["greenhouse-transpiration-water","fan-pad-evaporative-cooling","psychrometric"],
+  "co2-enrichment-rate": ["greenhouse-vent-area","fan-pad-evaporative-cooling","ppfd-daily-light-integral"],
+  "shade-cloth-transmission": ["ppfd-daily-light-integral","fan-pad-evaporative-cooling","greenhouse-vent-area"],
+  "greenhouse-transpiration-water": ["vapor-pressure-deficit","leaching-fraction-runoff-ec","fan-pad-evaporative-cooling"],
+  "thermal-screen-energy-saving": ["greenhouse-vent-area","building-ua","ppfd-daily-light-integral"],
+  "plug-tray-cell-count": ["substrate-container-volume","greenhouse-transpiration-water","ppfd-daily-light-integral"],
+  "substrate-container-volume": ["plug-tray-cell-count","greenhouse-transpiration-water","mulch-topsoil-volume"],
+  "photoperiod-blackout-schedule": ["ppfd-daily-light-integral","grow-light-fixture-count","shade-cloth-transmission"],
+  "leaching-fraction-runoff-ec": ["greenhouse-transpiration-water","tds-from-conductivity","vapor-pressure-deficit"],
 };
 
 export { RELATED };
