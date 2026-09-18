@@ -232,7 +232,12 @@ the inverse, and the inverse's answer must land back on the
 forward input to 1e-6 relative. The test finds the pairs itself.
 On 2026-09-18 it found 103 pairs, and 84 of them connect by key
 name or an explicit map. A floor keeps that count from dropping.
-All 84 round-trip.
+All 84 round-trip. The other 19 are limit inverses, such as the
+longest run for a drop or the largest input for a room. Those run
+the other way: the inverse's answer goes into the forward tile,
+which must land exactly on the limit. All 19 do. The one
+tolerance is 8 ppm for voltage drop, where the forward tile
+computes 12 AWG as 6,529.9 cmil and NEC Table 8 prints 6,530.
 
 ## Per-group reviewer signoff (Phase H)
 

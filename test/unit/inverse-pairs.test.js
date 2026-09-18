@@ -8,9 +8,9 @@
 // Keys match by name, or after stripping a target_/max_/required_ prefix.
 // FEED names the forward output an inverse input takes when the names differ.
 // BACK names the forward input an inverse output lands on. SET fixes an
-// inverse input the forward tile has no key for. A pair none of these can
-// connect is counted but not run; the floor below keeps that count from
-// growing by accident.
+// inverse input the forward tile has no key for. The 19 pairs none of these
+// connect are limit inverses, run the other way under REVERSE below; the
+// floor keeps the forward count from falling by accident.
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -188,4 +188,63 @@ test("every declared inverse tile undoes its forward tile on the worked example"
 test("every FEED, BACK and SET entry names a declared pair", () => {
   const pairs = new Set(declaredPairs());
   for (const map of [FEED, BACK, SET]) for (const p of Object.keys(map)) assert.ok(pairs.has(p), `${p} is not a declared pair`);
+});
+
+// Limit inverses solve for the input at which a forward margin reaches zero,
+// and share few key names with the forward tile. These run the other way: the
+// inverse on its own example, its answer set into the forward tile (whose
+// remaining inputs come from the inverse's example where the names match),
+// and the forward tile must land on the inverse's target.
+// { set: { forwardInput: inverseOutput }, expect: { forwardOutput: inverseInput or inverseOutput }, tol? }
+const REVERSE = {
+  "block-redirect-load block-redirect-max-angle": { set: { direction_chg_deg: "max_angle_deg" }, expect: { resultant_lb: "block_wll_lb" } },
+  "coil-face-velocity coil-face-area": { set: { face_width_in: "square_side_in", face_height_in: "square_side_in" }, expect: { face_velocity_fpm: "target_fpm" } },
+  "combustion-air combustion-air-max-input": { set: { btu_input: "max_btu_input" }, expect: { required_volume_ft3: "room_volume_ft3" } },
+  "conduit-thermal-expansion conduit-expansion-max-run": { set: { run_length_ft: "max_run_ft" }, expect: { delta_l_in: "trigger_in" } },
+  "fiber-loss-budget fiber-max-length": { set: { length_m: "max_length_m" }, expect: { total_loss_db: "max_channel_loss_db" } },
+  "ground-potential-rise max-grid-resistance-for-touch": { set: { grid_resistance_ohm: "max_grid_resistance_ohm" }, expect: { gpr_v: "tolerable_touch_v" } },
+  "hoop-stress-thin-wall hoop-stress-mawp": { set: { P_psi: "p_max_psi" }, expect: { sigma_h_psi: "S_allow" } },
+  "hull-speed waterline-for-hull-speed": { set: { lwl_ft: "waterline_length_ft" }, expect: { hull_speed_kn: "target_hull_speed_kn" } },
+  "led-tape-run led-tape-max-run": { set: { run_length_ft: "max_run_ft" }, expect: { drop_pct: "drop_tolerance_pct" } },
+  "point-illuminance point-method-required-candela": { set: { intensity_cd: "required_cd" }, expect: { e_fc: "target_illuminance" } },
+  "projector-brightness projector-max-screen-size": { set: { screen_w_ft: "max_width_ft", screen_h_ft: "max_height_ft" }, expect: { required_lumens: "available_lumens" } },
+  "reineke-sdi thinning-target-tpa": { set: { trees_per_acre: "tpa_target" }, expect: { percent_max: "target_pct" } },
+  "room-acoustics room-absorption-target": { set: { total_sabins: "required_sabins" }, expect: { rt60_s: "target_rt60_s" } },
+  "septic-drainfield septic-drainfield-capacity": { set: { design_flow_gpd: "design_flow_gpd" }, expect: { trench_feet: "available_trench_ft" } },
+  "steam-pipe-velocity steam-pipe-capacity": { set: { steam_flow_lbhr: "capacity_lbhr" }, expect: { req_area_in2: "area_in2" } },
+  "taper-calc taper-diameter": { set: { large_dia_in: "large_dia_in", small_dia_in: "small_dia_in" }, expect: { tpf_in: "taper_per_foot" } },
+  "two-stroke-mix two-stroke-mix-ratio-check": { set: { ratio: "ratio" }, expect: { oil_oz: "oil_amount" } },
+  // The forward tile computes 12 AWG from the AWG formula (6,529.9 cmil); the
+  // inverse's example enters NEC Chapter 9 Table 8's printed 6,530. 8 ppm.
+  "voltage-drop max-circuit-length-for-vd": { set: { length_ft: "max_length_ft", awg: "12", source_voltage_V: "source_voltage_v", current_A: "current_a" }, expect: { percent: "target_vd_pct" }, tol: 2e-5 },
+  "voltage-drop min-conductor-for-vd": { set: { awg: "min_awg_copper" }, expect: { percent: "resulting_percent" } },
+};
+
+async function reverseTrip(pair) {
+  const [fwdId, invId] = pair.split(" ");
+  const spec = REVERSE[pair];
+  const ef = exampleFor(fwdId), ei = exampleFor(invId);
+  const fwd = (await importCalc(COMPUTE_MAP[fwdId].module))[COMPUTE_MAP[fwdId].fn];
+  const inv = (await importCalc(COMPUTE_MAP[invId].module))[COMPUTE_MAP[invId].fn];
+  const ib = ei.inputs, ob = inv(ib);
+  if (!ob || ob.error) return `inverse example errors: ${ob && ob.error}`;
+  const pick = (k) => (k in ob ? ob[k] : k in ib ? ib[k] : k);
+  const ia = { ...ef.inputs };
+  for (const k of Object.keys(ia)) if (k in ib) ia[k] = ib[k];
+  for (const [k, from] of Object.entries(spec.set)) ia[k] = pick(from);
+  const oa = fwd(ia);
+  if (!oa || oa.error) return `forward errors on the inverse answer: ${oa && oa.error}`;
+  const bad = Object.entries(spec.expect).filter(([o, from]) => !(typeof oa[o] === "number" && rel(oa[o], Number(pick(from))) <= (spec.tol || 1e-6)));
+  return bad.map(([o, from]) => `${o} = ${oa[o]}, inverse ${from} = ${pick(from)}`).join("; ");
+}
+
+test("every limit inverse puts its forward tile exactly at the limit", async () => {
+  const pairs = new Set(declaredPairs());
+  const failures = [];
+  for (const p of Object.keys(REVERSE)) {
+    assert.ok(pairs.has(p), `${p} is not a declared pair`);
+    const msg = await reverseTrip(p);
+    if (msg) failures.push(`${p}: ${msg}`);
+  }
+  assert.deepEqual(failures, []);
 });
