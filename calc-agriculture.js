@@ -2999,7 +2999,7 @@ export function computeManureStorageVolume({ daily_manure_ft3 = 0, wastewater_ft
   const precip_storm_ft3 = area * (precip + storm) / 12;
   const freeboard_ft3 = area * fb / 12;
   const total_ft3 = manure_volume_ft3 + precip_storm_ft3 + freeboard_ft3;
-  const total_gal = total_ft3 * 7.48052;
+  const total_gal = total_ft3 * (1728 / 231);
   const short_days = days < 120;
   return {
     manure_volume_ft3, precip_storm_ft3, freeboard_ft3, total_ft3, total_gal, short_days,
@@ -3062,7 +3062,7 @@ export function computeManureCoverSavings({ daily_manure_ft3 = 0, wastewater_ft3
   const freeboard_ft3 = area * fb / 12;
   const open_ft3 = manure_volume_ft3 + roof_saving_ft3 + freeboard_ft3;
   const covered_ft3 = open_ft3 - roof_saving_ft3;
-  const roof_saving_gal = roof_saving_ft3 * 7.48052;
+  const roof_saving_gal = roof_saving_ft3 * (1728 / 231);
   const percent_saved = open_ft3 > 0 ? roof_saving_ft3 / open_ft3 * 100 : 0;
   return {
     open_ft3, covered_ft3, roof_saving_ft3, roof_saving_gal, percent_saved,

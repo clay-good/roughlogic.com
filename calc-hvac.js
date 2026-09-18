@@ -1426,7 +1426,7 @@ export function computeAirReceiver({
   if (deficit > 0) {
     receiver_ft3 = (drawdown_minutes * deficit * p_atm_psi) / (p_high_psi - p_low_psi);
   }
-  const receiver_gal = receiver_ft3 * 7.4805;
+  const receiver_gal = receiver_ft3 * (1728 / 231);
   // Concurrent tools count: how many tools (in given order) total cfm <= pump+deficit-supply
   // Simpler: how many full tools the pump alone can sustain at duty cycle.
   let concurrent = 0;

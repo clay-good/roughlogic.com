@@ -740,7 +740,7 @@ export function computePoolVolume({ shape = "rectangle", length_ft = 0, width_ft
     return { error: "Shape must be rectangle, round, or oval." };
   }
   const volume_ft3 = area_ft2 * avg_depth_ft;
-  const gallons = volume_ft3 * 7.48052;
+  const gallons = volume_ft3 * (1728 / 231);
   return {
     area_ft2, avg_depth_ft, volume_ft3, gallons,
     note: "Pool volume = surface area x average depth x 7.48052 gal/ft^3, with average depth = (shallow + deep)/2 for a linearly sloping floor. Rectangle area = L x W, round = pi (D/2)^2, oval = (pi/4) L x W. A pool with a deep-end hopper, spa, or steps holds a bit less than the straight prism; measure or estimate the average depth carefully, since every chemical dose is figured per this gallonage. A field estimate; a metered fill or a plan takeoff is more exact.",

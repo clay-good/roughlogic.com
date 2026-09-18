@@ -802,13 +802,13 @@ import { computeSPL } from "../../calc-stage.js";
 import { computeRecipeScale, recipeScaleExample } from "../../calc-kitchen.js";
 
 test("computeStandingWater: bit-stable at the spec example (500 ft^2 / 1 in depth)", () => {
-  // Group D. 500 ft^2 * (1/12) ft = 41.666... ft^3; 41.666 * 7.4805 =
+  // Group D. 500 ft^2 * (1/12) ft = 41.666... ft^3; x 1728/231 =
   // 311.688 gal; 41.666 * 62.4 = 2600 lb (integer, exact). Pins the
-  // 7.4805 gal/ft^3 conversion and the 62.4 lb/ft^3 water-density
+  // exact 1728/231 gal/ft^3 conversion and the 62.4 lb/ft^3 water-density
   // constant that the §10.1 shared-constant row already governs at the
   // cross-tile level.
   const r = computeStandingWater({ area_ft2: 500, depth_in: 1 });
-  assert.equal(bits(r.gallons), "40737b0369d0369d", `gallons=${r.gallons}`);
+  assert.equal(bits(r.gallons), "40737b03531dec0d", `gallons=${r.gallons}`);
   assert.equal(bits(r.cubic_feet), "4044d55555555555", `cubic_feet=${r.cubic_feet}`);
   assert.equal(bits(r.pounds), "40a4500000000000", `pounds=${r.pounds}`);
 });

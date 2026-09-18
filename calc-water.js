@@ -204,7 +204,7 @@ export function computeDetentionBasinVolume({ target_minutes = 0, flow_gpm = 0 }
   if (!(t > 0)) return { error: "Target detention time must be positive (min)." };
   if (!(q > 0)) return { error: "Flow must be positive (GPM)." };
   const tank_volume_gal = t * q;
-  return { tank_volume_gal, tank_volume_ft3: tank_volume_gal / 7.48052, hours: t / 60 };
+  return { tank_volume_gal, tank_volume_ft3: tank_volume_gal / (1728 / 231), hours: t / 60 };
 }
 
 export const detentionBasinVolumeExample = { inputs: { target_minutes: 120, flow_gpm: 350 } };

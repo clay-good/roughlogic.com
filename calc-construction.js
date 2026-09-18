@@ -5987,7 +5987,7 @@ export function computeConcreteWashoutVolume({ trucks = 20, washout_gal_per_truc
   if (!(pit_depth_ft > 0)) return { error: "Pit depth must be positive (ft)." };
   if (freeboard_pct < 0) return { error: "Freeboard cannot be negative (percent)." };
   const total_gal = trucks * washout_gal_per_truck;
-  const required_cf = (total_gal / 7.48052) * (1 + freeboard_pct / 100);
+  const required_cf = (total_gal / (1728 / 231)) * (1 + freeboard_pct / 100);
   const required_cy = required_cf / 27;
   const pit_side_ft = Math.sqrt(required_cf / pit_depth_ft);
   if (![total_gal, required_cf, required_cy, pit_side_ft].every(Number.isFinite)) return { error: "Washout-volume math is not a finite value." };
@@ -7697,7 +7697,7 @@ export function computeAnnularGroutVolume({ bore_dia_in = 0, carrier_od_in = 0, 
   const annular_area_in2 = (Math.PI / 4) * (bore_dia_in * bore_dia_in - carrier_od_in * carrier_od_in);
   const neat_ft3 = (annular_area_in2 / 144) * length_ft;
   const grout_cy = (neat_ft3 / 27) * (1 + waste_pct / 100);
-  const grout_gal = neat_ft3 * 7.48052 * (1 + waste_pct / 100);
+  const grout_gal = neat_ft3 * (1728 / 231) * (1 + waste_pct / 100);
   if (![annular_area_in2, neat_ft3, grout_cy, grout_gal].every(Number.isFinite)) return { error: "Grout-volume math is not a finite value." };
   return {
     annular_area_in2,

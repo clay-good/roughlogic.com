@@ -1460,7 +1460,7 @@ export function computeDewateringRate({ pit_len_ft, pit_wid_ft, drawdown_ft = 0,
   if (!Number.isFinite(drawMin) || drawMin <= 0) return { error: "Drawdown time must be a positive finite number (min)." };
   if (!Number.isFinite(inflow) || inflow < 0) return { error: "Inflow must be a non-negative finite number (gpm)." };
   if (!Number.isFinite(safety) || safety < 0) return { error: "Safety margin must be a non-negative finite percent." };
-  const drawdownGal = len * wid * draw * 7.48052;
+  const drawdownGal = len * wid * draw * (1728 / 231);
   const pumpGpm = drawdownGal / drawMin + inflow;
   const sizedGpm = pumpGpm * (1 + safety / 100);
   if (![drawdownGal, pumpGpm, sizedGpm].every(Number.isFinite)) return { error: "Dewatering math is not a finite value." };

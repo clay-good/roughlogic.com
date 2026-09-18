@@ -509,7 +509,7 @@ export function computeStandingWater({ area_ft2, depth_in }) {
   const d = Number(depth_in) || 0;
   if (a <= 0 || d <= 0) return { error: "Provide positive area and depth." };
   const cubic_feet = (a * d) / 12;
-  const gallons = cubic_feet * 7.48052;
+  const gallons = cubic_feet * (1728 / 231);
   const pounds = cubic_feet * 62.4;
   return { gallons, cubic_feet, pounds };
 }
@@ -1832,7 +1832,7 @@ export function computeCeilingWaterLoad({ pooled_area_ft2 = 0, avg_depth_in = 0,
   if (!(area > 0)) return { error: "Pooled area must be positive (ft2)." };
   if (!(depth > 0)) return { error: "Average depth must be positive (in)." };
   const depth_ft = depth / 12;
-  const water_volume_gal = area * depth_ft * 7.48052; // 1 ft^3 = 7.48052 gal
+  const water_volume_gal = area * depth_ft * (1728 / 231); // 1 ft^3 = 7.48052 gal
   const water_weight_lb = area * depth_ft * 62.4;      // water ~ 62.4 lb/ft^3
   const load_psf = depth_ft * 62.4;                    // distributed load, depth-only
   const drain_first = load_psf > thr;
@@ -3048,7 +3048,7 @@ export function computeWaterExtractionRate({ area_sqft = 0, standing_depth_in = 
   if (!(extraction_rate_gpm > 0)) return { error: "Effective extraction rate must be positive." };
   if (!(waste_tank_gal > 0)) return { error: "Waste tank capacity must be positive." };
   if (!(dehu_gal_per_day > 0)) return { error: "Dehumidifier removal rate must be positive." };
-  const standing_gal = area_sqft * (standing_depth_in / 12) * 7.48052;
+  const standing_gal = area_sqft * (standing_depth_in / 12) * (1728 / 231);
   const absorbed_gal = area_sqft * absorption_gal_per_sqft;
   const total_gal = standing_gal + absorbed_gal;
   const wand_time_min = total_gal / extraction_rate_gpm;
@@ -3108,7 +3108,7 @@ export function computeSewageLossDisposal({ soft_area_sqft = 0, soft_thickness_i
   // Debris does not stay the size it was on the wall: carpet and pad in
   // particular bulk enormously once cut out and rolled.
   const loose_cf = in_place_cf * bulking_factor;
-  const bag_cf = bag_capacity_gal / 7.48052;
+  const bag_cf = bag_capacity_gal / (1728 / 231);
   const bag_count = Math.ceil(loose_cf / bag_cf);
   const container_cf = container_cy * 27;
   const container_utilization_pct = loose_cf / container_cf * 100;

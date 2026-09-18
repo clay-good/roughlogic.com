@@ -4339,7 +4339,7 @@ export function computeStormwaterDetentionVolume({ runoff_c = 0, intensity_in_hr
   const storage_cf = (q_in_cfs - qa) * dur * 60;
   const storage_ac_ft = storage_cf / 43560;
   return {
-    q_in_cfs, storage_cf, storage_ac_ft, storage_gal: storage_cf * 7.48052,
+    q_in_cfs, storage_cf, storage_ac_ft, storage_gal: storage_cf * (1728 / 231),
     note: "Modified Rational detention volume: the peak inflow Q_in = C i A (the Rational method, C runoff coefficient, i design intensity in in/hr, A in acres gives cfs directly), and the required storage = (Q_in - Q_allow) x duration x 60, the volume that must be held while the outlet passes only the allowable (pre-development) release. Because a longer, lighter storm can require MORE storage than the short intense one, the critical duration must be searched by trying several durations off the IDF curve and taking the largest volume. This sizes one duration; the routing, the outlet structure, and the local drainage ordinance govern. A design aid; the engineer of record governs.",
   };
 }

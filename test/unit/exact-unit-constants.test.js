@@ -162,3 +162,27 @@ test("no two modules define the same named numeric constant differently", () => 
       `${name}: ` + [...byValue.entries()].map(([v, fs]) => `${v} in ${fs.join("/")}`).join("  vs  "));
   assert.deepEqual(conflicts, []);
 });
+
+// The same factor written inline. On 2026-09-18 seventeen code lines across ten
+// modules multiplied by 7.48052, 7.4805 or 7.48 -- up to 70 ppm off 1728 / 231
+// -- where the table above could not see them. They now read (1728 / 231).
+// An inline literal is allowed only where the tile's own cited formula prints
+// it, and each such line is named here with its reason.
+const INLINE_GALLON_ALLOWED = new Map([
+  ["calc-treatment.js", "the WEF operator formula for digester detention time, DT = volume x 7.48 / feed, as the cited courses print it"],
+]);
+
+test("no code line converts cubic feet to gallons with a truncated inline 7.48", () => {
+  const found = [];
+  for (const file of readdirSync(ROOT).filter((f) => /^calc-.*\.js$/.test(f))) {
+    const lines = readFileSync(resolve(ROOT, file), "utf8").split("\n");
+    lines.forEach((line, i) => {
+      if (/^\s*\/\//.test(line)) return;
+      // Strings carry citation prose, which may print the rounded figure.
+      const code = line.replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`/g, '""').replace(/\/\/.*$/, "");
+      // Only as a multiplier or divisor: HEPES's pKa of 7.48 is not a gallon.
+      if (/[*/]\s*7\.48\d*\b|\b7\.48\d*\s*[*/]/.test(code) && !INLINE_GALLON_ALLOWED.has(file)) found.push(`${file}:${i + 1}: ${line.trim()}`);
+    });
+  }
+  assert.deepEqual(found, []);
+});

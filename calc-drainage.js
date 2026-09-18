@@ -205,7 +205,7 @@ export function computeSumpBasinSizing({ basin_dia, drawdown_in, inflow_gpm, pum
   if (inflow >= pump) return { error: "Inflow must be less than the pump rate, or the pump never empties the basin." };
   if (!Number.isFinite(minRun) || minRun < 0) return { error: "Minimum run time must be a non-negative finite number (s)." };
   const areaFt2 = Math.PI / 4 * Math.pow(dia / 12, 2);
-  const drawdownGal = areaFt2 * (band / 12) * 7.48;
+  const drawdownGal = areaFt2 * (band / 12) * (1728 / 231);
   const runTimeS = drawdownGal / (pump - inflow) * 60;
   const fillTimeS = drawdownGal / inflow * 60;
   const cyclesPerHr = 3600 / (runTimeS + fillTimeS);
@@ -819,7 +819,7 @@ export function computeCurveNumberRunoff({ rainfall_in = 0, curve_number = 0, ar
   if (area > 0) {
     runoff_volume_acreft = (runoff_in / 12) * area;          // in x acres / 12 = acre-ft
     runoff_volume_ft3 = runoff_volume_acreft * 43560;
-    runoff_gal = runoff_volume_ft3 * 7.48052;
+    runoff_gal = runoff_volume_ft3 * (1728 / 231);
   }
   if (![S, Ia, runoff_in, runoff_coefficient].every(Number.isFinite)) return { error: "Curve-number math is not a finite value." };
   return {
@@ -1811,7 +1811,7 @@ export function computeWaterQualityVolume({ rainfall_depth_in = 0, impervious_pe
   const runoff_coefficient = rv(impervious_percent);
   const wqv_cf = rainfall_depth_in * runoff_coefficient * area_ac * CF_PER_IN_ACRE;
   const wqv_ac_ft = wqv_cf / CF_PER_ACRE_FT;
-  const wqv_gal = wqv_cf * 7.48052;
+  const wqv_gal = wqv_cf * (1728 / 231);
   const alternative_runoff_coefficient = alternative_impervious_percent > 0 ? rv(alternative_impervious_percent) : null;
   const alternative_wqv_cf = alternative_runoff_coefficient === null ? null : rainfall_depth_in * alternative_runoff_coefficient * area_ac * CF_PER_IN_ACRE;
   const volume_saved_cf = alternative_wqv_cf === null ? null : wqv_cf - alternative_wqv_cf;

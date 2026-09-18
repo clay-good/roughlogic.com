@@ -333,7 +333,7 @@ export function computeDrypipeAirCompressor({ dry_volume_gal = 400, normal_press
   if (!(dry_volume_gal > 0)) return { error: "Dry system volume must be positive (gal)." };
   if (!(normal_pressure_psig > 0)) return { error: "Normal air pressure must be positive (psig)." };
   if (!(restore_minutes > 0)) return { error: "Restore time must be positive (min)." };
-  const system_ft3 = dry_volume_gal / 7.48;
+  const system_ft3 = dry_volume_gal / (1728 / 231);
   // Free air to pressurize the system volume to the normal gauge pressure = V x (P_gauge / atmospheric);
   // spread over the NFPA 13 restore time gives the compressor free-air CFM.
   const free_air_cfm = system_ft3 * (normal_pressure_psig / 14.7) / restore_minutes;

@@ -1411,7 +1411,7 @@ test("bounds: spec-v699 computeDetentionBasinVolume pins volume = target_minutes
   const r = computeDetentionBasinVolume({ target_minutes: 120, flow_gpm: 350 });
   assert.ok(!r.error, JSON.stringify(r));
   assert.ok(Math.abs(r.tank_volume_gal - 42000) < 1e-9, `volume identity: ${r.tank_volume_gal}`);
-  assert.ok(Math.abs(r.tank_volume_ft3 - 42000 / 7.48052) < 1e-6, `ft3: ${r.tank_volume_ft3}`);
+  assert.ok(Math.abs(r.tank_volume_ft3 - 42000 / (1728 / 231)) < 1e-6, `ft3: ${r.tank_volume_ft3}`);
   // Round-trip: at the required volume the forward tile's detention time equals the target.
   for (const target_minutes of [15, 120, 600]) {
     for (const flow_gpm of [10, 350, 2000]) {
@@ -2269,7 +2269,7 @@ test("bounds: calc-restoration computeStandingWater pins gallons = (area * depth
       assert.ok(!r.error, `${area_ft2} x ${depth_in}: ${JSON.stringify(r)}`);
       const expected_ft3 = (area_ft2 * depth_in) / 12;
       assert.ok(Math.abs(r.cubic_feet - expected_ft3) < 1e-12, `ft^3 identity`);
-      assert.ok(Math.abs(r.gallons - expected_ft3 * 7.48052) < 1e-9, `gal identity`);
+      assert.ok(Math.abs(r.gallons - expected_ft3 * (1728 / 231)) < 1e-9, `gal identity`);
       assert.ok(Math.abs(r.pounds - expected_ft3 * 62.4) < 1e-9, `lb identity`);
     }
   }
@@ -7401,7 +7401,7 @@ test("bounds: calc-hvac computeAirReceiver pins receiver_ft3 = t*(demand - pump)
   assert.ok(Math.abs(r.deficit_scfm - 0.6) < 1e-9);
   const expected_ft3 = (1 * 0.6 * 14.7) / (175 - 125);
   assert.ok(Math.abs(r.receiver_ft3 - expected_ft3) < 1e-9);
-  assert.ok(Math.abs(r.receiver_gal - expected_ft3 * 7.4805) < 1e-9);
+  assert.ok(Math.abs(r.receiver_gal - expected_ft3 * (1728 / 231)) < 1e-9);
   // Concurrent: 2 (first two acc <= 5).
   assert.strictEqual(r.concurrent, 2);
   // Rejections.
@@ -11569,15 +11569,15 @@ test("bounds: calc-plumbing v62 roof-drain-sizing + sump-basin-sizing pin storm 
   assert.ok("error" in _v62b1({ roof_area: 5000, rainfall_rate: 4, leader_table: [[6, 290], [3, 90]] })); // non-monotonic table
   // 24 in basin, 12 in band, 10 inflow, 30 pump, 60 s min -> 23.5 gal, 70.5 s run, 141 s fill, 17.0 cyc, adequate
   const s = _v62b2({ basin_dia: 24, drawdown_in: 12, inflow_gpm: 10, pump_gpm: 30, min_run_s: 60 });
-  assert.ok(Math.abs(s.drawdown_gal - 23.499113) < 1e-4);
-  assert.ok(Math.abs(s.run_time_s - 70.497339) < 1e-4);
-  assert.ok(Math.abs(s.fill_time_s - 140.994678) < 1e-4);
-  assert.ok(Math.abs(s.cycles_per_hr - 17.021919) < 1e-4);
+  assert.ok(Math.abs(s.drawdown_gal - 23.500745) < 1e-4);
+  assert.ok(Math.abs(s.run_time_s - 70.502235) < 1e-4);
+  assert.ok(Math.abs(s.fill_time_s - 141.004470) < 1e-4);
+  assert.ok(Math.abs(s.cycles_per_hr - 17.020737) < 1e-4);
   assert.strictEqual(s.adequate, true);
   // inflow raised to 25 GPM (pump 30) -> run 281.99 s, fill 56.40 s, still adequate, slower-cycling
   const s2 = _v62b2({ basin_dia: 24, drawdown_in: 12, inflow_gpm: 25, pump_gpm: 30, min_run_s: 60 });
-  assert.ok(Math.abs(s2.run_time_s - 281.989357) < 1e-4);
-  assert.ok(Math.abs(s2.fill_time_s - 56.397871) < 1e-4);
+  assert.ok(Math.abs(s2.run_time_s - 282.008941) < 1e-4);
+  assert.ok(Math.abs(s2.fill_time_s - 56.401788) < 1e-4);
   assert.ok("error" in _v62b2({ basin_dia: 0, drawdown_in: 12, inflow_gpm: 10, pump_gpm: 30 })); // non-positive dimension
   assert.ok("error" in _v62b2({ basin_dia: 24, drawdown_in: 12, inflow_gpm: 30, pump_gpm: 30 })); // inflow >= pump
   assert.ok("error" in _v62b2({ basin_dia: 24, drawdown_in: 12, inflow_gpm: 10, pump_gpm: 0 })); // non-positive pump
@@ -20388,12 +20388,12 @@ test("bounds: spec-v768 computePoolVolume pins area/avg-depth/gallons per shape,
   assert.strictEqual(r.area_ft2, 512);
   assert.strictEqual(r.avg_depth_ft, 5.5);
   assert.ok(Math.abs(r.volume_ft3 - 2816) < 1e-9);
-  assert.ok(Math.abs(r.gallons - 2816 * 7.48052) < 1e-6);
+  assert.ok(Math.abs(r.gallons - 2816 * (1728 / 231)) < 1e-6);
   assert.ok(Math.abs(r.gallons - 21065.1) < 0.5);
   // Round area = pi (D/2)^2: a 20 ft round pool, 5 ft constant depth.
   const round = _v768({ shape: "round", diameter_ft: 20, shallow_ft: 5, deep_ft: 5 });
   assert.ok(Math.abs(round.area_ft2 - Math.PI * 100) < 1e-9);
-  assert.ok(Math.abs(round.gallons - Math.PI * 100 * 5 * 7.48052) < 1e-6);
+  assert.ok(Math.abs(round.gallons - Math.PI * 100 * 5 * (1728 / 231)) < 1e-6);
   // Oval area = (pi/4) L W = the rectangle's area x pi/4 for the same L, W and depth.
   const rect = _v768({ shape: "rectangle", length_ft: 40, width_ft: 20, shallow_ft: 4, deep_ft: 4 });
   const oval = _v768({ shape: "oval", length_ft: 40, width_ft: 20, shallow_ft: 4, deep_ft: 4 });
@@ -26447,7 +26447,7 @@ test("bounds: spec-v582 computeManureStorageVolume pins the manure, precipitatio
   assert.ok(Math.abs(r.precip_storm_ft3 - 8000 * 10 / 12) < 1e-9);
   assert.ok(Math.abs(r.freeboard_ft3 - 8000) < 1e-9); // 8000*12/12
   assert.ok(Math.abs(r.total_ft3 - (20400 + 8000 * 10 / 12 + 8000)) < 1e-9);
-  assert.ok(Math.abs(r.total_gal - r.total_ft3 * 7.48052) < 1e-6);
+  assert.ok(Math.abs(r.total_gal - r.total_ft3 * (1728 / 231)) < 1e-6);
   // Manure alone (no water banked) badly undersizes.
   const dry = _v582({ daily_manure_ft3: 150, wastewater_ft3: 0, bedding_ft3: 20, storage_days: 120, surface_area_ft2: 0, net_precip_in: 0, storm_in: 0, freeboard_in: 0 });
   assert.ok(Math.abs(dry.total_ft3 - 20400) < 1e-9);
@@ -28913,11 +28913,11 @@ import { computeDrypipeAirCompressor as _v934 } from "../../calc-firesprinkler.j
 
 test("bounds: spec-v934 computeDrypipeAirCompressor pins the volume, free-air CFM, and error seams", () => {
   const r = _v934({ dry_volume_gal: 400, normal_pressure_psig: 40, restore_minutes: 30 });
-  assert.ok(Math.abs(r.system_ft3 - 53.4759) < 1e-3); // 400/7.48
-  assert.ok(Math.abs(r.free_air_cfm - 4.850425) < 1e-4); // 53.48*(40/14.7)/30
-  assert.ok(Math.abs(_v934({ dry_volume_gal: 750, normal_pressure_psig: 40, restore_minutes: 30 }).free_air_cfm - 9.094547) < 1e-4);
+  assert.ok(Math.abs(r.system_ft3 - 400 / (1728 / 231)) < 1e-9); // 400 gal at 231 cu in each
+  assert.ok(Math.abs(r.free_air_cfm - 4.850088) < 1e-4); // 53.47*(40/14.7)/30
+  assert.ok(Math.abs(_v934({ dry_volume_gal: 750, normal_pressure_psig: 40, restore_minutes: 30 }).free_air_cfm - 9.093915) < 1e-4);
   // A 60 min restore halves the CFM.
-  assert.ok(Math.abs(_v934({ dry_volume_gal: 400, normal_pressure_psig: 40, restore_minutes: 60 }).free_air_cfm - 4.850425 / 2) < 1e-4);
+  assert.ok(Math.abs(_v934({ dry_volume_gal: 400, normal_pressure_psig: 40, restore_minutes: 60 }).free_air_cfm - 4.850088 / 2) < 1e-4);
   // Error seams: non-positive volume / pressure / time, non-finite.
   assert.ok("error" in _v934({ dry_volume_gal: 0, normal_pressure_psig: 40, restore_minutes: 30 }));
   assert.ok("error" in _v934({ dry_volume_gal: 400, normal_pressure_psig: 0, restore_minutes: 30 }));
@@ -31158,7 +31158,7 @@ test("bounds: spec-v1201 computeCurveNumberRunoff pins the SCS runoff equation, 
   // Volume: (Q/12) x acres = acre-ft, then x 43560 ft^3, x 7.48052 gal.
   assert.ok(Math.abs(r.runoff_volume_acreft - (r.runoff_in / 12) * 10) < 1e-9);
   assert.ok(Math.abs(r.runoff_volume_ft3 - r.runoff_volume_acreft * 43560) < 1e-6);
-  assert.ok(Math.abs(r.runoff_gal - r.runoff_volume_ft3 * 7.48052) < 1e-6);
+  assert.ok(Math.abs(r.runoff_gal - r.runoff_volume_ft3 * (1728 / 231)) < 1e-6);
   // Ia threshold: a storm at or below Ia produces exactly zero runoff.
   assert.strictEqual(_v1201({ rainfall_in: 0.3, curve_number: 70 }).runoff_in, 0);
   assert.strictEqual(_v1201({ rainfall_in: 0.85, curve_number: 70 }).runoff_coefficient, 0);
