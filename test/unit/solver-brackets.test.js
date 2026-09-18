@@ -34,3 +34,12 @@ test("insulation surface-limit solve errors rather than return its 12 in bracket
   const r = computeInsulationThickness({ pipe_od_in: 1, surface_temp_F: 250, ambient_F: 75, surface_limit_F: 75.5, k_btu_in_per_hr_ft2_F: 0.27 });
   assert.ok("error" in r);
 });
+
+test("insulation alternative-film solve says 'more than 12 in' rather than report 12.00", () => {
+  const r = computeInsulationThickness({ pipe_od_in: 1, surface_temp_F: 250, ambient_F: 75, surface_limit_F: 77, k_btu_in_per_hr_ft2_F: 0.27, alt_film_coeff_btu_hr_ft2_F: 0.5 });
+  assert.equal(r.alt_thickness_in, null);
+  assert.ok(r.alt_film_verdict.includes("more than 12 in"));
+  // Inside the bracket the alternative solve is unchanged.
+  const ok = computeInsulationThickness({ pipe_od_in: 1, surface_temp_F: 250, ambient_F: 75, surface_limit_F: 120, k_btu_in_per_hr_ft2_F: 0.27, alt_film_coeff_btu_hr_ft2_F: 4 });
+  assert.ok(Math.abs(ok.alt_thickness_in - 0.169157) < 1e-5);
+});

@@ -643,21 +643,25 @@ export function computeInsulationThickness({
   // is an input rather than a constant.
   const has_alt_film = alt_film_coeff_btu_hr_ft2_F > 0;
   let alt_thickness_in = 0;
+  let alt_beyond_bracket = false;
   if (has_alt_film) {
     let alo = r1 + 1e-3, ahi = r1 + 12;
+    // Same bracket guard as the main solve: past 12 in, say so rather than
+    // report the bracket edge as the answer.
+    alt_beyond_bracket = (2 * Math.PI * k * Td_minus_Ts) / Math.log(ahi / r1) > alt_film_coeff_btu_hr_ft2_F * (Math.PI * 2 * ahi / 12) * allowable_outer_dT;
     for (let i = 0; i < 80; i++) {
       const mid = (alo + ahi) / 2;
       const q_through = (2 * Math.PI * k * Td_minus_Ts) / Math.log(mid / r1);
       const q_out = alt_film_coeff_btu_hr_ft2_F * (Math.PI * 2 * mid / 12) * allowable_outer_dT;
       if (q_through > q_out) alo = mid; else ahi = mid;
     }
-    alt_thickness_in = (alo + ahi) / 2 - r1;
+    alt_thickness_in = alt_beyond_bracket ? null : (alo + ahi) / 2 - r1;
   }
   const alt_surface_at_thickness_F = has_alt_film && has_at_thickness ? surfaceAt(at_thickness_in, alt_film_coeff_btu_hr_ft2_F) : null;
   const alt_film_verdict = !has_alt_film
     ? "(no alternative film coefficient entered)"
     : "at a film coefficient of " + fmt(alt_film_coeff_btu_hr_ft2_F, 2) + " the target takes "
-      + fmt(alt_thickness_in, 2) + " in against " + fmt(thickness_in, 2) + " in at "
+      + (alt_beyond_bracket ? "more than 12" : fmt(alt_thickness_in, 2)) + " in against " + fmt(thickness_in, 2) + " in at "
       + fmt(outside_film_coeff_btu_hr_ft2_F, 2)
       + (alt_surface_at_thickness_F !== null
         ? ", and the stated thickness would run " + fmt(alt_surface_at_thickness_F, 0) + " degF at the surface rather than " + fmt(surface_at_thickness_F, 0)
