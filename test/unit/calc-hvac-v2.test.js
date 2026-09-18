@@ -305,7 +305,7 @@ test("Wet-bulb: RH bounded [0,100]", () => {
 test("Insulation: example yields positive thickness in band", () => {
   const r = computeInsulationThickness(insulationThicknessExample.inputs);
   assert.ok(!r.error);
-  assert.ok(r.thickness_in > 0.4 && r.thickness_in < 3.0);
+  assert.ok(r.thickness_in > 0.3 && r.thickness_in < 0.45); // 0.364 in: conduction per foot takes k/12
 });
 
 test("Insulation: surface limit above pipe surface returns error", () => {

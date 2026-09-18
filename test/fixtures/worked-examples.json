@@ -8450,12 +8450,12 @@
   },
   {
    "tile_id": "insulation-thickness",
-   "source_publisher": "ASHRAE Handbook (Fundamentals)",
-   "source_title": "Insulation thickness to hold outer surface temperature at limit: radial conduction with surface convection",
-   "source_edition_or_year": "ASHRAE Fundamentals heat-transfer chapter (radial conduction over pipe insulation)",
-   "source_section_or_page": "1 in OD pipe at 250 F into 75 F ambient, 120 F surface limit, k=0.27 BTU in/hr-ft^2-F -> ~2.61 in thickness (r2 = 3.11 in)",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Insulation thickness to hold outer surface temperature at limit: radial conduction per foot of pipe, 2 pi (k/12) dT / ln(r2/r1), against the outside film h (2 pi r2/12) dT",
+   "source_edition_or_year": "heat-transfer relation, cross-checked against pipe-heat-loss-radial and an SI re-derivation",
+   "source_section_or_page": "1 in OD pipe at 250 F into 75 F ambient, 120 F surface limit, k=0.27 BTU in/hr-ft^2-F h=1.65 -> 0.364 in thickness (r2 = 0.864 in); k is per inch, so conduction per foot of pipe takes k/12",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-18",
    "inputs": {
     "pipe_od_in": 1,
     "surface_temp_F": 250,
@@ -8465,13 +8465,13 @@
    },
    "outputs": {
     "thickness_in": {
-     "value": 2.61,
+     "value": 0.364,
      "tolerance": {
       "abs": 0.05
      }
     },
     "r2_in": {
-     "value": 3.11,
+     "value": 0.864,
      "tolerance": {
       "abs": 0.05
      }
@@ -75716,9 +75716,9 @@
    "source_publisher": "public engineering relations",
    "source_title": "cold-line condensation-control minimum wall, 1-in chilled line (spec-v1024)",
    "source_edition_or_year": "cylindrical conduction + Magnus psychrometrics",
-   "source_section_or_page": "1-in OD at 40 F in 75 F / 50% RH -> dew point 55.1 F, minimum wall 0.92 in (round UP to the next stock size); matches ~1-in manufacturer condensation-table walls for these conditions",
+   "source_section_or_page": "1-in OD at 40 F in 75 F / 50% RH -> dew point 55.1 F, minimum wall 0.112 in (round UP to the next stock size); conduction per foot of pipe takes k/12 for k entered per inch",
    "verified_by": "rl",
-   "verified_on": "2026-07-27",
+   "verified_on": "2026-09-18",
    "inputs": {
     "pipe_od_in": 1,
     "pipe_temp_F": 40,
@@ -75735,13 +75735,13 @@
      }
     },
     "thickness_in": {
-     "value": 0.92434,
+     "value": 0.11246,
      "tolerance": {
       "abs": 0.0005
      }
     },
     "r2_in": {
-     "value": 1.42434,
+     "value": 0.61246,
      "tolerance": {
       "abs": 0.0005
      }
@@ -109398,7 +109398,7 @@
    "source_edition_or_year": "spec-v1675 of scope-trade-expansion-2, 2026-09-09",
    "source_section_or_page": "the standards named in the tile citation govern",
    "verified_by": "rl",
-   "verified_on": "2026-09-09",
+   "verified_on": "2026-09-18",
    "inputs": {
     "pipe_od_in": 1,
     "surface_temp_F": 250,
@@ -109410,19 +109410,19 @@
    },
    "outputs": {
     "thickness_in": {
-     "value": 2.6059,
+     "value": 0.3641,
      "tolerance": {
       "pct": 0.5
      }
     },
     "surface_at_thickness_F": {
-     "value": 170.1,
+     "value": 90.81,
      "tolerance": {
       "pct": 0.5
      }
     },
     "alt_thickness_in": {
-     "value": 1.315,
+     "value": 0.1692,
      "tolerance": {
       "pct": 0.5
      }

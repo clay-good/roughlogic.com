@@ -556,7 +556,7 @@ export const wetBulbPsychrometerExample = {
 
 // --- Utility 84: Pipe Insulation Thickness ---
 //
-// Q = 2*pi*k*L*dT / ln(r2/r1) per unit length L=1.
+// Q = 2*pi*(k/12)*L*dT / ln(r2/r1) per unit length L=1, k entered per inch.
 // Outer surface temperature is governed by ambient + Q*R_out where R_out
 // is the outside film resistance. For estimation, iterate on r2 (i.e.
 // thickness = r2 - r1) until Q matches a target heat loss that yields
@@ -588,18 +588,27 @@ export function computeInsulationThickness({
   if (allowable_outer_dT <= 0) return { error: "Surface limit must exceed ambient." };
   // Iterate r2 such that q (per ft) flows through insulation and equals
   // outside film flux at allowable surface dT:
-  //   q_through = 2*pi*k*(Td - Tsurf) / ln(r2/r1)  (k converted to per inch)
+  //   q_through = 2*pi*(k/12)*(Td - Tsurf) / ln(r2/r1)
   //   q_out     = h * A_out * dT_out = h * (pi*2*r2/12) * allowable_outer_dT
+  // Both per foot of pipe. k is entered per INCH of thickness, so conduction
+  // per foot of pipe takes k/12 (BTU/hr-ft-F); until 2026-09-18 it took k
+  // itself, which ran conduction 12 times high and asked for 2.61 in of
+  // insulation where 0.36 in holds the example's 120 F surface.
   // Set Td - Tsurf = surface_temp_F - surface_limit_F.
   // Solve for r2.
-  const k = k_btu_in_per_hr_ft2_F; // BTU * in / (hr ft^2 F)
+  const k = k_btu_in_per_hr_ft2_F / 12; // BTU / (hr ft F)
   const Td_minus_Ts = surface_temp_F - surface_limit_F;
   if (Td_minus_Ts <= 0) {
     return { error: "Surface limit must be below pipe surface temp." };
   }
-  // Bisection on r2 in inches.
+  // Bisection on r2 in inches. Conduction falls and film loss rises with r2,
+  // so the root is unique; if conduction still wins at 12 in, it lies beyond
+  // the bracket and bisection would return the bracket edge as an answer.
   let lo = r1 + 1e-3;
   let hi = r1 + 12;
+  if ((2 * Math.PI * k * Td_minus_Ts) / Math.log(hi / r1) > outside_film_coeff_btu_hr_ft2_F * (Math.PI * 2 * hi / 12) * allowable_outer_dT) {
+    return { error: "More than 12 in of insulation would be needed to hold that surface limit; check the inputs or raise the limit." };
+  }
   for (let i = 0; i < 80; i++) {
     const mid = (lo + hi) / 2;
     const q_through = (2 * Math.PI * k * Td_minus_Ts) / Math.log(mid / r1);
@@ -624,7 +633,7 @@ export function computeInsulationThickness({
   };
   const has_at_thickness = at_thickness_in > 0;
   const surface_at_thickness_F = has_at_thickness ? surfaceAt(at_thickness_in, outside_film_coeff_btu_hr_ft2_F) : null;
-  const at_thickness_meets = has_at_thickness && surface_at_thickness_F !== null && surface_at_thickness_F <= surface_limit_F;
+  const at_thickness_meets = has_at_thickness && surface_at_thickness_F !== null && surface_at_thickness_F <= surface_limit_F + 1e-9; // round-off: the solved thickness fed back lands within 1e-14 F
   const at_thickness_verdict = !has_at_thickness
     ? "(no stated thickness entered)"
     : fmt(at_thickness_in, 2) + " in of insulation leaves the surface at " + fmt(surface_at_thickness_F, 0)
@@ -886,7 +895,7 @@ export function renderWetBulbPsychrometer(inputRegion, outputRegion, citationEl)
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderInsulationThickness(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Cylindrical conduction Q = 2*pi*k*L*dT / ln(r2/r1) iterated against an outside film coefficient (~1.65 BTU/hr/ft^2/F still air).";
+  citationEl.textContent = "Citation: Cylindrical conduction Q = 2*pi*(k/12)*L*dT / ln(r2/r1), k per inch of thickness, iterated against an outside film coefficient (~1.65 BTU/hr/ft^2/F still air).";
   const od = makeNumber("Pipe OD (in)", "it-od", { step: "any", min: "0" });
   const ts = makeNumber("Pipe surface (°F)", "it-ts", { step: "any" });
   const amb = makeNumber("Ambient (°F)", "it-amb", { step: "any" });
@@ -4792,7 +4801,7 @@ HVAC_RENDERERS["economizer-enthalpy-changeover"] = _v443renderEconomizerEnthalpy
 // The COLD-pipe mirror of computeInsulationThickness (which solves the hot-pipe surface-limit
 // case to a USER-ENTERED limit): here the limit is COMPUTED - the ambient dew point. At the
 // minimum thickness the outer surface sits exactly at the dew point: heat in through the outside
-// film, h (2 pi r2/12)(Tamb - Td), equals heat through the insulation, 2 pi k (Td - Tpipe)/ln(r2/r1).
+// film, h (2 pi r2/12)(Tamb - Td), equals heat through the insulation, 2 pi (k/12) (Td - Tpipe)/ln(r2/r1).
 // LHS grows and RHS shrinks with r2, so the root is unique (critical-radius k/h ~ 0.16 in is far
 // below any real pipe). Dew point from the repo's pinned psychrometric functions.
 // dims: in { pipe_od_in: L, pipe_temp_F: T, ambient_F: T, ambient_rh_pct: dimensionless, k_btu_in_per_hr_ft2_F: M L^2 T^-3, outside_film_coeff_btu_hr_ft2_F: M T^-3 } out: { dew_point_F: T, thickness_in: L, r2_in: L }
@@ -4820,7 +4829,8 @@ export function computePipeInsulationForCondensation({ pipe_od_in = 0, pipe_temp
     };
   }
   const r1 = od / 2;
-  const lhs = (r2) => 2 * Math.PI * k * (dew_point_F - Tp) / Math.log(r2 / r1);
+  // k is entered per inch of thickness; conduction per foot of pipe takes k/12.
+  const lhs = (r2) => 2 * Math.PI * (k / 12) * (dew_point_F - Tp) / Math.log(r2 / r1);
   const rhs = (r2) => h * (2 * Math.PI * r2 / 12) * (Tamb - dew_point_F);
   let lo = r1 + 1e-4, hi = r1 + 60;
   if (lhs(hi) > rhs(hi)) return { error: "No practical thickness keeps the surface at the dew point for these inputs - the humidity is too close to saturation for this pipe temperature; consider a vapor-sealed system review." };
@@ -4840,7 +4850,7 @@ export const pipeInsulationForCondensationExample = { inputs: { pipe_od_in: 1, p
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function renderPipeInsulationForCondensation(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: minimum condensation-control thickness for a cold pipe: the outer-surface energy balance h (2 pi r2/12)(Tamb - Tdp) = 2 pi k (Tdp - Tpipe)/ln(r2/r1), solved for the radius where the jacket sits exactly at the ambient dew point (dew point from the saturation-vapor-pressure psychrometrics this catalog already pins). The industry practice is to round UP to the next stock wall: a surface at the dew point is on the edge of sweating. Assumes still air and an intact vapor retarder; design-day RH governs, not the average. Manufacturer condensation tables (e.g. the insulation maker's design guide) and the mechanical code govern - a sizing aid, not a substitute for them.";
+  citationEl.textContent = "Citation: minimum condensation-control thickness for a cold pipe: the outer-surface energy balance h (2 pi r2/12)(Tamb - Tdp) = 2 pi (k/12) (Tdp - Tpipe)/ln(r2/r1) with k per inch, solved for the radius where the jacket sits exactly at the ambient dew point (dew point from the saturation-vapor-pressure psychrometrics this catalog already pins). The industry practice is to round UP to the next stock wall: a surface at the dew point is on the edge of sweating. Assumes still air and an intact vapor retarder; design-day RH governs, not the average. Manufacturer condensation tables (e.g. the insulation maker's design guide) and the mechanical code govern - a sizing aid, not a substitute for them.";
   const od = makeNumber("Pipe OD (in)", "pifc-od", { step: "any" });
   const tp = makeNumber("Cold-pipe surface temp (°F)", "pifc-tp", { step: "any" });
   const ta = makeNumber("Ambient dry-bulb (°F)", "pifc-ta", { step: "any" });

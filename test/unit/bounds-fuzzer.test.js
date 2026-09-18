@@ -7352,7 +7352,16 @@ test("bounds: calc-hvac computeWetBulbPsychrometer pins RH band and finite dew/W
 test("bounds: calc-hvac computeInsulationThickness bisects to a thickness inside [r1, r1+12] on the spec hot-pipe example", () => {
   const r = computeInsulationThickness({ pipe_od_in: 1, surface_temp_F: 250, ambient_F: 75, surface_limit_F: 120, k_btu_in_per_hr_ft2_F: 0.27 });
   assert.ok(Number.isFinite(r.thickness_in) && r.thickness_in > 0);
-  assert.ok(r.thickness_in >= 0.4 && r.thickness_in <= 3.0, "thickness in expected band");
+  // Per foot of pipe, conduction takes k/12 for k entered per inch: 0.364 in, and
+  // the independent pipe-heat-loss-radial tile agrees that conduction through
+  // that wall equals the film loss at the 120 F surface.
+  assert.ok(Math.abs(r.thickness_in - 0.364097) < 1e-5);
+  {
+    const q = _c2({ od_in: 1, thickness_in: r.thickness_in, k_value: 0.27, hot_f: 250, amb_f: 120 });
+    assert.ok(Math.abs(q.q_per_ft_btuh - 1.65 * (2 * Math.PI * r.r2_in / 12) * 45) < 1e-9);
+  }
+  // A limit only 0.5 F over ambient needs more than the 12 in bracket: an error, not the bracket edge.
+  assert.ok("error" in computeInsulationThickness({ pipe_od_in: 1, surface_temp_F: 250, ambient_F: 75, surface_limit_F: 75.5, k_btu_in_per_hr_ft2_F: 0.27 }));
   assert.ok(r.r2_in > r.r1_in);
   // Rejections.
   assert.ok("error" in computeInsulationThickness({ pipe_od_in: 1, surface_temp_F: 50, ambient_F: 75, surface_limit_F: 120, k_btu_in_per_hr_ft2_F: 0.27 })); // pipe < ambient
@@ -31991,7 +32000,7 @@ test("bounds: spec-v1024 computePipeInsulationForCondensation pins the worked ex
   const base = { pipe_od_in: 1, pipe_temp_F: 40, ambient_F: 75, ambient_rh_pct: 50, k_btu_in_per_hr_ft2_F: 0.27, outside_film_coeff_btu_hr_ft2_F: 1.65 };
   const r = _v1024(base);
   assert.ok(Math.abs(r.dew_point_F - 55.10621) < 0.0005);
-  assert.ok(Math.abs(r.thickness_in - 0.92434) < 0.0005);
+  assert.ok(Math.abs(r.thickness_in - 0.11246) < 0.0005);
   // Dew point cross-check: identical to calling the pinned pure-math functions directly.
   {
     const TC = (75 - 32) * 5 / 9;
@@ -32002,7 +32011,7 @@ test("bounds: spec-v1024 computePipeInsulationForCondensation pins the worked ex
   // Back-substitution: at the root, film heat-in equals insulation conduction exactly.
   {
     const r1 = 0.5, r2 = r.r2_in, Td = r.dew_point_F;
-    const lhs = 2 * Math.PI * 0.27 * (Td - 40) / Math.log(r2 / r1);
+    const lhs = 2 * Math.PI * (0.27 / 12) * (Td - 40) / Math.log(r2 / r1);
     const rhs = 1.65 * (2 * Math.PI * r2 / 12) * (75 - Td);
     assert.ok(Math.abs(lhs - rhs) < 1e-6);
   }
@@ -52284,7 +52293,7 @@ test("bounds: spec-v1675 (cut into insulation-thickness) -- the forward solve ro
   const base = { pipe_od_in: 1, surface_temp_F: 250, ambient_F: 75, surface_limit_F: 120, k_btu_in_per_hr_ft2_F: 0.27 };
   const legacy = computeInsulationThickness(base);
   // ADDITIVE: the tile's original answer is untouched with the new inputs absent.
-  assert.ok(Math.abs(legacy.thickness_in - 2.605884) < 1e-5);
+  assert.ok(Math.abs(legacy.thickness_in - 0.364097) < 1e-5);
   assert.equal(legacy.has_at_thickness, false);
   assert.equal(legacy.has_alt_film, false);
   // ROUND TRIP, the strongest check available here: the surface temperature at
@@ -52294,7 +52303,7 @@ test("bounds: spec-v1675 (cut into insulation-thickness) -- the forward solve ro
   assert.ok(Math.abs(rt.surface_at_thickness_F - 120) < 1e-6);
   assert.equal(rt.at_thickness_meets, true);
   // Thinner than required runs hotter than the target, and says so.
-  const thin = computeInsulationThickness({ ...base, at_thickness_in: 1.0 });
+  const thin = computeInsulationThickness({ ...base, at_thickness_in: 0.2 });
   assert.ok(thin.surface_at_thickness_F > 120);
   assert.equal(thin.at_thickness_meets, false);
   assert.ok(thin.at_thickness_verdict.includes("ABOVE"));
