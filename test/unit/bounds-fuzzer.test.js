@@ -15957,15 +15957,15 @@ test("bounds: spec-v812 computeScaffoldMudsillBearing pins the area, bearing, pa
 
 test("bounds: spec-v246 computeConcreteEvaporationRate pins the metric/US rates, the flag, and error seams", () => {
   const r = _v246({ air_temp_f: 90, concrete_temp_f: 90, rh_pct: 40, wind_mph: 15 });
-  assert.ok(Math.abs(r.E_metric - 1.5087177) < 1e-4);
-  assert.ok(Math.abs(r.E_us - 0.3089854) < 1e-5);
+  assert.ok(Math.abs(r.E_metric - 1.5089944) < 1e-4);
+  assert.ok(Math.abs(r.E_us - 0.3090664) < 1e-5);
   assert.strictEqual(r.flag, "precautions");
   // Mild morning: no precautions.
   const r2 = _v246({ air_temp_f: 70, concrete_temp_f: 70, rh_pct: 70, wind_mph: 10 });
-  assert.ok(Math.abs(r2.E_us - 0.0590407) < 1e-5);
+  assert.ok(Math.abs(r2.E_us - 0.0590555) < 1e-5);
   assert.strictEqual(r2.flag, "ok");
   // Concrete temp defaults to air temp.
-  assert.ok(Math.abs(_v246({ air_temp_f: 90, rh_pct: 40, wind_mph: 15 }).E_us - 0.3089854) < 1e-5);
+  assert.ok(Math.abs(_v246({ air_temp_f: 90, rh_pct: 40, wind_mph: 15 }).E_us - 0.3090664) < 1e-5);
   // Error seams.
   assert.ok("error" in _v246({ air_temp_f: 90, rh_pct: 101, wind_mph: 15 }));
   assert.ok("error" in _v246({ air_temp_f: 90, rh_pct: -1, wind_mph: 15 }));

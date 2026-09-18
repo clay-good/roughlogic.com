@@ -6,6 +6,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The concrete evaporation tile rounded two exact factors.** `concrete-evaporation-rate` converted mph to km/h with 1.609, where the exact factor is 1.609344 (214 ppm short). It converted kg/m^2/h to lb/ft^2/h with 0.2048, where the exact factor is 0.3048^2 / 0.45359237 = 0.204816. Both are now written as definitions, which moves the worked rate from 0.30899 to 0.30907 lb/ft^2/h. The exact-constants scan now also flags an inline 1.609.
+
 - **Two scupper tiles converted flow with 448.8.** The overflow-scupper and scupper-width tiles converted between cfs and gpm with 448.8, a looser rounding than the 448.831 the previous sweep caught. The exact factor is 448.8312, so they were 70 parts per million off. Both now use the definition, their citation formulas read 448.83, and the exact-constants scan now matches any 448.8x factor.
 
 - **The boiler pipe tile did not say its friction formula is a cool-water fit.** `boiler-pipe-sizing` applies Hazen-Williams to hydronic water. Hazen-Williams is empirical for cool water, and hot water's lower viscosity gives less friction, so the head loss shown runs high. That is conservative for sizing a pump. The formula also does not apply to glycol, whose heat capacity changes the tile's 500 factor too. Both limits are now among the tile's assumptions.

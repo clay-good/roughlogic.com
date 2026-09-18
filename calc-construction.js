@@ -6033,9 +6033,9 @@ export function computeConcreteEvaporationRate({ air_temp_f = 70, concrete_temp_
   const Ta = (air_temp_f - 32) / 1.8;
   // The Menzel/NRMCA form needs (T + 18) > 0 (i.e. T > -18 C, ~ 0 F).
   if (Tc <= -18 || Ta <= -18) return { error: "Temperature is below the model's valid range (about 0 F)." };
-  const V = wind_mph * 1.609;
+  const V = wind_mph * 1.609344; // km/h per mph, exactly
   const E_metric = 5 * (Math.pow(Tc + 18, 2.5) - (rh_pct / 100) * Math.pow(Ta + 18, 2.5)) * (V + 4) * 1e-6;
-  const E_us = E_metric * 0.2048;
+  const E_us = E_metric * (0.3048 * 0.3048 / 0.45359237); // 1 kg/m^2 = 0.204816 lb/ft^2
   const flag = E_us >= 0.2 ? "precautions" : E_us >= 0.1 ? "caution" : "ok";
   return { Tc, Ta, E_metric, E_us, flag };
 }
