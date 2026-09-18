@@ -629,6 +629,24 @@ export function computeTankBottomAnodeLayout({ tank_diameter_ft = 0, current_den
     grid_ribbon_ft += 2 * 2 * Math.sqrt(radius_ft * radius_ft - y * y);
     line_count += 2;
   }
+  // The farthest point of the bottom from any ribbon is midway between two
+  // lines or on the rim, where the chords shorten: beyond the last line, and
+  // at the ends of each band between lines. Half a spacing is only the first
+  // of those. For a rim point, only its adjacent inner line, its adjacent outer
+  // line, and the line just across the centreline can be nearest.
+  const s = grid_spacing_ft;
+  const toChord = (x, y, ly) => Math.hypot(Math.max(0, Math.abs(x) - Math.sqrt(radius_ft * radius_ft - ly * ly)), y - ly);
+  const last_line = Math.ceil((radius_ft - s / 2) / s) - 1;
+  let grid_to_farthest_ft = s / 2;
+  const RIM_STEPS = 16384;
+  for (let i = 0; i <= RIM_STEPS; i++) {
+    const a = (Math.PI / 2) * i / RIM_STEPS;
+    const x = radius_ft * Math.cos(a);
+    const y = radius_ft * Math.sin(a);
+    const k = Math.min(last_line, Math.max(0, Math.floor((y - s / 2) / s)));
+    const candidates = [-s / 2, s / 2 + k * s, s / 2 + (k + 1) * s].filter((ly) => Math.abs(ly) < radius_ft);
+    grid_to_farthest_ft = Math.max(grid_to_farthest_ft, Math.min(...candidates.map((ly) => toChord(x, y, ly))));
+  }
   const ring_ribbon_ft = Math.PI * tank_diameter_ft;
   const grid_loading_ma_per_ft = current_ma / grid_ribbon_ft;
   const ring_loading_ma_per_ft = current_ma / ring_ribbon_ft;
@@ -642,7 +660,7 @@ export function computeTankBottomAnodeLayout({ tank_diameter_ft = 0, current_den
     ring_passes_rating: ring_loading_ma_per_ft <= ribbon_rating_ma_per_ft,
     ring_saving_pct: 100 * (grid_ribbon_ft - ring_ribbon_ft) / grid_ribbon_ft,
     ring_to_centre_ft: radius_ft,
-    grid_to_farthest_ft: grid_spacing_ft / 2,
+    grid_to_farthest_ft,
     note: "The perimeter ring passes its ribbon-loading check, uses far less anode, and costs far less to install -- and it leaves the middle of the tank the farthest from any anode, with current attenuating through the pad the whole way. Tank bottoms PERFORATE IN THE MIDDLE, where a bottom is least likely to be reached and least likely to be checked; a ring protects everywhere the problem is not. Over a containment liner the ring does not merely underperform, it does NOTHING, because the liner closes the electrolyte. The grid has to be inside the containment and installed when the tank is built, since the alternative is lifting the bottom. API RP 651, NACE SP0193, and the ribbon manufacturer's rating govern.",
   };
 }

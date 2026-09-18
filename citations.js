@@ -24528,7 +24528,7 @@ export const CITATIONS = {
     edition: "API RP 651, NACE SP0193 (now AMPP), and the ribbon manufacturer's rating govern.",
     freeAccess: "API RP 651 is a purchased standard; ribbon ratings are published by manufacturers.",
     governance: GOVERNANCE.general,
-    editionNote: "A perimeter ring passes its loading check and leaves the tank centre farthest from any anode -- where bottoms perforate. Over a containment liner the ring does nothing, so the grid must go in when the tank is built.",
+    editionNote: "A perimeter ring passes its loading check and leaves the tank centre farthest from any anode -- where bottoms perforate. Over a containment liner the ring does nothing, so the grid must go in when the tank is built. The grid's own worst point is not half a spacing: near the rim the chords shorten, so the 100 ft example's farthest point is 6.7 ft from a ribbon, and a 70 ft tank on the same 10 ft grid leaves its rim 10 ft away.",
     assumptions: [
       { name: "Distribution", value: "ribbon loading is checked; current spread through the pad is not modelled", source: "spec-v1771 scope" },
       { name: "Liner", value: "a closed containment blocks any anode outside it", source: "API RP 651" },
