@@ -4641,12 +4641,16 @@ export function computeDockPilingLateral({
       const A = _MEC_EMBED_A_CONST * lateral_load_lb / (soil_lateral_bearing_psf_per_ft * d / 3 * b_ft);
       return 0.5 * A * (1 + Math.sqrt(1 + _MEC_EMBED_H_CONST * h_ft / A));
     };
+    // req(d) falls as d rises, so the crossing is unique; grow the bracket
+    // until it holds the root rather than return its edge.
     let lo = 1e-6, hi = 1000;
+    for (let i = 0; i < 40 && req(hi) > hi; i++) hi *= 2;
+    const bracketed = req(hi) <= hi;
     for (let i = 0; i < 200; i++) {
       const mid = (lo + hi) / 2;
       if (req(mid) > mid) lo = mid; else hi = mid;
     }
-    return (lo + hi) / 2;
+    return bracketed ? (lo + hi) / 2 : NaN;
   };
   const embedment_ft = embedFor(height_above_mudline_ft);
   const a_term = _MEC_EMBED_A_CONST * lateral_load_lb / (soil_lateral_bearing_psf_per_ft * embedment_ft / 3 * b_ft);

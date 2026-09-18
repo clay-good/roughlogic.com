@@ -1608,7 +1608,12 @@ export function computePoleEmbedmentDepth({ lateral_force_lb = 0, force_height_f
       const A = 2.34 * P / (S1 * b);
       return 0.5 * A * (1 + Math.sqrt(1 + 4.36 * h / A));
     };
+    // req(d) falls as d rises, so the crossing is unique. Grow the bracket
+    // until it holds the root: a fixed 60 ft ceiling returned 60 ft as the
+    // answer for any pole that needed more.
     let lo = 0.01, hi = 60;
+    for (let i = 0; i < 40 && req(hi) > hi; i++) hi *= 2;
+    if (req(hi) > hi) return { error: "No embedment depth satisfies the IBC relation for these inputs." };
     for (let i = 0; i < 200; i++) {
       const mid = (lo + hi) / 2;
       if (req(mid) > mid) lo = mid; else hi = mid;
