@@ -9,6 +9,14 @@ const ROOT = resolve(new URL(".", import.meta.url).pathname, "..", "..");
 const GATE = resolve(ROOT, "scripts/check-data-stamp-monotonic.mjs");
 // The gate imports its horizon from here, so every throwaway repo needs both.
 const HORIZON = resolve(ROOT, "scripts/check-future-stamps.mjs");
+// The gate reads DATA_STAMP_WORKTREE from its environment, and a caller that
+// runs the suite under it (as `DATA_STAMP_WORKTREE=1 npm run audit` does)
+// would switch off the very refusal these tests seed. Start every run clean.
+const gateEnv = (base) => {
+  const env = { ...process.env, DATA_STAMP_BASE: base };
+  delete env.DATA_STAMP_WORKTREE;
+  return env;
+};
 const copyGate = (dir) => {
   execFileSync("cp", [GATE, join(dir, "scripts", "check-data-stamp-monotonic.mjs")]);
   execFileSync("cp", [HORIZON, join(dir, "scripts", "check-future-stamps.mjs")]);
@@ -58,7 +66,7 @@ function runGate(dir) {
     const stdout = execFileSync("node", ["scripts/check-data-stamp-monotonic.mjs"], {
       cwd: dir,
       encoding: "utf8",
-      env: { ...process.env, DATA_STAMP_BASE: "main" },
+      env: gateEnv("main"),
     });
     return { code: 0, out: stdout };
   } catch (err) {
@@ -158,7 +166,7 @@ test("the gate refuses to pass when it has no base to compare against", () => {
       execFileSync("node", ["scripts/check-data-stamp-monotonic.mjs"], {
         cwd: dir,
         encoding: "utf8",
-        env: { ...process.env, DATA_STAMP_BASE: "no-such-ref" },
+        env: gateEnv("no-such-ref"),
       });
     } catch (err) {
       code = err.status;
@@ -190,7 +198,7 @@ test("comparing a commit with itself is refused, not reported OK", () => {
       execFileSync("node", ["scripts/check-data-stamp-monotonic.mjs"], {
         cwd: dir,
         encoding: "utf8",
-        env: { ...process.env, DATA_STAMP_BASE: "HEAD" },
+        env: gateEnv("HEAD"),
       });
     } catch (err) {
       code = err.status;

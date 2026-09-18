@@ -24662,11 +24662,11 @@ export const CITATIONS = {
     ],
   },
   "fermenter-glycol-load": {
-    formula: "extract = (OG - FG points) x gal / 46; Q = extract x 280 Btu/lb; crash = gal x 8.4 x 0.90 x dT / hours; ambient = A x U x dT; gpm = load / (60 x 8.6 x 0.90 x glycol rise).",
+    formula: "extract = (OG - FG points) x gal / 46; Q = extract x 280 Btu/lb; crash = gal x 8.4 x 0.90 x dT / hours; ambient = A x U x (cellar - beer), at the fermenting beer for the fermentation load and the crashed beer for the crash; gpm = load / (60 x 8.6 x 0.90 x glycol rise).",
     edition: "Heat of fermentation about 280 Btu per lb of extract. The chiller manufacturer's capacity at the actual glycol temperature governs.",
     freeAccess: "Public heat-balance arithmetic.",
     governance: GOVERNANCE.general,
-    editionNote: "The adiabatic rise (20 to 40 degF observed) checks the heat figure. The crash, not fermentation, sizes the chiller.",
+    editionNote: "The adiabatic rise (20 to 40 degF observed) checks the heat figure. The crash, not fermentation, sizes the chiller. spec-v1784 states shell gain as area x U x (room - beer), then charged the fermenting tank the gain of a crashed one (70 - 34 degF) while its beer is at 68; the tile takes each period at its own beer temperature, giving a 1,395 Btu/h peak fermentation load where the spec said 2,125. The conclusion strengthens: the crash is 2.9 times the fermentation load (the spec said 1.9), and a plant sized on fermentation is 66% short (the spec said 48).",
     assumptions: [
       { name: "Beer", value: "8.4 lb/gal at 0.90 Btu/lb-degF", source: "spec-v1784" },
       { name: "Glycol", value: "8.6 lb/gal at 0.90 Btu/lb-degF", source: "spec-v1784" },

@@ -646,18 +646,26 @@ export function computeFermenterGlycolLoad({ batch_volume_gal = 0, original_grav
   const beer_lb = batch_volume_gal * 8.4;
   const beer_specific_heat = 0.9;
   const beer_heat_capacity = beer_lb * beer_specific_heat;
-  const ambient_btuh = tank_surface_sqft * tank_u_factor * (cellar_temp_f - crash_target_temp_f);
-  const fermentation_load_btuh = fermentation_heat_btu * (peak_day_share_pct / 100) / HOURS_PER_DAY + ambient_btuh;
+  // Shell gain is area x U x (room - beer), and the beer is at a different
+  // temperature in each period. spec-v1784 states that formula, then charges the
+  // fermenting tank the gain of a CRASHED one (70 - 34 degF) while its beer is
+  // at the crash start, overstating the fermentation load by more than half and
+  // understating how far the crash outruns it.
+  const shell_ua = tank_surface_sqft * tank_u_factor;
+  const fermentation_ambient_btuh = shell_ua * (cellar_temp_f - crash_start_temp_f);
+  const ambient_btuh = shell_ua * (cellar_temp_f - crash_target_temp_f);
+  const fermentation_load_btuh = fermentation_heat_btu * (peak_day_share_pct / 100) / HOURS_PER_DAY + fermentation_ambient_btuh;
   const crash_heat_btu = beer_heat_capacity * (crash_start_temp_f - crash_target_temp_f);
   const crashFor = (hours) => crash_heat_btu / hours + ambient_btuh;
   const crash_load_btuh = crashFor(crash_hours);
+  if (!(fermentation_load_btuh > 0) || !(crash_load_btuh > 0)) return { error: "The cellar is cold enough to carry this tank on its own; there is no glycol load to size at these temperatures." };
   const fast_crash_load_btuh = crashFor(crash_hours / 2);
   const glycol_gpm = crash_load_btuh / (60 * 8.6 * 0.9 * glycol_delta_t_f);
   return {
     batch_volume_gal, crash_hours,
     extract_consumed_lb, fermentation_heat_btu, beer_lb,
     adiabatic_rise_f: fermentation_heat_btu / beer_heat_capacity,
-    ambient_btuh,
+    ambient_btuh, fermentation_ambient_btuh,
     fermentation_load_btuh,
     fermentation_load_tr: fermentation_load_btuh / BTU_PER_REFRIG_TON_HR,
     crash_heat_btu,
@@ -674,7 +682,7 @@ export function computeFermenterGlycolLoad({ batch_volume_gal = 0, original_grav
 
 const glycolExample = { batch_volume_gal: 310, original_gravity: 1.055, final_gravity: 1.012, heat_of_fermentation_btu_per_lb: 280, peak_day_share_pct: 40, crash_start_temp_f: 68, crash_target_temp_f: 34, crash_hours: 24, tank_surface_sqft: 143, tank_u_factor: 0.15, cellar_temp_f: 70, glycol_delta_t_f: 8 };
 BREWING_RENDERERS["fermenter-glycol-load"] = _simpleRenderer({
-  citation: "Citation: heat of fermentation about 280 Btu per lb of extract consumed, with extract = (OG - FG points) x volume / 46; the crash load = beer mass x 0.9 Btu/lb-degF x the temperature drop / the hours allowed, plus ambient gain through the tank shell; glycol flow = load / (60 x 8.6 lb/gal x 0.9 x the glycol temperature rise). The chiller manufacturer's capacity at the actual glycol temperature governs.",
+  citation: "Citation: heat of fermentation about 280 Btu per lb of extract consumed, with extract = (OG - FG points) x volume / 46; the crash load = beer mass x 0.9 Btu/lb-degF x the temperature drop / the hours allowed; each load adds ambient gain through the tank shell, area x U x (cellar - beer), at the beer's temperature in that period (spec-v1784 took the fermentation-period gain at the crash target); glycol flow = load / (60 x 8.6 lb/gal x 0.9 x the glycol temperature rise). The chiller manufacturer's capacity at the actual glycol temperature governs.",
   example: glycolExample,
   fields: [
     { key: "batch_volume_gal", label: "Batch volume (gal)" },
@@ -693,7 +701,7 @@ BREWING_RENDERERS["fermenter-glycol-load"] = _simpleRenderer({
   outputs: [
     { key: "fermentation_heat_btu", id: "fgl-heat", label: "Heat of fermentation, whole batch", value: (r) => fmt(r.fermentation_heat_btu, 0) + " Btu from " + fmt(r.extract_consumed_lb, 0) + " lb of extract" },
     { key: "adiabatic_rise_f", id: "fgl-rise", label: "Rise with the glycol off", unit: "deg F", value: (r) => fmt(r.adiabatic_rise_f, 1) + " deg F -- the check on the heat figure" },
-    { key: "fermentation_load_btuh", id: "fgl-ferm", label: "Peak fermentation load", value: (r) => fmt(r.fermentation_load_btuh, 0) + " Btu/h (" + fmt(r.fermentation_load_tr, 2) + " tons)" },
+    { key: "fermentation_load_btuh", id: "fgl-ferm", label: "Peak fermentation load", value: (r) => fmt(r.fermentation_load_btuh, 0) + " Btu/h (" + fmt(r.fermentation_load_tr, 2) + " tons), " + fmt(r.fermentation_ambient_btuh, 0) + " of it through the shell" },
     { key: "crash_load_btuh", id: "fgl-crash", label: "Crash load", value: (r) => fmt(r.crash_load_btuh, 0) + " Btu/h (" + fmt(r.crash_load_tr, 2) + " tons) -- " + fmt(r.crash_to_fermentation_ratio, 1) + " times the fermentation load" },
     { key: "fermentation_sizing_shortfall_pct", id: "fgl-short", label: "Sizing on fermentation alone", value: (r) => "leaves the plant " + fmt(r.fermentation_sizing_shortfall_pct, 0) + "% short on a crash day" },
     { key: "fast_crash_load_btuh", id: "fgl-fast", label: "Crashing in half the time", value: (r) => fmt(r.fast_crash_load_btuh, 0) + " Btu/h (" + fmt(r.fast_crash_load_tr, 2) + " tons) from one fermenter" },
