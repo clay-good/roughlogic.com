@@ -7,6 +7,12 @@ import { resolve, join } from "node:path";
 
 const ROOT = resolve(new URL(".", import.meta.url).pathname, "..", "..");
 const GATE = resolve(ROOT, "scripts/check-data-stamp-monotonic.mjs");
+// The gate imports its horizon from here, so every throwaway repo needs both.
+const HORIZON = resolve(ROOT, "scripts/check-future-stamps.mjs");
+const copyGate = (dir) => {
+  execFileSync("cp", [GATE, join(dir, "scripts", "check-data-stamp-monotonic.mjs")]);
+  execFileSync("cp", [HORIZON, join(dir, "scripts", "check-future-stamps.mjs")]);
+};
 
 // Build a throwaway repository that reproduces the shape of a stale
 // data-refresh pull request: a branch cut from an old main, and a correction
@@ -19,7 +25,7 @@ function makeRepo({ baseStamp, branchStamp, branchCap }) {
   git("config", "user.name", "t");
   mkdirSync(join(dir, "data", "accounting"), { recursive: true });
   mkdirSync(join(dir, "scripts"), { recursive: true });
-  execFileSync("cp", [GATE, join(dir, "scripts", "check-data-stamp-monotonic.mjs")]);
+  copyGate(dir);
 
   const shard = (verified, cap) =>
     JSON.stringify({ verified_on: verified, by_year: { 2026: { cap_usd: cap } } }, null, 2);
@@ -114,6 +120,25 @@ test("a genuinely newer refresh passes", () => {
   }
 });
 
+test("correcting a stamp dated in the future back to the real date passes", () => {
+  // 2026-09-18: data/search/aliases.json carried an `_updated` of 2026-09-22,
+  // four days ahead of the calendar. Moving it back to the day the work was
+  // done is a correction, not a stale snapshot -- but only while the base
+  // stamp is still impossible.
+  const { dir } = makeRepo({
+    baseStamp: "2999-01-01",
+    branchStamp: "2026-09-01",
+    branchCap: 2560000,
+  });
+  try {
+    const { code, out } = runGate(dir);
+    assert.equal(code, 0, out);
+    assert.match(out, /check-data-stamp-monotonic OK/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test("the gate refuses to pass when it has no base to compare against", () => {
   // A gate that silently skips is worse than no gate: it reports green having
   // looked at nothing.
@@ -123,7 +148,7 @@ test("the gate refuses to pass when it has no base to compare against", () => {
     execFileSync("git", ["config", "user.email", "t@example.com"], { cwd: dir });
     execFileSync("git", ["config", "user.name", "t"], { cwd: dir });
     mkdirSync(join(dir, "scripts"), { recursive: true });
-    execFileSync("cp", [GATE, join(dir, "scripts", "check-data-stamp-monotonic.mjs")]);
+    copyGate(dir);
     writeFileSync(join(dir, "x.txt"), "x");
     execFileSync("git", ["add", "-A"], { cwd: dir });
     execFileSync("git", ["commit", "-q", "-m", "only commit"], { cwd: dir });

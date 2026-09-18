@@ -34,6 +34,7 @@ import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { stampHorizon } from "./check-future-stamps.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -171,6 +172,10 @@ function main() {
 
   const errors = [];
   let compared = 0;
+  // A base stamp dated after tomorrow records a look that has not happened
+  // (check-future-stamps refuses them). Moving it back to the day the work was
+  // really done corrects a fiction; it restores nothing.
+  const horizon = stampHorizon();
 
   for (const file of changed) {
     // ...but read the OTHER side from the base tip, which is what this branch
@@ -187,7 +192,7 @@ function main() {
     }
     for (const [pointer, a, b, rawBefore, rawAfter] of stampPairs(before, after)) {
       compared += 1;
-      if (b < a) {
+      if (b < a && a <= horizon) {
         errors.push(file + " " + pointer + ": " + rawBefore + " -> " + rawAfter);
       }
     }

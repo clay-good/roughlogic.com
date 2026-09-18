@@ -537,6 +537,13 @@ async function main() {
   // "Contribute" panel, so it drifts the same way and is pinned the same way.
   checked += checkPattern(contributing, /alone is (\d+) static gates/g, live.gates, "lint gate count (CONTRIBUTING.md)", errors);
 
+  // Both sentences carry a SECOND number -- how many of those gates run without
+  // the private n-gram list -- and nothing read it: at 59 gates both still said
+  // 56, three short of the 58 the README's own lede counts. check-ngrams is the
+  // only gate that skips, so the runnable count is the gate count less one.
+  checked += checkPattern(readme, /-- (\d+) run without the private n-gram list/g, live.gates - 1, "runnable lint gate count", errors);
+  checked += checkPattern(contributing, /static gates, of which (\d+) run here/g, live.gates - 1, "runnable lint gate count (CONTRIBUTING.md)", errors);
+
   // Sitemap URL count: the prose "carries N URLs" (the build-diagram node is
   // retired with the other three -- see the note above).
   checked += checkPattern(readme, /carries (\d+) URLs/g, live.sitemap, "sitemap URL count", errors);
