@@ -5270,8 +5270,8 @@
       "date": "2026-09-01"
     },
     "/tools/pipe-sizing/": {
-      "sha": "72af6615fff96219",
-      "date": "2026-09-01"
+      "sha": "49938a81b6eddf13",
+      "date": "2026-09-18"
     },
     "/tools/pipe-spacing-rack/": {
       "sha": "9985f8bc246796d8",
@@ -6434,8 +6434,8 @@
       "date": "2026-09-09"
     },
     "/tools/sanitary-dfu/": {
-      "sha": "66632defc96e42ba",
-      "date": "2026-09-01"
+      "sha": "4b72c6130ffab1f7",
+      "date": "2026-09-18"
     },
     "/tools/sawmill-residue-yield/": {
       "sha": "c7cd5381ca26f737",
@@ -8454,8 +8454,8 @@
       "date": "2026-09-04"
     },
     "/tools/water-hammer-surge/": {
-      "sha": "35f0f898843f9d7f",
-      "date": "2026-09-04"
+      "sha": "f60a81372b4021d2",
+      "date": "2026-09-18"
     },
     "/tools/water-heater-input/": {
       "sha": "db523f2e976a273f",
@@ -8806,8 +8806,8 @@
       "date": "2026-09-04"
     },
     "/tools/wsfu-demand/": {
-      "sha": "2effd97712d6fd26",
-      "date": "2026-09-01"
+      "sha": "5a931dc43c3ce4d6",
+      "date": "2026-09-18"
     },
     "/tools/yaw-error-loss/": {
       "sha": "d278320185dfe702",

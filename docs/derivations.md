@@ -4268,7 +4268,7 @@ per spec-v14 §13.1 second paragraph.
 | `recirc-pump-head` | Hot Water Recirc Pump Head | Project (first-principles); 100 ft of 0.75 in copper / 8 fittings (eq. ~16 ft) / 4 gp... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `reducer-offset` | Reducer Centerline Offset and Invert Continuity | Geometry; ASME B16.9 lay lengths (by ...; spec-v202 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `roof-drain-sizing` | Roof Drain and Leader Sizing | IPC 2021 Section 1106 (Tables 1106.2 ...; 5000 ft^2 roof, 4 in/hr design rainfall -> 208 GPM, 6 in ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `sanitary-dfu` | Sanitary Drain DFU Sizing | ICC; DFU = 3 + 1 + 2 = 6; 2 in horizontal branch (max 6 DFU) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `sanitary-dfu` | Sanitary Drain DFU Sizing | ICC; DFU = 3 + 1 + 2 = 6, which a 2 in branch carries (max 6 D... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `scupper-width-for-flow` | Scupper Width for a Required Overflow Flow | Francis weir / IPC 1108 (solved for t...; spec-v731 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `separator-retention-sizing` | Two-Phase Separator Retention and Gas Capacity | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `septic-dose-tank` | Septic Pump / Dose Tank Volume | USEPA Onsite Wastewater Treatment Sys...; 600 gpd, 4 doses, 5 gal drainback -> 150 net, 155 per cyc... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -4329,7 +4329,7 @@ per spec-v14 §13.1 second paragraph.
 | `well-shock-chlorination` | Well Shock-Chlorination Dose | AWWA A100 / state private-well shock-...; spec-v103 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve -> 73.0 GPM, a printed row of Table ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group C HVAC (214 tiles)
 

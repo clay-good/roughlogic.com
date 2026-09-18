@@ -1985,7 +1985,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "Water bulk modulus K", value: "2.19 GPa ≈ 317 800 psi at 60 °F", source: "NIST" },
       { name: "Water density rho", value: "1.940 slug/ft³", source: "physical fact at 60 °F" },
-      { name: "Schedule 40 D / t table", value: "data/plumbing/pipe-elastic-properties.json + SCH40_DIMS_IN", source: "engineering reference" },
+      { name: "Wall D / t by material", value: "copper ASTM B88 Type L; PEX SDR 9 and CPVC SDR 11 (copper tube size); PVC Schedule 80; steel and ductile iron Schedule 40 (ductile iron as a proxy)", source: "ASTM B88 / F876 / F441 / D1785" },
     ],
   },
   "pump-operating-point": {

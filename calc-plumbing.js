@@ -47,16 +47,19 @@ export const FIXTURE_UNITS = {
 };
 
 // Hunter's Curve estimate (gpm from total WSFU) - flush-tank predominant.
-// Values represent public-domain Hunter's Curve at typical points.
+// Rows of IPC Appendix E Table E103.3(3), flush-tank column. Until 2026-09-18
+// these were eyeballed points up to 18% low (10 WSFU read 12 gpm; the table
+// prints 14.6).
 export const HUNTERS_CURVE = [
-  { wsfu: 1, gpm: 3 },
-  { wsfu: 5, gpm: 8 },
-  { wsfu: 10, gpm: 12 },
-  { wsfu: 20, gpm: 18 },
-  { wsfu: 40, gpm: 26 },
-  { wsfu: 80, gpm: 38 },
-  { wsfu: 150, gpm: 55 },
-  { wsfu: 300, gpm: 88 },
+  { wsfu: 1, gpm: 3.0 },
+  { wsfu: 5, gpm: 9.4 },
+  { wsfu: 10, gpm: 14.6 },
+  { wsfu: 20, gpm: 19.6 },
+  { wsfu: 40, gpm: 26.3 },
+  { wsfu: 80, gpm: 38.0 },
+  { wsfu: 140, gpm: 52.5 },
+  { wsfu: 160, gpm: 57.0 },
+  { wsfu: 300, gpm: 85.0 },
 ];
 
 function huntersFlowFromWSFU(wsfu) {
@@ -1474,7 +1477,7 @@ import {
 
 // Pipe elastic properties keyed to material. E in psi (Young's modulus);
 // fluid bulk modulus K in psi; fluid density rho in slug/ft^3 for Imperial.
-// Wall-thickness ratio (D/t) is built into the table per Schedule 40 nominal.
+// Wall-thickness ratio (D/t) comes from _waterHammerDims below, per material.
 export const PIPE_ELASTIC_PROPERTIES = {
   copper:        { E_psi: 17e6,    description: "Copper Type L (engineering reference)" },
   pex:           { E_psi: 95000,   description: "PEX-A / PEX-B (manufacturer typical)" },
@@ -1496,6 +1499,25 @@ export const SCH40_DIMS_IN = {
   "4":   { D: 4.500, t: 0.237 },
 };
 
+// The wall that governs the wave speed is the material's own, not Schedule 40
+// steel's. Until 2026-09-18 every material took SCH40_DIMS_IN, so 1 in copper
+// ran with D/t = 9.9 where Type L is 22.5, and surge read 10% high.
+const _NOMINAL_IN = { "1/2": 0.5, "3/4": 0.75, "1": 1, "1.25": 1.25, "1.5": 1.5, "2": 2, "3": 3, "4": 4 };
+// ASTM B88 Type L copper wall, in (OD = nominal + 1/8).
+const _COPPER_L_WALL_IN = { "1/2": 0.040, "3/4": 0.045, "1": 0.050, "1.25": 0.055, "1.5": 0.060, "2": 0.070, "3": 0.090, "4": 0.110 };
+// ASTM D1785 Schedule 80 PVC wall, in (OD as Schedule 40).
+const _SCH80_WALL_IN = { "1/2": 0.147, "3/4": 0.154, "1": 0.179, "1.25": 0.191, "1.5": 0.200, "2": 0.218, "3": 0.300, "4": 0.337 };
+function _waterHammerDims(material, pipe_size) {
+  const sch40 = SCH40_DIMS_IN[pipe_size];
+  if (!sch40) return null;
+  const cts_od = _NOMINAL_IN[pipe_size] + 0.125; // copper tube size
+  if (material === "copper") return { D: cts_od, t: _COPPER_L_WALL_IN[pipe_size], basis: "ASTM B88 Type L" };
+  if (material === "pex") return { D: cts_od, t: cts_od / 9, basis: "PEX SDR 9 (CTS)" };
+  if (material === "cpvc") return { D: cts_od, t: cts_od / 11, basis: "CPVC SDR 11 (CTS)" };
+  if (material === "pvc") return { D: sch40.D, t: _SCH80_WALL_IN[pipe_size], basis: "PVC Schedule 80" };
+  return { D: sch40.D, t: sch40.t, basis: "Schedule 40" };
+}
+
 // Bulk modulus K and density rho for the pumped fluid (water default).
 export const FLUID_PROPERTIES = {
   water:        { K_psi: 317800, rho_slug_ft3: 1.940, label: "Water at 60 °F" },
@@ -1515,7 +1537,7 @@ export function computeWaterHammerSurge({
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const m = PIPE_ELASTIC_PROPERTIES[material];
   if (!m) return { error: "Unknown pipe material." };
-  const dims = SCH40_DIMS_IN[pipe_size];
+  const dims = _waterHammerDims(material, pipe_size);
   if (!dims) return { error: "Unknown pipe size." };
   const f = FLUID_PROPERTIES[fluid];
   if (!f) return { error: "Unknown fluid." };
@@ -1536,7 +1558,7 @@ export function computeWaterHammerSurge({
   const rapid_closure = closure_time_s < reflection_time_s;
   return {
     celerity_fps: a_fps, surge_psi: dP_psi, reflection_time_s,
-    rapid_closure, fluid_label: f.label, material_label: m.description,
+    rapid_closure, fluid_label: f.label, material_label: m.description, wall_basis: dims.basis, d_over_t: dims.D / dims.t,
   };
 }
 
@@ -1688,7 +1710,7 @@ function _v7p_renderWaterHammer(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Joukowsky equation by name. Pipe-fluid coupling via celerity formula. Rapid closure flagged when t_close < 2L/a.";
   _v7p_attachEx(inputRegion, () => fillExample(waterHammerSurgeExample.inputs));
   const mat = _v7p_makeSelect("Pipe material", "wh-mat", Object.keys(PIPE_ELASTIC_PROPERTIES).map((k) => ({ value: k, label: PIPE_ELASTIC_PROPERTIES[k].description })));
-  const sz = _v7p_makeSelect("Pipe size (Sch 40)", "wh-sz", Object.keys(SCH40_DIMS_IN).map((k) => ({ value: k, label: '"' + k + '" (D=' + SCH40_DIMS_IN[k].D + ' in)' })));
+  const sz = _v7p_makeSelect("Pipe size (nominal)", "wh-sz", Object.keys(SCH40_DIMS_IN).map((k) => ({ value: k, label: '"' + k + '" (D=' + SCH40_DIMS_IN[k].D + ' in)' })));
   const v = _v7p_makeNumber("Velocity at closure (fps)", "wh-v", { step: "any", min: "0" });
   const tc = _v7p_makeNumber("Closure time (s)", "wh-tc", { step: "any", min: "0" });
   const len = _v7p_makeNumber("Run length (ft)", "wh-len", { step: "any", min: "0" });
@@ -2520,6 +2542,17 @@ export function computeSanitaryDfu({
   }
 
   const warnings = [];
+  // A water closet's outlet is 3 in (IPC Table 709.1), and a drain may not
+  // shrink in the direction of flow (IPC 704.2), so any line carrying one is
+  // at least 3 in whatever its DFU total. Until 2026-09-18 a bathroom group
+  // (6 DFU) sized to a 2 in branch.
+  const has_water_closet = (Number(fixtures.water_closet_private) || 0) > 0 || (Number(fixtures.water_closet_public) || 0) > 0;
+  if (has_water_closet && min_size_in != null && min_size_in < 3) {
+    warnings.push("Raised to 3 in: a water closet's 3 in outlet sets the minimum (IPC Table 709.1, 704.2); the DFU load alone allows " + min_size_in + " in.");
+    min_size_in = 3;
+    if (config === "building_drain") capacity_at_size = SANITARY_BUILDING_DRAIN_MAX_DFU[String(slope_in_per_ft)][3] ?? capacity_at_size;
+    else capacity_at_size = SANITARY_BRANCH_STACK_MAX_DFU.find((r) => r.size === 3)[config === "stack" ? "stack" : "branch"];
+  }
   if (min_size_in == null) warnings.push("Total DFU exceeds the bundled table maximum; this is a commercial-engineered system, consult IPC Table 710.1 directly.");
   if (total_dfu > 1400) warnings.push("DFU load above 1400 is a commercial-engineered system; an engineer of record should size the drainage.");
   if (slope_in_per_ft < 0.125 && config !== "stack") warnings.push("Slope below 1/8 in per ft is below the IPC minimum for pipe 3 in and smaller.");
@@ -3432,10 +3465,12 @@ PLUMBING_RENDERERS["pipe-velocity"] = _v26renderPipeVelocity;
 //
 // Hunter's-curve interpolation: total water-supply fixture units (WSFU) ->
 // probable simultaneous peak flow (GPM). The curve splits flush-tank vs
-// flush-valve; both ship as editable breakpoints (approximations of IPC 2021
-// Appendix E Table E103.3(2) / NBS BMS65, tune to the published table).
-const WSFU_FLUSH_TANK = [[10, 8], [50, 24], [100, 43], [150, 51], [240, 65]];
-const WSFU_FLUSH_VALVE = [[10, 27], [50, 51], [100, 55], [150, 66], [240, 80]];
+// flush-valve; both ship as editable breakpoints read from IPC Appendix E
+// Table E103.3(3) (NBS BMS65). Until 2026-09-18 these were approximations up
+// to 45% off the table: flush tank 10 WSFU read 8 gpm (the table's 4-WSFU
+// row; 10 prints 14.6), flush valve 100 read 55 (67.5).
+const WSFU_FLUSH_TANK = [[1, 3.0], [5, 9.4], [10, 14.6], [20, 19.6], [30, 23.3], [40, 26.3], [50, 29.1], [60, 32.0], [80, 38.0], [100, 43.5], [120, 48.0], [140, 52.5], [160, 57.0], [200, 65.0], [250, 75.0], [300, 85.0]];
+const WSFU_FLUSH_VALVE = [[5, 15.0], [10, 27.0], [20, 35.0], [30, 42.0], [40, 46.0], [50, 50.0], [60, 54.0], [80, 61.2], [100, 67.5], [120, 73.0], [140, 77.0], [160, 81.0], [200, 90.0], [250, 101.0], [300, 108.0]];
 
 // dims: in { wsfu: dimensionless, system_type: dimensionless, curve: dimensionless } out: { gpm: L^3 T^-1, bracket_low_wsfu: dimensionless, bracket_high_wsfu: dimensionless }
 // (Fixture units are dimensionless; the probable peak demand is a volumetric
@@ -3463,13 +3498,13 @@ export function computeWsfuDemand({ wsfu, system_type = "flush_tank", curve = nu
     bracket_high_gpm: y2,
     system_type: system_type === "flush_valve" ? "flush valve" : "flush tank",
     extrapolated,
-    note: "WSFU come from the fixture schedule (IPC Table E103.3(2) assigns WSFU per fixture by supply type). Flush-valve systems peak higher at low WSFU - use that curve. The bundled curve is an editable approximation of Hunter's curve (NBS BMS65 / IPC Appendix E); tune it to the published table. This is the design demand that feeds pipe-sizing, water-meter-sizing, and supply-pressure-budget, not a metered actual.",
+    note: "WSFU come from the fixture schedule (IPC Table E103.3(2) assigns WSFU per fixture by supply type). Flush-valve systems peak higher at low WSFU - use that curve. The bundled curve carries the printed rows of IPC Appendix E Table E103.3(3) (Hunter's curve, NBS BMS65) and interpolates between them. This is the design demand that feeds pipe-sizing, water-meter-sizing, and supply-pressure-budget, not a metered actual.",
   };
 }
 
 export const wsfuDemandExample = {
   inputs: { wsfu: 120, system_type: "flush_valve" },
-  expectedRange: { gpm: { min: 59.3, max: 59.5 } },
+  expectedRange: { gpm: { min: 72.9, max: 73.1 } },
 };
 
 function renderWsfuDemand(inputRegion, outputRegion, citationEl) {

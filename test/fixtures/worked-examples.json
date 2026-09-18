@@ -7837,9 +7837,9 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Joukowsky surge: dP (psi) = rho * a * dV (Pa) / 6895 with elastic-coupling-adjusted celerity a",
    "source_edition_or_year": "n/a; classical Joukowsky identity over manufacturer copper-tube elasticity (Type L 1 in)",
-   "source_section_or_page": "Copper Type L 1 in / water at 60 F / 8 fps velocity / 0.05 s closure / 100 ft run -> celerity ~4462 fps, surge ~481 psi, reflection time ~0.045 s (not rapid since closure > reflection)",
+   "source_section_or_page": "Copper Type L 1 in / water at 60 F / 8 fps velocity / 0.05 s closure / 100 ft run (B88 Type L: 1.125 in OD, 0.050 in wall, D/t 22.5) -> celerity ~4075 fps, surge ~439 psi, reflection time ~0.049 s (not rapid since closure > reflection)",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-18",
    "inputs": {
     "material": "copper",
     "pipe_size": "1",
@@ -7850,19 +7850,19 @@
    },
    "outputs": {
     "celerity_fps": {
-     "value": 4462,
+     "value": 4075,
      "tolerance": {
       "abs": 5
      }
     },
     "surge_psi": {
-     "value": 481,
+     "value": 439,
      "tolerance": {
       "abs": 1
      }
     },
     "reflection_time_s": {
-     "value": 0.0448,
+     "value": 0.0491,
      "tolerance": {
       "abs": 0.001
      }
@@ -9704,9 +9704,9 @@
    "source_publisher": "IPC / UPC fixture-unit tables (project bundled)",
    "source_title": "Hunter's Curve fixture-unit demand: total_wsfu -> gpm via Hunter's lookup; recommended supply / drainage size from per-fixture units",
    "source_edition_or_year": "IPC 2024 / UPC 2024 fixture-unit tables (lavatory 1 wsfu_total, water_closet_flush_tank 2.5 wsfu_total, shower 2, kitchen_sink 1.5)",
-   "source_section_or_page": "2x lavatory + 2x WC flush-tank + 1x shower + 1x kitchen sink -> 10.5 wsfu / 12 dfu / 12.3 gpm / 1 in supply / 3 in drainage; exercises the string-equality path on supply/drainage size",
+   "source_section_or_page": "2x lavatory + 2x WC flush-tank + 1x shower + 1x kitchen sink -> 10.5 wsfu / 12 dfu / 14.85 gpm (Table E103.3(3) flush tanks: 10 -> 14.6, 20 -> 19.6) / 1 in supply / 3 in drainage; exercises the string-equality path on supply/drainage size",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-18",
    "inputs": {
     "fixtures": [
      {
@@ -9742,7 +9742,7 @@
      }
     },
     "estimated_demand_gpm": {
-     "value": 12.3,
+     "value": 14.85,
      "tolerance": {
       "abs": 0.1
      }
@@ -15534,9 +15534,9 @@
    "source_publisher": "ICC",
    "source_title": "Sanitary DFU: single-bath branch (1 private WC + 1 lavatory + 1 bathtub)",
    "source_edition_or_year": "IPC 2021 Tables 709.1 / 710.1(2)",
-   "source_section_or_page": "DFU = 3 + 1 + 2 = 6; 2 in horizontal branch (max 6 DFU)",
+   "source_section_or_page": "DFU = 3 + 1 + 2 = 6, which a 2 in branch carries (max 6 DFU), but the water closet sets 3 in (Table 709.1; 704.2 no reduction in the direction of flow)",
    "verified_by": "rl",
-   "verified_on": "2026-06-02",
+   "verified_on": "2026-09-18",
    "inputs": {
     "fixtures": {
      "water_closet_private": 1,
@@ -15554,7 +15554,7 @@
      }
     },
     "min_size_in": {
-     "value": 2,
+     "value": 3,
      "tolerance": {
       "abs": 0
      }
@@ -24010,17 +24010,17 @@
    "tile_id": "wsfu-demand",
    "source_publisher": "Hunter's curve (NBS BMS65) / IPC 2021 Appendix E",
    "source_title": "gpm = interpolate(curve, wsfu); flush-tank vs flush-valve curves",
-   "source_edition_or_year": "IPC 2021 Appendix E Table E103.3(2)",
-   "source_section_or_page": "120 WSFU flush-valve between (100,55) and (150,66) -> 59.4 GPM",
+   "source_edition_or_year": "IPC 2021 Appendix E Table E103.3(3)",
+   "source_section_or_page": "120 WSFU flush-valve -> 73.0 GPM, a printed row of Table E103.3(3)",
    "verified_by": "rl",
-   "verified_on": "2026-06-13",
+   "verified_on": "2026-09-18",
    "inputs": {
     "wsfu": 120,
     "system_type": "flush_valve"
    },
    "outputs": {
     "gpm": {
-     "value": 59.4,
+     "value": 73.0,
      "tolerance": {
       "abs": 0.05
      }

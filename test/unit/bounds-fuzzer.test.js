@@ -8492,15 +8492,18 @@ test("bounds: calc-plumbing computeWhExpansionTank pins V_exp = vol*factor and V
 test("bounds: calc-plumbing computeSanitaryDfu sums DFUs and sizes per IPC Table 710.1", () => {
   const r = computeSanitaryDfu({ fixtures: { water_closet_private: 1, lavatory: 1, bathtub: 1 }, config: "horizontal_branch", slope_in_per_ft: 0.25 });
   assert.strictEqual(r.total_dfu, 6);
-  assert.strictEqual(r.min_size_in, 2);
-  assert.strictEqual(r.capacity_at_size, 6);
+  // 6 DFU fits 2 in, but the water closet's 3 in outlet governs (IPC 709.1 / 704.2).
+  assert.strictEqual(r.min_size_in, 3);
+  assert.strictEqual(r.capacity_at_size, 20);
   // A stack with 112 DFU needs 4 in (stack max 500 at 4 in; 3 in caps at 72).
   const s = computeSanitaryDfu({ fixtures: { water_closet_public: 20, lavatory: 8, urinal: 6 }, config: "stack" });
   assert.strictEqual(s.total_dfu, 112);
   assert.strictEqual(s.min_size_in, 4);
-  // Building drain at 1/4 in/ft, 6 DFU -> 2 in (max 21).
+  // Building drain at 1/4 in/ft: 6 DFU alone would be 2 in (max 21); the WC makes it 3 in (max 42).
   const bd = computeSanitaryDfu({ fixtures: { water_closet_private: 1, lavatory: 1, bathtub: 1 }, config: "building_drain", slope_in_per_ft: 0.25 });
-  assert.strictEqual(bd.min_size_in, 2);
+  assert.strictEqual(bd.min_size_in, 3);
+  assert.strictEqual(bd.capacity_at_size, 42);
+  assert.strictEqual(computeSanitaryDfu({ fixtures: { lavatory: 2, bathtub: 2 }, config: "building_drain", slope_in_per_ft: 0.25 }).min_size_in, 2);
   // Undersized proposed pipe is flagged.
   const u = computeSanitaryDfu({ fixtures: { water_closet_public: 20, lavatory: 8, urinal: 6 }, config: "stack", proposed_size_in: 3 });
   assert.strictEqual(u.adequate, false);
@@ -11540,10 +11543,11 @@ import {
 
 import { computeWsfuDemand as _v61b1, computeSupplyPressureBudget as _v61b2 } from "../../calc-plumbing.js";
 test("bounds: calc-plumbing v61 wsfu-demand + supply-pressure-budget pin Hunter interpolation and the pressure budget", () => {
-  // 120 WSFU flush-valve between (100,55) and (150,66) -> 59.4 GPM
-  assert.ok(Math.abs(_v61b1({ wsfu: 120, system_type: "flush_valve" }).gpm - 59.4) < 1e-9);
-  // 120 WSFU flush-tank between (100,43) and (150,51) -> 46.2 GPM
-  assert.ok(Math.abs(_v61b1({ wsfu: 120, system_type: "flush_tank" }).gpm - 46.2) < 1e-9);
+  // IPC Table E103.3(3) prints 120 WSFU as 73.0 gpm (flush valve) and 48.0 (flush tank).
+  assert.ok(Math.abs(_v61b1({ wsfu: 120, system_type: "flush_valve" }).gpm - 73.0) < 1e-9);
+  assert.ok(Math.abs(_v61b1({ wsfu: 120, system_type: "flush_tank" }).gpm - 48.0) < 1e-9);
+  // Between printed rows it interpolates: 10.5 flush tank between 10 -> 14.6 and 20 -> 19.6.
+  assert.ok(Math.abs(_v61b1({ wsfu: 10.5, system_type: "flush_tank" }).gpm - 14.85) < 1e-9);
   assert.ok("error" in _v61b1({ wsfu: 120, curve: [[100, 50], [50, 40]] })); // non-monotonic
   assert.ok("error" in _v61b1({ wsfu: -1 }));
   assert.ok("error" in _v61b1({ wsfu: Infinity }));

@@ -139,11 +139,15 @@ test("wh-expansion-tank: rejects zero volume, bad acceptance, and inverted temps
 
 // --- B.5 Sanitary stack / branch DFU sizing (10 tests) ---------------
 
-test("sanitary-dfu: single-bath branch = 6 DFU, 2 in minimum", () => {
+test("sanitary-dfu: single-bath branch = 6 DFU, but the water closet sets 3 in", () => {
   const r = computeSanitaryDfu(sanitaryDfuExample.inputs);
   assert.strictEqual(r.total_dfu, 6);
-  assert.strictEqual(r.min_size_in, 2);
-  assert.strictEqual(r.capacity_at_size, 6);
+  // 6 DFU fits a 2 in branch, but a WC's 3 in outlet sets the minimum (IPC 709.1 / 704.2).
+  assert.strictEqual(r.min_size_in, 3);
+  assert.strictEqual(r.capacity_at_size, 20);
+  assert.ok(r.warnings.some((w) => /water closet/.test(w)));
+  // Without the WC the same 3 DFU of lavatory + tub stays on DFU capacity alone.
+  assert.strictEqual(computeSanitaryDfu({ fixtures: { lavatory: 1, bathtub: 1 } }).min_size_in, 1.5);
 });
 
 test("sanitary-dfu: DFU total sums count * Table 709.1 value", () => {
@@ -166,14 +170,14 @@ test("sanitary-dfu: building-drain sizing is slope-aware", () => {
 });
 
 test("sanitary-dfu: 2 in horizontal branch caps at 6 DFU (7th DFU bumps to 2.5 in)", () => {
-  const r = computeSanitaryDfu({ fixtures: { water_closet_private: 2, lavatory: 1 }, config: "horizontal_branch" });
+  const r = computeSanitaryDfu({ fixtures: { shower: 3, lavatory: 1 }, config: "horizontal_branch" });
   assert.strictEqual(r.total_dfu, 7);
   assert.strictEqual(r.min_size_in, 2.5);
 });
 
 test("sanitary-dfu: branch and stack columns differ for the same DFU load", () => {
-  const branch = computeSanitaryDfu({ fixtures: { water_closet_private: 6 }, config: "horizontal_branch" });
-  const stack = computeSanitaryDfu({ fixtures: { water_closet_private: 6 }, config: "stack" });
+  const branch = computeSanitaryDfu({ fixtures: { shower: 9 }, config: "horizontal_branch" });
+  const stack = computeSanitaryDfu({ fixtures: { shower: 9 }, config: "stack" });
   // 18 DFU: branch max 20 at 3 in; stack max 24 at 2 in.
   assert.strictEqual(branch.min_size_in, 3);
   assert.strictEqual(stack.min_size_in, 2);
