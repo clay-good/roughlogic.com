@@ -133,7 +133,14 @@ export function computeRadonFanStatic({
     const v_fps = v_fpm / 60;
     const re = v_fps * d_ft / _RADON_KINEMATIC_VISC_FT2_S;
     if (!(re > 0)) return 0;
-    const f = 0.316 / Math.pow(re, 0.25);
+    // Blasius holds for smooth pipe from Re 4,000 to 100,000. Below 2,300 the
+    // flow is laminar and f = 64 / Re exactly -- a small fan in a 6 in pipe
+    // gets there -- and above 100,000 Blasius runs low, so the Swamee-Jain
+    // smooth-pipe fit takes over. The transitional band keeps Blasius, the
+    // higher of the two at its lower edge.
+    const f = re < 2300 ? 64 / re
+      : re <= 1e5 ? 0.316 / Math.pow(re, 0.25)
+        : 0.25 / Math.pow(Math.log10(5.74 / Math.pow(re, 0.9)), 2);
     const head_ft_air = f * (pipe_length_ft / d_ft) * (v_fps * v_fps / 64.4);
     return head_ft_air * _RADON_AIR_DENSITY_LB_FT3 / _RADON_LB_FT2_PER_IN_WC;
   };

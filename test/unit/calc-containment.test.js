@@ -53,3 +53,11 @@ test("lab pressure: the offset is exhaust less supply, and the ACH floor can gov
   close(r.offset_cfm, 100, "offset");
   assert.equal(r.drift_swamps, true);
 });
+
+test("radon pipe: laminar flow takes f = 64 / Re, not Blasius outside its range", () => {
+  // 8 cfm in a 6 in pipe: Re about 1,300, laminar.
+  const r = computeRadonFanStatic({ flow_cfm: 8, pipe_diameter_in: 6, pipe_length_ft: 30, fan_static_in_wc: 1.2, measured_vacuum_in_wc: 1, alt_pipe_diameter_in: 4 });
+  const d = 0.5, v = 8 / (Math.PI / 4 * d * d) / 60, re = v * d / 1.57e-4;
+  assert.ok(re < 2300, `Re ${re}`);
+  close(r.pipe_loss_in_wc, 64 / re * (30 / d) * v * v / 64.4 * 0.075 / 5.192, "Hagen-Poiseuille");
+});
