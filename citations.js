@@ -3740,6 +3740,7 @@ export const CITATIONS = {
       { name: "Velocity constant", value: "v = GPM / (2.448 × d²)", source: "pipe-area / 448.83 gal·ft⁻³·min⁻¹ identity" },
       { name: "Hazen-Williams C", value: "150 copper / PEX, 130 black steel", source: "AWWA water-flow C-values" },
       { name: "Default velocity ceiling", value: "4 / 6 / 3 ft/s (copper / steel / PEX)", source: "Bell & Gossett / Taco quiet-operation limits" },
+      { name: "Water near room temperature", value: "Hazen-Williams is an empirical fit for cool water; hot hydronic water is less viscous, so the head loss shown runs high (conservative), and it does not apply to glycol solutions, whose heat capacity also changes the 500 factor", source: "ASHRAE Fundamentals pipe-sizing chapter" },
     ],
   },
   "compressor-short-cycle": {
