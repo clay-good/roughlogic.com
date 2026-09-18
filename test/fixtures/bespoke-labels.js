@@ -474,7 +474,7 @@ export const BESPOKE_LABELS = {
   "iowa-rate-of-flow": {"length_ft":"Compartment length (ft)","width_ft":"Compartment width (ft)","height_ft":"Compartment height / ceiling (ft)"},
   "iron-manganese-chlorine-dose": {"fe_mgl":"Iron Fe (mg/L)","mn_mgl":"Manganese Mn (mg/L)","extra_demand_mgl":"Other chlorine demand (mg/L)","target_residual_mgl":"Target free residual (mg/L)","flow_mgd":"Flow (MGD)"},
   "irrigation-requirement": {"crop":"Crop","et_ref_in_per_day":"Reference ET0 (in/day)","period_days":"Period length (days)","area_acres":"Field area (acres)","efficiency_pct":"Irrigation method (efficiency)","rainfall_in":"Effective rainfall over the period (in)"},
-  "iso-nff": {"area_ft2":"Footprint area (ft²)","stories":"Stories","construction_class":"Construction class","occupancy_factor":"Occupancy factor Oi (0.75-1.25)","exposure_distance_ft":"Exposure distance (ft)","exposure_communication_factor":"Communication factor P (0-0.30)"},
+  "iso-nff": {"area_ft2":"Footprint area (ft²)","stories":"Stories","construction_class":"Construction class","occupancy_factor":"Occupancy factor Oi (0.75-1.25)","exposure_distance_ft":"Exposure distance (ft)","exposure_communication_factor":"Communication factor P (0-0.30)","vertical_openings":"Vertical openings (Classes 5-6)"},
   "joist-deflection": {"uniform_load_plf":"Uniform load (plf)","span_ft":"Span (ft)","E_psi":"E (psi)","I_in4":"I (in⁴)"},
   "keyseat-key-size": {"shaft_diameter_in":"Shaft diameter D (in)","torque_in_lb":"Transmitted torque (in-lb, 0 = geometry only)","key_length_in":"Key / hub engagement length L (in, 0 = geometry only)"},
   "knurl-blank-diameter": {"target_diameter_in":"Target diameter (in)","knurl_tpi":"Knurl pitch (TPI)"},

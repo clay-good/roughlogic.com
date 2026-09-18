@@ -5342,9 +5342,11 @@ test("monotonicity: computeIsoNeededFireFlow NFF_raw_gpm is strictly non-decreas
     const r = computeIsoNeededFireFlow({ area_ft2, stories: 1, construction_class: 3, occupancy_factor: 1.0, exposure_distance_ft: 200, exposure_communication_factor: 0 });
     assert.ok(Number.isFinite(r.NFF_raw_gpm) && r.NFF_raw_gpm > 0,
       `NFF_raw at A=${area_ft2}: ${JSON.stringify(r)}`);
-    assert.ok(r.NFF_raw_gpm > prev,
-      `NFF_raw at A=${area_ft2} = ${r.NFF_raw_gpm} not greater than prev=${prev}`);
-    prev = r.NFF_raw_gpm;
+    // Ci is rounded to 250 gpm before the multipliers (ISO Guide ch. 2 sec. 5),
+    // so NFF_raw steps; Ci_raw is the strictly increasing quantity.
+    assert.ok(r.Ci_raw > prev,
+      `Ci_raw at A=${area_ft2} = ${r.Ci_raw} not greater than prev=${prev}`);
+    prev = r.Ci_raw;
   }
   // 4x-area pin: 4x A -> 2x Ci_raw exactly (sqrt scaling).
   const a = computeIsoNeededFireFlow({ area_ft2: 2500, stories: 1, construction_class: 3, occupancy_factor: 1.0, exposure_distance_ft: 200, exposure_communication_factor: 0 });
@@ -5358,12 +5360,12 @@ test("monotonicity: computeIsoNeededFireFlow NFF_raw_gpm is strictly non-decreas
   assert.ok(big.Ci_raw > 8000,
     `Ci_raw = ${big.Ci_raw}, expected to exceed 8000 cap`);
   // Closed-form pin from isoNeededFireFlowExample: area=5000 / stories=2
-  // / class=2 -> F = ISO_CONSTRUCTION_F[2] / A_eff = 5000 * min(2, 3)
-  // = 10000. Ci_raw = 18 * F * sqrt(10000) = 1800 * F.
+  // / class=2 -> F = ISO_CONSTRUCTION_F[2] / A_eff = 5000 + 50% x 5000
+  // = 7500. Ci_raw = 18 * F * sqrt(7500).
   const ref = computeIsoNeededFireFlow({ area_ft2: 5000, stories: 2, construction_class: 2, occupancy_factor: 1.0, exposure_distance_ft: 50, exposure_communication_factor: 0 });
-  assert.equal(ref.A_eff_ft2, 10000);
-  assert.ok(Math.abs(ref.Ci_raw - 18 * ref.F_factor * Math.sqrt(10000)) < 1e-9,
-    `Ci_raw = ${ref.Ci_raw}, expected ${18 * ref.F_factor * Math.sqrt(10000)}`);
+  assert.equal(ref.A_eff_ft2, 7500);
+  assert.ok(Math.abs(ref.Ci_raw - 18 * ref.F_factor * Math.sqrt(7500)) < 1e-9,
+    `Ci_raw = ${ref.Ci_raw}, expected ${18 * ref.F_factor * Math.sqrt(7500)}`);
   // Exposure-distance step pin: 50 ft falls in (30, 60] -> X = 0.15.
   assert.equal(ref.X_exposure, 0.15);
   // NFF_gpm is rounded to 250-gpm increment and bounded by min/max.
@@ -12546,8 +12548,8 @@ test("monotonicity: gas high-altitude derate applies only above the threshold an
   assert.ok(ad({}).factor < 1, "above the threshold the derate factor must drop below 1");
   assert.ok(ad({}).derated_input_btuh < 100000, "above the threshold the derated input must fall below the nameplate");
   assert.ok(ad({ elevation_ft: 8000 }).derated_input_btuh < ad({}).derated_input_btuh, "derated input must fall as elevation rises");
-  assert.strictEqual(ad({}).steps_1000, 3, "5000 ft with a 2000 ft threshold gives 3 full 1000-ft steps");
-  assert.ok(Math.abs(ad({}).factor - (1 - 3 * 0.04)) < 1e-9, "factor = 1 - steps * derate-per-1000");
+  assert.strictEqual(ad({}).steps_1000, 5, "above the 2000 ft threshold the steps count from sea level: 5000 ft gives 5");
+  assert.ok(Math.abs(ad({}).factor - (1 - 5 * 0.04)) < 1e-9, "factor = 1 - steps * derate-per-1000");
   assert.ok(Math.abs(ad({}).derated_input_btuh - 100000 * ad({}).factor) < 1e-6, "derated input = nameplate * factor");
 });
 

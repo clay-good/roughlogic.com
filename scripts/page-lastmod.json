@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "0e9b4a6afa405f45",
+      "sha": "4f536b2c41d31562",
       "date": "2026-09-18"
     },
     "/tools/": {
@@ -3178,8 +3178,8 @@
       "date": "2026-09-01"
     },
     "/tools/gas-altitude-derate/": {
-      "sha": "dd9ae924e32e14ce",
-      "date": "2026-09-09"
+      "sha": "7f1d125652f09913",
+      "date": "2026-09-18"
     },
     "/tools/gas-appliance-connection/": {
       "sha": "11efa0afe3b863a3",
@@ -3958,8 +3958,8 @@
       "date": "2026-09-01"
     },
     "/tools/iso-nff/": {
-      "sha": "6837d3f6710aab1c",
-      "date": "2026-09-01"
+      "sha": "2eb4604c3940bf90",
+      "date": "2026-09-18"
     },
     "/tools/isolator-deflection/": {
       "sha": "f7c7e9d3cb2f521d",

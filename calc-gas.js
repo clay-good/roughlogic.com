@@ -427,8 +427,10 @@ GAS_RENDERERS["gas-pipe-max-flow"] = renderGasPipeMaxFlow;
 // =====================================================================
 // spec-v111: gas-altitude-derate (Group B) - high-altitude appliance input
 // derate (NFPA 54 / IFGC). The derated maximum input at altitude and the
-// kit flag. derate above a threshold elevation, the common
-// 4-percent-per-1000-ft-above-2000-ft convention (editable, edition varies).
+// kit flag. NFPA 54 / IFGC: above 2,000 ft, derate "at the rate of 4 percent
+// for each 1000 feet above sea level" -- the steps count from SEA LEVEL once
+// the threshold is passed. Until 2026-09-18 they counted from 2,000 ft, so
+// 6,000 ft derated 16% where the code's rule gives 24%.
 // =====================================================================
 
 // dims: in { nameplate_input_btuh: M L^2 T^-3, elevation_ft: L, derate_pct_per_1000: dimensionless, threshold_ft: L } out: { steps_1000: dimensionless, factor: dimensionless, derated_input_btuh: M L^2 T^-3 }
@@ -438,7 +440,7 @@ export function computeGasAltitudeDerate({ nameplate_input_btuh = 0, elevation_f
   if (elevation_ft < 0) return { error: "Elevation must be non-negative (ft)." };
   if (derate_pct_per_1000 < 0) return { error: "Derate percent must be non-negative." };
   if (threshold_ft < 0) return { error: "Threshold elevation must be non-negative (ft)." };
-  const steps_1000 = Math.max(0, (elevation_ft - threshold_ft) / 1000);
+  const steps_1000 = elevation_ft > threshold_ft ? elevation_ft / 1000 : 0;
   const factor = Math.max(0, 1 - (derate_pct_per_1000 / 100) * steps_1000);
   const derated_input_btuh = nameplate_input_btuh * factor;
   const needs_kit = elevation_ft > threshold_ft;
@@ -447,13 +449,13 @@ export function computeGasAltitudeDerate({ nameplate_input_btuh = 0, elevation_f
     : "at or below " + fmt(threshold_ft, 0) + " ft - no derate, no high-altitude kit";
   return {
     steps_1000, factor, derated_input_btuh, needs_kit, flag,
-    note: "Air thins with altitude, so a gas appliance must be derated above a threshold elevation. The common convention is 4% per 1000 ft above 2000 ft (both editable) - the exact basis differs by code edition and jurisdiction, and the manufacturer's instructions and the AHJ govern. Field orifice drilling is generally prohibited; use a listed manufacturer high-altitude conversion kit. The factor is floored at zero.",
+    note: "Air thins with altitude, so a gas appliance must be derated above a threshold elevation. NFPA 54 / IFGC derate 4% per 1000 ft above SEA LEVEL once the site is above 2000 ft (both editable) - the exact basis differs by code edition and jurisdiction, and the manufacturer's instructions and the AHJ govern. Field orifice drilling is generally prohibited; use a listed manufacturer high-altitude conversion kit. The factor is floored at zero.",
   };
 }
 export const gasAltitudeDerateExample = { inputs: { nameplate_input_btuh: 100000, elevation_ft: 6000, derate_pct_per_1000: 4, threshold_ft: 2000 } };
 
 function renderGasAltitudeDerate(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: NFPA 54 (National Fuel Gas Code) / IFGC high-altitude provision (by name, not reproduced). The 4-percent-per-1000-ft-above-2000-ft derate is the common editable convention; the exact basis varies by edition and AHJ. Field orifice drilling is generally prohibited - use a listed manufacturer kit. Free read-only at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: NFPA 54 (National Fuel Gas Code) / IFGC high-altitude provision (by name, not reproduced). The derate is 4 percent per 1000 ft above sea level, applied above 2000 ft (editable); the exact basis varies by edition and AHJ. Field orifice drilling is generally prohibited - use a listed manufacturer kit. Free read-only at nfpa.org/freeaccess.";
   const input = makeNumber("Nameplate input (BTU/hr)", "gad-in", { step: "any", min: "0" });
   const elev = makeNumber("Installation elevation (ft)", "gad-elev", { step: "any", min: "0" });
   const pct = makeNumber("Derate (% per 1000 ft)", "gad-pct", { step: "any", min: "0", value: "4" });

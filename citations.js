@@ -2037,14 +2037,14 @@ export const CITATIONS = {
   // --- v7 utility 252: ISO Needed Fire Flow ---
 
   "iso-nff": {
-    formula: "NFF = Ci × Oi × (1 + X + P) where Ci = 18 × F × sqrt(A_eff). F per construction class (Frame 1.5 / Joisted masonry 1.0 / Noncombustible and Masonry-noncombustible 0.8 / Modified-FR and Fire-resistive 0.6). A_eff = footprint × min(stories, 3) for non-fire-resistive; footprint × 1 for fire-resistive. X = exposure factor by distance band (0.05-0.25). P = communication factor. Output rounded to 250 gpm; floor 500, cap 12 000 gpm.",
+    formula: "NFF = Ci × Oi × (1 + X + P) where Ci = 18 × F × sqrt(A_eff). F per construction class (Frame 1.5 / Joisted masonry 1.0 / Noncombustible and Masonry-noncombustible 0.8 / Modified-FR and Fire-resistive 0.6). A_eff = largest floor + 50% of all other floors (Classes 1-4); Classes 5-6: + 25% of up to the two other largest floors with protected vertical openings, + 50% of up to eight if unprotected (ISO Guide for Determination of Needed Fire Flow, 2014, ch. 2 sec. 4c). Ci rounded to 250 gpm, 500 min, 8,000 max for Classes 1-2 and 6,000 for Classes 3-6 or a one-story building (sec. 5). X = exposure factor by distance band (0.05-0.25). P = communication factor. NFF rounded to 250 gpm; floor 500, cap 12 000 gpm.",
     edition: "ISO Public Protection Classification (PPC) Schedule by name. Cited by name only; the schedule's commentary is not reproduced.",
     freeAccess: "ISO PPC Schedule licensed; class-factor table free in published fire-protection texts and at most state insurance department outreach.",
     governance: GOVERNANCE.fire,
     editionNote: "Single-edition (ISO PPC Schedule).",
     assumptions: [
       { name: "Construction-class F table", value: "1=1.5 / 2=1.0 / 3=4=0.8 / 5=6=0.6", source: "ISO PPC" },
-      { name: "Cap on Ci", value: "8000 gpm before X / P / Oi factors", source: "ISO PPC engineering practice" },
+      { name: "Cap on Ci", value: "8,000 gpm (Classes 1-2), 6,000 gpm (Classes 3-6, or any one-story building), rounded to 250 and at least 500, before X / P / Oi", source: "ISO Guide for Determination of Needed Fire Flow (2014), ch. 2 sec. 5" },
       { name: "Round increment / floor / cap", value: "250 gpm / 500 gpm / 12 000 gpm", source: "ISO PPC" },
     ],
   },
@@ -15719,13 +15719,13 @@ export const CITATIONS = {
     ],
   },
   "gas-altitude-derate": {
-    formula: "steps = max(0, (elevation - threshold) / 1000); factor = max(0, 1 - (derate-per-1000ft / 100) x steps); derated input = nameplate x factor. A high-altitude-kit flag is set above the threshold.",
+    formula: "steps = elevation / 1000 when elevation > threshold, else 0 (counted from sea level); factor = max(0, 1 - (derate-per-1000ft / 100) x steps); derated input = nameplate x factor. A high-altitude-kit flag is set above the threshold.",
     edition: "NFPA 54 (National Fuel Gas Code) / IFGC high-altitude provision (by name, not reproduced); the derate basis is an editable convention.",
     freeAccess: "The derate arithmetic is public; the exact basis varies by edition and AHJ. Free read-only at nfpa.org/freeaccess.",
     governance: GOVERNANCE.general,
     editionNote: "Multi-edition (the exact high-altitude basis differs by NFPA 54 / IFGC edition and jurisdiction; the manufacturer's instructions and the AHJ govern).",
     assumptions: [
-      { name: "Derate basis", value: "default 4%/1000 ft above 2000 ft, both editable; the exact basis varies by edition and jurisdiction", source: "NFPA 54 / IFGC high-altitude provision" },
+      { name: "Derate basis", value: "default 4% per 1000 ft above sea level, applied above 2000 ft (the code counts from sea level, not from the threshold), both editable", source: "NFPA 54 / IFGC high-altitude provision" },
       { name: "Field drilling", value: "field orifice drilling is generally prohibited; use a listed manufacturer high-altitude conversion kit", source: "manufacturer instructions" },
       { name: "Floor", value: "the derate factor is floored at zero", source: "first principles" },
     ],

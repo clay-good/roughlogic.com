@@ -863,17 +863,31 @@ export const NFF_ROUND_INCREMENT = 250;
 export function computeIsoNeededFireFlow({
   area_ft2 = 0, stories = 1, construction_class = 3,
   occupancy_factor = 1.0, exposure_distance_ft = 100,
-  exposure_communication_factor = 0,
+  exposure_communication_factor = 0, vertical_openings = "protected",
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_ft2 > 0)) return { error: "Building footprint area must be positive." };
+  if (vertical_openings !== "protected" && vertical_openings !== "unprotected") return { error: "Vertical openings must be protected or unprotected." };
   if (!(stories >= 1)) return { error: "Stories must be >= 1." };
   const F = ISO_CONSTRUCTION_F[construction_class];
   if (F === undefined) return { error: "Construction class must be 1 through 6." };
   if (!(occupancy_factor > 0)) return { error: "Occupancy factor must be positive." };
-  const A_eff = construction_class >= 5 ? area_ft2 : area_ft2 * Math.min(stories, 3);
+  // ISO Guide for Determination of Needed Fire Flow (2014) Ch. 2 section 4c, with
+  // equal floors of the entered footprint: the largest floor plus, for Classes 1-4,
+  // 50% of all other floors; for Classes 5-6, 25% of up to the two other largest
+  // floors when vertical openings are protected, or 50% of up to eight when not
+  // (never less than the protected figure). Section 5: C is rounded to the
+  // nearest 250 gpm, at least 500, at most 8,000 (Classes 1-2) or 6,000
+  // (Classes 3-6, or any one-story building). Until 2026-09-18 other floors
+  // counted at 100% (1-4) or not at all (5-6), C was not rounded, and every
+  // class capped at 8,000.
+  const others = Math.max(0, Math.floor(stories) - 1);
+  const A_eff = construction_class <= 4 ? area_ft2 * (1 + 0.5 * others)
+    : vertical_openings === "unprotected" ? area_ft2 * (1 + Math.max(0.5 * Math.min(others, 8), 0.25 * Math.min(others, 2)))
+      : area_ft2 * (1 + 0.25 * Math.min(others, 2));
   const Ci_raw = 18 * F * Math.sqrt(A_eff);
-  const Ci = Math.min(Ci_raw, 8000);
+  const Ci_max = construction_class <= 2 && others > 0 ? 8000 : 6000;
+  const Ci = Math.min(Math.max(Math.round(Ci_raw / NFF_ROUND_INCREMENT) * NFF_ROUND_INCREMENT, 500), Ci_max);
   let X = 0;
   if (exposure_distance_ft > 0) {
     if (exposure_distance_ft <= 10) X = 0.25;
@@ -897,11 +911,11 @@ export function computeIsoNeededFireFlow({
 }
 
 export const isoNeededFireFlowExample = {
-  inputs: { area_ft2: 5000, stories: 2, construction_class: 2, occupancy_factor: 1.0, exposure_distance_ft: 50, exposure_communication_factor: 0 },
+  inputs: { area_ft2: 5000, stories: 2, construction_class: 2, occupancy_factor: 1.0, exposure_distance_ft: 50, exposure_communication_factor: 0, vertical_openings: "protected" },
 };
 
 function _v7f_renderIsoNFF(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: ISO Public Protection Classification (PPC) Schedule by name. NFF = Ci × Oi × (1 + X + P) where Ci = 18 × F × sqrt(A); rounded to the published 250 gpm increment and capped at 12 000 gpm. SOP-and-incident-command governs.";
+  citationEl.textContent = "Citation: ISO Public Protection Classification (PPC) Schedule by name. NFF = Ci × Oi × (1 + X + P) where Ci = 18 × F × sqrt(A), A = largest floor + 50% of other floors (Classes 1-4) or 25% of up to two others (5-6, protected openings; 50% of up to eight if unprotected); Ci rounded to 250 gpm, 500 min, 8,000 max (Classes 1-2) or 6,000 (3-6 or one story); NFF rounded to 250 and capped at 12 000 gpm. SOP-and-incident-command governs.";
   _v7f_attachEx(inputRegion, () => fillExample(isoNeededFireFlowExample.inputs));
   const a = _v7f_makeNumber("Footprint area (ft²)", "nf-a", { step: "any", min: "0" });
   const s = _v7f_makeNumber("Stories", "nf-s", { step: "1", min: "1" });
@@ -919,24 +933,29 @@ function _v7f_renderIsoNFF(inputRegion, outputRegion, citationEl) {
   const e = _v7f_makeNumber("Exposure distance (ft)", "nf-e", { step: "any", min: "0" });
   const p = _v7f_makeNumber("Communication factor P (0-0.30)", "nf-p", { step: "any", min: "0" });
   p.input.value = "0";
-  for (const f of [a, s, c, o, e, p]) inputRegion.appendChild(f.wrap);
+  const vo = _v7f_makeSelect("Vertical openings (Classes 5-6)", "nf-vo", [
+    { value: "protected", label: "Protected (1-hour enclosures)" },
+    { value: "unprotected", label: "Unprotected" },
+  ]);
+  for (const f of [a, s, c, o, e, p, vo]) inputRegion.appendChild(f.wrap);
   const oCi = _v7f_makeOut(outputRegion, "Construction factor Ci", "nf-out-ci");
   const oX = _v7f_makeOut(outputRegion, "Exposure factor X", "nf-out-x");
   const oNFF = _v7f_makeOut(outputRegion, "Needed Fire Flow (NFF)", "nf-out-nff");
-  function fillExample(x) { a.input.value = x.area_ft2; s.input.value = x.stories; c.select.value = String(x.construction_class); o.input.value = x.occupancy_factor; e.input.value = x.exposure_distance_ft; p.input.value = x.exposure_communication_factor; update(); }
+  function fillExample(x) { a.input.value = x.area_ft2; s.input.value = x.stories; c.select.value = String(x.construction_class); o.input.value = x.occupancy_factor; e.input.value = x.exposure_distance_ft; p.input.value = x.exposure_communication_factor; vo.select.value = x.vertical_openings || "protected"; update(); }
   const update = _v7f_debounce(() => {
     const r = computeIsoNeededFireFlow({
       area_ft2: Number(a.input.value) || 0, stories: Number(s.input.value) || 1,
       construction_class: Number(c.select.value), occupancy_factor: Number(o.input.value) || 1.0,
       exposure_distance_ft: Number(e.input.value) || 100,
       exposure_communication_factor: Number(p.input.value) || 0,
+      vertical_openings: vo.select.value,
     });
     if (r.error) { oCi.textContent = r.error; oX.textContent = "-"; oNFF.textContent = "-"; return; }
     oCi.textContent = _v7f_fmt(r.Ci_capped, 0) + " (raw " + _v7f_fmt(r.Ci_raw, 0) + ")";
     oX.textContent = _v7f_fmt(r.X_exposure, 2);
     oNFF.textContent = _v7f_fmt(r.NFF_gpm, 0) + " gpm (rounded; cap 12 000)";
   }, _V7F_DEB);
-  for (const f of [a.input, s.input, c.select, o.input, e.input, p.input]) f.addEventListener("input", update);
+  for (const f of [a.input, s.input, c.select, o.input, e.input, p.input, vo.select]) f.addEventListener("input", update);
 }
 
 FIRE_RENDERERS["iso-nff"] = _v7f_renderIsoNFF;

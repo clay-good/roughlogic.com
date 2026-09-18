@@ -5286,17 +5286,23 @@ test("bounds: calc-fire computeLadderPipeReach pins horizontal_total = ladder_ho
 });
 
 test("bounds: calc-fire computeIsoNeededFireFlow pins Ci = 18*F*sqrt(A_eff), the X exposure ladder, the 250-gpm rounding, and the 12000-gpm cap", () => {
-  // Spec example pin (area 5000, stories 2, class 2 -> F=1.0, occ=1, exposure 50 ft -> X=0.15, no P).
-  // A_eff = 5000 * min(2,3) = 10000; Ci_raw = 18 * 1.0 * sqrt(10000) = 1800; not capped.
-  // NFF_raw = 1800 * 1.0 * (1 + 0.15 + 0) = 2070; rounded to nearest 250 = 2000.
+  // Spec example (area 5000, stories 2, class 2 -> F=1.0, occ=1, exposure 50 ft -> X=0.15, no P).
+  // ISO Guide ch. 2 sec. 4c: A_eff = 5000 + 50% x 5000 = 7500; Ci_raw = 18 sqrt(7500) = 1558.8,
+  // rounded to 1500 (sec. 5); NFF_raw = 1500 x 1.15 = 1725 -> 1750.
   const r = computeIsoNeededFireFlow({ area_ft2: 5000, stories: 2, construction_class: 2, occupancy_factor: 1.0, exposure_distance_ft: 50, exposure_communication_factor: 0 });
   assert.ok(!r.error, JSON.stringify(r));
   assert.strictEqual(r.F_factor, 1.0);
-  assert.strictEqual(r.A_eff_ft2, 10000);
-  assert.ok(Math.abs(r.Ci_raw - 18 * 1.0 * Math.sqrt(10000)) < 1e-9, `Ci_raw identity`);
+  assert.strictEqual(r.A_eff_ft2, 7500);
+  assert.ok(Math.abs(r.Ci_raw - 18 * 1.0 * Math.sqrt(7500)) < 1e-9, `Ci_raw identity`);
+  assert.strictEqual(r.Ci_capped, 1500, `Ci rounded to 250 before the multipliers`);
   assert.strictEqual(r.X_exposure, 0.15);
-  assert.ok(Math.abs(r.NFF_raw_gpm - 2070) < 1e-9, `NFF_raw identity`);
-  assert.strictEqual(r.NFF_gpm, 2000, `rounded to nearest 250`);
+  assert.ok(Math.abs(r.NFF_raw_gpm - 1725) < 1e-9, `NFF_raw identity`);
+  assert.strictEqual(r.NFF_gpm, 1750, `rounded to nearest 250`);
+  // Classes 5-6: 25% of up to two other floors (protected); 50% of up to eight (unprotected).
+  assert.strictEqual(computeIsoNeededFireFlow({ area_ft2: 10000, stories: 4, construction_class: 6, exposure_distance_ft: 200 }).A_eff_ft2, 15000);
+  assert.strictEqual(computeIsoNeededFireFlow({ area_ft2: 10000, stories: 4, construction_class: 6, exposure_distance_ft: 200, vertical_openings: "unprotected" }).A_eff_ft2, 25000);
+  // One-story buildings cap Ci at 6,000 even in Class 1.
+  assert.strictEqual(computeIsoNeededFireFlow({ area_ft2: 1e6, stories: 1, construction_class: 1, exposure_distance_ft: 200 }).Ci_capped, 6000);
   // X-ladder pinning: every band returns the expected coefficient.
   const ladder = [
     { d: 5, X: 0.25 }, { d: 10, X: 0.25 },
@@ -13509,7 +13515,10 @@ test("bounds: spec-v652 computeGasMeterClockTarget inverts the meter clock, roun
 import { computeGasAltitudeDerate as _v111a, computeGasFuelConversion as _v111b } from "../../calc-gas.js";
 test("bounds: spec-v111 fuel-gas altitude derate and NG/LP conversion (NFPA 54 / orifice flow)", () => {
   const a = _v111a({ nameplate_input_btuh: 100000, elevation_ft: 6000, derate_pct_per_1000: 4, threshold_ft: 2000 });
-  assert.ok(a.steps_1000 === 4 && Math.abs(a.factor - 0.84) < 1e-9 && Math.abs(a.derated_input_btuh - 84000) < 1e-6 && a.needs_kit === true);
+  // NFPA 54 / IFGC: 4% per 1000 ft above SEA LEVEL once past 2000 ft -> 6 steps at 6000 ft.
+  assert.ok(a.steps_1000 === 6 && Math.abs(a.factor - 0.76) < 1e-9 && Math.abs(a.derated_input_btuh - 76000) < 1e-6 && a.needs_kit === true);
+  // Just past the threshold the whole 2,100 ft counts: 8.4%, not 0.4%.
+  assert.ok(Math.abs(_v111a({ nameplate_input_btuh: 100000, elevation_ft: 2100 }).factor - 0.916) < 1e-9);
   const a2 = _v111a({ nameplate_input_btuh: 100000, elevation_ft: 2000 });
   assert.ok(a2.steps_1000 === 0 && a2.factor === 1 && a2.derated_input_btuh === 100000 && a2.needs_kit === false);
   assert.ok("error" in _v111a({ nameplate_input_btuh: 0 }) && "error" in _v111a({ nameplate_input_btuh: 100000, elevation_ft: -5 }));

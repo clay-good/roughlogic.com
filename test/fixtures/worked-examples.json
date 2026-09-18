@@ -10550,11 +10550,11 @@
   {
    "tile_id": "iso-nff",
    "source_publisher": "ISO Public Protection Classification (PPC) Schedule (cited by name)",
-   "source_title": "Needed Fire Flow: NFF = Ci * Oi * (1 + X + P), Ci = 18 * F * sqrt(A_eff), rounded to nearest 250 gpm and capped at 12,000",
-   "source_edition_or_year": "ISO PPC Schedule (Class 2 joisted masonry F = 1.0; up to 3 stories multiply A by stories for Ci)",
-   "source_section_or_page": "5000 ft^2 / 2 stories / Class 2 / occupancy 1.0 / 50 ft exposure -> A_eff 10,000 / Ci 1800 / X 0.15 / NFF 2000 gpm",
+   "source_title": "Needed Fire Flow: NFF = Ci * Oi * (1 + X + P), Ci = 18 * F * sqrt(A_eff), Ci rounded to 250 gpm, NFF rounded to 250 and capped at 12,000",
+   "source_edition_or_year": "ISO PPC Schedule ISO Guide for Determination of Needed Fire Flow (2014) ch. 2 sec. 4c-5 (Class 2 joisted masonry F = 1.0; A = largest floor + 50% of other floors)",
+   "source_section_or_page": "5000 ft^2 / 2 stories / Class 2 / occupancy 1.0 / 50 ft exposure -> A_eff 7,500 / Ci 1558.8 rounded to 1500 / X 0.15 / 1725 -> NFF 1750 gpm",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-18",
    "inputs": {
     "area_ft2": 5000,
     "stories": 2,
@@ -10570,13 +10570,13 @@
      }
     },
     "A_eff_ft2": {
-     "value": 10000,
+     "value": 7500,
      "tolerance": {
       "abs": 0.01
      }
     },
     "Ci_capped": {
-     "value": 1800,
+     "value": 1500,
      "tolerance": {
       "abs": 1
      }
@@ -10588,7 +10588,7 @@
      }
     },
     "NFF_gpm": {
-     "value": 2000,
+     "value": 1750,
      "tolerance": {
       "abs": 0
      }
@@ -32141,11 +32141,11 @@
   {
    "tile_id": "gas-altitude-derate",
    "source_publisher": "NFPA 54 (National Fuel Gas Code) / IFGC high-altitude provision (by name)",
-   "source_title": "4 percent per 1000 ft above 2000 ft derate",
+   "source_title": "4 percent per 1000 ft above sea level, applied above 2000 ft (NFPA 54 / IFGC)",
    "source_edition_or_year": "spec-v111 worked example (machine-verified)",
-   "source_section_or_page": "spec-v111 section 2.1 pinned example (100k at 6,000 ft -> 0.84 factor, 84,000 BTU/hr, kit flag)",
+   "source_section_or_page": "spec-v111 section 2.1 pinned example (100k at 6,000 ft -> 6 steps from sea level, 0.76 factor, 76,000 BTU/hr, kit flag)",
    "verified_by": "rl",
-   "verified_on": "2026-06-20",
+   "verified_on": "2026-09-18",
    "inputs": {
     "nameplate_input_btuh": 100000,
     "elevation_ft": 6000,
@@ -32154,19 +32154,19 @@
    },
    "outputs": {
     "steps_1000": {
-     "value": 4,
+     "value": 6,
      "tolerance": {
       "abs": 0
      }
     },
     "factor": {
-     "value": 0.84,
+     "value": 0.76,
      "tolerance": {
       "abs": 0.0001
      }
     },
     "derated_input_btuh": {
-     "value": 84000,
+     "value": 76000,
      "tolerance": {
       "abs": 1
      }

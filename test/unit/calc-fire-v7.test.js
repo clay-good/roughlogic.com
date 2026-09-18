@@ -22,15 +22,18 @@ test("252 Ci = 18 × F × sqrt(A_eff)", () => {
   assert.ok(close(r.Ci_raw, 18 * 1.0 * Math.sqrt(5000), 0.01));
 });
 
-test("252 stories multiplier capped at 3 for non-fire-resistive", () => {
+test("252 Classes 1-4: largest floor plus 50% of all other floors (ISO Guide ch. 2 sec. 4c)", () => {
   const a = computeIsoNeededFireFlow({ area_ft2: 5000, stories: 3, construction_class: 2, exposure_distance_ft: 999 });
   const b = computeIsoNeededFireFlow({ area_ft2: 5000, stories: 10, construction_class: 2, exposure_distance_ft: 999 });
-  assert.equal(a.A_eff_ft2, b.A_eff_ft2);
+  assert.equal(a.A_eff_ft2, 5000 * 2);
+  assert.equal(b.A_eff_ft2, 5000 * 5.5);
 });
 
-test("252 fire-resistive (class 5/6) does NOT multiply by stories", () => {
+test("252 fire-resistive (class 5/6) adds 25% of up to two other floors with protected openings", () => {
   const r = computeIsoNeededFireFlow({ area_ft2: 5000, stories: 5, construction_class: 6, exposure_distance_ft: 999 });
-  assert.equal(r.A_eff_ft2, 5000);
+  assert.equal(r.A_eff_ft2, 5000 * 1.5);
+  const u = computeIsoNeededFireFlow({ area_ft2: 5000, stories: 5, construction_class: 6, exposure_distance_ft: 999, vertical_openings: "unprotected" });
+  assert.equal(u.A_eff_ft2, 5000 * 3);
 });
 
 test("252 NFF rounded to nearest 250 gpm", () => {
