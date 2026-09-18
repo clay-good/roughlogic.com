@@ -8045,7 +8045,8 @@ test("bounds: calc-plumbing computeTanklessGPM pins GPM = (kBTU*1000)/(8.33*60*d
   assert.strictEqual(r.inlet_F, 50);
   assert.strictEqual(r.delta_T_F, 60);
   assert.strictEqual(r.target_outlet_F, 110);
-  assert.ok(Math.abs(r.gpm - (199 * 1000) / (8.33 * 60 * 60)) < 1e-9);
+  assert.ok(Math.abs(r.gpm - (199 * 1000 * 0.82) / (8.33 * 60 * 60)) < 1e-9); // default 0.82 thermal efficiency
+  assert.ok("error" in computeTanklessGPM({ kbtu_input: 199, climate_zone: "5A_Chicago_IL", thermal_efficiency: 1.2 }));
   // Rejections.
   assert.ok("error" in computeTanklessGPM({ kbtu_input: 199, climate_zone: "unknown", target_outlet_F: 110 }));
   assert.ok("error" in computeTanklessGPM({ kbtu_input: 0, climate_zone: "5A_Chicago_IL" })); // kbtu<=0

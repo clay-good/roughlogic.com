@@ -353,9 +353,14 @@ test("Tankless: 7 zones bundled", () => {
 });
 
 test("Tankless: hand-calc check at 199 kBTU, dT=60", () => {
-  // gpm = 199*1000 / (8.33*60*60) ~ 6.64
+  // gpm = 199*1000*0.82 / (8.33*60*60) ~ 5.44 at the default 0.82 thermal efficiency
   const r = computeTanklessGPM({ kbtu_input: 199, climate_zone: "5A_Chicago_IL", target_outlet_F: 110 });
-  assert.ok(close(r.gpm, 199 * 1000 / (8.33 * 60 * 60), 0.05));
+  assert.ok(close(r.gpm, 199 * 1000 * 0.82 / (8.33 * 60 * 60), 0.01));
+  // A 0.95 condensing unit delivers proportionally more.
+  const c = computeTanklessGPM({ kbtu_input: 199, climate_zone: "5A_Chicago_IL", target_outlet_F: 110, thermal_efficiency: 0.95 });
+  assert.ok(close(c.gpm / r.gpm, 0.95 / 0.82, 1e-9));
+  // The inverse modes invert it: the input needed for 5.44 gpm is 199 kBTU.
+  assert.ok(close(computeTanklessGPM({ solve_for: "kbtu", target_gpm: r.gpm, climate_zone: "5A_Chicago_IL", target_outlet_F: 110 }).kbtu_input, 199, 1e-9));
 });
 
 // --- Utility 78: Gas Leak Rate ---

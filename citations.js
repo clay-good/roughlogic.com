@@ -4109,13 +4109,13 @@ export const CITATIONS = {
     ],
   },
   "tankless-gpm": {
-    formula: "Required heater output (BTU/hr) = 8.34 × ΔT × GPM × 60. Solved for GPM given the heater's rated input × thermal efficiency.",
+    formula: "Delivered heat (BTU/hr) = 8.33 × ΔT × GPM × 60 = rated input × thermal efficiency. Solved for GPM, required input, or temperature rise.",
     edition: "ASHRAE Handbook (HVAC Systems and Equipment) by name; manufacturer ratings on the heater nameplate.",
     freeAccess: "ASHRAE Handbook licensed; manufacturer data sheets free at each manufacturer site.",
     governance: GOVERNANCE.plumbing,
     editionNote: "Single-edition (engineering practice + manufacturer data).",
     assumptions: [
-      { name: "Specific heat × density factor", value: "8.34 (BTU per gal-°F)", source: "physical fact for water" },
+      { name: "Specific heat × density factor", value: "8.33 (BTU per gal-°F)", source: "physical fact for water" },
       { name: "Default thermal efficiency", value: "0.82 unless user supplies a tested EF", source: "DOE federal minimum for gas tankless" },
     ],
   },

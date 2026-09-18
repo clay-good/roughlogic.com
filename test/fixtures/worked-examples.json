@@ -5546,9 +5546,9 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Tankless GPM = (kBTU * 1000) / (8.33 lb/gal * 60 min/hr * dT_F)",
    "source_edition_or_year": "n/a",
-   "source_section_or_page": "199 kBTU input, climate 5A (Chicago) inlet 50 F, target 110 F outlet -> dT 60 F -> 6.64 gpm; standard sensible-heat identity for water",
+   "source_section_or_page": "199 kBTU input, climate 5A (Chicago) inlet 50 F, target 110 F outlet -> dT 60 F -> 5.44 gpm at the default 0.82 thermal efficiency (199,000 x 0.82 / (8.33 x 60 x 60)); standard sensible-heat identity for water",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-18",
    "inputs": {
     "kbtu_input": 199,
     "climate_zone": "5A_Chicago_IL",
@@ -5556,7 +5556,7 @@
    },
    "outputs": {
     "gpm": {
-     "value": 6.636,
+     "value": 5.4415,
      "tolerance": {
       "pct": 0.5
      }

@@ -5804,7 +5804,7 @@ test("monotonicity: computeTanklessGPM gpm is strictly increasing in kbtu_input 
     `2x kbtu: gpm = ${b.gpm} != 2 * ${a.gpm}`);
   // Closed-form pin: gpm = kbtu * 1000 / (8.33 * 60 * dT).
   const ref = computeTanklessGPM({ kbtu_input: 199, climate_zone: "5A_Chicago_IL", target_outlet_F: 110 });
-  const expectedGpm = (199 * 1000) / (8.33 * 60 * ref.delta_T_F);
+  const expectedGpm = (199 * 1000 * 0.82) / (8.33 * 60 * ref.delta_T_F); // default 0.82 thermal efficiency
   assert.ok(Math.abs(ref.gpm - expectedGpm) < 1e-9,
     `gpm = ${ref.gpm}, expected ${expectedGpm}`);
   assert.equal(ref.target_outlet_F, 110);

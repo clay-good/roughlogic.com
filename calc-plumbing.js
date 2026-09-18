@@ -742,8 +742,14 @@ export const TANKLESS_INLET_F_BY_ZONE = {
 };
 
 // dims: in { kbtu_input: M L^2 T^-3, climate_zone: dimensionless, target_outlet_F: T, solve_for: dimensionless, target_gpm: L^3 T^-1, inlet_override_F: T } out: { gpm: L^3 T^-1, kbtu_input: M L^2 T^-3, delta_T_F: T }
-export function computeTanklessGPM({ kbtu_input, climate_zone, target_outlet_F = 110, solve_for = "gpm", target_gpm = 0, inlet_override_F = 0 }) {
+export function computeTanklessGPM({ kbtu_input, climate_zone, target_outlet_F = 110, solve_for = "gpm", target_gpm = 0, inlet_override_F = 0, thermal_efficiency = 0.82 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The burner's INPUT rating times its thermal efficiency is the heat the water
+  // gets. The citation always said so (default 0.82, the DOE gas-tankless
+  // minimum), but until 2026-09-18 the code took input as delivered heat, which
+  // overstated flow 22% at 0.82 and 5% for a 0.95 condensing unit.
+  const eff = Number(thermal_efficiency);
+  if (!(eff > 0 && eff <= 1)) return { error: "Thermal efficiency must be over 0 and at most 1 (0.82 typical non-condensing, 0.95 condensing)." };
   let inlet = TANKLESS_INLET_F_BY_ZONE[climate_zone];
   if (inlet === undefined) return { error: "Unknown climate zone." };
   // v23 EN.4: optional inlet override (a summer/winter worst-case preset the
@@ -756,19 +762,19 @@ export function computeTanklessGPM({ kbtu_input, climate_zone, target_outlet_F =
     const g = Number(target_gpm) || 0;
     if (!(g > 0 && Number.isFinite(g))) return { error: "Provide a positive target GPM." };
     if (!(dT > 0)) return { error: "Outlet must exceed inlet." };
-    return { solve_for, kbtu_input: (g * 8.33 * 60 * dT) / 1000, gpm: g, delta_T_F: dT, inlet_F: inlet, target_outlet_F: out };
+    return { solve_for, kbtu_input: (g * 8.33 * 60 * dT) / (1000 * eff), gpm: g, delta_T_F: dT, inlet_F: inlet, target_outlet_F: out };
   }
   if (solve_for === "dt") {
     const g = Number(target_gpm) || 0;
     const kbtu = Number(kbtu_input) || 0;
     if (!(g > 0 && Number.isFinite(g))) return { error: "Provide a positive target GPM." };
     if (!(kbtu > 0 && Number.isFinite(kbtu))) return { error: "Provide positive kBTU." };
-    const dt_req = (kbtu * 1000) / (8.33 * 60 * g);
+    const dt_req = (kbtu * 1000 * eff) / (8.33 * 60 * g);
     return { solve_for, delta_T_F: dt_req, gpm: g, kbtu_input: kbtu, inlet_F: inlet, target_outlet_F: inlet + dt_req };
   }
   const kbtu = Number(kbtu_input) || 0;
   if (kbtu <= 0 || dT <= 0) return { error: "Provide positive kBTU and outlet > inlet." };
-  const gpm = (kbtu * 1000) / (8.33 * 60 * dT);
+  const gpm = (kbtu * 1000 * eff) / (8.33 * 60 * dT);
   return { gpm, delta_T_F: dT, inlet_F: inlet, target_outlet_F: out, solve_for: "gpm" };
 }
 
@@ -935,9 +941,11 @@ export function renderTanklessGPM(inputRegion, outputRegion, citationEl) {
   const zone = makeSelect("Climate zone", "tl-z", Object.keys(TANKLESS_INLET_F_BY_ZONE).map((z) => ({ value: z, label: z.replace(/_/g, " ") })));
   const ovr = makeNumber("Inlet override (F, winter worst-case; blank = zone)", "tl-ov", { step: "any", min: "0" });
   const out = makeNumber("Target outlet (°F)", "tl-o", { step: "any", min: "0", value: "110" });
+  const eff = makeNumber("Thermal efficiency (0.82 non-condensing, 0.95 condensing)", "tl-eff", { step: "any", min: "0", max: "1", value: "0.82" });
+  eff.input.value = "0.82";
   out.input.value = "110";
-  for (const f of [solve, kbtu, tgpm, zone, ovr, out]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { solve.select.value = "gpm"; kbtu.input.value = "199"; tgpm.input.value = ""; zone.select.value = "5A_Chicago_IL"; ovr.input.value = ""; out.input.value = "110"; update(); });
+  for (const f of [solve, kbtu, tgpm, zone, ovr, out, eff]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { solve.select.value = "gpm"; kbtu.input.value = "199"; tgpm.input.value = ""; zone.select.value = "5A_Chicago_IL"; ovr.input.value = ""; out.input.value = "110"; eff.input.value = "0.82"; update(); });
   const oG = makeOutputLine(outputRegion, "Solved", "tl-out-g");
   const oI = makeOutputLine(outputRegion, "Inlet temperature", "tl-out-i");
   const oD = makeOutputLine(outputRegion, "delta T", "tl-out-d");
@@ -949,13 +957,14 @@ export function renderTanklessGPM(inputRegion, outputRegion, citationEl) {
       solve_for: solve.select.value,
       target_gpm: Number(tgpm.input.value) || 0,
       inlet_override_F: Number(ovr.input.value) || 0,
+      thermal_efficiency: Number(eff.input.value) || 0.82,
     });
     if (r.error) { oG.textContent = r.error; oI.textContent = "-"; oD.textContent = "-"; return; }
     oG.textContent = r.solve_for === "kbtu" ? (fmt(r.kbtu_input, 1) + " kBTU/hr") : r.solve_for === "dt" ? (fmt(r.delta_T_F, 1) + " F rise") : (fmt(r.gpm, 2) + " gpm");
     oI.textContent = fmt(r.inlet_F, 0) + " F";
     oD.textContent = fmt(r.delta_T_F, 0) + " F";
   }, DEBOUNCE_MS);
-  for (const el of [solve.select, kbtu.input, tgpm.input, zone.select, ovr.input, out.input]) el.addEventListener("input", update);
+  for (const el of [solve.select, kbtu.input, tgpm.input, zone.select, ovr.input, out.input, eff.input]) el.addEventListener("input", update);
 }
 
 // renderGasLeakRate -> relocated to calc-gas.js (spec-v42 split)
