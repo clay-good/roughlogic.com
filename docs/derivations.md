@@ -3709,6 +3709,17 @@ cross-check.
 | calc-warehouse.js | `computeRackUprightCapacityDerate` | `{ beam_spacing_in = 0, column_moment_of_inertia_in4 = 0, effective_length_fac...` | _ | _ | _ |
 | calc-warehouse.js | `computeStackingAisleWidth` | `{ load_length_in = 0, operating_clearance_in = 0, counterbalanced_turning_rad...` | _ | _ | _ |
 | calc-warehouse.js | `computeWarehouseCubeUtilization` | `{ building_width_ft = 0, building_depth_ft = 0, clear_height_ft = 0, module_p...` | _ | _ | _ |
+| calc-waste.js | `computeCollectionRouteProductivity` | `{ stop_count = 0, seconds_per_stop = 0, setout_weight_lb = 0, truck_payload_t...` | _ | _ | _ |
+| calc-waste.js | `computeCollectionVehiclePayload` | `{ body_volume_cy = 0, loose_density_lb_per_cy = 0, compaction_ratio = 0, gvwr...` | _ | _ | _ |
+| calc-waste.js | `computeDailyCoverVolume` | `{ face_length_ft = 0, face_width_ft = 0, cover_depth_in = 0, operating_days =...` | _ | _ | _ |
+| calc-waste.js | `computeDiversionRateContamination` | `{ total_generated_tons = 0, recycling_tons = 0, organics_tons = 0, contaminat...` | _ | _ | _ |
+| calc-waste.js | `computeLandfillAirspaceDensity` | `{ annual_tons = 0, in_place_density_lb_per_cy = 0, cover_ratio_pct = 0, airsp...` | _ | _ | _ |
+| calc-waste.js | `computeLandfillGasGeneration` | `{ annual_tons = 0, placement_years = 0, methane_yield_m3_per_mg = 0, decay_co...` | _ | _ | _ |
+| calc-waste.js | `computeLandfillSettlementAirspace` | `{ waste_thickness_ft = 0, filled_acres = 0, primary_settlement_pct = 0, secon...` | _ | _ | _ |
+| calc-waste.js | `computeLeachateWaterBalance` | `{ open_acres = 0, annual_precip_in = 0, runoff_coefficient = 0, evapotranspir...` | _ | _ | _ |
+| calc-waste.js | `computeLfgFlareCapacity` | `{ peak_lfg_cfm = 0, methane_fraction_pct = 0, design_margin_pct = 0, turndown...` | _ | _ | _ |
+| calc-waste.js | `computeTransferStationThroughput` | `{ daily_tons = 0, operating_hours = 0, peak_hour_share_pct = 0, collection_pa...` | _ | _ | _ |
+| calc-waste.js | `computeWorkingFaceCellLift` | `{ daily_tons = 0, in_place_density_lb_per_cy = 0, face_width_ft = 0, lift_hei...` | _ | _ | _ |
 | calc-water.js | `computeAerationOxygenDemand` | `{ bod_removed_lb_day = 0, oxygen_factor = 0, nh3_nitrified_lb_day = 0, sote_p...` | _ | _ | _ |
 | calc-water.js | `computeBackflowTestPSI` | `{ assembly_type = "rp", check1_psid = 0, relief_open_psid = 0, check2_psi = 0...` | _ | _ | _ |
 | calc-water.js | `computeChlorineDecay` | `{ initial_mg_l = 0, decay_k_per_hr = 0.1, time_hr = 0, target_mg_l = 0.2, vel...` | _ | _ | _ |
@@ -3798,7 +3809,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2384.
+Row count: 2395.
 
 <!-- END function-corpus-v14 -->
 
@@ -5217,7 +5228,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (156 tiles)
+### Group G Cross-trade (157 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5282,6 +5293,7 @@ per spec-v14 §13.1 second paragraph.
 | `laundry-cost-per-pound` | Laundry Water, Sewer, and Energy Cost per Pound | Project (first-principles); the utility tariffs, the chemical supplier, and the equip... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `laundry-dryer-evaporation` | Tumble Dryer Evaporation Load and Makeup Air | Project (first-principles); the dryer manufacturer, the adopted mechanical code, and ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `laundry-washer-turns` | Commercial Laundry Washer Capacity and Turns per Day | Project (first-principles); the equipment manufacturer and the applicable laundry sta... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `lfg-flare-capacity` | Landfill Gas Flare Capacity and Destruction | Project (first-principles); the air permit and manufacturer govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lifeline-tension` | Horizontal Lifeline Tension and Anchorage (OSHA 1926.502) | roughlogic; At midspan, 2 T sin(theta) = W with sin(theta) = s / sqrt... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `linear-interpolation` | Linear Interpolation | First-principles linear interpolation; (0,10) and (10,30), x = 4 -> y = 18, slope 2 (within range) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `loan-payment` | Loan Payment | Project (first-principles); Closed-form annuity-immediate at monthly rate r = APR/12/100 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5398,7 +5410,7 @@ per spec-v14 §13.1 second paragraph.
 | `tool-maintenance` | Tool Maintenance Intervals | Project bundled tool maintenance sche...; Reference compute returns the per-attribute table; runner... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 | `triage-quickread` | Field First Aid Triage Quick-Read | START / SALT triage protocols (projec...; Returns 4 categories + notice + citation; tested on the n... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 
-### Group J Trucking (49 tiles)
+### Group J Trucking (52 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5408,6 +5420,8 @@ per spec-v14 §13.1 second paragraph.
 | `bridge-formula-min-spacing` | Bridge Formula Minimum Axle Spread | FHWA (Federal Bridge Formula B, solve...; spec-v656 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cargo-securement-wll` | Cargo Securement Working-Load-Limit Check | FMCSA 49 CFR 393.100-393.136; 8000 lb, 4 tiedowns x 1500 lb -> 6000 lb aggregate >= 400... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `clearance-plate-envelope` | Railcar Curve Swing and Clearance Envelope | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `collection-route-productivity` | Waste Collection Route Time and Truck Count | Project (first-principles); the operation's own time study governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `collection-vehicle-payload` | Collection Vehicle Payload and Compaction Ratio | Project (first-principles); the weight law and manufacturer ratings govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cost-per-mile` | Operating Cost Per Mile | ATRI cost-per-mile bucket methodology; $6000/10,000 mi, $4.00/gal at 6.5 mpg, $0.18 maint, $0.65... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `deadhead-percent` | Deadhead Percentage and Effective Rate | Freight-economics arithmetic + FMCSA ...; 800 loaded / 120 deadhead / $1840 -> 13.04% deadhead, $2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `deck-point-load-dunnage` | Trailer Deck Point Load and Dunnage Spread | Project (first-principles); load / bearing length along the trailer | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5447,6 +5461,7 @@ per spec-v14 §13.1 second paragraph.
 | `tonnage-rating-grade` | Locomotive Tonnage Rating on a Ruling Grade | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `train-brake-reduction` | Train Air Brake Reduction and Cylinder Pressure | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `transfer-station-throughput` | Transfer Station Throughput and Trailer Loadout | Project (first-principles); the facility's scale records govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `truck-off-tracking` | Low-Speed Off-Tracking (Swept Path) | AASHTO Green Book (low-speed off-trac...; OT = 50 - sqrt(2500 - 400) = 50 - 45.826 = 4.174 ft; effe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5711,7 +5726,7 @@ per spec-v14 §13.1 second paragraph.
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-stroke-mix-ratio-check` | Two-Stroke Mix Ratio Check | First-principles volume arithmetic (i...; spec-v653 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group M Water and wastewater (76 tiles)
+### Group M Water and wastewater (83 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5733,6 +5748,7 @@ per spec-v14 §13.1 second paragraph.
 | `conductivity-from-tds` | Conductivity from Total Dissolved Solids | Standard Methods 2510 (inverse of tds...; spec-v657 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `constant-pressure-well-vfd` | Constant-Pressure Well VFD Setpoint and Speed | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cooling-water-makeup` | Cooling Water Makeup (Cycles of Concentration) | CTI / ASHRAE; evap = 1000*10/1000 = 10; blowdown = 10/(4-1) = 3.333; dr... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `daily-cover-volume` | Landfill Daily Cover Soil Volume | Project (first-principles); the permit and regulator govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dechlorination-dose` | Dechlorination Chemical Dose | Dechlorination stoichiometry + pounds...; dose = 1.46*2.0 = 2.92; feed = 2.92*5*8.34/1.0 = 121.76 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `design-flow-peaking` | Design Flow from Population (Average, Peak, Minimum) | Metcalf & Eddy, Wastewater Engineerin...; avg = 50000 x 100 / 1e6 = 5.0 MGD; PF = 1 + 14/(4 + sqrt(... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `detention-basin-volume` | Detention Basin Volume for a Target Time | Ten States Standards / USEPA; 120 min contact at 350 GPM -> 42,000 gal | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5740,6 +5756,7 @@ per spec-v14 §13.1 second paragraph.
 | `digester-gas-production` | Digester Gas and Methane Production | Anaerobic digester gas production (WE...; 10,000 lb/day VS fed at 55% reduction, 15 ft3/lb, 65% met... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `digester-vs-loading` | Anaerobic Digester Volatile Solids Loading | WEF / university operator courses; 15000 gpd, 4% TS, 75% VS, 20000 ft^3 -> 3753 lb/day, 188 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `disinfection-ct` | Disinfection CT (USEPA SWTR) | USEPA; Table A-1 (<=0.4 mg/L band): CT_required = 139 mg-min/L a... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `diversion-rate-contamination` | Recycling Diversion Rate and Residual Contamination | Project (first-principles); the jurisdiction's diversion definition governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `filter-area-for-loading` | Filter Area for a Target Loading Rate | USEPA / AWWA general practice; Rapid-sand band 2-5 gpm/ft^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `filter-loading` | Filter Loading Rate and Backwash | USEPA; Rapid-sand band 2-5 gpm/ft^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `float-method-flow` | Float-Method (Velocity-Area) Open-Channel Flow | Float (velocity-area) open-channel fl...; V = 20/10 = 2.0; A = 4*1.5 = 6; Q = 0.85*2.0*6 = 10.2 cfs... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5748,7 +5765,11 @@ per spec-v14 §13.1 second paragraph.
 | `fluoride-feed-dose` | Fluoride Feed Dose (Available Fluoride Ion) | Water-fluoridation feed (available-fl...; pure = 0.6 x 2 x 8.34 = 10.008; feed = 10.008 / (0.792 x ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `iron-manganese-chlorine-dose` | Chlorine Dose to Oxidize Iron and Manganese | iron/manganese chlorine oxidation (AW...; dose = 0.62*3.0 + 1.30*0.5 + 0.5 + 0.3 = 3.31; lb/day = 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lab-dilution` | Lab Dilution and Serial Dilution | Project (first-principles) over stand...; C1=1000 / C2=50 / V2=100 -> V1=5, diluent=95 (computed by... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `landfill-airspace-density` | Landfill Airspace Consumption and In-Place Density | Project (first-principles); the site's airspace survey governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `landfill-gas-generation` | Landfill Gas Generation (First-Order Decay) | Project (first-principles); the site's gas data and Clean Air Act rules govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `landfill-settlement-airspace` | Waste Settlement and Recovered Airspace | Project (first-principles); the closure plan and permit govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `langelier-index` | Langelier Saturation Index | Langelier (1936) / Standard Methods (...; pH 7.5, 25 C, Ca 200, alk 150, TDS 320 -> LSI ~+0.04 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `leachate-water-balance` | Leachate Generation from a Water Balance | Project (first-principles); HELP modelling and the permit govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `main-flushing-volume` | Water Main Flushing Volume, Duration, and Velocity | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `oil-water-separator-sizing` | Gravity Oil/Water Separator Surface Area (API 421) | API Publication 421 (gravity oil/wate...; Vt=9.81*(rho_w-rho_o)*d^2/(18*mu) SI -> 0.3285 ft/min; ar... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `particle-settling-velocity` | Discrete-Particle Settling Velocity (Stokes' Law) | Stokes' law (Davis & Cornwell, Introd...; mu=2.414e-5*10^(247.8/(293.15-140))=1.0019e-3; rho_w=998.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5791,6 +5812,7 @@ per spec-v14 §13.1 second paragraph.
 | `well-drawdown` | Well Drawdown and Specific Capacity | AWWA / USGS; drawdown = 80 - 50 = 30 ft; specific capacity = 30/30 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `well-max-yield` | Well Sustainable Yield from Specific Capacity | AWWA / USGS (inverse); 1.0 GPM/ft, 30 ft allowable drawdown -> 30 GPM (round-tri... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wet-well-cycle-time` | Lift Station Wet-Well Volume and Cycle Time | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `working-face-cell-lift` | Landfill Working Face Cell and Lift Volume | Project (first-principles); the approved operations plan governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group N Stage (40 tiles)
 
@@ -6104,6 +6126,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 2133. Fixture-covered or reference-cadence: 2133 / 2133.
+Tile count: 2144. Fixture-covered or reference-cadence: 2144 / 2144.
 
 <!-- END tile-index-v14 -->

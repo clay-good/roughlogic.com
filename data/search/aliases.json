@@ -1,8 +1,283 @@
 {
  "_comment": "v10 Phase D.1 search aliases (spec-v10 \u00a76.1). One row per alias mapping a free-text term to a tile id. AUTHORING MASTER ONLY since the spec-v590 split remediation (2026-07-17): the runtime never fetches this file. scripts/build-alias-shards.mjs derives the per-group runtime shards data/search/aliases-<letter>.json from it (lazy parallel fetch on first search interaction via bindSearch / ensureAliases in app.js; --check in npm run lint gates drift), so edit THIS file and rerun the script. On exact-term match the user is routed to the target tile via the same path as a tool-name suggestion. Industry vocabulary, misspellings, abbreviations, question phrasings (spec-v590), and adjacent-question redirects only. The resolveQuery / matchAliasPrefix helpers in search-discovery.js are the canonical pure-functional resolvers (exercised by test/unit/search-discovery.test.js).",
- "_updated": "2026-09-18",
+ "_updated": "2026-09-19",
  "_schema": "Each alias row: { term: string, target: tile-id, kind: 'question' | 'industry' | 'adjacent' | 'redirect' }. Multiple aliases may map to the same target.",
  "aliases": [
+  {
+   "term": "landfill airspace consumption",
+   "target": "landfill-airspace-density",
+   "kind": "industry"
+  },
+  {
+   "term": "in place density msw",
+   "target": "landfill-airspace-density",
+   "kind": "industry"
+  },
+  {
+   "term": "airspace utilization factor",
+   "target": "landfill-airspace-density",
+   "kind": "industry"
+  },
+  {
+   "term": "landfill compaction density",
+   "target": "landfill-airspace-density",
+   "kind": "industry"
+  },
+  {
+   "term": "waste density pounds per cubic yard",
+   "target": "landfill-airspace-density",
+   "kind": "industry"
+  },
+  {
+   "term": "landfill gas generation",
+   "target": "landfill-gas-generation",
+   "kind": "industry"
+  },
+  {
+   "term": "landgem first order decay",
+   "target": "landfill-gas-generation",
+   "kind": "industry"
+  },
+  {
+   "term": "methane generation rate constant",
+   "target": "landfill-gas-generation",
+   "kind": "industry"
+  },
+  {
+   "term": "lfg to energy sizing",
+   "target": "landfill-gas-generation",
+   "kind": "industry"
+  },
+  {
+   "term": "landfill methane yield",
+   "target": "landfill-gas-generation",
+   "kind": "industry"
+  },
+  {
+   "term": "leachate generation rate",
+   "target": "leachate-water-balance",
+   "kind": "industry"
+  },
+  {
+   "term": "landfill water balance",
+   "target": "leachate-water-balance",
+   "kind": "industry"
+  },
+  {
+   "term": "leachate per acre per day",
+   "target": "leachate-water-balance",
+   "kind": "industry"
+  },
+  {
+   "term": "open cell infiltration landfill",
+   "target": "leachate-water-balance",
+   "kind": "industry"
+  },
+  {
+   "term": "leachate storage sizing",
+   "target": "leachate-water-balance",
+   "kind": "industry"
+  },
+  {
+   "term": "daily cover soil volume",
+   "target": "daily-cover-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "landfill adc alternative daily cover",
+   "target": "daily-cover-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "cover soil airspace cost",
+   "target": "daily-cover-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "working face cover quantity",
+   "target": "daily-cover-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "six inch daily cover",
+   "target": "daily-cover-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "waste collection route time",
+   "target": "collection-route-productivity",
+   "kind": "industry"
+  },
+  {
+   "term": "refuse route stops per day",
+   "target": "collection-route-productivity",
+   "kind": "industry"
+  },
+  {
+   "term": "collection productivity stops per hour",
+   "target": "collection-route-productivity",
+   "kind": "industry"
+  },
+  {
+   "term": "route balancing solid waste",
+   "target": "collection-route-productivity",
+   "kind": "industry"
+  },
+  {
+   "term": "disposal trips per route",
+   "target": "collection-route-productivity",
+   "kind": "industry"
+  },
+  {
+   "term": "transfer station throughput",
+   "target": "transfer-station-throughput",
+   "kind": "industry"
+  },
+  {
+   "term": "tipping floor sizing",
+   "target": "transfer-station-throughput",
+   "kind": "industry"
+  },
+  {
+   "term": "transfer trailer loads per day",
+   "target": "transfer-station-throughput",
+   "kind": "industry"
+  },
+  {
+   "term": "unloading positions transfer station",
+   "target": "transfer-station-throughput",
+   "kind": "industry"
+  },
+  {
+   "term": "waste transfer fleet",
+   "target": "transfer-station-throughput",
+   "kind": "industry"
+  },
+  {
+   "term": "landfill gas flare sizing",
+   "target": "lfg-flare-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "flare turndown ratio lfg",
+   "target": "lfg-flare-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "methane destruction efficiency",
+   "target": "lfg-flare-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "enclosed flare capacity",
+   "target": "lfg-flare-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "lfg btu content air intrusion",
+   "target": "lfg-flare-capacity",
+   "kind": "industry"
+  },
+  {
+   "term": "recycling diversion rate",
+   "target": "diversion-rate-contamination",
+   "kind": "industry"
+  },
+  {
+   "term": "mrf residual contamination",
+   "target": "diversion-rate-contamination",
+   "kind": "industry"
+  },
+  {
+   "term": "true diversion rate calculation",
+   "target": "diversion-rate-contamination",
+   "kind": "industry"
+  },
+  {
+   "term": "inbound contamination recycling",
+   "target": "diversion-rate-contamination",
+   "kind": "industry"
+  },
+  {
+   "term": "recycling residual disposal cost",
+   "target": "diversion-rate-contamination",
+   "kind": "industry"
+  },
+  {
+   "term": "landfill settlement",
+   "target": "landfill-settlement-airspace",
+   "kind": "industry"
+  },
+  {
+   "term": "recovered airspace settlement",
+   "target": "landfill-settlement-airspace",
+   "kind": "industry"
+  },
+  {
+   "term": "waste primary secondary settlement",
+   "target": "landfill-settlement-airspace",
+   "kind": "industry"
+  },
+  {
+   "term": "differential settlement landfill cap",
+   "target": "landfill-settlement-airspace",
+   "kind": "industry"
+  },
+  {
+   "term": "final cover grade settlement",
+   "target": "landfill-settlement-airspace",
+   "kind": "industry"
+  },
+  {
+   "term": "refuse truck payload",
+   "target": "collection-vehicle-payload",
+   "kind": "industry"
+  },
+  {
+   "term": "collection vehicle compaction ratio",
+   "target": "collection-vehicle-payload",
+   "kind": "industry"
+  },
+  {
+   "term": "garbage truck overweight axle",
+   "target": "collection-vehicle-payload",
+   "kind": "industry"
+  },
+  {
+   "term": "refuse body cubic yards payload",
+   "target": "collection-vehicle-payload",
+   "kind": "industry"
+  },
+  {
+   "term": "gvwr refuse collection",
+   "target": "collection-vehicle-payload",
+   "kind": "industry"
+  },
+  {
+   "term": "landfill working face size",
+   "target": "working-face-cell-lift",
+   "kind": "industry"
+  },
+  {
+   "term": "daily cell volume lift",
+   "target": "working-face-cell-lift",
+   "kind": "industry"
+  },
+  {
+   "term": "face advance rate landfill",
+   "target": "working-face-cell-lift",
+   "kind": "industry"
+  },
+  {
+   "term": "lift thickness compaction passes",
+   "target": "working-face-cell-lift",
+   "kind": "industry"
+  },
+  {
+   "term": "working face width cover area",
+   "target": "working-face-cell-lift",
+   "kind": "industry"
+  },
   {
    "term": "cutter suction dredge production",
    "target": "dredge-production-rate",

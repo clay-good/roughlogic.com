@@ -2277,6 +2277,18 @@ const RELATED = {
   "mooring-load-wind-current": ["barge-draft-displacement","berthing-fender-energy","wave-height-fetch"],
   "pier-scour-depth": ["sheet-pile-penetration","riprap-d50","dredge-production-rate"],
   "wave-height-fetch": ["mooring-load-wind-current","barge-draft-displacement","berthing-fender-energy"],
+  // spec-v1789..v1799 solid waste, landfill, and transfer operations band.
+  "landfill-airspace-density": ["daily-cover-volume","landfill-settlement-airspace","working-face-cell-lift"],
+  "landfill-gas-generation": ["lfg-flare-capacity","landfill-airspace-density","leachate-water-balance"],
+  "leachate-water-balance": ["landfill-airspace-density","working-face-cell-lift","landfill-settlement-airspace"],
+  "daily-cover-volume": ["landfill-airspace-density","working-face-cell-lift","landfill-settlement-airspace"],
+  "collection-route-productivity": ["collection-vehicle-payload","transfer-station-throughput","dumpster-count"],
+  "transfer-station-throughput": ["collection-route-productivity","collection-vehicle-payload","landfill-airspace-density"],
+  "lfg-flare-capacity": ["landfill-gas-generation","landfill-airspace-density","leachate-water-balance"],
+  "diversion-rate-contamination": ["landfill-airspace-density","collection-route-productivity","transfer-station-throughput"],
+  "landfill-settlement-airspace": ["landfill-airspace-density","daily-cover-volume","leachate-water-balance"],
+  "collection-vehicle-payload": ["collection-route-productivity","transfer-station-throughput","dim-weight"],
+  "working-face-cell-lift": ["landfill-airspace-density","daily-cover-volume","leachate-water-balance"],
 };
 
 export { RELATED };

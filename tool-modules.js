@@ -1402,6 +1402,17 @@ export const TOOL_MODULES = (() => {
     "pile-hammer-bearing", "berthing-fender-energy",
     "mooring-load-wind-current", "pier-scour-depth", "wave-height-fetch",
   ]);
+  // spec-v1789..v1799: solid waste, landfill, and transfer operations. Seven
+  // Group M tiles are the landfill as an asset and what it emits, three Group J
+  // tiles are the operation feeding it, and one Group G tile is the flare.
+  declare("./calc-waste.js", "WASTE_RENDERERS", [
+    "landfill-airspace-density", "landfill-gas-generation",
+    "leachate-water-balance", "daily-cover-volume",
+    "collection-route-productivity", "transfer-station-throughput",
+    "lfg-flare-capacity", "diversion-rate-contamination",
+    "landfill-settlement-airspace", "collection-vehicle-payload",
+    "working-face-cell-lift",
+  ]);
   // spec-v1845..v1850: the snow and ice management bench -- what a pavement
   // temperature costs in salt, what a brine batch has to be, how long a plow
   // route takes, where the snow goes, when a deicer stops working, and whether

@@ -112,7 +112,8 @@ test("Group F all 18 tiles use the fire governance variant", () => {
 
 test("Group G audit coverage: every cross-trade tile has a CITATIONS entry", async () => {
   const ids = await _groupIds("// Group G: Cross-Trade", "// Group H:");
-  assert.ok(ids.length === 41, "expected 41 Group G tile ids, got " + ids.length);
+  // 41 + the Group G flare of the spec-v1789..v1799 solid waste band.
+  assert.ok(ids.length === 42, "expected 42 Group G tile ids, got " + ids.length);
   for (const id of ids) assert.ok(CITATIONS[id], "Group G tile '" + id + "' missing CITATIONS entry");
 });
 
@@ -247,7 +248,8 @@ test("Group M audit coverage: every water tile id has a CITATIONS entry", async 
   const re = /\{ id: "([a-z0-9-]+)"/g;
   let m;
   while ((m = re.exec(groupMBlock)) !== null) ids.push(m[1]);
-  assert.ok(ids.length === 41, "expected 41 Group M tile ids, got " + ids.length);
+  // 41 + the 7 Group M tiles of the spec-v1789..v1799 solid waste band.
+  assert.ok(ids.length === 48, "expected 48 Group M tile ids, got " + ids.length);
   for (const id of ids) {
     assert.ok(CITATIONS[id], "Group M tile '" + id + "' missing CITATIONS entry");
   }
@@ -336,7 +338,8 @@ test("Group J audit coverage: every trucking tile id has a CITATIONS entry", asy
   while ((m = re.exec(groupJBlock)) !== null) ids.push(m[1]);
   // 22 original + the 9 of the spec-v1377..v1385 trade-expansion band + the 5
   // Group J tiles of the spec-v1809..v1817 warehouse racking band.
-  assert.ok(ids.length === 36, "expected 36 Group J tile ids, got " + ids.length);
+  // 36 + the 3 Group J tiles of the spec-v1789..v1799 solid waste band.
+  assert.ok(ids.length === 39, "expected 39 Group J tile ids, got " + ids.length);
   for (const id of ids) {
     assert.ok(CITATIONS[id], "Group J tile '" + id + "' missing CITATIONS entry");
   }

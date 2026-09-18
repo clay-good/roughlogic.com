@@ -150,6 +150,10 @@ export const PROFESSION_NOUN = {
   // the first thing buildTitle drops at the 70-char cap.
   warehouse: "Warehouse",
   logistics: "Logistics",
+  // Added 2026-09-18 with the solid waste, landfill, and transfer band, where
+  // it leads on all eleven tiles. Short on purpose: a long noun is the first
+  // thing buildTitle drops at the 70-char cap.
+  waste: "Solid Waste",
 };
 
 // Escape a string for embedding inside HTML text content or an attribute.

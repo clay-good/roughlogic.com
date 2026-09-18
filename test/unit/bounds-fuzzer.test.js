@@ -54179,3 +54179,299 @@ test("bounds: spec-v1836 computeWaveHeightFetch -- height goes as the square roo
   }
   assert.ok(_v1836({ ...base, fetch_mi: Infinity }).error);
 });
+
+// ---------------------------------------------------------------------------
+// spec-v1789..v1799: solid waste, landfill, and transfer operations.
+// ---------------------------------------------------------------------------
+
+import {
+  computeLandfillAirspaceDensity as _v1789,
+  computeLandfillGasGeneration as _v1790,
+  computeLeachateWaterBalance as _v1791,
+  computeDailyCoverVolume as _v1792,
+  computeCollectionRouteProductivity as _v1793,
+  computeTransferStationThroughput as _v1794,
+  computeLfgFlareCapacity as _v1795,
+  computeDiversionRateContamination as _v1796,
+  computeLandfillSettlementAirspace as _v1797,
+  computeCollectionVehiclePayload as _v1798,
+  computeWorkingFaceCellLift as _v1799,
+} from "../../calc-waste.js";
+
+test("bounds: spec-v1789 computeLandfillAirspaceDensity -- airspace is the asset, tonnage only the revenue", () => {
+  const base = { annual_tons: 250000, in_place_density_lb_per_cy: 1200, cover_ratio_pct: 20, airspace_value_per_cy: 8, improved_density_lb_per_cy: 1500 };
+  const r = _v1789(base); assertFiniteNumericOutputs(r, "v1789");
+  assert.ok(Math.abs(r.waste_airspace_cy - 416666.6666666667) < 1e-6);
+  assert.ok(Math.abs(r.total_airspace_cy - 500000) < 1e-6);
+  assert.ok(Math.abs(r.airspace_utilization_factor - 0.5) < 1e-12);
+  // 25% more density buys 20% of the airspace back, for no capital.
+  assert.ok(Math.abs(r.density_improvement_pct - 25) < 1e-12);
+  assert.ok(Math.abs(r.airspace_saved_cy - 100000) < 1e-6);
+  assert.ok(Math.abs(r.airspace_saved_pct - 20) < 1e-9);
+  assert.ok(Math.abs(r.airspace_saved_value - 800000) < 1e-6);
+  // Airspace is inverse to density, exactly.
+  assert.ok(Math.abs(r.total_airspace_cy / r.improved_total_airspace_cy - 1500 / 1200) < 1e-12);
+  // Cover is not a rounding item.
+  assert.ok(Math.abs(r.cover_share_pct - 100 / 6) < 1e-9);
+  // No cover at all makes the AUF the density itself, in tons per cy.
+  const bare = _v1789({ ...base, cover_ratio_pct: 0 });
+  assert.ok(Math.abs(bare.airspace_utilization_factor - 0.6) < 1e-12);
+  for (const bad of [{ annual_tons: 0 }, { in_place_density_lb_per_cy: 0 }, { improved_density_lb_per_cy: 0 }, { cover_ratio_pct: -1 }, { airspace_value_per_cy: -1 }, { annual_tons: Infinity }]) {
+    assert.ok(_v1789({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1790 computeLandfillGasGeneration -- generation is not collection, and the peak is at closure", () => {
+  const base = { annual_tons: 250000, placement_years: 20, methane_yield_m3_per_mg: 100, decay_constant_per_year: 0.04, methane_fraction_pct: 50, collection_efficiency_pct: 75, methane_heating_value_btu_per_cf: 911, generator_efficiency_pct: 30 };
+  const r = _v1790(base); assertFiniteNumericOutputs(r, "v1790");
+  // The decay sum is a geometric series; check it closed-form rather than by
+  // repeating the loop the compute already ran.
+  const closed = (1 - Math.exp(-0.04 * 20)) / (1 - Math.exp(-0.04));
+  assert.ok(Math.abs(r.decay_sum - closed) < 1e-9);
+  assert.ok(Math.abs(r.methane_cfm - 856.0214972834383) < 1e-6);
+  assert.ok(Math.abs(r.landfill_gas_cfm - r.methane_cfm * 2) < 1e-9);
+  assert.ok(Math.abs(r.heat_rate_mmbtu_per_hr - 46.79013504151274) < 1e-9);
+  assert.ok(Math.abs(r.collected_capacity_kw - 3085.515939138443) < 1e-6);
+  // The collection shortfall IS the site's methane emission.
+  assert.ok(Math.abs(r.uncollected_capacity_kw - r.gross_capacity_kw * 0.25) < 1e-9);
+  // The whole curve decays as e^(-kt), so the decade ratios are pure physics.
+  assert.ok(Math.abs(r.capacity_10yr_pct - 100 * Math.exp(-0.4)) < 1e-9);
+  assert.ok(Math.abs(r.capacity_20yr_pct - 100 * Math.exp(-0.8)) < 1e-9);
+  assert.ok(Math.abs(r.half_life_years - Math.LN2 / 0.04) < 1e-9);
+  // A wetter site with twice the decay constant gives more gas sooner and less
+  // later -- the two move in OPPOSITE directions, which is the spec's point.
+  const wet = _v1790({ ...base, decay_constant_per_year: 0.08 });
+  assert.ok(wet.collected_capacity_kw > r.collected_capacity_kw);
+  assert.ok(wet.capacity_20yr_kw < r.capacity_20yr_kw);
+  for (const bad of [{ annual_tons: 0 }, { placement_years: 0 }, { methane_yield_m3_per_mg: 0 }, { decay_constant_per_year: 0 }, { methane_fraction_pct: 0 }, { methane_fraction_pct: 101 }, { collection_efficiency_pct: 0 }, { generator_efficiency_pct: 101 }, { methane_heating_value_btu_per_cf: 0 }, { annual_tons: Infinity }]) {
+    assert.ok(_v1790({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1791 computeLeachateWaterBalance -- storage rides out the peak, treatment cannot", () => {
+  const base = { open_acres: 20, annual_precip_in: 40, runoff_coefficient: 0.15, evapotranspiration_coefficient: 0.30, capped_infiltration_in_per_year: 2, design_storm_in: 2 };
+  const r = _v1791(base); assertFiniteNumericOutputs(r, "v1791");
+  assert.ok(Math.abs(r.infiltration_in_per_year - 22) < 1e-12);
+  assert.ok(Math.abs(r.leachate_gal_per_year - 11947886.544) < 1e-3);
+  assert.ok(Math.abs(r.gpd_per_acre - 1636.696786849315) < 1e-6);
+  // Capping is a different order of magnitude, not an improvement.
+  assert.ok(r.capping_reduction_pct > 90);
+  assert.ok(Math.abs(r.deferred_cap_gpd - (r.leachate_gpd - r.capped_gpd)) < 1e-9);
+  // A design storm arrives as many days of average flow at once.
+  assert.ok(Math.abs(r.storm_volume_gal - 597394.3272) < 1e-3);
+  assert.ok(r.storm_days_of_average > 18 && r.storm_days_of_average < 19);
+  // Leachate is linear in open area, which is what makes the per-acre figure
+  // the one to carry.
+  const half = _v1791({ ...base, open_acres: 10 });
+  assert.ok(Math.abs(half.gpd_per_acre - r.gpd_per_acre) < 1e-9);
+  assert.ok(Math.abs(half.leachate_gpd * 2 - r.leachate_gpd) < 1e-9);
+  // Coefficients that leave no infiltration are not a zero answer, they are a
+  // nonsense input.
+  assert.ok(_v1791({ ...base, runoff_coefficient: 0.7, evapotranspiration_coefficient: 0.3 }).error);
+  for (const bad of [{ open_acres: 0 }, { annual_precip_in: 0 }, { runoff_coefficient: -1 }, { design_storm_in: 0 }, { capped_infiltration_in_per_year: -1 }, { open_acres: Infinity }]) {
+    assert.ok(_v1791({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1792 computeDailyCoverVolume -- 17% of the site's airspace is dirt", () => {
+  const base = { face_length_ft: 100, face_width_ft: 150, cover_depth_in: 6, operating_days: 312, airspace_value_per_cy: 8, annual_tons: 250000, in_place_density_lb_per_cy: 1200, alternative_cover_annual_cost: 5000 };
+  const r = _v1792(base); assertFiniteNumericOutputs(r, "v1792");
+  assert.ok(Math.abs(r.cover_cy_per_day - 7500 / 27) < 1e-9);
+  assert.ok(Math.abs(r.cover_cy_per_year - 86666.66666666667) < 1e-6);
+  assert.ok(Math.abs(r.cover_share_pct - 17.218543046357617) < 1e-9);
+  assert.ok(Math.abs(r.cover_airspace_value - 693333.3333333334) < 1e-6);
+  assert.ok(Math.abs(r.net_saving - (r.cover_airspace_value - 5000)) < 1e-9);
+  // The airspace freed converts to tonnage at the site's own density, and to
+  // site life at its own annual tonnage.
+  assert.ok(Math.abs(r.recovered_tons - 52000) < 1e-6);
+  assert.ok(Math.abs(r.extra_site_life_years - 52000 / 250000) < 1e-12);
+  // Cover volume is linear in depth: 12 in is exactly twice 6 in.
+  const deep = _v1792({ ...base, cover_depth_in: 12 });
+  assert.ok(Math.abs(deep.cover_cy_per_year - r.cover_cy_per_year * 2) < 1e-6);
+  for (const bad of [{ face_length_ft: 0 }, { face_width_ft: 0 }, { cover_depth_in: 0 }, { operating_days: 0 }, { annual_tons: 0 }, { in_place_density_lb_per_cy: 0 }, { airspace_value_per_cy: -1 }, { alternative_cover_annual_cost: -1 }, { cover_depth_in: Infinity }]) {
+    assert.ok(_v1792({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1793 computeCollectionRouteProductivity -- the cliff is a whole haul cycle, added in one step", () => {
+  const base = { stop_count: 900, seconds_per_stop: 22, setout_weight_lb: 40, truck_payload_tons: 12, round_trip_min: 45, tipping_min: 15, fixed_time_hr: 0.5, break_time_hr: 0.5, shift_hours: 8 };
+  const r = _v1793(base); assertFiniteNumericOutputs(r, "v1793");
+  assert.ok(Math.abs(r.collection_hours - 5.5) < 1e-12);
+  assert.ok(Math.abs(r.route_tons - 18) < 1e-12);
+  assert.deepStrictEqual([r.disposal_loads, r.max_stops], [2, 818]);
+  assert.ok(Math.abs(r.route_day_hours - 8.5) < 1e-12);
+  assert.ok(!r.fits_shift && Math.abs(r.overtime_hours - 0.5) < 1e-12);
+  assert.ok(Math.abs(r.stops_over - 82) < 1e-12);
+  // The max-stop count must itself fit: a route built to it does not run over.
+  const trimmed = _v1793({ ...base, stop_count: r.max_stops });
+  assert.ok(trimmed.fits_shift);
+  // The cliff: crossing a payload multiple adds a whole haul cycle at once,
+  // not a gradually longer day.
+  assert.ok(Math.abs(r.tons_to_next_load - 6) < 1e-12);
+  assert.ok(Math.abs(r.next_load_step_hours - 1) < 1e-12);
+  const overCliff = _v1793({ ...base, setout_weight_lb: 54 });
+  assert.strictEqual(overCliff.disposal_loads, 3);
+  assert.ok(overCliff.route_day_hours - r.route_day_hours > 0.9);
+  for (const bad of [{ stop_count: 0 }, { seconds_per_stop: 0 }, { setout_weight_lb: 0 }, { truck_payload_tons: 0 }, { round_trip_min: 0 }, { tipping_min: 0 }, { shift_hours: 0 }, { fixed_time_hr: -1 }, { stop_count: Infinity }]) {
+    assert.ok(_v1793({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1794 computeTransferStationThroughput -- the building is sized on how late the trailers can be", () => {
+  const base = { daily_tons: 800, operating_hours: 10, peak_hour_share_pct: 15, collection_payload_tons: 8, floor_time_min: 6, trailer_payload_tons: 22, trailer_round_trip_hr: 3, loose_density_lb_per_cy: 400, pile_depth_ft: 8, manoeuvring_factor: 3, loadout_delay_hr: 2 };
+  const r = _v1794(base); assertFiniteNumericOutputs(r, "v1794");
+  assert.ok(Math.abs(r.peak_hour_tons - 120) < 1e-12);
+  assert.ok(Math.abs(r.peak_arrivals_per_hour - 15) < 1e-12);
+  // Sizing on the average would build one position and queue the street.
+  assert.deepStrictEqual([r.unloading_positions, r.average_positions, r.positions_the_average_would_miss], [2, 1, 1]);
+  assert.deepStrictEqual([r.trailer_loads_per_day, r.trailer_fleet], [37, 12]);
+  // The round trip does most of the work in the fleet number: half an hour
+  // more can cost a whole trailer and driver.
+  const slower = _v1794({ ...base, trailer_round_trip_hr: 3.5 });
+  assert.strictEqual(slower.trailer_fleet, 13);
+  assert.ok(Math.abs(r.surge_tons - 160) < 1e-12);
+  assert.ok(Math.abs(r.surge_cy - 800) < 1e-12);
+  assert.ok(Math.abs(r.surge_floor_sqft - 8100) < 1e-9);
+  // The manoeuvring factor multiplies the bare footprint and nothing else.
+  assert.ok(Math.abs(r.surge_floor_sqft / r.surge_footprint_sqft - 3) < 1e-12);
+  assert.ok(_v1794({ ...base, manoeuvring_factor: 0.5 }).error);
+  for (const bad of [{ daily_tons: 0 }, { operating_hours: 0 }, { peak_hour_share_pct: 0 }, { peak_hour_share_pct: 101 }, { collection_payload_tons: 0 }, { floor_time_min: 0 }, { trailer_payload_tons: 0 }, { trailer_round_trip_hr: 0 }, { loose_density_lb_per_cy: 0 }, { pile_depth_ft: 0 }, { loadout_delay_hr: 0 }, { daily_tons: Infinity }]) {
+    assert.ok(_v1794({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1795 computeLfgFlareCapacity -- quality puts a flare out, not flow", () => {
+  const base = { peak_lfg_cfm: 1712, methane_fraction_pct: 50, design_margin_pct: 25, turndown_ratio: 10, methane_heating_value_btu_per_cf: 911, destruction_efficiency_pct: 98, global_warming_potential: 28, reduced_methane_fraction_pct: 20, methane_density_lb_per_cf: 0.04226 };
+  const r = _v1795(base); assertFiniteNumericOutputs(r, "v1795");
+  assert.ok(Math.abs(r.methane_cfm - 856) < 1e-9);
+  assert.ok(Math.abs(r.rated_capacity_scfm - 2140) < 1e-9);
+  assert.ok(Math.abs(r.minimum_stable_scfm - 214) < 1e-9);
+  assert.ok(Math.abs(r.heat_release_mmbtu_per_hr - 46.78896) < 1e-9);
+  // Flow has a factor of 8 of headroom above the turndown: decline alone takes
+  // decades to reach it.
+  assert.ok(r.turndown_headroom_ratio > 5);
+  // Gas quality is the real limit, and it is the METHANE FRACTION times the
+  // heating value -- what a flame actually sees.
+  assert.ok(Math.abs(r.design_btu_per_cf - 455.5) < 1e-9);
+  assert.ok(Math.abs(r.reduced_btu_per_cf - 182.2) < 1e-9);
+  assert.ok(Math.abs(r.methane_fraction_fall_pct - 60) < 1e-9);
+  assert.ok(Math.abs(r.methane_destroyed_tons - 9316.540880639997) < 1e-6);
+  assert.ok(Math.abs(r.co2e_tons - r.methane_destroyed_tons * 28) < 1e-6);
+  assert.ok(Math.abs(r.destroyed_lb_per_year - r.methane_lb_per_year * 0.98) < 1e-6);
+  assert.ok(_v1795({ ...base, turndown_ratio: 1 }).error);
+  for (const bad of [{ peak_lfg_cfm: 0 }, { methane_fraction_pct: 0 }, { methane_fraction_pct: 101 }, { design_margin_pct: -1 }, { methane_heating_value_btu_per_cf: 0 }, { destruction_efficiency_pct: 0 }, { global_warming_potential: 0 }, { methane_density_lb_per_cf: 0 }, { peak_lfg_cfm: Infinity }]) {
+    assert.ok(_v1795({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1796 computeDiversionRateContamination -- the overstatement has two bases and they are not the same number", () => {
+  const base = { total_generated_tons: 100000, recycling_tons: 22000, organics_tons: 8000, contamination_pct: 18, processing_fee_per_ton: 75, tipping_fee_per_ton: 45, improved_contamination_pct: 8 };
+  const r = _v1796(base); assertFiniteNumericOutputs(r, "v1796");
+  assert.ok(Math.abs(r.reported_diversion_pct - 30) < 1e-12);
+  assert.ok(Math.abs(r.residual_tons - 3960) < 1e-9);
+  assert.ok(Math.abs(r.true_diversion_pct - 26.04) < 1e-9);
+  assert.ok(Math.abs(r.overstatement_points - 3.96) < 1e-9);
+  // spec-v1796 §3 calls the gap "15 percent of the figure being claimed". 15%
+  // is the overstatement relative to the TRUE rate; as a share of the claimed
+  // 30.0% it is 13.2%. Both are reported rather than one standing for the other.
+  assert.ok(Math.abs(r.overstatement_share_of_claim_pct - 13.2) < 1e-9);
+  assert.ok(Math.abs(r.overstatement_above_true_pct - 15.207373271889406) < 1e-9);
+  assert.ok(Math.abs(r.residual_cost - 475200) < 1e-9);
+  // Improving contamination raises the rate and cuts the cost in one move.
+  assert.ok(Math.abs(r.improved_points_gained - 2.2) < 1e-9);
+  assert.ok(Math.abs(r.improved_saving - 264000) < 1e-9);
+  // Zero contamination makes the two rates identical, with no residual at all.
+  const clean = _v1796({ ...base, contamination_pct: 0 });
+  assert.ok(Math.abs(clean.true_diversion_pct - clean.reported_diversion_pct) < 1e-12);
+  assert.ok(clean.residual_tons === 0 && clean.residual_cost === 0);
+  assert.ok(_v1796({ ...base, recycling_tons: 95000 }).error);
+  assert.ok(_v1796({ ...base, contamination_pct: 100 }).error);
+  for (const bad of [{ total_generated_tons: 0 }, { recycling_tons: 0 }, { organics_tons: -1 }, { processing_fee_per_ton: -1 }, { total_generated_tons: Infinity }]) {
+    assert.ok(_v1796({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1797 computeLandfillSettlementAirspace -- only the primary share is airspace", () => {
+  const base = { waste_thickness_ft: 100, filled_acres: 50, primary_settlement_pct: 8, secondary_settlement_pct: 12, in_place_density_lb_per_cy: 1200, tipping_fee_per_ton: 45, cap_slope_pct: 4, slope_run_ft: 300, adjacent_thickness_ft: 50 };
+  const r = _v1797(base); assertFiniteNumericOutputs(r, "v1797");
+  assert.deepStrictEqual([r.primary_settlement_ft, r.secondary_settlement_ft, r.total_settlement_ft], [8, 12, 20]);
+  assert.ok(Math.abs(r.total_volume_cy - 1613333.3333333333) < 1e-6);
+  assert.ok(Math.abs(r.recoverable_airspace_cy - 645333.3333333334) < 1e-6);
+  // The secondary volume is real volume and is NOT airspace.
+  assert.ok(Math.abs(r.secondary_volume_cy - (r.total_volume_cy - r.recoverable_airspace_cy)) < 1e-6);
+  assert.ok(Math.abs(r.recoverable_tons - 387200) < 1e-6);
+  assert.ok(Math.abs(r.recoverable_revenue - 17424000) < 1e-6);
+  // The differential, not the total, governs the cap.
+  assert.ok(Math.abs(r.differential_settlement_ft - 10) < 1e-12);
+  assert.ok(Math.abs(r.design_fall_ft - 12) < 1e-12);
+  assert.ok(Math.abs(r.remaining_slope_pct - 2 / 3) < 1e-9);
+  assert.ok(Math.abs(r.fall_consumed_pct - 250 / 3) < 1e-9);
+  assert.ok(!r.slope_reverses);
+  // Equal thicknesses settle equally, so there is no differential at all.
+  const even = _v1797({ ...base, adjacent_thickness_ft: 100 });
+  assert.ok(even.differential_settlement_ft === 0);
+  assert.ok(Math.abs(even.remaining_slope_pct - 4) < 1e-12);
+  // A deeper adjacent fill takes the remaining fall past zero and reverses it,
+  // and the tile says so rather than printing a negative slope as a number.
+  const reversed = _v1797({ ...base, adjacent_thickness_ft: 200 });
+  assert.ok(reversed.slope_reverses);
+  assert.ok(_v1797({ ...base, primary_settlement_pct: 60, secondary_settlement_pct: 50 }).error);
+  for (const bad of [{ waste_thickness_ft: 0 }, { filled_acres: 0 }, { in_place_density_lb_per_cy: 0 }, { cap_slope_pct: 0 }, { slope_run_ft: 0 }, { adjacent_thickness_ft: 0 }, { primary_settlement_pct: -1 }, { waste_thickness_ft: Infinity }]) {
+    assert.ok(_v1797({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1798 computeCollectionVehiclePayload -- specify the chassis and the body together", () => {
+  const base = { body_volume_cy: 25, loose_density_lb_per_cy: 200, compaction_ratio: 3, gvwr_lb: 33000, tare_weight_lb: 21000, alternative_body_volume_cy: 31, alternative_gvwr_lb: 54000, alternative_tare_weight_lb: 28000, wet_loose_density_lb_per_cy: 250 };
+  const r = _v1798(base); assertFiniteNumericOutputs(r, "v1798");
+  assert.ok(Math.abs(r.in_body_density_lb_per_cy - 600) < 1e-12);
+  assert.deepStrictEqual([r.body_payload_tons, r.chassis_payload_tons], [7.5, 6]);
+  // The chassis governs, so the legal fill is not a full body and nothing on
+  // the truck says so.
+  assert.ok(r.chassis_governs);
+  assert.ok(Math.abs(r.legal_fill_cy - 20) < 1e-12);
+  assert.ok(Math.abs(r.legal_fill_share_pct - 80) < 1e-12);
+  assert.ok(Math.abs(r.overload_lb - 3000) < 1e-12);
+  assert.ok(Math.abs(r.overload_pct_of_gvwr - 100 * 3000 / 33000) < 1e-9);
+  // The alternative configuration flips which side governs, which is the fix.
+  assert.ok(!r.alternative_chassis_governs);
+  assert.ok(Math.abs(r.alternative_headroom_lb - 7400) < 1e-9);
+  // Wet waste moves the boundary with nothing about the truck changed.
+  assert.ok(Math.abs(r.wet_legal_fill_cy - 16) < 1e-12);
+  assert.ok(Math.abs(r.wet_fill_reduction_pct - 20) < 1e-9);
+  // A body the chassis can carry full reports no overload at all.
+  const small = _v1798({ ...base, body_volume_cy: 15 });
+  assert.ok(!small.chassis_governs && small.overload_lb === 0);
+  // A chassis whose tare reaches its rating has no payload; that is an input
+  // error rather than a zero answer.
+  assert.ok(_v1798({ ...base, tare_weight_lb: 33000 }).error);
+  assert.ok(_v1798({ ...base, compaction_ratio: 0.5 }).error);
+  for (const bad of [{ body_volume_cy: 0 }, { loose_density_lb_per_cy: 0 }, { gvwr_lb: 0 }, { tare_weight_lb: 0 }, { wet_loose_density_lb_per_cy: 0 }, { body_volume_cy: Infinity }]) {
+    assert.ok(_v1798({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1799 computeWorkingFaceCellLift -- halving the width leaves the top area untouched", () => {
+  const base = { daily_tons: 800, in_place_density_lb_per_cy: 1200, face_width_ft: 100, lift_height_ft: 10, face_slope_run: 3, cover_depth_in: 6, layer_thickness_ft: 2, passes_per_layer: 4, narrow_face_width_ft: 50 };
+  const r = _v1799(base); assertFiniteNumericOutputs(r, "v1799");
+  assert.ok(Math.abs(r.daily_volume_cy - 4000 / 3) < 1e-9);
+  assert.ok(Math.abs(r.daily_volume_cuft - 36000) < 1e-9);
+  assert.ok(Math.abs(r.advance_ft_per_day - 36) < 1e-12);
+  assert.ok(Math.abs(r.slope_length_ft - 10 * Math.sqrt(10)) < 1e-12);
+  // The finding: halving the width doubles the advance EXACTLY, so the top
+  // area does not move and every bit of the saving is off the sloped face.
+  assert.ok(Math.abs(r.narrow_advance_ft_per_day - r.advance_ft_per_day * 2) < 1e-9);
+  assert.ok(Math.abs(r.narrow_top_sqft - r.top_sqft) < 1e-9);
+  assert.ok(Math.abs(r.narrow_face_sqft - r.face_sqft / 2) < 1e-9);
+  assert.ok(Math.abs(r.cover_cy - 125.22736407719222) < 1e-9);
+  assert.ok(Math.abs(r.narrow_cover_cy - 95.94701537192947) < 1e-9);
+  // Cover and exposed surface fall by the same fraction, because cover IS the
+  // exposed surface times a depth.
+  assert.ok(Math.abs(r.cover_reduction_pct - r.exposed_reduction_pct) < 1e-9);
+  assert.deepStrictEqual([r.layers, r.total_passes], [5, 20]);
+  // A layer thicker than the lift it builds is nonsense, not one layer.
+  assert.ok(_v1799({ ...base, layer_thickness_ft: 12 }).error);
+  for (const bad of [{ daily_tons: 0 }, { in_place_density_lb_per_cy: 0 }, { face_width_ft: 0 }, { lift_height_ft: 0 }, { face_slope_run: 0 }, { cover_depth_in: 0 }, { layer_thickness_ft: 0 }, { narrow_face_width_ft: 0 }, { daily_tons: Infinity }]) {
+    assert.ok(_v1799({ ...base, ...bad }).error);
+  }
+});

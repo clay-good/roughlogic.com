@@ -1377,6 +1377,18 @@ const _TILES = [
   ["mooring-load-wind-current", "K"],
   ["pier-scour-depth", "E"],
   ["wave-height-fetch", "E"],
+  // spec-v1789..v1799 solid waste, landfill, and transfer operations
+  ["landfill-airspace-density", "M"],
+  ["landfill-gas-generation", "M"],
+  ["leachate-water-balance", "M"],
+  ["daily-cover-volume", "M"],
+  ["collection-route-productivity", "J"],
+  ["transfer-station-throughput", "J"],
+  ["lfg-flare-capacity", "G"],
+  ["diversion-rate-contamination", "M"],
+  ["landfill-settlement-airspace", "M"],
+  ["collection-vehicle-payload", "J"],
+  ["working-face-cell-lift", "M"],
 ];
 
 

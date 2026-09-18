@@ -2,95 +2,95 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "24a4af4a6dc858e0",
+      "sha": "31827f9e9e7ae8e2",
       "date": "2026-09-18"
     },
     "/tools/": {
-      "sha": "da295fcf44278efd",
+      "sha": "44728e19d7760e13",
       "date": "2026-09-18"
     },
     "/groups/accounting/": {
-      "sha": "693b7f8016bde5e6",
+      "sha": "4ae14cc376c6c752",
       "date": "2026-09-18"
     },
     "/groups/agriculture/": {
-      "sha": "08465d54b5956ea7",
+      "sha": "a31d198056c97c60",
       "date": "2026-09-18"
     },
     "/groups/construction/": {
-      "sha": "48e4d067b9daf565",
+      "sha": "bca8738d47222cbe",
       "date": "2026-09-18"
     },
     "/groups/cross-trade/": {
-      "sha": "c8b2df3c4e49e250",
+      "sha": "c9552697390e127b",
       "date": "2026-09-18"
     },
     "/groups/educators/": {
-      "sha": "b96f57f58ff7f1a3",
+      "sha": "bced4175b907551d",
       "date": "2026-09-18"
     },
     "/groups/electrical/": {
-      "sha": "c1908a389b9c7c96",
+      "sha": "2c2a8786ef99c797",
       "date": "2026-09-18"
     },
     "/groups/field/": {
-      "sha": "c32e6577a3d3fa68",
+      "sha": "1fceaba4c9ddc6c7",
       "date": "2026-09-18"
     },
     "/groups/fire-ground/": {
-      "sha": "06927017249aed16",
+      "sha": "44690cfe517dd928",
       "date": "2026-09-18"
     },
     "/groups/historical/": {
-      "sha": "82c4ecd4b73579fc",
+      "sha": "fb891c2aac4c12ff",
       "date": "2026-09-18"
     },
     "/groups/hvac/": {
-      "sha": "56b04969a3d37c27",
+      "sha": "248a6ca1766743de",
       "date": "2026-09-18"
     },
     "/groups/kitchen/": {
-      "sha": "565aaa104cda66e1",
+      "sha": "ca29d78362c1e951",
       "date": "2026-09-18"
     },
     "/groups/lab/": {
-      "sha": "31fbda588ab5182f",
+      "sha": "0d0ace38da9be422",
       "date": "2026-09-18"
     },
     "/groups/mechanic/": {
-      "sha": "f8bce57073ca5469",
+      "sha": "fd49c0e8af635f36",
       "date": "2026-09-18"
     },
     "/groups/plumbing/": {
-      "sha": "86d19dcc4f3c4525",
+      "sha": "6b231da291c56c54",
       "date": "2026-09-18"
     },
     "/groups/real-estate/": {
-      "sha": "360ea511f84eeacb",
+      "sha": "0c31532a5eab2f31",
       "date": "2026-09-18"
     },
     "/groups/references/": {
-      "sha": "20cd93ab2a635bd7",
+      "sha": "c83051f64c3882f0",
       "date": "2026-09-18"
     },
     "/groups/restoration/": {
-      "sha": "cae57d268f60105a",
+      "sha": "d4cbe23fc2bbe906",
       "date": "2026-09-18"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "d8fb0d8655db6b10",
+      "sha": "1128dfc3434dcba0",
       "date": "2026-09-18"
     },
     "/groups/stage/": {
-      "sha": "32a9fdab65713a4c",
+      "sha": "8e3928f6ea9c20ff",
       "date": "2026-09-18"
     },
     "/groups/trucking/": {
-      "sha": "2bf11653cb12a727",
+      "sha": "e118e51787c651b2",
       "date": "2026-09-18"
     },
     "/groups/water/": {
-      "sha": "fcc64a6edb802a78",
+      "sha": "949d11e611cfe183",
       "date": "2026-09-18"
     },
     "/tools/aav-install-check/": {
@@ -1313,6 +1313,14 @@
       "sha": "7148da0f365771c4",
       "date": "2026-09-01"
     },
+    "/tools/collection-route-productivity/": {
+      "sha": "c9004d02371d4d20",
+      "date": "2026-09-18"
+    },
+    "/tools/collection-vehicle-payload/": {
+      "sha": "80c3efd6c24df7ba",
+      "date": "2026-09-18"
+    },
     "/tools/color-codes/": {
       "sha": "5f86e2350a5bd1c3",
       "date": "2026-09-01"
@@ -1929,6 +1937,10 @@
       "sha": "13e19e8f2bde2de2",
       "date": "2026-09-09"
     },
+    "/tools/daily-cover-volume/": {
+      "sha": "6bfe73f6825b7850",
+      "date": "2026-09-18"
+    },
     "/tools/damper-actuator-torque/": {
       "sha": "31e4bbf582cf7fd4",
       "date": "2026-09-11"
@@ -2120,6 +2132,10 @@
     "/tools/distance-distance-intersection/": {
       "sha": "ba68e95a69e93205",
       "date": "2026-09-01"
+    },
+    "/tools/diversion-rate-contamination/": {
+      "sha": "e9a45f9008d08ef3",
+      "date": "2026-09-18"
     },
     "/tools/dividing-head/": {
       "sha": "2e73be4a9149a812",
@@ -2798,8 +2814,8 @@
       "date": "2026-09-04"
     },
     "/tools/filter-loading/": {
-      "sha": "fb3887d5a5a61786",
-      "date": "2026-09-01"
+      "sha": "f3a504ad58ca5afa",
+      "date": "2026-09-18"
     },
     "/tools/filter-pressure-drop/": {
       "sha": "b733057a1876c36f",
@@ -2902,8 +2918,8 @@
       "date": "2026-09-05"
     },
     "/tools/flatbed-tarp-size/": {
-      "sha": "50b2070af304ec96",
-      "date": "2026-09-04"
+      "sha": "785df30c7971e86f",
+      "date": "2026-09-18"
     },
     "/tools/flexible-pipe-deflection/": {
       "sha": "490b0359215af896",
@@ -3758,8 +3774,8 @@
       "date": "2026-09-01"
     },
     "/tools/incoterm-decoder/": {
-      "sha": "b037377bb6568bc8",
-      "date": "2026-09-17"
+      "sha": "952d5140880116c8",
+      "date": "2026-09-18"
     },
     "/tools/indirect-evaporative-cooling/": {
       "sha": "d2f164773824af54",
@@ -3965,6 +3981,18 @@
       "sha": "e9237e8c97f826fd",
       "date": "2026-09-01"
     },
+    "/tools/landfill-airspace-density/": {
+      "sha": "8bc626aaf7762a52",
+      "date": "2026-09-18"
+    },
+    "/tools/landfill-gas-generation/": {
+      "sha": "6264a631dacee547",
+      "date": "2026-09-18"
+    },
+    "/tools/landfill-settlement-airspace/": {
+      "sha": "85ecb8ca5531a810",
+      "date": "2026-09-18"
+    },
     "/tools/landing-check/": {
       "sha": "6911c9839c634bfc",
       "date": "2026-09-01"
@@ -4001,6 +4029,10 @@
       "sha": "6459dd54f3fcd092",
       "date": "2026-09-01"
     },
+    "/tools/leachate-water-balance/": {
+      "sha": "ae0754709bf0e123",
+      "date": "2026-09-18"
+    },
     "/tools/lead-dust-clearance/": {
       "sha": "1c248d69090ee6c3",
       "date": "2026-09-08"
@@ -4028,6 +4060,10 @@
     "/tools/lexile-band/": {
       "sha": "4d1a59ee62fc811e",
       "date": "2026-09-01"
+    },
+    "/tools/lfg-flare-capacity/": {
+      "sha": "eaf89d278facc4c5",
+      "date": "2026-09-18"
     },
     "/tools/lidar-point-density/": {
       "sha": "693dffe10794e157",
@@ -4926,8 +4962,8 @@
       "date": "2026-09-04"
     },
     "/tools/pallet-loadout/": {
-      "sha": "5a838c321b2870ca",
-      "date": "2026-09-17"
+      "sha": "7d048f0c8b51f70d",
+      "date": "2026-09-18"
     },
     "/tools/pallet-rack-beam-capacity/": {
       "sha": "c29c37714a3591cb",
@@ -6114,8 +6150,8 @@
       "date": "2026-09-01"
     },
     "/tools/rolling-offset/": {
-      "sha": "f6f72e2699e9201e",
-      "date": "2026-09-01"
+      "sha": "3b3e14eeed6ef76e",
+      "date": "2026-09-18"
     },
     "/tools/rolling-sphere-protection/": {
       "sha": "95aacdeb1b47191b",
@@ -7102,8 +7138,8 @@
       "date": "2026-09-08"
     },
     "/tools/stacking-aisle-width/": {
-      "sha": "3063e2413ede77f9",
-      "date": "2026-09-17"
+      "sha": "bb091f224f2f8ed2",
+      "date": "2026-09-18"
     },
     "/tools/stadia-distance/": {
       "sha": "6a3286252fdf99c4",
@@ -7804,6 +7840,10 @@
     "/tools/train-brake-reduction/": {
       "sha": "a5e20d59701de466",
       "date": "2026-09-08"
+    },
+    "/tools/transfer-station-throughput/": {
+      "sha": "046cce74d57d2ed1",
+      "date": "2026-09-18"
     },
     "/tools/transformer-conductor-protection/": {
       "sha": "e94be785db54da67",
@@ -8600,6 +8640,10 @@
     "/tools/workers-comp-emr-premium/": {
       "sha": "4205f713daa038c0",
       "date": "2026-09-01"
+    },
+    "/tools/working-face-cell-lift/": {
+      "sha": "7a634e64e2c6ee08",
+      "date": "2026-09-18"
     },
     "/tools/working-space-110-26/": {
       "sha": "1ba6926b8fce29de",

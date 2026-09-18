@@ -24434,6 +24434,128 @@ export const CITATIONS = {
       { name: "Discharge coefficient", value: "entered coefficient represents the selected tile geometry", source: "manufacturer curve / field measurement" },
     ],
   },
+  // spec-v1789..v1799: solid waste, landfill, and transfer operations.
+  "landfill-airspace-density": {
+    formula: "waste airspace = tons / in-place density in tons per cubic yard; cover airspace = waste airspace x the cover ratio; airspace utilisation factor = tons placed / total airspace consumed.",
+    edition: "Volumetric bookkeeping. In-place density is commonly 1,000 to 1,600 lb per cubic yard and cover commonly adds 15 to 25%. The site's own airspace survey and its permitted capacity govern.",
+    freeAccess: "Public arithmetic; the densities and cover ratios come from the site's own survey.",
+    governance: GOVERNANCE.general,
+    editionNote: "Density is an OPERATING result and a report card on the working face, not a property of the waste: the same stream compacts very differently with machine weight, pass count, lift thickness, and moisture.",
+    assumptions: [
+      { name: "Cover", value: "counted alongside the waste; reporting density on waste alone while measuring capacity on total volume mixes two bases", source: "site airspace survey" },
+      { name: "Airspace value", value: "the committed construction, cover, closure, and post-care cost per cubic yard", source: "site financial assurance" },
+    ],
+  },
+  "landfill-gas-generation": {
+    formula: "Q = sum over placement years of k x L0 x M x e^(-k t); capacity = methane flow x heating value x generator efficiency, decayed forward as e^(-k t).",
+    edition: "First-order decay, with the Clean Air Act default methane yield of 100 cubic metres per megagram and a methane generation rate constant of roughly 0.02 arid, 0.04 conventional, and 0.05 to 0.07 wet or bioreactor.",
+    freeAccess: "The model and its defaults are published by the EPA and are freely available.",
+    governance: GOVERNANCE.general,
+    editionNote: "Generation and collection are different quantities and mixing them is the usual error in a project proposal; the uncollected share is also the site's methane emission and its regulatory exposure.",
+    assumptions: [
+      { name: "Decay constant", value: "where the uncertainty lives; it depends overwhelmingly on moisture and a factor of two or three between an arid and a wet site is ordinary", source: "site gas data" },
+      { name: "Peak", value: "modelled at closure, when every placement year contributes and none has decayed far", source: "spec-v1790 scope" },
+    ],
+  },
+  "leachate-water-balance": {
+    formula: "infiltration = precipitation x (1 - runoff coefficient - evapotranspiration coefficient); leachate volume = infiltration depth x area, at 7.48 gallons per cubic foot.",
+    edition: "A screening water balance. HELP modelling, the site's own leachate records, and the permit's storage and treatment requirements govern.",
+    freeAccess: "Public arithmetic; HELP is published by the EPA and is freely available.",
+    governance: GOVERNANCE.general,
+    editionNote: "A design storm arrives as many days of average flow at once, and a treatment system sized on the average with no storage has that many days of catching up to do. Storage rides out the peak; treatment capacity cannot.",
+    assumptions: [
+      { name: "Coefficients", value: "entered; runoff and evapotranspiration are site and cover specific", source: "site records / HELP" },
+      { name: "Scope", value: "infiltration only; it does not model the liner, the collection system, or recirculation", source: "spec-v1791 scope" },
+    ],
+  },
+  "daily-cover-volume": {
+    formula: "cover volume = working face area x cover depth; its share = cover volume / (waste airspace + cover volume); the airspace value = cover volume x the committed cost per cubic yard.",
+    edition: "Geometry against the site's own airspace value. Six inches of daily cover is the common baseline requirement; the permit and the regulator govern.",
+    freeAccess: "Public arithmetic; the requirement itself is in the site's permit.",
+    governance: GOVERNANCE.general,
+    editionNote: "The cover is doing a job -- vector, litter, odour, fire, and scavenging control -- and an alternative daily cover has to be APPROVED as meeting those purposes before any of this saving is available.",
+    assumptions: [
+      { name: "Airspace value", value: "the committed cost per cubic yard, before the cost of buying, hauling, and placing the soil", source: "site financial assurance" },
+      { name: "Alternative cover", value: "its own annual cost is entered and netted; approval is not assumed", source: "permit / regulator" },
+    ],
+  },
+  "collection-route-productivity": {
+    formula: "collection time = stops x seconds per stop; route tonnage = stops x average setout weight; disposal loads = tonnage / payload rounded up; route day = collection + haul + tipping + fixed and break time.",
+    edition: "Element build-up. The operation's own time study and any applicable collective bargaining agreement govern a standard used to staff or to pay.",
+    freeAccess: "Public method; the element times are the operation's own measurements.",
+    governance: GOVERNANCE.general,
+    editionNote: "The cliff is what to watch: when tonnage crosses a multiple of the payload the day gets a whole haul cycle longer overnight, which is why routes are watched in TONS rather than stops.",
+    assumptions: [
+      { name: "Element times", value: "entered from the operation's own study rather than assumed", source: "facility time study" },
+      { name: "Scope", value: "one route on one shift; it does not sequence the route or model traffic", source: "spec-v1793 scope" },
+    ],
+  },
+  "transfer-station-throughput": {
+    formula: "peak hour tonnage = daily tonnage x the peak share; unloading positions = peak arrivals x floor time; trailer loads = tonnage / payload rounded up; fleet = loads / (operating hours / round trip); surge floor = delayed tonnage / loose density / pile depth x a manoeuvring factor.",
+    edition: "Queueing and volumetric arithmetic. The facility's own scale records, its permit's throughput limit, and the traffic study govern.",
+    freeAccess: "Public arithmetic; the arrival profile is the facility's own data.",
+    governance: GOVERNANCE.general,
+    editionNote: "The building is not sized on the tonnage it handles; it is sized on how long the trailers can be late, which is a judgement about the highway rather than about the waste.",
+    assumptions: [
+      { name: "Peak share", value: "entered; sizing the inbound side on the daily average queues trucks onto the street when routes come in together", source: "facility scale records" },
+      { name: "Manoeuvring factor", value: "entered multiplier on the bare pile footprint for equipment and traffic", source: "facility layout" },
+    ],
+  },
+  "lfg-flare-capacity": {
+    formula: "rated capacity = peak flow x (1 + design margin); minimum stable flow = rated / turndown ratio; heat release = methane flow x heating value; credit = methane mass destroyed x its global warming potential.",
+    edition: "Flare sizing against the manufacturer's rated capacity and turndown. A flare needs roughly 20% methane to hold a flame. The site's gas analysis and the applicable air permit govern.",
+    freeAccess: "Public arithmetic; the turndown and rated capacity come from the flare manufacturer.",
+    governance: GOVERNANCE.general,
+    editionNote: "Flow is not what puts a flare out -- reaching the turndown by decline alone takes decades. Gas QUALITY is: a well field pulled too hard draws air through the cover, dilutes the methane, and trips the flare with plenty of flow still arriving.",
+    assumptions: [
+      { name: "Biogenic carbon dioxide", value: "the flare's own CO2 is biogenic and is not charged against the credit", source: "greenhouse gas accounting convention" },
+      { name: "Destruction efficiency", value: "entered; it is a permit and manufacturer figure, not a calculated one", source: "air permit / manufacturer" },
+    ],
+  },
+  "diversion-rate-contamination": {
+    formula: "reported diversion = (recycling + organics) / total generated; true diversion replaces the recycling tonnage with what survives the measured inbound contamination; residual cost = residual tons x (processing + tipping fees).",
+    edition: "Diversion bookkeeping. The jurisdiction's diversion definition governs which materials count and whether they are counted at the truck or at the bale; the processor's own contamination measurement governs the residual.",
+    freeAccess: "Public arithmetic; the contamination rate is the processor's own measurement.",
+    governance: GOVERNANCE.general,
+    editionNote: "Nothing is misreported when the two rates differ: the measurement was simply taken at the truck rather than at the bale. Improving contamination beats adding tonnage, because it improves the rate and the cost in the same move.",
+    assumptions: [
+      { name: "Overstatement", value: "reported against true is stated BOTH as a share of the claimed figure and as a percentage above the true rate; they are different quantities", source: "spec-v1796 correction" },
+      { name: "Residual", value: "the most expensive tonnage in the system -- collected, tipped, sorted, rejected, reloaded, and hauled to the landfill it would have reached directly", source: "processor records" },
+    ],
+  },
+  "landfill-settlement-airspace": {
+    formula: "settlement = waste thickness x the primary and secondary fractions; recoverable airspace = primary settlement x area; differential = the settlement difference between adjacent fill thicknesses, against the cap's design fall over its run.",
+    edition: "Settlement as a fraction of waste thickness. The site's own settlement monitoring, the closure plan, and the permit's minimum final-cover slope govern.",
+    freeAccess: "Public arithmetic; the settlement fractions come from the site's own monitoring.",
+    governance: GOVERNANCE.general,
+    editionNote: "Only the PRIMARY settlement, arriving while the cell is still open, is recoverable airspace. The secondary settlement arrives after the cap and only lowers the final grades, which is where the hazard is.",
+    assumptions: [
+      { name: "Differential", value: "not the total, is the number that governs the cap; final grades are designed with the settlement added back in", source: "closure plan" },
+      { name: "Settlement fractions", value: "entered; they are highly waste and site specific and are not predicted here", source: "site settlement monitoring" },
+    ],
+  },
+  "collection-vehicle-payload": {
+    formula: "in-body density = loose density x compaction ratio; body payload = body volume x that density; chassis payload = gross vehicle weight rating - tare weight; the smaller governs, and the legal fill = chassis payload / in-body density.",
+    edition: "Manufacturer ratings against the applicable weight law. Axle-by-axle loading, not just gross weight, is what an enforcement scale checks.",
+    freeAccess: "Public arithmetic; the ratings come from the chassis and body manufacturers.",
+    governance: GOVERNANCE.general,
+    editionNote: "When the chassis governs there is no gauge and no warning -- a crew filling to the pack panel is simply over the rating on the road. Specify the chassis and body together so the BODY governs and the judgement leaves the crew.",
+    assumptions: [
+      { name: "Axle loading", value: "not computed here; gross weight alone does not establish legality", source: "applicable weight law" },
+      { name: "Loose density", value: "moves with the weather, so the legal fill moves with it too", source: "facility scale records" },
+    ],
+  },
+  "working-face-cell-lift": {
+    formula: "daily cell volume = tonnage / in-place density; face advance = volume / (width x lift height); sloped face length = lift height x sqrt(1 + run^2); cover volume = exposed top and face area x cover depth.",
+    edition: "Geometry. The approved operations plan and the permit govern the working face size, the lift, and the cover.",
+    freeAccess: "Public arithmetic; the face size and lift are in the site's operations plan.",
+    governance: GOVERNANCE.general,
+    editionNote: "Halving the face width doubles the advance exactly, so the top area does not move and the whole saving comes off the sloped face -- as does the leachate, litter, odour, and bird exposure that scales with the same area.",
+    assumptions: [
+      { name: "The limit", value: "whether the face can still be worked; density lost to a crowded face costs far more airspace than the cover ever saves", source: "approved operations plan" },
+      { name: "Passes", value: "layers x passes per layer is what the operations plan commits to, not what the arithmetic allows", source: "approved operations plan" },
+    ],
+  },
   // spec-v1828..v1836: marine construction and dredging.
   "dredge-production-rate": {
     formula: "flow = pipe area x velocity; solids = flow x Cv; in-situ = solids / (1 - porosity); production in cy/h = in-situ cu ft/s x 3,600 / 27; slurry SG = 1 + Cv (SG_solids - 1).",
