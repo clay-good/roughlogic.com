@@ -10835,13 +10835,13 @@ export const CITATIONS = {
     ],
   },
   "wire-pulling-lubricant": {
-    formula: "gallons = k_factor x length_ft x conduit_id_in^2 x bend_factor.",
-    edition: "Film-coating lubricant estimate by name (gallons proportional to length x conduit ID^2, scaled by a bend/fill factor); rule-of-thumb.",
-    freeAccess: "The film-coating rule of thumb (~0.0015 gal per foot per square inch of conduit) is public; the lubricant manufacturer's rate governs.",
+    formula: "gallons = k_factor x length_ft x conduit_id_in x bend_factor (Polywater Q = k x L x D).",
+    edition: "Film-coating lubricant estimate by name (gallons proportional to length x conduit ID, the wall area the film coats, scaled by a bend/fill factor); rule-of-thumb.",
+    freeAccess: "The film-coating rule of thumb (~0.0015 gal per foot of run per inch of conduit ID) is public; the lubricant manufacturer's rate governs.",
     governance: GOVERNANCE.general,
     editionNote: "K is a film-coating rule from the lubricant manufacturer (about 0.0015 for the common Polywater rule). More bends and higher conduit fill raise the demand through the bend factor. Under-lubing risks a stuck pull, so round up and keep a spare pail.",
     assumptions: [
-      { name: "K factor", value: "~0.0015 gal per foot per square inch of conduit (the common Polywater film-coating rule)", source: "lubricant manufacturer" },
+      { name: "K factor", value: "~0.0015 gal per foot of run per inch of conduit ID (Polywater Q = 0.0015 x L x D; 0.0008 L/m/mm metric)", source: "lubricant manufacturer" },
       { name: "Bend factor", value: "1.0 for a straight run; raise it for multiple sweeps and high conduit fill", source: "field judgment" },
     ],
   },

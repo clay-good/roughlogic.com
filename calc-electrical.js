@@ -1569,7 +1569,9 @@ export function computeMultiLoadVoltageDrop({
   if (!Array.isArray(loads) || loads.length === 0) return { error: "Provide at least one load." };
   const knownAwg = ["18","16","14","12","10","8","6","4","2","1","1/0","2/0","3/0","4/0"];
   if (!knownAwg.includes(awg)) return { error: "Unknown AWG." };
-  const r_per_kft = conductorResistancePerKft({ material, awg, temperature_C: 25 });
+  // 75 C, the NEC Chapter 9 Table 8 basis the citation names and the
+  // voltage-drop tile's K = 12.9 uses; 25 C read 18% low against both.
+  const r_per_kft = conductorResistancePerKft({ material, awg, temperature_C: 75 });
   if (!Number.isFinite(r_per_kft)) return { error: "Unknown conductor size or material." };
   // Sort by distance ascending.
   const ordered = [...loads].map((l) => ({ distance_ft: Number(l.distance_ft) || 0, current_A: Number(l.current_A) || 0 })).sort((a, b) => a.distance_ft - b.distance_ft);
@@ -1635,7 +1637,8 @@ export function computeLVDCDrop({ system_V = 12, awg = "10", run_length_ft = 0, 
   if (!(current_A >= 0)) return { error: "Current must be non-negative." };
   const knownAwg = ["18","16","14","12","10","8","6","4","2","1","1/0","2/0","3/0","4/0"];
   if (!knownAwg.includes(awg)) return { error: "Unknown AWG." };
-  const r_per_kft = conductorResistancePerKft({ material: "copper", awg, temperature_C: 25 });
+  // 75 C, the NEC Chapter 9 Table 8 basis the citation names (25 C read 18% low).
+  const r_per_kft = conductorResistancePerKft({ material: "copper", awg, temperature_C: 75 });
   if (!Number.isFinite(r_per_kft)) return { error: "Unknown AWG." };
   const drop_V = current_A * (2 * r_per_kft) * (run_length_ft / 1000);
   const percent = (drop_V / system_V) * 100;
@@ -5620,7 +5623,9 @@ export function computeWirePullingLubricant({ length_ft = 400, conduit_id_in = 3
   if (!(conduit_id_in > 0)) return { error: "Conduit inside diameter must be positive (in)." };
   if (!(k_factor > 0)) return { error: "K factor must be positive." };
   if (!(bend_factor > 0)) return { error: "Bend factor must be positive." };
-  const gallons = k_factor * length_ft * conduit_id_in * conduit_id_in * bend_factor;
+  // Polywater: Q = K x L x D, linear in the ID because the film coats the
+  // wall area (pi D L). Until 2026-09-18 this squared D, 3x high at 3 in.
+  const gallons = k_factor * length_ft * conduit_id_in * bend_factor;
   if (!Number.isFinite(gallons)) return { error: "Lubricant math is not a finite value." };
   return {
     gallons,
@@ -5631,7 +5636,7 @@ export function computeWirePullingLubricant({ length_ft = 400, conduit_id_in = 3
 export const wirePullingLubricantExample = { inputs: { length_ft: 400, conduit_id_in: 3, k_factor: 0.0015, bend_factor: 1.0 } };
 
 function _v852renderWirePullingLubricant(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: film-coating estimate by name. gallons = K x length x conduit ID^2 x bend factor. K is a film-coating rule from the lubricant manufacturer (~0.0015 for the common Polywater rule); more bends and fill raise the bend factor.";
+  citationEl.textContent = "Citation: film-coating estimate by name. gallons = K x length x conduit ID x bend factor (Polywater Q = 0.0015 x L(ft) x D(in)). K is a film-coating rule from the lubricant manufacturer (~0.0015 for the common Polywater rule); more bends and fill raise the bend factor.";
   const l = makeNumber("Conduit run length (ft)", "wpl-l", { step: "any", min: "0" });
   const id = makeNumber("Conduit inside diameter (in)", "wpl-id", { step: "any", min: "0" });
   const k = makeNumber("Film-coating K factor", "wpl-k", { step: "any", min: "0" });

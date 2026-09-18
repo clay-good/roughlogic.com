@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "a62f6071c9b3f736",
+      "sha": "5a9b83bc384a2f67",
       "date": "2026-09-18"
     },
     "/tools/": {
@@ -4330,8 +4330,8 @@
       "date": "2026-09-04"
     },
     "/tools/lv-dc-drop/": {
-      "sha": "2785baf15ac55fcb",
-      "date": "2026-09-01"
+      "sha": "d73e334fdf3d5e73",
+      "date": "2026-09-18"
     },
     "/tools/machine-room-heat/": {
       "sha": "e4f59dc83023eb2f",
@@ -4806,8 +4806,8 @@
       "date": "2026-09-01"
     },
     "/tools/multi-load-vd/": {
-      "sha": "fe0432d1d8c2062f",
-      "date": "2026-09-01"
+      "sha": "42bcd57a4c1a28dc",
+      "date": "2026-09-18"
     },
     "/tools/multi-motor-feeder/": {
       "sha": "0be6164fd51bf3f8",
@@ -8706,8 +8706,8 @@
       "date": "2026-09-01"
     },
     "/tools/wire-pulling-lubricant/": {
-      "sha": "160476a07acfa98f",
-      "date": "2026-09-01"
+      "sha": "adc464601eeee2b0",
+      "date": "2026-09-18"
     },
     "/tools/wire-rope-clips/": {
       "sha": "109c2a4b77bad3bb",

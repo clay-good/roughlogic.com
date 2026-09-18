@@ -19274,13 +19274,16 @@ test("bounds: spec-v851 computeDuctMetalWeight pins the perimeter, area, weight,
 });
 
 test("bounds: spec-v852 computeWirePullingLubricant pins the gallons and error seams", () => {
-  // 400 ft, 3 in conduit, K 0.0015, bend 1.0 -> 5.4 gal.
+  // 400 ft, 3 in conduit, K 0.0015, bend 1.0 -> 1.8 gal (Polywater Q = k L D).
   const r = _v852wpl({ length_ft: 400, conduit_id_in: 3, k_factor: 0.0015, bend_factor: 1.0 });
-  assert.ok(Math.abs(r.gallons - 5.4) < 1e-6);
+  assert.ok(Math.abs(r.gallons - 1.8) < 1e-9);
   // A bend-heavy pull at 1.3 raises it (bends, not length alone, decide the pail count).
-  assert.ok(Math.abs(_v852wpl({ length_ft: 400, conduit_id_in: 3, k_factor: 0.0015, bend_factor: 1.3 }).gallons - 7.02) < 1e-6);
-  // Conduit ID enters squared.
-  assert.ok(Math.abs(_v852wpl({ length_ft: 400, conduit_id_in: 6, k_factor: 0.0015, bend_factor: 1.0 }).gallons - 21.6) < 1e-6);
+  assert.ok(Math.abs(_v852wpl({ length_ft: 400, conduit_id_in: 3, k_factor: 0.0015, bend_factor: 1.3 }).gallons - 2.34) < 1e-9);
+  // Conduit ID enters linearly: the film coats the wall area, pi D L. Polywater's
+  // own check, 1,000 ft of 4 in duct, lands in its stated 4-10 gal field range.
+  assert.ok(Math.abs(_v852wpl({ length_ft: 400, conduit_id_in: 6, k_factor: 0.0015, bend_factor: 1.0 }).gallons - 3.6) < 1e-9);
+  const field = _v852wpl({ length_ft: 1000, conduit_id_in: 4, k_factor: 0.0015, bend_factor: 1.0 }).gallons;
+  assert.ok(field >= 4 && field <= 10);
   // Error seams.
   assert.ok("error" in _v852wpl({ length_ft: 0, conduit_id_in: 3, k_factor: 0.0015, bend_factor: 1.0 }));
   assert.ok("error" in _v852wpl({ length_ft: 400, conduit_id_in: 0, k_factor: 0.0015, bend_factor: 1.0 }));

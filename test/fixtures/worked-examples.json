@@ -7169,10 +7169,10 @@
    "tile_id": "lv-dc-drop",
    "source_publisher": "Project (first-principles)",
    "source_title": "Low-voltage DC voltage drop on a 2-wire run: V_drop = 2 * I * R_per_ft * L",
-   "source_edition_or_year": "n/a; physical resistance of 10 AWG Cu at 25 C ~ 1.018 milliohm/ft (NIST); LED driver tolerance band ~3%",
-   "source_section_or_page": "12 V / 10 AWG Cu / 20 ft / 10 A LED lighting -> ~0.407 V drop (~3.4%); above the 3% LED-driver band, so 'not acceptable'",
+   "source_edition_or_year": "n/a; physical resistance of 10 AWG Cu at 75 C ~ 1.215 milliohm/ft (NEC Ch. 9 Table 8 basis); LED driver tolerance band ~3%",
+   "source_section_or_page": "12 V / 10 AWG Cu / 20 ft / 10 A LED lighting -> ~0.486 V drop (~4.0%); above the 3% LED-driver band, so 'not acceptable'",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-18",
    "inputs": {
     "system_V": 12,
     "awg": "10",
@@ -7182,13 +7182,13 @@
    },
    "outputs": {
     "drop_V": {
-     "value": 0.407,
+     "value": 0.486,
      "tolerance": {
       "abs": 0.02
      }
     },
     "percent": {
-     "value": 3.39,
+     "value": 4.05,
      "tolerance": {
       "abs": 0.1
      }
@@ -8036,9 +8036,9 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Cumulative voltage drop along a feeder with discrete loads at distance",
    "source_edition_or_year": "n/a; NEC 215 advisory + Ohm's-law identity over copper resistance per foot",
-   "source_section_or_page": "12 AWG copper feeder at 120 V with 5 A @ 50 ft and 10 A @ 100 ft -> worst drop 4.05 V (3.37%) at the second load",
+   "source_section_or_page": "12 AWG copper feeder at 120 V with 5 A @ 50 ft and 10 A @ 100 ft -> worst drop 4.83 V (4.02%) at the second load, at the 75 C Table 8 resistance (1.93 ohm/kft)",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-18",
    "inputs": {
     "material": "copper",
     "awg": "12",
@@ -8056,19 +8056,19 @@
    },
    "outputs": {
     "worst_drop_V": {
-     "value": 4.05,
+     "value": 4.83,
      "tolerance": {
       "abs": 0.05
      }
     },
     "worst_voltage_V": {
-     "value": 115.95,
+     "value": 115.17,
      "tolerance": {
       "abs": 0.05
      }
     },
     "worst_percent": {
-     "value": 3.37,
+     "value": 4.02,
      "tolerance": {
       "abs": 0.05
      }
@@ -59843,9 +59843,9 @@
    "source_publisher": "Film-coating lubricant estimate (rule of thumb)",
    "source_title": "400 ft run, 3 in conduit, K 0.0015, bend factor 1.0",
    "source_edition_or_year": "spec-v852 worked example",
-   "source_section_or_page": "gallons = 0.0015*400*9*1.0 = 5.4 gal",
+   "source_section_or_page": "gallons = 0.0015*400*3*1.0 = 1.8 gal (Polywater Q = k L D)",
    "verified_by": "rl",
-   "verified_on": "2026-07-17",
+   "verified_on": "2026-09-18",
    "inputs": {
     "length_ft": 400,
     "conduit_id_in": 3,
@@ -59854,7 +59854,7 @@
    },
    "outputs": {
     "gallons": {
-     "value": 5.4,
+     "value": 1.8,
      "tolerance": {
       "abs": 0.01
      }
@@ -59866,9 +59866,9 @@
    "source_publisher": "Film-coating lubricant estimate (rule of thumb)",
    "source_title": "cross-check: a bend-heavy, high-fill pull at 1.3 bend factor",
    "source_edition_or_year": "spec-v852 worked example",
-   "source_section_or_page": "gallons = 0.0015*400*9*1.3 = 7.02 gal (bends decide whether one pail does it)",
+   "source_section_or_page": "gallons = 0.0015*400*3*1.3 = 2.34 gal (bends decide whether one pail does it)",
    "verified_by": "rl",
-   "verified_on": "2026-07-17",
+   "verified_on": "2026-09-18",
    "inputs": {
     "length_ft": 400,
     "conduit_id_in": 3,
@@ -59877,7 +59877,7 @@
    },
    "outputs": {
     "gallons": {
-     "value": 7.02,
+     "value": 2.34,
      "tolerance": {
       "abs": 0.01
      }
