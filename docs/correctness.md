@@ -177,19 +177,34 @@ its spec did not write. That can be:
 
 | | Modules | Tiles |
 |---|---|---|
-| Covered | 11: brewing, corrosion, greenhouse, waste, marine, warehouse, datacenter, telecom, controls, winterops, finishing | 101 |
-| Not yet | 23, led by hvacsystems and oilgas (15 each), airquality and process (12), inspection (11), refrigeration (10) | 154 |
+| Covered | all 34 modules holding such tiles | all 255 |
 
-The first eleven suites found seven defects, all shown in
-[CHANGELOG.md](../CHANGELOG.md):
+The suites found fourteen defects, each written up in
+[CHANGELOG.md](../CHANGELOG.md). In three cases the tile ran its
+reference's relation past that reference's own limits:
 
-- a glycol load taken at the wrong beer temperature;
-- a tank-grid coverage figure that ignored the rim;
-- fifteen truncated conversion factors;
-- HEC-18's three limits on its own pier-scour equation;
-- the Shore Protection Manual's fully developed sea;
-- an undisclosed gap to EPA's LandGEM;
-- a buckling square law quoted outside its elastic range.
+- HEC-18's pier-scour bounds were missing.
+- The Shore Protection Manual's fully developed sea was missing.
+- B31G's safe pressure could exceed the pipe's design pressure.
+
+In four cases units were mixed:
+
+- A radiography gamma constant was per metre but used as per
+  foot, putting the boundary 3.3 times too close.
+- Normalized leakage divided square inches by square feet.
+- An odour unit counted cubic feet, not the EN 13725 cubic metre.
+- Twenty-five exact conversion factors were written short.
+
+In six cases the wrong relation was used:
+
+- Duct breakout noise used the partition equation.
+- The pile embedment took S1 without its d/3 depth.
+- The low-fill MT coil used the high-fill denominator.
+- A glycol load was taken at the wrong beer temperature.
+- A tank-grid coverage figure ignored the rim.
+- A buckling square law was quoted outside its elastic range.
+
+One more was an undisclosed modelling gap to EPA's LandGEM.
 
 The pattern that yields most is to read each tile against its
 reference's own bounds and sub-cases. The specs state the
