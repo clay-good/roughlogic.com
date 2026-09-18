@@ -3781,7 +3781,7 @@ export const CITATIONS = {
     ],
   },
   "insulation-heat-loss": {
-    formula: "R_cond = ln(r2/r1) / (2π × k); h_outside = h_conv(V) + h_rad(eps, T); R_outside = 1 / (h_outside × 2π × r2); Q = (T_s − T_a) / (R_cond + R_outside). h_conv ≈ 0.225 + 0.000625 × V_fpm (engineering approximation); h_rad = eps × σ × ((T_s_R² + T_a_R²)(T_s_R + T_a_R)). Iterate for outer-surface temperature.",
+    formula: "R_cond = ln(r2/r1) / (2π × k); h_outside = h_conv(V) + h_rad(eps, T); R_outside = 1 / (h_outside × 2π × r2); Q = (T_s − T_a) / (R_cond + R_outside). h_conv = cube-root sum of natural (ASHRAE simplified horizontal cylinder: max(0.27 (ΔT/D)^0.25, 0.18 ΔT^(1/3))) and forced (Hilpert Nu = C Re^m Pr^(1/3), standard air) convection; h_rad = eps × σ × ((T_s_R² + T_a_R²)(T_s_R + T_a_R)). Iterate for outer-surface temperature.",
     edition: "ASHRAE Handbook Fundamentals chapter 25 (insulation) by name; ASTM C680 (cylindrical surface conditions) by name; manufacturer k-values from data/hvac/insulation-k-values.json.",
     freeAccess: "ASTM C680 licensed; manufacturer technical bulletins free at each manufacturer site.",
     governance: GOVERNANCE.mechanical,
@@ -3789,6 +3789,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "Stefan-Boltzmann constant σ", value: "0.1714×10⁻⁸ BTU/(hr·ft²·°R⁴)", source: "physical fact" },
       { name: "Default jacket emissivity", value: "0.9 (painted steel / fabric jacket)", source: "engineering practice" },
+      { name: "Film air properties", value: "standard air (nu 1.69e-4 ft^2/s, k 0.0150 Btu/hr-ft-F, Pr 0.71), not re-evaluated at the film temperature", source: "engineering practice" },
       { name: "Iterative outer-surface T solve", value: "12 fixed-point iterations for the R_outside ↔ T_s2 coupling", source: "engineering practice" },
     ],
   },
@@ -21027,14 +21028,14 @@ export const CITATIONS = {
     ],
   },
   "radiant-floor-output": {
-    formula: "q = 2 x (T_surface - T_room)^1.1 Btu/hr-ft^2; inverse T_surface = T_room + (q/2)^(1/1.1); comfort cap ~85 F surface.",
-    edition: "The radiant-floor heat-output relation q = 2 (Tsurface - Troom)^1.1 with the ~85 F surface comfort limit, from ASHRAE / radiant-panel practice, by name.",
+    formula: "q = 1.481 x (T_surface - T_room)^1.1 Btu/hr-ft^2 (EN 1264 basic characteristic, 8.92 W/m^2 per K^1.1, converted); inverse T_surface = T_room + (q/1.481)^(1/1.1); comfort cap ~85 F surface.",
+    edition: "EN 1264 basic characteristic curve for heated floors, q = 8.92 (theta_F - theta_i)^1.1 W/m^2, by name, with the ~85 F surface comfort limit.",
     freeAccess: "The floor heat-output correlation and the ~85 F comfort limit are standard published radiant-heating results.",
     governance: GOVERNANCE.general,
-    editionNote: "Radiant floor heat output: the combined radiant-plus-convective output of a warm floor is about q = 2 x (the mean surface temperature - the room air temperature)^1.1 Btu/hr-ft^2, solvable in either direction (the output from a surface temperature, or the surface temperature needed for a target output). The mean surface temperature is held to about 85 F for foot comfort (ASHRAE), which caps the output near 39 Btu/hr-ft^2 in a 70 F room; a higher load needs more floor area, a supplemental emitter, or a warmer design condition, not a hotter floor. The surface temperature itself follows from the water temperature, the tube spacing, and the floor-covering resistance (see radiant-loop-sizing for the tubing layout). A design aid; the panel manufacturer's ratings govern.",
+    editionNote: "Radiant floor heat output: the combined radiant-plus-convective output of a warm floor is about q = 1.481 x (the mean surface temperature - the room air temperature)^1.1 Btu/hr-ft^2 (EN 1264), solvable in either direction (the output from a surface temperature, or the surface temperature needed for a target output). The mean surface temperature is held to about 85 F for foot comfort (ASHRAE), which caps the output near 39 Btu/hr-ft^2 in a 70 F room; a higher load needs more floor area, a supplemental emitter, or a warmer design condition, not a hotter floor. The surface temperature itself follows from the water temperature, the tube spacing, and the floor-covering resistance (see radiant-loop-sizing for the tubing layout). A design aid; the panel manufacturer's ratings govern.",
     assumptions: [
-      { name: "Output", value: "q = 2 x (T_surface - T_room)^1.1 Btu/hr-ft^2", source: "radiant-panel practice" },
-      { name: "Comfort cap", value: "mean surface temperature limited to ~85 F (~39 Btu/hr-ft^2 in a 70 F room)", source: "ASHRAE comfort" },
+      { name: "Output", value: "q = 1.481 x (T_surface - T_room)^1.1 Btu/hr-ft^2 (8.92 W/m^2 per K^1.1)", source: "EN 1264" },
+      { name: "Comfort cap", value: "mean surface temperature limited to ~85 F (~29 Btu/hr-ft^2 in a 70 F room)", source: "ASHRAE comfort" },
       { name: "Tubing separate", value: "the surface temperature follows from water temp, spacing, and covering", source: "scope of this tile" },
     ],
   },

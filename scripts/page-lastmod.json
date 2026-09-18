@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "5a9b83bc384a2f67",
+      "sha": "1d19c02ba4a996ea",
       "date": "2026-09-18"
     },
     "/tools/": {
@@ -3894,8 +3894,8 @@
       "date": "2026-09-01"
     },
     "/tools/insulation-heat-loss/": {
-      "sha": "627688e2eeb61c86",
-      "date": "2026-09-01"
+      "sha": "da474fb22fcb494d",
+      "date": "2026-09-18"
     },
     "/tools/insulation-resistance-pi/": {
       "sha": "4e55a0d9d272e785",
@@ -5826,8 +5826,8 @@
       "date": "2026-09-01"
     },
     "/tools/radiant-floor-output/": {
-      "sha": "bf75bba865b92130",
-      "date": "2026-09-01"
+      "sha": "46ecec24140ef9fd",
+      "date": "2026-09-18"
     },
     "/tools/radiant-heat-exchange/": {
       "sha": "a1a6b609076fe895",

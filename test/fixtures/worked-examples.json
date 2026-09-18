@@ -8231,12 +8231,12 @@
   },
   {
    "tile_id": "insulation-heat-loss",
-   "source_publisher": "ASHRAE Handbook (Fundamentals) / manufacturer fiberglass bulletins",
+   "source_publisher": "Project (first-principles)",
    "source_title": "Bare-pipe vs insulated-pipe heat loss per ft (radial conduction + convective/radiative surface loss)",
    "source_edition_or_year": "ASHRAE Fundamentals heat-transfer chapter; manufacturer fiberglass k = 0.025 W/m-K typical",
-   "source_section_or_page": "2.375 in OD pipe at 200 F into 70 F still air with 1.5 in fiberglass -> 124.33 BTU/hr-ft bare vs 22.40 BTU/hr-ft insulated (82% effectiveness)",
+   "source_section_or_page": "2.375 in OD pipe at 200 F into 70 F still air with 1.5 in fiberglass -> 216.6 BTU/hr-ft bare vs 22.96 BTU/hr-ft insulated (89.4% effectiveness); bare film h = 1.37 conv (ASHRAE 0.27 (dT/D)^0.25) + 1.31 rad; Churchill-Chu gives ~203, ASHRAE bare-pipe tables ~190-200",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-18",
    "inputs": {
     "pipe_OD_in": 2.375,
     "surface_T_F": 200,
@@ -8247,19 +8247,19 @@
    },
    "outputs": {
     "Q_bare_BTU_hr_ft": {
-     "value": 124.33,
+     "value": 216.62,
      "tolerance": {
       "abs": 1
      }
     },
     "Q_insulated_BTU_hr_ft": {
-     "value": 22.4,
+     "value": 22.96,
      "tolerance": {
       "abs": 0.5
      }
     },
     "effectiveness_pct": {
-     "value": 81.98,
+     "value": 89.4,
      "tolerance": {
       "abs": 0.5
      }
@@ -70140,12 +70140,12 @@
   },
   {
    "tile_id": "radiant-floor-output",
-   "source_publisher": "radiant-panel practice",
-   "source_title": "85 F floor, 70 F room -> 39.3 Btu/hr-ft^2 (at the comfort limit)",
+   "source_publisher": "EN 1264 basic characteristic (8.92 W/m^2 per K^1.1)",
+   "source_title": "85 F floor, 70 F room -> 29.1 Btu/hr-ft^2 (at the comfort limit)",
    "source_edition_or_year": "spec worked example (machine-verified)",
    "source_section_or_page": "spec-v442 section 2.1 pinned example",
    "verified_by": "rl",
-   "verified_on": "2026-07-04",
+   "verified_on": "2026-09-18",
    "inputs": {
     "mode": "surface_to_q",
     "t_surface_f": 85,
@@ -70153,7 +70153,7 @@
    },
    "outputs": {
     "q_btuh_ft2": {
-     "value": 39.3,
+     "value": 29.13,
      "tolerance": {
       "pct": 1
      }
@@ -70162,12 +70162,12 @@
   },
   {
    "tile_id": "radiant-floor-output",
-   "source_publisher": "radiant-panel practice",
-   "source_title": "cross-check: a 30 Btu/hr-ft^2 load needs an 81.7 F surface (under the 85 F cap)",
+   "source_publisher": "EN 1264 basic characteristic (8.92 W/m^2 per K^1.1)",
+   "source_title": "cross-check: a 30 Btu/hr-ft^2 load needs an 85.4 F surface (just over the 85 F cap)",
    "source_edition_or_year": "spec worked example (machine-verified)",
    "source_section_or_page": "spec-v442 section 2.1 cross-check",
    "verified_by": "rl",
-   "verified_on": "2026-07-04",
+   "verified_on": "2026-09-18",
    "inputs": {
     "mode": "q_to_surface",
     "t_room_f": 70,
@@ -70175,7 +70175,7 @@
    },
    "outputs": {
     "t_surface_out_f": {
-     "value": 81.7,
+     "value": 85.41,
      "tolerance": {
       "pct": 0.5
      }

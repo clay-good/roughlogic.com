@@ -2036,8 +2036,26 @@ export const INSULATION_K_VALUES_v7 = {
   pheno_foam:       { k: 0.014, description: "Phenolic foam (manufacturer typical)" },
 };
 
-function _filmCoeff(V_fpm, eps_jacket, T_surface_F, T_ambient_F) {
-  const h_conv = 0.225 + 0.000625 * Math.max(0, V_fpm);
+// Outside film on a horizontal cylinder of diameter D_ft, Btu/hr-ft^2-F.
+// Natural: ASHRAE Fundamentals simplified free convection in air, laminar
+// 0.27 (dT/D)^0.25, turbulent 0.18 dT^(1/3), the larger governing. Forced:
+// Hilpert's cross-flow correlation Nu = C Re^m Pr^(1/3) with standard-air
+// properties (nu 1.69e-4 ft^2/s, k 0.0150 Btu/hr-ft-F, Pr 0.71). Mixed flow
+// takes the cube-root sum. Until 2026-09-18 convection was a flat
+// 0.225 + 0.000625 V: 5-6x low in still air (1.37 for 2 in pipe at dT 130),
+// which put a bare 2 in line at 124 Btu/hr-ft where ASHRAE's tables give ~200.
+const _HILPERT = [[4, 0.989, 0.330], [40, 0.911, 0.385], [4000, 0.683, 0.466], [40000, 0.193, 0.618], [Infinity, 0.027, 0.805]];
+function _filmCoeff(V_fpm, eps_jacket, T_surface_F, T_ambient_F, D_ft) {
+  const dT = Math.abs(T_surface_F - T_ambient_F);
+  const h_nat = Math.max(0.27 * Math.pow(dT / D_ft, 0.25), 0.18 * Math.cbrt(dT));
+  const V_fps = Math.max(0, V_fpm) / 60;
+  let h_forced = 0;
+  if (V_fps > 0) {
+    const Re = V_fps * D_ft / 1.69e-4;
+    const [, C, m] = _HILPERT.find(([hi]) => Re < hi);
+    h_forced = C * Math.pow(Re, m) * Math.cbrt(0.71) * 0.0150 / D_ft;
+  }
+  const h_conv = Math.cbrt(h_nat ** 3 + h_forced ** 3);
   const T_s_R = T_surface_F + 459.67;
   const T_a_R = T_ambient_F + 459.67;
   const h_rad = eps_jacket * 0.1714e-8 * ((T_s_R * T_s_R + T_a_R * T_a_R) * (T_s_R + T_a_R));
@@ -2060,13 +2078,13 @@ export function computeInsulationHeatLoss({
   const r1 = (pipe_OD_in / 2) / 12;
   const r2 = r1 + thickness_in / 12;
   const dT = surface_T_F - ambient_T_F;
-  const h_bare = _filmCoeff(air_velocity_fpm, jacket_emissivity, surface_T_F, ambient_T_F);
+  const h_bare = _filmCoeff(air_velocity_fpm, jacket_emissivity, surface_T_F, ambient_T_F, 2 * r1);
   const Q_bare_per_ft = h_bare * (2 * Math.PI * r1) * dT;
   let T_s2 = surface_T_F - 0.7 * dT;
   let R_cond = 0, R_out = 0, Q_ins = 0;
   for (let i = 0; i < 12; i++) {
     R_cond = Math.log(r2 / r1) / (2 * Math.PI * m.k);
-    const h_out = _filmCoeff(air_velocity_fpm, jacket_emissivity, T_s2, ambient_T_F);
+    const h_out = _filmCoeff(air_velocity_fpm, jacket_emissivity, T_s2, ambient_T_F, 2 * r2);
     R_out = 1 / (h_out * 2 * Math.PI * r2);
     Q_ins = dT / (R_cond + R_out);
     T_s2 = surface_T_F - Q_ins * R_cond;
@@ -4643,6 +4661,11 @@ HVAC_RENDERERS["erv-total-enthalpy-recovery"] = _rEnv({
   compute: computeErvTotalEnthalpyRecovery,
 });
 
+// EN 1264's basic characteristic for a heated floor, q = 8.92 (dT_K)^1.1 W/m^2,
+// converted exactly to Btu/hr-ft^2 with dT in F: 1.4812. Until 2026-09-18 this
+// used 2, the US LINEAR rule's coefficient (about 2 Btu/hr-ft^2 per F), under
+// EN 1264's 1.1 exponent -- a pairing no source prints, 35% high at 15 F.
+const _RADIANT_FLOOR_COEF = 8.92 * (3600 / 1055.05585262 * 0.09290304) / Math.pow(1.8, 1.1);
 // dims: in { mode: dimensionless, t_surface_f: T, t_room_f: T, q_target: M T^-3 } out: { q_btuh_ft2: M T^-3, t_surface_out_f: T }
 export function computeRadiantFloorOutput({ mode = "surface_to_q", t_surface_f = 0, t_room_f = 70, q_target = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -4651,24 +4674,24 @@ export function computeRadiantFloorOutput({ mode = "surface_to_q", t_surface_f =
   if (mode === "q_to_surface") {
     const q = Number(q_target) || 0;
     if (!(q > 0)) return { error: "Target output must be positive (Btu/hr-ft^2)." };
-    const t_surface_out_f = room + Math.pow(q / 2, 1 / 1.1);
+    const t_surface_out_f = room + Math.pow(q / _RADIANT_FLOOR_COEF, 1 / 1.1);
     return {
       mode, q_btuh_ft2: q, t_surface_out_f, comfort_ok: t_surface_out_f <= 85,
-      note: "Radiant floor heat output (the standard q = 2 x (T_surface - T_room)^1.1 Btu/hr-ft^2 relation): here solved inverse for the mean floor surface temperature that delivers the target output. The 85 F comfort limit caps the output at about 39 Btu/hr-ft^2 for a 70 F room; a higher load needs supplemental heat or a warmer design condition, not a hotter floor. The output scales with the surface-to-room difference, set by the water temperature, tube spacing, and floor covering resistance (see radiant-loop-sizing for the tubing). A design aid; the panel manufacturer's ratings govern.",
+      note: "Radiant floor heat output (EN 1264: q = 1.481 x (T_surface - T_room)^1.1 Btu/hr-ft^2, 8.92 W/m^2 per K^1.1): here solved inverse for the mean floor surface temperature that delivers the target output. The 85 F comfort limit caps the output at about 29 Btu/hr-ft^2 for a 70 F room (EN 1264 puts the floor limit near 100 W/m^2, 32 Btu/hr-ft^2); a higher load needs supplemental heat or a warmer design condition, not a hotter floor. The output scales with the surface-to-room difference, set by the water temperature, tube spacing, and floor covering resistance (see radiant-loop-sizing for the tubing). A design aid; the panel manufacturer's ratings govern.",
     };
   }
   const surf = Number(t_surface_f);
   if (!Number.isFinite(surf)) return { error: "Enter a valid surface temperature (F)." };
   if (!(surf > room)) return { error: "Surface temperature must be above the room temperature." };
-  const q_btuh_ft2 = 2 * Math.pow(surf - room, 1.1);
+  const q_btuh_ft2 = _RADIANT_FLOOR_COEF * Math.pow(surf - room, 1.1);
   return {
     mode, q_btuh_ft2, t_surface_out_f: surf, comfort_ok: surf <= 85,
-    note: "Radiant floor heat output: q = 2 x (T_surface - T_room)^1.1 Btu/hr-ft^2, the combined convective-plus-radiant output of a warm floor. Comfort caps the mean surface temperature at about 85 F (a warmer floor is uncomfortable underfoot), which limits the output to roughly 39 Btu/hr-ft^2 in a 70 F room; a higher load needs more floor area or supplemental heat. The surface temperature follows from the water temperature, tube spacing, and floor covering (see radiant-loop-sizing). A design aid; the panel manufacturer's ratings govern.",
+    note: "Radiant floor heat output: q = 1.481 x (T_surface - T_room)^1.1 Btu/hr-ft^2 (EN 1264: 8.92 W/m^2 per K^1.1), the combined convective-plus-radiant output of a warm floor. Comfort caps the mean surface temperature at about 85 F (a warmer floor is uncomfortable underfoot), which limits the output to roughly 29 Btu/hr-ft^2 in a 70 F room; a higher load needs more floor area or supplemental heat. The surface temperature follows from the water temperature, tube spacing, and floor covering (see radiant-loop-sizing). A design aid; the panel manufacturer's ratings govern.",
   };
 }
 export const radiantFloorOutputExample = { inputs: { mode: "surface_to_q", t_surface_f: 85, t_room_f: 70, q_target: 0 } };
 function _v442renderRadiantFloorOutput(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Radiant floor heat output q = 2 x (T_surface - T_room)^1.1 Btu/hr-ft^2 (ASHRAE / radiant-panel practice), with the ~85 F mean-surface comfort limit (~39 Btu/hr-ft^2 in a 70 F room). A design aid; the panel manufacturer's ratings govern.";
+  citationEl.textContent = "Citation: Radiant floor heat output q = 1.481 x (T_surface - T_room)^1.1 Btu/hr-ft^2 (EN 1264: 8.92 W/m^2 per K^1.1), with the ~85 F mean-surface comfort limit (~29 Btu/hr-ft^2 in a 70 F room). A design aid; the panel manufacturer's ratings govern.";
   const mode = makeSelect("Solve for", "rfo-mode", [
     { value: "surface_to_q", label: "Output from a surface temperature" },
     { value: "q_to_surface", label: "Surface temperature for a target output" },

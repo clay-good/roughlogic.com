@@ -23058,10 +23058,14 @@ test("bounds: spec-v441 computeErvTotalEnthalpyRecovery pins the recovery, suppl
 
 test("bounds: spec-v442 computeRadiantFloorOutput pins both directions, the comfort cap, and error seams", () => {
   const r = _v442({ mode: "surface_to_q", t_surface_f: 85, t_room_f: 70 });
-  assert.ok(Math.abs(r.q_btuh_ft2 - 2 * Math.pow(15, 1.1)) < 1e-9 && r.comfort_ok === true);
+  // EN 1264: 8.92 W/m^2 per K^1.1, converted exactly -> 29.13 Btu/hr-ft^2 at 15 F.
+  assert.ok(Math.abs(r.q_btuh_ft2 - 29.1288) < 1e-3 && r.comfort_ok === true);
   // Inverse: the surface needed for a target output.
   const inv = _v442({ mode: "q_to_surface", t_room_f: 70, q_target: 30 });
-  assert.ok(Math.abs(inv.t_surface_out_f - (70 + Math.pow(15, 1 / 1.1))) < 1e-9 && inv.comfort_ok === true);
+  // 30 Btu/hr-ft^2 needs 85.4 F, just over the comfort cap.
+  assert.ok(Math.abs(inv.t_surface_out_f - 85.4073) < 1e-3 && inv.comfort_ok === false);
+  // Round trip.
+  assert.ok(Math.abs(_v442({ mode: "surface_to_q", t_surface_f: inv.t_surface_out_f, t_room_f: 70 }).q_btuh_ft2 - 30) < 1e-9);
   // A hot surface exceeds the comfort cap.
   assert.ok(_v442({ mode: "surface_to_q", t_surface_f: 95, t_room_f: 70 }).comfort_ok === false);
   // Error seams.
