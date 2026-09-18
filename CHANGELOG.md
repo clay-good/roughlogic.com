@@ -62,6 +62,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **A round-trip test for every declared inverse tile.** 103 tiles say in their code that they are "the inverse of" another tile. `test/unit/inverse-pairs.test.js` finds those pairs itself. It runs each forward tile on its worked example and feeds the answer into the inverse. The inverse must land back on the forward input to 1e-6. 84 of the pairs connect by key name or an explicit map, and all 84 round-trip. A floor keeps the count from falling silently, and a seeded 0.52 to 0.53 change in the chimney-height inverse fails it.
+
 - **The commercial brewing and distilling bench.** The eleventh and last band of `specs/scope-trade-expansion-3.md`: thirteen Group O tiles in a new lazy module `calc-brewing.js` (the 88th). They follow a brew day from the mash (strike water, sparge volume, brewhouse efficiency, grain bed depth) through the kettle (Tinseth IBU, Morey color, boil-off) and the cellar (yeast pitch, glycol load, carbonation) to packaging, dry-hop loss, and the still's proof-gallon gauging. Before this band the catalog had four consumer beverage tiles and nothing for a production brewery or distillery. Catalog 2,170 -> 2,183.
 
   **`fermenter-glycol-load` shows the crash, not fermentation, sizes the chiller.** The worked 310 gal fermenter peaks at **0.12 tons** fermenting and **0.34 tons** crashing to 34 degF in 24 hours. Halving the crash time asks **0.62 tons of one tank**. The adiabatic rise of **34.6 degF** checks the heat-of-fermentation figure against the 20 to 40 degF breweries observe.

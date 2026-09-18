@@ -225,6 +225,15 @@ Where a calculator's output is monotonic in an input, the test
 asserts monotonicity over a sweep. A non-monotonic result for
 a monotonic relationship is a transcription error.
 
+Where a tile says in its code that it is the inverse of another
+tile, `test/unit/inverse-pairs.test.js` runs the round trip on
+the forward tile's worked example. The forward answer goes into
+the inverse, and the inverse's answer must land back on the
+forward input to 1e-6 relative. The test finds the pairs itself.
+On 2026-09-18 it found 103 pairs, and 84 of them connect by key
+name or an explicit map. A floor keeps that count from dropping.
+All 84 round-trip.
+
 ## Per-group reviewer signoff (Phase H)
 
 **Status: not yet operating. 0 of 19 non-exempt groups are
