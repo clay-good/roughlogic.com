@@ -25066,6 +25066,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "Angle of attack", value: "a geometry problem rather than a hydraulic one, and channels migrate -- a pier aligned when built is not necessarily aligned now", source: "bridge hydraulic study" },
       { name: "Scour mechanism", value: "removes the soil providing both the bearing and the lateral support, often during the flood when the bed cannot be seen", source: "HEC-18" },
+      { name: "Limits", value: "L/a enters K2 at no more than 12; K1 is 1.0 past 5 degrees of skew; a round-nosed pier aligned with the flow is held to 2.4 pier widths at Fr <= 0.8 and 3.0 above", source: "HEC-18" },
     ],
   },
   "wave-height-fetch": {
@@ -25077,6 +25078,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "Duration", value: "the term most often left out and frequently what governs; a squall does not build the wave its speed and fetch would suggest", source: "spec-v1836 method" },
       { name: "Water", value: "deep-water growth over a uniform fetch; shoaling and refraction are not modelled", source: "Shore Protection Manual" },
+      { name: "Fully developed sea", value: "growth stops at gH/U_A^2 = 0.2433 (period 8.134 U_A/g, duration 7.15e4 U_A/g), reached near a dimensionless fetch of 23,000", source: "Shore Protection Manual (1984) eq 3-42" },
     ],
   },
   // spec-v1809..v1817: warehouse racking and material handling.

@@ -595,18 +595,31 @@ export function computePierScourDepth({ pier_width_ft = 0, pier_length_ft = 0, f
   const froude_number = velocity_fps / Math.sqrt(G_FPS2 * flow_depth_ft);
   // HEC-18: y_s = 2.0 K1 K2 K3 y1 (a/y1)^0.65 Fr^0.43, with the angle factor
   // K2 = (cos t + (L/a) sin t)^0.65 -- aligned, that is exactly 1.
-  const angleFactor = (width_ft) => Math.pow(
-    Math.cos(angle_of_attack_deg * DEG) + (pier_length_ft / width_ft) * Math.sin(angle_of_attack_deg * DEG),
+  // HEC-18 bounds its own relation three ways, and the spec states none of
+  // them: L/a enters K2 at no more than 12; past 5 degrees of skew K2 dominates
+  // and K1 is taken as 1.0; and a round-nosed pier aligned with the flow scours
+  // no deeper than 2.4 pier widths at Fr <= 0.8, or 3.0 above it.
+  const length_ratio_used = Math.min(pier_length_ft / pier_width_ft, 12);
+  const angleFactor = (length_ratio) => Math.pow(
+    Math.cos(angle_of_attack_deg * DEG) + length_ratio * Math.sin(angle_of_attack_deg * DEG),
     0.65,
   );
-  const scourAt = (width_ft, k2) => 2.0 * nose_shape_factor * k2 * bed_condition_factor * flow_depth_ft *
+  const scourAt = (width_ft, k1, k2) => 2.0 * k1 * k2 * bed_condition_factor * flow_depth_ft *
     Math.pow(width_ft / flow_depth_ft, 0.65) * Math.pow(froude_number, 0.43);
-  const scour_depth_ft = scourAt(pier_width_ft, 1);
-  const wider_pier_scour_ft = scourAt(wider_pier_width_ft, 1);
-  const angle_factor = angleFactor(pier_width_ft);
-  const skewed_scour_ft = scourAt(pier_width_ft, angle_factor);
+  const round_nose = Math.abs(nose_shape_factor - 1) < 1e-9;
+  const aligned_limit_ratio = froude_number <= 0.8 ? 2.4 : 3.0;
+  const alignedAt = (width_ft) => {
+    const ys = scourAt(width_ft, nose_shape_factor, 1);
+    return round_nose ? Math.min(ys, aligned_limit_ratio * width_ft) : ys;
+  };
+  const scour_depth_ft = alignedAt(pier_width_ft);
+  const wider_pier_scour_ft = alignedAt(wider_pier_width_ft);
+  const aligned_limited = round_nose && scourAt(pier_width_ft, 1, 1) > aligned_limit_ratio * pier_width_ft;
+  const angle_factor = angleFactor(length_ratio_used);
+  const skewed_k1 = angle_of_attack_deg > 5 ? 1 : nose_shape_factor;
+  const skewed_scour_ft = scourAt(pier_width_ft, skewed_k1, angle_factor);
   return {
-    froude_number, angle_factor,
+    froude_number, angle_factor, length_ratio_used, skewed_k1, aligned_limit_ratio, aligned_limited,
     scour_depth_ft, wider_pier_scour_ft,
     wider_pier_ratio: wider_pier_scour_ft / scour_depth_ft,
     wider_pier_increase_pct: 100 * (wider_pier_scour_ft - scour_depth_ft) / scour_depth_ft,
@@ -635,7 +648,7 @@ MARINE_RENDERERS["pier-scour-depth"] = _simpleRenderer({
   ],
   outputs: [
     { key: "froude_number", id: "psd-fr", label: "Approach Froude number", value: (r) => fmt(r.froude_number, 4) },
-    { key: "scour_depth_ft", id: "psd-ys", label: "Local scour, aligned", unit: "ft", value: (r) => fmt(r.scour_depth_ft, 1) + " ft below the ambient bed" },
+    { key: "scour_depth_ft", id: "psd-ys", label: "Local scour, aligned", unit: "ft", value: (r) => fmt(r.scour_depth_ft, 1) + " ft below the ambient bed" + (r.aligned_limited ? " -- held at HEC-18's " + fmt(r.aligned_limit_ratio, 1) + " pier widths" : "") },
     { key: "wider_pier_scour_ft", id: "psd-wide", label: "With the wider pier", unit: "ft", value: (r) => fmt(r.wider_pier_scour_ft, 1) + " ft -- " + fmt(r.wider_pier_increase_pct, 0) + "% deeper; a heavier pier is not a safer one" },
     { key: "angle_factor", id: "psd-k2", label: "Angle-of-attack factor K2", value: (r) => fmt(r.angle_factor, 3) + " at the entered skew" },
     { key: "skewed_scour_ft", id: "psd-skew", label: "Local scour at the skew", unit: "ft", value: (r) => fmt(r.skewed_scour_ft, 1) + " ft -- " + fmt(r.skew_ratio, 1) + " times the aligned depth" },
@@ -662,14 +675,18 @@ export function computeWaveHeightFetch({ wind_speed_mph = 0, fetch_mi = 0, alter
   const seaState = (mph, miles) => {
     const ua = adjustedWind(mph);
     const x = G_MS2 * (miles * M_PER_MILE) / (ua * ua);
-    const height_m = 0.0016 * Math.sqrt(x) * ua * ua / G_MS2;
+    // Fetch-limited growth stops at a fully developed sea (SPM 1984 eq 3-42:
+    // gH/U_A^2 = 0.2433, gT/U_A = 8.134, gt/U_A = 7.15e4). The square-root law
+    // does not know that, and past X of about 23,000 it keeps climbing.
+    const height_m = Math.min(0.0016 * Math.sqrt(x), 0.2433) * ua * ua / G_MS2;
     return {
       adjusted_wind_ms: ua,
       dimensionless_fetch: x,
+      fully_developed: 0.0016 * Math.sqrt(x) >= 0.2433,
       wave_height_m: height_m,
       wave_height_ft: height_m * FT_PER_M,
-      peak_period_s: 0.2857 * Math.cbrt(x) * ua / G_MS2,
-      duration_required_hr: 68.8 * Math.pow(x, 2 / 3) * ua / G_MS2 / SEC_PER_HOUR,
+      peak_period_s: Math.min(0.2857 * Math.cbrt(x), 8.134) * ua / G_MS2,
+      duration_required_hr: Math.min(68.8 * Math.pow(x, 2 / 3), 7.15e4) * ua / G_MS2 / SEC_PER_HOUR,
     };
   };
   const base = seaState(wind_speed_mph, fetch_mi);
@@ -678,6 +695,7 @@ export function computeWaveHeightFetch({ wind_speed_mph = 0, fetch_mi = 0, alter
   return {
     adjusted_wind_ms: base.adjusted_wind_ms,
     dimensionless_fetch: base.dimensionless_fetch,
+    fully_developed: base.fully_developed,
     wave_height_m: base.wave_height_m,
     wave_height_ft: base.wave_height_ft,
     peak_period_s: base.peak_period_s,
@@ -706,7 +724,7 @@ MARINE_RENDERERS["wave-height-fetch"] = _simpleRenderer({
   ],
   outputs: [
     { key: "adjusted_wind_ms", id: "whf-ua", label: "Adjusted wind speed", value: (r) => fmt(r.adjusted_wind_ms, 2) + " m/s stress-equivalent, at a dimensionless fetch of " + fmt(r.dimensionless_fetch, 1) },
-    { key: "wave_height_ft", id: "whf-h", label: "Significant wave height", unit: "ft", value: (r) => fmt(r.wave_height_ft, 1) + " ft (" + fmt(r.wave_height_m, 2) + " m)" },
+    { key: "wave_height_ft", id: "whf-h", label: "Significant wave height", unit: "ft", value: (r) => fmt(r.wave_height_ft, 1) + " ft (" + fmt(r.wave_height_m, 2) + " m)" + (r.fully_developed ? " -- a fully developed sea; more fetch adds nothing" : "") },
     { key: "peak_period_s", id: "whf-tp", label: "Peak period", unit: "s", value: (r) => fmt(r.peak_period_s, 1) + " s -- a short, steep sea is what an enclosed water produces" },
     { key: "duration_required_hr", id: "whf-dur", label: "Wind duration required", unit: "hours", value: (r) => fmt(r.duration_required_hr, 2) + " hours of sustained wind before that height is reached" },
     { key: "alternative_fetch_height_ft", id: "whf-fet", label: "At the alternative fetch", unit: "ft", value: (r) => fmt(r.alternative_fetch_height_ft, 1) + " ft -- " + fmt(r.alternative_fetch_increase_pct, 0) + "% taller for " + fmt(r.fetch_increase_pct, 0) + "% more fetch" },
