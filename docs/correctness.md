@@ -142,6 +142,17 @@ Out-of-domain inputs are expected to throw a named error or
 return a documented sentinel. A function that silently clamps
 out-of-domain inputs must document the clamp in its row.
 
+A bisection is a silent clamp when its root lies outside its
+bracket: it returns the bracket edge, and the edge reads as an
+answer. On 2026-09-18 three solvers did this. Pole embedment
+reported 60 ft for a pole that needs 74.6 ft, and dock piling
+and the insulation surface-limit solve had the same fault at
+1,000 ft and 12 in. Every bisection in the catalog now checks
+its bracket or grows it until it holds the root.
+`test/unit/solver-brackets.test.js` back-substitutes each
+answer into the relation it solves, including past the old
+brackets.
+
 ## Numerical stability (Phase E)
 
 The iterative and transcendental calculators (Colebrook,
