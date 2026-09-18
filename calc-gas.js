@@ -192,12 +192,14 @@ GAS_RENDERERS["gas-pipe-sizing"] = renderGasPipeSizing;
 // =====================================================================
 // gas-leak-rate (Group B) - orifice flow leak estimate.
 //
-// Q (cfh) = 3550 * c * A * sqrt(dP / SG / L_unit_factor)
-// Simplified per spec-v2: Q (cfh) = 3550 * c * A * sqrt(dP / SG)
+// Q (cfh) = 8706 * c * A * sqrt(dP / SG / L_unit_factor)
+// Simplified per spec-v2: Q (cfh) = 8706 * c * A * sqrt(dP / SG)
 // where A is orifice area in in^2, dP in psi (gauge), SG is gas specific
-// gravity. This is a Spitzglass-style leak estimate, not an authoritative value.
+// gravity. The 8706 is the orifice equation Q = c A sqrt(2 dP / rho) in cfh, in^2, psi, with rho = SG x 0.0764 lb/ft^3 air: 25 sqrt(2 x 144 x 32.174 / 0.0764). Until 2026-09-18 this used 3550, the SPITZGLASS PIPE constant, and read 2.45x low. Incompressible: fair at the low pressures of a leak test, understates choked flow above about 13 psi.
 // =====================================================================
 
+// Orifice-equation constant for cfh from in^2 and psi: 25 sqrt(2 x 144 x 32.174 / 0.0764) = 8706.
+const _ORIFICE_CFH_K = 25 * Math.sqrt(2 * 144 * 32.174 / 0.0764);
 // dims: in { orifice_diameter_in: L, upstream_psi: M L^-1 T^-2, gas: dimensionless, c: dimensionless } out: { leak_rate_scfh: L^3 T^-1 }
 export function computeGasLeakRate({ orifice_diameter_in, upstream_psi, gas, c = 0.7 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -208,7 +210,7 @@ export function computeGasLeakRate({ orifice_diameter_in, upstream_psi, gas, c =
   const dP = Number(upstream_psi) || 0;
   if (d <= 0 || dP <= 0) return { error: "Provide positive orifice diameter and pressure." };
   const A = Math.PI * (d / 2) ** 2;
-  const Q = 3550 * c * A * Math.sqrt(dP / props.specific_gravity);
+  const Q = _ORIFICE_CFH_K * c * A * Math.sqrt(dP / props.specific_gravity);
   return {
     leak_rate_cfh: Q,
     orifice_area_in2: A,
@@ -224,7 +226,7 @@ export const gasLeakRateExample = {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderGasLeakRate(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Q = 3550 * c * A * sqrt(dP / SG). Orifice flow approximation for a small gas leak. Estimation only.";
+  citationEl.textContent = "Citation: Q = 8706 * c * A * sqrt(dP / SG). Orifice flow approximation for a small gas leak. Estimation only.";
   const dia = makeNumber("Orifice diameter (in)", "gl-d", { step: "any", min: "0" });
   const psi = makeNumber("Upstream gauge pressure (psi)", "gl-p", { step: "any", min: "0" });
   const c = makeNumber("Discharge coefficient", "gl-c", { step: "any", min: "0", max: "1", value: "0.7" });
@@ -253,9 +255,9 @@ GAS_RENDERERS["gas-leak-rate"] = renderGasLeakRate;
 
 // gas-leak-hole-diameter: inverse of gas-leak-rate. The forward tile gives the leak rate from the orifice diameter; the
 // inverse recovers the equivalent orifice (hole) diameter from a measured leak rate, so an estimator turns a clocked or
-// metered leak into a hole size. From Q = 3550 c (pi d^2 / 4) sqrt(dP / SG),
-// d = sqrt( 4 Q / (3550 c pi sqrt(dP / SG)) ). Distinct from orifice-diameter-for-flow (the WATER orifice-discharge
-// inverse); this uses the 3550-coefficient compressible small-leak form and the gas specific gravity.
+// metered leak into a hole size. From Q = 8706 c (pi d^2 / 4) sqrt(dP / SG),
+// d = sqrt( 4 Q / (8706 c pi sqrt(dP / SG)) ). Distinct from orifice-diameter-for-flow (the WATER orifice-discharge
+// inverse); this uses the 8706-coefficient orifice-equation small-leak form and the gas specific gravity.
 // dims: in { leak_rate_cfh: L^3 T^-1, upstream_psi: M L^-1 T^-2, gas: dimensionless, c: dimensionless } out: { orifice_diameter_in: L, orifice_area_in2: L^2 }
 export function computeGasLeakHoleDiameter({ leak_rate_cfh, upstream_psi, gas, c = 0.7 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -267,7 +269,7 @@ export function computeGasLeakHoleDiameter({ leak_rate_cfh, upstream_psi, gas, c
   if (!(Q > 0)) return { error: "Provide a positive leak rate (cfh)." };
   if (!(dP > 0)) return { error: "Provide a positive upstream pressure (psi)." };
   if (!(cd > 0)) return { error: "Discharge coefficient must be positive." };
-  const orifice_area_in2 = Q / (3550 * cd * Math.sqrt(dP / props.specific_gravity));
+  const orifice_area_in2 = Q / (_ORIFICE_CFH_K * cd * Math.sqrt(dP / props.specific_gravity));
   const orifice_diameter_in = Math.sqrt(4 * orifice_area_in2 / Math.PI);
   if (![orifice_area_in2, orifice_diameter_in].every(Number.isFinite)) return { error: "Hole-diameter math is not a finite value." };
   return {
@@ -275,15 +277,15 @@ export function computeGasLeakHoleDiameter({ leak_rate_cfh, upstream_psi, gas, c
     orifice_area_in2,
     discharge_coefficient: cd,
     specific_gravity: props.specific_gravity,
-    note: "Equivalent orifice diameter for a measured gas leak: from Q = 3550 c A sqrt(dP / SG) with A = pi d^2 / 4, d = sqrt( 4 Q / (3550 c pi sqrt(dP / SG)) ). This is the small-leak orifice-flow approximation (compressible, subsonic) - an ESTIMATE of the effective hole size, not a code leak-test method. The discharge coefficient (~0.7 for a sharp orifice) and the actual crack geometry, temperature, and choked-flow at high pressure ratios all shift it. Any positive leak is a hazard: find and repair it, and follow the code test and the utility's procedure.",
+    note: "Equivalent orifice diameter for a measured gas leak: from Q = 8706 c A sqrt(dP / SG) with A = pi d^2 / 4, d = sqrt( 4 Q / (8706 c pi sqrt(dP / SG)) ). This is the small-leak orifice-flow approximation (compressible, subsonic) - an ESTIMATE of the effective hole size, not a code leak-test method. The discharge coefficient (~0.7 for a sharp orifice) and the actual crack geometry, temperature, and choked-flow at high pressure ratios all shift it. Any positive leak is a hazard: find and repair it, and follow the code test and the utility's procedure.",
   };
 }
 export const gasLeakHoleDiameterExample = {
-  inputs: { leak_rate_cfh: 3.15, upstream_psi: 0.25, gas: "natural_gas", c: 0.7 },
+  inputs: { leak_rate_cfh: 7.72, upstream_psi: 0.25, gas: "natural_gas", c: 0.7 },
   expectedRange: { orifice_diameter_in: { min: 0.01, max: 0.2 } },
 };
 function renderGasLeakHoleDiameter(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: d = sqrt( 4 Q / (3550 * c * pi * sqrt(dP / SG)) ), the orifice-flow leak approximation Q = 3550 c A sqrt(dP/SG) solved for the diameter. An estimate of the effective hole size, not a code leak-test method. Estimation only.";
+  citationEl.textContent = "Citation: d = sqrt( 4 Q / (8706 * c * pi * sqrt(dP / SG)) ), the orifice-flow leak approximation Q = 8706 c A sqrt(dP/SG) solved for the diameter. An estimate of the effective hole size, not a code leak-test method. Estimation only.";
   const q = makeNumber("Measured leak rate (ft³/hr)", "glh-q", { step: "any", min: "0" });
   const psi = makeNumber("Upstream gauge pressure (psi)", "glh-p", { step: "any", min: "0" });
   const c = makeNumber("Discharge coefficient", "glh-c", { step: "any", min: "0", max: "1", value: "0.7" });

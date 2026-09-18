@@ -8053,11 +8053,14 @@ test("bounds: calc-plumbing computeTanklessGPM pins GPM = (kBTU*1000)/(8.33*60*d
   assert.ok("error" in computeTanklessGPM({ kbtu_input: 199, climate_zone: "5A_Chicago_IL", target_outlet_F: 40 })); // outlet<=inlet
 });
 
-test("bounds: calc-plumbing computeGasLeakRate pins Q = 3550*c*A*sqrt(dP/SG) on the spec orifice example", () => {
+test("bounds: calc-plumbing computeGasLeakRate pins the orifice equation Q = c A sqrt(2 dP / rho) on the spec example", () => {
   const r = computeGasLeakRate({ orifice_diameter_in: 0.05, upstream_psi: 0.25, gas: "natural_gas", c: 0.7 });
   const A = Math.PI * (0.05 / 2) ** 2;
-  const expected = 3550 * 0.7 * A * Math.sqrt(0.25 / 0.6);
+  // Independent SI-free re-derivation: 36 psf over rho = 0.6 x 0.0764 / 32.174 slug/ft^3.
+  const rho = 0.6 * 0.0764 / 32.174;
+  const expected = 3600 * 0.7 * (A / 144) * Math.sqrt(2 * 0.25 * 144 / rho);
   assert.ok(Math.abs(r.leak_rate_cfh - expected) < 1e-9);
+  assert.ok(Math.abs(r.leak_rate_cfh - 7.724) < 0.001); // not 3.15: 3550 was the Spitzglass PIPE constant
   assert.ok(Math.abs(r.orifice_area_in2 - A) < 1e-9);
   assert.strictEqual(r.discharge_coefficient, 0.7);
   assert.strictEqual(r.specific_gravity, 0.6);
@@ -8068,7 +8071,7 @@ test("bounds: calc-plumbing computeGasLeakRate pins Q = 3550*c*A*sqrt(dP/SG) on 
 });
 
 test("bounds: spec-v755 gas leak equivalent hole diameter (inverse of gas-leak-rate)", () => {
-  const p = computeGasLeakHoleDiameter({ leak_rate_cfh: 3.15, upstream_psi: 0.25, gas: "natural_gas", c: 0.7 });
+  const p = computeGasLeakHoleDiameter({ leak_rate_cfh: 7.724, upstream_psi: 0.25, gas: "natural_gas", c: 0.7 });
   assert.ok(Math.abs(p.orifice_diameter_in - 0.05) < 0.001);
   assert.strictEqual(p.specific_gravity, 0.6);
   // round-trip: the recovered diameter fed to gas-leak-rate reproduces the leak rate
@@ -38082,14 +38085,17 @@ test("bounds: spec-v1333 computeScotchYokeMotion pins the SHM peaks, the end/mid
 
 import { computeWedgeForce as _v1336 } from "../../calc-mechanic.js";
 test("bounds: spec-v1336 computeWedgeForce pins the friction MA, the frictionless cot(b) limit, the self-locking flag, and error seams", () => {
-  // 100 lb, 30 deg included (b=15), mu 0.3: MA = (cos15 - 0.3 sin15)/(sin15 + 0.3 cos15) = 1.619; split 161.9 lb.
+  // 100 lb, 30 deg included (b=15), mu 0.3: P = 2N(sin15 + 0.3 cos15), per face N(cos15 - 0.3 sin15)
+  // -> MA = 0.8883 / (2 x 0.5486) = 0.8096; 81.0 lb on each face.
   const w = _v1336({ driving_force_lb: 100, included_angle_deg: 30, friction_coefficient: 0.3 });
-  assert.ok(Math.abs(w.mechanical_advantage - 1.619) < 1e-2 && Math.abs(w.spreading_force_lb - 161.9) < 0.5);
+  assert.ok(Math.abs(w.mechanical_advantage - 0.8096) < 1e-3 && Math.abs(w.spreading_force_lb - 80.96) < 0.05);
+  // Force balance holds: the two faces' normal + friction reactions sum to the drive.
+  { const b = 15 * Math.PI / 180, N = w.spreading_force_lb / (Math.cos(b) - 0.3 * Math.sin(b)); assert.ok(Math.abs(2 * N * (Math.sin(b) + 0.3 * Math.cos(b)) - 100) < 1e-9); }
   // Self-locks: 15 deg half-angle < atan(0.3) = 16.7 deg friction angle.
   assert.ok(w.self_locking === true && Math.abs(w.friction_angle_deg - 16.699) < 1e-2 && Math.abs(w.half_angle_deg - 15) < 1e-9);
-  // Frictionless limit: MA = cot(b), and it never self-locks (mu = 0).
+  // Frictionless limit: MA = 1/(2 tan b), the standard symmetric-wedge advantage, and it never self-locks (mu = 0).
   const fl = _v1336({ driving_force_lb: 100, included_angle_deg: 30, friction_coefficient: 0 });
-  assert.ok(Math.abs(fl.mechanical_advantage - 1 / Math.tan(15 * Math.PI / 180)) < 1e-9 && Math.abs(fl.spreading_force_lb - 373.21) < 0.1 && fl.self_locking === false);
+  assert.ok(Math.abs(fl.mechanical_advantage - 1 / (2 * Math.tan(15 * Math.PI / 180))) < 1e-9 && Math.abs(fl.spreading_force_lb - 186.60) < 0.01 && fl.self_locking === false);
   assert.ok(Math.abs(fl.mechanical_advantage - fl.ideal_mechanical_advantage) < 1e-9);
   // A slicker surface (smaller mu) drops the self-lock: 15 deg half-angle > atan(0.2) = 11.3 deg.
   const slick = _v1336({ driving_force_lb: 100, included_angle_deg: 30, friction_coefficient: 0.2 });

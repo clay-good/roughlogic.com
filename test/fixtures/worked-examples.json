@@ -7650,11 +7650,11 @@
   {
    "tile_id": "gas-leak-rate",
    "source_publisher": "Project (first-principles)",
-   "source_title": "Compressible orifice low-dP flow: Q (cfh) = 3600 * c * A * sqrt(2 * dP / rho)",
+   "source_title": "Orifice flow at low dP (incompressible): Q (cfh) = 3600 * c * A * sqrt(2 * dP / rho)",
    "source_edition_or_year": "n/a; standard orifice flow identity, SG natural gas 0.60, c = 0.7",
-   "source_section_or_page": "0.05 in orifice / 0.25 psi upstream natural gas -> ~3.15 cfh leak; orifice area ~0.00196 in^2",
+   "source_section_or_page": "0.05 in orifice / 0.25 psi upstream natural gas -> ~7.72 cfh leak (3600 x 0.7 x 1.3635e-5 ft^2 x sqrt(2 x 36 psf / 0.001425 slug/ft^3)); orifice area ~0.00196 in^2",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-09-18",
    "inputs": {
     "orifice_diameter_in": 0.05,
     "upstream_psi": 0.25,
@@ -7663,7 +7663,7 @@
    },
    "outputs": {
     "leak_rate_cfh": {
-     "value": 3.15,
+     "value": 7.724,
      "tolerance": {
       "abs": 0.1
      }
@@ -7679,13 +7679,13 @@
   {
    "tile_id": "gas-leak-hole-diameter",
    "source_publisher": "Project (first-principles, solved for diameter)",
-   "source_title": "d = sqrt( 4 Q / (3550 * c * pi * sqrt(dP / SG)) )",
+   "source_title": "d = sqrt( 4 Q / (8706 * c * pi * sqrt(dP / SG)) )",
    "source_edition_or_year": "n/a; standard orifice flow identity, SG natural gas 0.60, c = 0.7",
-   "source_section_or_page": "3.15 cfh natural-gas leak at 0.25 psi -> ~0.050 in equivalent hole",
+   "source_section_or_page": "7.72 cfh natural-gas leak at 0.25 psi -> ~0.050 in equivalent hole",
    "verified_by": "rl",
-   "verified_on": "2026-07-14",
+   "verified_on": "2026-09-18",
    "inputs": {
-    "leak_rate_cfh": 3.15,
+    "leak_rate_cfh": 7.72,
     "upstream_psi": 0.25,
     "gas": "natural_gas",
     "c": 0.7
@@ -87327,11 +87327,11 @@
   {
    "tile_id": "wedge-force",
    "source_publisher": "Project (first-principles)",
-   "source_title": "100 lb drive, 30 deg wedge, mu 0.3: 162 lb split, self-locks",
+   "source_title": "100 lb drive, 30 deg wedge, mu 0.3: 81 lb on each face, self-locks",
    "source_edition_or_year": "wedge statics",
-   "source_section_or_page": "MA=(cos b - mu sin b)/(sin b + mu cos b), b=15 deg",
+   "source_section_or_page": "MA=(cos b - mu sin b)/(2 (sin b + mu cos b)), b=15 deg",
    "verified_by": "rl",
-   "verified_on": "2026-08-13",
+   "verified_on": "2026-09-18",
    "inputs": {
     "driving_force_lb": 100,
     "included_angle_deg": 30,
@@ -87339,13 +87339,13 @@
    },
    "outputs": {
     "spreading_force_lb": {
-     "value": 161.9,
+     "value": 80.96,
      "tolerance": {
       "pct": 0.5
      }
     },
     "ideal_mechanical_advantage": {
-     "value": 3.7321,
+     "value": 1.8660,
      "tolerance": {
       "pct": 0.5
      }
@@ -87355,24 +87355,24 @@
   {
    "tile_id": "wedge-force",
    "source_publisher": "Project (first-principles)",
-   "source_title": "Frictionless limit: MA = cot(half-angle) (30 deg wedge -> 3.73x)",
+   "source_title": "Frictionless limit: MA = 1/(2 tan(half-angle)) (30 deg wedge -> 1.87x)",
    "source_edition_or_year": "wedge statics",
-   "source_section_or_page": "mu=0 -> spreading = P cot 15 = 373 lb",
+   "source_section_or_page": "mu=0 -> spreading per face = P / (2 tan 15) = 186.6 lb",
    "verified_by": "rl",
-   "verified_on": "2026-08-13",
+   "verified_on": "2026-09-18",
    "inputs": {
     "driving_force_lb": 100,
     "included_angle_deg": 30
    },
    "outputs": {
     "spreading_force_lb": {
-     "value": 373.21,
+     "value": 186.60,
      "tolerance": {
       "pct": 0.5
      }
     },
     "mechanical_advantage": {
-     "value": 3.7321,
+     "value": 1.8660,
      "tolerance": {
       "pct": 0.5
      }

@@ -755,7 +755,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "resuspension-volume": {"volume":"Diluent volume"},
   "retainage-tracker": {"retention_this":"Retention this draw","net_payment":"Net payment","cumulative_ret":"Cumulative retention","note":"Note"},
   "reverse-curve": {"central_angle_deg":"Central angle I (each arc)","distance_ft":"Tangent-point distance","note":"Note"},
-  "reverse-lay-friction": {"single_pump_psi":"Single-pump friction","per_pump_psi":"Per-pump friction (parallel)","n_pumps":"Pump count"},
+  "reverse-lay-friction": {"single_pump_psi":"Friction if one line carried it all","per_pump_psi":"Friction per parallel line","n_pumps":"Parallel lines"},
   "ripper-production": {"cross_section_ft2":"Ripped cross-section","production_bcy_hr":"Loosened production"},
   "riprap-tonnage": {"tons":"Stone to order","volume_cy":"Layer volume"},
   "rlc-reactance-resonance": {"resonant_frequency_hz":"Resonant frequency"},

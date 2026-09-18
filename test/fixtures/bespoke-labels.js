@@ -748,7 +748,7 @@ export const BESPOKE_LABELS = {
   "resuspension-volume": {"mass_g":"Lyophilized mass (g)","target_concentration":"Target concentration (g/L)"},
   "retainage-tracker": {"work_this_period_usd":"Work this period (USD)","retainage_pct":"Retainage rate (%)","prior_retained_usd":"Prior retained (USD)"},
   "reverse-curve": {"r1_ft":"First radius R1 (ft)","r2_ft":"Second radius R2 (ft)","offset_ft":"Offset between parallel tangents p (ft)"},
-  "reverse-lay-friction": {"hose_diameter":"Hose diameter","gpm":"Total flow (gpm)","length_ft":"Length (ft)","n_pumps":"Number of pumps"},
+  "reverse-lay-friction": {"hose_diameter":"Hose diameter","gpm":"Total flow (gpm)","length_ft":"Length (ft)","n_pumps":"Number of parallel supply lines (sharing the flow)"},
   "ripper-production": {"spacing_ft":"Shank spacing / pass width (ft)","penetration_ft":"Ripping depth (ft)","speed_fpm":"Ripping speed (ft/min)","efficiency":"Job efficiency"},
   "riprap-d50": {"velocity_fps":"Flow velocity against the stone (ft/s)","specific_gravity":"Stone specific gravity Ss","turbulence_coeff":"Isbash turbulence coefficient C","safety_factor":"Safety factor SF"},
   "riprap-tonnage": {"area_sf":"Plan area of the riprap layer (ft²)","thickness_ft":"Layer thickness (ft, at least 1.5 x D50)","unit_wt_pcf":"Stone unit weight (pcf)"},

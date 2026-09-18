@@ -7377,7 +7377,7 @@ test("monotonicity: computePhaseBalance imbalance_percent = (max-min)/avg * 100 
 });
 
 test("monotonicity: computeGasLeakRate leak_rate_cfh is strictly increasing in orifice_diameter_in (d^2 area pin); strictly increasing in upstream_psi (sqrt(dP) pin); strictly decreasing as specific_gravity rises (propane vs natural_gas); doubling d -> 4x leak rate exact", () => {
-  // Group B. Q = 3550 * c * pi * (d/2)^2 * sqrt(dP / SG). Strictly increasing
+  // Group B. Q = 8706 * c * pi * (d/2)^2 * sqrt(dP / SG). Strictly increasing
   // in d (d^2), in dP (sqrt), strictly decreasing in SG (sqrt 1/SG).
   let prev = -Infinity;
   for (const orifice_diameter_in of [0.01, 0.025, 0.05, 0.1, 0.15, 0.25, 0.5]) {

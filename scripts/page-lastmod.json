@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "1d19c02ba4a996ea",
+      "sha": "5c9b610f6050a2e9",
       "date": "2026-09-18"
     },
     "/tools/": {
@@ -38,7 +38,7 @@
       "date": "2026-09-18"
     },
     "/groups/fire-ground/": {
-      "sha": "093bcf9c490f179b",
+      "sha": "d1248b7e8cc61a1d",
       "date": "2026-09-18"
     },
     "/groups/historical/": {
@@ -3198,12 +3198,12 @@
       "date": "2026-09-04"
     },
     "/tools/gas-leak-hole-diameter/": {
-      "sha": "39ef992ed77bc61c",
-      "date": "2026-09-01"
+      "sha": "1c975424f3ae121b",
+      "date": "2026-09-18"
     },
     "/tools/gas-leak-rate/": {
-      "sha": "7aab4b04c194d8db",
-      "date": "2026-09-01"
+      "sha": "89d9ea4b36b16e3b",
+      "date": "2026-09-18"
     },
     "/tools/gas-meter-clock/": {
       "sha": "d41d992a997ac964",
@@ -6198,8 +6198,8 @@
       "date": "2026-09-05"
     },
     "/tools/reverse-lay-friction/": {
-      "sha": "991960a74ddcd4d6",
-      "date": "2026-09-04"
+      "sha": "a9a8053dbd7094c0",
+      "date": "2026-09-18"
     },
     "/tools/revolving-door-throughput/": {
       "sha": "5d6d14b4d816fceb",
@@ -8494,8 +8494,8 @@
       "date": "2026-09-18"
     },
     "/tools/wedge-force/": {
-      "sha": "8d91ddc8dce9ef9e",
-      "date": "2026-09-04"
+      "sha": "6655a27b3876039d",
+      "date": "2026-09-18"
     },
     "/tools/weibull-capacity-factor/": {
       "sha": "61a561f8d5e5fc30",

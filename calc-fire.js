@@ -510,9 +510,12 @@ export function renderSmokeReading(inputRegion, outputRegion, citationEl) {
 
 // --- Utility 100: Reverse-Lay Supply Friction Loss ---
 //
-// Extends the single-pump CQ^2L formula to a two-pump tandem operation.
-// Per spec-v2: per-pump friction = single-pump friction * (1/n_pumps)^2
-// for the parallel section.
+// Extends the single-line CQ^2L formula to n PARALLEL supply lines sharing
+// the flow: each carries Q/n, so each loses (1/n)^2 of the single-line
+// friction. The input key keeps its spec-v2 name `n_pumps` (a public MCP key),
+// but it is the number of parallel LINES. Until 2026-09-18 the page asked for
+// "number of pumps" and reported "per-pump friction", so two pumps in TANDEM
+// on one line read 18.75 psi where the line still loses 75 psi (37.5 each).
 
 // dims: in { hose_diameter: dimensionless, gpm: L^3 T^-1, length_ft: L, n_pumps: dimensionless }
 //        out: { single_pump_psi: M L^-1 T^-2, per_pump_psi: M L^-1 T^-2, n_pumps: dimensionless, coefficient: dimensionless }
@@ -672,17 +675,17 @@ export const brakingExample = {
 //        out: { dom_side_effect: dimensionless }
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderReverseLayFriction(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: NFA CQ^2L extended to tandem-pump operation. Per-pump friction (parallel section) scales as (1/n_pumps)^2.";
+  citationEl.textContent = "Citation: NFA CQ^2L for n parallel supply lines sharing the flow (each carries Q/n): friction per line scales as (1/n)^2. Pumps in tandem on ONE line do not cut the friction; they share it.";
   const dia = makeSelect("Hose diameter", "rl-d", Object.keys(HOSE_FRICTION_COEFFICIENTS).map((k) => ({ value: k, label: k.replace("_in", " in") })));
   const gpm = makeNumber("Total flow (gpm)", "rl-q", { step: "any", min: "0" });
   const len = makeNumber("Length (ft)", "rl-l", { step: "any", min: "0" });
-  const np = makeNumber("Number of pumps", "rl-n", { step: "1", min: "1", value: "1" });
+  const np = makeNumber("Number of parallel supply lines (sharing the flow)", "rl-n", { step: "1", min: "1", value: "1" });
   np.input.value = "1";
   for (const f of [dia, gpm, len, np]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { dia.select.value = "2.5_in"; gpm.input.value = "250"; len.input.value = "600"; np.input.value = "2"; update(); });
-  const oS = makeOutputLine(outputRegion, "Single-pump friction", "rl-out-s");
-  const oP = makeOutputLine(outputRegion, "Per-pump friction (parallel)", "rl-out-p");
-  const oN = makeOutputLine(outputRegion, "Pump count", "rl-out-n");
+  const oS = makeOutputLine(outputRegion, "Friction if one line carried it all", "rl-out-s");
+  const oP = makeOutputLine(outputRegion, "Friction per parallel line", "rl-out-p");
+  const oN = makeOutputLine(outputRegion, "Parallel lines", "rl-out-n");
   const update = debounce(() => {
     const r = computeReverseLayFriction({
       hose_diameter: dia.select.value,

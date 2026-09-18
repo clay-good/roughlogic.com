@@ -4120,11 +4120,11 @@ export const CITATIONS = {
     ],
   },
   "gas-leak-hole-diameter": {
-    formula: "d = sqrt( 4 Q / (3550 x c x pi x sqrt(dP / SG)) ), the inverse of Q = 3550 x c x (pi d^2 / 4) x sqrt(dP / SG); orifice area A = Q / (3550 c sqrt(dP/SG)).",
-    edition: "Classical orifice-flow leak approximation (compressible small leak), solved for the diameter; the 3550 coefficient and gas specific gravity from public engineering references.",
+    formula: "d = sqrt( 4 Q / (8706 x c x pi x sqrt(dP / SG)) ), the inverse of Q = 8706 x c x (pi d^2 / 4) x sqrt(dP / SG); orifice area A = Q / (8706 c sqrt(dP/SG)).",
+    edition: "Classical orifice-flow leak approximation (incompressible, small leak at low pressure), solved for the diameter; the 8706 coefficient is the orifice equation in these units (25 sqrt(2 x 144 x 32.174 / 0.0764)); gas specific gravity bundled.",
     freeAccess: "The orifice-flow leak relation is public; the gas specific gravity is a bundled property.",
     governance: GOVERNANCE.plumbing,
-    editionNote: "Single-edition (physics). The equivalent orifice (hole) diameter for a measured gas leak, the inverse of Q = 3550 c A sqrt(dP/SG). This is the small-leak orifice-flow approximation (compressible, subsonic) and gives an ESTIMATE of the effective hole size, not a code leak-test method. The discharge coefficient (about 0.7 for a sharp orifice) and the actual crack geometry, temperature, and choked flow at high pressure ratios all shift it. Distinct from the water orifice-diameter tile, which inverts the incompressible Q = Cd A sqrt(2 g h) form. Any positive leak is a hazard: find and repair it, and follow the code test and the utility's procedure.",
+    editionNote: "Single-edition (physics). The equivalent orifice (hole) diameter for a measured gas leak, the inverse of Q = 8706 c A sqrt(dP/SG). This is the small-leak orifice-flow approximation (incompressible, low-pressure) and gives an ESTIMATE of the effective hole size, not a code leak-test method. The discharge coefficient (about 0.7 for a sharp orifice) and the actual crack geometry, temperature, and choked flow at high pressure ratios all shift it. Distinct from the water orifice-diameter tile, which inverts the incompressible Q = Cd A sqrt(2 g h) form. Any positive leak is a hazard: find and repair it, and follow the code test and the utility's procedure.",
     assumptions: [
       { name: "Discharge coefficient c", value: "about 0.7 for a sharp orifice unless the user supplies otherwise", source: "engineering practice" },
       { name: "Gas specific gravity", value: "bundled natural-gas / propane specific gravity", source: "engineering reference" },
@@ -4132,7 +4132,7 @@ export const CITATIONS = {
     ],
   },
   "gas-leak-rate": {
-    formula: "Orifice-flow leak estimate Q = 3550 * c * A * sqrt(dP / SG) (scf/h), the Spitzglass-coefficient form using specific gravity, matching the compute. Estimation only, not an authoritative leak-rate calculation.",
+    formula: "Orifice-flow leak estimate Q = 8706 * c * A * sqrt(dP / SG) (scf/h), the orifice equation Q = c A sqrt(2 dP / rho) in cfh, in^2 and psi (8706 = 25 sqrt(2 x 144 x 32.174 / 0.0764), air 0.0764 lb/ft^3), matching the compute. Estimation only, not an authoritative leak-rate calculation.",
     edition: "Classical fluid mechanics; orifice coefficient typical from public engineering references.",
     freeAccess: "NIST fluid-property tables free at nist.gov.",
     governance: GOVERNANCE.plumbing,
@@ -6255,7 +6255,7 @@ export const CITATIONS = {
     assumptions: [],
   },
   "reverse-lay-friction": {
-    formula: "Single-pump: FL = C × Q² × L. Tandem (parallel): FL_parallel = FL_single / n² where n is the number of parallel hoses (each carrying Q/n).",
+    formula: "One line: FL = C × Q² × L. n parallel lines sharing the flow: FL_per_line = FL_single / n², each carrying Q/n. (Pumps in tandem on one line share the single-line loss; they do not reduce it.)",
     edition: "NFA hose-hydraulics training materials by name.",
     freeAccess: "Free at usfa.fema.gov/training.",
     governance: GOVERNANCE.fire,
@@ -13053,13 +13053,13 @@ export const CITATIONS = {
     ],
   },
   "wedge-force": {
-    formula: "b = alpha/2; MA = (cos b - mu sin b)/(sin b + mu cos b); spreading = P x MA; frictionless MA = cot b; self-locks when b < atan(mu).",
-    edition: "Wedge statics - spreading force (cos b - mu sin b)/(sin b + mu cos b) and self-locking at b < atan(mu) (standard mechanics; Machinery's Handbook), by name.",
+    formula: "b = alpha/2; P = 2 N (sin b + mu cos b); per-face spreading N (cos b - mu sin b), so MA = (cos b - mu sin b)/(2 (sin b + mu cos b)); spreading = P x MA; frictionless MA = 1/(2 tan b); self-locks when b < atan(mu).",
+    edition: "Wedge statics - spreading force per face (cos b - mu sin b)/(2 (sin b + mu cos b)) and self-locking at b < atan(mu) (standard mechanics; Machinery's Handbook), by name.",
     freeAccess: "Wedge statics is a standard published result; the driving force, wedge angle, and friction coefficient are the user's inputs.",
     governance: GOVERNANCE.general,
-    editionNote: "The splitting, lifting, or shimming force of a symmetric wedge of included angle alpha (half-angle b = alpha/2). A driving force P along the centerline gives a spreading force P(cos b - mu sin b)/(sin b + mu cos b) on the output. Frictionless the advantage is cot b, but a wedge lives on friction: a large share of the drive is spent overcoming it, and that same friction is what makes a driven wedge or shim self-locking - it stays put when the half-angle is under the friction angle, b < atan(mu). A blunt wedge can multiply less than 1 or jam. Ideal rigid wedge, uniform dry friction, quasi-static; the material's splitting resistance, impact (dynamic) driving, and the wedge strength are separate. A planning aid; Machinery's Handbook and the tool maker govern.",
+    editionNote: "The splitting, lifting, or shimming force of a symmetric wedge of included angle alpha (half-angle b = alpha/2). A driving force P along the centerline gives a spreading force P(cos b - mu sin b)/(2 (sin b + mu cos b)) on each face. Frictionless the advantage is 1/(2 tan b), but a wedge lives on friction: a large share of the drive is spent overcoming it, and that same friction is what makes a driven wedge or shim self-locking - it stays put when the half-angle is under the friction angle, b < atan(mu). A blunt wedge can multiply less than 1 or jam. Ideal rigid wedge, uniform dry friction, quasi-static; the material's splitting resistance, impact (dynamic) driving, and the wedge strength are separate. A planning aid; Machinery's Handbook and the tool maker govern.",
     assumptions: [
-      { name: "Advantage", value: "MA = (cos b - mu sin b)/(sin b + mu cos b), b the half-angle; frictionless cot b", source: "Machinery's Handbook" },
+      { name: "Advantage", value: "MA = (cos b - mu sin b)/(2 (sin b + mu cos b)), b the half-angle; frictionless 1/(2 tan b)", source: "Machinery's Handbook" },
       { name: "Self-locking", value: "self-locks (stays driven) when b < atan(mu); backs out otherwise", source: "friction mechanics" },
       { name: "Scope", value: "rigid wedge, dry quasi-static friction; splitting resistance, impact driving, wedge strength are separate", source: "scope of this tile" },
     ],
