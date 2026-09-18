@@ -25101,6 +25101,7 @@ export const CITATIONS = {
     editionNote: "The Euler load overstates a perforated cold-formed rack column considerably, which fails by local and distortional buckling well below it; the figure is shown for the square-law trend on unbraced length, not as a capacity.",
     assumptions: [
       { name: "Frame rating", value: "stated AT a beam spacing; it is not a property of the frame alone", source: "rack manufacturer" },
+      { name: "Square law", value: "holds only where the column buckles elastically, KL/r above 4.71 sqrt(E/Fy) (about 113 at 50 ksi); a stockier segment is governed by inelastic buckling and loses less than the Euler ratio when a level is removed -- a 60 in segment at KL/r 50 doubled to 100 loses about 42% on the AISC column curve, not 75%", source: "AISC 360 E3" },
       { name: "Damage", value: "not a derate -- the standard requires unloading and repair or replacement, not a reduction factor", source: "ANSI MH16.1" },
     ],
   },
