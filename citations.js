@@ -24434,6 +24434,106 @@ export const CITATIONS = {
       { name: "Discharge coefficient", value: "entered coefficient represents the selected tile geometry", source: "manufacturer curve / field measurement" },
     ],
   },
+  // spec-v1828..v1836: marine construction and dredging.
+  "dredge-production-rate": {
+    formula: "flow = pipe area x velocity; solids = flow x Cv; in-situ = solids / (1 - porosity); production in cy/h = in-situ cu ft/s x 3,600 / 27; slurry SG = 1 + Cv (SG_solids - 1).",
+    edition: "Continuity and volumetric bookkeeping. The pay quantity, the in-situ porosity assumed, and effective-hour accounting come from the dredging contract and the site's own material.",
+    freeAccess: "Public relations; no purchased standard is required to reproduce them.",
+    governance: GOVERNANCE.general,
+    editionNote: "The in-situ conversion runs opposite to a fill: the pipeline carries only the solids, and a contract paid on in-situ cubic yards is paid on the void space the material had in the bank. The porosity assumed is worth agreeing before the job rather than after.",
+    assumptions: [
+      { name: "Porosity", value: "entered; about 0.35 to 0.45 for sand, and a contract term rather than a measurement", source: "dredging contract" },
+      { name: "Effective hours", value: "dredging hours only -- swing, anchor moves, and pipeline changes are not dredging", source: "production accounting" },
+    ],
+  },
+  "slurry-critical-velocity": {
+    formula: "V_c = F_L x sqrt(2 g D (S_s - 1)), with D in feet and V_c in ft/s; relative friction head at the operating velocity = (V / V_c)^2.",
+    edition: "Durand's deposition-velocity relation, with F_L read from Durand's curves by particle size and concentration, roughly 0.8 to 1.5.",
+    freeAccess: "The relation is public; the coefficient comes from published curves and the material's own gradation.",
+    governance: GOVERNANCE.general,
+    editionNote: "Pipe diameter works the counterintuitive way: V_c goes as the square root of diameter, so upsizing a line to gain capacity raises the velocity below which it plugs. A coarser layer raises the coefficient with no warning from the dredge.",
+    assumptions: [
+      { name: "F_L", value: "entered; it is where the answer lives and the material is what sets it", source: "Durand's curves / site gradation" },
+      { name: "Operating point", value: "just above V_c, because friction head rises as the square of velocity while production rises linearly", source: "spec-v1829 method" },
+    ],
+  },
+  "barge-draft-displacement": {
+    formula: "displacement = L x B x draft x Cb x water density / 2,000; TPI = L x B x Cb x density / (12 x 2,000); fresh-water draft = displacement x 2,000 / (L x B x Cb x fresh density).",
+    edition: "Archimedes, with 64.0 lb/cu ft sea water and 62.4 lb/cu ft fresh. The barge's capacity plan, its load line, and its stability booklet govern.",
+    freeAccess: "Public hydrostatics; the vessel's own capacity plan is the controlling document.",
+    governance: GOVERNANCE.marine,
+    editionNote: "Freeboard is reserve buoyancy and a regulated minimum, not spare capacity -- the load line is the limit, not the deck edge. A barge loaded to its marks in salt water floats deeper in fresh with nothing added.",
+    assumptions: [
+      { name: "Tons per inch", value: "treated as constant, which holds for a box-shaped hull across its working range and not for a shaped one", source: "spec-v1830 idealisation" },
+      { name: "Block coefficient", value: "entered; a rake-ended deck barge runs about 0.90 to 0.97", source: "barge capacity plan" },
+    ],
+  },
+  "sheet-pile-penetration": {
+    formula: "Ka = tan^2(45 - phi/2); Kp = tan^2(45 + phi/2); Pa = 0.5 Ka gamma H^2 at H/3; embedment from (Kp - Ka) gamma D^3 / 6 = Pa (D + H/3); max moment where net shear is zero; S = M / allowable stress.",
+    edition: "Rankine earth pressure with the cantilever net-pressure simplification, increased by the conventional 20 to 40% for that idealisation. The geotechnical report, the applicable building code, and the design engineer govern.",
+    freeAccess: "Rankine's relations are public; the soil parameters come from the site's own investigation.",
+    governance: GOVERNANCE.general,
+    editionNote: "The 20 to 40% increase is NOT a safety factor in the usual sense -- it corrects the simplification's idealised rotation point and pressure distribution, and applies on top of, not instead of, the factors of safety in the pressure coefficients.",
+    assumptions: [
+      { name: "Soil", value: "drained granular, no surcharge, and no water differential across the wall", source: "spec-v1831 scope" },
+      { name: "Deflection", value: "NOT computed, and frequently the criterion that governs; a flexible wall can move inches while the section is well inside its capacity", source: "design engineer" },
+    ],
+  },
+  "pile-hammer-bearing": {
+    formula: "Engineering News R_allowable = 2 E / (s + c), with E in ft-lb, s the set per blow in inches, and c 0.1 in for steam, air, and diesel hammers or 1.0 in for a drop hammer; set = 2 E / R - c; blows per foot = 12 / s.",
+    edition: "The Engineering News formula, carrying an embedded factor of safety of about 6 and returning an allowable rather than an ultimate load. The project specification, a wave equation analysis, and the geotechnical engineer govern.",
+    freeAccess: "A public historical relation.",
+    governance: GOVERNANCE.general,
+    editionNote: "Measured against static load tests, dynamic formulas scatter by a factor of two or three in both directions. Use this as a FIELD CONTROL on a criterion someone calibrated, never as a design method: a wave equation analysis sets the criterion and a load test verifies it.",
+    assumptions: [
+      { name: "What is missing", value: "nothing about the pile's length, stiffness, or mass, nothing about the cushion, and nothing about soil behaviour under a millisecond blow", source: "spec-v1832 caveat" },
+      { name: "Refusal", value: "exists to protect the PILE, not to prove capacity; a pile at refusal in a soft layer above a hard one has proven nothing", source: "project specification" },
+    ],
+  },
+  "berthing-fender-energy": {
+    formula: "E = 0.5 M V^2 with M = displacement / g and V normal to the berth; design energy = E x Cm x Ce x Cs x Cc against the fender's rated absorption at its design deflection.",
+    edition: "Published berthing-energy guidance, with virtual mass 1.3 to 1.8, eccentricity 0.4 to 0.7 for a normal quarter-point berthing, softness 0.9 to 1.0, and configuration 0.8 to 1.0. The fender manufacturer's energy curves and the berth designer govern.",
+    freeAccess: "The kinetic-energy relation is public; the coefficient bands come from published design guidance.",
+    governance: GOVERNANCE.marine,
+    editionNote: "Approach velocity is the term that is squared and the least controlled quantity in the calculation. A vessel at twice the design speed delivers four times the energy, and the load path beyond an overwhelmed fender is the quay structure.",
+    assumptions: [
+      { name: "Approach velocity", value: "an assumption about seamanship on a day nobody can specify; design guidance gives wide bands by vessel size and berthing condition", source: "berth designer" },
+      { name: "Eccentricity", value: "a barge pushed square onto a face has Ce near 1.0 and delivers about twice the usual assumption -- an easily overlooked second design case", source: "spec-v1833 method" },
+    ],
+  },
+  "mooring-load-wind-current": {
+    formula: "wind F = 0.00256 Cd A V^2 (A in sq ft, V in mph); current F = 0.5 rho Cd A V^2 (rho 1.99 slugs/cu ft, V in ft/s at 1.688 ft/s per knot); per line = total / (count x cos angle); required MBL = line load x safety factor.",
+    edition: "Standard drag relations. The terminal's own mooring analysis, the line manufacturer's published minimum breaking load, and the vessel's mooring arrangement govern.",
+    freeAccess: "Public drag relations; the drag coefficients come from published guidance for the hull form.",
+    governance: GOVERNANCE.marine,
+    editionNote: "Water is roughly 800 times denser than air, so a modest current on a modest area beats a strong wind on a large one -- a mooring analysis considering only wind has missed the larger load, which on a river or tidal berth is the usual case.",
+    assumptions: [
+      { name: "Equal sharing", value: "an assumption a real arrangement does not honour, and the error is always unsafe: load distributes by stiffness, length, and geometry", source: "spec-v1834 method" },
+      { name: "Vertical angle", value: "not modelled; a line with significant vertical angle is partly pulling the vessel down rather than holding it in", source: "mooring analysis" },
+    ],
+  },
+  "pier-scour-depth": {
+    formula: "y_s / y_1 = 2.0 K1 K2 K3 (a / y_1)^0.65 Fr_1^0.43, with Fr = V / sqrt(g y) and K2 = (cos theta + (L/a) sin theta)^0.65.",
+    edition: "FHWA HEC-18 Evaluating Scour at Bridges, with K1 the nose shape (1.0 round, 1.1 square, 0.9 sharp) and K3 the bed condition (1.1 plane bed and antidunes).",
+    freeAccess: "HEC-18 is published by the Federal Highway Administration and is freely available.",
+    governance: GOVERNANCE.general,
+    editionNote: "This is the LOCAL component only. Contraction scour across the bridge opening and long-term degradation of the reach are separate components and they ADD; a foundation designed against local scour alone is designed against a fraction of the depth the bed will reach.",
+    assumptions: [
+      { name: "Angle of attack", value: "a geometry problem rather than a hydraulic one, and channels migrate -- a pier aligned when built is not necessarily aligned now", source: "bridge hydraulic study" },
+      { name: "Scour mechanism", value: "removes the soil providing both the bearing and the lateral support, often during the flood when the bed cannot be seen", source: "HEC-18" },
+    ],
+  },
+  "wave-height-fetch": {
+    formula: "U_A = 0.71 U^1.23 (U in m/s); X = g F / U_A^2; H_mo = 0.0016 sqrt(X) U_A^2 / g; T_p = 0.2857 X^(1/3) U_A / g; duration t = 68.8 X^(2/3) U_A / g.",
+    edition: "The Shore Protection Manual fetch-limited deep-water growth relations. A measured wave record where one exists, and shoaling and refraction at the site, govern.",
+    freeAccess: "Published by the US Army Corps of Engineers and freely available.",
+    governance: GOVERNANCE.general,
+    editionNote: "A hindcast, not a forecast. Height goes as the square root of fetch while wind enters far more strongly, which is why a short fetch in a gale is worse than a long fetch in a breeze.",
+    assumptions: [
+      { name: "Duration", value: "the term most often left out and frequently what governs; a squall does not build the wave its speed and fetch would suggest", source: "spec-v1836 method" },
+      { name: "Water", value: "deep-water growth over a uniform fetch; shoaling and refraction are not modelled", source: "Shore Protection Manual" },
+    ],
+  },
   // spec-v1809..v1817: warehouse racking and material handling.
   "pallet-rack-beam-capacity": {
     formula: "Two equal point loads at the quarter points: M = P L / 4; d = P a (3 L^2 - 4 a^2) / (24 E I) with a = L/4 and E = 29,000,000 psi; allowable bending stress = Fy / 1.67; acceptance limit L/180.",

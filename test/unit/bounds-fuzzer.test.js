@@ -53930,3 +53930,252 @@ test("bounds: spec-v1817 computeOrderPickLaborStandard -- the gain comes out of 
   assert.ok(_v1817({ ...base, pfd_allowance_pct: -1 }).error);
   assert.ok(_v1817({ ...base, lines_per_order: Infinity }).error);
 });
+
+// ---------------------------------------------------------------------------
+// spec-v1828..v1836: marine construction and dredging.
+// ---------------------------------------------------------------------------
+
+import {
+  computeDredgeProductionRate as _v1828,
+  computeSlurryCriticalVelocity as _v1829,
+  computeBargeDraftDisplacement as _v1830,
+  computeSheetPilePenetration as _v1831,
+  computePileHammerBearing as _v1832,
+  computeBerthingFenderEnergy as _v1833,
+  computeMooringLoadWindCurrent as _v1834,
+  computePierScourDepth as _v1835,
+  computeWaveHeightFetch as _v1836,
+} from "../../calc-marine.js";
+
+test("bounds: spec-v1828 computeDredgeProductionRate -- the contract pays for voids the pipeline never carried", () => {
+  const base = { pipe_diameter_in: 24, velocity_fps: 18, concentration_pct: 15, porosity: 0.4, solids_specific_gravity: 2.65, effective_hours: 20, alternative_concentration_pct: 20 };
+  const r = _v1828(base); assertFiniteNumericOutputs(r, "v1828");
+  assert.ok(Math.abs(r.flow_cfs - 56.548667764616276) < 1e-9);
+  assert.ok(Math.abs(r.production_cy_per_hr - 1884.9555921538758) < 1e-6);
+  // The pipeline carried 1,131 cy/h of particles; the contract pays 1,885.
+  assert.ok(Math.abs(r.solids_cy_per_hr - 1130.9733552923255) < 1e-6);
+  assert.ok(Math.abs(r.void_share_cy_per_hr - (r.production_cy_per_hr - r.solids_cy_per_hr)) < 1e-9);
+  // Production is linear in concentration -- which is why the density gauge on
+  // the discharge is the production instrument.
+  assert.ok(Math.abs(r.alternative_gain_pct - 100 / 3) < 1e-9);
+  assert.ok(Math.abs(r.slurry_specific_gravity - 1.2475) < 1e-12);
+  // The gauge reading and the concentration are one relation: entering the
+  // alternative as the primary must give the same specific gravity.
+  const atAlt = _v1828({ ...base, concentration_pct: 20 });
+  assert.ok(Math.abs(atAlt.slurry_specific_gravity - r.alternative_slurry_specific_gravity) < 1e-12);
+  for (const bad of [{ pipe_diameter_in: 0 }, { velocity_fps: 0 }, { concentration_pct: 0 }, { concentration_pct: 100 }, { porosity: 0 }, { porosity: 1 }, { solids_specific_gravity: 1 }, { effective_hours: 0 }, { pipe_diameter_in: Infinity }]) {
+    assert.ok(_v1828({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1829 computeSlurryCriticalVelocity -- a coarser layer raises the threshold under a running line", () => {
+  const base = { pipe_diameter_in: 24, solids_specific_gravity: 2.65, durand_coefficient: 1.0, operating_velocity_fps: 18, coarser_coefficient: 1.2, coarsest_coefficient: 1.34, upsized_diameter_in: 30 };
+  const r = _v1829(base); assertFiniteNumericOutputs(r, "v1829");
+  assert.ok(Math.abs(r.root_term_fps - 14.578065715313539) < 1e-9);
+  // The coefficient is a pure multiplier on the square-root term.
+  assert.ok(Math.abs(r.coarser_critical_velocity_fps / r.root_term_fps - 1.2) < 1e-12);
+  assert.ok(Math.abs(r.coarsest_critical_velocity_fps / r.root_term_fps - 1.34) < 1e-12);
+  // The whole finding: the same line runs the expected material and the
+  // coarser one, and does NOT run the coarsest -- nothing about the dredge
+  // changed, the cutter ran into a different layer.
+  assert.ok(r.runs && r.coarser_runs && !r.coarsest_runs);
+  assert.ok(Math.abs(r.relative_friction_head - 1.5245623941276112) < 1e-9);
+  assert.ok(Math.abs(r.excess_friction_pct - 100 * (r.relative_friction_head - 1)) < 1e-9);
+  // Diameter works the WRONG way: V_c goes as its square root, so the upsized
+  // line has a HIGHER threshold than the one it replaces.
+  assert.ok(r.upsized_critical_velocity_fps > r.critical_velocity_fps);
+  assert.ok(Math.abs(r.upsized_critical_velocity_fps / r.critical_velocity_fps - Math.sqrt(30 / 24)) < 1e-12);
+  for (const key of ["pipe_diameter_in", "durand_coefficient", "operating_velocity_fps", "coarser_coefficient", "coarsest_coefficient", "upsized_diameter_in"]) {
+    assert.ok(_v1829({ ...base, [key]: 0 }).error);
+  }
+  assert.ok(_v1829({ ...base, solids_specific_gravity: 1 }).error);
+  assert.ok(_v1829({ ...base, pipe_diameter_in: Infinity }).error);
+});
+
+test("bounds: spec-v1830 computeBargeDraftDisplacement -- tons per inch closes the loop on the draft change", () => {
+  const base = { barge_length_ft: 195, beam_ft: 35, depth_ft: 12, block_coefficient: 0.95, light_draft_ft: 1.5, loaded_draft_ft: 8, water_density_pcf: 64, fresh_water_density_pcf: 62.4 };
+  const r = _v1830(base); assertFiniteNumericOutputs(r, "v1830");
+  assert.ok(Math.abs(r.light_displacement_tons - 311.22) < 1e-9);
+  assert.ok(Math.abs(r.loaded_displacement_tons - 1659.84) < 1e-9);
+  assert.ok(Math.abs(r.cargo_tons - 1348.62) < 1e-9);
+  assert.ok(Math.abs(r.tons_per_inch - 17.29) < 1e-9);
+  // The identity that makes TPI usable at all: the cargo's sinkage must equal
+  // the draft change it was computed from.
+  assert.ok(Math.abs(r.sinkage_ft - r.draft_change_ft) < 1e-9);
+  assert.ok(Math.abs(r.sinkage_in - 78) < 1e-9);
+  assert.ok(Math.abs(r.freeboard_ft - 4) < 1e-12);
+  // Fresh water: the same weight in a lighter fluid means more hull under.
+  assert.ok(r.fresh_water_draft_ft > base.loaded_draft_ft);
+  assert.ok(Math.abs(r.fresh_water_allowance_in - 2.4615384615384617) < 1e-9);
+  // Same density in and out leaves the draft exactly where it was.
+  const same = _v1830({ ...base, fresh_water_density_pcf: 64 });
+  assert.ok(Math.abs(same.fresh_water_draft_ft - 8) < 1e-9 && Math.abs(same.fresh_water_allowance_in) < 1e-9);
+  assert.ok(_v1830({ ...base, loaded_draft_ft: 1 }).error);   // loaded below light
+  assert.ok(_v1830({ ...base, loaded_draft_ft: 13 }).error);  // no freeboard
+  assert.ok(_v1830({ ...base, block_coefficient: 1.2 }).error);
+  for (const key of ["barge_length_ft", "beam_ft", "depth_ft", "block_coefficient", "light_draft_ft", "water_density_pcf", "fresh_water_density_pcf"]) {
+    assert.ok(_v1830({ ...base, [key]: 0 }).error);
+  }
+  assert.ok(_v1830({ ...base, beam_ft: Infinity }).error);
+});
+
+test("bounds: spec-v1831 computeSheetPilePenetration -- a 12 ft wall is a 23 ft pile", () => {
+  const base = { retained_height_ft: 12, friction_angle_deg: 32, unit_weight_pcf: 120, increase_factor_pct: 30, allowable_stress_psi: 30000 };
+  const r = _v1831(base); assertFiniteNumericOutputs(r, "v1831");
+  assert.ok(Math.abs(r.ka - 0.3072585245224685) < 1e-12);
+  assert.ok(Math.abs(r.kp - 3.254588303299862) < 1e-12);
+  // Ka and Kp are reciprocals for Rankine, which is the check on both at once.
+  assert.ok(Math.abs(r.ka * r.kp - 1) < 1e-12);
+  assert.ok(Math.abs(r.active_force_plf - 2654.713651874128) < 1e-9);
+  assert.ok(Math.abs(r.theoretical_depth_ft - 8.187659076403115) < 1e-7);
+  assert.ok(Math.abs(r.design_depth_ft - 10.64395679932405) < 1e-7);
+  assert.ok(Math.abs(r.total_length_ft - 22.64395679932405) < 1e-7);
+  // 47% of the steel is below the excavation and never seen -- the estimating
+  // error the spec names.
+  assert.ok(Math.abs(r.embedment_share_pct - 47.00572825523932) < 1e-6);
+  // The bisection must actually satisfy the moment equation it solved.
+  const lhs = (r.net_passive_rate / 6) * Math.pow(r.theoretical_depth_ft, 3);
+  const rhs = r.active_force_plf * (r.theoretical_depth_ft + r.lever_arm_ft);
+  assert.ok(Math.abs(lhs - rhs) / rhs < 1e-9);
+  // The moment peaks BELOW the dredge line, not at it.
+  assert.ok(r.depth_to_max_moment_ft > 0);
+  assert.ok(Math.abs(r.max_moment_ftlb_per_ft - 17476.03026090847) < 1e-6);
+  assert.ok(Math.abs(r.section_modulus_in3_per_ft - 6.990412104363387) < 1e-9);
+  // A zero increase leaves the design depth at the theoretical one.
+  const bare = _v1831({ ...base, increase_factor_pct: 0 });
+  assert.ok(Math.abs(bare.design_depth_ft - bare.theoretical_depth_ft) < 1e-9);
+  for (const bad of [{ retained_height_ft: 0 }, { friction_angle_deg: 0 }, { friction_angle_deg: 90 }, { unit_weight_pcf: 0 }, { increase_factor_pct: -1 }, { allowable_stress_psi: 0 }, { unit_weight_pcf: Infinity }]) {
+    assert.ok(_v1831({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1832 computePileHammerBearing -- a tenth of an inch of set spans a factor of two", () => {
+  const base = { hammer_energy_ftlb: 42000, loss_constant_in: 0.1, required_capacity_tons: 150, refusal_blows_per_inch: 10, loose_set_in: 0.3, embedded_safety_factor: 6 };
+  const r = _v1832(base); assertFiniteNumericOutputs(r, "v1832");
+  assert.ok(Math.abs(r.set_in - 0.18) < 1e-12);
+  assert.ok(Math.abs(r.blows_per_inch - 1 / 0.18) < 1e-12);
+  assert.ok(Math.abs(r.blows_per_foot - 12 / 0.18) < 1e-12);
+  assert.ok(Math.abs(r.ultimate_capacity_tons - 900) < 1e-12);
+  assert.deepStrictEqual([r.refusal_capacity_tons, r.loose_set_capacity_tons], [210, 105]);
+  assert.ok(Math.abs(r.refusal_capacity_ratio - 1.4) < 1e-12);
+  assert.ok(Math.abs(r.loose_set_shortfall_pct + 30) < 1e-12);
+  // The sensitivity that makes the formula unreliable, and it is visible in
+  // the arithmetic rather than hidden behind it.
+  assert.ok(Math.abs(r.set_range_capacity_ratio - 2) < 1e-12);
+  // Solving for the set and back for the capacity must round-trip.
+  const back = 2 * base.hammer_energy_ftlb / (r.set_in + base.loss_constant_in) / 2000;
+  assert.ok(Math.abs(back - base.required_capacity_tons) < 1e-9);
+  // A hammer too small for the capacity asks for a set at or below zero, which
+  // is past refusal -- the tile says so rather than returning a negative set.
+  assert.ok(_v1832({ ...base, required_capacity_tons: 1000 }).error);
+  for (const key of ["hammer_energy_ftlb", "loss_constant_in", "required_capacity_tons", "refusal_blows_per_inch", "loose_set_in", "embedded_safety_factor"]) {
+    assert.ok(_v1832({ ...base, [key]: 0 }).error);
+  }
+  assert.ok(_v1832({ ...base, hammer_energy_ftlb: Infinity }).error);
+});
+
+test("bounds: spec-v1833 computeBerthingFenderEnergy -- twice the speed is four times the energy", () => {
+  const base = { displacement_tons: 22000, approach_velocity_fps: 0.5, virtual_mass_factor: 1.5, eccentricity_factor: 0.5, softness_factor: 1.0, configuration_factor: 0.95, fender_rating_ftlb: 150000, alternative_velocity_fps: 1.0 };
+  const r = _v1833(base); assertFiniteNumericOutputs(r, "v1833");
+  assert.ok(Math.abs(r.vessel_mass_slugs - 1366459.6273291924) < 1e-6);
+  assert.ok(Math.abs(r.kinetic_energy_ftlb - 170807.45341614904) < 1e-6);
+  assert.ok(Math.abs(r.design_energy_ftlb - 121700.31055900618) < 1e-6);
+  // The square is the whole point: the fender is comfortable at 0.5 ft/s and
+  // overwhelmed at 1.0, and the load path beyond it is the quay.
+  assert.ok(r.fender_adequate && !r.alternative_fender_adequate);
+  assert.ok(Math.abs(r.alternative_energy_ratio - 4) < 1e-9);
+  assert.ok(Math.abs(r.alternative_energy_ratio - Math.pow(r.velocity_ratio, 2)) < 1e-9);
+  // A square berthing -- a flat-pushed barge -- is the easily overlooked case.
+  assert.ok(Math.abs(r.square_berthing_ratio - 2) < 1e-12);
+  assert.ok(Math.abs(r.square_berthing_energy_ftlb - r.design_energy_ftlb * 2) < 1e-6);
+  // Ce = 1 IS the square berthing, so entering it must agree.
+  const square = _v1833({ ...base, eccentricity_factor: 1 });
+  assert.ok(Math.abs(square.design_energy_ftlb - r.square_berthing_energy_ftlb) < 1e-6);
+  for (const bad of [{ displacement_tons: 0 }, { approach_velocity_fps: 0 }, { virtual_mass_factor: 0 }, { eccentricity_factor: 0 }, { eccentricity_factor: 1.5 }, { softness_factor: 1.5 }, { configuration_factor: 0 }, { fender_rating_ftlb: 0 }, { alternative_velocity_fps: 0 }, { displacement_tons: Infinity }]) {
+    assert.ok(_v1833({ ...base, ...bad }).error);
+  }
+});
+
+test("bounds: spec-v1834 computeMooringLoadWindCurrent -- the current beats the wind on a quarter of the area", () => {
+  const base = { wind_area_ft2: 12000, wind_drag_coefficient: 1.0, wind_speed_mph: 50, submerged_area_ft2: 3000, current_drag_coefficient: 1.2, current_speed_knots: 3, line_count: 6, line_angle_deg: 30, worst_line_share_pct: 70, safety_factor: 2 };
+  const r = _v1834(base); assertFiniteNumericOutputs(r, "v1834");
+  assert.ok(Math.abs(r.wind_force_lb - 76800) < 1e-9);
+  assert.ok(Math.abs(r.current_force_lb - 91836.45874236191) < 1e-6);
+  // Water is ~800x denser than air, and that ratio swamps the area difference:
+  // a mooring analysis considering only wind has missed the larger load.
+  assert.ok(r.current_exceeds_wind && base.submerged_area_ft2 < base.wind_area_ft2);
+  assert.ok(Math.abs(r.total_force_lb - (r.wind_force_lb + r.current_force_lb)) < 1e-9);
+  assert.ok(Math.abs(r.load_per_line_lb - 32454.101616695956) < 1e-6);
+  assert.ok(Math.abs(r.required_mbl_lb - r.load_per_line_lb * 2) < 1e-9);
+  // Unequal sharing is the unsafe direction, and it is not a small error.
+  assert.ok(Math.abs(r.worst_to_equal_ratio - 4.2) < 1e-9);
+  assert.ok(Math.abs(r.worst_line_load_lb - 136307.226790123) < 1e-6);
+  // At an exactly equal share the two figures must coincide.
+  const even = _v1834({ ...base, worst_line_share_pct: 100 / 6 });
+  assert.ok(Math.abs(even.worst_line_load_lb - even.load_per_line_lb) < 1e-6);
+  // Both forces go as the square of their speed.
+  const double = _v1834({ ...base, wind_speed_mph: 100 });
+  assert.ok(Math.abs(double.wind_force_lb / r.wind_force_lb - 4) < 1e-9);
+  assert.ok(_v1834({ ...base, line_angle_deg: 90 }).error);
+  for (const key of ["wind_area_ft2", "wind_drag_coefficient", "wind_speed_mph", "submerged_area_ft2", "current_drag_coefficient", "current_speed_knots", "line_count", "worst_line_share_pct", "safety_factor"]) {
+    assert.ok(_v1834({ ...base, [key]: 0 }).error);
+  }
+  assert.ok(_v1834({ ...base, wind_area_ft2: Infinity }).error);
+});
+
+test("bounds: spec-v1835 computePierScourDepth -- 30 degrees of skew is 2.4 times the scour", () => {
+  const base = { pier_width_ft: 6, pier_length_ft: 36, flow_depth_ft: 15, velocity_fps: 8, nose_shape_factor: 1.0, bed_condition_factor: 1.1, angle_of_attack_deg: 30, wider_pier_width_ft: 12, foundation_margin_ft: 2 };
+  const r = _v1835(base); assertFiniteNumericOutputs(r, "v1835");
+  assert.ok(Math.abs(r.froude_number - 0.36401260415463205) < 1e-12);
+  assert.ok(Math.abs(r.scour_depth_ft - 11.779666511882333) < 1e-9);
+  // Width enters at the 0.65 power, so twice the width is 2^0.65 the scour --
+  // a heavier pier is not a safer one.
+  assert.ok(Math.abs(r.wider_pier_ratio - Math.pow(2, 0.65)) < 1e-12);
+  assert.ok(Math.abs(r.wider_pier_scour_ft - 18.48427804749953) < 1e-9);
+  // The angle factor is the term that turns a design number into a failure.
+  assert.ok(Math.abs(r.angle_factor - 2.4083636143819525) < 1e-9);
+  assert.ok(Math.abs(r.skewed_scour_ft - 28.36972021677099) < 1e-9);
+  assert.ok(Math.abs(r.skew_ratio - r.angle_factor) < 1e-12);
+  // Aligned with the flow, K2 is exactly 1 and the skew case collapses onto
+  // the aligned one.
+  const aligned = _v1835({ ...base, angle_of_attack_deg: 0 });
+  assert.ok(Math.abs(aligned.angle_factor - 1) < 1e-12);
+  assert.ok(Math.abs(aligned.skewed_scour_ft - aligned.scour_depth_ft) < 1e-12);
+  // The foundation is sized on the governing case, not the aligned one.
+  assert.ok(Math.abs(r.foundation_depth_ft - (r.skewed_scour_ft + 2)) < 1e-9);
+  assert.ok(_v1835({ ...base, pier_length_ft: 3 }).error);
+  assert.ok(_v1835({ ...base, angle_of_attack_deg: 91 }).error);
+  for (const key of ["pier_width_ft", "flow_depth_ft", "velocity_fps", "nose_shape_factor", "bed_condition_factor", "wider_pier_width_ft"]) {
+    assert.ok(_v1835({ ...base, [key]: 0 }).error);
+  }
+  assert.ok(_v1835({ ...base, foundation_margin_ft: -1 }).error);
+  assert.ok(_v1835({ ...base, velocity_fps: Infinity }).error);
+});
+
+test("bounds: spec-v1836 computeWaveHeightFetch -- height goes as the square root of fetch", () => {
+  const base = { wind_speed_mph: 40, fetch_mi: 5, alternative_fetch_mi: 10, alternative_wind_speed_mph: 60 };
+  const r = _v1836(base); assertFiniteNumericOutputs(r, "v1836");
+  assert.ok(Math.abs(r.adjusted_wind_ms - 24.644396694639088) < 1e-9);
+  assert.ok(Math.abs(r.dimensionless_fetch - 129.97251271988713) < 1e-9);
+  assert.ok(Math.abs(r.wave_height_ft - 3.7050847969669154) < 1e-9);
+  assert.ok(Math.abs(r.peak_period_s - 3.6356041928384233) < 1e-9);
+  // The duration term is the one most often left out and frequently governs.
+  assert.ok(Math.abs(r.duration_required_hr - 1.2318830068165643) < 1e-9);
+  // Doubling the fetch raises the height by sqrt(2), not by 2 -- which is why
+  // enclosed waters stay workable.
+  assert.ok(Math.abs(r.alternative_fetch_ratio - Math.SQRT2) < 1e-9);
+  assert.ok(Math.abs(r.alternative_fetch_increase_pct - 100 * (Math.SQRT2 - 1)) < 1e-9);
+  // Wind is the dominant variable: 50% more wind beats 100% more fetch.
+  assert.ok(r.alternative_wind_increase_pct > r.alternative_fetch_increase_pct);
+  assert.ok(Math.abs(r.alternative_wind_height_ft - 6.100850749768229) < 1e-9);
+  // Entering the alternative as the primary must reproduce it exactly.
+  const asPrimary = _v1836({ ...base, fetch_mi: 10 });
+  assert.ok(Math.abs(asPrimary.wave_height_ft - r.alternative_fetch_height_ft) < 1e-9);
+  assert.ok(Math.abs(asPrimary.duration_required_hr - r.alternative_fetch_duration_hr) < 1e-9);
+  const strongerWind = _v1836({ ...base, wind_speed_mph: 60 });
+  assert.ok(Math.abs(strongerWind.wave_height_ft - r.alternative_wind_height_ft) < 1e-9);
+  for (const key of ["wind_speed_mph", "fetch_mi", "alternative_fetch_mi", "alternative_wind_speed_mph"]) {
+    assert.ok(_v1836({ ...base, [key]: 0 }).error);
+  }
+  assert.ok(_v1836({ ...base, fetch_mi: Infinity }).error);
+});

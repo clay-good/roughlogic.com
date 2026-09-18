@@ -310,7 +310,8 @@ test("Group K audit coverage: every mechanic tile id has a CITATIONS entry", asy
   const re = /\{ id: "([a-z0-9-]+)"/g;
   let m;
   while ((m = re.exec(groupKBlock)) !== null) ids.push(m[1]);
-  assert.ok(ids.length === 15, "expected 15 Group K tile ids, got " + ids.length);
+  // 15 original + the 2 Group K tiles of the spec-v1828..v1836 marine band.
+  assert.ok(ids.length === 17, "expected 17 Group K tile ids, got " + ids.length);
   for (const id of ids) {
     assert.ok(CITATIONS[id], "Group K tile '" + id + "' missing CITATIONS entry");
   }

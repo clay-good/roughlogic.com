@@ -1291,7 +1291,7 @@ EARTHWORK_RENDERERS["dump-truck-loads"] = _v845renderDumpTruckLoads;
 //   hourly_cost = equipment_rate_per_hr + operator_rate_per_hr + support_rate_per_hr
 //   unit_cost_per_cy = hourly_cost / production_cy_per_hr
 //   total_cost = total_cy > 0 ? unit_cost_per_cy x total_cy : null
-// dims: in { equipment_rate_per_hr: dimensionless, operator_rate_per_hr: dimensionless, support_rate_per_hr: dimensionless, production_cy_per_hr: dimensionless, total_cy: L^3 } out: { hourly_cost: dimensionless, unit_cost_per_cy: dimensionless }
+// dims: in { equipment_rate_per_hr: dimensionless, operator_rate_per_hr: dimensionless, support_rate_per_hr: dimensionless, production_cy_per_hr: L^3 T^-1, total_cy: L^3 } out: { hourly_cost: dimensionless, unit_cost_per_cy: dimensionless }
 export function computeUnitCostEarthwork({ equipment_rate_per_hr = 150, operator_rate_per_hr = 65, support_rate_per_hr = 0, production_cy_per_hr = 656, total_cy = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(production_cy_per_hr > 0)) return { error: "Production rate must be positive (cy/hr)." };

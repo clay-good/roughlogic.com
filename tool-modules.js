@@ -1391,6 +1391,17 @@ export const TOOL_MODULES = (() => {
     "warehouse-cube-utilization", "dock-leveler-slope",
     "dock-door-count-throughput", "order-pick-labor-standard",
   ]);
+  // spec-v1828..v1836: marine construction and dredging. Seven Group E tiles
+  // are the dredge, the waterfront structure, and the water -- production and
+  // slurry density, critical velocity, sheet pile penetration, pile driving
+  // bearing, berthing fender energy, pier scour, wave height from fetch -- and
+  // two Group K tiles are the vessel: barge draft and mooring load.
+  declare("./calc-marine.js", "MARINE_RENDERERS", [
+    "dredge-production-rate", "slurry-critical-velocity",
+    "barge-draft-displacement", "sheet-pile-penetration",
+    "pile-hammer-bearing", "berthing-fender-energy",
+    "mooring-load-wind-current", "pier-scour-depth", "wave-height-fetch",
+  ]);
   // spec-v1845..v1850: the snow and ice management bench -- what a pavement
   // temperature costs in salt, what a brine batch has to be, how long a plow
   // route takes, where the snow goes, when a deicer stops working, and whether

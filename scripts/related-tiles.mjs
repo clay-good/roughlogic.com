@@ -2267,6 +2267,16 @@ const RELATED = {
   "dock-leveler-slope": ["dock-door-count-throughput","forklift-capacity-derate","ramp-slope"],
   "dock-door-count-throughput": ["dock-leveler-slope","order-pick-labor-standard","pallet-loadout"],
   "order-pick-labor-standard": ["warehouse-cube-utilization","dock-door-count-throughput","stacking-aisle-width"],
+  // spec-v1828..v1836 marine construction and dredging band.
+  "dredge-production-rate": ["slurry-critical-velocity","barge-draft-displacement","pier-scour-depth"],
+  "slurry-critical-velocity": ["dredge-production-rate","friction-loss","pier-scour-depth"],
+  "barge-draft-displacement": ["mooring-load-wind-current","dredge-production-rate","berthing-fender-energy"],
+  "sheet-pile-penetration": ["pile-hammer-bearing","lateral-earth-pressure","dock-piling-lateral"],
+  "pile-hammer-bearing": ["sheet-pile-penetration","pile-group-efficiency","berthing-fender-energy"],
+  "berthing-fender-energy": ["mooring-load-wind-current","barge-draft-displacement","pile-hammer-bearing"],
+  "mooring-load-wind-current": ["barge-draft-displacement","berthing-fender-energy","wave-height-fetch"],
+  "pier-scour-depth": ["sheet-pile-penetration","riprap-d50","dredge-production-rate"],
+  "wave-height-fetch": ["mooring-load-wind-current","barge-draft-displacement","berthing-fender-energy"],
 };
 
 export { RELATED };

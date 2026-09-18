@@ -1367,6 +1367,16 @@ const _TILES = [
   ["dock-leveler-slope", "J"],
   ["dock-door-count-throughput", "J"],
   ["order-pick-labor-standard", "J"],
+  // spec-v1828..v1836 marine construction and dredging
+  ["dredge-production-rate", "E"],
+  ["slurry-critical-velocity", "E"],
+  ["barge-draft-displacement", "K"],
+  ["sheet-pile-penetration", "E"],
+  ["pile-hammer-bearing", "E"],
+  ["berthing-fender-energy", "E"],
+  ["mooring-load-wind-current", "K"],
+  ["pier-scour-depth", "E"],
+  ["wave-height-fetch", "E"],
 ];
 
 

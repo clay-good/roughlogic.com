@@ -2,96 +2,96 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "7cb3e1385c4b1079",
-      "date": "2026-09-17"
+      "sha": "24a4af4a6dc858e0",
+      "date": "2026-09-18"
     },
     "/tools/": {
-      "sha": "d8bbd96b0fced83c",
-      "date": "2026-09-17"
+      "sha": "da295fcf44278efd",
+      "date": "2026-09-18"
     },
     "/groups/accounting/": {
-      "sha": "74c62211e128b788",
-      "date": "2026-09-17"
+      "sha": "693b7f8016bde5e6",
+      "date": "2026-09-18"
     },
     "/groups/agriculture/": {
-      "sha": "5c9667196da0b07c",
-      "date": "2026-09-17"
+      "sha": "08465d54b5956ea7",
+      "date": "2026-09-18"
     },
     "/groups/construction/": {
-      "sha": "2e5167ae1cbea5cb",
-      "date": "2026-09-17"
+      "sha": "48e4d067b9daf565",
+      "date": "2026-09-18"
     },
     "/groups/cross-trade/": {
-      "sha": "0b1bfa478e3e5228",
-      "date": "2026-09-17"
+      "sha": "c8b2df3c4e49e250",
+      "date": "2026-09-18"
     },
     "/groups/educators/": {
-      "sha": "6fe240be7065102e",
-      "date": "2026-09-17"
+      "sha": "b96f57f58ff7f1a3",
+      "date": "2026-09-18"
     },
     "/groups/electrical/": {
-      "sha": "bed32c23e7a728e3",
-      "date": "2026-09-17"
+      "sha": "c1908a389b9c7c96",
+      "date": "2026-09-18"
     },
     "/groups/field/": {
-      "sha": "868eb12de3daa851",
-      "date": "2026-09-17"
+      "sha": "c32e6577a3d3fa68",
+      "date": "2026-09-18"
     },
     "/groups/fire-ground/": {
-      "sha": "3e028c4cfa61cf24",
-      "date": "2026-09-17"
+      "sha": "06927017249aed16",
+      "date": "2026-09-18"
     },
     "/groups/historical/": {
-      "sha": "6d5a344add67c9d9",
-      "date": "2026-09-17"
+      "sha": "82c4ecd4b73579fc",
+      "date": "2026-09-18"
     },
     "/groups/hvac/": {
-      "sha": "c37f42a138f3b849",
-      "date": "2026-09-17"
+      "sha": "56b04969a3d37c27",
+      "date": "2026-09-18"
     },
     "/groups/kitchen/": {
-      "sha": "e29629b3f4bc5477",
-      "date": "2026-09-17"
+      "sha": "565aaa104cda66e1",
+      "date": "2026-09-18"
     },
     "/groups/lab/": {
-      "sha": "4c56bd75e059814d",
-      "date": "2026-09-17"
+      "sha": "31fbda588ab5182f",
+      "date": "2026-09-18"
     },
     "/groups/mechanic/": {
-      "sha": "1bd439a9f52e23f1",
-      "date": "2026-09-17"
+      "sha": "f8bce57073ca5469",
+      "date": "2026-09-18"
     },
     "/groups/plumbing/": {
-      "sha": "793168aa2d7ae73e",
-      "date": "2026-09-17"
+      "sha": "86d19dcc4f3c4525",
+      "date": "2026-09-18"
     },
     "/groups/real-estate/": {
-      "sha": "b5a29e742468f6dc",
-      "date": "2026-09-17"
+      "sha": "360ea511f84eeacb",
+      "date": "2026-09-18"
     },
     "/groups/references/": {
-      "sha": "3ce8cd2c6c2ca78b",
-      "date": "2026-09-17"
+      "sha": "20cd93ab2a635bd7",
+      "date": "2026-09-18"
     },
     "/groups/restoration/": {
-      "sha": "f462255a51877ffe",
-      "date": "2026-09-17"
+      "sha": "cae57d268f60105a",
+      "date": "2026-09-18"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "e111c62368d53ce2",
-      "date": "2026-09-17"
+      "sha": "d8fb0d8655db6b10",
+      "date": "2026-09-18"
     },
     "/groups/stage/": {
-      "sha": "014047720c06b977",
-      "date": "2026-09-17"
+      "sha": "32a9fdab65713a4c",
+      "date": "2026-09-18"
     },
     "/groups/trucking/": {
-      "sha": "b819a9c2af706e7c",
-      "date": "2026-09-17"
+      "sha": "2bf11653cb12a727",
+      "date": "2026-09-18"
     },
     "/groups/water/": {
-      "sha": "fc6068726e5730f5",
-      "date": "2026-09-17"
+      "sha": "fcc64a6edb802a78",
+      "date": "2026-09-18"
     },
     "/tools/aav-install-check/": {
       "sha": "4e1b1d5b33ca35e4",
@@ -465,6 +465,10 @@
       "sha": "9fb407f4dbcc14f9",
       "date": "2026-09-01"
     },
+    "/tools/barge-draft-displacement/": {
+      "sha": "cb9707760c4ff4cf",
+      "date": "2026-09-18"
+    },
     "/tools/barrel-volume/": {
       "sha": "d49093be74652639",
       "date": "2026-09-09"
@@ -608,6 +612,10 @@
     "/tools/bernoulli-head/": {
       "sha": "185ce9d9aacd2826",
       "date": "2026-09-01"
+    },
+    "/tools/berthing-fender-energy/": {
+      "sha": "acc980663be668c6",
+      "date": "2026-09-18"
     },
     "/tools/beverage-co2-duration/": {
       "sha": "b7043acbbe5d5f6b",
@@ -2212,6 +2220,10 @@
     "/tools/drawbar-pull/": {
       "sha": "85457d525b8e0712",
       "date": "2026-09-01"
+    },
+    "/tools/dredge-production-rate/": {
+      "sha": "c37d188e9fba765b",
+      "date": "2026-09-18"
     },
     "/tools/dressing-percentage/": {
       "sha": "c6b1677beee7418b",
@@ -4537,6 +4549,10 @@
       "sha": "5d13b1769e266be0",
       "date": "2026-09-09"
     },
+    "/tools/mooring-load-wind-current/": {
+      "sha": "a4d410583dabec96",
+      "date": "2026-09-18"
+    },
     "/tools/mortar-batch-c270/": {
       "sha": "56268c950d3fb598",
       "date": "2026-09-08"
@@ -5025,6 +5041,10 @@
       "sha": "019feb1fab1e45e7",
       "date": "2026-09-01"
     },
+    "/tools/pier-scour-depth/": {
+      "sha": "76a185aa1e65548b",
+      "date": "2026-09-18"
+    },
     "/tools/pig-batch-volume/": {
       "sha": "a96cbac4b2800136",
       "date": "2026-09-08"
@@ -5040,6 +5060,10 @@
     "/tools/pile-group-spacing-for-efficiency/": {
       "sha": "a307dc48dcb8769e",
       "date": "2026-09-01"
+    },
+    "/tools/pile-hammer-bearing/": {
+      "sha": "91f2d6e780355b74",
+      "date": "2026-09-18"
     },
     "/tools/pile-length-for-capacity/": {
       "sha": "c044f9cb82ddd49c",
@@ -6545,6 +6569,10 @@
       "sha": "40fa200772d6eadb",
       "date": "2026-09-04"
     },
+    "/tools/sheet-pile-penetration/": {
+      "sha": "6bc0a22c687a3590",
+      "date": "2026-09-18"
+    },
     "/tools/shielding-gas-runtime/": {
       "sha": "46fd0efc892fc4c1",
       "date": "2026-09-01"
@@ -6704,6 +6732,10 @@
     "/tools/sluice-gate-flow/": {
       "sha": "3c28085a0d31330a",
       "date": "2026-09-04"
+    },
+    "/tools/slurry-critical-velocity/": {
+      "sha": "34bf5c030dd087f9",
+      "date": "2026-09-18"
     },
     "/tools/smoke-alarm-placement/": {
       "sha": "9fdfdedbd31dbb3c",
@@ -8264,6 +8296,10 @@
     "/tools/waterline-for-hull-speed/": {
       "sha": "f8063f387d16b27e",
       "date": "2026-09-01"
+    },
+    "/tools/wave-height-fetch/": {
+      "sha": "7054b0969d3c049d",
+      "date": "2026-09-18"
     },
     "/tools/wedge-force/": {
       "sha": "8d91ddc8dce9ef9e",

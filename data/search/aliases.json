@@ -1,8 +1,233 @@
 {
  "_comment": "v10 Phase D.1 search aliases (spec-v10 \u00a76.1). One row per alias mapping a free-text term to a tile id. AUTHORING MASTER ONLY since the spec-v590 split remediation (2026-07-17): the runtime never fetches this file. scripts/build-alias-shards.mjs derives the per-group runtime shards data/search/aliases-<letter>.json from it (lazy parallel fetch on first search interaction via bindSearch / ensureAliases in app.js; --check in npm run lint gates drift), so edit THIS file and rerun the script. On exact-term match the user is routed to the target tile via the same path as a tool-name suggestion. Industry vocabulary, misspellings, abbreviations, question phrasings (spec-v590), and adjacent-question redirects only. The resolveQuery / matchAliasPrefix helpers in search-discovery.js are the canonical pure-functional resolvers (exercised by test/unit/search-discovery.test.js).",
- "_updated": "2026-09-17",
+ "_updated": "2026-09-18",
  "_schema": "Each alias row: { term: string, target: tile-id, kind: 'question' | 'industry' | 'adjacent' | 'redirect' }. Multiple aliases may map to the same target.",
  "aliases": [
+  {
+   "term": "cutter suction dredge production",
+   "target": "dredge-production-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "slurry concentration by volume",
+   "target": "dredge-production-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "dredge pipeline flow cubic yards per hour",
+   "target": "dredge-production-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "in situ volume dredging",
+   "target": "dredge-production-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "slurry specific gravity",
+   "target": "dredge-production-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "slurry critical velocity durand",
+   "target": "slurry-critical-velocity",
+   "kind": "industry"
+  },
+  {
+   "term": "settling velocity slurry pipeline",
+   "target": "slurry-critical-velocity",
+   "kind": "industry"
+  },
+  {
+   "term": "deposition velocity dredge discharge",
+   "target": "slurry-critical-velocity",
+   "kind": "industry"
+  },
+  {
+   "term": "fl factor durand slurry",
+   "target": "slurry-critical-velocity",
+   "kind": "industry"
+  },
+  {
+   "term": "pipeline plugging slurry",
+   "target": "slurry-critical-velocity",
+   "kind": "industry"
+  },
+  {
+   "term": "barge draft displacement",
+   "target": "barge-draft-displacement",
+   "kind": "industry"
+  },
+  {
+   "term": "tons per inch immersion",
+   "target": "barge-draft-displacement",
+   "kind": "industry"
+  },
+  {
+   "term": "deck barge cargo capacity",
+   "target": "barge-draft-displacement",
+   "kind": "industry"
+  },
+  {
+   "term": "fresh water allowance draft",
+   "target": "barge-draft-displacement",
+   "kind": "industry"
+  },
+  {
+   "term": "block coefficient barge",
+   "target": "barge-draft-displacement",
+   "kind": "industry"
+  },
+  {
+   "term": "cantilever sheet pile embedment",
+   "target": "sheet-pile-penetration",
+   "kind": "industry"
+  },
+  {
+   "term": "sheet pile penetration depth",
+   "target": "sheet-pile-penetration",
+   "kind": "industry"
+  },
+  {
+   "term": "rankine active passive sheet pile",
+   "target": "sheet-pile-penetration",
+   "kind": "industry"
+  },
+  {
+   "term": "sheet pile section modulus",
+   "target": "sheet-pile-penetration",
+   "kind": "industry"
+  },
+  {
+   "term": "bulkhead wall design granular soil",
+   "target": "sheet-pile-penetration",
+   "kind": "industry"
+  },
+  {
+   "term": "pile driving formula engineering news",
+   "target": "pile-hammer-bearing",
+   "kind": "industry"
+  },
+  {
+   "term": "enr pile bearing capacity",
+   "target": "pile-hammer-bearing",
+   "kind": "industry"
+  },
+  {
+   "term": "set per blow refusal",
+   "target": "pile-hammer-bearing",
+   "kind": "industry"
+  },
+  {
+   "term": "blows per foot pile driving",
+   "target": "pile-hammer-bearing",
+   "kind": "industry"
+  },
+  {
+   "term": "dynamic pile formula reliability",
+   "target": "pile-hammer-bearing",
+   "kind": "industry"
+  },
+  {
+   "term": "berthing energy fender",
+   "target": "berthing-fender-energy",
+   "kind": "industry"
+  },
+  {
+   "term": "fender selection kinetic energy",
+   "target": "berthing-fender-energy",
+   "kind": "industry"
+  },
+  {
+   "term": "approach velocity berthing",
+   "target": "berthing-fender-energy",
+   "kind": "industry"
+  },
+  {
+   "term": "eccentricity factor berthing",
+   "target": "berthing-fender-energy",
+   "kind": "industry"
+  },
+  {
+   "term": "virtual mass added mass berthing",
+   "target": "berthing-fender-energy",
+   "kind": "industry"
+  },
+  {
+   "term": "mooring line load wind current",
+   "target": "mooring-load-wind-current",
+   "kind": "industry"
+  },
+  {
+   "term": "vessel mooring force calculation",
+   "target": "mooring-load-wind-current",
+   "kind": "industry"
+  },
+  {
+   "term": "current drag on hull moored",
+   "target": "mooring-load-wind-current",
+   "kind": "industry"
+  },
+  {
+   "term": "mooring line safety factor mbl",
+   "target": "mooring-load-wind-current",
+   "kind": "industry"
+  },
+  {
+   "term": "wind area moored vessel",
+   "target": "mooring-load-wind-current",
+   "kind": "industry"
+  },
+  {
+   "term": "bridge pier scour depth",
+   "target": "pier-scour-depth",
+   "kind": "industry"
+  },
+  {
+   "term": "hec-18 local scour",
+   "target": "pier-scour-depth",
+   "kind": "industry"
+  },
+  {
+   "term": "pier skew scour angle of attack",
+   "target": "pier-scour-depth",
+   "kind": "industry"
+  },
+  {
+   "term": "scour foundation depth bridge",
+   "target": "pier-scour-depth",
+   "kind": "industry"
+  },
+  {
+   "term": "contraction scour pier",
+   "target": "pier-scour-depth",
+   "kind": "industry"
+  },
+  {
+   "term": "wave height from fetch",
+   "target": "wave-height-fetch",
+   "kind": "industry"
+  },
+  {
+   "term": "fetch limited wave growth",
+   "target": "wave-height-fetch",
+   "kind": "industry"
+  },
+  {
+   "term": "significant wave height wind",
+   "target": "wave-height-fetch",
+   "kind": "industry"
+  },
+  {
+   "term": "shore protection manual wave hindcast",
+   "target": "wave-height-fetch",
+   "kind": "industry"
+  },
+  {
+   "term": "enclosed water wave estimate",
+   "target": "wave-height-fetch",
+   "kind": "industry"
+  },
   {
    "term": "pallet rack beam capacity",
    "target": "pallet-rack-beam-capacity",
