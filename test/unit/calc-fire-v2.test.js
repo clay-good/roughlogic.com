@@ -277,9 +277,9 @@ test("Braking: zero friction returns error", () => {
   assert.ok(r.error);
 });
 
-test("Braking: reaction distance = v * 1.467 * t", () => {
+test("Braking: reaction distance = v * 22/15 * t", () => {
   const r = computeBrakingDistance({ speed_mph: 60, friction_coefficient: 0.7, reaction_time_s: 1.5 });
-  assert.ok(close(r.reaction_distance_ft, 60 * 1.467 * 1.5, 0.01));
+  assert.ok(close(r.reaction_distance_ft, 60 * (22 / 15) * 1.5, 0.01));
 });
 
 test("Braking: total = braking + reaction", () => {

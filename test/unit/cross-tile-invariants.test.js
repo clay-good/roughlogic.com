@@ -3399,10 +3399,10 @@ test("monotonicity: computeBrakingDistance braking_distance_ft is strictly incre
   const b = computeBrakingDistance({ speed_mph: 60, friction_coefficient: 0.7, grade_percent: 0, reaction_time_s: 1.5 });
   assert.ok(Math.abs(b.braking_distance_ft - 4 * a.braking_distance_ft) / a.braking_distance_ft < 1e-12,
     `braking(60 mph) = ${b.braking_distance_ft} != 4 * braking(30 mph) = ${4 * a.braking_distance_ft}`);
-  // Reaction-distance 1.467 ft/s/mph pin: v=55 / t=1.5 -> 55 * 1.467 * 1.5.
+  // Reaction-distance 22/15 ft/s/mph pin: v=55 / t=1.5 -> 55 * 22/15 * 1.5.
   const rx = computeBrakingDistance({ speed_mph: 55, friction_coefficient: 0.7, grade_percent: 0, reaction_time_s: 1.5 });
-  assert.ok(Math.abs(rx.reaction_distance_ft - 55 * 1.467 * 1.5) < 1e-9,
-    `reaction_distance = ${rx.reaction_distance_ft}, expected ${55 * 1.467 * 1.5} (1.467 ft/s per mph)`);
+  assert.ok(Math.abs(rx.reaction_distance_ft - 55 * (22 / 15) * 1.5) < 1e-9,
+    `reaction_distance = ${rx.reaction_distance_ft}, expected ${55 * (22 / 15) * 1.5} (22/15 ft/s per mph)`);
 });
 
 // --- spec-v14 §10.3 Phase F twenty-seventh monotonicity batch ----------

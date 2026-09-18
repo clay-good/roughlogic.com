@@ -1834,7 +1834,7 @@ export function computeStaticRolloverThreshold({ track_width_in = 72, cg_height_
   // Static Stability Factor: the lateral acceleration (in g) that lifts the inside wheels,
   // SRT = (track width / 2) / CG height. Rollover on a steady curve when v^2/R = SRT x g.
   const srt_g = (track_width_in / 2) / cg_height_in;
-  const rollover_speed_mph = curve_radius_ft > 0 ? Math.sqrt(srt_g * 32.174 * curve_radius_ft) * 0.6818182 : null;
+  const rollover_speed_mph = curve_radius_ft > 0 ? Math.sqrt(srt_g * 32.174 * curve_radius_ft) * (15 / 22) : null;
   if (!Number.isFinite(srt_g)) return { error: "Rollover-threshold math is not a finite value." };
   return {
     srt_g,

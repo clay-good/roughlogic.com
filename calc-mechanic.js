@@ -675,7 +675,7 @@ const renderBrakePadLife = _simpleRenderer({
     // stays as the parenthetical. Compute unchanged.
     { key: "ke", id: "bp-out-ke", label: "KE per stop", value: (r) => fmt(r.ke_kJ * 737.562149, 0) + " ft-lb (" + fmt(r.ke_kJ, 1) + " kJ)" },
     { key: "tr", id: "bp-out-tr", label: "Rotor temp rise per stop", value: (r) => r.rotor_temp_rise_C === null ? "-" : fmt(r.rotor_temp_rise_C * 9 / 5, 1) + " deg F (" + fmt(r.rotor_temp_rise_C, 1) + " deg C)" },
-    { key: "w", id: "bp-out-w", label: "Wear per stop", value: (r) => fmt(r.wear_per_stop_mm * 39.3700787, 3) + " mils (" + fmt(r.wear_per_stop_mm * 1000, 3) + " um)" },
+    { key: "w", id: "bp-out-w", label: "Wear per stop", value: (r) => fmt(r.wear_per_stop_mm * (1 / 0.0254), 3) + " mils (" + fmt(r.wear_per_stop_mm * 1000, 3) + " um)" },
     { key: "m", id: "bp-out-m", label: "Estimated pad life", value: (r) => Number.isFinite(r.miles_until_worn) ? fmt(r.miles_until_worn, 0) + " mi" : "n/a" },
     { key: "ax", id: "bp-out-ax", label: "Per-axle life (front bias)", value: (r) => Number.isFinite(r.front_miles_until_worn) ? "front " + fmt(r.front_miles_until_worn, 0) + " mi / rear " + fmt(r.rear_miles_until_worn, 0) + " mi" : "n/a" },
     { key: "c", id: "bp-out-c", label: "Cost per 100k mi (if $/set supplied)", value: (r) => r.cost_per_100k_miles_usd === null ? "-" : "$" + fmt(r.cost_per_100k_miles_usd, 2) + " / 100,000 mi" },
@@ -1175,7 +1175,7 @@ export function computeAerodynamicDragForce({ speed_mph = 0, frontal_area_ft2 = 
   if (!(Cd > 0)) return { error: "Drag coefficient must be positive." };
   if (!(rhoW > 0)) return { error: "Air density must be positive (lb/ft^3)." };
   const g = 32.174; // ft/s^2
-  const V = Vmph * 1.46667; // ft/s
+  const V = Vmph * (22 / 15); // ft/s
   const rhoMass = rhoW / g; // slug/ft^3
   const dynamic_pressure_psf = 0.5 * rhoMass * V * V;
   const drag_force_lbf = dynamic_pressure_psf * Cd * A;
@@ -1226,7 +1226,7 @@ export function computeVehicleRoadLoadPower({ speed_mph = 0, vehicle_weight_lb =
   // Delegate the aero term to the aerodynamic-drag-force tile so the two cannot drift.
   const aero = computeAerodynamicDragForce({ speed_mph: Vmph, frontal_area_ft2, drag_coefficient, air_density_lb_ft3 });
   if (aero.error) return { error: aero.error };
-  const V = Vmph * 1.46667; // ft/s
+  const V = Vmph * (22 / 15); // ft/s
   const aero_force_lbf = aero.drag_force_lbf;
   const rolling_force_lbf = Crr * W;
   const grade_force_lbf = W * Math.sin(Math.atan(grade / 100));
@@ -3560,7 +3560,7 @@ export function computeTurnRadiusBank({ airspeed_kt = 0, bank_angle_deg = 0 } = 
   if (!(phi > 0 && phi < 90)) return { error: "Bank angle must be over 0 and under 90 degrees." };
   const rad = Math.PI / 180;
   const tan = Math.tan(phi * rad);
-  const v_fps = v * 1.68781;
+  const v_fps = v * (1852 / (0.3048 * 3600));
   const turn_radius_ft = (v_fps * v_fps) / (32.174 * tan);
   const rate_of_turn_deg_s = (v_fps / turn_radius_ft) / rad;
   if (![turn_radius_ft, rate_of_turn_deg_s].every(Number.isFinite)) return { error: "Turn-radius math is not a finite value." };

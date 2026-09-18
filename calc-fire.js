@@ -638,7 +638,7 @@ export const ladderPipeExample = {
 // --- Utility 104: Vehicle Braking Distance ---
 //
 // d_ft = v_mph^2 / (30 * (mu +/- grade%/100))
-// Reaction-time distance = v_mph * 1.467 * t_s.
+// Reaction-time distance = v_mph * 22/15 * t_s (22/15 = 1.4667 ft/s per mph, exactly).
 
 // dims: in { speed_mph: L T^-1, friction_coefficient: dimensionless, grade_percent: dimensionless, reaction_time_s: T }
 //        out: { braking_distance_ft: L, reaction_distance_ft: L, total_distance_ft: L, effective_friction: dimensionless }
@@ -652,7 +652,7 @@ export function computeBrakingDistance({ speed_mph, friction_coefficient, grade_
   const eff = mu + g_pct / 100; // negative grade subtracts
   if (eff <= 0) return { error: "Effective friction is non-positive (downhill on ice)." };
   const braking_ft = (v * v) / (30 * eff);
-  const reaction_ft = v * 1.467 * t;
+  const reaction_ft = v * (22 / 15) * t;
   return {
     braking_distance_ft: braking_ft,
     reaction_distance_ft: reaction_ft,
@@ -793,7 +793,7 @@ export function renderLadderPipeReach(inputRegion, outputRegion, citationEl) {
 //        out: { dom_side_effect: dimensionless }
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderBrakingDistance(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: d = v^2 / (30 * (mu +/- grade%/100)). Reaction distance = v * 1.467 * t.";
+  citationEl.textContent = "Citation: d = v^2 / (30 * (mu +/- grade%/100)). Reaction distance = v * 1.4667 * t (22/15 ft/s per mph).";
   const v = makeNumber("Speed (mph)", "br-v", { step: "any", min: "0" });
   const mu = makeNumber("Road friction coefficient", "br-mu", { step: "any", min: "0", max: "1" });
   const g = makeNumber("Grade (%, downhill negative)", "br-g", { step: "any", value: "0" });

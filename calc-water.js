@@ -274,7 +274,7 @@ export function computePumpEfficiency({ flow_gpm = 0, tdh_ft = 0, motor_kW = 0, 
   if (!(motor_eff > 0 && motor_eff <= 1)) return { error: "Motor efficiency must be 0-1." };
   if (!(drive_eff > 0 && drive_eff <= 1)) return { error: "Drive efficiency must be 0-1." };
   const whp = (flow_gpm * tdh_ft) / 3960; // water horsepower
-  const motor_hp = motor_kW * 1.34102;
+  const motor_hp = motor_kW * (1000 / (550 * 0.3048 * 4.4482216152605));
   const bhp = motor_hp * motor_eff * drive_eff; // brake horsepower at the pump shaft
   const wire_to_water_pct = (whp / motor_hp) * 100;
   let category;

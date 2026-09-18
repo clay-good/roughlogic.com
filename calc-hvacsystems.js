@@ -822,7 +822,7 @@ export function computeHumidifierCapacity({
   // Dry-air density (lb/ft^3) at the altitude pressure and dry-bulb temp.
   const T_K = (Tdb - 32) * 5 / 9 + 273.15;
   const rho_kg_m3 = (P_kPa * 1000) / (287.055 * T_K);
-  const rho_lb_ft3 = rho_kg_m3 * 0.0624280;
+  const rho_lb_ft3 = rho_kg_m3 * (0.3048 * 0.3048 * 0.3048 / 0.45359237);
 
   const m_dot_air_lb_hr = 60 * CFM * rho_lb_ft3;
   const addition_lb_hr = m_dot_air_lb_hr * dW;

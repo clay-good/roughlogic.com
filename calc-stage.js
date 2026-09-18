@@ -1387,7 +1387,7 @@ export function computeMassLawTL({ surface_mass_psf = 0, frequency_hz = 0, incid
   if (!(psf > 0)) return { error: "Surface mass must be positive (lb/ft^2)." };
   if (!(f > 0)) return { error: "Frequency must be positive (Hz)." };
   if (incidence !== "field" && incidence !== "normal") return { error: "Incidence must be field or normal." };
-  const surface_mass_kgm2 = psf * 4.88243;
+  const surface_mass_kgm2 = psf * (0.45359237 / (0.3048 * 0.3048));
   const constant = incidence === "normal" ? 42 : 47;
   const transmission_loss_db = 20 * Math.log10(surface_mass_kgm2 * f) - constant;
   const below_floor = transmission_loss_db < 0;

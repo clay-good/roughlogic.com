@@ -213,3 +213,70 @@ test("no code line converts cfs or horsepower with a truncated inline factor", (
   }
   assert.deepEqual(found, []);
 });
+
+// Every numeric literal in the catalog's code, compared against the exact
+// conversion factors and their reciprocals. A literal within 0.1% of one of
+// them but not equal to it is either a truncated factor or a number that
+// merely lands nearby -- a pipe diameter, a table coefficient, an atomic
+// weight. The second kind is named below with its reason; anything else fails.
+// Added 2026-09-18, when a one-off version of this scan found nine truncated
+// factors (10.764 lux, 1.467 ft/s per mph, 16.0185, 0.133681, 1.34102, ...)
+// that the named-constant table and the inline scans above could not see.
+const _FT = 0.3048, _LB = 0.45359237, _LBF = 4.4482216152605, _MI = 1609.344;
+const NEAR_FACTORS = {
+  "m per ft": _FT, "sq ft per sq m": 1 / _FT ** 2, "sq m per sq ft": _FT ** 2, "cu m per cu ft": _FT ** 3,
+  "cu ft per cu m": 1 / _FT ** 3, "kg per lb": _LB, "lb per kg": 1 / _LB, "L per gal": 3.785411784,
+  "gal per cu ft": 1728 / 231, "cu ft per gal": 231 / 1728, "in per m": 1 / 0.0254, "km per mi": 1.609344,
+  "mi per km": 1 / 1.609344, "N per lbf": _LBF, "kPa per psi": _LBF / 0.0254 ** 2 / 1000,
+  "psi per kPa": 1000 * 0.0254 ** 2 / _LBF, "Pa per psf": _LBF / _FT ** 2, "kg/m2 per lb/ft2": _LB / _FT ** 2,
+  "lb/ft2 per kg/m2": _FT ** 2 / _LB, "gpm per cfs": 60 * 1728 / 231, "kW per hp": 550 * _FT * _LBF / 1000,
+  "hp per kW": 1000 / (550 * _FT * _LBF), "m/s per mph": _MI / 3600, "mph per m/s": 3600 / _MI,
+  "ft/s per mph": 22 / 15, "mph per ft/s": 15 / 22, "kg/m3 per lb/ft3": _LB / _FT ** 3,
+  "lb/ft3 per kg/m3": _FT ** 3 / _LB, "L per cu ft": _FT ** 3 * 1000, "acre per ha": 1e4 / (43560 * _FT ** 2),
+  "m/s per knot": 1852 / 3600, "ft/s per knot": 1852 / (_FT * 3600),
+};
+const NEAR_MISS_ALLOWED = new Map(Object.entries({
+  "calc-accounting.js:0.205": "a tax or rate figure, not a unit conversion",
+  "calc-airquality.js:0.6214": "a worked-example input: one kilometre typed in miles",
+  "calc-cross.js:0.6215": "the NWS wind-chill coefficient",
+  "calc-drainage.js:0.51429": "a TR-55 unit-peak-discharge table coefficient",
+  "calc-drainage.js:2.23537": "a TR-55 unit-peak-discharge table coefficient",
+  "calc-drainage.js:2.20282": "a TR-55 unit-peak-discharge table coefficient",
+  "calc-drainage.js:2.47317": "a TR-55 unit-peak-discharge table coefficient",
+  "calc-drainage.js:0.682": "a TR-55 Fp/ponding table coefficient",
+  "calc-gas.js:1.610": "the 1-1/2 in Schedule 40 inside diameter", "calc-gas.js:2.469": "the 2-1/2 in Schedule 40 inside diameter",
+  "calc-hvacsystems.js:1.610": "the 1-1/2 in Schedule 40 inside diameter", "calc-hvacsystems.js:2.469": "the 2-1/2 in Schedule 40 inside diameter",
+  "calc-pipefit.js:1.610": "the 1-1/2 in Schedule 40 inside diameter", "calc-pipefit.js:2.469": "the 2-1/2 in Schedule 40 inside diameter",
+  "calc-plumbing.js:1.610": "the 1-1/2 in Schedule 40 inside diameter", "calc-plumbing.js:2.469": "the 2-1/2 in Schedule 40 inside diameter",
+  "calc-plumbing.js:0.145": "a 1-1/2 in pipe wall thickness",
+  "calc-hvac.js:0.621945": "the water/air molecular-weight ratio 18.01528 / 28.9645",
+  "calc-hvacsystems.js:0.621945": "the water/air molecular-weight ratio 18.01528 / 28.9645",
+  "calc-lab.js:47.867": "the atomic weight of titanium",
+  "calc-telecom.js:1.468": "a fibre group index",
+  "calc-electrical.js:0.746": "the motor convention its premium-motor formula and citation print",
+  "calc-motor.js:0.746": "the motor convention its formulas and citations print",
+  "calc-hvac.js:0.746": "the DOE compressed-air 0.746 kW/hp its batch comment names",
+}));
+
+test("no literal in the catalog sits within 0.1% of an exact conversion factor without being it", () => {
+  const found = [];
+  let scanned = 0;
+  for (const file of readdirSync(ROOT).filter((f) => /^calc-.*\.js$/.test(f) || f === "pure-math.js")) {
+    readFileSync(resolve(ROOT, file), "utf8").split("\n").forEach((line, i) => {
+      if (/^\s*\/\//.test(line)) return;
+      const code = line.replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`/g, '""').replace(/\/\/.*$/, "");
+      for (const m of code.matchAll(/(?<![\w.])(\d+\.\d{3,})(?![\w.])/g)) {
+        scanned++;
+        const v = Number(m[1]);
+        for (const [name, exact] of Object.entries(NEAR_FACTORS)) {
+          const rel = Math.abs(v - exact) / exact;
+          if (rel > 1e-9 && rel < 1e-3 && !NEAR_MISS_ALLOWED.has(`${file}:${m[1]}`)) {
+            found.push(`${file}:${i + 1}: ${m[1]} is ${(rel * 1e6).toFixed(1)} ppm off ${name} (${exact})`);
+          }
+        }
+      }
+    });
+  }
+  assert.ok(scanned > 1500, `expected to scan the catalog's literals, scanned ${scanned}`);
+  assert.deepEqual(found, []);
+});

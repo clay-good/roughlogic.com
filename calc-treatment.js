@@ -1518,12 +1518,12 @@ export function computeOilWaterSeparatorSizing({ flow_gpm = 50, oil_sg = 0.85, d
   const RHO_W_LB_FT3 = 62.3; // water at ~60 F
   const F = 1.2;             // API 421 turbulence / short-circuit factor
   const d_m = droplet_micron * 1e-6;
-  const rho_w = RHO_W_LB_FT3 * 16.0185;
+  const rho_w = RHO_W_LB_FT3 * (0.45359237 / (0.3048 * 0.3048 * 0.3048));
   const rho_o = oil_sg * rho_w;
   const mu = water_viscosity_cp * 1e-3;
   const vt_ms = 9.81 * (rho_w - rho_o) * d_m * d_m / (18 * mu);
   const rise_velocity_ftmin = vt_ms * 3.28084 * 60;
-  const q_ft3min = flow_gpm * 0.133681;
+  const q_ft3min = flow_gpm * (231 / 1728);
   const horizontal_area_ft2 = F * q_ft3min / rise_velocity_ftmin;
   if (![rise_velocity_ftmin, horizontal_area_ft2].every(Number.isFinite)) return { error: "Separator-sizing math is not a finite value." };
   return {

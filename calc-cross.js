@@ -3068,7 +3068,7 @@ export function computeSwingFallGeometry({ horizontal_offset_ft = 0, anchor_heig
   const swing_angle_deg = swing_angle_rad * 180 / Math.PI;
   const swing_drop_ft = L - Math.sqrt(L * L - x * x);
   const impact_speed_fps = Math.sqrt(2 * 32.174 * swing_drop_ft);
-  const impact_speed_mph = impact_speed_fps * 0.681818;
+  const impact_speed_mph = impact_speed_fps * (15 / 22);
   const arc_length_ft = L * swing_angle_rad;
   const total_required_clearance_ft = base + swing_drop_ft;
   // Epsilon-guarded: asin(0.5) in degrees lands a hair above 30 in floating point, and an

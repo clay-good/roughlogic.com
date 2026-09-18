@@ -176,7 +176,7 @@ export function computePointIlluminance({ intensity_cd = 0, mount_height_ft = 0,
   const cosA = Math.cos(ang * Math.PI / 180);
   const distance_ft = h / cosA;                        // slant distance source-to-point
   const e_fc = cd * cosA / (distance_ft * distance_ft); // = cd * cos^3 / h^2
-  const e_lux = e_fc * 10.764;
+  const e_lux = e_fc * (1 / (0.3048 * 0.3048));
   return {
     distance_ft: Number.isFinite(distance_ft) ? distance_ft : null,
     e_fc: Number.isFinite(e_fc) ? e_fc : null,
@@ -252,13 +252,13 @@ export function computePointMethodRequiredCandela({ target_illuminance = 0, illu
   if (unit !== "fc" && unit !== "lux") return { error: "Illuminance unit must be fc or lux." };
   if (!(h > 0)) return { error: "Mounting height must be positive (ft)." };
   if (ang < 0 || ang >= 90) return { error: "Angle from nadir must be in [0, 90) degrees." };
-  const e_fc = unit === "lux" ? target / 10.764 : target;
+  const e_fc = unit === "lux" ? target / (1 / (0.3048 * 0.3048)) : target;
   const cosA = Math.cos(ang * Math.PI / 180);
   // Inverse of E_fc = I x cos^3(angle) / h^2: I = E_fc x h^2 / cos^3(angle).
   const required_cd = e_fc * h * h / (cosA * cosA * cosA);
   if (!Number.isFinite(required_cd) || !(required_cd > 0)) return { error: "Candela math is not a finite positive value." };
   return {
-    required_cd, e_fc, e_lux: e_fc * 10.764,
+    required_cd, e_fc, e_lux: e_fc * (1 / (0.3048 * 0.3048)),
     note: "The luminous intensity a fixture must aim toward a point to hit a target illuminance, the inverse of the point-illuminance tile: from E = I x cos^3(angle) / height^2 (the IES point method, inverse-square + cosine), I = E x height^2 / cos^3(angle) with E in footcandles (lux / 10.764). The candela climbs steeply off-nadir - the cos^3 in the denominator means a point 30 deg to the side needs about 54% more candlepower than the point straight below for the same footcandles, which is why the aiming angle and the fixture's candela at that angle (from its photometric file) matter as much as its rating. This is the direct component from one source, ignoring interreflection. The photometric file and the IES target level govern."
   };
 }

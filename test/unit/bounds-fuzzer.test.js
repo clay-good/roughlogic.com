@@ -4991,7 +4991,7 @@ test("bounds: spec-v1224 computeEyringReverberation pins RT60 = 0.049 V/(-S ln(1
 test("bounds: spec-v1242 computeMassLawTL pins TL = 20 log10(m f) - 47, the field/normal offset, the +6 dB doubling, and error seams", () => {
   // 2 lb/ft^2 at 500 Hz, field: m 9.765 kg/m^2, TL 26.8 dB.
   const r = computeMassLawTL({ surface_mass_psf: 2.0, frequency_hz: 500, incidence: "field" });
-  assert.ok(Math.abs(r.surface_mass_kgm2 - 2.0 * 4.88243) < 1e-9);
+  assert.ok(Math.abs(r.surface_mass_kgm2 - 2.0 * (0.45359237 / (0.3048 * 0.3048))) < 1e-9);
   assert.ok(Math.abs(r.transmission_loss_db - (20 * Math.log10(r.surface_mass_kgm2 * 500) - 47)) < 1e-12);
   assert.ok(Math.abs(r.transmission_loss_db - 26.8) < 0.1);
   // Normal incidence is exactly 5 dB higher than field (47 - 42).
@@ -52860,7 +52860,7 @@ test("bounds: spec-v1827 computePhosphateCoatingWeight -- one face reports exact
   assert.ok(/EXCEEDS THE MAXIMUM/.test(iron.spec_verdict));
   assert.ok(Math.abs(iron.margin_mg_ft2 - 25) < 0.01);
   // IDENTITY: the metric conversion, and linearity in the mass lost.
-  assert.ok(Math.abs(r.coating_g_m2 - r.coating_mg_ft2 * 10.7639 / 1000) < 1e-12);
+  assert.ok(Math.abs(r.coating_g_m2 - r.coating_mg_ft2 / (0.3048 * 0.3048) / 1000) < 1e-12);
   const heavier = _v1827({ ...base, mass_after_g: 45.612 });
   assert.ok(Math.abs(heavier.mass_lost_mg - 70) < 1e-6);
   assert.ok(Math.abs(heavier.coating_mg_ft2 - 2 * r.coating_mg_ft2) < 1e-6);
