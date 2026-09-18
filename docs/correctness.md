@@ -154,6 +154,47 @@ is bit-stable across Node 20, Node 22, and the latest Node LTS
 at v14 close; the test fixture pins the IEEE 754 double bit
 pattern.
 
+### Where Phase B's independence does not hold
+
+Not every fixture row meets the promise above. As of 2026-09-18,
+**255 tiles'** only row is their own spec's worked example,
+recomputed (publisher `Project (first-principles)`, title "the
+spec-vN worked example, recomputed"). A spec and a tile that
+share an error agree with each other, so these rows cannot catch
+one. Spec-v1784's glycol load is an example: the spec charged a
+fermenting tank the shell gain of a crashed one, the tile copied
+it, and the fixture agreed.
+
+For those tiles, a per-module reference suite,
+`test/unit/calc-<module>.test.js`, holds each tile to something
+its spec did not write. That can be:
+
+- a published table;
+- a constant re-derived from its definition;
+- an independent numeric method (virtual work, a Gaussian overlap
+  integral, a time-stepped simulation, a brute-force scan);
+- a limit the cited reference places on its own relation.
+
+| | Modules | Tiles |
+|---|---|---|
+| Covered | 11: brewing, corrosion, greenhouse, waste, marine, warehouse, datacenter, telecom, controls, winterops, finishing | 101 |
+| Not yet | 23, led by hvacsystems and oilgas (15 each), airquality and process (12), inspection (11), refrigeration (10) | 154 |
+
+The first eleven suites found seven defects, all shown in
+[CHANGELOG.md](../CHANGELOG.md):
+
+- a glycol load taken at the wrong beer temperature;
+- a tank-grid coverage figure that ignored the rim;
+- fifteen truncated conversion factors;
+- HEC-18's three limits on its own pier-scour equation;
+- the Shore Protection Manual's fully developed sea;
+- an undisclosed gap to EPA's LandGEM;
+- a buckling square law quoted outside its elastic range.
+
+The pattern that yields most is to read each tile against its
+reference's own bounds and sub-cases. The specs state the
+headline formula and omit the limits.
+
 ## Cross-tile invariants (Phase F)
 
 Where two or more tiles share a computation (AWG-to-cmils,
